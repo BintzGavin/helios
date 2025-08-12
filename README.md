@@ -71,11 +71,24 @@ All rendering paths feed their output into FFmpeg, the industry-standard tool fo
 - **Direct Execution**: We spawn FFmpeg directly as a child process from Node.js (`child_process.spawn`). This is a more stable and future-proof approach than relying on third-party JavaScript wrappers (like the deprecated `fluent-ffmpeg`), which can become outdated or introduce an unnecessary layer of abstraction.
 - **Performance Optimization**: To minimize disk I/O, which is a major bottleneck, the engine pipes image data (as `Buffer`s) directly from the browser to FFmpeg's `stdin`, avoiding the need to write thousands of temporary frame files to disk. FFmpeg is configured to accept this piped input using the `image2pipe` demuxer.
 - **Audio Integration**: The engine will support audio by using FFmpeg's powerful filter complex (e.g., `amix`) to mix multiple audio sources programmatically.
+### 4. The In-Browser Player: A High-Fidelity Preview Engine
+The in-browser player is crucial for providing developers with a rapid, iterative feedback loop. The key to a true "what you see is what you get" (WYSIWYG) experience is to use the exact same bundled composition code for both the in-browser preview and the final server-side render.
+
+The fidelity of the preview is significantly improved by leveraging the same dual-path architecture:
+- For **DOM-based** compositions, the player uses a `requestAnimationFrame` loop to drive the animation, providing a good approximation of the final output.
+- For **canvas-based** compositions, the player can use the native browser WebCodecs API to generate a true video preview in real-time. This provides a preview that is much more accurate in terms of timing, performance, and final appearance than a simple frame loop.
 ## Technology Stack
- - Browser Automation: Playwright - Chosen for its superior resilience (auto-waiting), native cross-browser support (Chromium, Firefox, WebKit), and modern API.
- - Video Encoding: FFmpeg - Invoked directly via child_process.spawn for maximum control, stability, and performance.
- - Core Language: TypeScript - For type safety, improved developer experience, and a more maintainable codebase.
- - Bundling: Vite / Rollup - Modern, fast, and optimized for building libraries.
+- **Browser Automation: Playwright**: Chosen for its superior resilience, cross-browser support, and developer experience. While Puppeteer is a viable alternative, Playwright's architectural advantages are a better fit for a production-grade rendering engine.
+
+| Feature | Puppeteer | Playwright | Recommendation & Rationale |
+|---|---|---|---|
+| **Auto-Waiting/Resilience** | Requires manual `waitFor` calls, a common source of flaky renders. | **Built-in auto-waiting** for elements to be actionable, drastically reducing flakiness. | **Playwright**. Resilience is paramount for a library rendering arbitrary user content. |
+| **Cross-Browser Support** | Primarily Chromium. | **Native support for Chromium, Firefox, and WebKit.** | **Playwright**. Provides greater flexibility and future-proofs the library. |
+| **Debugging Tools** | Basic debugging. | **Comprehensive suite** including Playwright Inspector and Trace Viewer. | **Playwright**. Superior tooling accelerates debugging for both library and end-user code. |
+
+- **Video Encoding: FFmpeg**: Invoked directly via `child_process.spawn` for maximum control, stability, and performance.
+- **Core Language: TypeScript**: For type safety, improved developer experience, and a more maintainable codebase.
+- **Bundling: Vite / Rollup**: Modern, fast, and optimized for building libraries.
 ## Project Status
 Alpha: This project is in the early stages of development. The architecture is defined, but the API is subject to change. We are actively seeking contributors to help shape the future of the project!
 ## Roadmap: The Future of Helios
@@ -98,6 +111,21 @@ The architecture is designed to be container-native and platform-agnostic, givin
 
 - **AWS Lambda**: Ideal for users prioritizing hyper-parallelism and minimum render time. Lambda is optimized for massive, fine-grained parallelism, which is perfect for splitting a video render across hundreds or thousands of concurrent function executions. This requires a chunking architecture and a final stitching step.
 - **Google Cloud Run**: Ideal for users prioritizing simplicity and long-running jobs. Cloud Run can run standard Docker containers for extended periods (up to 24 hours), allowing a single container invocation to render an entire video from start to finish without the complexity of chunking and stitching.
+
+#### Distributed Rendering Workflow and Concatenation
+The success of a distributed rendering architecture hinges on the video concatenation strategy. Merging video chunks must be done without a costly re-encode. FFmpeg offers several methods, but only one is suitable:
+
+| Method | How it Works | Supported Formats | Use Case for This Project |
+|---|---|---|---|
+| **Concat Demuxer** | Operates at the file level from a text file list. Can stream copy if codecs match. | All formats, including MP4. | **Recommended**. The only method for losslessly stitching MP4 chunks. |
+| Concat Protocol | Operates at the bitstream level. | Simple stream formats (e.g., MPEG-2 PS). Not compatible with MP4. | Unsuitable. Will fail or corrupt MP4 files. |
+| Concat Filter | A complex filter that decodes and re-encodes frames. | All formats. | Unsuitable. Re-encoding is slow and causes quality loss. |
+
+The distributed workflow is as follows:
+1.  **Orchestration**: A coordinator function (e.g., AWS Step Function) divides the video into `N` logical chunks (e.g., frames 0-299, 300-599, etc.).
+2.  **Parallel Execution**: The orchestrator invokes `N` parallel workers (e.g., Lambda functions), assigning each a frame range.
+3.  **Chunk Rendering**: Each worker renders its video and audio segments as separate files (e.g., `chunk_1.mp4`, `chunk_1.aac`) and uploads them to a shared location like S3.
+4.  **Final Stitching**: A final assembly job uses FFmpeg's `concat` demuxer to perform a fast, lossless merge of the video and audio chunks into the final output file.
 ## Getting Started (for Contributors)
 We are excited to have you contribute! Here’s how to get your development environment set up.
  - Fork & Clone: Fork the repository and clone it to your local machine.
