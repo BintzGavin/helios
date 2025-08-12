@@ -1,8 +1,6 @@
 # Helios Engine
-(https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-(https://img.shields.io/discord/830822222995710024?color=7289DA&label=discord&logo=discord&logoColor=white)](https://discord.gg/your-invite-link)
 
-Helios is a modern, performant, and framework-agnostic engine for programmatic video creation.
+Helios is a vision for a modern, performant, and framework-agnostic engine for programmatic video creation.
 The vision is to empower developers to create high-quality, dynamic videos using standard web technologies (HTML, CSS, JS) without being locked into a specific UI framework. Helios prioritizes performance, a superior developer experience, and a flexible architecture that leverages native browser APIs to deliver a next-generation video creation toolkit for the web.
 Table of Contents
  * Core Principles
