@@ -52,6 +52,9 @@ This architecture offers several profound advantages:
 - **Familiarity**: It unlocks the full power of the web platform, including complex easing functions, sequencing, and synchronization, using an API that is already a W3C standard.
 ### 3. The Rendering Pipeline: The Engine
 The server-side engine transforms a composition into a final video file. It features a powerful dual-path architecture to intelligently select the most efficient rendering strategy based on the nature of the composition.
+
+> **Note on Initial Implementation**: For the initial MVP, we will prioritize the **Canvas-to-Video** path. This approach offers superior performance and a faster path to a minimum viable product. The more versatile **DOM-to-Video** path is a planned feature for a subsequent release.
+
 #### Path 1: DOM-to-Video (Versatile)
 This path is a proven and versatile method for capturing any content that can be rendered in a web browser. It is ideal for compositions that rely on the standard DOM, including HTML elements, CSS styling, and SVG graphics.
 - **Technology**: This path uses Playwright to launch a headless browser, render the full DOM for each frame, and capture a screenshot. A critical optimization is ensuring all assets (images, fonts, etc.) are fully pre-loaded before the render loop begins to prevent rendering artifacts.
