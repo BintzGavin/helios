@@ -38,6 +38,9 @@ To provide an idiomatic authoring experience, we will offer small, dedicated NPM
 #### Playback via Web Components
 For the in-browser preview, the player UI (scrubber, controls, etc.) is encapsulated as a standard **Web Component** (`<helios-player>`). This ensures maximum portability and isolation. The player can be dropped into any HTML page, regardless of the surrounding framework, without style or script conflicts. It uses a sandboxed `<iframe>` internally to render the user's composition, providing a clean and isolated environment for a true WYSIWYG preview.
 ### 2. The Animation System: A Modern, Performant Approach
+
+> **Note on Animation for MVP**: The Web Animations API (WAAPI) approach described here is ideal for the versatile DOM-to-Video path. For the initial canvas-focused MVP, animations will be driven directly by the chosen canvas library's internal loop (e.g., a `requestAnimationFrame` loop in Three.js or Pixi.js). In this mode, Helios's role is to control the master timeline by providing the correct `currentTime` to the canvas on each frame.
+
 A primitive approach to animation would require developers to write inefficient logic that re-runs on every single frame (e.g., `if (frame > 100) { opacity = 1; }`). Helios avoids this by leveraging the browser's native **Web Animations API (WAAPI)** for a more declarative and performant animation model.
 
 The implementation is simple but powerful:
@@ -52,6 +55,9 @@ This architecture offers several profound advantages:
 - **Familiarity**: It unlocks the full power of the web platform, including complex easing functions, sequencing, and synchronization, using an API that is already a W3C standard.
 ### 3. The Rendering Pipeline: The Engine
 The server-side engine transforms a composition into a final video file. It features a powerful dual-path architecture to intelligently select the most efficient rendering strategy based on the nature of the composition.
+
+> **Note on Initial Implementation**: For the initial MVP, we will prioritize the **Canvas-to-Video** path. This approach offers superior performance and a faster path to a minimum viable product. The more versatile **DOM-to-Video** path is a planned feature for a subsequent release.
+
 #### Path 1: DOM-to-Video (Versatile)
 This path is a proven and versatile method for capturing any content that can be rendered in a web browser. It is ideal for compositions that rely on the standard DOM, including HTML elements, CSS styling, and SVG graphics.
 - **Technology**: This path uses Playwright to launch a headless browser, render the full DOM for each frame, and capture a screenshot. A critical optimization is ensuring all assets (images, fonts, etc.) are fully pre-loaded before the render loop begins to prevent rendering artifacts.
