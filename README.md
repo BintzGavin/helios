@@ -38,6 +38,9 @@ To provide an idiomatic authoring experience, we will offer small, dedicated NPM
 #### Playback via Web Components
 For the in-browser preview, the player UI (scrubber, controls, etc.) is encapsulated as a standard **Web Component** (`<helios-player>`). This ensures maximum portability and isolation. The player can be dropped into any HTML page, regardless of the surrounding framework, without style or script conflicts. It uses a sandboxed `<iframe>` internally to render the user's composition, providing a clean and isolated environment for a true WYSIWYG preview.
 ### 2. The Animation System: A Modern, Performant Approach
+
+> **Note on Animation for MVP**: The Web Animations API (WAAPI) approach described here is ideal for the versatile DOM-to-Video path. For the initial canvas-focused MVP, animations will be driven directly by the chosen canvas library's internal loop (e.g., a `requestAnimationFrame` loop in Three.js or Pixi.js). In this mode, Helios's role is to control the master timeline by providing the correct `currentTime` to the canvas on each frame.
+
 A primitive approach to animation would require developers to write inefficient logic that re-runs on every single frame (e.g., `if (frame > 100) { opacity = 1; }`). Helios avoids this by leveraging the browser's native **Web Animations API (WAAPI)** for a more declarative and performant animation model.
 
 The implementation is simple but powerful:
