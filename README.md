@@ -126,28 +126,7 @@ The distributed workflow is as follows:
 2.  **Parallel Execution**: The orchestrator invokes `N` parallel workers (e.g., Lambda functions), assigning each a frame range.
 3.  **Chunk Rendering**: Each worker renders its video and audio segments as separate files (e.g., `chunk_1.mp4`, `chunk_1.aac`) and uploads them to a shared location like S3.
 4.  **Final Stitching**: A final assembly job uses FFmpeg's `concat` demuxer to perform a fast, lossless merge of the video and audio chunks into the final output file.
-## Getting Started (for Contributors)
-We are excited to have you contribute! Here’s how to get your development environment set up.
- - Fork & Clone: Fork the repository and clone it to your local machine.
-   ```bash
-   git clone https://github.com/your-username/helios-engine.git
-   cd helios-engine
-   ```
 
- - Install Dependencies: Navigate to the project root and run:
-   ```bash
-   npm install
-   ```
-
- - Build the Library: To run a one-time build of the library, use:
-   ```bash
-   npm run build
-   ```
-
-   For a development server that watches for changes and enables hot-reloading, use:
-   ```bash
-   npm run dev
-   ```
 ### Development Workflow & Debugging
 A seamless local development workflow is crucial for productivity. We recommend a hot-reloading environment for developers working on the library itself or on compositions using it.
 
@@ -157,24 +136,5 @@ A seamless local development workflow is crucial for productivity. We recommend 
   - **Remote Debugging**: A `--debug` flag can launch the browser with a remote debugging port open. This allows you to connect the familiar Chrome DevTools to the headless instance to inspect the DOM, view console logs, and debug JavaScript live.
   - **Playwright Trace Viewer**: For post-mortem analysis, you can enable Playwright's Trace Viewer. It captures a complete trace of a render, including a video screencast, live DOM snapshots, console logs, and network requests, which is invaluable for diagnosing failed renders.
 
-## Contributing
-Contributions are what make the open-source community such an amazing place to learn, inspire, and create. Any contributions you make are greatly appreciated.
-Please read our CONTRIBUTING.md for details on our code of conduct and the process for submitting pull requests to us.
-#### How to Contribute
- - Find an Issue: Look for existing issues or create your own to discuss a new feature or bug.
- - Fork the Project: Create your own fork of the project to work on.
- - Create a Branch:
-   ```bash
-   git checkout -b feature/AmazingFeature
-   ```
- - Commit Your Changes:
-   ```bash
-   git commit -m 'Add some AmazingFeature'
-   ```
- - Push to the Branch:
-   ```bash
-   git push origin feature/AmazingFeature
-   ```
- - Open a Pull Request: Create a pull request with a clear description of your changes, linking it to the relevant issue.
 ## License
 Distributed under the MIT License. See LICENSE for more information.
