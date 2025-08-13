@@ -13,8 +13,6 @@ Table of Contents
 - [Roadmap: The Future of Helios](#roadmap-the-future-of-helios)
   - [V2: Distributed Rendering & Advanced Audio](#v2-distributed-rendering--advanced-audio)
   - [V3: Native Node.js Encoding](#v3-native-nodejs-encoding)
-- [Getting Started (for Contributors)](#getting-started-for-contributors)
-- [Contributing](#contributing)
 - [License](#license)
 ## Core Principles
 The development of Helios is guided by a set of foundational principles that inform every architectural decision.
