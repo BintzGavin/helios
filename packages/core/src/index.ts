@@ -80,7 +80,7 @@ export class Helios {
     const nextFrame = this.state.currentFrame + 1;
 
     if (nextFrame >= totalFrames) {
-      this.setState({ currentFrame: totalFrames });
+      this.setState({ currentFrame: totalFrames - 1 });
       this.pause();
       return;
     }
