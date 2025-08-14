@@ -1,0 +1,21 @@
+{
+  "name": "helios",
+  "version": "0.0.1",
+  "private": true,
+  "description": "A framework-agnostic engine for programmatic video creation.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BintzGavin/helios.git"
+  },
+  "license": "MIT",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "npx vite ./examples/simple-animation"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0",
+    "vite": "^7.1.2"
+  }
+}

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simple Composition</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      background-color: #eee;
+    }
+    .animated-box {
+      width: 150px;
+      height: 150px;
+      background-color: #007bff;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+
+      /* Animation */
+      animation-name: fadeInMove;
+      animation-duration: 5s; /* This will be controlled by the player */
+      animation-timing-function: linear;
+      animation-fill-mode: forwards;
+
+      /* Paused by default, will be controlled by timeline */
+      animation-play-state: paused;
+    }
+    @keyframes fadeInMove {
+      0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.5);
+      }
+      50% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1.2);
+      }
+      100% {
+        opacity: 1;
+        transform: translate(calc(50vw - 100%), -50%) scale(1);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="animated-box"></div>
+</body>
+</html>
