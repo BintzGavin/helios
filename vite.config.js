@@ -7,7 +7,8 @@ export default defineConfig({
   resolve: {
     alias: {
       'helios-core': new URL('packages/core/src/index.ts', import.meta.url).pathname,
-      'helios-player': new URL('packages/player/src/index.ts', import.meta.url).pathname,
+      'helios-core': fileURLToPath(new URL('packages/core/src/index.ts', import.meta.url)),
+      'helios-player': fileURLToPath(new URL('packages/player/src/index.ts', import.meta.url)),
     }
   }
 });
