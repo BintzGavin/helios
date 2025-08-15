@@ -12,7 +12,7 @@
     "packages/*"
   ],
   "scripts": {
-    "dev": "npx vite ./examples/simple-animation",
+    "dev": "npx vite ./examples/simple-canvas-animation",
     "render:canvas-example": "ts-node packages/renderer/scripts/render.ts"
   },
   "devDependencies": {
