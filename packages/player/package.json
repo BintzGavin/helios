@@ -12,7 +12,6 @@
     "mp4-muxer": "^2.0.1"
   },
   "devDependencies": {
-    "@types/w3c-web-codecs": "^0.1.10",
     "typescript": "^5.0.0"
   }
 }

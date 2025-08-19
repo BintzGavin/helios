@@ -17,12 +17,40 @@
     h1 {
       color: #333;
     }
-    helios-player {
+    .player-container {
       width: 80%;
       max-width: 960px;
+      margin-bottom: 2rem;
+    }
+    helios-player {
+      width: 100%;
       box-shadow: 0 4px 15px rgba(0,0,0,0.1);
       border-radius: 8px;
-      overflow: hidden; /* Ensures the shadow is applied correctly */
+      overflow: hidden;
+    }
+    .examples {
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+      width: 100%;
+    }
+    .example {
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 1rem;
+      background: white;
+    }
+    .example h3 {
+      margin-top: 0;
+      color: #333;
+    }
+    .note {
+      background: #d4edda;
+      border: 1px solid #c3e6cb;
+      border-radius: 4px;
+      padding: 0.75rem;
+      margin-bottom: 1rem;
+      color: #155724;
     }
   </style>
 </head>
@@ -30,18 +58,36 @@
 
   <h1>Helios Player Demo</h1>
 
-  <helios-player
-    src="./composition.html"
-    duration="5"
-    fps="60">
-  </helios-player>
+  <div class="examples">
+    <div class="example">
+      <h3>DOM-based Animation (Export Supported!)</h3>
+      <div class="note">
+        ✅ This composition uses HTML/CSS animations. Video export automatically converts DOM to canvas during rendering.
+      </div>
+      <helios-player
+        src="./composition.html"
+        duration="5"
+        fps="30">
+      </helios-player>
+    </div>
+
+    <div class="example">
+      <h3>Canvas-based Animation (Export Supported)</h3>
+      <div class="note">
+        ✅ This composition uses a canvas element. Direct video export using WebCodecs API.
+      </div>
+      <helios-player
+        src="./canvas-composition.html"
+        duration="5"
+        fps="30">
+      </helios-player>
+    </div>
+  </div>
 
   <!--
-    We use type="module" and an aliased path, which Vite's dev server
-    will resolve and handle on the fly. In a production build, this would
-    point to a single bundled JS file.
+    We use type="module" and import the player module.
   -->
-  <script type="module" src="helios-player"></script>
+  <script type="module" src="./import-player.js"></script>
 
 </body>
 </html>
