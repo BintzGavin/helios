@@ -18,33 +18,34 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-
-      /* Animation */
-      animation-name: fadeInMove;
-      animation-duration: 5s; /* This will be controlled by the player */
-      animation-timing-function: linear;
-      animation-fill-mode: forwards;
-
-      /* Paused by default, will be controlled by timeline */
-      animation-play-state: paused;
-    }
-    @keyframes fadeInMove {
-      0% {
-        opacity: 0;
-        transform: translate(-50%, -50%) scale(0.5);
-      }
-      50% {
-        opacity: 1;
-        transform: translate(-50%, -50%) scale(1.2);
-      }
-      100% {
-        opacity: 1;
-        transform: translate(calc(50vw - 100%), -50%) scale(1);
-      }
+      
+      /* Use CSS custom properties for animation control */
+      --animation-progress: 0;
+      --animation-duration: 5s;
+      --animation-start-time: 0s;
+      --animation-end-time: 5s;
+      
+      /* Calculate position based on progress */
+      opacity: calc(var(--animation-progress) * 2);
+      transform: translate(
+        calc(-50% + (var(--animation-progress) * (50vw - 100%))),
+        -50%
+      ) scale(calc(0.5 + var(--animation-progress) * 0.5));
+      
+      transition: opacity 0.1s linear, transform 0.1s linear;
     }
   </style>
 </head>
 <body>
   <div class="animated-box"></div>
+  
+  <script type="module">
+    // Import the framework-provided animation helpers
+    import { initializeAnimation } from '../../packages/core/dist/index.js';
+    
+    // Initialize the animation system
+    // This automatically sets up the window functions that the player needs
+    initializeAnimation('.animated-box');
+  </script>
 </body>
 </html>
