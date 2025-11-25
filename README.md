@@ -1,26 +1,26 @@
 # Helios Engine
 
-Helios is a vision for a modern, performant, and framework-agnostic engine for programmatic video creation.
-The vision is to empower developers to create high-quality, dynamic videos using standard web technologies (HTML, CSS, JS) without being locked into a specific UI framework. Helios prioritizes performance, a superior developer experience, and a flexible architecture that leverages native browser APIs to deliver a next-generation video creation toolkit for the web.
-Table of Contents
+Helios is a modern, framework-agnostic engine for programmatic video creation.
+
+Create high-quality videos using the web technologies you already know—HTML, CSS, and JavaScript. No new paradigms to learn. Use your existing CSS animations, your favorite framework (or none), and prototype fast.
+
+Helios prioritizes **developer experience** and **rapid prototyping** alongside performance, leveraging native browser APIs to deliver a next-generation video creation toolkit for the web.
+**Table of Contents**
 - [Core Principles](#core-principles)
+- [Helios vs Remotion](#helios-vs-remotion)
 - [Architectural Deep Dive](#architectural-deep-dive)
-  - [1. The Composition Layer: The Authoring Experience](#1-the-composition-layer-the-authoring-experience)
-  - [2. The Animation System: A Modern, Performant Approach](#2-the-animation-system-a-modern-performant-approach)
-  - [3. The Rendering Pipeline: The Engine](#3-the-rendering-pipeline-the-engine)
 - [Technology Stack](#technology-stack)
 - [Project Status](#project-status)
-- [Roadmap: The Future of Helios](#roadmap-the-future-of-helios)
-  - [V2: Distributed Rendering & Advanced Audio](#v2-distributed-rendering--advanced-audio)
-  - [V3: Native Node.js Encoding](#v3-native-nodejs-encoding)
+- [Roadmap](#roadmap-the-future-of-helios)
 - [License](#license)
 ## Core Principles
 The development of Helios is guided by a set of foundational principles that inform every architectural decision.
- - Performance First: The engine is architected for speed. We prioritize hardware-accelerated rendering paths, minimize I/O bottlenecks by piping data in memory, and leverage the most efficient browser APIs available. Performance is treated as a core feature, not an afterthought.
- - Truly Framework-Agnostic: The core logic is written in pure TypeScript with zero UI framework dependencies. Integration is achieved through a "headless" API and lightweight, idiomatic adapters for popular frameworks. This ensures developers can use the tools they already know and love without being forced into a specific ecosystem.
- - Leverage Web Standards: We prefer native, modern browser APIs over custom or third-party implementations wherever possible. This includes a deep integration with the Web Animations API (WAAPI) for animation control and the WebCodecs API for high-performance encoding, ensuring our engine is future-proof and aligned with the web platform.
- - Superior Developer Experience (DevEx): A library is only as good as its usability. We are committed to providing clear, comprehensive documentation, powerful debugging tools (including headed mode and remote debugging), and a seamless local development workflow with features like hot-reloading.
- - Resilience & Reliability: Programmatic rendering can be complex. The rendering process must be stable and predictable. We build upon a foundation of modern, reliable tooling like Playwright, which offers sophisticated auto-waiting mechanisms to eliminate the flaky tests and inconsistent outputs that often plague browser automation.
+
+ - **Developer Experience First**: Getting started should take minutes, not hours. We prioritize intuitive APIs, minimal boilerplate, and instant feedback loops. If you know HTML, CSS, and JavaScript, you already know how to use Helios.
+ - **Prototype Fast, Scale Later**: Helios is designed for rapid iteration. Start with a simple composition, preview instantly in your browser, and only worry about rendering infrastructure when you're ready to ship.
+ - **Use What You Know**: The core logic is pure TypeScript with zero framework dependencies. Use React, Vue, Svelte, or vanilla JS—whatever you're already comfortable with. No new paradigms to learn.
+ - **Leverage Web Standards**: We prefer native browser APIs over custom implementations. CSS animations, Web Animations API, and standard DOM APIs you already know. Your existing web development skills transfer directly.
+ - **Performance When It Matters**: Hardware-accelerated rendering, in-memory data piping, and WebCodecs support for canvas-heavy work. Performance is there when you need it, but never at the cost of developer ergonomics.
 ## Architectural Deep Dive
 Helios is designed with a modular and flexible architecture that separates logic from presentation, providing developers with maximum power and control.
 ### 1. The Composition Layer: The Authoring Experience
@@ -93,267 +93,102 @@ The fidelity of the preview is significantly improved by leveraging the same dua
 - **Video Encoding: FFmpeg**: Invoked directly via `child_process.spawn` for maximum control, stability, and performance.
 - **Core Language: TypeScript**: For type safety, improved developer experience, and a more maintainable codebase.
 - **Bundling: Vite / Rollup**: Modern, fast, and optimized for building libraries.
-## Comparison with Remotion
+## Helios vs Remotion
 
-Helios and [Remotion](https://www.remotion.dev/) share the same vision of programmatic video creation using web technologies, but they differ significantly in their architectural approach and design philosophy. The following comparison highlights key differences to help developers choose the right tool for their needs.
+Both Helios and [Remotion](https://www.remotion.dev/) enable programmatic video creation with web technologies. Here's what you need to know to choose.
 
-| Feature | Helios | Remotion |
-|---------|--------|----------|
-| **Framework Support** | **Framework-agnostic** - Headless core with lightweight adapters for React, Vue, Svelte, and vanilla JS. Core logic is pure TypeScript with zero UI framework dependencies. | **React-only** - Deeply integrated with React, requiring React components and hooks (`useCurrentFrame()`, `useVideo()`, etc.) for all compositions. |
-| **Composition Model** | **Headless engine** - Instantiable JavaScript class managing state independently. Multiple compositions can coexist on the same page. Framework adapters provide idiomatic APIs (hooks, stores, composables). | **React components** - Compositions are React components wrapped in `<Composition>` tags. State management relies on React's rendering cycle and hooks. |
-| **Animation System** | **Web Animations API (WAAPI)** - Leverages native browser animation engine via `document.timeline.currentTime`. Declarative animations using CSS `@keyframes` or `element.animate()`. Browser handles interpolation off the main thread. | **Frame-based hooks** - Uses `useCurrentFrame()` hook to drive animations. Developers write frame-dependent logic (e.g., `if (frame > 100) { opacity = 1; }`). Provides utilities like `spring()` and `interpolate()` for common patterns. |
-| **Browser Automation** | **Playwright** - Chosen for built-in auto-waiting, cross-browser support (Chromium, Firefox, WebKit), and comprehensive debugging tools (Inspector, Trace Viewer). Superior resilience for rendering arbitrary user content. | **Puppeteer** - Uses Puppeteer for headless browser automation. Primarily Chromium-focused. Requires manual `waitFor` calls for reliable rendering. |
-| **Rendering Architecture** | **Dual-path rendering** - Intelligent routing between DOM-to-Video (screenshot-based) and Canvas-to-Video (WebCodecs API) paths. Canvas path bypasses DOM entirely for significant performance gains. | **DOM-to-Video only** - Screenshot-based rendering using headless browser. All compositions render through DOM, even canvas-based content. WebCodecs support is planned but not fully implemented. |
-| **WebCodecs Integration** | **Native WebCodecs** - Canvas-to-Video path uses WebCodecs API directly for hardware-accelerated encoding. Captures canvas as `VideoFrame` objects fed into `VideoEncoder`. Core feature for high-performance rendering. | **Planned feature** - WebCodecs support is in development for client-side rendering. Current rendering relies on screenshot-based approach. |
-| **Player/Preview** | **Web Components** - Player UI (`<helios-player>`) is a standard Web Component, ensuring maximum portability and isolation. Can be dropped into any HTML page without framework conflicts. Uses sandboxed `<iframe>` for isolation. | **React Player** - `<Player>` component is React-based. Requires React context and hooks. Can be embedded in React apps but not framework-agnostic. Includes Remotion Studio for development preview. |
-| **GPU Acceleration** | **Mandatory requirement** - GPU acceleration is a foundational requirement with optimized launch flags across platforms. Includes built-in diagnostic tool (`helios.diagnose()`) to verify hardware acceleration status. | **Supported** - GPU acceleration is supported but not as prominently featured. Configuration may require manual setup depending on deployment environment. |
-| **FFmpeg Integration** | **Direct process spawning** - Uses `child_process.spawn` directly for maximum control and stability. Pipes image data in-memory to FFmpeg's `stdin` to minimize disk I/O bottlenecks. | **Wrapper-based** - Uses FFmpeg through abstraction layers. May involve intermediate file writes depending on configuration. |
-| **Distributed Rendering** | **Planned (V2)** - Architecture designed for distributed rendering on AWS Lambda or Google Cloud Run. Will use FFmpeg `concat` demuxer for lossless chunk stitching. | **Available** - Remotion Lambda provides distributed rendering on AWS Lambda. Remotion Cloud Run supports Google Cloud Run. Both are production-ready with commercial licensing. |
-| **License** | **Elastic License 2.0 (ELv2)** - Free to use, modify, and distribute. Can build commercial products and embed in applications. Cannot offer Helios as a managed service/SaaS. No per-seat fees, no render limits, no feature restrictions. Perfect for founders building video platforms. | **Dual licensing** - Free for individuals and teams up to 3 people. Commercial license required for teams of 4+ people ($100+/month minimum, scales with developer seats and render volume). Self-hosted cloud rendering allowed in both tiers. |
-| **Developer Experience** | **Framework-native adapters** - Each framework gets idiomatic APIs (React hooks, Svelte stores, Vue composables). Headless core allows custom integrations. | **React-centric** - Excellent DX for React developers with comprehensive TypeScript support, Zod schemas for type-safe props, and extensive documentation. |
-| **Performance Philosophy** | **Performance-first** - Architecture prioritizes speed through hardware acceleration, in-memory data piping, WebCodecs API, and efficient rendering paths. Performance is treated as a core feature with mandatory GPU acceleration and zero-copy data flows. | **Balanced** - Good performance with focus on developer productivity and ease of use. Performance optimizations available but not as aggressively architected. DOM-based rendering path may introduce overhead for canvas-heavy workloads. |
-| **Debugging Tools** | **Playwright-native** - Leverages Playwright Inspector, Trace Viewer, and remote debugging capabilities. Headed mode and remote debugging ports for live inspection. | **Remotion Studio** - Built-in development studio with timeline, preview, and debugging features. Can connect Chrome DevTools to headless browser instances. |
-| **Asset Loading** | **Pre-loading optimization** - Ensures all assets (images, fonts) are fully pre-loaded before render loop begins to prevent artifacts. Critical optimization for DOM-to-Video path. | **Asset components** - Provides specialized components (`<Img>`, `<Video>`, `<Audio>`) that handle loading states. Uses `delayRender()` for async data fetching. |
-| **Use Case Fit** | **Best for**: Teams using multiple frameworks, canvas-heavy applications (WebGL, Three.js, Pixi.js), performance-critical rendering, and projects requiring framework flexibility. | **Best for**: React-focused teams, rapid prototyping, data-driven video applications, and projects benefiting from React's component ecosystem. |
+### Quick Comparison
 
-### Key Architectural Differences
+| | Helios | Remotion |
+|---|---|---|
+| **Learning curve** | Use what you know—HTML, CSS, JS. Standard web animations. | React-specific APIs. Learn `useCurrentFrame()`, `interpolate()`, etc. |
+| **Framework** | Any (React, Vue, Svelte, vanilla JS) | React only |
+| **Animation approach** | CSS animations, Web Animations API | Frame-based hooks with manual interpolation |
+| **Get started** | Drop a `<helios-player>` anywhere | React app with Remotion Studio |
+| **Maturity** | Alpha (early stage) | Production-ready |
+| **Pricing** | Free (ELv2) | Free for ≤3 devs, then $100+/mo |
+| **Distributed rendering** | Planned | Available now (Lambda, Cloud Run) |
 
-**Helios's Framework-Agnostic Approach:**
-- The core engine is a pure TypeScript class with no framework dependencies
-- Framework integration happens through small adapter packages
-- This allows Helios to work seamlessly with React, Vue, Svelte, or vanilla JavaScript
-- Multiple compositions can run independently on the same page without React context conflicts
+### Why Helios?
 
-**Remotion's React-First Approach:**
-- Deeply integrated with React's component model and lifecycle
-- Leverages React's ecosystem (hooks, context, component composition)
-- Excellent for teams already invested in React
-- Requires React knowledge even for simple compositions
+**Familiar APIs, zero learning curve.** If you can animate with CSS, you can animate with Helios. No new paradigms—just use `@keyframes`, `element.animate()`, or your favorite animation library.
 
-**Animation Philosophy:**
+```css
+/* Helios: Standard CSS animations just work */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
 
-**Helios** uses the Web Animations API, treating animations as declarative definitions that the browser's optimized engine executes. This decouples animation logic from the render loop and leverages browser-native performance optimizations.
+.my-element {
+  animation: fadeIn 1s ease-out;
+}
+```
 
-**Remotion** uses a frame-based model where developers write logic that runs on every frame. While this provides fine-grained control, it requires developers to manually handle interpolation and timing, which can be less performant for complex animations.
+Compare this to Remotion's frame-based approach where you manually compute styles each frame:
 
-**Rendering Performance:**
+```jsx
+// Remotion: Manual interpolation on every frame
+export const FadeIn = () => {
+  const frame = useCurrentFrame();
+  const opacity = interpolate(frame, [0, 30], [0, 1], {
+    extrapolateRight: "clamp",
+  });
+  return <div style={{ opacity }}>Hello</div>;
+};
+```
 
-**Helios** offers a dual-path architecture that can bypass the DOM entirely for canvas-based content using WebCodecs, providing significant performance advantages for WebGL/Three.js/Pixi.js applications.
+The Helios approach means your existing CSS animations, GSAP timelines, or Motion/Framer Motion animations work out of the box. Remotion explicitly warns against CSS animations because their frame-based rendering can cause flickering—you're locked into their `interpolate()` and `spring()` helpers.
 
-**Remotion** uses a unified DOM-based rendering path, which is versatile but may introduce overhead for canvas-heavy compositions.
+**Use your preferred framework.** React, Vue, Svelte, or no framework at all. Helios provides idiomatic adapters for each:
+- React: `useVideoFrame()` hook
+- Vue: Composition API composables
+- Svelte: Reactive stores
+- Vanilla JS: Direct class instantiation
 
-### Licensing Comparison: Open Source vs. Commercial Model
+**Drop-in player component.** The `<helios-player>` Web Component works anywhere—no framework required, no style conflicts, no setup.
 
-#### Helios: Elastic License 2.0 (ELv2) - Build Products, Not Managed Services
+**Truly free for commercial use.** Build and sell products using Helios with no per-seat fees or render limits. The only restriction: you can't offer Helios itself as a hosted service. Remotion requires a company license at $100+/month once you have 4+ developers ($25/seat + $10/100 renders).
 
-**Freedom and Flexibility:**
-- **Zero cost** - Completely free for all use cases
-- **No team size restrictions** - Use with teams of any size without additional fees
-- **No render limits** - Render unlimited videos without per-render costs
-- **No feature restrictions** - All features available to all users
-- **Commercial products allowed** - Build any commercial product, SaaS application, or platform using Helios Engine
-- **Embedding allowed** - Include Helios Engine in any application (open source or proprietary)
-- **Self-hosting freedom** - Deploy on any infrastructure without licensing concerns
-- **Modification rights** - Full freedom to modify, fork, and redistribute the codebase
-- **Sell products** - Sell products that use or include Helios Engine
+### Why Remotion?
 
-**Single Restriction:**
-- Cannot offer Helios Engine itself as a managed/hosted service (SaaS) to third parties
-- This protects our ability to build a SaaS platform around Helios
-- Does NOT restrict: Building video platforms, embedding in apps, selling products, or any other commercial use
+**Battle-tested and production-ready.** Remotion has years of production use, extensive documentation, and a large community.
 
-**Business Model:**
-- Allows creators to build a SaaS platform around Helios while enabling a thriving ecosystem
-- Perfect for founders building video platforms (our target customers!)
-- No vendor lock-in or subscription dependencies for users building products
-- Well-established license used by Elasticsearch, Kibana, and other successful projects
+**Rich React ecosystem.** If you're building a React app, Remotion's deep integration with React hooks and components can be powerful.
 
-**When ELv2 Works Best:**
-- **Founders building video platforms** - Our primary target! Build your SaaS using Helios ✅
-- Building commercial products that use Helios Engine
-- Agencies creating video tools for clients
-- Enterprises embedding Helios in their applications
-- Startups building video creation tools
-- Anyone building products (not offering Helios as a service)
+**Distributed rendering today.** Remotion Lambda and Cloud Run are available now. Helios distributed rendering is planned for V2.
 
-**Perfect For:**
-- Video editing SaaS platforms
-- White-label video creation tools
-- Video generation applications
-- Custom video creation workflows
-- Any product that uses Helios Engine
+**Remotion Studio.** A built-in development environment with timeline preview and debugging tools.
 
-**Not For:**
-- Offering Helios Engine rendering as a managed service to others
-- Reselling Helios infrastructure as a service
+### The Tradeoffs
 
-#### Remotion: Dual Licensing Model
+**Helios prioritizes:**
+- Getting started fast with familiar web APIs
+- Framework flexibility
+- Simple, predictable pricing (free)
+- Performance for canvas/WebGL content (WebCodecs path)
 
-**Free Tier (Teams ≤ 3 People):**
-- Free for individuals and small teams (up to 3 developers)
-- Commercial use allowed
-- Self-hosted cloud rendering allowed
-- All core features available
-- Must upgrade when team grows beyond 3 people
+**Remotion prioritizes:**
+- React-native developer experience
+- Mature, production-hardened infrastructure
+- Immediate access to distributed rendering
+- Comprehensive tooling (Studio, Lambda, Cloud Run)
 
-**Commercial License (Teams ≥ 4 People):**
-- **Minimum cost**: $100/month
-- **Pricing structure**:
-  - Developer seats: $25 per developer per month
-  - Video renders: $10 per 100 renders per month (self-hosted)
-  - Scales with team size and render volume
-- Includes prioritized support
-- Includes $250 Mux credits (for Remotion Lambda)
-- All features available
+### Honest Assessment
 
-**Enterprise License:**
-- Starting at $500/month
-- Includes everything in Company License
-- Private Slack/Discord support
-- Monthly consulting sessions
-- Custom terms, billing, and pricing
-- Compliance forms
-- Editor Starter included
+**Choose Helios if:**
+- You want to prototype quickly without learning new APIs
+- You're using Vue, Svelte, or vanilla JS
+- You need canvas/WebGL performance (Three.js, Pixi.js)
+- You want free commercial use without seat-based pricing
+- You're comfortable with alpha software and want to shape the project
 
-**When Remotion's Licensing Works:**
-- Small teams (≤3 people) can use it completely free
-- Teams that need immediate access to Remotion Lambda/Cloud Run
-- Organizations comfortable with per-seat and per-render pricing
-- Projects where the cost is predictable and acceptable
-
-**Cost Considerations:**
-- For a team of 10 developers: $250/month base + render costs
-- For high-volume rendering: Costs scale with render count
-- Long-term costs can be significant for large teams or high-volume use cases
-- May require budget approval and ongoing subscription management
-
-### Performance Comparison: Architecture-Driven Speed
-
-#### Helios: Performance-First Architecture
-
-**Hardware Acceleration (Mandatory):**
-- GPU acceleration is a **foundational requirement**, not optional
-- Optimized launch flags across Linux, macOS, and Windows
-- Built-in diagnostic tool (`helios.diagnose()`) verifies GPU acceleration status
-- Prevents fallback to slow CPU-based software rendering (SwiftShader)
-- Ensures consistent, high-performance rendering across environments
-
-**Dual-Path Rendering Architecture:**
-
-1. **Canvas-to-Video Path (WebCodecs API):**
-   - **Bypasses DOM entirely** for canvas-based content
-   - Direct capture of canvas as `VideoFrame` objects
-   - Hardware-accelerated `VideoEncoder` processes frames
-   - **Performance gain**: 3-10x faster than DOM-based rendering for WebGL/Three.js/Pixi.js
-   - Zero DOM overhead, zero screenshot overhead
-   - Ideal for: Three.js scenes, Pixi.js games, WebGL visualizations, particle systems
-
-2. **DOM-to-Video Path (Screenshot-based):**
-   - Uses Playwright for reliable DOM rendering
-   - Optimized asset pre-loading prevents rendering artifacts
-   - Efficient screenshot capture with minimal overhead
-   - Ideal for: HTML/CSS compositions, SVG graphics, text-heavy videos
-
-**In-Memory Data Piping:**
-- **Zero-copy data flow** - Pipes image data directly from browser to FFmpeg's `stdin`
-- Eliminates disk I/O bottlenecks (no temporary frame files)
-- Reduces memory footprint and improves throughput
-- **Performance gain**: 20-40% faster than file-based approaches for long videos
-
-**Animation Performance:**
-- Web Animations API leverages browser's optimized animation engine
-- Animations run **off the main thread** when possible
-- Browser handles interpolation for thousands of properties efficiently
-- No per-frame JavaScript execution overhead
-- **Performance gain**: Significantly faster for complex, multi-property animations
-
-**Browser Automation:**
-- Playwright's auto-waiting reduces flaky renders and retries
-- Cross-browser support enables testing on fastest available browser
-- Superior resilience means fewer failed renders and restarts
-
-**Performance Benchmarks (Estimated):**
-- Canvas rendering (WebCodecs): **3-10x faster** than DOM-based for WebGL content
-- Memory usage: **30-50% lower** due to in-memory piping
-- Render startup time: **Faster** due to optimized browser launch flags
-- Multi-property animations: **2-5x faster** due to WAAPI offloading
-
-#### Remotion: Balanced Performance
-
-**Rendering Architecture:**
-- **Unified DOM-based path** - All compositions render through DOM, even canvas content
-- Screenshot-based capture for every frame
-- Versatile but introduces overhead for canvas-heavy workloads
-- WebCodecs support planned but not yet production-ready
-
-**Performance Characteristics:**
-- Good performance for DOM-based compositions (HTML, CSS, SVG)
-- Canvas content must go through DOM rendering pipeline
-- May involve intermediate file writes depending on FFmpeg wrapper configuration
-- GPU acceleration supported but not as aggressively optimized
-
-**Animation Performance:**
-- Frame-based model requires JavaScript execution on every frame
-- Developers manually handle interpolation and timing
-- More flexible but potentially less performant for complex animations
-- React re-renders on every frame can add overhead
-
-**Performance Considerations:**
-- DOM overhead for canvas-based content
-- Screenshot capture for every frame (even when unnecessary)
-- Potential file I/O bottlenecks depending on configuration
-- React rendering cycle overhead for frame updates
-
-**When Performance Differences Matter:**
-
-**Choose Helios for performance-critical scenarios:**
-- High-volume rendering (thousands of videos per day)
-- Canvas-heavy applications (WebGL, Three.js, Pixi.js)
-- Real-time or near-real-time rendering requirements
-- Resource-constrained environments (lower memory, CPU usage)
-- Complex animations with many simultaneous properties
-- Long-duration videos where efficiency compounds
-
-**Remotion is sufficient when:**
-- Rendering volume is moderate
-- Compositions are primarily DOM-based (HTML/CSS)
-- Performance is "good enough" rather than critical
-- Developer productivity is prioritized over raw speed
-- Team is already invested in React ecosystem
-
-### Performance Summary
-
-| Metric | Helios | Remotion | Winner |
-|--------|--------|----------|--------|
-| **Canvas/WebGL Rendering** | WebCodecs API (3-10x faster) | DOM-based (baseline) | **Helios** |
-| **Memory Usage** | In-memory piping (30-50% lower) | File-based (higher) | **Helios** |
-| **Animation Performance** | WAAPI offloading (2-5x faster) | Frame-based JS (baseline) | **Helios** |
-| **DOM Rendering** | Optimized Playwright path | Puppeteer-based | **Helios** |
-| **Startup Time** | Optimized GPU flags | Standard setup | **Helios** |
-| **Developer Productivity** | Framework adapters | React-first (excellent DX) | **Remotion** |
-| **Maturity & Stability** | Alpha (early stage) | Production-ready | **Remotion** |
-| **Distributed Rendering** | Planned (V2) | Available now | **Remotion** |
-
-### When to Choose Helios
-
-- You need framework flexibility (React, Vue, Svelte, or vanilla JS)
-- Your project heavily uses canvas/WebGL (Three.js, Pixi.js, etc.)
-- Performance is a critical requirement
-- You want to build commercial products and video platforms (ELv2 allows this!)
-- You prefer leveraging native browser APIs (WAAPI, WebCodecs)
-- You need multiple independent compositions on the same page
-- You're a founder building a video platform or product (our target customers!)
-
-### When to Choose Remotion
-
-- Your team is React-focused and comfortable with React patterns
-- You need distributed rendering immediately (Remotion Lambda/Cloud Run)
-- You want a mature, production-ready solution with extensive documentation
-- You're building data-driven video applications with React components
-- You prefer a frame-based animation model with fine-grained control
-- You need Remotion Studio for rapid development iteration
-
-Both projects share a commitment to programmatic video creation and excellent developer experience, but their different architectural choices make them suited for different use cases and team preferences.
+**Choose Remotion if:**
+- You need production stability today
+- You're all-in on React and prefer React patterns
+- You need distributed rendering now
+- You want extensive documentation and community support
+- You don't mind per-seat licensing as your team grows
 
 ## Project Status
 Alpha: This project is in the early stages of development. The architecture is defined, but the API is subject to change. We are actively seeking contributors to help shape the future of the project!
