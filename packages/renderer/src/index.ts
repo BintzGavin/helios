@@ -77,9 +77,10 @@ export class Renderer {
       });
 
       console.log(`Starting capture for ${totalFrames} frames...`);
+      const progressInterval = Math.floor(totalFrames / 10);
       for (let i = 0; i < totalFrames; i++) {
         const time = (i / fps) * 1000;
-        if (i > 0 && i % Math.floor(totalFrames / 10) === 0) {
+        if (i > 0 && i % progressInterval === 0) {
             console.log(`Progress: Rendered ${i} / ${totalFrames} frames`);
         }
 
