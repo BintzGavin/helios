@@ -27,9 +27,10 @@ export function createAnimationController() {
     totalDuration: 5,
   };
 
+  const box = document.querySelector(".animated-box") as HTMLElement;
+
   // Function to update animation progress directly
   function updateAnimationProgress(progress: number) {
-    const box = document.querySelector(".animated-box") as HTMLElement;
     if (box) {
       box.style.setProperty("--animation-progress", progress.toString());
     }
@@ -43,7 +44,6 @@ export function createAnimationController() {
   ) {
     timing = { startTime, endTime, totalDuration };
 
-    const box = document.querySelector(".animated-box") as HTMLElement;
     if (box) {
       box.style.setProperty("--animation-start-time", startTime + "s");
       box.style.setProperty("--animation-end-time", endTime + "s");
@@ -53,7 +53,6 @@ export function createAnimationController() {
 
   // Function to update animation based on current time
   function updateAnimationAtTime(currentTime: number, totalDuration: number) {
-    const box = document.querySelector(".animated-box") as HTMLElement;
     if (box) {
       // Calculate animation progress based on timing
       let progress = 0;
