@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Canvas Basic</title>
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: #000;
+    }
+    canvas {
+      width: 1920px;
+      height: 1080px;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="canvas" width="1920" height="1080"></canvas>
+  <script type="module">
+    import { Helios } from '../../packages/core/src/index.ts';
+
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+
+    // Create Helios instance
+    const helios = new Helios({
+      duration: 5,
+      fps: 30
+    });
+
+    // Drawing function
+    function draw(state) {
+        const { currentFrame, duration, fps } = state;
+        const width = canvas.width;
+        const height = canvas.height;
+
+        const time = currentFrame / fps;
+        const progress = time / duration;
+
+        // Background
+        ctx.fillStyle = '#111';
+        ctx.fillRect(0, 0, width, height);
+
+        // Animated Square
+        const size = 200;
+        ctx.save();
+        ctx.translate(width / 2, height / 2);
+        ctx.rotate(progress * Math.PI * 2);
+        ctx.fillStyle = 'tomato';
+        ctx.fillRect(-size / 2, -size / 2, size, size);
+        ctx.restore();
+
+        // Frame counter
+        ctx.fillStyle = 'white';
+        ctx.font = '40px sans-serif';
+        ctx.fillText(`Frame: ${currentFrame}`, 50, 100);
+        ctx.fillText(`Time: ${time.toFixed(2)}s`, 50, 150);
+    }
+
+    // Subscribe to updates
+    helios.subscribe(draw);
+
+    // Expose helios to window for the renderer to control
+    window.helios = helios;
+
+    // Also support document.timeline.currentTime for the "implicit" contract
+    // But since we are using Helios state, we should probably let Helios drive.
+
+    // Initial draw
+    draw(helios.getState());
+
+  </script>
+</body>
+</html>

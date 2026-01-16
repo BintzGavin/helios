@@ -84,8 +84,15 @@ export class Renderer {
             console.log(`Progress: Rendered ${i} / ${totalFrames} frames`);
         }
 
-        const dataUrl = await page.evaluate((timeValue) => {
-          (document.timeline as any).currentTime = timeValue;
+        const dataUrl = await page.evaluate(({ time, frame, fps }) => {
+          // 1. Try to drive Helios instance if present
+          if ((window as any).helios) {
+            (window as any).helios.seek(frame);
+          } else {
+             // 2. Fallback to Web Animations API
+            (document.timeline as any).currentTime = time;
+          }
+
           return new Promise((resolve) => {
             requestAnimationFrame(() => {
               const canvas = document.querySelector('canvas');
@@ -93,7 +100,7 @@ export class Renderer {
               resolve(canvas.toDataURL('image/png'));
             });
           });
-        }, time);
+        }, { time, frame: i, fps });
 
         if (typeof dataUrl !== 'string' || dataUrl === 'error:canvas-not-found') {
           throw new Error('Could not find canvas element or an error occurred during capture.');
