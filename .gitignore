@@ -4,6 +4,7 @@
 # Build artifacts
 /dist
 /build
+/output
 
 # Logs
 logs

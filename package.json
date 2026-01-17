@@ -13,7 +13,8 @@
   ],
   "scripts": {
     "dev": "npx vite ./examples/simple-canvas-animation",
-    "render:canvas-example": "ts-node packages/renderer/scripts/render.ts"
+    "render:canvas-example": "ts-node packages/renderer/scripts/render.ts",
+    "diagnose": "ts-node packages/renderer/src/diagnose.ts"
   },
   "devDependencies": {
     "ts-node": "^10.9.2",
