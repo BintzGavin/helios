@@ -17,6 +17,7 @@
       background-color: #111;
     }
     canvas {
+      display: block; /* Remove inline-block spacing */
       width: 100%;
       height: 100%;
     }
@@ -24,25 +25,43 @@
 </head>
 <body>
   <canvas id="composition-canvas"></canvas>
-  <script>
+  <script type="module">
+    import { Helios } from '../../packages/core/dist/index.js';
+
     const canvas = document.getElementById('composition-canvas');
     const ctx = canvas.getContext('2d');
 
     const resizeCanvas = () => {
-        const { width, height } = canvas.getBoundingClientRect();
-        canvas.width = width;
-        canvas.height = height;
+        // Use window dimensions to be safe, as we want full screen canvas
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        console.log(`Canvas resized to ${canvas.width}x${canvas.height}`);
     };
 
+    // Resize immediately
     resizeCanvas();
+    // And on window resize
+    window.addEventListener('resize', resizeCanvas);
 
-    const duration = 5000; // 5 seconds in milliseconds
+    const duration = 5; // seconds
+    const fps = 30;
 
-    function draw(time) {
-      const progress = (time % duration) / duration;
+    // Initialize Helios
+    const helios = new Helios({
+        duration,
+        fps
+    });
+
+    // Bind to document.timeline so the Renderer can drive us
+    helios.bindToDocumentTimeline();
+
+    function draw(currentFrame) {
+      const time = currentFrame / fps * 1000; // in ms
+      const progress = (time % (duration * 1000)) / (duration * 1000);
 
       const { width, height } = canvas;
 
+      // Clear
       ctx.fillStyle = '#111';
       ctx.fillRect(0, 0, width, height);
 
@@ -50,11 +69,13 @@
       const y = height / 2;
       const radius = 50;
 
+      // Draw moving circle
       ctx.fillStyle = 'royalblue';
       ctx.beginPath();
       ctx.arc(x, y, radius, 0, Math.PI * 2);
       ctx.fill();
 
+      // Draw rotating square
       const squareSize = 100;
       ctx.save();
       ctx.translate(width / 2, height / 2);
@@ -64,17 +85,14 @@
       ctx.restore();
     }
 
-    let lastTime = -1;
-    function animationLoop() {
-        const currentTime = document.timeline.currentTime;
-        if (currentTime !== lastTime) {
-            draw(currentTime);
-            lastTime = currentTime;
-        }
-        requestAnimationFrame(animationLoop);
-    }
+    // Subscribe to Helios state changes
+    helios.subscribe((state) => {
+        draw(state.currentFrame);
+    });
 
-    animationLoop();
+    // Make helios available globally for debugging/manual driving if needed
+    window.helios = helios;
+
   </script>
 </body>
 </html>

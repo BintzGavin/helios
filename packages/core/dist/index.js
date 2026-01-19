@@ -2,6 +2,7 @@ export class Helios {
     state;
     subscribers = new Set();
     animationFrameId = null;
+    syncWithDocumentTimeline = false;
     constructor(options) {
         this.state = {
             ...options,
@@ -50,10 +51,61 @@ export class Helios {
     seek(frame) {
         const newFrame = Math.max(0, Math.min(frame, this.state.duration * this.state.fps));
         this.setState({ currentFrame: newFrame });
+        // If we are controlling document.timeline, update it
+        if (typeof document !== 'undefined' && document.timeline) {
+            const timeInMs = (newFrame / this.state.fps) * 1000;
+            // Check if we can set it (some browsers might differ, but standard says read-only unless we use AnimationController which is separate)
+            // Actually, document.timeline.currentTime is read-only in standard WAAPI, but Playwright overrides it?
+            // Wait, the renderer uses: (document.timeline as any).currentTime = timeValue;
+            // This implies the renderer is "hacking" the timeline in the context of the headless browser.
+            // In a normal browser, we can't set document.timeline.currentTime directly.
+            // For now, Helios core should probably NOT try to set document.timeline.currentTime for normal playback
+            // unless we are in a special "render mode" or we are using a custom timeline.
+            // Let's stick to the plan: `bindToDocumentTimeline` allows Helios to READ from it.
+        }
+    }
+    /**
+     * Binds the Helios instance to document.timeline.
+     * This is useful when the timeline is being driven externally (e.g. by the Renderer).
+     * Helios will poll document.timeline.currentTime and update its internal state.
+     */
+    bindToDocumentTimeline() {
+        if (typeof document === 'undefined' || !document.timeline) {
+            console.warn('document.timeline is not available.');
+            return;
+        }
+        this.syncWithDocumentTimeline = true;
+        // Start a loop to poll the timeline
+        const poll = () => {
+            if (!this.syncWithDocumentTimeline)
+                return;
+            const currentTime = document.timeline.currentTime;
+            if (currentTime !== null && typeof currentTime === 'number') {
+                const frame = Math.round((currentTime / 1000) * this.state.fps);
+                if (frame !== this.state.currentFrame) {
+                    this.setState({ currentFrame: frame });
+                }
+            }
+            requestAnimationFrame(poll);
+        };
+        requestAnimationFrame(poll);
+    }
+    unbindFromDocumentTimeline() {
+        this.syncWithDocumentTimeline = false;
     }
     tick = () => {
         if (!this.state.isPlaying)
             return;
+        // If we are syncing FROM document.timeline, we shouldn't drive our own loop logic
+        // But play() implies we ARE driving.
+        if (this.syncWithDocumentTimeline) {
+            // If we are synced, we just let the poll loop handle updates.
+            // But we still need to keep the loop alive if we want to support 'isPlaying' semantics
+            // alongside external drivers?
+            // Actually, if we are synced, 'play' might be meaningless if the external timeline isn't moving.
+            this.animationFrameId = requestAnimationFrame(this.tick);
+            return;
+        }
         const totalFrames = this.state.duration * this.state.fps;
         const nextFrame = this.state.currentFrame + 1;
         if (nextFrame >= totalFrames) {
