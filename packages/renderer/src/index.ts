@@ -26,6 +26,8 @@ export class Renderer {
         '--ignore-gpu-blocklist',
         '--enable-gpu-rasterization',
         '--enable-zero-copy',
+        '--disable-web-security',
+        '--allow-file-access-from-files',
       ],
     });
 
@@ -38,6 +40,11 @@ export class Renderer {
       });
 
       console.log(`Navigating to ${compositionUrl}...`);
+
+      // Capture console logs from the page
+      page.on('console', msg => console.log(`PAGE LOG: ${msg.text()}`));
+      page.on('pageerror', err => console.error(`PAGE ERROR: ${err.message}`));
+
       await page.goto(compositionUrl, { waitUntil: 'networkidle' });
       console.log('Page loaded.');
 

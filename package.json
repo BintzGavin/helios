@@ -13,11 +13,13 @@
   ],
   "scripts": {
     "dev": "npx vite ./examples/simple-canvas-animation",
-    "render:canvas-example": "ts-node packages/renderer/scripts/render.ts"
+    "build:examples": "vite build -c vite.build-example.config.js",
+    "render:canvas-example": "npm run build:examples && ts-node packages/renderer/scripts/render.ts"
   },
   "devDependencies": {
     "ts-node": "^10.9.2",
     "typescript": "^5.0.0",
-    "vite": "^7.1.2"
+    "vite": "^7.1.2",
+    "vitest": "^4.0.17"
   }
 }

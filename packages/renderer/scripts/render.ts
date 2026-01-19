@@ -14,7 +14,7 @@ async function main() {
 
   const compositionPath = path.resolve(
     process.cwd(),
-    'examples/simple-canvas-animation/composition.html'
+    'output/example-build/examples/simple-canvas-animation/composition.html'
   );
   const compositionUrl = `file://${compositionPath}`;
 
