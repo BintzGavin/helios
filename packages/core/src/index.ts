@@ -10,6 +10,7 @@ type Subscriber = (state: HeliosState) => void;
 interface HeliosOptions {
   duration: number; // in seconds
   fps: number;
+  autoSyncAnimations?: boolean;
 }
 
 export class Helios {
@@ -17,13 +18,16 @@ export class Helios {
   private subscribers: Set<Subscriber> = new Set();
   private animationFrameId: number | null = null;
   private syncWithDocumentTimeline = false;
+  private autoSyncAnimations = false;
 
   constructor(options: HeliosOptions) {
     this.state = {
-      ...options,
+      duration: options.duration,
+      fps: options.fps,
       currentFrame: 0,
       isPlaying: false,
     };
+    this.autoSyncAnimations = options.autoSyncAnimations || false;
   }
 
   // --- State Management ---
@@ -73,20 +77,21 @@ export class Helios {
     const newFrame = Math.max(0, Math.min(frame, this.state.duration * this.state.fps));
     this.setState({ currentFrame: newFrame });
 
-    // If we are controlling document.timeline, update it
-    if (typeof document !== 'undefined' && document.timeline) {
-        const timeInMs = (newFrame / this.state.fps) * 1000;
-        // Check if we can set it (some browsers might differ, but standard says read-only unless we use AnimationController which is separate)
-        // Actually, document.timeline.currentTime is read-only in standard WAAPI, but Playwright overrides it?
-        // Wait, the renderer uses: (document.timeline as any).currentTime = timeValue;
-        // This implies the renderer is "hacking" the timeline in the context of the headless browser.
-        // In a normal browser, we can't set document.timeline.currentTime directly.
-
-        // For now, Helios core should probably NOT try to set document.timeline.currentTime for normal playback
-        // unless we are in a special "render mode" or we are using a custom timeline.
-
-        // Let's stick to the plan: `bindToDocumentTimeline` allows Helios to READ from it.
+    if (this.autoSyncAnimations) {
+      this.syncDomAnimations((newFrame / this.state.fps) * 1000);
     }
+  }
+
+  private syncDomAnimations(timeInMs: number) {
+    if (typeof document === 'undefined' || !document.getAnimations) return;
+
+    document.getAnimations().forEach((anim) => {
+      anim.currentTime = timeInMs;
+      // Ensure it doesn't auto-play if we are driving it
+      if (anim.playState !== 'paused') {
+        anim.pause();
+      }
+    });
   }
 
   /**
@@ -147,6 +152,11 @@ export class Helios {
     }
 
     this.setState({ currentFrame: nextFrame });
+
+    if (this.autoSyncAnimations) {
+      this.syncDomAnimations((nextFrame / this.state.fps) * 1000);
+    }
+
     this.animationFrameId = requestAnimationFrame(this.tick);
   }
 }

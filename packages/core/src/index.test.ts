@@ -76,4 +76,61 @@ describe('Helios Core', () => {
         helios.unbindFromDocumentTimeline();
     });
   });
+
+  describe('WAAPI Synchronization', () => {
+    beforeEach(() => {
+        vi.stubGlobal('document', {
+            getAnimations: vi.fn().mockReturnValue([]),
+            timeline: { currentTime: 0 }
+        });
+        vi.stubGlobal('requestAnimationFrame', (cb: any) => setTimeout(cb, 0));
+        vi.stubGlobal('cancelAnimationFrame', (id: any) => clearTimeout(id));
+    });
+
+    afterEach(() => {
+        vi.unstubAllGlobals();
+    });
+
+    it('should sync DOM animations when autoSyncAnimations is true', () => {
+        const mockAnim = { currentTime: 0, playState: 'running', pause: vi.fn() };
+        (document.getAnimations as any).mockReturnValue([mockAnim]);
+
+        const helios = new Helios({ duration: 10, fps: 30, autoSyncAnimations: true });
+
+        // Seek to 1 second (frame 30)
+        helios.seek(30);
+
+        expect(mockAnim.currentTime).toBe(1000);
+        expect(mockAnim.pause).toHaveBeenCalled();
+    });
+
+    it('should NOT sync DOM animations when autoSyncAnimations is false', () => {
+        const mockAnim = { currentTime: 0, playState: 'running', pause: vi.fn() };
+        (document.getAnimations as any).mockReturnValue([mockAnim]);
+
+        const helios = new Helios({ duration: 10, fps: 30, autoSyncAnimations: false });
+
+        helios.seek(30);
+
+        expect(mockAnim.currentTime).toBe(0);
+        expect(mockAnim.pause).not.toHaveBeenCalled();
+    });
+
+    it('should sync DOM animations during playback', async () => {
+        const mockAnim = { currentTime: 0, playState: 'running', pause: vi.fn() };
+        (document.getAnimations as any).mockReturnValue([mockAnim]);
+
+        const helios = new Helios({ duration: 10, fps: 30, autoSyncAnimations: true });
+
+        helios.play();
+
+        // Wait for one tick
+        await new Promise(resolve => setTimeout(resolve, 50));
+
+        expect(mockAnim.currentTime).toBeGreaterThan(0);
+        expect(mockAnim.pause).toHaveBeenCalled();
+
+        helios.pause();
+    });
+  });
 });
