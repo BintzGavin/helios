@@ -25,7 +25,7 @@ One scribe agent gathers everyone's progress, updates the project history, and r
 
 **Infrastructure**: All scheduling is handled through the [Jules website dashboard](https://jules.ai) (Google's Ultra plan). No custom infrastructure needed. The Ultra plan allows up to 300 tasks per day, which is more than enough for multiple cycles. Tasks are scheduled directly through their web interface—morning planning tasks, afternoon execution tasks, and end-of-day scribe tasks. 
 
-Alternatively, tasks can be triggered via the Gemini CLI (with Jules extension enabled) instead of only through the web dashboard. This opens up the possibility of implementing a more traditional loop—similar to the "Ralph Loop" or Claude Code approaches, but by programmatically orchestrating cycles without manual intervention. It would be interesting to compare the operational costs and efficiency of this API-driven method versus a Claude Code–powered workflow.
+Alternatively, tasks can be triggered via the Gemini CLI (with Jules extension enabled) instead of only through the web dashboard. This opens up the possibility of implementing a more traditional loop—similar to the "Ralph Loop" or Claude Code approaches, but by programmatically orchestrating cycles without manual intervention. It would be interesting to compare the operational costs and efficiency of this Gemini CLI/cloud-driven method versus a Claude Code–powered workflow.
 
 ## Prompt Structure
 
