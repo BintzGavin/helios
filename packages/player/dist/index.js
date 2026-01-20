@@ -1,4 +1,3 @@
-import { Helios } from "@helios-project/core";
 import { CanvasExportStrategy } from "./strategies/CanvasExportStrategy";
 import { DomExportStrategy } from "./strategies/DomExportStrategy";
 const template = document.createElement("template");
@@ -90,6 +89,8 @@ export class HeliosPlayer extends HTMLElement {
     scrubber;
     timeDisplay;
     exportBtn;
+    // The Helios instance driving the animation.
+    // This can be a local instance (fallback) or a remote instance (from iframe).
     helios = null;
     constructor() {
         super();
@@ -120,22 +121,33 @@ export class HeliosPlayer extends HTMLElement {
         this.helios?.pause();
     }
     handleIframeLoad = () => {
-        if (!this.iframe.contentDocument)
+        if (!this.iframe.contentWindow)
             return;
-        const duration = parseInt(this.getAttribute("duration") || "5", 10);
-        const fps = parseInt(this.getAttribute("fps") || "60", 10);
-        this.helios = new Helios({ duration, fps });
-        this.scrubber.max = String(duration * fps);
-        // Configure animation timing (animation plays from 3s to 8s)
-        if (this.iframe.contentWindow) {
-            this.iframe.contentWindow.setAnimationTiming(3, 8, duration);
+        // Check for Helios instance in the iframe
+        const remoteHelios = this.iframe.contentWindow.helios;
+        if (remoteHelios) {
+            console.log("HeliosPlayer: Connected to remote Helios instance in iframe.");
+            this.helios = remoteHelios;
+            this.playPauseBtn.disabled = false;
+            this.exportBtn.disabled = false;
+            this.scrubber.disabled = false;
         }
+        else {
+            console.warn("HeliosPlayer: No Helios instance found in iframe (window.helios). Player controls will not function.");
+            this.playPauseBtn.disabled = true;
+            this.exportBtn.disabled = true;
+            this.scrubber.disabled = true;
+            return;
+        }
+        const state = this.helios.getState();
+        this.scrubber.max = String(state.duration * state.fps);
+        this.updateUI(state); // Initial UI update
         this.setupHeliosSubscription();
     };
     togglePlayPause = () => {
-        const state = this.helios?.getState();
-        if (!state || !this.helios)
+        if (!this.helios)
             return;
+        const state = this.helios.getState();
         const isFinished = state.currentFrame >= state.duration * state.fps - 1;
         if (isFinished) {
             // Restart the animation
@@ -155,26 +167,25 @@ export class HeliosPlayer extends HTMLElement {
             this.helios.seek(frame);
         }
     };
+    updateUI(state) {
+        const isFinished = state.currentFrame >= state.duration * state.fps - 1;
+        if (isFinished) {
+            this.playPauseBtn.textContent = "🔄"; // Restart button
+        }
+        else {
+            this.playPauseBtn.textContent = state.isPlaying ? "❚❚" : "▶";
+        }
+        this.scrubber.value = String(state.currentFrame);
+        this.timeDisplay.textContent = `${(state.currentFrame / state.fps).toFixed(2)} / ${state.duration.toFixed(2)}`;
+    }
     setupHeliosSubscription() {
         if (!this.helios)
             return;
         this.helios.subscribe((state) => {
-            // Update animation in the iframe
-            if (this.iframe.contentWindow) {
-                const currentTime = state.currentFrame / state.fps;
-                // Use the new timing-aware function
-                this.iframe.contentWindow.updateAnimationAtTime(currentTime, state.duration);
-            }
-            // Update UI
-            const isFinished = state.currentFrame >= state.duration * state.fps - 1;
-            if (isFinished) {
-                this.playPauseBtn.textContent = "🔄"; // Restart button
-            }
-            else {
-                this.playPauseBtn.textContent = state.isPlaying ? "❚❚" : "▶";
-            }
-            this.scrubber.value = String(state.currentFrame);
-            this.timeDisplay.textContent = `${(state.currentFrame / state.fps).toFixed(2)} / ${state.duration.toFixed(2)}`;
+            // Since we are driving the remote instance, the iframe content should update itself
+            // (because it should be subscribed to its own helios instance).
+            // So we only need to update our UI.
+            this.updateUI(state);
         });
     }
     handleExport = async () => {
@@ -183,8 +194,11 @@ export class HeliosPlayer extends HTMLElement {
         console.log("Client-side rendering started!");
         this.exportBtn.disabled = true;
         this.exportBtn.textContent = "Rendering...";
+        // Pause playback before rendering
+        this.helios.pause();
         try {
             // Check if this is a canvas-based or DOM-based composition
+            // We look for a canvas in the iframe
             const canvas = this.iframe.contentWindow?.document.querySelector("canvas");
             const isCanvasBased = !!canvas;
             let strategy;

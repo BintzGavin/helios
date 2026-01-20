@@ -6,7 +6,7 @@
 This codebase is primarily managed and developed by a fleet of AI agents running on **Google's Jules** platform. It is **not** currently intended for production use.
 
 ### How It Works
-The system operates on a scheduled daily cycle designed to simulate a fully autonomous engineering team:
+The system uses a **Vision Spirals Architecture**—a daily cycle designed to simulate a fully autonomous engineering team where agents persistently spiral the codebase toward the documented vision:
 
 1.  **Autonomous Scheduling:** "Prompts" are executed daily to drive the development lifecycle.
     * **Morning Phase:** Planning agents scan the codebase and `README` vision, identifying missing features or bugs to populate their own backlog.

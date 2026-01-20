@@ -11,6 +11,7 @@ export declare class HeliosPlayer extends HTMLElement {
     private handleIframeLoad;
     private togglePlayPause;
     private handleScrubberInput;
+    private updateUI;
     private setupHeliosSubscription;
     private handleExport;
 }
