@@ -3,15 +3,23 @@ import { RenderStrategy } from './RenderStrategy';
 
 export class DomStrategy implements RenderStrategy {
   async capture(page: Page, frameTime: number): Promise<Buffer> {
-    await page.evaluate((timeValue) => {
-      (document.timeline as any).currentTime = timeValue;
-      return new Promise<void>((resolve) => {
-        requestAnimationFrame(() => {
-          resolve();
+    try {
+      await page.evaluate((timeValue) => {
+        (document.timeline as any).currentTime = timeValue;
+        return new Promise<void>((resolve) => {
+          requestAnimationFrame(() => {
+            resolve();
+          });
         });
-      });
-    }, frameTime);
+      }, frameTime);
 
-    return await page.screenshot({ type: 'png' });
+      return await page.screenshot({ type: 'png' });
+    } catch (error) {
+      console.error('DomStrategy.capture: failed to capture screenshot', {
+        frameTime,
+        error,
+      });
+      throw error;
+    }
   }
 }
