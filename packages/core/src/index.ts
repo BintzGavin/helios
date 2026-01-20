@@ -86,7 +86,10 @@ export class Helios {
     if (typeof document === 'undefined' || !document.getAnimations) return;
 
     document.getAnimations().forEach((anim) => {
-      anim.currentTime = timeInMs;
+      // Avoid changing behavior for animations that are currently idle (currentTime === null).
+      if (anim.currentTime !== null) {
+        anim.currentTime = timeInMs;
+      }
       // Ensure it doesn't auto-play if we are driving it
       if (anim.playState !== 'paused') {
         anim.pause();
