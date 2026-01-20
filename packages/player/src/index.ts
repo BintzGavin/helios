@@ -93,6 +93,7 @@ export class HeliosPlayer extends HTMLElement {
   private exportBtn: HTMLButtonElement;
 
   private helios: Helios | null = null;
+  private isRemoteHelios: boolean = false;
 
   constructor() {
     super();
@@ -125,30 +126,53 @@ export class HeliosPlayer extends HTMLElement {
     this.playPauseBtn.removeEventListener("click", this.togglePlayPause);
     this.scrubber.removeEventListener("input", this.handleScrubberInput);
     this.exportBtn.removeEventListener("click", this.renderClientSide);
-    this.helios?.pause();
+    if (this.helios) {
+      this.helios.pause();
+    }
   }
 
   private handleIframeLoad = () => {
     if (!this.iframe.contentDocument) return;
+    if (!this.iframe.contentWindow) return;
 
-    const duration = parseInt(this.getAttribute("duration") || "5", 10);
-    const fps = parseInt(this.getAttribute("fps") || "60", 10);
+    const win = this.iframe.contentWindow as any;
 
-    this.helios = new Helios({ duration, fps });
+    // Check if the iframe exposes a Helios instance
+    if (win.helios && win.helios instanceof Helios) {
+      console.log("HeliosPlayer: Found remote Helios instance in iframe.");
+      this.helios = win.helios;
+      this.isRemoteHelios = true;
 
-    this.scrubber.max = String(duration * fps);
+      // Update local state from remote
+      const state = this.helios!.getState();
+      this.scrubber.max = String(state.duration * state.fps);
 
-    // Configure animation timing (animation plays from 3s to 8s)
-    if (this.iframe.contentWindow) {
-      (this.iframe.contentWindow as any).setAnimationTiming(3, 8, duration);
+    } else {
+      console.log("HeliosPlayer: No remote Helios found. Initializing local instance.");
+      const duration = parseInt(this.getAttribute("duration") || "5", 10);
+      const fps = parseInt(this.getAttribute("fps") || "60", 10);
+
+      this.helios = new Helios({ duration, fps });
+      this.isRemoteHelios = false;
+      this.scrubber.max = String(duration * fps);
+
+      // Legacy support: Configure animation timing
+      if (typeof win.setAnimationTiming === 'function') {
+        // Assume default range 3s to 8s if not specified (legacy behavior from original code)
+        // Or better, 0 to duration? The original code had 3, 8, duration.
+        // Let's stick to the original if it was working for that example,
+        // but ideally this should be cleaner.
+        // The legacy example 'canvas-composition.html' expects start, end, total.
+        win.setAnimationTiming(0, duration, duration);
+      }
     }
 
     this.setupHeliosSubscription();
   };
 
   private togglePlayPause = () => {
-    const state = this.helios?.getState();
-    if (!state || !this.helios) return;
+    if (!this.helios) return;
+    const state = this.helios.getState();
 
     const isFinished = state.currentFrame >= state.duration * state.fps - 1;
 
@@ -174,15 +198,14 @@ export class HeliosPlayer extends HTMLElement {
     if (!this.helios) return;
 
     this.helios.subscribe((state: any) => {
-      // Update animation in the iframe
-      if (this.iframe.contentWindow) {
+      // If we are using a local Helios instance (legacy mode), we need to push updates to the iframe
+      if (!this.isRemoteHelios && this.iframe.contentWindow) {
+        const win = this.iframe.contentWindow as any;
         const currentTime = state.currentFrame / state.fps;
 
-        // Use the new timing-aware function
-        (this.iframe.contentWindow as any).updateAnimationAtTime(
-          currentTime,
-          state.duration
-        );
+        if (typeof win.updateAnimationAtTime === 'function') {
+           win.updateAnimationAtTime(currentTime, state.duration);
+        }
       }
 
       // Update UI

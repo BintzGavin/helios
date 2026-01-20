@@ -10,7 +10,8 @@ export default defineConfig({
     emptyOutDir: true,
     rollupOptions: {
       input: {
-        composition: resolve(__dirname, "examples/simple-canvas-animation/composition.html"),
+        simple_canvas: resolve(__dirname, "examples/simple-canvas-animation/composition.html"),
+        react_canvas: resolve(__dirname, "examples/react-canvas-animation/composition.html"),
       },
     },
   },

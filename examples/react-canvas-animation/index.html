@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Helios React Example</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background-color: #f4f4f9;
+      margin: 0;
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    h1 {
+      color: #333;
+    }
+    helios-player {
+      width: 80%;
+      max-width: 600px;
+      aspect-ratio: 1 / 1;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Helios React Demo</h1>
+
+  <!--
+    The player loads the composition.
+    In this case, the composition is the React app itself, but we need to point to an HTML file
+    that bootstraps the React app.
+    However, standard Vite React apps have `index.html` as the entry.
+    Since we are already in `index.html`, we can't load ourselves recursively easily.
+
+    Usually, the 'player' page is separate from the 'composition' page.
+    Let's make `composition.html` the entry point for the React App.
+  -->
+  <helios-player
+    src="./composition.html"
+    duration="5"
+    fps="30">
+  </helios-player>
+
+  <script type="module" src="/packages/player/src/index.ts"></script>
+
+</body>
+</html>

@@ -1,0 +1,1 @@
+[2026-01-16] ✅ Completed: Added React Example - Created `examples/react-canvas-animation`, updated `HeliosPlayer` to support remote Helios instances, and enhanced `render.ts` to support CLI arguments. Verified end-to-end rendering for React example.

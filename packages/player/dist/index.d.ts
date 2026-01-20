@@ -5,6 +5,7 @@ export declare class HeliosPlayer extends HTMLElement {
     private timeDisplay;
     private exportBtn;
     private helios;
+    private isRemoteHelios;
     constructor();
     connectedCallback(): void;
     disconnectedCallback(): void;
