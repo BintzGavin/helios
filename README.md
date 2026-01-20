@@ -1,7 +1,9 @@
 <!-- AGENT_SKIP_START: This section is for human readers only. Planning agents should skip to the next section. -->
-> **DISCLAIMER: This repository is an active experiment in autonomous software engineering.**
+<details>
+<summary>DISCLAIMER: This repository is an active experiment in autonomous software engineering.</summary>
 
-**Current Status:** 🚧 **Alpha / Self-Driving**
+
+> **Current Status:** 🚧 **Alpha / Self-Driving**
 
 This codebase is primarily managed and developed by a fleet of AI agents running on **Google's Jules** platform. It is **not** currently intended for production use.
 
@@ -24,6 +26,7 @@ The system uses a **Black Hole Architecture**—a planning-execution cycle desig
 For transparency and educational purposes, the complete prompts used to orchestrate the agent swarm are available in the [`docs/prompts/`](./docs/prompts/) directory.
 
 **Expect rapid changes, experimental commits, and occasional "hallucinated" refactors as the swarm learns to optimize its own workflow.**
+</details>
 <!-- AGENT_SKIP_END -->
 
 # Helios Engine
