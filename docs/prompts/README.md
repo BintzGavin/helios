@@ -2,9 +2,9 @@
 
 This directory contains the complete prompts used to orchestrate the autonomous agent swarm that develops Helios Engine. These prompts are provided for full transparency and educational purposes.
 
-## Vision Spirals Architecture
+## Black Hole Architecture
 
-An alternative to the "Ralph Loop" pattern. Instead of one agent retrying until it works, Vision Spirals uses a team of specialized agents that work together in daily cycles. They compare what exists to what's planned, find the gaps, and gradually spiral the codebase toward the vision—with separate agents handling planning, coding, and documentation.
+An alternative to the "Ralph Loop" pattern. Instead of one agent retrying until it works, Black Hole Architecture uses a team of specialized agents that cycle through phases in planning -> execution loops. They compare what exists to what's planned, find the gaps, and continuously pull the codebase toward the vision—with separate agents handling planning, coding, and documentation in a continuous pull towards the vision.
 
 My implementation here operates on a daily cycle with three distinct phases, each with specialized agents and responsibilities:
 
@@ -25,7 +25,7 @@ One scribe agent gathers everyone's progress, updates the project history, and r
 
 **Infrastructure**: All scheduling is handled through the [Jules website dashboard](https://jules.ai) (Google's Ultra plan). No custom infrastructure needed. The Ultra plan allows up to 300 tasks per day, which is more than enough for multiple cycles. Tasks are scheduled directly through their web interface—morning planning tasks, afternoon execution tasks, and end-of-day scribe tasks. 
 
-Alternatively, tasks can be triggered via the Gemini CLI (with Jules extension enabled) instead of only through the web dashboard. This opens up the possibility of implementing a more traditional loop—similar to the "Ralph Loop" or Claude Code approaches, but by programmatically orchestrating cycles without manual intervention. It would be interesting to compare the operational costs and efficiency of this Gemini CLI/cloud-driven method versus a Claude Code–powered workflow.
+Alternatively, tasks can be triggered via the Jules CLI instead of only through the web dashboard. This opens up the possibility of implementing a more traditional loop—similar to the "Ralph Loop" or Claude Code approaches, but by programmatically orchestrating cycles without manual intervention. It would be interesting to compare the operational costs and efficiency of this Jules CLI/cloud-driven method versus a Claude Code–powered workflow where code updates and tests are locally executed.
 
 ## Prompt Structure
 
