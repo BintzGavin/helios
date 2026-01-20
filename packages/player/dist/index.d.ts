@@ -12,8 +12,5 @@ export declare class HeliosPlayer extends HTMLElement {
     private togglePlayPause;
     private handleScrubberInput;
     private setupHeliosSubscription;
-    private renderClientSide;
-    private renderDOMToVideo;
-    private captureDOMToCanvas;
-    private renderElementToCanvas;
+    private handleExport;
 }

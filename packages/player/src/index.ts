@@ -1,5 +1,7 @@
 import { Helios } from "@helios-project/core";
-import { Muxer, ArrayBufferTarget } from "mp4-muxer";
+import { CanvasExportStrategy } from "./strategies/CanvasExportStrategy";
+import { DomExportStrategy } from "./strategies/DomExportStrategy";
+import { ExportStrategy } from "./strategies/ExportStrategy";
 
 const template = document.createElement("template");
 template.innerHTML = `
@@ -117,14 +119,14 @@ export class HeliosPlayer extends HTMLElement {
 
     this.playPauseBtn.addEventListener("click", this.togglePlayPause);
     this.scrubber.addEventListener("input", this.handleScrubberInput);
-    this.exportBtn.addEventListener("click", this.renderClientSide);
+    this.exportBtn.addEventListener("click", this.handleExport);
   }
 
   disconnectedCallback() {
     this.iframe.removeEventListener("load", this.handleIframeLoad);
     this.playPauseBtn.removeEventListener("click", this.togglePlayPause);
     this.scrubber.removeEventListener("input", this.handleScrubberInput);
-    this.exportBtn.removeEventListener("click", this.renderClientSide);
+    this.exportBtn.removeEventListener("click", this.handleExport);
     this.helios?.pause();
   }
 
@@ -200,289 +202,40 @@ export class HeliosPlayer extends HTMLElement {
     });
   }
 
-  private renderClientSide = async () => {
+  private handleExport = async () => {
     if (!this.helios) return;
     console.log("Client-side rendering started!");
     this.exportBtn.disabled = true;
     this.exportBtn.textContent = "Rendering...";
 
-    let encoder: VideoEncoder | null = null;
-
     try {
-      const state = this.helios.getState();
-      const totalFrames = state.duration * state.fps;
       // Check if this is a canvas-based or DOM-based composition
       const canvas =
         this.iframe.contentWindow?.document.querySelector("canvas");
       const isCanvasBased = !!canvas;
 
-      if (!isCanvasBased) {
-        // For DOM-based compositions, we'll convert DOM to canvas for export
-        await this.renderDOMToVideo();
-        return;
+      let strategy: ExportStrategy;
+      if (isCanvasBased) {
+        strategy = new CanvasExportStrategy();
+      } else {
+        strategy = new DomExportStrategy();
       }
 
-      const target = new ArrayBufferTarget();
-      const muxer = new Muxer({
-        target,
-      });
-
-      encoder = new VideoEncoder({
-        output: (chunk, meta) => {
-          if (meta) {
-            muxer.addVideoChunk(chunk, meta);
-          }
-        },
-        error: (e) => {
-          console.error("VideoEncoder error:", e);
-          throw e;
-        },
-      });
-
-      const config = {
-        codec: "avc1.42001E", // H.264 Baseline
-        width: canvas.width,
-        height: canvas.height,
-        framerate: state.fps,
-        bitrate: 5_000_000, // 5 Mbps
-      };
-
-      if (!(await VideoEncoder.isConfigSupported(config))) {
-        throw new Error(
-          `Unsupported VideoEncoder config: ${JSON.stringify(config)}`
-        );
-      }
-
-      await encoder.configure(config);
-
-      for (let i = 0; i < totalFrames; i++) {
-        this.helios.seek(i);
-        await new Promise((r) =>
-          this.iframe.contentWindow?.requestAnimationFrame(r)
-        );
-
-        const frame = new VideoFrame(canvas, {
-          timestamp: (i / state.fps) * 1_000_000,
-        });
-        const keyFrame = i % (state.fps * 2) === 0;
-
-        await encoder.encode(frame, { keyFrame });
-        frame.close();
+      await strategy.export(this.helios, this.iframe, (progress) => {
         this.exportBtn.textContent = `Rendering: ${Math.round(
-          ((i + 1) / totalFrames) * 100
+          progress * 100
         )}%`;
-      }
-
-      await encoder.flush();
-      muxer.finalize();
-      const buffer = target.buffer;
-
-      const blob = new Blob([buffer], { type: "video/mp4" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "video.mp4";
-      a.click();
-      URL.revokeObjectURL(url);
+      });
 
       console.log("Client-side rendering and download finished!");
     } catch (e: any) {
       console.error("Client-side rendering failed:", e);
       alert(`Rendering failed: ${e.message}`);
     } finally {
-      // Clean up encoder
-      if (encoder) {
-        try {
-          await encoder.close();
-        } catch (e) {
-          console.warn("Error closing encoder:", e);
-        }
-      }
       this.exportBtn.disabled = false;
       this.exportBtn.textContent = "Export";
     }
   };
-
-  private async renderDOMToVideo() {
-    let encoder: VideoEncoder | null = null;
-
-    try {
-      const state = this.helios!.getState();
-      const totalFrames = state.duration * state.fps;
-
-      // Create a temporary canvas for DOM-to-canvas conversion
-      const tempCanvas = document.createElement("canvas");
-      const tempCtx = tempCanvas.getContext("2d")!;
-
-      // Set canvas size to match iframe content
-      const iframeDoc = this.iframe.contentDocument!;
-      const body = iframeDoc.body;
-      tempCanvas.width = body.scrollWidth;
-      tempCanvas.height = body.scrollHeight;
-
-      // Create video encoder setup
-      const target = new ArrayBufferTarget();
-      const muxer = new Muxer({
-        target,
-      });
-
-      encoder = new VideoEncoder({
-        output: (chunk, meta) => {
-          if (meta) {
-            muxer.addVideoChunk(chunk, meta);
-          }
-        },
-        error: (e) => {
-          console.error("VideoEncoder error:", e);
-          throw e;
-        },
-      });
-
-      const config = {
-        codec: "avc1.42001E", // H.264 Baseline
-        width: tempCanvas.width,
-        height: tempCanvas.height,
-        framerate: state.fps,
-        bitrate: 5_000_000, // 5 Mbps
-      };
-
-      if (!(await VideoEncoder.isConfigSupported(config))) {
-        throw new Error(
-          `Unsupported VideoEncoder config: ${JSON.stringify(config)}`
-        );
-      }
-
-      await encoder.configure(config);
-
-      // Render each frame
-      for (let i = 0; i < totalFrames; i++) {
-        // Seek to the current frame
-        this.helios!.seek(i);
-
-        // Wait for the animation to update
-        await new Promise((r) =>
-          this.iframe.contentWindow?.requestAnimationFrame(r)
-        );
-
-        // Convert DOM to canvas using html2canvas-like approach
-        await this.captureDOMToCanvas(tempCanvas, tempCtx);
-
-        // Create video frame from canvas
-        const frame = new VideoFrame(tempCanvas, {
-          timestamp: (i / state.fps) * 1_000_000,
-        });
-        const keyFrame = i % (state.fps * 2) === 0;
-
-        await encoder.encode(frame, { keyFrame });
-        frame.close();
-
-        this.exportBtn.textContent = `Rendering: ${Math.round(
-          ((i + 1) / totalFrames) * 100
-        )}%`;
-      }
-
-      await encoder.flush();
-      muxer.finalize();
-      const buffer = target.buffer;
-
-      const blob = new Blob([buffer], { type: "video/mp4" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "video.mp4";
-      a.click();
-      URL.revokeObjectURL(url);
-
-      console.log("DOM-to-video rendering finished!");
-    } catch (e: any) {
-      console.error("DOM-to-video rendering failed:", e);
-      alert(`Rendering failed: ${e.message}`);
-    } finally {
-      // Clean up encoder
-      if (encoder) {
-        try {
-          await encoder.close();
-        } catch (e) {
-          console.warn("Error closing encoder:", e);
-        }
-      }
-    }
-  }
-
-  private async captureDOMToCanvas(
-    canvas: HTMLCanvasElement,
-    ctx: CanvasRenderingContext2D
-  ) {
-    const iframeDoc = this.iframe.contentDocument!;
-    const body = iframeDoc.body;
-
-    // Clear canvas
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    // Set background color
-    const computedStyle = iframeDoc.defaultView?.getComputedStyle(body);
-    const bgColor = computedStyle?.backgroundColor || "#eee";
-    ctx.fillStyle = bgColor;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    // Simple DOM-to-canvas conversion
-    // This is a basic implementation - for production, you'd want to use html2canvas or similar
-    await this.renderElementToCanvas(body, ctx, 0, 0);
-  }
-
-  private async renderElementToCanvas(
-    element: Element,
-    ctx: CanvasRenderingContext2D,
-    offsetX: number,
-    offsetY: number
-  ) {
-    const iframeWindow = this.iframe.contentWindow!;
-    const computedStyle = iframeWindow.getComputedStyle(element);
-
-    // Get element bounds
-    const rect = element.getBoundingClientRect();
-    const x = rect.left + offsetX;
-    const y = rect.top + offsetY;
-    const width = rect.width;
-    const height = rect.height;
-
-    // Skip if element is not visible
-    if (
-      computedStyle.display === "none" ||
-      computedStyle.visibility === "hidden" ||
-      width === 0 ||
-      height === 0
-    ) {
-      return;
-    }
-
-    // Handle different element types
-    if (element instanceof HTMLDivElement) {
-      // Render div background and border
-      const bgColor = computedStyle.backgroundColor;
-      if (
-        bgColor &&
-        bgColor !== "rgba(0, 0, 0, 0)" &&
-        bgColor !== "transparent"
-      ) {
-        ctx.fillStyle = bgColor;
-        ctx.fillRect(x, y, width, height);
-      }
-
-      // Render border if present
-      const borderWidth = parseInt(computedStyle.borderWidth);
-      if (borderWidth > 0) {
-        ctx.strokeStyle = computedStyle.borderColor;
-        ctx.lineWidth = borderWidth;
-        ctx.strokeRect(x, y, width, height);
-      }
-    }
-
-    // Recursively render child elements
-    for (const child of Array.from(element.children)) {
-      await this.renderElementToCanvas(child, ctx, offsetX, offsetY);
-    }
-  }
 }
 
 customElements.define("helios-player", HeliosPlayer);

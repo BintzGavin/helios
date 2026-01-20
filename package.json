@@ -17,8 +17,9 @@
     "render:canvas-example": "npm run build:examples && ts-node packages/renderer/scripts/render.ts"
   },
   "devDependencies": {
+    "jsdom": "^27.4.0",
     "ts-node": "^10.9.2",
-    "typescript": "^5.0.0",
+    "typescript": "^5.9.3",
     "vite": "^7.1.2",
     "vitest": "^4.0.17"
   }
