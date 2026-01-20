@@ -19,7 +19,6 @@
 - **Pseudo-Code**:
     ```typescript
     interface RenderStrategy {
-        init(page: Page): Promise<void>; // Optional, for setup
         capture(page: Page, frameTime: number): Promise<Buffer>;
     }
 
