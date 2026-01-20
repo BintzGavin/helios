@@ -1,6 +1,6 @@
 # AI Agent Prompts
 
-This directory contains the complete prompts used to orchestrate the autonomous agent swarm that develops Helios Engine. These prompts are provided for full transparency and educational purposes.
+This directory contains the complete prompts used to orchestrate the autonomous agent swarm that develops Helios Engine. These prompts are provided for transparency and educational purposes.
 
 ## Black Hole Architecture
 
