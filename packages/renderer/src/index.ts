@@ -1,23 +1,33 @@
 import { spawn } from 'child_process';
 import { chromium, Browser, Page } from 'playwright';
 import ffmpeg from '@ffmpeg-installer/ffmpeg';
+import { RenderStrategy } from './strategies/RenderStrategy';
+import { CanvasStrategy } from './strategies/CanvasStrategy';
+import { DomStrategy } from './strategies/DomStrategy';
 
 export interface RendererOptions {
   width: number;
   height: number;
   fps: number;
   durationInSeconds: number;
+  mode?: 'canvas' | 'dom';
 }
 
 export class Renderer {
   private options: RendererOptions;
+  private strategy: RenderStrategy;
 
   constructor(options: RendererOptions) {
     this.options = options;
+    if (this.options.mode === 'dom') {
+      this.strategy = new DomStrategy();
+    } else {
+      this.strategy = new CanvasStrategy();
+    }
   }
 
   public async render(compositionUrl: string, outputPath: string): Promise<void> {
-    console.log(`Starting render for composition: ${compositionUrl}`);
+    console.log(`Starting render for composition: ${compositionUrl} (Mode: ${this.options.mode || 'canvas'})`);
 
     const browser = await chromium.launch({
       headless: true,
@@ -91,22 +101,8 @@ export class Renderer {
             console.log(`Progress: Rendered ${i} / ${totalFrames} frames`);
         }
 
-        const dataUrl = await page.evaluate((timeValue) => {
-          (document.timeline as any).currentTime = timeValue;
-          return new Promise((resolve) => {
-            requestAnimationFrame(() => {
-              const canvas = document.querySelector('canvas');
-              if (!canvas) return resolve('error:canvas-not-found');
-              resolve(canvas.toDataURL('image/png'));
-            });
-          });
-        }, time);
+        const buffer = await this.strategy.capture(page, time);
 
-        if (typeof dataUrl !== 'string' || dataUrl === 'error:canvas-not-found') {
-          throw new Error('Could not find canvas element or an error occurred during capture.');
-        }
-
-        const buffer = Buffer.from(dataUrl.split(',')[1], 'base64');
         await new Promise<void>((resolve, reject) => {
             ffmpegProcess.stdin.write(buffer, (err?: Error | null) => err ? reject(err) : resolve());
         });
