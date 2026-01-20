@@ -15,17 +15,11 @@ export class CanvasStrategy implements RenderStrategy {
       });
     }, frameTime);
 
-    if (dataUrl === 'error:canvas-not-found') {
+    if (typeof dataUrl !== 'string' || dataUrl === 'error:canvas-not-found') {
       throw new Error('CanvasStrategy: Could not find canvas element or an error occurred during capture.');
     }
 
-    // Extract base64 data safely from data URL
-    const commaIndex = dataUrl.indexOf(',');
-    if (commaIndex === -1 || commaIndex === dataUrl.length - 1) {
-      throw new Error('CanvasStrategy: Received invalid data URL from canvas.');
-    }
-
-    const base64Data = dataUrl.slice(commaIndex + 1);
-    return Buffer.from(base64Data, 'base64');
+    // Extract base64 data
+    return Buffer.from(dataUrl.split(',')[1], 'base64');
   }
 }
