@@ -15,7 +15,7 @@ export class CanvasStrategy implements RenderStrategy {
       });
     }, frameTime);
 
-    if (typeof dataUrl !== 'string' || dataUrl === 'error:canvas-not-found') {
+    if (dataUrl === 'error:canvas-not-found') {
       throw new Error('CanvasStrategy: Could not find canvas element or an error occurred during capture.');
     }
 
