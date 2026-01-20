@@ -2,32 +2,53 @@
 
 This directory contains the complete prompts used to orchestrate the autonomous agent swarm that develops Helios Engine. These prompts are provided for full transparency and educational purposes.
 
-## Overview
+## Vision Spirals Architecture
 
-The Helios Swarm System operates on a daily cycle with three main phases:
+An alternative to the "Ralph Loop" pattern. Instead of one agent retrying until it works, Vision Spirals uses a team of specialized agents that work together in daily cycles. They compare what exists to what's planned, find the gaps, and gradually spiral the codebase toward the vision—with separate agents handling planning, coding, and documentation.
 
-1. **Morning Phase**: Planning agents analyze the codebase and generate implementation plans
-2. **Afternoon Phase**: Execution agents implement the planned tasks
-3. **End-of-Day Phase**: Scribe agent consolidates progress and regenerates the context knowledge base
+My implementation here operates on a daily cycle with three distinct phases, each with specialized agents and responsibilities:
 
-## Prompt Files
+### Morning Phase: Planning
+Four planning agents (one per domain: CORE, RENDERER, PLAYER, DEMO) compare the codebase to the vision in `README.md`, find what's missing, and write up plans for what needs to be built.
 
-- **[Planning Prompt](./planning.md)** - The morning cycle prompt template used by planning agents
-- **[Execution Prompt](./execution.md)** - The afternoon cycle prompt template used by execution agents
-- **[Scribe Prompt](./scribe.md)** - The end-of-day prompt for consolidating progress and maintaining documentation
-- **[Role Definitions](./roles.md)** - Role-specific definitions for each agent type (CORE, RENDERER, PLAYER, DEMO)
+### Afternoon Phase: Execution
+Four execution agents read those plans and write the actual code. Each stays in their own domain, tests their work, and logs what they completed.
 
-## How to Use
+### End-of-Day Phase: Scribe
+One scribe agent gathers everyone's progress, updates the project history, and refreshes the knowledge base that planning agents use the next day.
 
-1. **Morning**: Copy the Planning Prompt + the relevant Role Definition into the agent context
-2. **Afternoon**: Copy the Execution Prompt + the relevant Role Definition into the agent context
-3. **End-of-Day**: Copy the Scribe Prompt into the agent context (no role definition needed)
+## Scheduling & Autonomy
 
-The prompts use `{{ROLE_DEFINITION}}` as a placeholder that should be replaced with the appropriate role definition from `roles.md`.
+**Current Implementation**: I'm running one complete cycle (planning → execution → scribe) per day, which gives me time to review and merge PRs. This is still a human-in-the-loop setup where I'm at least rubber-stamping changes.
 
-## What These Prompts Demonstrate
+**True Autonomy**: The loop could be condensed to have zero idle time between cycles—as soon as scribe finishes, planning starts again. As soon as planning finishes, execution starts again. And the same with the scribe (which is essentially a safeguard to ensure against out of date context before planning starts again). This would make it fully autonomous with no human review bottleneck.
 
-These prompts demonstrate how the agents are instructed to bootstrap the system, analyze the codebase, generate implementation plans, and execute work while maintaining isolation and avoiding conflicts.
+**Infrastructure**: All scheduling is handled through the [Jules website dashboard](https://jules.ai) (Google's Ultra plan). No custom infrastructure needed. The Ultra plan allows up to 300 tasks per day, which is more than enough for multiple cycles. Tasks are scheduled directly through their web interface—morning planning tasks, afternoon execution tasks, and end-of-day scribe tasks. 
+
+Alternatively, tasks can be triggered via the Gemini CLI (with Jules extension enabled) instead of only through the web dashboard. This opens up the possibility of implementing a more traditional loop—similar to the "Ralph Loop" or Claude Code approaches, but by programmatically orchestrating cycles without manual intervention. It would be interesting to compare the operational costs and efficiency of this API-driven method versus a Claude Code–powered workflow.
+
+## Prompt Structure
+
+The system uses template-based prompts with role-specific definitions:
+
+- **[Planning Prompt](./planning.md)** - Template for morning cycle planning agents
+- **[Execution Prompt](./execution.md)** - Template for afternoon cycle execution agents
+- **[Scribe Prompt](./scribe.md)** - Template for end-of-day consolidation and documentation
+- **[Role Definitions](./roles.md)** - Domain-specific role configurations (CORE, RENDERER, PLAYER, DEMO)
+
+Each prompt template uses `{{ROLE_DEFINITION}}` as a placeholder that is replaced with the appropriate role definition, allowing the same prompt structure to be specialized for different domains.
+
+## Design Principles
+
+**Separation of Concerns**: Planners plan, executors code. No mixing—keeps things organized.
+
+**Domain Isolation**: Each agent owns their own area. No stepping on toes, everyone works in parallel.
+
+**Self-Bootstrapping**: Agents create what they need if it's missing. The system sets itself up.
+
+**Vision-Driven Development**: When there's no backlog, planners compare code to `README.md` and figure out what to build next.
+
+**Context Engineering**: The scribe keeps a clean summary of how things connect, not every detail. Makes planning faster.
 
 **Objective:** The goal of this project is to benchmark the capabilities of an autonomous agent fleet. We are testing the extent to which AI agents can self-organize, maintain a coherent architecture, and evolve a complex system from a vision document into a production-grade product with minimal human intervention.
 
