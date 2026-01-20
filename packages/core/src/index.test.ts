@@ -132,5 +132,18 @@ describe('Helios Core', () => {
 
         helios.pause();
     });
+
+    it('should gracefully handle missing getAnimations API', () => {
+        // Mock document without getAnimations
+        vi.stubGlobal('document', {
+            // getAnimations is undefined
+            timeline: { currentTime: 0 }
+        });
+
+        const helios = new Helios({ duration: 10, fps: 30, autoSyncAnimations: true });
+
+        // Should not throw
+        expect(() => helios.seek(30)).not.toThrow();
+    });
   });
 });
