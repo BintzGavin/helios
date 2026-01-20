@@ -4,7 +4,7 @@ This directory contains the complete prompts used to orchestrate the autonomous 
 
 ## Black Hole Architecture
 
-An alternative to the "Ralph Loop" pattern. Instead of one agent retrying until it works, Black Hole Architecture uses a team of specialized agents that cycle through phases in planning -> execution loops. They compare what exists to what's planned, find the gaps, and continuously pull the codebase toward the vision—with separate agents handling planning, coding, and documentation in a continuous pull towards the vision.
+An alternative to the "Ralph Loop" pattern. Instead of one agent retrying until it works, Black Hole Architecture uses a team of specialized agents that cycle through phases in planning -> execution loops. They compare what exists to what's planned and what's in the long-term vision and find the gaps, and continuously pull the codebase toward that long-term vision.
 
 My implementation here operates on a daily cycle with three distinct phases, each with specialized agents and responsibilities:
 
