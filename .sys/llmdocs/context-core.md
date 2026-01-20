@@ -1,18 +1,16 @@
-# Context: Core Logic Engine
+# Context: Core Logic Engine (`packages/core`)
 
 ## A. Architecture
-The Helios Core is a **Framework-Agnostic State Machine**. It manages the "Truth of Time" for any animation.
-- **Store**: Holds `currentFrame`, `fps`, `duration`, `isPlaying`.
-- **Actions**: Methods like `seek()`, `play()`, `bindToDocumentTimeline()` mutate the store.
-- **Subscribers**: Listen for state changes to update the view (Canvas, DOM, or Web Component).
+The Core package implements the **Helios State Machine**, serving as the single source of truth for time and animation state.
+- **Store**: Holds `frame`, `time`, `fps`, `duration`, `isPlaying`.
+- **Actions**: Methods like `seek()`, `play()`, `pause()` modify the store.
+- **Subscribers**: Components (Player, Renderer) subscribe to state changes to update their views.
 
 ## B. File Tree
-```
 packages/core/src/
-├── animation-helpers.ts  # Animation control functions attached to window
-├── index.test.ts         # Unit tests
-└── index.ts              # Main entry point (Helios class)
-```
+├── animation-helpers.ts
+├── index.test.ts
+└── index.ts
 
 ## C. Type Definitions
 ```typescript
@@ -28,53 +26,42 @@ type Subscriber = (state: HeliosState) => void;
 interface HeliosOptions {
   duration: number; // in seconds
   fps: number;
+  autoSyncAnimations?: boolean;
+  animationScope?: HTMLElement;
 }
 
-interface AnimationTiming {
+export interface AnimationTiming {
   startTime: number;
   endTime: number;
   totalDuration: number;
 }
 
-interface AnimationState {
+export interface AnimationState {
   progress: number;
   isActive: boolean;
   isComplete: boolean;
 }
 ```
 
-## D. Public Methods
-### `Helios` Class
+## D. Public Methods (Helios Class)
 ```typescript
-class Helios {
+export class Helios {
   constructor(options: HeliosOptions);
 
-  // State Access
-  getState(): Readonly<HeliosState>;
+  // State Management
+  public getState(): Readonly<HeliosState>;
 
   // Subscription
-  subscribe(callback: Subscriber): () => void;
-  unsubscribe(callback: Subscriber): void;
+  public subscribe(callback: Subscriber): () => void;
+  public unsubscribe(callback: Subscriber): void;
 
   // Playback Controls
-  play(): void;
-  pause(): void;
-  seek(frame: number): void;
+  public play(): void;
+  public pause(): void;
+  public seek(frame: number): void;
 
   // Timeline Synchronization
-  bindToDocumentTimeline(): void;
-  unbindFromDocumentTimeline(): void;
+  public bindToDocumentTimeline(): void;
+  public unbindFromDocumentTimeline(): void;
 }
-```
-
-### Animation Helpers
-```typescript
-function createAnimationController(): {
-    updateAnimationProgress: (progress: number) => void;
-    setAnimationTiming: (startTime: number, endTime: number, totalDuration: number) => void;
-    updateAnimationAtTime: (currentTime: number, totalDuration: number) => void;
-    timing: AnimationTiming;
-};
-
-function initializeAnimation(elementSelector?: string): ReturnType<typeof createAnimationController>;
 ```

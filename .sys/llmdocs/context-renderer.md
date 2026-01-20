@@ -1,32 +1,45 @@
-# Context: Renderer
+# Context: Renderer (`packages/renderer`)
 
-## A. Strategy
-The Renderer employs a **Dual-Path Architecture**:
-1.  **Canvas Path (MVP)**: Uses `page.evaluate()` to access `canvas.toDataURL()` and pipe Base64 data to FFmpeg.
-2.  **DOM Path (Planned)**: Will use Playwright to screenshot the DOM or use `VideoEncoder` approaches.
-
-The renderer runs in a Node.js environment, launching a Headless Chromium instance via Playwright. It synchronizes the browser's `document.timeline` with the frame-by-frame export loop.
+## A. Strategy Architecture
+The Renderer uses a **Strategy Pattern** to support different rendering modes:
+- **Canvas Strategy**: Uses `canvas.toDataURL()` via Playwright evaluation. Best for WebGL/Canvas2D.
+- **DOM Strategy**: Uses `page.screenshot()` via Playwright. Best for CSS/HTML animations.
+The strategy is selected via the `mode` option in `RendererOptions`.
 
 ## B. File Tree
-```
-packages/renderer/src/
-└── index.ts  # Main Renderer class and FFmpeg integration
-```
+packages/renderer/
+├── package.json
+├── scripts
+│   └── render.ts
+├── src
+│   ├── index.ts
+│   └── strategies
+│       ├── CanvasStrategy.ts
+│       ├── DomStrategy.ts
+│       └── RenderStrategy.ts
+└── tsconfig.json
 
 ## C. Configuration
 ```typescript
-interface RendererOptions {
+export interface RendererOptions {
   width: number;
   height: number;
   fps: number;
   durationInSeconds: number;
+  /**
+   * The rendering mode to use.
+   * - 'canvas': Captures frames by converting the first <canvas> element to a data URL.
+   * - 'dom': Captures frames by taking a screenshot of the entire viewport.
+   *
+   * Defaults to 'canvas'.
+   */
+  mode?: 'canvas' | 'dom';
 }
 ```
 
 ## D. FFmpeg Interface
-The renderer pipes raw image data to FFmpeg with the following configuration:
--   **Input Format**: `image2pipe` (piped via stdin)
--   **Video Codec**: `libx264`
--   **Pixel Format**: `yuv420p` (for compatibility)
--   **Flags**: `-movflags +faststart` (web optimization)
--   **Frame Rate**: Matches `RendererOptions.fps`
+The renderer pipes image data to FFmpeg (spawned process) with the following flags:
+- Input: `-f image2pipe`, `-framerate {fps}`, `-i -`
+- Codec: `-c:v libx264`
+- Pixel Format: `-pix_fmt yuv420p`
+- Flags: `-movflags +faststart`

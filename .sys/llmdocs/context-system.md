@@ -1,6 +1,6 @@
-# Context: System & Operations
+# Context: System & Constraints
 
-## A. Milestones (Backlog)
+## A. Milestones (from BACKLOG)
 ### 1. Canvas MVP End-to-End
 - [x] Implement `HeliosEngine` core logic (Timeline, State).
 - [x] Create a basic Canvas rendering example (using Helios core).
@@ -16,6 +16,8 @@
 ### 3. In-Browser Player Polish
 - [ ] Ensure `<helios-player>` works with `HeliosEngine`.
 - [ ] Sync player state with engine state.
+- [ ] Implement robust Client-Side Export (WebCodecs) using the correct `seek` mechanism.
+- [ ] Add proper UI feedback for "Loading" state.
 
 ### 4. Diagnostics and GPU Detection
 - [ ] Implement `helios.diagnose()` for environment checks.
@@ -28,12 +30,12 @@
 - [ ] Scaffolding for distributed rendering.
 
 ## B. Role Boundaries
-1.  **Core**: Pure TypeScript logic. No DOM manipulation (except via optional bindings). Zero dependencies on Renderer or Player.
-2.  **Renderer**: Node.js environment only. Controls the Browser via Playwright. Imports `core` for type definitions or shared logic if needed, but primarily orchestrates the process.
-3.  **Player**: Browser-native Web Component. Controls `core` instances inside an iframe.
-4.  **Examples**: Standalone Vite apps. Must be buildable via `npm run build:examples` for the Renderer to consume.
+- **Core Agent**: Manages `packages/core`. Pure logic/state. Never imports Renderer or Player.
+- **Renderer Agent**: Manages `packages/renderer`. Node.js/Playwright context. Imports Core (types/logic).
+- **Player Agent**: Manages `packages/player`. Browser/Web Component context. Imports Core.
+- **Scribe Agent**: Manages `docs/`. Read-only access to code.
 
 ## C. Shared Build Commands
--   `npm run build:examples`: Builds the example compositions into `output/example-build` for consumption by the Renderer.
--   `npm run dev`: Starts the development server for the active example.
--   `npm run diagnose`: Checks for FFmpeg and Playwright availability.
+- `npm run dev`: Start the dev server for examples (usually `simple-canvas-animation`).
+- `npm run build:examples`: Build the examples using Vite (required before rendering).
+- `npm run render:canvas-example`: Build examples and run the renderer script.
