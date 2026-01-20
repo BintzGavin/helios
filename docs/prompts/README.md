@@ -24,3 +24,10 @@ The Helios Swarm System operates on a daily cycle with three main phases:
 3. **End-of-Day**: Copy the Scribe Prompt into the agent context (no role definition needed)
 
 The prompts use `{{ROLE_DEFINITION}}` as a placeholder that should be replaced with the appropriate role definition from `roles.md`.
+
+## What These Prompts Demonstrate
+
+These prompts demonstrate how the agents are instructed to bootstrap the system, analyze the codebase, generate implementation plans, and execute work while maintaining isolation and avoiding conflicts.
+
+**Objective:** The goal of this project is to benchmark the capabilities of an autonomous agent fleet. We are testing the extent to which AI agents can self-organize, maintain a coherent architecture, and evolve a complex system from a vision document into a production-grade product with minimal human intervention.
+

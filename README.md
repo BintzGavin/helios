@@ -1,6 +1,4 @@
 <!-- AGENT_SKIP_START: This section is for human readers only. Planning agents should skip to the next section. -->
-# ⚠️ EXPERIMENTAL: Autonomous Agent Swarm
-
 > **DISCLAIMER: This repository is an active experiment in autonomous software engineering.**
 
 **Current Status:** 🚧 **Alpha / Self-Driving**
@@ -23,16 +21,7 @@ The system operates on a scheduled daily cycle designed to simulate a fully auto
 
 ### Full Transparency: Agent Prompts
 
-For full transparency and educational purposes, the complete prompts used to orchestrate the agent swarm are available in the [`docs/prompts/`](./docs/prompts/) directory:
-
-- **[Planning Prompt](./docs/prompts/planning.md)** - Morning cycle prompt for planning agents
-- **[Execution Prompt](./docs/prompts/execution.md)** - Afternoon cycle prompt for execution agents
-- **[Scribe Prompt](./docs/prompts/scribe.md)** - End-of-day prompt for consolidating progress and maintaining documentation
-- **[Role Definitions](./docs/prompts/roles.md)** - Role-specific definitions for each agent type (CORE, RENDERER, PLAYER, DEMO)
-
-These prompts demonstrate how the agents are instructed to bootstrap the system, analyze the codebase, generate implementation plans, and execute work while maintaining isolation and avoiding conflicts.
-
-**Objective:** The goal of this project is to benchmark the capabilities of an autonomous agent fleet. We are testing the extent to which AI agents can self-organize, maintain a coherent architecture, and evolve a complex system from a vision document into a production-grade product with minimal human intervention.
+For full transparency and educational purposes, the complete prompts used to orchestrate the agent swarm are available in the [`docs/prompts/`](./docs/prompts/) directory.
 
 **Expect rapid changes, experimental commits, and occasional "hallucinated" refactors as the swarm learns to optimize its own workflow.**
 <!-- AGENT_SKIP_END -->
