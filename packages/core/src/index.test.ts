@@ -145,5 +145,26 @@ describe('Helios Core', () => {
         // Should not throw
         expect(() => helios.seek(30)).not.toThrow();
     });
+
+    it('should respect animationScope if provided', () => {
+        const mockScope = {
+            getAnimations: vi.fn().mockReturnValue([])
+        };
+        const mockAnim = { currentTime: 0, playState: 'running', pause: vi.fn() };
+        mockScope.getAnimations.mockReturnValue([mockAnim]);
+
+        const helios = new Helios({
+            duration: 10,
+            fps: 30,
+            autoSyncAnimations: true,
+            animationScope: mockScope as any
+        });
+
+        helios.seek(30);
+
+        expect(mockScope.getAnimations).toHaveBeenCalledWith({ subtree: true });
+        expect((document.getAnimations as any)).not.toHaveBeenCalled();
+        expect(mockAnim.currentTime).toBe(1000);
+    });
   });
 });

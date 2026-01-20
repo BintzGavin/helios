@@ -11,6 +11,7 @@ interface HeliosOptions {
   duration: number; // in seconds
   fps: number;
   autoSyncAnimations?: boolean;
+  animationScope?: HTMLElement;
 }
 
 export class Helios {
@@ -19,6 +20,7 @@ export class Helios {
   private animationFrameId: number | null = null;
   private syncWithDocumentTimeline = false;
   private autoSyncAnimations = false;
+  private animationScope: HTMLElement | Document = typeof document !== 'undefined' ? document : ({} as Document);
 
   constructor(options: HeliosOptions) {
     this.state = {
@@ -28,6 +30,9 @@ export class Helios {
       isPlaying: false,
     };
     this.autoSyncAnimations = options.autoSyncAnimations || false;
+    if (options.animationScope) {
+      this.animationScope = options.animationScope;
+    }
   }
 
   // --- State Management ---
@@ -83,9 +88,27 @@ export class Helios {
   }
 
   private syncDomAnimations(timeInMs: number) {
-    if (typeof document === 'undefined' || !document.getAnimations) return;
+    if (typeof document === 'undefined') return;
 
-    document.getAnimations().forEach((anim) => {
+    // Use the configured scope or fallback to document
+    // Note: getAnimations() on element requires { subtree: true } to act like document.getAnimations() for children
+    let anims: Animation[] = [];
+
+    // Check if animationScope is Document (safe check for environment where Document might not exist as a global constructor)
+    const isDocument = typeof Document !== 'undefined' && this.animationScope instanceof Document;
+
+    if (isDocument) {
+        if (typeof (this.animationScope as Document).getAnimations === 'function') {
+            anims = (this.animationScope as Document).getAnimations();
+        }
+    } else {
+        // Assume HTMLElement or similar interface
+        if (typeof (this.animationScope as any).getAnimations === 'function') {
+            anims = (this.animationScope as any).getAnimations({ subtree: true });
+        }
+    }
+
+    anims.forEach((anim: Animation) => {
       anim.currentTime = timeInMs;
       // Ensure it doesn't auto-play if we are driving it
       if (anim.playState !== 'paused') {
