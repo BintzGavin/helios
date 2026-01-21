@@ -22,4 +22,12 @@ export class CanvasStrategy implements RenderStrategy {
     // Extract base64 data
     return Buffer.from(dataUrl.split(',')[1], 'base64');
   }
+
+  getFFmpegInputArgs(config: { fps: number }): string[] {
+    return [
+      '-f', 'image2pipe',
+      '-framerate', `${config.fps}`,
+      '-i', '-',
+    ];
+  }
 }

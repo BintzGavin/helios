@@ -8,4 +8,11 @@ export interface RenderStrategy {
    * @returns A Promise that resolves to a Buffer containing the image data.
    */
   capture(page: Page, frameTime: number): Promise<Buffer>;
+
+  /**
+   * Returns the FFmpeg input arguments for this strategy.
+   * These arguments describe how the data is piped into FFmpeg.
+   * @param config Configuration object containing fps.
+   */
+  getFFmpegInputArgs(config: { fps: number }): string[];
 }
