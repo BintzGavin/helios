@@ -6,14 +6,16 @@
 - **Responsibility**: `<helios-player>` Web Component, UI controls, iframe bridge.
 
 ## Current State
-- `<helios-player>` exists but uses a hardcoded, non-standard contract (`updateAnimationAtTime`) to communicate with the iframe.
-- The standard composition example (`examples/simple-canvas-animation/composition.html`) exposes `window.helios` but does not implement `updateAnimationAtTime`.
-- Consequently, the Player cannot currently control or preview the example composition.
+- `<helios-player>` correctly drives the `Helios` instance exposed by the composition (via `window.helios`).
+- Client-side export using WebCodecs is implemented, driving the animation frame-by-frame via `seek()`.
+- The Player acts as a "Remote Control" for the headless logic engine inside the iframe.
 
 ## Critical Task
-- **Refactor Player Control Logic**: Update `HeliosPlayer` to detect and drive `window.helios` inside the iframe. This aligns the Player with the "Headless Logic Engine" architecture.
+- **None**: Major refactor complete. Next focus: UI polish and error handling.
 
 ## Backlog
-- [ ] Refactor `HeliosPlayer` to support `window.helios`.
-- [ ] Implement robust Client-Side Export (WebCodecs) using the correct `seek` mechanism.
+- [x] Refactor `HeliosPlayer` to support `window.helios`.
+- [x] Implement robust Client-Side Export (WebCodecs) using the correct `seek` mechanism.
 - [ ] Add proper UI feedback for "Loading" state.
+
+[2026-01-20] ✅ Completed: Refactor Player Control Logic - Verified `<helios-player>` uses `window.helios` and supports client-side export.

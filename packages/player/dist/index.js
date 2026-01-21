@@ -127,13 +127,15 @@ export class HeliosPlayer extends HTMLElement {
         if (remoteHelios) {
             console.log("HeliosPlayer: Connected to remote Helios instance in iframe.");
             this.helios = remoteHelios;
+            this.playPauseBtn.disabled = false;
+            this.exportBtn.disabled = false;
+            this.scrubber.disabled = false;
         }
         else {
             console.warn("HeliosPlayer: No Helios instance found in iframe (window.helios). Player controls will not function.");
-            // We could create a local instance, but it wouldn't drive anything.
-            // For backwards compatibility or fallback, we might want to keep the old logic?
-            // But the old logic relied on 'setAnimationTiming' which is also non-standard.
-            // Let's assume strict adherence to the new protocol.
+            this.playPauseBtn.disabled = true;
+            this.exportBtn.disabled = true;
+            this.scrubber.disabled = true;
             return;
         }
         const state = this.helios.getState();
