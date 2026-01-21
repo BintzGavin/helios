@@ -15,13 +15,13 @@
 - [ ] Handle asset preloading.
 
 ### 3. In-Browser Player Polish
-- [ ] Ensure `<helios-player>` works with `HeliosEngine`.
+- [x] Ensure `<helios-player>` works with `HeliosEngine`.
 - [ ] Sync player state with engine state.
-- [ ] Implement robust Client-Side Export (WebCodecs) using the correct `seek` mechanism.
+- [x] Implement robust Client-Side Export (WebCodecs) using the correct `seek` mechanism.
 - [ ] Add proper UI feedback for "Loading" state.
 
 ### 4. Diagnostics and GPU Detection
-- [ ] Implement `helios.diagnose()` for environment checks.
+- [x] Implement `helios.diagnose()` for environment checks.
 
 ### 5. Documentation and Examples
 - [ ] Add Quickstart guide.

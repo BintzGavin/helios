@@ -1,45 +1,41 @@
-# Context: Renderer (`packages/renderer`)
+# Context: Renderer (Pipeline)
 
-## A. Strategy Architecture
-The Renderer uses a **Strategy Pattern** to support different rendering modes:
-- **Canvas Strategy**: Uses `canvas.toDataURL()` via Playwright evaluation. Best for WebGL/Canvas2D.
-- **DOM Strategy**: Uses `page.screenshot()` via Playwright. Best for CSS/HTML animations.
-The strategy is selected via the `mode` option in `RendererOptions`.
+## A. Strategy
+The Renderer architecture implements a "Dual-Path" strategy using the Strategy Pattern:
+- **Canvas Mode**: Captures frames by converting the first `<canvas>` element to a data URL (using `toDataURL`). Best for canvas-based animations.
+- **DOM Mode**: Captures frames by taking a screenshot of the entire viewport (using `page.screenshot`). Best for CSS/DOM-based animations.
 
 ## B. File Tree
-packages/renderer/
-├── package.json
-├── scripts
-│   └── render.ts
-├── src
-│   ├── index.ts
-│   └── strategies
-│       ├── CanvasStrategy.ts
-│       ├── DomStrategy.ts
-│       └── RenderStrategy.ts
-└── tsconfig.json
+```
+packages/renderer/src/
+├── strategies/
+│   ├── CanvasStrategy.ts
+│   ├── DomStrategy.ts
+│   └── RenderStrategy.ts
+└── index.ts
+```
 
 ## C. Configuration
 ```typescript
-export interface RendererOptions {
+interface RendererOptions {
   width: number;
   height: number;
   fps: number;
   durationInSeconds: number;
   /**
    * The rendering mode to use.
-   * - 'canvas': Captures frames by converting the first <canvas> element to a data URL.
-   * - 'dom': Captures frames by taking a screenshot of the entire viewport.
-   *
-   * Defaults to 'canvas'.
+   * - 'canvas': Defaults to 'canvas'.
+   * - 'dom': Use for CSS/DOM animations.
    */
   mode?: 'canvas' | 'dom';
 }
 ```
 
 ## D. FFmpeg Interface
-The renderer pipes image data to FFmpeg (spawned process) with the following flags:
-- Input: `-f image2pipe`, `-framerate {fps}`, `-i -`
-- Codec: `-c:v libx264`
-- Pixel Format: `-pix_fmt yuv420p`
-- Flags: `-movflags +faststart`
+The renderer spawns an FFmpeg process with the following flags:
+- **Input**: `'-f', 'image2pipe', '-framerate', <fps>, '-i', '-'` (piped from buffer)
+- **Output**:
+  - `-c:v libx264`
+  - `-pix_fmt yuv420p`
+  - `-movflags +faststart`
+  - `-y` (overwrite)

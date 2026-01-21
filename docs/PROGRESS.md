@@ -27,3 +27,8 @@
 - **DOM to Video Path**: Now that Canvas MVP is solid, we can look at the DOM path.
 - **In-browser Player**: Ensure the player component works with the new `Helios` build.
 - **Diagnostics**: Add `helios.diagnose()` to help users debug environment issues.
+
+## [2026-01-21] Daily Report
+
+### Core
+- ✅ Completed: Implement Helios.diagnose() - Implemented static diagnose method and DiagnosticReport interface
