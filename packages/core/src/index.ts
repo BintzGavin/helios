@@ -14,6 +14,13 @@ interface HeliosOptions {
   animationScope?: HTMLElement;
 }
 
+export interface DiagnosticReport {
+  waapi: boolean;
+  webCodecs: boolean;
+  offscreenCanvas: boolean;
+  userAgent: string;
+}
+
 export class Helios {
   private state: HeliosState;
   private subscribers: Set<Subscriber> = new Set();
@@ -21,6 +28,27 @@ export class Helios {
   private syncWithDocumentTimeline = false;
   private autoSyncAnimations = false;
   private animationScope: HTMLElement | Document = typeof document !== 'undefined' ? document : ({} as Document);
+
+  static async diagnose(): Promise<DiagnosticReport> {
+    const report: DiagnosticReport = {
+      waapi: typeof document !== 'undefined' && 'timeline' in document,
+      webCodecs: typeof VideoEncoder !== 'undefined',
+      offscreenCanvas: typeof OffscreenCanvas !== 'undefined',
+      userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : 'Node/Server',
+    };
+
+    console.group('Helios Diagnostics');
+    console.log('WAAPI Support:', report.waapi ? '✅' : '❌');
+    console.log('WebCodecs Support:', report.webCodecs ? '✅' : '❌');
+    console.log('OffscreenCanvas Support:', report.offscreenCanvas ? '✅' : '❌');
+    console.log('User Agent:', report.userAgent);
+
+    if (!report.webCodecs) console.warn('Hardware accelerated rendering requires WebCodecs.');
+    console.log('To verify GPU acceleration, please visit: chrome://gpu');
+    console.groupEnd();
+
+    return report;
+  }
 
   constructor(options: HeliosOptions) {
     this.state = {
