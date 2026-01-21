@@ -8,12 +8,16 @@ type Subscriber = (state: HeliosState) => void;
 interface HeliosOptions {
     duration: number;
     fps: number;
+    autoSyncAnimations?: boolean;
+    animationScope?: HTMLElement;
 }
 export declare class Helios {
     private state;
     private subscribers;
     private animationFrameId;
     private syncWithDocumentTimeline;
+    private autoSyncAnimations;
+    private animationScope;
     constructor(options: HeliosOptions);
     private setState;
     getState(): Readonly<HeliosState>;
@@ -23,6 +27,7 @@ export declare class Helios {
     play(): void;
     pause(): void;
     seek(frame: number): void;
+    private syncDomAnimations;
     /**
      * Binds the Helios instance to document.timeline.
      * This is useful when the timeline is being driven externally (e.g. by the Renderer).

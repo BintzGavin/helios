@@ -13,10 +13,14 @@
   ],
   "scripts": {
     "dev": "npx vite ./examples/simple-canvas-animation",
+    "dev:react": "vite serve examples/react-canvas-animation",
     "build:examples": "vite build -c vite.build-example.config.js",
     "render:canvas-example": "npm run build:examples && ts-node packages/renderer/scripts/render.ts"
   },
   "devDependencies": {
+    "@vitejs/plugin-react": "^5.1.2",
+    "react": "^19.2.3",
+    "react-dom": "^19.2.3",
     "ts-node": "^10.9.2",
     "typescript": "^5.0.0",
     "vite": "^7.1.2",
