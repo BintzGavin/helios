@@ -5,13 +5,13 @@ To provide comprehensive, idiomatic examples for every major framework (React, V
 
 ## Current State
 - **Vanilla JS**: ✅ `examples/simple-canvas-animation` exists and works.
-- **React**: ❌ Missing.
+- **React**: ✅ `examples/react-canvas-animation` exists and works.
 - **Vue**: ❌ Missing.
 - **Svelte**: ❌ Missing.
 - **E2E Tests**: ❓ Need to verify coverage.
 
 ## Backlog
-- [ ] Scaffold React Example (`examples/react-canvas-animation`)
+- [x] Scaffold React Example (`examples/react-canvas-animation`)
 - [ ] Scaffold Vue Example
 - [ ] Scaffold Svelte Example
 - [ ] Verify E2E tests for examples
