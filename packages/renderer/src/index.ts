@@ -69,15 +69,18 @@ export class Renderer {
       const totalFrames = this.options.durationInSeconds * this.options.fps;
       const fps = this.options.fps;
 
-      const args = [
-        '-y',
-        '-f', 'image2pipe',
-        '-framerate', `${fps}`,
-        '-i', '-',
+      const inputArgs = this.strategy.getFFmpegInputArgs({ fps });
+      const outputArgs = [
         '-c:v', 'libx264',
         '-pix_fmt', 'yuv420p',
         '-movflags', '+faststart',
         outputPath,
+      ];
+
+      const args = [
+        '-y',
+        ...inputArgs,
+        ...outputArgs,
       ];
 
       const ffmpegProcess = spawn(ffmpegPath, args);

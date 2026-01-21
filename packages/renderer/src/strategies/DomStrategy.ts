@@ -14,4 +14,12 @@ export class DomStrategy implements RenderStrategy {
 
     return await page.screenshot({ type: 'png' });
   }
+
+  getFFmpegInputArgs(config: { fps: number }): string[] {
+    return [
+      '-f', 'image2pipe',
+      '-framerate', `${config.fps}`,
+      '-i', '-',
+    ];
+  }
 }
