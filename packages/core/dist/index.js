@@ -5,6 +5,24 @@ export class Helios {
     syncWithDocumentTimeline = false;
     autoSyncAnimations = false;
     animationScope = typeof document !== 'undefined' ? document : {};
+    static async diagnose() {
+        const report = {
+            waapi: typeof document !== 'undefined' && 'timeline' in document,
+            webCodecs: typeof VideoEncoder !== 'undefined',
+            offscreenCanvas: typeof OffscreenCanvas !== 'undefined',
+            userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : 'Node/Server',
+        };
+        console.group('Helios Diagnostics');
+        console.log('WAAPI Support:', report.waapi ? '✅' : '❌');
+        console.log('WebCodecs Support:', report.webCodecs ? '✅' : '❌');
+        console.log('OffscreenCanvas Support:', report.offscreenCanvas ? '✅' : '❌');
+        console.log('User Agent:', report.userAgent);
+        if (!report.webCodecs)
+            console.warn('Hardware accelerated rendering requires WebCodecs.');
+        console.log('To verify GPU acceleration, please visit: chrome://gpu');
+        console.groupEnd();
+        return report;
+    }
     constructor(options) {
         this.state = {
             duration: options.duration,
@@ -145,5 +163,3 @@ export class Helios {
         this.animationFrameId = requestAnimationFrame(this.tick);
     };
 }
-// Export animation helpers
-export * from './animation-helpers';

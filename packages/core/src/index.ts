@@ -211,6 +211,3 @@ export class Helios {
     this.animationFrameId = requestAnimationFrame(this.tick);
   }
 }
-
-// Export animation helpers
-export * from './animation-helpers';

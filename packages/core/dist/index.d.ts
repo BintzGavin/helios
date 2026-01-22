@@ -11,6 +11,12 @@ interface HeliosOptions {
     autoSyncAnimations?: boolean;
     animationScope?: HTMLElement;
 }
+export interface DiagnosticReport {
+    waapi: boolean;
+    webCodecs: boolean;
+    offscreenCanvas: boolean;
+    userAgent: string;
+}
 export declare class Helios {
     private state;
     private subscribers;
@@ -18,6 +24,7 @@ export declare class Helios {
     private syncWithDocumentTimeline;
     private autoSyncAnimations;
     private animationScope;
+    static diagnose(): Promise<DiagnosticReport>;
     constructor(options: HeliosOptions);
     private setState;
     getState(): Readonly<HeliosState>;
@@ -37,4 +44,4 @@ export declare class Helios {
     unbindFromDocumentTimeline(): void;
     private tick;
 }
-export * from './animation-helpers';
+export {};

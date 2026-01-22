@@ -21,20 +21,31 @@
     <canvas id="canvas" width="960" height="540"></canvas>
 
     <script type="module">
-      // Import the framework-provided animation helpers
-      import { initializeAnimation } from "../../packages/core/dist/index.js";
+      import { Helios } from "../../packages/core/dist/index.js";
 
       const canvas = document.getElementById("canvas");
       const ctx = canvas.getContext("2d");
 
-      // Animation state
-      let animationProgress = 0;
+      // Initialize Helios
+      const helios = new Helios({
+        duration: 5,
+        fps: 30
+      });
+
+      // Expose for debugging/Player
+      window.helios = helios;
 
       // Function to render the current frame
-      function render() {
+      function render(currentFrame, duration, fps) {
         // Clear canvas
         ctx.fillStyle = "#eee";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        const time = currentFrame / fps;
+        const totalDuration = duration;
+
+        // Calculate animation progress (0 to 1)
+        const progress = Math.min(1, Math.max(0, time / totalDuration));
 
         // Calculate box properties based on animation progress
         const centerX = canvas.width / 2;
@@ -42,9 +53,9 @@
         const boxSize = 150;
 
         // Animation: fade in, scale up, then move to the left
-        const opacity = Math.min(animationProgress * 2, 1);
-        const scale = 0.5 + animationProgress * 0.5;
-        const moveX = animationProgress * (canvas.width - boxSize);
+        const opacity = Math.min(progress * 2, 1);
+        const scale = 0.5 + progress * 0.5;
+        const moveX = progress * (canvas.width - boxSize);
 
         // Draw the animated box
         ctx.save();
@@ -58,64 +69,16 @@
         ctx.restore();
       }
 
-      // Create custom animation controller for canvas
-      function createCanvasAnimationController() {
-        // Function to update animation progress directly
-        function updateAnimationProgress(progress) {
-          animationProgress = progress;
-          render();
-        }
-
-        // Function to set animation timing
-        function setAnimationTiming(startTime, endTime, totalDuration) {
-          // Store timing info for future use
-          window.animationTiming = { startTime, endTime, totalDuration };
-        }
-
-        // Function to update animation based on current time
-        function updateAnimationAtTime(currentTime, totalDuration) {
-          const timing = window.animationTiming || {
-            startTime: 0,
-            endTime: 5,
-            totalDuration: 5,
-          };
-
-          // Calculate animation progress based on timing
-          let progress = 0;
-          if (
-            currentTime >= timing.startTime &&
-            currentTime <= timing.endTime
-          ) {
-            // Animation is active
-            progress =
-              (currentTime - timing.startTime) /
-              (timing.endTime - timing.startTime);
-          } else if (currentTime > timing.endTime) {
-            // Animation has finished
-            progress = 1;
-          }
-          // If currentTime < startTime, progress remains 0
-
-          updateAnimationProgress(progress);
-        }
-
-        // Attach functions to window for the player to use
-        window.updateAnimationProgress = updateAnimationProgress;
-        window.setAnimationTiming = setAnimationTiming;
-        window.updateAnimationAtTime = updateAnimationAtTime;
-
-        return {
-          updateAnimationProgress,
-          setAnimationTiming,
-          updateAnimationAtTime,
-        };
-      }
-
-      // Initialize the canvas animation system
-      createCanvasAnimationController();
+      // Subscribe to state changes
+      helios.subscribe((state) => {
+        render(state.currentFrame, state.duration, state.fps);
+      });
 
       // Initial render
-      render();
+      render(0, 5, 30);
+
+      // Bind to document timeline for external control
+      helios.bindToDocumentTimeline();
     </script>
   </body>
 </html>

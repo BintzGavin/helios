@@ -31,6 +31,15 @@ describe('Helios Core', () => {
         helios.seek(10);
         expect(spy).toHaveBeenLastCalledWith(expect.objectContaining({ currentFrame: 10 }));
     });
+    describe('Diagnostics', () => {
+        it('should run diagnose without error', async () => {
+            const report = await Helios.diagnose();
+            expect(report).toHaveProperty('waapi');
+            expect(report).toHaveProperty('webCodecs');
+            expect(report).toHaveProperty('offscreenCanvas');
+            expect(report).toHaveProperty('userAgent');
+        });
+    });
     describe('Document Timeline Binding', () => {
         beforeEach(() => {
             // Mock document.timeline
