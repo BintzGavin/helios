@@ -2,6 +2,11 @@ import { Page } from 'playwright';
 import { RenderStrategy } from './RenderStrategy';
 
 export class DomStrategy implements RenderStrategy {
+  async prepare(page: Page): Promise<void> {
+    // No-op for now.
+    return Promise.resolve();
+  }
+
   async capture(page: Page, frameTime: number): Promise<Buffer> {
     await page.evaluate((timeValue) => {
       (document.timeline as any).currentTime = timeValue;

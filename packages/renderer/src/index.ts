@@ -65,6 +65,10 @@ export class Renderer {
       await page.goto(compositionUrl, { waitUntil: 'networkidle' });
       console.log('Page loaded.');
 
+      console.log('Preparing render strategy...');
+      await this.strategy.prepare(page);
+      console.log('Strategy prepared.');
+
       const ffmpegPath = ffmpeg.path;
       const totalFrames = this.options.durationInSeconds * this.options.fps;
       const fps = this.options.fps;
