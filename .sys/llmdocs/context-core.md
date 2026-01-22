@@ -1,62 +1,30 @@
-# Context: Core (Logic Engine)
+# Context: Core
 
-## A. Architecture
-The Helios Core functions as a State Machine (Store -> Actions -> Subscribers) to maintain the "Truth of Time" (duration, fps, currentFrame) for animations. It manages the timeline state and synchronizes with the browser's native timeline (WAAPI) if configured.
+## Section A: Architecture
+The Core package implements the "Helios State Machine" pattern. It serves as the single source of truth for time and state (Store -> Actions -> Subscribers). It is fully headless and does not depend on the DOM for its logic, although it can bind to `document.timeline`.
 
-## B. File Tree
-```
+## Section B: File Tree
 packages/core/src/
-├── animation-helpers.ts
 ├── index.test.ts
-└── index.ts
-```
+├── index.ts
 
-## C. Type Definitions
-```typescript
-type HeliosState = {
-  duration: number;
-  fps: number;
-  currentFrame: number;
-  isPlaying: boolean;
-};
+## Section C: Type Definitions
+### exported from index.ts
+- type HeliosState = { duration: number; fps: number; currentFrame: number; isPlaying: boolean; };
+- type Subscriber = (state: HeliosState) => void;
+- interface HeliosOptions { duration: number; fps: number; autoSyncAnimations?: boolean; animationScope?: HTMLElement; }
+- interface DiagnosticReport { waapi: boolean; webCodecs: boolean; offscreenCanvas: boolean; userAgent: string; }
 
-type Subscriber = (state: HeliosState) => void;
-
-interface HeliosOptions {
-  duration: number; // in seconds
-  fps: number;
-  autoSyncAnimations?: boolean;
-  animationScope?: HTMLElement;
-}
-
-interface DiagnosticReport {
-  waapi: boolean;
-  webCodecs: boolean;
-  offscreenCanvas: boolean;
-  userAgent: string;
-}
-```
-
-## D. Public Methods
-```typescript
+## Section D: Public Methods
 class Helios {
   static diagnose(): Promise<DiagnosticReport>;
   constructor(options: HeliosOptions);
-
-  // State Management
   getState(): Readonly<HeliosState>;
-
-  // Subscription
   subscribe(callback: Subscriber): () => void;
   unsubscribe(callback: Subscriber): void;
-
-  // Playback Controls
   play(): void;
   pause(): void;
   seek(frame: number): void;
-
-  // Timeline Synchronization
   bindToDocumentTimeline(): void;
   unbindFromDocumentTimeline(): void;
 }
-```
