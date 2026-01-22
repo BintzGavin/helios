@@ -1,21 +1,19 @@
-# Context: Player (Web Component)
+# Context: Player
 
-## A. Component Structure
-The `<helios-player>` Web Component utilizes a Shadow DOM structure acting as a "Remote Control" for the composition in the iframe.
+## Section A: Component Structure
+The `<helios-player>` web component uses a Shadow DOM with the following structure:
+- Wrapper (Host)
+  - Iframe (`part="iframe"`, `sandbox="allow-scripts allow-same-origin"`)
+  - Controls Overlay (`.controls`)
+    - Play/Pause Button
+    - Export Button
+    - Scrubber
+    - Time Display
 
-**Shadow DOM Layout**:
-```
-:host
-├── iframe (part="iframe")
-└── div.controls
-    ├── button.play-pause-btn (part="play-pause-button")
-    ├── button.export-btn (part="export-button")
-    ├── input.scrubber (type="range", part="scrubber")
-    └── div.time-display (part="time-display")
-```
+## Section B: Events
+The component does not explicitly dispatch custom DOM events. It communicates via `postMessage`:
+- Sends: `HELIOS_CONNECT`, `HELIOS_PLAY`, `HELIOS_PAUSE`, `HELIOS_SEEK`.
+- Receives: `HELIOS_READY`, `HELIOS_STATE`.
 
-## B. Events
-The component does not currently dispatch custom events. It listens for interactions and drives the `window.helios` instance within the iframe.
-
-## C. Attributes
-- **`src`**: The URL of the composition to load within the iframe.
+## Section C: Attributes
+- `src`: The URL of the composition to load in the iframe.

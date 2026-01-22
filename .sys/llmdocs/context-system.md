@@ -1,7 +1,6 @@
-# Context: System (Global)
+# Context: System
 
-## A. Milestones (from BACKLOG.md)
-
+## Section A: Milestones
 ### 1. Canvas MVP End-to-End
 - [x] Implement `HeliosEngine` core logic (Timeline, State).
 - [x] Create a basic Canvas rendering example (using Helios core).
@@ -9,6 +8,7 @@
 - [x] Wire up FFmpeg for video output.
 - [x] Create a CLI entry point for rendering.
 - [ ] Refactor `Renderer` to use `WebCodecs` (High Performance) instead of `toDataURL` (current MVP).
+- [ ] Add test script to packages/core.
 
 ### 2. DOM to Video Path
 - [ ] Implement Playwright capture loop for DOM elements.
@@ -30,12 +30,12 @@
 ### 6. Distributed Rendering Research
 - [ ] Scaffolding for distributed rendering.
 
-## B. Role Boundaries
-- **Core**: Pure TypeScript logic, state, timing. Must **NEVER** import `renderer` or `player`.
-- **Renderer**: Node.js/Playwright environment. Can import `core` types if necessary but operates on built artifacts.
-- **Player**: Web Component (Browser). Imports `core` to interact with `window.helios` instance in iframe.
+## Section B: Role Boundaries
+- **Core**: Logic Engine. Pure TypeScript. Never imports Renderer or Player.
+- **Renderer**: Rendering Pipeline (Playwright + FFmpeg). Node.js environment.
+- **Player**: Web Component. Browser environment.
 
-## C. Shared Build Commands
-- `npm run build:examples`: Builds the example compositions using Vite (generating `output/examples`).
-- `npm run render:canvas-example`: Executes the `render.ts` script to render the default canvas example.
-- `npm run dev`: Starts the dev server for examples.
+## Section C: Shared Build Commands
+- `npm run build:examples`: Builds the example compositions.
+- `npm run build`: Builds the renderer package.
+- `npm run build -w packages/player`: Builds the player package.
