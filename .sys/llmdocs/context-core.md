@@ -1,16 +1,15 @@
-# Context: Core Logic Engine (`packages/core`)
+# Context: Core (Logic Engine)
 
 ## A. Architecture
-The Core package implements the **Helios State Machine**, serving as the single source of truth for time and animation state.
-- **Store**: Holds `frame`, `time`, `fps`, `duration`, `isPlaying`.
-- **Actions**: Methods like `seek()`, `play()`, `pause()` modify the store.
-- **Subscribers**: Components (Player, Renderer) subscribe to state changes to update their views.
+The Helios Core functions as a State Machine (Store -> Actions -> Subscribers) to maintain the "Truth of Time" (duration, fps, currentFrame) for animations. It manages the timeline state and synchronizes with the browser's native timeline (WAAPI) if configured.
 
 ## B. File Tree
+```
 packages/core/src/
 ├── animation-helpers.ts
 ├── index.test.ts
 └── index.ts
+```
 
 ## C. Type Definitions
 ```typescript
@@ -30,38 +29,34 @@ interface HeliosOptions {
   animationScope?: HTMLElement;
 }
 
-export interface AnimationTiming {
-  startTime: number;
-  endTime: number;
-  totalDuration: number;
-}
-
-export interface AnimationState {
-  progress: number;
-  isActive: boolean;
-  isComplete: boolean;
+interface DiagnosticReport {
+  waapi: boolean;
+  webCodecs: boolean;
+  offscreenCanvas: boolean;
+  userAgent: string;
 }
 ```
 
-## D. Public Methods (Helios Class)
+## D. Public Methods
 ```typescript
-export class Helios {
+class Helios {
+  static diagnose(): Promise<DiagnosticReport>;
   constructor(options: HeliosOptions);
 
   // State Management
-  public getState(): Readonly<HeliosState>;
+  getState(): Readonly<HeliosState>;
 
   // Subscription
-  public subscribe(callback: Subscriber): () => void;
-  public unsubscribe(callback: Subscriber): void;
+  subscribe(callback: Subscriber): () => void;
+  unsubscribe(callback: Subscriber): void;
 
   // Playback Controls
-  public play(): void;
-  public pause(): void;
-  public seek(frame: number): void;
+  play(): void;
+  pause(): void;
+  seek(frame: number): void;
 
   // Timeline Synchronization
-  public bindToDocumentTimeline(): void;
-  public unbindFromDocumentTimeline(): void;
+  bindToDocumentTimeline(): void;
+  unbindFromDocumentTimeline(): void;
 }
 ```
