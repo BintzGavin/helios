@@ -40,12 +40,34 @@
   <div class="animated-box"></div>
   
   <script type="module">
-    // Import the framework-provided animation helpers
-    import { initializeAnimation } from '../../packages/core/dist/index.js';
+    import { Helios } from '../../packages/core/dist/index.js';
+
+    // Initialize Helios engine
+    const helios = new Helios({
+      duration: 5,
+      fps: 30
+    });
+
+    // Expose for the Player and debugging
+    window.helios = helios;
+
+    // Connect to the DOM
+    const box = document.querySelector('.animated-box');
     
-    // Initialize the animation system
-    // This automatically sets up the window functions that the player needs
-    initializeAnimation('.animated-box');
+    // Set static properties
+    box.style.setProperty('--animation-duration', '5s');
+    box.style.setProperty('--animation-start-time', '0s');
+    box.style.setProperty('--animation-end-time', '5s');
+
+    // Subscribe to state changes to drive the CSS variable
+    helios.subscribe((state) => {
+      const time = state.currentFrame / state.fps;
+      const progress = Math.min(1, Math.max(0, time / 5));
+      box.style.setProperty('--animation-progress', String(progress));
+    });
+
+    // Enable external control (e.g. from Renderer)
+    helios.bindToDocumentTimeline();
   </script>
 </body>
 </html>
