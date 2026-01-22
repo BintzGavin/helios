@@ -2,6 +2,12 @@ import { Page } from 'playwright';
 import { RenderStrategy } from './RenderStrategy';
 
 export class CanvasStrategy implements RenderStrategy {
+  async prepare(page: Page): Promise<void> {
+    // No-op for now.
+    // In the future, this is where we would initialize WebCodecs or other stateful components.
+    return Promise.resolve();
+  }
+
   async capture(page: Page, frameTime: number): Promise<Buffer> {
     const dataUrl = await page.evaluate((timeValue) => {
       // Direct access to document.timeline to set time

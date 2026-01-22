@@ -2,8 +2,9 @@
 **/node_modules
 
 # Build artifacts
-/dist
-/build
+dist/
+build/
+*.tsbuildinfo
 output/
 
 # Logs
