@@ -51,6 +51,10 @@ template.innerHTML = `
     .export-btn:hover {
       background-color: #0056b3;
     }
+    .export-btn:disabled {
+      background-color: #666;
+      cursor: not-allowed;
+    }
     .scrubber {
       flex-grow: 1;
       margin: 0 16px;
@@ -76,7 +80,7 @@ template.innerHTML = `
       text-align: center;
     }
   </style>
-  <iframe part="iframe"></iframe>
+  <iframe part="iframe" sandbox="allow-scripts allow-same-origin"></iframe>
   <div class="controls">
     <button class="play-pause-btn" part="play-pause-button">▶</button>
     <button class="export-btn" part="export-button">Export</button>
@@ -85,6 +89,67 @@ template.innerHTML = `
   </div>
 `;
 
+interface HeliosController {
+  play(): void;
+  pause(): void;
+  seek(frame: number): void;
+  subscribe(callback: (state: any) => void): () => void;
+  getState(): any;
+  dispose(): void;
+}
+
+class DirectController implements HeliosController {
+  constructor(public instance: Helios) {}
+  play() { this.instance.play(); }
+  pause() { this.instance.pause(); }
+  seek(frame: number) { this.instance.seek(frame); }
+  subscribe(callback: (state: any) => void) { return this.instance.subscribe(callback); }
+  getState() { return this.instance.getState(); }
+  dispose() { /* No-op for direct */ }
+}
+
+class BridgeController implements HeliosController {
+  private listeners: ((state: any) => void)[] = [];
+  private lastState: any;
+
+  constructor(private iframeWindow: Window, initialState?: any) {
+    this.lastState = initialState || { isPlaying: false, currentFrame: 0, duration: 0, fps: 30 };
+    window.addEventListener('message', this.handleMessage);
+  }
+
+  private handleMessage = (event: MessageEvent) => {
+    // Only accept messages from valid sources?
+    // For now we accept any HELIOS_STATE as we might not know the exact source origin if sandboxed 'null'
+    if (event.data?.type === 'HELIOS_STATE') {
+      this.lastState = event.data.state;
+      this.notifyListeners();
+    }
+  }
+
+  private notifyListeners() {
+    this.listeners.forEach(cb => cb(this.lastState));
+  }
+
+  play() { this.iframeWindow.postMessage({ type: 'HELIOS_PLAY' }, '*'); }
+  pause() { this.iframeWindow.postMessage({ type: 'HELIOS_PAUSE' }, '*'); }
+  seek(frame: number) { this.iframeWindow.postMessage({ type: 'HELIOS_SEEK', frame }, '*'); }
+
+  subscribe(callback: (state: any) => void) {
+    this.listeners.push(callback);
+    // Call immediately with current state
+    callback(this.lastState);
+    return () => {
+      this.listeners = this.listeners.filter(l => l !== callback);
+    };
+  }
+
+  getState() { return this.lastState; }
+
+  dispose() {
+      window.removeEventListener('message', this.handleMessage);
+  }
+}
+
 export class HeliosPlayer extends HTMLElement {
   private iframe: HTMLIFrameElement;
   private playPauseBtn: HTMLButtonElement;
@@ -92,9 +157,10 @@ export class HeliosPlayer extends HTMLElement {
   private timeDisplay: HTMLDivElement;
   private exportBtn: HTMLButtonElement;
 
-  // The Helios instance driving the animation.
-  // This can be a local instance (fallback) or a remote instance (from iframe).
-  private helios: Helios | null = null;
+  private controller: HeliosController | null = null;
+  // Keep track if we have direct access for export purposes
+  private directHelios: Helios | null = null;
+  private unsubscribe: (() => void) | null = null;
 
   constructor() {
     super();
@@ -110,6 +176,7 @@ export class HeliosPlayer extends HTMLElement {
 
   connectedCallback() {
     this.iframe.addEventListener("load", this.handleIframeLoad);
+    window.addEventListener("message", this.handleWindowMessage);
 
     // Set src from attribute
     const src = this.getAttribute("src");
@@ -120,64 +187,130 @@ export class HeliosPlayer extends HTMLElement {
     this.playPauseBtn.addEventListener("click", this.togglePlayPause);
     this.scrubber.addEventListener("input", this.handleScrubberInput);
     this.exportBtn.addEventListener("click", this.renderClientSide);
+
+    // Initial state: disabled until connected
+    this.setControlsDisabled(true);
   }
 
   disconnectedCallback() {
     this.iframe.removeEventListener("load", this.handleIframeLoad);
+    window.removeEventListener("message", this.handleWindowMessage);
     this.playPauseBtn.removeEventListener("click", this.togglePlayPause);
     this.scrubber.removeEventListener("input", this.handleScrubberInput);
     this.exportBtn.removeEventListener("click", this.renderClientSide);
-    this.helios?.pause();
+
+    if (this.unsubscribe) {
+        this.unsubscribe();
+    }
+    if (this.controller) {
+        this.controller.pause();
+        this.controller.dispose();
+    }
+  }
+
+  private setControlsDisabled(disabled: boolean) {
+      this.playPauseBtn.disabled = disabled;
+      this.scrubber.disabled = disabled;
+      // Export is managed separately based on direct access
+      if (disabled) {
+          this.exportBtn.disabled = true;
+      }
   }
 
   private handleIframeLoad = () => {
     if (!this.iframe.contentWindow) return;
 
-    // Check for Helios instance in the iframe
-    const remoteHelios = (this.iframe.contentWindow as any).helios as Helios | undefined;
-
-    if (remoteHelios) {
-        console.log("HeliosPlayer: Connected to remote Helios instance in iframe.");
-        this.helios = remoteHelios;
-        this.playPauseBtn.disabled = false;
-        this.exportBtn.disabled = false;
-        this.scrubber.disabled = false;
-    } else {
-        console.warn("HeliosPlayer: No Helios instance found in iframe (window.helios). Player controls will not function.");
-        this.playPauseBtn.disabled = true;
-        this.exportBtn.disabled = true;
-        this.scrubber.disabled = true;
-        return;
+    // 1. Try Direct Mode (Legacy/Local)
+    let directInstance: Helios | undefined;
+    try {
+        directInstance = (this.iframe.contentWindow as any).helios as Helios | undefined;
+    } catch (e) {
+        // Access denied (Cross-origin)
+        console.log("HeliosPlayer: Direct access to iframe denied (likely cross-origin).");
     }
 
-    const state = this.helios.getState();
-    this.scrubber.max = String(state.duration * state.fps);
-    this.updateUI(state); // Initial UI update
+    if (directInstance) {
+        console.log("HeliosPlayer: Connected via Direct Mode.");
+        this.directHelios = directInstance;
+        this.setController(new DirectController(directInstance));
+        this.exportBtn.disabled = false;
+    } else {
+        this.directHelios = null;
+        this.exportBtn.disabled = true; // Cannot export without direct access currently
+        // If not direct, we wait for Bridge connection
+        console.log("HeliosPlayer: Waiting for Bridge connection...");
+    }
 
-    this.setupHeliosSubscription();
+    // 2. Initiate Bridge Mode (always try to connect)
+    this.iframe.contentWindow.postMessage({ type: 'HELIOS_CONNECT' }, '*');
   };
 
+  private handleWindowMessage = (event: MessageEvent) => {
+      // Check if this message is a handshake response
+      if (event.data?.type === 'HELIOS_READY') {
+          // If we already have a controller (e.g. Direct Mode), we might stick with it
+          // OR we could switch to Bridge if we prefer consistent behavior?
+          // BUT Direct Mode is needed for Export.
+          // So if we have directHelios, we ignore HELIOS_READY for control purposes,
+          // or we just acknowledge it but don't replace the controller.
+
+          if (!this.controller) {
+              console.log("HeliosPlayer: Connected via Bridge Mode.");
+              const iframeWin = this.iframe.contentWindow;
+              if (iframeWin) {
+                  this.setController(new BridgeController(iframeWin));
+                  // Ensure we get the latest state immediately if provided
+                  if (event.data.state) {
+                      this.updateUI(event.data.state);
+                  }
+              }
+          }
+      }
+  };
+
+  private setController(controller: HeliosController) {
+      // Clean up old controller
+      if (this.controller) {
+          this.controller.dispose();
+      }
+      if (this.unsubscribe) {
+          this.unsubscribe();
+          this.unsubscribe = null;
+      }
+
+      this.controller = controller;
+      this.setControlsDisabled(false);
+
+      const state = this.controller.getState();
+      if (state) {
+          this.scrubber.max = String(state.duration * state.fps);
+          this.updateUI(state);
+      }
+
+      this.unsubscribe = this.controller.subscribe((s) => this.updateUI(s));
+  }
+
   private togglePlayPause = () => {
-    if (!this.helios) return;
-    const state = this.helios.getState();
+    if (!this.controller) return;
+    const state = this.controller.getState();
 
     const isFinished = state.currentFrame >= state.duration * state.fps - 1;
 
     if (isFinished) {
       // Restart the animation
-      this.helios.seek(0);
-      this.helios.play();
+      this.controller.seek(0);
+      this.controller.play();
     } else if (state.isPlaying) {
-      this.helios.pause();
+      this.controller.pause();
     } else {
-      this.helios.play();
+      this.controller.play();
     }
   };
 
   private handleScrubberInput = () => {
     const frame = parseInt(this.scrubber.value, 10);
-    if (this.helios) {
-      this.helios.seek(frame);
+    if (this.controller) {
+      this.controller.seek(frame);
     }
   };
 
@@ -195,30 +328,24 @@ export class HeliosPlayer extends HTMLElement {
       ).toFixed(2)} / ${state.duration.toFixed(2)}`;
   }
 
-  private setupHeliosSubscription() {
-    if (!this.helios) return;
-
-    this.helios.subscribe((state: any) => {
-      // Since we are driving the remote instance, the iframe content should update itself
-      // (because it should be subscribed to its own helios instance).
-      // So we only need to update our UI.
-      this.updateUI(state);
-    });
-  }
-
   private renderClientSide = async () => {
-    if (!this.helios) return;
+    // Export requires Direct Mode
+    if (!this.directHelios || !this.controller) {
+        console.error("Export not available: No direct access to Helios instance.");
+        return;
+    }
+
     console.log("Client-side rendering started!");
     this.exportBtn.disabled = true;
     this.exportBtn.textContent = "Rendering...";
 
     // Pause playback before rendering
-    this.helios.pause();
+    this.controller.pause();
 
     let encoder: VideoEncoder | null = null;
 
     try {
-      const state = this.helios.getState();
+      const state = this.controller.getState();
       const totalFrames = state.duration * state.fps;
 
       // Check if this is a canvas-based or DOM-based composition
@@ -268,7 +395,7 @@ export class HeliosPlayer extends HTMLElement {
 
       for (let i = 0; i < totalFrames; i++) {
         // Seek the remote Helios instance
-        this.helios.seek(i);
+        this.controller.seek(i);
 
         // Wait for a frame to pass to ensure rendering is updated
         // We use the iframe's requestAnimationFrame to be sure
@@ -322,10 +449,12 @@ export class HeliosPlayer extends HTMLElement {
   };
 
   private async renderDOMToVideo() {
+    if (!this.directHelios || !this.controller) return;
+
     let encoder: VideoEncoder | null = null;
 
     try {
-      const state = this.helios!.getState();
+      const state = this.controller.getState();
       const totalFrames = state.duration * state.fps;
 
       // Create a temporary canvas for DOM-to-canvas conversion
@@ -375,7 +504,7 @@ export class HeliosPlayer extends HTMLElement {
       // Render each frame
       for (let i = 0; i < totalFrames; i++) {
         // Seek to the current frame
-        this.helios!.seek(i);
+        this.controller.seek(i);
 
         // Wait for the animation to update
         await new Promise((r) =>
@@ -431,6 +560,7 @@ export class HeliosPlayer extends HTMLElement {
     canvas: HTMLCanvasElement,
     ctx: CanvasRenderingContext2D
   ) {
+    // This requires access to iframe.contentDocument, only available in Direct Mode
     const iframeDoc = this.iframe.contentDocument!;
     const body = iframeDoc.body;
 
@@ -444,7 +574,6 @@ export class HeliosPlayer extends HTMLElement {
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     // Simple DOM-to-canvas conversion
-    // This is a basic implementation - for production, you'd want to use html2canvas or similar
     await this.renderElementToCanvas(body, ctx, 0, 0);
   }
 
