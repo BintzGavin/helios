@@ -1,30 +1,69 @@
-# Context: Core
+# Context: Core (Logic Engine)
 
-## Section A: Architecture
-The Core package implements the "Helios State Machine" pattern. It serves as the single source of truth for time and state (Store -> Actions -> Subscribers). It is fully headless and does not depend on the DOM for its logic, although it can bind to `document.timeline`.
+## A. Architecture
+The Helios Core (`packages/core`) implements a framework-agnostic **State Machine** pattern.
+1. **Store**: Holds the source of truth (`HeliosState`: `currentFrame`, `isPlaying`, `fps`, `duration`).
+2. **Actions**: Methods like `play()`, `pause()`, `seek()` mutate the state.
+3. **Subscribers**: External consumers (UI, Renderer) subscribe to state changes to update their view.
 
-## Section B: File Tree
+This design allows the Core to be "Headless" and driver-agnostic (it can be driven by `requestAnimationFrame`, `document.timeline`, or manual seeking).
+
+## B. File Tree
+```
 packages/core/src/
-├── index.test.ts
-├── index.ts
+├── index.ts      # Main entry point (Helios class, types)
+├── index.test.ts # Unit tests
+```
 
-## Section C: Type Definitions
-### exported from index.ts
-- type HeliosState = { duration: number; fps: number; currentFrame: number; isPlaying: boolean; };
-- type Subscriber = (state: HeliosState) => void;
-- interface HeliosOptions { duration: number; fps: number; autoSyncAnimations?: boolean; animationScope?: HTMLElement; }
-- interface DiagnosticReport { waapi: boolean; webCodecs: boolean; offscreenCanvas: boolean; userAgent: string; }
+## C. Type Definitions
+```typescript
+type HeliosState = {
+  duration: number;
+  fps: number;
+  currentFrame: number;
+  isPlaying: boolean;
+};
 
-## Section D: Public Methods
+type Subscriber = (state: HeliosState) => void;
+
+interface HeliosOptions {
+  duration: number; // in seconds
+  fps: number;
+  autoSyncAnimations?: boolean;
+  animationScope?: HTMLElement;
+}
+
+interface DiagnosticReport {
+  waapi: boolean;
+  webCodecs: boolean;
+  offscreenCanvas: boolean;
+  userAgent: string;
+}
+```
+
+## D. Public Methods (Helios Class)
+```typescript
 class Helios {
+  // Static Diagnostics
   static diagnose(): Promise<DiagnosticReport>;
+
+  // Lifecycle
   constructor(options: HeliosOptions);
+
+  // State Access
   getState(): Readonly<HeliosState>;
+
+  // Subscription
   subscribe(callback: Subscriber): () => void;
   unsubscribe(callback: Subscriber): void;
+
+  // Playback Controls
   play(): void;
   pause(): void;
   seek(frame: number): void;
+
+  // External Timeline Sync (for Renderer/DevTools)
   bindToDocumentTimeline(): void;
   unbindFromDocumentTimeline(): void;
 }
+```
