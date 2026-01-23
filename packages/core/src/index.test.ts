@@ -39,6 +39,22 @@ describe('Helios Core', () => {
     expect(spy).toHaveBeenLastCalledWith(expect.objectContaining({ currentFrame: 10 }));
   });
 
+  describe('Constructor Validation', () => {
+    it('should throw if duration is negative', () => {
+      expect(() => new Helios({ duration: -1, fps: 30 })).toThrow("Duration must be non-negative");
+    });
+
+    it('should throw if fps is zero or negative', () => {
+      expect(() => new Helios({ duration: 10, fps: 0 })).toThrow("FPS must be greater than 0");
+      expect(() => new Helios({ duration: 10, fps: -30 })).toThrow("FPS must be greater than 0");
+    });
+
+    it('should not throw for valid options', () => {
+      expect(() => new Helios({ duration: 0, fps: 30 })).not.toThrow();
+      expect(() => new Helios({ duration: 10, fps: 0.1 })).not.toThrow();
+    });
+  });
+
   describe('Diagnostics', () => {
     it('should run diagnose without error', async () => {
       const report = await Helios.diagnose();
