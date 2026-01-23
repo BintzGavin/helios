@@ -1,4 +1,5 @@
 import { Page } from 'playwright';
+import { RendererOptions } from '../types';
 
 export interface RenderStrategy {
   /**
@@ -27,9 +28,10 @@ export interface RenderStrategy {
   finish(page: Page): Promise<Buffer | void>;
 
   /**
-   * Returns the FFmpeg input arguments for this strategy.
-   * These arguments describe how the data is piped into FFmpeg.
-   * @param config Configuration object containing fps.
+   * Returns the full FFmpeg arguments for this strategy.
+   * These arguments describe both input and output configuration.
+   * @param options Renderer options.
+   * @param outputPath The path to the output file.
    */
-  getFFmpegInputArgs(config: { fps: number }): string[];
+  getFFmpegArgs(options: RendererOptions, outputPath: string): string[];
 }

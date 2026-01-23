@@ -4,21 +4,9 @@ import ffmpeg from '@ffmpeg-installer/ffmpeg';
 import { RenderStrategy } from './strategies/RenderStrategy';
 import { CanvasStrategy } from './strategies/CanvasStrategy';
 import { DomStrategy } from './strategies/DomStrategy';
+import { RendererOptions } from './types';
 
-export interface RendererOptions {
-  width: number;
-  height: number;
-  fps: number;
-  durationInSeconds: number;
-  /**
-   * The rendering mode to use.
-   * - 'canvas': Captures frames by converting the first <canvas> element to a data URL. Best for canvas-based animations.
-   * - 'dom': Captures frames by taking a screenshot of the entire viewport. Best for CSS/DOM-based animations.
-   *
-   * Defaults to 'canvas'.
-   */
-  mode?: 'canvas' | 'dom';
-}
+export { RendererOptions } from './types';
 
 export class Renderer {
   private options: RendererOptions;
@@ -73,19 +61,7 @@ export class Renderer {
       const totalFrames = this.options.durationInSeconds * this.options.fps;
       const fps = this.options.fps;
 
-      const inputArgs = this.strategy.getFFmpegInputArgs({ fps });
-      const outputArgs = [
-        '-c:v', 'libx264',
-        '-pix_fmt', 'yuv420p',
-        '-movflags', '+faststart',
-        outputPath,
-      ];
-
-      const args = [
-        '-y',
-        ...inputArgs,
-        ...outputArgs,
-      ];
+      const args = this.strategy.getFFmpegArgs(this.options, outputPath);
 
       const ffmpegProcess = spawn(ffmpegPath, args);
       console.log(`Spawning FFmpeg: ${ffmpegPath} ${args.join(' ')}`);

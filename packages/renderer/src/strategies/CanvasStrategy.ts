@@ -1,5 +1,6 @@
 import { Page } from 'playwright';
 import { RenderStrategy } from './RenderStrategy';
+import { RendererOptions } from '../types';
 
 export class CanvasStrategy implements RenderStrategy {
   private useWebCodecs = false;
@@ -235,17 +236,18 @@ export class CanvasStrategy implements RenderStrategy {
     return Promise.resolve();
   }
 
-  getFFmpegInputArgs(config: { fps: number }): string[] {
-    if (this.useWebCodecs) {
-      return [
-        '-f', 'ivf',
-        '-i', '-',
-      ];
-    }
-    return [
-      '-f', 'image2pipe',
-      '-framerate', `${config.fps}`,
-      '-i', '-',
+  getFFmpegArgs(options: RendererOptions, outputPath: string): string[] {
+    const inputArgs = this.useWebCodecs
+      ? ['-f', 'ivf', '-i', '-']
+      : ['-f', 'image2pipe', '-framerate', `${options.fps}`, '-i', '-'];
+
+    const outputArgs = [
+      '-c:v', 'libx264',
+      '-pix_fmt', 'yuv420p',
+      '-movflags', '+faststart',
+      outputPath,
     ];
+
+    return ['-y', ...inputArgs, ...outputArgs];
   }
 }
