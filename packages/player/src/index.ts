@@ -79,7 +79,46 @@ template.innerHTML = `
       min-width: 90px;
       text-align: center;
     }
+    .status-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.8);
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+      transition: opacity 0.3s;
+    }
+    .status-overlay.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+    .error-msg {
+      color: #ff6b6b;
+      margin-bottom: 10px;
+      font-size: 16px;
+      font-weight: bold;
+    }
+    .retry-btn {
+      background-color: #ff6b6b;
+      border: none;
+      color: white;
+      padding: 8px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      margin-top: 10px;
+    }
+    .retry-btn:hover {
+      background-color: #ff5252;
+    }
   </style>
+  <div class="status-overlay" part="overlay">
+    <div class="status-text">Connecting...</div>
+    <button class="retry-btn" style="display:none">Retry</button>
+  </div>
   <iframe part="iframe" sandbox="allow-scripts allow-same-origin"></iframe>
   <div class="controls">
     <button class="play-pause-btn" part="play-pause-button">▶</button>
@@ -156,11 +195,15 @@ export class HeliosPlayer extends HTMLElement {
   private scrubber: HTMLInputElement;
   private timeDisplay: HTMLDivElement;
   private exportBtn: HTMLButtonElement;
+  private overlay: HTMLElement;
+  private statusText: HTMLElement;
+  private retryBtn: HTMLButtonElement;
 
   private controller: HeliosController | null = null;
   // Keep track if we have direct access for export purposes
   private directHelios: Helios | null = null;
   private unsubscribe: (() => void) | null = null;
+  private connectionTimeout: number | null = null;
 
   constructor() {
     super();
@@ -172,6 +215,11 @@ export class HeliosPlayer extends HTMLElement {
     this.scrubber = this.shadowRoot!.querySelector(".scrubber")!;
     this.timeDisplay = this.shadowRoot!.querySelector(".time-display")!;
     this.exportBtn = this.shadowRoot!.querySelector(".export-btn")!;
+    this.overlay = this.shadowRoot!.querySelector(".status-overlay")!;
+    this.statusText = this.shadowRoot!.querySelector(".status-text")!;
+    this.retryBtn = this.shadowRoot!.querySelector(".retry-btn")!;
+
+    this.retryBtn.onclick = () => this.retryConnection();
   }
 
   connectedCallback() {
@@ -190,6 +238,7 @@ export class HeliosPlayer extends HTMLElement {
 
     // Initial state: disabled until connected
     this.setControlsDisabled(true);
+    this.showStatus("Connecting...", false);
   }
 
   disconnectedCallback() {
@@ -220,6 +269,9 @@ export class HeliosPlayer extends HTMLElement {
   private handleIframeLoad = () => {
     if (!this.iframe.contentWindow) return;
 
+    // Clear any existing timeout
+    if (this.connectionTimeout) window.clearTimeout(this.connectionTimeout);
+
     // 1. Try Direct Mode (Legacy/Local)
     let directInstance: Helios | undefined;
     try {
@@ -231,15 +283,22 @@ export class HeliosPlayer extends HTMLElement {
 
     if (directInstance) {
         console.log("HeliosPlayer: Connected via Direct Mode.");
+        this.hideStatus();
         this.directHelios = directInstance;
         this.setController(new DirectController(directInstance));
         this.exportBtn.disabled = false;
+        return;
     } else {
         this.directHelios = null;
         this.exportBtn.disabled = true; // Cannot export without direct access currently
         // If not direct, we wait for Bridge connection
         console.log("HeliosPlayer: Waiting for Bridge connection...");
     }
+
+    // Start timeout for bridge
+    this.connectionTimeout = window.setTimeout(() => {
+      this.showStatus("Connection Failed. Check window.helios.", true);
+    }, 3000);
 
     // 2. Initiate Bridge Mode (always try to connect)
     this.iframe.contentWindow.postMessage({ type: 'HELIOS_CONNECT' }, '*');
@@ -248,6 +307,9 @@ export class HeliosPlayer extends HTMLElement {
   private handleWindowMessage = (event: MessageEvent) => {
       // Check if this message is a handshake response
       if (event.data?.type === 'HELIOS_READY') {
+          if (this.connectionTimeout) window.clearTimeout(this.connectionTimeout);
+          this.hideStatus();
+
           // If we already have a controller (e.g. Direct Mode), we might stick with it
           // OR we could switch to Bridge if we prefer consistent behavior?
           // BUT Direct Mode is needed for Export.
@@ -326,6 +388,23 @@ export class HeliosPlayer extends HTMLElement {
       this.timeDisplay.textContent = `${(
         state.currentFrame / state.fps
       ).toFixed(2)} / ${state.duration.toFixed(2)}`;
+  }
+
+  private showStatus(msg: string, isError: boolean) {
+    this.overlay.classList.remove("hidden");
+    this.statusText.textContent = msg;
+    this.retryBtn.style.display = isError ? "block" : "none";
+  }
+
+  private hideStatus() {
+    this.overlay.classList.add("hidden");
+  }
+
+  private retryConnection() {
+    this.showStatus("Retrying...", false);
+    // Reload iframe to force fresh start
+    const src = this.iframe.src;
+    this.iframe.src = src;
   }
 
   private renderClientSide = async () => {

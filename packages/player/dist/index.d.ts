@@ -4,9 +4,13 @@ export declare class HeliosPlayer extends HTMLElement {
     private scrubber;
     private timeDisplay;
     private exportBtn;
+    private overlay;
+    private statusText;
+    private retryBtn;
     private controller;
     private directHelios;
     private unsubscribe;
+    private connectionTimeout;
     constructor();
     connectedCallback(): void;
     disconnectedCallback(): void;
@@ -17,6 +21,9 @@ export declare class HeliosPlayer extends HTMLElement {
     private togglePlayPause;
     private handleScrubberInput;
     private updateUI;
+    private showStatus;
+    private hideStatus;
+    private retryConnection;
     private renderClientSide;
     private renderDOMToVideo;
     private captureDOMToCanvas;
