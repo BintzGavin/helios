@@ -51,6 +51,13 @@ export class Helios {
   }
 
   constructor(options: HeliosOptions) {
+    if (options.duration < 0) {
+      throw new Error("Duration must be non-negative");
+    }
+    if (options.fps <= 0) {
+      throw new Error("FPS must be greater than 0");
+    }
+
     this.state = {
       duration: options.duration,
       fps: options.fps,
