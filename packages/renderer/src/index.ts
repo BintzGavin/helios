@@ -122,6 +122,15 @@ export class Renderer {
         });
       }
 
+      console.log('Finishing render strategy...');
+      const finalBuffer = await this.strategy.finish(page);
+      if (finalBuffer && Buffer.isBuffer(finalBuffer) && finalBuffer.length > 0) {
+        console.log(`Writing final buffer of ${finalBuffer.length} bytes...`);
+        await new Promise<void>((resolve, reject) => {
+          ffmpegProcess.stdin.write(finalBuffer, (err?: Error | null) => err ? reject(err) : resolve());
+        });
+      }
+
       console.log('Finished sending frames. Closing FFmpeg stdin.');
       ffmpegProcess.stdin.end();
 
