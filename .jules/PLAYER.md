@@ -5,3 +5,7 @@
 ## 2026-01-21 - Hybrid Bridge Architecture
 **Learning:** Implementing the bridge required a "Dual Mode" controller strategy to support both legacy/direct access (needed for DOM export) and secure bridge access (for sandboxing). The `HeliosController` interface proved essential for abstracting this complexity from the UI logic.
 **Action:** When introducing secure/remote patterns to existing local-access code, define a common interface early to decouple the implementation details (Direct vs. IPC) from the consumer logic.
+
+## 2026-01-21 - Verify Full File Content
+**Learning:** The `read_file` tool may return truncated output for large files, which can lead to false assumptions about missing methods (e.g., missing `handleIframeLoad` when it was just further down).
+**Action:** Always check the end of the file or use `start_line` to read the rest if the file seems incomplete or if specific methods are not visible in the initial chunk.
