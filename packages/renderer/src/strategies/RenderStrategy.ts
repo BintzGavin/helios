@@ -18,6 +18,15 @@ export interface RenderStrategy {
   capture(page: Page, frameTime: number): Promise<Buffer>;
 
   /**
+   * Finishes the rendering process.
+   * This method is called after the capture loop ends.
+   * Useful for flushing encoders or cleaning up resources.
+   * @param page The Playwright page instance.
+   * @returns A Promise that resolves to a Buffer containing any remaining data, or void.
+   */
+  finish(page: Page): Promise<Buffer | void>;
+
+  /**
    * Returns the FFmpeg input arguments for this strategy.
    * These arguments describe how the data is piped into FFmpeg.
    * @param config Configuration object containing fps.

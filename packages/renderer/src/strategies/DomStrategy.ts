@@ -20,6 +20,11 @@ export class DomStrategy implements RenderStrategy {
     return await page.screenshot({ type: 'png' });
   }
 
+  async finish(page: Page): Promise<void> {
+    // No-op for DomStrategy
+    return Promise.resolve();
+  }
+
   getFFmpegInputArgs(config: { fps: number }): string[] {
     return [
       '-f', 'image2pipe',
