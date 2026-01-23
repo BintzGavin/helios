@@ -32,3 +32,18 @@
 
 ### Core
 - ✅ Completed: Implement Helios.diagnose() - Implemented static diagnose method and DiagnosticReport interface
+
+## [2026-02-18] Consolidated Report
+
+### Core
+- [2026-01-22] ✅ Completed: Enable Core Testing And Robustness - Added `test` script, constructor validation, and unit tests.
+
+### Renderer
+- [2026-02-18] ✅ Completed: Refactor FFmpeg Config - Fully decoupled FFmpeg argument generation by moving it to `RenderStrategy.getFFmpegArgs` and extracted `RendererOptions` to `types.ts`.
+
+### Player
+- [2026-01-20] ✅ Completed: Refactor Player Control Logic - Verified `<helios-player>` uses `window.helios` and supports client-side export.
+- [2026-01-21] ✅ Completed: Sandbox and Bridge - Implemented `postMessage` bridge and sandboxed iframe support.
+
+### Demo
+- [2026-01-22] ✅ Completed: Verify Vue Example - Verified build and render of `examples/vue-canvas-animation`. Created `tests/e2e/verify-render.ts`.
