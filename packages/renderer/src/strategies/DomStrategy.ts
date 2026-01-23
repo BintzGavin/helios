@@ -1,5 +1,6 @@
 import { Page } from 'playwright';
 import { RenderStrategy } from './RenderStrategy';
+import { RendererOptions } from '../types';
 
 export class DomStrategy implements RenderStrategy {
   async prepare(page: Page): Promise<void> {
@@ -25,11 +26,20 @@ export class DomStrategy implements RenderStrategy {
     return Promise.resolve();
   }
 
-  getFFmpegInputArgs(config: { fps: number }): string[] {
-    return [
+  getFFmpegArgs(options: RendererOptions, outputPath: string): string[] {
+    const inputArgs = [
       '-f', 'image2pipe',
-      '-framerate', `${config.fps}`,
+      '-framerate', `${options.fps}`,
       '-i', '-',
     ];
+
+    const outputArgs = [
+      '-c:v', 'libx264',
+      '-pix_fmt', 'yuv420p',
+      '-movflags', '+faststart',
+      outputPath,
+    ];
+
+    return ['-y', ...inputArgs, ...outputArgs];
   }
 }
