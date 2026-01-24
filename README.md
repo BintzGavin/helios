@@ -35,7 +35,7 @@ Helios is a modern, framework-agnostic engine for programmatic video creation.
 
 Create high-quality videos using the web technologies you already know—HTML, CSS, and JavaScript. No new paradigms to learn. Use your existing CSS animations, your favorite framework (or none), and prototype fast.
 
-Helios prioritizes **developer experience** and **rapid prototyping** alongside performance, leveraging native browser APIs to deliver a next-generation video creation toolkit for the web.
+Helios prioritizes **agent experience** and **rapid prototyping** alongside performance, leveraging native browser APIs to deliver a next-generation video creation toolkit for the web.
 **Table of Contents**
 - [Core Principles](#core-principles)
 - [Helios vs Remotion](#helios-vs-remotion)
@@ -47,11 +47,11 @@ Helios prioritizes **developer experience** and **rapid prototyping** alongside 
 ## Core Principles
 The development of Helios is guided by a set of foundational principles that inform every architectural decision.
 
- - **Developer Experience First**: Getting started should take minutes, not hours. We prioritize intuitive APIs, minimal boilerplate, and instant feedback loops. If you know HTML, CSS, and JavaScript, you already know how to use Helios.
+ - **Agent Experience First**: As AI agents become primary users of developer tools, Helios prioritizes **Agent Experience (AX)**—the holistic experience AI agents have when using our APIs and platform. Great AX means agents can discover, understand, and execute tasks efficiently in a single run, cost-effectively, and without human intervention. This means predictable APIs, clear error messages, machine-readable documentation, and composable primitives that work well with LLM-driven workflows. DX and AX are deeply aligned—what works for agents works for humans too.
  - **Prototype Fast, Scale Later**: Helios is designed for rapid iteration. Start with a simple composition, preview instantly in your browser, and only worry about rendering infrastructure when you're ready to ship.
  - **Use What You Know**: The core logic is pure TypeScript with zero framework dependencies. Use React, Vue, Svelte, or vanilla JS—whatever you're already comfortable with. No new paradigms to learn.
  - **Leverage Web Standards**: We prefer native browser APIs over custom implementations. CSS animations, Web Animations API, and standard DOM APIs you already know. Your existing web development skills transfer directly.
- - **Performance When It Matters**: Hardware-accelerated rendering, in-memory data piping, and WebCodecs support for canvas-heavy work. Performance is there when you need it, but never at the cost of developer ergonomics.
+ - **Performance When It Matters**: Hardware-accelerated rendering, in-memory data piping, and WebCodecs support for canvas-heavy work. Performance is there when you need it, but never at the cost of ergonomics.
 ## Architectural Deep Dive
 Helios is designed with a modular and flexible architecture that separates logic from presentation, providing developers with maximum power and control.
 ### 1. The Composition Layer: The Authoring Experience
@@ -136,6 +136,7 @@ Both Helios and [Remotion](https://www.remotion.dev/) enable programmatic video 
 | **Framework** | Any (React, Vue, Svelte, vanilla JS) | React only |
 | **Animation approach** | CSS animations, Web Animations API | Frame-based hooks with manual interpolation |
 | **Get started** | Drop a `<helios-player>` anywhere | React app with Remotion Studio |
+| **Studio environment** | Helios Studio (planned, framework-agnostic) | Remotion Studio (React only) |
 | **Maturity** | Alpha (early stage) | Production-ready |
 | **Pricing** | Free (ELv2) | Free for ≤3 devs, then $100+/mo |
 | **Distributed rendering** | Planned | Available now (Lambda, Cloud Run) |
@@ -189,7 +190,7 @@ The Helios approach means your existing CSS animations, GSAP timelines, or Motio
 
 **Distributed rendering today.** Remotion Lambda and Cloud Run are available now. Helios distributed rendering is planned for V2.
 
-**Remotion Studio.** A built-in development environment with timeline preview and debugging tools.
+**Remotion Studio.** A built-in development environment with timeline preview and debugging tools. (Helios Studio is planned with framework-agnostic support.)
 
 ### The Tradeoffs
 
@@ -204,6 +205,8 @@ The Helios approach means your existing CSS animations, GSAP timelines, or Motio
 - Mature, production-hardened infrastructure
 - Immediate access to distributed rendering
 - Comprehensive tooling (Studio, Lambda, Cloud Run)
+
+> **On Agent Experience (AX):** As AI agents increasingly drive development workflows, Helios is designed with Agent Experience as a first-class concern. Our APIs are predictable, errors are machine-readable, and documentation is structured for LLM consumption. This makes Helios particularly well-suited for AI-assisted development, automated video pipelines, and agent-driven content generation.
 
 ### Honest Assessment
 
@@ -225,6 +228,24 @@ The Helios approach means your existing CSS animations, GSAP timelines, or Motio
 Alpha: This project is in the early stages of development. The architecture is defined, but the API is subject to change. We are actively seeking contributors to help shape the future of the project!
 ## Roadmap: The Future of Helios
 Our vision extends beyond the initial release. Here are some of our future goals:
+
+### V1.x: Helios Studio
+**A browser-based development environment for video composition.**
+
+Inspired by Remotion Studio, Helios Studio will provide a dedicated development environment for authoring and previewing video compositions in real-time. Unlike Remotion's React-only approach, Helios Studio will be framework-agnostic—supporting React, Vue, Svelte, and vanilla JS compositions.
+
+**Planned Features:**
+- **Playback Controls** - Play/pause, frame-by-frame navigation, variable speed playback (including reverse), and keyboard shortcuts
+- **Timeline Scrubber** - Visual timeline with in/out markers to define render ranges
+- **Composition Switcher** - Quick navigation between registered compositions (Cmd/Ctrl+K)
+- **Props Editor** - Live editing of composition input props with schema validation
+- **Assets Panel** - Preview and manage assets from your project's public folder
+- **Renders Panel** - Track rendering progress and manage render jobs
+- **Canvas Controls** - Zoom, resize, and toggle transparent backgrounds
+- **Hot Reloading** - Instant preview updates as you edit your composition code
+
+The studio will run via `npx helios studio` and serve as the primary development interface for building compositions, providing a true WYSIWYG editing experience that matches the final rendered output.
+
 ### V2: Distributed Rendering & Advanced Audio
 - **Distributed Rendering**: We will implement a scalable, serverless rendering model inspired by Remotion Lambda. The architecture will split a video into `N` logical chunks and render them in parallel on platforms like AWS Lambda or Google Cloud Run.
   - **Critical Detail: Concatenation Strategy**: The success of this architecture hinges on the final merge step. FFmpeg's `concat` **demuxer** is the only method that can losslessly stitch MP4 chunks without a costly and quality-degrading re-encode. This is essential for a fast and efficient distributed workflow. Methods like the `concat` filter or protocol are unsuitable as they either re-encode or do not support the MP4 container format.
