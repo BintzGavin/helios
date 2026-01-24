@@ -13,3 +13,11 @@
 ## 2026-01-22 - Missing Parametric State
 **Learning:** The README explicitly states the "Headless Logic Engine" manages `inputProps`, but this property is completely absent from the `HeliosState` and `Helios` class in reality.
 **Action:** Created plan `2026-01-22-CORE-InputProps.md` to implement this missing state management feature, unlocking parametric compositions.
+
+## 2026-01-23 - Unexecuted Plans in Queue
+**Learning:** Found `2026-01-22-CORE-InputProps.md` in `.sys/plans` but code was not implemented. This indicates the Execution Agent loop hasn't run or completed for that task.
+**Action:** Always check `.sys/plans` and compare with `src` code to avoid creating duplicate plans. Assumed the previous plan is valid and planned the next dependent/independent task (`PlaybackRate`).
+
+## 2026-01-23 - Private Interface Visibility
+**Learning:** `HeliosOptions` is defined but not exported, preventing consumers from using the type. This is a common pattern in this codebase (internal types not exposed).
+**Action:** Explicitly included "Export HeliosOptions" in the `PlaybackRate` plan to fix this DX issue.
