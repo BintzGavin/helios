@@ -2,32 +2,66 @@ import { Renderer } from '../../packages/renderer/src/index';
 import * as path from 'path';
 import * as fs from 'fs/promises';
 
+const CASES = [
+  { name: 'Canvas', relativePath: 'examples/simple-canvas-animation/composition.html' },
+  { name: 'React', relativePath: 'examples/react-canvas-animation/composition.html' },
+  { name: 'Vue', relativePath: 'examples/vue-canvas-animation/composition.html' },
+  { name: 'Svelte', relativePath: 'examples/svelte-canvas-animation/composition.html' },
+];
+
 async function main() {
-  console.log('Starting Vue verification render...');
+  console.log('Starting E2E verification render for all examples...');
 
-  const renderer = new Renderer({
-    width: 600,
-    height: 600,
-    fps: 30,
-    durationInSeconds: 5,
-  });
+  let failedCases = 0;
 
-  const compositionPath = path.resolve(
-    process.cwd(),
-    'output/example-build/examples/vue-canvas-animation/composition.html'
-  );
-  const compositionUrl = `file://${compositionPath}`;
+  for (const testCase of CASES) {
+    console.log(`\nVerifying ${testCase.name}...`);
 
-  const outputPath = path.resolve(process.cwd(), 'output/vue-render-verified.mp4');
+    // Create a new renderer for each case to ensure clean state
+    const renderer = new Renderer({
+      width: 600,
+      height: 600,
+      fps: 30,
+      durationInSeconds: 5,
+    });
 
-  await fs.mkdir(path.dirname(outputPath), { recursive: true });
+    const compositionPath = path.resolve(
+      process.cwd(),
+      'output/example-build',
+      testCase.relativePath
+    );
 
-  try {
-    await renderer.render(compositionUrl, outputPath);
-    console.log(`Verification passed! Video saved to: ${outputPath}`);
-  } catch (error) {
-    console.error('Verification failed:', error);
+    // Check if file exists first to provide better error message
+    try {
+        await fs.access(compositionPath);
+    } catch {
+        console.error(`❌ Build artifact not found: ${compositionPath}`);
+        console.error(`   Did you run 'npm run build:examples'?`);
+        failedCases++;
+        continue;
+    }
+
+    const compositionUrl = `file://${compositionPath}`;
+    const outputPath = path.resolve(process.cwd(), `output/${testCase.name.toLowerCase()}-render-verified.mp4`);
+
+    await fs.mkdir(path.dirname(outputPath), { recursive: true });
+
+    try {
+      await renderer.render(compositionUrl, outputPath);
+      console.log(`✅ ${testCase.name} Passed! Video saved to: ${outputPath}`);
+    } catch (error) {
+      console.error(`❌ ${testCase.name} Failed:`, error);
+      failedCases++;
+    }
+  }
+
+  console.log('\n--------------------------------------------------');
+  if (failedCases > 0) {
+    console.error(`❌ Verification finished with ${failedCases} failures.`);
     process.exit(1);
+  } else {
+    console.log(`✅ All ${CASES.length} examples verified successfully!`);
+    process.exit(0);
   }
 }
 
