@@ -10,8 +10,10 @@ export class ClientSideExporter {
   public async export(options: {
     onProgress: (progress: number) => void;
     signal: AbortSignal;
+    mode?: 'auto' | 'canvas' | 'dom';
+    canvasSelector?: string;
   }): Promise<void> {
-    const { onProgress, signal } = options;
+    const { onProgress, signal, mode = 'auto', canvasSelector = 'canvas' } = options;
 
     console.log("Client-side rendering started!");
     this.controller.pause();
@@ -22,12 +24,19 @@ export class ClientSideExporter {
       const state = this.controller.getState();
       const totalFrames = state.duration * state.fps;
 
-      // Check if this is a canvas-based or DOM-based composition
-      const canvas =
-        this.iframe.contentWindow?.document.querySelector("canvas");
-      const isCanvasBased = !!canvas;
+      if (mode === 'dom') {
+        await this.exportDOM(state, totalFrames, onProgress, signal);
+        return;
+      }
 
-      if (!isCanvasBased) {
+      const canvas = this.iframe.contentWindow?.document.querySelector(canvasSelector);
+
+      if (!canvas || !(canvas instanceof HTMLCanvasElement)) {
+        if (mode === 'canvas') {
+           throw new Error(`Target canvas not found for selector: ${canvasSelector}`);
+        }
+        // mode is 'auto', fallback to DOM
+        console.log(`Canvas not found for selector "${canvasSelector}", falling back to DOM export.`);
         await this.exportDOM(state, totalFrames, onProgress, signal);
         return;
       }

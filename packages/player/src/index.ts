@@ -364,12 +364,17 @@ export class HeliosPlayer extends HTMLElement {
 
     const exporter = new ClientSideExporter(this.controller, this.iframe);
 
+    const exportMode = (this.getAttribute("export-mode") || "auto") as "auto" | "canvas" | "dom";
+    const canvasSelector = this.getAttribute("canvas-selector") || "canvas";
+
     try {
         await exporter.export({
             onProgress: (p) => {
                 this.exportBtn.textContent = `Cancel (${Math.round(p * 100)}%)`;
             },
-            signal: this.abortController.signal
+            signal: this.abortController.signal,
+            mode: exportMode,
+            canvasSelector: canvasSelector
         });
     } catch (e: any) {
         console.error("Export failed or aborted", e);

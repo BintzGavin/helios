@@ -9,6 +9,8 @@ The `packages/player` package provides the `<helios-player>` Web Component, whic
 
 #### Attributes
 - `src` (string): The URL of the composition to load in the iframe.
+- `export-mode` (string): 'auto' (default), 'canvas', or 'dom'. Controls the export strategy.
+- `canvas-selector` (string): CSS selector to target the canvas element for export (default: 'canvas').
 
 #### Methods
 - `disconnectCallback()`: Cleans up listeners and controllers.
@@ -22,7 +24,7 @@ The `packages/player` package provides the `<helios-player>` Web Component, whic
 - **Client-Side Export**: Uses `ClientSideExporter` (WebCodecs + mp4-muxer) to generate MP4s in the browser.
 - **Cancellation**: Users can cancel an ongoing export.
 - **Modes**:
-    - **Canvas**: Captures content from a `<canvas>` element.
+    - **Canvas**: Captures content from a `<canvas>` element (configurable via attributes).
     - **DOM**: Fallback using rudimentary DOM-to-Canvas rendering.
 
 ## Internal Architecture
