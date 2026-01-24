@@ -22,6 +22,7 @@ type HeliosState = {
   fps: number;
   currentFrame: number;
   isPlaying: boolean;
+  inputProps: Record<string, any>;
 };
 
 type Subscriber = (state: HeliosState) => void;
@@ -31,6 +32,7 @@ interface HeliosOptions {
   fps: number;
   autoSyncAnimations?: boolean;
   animationScope?: HTMLElement;
+  inputProps?: Record<string, any>;
 }
 
 interface DiagnosticReport {
@@ -52,6 +54,8 @@ class Helios {
 
   // State Access
   getState(): Readonly<HeliosState>;
+
+  setInputProps(props: Record<string, any>): void;
 
   // Subscription
   subscribe(callback: Subscriber): () => void;

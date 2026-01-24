@@ -47,3 +47,6 @@
 
 ### Demo
 - [2026-01-22] ✅ Completed: Verify Vue Example - Verified build and render of `examples/vue-canvas-animation`. Created `tests/e2e/verify-render.ts`.
+
+## CORE v1.1.0
+- ✅ Completed: Implement InputProps - Added `inputProps` to state/options and `setInputProps` method to Helios class.
