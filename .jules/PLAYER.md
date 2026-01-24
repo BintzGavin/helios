@@ -9,3 +9,7 @@
 ## 2026-01-21 - Verify Full File Content
 **Learning:** The `read_file` tool may return truncated output for large files, which can lead to false assumptions about missing methods (e.g., missing `handleIframeLoad` when it was just further down).
 **Action:** Always check the end of the file or use `start_line` to read the rest if the file seems incomplete or if specific methods are not visible in the initial chunk.
+
+## 2026-01-22 - Library Version Mismatches
+**Learning:** I relied on online documentation for `mp4-muxer` which described version 5.x features (`fastStart`), but the project used version 2.x. This caused build failures when applying the plan.
+**Action:** Always check `package.json` for installed versions and try to verify `node_modules` types or documentation specific to that version before coding against it.
