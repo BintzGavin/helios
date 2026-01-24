@@ -14,7 +14,8 @@ export default defineConfig({
     emptyOutDir: true,
     rollupOptions: {
       input: {
-        composition: resolve(__dirname, "examples/simple-canvas-animation/composition.html"),
+        simple_dom: resolve(__dirname, "examples/simple-animation/composition.html"),
+        simple_canvas: resolve(__dirname, "examples/simple-canvas-animation/composition.html"),
         react_composition: resolve(__dirname, "examples/react-canvas-animation/composition.html"),
         vue_composition: resolve(__dirname, "examples/vue-canvas-animation/composition.html"),
         svelte_composition: resolve(__dirname, "examples/svelte-canvas-animation/composition.html"),

@@ -12,13 +12,17 @@ The Renderer supports two distinct capture strategies depending on the content t
 
 ## B. File Tree
 ```
-packages/renderer/src/
-├── index.ts      # Renderer class entry point
-├── types.ts      # Shared interfaces (RendererOptions)
-└── strategies/
-    ├── RenderStrategy.ts # Strategy Interface
-    ├── CanvasStrategy.ts # WebCodecs/Canvas implementation
-    └── DomStrategy.ts    # DOM capture implementation
+packages/renderer/
+├── scripts/          # Verification and utility scripts
+│   ├── render.ts     # Canvas rendering verification
+│   └── render-dom.ts # DOM rendering verification
+└── src/
+    ├── index.ts      # Renderer class entry point
+    ├── types.ts      # Shared interfaces (RendererOptions)
+    └── strategies/
+        ├── RenderStrategy.ts # Strategy Interface
+        ├── CanvasStrategy.ts # WebCodecs/Canvas implementation
+        └── DomStrategy.ts    # DOM capture implementation
 ```
 
 ## C. Configuration (RendererOptions)
