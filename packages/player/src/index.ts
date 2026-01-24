@@ -1,5 +1,6 @@
 import { Helios } from "@helios-project/core";
-import { Muxer, ArrayBufferTarget } from "mp4-muxer";
+import { HeliosController, DirectController, BridgeController } from "./controllers";
+import { ClientSideExporter } from "./features/exporter";
 
 const template = document.createElement("template");
 template.innerHTML = `
@@ -128,67 +129,6 @@ template.innerHTML = `
   </div>
 `;
 
-interface HeliosController {
-  play(): void;
-  pause(): void;
-  seek(frame: number): void;
-  subscribe(callback: (state: any) => void): () => void;
-  getState(): any;
-  dispose(): void;
-}
-
-class DirectController implements HeliosController {
-  constructor(public instance: Helios) {}
-  play() { this.instance.play(); }
-  pause() { this.instance.pause(); }
-  seek(frame: number) { this.instance.seek(frame); }
-  subscribe(callback: (state: any) => void) { return this.instance.subscribe(callback); }
-  getState() { return this.instance.getState(); }
-  dispose() { /* No-op for direct */ }
-}
-
-class BridgeController implements HeliosController {
-  private listeners: ((state: any) => void)[] = [];
-  private lastState: any;
-
-  constructor(private iframeWindow: Window, initialState?: any) {
-    this.lastState = initialState || { isPlaying: false, currentFrame: 0, duration: 0, fps: 30 };
-    window.addEventListener('message', this.handleMessage);
-  }
-
-  private handleMessage = (event: MessageEvent) => {
-    // Only accept messages from valid sources?
-    // For now we accept any HELIOS_STATE as we might not know the exact source origin if sandboxed 'null'
-    if (event.data?.type === 'HELIOS_STATE') {
-      this.lastState = event.data.state;
-      this.notifyListeners();
-    }
-  }
-
-  private notifyListeners() {
-    this.listeners.forEach(cb => cb(this.lastState));
-  }
-
-  play() { this.iframeWindow.postMessage({ type: 'HELIOS_PLAY' }, '*'); }
-  pause() { this.iframeWindow.postMessage({ type: 'HELIOS_PAUSE' }, '*'); }
-  seek(frame: number) { this.iframeWindow.postMessage({ type: 'HELIOS_SEEK', frame }, '*'); }
-
-  subscribe(callback: (state: any) => void) {
-    this.listeners.push(callback);
-    // Call immediately with current state
-    callback(this.lastState);
-    return () => {
-      this.listeners = this.listeners.filter(l => l !== callback);
-    };
-  }
-
-  getState() { return this.lastState; }
-
-  dispose() {
-      window.removeEventListener('message', this.handleMessage);
-  }
-}
-
 export class HeliosPlayer extends HTMLElement {
   private iframe: HTMLIFrameElement;
   private playPauseBtn: HTMLButtonElement;
@@ -204,6 +144,7 @@ export class HeliosPlayer extends HTMLElement {
   private directHelios: Helios | null = null;
   private unsubscribe: (() => void) | null = null;
   private connectionTimeout: number | null = null;
+  private abortController: AbortController | null = null;
 
   constructor() {
     super();
@@ -311,11 +252,6 @@ export class HeliosPlayer extends HTMLElement {
           this.hideStatus();
 
           // If we already have a controller (e.g. Direct Mode), we might stick with it
-          // OR we could switch to Bridge if we prefer consistent behavior?
-          // BUT Direct Mode is needed for Export.
-          // So if we have directHelios, we ignore HELIOS_READY for control purposes,
-          // or we just acknowledge it but don't replace the controller.
-
           if (!this.controller) {
               console.log("HeliosPlayer: Connected via Bridge Mode.");
               const iframeWin = this.iframe.contentWindow;
@@ -408,307 +344,42 @@ export class HeliosPlayer extends HTMLElement {
   }
 
   private renderClientSide = async () => {
+    // If we are already exporting, this is a cancel request
+    if (this.abortController) {
+      this.abortController.abort();
+      this.abortController = null;
+      this.exportBtn.textContent = "Export";
+      this.exportBtn.disabled = false;
+      return;
+    }
+
     // Export requires Direct Mode
     if (!this.directHelios || !this.controller) {
         console.error("Export not available: No direct access to Helios instance.");
         return;
     }
 
-    console.log("Client-side rendering started!");
-    this.exportBtn.disabled = true;
-    this.exportBtn.textContent = "Rendering...";
+    this.abortController = new AbortController();
+    this.exportBtn.textContent = "Cancel";
 
-    // Pause playback before rendering
-    this.controller.pause();
-
-    let encoder: VideoEncoder | null = null;
+    const exporter = new ClientSideExporter(this.controller, this.iframe);
 
     try {
-      const state = this.controller.getState();
-      const totalFrames = state.duration * state.fps;
-
-      // Check if this is a canvas-based or DOM-based composition
-      // We look for a canvas in the iframe
-      const canvas =
-        this.iframe.contentWindow?.document.querySelector("canvas");
-      const isCanvasBased = !!canvas;
-
-      if (!isCanvasBased) {
-        // For DOM-based compositions, we'll convert DOM to canvas for export
-        await this.renderDOMToVideo();
-        return;
-      }
-
-      const target = new ArrayBufferTarget();
-      const muxer = new Muxer({
-        target,
-      });
-
-      encoder = new VideoEncoder({
-        output: (chunk, meta) => {
-          if (meta) {
-            muxer.addVideoChunk(chunk, meta);
-          }
-        },
-        error: (e) => {
-          console.error("VideoEncoder error:", e);
-          throw e;
-        },
-      });
-
-      const config = {
-        codec: "avc1.42001E", // H.264 Baseline
-        width: canvas.width,
-        height: canvas.height,
-        framerate: state.fps,
-        bitrate: 5_000_000, // 5 Mbps
-      };
-
-      if (!(await VideoEncoder.isConfigSupported(config))) {
-        throw new Error(
-          `Unsupported VideoEncoder config: ${JSON.stringify(config)}`
-        );
-      }
-
-      await encoder.configure(config);
-
-      for (let i = 0; i < totalFrames; i++) {
-        // Seek the remote Helios instance
-        this.controller.seek(i);
-
-        // Wait for a frame to pass to ensure rendering is updated
-        // We use the iframe's requestAnimationFrame to be sure
-        await new Promise((r) =>
-          this.iframe.contentWindow?.requestAnimationFrame(r)
-        );
-
-        // Double check: wait one more frame? sometimes seeking takes a tick
-        // But let's start with one.
-
-        const frame = new VideoFrame(canvas, {
-          timestamp: (i / state.fps) * 1_000_000,
+        await exporter.export({
+            onProgress: (p) => {
+                this.exportBtn.textContent = `Cancel (${Math.round(p * 100)}%)`;
+            },
+            signal: this.abortController.signal
         });
-        const keyFrame = i % (state.fps * 2) === 0;
-
-        await encoder.encode(frame, { keyFrame });
-        frame.close();
-        this.exportBtn.textContent = `Rendering: ${Math.round(
-          ((i + 1) / totalFrames) * 100
-        )}%`;
-      }
-
-      await encoder.flush();
-      muxer.finalize();
-      const buffer = target.buffer;
-
-      const blob = new Blob([buffer], { type: "video/mp4" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "video.mp4";
-      a.click();
-      URL.revokeObjectURL(url);
-
-      console.log("Client-side rendering and download finished!");
     } catch (e: any) {
-      console.error("Client-side rendering failed:", e);
-      alert(`Rendering failed: ${e.message}`);
+        console.error("Export failed or aborted", e);
+        // Error handling is mostly done inside exporter, but we should reset UI
     } finally {
-      // Clean up encoder
-      if (encoder) {
-        try {
-          await encoder.close();
-        } catch (e) {
-          console.warn("Error closing encoder:", e);
-        }
-      }
-      this.exportBtn.disabled = false;
-      this.exportBtn.textContent = "Export";
+        this.exportBtn.textContent = "Export";
+        this.exportBtn.disabled = false;
+        this.abortController = null;
     }
   };
-
-  private async renderDOMToVideo() {
-    if (!this.directHelios || !this.controller) return;
-
-    let encoder: VideoEncoder | null = null;
-
-    try {
-      const state = this.controller.getState();
-      const totalFrames = state.duration * state.fps;
-
-      // Create a temporary canvas for DOM-to-canvas conversion
-      const tempCanvas = document.createElement("canvas");
-      const tempCtx = tempCanvas.getContext("2d")!;
-
-      // Set canvas size to match iframe content
-      const iframeDoc = this.iframe.contentDocument!;
-      const body = iframeDoc.body;
-      tempCanvas.width = body.scrollWidth;
-      tempCanvas.height = body.scrollHeight;
-
-      // Create video encoder setup
-      const target = new ArrayBufferTarget();
-      const muxer = new Muxer({
-        target,
-      });
-
-      encoder = new VideoEncoder({
-        output: (chunk, meta) => {
-          if (meta) {
-            muxer.addVideoChunk(chunk, meta);
-          }
-        },
-        error: (e) => {
-          console.error("VideoEncoder error:", e);
-          throw e;
-        },
-      });
-
-      const config = {
-        codec: "avc1.42001E", // H.264 Baseline
-        width: tempCanvas.width,
-        height: tempCanvas.height,
-        framerate: state.fps,
-        bitrate: 5_000_000, // 5 Mbps
-      };
-
-      if (!(await VideoEncoder.isConfigSupported(config))) {
-        throw new Error(
-          `Unsupported VideoEncoder config: ${JSON.stringify(config)}`
-        );
-      }
-
-      await encoder.configure(config);
-
-      // Render each frame
-      for (let i = 0; i < totalFrames; i++) {
-        // Seek to the current frame
-        this.controller.seek(i);
-
-        // Wait for the animation to update
-        await new Promise((r) =>
-          this.iframe.contentWindow?.requestAnimationFrame(r)
-        );
-
-        // Convert DOM to canvas using html2canvas-like approach
-        await this.captureDOMToCanvas(tempCanvas, tempCtx);
-
-        // Create video frame from canvas
-        const frame = new VideoFrame(tempCanvas, {
-          timestamp: (i / state.fps) * 1_000_000,
-        });
-        const keyFrame = i % (state.fps * 2) === 0;
-
-        await encoder.encode(frame, { keyFrame });
-        frame.close();
-
-        this.exportBtn.textContent = `Rendering: ${Math.round(
-          ((i + 1) / totalFrames) * 100
-        )}%`;
-      }
-
-      await encoder.flush();
-      muxer.finalize();
-      const buffer = target.buffer;
-
-      const blob = new Blob([buffer], { type: "video/mp4" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "video.mp4";
-      a.click();
-      URL.revokeObjectURL(url);
-
-      console.log("DOM-to-video rendering finished!");
-    } catch (e: any) {
-      console.error("DOM-to-video rendering failed:", e);
-      alert(`Rendering failed: ${e.message}`);
-    } finally {
-      // Clean up encoder
-      if (encoder) {
-        try {
-          await encoder.close();
-        } catch (e) {
-          console.warn("Error closing encoder:", e);
-        }
-      }
-    }
-  }
-
-  private async captureDOMToCanvas(
-    canvas: HTMLCanvasElement,
-    ctx: CanvasRenderingContext2D
-  ) {
-    // This requires access to iframe.contentDocument, only available in Direct Mode
-    const iframeDoc = this.iframe.contentDocument!;
-    const body = iframeDoc.body;
-
-    // Clear canvas
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    // Set background color
-    const computedStyle = iframeDoc.defaultView?.getComputedStyle(body);
-    const bgColor = computedStyle?.backgroundColor || "#eee";
-    ctx.fillStyle = bgColor;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    // Simple DOM-to-canvas conversion
-    await this.renderElementToCanvas(body, ctx, 0, 0);
-  }
-
-  private async renderElementToCanvas(
-    element: Element,
-    ctx: CanvasRenderingContext2D,
-    offsetX: number,
-    offsetY: number
-  ) {
-    const iframeWindow = this.iframe.contentWindow!;
-    const computedStyle = iframeWindow.getComputedStyle(element);
-
-    // Get element bounds
-    const rect = element.getBoundingClientRect();
-    const x = rect.left + offsetX;
-    const y = rect.top + offsetY;
-    const width = rect.width;
-    const height = rect.height;
-
-    // Skip if element is not visible
-    if (
-      computedStyle.display === "none" ||
-      computedStyle.visibility === "hidden" ||
-      width === 0 ||
-      height === 0
-    ) {
-      return;
-    }
-
-    // Handle different element types
-    if (element instanceof HTMLDivElement) {
-      // Render div background and border
-      const bgColor = computedStyle.backgroundColor;
-      if (
-        bgColor &&
-        bgColor !== "rgba(0, 0, 0, 0)" &&
-        bgColor !== "transparent"
-      ) {
-        ctx.fillStyle = bgColor;
-        ctx.fillRect(x, y, width, height);
-      }
-
-      // Render border if present
-      const borderWidth = parseInt(computedStyle.borderWidth);
-      if (borderWidth > 0) {
-        ctx.strokeStyle = computedStyle.borderColor;
-        ctx.lineWidth = borderWidth;
-        ctx.strokeRect(x, y, width, height);
-      }
-    }
-
-    // Recursively render child elements
-    for (const child of Array.from(element.children)) {
-      await this.renderElementToCanvas(child, ctx, offsetX, offsetY);
-    }
-  }
 }
 
 customElements.define("helios-player", HeliosPlayer);
