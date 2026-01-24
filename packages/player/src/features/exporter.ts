@@ -24,30 +24,44 @@ export class ClientSideExporter {
       const state = this.controller.getState();
       const totalFrames = state.duration * state.fps;
 
+      // Handle DOM mode explicitly
       if (mode === 'dom') {
-        await this.exportDOM(state, totalFrames, onProgress, signal);
-        return;
-      }
-
-      const canvas = this.iframe.contentWindow?.document.querySelector(canvasSelector);
-
-      if (!canvas || !(canvas instanceof HTMLCanvasElement)) {
-        if (mode === 'canvas') {
-           throw new Error(`Target canvas not found for selector: ${canvasSelector}`);
+        if (!this.canAccessIframeDOM()) {
+             throw new Error("DOM Export requires direct access (same-origin). Bridge mode not supported for DOM export.");
         }
-        // mode is 'auto', fallback to DOM
-        console.log(`Canvas not found for selector "${canvasSelector}", falling back to DOM export.`);
         await this.exportDOM(state, totalFrames, onProgress, signal);
         return;
       }
+
+      // 1. Get first frame to determine dimensions and validity
+      const firstFrame = await this.controller.captureFrame(0, {
+          selector: canvasSelector,
+          mode: 'canvas'
+      });
+
+      if (!firstFrame) {
+         if (mode === 'canvas') {
+             throw new Error(`Target canvas not found for selector: ${canvasSelector}`);
+         }
+         // Fallback to DOM (auto mode)
+         console.log(`Canvas not found, falling back to DOM export.`);
+         if (!this.canAccessIframeDOM()) {
+             throw new Error("Fallback to DOM Export failed: Bridge mode not supported for DOM export.");
+         }
+         await this.exportDOM(state, totalFrames, onProgress, signal);
+         return;
+      }
+
+      const width = firstFrame.displayWidth;
+      const height = firstFrame.displayHeight;
 
       const target = new ArrayBufferTarget();
       const muxer = new Muxer({
         target,
         video: {
             codec: 'avc',
-            width: canvas.width,
-            height: canvas.height
+            width: width,
+            height: height
         }
       });
 
@@ -62,14 +76,16 @@ export class ClientSideExporter {
       });
 
       const config: VideoEncoderConfig = {
-        codec: "avc1.42001E", // H.264 Baseline
-        width: canvas.width,
-        height: canvas.height,
+        codec: "avc1.420028", // H.264 Baseline Level 4.0
+        width: width,
+        height: height,
         framerate: state.fps,
         bitrate: 5_000_000, // 5 Mbps
       };
 
       if (!(await VideoEncoder.isConfigSupported(config))) {
+        // Clean up first frame
+        firstFrame.close();
         throw new Error(
           `Unsupported VideoEncoder config: ${JSON.stringify(config)}`
         );
@@ -77,23 +93,26 @@ export class ClientSideExporter {
 
       await encoder.configure(config);
 
-      for (let i = 0; i < totalFrames; i++) {
+      // Encode first frame
+      await encoder.encode(firstFrame, { keyFrame: true });
+      firstFrame.close();
+      onProgress(1 / totalFrames);
+
+      // Loop remaining frames
+      for (let i = 1; i < totalFrames; i++) {
         if (signal.aborted) {
             throw new Error("Export aborted");
         }
 
-        // Seek the remote Helios instance
-        this.controller.seek(i);
-
-        // Wait for a frame to pass to ensure rendering is updated
-        // We use the iframe's requestAnimationFrame to be sure
-        await new Promise((r) =>
-          this.iframe.contentWindow?.requestAnimationFrame(r)
-        );
-
-        const frame = new VideoFrame(canvas, {
-          timestamp: (i / state.fps) * 1_000_000,
+        const frame = await this.controller.captureFrame(i, {
+            selector: canvasSelector,
+            mode: 'canvas'
         });
+
+        if (!frame) {
+            throw new Error(`Frame ${i} missing during export.`);
+        }
+
         const keyFrame = i % (state.fps * 2) === 0;
 
         await encoder.encode(frame, { keyFrame });
@@ -125,6 +144,14 @@ export class ClientSideExporter {
         }
       }
     }
+  }
+
+  private canAccessIframeDOM(): boolean {
+      try {
+          return !!this.iframe.contentDocument;
+      } catch (e) {
+          return false;
+      }
   }
 
   private async exportDOM(
@@ -190,6 +217,10 @@ export class ClientSideExporter {
         }
 
         // Seek to the current frame
+        // Note: For DOM export, we still rely on controller seek.
+        // But render capture is MANUAL (captureDOMToCanvas).
+        // Moving this to Controller.captureFrame(mode='dom') is possible but complex.
+        // For now, we keep logic here.
         this.controller.seek(i);
 
         // Wait for the animation to update

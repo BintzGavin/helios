@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Bridge Export Child</title>
+    <style>
+        body { margin: 0; overflow: hidden; }
+        canvas { width: 100vw; height: 100vh; display: block; }
+    </style>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+    <script type="module">
+        import { Helios } from '../../packages/core/dist/index.js';
+        import { connectToParent } from '../../packages/player/dist/bridge.js';
+
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+
+        canvas.width = 1920;
+        canvas.height = 1080;
+
+        const helios = new Helios({
+            duration: 2,
+            fps: 30
+        });
+
+        // Simple animation
+        helios.subscribe((state) => {
+            const progress = state.currentFrame / (state.duration * state.fps);
+            ctx.fillStyle = '#222';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = 'red';
+            ctx.beginPath();
+            ctx.arc(
+                canvas.width * progress,
+                canvas.height / 2,
+                100,
+                0,
+                Math.PI * 2
+            );
+            ctx.fill();
+        });
+
+        // Initialize bridge
+        connectToParent(helios);
+
+        // Note: We deliberately do NOT expose window.helios = helios here
+        // to force HeliosPlayer to use Bridge Mode instead of Direct Mode
+        // for testing purposes.
+    </script>
+</body>
+</html>

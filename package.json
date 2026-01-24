@@ -20,6 +20,7 @@
     "render:canvas-example": "npm run build:examples && ts-node packages/renderer/scripts/render.ts"
   },
   "devDependencies": {
+    "@playwright/test": "^1.58.0",
     "@sveltejs/vite-plugin-svelte": "^6.2.4",
     "@vitejs/plugin-react": "^5.1.2",
     "@vitejs/plugin-vue": "^6.0.3",

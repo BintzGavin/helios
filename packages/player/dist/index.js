@@ -136,7 +136,7 @@ export class HeliosPlayer extends HTMLElement {
     statusText;
     retryBtn;
     controller = null;
-    // Keep track if we have direct access for export purposes
+    // Keep track if we have direct access (optional, mainly for debugging/logging)
     directHelios = null;
     unsubscribe = null;
     connectionTimeout = null;
@@ -187,7 +187,7 @@ export class HeliosPlayer extends HTMLElement {
     setControlsDisabled(disabled) {
         this.playPauseBtn.disabled = disabled;
         this.scrubber.disabled = disabled;
-        // Export is managed separately based on direct access
+        // Export is managed separately based on connection state
         if (disabled) {
             this.exportBtn.disabled = true;
         }
@@ -211,14 +211,13 @@ export class HeliosPlayer extends HTMLElement {
             console.log("HeliosPlayer: Connected via Direct Mode.");
             this.hideStatus();
             this.directHelios = directInstance;
-            this.setController(new DirectController(directInstance));
+            this.setController(new DirectController(directInstance, this.iframe));
             this.exportBtn.disabled = false;
             return;
         }
         else {
             this.directHelios = null;
-            this.exportBtn.disabled = true; // Cannot export without direct access currently
-            // If not direct, we wait for Bridge connection
+            this.exportBtn.disabled = true; // Wait for bridge connection
             console.log("HeliosPlayer: Waiting for Bridge connection...");
         }
         // Start timeout for bridge
@@ -244,6 +243,8 @@ export class HeliosPlayer extends HTMLElement {
                     if (event.data.state) {
                         this.updateUI(event.data.state);
                     }
+                    // Enable export for bridge mode
+                    this.exportBtn.disabled = false;
                 }
             }
         }
@@ -323,9 +324,9 @@ export class HeliosPlayer extends HTMLElement {
             this.exportBtn.disabled = false;
             return;
         }
-        // Export requires Direct Mode
-        if (!this.directHelios || !this.controller) {
-            console.error("Export not available: No direct access to Helios instance.");
+        // Export requires Controller (Direct or Bridge)
+        if (!this.controller) {
+            console.error("Export not available: Not connected.");
             return;
         }
         this.abortController = new AbortController();
