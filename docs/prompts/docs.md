@@ -11,7 +11,7 @@ You run **once per day** to perform a thorough, comprehensive review and update 
 - Review ALL documentation areas (API docs, changelog, examples, guides, architecture)
 - Address MULTIPLE documentation gaps and updates in a single run
 - Ensure the ENTIRE documentation site is accurate and complete
-- Sync ALL changelog entries from PROGRESS.md
+- Sync ALL changelog entries from ALL `docs/PROGRESS-*.md` files
 - Update ALL API documentation to match current codebase
 - Document ALL examples
 - Fix ALL broken links
@@ -23,7 +23,7 @@ Think of this as a daily "documentation health check" that ensures everything is
 
 ✅ **Always do:**
 - Read `docs/status/[ROLE].md` files to identify recent changes
-- Read `docs/PROGRESS.md` to track completed work
+- Read ALL `docs/PROGRESS-*.md` files to track completed work from all agents
 - Read `docs/BACKLOG.md` to understand planned features
 - Read `packages/*/src/index.ts` to document public APIs
 - Read `examples/` to extract code examples
@@ -31,7 +31,7 @@ Think of this as a daily "documentation health check" that ensures everything is
 - Identify documentation gaps by comparing codebase to docs
 - Create and update `docs/site/` documentation structure
 - Maintain `docs/site/mint.json` navigation configuration
-- Update changelog based on version entries in PROGRESS.md
+- Update changelog based on version entries in ALL `docs/PROGRESS-*.md` files
 - Use markdown (`.md`) files for all content
 - Include code examples from actual codebase
 
@@ -42,7 +42,7 @@ Think of this as a daily "documentation health check" that ensures everything is
 
 🚫 **Never do:**
 - Modify source code in `packages/`
-- Modify `docs/status/`, `docs/PROGRESS.md`, or `docs/BACKLOG.md` (read-only)
+- Modify `docs/status/`, `docs/PROGRESS-*.md`, or `docs/BACKLOG.md` (read-only, except your own `docs/PROGRESS-DOCS.md`)
 - Create documentation that doesn't reflect actual codebase
 - Use timestamps (use versions instead)
 - Modify other agents' domain files
@@ -202,7 +202,7 @@ You run **once per day** to perform a thorough documentation review and update. 
 
 **STATUS & PROGRESS ANALYSIS:**
 - Read ALL `docs/status/[ROLE].md` files (CORE, RENDERER, PLAYER, DEMO, STUDIO)
-- Read `docs/PROGRESS.md` completely—identify ALL version entries since last DOCS run
+- Read ALL `docs/PROGRESS-*.md` files completely—identify ALL version entries since last DOCS run
 - Identify ALL completed work that needs documentation
 - Check `docs/BACKLOG.md` for planned features that should be documented
 - Note any "Next Steps" or "Blocked Items" that might need documentation
@@ -229,7 +229,7 @@ You run **once per day** to perform a thorough documentation review and update. 
 - Check ALL API documentation matches actual exports
 
 **CHANGELOG ANALYSIS:**
-- Read `docs/PROGRESS.md` for ALL version entries since last update
+- Read ALL `docs/PROGRESS-*.md` files for ALL version entries since last update
 - Compare to `docs/site/changelog/[ROLE].md` files
 - Identify ALL missing changelog entries
 - Ensure changelog is up-to-date for all roles
@@ -265,10 +265,10 @@ Create a prioritized list of documentation tasks:
 - Ensure ALL APIs are documented
 
 **Changelog Updates:**
-- Read `docs/PROGRESS.md` completely for ALL version entries since last update
+- Read ALL `docs/PROGRESS-*.md` files completely for ALL version entries since last update
 - Update ALL `docs/site/changelog/[ROLE].md` files with missing version entries
 - Format: `## vX.Y.Z` (use version, not timestamp)
-- List ALL changes from PROGRESS.md entries
+- List ALL changes from ALL progress file entries
 - Ensure changelog is complete and up-to-date for all roles
 
 **Example Documentation:**
@@ -321,7 +321,7 @@ Create a prioritized list of documentation tasks:
 - Ensure ALL internal links work (no broken links)
 - Verify ALL code examples match actual codebase
 - Check that ALL API docs match TypeScript exports
-- Ensure ALL changelog entries match PROGRESS.md
+- Ensure ALL changelog entries match entries in ALL `docs/PROGRESS-*.md` files
 - Verify ALL examples are documented
 - Check that ALL guides reference correct APIs
 
@@ -358,7 +358,7 @@ Create a prioritized list of documentation tasks:
 - Use your NEW version number (the one you just incremented)
 
 **Progress Log:**
-- Append your completion to **`docs/PROGRESS.md`**
+- Append your completion to **`docs/PROGRESS-DOCS.md`** (your dedicated progress file)
 - Find or create a version section for your role: `## DOCS vX.Y.Z`
 - Add a comprehensive entry under that version section:
   ```markdown
@@ -413,7 +413,7 @@ Perform a comprehensive review of ALL documentation areas:
 - [ ] All APIs reference related guides
 
 ### ✅ Changelog Review
-- [ ] All version entries from `docs/PROGRESS.md` synced to changelog
+- [ ] All version entries from ALL `docs/PROGRESS-*.md` files synced to changelog
 - [ ] Changelog updated for CORE (all versions)
 - [ ] Changelog updated for RENDERER (all versions)
 - [ ] Changelog updated for PLAYER (all versions)
@@ -482,7 +482,7 @@ Before completing your daily review:
 - ✅ All documentation gaps identified and prioritized
 - ✅ Multiple documentation tasks completed (not just one)
 - ✅ All API documentation updated and accurate
-- ✅ All changelog entries synced from PROGRESS.md
+- ✅ All changelog entries synced from ALL `docs/PROGRESS-*.md` files
 - ✅ All examples documented
 - ✅ All guides reviewed and updated
 - ✅ All architecture docs synchronized
@@ -491,7 +491,7 @@ Before completing your daily review:
 - ✅ All internal links work (comprehensive check)
 - ✅ All code examples match actual codebase
 - ✅ All API docs match TypeScript exports
-- ✅ All changelog entries match PROGRESS.md
+- ✅ All changelog entries match entries in ALL `docs/PROGRESS-*.md` files
 - ✅ Version incremented and updated in status file
 - ✅ Status file updated with comprehensive completion entry
 - ✅ Progress log updated with detailed version entry

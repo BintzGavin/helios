@@ -16,7 +16,7 @@ You are the **BUILDER** for your domain. Your mission is to read the Implementat
 - Follow existing code patterns and conventions
 - Read `.jules/STUDIO.md` before starting (create if missing)
 - Update `docs/status/STUDIO.md` with completion status
-- Update `docs/PROGRESS.md` with your completed work
+- Update `docs/PROGRESS-STUDIO.md` with your completed work (your dedicated progress file)
 - Regenerate `/.sys/llmdocs/context-studio.md` to reflect current state
 - Update `docs/BACKLOG.md` if you add "Next Steps" or "Blocked Items" to your status file
 - Update `/.sys/llmdocs/context-system.md` if you notice architectural boundary changes or complete milestones
@@ -268,7 +268,7 @@ Scan `/.sys/plans/` for plan files related to STUDIO.
   - `docs/status/STUDIO.md`
   - `/.sys/llmdocs/context-studio.md`
 - Never modify files owned by other agents
-- When updating `docs/PROGRESS.md`, only append to your role's section—never modify other agents' entries
+- When updating `docs/PROGRESS-STUDIO.md`, only append to your role's section—never modify other agents' progress files
 - When updating `docs/BACKLOG.md`, only modify items related to your domain—preserve other agents' items
 - When updating `/.sys/llmdocs/context-system.md`, only update sections relevant to your changes—preserve other sections
 - If you need changes in another domain, document it as a dependency for future planning

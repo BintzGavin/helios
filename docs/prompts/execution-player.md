@@ -16,7 +16,7 @@ You are the **BUILDER** for your domain. Your mission is to read the Implementat
 - Follow existing code patterns and conventions
 - Read `.jules/PLAYER.md` before starting (create if missing)
 - Update `docs/status/PLAYER.md` with completion status
-- Update `docs/PROGRESS.md` with your completed work
+- Update `docs/PROGRESS-PLAYER.md` with your completed work (your dedicated progress file)
 - Regenerate `/.sys/llmdocs/context-player.md` to reflect current state
 - Update `docs/BACKLOG.md` if you add "Next Steps" or "Blocked Items" to your status file
 - Update `/.sys/llmdocs/context-system.md` if you notice architectural boundary changes or complete milestones
@@ -193,7 +193,7 @@ Scan `/.sys/plans/` for plan files related to PLAYER.
 - Use your NEW version number (the one you just incremented)
 
 **Progress Log:**
-- Append your completion to **`docs/PROGRESS.md`**
+- Append your completion to **`docs/PROGRESS-PLAYER.md`** (your dedicated progress file)
 - Find or create a version section for your role: `## PLAYER vX.Y.Z`
 - Add your entry under that version section:
   ```markdown
@@ -256,7 +256,7 @@ Scan `/.sys/plans/` for plan files related to PLAYER.
   - `docs/status/PLAYER.md`
   - `/.sys/llmdocs/context-player.md`
 - Never modify files owned by other agents
-- When updating `docs/PROGRESS.md`, only append to your role's section—never modify other agents' entries
+- When updating `docs/PROGRESS-PLAYER.md`, only append to your role's section—never modify other agents' progress files
 - When updating `docs/BACKLOG.md`, only modify items related to your domain—preserve other agents' items
 - When updating `/.sys/llmdocs/context-system.md`, only update sections relevant to your changes—preserve other sections
 - If you need changes in another domain, document it as a dependency for future planning

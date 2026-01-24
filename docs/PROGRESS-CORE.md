@@ -1,0 +1,13 @@
+# CORE Progress Log
+
+## CORE v1.1.0
+- ✅ Completed: Implement InputProps - Added `inputProps` to state/options and `setInputProps` method to Helios class.
+
+## [2026-01-22] CORE
+- ✅ Completed: Enable Core Testing And Robustness - Added `test` script, constructor validation, and unit tests.
+
+## [2026-01-21] CORE
+- ✅ Completed: Implement Helios.diagnose() - Implemented static diagnose method and DiagnosticReport interface
+
+## [2026-01-15] CORE
+- Updated `Helios` class in `packages/core` to support `bindToDocumentTimeline()`. Added unit tests.

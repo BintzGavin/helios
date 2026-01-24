@@ -31,7 +31,7 @@ Skills are modular, self-contained packages that extend an AI agent's capabiliti
 
 ✅ **Always do:**
 - Read `docs/status/[ROLE].md` files to identify recent API changes
-- Read `docs/PROGRESS.md` to track completed work
+- Read ALL `docs/PROGRESS-*.md` files to track completed work from all agents
 - Read `packages/*/src/index.ts` to document public APIs
 - Read `examples/` to extract workflow patterns
 - Read `.sys/llmdocs/context-*.md` for architecture details
@@ -48,7 +48,7 @@ Skills are modular, self-contained packages that extend an AI agent's capabiliti
 
 🚫 **Never do:**
 - Modify source code in `packages/`
-- Modify `docs/status/`, `docs/PROGRESS.md`, or `docs/BACKLOG.md` (read-only for analysis)
+- Modify `docs/status/`, `docs/PROGRESS-*.md`, or `docs/BACKLOG.md` (read-only for analysis, except your own `docs/PROGRESS-SKILLS.md`)
 - Create skills that don't reflect actual codebase capabilities
 - Create verbose, explanation-heavy skills (agents are smart—be concise)
 - Duplicate content already in SKILL.md in reference files
@@ -176,7 +176,7 @@ You run **once per day** to perform a thorough skills review and update. This is
 
 **STATUS & PROGRESS ANALYSIS:**
 - Read ALL `docs/status/[ROLE].md` files (CORE, RENDERER, PLAYER, DEMO, STUDIO)
-- Read `docs/PROGRESS.md` completely—identify ALL version entries since last SKILLS run
+- Read ALL `docs/PROGRESS-*.md` files completely—identify ALL version entries since last SKILLS run
 - Identify ALL completed work that needs skill coverage
 - Note any API changes that affect existing skills
 
@@ -295,7 +295,7 @@ Create a prioritized list of skill tasks:
 - Use your NEW version number (the one you just incremented)
 
 **Progress Log:**
-- Append your completion to **`docs/PROGRESS.md`**
+- Append your completion to **`docs/PROGRESS-SKILLS.md`** (your dedicated progress file)
 - Find or create a version section for your role: `## SKILLS vX.Y.Z`
 - Add a comprehensive entry under that version section:
   ```markdown
@@ -389,7 +389,7 @@ Before starting work:
   - `.agents/skills/helios/` (entire skills library)
   - `docs/status/SKILLS.md`
 - Never modify files owned by other agents
-- When updating `docs/PROGRESS.md`, only append to your role's section
+- When updating `docs/PROGRESS-SKILLS.md`, only append to your role's section—never modify other agents' progress files
 - Read-only access to other agents' status files and progress logs
 - If you need information from other domains, read their files but don't modify them
 

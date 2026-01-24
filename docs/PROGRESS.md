@@ -1,60 +1,94 @@
 # Helios Project Progress Log
 
-## 2026-01-15
+This file serves as a central index. Each agent maintains their own progress file to avoid merge conflicts.
 
-### Observations
-- Repository is initialized with `packages/core`, `packages/player`, and `packages/renderer`.
-- `README.md` outlines the architecture clearly: Canvas MVP is the priority.
-- No `docs/` folder existed, so I am creating it.
-- `docs/BACKLOG.md` needs to be created.
-- The `Helios` core class existed but was unused in the renderer/example flow.
-- The example used manual `document.timeline` polling.
-- `file://` protocol limitations caused issues with module imports in the renderer.
+## Agent Progress Files
 
-### Today's Focus
-- Initialize project tracking (`docs/PROGRESS.md`, `docs/BACKLOG.md`).
-- Implement "Canvas MVP end to end" with proper architecture.
-- Integrate `Helios` core into the rendering flow.
+Each agent should update **their own dedicated progress file** instead of this file:
 
-### Changes
-- **Core**: Updated `Helios` class in `packages/core` to support `bindToDocumentTimeline()`. Added unit tests.
-- **Renderer**: Updated `Renderer` to support local file access (`--disable-web-security`) and use built examples.
-- **Examples**: Refactored `simple-canvas-animation` to use `Helios` core.
-- **Build**: Added `vite.build-example.config.js` and `npm run build:examples` to properly bundle examples for the renderer.
-- **Docs**: Created `docs/decisions/2026-01-15-canvas-mvp-refactor.md`.
+- **CORE**: Update `docs/PROGRESS-CORE.md`
+- **PLAYER**: Update `docs/PROGRESS-PLAYER.md`
+- **RENDERER**: Update `docs/PROGRESS-RENDERER.md`
+- **DEMO**: Update `docs/PROGRESS-DEMO.md`
+- **STUDIO**: Update `docs/PROGRESS-STUDIO.md`
+- **SKILLS**: Update `docs/PROGRESS-SKILLS.md`
+- **DOCS**: Update `docs/PROGRESS-DOCS.md`
 
-### Next Up
-- **DOM to Video Path**: Now that Canvas MVP is solid, we can look at the DOM path.
-- **In-browser Player**: Ensure the player component works with the new `Helios` build.
-- **Diagnostics**: Add `helios.diagnose()` to help users debug environment issues.
+## Instructions for Each Agent
 
-## [2026-01-21] Daily Report
+### CORE Agent
+- **Your progress file**: `docs/PROGRESS-CORE.md`
+- Find or create a version section: `## CORE vX.Y.Z`
+- Add your entry under that version section:
+  ```markdown
+  ### CORE vX.Y.Z
+  - ✅ Completed: [Task Name] - [Brief Result]
+  ```
+- If this is a new version, create the section at the top of the file (after any existing content)
+- Group multiple completions under the same version section if they're part of the same release
 
-### Core
-- ✅ Completed: Implement Helios.diagnose() - Implemented static diagnose method and DiagnosticReport interface
+### PLAYER Agent
+- **Your progress file**: `docs/PROGRESS-PLAYER.md`
+- Find or create a version section: `## PLAYER vX.Y.Z`
+- Add your entry under that version section:
+  ```markdown
+  ### PLAYER vX.Y.Z
+  - ✅ Completed: [Task Name] - [Brief Result]
+  ```
+- If this is a new version, create the section at the top of the file (after any existing content)
+- Group multiple completions under the same version section if they're part of the same release
 
-## [2026-02-18] Consolidated Report
+### RENDERER Agent
+- **Your progress file**: `docs/PROGRESS-RENDERER.md`
+- Find or create a version section: `## RENDERER vX.Y.Z`
+- Add your entry under that version section:
+  ```markdown
+  ### RENDERER vX.Y.Z
+  - ✅ Completed: [Task Name] - [Brief Result]
+  ```
+- If this is a new version, create the section at the top of the file (after any existing content)
+- Group multiple completions under the same version section if they're part of the same release
 
-### Core
-- [2026-01-22] ✅ Completed: Enable Core Testing And Robustness - Added `test` script, constructor validation, and unit tests.
+### DEMO Agent
+- **Your progress file**: `docs/PROGRESS-DEMO.md`
+- Find or create a version section: `## DEMO vX.Y.Z`
+- Add your entry under that version section:
+  ```markdown
+  ### DEMO vX.Y.Z
+  - ✅ Completed: [Task Name] - [Brief Result]
+  ```
+- If this is a new version, create the section at the top of the file (after any existing content)
+- Group multiple completions under the same version section if they're part of the same release
 
-### Renderer
-- [2026-02-18] ✅ Completed: Refactor FFmpeg Config - Fully decoupled FFmpeg argument generation by moving it to `RenderStrategy.getFFmpegArgs` and extracted `RendererOptions` to `types.ts`.
+### STUDIO Agent
+- **Your progress file**: `docs/PROGRESS-STUDIO.md`
+- Find or create a version section: `## STUDIO vX.Y.Z`
+- Add your entry under that version section:
+  ```markdown
+  ### STUDIO vX.Y.Z
+  - ✅ Completed: [Task Name] - [Brief Result]
+  ```
+- If this is a new version, create the section at the top of the file (after any existing content)
+- Group multiple completions under the same version section if they're part of the same release
 
-### Player
-- [2026-01-20] ✅ Completed: Refactor Player Control Logic - Verified `<helios-player>` uses `window.helios` and supports client-side export.
-- [2026-01-21] ✅ Completed: Sandbox and Bridge - Implemented `postMessage` bridge and sandboxed iframe support.
+### SKILLS Agent
+- **Your progress file**: `docs/PROGRESS-SKILLS.md`
+- Find or create a version section: `## SKILLS vX.Y.Z`
+- Add your entry under that version section:
+  ```markdown
+  ### SKILLS vX.Y.Z
+  - ✅ Completed: [Task Name] - [Brief Result]
+  ```
+- If this is a new version, create the section at the top of the file (after any existing content)
+- Group multiple completions under the same version section if they're part of the same release
 
-### Demo
-- [2026-01-22] ✅ Completed: Verify Vue Example - Verified build and render of `examples/vue-canvas-animation`. Created `tests/e2e/verify-render.ts`.
-
-## DEMO v1.1.0
-- ✅ Completed: Scaffold Svelte Example - Created `examples/svelte-canvas-animation` and E2E verification test.
-## STUDIO v0.1.0
-- ✅ Completed: Scaffold Studio Package - Created package structure, config, and basic UI.
-## PLAYER v0.2.0
-- ✅ Completed: Refactor Player Export - Extracted `ClientSideExporter`, added cancellation support, and modularized controllers.
-### RENDERER v1.0.1
-- ✅ Completed: Implement DomStrategy Preloading - Implemented `DomStrategy.prepare()` to wait for fonts and images to load before rendering, preventing visual artifacts.
-## CORE v1.1.0
-- ✅ Completed: Implement InputProps - Added `inputProps` to state/options and `setInputProps` method to Helios class.
+### DOCS Agent
+- **Your progress file**: `docs/PROGRESS-DOCS.md`
+- Find or create a version section: `## DOCS vX.Y.Z`
+- Add your entry under that version section:
+  ```markdown
+  ### DOCS vX.Y.Z
+  - ✅ Completed: [Task Name] - [Brief Result]
+  ```
+- If this is a new version, create the section at the top of the file (after any existing content)
+- Group multiple completions under the same version section if they're part of the same release

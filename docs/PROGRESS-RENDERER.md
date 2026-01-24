@@ -1,0 +1,10 @@
+# RENDERER Progress Log
+
+## RENDERER v1.0.1
+- ✅ Completed: Implement DomStrategy Preloading - Implemented `DomStrategy.prepare()` to wait for fonts and images to load before rendering, preventing visual artifacts.
+
+## [2026-02-18] RENDERER
+- ✅ Completed: Refactor FFmpeg Config - Fully decoupled FFmpeg argument generation by moving it to `RenderStrategy.getFFmpegArgs` and extracted `RendererOptions` to `types.ts`.
+
+## [2026-01-15] RENDERER
+- Updated `Renderer` to support local file access (`--disable-web-security`) and use built examples.
