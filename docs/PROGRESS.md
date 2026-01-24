@@ -50,3 +50,9 @@
 
 ## STUDIO v0.1.0
 - ✅ Completed: Scaffold Studio Package - Created package structure, config, and basic UI.
+## PLAYER v0.2.0
+- ✅ Completed: Refactor Player Export - Extracted `ClientSideExporter`, added cancellation support, and modularized controllers.
+### RENDERER v1.0.1
+- ✅ Completed: Implement DomStrategy Preloading - Implemented `DomStrategy.prepare()` to wait for fonts and images to load before rendering, preventing visual artifacts.
+## CORE v1.1.0
+- ✅ Completed: Implement InputProps - Added `inputProps` to state/options and `setInputProps` method to Helios class.

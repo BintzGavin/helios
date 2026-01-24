@@ -3,6 +3,7 @@ type HeliosState = {
   fps: number;
   currentFrame: number;
   isPlaying: boolean;
+  inputProps: Record<string, any>;
 };
 
 type Subscriber = (state: HeliosState) => void;
@@ -12,6 +13,7 @@ interface HeliosOptions {
   fps: number;
   autoSyncAnimations?: boolean;
   animationScope?: HTMLElement;
+  inputProps?: Record<string, any>;
 }
 
 export interface DiagnosticReport {
@@ -63,6 +65,7 @@ export class Helios {
       fps: options.fps,
       currentFrame: 0,
       isPlaying: false,
+      inputProps: options.inputProps || {},
     };
     this.autoSyncAnimations = options.autoSyncAnimations || false;
     if (options.animationScope) {
@@ -78,6 +81,15 @@ export class Helios {
 
   public getState(): Readonly<HeliosState> {
     return this.state;
+  }
+
+  /**
+   * Updates the input properties for the composition.
+   * This triggers a state update and notifies subscribers.
+   * @param props A record of properties to pass to the composition.
+   */
+  public setInputProps(props: Record<string, any>) {
+    this.setState({ inputProps: props });
   }
 
   // --- Subscription ---

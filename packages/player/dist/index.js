@@ -46,7 +46,6 @@ template.innerHTML = `
       padding: 6px 12px;
       margin: 0 10px;
       border-radius: 4px;
-      min-width: 80px;
     }
     .export-btn:hover {
       background-color: #0056b3;
@@ -141,7 +140,6 @@ export class HeliosPlayer extends HTMLElement {
     directHelios = null;
     unsubscribe = null;
     connectionTimeout = null;
-    isExporting = false;
     abortController = null;
     constructor() {
         super();
@@ -237,10 +235,6 @@ export class HeliosPlayer extends HTMLElement {
                 window.clearTimeout(this.connectionTimeout);
             this.hideStatus();
             // If we already have a controller (e.g. Direct Mode), we might stick with it
-            // OR we could switch to Bridge if we prefer consistent behavior?
-            // BUT Direct Mode is needed for Export.
-            // So if we have directHelios, we ignore HELIOS_READY for control purposes,
-            // or we just acknowledge it but don't replace the controller.
             if (!this.controller) {
                 console.log("HeliosPlayer: Connected via Bridge Mode.");
                 const iframeWin = this.iframe.contentWindow;
@@ -296,8 +290,6 @@ export class HeliosPlayer extends HTMLElement {
         }
     };
     updateUI(state) {
-        // During export, we might not want to update UI heavily or interfere?
-        // But keeping it in sync is fine.
         const isFinished = state.currentFrame >= state.duration * state.fps - 1;
         if (isFinished) {
             this.playPauseBtn.textContent = "🔄"; // Restart button
@@ -323,9 +315,12 @@ export class HeliosPlayer extends HTMLElement {
         this.iframe.src = src;
     }
     renderClientSide = async () => {
-        if (this.isExporting) {
-            console.log("Cancelling export...");
-            this.abortController?.abort();
+        // If we are already exporting, this is a cancel request
+        if (this.abortController) {
+            this.abortController.abort();
+            this.abortController = null;
+            this.exportBtn.textContent = "Export";
+            this.exportBtn.disabled = false;
             return;
         }
         // Export requires Direct Mode
@@ -333,34 +328,25 @@ export class HeliosPlayer extends HTMLElement {
             console.error("Export not available: No direct access to Helios instance.");
             return;
         }
-        console.log("Client-side rendering started!");
-        this.isExporting = true;
         this.abortController = new AbortController();
         this.exportBtn.textContent = "Cancel";
-        // Create Exporter
         const exporter = new ClientSideExporter(this.controller, this.iframe);
         try {
-            await exporter.export((msg) => {
-                this.exportBtn.textContent = `${msg} (Cancel)`;
-            }, this.abortController.signal);
-            console.log("Client-side rendering finished!");
+            await exporter.export({
+                onProgress: (p) => {
+                    this.exportBtn.textContent = `Cancel (${Math.round(p * 100)}%)`;
+                },
+                signal: this.abortController.signal
+            });
         }
         catch (e) {
-            if (e.message === "Export aborted") {
-                console.log("Export cancelled by user.");
-            }
-            else {
-                console.error("Client-side rendering failed:", e);
-                alert(`Rendering failed: ${e.message}`);
-            }
+            console.error("Export failed or aborted", e);
+            // Error handling is mostly done inside exporter, but we should reset UI
         }
         finally {
-            this.isExporting = false;
             this.exportBtn.textContent = "Export";
             this.exportBtn.disabled = false;
             this.abortController = null;
-            // Ensure playback is paused or state restored?
-            // The exporter pauses it.
         }
     };
 }
