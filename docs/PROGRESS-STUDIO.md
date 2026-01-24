@@ -1,5 +1,8 @@
 # STUDIO Progress Log
 
+## STUDIO v0.2.1
+- ✅ Completed: Verify & Refine - Fixed TypeScript configuration and verified build/CLI.
+
 ## STUDIO v0.2.0
 - ✅ Completed: Scaffold CLI Package - Created @helios-project/cli and studio command.
 

@@ -20,7 +20,12 @@ packages/studio/
 └── src/
     ├── main.tsx
     ├── App.tsx
-    └── vite-env.d.ts
+    ├── vite-env.d.ts
+    └── components/
+        └── Layout/
+            ├── Panel.tsx
+            ├── StudioLayout.css
+            └── StudioLayout.tsx
 
 packages/cli/
 ├── package.json
@@ -42,8 +47,10 @@ Internal scripts:
 - `npm run build -w packages/studio`: Builds the application.
 
 ## D. UI Components
-- **Main Layout**: `App.tsx` contains the initial scaffolding.
-- **Preview Pane**: Uses `<helios-player>` to display the composition.
+- **Main Layout**: `App.tsx` orchestrates the layout.
+- **StudioLayout**: `components/Layout/StudioLayout.tsx` defines the grid areas (header, sidebar, stage, inspector, timeline).
+- **Panel**: `components/Layout/Panel.tsx` is a generic container for UI panels.
+- **Preview Pane**: Uses `<helios-player>` in the stage area.
 
 ## E. Integration
 - **Player**: Imports `@helios-project/player` to register the web component.
