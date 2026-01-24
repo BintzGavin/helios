@@ -30,11 +30,7 @@ The SKILLS agent (unified planning/execution) runs **once per day** to maintain 
 
 **Cycle Timing**: The 2-hour window (1h planning, 1h execution) provides natural separation to avoid conflicts. Planning completes before execution begins, and execution completes before the next planning cycle starts.
 
-**Infrastructure**: All scheduling is handled through the [Jules website dashboard](https://jules.ai). Tasks are scheduled in 1-hour blocks—planning tasks run first, then execution tasks, then repeat. The DOCS agent runs once per day for comprehensive documentation review. The Ultra plan allows up to 300 tasks per day, which supports ~12 cycles per day (24 hours / 2 hours per cycle) plus daily documentation review.
-
-Alternatively, tasks can be triggered via the Jules CLI for programmatic orchestration, enabling fully autonomous loops without manual scheduling. 
-
-Alternatively, tasks can be triggered via the Jules CLI instead of only through the web dashboard. This opens up the possibility of implementing a more traditional loop—similar to the "Ralph Loop" or Claude Code approaches, but by programmatically orchestrating cycles without manual intervention. It would be interesting to compare the operational costs and efficiency of this Jules CLI/cloud-driven method versus a Claude Code–powered workflow where code updates and tests are locally executed.
+**Infrastructure**: All scheduling is handled through the [Jules website dashboard](https://jules.ai). Tasks are scheduled in 1-hour blocks—planning tasks run first, then execution tasks, then repeat. The DOCS agent runs once per day for comprehensive documentation review. The Ultra plan allows up to 300 tasks per day, which now supports our ~12 cycles per day and 120 agent runs(24 hours * 5 agent runs per hour) + 2 (documentation and skills review). So 122 agents run per day fully automated. I also created a GitHub action to merge the Pull Requests from the agents into the main branch.
 
 ## Prompt Structure
 
