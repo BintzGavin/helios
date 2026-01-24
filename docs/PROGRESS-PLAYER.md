@@ -1,5 +1,8 @@
 # PLAYER Progress Log
 
+## PLAYER v0.3.1
+- ✅ Completed: Loading UI - Verified Loading and Error states with Status Overlay.
+
 ## PLAYER v0.3.0
 - ✅ Completed: Export Config - Added `export-mode` and `canvas-selector` attributes for explicit export control.
 

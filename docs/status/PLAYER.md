@@ -1,4 +1,4 @@
-**Version**: 0.3.0
+**Version**: 0.3.1
 
 # Status: PLAYER
 
@@ -8,6 +8,7 @@
 - **Responsibility**: `<helios-player>` Web Component, UI controls, iframe bridge.
 
 ## Current State
+- `<helios-player>` includes a Status Overlay for Loading and Error states.
 - `<helios-player>` uses a modular architecture with `HeliosController` (Direct/Bridge) and `ClientSideExporter`.
 - Client-side export supports explicit configuration via `export-mode` and `canvas-selector` attributes.
 - Supports sandboxed iframes and cross-origin usage via `postMessage` bridge.
@@ -21,8 +22,9 @@
 - [x] Implement Sandbox and Bridge support.
 - [x] Refactor Export logic into dedicated `ClientSideExporter` with cancellation.
 - [x] Implement Export Configuration (`export-mode`, `canvas-selector`).
-- [ ] Add proper UI feedback for "Loading" state.
+- [x] Add proper UI feedback for "Loading" state.
 
+[v0.3.1] ✅ Completed: Loading UI - Verified Loading and Error states with Status Overlay.
 [2026-01-20] ✅ Completed: Refactor Player Control Logic - Verified `<helios-player>` uses `window.helios` and supports client-side export.
 [2026-01-21] ✅ Completed: Sandbox and Bridge - Implemented `postMessage` bridge and sandboxed iframe support.
 [v0.2.0] ✅ Completed: Refactor Player Export - Extracted `ClientSideExporter`, added cancellation support, and modularized controllers.
