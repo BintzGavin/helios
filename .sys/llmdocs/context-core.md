@@ -6,10 +6,13 @@ The Core domain implements the "Helios State Machine" pattern.
 - **Actions**: Public methods (e.g., `play`, `seek`, `setPlaybackRate`) modify the state.
 - **Subscribers**: External components subscribe to state changes via `subscribe`.
 - **Ticking**: The `tick` method runs on `requestAnimationFrame`, calculating frame advancements based on `performance.now()` delta time and `playbackRate`.
+- **Helpers**: Pure functions like `interpolate` for animation logic.
 
 ## B. File Tree
 ```
 packages/core/src/
+├── animation.test.ts
+├── animation.ts
 ├── index.test.ts
 └── index.ts
 ```
@@ -41,9 +44,17 @@ export interface DiagnosticReport {
   offscreenCanvas: boolean;
   userAgent: string;
 }
+
+export type ExtrapolateType = 'extend' | 'clamp' | 'identity';
+
+export interface InterpolateOptions {
+  extrapolateLeft?: ExtrapolateType;
+  extrapolateRight?: ExtrapolateType;
+  easing?: (t: number) => number;
+}
 ```
 
-## D. Public Methods
+## D. Public Methods & Exports
 
 ```typescript
 class Helios {
@@ -60,4 +71,11 @@ class Helios {
   bindToDocumentTimeline(): void;
   unbindFromDocumentTimeline(): void;
 }
+
+export function interpolate(
+  input: number,
+  inputRange: number[],
+  outputRange: number[],
+  options?: InterpolateOptions
+): number;
 ```

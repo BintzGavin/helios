@@ -25,6 +25,8 @@ export interface DiagnosticReport {
   userAgent: string;
 }
 
+export * from './animation';
+
 export class Helios {
   private state: HeliosState;
   private subscribers: Set<Subscriber> = new Set();

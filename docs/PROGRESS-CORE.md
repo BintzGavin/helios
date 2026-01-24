@@ -1,5 +1,8 @@
 # CORE Progress Log
 
+## CORE v1.3.0
+- ✅ Completed: Implement Animation Helpers - Implemented `interpolate` function with easing and extrapolation support.
+
 ## CORE v1.2.0
 - ✅ Completed: Implement Variable Playback Rate - Added `playbackRate` control, time-based ticking logic, and exported `HeliosOptions`.
 
