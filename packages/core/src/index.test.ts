@@ -9,6 +9,7 @@ describe('Helios Core', () => {
       fps: 30,
       currentFrame: 0,
       isPlaying: false,
+      inputProps: {},
     });
   });
 
@@ -191,6 +192,32 @@ describe('Helios Core', () => {
         expect(mockScope.getAnimations).toHaveBeenCalledWith({ subtree: true });
         expect((document.getAnimations as any)).not.toHaveBeenCalled();
         expect(mockAnim.currentTime).toBe(1000);
+    });
+  });
+
+  describe('Input Props', () => {
+    it('should initialize with inputProps', () => {
+      const props = { text: 'Hello', value: 42 };
+      const helios = new Helios({ duration: 10, fps: 30, inputProps: props });
+      expect(helios.getState().inputProps).toEqual(props);
+    });
+
+    it('should update inputProps', () => {
+      const helios = new Helios({ duration: 10, fps: 30 });
+      const newProps = { text: 'World', value: 100 };
+
+      const spy = vi.fn();
+      helios.subscribe(spy);
+
+      helios.setInputProps(newProps);
+
+      expect(helios.getState().inputProps).toEqual(newProps);
+      expect(spy).toHaveBeenLastCalledWith(expect.objectContaining({ inputProps: newProps }));
+    });
+
+    it('should default inputProps to empty object', () => {
+      const helios = new Helios({ duration: 10, fps: 30 });
+      expect(helios.getState().inputProps).toEqual({});
     });
   });
 });
