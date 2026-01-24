@@ -3,10 +3,11 @@ import * as path from 'path';
 import * as fs from 'fs/promises';
 
 const CASES = [
-  { name: 'Canvas', relativePath: 'examples/simple-canvas-animation/composition.html' },
-  { name: 'React', relativePath: 'examples/react-canvas-animation/composition.html' },
-  { name: 'Vue', relativePath: 'examples/vue-canvas-animation/composition.html' },
-  { name: 'Svelte', relativePath: 'examples/svelte-canvas-animation/composition.html' },
+  { name: 'Canvas', relativePath: 'examples/simple-canvas-animation/composition.html', mode: 'canvas' as const },
+  { name: 'DOM', relativePath: 'examples/simple-animation/composition.html', mode: 'dom' as const },
+  { name: 'React', relativePath: 'examples/react-canvas-animation/composition.html', mode: 'canvas' as const },
+  { name: 'Vue', relativePath: 'examples/vue-canvas-animation/composition.html', mode: 'canvas' as const },
+  { name: 'Svelte', relativePath: 'examples/svelte-canvas-animation/composition.html', mode: 'canvas' as const },
 ];
 
 async function main() {
@@ -23,6 +24,7 @@ async function main() {
       height: 600,
       fps: 30,
       durationInSeconds: 5,
+      mode: testCase.mode || 'canvas',
     });
 
     const compositionPath = path.resolve(

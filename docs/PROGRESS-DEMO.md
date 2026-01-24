@@ -1,5 +1,8 @@
 # DEMO Progress Log
 
+## DEMO v1.3.0
+- ✅ Completed: Verify DOM Render - Updated `tests/e2e/verify-render.ts` to include the DOM rendering test case and verified it passes.
+
 ## DEMO v1.2.0
 - ✅ Completed: Expand E2E Tests - Refactored `tests/e2e/verify-render.ts` to verify all 4 examples (Canvas, React, Vue, Svelte).
 
