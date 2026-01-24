@@ -13,3 +13,7 @@
 ## 2026-01-22 - Library Version Mismatches
 **Learning:** I relied on online documentation for `mp4-muxer` which described version 5.x features (`fastStart`), but the project used version 2.x. This caused build failures when applying the plan.
 **Action:** Always check `package.json` for installed versions and try to verify `node_modules` types or documentation specific to that version before coding against it.
+
+## 2026-01-22 - God Class Refactor
+**Learning:** `index.ts` accumulated UI, State, and Export logic, making it hard to see the "Client-Side Export" implementation details. This obscured the fact that the exporter was primitive.
+**Action:** When a file exceeds ~300 lines or handles >2 distinct domains, prioritize refactoring before adding new features.

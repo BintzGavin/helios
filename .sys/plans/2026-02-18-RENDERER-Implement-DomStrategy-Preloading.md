@@ -1,48 +1,67 @@
 # Context & Goal
-- **Objective**: Implement asset preloading (fonts and images) in `DomStrategy` to ensure artifact-free rendering.
-- **Trigger**: The `README.md` vision explicitly states that the DOM-to-Video path must "ensure all assets (images, fonts, etc.) are fully pre-loaded," but the current `DomStrategy.prepare()` method is a no-op.
-- **Impact**: Eliminates visual artifacts (like FOUT or missing images) in the first few frames of DOM-based video exports.
+- **Objective**: Implement asset preloading in `DomStrategy.prepare()` to ensure fonts and images are fully loaded before rendering begins.
+- **Trigger**: The README explicitly requires preloading to prevent rendering artifacts (flashing content), but the current `DomStrategy.prepare()` is a no-op. Additionally, the DOM animation example is not currently verifiable.
+- **Impact**: Ensures reliable DOM-to-Video rendering, matching the "Dual-Path Architecture" vision, and enables verification of DOM-based compositions.
 
 # File Inventory
-- **Modify**: `packages/renderer/src/strategies/DomStrategy.ts` (Implement `prepare` method)
-- **Read-Only**: `packages/renderer/src/index.ts` (Reference for `prepare` call site)
+- **Modify**: `packages/renderer/src/strategies/DomStrategy.ts`
+  - Implement `prepare(page)` logic.
+- **Modify**: `vite.build-example.config.js`
+  - Add `simple_dom` entry to `rollupOptions.input` to enable building the DOM example.
+- **Create**: `packages/renderer/scripts/render-dom.ts`
+  - A utility script to execute the renderer in DOM mode against the built example.
 
 # Implementation Spec
-- **Architecture**: Use Playwright's `page.evaluate()` to execute client-side preloading logic within the browser context before the capture loop begins.
-- **Pseudo-Code**:
-  ```typescript
-  async prepare(page: Page): Promise<void> {
-    await page.evaluate(async () => {
-      // 1. Wait for fonts
-      await document.fonts.ready;
+- **Architecture**:
+  - The `DomStrategy` will use `page.evaluate` during the `prepare` phase to inject a promise that resolves only when the document's fonts and images are ready.
+  - The build configuration and verification script are necessary infrastructure updates to support and test this change.
 
-      // 2. Wait for images
-      const images = Array.from(document.images);
-      await Promise.all(images.map(img => {
-        if (img.complete) return;
-        return new Promise(resolve => {
-          img.onload = resolve;
-          img.onerror = resolve; // Don't block on broken images
+- **Pseudo-Code**:
+  1.  **In `DomStrategy.ts`**:
+      ```typescript
+      async prepare(page: Page): Promise<void> {
+        console.log('DomStrategy: Preloading assets...');
+        await page.evaluate(async () => {
+          // 1. Wait for Fonts
+          await document.fonts.ready;
+
+          // 2. Wait for Images
+          const images = Array.from(document.images);
+          await Promise.all(images.map(img => {
+             if (img.complete) return Promise.resolve();
+             return new Promise((resolve) => {
+               img.onload = resolve;
+               img.onerror = resolve; // Don't block on error
+             });
+          }));
         });
-      }));
-    });
-  }
-  ```
+        console.log('DomStrategy: Assets ready.');
+      }
+      ```
+
+  2.  **In `vite.build-example.config.js`**:
+      - Add `simple_dom: resolve(__dirname, "examples/simple-animation/composition.html")` to the `input` object.
+
+  3.  **In `packages/renderer/scripts/render-dom.ts`**:
+      - Import `Renderer` from `../src/index`.
+      - Instantiate `Renderer` with `{ mode: 'dom', ... }`.
+      - Set `compositionUrl` to resolve to `output/example-build/examples/simple-animation/composition.html`.
+      - Set `outputPath` to `output/dom-animation.mp4`.
+      - Execute `renderer.render`.
+
 - **Public API Changes**: None.
-- **Dependencies**: None.
+- **Dependencies**:
+  - `packages/core` must be built before building examples (`npm run build -w packages/core`).
 
 # Test Plan
 - **Verification**:
-  1. Create a temporary verification script `packages/renderer/scripts/verify-dom-preload.ts` that:
-     - Instantiates `Renderer` with `{ mode: 'dom', ... }`.
-     - Renders a dummy composition.
-  2. Run: `npx ts-node packages/renderer/scripts/verify-dom-preload.ts`
-  3. Run existing E2E tests: `npx ts-node tests/e2e/verify-render.ts` to ensure no regressions in the Canvas path.
+  - Run the following command chain:
+    ```bash
+    npm run build -w packages/core && npm run build:examples && npx ts-node packages/renderer/scripts/render-dom.ts
+    ```
 - **Success Criteria**:
-  - The DOM verification script executes successfully, logs "Strategy prepared", and produces a valid output file.
-  - The Canvas regression test passes.
+  - `output/dom-animation.mp4` is created and has a file size > 0.
+  - Console logs indicate "DomStrategy: Preloading assets..." followed by "DomStrategy: Assets ready."
 - **Edge Cases**:
-  - Page has no images (Should return immediately).
-  - Page has broken images (Should resolve `onerror` and not hang).
-- **Pre-commit**:
-  - Complete pre commit steps to ensure proper testing, verification, review, and reflection are done.
+  - Pages with no images/fonts should resolve immediately.
+  - Broken image links should not hang the renderer (handled by `onerror`).

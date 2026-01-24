@@ -21,3 +21,7 @@
 ## 2026-01-23 - Private Interface Visibility
 **Learning:** `HeliosOptions` is defined but not exported, preventing consumers from using the type. This is a common pattern in this codebase (internal types not exposed).
 **Action:** Explicitly included "Export HeliosOptions" in the `PlaybackRate` plan to fix this DX issue.
+
+## 2026-01-24 - Critical Timing Bug Discovered
+**Learning:** The `tick` method was blindly incrementing `currentFrame + 1` on every `requestAnimationFrame` callback. This ties playback speed to the user's monitor refresh rate (e.g., 60Hz vs 144Hz) rather than the configured `fps`.
+**Action:** Planned `2026-01-24-CORE-PlaybackRate.md` to switch to a Delta-Time based ticking system (`performance.now()`) to ensure consistent playback speed across devices.

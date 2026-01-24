@@ -1,0 +1,2 @@
+# Configure merge strategy for PROGRESS.md to accept both changes
+docs/PROGRESS.md merge=union
