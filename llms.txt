@@ -1,0 +1,128 @@
+# Helios Engine
+
+> Framework-agnostic programmatic video creation for the web
+
+Helios is a modern engine for creating videos programmatically using standard web technologies—HTML, CSS, and JavaScript. Unlike Remotion (React-only), Helios works with any framework or vanilla JS.
+
+## Quick Facts
+
+- **License**: Elastic License 2.0 (free commercial use, no SaaS resale)
+- **Status**: Alpha
+- **Frameworks**: React, Vue, Svelte, vanilla JS
+- **Animation**: Standard CSS, Web Animations API (WAAPI), any animation library
+
+## Core API
+
+```typescript
+import { Helios } from '@helios-engine/core';
+
+const helios = new Helios({
+  duration: 10,  // seconds
+  fps: 30,
+  autoSyncAnimations: true
+});
+
+helios.subscribe(({ currentFrame, duration, fps }) => {
+  const progress = currentFrame / (duration * fps);
+  // Drive animations with progress (0-1)
+});
+
+helios.play();
+helios.pause();
+helios.seek(150);  // Jump to frame 150
+```
+
+## Packages
+
+- `@helios-engine/core` - Headless video engine (state, timeline, subscriptions)
+- `@helios-engine/player` - Web Component player (`<helios-player>`)
+- `@helios-engine/renderer` - Server-side rendering (Playwright, FFmpeg)
+
+## Animation Approach
+
+Helios uses native browser APIs, not proprietary hooks:
+
+```css
+/* Standard CSS animations work */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.element { animation: fadeIn 1s ease-out; }
+```
+
+The engine controls `document.timeline.currentTime` to seek animations frame-accurately.
+
+## Architecture
+
+### Rendering Paths
+
+1. **Canvas-to-Video** (MVP): WebCodecs API for Three.js, Pixi.js, WebGL
+2. **DOM-to-Video** (planned): Playwright screenshots for HTML/CSS/SVG
+
+### Components
+
+- **Helios class**: Headless state machine (currentFrame, isPlaying, etc.)
+- **Framework adapters**: React hook, Vue composable, Svelte store
+- **Web Component**: `<helios-player>` for browser preview
+- **Renderer**: FFmpeg with piped frames (no temp files)
+
+## vs Remotion
+
+| | Helios | Remotion |
+|---|--------|----------|
+| Framework | Any | React only |
+| Animation | CSS, WAAPI | `interpolate()`, `spring()` |
+| Pricing | Free | $100+/mo for 4+ devs |
+| Maturity | Alpha | Production-ready |
+| Distributed rendering | Planned | Available |
+
+## Agent Skills
+
+Skills for AI agents are in `.agents/skills/helios/`:
+
+- `core/SKILL.md` - Core API patterns, state management, subscriptions
+- `renderer/SKILL.md` - Rendering pipeline (planned)
+- `player/SKILL.md` - Player component (planned)
+
+## Key Files for Agents
+
+- `README.md` - Vision document (planning agents scan this)
+- `docs/BACKLOG.md` - Feature backlog
+- `docs/PROGRESS.md` - Completed work
+- `docs/status/[ROLE].md` - Domain-specific status
+- `.sys/llmdocs/context-*.md` - Architecture summaries
+- `packages/core/src/index.ts` - Core public API
+- `packages/player/src/index.ts` - Player public API
+- `packages/renderer/src/index.ts` - Renderer public API
+
+## Diagnostics
+
+```typescript
+const report = await Helios.diagnose();
+// { waapi: boolean, webCodecs: boolean, offscreenCanvas: boolean, userAgent: string }
+```
+
+## Roadmap
+
+### V1.x
+- Helios Studio (framework-agnostic IDE)
+- Optional animation helpers (interpolate, spring, Sequence)
+- Captions/subtitles
+- MCP Server for AI assistants
+- Publishable Agent Skills
+
+### V2
+- Distributed rendering (Lambda, Cloud Run)
+- Advanced audio engine
+
+### V3
+- Native Node.js encoding (beamcoder)
+
+## Links
+
+- Repository: https://github.com/gavinbintz/helios
+- Documentation: ./docs/
+- Examples: ./examples/
+- Agent Prompts: ./docs/prompts/
