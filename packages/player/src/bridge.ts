@@ -21,6 +21,9 @@ export function connectToParent(helios: Helios) {
           helios.seek(frame);
         }
         break;
+      case 'HELIOS_CAPTURE_FRAME':
+        handleCaptureFrame(helios, event.data);
+        break;
     }
   });
 
@@ -32,4 +35,46 @@ export function connectToParent(helios: Helios) {
   // 3. Announce readiness immediately (in case parent is already listening)
   // This helps when the iframe reloads or connects after the parent has already set up listeners
   window.parent.postMessage({ type: 'HELIOS_READY' }, '*');
+}
+
+async function handleCaptureFrame(helios: Helios, data: any) {
+    const { frame, selector } = data;
+
+    // 1. Seek
+    helios.seek(frame);
+
+    // 2. Wait for render (double RAF to be safe and ensure paint)
+    await new Promise<void>(r => requestAnimationFrame(() => requestAnimationFrame(() => r())));
+
+    // 3. Find canvas
+    const canvas = document.querySelector(selector || 'canvas');
+    if (!canvas || !(canvas instanceof HTMLCanvasElement)) {
+        window.parent.postMessage({
+            type: 'HELIOS_FRAME_DATA',
+            frame,
+            success: false,
+            error: 'Canvas not found'
+        }, '*');
+        return;
+    }
+
+    // 4. Create Bitmap
+    try {
+        const bitmap = await createImageBitmap(canvas);
+
+        // 5. Send back
+        window.parent.postMessage({
+            type: 'HELIOS_FRAME_DATA',
+            frame,
+            success: true,
+            bitmap
+        }, '*', [bitmap]);
+    } catch (e: any) {
+        window.parent.postMessage({
+            type: 'HELIOS_FRAME_DATA',
+            frame,
+            success: false,
+            error: e.message
+        }, '*');
+    }
 }
