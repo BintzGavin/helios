@@ -9,3 +9,7 @@
 ## 2026-01-22 - README Hallucination on Timeline Control
 **Learning:** The README claims Helios controls time via `document.timeline.currentTime = (f / fps) * 1000`. This is technically impossible as `document.timeline` is read-only. The implementation correctly uses `element.animate()` and sets `animation.currentTime`.
 **Action:** Do not attempt to implement the README's technical claim literally. The current `WAAPI` integration is the correct "Reality". Future documentation updates should correct this.
+
+## 2026-01-22 - Missing Parametric State
+**Learning:** The README explicitly states the "Headless Logic Engine" manages `inputProps`, but this property is completely absent from the `HeliosState` and `Helios` class in reality.
+**Action:** Created plan `2026-01-22-CORE-InputProps.md` to implement this missing state management feature, unlocking parametric compositions.
