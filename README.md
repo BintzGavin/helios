@@ -386,10 +386,6 @@ WYSIWYG preview using the same bundled composition code as the final render:
 - ✅ `helios.diagnose()` environment checks
 - ✅ Client-side export (WebCodecs)
 
-### In Progress
-- 🔄 DOM-to-Video rendering path
-- 🔄 Asset preloading
-- 🔄 Player UI polish
 
 See [`docs/BACKLOG.md`](./docs/BACKLOG.md) for the full task list.
 
