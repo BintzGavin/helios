@@ -17,8 +17,12 @@ Five execution agents read those plans and write the actual code. Each stays in 
 ### Daily: Comprehensive Documentation Review
 The DOCS agent (unified planning/execution) runs **once per day** to perform a comprehensive review and update of all user-facing documentation in a Mintlify-like structure. It identifies gaps, updates API docs, syncs changelogs, documents examples, and ensures the entire documentation site is accurate and synchronized with the codebase.
 
+### Daily: Agent Skills Maintenance
+The SKILLS agent (unified planning/execution) runs **once per day** to maintain agent-facing skills—specialized "onboarding guides" that enable AI agents to effectively use Helios APIs. Unlike user documentation, skills are optimized for LLM consumption: concise, procedural, and actionable. The SKILLS agent ensures agents can discover, understand, and execute tasks efficiently in a single run.
+
 **Cycle**: Planning (1h) → Execution (1h) → Planning (1h) → Execution (1h) → ... (continuous loop)
-**Documentation**: DOCS runs once daily for comprehensive review
+**Documentation**: DOCS runs once daily for comprehensive user-facing documentation review
+**Skills**: SKILLS runs once daily for comprehensive agent-facing skills maintenance
 
 ## Scheduling & Autonomy
 
@@ -51,14 +55,16 @@ The system uses individual prompts for each agent role:
 - **[STUDIO Execution](./execution-studio.md)** - Execution agent for Helios Studio dev environment
 
 **Other Prompts:**
-- **[Documentation Prompt](./docs.md)** - Unified prompt for documentation agent (no planning/execution separation)
+- **[Documentation Prompt](./docs.md)** - Unified prompt for user-facing documentation agent (no planning/execution separation)
+- **[Skills Prompt](./skills.md)** - Unified prompt for agent-facing skills agent (no planning/execution separation)
 - **[Role Definitions](./roles.md)** - Domain-specific role configurations (reference only)
 
 **Note**: 
 - Each agent has its own dedicated planning and execution prompt files with role definitions embedded directly (no template variables).
 - Execution agents (CORE/RENDERER/PLAYER/DEMO/STUDIO) update progress logs, context files, backlog, and system context immediately upon completing work, eliminating the need for a separate scribe agent.
-- The DOCS agent runs **once per day** to perform a comprehensive review and update of all documentation, ensuring the entire documentation site stays synchronized with the codebase.
-- Each role maintains its own semantic version (e.g., CORE: 1.2.3, DOCS: 2.1.0) instead of using timestamps, which are unreliable in agent workflows.
+- The DOCS agent runs **once per day** to perform a comprehensive review and update of all user-facing documentation, ensuring the entire documentation site stays synchronized with the codebase.
+- The SKILLS agent runs **once per day** to maintain agent-facing skills, ensuring AI agents can effectively use Helios APIs with specialized, LLM-optimized guidance.
+- Each role maintains its own semantic version (e.g., CORE: 1.2.3, DOCS: 2.1.0, SKILLS: 1.0.0) instead of using timestamps, which are unreliable in agent workflows.
 
 ## Design Principles
 
