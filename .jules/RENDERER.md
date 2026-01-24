@@ -19,3 +19,7 @@
 ## 2024-05-24 - Gitignore Recursive Patterns
 **Learning:** `/dist` in `.gitignore` only ignores the root directory. To ignore `dist` in subpackages, use `dist/`.
 **Action:** Use `dist/` instead of `/dist` in monorepo `.gitignore` files.
+
+## 2026-02-18 - DomStrategy Preloading Gap
+**Learning:** `DomStrategy.prepare()` was implemented as a no-op, contradicting the README requirement for asset preloading to prevent artifacts.
+**Action:** Always cross-reference method implementations (like `prepare`) with specific optimization requirements in the Vision/README.
