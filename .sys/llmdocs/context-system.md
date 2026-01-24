@@ -12,6 +12,8 @@
 5. **Documentation and Examples**
    - Quickstart, Realistic Examples (React, Vue, Svelte).
 6. **Distributed Rendering Research**
+7. **Helios Studio**
+   - Browser-based IDE for composition.
 
 ## B. Role Boundaries
 1. **Core (`packages/core`)**:
@@ -23,6 +25,9 @@
 3. **Player (`packages/player`)**:
    - Imports `core` for types.
    - **MUST** work as a standalone Web Component.
+4. **Studio (`packages/studio`)**:
+   - Imports `player` for preview.
+   - **MUST** provide the browser-based development environment.
 
 ## C. Shared Commands
 - `npm run build:examples`: Bundles all examples in `examples/` using Vite, making them ready for the Renderer.
