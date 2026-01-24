@@ -61,6 +61,9 @@
   const resizeCanvas = () => {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
+    if (ctx && $heliosStore) {
+      draw($heliosStore.currentFrame);
+    }
   };
 
   onMount(() => {
