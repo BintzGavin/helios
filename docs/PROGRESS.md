@@ -48,6 +48,8 @@
 ### Demo
 - [2026-01-22] ✅ Completed: Verify Vue Example - Verified build and render of `examples/vue-canvas-animation`. Created `tests/e2e/verify-render.ts`.
 
+## DEMO v1.1.0
+- ✅ Completed: Scaffold Svelte Example - Created `examples/svelte-canvas-animation` and E2E verification test.
 ## STUDIO v0.1.0
 - ✅ Completed: Scaffold Studio Package - Created package structure, config, and basic UI.
 ## PLAYER v0.2.0
