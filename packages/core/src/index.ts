@@ -4,16 +4,18 @@ type HeliosState = {
   currentFrame: number;
   isPlaying: boolean;
   inputProps: Record<string, any>;
+  playbackRate: number;
 };
 
 type Subscriber = (state: HeliosState) => void;
 
-interface HeliosOptions {
+export interface HeliosOptions {
   duration: number; // in seconds
   fps: number;
   autoSyncAnimations?: boolean;
   animationScope?: HTMLElement;
   inputProps?: Record<string, any>;
+  playbackRate?: number;
 }
 
 export interface DiagnosticReport {
@@ -27,6 +29,7 @@ export class Helios {
   private state: HeliosState;
   private subscribers: Set<Subscriber> = new Set();
   private animationFrameId: number | null = null;
+  private lastFrameTime: number = 0;
   private syncWithDocumentTimeline = false;
   private autoSyncAnimations = false;
   private animationScope: HTMLElement | Document = typeof document !== 'undefined' ? document : ({} as Document);
@@ -66,6 +69,7 @@ export class Helios {
       currentFrame: 0,
       isPlaying: false,
       inputProps: options.inputProps || {},
+      playbackRate: options.playbackRate ?? 1,
     };
     this.autoSyncAnimations = options.autoSyncAnimations || false;
     if (options.animationScope) {
@@ -92,6 +96,10 @@ export class Helios {
     this.setState({ inputProps: props });
   }
 
+  public setPlaybackRate(rate: number) {
+    this.setState({ playbackRate: rate });
+  }
+
   // --- Subscription ---
   public subscribe(callback: Subscriber): () => void {
     this.subscribers.add(callback);
@@ -113,6 +121,7 @@ export class Helios {
   public play() {
     if (this.state.isPlaying) return;
     this.setState({ isPlaying: true });
+    this.lastFrameTime = performance.now();
     this.animationFrameId = requestAnimationFrame(this.tick);
   }
 
@@ -212,13 +221,26 @@ export class Helios {
         return;
     }
 
-    const totalFrames = this.state.duration * this.state.fps;
-    const nextFrame = this.state.currentFrame + 1;
+    const now = performance.now();
+    const deltaTime = now - this.lastFrameTime;
+    this.lastFrameTime = now;
 
-    if (nextFrame >= totalFrames) {
-      this.setState({ currentFrame: totalFrames - 1 });
-      this.pause();
-      return;
+    const totalFrames = this.state.duration * this.state.fps;
+    const frameDelta = (deltaTime / 1000) * this.state.fps * this.state.playbackRate;
+    const nextFrame = this.state.currentFrame + frameDelta;
+
+    if (this.state.playbackRate > 0) {
+      if (nextFrame >= totalFrames) {
+        this.setState({ currentFrame: totalFrames - 1 });
+        this.pause();
+        return;
+      }
+    } else {
+      if (nextFrame <= 0) {
+        this.setState({ currentFrame: 0 });
+        this.pause();
+        return;
+      }
     }
 
     this.setState({ currentFrame: nextFrame });

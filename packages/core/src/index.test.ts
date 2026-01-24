@@ -10,6 +10,7 @@ describe('Helios Core', () => {
       currentFrame: 0,
       isPlaying: false,
       inputProps: {},
+      playbackRate: 1,
     });
   });
 
@@ -218,6 +219,93 @@ describe('Helios Core', () => {
     it('should default inputProps to empty object', () => {
       const helios = new Helios({ duration: 10, fps: 30 });
       expect(helios.getState().inputProps).toEqual({});
+    });
+  });
+
+  describe('Playback Rate', () => {
+    it('should initialize with default playbackRate of 1', () => {
+      const helios = new Helios({ duration: 10, fps: 30 });
+      expect(helios.getState().playbackRate).toBe(1);
+    });
+
+    it('should initialize with provided playbackRate', () => {
+      const helios = new Helios({ duration: 10, fps: 30, playbackRate: 2 });
+      expect(helios.getState().playbackRate).toBe(2);
+    });
+
+    it('should update playbackRate via setPlaybackRate', () => {
+      const helios = new Helios({ duration: 10, fps: 30 });
+      helios.setPlaybackRate(0.5);
+      expect(helios.getState().playbackRate).toBe(0.5);
+    });
+  });
+
+  describe('Time-Based Ticking', () => {
+    let currentTime = 0;
+
+    beforeEach(() => {
+        currentTime = 0;
+        vi.stubGlobal('performance', { now: () => currentTime });
+        vi.stubGlobal('requestAnimationFrame', (cb: any) => setTimeout(cb, 0));
+        vi.stubGlobal('cancelAnimationFrame', (id: any) => clearTimeout(id));
+    });
+
+    afterEach(() => {
+        vi.unstubAllGlobals();
+    });
+
+    it('should advance frames correctly at 1x speed', async () => {
+        const helios = new Helios({ duration: 10, fps: 30 });
+        helios.play(); // lastFrameTime = 0
+
+        currentTime = 1000; // 1 second elapses
+
+        // wait for tick loop
+        await new Promise(resolve => setTimeout(resolve, 10));
+
+        // delta = 1000ms. frames = 1 * 30 * 1 = 30.
+        expect(helios.getState().currentFrame).toBeCloseTo(30, 0);
+        helios.pause();
+    });
+
+    it('should advance frames correctly at 2x speed', async () => {
+        const helios = new Helios({ duration: 10, fps: 30, playbackRate: 2 });
+        helios.play();
+
+        currentTime = 1000;
+
+        await new Promise(resolve => setTimeout(resolve, 10));
+
+        // delta = 1000ms. frames = 1 * 30 * 2 = 60.
+        expect(helios.getState().currentFrame).toBeCloseTo(60, 0);
+        helios.pause();
+    });
+
+    it('should reverse frames at -1x speed', async () => {
+        const helios = new Helios({ duration: 10, fps: 30 });
+        helios.seek(60);
+        helios.setPlaybackRate(-1);
+        helios.play();
+
+        currentTime = 1000;
+
+        await new Promise(resolve => setTimeout(resolve, 10));
+
+        // 60 + (1 * 30 * -1) = 30
+        expect(helios.getState().currentFrame).toBeCloseTo(30, 0);
+        helios.pause();
+    });
+
+    it('should pause when reaching end', async () => {
+        const helios = new Helios({ duration: 2, fps: 30 }); // 60 frames total
+        helios.play();
+
+        currentTime = 3000; // 3 seconds, should overshoot
+
+        await new Promise(resolve => setTimeout(resolve, 10));
+
+        expect(helios.getState().currentFrame).toBe(59); // clamped to totalFrames - 1
+        expect(helios.getState().isPlaying).toBe(false);
     });
   });
 });

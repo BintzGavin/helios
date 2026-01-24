@@ -1,21 +1,21 @@
-# Context: Core (Logic Engine)
+# Context: CORE
 
 ## A. Architecture
-The Helios Core (`packages/core`) implements a framework-agnostic **State Machine** pattern.
-1. **Store**: Holds the source of truth (`HeliosState`: `currentFrame`, `isPlaying`, `fps`, `duration`).
-2. **Actions**: Methods like `play()`, `pause()`, `seek()` mutate the state.
-3. **Subscribers**: External consumers (UI, Renderer) subscribe to state changes to update their view.
-
-This design allows the Core to be "Headless" and driver-agnostic (it can be driven by `requestAnimationFrame`, `document.timeline`, or manual seeking).
+The Core domain implements the "Helios State Machine" pattern.
+- **Store**: The `Helios` class maintains `HeliosState` (frame, playback status, inputs, etc.).
+- **Actions**: Public methods (e.g., `play`, `seek`, `setPlaybackRate`) modify the state.
+- **Subscribers**: External components subscribe to state changes via `subscribe`.
+- **Ticking**: The `tick` method runs on `requestAnimationFrame`, calculating frame advancements based on `performance.now()` delta time and `playbackRate`.
 
 ## B. File Tree
 ```
 packages/core/src/
-├── index.ts      # Main entry point (Helios class, types)
-├── index.test.ts # Unit tests
+├── index.test.ts
+└── index.ts
 ```
 
 ## C. Type Definitions
+
 ```typescript
 type HeliosState = {
   duration: number;
@@ -23,19 +23,19 @@ type HeliosState = {
   currentFrame: number;
   isPlaying: boolean;
   inputProps: Record<string, any>;
+  playbackRate: number;
 };
 
-type Subscriber = (state: HeliosState) => void;
-
-interface HeliosOptions {
+export interface HeliosOptions {
   duration: number; // in seconds
   fps: number;
   autoSyncAnimations?: boolean;
   animationScope?: HTMLElement;
   inputProps?: Record<string, any>;
+  playbackRate?: number;
 }
 
-interface DiagnosticReport {
+export interface DiagnosticReport {
   waapi: boolean;
   webCodecs: boolean;
   offscreenCanvas: boolean;
@@ -43,30 +43,20 @@ interface DiagnosticReport {
 }
 ```
 
-## D. Public Methods (Helios Class)
+## D. Public Methods
+
 ```typescript
 class Helios {
-  // Static Diagnostics
   static diagnose(): Promise<DiagnosticReport>;
-
-  // Lifecycle
   constructor(options: HeliosOptions);
-
-  // State Access
   getState(): Readonly<HeliosState>;
-
   setInputProps(props: Record<string, any>): void;
-
-  // Subscription
+  setPlaybackRate(rate: number): void;
   subscribe(callback: Subscriber): () => void;
   unsubscribe(callback: Subscriber): void;
-
-  // Playback Controls
   play(): void;
   pause(): void;
   seek(frame: number): void;
-
-  // External Timeline Sync (for Renderer/DevTools)
   bindToDocumentTimeline(): void;
   unbindFromDocumentTimeline(): void;
 }

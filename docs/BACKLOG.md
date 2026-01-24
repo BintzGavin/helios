@@ -9,7 +9,7 @@
 - [x] Wire up FFmpeg for video output.
 - [x] Create a CLI entry point for rendering.
 - [ ] Refactor `Renderer` to use `WebCodecs` (High Performance) instead of `toDataURL` (current MVP).
-- [ ] Add test script to packages/core.
+- [x] Add test script to packages/core.
 
 ### 2. DOM to Video Path
 - [ ] Implement Playwright capture loop for DOM elements.
