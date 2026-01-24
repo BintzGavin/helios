@@ -48,5 +48,7 @@
 ### Demo
 - [2026-01-22] ✅ Completed: Verify Vue Example - Verified build and render of `examples/vue-canvas-animation`. Created `tests/e2e/verify-render.ts`.
 
+### RENDERER v1.0.1
+- ✅ Completed: Implement DomStrategy Preloading - Implemented `DomStrategy.prepare()` to wait for fonts and images to load before rendering, preventing visual artifacts.
 ## CORE v1.1.0
 - ✅ Completed: Implement InputProps - Added `inputProps` to state/options and `setInputProps` method to Helios class.
