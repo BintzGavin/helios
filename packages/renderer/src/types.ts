@@ -12,3 +12,16 @@ export interface RendererOptions {
    */
   mode?: 'canvas' | 'dom';
 }
+
+export interface RenderJobOptions {
+  /**
+   * Callback for progress updates.
+   * @param progress A number between 0 and 1.
+   */
+  onProgress?: (progress: number) => void;
+
+  /**
+   * An AbortSignal to cancel the rendering process.
+   */
+  signal?: AbortSignal;
+}

@@ -1,5 +1,8 @@
 # RENDERER Progress Log
 
+## RENDERER v1.1.0
+- ✅ Completed: Implement Progress and Cancellation - Added `RenderJobOptions` with `onProgress` callback and `AbortSignal` support to `Renderer.render`.
+
 ## RENDERER v1.0.2
 - ✅ Completed: Fix DomStrategy Preloading Implementation - Added missing build config and render script, enabling proper verification of the preloading strategy.
 

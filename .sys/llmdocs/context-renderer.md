@@ -13,19 +13,21 @@ The Renderer supports two distinct capture strategies depending on the content t
 ## B. File Tree
 ```
 packages/renderer/
-├── scripts/          # Verification and utility scripts
-│   ├── render.ts     # Canvas rendering verification
-│   └── render-dom.ts # DOM rendering verification
+├── scripts/              # Verification and utility scripts
+│   ├── render.ts         # Canvas rendering verification
+│   ├── render-dom.ts     # DOM rendering verification
+│   └── verify-cancellation.ts # Cancellation/Progress verification
 └── src/
-    ├── index.ts      # Renderer class entry point
-    ├── types.ts      # Shared interfaces (RendererOptions)
+    ├── index.ts          # Renderer class entry point
+    ├── types.ts          # Shared interfaces (RendererOptions, RenderJobOptions)
     └── strategies/
         ├── RenderStrategy.ts # Strategy Interface
         ├── CanvasStrategy.ts # WebCodecs/Canvas implementation
         └── DomStrategy.ts    # DOM capture implementation
 ```
 
-## C. Configuration (RendererOptions)
+## C. Configuration
+
 ```typescript
 interface RendererOptions {
   width: number;
@@ -34,6 +36,19 @@ interface RendererOptions {
   durationInSeconds: number;
   mode?: 'canvas' | 'dom'; // Defaults to 'canvas'
 }
+
+interface RenderJobOptions {
+  onProgress?: (progress: number) => void;
+  signal?: AbortSignal;
+}
+```
+
+**Usage**:
+```typescript
+renderer.render(url, outputPath, {
+  onProgress: (p) => console.log(`Progress: ${p}`),
+  signal: abortController.signal
+});
 ```
 
 ## D. FFmpeg Interface
