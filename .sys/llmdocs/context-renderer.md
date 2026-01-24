@@ -7,7 +7,8 @@ The Renderer supports two distinct capture strategies depending on the content t
    - **Fallback**: Uses `canvas.toDataURL()` if WebCodecs is unavailable.
    - **Transfer**: Streams binary chunks (or Base64 images) to the Node.js process via Playwright `evaluate`.
 2. **DOM Mode**:
-   - Uses `page.screenshot()` (implied, or similar full-page capture) for CSS/HTML-heavy animations.
+   - Uses `page.screenshot()` for full-page capture of CSS/HTML animations.
+   - **Preloading**: Explicitly waits for fonts (`document.fonts.ready`) and images to fully load before starting the capture loop to prevent artifacts.
 
 ## B. File Tree
 ```
@@ -39,7 +40,7 @@ The strategy fully controls the FFmpeg argument construction (`getFFmpegArgs`).
 -f ivf -i -
 ```
 
-**Input Args (Image Pipe/Fallback)**:
+**Input Args (Image Pipe)**:
 ```
 -f image2pipe -framerate [FPS] -i -
 ```
