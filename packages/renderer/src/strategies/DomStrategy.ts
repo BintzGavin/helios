@@ -4,8 +4,20 @@ import { RendererOptions } from '../types';
 
 export class DomStrategy implements RenderStrategy {
   async prepare(page: Page): Promise<void> {
-    // No-op for now.
-    return Promise.resolve();
+    await page.evaluate(async () => {
+      // 1. Wait for fonts
+      await document.fonts.ready;
+
+      // 2. Wait for images
+      const images = Array.from(document.images);
+      await Promise.all(images.map((img) => {
+        if (img.complete) return;
+        return new Promise((resolve) => {
+          img.onload = resolve;
+          img.onerror = resolve; // Don't block on broken images
+        });
+      }));
+    });
   }
 
   async capture(page: Page, frameTime: number): Promise<Buffer> {

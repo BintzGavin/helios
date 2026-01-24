@@ -30,3 +30,8 @@
 
 ### 6. Distributed Rendering Research
 - [ ] Scaffolding for distributed rendering.
+
+### 7. Helios Studio
+- [x] Scaffold `packages/studio` package.
+- [ ] Implement Studio UI (Timeline, Props).
+- [ ] Implement CLI integration.

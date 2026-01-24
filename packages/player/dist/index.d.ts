@@ -11,7 +11,6 @@ export declare class HeliosPlayer extends HTMLElement {
     private directHelios;
     private unsubscribe;
     private connectionTimeout;
-    private isExporting;
     private abortController;
     constructor();
     connectedCallback(): void;
