@@ -30,8 +30,8 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           
-          # Attempt merge with union strategy (this should handle PROGRESS.md automatically via .gitattributes)
-          if ! git merge base-branch -X union --no-edit; then
+          # Attempt merge - .gitattributes will automatically use union merge for PROGRESS.md only
+          if ! git merge base-branch --no-edit; then
             # If merge failed, check if PROGRESS.md has conflicts
             if git diff --name-only --diff-filter=U | grep -q "docs/PROGRESS.md"; then
               echo "Resolving PROGRESS.md conflicts by combining both versions..."

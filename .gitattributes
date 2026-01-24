@@ -1,2 +1,3 @@
 # Configure merge strategy for PROGRESS.md to accept both changes
+# This ONLY applies to docs/PROGRESS.md - all other files use default merge strategy
 docs/PROGRESS.md merge=union
