@@ -31,9 +31,9 @@ For transparency and educational purposes, the complete prompts used to orchestr
 
 <div align="center">
 
-# Helios Engine
+# ☀️ Helios
 
-**Framework-agnostic programmatic video creation for the web**
+### Video is Light Over Time
 
 [![License](https://img.shields.io/badge/license-ELv2-blue.svg)](LICENSE)
 [![Status](https://img.shields.io/badge/status-alpha-orange.svg)](#project-status)
@@ -43,12 +43,104 @@ For transparency and educational purposes, the complete prompts used to orchestr
 [![GitHub](https://img.shields.io/badge/GitHub-BintzGavin%2Fhelios-black.svg)](https://github.com/BintzGavin/helios)
 [![Made with](https://img.shields.io/badge/made%20with-AI%20Agents-purple.svg)](./docs/prompts/)
 
-Create high-quality videos using the web technologies you already know—HTML, CSS, and JavaScript.  
-No new paradigms. No framework lock-in. Just the web.
+**A programmatic video engine that runs on web standards.**  
+Stop reinventing animation in JavaScript. Use the platform.
 
-[Quick Start](#quick-start) • [Why Helios?](#why-helios) • [Documentation](#documentation) • [Roadmap](#roadmap-the-future-of-helios)
+[The Thesis](#the-thesis) • [Quick Start](#quick-start) • [Why Helios?](#why-helios) • [Documentation](#architecture) • [Roadmap](#roadmap-the-future-of-helios)
 
 </div>
+
+---
+
+## The Thesis
+
+### Native Always Wins
+
+The history of software teaches a consistent lesson: **betting on native platform capabilities almost always beats simulation.**
+
+- Native mobile apps outperformed PhoneGap wrappers
+- CSS Grid replaced JavaScript layout libraries  
+- Browser `fetch()` displaced jQuery AJAX
+- Web Components are outliving many JavaScript frameworks
+
+When the platform catches up, the abstractions built to work around it become legacy debt.
+
+### The Remotion Era: Simulating What the Browser Already Does
+
+[Remotion](https://www.remotion.dev/) solved programmatic video by treating the browser as a **static image generator**. Stop time. Inject a frame number. Render. Screenshot. Repeat 30 times per second.
+
+```typescript
+// Remotion: The browser is a screenshot machine
+function MyComponent() {
+  const frame = useCurrentFrame();  // Frame number injected from outside
+  const opacity = interpolate(frame, [0, 30], [0, 1]);  // YOU calculate every value
+  return <div style={{ opacity }}>Hello</div>;
+}
+```
+
+This works. It's deterministic. Remotion is brilliant engineering, battle-tested, and has earned its place as the market leader.
+
+But look at what this architecture requires: **reimplementing animation in JavaScript.** The browser has a world-class animation engine—CSS `@keyframes`, hardware-accelerated compositing, the Web Animations API—but the frame-based model says: *"Ignore all of that. We'll simulate it ourselves."*
+
+Your CSS animations? Broken—the system clock drifts during render.  
+Your GSAP timelines? Need custom integration.  
+The browser's C++ compositor? Bypassed entirely.
+
+This is a **simulation-based architecture**. It works *despite* the browser, not *with* it.
+
+### The Helios Bet: Drive the Browser, Don't Simulate It
+
+Helios takes a different bet: **what if we drove the browser's native animation engine instead of replacing it?**
+
+The approach varies by context:
+
+**For Production Rendering:** Helios uses the Chrome DevTools Protocol (CDP) to virtualize time at the environment level. The `Emulation.setVirtualTimePolicy` command detaches the browser's internal clock from wall-clock time, allowing the renderer to advance time frame-by-frame as fast as the CPU allows. The browser's native animation engine calculates all interpolated values—we just tell it what time it is.
+
+**For Preview/Development:** Helios uses the Web Animations API to seek individual animations. Every `Animation` object has a writable `.currentTime` property:
+
+```typescript
+// Seek all animations to 1.5 seconds
+document.getAnimations().forEach(anim => {
+  anim.currentTime = 1500;
+  anim.pause();
+});
+```
+
+When you set `animation.currentTime`, the browser's C++ rendering engine recalculates all interpolated values. Hardware-accelerated. Using the same optimized code that powers every CSS animation on the web.
+
+**The result for developers:**
+
+```css
+/* Your existing CSS. No changes. */
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.my-element {
+  animation: fadeIn 1s ease-out forwards;
+}
+```
+
+```typescript
+// Helios drives the browser's animation engine
+const helios = new Helios({ duration: 10, fps: 30, autoSyncAnimations: true });
+helios.seek(45); // All CSS/WAAPI animations instantly update to frame 45
+```
+
+**That's it.** Your CSS animations, your GSAP timelines, your Framer Motion springs—they work because the browser is doing the animation, not JavaScript.
+
+### The Honest Trade-off
+
+This is a **native-aligned architecture**, but it's not without constraints:
+
+- **Browser-specific:** CDP is Chromium-only. Helios renders in headless Chrome.
+- **Non-standard time control:** The W3C spec marks `document.timeline.currentTime` as read-only. We work around this via protocol-level control, not by violating the spec.
+- **A bet, not a certainty:** We're betting that platform capabilities will mature and this approach will become standard. If we're wrong, simulation-based architectures like Remotion will continue to dominate.
+
+But if history is any guide—native mobile vs PhoneGap, CSS Grid vs JavaScript layouts, `fetch()` vs jQuery—native-aligned architectures eventually win.
+
+We named this engine after the sun because video is, fundamentally, *light over time*.
 
 ---
 
@@ -242,6 +334,18 @@ console.log(report);
 
 Both Helios and [Remotion](https://www.remotion.dev/) enable programmatic video creation. Here's an honest comparison:
 
+### Philosophical Difference
+
+| | Helios | Remotion |
+|---|--------|----------|
+| **Architecture** | Native-aligned (drive the browser's engine) | Simulation-based (treat browser as screenshot machine) |
+| **Animation Calculation** | Browser's C++ compositor | JavaScript on every frame |
+| **Time Control** | CDP virtual time (production) / WAAPI seeking (preview) | React state propagation |
+| **CSS `@keyframes`** | ✅ Work natively | ❌ Clock drifts during render |
+| **Browser Dependency** | Chromium (CDP required) | Any browser (pure JS) |
+| **Historical Analog** | Native apps, CSS Grid, `fetch()` | PhoneGap, layout.js, jQuery AJAX |
+| **Bet** | Platform capabilities will mature | Abstraction layer will remain necessary |
+
 ### Feature Comparison
 
 | Feature | Helios | Remotion |
@@ -316,18 +420,38 @@ The `<helios-player>` Web Component encapsulates the preview UI. It uses a sandb
 
 ### 2. The Animation System
 
-Helios leverages the browser's native **Web Animations API (WAAPI)** for declarative, performant animations:
+Helios drives the browser's native animation engine rather than simulating animation in JavaScript. The mechanism varies by context:
 
-1. Developers define animations using CSS `@keyframes` or `element.animate()`
-2. The engine controls a global timeline: `document.timeline.currentTime = (frame / fps) * 1000`
-3. The browser's optimized animation engine calculates all interpolated values
+#### Production Rendering (Headless Chrome)
+Uses Chrome DevTools Protocol to virtualize time:
+```
+CDP: Emulation.setVirtualTimePolicy({ policy: 'advance', budget: 33.33 })
+→ Browser advances internal clock by exactly 33.33ms
+→ All CSS/WAAPI animations update to new time
+→ Layout and paint complete
+→ Frame captured
+```
+
+This is deterministic: the browser cannot advance until each frame is fully rendered, regardless of scene complexity.
+
+#### Preview Mode (Browser Tab)
+Uses WAAPI's writable `Animation.currentTime`:
+```typescript
+// Seek all animations to target time
+document.getAnimations().forEach(anim => {
+  anim.currentTime = targetTimeMs;
+  anim.pause();
+});
+```
+
+This is an O(N) operation over animations, but lets developers preview without running a headless browser.
 
 **Advantages:**
-- Performance: Animation calculation happens off the main thread
-- Maintainability: Declarative over imperative
-- Familiarity: Standard W3C APIs
+- Performance: Animation interpolation happens in the browser's C++ compositor
+- Maintainability: Declarative CSS over imperative JavaScript
+- Familiarity: Standard CSS and WAAPI—skills transfer directly
 
-> **Canvas MVP Note**: For canvas compositions (Three.js, Pixi.js), Helios provides `currentTime` to the canvas's internal loop rather than controlling WAAPI.
+> **Canvas MVP Note**: For canvas compositions (Three.js, Pixi.js), Helios provides `currentTime` to the canvas's internal render loop rather than controlling WAAPI.
 
 ### 3. The Rendering Pipeline
 
@@ -438,6 +562,62 @@ For developers who want Remotion-style helpers alongside standard CSS:
 - AI chatbot for documentation help
 - System prompt for LLM code generation
 - `.md` URL suffix for documentation
+
+### V1.x: Architecture Hardening
+
+Three structural improvements to move Helios from "clever hack" to "stable standard":
+
+#### 1. TimeDriver Abstraction
+
+Currently, Helios's time control relies on CDP hacks (production) and WAAPI seeking (preview). This works, but couples the library to implementation details that browsers could tighten.
+
+**The Fix:** Introduce a `TimeDriver` interface that abstracts the source of truth for time.
+
+```typescript
+// User code (clean API)
+director.seek(1500); // Seek to 1.5 seconds
+
+// Under the hood:
+// - Preview: TimeDriver updates CSS variables or WAAPI currentTime
+// - Production: TimeDriver calls CDP setVirtualTimePolicy
+```
+
+**Why:** This decoupling protects the library from breaking when browsers inevitably tighten security around read-only native properties. The public API stays stable even as the underlying mechanism evolves.
+
+#### 2. Signal-Based State
+
+Remotion ties frame numbers to React State. This is its biggest performance bottleneck—React is not designed to re-render a component tree 60 times per second. It creates massive garbage collection overhead and "jank."
+
+**The Fix:** Adopt a Signal-based architecture (similar to SolidJS or Preact Signals) for the animation loop.
+
+```typescript
+// Signals: fine-grained updates
+const opacity = signal(0);
+opacity.value = 1; // Only the bound DOM node updates—not the entire tree
+```
+
+**Why:** Signals allow fine-grained updates. Changing `opacity` from 0 to 1 updates only that DOM node's style attribute—not the entire component tree. This would allow Helios to render scenes with thousands of animated elements at 60 FPS in the previewer, whereas Remotion often drops to 5-10 FPS on complex timelines because it's thrashing the React Reconciler.
+
+#### 3. Client-Side WebCodecs as Primary Export
+
+Currently, Helios supports WebCodecs but server-side rendering (headless Chrome + FFmpeg) remains the primary path. Remotion has the same architecture—expensive servers, slow to scale.
+
+**The Fix:** Fully commit to **client-side WebCodecs as the primary export target**.
+
+```typescript
+// User's browser does all the work
+const encoder = new VideoEncoder({ ... });
+// → Render to OffscreenCanvas
+// → Encode with local GPU
+// → Download MP4 directly
+```
+
+**Why:** This creates a "Canva-like" experience where the user's own hardware does the compute, reducing infrastructure costs to near zero. Server-side rendering becomes a fallback for low-power devices or background batch jobs—not the default.
+
+| Export Path | Current | Planned |
+|-------------|---------|---------|
+| **Primary** | Server (Headless Chrome + FFmpeg) | Client (WebCodecs + local GPU) |
+| **Fallback** | Client (experimental) | Server (batch/low-power devices) |
 
 ### V2: Distributed Rendering
 Scalable serverless rendering on AWS Lambda or Google Cloud Run.
@@ -681,8 +861,10 @@ We welcome contributions! This project is primarily developed by an autonomous A
 
 <div align="center">
 
-**Built with 🤖 by an autonomous AI agent swarm**
+**☀️ Video is light over time.**
 
 [Documentation](./docs/) • [Examples](./examples/) • [Backlog](./docs/BACKLOG.md) • [Progress](./docs/PROGRESS.md)
+
+*Built with AI agents by [Gavin Bintz](https://github.com/BintzGavin)*
 
 </div>
