@@ -4,9 +4,9 @@ import ffmpeg from '@ffmpeg-installer/ffmpeg';
 import { RenderStrategy } from './strategies/RenderStrategy';
 import { CanvasStrategy } from './strategies/CanvasStrategy';
 import { DomStrategy } from './strategies/DomStrategy';
-import { RendererOptions } from './types';
+import { RendererOptions, RenderJobOptions } from './types';
 
-export { RendererOptions } from './types';
+export { RendererOptions, RenderJobOptions } from './types';
 
 export class Renderer {
   private options: RendererOptions;
@@ -21,7 +21,7 @@ export class Renderer {
     }
   }
 
-  public async render(compositionUrl: string, outputPath: string): Promise<void> {
+  public async render(compositionUrl: string, outputPath: string, jobOptions?: RenderJobOptions): Promise<void> {
     console.log(`Starting render for composition: ${compositionUrl} (Mode: ${this.options.mode || 'canvas'})`);
 
     const browser = await chromium.launch({
@@ -75,43 +75,94 @@ export class Renderer {
           if (code === 0) {
             resolve();
           } else {
-            reject(new Error(`FFmpeg process exited with code ${code}`));
+            // If aborted, we expect a non-zero exit code (likely SIGKILL/SIGTERM).
+            // We resolve the promise to prevent unhandled rejections, as the main flow handles the abort error.
+            if (jobOptions?.signal?.aborted) {
+              resolve();
+            } else {
+              reject(new Error(`FFmpeg process exited with code ${code}`));
+            }
           }
         });
         ffmpegProcess.on('error', (err: Error) => {
-            reject(err);
+            if (jobOptions?.signal?.aborted) {
+              resolve();
+            } else {
+              reject(err);
+            }
         });
       });
 
+      // Handle AbortSignal
+      const abortHandler = () => {
+        console.log('Render aborted via signal. Killing FFmpeg...');
+        ffmpegProcess.kill();
+      };
+
+      if (jobOptions?.signal) {
+        if (jobOptions.signal.aborted) {
+           throw new Error('Aborted');
+        }
+        jobOptions.signal.addEventListener('abort', abortHandler);
+      }
+
       console.log(`Starting capture for ${totalFrames} frames...`);
       const progressInterval = Math.floor(totalFrames / 10);
-      for (let i = 0; i < totalFrames; i++) {
-        const time = (i / fps) * 1000;
-        if (i > 0 && i % progressInterval === 0) {
-            console.log(`Progress: Rendered ${i} / ${totalFrames} frames`);
+
+      try {
+        for (let i = 0; i < totalFrames; i++) {
+          if (jobOptions?.signal?.aborted) {
+            throw new Error('Aborted');
+          }
+
+          const time = (i / fps) * 1000;
+          if (i > 0 && i % progressInterval === 0) {
+              console.log(`Progress: Rendered ${i} / ${totalFrames} frames`);
+          }
+
+          if (jobOptions?.onProgress) {
+             jobOptions.onProgress(i / totalFrames);
+          }
+
+          const buffer = await this.strategy.capture(page, time);
+
+          await new Promise<void>((resolve, reject) => {
+              // processing write errors is important, especially if ffmpeg died
+              if (!ffmpegProcess.stdin.writable) {
+                 return reject(new Error('FFmpeg stdin is not writable'));
+              }
+              ffmpegProcess.stdin.write(buffer, (err?: Error | null) => err ? reject(err) : resolve());
+          });
         }
 
-        const buffer = await this.strategy.capture(page, time);
+        console.log('Finishing render strategy...');
+        const finalBuffer = await this.strategy.finish(page);
+        if (finalBuffer && Buffer.isBuffer(finalBuffer) && finalBuffer.length > 0) {
+          console.log(`Writing final buffer of ${finalBuffer.length} bytes...`);
+          await new Promise<void>((resolve, reject) => {
+             if (!ffmpegProcess.stdin.writable) {
+                 return reject(new Error('FFmpeg stdin is not writable'));
+              }
+            ffmpegProcess.stdin.write(finalBuffer, (err?: Error | null) => err ? reject(err) : resolve());
+          });
+        }
 
-        await new Promise<void>((resolve, reject) => {
-            ffmpegProcess.stdin.write(buffer, (err?: Error | null) => err ? reject(err) : resolve());
-        });
+        console.log('Finished sending frames. Closing FFmpeg stdin.');
+        ffmpegProcess.stdin.end();
+
+        await ffmpegExitPromise;
+        console.log('FFmpeg has finished processing.');
+      } catch (err: any) {
+        // If it was aborted, ensure we throw an AbortError-like message
+        if (jobOptions?.signal?.aborted) {
+           throw new Error('Aborted');
+        }
+        throw err;
+      } finally {
+        if (jobOptions?.signal) {
+          jobOptions.signal.removeEventListener('abort', abortHandler);
+        }
       }
-
-      console.log('Finishing render strategy...');
-      const finalBuffer = await this.strategy.finish(page);
-      if (finalBuffer && Buffer.isBuffer(finalBuffer) && finalBuffer.length > 0) {
-        console.log(`Writing final buffer of ${finalBuffer.length} bytes...`);
-        await new Promise<void>((resolve, reject) => {
-          ffmpegProcess.stdin.write(finalBuffer, (err?: Error | null) => err ? reject(err) : resolve());
-        });
-      }
-
-      console.log('Finished sending frames. Closing FFmpeg stdin.');
-      ffmpegProcess.stdin.end();
-
-      await ffmpegExitPromise;
-      console.log('FFmpeg has finished processing.');
 
     } finally {
       await browser.close();
