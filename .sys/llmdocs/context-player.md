@@ -1,26 +1,36 @@
-# Context: Player (Web Component)
+# Context: PLAYER
 
-## A. Component Structure
-The `<helios-player>` is a Web Component that hosts the animation in an isolated iframe.
-**Shadow DOM**:
-```html
-<div class="status-overlay">...</div> <!-- Connecting/Error states -->
-<iframe sandbox="allow-scripts allow-same-origin"></iframe> <!-- The Content -->
-<div class="controls">...</div> <!-- Play/Pause/Seek UI -->
-```
+## Overview
+The `packages/player` package provides the `<helios-player>` Web Component, which acts as a "Remote Control" for a Helios animation running inside an iframe. It supports both Direct Mode (same-origin) and Bridge Mode (cross-origin, sandboxed) via `postMessage`.
 
-## B. Communication Protocol (Bridge)
-The Player communicates with the iframe content (which must use the `bridge` helper) via `window.postMessage`.
+## Public API
 
-**Commands (Player -> Iframe)**:
-- `HELIOS_CONNECT`: Handshake initiation.
-- `HELIOS_PLAY`: Resume playback.
-- `HELIOS_PAUSE`: Pause playback.
-- `HELIOS_SEEK`: Jump to a specific frame.
+### Web Component: `<helios-player>`
 
-**Events (Iframe -> Player)**:
-- `HELIOS_READY`: Confirmation of connection.
-- `HELIOS_STATE`: Updates the player UI with `currentFrame`, `isPlaying`, etc.
+#### Attributes
+- `src` (string): The URL of the composition to load in the iframe.
 
-## C. Attributes
-- `src`: The URL of the Helios composition to load.
+#### Methods
+- `disconnectCallback()`: Cleans up listeners and controllers.
+
+#### Shadow DOM Structure
+- `.status-overlay`: Displays connection status ("Connecting...", "Failed").
+- `iframe`: The sandbox for the composition.
+- `.controls`: The UI bar (Play/Pause, Scrubber, Time Display, Export Button).
+
+### Export Functionality
+- **Client-Side Export**: Uses `ClientSideExporter` (WebCodecs + mp4-muxer) to generate MP4s in the browser.
+- **Cancellation**: Users can cancel an ongoing export.
+- **Modes**:
+    - **Canvas**: Captures content from a `<canvas>` element.
+    - **DOM**: Fallback using rudimentary DOM-to-Canvas rendering.
+
+## Internal Architecture
+
+### Controllers (`src/controllers.ts`)
+- `HeliosController` (Interface): Common interface for controlling Helios.
+- `DirectController`: Wraps a direct `Helios` instance (same-origin).
+- `BridgeController`: Communicates via `postMessage` (cross-origin).
+
+### Features (`src/features/exporter.ts`)
+- `ClientSideExporter`: Handles the render loop, seeking, encoding, and muxing.
