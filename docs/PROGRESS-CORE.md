@@ -1,5 +1,8 @@
 # CORE Progress Log
 
+## CORE v1.2.0
+- ✅ Completed: Implement Variable Playback Rate - Added `playbackRate` control, time-based ticking logic, and exported `HeliosOptions`.
+
 ## CORE v1.1.0
 - ✅ Completed: Implement InputProps - Added `inputProps` to state/options and `setInputProps` method to Helios class.
 
