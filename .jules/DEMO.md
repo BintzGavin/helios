@@ -15,3 +15,7 @@
 ## 2025-01-22 - Vue Composable Pattern
 **Learning:** Porting React hooks to Vue composables for Helios integration is straightforward. The pattern of wrapping `helios.subscribe` in `onMounted/onUnmounted` (or just `onUnmounted` if init is synchronous) matches perfectly with `useVideoFrame`.
 **Action:** When scaffolding Svelte or other frameworks, look for similar "subscribe/unsubscribe" lifecycle equivalents (e.g., Svelte stores).
+
+## 2026-02-19 - Missing Framework Adapter Packages
+**Learning:** The README claims `packages/react`, `packages/vue` etc. exist as adapters, but they do not. Examples currently implement hooks (`useVideoFrame`) locally.
+**Action:** When planning examples, must include local hook implementation. Future plans should address creating these packages to centralize logic.
