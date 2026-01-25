@@ -33,3 +33,11 @@
 ## 2026-01-25 - Duplicate Concept Disambiguation
 **Learning:** `packages/renderer` defines a `TimeDriver` interface for Playwright automation. The `packages/core` TimeDriver (for internal engine logic) must be distinct.
 **Action:** Ensure naming or documentation clarifies the distinction. The Core driver drives the *internal* state/WAAPI, while the Renderer driver drives the *browser* time.
+
+## 1.7.0 - Sandbox Environment Dependencies
+**Learning:** The sandbox environment may start without `node_modules`. Running `npm test` immediately can fail with confusing errors like `sh: 1: vitest: not found`.
+**Action:** Always check for `node_modules` and run `npm install` if missing before running tests or build scripts.
+
+## 1.7.0 - Plan Ambiguity vs Spec
+**Learning:** The plan title ("Sequencing Primitives") and context implied `series` logic, but the specification only defined `sequence`.
+**Action:** Followed the explicit specification for `sequence`. Documented the omission of `series` to avoid scope creep or hallucination.
