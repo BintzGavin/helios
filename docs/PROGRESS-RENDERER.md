@@ -1,5 +1,8 @@
 # RENDERER Progress Log
 
+## RENDERER v1.7.0
+- ✅ Completed: Implement Video Concatenation - Added `concatenateVideos` utility using FFmpeg concat demuxer to support distributed rendering workflows.
+
 ## RENDERER v1.6.0
 - ✅ Completed: Configurable Codecs - Added `videoCodec`, `pixelFormat`, `crf`, `preset`, and `videoBitrate` options to `RendererOptions` and updated strategies to use them.
 

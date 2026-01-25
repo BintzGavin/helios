@@ -10,6 +10,7 @@ import { SeekTimeDriver } from './drivers/SeekTimeDriver';
 import { RendererOptions, RenderJobOptions } from './types';
 
 export { RendererOptions, RenderJobOptions } from './types';
+export { concatenateVideos } from './concat';
 
 export class Renderer {
   private options: RendererOptions;

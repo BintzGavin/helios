@@ -1,107 +1,56 @@
-# Context: Renderer (Visualization Pipeline)
+# Context: Renderer
 
-## A. Strategy: Dual-Path Architecture
-The Renderer supports two distinct capture strategies depending on the content type:
-1. **Canvas Mode** (Default):
-   - **Primary**: Uses `WebCodecs` (`VideoEncoder`) to encode frames directly in the browser into VP8/IVF chunks. This is high-performance and preserves color accuracy.
-   - **Fallback**: Uses `canvas.toDataURL()` if WebCodecs is unavailable.
-   - **Transfer**: Streams binary chunks (or Base64 images) to the Node.js process via Playwright `evaluate`.
-2. **DOM Mode**:
-   - Uses `page.screenshot()` for full-page capture of CSS/HTML animations.
-   - **Preloading**: Explicitly waits for fonts (`document.fonts.ready`) and images to fully load before starting the capture loop to prevent artifacts.
+## A. Strategy
+The Renderer employs a "Dual-Path" architecture:
+1. **Canvas Mode**: For high-performance rendering of `<canvas>` based animations. Uses `CdpTimeDriver` to control time via Chrome DevTools Protocol and WebCodecs for efficient frame capture.
+2. **DOM Mode**: For rendering standard DOM/CSS animations. Uses `SeekTimeDriver` to manipulate `document.timeline.currentTime` and `page.screenshot` for capture.
 
-## B. Time Control
-The Renderer uses a `TimeDriver` architecture to control animation timing:
-- **CdpTimeDriver** (Canvas Mode): Uses Chrome DevTools Protocol (`Emulation.setVirtualTimePolicy`) for deterministic, frame-perfect rendering independent of wall-clock time.
-- **SeekTimeDriver** (DOM Mode): Uses `requestAnimationFrame` seeking because `CdpTimeDriver` is incompatible with `page.screenshot` capture.
-
-## C. File Tree
-```
+## B. File Tree
 packages/renderer/
-├── scripts/              # Verification and utility scripts
-│   ├── render.ts         # Canvas rendering verification
-│   ├── render-dom.ts     # DOM rendering verification
-│   ├── verify-cancellation.ts # Cancellation/Progress verification
-│   └── verify-error-handling.ts # Strict error handling verification
-└── src/
-    ├── index.ts          # Renderer class entry point
-    ├── types.ts          # Shared interfaces (RendererOptions, RenderJobOptions)
-    ├── drivers/          # Time Control
-    │   ├── TimeDriver.ts     # Interface
-    │   ├── SeekTimeDriver.ts # RequestAnimationFrame implementation (Legacy/Preview)
-    │   └── CdpTimeDriver.ts  # Chrome DevTools Protocol implementation (Production)
-    └── strategies/
-        ├── RenderStrategy.ts # Strategy Interface
-        ├── CanvasStrategy.ts # WebCodecs/Canvas implementation
-        └── DomStrategy.ts    # DOM capture implementation
-```
+├── src/
+│   ├── drivers/
+│   │   ├── CdpTimeDriver.ts
+│   │   ├── SeekTimeDriver.ts
+│   │   └── TimeDriver.ts
+│   ├── strategies/
+│   │   ├── CanvasStrategy.ts
+│   │   ├── DomStrategy.ts
+│   │   └── RenderStrategy.ts
+│   ├── concat.ts
+│   ├── index.ts
+│   └── types.ts
+├── tests/
+│   ├── verify-codecs.ts
+│   ├── verify-concat.ts
+│   └── verify-range-render.ts
+└── package.json
 
-## D. Configuration
-
+## C. Configuration
 ```typescript
 interface RendererOptions {
   width: number;
   height: number;
   fps: number;
   durationInSeconds: number;
-  mode?: 'canvas' | 'dom'; // Defaults to 'canvas'
-  startFrame?: number; // Start rendering from this frame (distributed rendering)
-  audioFilePath?: string; // Path to audio file to mix
-  videoCodec?: string; // e.g., 'libx264', 'prores_ks'
-  pixelFormat?: string; // e.g., 'yuv420p', 'yuva444p10le'
-  crf?: number; // Constant Rate Factor
-  preset?: string; // Encoding preset
-  videoBitrate?: string; // e.g., '5M'
+  mode?: 'canvas' | 'dom';
+  startFrame?: number;
+  audioFilePath?: string;
+  videoCodec?: string;
+  pixelFormat?: string;
+  crf?: number;
+  preset?: string;
+  videoBitrate?: string;
 }
 
 interface RenderJobOptions {
   onProgress?: (progress: number) => void;
   signal?: AbortSignal;
-  tracePath?: string; // Path to save Playwright trace zip
+  tracePath?: string;
 }
 ```
 
-**Usage**:
-```typescript
-renderer.render(url, outputPath, {
-  onProgress: (p) => console.log(`Progress: ${p}`),
-  signal: abortController.signal,
-  tracePath: 'output/trace.zip'
-});
-```
-
-## E. FFmpeg Interface
-The strategy fully controls the FFmpeg argument construction (`getFFmpegArgs`).
-
-**Input Args (WebCodecs/IVF)**:
-```
--f ivf -i -
-```
-
-**Input Args (Image Pipe)**:
-```
--f image2pipe -framerate [FPS] -i -
-```
-
-**Output Args (Configurable)**:
-```
--c:v [videoCodec=libx264]
--pix_fmt [pixelFormat=yuv420p]
--movflags +faststart
--crf [crf] (optional)
--preset [preset] (optional)
--b:v [videoBitrate] (optional)
-[OUTPUT_PATH]
-```
-
-**Audio Support**:
-If `audioFilePath` is present, adds input `1` and maps it:
-```
--i [AUDIO_PATH] ... -c:a aac -map 0:v -map 1:a -t [DURATION]
-```
-If `startFrame` is > 0, the audio input is pre-seeked using `-ss [TIME]`.
-
-## F. Error Handling
-- **Strict Propagation**: The Renderer listens for `pageerror` and `crash` events from the browser.
-- **Fail Fast**: Any captured error (including async WebCodecs failures) immediately aborts the render loop and rejects the `render()` promise.
-- **Process Cleanup**: The FFmpeg child process is explicitly killed if an error occurs to prevent hangs.
+## D. FFmpeg Interface
+The renderer pipes raw frames to FFmpeg via `stdin`.
+Default flags: `-c:v libx264 -pix_fmt yuv420p -crf 23 -preset medium`.
+Arguments are configurable via `RendererOptions`.
+Includes a `concatenateVideos` utility for stitching multiple video files.
