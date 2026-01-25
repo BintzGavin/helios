@@ -1,5 +1,8 @@
 # PLAYER Progress Log
 
+## PLAYER v0.7.0
+- ✅ Completed: Enable External Stylesheets - Updated DOM capture to fetch and inline external CSS (`<link rel="stylesheet">`) for high-fidelity exports.
+
 ## PLAYER v0.6.0
 - ✅ Completed: Keyboard & Fullscreen Support - Implemented standard keyboard shortcuts (Space, F, Arrows) and Fullscreen UI/logic.
 
