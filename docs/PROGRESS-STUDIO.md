@@ -1,5 +1,8 @@
 # Studio Progress Log
 
+## STUDIO v0.11.0
+- ✅ Completed: Implement Asset Discovery - Added `findAssets` backend logic, exposed `/api/assets` endpoint, and connected `StudioContext` to fetch real assets from `examples/`.
+
 ## STUDIO v0.10.0
 - ✅ Completed: Implement Backend API & Project Discovery - Added Vite plugin for dynamic composition discovery from `examples/` directory and connected StudioContext.
 

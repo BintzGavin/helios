@@ -1,5 +1,5 @@
 import { Plugin } from 'vite';
-import { findCompositions } from './src/server/discovery';
+import { findCompositions, findAssets } from './src/server/discovery';
 
 export function studioApiPlugin(): Plugin {
   return {
@@ -20,6 +20,22 @@ export function studioApiPlugin(): Plugin {
             console.error(e);
             res.statusCode = 500;
             res.end(JSON.stringify({ error: 'Failed to scan compositions' }));
+          }
+          return;
+        }
+        next();
+      });
+
+      server.middlewares.use('/api/assets', async (req, res, next) => {
+        if (req.url === '/' || req.url === '') {
+          try {
+            const assets = findAssets(process.cwd());
+            res.setHeader('Content-Type', 'application/json');
+            res.end(JSON.stringify(assets));
+          } catch (e) {
+            console.error(e);
+            res.statusCode = 500;
+            res.end(JSON.stringify({ error: 'Failed to scan assets' }));
           }
           return;
         }

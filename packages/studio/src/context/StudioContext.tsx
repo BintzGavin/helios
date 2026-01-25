@@ -78,31 +78,9 @@ interface StudioContextType {
 
 const StudioContext = createContext<StudioContextType | undefined>(undefined);
 
-// Mocks kept for Assets for now
-const MOCK_ASSETS: Asset[] = [
-  {
-    id: '1',
-    name: 'logo.png',
-    url: 'https://via.placeholder.com/150/0000FF/808080?text=Logo',
-    type: 'image'
-  },
-  {
-    id: '2',
-    name: 'background.jpg',
-    url: 'https://via.placeholder.com/300/FF0000/FFFFFF?text=Background',
-    type: 'image'
-  },
-  {
-    id: '3',
-    name: 'music.mp3',
-    url: '#',
-    type: 'audio'
-  }
-];
-
 export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [compositions, setCompositions] = useState<Composition[]>([]);
-  const [assets] = useState<Asset[]>(MOCK_ASSETS);
+  const [assets, setAssets] = useState<Asset[]>([]);
   const [activeComposition, setActiveComposition] = useState<Composition | null>(null);
   const [isSwitcherOpen, setSwitcherOpen] = useState(false);
 
@@ -123,7 +101,7 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     });
   };
 
-  // Fetch compositions from backend
+  // Fetch compositions and assets from backend
   useEffect(() => {
     fetch('/api/compositions')
       .then(res => res.json())
@@ -135,6 +113,15 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       })
       .catch(err => {
         console.error('Failed to fetch compositions:', err);
+      });
+
+    fetch('/api/assets')
+      .then(res => res.json())
+      .then((data: Asset[]) => {
+        setAssets(data);
+      })
+      .catch(err => {
+        console.error('Failed to fetch assets:', err);
       });
   }, []);
 
