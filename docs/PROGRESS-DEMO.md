@@ -1,4 +1,5 @@
-# DEMO Progress Log
+## DEMO v1.6.0
+- ✅ Completed: Scaffold Animation Helpers Example - Created `examples/animation-helpers` demonstrating `interpolate` and `spring` from Core.
 
 ## DEMO v1.5.0
 - ✅ Completed: Scaffold Three.js Example - Created `examples/threejs-canvas-animation`, updated build config, and added E2E verification.
