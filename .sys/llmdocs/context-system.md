@@ -13,7 +13,7 @@
    - Quickstart, Realistic Examples (React, Vue, Svelte).
 6. **Distributed Rendering Research**
 7. **Helios Studio**
-   - Browser-based IDE for composition.
+   - Browser-based IDE for composition (UI, Playback Controls implemented).
 
 ## B. Role Boundaries
 1. **Core (`packages/core`)**:

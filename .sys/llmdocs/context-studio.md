@@ -9,7 +9,7 @@ The Studio is a React 19 application built with Vite. It serves as the IDE for v
 - **Framework**: React 19
 - **Build Tool**: Vite
 - **Preview**: Integrated via `<helios-player>` web component.
-- **State Management**: React state synced with `<helios-player>` controller.
+- **State Management**: `StudioContext` provides centralized access to `HeliosController`, player state (frame, playing, props), and Studio settings (loop, active composition).
 
 ## B. File Tree
 ```
@@ -22,9 +22,16 @@ packages/studio/
     ├── main.tsx
     ├── App.tsx
     ├── vite-env.d.ts
+    ├── context/
+    │   └── StudioContext.tsx
+    ├── hooks/
+    │   └── useKeyboardShortcut.ts
     └── components/
+        ├── CompositionSwitcher.tsx
         ├── PropsEditor.tsx
         ├── Timeline.tsx
+        ├── Controls/
+        │   └── PlaybackControls.tsx
         └── Layout/
             ├── Panel.tsx
             ├── StudioLayout.css
@@ -50,11 +57,14 @@ Internal scripts:
 - `npm run build -w packages/studio`: Builds the application.
 
 ## D. UI Components
-- **Main Layout**: `App.tsx` orchestrates the layout and manages player state.
+- **StudioProvider**: `context/StudioContext.tsx` wraps the application to provide state.
+- **Main Layout**: `App.tsx` initializes the `HeliosController` connection and handles layout composition.
 - **StudioLayout**: `components/Layout/StudioLayout.tsx` defines the grid areas (header, sidebar, stage, inspector, timeline).
 - **Panel**: `components/Layout/Panel.tsx` is a generic container for UI panels.
-- **Timeline**: `components/Timeline.tsx` provides playback controls (Play/Pause, Seek) and time display.
+- **Timeline**: `components/Timeline.tsx` provides the scrubber and time display.
+- **PlaybackControls**: `components/Controls/PlaybackControls.tsx` provides Play, Pause, Rewind, and Loop controls.
 - **PropsEditor**: `components/PropsEditor.tsx` provides inputs to modify composition properties (`inputProps`).
+- **CompositionSwitcher**: `components/CompositionSwitcher.tsx` allows switching between active compositions.
 - **Preview Pane**: Uses `<helios-player>` in the stage area, controlled via `HeliosController`.
 
 ## E. Integration

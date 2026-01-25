@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState } from 'react';
+import type { HeliosController } from '@helios-project/player';
 
 export interface Composition {
   id: string;
@@ -7,12 +8,38 @@ export interface Composition {
   description?: string;
 }
 
+export interface PlayerState {
+  currentFrame: number;
+  duration: number;
+  fps: number;
+  isPlaying: boolean;
+  inputProps: Record<string, any>;
+}
+
+const DEFAULT_PLAYER_STATE: PlayerState = {
+  currentFrame: 0,
+  duration: 0,
+  fps: 30,
+  isPlaying: false,
+  inputProps: {}
+};
+
 interface StudioContextType {
   compositions: Composition[];
   activeComposition: Composition | null;
   setActiveComposition: (comp: Composition) => void;
   isSwitcherOpen: boolean;
   setSwitcherOpen: (isOpen: boolean) => void;
+
+  // Player Control
+  controller: HeliosController | null;
+  setController: (controller: HeliosController | null) => void;
+  playerState: PlayerState;
+  setPlayerState: (state: PlayerState) => void;
+
+  // Studio UI State
+  loop: boolean;
+  toggleLoop: () => void;
 }
 
 const StudioContext = createContext<StudioContextType | undefined>(undefined);
@@ -50,6 +77,12 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [activeComposition, setActiveComposition] = useState<Composition | null>(MOCK_COMPOSITIONS[0]);
   const [isSwitcherOpen, setSwitcherOpen] = useState(false);
 
+  const [controller, setController] = useState<HeliosController | null>(null);
+  const [playerState, setPlayerState] = useState<PlayerState>(DEFAULT_PLAYER_STATE);
+  const [loop, setLoop] = useState(false);
+
+  const toggleLoop = () => setLoop(prev => !prev);
+
   return (
     <StudioContext.Provider
       value={{
@@ -57,7 +90,13 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         activeComposition,
         setActiveComposition,
         isSwitcherOpen,
-        setSwitcherOpen
+        setSwitcherOpen,
+        controller,
+        setController,
+        playerState,
+        setPlayerState,
+        loop,
+        toggleLoop
       }}
     >
       {children}

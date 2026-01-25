@@ -33,5 +33,5 @@
 
 ### 7. Helios Studio
 - [x] Scaffold `packages/studio` package.
-- [ ] Implement Studio UI (Timeline, Props).
-- [ ] Implement CLI integration.
+- [x] Implement Studio UI (Timeline, Props).
+- [x] Implement CLI integration.
