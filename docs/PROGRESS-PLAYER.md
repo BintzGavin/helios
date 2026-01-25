@@ -1,5 +1,8 @@
 # PLAYER Progress Log
 
+## PLAYER v0.5.0
+- ✅ Completed: Dynamic Sizing - Implemented `observedAttributes` for `src`, `width`, and `height` to allow dynamic player updates.
+
 ## PLAYER v0.4.0
 - ✅ Completed: Robust DOM Export - Implemented XMLSerializer/SVG-based DOM capture for high-fidelity export in Direct and Bridge modes.
 

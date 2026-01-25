@@ -1,8 +1,9 @@
 import { Helios } from "@helios-project/core";
-import { HeliosController, DirectController, BridgeController } from "./controllers";
+import { DirectController, BridgeController } from "./controllers";
+import type { HeliosController } from "./controllers";
 import { ClientSideExporter } from "./features/exporter";
 
-export { HeliosController };
+export type { HeliosController };
 
 const template = document.createElement("template");
 template.innerHTML = `
@@ -173,6 +174,10 @@ export class HeliosPlayer extends HTMLElement {
   private connectionTimeout: number | null = null;
   private abortController: AbortController | null = null;
 
+  static get observedAttributes() {
+    return ["src", "width", "height"];
+  }
+
   constructor() {
     super();
     this.attachShadow({ mode: "open" });
@@ -191,15 +196,28 @@ export class HeliosPlayer extends HTMLElement {
     this.retryBtn.onclick = () => this.retryConnection();
   }
 
+  attributeChangedCallback(name: string, oldVal: string, newVal: string) {
+    if (oldVal === newVal) return;
+
+    if (name === "src") {
+      this.iframe.src = newVal;
+      if (this.controller) {
+        this.controller.pause();
+        this.controller.dispose();
+        this.controller = null;
+      }
+      this.setControlsDisabled(true);
+      this.showStatus("Loading...", false);
+    }
+
+    if (name === "width" || name === "height") {
+      this.updateAspectRatio();
+    }
+  }
+
   connectedCallback() {
     this.iframe.addEventListener("load", this.handleIframeLoad);
     window.addEventListener("message", this.handleWindowMessage);
-
-    // Set src from attribute
-    const src = this.getAttribute("src");
-    if (src) {
-      this.iframe.src = src;
-    }
 
     this.playPauseBtn.addEventListener("click", this.togglePlayPause);
     this.scrubber.addEventListener("input", this.handleScrubberInput);
@@ -208,7 +226,13 @@ export class HeliosPlayer extends HTMLElement {
 
     // Initial state: disabled until connected
     this.setControlsDisabled(true);
-    this.showStatus("Connecting...", false);
+    // Only show connecting if we haven't already shown "Loading..." via attributeChangedCallback
+    if (this.overlay.classList.contains("hidden")) {
+        this.showStatus("Connecting...", false);
+    }
+
+    // Ensure aspect ratio is correct on connect
+    this.updateAspectRatio();
   }
 
   disconnectedCallback() {
@@ -318,6 +342,17 @@ export class HeliosPlayer extends HTMLElement {
       }
 
       this.unsubscribe = this.controller.subscribe((s) => this.updateUI(s));
+  }
+
+  private updateAspectRatio() {
+    const w = parseFloat(this.getAttribute("width") || "");
+    const h = parseFloat(this.getAttribute("height") || "");
+
+    if (!isNaN(w) && !isNaN(h) && w > 0 && h > 0) {
+      this.style.aspectRatio = `${w} / ${h}`;
+    } else {
+      this.style.removeProperty("aspect-ratio");
+    }
   }
 
   private togglePlayPause = () => {
