@@ -89,7 +89,7 @@ The strategy fully controls the FFmpeg argument construction (`getFFmpegArgs`).
 **Audio Support**:
 If `audioFilePath` is present, adds input `1` and maps it:
 ```
--i [AUDIO_PATH] ... -c:a aac -map 0:v -map 1:a -shortest
+-i [AUDIO_PATH] ... -c:a aac -map 0:v -map 1:a -t [DURATION]
 ```
 If `startFrame` is > 0, the audio input is pre-seeked using `-ss [TIME]`.
 
