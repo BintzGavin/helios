@@ -11,6 +11,12 @@ export interface RendererOptions {
    * Defaults to 'canvas'.
    */
   mode?: 'canvas' | 'dom';
+
+  /**
+   * Path to an audio file to include in the output video.
+   * If provided, the audio will be mixed with the video.
+   */
+  audioFilePath?: string;
 }
 
 export interface RenderJobOptions {
