@@ -86,6 +86,7 @@ template.innerHTML = `
       position: absolute;
       inset: 0;
       background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(4px);
       color: white;
       display: flex;
       flex-direction: column;
@@ -120,7 +121,7 @@ template.innerHTML = `
   </style>
   <div class="status-overlay" part="overlay">
     <div class="status-text">Connecting...</div>
-    <button class="retry-btn" style="display:none">Retry</button>
+    <button class="retry-btn" style="display: none">Retry</button>
   </div>
   <iframe part="iframe" sandbox="allow-scripts allow-same-origin"></iframe>
   <div class="controls">
@@ -329,10 +330,15 @@ export class HeliosPlayer extends HTMLElement {
       ).toFixed(2)} / ${state.duration.toFixed(2)}`;
   }
 
+  // --- Loading / Error UI Helpers ---
+
   private showStatus(msg: string, isError: boolean) {
     this.overlay.classList.remove("hidden");
     this.statusText.textContent = msg;
     this.retryBtn.style.display = isError ? "block" : "none";
+
+    // Optional: Add visual distinction for errors beyond just the button
+    this.statusText.classList.toggle('error-msg', isError);
   }
 
   private hideStatus() {

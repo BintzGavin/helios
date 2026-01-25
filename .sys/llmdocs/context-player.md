@@ -16,7 +16,7 @@ The `packages/player` package provides the `<helios-player>` Web Component, whic
 - `disconnectCallback()`: Cleans up listeners and controllers.
 
 #### Shadow DOM Structure
-- `.status-overlay`: Displays connection status ("Connecting...", "Failed").
+- `.status-overlay`: Displays connection status ("Connecting...", "Failed") and a "Retry" button.
 - `iframe`: The sandbox for the composition.
 - `.controls`: The UI bar (Play/Pause, Scrubber, Time Display, Export Button).
 
@@ -28,6 +28,11 @@ The `packages/player` package provides the `<helios-player>` Web Component, whic
     - **DOM**: Fallback using rudimentary DOM-to-Canvas rendering.
 
 ## Internal Architecture
+
+### Connection Logic
+- **Direct Mode**: Tries to access `iframe.contentWindow.helios` directly.
+- **Bridge Mode**: Sends `HELIOS_CONNECT` via `postMessage` if direct access fails.
+- **Timeout**: Shows an error state if connection is not established within 3000ms.
 
 ### Controllers (`src/controllers.ts`)
 - `HeliosController` (Interface): Common interface for controlling Helios.
