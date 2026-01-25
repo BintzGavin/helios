@@ -1,27 +1,34 @@
-# CORE Domain Context
+# Core Context
 
 ## A. Architecture
-The Core domain implements the "Helios State Machine" pattern. It is the pure logic engine that drives the application.
-- **Store**: `Helios` class holds the state (`currentFrame`, `isPlaying`, `inputProps`).
-- **Actions**: Methods like `play()`, `pause()`, `seek()`, `setInputProps()` modify the state.
-- **Subscribers**: External components (Player, Renderer) subscribe to state changes via `subscribe()`.
-- **TimeDriver**: Decouples time synchronization logic. `Helios` delegates environment updates (like WAAPI `currentTime`) to a `TimeDriver` implementation (`WaapiDriver` or `NoopDriver`).
+
+The `packages/core` module implements a **Headless Logic Engine** for video composition. It follows a "State Machine" pattern where the `Helios` class maintains the source of truth for:
+- `currentFrame`
+- `isPlaying`
+- `duration`
+- `fps`
+- `inputProps`
+- `playbackRate`
+
+State changes are propagated to subscribers via an Observer pattern (`subscribe()`). Time advancement is handled by an abstracted `TimeDriver` strategy, allowing the engine to drive different environments (WAAPI for preview, No-op for testing, etc.).
 
 ## B. File Tree
+
 ```
 packages/core/src/
+├── animation.ts
 ├── drivers/
-│   ├── NoopDriver.ts
+│   ├── index.ts
 │   ├── TimeDriver.ts
 │   ├── WaapiDriver.ts
-│   └── index.ts
-├── animation.ts
-├── index.test.ts
+│   └── NoopDriver.ts
 ├── index.ts
-└── types.ts (if applicable)
+├── sequencing.ts
+└── sequencing.test.ts
 ```
 
 ## C. Type Definitions
+
 ```typescript
 export interface HeliosOptions {
   duration: number; // in seconds
@@ -44,22 +51,64 @@ export interface TimeDriver {
   init(scope: HTMLElement | Document): void;
   update(timeInMs: number): void;
 }
+
+export interface InterpolateOptions {
+  extrapolateLeft?: ExtrapolateType;
+  extrapolateRight?: ExtrapolateType;
+  easing?: (t: number) => number;
+}
+
+export interface SpringConfig {
+  mass?: number;
+  stiffness?: number;
+  damping?: number;
+  overshootClamping?: boolean;
+}
+
+export interface SpringOptions {
+  frame: number;
+  fps: number;
+  config?: SpringConfig;
+  from?: number;
+  to?: number;
+  durationInFrames?: number;
+}
+
+export interface SequenceOptions {
+  frame: number;
+  from: number;
+  durationInFrames?: number;
+}
+
+export interface SequenceResult {
+  localFrame: number;
+  relativeFrame: number;
+  progress: number;
+  isActive: boolean;
+}
 ```
 
 ## D. Public Methods
+
 ```typescript
-class Helios {
-  static diagnose(): Promise<DiagnosticReport>;
-  constructor(options: HeliosOptions);
-  getState(): Readonly<HeliosState>;
-  setInputProps(props: Record<string, any>): void;
-  setPlaybackRate(rate: number): void;
-  subscribe(callback: Subscriber): () => void;
-  unsubscribe(callback: Subscriber): void;
-  play(): void;
-  pause(): void;
-  seek(frame: number): void;
-  bindToDocumentTimeline(): void;
-  unbindFromDocumentTimeline(): void;
-}
+// Helios Class
+static diagnose(): Promise<DiagnosticReport>;
+constructor(options: HeliosOptions);
+getState(): Readonly<HeliosState>;
+setInputProps(props: Record<string, any>): void;
+setPlaybackRate(rate: number): void;
+subscribe(callback: Subscriber): () => void;
+unsubscribe(callback: Subscriber): void;
+play(): void;
+pause(): void;
+seek(frame: number): void;
+bindToDocumentTimeline(): void;
+unbindFromDocumentTimeline(): void;
+
+// Animation Helpers
+function interpolate(input: number, inputRange: number[], outputRange: number[], options?: InterpolateOptions): number;
+function spring(options: SpringOptions): number;
+
+// Sequencing
+function sequence(options: SequenceOptions): SequenceResult;
 ```

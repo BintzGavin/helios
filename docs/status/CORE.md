@@ -1,6 +1,6 @@
 # Status: CORE
 
-**Version**: 1.6.0
+**Version**: 1.7.0
 
 - **Status**: Active
 - **Current Focus**: Planned TimeDriver Abstraction
@@ -13,3 +13,4 @@
 [v1.3.0] ✅ Completed: Implement Animation Helpers - Implemented `interpolate` function with easing and extrapolation support.
 [v1.5.0] ✅ Completed: Implement Spring Animation Helper - Implemented physics-based `spring` function with underdamped, critically damped, and overdamped support.
 [v1.6.0] ✅ Completed: Implement TimeDriver Abstraction - Refactored `Helios` to use `TimeDriver` strategy, extracted `WaapiDriver`, and added support for custom drivers.
+[v1.7.0] ✅ Completed: Implement Sequencing Primitives - Implemented `sequence` function and interfaces in `packages/core`.

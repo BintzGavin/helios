@@ -1,5 +1,8 @@
 # CORE Progress Log
 
+## CORE v1.7.0
+- ✅ Completed: Implement Sequencing Primitives - Implemented `sequence` function and interfaces in `packages/core`.
+
 ## CORE v1.6.0
 - ✅ Completed: Implement TimeDriver Abstraction - Refactored `Helios` to use `TimeDriver` strategy, extracted `WaapiDriver`, and added support for custom drivers.
 

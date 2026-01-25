@@ -30,6 +30,7 @@ export interface DiagnosticReport {
 
 export * from './animation';
 export * from './drivers';
+export * from './sequencing';
 
 export class Helios {
   private state: HeliosState;
