@@ -17,3 +17,7 @@
 ## [0.3.1] - Performance Optimization in Hooks
 **Learning:** Initial implementation of `useKeyboardShortcut` attached `useEffect` listeners on every render because the callback was an inline arrow function. This causes unnecessary DOM operations.
 **Action:** When creating event listener hooks, always use `useRef` to hold the callback or wrap it in `useCallback` to ensure stable identity and prevent effect re-execution.
+
+## [0.4.0] - Assets Panel Backend Requirement
+**Learning:** The "Assets Panel" vision requires listing files from the user's project (`public/` folder). However, `packages/studio` runs as a client-side SPA (via Vite) and lacks a built-in API to inspect the host file system when distributed as a package.
+**Action:** Future plans for "Assets Panel" must include a server-side component (likely extending the `npx helios studio` CLI or a Vite plugin) to serve the file list to the frontend.
