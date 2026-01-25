@@ -1,3 +1,6 @@
+## DEMO v1.9.0
+- ✅ Completed: Scaffold Vue DOM Example - Created `examples/vue-dom-animation` and added E2E verification case (blocked).
+
 ## DEMO v1.8.1
 - ✅ Completed: Scaffold React DOM Example - Updated `verify-render.ts` to document blocking issue.
 

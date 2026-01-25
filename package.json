@@ -16,6 +16,7 @@
     "dev:react": "vite serve examples/react-canvas-animation",
     "dev:react-dom": "vite serve examples/react-dom-animation",
     "dev:vue": "vite serve examples/vue-canvas-animation",
+    "dev:vue-dom": "vite serve examples/vue-dom-animation",
     "dev:svelte": "vite serve examples/svelte-canvas-animation",
     "dev:threejs": "vite serve examples/threejs-canvas-animation",
     "dev:pixi": "vite serve examples/pixi-canvas-animation",
