@@ -32,6 +32,7 @@ To provide comprehensive, idiomatic examples for every major framework (React, V
 - `DomStrategy` (used by `simple-animation`, `react-dom-animation`, and `vue-dom-animation`) fails in `verify-render.ts` with `CdpTimeDriver` (timeout). Verified working with `SeekTimeDriver`.
 
 ## Log
+- [v2.0.0] 📋 Planned: Scaffold Svelte DOM Example - Created spec file `/.sys/plans/2025-02-19-DEMO-SvelteDOM.md` to guide implementation.
 - [v1.9.0] ✅ Completed: Scaffold Vue DOM Example - Created `examples/vue-dom-animation` and added E2E verification case (blocked).
 - [v1.8.1] ✅ Completed: Scaffold React DOM Example - Updated `verify-render.ts` to document blocking issue.
 - [v1.8.0] ✅ Completed: Scaffold React DOM Example - Created `examples/react-dom-animation` and added E2E verification case.
