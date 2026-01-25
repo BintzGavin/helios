@@ -10,7 +10,12 @@ The Renderer supports two distinct capture strategies depending on the content t
    - Uses `page.screenshot()` for full-page capture of CSS/HTML animations.
    - **Preloading**: Explicitly waits for fonts (`document.fonts.ready`) and images to fully load before starting the capture loop to prevent artifacts.
 
-## B. File Tree
+## B. Time Control
+The Renderer uses a `TimeDriver` architecture to control animation timing:
+- **CdpTimeDriver** (Default): Uses Chrome DevTools Protocol (`Emulation.setVirtualTimePolicy`) for deterministic, frame-perfect rendering independent of wall-clock time.
+- **SeekTimeDriver**: Uses `requestAnimationFrame` seeking (legacy/preview fallback).
+
+## C. File Tree
 ```
 packages/renderer/
 ├── scripts/              # Verification and utility scripts
@@ -22,14 +27,15 @@ packages/renderer/
     ├── types.ts          # Shared interfaces (RendererOptions, RenderJobOptions)
     ├── drivers/          # Time Control
     │   ├── TimeDriver.ts     # Interface
-    │   └── SeekTimeDriver.ts # RequestAnimationFrame implementation
+    │   ├── SeekTimeDriver.ts # RequestAnimationFrame implementation (Legacy/Preview)
+    │   └── CdpTimeDriver.ts  # Chrome DevTools Protocol implementation (Production)
     └── strategies/
         ├── RenderStrategy.ts # Strategy Interface
         ├── CanvasStrategy.ts # WebCodecs/Canvas implementation
         └── DomStrategy.ts    # DOM capture implementation
 ```
 
-## C. Configuration
+## D. Configuration
 
 ```typescript
 interface RendererOptions {
@@ -56,7 +62,7 @@ renderer.render(url, outputPath, {
 });
 ```
 
-## D. FFmpeg Interface
+## E. FFmpeg Interface
 The strategy fully controls the FFmpeg argument construction (`getFFmpegArgs`).
 
 **Input Args (WebCodecs/IVF)**:

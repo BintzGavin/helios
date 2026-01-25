@@ -1,5 +1,8 @@
 # RENDERER Progress Log
 
+## RENDERER v1.3.0
+- ✅ Completed: Implement CdpTimeDriver - Implemented `CdpTimeDriver` using Chrome DevTools Protocol to virtually advance time, ensuring deterministic rendering for complex animations.
+
 ## RENDERER v1.2.0
 - ✅ Completed: Enable Playwright Trace Viewer - Added `tracePath` option to `RenderJobOptions`, enabling generation of Playwright trace files for debugging rendering sessions.
 
