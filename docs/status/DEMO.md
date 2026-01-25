@@ -1,5 +1,5 @@
 # Status: DEMO (Executor)
-**Version**: 1.12.0
+**Version**: 1.13.0
 
 ## Vision
 To provide comprehensive, idiomatic examples for every major framework (React, Vue, Svelte, Vanilla) and robust end-to-end testing to ensure the Helios engine delivers on its "Use What You Know" promise.
@@ -14,11 +14,13 @@ To provide comprehensive, idiomatic examples for every major framework (React, V
 - **Vue (Canvas)**: ✅ `examples/vue-canvas-animation` exists and works.
 - **Vue (DOM)**: ✅ `examples/vue-dom-animation` exists and works (Verified build, E2E blocked by Renderer).
 - **Svelte**: ✅ `examples/svelte-canvas-animation` exists and works.
+- **Svelte (Helpers)**: ✅ `examples/svelte-animation-helpers` exists and works (Demonstrates `<Sequence>`).
 - **Three.js**: ✅ `examples/threejs-canvas-animation` exists and works.
 - **Pixi.js**: ✅ `examples/pixi-canvas-animation` exists and works.
 - **E2E Tests**: ✅ Verified all existing examples via `tests/e2e/verify-render.ts` (DOM tests temporarily disabled).
 
 ## Backlog
+- [x] Scaffold Svelte Animation Helpers (`examples/svelte-animation-helpers`)
 - [x] Scaffold Animation Helpers Example (`examples/animation-helpers`)
 - [x] Scaffold Three.js Example (`examples/threejs-canvas-animation`)
 - [x] Scaffold Pixi.js Example (`examples/pixi-canvas-animation`)
@@ -33,6 +35,7 @@ To provide comprehensive, idiomatic examples for every major framework (React, V
 - `DomStrategy` (used by `simple-animation`, `react-dom-animation`, and `vue-dom-animation`) fails in `verify-render.ts` with `CdpTimeDriver` (timeout). Verified working with `SeekTimeDriver`.
 
 ## Log
+- [v1.13.0] ✅ Completed: Verify Svelte Animation Helpers - Verified `examples/svelte-animation-helpers` and enabled E2E test.
 - [v1.12.0] ✅ Completed: Update Animation Helpers - Updated `examples/animation-helpers` to demonstrate `sequence` and `series` core functions.
 - [v1.11.0] ✅ Completed: Scaffold React Animation Helpers - Created `examples/react-animation-helpers` with `<Sequence>` component and Context-based timing.
 - [v1.10.0] ✅ Completed: Scaffold Svelte DOM Example - Created `examples/svelte-dom-animation` and verified with E2E (commented out).
