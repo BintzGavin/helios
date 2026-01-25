@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Animation Helpers</title>
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: #111;
+    }
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="canvas"></canvas>
+  <script type="module">
+    import { Helios, interpolate, spring } from '../../packages/core/dist/index.js';
+
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+
+    const resizeCanvas = () => {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    };
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    const helios = new Helios({ duration: 5, fps: 30 });
+    helios.bindToDocumentTimeline();
+
+    function draw(frame) {
+      const { width, height } = canvas;
+
+      // Clear canvas
+      ctx.fillStyle = '#111';
+      ctx.fillRect(0, 0, width, height);
+
+      // Interpolate X position: 0 -> 500 (or width/2) over frames 0 -> 60
+      // We'll move from left edge to center
+      const x = interpolate(frame, [0, 60], [100, width / 2], { extrapolateRight: 'clamp' });
+
+      // Spring scale: pop in from 0 to 1 starting at frame 0
+      const scale = spring({
+          frame: frame,
+          fps: 30,
+          from: 0,
+          to: 1,
+          config: { stiffness: 120, damping: 10 }
+      });
+
+      // Draw Rectangle at X
+      ctx.fillStyle = 'royalblue';
+      ctx.fillRect(x - 50, height / 2 - 50, 100, 100);
+
+      // Draw Circle with Scale, positioned to the right of the rectangle
+      // Let's make the circle appear at the final position of the rectangle + offset
+      const circleX = width / 2 + 200;
+      const circleY = height / 2;
+
+      ctx.save();
+      ctx.translate(circleX, circleY);
+      ctx.scale(scale, scale);
+      ctx.beginPath();
+      ctx.arc(0, 0, 50, 0, Math.PI * 2);
+      ctx.fillStyle = 'tomato';
+      ctx.fill();
+      ctx.restore();
+
+      // Add some text to explain
+      ctx.font = '20px sans-serif';
+      ctx.fillStyle = '#fff';
+      ctx.textAlign = 'center';
+      ctx.fillText(`Frame: ${frame.toFixed(2)}`, width/2, 50);
+      ctx.fillText(`Interpolate X: ${x.toFixed(0)}`, width/2, 80);
+      ctx.fillText(`Spring Scale: ${scale.toFixed(2)}`, width/2, 110);
+    }
+
+    helios.subscribe(state => draw(state.currentFrame));
+
+    // Initial draw
+    draw(0);
+
+    window.helios = helios;
+  </script>
+</body>
+</html>
