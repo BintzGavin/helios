@@ -8,12 +8,12 @@
 - [x] Implement `renderFrames` function in renderer.
 - [x] Wire up FFmpeg for video output.
 - [x] Create a CLI entry point for rendering.
-- [ ] Refactor `Renderer` to use `WebCodecs` (High Performance) instead of `toDataURL` (current MVP).
+- [x] Refactor `Renderer` to use `WebCodecs` (High Performance) instead of `toDataURL` (current MVP).
 - [x] Add test script to packages/core.
 
 ### 2. DOM to Video Path
-- [ ] Implement Playwright capture loop for DOM elements.
-- [ ] Handle asset preloading.
+- [x] Implement Playwright capture loop for DOM elements.
+- [x] Handle asset preloading.
 
 ### 3. In-Browser Player Polish
 - [x] Ensure `<helios-player>` works with `HeliosEngine`.

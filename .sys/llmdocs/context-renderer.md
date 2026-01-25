@@ -20,6 +20,9 @@ packages/renderer/
 └── src/
     ├── index.ts          # Renderer class entry point
     ├── types.ts          # Shared interfaces (RendererOptions, RenderJobOptions)
+    ├── drivers/          # Time Control
+    │   ├── TimeDriver.ts     # Interface
+    │   └── SeekTimeDriver.ts # RequestAnimationFrame implementation
     └── strategies/
         ├── RenderStrategy.ts # Strategy Interface
         ├── CanvasStrategy.ts # WebCodecs/Canvas implementation

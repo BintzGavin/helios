@@ -1,5 +1,8 @@
 # RENDERER Progress Log
 
+## RENDERER v1.1.1
+- ✅ Completed: Refactor TimeDriver - Decoupled time advancement logic from RenderStrategy into a dedicated TimeDriver interface, preparing for CDP integration.
+
 ## RENDERER v1.1.0
 - ✅ Completed: Implement Progress and Cancellation - Added `RenderJobOptions` with `onProgress` callback and `AbortSignal` support to `Renderer.render`.
 

@@ -117,19 +117,14 @@ export class CanvasStrategy implements RenderStrategy {
 
   private async captureWebCodecs(page: Page, frameTime: number): Promise<Buffer> {
     const chunkData = await page.evaluate(async (time) => {
-      // 1. Advance Time
-      (document.timeline as any).currentTime = time;
-      await new Promise<void>(r => requestAnimationFrame(() => r()));
-
       const context = (window as any).heliosWebCodecs;
       const encoder = context.encoder as VideoEncoder;
       const canvas = document.querySelector('canvas');
 
       if (!canvas) throw new Error('Canvas not found');
 
-      // 2. Create Frame and Encode
+      // Create Frame and Encode
       const frame = new VideoFrame(canvas, { timestamp: time * 1000 }); // microseconds
-      // console.log(`[Browser] Encoding frame at ${time}ms`);
       encoder.encode(frame, { keyFrame: (time === 0) });
       frame.close();
 
@@ -181,17 +176,11 @@ export class CanvasStrategy implements RenderStrategy {
   }
 
   private async captureCanvas(page: Page, frameTime: number): Promise<Buffer> {
-    const dataUrl = await page.evaluate((timeValue) => {
-      // Direct access to document.timeline to set time
-      (document.timeline as any).currentTime = timeValue;
-      return new Promise<string>((resolve) => {
-        requestAnimationFrame(() => {
-          const canvas = document.querySelector('canvas');
-          if (!canvas) return resolve('error:canvas-not-found');
-          resolve(canvas.toDataURL('image/png'));
-        });
-      });
-    }, frameTime);
+    const dataUrl = await page.evaluate(() => {
+      const canvas = document.querySelector('canvas');
+      if (!canvas) return 'error:canvas-not-found';
+      return canvas.toDataURL('image/png');
+    });
 
     if (typeof dataUrl !== 'string' || dataUrl === 'error:canvas-not-found') {
       throw new Error('CanvasStrategy: Could not find canvas element or an error occurred during capture.');

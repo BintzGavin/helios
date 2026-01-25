@@ -4,6 +4,8 @@ import ffmpeg from '@ffmpeg-installer/ffmpeg';
 import { RenderStrategy } from './strategies/RenderStrategy';
 import { CanvasStrategy } from './strategies/CanvasStrategy';
 import { DomStrategy } from './strategies/DomStrategy';
+import { TimeDriver } from './drivers/TimeDriver';
+import { SeekTimeDriver } from './drivers/SeekTimeDriver';
 import { RendererOptions, RenderJobOptions } from './types';
 
 export { RendererOptions, RenderJobOptions } from './types';
@@ -11,6 +13,7 @@ export { RendererOptions, RenderJobOptions } from './types';
 export class Renderer {
   private options: RendererOptions;
   private strategy: RenderStrategy;
+  private timeDriver: TimeDriver;
 
   constructor(options: RendererOptions) {
     this.options = options;
@@ -19,6 +22,7 @@ export class Renderer {
     } else {
       this.strategy = new CanvasStrategy();
     }
+    this.timeDriver = new SeekTimeDriver();
   }
 
   public async render(compositionUrl: string, outputPath: string, jobOptions?: RenderJobOptions): Promise<void> {
@@ -54,6 +58,7 @@ export class Renderer {
       console.log('Page loaded.');
 
       console.log('Preparing render strategy...');
+      await this.timeDriver.prepare(page);
       await this.strategy.prepare(page);
       console.log('Strategy prepared.');
 
@@ -123,6 +128,9 @@ export class Renderer {
           if (jobOptions?.onProgress) {
              jobOptions.onProgress(i / totalFrames);
           }
+
+          const timeInSeconds = i / fps;
+          await this.timeDriver.setTime(page, timeInSeconds);
 
           const buffer = await this.strategy.capture(page, time);
 
