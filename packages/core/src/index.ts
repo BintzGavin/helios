@@ -31,6 +31,7 @@ export interface DiagnosticReport {
 
 export * from './animation';
 export * from './drivers';
+export * from './easing';
 export * from './sequencing';
 export * from './signals';
 

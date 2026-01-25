@@ -8,6 +8,7 @@ The `packages/core` module is the framework-agnostic engine of Helios. It manage
 - **Signals**: State management is built on top of a custom Signals implementation (inspired by Preact/Solid), allowing for fine-grained reactivity.
 - **TimeDriver**: An abstraction for the timing source (e.g., WAAPI, RequestAnimationFrame, or external CDP control).
 - **Sequencing**: Pure functions for arranging clips in time.
+- **Animation Helpers**: Standard easing functions and interpolation utilities.
 
 ## B. File Tree
 ```
@@ -18,6 +19,7 @@ packages/core/src/
 │   ├── time-driver.ts
 │   └── waapi-driver.ts
 ├── animation.ts
+├── easing.ts
 ├── index.ts
 ├── sequencing.ts
 └── signals.ts
@@ -62,6 +64,26 @@ export interface TimeDriver {
   init(scope: HTMLElement | Document): void;
   update(currentTimeMs: number): void;
 }
+
+// From easing.ts
+export type EasingFunction = (t: number) => number;
+
+// Easing object structure (simplified)
+export const Easing: {
+  linear: EasingFunction;
+  step: (steps: number) => EasingFunction;
+  bezier: (x1: number, y1: number, x2: number, y2: number) => EasingFunction;
+  quad: { in: EasingFunction; out: EasingFunction; inOut: EasingFunction };
+  cubic: { in: EasingFunction; out: EasingFunction; inOut: EasingFunction };
+  quart: { in: EasingFunction; out: EasingFunction; inOut: EasingFunction };
+  quint: { in: EasingFunction; out: EasingFunction; inOut: EasingFunction };
+  sine: { in: EasingFunction; out: EasingFunction; inOut: EasingFunction };
+  expo: { in: EasingFunction; out: EasingFunction; inOut: EasingFunction };
+  circ: { in: EasingFunction; out: EasingFunction; inOut: EasingFunction };
+  back: { in: EasingFunction; out: EasingFunction; inOut: EasingFunction };
+  elastic: { in: EasingFunction; out: EasingFunction; inOut: EasingFunction };
+  bounce: { in: EasingFunction; out: EasingFunction; inOut: EasingFunction };
+};
 ```
 
 ## D. Public Methods
@@ -71,7 +93,7 @@ export class Helios {
   // Public Signals
   public get currentFrame(): ReadonlySignal<number>;
   public get isPlaying(): ReadonlySignal<boolean>;
-  public get inputProps(): ReadonlySignal<Record<string, any>;
+  public get inputProps(): ReadonlySignal<Record<string, any>>;
   public get playbackRate(): ReadonlySignal<number>;
 
   // Properties

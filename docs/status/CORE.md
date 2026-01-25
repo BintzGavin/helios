@@ -1,9 +1,9 @@
 # Status: CORE
 
-**Version**: 1.10.0
+**Version**: 1.11.0
 
 - **Status**: Active
-- **Current Focus**: Signals Implementation
+- **Current Focus**: Easing Functions
 - **Last Updated**: 2026-02-21
 [2026-01-21] ✅ Completed: Implement Helios.diagnose() - Implemented static diagnose method and DiagnosticReport interface
 [2026-01-22] 🔍 Discovery: Verified removal of `animation-helpers.ts` and identified missing `test` script in `packages/core`.
@@ -17,6 +17,7 @@
 [v1.8.0] ✅ Completed: Implement Series Helper - Implemented `series` function for sequential layout of composition elements.
 [v1.9.0] ✅ Completed: Implement Signals - Implemented `signal`, `computed`, and `effect` primitives with memory safety and consistency guarantees.
 [v1.10.0] ✅ Completed: Refactor Helios to use Signals - Replaced internal state with signals, exposed ReadonlySignal getters, and maintained backward compatibility.
+[v1.11.0] ✅ Completed: Implement Easing Functions - Implemented standard easing functions (linear, quad, cubic, quart, quint, sine, expo, circ, back, elastic, bounce) and cubic-bezier solver.
 
 **Next Steps**:
 - Verify signal integration in downstream packages (Player).
