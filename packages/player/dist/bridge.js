@@ -20,7 +20,6 @@ export function connectToParent(helios) {
                 }
                 break;
             case 'HELIOS_CAPTURE_FRAME':
-                console.log('[Bridge] HELIOS_CAPTURE_FRAME received', event.data);
                 handleCaptureFrame(helios, event.data);
                 break;
         }
