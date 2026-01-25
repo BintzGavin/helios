@@ -7,12 +7,13 @@ export async function captureDomToBitmap(element: HTMLElement): Promise<ImageBit
 
   // 2. Collect styles
   // We collect all style tags to ensure CSS-in-JS and other styles are preserved.
-  // Note: External stylesheets (<link rel="stylesheet">) might not work due to CORS
-  // or because they are not loaded synchronously in the SVG.
-  // A robust implementation would fetch and inline them, but for now we focus on inline styles.
-  const styles = Array.from(doc.querySelectorAll('style'))
+  const inlineStyles = Array.from(doc.querySelectorAll('style'))
     .map(style => style.outerHTML)
     .join('\n');
+
+  // Fetch and inline external stylesheets
+  const externalStyles = await getExternalStyles(doc);
+  const styles = externalStyles + '\n' + inlineStyles;
 
   // 3. Determine dimensions
   // Use scroll dimensions to capture full content, fallback to offset or defaults.
@@ -53,4 +54,23 @@ export async function captureDomToBitmap(element: HTMLElement): Promise<ImageBit
   URL.revokeObjectURL(url);
 
   return bitmap;
+}
+
+async function getExternalStyles(doc: Document): Promise<string> {
+  const links = Array.from(doc.querySelectorAll('link[rel="stylesheet"]')) as HTMLLinkElement[];
+  const promises = links.map(async (link) => {
+    try {
+      // Skip if no href
+      if (!link.href) return '';
+
+      const response = await fetch(link.href);
+      if (!response.ok) throw new Error(`HTTP ${response.status} ${response.statusText}`);
+      const css = await response.text();
+      return `<style>/* ${link.href} */\n${css}</style>`;
+    } catch (e) {
+      console.warn('Helios: Failed to inline stylesheet:', link.href, e);
+      return '';
+    }
+  });
+  return (await Promise.all(promises)).join('\n');
 }

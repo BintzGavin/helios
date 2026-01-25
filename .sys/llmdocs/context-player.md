@@ -1,85 +1,52 @@
-# Player Context
+# PLAYER Context
 
-This file documents the public interface and structure of the `packages/player` domain.
+## Identity
+- **Role**: Frontend / Player Agent
+- **Domain**: `packages/player`
+- **Responsibility**: `<helios-player>` Web Component, UI controls, iframe bridge.
 
-## A. Component Structure
+## Component Structure
+The `<helios-player>` component utilizes Shadow DOM for isolation.
+- **Root**: Host element (block display, relative positioning).
+- **Status Overlay**: Handles "Connecting...", "Loading...", and Error states (with Retry).
+- **Iframe**: Sandboxed execution environment for the user's content (`sandbox="allow-scripts allow-same-origin"`).
+- **Controls Overlay**:
+  - Play/Pause / Restart Button
+  - Export / Cancel Button
+  - Speed Selector (0.25x - 2x)
+  - Scrubber (Input Range)
+  - Time Display (Current / Total)
+  - Fullscreen Toggle
 
-The `<helios-player>` Web Component encapsulates the playback environment and UI controls.
+## Events
+The component does not currently dispatch custom events to the DOM.
+It communicates internally via:
+- `window.postMessage` (Bridge Protocol)
+- `KeyboardEvent` (Shortcuts)
 
-**Shadow DOM Layout:**
-```html
-<shadow-root>
-  <style>...</style>
+## Attributes
+The component observes the following attributes:
 
-  <!-- Status Overlay (Loading/Error) -->
-  <div class="status-overlay" part="overlay">
-    <div class="status-text">...</div>
-    <button class="retry-btn">Retry</button>
-  </div>
+| Attribute | Type | Description |
+|---|---|---|
+| `src` | string | URL of the composition to load in the iframe. |
+| `width` | number | Width aspect ratio component. |
+| `height` | number | Height aspect ratio component. |
+| `autoplay` | boolean | If present, starts playback automatically upon connection. |
+| `loop` | boolean | If present, restarts playback when the timeline ends. |
+| `controls` | boolean | If present, shows the UI controls overlay. |
+| `export-mode` | string | `auto` (default), `canvas`, or `dom`. Controls the capture strategy. |
+| `canvas-selector`| string | CSS selector for the canvas element (default: `canvas`). Used in `canvas` mode. |
 
-  <!-- Sandboxed Iframe -->
-  <iframe part="iframe" sandbox="allow-scripts allow-same-origin"></iframe>
+## Keyboard Shortcuts
+| Key | Action |
+|---|---|
+| Space / K | Toggle Play/Pause |
+| F | Toggle Fullscreen |
+| Right Arrow / L | Seek Forward 10 frames |
+| Left Arrow / J | Seek Backward 10 frames |
 
-  <!-- Controls Bar -->
-  <div class="controls">
-    <button class="play-pause-btn" part="play-pause-button">...</button>
-    <button class="export-btn" part="export-button">...</button>
-    <select class="speed-selector" part="speed-selector">...</select>
-    <input type="range" class="scrubber" part="scrubber">
-    <div class="time-display" part="time-display">...</div>
-    <button class="fullscreen-btn" part="fullscreen-button">...</button>
-  </div>
-</shadow-root>
-```
-
-## B. Attributes
-
-- **`src`**: URL of the Helios composition to load in the iframe. Changes trigger a reload of the iframe.
-- **`width`**: The desired width of the player aspect ratio (e.g., "1920").
-- **`height`**: The desired height of the player aspect ratio (e.g., "1080").
-- **`autoplay`**: If present, the video starts playing automatically upon connection.
-- **`loop`**: If present, the video restarts automatically when it reaches the end.
-- **`controls`**: If present (or default), controls are visible. If absent, controls are hidden.
-- **`export-mode`**: Controls client-side export behavior. Values: `auto` (default), `canvas`, `dom`.
-- **`canvas-selector`**: CSS selector for the canvas to capture in `canvas` mode (default: `canvas`).
-
-**Note:** If `width` and `height` are provided, the player sets an inline `aspect-ratio` style. If omitted, the default aspect ratio is 16:9, unless overridden by external CSS (in which case the inline style is removed).
-
-## C. Public API
-
-The element supports the following keyboard shortcuts when focused (or when mouse is over it):
-- **Space / K**: Toggle Play/Pause.
-- **F**: Toggle Fullscreen.
-- **ArrowRight / L**: Seek forward 10 frames.
-- **ArrowLeft / J**: Seek backward 10 frames.
-
-The element exposes a `getController()` method:
-
-```typescript
-function getController(): HeliosController | null;
-```
-
-**HeliosController Interface:**
-```typescript
-interface HeliosController {
-  play(): void;
-  pause(): void;
-  seek(frame: number): void;
-  setPlaybackRate(rate: number): void;
-  setInputProps(props: Record<string, any>): void;
-  subscribe(callback: (state: any) => void): () => void;
-  getState(): any;
-  dispose(): void;
-  captureFrame(frame: number, options?: CaptureOptions): Promise<VideoFrame | null>;
-}
-```
-
-## D. Export Features
-
-The player supports client-side video export (MP4/H.264) via `ClientSideExporter`.
-
-- **Canvas Mode**: Captures the canvas element directly.
-- **DOM Mode**: Serializes the DOM using `XMLSerializer` and renders via SVG `<foreignObject>` to an `ImageBitmap`.
-- **Auto Mode**: Attempts to find a canvas; falls back to DOM capture if none found.
-
-Supported in both Direct (same-origin) and Bridge (cross-origin/sandboxed) modes.
+## Architecture
+- **Controllers**: Abstraction layer (`DirectController` vs `BridgeController`) to unify local and cross-origin interaction.
+- **ClientSideExporter**: Modular export logic supporting WebCodecs (VideoEncoder) and DOM Snapshotting.
+- **DOM Capture**: Robust implementation using `XMLSerializer`, SVG `<foreignObject>`, and external stylesheet inlining for high-fidelity HTML exports.

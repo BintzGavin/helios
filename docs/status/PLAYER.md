@@ -1,4 +1,4 @@
-**Version**: 0.6.0
+**Version**: 0.7.0
 
 # Status: PLAYER
 
@@ -13,13 +13,14 @@
 - Supports sandboxed iframes and cross-origin usage via `postMessage` bridge.
 - Includes visual feedback for loading and error states (connection timeouts).
 - Supports variable playback speed via UI and Controller API.
-- Implements Robust DOM Export using XMLSerializer and SVG foreignObject.
+- Implements Robust DOM Export using XMLSerializer and SVG foreignObject, including external stylesheets.
 - Supports dynamic sizing via `width`/`height` attributes and `src` changes.
-- **New**: Supports standard keyboard shortcuts (Space/K, F, Arrows) and Fullscreen toggle.
+- Supports standard keyboard shortcuts (Space/K, F, Arrows) and Fullscreen toggle.
 
 ## Critical Task
 - **None**: Recent critical task completed. Await next assignment.
 
+[v0.7.0] ✅ Completed: Enable External Stylesheets - Updated DOM capture to fetch and inline external CSS (`<link rel="stylesheet">`) for high-fidelity exports.
 [v0.6.0] ✅ Completed: Keyboard & Fullscreen Support - Implemented standard keyboard shortcuts (Space, F, Arrows) and Fullscreen UI/logic.
 [v0.5.2] ✅ Completed: Scaffold Tests - Added unit test suite for controllers and exporter using Vitest.
 [v0.5.1] ✅ Completed: Standard Attributes - Implemented `autoplay`, `loop`, and `controls` attributes. Synced version and artifacts.
@@ -34,6 +35,7 @@
 - [x] Refactor Export logic into dedicated `ClientSideExporter` with cancellation.
 - [x] Implement Export Configuration (`export-mode`, `canvas-selector`).
 - [x] Add proper UI feedback for "Loading" state.
+- [x] Enable External Stylesheets for DOM Export.
 
 [2026-01-20] ✅ Completed: Refactor Player Control Logic - Verified `<helios-player>` uses `window.helios` and supports client-side export.
 [2026-01-21] ✅ Completed: Sandbox and Bridge - Implemented `postMessage` bridge and sandboxed iframe support.
