@@ -86,3 +86,78 @@ function interpolateLinear(input: number, inMin: number, inMax: number, outMin: 
   const ratio = (input - inMin) / (inMax - inMin);
   return outMin + ratio * (outMax - outMin);
 }
+
+export interface SpringConfig {
+  mass?: number;      // default: 1
+  stiffness?: number; // default: 100
+  damping?: number;   // default: 10
+  overshootClamping?: boolean; // default: false
+}
+
+export interface SpringOptions {
+  frame: number;
+  fps: number;
+  config?: SpringConfig;
+  from?: number; // default: 0
+  to?: number;   // default: 1
+  /**
+   * Optional duration hint.
+   * Note: Physics simulations are time-based and do not have a fixed duration.
+   * This property is currently ignored by the spring function.
+   */
+  durationInFrames?: number;
+}
+
+/**
+ * Calculates the value of a spring physics simulation at a specific frame.
+ * Simulates a Damped Harmonic Oscillator.
+ */
+export function spring(options: SpringOptions): number {
+  const {
+    frame,
+    fps,
+    config = {},
+    from = 0,
+    to = 1
+  } = options;
+
+  const t = frame / fps;
+  if (t <= 0) return from;
+
+  const { mass = 1, stiffness = 100, damping = 10, overshootClamping = false } = config;
+
+  if (mass <= 0) throw new Error("Spring mass must be > 0");
+  if (stiffness <= 0) throw new Error("Spring stiffness must be > 0");
+
+  const omega_n = Math.sqrt(stiffness / mass);
+  const zeta = damping / (2 * Math.sqrt(stiffness * mass));
+
+  let value: number;
+
+  if (zeta === 1) {
+    // Critically Damped
+    value = to - Math.exp(-omega_n * t) * (to - from) * (1 + omega_n * t);
+  } else if (zeta < 1) {
+    // Underdamped
+    const omega_d = omega_n * Math.sqrt(1 - zeta * zeta);
+    value = to - Math.exp(-zeta * omega_n * t) * (to - from) * (
+      Math.cos(omega_d * t) + (zeta / Math.sqrt(1 - zeta * zeta)) * Math.sin(omega_d * t)
+    );
+  } else {
+    // Overdamped
+    const root1 = -omega_n * (zeta - Math.sqrt(zeta * zeta - 1));
+    const root2 = -omega_n * (zeta + Math.sqrt(zeta * zeta - 1));
+
+    const C1 = (from - to) * root2 / (root2 - root1);
+    const C2 = (from - to) * root1 / (root1 - root2);
+
+    value = to + C1 * Math.exp(root1 * t) + C2 * Math.exp(root2 * t);
+  }
+
+  if (overshootClamping) {
+    if (to > from && value > to) return to;
+    if (to < from && value < to) return to;
+  }
+
+  return value;
+}

@@ -1,5 +1,8 @@
 # CORE Progress Log
 
+## CORE v1.5.0
+- ✅ Completed: Implement Spring Animation Helper - Implemented physics-based `spring` function with underdamped, critically damped, and overdamped support.
+
 ## CORE v1.3.0
 - ✅ Completed: Implement Animation Helpers - Implemented `interpolate` function with easing and extrapolation support.
 
