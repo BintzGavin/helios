@@ -1,10 +1,10 @@
 # Status: CORE
 
-**Version**: 1.11.3
+**Version**: 1.12.0
 
 - **Status**: Active
 - **Current Focus**: Maintenance and Optimization
-- **Last Updated**: 2026-02-21
+- **Last Updated**: 2026-02-22
 
 [2026-01-21] ✅ Completed: Implement Helios.diagnose() - Implemented static diagnose method and DiagnosticReport interface
 [2026-01-22] 🔍 Discovery: Verified removal of `animation-helpers.ts` and identified missing `test` script in `packages/core`.
@@ -22,6 +22,7 @@
 [v1.11.1] ✅ Completed: Refactor Helios Signals - Added JSDoc documentation to public signal properties and verified signal implementation.
 [v1.11.2] ✅ Completed: Verify Signals and Cleanup Plans - Verified signal integration and cleaned up completed plan files.
 [v1.11.3] ✅ Completed: Add Documentation - Created comprehensive `README.md` for `packages/core`.
+[v1.12.0] ✅ Completed: Implement DomDriver - Implemented `DomDriver` to sync WAAPI and HTMLMediaElements, updated `Helios` to use it by default, and deprecated `WaapiDriver`.
 
 **Next Steps**:
 - None.

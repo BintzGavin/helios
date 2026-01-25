@@ -1,4 +1,4 @@
-import { TimeDriver, WaapiDriver, NoopDriver, Ticker, RafTicker } from './drivers';
+import { TimeDriver, WaapiDriver, DomDriver, NoopDriver, Ticker, RafTicker } from './drivers';
 import { signal, effect, Signal, ReadonlySignal } from './signals';
 
 type HeliosState = {
@@ -128,7 +128,7 @@ export class Helios {
     if (options.driver) {
       this.driver = options.driver;
     } else if (this.autoSyncAnimations) {
-      this.driver = new WaapiDriver();
+      this.driver = new DomDriver();
     } else {
       this.driver = new NoopDriver();
     }
@@ -186,6 +186,14 @@ export class Helios {
   public play() {
     if (this._isPlaying.peek()) return;
     this._isPlaying.value = true;
+
+    // Sync driver immediately
+    const currentFrame = this._currentFrame.peek();
+    this.driver.update((currentFrame / this.fps) * 1000, {
+      isPlaying: true,
+      playbackRate: this._playbackRate.peek()
+    });
+
     this.ticker.start(this.onTick);
   }
 
@@ -193,13 +201,23 @@ export class Helios {
     if (!this._isPlaying.peek()) return;
     this._isPlaying.value = false;
     this.ticker.stop();
+
+    // Sync driver to ensure media is paused
+    const currentFrame = this._currentFrame.peek();
+    this.driver.update((currentFrame / this.fps) * 1000, {
+      isPlaying: false,
+      playbackRate: this._playbackRate.peek()
+    });
   }
 
   public seek(frame: number) {
     const newFrame = Math.max(0, Math.min(frame, this.duration * this.fps));
     this._currentFrame.value = newFrame;
 
-    this.driver.update((newFrame / this.fps) * 1000);
+    this.driver.update((newFrame / this.fps) * 1000, {
+      isPlaying: this._isPlaying.peek(),
+      playbackRate: this._playbackRate.peek()
+    });
   }
 
   /**
@@ -265,6 +283,9 @@ export class Helios {
 
     this._currentFrame.value = nextFrame;
 
-    this.driver.update((nextFrame / this.fps) * 1000);
+    this.driver.update((nextFrame / this.fps) * 1000, {
+      isPlaying: true,
+      playbackRate
+    });
   }
 }

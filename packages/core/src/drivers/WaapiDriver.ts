@@ -1,5 +1,8 @@
 import { TimeDriver } from './TimeDriver';
 
+/**
+ * @deprecated Use DomDriver instead, which supports both WAAPI and HTMLMediaElements.
+ */
 export class WaapiDriver implements TimeDriver {
   private scope: HTMLElement | Document | null = null;
 

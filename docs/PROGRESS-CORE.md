@@ -1,5 +1,8 @@
 # CORE Progress Log
 
+## CORE v1.12.0
+- ✅ Completed: Implement DomDriver - Implemented `DomDriver` to sync WAAPI and HTMLMediaElements, updated `Helios` to use it by default, and deprecated `WaapiDriver`.
+
 ## CORE v1.11.3
 - ✅ Completed: Add Documentation - Created comprehensive `README.md` for `packages/core`.
 

@@ -333,7 +333,7 @@ describe('Helios Core', () => {
     it('should use provided driver', () => {
       const helios = new Helios({ duration: 10, fps: 30, driver: mockDriver });
       helios.seek(30);
-      expect(mockDriver.update).toHaveBeenCalledWith(1000);
+      expect(mockDriver.update).toHaveBeenCalledWith(1000, { isPlaying: false, playbackRate: 1 });
     });
 
     it('should initialize driver with scope', () => {
@@ -349,9 +349,20 @@ describe('Helios Core', () => {
 
         ticker.tick(100); // 100ms elapsed
 
-        expect(mockDriver.update).toHaveBeenCalled();
+        expect(mockDriver.update).toHaveBeenCalledWith(expect.any(Number), { isPlaying: true, playbackRate: 1 });
 
         helios.pause();
+    });
+
+    it('should call driver.update on play and pause', () => {
+        const ticker = new ManualTicker();
+        const helios = new Helios({ duration: 10, fps: 30, driver: mockDriver, ticker });
+
+        helios.play();
+        expect(mockDriver.update).toHaveBeenCalledWith(0, { isPlaying: true, playbackRate: 1 });
+
+        helios.pause();
+        expect(mockDriver.update).toHaveBeenCalledWith(0, { isPlaying: false, playbackRate: 1 });
     });
   });
 });
