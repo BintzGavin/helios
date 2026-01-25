@@ -1,4 +1,5 @@
 import { Helios } from "@helios-project/core";
+import { captureDomToBitmap } from "./features/dom-capture";
 
 export function connectToParent(helios: Helios) {
   // 1. Listen for messages from parent
@@ -48,7 +49,7 @@ export function connectToParent(helios: Helios) {
 }
 
 async function handleCaptureFrame(helios: Helios, data: any) {
-    const { frame, selector } = data;
+    const { frame, selector, mode } = data;
 
     // 1. Seek
     helios.seek(frame);
@@ -56,7 +57,28 @@ async function handleCaptureFrame(helios: Helios, data: any) {
     // 2. Wait for render (double RAF to be safe and ensure paint)
     await new Promise<void>(r => requestAnimationFrame(() => requestAnimationFrame(() => r())));
 
-    // 3. Find canvas
+    // 3. DOM Mode
+    if (mode === 'dom') {
+        try {
+            const bitmap = await captureDomToBitmap(document.body);
+            window.parent.postMessage({
+                type: 'HELIOS_FRAME_DATA',
+                frame,
+                success: true,
+                bitmap
+            }, '*', [bitmap]);
+        } catch (e: any) {
+            window.parent.postMessage({
+                type: 'HELIOS_FRAME_DATA',
+                frame,
+                success: false,
+                error: e.message
+            }, '*');
+        }
+        return;
+    }
+
+    // 4. Canvas Mode (Default)
     const canvas = document.querySelector(selector || 'canvas');
     if (!canvas || !(canvas instanceof HTMLCanvasElement)) {
         window.parent.postMessage({

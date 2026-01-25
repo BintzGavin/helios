@@ -1,5 +1,8 @@
 # PLAYER Progress Log
 
+## PLAYER v0.4.0
+- ✅ Completed: Robust DOM Export - Implemented XMLSerializer/SVG-based DOM capture for high-fidelity export in Direct and Bridge modes.
+
 ## PLAYER v0.3.3
 - ✅ Completed: Sync player state with engine state - Updated Bridge Protocol to include initial state in handshake.
 

@@ -1,43 +1,71 @@
-# Context: PLAYER
+# Player Context
 
-## Overview
-The `packages/player` package provides the `<helios-player>` Web Component, which acts as a "Remote Control" for a Helios animation running inside an iframe. It supports both Direct Mode (same-origin) and Bridge Mode (cross-origin, sandboxed) via `postMessage`.
+This file documents the public interface and structure of the `packages/player` domain.
 
-## Public API
+## A. Component Structure
 
-### Web Component: `<helios-player>`
+The `<helios-player>` Web Component encapsulates the playback environment and UI controls.
 
-#### Attributes
-- `src` (string): The URL of the composition to load in the iframe.
-- `export-mode` (string): 'auto' (default), 'canvas', or 'dom'. Controls the export strategy.
-- `canvas-selector` (string): CSS selector to target the canvas element for export (default: 'canvas').
+**Shadow DOM Layout:**
+```html
+<shadow-root>
+  <style>...</style>
 
-#### Methods
-- `disconnectCallback()`: Cleans up listeners and controllers.
+  <!-- Status Overlay (Loading/Error) -->
+  <div class="status-overlay" part="overlay">
+    <div class="status-text">...</div>
+    <button class="retry-btn">Retry</button>
+  </div>
 
-#### Shadow DOM Structure
-- `.status-overlay`: Displays connection status ("Connecting...", "Failed") and a "Retry" button.
-- `iframe`: The sandbox for the composition.
-- `.controls`: The UI bar (Play/Pause, Scrubber, Time Display, Export Button).
+  <!-- Sandboxed Iframe -->
+  <iframe part="iframe" sandbox="allow-scripts allow-same-origin"></iframe>
 
-### Export Functionality
-- **Client-Side Export**: Uses `ClientSideExporter` (WebCodecs + mp4-muxer) to generate MP4s in the browser.
-- **Cancellation**: Users can cancel an ongoing export.
-- **Modes**:
-    - **Canvas**: Captures content from a `<canvas>` element (configurable via attributes).
-    - **DOM**: Fallback using rudimentary DOM-to-Canvas rendering.
+  <!-- Controls Bar -->
+  <div class="controls">
+    <button class="play-pause-btn" part="play-pause-button">...</button>
+    <button class="export-btn" part="export-button">...</button>
+    <select class="speed-selector" part="speed-selector">...</select>
+    <input type="range" class="scrubber" part="scrubber">
+    <div class="time-display" part="time-display">...</div>
+  </div>
+</shadow-root>
+```
 
-## Internal Architecture
+## B. Attributes
 
-### Connection Logic
-- **Direct Mode**: Tries to access `iframe.contentWindow.helios` directly.
-- **Bridge Mode**: Sends `HELIOS_CONNECT` via `postMessage` if direct access fails. Receives `HELIOS_READY` with initial state to establish `BridgeController`.
-- **Timeout**: Shows an error state if connection is not established within 3000ms.
+- **`src`**: URL of the Helios composition to load in the iframe.
+- **`export-mode`**: Controls client-side export behavior. Values: `auto` (default), `canvas`, `dom`.
+- **`canvas-selector`**: CSS selector for the canvas to capture in `canvas` mode (default: `canvas`).
 
-### Controllers (`src/controllers.ts`)
-- `HeliosController` (Interface): Common interface for controlling Helios.
-- `DirectController`: Wraps a direct `Helios` instance (same-origin).
-- `BridgeController`: Communicates via `postMessage` (cross-origin). Accepts initial state in constructor.
+## C. Public API
 
-### Features (`src/features/exporter.ts`)
-- `ClientSideExporter`: Handles the render loop, seeking, encoding, and muxing.
+The element exposes a `getController()` method:
+
+```typescript
+function getController(): HeliosController | null;
+```
+
+**HeliosController Interface:**
+```typescript
+interface HeliosController {
+  play(): void;
+  pause(): void;
+  seek(frame: number): void;
+  setPlaybackRate(rate: number): void;
+  setInputProps(props: Record<string, any>): void;
+  subscribe(callback: (state: any) => void): () => void;
+  getState(): any;
+  dispose(): void;
+  captureFrame(frame: number, options?: CaptureOptions): Promise<VideoFrame | null>;
+}
+```
+
+## D. Export Features
+
+The player supports client-side video export (MP4/H.264) via `ClientSideExporter`.
+
+- **Canvas Mode**: Captures the canvas element directly.
+- **DOM Mode**: Serializes the DOM using `XMLSerializer` and renders via SVG `<foreignObject>` to an `ImageBitmap`.
+- **Auto Mode**: Attempts to find a canvas; falls back to DOM capture if none found.
+
+Supported in both Direct (same-origin) and Bridge (cross-origin/sandboxed) modes.
