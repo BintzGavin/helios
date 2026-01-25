@@ -172,4 +172,60 @@ describe('dom-capture', () => {
         // Check that the URL is replaced
         expect(text).toMatch(/url\(&quot;data:image\/png;base64,.*\)/);
     });
+
+    it('should inline assets in external stylesheets', async () => {
+        const link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = 'https://example.com/style.css';
+        document.head.appendChild(link);
+
+        // Mock fetch for the stylesheet and the asset
+        fetchSpy.mockImplementation((url: string) => {
+            if (url === 'https://example.com/style.css') {
+                return Promise.resolve({
+                    ok: true,
+                    text: () => Promise.resolve('.external { background-image: url("bg.png"); }')
+                });
+            }
+            if (url === 'https://example.com/bg.png') {
+                 return Promise.resolve({
+                    ok: true,
+                    blob: () => Promise.resolve(new Blob(['mock-bg-data'], { type: 'image/png' }))
+                });
+            }
+            return Promise.reject(new Error('Unknown URL: ' + url));
+        });
+
+        await captureDomToBitmap(container);
+
+        expect(fetchSpy).toHaveBeenCalledWith('https://example.com/style.css');
+        // The relative URL "bg.png" should be resolved against the stylesheet URL
+        expect(fetchSpy).toHaveBeenCalledWith('https://example.com/bg.png');
+
+        const blob = (URL.createObjectURL as any).mock.calls[0][0] as Blob;
+        const text = await readBlob(blob);
+
+        expect(text).toContain('data:image/png;base64,');
+    });
+
+    it('should inline assets in style tags', async () => {
+        const style = document.createElement('style');
+        style.textContent = '.internal { background-image: url("https://example.com/internal-bg.png"); }';
+        document.head.appendChild(style);
+
+        const mockBlob = new Blob(['mock-internal-bg-data'], { type: 'image/png' });
+        fetchSpy.mockResolvedValue({
+            ok: true,
+            blob: () => Promise.resolve(mockBlob)
+        });
+
+        await captureDomToBitmap(container);
+
+        expect(fetchSpy).toHaveBeenCalledWith('https://example.com/internal-bg.png');
+
+        const blob = (URL.createObjectURL as any).mock.calls[0][0] as Blob;
+        const text = await readBlob(blob);
+
+        expect(text).toContain('data:image/png;base64,');
+    });
 });

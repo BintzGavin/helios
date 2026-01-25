@@ -8,9 +8,20 @@ export async function captureDomToBitmap(element) {
     const html = serializer.serializeToString(clone);
     // 3. Collect styles
     // We collect all style tags to ensure CSS-in-JS and other styles are preserved.
-    const inlineStyles = Array.from(doc.querySelectorAll('style'))
-        .map(style => style.outerHTML)
-        .join('\n');
+    const styleElements = Array.from(doc.querySelectorAll('style'));
+    const inlineStylesPromises = styleElements.map(async (style) => {
+        const css = style.textContent || '';
+        const processed = await processCss(css, doc.baseURI);
+        // Create a new style tag to preserve the structure,
+        // but here we just wrap in <style> as we are concatenating strings anyway.
+        // If we want to preserve attributes (like id="my-style"), we should look at attributes.
+        // The previous implementation used style.outerHTML which preserved attributes.
+        // Let's try to preserve attributes by cloning.
+        const styleClone = style.cloneNode(true);
+        styleClone.textContent = processed;
+        return styleClone.outerHTML;
+    });
+    const inlineStyles = (await Promise.all(inlineStylesPromises)).join('\n');
     // Fetch and inline external stylesheets
     const externalStyles = await getExternalStyles(doc);
     const styles = externalStyles + '\n' + inlineStyles;
@@ -58,7 +69,8 @@ async function getExternalStyles(doc) {
             if (!response.ok)
                 throw new Error(`HTTP ${response.status} ${response.statusText}`);
             const css = await response.text();
-            return `<style>/* ${link.href} */\n${css}</style>`;
+            const processed = await processCss(css, link.href);
+            return `<style>/* ${link.href} */\n${processed}</style>`;
         }
         catch (e) {
             console.warn('Helios: Failed to inline stylesheet:', link.href, e);
@@ -66,6 +78,34 @@ async function getExternalStyles(doc) {
         }
     });
     return (await Promise.all(promises)).join('\n');
+}
+async function processCss(css, baseUrl) {
+    const urlRegex = /url\((?:['"]?)(.*?)(?:['"]?)\)/g;
+    const matches = Array.from(css.matchAll(urlRegex));
+    const replacementsPromises = matches.map(async (match) => {
+        const originalMatch = match[0];
+        const url = match[1];
+        if (url.startsWith('data:'))
+            return null;
+        try {
+            const absoluteUrl = new URL(url, baseUrl).href;
+            const dataUri = await fetchAsDataUri(absoluteUrl);
+            return {
+                original: originalMatch,
+                replacement: `url("${dataUri}")`,
+            };
+        }
+        catch (e) {
+            console.warn(`Helios: Failed to inline CSS asset: ${url}`, e);
+            return null;
+        }
+    });
+    const replacements = (await Promise.all(replacementsPromises)).filter((r) => r !== null);
+    let processedCss = css;
+    for (const { original, replacement } of replacements) {
+        processedCss = processedCss.split(original).join(replacement);
+    }
+    return processedCss;
 }
 async function inlineImages(root) {
     const promises = [];
@@ -90,7 +130,8 @@ async function inlineImages(root) {
             if (match && match[1] && !match[1].startsWith('data:')) {
                 promises.push(fetchAsDataUri(match[1])
                     .then((dataUri) => {
-                    element.style.backgroundImage = `url("${dataUri}")`;
+                    // Replace the specific URL instance to preserve other layers (gradients, etc.)
+                    element.style.backgroundImage = element.style.backgroundImage.replace(match[0], `url("${dataUri}")`);
                 })
                     .catch((e) => console.warn('Helios: Failed to inline background:', match[1], e)));
             }
