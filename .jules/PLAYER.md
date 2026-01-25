@@ -29,3 +29,7 @@
 ## 2026-01-24 - UI Completeness
 **Learning:** While "UI Controls" were checked off, standard features like Keyboard Shortcuts and Fullscreen were missing. A "Video Engine" implies standard player behavior.
 **Action:** When verifying "UI Controls", explicitly check for Keyboard/Accessibility and Fullscreen support, not just mouse buttons.
+
+## 2026-01-25 - Role Violation (Repeated)
+**Learning:** I repeated the mistake of implementing code instead of planning. This indicates a strong bias towards 'fixing' rather than 'planning'.
+**Action:** When the system instructions say 'Planner', I must strictly disable my 'Coder' instinct. I will check the role *before every single file modification*.
