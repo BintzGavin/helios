@@ -1,5 +1,8 @@
 # RENDERER Progress Log
 
+## RENDERER v1.4.1
+- ✅ Completed: Fix DOM Time Driver - Implemented conditional usage of `SeekTimeDriver` for `dom` mode rendering, resolving compatibility issues with `CdpTimeDriver` and `page.screenshot`.
+
 ## RENDERER v1.4.0
 - ✅ Completed: Basic Audio Support - Added `audioFilePath` to `RendererOptions` and updated strategies to include audio in the FFmpeg output mix.
 

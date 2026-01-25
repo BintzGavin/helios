@@ -12,8 +12,8 @@ The Renderer supports two distinct capture strategies depending on the content t
 
 ## B. Time Control
 The Renderer uses a `TimeDriver` architecture to control animation timing:
-- **CdpTimeDriver** (Default): Uses Chrome DevTools Protocol (`Emulation.setVirtualTimePolicy`) for deterministic, frame-perfect rendering independent of wall-clock time.
-- **SeekTimeDriver**: Uses `requestAnimationFrame` seeking (legacy/preview fallback).
+- **CdpTimeDriver** (Canvas Mode): Uses Chrome DevTools Protocol (`Emulation.setVirtualTimePolicy`) for deterministic, frame-perfect rendering independent of wall-clock time.
+- **SeekTimeDriver** (DOM Mode): Uses `requestAnimationFrame` seeking because `CdpTimeDriver` is incompatible with `page.screenshot` capture.
 
 ## C. File Tree
 ```
