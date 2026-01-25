@@ -41,3 +41,11 @@
 ## 1.7.0 - Plan Ambiguity vs Spec
 **Learning:** The plan title ("Sequencing Primitives") and context implied `series` logic, but the specification only defined `sequence`.
 **Action:** Followed the explicit specification for `sequence`. Documented the omission of `series` to avoid scope creep or hallucination.
+
+## 2026-02-22 - Audio Synchronization Gap
+**Learning:** `WaapiDriver` only handles CSS/WAAPI, leaving `<audio>` elements unsynchronized.
+**Action:** Created plan `2026-02-22-CORE-DomDriver.md` to implement a unified `DomDriver` that handles both visual animations and media elements.
+
+## 2026-02-22 - Plan Review Confusion
+**Learning:** `request_plan_review` should be used to review the *execution steps* of the agent, not the text content of the Spec File being generated.
+**Action:** When using `request_plan_review`, focus on "What I will do" (e.g., create file X), rather than "What file X contains".
