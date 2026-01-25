@@ -1,3 +1,5 @@
+import { TimeDriver, WaapiDriver, NoopDriver } from './drivers';
+
 type HeliosState = {
   duration: number;
   fps: number;
@@ -16,6 +18,7 @@ export interface HeliosOptions {
   animationScope?: HTMLElement;
   inputProps?: Record<string, any>;
   playbackRate?: number;
+  driver?: TimeDriver;
 }
 
 export interface DiagnosticReport {
@@ -26,6 +29,7 @@ export interface DiagnosticReport {
 }
 
 export * from './animation';
+export * from './drivers';
 
 export class Helios {
   private state: HeliosState;
@@ -35,6 +39,7 @@ export class Helios {
   private syncWithDocumentTimeline = false;
   private autoSyncAnimations = false;
   private animationScope: HTMLElement | Document = typeof document !== 'undefined' ? document : ({} as Document);
+  private driver: TimeDriver;
 
   static async diagnose(): Promise<DiagnosticReport> {
     const report: DiagnosticReport = {
@@ -77,6 +82,17 @@ export class Helios {
     if (options.animationScope) {
       this.animationScope = options.animationScope;
     }
+
+    // Driver Selection Strategy
+    if (options.driver) {
+      this.driver = options.driver;
+    } else if (this.autoSyncAnimations) {
+      this.driver = new WaapiDriver();
+    } else {
+      this.driver = new NoopDriver();
+    }
+
+    this.driver.init(this.animationScope);
   }
 
   // --- State Management ---
@@ -140,39 +156,7 @@ export class Helios {
     const newFrame = Math.max(0, Math.min(frame, this.state.duration * this.state.fps));
     this.setState({ currentFrame: newFrame });
 
-    if (this.autoSyncAnimations) {
-      this.syncDomAnimations((newFrame / this.state.fps) * 1000);
-    }
-  }
-
-  private syncDomAnimations(timeInMs: number) {
-    if (typeof document === 'undefined') return;
-
-    // Use the configured scope or fallback to document
-    // Note: getAnimations() on element requires { subtree: true } to act like document.getAnimations() for children
-    let anims: Animation[] = [];
-
-    // Check if animationScope is Document (safe check for environment where Document might not exist as a global constructor)
-    const isDocument = typeof Document !== 'undefined' && this.animationScope instanceof Document;
-
-    if (isDocument) {
-        if (typeof (this.animationScope as Document).getAnimations === 'function') {
-            anims = (this.animationScope as Document).getAnimations();
-        }
-    } else {
-        // Assume HTMLElement or similar interface
-        if (typeof (this.animationScope as any).getAnimations === 'function') {
-            anims = (this.animationScope as any).getAnimations({ subtree: true });
-        }
-    }
-
-    anims.forEach((anim: Animation) => {
-      anim.currentTime = timeInMs;
-      // Ensure it doesn't auto-play if we are driving it
-      if (anim.playState !== 'paused') {
-        anim.pause();
-      }
-    });
+    this.driver.update((newFrame / this.state.fps) * 1000);
   }
 
   /**
@@ -247,9 +231,7 @@ export class Helios {
 
     this.setState({ currentFrame: nextFrame });
 
-    if (this.autoSyncAnimations) {
-      this.syncDomAnimations((nextFrame / this.state.fps) * 1000);
-    }
+    this.driver.update((nextFrame / this.state.fps) * 1000);
 
     this.animationFrameId = requestAnimationFrame(this.tick);
   }

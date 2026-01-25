@@ -1,5 +1,8 @@
 # CORE Progress Log
 
+## CORE v1.6.0
+- ✅ Completed: Implement TimeDriver Abstraction - Refactored `Helios` to use `TimeDriver` strategy, extracted `WaapiDriver`, and added support for custom drivers.
+
 ## CORE v1.5.0
 - ✅ Completed: Implement Spring Animation Helper - Implemented physics-based `spring` function with underdamped, critically damped, and overdamped support.
 
