@@ -1,4 +1,4 @@
-**Version**: 0.5.1
+**Version**: 0.5.2
 
 # Status: PLAYER
 
@@ -19,6 +19,7 @@
 ## Critical Task
 - **None**: Recent critical task completed. Await next assignment.
 
+[v0.5.2] ✅ Completed: Scaffold Tests - Added unit test suite for controllers and exporter using Vitest.
 [v0.5.1] ✅ Completed: Standard Attributes - Implemented `autoplay`, `loop`, and `controls` attributes. Synced version and artifacts.
 
 ## Backlog

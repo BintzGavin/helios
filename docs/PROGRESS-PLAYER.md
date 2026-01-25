@@ -1,5 +1,8 @@
 # PLAYER Progress Log
 
+## PLAYER v0.5.2
+- ✅ Completed: Scaffold Tests - Added unit test suite for controllers and exporter using Vitest.
+
 ## PLAYER v0.5.1
 - ✅ Completed: Standard Attributes - Implemented `autoplay`, `loop`, and `controls` attributes. Synced version and artifacts.
 
