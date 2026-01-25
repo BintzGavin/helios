@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import type { HeliosController } from '@helios-project/player';
 
 export interface Composition {
@@ -78,34 +78,7 @@ interface StudioContextType {
 
 const StudioContext = createContext<StudioContextType | undefined>(undefined);
 
-// Mock data representing what the CLI/Project Discovery would provide
-const MOCK_COMPOSITIONS: Composition[] = [
-  {
-    id: 'simple-canvas',
-    name: 'Simple Canvas Animation',
-    url: 'http://localhost:5173/examples/simple-canvas-animation/composition.html',
-    description: 'Basic vanilla JS canvas animation'
-  },
-  {
-    id: 'react-canvas',
-    name: 'React Composition',
-    url: 'http://localhost:5173/examples/react-canvas-animation/composition.html',
-    description: 'Canvas animation using React'
-  },
-  {
-    id: 'svelte-canvas',
-    name: 'Svelte Composition',
-    url: 'http://localhost:5173/examples/svelte-canvas-animation/composition.html',
-    description: 'Canvas animation using Svelte'
-  },
-  {
-    id: 'threejs',
-    name: 'Three.js Cube',
-    url: 'http://localhost:5173/examples/threejs-canvas-animation/composition.html',
-    description: '3D cube using Three.js'
-  }
-];
-
+// Mocks kept for Assets for now
 const MOCK_ASSETS: Asset[] = [
   {
     id: '1',
@@ -128,9 +101,9 @@ const MOCK_ASSETS: Asset[] = [
 ];
 
 export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [compositions] = useState<Composition[]>(MOCK_COMPOSITIONS);
+  const [compositions, setCompositions] = useState<Composition[]>([]);
   const [assets] = useState<Asset[]>(MOCK_ASSETS);
-  const [activeComposition, setActiveComposition] = useState<Composition | null>(MOCK_COMPOSITIONS[0]);
+  const [activeComposition, setActiveComposition] = useState<Composition | null>(null);
   const [isSwitcherOpen, setSwitcherOpen] = useState(false);
 
   const [renderJobs, setRenderJobs] = useState<RenderJob[]>([]);
@@ -150,14 +123,29 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     });
   };
 
+  // Fetch compositions from backend
+  useEffect(() => {
+    fetch('/api/compositions')
+      .then(res => res.json())
+      .then((data: Composition[]) => {
+        setCompositions(data);
+        if (data.length > 0 && !activeComposition) {
+          setActiveComposition(data[0]);
+        }
+      })
+      .catch(err => {
+        console.error('Failed to fetch compositions:', err);
+      });
+  }, []);
+
   // Reset range when composition changes
-  React.useEffect(() => {
+  useEffect(() => {
     setInPoint(0);
     setOutPoint(0);
   }, [activeComposition?.id]);
 
   // Initialize outPoint when duration becomes available
-  React.useEffect(() => {
+  useEffect(() => {
     const { duration, fps } = playerState;
     if (duration > 0 && outPoint === 0) {
       setOutPoint(Math.floor(duration * fps));
