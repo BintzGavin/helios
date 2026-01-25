@@ -21,3 +21,11 @@
 ## 2026-01-23 - Role Boundaries Violation
 **Learning:** I mistakenly implemented code changes (modifying `packages/player/src/index.ts`) instead of creating a spec file, violating the "Planner" role boundaries.
 **Action:** Always verify the active role protocol before execution. If the role is "Planner", the output MUST be a `.md` file in `.sys/plans/`, and NO source code changes are allowed.
+
+## 2026-01-24 - Client-Side Export Gaps
+**Learning:** The `ClientSideExporter` (WebCodecs) completely ignores audio, and the `dom-capture` utility ignores external stylesheets (only inline styles work). This creates a "parity gap" where the exported video differs significantly from the preview or server-side render.
+**Action:** Future plans for "Client-Side Export" must prioritize Audio mixing and Stylesheet inlining to meet the "Use What You Know" promise.
+
+## 2026-01-24 - UI Completeness
+**Learning:** While "UI Controls" were checked off, standard features like Keyboard Shortcuts and Fullscreen were missing. A "Video Engine" implies standard player behavior.
+**Action:** When verifying "UI Controls", explicitly check for Keyboard/Accessibility and Fullscreen support, not just mouse buttons.
