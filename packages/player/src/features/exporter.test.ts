@@ -102,6 +102,8 @@ describe('ClientSideExporter', () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
+        // Reset default implementation
+        (VideoEncoder.isConfigSupported as any).mockResolvedValue(true);
 
         mockController = {
             play: vi.fn(),
@@ -207,5 +209,35 @@ describe('ClientSideExporter', () => {
         expect(audioEncodeSpy).toHaveBeenCalled();
         expect(audioFlushSpy).toHaveBeenCalled();
         expect(audioCloseSpy).toHaveBeenCalled();
+    });
+
+    it('should fallback to lower profile if primary config is not supported', async () => {
+        const onProgress = vi.fn();
+        const signal = new AbortController().signal;
+
+        // First call (Level 4.0) returns false, Second call (Level 3.0) returns true
+        (VideoEncoder.isConfigSupported as any)
+            .mockResolvedValueOnce(false)
+            .mockResolvedValueOnce(true);
+
+        await exporter.export({ onProgress, signal, mode: 'canvas' });
+
+        expect(VideoEncoder.isConfigSupported).toHaveBeenCalledTimes(2);
+        // Verify configure was called with the fallback config (Level 3.0 => avc1.42001E)
+        expect(configureSpy).toHaveBeenCalledWith(expect.objectContaining({
+            codec: 'avc1.42001E'
+        }));
+    });
+
+    it('should throw error if no supported config found', async () => {
+        const onProgress = vi.fn();
+        const signal = new AbortController().signal;
+
+        // Both return false
+        (VideoEncoder.isConfigSupported as any).mockResolvedValue(false);
+
+        await expect(exporter.export({ onProgress, signal, mode: 'canvas' }))
+            .rejects
+            .toThrow(/Unsupported VideoEncoder config/);
     });
 });

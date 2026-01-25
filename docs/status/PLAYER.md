@@ -1,4 +1,4 @@
-**Version**: 0.8.0
+**Version**: 0.8.1
 
 # Status: PLAYER
 
@@ -20,6 +20,7 @@
 ## Critical Task
 - **None**: Recent critical task completed. Await next assignment.
 
+[v0.8.1] ✅ Completed: Scaffold Tests (Update) - Added tests for invalid VideoEncoder configurations and verified test suite.
 [v0.8.0] ✅ Completed: Client Side Audio - Implemented audio capture, mixing (OfflineAudioContext), and encoding (AAC) for client-side export.
 [v0.7.0] ✅ Completed: Enable External Stylesheets - Updated DOM capture to fetch and inline external CSS (`<link rel="stylesheet">`) for high-fidelity exports.
 [v0.6.0] ✅ Completed: Keyboard & Fullscreen Support - Implemented standard keyboard shortcuts (Space, F, Arrows) and Fullscreen UI/logic.
