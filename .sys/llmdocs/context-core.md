@@ -9,6 +9,7 @@ The Core domain implements the `Helios` engine, a framework-agnostic video creat
 2.  **Reactivity:** Public properties expose `ReadonlySignal<T>` which allows consumers (like UI or Renderer) to subscribe to specific changes without polling.
 3.  **Time Driver Strategy:** The engine uses a `TimeDriver` abstraction (`WaapiDriver`, `NoopDriver`, or custom) to manage the animation loop, decoupling logic from the execution environment (DOM vs Node.js).
 4.  **Legacy Compatibility:** The `subscribe(callback)` method is maintained using an `effect` wrapper, ensuring backward compatibility with the monolithic state object pattern.
+5.  **Standard Library:** Includes built-in helpers for animation (`interpolate`, `spring`), easing (`Easing`), and sequencing (`sequence`, `series`).
 
 ## B. File Tree
 
@@ -16,7 +17,7 @@ The Core domain implements the `Helios` engine, a framework-agnostic video creat
 packages/core/src/
 ├── drivers/           # TimeDriver implementations (Waapi, Noop)
 ├── animation.ts       # Animation helpers (interpolate, spring)
-├── easing.ts          # Easing functions
+├── easing.ts          # Easing functions and types
 ├── index.ts           # Main entry point, Helios class
 ├── sequencing.ts      # Sequencing primitives (sequence, series)
 └── signals.ts         # Signal/Effect/Computed implementation
@@ -35,6 +36,7 @@ export interface HeliosOptions {
   inputProps?: Record<string, any>;
   playbackRate?: number;
   driver?: TimeDriver;
+  ticker?: Ticker;
 }
 
 export interface DiagnosticReport {
@@ -43,6 +45,10 @@ export interface DiagnosticReport {
   offscreenCanvas: boolean;
   userAgent: string;
 }
+
+// packages/core/src/easing.ts
+
+export type EasingFunction = (t: number) => number;
 
 // packages/core/src/signals.ts
 
