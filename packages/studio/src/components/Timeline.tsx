@@ -1,32 +1,10 @@
 import React from 'react';
-import type { HeliosController } from '@helios-project/player';
+import { useStudio } from '../context/StudioContext';
 
-interface TimelineProps {
-  controller: HeliosController | null;
-  state: {
-    currentFrame: number;
-    duration: number;
-    fps: number;
-    isPlaying: boolean;
-  };
-}
-
-export const Timeline: React.FC<TimelineProps> = ({ controller, state }) => {
-  const { currentFrame, duration, fps, isPlaying } = state;
+export const Timeline: React.FC = () => {
+  const { controller, playerState } = useStudio();
+  const { currentFrame, duration, fps } = playerState;
   const totalFrames = duration * fps;
-
-  const handlePlayPause = () => {
-    if (!controller) return;
-    if (isPlaying) {
-      controller.pause();
-    } else {
-      // If at end, restart
-      if (currentFrame >= totalFrames - 1) {
-        controller.seek(0);
-      }
-      controller.play();
-    }
-  };
 
   const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!controller) return;
@@ -42,19 +20,8 @@ export const Timeline: React.FC<TimelineProps> = ({ controller, state }) => {
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', padding: '8px' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-        <button
-          onClick={handlePlayPause}
-          disabled={!controller}
-          style={{
-            cursor: controller ? 'pointer' : 'not-allowed',
-            padding: '4px 8px',
-            minWidth: '40px'
-          }}
-        >
-          {isPlaying ? '❚❚' : '▶'}
-        </button>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', padding: '8px', flex: 1 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', justifyContent: 'space-between' }}>
         <div style={{ fontFamily: 'monospace' }}>
           {formatTime(currentFrame, fps)} / {formatTime(totalFrames, fps)}
         </div>

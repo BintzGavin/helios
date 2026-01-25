@@ -1,17 +1,15 @@
 import React from 'react';
-import type { HeliosController } from '@helios-project/player';
+import { useStudio } from '../context/StudioContext';
 
-interface PropsEditorProps {
-  controller: HeliosController | null;
-  inputProps: Record<string, any>;
-}
+export const PropsEditor: React.FC = () => {
+  const { controller, playerState } = useStudio();
+  const { inputProps } = playerState;
 
-export const PropsEditor: React.FC<PropsEditorProps> = ({ controller, inputProps }) => {
   if (!controller) {
     return <div style={{ padding: '8px', color: '#666' }}>No active controller</div>;
   }
 
-  if (Object.keys(inputProps).length === 0) {
+  if (!inputProps || Object.keys(inputProps).length === 0) {
     return <div style={{ padding: '8px', color: '#666' }}>No input props defined</div>;
   }
 

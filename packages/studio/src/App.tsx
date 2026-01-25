@@ -1,9 +1,10 @@
-import { useState, useEffect, useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import '@helios-project/player'
 import { StudioLayout } from './components/Layout/StudioLayout'
 import { Panel } from './components/Layout/Panel'
 import { Timeline } from './components/Timeline'
 import { PropsEditor } from './components/PropsEditor'
+import { PlaybackControls } from './components/Controls/PlaybackControls'
 import { StudioProvider, useStudio } from './context/StudioContext'
 import { CompositionSwitcher } from './components/CompositionSwitcher'
 import { useKeyboardShortcut } from './hooks/useKeyboardShortcut'
@@ -15,16 +16,17 @@ interface HeliosPlayerElement extends HTMLElement {
 }
 
 function AppContent() {
-  const { activeComposition, setSwitcherOpen } = useStudio();
+  const {
+    activeComposition,
+    setSwitcherOpen,
+    controller,
+    setController,
+    playerState,
+    setPlayerState,
+    loop
+  } = useStudio();
+
   const playerRef = useRef<HeliosPlayerElement>(null);
-  const [controller, setController] = useState<HeliosController | null>(null);
-  const [playerState, setPlayerState] = useState<any>({
-    currentFrame: 0,
-    duration: 0,
-    fps: 30,
-    isPlaying: false,
-    inputProps: {}
-  });
 
   const src = activeComposition?.url || '';
 
@@ -51,7 +53,7 @@ function AppContent() {
     }, 200);
 
     return () => clearInterval(interval);
-  }, [src]);
+  }, [src, setController]);
 
   useEffect(() => {
     if (!controller) return;
@@ -70,7 +72,23 @@ function AppContent() {
     return () => {
         unsubscribe();
     };
-  }, [controller]);
+  }, [controller, setPlayerState]);
+
+  // Loop logic
+  useEffect(() => {
+    if (!loop || !controller) return;
+
+    const { isPlaying, currentFrame, duration, fps } = playerState;
+    if (!isPlaying) return;
+
+    const totalFrames = duration * fps;
+    if (currentFrame >= totalFrames - 1) {
+      // Seek to 0 and play to loop
+      controller.seek(0);
+      controller.play();
+    }
+  }, [playerState, loop, controller]);
+
 
   return (
     <>
@@ -128,12 +146,15 @@ function AppContent() {
         }
         inspector={
           <Panel title="Properties">
-            <PropsEditor controller={controller} inputProps={playerState.inputProps || {}} />
+            <PropsEditor />
           </Panel>
         }
         timeline={
           <Panel title="Timeline">
-            <Timeline controller={controller} state={playerState} />
+            <div style={{ display: 'flex', alignItems: 'center', width: '100%', gap: '16px', paddingRight: '16px' }}>
+                <PlaybackControls />
+                <Timeline />
+            </div>
           </Panel>
         }
       />
