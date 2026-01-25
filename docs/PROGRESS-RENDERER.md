@@ -1,5 +1,8 @@
 # RENDERER Progress Log
 
+## RENDERER v1.2.0
+- ✅ Completed: Enable Playwright Trace Viewer - Added `tracePath` option to `RenderJobOptions`, enabling generation of Playwright trace files for debugging rendering sessions.
+
 ## RENDERER v1.1.1
 - ✅ Completed: Refactor TimeDriver - Decoupled time advancement logic from RenderStrategy into a dedicated TimeDriver interface, preparing for CDP integration.
 

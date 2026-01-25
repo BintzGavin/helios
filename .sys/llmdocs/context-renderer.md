@@ -43,6 +43,7 @@ interface RendererOptions {
 interface RenderJobOptions {
   onProgress?: (progress: number) => void;
   signal?: AbortSignal;
+  tracePath?: string; // Path to save Playwright trace zip
 }
 ```
 
@@ -50,7 +51,8 @@ interface RenderJobOptions {
 ```typescript
 renderer.render(url, outputPath, {
   onProgress: (p) => console.log(`Progress: ${p}`),
-  signal: abortController.signal
+  signal: abortController.signal,
+  tracePath: 'output/trace.zip'
 });
 ```
 

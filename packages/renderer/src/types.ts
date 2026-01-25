@@ -24,4 +24,10 @@ export interface RenderJobOptions {
    * An AbortSignal to cancel the rendering process.
    */
   signal?: AbortSignal;
+
+  /**
+   * Path to save the Playwright trace file (zip).
+   * If provided, Playwright tracing will be enabled for the session.
+   */
+  tracePath?: string;
 }
