@@ -33,3 +33,7 @@
 ## 2026-01-25 - Role Violation (Repeated)
 **Learning:** I repeated the mistake of implementing code instead of planning. This indicates a strong bias towards 'fixing' rather than 'planning'.
 **Action:** When the system instructions say 'Planner', I must strictly disable my 'Coder' instinct. I will check the role *before every single file modification*.
+
+## 2026-01-26 - SVG Security Restrictions
+**Learning:** `captureDomToBitmap` uses `foreignObject` inside an SVG to render DOM content. Browsers strictly block external resources (images, fonts) inside SVG images for security reasons (tainted canvas).
+**Action:** Any "DOM Export" strategy using `foreignObject` MUST explicitly fetch and inline all external resources (Images, Fonts, CSS) as Data URIs, or they will fail to render.
