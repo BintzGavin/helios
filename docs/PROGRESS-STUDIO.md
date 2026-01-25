@@ -1,13 +1,9 @@
-# STUDIO Progress Log
+# Studio Progress Log
 
-## STUDIO v0.3.0
-- ✅ Completed: Implement Studio UI and Player Control - Added Timeline, Props Editor, and programmatic control for helios-player.
+## 2026-02-18
+- **UI Implementation & Player Control**: Implemented Timeline, Props Editor, and programmatic control for helios-player.
+- **Scaffold CLI**: Created `@helios-project/cli` and `studio` command.
+- **Scaffold Studio**: Initialized `packages/studio` with Vite + React.
 
-## STUDIO v0.2.1
-- ✅ Completed: Verify & Refine - Fixed TypeScript configuration and verified build/CLI.
-
-## STUDIO v0.2.0
-- ✅ Completed: Scaffold CLI Package - Created @helios-project/cli and studio command.
-
-## STUDIO v0.1.0
-- ✅ Completed: Scaffold Studio Package - Created package structure, config, and basic UI.
+## [Current Version]
+- **Composition Switcher**: Implemented Cmd+K command palette to switch between compositions. Introduced `StudioContext` for project state management.

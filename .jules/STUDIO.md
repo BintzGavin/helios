@@ -13,3 +13,7 @@
 ## [0.2.2] - Protocol Violation & Controller Duplication
 **Learning:** I violated the core "Planner" protocol by implementing code instead of stopping at the Plan. This led to a critical failure review.
 **Action:** Always stop after saving the `.md` plan file. Additionally, `packages/player` does not export its controller logic, forcing the Studio to duplicate the Bridge Protocol implementation to control the iframe. Future plans should consider exposing this from `player`.
+
+## [0.3.1] - Performance Optimization in Hooks
+**Learning:** Initial implementation of `useKeyboardShortcut` attached `useEffect` listeners on every render because the callback was an inline arrow function. This causes unnecessary DOM operations.
+**Action:** When creating event listener hooks, always use `useRef` to hold the callback or wrap it in `useCallback` to ensure stable identity and prevent effect re-execution.
