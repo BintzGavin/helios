@@ -9,7 +9,7 @@ The Studio is a React 19 application built with Vite. It serves as the IDE for v
 - **Framework**: React 19
 - **Build Tool**: Vite
 - **Preview**: Integrated via `<helios-player>` web component, wrapped in a `Stage` component for zoom/pan controls.
-- **State Management**: `StudioContext` provides centralized access to `HeliosController`, player state (frame, playing, props), and Studio settings (loop, active composition).
+- **State Management**: `StudioContext` provides centralized access to `HeliosController`, player state (frame, playing, props), and Studio settings (loop, active composition, assets).
 
 ## B. File Tree
 ```
@@ -30,6 +30,9 @@ packages/studio/
         ├── CompositionSwitcher.tsx
         ├── PropsEditor.tsx
         ├── Timeline.tsx
+        ├── AssetsPanel/
+        │   ├── AssetItem.tsx
+        │   └── AssetsPanel.tsx
         ├── Controls/
         │   └── PlaybackControls.tsx
         ├── Stage/
@@ -67,6 +70,7 @@ Internal scripts:
 - **Stage**: `components/Stage/Stage.tsx` wraps `<helios-player>`, handling controller connection, zoom, pan, and transparency toggling.
 - **StageToolbar**: `components/Stage/StageToolbar.tsx` provides floating controls for the Stage.
 - **Panel**: `components/Layout/Panel.tsx` is a generic container for UI panels.
+- **AssetsPanel**: `components/AssetsPanel/AssetsPanel.tsx` displays a grid of available assets (currently mocked).
 - **Timeline**: `components/Timeline.tsx` provides the scrubber and time display.
 - **PlaybackControls**: `components/Controls/PlaybackControls.tsx` provides Play, Pause, Rewind, and Loop controls.
 - **PropsEditor**: `components/PropsEditor.tsx` provides inputs to modify composition properties (`inputProps`).

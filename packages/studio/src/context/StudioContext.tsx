@@ -8,6 +8,13 @@ export interface Composition {
   description?: string;
 }
 
+export interface Asset {
+  id: string;
+  name: string;
+  url: string;
+  type: 'image' | 'video' | 'audio' | 'font' | 'other';
+}
+
 export interface PlayerState {
   currentFrame: number;
   duration: number;
@@ -30,6 +37,9 @@ interface StudioContextType {
   setActiveComposition: (comp: Composition) => void;
   isSwitcherOpen: boolean;
   setSwitcherOpen: (isOpen: boolean) => void;
+
+  // Assets
+  assets: Asset[];
 
   // Player Control
   controller: HeliosController | null;
@@ -72,8 +82,30 @@ const MOCK_COMPOSITIONS: Composition[] = [
   }
 ];
 
+const MOCK_ASSETS: Asset[] = [
+  {
+    id: '1',
+    name: 'logo.png',
+    url: 'https://via.placeholder.com/150/0000FF/808080?text=Logo',
+    type: 'image'
+  },
+  {
+    id: '2',
+    name: 'background.jpg',
+    url: 'https://via.placeholder.com/300/FF0000/FFFFFF?text=Background',
+    type: 'image'
+  },
+  {
+    id: '3',
+    name: 'music.mp3',
+    url: '#',
+    type: 'audio'
+  }
+];
+
 export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [compositions] = useState<Composition[]>(MOCK_COMPOSITIONS);
+  const [assets] = useState<Asset[]>(MOCK_ASSETS);
   const [activeComposition, setActiveComposition] = useState<Composition | null>(MOCK_COMPOSITIONS[0]);
   const [isSwitcherOpen, setSwitcherOpen] = useState(false);
 
@@ -87,6 +119,7 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     <StudioContext.Provider
       value={{
         compositions,
+        assets,
         activeComposition,
         setActiveComposition,
         isSwitcherOpen,
