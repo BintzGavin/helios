@@ -36,7 +36,7 @@ async function init() {
 
   // Sync with Helios
   helios.subscribe((state) => {
-    const time = state.currentFrame / helios.config.fps;
+    const time = state.currentFrame / helios.fps;
     graphics.rotation = time * Math.PI; // Rotate 180 degrees per second
   });
 

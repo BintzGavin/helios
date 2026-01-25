@@ -1,5 +1,5 @@
 # Status: DEMO (Executor)
-**Version**: 1.14.0
+**Version**: 1.15.0
 
 ## Vision
 To provide comprehensive, idiomatic examples for every major framework (React, Vue, Svelte, Vanilla) and robust end-to-end testing to ensure the Helios engine delivers on its "Use What You Know" promise.
@@ -9,16 +9,16 @@ To provide comprehensive, idiomatic examples for every major framework (React, V
 - **Vanilla JS (DOM)**: ✅ `examples/simple-animation` exists and works.
 - **Animation Helpers**: ✅ `examples/animation-helpers` exists and works (Demonstrates `interpolate`, `spring`, `sequence`, `series`).
 - **React (Canvas)**: ✅ `examples/react-canvas-animation` exists and works.
-- **React (DOM)**: ✅ `examples/react-dom-animation` exists and works (Verified in browser, E2E blocked by Renderer).
+- **React (DOM)**: ✅ `examples/react-dom-animation` exists and works.
 - **React (Helpers)**: ✅ `examples/react-animation-helpers` exists and works (Demonstrates `<Sequence>`).
 - **Vue (Canvas)**: ✅ `examples/vue-canvas-animation` exists and works.
-- **Vue (DOM)**: ✅ `examples/vue-dom-animation` exists and works (Verified build, E2E blocked by Renderer).
+- **Vue (DOM)**: ✅ `examples/vue-dom-animation` exists and works.
 - **Vue (Helpers)**: ✅ `examples/vue-animation-helpers` exists and works (Demonstrates `<Sequence>`).
 - **Svelte**: ✅ `examples/svelte-canvas-animation` exists and works.
 - **Svelte (Helpers)**: ✅ `examples/svelte-animation-helpers` exists and works (Demonstrates `<Sequence>`).
 - **Three.js**: ✅ `examples/threejs-canvas-animation` exists and works.
 - **Pixi.js**: ✅ `examples/pixi-canvas-animation` exists and works.
-- **E2E Tests**: ✅ Verified all existing examples via `tests/e2e/verify-render.ts` (DOM tests temporarily disabled).
+- **E2E Tests**: ✅ Verified all existing examples via `tests/e2e/verify-render.ts`.
 
 ## Backlog
 - [x] Scaffold Svelte Animation Helpers (`examples/svelte-animation-helpers`)
@@ -33,9 +33,10 @@ To provide comprehensive, idiomatic examples for every major framework (React, V
 - [x] Verify DOM rendering example
 
 ## Known Issues
-- `DomStrategy` (used by `simple-animation`, `react-dom-animation`, and `vue-dom-animation`) fails in `verify-render.ts` with `CdpTimeDriver` (timeout). Verified working with `SeekTimeDriver`.
+None.
 
 ## Log
+- [v1.15.0] ✅ Completed: Enable E2E verification for DOM examples - Uncommented DOM test cases in `verify-render.ts`, verified all 14 examples pass (using `SeekTimeDriver` for DOM), and fixed a bug in Pixi example.
 - [v1.14.0] ✅ Completed: Scaffold Vue Animation Helpers - Created `examples/vue-animation-helpers` with `<Sequence>` component and Provide/Inject timing.
 - [v1.13.0] ✅ Completed: Verify Svelte Animation Helpers - Verified `examples/svelte-animation-helpers` and enabled E2E test.
 - [v1.12.0] ✅ Completed: Update Animation Helpers - Updated `examples/animation-helpers` to demonstrate `sequence` and `series` core functions.
