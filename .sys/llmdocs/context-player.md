@@ -36,6 +36,9 @@ The `<helios-player>` Web Component encapsulates the playback environment and UI
 - **`src`**: URL of the Helios composition to load in the iframe. Changes trigger a reload of the iframe.
 - **`width`**: The desired width of the player aspect ratio (e.g., "1920").
 - **`height`**: The desired height of the player aspect ratio (e.g., "1080").
+- **`autoplay`**: If present, the video starts playing automatically upon connection.
+- **`loop`**: If present, the video restarts automatically when it reaches the end.
+- **`controls`**: If present (or default), controls are visible. If absent, controls are hidden.
 - **`export-mode`**: Controls client-side export behavior. Values: `auto` (default), `canvas`, `dom`.
 - **`canvas-selector`**: CSS selector for the canvas to capture in `canvas` mode (default: `canvas`).
 

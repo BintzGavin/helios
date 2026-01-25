@@ -31,6 +31,11 @@ template.innerHTML = `
       align-items: center;
       padding: 8px;
       color: white;
+      transition: opacity 0.3s;
+    }
+    :host(:not([controls])) .controls {
+      display: none;
+      pointer-events: none;
     }
     .play-pause-btn {
       background: none;
@@ -175,7 +180,7 @@ export class HeliosPlayer extends HTMLElement {
   private abortController: AbortController | null = null;
 
   static get observedAttributes() {
-    return ["src", "width", "height"];
+    return ["src", "width", "height", "autoplay", "loop", "controls"];
   }
 
   constructor() {
@@ -342,6 +347,10 @@ export class HeliosPlayer extends HTMLElement {
       }
 
       this.unsubscribe = this.controller.subscribe((s) => this.updateUI(s));
+
+      if (this.hasAttribute("autoplay")) {
+        this.controller.play();
+      }
   }
 
   private updateAspectRatio() {
@@ -387,6 +396,16 @@ export class HeliosPlayer extends HTMLElement {
 
   private updateUI(state: any) {
       const isFinished = state.currentFrame >= state.duration * state.fps - 1;
+
+      if (isFinished && this.hasAttribute("loop")) {
+        // Prevent infinite loop if something goes wrong, only restart if we stopped
+        if (!state.isPlaying) {
+             this.controller!.seek(0);
+             this.controller!.play();
+             return;
+        }
+      }
+
       if (isFinished) {
         this.playPauseBtn.textContent = "🔄"; // Restart button
       } else {
