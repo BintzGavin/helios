@@ -1,5 +1,8 @@
 # RENDERER Progress Log
 
+## RENDERER v1.6.0
+- ✅ Completed: Configurable Codecs - Added `videoCodec`, `pixelFormat`, `crf`, `preset`, and `videoBitrate` options to `RendererOptions` and updated strategies to use them.
+
 ## RENDERER v1.5.2
 - ✅ Completed: Fix Audio Duration Logic - Replaced `-shortest` with `-t duration` to prevent video truncation when audio is short.
 

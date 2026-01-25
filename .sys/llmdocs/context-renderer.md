@@ -47,6 +47,11 @@ interface RendererOptions {
   mode?: 'canvas' | 'dom'; // Defaults to 'canvas'
   startFrame?: number; // Start rendering from this frame (distributed rendering)
   audioFilePath?: string; // Path to audio file to mix
+  videoCodec?: string; // e.g., 'libx264', 'prores_ks'
+  pixelFormat?: string; // e.g., 'yuv420p', 'yuva444p10le'
+  crf?: number; // Constant Rate Factor
+  preset?: string; // Encoding preset
+  videoBitrate?: string; // e.g., '5M'
 }
 
 interface RenderJobOptions {
@@ -78,11 +83,14 @@ The strategy fully controls the FFmpeg argument construction (`getFFmpegArgs`).
 -f image2pipe -framerate [FPS] -i -
 ```
 
-**Output Args (Standard)**:
+**Output Args (Configurable)**:
 ```
--c:v libx264
--pix_fmt yuv420p
+-c:v [videoCodec=libx264]
+-pix_fmt [pixelFormat=yuv420p]
 -movflags +faststart
+-crf [crf] (optional)
+-preset [preset] (optional)
+-b:v [videoBitrate] (optional)
 [OUTPUT_PATH]
 ```
 
