@@ -23,10 +23,11 @@ export class RafTicker implements Ticker {
     const now = performance.now();
     const dt = now - this.lastTime;
     this.lastTime = now;
-    if (this.callback) {
-      this.callback(dt);
+
+    const cb = this.callback;
+    if (cb) {
+      cb(dt);
       // Only schedule next frame if we are still running
-      // @ts-ignore
       if (this.callback) {
         this.frameId = requestAnimationFrame(this.loop);
       }
