@@ -7,6 +7,7 @@ const CASES = [
   // DOM Strategy currently fails with CdpTimeDriver (default). See docs/status/DEMO.md Known Issues.
   // { name: 'DOM', relativePath: 'examples/simple-animation/composition.html', mode: 'dom' as const },
   { name: 'React', relativePath: 'examples/react-canvas-animation/composition.html', mode: 'canvas' as const },
+  // React DOM validation is currently blocked by RENDERER-Fix-Dom-TimeDriver (CdpTimeDriver + DomStrategy issue)
   // { name: 'React DOM', relativePath: 'examples/react-dom-animation/composition.html', mode: 'dom' as const },
   { name: 'Vue', relativePath: 'examples/vue-canvas-animation/composition.html', mode: 'canvas' as const },
   { name: 'Svelte', relativePath: 'examples/svelte-canvas-animation/composition.html', mode: 'canvas' as const },
