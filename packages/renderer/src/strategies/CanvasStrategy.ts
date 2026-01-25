@@ -249,6 +249,8 @@ export class CanvasStrategy implements RenderStrategy {
       }
     }
 
+    // Use -t instead of -shortest to ensure video duration matches exact animation length,
+    // even if audio is shorter (silence) or longer (cut).
     const audioOutputArgs = options.audioFilePath
       ? ['-c:a', 'aac', '-map', '0:v', '-map', '1:a', '-t', options.durationInSeconds.toString()]
       : [];
