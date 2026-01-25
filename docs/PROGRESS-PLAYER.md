@@ -1,5 +1,8 @@
 # PLAYER Progress Log
 
+## PLAYER v0.3.2
+- ✅ Completed: Variable Speed - Added `setPlaybackRate` to `HeliosController` and Speed Selector UI to `<helios-player>`.
+
 ## PLAYER v0.3.1
 - ✅ Completed: Loading UI - Verified implementation of loading and error state overlays.
 

@@ -9,6 +9,7 @@ export declare class HeliosPlayer extends HTMLElement {
     private overlay;
     private statusText;
     private retryBtn;
+    private speedSelector;
     private controller;
     private directHelios;
     private unsubscribe;
@@ -23,6 +24,7 @@ export declare class HeliosPlayer extends HTMLElement {
     private setController;
     private togglePlayPause;
     private handleScrubberInput;
+    private handleSpeedChange;
     private updateUI;
     private showStatus;
     private hideStatus;

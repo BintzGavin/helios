@@ -19,6 +19,11 @@ export function connectToParent(helios) {
                     helios.seek(frame);
                 }
                 break;
+            case 'HELIOS_SET_PLAYBACK_RATE':
+                if (typeof event.data.rate === 'number') {
+                    helios.setPlaybackRate(event.data.rate);
+                }
+                break;
             case 'HELIOS_SET_PROPS':
                 if (event.data.props) {
                     helios.setInputProps(event.data.props);
