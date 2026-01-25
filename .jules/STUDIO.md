@@ -21,3 +21,7 @@
 ## [0.4.0] - Assets Panel Backend Requirement
 **Learning:** The "Assets Panel" vision requires listing files from the user's project (`public/` folder). However, `packages/studio` runs as a client-side SPA (via Vite) and lacks a built-in API to inspect the host file system when distributed as a package.
 **Action:** Future plans for "Assets Panel" must include a server-side component (likely extending the `npx helios studio` CLI or a Vite plugin) to serve the file list to the frontend.
+
+## [0.9.0] - Studio Backend Architecture
+**Learning:** To bridge the gap between the static Studio UI and the user's file system, we cannot rely on a separate backend service due to packaging constraints. The solution is to utilize Vite's plugin system to inject API middleware directly into the dev server.
+**Action:** Planned `vite-plugin-studio-api.ts` to provide `/api/compositions` and `/api/assets` endpoints, allowing the frontend to "discover" the project structure without a heavy backend dependency.
