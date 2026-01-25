@@ -5,7 +5,7 @@ export function connectToParent(helios) {
         switch (type) {
             case 'HELIOS_CONNECT':
                 // Reply with ready and current state
-                window.parent.postMessage({ type: 'HELIOS_READY' }, '*');
+                window.parent.postMessage({ type: 'HELIOS_READY', state: helios.getState() }, '*');
                 window.parent.postMessage({ type: 'HELIOS_STATE', state: helios.getState() }, '*');
                 break;
             case 'HELIOS_PLAY':
@@ -34,13 +34,13 @@ export function connectToParent(helios) {
                 break;
         }
     });
-    // 2. Subscribe to Helios state changes and broadcast
+    // 2. Announce readiness immediately (in case parent is already listening)
+    // This helps when the iframe reloads or connects after the parent has already set up listeners
+    window.parent.postMessage({ type: 'HELIOS_READY', state: helios.getState() }, '*');
+    // 3. Subscribe to Helios state changes and broadcast
     helios.subscribe((state) => {
         window.parent.postMessage({ type: 'HELIOS_STATE', state }, '*');
     });
-    // 3. Announce readiness immediately (in case parent is already listening)
-    // This helps when the iframe reloads or connects after the parent has already set up listeners
-    window.parent.postMessage({ type: 'HELIOS_READY' }, '*');
 }
 async function handleCaptureFrame(helios, data) {
     const { frame, selector } = data;

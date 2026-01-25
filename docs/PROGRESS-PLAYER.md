@@ -1,5 +1,8 @@
 # PLAYER Progress Log
 
+## PLAYER v0.3.3
+- ✅ Completed: Sync player state with engine state - Updated Bridge Protocol to include initial state in handshake.
+
 ## PLAYER v0.3.2
 - ✅ Completed: Variable Speed - Added `setPlaybackRate` to `HeliosController` and Speed Selector UI to `<helios-player>`.
 

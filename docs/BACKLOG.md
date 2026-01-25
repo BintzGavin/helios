@@ -17,7 +17,7 @@
 
 ### 3. In-Browser Player Polish
 - [x] Ensure `<helios-player>` works with `HeliosEngine`.
-- [ ] Sync player state with engine state.
+- [x] Sync player state with engine state.
 - [x] Implement robust Client-Side Export (WebCodecs) using the correct `seek` mechanism.
 - [ ] Add proper UI feedback for "Loading" state.
 

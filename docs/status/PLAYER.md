@@ -1,4 +1,4 @@
-**Version**: 0.3.2
+**Version**: 0.3.3
 
 # Status: PLAYER
 
@@ -18,6 +18,7 @@
 - **None**: Feature complete.
 
 ## Backlog
+- [x] Sync player state with engine state (Bridge Initialization Fix).
 - [x] Implement Variable Playback Speed controls (API + UI).
 - [x] Refactor `HeliosPlayer` to support `window.helios`.
 - [x] Implement robust Client-Side Export (WebCodecs) using the correct `seek` mechanism.
@@ -32,3 +33,4 @@
 [v0.3.0] ✅ Completed: Export Config - Added `export-mode` and `canvas-selector` attributes for explicit export control.
 [v0.3.1] ✅ Completed: Loading UI - Verified implementation of loading and error state overlays.
 [v0.3.2] ✅ Completed: Variable Speed - Added `setPlaybackRate` to `HeliosController` and Speed Selector UI to `<helios-player>`.
+[v0.3.3] ✅ Completed: Sync player state with engine state - Updated Bridge Protocol to include initial state in handshake.
