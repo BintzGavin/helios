@@ -47,9 +47,29 @@ export class Helios {
   private _playbackRate: Signal<number>;
 
   // Public Readonly Signals
+
+  /**
+   * Signal for the current frame number.
+   * Can be subscribed to for reactive updates.
+   */
   public get currentFrame(): ReadonlySignal<number> { return this._currentFrame; }
+
+  /**
+   * Signal for the playback state (playing or paused).
+   * Can be subscribed to for reactive updates.
+   */
   public get isPlaying(): ReadonlySignal<boolean> { return this._isPlaying; }
+
+  /**
+   * Signal for the input properties.
+   * Can be subscribed to for reactive updates.
+   */
   public get inputProps(): ReadonlySignal<Record<string, any>> { return this._inputProps; }
+
+  /**
+   * Signal for the playback rate (speed multiplier).
+   * Can be subscribed to for reactive updates.
+   */
   public get playbackRate(): ReadonlySignal<number> { return this._playbackRate; }
 
   // Other internals

@@ -1,5 +1,8 @@
 # CORE Progress Log
 
+## CORE v1.11.1
+- ✅ Completed: Refactor Helios Signals - Added JSDoc documentation to public signal properties and verified signal implementation.
+
 ## CORE v1.11.0
 - ✅ Completed: Implement Easing Functions - Implemented standard easing functions (linear, quad, cubic, quart, quint, sine, expo, circ, back, elastic, bounce) and cubic-bezier solver.
 
