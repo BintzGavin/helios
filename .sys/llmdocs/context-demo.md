@@ -6,6 +6,7 @@
 - **animation-helpers**: Vanilla JS example demonstrating `interpolate` and `spring` helpers.
 - **react-canvas-animation**: React example using `useVideoFrame` hook and Canvas Strategy.
 - **react-dom-animation**: React example using `useVideoFrame` hook and DOM Strategy.
+- **react-animation-helpers**: React example demonstrating `<Sequence>` and Context-based timing (DOM).
 - **vue-canvas-animation**: Vue example using Canvas Strategy.
 - **vue-dom-animation**: Vue example using DOM Strategy.
 - **svelte-canvas-animation**: Svelte example using Canvas Strategy.
@@ -16,7 +17,7 @@
 ## B. Build Config
 - **Root**: `vite.config.js` for dev server.
 - **Examples Build**: `vite.build-example.config.js` builds all examples into `output/example-build/`.
-  - Inputs: `simple_canvas`, `simple_dom`, `animation_helpers`, `react_composition`, `react_dom`, `vue_composition`, `vue_dom`, `svelte_composition`, `svelte_dom`, `threejs_composition`, `pixi_composition`.
+  - Inputs: `simple_canvas`, `simple_dom`, `animation_helpers`, `react_composition`, `react_dom`, `react_helpers`, `vue_composition`, `vue_dom`, `svelte_composition`, `svelte_dom`, `threejs_composition`, `pixi_composition`.
   - Output: `output/example-build/examples/<example>/composition.html`.
 
 ## C. E2E Tests

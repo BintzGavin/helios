@@ -25,6 +25,7 @@ export default defineConfig({
         threejs_composition: resolve(__dirname, "examples/threejs-canvas-animation/composition.html"),
         pixi_composition: resolve(__dirname, "examples/pixi-canvas-animation/composition.html"),
         animation_helpers: resolve(__dirname, "examples/animation-helpers/composition.html"),
+        react_helpers: resolve(__dirname, "examples/react-animation-helpers/composition.html"),
       },
     },
   },
