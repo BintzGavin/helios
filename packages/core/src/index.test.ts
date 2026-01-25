@@ -42,6 +42,19 @@ describe('Helios Core', () => {
     expect(spy).toHaveBeenLastCalledWith(expect.objectContaining({ currentFrame: 10 }));
   });
 
+  it('should allow unsubscribing via unsubscribe method', () => {
+    const helios = new Helios({ duration: 10, fps: 30 });
+    const spy = vi.fn();
+    helios.subscribe(spy);
+
+    helios.seek(10);
+    expect(spy).toHaveBeenCalledTimes(2); // Initial + seek
+
+    helios.unsubscribe(spy);
+    helios.seek(20);
+    expect(spy).toHaveBeenCalledTimes(2); // Should not increase
+  });
+
   describe('Constructor Validation', () => {
     it('should throw if duration is negative', () => {
       expect(() => new Helios({ duration: -1, fps: 30 })).toThrow("Duration must be non-negative");
