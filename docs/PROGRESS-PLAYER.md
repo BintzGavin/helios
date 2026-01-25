@@ -1,5 +1,8 @@
 # PLAYER Progress Log
 
+## PLAYER v0.5.1
+- ✅ Completed: Standard Attributes - Implemented `autoplay`, `loop`, and `controls` attributes. Synced version and artifacts.
+
 ## PLAYER v0.5.0
 - ✅ Completed: Dynamic Sizing - Implemented `observedAttributes` for `src`, `width`, and `height` to allow dynamic player updates.
 

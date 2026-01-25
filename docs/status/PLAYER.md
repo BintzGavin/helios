@@ -1,4 +1,4 @@
-**Version**: 0.5.0
+**Version**: 0.5.1
 
 # Status: PLAYER
 
@@ -18,6 +18,8 @@
 
 ## Critical Task
 - **None**: Recent critical task completed. Await next assignment.
+
+[v0.5.1] ✅ Completed: Standard Attributes - Implemented `autoplay`, `loop`, and `controls` attributes. Synced version and artifacts.
 
 ## Backlog
 - [x] Implement Dynamic Sizing & Reactive Attributes.
