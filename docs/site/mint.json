@@ -1,0 +1,64 @@
+{
+  "name": "Helios Engine",
+  "logo": {
+    "light": "/logo/light.svg",
+    "dark": "/logo/dark.svg"
+  },
+  "favicon": "/favicon.png",
+  "colors": {
+    "primary": "#3770FF",
+    "light": "#3770FF",
+    "dark": "#3770FF"
+  },
+  "navigation": [
+    {
+      "group": "Getting Started",
+      "pages": [
+        "getting-started/quickstart",
+        "getting-started/installation",
+        "getting-started/first-steps"
+      ]
+    },
+    {
+      "group": "Guides",
+      "pages": [
+        "guides/creating-compositions",
+        "guides/rendering-videos",
+        "guides/using-the-player"
+      ]
+    },
+    {
+      "group": "Examples",
+      "pages": [
+        "examples/react-example",
+        "examples/vue-example",
+        "examples/canvas-example",
+        "examples/threejs-example"
+      ]
+    },
+    {
+      "group": "API Reference",
+      "pages": [
+        "api/core",
+        "api/player",
+        "api/renderer"
+      ]
+    },
+    {
+      "group": "Architecture",
+      "pages": [
+        "architecture/overview"
+      ]
+    },
+    {
+      "group": "Changelog",
+      "pages": [
+        "changelog/core",
+        "changelog/player",
+        "changelog/renderer",
+        "changelog/demo",
+        "changelog/studio"
+      ]
+    }
+  ]
+}
