@@ -11,6 +11,7 @@
 - `examples/vue-dom-animation`: Vue with DOM elements.
 - `examples/svelte-canvas-animation`: Svelte with Canvas.
 - `examples/svelte-dom-animation`: Svelte with DOM elements.
+- `examples/svelte-animation-helpers`: Svelte demonstrating `<Sequence>` pattern.
 - `examples/threejs-canvas-animation`: Three.js integration.
 - `examples/pixi-canvas-animation`: Pixi.js integration.
 
@@ -21,4 +22,4 @@
 
 ## Section C: E2E Tests
 - `tests/e2e/verify-render.ts`: Script using Playwright and Renderer to verify that examples render correctly to video.
-- Verified cases: Canvas, DOM (partial), React, Vue, Svelte, ThreeJS, Pixi, Helpers.
+- Verified cases: Canvas, DOM (partial), React, Vue, Svelte, ThreeJS, Pixi, Helpers, React Helpers, Svelte Helpers.
