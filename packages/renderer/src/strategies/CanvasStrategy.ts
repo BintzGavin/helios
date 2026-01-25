@@ -230,7 +230,15 @@ export class CanvasStrategy implements RenderStrategy {
       ? ['-f', 'ivf', '-i', '-']
       : ['-f', 'image2pipe', '-framerate', `${options.fps}`, '-i', '-'];
 
-    const audioInputArgs = options.audioFilePath ? ['-i', options.audioFilePath] : [];
+    let audioInputArgs: string[] = [];
+    if (options.audioFilePath) {
+      if (options.startFrame && options.startFrame > 0) {
+        const startTime = options.startFrame / options.fps;
+        audioInputArgs = ['-ss', startTime.toString(), '-i', options.audioFilePath];
+      } else {
+        audioInputArgs = ['-i', options.audioFilePath];
+      }
+    }
 
     const audioOutputArgs = options.audioFilePath
       ? ['-c:a', 'aac', '-map', '0:v', '-map', '1:a', '-shortest']
