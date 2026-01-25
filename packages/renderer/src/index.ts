@@ -74,6 +74,7 @@ export class Renderer {
       const ffmpegPath = ffmpeg.path;
       const totalFrames = this.options.durationInSeconds * this.options.fps;
       const fps = this.options.fps;
+      const startFrame = this.options.startFrame || 0;
 
       const args = this.strategy.getFFmpegArgs(this.options, outputPath);
 
@@ -138,8 +139,8 @@ export class Renderer {
              jobOptions.onProgress(i / totalFrames);
           }
 
-          const timeInSeconds = i / fps;
-          await this.timeDriver.setTime(page, timeInSeconds);
+          const compositionTimeInSeconds = (startFrame + i) / fps;
+          await this.timeDriver.setTime(page, compositionTimeInSeconds);
 
           const buffer = await this.strategy.capture(page, time);
 

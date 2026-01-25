@@ -13,6 +13,12 @@ export interface RendererOptions {
   mode?: 'canvas' | 'dom';
 
   /**
+   * The frame to start rendering from. Defaults to 0.
+   * Useful for rendering a range of frames (distributed rendering).
+   */
+  startFrame?: number;
+
+  /**
    * Path to an audio file to include in the output video.
    * If provided, the audio will be mixed with the video.
    */

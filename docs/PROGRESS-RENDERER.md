@@ -1,5 +1,8 @@
 # RENDERER Progress Log
 
+## RENDERER v1.5.0
+- ✅ Completed: Implement Range Rendering - Added `startFrame` to `RendererOptions`, enabling rendering of partial animation ranges (distributed rendering support).
+
 ## RENDERER v1.4.1
 - ✅ Completed: Fix DOM Time Driver - Implemented conditional usage of `SeekTimeDriver` for `dom` mode rendering, resolving compatibility issues with `CdpTimeDriver` and `page.screenshot`.
 

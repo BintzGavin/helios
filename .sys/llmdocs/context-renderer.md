@@ -44,6 +44,7 @@ interface RendererOptions {
   fps: number;
   durationInSeconds: number;
   mode?: 'canvas' | 'dom'; // Defaults to 'canvas'
+  startFrame?: number; // Start rendering from this frame (distributed rendering)
   audioFilePath?: string; // Path to audio file to mix
 }
 
@@ -89,3 +90,4 @@ If `audioFilePath` is present, adds input `1` and maps it:
 ```
 -i [AUDIO_PATH] ... -c:a aac -map 0:v -map 1:a -shortest
 ```
+If `startFrame` is > 0, the audio input is pre-seeked using `-ss [TIME]`.
