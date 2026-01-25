@@ -1,4 +1,4 @@
-**Version**: 0.6.0
+**Version**: 0.7.0
 
 # Studio Domain Status
 
@@ -7,6 +7,7 @@
 **Focus**: UI Implementation & CLI
 
 ## Recent Updates
+- [v0.7.0] ✅ Completed: Implement Renders Panel - Added RendersPanel, Sidebar (tabs), and mock render job management in StudioContext.
 - [v0.6.0] ✅ Completed: Implement Assets Panel - Added AssetsPanel, AssetItem, and mock assets in StudioContext.
 - [v0.5.0] ✅ Completed: Implement Stage & Canvas Controls - Created Stage component with Pan/Zoom/Transparency controls and refactored App.tsx to use it.
 - [v0.4.0] ✅ Completed: Implement Playback Controls - Centralized player state in StudioContext, added Play/Pause/Rewind/Loop controls, and refactored Timeline/PropsEditor.

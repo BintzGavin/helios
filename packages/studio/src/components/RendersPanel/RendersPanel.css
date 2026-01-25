@@ -1,0 +1,66 @@
+.renders-panel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 8px;
+  gap: 8px;
+  overflow-y: auto;
+}
+
+.render-job {
+  background-color: #252526;
+  border: 1px solid #333;
+  border-radius: 4px;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.render-job-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.render-job-status {
+  font-size: 10px;
+  padding: 2px 4px;
+  border-radius: 2px;
+  text-transform: uppercase;
+}
+
+.status-queued { background-color: #555; color: #ccc; }
+.status-rendering { background-color: #007acc; color: #fff; }
+.status-completed { background-color: #4caf50; color: #fff; }
+.status-failed { background-color: #f44336; color: #fff; }
+
+.render-progress-bar {
+  height: 4px;
+  background-color: #333;
+  border-radius: 2px;
+  overflow: hidden;
+  margin-top: 4px;
+}
+
+.render-progress-fill {
+  height: 100%;
+  background-color: #007acc;
+  transition: width 0.3s ease;
+}
+
+.start-render-btn {
+  background-color: #007acc;
+  color: white;
+  border: none;
+  padding: 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.start-render-btn:hover {
+  background-color: #005f9e;
+}

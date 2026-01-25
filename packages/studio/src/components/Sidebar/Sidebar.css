@@ -1,0 +1,44 @@
+.studio-sidebar {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background-color: #1e1e1e;
+  border-right: 1px solid #333;
+}
+
+.sidebar-tabs {
+  display: flex;
+  background-color: #252526;
+  border-bottom: 1px solid #333;
+}
+
+.sidebar-tab {
+  flex: 1;
+  padding: 10px;
+  background: none;
+  border: none;
+  color: #888;
+  cursor: pointer;
+  font-size: 12px;
+  text-transform: uppercase;
+  font-weight: bold;
+  text-align: center;
+  outline: none;
+}
+
+.sidebar-tab:hover {
+  color: #ccc;
+  background-color: #2a2d2e;
+}
+
+.sidebar-tab.active {
+  color: #fff;
+  background-color: #1e1e1e;
+  border-bottom: 2px solid #007acc;
+}
+
+.sidebar-content {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+}

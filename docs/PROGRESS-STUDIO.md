@@ -1,5 +1,8 @@
 # Studio Progress Log
 
+## STUDIO v0.7.0
+- ✅ Completed: Implement Renders Panel - Added RendersPanel, Sidebar (tabs), and mock render job management in StudioContext.
+
 ## STUDIO v0.6.0
 - ✅ Completed: Implement Assets Panel - Added AssetsPanel, AssetItem, and mock assets in StudioContext.
 
