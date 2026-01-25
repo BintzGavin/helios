@@ -25,3 +25,7 @@
 ## 2026-01-24 - Critical Timing Bug Discovered
 **Learning:** The `tick` method was blindly incrementing `currentFrame + 1` on every `requestAnimationFrame` callback. This ties playback speed to the user's monitor refresh rate (e.g., 60Hz vs 144Hz) rather than the configured `fps`.
 **Action:** Planned `2026-01-24-CORE-PlaybackRate.md` to switch to a Delta-Time based ticking system (`performance.now()`) to ensure consistent playback speed across devices.
+
+## 2026-01-25 - TimeDriver Abstraction Needed
+**Learning:** The `Helios` class hardcodes `requestAnimationFrame` and `performance.now()`. This couples the core logic to the browser environment and makes testing time-dependent logic brittle. The README Roadmap explicitly calls for a `TimeDriver` abstraction to decouple this.
+**Action:** Prioritize "Architecture Hardening: TimeDriver" in future planning cycles to improve testability and portability (e.g., for Node.js rendering).
