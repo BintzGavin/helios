@@ -139,33 +139,44 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     }
   }, [playerState.duration, playerState.fps, outPoint]);
 
-  const startRender = (compositionId: string, options?: { inPoint: number; outPoint: number }) => {
-    const newJob: RenderJob = {
-      id: Date.now().toString(),
-      status: 'queued',
-      progress: 0,
-      compositionId,
-      createdAt: Date.now(),
-      inPoint: options?.inPoint,
-      outPoint: options?.outPoint
-    };
-    setRenderJobs(prev => [newJob, ...prev]);
+  const fetchJobs = () => {
+    fetch('/api/jobs')
+      .then(res => res.json())
+      .then((data: RenderJob[]) => setRenderJobs(data))
+      .catch(console.error);
+  };
 
-    // Mock simulation
-    setTimeout(() => {
-      setRenderJobs(prev => prev.map(j => j.id === newJob.id ? { ...j, status: 'rendering' } : j));
+  // Poll for jobs
+  useEffect(() => {
+    fetchJobs();
+    const interval = setInterval(fetchJobs, 1000);
+    return () => clearInterval(interval);
+  }, []);
 
-      let progress = 0;
-      const interval = setInterval(() => {
-        progress += 0.1;
-        setRenderJobs(prev => prev.map(j => j.id === newJob.id ? { ...j, progress: Math.min(progress, 1) } : j));
+  const startRender = async (compositionId: string, options?: { inPoint: number; outPoint: number }) => {
+    const comp = compositions.find(c => c.id === compositionId);
+    if (!comp) return;
 
-        if (progress >= 1) {
-          clearInterval(interval);
-          setRenderJobs(prev => prev.map(j => j.id === newJob.id ? { ...j, status: 'completed', progress: 1 } : j));
-        }
-      }, 500);
-    }, 1000);
+    const { fps, duration } = playerState;
+
+    try {
+      await fetch('/api/render', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          compositionUrl: comp.url,
+          fps,
+          duration,
+          width: 1920, // TODO: Get from player state/config
+          height: 1080,
+          inPoint: options?.inPoint,
+          outPoint: options?.outPoint
+        })
+      });
+      fetchJobs();
+    } catch (err) {
+      console.error('Failed to start render:', err);
+    }
   };
 
   const [controller, setController] = useState<HeliosController | null>(null);
