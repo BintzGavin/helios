@@ -1,4 +1,4 @@
-**Version**: 1.1.0
+**Version**: 1.1.1
 
 # Renderer Agent Status
 
@@ -9,3 +9,4 @@
 - [1.0.1] ✅ Completed: Implement DomStrategy Preloading - Implemented `DomStrategy.prepare()` to wait for fonts and images to load before rendering, preventing visual artifacts.
 - [1.0.2] ✅ Completed: Fix DomStrategy Preloading Implementation - Added missing build config and render script, enabling proper verification of the preloading strategy.
 - [1.1.0] ✅ Completed: Implement Progress and Cancellation - Added `RenderJobOptions` with `onProgress` callback and `AbortSignal` support to `Renderer.render`, enabling UIs to track progress and cancel long-running jobs.
+- [1.1.1] ✅ Completed: Refactor TimeDriver - Decoupled time advancement logic from RenderStrategy into a dedicated TimeDriver interface, preparing for CDP integration.
