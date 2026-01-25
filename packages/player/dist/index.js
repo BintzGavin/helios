@@ -136,6 +136,19 @@ template.innerHTML = `
       outline: none;
       border-color: #007bff;
     }
+    .fullscreen-btn {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 20px;
+      cursor: pointer;
+      width: 40px;
+      height: 40px;
+      margin-left: 8px;
+    }
+    .fullscreen-btn:hover {
+      color: #007bff;
+    }
   </style>
   <div class="status-overlay" part="overlay">
     <div class="status-text">Connecting...</div>
@@ -153,6 +166,7 @@ template.innerHTML = `
     </select>
     <input type="range" class="scrubber" min="0" value="0" step="1" part="scrubber">
     <div class="time-display" part="time-display">0.00 / 0.00</div>
+    <button class="fullscreen-btn" part="fullscreen-button">⛶</button>
   </div>
 `;
 export class HeliosPlayer extends HTMLElement {
@@ -165,6 +179,7 @@ export class HeliosPlayer extends HTMLElement {
     statusText;
     retryBtn;
     speedSelector;
+    fullscreenBtn;
     controller = null;
     // Keep track if we have direct access (optional, mainly for debugging/logging)
     directHelios = null;
@@ -187,6 +202,7 @@ export class HeliosPlayer extends HTMLElement {
         this.statusText = this.shadowRoot.querySelector(".status-text");
         this.retryBtn = this.shadowRoot.querySelector(".retry-btn");
         this.speedSelector = this.shadowRoot.querySelector(".speed-selector");
+        this.fullscreenBtn = this.shadowRoot.querySelector(".fullscreen-btn");
         this.retryBtn.onclick = () => this.retryConnection();
     }
     attributeChangedCallback(name, oldVal, newVal) {
@@ -207,12 +223,16 @@ export class HeliosPlayer extends HTMLElement {
         }
     }
     connectedCallback() {
+        this.setAttribute("tabindex", "0");
         this.iframe.addEventListener("load", this.handleIframeLoad);
         window.addEventListener("message", this.handleWindowMessage);
+        this.addEventListener("keydown", this.handleKeydown);
+        document.addEventListener("fullscreenchange", this.updateFullscreenUI);
         this.playPauseBtn.addEventListener("click", this.togglePlayPause);
         this.scrubber.addEventListener("input", this.handleScrubberInput);
         this.exportBtn.addEventListener("click", this.renderClientSide);
         this.speedSelector.addEventListener("change", this.handleSpeedChange);
+        this.fullscreenBtn.addEventListener("click", this.toggleFullscreen);
         // Initial state: disabled until connected
         this.setControlsDisabled(true);
         // Only show connecting if we haven't already shown "Loading..." via attributeChangedCallback
@@ -225,10 +245,13 @@ export class HeliosPlayer extends HTMLElement {
     disconnectedCallback() {
         this.iframe.removeEventListener("load", this.handleIframeLoad);
         window.removeEventListener("message", this.handleWindowMessage);
+        this.removeEventListener("keydown", this.handleKeydown);
+        document.removeEventListener("fullscreenchange", this.updateFullscreenUI);
         this.playPauseBtn.removeEventListener("click", this.togglePlayPause);
         this.scrubber.removeEventListener("input", this.handleScrubberInput);
         this.exportBtn.removeEventListener("click", this.renderClientSide);
         this.speedSelector.removeEventListener("change", this.handleSpeedChange);
+        this.fullscreenBtn.removeEventListener("click", this.toggleFullscreen);
         if (this.unsubscribe) {
             this.unsubscribe();
         }
@@ -241,6 +264,7 @@ export class HeliosPlayer extends HTMLElement {
         this.playPauseBtn.disabled = disabled;
         this.scrubber.disabled = disabled;
         this.speedSelector.disabled = disabled;
+        this.fullscreenBtn.disabled = disabled;
         // Export is managed separately based on connection state
         if (disabled) {
             this.exportBtn.disabled = true;
@@ -360,6 +384,62 @@ export class HeliosPlayer extends HTMLElement {
     handleSpeedChange = () => {
         if (this.controller) {
             this.controller.setPlaybackRate(parseFloat(this.speedSelector.value));
+        }
+    };
+    handleKeydown = (e) => {
+        // Ignore if we are not the target (e.g. bubbling from inside)
+        if (e.composedPath()[0] !== this)
+            return;
+        if (!this.controller)
+            return;
+        switch (e.key) {
+            case " ":
+            case "k":
+            case "K":
+                e.preventDefault(); // Prevent scrolling
+                this.togglePlayPause();
+                break;
+            case "f":
+            case "F":
+                this.toggleFullscreen();
+                break;
+            case "ArrowRight":
+            case "l":
+            case "L":
+                this.seekRelative(10);
+                break;
+            case "ArrowLeft":
+            case "j":
+            case "J":
+                this.seekRelative(-10);
+                break;
+        }
+    };
+    seekRelative(frames) {
+        if (!this.controller)
+            return;
+        const state = this.controller.getState();
+        const newFrame = Math.max(0, Math.min(Math.floor(state.duration * state.fps), state.currentFrame + frames));
+        this.controller.seek(newFrame);
+    }
+    toggleFullscreen = () => {
+        if (!document.fullscreenElement) {
+            this.requestFullscreen().catch((err) => {
+                console.error(`Error attempting to enable fullscreen: ${err.message}`);
+            });
+        }
+        else {
+            document.exitFullscreen();
+        }
+    };
+    updateFullscreenUI = () => {
+        if (document.fullscreenElement === this) {
+            this.fullscreenBtn.textContent = "↙";
+            this.fullscreenBtn.title = "Exit Fullscreen";
+        }
+        else {
+            this.fullscreenBtn.textContent = "⛶";
+            this.fullscreenBtn.title = "Fullscreen";
         }
     };
     updateUI(state) {

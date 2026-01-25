@@ -27,6 +27,7 @@ The `<helios-player>` Web Component encapsulates the playback environment and UI
     <select class="speed-selector" part="speed-selector">...</select>
     <input type="range" class="scrubber" part="scrubber">
     <div class="time-display" part="time-display">...</div>
+    <button class="fullscreen-btn" part="fullscreen-button">...</button>
   </div>
 </shadow-root>
 ```
@@ -45,6 +46,12 @@ The `<helios-player>` Web Component encapsulates the playback environment and UI
 **Note:** If `width` and `height` are provided, the player sets an inline `aspect-ratio` style. If omitted, the default aspect ratio is 16:9, unless overridden by external CSS (in which case the inline style is removed).
 
 ## C. Public API
+
+The element supports the following keyboard shortcuts when focused (or when mouse is over it):
+- **Space / K**: Toggle Play/Pause.
+- **F**: Toggle Fullscreen.
+- **ArrowRight / L**: Seek forward 10 frames.
+- **ArrowLeft / J**: Seek backward 10 frames.
 
 The element exposes a `getController()` method:
 

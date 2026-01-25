@@ -10,6 +10,7 @@ export declare class HeliosPlayer extends HTMLElement {
     private statusText;
     private retryBtn;
     private speedSelector;
+    private fullscreenBtn;
     private controller;
     private directHelios;
     private unsubscribe;
@@ -28,6 +29,10 @@ export declare class HeliosPlayer extends HTMLElement {
     private togglePlayPause;
     private handleScrubberInput;
     private handleSpeedChange;
+    private handleKeydown;
+    private seekRelative;
+    private toggleFullscreen;
+    private updateFullscreenUI;
     private updateUI;
     private showStatus;
     private hideStatus;
