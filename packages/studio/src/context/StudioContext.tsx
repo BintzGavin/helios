@@ -31,6 +31,7 @@ export interface PlayerState {
   currentFrame: number;
   duration: number;
   fps: number;
+  playbackRate: number;
   isPlaying: boolean;
   inputProps: Record<string, any>;
 }
@@ -39,6 +40,7 @@ const DEFAULT_PLAYER_STATE: PlayerState = {
   currentFrame: 0,
   duration: 0,
   fps: 30,
+  playbackRate: 1,
   isPlaying: false,
   inputProps: {}
 };
@@ -67,7 +69,7 @@ interface StudioContextType {
   controller: HeliosController | null;
   setController: (controller: HeliosController | null) => void;
   playerState: PlayerState;
-  setPlayerState: (state: PlayerState) => void;
+  setPlayerState: (state: Partial<PlayerState> | ((prev: PlayerState) => PlayerState)) => void;
 
   // Studio UI State
   loop: boolean;
@@ -81,25 +83,25 @@ const MOCK_COMPOSITIONS: Composition[] = [
   {
     id: 'simple-canvas',
     name: 'Simple Canvas Animation',
-    url: 'http://localhost:5173/examples/simple-canvas-animation/index.html',
+    url: 'http://localhost:5173/examples/simple-canvas-animation/composition.html',
     description: 'Basic vanilla JS canvas animation'
   },
   {
     id: 'react-canvas',
     name: 'React Composition',
-    url: 'http://localhost:5173/examples/react-canvas-animation/index.html',
+    url: 'http://localhost:5173/examples/react-canvas-animation/composition.html',
     description: 'Canvas animation using React'
   },
   {
     id: 'svelte-canvas',
     name: 'Svelte Composition',
-    url: 'http://localhost:5173/examples/svelte-canvas-animation/index.html',
+    url: 'http://localhost:5173/examples/svelte-canvas-animation/composition.html',
     description: 'Canvas animation using Svelte'
   },
   {
     id: 'threejs',
     name: 'Three.js Cube',
-    url: 'http://localhost:5173/examples/threejs-canvas-animation/index.html',
+    url: 'http://localhost:5173/examples/threejs-canvas-animation/composition.html',
     description: '3D cube using Three.js'
   }
 ];
@@ -135,7 +137,18 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
   const [inPoint, setInPoint] = useState(0);
   const [outPoint, setOutPoint] = useState(0);
-  const [playerState, setPlayerState] = useState<PlayerState>(DEFAULT_PLAYER_STATE);
+  const [playerState, _setPlayerState] = useState<PlayerState>(DEFAULT_PLAYER_STATE);
+
+  const setPlayerState = (newState: Partial<PlayerState> | ((prev: PlayerState) => PlayerState)) => {
+    _setPlayerState(prev => {
+      const state = typeof newState === 'function' ? newState(prev) : newState;
+      return {
+        ...prev,
+        ...state,
+        playbackRate: state.playbackRate ?? prev.playbackRate ?? 1
+      };
+    });
+  };
 
   // Reset range when composition changes
   React.useEffect(() => {

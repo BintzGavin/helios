@@ -1,5 +1,8 @@
 # Studio Progress Log
 
+## STUDIO v0.9.0
+- ✅ Completed: Implement Playback Speed Controls - Added speed selector (0.25x to 4x, reverse) and updated StudioContext state management.
+
 ## STUDIO v0.8.0
 - ✅ Completed: Implement Timeline Range Markers - Added draggable in/out markers, keyboard shortcuts ('I'/'O'), and range state management.
 
