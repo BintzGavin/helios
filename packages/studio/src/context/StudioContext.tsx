@@ -15,6 +15,16 @@ export interface Asset {
   type: 'image' | 'video' | 'audio' | 'font' | 'other';
 }
 
+export interface RenderJob {
+  id: string;
+  status: 'queued' | 'rendering' | 'completed' | 'failed';
+  progress: number; // 0-1
+  compositionId: string;
+  outputUrl?: string;
+  error?: string;
+  createdAt: number;
+}
+
 export interface PlayerState {
   currentFrame: number;
   duration: number;
@@ -40,6 +50,10 @@ interface StudioContextType {
 
   // Assets
   assets: Asset[];
+
+  // Render Jobs
+  renderJobs: RenderJob[];
+  startRender: (compositionId: string) => void;
 
   // Player Control
   controller: HeliosController | null;
@@ -109,6 +123,35 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [activeComposition, setActiveComposition] = useState<Composition | null>(MOCK_COMPOSITIONS[0]);
   const [isSwitcherOpen, setSwitcherOpen] = useState(false);
 
+  const [renderJobs, setRenderJobs] = useState<RenderJob[]>([]);
+
+  const startRender = (compositionId: string) => {
+    const newJob: RenderJob = {
+      id: Date.now().toString(),
+      status: 'queued',
+      progress: 0,
+      compositionId,
+      createdAt: Date.now()
+    };
+    setRenderJobs(prev => [newJob, ...prev]);
+
+    // Mock simulation
+    setTimeout(() => {
+      setRenderJobs(prev => prev.map(j => j.id === newJob.id ? { ...j, status: 'rendering' } : j));
+
+      let progress = 0;
+      const interval = setInterval(() => {
+        progress += 0.1;
+        setRenderJobs(prev => prev.map(j => j.id === newJob.id ? { ...j, progress: Math.min(progress, 1) } : j));
+
+        if (progress >= 1) {
+          clearInterval(interval);
+          setRenderJobs(prev => prev.map(j => j.id === newJob.id ? { ...j, status: 'completed', progress: 1 } : j));
+        }
+      }, 500);
+    }, 1000);
+  };
+
   const [controller, setController] = useState<HeliosController | null>(null);
   const [playerState, setPlayerState] = useState<PlayerState>(DEFAULT_PLAYER_STATE);
   const [loop, setLoop] = useState(false);
@@ -124,6 +167,8 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         setActiveComposition,
         isSwitcherOpen,
         setSwitcherOpen,
+        renderJobs,
+        startRender,
         controller,
         setController,
         playerState,
