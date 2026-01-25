@@ -23,6 +23,33 @@ export interface RendererOptions {
    * If provided, the audio will be mixed with the video.
    */
   audioFilePath?: string;
+
+  /**
+   * The video codec to use. Defaults to 'libx264'.
+   */
+  videoCodec?: string;
+
+  /**
+   * The pixel format to use. Defaults to 'yuv420p'.
+   */
+  pixelFormat?: string;
+
+  /**
+   * The Constant Rate Factor (CRF) for quality control.
+   * Lower values mean better quality. Range varies by codec.
+   */
+  crf?: number;
+
+  /**
+   * The encoding preset. Defaults to 'fast' (if supported by codec).
+   */
+  preset?: string;
+
+  /**
+   * The video bitrate (e.g., '5M', '1000k').
+   * If provided, overrides CRF for some codecs.
+   */
+  videoBitrate?: string;
 }
 
 export interface RenderJobOptions {
