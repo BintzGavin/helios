@@ -8,6 +8,7 @@ const CASES = [
   { name: 'React', relativePath: 'examples/react-canvas-animation/composition.html', mode: 'canvas' as const },
   { name: 'Vue', relativePath: 'examples/vue-canvas-animation/composition.html', mode: 'canvas' as const },
   { name: 'Svelte', relativePath: 'examples/svelte-canvas-animation/composition.html', mode: 'canvas' as const },
+  { name: 'ThreeJS', relativePath: 'examples/threejs-canvas-animation/composition.html', mode: 'canvas' as const },
 ];
 
 async function main() {
