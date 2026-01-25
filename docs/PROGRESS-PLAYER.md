@@ -1,5 +1,8 @@
 # PLAYER Progress Log
 
+## PLAYER v0.6.0
+- ✅ Completed: Keyboard & Fullscreen Support - Implemented standard keyboard shortcuts (Space, F, Arrows) and Fullscreen UI/logic.
+
 ## PLAYER v0.5.2
 - ✅ Completed: Scaffold Tests - Added unit test suite for controllers and exporter using Vitest.
 

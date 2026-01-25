@@ -1,4 +1,4 @@
-**Version**: 0.5.2
+**Version**: 0.6.0
 
 # Status: PLAYER
 
@@ -15,10 +15,12 @@
 - Supports variable playback speed via UI and Controller API.
 - Implements Robust DOM Export using XMLSerializer and SVG foreignObject.
 - Supports dynamic sizing via `width`/`height` attributes and `src` changes.
+- **New**: Supports standard keyboard shortcuts (Space/K, F, Arrows) and Fullscreen toggle.
 
 ## Critical Task
 - **None**: Recent critical task completed. Await next assignment.
 
+[v0.6.0] ✅ Completed: Keyboard & Fullscreen Support - Implemented standard keyboard shortcuts (Space, F, Arrows) and Fullscreen UI/logic.
 [v0.5.2] ✅ Completed: Scaffold Tests - Added unit test suite for controllers and exporter using Vitest.
 [v0.5.1] ✅ Completed: Standard Attributes - Implemented `autoplay`, `loop`, and `controls` attributes. Synced version and artifacts.
 
