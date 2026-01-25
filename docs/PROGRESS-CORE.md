@@ -1,5 +1,8 @@
 # CORE Progress Log
 
+## CORE v1.13.0
+- ✅ Completed: Export Types - Exported `HeliosState` and `HeliosSubscriber` types from `packages/core` to improve DX.
+
 ## CORE v1.12.0
 - ✅ Completed: Implement DomDriver - Implemented `DomDriver` to sync WAAPI and HTMLMediaElements, updated `Helios` to use it by default, and deprecated `WaapiDriver`.
 

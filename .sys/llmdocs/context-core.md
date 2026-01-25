@@ -77,6 +77,8 @@ export type HeliosState = {
   inputProps: Record<string, any>;
   playbackRate: number;
 };
+
+export type HeliosSubscriber = (state: HeliosState) => void;
 ```
 
 ## D. Public Methods (Helios)
@@ -104,8 +106,8 @@ class Helios {
     setInputProps(props: Record<string, any>): void;
 
     // Subscription
-    subscribe(callback: (state: HeliosState) => void): () => void;
-    unsubscribe(callback: (state: HeliosState) => void): void;
+    subscribe(callback: HeliosSubscriber): () => void;
+    unsubscribe(callback: HeliosSubscriber): void;
 
     // External Sync
     bindToDocumentTimeline(): void;

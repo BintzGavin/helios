@@ -1,7 +1,7 @@
 import { TimeDriver, WaapiDriver, DomDriver, NoopDriver, Ticker, RafTicker } from './drivers';
 import { signal, effect, Signal, ReadonlySignal } from './signals';
 
-type HeliosState = {
+export type HeliosState = {
   duration: number;
   fps: number;
   currentFrame: number;
@@ -10,7 +10,7 @@ type HeliosState = {
   playbackRate: number;
 };
 
-type Subscriber = (state: HeliosState) => void;
+export type HeliosSubscriber = (state: HeliosState) => void;
 
 export interface HeliosOptions {
   duration: number; // in seconds
@@ -79,7 +79,7 @@ export class Helios {
   private animationScope: HTMLElement | Document = typeof document !== 'undefined' ? document : ({} as Document);
   private driver: TimeDriver;
   private ticker: Ticker;
-  private subscriberMap = new Map<Subscriber, () => void>();
+  private subscriberMap = new Map<HeliosSubscriber, () => void>();
 
   static async diagnose(): Promise<DiagnosticReport> {
     const report: DiagnosticReport = {
@@ -164,7 +164,7 @@ export class Helios {
   }
 
   // --- Subscription ---
-  public subscribe(callback: Subscriber): () => void {
+  public subscribe(callback: HeliosSubscriber): () => void {
     const dispose = effect(() => {
       callback(this.getState());
     });
@@ -174,7 +174,7 @@ export class Helios {
     return () => this.unsubscribe(callback);
   }
 
-  public unsubscribe(callback: Subscriber) {
+  public unsubscribe(callback: HeliosSubscriber) {
     const dispose = this.subscriberMap.get(callback);
     if (dispose) {
       dispose();
