@@ -9,7 +9,7 @@ const assert = (condition: boolean, message: string) => {
 };
 
 const runTest = () => {
-  console.log('Verifying Audio Arguments Generation...');
+  console.log('Verifying Audio Arguments Generation (Ensuring -t is used instead of -shortest)...');
 
   const optionsWithAudio: RendererOptions = {
     width: 1920,
