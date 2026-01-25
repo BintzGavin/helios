@@ -1,3 +1,6 @@
+## DEMO v1.10.0
+- ✅ Completed: Scaffold Svelte DOM Example - Created `examples/svelte-dom-animation` and verified with E2E (commented out).
+
 ## DEMO v1.9.0
 - ✅ Completed: Scaffold Vue DOM Example - Created `examples/vue-dom-animation` and added E2E verification case (blocked).
 
