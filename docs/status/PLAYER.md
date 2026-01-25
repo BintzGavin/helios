@@ -1,4 +1,4 @@
-**Version**: 0.3.3
+**Version**: 0.4.0
 
 # Status: PLAYER
 
@@ -13,6 +13,7 @@
 - Supports sandboxed iframes and cross-origin usage via `postMessage` bridge.
 - Includes visual feedback for loading and error states (connection timeouts).
 - Supports variable playback speed via UI and Controller API.
+- Implements Robust DOM Export using XMLSerializer and SVG foreignObject.
 
 ## Critical Task
 - **None**: Feature complete.
@@ -34,3 +35,4 @@
 [v0.3.1] ✅ Completed: Loading UI - Verified implementation of loading and error state overlays.
 [v0.3.2] ✅ Completed: Variable Speed - Added `setPlaybackRate` to `HeliosController` and Speed Selector UI to `<helios-player>`.
 [v0.3.3] ✅ Completed: Sync player state with engine state - Updated Bridge Protocol to include initial state in handshake.
+[v0.4.0] ✅ Completed: Robust DOM Export - Implemented XMLSerializer/SVG-based DOM capture for high-fidelity export in Direct and Bridge modes.

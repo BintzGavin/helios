@@ -19,7 +19,7 @@
 - [x] Ensure `<helios-player>` works with `HeliosEngine`.
 - [x] Sync player state with engine state.
 - [x] Implement robust Client-Side Export (WebCodecs) using the correct `seek` mechanism.
-- [ ] Add proper UI feedback for "Loading" state.
+- [x] Add proper UI feedback for "Loading" state.
 
 ### 4. Diagnostics and GPU Detection
 - [x] Implement `helios.diagnose()` for environment checks.

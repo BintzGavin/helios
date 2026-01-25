@@ -1,4 +1,5 @@
 import { Helios } from "@helios-project/core";
+import { captureDomToBitmap } from "./features/dom-capture";
 
 export interface HeliosController {
   play(): void;
@@ -33,11 +34,19 @@ export class DirectController implements HeliosController {
          await new Promise<void>(r => this.iframe!.contentWindow!.requestAnimationFrame(() => r()));
       }
 
-      // If mode is DOM, we might need special handling, but for now we focus on Canvas
-      // For DOM, ClientSideExporter has logic that might need to remain there or be moved.
-      // But adhering to the interface:
-
       const doc = this.iframe?.contentDocument || document;
+
+      // Handle DOM mode
+      if (options?.mode === 'dom') {
+          try {
+             const bitmap = await captureDomToBitmap(doc.body);
+             return new VideoFrame(bitmap, { timestamp: (frame / fps) * 1_000_000 });
+          } catch (e) {
+             console.error("DOM capture failed:", e);
+             return null;
+          }
+      }
+
       const selector = options?.selector || 'canvas';
       const canvas = doc.querySelector(selector);
 
@@ -92,12 +101,6 @@ export class BridgeController implements HeliosController {
   }
 
   async captureFrame(frame: number, options?: { selector?: string, mode?: 'canvas' | 'dom' }): Promise<VideoFrame | null> {
-      // Bridge only supports canvas for now
-      if (options?.mode === 'dom') {
-          console.warn("BridgeController does not support DOM export yet.");
-          return null;
-      }
-
       return new Promise((resolve) => {
           const handler = (event: MessageEvent) => {
               if (event.data?.type === 'HELIOS_FRAME_DATA' && event.data.frame === frame) {
@@ -119,7 +122,8 @@ export class BridgeController implements HeliosController {
           this.iframeWindow.postMessage({
               type: 'HELIOS_CAPTURE_FRAME',
               frame,
-              selector: options?.selector
+              selector: options?.selector,
+              mode: options?.mode
           }, '*');
 
           // Timeout
