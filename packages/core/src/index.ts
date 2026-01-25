@@ -1,4 +1,5 @@
 import { TimeDriver, WaapiDriver, NoopDriver } from './drivers';
+import { signal, effect, Signal, ReadonlySignal } from './signals';
 
 type HeliosState = {
   duration: number;
@@ -34,14 +35,30 @@ export * from './sequencing';
 export * from './signals';
 
 export class Helios {
-  private state: HeliosState;
-  private subscribers: Set<Subscriber> = new Set();
+  // Constants
+  public readonly duration: number;
+  public readonly fps: number;
+
+  // Internal Signals
+  private _currentFrame: Signal<number>;
+  private _isPlaying: Signal<boolean>;
+  private _inputProps: Signal<Record<string, any>>;
+  private _playbackRate: Signal<number>;
+
+  // Public Readonly Signals
+  public get currentFrame(): ReadonlySignal<number> { return this._currentFrame; }
+  public get isPlaying(): ReadonlySignal<boolean> { return this._isPlaying; }
+  public get inputProps(): ReadonlySignal<Record<string, any>> { return this._inputProps; }
+  public get playbackRate(): ReadonlySignal<number> { return this._playbackRate; }
+
+  // Other internals
   private animationFrameId: number | null = null;
   private lastFrameTime: number = 0;
   private syncWithDocumentTimeline = false;
   private autoSyncAnimations = false;
   private animationScope: HTMLElement | Document = typeof document !== 'undefined' ? document : ({} as Document);
   private driver: TimeDriver;
+  private subscriberMap = new Map<Subscriber, () => void>();
 
   static async diagnose(): Promise<DiagnosticReport> {
     const report: DiagnosticReport = {
@@ -72,14 +89,15 @@ export class Helios {
       throw new Error("FPS must be greater than 0");
     }
 
-    this.state = {
-      duration: options.duration,
-      fps: options.fps,
-      currentFrame: 0,
-      isPlaying: false,
-      inputProps: options.inputProps || {},
-      playbackRate: options.playbackRate ?? 1,
-    };
+    this.duration = options.duration;
+    this.fps = options.fps;
+
+    // Initialize signals
+    this._currentFrame = signal(0);
+    this._isPlaying = signal(false);
+    this._inputProps = signal(options.inputProps || {});
+    this._playbackRate = signal(options.playbackRate ?? 1);
+
     this.autoSyncAnimations = options.autoSyncAnimations || false;
     if (options.animationScope) {
       this.animationScope = options.animationScope;
@@ -97,14 +115,15 @@ export class Helios {
     this.driver.init(this.animationScope);
   }
 
-  // --- State Management ---
-  private setState(newState: Partial<HeliosState>) {
-    this.state = { ...this.state, ...newState };
-    this.notifySubscribers();
-  }
-
   public getState(): Readonly<HeliosState> {
-    return this.state;
+    return {
+      duration: this.duration,
+      fps: this.fps,
+      currentFrame: this._currentFrame.value,
+      isPlaying: this._isPlaying.value,
+      inputProps: this._inputProps.value,
+      playbackRate: this._playbackRate.value,
+    };
   }
 
   /**
@@ -113,41 +132,43 @@ export class Helios {
    * @param props A record of properties to pass to the composition.
    */
   public setInputProps(props: Record<string, any>) {
-    this.setState({ inputProps: props });
+    this._inputProps.value = props;
   }
 
   public setPlaybackRate(rate: number) {
-    this.setState({ playbackRate: rate });
+    this._playbackRate.value = rate;
   }
 
   // --- Subscription ---
   public subscribe(callback: Subscriber): () => void {
-    this.subscribers.add(callback);
-    callback(this.state); // Immediately notify with current state
+    const dispose = effect(() => {
+      callback(this.getState());
+    });
+
+    this.subscriberMap.set(callback, dispose);
+
     return () => this.unsubscribe(callback);
   }
 
   public unsubscribe(callback: Subscriber) {
-    this.subscribers.delete(callback);
-  }
-
-  private notifySubscribers() {
-    for (const subscriber of this.subscribers) {
-      subscriber(this.state);
+    const dispose = this.subscriberMap.get(callback);
+    if (dispose) {
+      dispose();
+      this.subscriberMap.delete(callback);
     }
   }
 
   // --- Playback Controls ---
   public play() {
-    if (this.state.isPlaying) return;
-    this.setState({ isPlaying: true });
+    if (this._isPlaying.peek()) return;
+    this._isPlaying.value = true;
     this.lastFrameTime = performance.now();
     this.animationFrameId = requestAnimationFrame(this.tick);
   }
 
   public pause() {
-    if (!this.state.isPlaying) return;
-    this.setState({ isPlaying: false });
+    if (!this._isPlaying.peek()) return;
+    this._isPlaying.value = false;
     if (this.animationFrameId) {
       cancelAnimationFrame(this.animationFrameId);
       this.animationFrameId = null;
@@ -155,10 +176,10 @@ export class Helios {
   }
 
   public seek(frame: number) {
-    const newFrame = Math.max(0, Math.min(frame, this.state.duration * this.state.fps));
-    this.setState({ currentFrame: newFrame });
+    const newFrame = Math.max(0, Math.min(frame, this.duration * this.fps));
+    this._currentFrame.value = newFrame;
 
-    this.driver.update((newFrame / this.state.fps) * 1000);
+    this.driver.update((newFrame / this.fps) * 1000);
   }
 
   /**
@@ -180,9 +201,9 @@ export class Helios {
 
         const currentTime = document.timeline.currentTime;
         if (currentTime !== null && typeof currentTime === 'number') {
-            const frame = Math.round((currentTime / 1000) * this.state.fps);
-            if (frame !== this.state.currentFrame) {
-                 this.setState({ currentFrame: frame });
+            const frame = Math.round((currentTime / 1000) * this.fps);
+            if (frame !== this._currentFrame.peek()) {
+                 this._currentFrame.value = frame;
             }
         }
         requestAnimationFrame(poll);
@@ -196,7 +217,7 @@ export class Helios {
   }
 
   private tick = () => {
-    if (!this.state.isPlaying) return;
+    if (!this._isPlaying.peek()) return;
 
     // If we are syncing FROM document.timeline, we shouldn't drive our own loop logic
     // But play() implies we ARE driving.
@@ -213,27 +234,28 @@ export class Helios {
     const deltaTime = now - this.lastFrameTime;
     this.lastFrameTime = now;
 
-    const totalFrames = this.state.duration * this.state.fps;
-    const frameDelta = (deltaTime / 1000) * this.state.fps * this.state.playbackRate;
-    const nextFrame = this.state.currentFrame + frameDelta;
+    const totalFrames = this.duration * this.fps;
+    const playbackRate = this._playbackRate.peek();
+    const frameDelta = (deltaTime / 1000) * this.fps * playbackRate;
+    const nextFrame = this._currentFrame.peek() + frameDelta;
 
-    if (this.state.playbackRate > 0) {
+    if (playbackRate > 0) {
       if (nextFrame >= totalFrames) {
-        this.setState({ currentFrame: totalFrames - 1 });
+        this._currentFrame.value = totalFrames - 1;
         this.pause();
         return;
       }
     } else {
       if (nextFrame <= 0) {
-        this.setState({ currentFrame: 0 });
+        this._currentFrame.value = 0;
         this.pause();
         return;
       }
     }
 
-    this.setState({ currentFrame: nextFrame });
+    this._currentFrame.value = nextFrame;
 
-    this.driver.update((nextFrame / this.state.fps) * 1000);
+    this.driver.update((nextFrame / this.fps) * 1000);
 
     this.animationFrameId = requestAnimationFrame(this.tick);
   }

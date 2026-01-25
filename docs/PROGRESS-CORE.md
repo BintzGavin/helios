@@ -1,5 +1,8 @@
 # CORE Progress Log
 
+## CORE v1.10.0
+- ✅ Completed: Refactor Helios to use Signals - Replaced internal state with signals, exposed ReadonlySignal getters, and maintained backward compatibility.
+
 ## CORE v1.9.0
 - ✅ Completed: Implement Signals - Implemented `signal`, `computed`, and `effect` primitives with memory safety and consistency guarantees.
 

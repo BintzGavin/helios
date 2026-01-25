@@ -1,23 +1,32 @@
-# Context: CORE
+# CORE Domain Context
 
 ## A. Architecture
-The `packages/core` module is the framework-agnostic engine for Helios. It manages the animation state (timeline, playback status) and driving loop.
-The architecture is evolving from a strict `Helios` class state machine towards a fine-grained reactivity model using **Signals**.
-Currently, `Helios` class manages state via `setState` and notifies a `Set` of subscribers.
-New primitives (`signal`, `computed`, `effect`) are available to support future reactive state management.
+The `packages/core` module is the framework-agnostic engine of Helios. It manages the animation lifecycle, state, and timing.
+
+**Key Concepts:**
+- **Helios Class**: The main entry point. It orchestrates the animation loop and manages state.
+- **Signals**: State management is built on top of a custom Signals implementation (inspired by Preact/Solid), allowing for fine-grained reactivity.
+- **TimeDriver**: An abstraction for the timing source (e.g., WAAPI, RequestAnimationFrame, or external CDP control).
+- **Sequencing**: Pure functions for arranging clips in time.
 
 ## B. File Tree
 ```
 packages/core/src/
-├── animation.ts       # Animation helpers (interpolate, spring)
-├── drivers/           # TimeDriver implementations (WaapiDriver, etc.)
-├── index.ts           # Public API exports
-├── sequencing.ts      # Sequencing primitives (sequence, series)
-└── signals.ts         # Reactivity primitives (signal, computed, effect)
+├── drivers/
+│   ├── index.ts
+│   ├── noop-driver.ts
+│   ├── time-driver.ts
+│   └── waapi-driver.ts
+├── animation.ts
+├── index.ts
+├── sequencing.ts
+└── signals.ts
 ```
 
 ## C. Type Definitions
+
 ```typescript
+// From index.ts
 export interface HeliosOptions {
   duration: number; // in seconds
   fps: number;
@@ -35,6 +44,7 @@ export interface DiagnosticReport {
   userAgent: string;
 }
 
+// From signals.ts
 export interface Signal<T> {
   value: T;
   peek(): T;
@@ -47,26 +57,45 @@ export interface ReadonlySignal<T> {
   subscribe(fn: (value: T) => void): () => void;
 }
 
-export interface Subscription {
-  unsubscribe(): void;
+// From drivers/time-driver.ts
+export interface TimeDriver {
+  init(scope: HTMLElement | Document): void;
+  update(currentTimeMs: number): void;
 }
 ```
 
 ## D. Public Methods
-### `Helios`
-- `constructor(options: HeliosOptions)`
-- `getState(): Readonly<HeliosState>`
-- `setInputProps(props: Record<string, any>): void`
-- `setPlaybackRate(rate: number): void`
-- `subscribe(callback: Subscriber): () => void`
-- `play(): void`
-- `pause(): void`
-- `seek(frame: number): void`
-- `bindToDocumentTimeline(): void`
-- `unbindFromDocumentTimeline(): void`
-- `static diagnose(): Promise<DiagnosticReport>`
 
-### Signals
-- `signal<T>(value: T): Signal<T>`
-- `computed<T>(fn: () => T): ReadonlySignal<T>`
-- `effect(fn: () => void): () => void`
+```typescript
+export class Helios {
+  // Public Signals
+  public get currentFrame(): ReadonlySignal<number>;
+  public get isPlaying(): ReadonlySignal<boolean>;
+  public get inputProps(): ReadonlySignal<Record<string, any>;
+  public get playbackRate(): ReadonlySignal<number>;
+
+  // Properties
+  public readonly duration: number;
+  public readonly fps: number;
+
+  static diagnose(): Promise<DiagnosticReport>;
+
+  constructor(options: HeliosOptions);
+
+  // State Access (Legacy)
+  public getState(): Readonly<HeliosState>;
+
+  // Controls
+  public setInputProps(props: Record<string, any>): void;
+  public setPlaybackRate(rate: number): void;
+  public subscribe(callback: Subscriber): () => void;
+  public unsubscribe(callback: Subscriber): void;
+  public play(): void;
+  public pause(): void;
+  public seek(frame: number): void;
+
+  // External Synchronization
+  public bindToDocumentTimeline(): void;
+  public unbindFromDocumentTimeline(): void;
+}
+```
