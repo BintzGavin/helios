@@ -1,5 +1,8 @@
 # CORE Progress Log
 
+## CORE v1.11.3
+- ✅ Completed: Add Documentation - Created comprehensive `README.md` for `packages/core`.
+
 ## CORE v1.11.2
 - ✅ Completed: Verify Signals and Cleanup Plans - Verified signal integration and cleaned up completed plan files.
 
