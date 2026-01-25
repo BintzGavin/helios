@@ -1,3 +1,6 @@
+## DEMO v1.8.1
+- ✅ Completed: Scaffold React DOM Example - Updated `verify-render.ts` to document blocking issue.
+
 ## DEMO v1.8.0
 - ✅ Completed: Scaffold React DOM Example - Created `examples/react-dom-animation` and added E2E verification case.
 
