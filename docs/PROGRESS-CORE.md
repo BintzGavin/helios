@@ -1,5 +1,8 @@
 # CORE Progress Log
 
+## CORE v1.8.0
+- ✅ Completed: Implement Series Helper - Implemented `series` function for sequential layout of composition elements.
+
 ## CORE v1.7.0
 - ✅ Completed: Implement Sequencing Primitives - Implemented `sequence` function and interfaces in `packages/core`.
 

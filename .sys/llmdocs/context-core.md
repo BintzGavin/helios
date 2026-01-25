@@ -86,6 +86,11 @@ export interface SequenceResult {
   progress: number;
   isActive: boolean;
 }
+
+export interface SeriesItem {
+  durationInFrames: number;
+  offset?: number;
+}
 ```
 
 ## D. Public Methods
@@ -111,4 +116,5 @@ function spring(options: SpringOptions): number;
 
 // Sequencing
 function sequence(options: SequenceOptions): SequenceResult;
+function series<T extends SeriesItem>(items: T[], startFrame?: number): (T & { from: number })[];
 ```

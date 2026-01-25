@@ -48,3 +48,29 @@ export function sequence(options: SequenceOptions): SequenceResult {
     isActive,
   };
 }
+
+export interface SeriesItem {
+  durationInFrames: number;
+  offset?: number;
+}
+
+/**
+ * Calculates a sequence of start frames ('from') for a list of items,
+ * placing them one after another based on their duration.
+ *
+ * @param items Array of items with durationInFrames
+ * @param startFrame Optional starting frame for the sequence (default: 0)
+ * @returns Array of items with 'from' property added
+ */
+export function series<T extends SeriesItem>(items: T[], startFrame = 0): (T & { from: number })[] {
+  let current = startFrame;
+  return items.map((item) => {
+    // Offset shifts the start time of THIS item relative to the end of the PREVIOUS item
+    const from = current + (item.offset || 0);
+
+    // The next item starts after this one ends
+    current = from + item.durationInFrames;
+
+    return { ...item, from };
+  });
+}
