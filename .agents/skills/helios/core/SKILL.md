@@ -5,28 +5,31 @@ description: Core API for Helios video engine. Use when creating compositions, m
 
 # Helios Core API
 
-The `Helios` class is the headless logic engine for video compositions. It manages timeline state and provides frame-accurate control.
+The `Helios` class is the headless logic engine for video compositions. It manages timeline state, provides frame-accurate control, and drives animations.
 
 ## Quick Start
 
 ```typescript
-import { Helios } from '@helios-engine/core';
+import { Helios } from '@helios-project/core';
 
-// Create instance with duration and fps
+// Create instance
 const helios = new Helios({
   duration: 10,  // seconds
-  fps: 30
+  fps: 30,
+  playbackRate: 1,
+  inputProps: { text: "Hello World" }
 });
 
 // Subscribe to state changes
 const unsubscribe = helios.subscribe((state) => {
-  console.log(`Frame: ${state.currentFrame}/${state.duration * state.fps}`);
+  console.log(`Frame: ${state.currentFrame}, Props:`, state.inputProps);
 });
 
 // Control playback
 helios.play();
 helios.pause();
 helios.seek(150);  // Jump to frame 150
+helios.setPlaybackRate(2); // 2x speed
 ```
 
 ## API Reference
@@ -37,16 +40,15 @@ helios.seek(150);  // Jump to frame 150
 new Helios(options: HeliosOptions)
 
 interface HeliosOptions {
-  duration: number;           // Duration in seconds (must be >= 0)
-  fps: number;               // Frames per second (must be > 0)
-  autoSyncAnimations?: boolean;  // Auto-sync DOM animations to timeline
+  duration: number;              // Duration in seconds (must be >= 0)
+  fps: number;                   // Frames per second (must be > 0)
+  autoSyncAnimations?: boolean;  // Auto-sync DOM animations (WAAPI) to timeline
   animationScope?: HTMLElement;  // Scope for animation syncing
+  inputProps?: Record<string, any>; // Initial input properties
+  playbackRate?: number;         // Initial playback rate (default: 1)
+  driver?: TimeDriver;           // Custom time driver (mostly internal use)
 }
 ```
-
-**Throws:**
-- `Error` if `duration < 0`
-- `Error` if `fps <= 0`
 
 ### State
 
@@ -54,57 +56,73 @@ interface HeliosOptions {
 helios.getState(): Readonly<HeliosState>
 
 interface HeliosState {
-  duration: number;     // Duration in seconds
-  fps: number;          // Frames per second
-  currentFrame: number; // Current frame (0 to duration*fps)
-  isPlaying: boolean;   // Playback state
+  duration: number;
+  fps: number;
+  currentFrame: number;
+  isPlaying: boolean;
+  inputProps: Record<string, any>;
+  playbackRate: number;
 }
 ```
 
-### Playback Controls
+### Methods
 
+#### Playback Control
 ```typescript
-helios.play()   // Start playback (no-op if already playing)
-helios.pause()  // Pause playback (no-op if already paused)
-helios.seek(frame: number)  // Jump to specific frame (clamped to valid range)
+helios.play()                 // Start playback
+helios.pause()                // Pause playback
+helios.seek(frame: number)    // Jump to specific frame
+helios.setPlaybackRate(rate: number) // Change playback speed (e.g., 0.5, 2.0)
 ```
 
-### Subscription
-
+#### Data Input
 ```typescript
-// Subscribe - callback fires immediately with current state, then on every change
+helios.setInputProps(props: Record<string, any>) // Update input properties (triggers subscribers)
+```
+
+#### Subscription
+```typescript
+// Callback fires immediately with current state, then on every change
 const unsubscribe = helios.subscribe((state: HeliosState) => {
-  // React to state changes
+  // Render frame based on state
 });
 
-// Unsubscribe when done
+// Cleanup
 unsubscribe();
-
-// Or manually:
-helios.unsubscribe(callback);
 ```
 
-### Timeline Binding
-
-For renderer integration—bind Helios to `document.timeline` when timeline is driven externally:
+#### Timeline Binding
+Bind Helios to `document.timeline` when the timeline is driven externally (e.g., by the Renderer or Studio).
 
 ```typescript
-helios.bindToDocumentTimeline()    // Start polling document.timeline.currentTime
+helios.bindToDocumentTimeline()    // Start polling document.timeline
 helios.unbindFromDocumentTimeline() // Stop polling
 ```
 
-### Diagnostics
+#### Diagnostics
+Check browser capabilities for rendering.
 
 ```typescript
-// Static method - check browser capabilities
 const report = await Helios.diagnose();
 
 interface DiagnosticReport {
   waapi: boolean;         // Web Animations API support
-  webCodecs: boolean;     // VideoEncoder support (for canvas rendering)
+  webCodecs: boolean;     // VideoEncoder support
   offscreenCanvas: boolean;
   userAgent: string;
 }
+```
+
+## Signals (Advanced)
+
+The `Helios` class exposes reactive signals for granular state management.
+
+```typescript
+// Read-only signals
+helios.currentFrame: ReadonlySignal<number>
+helios.isPlaying: ReadonlySignal<boolean>
+helios.inputProps: ReadonlySignal<Record<string, any>>
+helios.playbackRate: ReadonlySignal<number>
 ```
 
 ## Common Patterns
@@ -114,66 +132,32 @@ interface DiagnosticReport {
 ```typescript
 const helios = new Helios({ duration: 5, fps: 60 });
 
-helios.subscribe(({ currentFrame, fps, duration }) => {
-  const totalFrames = duration * fps;
-  const progress = currentFrame / totalFrames;
+helios.subscribe(({ currentFrame, duration, fps }) => {
+  const timeInSeconds = currentFrame / fps;
+  const progress = timeInSeconds / duration; // 0 to 1
   
-  // Use progress (0-1) for animations
-  element.style.opacity = progress;
+  // Update your visualization
+  renderScene(progress);
 });
 ```
 
 ### DOM Animation Sync
 
-Automatically sync CSS/WAAPI animations to Helios timeline:
+Automatically sync CSS/WAAPI animations to Helios timeline.
 
 ```typescript
 const helios = new Helios({
   duration: 10,
   fps: 30,
   autoSyncAnimations: true,
-  animationScope: document.querySelector('.composition')
+  animationScope: document.querySelector('#scene')
 });
 
-// All CSS animations within .composition will sync to helios.seek()
-helios.seek(150);  // Animations jump to 5s mark (150/30fps)
-```
-
-### Composition Component (React)
-
-```typescript
-function useVideoFrame() {
-  const [state, setState] = useState(null);
-  const heliosRef = useRef(null);
-
-  useEffect(() => {
-    heliosRef.current = new Helios({ duration: 10, fps: 30 });
-    const unsub = heliosRef.current.subscribe(setState);
-    return unsub;
-  }, []);
-
-  return { state, helios: heliosRef.current };
-}
-```
-
-## Error Handling
-
-```typescript
-// Invalid options throw immediately
-try {
-  new Helios({ duration: -1, fps: 30 }); // Throws: "Duration must be non-negative"
-} catch (e) {
-  console.error(e.message);
-}
-
-try {
-  new Helios({ duration: 10, fps: 0 }); // Throws: "FPS must be greater than 0"
-} catch (e) {
-  console.error(e.message);
-}
+// CSS animations inside #scene will now sync to helios.seek()
+helios.seek(150);
 ```
 
 ## Source Files
 
 - Main class: `packages/core/src/index.ts`
-- Tests: `packages/core/src/index.test.ts`
+- Signals: `packages/core/src/signals.ts`
