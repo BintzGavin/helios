@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect } from 'react'
 import '@helios-project/player'
 import { StudioLayout } from './components/Layout/StudioLayout'
 import { Panel } from './components/Layout/Panel'
@@ -8,25 +8,17 @@ import { PlaybackControls } from './components/Controls/PlaybackControls'
 import { StudioProvider, useStudio } from './context/StudioContext'
 import { CompositionSwitcher } from './components/CompositionSwitcher'
 import { useKeyboardShortcut } from './hooks/useKeyboardShortcut'
-import type { HeliosController } from '@helios-project/player'
-
-// Helper type for the custom element
-interface HeliosPlayerElement extends HTMLElement {
-  getController(): HeliosController | null;
-}
+import { Stage } from './components/Stage/Stage'
 
 function AppContent() {
   const {
     activeComposition,
     setSwitcherOpen,
     controller,
-    setController,
     playerState,
     setPlayerState,
     loop
   } = useStudio();
-
-  const playerRef = useRef<HeliosPlayerElement>(null);
 
   const src = activeComposition?.url || '';
 
@@ -35,25 +27,6 @@ function AppContent() {
     e.preventDefault();
     setSwitcherOpen(true);
   }, { ctrlOrCmd: true });
-
-  useEffect(() => {
-    const el = playerRef.current;
-    if (!el) return;
-
-    // Reset controller when src changes (element remounts)
-    setController(null);
-
-    // Poll for controller availability
-    const interval = setInterval(() => {
-      const ctrl = el.getController();
-      if (ctrl) {
-        setController(ctrl);
-        clearInterval(interval);
-      }
-    }, 200);
-
-    return () => clearInterval(interval);
-  }, [src, setController]);
 
   useEffect(() => {
     if (!controller) return;
@@ -124,26 +97,7 @@ function AppContent() {
             </div>
           </Panel>
         }
-        stage={
-          <div style={{ width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', background: '#333' }}>
-            {src ? (
-              <helios-player
-                ref={playerRef}
-                key={src}
-                src={src}
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  display: 'block',
-                  maxHeight: '100%',
-                  maxWidth: '100%'
-                }}
-              ></helios-player>
-            ) : (
-              <div style={{ color: '#888' }}>No composition selected</div>
-            )}
-          </div>
-        }
+        stage={<Stage src={src} />}
         inspector={
           <Panel title="Properties">
             <PropsEditor />

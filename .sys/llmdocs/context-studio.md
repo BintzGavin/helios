@@ -8,7 +8,7 @@ The Studio is a React 19 application built with Vite. It serves as the IDE for v
 - **Entry Point**: `packages/studio/index.html` -> `src/main.tsx`
 - **Framework**: React 19
 - **Build Tool**: Vite
-- **Preview**: Integrated via `<helios-player>` web component.
+- **Preview**: Integrated via `<helios-player>` web component, wrapped in a `Stage` component for zoom/pan controls.
 - **State Management**: `StudioContext` provides centralized access to `HeliosController`, player state (frame, playing, props), and Studio settings (loop, active composition).
 
 ## B. File Tree
@@ -32,6 +32,10 @@ packages/studio/
         ├── Timeline.tsx
         ├── Controls/
         │   └── PlaybackControls.tsx
+        ├── Stage/
+        │   ├── Stage.css
+        │   ├── Stage.tsx
+        │   └── StageToolbar.tsx
         └── Layout/
             ├── Panel.tsx
             ├── StudioLayout.css
@@ -60,12 +64,13 @@ Internal scripts:
 - **StudioProvider**: `context/StudioContext.tsx` wraps the application to provide state.
 - **Main Layout**: `App.tsx` initializes the `HeliosController` connection and handles layout composition.
 - **StudioLayout**: `components/Layout/StudioLayout.tsx` defines the grid areas (header, sidebar, stage, inspector, timeline).
+- **Stage**: `components/Stage/Stage.tsx` wraps `<helios-player>`, handling controller connection, zoom, pan, and transparency toggling.
+- **StageToolbar**: `components/Stage/StageToolbar.tsx` provides floating controls for the Stage.
 - **Panel**: `components/Layout/Panel.tsx` is a generic container for UI panels.
 - **Timeline**: `components/Timeline.tsx` provides the scrubber and time display.
 - **PlaybackControls**: `components/Controls/PlaybackControls.tsx` provides Play, Pause, Rewind, and Loop controls.
 - **PropsEditor**: `components/PropsEditor.tsx` provides inputs to modify composition properties (`inputProps`).
 - **CompositionSwitcher**: `components/CompositionSwitcher.tsx` allows switching between active compositions.
-- **Preview Pane**: Uses `<helios-player>` in the stage area, controlled via `HeliosController`.
 
 ## E. Integration
 - **Player**: Imports `@helios-project/player` to register the web component and access `HeliosController`.
