@@ -10,13 +10,15 @@
   },
   "scripts": {
     "build": "tsc",
-    "dev": "tsc -w"
+    "dev": "tsc -w",
+    "test": "vitest"
   },
   "dependencies": {
     "@helios-project/core": "0.0.1",
     "mp4-muxer": "^2.0.1"
   },
   "devDependencies": {
+    "jsdom": "^27.4.0",
     "typescript": "^5.0.0"
   }
 }
