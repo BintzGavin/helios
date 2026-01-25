@@ -1,5 +1,11 @@
 # Studio Progress Log
 
+## STUDIO v0.13.0
+- ✅ Completed: Implement Playback Shortcuts - Added global keyboard shortcuts for playback control with input conflict prevention.
+
+## STUDIO v0.12.0
+- ✅ Completed: Implement Real Rendering - Integrated `@helios-project/renderer` with Studio via Vite plugin API (`/api/render`), enabling real render job execution and progress tracking.
+
 ## STUDIO v0.11.0
 - ✅ Completed: Implement Asset Discovery - Added `findAssets` backend logic, exposed `/api/assets` endpoint, and connected `StudioContext` to fetch real assets from `examples/`.
 

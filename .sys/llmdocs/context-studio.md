@@ -78,7 +78,7 @@ Internal scripts:
 
 ## D. UI Components
 - **StudioProvider**: `context/StudioContext.tsx` wraps the application to provide state, including timeline range and composition data fetched from `/api/compositions`.
-- **Main Layout**: `App.tsx` initializes the `HeliosController` connection and handles layout composition.
+- **Main Layout**: `App.tsx` initializes the `HeliosController` connection, handles layout composition, and manages global playback shortcuts (Space, Arrows, Home).
 - **StudioLayout**: `components/Layout/StudioLayout.tsx` defines the grid areas (header, sidebar, stage, inspector, timeline).
 - **Sidebar**: `components/Sidebar/Sidebar.tsx` manages tabs (Assets, Renders) in the sidebar area.
 - **AssetsPanel**: `components/AssetsPanel/AssetsPanel.tsx` displays a grid of available assets (fetched from `/api/assets`).
@@ -86,7 +86,7 @@ Internal scripts:
 - **Stage**: `components/Stage/Stage.tsx` wraps `<helios-player>`, handling controller connection, zoom, pan, and transparency toggling.
 - **StageToolbar**: `components/Stage/StageToolbar.tsx` provides floating controls for the Stage.
 - **Panel**: `components/Layout/Panel.tsx` is a generic container for UI panels.
-- **Timeline**: `components/Timeline.tsx` provides a visual timeline with draggable in/out markers and keyboard shortcuts.
+- **Timeline**: `components/Timeline.tsx` provides a visual timeline with draggable in/out markers and keyboard shortcuts ('I', 'O').
 - **PlaybackControls**: `components/Controls/PlaybackControls.tsx` provides Play, Pause, Rewind, Loop, and Speed (0.25x - 4x) controls.
 - **PropsEditor**: `components/PropsEditor.tsx` provides inputs to modify composition properties (`inputProps`).
 - **CompositionSwitcher**: `components/CompositionSwitcher.tsx` allows switching between active compositions.

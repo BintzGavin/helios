@@ -63,6 +63,39 @@ function AppContent() {
     }
   }, [playerState, loop, controller]);
 
+  // Global Playback Shortcuts
+
+  // Toggle Play/Pause (Space)
+  useKeyboardShortcut(' ', (e) => {
+    if (!controller) return;
+    if (playerState.isPlaying) {
+      controller.pause();
+    } else {
+      controller.play();
+    }
+  }, { ignoreInput: true, preventDefault: true });
+
+  // Seek -1 Frame (ArrowLeft)
+  useKeyboardShortcut('ArrowLeft', () => {
+    if (!controller) return;
+    const { currentFrame } = playerState;
+    controller.seek(Math.max(0, currentFrame - 1));
+  }, { ignoreInput: true });
+
+  // Seek +1 Frame (ArrowRight)
+  useKeyboardShortcut('ArrowRight', () => {
+    if (!controller) return;
+    const { currentFrame, duration, fps } = playerState;
+    const totalFrames = duration * fps;
+    controller.seek(Math.min(totalFrames, currentFrame + 1));
+  }, { ignoreInput: true });
+
+  // Seek to Start (Home)
+  useKeyboardShortcut('Home', () => {
+    if (!controller) return;
+    controller.seek(0);
+  }, { ignoreInput: true });
+
 
   return (
     <>

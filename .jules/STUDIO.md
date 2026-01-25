@@ -25,3 +25,7 @@
 ## [0.9.0] - Studio Backend Architecture
 **Learning:** To bridge the gap between the static Studio UI and the user's file system, we cannot rely on a separate backend service due to packaging constraints. The solution is to utilize Vite's plugin system to inject API middleware directly into the dev server.
 **Action:** Planned `vite-plugin-studio-api.ts` to provide `/api/compositions` and `/api/assets` endpoints, allowing the frontend to "discover" the project structure without a heavy backend dependency.
+
+## [0.13.0] - Keyboard Shortcut Conflicts
+**Learning:** Global keyboard shortcuts (like Space for play/pause) conflict with text inputs (typing space in an input).
+**Action:** Implemented an `ignoreInput` option in `useKeyboardShortcut` to check `document.activeElement` and return early if the user is typing in `INPUT`, `TEXTAREA`, or `SELECT` elements.

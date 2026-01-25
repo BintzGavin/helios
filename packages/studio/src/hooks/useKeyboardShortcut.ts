@@ -3,7 +3,7 @@ import { useEffect, useRef } from 'react';
 export const useKeyboardShortcut = (
   key: string,
   callback: (e: KeyboardEvent) => void,
-  options: { ctrlOrCmd?: boolean; preventDefault?: boolean } = {}
+  options: { ctrlOrCmd?: boolean; preventDefault?: boolean; ignoreInput?: boolean } = {}
 ) => {
   const callbackRef = useRef(callback);
 
@@ -13,6 +13,13 @@ export const useKeyboardShortcut = (
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
+      if (options.ignoreInput) {
+        const tagName = (document.activeElement as HTMLElement)?.tagName;
+        if (tagName === 'INPUT' || tagName === 'TEXTAREA' || tagName === 'SELECT') {
+          return;
+        }
+      }
+
       if (options.ctrlOrCmd) {
         if (!e.ctrlKey && !e.metaKey) return;
       }
@@ -27,5 +34,5 @@ export const useKeyboardShortcut = (
 
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-  }, [key, options.ctrlOrCmd, options.preventDefault]);
+  }, [key, options.ctrlOrCmd, options.preventDefault, options.ignoreInput]);
 };
