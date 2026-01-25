@@ -47,7 +47,7 @@ export class DomStrategy implements RenderStrategy {
     }
 
     const audioOutputArgs = options.audioFilePath
-      ? ['-c:a', 'aac', '-map', '0:v', '-map', '1:a', '-shortest']
+      ? ['-c:a', 'aac', '-map', '0:v', '-map', '1:a', '-t', options.durationInSeconds.toString()]
       : [];
 
     const outputArgs = [

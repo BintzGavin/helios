@@ -1,5 +1,8 @@
 # RENDERER Progress Log
 
+## RENDERER v1.5.2
+- ✅ Completed: Fix Audio Duration Logic - Replaced `-shortest` with `-t duration` to prevent video truncation when audio is short.
+
 ## RENDERER v1.5.1
 - ✅ Completed: Strict Error Propagation - Implemented "Fail Fast" mechanism to catch page errors, crashes, and WebCodecs failures immediately, and ensure proper FFmpeg process cleanup.
 

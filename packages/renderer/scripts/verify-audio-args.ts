@@ -39,6 +39,9 @@ const runTest = () => {
   assert(argsDomWithAudio.includes('-c:a'), 'DomStrategy should include -c:a');
   assert(argsDomWithAudio.includes('-map'), 'DomStrategy should include -map');
   assert(argsDomWithAudio.includes('1:a'), 'DomStrategy should map audio stream 1:a');
+  assert(argsDomWithAudio.includes('-t'), 'DomStrategy should include -t');
+  assert(argsDomWithAudio.includes('5'), 'DomStrategy should include duration 5');
+  assert(!argsDomWithAudio.includes('-shortest'), 'DomStrategy should NOT include -shortest');
 
   // Case 2: DomStrategy without Audio
   const argsDomNoAudio = domStrategy.getFFmpegArgs(optionsWithoutAudio, outputPath);
@@ -59,6 +62,9 @@ const runTest = () => {
   assert(argsCanvasWithAudio.includes('-c:a'), 'CanvasStrategy should include -c:a');
   assert(argsCanvasWithAudio.includes('-map'), 'CanvasStrategy should include -map');
   assert(argsCanvasWithAudio.includes('1:a'), 'CanvasStrategy should map audio stream 1:a');
+  assert(argsCanvasWithAudio.includes('-t'), 'CanvasStrategy should include -t');
+  assert(argsCanvasWithAudio.includes('5'), 'CanvasStrategy should include duration 5');
+  assert(!argsCanvasWithAudio.includes('-shortest'), 'CanvasStrategy should NOT include -shortest');
 
   // Case 4: CanvasStrategy without Audio
   const argsCanvasNoAudio = canvasStrategy.getFFmpegArgs(optionsWithoutAudio, outputPath);
