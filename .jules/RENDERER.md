@@ -27,3 +27,7 @@
 ## 2026-02-19 - Test Discovery
 **Learning:** `packages/renderer` lacks a `README.md` and explicit `test` script in `package.json`. Tests are located in `packages/renderer/tests/` and run via `ts-node`.
 **Action:** When planning tests for Renderer, explicitly specify `npx ts-node packages/renderer/tests/[test-file].ts` instead of `npm test`.
+
+## [1.5.2] - Vision Reality Gap (Diagnostics)
+**Learning:** The README explicitly claims features ("includes `helios.diagnose()`") that are not implemented in the codebase.
+**Action:** When identifying gaps, check "Current Status" claims in README against the code, not just "Planned Features".
