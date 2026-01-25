@@ -21,6 +21,11 @@ export function connectToParent(helios: Helios) {
           helios.seek(frame);
         }
         break;
+      case 'HELIOS_SET_PROPS':
+        if (event.data.props) {
+            helios.setInputProps(event.data.props);
+        }
+        break;
       case 'HELIOS_CAPTURE_FRAME':
         handleCaptureFrame(helios, event.data);
         break;

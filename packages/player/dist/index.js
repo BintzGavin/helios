@@ -309,6 +309,9 @@ export class HeliosPlayer extends HTMLElement {
     hideStatus() {
         this.overlay.classList.add("hidden");
     }
+    getController() {
+        return this.controller;
+    }
     retryConnection() {
         this.showStatus("Retrying...", false);
         // Reload iframe to force fresh start
