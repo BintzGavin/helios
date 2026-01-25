@@ -1,26 +1,24 @@
 # DEMO Context
 
-## A. Examples
-- **simple-canvas-animation**: Vanilla JS example using the Canvas Strategy.
-- **simple-animation**: Vanilla JS example using the DOM Strategy (HTML/CSS).
-- **animation-helpers**: Vanilla JS example demonstrating `interpolate` and `spring` helpers.
-- **react-canvas-animation**: React example using `useVideoFrame` hook and Canvas Strategy.
-- **react-dom-animation**: React example using `useVideoFrame` hook and DOM Strategy.
-- **react-animation-helpers**: React example demonstrating `<Sequence>` and Context-based timing (DOM).
-- **vue-canvas-animation**: Vue example using Canvas Strategy.
-- **vue-dom-animation**: Vue example using DOM Strategy.
-- **svelte-canvas-animation**: Svelte example using Canvas Strategy.
-- **svelte-dom-animation**: Svelte example using DOM Strategy.
-- **threejs-canvas-animation**: Three.js example using WebGL and Canvas Strategy.
-- **pixi-canvas-animation**: Pixi.js example using WebGL and Canvas Strategy.
+## Section A: Examples
+- `examples/simple-canvas-animation`: Vanilla JS Canvas API.
+- `examples/simple-animation`: Vanilla JS DOM manipulation.
+- `examples/animation-helpers`: Vanilla JS Canvas demonstrating `interpolate`, `spring`, `sequence`, and `series`.
+- `examples/react-canvas-animation`: React with Canvas.
+- `examples/react-dom-animation`: React with DOM elements.
+- `examples/react-animation-helpers`: React demonstrating `<Sequence>` and `<Series>` components.
+- `examples/vue-canvas-animation`: Vue with Canvas.
+- `examples/vue-dom-animation`: Vue with DOM elements.
+- `examples/svelte-canvas-animation`: Svelte with Canvas.
+- `examples/svelte-dom-animation`: Svelte with DOM elements.
+- `examples/threejs-canvas-animation`: Three.js integration.
+- `examples/pixi-canvas-animation`: Pixi.js integration.
 
-## B. Build Config
-- **Root**: `vite.config.js` for dev server.
-- **Examples Build**: `vite.build-example.config.js` builds all examples into `output/example-build/`.
-  - Inputs: `simple_canvas`, `simple_dom`, `animation_helpers`, `react_composition`, `react_dom`, `react_helpers`, `vue_composition`, `vue_dom`, `svelte_composition`, `svelte_dom`, `threejs_composition`, `pixi_composition`.
-  - Output: `output/example-build/examples/<example>/composition.html`.
+## Section B: Build Config
+- `vite.build-example.config.js`: Root configuration for building all examples.
+- Output directory: `output/example-build/`.
+- Entry points defined in `rollupOptions.input`.
 
-## C. E2E Tests
-- **verify-render.ts**: Verifies that all examples can be rendered to MP4 (Canvas and DOM modes).
-  - Usage: `npm run build:examples && npx ts-node tests/e2e/verify-render.ts`
-  - Output: `output/<example>-render-verified.mp4`
+## Section C: E2E Tests
+- `tests/e2e/verify-render.ts`: Script using Playwright and Renderer to verify that examples render correctly to video.
+- Verified cases: Canvas, DOM (partial), React, Vue, Svelte, ThreeJS, Pixi, Helpers.

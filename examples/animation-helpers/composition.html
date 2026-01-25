@@ -26,7 +26,7 @@
 <body>
   <canvas id="canvas"></canvas>
   <script type="module">
-    import { Helios, interpolate, spring } from '../../packages/core/dist/index.js';
+    import { Helios, interpolate, spring, sequence, series } from '../../packages/core/dist/index.js';
 
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
@@ -41,12 +41,26 @@
     const helios = new Helios({ duration: 5, fps: 30 });
     helios.bindToDocumentTimeline();
 
+    // Define sequence steps
+    const steps = [
+      { name: 'Phase 1: Grow', durationInFrames: 30, color: 'crimson' },
+      { name: 'Phase 2: Hold', durationInFrames: 60, color: 'teal' },
+      { name: 'Phase 3: Shrink', durationInFrames: 30, color: 'gold' }
+    ];
+
+    // Calculate start times automatically
+    // series() adds a 'from' property to each item
+    // We start the sequence at frame 60 (after the initial movement settles a bit)
+    const timeline = series(steps, 60);
+
     function draw(frame) {
       const { width, height } = canvas;
 
       // Clear canvas
       ctx.fillStyle = '#111';
       ctx.fillRect(0, 0, width, height);
+
+      // --- SECTION 1: Interpolate & Spring ---
 
       // Interpolate X position: 0 -> 500 (or width/2) over frames 0 -> 60
       // We'll move from left edge to center
@@ -63,12 +77,12 @@
 
       // Draw Rectangle at X
       ctx.fillStyle = 'royalblue';
-      ctx.fillRect(x - 50, height / 2 - 50, 100, 100);
+      // Shift up by 100px to make room for sequence below
+      ctx.fillRect(x - 50, (height / 2) - 150, 100, 100);
 
       // Draw Circle with Scale, positioned to the right of the rectangle
-      // Let's make the circle appear at the final position of the rectangle + offset
       const circleX = width / 2 + 200;
-      const circleY = height / 2;
+      const circleY = (height / 2) - 100;
 
       ctx.save();
       ctx.translate(circleX, circleY);
@@ -79,13 +93,63 @@
       ctx.fill();
       ctx.restore();
 
-      // Add some text to explain
+      // --- SECTION 2: Sequence & Series ---
+
+      // Draw Sequence Demo at the bottom
+      const seqStartY = (height / 2) + 50;
+
+      ctx.font = '20px sans-serif';
+      ctx.textAlign = 'left';
+      ctx.fillStyle = '#fff';
+      ctx.fillText("Sequence & Series Demo (Starts at f:60)", 50, seqStartY - 20);
+
+      timeline.forEach((step, index) => {
+        const seq = sequence({
+          frame,
+          from: step.from,
+          durationInFrames: step.durationInFrames
+        });
+
+        // Calculate position
+        const boxX = 50 + (index * 160);
+        const boxY = seqStartY;
+        const boxW = 150;
+        const boxH = 50;
+
+        // Draw background slot
+        ctx.fillStyle = '#333';
+        ctx.fillRect(boxX, boxY, boxW, boxH);
+
+        if (seq.isActive) {
+           // Highlight active step
+           ctx.fillStyle = step.color;
+           // Fill based on progress (left to right)
+           ctx.fillRect(boxX, boxY, boxW * seq.progress, boxH);
+
+           // Text Active
+           ctx.fillStyle = '#fff';
+           ctx.textAlign = 'center';
+           ctx.fillText(step.name, boxX + boxW/2, boxY + 32);
+        } else {
+           // Text Inactive
+           ctx.fillStyle = '#666';
+           ctx.textAlign = 'center';
+           ctx.fillText(step.name, boxX + boxW/2, boxY + 32);
+        }
+
+        // Draw frame info below box
+        ctx.fillStyle = '#888';
+        ctx.font = '12px monospace';
+        ctx.fillText(`[${step.from}-${step.from + step.durationInFrames}]`, boxX + boxW/2, boxY + boxH + 15);
+        ctx.font = '20px sans-serif'; // Reset font
+      });
+
+      // --- Debug Info ---
       ctx.font = '20px sans-serif';
       ctx.fillStyle = '#fff';
       ctx.textAlign = 'center';
-      ctx.fillText(`Frame: ${frame.toFixed(2)}`, width/2, 50);
-      ctx.fillText(`Interpolate X: ${x.toFixed(0)}`, width/2, 80);
-      ctx.fillText(`Spring Scale: ${scale.toFixed(2)}`, width/2, 110);
+      ctx.fillText(`Frame: ${frame.toFixed(0)}`, width/2, 50);
+      ctx.fillText(`Interpolate: ${x.toFixed(0)} | Spring: ${scale.toFixed(2)}`, width/2, 80);
     }
 
     helios.subscribe(state => draw(state.currentFrame));
