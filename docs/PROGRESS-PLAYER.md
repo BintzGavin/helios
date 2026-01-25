@@ -1,5 +1,8 @@
 # PLAYER Progress Log
 
+## PLAYER v0.8.1
+- ✅ Completed: Scaffold Tests (Update) - Added tests for invalid VideoEncoder configurations and verified test suite.
+
 ## PLAYER v0.8.0
 - ✅ Completed: Client Side Audio - Implemented audio capture, mixing (OfflineAudioContext), and encoding (AAC) for client-side export.
 
