@@ -387,9 +387,18 @@ export class HeliosPlayer extends HTMLElement {
         }
     };
     handleKeydown = (e) => {
-        // Ignore if we are not the target (e.g. bubbling from inside)
-        if (e.composedPath()[0] !== this)
-            return;
+        // Allow bubbling from children (like buttons), but ignore inputs
+        const target = e.composedPath()[0];
+        if (target && target.tagName) {
+            const tagName = target.tagName.toLowerCase();
+            if (tagName === "input" || tagName === "select" || tagName === "textarea") {
+                return;
+            }
+            // If focusing a button, Space triggers click natively. Avoid double toggle.
+            if (e.key === " " && tagName === "button") {
+                return;
+            }
+        }
         if (!this.controller)
             return;
         switch (e.key) {

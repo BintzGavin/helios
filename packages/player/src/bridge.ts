@@ -1,11 +1,17 @@
 import { Helios } from "@helios-project/core";
 import { captureDomToBitmap } from "./features/dom-capture";
+import { getAudioAssets } from "./features/audio-utils";
 
 export function connectToParent(helios: Helios) {
   // 1. Listen for messages from parent
-  window.addEventListener('message', (event) => {
+  window.addEventListener('message', async (event) => {
     const { type, frame } = event.data;
     switch (type) {
+      case 'HELIOS_GET_AUDIO_TRACKS':
+        const assets = await getAudioAssets(document);
+        const buffers = assets.map(a => a.buffer);
+        window.parent.postMessage({ type: 'HELIOS_AUDIO_DATA', assets }, '*', buffers);
+        break;
       case 'HELIOS_CONNECT':
         // Reply with ready and current state
         window.parent.postMessage({ type: 'HELIOS_READY', state: helios.getState() }, '*');

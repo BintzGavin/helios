@@ -26,6 +26,7 @@ export class RafTicker implements Ticker {
     if (this.callback) {
       this.callback(dt);
       // Only schedule next frame if we are still running
+      // @ts-ignore
       if (this.callback) {
         this.frameId = requestAnimationFrame(this.loop);
       }

@@ -48,5 +48,5 @@ The component observes the following attributes:
 
 ## Architecture
 - **Controllers**: Abstraction layer (`DirectController` vs `BridgeController`) to unify local and cross-origin interaction.
-- **ClientSideExporter**: Modular export logic supporting WebCodecs (VideoEncoder) and DOM Snapshotting.
+- **ClientSideExporter**: Modular export logic supporting WebCodecs (VideoEncoder, AudioEncoder) and DOM Snapshotting. Supports AAC audio mixing from `<audio>` elements.
 - **DOM Capture**: Robust implementation using `XMLSerializer`, SVG `<foreignObject>`, and external stylesheet inlining for high-fidelity HTML exports.

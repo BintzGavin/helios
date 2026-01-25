@@ -1,4 +1,4 @@
-**Version**: 0.7.0
+**Version**: 0.8.0
 
 # Status: PLAYER
 
@@ -20,12 +20,14 @@
 ## Critical Task
 - **None**: Recent critical task completed. Await next assignment.
 
+[v0.8.0] ✅ Completed: Client Side Audio - Implemented audio capture, mixing (OfflineAudioContext), and encoding (AAC) for client-side export.
 [v0.7.0] ✅ Completed: Enable External Stylesheets - Updated DOM capture to fetch and inline external CSS (`<link rel="stylesheet">`) for high-fidelity exports.
 [v0.6.0] ✅ Completed: Keyboard & Fullscreen Support - Implemented standard keyboard shortcuts (Space, F, Arrows) and Fullscreen UI/logic.
 [v0.5.2] ✅ Completed: Scaffold Tests - Added unit test suite for controllers and exporter using Vitest.
 [v0.5.1] ✅ Completed: Standard Attributes - Implemented `autoplay`, `loop`, and `controls` attributes. Synced version and artifacts.
 
 ## Backlog
+- [x] Implement Client Side Audio Export.
 - [x] Implement Dynamic Sizing & Reactive Attributes.
 - [x] Sync player state with engine state (Bridge Initialization Fix).
 - [x] Implement Variable Playback Speed controls (API + UI).

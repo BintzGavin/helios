@@ -3,10 +3,12 @@ import { ClientSideExporter } from './exporter';
 import { HeliosController } from '../controllers';
 
 // Mock mp4-muxer
+const addAudioChunkSpy = vi.fn();
 vi.mock('mp4-muxer', () => {
     return {
         Muxer: class {
             addVideoChunk = vi.fn();
+            addAudioChunk = addAudioChunkSpy;
             finalize = vi.fn();
         },
         ArrayBufferTarget: class {
@@ -30,6 +32,48 @@ class MockVideoEncoder {
     close = closeSpy;
 }
 vi.stubGlobal('VideoEncoder', MockVideoEncoder);
+
+// Mock AudioEncoder
+const audioConfigureSpy = vi.fn();
+const audioEncodeSpy = vi.fn();
+const audioFlushSpy = vi.fn().mockResolvedValue(undefined);
+const audioCloseSpy = vi.fn();
+
+class MockAudioEncoder {
+    static isConfigSupported = vi.fn().mockResolvedValue(true);
+    configure = audioConfigureSpy;
+    encode = audioEncodeSpy;
+    flush = audioFlushSpy;
+    close = audioCloseSpy;
+}
+vi.stubGlobal('AudioEncoder', MockAudioEncoder);
+
+// Mock AudioData
+class MockAudioData {
+    constructor(public init: any) {}
+    close = vi.fn();
+}
+vi.stubGlobal('AudioData', MockAudioData);
+
+// Mock OfflineAudioContext
+class MockOfflineAudioContext {
+    createBufferSource = vi.fn().mockReturnValue({
+        buffer: null,
+        connect: vi.fn(),
+        start: vi.fn()
+    });
+    destination = {};
+    decodeAudioData = vi.fn().mockResolvedValue({
+        length: 100,
+        getChannelData: vi.fn().mockReturnValue(new Float32Array(100))
+    });
+    startRendering = vi.fn().mockResolvedValue({
+        length: 100,
+        getChannelData: vi.fn().mockReturnValue(new Float32Array(100))
+    });
+}
+vi.stubGlobal('OfflineAudioContext', MockOfflineAudioContext);
+
 
 // Mock VideoFrame if not present
 if (typeof VideoFrame === 'undefined') {
@@ -68,7 +112,8 @@ describe('ClientSideExporter', () => {
             subscribe: vi.fn(),
             getState: vi.fn().mockReturnValue({ duration: 1, fps: 10 }), // 10 frames total
             dispose: vi.fn(),
-            captureFrame: vi.fn().mockResolvedValue(new VideoFrame({} as any, {}))
+            captureFrame: vi.fn().mockResolvedValue(new VideoFrame({} as any, {})),
+            getAudioTracks: vi.fn().mockResolvedValue([])
         } as unknown as HeliosController;
 
         mockIframe = {} as HTMLIFrameElement;
@@ -104,6 +149,9 @@ describe('ClientSideExporter', () => {
         expect(configureSpy).toHaveBeenCalled();
         expect(encodeSpy).toHaveBeenCalledTimes(10); // 0..9
         expect(flushSpy).toHaveBeenCalled();
+
+        // Audio shouldn't run if no tracks
+        expect(audioEncodeSpy).not.toHaveBeenCalled();
 
         // Download
         expect(URL.createObjectURL).toHaveBeenCalled();
@@ -143,5 +191,21 @@ describe('ClientSideExporter', () => {
 
         // Second call (setup) should use 'dom'
         expect(mockController.captureFrame).toHaveBeenNthCalledWith(2, 0, { selector: 'canvas', mode: 'dom' });
+    });
+
+    it('should export audio if tracks exist', async () => {
+        const onProgress = vi.fn();
+        const signal = new AbortController().signal;
+
+        (mockController.getAudioTracks as any).mockResolvedValue([
+            { buffer: new ArrayBuffer(8), mimeType: 'audio/mp3' }
+        ]);
+
+        await exporter.export({ onProgress, signal, mode: 'canvas' });
+
+        expect(audioConfigureSpy).toHaveBeenCalled();
+        expect(audioEncodeSpy).toHaveBeenCalled();
+        expect(audioFlushSpy).toHaveBeenCalled();
+        expect(audioCloseSpy).toHaveBeenCalled();
     });
 });
