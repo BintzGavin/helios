@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { Helios } from './index';
-import { TimeDriver } from './drivers';
+import { TimeDriver, ManualTicker } from './drivers';
 
 describe('Helios Core', () => {
   it('should initialize with correct state', () => {
@@ -254,69 +254,51 @@ describe('Helios Core', () => {
     });
   });
 
-  describe('Time-Based Ticking', () => {
-    let currentTime = 0;
+  describe('Time-Based Ticking (Manual)', () => {
+    it('should advance frames correctly at 1x speed', () => {
+        const ticker = new ManualTicker();
+        const helios = new Helios({ duration: 10, fps: 30, ticker });
+        helios.play();
 
-    beforeEach(() => {
-        currentTime = 0;
-        vi.stubGlobal('performance', { now: () => currentTime });
-        vi.stubGlobal('requestAnimationFrame', (cb: any) => setTimeout(cb, 0));
-        vi.stubGlobal('cancelAnimationFrame', (id: any) => clearTimeout(id));
-    });
-
-    afterEach(() => {
-        vi.unstubAllGlobals();
-    });
-
-    it('should advance frames correctly at 1x speed', async () => {
-        const helios = new Helios({ duration: 10, fps: 30 });
-        helios.play(); // lastFrameTime = 0
-
-        currentTime = 1000; // 1 second elapses
-
-        // wait for tick loop
-        await new Promise(resolve => setTimeout(resolve, 10));
+        ticker.tick(1000); // 1 second elapses
 
         // delta = 1000ms. frames = 1 * 30 * 1 = 30.
         expect(helios.getState().currentFrame).toBeCloseTo(30, 0);
         helios.pause();
     });
 
-    it('should advance frames correctly at 2x speed', async () => {
-        const helios = new Helios({ duration: 10, fps: 30, playbackRate: 2 });
+    it('should advance frames correctly at 2x speed', () => {
+        const ticker = new ManualTicker();
+        const helios = new Helios({ duration: 10, fps: 30, playbackRate: 2, ticker });
         helios.play();
 
-        currentTime = 1000;
-
-        await new Promise(resolve => setTimeout(resolve, 10));
+        ticker.tick(1000);
 
         // delta = 1000ms. frames = 1 * 30 * 2 = 60.
         expect(helios.getState().currentFrame).toBeCloseTo(60, 0);
         helios.pause();
     });
 
-    it('should reverse frames at -1x speed', async () => {
-        const helios = new Helios({ duration: 10, fps: 30 });
+    it('should reverse frames at -1x speed', () => {
+        const ticker = new ManualTicker();
+        const helios = new Helios({ duration: 10, fps: 30, ticker });
         helios.seek(60);
         helios.setPlaybackRate(-1);
         helios.play();
 
-        currentTime = 1000;
-
-        await new Promise(resolve => setTimeout(resolve, 10));
+        ticker.tick(1000);
 
         // 60 + (1 * 30 * -1) = 30
         expect(helios.getState().currentFrame).toBeCloseTo(30, 0);
         helios.pause();
     });
 
-    it('should pause when reaching end', async () => {
-        const helios = new Helios({ duration: 2, fps: 30 }); // 60 frames total
+    it('should pause when reaching end', () => {
+        const ticker = new ManualTicker();
+        const helios = new Helios({ duration: 2, fps: 30, ticker }); // 60 frames total
         helios.play();
 
-        currentTime = 3000; // 3 seconds, should overshoot
-
-        await new Promise(resolve => setTimeout(resolve, 10));
+        ticker.tick(3000); // 3 seconds, should overshoot
 
         expect(helios.getState().currentFrame).toBe(59); // clamped to totalFrames - 1
         expect(helios.getState().isPlaying).toBe(false);
@@ -345,24 +327,16 @@ describe('Helios Core', () => {
        expect(mockDriver.init).toHaveBeenCalledWith(scope);
     });
 
-    it('should call driver.update during playback', async () => {
-        let currentTime = 0;
-        vi.stubGlobal('performance', { now: () => currentTime });
-        vi.stubGlobal('requestAnimationFrame', (cb: any) => setTimeout(cb, 0));
-        vi.stubGlobal('cancelAnimationFrame', (id: any) => clearTimeout(id));
-
-        const helios = new Helios({ duration: 10, fps: 30, driver: mockDriver });
+    it('should call driver.update during playback', () => {
+        const ticker = new ManualTicker();
+        const helios = new Helios({ duration: 10, fps: 30, driver: mockDriver, ticker });
         helios.play();
 
-        // Advance time
-        currentTime = 100; // 100ms elapsed
-
-        await new Promise(resolve => setTimeout(resolve, 10));
+        ticker.tick(100); // 100ms elapsed
 
         expect(mockDriver.update).toHaveBeenCalled();
 
         helios.pause();
-        vi.unstubAllGlobals();
     });
   });
 });

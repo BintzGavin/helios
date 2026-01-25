@@ -1,4 +1,4 @@
-import { TimeDriver, WaapiDriver, NoopDriver } from './drivers';
+import { TimeDriver, WaapiDriver, NoopDriver, Ticker, RafTicker } from './drivers';
 import { signal, effect, Signal, ReadonlySignal } from './signals';
 
 type HeliosState = {
@@ -20,6 +20,7 @@ export interface HeliosOptions {
   inputProps?: Record<string, any>;
   playbackRate?: number;
   driver?: TimeDriver;
+  ticker?: Ticker;
 }
 
 export interface DiagnosticReport {
@@ -73,12 +74,11 @@ export class Helios {
   public get playbackRate(): ReadonlySignal<number> { return this._playbackRate; }
 
   // Other internals
-  private animationFrameId: number | null = null;
-  private lastFrameTime: number = 0;
   private syncWithDocumentTimeline = false;
   private autoSyncAnimations = false;
   private animationScope: HTMLElement | Document = typeof document !== 'undefined' ? document : ({} as Document);
   private driver: TimeDriver;
+  private ticker: Ticker;
   private subscriberMap = new Map<Subscriber, () => void>();
 
   static async diagnose(): Promise<DiagnosticReport> {
@@ -134,6 +134,9 @@ export class Helios {
     }
 
     this.driver.init(this.animationScope);
+
+    // Ticker Selection
+    this.ticker = options.ticker || new RafTicker();
   }
 
   public getState(): Readonly<HeliosState> {
@@ -183,17 +186,13 @@ export class Helios {
   public play() {
     if (this._isPlaying.peek()) return;
     this._isPlaying.value = true;
-    this.lastFrameTime = performance.now();
-    this.animationFrameId = requestAnimationFrame(this.tick);
+    this.ticker.start(this.onTick);
   }
 
   public pause() {
     if (!this._isPlaying.peek()) return;
     this._isPlaying.value = false;
-    if (this.animationFrameId) {
-      cancelAnimationFrame(this.animationFrameId);
-      this.animationFrameId = null;
-    }
+    this.ticker.stop();
   }
 
   public seek(frame: number) {
@@ -237,23 +236,13 @@ export class Helios {
       this.syncWithDocumentTimeline = false;
   }
 
-  private tick = () => {
+  private onTick = (deltaTime: number) => {
     if (!this._isPlaying.peek()) return;
 
     // If we are syncing FROM document.timeline, we shouldn't drive our own loop logic
-    // But play() implies we ARE driving.
     if (this.syncWithDocumentTimeline) {
-        // If we are synced, we just let the poll loop handle updates.
-        // But we still need to keep the loop alive if we want to support 'isPlaying' semantics
-        // alongside external drivers?
-        // Actually, if we are synced, 'play' might be meaningless if the external timeline isn't moving.
-        this.animationFrameId = requestAnimationFrame(this.tick);
         return;
     }
-
-    const now = performance.now();
-    const deltaTime = now - this.lastFrameTime;
-    this.lastFrameTime = now;
 
     const totalFrames = this.duration * this.fps;
     const playbackRate = this._playbackRate.peek();
@@ -277,7 +266,5 @@ export class Helios {
     this._currentFrame.value = nextFrame;
 
     this.driver.update((nextFrame / this.fps) * 1000);
-
-    this.animationFrameId = requestAnimationFrame(this.tick);
   }
 }
