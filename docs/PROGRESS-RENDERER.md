@@ -1,5 +1,8 @@
 # RENDERER Progress Log
 
+## RENDERER v1.4.0
+- ✅ Completed: Basic Audio Support - Added `audioFilePath` to `RendererOptions` and updated strategies to include audio in the FFmpeg output mix.
+
 ## RENDERER v1.3.0
 - ✅ Completed: Implement CdpTimeDriver - Implemented `CdpTimeDriver` using Chrome DevTools Protocol to virtually advance time, ensuring deterministic rendering for complex animations.
 

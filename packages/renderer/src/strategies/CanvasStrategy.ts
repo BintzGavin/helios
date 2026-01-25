@@ -226,17 +226,24 @@ export class CanvasStrategy implements RenderStrategy {
   }
 
   getFFmpegArgs(options: RendererOptions, outputPath: string): string[] {
-    const inputArgs = this.useWebCodecs
+    const videoInputArgs = this.useWebCodecs
       ? ['-f', 'ivf', '-i', '-']
       : ['-f', 'image2pipe', '-framerate', `${options.fps}`, '-i', '-'];
+
+    const audioInputArgs = options.audioFilePath ? ['-i', options.audioFilePath] : [];
+
+    const audioOutputArgs = options.audioFilePath
+      ? ['-c:a', 'aac', '-map', '0:v', '-map', '1:a', '-shortest']
+      : [];
 
     const outputArgs = [
       '-c:v', 'libx264',
       '-pix_fmt', 'yuv420p',
       '-movflags', '+faststart',
+      ...audioOutputArgs,
       outputPath,
     ];
 
-    return ['-y', ...inputArgs, ...outputArgs];
+    return ['-y', ...videoInputArgs, ...audioInputArgs, ...outputArgs];
   }
 }

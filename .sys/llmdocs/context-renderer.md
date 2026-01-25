@@ -44,6 +44,7 @@ interface RendererOptions {
   fps: number;
   durationInSeconds: number;
   mode?: 'canvas' | 'dom'; // Defaults to 'canvas'
+  audioFilePath?: string; // Path to audio file to mix
 }
 
 interface RenderJobOptions {
@@ -81,4 +82,10 @@ The strategy fully controls the FFmpeg argument construction (`getFFmpegArgs`).
 -pix_fmt yuv420p
 -movflags +faststart
 [OUTPUT_PATH]
+```
+
+**Audio Support**:
+If `audioFilePath` is present, adds input `1` and maps it:
+```
+-i [AUDIO_PATH] ... -c:a aac -map 0:v -map 1:a -shortest
 ```
