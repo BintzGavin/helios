@@ -21,7 +21,8 @@ packages/renderer/
 ├── scripts/              # Verification and utility scripts
 │   ├── render.ts         # Canvas rendering verification
 │   ├── render-dom.ts     # DOM rendering verification
-│   └── verify-cancellation.ts # Cancellation/Progress verification
+│   ├── verify-cancellation.ts # Cancellation/Progress verification
+│   └── verify-error-handling.ts # Strict error handling verification
 └── src/
     ├── index.ts          # Renderer class entry point
     ├── types.ts          # Shared interfaces (RendererOptions, RenderJobOptions)
@@ -91,3 +92,8 @@ If `audioFilePath` is present, adds input `1` and maps it:
 -i [AUDIO_PATH] ... -c:a aac -map 0:v -map 1:a -shortest
 ```
 If `startFrame` is > 0, the audio input is pre-seeked using `-ss [TIME]`.
+
+## F. Error Handling
+- **Strict Propagation**: The Renderer listens for `pageerror` and `crash` events from the browser.
+- **Fail Fast**: Any captured error (including async WebCodecs failures) immediately aborts the render loop and rejects the `render()` promise.
+- **Process Cleanup**: The FFmpeg child process is explicitly killed if an error occurs to prevent hangs.

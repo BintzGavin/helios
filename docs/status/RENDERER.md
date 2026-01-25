@@ -1,4 +1,4 @@
-**Version**: 1.5.0
+**Version**: 1.5.1
 
 # Renderer Agent Status
 
@@ -15,3 +15,4 @@
 - [1.4.0] ✅ Completed: Basic Audio Support - Added `audioFilePath` to `RendererOptions` and updated strategies to include audio in the FFmpeg output mix.
 - [1.4.1] ✅ Completed: Fix DOM Time Driver - Implemented conditional usage of `SeekTimeDriver` for `dom` mode rendering, resolving compatibility issues with `CdpTimeDriver` and `page.screenshot`.
 - [1.5.0] ✅ Completed: Implement Range Rendering - Added `startFrame` to `RendererOptions`, enabling rendering of partial animation ranges (distributed rendering support).
+- [1.5.1] ✅ Completed: Strict Error Propagation - Implemented "Fail Fast" mechanism to catch page errors, crashes, and WebCodecs failures immediately, and ensure proper FFmpeg process cleanup.

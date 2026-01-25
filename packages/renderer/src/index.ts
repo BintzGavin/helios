@@ -1,5 +1,5 @@
 import { spawn } from 'child_process';
-import { chromium, Browser, Page } from 'playwright';
+import { chromium, Browser, Page, ConsoleMessage } from 'playwright';
 import ffmpeg from '@ffmpeg-installer/ffmpeg';
 import { RenderStrategy } from './strategies/RenderStrategy';
 import { CanvasStrategy } from './strategies/CanvasStrategy';
@@ -59,9 +59,19 @@ export class Renderer {
 
       console.log(`Navigating to ${compositionUrl}...`);
 
+      const capturedErrors: Error[] = [];
+
       // Capture console logs from the page
-      page.on('console', msg => console.log(`PAGE LOG: ${msg.text()}`));
-      page.on('pageerror', err => console.error(`PAGE ERROR: ${err.message}`));
+      page.on('console', (msg: ConsoleMessage) => console.log(`PAGE LOG: ${msg.text()}`));
+      page.on('pageerror', (err: Error) => {
+        console.error(`PAGE ERROR: ${err.message}`);
+        capturedErrors.push(err);
+      });
+      page.on('crash', () => {
+        const err = new Error('Page crashed!');
+        console.error(err.message);
+        capturedErrors.push(err);
+      });
 
       await page.goto(compositionUrl, { waitUntil: 'networkidle' });
       console.log('Page loaded.');
@@ -92,7 +102,7 @@ export class Renderer {
           } else {
             // If aborted, we expect a non-zero exit code (likely SIGKILL/SIGTERM).
             // We resolve the promise to prevent unhandled rejections, as the main flow handles the abort error.
-            if (jobOptions?.signal?.aborted) {
+            if (jobOptions?.signal?.aborted || capturedErrors.length > 0) {
               resolve();
             } else {
               reject(new Error(`FFmpeg process exited with code ${code}`));
@@ -100,7 +110,7 @@ export class Renderer {
           }
         });
         ffmpegProcess.on('error', (err: Error) => {
-            if (jobOptions?.signal?.aborted) {
+            if (jobOptions?.signal?.aborted || capturedErrors.length > 0) {
               resolve();
             } else {
               reject(err);
@@ -126,6 +136,10 @@ export class Renderer {
 
       try {
         for (let i = 0; i < totalFrames; i++) {
+          if (capturedErrors.length > 0) {
+            throw capturedErrors[0];
+          }
+
           if (jobOptions?.signal?.aborted) {
             throw new Error('Aborted');
           }
@@ -171,6 +185,11 @@ export class Renderer {
         await ffmpegExitPromise;
         console.log('FFmpeg has finished processing.');
       } catch (err: any) {
+        // Kill FFmpeg if an error occurs to prevent it from hanging
+        if (ffmpegProcess && !ffmpegProcess.killed) {
+           ffmpegProcess.kill();
+        }
+
         // If it was aborted, ensure we throw an AbortError-like message
         if (jobOptions?.signal?.aborted) {
            throw new Error('Aborted');

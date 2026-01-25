@@ -1,5 +1,8 @@
 # RENDERER Progress Log
 
+## RENDERER v1.5.1
+- ✅ Completed: Strict Error Propagation - Implemented "Fail Fast" mechanism to catch page errors, crashes, and WebCodecs failures immediately, and ensure proper FFmpeg process cleanup.
+
 ## RENDERER v1.5.0
 - ✅ Completed: Implement Range Rendering - Added `startFrame` to `RendererOptions`, enabling rendering of partial animation ranges (distributed rendering support).
 
