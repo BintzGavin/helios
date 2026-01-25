@@ -7,6 +7,7 @@
 - **react-canvas-animation**: React example using `useVideoFrame` hook and Canvas Strategy.
 - **react-dom-animation**: React example using `useVideoFrame` hook and DOM Strategy.
 - **vue-canvas-animation**: Vue example using Canvas Strategy.
+- **vue-dom-animation**: Vue example using DOM Strategy.
 - **svelte-canvas-animation**: Svelte example using Canvas Strategy.
 - **threejs-canvas-animation**: Three.js example using WebGL and Canvas Strategy.
 - **pixi-canvas-animation**: Pixi.js example using WebGL and Canvas Strategy.
@@ -14,7 +15,7 @@
 ## B. Build Config
 - **Root**: `vite.config.js` for dev server.
 - **Examples Build**: `vite.build-example.config.js` builds all examples into `output/example-build/`.
-  - Inputs: `simple_canvas`, `simple_dom`, `animation_helpers`, `react_composition`, `react_dom`, `vue_composition`, `svelte_composition`, `threejs_composition`, `pixi_composition`.
+  - Inputs: `simple_canvas`, `simple_dom`, `animation_helpers`, `react_composition`, `react_dom`, `vue_composition`, `vue_dom`, `svelte_composition`, `threejs_composition`, `pixi_composition`.
   - Output: `output/example-build/examples/<example>/composition.html`.
 
 ## C. E2E Tests

@@ -10,6 +10,8 @@ const CASES = [
   // React DOM validation is currently blocked by RENDERER-Fix-Dom-TimeDriver (CdpTimeDriver + DomStrategy issue)
   // { name: 'React DOM', relativePath: 'examples/react-dom-animation/composition.html', mode: 'dom' as const },
   { name: 'Vue', relativePath: 'examples/vue-canvas-animation/composition.html', mode: 'canvas' as const },
+  // Vue DOM validation is currently blocked by RENDERER-Fix-Dom-TimeDriver (CdpTimeDriver + DomStrategy issue)
+  // { name: 'Vue DOM', relativePath: 'examples/vue-dom-animation/composition.html', mode: 'dom' as const },
   { name: 'Svelte', relativePath: 'examples/svelte-canvas-animation/composition.html', mode: 'canvas' as const },
   { name: 'ThreeJS', relativePath: 'examples/threejs-canvas-animation/composition.html', mode: 'canvas' as const },
   { name: 'Pixi', relativePath: 'examples/pixi-canvas-animation/composition.html', mode: 'canvas' as const },
