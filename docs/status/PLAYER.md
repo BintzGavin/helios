@@ -16,9 +16,10 @@
 - Implements Robust DOM Export using XMLSerializer and SVG foreignObject.
 
 ## Critical Task
-- **None**: Feature complete.
+- **Implement Dynamic Sizing**: Make `<helios-player>` respect `width`, `height`, and `src` attributes dynamically.
 
 ## Backlog
+- [ ] Implement Dynamic Sizing & Reactive Attributes.
 - [x] Sync player state with engine state (Bridge Initialization Fix).
 - [x] Implement Variable Playback Speed controls (API + UI).
 - [x] Refactor `HeliosPlayer` to support `window.helios`.
