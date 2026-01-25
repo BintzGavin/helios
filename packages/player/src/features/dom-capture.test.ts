@@ -103,4 +103,73 @@ describe('dom-capture', () => {
         // Should not contain undefined or error text, just empty or existing styles
         expect(text).not.toContain('undefined');
     });
+
+    it('should inline external images', async () => {
+        const img = document.createElement('img');
+        img.src = 'https://example.com/image.png';
+        container.appendChild(img);
+
+        const mockBlob = new Blob(['mock-image-data'], { type: 'image/png' });
+        fetchSpy.mockResolvedValue({
+            ok: true,
+            blob: () => Promise.resolve(mockBlob)
+        });
+
+        await captureDomToBitmap(container);
+
+        expect(fetchSpy).toHaveBeenCalledWith('https://example.com/image.png');
+
+        const blob = (URL.createObjectURL as any).mock.calls[0][0] as Blob;
+        const text = await readBlob(blob);
+
+        // The src should be replaced with a data URI
+        expect(text).toContain('data:image/png;base64,');
+    });
+
+    it('should inline background images', async () => {
+        const div = document.createElement('div');
+        div.style.backgroundImage = 'url("https://example.com/bg.png")';
+        container.appendChild(div);
+
+        const mockBlob = new Blob(['mock-bg-data'], { type: 'image/png' });
+        fetchSpy.mockResolvedValue({
+            ok: true,
+            blob: () => Promise.resolve(mockBlob)
+        });
+
+        await captureDomToBitmap(container);
+
+        expect(fetchSpy).toHaveBeenCalledWith('https://example.com/bg.png');
+
+        const blob = (URL.createObjectURL as any).mock.calls[0][0] as Blob;
+        const text = await readBlob(blob);
+
+        // Note: serializer might encode quotes
+        expect(text).toMatch(/background-image: url\(&quot;data:image\/png;base64,.*\)/);
+    });
+
+    it('should preserve other background layers when inlining', async () => {
+        const div = document.createElement('div');
+        // A complex background with gradient and image
+        div.style.backgroundImage = 'linear-gradient(red, blue), url("https://example.com/bg.png")';
+        container.appendChild(div);
+
+        const mockBlob = new Blob(['mock-bg-data'], { type: 'image/png' });
+        fetchSpy.mockResolvedValue({
+            ok: true,
+            blob: () => Promise.resolve(mockBlob)
+        });
+
+        await captureDomToBitmap(container);
+
+        expect(fetchSpy).toHaveBeenCalledWith('https://example.com/bg.png');
+
+        const blob = (URL.createObjectURL as any).mock.calls[0][0] as Blob;
+        const text = await readBlob(blob);
+
+        // Check that the gradient is still there
+        expect(text).toContain('linear-gradient(red, blue)');
+        // Check that the URL is replaced
+        expect(text).toMatch(/url\(&quot;data:image\/png;base64,.*\)/);
+    });
 });

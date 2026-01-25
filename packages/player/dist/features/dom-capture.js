@@ -1,9 +1,12 @@
 export async function captureDomToBitmap(element) {
     const doc = element.ownerDocument || document;
-    // 1. Serialize DOM
+    // 1. Clone & Inline Assets
+    const clone = element.cloneNode(true);
+    await inlineImages(clone);
+    // 2. Serialize DOM
     const serializer = new XMLSerializer();
-    const html = serializer.serializeToString(element);
-    // 2. Collect styles
+    const html = serializer.serializeToString(clone);
+    // 3. Collect styles
     // We collect all style tags to ensure CSS-in-JS and other styles are preserved.
     const inlineStyles = Array.from(doc.querySelectorAll('style'))
         .map(style => style.outerHTML)
@@ -11,11 +14,11 @@ export async function captureDomToBitmap(element) {
     // Fetch and inline external stylesheets
     const externalStyles = await getExternalStyles(doc);
     const styles = externalStyles + '\n' + inlineStyles;
-    // 3. Determine dimensions
+    // 4. Determine dimensions
     // Use scroll dimensions to capture full content, fallback to offset or defaults.
     const width = element.scrollWidth || element.offsetWidth || 1920;
     const height = element.scrollHeight || element.offsetHeight || 1080;
-    // 4. Construct SVG
+    // 5. Construct SVG
     // We wrap the content in a div to ensure block formatting context.
     const svg = `
     <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}">
@@ -27,10 +30,10 @@ export async function captureDomToBitmap(element) {
       </foreignObject>
     </svg>
   `;
-    // 5. Create Blob and URL
+    // 6. Create Blob and URL
     const blob = new Blob([svg], { type: 'image/svg+xml;charset=utf-8' });
     const url = URL.createObjectURL(blob);
-    // 6. Load Image
+    // 7. Load Image
     const img = new Image();
     // Return a promise that resolves when the image loads
     await new Promise((resolve, reject) => {
@@ -38,9 +41,9 @@ export async function captureDomToBitmap(element) {
         img.onerror = (e) => reject(new Error('Failed to load SVG image for DOM capture'));
         img.src = url;
     });
-    // 7. Create ImageBitmap
+    // 8. Create ImageBitmap
     const bitmap = await createImageBitmap(img);
-    // 8. Cleanup
+    // 9. Cleanup
     URL.revokeObjectURL(url);
     return bitmap;
 }
@@ -63,4 +66,47 @@ async function getExternalStyles(doc) {
         }
     });
     return (await Promise.all(promises)).join('\n');
+}
+async function inlineImages(root) {
+    const promises = [];
+    // A. Handle <img> tags
+    const images = root.querySelectorAll('img');
+    images.forEach((img) => {
+        if (img.src && !img.src.startsWith('data:')) {
+            promises.push(fetchAsDataUri(img.src)
+                .then((dataUri) => {
+                img.src = dataUri;
+            })
+                .catch((e) => console.warn('Helios: Failed to inline image:', img.src, e)));
+        }
+    });
+    // B. Handle background-images (inline styles only)
+    const elementsWithStyle = root.querySelectorAll('[style*="background-image"]');
+    elementsWithStyle.forEach((el) => {
+        const element = el;
+        const bg = element.style.backgroundImage;
+        if (bg && bg.includes('url(')) {
+            const match = bg.match(/url\(['"]?(.*?)['"]?\)/);
+            if (match && match[1] && !match[1].startsWith('data:')) {
+                promises.push(fetchAsDataUri(match[1])
+                    .then((dataUri) => {
+                    element.style.backgroundImage = `url("${dataUri}")`;
+                })
+                    .catch((e) => console.warn('Helios: Failed to inline background:', match[1], e)));
+            }
+        }
+    });
+    await Promise.all(promises);
+}
+async function fetchAsDataUri(url) {
+    const response = await fetch(url);
+    if (!response.ok)
+        throw new Error(`HTTP ${response.status} ${response.statusText}`);
+    const blob = await response.blob();
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+    });
 }

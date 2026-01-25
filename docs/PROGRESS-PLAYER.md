@@ -1,5 +1,8 @@
 # PLAYER Progress Log
 
+## PLAYER v0.9.0
+- ✅ Completed: Client-Side Image Inlining - Implemented fetching and inlining of `<img>` and `background-image` sources as Data URIs for robust DOM export.
+
 ## PLAYER v0.8.1
 - ✅ Completed: Scaffold Tests (Update) - Added tests for invalid VideoEncoder configurations and verified test suite.
 

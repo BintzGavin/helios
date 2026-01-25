@@ -1,4 +1,4 @@
-**Version**: 0.8.1
+**Version**: 0.9.0
 
 # Status: PLAYER
 
@@ -20,6 +20,7 @@
 ## Critical Task
 - **None**: Recent critical task completed. Await next assignment.
 
+[v0.9.0] ✅ Completed: Client-Side Image Inlining - Implemented fetching and inlining of `<img>` and `background-image` sources as Data URIs for robust DOM export.
 [v0.8.1] ✅ Completed: Scaffold Tests (Update) - Added tests for invalid VideoEncoder configurations and verified test suite.
 [v0.8.0] ✅ Completed: Client Side Audio - Implemented audio capture, mixing (OfflineAudioContext), and encoding (AAC) for client-side export.
 [v0.7.0] ✅ Completed: Enable External Stylesheets - Updated DOM capture to fetch and inline external CSS (`<link rel="stylesheet">`) for high-fidelity exports.
@@ -39,6 +40,7 @@
 - [x] Implement Export Configuration (`export-mode`, `canvas-selector`).
 - [x] Add proper UI feedback for "Loading" state.
 - [x] Enable External Stylesheets for DOM Export.
+- [x] Enable Image Inlining for DOM Export.
 
 [2026-01-20] ✅ Completed: Refactor Player Control Logic - Verified `<helios-player>` uses `window.helios` and supports client-side export.
 [2026-01-21] ✅ Completed: Sandbox and Bridge - Implemented `postMessage` bridge and sandboxed iframe support.
