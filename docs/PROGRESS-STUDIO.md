@@ -1,5 +1,8 @@
 # STUDIO Progress Log
 
+## STUDIO v0.3.0
+- ✅ Completed: Implement Studio UI and Player Control - Added Timeline, Props Editor, and programmatic control for helios-player.
+
 ## STUDIO v0.2.1
 - ✅ Completed: Verify & Refine - Fixed TypeScript configuration and verified build/CLI.
 

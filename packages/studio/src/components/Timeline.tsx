@@ -1,0 +1,76 @@
+import React from 'react';
+import type { HeliosController } from '@helios-project/player';
+
+interface TimelineProps {
+  controller: HeliosController | null;
+  state: {
+    currentFrame: number;
+    duration: number;
+    fps: number;
+    isPlaying: boolean;
+  };
+}
+
+export const Timeline: React.FC<TimelineProps> = ({ controller, state }) => {
+  const { currentFrame, duration, fps, isPlaying } = state;
+  const totalFrames = duration * fps;
+
+  const handlePlayPause = () => {
+    if (!controller) return;
+    if (isPlaying) {
+      controller.pause();
+    } else {
+      // If at end, restart
+      if (currentFrame >= totalFrames - 1) {
+        controller.seek(0);
+      }
+      controller.play();
+    }
+  };
+
+  const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!controller) return;
+    const frame = parseInt(e.target.value, 10);
+    controller.seek(frame);
+  };
+
+  const formatTime = (frame: number, fps: number) => {
+    const totalSeconds = frame / fps;
+    const mins = Math.floor(totalSeconds / 60);
+    const secs = (totalSeconds % 60).toFixed(2);
+    return `${mins}:${secs.padStart(5, '0')}`;
+  };
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', padding: '8px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <button
+          onClick={handlePlayPause}
+          disabled={!controller}
+          style={{
+            cursor: controller ? 'pointer' : 'not-allowed',
+            padding: '4px 8px',
+            minWidth: '40px'
+          }}
+        >
+          {isPlaying ? '❚❚' : '▶'}
+        </button>
+        <div style={{ fontFamily: 'monospace' }}>
+          {formatTime(currentFrame, fps)} / {formatTime(totalFrames, fps)}
+        </div>
+        <div style={{ fontFamily: 'monospace', fontSize: '0.8em', color: '#666' }}>
+          Frame: {Math.round(currentFrame)}
+        </div>
+      </div>
+      <input
+        type="range"
+        min="0"
+        max={totalFrames}
+        value={currentFrame}
+        onChange={handleSeek}
+        disabled={!controller}
+        style={{ width: '100%', cursor: controller ? 'pointer' : 'not-allowed' }}
+      />
+    </div>
+  );
+};

@@ -1,3 +1,5 @@
+import { HeliosController } from "./controllers";
+export { HeliosController };
 export declare class HeliosPlayer extends HTMLElement {
     private iframe;
     private playPauseBtn;
@@ -24,6 +26,7 @@ export declare class HeliosPlayer extends HTMLElement {
     private updateUI;
     private showStatus;
     private hideStatus;
+    getController(): HeliosController | null;
     private retryConnection;
     private renderClientSide;
 }

@@ -4,6 +4,7 @@ export interface HeliosController {
   play(): void;
   pause(): void;
   seek(frame: number): void;
+  setInputProps(props: Record<string, any>): void;
   subscribe(callback: (state: any) => void): () => void;
   getState(): any;
   dispose(): void;
@@ -15,6 +16,7 @@ export class DirectController implements HeliosController {
   play() { this.instance.play(); }
   pause() { this.instance.pause(); }
   seek(frame: number) { this.instance.seek(frame); }
+  setInputProps(props: Record<string, any>) { this.instance.setInputProps(props); }
   subscribe(callback: (state: any) => void) { return this.instance.subscribe(callback); }
   getState() { return this.instance.getState(); }
   dispose() { /* No-op for direct */ }
@@ -69,6 +71,7 @@ export class BridgeController implements HeliosController {
   play() { this.iframeWindow.postMessage({ type: 'HELIOS_PLAY' }, '*'); }
   pause() { this.iframeWindow.postMessage({ type: 'HELIOS_PAUSE' }, '*'); }
   seek(frame: number) { this.iframeWindow.postMessage({ type: 'HELIOS_SEEK', frame }, '*'); }
+  setInputProps(props: Record<string, any>) { this.iframeWindow.postMessage({ type: 'HELIOS_SET_PROPS', props }, '*'); }
 
   subscribe(callback: (state: any) => void) {
     this.listeners.push(callback);

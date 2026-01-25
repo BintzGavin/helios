@@ -2,6 +2,8 @@ import { Helios } from "@helios-project/core";
 import { HeliosController, DirectController, BridgeController } from "./controllers";
 import { ClientSideExporter } from "./features/exporter";
 
+export { HeliosController };
+
 const template = document.createElement("template");
 template.innerHTML = `
   <style>
@@ -335,6 +337,10 @@ export class HeliosPlayer extends HTMLElement {
 
   private hideStatus() {
     this.overlay.classList.add("hidden");
+  }
+
+  public getController(): HeliosController | null {
+    return this.controller;
   }
 
   private retryConnection() {
