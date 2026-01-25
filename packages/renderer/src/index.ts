@@ -40,13 +40,20 @@ export class Renderer {
       ],
     });
 
+    const context = await browser.newContext({
+      viewport: {
+        width: this.options.width,
+        height: this.options.height,
+      },
+    });
+
+    if (jobOptions?.tracePath) {
+      console.log(`Enabling Playwright tracing. Trace will be saved to: ${jobOptions.tracePath}`);
+      await context.tracing.start({ screenshots: true, snapshots: true });
+    }
+
     try {
-      const page = await browser.newPage({
-        viewport: {
-          width: this.options.width,
-          height: this.options.height,
-        },
-      });
+      const page = await context.newPage();
 
       console.log(`Navigating to ${compositionUrl}...`);
 
@@ -173,6 +180,11 @@ export class Renderer {
       }
 
     } finally {
+      if (jobOptions?.tracePath) {
+        console.log('Stopping tracing...');
+        await context.tracing.stop({ path: jobOptions.tracePath });
+      }
+      await context.close();
       await browser.close();
       console.log('Browser closed.');
     }
