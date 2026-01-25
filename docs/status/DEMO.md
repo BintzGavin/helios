@@ -1,5 +1,5 @@
 # Status: DEMO (Executor)
-**Version**: 1.15.0
+**Version**: 1.16.0
 
 ## Vision
 To provide comprehensive, idiomatic examples for every major framework (React, Vue, Svelte, Vanilla) and robust end-to-end testing to ensure the Helios engine delivers on its "Use What You Know" promise.
@@ -10,7 +10,7 @@ To provide comprehensive, idiomatic examples for every major framework (React, V
 - **Animation Helpers**: ✅ `examples/animation-helpers` exists and works (Demonstrates `interpolate`, `spring`, `sequence`, `series`).
 - **React (Canvas)**: ✅ `examples/react-canvas-animation` exists and works.
 - **React (DOM)**: ✅ `examples/react-dom-animation` exists and works.
-- **React (Helpers)**: ✅ `examples/react-animation-helpers` exists and works (Demonstrates `<Sequence>`).
+- **React (Helpers)**: ✅ `examples/react-animation-helpers` exists and works (Demonstrates `<Sequence>`, `<Series>`).
 - **Vue (Canvas)**: ✅ `examples/vue-canvas-animation` exists and works.
 - **Vue (DOM)**: ✅ `examples/vue-dom-animation` exists and works.
 - **Vue (Helpers)**: ✅ `examples/vue-animation-helpers` exists and works (Demonstrates `<Sequence>`).
@@ -36,6 +36,7 @@ To provide comprehensive, idiomatic examples for every major framework (React, V
 None.
 
 ## Log
+- [v1.16.0] ✅ Completed: Implement React Series Component - Added `<Series>` component to `examples/react-animation-helpers` and updated example to demonstrate it.
 - [v1.15.0] ✅ Completed: Enable E2E verification for DOM examples - Uncommented DOM test cases in `verify-render.ts`, verified all 14 examples pass (using `SeekTimeDriver` for DOM), and fixed a bug in Pixi example.
 - [v1.14.0] ✅ Completed: Scaffold Vue Animation Helpers - Created `examples/vue-animation-helpers` with `<Sequence>` component and Provide/Inject timing.
 - [v1.13.0] ✅ Completed: Verify Svelte Animation Helpers - Verified `examples/svelte-animation-helpers` and enabled E2E test.
