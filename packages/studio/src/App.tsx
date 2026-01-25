@@ -29,6 +29,31 @@ function AppContent() {
     setSwitcherOpen(true);
   }, { ctrlOrCmd: true });
 
+  // Playback Shortcuts
+  useKeyboardShortcut(' ', () => {
+    if (!controller) return;
+    if (playerState.isPlaying) {
+      controller.pause();
+    } else {
+      controller.play();
+    }
+  }, { ignoreInput: true, preventDefault: true });
+
+  useKeyboardShortcut('ArrowLeft', () => {
+    if (!controller) return;
+    controller.seek(Math.max(0, playerState.currentFrame - 1));
+  }, { ignoreInput: true, preventDefault: true });
+
+  useKeyboardShortcut('ArrowRight', () => {
+    if (!controller) return;
+    controller.seek(playerState.currentFrame + 1);
+  }, { ignoreInput: true, preventDefault: true });
+
+  useKeyboardShortcut('Home', () => {
+    if (!controller) return;
+    controller.seek(0);
+  }, { ignoreInput: true, preventDefault: true });
+
   useEffect(() => {
     if (!controller) return;
 
