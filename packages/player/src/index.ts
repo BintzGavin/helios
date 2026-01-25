@@ -286,7 +286,7 @@ export class HeliosPlayer extends HTMLElement {
               console.log("HeliosPlayer: Connected via Bridge Mode.");
               const iframeWin = this.iframe.contentWindow;
               if (iframeWin) {
-                  this.setController(new BridgeController(iframeWin));
+                  this.setController(new BridgeController(iframeWin, event.data.state));
                   // Ensure we get the latest state immediately if provided
                   if (event.data.state) {
                       this.updateUI(event.data.state);

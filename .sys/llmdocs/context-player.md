@@ -31,13 +31,13 @@ The `packages/player` package provides the `<helios-player>` Web Component, whic
 
 ### Connection Logic
 - **Direct Mode**: Tries to access `iframe.contentWindow.helios` directly.
-- **Bridge Mode**: Sends `HELIOS_CONNECT` via `postMessage` if direct access fails.
+- **Bridge Mode**: Sends `HELIOS_CONNECT` via `postMessage` if direct access fails. Receives `HELIOS_READY` with initial state to establish `BridgeController`.
 - **Timeout**: Shows an error state if connection is not established within 3000ms.
 
 ### Controllers (`src/controllers.ts`)
 - `HeliosController` (Interface): Common interface for controlling Helios.
 - `DirectController`: Wraps a direct `Helios` instance (same-origin).
-- `BridgeController`: Communicates via `postMessage` (cross-origin).
+- `BridgeController`: Communicates via `postMessage` (cross-origin). Accepts initial state in constructor.
 
 ### Features (`src/features/exporter.ts`)
 - `ClientSideExporter`: Handles the render loop, seeking, encoding, and muxing.
