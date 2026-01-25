@@ -6,6 +6,7 @@
 ## A. Architecture
 The Studio is a React 19 application built with Vite. It serves as the IDE for video composition, providing a live preview, property controls, and timeline management.
 - **Entry Point**: `packages/studio/index.html` -> `src/main.tsx`
+- **Backend API**: A custom Vite plugin (`vite-plugin-studio-api.ts`) provides a `/api/compositions` endpoint and serves files from the `examples/` directory using `/@fs` paths.
 - **Framework**: React 19
 - **Build Tool**: Vite
 - **Preview**: Integrated via `<helios-player>` web component, wrapped in a `Stage` component for zoom/pan controls.
@@ -17,11 +18,14 @@ packages/studio/
 ├── package.json
 ├── tsconfig.json
 ├── vite.config.ts
+├── vite-plugin-studio-api.ts
 ├── index.html
 └── src/
     ├── main.tsx
     ├── App.tsx
     ├── vite-env.d.ts
+    ├── server/
+    │   └── discovery.ts
     ├── context/
     │   └── StudioContext.tsx
     ├── hooks/
@@ -71,7 +75,7 @@ Internal scripts:
 - `npm run build -w packages/studio`: Builds the application.
 
 ## D. UI Components
-- **StudioProvider**: `context/StudioContext.tsx` wraps the application to provide state, including timeline range (`inPoint`/`outPoint`).
+- **StudioProvider**: `context/StudioContext.tsx` wraps the application to provide state, including timeline range and composition data fetched from `/api/compositions`.
 - **Main Layout**: `App.tsx` initializes the `HeliosController` connection and handles layout composition.
 - **StudioLayout**: `components/Layout/StudioLayout.tsx` defines the grid areas (header, sidebar, stage, inspector, timeline).
 - **Sidebar**: `components/Sidebar/Sidebar.tsx` manages tabs (Assets, Renders) in the sidebar area.
@@ -86,6 +90,7 @@ Internal scripts:
 - **CompositionSwitcher**: `components/CompositionSwitcher.tsx` allows switching between active compositions.
 
 ## E. Integration
+- **Backend**: Vite plugin scans `examples/` directory and serves files via `/@fs` to support dynamic project discovery.
 - **Player**: Imports `@helios-project/player` to register the web component and access `HeliosController`.
 - **CLI**: The `@helios-project/cli` package acts as a launcher for the Studio.
 - **Core**: Indirectly uses Core via Player.

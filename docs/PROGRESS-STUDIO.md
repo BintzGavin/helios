@@ -1,5 +1,8 @@
 # Studio Progress Log
 
+## STUDIO v0.10.0
+- ✅ Completed: Implement Backend API & Project Discovery - Added Vite plugin for dynamic composition discovery from `examples/` directory and connected StudioContext.
+
 ## STUDIO v0.9.0
 - ✅ Completed: Implement Playback Speed Controls - Added speed selector (0.25x to 4x, reverse) and updated StudioContext state management.
 
