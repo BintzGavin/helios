@@ -49,3 +49,11 @@
 ## 2026-02-22 - Plan Review Confusion
 **Learning:** `request_plan_review` should be used to review the *execution steps* of the agent, not the text content of the Spec File being generated.
 **Action:** When using `request_plan_review`, focus on "What I will do" (e.g., create file X), rather than "What file X contains".
+
+## 2026-02-24 - Core Type Visibility Gap
+**Learning:** Key types `HeliosState` and `Subscriber` are defined but not exported in `packages/core/src/index.ts`. This forces consumers to rely on implicit types or `Parameters<...>` hacks, degrading the Developer Experience (DX) promised by "Pure TypeScript".
+**Action:** Created plan `2026-02-24-CORE-ExportTypes.md` to explicitly export these types and rename `Subscriber` to `HeliosSubscriber` to avoid naming conflicts.
+
+## 2026-02-24 - Package Name Mismatch
+**Learning:** `README.md` instructs users to install `@helios-engine/core`, but `package.json` names the package `@helios-project/core`. This inconsistency will cause installation failures for users following the docs.
+**Action:** Logged this as a documentation/configuration gap. Deferred fixing to avoid breaking cross-package dependencies in this cycle.
