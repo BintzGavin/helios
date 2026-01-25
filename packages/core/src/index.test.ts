@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { Helios } from './index';
+import { Helios, HeliosState, HeliosSubscriber } from './index';
 import { TimeDriver, ManualTicker } from './drivers';
 
 describe('Helios Core', () => {
@@ -363,6 +363,26 @@ describe('Helios Core', () => {
 
         helios.pause();
         expect(mockDriver.update).toHaveBeenCalledWith(0, { isPlaying: false, playbackRate: 1 });
+    });
+  });
+
+  describe('Type Exports', () => {
+    it('should allow usage of exported types', () => {
+      const state: HeliosState = {
+        duration: 10,
+        fps: 30,
+        currentFrame: 0,
+        isPlaying: false,
+        inputProps: {},
+        playbackRate: 1
+      };
+
+      const subscriber: HeliosSubscriber = (s: HeliosState) => {
+        // no-op
+      };
+
+      expect(state.duration).toBe(10);
+      expect(subscriber).toBeDefined();
     });
   });
 });

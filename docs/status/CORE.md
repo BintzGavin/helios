@@ -1,6 +1,6 @@
 # Status: CORE
 
-**Version**: 1.12.0
+**Version**: 1.13.0
 
 - **Status**: Active
 - **Current Focus**: Maintenance and Optimization
@@ -23,6 +23,7 @@
 [v1.11.2] ✅ Completed: Verify Signals and Cleanup Plans - Verified signal integration and cleaned up completed plan files.
 [v1.11.3] ✅ Completed: Add Documentation - Created comprehensive `README.md` for `packages/core`.
 [v1.12.0] ✅ Completed: Implement DomDriver - Implemented `DomDriver` to sync WAAPI and HTMLMediaElements, updated `Helios` to use it by default, and deprecated `WaapiDriver`.
+[v1.13.0] ✅ Completed: Export Types - Exported `HeliosState` and `HeliosSubscriber` types from `packages/core` to improve DX.
 
 **Next Steps**:
 - None.
