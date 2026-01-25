@@ -14,6 +14,7 @@
   "scripts": {
     "dev": "npx vite ./examples/simple-canvas-animation",
     "dev:react": "vite serve examples/react-canvas-animation",
+    "dev:react-dom": "vite serve examples/react-dom-animation",
     "dev:vue": "vite serve examples/vue-canvas-animation",
     "dev:svelte": "vite serve examples/svelte-canvas-animation",
     "dev:threejs": "vite serve examples/threejs-canvas-animation",

@@ -19,3 +19,7 @@
 ## 2026-02-19 - Missing Framework Adapter Packages
 **Learning:** The README claims `packages/react`, `packages/vue` etc. exist as adapters, but they do not. Examples currently implement hooks (`useVideoFrame`) locally.
 **Action:** When planning examples, must include local hook implementation. Future plans should address creating these packages to centralize logic.
+
+## [v1.8.0] - CdpTimeDriver Incompatibility with DomStrategy
+**Learning:** `CdpTimeDriver` (the default time driver in Renderer) causes timeouts with `DomStrategy` (used for `page.screenshot`) in the verification environment. This breaks E2E verification for DOM-based examples.
+**Action:** Temporarily use `SeekTimeDriver` for verifying DOM examples, or flag it as a Known Issue. Future work should investigate `CdpTimeDriver` + `page.screenshot` compatibility (possibly virtual time budget exhaustion during screenshot).
