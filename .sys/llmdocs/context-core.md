@@ -1,20 +1,24 @@
-# Core Domain Context
+# CORE Domain Context
 
 ## A. Architecture
-The **Core** domain implements the "Headless Logic Engine" of Helios. It is a pure TypeScript library with zero dependencies that manages the state of the composition (frame, duration, fps, input props) and drives the animation timeline.
-It follows a **Store -> Actions -> Subscribers** pattern:
-- **Store**: `HeliosState` holds the source of truth (currentFrame, isPlaying, inputProps, etc).
-- **Actions**: Public methods on the `Helios` class (e.g. `seek`, `play`, `setInputProps`) mutate the state.
-- **Subscribers**: The UI or Renderer subscribes to state changes to update the view.
-It also provides pure math helpers for animation (`interpolate`, `spring`).
+The Core domain implements the "Helios State Machine" pattern. It is the pure logic engine that drives the application.
+- **Store**: `Helios` class holds the state (`currentFrame`, `isPlaying`, `inputProps`).
+- **Actions**: Methods like `play()`, `pause()`, `seek()`, `setInputProps()` modify the state.
+- **Subscribers**: External components (Player, Renderer) subscribe to state changes via `subscribe()`.
+- **TimeDriver**: Decouples time synchronization logic. `Helios` delegates environment updates (like WAAPI `currentTime`) to a `TimeDriver` implementation (`WaapiDriver` or `NoopDriver`).
 
 ## B. File Tree
 ```
 packages/core/src/
-├── animation.test.ts
-├── animation.ts       # Animation helpers (interpolate, spring)
+├── drivers/
+│   ├── NoopDriver.ts
+│   ├── TimeDriver.ts
+│   ├── WaapiDriver.ts
+│   └── index.ts
+├── animation.ts
 ├── index.test.ts
-└── index.ts           # Main entry point, Helios class
+├── index.ts
+└── types.ts (if applicable)
 ```
 
 ## C. Type Definitions
@@ -26,6 +30,7 @@ export interface HeliosOptions {
   animationScope?: HTMLElement;
   inputProps?: Record<string, any>;
   playbackRate?: number;
+  driver?: TimeDriver;
 }
 
 export interface DiagnosticReport {
@@ -35,63 +40,26 @@ export interface DiagnosticReport {
   userAgent: string;
 }
 
-export type ExtrapolateType = 'extend' | 'clamp' | 'identity';
-
-export interface InterpolateOptions {
-  extrapolateLeft?: ExtrapolateType;
-  extrapolateRight?: ExtrapolateType;
-  easing?: (t: number) => number;
-}
-
-export interface SpringConfig {
-  mass?: number;      // default: 1
-  stiffness?: number; // default: 100
-  damping?: number;   // default: 10
-  overshootClamping?: boolean; // default: false
-}
-
-export interface SpringOptions {
-  frame: number;
-  fps: number;
-  config?: SpringConfig;
-  from?: number; // default: 0
-  to?: number;   // default: 1
-  /**
-   * Optional duration hint.
-   * Note: Physics simulations are time-based and do not have a fixed duration.
-   * This property is currently ignored by the spring function.
-   */
-  durationInFrames?: number;
+export interface TimeDriver {
+  init(scope: HTMLElement | Document): void;
+  update(timeInMs: number): void;
 }
 ```
 
 ## D. Public Methods
 ```typescript
-export class Helios {
+class Helios {
   static diagnose(): Promise<DiagnosticReport>;
   constructor(options: HeliosOptions);
-
   getState(): Readonly<HeliosState>;
   setInputProps(props: Record<string, any>): void;
   setPlaybackRate(rate: number): void;
-
   subscribe(callback: Subscriber): () => void;
   unsubscribe(callback: Subscriber): void;
-
   play(): void;
   pause(): void;
   seek(frame: number): void;
-
   bindToDocumentTimeline(): void;
   unbindFromDocumentTimeline(): void;
 }
-
-export function interpolate(
-  input: number,
-  inputRange: number[],
-  outputRange: number[],
-  options?: InterpolateOptions
-): number;
-
-export function spring(options: SpringOptions): number;
 ```

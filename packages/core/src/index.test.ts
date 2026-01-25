@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { Helios } from './index';
+import { TimeDriver } from './drivers';
 
 describe('Helios Core', () => {
   it('should initialize with correct state', () => {
@@ -306,6 +307,49 @@ describe('Helios Core', () => {
 
         expect(helios.getState().currentFrame).toBe(59); // clamped to totalFrames - 1
         expect(helios.getState().isPlaying).toBe(false);
+    });
+  });
+
+  describe('TimeDriver Abstraction', () => {
+    let mockDriver: TimeDriver;
+
+    beforeEach(() => {
+       mockDriver = {
+         init: vi.fn(),
+         update: vi.fn()
+       };
+    });
+
+    it('should use provided driver', () => {
+      const helios = new Helios({ duration: 10, fps: 30, driver: mockDriver });
+      helios.seek(30);
+      expect(mockDriver.update).toHaveBeenCalledWith(1000);
+    });
+
+    it('should initialize driver with scope', () => {
+       const scope = {} as any;
+       new Helios({ duration: 10, fps: 30, driver: mockDriver, animationScope: scope });
+       expect(mockDriver.init).toHaveBeenCalledWith(scope);
+    });
+
+    it('should call driver.update during playback', async () => {
+        let currentTime = 0;
+        vi.stubGlobal('performance', { now: () => currentTime });
+        vi.stubGlobal('requestAnimationFrame', (cb: any) => setTimeout(cb, 0));
+        vi.stubGlobal('cancelAnimationFrame', (id: any) => clearTimeout(id));
+
+        const helios = new Helios({ duration: 10, fps: 30, driver: mockDriver });
+        helios.play();
+
+        // Advance time
+        currentTime = 100; // 100ms elapsed
+
+        await new Promise(resolve => setTimeout(resolve, 10));
+
+        expect(mockDriver.update).toHaveBeenCalled();
+
+        helios.pause();
+        vi.unstubAllGlobals();
     });
   });
 });
