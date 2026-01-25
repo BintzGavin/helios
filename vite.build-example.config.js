@@ -17,6 +17,7 @@ export default defineConfig({
         simple_dom: resolve(__dirname, "examples/simple-animation/composition.html"),
         simple_canvas: resolve(__dirname, "examples/simple-canvas-animation/composition.html"),
         react_composition: resolve(__dirname, "examples/react-canvas-animation/composition.html"),
+        react_dom: resolve(__dirname, "examples/react-dom-animation/composition.html"),
         vue_composition: resolve(__dirname, "examples/vue-canvas-animation/composition.html"),
         svelte_composition: resolve(__dirname, "examples/svelte-canvas-animation/composition.html"),
         threejs_composition: resolve(__dirname, "examples/threejs-canvas-animation/composition.html"),

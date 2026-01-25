@@ -1,5 +1,5 @@
 # Status: DEMO (Executor)
-**Version**: 1.7.0
+**Version**: 1.8.0
 
 ## Vision
 To provide comprehensive, idiomatic examples for every major framework (React, Vue, Svelte, Vanilla) and robust end-to-end testing to ensure the Helios engine delivers on its "Use What You Know" promise.
@@ -8,7 +8,8 @@ To provide comprehensive, idiomatic examples for every major framework (React, V
 - **Vanilla JS (Canvas)**: ✅ `examples/simple-canvas-animation` exists and works.
 - **Vanilla JS (DOM)**: ✅ `examples/simple-animation` exists and works.
 - **Animation Helpers**: ✅ `examples/animation-helpers` exists and works.
-- **React**: ✅ `examples/react-canvas-animation` exists and works.
+- **React (Canvas)**: ✅ `examples/react-canvas-animation` exists and works.
+- **React (DOM)**: ✅ `examples/react-dom-animation` exists and works (Verified with SeekTimeDriver).
 - **Vue**: ✅ `examples/vue-canvas-animation` exists and works.
 - **Svelte**: ✅ `examples/svelte-canvas-animation` exists and works.
 - **Three.js**: ✅ `examples/threejs-canvas-animation` exists and works.
@@ -25,7 +26,11 @@ To provide comprehensive, idiomatic examples for every major framework (React, V
 - [x] Verify E2E tests for examples
 - [x] Verify DOM rendering example
 
+## Known Issues
+- `DomStrategy` (used by `simple-animation` and `react-dom-animation`) fails in `verify-render.ts` with `CdpTimeDriver` (timeout). Verified working with `SeekTimeDriver`.
+
 ## Log
+- [v1.8.0] ✅ Completed: Scaffold React DOM Example - Created `examples/react-dom-animation` and added E2E verification case.
 - [v1.7.0] ✅ Completed: Scaffold Pixi.js Example - Created `examples/pixi-canvas-animation` with `pixi.js` dependency and verification script.
 - [v1.6.0] ✅ Completed: Scaffold Animation Helpers Example - Created `examples/animation-helpers` demonstrating `interpolate` and `spring` from Core.
 - [v1.5.0] ✅ Completed: Scaffold Three.js Example - Created `examples/threejs-canvas-animation` with `three` dependency and verification script.

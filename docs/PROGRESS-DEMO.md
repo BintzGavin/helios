@@ -1,3 +1,6 @@
+## DEMO v1.8.0
+- ✅ Completed: Scaffold React DOM Example - Created `examples/react-dom-animation` and added E2E verification case.
+
 ## DEMO v1.7.0
 - ✅ Completed: Scaffold Pixi.js Example - Created `examples/pixi-canvas-animation` with `pixi.js` dependency and verification script.
 
