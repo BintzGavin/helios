@@ -9,6 +9,7 @@ import { StudioProvider, useStudio } from './context/StudioContext'
 import { CompositionSwitcher } from './components/CompositionSwitcher'
 import { useKeyboardShortcut } from './hooks/useKeyboardShortcut'
 import { Stage } from './components/Stage/Stage'
+import { AssetsPanel } from './components/AssetsPanel/AssetsPanel'
 
 function AppContent() {
   const {
@@ -90,11 +91,8 @@ function AppContent() {
           </div>
         }
         sidebar={
-          <Panel title="Explorer">
-            <div style={{ padding: '8px', fontSize: '0.9em' }}>
-              <div>Assets</div>
-              <div>Compositions</div>
-            </div>
+          <Panel title="Assets">
+            <AssetsPanel />
           </Panel>
         }
         stage={<Stage src={src} />}

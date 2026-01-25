@@ -1,5 +1,8 @@
 # Studio Progress Log
 
+## STUDIO v0.6.0
+- ✅ Completed: Implement Assets Panel - Added AssetsPanel, AssetItem, and mock assets in StudioContext.
+
 ## STUDIO v0.5.0
 - ✅ Completed: Implement Stage & Canvas Controls - Created Stage component with Pan/Zoom/Transparency controls and refactored App.tsx to use it.
 
