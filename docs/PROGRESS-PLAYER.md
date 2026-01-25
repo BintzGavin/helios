@@ -1,5 +1,8 @@
 # PLAYER Progress Log
 
+## PLAYER v0.8.0
+- ✅ Completed: Client Side Audio - Implemented audio capture, mixing (OfflineAudioContext), and encoding (AAC) for client-side export.
+
 ## PLAYER v0.7.0
 - ✅ Completed: Enable External Stylesheets - Updated DOM capture to fetch and inline external CSS (`<link rel="stylesheet">`) for high-fidelity exports.
 

@@ -1,5 +1,6 @@
 import { HeliosController } from "../controllers";
 import { Muxer, ArrayBufferTarget } from "mp4-muxer";
+import { mixAudio } from "./audio-utils";
 
 export class ClientSideExporter {
   constructor(
@@ -65,7 +66,13 @@ export class ClientSideExporter {
             codec: 'avc',
             width: width,
             height: height
-        }
+        },
+        audio: {
+            codec: 'aac',
+            numberOfChannels: 2,
+            sampleRate: 48000
+        },
+        firstTimestampBehavior: 'offset'
       });
 
       encoder = new VideoEncoder({
@@ -77,6 +84,52 @@ export class ClientSideExporter {
           throw e;
         },
       });
+
+      // --- Audio Setup ---
+      let audioEncoder: AudioEncoder | null = null;
+      try {
+          if (typeof AudioEncoder !== 'undefined') {
+              audioEncoder = new AudioEncoder({
+                  output: (chunk, meta) => muxer.addAudioChunk(chunk, meta),
+                  error: e => console.warn("AudioEncoder error:", e)
+              });
+
+              await audioEncoder.configure({
+                  codec: 'mp4a.40.2',
+                  numberOfChannels: 2,
+                  sampleRate: 48000
+              });
+
+              const audioTracks = await this.controller.getAudioTracks();
+              if (audioTracks && audioTracks.length > 0) {
+                  const audioBuffer = await mixAudio(audioTracks, state.duration, 48000);
+                  const c0 = audioBuffer.getChannelData(0);
+                  const c1 = audioBuffer.getChannelData(1);
+                  const planarData = new Float32Array(c0.length + c1.length);
+                  planarData.set(c0, 0);
+                  planarData.set(c1, c0.length);
+
+                  const audioData = new AudioData({
+                      format: 'f32-planar',
+                      sampleRate: 48000,
+                      numberOfFrames: audioBuffer.length,
+                      numberOfChannels: 2,
+                      timestamp: 0,
+                      data: planarData
+                  });
+
+                  audioEncoder.encode(audioData);
+                  audioData.close();
+                  await audioEncoder.flush();
+                  audioEncoder.close();
+              }
+          }
+      } catch (e) {
+          console.warn("Audio export failed or ignored:", e);
+          if (audioEncoder) {
+              try { audioEncoder.close(); } catch (_) {}
+          }
+      }
 
       const config: VideoEncoderConfig = {
         codec: "avc1.420028", // H.264 Baseline Level 4.0
@@ -143,7 +196,7 @@ export class ClientSideExporter {
         try {
           await encoder.close();
         } catch (e) {
-          console.warn("Error closing encoder:", e);
+          console.warn("Error closing video encoder:", e);
         }
       }
     }

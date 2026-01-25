@@ -1,5 +1,6 @@
 import { Helios } from "@helios-project/core";
 import { captureDomToBitmap } from "./features/dom-capture";
+import { getAudioAssets, AudioAsset } from "./features/audio-utils";
 
 export interface HeliosController {
   play(): void;
@@ -11,6 +12,7 @@ export interface HeliosController {
   getState(): any;
   dispose(): void;
   captureFrame(frame: number, options?: { selector?: string, mode?: 'canvas' | 'dom' }): Promise<VideoFrame | null>;
+  getAudioTracks(): Promise<AudioAsset[]>;
 }
 
 export class DirectController implements HeliosController {
@@ -23,6 +25,11 @@ export class DirectController implements HeliosController {
   subscribe(callback: (state: any) => void) { return this.instance.subscribe(callback); }
   getState() { return this.instance.getState(); }
   dispose() { /* No-op for direct */ }
+
+  async getAudioTracks(): Promise<AudioAsset[]> {
+     const doc = this.iframe?.contentDocument || document;
+     return getAudioAssets(doc);
+  }
 
   async captureFrame(frame: number, options?: { selector?: string, mode?: 'canvas' | 'dom' }): Promise<VideoFrame | null> {
       const fps = this.instance.getState().fps;
@@ -130,6 +137,25 @@ export class BridgeController implements HeliosController {
           setTimeout(() => {
               window.removeEventListener('message', handler);
               resolve(null);
+          }, 5000);
+      });
+  }
+
+  async getAudioTracks(): Promise<AudioAsset[]> {
+      return new Promise((resolve) => {
+          const handler = (event: MessageEvent) => {
+              if (event.data?.type === 'HELIOS_AUDIO_DATA') {
+                  window.removeEventListener('message', handler);
+                  resolve(event.data.assets || []);
+              }
+          };
+          window.addEventListener('message', handler);
+          this.iframeWindow.postMessage({ type: 'HELIOS_GET_AUDIO_TRACKS' }, '*');
+
+          // Timeout
+          setTimeout(() => {
+              window.removeEventListener('message', handler);
+              resolve([]);
           }, 5000);
       });
   }
