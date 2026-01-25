@@ -1,5 +1,8 @@
 # PLAYER Progress Log
 
+## PLAYER v0.10.0
+- ✅ Completed: CSS Asset Inlining - Implemented parsing and inlining of assets (images, fonts) referenced in CSS via `url()` as Data URIs for robust DOM export.
+
 ## PLAYER v0.9.0
 - ✅ Completed: Client-Side Image Inlining - Implemented fetching and inlining of `<img>` and `background-image` sources as Data URIs for robust DOM export.
 
