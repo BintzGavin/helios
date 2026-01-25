@@ -1,5 +1,8 @@
 # DEMO Progress Log
 
+## DEMO v1.5.0
+- ✅ Completed: Scaffold Three.js Example - Created `examples/threejs-canvas-animation`, updated build config, and added E2E verification.
+
 ## DEMO v1.3.0
 - ✅ Completed: Verify DOM Render - Updated `tests/e2e/verify-render.ts` to include the DOM rendering test case and verified it passes.
 
