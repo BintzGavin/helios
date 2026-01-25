@@ -1,4 +1,4 @@
-**Version**: 1.2.0
+**Version**: 1.3.0
 
 # Renderer Agent Status
 
@@ -11,3 +11,4 @@
 - [1.1.0] ✅ Completed: Implement Progress and Cancellation - Added `RenderJobOptions` with `onProgress` callback and `AbortSignal` support to `Renderer.render`, enabling UIs to track progress and cancel long-running jobs.
 - [1.1.1] ✅ Completed: Refactor TimeDriver - Decoupled time advancement logic from RenderStrategy into a dedicated TimeDriver interface, preparing for CDP integration.
 - [1.2.0] ✅ Completed: Enable Playwright Trace Viewer - Added `tracePath` option to `RenderJobOptions`, enabling generation of Playwright trace files for debugging rendering sessions.
+- [1.3.0] ✅ Completed: Implement CdpTimeDriver - Implemented `CdpTimeDriver` using Chrome DevTools Protocol to virtually advance time, ensuring deterministic rendering for complex animations.
