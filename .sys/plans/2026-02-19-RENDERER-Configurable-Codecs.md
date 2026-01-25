@@ -1,60 +1,37 @@
-# 1. Context & Goal
-- **Objective**: Enable configurable video codecs and pixel formats in `RendererOptions` and eliminate duplicated FFmpeg argument logic across strategies.
-- **Trigger**: The current implementation hardcodes `libx264` and `yuv420p`, preventing transparency support (e.g., WebM/VP9) and limiting format choices.
-- **Impact**: Unlocks transparent video export, custom bitrate/quality control, and simplifies maintenance by centralizing FFmpeg logic.
+#### 1. Context & Goal
+- **Objective**: Allow users to customize video encoding parameters (codec, pixel format, quality, preset) in `RendererOptions` to support use cases like transparent video (ProRes/QT RLE) and high-quality archiving.
+- **Trigger**: "Current Renderer implementation hardcodes FFmpeg output to 'libx264' and 'yuv420p'" (Vision Gap).
+- **Impact**: Unlocks transparent video export (via DomStrategy), configurable quality/size trade-offs, and compatibility with non-standard workflows.
 
-# 2. File Inventory
-- **Create**:
-  - `packages/renderer/src/strategies/ffmpeg-utils.ts`: Utility for generating common FFmpeg arguments.
-  - `packages/renderer/scripts/verify-codec-config.ts`: Verification script to test codec configuration.
-- **Modify**:
-  - `packages/renderer/src/types.ts`: Add `videoCodec`, `pixelFormat`, `audioCodec`, `outputFormat` to `RendererOptions`.
-  - `packages/renderer/src/strategies/CanvasStrategy.ts`: Use `ffmpeg-utils` helper.
-  - `packages/renderer/src/strategies/DomStrategy.ts`: Use `ffmpeg-utils` helper.
-- **Read-Only**:
-  - `packages/renderer/src/strategies/RenderStrategy.ts`
+#### 2. File Inventory
+- **Modify**: `packages/renderer/src/types.ts` (Add codec options)
+- **Modify**: `packages/renderer/src/strategies/CanvasStrategy.ts` (Apply options to FFmpeg args)
+- **Modify**: `packages/renderer/src/strategies/DomStrategy.ts` (Apply options to FFmpeg args)
+- **Create**: `packages/renderer/tests/verify-codecs.ts` (Verification script)
 
-# 3. Implementation Spec
-- **Architecture**: Extract common FFmpeg argument generation (audio input, audio/video output) into a shared utility function `getCommonFFmpegArgs` in `ffmpeg-utils.ts`. Strategies will invoke this helper, passing their specific `videoInputArgs`.
+#### 3. Implementation Spec
+- **Architecture**: Extend `RendererOptions` to include optional FFmpeg overrides. Update strategies to prioritize these options over defaults.
 - **Public API Changes**:
-  - `RendererOptions` interface in `types.ts` will add:
-    - `videoCodec?: string`: Default `'libx264'`.
-    - `pixelFormat?: string`: Default `'yuv420p'`.
-    - `audioCodec?: string`: Default `'aac'`.
-    - `outputFormat?: string`: Optional explicit container format (e.g., `'mp4'`, `'webm'`).
-- **Pseudo-Code**:
-  ```typescript
-  // packages/renderer/src/strategies/ffmpeg-utils.ts
-
-  export function getCommonFFmpegArgs(
-    options: RendererOptions,
-    videoInputArgs: string[],
-    outputPath: string
-  ): string[] {
-    // CALCULATE audioInputArgs based on options.audioFilePath and options.startFrame
-    // IF audioFilePath exists:
-    //   CALCULATE audioOutputArgs using options.audioCodec (default 'aac') and duration
-    // ELSE:
-    //   SET audioOutputArgs to empty
-
-    // CALCULATE outputArgs:
-    //   -c:v options.videoCodec OR 'libx264'
-    //   -pix_fmt options.pixelFormat OR 'yuv420p'
-    //   -movflags +faststart (if format is compatible, or always)
-    //   INCLUDE audioOutputArgs
-    //   outputPath
-
-    // RETURN ['-y', ...videoInputArgs, ...audioInputArgs, ...outputArgs]
-  }
-  ```
-
+  - Update `RendererOptions` interface:
+    - `videoCodec?: string` (default: 'libx264')
+    - `pixelFormat?: string` (default: 'yuv420p')
+    - `crf?: number` (default: undefined)
+    - `preset?: string` (default: 'fast')
+    - `videoBitrate?: string` (default: undefined)
+- **Logic**:
+  - In `getFFmpegArgs`, replace hardcoded strings with values from `options`.
+  - Default values (if options are missing):
+    - `videoCodec`: 'libx264'
+    - `pixelFormat`: 'yuv420p'
+    - `movflags`: '+faststart'
+  - If `options.crf` is provided, add `-crf ${options.crf}`.
+  - If `options.preset` is provided, add `-preset ${options.preset}`.
+  - If `options.videoBitrate` is provided, add `-b:v ${options.videoBitrate}`.
 - **Dependencies**: None.
 
-# 4. Test Plan
-- **Verification**: Run the verification script and build the package.
-  `npx ts-node packages/renderer/scripts/verify-codec-config.ts && npm run build`
-- **Success Criteria**:
-  - `verify-codec-config.ts` runs without errors and confirms that `DomStrategy` and `CanvasStrategy` generate correct FFmpeg arguments when custom codecs are provided (e.g., `videoCodec: 'libvpx-vp9'`).
-  - `npm run build` completes successfully, ensuring type safety.
-  - Default options still produce `libx264` and `yuv420p`.
-- **Pre-Commit**: Complete pre-commit steps to ensure proper testing, verification, review, and reflection are done.
+#### 4. Test Plan
+- **Verification**: `npx ts-node packages/renderer/tests/verify-codecs.ts`
+- **Success Criteria**: Render completes with custom arguments (logged to console) without FFmpeg error.
+- **Edge Cases**:
+  - Invalid codec (FFmpeg should fail, `Renderer` should catch/propagate error).
+  - WebCodecs transparency (Known limitation: CanvasStrategy might still use VP8 without alpha).
