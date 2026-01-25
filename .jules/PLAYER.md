@@ -17,3 +17,7 @@
 ## 2026-01-22 - God Class Refactor
 **Learning:** `index.ts` accumulated UI, State, and Export logic, making it hard to see the "Client-Side Export" implementation details. This obscured the fact that the exporter was primitive.
 **Action:** When a file exceeds ~300 lines or handles >2 distinct domains, prioritize refactoring before adding new features.
+
+## 2026-01-23 - Role Boundaries Violation
+**Learning:** I mistakenly implemented code changes (modifying `packages/player/src/index.ts`) instead of creating a spec file, violating the "Planner" role boundaries.
+**Action:** Always verify the active role protocol before execution. If the role is "Planner", the output MUST be a `.md` file in `.sys/plans/`, and NO source code changes are allowed.
