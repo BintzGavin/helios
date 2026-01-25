@@ -29,7 +29,7 @@
 - [ ] Add realistic examples (Canvas and DOM).
 
 ### 6. Distributed Rendering Research
-- [ ] Scaffolding for distributed rendering.
+- [x] Scaffolding for distributed rendering.
 
 ### 7. Helios Studio
 - [x] Scaffold `packages/studio` package.

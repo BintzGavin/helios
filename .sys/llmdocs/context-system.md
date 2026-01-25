@@ -11,7 +11,7 @@
    - `helios.diagnose()` for environment checks.
 5. **Documentation and Examples**
    - Quickstart, Realistic Examples (React, Vue, Svelte).
-6. **Distributed Rendering Research**
+6. **Distributed Rendering Research** (Scaffolding Complete)
 7. **Helios Studio**
    - Browser-based IDE for composition (UI, Playback Controls, Asset Discovery implemented).
 
