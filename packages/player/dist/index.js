@@ -114,6 +114,23 @@ template.innerHTML = `
     .retry-btn:hover {
       background-color: #ff5252;
     }
+    .speed-selector {
+      background: rgba(0, 0, 0, 0.4);
+      color: white;
+      border: 1px solid #555;
+      border-radius: 4px;
+      padding: 4px 8px;
+      margin-left: 8px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .speed-selector:hover {
+      background: rgba(0, 0, 0, 0.6);
+    }
+    .speed-selector:focus {
+      outline: none;
+      border-color: #007bff;
+    }
   </style>
   <div class="status-overlay" part="overlay">
     <div class="status-text">Connecting...</div>
@@ -123,6 +140,12 @@ template.innerHTML = `
   <div class="controls">
     <button class="play-pause-btn" part="play-pause-button">▶</button>
     <button class="export-btn" part="export-button">Export</button>
+    <select class="speed-selector" part="speed-selector">
+      <option value="0.25">0.25x</option>
+      <option value="0.5">0.5x</option>
+      <option value="1" selected>1x</option>
+      <option value="2">2x</option>
+    </select>
     <input type="range" class="scrubber" min="0" value="0" step="1" part="scrubber">
     <div class="time-display" part="time-display">0.00 / 0.00</div>
   </div>
@@ -136,6 +159,7 @@ export class HeliosPlayer extends HTMLElement {
     overlay;
     statusText;
     retryBtn;
+    speedSelector;
     controller = null;
     // Keep track if we have direct access (optional, mainly for debugging/logging)
     directHelios = null;
@@ -154,6 +178,7 @@ export class HeliosPlayer extends HTMLElement {
         this.overlay = this.shadowRoot.querySelector(".status-overlay");
         this.statusText = this.shadowRoot.querySelector(".status-text");
         this.retryBtn = this.shadowRoot.querySelector(".retry-btn");
+        this.speedSelector = this.shadowRoot.querySelector(".speed-selector");
         this.retryBtn.onclick = () => this.retryConnection();
     }
     connectedCallback() {
@@ -167,6 +192,7 @@ export class HeliosPlayer extends HTMLElement {
         this.playPauseBtn.addEventListener("click", this.togglePlayPause);
         this.scrubber.addEventListener("input", this.handleScrubberInput);
         this.exportBtn.addEventListener("click", this.renderClientSide);
+        this.speedSelector.addEventListener("change", this.handleSpeedChange);
         // Initial state: disabled until connected
         this.setControlsDisabled(true);
         this.showStatus("Connecting...", false);
@@ -177,6 +203,7 @@ export class HeliosPlayer extends HTMLElement {
         this.playPauseBtn.removeEventListener("click", this.togglePlayPause);
         this.scrubber.removeEventListener("input", this.handleScrubberInput);
         this.exportBtn.removeEventListener("click", this.renderClientSide);
+        this.speedSelector.removeEventListener("change", this.handleSpeedChange);
         if (this.unsubscribe) {
             this.unsubscribe();
         }
@@ -188,6 +215,7 @@ export class HeliosPlayer extends HTMLElement {
     setControlsDisabled(disabled) {
         this.playPauseBtn.disabled = disabled;
         this.scrubber.disabled = disabled;
+        this.speedSelector.disabled = disabled;
         // Export is managed separately based on connection state
         if (disabled) {
             this.exportBtn.disabled = true;
@@ -291,6 +319,11 @@ export class HeliosPlayer extends HTMLElement {
             this.controller.seek(frame);
         }
     };
+    handleSpeedChange = () => {
+        if (this.controller) {
+            this.controller.setPlaybackRate(parseFloat(this.speedSelector.value));
+        }
+    };
     updateUI(state) {
         const isFinished = state.currentFrame >= state.duration * state.fps - 1;
         if (isFinished) {
@@ -301,6 +334,9 @@ export class HeliosPlayer extends HTMLElement {
         }
         this.scrubber.value = String(state.currentFrame);
         this.timeDisplay.textContent = `${(state.currentFrame / state.fps).toFixed(2)} / ${state.duration.toFixed(2)}`;
+        if (state.playbackRate !== undefined) {
+            this.speedSelector.value = String(state.playbackRate);
+        }
     }
     // --- Loading / Error UI Helpers ---
     showStatus(msg, isError) {
