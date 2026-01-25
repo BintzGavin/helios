@@ -9,6 +9,7 @@
 - `examples/react-animation-helpers`: React demonstrating `<Sequence>` and `<Series>` components.
 - `examples/vue-canvas-animation`: Vue with Canvas.
 - `examples/vue-dom-animation`: Vue with DOM elements.
+- `examples/vue-animation-helpers`: Vue demonstrating `<Sequence>` pattern.
 - `examples/svelte-canvas-animation`: Svelte with Canvas.
 - `examples/svelte-dom-animation`: Svelte with DOM elements.
 - `examples/svelte-animation-helpers`: Svelte demonstrating `<Sequence>` pattern.
@@ -22,4 +23,4 @@
 
 ## Section C: E2E Tests
 - `tests/e2e/verify-render.ts`: Script using Playwright and Renderer to verify that examples render correctly to video.
-- Verified cases: Canvas, DOM (partial), React, Vue, Svelte, ThreeJS, Pixi, Helpers, React Helpers, Svelte Helpers.
+- Verified cases: Canvas, DOM, React, React DOM, Vue, Vue DOM, Svelte, Svelte DOM, ThreeJS, Pixi, Helpers, React Helpers, Svelte Helpers, Vue Helpers.

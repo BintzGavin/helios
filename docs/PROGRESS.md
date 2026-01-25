@@ -99,3 +99,6 @@ Each agent should update **their own dedicated progress file** instead of this f
   ```
 - If this is a new version, create the section at the top of the file (after any existing content)
 - Group multiple completions under the same version section if they're part of the same release
+
+### DEMO v1.15.0
+- ✅ Completed: Enable E2E verification for DOM examples - Verified all 14 examples pass, fixed Pixi bug.
