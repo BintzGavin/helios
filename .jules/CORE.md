@@ -29,3 +29,7 @@
 ## 2026-01-25 - TimeDriver Abstraction Needed
 **Learning:** The `Helios` class hardcodes `requestAnimationFrame` and `performance.now()`. This couples the core logic to the browser environment and makes testing time-dependent logic brittle. The README Roadmap explicitly calls for a `TimeDriver` abstraction to decouple this.
 **Action:** Prioritize "Architecture Hardening: TimeDriver" in future planning cycles to improve testability and portability (e.g., for Node.js rendering).
+
+## 2026-01-25 - Duplicate Concept Disambiguation
+**Learning:** `packages/renderer` defines a `TimeDriver` interface for Playwright automation. The `packages/core` TimeDriver (for internal engine logic) must be distinct.
+**Action:** Ensure naming or documentation clarifies the distinction. The Core driver drives the *internal* state/WAAPI, while the Renderer driver drives the *browser* time.
