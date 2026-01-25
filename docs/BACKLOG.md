@@ -35,3 +35,4 @@
 - [x] Scaffold `packages/studio` package.
 - [x] Implement Studio UI (Timeline, Props).
 - [x] Implement CLI integration.
+- [x] Implement Asset Discovery (Backend & UI).

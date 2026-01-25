@@ -8,6 +8,13 @@ export interface CompositionInfo {
   description?: string;
 }
 
+export interface AssetInfo {
+  id: string;
+  name: string;
+  url: string;
+  type: 'image' | 'video' | 'audio' | 'font' | 'other';
+}
+
 export function findCompositions(rootDir: string): CompositionInfo[] {
   // rootDir is expected to be packages/studio (or wherever the vite server is running from)
   // We want to look at ../../examples
@@ -43,4 +50,56 @@ export function findCompositions(rootDir: string): CompositionInfo[] {
     }
   }
   return compositions;
+}
+
+function getAssetType(ext: string): AssetInfo['type'] {
+  const images = ['.png', '.jpg', '.jpeg', '.gif', '.svg', '.webp'];
+  const videos = ['.mp4', '.webm', '.mov'];
+  const audio = ['.mp3', '.wav', '.aac', '.ogg'];
+  const fonts = ['.ttf', '.otf', '.woff', '.woff2'];
+
+  if (images.includes(ext)) return 'image';
+  if (videos.includes(ext)) return 'video';
+  if (audio.includes(ext)) return 'audio';
+  if (fonts.includes(ext)) return 'font';
+  return 'other';
+}
+
+export function findAssets(rootDir: string): AssetInfo[] {
+  const examplesDir = path.resolve(rootDir, '../../examples');
+
+  if (!fs.existsSync(examplesDir)) {
+    console.warn(`Examples directory not found at: ${examplesDir}`);
+    return [];
+  }
+
+  const assets: AssetInfo[] = [];
+
+  function scan(dir: string) {
+    const entries = fs.readdirSync(dir, { withFileTypes: true });
+
+    for (const entry of entries) {
+      const fullPath = path.join(dir, entry.name);
+
+      if (entry.isDirectory()) {
+        if (['node_modules', '.git', 'dist', 'build'].includes(entry.name)) continue;
+        scan(fullPath);
+      } else {
+        const ext = path.extname(entry.name).toLowerCase();
+        const type = getAssetType(ext);
+
+        if (type !== 'other') {
+           assets.push({
+             id: fullPath,
+             name: entry.name,
+             url: `/@fs${fullPath}`,
+             type
+           });
+        }
+      }
+    }
+  }
+
+  scan(examplesDir);
+  return assets;
 }
