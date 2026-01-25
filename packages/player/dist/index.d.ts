@@ -1,5 +1,5 @@
-import { HeliosController } from "./controllers";
-export { HeliosController };
+import type { HeliosController } from "./controllers";
+export type { HeliosController };
 export declare class HeliosPlayer extends HTMLElement {
     private iframe;
     private playPauseBtn;
@@ -15,13 +15,16 @@ export declare class HeliosPlayer extends HTMLElement {
     private unsubscribe;
     private connectionTimeout;
     private abortController;
+    static get observedAttributes(): string[];
     constructor();
+    attributeChangedCallback(name: string, oldVal: string, newVal: string): void;
     connectedCallback(): void;
     disconnectedCallback(): void;
     private setControlsDisabled;
     private handleIframeLoad;
     private handleWindowMessage;
     private setController;
+    private updateAspectRatio;
     private togglePlayPause;
     private handleScrubberInput;
     private handleSpeedChange;

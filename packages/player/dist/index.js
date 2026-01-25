@@ -166,6 +166,9 @@ export class HeliosPlayer extends HTMLElement {
     unsubscribe = null;
     connectionTimeout = null;
     abortController = null;
+    static get observedAttributes() {
+        return ["src", "width", "height"];
+    }
     constructor() {
         super();
         this.attachShadow({ mode: "open" });
@@ -181,21 +184,38 @@ export class HeliosPlayer extends HTMLElement {
         this.speedSelector = this.shadowRoot.querySelector(".speed-selector");
         this.retryBtn.onclick = () => this.retryConnection();
     }
+    attributeChangedCallback(name, oldVal, newVal) {
+        if (oldVal === newVal)
+            return;
+        if (name === "src") {
+            this.iframe.src = newVal;
+            if (this.controller) {
+                this.controller.pause();
+                this.controller.dispose();
+                this.controller = null;
+            }
+            this.setControlsDisabled(true);
+            this.showStatus("Loading...", false);
+        }
+        if (name === "width" || name === "height") {
+            this.updateAspectRatio();
+        }
+    }
     connectedCallback() {
         this.iframe.addEventListener("load", this.handleIframeLoad);
         window.addEventListener("message", this.handleWindowMessage);
-        // Set src from attribute
-        const src = this.getAttribute("src");
-        if (src) {
-            this.iframe.src = src;
-        }
         this.playPauseBtn.addEventListener("click", this.togglePlayPause);
         this.scrubber.addEventListener("input", this.handleScrubberInput);
         this.exportBtn.addEventListener("click", this.renderClientSide);
         this.speedSelector.addEventListener("change", this.handleSpeedChange);
         // Initial state: disabled until connected
         this.setControlsDisabled(true);
-        this.showStatus("Connecting...", false);
+        // Only show connecting if we haven't already shown "Loading..." via attributeChangedCallback
+        if (this.overlay.classList.contains("hidden")) {
+            this.showStatus("Connecting...", false);
+        }
+        // Ensure aspect ratio is correct on connect
+        this.updateAspectRatio();
     }
     disconnectedCallback() {
         this.iframe.removeEventListener("load", this.handleIframeLoad);
@@ -295,6 +315,16 @@ export class HeliosPlayer extends HTMLElement {
             this.updateUI(state);
         }
         this.unsubscribe = this.controller.subscribe((s) => this.updateUI(s));
+    }
+    updateAspectRatio() {
+        const w = parseFloat(this.getAttribute("width") || "");
+        const h = parseFloat(this.getAttribute("height") || "");
+        if (!isNaN(w) && !isNaN(h) && w > 0 && h > 0) {
+            this.style.aspectRatio = `${w} / ${h}`;
+        }
+        else {
+            this.style.removeProperty("aspect-ratio");
+        }
     }
     togglePlayPause = () => {
         if (!this.controller)

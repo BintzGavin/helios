@@ -33,9 +33,13 @@ The `<helios-player>` Web Component encapsulates the playback environment and UI
 
 ## B. Attributes
 
-- **`src`**: URL of the Helios composition to load in the iframe.
+- **`src`**: URL of the Helios composition to load in the iframe. Changes trigger a reload of the iframe.
+- **`width`**: The desired width of the player aspect ratio (e.g., "1920").
+- **`height`**: The desired height of the player aspect ratio (e.g., "1080").
 - **`export-mode`**: Controls client-side export behavior. Values: `auto` (default), `canvas`, `dom`.
 - **`canvas-selector`**: CSS selector for the canvas to capture in `canvas` mode (default: `canvas`).
+
+**Note:** If `width` and `height` are provided, the player sets an inline `aspect-ratio` style. If omitted, the default aspect ratio is 16:9, unless overridden by external CSS (in which case the inline style is removed).
 
 ## C. Public API
 

@@ -1,4 +1,4 @@
-**Version**: 0.4.0
+**Version**: 0.5.0
 
 # Status: PLAYER
 
@@ -14,12 +14,13 @@
 - Includes visual feedback for loading and error states (connection timeouts).
 - Supports variable playback speed via UI and Controller API.
 - Implements Robust DOM Export using XMLSerializer and SVG foreignObject.
+- Supports dynamic sizing via `width`/`height` attributes and `src` changes.
 
 ## Critical Task
-- **Implement Dynamic Sizing**: Make `<helios-player>` respect `width`, `height`, and `src` attributes dynamically.
+- **None**: Recent critical task completed. Await next assignment.
 
 ## Backlog
-- [ ] Implement Dynamic Sizing & Reactive Attributes.
+- [x] Implement Dynamic Sizing & Reactive Attributes.
 - [x] Sync player state with engine state (Bridge Initialization Fix).
 - [x] Implement Variable Playback Speed controls (API + UI).
 - [x] Refactor `HeliosPlayer` to support `window.helios`.
@@ -37,3 +38,4 @@
 [v0.3.2] ✅ Completed: Variable Speed - Added `setPlaybackRate` to `HeliosController` and Speed Selector UI to `<helios-player>`.
 [v0.3.3] ✅ Completed: Sync player state with engine state - Updated Bridge Protocol to include initial state in handshake.
 [v0.4.0] ✅ Completed: Robust DOM Export - Implemented XMLSerializer/SVG-based DOM capture for high-fidelity export in Direct and Bridge modes.
+[v0.5.0] ✅ Completed: Dynamic Sizing - Implemented `observedAttributes` for `src`, `width`, and `height` to allow dynamic player updates.
