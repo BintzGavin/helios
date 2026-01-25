@@ -1,5 +1,8 @@
 # Studio Progress Log
 
+## STUDIO v0.5.0
+- ✅ Completed: Implement Stage & Canvas Controls - Created Stage component with Pan/Zoom/Transparency controls and refactored App.tsx to use it.
+
 ## STUDIO v0.4.0
 - ✅ Completed: Implement Playback Controls - Centralized player state in StudioContext, added Play/Pause/Rewind/Loop controls, and refactored Timeline/PropsEditor.
 
