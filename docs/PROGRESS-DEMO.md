@@ -9,3 +9,6 @@
 
 ## DEMO v1.15.0
 - ✅ Completed: Enable E2E verification for DOM examples - Verified all 14 examples pass, fixed Pixi bug.
+
+## DEMO v1.16.0
+- ✅ Completed: Implement React Series Component - Added `<Series>` component to `examples/react-animation-helpers` and updated example to demonstrate it.
