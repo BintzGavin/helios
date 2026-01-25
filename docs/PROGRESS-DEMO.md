@@ -1,3 +1,6 @@
+## DEMO v1.7.0
+- ✅ Completed: Scaffold Pixi.js Example - Created `examples/pixi-canvas-animation` with `pixi.js` dependency and verification script.
+
 ## DEMO v1.6.0
 - ✅ Completed: Scaffold Animation Helpers Example - Created `examples/animation-helpers` demonstrating `interpolate` and `spring` from Core.
 
