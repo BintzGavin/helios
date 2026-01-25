@@ -3,8 +3,15 @@ import { useStudio } from '../../context/StudioContext';
 
 export const PlaybackControls: React.FC = () => {
   const { controller, playerState, loop, toggleLoop } = useStudio();
-  const { isPlaying, currentFrame, duration, fps } = playerState;
+  const { isPlaying, currentFrame, duration, fps, playbackRate } = playerState;
   const totalFrames = duration * fps;
+
+  const handleSpeedChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const rate = parseFloat(e.target.value);
+    if (controller) {
+      controller.setPlaybackRate(rate);
+    }
+  };
 
   const handlePlayPause = () => {
     if (!controller) return;
@@ -72,6 +79,32 @@ export const PlaybackControls: React.FC = () => {
       >
         🔁
       </button>
+
+      <div style={{ height: '24px', width: '1px', background: '#444', margin: '0 4px' }} />
+
+      <select
+        value={playbackRate}
+        onChange={handleSpeedChange}
+        disabled={!controller}
+        title="Playback Speed"
+        style={{
+          cursor: controller ? 'pointer' : 'not-allowed',
+          padding: '4px 4px',
+          background: '#222',
+          border: '1px solid #444',
+          borderRadius: '4px',
+          color: 'white',
+          fontSize: '12px',
+          outline: 'none'
+        }}
+      >
+        <option value="-1">⏪ -1x</option>
+        <option value="0.25">0.25x</option>
+        <option value="0.5">0.5x</option>
+        <option value="1">1x</option>
+        <option value="2">2x</option>
+        <option value="4">4x</option>
+      </select>
     </div>
   );
 };
