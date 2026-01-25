@@ -1,5 +1,5 @@
 # Status: DEMO (Executor)
-**Version**: 1.11.0
+**Version**: 1.12.0
 
 ## Vision
 To provide comprehensive, idiomatic examples for every major framework (React, Vue, Svelte, Vanilla) and robust end-to-end testing to ensure the Helios engine delivers on its "Use What You Know" promise.
@@ -7,7 +7,7 @@ To provide comprehensive, idiomatic examples for every major framework (React, V
 ## Current State
 - **Vanilla JS (Canvas)**: ✅ `examples/simple-canvas-animation` exists and works.
 - **Vanilla JS (DOM)**: ✅ `examples/simple-animation` exists and works.
-- **Animation Helpers**: ✅ `examples/animation-helpers` exists and works.
+- **Animation Helpers**: ✅ `examples/animation-helpers` exists and works (Demonstrates `interpolate`, `spring`, `sequence`, `series`).
 - **React (Canvas)**: ✅ `examples/react-canvas-animation` exists and works.
 - **React (DOM)**: ✅ `examples/react-dom-animation` exists and works (Verified in browser, E2E blocked by Renderer).
 - **React (Helpers)**: ✅ `examples/react-animation-helpers` exists and works (Demonstrates `<Sequence>`).
@@ -33,6 +33,7 @@ To provide comprehensive, idiomatic examples for every major framework (React, V
 - `DomStrategy` (used by `simple-animation`, `react-dom-animation`, and `vue-dom-animation`) fails in `verify-render.ts` with `CdpTimeDriver` (timeout). Verified working with `SeekTimeDriver`.
 
 ## Log
+- [v1.12.0] ✅ Completed: Update Animation Helpers - Updated `examples/animation-helpers` to demonstrate `sequence` and `series` core functions.
 - [v1.11.0] ✅ Completed: Scaffold React Animation Helpers - Created `examples/react-animation-helpers` with `<Sequence>` component and Context-based timing.
 - [v1.10.0] ✅ Completed: Scaffold Svelte DOM Example - Created `examples/svelte-dom-animation` and verified with E2E (commented out).
 - [v2.0.0] 📋 Planned: Scaffold Svelte DOM Example - Created spec file `/.sys/plans/2025-02-19-DEMO-SvelteDOM.md` to guide implementation.
