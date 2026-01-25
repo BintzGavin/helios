@@ -31,6 +31,7 @@ export class CanvasStrategy implements RenderStrategy {
         // Initialize global state for accumulation
         (window as any).heliosWebCodecs = {
           chunks: [], // Array of ArrayBuffers
+          error: null,
         };
 
         // Create IVF File Header (32 bytes)
@@ -85,7 +86,10 @@ export class CanvasStrategy implements RenderStrategy {
             chunk.copyTo(chunkData);
             context.chunks.push(chunkData);
           },
-          error: (e) => console.error('VideoEncoder error:', e),
+          error: (e) => {
+            console.error('VideoEncoder error:', e);
+            (window as any).heliosWebCodecs.error = e.message || 'Unknown VideoEncoder error';
+          },
         });
 
         encoder.configure(encoderConfig);
@@ -118,6 +122,11 @@ export class CanvasStrategy implements RenderStrategy {
   private async captureWebCodecs(page: Page, frameTime: number): Promise<Buffer> {
     const chunkData = await page.evaluate(async (time) => {
       const context = (window as any).heliosWebCodecs;
+
+      if (context.error) {
+        throw new Error(`WebCodecs Error: ${context.error}`);
+      }
+
       const encoder = context.encoder as VideoEncoder;
       const canvas = document.querySelector('canvas');
 
