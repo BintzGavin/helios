@@ -117,6 +117,21 @@ describe('Helios Core', () => {
 
         helios.unbindFromDocumentTimeline();
     });
+
+    it('should sync fractional frames from document.timeline', async () => {
+        const helios = new Helios({ duration: 10, fps: 30 });
+        helios.bindToDocumentTimeline();
+
+        // 1010 ms = 1.01 seconds. 1.01 * 30 = 30.3 frames
+        (document.timeline as any).currentTime = 1010;
+
+        // Wait for polling loop
+        await new Promise(resolve => setTimeout(resolve, 50));
+
+        expect(helios.getState().currentFrame).toBeCloseTo(30.3, 1);
+
+        helios.unbindFromDocumentTimeline();
+    });
   });
 
   describe('WAAPI Synchronization', () => {

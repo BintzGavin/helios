@@ -221,7 +221,7 @@ export class Helios {
 
         const currentTime = document.timeline.currentTime;
         if (currentTime !== null && typeof currentTime === 'number') {
-            const frame = Math.round((currentTime / 1000) * this.fps);
+            const frame = (currentTime / 1000) * this.fps;
             if (frame !== this._currentFrame.peek()) {
                  this._currentFrame.value = frame;
             }
