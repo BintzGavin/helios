@@ -22,10 +22,13 @@ template.innerHTML = `
       left: 0;
       right: 0;
       background: rgba(0, 0, 0, 0.6);
-      display: flex;
+      display: none;
       align-items: center;
       padding: 8px;
       color: white;
+    }
+    :host([controls]) .controls {
+      display: flex;
     }
     .play-pause-btn {
       background: none;
@@ -315,6 +318,9 @@ export class HeliosPlayer extends HTMLElement {
             this.updateUI(state);
         }
         this.unsubscribe = this.controller.subscribe((s) => this.updateUI(s));
+        if (this.hasAttribute("autoplay")) {
+            this.controller.play();
+        }
     }
     updateAspectRatio() {
         const w = parseFloat(this.getAttribute("width") || "");
@@ -356,6 +362,11 @@ export class HeliosPlayer extends HTMLElement {
     };
     updateUI(state) {
         const isFinished = state.currentFrame >= state.duration * state.fps - 1;
+        if (isFinished && !state.isPlaying && this.hasAttribute("loop") && this.controller) {
+            this.controller.seek(0);
+            this.controller.play();
+            return;
+        }
         if (isFinished) {
             this.playPauseBtn.textContent = "🔄"; // Restart button
         }
