@@ -23,6 +23,8 @@ export interface RenderJob {
   outputUrl?: string;
   error?: string;
   createdAt: number;
+  inPoint?: number;
+  outPoint?: number;
 }
 
 export interface PlayerState {
@@ -53,7 +55,13 @@ interface StudioContextType {
 
   // Render Jobs
   renderJobs: RenderJob[];
-  startRender: (compositionId: string) => void;
+  startRender: (compositionId: string, options?: { inPoint: number; outPoint: number }) => void;
+
+  // Timeline Range
+  inPoint: number;
+  setInPoint: (val: number) => void;
+  outPoint: number;
+  setOutPoint: (val: number) => void;
 
   // Player Control
   controller: HeliosController | null;
@@ -125,13 +133,33 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
   const [renderJobs, setRenderJobs] = useState<RenderJob[]>([]);
 
-  const startRender = (compositionId: string) => {
+  const [inPoint, setInPoint] = useState(0);
+  const [outPoint, setOutPoint] = useState(0);
+  const [playerState, setPlayerState] = useState<PlayerState>(DEFAULT_PLAYER_STATE);
+
+  // Reset range when composition changes
+  React.useEffect(() => {
+    setInPoint(0);
+    setOutPoint(0);
+  }, [activeComposition?.id]);
+
+  // Initialize outPoint when duration becomes available
+  React.useEffect(() => {
+    const { duration, fps } = playerState;
+    if (duration > 0 && outPoint === 0) {
+      setOutPoint(Math.floor(duration * fps));
+    }
+  }, [playerState.duration, playerState.fps, outPoint]);
+
+  const startRender = (compositionId: string, options?: { inPoint: number; outPoint: number }) => {
     const newJob: RenderJob = {
       id: Date.now().toString(),
       status: 'queued',
       progress: 0,
       compositionId,
-      createdAt: Date.now()
+      createdAt: Date.now(),
+      inPoint: options?.inPoint,
+      outPoint: options?.outPoint
     };
     setRenderJobs(prev => [newJob, ...prev]);
 
@@ -153,7 +181,6 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   };
 
   const [controller, setController] = useState<HeliosController | null>(null);
-  const [playerState, setPlayerState] = useState<PlayerState>(DEFAULT_PLAYER_STATE);
   const [loop, setLoop] = useState(false);
 
   const toggleLoop = () => setLoop(prev => !prev);
@@ -169,6 +196,10 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         setSwitcherOpen,
         renderJobs,
         startRender,
+        inPoint,
+        setInPoint,
+        outPoint,
+        setOutPoint,
         controller,
         setController,
         playerState,

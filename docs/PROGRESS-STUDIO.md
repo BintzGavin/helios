@@ -1,5 +1,8 @@
 # Studio Progress Log
 
+## STUDIO v0.8.0
+- ✅ Completed: Implement Timeline Range Markers - Added draggable in/out markers, keyboard shortcuts ('I'/'O'), and range state management.
+
 ## STUDIO v0.7.0
 - ✅ Completed: Implement Renders Panel - Added RendersPanel, Sidebar (tabs), and mock render job management in StudioContext.
 

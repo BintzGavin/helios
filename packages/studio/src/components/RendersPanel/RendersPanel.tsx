@@ -3,11 +3,11 @@ import { useStudio } from '../../context/StudioContext';
 import './RendersPanel.css';
 
 export const RendersPanel: React.FC = () => {
-  const { renderJobs, startRender, activeComposition } = useStudio();
+  const { renderJobs, startRender, activeComposition, inPoint, outPoint } = useStudio();
 
   const handleTestRender = () => {
     if (activeComposition) {
-      startRender(activeComposition.id);
+      startRender(activeComposition.id, { inPoint, outPoint });
     }
   };
 
@@ -16,6 +16,10 @@ export const RendersPanel: React.FC = () => {
       <button className="start-render-btn" onClick={handleTestRender} disabled={!activeComposition}>
         Start Test Render
       </button>
+
+      <div style={{ fontSize: '10px', color: '#888', marginBottom: '8px', textAlign: 'center' }}>
+        Range: {inPoint} - {outPoint}
+      </div>
 
       {renderJobs.length === 0 && (
         <div style={{ color: '#666', fontSize: '0.9em', textAlign: 'center', marginTop: '16px' }}>
@@ -32,7 +36,7 @@ export const RendersPanel: React.FC = () => {
             </span>
           </div>
           <div style={{ fontSize: '10px', color: '#888' }}>
-            ID: {job.id.slice(-6)}
+            ID: {job.id.slice(-6)} {job.inPoint !== undefined && `(${job.inPoint}-${job.outPoint})`}
           </div>
           {job.status === 'rendering' && (
             <div className="render-progress-bar">
