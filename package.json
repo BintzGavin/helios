@@ -17,6 +17,7 @@
     "dev:vue": "vite serve examples/vue-canvas-animation",
     "dev:svelte": "vite serve examples/svelte-canvas-animation",
     "dev:threejs": "vite serve examples/threejs-canvas-animation",
+    "dev:pixi": "vite serve examples/pixi-canvas-animation",
     "build:examples": "vite build -c vite.build-example.config.js",
     "render:canvas-example": "npm run build:examples && ts-node packages/renderer/scripts/render.ts"
   },
@@ -27,6 +28,7 @@
     "@vitejs/plugin-vue": "^6.0.3",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
+    "pixi.js": "^8.7.2",
     "svelte": "^5.48.2",
     "three": "^0.182.0",
     "ts-node": "^10.9.2",
