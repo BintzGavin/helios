@@ -6,6 +6,7 @@ import { CanvasStrategy } from './strategies/CanvasStrategy';
 import { DomStrategy } from './strategies/DomStrategy';
 import { TimeDriver } from './drivers/TimeDriver';
 import { CdpTimeDriver } from './drivers/CdpTimeDriver';
+import { SeekTimeDriver } from './drivers/SeekTimeDriver';
 import { RendererOptions, RenderJobOptions } from './types';
 
 export { RendererOptions, RenderJobOptions } from './types';
@@ -19,10 +20,11 @@ export class Renderer {
     this.options = options;
     if (this.options.mode === 'dom') {
       this.strategy = new DomStrategy();
+      this.timeDriver = new SeekTimeDriver();
     } else {
       this.strategy = new CanvasStrategy();
+      this.timeDriver = new CdpTimeDriver();
     }
-    this.timeDriver = new CdpTimeDriver();
   }
 
   public async render(compositionUrl: string, outputPath: string, jobOptions?: RenderJobOptions): Promise<void> {
