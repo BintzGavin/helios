@@ -1,6 +1,6 @@
 # Status: CORE
 
-**Version**: 1.11.2
+**Version**: 1.11.3
 
 - **Status**: Active
 - **Current Focus**: Maintenance and Optimization
@@ -21,6 +21,7 @@
 [v1.11.0] ✅ Completed: Implement Easing Functions - Implemented standard easing functions (linear, quad, cubic, quart, quint, sine, expo, circ, back, elastic, bounce) and cubic-bezier solver.
 [v1.11.1] ✅ Completed: Refactor Helios Signals - Added JSDoc documentation to public signal properties and verified signal implementation.
 [v1.11.2] ✅ Completed: Verify Signals and Cleanup Plans - Verified signal integration and cleaned up completed plan files.
+[v1.11.3] ✅ Completed: Add Documentation - Created comprehensive `README.md` for `packages/core`.
 
 **Next Steps**:
 - None.

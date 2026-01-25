@@ -1,35 +1,35 @@
-# CORE Domain Context
+# Context: CORE
 
 ## A. Architecture
 
-The Core domain implements the `Helios` engine, a framework-agnostic video creation engine.
-
-**Key Patterns:**
-1.  **Signal-Based State:** Internal state (`currentFrame`, `isPlaying`, etc.) is managed using fine-grained `Signal<T>` primitives.
-2.  **Reactivity:** Public properties expose `ReadonlySignal<T>` which allows consumers (like UI or Renderer) to subscribe to specific changes without polling.
-3.  **Time Driver Strategy:** The engine uses a `TimeDriver` abstraction (`WaapiDriver`, `NoopDriver`, or custom) to manage the animation loop, decoupling logic from the execution environment (DOM vs Node.js).
-4.  **Legacy Compatibility:** The `subscribe(callback)` method is maintained using an `effect` wrapper, ensuring backward compatibility with the monolithic state object pattern.
-5.  **Standard Library:** Includes built-in helpers for animation (`interpolate`, `spring`), easing (`Easing`), and sequencing (`sequence`, `series`).
+Helios Core is a headless logic engine for programmatic video creation. It manages:
+- **State**: Current frame, playback state, and input properties using reactive Signals.
+- **Timing**: Abstracted via `TimeDriver` and `Ticker` to support Browser (RAF), Node, and WAAPI.
+- **Animation**: Provides primitives (`interpolate`, `spring`) and sequencing (`sequence`, `series`).
 
 ## B. File Tree
 
-```
 packages/core/src/
-├── drivers/           # TimeDriver implementations (Waapi, Noop)
-├── animation.ts       # Animation helpers (interpolate, spring)
-├── easing.ts          # Easing functions and types
-├── index.ts           # Main entry point, Helios class
-├── sequencing.ts      # Sequencing primitives (sequence, series)
-└── signals.ts         # Signal/Effect/Computed implementation
-```
+├── drivers/
+│   ├── ManualTicker.ts
+│   ├── NoopDriver.ts
+│   ├── RafTicker.ts
+│   ├── Ticker.ts
+│   ├── TimeDriver.ts
+│   ├── WaapiDriver.ts
+│   └── index.ts
+├── animation.ts
+├── easing.ts
+├── index.ts
+├── sequencing.ts
+└── signals.ts
 
 ## C. Type Definitions
 
 ```typescript
-// packages/core/src/index.ts
-
-export interface HeliosOptions {
-  duration: number; // in seconds
+// index.ts
+interface HeliosOptions {
+  duration: number;
   fps: number;
   autoSyncAnimations?: boolean;
   animationScope?: HTMLElement;
@@ -39,67 +39,82 @@ export interface HeliosOptions {
   ticker?: Ticker;
 }
 
-export interface DiagnosticReport {
+interface DiagnosticReport {
   waapi: boolean;
   webCodecs: boolean;
   offscreenCanvas: boolean;
   userAgent: string;
 }
 
-// packages/core/src/easing.ts
-
-export type EasingFunction = (t: number) => number;
-
-// packages/core/src/signals.ts
-
-export interface Signal<T> {
-  value: T;
-  peek(): T;
-  subscribe(fn: (value: T) => void): () => void;
+// sequencing.ts
+interface SequenceOptions {
+  frame: number;
+  from: number;
+  durationInFrames?: number;
 }
 
-export interface ReadonlySignal<T> {
-  readonly value: T;
-  peek(): T;
-  subscribe(fn: (value: T) => void): () => void;
+interface SequenceResult {
+  localFrame: number;
+  relativeFrame: number;
+  progress: number;
+  isActive: boolean;
 }
 
-export interface Subscription {
-  unsubscribe(): void;
+interface SeriesItem {
+  durationInFrames: number;
+  offset?: number;
+}
+
+// animation.ts
+interface InterpolateOptions {
+  extrapolateLeft?: 'extend' | 'clamp' | 'identity';
+  extrapolateRight?: 'extend' | 'clamp' | 'identity';
+  easing?: (t: number) => number;
+}
+
+interface SpringConfig {
+  mass?: number;
+  stiffness?: number;
+  damping?: number;
+  overshootClamping?: boolean;
+}
+
+interface SpringOptions {
+  frame: number;
+  fps: number;
+  config?: SpringConfig;
+  from?: number;
+  to?: number;
+  durationInFrames?: number;
 }
 ```
 
-## D. Public Methods
+## D. Public Methods (Helios Class)
 
 ```typescript
-export class Helios {
-  // Public Readonly Signals
-  public get currentFrame(): ReadonlySignal<number>;
-  public get isPlaying(): ReadonlySignal<boolean>;
-  public get inputProps(): ReadonlySignal<Record<string, any>>;
-  public get playbackRate(): ReadonlySignal<number>;
+class Helios {
+  readonly duration: number;
+  readonly fps: number;
 
-  // Static
+  // Signals
+  readonly currentFrame: ReadonlySignal<number>;
+  readonly isPlaying: ReadonlySignal<boolean>;
+  readonly inputProps: ReadonlySignal<Record<string, any>>;
+  readonly playbackRate: ReadonlySignal<number>;
+
   static diagnose(): Promise<DiagnosticReport>;
 
   constructor(options: HeliosOptions);
 
-  // State Access
-  public getState(): Readonly<HeliosState>;
-  public setInputProps(props: Record<string, any>): void;
-  public setPlaybackRate(rate: number): void;
-
-  // Subscription
-  public subscribe(callback: Subscriber): () => void;
-  public unsubscribe(callback: Subscriber): void;
-
-  // Playback Controls
-  public play(): void;
-  public pause(): void;
-  public seek(frame: number): void;
-
-  // Timeline Synchronization
-  public bindToDocumentTimeline(): void;
-  public unbindFromDocumentTimeline(): void;
+  getState(): Readonly<HeliosState>;
+  setInputProps(props: Record<string, any>): void;
+  setPlaybackRate(rate: number): void;
+  subscribe(callback: Subscriber): () => void;
+  unsubscribe(callback: Subscriber): void;
+  play(): void;
+  pause(): void;
+  seek(frame: number): void;
+  bindToDocumentTimeline(): void;
+  unbindFromDocumentTimeline(): void;
 }
 ```
