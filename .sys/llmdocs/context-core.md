@@ -1,34 +1,22 @@
-# Core Context
+# Context: CORE
 
 ## A. Architecture
-
-The `packages/core` module implements a **Headless Logic Engine** for video composition. It follows a "State Machine" pattern where the `Helios` class maintains the source of truth for:
-- `currentFrame`
-- `isPlaying`
-- `duration`
-- `fps`
-- `inputProps`
-- `playbackRate`
-
-State changes are propagated to subscribers via an Observer pattern (`subscribe()`). Time advancement is handled by an abstracted `TimeDriver` strategy, allowing the engine to drive different environments (WAAPI for preview, No-op for testing, etc.).
+The `packages/core` module is the framework-agnostic engine for Helios. It manages the animation state (timeline, playback status) and driving loop.
+The architecture is evolving from a strict `Helios` class state machine towards a fine-grained reactivity model using **Signals**.
+Currently, `Helios` class manages state via `setState` and notifies a `Set` of subscribers.
+New primitives (`signal`, `computed`, `effect`) are available to support future reactive state management.
 
 ## B. File Tree
-
 ```
 packages/core/src/
-├── animation.ts
-├── drivers/
-│   ├── index.ts
-│   ├── TimeDriver.ts
-│   ├── WaapiDriver.ts
-│   └── NoopDriver.ts
-├── index.ts
-├── sequencing.ts
-└── sequencing.test.ts
+├── animation.ts       # Animation helpers (interpolate, spring)
+├── drivers/           # TimeDriver implementations (WaapiDriver, etc.)
+├── index.ts           # Public API exports
+├── sequencing.ts      # Sequencing primitives (sequence, series)
+└── signals.ts         # Reactivity primitives (signal, computed, effect)
 ```
 
 ## C. Type Definitions
-
 ```typescript
 export interface HeliosOptions {
   duration: number; // in seconds
@@ -47,74 +35,38 @@ export interface DiagnosticReport {
   userAgent: string;
 }
 
-export interface TimeDriver {
-  init(scope: HTMLElement | Document): void;
-  update(timeInMs: number): void;
+export interface Signal<T> {
+  value: T;
+  peek(): T;
+  subscribe(fn: (value: T) => void): () => void;
 }
 
-export interface InterpolateOptions {
-  extrapolateLeft?: ExtrapolateType;
-  extrapolateRight?: ExtrapolateType;
-  easing?: (t: number) => number;
+export interface ReadonlySignal<T> {
+  readonly value: T;
+  peek(): T;
+  subscribe(fn: (value: T) => void): () => void;
 }
 
-export interface SpringConfig {
-  mass?: number;
-  stiffness?: number;
-  damping?: number;
-  overshootClamping?: boolean;
-}
-
-export interface SpringOptions {
-  frame: number;
-  fps: number;
-  config?: SpringConfig;
-  from?: number;
-  to?: number;
-  durationInFrames?: number;
-}
-
-export interface SequenceOptions {
-  frame: number;
-  from: number;
-  durationInFrames?: number;
-}
-
-export interface SequenceResult {
-  localFrame: number;
-  relativeFrame: number;
-  progress: number;
-  isActive: boolean;
-}
-
-export interface SeriesItem {
-  durationInFrames: number;
-  offset?: number;
+export interface Subscription {
+  unsubscribe(): void;
 }
 ```
 
 ## D. Public Methods
+### `Helios`
+- `constructor(options: HeliosOptions)`
+- `getState(): Readonly<HeliosState>`
+- `setInputProps(props: Record<string, any>): void`
+- `setPlaybackRate(rate: number): void`
+- `subscribe(callback: Subscriber): () => void`
+- `play(): void`
+- `pause(): void`
+- `seek(frame: number): void`
+- `bindToDocumentTimeline(): void`
+- `unbindFromDocumentTimeline(): void`
+- `static diagnose(): Promise<DiagnosticReport>`
 
-```typescript
-// Helios Class
-static diagnose(): Promise<DiagnosticReport>;
-constructor(options: HeliosOptions);
-getState(): Readonly<HeliosState>;
-setInputProps(props: Record<string, any>): void;
-setPlaybackRate(rate: number): void;
-subscribe(callback: Subscriber): () => void;
-unsubscribe(callback: Subscriber): void;
-play(): void;
-pause(): void;
-seek(frame: number): void;
-bindToDocumentTimeline(): void;
-unbindFromDocumentTimeline(): void;
-
-// Animation Helpers
-function interpolate(input: number, inputRange: number[], outputRange: number[], options?: InterpolateOptions): number;
-function spring(options: SpringOptions): number;
-
-// Sequencing
-function sequence(options: SequenceOptions): SequenceResult;
-function series<T extends SeriesItem>(items: T[], startFrame?: number): (T & { from: number })[];
-```
+### Signals
+- `signal<T>(value: T): Signal<T>`
+- `computed<T>(fn: () => T): ReadonlySignal<T>`
+- `effect(fn: () => void): () => void`

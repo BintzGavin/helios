@@ -1,5 +1,8 @@
 # CORE Progress Log
 
+## CORE v1.9.0
+- ✅ Completed: Implement Signals - Implemented `signal`, `computed`, and `effect` primitives with memory safety and consistency guarantees.
+
 ## CORE v1.8.0
 - ✅ Completed: Implement Series Helper - Implemented `series` function for sequential layout of composition elements.
 
