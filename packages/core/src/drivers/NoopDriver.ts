@@ -5,7 +5,7 @@ export class NoopDriver implements TimeDriver {
     // No-op
   }
 
-  update(timeInMs: number) {
+  update(timeInMs: number, options?: { isPlaying: boolean; playbackRate: number; volume?: number; muted?: boolean }) {
     // No-op
   }
 }

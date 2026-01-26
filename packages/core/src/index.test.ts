@@ -13,6 +13,8 @@ describe('Helios Core', () => {
       isPlaying: false,
       inputProps: {},
       playbackRate: 1,
+      volume: 1,
+      muted: false,
     });
   });
 
@@ -352,7 +354,7 @@ describe('Helios Core', () => {
     it('should use provided driver', () => {
       const helios = new Helios({ duration: 10, fps: 30, driver: mockDriver });
       helios.seek(30);
-      expect(mockDriver.update).toHaveBeenCalledWith(1000, { isPlaying: false, playbackRate: 1 });
+      expect(mockDriver.update).toHaveBeenCalledWith(1000, { isPlaying: false, playbackRate: 1, volume: 1, muted: false });
     });
 
     it('should initialize driver with scope', () => {
@@ -368,7 +370,7 @@ describe('Helios Core', () => {
 
         ticker.tick(100); // 100ms elapsed
 
-        expect(mockDriver.update).toHaveBeenCalledWith(expect.any(Number), { isPlaying: true, playbackRate: 1 });
+        expect(mockDriver.update).toHaveBeenCalledWith(expect.any(Number), { isPlaying: true, playbackRate: 1, volume: 1, muted: false });
 
         helios.pause();
     });
@@ -378,10 +380,10 @@ describe('Helios Core', () => {
         const helios = new Helios({ duration: 10, fps: 30, driver: mockDriver, ticker });
 
         helios.play();
-        expect(mockDriver.update).toHaveBeenCalledWith(0, { isPlaying: true, playbackRate: 1 });
+        expect(mockDriver.update).toHaveBeenCalledWith(0, { isPlaying: true, playbackRate: 1, volume: 1, muted: false });
 
         helios.pause();
-        expect(mockDriver.update).toHaveBeenCalledWith(0, { isPlaying: false, playbackRate: 1 });
+        expect(mockDriver.update).toHaveBeenCalledWith(0, { isPlaying: false, playbackRate: 1, volume: 1, muted: false });
     });
   });
 
@@ -393,7 +395,9 @@ describe('Helios Core', () => {
         currentFrame: 0,
         isPlaying: false,
         inputProps: {},
-        playbackRate: 1
+        playbackRate: 1,
+        volume: 1,
+        muted: false
       };
 
       const subscriber: HeliosSubscriber = (s: HeliosState) => {
