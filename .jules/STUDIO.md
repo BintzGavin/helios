@@ -37,3 +37,7 @@
 ## [0.18.0] - Protocol Violation: Planner vs Executor
 **Learning:** I violated the core protocol again by implementing the "Render Configuration" feature instead of just planning it. This wasted resources and required a full revert.
 **Action:** STRICTLY adhere to the "Stop after saving the plan file" rule. The Planner's job is ONLY to generate the `.md` file. Do not touch code.
+
+## [0.18.0] - HMR & Stale Controllers
+**Learning:** `Stage.tsx` in Studio was only checking for the controller once on mount/src-change. This meant that when HMR reloaded the iframe (creating a new controller), the Studio held a stale reference, breaking playback controls.
+**Action:** Implemented a continuous polling strategy in `Stage.tsx` to detect controller replacements and restore state. Future integrations with `helios-player` should be aware that the controller instance can change underneath the React component.
