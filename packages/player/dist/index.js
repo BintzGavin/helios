@@ -300,7 +300,7 @@ export class HeliosPlayer extends HTMLElement {
         }
         // Start timeout for bridge
         this.connectionTimeout = window.setTimeout(() => {
-            this.showStatus("Connection Failed. Check window.helios.", true);
+            this.showStatus("Connection Failed. Ensure window.helios is set or connectToParent() is called.", true);
         }, 3000);
         // 2. Initiate Bridge Mode (always try to connect)
         this.iframe.contentWindow.postMessage({ type: 'HELIOS_CONNECT' }, '*');

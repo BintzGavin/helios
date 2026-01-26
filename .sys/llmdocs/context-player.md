@@ -48,5 +48,6 @@ The component observes the following attributes:
 
 ## Architecture
 - **Controllers**: Abstraction layer (`DirectController` vs `BridgeController`) to unify local and cross-origin interaction.
+- **Bridge**: Uses `postMessage` for communication. The child page uses `connectToParent(helios)` helper to establish connection.
 - **ClientSideExporter**: Modular export logic supporting WebCodecs (VideoEncoder, AudioEncoder) and DOM Snapshotting. Supports AAC audio mixing from `<audio>` elements.
 - **DOM Capture**: Robust implementation using `XMLSerializer`, SVG `<foreignObject>`, and asset inlining (stylesheets, images, backgrounds, and CSS `url()` assets) for high-fidelity HTML exports.

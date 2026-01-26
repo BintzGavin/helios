@@ -1,5 +1,8 @@
 # PLAYER Progress Log
 
+## PLAYER v0.10.1
+- ✅ Completed: Bridge Documentation - Added README.md and improved connection error message to guide users towards `connectToParent`.
+
 ## PLAYER v0.10.0
 - ✅ Completed: CSS Asset Inlining - Implemented parsing and inlining of assets (images, fonts) referenced in CSS via `url()` as Data URIs for robust DOM export.
 
