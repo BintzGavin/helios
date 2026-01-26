@@ -1,5 +1,8 @@
 # CORE Progress Log
 
+## CORE v1.18.0
+- ✅ Completed: Implement Input Schema Validation - Added `HeliosSchema` definition, `validateProps` logic, and integrated validation into `Helios` constructor and `setInputProps`.
+
 ## CORE v1.17.0
 - ✅ Completed: Implement SRT Parser - Implemented `parseSrt` and `stringifySrt` utilities for caption support.
 

@@ -9,6 +9,7 @@ The `packages/core` module is the heart of the Helios system. It implements a **
 - **Subscribers**: The UI (Studio, Player) and Drivers subscribe to state changes to update the DOM or other outputs.
 - **Drivers**: `TimeDriver` implementations (like `DomDriver`) synchronize the internal timeline with external systems (like WAAPI or HTMLMediaElements).
 - **Ticker**: A `Ticker` (RafTicker or TimeoutTicker) drives the frame advancement loop when playing.
+- **Schema**: An optional `HeliosSchema` defines the structure and types of `inputProps` for validation.
 
 ## B. File Tree
 
@@ -20,6 +21,7 @@ packages/core/src/
 ├── easing.ts          # Easing functions
 ├── errors.ts          # Structured Error Handling
 ├── index.ts           # Public API entry point (Helios class)
+├── schema.ts          # Schema definition and validation
 ├── sequencing.ts      # Sequencing helpers (sequence, series)
 └── signals.ts         # Signal/Effect implementation
 ```
@@ -38,12 +40,23 @@ export type HeliosState = {
 
 export type HeliosSubscriber = (state: HeliosState) => void;
 
+export type PropType = 'string' | 'number' | 'boolean' | 'object' | 'array' | 'color';
+
+export interface PropDefinition {
+  type: PropType;
+  optional?: boolean;
+  default?: any;
+}
+
+export type HeliosSchema = Record<string, PropDefinition>;
+
 export interface HeliosOptions {
   duration: number; // in seconds
   fps: number;
   autoSyncAnimations?: boolean;
   animationScope?: HTMLElement;
   inputProps?: Record<string, any>;
+  schema?: HeliosSchema;
   playbackRate?: number;
   driver?: TimeDriver;
   ticker?: Ticker;
@@ -68,6 +81,11 @@ export interface CaptionCue {
 
 ```typescript
 class Helios {
+  // Properties
+  public readonly duration: number;
+  public readonly fps: number;
+  public readonly schema?: HeliosSchema;
+
   // Readonly Signals
   public get currentFrame(): ReadonlySignal<number>;
   public get isPlaying(): ReadonlySignal<boolean>;
