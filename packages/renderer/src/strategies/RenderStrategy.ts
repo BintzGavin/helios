@@ -12,10 +12,10 @@ export interface RenderStrategy {
 
   /**
    * Runs diagnostics to verify the environment capabilities required by this strategy.
-   * Should log findings to the console.
+   * Should return a JSON object with findings.
    * @param page The Playwright page instance.
    */
-  diagnose(page: Page): Promise<void>;
+  diagnose(page: Page): Promise<any>;
 
   /**
    * Captures a single frame at the specified time.

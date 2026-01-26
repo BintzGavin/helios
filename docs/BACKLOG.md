@@ -23,6 +23,7 @@
 
 ### 4. Diagnostics and GPU Detection
 - [x] Implement `helios.diagnose()` for environment checks.
+- [x] Expose programmatic diagnostics in Renderer (`renderer.diagnose()`).
 
 ### 5. Documentation and Examples
 - [ ] Add Quickstart guide.

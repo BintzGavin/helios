@@ -1,5 +1,8 @@
 # RENDERER Progress Log
 
+## RENDERER v1.15.0
+- ✅ Completed: Expose Diagnostics - Updated `RenderStrategy.diagnose` to return a diagnostic report instead of logging it, and exposed `renderer.diagnose()` to programmatically verify environment capabilities (WebCodecs, WAAPI).
+
 ## RENDERER v1.14.0
 - ✅ Completed: Input Props Injection - Added `inputProps` to `RendererOptions` and implemented injection via `page.addInitScript`, enabling parameterized rendering (e.g. dynamic text/colors) by setting `window.__HELIOS_PROPS__`.
 

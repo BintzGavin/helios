@@ -28,6 +28,30 @@ export class Renderer {
     }
   }
 
+  public async diagnose(): Promise<any> {
+    console.log(`Starting diagnostics (Mode: ${this.options.mode || 'canvas'})`);
+
+    const browser = await chromium.launch({
+      headless: true,
+      args: [
+        '--use-gl=egl',
+        '--ignore-gpu-blocklist',
+        '--enable-gpu-rasterization',
+        '--enable-zero-copy',
+        '--disable-web-security',
+        '--allow-file-access-from-files',
+      ],
+    });
+
+    try {
+      const page = await browser.newPage();
+      await page.goto('about:blank');
+      return await this.strategy.diagnose(page);
+    } finally {
+      await browser.close();
+    }
+  }
+
   public async render(compositionUrl: string, outputPath: string, jobOptions?: RenderJobOptions): Promise<void> {
     console.log(`Starting render for composition: ${compositionUrl} (Mode: ${this.options.mode || 'canvas'})`);
 
@@ -83,7 +107,8 @@ export class Renderer {
       console.log('Page loaded.');
 
       console.log('Running diagnostics...');
-      await this.strategy.diagnose(page);
+      const diagnostics = await this.strategy.diagnose(page);
+      console.log('[Helios Diagnostics]', JSON.stringify(diagnostics, null, 2));
 
       console.log('Preparing render strategy...');
       await this.timeDriver.prepare(page);
