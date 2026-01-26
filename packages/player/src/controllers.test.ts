@@ -38,6 +38,8 @@ describe('DirectController', () => {
             play: vi.fn(),
             pause: vi.fn(),
             seek: vi.fn(),
+            setAudioVolume: vi.fn(),
+            setAudioMuted: vi.fn(),
             setPlaybackRate: vi.fn(),
             setInputProps: vi.fn(),
             subscribe: vi.fn((cb) => {
@@ -86,6 +88,14 @@ describe('DirectController', () => {
 
         controller.setInputProps({ foo: 'bar' });
         expect(mockHeliosInstance.setInputProps).toHaveBeenCalledWith({ foo: 'bar' });
+    });
+
+    it('should set audio volume and muted', () => {
+        controller.setAudioVolume(0.5);
+        expect(mockHeliosInstance.setAudioVolume).toHaveBeenCalledWith(0.5);
+
+        controller.setAudioMuted(true);
+        expect(mockHeliosInstance.setAudioMuted).toHaveBeenCalledWith(true);
     });
 
     it('should capture DOM frame', async () => {
@@ -164,6 +174,14 @@ describe('BridgeController', () => {
 
         controller.seek(10);
         expect(mockWindow.postMessage).toHaveBeenCalledWith({ type: 'HELIOS_SEEK', frame: 10 }, '*');
+    });
+
+    it('should post messages for audio controls', () => {
+        controller.setAudioVolume(0.5);
+        expect(mockWindow.postMessage).toHaveBeenCalledWith({ type: 'HELIOS_SET_VOLUME', volume: 0.5 }, '*');
+
+        controller.setAudioMuted(true);
+        expect(mockWindow.postMessage).toHaveBeenCalledWith({ type: 'HELIOS_SET_MUTED', muted: true }, '*');
     });
 
     it('should update state on HELIOS_STATE message', () => {

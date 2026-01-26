@@ -3,6 +3,8 @@ export type { HeliosController };
 export declare class HeliosPlayer extends HTMLElement {
     private iframe;
     private playPauseBtn;
+    private volumeBtn;
+    private volumeSlider;
     private scrubber;
     private timeDisplay;
     private exportBtn;
@@ -32,6 +34,8 @@ export declare class HeliosPlayer extends HTMLElement {
     private setController;
     private updateAspectRatio;
     private togglePlayPause;
+    private toggleMute;
+    private handleVolumeInput;
     private handleScrubberInput;
     private handleScrubStart;
     private handleScrubEnd;

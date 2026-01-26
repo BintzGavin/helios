@@ -1,5 +1,5 @@
-import { DirectController, BridgeController } from "./controllers";
-import { ClientSideExporter } from "./features/exporter";
+import { DirectController, BridgeController } from "./controllers.js";
+import { ClientSideExporter } from "./features/exporter.js";
 const template = document.createElement("template");
 template.innerHTML = `
   <style>
@@ -40,6 +40,41 @@ template.innerHTML = `
       cursor: pointer;
       width: 40px;
       height: 40px;
+    }
+    .volume-control {
+      display: flex;
+      align-items: center;
+      margin-right: 8px;
+    }
+    .volume-btn {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 20px;
+      cursor: pointer;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .volume-slider {
+      width: 60px;
+      margin-left: 4px;
+      height: 4px;
+      -webkit-appearance: none;
+      background: #555;
+      outline: none;
+      border-radius: 2px;
+    }
+    .volume-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 12px;
+      height: 12px;
+      background: #fff;
+      cursor: pointer;
+      border-radius: 50%;
     }
     .export-btn {
       background-color: #007bff;
@@ -157,6 +192,10 @@ template.innerHTML = `
   <iframe part="iframe" sandbox="allow-scripts allow-same-origin" title="Helios Composition Preview"></iframe>
   <div class="controls" role="toolbar" aria-label="Playback Controls">
     <button class="play-pause-btn" part="play-pause-button" aria-label="Play">▶</button>
+    <div class="volume-control">
+      <button class="volume-btn" part="volume-button" aria-label="Mute">🔊</button>
+      <input type="range" class="volume-slider" min="0" max="1" step="0.05" value="1" part="volume-slider" aria-label="Volume">
+    </div>
     <button class="export-btn" part="export-button" aria-label="Export video">Export</button>
     <select class="speed-selector" part="speed-selector" aria-label="Playback speed">
       <option value="0.25">0.25x</option>
@@ -172,6 +211,8 @@ template.innerHTML = `
 export class HeliosPlayer extends HTMLElement {
     iframe;
     playPauseBtn;
+    volumeBtn;
+    volumeSlider;
     scrubber;
     timeDisplay;
     exportBtn;
@@ -199,6 +240,8 @@ export class HeliosPlayer extends HTMLElement {
         this.shadowRoot.appendChild(template.content.cloneNode(true));
         this.iframe = this.shadowRoot.querySelector("iframe");
         this.playPauseBtn = this.shadowRoot.querySelector(".play-pause-btn");
+        this.volumeBtn = this.shadowRoot.querySelector(".volume-btn");
+        this.volumeSlider = this.shadowRoot.querySelector(".volume-slider");
         this.scrubber = this.shadowRoot.querySelector(".scrubber");
         this.timeDisplay = this.shadowRoot.querySelector(".time-display");
         this.exportBtn = this.shadowRoot.querySelector(".export-btn");
@@ -234,6 +277,8 @@ export class HeliosPlayer extends HTMLElement {
         this.addEventListener("keydown", this.handleKeydown);
         document.addEventListener("fullscreenchange", this.updateFullscreenUI);
         this.playPauseBtn.addEventListener("click", this.togglePlayPause);
+        this.volumeBtn.addEventListener("click", this.toggleMute);
+        this.volumeSlider.addEventListener("input", this.handleVolumeInput);
         this.scrubber.addEventListener("input", this.handleScrubberInput);
         this.scrubber.addEventListener("mousedown", this.handleScrubStart);
         this.scrubber.addEventListener("change", this.handleScrubEnd);
@@ -255,6 +300,8 @@ export class HeliosPlayer extends HTMLElement {
         this.removeEventListener("keydown", this.handleKeydown);
         document.removeEventListener("fullscreenchange", this.updateFullscreenUI);
         this.playPauseBtn.removeEventListener("click", this.togglePlayPause);
+        this.volumeBtn.removeEventListener("click", this.toggleMute);
+        this.volumeSlider.removeEventListener("input", this.handleVolumeInput);
         this.scrubber.removeEventListener("input", this.handleScrubberInput);
         this.scrubber.removeEventListener("mousedown", this.handleScrubStart);
         this.scrubber.removeEventListener("change", this.handleScrubEnd);
@@ -271,6 +318,8 @@ export class HeliosPlayer extends HTMLElement {
     }
     setControlsDisabled(disabled) {
         this.playPauseBtn.disabled = disabled;
+        this.volumeBtn.disabled = disabled;
+        this.volumeSlider.disabled = disabled;
         this.scrubber.disabled = disabled;
         this.speedSelector.disabled = disabled;
         this.fullscreenBtn.disabled = disabled;
@@ -281,6 +330,8 @@ export class HeliosPlayer extends HTMLElement {
     }
     lockPlaybackControls(locked) {
         this.playPauseBtn.disabled = locked;
+        this.volumeBtn.disabled = locked;
+        this.volumeSlider.disabled = locked;
         this.scrubber.disabled = locked;
         this.speedSelector.disabled = locked;
         this.fullscreenBtn.disabled = locked;
@@ -388,6 +439,21 @@ export class HeliosPlayer extends HTMLElement {
         }
         else {
             this.controller.play();
+        }
+    };
+    toggleMute = () => {
+        if (!this.controller)
+            return;
+        const state = this.controller.getState();
+        this.controller.setAudioMuted(!state.muted);
+    };
+    handleVolumeInput = () => {
+        if (!this.controller)
+            return;
+        const vol = parseFloat(this.volumeSlider.value);
+        this.controller.setAudioVolume(vol);
+        if (vol > 0) {
+            this.controller.setAudioMuted(false);
         }
     };
     handleScrubberInput = () => {
@@ -510,6 +576,10 @@ export class HeliosPlayer extends HTMLElement {
             this.playPauseBtn.textContent = state.isPlaying ? "❚❚" : "▶";
             this.playPauseBtn.setAttribute("aria-label", state.isPlaying ? "Pause" : "Play");
         }
+        const isMuted = state.muted || state.volume === 0;
+        this.volumeBtn.textContent = isMuted ? "🔇" : "🔊";
+        this.volumeBtn.setAttribute("aria-label", isMuted ? "Unmute" : "Mute");
+        this.volumeSlider.value = String(state.volume !== undefined ? state.volume : 1);
         if (!this.isScrubbing) {
             this.scrubber.value = String(state.currentFrame);
         }

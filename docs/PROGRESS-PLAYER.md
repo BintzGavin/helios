@@ -1,5 +1,8 @@
 # PLAYER Progress Log
 
+## PLAYER v0.16.0
+- ✅ Completed: Volume Controls - Implemented volume slider and mute button in UI, updated controllers and bridge protocol.
+
 ## PLAYER v0.15.0
 - ✅ Completed: Export UX - Implemented Error Overlay with "Dismiss" action for client-side export failures, providing visibility into errors like unsupported codecs.
 
