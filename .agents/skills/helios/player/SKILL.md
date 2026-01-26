@@ -34,7 +34,7 @@ The `<helios-player>` Web Component allows you to embed and control Helios compo
 | `autoplay` | boolean | Start playing immediately when ready |
 | `loop` | boolean | Loop playback when finished |
 | `export-mode` | 'auto' \| 'canvas' \| 'dom' | Strategy for client-side export (default: 'auto') |
-| `canvas-selector`| string | CSS selector for the canvas element (for canvas export) |
+| `canvas-selector`| string | CSS selector for the canvas element (default: 'canvas') |
 
 ### JavaScript API
 
@@ -71,6 +71,13 @@ The player supports exporting videos directly in the browser (using `VideoEncode
 1. Ensure your composition uses `canvas` rendering if using `export-mode="canvas"` (recommended for performance).
 2. The user can click the "Export" button in the default controls.
 3. Or trigger programmatically (via UI interaction logic you implement that calls internal export methods - currently primarily via UI).
+
+## Styling & Customization
+
+The player uses Shadow DOM. You can style certain parts if exposed via `::part()`, but general layout is encapsulated.
+
+- **Status Overlay:** The player has a status overlay (`.status-overlay`) that shows connection status and errors.
+- **Controls:** The controls bar is accessible via Shadow DOM inspection but not explicitly customizable via API yet.
 
 ## Common Issues
 

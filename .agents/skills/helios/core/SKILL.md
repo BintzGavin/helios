@@ -46,6 +46,8 @@ interface HeliosOptions {
   animationScope?: HTMLElement;  // Scope for animation syncing
   inputProps?: Record<string, any>; // Initial input properties
   playbackRate?: number;         // Initial playback rate (default: 1)
+  volume?: number;               // Initial volume (0.0 to 1.0)
+  muted?: boolean;               // Initial muted state
   driver?: TimeDriver;           // Custom time driver (mostly internal use)
 }
 ```
@@ -62,6 +64,8 @@ interface HeliosState {
   isPlaying: boolean;
   inputProps: Record<string, any>;
   playbackRate: number;
+  volume: number;
+  muted: boolean;
 }
 ```
 
@@ -75,6 +79,12 @@ helios.seek(frame: number)    // Jump to specific frame
 helios.setPlaybackRate(rate: number) // Change playback speed (e.g., 0.5, 2.0)
 ```
 
+#### Audio Control
+```typescript
+helios.setAudioVolume(volume: number) // Set volume (0.0 to 1.0)
+helios.setAudioMuted(muted: boolean)  // Set muted state
+```
+
 #### Data Input
 ```typescript
 helios.setInputProps(props: Record<string, any>) // Update input properties (triggers subscribers)
@@ -82,6 +92,8 @@ helios.setInputProps(props: Record<string, any>) // Update input properties (tri
 
 #### Subscription
 ```typescript
+type HeliosSubscriber = (state: HeliosState) => void;
+
 // Callback fires immediately with current state, then on every change
 const unsubscribe = helios.subscribe((state: HeliosState) => {
   // Render frame based on state
@@ -123,6 +135,8 @@ helios.currentFrame: ReadonlySignal<number>
 helios.isPlaying: ReadonlySignal<boolean>
 helios.inputProps: ReadonlySignal<Record<string, any>>
 helios.playbackRate: ReadonlySignal<number>
+helios.volume: ReadonlySignal<number>
+helios.muted: ReadonlySignal<boolean>
 ```
 
 ## Common Patterns
