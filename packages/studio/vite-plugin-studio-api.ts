@@ -1,7 +1,7 @@
 import { Plugin } from 'vite';
 import { AddressInfo } from 'net';
 import { findCompositions, findAssets } from './src/server/discovery';
-import { startRender, getJob, getJobs } from './src/server/render-manager';
+import { startRender, getJob, getJobs, cancelJob, deleteJob } from './src/server/render-manager';
 
 export function studioApiPlugin(): Plugin {
   return {
@@ -84,9 +84,30 @@ export function studioApiPlugin(): Plugin {
           return;
         }
 
+        // Cancel Job: POST /api/jobs/:id/cancel
+        const cancelMatch = req.url!.match(/^\/([^\/]+)\/cancel$/);
+        if (cancelMatch) {
+            if (req.method === 'POST') {
+                const jobId = cancelMatch[1];
+                const success = cancelJob(jobId);
+                res.setHeader('Content-Type', 'application/json');
+                res.end(JSON.stringify({ success }));
+                return;
+            }
+        }
+
+        // Get or Delete Job: /api/jobs/:id
         const match = req.url!.match(/^\/([^\/]+)$/);
         if (match) {
           const jobId = match[1];
+
+          if (req.method === 'DELETE') {
+              const success = deleteJob(jobId);
+              res.setHeader('Content-Type', 'application/json');
+              res.end(JSON.stringify({ success }));
+              return;
+          }
+
           const job = getJob(jobId);
           if (job) {
             res.setHeader('Content-Type', 'application/json');

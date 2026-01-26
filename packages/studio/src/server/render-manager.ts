@@ -5,7 +5,7 @@ import fs from 'fs';
 
 export interface RenderJob {
   id: string;
-  status: 'queued' | 'rendering' | 'completed' | 'failed';
+  status: 'queued' | 'rendering' | 'completed' | 'failed' | 'cancelled';
   progress: number;
   compositionId: string; // The URL/Path
   outputPath?: string;
@@ -16,6 +16,7 @@ export interface RenderJob {
 }
 
 const jobs = new Map<string, RenderJob>();
+const jobControllers = new Map<string, AbortController>();
 
 export interface StartRenderOptions {
   compositionUrl: string; // The URL to visit (e.g. /@fs/...)
@@ -54,6 +55,8 @@ export async function startRender(options: StartRenderOptions, serverPort: numbe
   };
 
   jobs.set(jobId, job);
+  const controller = new AbortController();
+  jobControllers.set(jobId, controller);
 
   // Run in background
   (async () => {
@@ -89,16 +92,24 @@ export async function startRender(options: StartRenderOptions, serverPort: numbe
       await renderer.render(fullUrl, outputPath, {
         onProgress: (p) => {
           job.progress = p;
-        }
+        },
+        signal: controller.signal
       });
 
       job.status = 'completed';
       job.progress = 1;
       console.log(`[RenderManager] Job ${jobId} completed: ${outputPath}`);
     } catch (e: any) {
-      console.error(`[RenderManager] Job ${jobId} failed:`, e);
-      job.status = 'failed';
-      job.error = e.message;
+      if (e.message === 'Aborted') {
+        console.log(`[RenderManager] Job ${jobId} was cancelled.`);
+        job.status = 'cancelled';
+      } else {
+        console.error(`[RenderManager] Job ${jobId} failed:`, e);
+        job.status = 'failed';
+        job.error = e.message;
+      }
+    } finally {
+      jobControllers.delete(jobId);
     }
   })();
 
@@ -111,4 +122,36 @@ export function getJob(id: string): RenderJob | undefined {
 
 export function getJobs(): RenderJob[] {
     return Array.from(jobs.values()).sort((a, b) => b.createdAt - a.createdAt);
+}
+
+export function cancelJob(id: string): boolean {
+  const job = jobs.get(id);
+  const controller = jobControllers.get(id);
+
+  if (job && controller) {
+    console.log(`[RenderManager] Cancelling job ${id}...`);
+    controller.abort();
+    job.status = 'cancelled';
+    return true;
+  }
+  return false;
+}
+
+export function deleteJob(id: string): boolean {
+  const job = jobs.get(id);
+  if (!job) return false;
+
+  // Prevent deleting running jobs
+  if (job.status === 'rendering') return false;
+
+  jobs.delete(id);
+  if (job.outputPath && fs.existsSync(job.outputPath)) {
+    try {
+      fs.unlinkSync(job.outputPath);
+      console.log(`[RenderManager] Deleted output file for job ${id}`);
+    } catch (e) {
+      console.error(`[RenderManager] Failed to delete file ${job.outputPath}`, e);
+    }
+  }
+  return true;
 }

@@ -4,7 +4,17 @@ import { RenderConfig } from './RenderConfig';
 import './RendersPanel.css';
 
 export const RendersPanel: React.FC = () => {
-  const { renderJobs, startRender, activeComposition, inPoint, outPoint, renderConfig, setRenderConfig } = useStudio();
+  const {
+    renderJobs,
+    startRender,
+    activeComposition,
+    inPoint,
+    outPoint,
+    renderConfig,
+    setRenderConfig,
+    cancelRender,
+    deleteRender
+  } = useStudio();
 
   const handleTestRender = () => {
     if (activeComposition) {
@@ -40,6 +50,43 @@ export const RendersPanel: React.FC = () => {
           <div style={{ fontSize: '10px', color: '#888' }}>
             ID: {job.id.slice(-6)} {job.inPoint !== undefined && `(${job.inPoint}-${job.outPoint})`}
           </div>
+
+          <div className="render-job-actions" style={{ marginTop: '4px', marginBottom: '4px', display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
+             {(job.status === 'queued' || job.status === 'rendering') && (
+                <button
+                    onClick={() => cancelRender(job.id)}
+                    style={{
+                      fontSize: '10px',
+                      padding: '2px 6px',
+                      background: '#d32f2f',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '4px',
+                      cursor: 'pointer'
+                    }}
+                >
+                    Cancel
+                </button>
+             )}
+             {(job.status !== 'queued' && job.status !== 'rendering') && (
+                <button
+                    onClick={() => deleteRender(job.id)}
+                    style={{
+                      fontSize: '10px',
+                      padding: '2px 6px',
+                      background: 'transparent',
+                      color: '#888',
+                      border: '1px solid #444',
+                      borderRadius: '4px',
+                      cursor: 'pointer'
+                    }}
+                    title="Delete Job"
+                >
+                    Delete
+                </button>
+             )}
+          </div>
+
           {job.status === 'rendering' && (
             <div className="render-progress-bar">
               <div
@@ -50,6 +97,12 @@ export const RendersPanel: React.FC = () => {
           )}
           {job.status === 'completed' && (
              <div style={{ fontSize: '10px', color: '#4caf50' }}>Done</div>
+          )}
+          {job.status === 'cancelled' && (
+             <div style={{ fontSize: '10px', color: '#ff9800' }}>Cancelled</div>
+          )}
+          {job.status === 'failed' && (
+             <div style={{ fontSize: '10px', color: '#f44336' }}>Failed</div>
           )}
         </div>
       ))}

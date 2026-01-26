@@ -1,5 +1,8 @@
 # Studio Progress Log
 
+## STUDIO v0.21.0
+- ✅ Completed: Implement Render Job Management - Added ability to Cancel and Delete render jobs via UI and API, including aborting FFmpeg processes.
+
 ## STUDIO v0.20.0
 - ✅ Completed: Pass inputProps to Render Job - Updated `StudioContext` and `render-manager` to forward `inputProps` from the player state to the backend and Renderer.
 

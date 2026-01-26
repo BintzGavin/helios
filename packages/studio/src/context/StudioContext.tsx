@@ -23,7 +23,7 @@ export interface RenderConfig {
 
 export interface RenderJob {
   id: string;
-  status: 'queued' | 'rendering' | 'completed' | 'failed';
+  status: 'queued' | 'rendering' | 'completed' | 'failed' | 'cancelled';
   progress: number; // 0-1
   compositionId: string;
   outputUrl?: string;
@@ -64,6 +64,8 @@ interface StudioContextType {
   // Render Jobs
   renderJobs: RenderJob[];
   startRender: (compositionId: string, options?: { inPoint: number; outPoint: number }) => void;
+  cancelRender: (jobId: string) => void;
+  deleteRender: (jobId: string) => void;
 
   // Timeline Range
   inPoint: number;
@@ -197,6 +199,24 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     }
   };
 
+  const cancelRender = async (jobId: string) => {
+    try {
+      await fetch(`/api/jobs/${jobId}/cancel`, { method: 'POST' });
+      fetchJobs();
+    } catch (err) {
+      console.error('Failed to cancel render:', err);
+    }
+  };
+
+  const deleteRender = async (jobId: string) => {
+    try {
+      await fetch(`/api/jobs/${jobId}`, { method: 'DELETE' });
+      fetchJobs();
+    } catch (err) {
+      console.error('Failed to delete render:', err);
+    }
+  };
+
   const [controller, setController] = useState<HeliosController | null>(null);
   const [loop, setLoop] = useState(false);
 
@@ -213,6 +233,8 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         setSwitcherOpen,
         renderJobs,
         startRender,
+        cancelRender,
+        deleteRender,
         inPoint,
         setInPoint,
         outPoint,
