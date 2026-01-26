@@ -47,3 +47,7 @@
 ## [1.13.0] - CdpTimeDriver and Playwright Screenshot Incompatibility
 **Learning:** `Emulation.setVirtualTimePolicy` (CDP) with `policy: 'pause'` effectively freezes the browser's compositor loop, causing Playwright's `page.screenshot` to hang indefinitely as it waits for a frame. Attempts to use `CDP.Page.captureScreenshot` also failed (timed out), suggesting the pause is deep.
 **Action:** Do not attempt to unify `TimeDriver` for `DomStrategy` until a solution for screenshotting under virtual time is found (e.g. unpausing briefly or using a different capture method). `SeekTimeDriver` remains the required fallback for DOM mode.
+
+## [2026-03-03] - Plan Review Protocol
+**Learning:** `request_plan_review` validates the *execution plan* (steps to take), not the *content* of the spec file being created.
+**Action:** When calling `request_plan_review`, provide the steps (1. Create spec file, 2. Pre-commit), not the spec file content itself.
