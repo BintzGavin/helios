@@ -10,6 +10,7 @@
 | `examples/framer-motion-animation` | Integration with Framer Motion via `useMotionValue`. | DOM |
 | `examples/lottie-animation` | Integration with Lottie (`lottie-web`) via frame seeking. | DOM |
 | `examples/motion-one-animation` | Integration with Motion One via `autoSyncAnimations`. | DOM |
+| `examples/captions-animation` | Integration with built-in SRT captions. | DOM |
 | `examples/animation-helpers` | Vanilla JS reference for `interpolate`, `spring`, `sequence`, `series`. | Canvas |
 | `examples/react-canvas-animation` | React canvas animation. | Canvas |
 | `examples/react-dom-animation` | React DOM animation. | DOM |

@@ -39,3 +39,6 @@
 
 ## DEMO v1.26.0
 - ✅ Completed: Scaffold Motion One Example - Created examples/motion-one-animation demonstrating integration with motion library via autoSyncAnimations: true.
+
+## DEMO v1.27.0
+- ✅ Completed: Scaffold Captions Animation Example - Created `examples/captions-animation` demonstrating built-in SRT caption support.
