@@ -13,7 +13,7 @@ interface HeliosPlayerElement extends HTMLElement {
 }
 
 export const Stage: React.FC<StageProps> = ({ src }) => {
-  const { setController, canvasSize, setCanvasSize } = useStudio();
+  const { setController, canvasSize, setCanvasSize, playerState, controller } = useStudio();
   const playerRef = useRef<HeliosPlayerElement>(null);
 
   // State
@@ -23,24 +23,58 @@ export const Stage: React.FC<StageProps> = ({ src }) => {
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
 
-  // Controller Connection Logic
+  // HMR State Preservation
+  const lastStateRef = useRef({ frame: 0, isPlaying: false, src: '' });
+
+  // Track latest state
+  useEffect(() => {
+    if (controller && src) {
+      lastStateRef.current = {
+        frame: playerState.currentFrame,
+        isPlaying: playerState.isPlaying,
+        src: src
+      };
+    }
+  }, [playerState.currentFrame, playerState.isPlaying, src, controller]);
+
+  // Reset controller when composition changes
+  useEffect(() => {
+    setController(null);
+  }, [src, setController]);
+
+  // Controller Connection & HMR Detection
   useEffect(() => {
     const el = playerRef.current;
     if (!el || !src) return;
 
-    // Reset controller when src changes
-    setController(null);
-
     const interval = setInterval(() => {
-      const ctrl = el.getController();
-      if (ctrl) {
-        setController(ctrl);
-        clearInterval(interval);
+      const freshCtrl = el.getController();
+
+      // Check if controller has changed (reference inequality)
+      // This handles:
+      // a) Initial load (null -> ctrl)
+      // b) HMR Reload (ctrlA -> null -> ctrlB) or (ctrlA -> ctrlB)
+      if (freshCtrl && freshCtrl !== controller) {
+        setController(freshCtrl);
+
+        // If we found a new controller, check if we should restore state
+        if (lastStateRef.current.src === src) {
+          // Restore state
+          const { frame, isPlaying } = lastStateRef.current;
+          // Use try-catch as seeking immediately might sometimes fail if not ready,
+          // though freshCtrl usually implies ready in Helios.
+          try {
+            if (frame > 0) freshCtrl.seek(frame);
+            if (isPlaying) freshCtrl.play();
+          } catch (e) {
+            console.warn('Failed to restore state after HMR', e);
+          }
+        }
       }
     }, 200);
 
     return () => clearInterval(interval);
-  }, [src, setController]);
+  }, [src, controller, setController]);
 
   // Event Handlers
   const handleWheel = (e: WheelEvent) => {
