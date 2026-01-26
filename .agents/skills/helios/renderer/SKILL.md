@@ -43,6 +43,16 @@ interface RendererOptions {
   durationInSeconds: number; // Duration of the clip
   startFrame?: number;     // Frame to start rendering from (default: 0)
   mode?: 'dom' | 'canvas'; // Rendering strategy (default: 'canvas')
+
+  // Audio & Encoding
+  audioFilePath?: string;        // Path to audio file to mix
+  videoCodec?: string;           // e.g., 'libx264' (default), 'libvpx'
+  pixelFormat?: string;          // e.g., 'yuv420p' (default)
+  crf?: number;                  // Constant Rate Factor (quality control)
+  preset?: string;               // Encoding preset (e.g., 'fast')
+  videoBitrate?: string;         // e.g., '5M', '1000k'
+  intermediateVideoCodec?: string; // Capture codec ('vp8', 'vp9', 'av1')
+  ffmpegPath?: string;           // Custom FFmpeg binary path
 }
 ```
 

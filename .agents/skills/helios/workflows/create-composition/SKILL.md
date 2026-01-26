@@ -19,10 +19,13 @@ Create a `composition.html` file. This is the entry point.
     <style>
         body { margin: 0; overflow: hidden; background: black; }
         canvas { display: block; width: 100vw; height: 100vh; }
+        .box { width: 100px; height: 100px; background: red; animation: move 2s linear; }
+        @keyframes move { to { transform: translateX(500px); } }
     </style>
 </head>
 <body>
     <canvas id="canvas"></canvas>
+    <div class="box"></div>
     <script type="module" src="./src/main.ts"></script>
 </body>
 </html>
@@ -50,7 +53,9 @@ const ctx = canvas.getContext('2d');
 // 3. Initialize Engine
 const helios = new Helios({
     duration,
-    fps
+    fps,
+    // OPTIONAL: Automatically sync CSS/WAAPI animations
+    autoSyncAnimations: true
 });
 
 // 4. Bind to Document Timeline (CRITICAL for Renderer/Player)
@@ -96,7 +101,11 @@ draw(0);
 - [ ] **State Subscribed:** `helios.subscribe(...)` used to trigger renders.
 - [ ] **Canvas/DOM Ready:** Elements are sized correctly (usually 100vw/100vh or fixed resolution).
 
+## Auto-Sync Animations
+
+If you are using CSS animations or Web Animations API (WAAPI), set `autoSyncAnimations: true` in the constructor. Helios will automatically hijack the document timeline and sync these animations to the current frame when scrubbing.
+
 ## Frameworks
 
 For React, Vue, or Svelte, wrap this logic in a component or hook.
-See `examples/react/SKILL.md` or `examples/vue/SKILL.md` for specific patterns.
+See `examples/react/SKILL.md`, `examples/vue/SKILL.md`, or `examples/svelte/SKILL.md`.
