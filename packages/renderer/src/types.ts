@@ -66,6 +66,12 @@ export interface RendererOptions {
    * Defaults to the binary provided by @ffmpeg-installer/ffmpeg.
    */
   ffmpegPath?: string;
+
+  /**
+   * Optional props to inject into the composition.
+   * These will be available as `window.__HELIOS_PROPS__`.
+   */
+  inputProps?: Record<string, any>;
 }
 
 export interface RenderJobOptions {

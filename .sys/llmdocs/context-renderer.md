@@ -51,6 +51,7 @@ interface RendererOptions {
   preset?: string;
   videoBitrate?: string;
   intermediateVideoCodec?: string;
+  inputProps?: Record<string, any>;
 }
 
 interface RenderJobOptions {
