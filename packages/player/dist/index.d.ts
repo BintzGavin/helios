@@ -16,12 +16,14 @@ export declare class HeliosPlayer extends HTMLElement {
     private unsubscribe;
     private connectionTimeout;
     private abortController;
+    private isExporting;
     static get observedAttributes(): string[];
     constructor();
     attributeChangedCallback(name: string, oldVal: string, newVal: string): void;
     connectedCallback(): void;
     disconnectedCallback(): void;
     private setControlsDisabled;
+    private lockPlaybackControls;
     private handleIframeLoad;
     private handleWindowMessage;
     private setController;

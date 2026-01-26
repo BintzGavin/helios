@@ -179,4 +179,69 @@ describe('HeliosPlayer', () => {
     player.dispatchEvent(eventButtonF);
     expect(player.requestFullscreen).toHaveBeenCalled();
   });
+
+  it('should lock playback controls when requested', () => {
+    // Access private method via any
+    (player as any).lockPlaybackControls(true);
+
+    const playBtn = player.shadowRoot!.querySelector('.play-pause-btn') as HTMLButtonElement;
+    const scrubber = player.shadowRoot!.querySelector('.scrubber') as HTMLInputElement;
+    const speedSelector = player.shadowRoot!.querySelector('.speed-selector') as HTMLSelectElement;
+    const fullscreenBtn = player.shadowRoot!.querySelector('.fullscreen-btn') as HTMLButtonElement;
+
+    expect(playBtn.disabled).toBe(true);
+    expect(scrubber.disabled).toBe(true);
+    expect(speedSelector.disabled).toBe(true);
+    expect(fullscreenBtn.disabled).toBe(true);
+
+    (player as any).lockPlaybackControls(false);
+
+    expect(playBtn.disabled).toBe(false);
+    expect(scrubber.disabled).toBe(false);
+    expect(speedSelector.disabled).toBe(false);
+    expect(fullscreenBtn.disabled).toBe(false);
+  });
+
+  it('should ignore keyboard events when exporting', () => {
+    const mockController = {
+      getState: vi.fn().mockReturnValue({ currentFrame: 0, duration: 10, fps: 30, isPlaying: false }),
+      play: vi.fn(),
+      pause: vi.fn(),
+      seek: vi.fn(),
+      subscribe: vi.fn().mockReturnValue(() => {}),
+      dispose: vi.fn(),
+      setPlaybackRate: vi.fn()
+    };
+    (player as any).setController(mockController);
+
+    // Simulate exporting state
+    (player as any).isExporting = true;
+
+    const dispatchKey = (key: string) => {
+      const event = new KeyboardEvent('keydown', {
+        key,
+        bubbles: true,
+        composed: true
+      });
+      Object.defineProperty(event, 'composedPath', {
+        value: () => [player]
+      });
+      player.dispatchEvent(event);
+    };
+
+    // Try to play
+    dispatchKey(' ');
+    expect(mockController.play).not.toHaveBeenCalled();
+
+    // Try to seek
+    dispatchKey('ArrowRight');
+    expect(mockController.seek).not.toHaveBeenCalled();
+
+    // Reset exporting state
+    (player as any).isExporting = false;
+
+    // Now it should work
+    dispatchKey(' ');
+    expect(mockController.play).toHaveBeenCalled();
+  });
 });
