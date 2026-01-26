@@ -65,3 +65,7 @@
 ## 2026-02-25 - Structured Errors Gap
 **Learning:** The README promises "Machine-readable, actionable errors", but the codebase uses generic `Error` objects. This hinders the "Agent Experience" by making diagnosis harder.
 **Action:** Created plan `2026-02-25-CORE-StructuredErrors.md` to implement `HeliosError` and `HeliosErrorCode`.
+
+## 2026-02-27 - SRT Parser Gap Identified
+**Learning:** While "Captions & Audio" is a major V1.x roadmap item, no work has started on it. "Caption/subtitle import (SRT)" is a pure logic task perfect for `packages/core`.
+**Action:** Created plan `2026-02-27-CORE-Implement-SRT-Parser.md` to implement the parser/serializer.
