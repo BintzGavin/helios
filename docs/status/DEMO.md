@@ -45,6 +45,7 @@ To provide comprehensive, idiomatic examples for every major framework (React, V
 None.
 
 ## Log
+- [v1.28.0] 📋 Planned: Scaffold Signals Animation Example - Created spec file `/.sys/plans/2025-02-20-DEMO-SignalsAnimation.md` to guide implementation of high-performance signal-based animation.
 - [v1.27.0] ✅ Completed: Scaffold Captions Animation Example - Created `examples/captions-animation` demonstrating built-in SRT caption support.
 - [v1.26.1] 📋 Planned: Scaffold Captions Animation Example - Created spec file `/.sys/plans/2025-02-19-DEMO-CaptionsAnimation.md` to guide implementation of built-in SRT caption support.
 - [v1.26.0] ✅ Completed: Scaffold Motion One Example - Created `examples/motion-one-animation` demonstrating integration with `motion` library via `autoSyncAnimations: true`.

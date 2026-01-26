@@ -1,5 +1,9 @@
 # Planner's Journal - DEMO
 
+## [v1.28.0] - Signal-Based State Hidden Feature
+**Learning:** Similar to Captions, the "Signal-Based State" feature (`signal`, `computed`, `effect`) is fully implemented and exported in `packages/core` but marked as "Planned" or "Architecture Hardening" in the README, with no examples demonstrating it.
+**Action:** Created `examples/signals-animation` plan to expose this capability. Future plans should prioritize exposing existing "hidden" core features over building new ones.
+
 ## 2025-02-19 - Vue Series Component Gap
 **Learning**: The README promises `<Series>` support for sequential layouts, but `examples/vue-animation-helpers` lacked it, forcing manual offsets. The Status file incorrectly claimed React had it, but React was also missing it.
 **Action**: Prioritized implementing `<Series>` for Vue to close the gap. Future plans should verify "Completed" status claims against actual file existence.
