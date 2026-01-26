@@ -3,14 +3,23 @@ import * as fs from 'fs';
 import * as path from 'path';
 import ffmpeg from '@ffmpeg-installer/ffmpeg';
 
+export interface ConcatOptions {
+  /**
+   * Path to the FFmpeg binary.
+   * Defaults to the binary provided by @ffmpeg-installer/ffmpeg.
+   */
+  ffmpegPath?: string;
+}
+
 /**
  * Concatenates multiple video files into a single video file using FFmpeg's concat demuxer.
  * This performs a stream copy (no re-encoding), so all inputs must have the same codecs and streams.
  *
  * @param inputPaths Array of paths to input video files
  * @param outputPath Path to the output video file
+ * @param options Configuration options
  */
-export async function concatenateVideos(inputPaths: string[], outputPath: string): Promise<void> {
+export async function concatenateVideos(inputPaths: string[], outputPath: string, options?: ConcatOptions): Promise<void> {
   if (inputPaths.length === 0) {
     throw new Error('No input files provided for concatenation');
   }
@@ -33,7 +42,7 @@ export async function concatenateVideos(inputPaths: string[], outputPath: string
 
   await fs.promises.writeFile(listPath, listContent);
 
-  const ffmpegPath = ffmpeg.path;
+  const ffmpegPath = options?.ffmpegPath || ffmpeg.path;
   const args = [
     '-f', 'concat',
     '-safe', '0',

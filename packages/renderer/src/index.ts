@@ -82,7 +82,7 @@ export class Renderer {
       await this.strategy.prepare(page);
       console.log('Strategy prepared.');
 
-      const ffmpegPath = ffmpeg.path;
+      const ffmpegPath = this.options.ffmpegPath || ffmpeg.path;
       const totalFrames = this.options.durationInSeconds * this.options.fps;
       const fps = this.options.fps;
       const startFrame = this.options.startFrame || 0;
@@ -136,54 +136,60 @@ export class Renderer {
       const progressInterval = Math.floor(totalFrames / 10);
 
       try {
-        for (let i = 0; i < totalFrames; i++) {
-          if (capturedErrors.length > 0) {
-            throw capturedErrors[0];
+        const captureLoop = async () => {
+          for (let i = 0; i < totalFrames; i++) {
+            if (capturedErrors.length > 0) {
+              throw capturedErrors[0];
+            }
+
+            if (jobOptions?.signal?.aborted) {
+              throw new Error('Aborted');
+            }
+
+            const time = (i / fps) * 1000;
+            if (i > 0 && i % progressInterval === 0) {
+                console.log(`Progress: Rendered ${i} / ${totalFrames} frames`);
+            }
+
+            if (jobOptions?.onProgress) {
+               jobOptions.onProgress(i / totalFrames);
+            }
+
+            const compositionTimeInSeconds = (startFrame + i) / fps;
+            await this.timeDriver.setTime(page, compositionTimeInSeconds);
+
+            const buffer = await this.strategy.capture(page, time);
+
+            await new Promise<void>((resolve, reject) => {
+                // processing write errors is important, especially if ffmpeg died
+                if (!ffmpegProcess.stdin.writable) {
+                   return reject(new Error('FFmpeg stdin is not writable'));
+                }
+                ffmpegProcess.stdin.write(buffer, (err?: Error | null) => err ? reject(err) : resolve());
+            });
           }
 
-          if (jobOptions?.signal?.aborted) {
-            throw new Error('Aborted');
+          console.log('Finishing render strategy...');
+          const finalBuffer = await this.strategy.finish(page);
+          if (finalBuffer && Buffer.isBuffer(finalBuffer) && finalBuffer.length > 0) {
+            console.log(`Writing final buffer of ${finalBuffer.length} bytes...`);
+            await new Promise<void>((resolve, reject) => {
+               if (!ffmpegProcess.stdin.writable) {
+                   return reject(new Error('FFmpeg stdin is not writable'));
+                }
+              ffmpegProcess.stdin.write(finalBuffer, (err?: Error | null) => err ? reject(err) : resolve());
+            });
           }
 
-          const time = (i / fps) * 1000;
-          if (i > 0 && i % progressInterval === 0) {
-              console.log(`Progress: Rendered ${i} / ${totalFrames} frames`);
-          }
+          console.log('Finished sending frames. Closing FFmpeg stdin.');
+          ffmpegProcess.stdin.end();
+        };
 
-          if (jobOptions?.onProgress) {
-             jobOptions.onProgress(i / totalFrames);
-          }
+        // Run capture loop and ffmpeg process in parallel.
+        // If ffmpeg fails (e.g. invalid path), it will reject ffmpegExitPromise immediately,
+        // which will cause Promise.all to reject, correctly propagating the error.
+        await Promise.all([captureLoop(), ffmpegExitPromise]);
 
-          const compositionTimeInSeconds = (startFrame + i) / fps;
-          await this.timeDriver.setTime(page, compositionTimeInSeconds);
-
-          const buffer = await this.strategy.capture(page, time);
-
-          await new Promise<void>((resolve, reject) => {
-              // processing write errors is important, especially if ffmpeg died
-              if (!ffmpegProcess.stdin.writable) {
-                 return reject(new Error('FFmpeg stdin is not writable'));
-              }
-              ffmpegProcess.stdin.write(buffer, (err?: Error | null) => err ? reject(err) : resolve());
-          });
-        }
-
-        console.log('Finishing render strategy...');
-        const finalBuffer = await this.strategy.finish(page);
-        if (finalBuffer && Buffer.isBuffer(finalBuffer) && finalBuffer.length > 0) {
-          console.log(`Writing final buffer of ${finalBuffer.length} bytes...`);
-          await new Promise<void>((resolve, reject) => {
-             if (!ffmpegProcess.stdin.writable) {
-                 return reject(new Error('FFmpeg stdin is not writable'));
-              }
-            ffmpegProcess.stdin.write(finalBuffer, (err?: Error | null) => err ? reject(err) : resolve());
-          });
-        }
-
-        console.log('Finished sending frames. Closing FFmpeg stdin.');
-        ffmpegProcess.stdin.end();
-
-        await ffmpegExitPromise;
         console.log('FFmpeg has finished processing.');
       } catch (err: any) {
         // Kill FFmpeg if an error occurs to prevent it from hanging
