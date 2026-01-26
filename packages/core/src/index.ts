@@ -48,6 +48,7 @@ export * from './signals';
 export * from './errors';
 export * from './captions';
 export * from './schema';
+export * from './random';
 
 export class Helios {
   // Constants

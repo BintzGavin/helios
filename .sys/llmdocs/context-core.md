@@ -21,6 +21,7 @@ packages/core/src/
 ├── easing.ts          # Easing functions
 ├── errors.ts          # Structured Error Handling
 ├── index.ts           # Public API entry point (Helios class)
+├── random.ts          # Deterministic PRNG
 ├── schema.ts          # Schema definition and validation
 ├── sequencing.ts      # Sequencing helpers (sequence, series)
 └── signals.ts         # Signal/Effect implementation
