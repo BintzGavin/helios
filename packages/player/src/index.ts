@@ -350,6 +350,9 @@ export class HeliosPlayer extends HTMLElement {
     this.scrubber.addEventListener("input", this.handleScrubberInput);
     this.scrubber.addEventListener("mousedown", this.handleScrubStart);
     this.scrubber.addEventListener("change", this.handleScrubEnd);
+    this.scrubber.addEventListener("touchstart", this.handleScrubStart, { passive: true });
+    this.scrubber.addEventListener("touchend", this.handleScrubEnd);
+    this.scrubber.addEventListener("touchcancel", this.handleScrubEnd);
     this.exportBtn.addEventListener("click", this.renderClientSide);
     this.speedSelector.addEventListener("change", this.handleSpeedChange);
     this.fullscreenBtn.addEventListener("click", this.toggleFullscreen);
@@ -377,6 +380,9 @@ export class HeliosPlayer extends HTMLElement {
     this.scrubber.removeEventListener("input", this.handleScrubberInput);
     this.scrubber.removeEventListener("mousedown", this.handleScrubStart);
     this.scrubber.removeEventListener("change", this.handleScrubEnd);
+    this.scrubber.removeEventListener("touchstart", this.handleScrubStart);
+    this.scrubber.removeEventListener("touchend", this.handleScrubEnd);
+    this.scrubber.removeEventListener("touchcancel", this.handleScrubEnd);
     this.exportBtn.removeEventListener("click", this.renderClientSide);
     this.speedSelector.removeEventListener("change", this.handleSpeedChange);
     this.fullscreenBtn.removeEventListener("click", this.toggleFullscreen);
