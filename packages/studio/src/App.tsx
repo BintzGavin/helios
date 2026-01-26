@@ -39,14 +39,16 @@ function AppContent() {
     }
   }, { ignoreInput: true, preventDefault: true });
 
-  useKeyboardShortcut('ArrowLeft', () => {
+  useKeyboardShortcut('ArrowLeft', (e) => {
     if (!controller) return;
-    controller.seek(Math.max(0, playerState.currentFrame - 1));
+    const amount = e.shiftKey ? 10 : 1;
+    controller.seek(Math.max(0, playerState.currentFrame - amount));
   }, { ignoreInput: true, preventDefault: true });
 
-  useKeyboardShortcut('ArrowRight', () => {
+  useKeyboardShortcut('ArrowRight', (e) => {
     if (!controller) return;
-    controller.seek(playerState.currentFrame + 1);
+    const amount = e.shiftKey ? 10 : 1;
+    controller.seek(playerState.currentFrame + amount);
   }, { ignoreInput: true, preventDefault: true });
 
   useKeyboardShortcut('Home', () => {
