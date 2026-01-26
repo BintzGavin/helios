@@ -1,8 +1,9 @@
-**Version**: 1.12.0
+**Version**: 1.13.0
 
 # Renderer Agent Status
 
 ## Progress Log
+- [1.13.0] ⚠️ Blocked: Enable CdpTimeDriver for DOM - Investigated switching `DomStrategy` to `CdpTimeDriver`. Determined that `page.screenshot` hangs when `Emulation.setVirtualTimePolicy` is active (paused), and CDP `Page.captureScreenshot` also hangs/timeouts. Reverted to `SeekTimeDriver` for DOM mode.
 - [1.12.0] ✅ Completed: Configurable WebCodecs - Added `intermediateVideoCodec` to `RendererOptions` and updated `CanvasStrategy` to support VP9 and AV1 for intermediate capture, enabling higher quality or better compression.
 - [1.11.0] ✅ Completed: Implement Media Preloading - Updated `DomStrategy` to detect and preload `<video>` and `<audio>` elements, ensuring they are buffered (`HAVE_ENOUGH_DATA`) before rendering starts.
 - [1.10.0] ✅ Completed: Implement Background Image Preloading - Updated `DomStrategy` to detect and preload CSS background images, ensuring they are loaded before rendering starts.

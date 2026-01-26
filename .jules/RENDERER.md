@@ -1,4 +1,4 @@
-**Version**: 1.5.0
+**Version**: 1.13.0
 
 # Renderer Agent Status
 
@@ -43,3 +43,7 @@
 ## [2026-02-19] - DomStrategy Vision Deviation
 **Learning:** `DomStrategy` uses `SeekTimeDriver` (WAAPI) instead of `CdpTimeDriver` (CDP) as strictly required by the Vision ("Production Rendering... Uses CDP"). This was a workaround for `page.screenshot` compatibility.
 **Action:** Future plans must address this technical debt by fixing the underlying compatibility issue rather than accepting the deviation permanently.
+
+## [1.13.0] - CdpTimeDriver and Playwright Screenshot Incompatibility
+**Learning:** `Emulation.setVirtualTimePolicy` (CDP) with `policy: 'pause'` effectively freezes the browser's compositor loop, causing Playwright's `page.screenshot` to hang indefinitely as it waits for a frame. Attempts to use `CDP.Page.captureScreenshot` also failed (timed out), suggesting the pause is deep.
+**Action:** Do not attempt to unify `TimeDriver` for `DomStrategy` until a solution for screenshotting under virtual time is found (e.g. unpausing briefly or using a different capture method). `SeekTimeDriver` remains the required fallback for DOM mode.

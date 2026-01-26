@@ -10,6 +10,7 @@ Includes `diagnose(page)` capability to verify environment requirements (e.g., W
 ## B. File Tree
 packages/renderer/
 ├── scripts/
+│   ├── render-dom.ts
 │   ├── render.ts
 │   ├── verify-bitrate.ts
 │   ├── verify-diagnostics.ts

@@ -1,5 +1,8 @@
 # RENDERER Progress Log
 
+## RENDERER v1.13.0
+- ⚠️ Blocked: Enable CdpTimeDriver for DOM - Investigated switching `DomStrategy` to `CdpTimeDriver`. Determined that `page.screenshot` hangs when `Emulation.setVirtualTimePolicy` is active (paused), and CDP `Page.captureScreenshot` also hangs/timeouts. Reverted to `SeekTimeDriver` for DOM mode.
+
 ## RENDERER v1.12.0
 - ✅ Completed: Configurable WebCodecs - Added `intermediateVideoCodec` to `RendererOptions` and updated `CanvasStrategy` to support VP9 and AV1 for intermediate capture, enabling higher quality or better compression.
 
