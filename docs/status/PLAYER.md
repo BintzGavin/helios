@@ -1,4 +1,4 @@
-**Version**: 0.11.0
+**Version**: 0.11.1
 
 # Status: PLAYER
 
@@ -20,6 +20,7 @@
 ## Critical Task
 - **None**: Recent critical task completed. Await next assignment.
 
+[v0.11.1] ✅ Completed: Dom Canvas Capture - Implemented `inlineCanvases` to replace `<canvas>` elements with data-URI images during DOM export, ensuring mixed content is preserved.
 [v0.11.0] ✅ Completed: Lock UI During Export - Disabled playback controls and keyboard shortcuts during client-side export to ensure data integrity.
 [v0.10.1] ✅ Completed: Bridge Documentation - Added README.md and improved connection error message to guide users towards `connectToParent`.
 [v0.10.0] ✅ Completed: CSS Asset Inlining - Implemented parsing and inlining of assets (images, fonts) referenced in CSS via `url()` as Data URIs for robust DOM export.
@@ -45,6 +46,7 @@
 - [x] Enable External Stylesheets for DOM Export.
 - [x] Enable Image Inlining for DOM Export.
 - [x] Enable CSS Asset Inlining for DOM Export.
+- [x] Enable Canvas Inlining for DOM Export.
 
 [2026-01-20] ✅ Completed: Refactor Player Control Logic - Verified `<helios-player>` uses `window.helios` and supports client-side export.
 [2026-01-21] ✅ Completed: Sandbox and Bridge - Implemented `postMessage` bridge and sandboxed iframe support.

@@ -2,8 +2,9 @@ export async function captureDomToBitmap(element: HTMLElement): Promise<ImageBit
   const doc = element.ownerDocument || document;
 
   // 1. Clone & Inline Assets
-  const clone = element.cloneNode(true) as HTMLElement;
+  let clone = element.cloneNode(true) as HTMLElement;
   await inlineImages(clone);
+  clone = inlineCanvases(element, clone);
 
   // 2. Serialize DOM
   const serializer = new XMLSerializer();
@@ -180,4 +181,49 @@ async function fetchAsDataUri(url: string): Promise<string> {
     reader.onerror = reject;
     reader.readAsDataURL(blob);
   });
+}
+
+function inlineCanvases(original: HTMLElement, clone: HTMLElement): HTMLElement {
+  // Handle root element being a canvas
+  if (original instanceof HTMLCanvasElement && clone instanceof HTMLCanvasElement) {
+    try {
+      const dataUri = original.toDataURL();
+      const img = document.createElement('img');
+      img.src = dataUri;
+      img.style.cssText = original.style.cssText;
+      img.className = original.className;
+      if (original.id) img.id = original.id;
+      if (original.hasAttribute('width')) img.setAttribute('width', original.getAttribute('width')!);
+      if (original.hasAttribute('height')) img.setAttribute('height', original.getAttribute('height')!);
+      return img;
+    } catch (e) {
+      console.warn('Helios: Failed to inline root canvas:', e);
+      return clone;
+    }
+  }
+
+  const originalCanvases = Array.from(original.querySelectorAll('canvas'));
+  const clonedCanvases = Array.from(clone.querySelectorAll('canvas'));
+
+  for (let i = 0; i < Math.min(originalCanvases.length, clonedCanvases.length); i++) {
+    const source = originalCanvases[i];
+    const target = clonedCanvases[i];
+
+    try {
+      const dataUri = source.toDataURL();
+      const img = document.createElement('img');
+      img.src = dataUri;
+      img.style.cssText = source.style.cssText;
+      img.className = source.className;
+      if (source.id) img.id = source.id;
+      if (source.hasAttribute('width')) img.setAttribute('width', source.getAttribute('width')!);
+      if (source.hasAttribute('height')) img.setAttribute('height', source.getAttribute('height')!);
+
+      target.parentNode?.replaceChild(img, target);
+    } catch (e) {
+      console.warn('Helios: Failed to inline nested canvas:', e);
+    }
+  }
+
+  return clone;
 }

@@ -51,4 +51,4 @@ The component observes the following attributes:
 - **Bridge**: Uses `postMessage` for communication. The child page uses `connectToParent(helios)` helper to establish connection.
 - **ClientSideExporter**: Modular export logic supporting WebCodecs (VideoEncoder, AudioEncoder) and DOM Snapshotting. Supports AAC audio mixing from `<audio>` elements.
 - **UI Locking**: Prevents race conditions by disabling playback controls and keyboard shortcuts during client-side export.
-- **DOM Capture**: Robust implementation using `XMLSerializer`, SVG `<foreignObject>`, and asset inlining (stylesheets, images, backgrounds, and CSS `url()` assets) for high-fidelity HTML exports.
+- **DOM Capture**: Robust implementation using `XMLSerializer`, SVG `<foreignObject>`, and asset inlining (stylesheets, images, backgrounds, CSS `url()` assets, and `<canvas>` snapshots) for high-fidelity HTML exports.
