@@ -1,5 +1,8 @@
 # PLAYER Progress Log
 
+## PLAYER v0.17.1
+- ✅ Completed: Touch Support - Added touch event listeners to the scrubber to support smooth seeking on mobile devices.
+
 ## PLAYER v0.17.0
 - ✅ Completed: Implement Captions - Added caption rendering overlay and "CC" toggle button to `<helios-player>`, leveraging `activeCaptions` from core state.
 

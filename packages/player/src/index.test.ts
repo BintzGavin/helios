@@ -364,6 +364,35 @@ describe('HeliosPlayer', () => {
         (player as any).updateUI({ currentFrame: 30, duration: 10, fps: 30, isPlaying: false });
         expect(scrubber.value).toBe('30');
     });
+
+    it('should handle touch events for scrubbing', () => {
+      // 1. touchstart (Pause if playing)
+      mockController.getState.mockReturnValue({ currentFrame: 0, duration: 10, fps: 30, isPlaying: true });
+      const scrubber = player.shadowRoot!.querySelector('.scrubber') as HTMLInputElement;
+
+      scrubber.dispatchEvent(new Event('touchstart'));
+      expect(mockController.pause).toHaveBeenCalled();
+      expect((player as any).isScrubbing).toBe(true);
+      expect((player as any).wasPlayingBeforeScrub).toBe(true);
+
+      // 2. touchend (Resume if was playing)
+      scrubber.dispatchEvent(new Event('touchend'));
+      expect(mockController.play).toHaveBeenCalled();
+      expect((player as any).isScrubbing).toBe(false);
+
+      // Reset
+      mockController.play.mockClear();
+      mockController.pause.mockClear();
+
+      // 3. touchcancel (Resume if was playing)
+      mockController.getState.mockReturnValue({ currentFrame: 0, duration: 10, fps: 30, isPlaying: true });
+      scrubber.dispatchEvent(new Event('touchstart')); // Start again
+      expect(mockController.pause).toHaveBeenCalled();
+
+      scrubber.dispatchEvent(new Event('touchcancel'));
+      expect(mockController.play).toHaveBeenCalled();
+      expect((player as any).isScrubbing).toBe(false);
+    });
   });
 
   describe('Accessibility', () => {
