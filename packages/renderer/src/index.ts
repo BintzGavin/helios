@@ -74,6 +74,11 @@ export class Renderer {
         capturedErrors.push(err);
       });
 
+      if (this.options.inputProps) {
+        const serializedProps = JSON.stringify(this.options.inputProps);
+        await page.addInitScript(`window.__HELIOS_PROPS__ = ${serializedProps};`);
+      }
+
       await page.goto(compositionUrl, { waitUntil: 'networkidle' });
       console.log('Page loaded.');
 
