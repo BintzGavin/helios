@@ -37,6 +37,7 @@ export * from './easing';
 export * from './sequencing';
 export * from './signals';
 export * from './errors';
+export * from './captions';
 
 export class Helios {
   // Constants

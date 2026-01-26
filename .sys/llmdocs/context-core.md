@@ -15,6 +15,7 @@ The `packages/core` module is the heart of the Helios system. It implements a **
 ```
 packages/core/src/
 ├── animation.ts       # Animation helpers (spring, interpolate)
+├── captions.ts        # SRT parsing and serialization
 ├── drivers/           # TimeDriver implementations (DomDriver, etc.)
 ├── easing.ts          # Easing functions
 ├── errors.ts          # Structured Error Handling
@@ -53,6 +54,13 @@ export interface DiagnosticReport {
   webCodecs: boolean;
   offscreenCanvas: boolean;
   userAgent: string;
+}
+
+export interface CaptionCue {
+  id: string;
+  startTime: number; // in milliseconds
+  endTime: number;   // in milliseconds
+  text: string;
 }
 ```
 

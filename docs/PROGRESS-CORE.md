@@ -1,5 +1,8 @@
 # CORE Progress Log
 
+## CORE v1.17.0
+- ✅ Completed: Implement SRT Parser - Implemented `parseSrt` and `stringifySrt` utilities for caption support.
+
 ## CORE v1.16.0
 - ✅ Completed: Implement Helios Disposal - Added `dispose()` method to `Helios` for proper resource cleanup (tickers, polling loops, subscribers).
 
