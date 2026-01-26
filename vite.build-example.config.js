@@ -33,6 +33,7 @@ export default defineConfig({
         lottie_animation: resolve(__dirname, "examples/lottie-animation/composition.html"),
         motion_one: resolve(__dirname, "examples/motion-one-animation/composition.html"),
         captions_animation: resolve(__dirname, "examples/captions-animation/composition.html"),
+        signals_animation: resolve(__dirname, "examples/signals-animation/composition.html"),
       },
     },
   },

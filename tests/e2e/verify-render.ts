@@ -22,6 +22,7 @@ const CASES = [
   { name: 'Lottie', relativePath: 'examples/lottie-animation/composition.html', mode: 'dom' as const },
   { name: 'Motion One', relativePath: 'examples/motion-one-animation/composition.html', mode: 'dom' as const },
   { name: 'Captions', relativePath: 'examples/captions-animation/composition.html', mode: 'dom' as const },
+  { name: 'Signals', relativePath: 'examples/signals-animation/composition.html', mode: 'dom' as const },
 ];
 
 async function main() {
