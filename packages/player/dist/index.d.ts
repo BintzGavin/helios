@@ -17,6 +17,8 @@ export declare class HeliosPlayer extends HTMLElement {
     private connectionTimeout;
     private abortController;
     private isExporting;
+    private isScrubbing;
+    private wasPlayingBeforeScrub;
     static get observedAttributes(): string[];
     constructor();
     attributeChangedCallback(name: string, oldVal: string, newVal: string): void;
@@ -30,6 +32,8 @@ export declare class HeliosPlayer extends HTMLElement {
     private updateAspectRatio;
     private togglePlayPause;
     private handleScrubberInput;
+    private handleScrubStart;
+    private handleScrubEnd;
     private handleSpeedChange;
     private handleKeydown;
     private seekRelative;

@@ -43,8 +43,10 @@ The component observes the following attributes:
 |---|---|
 | Space / K | Toggle Play/Pause |
 | F | Toggle Fullscreen |
-| Right Arrow / L | Seek Forward 10 frames |
-| Left Arrow / J | Seek Backward 10 frames |
+| Right Arrow / L | Seek Forward 1 frame (Shift: 10 frames) |
+| Left Arrow / J | Seek Backward 1 frame (Shift: 10 frames) |
+| . | Seek Forward 1 frame |
+| , | Seek Backward 1 frame |
 
 ## Architecture
 - **Controllers**: Abstraction layer (`DirectController` vs `BridgeController`) to unify local and cross-origin interaction.
