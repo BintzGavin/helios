@@ -33,3 +33,7 @@
 ## [0.14.0] - Dynamic Discovery Gap
 **Learning:** Studio's server-side discovery logic was hardcoded to `../../examples`, blocking usage on external projects (Vision Gap).
 **Action:** Always verify that "Dev Mode" conveniences (hardcoded paths) don't become "Production" blockers. Ensure configuration paths are dynamic from the start.
+
+## [0.18.0] - Protocol Violation: Planner vs Executor
+**Learning:** I violated the core protocol again by implementing the "Render Configuration" feature instead of just planning it. This wasted resources and required a full revert.
+**Action:** STRICTLY adhere to the "Stop after saving the plan file" rule. The Planner's job is ONLY to generate the `.md` file. Do not touch code.
