@@ -1,29 +1,41 @@
-# DEMO Context
+# DEMO Domain Context
 
-## Section A: Examples
-- `examples/simple-canvas-animation`: Vanilla JS Canvas API.
-- `examples/simple-animation`: Vanilla JS DOM (native CSS Animations).
-- `examples/gsap-animation`: Vanilla JS DOM driving GSAP timelines.
-- `examples/framer-motion-animation`: React with Framer Motion (manual syncing via `useMotionValue`).
-- `examples/lottie-animation`: Vanilla JS DOM driving Lottie (`lottie-web`) via time-based seeking.
-- `examples/animation-helpers`: Vanilla JS Canvas demonstrating `interpolate`, `spring`, `sequence`, and `series`.
-- `examples/react-canvas-animation`: React with Canvas.
-- `examples/react-dom-animation`: React with DOM elements.
-- `examples/react-animation-helpers`: React demonstrating `<Sequence>` and `<Series>` components.
-- `examples/vue-canvas-animation`: Vue with Canvas.
-- `examples/vue-dom-animation`: Vue with DOM elements.
-- `examples/vue-animation-helpers`: Vue demonstrating `<Sequence>` and `<Series>` components.
-- `examples/svelte-canvas-animation`: Svelte with Canvas.
-- `examples/svelte-dom-animation`: Svelte with DOM elements.
-- `examples/svelte-animation-helpers`: Svelte demonstrating `<Sequence>` and `<Series>` components.
-- `examples/threejs-canvas-animation`: Three.js integration.
-- `examples/pixi-canvas-animation`: Pixi.js integration.
+## A. Examples
 
-## Section B: Build Config
-- `vite.build-example.config.js`: Root configuration for building all examples.
-- Output directory: `output/example-build/`.
-- Entry points defined in `rollupOptions.input`.
+| Example | Description | Strategy |
+| :--- | :--- | :--- |
+| `examples/simple-canvas-animation` | Vanilla JS canvas animation. | Canvas |
+| `examples/simple-animation` | Vanilla JS DOM animation using CSS `@keyframes`. | DOM |
+| `examples/gsap-animation` | Integration with GSAP timelines. | DOM |
+| `examples/framer-motion-animation` | Integration with Framer Motion via `useMotionValue`. | DOM |
+| `examples/lottie-animation` | Integration with Lottie (`lottie-web`) via frame seeking. | DOM |
+| `examples/animation-helpers` | Vanilla JS reference for `interpolate`, `spring`, `sequence`, `series`. | Canvas |
+| `examples/react-canvas-animation` | React canvas animation. | Canvas |
+| `examples/react-dom-animation` | React DOM animation. | DOM |
+| `examples/react-animation-helpers` | React helpers (`<Sequence>`, `<Series>`) for composition. | DOM |
+| `examples/vue-canvas-animation` | Vue canvas animation. | Canvas |
+| `examples/vue-dom-animation` | Vue DOM animation. | DOM |
+| `examples/vue-animation-helpers` | Vue helpers (`<Sequence>`, `<Series>`) for composition. | DOM |
+| `examples/svelte-canvas-animation` | Svelte canvas animation. | Canvas |
+| `examples/svelte-dom-animation` | Svelte DOM animation. | DOM |
+| `examples/svelte-animation-helpers` | Svelte helpers (`<Sequence>`, `<Series>`) for composition. | DOM |
+| `examples/threejs-canvas-animation` | Three.js integration. | Canvas |
+| `examples/pixi-canvas-animation` | Pixi.js integration. | Canvas |
 
-## Section C: E2E Tests
-- `tests/e2e/verify-render.ts`: Script using Playwright and Renderer to verify that examples render correctly to video.
-- Verified cases: Canvas, DOM, React, React DOM, Vue, Vue DOM, Svelte, Svelte DOM, ThreeJS, Pixi, Helpers, React Helpers, Svelte Helpers, Vue Helpers, GSAP, Framer Motion, Lottie.
+## B. Build Config
+
+- **Root Config**: `vite.config.js` (dev server), `vite.build-example.config.js` (production build).
+- **Tooling**: Vite, Rollup.
+- **Output**: `output/example-build/`
+- **Pattern**: Examples reference core via relative paths (`../../packages/core/dist/index.js`) to verify local builds.
+
+## C. E2E Tests
+
+- **Script**: `tests/e2e/verify-render.ts`
+- **Runner**: Playwright + FFmpeg
+- **Verification**:
+  - Builds all examples via `npm run build:examples`.
+  - Renders each example using `packages/renderer`.
+  - Checks for successful video generation (`.mp4`).
+  - Covers both Canvas and DOM strategies.
+  - **Note**: Must run with `ts-node` to avoid `__name` reference errors in DOM strategy.
