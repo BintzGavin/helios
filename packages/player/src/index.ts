@@ -289,6 +289,94 @@ export class HeliosPlayer extends HTMLElement {
   private isExporting: boolean = false;
   private isScrubbing: boolean = false;
   private wasPlayingBeforeScrub: boolean = false;
+  private lastState: any = null;
+
+  // --- Standard Media API ---
+
+  public get currentTime(): number {
+    if (!this.controller) return 0;
+    const s = this.controller.getState();
+    return s.fps ? s.currentFrame / s.fps : 0;
+  }
+
+  public set currentTime(val: number) {
+    if (this.controller) {
+      const s = this.controller.getState();
+      if (s.fps) {
+        this.controller.seek(Math.floor(val * s.fps));
+      }
+    }
+  }
+
+  public get currentFrame(): number {
+    return this.controller ? this.controller.getState().currentFrame : 0;
+  }
+
+  public set currentFrame(val: number) {
+    if (this.controller) {
+      this.controller.seek(Math.floor(val));
+    }
+  }
+
+  public get duration(): number {
+    return this.controller ? this.controller.getState().duration : 0;
+  }
+
+  public get paused(): boolean {
+    return this.controller ? !this.controller.getState().isPlaying : true;
+  }
+
+  public get ended(): boolean {
+    if (!this.controller) return false;
+    const s = this.controller.getState();
+    return s.currentFrame >= s.duration * s.fps - 1;
+  }
+
+  public get volume(): number {
+    return this.controller ? this.controller.getState().volume ?? 1 : 1;
+  }
+
+  public set volume(val: number) {
+    if (this.controller) {
+      this.controller.setAudioVolume(Math.max(0, Math.min(1, val)));
+    }
+  }
+
+  public get muted(): boolean {
+    return this.controller ? !!this.controller.getState().muted : false;
+  }
+
+  public set muted(val: boolean) {
+    if (this.controller) {
+      this.controller.setAudioMuted(val);
+    }
+  }
+
+  public get playbackRate(): number {
+    return this.controller ? this.controller.getState().playbackRate ?? 1 : 1;
+  }
+
+  public set playbackRate(val: number) {
+    if (this.controller) {
+      this.controller.setPlaybackRate(val);
+    }
+  }
+
+  public get fps(): number {
+    return this.controller ? this.controller.getState().fps : 0;
+  }
+
+  public async play(): Promise<void> {
+    if (this.controller) {
+      this.controller.play();
+    }
+  }
+
+  public pause(): void {
+    if (this.controller) {
+      this.controller.pause();
+    }
+  }
 
   static get observedAttributes() {
     return ["src", "width", "height", "autoplay", "loop", "controls", "export-format"];
@@ -667,6 +755,36 @@ export class HeliosPlayer extends HTMLElement {
   };
 
   private updateUI(state: any) {
+      // Event Dispatching
+      if (this.lastState) {
+        if (state.isPlaying !== this.lastState.isPlaying) {
+          this.dispatchEvent(new Event(state.isPlaying ? "play" : "pause"));
+        }
+
+        const wasFinished = this.lastState.currentFrame >= this.lastState.duration * this.lastState.fps - 1;
+        const isFinishedNow = state.currentFrame >= state.duration * state.fps - 1;
+        if (!wasFinished && isFinishedNow && !state.isPlaying) {
+             this.dispatchEvent(new Event("ended"));
+        }
+
+        if (state.currentFrame !== this.lastState.currentFrame) {
+             this.dispatchEvent(new Event("timeupdate"));
+        }
+
+        if (state.volume !== this.lastState.volume || state.muted !== this.lastState.muted) {
+            this.dispatchEvent(new Event("volumechange"));
+        }
+
+        if (state.playbackRate !== this.lastState.playbackRate) {
+            this.dispatchEvent(new Event("ratechange"));
+        }
+
+        if (state.duration !== this.lastState.duration) {
+            this.dispatchEvent(new Event("durationchange"));
+        }
+      }
+      this.lastState = state;
+
       const isFinished = state.currentFrame >= state.duration * state.fps - 1;
 
       if (isFinished && this.hasAttribute("loop")) {

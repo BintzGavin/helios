@@ -282,6 +282,79 @@ export class HeliosPlayer extends HTMLElement {
     isExporting = false;
     isScrubbing = false;
     wasPlayingBeforeScrub = false;
+    lastState = null;
+    // --- Standard Media API ---
+    get currentTime() {
+        if (!this.controller)
+            return 0;
+        const s = this.controller.getState();
+        return s.fps ? s.currentFrame / s.fps : 0;
+    }
+    set currentTime(val) {
+        if (this.controller) {
+            const s = this.controller.getState();
+            if (s.fps) {
+                this.controller.seek(Math.floor(val * s.fps));
+            }
+        }
+    }
+    get currentFrame() {
+        return this.controller ? this.controller.getState().currentFrame : 0;
+    }
+    set currentFrame(val) {
+        if (this.controller) {
+            this.controller.seek(Math.floor(val));
+        }
+    }
+    get duration() {
+        return this.controller ? this.controller.getState().duration : 0;
+    }
+    get paused() {
+        return this.controller ? !this.controller.getState().isPlaying : true;
+    }
+    get ended() {
+        if (!this.controller)
+            return false;
+        const s = this.controller.getState();
+        return s.currentFrame >= s.duration * s.fps - 1;
+    }
+    get volume() {
+        return this.controller ? this.controller.getState().volume ?? 1 : 1;
+    }
+    set volume(val) {
+        if (this.controller) {
+            this.controller.setAudioVolume(Math.max(0, Math.min(1, val)));
+        }
+    }
+    get muted() {
+        return this.controller ? !!this.controller.getState().muted : false;
+    }
+    set muted(val) {
+        if (this.controller) {
+            this.controller.setAudioMuted(val);
+        }
+    }
+    get playbackRate() {
+        return this.controller ? this.controller.getState().playbackRate ?? 1 : 1;
+    }
+    set playbackRate(val) {
+        if (this.controller) {
+            this.controller.setPlaybackRate(val);
+        }
+    }
+    get fps() {
+        return this.controller ? this.controller.getState().fps : 0;
+    }
+    async play() {
+        if (this.controller) {
+            this.controller.play();
+        }
+    }
+    pause() {
+        if (this.controller) {
+            this.controller.pause();
+        }
+    }
     static get observedAttributes() {
         return ["src", "width", "height", "autoplay", "loop", "controls", "export-format"];
     }
@@ -629,6 +702,30 @@ export class HeliosPlayer extends HTMLElement {
         }
     };
     updateUI(state) {
+        // Event Dispatching
+        if (this.lastState) {
+            if (state.isPlaying !== this.lastState.isPlaying) {
+                this.dispatchEvent(new Event(state.isPlaying ? "play" : "pause"));
+            }
+            const wasFinished = this.lastState.currentFrame >= this.lastState.duration * this.lastState.fps - 1;
+            const isFinishedNow = state.currentFrame >= state.duration * state.fps - 1;
+            if (!wasFinished && isFinishedNow && !state.isPlaying) {
+                this.dispatchEvent(new Event("ended"));
+            }
+            if (state.currentFrame !== this.lastState.currentFrame) {
+                this.dispatchEvent(new Event("timeupdate"));
+            }
+            if (state.volume !== this.lastState.volume || state.muted !== this.lastState.muted) {
+                this.dispatchEvent(new Event("volumechange"));
+            }
+            if (state.playbackRate !== this.lastState.playbackRate) {
+                this.dispatchEvent(new Event("ratechange"));
+            }
+            if (state.duration !== this.lastState.duration) {
+                this.dispatchEvent(new Event("durationchange"));
+            }
+        }
+        this.lastState = state;
         const isFinished = state.currentFrame >= state.duration * state.fps - 1;
         if (isFinished && this.hasAttribute("loop")) {
             // Prevent infinite loop if something goes wrong, only restart if we stopped

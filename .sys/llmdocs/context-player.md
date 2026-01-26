@@ -22,10 +22,32 @@ The `<helios-player>` component utilizes Shadow DOM for isolation.
   - Fullscreen Toggle
 
 ## Events
-The component does not currently dispatch custom events to the DOM.
-It communicates internally via:
+The component dispatches the following standard media events to the DOM:
+- `play`: Fired when playback starts or resumes.
+- `pause`: Fired when playback is paused.
+- `ended`: Fired when playback reaches the end of the timeline.
+- `timeupdate`: Fired when the current playback time has changed.
+- `volumechange`: Fired when volume or muted state has changed.
+- `ratechange`: Fired when playback rate has changed.
+- `durationchange`: Fired when the duration attribute has been updated.
+
+It also communicates internally via:
 - `window.postMessage` (Bridge Protocol)
 - `KeyboardEvent` (Shortcuts)
+
+## Public API
+The component exposes a subset of the `HTMLMediaElement` interface:
+- `currentTime`: (get/set) Current playback time in seconds.
+- `currentFrame`: (get/set) Current playback frame (integer).
+- `duration`: (get) Total duration in seconds.
+- `paused`: (get) Boolean indicating if playback is paused.
+- `ended`: (get) Boolean indicating if playback has finished.
+- `volume`: (get/set) Audio volume (0.0 - 1.0).
+- `muted`: (get/set) Boolean indicating if audio is muted.
+- `playbackRate`: (get/set) Playback speed multiplier (default 1.0).
+- `fps`: (get) Frames per second.
+- `play()`: Promise<void> - Starts playback.
+- `pause()`: void - Pauses playback.
 
 ## Attributes
 The component observes the following attributes:

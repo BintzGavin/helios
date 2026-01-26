@@ -1,5 +1,8 @@
 # PLAYER Progress Log
 
+## PLAYER v0.19.0
+- ✅ Completed: Implement Standard Media API - Implemented standard media properties (currentTime, duration, etc.) and events (play, pause, timeupdate) for improved interoperability.
+
 ## PLAYER v0.18.0
 - ✅ Completed: WebM Export - Implemented `export-format` attribute to support WebM (VP9/Opus) video export alongside MP4.
 

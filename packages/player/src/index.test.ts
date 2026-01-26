@@ -626,4 +626,184 @@ describe('HeliosPlayer', () => {
         expect(ccBtn.disabled).toBe(false);
     });
   });
+
+  describe('Standard Media API', () => {
+    let mockController: any;
+
+    beforeEach(() => {
+        mockController = {
+            getState: vi.fn().mockReturnValue({ currentFrame: 0, duration: 10, fps: 30, isPlaying: false, volume: 1, muted: false, playbackRate: 1 }),
+            play: vi.fn(),
+            pause: vi.fn(),
+            seek: vi.fn(),
+            setAudioVolume: vi.fn(),
+            setAudioMuted: vi.fn(),
+            setPlaybackRate: vi.fn(),
+            subscribe: vi.fn().mockReturnValue(() => {}),
+            dispose: vi.fn(),
+            setInputProps: vi.fn(),
+            captureFrame: vi.fn(),
+            getAudioTracks: vi.fn()
+        };
+        (player as any).setController(mockController);
+    });
+
+    it('should expose currentTime', () => {
+        // 1.5s = 45 frames @ 30fps
+        mockController.getState.mockReturnValue({ currentFrame: 45, duration: 10, fps: 30 });
+        expect(player.currentTime).toBe(1.5);
+
+        player.currentTime = 2.0;
+        expect(mockController.seek).toHaveBeenCalledWith(60); // 2 * 30
+    });
+
+    it('should expose currentFrame', () => {
+        mockController.getState.mockReturnValue({ currentFrame: 45, duration: 10, fps: 30 });
+        expect(player.currentFrame).toBe(45);
+
+        player.currentFrame = 100;
+        expect(mockController.seek).toHaveBeenCalledWith(100);
+    });
+
+    it('should expose duration', () => {
+        expect(player.duration).toBe(10);
+    });
+
+    it('should expose paused', () => {
+        mockController.getState.mockReturnValue({ isPlaying: false });
+        expect(player.paused).toBe(true);
+
+        mockController.getState.mockReturnValue({ isPlaying: true });
+        expect(player.paused).toBe(false);
+    });
+
+    it('should expose ended', () => {
+        // Not ended
+        mockController.getState.mockReturnValue({ currentFrame: 0, duration: 10, fps: 30 });
+        expect(player.ended).toBe(false);
+
+        // Ended
+        const endFrame = 299; // 10 * 30 - 1
+        mockController.getState.mockReturnValue({ currentFrame: endFrame, duration: 10, fps: 30 });
+        expect(player.ended).toBe(true);
+    });
+
+    it('should expose volume', () => {
+        expect(player.volume).toBe(1);
+
+        player.volume = 0.5;
+        expect(mockController.setAudioVolume).toHaveBeenCalledWith(0.5);
+    });
+
+    it('should expose muted', () => {
+        expect(player.muted).toBe(false);
+
+        player.muted = true;
+        expect(mockController.setAudioMuted).toHaveBeenCalledWith(true);
+    });
+
+    it('should expose playbackRate', () => {
+        expect(player.playbackRate).toBe(1);
+
+        player.playbackRate = 2;
+        expect(mockController.setPlaybackRate).toHaveBeenCalledWith(2);
+    });
+
+    it('should expose fps', () => {
+        expect(player.fps).toBe(30);
+    });
+
+    it('should implement play() and pause()', () => {
+        player.play();
+        expect(mockController.play).toHaveBeenCalled();
+
+        player.pause();
+        expect(mockController.pause).toHaveBeenCalled();
+    });
+
+    it('should dispatch play/pause events', () => {
+        const playSpy = vi.fn();
+        const pauseSpy = vi.fn();
+        player.addEventListener('play', playSpy);
+        player.addEventListener('pause', pauseSpy);
+
+        // Initial update (paused)
+        (player as any).updateUI({ isPlaying: false, currentFrame: 0, duration: 10, fps: 30 });
+        expect(playSpy).not.toHaveBeenCalled();
+        expect(pauseSpy).not.toHaveBeenCalled();
+
+        // Change to playing
+        (player as any).updateUI({ isPlaying: true, currentFrame: 0, duration: 10, fps: 30 });
+        expect(playSpy).toHaveBeenCalled();
+        expect(pauseSpy).not.toHaveBeenCalled();
+
+        // Change to paused
+        (player as any).updateUI({ isPlaying: false, currentFrame: 0, duration: 10, fps: 30 });
+        expect(pauseSpy).toHaveBeenCalled();
+    });
+
+    it('should dispatch timeupdate event', () => {
+        const spy = vi.fn();
+        player.addEventListener('timeupdate', spy);
+
+        // Initial
+        (player as any).updateUI({ currentFrame: 0, duration: 10, fps: 30 });
+
+        // Change frame
+        (player as any).updateUI({ currentFrame: 1, duration: 10, fps: 30 });
+        expect(spy).toHaveBeenCalled();
+    });
+
+    it('should dispatch volumechange event', () => {
+        const spy = vi.fn();
+        player.addEventListener('volumechange', spy);
+
+        // Initial
+        (player as any).updateUI({ volume: 1, muted: false, currentFrame: 0, duration: 10, fps: 30, isPlaying: false });
+
+        // Change volume
+        (player as any).updateUI({ volume: 0.5, muted: false, currentFrame: 0, duration: 10, fps: 30, isPlaying: false });
+        expect(spy).toHaveBeenCalledTimes(1);
+
+        // Change muted
+        (player as any).updateUI({ volume: 0.5, muted: true, currentFrame: 0, duration: 10, fps: 30, isPlaying: false });
+        expect(spy).toHaveBeenCalledTimes(2);
+    });
+
+    it('should dispatch ended event', () => {
+        const spy = vi.fn();
+        player.addEventListener('ended', spy);
+
+        // Not ended
+        (player as any).updateUI({ isPlaying: true, currentFrame: 298, duration: 10, fps: 30 });
+
+        // Ended (and stopped)
+        (player as any).updateUI({ isPlaying: false, currentFrame: 299, duration: 10, fps: 30 });
+        expect(spy).toHaveBeenCalled();
+    });
+
+    it('should dispatch ratechange event', () => {
+        const spy = vi.fn();
+        player.addEventListener('ratechange', spy);
+
+        // Initial
+        (player as any).updateUI({ playbackRate: 1, currentFrame: 0, duration: 10, fps: 30, isPlaying: false });
+
+        // Change
+        (player as any).updateUI({ playbackRate: 2, currentFrame: 0, duration: 10, fps: 30, isPlaying: false });
+        expect(spy).toHaveBeenCalled();
+    });
+
+    it('should dispatch durationchange event', () => {
+        const spy = vi.fn();
+        player.addEventListener('durationchange', spy);
+
+        // Initial
+        (player as any).updateUI({ duration: 10, currentFrame: 0, fps: 30, isPlaying: false });
+
+        // Change
+        (player as any).updateUI({ duration: 20, currentFrame: 0, fps: 30, isPlaying: false });
+        expect(spy).toHaveBeenCalled();
+    });
+  });
 });
