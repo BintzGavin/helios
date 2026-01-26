@@ -15,3 +15,6 @@
 
 ## DEMO v1.17.0
 - ✅ Completed: Implement Vue Series Component - Added `<Series>` component to `examples/vue-animation-helpers` and updated example to demonstrate it.
+
+## DEMO v1.18.0
+- ✅ Completed: Implement React Series Component - Implemented `<Series>` component in `examples/react-animation-helpers` and verified with E2E tests.

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Helios } from '../../../packages/core/dist/index.js';
 import { Sequence } from './components/Sequence';
+import { Series } from './components/Series';
 import { FrameContext } from './components/FrameContext';
 import { useVideoFrame } from './hooks/useVideoFrame';
 
@@ -51,15 +52,17 @@ export default function App() {
       <div style={{ position: 'relative', width: '100%', height: '100%', background: '#222', fontFamily: 'sans-serif' }}>
         <h1 style={{ color: 'white', margin: 0, padding: 20 }}>React Animation Helpers</h1>
 
-        {/* First sequence: 0-60 frames (0s - 2s) */}
-        <Sequence from={0} durationInFrames={60}>
+        <Series>
+          {/* First sequence: 0-60 frames (0s - 2s) */}
+          <Sequence durationInFrames={60}>
             <MovingBox color="#ff4444" label="Seq 1" />
-        </Sequence>
+          </Sequence>
 
-        {/* Second sequence: starts at 60, runs for 60 frames (2s - 4s) */}
-        <Sequence from={60} durationInFrames={60}>
+          {/* Second sequence: starts at 60 (automatically), runs for 60 frames (2s - 4s) */}
+          <Sequence durationInFrames={60}>
             <MovingBox color="#4444ff" label="Seq 2" />
-        </Sequence>
+          </Sequence>
+        </Series>
       </div>
     </FrameContext.Provider>
   );
