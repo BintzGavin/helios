@@ -12,6 +12,7 @@ packages/renderer/
 ├── scripts/
 │   ├── render-dom.ts
 │   ├── render.ts
+│   ├── verify-audio-mixing.ts
 │   ├── verify-bitrate.ts
 │   ├── verify-diagnostics.ts
 │   ├── verify-dom-preload.ts
@@ -50,7 +51,7 @@ interface RendererOptions {
   mode?: 'canvas' | 'dom';
   startFrame?: number;
   audioFilePath?: string;
-  audioTracks?: string[];
+  audioTracks?: (string | AudioTrackConfig)[];
   videoCodec?: string;
   pixelFormat?: string;
   crf?: number;
@@ -59,6 +60,13 @@ interface RendererOptions {
   intermediateVideoCodec?: string;
   inputProps?: Record<string, any>;
   ffmpegPath?: string;
+}
+
+interface AudioTrackConfig {
+  path: string;
+  volume?: number;
+  offset?: number;
+  seek?: number;
 }
 
 interface RenderJobOptions {
