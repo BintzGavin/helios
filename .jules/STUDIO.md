@@ -25,3 +25,7 @@
 ## [0.9.0] - Studio Backend Architecture
 **Learning:** To bridge the gap between the static Studio UI and the user's file system, we cannot rely on a separate backend service due to packaging constraints. The solution is to utilize Vite's plugin system to inject API middleware directly into the dev server.
 **Action:** Planned `vite-plugin-studio-api.ts` to provide `/api/compositions` and `/api/assets` endpoints, allowing the frontend to "discover" the project structure without a heavy backend dependency.
+
+## [0.13.0] - Props Schema Validation Constraint
+**Learning:** The Vision promises "Props editor with schema validation", but `Helios` core (`packages/core`) only defines `inputProps` as a generic `Record<string, any>` without schema metadata. Since I cannot modify Core, true schema validation is currently impossible.
+**Action:** Planned "Rich Props Editor" to support JSON editing for objects/arrays as a workaround. Future implementation of full validation requires architectural changes in Core to allow users to define schemas.
