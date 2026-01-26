@@ -51,3 +51,7 @@
 ## [2026-03-03] - Plan Review Protocol
 **Learning:** `request_plan_review` validates the *execution plan* (steps to take), not the *content* of the spec file being created.
 **Action:** When calling `request_plan_review`, provide the steps (1. Create spec file, 2. Pre-commit), not the spec file content itself.
+
+## [2026-03-05] - SeekTimeDriver Non-Determinism
+**Learning:** `SeekTimeDriver` (used for DOM rendering) relies on WAAPI and does not mock `performance.now()` or `Date.now()`. This exposes wall-clock time drift to JavaScript-driven animations (e.g. `requestAnimationFrame` loops), violating the "Deterministic Rendering" vision.
+**Action:** Prioritize polyfilling these globals in `SeekTimeDriver` to ensure consistent rendering for non-CSS animations.
