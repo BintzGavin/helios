@@ -1,8 +1,9 @@
-**Version**: 1.8.0
+**Version**: 1.9.0
 
 # Renderer Agent Status
 
 ## Progress Log
+- [1.9.0] ✅ Completed: Integrate Diagnostics - Added `diagnose(page)` to `RenderStrategy` interface and implemented environment checks (VideoEncoder, WAAPI) in strategies to improve observability.
 - [1.8.0] ✅ Completed: Configurable WebCodecs Bitrate - Updated `CanvasStrategy` to respect `videoBitrate` in `RendererOptions`, enabling high-quality intermediate capture (defaulting to 25 Mbps floor).
 - [1.7.0] ✅ Completed: Implement Video Concatenation - Added `concatenateVideos` utility using FFmpeg concat demuxer to support distributed rendering workflows.
 - [1.6.0] ✅ Completed: Configurable Codecs - Added `videoCodec`, `pixelFormat`, `crf`, `preset`, and `videoBitrate` options to `RendererOptions` and updated strategies to use them.

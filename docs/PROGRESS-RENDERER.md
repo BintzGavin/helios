@@ -1,5 +1,8 @@
 # RENDERER Progress Log
 
+## RENDERER v1.9.0
+- ✅ Completed: Integrate Diagnostics - Added `diagnose(page)` to `RenderStrategy` interface and implemented environment checks (VideoEncoder, WAAPI) in strategies to improve observability.
+
 ## RENDERER v1.8.0
 - ✅ Completed: Configurable WebCodecs Bitrate - Updated `CanvasStrategy` to respect `videoBitrate` in `RendererOptions`, enabling high-quality intermediate capture (defaulting to 25 Mbps floor).
 
