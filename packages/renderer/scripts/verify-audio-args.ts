@@ -38,7 +38,8 @@ const runTest = () => {
   assert(argsDomWithAudio.includes('/path/to/audio.mp3'), 'DomStrategy should include audio path');
   assert(argsDomWithAudio.includes('-c:a'), 'DomStrategy should include -c:a');
   assert(argsDomWithAudio.includes('-map'), 'DomStrategy should include -map');
-  assert(argsDomWithAudio.includes('1:a'), 'DomStrategy should map audio stream 1:a');
+  // With complex filter implementation, we map [a0] instead of 1:a directly
+  assert(argsDomWithAudio.includes('[a0]'), 'DomStrategy should map audio stream [a0]');
   assert(argsDomWithAudio.includes('-t'), 'DomStrategy should include -t');
   assert(argsDomWithAudio.includes('5'), 'DomStrategy should include duration 5');
   assert(!argsDomWithAudio.includes('-shortest'), 'DomStrategy should NOT include -shortest');
@@ -52,7 +53,7 @@ const runTest = () => {
 
 
   // Test CanvasStrategy
-  const canvasStrategy = new CanvasStrategy();
+  const canvasStrategy = new CanvasStrategy(optionsWithAudio);
 
   // Case 3: CanvasStrategy with Audio
   const argsCanvasWithAudio = canvasStrategy.getFFmpegArgs(optionsWithAudio, outputPath);
@@ -61,7 +62,8 @@ const runTest = () => {
   assert(argsCanvasWithAudio.includes('/path/to/audio.mp3'), 'CanvasStrategy should include audio path');
   assert(argsCanvasWithAudio.includes('-c:a'), 'CanvasStrategy should include -c:a');
   assert(argsCanvasWithAudio.includes('-map'), 'CanvasStrategy should include -map');
-  assert(argsCanvasWithAudio.includes('1:a'), 'CanvasStrategy should map audio stream 1:a');
+  // With complex filter implementation, we map [a0] instead of 1:a directly
+  assert(argsCanvasWithAudio.includes('[a0]'), 'CanvasStrategy should map audio stream [a0]');
   assert(argsCanvasWithAudio.includes('-t'), 'CanvasStrategy should include -t');
   assert(argsCanvasWithAudio.includes('5'), 'CanvasStrategy should include duration 5');
   assert(!argsCanvasWithAudio.includes('-shortest'), 'CanvasStrategy should NOT include -shortest');
