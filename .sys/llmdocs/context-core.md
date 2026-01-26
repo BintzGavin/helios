@@ -1,63 +1,51 @@
-# Core Domain Context
+# CORE Context
 
 ## A. Architecture
 
-The `packages/core` module implements the **Helios State Machine**, which is the central nervous system of the application. It follows a reactive pattern using Signals.
+The **Core** package is the pure TypeScript logic engine for Helios. It implements a **Headless Logic Engine** pattern where state management and timing are decoupled from the rendering environment.
 
-- **Helios Class**: The main orchestrator. It manages:
-  - **State**: `currentFrame`, `isPlaying`, `playbackRate`, `inputProps` (all Signals).
-  - **Loop**: Uses a `Ticker` strategy (e.g., `RafTicker`) to drive the animation loop.
-  - **Drivers**: Uses a `TimeDriver` strategy (e.g., `DomDriver`) to synchronize external entities (WAAPI, Audio, Video).
-- **Signals**: A reactivity system (`signal`, `computed`, `effect`) inspired by Preact/Solid signals. This allows granular subscriptions to state changes without polling or heavy event emitters.
-- **Drivers**: The `DomDriver` synchronizes both WAAPI animations and `HTMLMediaElement`s (`<audio>`, `<video>`) with the Helios timeline.
+Key Architectural Patterns:
+1.  **Helios State Machine**: The `Helios` class manages the timeline state (`currentFrame`, `isPlaying`, `playbackRate`).
+2.  **Reactive Signals**: Internal state is managed using fine-grained signals (`signal`, `computed`, `effect`) and exposed as `ReadonlySignal`.
+3.  **Driver Strategy**: The `TimeDriver` interface abstracts the underlying timing mechanism (e.g., `DomDriver` for WAAPI/Media synchronization, `NoopDriver` for manual control).
+4.  **Ticker Strategy**: The `Ticker` interface abstracts the loop mechanism (`RafTicker` for browser, `TimeoutTicker` for Node.js).
+5.  **Environment Agnostic**: The core logic adapts to Browser (DOM) or Node.js environments.
 
 ## B. File Tree
 
 ```
 packages/core/src/
-├── animation.ts       # Animation primitives (interpolate, spring)
-├── drivers/           # Time synchronization strategies
-│   ├── DomDriver.ts   # Syncs WAAPI and Media Elements (Default)
-│   ├── ManualTicker.ts # For testing
-│   ├── NoopDriver.ts  # No-op implementation
-│   ├── RafTicker.ts   # RequestAnimationFrame loop
-│   ├── Ticker.ts      # Ticker interface
-│   ├── TimeDriver.ts  # Driver interface
-│   ├── WaapiDriver.ts # (Deprecated) Syncs only WAAPI
+├── drivers/
+│   ├── DomDriver.ts
+│   ├── ManualTicker.ts
+│   ├── NoopDriver.ts
+│   ├── RafTicker.ts
+│   ├── Ticker.ts
+│   ├── TimeDriver.ts
+│   ├── TimeoutTicker.ts
+│   ├── WaapiDriver.ts
 │   └── index.ts
-├── easing.ts          # Easing functions
-├── index.ts           # Main Helios class entry point
-├── sequencing.ts      # Sequencing helpers (sequence, series)
-├── signals.ts         # Reactive signals implementation
-└── types.ts           # Shared types
+├── animation.ts
+├── easing.ts
+├── index.ts
+├── sequencing.ts
+└── signals.ts
 ```
 
 ## C. Type Definitions
 
 ```typescript
-// signals.ts
-export interface ReadonlySignal<T> {
-    readonly value: T;
-    peek(): T;
-}
-export interface Signal<T> extends ReadonlySignal<T> {
-    value: T;
-}
+export type HeliosState = {
+  duration: number;
+  fps: number;
+  currentFrame: number;
+  isPlaying: boolean;
+  inputProps: Record<string, any>;
+  playbackRate: number;
+};
 
-// drivers/TimeDriver.ts
-export interface TimeDriver {
-  init(scope: HTMLElement | Document): void;
-  update(timeInMs: number, options?: { isPlaying: boolean; playbackRate: number }): void;
-}
+export type HeliosSubscriber = (state: HeliosState) => void;
 
-// drivers/Ticker.ts
-export interface Ticker {
-  start(callback: (deltaTime: number) => void): void;
-  stop(): void;
-  tick(deltaTime: number): void;
-}
-
-// index.ts
 export interface HeliosOptions {
   duration: number; // in seconds
   fps: number;
@@ -69,48 +57,44 @@ export interface HeliosOptions {
   ticker?: Ticker;
 }
 
-export type HeliosState = {
-  duration: number;
-  fps: number;
-  currentFrame: number;
-  isPlaying: boolean;
-  inputProps: Record<string, any>;
-  playbackRate: number;
-};
-
-export type HeliosSubscriber = (state: HeliosState) => void;
+export interface DiagnosticReport {
+  waapi: boolean;
+  webCodecs: boolean;
+  offscreenCanvas: boolean;
+  userAgent: string;
+}
 ```
 
-## D. Public Methods (Helios)
+## D. Public Methods
 
 ```typescript
 class Helios {
-    // Readonly Signals
-    get currentFrame(): ReadonlySignal<number>;
-    get isPlaying(): ReadonlySignal<boolean>;
-    get inputProps(): ReadonlySignal<Record<string, any>>;
-    get playbackRate(): ReadonlySignal<number>;
+  // Constants
+  readonly duration: number;
+  readonly fps: number;
 
-    constructor(options: HeliosOptions);
+  // Signals
+  get currentFrame(): ReadonlySignal<number>;
+  get isPlaying(): ReadonlySignal<boolean>;
+  get inputProps(): ReadonlySignal<Record<string, any>>;
+  get playbackRate(): ReadonlySignal<number>;
 
-    static diagnose(): Promise<DiagnosticReport>;
+  static diagnose(): Promise<DiagnosticReport>;
 
-    // State Access
-    getState(): Readonly<HeliosState>;
+  constructor(options: HeliosOptions);
 
-    // Controls
-    play(): void;
-    pause(): void;
-    seek(frame: number): void;
-    setPlaybackRate(rate: number): void;
-    setInputProps(props: Record<string, any>): void;
+  getState(): Readonly<HeliosState>;
+  setInputProps(props: Record<string, any>): void;
+  setPlaybackRate(rate: number): void;
 
-    // Subscription
-    subscribe(callback: HeliosSubscriber): () => void;
-    unsubscribe(callback: HeliosSubscriber): void;
+  subscribe(callback: HeliosSubscriber): () => void;
+  unsubscribe(callback: HeliosSubscriber): void;
 
-    // External Sync
-    bindToDocumentTimeline(): void;
-    unbindFromDocumentTimeline(): void;
+  play(): void;
+  pause(): void;
+  seek(frame: number): void;
+
+  bindToDocumentTimeline(): void;
+  unbindFromDocumentTimeline(): void;
 }
 ```

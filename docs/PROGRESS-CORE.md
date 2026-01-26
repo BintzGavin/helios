@@ -1,5 +1,8 @@
 # CORE Progress Log
 
+## CORE v1.14.0
+- ✅ Completed: Enable Node.js Runtime Support - Implemented `TimeoutTicker` and environment detection for Node.js compatibility.
+
 ## CORE v1.13.0
 - ✅ Completed: Export Types - Exported `HeliosState` and `HeliosSubscriber` types from `packages/core` to improve DX.
 

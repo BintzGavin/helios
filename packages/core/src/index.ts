@@ -1,4 +1,4 @@
-import { TimeDriver, WaapiDriver, DomDriver, NoopDriver, Ticker, RafTicker } from './drivers';
+import { TimeDriver, WaapiDriver, DomDriver, NoopDriver, Ticker, RafTicker, TimeoutTicker } from './drivers';
 import { signal, effect, Signal, ReadonlySignal } from './signals';
 
 export type HeliosState = {
@@ -136,7 +136,7 @@ export class Helios {
     this.driver.init(this.animationScope);
 
     // Ticker Selection
-    this.ticker = options.ticker || new RafTicker();
+    this.ticker = options.ticker || (typeof requestAnimationFrame !== 'undefined' ? new RafTicker() : new TimeoutTicker());
   }
 
   public getState(): Readonly<HeliosState> {

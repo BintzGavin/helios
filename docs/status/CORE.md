@@ -1,10 +1,10 @@
 # Status: CORE
 
-**Version**: 1.13.0
+**Version**: 1.14.0
 
 - **Status**: Active
 - **Current Focus**: Maintenance and Optimization
-- **Last Updated**: 2026-02-22
+- **Last Updated**: 2026-02-25
 
 [2026-01-21] ✅ Completed: Implement Helios.diagnose() - Implemented static diagnose method and DiagnosticReport interface
 [2026-01-22] 🔍 Discovery: Verified removal of `animation-helpers.ts` and identified missing `test` script in `packages/core`.
@@ -24,6 +24,7 @@
 [v1.11.3] ✅ Completed: Add Documentation - Created comprehensive `README.md` for `packages/core`.
 [v1.12.0] ✅ Completed: Implement DomDriver - Implemented `DomDriver` to sync WAAPI and HTMLMediaElements, updated `Helios` to use it by default, and deprecated `WaapiDriver`.
 [v1.13.0] ✅ Completed: Export Types - Exported `HeliosState` and `HeliosSubscriber` types from `packages/core` to improve DX.
+[v1.14.0] ✅ Completed: Enable Node.js Runtime Support - Implemented `TimeoutTicker` and environment detection for Node.js compatibility.
 
 **Next Steps**:
 - None.
