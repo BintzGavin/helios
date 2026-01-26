@@ -1,5 +1,8 @@
 # PLAYER Progress Log
 
+## PLAYER v0.15.0
+- ✅ Completed: Export UX - Implemented Error Overlay with "Dismiss" action for client-side export failures, providing visibility into errors like unsupported codecs.
+
 ## PLAYER v0.14.0
 - ✅ Completed: Accessibility Improvements - Implemented ARIA labels and roles for controls, including dynamic updates for play state and scrubber time.
 

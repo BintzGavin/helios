@@ -2,6 +2,17 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { HeliosPlayer } from './index';
 
+// Mock ClientSideExporter
+vi.mock('./features/exporter', () => {
+  return {
+    ClientSideExporter: vi.fn().mockImplementation(() => {
+      return {
+        export: vi.fn()
+      };
+    })
+  };
+});
+
 // Mock requestFullscreen if not available in JSDOM
 if (!HTMLElement.prototype.requestFullscreen) {
   HTMLElement.prototype.requestFullscreen = vi.fn();
@@ -422,6 +433,75 @@ describe('HeliosPlayer', () => {
       (player as any).updateUI({ currentFrame: 45, duration: 10, fps: 30, isPlaying: false });
       expect(scrubber?.getAttribute('aria-valuenow')).toBe('45');
       expect(scrubber?.getAttribute('aria-valuetext')).toBe('1.50 of 10.00 seconds');
+    });
+  });
+
+  describe('Export Error Handling', () => {
+    it('should display error overlay when export fails', async () => {
+        const mockController = {
+            getState: vi.fn().mockReturnValue({ currentFrame: 0, duration: 10, fps: 30, isPlaying: false }),
+            play: vi.fn(),
+            pause: vi.fn(),
+            seek: vi.fn(),
+            subscribe: vi.fn().mockReturnValue(() => {}),
+            dispose: vi.fn(),
+            setPlaybackRate: vi.fn()
+        };
+        (player as any).setController(mockController);
+
+        // Access the mocked exporter constructor to setup the throw
+        const { ClientSideExporter } = await import('./features/exporter');
+        const mockExport = vi.fn().mockRejectedValue(new Error('Codec not supported'));
+        (ClientSideExporter as any).mockImplementation(function() {
+          return { export: mockExport };
+        });
+
+        // Trigger export via private method to await it
+        await (player as any).renderClientSide();
+
+        // Verify Status Overlay
+        const overlay = player.shadowRoot!.querySelector('.status-overlay') as HTMLElement;
+        const statusText = player.shadowRoot!.querySelector('.status-text') as HTMLElement;
+        const retryBtn = player.shadowRoot!.querySelector('.retry-btn') as HTMLButtonElement;
+
+        expect(overlay.classList.contains('hidden')).toBe(false);
+        expect(statusText.textContent).toContain('Export Failed: Codec not supported');
+        expect(retryBtn.textContent).toBe('Dismiss');
+        expect(retryBtn.style.display).toBe('block');
+
+        // Verify Dismiss Action
+        retryBtn.click();
+        expect(overlay.classList.contains('hidden')).toBe(true);
+    });
+
+    it('should NOT display error overlay when export is aborted', async () => {
+        const mockController = {
+            getState: vi.fn().mockReturnValue({ currentFrame: 0, duration: 10, fps: 30, isPlaying: false }),
+            play: vi.fn(),
+            pause: vi.fn(),
+            seek: vi.fn(),
+            subscribe: vi.fn().mockReturnValue(() => {}),
+            dispose: vi.fn(),
+            setPlaybackRate: vi.fn()
+        };
+        (player as any).setController(mockController);
+
+        const { ClientSideExporter } = await import('./features/exporter');
+        // Simulate abort error
+        const mockExport = vi.fn().mockRejectedValue(new Error('Export aborted'));
+        (ClientSideExporter as any).mockImplementation(function() {
+          return { export: mockExport };
+        });
+
+        // Ensure overlay is hidden initially
+        const overlay = player.shadowRoot!.querySelector('.status-overlay') as HTMLElement;
+        overlay.classList.add('hidden');
+
+        // Trigger export
+        await (player as any).renderClientSide();
+
+        // Should still be hidden (or at least not showing failure)
+        expect(overlay.classList.contains('hidden')).toBe(true);
     });
   });
 });
