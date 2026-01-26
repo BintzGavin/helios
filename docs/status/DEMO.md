@@ -1,5 +1,5 @@
 # Status: DEMO (Executor)
-**Version**: 1.26.0
+**Version**: 1.27.0
 
 ## Vision
 To provide comprehensive, idiomatic examples for every major framework (React, Vue, Svelte, Vanilla) and robust end-to-end testing to ensure the Helios engine delivers on its "Use What You Know" promise.
@@ -11,6 +11,7 @@ To provide comprehensive, idiomatic examples for every major framework (React, V
 - **Framer Motion**: ✅ `examples/framer-motion-animation` exists and works.
 - **Lottie**: ✅ `examples/lottie-animation` exists and works.
 - **Motion One**: ✅ `examples/motion-one-animation` exists and works.
+- **Captions**: ✅ `examples/captions-animation` exists and works (Demonstrates built-in SRT captions).
 - **Animation Helpers**: ✅ `examples/animation-helpers` exists and works (Demonstrates `interpolate`, `spring`, `sequence`, `series`).
 - **React (Canvas)**: ✅ `examples/react-canvas-animation` exists and works.
 - **React (DOM)**: ✅ `examples/react-dom-animation` exists and works.
@@ -25,6 +26,7 @@ To provide comprehensive, idiomatic examples for every major framework (React, V
 - **E2E Tests**: ✅ Verified all existing examples via `tests/e2e/verify-render.ts`.
 
 ## Backlog
+- [x] Scaffold Captions Animation Example (`examples/captions-animation`)
 - [x] Scaffold Svelte Animation Helpers (`examples/svelte-animation-helpers`)
 - [x] Scaffold Animation Helpers Example (`examples/animation-helpers`)
 - [x] Scaffold Three.js Example (`examples/threejs-canvas-animation`)
@@ -43,6 +45,7 @@ To provide comprehensive, idiomatic examples for every major framework (React, V
 None.
 
 ## Log
+- [v1.27.0] ✅ Completed: Scaffold Captions Animation Example - Created `examples/captions-animation` demonstrating built-in SRT caption support.
 - [v1.26.1] 📋 Planned: Scaffold Captions Animation Example - Created spec file `/.sys/plans/2025-02-19-DEMO-CaptionsAnimation.md` to guide implementation of built-in SRT caption support.
 - [v1.26.0] ✅ Completed: Scaffold Motion One Example - Created `examples/motion-one-animation` demonstrating integration with `motion` library via `autoSyncAnimations: true`.
 - [v1.25.0] ✅ Completed: Verify React Series Component - Verified implementation of `<Series>` component in `examples/react-animation-helpers` and confirmed E2E tests pass using `ts-node`.
