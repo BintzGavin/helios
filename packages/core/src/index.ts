@@ -5,6 +5,8 @@ import { HeliosSchema, validateProps } from './schema';
 import { CaptionCue, parseSrt, findActiveCues, areCuesEqual } from './captions';
 
 export type HeliosState = {
+  width: number;
+  height: number;
   duration: number;
   fps: number;
   currentFrame: number;
@@ -19,6 +21,8 @@ export type HeliosState = {
 export type HeliosSubscriber = (state: HeliosState) => void;
 
 export interface HeliosOptions {
+  width?: number;
+  height?: number;
   duration: number; // in seconds
   fps: number;
   autoSyncAnimations?: boolean;
@@ -65,6 +69,8 @@ export class Helios {
   private _muted: Signal<boolean>;
   private _captions: Signal<CaptionCue[]>;
   private _activeCaptions: Signal<CaptionCue[]>;
+  private _width: Signal<number>;
+  private _height: Signal<number>;
 
   // Public Readonly Signals
 
@@ -112,6 +118,18 @@ export class Helios {
     return this._activeCaptions;
   }
 
+  /**
+   * Signal for the canvas width.
+   * Can be subscribed to for reactive updates.
+   */
+  public get width(): ReadonlySignal<number> { return this._width; }
+
+  /**
+   * Signal for the canvas height.
+   * Can be subscribed to for reactive updates.
+   */
+  public get height(): ReadonlySignal<number> { return this._height; }
+
   // Other internals
   private syncWithDocumentTimeline = false;
   private autoSyncAnimations = false;
@@ -157,6 +175,17 @@ export class Helios {
       );
     }
 
+    const width = options.width ?? 1920;
+    const height = options.height ?? 1080;
+
+    if (width <= 0 || height <= 0) {
+      throw new HeliosError(
+        HeliosErrorCode.INVALID_RESOLUTION,
+        "Resolution must be positive",
+        "Ensure the 'width' and 'height' options are greater than 0."
+      );
+    }
+
     this.duration = options.duration;
     this.fps = options.fps;
     this.schema = options.schema;
@@ -172,6 +201,8 @@ export class Helios {
     this._volume = signal(options.volume ?? 1);
     this._muted = signal(options.muted ?? false);
     this._captions = signal(initialCaptions);
+    this._width = signal(width);
+    this._height = signal(height);
 
     this._activeCaptions = signal(findActiveCues(initialCaptions, 0));
 
@@ -206,6 +237,8 @@ export class Helios {
 
   public getState(): Readonly<HeliosState> {
     return {
+      width: this._width.value,
+      height: this._height.value,
       duration: this.duration,
       fps: this.fps,
       currentFrame: this._currentFrame.value,
@@ -216,6 +249,18 @@ export class Helios {
       muted: this._muted.value,
       activeCaptions: this.activeCaptions.value,
     };
+  }
+
+  public setSize(width: number, height: number) {
+    if (width <= 0 || height <= 0) {
+      throw new HeliosError(
+        HeliosErrorCode.INVALID_RESOLUTION,
+        "Resolution must be positive",
+        "Ensure the 'width' and 'height' passed to setSize are greater than 0."
+      );
+    }
+    this._width.value = width;
+    this._height.value = height;
   }
 
   /**

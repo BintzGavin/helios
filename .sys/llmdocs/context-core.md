@@ -4,8 +4,8 @@
 
 The `packages/core` module is the heart of the Helios system. It implements a **Helios State Machine** pattern.
 
-- **Store**: The `Helios` class holds the state (`currentFrame`, `isPlaying`, `inputProps`, `playbackRate`, `volume`, `muted`, `activeCaptions`) using **Signals** (observable state primitives).
-- **Actions**: Methods like `play()`, `pause()`, `seek()`, `setInputProps()`, `setAudioVolume()`, `setCaptions()` modify the state.
+- **Store**: The `Helios` class holds the state (`currentFrame`, `isPlaying`, `inputProps`, `playbackRate`, `volume`, `muted`, `activeCaptions`, `width`, `height`) using **Signals** (observable state primitives).
+- **Actions**: Methods like `play()`, `pause()`, `seek()`, `setInputProps()`, `setAudioVolume()`, `setCaptions()`, `setSize()` modify the state.
 - **Subscribers**: The UI (Studio, Player) and Drivers subscribe to state changes to update the DOM or other outputs.
 - **Drivers**: `TimeDriver` implementations (like `DomDriver`) synchronize the internal timeline with external systems (like WAAPI or HTMLMediaElements).
 - **Ticker**: A `Ticker` (RafTicker or TimeoutTicker) drives the frame advancement loop when playing.
@@ -31,6 +31,8 @@ packages/core/src/
 
 ```typescript
 export type HeliosState = {
+  width: number;
+  height: number;
   duration: number;
   fps: number;
   currentFrame: number;
@@ -60,6 +62,8 @@ export interface PropDefinition {
 export type HeliosSchema = Record<string, PropDefinition>;
 
 export interface HeliosOptions {
+  width?: number;
+  height?: number;
   duration: number; // in seconds
   fps: number;
   autoSyncAnimations?: boolean;
@@ -148,6 +152,8 @@ class Helios {
   public get volume(): ReadonlySignal<number>;
   public get muted(): ReadonlySignal<boolean>;
   public get activeCaptions(): ReadonlySignal<CaptionCue[]>;
+  public get width(): ReadonlySignal<number>;
+  public get height(): ReadonlySignal<number>;
 
   // Static Methods
   static diagnose(): Promise<DiagnosticReport>;
@@ -160,6 +166,7 @@ class Helios {
   public getState(): Readonly<HeliosState>;
 
   // State Modifiers
+  public setSize(width: number, height: number): void;
   public setInputProps(props: Record<string, any>): void;
   public setPlaybackRate(rate: number): void;
   public setAudioVolume(volume: number): void;
