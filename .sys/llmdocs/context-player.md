@@ -55,3 +55,4 @@ The component observes the following attributes:
 - **UI Locking**: Prevents race conditions by disabling playback controls and keyboard shortcuts during client-side export.
 - **Scrubber Logic**: Manages internal `isScrubbing` state to pause playback during interaction and prevent the update loop from overwriting the scrubber position.
 - **DOM Capture**: Robust implementation using `XMLSerializer`, SVG `<foreignObject>`, and asset inlining (stylesheets, images, backgrounds, CSS `url()` assets, and `<canvas>` snapshots) for high-fidelity HTML exports.
+- **Accessibility**: Implements `role="toolbar"` for controls, dynamic `aria-label` updates for playback state, and `aria-valuetext` for scrubber time (seconds).

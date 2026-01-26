@@ -354,4 +354,74 @@ describe('HeliosPlayer', () => {
         expect(scrubber.value).toBe('30');
     });
   });
+
+  describe('Accessibility', () => {
+    it('should have initial ARIA attributes', () => {
+      const controls = player.shadowRoot!.querySelector('.controls');
+      expect(controls?.getAttribute('role')).toBe('toolbar');
+      expect(controls?.getAttribute('aria-label')).toBe('Playback Controls');
+
+      const iframe = player.shadowRoot!.querySelector('iframe');
+      expect(iframe?.getAttribute('title')).toBe('Helios Composition Preview');
+
+      const playBtn = player.shadowRoot!.querySelector('.play-pause-btn');
+      expect(playBtn?.getAttribute('aria-label')).toBe('Play');
+
+      const scrubber = player.shadowRoot!.querySelector('.scrubber');
+      expect(scrubber?.getAttribute('aria-label')).toBe('Seek time');
+    });
+
+    it('should update Play button ARIA label based on state', () => {
+      const mockController = {
+        getState: vi.fn().mockReturnValue({ currentFrame: 0, duration: 10, fps: 30, isPlaying: false }),
+        play: vi.fn(),
+        pause: vi.fn(),
+        seek: vi.fn(),
+        subscribe: vi.fn().mockReturnValue(() => {}),
+        dispose: vi.fn(),
+        setPlaybackRate: vi.fn()
+      };
+      (player as any).setController(mockController);
+
+      // Initial: Play
+      (player as any).updateUI({ currentFrame: 0, duration: 10, fps: 30, isPlaying: false });
+      const playBtn = player.shadowRoot!.querySelector('.play-pause-btn');
+      expect(playBtn?.getAttribute('aria-label')).toBe('Play');
+
+      // Playing: Pause
+      (player as any).updateUI({ currentFrame: 10, duration: 10, fps: 30, isPlaying: true });
+      expect(playBtn?.getAttribute('aria-label')).toBe('Pause');
+
+      // Finished: Restart
+      const endFrame = 299; // 10s * 30fps - 1
+      (player as any).updateUI({ currentFrame: endFrame, duration: 10, fps: 30, isPlaying: false });
+      expect(playBtn?.getAttribute('aria-label')).toBe('Restart');
+    });
+
+    it('should update Scrubber ARIA attributes based on time', () => {
+      const mockController = {
+        getState: vi.fn().mockReturnValue({ currentFrame: 0, duration: 10, fps: 30, isPlaying: false }),
+        play: vi.fn(),
+        pause: vi.fn(),
+        seek: vi.fn(),
+        subscribe: vi.fn().mockReturnValue(() => {}),
+        dispose: vi.fn(),
+        setPlaybackRate: vi.fn()
+      };
+      (player as any).setController(mockController);
+
+      // Time 0
+      (player as any).updateUI({ currentFrame: 0, duration: 10, fps: 30, isPlaying: false });
+      const scrubber = player.shadowRoot!.querySelector('.scrubber');
+      expect(scrubber?.getAttribute('aria-valuenow')).toBe('0');
+      expect(scrubber?.getAttribute('aria-valuemin')).toBe('0');
+      expect(scrubber?.getAttribute('aria-valuemax')).toBe('300'); // 10 * 30
+      expect(scrubber?.getAttribute('aria-valuetext')).toBe('0.00 of 10.00 seconds');
+
+      // Time 1.5s (Frame 45)
+      (player as any).updateUI({ currentFrame: 45, duration: 10, fps: 30, isPlaying: false });
+      expect(scrubber?.getAttribute('aria-valuenow')).toBe('45');
+      expect(scrubber?.getAttribute('aria-valuetext')).toBe('1.50 of 10.00 seconds');
+    });
+  });
 });
