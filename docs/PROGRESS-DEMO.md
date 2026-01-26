@@ -24,3 +24,6 @@
 
 ## DEMO v1.20.0
 - ✅ Completed: Refactor Simple Animation - Updated `examples/simple-animation` to use native CSS `@keyframes` and `autoSyncAnimations: true`.
+
+## DEMO v1.21.0
+- ✅ Completed: GSAP Example - Created `examples/gsap-animation` demonstrating integration with GSAP timelines.

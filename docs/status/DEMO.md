@@ -1,5 +1,5 @@
 # Status: DEMO (Executor)
-**Version**: 1.20.0
+**Version**: 1.21.0
 
 ## Vision
 To provide comprehensive, idiomatic examples for every major framework (React, Vue, Svelte, Vanilla) and robust end-to-end testing to ensure the Helios engine delivers on its "Use What You Know" promise.
@@ -7,6 +7,7 @@ To provide comprehensive, idiomatic examples for every major framework (React, V
 ## Current State
 - **Vanilla JS (Canvas)**: ✅ `examples/simple-canvas-animation` exists and works.
 - **Vanilla JS (DOM)**: ✅ `examples/simple-animation` exists and works.
+- **GSAP**: ✅ `examples/gsap-animation` exists and works.
 - **Animation Helpers**: ✅ `examples/animation-helpers` exists and works (Demonstrates `interpolate`, `spring`, `sequence`, `series`).
 - **React (Canvas)**: ✅ `examples/react-canvas-animation` exists and works.
 - **React (DOM)**: ✅ `examples/react-dom-animation` exists and works.
@@ -36,6 +37,7 @@ To provide comprehensive, idiomatic examples for every major framework (React, V
 None.
 
 ## Log
+- [v1.21.0] ✅ Completed: GSAP Example - Created `examples/gsap-animation` demonstrating integration with GSAP timelines.
 - [v1.20.0] ✅ Completed: Refactor Simple Animation - Updated `examples/simple-animation` to use native CSS `@keyframes` and `autoSyncAnimations: true` instead of JS-driven CSS variables.
 - [v1.19.0] ✅ Completed: Implement Svelte Series Component - Added `<Series>` component to `examples/svelte-animation-helpers` and updated example to use it.
 - [v1.18.0] ✅ Completed: Implement React Series Component - Implemented `<Series>` component in `examples/react-animation-helpers` and verified with E2E tests.
