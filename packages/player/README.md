@@ -60,6 +60,7 @@ The player will automatically attempt to access `window.helios` on the iframe's 
 | `controls` | Show the UI controls overlay. | `false` |
 | `export-mode` | Strategy for client-side export: `auto`, `canvas`, or `dom`. | `auto` |
 | `canvas-selector` | CSS selector for the canvas element (used in `canvas` export mode). | `canvas` |
+| `export-format` | Output video format: `mp4` (H.264/AAC) or `webm` (VP9/Opus). | `mp4` |
 
 ## Client-Side Export
 
@@ -75,5 +76,6 @@ Configuration:
 <helios-player
   src="..."
   export-mode="dom"
+  export-format="webm"
 ></helios-player>
 ```

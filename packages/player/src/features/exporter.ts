@@ -1,5 +1,6 @@
 import { HeliosController } from "../controllers";
-import { Muxer, ArrayBufferTarget } from "mp4-muxer";
+import { Muxer as Mp4Muxer, ArrayBufferTarget as Mp4ArrayBufferTarget } from "mp4-muxer";
+import { Muxer as WebMMuxer, ArrayBufferTarget as WebMArrayBufferTarget } from "webm-muxer";
 import { mixAudio } from "./audio-utils";
 
 export class ClientSideExporter {
@@ -13,10 +14,11 @@ export class ClientSideExporter {
     signal: AbortSignal;
     mode?: 'auto' | 'canvas' | 'dom';
     canvasSelector?: string;
+    format?: 'mp4' | 'webm';
   }): Promise<void> {
-    const { onProgress, signal, mode = 'auto', canvasSelector = 'canvas' } = options;
+    const { onProgress, signal, mode = 'auto', canvasSelector = 'canvas', format = 'mp4' } = options;
 
-    console.log("Client-side rendering started!");
+    console.log(`Client-side rendering started! Format: ${format}`);
     this.controller.pause();
 
     let encoder: VideoEncoder | null = null;
@@ -59,21 +61,42 @@ export class ClientSideExporter {
       const height = firstFrame.displayHeight;
 
       // 3. Setup Muxer and Encoder
-      const target = new ArrayBufferTarget();
-      const muxer = new Muxer({
-        target,
-        video: {
-            codec: 'avc',
-            width: width,
-            height: height
-        },
-        audio: {
-            codec: 'aac',
+      let muxer: any;
+      let target: any;
+
+      if (format === 'webm') {
+        target = new WebMArrayBufferTarget();
+        muxer = new WebMMuxer({
+          target,
+          video: {
+            codec: 'V_VP9',
+            width,
+            height,
+            frameRate: state.fps
+          },
+          audio: {
+            codec: 'A_OPUS',
             numberOfChannels: 2,
             sampleRate: 48000
-        },
-        firstTimestampBehavior: 'offset'
-      });
+          }
+        });
+      } else {
+        target = new Mp4ArrayBufferTarget();
+        muxer = new Mp4Muxer({
+          target,
+          video: {
+              codec: 'avc',
+              width: width,
+              height: height
+          },
+          audio: {
+              codec: 'aac',
+              numberOfChannels: 2,
+              sampleRate: 48000
+          },
+          firstTimestampBehavior: 'offset'
+        });
+      }
 
       encoder = new VideoEncoder({
         output: (chunk, meta) => {
@@ -94,11 +117,19 @@ export class ClientSideExporter {
                   error: e => console.warn("AudioEncoder error:", e)
               });
 
-              await audioEncoder.configure({
-                  codec: 'mp4a.40.2',
-                  numberOfChannels: 2,
-                  sampleRate: 48000
-              });
+              const audioConfig: AudioEncoderConfig = format === 'webm'
+                ? {
+                    codec: 'opus',
+                    numberOfChannels: 2,
+                    sampleRate: 48000
+                  }
+                : {
+                    codec: 'mp4a.40.2',
+                    numberOfChannels: 2,
+                    sampleRate: 48000
+                  };
+
+              await audioEncoder.configure(audioConfig);
 
               const audioTracks = await this.controller.getAudioTracks();
               if (audioTracks && audioTracks.length > 0) {
@@ -131,18 +162,37 @@ export class ClientSideExporter {
           }
       }
 
-      const config: VideoEncoderConfig = {
-        codec: "avc1.420028", // H.264 Baseline Level 4.0
-        width: width,
-        height: height,
-        framerate: state.fps,
-        bitrate: 5_000_000, // 5 Mbps
-      };
+      let config: VideoEncoderConfig;
+
+      if (format === 'webm') {
+        config = {
+          codec: 'vp09.00.10.08', // VP9 Profile 0, Level 4.1, 8-bit
+          width,
+          height,
+          framerate: state.fps,
+          bitrate: 5_000_000
+        };
+      } else {
+        config = {
+          codec: "avc1.420028", // H.264 Baseline Level 4.0
+          width: width,
+          height: height,
+          framerate: state.fps,
+          bitrate: 5_000_000, // 5 Mbps
+        };
+      }
 
       if (!(await VideoEncoder.isConfigSupported(config))) {
-         // Try a lower profile if 4.0 fails (rare but possible)
-         config.codec = "avc1.42001E"; // Baseline Level 3.0
-         if (!(await VideoEncoder.isConfigSupported(config))) {
+         if (format === 'mp4') {
+             // Try a lower profile if 4.0 fails (rare but possible)
+             config.codec = "avc1.42001E"; // Baseline Level 3.0
+             if (!(await VideoEncoder.isConfigSupported(config))) {
+                 firstFrame.close();
+                 throw new Error(`Unsupported VideoEncoder config: ${JSON.stringify(config)}`);
+             }
+         } else {
+             // For WebM (VP9), maybe try generic vp9 if specific profile fails, or just fail
+             // Usually vp09.00.10.08 is widely supported where VP9 is supported.
              firstFrame.close();
              throw new Error(`Unsupported VideoEncoder config: ${JSON.stringify(config)}`);
          }
@@ -181,7 +231,7 @@ export class ClientSideExporter {
       await encoder.flush();
       muxer.finalize();
 
-      this.download(target.buffer);
+      this.download(target.buffer, format);
       console.log("Client-side rendering and download finished!");
 
     } catch (e: any) {
@@ -202,12 +252,13 @@ export class ClientSideExporter {
     }
   }
 
-  private download(buffer: ArrayBuffer) {
-      const blob = new Blob([buffer], { type: "video/mp4" });
+  private download(buffer: ArrayBuffer, format: 'mp4' | 'webm') {
+      const type = format === 'webm' ? "video/webm" : "video/mp4";
+      const blob = new Blob([buffer], { type });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = "video.mp4";
+      a.download = `video.${format}`;
       a.click();
       URL.revokeObjectURL(url);
   }

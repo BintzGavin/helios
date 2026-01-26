@@ -283,7 +283,7 @@ export class HeliosPlayer extends HTMLElement {
     isScrubbing = false;
     wasPlayingBeforeScrub = false;
     static get observedAttributes() {
-        return ["src", "width", "height", "autoplay", "loop", "controls"];
+        return ["src", "width", "height", "autoplay", "loop", "controls", "export-format"];
     }
     constructor() {
         super();
@@ -722,6 +722,7 @@ export class HeliosPlayer extends HTMLElement {
         const exporter = new ClientSideExporter(this.controller, this.iframe);
         const exportMode = (this.getAttribute("export-mode") || "auto");
         const canvasSelector = this.getAttribute("canvas-selector") || "canvas";
+        const exportFormat = (this.getAttribute("export-format") || "mp4");
         try {
             await exporter.export({
                 onProgress: (p) => {
@@ -729,7 +730,8 @@ export class HeliosPlayer extends HTMLElement {
                 },
                 signal: this.abortController.signal,
                 mode: exportMode,
-                canvasSelector: canvasSelector
+                canvasSelector: canvasSelector,
+                format: exportFormat
             });
         }
         catch (e) {

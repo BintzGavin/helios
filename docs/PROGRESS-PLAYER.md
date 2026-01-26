@@ -1,5 +1,8 @@
 # PLAYER Progress Log
 
+## PLAYER v0.18.0
+- ✅ Completed: WebM Export - Implemented `export-format` attribute to support WebM (VP9/Opus) video export alongside MP4.
+
 ## PLAYER v0.17.1
 - ✅ Completed: Touch Support - Added touch event listeners to the scrubber to support smooth seeking on mobile devices.
 

@@ -40,6 +40,7 @@ The component observes the following attributes:
 | `controls` | boolean | If present, shows the UI controls overlay. |
 | `export-mode` | string | `auto` (default), `canvas`, or `dom`. Controls the capture strategy. |
 | `canvas-selector`| string | CSS selector for the canvas element (default: `canvas`). Used in `canvas` mode. |
+| `export-format` | string | `mp4` (default) or `webm`. Output video format. |
 
 ## Keyboard Shortcuts
 | Key | Action |
@@ -54,7 +55,7 @@ The component observes the following attributes:
 ## Architecture
 - **Controllers**: Abstraction layer (`DirectController` vs `BridgeController`) to unify local and cross-origin interaction.
 - **Bridge**: Uses `postMessage` for communication. The child page uses `connectToParent(helios)` helper to establish connection.
-- **ClientSideExporter**: Modular export logic supporting WebCodecs (VideoEncoder, AudioEncoder) and DOM Snapshotting. Supports AAC audio mixing from `<audio>` elements.
+- **ClientSideExporter**: Modular export logic supporting WebCodecs (VideoEncoder, AudioEncoder) and DOM Snapshotting. Supports MP4 (H.264/AAC) and WebM (VP9/Opus) output.
 - **UI Locking**: Prevents race conditions by disabling playback controls and keyboard shortcuts during client-side export.
 - **Scrubber Logic**: Manages internal `isScrubbing` state to pause playback during interaction and prevent the update loop from overwriting the scrubber position. Supports both Mouse and Touch events for mobile compatibility.
 - **DOM Capture**: Robust implementation using `XMLSerializer`, SVG `<foreignObject>`, and asset inlining (stylesheets, images, backgrounds, CSS `url()` assets, and `<canvas>` snapshots) for high-fidelity HTML exports.
