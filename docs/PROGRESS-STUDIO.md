@@ -1,5 +1,8 @@
 # Studio Progress Log
 
+## STUDIO v0.15.0
+- ✅ Completed: Dynamic Project Discovery - Enabled `HELIOS_PROJECT_ROOT` env var to configure project root for composition/asset discovery, unlocking "Studio as a Tool".
+
 ## STUDIO v0.14.0
 - ✅ Completed: Rich Props Editor - Implemented JSON editor for complex props (objects/arrays) and improved UI styling for primitives.
 

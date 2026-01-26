@@ -93,7 +93,7 @@ Internal scripts:
 - **CompositionSwitcher**: `components/CompositionSwitcher.tsx` allows switching between active compositions.
 
 ## E. Integration
-- **Backend**: Vite plugin scans `examples/` directory via `findCompositions` and `findAssets` (in `src/server/discovery.ts`) and serves files via `/@fs` to support dynamic project discovery.
+- **Backend**: Vite plugin scans the project root (default: `examples/`, configurable via `HELIOS_PROJECT_ROOT` env var) via `findCompositions` and `findAssets` (in `src/server/discovery.ts`) and serves files via `/@fs` to support dynamic project discovery.
 - **Player**: Imports `@helios-project/player` to register the web component and access `HeliosController`.
 - **CLI**: The `@helios-project/cli` package acts as a launcher for the Studio.
 - **Core**: Indirectly uses Core via Player.

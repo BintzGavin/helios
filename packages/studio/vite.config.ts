@@ -3,6 +3,10 @@ import react from '@vitejs/plugin-react'
 import { studioApiPlugin } from './vite-plugin-studio-api'
 import path from 'path'
 
+const projectRoot = process.env.HELIOS_PROJECT_ROOT
+  ? path.resolve(process.env.HELIOS_PROJECT_ROOT)
+  : path.resolve(__dirname, '../../');
+
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
@@ -16,8 +20,8 @@ export default defineConfig({
   },
   server: {
     fs: {
-      // Allow serving files from one level up to the project root (packages/studio -> packages -> root)
-      allow: [path.resolve(__dirname, '../../')]
+      // Allow serving files from the project root
+      allow: [projectRoot]
     }
   }
 })
