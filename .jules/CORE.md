@@ -57,3 +57,7 @@
 ## 2026-02-24 - Package Name Mismatch
 **Learning:** `README.md` instructs users to install `@helios-engine/core`, but `package.json` names the package `@helios-project/core`. This inconsistency will cause installation failures for users following the docs.
 **Action:** Logged this as a documentation/configuration gap. Deferred fixing to avoid breaking cross-package dependencies in this cycle.
+
+## 2026-02-25 - Node.js Runtime Crash
+**Learning:** Despite the vision claiming "runs in Node.js", the default `RafTicker` relies on `requestAnimationFrame`, causing `Helios` to crash or be unusable in pure Node environments.
+**Action:** Created plan `2026-02-25-CORE-NodeRuntime.md` to implement `TimeoutTicker` and auto-detect the environment to prevent crashes.
