@@ -1,5 +1,8 @@
 # CORE Progress Log
 
+## CORE v1.20.0
+- ✅ Completed: Implement Active Captions - Added `activeCaptions` signal, `setCaptions`, and `findActiveCues` with glitch-free updates.
+
 ## CORE v1.19.0
 - ✅ Completed: Implement Audio Volume Control - Added `volume` and `muted` state to `Helios` and updated `DomDriver` to sync with HTMLMediaElements.
 

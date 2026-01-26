@@ -1,11 +1,12 @@
 # Status: CORE
 
-**Version**: 1.19.0
+**Version**: 1.20.0
 
 - **Status**: Active
 - **Current Focus**: Maintenance and Optimization
 - **Last Updated**: 2026-03-01
 
+[v1.20.0] ✅ Completed: Implement Active Captions - Added `activeCaptions` signal to `Helios`, `setCaptions` method, and `findActiveCues` utility.
 [v1.19.0] ✅ Completed: Implement Audio Volume Control - Added `volume` and `muted` state to `Helios` and updated `DomDriver` to sync with HTMLMediaElements.
 [2026-01-21] ✅ Completed: Implement Helios.diagnose() - Implemented static diagnose method and DiagnosticReport interface
 [2026-01-22] 🔍 Discovery: Verified removal of `animation-helpers.ts` and identified missing `test` script in `packages/core`.

@@ -4,8 +4,8 @@
 
 The `packages/core` module is the heart of the Helios system. It implements a **Helios State Machine** pattern.
 
-- **Store**: The `Helios` class holds the state (`currentFrame`, `isPlaying`, `inputProps`, `playbackRate`, `volume`, `muted`) using **Signals** (observable state primitives).
-- **Actions**: Methods like `play()`, `pause()`, `seek()`, `setInputProps()`, `setAudioVolume()` modify the state.
+- **Store**: The `Helios` class holds the state (`currentFrame`, `isPlaying`, `inputProps`, `playbackRate`, `volume`, `muted`, `activeCaptions`) using **Signals** (observable state primitives).
+- **Actions**: Methods like `play()`, `pause()`, `seek()`, `setInputProps()`, `setAudioVolume()`, `setCaptions()` modify the state.
 - **Subscribers**: The UI (Studio, Player) and Drivers subscribe to state changes to update the DOM or other outputs.
 - **Drivers**: `TimeDriver` implementations (like `DomDriver`) synchronize the internal timeline with external systems (like WAAPI or HTMLMediaElements).
 - **Ticker**: A `Ticker` (RafTicker or TimeoutTicker) drives the frame advancement loop when playing.
@@ -16,7 +16,7 @@ The `packages/core` module is the heart of the Helios system. It implements a **
 ```
 packages/core/src/
 ├── animation.ts       # Animation helpers (spring, interpolate)
-├── captions.ts        # SRT parsing and serialization
+├── captions.ts        # SRT parsing, serialization, and cue helpers
 ├── drivers/           # TimeDriver implementations (DomDriver, etc.)
 ├── easing.ts          # Easing functions
 ├── errors.ts          # Structured Error Handling
@@ -38,6 +38,7 @@ export type HeliosState = {
   playbackRate: number;
   volume: number;
   muted: boolean;
+  activeCaptions: CaptionCue[];
 };
 
 export type HeliosSubscriber = (state: HeliosState) => void;
@@ -62,6 +63,7 @@ export interface HeliosOptions {
   playbackRate?: number;
   volume?: number;
   muted?: boolean;
+  captions?: string;
   driver?: TimeDriver;
   ticker?: Ticker;
 }
@@ -97,6 +99,7 @@ class Helios {
   public get playbackRate(): ReadonlySignal<number>;
   public get volume(): ReadonlySignal<number>;
   public get muted(): ReadonlySignal<boolean>;
+  public get activeCaptions(): ReadonlySignal<CaptionCue[]>;
 
   // Static Methods
   static diagnose(): Promise<DiagnosticReport>;
@@ -113,6 +116,7 @@ class Helios {
   public setPlaybackRate(rate: number): void;
   public setAudioVolume(volume: number): void;
   public setAudioMuted(muted: boolean): void;
+  public setCaptions(captions: string | CaptionCue[]): void;
 
   // Subscription
   public subscribe(callback: HeliosSubscriber): () => void;

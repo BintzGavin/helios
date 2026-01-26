@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { parseSrt, stringifySrt, CaptionCue } from './captions';
+import { parseSrt, stringifySrt, findActiveCues, CaptionCue } from './captions';
 import { HeliosError, HeliosErrorCode } from './errors';
 
 describe('captions', () => {
@@ -122,5 +122,44 @@ with two lines`;
       const output = stringifySrt(cues);
       expect(output).toBe(srt);
      });
+  });
+
+  describe('findActiveCues', () => {
+    const cues: CaptionCue[] = [
+      { id: '1', startTime: 1000, endTime: 2000, text: 'First' },
+      { id: '2', startTime: 2500, endTime: 3500, text: 'Second' },
+      { id: '3', startTime: 3000, endTime: 4000, text: 'Third (overlap)' }
+    ];
+
+    it('should return empty array if no cues match', () => {
+      expect(findActiveCues(cues, 0)).toEqual([]);
+      expect(findActiveCues(cues, 500)).toEqual([]);
+      expect(findActiveCues(cues, 2200)).toEqual([]);
+      expect(findActiveCues(cues, 5000)).toEqual([]);
+    });
+
+    it('should return single active cue', () => {
+      const active = findActiveCues(cues, 1500);
+      expect(active).toHaveLength(1);
+      expect(active[0].id).toBe('1');
+    });
+
+    it('should include cues at boundary times', () => {
+      // Start time inclusive
+      const start = findActiveCues(cues, 1000);
+      expect(start).toHaveLength(1);
+      expect(start[0].id).toBe('1');
+
+      // End time inclusive
+      const end = findActiveCues(cues, 2000);
+      expect(end).toHaveLength(1);
+      expect(end[0].id).toBe('1');
+    });
+
+    it('should return multiple cues if overlapping', () => {
+      const overlap = findActiveCues(cues, 3200);
+      expect(overlap).toHaveLength(2);
+      expect(overlap.map(c => c.id)).toEqual(['2', '3']);
+    });
   });
 });

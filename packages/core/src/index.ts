@@ -1,7 +1,8 @@
 import { TimeDriver, WaapiDriver, DomDriver, NoopDriver, Ticker, RafTicker, TimeoutTicker } from './drivers';
-import { signal, effect, Signal, ReadonlySignal } from './signals';
+import { signal, effect, computed, Signal, ReadonlySignal } from './signals';
 import { HeliosError, HeliosErrorCode } from './errors';
 import { HeliosSchema, validateProps } from './schema';
+import { CaptionCue, parseSrt, findActiveCues, areCuesEqual } from './captions';
 
 export type HeliosState = {
   duration: number;
@@ -12,6 +13,7 @@ export type HeliosState = {
   playbackRate: number;
   volume: number;
   muted: boolean;
+  activeCaptions: CaptionCue[];
 };
 
 export type HeliosSubscriber = (state: HeliosState) => void;
@@ -26,6 +28,7 @@ export interface HeliosOptions {
   playbackRate?: number;
   volume?: number;
   muted?: boolean;
+  captions?: string;
   driver?: TimeDriver;
   ticker?: Ticker;
 }
@@ -59,6 +62,8 @@ export class Helios {
   private _playbackRate: Signal<number>;
   private _volume: Signal<number>;
   private _muted: Signal<boolean>;
+  private _captions: Signal<CaptionCue[]>;
+  private _activeCaptions: Signal<CaptionCue[]>;
 
   // Public Readonly Signals
 
@@ -97,6 +102,14 @@ export class Helios {
    * Can be subscribed to for reactive updates.
    */
   public get muted(): ReadonlySignal<boolean> { return this._muted; }
+
+  /**
+   * Signal for the currently active captions.
+   * Can be subscribed to for reactive updates.
+   */
+  public get activeCaptions(): ReadonlySignal<CaptionCue[]> {
+    return this._activeCaptions;
+  }
 
   // Other internals
   private syncWithDocumentTimeline = false;
@@ -148,6 +161,7 @@ export class Helios {
     this.schema = options.schema;
 
     const initialProps = validateProps(options.inputProps || {}, this.schema);
+    const initialCaptions = options.captions ? parseSrt(options.captions) : [];
 
     // Initialize signals
     this._currentFrame = signal(0);
@@ -156,6 +170,18 @@ export class Helios {
     this._playbackRate = signal(options.playbackRate ?? 1);
     this._volume = signal(options.volume ?? 1);
     this._muted = signal(options.muted ?? false);
+    this._captions = signal(initialCaptions);
+
+    this._activeCaptions = signal(findActiveCues(initialCaptions, 0));
+
+    effect(() => {
+      const timeMs = (this._currentFrame.value / this.fps) * 1000;
+      const active = findActiveCues(this._captions.value, timeMs);
+
+      if (!areCuesEqual(active, this._activeCaptions.peek())) {
+        this._activeCaptions.value = active;
+      }
+    });
 
     this.autoSyncAnimations = options.autoSyncAnimations || false;
     if (options.animationScope) {
@@ -187,6 +213,7 @@ export class Helios {
       playbackRate: this._playbackRate.value,
       volume: this._volume.value,
       muted: this._muted.value,
+      activeCaptions: this.activeCaptions.value,
     };
   }
 
@@ -228,6 +255,15 @@ export class Helios {
       volume: this._volume.peek(),
       muted: muted
     });
+  }
+
+  /**
+   * Updates the captions for the composition.
+   * @param captions SRT string or array of CaptionCue objects.
+   */
+  public setCaptions(captions: string | CaptionCue[]) {
+    const cues = typeof captions === 'string' ? parseSrt(captions) : captions;
+    this._captions.value = cues;
   }
 
   // --- Subscription ---
