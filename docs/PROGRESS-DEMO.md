@@ -42,3 +42,6 @@
 
 ## DEMO v1.27.0
 - ✅ Completed: Scaffold Captions Animation Example - Created `examples/captions-animation` demonstrating built-in SRT caption support.
+
+## DEMO v1.28.0
+- ✅ Completed: Scaffold Signals Animation Example - Created `examples/signals-animation` demonstrating fine-grained reactivity using core signals.
