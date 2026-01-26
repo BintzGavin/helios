@@ -1,37 +1,40 @@
 ---
 title: "Three.js Example"
-description: "3D Animation with Three.js and Helios."
+description: "Using Helios with Three.js"
 ---
 
 # Three.js Example
 
-Helios can drive 3D scenes by updating object properties based on the current frame.
+The `threejs-canvas-animation` example shows how to drive a 3D scene using Helios.
 
-## Setup
+## Concept
+
+Instead of using Three.js's internal `Clock` or `requestAnimationFrame` loop directly, you let Helios drive the rendering.
+
+### Implementation
+
+1.  **Scene Setup**: Create Scene, Camera, Renderer.
+2.  **Disable Auto-Clear**: (Optional, depending on usage).
+3.  **Render Loop**: Instead of a self-driving loop, create a function `render(time)` that updates object positions based on time and calls `renderer.render()`.
+4.  **Subscribe**: Call your `render` function inside the Helios subscription.
 
 ```javascript
-import * as THREE from 'three';
 import { Helios } from '@helios-project/core';
+import * as THREE from 'three';
 
-// ... Standard Three.js setup (scene, camera, renderer) ...
-const cube = new THREE.Mesh(geometry, material);
-scene.add(cube);
-
-const helios = new Helios({ duration: 5, fps: 30 });
+const helios = new Helios({ duration: 10, fps: 60 });
 helios.bindToDocumentTimeline();
 
-function draw(frame) {
-  const time = frame / 30;
-
-  // Update 3D objects
-  cube.rotation.x = time;
-  cube.rotation.y = time;
-
-  // Render Scene
-  renderer.render(scene, camera);
-}
+// ... Three.js setup ...
 
 helios.subscribe((state) => {
-  draw(state.currentFrame);
+  const time = state.currentFrame / state.fps;
+
+  // Update objects
+  mesh.rotation.x = time * 0.5;
+  mesh.rotation.y = time * 0.2;
+
+  // Render frame
+  renderer.render(scene, camera);
 });
 ```

@@ -1,19 +1,15 @@
-**Version**: 1.0.0
+**Version**: 1.1.0
 
 # DOCS Status
 
 ## Recent Updates
-[v1.0.0] ✅ Completed: Daily Documentation Review - Bootstrapped documentation site structure and content.
-- Created `docs/site/` directory structure.
-- Created `mint.json` navigation configuration.
-- Created Getting Started guides (Quickstart, Installation, First Steps).
-- Created API Reference (Core, Player, Renderer).
-- Created Guides (Compositions, Rendering, Player).
-- Created Example Documentation (React, Vue, Canvas, Three.js).
-- Created Architecture Overview.
-- Synced Changelogs from PROGRESS files.
+[v1.1.0] ✅ Completed: Daily Documentation Review - Comprehensive update of API docs, changelogs, and examples.
+- Updated API documentation for Core (Signals, Audio, Diagnostics), Renderer (Options, Diagnostics), and Player (Export, A11y).
+- Synced changelogs for Core, Renderer, Player, Demo.
+- Created Studio Changelog and Studio User Guide.
+- Updated Example documentation to cover React (DOM/Canvas), Vue, GSAP, Framer Motion, and Animation Helpers.
+- Updated `mint.json` navigation.
 
 ## Next Steps
 - Implement automated TypeDoc generation for API docs.
-- Add more advanced guides (Custom TimeDrivers, Audio Visualization).
 - Add screenshots and diagrams to documentation.

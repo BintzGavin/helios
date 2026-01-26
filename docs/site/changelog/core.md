@@ -1,43 +1,69 @@
 ---
-title: "CORE Changelog"
-description: "Changelog for CORE package."
+title: "Core Changelog"
+description: "Changelog for the Core package"
 ---
 
+# Core Changelog
 
-# CORE Progress Log
+## v1.19.0
+- **Implement Audio Volume Control**: Added `volume` and `muted` state to `Helios` and updated `DomDriver` to sync with HTMLMediaElements.
 
-## CORE v1.10.0
-- ✅ Completed: Refactor Helios to use Signals - Replaced internal state with signals, exposed ReadonlySignal getters, and maintained backward compatibility.
+## v1.18.0
+- **Implement Input Schema Validation**: Added `HeliosSchema` definition, `validateProps` logic, and integrated validation into `Helios` constructor and `setInputProps`.
 
-## CORE v1.9.0
-- ✅ Completed: Implement Signals - Implemented `signal`, `computed`, and `effect` primitives with memory safety and consistency guarantees.
+## v1.17.0
+- **Implement SRT Parser**: Implemented `parseSrt` and `stringifySrt` utilities for caption support.
 
-## CORE v1.8.0
-- ✅ Completed: Implement Series Helper - Implemented `series` function for sequential layout of composition elements.
+## v1.16.0
+- **Implement Helios Disposal**: Added `dispose()` method to `Helios` for proper resource cleanup (tickers, polling loops, subscribers).
 
-## CORE v1.7.0
-- ✅ Completed: Implement Sequencing Primitives - Implemented `sequence` function and interfaces in `packages/core`.
+## v1.15.0
+- **Implement Structured Errors**: Implemented `HeliosError` and `HeliosErrorCode` to provide machine-parseable errors.
 
-## CORE v1.6.0
-- ✅ Completed: Implement TimeDriver Abstraction - Refactored `Helios` to use `TimeDriver` strategy, extracted `WaapiDriver`, and added support for custom drivers.
+## v1.14.0
+- **Enable Node.js Runtime Support**: Implemented `TimeoutTicker` and environment detection for Node.js compatibility.
 
-## CORE v1.5.0
-- ✅ Completed: Implement Spring Animation Helper - Implemented physics-based `spring` function with underdamped, critically damped, and overdamped support.
+## v1.13.0
+- **Export Types**: Exported `HeliosState` and `HeliosSubscriber` types from `packages/core` to improve DX.
 
-## CORE v1.3.0
-- ✅ Completed: Implement Animation Helpers - Implemented `interpolate` function with easing and extrapolation support.
+## v1.12.0
+- **Implement DomDriver**: Implemented `DomDriver` to sync WAAPI and HTMLMediaElements, updated `Helios` to use it by default, and deprecated `WaapiDriver`.
 
-## CORE v1.2.0
-- ✅ Completed: Implement Variable Playback Rate - Added `playbackRate` control, time-based ticking logic, and exported `HeliosOptions`.
+## v1.11.3
+- **Add Documentation**: Created comprehensive `README.md` for `packages/core`.
 
-## CORE v1.1.0
-- ✅ Completed: Implement InputProps - Added `inputProps` to state/options and `setInputProps` method to Helios class.
+## v1.11.2
+- **Verify Signals and Cleanup Plans**: Verified signal integration and cleaned up completed plan files.
 
-## [2026-01-22] CORE
-- ✅ Completed: Enable Core Testing And Robustness - Added `test` script, constructor validation, and unit tests.
+## v1.11.1
+- **Refactor Helios Signals**: Added JSDoc documentation to public signal properties and verified signal implementation.
 
-## [2026-01-21] CORE
-- ✅ Completed: Implement Helios.diagnose() - Implemented static diagnose method and DiagnosticReport interface
+## v1.11.0
+- **Implement Easing Functions**: Implemented standard easing functions (linear, quad, cubic, quart, quint, sine, expo, circ, back, elastic, bounce) and cubic-bezier solver.
 
-## [2026-01-15] CORE
-- Updated `Helios` class in `packages/core` to support `bindToDocumentTimeline()`. Added unit tests.
+## v1.10.0
+- **Refactor Helios to use Signals**: Replaced internal state with signals, exposed ReadonlySignal getters, and maintained backward compatibility.
+
+## v1.9.0
+- **Implement Signals**: Implemented `signal`, `computed`, and `effect` primitives with memory safety and consistency guarantees.
+
+## v1.8.0
+- **Implement Series Helper**: Implemented `series` function for sequential layout of composition elements.
+
+## v1.7.0
+- **Implement Sequencing Primitives**: Implemented `sequence` function and interfaces in `packages/core`.
+
+## v1.6.0
+- **Implement TimeDriver Abstraction**: Refactored `Helios` to use `TimeDriver` strategy, extracted `WaapiDriver`, and added support for custom drivers.
+
+## v1.5.0
+- **Implement Spring Animation Helper**: Implemented physics-based `spring` function with underdamped, critically damped, and overdamped support.
+
+## v1.3.0
+- **Implement Animation Helpers**: Implemented `interpolate` function with easing and extrapolation support.
+
+## v1.2.0
+- **Implement Variable Playback Rate**: Added `playbackRate` control, time-based ticking logic, and exported `HeliosOptions`.
+
+## v1.1.0
+- **Implement InputProps**: Added `inputProps` to state/options and `setInputProps` method to Helios class.

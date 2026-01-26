@@ -22,6 +22,7 @@
     {
       "group": "Guides",
       "pages": [
+        "guides/using-studio",
         "guides/creating-compositions",
         "guides/rendering-videos",
         "guides/using-the-player"
@@ -33,7 +34,9 @@
         "examples/react-example",
         "examples/vue-example",
         "examples/canvas-example",
-        "examples/threejs-example"
+        "examples/threejs-example",
+        "examples/animation-libraries",
+        "examples/animation-helpers"
       ]
     },
     {
@@ -54,8 +57,8 @@
       "group": "Changelog",
       "pages": [
         "changelog/core",
-        "changelog/player",
         "changelog/renderer",
+        "changelog/player",
         "changelog/demo",
         "changelog/studio"
       ]
