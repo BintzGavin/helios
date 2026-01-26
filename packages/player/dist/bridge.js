@@ -1,5 +1,5 @@
-import { captureDomToBitmap } from "./features/dom-capture.js";
-import { getAudioAssets } from "./features/audio-utils.js";
+import { captureDomToBitmap } from "./features/dom-capture";
+import { getAudioAssets } from "./features/audio-utils";
 export function connectToParent(helios) {
     // 1. Listen for messages from parent
     window.addEventListener('message', async (event) => {

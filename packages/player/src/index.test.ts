@@ -504,4 +504,97 @@ describe('HeliosPlayer', () => {
         expect(overlay.classList.contains('hidden')).toBe(true);
     });
   });
+
+  describe('Captions', () => {
+    let mockController: any;
+
+    beforeEach(() => {
+        mockController = {
+            getState: vi.fn().mockReturnValue({ currentFrame: 0, duration: 10, fps: 30, isPlaying: false }),
+            play: vi.fn(),
+            pause: vi.fn(),
+            seek: vi.fn(),
+            subscribe: vi.fn().mockReturnValue(() => {}),
+            dispose: vi.fn(),
+            setPlaybackRate: vi.fn(),
+            setAudioVolume: vi.fn(),
+            setAudioMuted: vi.fn(),
+            setInputProps: vi.fn(),
+            captureFrame: vi.fn(),
+            getAudioTracks: vi.fn()
+        };
+        (player as any).setController(mockController);
+    });
+
+    it('should initialize with CC button', () => {
+        const ccBtn = player.shadowRoot!.querySelector('.cc-btn');
+        expect(ccBtn).toBeTruthy();
+        expect(ccBtn!.textContent).toBe('CC');
+        expect(ccBtn!.classList.contains('active')).toBe(false);
+    });
+
+    it('should toggle captions state on button click', () => {
+        const ccBtn = player.shadowRoot!.querySelector('.cc-btn') as HTMLButtonElement;
+
+        // Click to enable
+        ccBtn.click();
+        expect(ccBtn.classList.contains('active')).toBe(true);
+        expect((player as any).showCaptions).toBe(true);
+
+        // Click to disable
+        ccBtn.click();
+        expect(ccBtn.classList.contains('active')).toBe(false);
+        expect((player as any).showCaptions).toBe(false);
+    });
+
+    it('should render active captions when enabled', () => {
+        const activeCaptions = [{ text: 'Hello World' }, { text: 'Testing Captions' }];
+        mockController.getState.mockReturnValue({
+            currentFrame: 0,
+            duration: 10,
+            fps: 30,
+            isPlaying: false,
+            activeCaptions
+        });
+
+        // Enable captions
+        const ccBtn = player.shadowRoot!.querySelector('.cc-btn') as HTMLButtonElement;
+        ccBtn.click();
+
+        // Check container
+        const container = player.shadowRoot!.querySelector('.captions-container');
+        expect(container!.children.length).toBe(2);
+        expect(container!.children[0].textContent).toBe('Hello World');
+        expect(container!.children[1].textContent).toBe('Testing Captions');
+    });
+
+    it('should NOT render captions when disabled', () => {
+        const activeCaptions = [{ text: 'Hello World' }];
+        mockController.getState.mockReturnValue({
+            currentFrame: 0,
+            duration: 10,
+            fps: 30,
+            isPlaying: false,
+            activeCaptions
+        });
+
+        // Ensure disabled (default)
+        expect((player as any).showCaptions).toBe(false);
+
+        // Force update UI
+        (player as any).updateUI(mockController.getState());
+
+        const container = player.shadowRoot!.querySelector('.captions-container');
+        expect(container!.children.length).toBe(0);
+    });
+
+    it('should disable CC button when controls are disabled', () => {
+        (player as any).setControlsDisabled(true);
+        const ccBtn = player.shadowRoot!.querySelector('.cc-btn') as HTMLButtonElement;
+        expect(ccBtn.disabled).toBe(true);
+
+        (player as any).setControlsDisabled(false);
+        expect(ccBtn.disabled).toBe(false);
+    });
+  });
 });

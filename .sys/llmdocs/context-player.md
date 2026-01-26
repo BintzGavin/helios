@@ -10,9 +10,11 @@ The `<helios-player>` component utilizes Shadow DOM for isolation.
 - **Root**: Host element (block display, relative positioning).
 - **Status Overlay**: Handles "Connecting...", "Loading...", and Error states (with Retry or Dismiss actions).
 - **Iframe**: Sandboxed execution environment for the user's content (`sandbox="allow-scripts allow-same-origin"`).
+- **Captions Overlay**: Absolute positioned container for rendering active captions text.
 - **Controls Overlay**:
   - Play/Pause / Restart Button
   - Volume Control (Mute Toggle + Slider)
+  - CC Button (Toggle Captions)
   - Export / Cancel Button
   - Speed Selector (0.25x - 2x)
   - Scrubber (Input Range)
@@ -57,3 +59,4 @@ The component observes the following attributes:
 - **Scrubber Logic**: Manages internal `isScrubbing` state to pause playback during interaction and prevent the update loop from overwriting the scrubber position.
 - **DOM Capture**: Robust implementation using `XMLSerializer`, SVG `<foreignObject>`, and asset inlining (stylesheets, images, backgrounds, CSS `url()` assets, and `<canvas>` snapshots) for high-fidelity HTML exports.
 - **Accessibility**: Implements `role="toolbar"` for controls, dynamic `aria-label` updates for playback state, and `aria-valuetext` for scrubber time (seconds).
+- **Captions**: Supports rendering of caption cues from `HeliosState.activeCaptions` via a toggleable overlay, ensuring accessibility and feature parity with rendered output.

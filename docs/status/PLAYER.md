@@ -1,4 +1,4 @@
-**Version**: 0.16.0
+**Version**: 0.17.0
 
 # Status: PLAYER
 
@@ -18,12 +18,13 @@
 - Supports standard keyboard shortcuts (Space/K, F, Arrows) and Fullscreen toggle.
 - Supports frame-by-frame navigation via `.` and `,` keys, and Shift modifier for 10-frame jumps.
 - Displays actionable error messages with "Dismiss" option for failed client-side exports.
-- **New**: Supports Volume and Mute controls via UI and Bridge.
+- Supports Volume and Mute controls via UI and Bridge.
+- **New**: Supports caption rendering overlay with toggleable "CC" button.
 
 ## Critical Task
-- **Plan**: `/.sys/plans/2026-03-01-PLAYER-Implement-Captions.md`
-- **Action**: Implement caption rendering in `<helios-player>`.
+- **None**: Recent task completed.
 
+[v0.17.0] ✅ Completed: Implement Captions - Added caption rendering overlay and "CC" toggle button to `<helios-player>`, leveraging `activeCaptions` from core state.
 [v0.16.0] ✅ Completed: Volume Controls - Implemented volume slider and mute button in UI, updated controllers and bridge protocol.
 [v0.15.0] ✅ Completed: Export UX - Implemented Error Overlay with "Dismiss" action for client-side export failures, providing visibility into errors like unsupported codecs.
 [v0.14.0] ✅ Completed: Accessibility Improvements - Implemented ARIA labels and roles for controls, including dynamic updates for play state and scrubber time.
@@ -42,6 +43,7 @@
 [v0.5.1] ✅ Completed: Standard Attributes - Implemented `autoplay`, `loop`, and `controls` attributes. Synced version and artifacts.
 
 ## Backlog
+- [x] Implement Caption Rendering.
 - [x] Implement Volume Controls.
 - [x] Implement Client Side Audio Export.
 - [x] Implement Dynamic Sizing & Reactive Attributes.

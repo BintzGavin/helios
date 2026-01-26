@@ -189,18 +189,66 @@ template.innerHTML = `
     .fullscreen-btn:hover {
       color: #007bff;
     }
+    .captions-container {
+      position: absolute;
+      bottom: 60px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80%;
+      text-align: center;
+      pointer-events: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      z-index: 5;
+    }
+    .caption-cue {
+      background: rgba(0, 0, 0, 0.7);
+      color: white;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 16px;
+      text-shadow: 0 1px 2px black;
+      white-space: pre-wrap;
+    }
+    .cc-btn {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-left: 4px;
+      opacity: 0.7;
+    }
+    .cc-btn:hover {
+      opacity: 1;
+    }
+    .cc-btn.active {
+      opacity: 1;
+      color: #007bff;
+      border-bottom: 2px solid #007bff;
+    }
   </style>
   <div class="status-overlay" part="overlay">
     <div class="status-text">Connecting...</div>
     <button class="retry-btn" style="display: none">Retry</button>
   </div>
   <iframe part="iframe" sandbox="allow-scripts allow-same-origin" title="Helios Composition Preview"></iframe>
+  <div class="captions-container" part="captions"></div>
   <div class="controls" role="toolbar" aria-label="Playback Controls">
     <button class="play-pause-btn" part="play-pause-button" aria-label="Play">▶</button>
     <div class="volume-control">
       <button class="volume-btn" part="volume-button" aria-label="Mute">🔊</button>
       <input type="range" class="volume-slider" min="0" max="1" step="0.05" value="1" part="volume-slider" aria-label="Volume">
     </div>
+    <button class="cc-btn" part="cc-button" aria-label="Toggle Captions">CC</button>
     <button class="export-btn" part="export-button" aria-label="Export video">Export</button>
     <select class="speed-selector" part="speed-selector" aria-label="Playback speed">
       <option value="0.25">0.25x</option>
@@ -228,6 +276,9 @@ export class HeliosPlayer extends HTMLElement {
   private retryAction: () => void;
   private speedSelector: HTMLSelectElement;
   private fullscreenBtn: HTMLButtonElement;
+  private captionsContainer: HTMLDivElement;
+  private ccBtn: HTMLButtonElement;
+  private showCaptions: boolean = false;
 
   private controller: HeliosController | null = null;
   // Keep track if we have direct access (optional, mainly for debugging/logging)
@@ -260,6 +311,8 @@ export class HeliosPlayer extends HTMLElement {
     this.retryBtn = this.shadowRoot!.querySelector(".retry-btn")!;
     this.speedSelector = this.shadowRoot!.querySelector(".speed-selector")!;
     this.fullscreenBtn = this.shadowRoot!.querySelector(".fullscreen-btn")!;
+    this.captionsContainer = this.shadowRoot!.querySelector(".captions-container")!;
+    this.ccBtn = this.shadowRoot!.querySelector(".cc-btn")!;
 
     this.retryAction = () => this.retryConnection();
     this.retryBtn.onclick = () => this.retryAction();
@@ -300,6 +353,7 @@ export class HeliosPlayer extends HTMLElement {
     this.exportBtn.addEventListener("click", this.renderClientSide);
     this.speedSelector.addEventListener("change", this.handleSpeedChange);
     this.fullscreenBtn.addEventListener("click", this.toggleFullscreen);
+    this.ccBtn.addEventListener("click", this.toggleCaptions);
 
     // Initial state: disabled until connected
     this.setControlsDisabled(true);
@@ -326,6 +380,7 @@ export class HeliosPlayer extends HTMLElement {
     this.exportBtn.removeEventListener("click", this.renderClientSide);
     this.speedSelector.removeEventListener("change", this.handleSpeedChange);
     this.fullscreenBtn.removeEventListener("click", this.toggleFullscreen);
+    this.ccBtn.removeEventListener("click", this.toggleCaptions);
 
     if (this.unsubscribe) {
         this.unsubscribe();
@@ -343,6 +398,7 @@ export class HeliosPlayer extends HTMLElement {
       this.scrubber.disabled = disabled;
       this.speedSelector.disabled = disabled;
       this.fullscreenBtn.disabled = disabled;
+      this.ccBtn.disabled = disabled;
       // Export is managed separately based on connection state
       if (disabled) {
           this.exportBtn.disabled = true;
@@ -356,6 +412,7 @@ export class HeliosPlayer extends HTMLElement {
       this.scrubber.disabled = locked;
       this.speedSelector.disabled = locked;
       this.fullscreenBtn.disabled = locked;
+      this.ccBtn.disabled = locked;
   }
 
   private handleIframeLoad = () => {
@@ -520,6 +577,14 @@ export class HeliosPlayer extends HTMLElement {
     }
   };
 
+  private toggleCaptions = () => {
+    this.showCaptions = !this.showCaptions;
+    this.ccBtn.classList.toggle("active", this.showCaptions);
+    if (this.controller) {
+      this.updateUI(this.controller.getState());
+    }
+  };
+
   private handleKeydown = (e: KeyboardEvent) => {
     if (this.isExporting) return;
 
@@ -635,6 +700,16 @@ export class HeliosPlayer extends HTMLElement {
 
       if (state.playbackRate !== undefined) {
           this.speedSelector.value = String(state.playbackRate);
+      }
+
+      this.captionsContainer.innerHTML = '';
+      if (this.showCaptions && state.activeCaptions && state.activeCaptions.length > 0) {
+        state.activeCaptions.forEach((cue: any) => {
+          const div = document.createElement('div');
+          div.className = 'caption-cue';
+          div.textContent = cue.text;
+          this.captionsContainer.appendChild(div);
+        });
       }
   }
 
