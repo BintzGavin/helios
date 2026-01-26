@@ -1,3 +1,28 @@
+export interface AudioTrackConfig {
+  /**
+   * Path to the audio file.
+   */
+  path: string;
+
+  /**
+   * Volume multiplier (0.0 to 1.0).
+   * Defaults to 1.0.
+   */
+  volume?: number;
+
+  /**
+   * Time in seconds when this track should start in the composition.
+   * Defaults to 0.
+   */
+  offset?: number;
+
+  /**
+   * Time in seconds to seek into the source file before playing.
+   * Defaults to 0.
+   */
+  seek?: number;
+}
+
 export interface RendererOptions {
   width: number;
   height: number;
@@ -25,10 +50,11 @@ export interface RendererOptions {
   audioFilePath?: string;
 
   /**
-   * List of paths to audio files to include in the output video.
+   * List of audio tracks to include in the output video.
+   * Can be a simple file path string or a configuration object.
    * If provided, these will be mixed with the video.
    */
-  audioTracks?: string[];
+  audioTracks?: (string | AudioTrackConfig)[];
 
   /**
    * The video codec to use. Defaults to 'libx264'.
