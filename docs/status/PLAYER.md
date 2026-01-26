@@ -1,4 +1,4 @@
-**Version**: 0.17.1
+**Version**: 0.18.0
 
 # Status: PLAYER
 
@@ -19,11 +19,13 @@
 - Supports frame-by-frame navigation via `.` and `,` keys, and Shift modifier for 10-frame jumps.
 - Displays actionable error messages with "Dismiss" option for failed client-side exports.
 - Supports Volume and Mute controls via UI and Bridge.
-- **New**: Supports caption rendering overlay with toggleable "CC" button.
+- Supports caption rendering overlay with toggleable "CC" button.
+- **New**: Supports WebM (VP9/Opus) client-side export via `export-format` attribute.
 
 ## Critical Task
 - **None**: Recent task completed.
 
+[v0.18.0] ✅ Completed: WebM Export - Implemented `export-format` attribute to support WebM (VP9/Opus) video export alongside MP4.
 [v0.17.1] ✅ Completed: Touch Support - Added touch event listeners to the scrubber to support smooth seeking on mobile devices.
 [v0.17.0] ✅ Completed: Implement Captions - Added caption rendering overlay and "CC" toggle button to `<helios-player>`, leveraging `activeCaptions` from core state.
 [v0.16.0] ✅ Completed: Volume Controls - Implemented volume slider and mute button in UI, updated controllers and bridge protocol.

@@ -15,7 +15,8 @@
   },
   "dependencies": {
     "@helios-project/core": "0.0.1",
-    "mp4-muxer": "^2.0.1"
+    "mp4-muxer": "^2.0.1",
+    "webm-muxer": "^5.1.4"
   },
   "devDependencies": {
     "jsdom": "^27.4.0",

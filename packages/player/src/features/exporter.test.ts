@@ -17,6 +17,20 @@ vi.mock('mp4-muxer', () => {
     };
 });
 
+// Mock webm-muxer
+vi.mock('webm-muxer', () => {
+    return {
+        Muxer: class {
+            addVideoChunk = vi.fn();
+            addAudioChunk = addAudioChunkSpy;
+            finalize = vi.fn();
+        },
+        ArrayBufferTarget: class {
+            buffer = new ArrayBuffer(0);
+        }
+    };
+});
+
 // Spies for VideoEncoder
 const configureSpy = vi.fn();
 const encodeSpy = vi.fn();
@@ -99,6 +113,7 @@ describe('ClientSideExporter', () => {
     let mockController: HeliosController;
     let exporter: ClientSideExporter;
     let mockIframe: HTMLIFrameElement;
+    let mockAnchor: any;
 
     beforeEach(() => {
         vi.clearAllMocks();
@@ -123,7 +138,7 @@ describe('ClientSideExporter', () => {
         exporter = new ClientSideExporter(mockController, mockIframe);
 
         // Mock document.createElement('a')
-        const mockAnchor = {
+        mockAnchor = {
             click: vi.fn(),
             href: '',
             download: ''
@@ -131,7 +146,7 @@ describe('ClientSideExporter', () => {
         vi.spyOn(document, 'createElement').mockReturnValue(mockAnchor as any);
     });
 
-    it('should run export process successfully', async () => {
+    it('should run export process successfully (MP4 default)', async () => {
         const onProgress = vi.fn();
         const signal = new AbortController().signal;
 
@@ -158,6 +173,20 @@ describe('ClientSideExporter', () => {
         // Download
         expect(URL.createObjectURL).toHaveBeenCalled();
         expect(document.createElement).toHaveBeenCalledWith('a');
+        expect(mockAnchor.download).toBe('video.mp4');
+    });
+
+    it('should run export process successfully (WebM)', async () => {
+        const onProgress = vi.fn();
+        const signal = new AbortController().signal;
+
+        await exporter.export({ onProgress, signal, mode: 'canvas', format: 'webm' });
+
+        expect(configureSpy).toHaveBeenCalledWith(expect.objectContaining({
+            codec: 'vp09.00.10.08'
+        }));
+
+        expect(mockAnchor.download).toBe('video.webm');
     });
 
     it('should handle abort signal', async () => {
@@ -195,7 +224,7 @@ describe('ClientSideExporter', () => {
         expect(mockController.captureFrame).toHaveBeenNthCalledWith(2, 0, { selector: 'canvas', mode: 'dom' });
     });
 
-    it('should export audio if tracks exist', async () => {
+    it('should export audio if tracks exist (MP4)', async () => {
         const onProgress = vi.fn();
         const signal = new AbortController().signal;
 
@@ -203,15 +232,35 @@ describe('ClientSideExporter', () => {
             { buffer: new ArrayBuffer(8), mimeType: 'audio/mp3' }
         ]);
 
-        await exporter.export({ onProgress, signal, mode: 'canvas' });
+        await exporter.export({ onProgress, signal, mode: 'canvas', format: 'mp4' });
 
-        expect(audioConfigureSpy).toHaveBeenCalled();
+        expect(audioConfigureSpy).toHaveBeenCalledWith(expect.objectContaining({
+            codec: 'mp4a.40.2'
+        }));
         expect(audioEncodeSpy).toHaveBeenCalled();
         expect(audioFlushSpy).toHaveBeenCalled();
         expect(audioCloseSpy).toHaveBeenCalled();
     });
 
-    it('should fallback to lower profile if primary config is not supported', async () => {
+    it('should export audio if tracks exist (WebM)', async () => {
+        const onProgress = vi.fn();
+        const signal = new AbortController().signal;
+
+        (mockController.getAudioTracks as any).mockResolvedValue([
+            { buffer: new ArrayBuffer(8), mimeType: 'audio/mp3' }
+        ]);
+
+        await exporter.export({ onProgress, signal, mode: 'canvas', format: 'webm' });
+
+        expect(audioConfigureSpy).toHaveBeenCalledWith(expect.objectContaining({
+            codec: 'opus'
+        }));
+        expect(audioEncodeSpy).toHaveBeenCalled();
+        expect(audioFlushSpy).toHaveBeenCalled();
+        expect(audioCloseSpy).toHaveBeenCalled();
+    });
+
+    it('should fallback to lower profile if primary config is not supported (MP4)', async () => {
         const onProgress = vi.fn();
         const signal = new AbortController().signal;
 
@@ -220,7 +269,7 @@ describe('ClientSideExporter', () => {
             .mockResolvedValueOnce(false)
             .mockResolvedValueOnce(true);
 
-        await exporter.export({ onProgress, signal, mode: 'canvas' });
+        await exporter.export({ onProgress, signal, mode: 'canvas', format: 'mp4' });
 
         expect(VideoEncoder.isConfigSupported).toHaveBeenCalledTimes(2);
         // Verify configure was called with the fallback config (Level 3.0 => avc1.42001E)
