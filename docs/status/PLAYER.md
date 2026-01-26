@@ -20,7 +20,8 @@
 - Displays actionable error messages with "Dismiss" option for failed client-side exports.
 
 ## Critical Task
-- **None**: Ready for new assignments.
+- **Plan**: `/.sys/plans/2026-03-01-PLAYER-VolumeControls.md`
+- **Action**: Implement Volume Controls (UI + Bridge + Controller).
 
 [v0.15.0] ✅ Completed: Export UX - Implemented Error Overlay with "Dismiss" action for client-side export failures, providing visibility into errors like unsupported codecs.
 [v0.14.0] ✅ Completed: Accessibility Improvements - Implemented ARIA labels and roles for controls, including dynamic updates for play state and scrubber time.
@@ -39,6 +40,7 @@
 [v0.5.1] ✅ Completed: Standard Attributes - Implemented `autoplay`, `loop`, and `controls` attributes. Synced version and artifacts.
 
 ## Backlog
+- [ ] Implement Volume Controls.
 - [x] Implement Client Side Audio Export.
 - [x] Implement Dynamic Sizing & Reactive Attributes.
 - [x] Sync player state with engine state (Bridge Initialization Fix).
