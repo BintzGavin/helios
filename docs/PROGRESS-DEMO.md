@@ -21,3 +21,6 @@
 
 ## DEMO v1.19.0
 - ✅ Completed: Implement Svelte Series Component - Added `<Series>` component to `examples/svelte-animation-helpers` and updated example to use it.
+
+## DEMO v1.20.0
+- ✅ Completed: Refactor Simple Animation - Updated `examples/simple-animation` to use native CSS `@keyframes` and `autoSyncAnimations: true`.
