@@ -18,3 +18,6 @@
 
 ## DEMO v1.18.0
 - ✅ Completed: Implement React Series Component - Implemented `<Series>` component in `examples/react-animation-helpers` and verified with E2E tests.
+
+## DEMO v1.19.0
+- ✅ Completed: Implement Svelte Series Component - Added `<Series>` component to `examples/svelte-animation-helpers` and updated example to use it.

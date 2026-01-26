@@ -12,7 +12,7 @@
 - `examples/vue-animation-helpers`: Vue demonstrating `<Sequence>` and `<Series>` components.
 - `examples/svelte-canvas-animation`: Svelte with Canvas.
 - `examples/svelte-dom-animation`: Svelte with DOM elements.
-- `examples/svelte-animation-helpers`: Svelte demonstrating `<Sequence>` pattern.
+- `examples/svelte-animation-helpers`: Svelte demonstrating `<Sequence>` and `<Series>` components.
 - `examples/threejs-canvas-animation`: Three.js integration.
 - `examples/pixi-canvas-animation`: Pixi.js integration.
 

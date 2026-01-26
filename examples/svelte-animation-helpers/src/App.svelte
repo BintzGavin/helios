@@ -5,6 +5,7 @@
   import { createHeliosStore } from './lib/store';
   import { FRAME_CONTEXT_KEY } from './lib/context';
   import Sequence from './lib/Sequence.svelte';
+  import Series from './lib/Series.svelte';
 
   const duration = 5;
   const fps = 30;
@@ -30,34 +31,40 @@
 <div class="container">
     <h1 style:color="white">Svelte Animation Helpers</h1>
 
-    <!-- Sequence 1: 0-30 frames -->
-    <Sequence from={0} durationInFrames={30}>
-        <div class="box" style:background="red">
-            Seq 1
-        </div>
-    </Sequence>
+    <Series>
+        <!-- Sequence 1: 0-30 frames -->
+        <Sequence durationInFrames={30}>
+            <div class="box" style:background="red">
+                Seq 1
+            </div>
+        </Sequence>
 
-    <!-- Sequence 2: 30-60 frames -->
-    <Sequence from={30} durationInFrames={30}>
-        <div class="box" style:background="blue">
-            Seq 2
-        </div>
-    </Sequence>
+        <!-- Sequence 2: 30-60 frames -->
+        <Sequence durationInFrames={30}>
+            <div class="box" style:background="blue">
+                Seq 2
+            </div>
+        </Sequence>
 
-    <!-- Sequence 3: Nested (Starts at 60, internal sequence starts at 0 rel) -->
-    <Sequence from={60} durationInFrames={60}>
-         <div style:color="white">Wrapper (60-120)</div>
-         <Sequence from={0} durationInFrames={30}>
-             <div class="box" style:background="green">
-                 Nested 1
-             </div>
-         </Sequence>
-         <Sequence from={30} durationInFrames={30}>
-             <div class="box" style:background="yellow" style:color="black">
-                 Nested 2
-             </div>
-         </Sequence>
-    </Sequence>
+        <!-- Sequence 3: Nested (Starts at 60) -->
+        <Sequence durationInFrames={60}>
+             <div style:color="white">Wrapper (60-120)</div>
+
+             <!-- Inner Series -->
+             <Series>
+                 <Sequence durationInFrames={30}>
+                     <div class="box" style:background="green">
+                         Nested 1
+                     </div>
+                 </Sequence>
+                 <Sequence durationInFrames={30}>
+                     <div class="box" style:background="yellow" style:color="black">
+                         Nested 2
+                     </div>
+                 </Sequence>
+             </Series>
+        </Sequence>
+    </Series>
 </div>
 
 <style>
