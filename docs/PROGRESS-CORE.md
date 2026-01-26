@@ -1,5 +1,8 @@
 # CORE Progress Log
 
+## CORE v1.15.0
+- ✅ Completed: Implement Structured Errors - Implemented `HeliosError` and `HeliosErrorCode` to provide machine-parseable errors.
+
 ## CORE v1.14.0
 - ✅ Completed: Enable Node.js Runtime Support - Implemented `TimeoutTicker` and environment detection for Node.js compatibility.
 

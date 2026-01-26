@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { interpolate, spring } from './animation';
+import { HeliosError, HeliosErrorCode } from './errors';
 
 describe('interpolate', () => {
   it('interpolates within range', () => {
@@ -47,16 +48,40 @@ describe('interpolate', () => {
   });
 
   it('validates input range length matches output range length', () => {
-    expect(() => interpolate(0, [0, 1], [0])).toThrow(/same length/);
+    expect.assertions(2);
+    try {
+      interpolate(0, [0, 1], [0]);
+    } catch (e) {
+      expect(e).toBeInstanceOf(HeliosError);
+      expect((e as HeliosError).code).toBe(HeliosErrorCode.INVALID_INPUT_RANGE);
+    }
   });
 
   it('validates input range has at least 2 elements', () => {
-    expect(() => interpolate(0, [0], [0])).toThrow(/at least 2 elements/);
+    expect.assertions(2);
+    try {
+      interpolate(0, [0], [0]);
+    } catch (e) {
+      expect(e).toBeInstanceOf(HeliosError);
+      expect((e as HeliosError).code).toBe(HeliosErrorCode.INVALID_INPUT_RANGE);
+    }
   });
 
   it('validates strictly ascending input range', () => {
-    expect(() => interpolate(0, [1, 0], [0, 100])).toThrow(/strictly monotonically increasing/);
-    expect(() => interpolate(0, [0, 0], [0, 100])).toThrow(/strictly monotonically increasing/);
+    expect.assertions(4);
+    try {
+      interpolate(0, [1, 0], [0, 100]);
+    } catch (e) {
+      expect(e).toBeInstanceOf(HeliosError);
+      expect((e as HeliosError).code).toBe(HeliosErrorCode.UNSORTED_INPUT_RANGE);
+    }
+
+    try {
+      interpolate(0, [0, 0], [0, 100]);
+    } catch (e) {
+      expect(e).toBeInstanceOf(HeliosError);
+      expect((e as HeliosError).code).toBe(HeliosErrorCode.UNSORTED_INPUT_RANGE);
+    }
   });
 });
 
@@ -127,7 +152,19 @@ describe('spring', () => {
   });
 
   it('throws on invalid physics config', () => {
-    expect(() => spring({ frame: 10, fps: 30, config: { mass: 0 } })).toThrow(/mass/);
-    expect(() => spring({ frame: 10, fps: 30, config: { stiffness: 0 } })).toThrow(/stiffness/);
+    expect.assertions(4);
+    try {
+      spring({ frame: 10, fps: 30, config: { mass: 0 } });
+    } catch (e) {
+      expect(e).toBeInstanceOf(HeliosError);
+      expect((e as HeliosError).code).toBe(HeliosErrorCode.INVALID_SPRING_CONFIG);
+    }
+
+    try {
+      spring({ frame: 10, fps: 30, config: { stiffness: 0 } });
+    } catch (e) {
+      expect(e).toBeInstanceOf(HeliosError);
+      expect((e as HeliosError).code).toBe(HeliosErrorCode.INVALID_SPRING_CONFIG);
+    }
   });
 });

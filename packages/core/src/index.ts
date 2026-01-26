@@ -1,5 +1,6 @@
 import { TimeDriver, WaapiDriver, DomDriver, NoopDriver, Ticker, RafTicker, TimeoutTicker } from './drivers';
 import { signal, effect, Signal, ReadonlySignal } from './signals';
+import { HeliosError, HeliosErrorCode } from './errors';
 
 export type HeliosState = {
   duration: number;
@@ -35,6 +36,7 @@ export * from './drivers';
 export * from './easing';
 export * from './sequencing';
 export * from './signals';
+export * from './errors';
 
 export class Helios {
   // Constants
@@ -104,10 +106,18 @@ export class Helios {
 
   constructor(options: HeliosOptions) {
     if (options.duration < 0) {
-      throw new Error("Duration must be non-negative");
+      throw new HeliosError(
+        HeliosErrorCode.INVALID_DURATION,
+        "Duration must be non-negative",
+        "Ensure the 'duration' option passed to the Helios constructor is >= 0."
+      );
     }
     if (options.fps <= 0) {
-      throw new Error("FPS must be greater than 0");
+      throw new HeliosError(
+        HeliosErrorCode.INVALID_FPS,
+        "FPS must be greater than 0",
+        "Ensure the 'fps' option passed to the Helios constructor is > 0."
+      );
     }
 
     this.duration = options.duration;

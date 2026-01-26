@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { Helios, HeliosState, HeliosSubscriber } from './index';
 import { TimeDriver, ManualTicker } from './drivers';
+import { HeliosError, HeliosErrorCode } from './errors';
 
 describe('Helios Core', () => {
   it('should initialize with correct state', () => {
@@ -57,12 +58,30 @@ describe('Helios Core', () => {
 
   describe('Constructor Validation', () => {
     it('should throw if duration is negative', () => {
-      expect(() => new Helios({ duration: -1, fps: 30 })).toThrow("Duration must be non-negative");
+      expect.assertions(2);
+      try {
+        new Helios({ duration: -1, fps: 30 });
+      } catch (e) {
+        expect(e).toBeInstanceOf(HeliosError);
+        expect((e as HeliosError).code).toBe(HeliosErrorCode.INVALID_DURATION);
+      }
     });
 
     it('should throw if fps is zero or negative', () => {
-      expect(() => new Helios({ duration: 10, fps: 0 })).toThrow("FPS must be greater than 0");
-      expect(() => new Helios({ duration: 10, fps: -30 })).toThrow("FPS must be greater than 0");
+      expect.assertions(4);
+      try {
+        new Helios({ duration: 10, fps: 0 });
+      } catch (e) {
+        expect(e).toBeInstanceOf(HeliosError);
+        expect((e as HeliosError).code).toBe(HeliosErrorCode.INVALID_FPS);
+      }
+
+      try {
+        new Helios({ duration: 10, fps: -30 });
+      } catch (e) {
+        expect(e).toBeInstanceOf(HeliosError);
+        expect((e as HeliosError).code).toBe(HeliosErrorCode.INVALID_FPS);
+      }
     });
 
     it('should not throw for valid options', () => {

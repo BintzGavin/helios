@@ -9,7 +9,8 @@ Key Architectural Patterns:
 2.  **Reactive Signals**: Internal state is managed using fine-grained signals (`signal`, `computed`, `effect`) and exposed as `ReadonlySignal`.
 3.  **Driver Strategy**: The `TimeDriver` interface abstracts the underlying timing mechanism (e.g., `DomDriver` for WAAPI/Media synchronization, `NoopDriver` for manual control).
 4.  **Ticker Strategy**: The `Ticker` interface abstracts the loop mechanism (`RafTicker` for browser, `TimeoutTicker` for Node.js).
-5.  **Environment Agnostic**: The core logic adapts to Browser (DOM) or Node.js environments.
+5.  **Structured Errors**: The `HeliosError` class provides machine-readable error codes for better AX (Agent Experience).
+6.  **Environment Agnostic**: The core logic adapts to Browser (DOM) or Node.js environments.
 
 ## B. File Tree
 
@@ -27,6 +28,7 @@ packages/core/src/
 │   └── index.ts
 ├── animation.ts
 ├── easing.ts
+├── errors.ts
 ├── index.ts
 ├── sequencing.ts
 └── signals.ts
@@ -35,6 +37,21 @@ packages/core/src/
 ## C. Type Definitions
 
 ```typescript
+export enum HeliosErrorCode {
+  INVALID_DURATION = 'INVALID_DURATION',
+  INVALID_FPS = 'INVALID_FPS',
+  INVALID_INPUT_RANGE = 'INVALID_INPUT_RANGE',
+  INVALID_OUTPUT_RANGE = 'INVALID_OUTPUT_RANGE',
+  UNSORTED_INPUT_RANGE = 'UNSORTED_INPUT_RANGE',
+  INVALID_SPRING_CONFIG = 'INVALID_SPRING_CONFIG'
+}
+
+export class HeliosError extends Error {
+  public readonly code: HeliosErrorCode;
+  public readonly suggestion?: string;
+  static isHeliosError(error: unknown): error is HeliosError;
+}
+
 export type HeliosState = {
   duration: number;
   fps: number;
