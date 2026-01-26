@@ -7,6 +7,7 @@ const CASES = [
   { name: 'DOM', relativePath: 'examples/simple-animation/composition.html', mode: 'dom' as const },
   { name: 'React', relativePath: 'examples/react-canvas-animation/composition.html', mode: 'canvas' as const },
   { name: 'React DOM', relativePath: 'examples/react-dom-animation/composition.html', mode: 'dom' as const },
+  { name: 'React CSS', relativePath: 'examples/react-css-animation/composition.html', mode: 'dom' as const },
   { name: 'Vue', relativePath: 'examples/vue-canvas-animation/composition.html', mode: 'canvas' as const },
   { name: 'Vue DOM', relativePath: 'examples/vue-dom-animation/composition.html', mode: 'dom' as const },
   { name: 'Svelte', relativePath: 'examples/svelte-canvas-animation/composition.html', mode: 'canvas' as const },
