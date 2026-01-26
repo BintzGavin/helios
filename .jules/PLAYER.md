@@ -37,3 +37,7 @@
 ## 2026-01-26 - SVG Security Restrictions
 **Learning:** `captureDomToBitmap` uses `foreignObject` inside an SVG to render DOM content. Browsers strictly block external resources (images, fonts) inside SVG images for security reasons (tainted canvas).
 **Action:** Any "DOM Export" strategy using `foreignObject` MUST explicitly fetch and inline all external resources (Images, Fonts, CSS) as Data URIs, or they will fail to render.
+
+## 2026-02-26 - Mixed Content Export Gaps
+**Learning:** `captureDomToBitmap` clones the DOM via `cloneNode(true)`, which creates empty `<canvas>` elements. This means any WebGL/Canvas content in a "DOM" export (or mixed mode) renders as blank, breaking the "In-Browser Preview" parity.
+**Action:** DOM Export utilities must explicitly iterate and inline `<canvas>` content (via `toDataURL()`) into the cloned DOM, as browsers do not clone canvas bitmaps automatically.
