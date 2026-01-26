@@ -61,3 +61,7 @@
 ## 2026-02-25 - Node.js Runtime Crash
 **Learning:** Despite the vision claiming "runs in Node.js", the default `RafTicker` relies on `requestAnimationFrame`, causing `Helios` to crash or be unusable in pure Node environments.
 **Action:** Created plan `2026-02-25-CORE-NodeRuntime.md` to implement `TimeoutTicker` and auto-detect the environment to prevent crashes.
+
+## 2026-02-25 - Structured Errors Gap
+**Learning:** The README promises "Machine-readable, actionable errors", but the codebase uses generic `Error` objects. This hinders the "Agent Experience" by making diagnosis harder.
+**Action:** Created plan `2026-02-25-CORE-StructuredErrors.md` to implement `HeliosError` and `HeliosErrorCode`.
