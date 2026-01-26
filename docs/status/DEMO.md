@@ -1,5 +1,5 @@
 # Status: DEMO (Executor)
-**Version**: 1.22.0
+**Version**: 1.23.0
 
 ## Vision
 To provide comprehensive, idiomatic examples for every major framework (React, Vue, Svelte, Vanilla) and robust end-to-end testing to ensure the Helios engine delivers on its "Use What You Know" promise.
@@ -9,6 +9,7 @@ To provide comprehensive, idiomatic examples for every major framework (React, V
 - **Vanilla JS (DOM)**: ✅ `examples/simple-animation` exists and works.
 - **GSAP**: ✅ `examples/gsap-animation` exists and works.
 - **Framer Motion**: ✅ `examples/framer-motion-animation` exists and works.
+- **Lottie**: ✅ `examples/lottie-animation` exists and works.
 - **Animation Helpers**: ✅ `examples/animation-helpers` exists and works (Demonstrates `interpolate`, `spring`, `sequence`, `series`).
 - **React (Canvas)**: ✅ `examples/react-canvas-animation` exists and works.
 - **React (DOM)**: ✅ `examples/react-dom-animation` exists and works.
@@ -34,11 +35,13 @@ To provide comprehensive, idiomatic examples for every major framework (React, V
 - [x] Verify E2E tests for examples
 - [x] Verify DOM rendering example
 - [x] Scaffold Framer Motion Example
+- [x] Scaffold Lottie Animation Example
 
 ## Known Issues
 None.
 
 ## Log
+- [v1.23.0] ✅ Completed: Scaffold Lottie Animation Example - Created `examples/lottie-animation` demonstrating integration with `lottie-web` via time-based seeking.
 - [v1.22.0] ✅ Completed: Scaffold Framer Motion Example - Created `examples/framer-motion-animation` demonstrating integration with `framer-motion` via `useMotionValue` and manual time syncing.
 - [v1.21.0] ✅ Completed: GSAP Example - Created `examples/gsap-animation` demonstrating integration with GSAP timelines.
 - [v1.20.0] ✅ Completed: Refactor Simple Animation - Updated `examples/simple-animation` to use native CSS `@keyframes` and `autoSyncAnimations: true` instead of JS-driven CSS variables.
