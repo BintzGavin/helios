@@ -41,3 +41,11 @@
 ## [0.18.0] - HMR & Stale Controllers
 **Learning:** `Stage.tsx` in Studio was only checking for the controller once on mount/src-change. This meant that when HMR reloaded the iframe (creating a new controller), the Studio held a stale reference, breaking playback controls.
 **Action:** Implemented a continuous polling strategy in `Stage.tsx` to detect controller replacements and restore state. Future integrations with `helios-player` should be aware that the controller instance can change underneath the React component.
+
+## [0.23.0] - Schema Validation Access
+**Learning:** `packages/core` now supports `HeliosSchema`, but the `BridgeController` in `packages/player` does not expose it over the iframe bridge. This blocks the Studio from implementing the "Schema Validation" vision (Prop Editor UI generation) without cross-domain changes.
+**Action:** Created a dependency on Player/Core to expose schema in the bridge handshake. Studio planning for Props Editor Validation is paused until this upstream dependency is resolved.
+
+## [0.23.0] - Asset Management Gaps
+**Learning:** The Vision calls for "Manage assets", but the current `findAssets` implementation is read-only. True management requires `POST` (upload) and `DELETE` endpoints in the `vite-plugin-studio-api` middleware.
+**Action:** Planned `2026-03-07-STUDIO-Asset-Management.md` to implement these missing endpoints and the corresponding UI (Drag & Drop, Delete button).
