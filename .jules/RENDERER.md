@@ -39,3 +39,7 @@
 ## [1.6.0] - Incomplete Media Preloading
 **Learning:** `DomStrategy` preloading logic missed `<video>` and `<audio>` elements, which can cause blank frames.
 **Action:** Always consider all media types (`img`, `video`, `audio`, `iframe`) when implementing asset preloading strategies.
+
+## [2026-02-19] - DomStrategy Vision Deviation
+**Learning:** `DomStrategy` uses `SeekTimeDriver` (WAAPI) instead of `CdpTimeDriver` (CDP) as strictly required by the Vision ("Production Rendering... Uses CDP"). This was a workaround for `page.screenshot` compatibility.
+**Action:** Future plans must address this technical debt by fixing the underlying compatibility issue rather than accepting the deviation permanently.
