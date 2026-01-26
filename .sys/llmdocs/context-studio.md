@@ -71,7 +71,7 @@ packages/cli/
 
 ## C. CLI Interface
 The studio can be launched via the Helios CLI.
-- `npx helios studio`: Launches the Studio development server.
+- `npx helios studio`: Launches the Studio development server. Pass the current working directory as the project root.
 
 Internal scripts:
 - `npm run dev -w packages/studio`: Starts the development server directly.

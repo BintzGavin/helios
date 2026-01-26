@@ -1,5 +1,8 @@
 # Studio Progress Log
 
+## STUDIO v0.17.0
+- ✅ Completed: Inject HELIOS_PROJECT_ROOT in CLI - Modified CLI to pass user's CWD to Studio process, enabling "Studio as a Tool".
+
 ## STUDIO v0.16.0
 - ✅ Completed: Canvas Resolution Controls - Added UI controls for setting composition resolution (presets & custom) and updated `StudioContext` to manage `canvasSize`.
 
