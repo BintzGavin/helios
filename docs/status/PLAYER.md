@@ -1,4 +1,4 @@
-**Version**: 0.11.1
+**Version**: 0.12.0
 
 # Status: PLAYER
 
@@ -20,6 +20,7 @@
 ## Critical Task
 - **None**: Recent critical task completed. Await next assignment.
 
+[v0.12.0] ✅ Completed: Scrubber UX - Implemented improved scrubber interaction (pause on scrub, anti-jitter) to ensure smooth seeking without fighting the update loop.
 [v0.11.1] ✅ Completed: Dom Canvas Capture - Implemented `inlineCanvases` to replace `<canvas>` elements with data-URI images during DOM export, ensuring mixed content is preserved.
 [v0.11.0] ✅ Completed: Lock UI During Export - Disabled playback controls and keyboard shortcuts during client-side export to ensure data integrity.
 [v0.10.1] ✅ Completed: Bridge Documentation - Added README.md and improved connection error message to guide users towards `connectToParent`.

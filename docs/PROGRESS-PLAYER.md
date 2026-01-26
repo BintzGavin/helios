@@ -1,5 +1,8 @@
 # PLAYER Progress Log
 
+## PLAYER v0.12.0
+- ✅ Completed: Scrubber UX - Implemented improved scrubber interaction (pause on scrub, anti-jitter) to ensure smooth seeking without fighting the update loop.
+
 ## PLAYER v0.11.1
 - ✅ Completed: Dom Canvas Capture - Implemented `inlineCanvases` to replace `<canvas>` elements with data-URI images during DOM export, ensuring mixed content is preserved.
 
