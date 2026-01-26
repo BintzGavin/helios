@@ -18,6 +18,7 @@ const CASES = [
   { name: 'Svelte Helpers', relativePath: 'examples/svelte-animation-helpers/composition.html', mode: 'dom' as const },
   { name: 'Vue Helpers', relativePath: 'examples/vue-animation-helpers/composition.html', mode: 'dom' as const },
   { name: 'GSAP', relativePath: 'examples/gsap-animation/composition.html', mode: 'dom' as const },
+  { name: 'Framer Motion', relativePath: 'examples/framer-motion-animation/composition.html', mode: 'dom' as const },
 ];
 
 async function main() {
