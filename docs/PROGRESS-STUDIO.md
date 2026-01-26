@@ -1,5 +1,8 @@
 # Studio Progress Log
 
+## STUDIO v0.19.0
+- ✅ Completed: Hot Reload State Preservation - Implemented state restoration (frame, playback status) for `Stage` when HMR triggers a controller reload.
+
 ## STUDIO v0.18.0
 - ✅ Completed: Render Configuration UI - Added UI for selecting render mode (DOM/Canvas), bitrate, and codec, and updated backend to respect these settings.
 
