@@ -82,6 +82,48 @@ export interface CaptionCue {
   endTime: number;   // in milliseconds
   text: string;
 }
+
+export type ExtrapolateType = 'extend' | 'clamp' | 'identity';
+
+export interface InterpolateOptions {
+  extrapolateLeft?: ExtrapolateType;
+  extrapolateRight?: ExtrapolateType;
+  easing?: (t: number) => number;
+}
+
+export interface SpringConfig {
+  mass?: number;
+  stiffness?: number;
+  damping?: number;
+  overshootClamping?: boolean;
+}
+
+export interface SpringOptions {
+  frame: number;
+  fps: number;
+  config?: SpringConfig;
+  from?: number;
+  to?: number;
+  durationInFrames?: number;
+}
+
+export interface SequenceOptions {
+  frame: number;
+  from: number;
+  durationInFrames?: number;
+}
+
+export interface SequenceResult {
+  localFrame: number;
+  relativeFrame: number;
+  progress: number;
+  isActive: boolean;
+}
+
+export interface SeriesItem {
+  durationInFrames: number;
+  offset?: number;
+}
 ```
 
 ## D. Public Methods
@@ -132,4 +174,38 @@ class Helios {
   public bindToDocumentTimeline(): void;
   public unbindFromDocumentTimeline(): void;
 }
+```
+
+## E. Public Utilities
+
+```typescript
+/**
+ * Generates a deterministic random number between 0 and 1 based on a seed.
+ */
+export function random(seed: number | string): number;
+
+/**
+ * Maps an input value within a range to an output value.
+ */
+export function interpolate(
+  input: number,
+  inputRange: number[],
+  outputRange: number[],
+  options?: InterpolateOptions
+): number;
+
+/**
+ * Calculates the value of a spring physics simulation.
+ */
+export function spring(options: SpringOptions): number;
+
+/**
+ * Calculates the local time and progress of a sequence relative to a start frame.
+ */
+export function sequence(options: SequenceOptions): SequenceResult;
+
+/**
+ * Calculates a sequence of start frames for a list of items.
+ */
+export function series<T extends SeriesItem>(items: T[], startFrame?: number): (T & { from: number })[];
 ```
