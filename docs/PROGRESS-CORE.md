@@ -1,5 +1,8 @@
 # CORE Progress Log
 
+## CORE v1.21.0
+- ✅ Completed: Implement Deterministic Randomness - Added `random` utility with Mulberry32 PRNG and string seeding support.
+
 ## CORE v1.20.0
 - ✅ Completed: Implement Active Captions - Added `activeCaptions` signal, `setCaptions`, and `findActiveCues` with glitch-free updates.
 
