@@ -1,4 +1,4 @@
-**Version**: 0.12.0
+**Version**: 0.13.0
 
 # Status: PLAYER
 
@@ -16,10 +16,12 @@
 - Implements Robust DOM Export using XMLSerializer and SVG foreignObject, including external stylesheets.
 - Supports dynamic sizing via `width`/`height` attributes and `src` changes.
 - Supports standard keyboard shortcuts (Space/K, F, Arrows) and Fullscreen toggle.
+- Supports frame-by-frame navigation via `.` and `,` keys, and Shift modifier for 10-frame jumps.
 
 ## Critical Task
 - **Frame-by-Frame Controls**: Implement `.`/`,` shortcuts and refine Arrow key behavior for single-frame stepping. Plan: `/.sys/plans/2026-02-27-PLAYER-Frame-By-Frame-Controls.md`.
 
+[v0.13.0] ✅ Completed: Frame-by-Frame Controls - Implemented `.`/`,` for single-frame stepping and updated Arrow keys to default to 1 frame (10 with Shift).
 [v0.12.0] ✅ Completed: Scrubber UX - Implemented improved scrubber interaction (pause on scrub, anti-jitter) to ensure smooth seeking without fighting the update loop.
 [v0.11.1] ✅ Completed: Dom Canvas Capture - Implemented `inlineCanvases` to replace `<canvas>` elements with data-URI images during DOM export, ensuring mixed content is preserved.
 [v0.11.0] ✅ Completed: Lock UI During Export - Disabled playback controls and keyboard shortcuts during client-side export to ensure data integrity.

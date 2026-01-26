@@ -1,5 +1,8 @@
 # PLAYER Progress Log
 
+## PLAYER v0.13.0
+- ✅ Completed: Frame-by-Frame Controls - Implemented `.`/`,` for single-frame stepping and updated Arrow keys to default to 1 frame (10 with Shift).
+
 ## PLAYER v0.12.0
 - ✅ Completed: Scrubber UX - Implemented improved scrubber interaction (pause on scrub, anti-jitter) to ensure smooth seeking without fighting the update loop.
 

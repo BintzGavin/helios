@@ -484,12 +484,18 @@ export class HeliosPlayer extends HTMLElement {
       case "ArrowRight":
       case "l":
       case "L":
-        this.seekRelative(10);
+        this.seekRelative(e.shiftKey ? 10 : 1);
         break;
       case "ArrowLeft":
       case "j":
       case "J":
-        this.seekRelative(-10);
+        this.seekRelative(e.shiftKey ? -10 : -1);
+        break;
+      case ".":
+        this.seekRelative(1);
+        break;
+      case ",":
+        this.seekRelative(-1);
         break;
     }
   };

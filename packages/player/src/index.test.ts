@@ -84,11 +84,12 @@ describe('HeliosPlayer', () => {
     // Inject controller (using private access workaround)
     (player as any).setController(mockController);
 
-    const dispatchKey = (key: string) => {
+    const dispatchKey = (key: string, options: { shiftKey?: boolean } = {}) => {
         const event = new KeyboardEvent('keydown', {
             key,
             bubbles: true,
-            composed: true
+            composed: true,
+            shiftKey: options.shiftKey
         });
 
         // Mock composedPath to return [player] as if event originated/bubbled to host
@@ -120,15 +121,36 @@ describe('HeliosPlayer', () => {
     dispatchKey('f');
     expect(player.requestFullscreen).toHaveBeenCalled();
 
-    // ArrowRight: Seek +10
+    // Reset mocks
+    mockController.seek.mockClear();
+
+    // ArrowRight: Seek +1 (Default)
     mockController.getState.mockReturnValue({ currentFrame: 0, duration: 10, fps: 30, isPlaying: false });
     dispatchKey('ArrowRight');
+    expect(mockController.seek).toHaveBeenCalledWith(1);
+
+    // ArrowRight + Shift: Seek +10
+    dispatchKey('ArrowRight', { shiftKey: true });
     expect(mockController.seek).toHaveBeenCalledWith(10);
 
-    // ArrowLeft: Seek -10
+    // ArrowLeft: Seek -1 (Default)
     mockController.getState.mockReturnValue({ currentFrame: 20, duration: 10, fps: 30, isPlaying: false });
     dispatchKey('ArrowLeft');
-    expect(mockController.seek).toHaveBeenCalledWith(10);
+    expect(mockController.seek).toHaveBeenCalledWith(19); // 20 - 1
+
+    // ArrowLeft + Shift: Seek -10
+    dispatchKey('ArrowLeft', { shiftKey: true });
+    expect(mockController.seek).toHaveBeenCalledWith(10); // 20 - 10
+
+    // .: Seek +1
+    mockController.getState.mockReturnValue({ currentFrame: 10, duration: 10, fps: 30, isPlaying: false });
+    dispatchKey('.');
+    expect(mockController.seek).toHaveBeenCalledWith(11); // 10 + 1
+
+    // ,: Seek -1
+    mockController.getState.mockReturnValue({ currentFrame: 10, duration: 10, fps: 30, isPlaying: false });
+    dispatchKey(',');
+    expect(mockController.seek).toHaveBeenCalledWith(9); // 10 - 1
   });
 
   it('should allow keyboard events from non-input children but ignore inputs', () => {

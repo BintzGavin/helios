@@ -187,6 +187,8 @@ export class HeliosPlayer extends HTMLElement {
     connectionTimeout = null;
     abortController = null;
     isExporting = false;
+    isScrubbing = false;
+    wasPlayingBeforeScrub = false;
     static get observedAttributes() {
         return ["src", "width", "height", "autoplay", "loop", "controls"];
     }
@@ -231,6 +233,8 @@ export class HeliosPlayer extends HTMLElement {
         document.addEventListener("fullscreenchange", this.updateFullscreenUI);
         this.playPauseBtn.addEventListener("click", this.togglePlayPause);
         this.scrubber.addEventListener("input", this.handleScrubberInput);
+        this.scrubber.addEventListener("mousedown", this.handleScrubStart);
+        this.scrubber.addEventListener("change", this.handleScrubEnd);
         this.exportBtn.addEventListener("click", this.renderClientSide);
         this.speedSelector.addEventListener("change", this.handleSpeedChange);
         this.fullscreenBtn.addEventListener("click", this.toggleFullscreen);
@@ -250,6 +254,8 @@ export class HeliosPlayer extends HTMLElement {
         document.removeEventListener("fullscreenchange", this.updateFullscreenUI);
         this.playPauseBtn.removeEventListener("click", this.togglePlayPause);
         this.scrubber.removeEventListener("input", this.handleScrubberInput);
+        this.scrubber.removeEventListener("mousedown", this.handleScrubStart);
+        this.scrubber.removeEventListener("change", this.handleScrubEnd);
         this.exportBtn.removeEventListener("click", this.renderClientSide);
         this.speedSelector.removeEventListener("change", this.handleSpeedChange);
         this.fullscreenBtn.removeEventListener("click", this.toggleFullscreen);
@@ -388,6 +394,24 @@ export class HeliosPlayer extends HTMLElement {
             this.controller.seek(frame);
         }
     };
+    handleScrubStart = () => {
+        if (!this.controller)
+            return;
+        this.isScrubbing = true;
+        const state = this.controller.getState();
+        this.wasPlayingBeforeScrub = state.isPlaying;
+        if (this.wasPlayingBeforeScrub) {
+            this.controller.pause();
+        }
+    };
+    handleScrubEnd = () => {
+        if (!this.controller)
+            return;
+        this.isScrubbing = false;
+        if (this.wasPlayingBeforeScrub) {
+            this.controller.play();
+        }
+    };
     handleSpeedChange = () => {
         if (this.controller) {
             this.controller.setPlaybackRate(parseFloat(this.speedSelector.value));
@@ -424,12 +448,18 @@ export class HeliosPlayer extends HTMLElement {
             case "ArrowRight":
             case "l":
             case "L":
-                this.seekRelative(10);
+                this.seekRelative(e.shiftKey ? 10 : 1);
                 break;
             case "ArrowLeft":
             case "j":
             case "J":
-                this.seekRelative(-10);
+                this.seekRelative(e.shiftKey ? -10 : -1);
+                break;
+            case ".":
+                this.seekRelative(1);
+                break;
+            case ",":
+                this.seekRelative(-1);
                 break;
         }
     };
@@ -476,7 +506,9 @@ export class HeliosPlayer extends HTMLElement {
         else {
             this.playPauseBtn.textContent = state.isPlaying ? "❚❚" : "▶";
         }
-        this.scrubber.value = String(state.currentFrame);
+        if (!this.isScrubbing) {
+            this.scrubber.value = String(state.currentFrame);
+        }
         this.timeDisplay.textContent = `${(state.currentFrame / state.fps).toFixed(2)} / ${state.duration.toFixed(2)}`;
         if (state.playbackRate !== undefined) {
             this.speedSelector.value = String(state.playbackRate);
