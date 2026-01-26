@@ -31,3 +31,7 @@
 ## [v1.19.0] - Renderer Verification Failure
 **Learning:** E2E verification for DOM-based examples fails with `ReferenceError: __name is not defined` in `DomStrategy.ts`. This is caused by `tsx`/esbuild injecting a helper `__name` into the `prepare` function which is evaluated in the browser context where `__name` is undefined.
 **Action:** Reported to Core/Renderer domain. For now, verified changes by temporarily patching `DomStrategy.ts` to polyfill `__name`. Future verifications will fail until this is fixed in Renderer.
+
+## [v1.23.0] - Specificity in Planning
+**Learning:** When requesting an Executor to modify configuration files (like `vite.build-example.config.js`), broad instructions ("Add the new example") are rejected. The Planner must provide the specific code snippets (e.g., exact object properties) to be inserted.
+**Action:** Always include exact code insertion blocks in "Implementation Spec" when modifying existing files.
