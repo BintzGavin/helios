@@ -184,6 +184,7 @@ export class HeliosPlayer extends HTMLElement {
   private overlay: HTMLElement;
   private statusText: HTMLElement;
   private retryBtn: HTMLButtonElement;
+  private retryAction: () => void;
   private speedSelector: HTMLSelectElement;
   private fullscreenBtn: HTMLButtonElement;
 
@@ -217,7 +218,8 @@ export class HeliosPlayer extends HTMLElement {
     this.speedSelector = this.shadowRoot!.querySelector(".speed-selector")!;
     this.fullscreenBtn = this.shadowRoot!.querySelector(".fullscreen-btn")!;
 
-    this.retryBtn.onclick = () => this.retryConnection();
+    this.retryAction = () => this.retryConnection();
+    this.retryBtn.onclick = () => this.retryAction();
   }
 
   attributeChangedCallback(name: string, oldVal: string, newVal: string) {
@@ -567,10 +569,18 @@ export class HeliosPlayer extends HTMLElement {
 
   // --- Loading / Error UI Helpers ---
 
-  private showStatus(msg: string, isError: boolean) {
+  private showStatus(msg: string, isError: boolean, action?: { label: string, handler: () => void }) {
     this.overlay.classList.remove("hidden");
     this.statusText.textContent = msg;
     this.retryBtn.style.display = isError ? "block" : "none";
+
+    if (action) {
+      this.retryBtn.textContent = action.label;
+      this.retryAction = action.handler;
+    } else {
+      this.retryBtn.textContent = "Retry";
+      this.retryAction = () => this.retryConnection();
+    }
 
     // Optional: Add visual distinction for errors beyond just the button
     this.statusText.classList.toggle('error-msg', isError);
@@ -628,8 +638,13 @@ export class HeliosPlayer extends HTMLElement {
             canvasSelector: canvasSelector
         });
     } catch (e: any) {
+        if (e.message !== "Export aborted") {
+          this.showStatus("Export Failed: " + e.message, true, {
+            label: "Dismiss",
+            handler: () => this.hideStatus()
+          });
+        }
         console.error("Export failed or aborted", e);
-        // Error handling is mostly done inside exporter, but we should reset UI
     } finally {
         this.isExporting = false;
         this.lockPlaybackControls(false);

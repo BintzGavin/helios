@@ -154,19 +154,19 @@ template.innerHTML = `
     <div class="status-text">Connecting...</div>
     <button class="retry-btn" style="display: none">Retry</button>
   </div>
-  <iframe part="iframe" sandbox="allow-scripts allow-same-origin"></iframe>
-  <div class="controls">
-    <button class="play-pause-btn" part="play-pause-button">▶</button>
-    <button class="export-btn" part="export-button">Export</button>
-    <select class="speed-selector" part="speed-selector">
+  <iframe part="iframe" sandbox="allow-scripts allow-same-origin" title="Helios Composition Preview"></iframe>
+  <div class="controls" role="toolbar" aria-label="Playback Controls">
+    <button class="play-pause-btn" part="play-pause-button" aria-label="Play">▶</button>
+    <button class="export-btn" part="export-button" aria-label="Export video">Export</button>
+    <select class="speed-selector" part="speed-selector" aria-label="Playback speed">
       <option value="0.25">0.25x</option>
       <option value="0.5">0.5x</option>
       <option value="1" selected>1x</option>
       <option value="2">2x</option>
     </select>
-    <input type="range" class="scrubber" min="0" value="0" step="1" part="scrubber">
+    <input type="range" class="scrubber" min="0" value="0" step="1" part="scrubber" aria-label="Seek time">
     <div class="time-display" part="time-display">0.00 / 0.00</div>
-    <button class="fullscreen-btn" part="fullscreen-button">⛶</button>
+    <button class="fullscreen-btn" part="fullscreen-button" aria-label="Toggle fullscreen">⛶</button>
   </div>
 `;
 export class HeliosPlayer extends HTMLElement {
@@ -178,6 +178,7 @@ export class HeliosPlayer extends HTMLElement {
     overlay;
     statusText;
     retryBtn;
+    retryAction;
     speedSelector;
     fullscreenBtn;
     controller = null;
@@ -206,7 +207,8 @@ export class HeliosPlayer extends HTMLElement {
         this.retryBtn = this.shadowRoot.querySelector(".retry-btn");
         this.speedSelector = this.shadowRoot.querySelector(".speed-selector");
         this.fullscreenBtn = this.shadowRoot.querySelector(".fullscreen-btn");
-        this.retryBtn.onclick = () => this.retryConnection();
+        this.retryAction = () => this.retryConnection();
+        this.retryBtn.onclick = () => this.retryAction();
     }
     attributeChangedCallback(name, oldVal, newVal) {
         if (oldVal === newVal)
@@ -502,23 +504,39 @@ export class HeliosPlayer extends HTMLElement {
         }
         if (isFinished) {
             this.playPauseBtn.textContent = "🔄"; // Restart button
+            this.playPauseBtn.setAttribute("aria-label", "Restart");
         }
         else {
             this.playPauseBtn.textContent = state.isPlaying ? "❚❚" : "▶";
+            this.playPauseBtn.setAttribute("aria-label", state.isPlaying ? "Pause" : "Play");
         }
         if (!this.isScrubbing) {
             this.scrubber.value = String(state.currentFrame);
         }
-        this.timeDisplay.textContent = `${(state.currentFrame / state.fps).toFixed(2)} / ${state.duration.toFixed(2)}`;
+        const currentTime = (state.currentFrame / state.fps).toFixed(2);
+        const totalTime = state.duration.toFixed(2);
+        this.timeDisplay.textContent = `${currentTime} / ${totalTime}`;
+        this.scrubber.setAttribute("aria-valuenow", String(state.currentFrame));
+        this.scrubber.setAttribute("aria-valuemin", "0");
+        this.scrubber.setAttribute("aria-valuemax", String(state.duration * state.fps));
+        this.scrubber.setAttribute("aria-valuetext", `${currentTime} of ${totalTime} seconds`);
         if (state.playbackRate !== undefined) {
             this.speedSelector.value = String(state.playbackRate);
         }
     }
     // --- Loading / Error UI Helpers ---
-    showStatus(msg, isError) {
+    showStatus(msg, isError, action) {
         this.overlay.classList.remove("hidden");
         this.statusText.textContent = msg;
         this.retryBtn.style.display = isError ? "block" : "none";
+        if (action) {
+            this.retryBtn.textContent = action.label;
+            this.retryAction = action.handler;
+        }
+        else {
+            this.retryBtn.textContent = "Retry";
+            this.retryAction = () => this.retryConnection();
+        }
         // Optional: Add visual distinction for errors beyond just the button
         this.statusText.classList.toggle('error-msg', isError);
     }
@@ -566,8 +584,13 @@ export class HeliosPlayer extends HTMLElement {
             });
         }
         catch (e) {
+            if (e.message !== "Export aborted") {
+                this.showStatus("Export Failed: " + e.message, true, {
+                    label: "Dismiss",
+                    handler: () => this.hideStatus()
+                });
+            }
             console.error("Export failed or aborted", e);
-            // Error handling is mostly done inside exporter, but we should reset UI
         }
         finally {
             this.isExporting = false;

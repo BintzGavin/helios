@@ -9,6 +9,7 @@ export declare class HeliosPlayer extends HTMLElement {
     private overlay;
     private statusText;
     private retryBtn;
+    private retryAction;
     private speedSelector;
     private fullscreenBtn;
     private controller;

@@ -8,7 +8,7 @@
 ## Component Structure
 The `<helios-player>` component utilizes Shadow DOM for isolation.
 - **Root**: Host element (block display, relative positioning).
-- **Status Overlay**: Handles "Connecting...", "Loading...", and Error states (with Retry).
+- **Status Overlay**: Handles "Connecting...", "Loading...", and Error states (with Retry or Dismiss actions).
 - **Iframe**: Sandboxed execution environment for the user's content (`sandbox="allow-scripts allow-same-origin"`).
 - **Controls Overlay**:
   - Play/Pause / Restart Button

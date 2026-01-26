@@ -1,4 +1,4 @@
-**Version**: 0.14.0
+**Version**: 0.15.0
 
 # Status: PLAYER
 
@@ -17,10 +17,12 @@
 - Supports dynamic sizing via `width`/`height` attributes and `src` changes.
 - Supports standard keyboard shortcuts (Space/K, F, Arrows) and Fullscreen toggle.
 - Supports frame-by-frame navigation via `.` and `,` keys, and Shift modifier for 10-frame jumps.
+- Displays actionable error messages with "Dismiss" option for failed client-side exports.
 
 ## Critical Task
 - **None**: Ready for new assignments.
 
+[v0.15.0] ✅ Completed: Export UX - Implemented Error Overlay with "Dismiss" action for client-side export failures, providing visibility into errors like unsupported codecs.
 [v0.14.0] ✅ Completed: Accessibility Improvements - Implemented ARIA labels and roles for controls, including dynamic updates for play state and scrubber time.
 [v0.13.0] ✅ Completed: Frame-by-Frame Controls - Implemented `.`/`,` for single-frame stepping and updated Arrow keys to default to 1 frame (10 with Shift).
 [v0.12.0] ✅ Completed: Scrubber UX - Implemented improved scrubber interaction (pause on scrub, anti-jitter) to ensure smooth seeking without fighting the update loop.
