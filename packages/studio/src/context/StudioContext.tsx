@@ -26,6 +26,7 @@ export interface RenderJob {
   status: 'queued' | 'rendering' | 'completed' | 'failed' | 'cancelled';
   progress: number; // 0-1
   compositionId: string;
+  outputPath?: string;
   outputUrl?: string;
   error?: string;
   createdAt: number;

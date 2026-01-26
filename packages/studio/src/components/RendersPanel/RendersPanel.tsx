@@ -96,7 +96,28 @@ export const RendersPanel: React.FC = () => {
             </div>
           )}
           {job.status === 'completed' && (
-             <div style={{ fontSize: '10px', color: '#4caf50' }}>Done</div>
+             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '4px' }}>
+                <div style={{ fontSize: '10px', color: '#4caf50' }}>Done</div>
+                {job.outputUrl && (
+                    <a
+                        href={job.outputUrl}
+                        download
+                        target="_blank"
+                        rel="noreferrer"
+                        style={{
+                            fontSize: '10px',
+                            color: '#66b2ff',
+                            textDecoration: 'none',
+                            border: '1px solid #66b2ff',
+                            padding: '2px 6px',
+                            borderRadius: '4px',
+                            background: 'rgba(0, 123, 255, 0.1)'
+                        }}
+                    >
+                        Download
+                    </a>
+                )}
+             </div>
           )}
           {job.status === 'cancelled' && (
              <div style={{ fontSize: '10px', color: '#ff9800' }}>Cancelled</div>

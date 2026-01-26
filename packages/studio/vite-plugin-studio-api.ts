@@ -1,5 +1,7 @@
 import { Plugin } from 'vite';
 import { AddressInfo } from 'net';
+import fs from 'fs';
+import path from 'path';
 import { findCompositions, findAssets } from './src/server/discovery';
 import { startRender, getJob, getJobs, cancelJob, deleteJob } from './src/server/render-manager';
 
@@ -72,6 +74,33 @@ export function studioApiPlugin(): Plugin {
             }
             return;
           }
+        }
+        next();
+      });
+
+      server.middlewares.use('/api/renders', async (req, res, next) => {
+        const match = req.url!.match(/^\/([^\/]+)$/);
+        if (match) {
+            const filename = match[1];
+            // Security check: simple basename check to avoid traversal
+            if (filename.includes('/') || filename.includes('\\') || filename.includes('..')) {
+                res.statusCode = 400;
+                res.end('Invalid filename');
+                return;
+            }
+
+            const rendersDir = path.resolve(process.cwd(), 'renders');
+            const filePath = path.join(rendersDir, filename);
+
+            if (fs.existsSync(filePath)) {
+                res.setHeader('Content-Type', 'video/mp4');
+                const stream = fs.createReadStream(filePath);
+                stream.pipe(res);
+            } else {
+                res.statusCode = 404;
+                res.end('File not found');
+            }
+            return;
         }
         next();
       });

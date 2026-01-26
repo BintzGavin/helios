@@ -9,6 +9,7 @@ export interface RenderJob {
   progress: number;
   compositionId: string; // The URL/Path
   outputPath?: string;
+  outputUrl?: string;
   error?: string;
   createdAt: number;
   inPoint?: number;
@@ -42,6 +43,7 @@ export async function startRender(options: StartRenderOptions, serverPort: numbe
   }
 
   const outputPath = path.resolve(rendersDir, `render-${jobId}.mp4`);
+  const outputUrl = `/api/renders/render-${jobId}.mp4`;
 
   const job: RenderJob = {
     id: jobId,
@@ -49,6 +51,7 @@ export async function startRender(options: StartRenderOptions, serverPort: numbe
     progress: 0,
     compositionId: options.compositionUrl,
     outputPath,
+    outputUrl,
     createdAt: Date.now(),
     inPoint: options.inPoint,
     outPoint: options.outPoint

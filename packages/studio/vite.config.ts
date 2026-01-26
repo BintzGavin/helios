@@ -20,8 +20,8 @@ export default defineConfig({
   },
   server: {
     fs: {
-      // Allow serving files from the project root
-      allow: [projectRoot]
+      // Allow serving files from the repository root (simplifies dev)
+      allow: [path.resolve(__dirname, '../../')]
     }
   }
 })
