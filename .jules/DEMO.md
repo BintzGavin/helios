@@ -43,3 +43,7 @@
 ## [1.26.1] - Captions Support Discovery
 **Learning:** The README claims "Captions/subtitles: Not yet", but `packages/core` has full SRT parsing and state management (`activeCaptions`). This feature is hidden/undocumented.
 **Action:** Created `examples/captions-animation` to expose this feature. Future plans should check source code before assuming "Not yet" in README is accurate for Core capabilities.
+
+## [1.28.2] - Input Props Gap
+**Learning:** The Core supports `inputProps` and `schema` validation, and the README highlights this as a feature ("Props editor with schema validation" planned). However, no example demonstrated how to use these features, creating a gap for users wanting parametrized compositions.
+**Action:** Created `examples/dynamic-props-animation` plan to bridge this gap.
