@@ -1,5 +1,8 @@
 # CORE Progress Log
 
+## CORE v1.22.0
+- ✅ Completed: Expand Input Schema Validation - Added `minimum`, `maximum`, and `enum` constraints to `HeliosSchema` and updated `validateProps`.
+
 ## CORE v1.21.0
 - ✅ Completed: Implement Deterministic Randomness - Added `random` utility with Mulberry32 PRNG and string seeding support.
 

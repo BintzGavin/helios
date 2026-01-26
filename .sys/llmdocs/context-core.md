@@ -50,6 +50,11 @@ export interface PropDefinition {
   type: PropType;
   optional?: boolean;
   default?: any;
+  minimum?: number;
+  maximum?: number;
+  enum?: (string | number)[];
+  label?: string;
+  description?: string;
 }
 
 export type HeliosSchema = Record<string, PropDefinition>;
