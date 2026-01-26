@@ -1,4 +1,4 @@
-**Version**: 0.10.0
+**Version**: 0.10.1
 
 # Status: PLAYER
 
@@ -20,6 +20,7 @@
 ## Critical Task
 - **None**: Recent critical task completed. Await next assignment.
 
+[v0.10.1] ✅ Completed: Bridge Documentation - Added README.md and improved connection error message to guide users towards `connectToParent`.
 [v0.10.0] ✅ Completed: CSS Asset Inlining - Implemented parsing and inlining of assets (images, fonts) referenced in CSS via `url()` as Data URIs for robust DOM export.
 [v0.9.0] ✅ Completed: Client-Side Image Inlining - Implemented fetching and inlining of `<img>` and `background-image` sources as Data URIs for robust DOM export.
 [v0.8.1] ✅ Completed: Scaffold Tests (Update) - Added tests for invalid VideoEncoder configurations and verified test suite.
