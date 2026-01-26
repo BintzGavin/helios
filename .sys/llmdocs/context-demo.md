@@ -15,6 +15,7 @@
 | `examples/animation-helpers` | Vanilla JS reference for `interpolate`, `spring`, `sequence`, `series`. | Canvas |
 | `examples/react-canvas-animation` | React canvas animation. | Canvas |
 | `examples/react-dom-animation` | React DOM animation. | DOM |
+| `examples/react-css-animation` | React CSS animation via `autoSyncAnimations`. | DOM |
 | `examples/react-animation-helpers` | React helpers (`<Sequence>`, `<Series>`) for composition. | DOM |
 | `examples/vue-canvas-animation` | Vue canvas animation. | Canvas |
 | `examples/vue-dom-animation` | Vue DOM animation. | DOM |

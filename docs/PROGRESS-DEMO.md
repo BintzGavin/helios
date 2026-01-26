@@ -45,3 +45,6 @@
 
 ## DEMO v1.28.0
 - ✅ Completed: Scaffold Signals Animation Example - Created `examples/signals-animation` demonstrating fine-grained reactivity using core signals.
+
+## DEMO v1.29.0
+- ✅ Completed: Scaffold React CSS Animation Example - Created `examples/react-css-animation` demonstrating standard CSS animations with `autoSyncAnimations: true`.

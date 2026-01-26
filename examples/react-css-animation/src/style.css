@@ -1,0 +1,30 @@
+body { margin: 0; background: #222; overflow: hidden; }
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+.box {
+  width: 150px;
+  height: 150px;
+  background: #61dafb;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: sans-serif;
+  font-weight: bold;
+  font-size: 1.5rem;
+  color: #222;
+  border-radius: 12px;
+}
+
+@keyframes slideAndRotate {
+  0% { transform: translateX(-200px) rotate(0deg); opacity: 0; }
+  50% { opacity: 1; }
+  100% { transform: translateX(200px) rotate(360deg); opacity: 0.5; }
+}
+
+.moving-box {
+  animation: slideAndRotate 5s linear forwards;
+}
