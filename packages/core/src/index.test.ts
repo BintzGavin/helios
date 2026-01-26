@@ -404,4 +404,71 @@ describe('Helios Core', () => {
       expect(subscriber).toBeDefined();
     });
   });
+
+  describe('Resource Disposal', () => {
+    it('should stop the ticker on dispose', () => {
+      const mockTicker = { start: vi.fn(), stop: vi.fn() };
+      const helios = new Helios({ duration: 10, fps: 30, ticker: mockTicker });
+
+      helios.play();
+      expect(mockTicker.start).toHaveBeenCalled();
+
+      helios.dispose();
+      expect(mockTicker.stop).toHaveBeenCalled();
+    });
+
+    it('should stop playback on dispose', () => {
+      const helios = new Helios({ duration: 10, fps: 30 });
+      helios.play();
+      expect(helios.getState().isPlaying).toBe(true);
+
+      helios.dispose();
+      expect(helios.getState().isPlaying).toBe(false);
+    });
+
+    it('should release all subscribers on dispose', () => {
+      const helios = new Helios({ duration: 10, fps: 30 });
+      const spy = vi.fn();
+
+      helios.subscribe(spy);
+      helios.setInputProps({ foo: 'bar' });
+      expect(spy).toHaveBeenLastCalledWith(expect.objectContaining({ inputProps: { foo: 'bar' } }));
+
+      helios.dispose();
+
+      // Should not trigger subscriber after dispose
+      helios.setInputProps({ foo: 'baz' });
+      expect(spy).not.toHaveBeenLastCalledWith(expect.objectContaining({ inputProps: { foo: 'baz' } }));
+      // Ensure it wasn't called again (call count check)
+      const callsBefore = spy.mock.calls.length;
+      helios.setInputProps({ foo: 'qux' });
+      expect(spy.mock.calls.length).toBe(callsBefore);
+    });
+
+    it('should unbind from document timeline on dispose', async () => {
+      vi.stubGlobal('document', {
+          timeline: { currentTime: 0 }
+      });
+      vi.stubGlobal('requestAnimationFrame', (cb: any) => setTimeout(cb, 0));
+      vi.stubGlobal('cancelAnimationFrame', (id: any) => clearTimeout(id));
+
+      const helios = new Helios({ duration: 10, fps: 30 });
+      helios.bindToDocumentTimeline();
+
+      (document.timeline as any).currentTime = 1000;
+      await new Promise(resolve => setTimeout(resolve, 50));
+      expect(helios.getState().currentFrame).toBe(30);
+
+      helios.dispose();
+
+      // Change time again
+      (document.timeline as any).currentTime = 2000;
+      await new Promise(resolve => setTimeout(resolve, 50));
+
+      // Should NOT have updated
+      expect(helios.getState().currentFrame).toBe(30);
+
+      vi.unstubAllGlobals();
+    });
+  });
 });

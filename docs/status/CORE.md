@@ -1,10 +1,10 @@
 # Status: CORE
 
-**Version**: 1.15.0
+**Version**: 1.16.0
 
 - **Status**: Active
 - **Current Focus**: Maintenance and Optimization
-- **Last Updated**: 2026-02-25
+- **Last Updated**: 2026-02-26
 
 [2026-01-21] ✅ Completed: Implement Helios.diagnose() - Implemented static diagnose method and DiagnosticReport interface
 [2026-01-22] 🔍 Discovery: Verified removal of `animation-helpers.ts` and identified missing `test` script in `packages/core`.
@@ -26,6 +26,7 @@
 [v1.13.0] ✅ Completed: Export Types - Exported `HeliosState` and `HeliosSubscriber` types from `packages/core` to improve DX.
 [v1.14.0] ✅ Completed: Enable Node.js Runtime Support - Implemented `TimeoutTicker` and environment detection for Node.js compatibility.
 [v1.15.0] ✅ Completed: Implement Structured Errors - Implemented `HeliosError` and `HeliosErrorCode` to provide machine-parseable errors.
+[v1.16.0] ✅ Completed: Implement Helios Disposal - Added `dispose()` method to `Helios` for proper resource cleanup (tickers, polling loops, subscribers).
 
 **Next Steps**:
 - None.
