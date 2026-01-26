@@ -187,6 +187,7 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           height: canvasSize.height,
           inPoint: options?.inPoint,
           outPoint: options?.outPoint,
+          inputProps: playerState.inputProps,
           ...renderConfig
         })
       });

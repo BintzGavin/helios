@@ -1,5 +1,8 @@
 # Studio Progress Log
 
+## STUDIO v0.20.0
+- ✅ Completed: Pass inputProps to Render Job - Updated `StudioContext` and `render-manager` to forward `inputProps` from the player state to the backend and Renderer.
+
 ## STUDIO v0.19.0
 - ✅ Completed: Hot Reload State Preservation - Implemented state restoration (frame, playback status) for `Stage` when HMR triggers a controller reload.
 
