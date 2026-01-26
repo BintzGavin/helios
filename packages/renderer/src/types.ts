@@ -50,6 +50,12 @@ export interface RendererOptions {
    * If provided, overrides CRF for some codecs.
    */
   videoBitrate?: string;
+
+  /**
+   * Path to the FFmpeg binary.
+   * Defaults to the binary provided by @ffmpeg-installer/ffmpeg.
+   */
+  ffmpegPath?: string;
 }
 
 export interface RenderJobOptions {
