@@ -1,5 +1,8 @@
 # RENDERER Progress Log
 
+## RENDERER v1.18.0
+- ✅ Completed: Audio Mixing - Added `audioTracks` to `RendererOptions` and implemented `FFmpegBuilder` to support mixing multiple audio tracks using the `amix` filter, enabling background music and voiceover mixing.
+
 ## RENDERER v1.17.0
 - ✅ Completed: Enable Transparent Canvas - Updated `CanvasStrategy` to infer transparency from `pixelFormat` (e.g., `yuva420p`) and configure `VideoEncoder` with `alpha: 'keep'`, enabling transparent video rendering in Canvas mode.
 

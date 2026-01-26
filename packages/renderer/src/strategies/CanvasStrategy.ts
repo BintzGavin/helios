@@ -1,6 +1,7 @@
 import { Page } from 'playwright';
 import { RenderStrategy } from './RenderStrategy';
 import { RendererOptions } from '../types';
+import { FFmpegBuilder } from '../utils/FFmpegBuilder';
 
 export class CanvasStrategy implements RenderStrategy {
   private useWebCodecs = false;
@@ -315,49 +316,6 @@ export class CanvasStrategy implements RenderStrategy {
       ? ['-f', 'ivf', '-i', '-']
       : ['-f', 'image2pipe', '-framerate', `${options.fps}`, '-i', '-'];
 
-    let audioInputArgs: string[] = [];
-    if (options.audioFilePath) {
-      if (options.startFrame && options.startFrame > 0) {
-        const startTime = options.startFrame / options.fps;
-        audioInputArgs = ['-ss', startTime.toString(), '-i', options.audioFilePath];
-      } else {
-        audioInputArgs = ['-i', options.audioFilePath];
-      }
-    }
-
-    // Use -t instead of -shortest to ensure video duration matches exact animation length,
-    // even if audio is shorter (silence) or longer (cut).
-    const audioOutputArgs = options.audioFilePath
-      ? ['-c:a', 'aac', '-map', '0:v', '-map', '1:a', '-t', options.durationInSeconds.toString()]
-      : [];
-
-    const videoCodec = options.videoCodec || 'libx264';
-    const pixelFormat = options.pixelFormat || 'yuv420p';
-
-    const encodingArgs: string[] = [
-      '-c:v', videoCodec,
-      '-pix_fmt', pixelFormat,
-      '-movflags', '+faststart',
-    ];
-
-    if (options.crf !== undefined) {
-      encodingArgs.push('-crf', options.crf.toString());
-    }
-
-    if (options.preset) {
-      encodingArgs.push('-preset', options.preset);
-    }
-
-    if (options.videoBitrate) {
-      encodingArgs.push('-b:v', options.videoBitrate);
-    }
-
-    const outputArgs = [
-      ...encodingArgs,
-      ...audioOutputArgs,
-      outputPath,
-    ];
-
-    return ['-y', ...videoInputArgs, ...audioInputArgs, ...outputArgs];
+    return FFmpegBuilder.getArgs(options, outputPath, videoInputArgs);
   }
 }

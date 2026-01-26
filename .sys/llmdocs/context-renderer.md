@@ -26,6 +26,8 @@ packages/renderer/
 │   │   ├── CanvasStrategy.ts
 │   │   ├── DomStrategy.ts
 │   │   └── RenderStrategy.ts
+│   ├── utils/
+│   │   └── FFmpegBuilder.ts
 │   ├── concat.ts
 │   ├── index.ts
 │   └── types.ts
@@ -48,6 +50,7 @@ interface RendererOptions {
   mode?: 'canvas' | 'dom';
   startFrame?: number;
   audioFilePath?: string;
+  audioTracks?: string[];
   videoCodec?: string;
   pixelFormat?: string;
   crf?: number;
@@ -69,4 +72,5 @@ interface RenderJobOptions {
 The renderer pipes raw frames to FFmpeg via `stdin`.
 Default flags: `-c:v libx264 -pix_fmt yuv420p -crf 23 -preset medium`.
 Arguments are configurable via `RendererOptions`.
+Supports mixing multiple audio tracks via `amix` filter, centrally managed by `FFmpegBuilder`.
 Includes a `concatenateVideos` utility for stitching multiple video files.
