@@ -58,10 +58,10 @@ Stop reinventing animation in JavaScript. Use the platform.
 
 The history of software teaches a consistent lesson: **betting on native platform capabilities almost always beats simulation.**
 
-- Native mobile apps outperformed PhoneGap wrappers
-- CSS Grid replaced JavaScript layout libraries  
-- Browser `fetch()` displaced jQuery AJAX
-- Web Components are outliving many JavaScript frameworks
+- CSS animations replaced jQuery `.animate()` and JS-driven motion
+- Native `<video>` and `<audio>` killed Flash
+- IntersectionObserver replaced expensive scroll-listener hacks
+- CSS Scroll Snap is displacing JavaScript carousel libraries
 
 When the platform catches up, the abstractions built to work around it become legacy debt.
 
