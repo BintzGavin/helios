@@ -12,6 +12,7 @@ The `<helios-player>` component utilizes Shadow DOM for isolation.
 - **Iframe**: Sandboxed execution environment for the user's content (`sandbox="allow-scripts allow-same-origin"`).
 - **Controls Overlay**:
   - Play/Pause / Restart Button
+  - Volume Control (Mute Toggle + Slider)
   - Export / Cancel Button
   - Speed Selector (0.25x - 2x)
   - Scrubber (Input Range)

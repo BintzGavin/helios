@@ -1,5 +1,5 @@
-import { captureDomToBitmap } from "./features/dom-capture";
-import { getAudioAssets } from "./features/audio-utils";
+import { captureDomToBitmap } from "./features/dom-capture.js";
+import { getAudioAssets } from "./features/audio-utils.js";
 export function connectToParent(helios) {
     // 1. Listen for messages from parent
     window.addEventListener('message', async (event) => {
@@ -29,6 +29,16 @@ export function connectToParent(helios) {
             case 'HELIOS_SET_PLAYBACK_RATE':
                 if (typeof event.data.rate === 'number') {
                     helios.setPlaybackRate(event.data.rate);
+                }
+                break;
+            case 'HELIOS_SET_VOLUME':
+                if (typeof event.data.volume === 'number') {
+                    helios.setAudioVolume(event.data.volume);
+                }
+                break;
+            case 'HELIOS_SET_MUTED':
+                if (typeof event.data.muted === 'boolean') {
+                    helios.setAudioMuted(event.data.muted);
                 }
                 break;
             case 'HELIOS_SET_PROPS':

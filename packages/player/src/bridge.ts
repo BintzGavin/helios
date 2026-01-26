@@ -33,6 +33,16 @@ export function connectToParent(helios: Helios) {
             helios.setPlaybackRate(event.data.rate);
         }
         break;
+      case 'HELIOS_SET_VOLUME':
+        if (typeof event.data.volume === 'number') {
+            helios.setAudioVolume(event.data.volume);
+        }
+        break;
+      case 'HELIOS_SET_MUTED':
+        if (typeof event.data.muted === 'boolean') {
+            helios.setAudioMuted(event.data.muted);
+        }
+        break;
       case 'HELIOS_SET_PROPS':
         if (event.data.props) {
             helios.setInputProps(event.data.props);
