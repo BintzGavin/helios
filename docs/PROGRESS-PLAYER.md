@@ -1,5 +1,8 @@
 # PLAYER Progress Log
 
+## PLAYER v0.11.0
+- ✅ Completed: Lock UI During Export - Disabled playback controls and keyboard shortcuts during client-side export to ensure data integrity.
+
 ## PLAYER v0.10.1
 - ✅ Completed: Bridge Documentation - Added README.md and improved connection error message to guide users towards `connectToParent`.
 

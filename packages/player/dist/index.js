@@ -186,6 +186,7 @@ export class HeliosPlayer extends HTMLElement {
     unsubscribe = null;
     connectionTimeout = null;
     abortController = null;
+    isExporting = false;
     static get observedAttributes() {
         return ["src", "width", "height", "autoplay", "loop", "controls"];
     }
@@ -269,6 +270,12 @@ export class HeliosPlayer extends HTMLElement {
         if (disabled) {
             this.exportBtn.disabled = true;
         }
+    }
+    lockPlaybackControls(locked) {
+        this.playPauseBtn.disabled = locked;
+        this.scrubber.disabled = locked;
+        this.speedSelector.disabled = locked;
+        this.fullscreenBtn.disabled = locked;
     }
     handleIframeLoad = () => {
         if (!this.iframe.contentWindow)
@@ -387,6 +394,8 @@ export class HeliosPlayer extends HTMLElement {
         }
     };
     handleKeydown = (e) => {
+        if (this.isExporting)
+            return;
         // Allow bubbling from children (like buttons), but ignore inputs
         const target = e.composedPath()[0];
         if (target && target.tagName) {
@@ -509,6 +518,8 @@ export class HeliosPlayer extends HTMLElement {
         }
         this.abortController = new AbortController();
         this.exportBtn.textContent = "Cancel";
+        this.isExporting = true;
+        this.lockPlaybackControls(true);
         const exporter = new ClientSideExporter(this.controller, this.iframe);
         const exportMode = (this.getAttribute("export-mode") || "auto");
         const canvasSelector = this.getAttribute("canvas-selector") || "canvas";
@@ -527,6 +538,8 @@ export class HeliosPlayer extends HTMLElement {
             // Error handling is mostly done inside exporter, but we should reset UI
         }
         finally {
+            this.isExporting = false;
+            this.lockPlaybackControls(false);
             this.exportBtn.textContent = "Export";
             this.exportBtn.disabled = false;
             this.abortController = null;
