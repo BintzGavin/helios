@@ -74,6 +74,10 @@ interface StudioContextType {
   // Studio UI State
   loop: boolean;
   toggleLoop: () => void;
+
+  // Canvas
+  canvasSize: { width: number; height: number };
+  setCanvasSize: (size: { width: number; height: number }) => void;
 }
 
 const StudioContext = createContext<StudioContextType | undefined>(undefined);
@@ -83,6 +87,7 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [assets, setAssets] = useState<Asset[]>([]);
   const [activeComposition, setActiveComposition] = useState<Composition | null>(null);
   const [isSwitcherOpen, setSwitcherOpen] = useState(false);
+  const [canvasSize, setCanvasSize] = useState({ width: 1920, height: 1080 });
 
   const [renderJobs, setRenderJobs] = useState<RenderJob[]>([]);
 
@@ -167,8 +172,8 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           compositionUrl: comp.url,
           fps,
           duration,
-          width: 1920, // TODO: Get from player state/config
-          height: 1080,
+          width: canvasSize.width,
+          height: canvasSize.height,
           inPoint: options?.inPoint,
           outPoint: options?.outPoint
         })
@@ -204,7 +209,9 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         playerState,
         setPlayerState,
         loop,
-        toggleLoop
+        toggleLoop,
+        canvasSize,
+        setCanvasSize
       }}
     >
       {children}
