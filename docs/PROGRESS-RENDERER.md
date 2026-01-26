@@ -1,5 +1,8 @@
 # RENDERER Progress Log
 
+## RENDERER v1.12.0
+- ✅ Completed: Configurable WebCodecs - Added `intermediateVideoCodec` to `RendererOptions` and updated `CanvasStrategy` to support VP9 and AV1 for intermediate capture, enabling higher quality or better compression.
+
 ## RENDERER v1.11.0
 - ✅ Completed: Implement Media Preloading - Updated `DomStrategy` to detect and preload `<video>` and `<audio>` elements, ensuring they are buffered (`HAVE_ENOUGH_DATA`) before rendering starts.
 

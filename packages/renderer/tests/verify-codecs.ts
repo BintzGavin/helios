@@ -6,8 +6,16 @@ function runTests() {
   console.log('Running Codec Configuration Verification...');
   let hasError = false;
 
+  const dummyOptions: RendererOptions = {
+    width: 1920,
+    height: 1080,
+    fps: 30,
+    durationInSeconds: 1,
+    mode: 'canvas',
+  };
+
   const strategies = [
-    { name: 'CanvasStrategy', instance: new CanvasStrategy() },
+    { name: 'CanvasStrategy', instance: new CanvasStrategy(dummyOptions) },
     { name: 'DomStrategy', instance: new DomStrategy() },
   ];
 

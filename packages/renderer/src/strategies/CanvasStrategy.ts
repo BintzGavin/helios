@@ -44,13 +44,42 @@ export class CanvasStrategy implements RenderStrategy {
     }
     const intermediateBitrate = Math.max(25_000_000, targetBitrate);
 
+    // Resolve codec and FourCC
+    let codecString = 'vp8';
+    let fourCC = 'VP80';
+    const requested = this.options.intermediateVideoCodec;
+
+    if (requested) {
+      const lower = requested.toLowerCase();
+      if (lower === 'vp9' || lower.startsWith('vp9')) {
+        codecString = 'vp9';
+        fourCC = 'VP90';
+      } else if (lower === 'av1' || lower.startsWith('av01')) {
+        // AV1 Main Profile, Level 2.1, 8-bit (reasonable default)
+        // If user provided a specific string starting with av01, use it.
+        if (lower.startsWith('av01')) {
+          codecString = requested;
+        } else {
+          codecString = 'av01.0.05M.08';
+        }
+        fourCC = 'AV01';
+      } else if (lower !== 'vp8') {
+        // Pass-through
+        codecString = requested;
+        // Infer FourCC if possible
+        if (lower.startsWith('vp9')) fourCC = 'VP90';
+        else if (lower.startsWith('av01')) fourCC = 'AV01';
+        // else default to VP80 or let it be (IVF requires valid FourCC)
+      }
+    }
+
     const result = await page.evaluate(async (config) => {
       if (typeof VideoEncoder === 'undefined') {
         return { supported: false, reason: 'VideoEncoder not found' };
       }
 
       const encoderConfig = {
-        codec: 'vp8',
+        codec: config.codecString,
         width: config.width,
         height: config.height,
         bitrate: config.bitrate,
@@ -59,7 +88,7 @@ export class CanvasStrategy implements RenderStrategy {
       try {
         const support = await VideoEncoder.isConfigSupported(encoderConfig);
         if (!support.supported) {
-          return { supported: false, reason: 'VP8 config not supported' };
+          return { supported: false, reason: `${config.codecString} config not supported` };
         }
 
         // Initialize global state for accumulation
@@ -81,11 +110,14 @@ export class CanvasStrategy implements RenderStrategy {
         view.setUint16(4, 0, true);
         // 6-7: Header length 32
         view.setUint16(6, 32, true);
-        // 8-11: 'VP80'
-        view.setUint8(8, 'V'.charCodeAt(0));
-        view.setUint8(9, 'P'.charCodeAt(0));
-        view.setUint8(10, '8'.charCodeAt(0));
-        view.setUint8(11, '0'.charCodeAt(0));
+
+        // 8-11: FourCC
+        const fourCCStr = config.fourCC;
+        view.setUint8(8, fourCCStr.charCodeAt(0));
+        view.setUint8(9, fourCCStr.charCodeAt(1));
+        view.setUint8(10, fourCCStr.charCodeAt(2));
+        view.setUint8(11, fourCCStr.charCodeAt(3));
+
         // 12-13: Width
         view.setUint16(12, config.width, true);
         // 14-15: Height
@@ -134,11 +166,11 @@ export class CanvasStrategy implements RenderStrategy {
       } catch (e) {
         return { supported: false, reason: (e as Error).message };
       }
-    }, { width, height, bitrate: intermediateBitrate });
+    }, { width, height, bitrate: intermediateBitrate, codecString, fourCC });
 
     if (result.supported) {
       this.useWebCodecs = true;
-      console.log(`CanvasStrategy: Using WebCodecs (VP8) with bitrate: ${intermediateBitrate}`);
+      console.log(`CanvasStrategy: Using WebCodecs (${codecString}) with bitrate: ${intermediateBitrate}`);
     } else {
       this.useWebCodecs = false;
       console.log(`CanvasStrategy: WebCodecs not available (${result.reason}). Falling back to toDataURL.`);
