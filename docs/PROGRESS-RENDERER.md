@@ -1,5 +1,8 @@
 # RENDERER Progress Log
 
+## RENDERER v1.16.0
+- ✅ Completed: Polyfill SeekTimeDriver - Injected virtual time polyfill (overriding `performance.now`, `Date.now`, `requestAnimationFrame`) into `SeekTimeDriver` to ensure deterministic rendering of JavaScript-driven animations in DOM mode.
+
 ## RENDERER v1.15.0
 - ✅ Completed: Expose Diagnostics - Updated `RenderStrategy.diagnose` to return a diagnostic report instead of logging it, and exposed `renderer.diagnose()` to programmatically verify environment capabilities (WebCodecs, WAAPI).
 
