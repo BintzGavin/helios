@@ -1,65 +1,56 @@
 ---
-title: "Vue Example"
-description: "How to use Helios with Vue."
+title: "Vue Examples"
+description: "Using Helios with Vue"
 ---
 
-# Vue Example
+# Vue Examples
 
-This example demonstrates how to integrate Helios with Vue 3 using the Composition API.
+Helios integrates easily with Vue's reactivity system.
 
-## The Composable: `useVideoFrame`
+## DOM Animation
 
-```javascript
-// useVideoFrame.js
-import { ref, onUnmounted } from 'vue';
+The `vue-dom-animation` example uses Vue's `ref` to store the current frame and `computed` properties to derive animation styles.
 
-export function useVideoFrame(helios) {
-    const frame = ref(helios.getState().currentFrame);
-
-    const update = (state) => {
-        frame.value = state.currentFrame;
-    };
-
-    const unsubscribe = helios.subscribe(update);
-
-    onUnmounted(() => {
-        unsubscribe();
-    });
-
-    return frame;
-}
-```
-
-## The Component
+### Example Code
 
 ```vue
 <script setup>
+import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { Helios } from '@helios-project/core';
-import { useVideoFrame } from './composables/useVideoFrame';
 
 const helios = new Helios({ duration: 5, fps: 30 });
 helios.bindToDocumentTimeline();
 
-const frame = useVideoFrame(helios);
+const currentFrame = ref(0);
+
+// Subscribe to updates
+let unsubscribe;
+onMounted(() => {
+  unsubscribe = helios.subscribe((state) => {
+    currentFrame.value = state.currentFrame;
+  });
+});
+
+onUnmounted(() => {
+  if (unsubscribe) unsubscribe();
+});
+
+const rotation = computed(() => {
+  const progress = currentFrame.value / (5 * 30);
+  return progress * 360;
+});
 </script>
 
 <template>
   <div
     class="box"
-    :style="{
-        opacity: Math.min(1, frame / 30),
-        transform: `rotate(${frame * 2}deg)`
-    }"
+    :style="{ transform: `rotate(${rotation}deg)` }"
   >
-    Vue
+    Frame: {{ currentFrame.toFixed(2) }}
   </div>
 </template>
-
-<style scoped>
-.box {
-    width: 200px;
-    height: 200px;
-    background-color: #42b883;
-}
-</style>
 ```
+
+## Canvas Animation
+
+Similar to React, for high-performance canvas rendering, you can subscribe to Helios and draw directly to the canvas context, bypassing Vue's template reactivity for the draw loop.

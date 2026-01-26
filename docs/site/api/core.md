@@ -5,118 +5,145 @@ description: "API Reference for @helios-project/core"
 
 # Core API
 
-The `@helios-project/core` package provides the fundamental building blocks for Helios compositions.
+The `@helios-project/core` package provides the fundamental building blocks for Helios compositions, including the animation engine, state management, and sequencing utilities.
 
 ## Helios Class
 
-The main class that manages the animation state and timing.
+The main class that manages the animation state, timing, and synchronization.
 
 ### Constructor
 
 ```typescript
+import { Helios } from '@helios-project/core';
+
 const helios = new Helios(options: HeliosOptions);
 ```
 
 **`HeliosOptions`**:
-- `duration` (number): Duration of the composition in seconds.
-- `fps` (number): Frames per second.
-- `width` (number, optional): Width of the composition.
-- `height` (number, optional): Height of the composition.
-- `id` (string, optional): Unique ID for the composition.
+- **`duration`** (number): Duration of the composition in seconds (Required).
+- **`fps`** (number): Frames per second (Required).
+- **`schema`** (`HeliosSchema`, optional): Schema for validating input properties.
+- **`inputProps`** (object, optional): Initial input properties.
+- **`autoSyncAnimations`** (boolean, default: `false`): If true, uses `DomDriver` to sync CSS/WAAPI animations.
+- **`playbackRate`** (number, default: `1`): Initial playback speed.
+- **`volume`** (number, default: `1`): Initial audio volume (0.0 - 1.0).
+- **`muted`** (boolean, default: `false`): Initial muted state.
+- **`animationScope`** (HTMLElement, optional): Scope for the driver to control.
+
+### Signals (State)
+
+Helios uses signals for reactive state management. You can subscribe to these signals or access their values.
+
+- **`currentFrame`** (`ReadonlySignal<number>`): The current frame number.
+- **`isPlaying`** (`ReadonlySignal<boolean>`): Whether the animation is playing.
+- **`playbackRate`** (`ReadonlySignal<number>`): Current playback speed multiplier.
+- **`volume`** (`ReadonlySignal<number>`): Current audio volume.
+- **`muted`** (`ReadonlySignal<boolean>`): Current muted state.
+- **`inputProps`** (`ReadonlySignal<Record<string, any>>`): Current input properties.
 
 ### Methods
-
-#### `bindToDocumentTimeline()`
-Binds the Helios instance to the browser's `requestAnimationFrame` loop. This allows the animation to play in the browser.
-
-```typescript
-helios.bindToDocumentTimeline();
-```
 
 #### `subscribe(listener)`
 Subscribes to state updates. Returns an unsubscribe function.
 
 ```typescript
-const unsubscribe = helios.subscribe((state) => {
-  console.log(state.currentFrame);
+const unsubscribe = helios.subscribe((state: HeliosState) => {
+  console.log(`Frame: ${state.currentFrame}, Playing: ${state.isPlaying}`);
 });
 ```
 
 #### `getState()`
-Returns the current state of the Helios instance.
+Returns a snapshot of the current state (`HeliosState`).
 
-```typescript
-const state = helios.getState();
-// state.currentFrame, state.isPlaying, state.time
-```
-
-#### `start()` / `stop()` / `pause()`
-Control playback.
+#### `play()` / `pause()`
+Starts or stops playback.
 
 #### `seek(frame)`
-Jump to a specific frame.
+Jumps to a specific frame index.
 
-## Signals
+#### `setPlaybackRate(rate)`
+Sets the playback speed (e.g., `0.5`, `1`, `2`).
 
-Helios provides a signals implementation for reactive state management.
+#### `setAudioVolume(volume)`
+Sets the audio volume (clamped between 0.0 and 1.0) and syncs with the driver.
 
-### `signal(initialValue)`
-Creates a writable signal.
+#### `setAudioMuted(muted)`
+Sets the audio muted state and syncs with the driver.
 
-```typescript
-import { signal } from '@helios-project/core';
+#### `setInputProps(props)`
+Updates the input properties, validating them against the schema if provided.
 
-const count = signal(0);
-console.log(count()); // 0
-count.set(1);
-console.log(count()); // 1
-```
+#### `bindToDocumentTimeline()`
+Binds the Helios instance to `document.timeline`. Useful when the timeline is driven externally (e.g., by the Renderer or Studio).
 
-### `computed(fn)`
-Creates a read-only signal that derives its value from other signals.
+#### `unbindFromDocumentTimeline()`
+Stops syncing with `document.timeline`.
 
-```typescript
-const double = computed(() => count() * 2);
-```
+#### `dispose()`
+Cleans up resources (tickers, subscribers, drivers) to prevent memory leaks.
 
-### `effect(fn)`
-Runs a side effect whenever dependencies change.
+### Static Methods
 
-```typescript
-effect(() => {
-  console.log('Count changed:', count());
-});
-```
+#### `Helios.diagnose()`
+Returns a `Promise<DiagnosticReport>` containing environment support information (WAAPI, WebCodecs, etc.).
 
-## Sequencing
+## Validation (Schema)
 
-Helpers for arranging animations in time.
-
-### `sequence(animations)`
-Arranges animations sequentially.
+Helios supports runtime validation of input properties.
 
 ```typescript
-import { sequence } from '@helios-project/core';
+import { Helios, HeliosSchema } from '@helios-project/core';
 
-const timeline = sequence([
-  { duration: 30, easing: 'ease-out' },
-  { duration: 60, easing: 'linear' }
-]);
+const schema: HeliosSchema = {
+  text: { type: 'string', default: 'Hello' },
+  color: { type: 'string', default: '#ff0000' },
+  count: { type: 'number', min: 0, max: 10 }
+};
+
+const helios = new Helios({ duration: 5, fps: 30, schema });
 ```
 
-### `series(items, options)`
-Layout items in a sequence with optional offsets.
+## Signals API
+
+Primitive for reactive state.
+
+- **`signal(initialValue)`**: Creates a writable signal.
+- **`computed(fn)`**: Creates a read-only signal derived from others.
+- **`effect(fn)`**: Runs a side effect when dependencies change.
 
 ## Animation Helpers
 
+### `sequence(animations)`
+Calculates start times for a sequence of durations.
+
+### `series(items)`
+Helper for sequential layout of elements.
+
 ### `spring(options)`
-Physics-based spring animation.
+Physics-based spring animation helper.
 
 ### `interpolate(value, inputRange, outputRange, options)`
-Interpolates a value from an input range to an output range.
+Interpolates values (linear or with easing).
+
+## Captions (SRT)
+
+Utilities for parsing SRT files.
+
+- **`parseSrt(srtContent)`**: Parses SRT string into structured data.
+- **`stringifySrt(captions)`**: Converts structured data back to SRT string.
+
+## Error Handling
+
+Helios throws `HeliosError` with specific error codes (`HeliosErrorCode`) for robust error handling.
 
 ```typescript
-import { interpolate } from '@helios-project/core';
+import { HeliosError, HeliosErrorCode } from '@helios-project/core';
 
-const opacity = interpolate(frame, [0, 30], [0, 1]);
+try {
+  // ...
+} catch (e) {
+  if (e instanceof HeliosError && e.code === HeliosErrorCode.INVALID_DURATION) {
+    // Handle specific error
+  }
+}
 ```

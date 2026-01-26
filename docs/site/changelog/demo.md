@@ -1,38 +1,39 @@
 ---
-title: "DEMO Changelog"
-description: "Changelog for DEMO package."
+title: "Examples Changelog"
+description: "Changelog for the Examples"
 ---
 
+# Examples Changelog
 
-## DEMO v1.9.0
-- ✅ Completed: Scaffold Vue DOM Example - Created `examples/vue-dom-animation` and added E2E verification case (blocked).
+## v1.22.0
+- **Scaffold Framer Motion Example**: Created `examples/framer-motion-animation` demonstrating integration with `framer-motion` via `useMotionValue` and manual time syncing.
 
-## DEMO v1.8.1
-- ✅ Completed: Scaffold React DOM Example - Updated `verify-render.ts` to document blocking issue.
+## v1.21.0
+- **GSAP Example**: Created `examples/gsap-animation` demonstrating integration with GSAP timelines.
 
-## DEMO v1.8.0
-- ✅ Completed: Scaffold React DOM Example - Created `examples/react-dom-animation` and added E2E verification case.
+## v1.20.0
+- **Refactor Simple Animation**: Updated `examples/simple-animation` to use native CSS `@keyframes` and `autoSyncAnimations: true`.
 
-## DEMO v1.7.0
-- ✅ Completed: Scaffold Pixi.js Example - Created `examples/pixi-canvas-animation` with `pixi.js` dependency and verification script.
+## v1.19.0
+- **Implement Svelte Series Component**: Added `<Series>` component to `examples/svelte-animation-helpers` and updated example to use it.
 
-## DEMO v1.6.0
-- ✅ Completed: Scaffold Animation Helpers Example - Created `examples/animation-helpers` demonstrating `interpolate` and `spring` from Core.
+## v1.18.0
+- **Implement React Series Component**: Implemented `<Series>` component in `examples/react-animation-helpers` and verified with E2E tests.
 
-## DEMO v1.5.0
-- ✅ Completed: Scaffold Three.js Example - Created `examples/threejs-canvas-animation`, updated build config, and added E2E verification.
+## v1.17.0
+- **Implement Vue Series Component**: Added `<Series>` component to `examples/vue-animation-helpers` and updated example to demonstrate it.
 
-## DEMO v1.3.0
-- ✅ Completed: Verify DOM Render - Updated `tests/e2e/verify-render.ts` to include the DOM rendering test case and verified it passes.
+## v1.16.0
+- **Implement React Series Component**: Added `<Series>` component to `examples/react-animation-helpers` and updated example to demonstrate it.
 
-## DEMO v1.2.0
-- ✅ Completed: Expand E2E Tests - Refactored `tests/e2e/verify-render.ts` to verify all 4 examples (Canvas, React, Vue, Svelte).
+## v1.15.0
+- **Enable E2E verification for DOM examples**: Verified all 14 examples pass, fixed Pixi bug.
 
-## DEMO v1.1.0
-- ✅ Completed: Scaffold Svelte Example - Created `examples/svelte-canvas-animation` and E2E verification test.
+## v1.13.0
+- **Verify Svelte Animation Helpers**: Verified `examples/svelte-animation-helpers` and enabled E2E test.
 
-## [2026-01-22] DEMO
-- ✅ Completed: Verify Vue Example - Verified build and render of `examples/vue-canvas-animation`. Created `tests/e2e/verify-render.ts`.
+## v1.12.0
+- **Update Animation Helpers**: Updated `examples/animation-helpers` to demonstrate `sequence` and `series` core functions.
 
-## [2026-01-15] DEMO
-- Refactored `simple-canvas-animation` to use `Helios` core.
+## v1.11.0
+- **Scaffold React Animation Helpers**: Created `examples/react-animation-helpers` with `<Sequence>` component and Context-based timing.
