@@ -1,8 +1,9 @@
-**Version**: 1.14.0
+**Version**: 1.15.0
 
 # Renderer Agent Status
 
 ## Progress Log
+- [1.15.0] ✅ Completed: Expose Diagnostics - Updated `RenderStrategy.diagnose` to return a diagnostic report instead of logging it, and exposed `renderer.diagnose()` to programmatically verify environment capabilities (WebCodecs, WAAPI).
 - [1.14.0] ✅ Completed: Input Props Injection - Added `inputProps` to `RendererOptions` and implemented injection via `page.addInitScript`, enabling parameterized rendering (e.g. dynamic text/colors) by setting `window.__HELIOS_PROPS__`.
 - [1.13.0] ⚠️ Blocked: Enable CdpTimeDriver for DOM - Investigated switching `DomStrategy` to `CdpTimeDriver`. Determined that `page.screenshot` hangs when `Emulation.setVirtualTimePolicy` is active (paused), and CDP `Page.captureScreenshot` also hangs/timeouts. Reverted to `SeekTimeDriver` for DOM mode.
 - [1.12.0] ✅ Completed: Configurable WebCodecs - Added `intermediateVideoCodec` to `RendererOptions` and updated `CanvasStrategy` to support VP9 and AV1 for intermediate capture, enabling higher quality or better compression.

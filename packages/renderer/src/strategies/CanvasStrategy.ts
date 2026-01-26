@@ -20,15 +20,15 @@ export class CanvasStrategy implements RenderStrategy {
     }
   }
 
-  async diagnose(page: Page): Promise<void> {
-    await page.evaluate(() => {
+  async diagnose(page: Page): Promise<any> {
+    return await page.evaluate(() => {
       console.log('[Helios Diagnostics] Checking Canvas environment...');
       const report = {
         videoEncoder: typeof VideoEncoder !== 'undefined',
         offscreenCanvas: typeof OffscreenCanvas !== 'undefined',
         userAgent: navigator.userAgent,
       };
-      console.log(JSON.stringify(report, null, 2));
+      return report;
     });
   }
 
