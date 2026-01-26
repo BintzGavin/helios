@@ -9,13 +9,13 @@ async function main() {
     width: 600,
     height: 600,
     fps: 30,
-    durationInSeconds: 2, // Short duration for quick verification
+    durationInSeconds: 1, // Short duration for quick verification
     mode: 'dom'
   });
 
   const compositionPath = path.resolve(
     process.cwd(),
-    'examples/simple-animation/composition.html'
+    'packages/renderer/scripts/fixtures/background-image.html'
   );
   const compositionUrl = `file://${compositionPath}`;
 

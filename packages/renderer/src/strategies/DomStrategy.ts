@@ -29,6 +29,42 @@ export class DomStrategy implements RenderStrategy {
           img.onerror = resolve; // Don't block on broken images
         });
       }));
+
+      // 3. Wait for CSS background images
+      const getAllElements = () => Array.from(document.querySelectorAll('*'));
+      const backgroundUrls = new Set<string>();
+
+      getAllElements().forEach((el) => {
+        const style = window.getComputedStyle(el);
+        const bgImage = style.backgroundImage;
+        if (bgImage && bgImage !== 'none') {
+          // Extract URLs from "url('...'), url("...")"
+          // Note: This regex handles simple cases. Complex escaping might need a robust parser,
+          // but getComputedStyle typically normalizes URLs.
+          const matches = bgImage.matchAll(/url\((['"]?)(.*?)\1\)/g);
+          for (const match of matches) {
+            if (match[2]) {
+              backgroundUrls.add(match[2]);
+            }
+          }
+        }
+      });
+
+      if (backgroundUrls.size > 0) {
+        console.log(`[DomStrategy] Preloading ${backgroundUrls.size} background images...`);
+        await Promise.all(Array.from(backgroundUrls).map((url) => {
+          return new Promise((resolve) => {
+            const img = new Image();
+            img.onload = () => resolve(undefined);
+            img.onerror = () => {
+              console.warn(`[DomStrategy] Failed to preload background image: ${url}`);
+              resolve(undefined); // Don't block
+            };
+            img.src = url;
+            if (img.complete) resolve(undefined);
+          });
+        }));
+      }
     });
   }
 
