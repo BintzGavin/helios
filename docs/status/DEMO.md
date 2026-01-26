@@ -43,6 +43,7 @@ To provide comprehensive, idiomatic examples for every major framework (React, V
 None.
 
 ## Log
+- [v1.26.1] 📋 Planned: Scaffold Captions Animation Example - Created spec file `/.sys/plans/2025-02-19-DEMO-CaptionsAnimation.md` to guide implementation of built-in SRT caption support.
 - [v1.26.0] ✅ Completed: Scaffold Motion One Example - Created `examples/motion-one-animation` demonstrating integration with `motion` library via `autoSyncAnimations: true`.
 - [v1.25.0] ✅ Completed: Verify React Series Component - Verified implementation of `<Series>` component in `examples/react-animation-helpers` and confirmed E2E tests pass using `ts-node`.
 - [v1.24.0] 📋 Planned: Scaffold Motion One Example - Created spec file `/.sys/plans/2026-01-26-DEMO-MotionOne.md` to guide integration with `motion` library.

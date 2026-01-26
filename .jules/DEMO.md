@@ -35,3 +35,7 @@
 ## [v1.23.0] - Specificity in Planning
 **Learning:** When requesting an Executor to modify configuration files (like `vite.build-example.config.js`), broad instructions ("Add the new example") are rejected. The Planner must provide the specific code snippets (e.g., exact object properties) to be inserted.
 **Action:** Always include exact code insertion blocks in "Implementation Spec" when modifying existing files.
+
+## [1.26.1] - Captions Support Discovery
+**Learning:** The README claims "Captions/subtitles: Not yet", but `packages/core` has full SRT parsing and state management (`activeCaptions`). This feature is hidden/undocumented.
+**Action:** Created `examples/captions-animation` to expose this feature. Future plans should check source code before assuming "Not yet" in README is accurate for Core capabilities.
