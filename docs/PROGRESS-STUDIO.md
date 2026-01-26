@@ -1,5 +1,8 @@
 # Studio Progress Log
 
+## STUDIO v0.18.0
+- ✅ Completed: Render Configuration UI - Added UI for selecting render mode (DOM/Canvas), bitrate, and codec, and updated backend to respect these settings.
+
 ## STUDIO v0.17.0
 - ✅ Completed: Inject HELIOS_PROJECT_ROOT in CLI - Modified CLI to pass user's CWD to Studio process, enabling "Studio as a Tool".
 

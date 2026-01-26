@@ -15,6 +15,12 @@ export interface Asset {
   type: 'image' | 'video' | 'audio' | 'font' | 'other';
 }
 
+export interface RenderConfig {
+  mode: 'canvas' | 'dom';
+  videoBitrate?: string;
+  videoCodec?: string;
+}
+
 export interface RenderJob {
   id: string;
   status: 'queued' | 'rendering' | 'completed' | 'failed';
@@ -78,6 +84,10 @@ interface StudioContextType {
   // Canvas
   canvasSize: { width: number; height: number };
   setCanvasSize: (size: { width: number; height: number }) => void;
+
+  // Render Config
+  renderConfig: RenderConfig;
+  setRenderConfig: (config: RenderConfig) => void;
 }
 
 const StudioContext = createContext<StudioContextType | undefined>(undefined);
@@ -88,6 +98,7 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [activeComposition, setActiveComposition] = useState<Composition | null>(null);
   const [isSwitcherOpen, setSwitcherOpen] = useState(false);
   const [canvasSize, setCanvasSize] = useState({ width: 1920, height: 1080 });
+  const [renderConfig, setRenderConfig] = useState<RenderConfig>({ mode: 'canvas' });
 
   const [renderJobs, setRenderJobs] = useState<RenderJob[]>([]);
 
@@ -175,7 +186,8 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           width: canvasSize.width,
           height: canvasSize.height,
           inPoint: options?.inPoint,
-          outPoint: options?.outPoint
+          outPoint: options?.outPoint,
+          ...renderConfig
         })
       });
       fetchJobs();
@@ -211,7 +223,9 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         loop,
         toggleLoop,
         canvasSize,
-        setCanvasSize
+        setCanvasSize,
+        renderConfig,
+        setRenderConfig
       }}
     >
       {children}
