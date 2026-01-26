@@ -2,7 +2,7 @@
 
 ## Section A: Examples
 - `examples/simple-canvas-animation`: Vanilla JS Canvas API.
-- `examples/simple-animation`: Vanilla JS DOM manipulation.
+- `examples/simple-animation`: Vanilla JS DOM (native CSS Animations).
 - `examples/animation-helpers`: Vanilla JS Canvas demonstrating `interpolate`, `spring`, `sequence`, and `series`.
 - `examples/react-canvas-animation`: React with Canvas.
 - `examples/react-dom-animation`: React with DOM elements.

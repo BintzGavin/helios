@@ -17,22 +17,28 @@
       position: absolute;
       top: 50%;
       left: 50%;
-      transform: translate(-50%, -50%);
+      /* Initial state */
+      transform: translate(-50%, -50%) scale(0.5);
+      opacity: 0;
       
-      /* Use CSS custom properties for animation control */
-      --animation-progress: 0;
-      --animation-duration: 5s;
-      --animation-start-time: 0s;
-      --animation-end-time: 5s;
-      
-      /* Calculate position based on progress */
-      opacity: calc(var(--animation-progress) * 2);
-      transform: translate(
-        calc(-50% + (var(--animation-progress) * (50vw - 100%))),
-        -50%
-      ) scale(calc(0.5 + var(--animation-progress) * 0.5));
-      
-      transition: opacity 0.1s linear, transform 0.1s linear;
+      /* Use standard CSS animation */
+      animation: moveAndScale 5s linear forwards;
+    }
+
+    @keyframes moveAndScale {
+      0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.5);
+      }
+      50% {
+        opacity: 1;
+      }
+      100% {
+        opacity: 1;
+        /* Match original logic: calc(-50% + (1 * (50vw - 100%))) */
+        /* -50% + 50vw - 100% */
+        transform: translate(calc(-50% + 50vw - 100%), -50%) scale(1);
+      }
     }
   </style>
 </head>
@@ -45,26 +51,12 @@
     // Initialize Helios engine
     const helios = new Helios({
       duration: 5,
-      fps: 30
+      fps: 30,
+      autoSyncAnimations: true
     });
 
     // Expose for the Player and debugging
     window.helios = helios;
-
-    // Connect to the DOM
-    const box = document.querySelector('.animated-box');
-    
-    // Set static properties
-    box.style.setProperty('--animation-duration', '5s');
-    box.style.setProperty('--animation-start-time', '0s');
-    box.style.setProperty('--animation-end-time', '5s');
-
-    // Subscribe to state changes to drive the CSS variable
-    helios.subscribe((state) => {
-      const time = state.currentFrame / state.fps;
-      const progress = Math.min(1, Math.max(0, time / 5));
-      box.style.setProperty('--animation-progress', String(progress));
-    });
 
     // Enable external control (e.g. from Renderer)
     helios.bindToDocumentTimeline();
