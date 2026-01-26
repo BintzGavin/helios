@@ -77,6 +77,9 @@ export class Renderer {
       await page.goto(compositionUrl, { waitUntil: 'networkidle' });
       console.log('Page loaded.');
 
+      console.log('Running diagnostics...');
+      await this.strategy.diagnose(page);
+
       console.log('Preparing render strategy...');
       await this.timeDriver.prepare(page);
       await this.strategy.prepare(page);

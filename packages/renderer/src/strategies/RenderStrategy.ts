@@ -11,6 +11,13 @@ export interface RenderStrategy {
   prepare(page: Page): Promise<void>;
 
   /**
+   * Runs diagnostics to verify the environment capabilities required by this strategy.
+   * Should log findings to the console.
+   * @param page The Playwright page instance.
+   */
+  diagnose(page: Page): Promise<void>;
+
+  /**
    * Captures a single frame at the specified time.
    * @param page The Playwright page instance.
    * @param frameTime The time in milliseconds to capture.
