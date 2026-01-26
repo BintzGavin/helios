@@ -1,6 +1,7 @@
 import { TimeDriver, WaapiDriver, DomDriver, NoopDriver, Ticker, RafTicker, TimeoutTicker } from './drivers';
 import { signal, effect, Signal, ReadonlySignal } from './signals';
 import { HeliosError, HeliosErrorCode } from './errors';
+import { HeliosSchema, validateProps } from './schema';
 
 export type HeliosState = {
   duration: number;
@@ -19,6 +20,7 @@ export interface HeliosOptions {
   autoSyncAnimations?: boolean;
   animationScope?: HTMLElement;
   inputProps?: Record<string, any>;
+  schema?: HeliosSchema;
   playbackRate?: number;
   driver?: TimeDriver;
   ticker?: Ticker;
@@ -38,11 +40,13 @@ export * from './sequencing';
 export * from './signals';
 export * from './errors';
 export * from './captions';
+export * from './schema';
 
 export class Helios {
   // Constants
   public readonly duration: number;
   public readonly fps: number;
+  public readonly schema?: HeliosSchema;
 
   // Internal Signals
   private _currentFrame: Signal<number>;
@@ -123,11 +127,14 @@ export class Helios {
 
     this.duration = options.duration;
     this.fps = options.fps;
+    this.schema = options.schema;
+
+    const initialProps = validateProps(options.inputProps || {}, this.schema);
 
     // Initialize signals
     this._currentFrame = signal(0);
     this._isPlaying = signal(false);
-    this._inputProps = signal(options.inputProps || {});
+    this._inputProps = signal(initialProps);
     this._playbackRate = signal(options.playbackRate ?? 1);
 
     this.autoSyncAnimations = options.autoSyncAnimations || false;
@@ -167,7 +174,7 @@ export class Helios {
    * @param props A record of properties to pass to the composition.
    */
   public setInputProps(props: Record<string, any>) {
-    this._inputProps.value = props;
+    this._inputProps.value = validateProps(props, this.schema);
   }
 
   public setPlaybackRate(rate: number) {
