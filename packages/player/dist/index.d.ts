@@ -14,6 +14,9 @@ export declare class HeliosPlayer extends HTMLElement {
     private retryAction;
     private speedSelector;
     private fullscreenBtn;
+    private captionsContainer;
+    private ccBtn;
+    private showCaptions;
     private controller;
     private directHelios;
     private unsubscribe;
@@ -40,6 +43,7 @@ export declare class HeliosPlayer extends HTMLElement {
     private handleScrubStart;
     private handleScrubEnd;
     private handleSpeedChange;
+    private toggleCaptions;
     private handleKeydown;
     private seekRelative;
     private toggleFullscreen;
