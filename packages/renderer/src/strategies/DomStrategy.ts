@@ -65,6 +65,42 @@ export class DomStrategy implements RenderStrategy {
           });
         }));
       }
+
+      // 4. Wait for media elements (video/audio)
+      const mediaElements = Array.from(document.querySelectorAll('video, audio')) as HTMLMediaElement[];
+      if (mediaElements.length > 0) {
+        console.log(`[DomStrategy] Preloading ${mediaElements.length} media elements...`);
+        await Promise.all(mediaElements.map((el) => {
+          // Check if already ready (HAVE_ENOUGH_DATA = 4)
+          if (el.readyState >= 4) return;
+
+          return new Promise((resolve) => {
+            let resolved = false;
+            const finish = () => {
+              if (resolved) return;
+              resolved = true;
+              resolve(undefined);
+            };
+
+            el.addEventListener('canplaythrough', finish, { once: true });
+            el.addEventListener('error', finish, { once: true });
+
+            // Force load if needed (e.g. if preload="none")
+            if (el.preload === 'none') {
+              el.preload = 'auto';
+            }
+
+            // Timeout fallback (e.g., 10 seconds)
+            setTimeout(() => {
+              if (!resolved) {
+                console.warn(`[DomStrategy] Timeout waiting for media element: ${el.currentSrc || el.src}`);
+                finish();
+              }
+            }, 10000);
+          });
+        }));
+        console.log('[DomStrategy] Media elements ready.');
+      }
     });
   }
 
