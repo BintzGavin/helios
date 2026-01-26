@@ -69,3 +69,7 @@
 ## 2026-02-27 - SRT Parser Gap Identified
 **Learning:** While "Captions & Audio" is a major V1.x roadmap item, no work has started on it. "Caption/subtitle import (SRT)" is a pure logic task perfect for `packages/core`.
 **Action:** Created plan `2026-02-27-CORE-Implement-SRT-Parser.md` to implement the parser/serializer.
+
+## 2026-01-26 - Time Discrepancy in Status Files
+**Learning:** `docs/status/CORE.md` contains entries dated in the future (e.g., March 2026) relative to the system date (January 2026). This causes confusion when naming plan files sequentially.
+**Action:** Trust the system date (`date` command) for new plan filenames to ensure accuracy to the current execution context, regardless of the "future" status logs.
