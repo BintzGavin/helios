@@ -1,3 +1,4 @@
+// @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { HeliosPlayer } from './index';
 
@@ -243,5 +244,92 @@ describe('HeliosPlayer', () => {
     // Now it should work
     dispatchKey(' ');
     expect(mockController.play).toHaveBeenCalled();
+  });
+
+  describe('Scrubbing Interaction', () => {
+    let mockController: any;
+
+    beforeEach(() => {
+        mockController = {
+            getState: vi.fn().mockReturnValue({ currentFrame: 0, duration: 10, fps: 30, isPlaying: false }),
+            play: vi.fn(),
+            pause: vi.fn(),
+            seek: vi.fn(),
+            subscribe: vi.fn().mockReturnValue(() => {}),
+            dispose: vi.fn(),
+            setPlaybackRate: vi.fn()
+        };
+        (player as any).setController(mockController);
+    });
+
+    it('should pause playback when scrubbing starts if currently playing', () => {
+        mockController.getState.mockReturnValue({ currentFrame: 0, duration: 10, fps: 30, isPlaying: true });
+
+        const scrubber = player.shadowRoot!.querySelector('.scrubber') as HTMLInputElement;
+        scrubber.dispatchEvent(new Event('mousedown'));
+
+        expect(mockController.pause).toHaveBeenCalled();
+        expect((player as any).isScrubbing).toBe(true);
+        expect((player as any).wasPlayingBeforeScrub).toBe(true);
+    });
+
+    it('should NOT pause playback when scrubbing starts if currently paused', () => {
+        mockController.getState.mockReturnValue({ currentFrame: 0, duration: 10, fps: 30, isPlaying: false });
+
+        const scrubber = player.shadowRoot!.querySelector('.scrubber') as HTMLInputElement;
+        scrubber.dispatchEvent(new Event('mousedown'));
+
+        expect(mockController.pause).not.toHaveBeenCalled();
+        expect((player as any).isScrubbing).toBe(true);
+        expect((player as any).wasPlayingBeforeScrub).toBe(false);
+    });
+
+    it('should resume playback when scrubbing ends if it was playing before', () => {
+        // Setup state manually
+        (player as any).isScrubbing = true;
+        (player as any).wasPlayingBeforeScrub = true;
+
+        const scrubber = player.shadowRoot!.querySelector('.scrubber') as HTMLInputElement;
+        scrubber.dispatchEvent(new Event('change'));
+
+        expect(mockController.play).toHaveBeenCalled();
+        expect((player as any).isScrubbing).toBe(false);
+    });
+
+    it('should NOT resume playback when scrubbing ends if it was paused before', () => {
+        // Setup state manually
+        (player as any).isScrubbing = true;
+        (player as any).wasPlayingBeforeScrub = false;
+
+        const scrubber = player.shadowRoot!.querySelector('.scrubber') as HTMLInputElement;
+        scrubber.dispatchEvent(new Event('change'));
+
+        expect(mockController.play).not.toHaveBeenCalled();
+        expect((player as any).isScrubbing).toBe(false);
+    });
+
+    it('should NOT update scrubber value from updateUI while scrubbing', () => {
+        const scrubber = player.shadowRoot!.querySelector('.scrubber') as HTMLInputElement;
+
+        // 1. Normal update
+        (player as any).updateUI({ currentFrame: 10, duration: 10, fps: 30, isPlaying: false });
+        expect(scrubber.value).toBe('10');
+
+        // 2. Start scrubbing
+        (player as any).isScrubbing = true;
+
+        // 3. Update comes in (e.g. from seek or just async update)
+        (player as any).updateUI({ currentFrame: 20, duration: 10, fps: 30, isPlaying: false });
+
+        // Scrubber should NOT change
+        expect(scrubber.value).toBe('10');
+
+        // 4. End scrubbing
+        (player as any).isScrubbing = false;
+
+        // 5. Update comes in
+        (player as any).updateUI({ currentFrame: 30, duration: 10, fps: 30, isPlaying: false });
+        expect(scrubber.value).toBe('30');
+    });
   });
 });
