@@ -1,5 +1,8 @@
 # Studio Progress Log
 
+## STUDIO v0.14.0
+- ✅ Completed: Rich Props Editor - Implemented JSON editor for complex props (objects/arrays) and improved UI styling for primitives.
+
 ## STUDIO v0.13.0
 - ✅ Completed: Implement Playback Shortcuts - Added global keyboard shortcuts for Play/Pause (Space), Frame Step (Arrows), and Seek Start (Home), with input protection.
 

@@ -1,16 +1,17 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useStudio } from '../context/StudioContext';
+import './PropsEditor.css';
 
 export const PropsEditor: React.FC = () => {
   const { controller, playerState } = useStudio();
   const { inputProps } = playerState;
 
   if (!controller) {
-    return <div style={{ padding: '8px', color: '#666' }}>No active controller</div>;
+    return <div className="editor-message">No active controller</div>;
   }
 
   if (!inputProps || Object.keys(inputProps).length === 0) {
-    return <div style={{ padding: '8px', color: '#666' }}>No input props defined</div>;
+    return <div className="editor-message">No input props defined</div>;
   }
 
   const handleChange = (key: string, value: any) => {
@@ -19,10 +20,10 @@ export const PropsEditor: React.FC = () => {
   };
 
   return (
-    <div style={{ padding: '8px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+    <div className="props-editor">
       {Object.entries(inputProps).map(([key, value]) => (
-        <div key={key} style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-          <label style={{ fontSize: '0.8em', fontWeight: 'bold' }}>{key}</label>
+        <div key={key} className="prop-row">
+          <label className="prop-label">{key}</label>
           <PropInput
             value={value}
             onChange={(newValue) => handleChange(key, newValue)}
@@ -33,23 +34,74 @@ export const PropsEditor: React.FC = () => {
   );
 };
 
+const JsonPropInput: React.FC<{ value: any, onChange: (val: any) => void }> = ({ value, onChange }) => {
+  const [text, setText] = useState(() => JSON.stringify(value, null, 2));
+  const [error, setError] = useState(false);
+  const prevValueRef = useRef(value);
+
+  useEffect(() => {
+    // Only update text if the value actually changed (deep comparison)
+    // This prevents overwriting user input if the parent re-renders with the same value (but new reference)
+    if (JSON.stringify(value) !== JSON.stringify(prevValueRef.current)) {
+      setText(JSON.stringify(value, null, 2));
+      prevValueRef.current = value;
+      setError(false); // Clear error if external value replaces our invalid state
+    }
+  }, [value]);
+
+  const handleBlur = () => {
+    try {
+      const parsed = JSON.parse(text);
+      setError(false);
+      // Only fire change if value actually changed to avoid unnecessary updates
+      if (JSON.stringify(parsed) !== JSON.stringify(value)) {
+        onChange(parsed);
+      }
+      // Re-format on blur
+      setText(JSON.stringify(parsed, null, 2));
+    } catch (e) {
+      setError(true);
+    }
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setText(e.target.value);
+    // Optional: clear error if valid while typing?
+    // Let's stick to blur for validation to be less distracting
+  };
+
+  return (
+    <textarea
+      className={`prop-input json-editor ${error ? 'error' : ''}`}
+      value={text}
+      onChange={handleChange}
+      onBlur={handleBlur}
+      spellCheck={false}
+    />
+  );
+};
+
 const PropInput: React.FC<{ value: any, onChange: (val: any) => void }> = ({ value, onChange }) => {
   const type = typeof value;
+
+  if (value === null) {
+      return <JsonPropInput value={value} onChange={onChange} />;
+  }
 
   if (type === 'number') {
     return (
       <input
         type="number"
+        className="prop-input"
         value={value}
         onChange={(e) => onChange(parseFloat(e.target.value))}
-        style={{ padding: '4px', width: '100%', boxSizing: 'border-box' }}
       />
     );
   }
 
   if (type === 'boolean') {
     return (
-      <label style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+      <label className="prop-checkbox-label">
         <input
           type="checkbox"
           checked={value}
@@ -64,17 +116,18 @@ const PropInput: React.FC<{ value: any, onChange: (val: any) => void }> = ({ val
      // Check if color
      if (value.startsWith('#') && (value.length === 4 || value.length === 7)) {
          return (
-             <div style={{ display: 'flex', gap: '4px' }}>
+             <div className="prop-color-container">
                  <input
                     type="color"
+                    className="prop-color-picker"
                     value={value}
                     onChange={(e) => onChange(e.target.value)}
                  />
                  <input
                     type="text"
+                    className="prop-input prop-color-text"
                     value={value}
                     onChange={(e) => onChange(e.target.value)}
-                    style={{ flex: 1, padding: '4px' }}
                  />
              </div>
          )
@@ -82,15 +135,19 @@ const PropInput: React.FC<{ value: any, onChange: (val: any) => void }> = ({ val
      return (
        <input
          type="text"
+         className="prop-input"
          value={value}
          onChange={(e) => onChange(e.target.value)}
-         style={{ padding: '4px', width: '100%', boxSizing: 'border-box' }}
        />
      );
   }
 
+  if (type === 'object') {
+      return <JsonPropInput value={value} onChange={onChange} />;
+  }
+
   return (
-    <div style={{ fontSize: '0.8em', color: '#999' }}>
+    <div className="unsupported-type">
       Unsupported type: {type} ({JSON.stringify(value)})
     </div>
   );
