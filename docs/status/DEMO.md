@@ -1,5 +1,5 @@
 # Status: DEMO (Executor)
-**Version**: 1.24.0
+**Version**: 1.25.0
 
 ## Vision
 To provide comprehensive, idiomatic examples for every major framework (React, Vue, Svelte, Vanilla) and robust end-to-end testing to ensure the Helios engine delivers on its "Use What You Know" promise.
@@ -41,6 +41,7 @@ To provide comprehensive, idiomatic examples for every major framework (React, V
 None.
 
 ## Log
+- [v1.25.0] ✅ Completed: Verify React Series Component - Verified implementation of `<Series>` component in `examples/react-animation-helpers` and confirmed E2E tests pass using `ts-node`.
 - [v1.24.0] 📋 Planned: Scaffold Motion One Example - Created spec file `/.sys/plans/2026-01-26-DEMO-MotionOne.md` to guide integration with `motion` library.
 - [v1.23.0] ✅ Completed: Scaffold Lottie Animation Example - Created `examples/lottie-animation` demonstrating integration with `lottie-web` via time-based seeking.
 - [v1.22.0] ✅ Completed: Scaffold Framer Motion Example - Created `examples/framer-motion-animation` demonstrating integration with `framer-motion` via `useMotionValue` and manual time syncing.
