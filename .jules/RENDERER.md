@@ -55,3 +55,11 @@
 ## [2026-03-05] - SeekTimeDriver Non-Determinism
 **Learning:** `SeekTimeDriver` (used for DOM rendering) relies on WAAPI and does not mock `performance.now()` or `Date.now()`. This exposes wall-clock time drift to JavaScript-driven animations (e.g. `requestAnimationFrame` loops), violating the "Deterministic Rendering" vision.
 **Action:** Prioritize polyfilling these globals in `SeekTimeDriver` to ensure consistent rendering for non-CSS animations.
+
+## [2026-03-09] - CanvasStrategy WebCodecs Limitation
+**Learning:** `CanvasStrategy` heavily relies on the IVF container format, which restricts WebCodecs usage to VP8/VP9/AV1. This prevents the usage of H.264 (AVC) which is the most common hardware-accelerated codec, potentially causing double-encoding (VP8 -> H.264) in the FFmpeg step.
+**Action:** Future optimization should support raw H.264 (Annex B) output from `CanvasStrategy` to enable direct stream copy to FFmpeg for MP4 outputs.
+
+## [2026-03-09] - FFmpeg Logic Duplication
+**Learning:** `CanvasStrategy` and `DomStrategy` contain nearly identical logic for generating FFmpeg arguments (especially for audio inputs and output flags). This duplication violates DRY and increases the risk of inconsistent behavior (e.g. one strategy supporting a feature while the other doesn't).
+**Action:** Centralize FFmpeg argument generation into a `FFmpegBuilder` or similar utility to ensure consistency and maintainability.
