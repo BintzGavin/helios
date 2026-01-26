@@ -13,7 +13,8 @@ jobs:
     runs-on: ubuntu-latest
     if: |
       github.event.pull_request.user.login == 'google-labs-jules' ||
-      github.event.pull_request.user.login == 'google-labs-jules[bot]'
+      github.event.pull_request.user.login == 'google-labs-jules[bot]' ||
+      github.event.pull_request.user.login == 'BintzGavin'
     steps:
       - name: Checkout PR branch
         uses: actions/checkout@v4
@@ -69,7 +70,8 @@ jobs:
     needs: resolve-progress-conflicts
     if: |
       github.event.pull_request.user.login == 'google-labs-jules' ||
-      github.event.pull_request.user.login == 'google-labs-jules[bot]'
+      github.event.pull_request.user.login == 'google-labs-jules[bot]' ||
+      github.event.pull_request.user.login == 'BintzGavin'
     steps:
       - name: Enable auto-merge
         env:
