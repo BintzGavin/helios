@@ -1,5 +1,8 @@
 # RENDERER Progress Log
 
+## RENDERER v1.10.0
+- ✅ Completed: Implement Background Image Preloading - Updated `DomStrategy` to detect and preload CSS background images, ensuring they are loaded before rendering starts.
+
 ## RENDERER v1.9.0
 - ✅ Completed: Integrate Diagnostics - Added `diagnose(page)` to `RenderStrategy` interface and implemented environment checks (VideoEncoder, WAAPI) in strategies to improve observability.
 

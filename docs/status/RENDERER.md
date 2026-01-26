@@ -1,8 +1,9 @@
-**Version**: 1.9.0
+**Version**: 1.10.0
 
 # Renderer Agent Status
 
 ## Progress Log
+- [1.10.0] ✅ Completed: Implement Background Image Preloading - Updated `DomStrategy` to detect and preload CSS background images, ensuring they are loaded before rendering starts.
 - [1.9.0] ✅ Completed: Integrate Diagnostics - Added `diagnose(page)` to `RenderStrategy` interface and implemented environment checks (VideoEncoder, WAAPI) in strategies to improve observability.
 - [1.8.0] ✅ Completed: Configurable WebCodecs Bitrate - Updated `CanvasStrategy` to respect `videoBitrate` in `RendererOptions`, enabling high-quality intermediate capture (defaulting to 25 Mbps floor).
 - [1.7.0] ✅ Completed: Implement Video Concatenation - Added `concatenateVideos` utility using FFmpeg concat demuxer to support distributed rendering workflows.

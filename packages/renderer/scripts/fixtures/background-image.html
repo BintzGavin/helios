@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Background Image Preload Test</title>
+  <style>
+    body { margin: 0; background: #333; }
+    .bg-box {
+      width: 200px;
+      height: 200px;
+      background-image: url('https://placehold.co/200x200.png');
+      background-size: cover;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-box"></div>
+  <script type="module">
+    import { Helios } from '../../../../packages/core/dist/index.js';
+    const helios = new Helios({ fps: 30, duration: 1 });
+    helios.bindToDocumentTimeline();
+  </script>
+</body>
+</html>
