@@ -1,5 +1,5 @@
 # Status: DEMO (Executor)
-**Version**: 1.18.0
+**Version**: 1.19.0
 
 ## Vision
 To provide comprehensive, idiomatic examples for every major framework (React, Vue, Svelte, Vanilla) and robust end-to-end testing to ensure the Helios engine delivers on its "Use What You Know" promise.
@@ -15,7 +15,7 @@ To provide comprehensive, idiomatic examples for every major framework (React, V
 - **Vue (DOM)**: ✅ `examples/vue-dom-animation` exists and works.
 - **Vue (Helpers)**: ✅ `examples/vue-animation-helpers` exists and works (Demonstrates `<Sequence>`, `<Series>`).
 - **Svelte**: ✅ `examples/svelte-canvas-animation` exists and works.
-- **Svelte (Helpers)**: ✅ `examples/svelte-animation-helpers` exists and works (Demonstrates `<Sequence>`).
+- **Svelte (Helpers)**: ✅ `examples/svelte-animation-helpers` exists and works (Demonstrates `<Sequence>`, `<Series>`).
 - **Three.js**: ✅ `examples/threejs-canvas-animation` exists and works.
 - **Pixi.js**: ✅ `examples/pixi-canvas-animation` exists and works.
 - **E2E Tests**: ✅ Verified all existing examples via `tests/e2e/verify-render.ts`.
@@ -36,6 +36,7 @@ To provide comprehensive, idiomatic examples for every major framework (React, V
 None.
 
 ## Log
+- [v1.19.0] ✅ Completed: Implement Svelte Series Component - Added `<Series>` component to `examples/svelte-animation-helpers` and updated example to use it.
 - [v1.18.0] ✅ Completed: Implement React Series Component - Implemented `<Series>` component in `examples/react-animation-helpers` and verified with E2E tests.
 - [v1.17.0] ✅ Completed: Implement Vue Series Component - Added `<Series>` component to `examples/vue-animation-helpers` and updated example to demonstrate it.
 - [v1.16.0] ✅ Completed: Implement React Series Component - Added `<Series>` component to `examples/react-animation-helpers` and updated example to demonstrate it.
