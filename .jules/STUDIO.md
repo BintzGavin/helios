@@ -29,3 +29,7 @@
 ## [0.13.0] - Props Schema Validation Constraint
 **Learning:** The Vision promises "Props editor with schema validation", but `Helios` core (`packages/core`) only defines `inputProps` as a generic `Record<string, any>` without schema metadata. Since I cannot modify Core, true schema validation is currently impossible.
 **Action:** Planned "Rich Props Editor" to support JSON editing for objects/arrays as a workaround. Future implementation of full validation requires architectural changes in Core to allow users to define schemas.
+
+## [0.14.0] - Dynamic Discovery Gap
+**Learning:** Studio's server-side discovery logic was hardcoded to `../../examples`, blocking usage on external projects (Vision Gap).
+**Action:** Always verify that "Dev Mode" conveniences (hardcoded paths) don't become "Production" blockers. Ensure configuration paths are dynamic from the start.
