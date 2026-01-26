@@ -1,5 +1,8 @@
 # Studio Progress Log
 
+## STUDIO v0.16.0
+- ✅ Completed: Canvas Resolution Controls - Added UI controls for setting composition resolution (presets & custom) and updated `StudioContext` to manage `canvasSize`.
+
 ## STUDIO v0.15.0
 - ✅ Completed: Dynamic Project Discovery - Enabled `HELIOS_PROJECT_ROOT` env var to configure project root for composition/asset discovery, unlocking "Studio as a Tool".
 
