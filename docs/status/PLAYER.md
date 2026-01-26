@@ -1,4 +1,4 @@
-**Version**: 0.18.0
+**Version**: 0.19.0
 
 # Status: PLAYER
 
@@ -20,11 +20,13 @@
 - Displays actionable error messages with "Dismiss" option for failed client-side exports.
 - Supports Volume and Mute controls via UI and Bridge.
 - Supports caption rendering overlay with toggleable "CC" button.
-- **New**: Supports WebM (VP9/Opus) client-side export via `export-format` attribute.
+- Supports WebM (VP9/Opus) client-side export via `export-format` attribute.
+- **New**: Implements Standard Media API (play, pause, currentTime, events) for better interoperability.
 
 ## Critical Task
 - **None**: Recent task completed.
 
+[v0.19.0] ✅ Completed: Implement Standard Media API - Implemented standard media properties (currentTime, duration, etc.) and events (play, pause, timeupdate) for improved interoperability.
 [v0.18.0] ✅ Completed: WebM Export - Implemented `export-format` attribute to support WebM (VP9/Opus) video export alongside MP4.
 [v0.17.1] ✅ Completed: Touch Support - Added touch event listeners to the scrubber to support smooth seeking on mobile devices.
 [v0.17.0] ✅ Completed: Implement Captions - Added caption rendering overlay and "CC" toggle button to `<helios-player>`, leveraging `activeCaptions` from core state.
@@ -46,7 +48,7 @@
 [v0.5.1] ✅ Completed: Standard Attributes - Implemented `autoplay`, `loop`, and `controls` attributes. Synced version and artifacts.
 
 ## Backlog
-- [ ] Implement Standard Media API (play, pause, currentTime, events).
+- [x] Implement Standard Media API (play, pause, currentTime, events).
 - [x] Implement Caption Rendering.
 - [x] Implement Volume Controls.
 - [x] Implement Client Side Audio Export.
