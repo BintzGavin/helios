@@ -1,5 +1,8 @@
 # PLAYER Progress Log
 
+## PLAYER v0.14.0
+- ✅ Completed: Accessibility Improvements - Implemented ARIA labels and roles for controls, including dynamic updates for play state and scrubber time.
+
 ## PLAYER v0.13.0
 - ✅ Completed: Frame-by-Frame Controls - Implemented `.`/`,` for single-frame stepping and updated Arrow keys to default to 1 frame (10 with Shift).
 

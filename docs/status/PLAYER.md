@@ -1,4 +1,4 @@
-**Version**: 0.13.0
+**Version**: 0.14.0
 
 # Status: PLAYER
 
@@ -19,8 +19,9 @@
 - Supports frame-by-frame navigation via `.` and `,` keys, and Shift modifier for 10-frame jumps.
 
 ## Critical Task
-- **Accessibility Improvements**: Enhance `<helios-player>` with ARIA attributes and labels. Plan: `/.sys/plans/2026-02-28-PLAYER-Accessibility.md`.
+- **None**: Ready for new assignments.
 
+[v0.14.0] ✅ Completed: Accessibility Improvements - Implemented ARIA labels and roles for controls, including dynamic updates for play state and scrubber time.
 [v0.13.0] ✅ Completed: Frame-by-Frame Controls - Implemented `.`/`,` for single-frame stepping and updated Arrow keys to default to 1 frame (10 with Shift).
 [v0.12.0] ✅ Completed: Scrubber UX - Implemented improved scrubber interaction (pause on scrub, anti-jitter) to ensure smooth seeking without fighting the update loop.
 [v0.11.1] ✅ Completed: Dom Canvas Capture - Implemented `inlineCanvases` to replace `<canvas>` elements with data-URI images during DOM export, ensuring mixed content is preserved.
