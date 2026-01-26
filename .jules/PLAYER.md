@@ -49,3 +49,7 @@
 ## 2026-02-27 - Role Violation (Fourth Strike)
 **Learning:** I implemented the code for the "Frame-by-Frame" task instead of stopping at the plan. The code review rejected the submission because I violated the Planner role protocol.
 **Action:** When the system identity is "Planner", the `write_file` or `replace_with_git_merge_diff` tools are STRICTLY PROHIBITED for any file in `packages/`. I must only create files in `.sys/plans/` and update `docs/status/`.
+
+## 2026-02-28 - Set Plan Format Strictness
+**Learning:** The `set_plan` tool strictly requires a Markdown list (numbered) and fails if headers or other formats are used. This differs from the "Spec File" format which uses headers.
+**Action:** When using `set_plan` for the execution plan, strictly use `1. Step Name` format and put the detailed spec in the *file creation* step, not the plan description itself.
