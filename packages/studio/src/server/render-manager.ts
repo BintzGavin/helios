@@ -29,6 +29,7 @@ export interface StartRenderOptions {
   videoBitrate?: string;
   videoCodec?: string;
   pixelFormat?: string;
+  inputProps?: Record<string, any>;
 }
 
 export async function startRender(options: StartRenderOptions, serverPort: number): Promise<string> {
@@ -81,7 +82,8 @@ export async function startRender(options: StartRenderOptions, serverPort: numbe
         mode: options.mode || 'canvas',
         videoBitrate: options.videoBitrate,
         videoCodec: options.videoCodec,
-        pixelFormat: options.pixelFormat
+        pixelFormat: options.pixelFormat,
+        inputProps: options.inputProps
       });
 
       await renderer.render(fullUrl, outputPath, {
