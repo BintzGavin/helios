@@ -1,5 +1,5 @@
 # Status: DEMO (Executor)
-**Version**: 1.25.0
+**Version**: 1.26.0
 
 ## Vision
 To provide comprehensive, idiomatic examples for every major framework (React, Vue, Svelte, Vanilla) and robust end-to-end testing to ensure the Helios engine delivers on its "Use What You Know" promise.
@@ -10,6 +10,7 @@ To provide comprehensive, idiomatic examples for every major framework (React, V
 - **GSAP**: ✅ `examples/gsap-animation` exists and works.
 - **Framer Motion**: ✅ `examples/framer-motion-animation` exists and works.
 - **Lottie**: ✅ `examples/lottie-animation` exists and works.
+- **Motion One**: ✅ `examples/motion-one-animation` exists and works.
 - **Animation Helpers**: ✅ `examples/animation-helpers` exists and works (Demonstrates `interpolate`, `spring`, `sequence`, `series`).
 - **React (Canvas)**: ✅ `examples/react-canvas-animation` exists and works.
 - **React (DOM)**: ✅ `examples/react-dom-animation` exists and works.
@@ -36,11 +37,13 @@ To provide comprehensive, idiomatic examples for every major framework (React, V
 - [x] Verify DOM rendering example
 - [x] Scaffold Framer Motion Example
 - [x] Scaffold Lottie Animation Example
+- [x] Scaffold Motion One Example
 
 ## Known Issues
 None.
 
 ## Log
+- [v1.26.0] ✅ Completed: Scaffold Motion One Example - Created `examples/motion-one-animation` demonstrating integration with `motion` library via `autoSyncAnimations: true`.
 - [v1.25.0] ✅ Completed: Verify React Series Component - Verified implementation of `<Series>` component in `examples/react-animation-helpers` and confirmed E2E tests pass using `ts-node`.
 - [v1.24.0] 📋 Planned: Scaffold Motion One Example - Created spec file `/.sys/plans/2026-01-26-DEMO-MotionOne.md` to guide integration with `motion` library.
 - [v1.23.0] ✅ Completed: Scaffold Lottie Animation Example - Created `examples/lottie-animation` demonstrating integration with `lottie-web` via time-based seeking.

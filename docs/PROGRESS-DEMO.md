@@ -36,3 +36,6 @@
 
 ## DEMO v1.25.0
 - ✅ Completed: Verify React Series Component - Verified implementation of `<Series>` component in `examples/react-animation-helpers` and confirmed E2E tests pass using `ts-node`.
+
+## DEMO v1.26.0
+- ✅ Completed: Scaffold Motion One Example - Created examples/motion-one-animation demonstrating integration with motion library via autoSyncAnimations: true.
