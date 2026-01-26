@@ -28,6 +28,7 @@ export default defineConfig({
         react_helpers: resolve(__dirname, "examples/react-animation-helpers/composition.html"),
         svelte_helpers: resolve(__dirname, "examples/svelte-animation-helpers/composition.html"),
         vue_helpers: resolve(__dirname, "examples/vue-animation-helpers/composition.html"),
+        gsap_animation: resolve(__dirname, "examples/gsap-animation/composition.html"),
       },
     },
   },
