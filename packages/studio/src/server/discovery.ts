@@ -15,22 +15,28 @@ export interface AssetInfo {
   type: 'image' | 'video' | 'audio' | 'font' | 'other';
 }
 
+export function getProjectRoot(cwd: string): string {
+  if (process.env.HELIOS_PROJECT_ROOT) {
+    return path.resolve(process.env.HELIOS_PROJECT_ROOT);
+  }
+  return path.resolve(cwd, '../../examples');
+}
+
 export function findCompositions(rootDir: string): CompositionInfo[] {
   // rootDir is expected to be packages/studio (or wherever the vite server is running from)
-  // We want to look at ../../examples
-  const examplesDir = path.resolve(rootDir, '../../examples');
+  const projectRoot = getProjectRoot(rootDir);
 
-  if (!fs.existsSync(examplesDir)) {
-    console.warn(`Examples directory not found at: ${examplesDir}`);
+  if (!fs.existsSync(projectRoot)) {
+    console.warn(`Project root directory not found at: ${projectRoot}`);
     return [];
   }
 
-  const entries = fs.readdirSync(examplesDir, { withFileTypes: true });
+  const entries = fs.readdirSync(projectRoot, { withFileTypes: true });
   const compositions: CompositionInfo[] = [];
 
   for (const entry of entries) {
     if (entry.isDirectory()) {
-      const compPath = path.join(examplesDir, entry.name, 'composition.html');
+      const compPath = path.join(projectRoot, entry.name, 'composition.html');
       if (fs.existsSync(compPath)) {
         // Format name: "simple-canvas-animation" -> "Simple Canvas Animation"
         const name = entry.name
@@ -66,10 +72,10 @@ function getAssetType(ext: string): AssetInfo['type'] {
 }
 
 export function findAssets(rootDir: string): AssetInfo[] {
-  const examplesDir = path.resolve(rootDir, '../../examples');
+  const projectRoot = getProjectRoot(rootDir);
 
-  if (!fs.existsSync(examplesDir)) {
-    console.warn(`Examples directory not found at: ${examplesDir}`);
+  if (!fs.existsSync(projectRoot)) {
+    console.warn(`Project root directory not found at: ${projectRoot}`);
     return [];
   }
 
@@ -100,6 +106,6 @@ export function findAssets(rootDir: string): AssetInfo[] {
     }
   }
 
-  scan(examplesDir);
+  scan(projectRoot);
   return assets;
 }
