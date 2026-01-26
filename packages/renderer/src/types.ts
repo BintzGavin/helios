@@ -25,6 +25,12 @@ export interface RendererOptions {
   audioFilePath?: string;
 
   /**
+   * List of paths to audio files to include in the output video.
+   * If provided, these will be mixed with the video.
+   */
+  audioTracks?: string[];
+
+  /**
    * The video codec to use. Defaults to 'libx264'.
    */
   videoCodec?: string;
