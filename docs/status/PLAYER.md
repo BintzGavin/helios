@@ -18,7 +18,7 @@
 - Supports standard keyboard shortcuts (Space/K, F, Arrows) and Fullscreen toggle.
 
 ## Critical Task
-- **None**: Recent critical task completed. Await next assignment.
+- **Frame-by-Frame Controls**: Implement `.`/`,` shortcuts and refine Arrow key behavior for single-frame stepping. Plan: `/.sys/plans/2026-02-27-PLAYER-Frame-By-Frame-Controls.md`.
 
 [v0.12.0] ✅ Completed: Scrubber UX - Implemented improved scrubber interaction (pause on scrub, anti-jitter) to ensure smooth seeking without fighting the update loop.
 [v0.11.1] ✅ Completed: Dom Canvas Capture - Implemented `inlineCanvases` to replace `<canvas>` elements with data-URI images during DOM export, ensuring mixed content is preserved.
