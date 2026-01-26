@@ -5,6 +5,7 @@
 - `examples/simple-animation`: Vanilla JS DOM (native CSS Animations).
 - `examples/gsap-animation`: Vanilla JS DOM driving GSAP timelines.
 - `examples/framer-motion-animation`: React with Framer Motion (manual syncing via `useMotionValue`).
+- `examples/lottie-animation`: Vanilla JS DOM driving Lottie (`lottie-web`) via time-based seeking.
 - `examples/animation-helpers`: Vanilla JS Canvas demonstrating `interpolate`, `spring`, `sequence`, and `series`.
 - `examples/react-canvas-animation`: React with Canvas.
 - `examples/react-dom-animation`: React with DOM elements.
@@ -25,4 +26,4 @@
 
 ## Section C: E2E Tests
 - `tests/e2e/verify-render.ts`: Script using Playwright and Renderer to verify that examples render correctly to video.
-- Verified cases: Canvas, DOM, React, React DOM, Vue, Vue DOM, Svelte, Svelte DOM, ThreeJS, Pixi, Helpers, React Helpers, Svelte Helpers, Vue Helpers, GSAP, Framer Motion.
+- Verified cases: Canvas, DOM, React, React DOM, Vue, Vue DOM, Svelte, Svelte DOM, ThreeJS, Pixi, Helpers, React Helpers, Svelte Helpers, Vue Helpers, GSAP, Framer Motion, Lottie.

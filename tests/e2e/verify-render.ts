@@ -19,6 +19,7 @@ const CASES = [
   { name: 'Vue Helpers', relativePath: 'examples/vue-animation-helpers/composition.html', mode: 'dom' as const },
   { name: 'GSAP', relativePath: 'examples/gsap-animation/composition.html', mode: 'dom' as const },
   { name: 'Framer Motion', relativePath: 'examples/framer-motion-animation/composition.html', mode: 'dom' as const },
+  { name: 'Lottie', relativePath: 'examples/lottie-animation/composition.html', mode: 'dom' as const },
 ];
 
 async function main() {
