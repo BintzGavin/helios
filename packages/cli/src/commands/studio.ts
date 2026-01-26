@@ -19,6 +19,10 @@ export function registerStudioCommand(program: Command) {
 
       const child = spawn('npm', ['run', 'dev'], {
         cwd: studioPath,
+        env: {
+          ...process.env,
+          HELIOS_PROJECT_ROOT: process.env.HELIOS_PROJECT_ROOT || process.cwd(),
+        },
         stdio: 'inherit',
         shell: true,
       });
