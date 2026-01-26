@@ -21,8 +21,8 @@
 - **New**: Supports Volume and Mute controls via UI and Bridge.
 
 ## Critical Task
-- **Plan**: None.
-- **Action**: Await further instructions.
+- **Plan**: `/.sys/plans/2026-03-01-PLAYER-Implement-Captions.md`
+- **Action**: Implement caption rendering in `<helios-player>`.
 
 [v0.16.0] ✅ Completed: Volume Controls - Implemented volume slider and mute button in UI, updated controllers and bridge protocol.
 [v0.15.0] ✅ Completed: Export UX - Implemented Error Overlay with "Dismiss" action for client-side export failures, providing visibility into errors like unsupported codecs.
