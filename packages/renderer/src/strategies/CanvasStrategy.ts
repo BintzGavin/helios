@@ -73,6 +73,15 @@ export class CanvasStrategy implements RenderStrategy {
       }
     }
 
+    // Determine alpha mode
+    const pixelFormat = this.options.pixelFormat || 'yuv420p';
+    const hasAlpha = pixelFormat.startsWith('yuva') ||
+                     pixelFormat.includes('rgba') ||
+                     pixelFormat.includes('bgra') ||
+                     pixelFormat.includes('argb') ||
+                     pixelFormat.includes('abgr');
+    const alphaMode = hasAlpha ? 'keep' : 'discard';
+
     const result = await page.evaluate(async (config) => {
       if (typeof VideoEncoder === 'undefined') {
         return { supported: false, reason: 'VideoEncoder not found' };
@@ -83,7 +92,8 @@ export class CanvasStrategy implements RenderStrategy {
         width: config.width,
         height: config.height,
         bitrate: config.bitrate,
-      };
+        alpha: config.alphaMode,
+      } as VideoEncoderConfig;
 
       try {
         const support = await VideoEncoder.isConfigSupported(encoderConfig);
@@ -166,11 +176,11 @@ export class CanvasStrategy implements RenderStrategy {
       } catch (e) {
         return { supported: false, reason: (e as Error).message };
       }
-    }, { width, height, bitrate: intermediateBitrate, codecString, fourCC });
+    }, { width, height, bitrate: intermediateBitrate, codecString, fourCC, alphaMode });
 
     if (result.supported) {
       this.useWebCodecs = true;
-      console.log(`CanvasStrategy: Using WebCodecs (${codecString}) with bitrate: ${intermediateBitrate}`);
+      console.log(`CanvasStrategy: Using WebCodecs (${codecString}) with bitrate: ${intermediateBitrate}, alpha: ${alphaMode}`);
     } else {
       this.useWebCodecs = false;
       console.log(`CanvasStrategy: WebCodecs not available (${result.reason}). Falling back to toDataURL.`);

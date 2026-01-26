@@ -1,8 +1,9 @@
-**Version**: 1.16.0
+**Version**: 1.17.0
 
 # Renderer Agent Status
 
 ## Progress Log
+- [1.17.0] ✅ Completed: Enable Transparent Canvas - Updated `CanvasStrategy` to infer transparency from `pixelFormat` (e.g., `yuva420p`) and configure `VideoEncoder` with `alpha: 'keep'`, enabling transparent video rendering in Canvas mode.
 - [1.16.0] ✅ Completed: Polyfill SeekTimeDriver - Injected virtual time polyfill (overriding `performance.now`, `Date.now`, `requestAnimationFrame`) into `SeekTimeDriver` to ensure deterministic rendering of JavaScript-driven animations in DOM mode.
 - [1.15.0] ✅ Completed: Expose Diagnostics - Updated `RenderStrategy.diagnose` to return a diagnostic report instead of logging it, and exposed `renderer.diagnose()` to programmatically verify environment capabilities (WebCodecs, WAAPI).
 - [1.14.0] ✅ Completed: Input Props Injection - Added `inputProps` to `RendererOptions` and implemented injection via `page.addInitScript`, enabling parameterized rendering (e.g. dynamic text/colors) by setting `window.__HELIOS_PROPS__`.

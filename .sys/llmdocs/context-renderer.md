@@ -2,7 +2,7 @@
 
 ## A. Strategy
 The Renderer employs a "Dual-Path" architecture:
-1. **Canvas Mode**: For high-performance rendering of `<canvas>` based animations. Uses `CdpTimeDriver` to control time via Chrome DevTools Protocol and WebCodecs for efficient frame capture. Intermediate bitrate and codec (VP8/VP9/AV1) are configurable.
+1. **Canvas Mode**: For high-performance rendering of `<canvas>` based animations. Uses `CdpTimeDriver` to control time via Chrome DevTools Protocol and WebCodecs for efficient frame capture. Intermediate bitrate and codec (VP8/VP9/AV1) are configurable. Supports transparent video generation by preserving alpha channel when `pixelFormat` indicates transparency (e.g. `yuva420p`).
 2. **DOM Mode**: For rendering standard DOM/CSS animations. Uses `SeekTimeDriver` to manipulate `document.timeline.currentTime` and `page.screenshot` for capture. Automatically preloads fonts, images (`<img>`), CSS background images, and media elements (`<video>`, `<audio>`) to prevent artifacts. To ensure deterministic JS animations, `SeekTimeDriver` injects a polyfill that overrides `performance.now()`, `Date.now()`, and `requestAnimationFrame()` with a controlled virtual time.
 
 Exposes a programmatic `diagnose()` method to verify environment requirements (e.g., WebCodecs support, WAAPI) and return a detailed capability report before rendering.
@@ -15,7 +15,8 @@ packages/renderer/
 │   ├── verify-bitrate.ts
 │   ├── verify-diagnostics.ts
 │   ├── verify-dom-preload.ts
-│   └── verify-error-handling.ts
+│   ├── verify-error-handling.ts
+│   └── verify-transparency.ts
 ├── src/
 │   ├── drivers/
 │   │   ├── CdpTimeDriver.ts
