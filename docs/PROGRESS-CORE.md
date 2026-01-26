@@ -1,5 +1,8 @@
 # CORE Progress Log
 
+## CORE v1.23.0
+- ✅ Completed: Implement Resolution Awareness - Added `width`/`height` to state/options, `setSize` method, and `INVALID_RESOLUTION` error.
+
 ## CORE v1.22.0
 - ✅ Completed: Expand Input Schema Validation - Added `minimum`, `maximum`, and `enum` constraints to `HeliosSchema` and updated `validateProps`.
 

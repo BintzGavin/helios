@@ -7,6 +7,8 @@ describe('Helios Core', () => {
   it('should initialize with correct state', () => {
     const helios = new Helios({ duration: 10, fps: 30 });
     expect(helios.getState()).toEqual({
+      width: 1920,
+      height: 1080,
       duration: 10,
       fps: 30,
       currentFrame: 0,
@@ -475,6 +477,61 @@ describe('Helios Core', () => {
       expect(helios.getState().currentFrame).toBe(30);
 
       vi.unstubAllGlobals();
+    });
+  });
+
+  describe('Resolution Handling', () => {
+    it('should initialize with default resolution (1920x1080)', () => {
+      const helios = new Helios({ duration: 10, fps: 30 });
+      expect(helios.width.value).toBe(1920);
+      expect(helios.height.value).toBe(1080);
+      expect(helios.getState().width).toBe(1920);
+      expect(helios.getState().height).toBe(1080);
+    });
+
+    it('should initialize with provided resolution', () => {
+      const helios = new Helios({ duration: 10, fps: 30, width: 1280, height: 720 });
+      expect(helios.width.value).toBe(1280);
+      expect(helios.height.value).toBe(720);
+    });
+
+    it('should throw INVALID_RESOLUTION for non-positive width/height in constructor', () => {
+      try {
+        new Helios({ duration: 10, fps: 30, width: 0, height: 1080 });
+      } catch (e) {
+        expect(e).toBeInstanceOf(HeliosError);
+        expect((e as HeliosError).code).toBe(HeliosErrorCode.INVALID_RESOLUTION);
+      }
+
+      try {
+        new Helios({ duration: 10, fps: 30, width: 1920, height: -1 });
+      } catch (e) {
+        expect(e).toBeInstanceOf(HeliosError);
+        expect((e as HeliosError).code).toBe(HeliosErrorCode.INVALID_RESOLUTION);
+      }
+    });
+
+    it('should update resolution via setSize', () => {
+      const helios = new Helios({ duration: 10, fps: 30 });
+      helios.setSize(800, 600);
+      expect(helios.width.value).toBe(800);
+      expect(helios.height.value).toBe(600);
+      expect(helios.getState().width).toBe(800);
+      expect(helios.getState().height).toBe(600);
+    });
+
+    it('should throw INVALID_RESOLUTION for non-positive width/height in setSize', () => {
+      const helios = new Helios({ duration: 10, fps: 30 });
+
+      expect(() => helios.setSize(0, 100)).toThrow(HeliosError);
+      expect(() => helios.setSize(100, -50)).toThrow(HeliosError);
+
+      try {
+        helios.setSize(-100, 100);
+      } catch (e) {
+        expect(e).toBeInstanceOf(HeliosError);
+        expect((e as HeliosError).code).toBe(HeliosErrorCode.INVALID_RESOLUTION);
+      }
     });
   });
 
