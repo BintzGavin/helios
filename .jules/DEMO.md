@@ -1,5 +1,9 @@
 # Planner's Journal - DEMO
 
+## 2025-02-19 - Vue Series Component Gap
+**Learning**: The README promises `<Series>` support for sequential layouts, but `examples/vue-animation-helpers` lacked it, forcing manual offsets. The Status file incorrectly claimed React had it, but React was also missing it.
+**Action**: Prioritized implementing `<Series>` for Vue to close the gap. Future plans should verify "Completed" status claims against actual file existence.
+
 ## 2025-02-18 - Animation Helpers Gap
 **Learning:** The README promises "Animation Helpers" (`interpolate`, `spring`) for code-driven animation, but no examples existed to demonstrate them. This was a gap between vision and reality.
 **Action:** Scaffolding `examples/animation-helpers` to close this gap and provide a reference implementation.
