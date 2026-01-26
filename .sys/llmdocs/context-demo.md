@@ -9,7 +9,7 @@
 - `examples/react-animation-helpers`: React demonstrating `<Sequence>` and `<Series>` components.
 - `examples/vue-canvas-animation`: Vue with Canvas.
 - `examples/vue-dom-animation`: Vue with DOM elements.
-- `examples/vue-animation-helpers`: Vue demonstrating `<Sequence>` pattern.
+- `examples/vue-animation-helpers`: Vue demonstrating `<Sequence>` and `<Series>` components.
 - `examples/svelte-canvas-animation`: Svelte with Canvas.
 - `examples/svelte-dom-animation`: Svelte with DOM elements.
 - `examples/svelte-animation-helpers`: Svelte demonstrating `<Sequence>` pattern.

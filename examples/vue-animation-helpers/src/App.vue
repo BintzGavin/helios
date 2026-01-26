@@ -2,6 +2,7 @@
 import { ref, provide, onUnmounted } from 'vue';
 import { Helios } from '../../../packages/core/dist/index.js';
 import Sequence from './components/Sequence.vue';
+import Series from './components/Series.vue';
 
 const helios = new Helios({ duration: 5, fps: 30 });
 helios.bindToDocumentTimeline();
@@ -28,26 +29,28 @@ provide('videoFrame', frame);
     <h1>Vue Animation Helpers</h1>
     <div>Root Frame: {{ frame.toFixed(2) }}</div>
 
-    <!-- Sequence 1: 0-30 frames -->
-    <Sequence :from="0" :durationInFrames="30">
-       <div class="box red">Seq 1</div>
-    </Sequence>
+    <Series>
+      <!-- Sequence 1: 0-30 frames -->
+      <Sequence :durationInFrames="30">
+        <div class="box red">Seq 1</div>
+      </Sequence>
 
-    <!-- Sequence 2: 30-60 frames -->
-    <Sequence :from="30" :durationInFrames="30">
-       <div class="box blue">Seq 2</div>
-    </Sequence>
+      <!-- Sequence 2: 30-60 frames -->
+      <Sequence :durationInFrames="30">
+        <div class="box blue">Seq 2</div>
+      </Sequence>
 
-    <!-- Sequence 3: Nested -->
-    <Sequence :from="60" :durationInFrames="60">
-        <div>Wrapper (60-120)</div>
-        <Sequence :from="0" :durationInFrames="30">
-            <div class="box green">Nested 1</div>
-        </Sequence>
-        <Sequence :from="30" :durationInFrames="30">
-            <div class="box yellow">Nested 2</div>
-        </Sequence>
-    </Sequence>
+      <!-- Sequence 3: Nested -->
+      <Sequence :durationInFrames="60">
+          <div>Wrapper (60-120)</div>
+          <Sequence :from="0" :durationInFrames="30">
+              <div class="box green">Nested 1</div>
+          </Sequence>
+          <Sequence :from="30" :durationInFrames="30">
+              <div class="box yellow">Nested 2</div>
+          </Sequence>
+      </Sequence>
+    </Series>
   </div>
 </template>
 
