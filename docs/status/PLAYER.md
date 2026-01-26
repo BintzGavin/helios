@@ -46,6 +46,7 @@
 [v0.5.1] ✅ Completed: Standard Attributes - Implemented `autoplay`, `loop`, and `controls` attributes. Synced version and artifacts.
 
 ## Backlog
+- [ ] Implement Standard Media API (play, pause, currentTime, events).
 - [x] Implement Caption Rendering.
 - [x] Implement Volume Controls.
 - [x] Implement Client Side Audio Export.
