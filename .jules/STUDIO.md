@@ -49,3 +49,7 @@
 ## [0.23.0] - Asset Management Gaps
 **Learning:** The Vision calls for "Manage assets", but the current `findAssets` implementation is read-only. True management requires `POST` (upload) and `DELETE` endpoints in the `vite-plugin-studio-api` middleware.
 **Action:** Planned `2026-03-07-STUDIO-Asset-Management.md` to implement these missing endpoints and the corresponding UI (Drag & Drop, Delete button).
+
+## [0.23.0] - External Project Support Gap
+**Learning:** `npx helios studio` fails for external projects because `vite.config.ts` has a restrictive `server.fs.allow` configuration (blocking external files) and `render-manager.ts` writes outputs to the package directory instead of the user's project root.
+**Action:** Planned `2026-01-26-STUDIO-External-Project-Support.md` to configure Vite and server modules to respect `HELIOS_PROJECT_ROOT` and enable external usage.
