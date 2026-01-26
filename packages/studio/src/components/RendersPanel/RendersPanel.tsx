@@ -1,9 +1,10 @@
 import React from 'react';
 import { useStudio } from '../../context/StudioContext';
+import { RenderConfig } from './RenderConfig';
 import './RendersPanel.css';
 
 export const RendersPanel: React.FC = () => {
-  const { renderJobs, startRender, activeComposition, inPoint, outPoint } = useStudio();
+  const { renderJobs, startRender, activeComposition, inPoint, outPoint, renderConfig, setRenderConfig } = useStudio();
 
   const handleTestRender = () => {
     if (activeComposition) {
@@ -13,6 +14,7 @@ export const RendersPanel: React.FC = () => {
 
   return (
     <div className="renders-panel">
+      <RenderConfig config={renderConfig} onChange={setRenderConfig} />
       <button className="start-render-btn" onClick={handleTestRender} disabled={!activeComposition}>
         Start Test Render
       </button>
