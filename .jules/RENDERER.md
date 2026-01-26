@@ -31,3 +31,7 @@
 ## [1.5.2] - Vision Reality Gap (Diagnostics)
 **Learning:** The README explicitly claims features ("includes `helios.diagnose()`") that are not implemented in the codebase.
 **Action:** When identifying gaps, check "Current Status" claims in README against the code, not just "Planned Features".
+
+## [1.5.3] - Incomplete Asset Preloading
+**Learning:** `DomStrategy` implementation of "Asset Preloading" was incomplete (missed CSS background images), contradicting the Vision's promise of preventing artifacts.
+**Action:** When auditing "Completed" features, verify they cover all standard web use cases (like CSS backgrounds), not just the happy path (`<img>` tags).
