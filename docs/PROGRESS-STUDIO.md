@@ -1,5 +1,8 @@
 # Studio Progress Log
 
+## STUDIO v0.23.0
+- ✅ Completed: Asset Management - Implemented asset upload (Drag & Drop) and delete functionality in Assets Panel, backed by new API endpoints.
+
 ## STUDIO v0.22.0
 - ✅ Completed: Global Shortcuts & Frame Stepping - Added Shift+Arrow shortcuts (10-frame jump) and Prev/Next Frame buttons to the UI.
 

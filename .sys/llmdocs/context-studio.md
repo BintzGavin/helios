@@ -10,7 +10,7 @@ The Studio is a browser-based development environment (IDE) for Helios video com
 
 It consists of:
 -   **CLI**: `@helios-project/cli` (via `npx helios studio`) starts the development server.
--   **Server**: A Vite development server with custom middleware (`vite-plugin-studio-api`) that serves the UI and handles API requests (rendering, file listing).
+-   **Server**: A Vite development server with custom middleware (`vite-plugin-studio-api`) that serves the UI and handles API requests (rendering, file listing, asset management).
 -   **UI**: A React-based Single Page Application (SPA) that consumes the `Helios` core and player.
 
 ## B. File Tree
@@ -19,15 +19,16 @@ It consists of:
 packages/studio/
 ├── bin/
 │   └── studio.js          # CLI entry point
+├── vite-plugin-studio-api.ts # Backend API implementation (Upload, Delete, Render)
 ├── src/
 │   ├── cli.ts             # CLI implementation (starts Vite server)
-│   ├── server.ts          # Vite server configuration & API middleware
-│   ├── vite-plugin-studio-api.ts # Backend API implementation
-│   ├── render-manager.ts  # Render job queue & FFmpeg management
+│   ├── server/            # Server-side logic
+│   │   ├── discovery.ts   # Composition and Asset scanning
+│   │   └── render-manager.ts # Render job queue & FFmpeg management
 │   ├── main.tsx           # React entry point
 │   ├── App.tsx            # Main application layout & global shortcuts
 │   ├── context/
-│   │   └── StudioContext.tsx # Global state (active composition, player state, render jobs)
+│   │   └── StudioContext.tsx # Global state (active composition, player state, render jobs, assets)
 │   ├── components/
 │   │   ├── Layout/        # Layout components (Panel, StudioLayout)
 │   │   ├── Controls/      # Playback controls (Play, Pause, Step, Loop)
@@ -36,7 +37,7 @@ packages/studio/
 │   │   ├── PropsEditor.tsx# JSON/Form editor for input props
 │   │   ├── CompositionSwitcher.tsx # Cmd+K switcher
 │   │   ├── RendersPanel/  # Render job list & configuration
-│   │   └── AssetsPanel/   # Asset browser
+│   │   └── AssetsPanel/   # Asset browser (Upload, Delete, Drag & Drop)
 │   └── hooks/
 │       └── useKeyboardShortcut.ts
 └── package.json
@@ -59,7 +60,7 @@ Env vars:
 -   **PlaybackControls**: Play/Pause, Rewind, Previous/Next Frame (< / >), Loop, and Playback Speed.
 -   **PropsEditor**: Auto-generates form inputs based on the composition's `inputProps`. Supports rich JSON editing.
 -   **Sidebar**:
-    -   **Assets**: Lists image/video assets in the project.
+    -   **Assets**: Lists image/video assets. Supports Drag & Drop upload and deletion with confirmation.
     -   **Renders**: Configures render settings (Mode, Bitrate, Codec), starts render jobs, and lists job status (Queued, Rendering, Done, Failed).
 -   **CompositionSwitcher**: A global command palette (Cmd+K) to switch between detected compositions.
 
@@ -69,5 +70,5 @@ Env vars:
 -   **Player**: Embeds `<helios-player>` web component. Controls it via `HeliosController`.
 -   **Renderer**: The backend (`render-manager.ts`) uses `@helios-project/renderer` to execute render jobs using FFmpeg or Headless Chrome.
 -   **Communication**:
-    -   **Frontend -> Backend**: HTTP calls to `/api/assets`, `/api/compositions`, `/api/render`.
+    -   **Frontend -> Backend**: HTTP calls to `/api/assets` (GET, DELETE, POST /upload), `/api/compositions`, `/api/render`.
     -   **Backend -> Frontend**: Vite HMR for code updates; Polling for render job status.
