@@ -1,5 +1,8 @@
 # RENDERER Progress Log
 
+## RENDERER v1.11.0
+- ✅ Completed: Implement Media Preloading - Updated `DomStrategy` to detect and preload `<video>` and `<audio>` elements, ensuring they are buffered (`HAVE_ENOUGH_DATA`) before rendering starts.
+
 ## RENDERER v1.10.0
 - ✅ Completed: Implement Background Image Preloading - Updated `DomStrategy` to detect and preload CSS background images, ensuring they are loaded before rendering starts.
 

@@ -3,7 +3,7 @@
 ## A. Strategy
 The Renderer employs a "Dual-Path" architecture:
 1. **Canvas Mode**: For high-performance rendering of `<canvas>` based animations. Uses `CdpTimeDriver` to control time via Chrome DevTools Protocol and WebCodecs for efficient frame capture. Intermediate bitrate is configurable (defaulting to 25 Mbps floor).
-2. **DOM Mode**: For rendering standard DOM/CSS animations. Uses `SeekTimeDriver` to manipulate `document.timeline.currentTime` and `page.screenshot` for capture. Automatically preloads fonts, images (`<img>`), and CSS background images to prevent artifacts.
+2. **DOM Mode**: For rendering standard DOM/CSS animations. Uses `SeekTimeDriver` to manipulate `document.timeline.currentTime` and `page.screenshot` for capture. Automatically preloads fonts, images (`<img>`), CSS background images, and media elements (`<video>`, `<audio>`) to prevent artifacts.
 
 Includes `diagnose(page)` capability to verify environment requirements (e.g., WebCodecs support, WAAPI) before rendering.
 
