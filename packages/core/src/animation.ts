@@ -1,3 +1,5 @@
+import { HeliosError, HeliosErrorCode } from './errors';
+
 export type ExtrapolateType = 'extend' | 'clamp' | 'identity';
 
 export interface InterpolateOptions {
@@ -24,16 +26,28 @@ export function interpolate(
   const { extrapolateLeft = 'extend', extrapolateRight = 'extend', easing } = options || {};
 
   if (inputRange.length !== outputRange.length) {
-    throw new Error('interpolate(): inputRange and outputRange must have the same length');
+    throw new HeliosError(
+      HeliosErrorCode.INVALID_INPUT_RANGE,
+      'interpolate(): inputRange and outputRange must have the same length',
+      'Ensure input and output arrays have the same number of elements.'
+    );
   }
   if (inputRange.length < 2) {
-    throw new Error('interpolate(): inputRange must have at least 2 elements');
+    throw new HeliosError(
+      HeliosErrorCode.INVALID_INPUT_RANGE,
+      'interpolate(): inputRange must have at least 2 elements',
+      'Provide at least 2 values for interpolation.'
+    );
   }
 
   // Validate strictly sorted
   for (let i = 0; i < inputRange.length - 1; i++) {
     if (inputRange[i] >= inputRange[i + 1]) {
-      throw new Error(`interpolate(): inputRange must be strictly monotonically increasing. Found ${inputRange[i]} >= ${inputRange[i + 1]}`);
+      throw new HeliosError(
+        HeliosErrorCode.UNSORTED_INPUT_RANGE,
+        `interpolate(): inputRange must be strictly monotonically increasing. Found ${inputRange[i]} >= ${inputRange[i + 1]}`,
+        'Sort the input range in ascending order.'
+      );
     }
   }
 
@@ -126,8 +140,8 @@ export function spring(options: SpringOptions): number {
 
   const { mass = 1, stiffness = 100, damping = 10, overshootClamping = false } = config;
 
-  if (mass <= 0) throw new Error("Spring mass must be > 0");
-  if (stiffness <= 0) throw new Error("Spring stiffness must be > 0");
+  if (mass <= 0) throw new HeliosError(HeliosErrorCode.INVALID_SPRING_CONFIG, "Spring mass must be > 0", "Set mass to a positive number.");
+  if (stiffness <= 0) throw new HeliosError(HeliosErrorCode.INVALID_SPRING_CONFIG, "Spring stiffness must be > 0", "Set stiffness to a positive number.");
 
   const omega_n = Math.sqrt(stiffness / mass);
   const zeta = damping / (2 * Math.sqrt(stiffness * mass));

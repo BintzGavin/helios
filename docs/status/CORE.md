@@ -1,6 +1,6 @@
 # Status: CORE
 
-**Version**: 1.14.0
+**Version**: 1.15.0
 
 - **Status**: Active
 - **Current Focus**: Maintenance and Optimization
@@ -25,6 +25,7 @@
 [v1.12.0] ✅ Completed: Implement DomDriver - Implemented `DomDriver` to sync WAAPI and HTMLMediaElements, updated `Helios` to use it by default, and deprecated `WaapiDriver`.
 [v1.13.0] ✅ Completed: Export Types - Exported `HeliosState` and `HeliosSubscriber` types from `packages/core` to improve DX.
 [v1.14.0] ✅ Completed: Enable Node.js Runtime Support - Implemented `TimeoutTicker` and environment detection for Node.js compatibility.
+[v1.15.0] ✅ Completed: Implement Structured Errors - Implemented `HeliosError` and `HeliosErrorCode` to provide machine-parseable errors.
 
 **Next Steps**:
 - None.
