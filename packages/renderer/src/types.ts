@@ -52,6 +52,16 @@ export interface RendererOptions {
   videoBitrate?: string;
 
   /**
+   * The codec to use for intermediate capture in 'canvas' mode.
+   * - 'vp8' (default): Widely supported, good performance.
+   * - 'vp9': Better compression, higher quality.
+   * - 'av1': Best compression, requires newer hardware/browsers.
+   *
+   * Can also be a specific codec string (e.g., 'av01.0.05M.08').
+   */
+  intermediateVideoCodec?: string;
+
+  /**
    * Path to the FFmpeg binary.
    * Defaults to the binary provided by @ffmpeg-installer/ffmpeg.
    */
