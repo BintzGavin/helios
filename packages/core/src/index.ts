@@ -264,6 +264,15 @@ export class Helios {
       this.syncWithDocumentTimeline = false;
   }
 
+  public dispose() {
+    this.pause();
+    this.ticker.stop();
+    this.unbindFromDocumentTimeline();
+
+    this.subscriberMap.forEach((dispose) => dispose());
+    this.subscriberMap.clear();
+  }
+
   private onTick = (deltaTime: number) => {
     if (!this._isPlaying.peek()) return;
 

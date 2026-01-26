@@ -1,5 +1,8 @@
 # CORE Progress Log
 
+## CORE v1.16.0
+- ✅ Completed: Implement Helios Disposal - Added `dispose()` method to `Helios` for proper resource cleanup (tickers, polling loops, subscribers).
+
 ## CORE v1.15.0
 - ✅ Completed: Implement Structured Errors - Implemented `HeliosError` and `HeliosErrorCode` to provide machine-parseable errors.
 
