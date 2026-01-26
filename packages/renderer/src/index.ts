@@ -23,7 +23,7 @@ export class Renderer {
       this.strategy = new DomStrategy();
       this.timeDriver = new SeekTimeDriver();
     } else {
-      this.strategy = new CanvasStrategy();
+      this.strategy = new CanvasStrategy(this.options);
       this.timeDriver = new CdpTimeDriver();
     }
   }

@@ -2,11 +2,15 @@
 
 ## A. Strategy
 The Renderer employs a "Dual-Path" architecture:
-1. **Canvas Mode**: For high-performance rendering of `<canvas>` based animations. Uses `CdpTimeDriver` to control time via Chrome DevTools Protocol and WebCodecs for efficient frame capture.
+1. **Canvas Mode**: For high-performance rendering of `<canvas>` based animations. Uses `CdpTimeDriver` to control time via Chrome DevTools Protocol and WebCodecs for efficient frame capture. Intermediate bitrate is configurable (defaulting to 25 Mbps floor).
 2. **DOM Mode**: For rendering standard DOM/CSS animations. Uses `SeekTimeDriver` to manipulate `document.timeline.currentTime` and `page.screenshot` for capture.
 
 ## B. File Tree
 packages/renderer/
+├── scripts/
+│   ├── render.ts
+│   ├── verify-bitrate.ts
+│   └── verify-error-handling.ts
 ├── src/
 │   ├── drivers/
 │   │   ├── CdpTimeDriver.ts
