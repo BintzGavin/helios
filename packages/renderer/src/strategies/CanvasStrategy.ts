@@ -5,10 +5,32 @@ import { RendererOptions } from '../types';
 export class CanvasStrategy implements RenderStrategy {
   private useWebCodecs = false;
 
+  constructor(private options: RendererOptions) {}
+
+  private parseBitrate(bitrate: string): number {
+    const match = bitrate.match(/^(\d+)([kmg]?)$/i);
+    if (!match) return 0;
+    const value = parseInt(match[1], 10);
+    const unit = match[2].toLowerCase();
+    switch (unit) {
+      case 'k': return value * 1_000;
+      case 'm': return value * 1_000_000;
+      case 'g': return value * 1_000_000_000;
+      default: return value;
+    }
+  }
+
   async prepare(page: Page): Promise<void> {
     // Detect WebCodecs support and initialize if possible
     const width = page.viewportSize()?.width || 1920;
     const height = page.viewportSize()?.height || 1080;
+
+    // Calculate intermediate bitrate
+    let targetBitrate = 0;
+    if (this.options.videoBitrate) {
+      targetBitrate = this.parseBitrate(this.options.videoBitrate);
+    }
+    const intermediateBitrate = Math.max(25_000_000, targetBitrate);
 
     const result = await page.evaluate(async (config) => {
       if (typeof VideoEncoder === 'undefined') {
@@ -19,7 +41,7 @@ export class CanvasStrategy implements RenderStrategy {
         codec: 'vp8',
         width: config.width,
         height: config.height,
-        bitrate: 5_000_000, // 5 Mbps
+        bitrate: config.bitrate,
       };
 
       try {
@@ -100,11 +122,11 @@ export class CanvasStrategy implements RenderStrategy {
       } catch (e) {
         return { supported: false, reason: (e as Error).message };
       }
-    }, { width, height });
+    }, { width, height, bitrate: intermediateBitrate });
 
     if (result.supported) {
       this.useWebCodecs = true;
-      console.log('CanvasStrategy: Using WebCodecs (VP8) for rendering.');
+      console.log(`CanvasStrategy: Using WebCodecs (VP8) with bitrate: ${intermediateBitrate}`);
     } else {
       this.useWebCodecs = false;
       console.log(`CanvasStrategy: WebCodecs not available (${result.reason}). Falling back to toDataURL.`);

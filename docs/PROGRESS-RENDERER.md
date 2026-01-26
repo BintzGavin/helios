@@ -1,5 +1,8 @@
 # RENDERER Progress Log
 
+## RENDERER v1.8.0
+- ✅ Completed: Configurable WebCodecs Bitrate - Updated `CanvasStrategy` to respect `videoBitrate` in `RendererOptions`, enabling high-quality intermediate capture (defaulting to 25 Mbps floor).
+
 ## RENDERER v1.7.0
 - ✅ Completed: Implement Video Concatenation - Added `concatenateVideos` utility using FFmpeg concat demuxer to support distributed rendering workflows.
 
