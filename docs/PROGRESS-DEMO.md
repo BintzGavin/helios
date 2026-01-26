@@ -27,3 +27,6 @@
 
 ## DEMO v1.21.0
 - ✅ Completed: GSAP Example - Created `examples/gsap-animation` demonstrating integration with GSAP timelines.
+
+## DEMO v1.22.0
+- ✅ Completed: Scaffold Framer Motion Example - Created `examples/framer-motion-animation` demonstrating integration with `framer-motion` via `useMotionValue` and manual time syncing.
