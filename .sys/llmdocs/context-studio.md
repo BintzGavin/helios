@@ -35,6 +35,7 @@ packages/studio/
     └── components/
         ├── CompositionSwitcher.tsx
         ├── PropsEditor.tsx
+        ├── PropsEditor.css
         ├── Timeline.tsx
         ├── Timeline.css
         ├── Sidebar/
@@ -88,7 +89,7 @@ Internal scripts:
 - **Panel**: `components/Layout/Panel.tsx` is a generic container for UI panels.
 - **Timeline**: `components/Timeline.tsx` provides a visual timeline with draggable in/out markers and keyboard shortcuts (I/O).
 - **PlaybackControls**: `components/Controls/PlaybackControls.tsx` provides Play, Pause, Rewind, Loop, and Speed (0.25x - 4x) controls.
-- **PropsEditor**: `components/PropsEditor.tsx` provides inputs to modify composition properties (`inputProps`).
+- **PropsEditor**: `components/PropsEditor.tsx` provides inputs to modify composition properties (`inputProps`). Supports primitive types (string, number, boolean, color) and complex types (objects, arrays) via a JSON editor.
 - **CompositionSwitcher**: `components/CompositionSwitcher.tsx` allows switching between active compositions.
 
 ## E. Integration
