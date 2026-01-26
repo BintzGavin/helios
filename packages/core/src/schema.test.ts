@@ -70,4 +70,38 @@ describe('validateProps', () => {
       const props = { known: 'yes', extra: 'allowed' };
       expect(validateProps(props, schema)).toEqual(props);
   });
+
+  it('should validate enum values', () => {
+    const schema = { choice: { type: 'string' as const, enum: ['A', 'B'] } };
+    expect(validateProps({ choice: 'A' }, schema)).toEqual({ choice: 'A' });
+    expect(() => validateProps({ choice: 'C' }, schema)).toThrow(HeliosError);
+    expect(() => validateProps({ choice: 'C' }, schema)).toThrow(/must be one of: A, B/);
+  });
+
+  it('should validate minimum value', () => {
+    const schema = { val: { type: 'number' as const, minimum: 10 } };
+    expect(validateProps({ val: 10 }, schema)).toEqual({ val: 10 });
+    expect(validateProps({ val: 11 }, schema)).toEqual({ val: 11 });
+    expect(() => validateProps({ val: 9 }, schema)).toThrow(HeliosError);
+    expect(() => validateProps({ val: 9 }, schema)).toThrow(/must be >= 10/);
+  });
+
+  it('should validate maximum value', () => {
+    const schema = { val: { type: 'number' as const, maximum: 10 } };
+    expect(validateProps({ val: 10 }, schema)).toEqual({ val: 10 });
+    expect(validateProps({ val: 9 }, schema)).toEqual({ val: 9 });
+    expect(() => validateProps({ val: 11 }, schema)).toThrow(HeliosError);
+    expect(() => validateProps({ val: 11 }, schema)).toThrow(/must be <= 10/);
+  });
+
+  it('should ignore metadata fields', () => {
+    const schema = {
+        val: {
+            type: 'string' as const,
+            label: 'My Value',
+            description: 'A test value'
+        }
+    };
+    expect(validateProps({ val: 'ok' }, schema)).toEqual({ val: 'ok' });
+  });
 });
