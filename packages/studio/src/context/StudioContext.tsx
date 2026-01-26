@@ -61,6 +61,8 @@ interface StudioContextType {
 
   // Assets
   assets: Asset[];
+  uploadAsset: (file: File) => Promise<void>;
+  deleteAsset: (id: string) => Promise<void>;
 
   // Render Jobs
   renderJobs: RenderJob[];
@@ -120,6 +122,45 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     });
   };
 
+  const fetchAssets = () => {
+    fetch('/api/assets')
+      .then(res => res.json())
+      .then((data: Asset[]) => {
+        setAssets(data);
+      })
+      .catch(err => {
+        console.error('Failed to fetch assets:', err);
+      });
+  };
+
+  const uploadAsset = async (file: File) => {
+    try {
+      await fetch('/api/assets/upload', {
+        method: 'POST',
+        headers: {
+          'x-filename': file.name
+        },
+        body: file
+      });
+      fetchAssets();
+    } catch (e) {
+      console.error('Failed to upload asset:', e);
+    }
+  };
+
+  const deleteAsset = async (id: string) => {
+    try {
+      await fetch('/api/assets', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id })
+      });
+      fetchAssets();
+    } catch (e) {
+      console.error('Failed to delete asset:', e);
+    }
+  };
+
   // Fetch compositions and assets from backend
   useEffect(() => {
     fetch('/api/compositions')
@@ -134,14 +175,7 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         console.error('Failed to fetch compositions:', err);
       });
 
-    fetch('/api/assets')
-      .then(res => res.json())
-      .then((data: Asset[]) => {
-        setAssets(data);
-      })
-      .catch(err => {
-        console.error('Failed to fetch assets:', err);
-      });
+    fetchAssets();
   }, []);
 
   // Reset range when composition changes
@@ -228,6 +262,8 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       value={{
         compositions,
         assets,
+        uploadAsset,
+        deleteAsset,
         activeComposition,
         setActiveComposition,
         isSwitcherOpen,

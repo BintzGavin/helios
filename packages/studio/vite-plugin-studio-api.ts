@@ -2,7 +2,7 @@ import { Plugin } from 'vite';
 import { AddressInfo } from 'net';
 import fs from 'fs';
 import path from 'path';
-import { findCompositions, findAssets } from './src/server/discovery';
+import { findCompositions, findAssets, getProjectRoot } from './src/server/discovery';
 import { startRender, getJob, getJobs, cancelJob, deleteJob } from './src/server/render-manager';
 
 export function studioApiPlugin(): Plugin {
@@ -42,17 +42,101 @@ export function studioApiPlugin(): Plugin {
 
       server.middlewares.use('/api/assets', async (req, res, next) => {
         if (req.url === '/' || req.url === '') {
-          try {
-            const assets = findAssets(process.cwd());
-            res.setHeader('Content-Type', 'application/json');
-            res.end(JSON.stringify(assets));
-          } catch (e) {
-            console.error(e);
-            res.statusCode = 500;
-            res.end(JSON.stringify({ error: 'Failed to scan assets' }));
+          // GET: List assets
+          if (req.method === 'GET') {
+            try {
+              const assets = findAssets(process.cwd());
+              res.setHeader('Content-Type', 'application/json');
+              res.end(JSON.stringify(assets));
+            } catch (e) {
+              console.error(e);
+              res.statusCode = 500;
+              res.end(JSON.stringify({ error: 'Failed to scan assets' }));
+            }
+            return;
           }
-          return;
+
+          // DELETE: Delete asset
+          if (req.method === 'DELETE') {
+            try {
+              const body = await getBody(req);
+              console.log('DELETE /api/assets body:', body);
+              const { id } = body;
+
+              if (!id) {
+                res.statusCode = 400;
+                res.end(JSON.stringify({ error: 'Missing asset ID' }));
+                return;
+              }
+
+              // Security check: ensure file is within project root
+              const projectRoot = getProjectRoot(process.cwd());
+              const resolvedPath = path.resolve(id);
+
+              if (!resolvedPath.startsWith(projectRoot)) {
+                 res.statusCode = 403;
+                 res.end(JSON.stringify({ error: 'Access denied: File outside project root' }));
+                 return;
+              }
+
+              if (fs.existsSync(resolvedPath)) {
+                fs.unlinkSync(resolvedPath);
+                res.setHeader('Content-Type', 'application/json');
+                res.end(JSON.stringify({ success: true }));
+              } else {
+                res.statusCode = 404;
+                res.end(JSON.stringify({ error: 'File not found' }));
+              }
+            } catch (e: any) {
+              console.error(e);
+              res.statusCode = 500;
+              res.end(JSON.stringify({ error: e.message }));
+            }
+            return;
+          }
         }
+
+        // POST: Upload asset
+        if (req.url === '/upload' && req.method === 'POST') {
+          const filename = req.headers['x-filename'] as string;
+          if (!filename) {
+            res.statusCode = 400;
+            res.end(JSON.stringify({ error: 'Missing x-filename header' }));
+            return;
+          }
+
+          try {
+            const safeFilename = path.basename(filename);
+            const projectRoot = getProjectRoot(process.cwd());
+            const publicDir = path.join(projectRoot, 'public');
+
+            // Use public directory if it exists, otherwise use project root
+            const targetDir = fs.existsSync(publicDir) ? publicDir : projectRoot;
+            const targetPath = path.join(targetDir, safeFilename);
+
+            const writeStream = fs.createWriteStream(targetPath);
+            req.pipe(writeStream);
+
+            req.on('end', () => {
+               res.setHeader('Content-Type', 'application/json');
+               res.end(JSON.stringify({ success: true, path: targetPath }));
+            });
+
+            req.on('error', (err: any) => {
+               console.error('Upload error:', err);
+               res.statusCode = 500;
+               res.end(JSON.stringify({ error: 'Upload failed' }));
+            });
+            return;
+
+          } catch (e: any) {
+             console.error(e);
+             res.statusCode = 500;
+             res.end(JSON.stringify({ error: e.message }));
+             return;
+          }
+        }
+
         next();
       });
 
