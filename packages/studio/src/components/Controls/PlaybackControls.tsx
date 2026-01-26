@@ -32,6 +32,18 @@ export const PlaybackControls: React.FC = () => {
     }
   };
 
+  const handlePrevFrame = () => {
+    if (controller) {
+      controller.seek(Math.max(0, currentFrame - 1));
+    }
+  };
+
+  const handleNextFrame = () => {
+    if (controller) {
+      controller.seek(currentFrame + 1);
+    }
+  };
+
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
       <button
@@ -50,6 +62,21 @@ export const PlaybackControls: React.FC = () => {
         ⏮
       </button>
       <button
+        onClick={handlePrevFrame}
+        disabled={!controller}
+        title="Previous Frame (Left Arrow)"
+        style={{
+           cursor: controller ? 'pointer' : 'not-allowed',
+           padding: '4px 8px',
+           background: 'none',
+           border: '1px solid #444',
+           borderRadius: '4px',
+           color: 'white'
+        }}
+      >
+        {'<'}
+      </button>
+      <button
         onClick={handlePlayPause}
         disabled={!controller}
         title="Play / Pause (Space)"
@@ -64,6 +91,21 @@ export const PlaybackControls: React.FC = () => {
         }}
       >
         {isPlaying ? '❚❚' : '▶'}
+      </button>
+      <button
+        onClick={handleNextFrame}
+        disabled={!controller}
+        title="Next Frame (Right Arrow)"
+        style={{
+           cursor: controller ? 'pointer' : 'not-allowed',
+           padding: '4px 8px',
+           background: 'none',
+           border: '1px solid #444',
+           borderRadius: '4px',
+           color: 'white'
+        }}
+      >
+        {'>'}
       </button>
       <button
         onClick={toggleLoop}
