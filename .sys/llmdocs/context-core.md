@@ -4,8 +4,8 @@
 
 The `packages/core` module is the heart of the Helios system. It implements a **Helios State Machine** pattern.
 
-- **Store**: The `Helios` class holds the state (`currentFrame`, `isPlaying`, `inputProps`, `playbackRate`) using **Signals** (observable state primitives).
-- **Actions**: Methods like `play()`, `pause()`, `seek()`, `setInputProps()` modify the state.
+- **Store**: The `Helios` class holds the state (`currentFrame`, `isPlaying`, `inputProps`, `playbackRate`, `volume`, `muted`) using **Signals** (observable state primitives).
+- **Actions**: Methods like `play()`, `pause()`, `seek()`, `setInputProps()`, `setAudioVolume()` modify the state.
 - **Subscribers**: The UI (Studio, Player) and Drivers subscribe to state changes to update the DOM or other outputs.
 - **Drivers**: `TimeDriver` implementations (like `DomDriver`) synchronize the internal timeline with external systems (like WAAPI or HTMLMediaElements).
 - **Ticker**: A `Ticker` (RafTicker or TimeoutTicker) drives the frame advancement loop when playing.
@@ -36,6 +36,8 @@ export type HeliosState = {
   isPlaying: boolean;
   inputProps: Record<string, any>;
   playbackRate: number;
+  volume: number;
+  muted: boolean;
 };
 
 export type HeliosSubscriber = (state: HeliosState) => void;
@@ -58,6 +60,8 @@ export interface HeliosOptions {
   inputProps?: Record<string, any>;
   schema?: HeliosSchema;
   playbackRate?: number;
+  volume?: number;
+  muted?: boolean;
   driver?: TimeDriver;
   ticker?: Ticker;
 }
@@ -91,6 +95,8 @@ class Helios {
   public get isPlaying(): ReadonlySignal<boolean>;
   public get inputProps(): ReadonlySignal<Record<string, any>>;
   public get playbackRate(): ReadonlySignal<number>;
+  public get volume(): ReadonlySignal<number>;
+  public get muted(): ReadonlySignal<boolean>;
 
   // Static Methods
   static diagnose(): Promise<DiagnosticReport>;
@@ -105,6 +111,8 @@ class Helios {
   // State Modifiers
   public setInputProps(props: Record<string, any>): void;
   public setPlaybackRate(rate: number): void;
+  public setAudioVolume(volume: number): void;
+  public setAudioMuted(muted: boolean): void;
 
   // Subscription
   public subscribe(callback: HeliosSubscriber): () => void;

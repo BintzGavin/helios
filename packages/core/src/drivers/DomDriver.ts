@@ -7,7 +7,7 @@ export class DomDriver implements TimeDriver {
     this.scope = scope;
   }
 
-  update(timeInMs: number, options: { isPlaying: boolean; playbackRate: number } = { isPlaying: false, playbackRate: 1 }) {
+  update(timeInMs: number, options: { isPlaying: boolean; playbackRate: number; volume?: number; muted?: boolean } = { isPlaying: false, playbackRate: 1 }) {
     if (!this.scope) return;
     if (typeof document === 'undefined') return;
 
@@ -41,7 +41,7 @@ export class DomDriver implements TimeDriver {
     });
   }
 
-  private syncMediaElements(timeInMs: number, { isPlaying, playbackRate }: { isPlaying: boolean; playbackRate: number }) {
+  private syncMediaElements(timeInMs: number, { isPlaying, playbackRate, volume, muted }: { isPlaying: boolean; playbackRate: number; volume?: number; muted?: boolean }) {
     if (!this.scope) return;
 
     // Both Document and HTMLElement implement ParentNode which has querySelectorAll
@@ -52,6 +52,20 @@ export class DomDriver implements TimeDriver {
 
     mediaElements.forEach((media: Element) => {
       const el = media as HTMLMediaElement;
+
+      // Sync Volume and Muted if provided
+      if (volume !== undefined) {
+        const clampedVolume = Math.max(0, Math.min(1, volume));
+        if (Math.abs(el.volume - clampedVolume) > 0.0001) {
+          el.volume = clampedVolume;
+        }
+      }
+
+      if (muted !== undefined) {
+        if (el.muted !== muted) {
+          el.muted = muted;
+        }
+      }
 
       // Sync Playback Rate
       if (el.playbackRate !== playbackRate) {

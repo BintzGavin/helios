@@ -90,4 +90,34 @@ describe('DomDriver', () => {
 
     expect(mockAudio.playbackRate).toBe(2);
   });
+
+  it('should sync volume', () => {
+    const mockAudio = document.createElement('audio');
+    Object.defineProperty(mockAudio, 'volume', { value: 1, writable: true });
+    scope.appendChild(mockAudio);
+
+    driver.update(0, { isPlaying: false, playbackRate: 1, volume: 0.5 });
+
+    expect(mockAudio.volume).toBe(0.5);
+  });
+
+  it('should sync muted state', () => {
+    const mockAudio = document.createElement('audio');
+    Object.defineProperty(mockAudio, 'muted', { value: false, writable: true });
+    scope.appendChild(mockAudio);
+
+    driver.update(0, { isPlaying: false, playbackRate: 1, muted: true });
+
+    expect(mockAudio.muted).toBe(true);
+  });
+
+  it('should not update volume if not provided', () => {
+    const mockAudio = document.createElement('audio');
+    Object.defineProperty(mockAudio, 'volume', { value: 1, writable: true });
+    scope.appendChild(mockAudio);
+
+    driver.update(0, { isPlaying: false, playbackRate: 1 });
+
+    expect(mockAudio.volume).toBe(1);
+  });
 });

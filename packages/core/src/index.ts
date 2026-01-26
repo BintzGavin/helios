@@ -10,6 +10,8 @@ export type HeliosState = {
   isPlaying: boolean;
   inputProps: Record<string, any>;
   playbackRate: number;
+  volume: number;
+  muted: boolean;
 };
 
 export type HeliosSubscriber = (state: HeliosState) => void;
@@ -22,6 +24,8 @@ export interface HeliosOptions {
   inputProps?: Record<string, any>;
   schema?: HeliosSchema;
   playbackRate?: number;
+  volume?: number;
+  muted?: boolean;
   driver?: TimeDriver;
   ticker?: Ticker;
 }
@@ -53,6 +57,8 @@ export class Helios {
   private _isPlaying: Signal<boolean>;
   private _inputProps: Signal<Record<string, any>>;
   private _playbackRate: Signal<number>;
+  private _volume: Signal<number>;
+  private _muted: Signal<boolean>;
 
   // Public Readonly Signals
 
@@ -79,6 +85,18 @@ export class Helios {
    * Can be subscribed to for reactive updates.
    */
   public get playbackRate(): ReadonlySignal<number> { return this._playbackRate; }
+
+  /**
+   * Signal for the audio volume (0.0 to 1.0).
+   * Can be subscribed to for reactive updates.
+   */
+  public get volume(): ReadonlySignal<number> { return this._volume; }
+
+  /**
+   * Signal for the audio muted state.
+   * Can be subscribed to for reactive updates.
+   */
+  public get muted(): ReadonlySignal<boolean> { return this._muted; }
 
   // Other internals
   private syncWithDocumentTimeline = false;
@@ -136,6 +154,8 @@ export class Helios {
     this._isPlaying = signal(false);
     this._inputProps = signal(initialProps);
     this._playbackRate = signal(options.playbackRate ?? 1);
+    this._volume = signal(options.volume ?? 1);
+    this._muted = signal(options.muted ?? false);
 
     this.autoSyncAnimations = options.autoSyncAnimations || false;
     if (options.animationScope) {
@@ -165,6 +185,8 @@ export class Helios {
       isPlaying: this._isPlaying.value,
       inputProps: this._inputProps.value,
       playbackRate: this._playbackRate.value,
+      volume: this._volume.value,
+      muted: this._muted.value,
     };
   }
 
@@ -179,6 +201,33 @@ export class Helios {
 
   public setPlaybackRate(rate: number) {
     this._playbackRate.value = rate;
+  }
+
+  public setAudioVolume(volume: number) {
+    const clamped = Math.max(0, Math.min(1, volume));
+    this._volume.value = clamped;
+
+    // Sync driver immediately
+    const currentFrame = this._currentFrame.peek();
+    this.driver.update((currentFrame / this.fps) * 1000, {
+      isPlaying: this._isPlaying.peek(),
+      playbackRate: this._playbackRate.peek(),
+      volume: clamped,
+      muted: this._muted.peek()
+    });
+  }
+
+  public setAudioMuted(muted: boolean) {
+    this._muted.value = muted;
+
+    // Sync driver immediately
+    const currentFrame = this._currentFrame.peek();
+    this.driver.update((currentFrame / this.fps) * 1000, {
+      isPlaying: this._isPlaying.peek(),
+      playbackRate: this._playbackRate.peek(),
+      volume: this._volume.peek(),
+      muted: muted
+    });
   }
 
   // --- Subscription ---
@@ -209,7 +258,9 @@ export class Helios {
     const currentFrame = this._currentFrame.peek();
     this.driver.update((currentFrame / this.fps) * 1000, {
       isPlaying: true,
-      playbackRate: this._playbackRate.peek()
+      playbackRate: this._playbackRate.peek(),
+      volume: this._volume.peek(),
+      muted: this._muted.peek()
     });
 
     this.ticker.start(this.onTick);
@@ -224,7 +275,9 @@ export class Helios {
     const currentFrame = this._currentFrame.peek();
     this.driver.update((currentFrame / this.fps) * 1000, {
       isPlaying: false,
-      playbackRate: this._playbackRate.peek()
+      playbackRate: this._playbackRate.peek(),
+      volume: this._volume.peek(),
+      muted: this._muted.peek()
     });
   }
 
@@ -234,7 +287,9 @@ export class Helios {
 
     this.driver.update((newFrame / this.fps) * 1000, {
       isPlaying: this._isPlaying.peek(),
-      playbackRate: this._playbackRate.peek()
+      playbackRate: this._playbackRate.peek(),
+      volume: this._volume.peek(),
+      muted: this._muted.peek()
     });
   }
 
@@ -312,7 +367,9 @@ export class Helios {
 
     this.driver.update((nextFrame / this.fps) * 1000, {
       isPlaying: true,
-      playbackRate
+      playbackRate,
+      volume: this._volume.peek(),
+      muted: this._muted.peek()
     });
   }
 }

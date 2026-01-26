@@ -1,5 +1,8 @@
 # CORE Progress Log
 
+## CORE v1.19.0
+- ✅ Completed: Implement Audio Volume Control - Added `volume` and `muted` state to `Helios` and updated `DomDriver` to sync with HTMLMediaElements.
+
 ## CORE v1.18.0
 - ✅ Completed: Implement Input Schema Validation - Added `HeliosSchema` definition, `validateProps` logic, and integrated validation into `Helios` constructor and `setInputProps`.
 
