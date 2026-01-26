@@ -228,4 +228,47 @@ describe('dom-capture', () => {
 
         expect(text).toContain('data:image/png;base64,');
     });
+
+    it('should inline nested canvas elements', async () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = 100;
+        canvas.height = 100;
+        // Mock toDataURL for this canvas instance
+        const dataUri = 'data:image/png;base64,mockCanvasData';
+        canvas.toDataURL = vi.fn().mockReturnValue(dataUri);
+
+        container.appendChild(canvas);
+
+        await captureDomToBitmap(container);
+
+        const blob = (URL.createObjectURL as any).mock.calls[0][0] as Blob;
+        const text = await readBlob(blob);
+
+        expect(text).toContain(dataUri);
+        expect(text).toContain('<img');
+        // Canvas tag should be replaced
+        expect(text).not.toContain('<canvas');
+    });
+
+    it('should inline root canvas element', async () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = 100;
+        canvas.height = 100;
+        const dataUri = 'data:image/png;base64,mockRootCanvasData';
+        canvas.toDataURL = vi.fn().mockReturnValue(dataUri);
+
+        // Use canvas as the element to capture
+        document.body.appendChild(canvas);
+
+        await captureDomToBitmap(canvas);
+
+        const blob = (URL.createObjectURL as any).mock.calls[0][0] as Blob;
+        const text = await readBlob(blob);
+
+        expect(text).toContain(dataUri);
+        expect(text).toContain('<img');
+        expect(text).not.toContain('<canvas');
+
+        document.body.removeChild(canvas);
+    });
 });
