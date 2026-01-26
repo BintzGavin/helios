@@ -35,3 +35,7 @@
 ## [1.5.3] - Incomplete Asset Preloading
 **Learning:** `DomStrategy` implementation of "Asset Preloading" was incomplete (missed CSS background images), contradicting the Vision's promise of preventing artifacts.
 **Action:** When auditing "Completed" features, verify they cover all standard web use cases (like CSS backgrounds), not just the happy path (`<img>` tags).
+
+## [1.6.0] - Incomplete Media Preloading
+**Learning:** `DomStrategy` preloading logic missed `<video>` and `<audio>` elements, which can cause blank frames.
+**Action:** Always consider all media types (`img`, `video`, `audio`, `iframe`) when implementing asset preloading strategies.
