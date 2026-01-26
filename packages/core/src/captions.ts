@@ -99,3 +99,15 @@ export function stringifySrt(cues: CaptionCue[]): string {
     })
     .join('\n\n');
 }
+
+export function findActiveCues(cues: CaptionCue[], timeMs: number): CaptionCue[] {
+  return cues.filter((cue) => cue.startTime <= timeMs && cue.endTime >= timeMs);
+}
+
+export function areCuesEqual(a: CaptionCue[], b: CaptionCue[]): boolean {
+  if (a.length !== b.length) return false;
+  for (let i = 0; i < a.length; i++) {
+    if (a[i] !== b[i]) return false;
+  }
+  return true;
+}

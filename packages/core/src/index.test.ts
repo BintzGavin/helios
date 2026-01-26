@@ -15,6 +15,7 @@ describe('Helios Core', () => {
       playbackRate: 1,
       volume: 1,
       muted: false,
+      activeCaptions: [],
     });
   });
 
@@ -473,6 +474,67 @@ describe('Helios Core', () => {
       expect(helios.getState().currentFrame).toBe(30);
 
       vi.unstubAllGlobals();
+    });
+  });
+
+  describe('Active Captions', () => {
+    it('should initialize with empty captions by default', () => {
+      const helios = new Helios({ duration: 10, fps: 30 });
+      expect(helios.getState().activeCaptions).toEqual([]);
+    });
+
+    it('should initialize with provided captions', () => {
+      const srt = `1
+00:00:01,000 --> 00:00:02,000
+Hello`;
+      const helios = new Helios({ duration: 10, fps: 30, captions: srt });
+
+      // At 0ms, no caption
+      expect(helios.getState().activeCaptions).toEqual([]);
+
+      // At 1500ms (frame 45), caption active
+      helios.seek(45);
+      const active = helios.getState().activeCaptions;
+      expect(active).toHaveLength(1);
+      expect(active[0].text).toBe('Hello');
+    });
+
+    it('should update active captions when seeking', () => {
+      const srt = `1
+00:00:01,000 --> 00:00:02,000
+One
+
+2
+00:00:02,500 --> 00:00:03,500
+Two`;
+      const helios = new Helios({ duration: 10, fps: 30, captions: srt });
+
+      helios.seek(30); // 1s
+      expect(helios.getState().activeCaptions[0].text).toBe('One');
+
+      helios.seek(60); // 2s (end of One)
+      expect(helios.getState().activeCaptions[0].text).toBe('One');
+
+      helios.seek(70); // 2.33s (gap)
+      expect(helios.getState().activeCaptions).toEqual([]);
+
+      helios.seek(80); // 2.66s (start of Two)
+      expect(helios.getState().activeCaptions[0].text).toBe('Two');
+    });
+
+    it('should update captions via setCaptions', () => {
+      const helios = new Helios({ duration: 10, fps: 30 });
+      expect(helios.getState().activeCaptions).toEqual([]);
+
+      const srt = `1
+00:00:00,000 --> 00:00:01,000
+Dynamic`;
+
+      helios.setCaptions(srt);
+      helios.seek(15); // 0.5s
+
+      expect(helios.getState().activeCaptions).toHaveLength(1);
+      expect(helios.getState().activeCaptions[0].text).toBe('Dynamic');
     });
   });
 });
