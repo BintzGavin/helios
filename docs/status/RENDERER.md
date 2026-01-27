@@ -1,8 +1,9 @@
-**Version**: 1.23.0
+**Version**: 1.24.0
 
 # Renderer Agent Status
 
 ## Progress Log
+- [1.24.0] ✅ Completed: Smart Codec Selection - Updated `CanvasStrategy` to intelligently select H.264 (Annex B) when `videoCodec: 'copy'` is requested, prioritizing direct stream copy while falling back to VP8 (IVF) if unsupported.
 - [1.23.0] ✅ Completed: Configurable Screenshot Format - Added `intermediateImageFormat` and `intermediateImageQuality` to `RendererOptions`, enabling faster JPEG capture for DOM rendering (vs default PNG) when performance matters.
 - [1.22.0] ✅ Completed: Implicit Audio Discovery - Updated `DomStrategy` to automatically detect `<audio>` and `<video>` elements in the DOM and include their audio tracks in the FFmpeg render, improving "Use What You Know" functionality.
 - [1.21.0] ✅ Completed: Configurable Audio Codecs - Added `audioCodec` and `audioBitrate` to `RendererOptions` and updated `FFmpegBuilder` to support smart defaults (e.g., auto-switching to `libvorbis` for WebM) and custom configurations.
