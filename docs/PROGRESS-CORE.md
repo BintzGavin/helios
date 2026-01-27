@@ -1,5 +1,8 @@
 # CORE Progress Log
 
+## CORE v1.25.0
+- ✅ Completed: Implement Color Interpolation - Implemented `interpolateColors` and `parseColor` utilities supporting Hex, RGB, and HSL formats.
+
 ## CORE v1.24.0
 - ✅ Completed: Implement Relative Audio Mixing - Implemented relative volume and mute handling in `DomDriver`.
 

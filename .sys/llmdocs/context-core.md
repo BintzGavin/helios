@@ -17,6 +17,7 @@ The `packages/core` module is the heart of the Helios system. It implements a **
 packages/core/src/
 ├── animation.ts       # Animation helpers (spring, interpolate)
 ├── captions.ts        # SRT parsing, serialization, and cue helpers
+├── color.ts           # Color parsing and interpolation
 ├── drivers/           # TimeDriver implementations (DomDriver, etc.)
 ├── easing.ts          # Easing functions
 ├── errors.ts          # Structured Error Handling
@@ -133,6 +134,13 @@ export interface SeriesItem {
   durationInFrames: number;
   offset?: number;
 }
+
+export interface RgbaColor {
+  r: number;
+  g: number;
+  b: number;
+  a: number;
+}
 ```
 
 ## D. Public Methods
@@ -205,6 +213,21 @@ export function interpolate(
   outputRange: number[],
   options?: InterpolateOptions
 ): number;
+
+/**
+ * Parses a color string into an RGBA object.
+ */
+export function parseColor(color: string): RgbaColor;
+
+/**
+ * Interpolates between colors based on an input value.
+ */
+export function interpolateColors(
+  input: number,
+  inputRange: number[],
+  outputRange: string[],
+  options?: InterpolateOptions
+): string;
 
 /**
  * Calculates the value of a spring physics simulation.
