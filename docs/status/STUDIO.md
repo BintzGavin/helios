@@ -1,4 +1,4 @@
-**Version**: 0.28.0
+**Version**: 0.29.0
 
 # Studio Domain Status
 
@@ -7,6 +7,7 @@
 **Focus**: UI Implementation & CLI
 
 ## Recent Updates
+- [v0.29.0] ✅ Completed: Schema-Aware Props Editor - Implemented specialized UI inputs (Enum, Range, Color, Boolean) driven by `HeliosSchema`, with fallback to standard inputs.
 - [v0.28.0] ✅ Completed: Captions Panel - Implemented SRT import panel and timeline markers for captions using Core's `parseSrt` and `inputProps` injection.
 - [v0.27.1] ✅ Fixed: Snapshot - Fixed type error in "Take Snapshot" implementation where `captureFrame` return value was mishandled.
 - [v0.27.0] ✅ Completed: Snapshot - Implemented "Take Snapshot" feature in Stage Toolbar to capture and download current frame as PNG.

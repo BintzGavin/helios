@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useStudio } from '../context/StudioContext';
+import { SchemaInput } from './SchemaInputs';
 import './PropsEditor.css';
 
 export const PropsEditor: React.FC = () => {
   const { controller, playerState } = useStudio();
-  const { inputProps } = playerState;
+  const { inputProps, schema } = playerState;
 
   if (!controller) {
     return <div className="editor-message">No active controller</div>;
@@ -21,15 +22,29 @@ export const PropsEditor: React.FC = () => {
 
   return (
     <div className="props-editor">
-      {Object.entries(inputProps).map(([key, value]) => (
-        <div key={key} className="prop-row">
-          <label className="prop-label">{key}</label>
-          <PropInput
-            value={value}
-            onChange={(newValue) => handleChange(key, newValue)}
-          />
-        </div>
-      ))}
+      {Object.entries(inputProps).map(([key, value]) => {
+        const def = schema ? schema[key] : undefined;
+
+        return (
+          <div key={key} className="prop-row">
+            <label className="prop-label" title={def?.description}>
+              {def?.label || key}
+            </label>
+            {def ? (
+              <SchemaInput
+                definition={def}
+                value={value}
+                onChange={(newValue) => handleChange(key, newValue)}
+              />
+            ) : (
+              <PropInput
+                value={value}
+                onChange={(newValue) => handleChange(key, newValue)}
+              />
+            )}
+          </div>
+        );
+      })}
     </div>
   );
 };

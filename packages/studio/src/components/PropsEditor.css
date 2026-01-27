@@ -91,3 +91,25 @@
   text-align: center;
   font-size: 0.9em;
 }
+
+/* Schema Inputs */
+.prop-select {
+  cursor: pointer;
+  background-color: white;
+}
+
+.prop-number-container {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.prop-number-container.has-range .prop-number {
+  width: 60px;
+  flex-shrink: 0;
+}
+
+.prop-range {
+  flex: 1;
+  cursor: pointer;
+}
