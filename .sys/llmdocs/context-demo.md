@@ -26,6 +26,7 @@
 - `examples/svelte-animation-helpers`: Svelte `<Sequence>`, `<Series>`.
 - `examples/threejs-canvas-animation`: Three.js (3D).
 - `examples/pixi-canvas-animation`: PixiJS (2D).
+- `examples/p5-canvas-animation`: P5.js (Instance Mode).
 - `examples/tailwind-animation`: Tailwind CSS v3 integration.
 
 ## B. Build Config
