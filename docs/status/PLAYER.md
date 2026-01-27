@@ -1,4 +1,4 @@
-**Version**: 0.19.1
+**Version**: 0.20.0
 
 # Status: PLAYER
 
@@ -22,10 +22,12 @@
 - Supports caption rendering overlay with toggleable "CC" button.
 - Supports WebM (VP9/Opus) client-side export via `export-format` attribute.
 - **New**: Implements Standard Media API (play, pause, currentTime, events) for better interoperability.
+- **New**: Client-side audio export now respects `volume` and `muted` properties of audio elements.
 
 ## Critical Task
 - **None**: Recent task completed.
 
+[v0.20.0] ✅ Completed: Client Side Audio Volume - Updated exporter to respect `volume` and `muted` attributes of audio elements during client-side export.
 [v0.19.1] ✅ Completed: Verify WebM Export - Verified that WebM export functionality works correctly by running tests and ensuring dependencies are installed.
 [v0.19.0] ✅ Completed: Implement Standard Media API - Implemented standard media properties (currentTime, duration, etc.) and events (play, pause, timeupdate) for improved interoperability.
 [v0.18.0] ✅ Completed: WebM Export - Implemented `export-format` attribute to support WebM (VP9/Opus) video export alongside MP4.

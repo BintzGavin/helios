@@ -2,6 +2,8 @@
 export interface AudioAsset {
   buffer: ArrayBuffer;
   mimeType: string | null;
+  volume?: number;
+  muted?: boolean;
 }
 
 export async function getAudioAssets(doc: Document): Promise<AudioAsset[]> {
@@ -10,7 +12,12 @@ export async function getAudioAssets(doc: Document): Promise<AudioAsset[]> {
     if (!tag.src) return { buffer: new ArrayBuffer(0), mimeType: null };
     try {
         const res = await fetch(tag.src);
-        return { buffer: await res.arrayBuffer(), mimeType: res.headers.get('content-type') };
+        return {
+            buffer: await res.arrayBuffer(),
+            mimeType: res.headers.get('content-type'),
+            volume: tag.volume,
+            muted: tag.muted
+        };
     } catch (e) {
         console.warn("Failed to fetch audio asset:", tag.src, e);
         return { buffer: new ArrayBuffer(0), mimeType: null };
@@ -38,7 +45,14 @@ export async function mixAudio(assets: AudioAsset[], duration: number, sampleRat
             const audioBuffer = await ctx.decodeAudioData(asset.buffer.slice(0));
             const source = ctx.createBufferSource();
             source.buffer = audioBuffer;
-            source.connect(ctx.destination);
+
+            const gainNode = ctx.createGain();
+            const volume = asset.muted ? 0 : (typeof asset.volume === 'number' ? asset.volume : 1);
+            gainNode.gain.value = volume;
+
+            source.connect(gainNode);
+            gainNode.connect(ctx.destination);
+
             source.start(0);
         } catch (e) {
             console.warn("Failed to decode audio asset:", e);
