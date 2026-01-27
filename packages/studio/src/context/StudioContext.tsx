@@ -150,10 +150,8 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
   const deleteAsset = async (id: string) => {
     try {
-      await fetch('/api/assets', {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id })
+      await fetch(`/api/assets?id=${encodeURIComponent(id)}`, {
+        method: 'DELETE'
       });
       fetchAssets();
     } catch (e) {

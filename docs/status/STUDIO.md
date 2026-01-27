@@ -1,4 +1,4 @@
-**Version**: 0.23.0
+**Version**: 0.23.1
 
 # Studio Domain Status
 
@@ -7,6 +7,7 @@
 **Focus**: UI Implementation & CLI
 
 ## Recent Updates
+- [v0.23.1] ✅ Fixed: Asset Deletion - Switched DELETE API to use query parameters to resolve body parsing timeouts.
 - [v0.23.0] ✅ Completed: Asset Management - Implemented asset upload (Drag & Drop) and delete functionality in Assets Panel, backed by new API endpoints.
 - [v0.22.0] ✅ Completed: Global Shortcuts & Frame Stepping - Added Shift+Arrow shortcuts (10-frame jump) and Prev/Next Frame buttons to the UI.
 - [v0.21.0] ✅ Completed: Implement Render Job Management - Added ability to Cancel and Delete render jobs via UI and API, including aborting FFmpeg processes.
