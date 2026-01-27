@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Helios WAAPI Animation</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background-color: #f4f4f9;
+      margin: 0;
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    h1 {
+      color: #333;
+    }
+    .player-container {
+      width: 80%;
+      max-width: 960px;
+      margin-bottom: 2rem;
+    }
+    helios-player {
+      width: 100%;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .note {
+      background: #d4edda;
+      border: 1px solid #c3e6cb;
+      border-radius: 4px;
+      padding: 0.75rem;
+      margin-bottom: 1rem;
+      color: #155724;
+      max-width: 600px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Web Animations API Example</h1>
+
+  <div class="note">
+    ✅ This composition uses the standard Web Animations API (<code>element.animate()</code>).
+    Helios automatically detects and synchronizes these animations using <code>autoSyncAnimations: true</code>.
+  </div>
+
+  <div class="player-container">
+    <helios-player
+      src="./composition.html"
+      duration="4"
+      fps="30">
+    </helios-player>
+  </div>
+
+  <script type="module" src="../../packages/player/dist/index.js"></script>
+
+</body>
+</html>

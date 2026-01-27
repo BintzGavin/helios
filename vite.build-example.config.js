@@ -39,6 +39,7 @@ export default defineConfig({
         media_element: resolve(__dirname, "examples/media-element-animation/composition.html"),
         d3_animation: resolve(__dirname, "examples/d3-animation/composition.html"),
         tailwind_animation: resolve(__dirname, "examples/tailwind-animation/composition.html"),
+        waapi_animation: resolve(__dirname, "examples/waapi-animation/composition.html"),
       },
     },
   },

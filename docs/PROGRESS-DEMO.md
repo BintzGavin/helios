@@ -57,3 +57,6 @@
 
 ## DEMO v1.35.0
 - ✅ Completed: Scaffold Tailwind CSS Example - Created `examples/tailwind-animation` demonstrating Tailwind v3 integration with proper scoping and build configuration.
+
+## DEMO v1.36.0
+- ✅ Completed: Scaffold WAAPI Animation Example - Created `examples/waapi-animation` demonstrating standard Web Animations API integration with `autoSyncAnimations`.

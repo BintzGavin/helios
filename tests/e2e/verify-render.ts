@@ -28,6 +28,7 @@ const CASES = [
   { name: 'Media Element', relativePath: 'examples/media-element-animation/composition.html', mode: 'dom' as const },
   { name: 'D3 Animation', relativePath: 'examples/d3-animation/composition.html', mode: 'dom' as const },
   { name: 'Tailwind Animation', relativePath: 'examples/tailwind-animation/composition.html', mode: 'dom' as const },
+  { name: 'WAAPI Animation', relativePath: 'examples/waapi-animation/composition.html', mode: 'dom' as const },
 ];
 
 async function main() {
