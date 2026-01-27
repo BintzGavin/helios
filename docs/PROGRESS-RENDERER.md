@@ -1,5 +1,8 @@
 # RENDERER Progress Log
 
+## RENDERER v1.23.0
+- ✅ Completed: Configurable Screenshot Format - Added `intermediateImageFormat` and `intermediateImageQuality` to `RendererOptions`, enabling faster JPEG capture for DOM rendering (vs default PNG) when performance matters.
+
 ## RENDERER v1.22.0
 - ✅ Completed: Implicit Audio Discovery - Updated `DomStrategy` to automatically detect `<audio>` and `<video>` elements in the DOM and include their audio tracks in the FFmpeg render, improving "Use What You Know" functionality.
 

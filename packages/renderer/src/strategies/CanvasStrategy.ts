@@ -289,11 +289,22 @@ export class CanvasStrategy implements RenderStrategy {
   }
 
   private async captureCanvas(page: Page, frameTime: number): Promise<Buffer> {
-    const dataUrl = await page.evaluate(() => {
+    const format = this.options.intermediateImageFormat || 'png';
+    const quality = this.options.intermediateImageQuality;
+
+    const dataUrl = await page.evaluate((args) => {
       const canvas = document.querySelector('canvas');
       if (!canvas) return 'error:canvas-not-found';
-      return canvas.toDataURL('image/png');
-    });
+
+      const mimeType = args.format === 'jpeg' ? 'image/jpeg' : 'image/png';
+
+      if (args.format === 'jpeg' && typeof args.quality === 'number') {
+        // canvas.toDataURL takes quality as 0.0 - 1.0
+        return canvas.toDataURL(mimeType, args.quality / 100);
+      }
+
+      return canvas.toDataURL(mimeType);
+    }, { format, quality });
 
     if (typeof dataUrl !== 'string' || dataUrl === 'error:canvas-not-found') {
       throw new Error('CanvasStrategy: Could not find canvas element or an error occurred during capture.');
