@@ -71,3 +71,7 @@
 ## [2026-03-12] - FFmpegBuilder Stream Copy Limitation
 **Learning:** `FFmpegBuilder` forces encoding flags (`-pix_fmt`, etc.) even when `videoCodec` is set to `'copy'`, preventing efficient H.264 passthrough from WebCodecs.
 **Action:** Refactor `FFmpegBuilder` to conditionally omit incompatible flags when `videoCodec === 'copy'`.
+
+## [1.20.0] - Environment Dependencies for E2E Tests
+**Learning:** Running `render:canvas-example` requires `packages/core` to be built (`npm run build` in `packages/core`) and Playwright browsers to be installed (`npx playwright install`). These dependencies are not automatically handled by the render script.
+**Action:** When running renderer E2E tests, ensuring these prerequisites are met first to avoid false negatives.

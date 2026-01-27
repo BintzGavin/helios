@@ -1,5 +1,8 @@
 # RENDERER Progress Log
 
+## RENDERER v1.20.0
+- ✅ Completed: Enable Stream Copy - Updated `FFmpegBuilder` to conditionally omit encoding flags (`-pix_fmt`, `-crf`, `-preset`) when `videoCodec` is `'copy'`, enabling efficient stream passthrough for H.264 WebCodecs.
+
 ## RENDERER v1.19.1
 - ✅ Completed: SeekTimeDriver Initialization - Added `init(page)` to `TimeDriver` interface and updated `SeekTimeDriver` to inject polyfills before `page.goto`, ensuring deterministic time for `requestAnimationFrame` and `Date.now` from the first frame.
 
