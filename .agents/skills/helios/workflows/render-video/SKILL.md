@@ -32,7 +32,20 @@ async function main() {
         height: 1080,
         fps: 30,
         durationInSeconds: 10,
-        mode: 'canvas' // Use 'dom' if your animation uses CSS/HTML elements
+        mode: 'canvas', // Use 'dom' if your animation uses CSS/HTML elements
+
+        // Audio Configuration
+        audioTracks: [
+            { path: 'background.mp3', volume: 0.5 },
+            { path: 'voiceover.wav', offset: 2 }
+        ],
+        audioCodec: 'aac',
+
+        // Input Props (Dynamic Content)
+        inputProps: {
+            title: "Custom Render",
+            color: "#00ff00"
+        }
     });
 
     console.log(`Starting render of ${compositionUrl}...`);
@@ -85,3 +98,7 @@ node render.js
   ```typescript
   await renderer.render(url, out, { tracePath: 'trace.zip' });
   ```
+
+### Audio Issues
+- Ensure audio file paths are correct relative to where the script is run.
+- If using `mode: 'dom'` and relying on implicit audio (e.g. `<audio>` tags), ensure the elements are present in the DOM.

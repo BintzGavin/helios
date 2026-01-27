@@ -19,13 +19,10 @@ Create a `composition.html` file. This is the entry point.
     <style>
         body { margin: 0; overflow: hidden; background: black; }
         canvas { display: block; width: 100vw; height: 100vh; }
-        .box { width: 100px; height: 100px; background: red; animation: move 2s linear; }
-        @keyframes move { to { transform: translateX(500px); } }
     </style>
 </head>
 <body>
     <canvas id="canvas"></canvas>
-    <div class="box"></div>
     <script type="module" src="./src/main.ts"></script>
 </body>
 </html>
@@ -44,29 +41,41 @@ const height = 1080;
 const fps = 30;
 const duration = 10; // seconds
 
-// 2. Setup Canvas
+// 2. Define Input Schema (Optional but recommended)
+const schema = {
+  type: 'object',
+  properties: {
+    title: { type: 'string', default: "Hello World" },
+    color: { type: 'string', default: "#ff0000" }
+  }
+};
+
+// 3. Setup Canvas
 const canvas = document.getElementById('canvas') as HTMLCanvasElement;
 canvas.width = width;
 canvas.height = height;
 const ctx = canvas.getContext('2d');
 
-// 3. Initialize Engine
+// 4. Initialize Engine
 const helios = new Helios({
     duration,
     fps,
-    // OPTIONAL: Automatically sync CSS/WAAPI animations
-    autoSyncAnimations: true
+    width,
+    height,
+    schema, // Pass schema
+    inputProps: { title: "Hello World", color: "#ff0000" }, // Initial props
+    autoSyncAnimations: true // Optional: Sync CSS/WAAPI
 });
 
-// 4. Bind to Document Timeline (CRITICAL for Renderer/Player)
+// 5. Bind to Document Timeline (CRITICAL for Renderer/Player)
 helios.bindToDocumentTimeline();
 
-// 5. Expose to Window (CRITICAL for detection)
+// 6. Expose to Window (CRITICAL for detection)
 // @ts-ignore
 window.helios = helios;
 
-// 6. Define Render Function
-function draw(frame: number) {
+// 7. Define Render Function
+function draw(frame: number, props: any) {
     // Clear
     ctx.fillStyle = 'black';
     ctx.fillRect(0, 0, width, height);
@@ -75,27 +84,27 @@ function draw(frame: number) {
     const time = frame / fps;
     const progress = time / duration;
 
-    // Draw something
+    // Draw something using props
     const x = progress * width;
 
-    ctx.fillStyle = 'red';
-    ctx.beginPath();
-    ctx.arc(x, height/2, 100, 0, Math.PI * 2);
-    ctx.fill();
+    ctx.fillStyle = props.color;
+    ctx.font = '100px sans-serif';
+    ctx.fillText(props.title, x, height/2);
 }
 
-// 7. Subscribe to State Changes
+// 8. Subscribe to State Changes
 helios.subscribe((state) => {
-    draw(state.currentFrame);
+    draw(state.currentFrame, state.inputProps);
 });
 
-// 8. Initial Draw
-draw(0);
+// 9. Initial Draw
+const state = helios.getState();
+draw(state.currentFrame, state.inputProps);
 ```
 
 ## Checklist
 
-- [ ] **Instance Created:** `new Helios(...)` called with duration/fps.
+- [ ] **Instance Created:** `new Helios(...)` called with duration/fps/props.
 - [ ] **Timeline Bound:** `helios.bindToDocumentTimeline()` called.
 - [ ] **Window Exposed:** `window.helios = helios` set.
 - [ ] **State Subscribed:** `helios.subscribe(...)` used to trigger renders.

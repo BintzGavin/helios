@@ -18,6 +18,7 @@ The `<helios-player>` Web Component allows you to embed and control Helios compo
   height="720"
   controls
   autoplay
+  input-props='{"title": "My Video"}'
 ></helios-player>
 ```
 
@@ -30,61 +31,82 @@ The `<helios-player>` Web Component allows you to embed and control Helios compo
 | `src` | string | URL of the composition (must contain Helios logic) |
 | `width` | number | Display width (maintains aspect ratio if height also set) |
 | `height` | number | Display height |
-| `controls` | boolean | Show built-in playback controls |
+| `controls` | boolean | Show built-in playback controls (Play, Volume, Captions, Export) |
 | `autoplay` | boolean | Start playing immediately when ready |
 | `loop` | boolean | Loop playback when finished |
+| `input-props` | JSON string | Pass initial properties to the composition |
 | `export-mode` | 'auto' \| 'canvas' \| 'dom' | Strategy for client-side export (default: 'auto') |
+| `export-format` | 'mp4' \| 'webm' | Output format for client-side export (default: 'mp4') |
 | `canvas-selector`| string | CSS selector for the canvas element (default: 'canvas') |
 
 ### JavaScript API
 
-To control the player programmatically, obtain a reference to the element and use `getController()`.
+The element implements a Standard Media API-like interface for easy integration.
 
 ```typescript
 const player = document.querySelector('helios-player');
+
+// Playback Control
+player.play();
+player.pause();
+player.currentTime = 5.0; // Seek to 5 seconds
+player.currentFrame = 150; // Seek to frame 150
+
+// Audio Control
+player.volume = 0.5; // 0.0 to 1.0
+player.muted = true;
+
+// Properties
+console.log(player.duration);     // Total duration in seconds
+console.log(player.paused);       // Boolean
+console.log(player.playbackRate); // Speed multiplier
+console.log(player.fps);          // Composition FPS
+
+// Input Props
+player.inputProps = { title: "Updated Title" };
+```
+
+#### Events
+The player dispatches standard media events:
+- `play`, `pause`, `ended`
+- `timeupdate`
+- `volumechange`
+- `durationchange`, `ratechange`
+
+#### Advanced Control
+For low-level access to the Helios state, use `getController()`.
+
+```typescript
 const controller = player.getController();
 
 if (controller) {
-  controller.play();
-  controller.seek(100);
-  controller.setPlaybackRate(1.5);
-}
-```
-
-#### HeliosController Interface
-
-```typescript
-interface HeliosController {
-  play(): void;
-  pause(): void;
-  seek(frame: number): void;
-  setPlaybackRate(rate: number): void;
-  getState(): HeliosState;
-  subscribe(callback: (state: HeliosState) => void): () => void;
+  const state = controller.getState();
+  console.log("Active Captions:", state.activeCaptions);
 }
 ```
 
 ## Client-Side Export
 
-The player supports exporting videos directly in the browser (using `VideoEncoder` and `mp4-muxer`).
+The player supports exporting videos directly in the browser (using `VideoEncoder`).
 
-1. Ensure your composition uses `canvas` rendering if using `export-mode="canvas"` (recommended for performance).
-2. The user can click the "Export" button in the default controls.
-3. Or trigger programmatically (via UI interaction logic you implement that calls internal export methods - currently primarily via UI).
+1. **Formats:** Supports `mp4` (H.264/AAC) and `webm` (VP9/Opus).
+2. **Audio:** Captures audio from `<audio>` elements (must be CORS-enabled).
+3. **Captions:** Supports "burning in" captions if they are active.
+4. **Usage:** User clicks "Export" in controls, or via custom logic.
 
-## Styling & Customization
+## UI Features
 
-The player uses Shadow DOM. You can style certain parts if exposed via `::part()`, but general layout is encapsulated.
-
-- **Status Overlay:** The player has a status overlay (`.status-overlay`) that shows connection status and errors.
-- **Controls:** The controls bar is accessible via Shadow DOM inspection but not explicitly customizable via API yet.
+- **Captions:** Toggle "CC" button to overlay active captions.
+- **Volume:** Slider and Mute toggle.
+- **Speed:** Selector for playback rate (0.25x - 2x).
+- **Fullscreen:** Toggle fullscreen mode.
 
 ## Common Issues
 
-- **Cross-Origin (CORS):** The player uses an `iframe`. If the `src` is on a different origin, you might encounter restrictions. Ensure CORS headers are set correctly if cross-origin.
-- **Connection Failed:** If you see "Connection Failed", ensure `window.helios` is exposed in your composition so the player can find it (Direct Mode) or that the composition is correctly handling window messages (Bridge Mode).
+- **Cross-Origin (CORS):** The player uses an `iframe`. If the `src` is on a different origin, ensure CORS headers are set.
+- **Audio Export:** Audio elements must serve data with `Access-Control-Allow-Origin` to be captured by the exporter.
 
 ## Source Files
 
 - Component: `packages/player/src/index.ts`
-- Controller: `packages/player/src/controllers/`
+- Exporter: `packages/player/src/features/exporter.ts`
