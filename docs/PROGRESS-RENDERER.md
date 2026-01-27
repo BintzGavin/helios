@@ -1,5 +1,8 @@
 # RENDERER Progress Log
 
+## RENDERER v1.22.0
+- ✅ Completed: Implicit Audio Discovery - Updated `DomStrategy` to automatically detect `<audio>` and `<video>` elements in the DOM and include their audio tracks in the FFmpeg render, improving "Use What You Know" functionality.
+
 ## RENDERER v1.21.0
 - ✅ Completed: Configurable Audio Codecs - Added `audioCodec` and `audioBitrate` to `RendererOptions` and updated `FFmpegBuilder` to support smart defaults (e.g., auto-switching to `libvorbis` for WebM) and custom configurations.
 

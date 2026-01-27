@@ -1,9 +1,11 @@
 import { Page } from 'playwright';
 import { RenderStrategy } from './RenderStrategy';
-import { RendererOptions } from '../types';
+import { RendererOptions, AudioTrackConfig } from '../types';
 import { FFmpegBuilder } from '../utils/FFmpegBuilder';
 
 export class DomStrategy implements RenderStrategy {
+  private discoveredAudioTracks: AudioTrackConfig[] = [];
+
   async diagnose(page: Page): Promise<any> {
     return await page.evaluate(() => {
       console.log('[Helios Diagnostics] Checking DOM environment...');
@@ -17,7 +19,7 @@ export class DomStrategy implements RenderStrategy {
   }
 
   async prepare(page: Page): Promise<void> {
-    await page.evaluate(async () => {
+    const discoveredTracks = await page.evaluate(async () => {
       // 1. Wait for fonts
       await document.fonts.ready;
 
@@ -69,6 +71,8 @@ export class DomStrategy implements RenderStrategy {
 
       // 4. Wait for media elements (video/audio)
       const mediaElements = Array.from(document.querySelectorAll('video, audio')) as HTMLMediaElement[];
+      const tracks: { path: string; volume: number }[] = [];
+
       if (mediaElements.length > 0) {
         console.log(`[DomStrategy] Preloading ${mediaElements.length} media elements...`);
         await Promise.all(mediaElements.map((el) => {
@@ -101,8 +105,32 @@ export class DomStrategy implements RenderStrategy {
           });
         }));
         console.log('[DomStrategy] Media elements ready.');
+
+        // Extract metadata
+        mediaElements.forEach(el => {
+          const src = el.currentSrc || el.src;
+          if (src) {
+            tracks.push({
+              path: src,
+              volume: el.volume
+            });
+          }
+        });
       }
+      return tracks;
     });
+
+    // Filter and map discovered tracks
+    this.discoveredAudioTracks = discoveredTracks
+      .filter(track => track.path && !track.path.startsWith('blob:'))
+      .map(track => ({
+        path: track.path,
+        volume: track.volume,
+      }));
+
+    if (this.discoveredAudioTracks.length > 0) {
+      console.log(`[DomStrategy] Discovered ${this.discoveredAudioTracks.length} audio/video tracks.`);
+    }
   }
 
   async capture(page: Page, frameTime: number): Promise<Buffer> {
@@ -121,6 +149,14 @@ export class DomStrategy implements RenderStrategy {
       '-i', '-',
     ];
 
-    return FFmpegBuilder.getArgs(options, outputPath, videoInputArgs);
+    const combinedOptions: RendererOptions = {
+      ...options,
+      audioTracks: [
+        ...(options.audioTracks || []),
+        ...this.discoveredAudioTracks
+      ]
+    };
+
+    return FFmpegBuilder.getArgs(combinedOptions, outputPath, videoInputArgs);
   }
 }
