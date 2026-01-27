@@ -1,5 +1,8 @@
 # Studio Progress Log
 
+## STUDIO v0.24.0
+- ✅ Completed: Scaffold Unit Tests - Added Vitest, JSDOM, and Testing Library infrastructure; implemented initial tests for Timeline component.
+
 ## STUDIO v0.23.2
 - ✅ Completed: Enable External Project Support - Configured Vite and Render Manager to respect HELIOS_PROJECT_ROOT for file serving and output.
 
