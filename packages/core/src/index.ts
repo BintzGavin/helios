@@ -15,6 +15,7 @@ export type HeliosState = {
   playbackRate: number;
   volume: number;
   muted: boolean;
+  captions: CaptionCue[];
   activeCaptions: CaptionCue[];
 };
 
@@ -33,7 +34,7 @@ export interface HeliosOptions {
   playbackRate?: number;
   volume?: number;
   muted?: boolean;
-  captions?: string;
+  captions?: string | CaptionCue[];
   driver?: TimeDriver;
   ticker?: Ticker;
 }
@@ -111,6 +112,12 @@ export class Helios {
    * Can be subscribed to for reactive updates.
    */
   public get muted(): ReadonlySignal<boolean> { return this._muted; }
+
+  /**
+   * Signal for the full list of captions.
+   * Can be subscribed to for reactive updates.
+   */
+  public get captions(): ReadonlySignal<CaptionCue[]> { return this._captions; }
 
   /**
    * Signal for the currently active captions.
@@ -193,7 +200,9 @@ export class Helios {
     this.schema = options.schema;
 
     const initialProps = validateProps(options.inputProps || {}, this.schema);
-    const initialCaptions = options.captions ? parseSrt(options.captions) : [];
+    const initialCaptions = options.captions
+      ? (typeof options.captions === 'string' ? parseSrt(options.captions) : options.captions)
+      : [];
 
     // Initialize Initial Frame
     const totalFrames = options.duration * options.fps;
@@ -262,6 +271,7 @@ export class Helios {
       playbackRate: this._playbackRate.value,
       volume: this._volume.value,
       muted: this._muted.value,
+      captions: this._captions.value,
       activeCaptions: this.activeCaptions.value,
     };
   }

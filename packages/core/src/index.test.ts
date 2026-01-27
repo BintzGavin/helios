@@ -17,6 +17,7 @@ describe('Helios Core', () => {
       playbackRate: 1,
       volume: 1,
       muted: false,
+      captions: [],
       activeCaptions: [],
     });
   });
@@ -595,6 +596,55 @@ Dynamic`;
 
       expect(helios.getState().activeCaptions).toHaveLength(1);
       expect(helios.getState().activeCaptions[0].text).toBe('Dynamic');
+    });
+  });
+
+  describe('Exposed Captions', () => {
+    it('should expose full captions list in state', () => {
+      const srt = `1
+00:00:01,000 --> 00:00:02,000
+First
+
+2
+00:00:03,000 --> 00:00:04,000
+Second`;
+      const helios = new Helios({ duration: 10, fps: 30, captions: srt });
+
+      expect(helios.captions.peek()).toHaveLength(2);
+      expect(helios.getState().captions).toHaveLength(2);
+      expect(helios.getState().captions[0].text).toBe('First');
+      expect(helios.getState().captions[1].text).toBe('Second');
+    });
+
+    it('should accept CaptionCue[] in constructor', () => {
+      const cues = [
+        { id: '1', startTime: 1000, endTime: 2000, text: 'Manual 1' },
+        { id: '2', startTime: 3000, endTime: 4000, text: 'Manual 2' }
+      ];
+      const helios = new Helios({ duration: 10, fps: 30, captions: cues });
+
+      expect(helios.getState().captions).toEqual(cues);
+      expect(helios.getState().captions).toHaveLength(2);
+    });
+
+    it('should update full captions list via setCaptions', () => {
+      const helios = new Helios({ duration: 10, fps: 30 });
+      expect(helios.getState().captions).toEqual([]);
+
+      const srt = `1
+00:00:01,000 --> 00:00:02,000
+Updated`;
+
+      helios.setCaptions(srt);
+      expect(helios.getState().captions).toHaveLength(1);
+      expect(helios.getState().captions[0].text).toBe('Updated');
+
+      const cues = [
+        { id: '1', startTime: 5000, endTime: 6000, text: 'Array' }
+      ];
+      helios.setCaptions(cues);
+      expect(helios.getState().captions).toEqual(cues);
+      expect(helios.getState().captions[0].text).toBe('Array');
     });
   });
 
