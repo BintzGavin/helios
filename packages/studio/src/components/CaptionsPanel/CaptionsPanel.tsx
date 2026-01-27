@@ -1,6 +1,7 @@
 import React, { ChangeEvent } from 'react';
 import { parseSrt, CaptionCue } from '@helios-project/core';
 import { useStudio } from '../../context/StudioContext';
+import { stringifySrt } from '../../utils/srt';
 import './CaptionsPanel.css';
 
 const formatTime = (ms: number) => {
@@ -84,6 +85,18 @@ export const CaptionsPanel: React.FC = () => {
       updateCaptions([]);
   };
 
+  const handleExport = () => {
+    if (captions.length === 0) return;
+    const srtContent = stringifySrt(captions);
+    const blob = new Blob([srtContent], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'captions.srt';
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   const handleAdd = () => {
       const currentTime = Math.round((playerState.currentFrame / playerState.fps) * 1000) || 0;
       const newCue: CaptionCue = {
@@ -120,9 +133,14 @@ export const CaptionsPanel: React.FC = () => {
                 + Add
              </button>
              {captions.length > 0 && (
-                <button onClick={handleClear} className="clear-button">
-                    Clear
-                </button>
+                <>
+                  <button onClick={handleExport} className="clear-button" title="Download SRT">
+                      Export SRT
+                  </button>
+                  <button onClick={handleClear} className="clear-button">
+                      Clear
+                  </button>
+                </>
             )}
         </div>
       </div>
