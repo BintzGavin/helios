@@ -39,7 +39,7 @@ The studio is launched via the `@helios-project/cli` package.
 - **PropsEditor**: JSON/Form editor for composition props.
 - **AssetsPanel**: Drag-and-drop asset management with rich previews for Video, Audio, and Fonts.
 - **RendersPanel**: Render job management (start, cancel, download).
-- **Stage**: Canvas/DOM preview area.
+- **Stage**: Canvas/DOM preview area with Pan/Zoom, Transparency Grid, and Snapshot controls.
 
 ## E. Integration
 - **Core**: Consumes `Helios` class for state management.

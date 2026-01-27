@@ -97,6 +97,9 @@ interface StudioContextType {
   // Render Config
   renderConfig: RenderConfig;
   setRenderConfig: (config: RenderConfig) => void;
+
+  // Snapshot
+  takeSnapshot: () => Promise<void>;
 }
 
 const StudioContext = createContext<StudioContextType | undefined>(undefined);
@@ -259,6 +262,40 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
   const toggleLoop = () => setLoop(prev => !prev);
 
+  const takeSnapshot = async () => {
+    if (!controller) return;
+
+    const frameNumber = playerState.currentFrame;
+    const mode = renderConfig.mode;
+
+    try {
+      const videoFrame = await controller.captureFrame(frameNumber, { mode });
+      if (!videoFrame) return;
+
+      const canvas = document.createElement('canvas');
+      canvas.width = videoFrame.displayWidth;
+      canvas.height = videoFrame.displayHeight;
+      const ctx = canvas.getContext('2d');
+
+      if (ctx) {
+        ctx.drawImage(videoFrame, 0, 0);
+        const dataUrl = canvas.toDataURL('image/png');
+
+        const compName = activeComposition?.name || 'composition';
+        const filename = `snapshot-${compName}-${frameNumber}.png`;
+
+        const a = document.createElement('a');
+        a.href = dataUrl;
+        a.download = filename;
+        a.click();
+      }
+
+      videoFrame.close();
+    } catch (e) {
+      console.error("Snapshot failed", e);
+    }
+  };
+
   return (
     <StudioContext.Provider
       value={{
@@ -287,7 +324,8 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         canvasSize,
         setCanvasSize,
         renderConfig,
-        setRenderConfig
+        setRenderConfig,
+        takeSnapshot
       }}
     >
       {children}

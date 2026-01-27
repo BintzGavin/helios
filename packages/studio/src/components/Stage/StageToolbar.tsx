@@ -8,6 +8,7 @@ interface StageToolbarProps {
   onToggleTransparent: () => void;
   canvasSize: { width: number; height: number };
   onCanvasSizeChange: (size: { width: number; height: number }) => void;
+  onSnapshot: () => void;
 }
 
 export const StageToolbar: React.FC<StageToolbarProps> = ({
@@ -17,7 +18,8 @@ export const StageToolbar: React.FC<StageToolbarProps> = ({
   isTransparent,
   onToggleTransparent,
   canvasSize,
-  onCanvasSizeChange
+  onCanvasSizeChange,
+  onSnapshot
 }) => {
   const styles = {
     container: {
@@ -153,6 +155,10 @@ export const StageToolbar: React.FC<StageToolbarProps> = ({
       <span style={styles.text}>{Math.round(zoom * 100)}%</span>
       <button style={styles.button} onClick={handleZoomIn} title="Zoom In">
         +
+      </button>
+      <div style={{ width: '1px', background: '#555', margin: '0 4px' }} />
+      <button style={styles.button} onClick={onSnapshot} title="Take Snapshot">
+        📷
       </button>
       <div style={{ width: '1px', background: '#555', margin: '0 4px' }} />
       <button

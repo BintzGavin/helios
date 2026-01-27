@@ -1,5 +1,8 @@
 # Studio Progress Log
 
+## STUDIO v0.27.0
+- ✅ Completed: Snapshot - Implemented "Take Snapshot" feature in Stage Toolbar to capture and download current frame as PNG.
+
 ## STUDIO v0.26.0
 - ✅ Completed: Audio Controls - Added Volume slider and Mute button to Playback Controls, updating `StudioContext` to track audio state.
 
