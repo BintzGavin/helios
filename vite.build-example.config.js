@@ -25,6 +25,7 @@ export default defineConfig({
         svelte_dom: resolve(__dirname, "examples/svelte-dom-animation/composition.html"),
         threejs_composition: resolve(__dirname, "examples/threejs-canvas-animation/composition.html"),
         pixi_composition: resolve(__dirname, "examples/pixi-canvas-animation/composition.html"),
+        p5_composition: resolve(__dirname, "examples/p5-canvas-animation/composition.html"),
         animation_helpers: resolve(__dirname, "examples/animation-helpers/composition.html"),
         react_helpers: resolve(__dirname, "examples/react-animation-helpers/composition.html"),
         svelte_helpers: resolve(__dirname, "examples/svelte-animation-helpers/composition.html"),

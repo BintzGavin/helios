@@ -1,5 +1,5 @@
 # Status: DEMO (Executor)
-**Version**: 1.36.0
+**Version**: 1.37.0
 
 ## Vision
 To provide comprehensive, idiomatic examples for every major framework (React, Vue, Svelte, Vanilla) and robust end-to-end testing to ensure the Helios engine delivers on its "Use What You Know" promise.
@@ -13,6 +13,7 @@ To provide comprehensive, idiomatic examples for every major framework (React, V
 - **Framer Motion**: ✅ `examples/framer-motion-animation` exists and works.
 - **Lottie**: ✅ `examples/lottie-animation` exists and works.
 - **Motion One**: ✅ `examples/motion-one-animation` exists and works.
+- **P5.js**: ✅ `examples/p5-canvas-animation` exists and works (Demonstrates Instance Mode integration).
 - **D3.js**: ✅ `examples/d3-animation` exists and works (Demonstrates data visualization).
 - **Captions**: ✅ `examples/captions-animation` exists and works (Demonstrates built-in SRT captions).
 - **Signals**: ✅ `examples/signals-animation` exists and works (Demonstrates `signal`, `computed`, `effect`).
@@ -48,6 +49,7 @@ To provide comprehensive, idiomatic examples for every major framework (React, V
 - [x] Scaffold Framer Motion Example
 - [x] Scaffold Lottie Animation Example
 - [x] Scaffold Motion One Example
+- [x] Scaffold P5.js Animation Example
 - [x] Scaffold Signals Animation Example
 - [x] Scaffold React CSS Animation Example
 - [x] Scaffold Dynamic Props Example
@@ -59,6 +61,7 @@ To provide comprehensive, idiomatic examples for every major framework (React, V
 None.
 
 ## Log
+- [v1.37.0] ✅ Completed: Scaffold P5.js Example - Created `examples/p5-canvas-animation` demonstrating integration with P5.js in Instance Mode.
 - [v1.36.0] ✅ Completed: Scaffold WAAPI Animation Example - Created `examples/waapi-animation` demonstrating standard Web Animations API integration with `autoSyncAnimations`.
 - [v1.35.0] ✅ Completed: Scaffold Tailwind CSS Example - Created `examples/tailwind-animation` demonstrating Tailwind v3 integration with proper scoping and build configuration.
 - [v1.34.0] 📋 Planned: Scaffold Tailwind CSS Example - Created spec file `/.sys/plans/2025-02-22-DEMO-TailwindAnimation.md` to guide implementation of Tailwind CSS integration.

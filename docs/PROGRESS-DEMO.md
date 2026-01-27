@@ -60,3 +60,6 @@
 
 ## DEMO v1.36.0
 - ✅ Completed: Scaffold WAAPI Animation Example - Created `examples/waapi-animation` demonstrating standard Web Animations API integration with `autoSyncAnimations`.
+
+## DEMO v1.37.0
+- ✅ Completed: Scaffold P5.js Example - Created `examples/p5-canvas-animation` demonstrating integration with P5.js in Instance Mode.

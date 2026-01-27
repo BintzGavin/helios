@@ -14,6 +14,7 @@ const CASES = [
   { name: 'Svelte DOM', relativePath: 'examples/svelte-dom-animation/composition.html', mode: 'dom' as const },
   { name: 'ThreeJS', relativePath: 'examples/threejs-canvas-animation/composition.html', mode: 'canvas' as const },
   { name: 'Pixi', relativePath: 'examples/pixi-canvas-animation/composition.html', mode: 'canvas' as const },
+  { name: 'P5', relativePath: 'examples/p5-canvas-animation/composition.html', mode: 'canvas' as const },
   { name: 'Helpers', relativePath: 'examples/animation-helpers/composition.html', mode: 'canvas' as const },
   { name: 'React Helpers', relativePath: 'examples/react-animation-helpers/composition.html', mode: 'dom' as const },
   { name: 'Svelte Helpers', relativePath: 'examples/svelte-animation-helpers/composition.html', mode: 'dom' as const },
