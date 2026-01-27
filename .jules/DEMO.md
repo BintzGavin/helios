@@ -67,3 +67,7 @@
 ## [v1.38.0] - FFmpeg Base64 Strictness in DomStrategy
 **Learning:** `DomStrategy` automatically detects `<video>` elements and pipes them to FFmpeg. If using Base64 Data URIs, FFmpeg is strict about the container format (needs `moov` atom) and stream presence (expects audio if configured). A 1x1 pixel video-only Base64 caused verification failure (`moov atom not found` or `stream specifier matches no streams`).
 **Action:** Created a valid minimal MP4 with Audio using FFmpeg and used that for `examples/media-element-animation` and `examples/social-media-story`. Future examples using `autoSyncAnimations` must use valid media assets.
+
+## [v1.42.0] - Documentation Sync
+**Learning:** Completed features (like `social-media-story`) can sometimes be missed in status updates, leading to a discrepancy between the codebase and documentation.
+**Action:** Always cross-reference the `examples/` directory with `docs/status/DEMO.md` during "Locate" phase to catch these discrepancies early.
