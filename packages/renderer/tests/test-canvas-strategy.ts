@@ -34,6 +34,20 @@ async function testCodec(codecOption: string | undefined, expectedFourCC: string
   const strategy = new CanvasStrategy(options);
   await strategy.prepare(page);
 
+  if (expectedFourCC === 'NONE') {
+    const chunkCount = await page.evaluate(() => {
+        return (window as any).heliosWebCodecs.chunks.length;
+    });
+    await browser.close();
+    if (chunkCount === 0) {
+        console.log(`✅ ${codecName} passed: No IVF header written`);
+    } else {
+        console.error(`❌ ${codecName} failed: Expected 0 chunks (no header), got ${chunkCount}`);
+        process.exit(1);
+    }
+    return;
+  }
+
   const fourCC = await page.evaluate(() => {
     const chunks = (window as any).heliosWebCodecs.chunks;
     if (!chunks || chunks.length === 0) return 'NO_CHUNKS';
@@ -64,6 +78,8 @@ async function run() {
     await testCodec('vp9', 'VP90', 'VP9');
     await testCodec('av1', 'AV01', 'AV1');
     await testCodec('av01.0.05M.08', 'AV01', 'Specific AV1');
+    await testCodec('avc1', 'NONE', 'H.264 (avc1)');
+    await testCodec('h264', 'NONE', 'H.264 (string)');
     console.log('\nAll tests passed!');
   } catch (e) {
     console.error(e);

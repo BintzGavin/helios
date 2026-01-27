@@ -1,5 +1,8 @@
 # RENDERER Progress Log
 
+## RENDERER v1.19.0
+- ✅ Completed: H.264 WebCodecs Support - Updated `CanvasStrategy` to support `avc1` (H.264) intermediate codec by skipping IVF container and using raw Annex B format, enabling direct stream copy to FFmpeg for better performance.
+
 ## RENDERER v1.18.0
 - ✅ Completed: Audio Mixing - Added `audioTracks` to `RendererOptions` and implemented `FFmpegBuilder` to support mixing multiple audio tracks using the `amix` filter, enabling background music and voiceover mixing.
 
