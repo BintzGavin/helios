@@ -2,6 +2,7 @@
 import { Renderer } from '../../../renderer/src/index';
 import path from 'path';
 import fs from 'fs';
+import { getProjectRoot } from './discovery';
 
 export interface RenderJob {
   id: string;
@@ -37,7 +38,8 @@ export interface StartRenderOptions {
 export async function startRender(options: StartRenderOptions, serverPort: number): Promise<string> {
   const jobId = Date.now().toString();
   // Save to project root 'renders' directory
-  const rendersDir = path.resolve(process.cwd(), 'renders');
+  const projectRoot = getProjectRoot(process.cwd());
+  const rendersDir = path.resolve(projectRoot, 'renders');
   if (!fs.existsSync(rendersDir)) {
     fs.mkdirSync(rendersDir, { recursive: true });
   }

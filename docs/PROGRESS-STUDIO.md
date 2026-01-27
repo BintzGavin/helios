@@ -1,5 +1,8 @@
 # Studio Progress Log
 
+## STUDIO v0.23.2
+- ✅ Completed: Enable External Project Support - Configured Vite and Render Manager to respect HELIOS_PROJECT_ROOT for file serving and output.
+
 ## STUDIO v0.23.1
 - ✅ Fixed: Asset Deletion - Switched DELETE API to use query parameters to resolve body parsing timeouts.
 
