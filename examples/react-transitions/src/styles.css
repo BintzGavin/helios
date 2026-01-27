@@ -1,0 +1,72 @@
+body, html, #root {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.scene {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-family: sans-serif;
+  font-size: 3rem;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+h1 {
+  font-size: 5rem;
+  margin-bottom: 0.5rem;
+}
+
+.scene-1 {
+  background: linear-gradient(135deg, #ff6b6b, #feca57);
+  z-index: 1;
+  /* Scene 1 Exit: Starts at 2s (frame 60), lasts 1s. */
+  animation: fadeOut 1s linear forwards;
+  animation-delay: 2s;
+}
+
+.scene-2 {
+  background: linear-gradient(135deg, #48dbfb, #0abde3);
+  z-index: 2;
+  /* Scene 2 Entry: Starts at 2s (frame 60) via --sequence-start */
+  transform: translateX(100%);
+  animation: slideIn 1s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+  animation-delay: var(--sequence-start);
+}
+
+/* Scene 2 also needs to exit?
+   If Scene 3 comes in on top, Scene 2 doesn't technically need to animate out if it's covered.
+   But let's make Scene 3 have transparency or just cover it.
+   Scene 3 zooms in, so it might show Scene 2 behind it initially.
+*/
+
+.scene-3 {
+  background: linear-gradient(135deg, #1dd1a1, #10ac84);
+  z-index: 3;
+  /* Scene 3 Entry: Starts at 4s (frame 120) via --sequence-start */
+  opacity: 0;
+  transform: scale(0.5);
+  animation: zoomFadeIn 1s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+  animation-delay: var(--sequence-start);
+}
+
+@keyframes fadeOut {
+  to { opacity: 0; }
+}
+
+@keyframes slideIn {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes zoomFadeIn {
+  from { opacity: 0; transform: scale(0.5); }
+  to { opacity: 1; transform: scale(1); }
+}
