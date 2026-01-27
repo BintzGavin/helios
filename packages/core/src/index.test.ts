@@ -20,6 +20,7 @@ describe('Helios Core', () => {
       muted: false,
       captions: [],
       activeCaptions: [],
+      markers: [],
     });
   });
 
@@ -839,6 +840,66 @@ Updated`;
 
       // 60.5 % 60 = 0.5
       expect(helios.getState().currentFrame).toBeCloseTo(0.5, 1);
+    });
+  });
+
+  describe('Markers', () => {
+    it('should initialize with empty markers by default', () => {
+      const helios = new Helios({ duration: 10, fps: 30 });
+      expect(helios.getState().markers).toEqual([]);
+      expect(helios.markers.peek()).toEqual([]);
+    });
+
+    it('should initialize with provided markers', () => {
+      const markers = [{ id: '1', time: 1.5, label: 'Start' }];
+      const helios = new Helios({ duration: 10, fps: 30, markers });
+      expect(helios.getState().markers).toHaveLength(1);
+      expect(helios.getState().markers[0].label).toBe('Start');
+    });
+
+    it('should add valid marker', () => {
+      const helios = new Helios({ duration: 10, fps: 30 });
+      helios.addMarker({ id: 'm1', time: 5, label: 'Mid' });
+      expect(helios.markers.peek()).toHaveLength(1);
+      expect(helios.markers.peek()[0].id).toBe('m1');
+    });
+
+    it('should throw when adding duplicate marker ID', () => {
+      const helios = new Helios({ duration: 10, fps: 30 });
+      helios.addMarker({ id: 'm1', time: 5, label: 'Mid' });
+      expect(() => helios.addMarker({ id: 'm1', time: 6, label: 'Conflict' })).toThrow(HeliosError);
+    });
+
+    it('should remove marker', () => {
+      const helios = new Helios({ duration: 10, fps: 30 });
+      helios.addMarker({ id: 'm1', time: 5, label: 'Mid' });
+      helios.removeMarker('m1');
+      expect(helios.markers.peek()).toHaveLength(0);
+    });
+
+    it('should seek to marker', () => {
+      const helios = new Helios({ duration: 10, fps: 30 });
+      helios.addMarker({ id: 'm1', time: 2, label: 'Seek Target' });
+
+      helios.seekToMarker('m1');
+
+      // 2 seconds * 30 fps = 60 frames
+      expect(helios.currentFrame.peek()).toBe(60);
+    });
+
+    it('should throw when seeking to non-existent marker', () => {
+      const helios = new Helios({ duration: 10, fps: 30 });
+      expect(() => helios.seekToMarker('ghost')).toThrow(HeliosError);
+    });
+
+    it('should sort markers by time when adding', () => {
+      const helios = new Helios({ duration: 10, fps: 30 });
+      helios.addMarker({ id: 'm2', time: 10, label: 'Late' });
+      helios.addMarker({ id: 'm1', time: 1, label: 'Early' });
+
+      const markers = helios.markers.peek();
+      expect(markers[0].id).toBe('m1');
+      expect(markers[1].id).toBe('m2');
     });
   });
 });

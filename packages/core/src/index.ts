@@ -3,6 +3,7 @@ import { signal, effect, computed, Signal, ReadonlySignal } from './signals';
 import { HeliosError, HeliosErrorCode } from './errors';
 import { HeliosSchema, validateProps } from './schema';
 import { CaptionCue, parseSrt, findActiveCues, areCuesEqual } from './captions';
+import { Marker, validateMarker, validateMarkers } from './markers';
 
 export type HeliosState = {
   width: number;
@@ -18,6 +19,7 @@ export type HeliosState = {
   muted: boolean;
   captions: CaptionCue[];
   activeCaptions: CaptionCue[];
+  markers: Marker[];
 };
 
 export type HeliosSubscriber = (state: HeliosState) => void;
@@ -37,6 +39,7 @@ export interface HeliosOptions {
   volume?: number;
   muted?: boolean;
   captions?: string | CaptionCue[];
+  markers?: Marker[];
   driver?: TimeDriver;
   ticker?: Ticker;
 }
@@ -59,6 +62,7 @@ export * from './schema';
 export * from './random';
 export * from './color';
 export * from './timecode';
+export * from './markers';
 
 export class Helios {
   // Constants
@@ -76,6 +80,7 @@ export class Helios {
   private _muted: Signal<boolean>;
   private _captions: Signal<CaptionCue[]>;
   private _activeCaptions: Signal<CaptionCue[]>;
+  private _markers: Signal<Marker[]>;
   private _width: Signal<number>;
   private _height: Signal<number>;
 
@@ -136,6 +141,12 @@ export class Helios {
   public get activeCaptions(): ReadonlySignal<CaptionCue[]> {
     return this._activeCaptions;
   }
+
+  /**
+   * Signal for the timeline markers.
+   * Can be subscribed to for reactive updates.
+   */
+  public get markers(): ReadonlySignal<Marker[]> { return this._markers; }
 
   /**
    * Signal for the canvas width.
@@ -222,6 +233,8 @@ export class Helios {
       ? (typeof options.captions === 'string' ? parseSrt(options.captions) : options.captions)
       : [];
 
+    const initialMarkers = options.markers ? validateMarkers(options.markers) : [];
+
     // Initialize Initial Frame
     const totalFrames = options.duration * options.fps;
     const initialFrameRaw = options.initialFrame || 0;
@@ -238,6 +251,7 @@ export class Helios {
     this._volume = signal(options.volume ?? 1);
     this._muted = signal(options.muted ?? false);
     this._captions = signal(initialCaptions);
+    this._markers = signal(initialMarkers);
     this._width = signal(width);
     this._height = signal(height);
 
@@ -295,6 +309,7 @@ export class Helios {
       muted: this._muted.value,
       captions: this._captions.value,
       activeCaptions: this.activeCaptions.value,
+      markers: this._markers.value,
     };
   }
 
@@ -409,6 +424,47 @@ export class Helios {
   public setCaptions(captions: string | CaptionCue[]) {
     const cues = typeof captions === 'string' ? parseSrt(captions) : captions;
     this._captions.value = cues;
+  }
+
+  public setMarkers(markers: Marker[]) {
+    this._markers.value = validateMarkers(markers);
+  }
+
+  public addMarker(marker: Marker) {
+    const valid = validateMarker(marker);
+    const current = this._markers.peek();
+
+    if (current.some((m) => m.id === valid.id)) {
+      throw new HeliosError(
+        HeliosErrorCode.INVALID_MARKER,
+        `Duplicate marker ID: ${valid.id}`,
+        'Ensure all markers have unique IDs.'
+      );
+    }
+
+    const newMarkers = [...current, valid].sort((a, b) => a.time - b.time);
+    this._markers.value = newMarkers;
+  }
+
+  public removeMarker(id: string) {
+    const current = this._markers.peek();
+    const newMarkers = current.filter((m) => m.id !== id);
+    if (newMarkers.length !== current.length) {
+      this._markers.value = newMarkers;
+    }
+  }
+
+  public seekToMarker(id: string) {
+    const marker = this._markers.peek().find((m) => m.id === id);
+    if (!marker) {
+      throw new HeliosError(
+        HeliosErrorCode.MARKER_NOT_FOUND,
+        `Marker not found: ${id}`,
+        'Ensure the marker ID exists before seeking.'
+      );
+    }
+    const frame = marker.time * this.fps;
+    this.seek(frame);
   }
 
   // --- Subscription ---
