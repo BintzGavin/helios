@@ -50,6 +50,7 @@ export type HeliosState = {
   playbackRate: number;
   volume: number;
   muted: boolean;
+  captions: CaptionCue[];
   activeCaptions: CaptionCue[];
 };
 
@@ -68,7 +69,7 @@ export interface HeliosOptions {
   playbackRate?: number;
   volume?: number;
   muted?: boolean;
-  captions?: string;
+  captions?: string | CaptionCue[];
   driver?: TimeDriver;
   ticker?: Ticker;
 }
@@ -137,6 +138,7 @@ export class Helios {
   public get playbackRate(): ReadonlySignal<number>;
   public get volume(): ReadonlySignal<number>;
   public get muted(): ReadonlySignal<boolean>;
+  public get captions(): ReadonlySignal<CaptionCue[]>;
   public get activeCaptions(): ReadonlySignal<CaptionCue[]>;
   public get width(): ReadonlySignal<number>;
   public get height(): ReadonlySignal<number>;

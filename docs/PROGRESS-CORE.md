@@ -1,5 +1,8 @@
 # CORE Progress Log
 
+## CORE v1.27.0
+- ✅ Completed: Expose Captions - Exposed full caption list in `HeliosState` and enabled array input for captions in constructor and `setCaptions`.
+
 ## CORE v1.26.2
 - ✅ Completed: Restore Context File - Restored missing `/.sys/llmdocs/context-core.md` and verified package integrity.
 
