@@ -3,13 +3,26 @@ import { useStudio } from '../../context/StudioContext';
 
 export const PlaybackControls: React.FC = () => {
   const { controller, playerState, loop, toggleLoop } = useStudio();
-  const { isPlaying, currentFrame, duration, fps, playbackRate } = playerState;
+  const { isPlaying, currentFrame, duration, fps, playbackRate, volume, muted } = playerState;
   const totalFrames = duration * fps;
 
   const handleSpeedChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const rate = parseFloat(e.target.value);
     if (controller) {
       controller.setPlaybackRate(rate);
+    }
+  };
+
+  const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newVolume = parseFloat(e.target.value);
+    if (controller) {
+      controller.setAudioVolume(newVolume);
+    }
+  };
+
+  const handleMuteToggle = () => {
+    if (controller) {
+      controller.setAudioMuted(!muted);
     }
   };
 
@@ -121,6 +134,40 @@ export const PlaybackControls: React.FC = () => {
       >
         🔁
       </button>
+
+      <div style={{ height: '24px', width: '1px', background: '#444', margin: '0 4px' }} />
+
+      <button
+        onClick={handleMuteToggle}
+        disabled={!controller}
+        title={muted ? "Unmute" : "Mute"}
+        style={{
+          cursor: controller ? 'pointer' : 'not-allowed',
+          padding: '4px 8px',
+          background: 'none',
+          border: '1px solid #444',
+          borderRadius: '4px',
+          color: 'white',
+          minWidth: '32px'
+        }}
+      >
+        {muted || volume === 0 ? '🔇' : '🔊'}
+      </button>
+
+      <input
+        type="range"
+        min="0"
+        max="1"
+        step="0.05"
+        value={volume}
+        onChange={handleVolumeChange}
+        disabled={!controller}
+        style={{
+          width: '60px',
+          cursor: controller ? 'pointer' : 'not-allowed'
+        }}
+        title={`Volume: ${Math.round(volume * 100)}%`}
+      />
 
       <div style={{ height: '24px', width: '1px', background: '#444', margin: '0 4px' }} />
 
