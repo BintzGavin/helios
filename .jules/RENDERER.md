@@ -75,3 +75,7 @@
 ## [1.20.0] - Environment Dependencies for E2E Tests
 **Learning:** Running `render:canvas-example` requires `packages/core` to be built (`npm run build` in `packages/core`) and Playwright browsers to be installed (`npx playwright install`). These dependencies are not automatically handled by the render script.
 **Action:** When running renderer E2E tests, ensuring these prerequisites are met first to avoid false negatives.
+
+## [2026-03-13] - CanvasStrategy Quality Gaps
+**Learning:** `CanvasStrategy` defaults to a 25Mbps bitrate floor for intermediate WebCodecs capture, which is insufficient for 4K/60fps rendering. It also lacks font preloading (unlike `DomStrategy`), which can lead to visual artifacts on the first frame.
+**Action:** Implement adaptive bitrate calculation (`width * height * fps * 0.2`) and inject `document.fonts.ready` waiting in `CanvasStrategy.prepare`.
