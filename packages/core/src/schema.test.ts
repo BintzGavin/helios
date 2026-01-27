@@ -104,4 +104,25 @@ describe('validateProps', () => {
     };
     expect(validateProps({ val: 'ok' }, schema)).toEqual({ val: 'ok' });
   });
+
+  it('should validate asset types', () => {
+    const schema = {
+      img: { type: 'image' as const },
+      vid: { type: 'video' as const },
+      aud: { type: 'audio' as const },
+      fnt: { type: 'font' as const },
+    };
+    const valid = {
+      img: 'path/to/image.png',
+      vid: 'path/to/video.mp4',
+      aud: 'path/to/audio.mp3',
+      fnt: 'path/to/font.ttf',
+    };
+    expect(validateProps(valid, schema)).toEqual(valid);
+
+    expect(() => validateProps({ img: 123 }, schema)).toThrow(HeliosError);
+    expect(() => validateProps({ vid: {} }, schema)).toThrow(HeliosError);
+    expect(() => validateProps({ aud: true }, schema)).toThrow(HeliosError);
+    expect(() => validateProps({ fnt: [] }, schema)).toThrow(HeliosError);
+  });
 });

@@ -1,11 +1,12 @@
 # Status: CORE
 
-**Version**: 1.31.0
+**Version**: 1.32.0
 
 - **Status**: Active
 - **Current Focus**: Maintenance and Optimization
-- **Last Updated**: 2026-03-24
+- **Last Updated**: 2026-03-25
 
+[v1.32.0] ✅ Completed: Implement Schema Asset Types - Added `image`, `video`, `audio`, `font` to `PropType` and validation, enabling asset selection in Studio.
 [v1.31.0] ✅ Completed: Optimize DomDriver - Implemented MutationObserver caching and disposal in DomDriver, reducing DOM queries and improving performance.
 [v1.30.0] ✅ Completed: Implement Loop Support - Implemented loop option, signal, and logic in Helios class, enabling seamless looping playback.
 [v1.29.0] ✅ Completed: Implement Timecode Utilities - Implemented `framesToTimecode`, `timecodeToFrames`, and `framesToTimestamp` utilities.
