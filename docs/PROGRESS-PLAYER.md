@@ -1,5 +1,8 @@
 # PLAYER Progress Log
 
+## PLAYER v0.24.1
+- ✅ Completed: Documentation Update - Added missing attributes (poster, preload, input-props), Standard Media API, and Events documentation to README.
+
 ## PLAYER v0.24.0
 - ✅ Completed: Implement Poster and Preload - Implemented `poster` attribute for custom preview images and `preload` attribute to control loading behavior (including deferred loading with "Big Play Button").
 

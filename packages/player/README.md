@@ -61,6 +61,44 @@ The player will automatically attempt to access `window.helios` on the iframe's 
 | `export-mode` | Strategy for client-side export: `auto`, `canvas`, or `dom`. | `auto` |
 | `canvas-selector` | CSS selector for the canvas element (used in `canvas` export mode). | `canvas` |
 | `export-format` | Output video format: `mp4` (H.264/AAC) or `webm` (VP9/Opus). | `mp4` |
+| `poster` | URL of an image to display before playback starts. | - |
+| `preload` | `auto` or `none`. If `none`, defers loading the iframe until interaction. | `auto` |
+| `input-props` | JSON string of properties to pass to the composition. | - |
+
+## Standard Media API
+
+The `<helios-player>` element implements a subset of the HTMLMediaElement interface, allowing you to control playback programmatically.
+
+### Methods
+
+- `play(): Promise<void>` - Starts playback.
+- `pause(): void` - Pauses playback.
+- `load(): void` - Reloads the iframe (useful if `src` changed or to retry connection).
+
+### Properties
+
+- `currentTime` (number): Current playback position in seconds.
+- `duration` (number, read-only): Total duration in seconds.
+- `paused` (boolean, read-only): Whether playback is paused.
+- `ended` (boolean, read-only): Whether playback has reached the end.
+- `volume` (number): Audio volume (0.0 to 1.0).
+- `muted` (boolean): Audio mute state.
+- `playbackRate` (number): Playback speed (default 1.0).
+- `fps` (number, read-only): Frames per second of the composition.
+- `currentFrame` (number): Current frame index.
+- `inputProps` (object): Get or set the input properties passed to the composition.
+
+## Events
+
+The element dispatches the following custom events:
+
+- `play`: Fired when playback starts.
+- `pause`: Fired when playback is paused.
+- `ended`: Fired when playback completes.
+- `timeupdate`: Fired when the current time/frame changes.
+- `volumechange`: Fired when volume or mute state changes.
+- `ratechange`: Fired when playback rate changes.
+- `durationchange`: Fired when the duration of the composition changes.
 
 ## Client-Side Export
 
