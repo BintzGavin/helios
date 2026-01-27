@@ -1,4 +1,5 @@
-# Studio Progress Log
+## STUDIO v0.32.0
+- ✅ Completed: Editable Captions Panel - Implemented editable inputs for captions (time/text), add/delete functionality, and syncing with Core via `controller.setCaptions` or `inputProps`.
 
 ## STUDIO v0.31.0
 - ✅ Completed: Integrate Core Captions - Updated Studio to use `HeliosState.captions` for Timeline and Captions Panel, ensuring full sync with Core's caption logic.

@@ -1,4 +1,4 @@
-**Version**: 0.31.0
+**Version**: 0.32.0
 
 # Studio Domain Status
 
@@ -7,6 +7,7 @@
 **Focus**: UI Implementation & CLI
 
 ## Recent Updates
+- [v0.32.0] ✅ Completed: Editable Captions Panel - Implemented editable inputs for captions (time/text), add/delete functionality, and syncing with Core via `controller.setCaptions` or `inputProps`.
 - [v0.31.0] ✅ Completed: Integrate Core Captions - Updated Studio to use `HeliosState.captions` for Timeline and Captions Panel, ensuring full sync with Core's caption logic.
 - [v0.30.1] ✅ Verified: Keyboard Shortcuts & Snapshot - Added unit tests for KeyboardShortcutsModal and StudioContext snapshot logic.
 - [v0.30.0] ✅ Completed: Keyboard Shortcuts Dialog - Implemented a modal dialog listing all keyboard shortcuts, accessible via `?` key or sidebar button, improving usability.
