@@ -1,47 +1,47 @@
-# Context: Renderer
+# Renderer Context
 
-## A. Strategy
-The Renderer employs a "Dual-Path" architecture:
-1. **Canvas Mode**: For high-performance rendering of `<canvas>` based animations. Uses `CdpTimeDriver` to control time via Chrome DevTools Protocol and WebCodecs for efficient frame capture. Intermediate bitrate and codec (VP8/VP9/AV1) are configurable. Supports transparent video generation by preserving alpha channel when `pixelFormat` indicates transparency (e.g. `yuva420p`).
-2. **DOM Mode**: For rendering standard DOM/CSS animations. Uses `SeekTimeDriver` to manipulate `document.timeline.currentTime` and `page.screenshot` for capture. Automatically preloads fonts, images (`<img>`), CSS background images, and media elements (`<video>`, `<audio>`) to prevent artifacts. To ensure deterministic JS animations, `SeekTimeDriver` injects a polyfill that overrides `performance.now()`, `Date.now()`, and `requestAnimationFrame()` with a controlled virtual time.
+## A. Strategy: Dual-Path Architecture
+The renderer supports two distinct strategies for capturing frames:
 
-Exposes a programmatic `diagnose()` method to verify environment requirements (e.g., WebCodecs support, WAAPI) and return a detailed capability report before rendering.
+1.  **CanvasStrategy** (Default):
+    -   Best for: High-performance canvas-based animations (WebGL, Three.js, PixiJS).
+    -   Mechanism: Uses `WebCodecs` (VideoEncoder) to capture frames directly from the canvas context.
+    -   Optimizations:
+        -   Supports VP8/VP9/AV1 via IVF container.
+        -   Supports H.264 (avc1) via raw Annex B stream (no container).
+        -   Falls back to `canvas.toDataURL()` if WebCodecs is unavailable.
+    -   Transparency: Supported (if `pixelFormat` is `yuva420p` or similar).
+
+2.  **DomStrategy**:
+    -   Best for: CSS/DOM-based animations.
+    -   Mechanism: Uses `page.screenshot()` (via Playwright) to capture the viewport.
+    -   Features: Includes asset preloading (images, fonts, media) to prevent artifacts.
+
+Both strategies pipe captured frames to a persistent FFmpeg process via stdin.
 
 ## B. File Tree
+```
 packages/renderer/
-├── scripts/
-│   ├── render-dom.ts
-│   ├── render.ts
-│   ├── verify-audio-mixing.ts
-│   ├── verify-bitrate.ts
-│   ├── verify-diagnostics.ts
-│   ├── verify-dom-preload.ts
-│   ├── verify-error-handling.ts
-│   └── verify-transparency.ts
 ├── src/
-│   ├── drivers/
-│   │   ├── CdpTimeDriver.ts
-│   │   ├── SeekTimeDriver.ts
-│   │   └── TimeDriver.ts
 │   ├── strategies/
-│   │   ├── CanvasStrategy.ts
-│   │   ├── DomStrategy.ts
-│   │   └── RenderStrategy.ts
+│   │   ├── RenderStrategy.ts      # Interface
+│   │   ├── CanvasStrategy.ts      # WebCodecs/Canvas implementation
+│   │   ├── DomStrategy.ts         # Screenshot implementation
+│   ├── drivers/
+│   │   ├── TimeDriver.ts          # Interface for time control
+│   │   ├── CdpTimeDriver.ts       # CDP-based deterministic timing
+│   │   └── SeekTimeDriver.ts      # RAF/Polyfill-based timing
 │   ├── utils/
-│   │   └── FFmpegBuilder.ts
-│   ├── concat.ts
-│   ├── index.ts
-│   └── types.ts
-├── tests/
-│   ├── test-canvas-strategy.ts
-│   ├── verify-codecs.ts
-│   ├── verify-concat.ts
-│   ├── verify-diagnose.ts
-│   ├── verify-range-render.ts
-│   └── verify-seek-driver-determinism.ts
-└── package.json
+│   │   └── FFmpegBuilder.ts       # FFmpeg argument generation logic
+│   ├── index.ts                   # Main entry point (Renderer class)
+│   ├── types.ts                   # Shared interfaces
+│   └── concat.ts                  # Video concatenation utility
+└── tests/                         # Verification scripts
+```
 
 ## C. Configuration
+The `Renderer` is configured via `RendererOptions`:
+
 ```typescript
 interface RendererOptions {
   width: number;
@@ -49,36 +49,27 @@ interface RendererOptions {
   fps: number;
   durationInSeconds: number;
   mode?: 'canvas' | 'dom';
-  startFrame?: number;
-  audioFilePath?: string;
-  audioTracks?: (string | AudioTrackConfig)[];
-  videoCodec?: string;
-  pixelFormat?: string;
-  crf?: number;
-  preset?: string;
-  videoBitrate?: string;
-  intermediateVideoCodec?: string;
-  inputProps?: Record<string, any>;
+  intermediateVideoCodec?: string; // e.g., 'vp8', 'avc1.42001f'
+  videoBitrate?: string;           // e.g., '5M'
+  pixelFormat?: string;            // e.g., 'yuv420p', 'yuva420p'
+  audioFilePath?: string;          // Single track
+  audioTracks?: (string | AudioTrackConfig)[]; // Multi-track mixing
+  inputProps?: Record<string, any>; // Dynamic props injection
   ffmpegPath?: string;
-}
-
-interface AudioTrackConfig {
-  path: string;
-  volume?: number;
-  offset?: number;
-  seek?: number;
-}
-
-interface RenderJobOptions {
-  onProgress?: (progress: number) => void;
-  signal?: AbortSignal;
-  tracePath?: string;
+  startFrame?: number;             // For distributed rendering
+  // ... (crf, preset, videoCodec)
 }
 ```
 
 ## D. FFmpeg Interface
-The renderer pipes raw frames to FFmpeg via `stdin`.
-Default flags: `-c:v libx264 -pix_fmt yuv420p -crf 23 -preset medium`.
-Arguments are configurable via `RendererOptions`.
-Supports mixing multiple audio tracks via `amix` filter, centrally managed by `FFmpegBuilder`.
-Includes a `concatenateVideos` utility for stitching multiple video files.
+The renderer spawns FFmpeg with arguments generated by `FFmpegBuilder`.
+- **Inputs**:
+    -   Video: Pipes from stdin (`-f ivf` for VPx, `-f h264` for AVC, or `-f image2pipe` for screenshots).
+    -   Audio: `-i <path>` for each track.
+- **Filters**:
+    -   `adelay`: For audio offsets.
+    -   `volume`: For track volume.
+    -   `amix`: For mixing multiple tracks.
+- **Output**:
+    -   Encodes to H.264 (MP4) by default, configurable via `videoCodec`.
+    -   Writes to the specified `outputPath`.

@@ -393,6 +393,8 @@ describe('Helios Core', () => {
   describe('Type Exports', () => {
     it('should allow usage of exported types', () => {
       const state: HeliosState = {
+        width: 1920,
+        height: 1080,
         duration: 10,
         fps: 30,
         currentFrame: 0,

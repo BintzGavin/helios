@@ -5,6 +5,7 @@ import { FFmpegBuilder } from '../utils/FFmpegBuilder';
 
 export class CanvasStrategy implements RenderStrategy {
   private useWebCodecs = false;
+  private useH264 = false;
 
   constructor(private options: RendererOptions) {}
 
@@ -48,6 +49,7 @@ export class CanvasStrategy implements RenderStrategy {
     // Resolve codec and FourCC
     let codecString = 'vp8';
     let fourCC = 'VP80';
+    let isH264 = false;
     const requested = this.options.intermediateVideoCodec;
 
     if (requested) {
@@ -64,6 +66,9 @@ export class CanvasStrategy implements RenderStrategy {
           codecString = 'av01.0.05M.08';
         }
         fourCC = 'AV01';
+      } else if (lower.startsWith('avc1') || lower.startsWith('h264')) {
+        codecString = requested;
+        isH264 = true;
       } else if (lower !== 'vp8') {
         // Pass-through
         codecString = requested;
@@ -73,6 +78,8 @@ export class CanvasStrategy implements RenderStrategy {
         // else default to VP80 or let it be (IVF requires valid FourCC)
       }
     }
+
+    this.useH264 = isH264;
 
     // Determine alpha mode
     const pixelFormat = this.options.pixelFormat || 'yuv420p';
@@ -96,6 +103,11 @@ export class CanvasStrategy implements RenderStrategy {
         alpha: config.alphaMode,
       } as VideoEncoderConfig;
 
+      // Ensure H.264 uses Annex B for FFmpeg piping
+      if (config.isH264) {
+         (encoderConfig as any).avc = { format: 'annexb' };
+      }
+
       try {
         const support = await VideoEncoder.isConfigSupported(encoderConfig);
         if (!support.supported) {
@@ -108,56 +120,60 @@ export class CanvasStrategy implements RenderStrategy {
           error: null,
         };
 
-        // Create IVF File Header (32 bytes)
-        // Little-endian
-        const ivfHeader = new ArrayBuffer(32);
-        const view = new DataView(ivfHeader);
-        // 0-3: 'DKIF'
-        view.setUint8(0, 'D'.charCodeAt(0));
-        view.setUint8(1, 'K'.charCodeAt(0));
-        view.setUint8(2, 'I'.charCodeAt(0));
-        view.setUint8(3, 'F'.charCodeAt(0));
-        // 4-5: Version 0
-        view.setUint16(4, 0, true);
-        // 6-7: Header length 32
-        view.setUint16(6, 32, true);
+        if (!config.isH264) {
+          // Create IVF File Header (32 bytes)
+          // Little-endian
+          const ivfHeader = new ArrayBuffer(32);
+          const view = new DataView(ivfHeader);
+          // 0-3: 'DKIF'
+          view.setUint8(0, 'D'.charCodeAt(0));
+          view.setUint8(1, 'K'.charCodeAt(0));
+          view.setUint8(2, 'I'.charCodeAt(0));
+          view.setUint8(3, 'F'.charCodeAt(0));
+          // 4-5: Version 0
+          view.setUint16(4, 0, true);
+          // 6-7: Header length 32
+          view.setUint16(6, 32, true);
 
-        // 8-11: FourCC
-        const fourCCStr = config.fourCC;
-        view.setUint8(8, fourCCStr.charCodeAt(0));
-        view.setUint8(9, fourCCStr.charCodeAt(1));
-        view.setUint8(10, fourCCStr.charCodeAt(2));
-        view.setUint8(11, fourCCStr.charCodeAt(3));
+          // 8-11: FourCC
+          const fourCCStr = config.fourCC;
+          view.setUint8(8, fourCCStr.charCodeAt(0));
+          view.setUint8(9, fourCCStr.charCodeAt(1));
+          view.setUint8(10, fourCCStr.charCodeAt(2));
+          view.setUint8(11, fourCCStr.charCodeAt(3));
 
-        // 12-13: Width
-        view.setUint16(12, config.width, true);
-        // 14-15: Height
-        view.setUint16(14, config.height, true);
-        // 16-19: Rate (1,000,000) - To match microsecond timestamps from VideoEncoder
-        view.setUint32(16, 1000000, true);
-        // 20-23: Scale (1)
-        view.setUint32(20, 1, true);
-        // 24-27: Frame count (placeholder, updated later or ignored)
-        view.setUint32(24, 0, true);
+          // 12-13: Width
+          view.setUint16(12, config.width, true);
+          // 14-15: Height
+          view.setUint16(14, config.height, true);
+          // 16-19: Rate (1,000,000) - To match microsecond timestamps from VideoEncoder
+          view.setUint32(16, 1000000, true);
+          // 20-23: Scale (1)
+          view.setUint32(20, 1, true);
+          // 24-27: Frame count (placeholder, updated later or ignored)
+          view.setUint32(24, 0, true);
 
-        (window as any).heliosWebCodecs.chunks.push(ivfHeader);
+          (window as any).heliosWebCodecs.chunks.push(ivfHeader);
+        }
 
         const encoder = new VideoEncoder({
           output: (chunk, meta) => {
             const context = (window as any).heliosWebCodecs;
 
-            // Create IVF Frame Header (12 bytes)
-            const frameHeader = new ArrayBuffer(12);
-            const view = new DataView(frameHeader);
+            if (!config.isH264) {
+              // Create IVF Frame Header (12 bytes)
+              const frameHeader = new ArrayBuffer(12);
+              const view = new DataView(frameHeader);
 
-            // 0-3: Frame size in bytes
-            view.setUint32(0, chunk.byteLength, true);
+              // 0-3: Frame size in bytes
+              view.setUint32(0, chunk.byteLength, true);
 
-            // 4-11: Timestamp (64-bit)
-            // chunk.timestamp is in microseconds.
-            view.setBigUint64(4, BigInt(chunk.timestamp || 0), true);
+              // 4-11: Timestamp (64-bit)
+              // chunk.timestamp is in microseconds.
+              view.setBigUint64(4, BigInt(chunk.timestamp || 0), true);
 
-            context.chunks.push(frameHeader);
+              context.chunks.push(frameHeader);
+            }
 
             const chunkData = new ArrayBuffer(chunk.byteLength);
             chunk.copyTo(chunkData);
@@ -177,7 +193,7 @@ export class CanvasStrategy implements RenderStrategy {
       } catch (e) {
         return { supported: false, reason: (e as Error).message };
       }
-    }, { width, height, bitrate: intermediateBitrate, codecString, fourCC, alphaMode });
+    }, { width, height, bitrate: intermediateBitrate, codecString, fourCC, alphaMode, isH264 });
 
     if (result.supported) {
       this.useWebCodecs = true;
@@ -312,9 +328,17 @@ export class CanvasStrategy implements RenderStrategy {
   }
 
   getFFmpegArgs(options: RendererOptions, outputPath: string): string[] {
-    const videoInputArgs = this.useWebCodecs
-      ? ['-f', 'ivf', '-i', '-']
-      : ['-f', 'image2pipe', '-framerate', `${options.fps}`, '-i', '-'];
+    let videoInputArgs: string[];
+
+    if (this.useWebCodecs) {
+      if (this.useH264) {
+        videoInputArgs = ['-f', 'h264', '-i', '-'];
+      } else {
+        videoInputArgs = ['-f', 'ivf', '-i', '-'];
+      }
+    } else {
+      videoInputArgs = ['-f', 'image2pipe', '-framerate', `${options.fps}`, '-i', '-'];
+    }
 
     return FFmpegBuilder.getArgs(options, outputPath, videoInputArgs);
   }
