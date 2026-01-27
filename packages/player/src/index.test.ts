@@ -806,4 +806,71 @@ describe('HeliosPlayer', () => {
         expect(spy).toHaveBeenCalled();
     });
   });
+
+  describe('Input Props', () => {
+    let mockController: any;
+
+    beforeEach(() => {
+        mockController = {
+            getState: vi.fn().mockReturnValue({ currentFrame: 0, duration: 10, fps: 30, isPlaying: false }),
+            play: vi.fn(),
+            pause: vi.fn(),
+            seek: vi.fn(),
+            setAudioVolume: vi.fn(),
+            setAudioMuted: vi.fn(),
+            setPlaybackRate: vi.fn(),
+            subscribe: vi.fn().mockReturnValue(() => {}),
+            dispose: vi.fn(),
+            setInputProps: vi.fn(),
+            captureFrame: vi.fn(),
+            getAudioTracks: vi.fn()
+        };
+        // Reset player pending props
+        player.inputProps = null;
+    });
+
+    it('should set input props via attribute', () => {
+        (player as any).setController(mockController);
+
+        const props = { text: 'Hello' };
+        player.setAttribute('input-props', JSON.stringify(props));
+
+        expect(mockController.setInputProps).toHaveBeenCalledWith(props);
+        expect(player.inputProps).toEqual(props);
+    });
+
+    it('should set input props via property', () => {
+        (player as any).setController(mockController);
+
+        const props = { text: 'World' };
+        player.inputProps = props;
+
+        expect(mockController.setInputProps).toHaveBeenCalledWith(props);
+        expect(player.inputProps).toEqual(props);
+    });
+
+    it('should store pending props if controller is not ready', () => {
+        const props = { text: 'Pending' };
+        player.inputProps = props;
+
+        expect(player.inputProps).toEqual(props);
+        // Controller not set yet
+
+        (player as any).setController(mockController);
+        expect(mockController.setInputProps).toHaveBeenCalledWith(props);
+    });
+
+    it('should handle invalid JSON in attribute', () => {
+        const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+        player.setAttribute('input-props', '{ invalid json }');
+
+        expect(warnSpy).toHaveBeenCalled();
+        expect(player.inputProps).toBeNull();
+        warnSpy.mockRestore();
+    });
+
+    it('should observe input-props', () => {
+        expect(HeliosPlayer.observedAttributes).toContain('input-props');
+    });
+  });
 });

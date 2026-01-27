@@ -283,6 +283,7 @@ export class HeliosPlayer extends HTMLElement {
     isScrubbing = false;
     wasPlayingBeforeScrub = false;
     lastState = null;
+    pendingProps = null;
     // --- Standard Media API ---
     get currentTime() {
         if (!this.controller)
@@ -356,7 +357,7 @@ export class HeliosPlayer extends HTMLElement {
         }
     }
     static get observedAttributes() {
-        return ["src", "width", "height", "autoplay", "loop", "controls", "export-format"];
+        return ["src", "width", "height", "autoplay", "loop", "controls", "export-format", "input-props"];
     }
     constructor() {
         super();
@@ -394,6 +395,27 @@ export class HeliosPlayer extends HTMLElement {
         }
         if (name === "width" || name === "height") {
             this.updateAspectRatio();
+        }
+        if (name === "input-props") {
+            try {
+                const props = JSON.parse(newVal);
+                this.pendingProps = props;
+                if (this.controller) {
+                    this.controller.setInputProps(props);
+                }
+            }
+            catch (e) {
+                console.warn("HeliosPlayer: Invalid JSON in input-props", e);
+            }
+        }
+    }
+    get inputProps() {
+        return this.pendingProps;
+    }
+    set inputProps(val) {
+        this.pendingProps = val;
+        if (this.controller && val) {
+            this.controller.setInputProps(val);
         }
     }
     connectedCallback() {
@@ -540,6 +562,9 @@ export class HeliosPlayer extends HTMLElement {
         }
         this.controller = controller;
         this.setControlsDisabled(false);
+        if (this.pendingProps) {
+            this.controller.setInputProps(this.pendingProps);
+        }
         const state = this.controller.getState();
         if (state) {
             this.scrubber.max = String(state.duration * state.fps);

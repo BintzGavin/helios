@@ -26,6 +26,7 @@ export declare class HeliosPlayer extends HTMLElement {
     private isScrubbing;
     private wasPlayingBeforeScrub;
     private lastState;
+    private pendingProps;
     get currentTime(): number;
     set currentTime(val: number);
     get currentFrame(): number;
@@ -45,6 +46,8 @@ export declare class HeliosPlayer extends HTMLElement {
     static get observedAttributes(): string[];
     constructor();
     attributeChangedCallback(name: string, oldVal: string, newVal: string): void;
+    get inputProps(): Record<string, any> | null;
+    set inputProps(val: Record<string, any> | null);
     connectedCallback(): void;
     disconnectedCallback(): void;
     private setControlsDisabled;

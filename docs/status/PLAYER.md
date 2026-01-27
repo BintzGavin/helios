@@ -1,4 +1,4 @@
-**Version**: v0.22.0
+**Version**: v0.23.0
 
 # Status: PLAYER
 
@@ -23,11 +23,13 @@
 - Supports WebM (VP9/Opus) client-side export via `export-format` attribute.
 - Implements Standard Media API (play, pause, currentTime, events) for better interoperability.
 - Client-side audio export respects `volume` and `muted` properties of audio elements.
-- **New**: Client-side export (DOM mode) now inlines `<video>` elements as static images, ensuring they are visible in the exported output.
+- Client-side export (DOM mode) now inlines `<video>` elements as static images, ensuring they are visible in the exported output.
+- **New**: Supports declarative data binding via `input-props` attribute (JSON string) and property, enabling dynamic composition updates.
 
 ## Critical Task
 - **None**: Recent task completed.
 
+[v0.23.0] ✅ Completed: Implement Input Props - Implemented `input-props` attribute/property on `<helios-player>` to pass dynamic data to the composition controller.
 [v0.22.0] ✅ Completed: Export Burn-In Captions - Implemented caption rendering (burn-in) for client-side export using intermediate OffscreenCanvas.
 [v0.21.0] ✅ Completed: Video Inlining - Implemented `inlineVideos` to capture `<video>` elements as images during client-side export, ensuring visual fidelity.
 [v0.20.1] ✅ Completed: Project Cleanup - Added explicit `vitest` dependency and removed obsolete plan file.
