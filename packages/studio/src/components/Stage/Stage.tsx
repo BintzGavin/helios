@@ -13,7 +13,7 @@ interface HeliosPlayerElement extends HTMLElement {
 }
 
 export const Stage: React.FC<StageProps> = ({ src }) => {
-  const { setController, canvasSize, setCanvasSize, playerState, controller } = useStudio();
+  const { setController, canvasSize, setCanvasSize, playerState, controller, takeSnapshot } = useStudio();
   const playerRef = useRef<HeliosPlayerElement>(null);
 
   // State
@@ -156,6 +156,7 @@ export const Stage: React.FC<StageProps> = ({ src }) => {
             onToggleTransparent={() => setIsTransparent(!isTransparent)}
             canvasSize={canvasSize}
             onCanvasSizeChange={setCanvasSize}
+            onSnapshot={takeSnapshot}
         />
     </div>
   );
