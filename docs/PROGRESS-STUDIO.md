@@ -1,5 +1,11 @@
 # Studio Progress Log
 
+## STUDIO v0.30.1
+- ✅ Verified: Keyboard Shortcuts & Snapshot - Added unit tests for KeyboardShortcutsModal and StudioContext snapshot logic.
+
+## STUDIO v0.30.0
+- ✅ Completed: Keyboard Shortcuts Dialog - Implemented a modal dialog listing all keyboard shortcuts, accessible via `?` key or sidebar button, improving usability.
+
 ## STUDIO v0.29.0
 - ✅ Completed: Schema-Aware Props Editor - Implemented specialized UI inputs (Enum, Range, Color, Boolean) driven by `HeliosSchema`, with fallback to standard inputs.
 
