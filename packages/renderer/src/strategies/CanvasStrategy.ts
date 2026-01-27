@@ -116,13 +116,13 @@ export class CanvasStrategy implements RenderStrategy {
                      pixelFormat.includes('abgr');
     const alphaMode = hasAlpha ? 'keep' : 'discard';
 
-    const result = await page.evaluate(async (config) => {
+    const result = await page.evaluate(async (config: { width: number, height: number, bitrate: number, candidates: any[], alphaMode: string }) => {
       if (typeof VideoEncoder === 'undefined') {
         return { supported: false, reason: 'VideoEncoder not found' };
       }
 
       // Helper to try configuring a candidate
-      const tryConfig = async (candidate: any) => {
+      const tryConfig = async (candidate: { codecString: string, isH264: boolean, fourCC: string }) => {
           const encoderConfig: any = {
             codec: candidate.codecString,
             width: config.width,
@@ -268,7 +268,7 @@ export class CanvasStrategy implements RenderStrategy {
   }
 
   private async captureWebCodecs(page: Page, frameTime: number): Promise<Buffer> {
-    const chunkData = await page.evaluate<string, number>(async (time) => {
+    const chunkData = await page.evaluate<string, number>(async (time: number) => {
       const context = (window as any).heliosWebCodecs;
 
       if (context.error) {
@@ -323,7 +323,7 @@ export class CanvasStrategy implements RenderStrategy {
     const format = this.options.intermediateImageFormat || 'png';
     const quality = this.options.intermediateImageQuality;
 
-    const dataUrl = await page.evaluate((args) => {
+    const dataUrl = await page.evaluate((args: { format: string, quality?: number }) => {
       const canvas = document.querySelector('canvas');
       if (!canvas) return 'error:canvas-not-found';
 
