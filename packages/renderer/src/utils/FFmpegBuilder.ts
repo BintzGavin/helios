@@ -103,24 +103,28 @@ export class FFmpegBuilder {
     }
 
     const videoCodec = options.videoCodec || 'libx264';
-    const pixelFormat = options.pixelFormat || 'yuv420p';
+    const encodingArgs: string[] = ['-c:v', videoCodec];
 
-    const encodingArgs: string[] = [
-      '-c:v', videoCodec,
-      '-pix_fmt', pixelFormat,
-      '-movflags', '+faststart',
-    ];
+    if (videoCodec === 'copy') {
+      encodingArgs.push('-movflags', '+faststart');
+    } else {
+      const pixelFormat = options.pixelFormat || 'yuv420p';
+      encodingArgs.push(
+        '-pix_fmt', pixelFormat,
+        '-movflags', '+faststart',
+      );
 
-    if (options.crf !== undefined) {
-      encodingArgs.push('-crf', options.crf.toString());
-    }
+      if (options.crf !== undefined) {
+        encodingArgs.push('-crf', options.crf.toString());
+      }
 
-    if (options.preset) {
-      encodingArgs.push('-preset', options.preset);
-    }
+      if (options.preset) {
+        encodingArgs.push('-preset', options.preset);
+      }
 
-    if (options.videoBitrate) {
-      encodingArgs.push('-b:v', options.videoBitrate);
+      if (options.videoBitrate) {
+        encodingArgs.push('-b:v', options.videoBitrate);
+      }
     }
 
     const outputArgs = [
