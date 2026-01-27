@@ -47,3 +47,7 @@
 ## [1.28.2] - Input Props Gap
 **Learning:** The Core supports `inputProps` and `schema` validation, and the README highlights this as a feature ("Props editor with schema validation" planned). However, no example demonstrated how to use these features, creating a gap for users wanting parametrized compositions.
 **Action:** Created `examples/dynamic-props-animation` plan to bridge this gap.
+
+## [1.31.0] - D3 Integration Architecture
+**Learning:** Integrating D3.js requires bypassing its internal timer-based transitions (`d3.transition()`) because they drift from Helios's frame clock. The correct pattern is to drive D3 selections directly via `helios.subscribe()`.
+**Action:** Created `examples/d3-animation` plan with explicit instructions to use `helios.subscribe` instead of D3 transitions.

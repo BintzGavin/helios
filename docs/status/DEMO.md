@@ -1,5 +1,5 @@
 # Status: DEMO (Executor)
-**Version**: 1.31.0
+**Version**: 1.32.0
 
 ## Vision
 To provide comprehensive, idiomatic examples for every major framework (React, Vue, Svelte, Vanilla) and robust end-to-end testing to ensure the Helios engine delivers on its "Use What You Know" promise.
@@ -53,6 +53,7 @@ To provide comprehensive, idiomatic examples for every major framework (React, V
 None.
 
 ## Log
+- [v1.32.0] 📋 Planned: Scaffold D3 Animation Example - Created spec file `/.sys/plans/2025-02-21-DEMO-D3-Animation.md` to guide implementation of data visualization example using D3.js.
 - [v1.31.0] ✅ Completed: Scaffold Media Element Example - Created `examples/media-element-animation` demonstrating `DomDriver` synchronization of native `<video>` and `<audio>` elements.
 - [v1.30.0] ✅ Completed: Scaffold Dynamic Props Example - Created `examples/dynamic-props-animation` demonstrating `inputProps` and `schema` validation with a React frontend.
 - [v1.29.0] ✅ Completed: Scaffold React CSS Animation Example - Created `examples/react-css-animation` demonstrating standard CSS animations with `autoSyncAnimations: true`.
