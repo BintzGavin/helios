@@ -1,5 +1,8 @@
 # PLAYER Progress Log
 
+## PLAYER v0.25.0
+- ✅ Completed: Responsive Controls - Implemented `ResizeObserver` to adapt player controls for smaller widths (compact/tiny modes) to prevent overflow.
+
 ## PLAYER v0.24.1
 - ✅ Completed: Documentation Update - Added missing attributes (poster, preload, input-props), Standard Media API, and Events documentation to README.
 

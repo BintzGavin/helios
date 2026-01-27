@@ -12,7 +12,7 @@
   - `<iframe>`: Renders the user's composition (sandboxed).
   - `.poster-container`: Overlay displaying custom preview image and play button (when `preload="none"`).
   - `.status-overlay`: Displays loading/error states.
-  - `.controls`: Overlay UI for playback (play, seek, volume, speed, fullscreen, captions, export).
+  - `.controls`: Overlay UI for playback (play, seek, volume, speed, fullscreen, captions, export). Adapts to width (compact/tiny modes).
   - `.captions-container`: Overlay for rendering burn-in style captions during preview.
 
 ### B. Events (Dispatched by `<helios-player>`)

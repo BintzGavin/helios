@@ -1,4 +1,4 @@
-**Version**: v0.24.1
+**Version**: v0.25.0
 
 # Status: PLAYER
 
@@ -26,10 +26,12 @@
 - Client-side export (DOM mode) now inlines `<video>` elements as static images, ensuring they are visible in the exported output.
 - Supports declarative data binding via `input-props` attribute (JSON string) and property, enabling dynamic composition updates.
 - **New**: Supports `poster` and `preload` attributes. `preload="none"` defers iframe loading until the user interacts with the new "Big Play Button".
+- **New**: Implemented responsive controls using `ResizeObserver`, adapting UI layout for smaller widths (hiding volume/speed controls).
 
 ## Critical Task
 - **None**: Recent task completed.
 
+[v0.25.0] ✅ Completed: Responsive Controls - Implemented `ResizeObserver` to adapt player controls for smaller widths (compact/tiny modes) to prevent overflow.
 [v0.24.1] ✅ Completed: Documentation Update - Added missing attributes (poster, preload, input-props), Standard Media API, and Events documentation to README.
 [v0.24.0] ✅ Completed: Implement Poster and Preload - Implemented `poster` attribute for custom preview images and `preload` attribute to control loading behavior (including deferred loading with "Big Play Button").
 [v0.23.0] ✅ Completed: Implement Input Props - Implemented `input-props` attribute/property on `<helios-player>` to pass dynamic data to the composition controller.

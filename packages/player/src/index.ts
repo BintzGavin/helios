@@ -277,6 +277,17 @@ template.innerHTML = `
     .big-play-btn:hover {
         transform: scale(1.1);
     }
+
+    /* Responsive Layouts */
+    .controls.layout-compact .volume-slider {
+      display: none;
+    }
+    .controls.layout-tiny .volume-slider {
+      display: none;
+    }
+    .controls.layout-tiny .speed-selector {
+      display: none;
+    }
   </style>
   <div class="status-overlay" part="overlay">
     <div class="status-text">Connecting...</div>
@@ -332,6 +343,7 @@ export class HeliosPlayer extends HTMLElement {
   private pendingSrc: string | null = null;
   private isLoaded: boolean = false;
 
+  private resizeObserver: ResizeObserver;
   private controller: HeliosController | null = null;
   // Keep track if we have direct access (optional, mainly for debugging/logging)
   private directHelios: Helios | null = null;
@@ -472,6 +484,17 @@ export class HeliosPlayer extends HTMLElement {
 
     this.retryAction = () => this.retryConnection();
     this.retryBtn.onclick = () => this.retryAction();
+
+    this.resizeObserver = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        const width = entry.contentRect.width;
+        const controls = this.shadowRoot!.querySelector(".controls");
+        if (controls) {
+          controls.classList.toggle("layout-compact", width < 500);
+          controls.classList.toggle("layout-tiny", width < 350);
+        }
+      }
+    });
   }
 
   attributeChangedCallback(name: string, oldVal: string, newVal: string) {
@@ -560,9 +583,12 @@ export class HeliosPlayer extends HTMLElement {
 
     // Ensure aspect ratio is correct on connect
     this.updateAspectRatio();
+
+    this.resizeObserver.observe(this);
   }
 
   disconnectedCallback() {
+    this.resizeObserver.disconnect();
     this.iframe.removeEventListener("load", this.handleIframeLoad);
     window.removeEventListener("message", this.handleWindowMessage);
     this.removeEventListener("keydown", this.handleKeydown);
