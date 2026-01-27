@@ -1,5 +1,8 @@
 # CORE Progress Log
 
+## CORE v1.30.0
+- ✅ Completed: Implement Loop Support - Implemented loop option, signal, and logic in Helios class, enabling seamless looping playback.
+
 ## CORE v1.29.0
 - ✅ Completed: Implement Timecode Utilities - Implemented `framesToTimecode`, `timecodeToFrames`, and `framesToTimestamp` utilities.
 

@@ -10,6 +10,7 @@ export type HeliosState = {
   duration: number;
   fps: number;
   currentFrame: number;
+  loop: boolean;
   isPlaying: boolean;
   inputProps: Record<string, any>;
   playbackRate: number;
@@ -27,6 +28,7 @@ export interface HeliosOptions {
   initialFrame?: number;
   duration: number; // in seconds
   fps: number;
+  loop?: boolean;
   autoSyncAnimations?: boolean;
   animationScope?: HTMLElement;
   inputProps?: Record<string, any>;
@@ -66,6 +68,7 @@ export class Helios {
   private _duration: Signal<number>;
   private _fps: Signal<number>;
   private _currentFrame: Signal<number>;
+  private _loop: Signal<boolean>;
   private _isPlaying: Signal<boolean>;
   private _inputProps: Signal<Record<string, any>>;
   private _playbackRate: Signal<number>;
@@ -83,6 +86,12 @@ export class Helios {
    * Can be subscribed to for reactive updates.
    */
   public get currentFrame(): ReadonlySignal<number> { return this._currentFrame; }
+
+  /**
+   * Signal for the loop state.
+   * Can be subscribed to for reactive updates.
+   */
+  public get loop(): ReadonlySignal<boolean> { return this._loop; }
 
   /**
    * Signal for the playback state (playing or paused).
@@ -222,6 +231,7 @@ export class Helios {
     this._duration = signal(options.duration);
     this._fps = signal(options.fps);
     this._currentFrame = signal(initialFrame);
+    this._loop = signal(options.loop ?? false);
     this._isPlaying = signal(false);
     this._inputProps = signal(initialProps);
     this._playbackRate = signal(options.playbackRate ?? 1);
@@ -277,6 +287,7 @@ export class Helios {
       duration: this._duration.value,
       fps: this._fps.value,
       currentFrame: this._currentFrame.value,
+      loop: this._loop.value,
       isPlaying: this._isPlaying.value,
       inputProps: this._inputProps.value,
       playbackRate: this._playbackRate.value,
@@ -297,6 +308,10 @@ export class Helios {
     }
     this._width.value = width;
     this._height.value = height;
+  }
+
+  public setLoop(shouldLoop: boolean) {
+    this._loop.value = shouldLoop;
   }
 
   public setDuration(seconds: number) {
@@ -514,24 +529,36 @@ export class Helios {
     const playbackRate = this._playbackRate.peek();
     const frameDelta = (deltaTime / 1000) * this.fps * playbackRate;
     const nextFrame = this._currentFrame.peek() + frameDelta;
+    const shouldLoop = this._loop.peek();
 
-    if (playbackRate > 0) {
-      if (nextFrame >= totalFrames) {
-        this._currentFrame.value = totalFrames - 1;
-        this.pause();
-        return;
+    if (shouldLoop && totalFrames > 0) {
+      if (playbackRate > 0 && nextFrame >= totalFrames) {
+        // Wrap around
+        this._currentFrame.value = nextFrame % totalFrames;
+      } else if (playbackRate < 0 && nextFrame < 0) {
+        // Wrap around (handling negative modulo behavior in JS)
+        this._currentFrame.value = totalFrames + (nextFrame % totalFrames);
+      } else {
+        this._currentFrame.value = nextFrame;
       }
     } else {
-      if (nextFrame <= 0) {
-        this._currentFrame.value = 0;
-        this.pause();
-        return;
+      if (playbackRate > 0) {
+        if (nextFrame >= totalFrames) {
+          this._currentFrame.value = totalFrames - 1;
+          this.pause();
+          return;
+        }
+      } else {
+        if (nextFrame <= 0) {
+          this._currentFrame.value = 0;
+          this.pause();
+          return;
+        }
       }
+      this._currentFrame.value = nextFrame;
     }
 
-    this._currentFrame.value = nextFrame;
-
-    this.driver.update((nextFrame / this.fps) * 1000, {
+    this.driver.update((this._currentFrame.peek() / this.fps) * 1000, {
       isPlaying: true,
       playbackRate,
       volume: this._volume.peek(),

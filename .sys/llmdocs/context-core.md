@@ -47,6 +47,7 @@ export type HeliosState = {
   duration: number;
   fps: number;
   currentFrame: number;
+  loop: boolean;
   isPlaying: boolean;
   inputProps: Record<string, any>;
   playbackRate: number;
@@ -64,6 +65,7 @@ export interface HeliosOptions {
   initialFrame?: number;
   duration: number; // in seconds
   fps: number;
+  loop?: boolean;
   autoSyncAnimations?: boolean;
   animationScope?: HTMLElement;
   inputProps?: Record<string, any>;
@@ -140,6 +142,7 @@ export class Helios {
 
   // Readonly Signals
   public get currentFrame(): ReadonlySignal<number>;
+  public get loop(): ReadonlySignal<boolean>;
   public get isPlaying(): ReadonlySignal<boolean>;
   public get inputProps(): ReadonlySignal<Record<string, any>>;
   public get playbackRate(): ReadonlySignal<number>;
@@ -162,6 +165,7 @@ export class Helios {
 
   // Actions
   public setSize(width: number, height: number): void;
+  public setLoop(shouldLoop: boolean): void;
   public setDuration(seconds: number): void;
   public setFps(fps: number): void;
   public setInputProps(props: Record<string, any>): void;

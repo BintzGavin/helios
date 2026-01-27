@@ -12,6 +12,7 @@ describe('Helios Core', () => {
       duration: 10,
       fps: 30,
       currentFrame: 0,
+      loop: false,
       isPlaying: false,
       inputProps: {},
       playbackRate: 1,
@@ -756,6 +757,87 @@ Updated`;
 
       // 0.5 * 24 = 12
       expect(helios.currentFrame.peek()).toBe(12);
+    });
+  });
+
+  describe('Loop Support', () => {
+    it('should initialize loop to false by default', () => {
+      const helios = new Helios({ duration: 10, fps: 30 });
+      expect(helios.loop.peek()).toBe(false);
+      expect(helios.getState().loop).toBe(false);
+    });
+
+    it('should initialize loop from options', () => {
+      const helios = new Helios({ duration: 10, fps: 30, loop: true });
+      expect(helios.loop.peek()).toBe(true);
+      expect(helios.getState().loop).toBe(true);
+    });
+
+    it('should update loop via setLoop', () => {
+      const helios = new Helios({ duration: 10, fps: 30 });
+      helios.setLoop(true);
+      expect(helios.loop.peek()).toBe(true);
+      expect(helios.getState().loop).toBe(true);
+    });
+
+    it('should loop forward playback', () => {
+      const ticker = new ManualTicker();
+      const helios = new Helios({ duration: 2, fps: 30, loop: true, ticker }); // 60 frames
+
+      // Seek to near end (frame 59)
+      helios.seek(59);
+      helios.play();
+
+      // Tick 1 frame (33.33ms)
+      ticker.tick(1000 / 30);
+
+      // Should wrap to 0 (approx)
+      expect(helios.getState().currentFrame).toBeCloseTo(0, 0);
+      expect(helios.getState().isPlaying).toBe(true);
+    });
+
+    it('should loop backward playback', () => {
+      const ticker = new ManualTicker();
+      const helios = new Helios({ duration: 2, fps: 30, loop: true, ticker }); // 60 frames
+
+      // Seek to start
+      helios.seek(0);
+      helios.setPlaybackRate(-1);
+      helios.play();
+
+      // Tick 1 frame
+      ticker.tick(1000 / 30);
+
+      // Should wrap to 59 (approx)
+      expect(helios.getState().currentFrame).toBeCloseTo(59, 0);
+      expect(helios.getState().isPlaying).toBe(true);
+    });
+
+    it('should NOT loop when loop is false', () => {
+      const ticker = new ManualTicker();
+      const helios = new Helios({ duration: 2, fps: 30, loop: false, ticker });
+
+      helios.seek(59);
+      helios.play();
+
+      ticker.tick(1000 / 30);
+
+      expect(helios.getState().currentFrame).toBe(59); // Clamped
+      expect(helios.getState().isPlaying).toBe(false); // Paused
+    });
+
+    it('should handle loop with fractional overflow', () => {
+      const ticker = new ManualTicker();
+      const helios = new Helios({ duration: 2, fps: 30, loop: true, ticker }); // 60 frames
+
+      helios.seek(59.5);
+      helios.play();
+
+      // Tick 1 frame (delta = 1) -> 60.5
+      ticker.tick(1000 / 30);
+
+      // 60.5 % 60 = 0.5
+      expect(helios.getState().currentFrame).toBeCloseTo(0.5, 1);
     });
   });
 });
