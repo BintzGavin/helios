@@ -63,3 +63,6 @@
 
 ## DEMO v1.37.0
 - ✅ Completed: Scaffold P5.js Example - Created `examples/p5-canvas-animation` demonstrating integration with P5.js in Instance Mode.
+
+## DEMO v1.38.0
+- 📋 Planned: Scaffold Audio Visualization Example - Created spec file.
