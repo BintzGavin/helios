@@ -59,3 +59,7 @@
 ## [v1.36.0] - File Path Permissions
 **Learning:** Writing to absolute paths starting with `/` (e.g. `/.sys/plans/...`) fails with permission denied. Must use relative paths (e.g. `.sys/plans/...`) or `./`.
 **Action:** Always use relative paths when creating plan files.
+
+## [v1.37.0] - P5.js Instance Mode Requirement
+**Learning:** P5.js normally runs in "Global Mode" which pollutes the window object and conflicts with ES modules. For Helios integration, "Instance Mode" is required to isolate the sketch and strictly control the loop via `p.noLoop()` and `p.redraw()`.
+**Action:** The plan explicitly mandates Instance Mode and disabling the internal loop to ensure frame-perfect synchronization with Helios.
