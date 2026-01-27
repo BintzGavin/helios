@@ -63,3 +63,7 @@
 ## [2026-03-09] - FFmpeg Logic Duplication
 **Learning:** `CanvasStrategy` and `DomStrategy` contain nearly identical logic for generating FFmpeg arguments (especially for audio inputs and output flags). This duplication violates DRY and increases the risk of inconsistent behavior (e.g. one strategy supporting a feature while the other doesn't).
 **Action:** Centralize FFmpeg argument generation into a `FFmpegBuilder` or similar utility to ensure consistency and maintainability.
+
+## [2026-03-10] - SeekTimeDriver Initialization Timing
+**Learning:** `page.addInitScript` must be called *before* `page.goto` to affect the page load. `SeekTimeDriver.prepare` uses it, but `Renderer.ts` calls `prepare` after `goto`, rendering the polyfill ineffective for the initial state.
+**Action:** Split `TimeDriver` initialization into `init` (pre-load) and `prepare` (post-load) to handle script injection correctly.
