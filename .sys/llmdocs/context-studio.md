@@ -8,9 +8,9 @@ The Studio is a browser-based development environment (IDE) for Helios video com
 3.  **Render** videos to disk (via backend integration).
 4.  **Manage** rendering jobs and assets.
 
-It consists of:
--   **CLI**: `@helios-project/cli` (via `npx helios studio`) starts the development server.
--   **Server**: A Vite development server with custom middleware (`vite-plugin-studio-api`) that serves the UI and handles API requests (rendering, file listing, asset management).
+It operates as a **tool** that runs locally in the user's project:
+-   **CLI**: `@helios-project/cli` (via `npx helios studio`) starts the development server, injecting the user's project root via `HELIOS_PROJECT_ROOT`.
+-   **Server**: A Vite development server that serves the UI and provides API endpoints (`/api/render`, `/api/assets`) that interact with the user's local file system (saving renders, listing assets).
 -   **UI**: A React-based Single Page Application (SPA) that consumes the `Helios` core and player.
 
 ## B. File Tree
@@ -69,6 +69,7 @@ Env vars:
 -   **Core**: Consumes `Helios` types and logic.
 -   **Player**: Embeds `<helios-player>` web component. Controls it via `HeliosController`.
 -   **Renderer**: The backend (`render-manager.ts`) uses `@helios-project/renderer` to execute render jobs using FFmpeg or Headless Chrome.
+-   **File System**: The backend respects `HELIOS_PROJECT_ROOT` (or CWD) to discover compositions, serve assets, and save rendered files.
 -   **Communication**:
     -   **Frontend -> Backend**: HTTP calls to `/api/assets` (GET, DELETE, POST /upload), `/api/compositions`, `/api/render`.
     -   **Backend -> Frontend**: Vite HMR for code updates; Polling for render job status.

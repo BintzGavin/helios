@@ -187,7 +187,8 @@ export function studioApiPlugin(): Plugin {
                 return;
             }
 
-            const rendersDir = path.resolve(process.cwd(), 'renders');
+            const projectRoot = getProjectRoot(process.cwd());
+            const rendersDir = path.resolve(projectRoot, 'renders');
             const filePath = path.join(rendersDir, filename);
 
             if (fs.existsSync(filePath)) {

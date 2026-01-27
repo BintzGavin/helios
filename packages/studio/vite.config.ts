@@ -21,7 +21,8 @@ export default defineConfig({
   server: {
     fs: {
       // Allow serving files from the repository root (simplifies dev)
-      allow: [path.resolve(__dirname, '../../')]
+      // Also allow the project root if it's different (e.g. external projects)
+      allow: [projectRoot, path.resolve(__dirname, '../../')]
     }
   }
 })
