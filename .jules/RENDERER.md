@@ -83,3 +83,7 @@
 ## [2026-03-14] - DOM Capture Performance Gap
 **Learning:** `DomStrategy` defaults to PNG capture (`page.screenshot`) which is slow and produces large temporary buffers. This bottlenecks performance for high-resolution DOM renders, violating the vision of "Performance When It Matters".
 **Action:** Introduced configurable `intermediateImageFormat` ('jpeg' | 'png') and `intermediateImageQuality` to allow trading visual quality for speed.
+
+## [2026-03-25] - SeekTimeDriver Media Sync Gap
+**Learning:** `DomStrategy` relies on `SeekTimeDriver` which polyfills `performance.now` but fails to sync `<video>` and `<audio>` elements, causing them to play at wall-clock speed or drift during slow frame capture in non-Helios pages.
+**Action:** Implement explicit media element synchronization (pause + seek) in `SeekTimeDriver.setTime` to force all media to the virtual time.
