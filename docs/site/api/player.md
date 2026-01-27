@@ -25,6 +25,7 @@ A custom element that embeds a composition (via iframe) and provides a rich play
   loop
   export-mode="canvas"
   canvas-selector="#my-canvas"
+  input-props='{"title":"Hello World"}'
 ></helios-player>
 ```
 
@@ -33,11 +34,32 @@ A custom element that embeds a composition (via iframe) and provides a rich play
 - **`src`** (string): URL of the composition.
 - **`width`** (number): Width of the player in pixels.
 - **`height`** (number): Height of the player in pixels.
-- **`controls`** (boolean): If present, displays the playback controls (play/pause, scrubber, speed, export).
+- **`controls`** (boolean): If present, displays the playback controls (play/pause, scrubber, speed, export, CC).
 - **`autoplay`** (boolean): If present, starts playback automatically.
 - **`loop`** (boolean): If present, loops playback.
 - **`export-mode`** (string): `'auto'`, `'canvas'`, or `'dom'`. Determines how frames are captured for client-side export.
+- **`export-format`** (string): `'mp4'` (default) or `'webm'`. The output video format.
 - **`canvas-selector`** (string): CSS selector for the canvas element (required for `export-mode="canvas"`).
+- **`input-props`** (string): JSON string of input properties to pass to the composition.
+
+### Standard Media API
+
+The `<helios-player>` element implements a subset of the HTMLMediaElement API, allowing programmatic control similar to a `<video>` element.
+
+#### Properties
+- **`currentTime`** (number): Current playback time in seconds. Can be set to seek.
+- **`duration`** (number, readonly): Total duration in seconds.
+- **`paused`** (boolean, readonly): Whether playback is paused.
+- **`ended`** (boolean, readonly): Whether playback has reached the end.
+- **`volume`** (number): Audio volume (0.0 - 1.0).
+- **`muted`** (boolean): Audio muted state.
+- **`playbackRate`** (number): Playback speed multiplier.
+- **`fps`** (number, readonly): The composition's frame rate.
+- **`currentFrame`** (number): Current frame index. Can be set to seek by frame.
+
+#### Methods
+- **`play()`**: Starts playback. Returns a Promise.
+- **`pause()`**: Pauses playback.
 
 ### Client-Side Export
 
@@ -46,6 +68,7 @@ The player supports client-side video export (rendering to WebM/MP4 in the brows
 - Supports canceling the export.
 - Locks the UI during export.
 - Supports audio export via OfflineAudioContext.
+- Supports "Burn-In" captions during export.
 
 ### Keyboard Shortcuts
 
@@ -62,17 +85,15 @@ The player implements ARIA attributes for accessibility:
 - `aria-label` for buttons.
 - `aria-valuenow` and `aria-valuetext` for the scrubber.
 
-### Programmatic Control
+### Programmatic Control (Controller)
 
-The `<helios-player>` element does not expose direct playback methods on itself. Instead, you can access the internal controller.
+You can also access the internal controller for advanced usage (though the Standard Media API on the element itself is preferred for basic control).
 
 ```typescript
 const player = document.querySelector('helios-player');
 const controller = player.getController();
 
 if (controller) {
-  controller.play();
-  controller.seek(0);
-  controller.setPlaybackRate(2);
+  controller.setInputProps({ newProp: 'value' });
 }
 ```

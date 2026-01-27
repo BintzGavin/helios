@@ -22,8 +22,10 @@ const helios = new Helios(options: HeliosOptions);
 **`HeliosOptions`**:
 - **`duration`** (number): Duration of the composition in seconds (Required).
 - **`fps`** (number): Frames per second (Required).
+- **`initialFrame`** (number, default: `0`): The frame to start at.
 - **`schema`** (`HeliosSchema`, optional): Schema for validating input properties.
 - **`inputProps`** (object, optional): Initial input properties.
+- **`captions`** (string | CaptionCue[], optional): Initial captions (SRT string or cue array).
 - **`autoSyncAnimations`** (boolean, default: `false`): If true, uses `DomDriver` to sync CSS/WAAPI animations.
 - **`playbackRate`** (number, default: `1`): Initial playback speed.
 - **`volume`** (number, default: `1`): Initial audio volume (0.0 - 1.0).
@@ -40,6 +42,10 @@ Helios uses signals for reactive state management. You can subscribe to these si
 - **`volume`** (`ReadonlySignal<number>`): Current audio volume.
 - **`muted`** (`ReadonlySignal<boolean>`): Current muted state.
 - **`inputProps`** (`ReadonlySignal<Record<string, any>>`): Current input properties.
+- **`captions`** (`ReadonlySignal<CaptionCue[]>`): The full list of parsed captions.
+- **`activeCaptions`** (`ReadonlySignal<CaptionCue[]>`): The list of captions active at the current time.
+- **`width`** (`ReadonlySignal<number>`): The composition width.
+- **`height`** (`ReadonlySignal<number>`): The composition height.
 
 ### Methods
 
@@ -73,6 +79,12 @@ Sets the audio muted state and syncs with the driver.
 #### `setInputProps(props)`
 Updates the input properties, validating them against the schema if provided.
 
+#### `setCaptions(captions)`
+Updates the captions. Accepts an SRT string or an array of `CaptionCue` objects.
+
+#### `setSize(width, height)`
+Updates the composition resolution.
+
 #### `bindToDocumentTimeline()`
 Binds the Helios instance to `document.timeline`. Useful when the timeline is driven externally (e.g., by the Renderer or Studio).
 
@@ -80,12 +92,12 @@ Binds the Helios instance to `document.timeline`. Useful when the timeline is dr
 Stops syncing with `document.timeline`.
 
 #### `dispose()`
-Cleans up resources (tickers, subscribers, drivers) to prevent memory leaks.
+Cleans up resources (tickers, polling loops, subscribers, drivers) to prevent memory leaks.
 
 ### Static Methods
 
 #### `Helios.diagnose()`
-Returns a `Promise<DiagnosticReport>` containing environment support information (WAAPI, WebCodecs, etc.).
+Returns a `Promise<DiagnosticReport>` containing environment support information (WAAPI, WebCodecs, OffscreenCanvas, User Agent).
 
 ## Validation (Schema)
 
@@ -97,7 +109,8 @@ import { Helios, HeliosSchema } from '@helios-project/core';
 const schema: HeliosSchema = {
   text: { type: 'string', default: 'Hello' },
   color: { type: 'string', default: '#ff0000' },
-  count: { type: 'number', min: 0, max: 10 }
+  count: { type: 'number', min: 0, max: 10 },
+  theme: { type: 'string', enum: ['light', 'dark'] }
 };
 
 const helios = new Helios({ duration: 5, fps: 30, schema });
@@ -125,25 +138,15 @@ Physics-based spring animation helper.
 ### `interpolate(value, inputRange, outputRange, options)`
 Interpolates values (linear or with easing).
 
+### `random(seed)`
+Deterministic random number generator based on Mulberry32.
+
+### `interpolateColors(value, inputRange, outputRange)`
+Interpolates between colors (Hex, RGB, HSL).
+
 ## Captions (SRT)
 
 Utilities for parsing SRT files.
 
 - **`parseSrt(srtContent)`**: Parses SRT string into structured data.
 - **`stringifySrt(captions)`**: Converts structured data back to SRT string.
-
-## Error Handling
-
-Helios throws `HeliosError` with specific error codes (`HeliosErrorCode`) for robust error handling.
-
-```typescript
-import { HeliosError, HeliosErrorCode } from '@helios-project/core';
-
-try {
-  // ...
-} catch (e) {
-  if (e instanceof HeliosError && e.code === HeliosErrorCode.INVALID_DURATION) {
-    // Handle specific error
-  }
-}
-```

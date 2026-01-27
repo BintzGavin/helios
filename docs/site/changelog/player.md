@@ -5,6 +5,36 @@ description: "Changelog for the Player package"
 
 # Player Changelog
 
+## v0.23.0
+- **Implement Input Props**: Implemented `input-props` attribute/property on `<helios-player>` to pass dynamic data to the composition controller.
+
+## v0.22.0
+- **Export Burn-In Captions**: Implemented caption rendering (burn-in) for client-side export using intermediate OffscreenCanvas.
+
+## v0.21.0
+- **Video Inlining**: Implemented `inlineVideos` to capture `<video>` elements as images during client-side export, ensuring visual fidelity.
+
+## v0.20.0
+- **Client Side Audio Volume**: Updated exporter to respect `volume` and `muted` attributes of audio elements during client-side export.
+
+## v0.19.0
+- **Implement Standard Media API**: Implemented standard media properties (currentTime, duration, etc.) and events (play, pause, timeupdate) for improved interoperability.
+
+## v0.18.0
+- **WebM Export**: Implemented `export-format` attribute to support WebM (VP9/Opus) video export alongside MP4.
+
+## v0.17.1
+- **Touch Support**: Added touch event listeners to the scrubber to support smooth seeking on mobile devices.
+
+## v0.17.0
+- **Implement Captions**: Added caption rendering overlay and "CC" toggle button to `<helios-player>`, leveraging `activeCaptions` from core state.
+
+## v0.16.0
+- **Volume Controls**: Implemented volume slider and mute button in UI, updated controllers and bridge protocol.
+
+## v0.15.0
+- **Export UX**: Implemented Error Overlay with "Dismiss" action for client-side export failures, providing visibility into errors like unsupported codecs.
+
 ## v0.14.0
 - **Accessibility Improvements**: Implemented ARIA labels and roles for controls, including dynamic updates for play state and scrubber time.
 

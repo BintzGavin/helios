@@ -1,9 +1,39 @@
 ---
-title: "Examples Changelog"
-description: "Changelog for the Examples"
+title: "Demo Changelog"
+description: "Changelog for the Demo package and examples"
 ---
 
-# Examples Changelog
+# Demo Changelog
+
+## v1.37.0
+- **Scaffold P5.js Example**: Created `examples/p5-canvas-animation` demonstrating integration with P5.js in Instance Mode.
+
+## v1.36.0
+- **Scaffold WAAPI Animation Example**: Created `examples/waapi-animation` demonstrating standard Web Animations API integration with `autoSyncAnimations`.
+
+## v1.35.0
+- **Scaffold Tailwind CSS Example**: Created `examples/tailwind-animation` demonstrating Tailwind v3 integration with proper scoping and build configuration.
+
+## v1.31.0
+- **Scaffold Media Element Example**: Created `examples/media-element-animation` demonstrating `DomDriver` synchronization of native `<video>` and `<audio>` elements.
+
+## v1.30.0
+- **Scaffold Dynamic Props Example**: Created `examples/dynamic-props-animation` demonstrating `inputProps` and `schema` validation with a React frontend.
+
+## v1.29.0
+- **Scaffold React CSS Animation Example**: Created `examples/react-css-animation` demonstrating standard CSS animations with `autoSyncAnimations: true`.
+
+## v1.28.0
+- **Scaffold Signals Animation Example**: Created `examples/signals-animation` demonstrating fine-grained reactivity using core signals.
+
+## v1.27.0
+- **Scaffold Captions Animation Example**: Created `examples/captions-animation` demonstrating built-in SRT caption support.
+
+## v1.26.0
+- **Scaffold Motion One Example**: Created `examples/motion-one-animation` demonstrating integration with motion library via `autoSyncAnimations: true`.
+
+## v1.23.0
+- **Scaffold Lottie Animation Example**: Created `examples/lottie-animation` demonstrating integration with `lottie-web` via time-based seeking.
 
 ## v1.22.0
 - **Scaffold Framer Motion Example**: Created `examples/framer-motion-animation` demonstrating integration with `framer-motion` via `useMotionValue` and manual time syncing.

@@ -20,11 +20,25 @@ const options: RendererOptions = {
   fps: 30,
   durationInSeconds: 5,
   mode: 'canvas', // 'canvas' or 'dom'
-  videoCodec: 'libx264', // 'libx264', 'libvpx-vp9', 'libaom-av1'
+
+  // Video Encoding
+  videoCodec: 'libx264', // 'libx264', 'libvpx-vp9', 'libaom-av1', or 'copy'
   videoBitrate: '5000k',
-  intermediateVideoCodec: 'libvpx-vp9', // For internal capture
+  intermediateVideoCodec: 'libvpx-vp9', // For internal capture (or 'avc1' for H.264)
+  pixelFormat: 'yuv420p',
+
+  // Audio
   audioFilePath: './audio.mp3',
+  audioCodec: 'aac', // 'aac', 'libvorbis', etc.
+  audioBitrate: '192k',
+  audioTracks: ['./voiceover.mp3', './music.mp3'], // For mixing multiple tracks
+
+  // Input Injection
+  inputProps: { title: "Rendered Video" },
+
+  // Rendering Range
   startFrame: 0,
+
   ffmpegPath: '/path/to/ffmpeg' // Optional
 };
 
@@ -57,13 +71,18 @@ await renderer.render(
 
 The renderer uses different strategies based on `mode`:
 
-- **`canvas`**: Uses `CdpTimeDriver` (Chrome DevTools Protocol) and `CanvasStrategy`. Captures frames via WebCodecs or Screenshot. Best for Canvas/WebGL.
-- **`dom`**: Uses `SeekTimeDriver` and `DomStrategy`. Captures frames by taking screenshots of the DOM. Supports CSS animations and `startFrame`.
+- **`canvas`**: Uses `CdpTimeDriver` (Chrome DevTools Protocol) and `CanvasStrategy`. Captures frames via WebCodecs (supports H.264 stream copy) or Screenshot. Best for Canvas/WebGL.
+- **`dom`**: Uses `SeekTimeDriver` and `DomStrategy`. Captures frames by taking screenshots of the DOM. Supports CSS animations, font loading, image preloading, and `startFrame`.
 
 ### Diagnostics
 
-#### `Renderer.diagnose(page)`
-Runs diagnostic checks on the page context to verify WebCodecs support, WAAPI availability, etc.
+#### `Renderer.diagnose()`
+Runs diagnostic checks on the page context to verify WebCodecs support, WAAPI availability, and other environment capabilities using a headless browser.
+
+```typescript
+const diagnostics = await renderer.diagnose();
+console.log(diagnostics);
+```
 
 ## Utilities
 
