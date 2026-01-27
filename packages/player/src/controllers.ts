@@ -1,4 +1,4 @@
-import { Helios } from "@helios-project/core";
+import { Helios, CaptionCue } from "@helios-project/core";
 import { captureDomToBitmap } from "./features/dom-capture";
 import { getAudioAssets, AudioAsset } from "./features/audio-utils";
 
@@ -13,7 +13,7 @@ export interface HeliosController {
   subscribe(callback: (state: any) => void): () => void;
   getState(): any;
   dispose(): void;
-  captureFrame(frame: number, options?: { selector?: string, mode?: 'canvas' | 'dom' }): Promise<VideoFrame | null>;
+  captureFrame(frame: number, options?: { selector?: string, mode?: 'canvas' | 'dom' }): Promise<{ frame: VideoFrame, captions: CaptionCue[] } | null>;
   getAudioTracks(): Promise<AudioAsset[]>;
 }
 
@@ -35,8 +35,10 @@ export class DirectController implements HeliosController {
      return getAudioAssets(doc);
   }
 
-  async captureFrame(frame: number, options?: { selector?: string, mode?: 'canvas' | 'dom' }): Promise<VideoFrame | null> {
-      const fps = this.instance.getState().fps;
+  async captureFrame(frame: number, options?: { selector?: string, mode?: 'canvas' | 'dom' }): Promise<{ frame: VideoFrame, captions: CaptionCue[] } | null> {
+      const state = this.instance.getState();
+      const fps = state.fps;
+      const captions = state.activeCaptions || [];
       this.instance.seek(frame);
 
       // Wait for RAF in iframe to ensure paint
@@ -46,25 +48,29 @@ export class DirectController implements HeliosController {
       }
 
       const doc = this.iframe?.contentDocument || document;
+      let videoFrame: VideoFrame | null = null;
 
       // Handle DOM mode
       if (options?.mode === 'dom') {
           try {
              const bitmap = await captureDomToBitmap(doc.body);
-             return new VideoFrame(bitmap, { timestamp: (frame / fps) * 1_000_000 });
+             videoFrame = new VideoFrame(bitmap, { timestamp: (frame / fps) * 1_000_000 });
           } catch (e) {
              console.error("DOM capture failed:", e);
              return null;
           }
+      } else {
+        const selector = options?.selector || 'canvas';
+        const canvas = doc.querySelector(selector);
+
+        if (canvas instanceof HTMLCanvasElement) {
+             videoFrame = new VideoFrame(canvas, { timestamp: (frame / fps) * 1_000_000 });
+        }
       }
 
-      const selector = options?.selector || 'canvas';
-      const canvas = doc.querySelector(selector);
-
-      if (canvas instanceof HTMLCanvasElement) {
-           return new VideoFrame(canvas, { timestamp: (frame / fps) * 1_000_000 });
+      if (videoFrame) {
+          return { frame: videoFrame, captions };
       }
-
       return null;
   }
 }
@@ -113,17 +119,18 @@ export class BridgeController implements HeliosController {
       window.removeEventListener('message', this.handleMessage);
   }
 
-  async captureFrame(frame: number, options?: { selector?: string, mode?: 'canvas' | 'dom' }): Promise<VideoFrame | null> {
+  async captureFrame(frame: number, options?: { selector?: string, mode?: 'canvas' | 'dom' }): Promise<{ frame: VideoFrame, captions: CaptionCue[] } | null> {
       return new Promise((resolve) => {
           const handler = (event: MessageEvent) => {
               if (event.data?.type === 'HELIOS_FRAME_DATA' && event.data.frame === frame) {
                   window.removeEventListener('message', handler);
                   if (event.data.success) {
                       const bitmap: ImageBitmap = event.data.bitmap;
+                      const captions: CaptionCue[] = event.data.captions || [];
                       // fps from last state
                       const fps = this.lastState.fps || 30;
                       const videoFrame = new VideoFrame(bitmap, { timestamp: (frame / fps) * 1_000_000 });
-                      resolve(videoFrame);
+                      resolve({ frame: videoFrame, captions });
                   } else {
                       console.error("Bridge capture failed:", event.data.error);
                       resolve(null);

@@ -108,3 +108,7 @@ Each agent should update **their own dedicated progress file** instead of this f
 
 ### RENDERER v1.20.1
 - ✅ Completed: Optimize Canvas Quality - Updated `CanvasStrategy` to auto-calculate intermediate bitrate based on resolution/FPS (e.g. ~100Mbps for 4K) and wait for fonts to load, ensuring high-quality output and no font glitches.
+
+
+### PLAYER v0.22.0
+- ✅ Completed: Export Burn-In Captions - Implemented caption rendering (burn-in) for client-side export using intermediate OffscreenCanvas.

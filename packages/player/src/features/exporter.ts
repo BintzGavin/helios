@@ -1,4 +1,5 @@
 import { HeliosController } from "../controllers";
+import { CaptionCue } from "@helios-project/core";
 import { Muxer as Mp4Muxer, ArrayBufferTarget as Mp4ArrayBufferTarget } from "mp4-muxer";
 import { Muxer as WebMMuxer, ArrayBufferTarget as WebMArrayBufferTarget } from "webm-muxer";
 import { mixAudio } from "./audio-utils";
@@ -33,14 +34,14 @@ export class ClientSideExporter {
       // If auto, try to find a canvas first. If not found, assume DOM.
       if (effectiveMode === 'auto') {
           // Try to capture frame 0 in canvas mode
-          const testFrame = await this.controller.captureFrame(0, {
+          const result = await this.controller.captureFrame(0, {
               selector: canvasSelector,
               mode: 'canvas'
           });
 
-          if (testFrame) {
+          if (result && result.frame) {
               effectiveMode = 'canvas';
-              testFrame.close();
+              result.frame.close();
           } else {
               effectiveMode = 'dom';
               console.log("Canvas not found for auto export, falling back to DOM mode.");
@@ -48,14 +49,16 @@ export class ClientSideExporter {
       }
 
       // 2. Capture first frame to determine dimensions and validate
-      const firstFrame = await this.controller.captureFrame(0, {
+      const firstResult = await this.controller.captureFrame(0, {
           selector: canvasSelector,
           mode: effectiveMode as 'canvas' | 'dom'
       });
 
-      if (!firstFrame) {
+      if (!firstResult || !firstResult.frame) {
          throw new Error(`Failed to capture first frame in mode: ${effectiveMode}`);
       }
+
+      const { frame: firstFrame, captions: firstCaptions } = firstResult;
 
       const width = firstFrame.displayWidth;
       const height = firstFrame.displayHeight;
@@ -201,8 +204,14 @@ export class ClientSideExporter {
       await encoder.configure(config);
 
       // Encode first frame
-      await encoder.encode(firstFrame, { keyFrame: true });
-      firstFrame.close();
+      let frameToEncode = firstFrame;
+      if (firstCaptions && firstCaptions.length > 0) {
+          frameToEncode = await this.drawCaptions(firstFrame, firstCaptions);
+          firstFrame.close();
+      }
+
+      await encoder.encode(frameToEncode, { keyFrame: true });
+      frameToEncode.close();
       onProgress(1 / totalFrames);
 
       // 4. Render Loop
@@ -211,19 +220,26 @@ export class ClientSideExporter {
             throw new Error("Export aborted");
         }
 
-        const frame = await this.controller.captureFrame(i, {
+        const result = await this.controller.captureFrame(i, {
             selector: canvasSelector,
             mode: effectiveMode as 'canvas' | 'dom'
         });
 
-        if (!frame) {
+        if (!result || !result.frame) {
             throw new Error(`Frame ${i} missing during export.`);
         }
 
+        const { frame: videoFrame, captions } = result;
         const keyFrame = i % (state.fps * 2) === 0;
 
-        await encoder.encode(frame, { keyFrame });
-        frame.close();
+        let finalFrame = videoFrame;
+        if (captions && captions.length > 0) {
+             finalFrame = await this.drawCaptions(videoFrame, captions);
+             videoFrame.close();
+        }
+
+        await encoder.encode(finalFrame, { keyFrame });
+        finalFrame.close();
 
         onProgress((i + 1) / totalFrames);
       }
@@ -250,6 +266,53 @@ export class ClientSideExporter {
         }
       }
     }
+  }
+
+  private async drawCaptions(frame: VideoFrame, captions: CaptionCue[]): Promise<VideoFrame> {
+      const width = frame.displayWidth;
+      const height = frame.displayHeight;
+      let canvas: OffscreenCanvas | HTMLCanvasElement;
+      let ctx: OffscreenCanvasRenderingContext2D | CanvasRenderingContext2D | null;
+
+      if (typeof OffscreenCanvas !== 'undefined') {
+          canvas = new OffscreenCanvas(width, height);
+          ctx = canvas.getContext('2d');
+      } else {
+          canvas = document.createElement('canvas');
+          canvas.width = width;
+          canvas.height = height;
+          ctx = canvas.getContext('2d');
+      }
+
+      if (!ctx) throw new Error("Failed to create canvas context for captions");
+
+      ctx.drawImage(frame, 0, 0);
+
+      // Responsive font size (approx 5% of height)
+      const fontSize = Math.max(16, Math.round(height * 0.05));
+      ctx.font = `${fontSize}px sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'bottom';
+
+      captions.forEach(cue => {
+          const text = cue.text;
+          const x = width / 2;
+          const y = height - (height * 0.05);
+
+          // Background for better visibility
+          const metrics = ctx!.measureText(text);
+          const bgHeight = fontSize * 1.4;
+          const bgWidth = metrics.width + (fontSize * 1.0);
+
+          ctx!.fillStyle = 'rgba(0, 0, 0, 0.7)';
+          // Centered background rect
+          ctx!.fillRect(x - bgWidth / 2, y - bgHeight + (bgHeight * 0.25), bgWidth, bgHeight);
+
+          ctx!.fillStyle = 'white';
+          ctx!.fillText(text, x, y);
+      });
+
+      return new VideoFrame(canvas, { timestamp: frame.timestamp });
   }
 
   private download(buffer: ArrayBuffer, format: 'mp4' | 'webm') {

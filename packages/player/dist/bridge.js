@@ -65,6 +65,8 @@ async function handleCaptureFrame(helios, data) {
     helios.seek(frame);
     // 2. Wait for render (double RAF to be safe and ensure paint)
     await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(() => r())));
+    const state = helios.getState();
+    const captions = state.activeCaptions || [];
     // 3. DOM Mode
     if (mode === 'dom') {
         try {
@@ -73,7 +75,8 @@ async function handleCaptureFrame(helios, data) {
                 type: 'HELIOS_FRAME_DATA',
                 frame,
                 success: true,
-                bitmap
+                bitmap,
+                captions
             }, '*', [bitmap]);
         }
         catch (e) {
@@ -105,7 +108,8 @@ async function handleCaptureFrame(helios, data) {
             type: 'HELIOS_FRAME_DATA',
             frame,
             success: true,
-            bitmap
+            bitmap,
+            captions
         }, '*', [bitmap]);
     }
     catch (e) {
