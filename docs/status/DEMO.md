@@ -1,10 +1,11 @@
 # Status: DEMO (Executor)
-**Version**: 1.42.0
+**Version**: 1.43.0
 
 ## Vision
 To provide comprehensive, idiomatic examples for every major framework (React, Vue, Svelte, Vanilla) and robust end-to-end testing to ensure the Helios engine delivers on its "Use What You Know" promise.
 
 ## Current State
+- **React Transitions**: ✅ `examples/react-transitions` exists and works (Demonstrates synchronizing CSS animations using `autoSyncAnimations` and manual time offsets).
 - **Social Media Story**: ✅ `examples/social-media-story` exists and works (Demonstrates `autoSyncAnimations` with `<video>` and sequence composition).
 - **Chart.js**: ✅ `examples/chartjs-animation` exists and works (Demonstrates synchronous update via `chart.update('none')`).
 - **Procedural Generation**: ✅ `examples/procedural-generation` exists and works (Demonstrates `random` and `interpolateColors`).
@@ -67,6 +68,7 @@ To provide comprehensive, idiomatic examples for every major framework (React, V
 None.
 
 ## Log
+- [v1.43.0] ✅ Completed: Create React Transitions Example - Created `examples/react-transitions` demonstrating how to synchronize CSS animations with Helios timeline using `autoSyncAnimations` and `animation-delay`.
 - [v1.42.0] ✅ Completed: Document Social Media Story Example - Documented `examples/social-media-story` demonstrating React integration with `autoSyncAnimations` and component composition.
 - [v1.41.0] ✅ Completed: Scaffold Chart.js Animation Example - Created `examples/chartjs-animation` demonstrating integration with Chart.js using synchronous updates.
 - [v1.40.0] ✅ Completed: Scaffold Procedural Generation Example - Created `examples/procedural-generation` demonstrating deterministic `random` and `interpolateColors` utilities.

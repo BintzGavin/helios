@@ -21,6 +21,7 @@
 - `examples/react-canvas-animation`: React Canvas.
 - `examples/react-dom-animation`: React DOM.
 - `examples/react-css-animation`: React CSS Animations.
+- `examples/react-transitions`: React transitions (CSS animation synchronization).
 - `examples/react-animation-helpers`: React `<Sequence>`, `<Series>`.
 - `examples/vue-canvas-animation`: Vue Canvas.
 - `examples/vue-dom-animation`: Vue DOM.

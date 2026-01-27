@@ -117,3 +117,6 @@ Each agent should update **their own dedicated progress file** instead of this f
 - ✅ Completed: Export Burn-In Captions - Implemented caption rendering (burn-in) for client-side export using intermediate OffscreenCanvas.
 ### RENDERER v1.24.0
 - ✅ Completed: Smart Codec Selection - Updated `CanvasStrategy` to intelligently select H.264 (Annex B) when `videoCodec: 'copy'` is requested, prioritizing direct stream copy while falling back to VP8 (IVF) if unsupported.
+
+## DEMO v1.43.0
+- ✅ Completed: Create React Transitions Example - Created `examples/react-transitions` demonstrating how to synchronize CSS animations with Helios timeline using `autoSyncAnimations` and `animation-delay`.
