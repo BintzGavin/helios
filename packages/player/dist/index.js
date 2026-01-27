@@ -272,6 +272,17 @@ template.innerHTML = `
     .big-play-btn:hover {
         transform: scale(1.1);
     }
+
+    /* Responsive Layouts */
+    .controls.layout-compact .volume-slider {
+      display: none;
+    }
+    .controls.layout-tiny .volume-slider {
+      display: none;
+    }
+    .controls.layout-tiny .speed-selector {
+      display: none;
+    }
   </style>
   <div class="status-overlay" part="overlay">
     <div class="status-text">Connecting...</div>
@@ -324,6 +335,7 @@ export class HeliosPlayer extends HTMLElement {
     bigPlayBtn;
     pendingSrc = null;
     isLoaded = false;
+    resizeObserver;
     controller = null;
     // Keep track if we have direct access (optional, mainly for debugging/logging)
     directHelios = null;
@@ -408,8 +420,9 @@ export class HeliosPlayer extends HTMLElement {
     }
     load() {
         if (this.pendingSrc) {
-            this.loadIframe(this.pendingSrc);
+            const src = this.pendingSrc;
             this.pendingSrc = null;
+            this.loadIframe(src);
         }
     }
     pause() {
@@ -443,6 +456,16 @@ export class HeliosPlayer extends HTMLElement {
         this.bigPlayBtn = this.shadowRoot.querySelector(".big-play-btn");
         this.retryAction = () => this.retryConnection();
         this.retryBtn.onclick = () => this.retryAction();
+        this.resizeObserver = new ResizeObserver((entries) => {
+            for (const entry of entries) {
+                const width = entry.contentRect.width;
+                const controls = this.shadowRoot.querySelector(".controls");
+                if (controls) {
+                    controls.classList.toggle("layout-compact", width < 500);
+                    controls.classList.toggle("layout-tiny", width < 350);
+                }
+            }
+        });
     }
     attributeChangedCallback(name, oldVal, newVal) {
         if (oldVal === newVal)
@@ -521,8 +544,10 @@ export class HeliosPlayer extends HTMLElement {
         }
         // Ensure aspect ratio is correct on connect
         this.updateAspectRatio();
+        this.resizeObserver.observe(this);
     }
     disconnectedCallback() {
+        this.resizeObserver.disconnect();
         this.iframe.removeEventListener("load", this.handleIframeLoad);
         window.removeEventListener("message", this.handleWindowMessage);
         this.removeEventListener("keydown", this.handleKeydown);
@@ -569,19 +594,7 @@ export class HeliosPlayer extends HTMLElement {
             this.controller.play();
         }
         else {
-            // If loading, listen for ready once
-            const onReady = (e) => {
-                // Wait for first valid state
-                if (this.controller) {
-                    this.controller.play();
-                }
-            };
-            // Simple approach: rely on the 'play' call in connected or just wait user to click again?
-            // Better: The controller setup will auto-play if autoplay is present.
-            // If we clicked big play, we essentially want 'autoplay' behavior for this session.
-            // We can just call play() when controller is set?
-            // Let's defer to handleIframeLoad or bridge setup.
-            // Actually, easiest is to set autoplay attribute temporarily or handle it in setController.
+            // Set autoplay so the controller will play once connected
             this.setAttribute("autoplay", "");
         }
     };

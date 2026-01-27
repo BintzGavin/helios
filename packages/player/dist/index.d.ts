@@ -22,6 +22,7 @@ export declare class HeliosPlayer extends HTMLElement {
     private bigPlayBtn;
     private pendingSrc;
     private isLoaded;
+    private resizeObserver;
     private controller;
     private directHelios;
     private unsubscribe;

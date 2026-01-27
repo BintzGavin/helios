@@ -18,6 +18,13 @@ if (!HTMLElement.prototype.requestFullscreen) {
   HTMLElement.prototype.requestFullscreen = vi.fn();
 }
 
+// Mock ResizeObserver
+global.ResizeObserver = class {
+  observe = vi.fn();
+  unobserve = vi.fn();
+  disconnect = vi.fn();
+} as any;
+
 describe('HeliosPlayer', () => {
   let player: HeliosPlayer;
 
