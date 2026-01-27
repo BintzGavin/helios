@@ -1,5 +1,8 @@
 # Studio Progress Log
 
+## STUDIO v0.25.0
+- ✅ Completed: Enhance Asset Previews - Implemented rich previews for video (hover-play), audio (click-play), and fonts (custom sample) in Assets Panel.
+
 ## STUDIO v0.24.0
 - ✅ Completed: Scaffold Unit Tests - Added Vitest, JSDOM, and Testing Library infrastructure; implemented initial tests for Timeline component.
 

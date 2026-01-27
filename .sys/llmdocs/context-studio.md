@@ -36,7 +36,7 @@ The studio is launched via the `@helios-project/cli` package.
 - **App**: Layout container.
 - **Timeline**: Visual timeline with scrubbing, playback controls, and range markers.
 - **PropsEditor**: JSON/Form editor for composition props.
-- **AssetsPanel**: Drag-and-drop asset management.
+- **AssetsPanel**: Drag-and-drop asset management with rich previews for Video, Audio, and Fonts.
 - **RendersPanel**: Render job management (start, cancel, download).
 - **Stage**: Canvas/DOM preview area.
 
