@@ -404,6 +404,7 @@ describe('Helios Core', () => {
         playbackRate: 1,
         volume: 1,
         muted: false,
+        captions: [],
         activeCaptions: []
       };
 

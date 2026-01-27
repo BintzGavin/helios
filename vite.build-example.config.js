@@ -41,6 +41,7 @@ export default defineConfig({
         d3_animation: resolve(__dirname, "examples/d3-animation/composition.html"),
         tailwind_animation: resolve(__dirname, "examples/tailwind-animation/composition.html"),
         waapi_animation: resolve(__dirname, "examples/waapi-animation/composition.html"),
+        audio_visualization: resolve(__dirname, "examples/audio-visualization/composition.html"),
       },
     },
   },
