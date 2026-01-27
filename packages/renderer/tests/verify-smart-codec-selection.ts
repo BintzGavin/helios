@@ -24,7 +24,7 @@ async function runTest() {
                 if (args && args.candidates) {
                     capturedArgs = args;
                     // Simulate H264 supported
-                    return { supported: true, selectedCodec: 'avc1.4d002a', isH264: true };
+                    return { supported: true, codec: 'avc1.4d002a', isH264: true };
                 }
                 return true;
             }
@@ -70,7 +70,7 @@ async function runTest() {
             evaluate: async (fn: any, args: any) => {
                  if (args && args.candidates) {
                     capturedArgs = args;
-                    return { supported: true, selectedCodec: 'vp8', isH264: false };
+                    return { supported: true, codec: 'vp8', isH264: false };
                 }
                 return true;
             }
@@ -111,7 +111,7 @@ async function runTest() {
             evaluate: async (fn: any, args: any) => {
                  if (args && args.candidates) {
                     capturedArgs = args;
-                    return { supported: true, selectedCodec: 'vp9', isH264: false };
+                    return { supported: true, codec: 'vp9', isH264: false };
                 }
                 return true;
             }
