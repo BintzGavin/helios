@@ -2,7 +2,7 @@ import { Page } from 'playwright';
 import { TimeDriver } from './TimeDriver';
 
 export class SeekTimeDriver implements TimeDriver {
-  async prepare(page: Page): Promise<void> {
+  async init(page: Page): Promise<void> {
     await page.addInitScript(() => {
       // Initialize virtual time
       (window as any).__HELIOS_VIRTUAL_TIME__ = 0;
@@ -26,6 +26,10 @@ export class SeekTimeDriver implements TimeDriver {
         });
       };
     });
+  }
+
+  async prepare(page: Page): Promise<void> {
+    // No-op for SeekTimeDriver, but required by interface
   }
 
   async setTime(page: Page, timeInSeconds: number): Promise<void> {

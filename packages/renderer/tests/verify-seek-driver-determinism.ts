@@ -8,7 +8,7 @@ async function verifyDeterminism() {
   const page = await browser.newPage();
 
   const driver = new SeekTimeDriver();
-  await driver.prepare(page);
+  await driver.init(page);
 
   // Define a simple animation page that logs performance.now()
   const htmlContent = `
@@ -41,6 +41,7 @@ async function verifyDeterminism() {
   `;
 
   await page.goto(`data:text/html,${encodeURIComponent(htmlContent)}`);
+  await driver.prepare(page);
 
   const fps = 30;
   const frameDuration = 1 / fps;

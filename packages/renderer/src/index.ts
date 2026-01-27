@@ -103,6 +103,9 @@ export class Renderer {
         await page.addInitScript(`window.__HELIOS_PROPS__ = ${serializedProps};`);
       }
 
+      console.log('Initializing time driver...');
+      await this.timeDriver.init(page);
+
       await page.goto(compositionUrl, { waitUntil: 'networkidle' });
       console.log('Page loaded.');
 
