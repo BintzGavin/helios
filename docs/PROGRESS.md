@@ -115,3 +115,5 @@ Each agent should update **their own dedicated progress file** instead of this f
 
 ### PLAYER v0.22.0
 - ✅ Completed: Export Burn-In Captions - Implemented caption rendering (burn-in) for client-side export using intermediate OffscreenCanvas.
+### RENDERER v1.24.0
+- ✅ Completed: Smart Codec Selection - Updated `CanvasStrategy` to intelligently select H.264 (Annex B) when `videoCodec: 'copy'` is requested, prioritizing direct stream copy while falling back to VP8 (IVF) if unsupported.

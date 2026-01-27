@@ -16,7 +16,7 @@ function runTests() {
 
   const strategies = [
     { name: 'CanvasStrategy', instance: new CanvasStrategy(dummyOptions) },
-    { name: 'DomStrategy', instance: new DomStrategy() },
+    { name: 'DomStrategy', instance: new DomStrategy(dummyOptions) },
   ];
 
   for (const { name, instance } of strategies) {
