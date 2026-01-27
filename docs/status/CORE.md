@@ -1,11 +1,12 @@
 # Status: CORE
 
-**Version**: 1.30.0
+**Version**: 1.31.0
 
 - **Status**: Active
 - **Current Focus**: Maintenance and Optimization
-- **Last Updated**: 2026-03-18
+- **Last Updated**: 2026-03-24
 
+[v1.31.0] ✅ Completed: Optimize DomDriver - Implemented MutationObserver caching and disposal in DomDriver, reducing DOM queries and improving performance.
 [v1.30.0] ✅ Completed: Implement Loop Support - Implemented loop option, signal, and logic in Helios class, enabling seamless looping playback.
 [v1.29.0] ✅ Completed: Implement Timecode Utilities - Implemented `framesToTimecode`, `timecodeToFrames`, and `framesToTimestamp` utilities.
 [v1.28.0] ✅ Completed: Implement Dynamic Timing - Implemented `setDuration` and `setFps` methods in `Helios` class, allowing runtime updates to composition timing.

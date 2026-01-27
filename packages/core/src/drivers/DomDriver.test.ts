@@ -34,7 +34,7 @@ describe('DomDriver', () => {
     expect(mockAnim.pause).toHaveBeenCalled();
   });
 
-  it('should sync media elements when scrubbing (not playing)', () => {
+  it('should sync media elements when scrubbing (not playing)', async () => {
     const mockAudio = document.createElement('audio');
     // Mock properties/methods that might not work in JSDOM
     Object.defineProperty(mockAudio, 'duration', { value: 100, writable: true });
@@ -44,6 +44,7 @@ describe('DomDriver', () => {
     mockAudio.play = vi.fn();
 
     scope.appendChild(mockAudio);
+    await new Promise(resolve => setTimeout(resolve, 0));
 
     driver.update(2000, { isPlaying: false, playbackRate: 1 });
 
@@ -51,7 +52,7 @@ describe('DomDriver', () => {
     expect(mockAudio.currentTime).toBe(2);
   });
 
-  it('should sync media elements when playing', () => {
+  it('should sync media elements when playing', async () => {
     const mockVideo = document.createElement('video');
     Object.defineProperty(mockVideo, 'currentTime', { value: 0, writable: true });
     Object.defineProperty(mockVideo, 'paused', { value: true, writable: true });
@@ -59,6 +60,7 @@ describe('DomDriver', () => {
     mockVideo.pause = vi.fn();
 
     scope.appendChild(mockVideo);
+    await new Promise(resolve => setTimeout(resolve, 0));
 
     // 0.5s is > 0.25s drift from 0s, so it should seek
     driver.update(500, { isPlaying: true, playbackRate: 1 });
@@ -67,13 +69,14 @@ describe('DomDriver', () => {
     expect(mockVideo.currentTime).toBe(0.5);
   });
 
-  it('should NOT sync media elements when playing if drift is small', () => {
+  it('should NOT sync media elements when playing if drift is small', async () => {
     const mockVideo = document.createElement('video');
     Object.defineProperty(mockVideo, 'currentTime', { value: 1.0, writable: true }); // 1.0s
     Object.defineProperty(mockVideo, 'paused', { value: false, writable: true });
     mockVideo.play = vi.fn();
 
     scope.appendChild(mockVideo);
+    await new Promise(resolve => setTimeout(resolve, 0));
 
     // Update to 1.1s (diff 0.1s < 0.25s tolerance)
     driver.update(1100, { isPlaying: true, playbackRate: 1 });
@@ -81,40 +84,44 @@ describe('DomDriver', () => {
     expect(mockVideo.currentTime).toBe(1.0); // Should not have changed
   });
 
-  it('should sync playbackRate', () => {
+  it('should sync playbackRate', async () => {
     const mockAudio = document.createElement('audio');
     mockAudio.play = vi.fn().mockResolvedValue(undefined);
     scope.appendChild(mockAudio);
+    await new Promise(resolve => setTimeout(resolve, 0));
 
     driver.update(0, { isPlaying: true, playbackRate: 2 });
 
     expect(mockAudio.playbackRate).toBe(2);
   });
 
-  it('should sync volume', () => {
+  it('should sync volume', async () => {
     const mockAudio = document.createElement('audio');
     Object.defineProperty(mockAudio, 'volume', { value: 1, writable: true });
     scope.appendChild(mockAudio);
+    await new Promise(resolve => setTimeout(resolve, 0));
 
     driver.update(0, { isPlaying: false, playbackRate: 1, volume: 0.5 });
 
     expect(mockAudio.volume).toBe(0.5);
   });
 
-  it('should sync muted state', () => {
+  it('should sync muted state', async () => {
     const mockAudio = document.createElement('audio');
     Object.defineProperty(mockAudio, 'muted', { value: false, writable: true });
     scope.appendChild(mockAudio);
+    await new Promise(resolve => setTimeout(resolve, 0));
 
     driver.update(0, { isPlaying: false, playbackRate: 1, muted: true });
 
     expect(mockAudio.muted).toBe(true);
   });
 
-  it('should not update volume if not provided', () => {
+  it('should not update volume if not provided', async () => {
     const mockAudio = document.createElement('audio');
     Object.defineProperty(mockAudio, 'volume', { value: 1, writable: true });
     scope.appendChild(mockAudio);
+    await new Promise(resolve => setTimeout(resolve, 0));
 
     driver.update(0, { isPlaying: false, playbackRate: 1 });
 
@@ -123,10 +130,11 @@ describe('DomDriver', () => {
 
   // New Tests for Relative Volume/Mute Logic
 
-  it('should handle relative volume mixing', () => {
+  it('should handle relative volume mixing', async () => {
     const mockAudio = document.createElement('audio');
     Object.defineProperty(mockAudio, 'volume', { value: 0.5, writable: true });
     scope.appendChild(mockAudio);
+    await new Promise(resolve => setTimeout(resolve, 0));
 
     // Master volume 0.5 * Base 0.5 = 0.25
     driver.update(0, { isPlaying: false, playbackRate: 1, volume: 0.5 });
@@ -134,10 +142,11 @@ describe('DomDriver', () => {
     expect(mockAudio.volume).toBe(0.25);
   });
 
-  it('should respect external volume changes', () => {
+  it('should respect external volume changes', async () => {
     const mockAudio = document.createElement('audio');
     Object.defineProperty(mockAudio, 'volume', { value: 1.0, writable: true });
     scope.appendChild(mockAudio);
+    await new Promise(resolve => setTimeout(resolve, 0));
 
     // Initial update: master 1.0 -> effective 1.0
     driver.update(0, { isPlaying: false, playbackRate: 1, volume: 1.0 });
@@ -152,10 +161,11 @@ describe('DomDriver', () => {
     expect(mockAudio.volume).toBe(0.4);
   });
 
-  it('should handle relative mute logic', () => {
+  it('should handle relative mute logic', async () => {
      const mockAudio = document.createElement('audio');
      Object.defineProperty(mockAudio, 'muted', { value: false, writable: true }); // Unmuted
      scope.appendChild(mockAudio);
+     await new Promise(resolve => setTimeout(resolve, 0));
 
      // Master muted
      driver.update(0, { isPlaying: false, playbackRate: 1, muted: true });
@@ -166,10 +176,11 @@ describe('DomDriver', () => {
      expect(mockAudio.muted).toBe(false); // Should return to base (false)
   });
 
-  it('should respect external mute changes', () => {
+  it('should respect external mute changes', async () => {
      const mockAudio = document.createElement('audio');
      Object.defineProperty(mockAudio, 'muted', { value: false, writable: true });
      scope.appendChild(mockAudio);
+     await new Promise(resolve => setTimeout(resolve, 0));
 
      // Master unmuted
      driver.update(0, { isPlaying: false, playbackRate: 1, muted: false });
@@ -185,10 +196,11 @@ describe('DomDriver', () => {
      expect(mockAudio.muted).toBe(true);
   });
 
-  it('should preserve element mute state when master is toggled', () => {
+  it('should preserve element mute state when master is toggled', async () => {
      const mockAudio = document.createElement('audio');
      Object.defineProperty(mockAudio, 'muted', { value: true, writable: true }); // Muted by default
      scope.appendChild(mockAudio);
+     await new Promise(resolve => setTimeout(resolve, 0));
 
      // Master unmuted
      driver.update(0, { isPlaying: false, playbackRate: 1, muted: false });
@@ -201,5 +213,75 @@ describe('DomDriver', () => {
      // Master unmuted again
      driver.update(0, { isPlaying: false, playbackRate: 1, muted: false });
      expect(mockAudio.muted).toBe(true); // Should return to base (true)
+  });
+
+  // MutationObserver Tests
+  it('should detect added media elements', async () => {
+    const mockAudio = document.createElement('audio');
+    Object.defineProperty(mockAudio, 'volume', { value: 1, writable: true });
+    scope.appendChild(mockAudio);
+
+    // Wait for observer
+    await new Promise(resolve => setTimeout(resolve, 20));
+
+    // Update with volume 0.5
+    driver.update(0, { isPlaying: false, playbackRate: 1, volume: 0.5 });
+
+    expect(mockAudio.volume).toBe(0.5);
+  });
+
+  it('should detect removed media elements', async () => {
+     const mockAudio = document.createElement('audio');
+     Object.defineProperty(mockAudio, 'volume', { value: 1, writable: true });
+     scope.appendChild(mockAudio);
+
+     await new Promise(resolve => setTimeout(resolve, 20));
+
+     driver.update(0, { isPlaying: false, playbackRate: 1, volume: 0.5 });
+     expect(mockAudio.volume).toBe(0.5);
+
+     scope.removeChild(mockAudio);
+     await new Promise(resolve => setTimeout(resolve, 20));
+
+     // Update with volume 1.0. The removed element should NOT be touched.
+     driver.update(0, { isPlaying: false, playbackRate: 1, volume: 1.0 });
+
+     expect(mockAudio.volume).toBe(0.5);
+  });
+
+  it('should detect nested media elements', async () => {
+      const container = document.createElement('div');
+      const mockVideo = document.createElement('video');
+      Object.defineProperty(mockVideo, 'volume', { value: 1, writable: true });
+      container.appendChild(mockVideo);
+
+      scope.appendChild(container);
+
+      await new Promise(resolve => setTimeout(resolve, 20));
+
+      driver.update(0, { isPlaying: false, playbackRate: 1, volume: 0.5 });
+
+      expect(mockVideo.volume).toBe(0.5);
+  });
+
+  it('should dispose observer and clear elements', async () => {
+      const mockAudio = document.createElement('audio');
+      Object.defineProperty(mockAudio, 'volume', { value: 1, writable: true });
+      scope.appendChild(mockAudio);
+      await new Promise(resolve => setTimeout(resolve, 20));
+
+      driver.dispose();
+
+      // Add another element - should NOT be detected
+      const newAudio = document.createElement('audio');
+      Object.defineProperty(newAudio, 'volume', { value: 1, writable: true });
+      scope.appendChild(newAudio);
+      await new Promise(resolve => setTimeout(resolve, 20));
+
+      driver.update(0, { isPlaying: false, playbackRate: 1, volume: 0.5 });
+
+      // Assuming original volume was 1
+      expect(mockAudio.volume).toBe(1);
+      expect(newAudio.volume).toBe(1);
   });
 });

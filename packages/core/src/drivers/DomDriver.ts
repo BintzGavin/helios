@@ -10,9 +10,63 @@ interface TrackState {
 export class DomDriver implements TimeDriver {
   private scope: HTMLElement | Document | null = null;
   private trackStates = new WeakMap<HTMLMediaElement, TrackState>();
+  private mediaElements = new Set<HTMLMediaElement>();
+  private observer: MutationObserver | null = null;
 
   init(scope: HTMLElement | Document) {
     this.scope = scope;
+    this.mediaElements.clear();
+
+    if (typeof (this.scope as any).querySelectorAll === 'function') {
+      const initial = (this.scope as any).querySelectorAll('audio, video');
+      initial.forEach((el: Element) => this.mediaElements.add(el as HTMLMediaElement));
+    }
+
+    if (typeof MutationObserver !== 'undefined' && (this.scope instanceof Element || this.scope instanceof Document)) {
+      this.observer = new MutationObserver((mutations) => {
+        mutations.forEach((m) => {
+          m.addedNodes.forEach((node) => {
+            this.scanAndAdd(node);
+          });
+          m.removedNodes.forEach((node) => {
+            this.scanAndRemove(node);
+          });
+        });
+      });
+      // Cast scope to Node because Document inherits from Node in DOM types
+      // even if TS strictness might complain about Document vs Node
+      this.observer.observe(this.scope as Node, { childList: true, subtree: true });
+    }
+  }
+
+  private scanAndAdd(node: Node) {
+    if (node.nodeName === 'AUDIO' || node.nodeName === 'VIDEO') {
+      this.mediaElements.add(node as HTMLMediaElement);
+    }
+    if (node instanceof Element) {
+      if (node.querySelectorAll) {
+        const children = node.querySelectorAll('audio, video');
+        children.forEach((el) => this.mediaElements.add(el as HTMLMediaElement));
+      }
+    }
+  }
+
+  private scanAndRemove(node: Node) {
+    if (node.nodeName === 'AUDIO' || node.nodeName === 'VIDEO') {
+      this.mediaElements.delete(node as HTMLMediaElement);
+    }
+    if (node instanceof Element) {
+      if (node.querySelectorAll) {
+        const children = node.querySelectorAll('audio, video');
+        children.forEach((el) => this.mediaElements.delete(el as HTMLMediaElement));
+      }
+    }
+  }
+
+  dispose() {
+    this.observer?.disconnect();
+    this.observer = null;
+    this.mediaElements.clear();
   }
 
   update(timeInMs: number, options: { isPlaying: boolean; playbackRate: number; volume?: number; muted?: boolean } = { isPlaying: false, playbackRate: 1 }) {
@@ -52,15 +106,10 @@ export class DomDriver implements TimeDriver {
   private syncMediaElements(timeInMs: number, { isPlaying, playbackRate, volume, muted }: { isPlaying: boolean; playbackRate: number; volume?: number; muted?: boolean }) {
     if (!this.scope) return;
 
-    // Both Document and HTMLElement implement ParentNode which has querySelectorAll
-    if (typeof (this.scope as any).querySelectorAll !== 'function') return;
-
-    const mediaElements = (this.scope as any).querySelectorAll('audio, video');
+    // Use cached mediaElements instead of querySelectorAll
     const timeInSeconds = timeInMs / 1000;
 
-    mediaElements.forEach((media: Element) => {
-      const el = media as HTMLMediaElement;
-
+    this.mediaElements.forEach((el) => {
       let state = this.trackStates.get(el);
 
       // --- Volume Logic ---

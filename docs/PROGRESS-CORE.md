@@ -1,5 +1,8 @@
 # CORE Progress Log
 
+## CORE v1.31.0
+- ✅ Completed: Optimize DomDriver - Implemented MutationObserver caching and disposal in DomDriver, reducing DOM queries and improving performance.
+
 ## CORE v1.30.0
 - ✅ Completed: Implement Loop Support - Implemented loop option, signal, and logic in Helios class, enabling seamless looping playback.
 
