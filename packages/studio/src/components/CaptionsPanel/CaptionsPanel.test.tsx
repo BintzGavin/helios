@@ -135,4 +135,55 @@ describe('CaptionsPanel', () => {
       const props = mockSetInputProps.mock.calls[0][0];
       expect(props.captions).toHaveLength(1);
   });
+
+  it('exports captions as SRT', () => {
+    const captions = [
+        { startTime: 0, endTime: 1000, text: 'Hello' },
+        { startTime: 2000, endTime: 3000, text: 'World' }
+    ];
+
+    (StudioContext.useStudio as any).mockReturnValue({
+        ...defaultContext,
+        playerState: { ...defaultPlayerState, captions }
+    });
+
+    const createObjectURLMock = vi.fn(() => 'blob:mock-url');
+    const revokeObjectURLMock = vi.fn();
+    global.URL.createObjectURL = createObjectURLMock;
+    global.URL.revokeObjectURL = revokeObjectURLMock;
+
+    // Spy on anchor click
+    const clickSpy = vi.fn();
+    const originalCreateElement = document.createElement.bind(document);
+    const createElementSpy = vi.spyOn(document, 'createElement');
+
+    createElementSpy.mockImplementation((tagName, options) => {
+        if (tagName === 'a') {
+            return {
+                href: '',
+                download: '',
+                click: clickSpy,
+                style: {},
+                remove: vi.fn()
+            } as unknown as HTMLAnchorElement;
+        }
+        return originalCreateElement(tagName, options);
+    });
+
+    render(<CaptionsPanel />);
+    const exportButton = screen.getByText('Export SRT');
+    fireEvent.click(exportButton);
+
+    expect(createObjectURLMock).toHaveBeenCalledTimes(1);
+    const blob = createObjectURLMock.mock.calls[0][0];
+    expect(blob).toBeInstanceOf(Blob);
+
+    // Verify click was called on the anchor
+    expect(clickSpy).toHaveBeenCalledTimes(1);
+
+    // Restore spies
+    createElementSpy.mockRestore();
+    // No easy way to restore global.URL in this scope if it wasn't there before,
+    // but tests run in isolation usually.
+  });
 });
