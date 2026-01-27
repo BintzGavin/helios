@@ -34,7 +34,8 @@ The studio is launched via the `@helios-project/cli` package.
 
 ## D. UI Components
 - **App**: Layout container.
-- **Timeline**: Visual timeline with scrubbing, playback controls, and range markers.
+- **Timeline**: Visual timeline with scrubbing and range markers.
+- **PlaybackControls**: Includes Play/Pause, Frame Step, Loop, Audio (Volume/Mute), and Speed controls.
 - **PropsEditor**: JSON/Form editor for composition props.
 - **AssetsPanel**: Drag-and-drop asset management with rich previews for Video, Audio, and Fonts.
 - **RendersPanel**: Render job management (start, cancel, download).

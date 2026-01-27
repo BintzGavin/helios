@@ -1,5 +1,8 @@
 # Studio Progress Log
 
+## STUDIO v0.26.0
+- ✅ Completed: Audio Controls - Added Volume slider and Mute button to Playback Controls, updating `StudioContext` to track audio state.
+
 ## STUDIO v0.25.0
 - ✅ Completed: Enhance Asset Previews - Implemented rich previews for video (hover-play), audio (click-play), and fonts (custom sample) in Assets Panel.
 

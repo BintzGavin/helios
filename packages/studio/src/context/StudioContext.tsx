@@ -40,6 +40,8 @@ export interface PlayerState {
   fps: number;
   playbackRate: number;
   isPlaying: boolean;
+  volume: number;
+  muted: boolean;
   inputProps: Record<string, any>;
 }
 
@@ -49,6 +51,8 @@ const DEFAULT_PLAYER_STATE: PlayerState = {
   fps: 30,
   playbackRate: 1,
   isPlaying: false,
+  volume: 1,
+  muted: false,
   inputProps: {}
 };
 
