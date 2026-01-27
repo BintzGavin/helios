@@ -3,7 +3,7 @@
 ## 1. Module Overview
 - **Package**: `@helios-project/player`
 - **Domain**: Web Component and Player UI
-- **Responsibility**: Renders the `<helios-player>` component, managing the preview iframe, UI controls, and communication bridge.
+- **Responsibility**: Renders the `<helios-player>` component, managing the preview iframe, UI controls, and communication bridge. Handles client-side export with burn-in captions.
 
 ## 2. Key Components
 

@@ -100,14 +100,18 @@ class MockOfflineAudioContext {
 }
 vi.stubGlobal('OfflineAudioContext', MockOfflineAudioContext);
 
+// Spies for Canvas
+const fillTextSpy = vi.fn();
+const fillRectSpy = vi.fn();
+
 // Mock OffscreenCanvas
 class MockOffscreenCanvas {
     constructor(public width: number, public height: number) {}
     getContext = vi.fn().mockReturnValue({
         drawImage: vi.fn(),
         measureText: vi.fn().mockReturnValue({ width: 10 }),
-        fillRect: vi.fn(),
-        fillText: vi.fn(),
+        fillRect: fillRectSpy,
+        fillText: fillTextSpy,
     });
 }
 vi.stubGlobal('OffscreenCanvas', MockOffscreenCanvas);
@@ -347,5 +351,44 @@ describe('ClientSideExporter', () => {
         // However, if the code didn't crash and we passed captions, it means the logic branch was taken.
         expect(mockController.captureFrame).toHaveBeenCalled();
         expect(encodeSpy).toHaveBeenCalled();
+    });
+
+    it('should NOT render captions if includeCaptions is false', async () => {
+        const onProgress = vi.fn();
+        const signal = new AbortController().signal;
+
+        // Reset spies
+        fillTextSpy.mockClear();
+        fillRectSpy.mockClear();
+
+        mockController.captureFrame = vi.fn().mockResolvedValue({
+            frame: new VideoFrame({} as any, {}),
+            captions: [{ id: '1', startTime: 0, endTime: 1000, text: 'Hello World' }]
+        });
+
+        await exporter.export({ onProgress, signal, mode: 'canvas', includeCaptions: false });
+
+        expect(fillTextSpy).not.toHaveBeenCalled();
+        expect(fillRectSpy).not.toHaveBeenCalled();
+    });
+
+    it('should handle multiline captions correctly', async () => {
+        const onProgress = vi.fn();
+        const signal = new AbortController().signal;
+
+        // Reset spies
+        fillTextSpy.mockClear();
+
+        mockController.captureFrame = vi.fn().mockResolvedValue({
+            frame: new VideoFrame({} as any, {}),
+            captions: [{ id: '1', startTime: 0, endTime: 1000, text: 'Line 1\nLine 2' }]
+        });
+
+        await exporter.export({ onProgress, signal, mode: 'canvas', includeCaptions: true });
+
+        // 10 frames * 2 lines = 20 calls
+        expect(fillTextSpy).toHaveBeenCalledTimes(20);
+        expect(fillTextSpy).toHaveBeenCalledWith('Line 1', expect.any(Number), expect.any(Number));
+        expect(fillTextSpy).toHaveBeenCalledWith('Line 2', expect.any(Number), expect.any(Number));
     });
 });
