@@ -35,16 +35,16 @@ The studio is launched via the `@helios-project/cli` package.
 ## D. UI Components
 - **App**: Layout container.
 - **Sidebar**: Tabbed navigation for panels (Assets, Captions, Renders).
-- **Timeline**: Visual timeline with scrubbing, range markers, and caption markers.
+- **Timeline**: Visual timeline with scrubbing, range markers, and caption markers (synced with Helios Core state).
 - **PlaybackControls**: Includes Play/Pause, Frame Step, Loop, Audio (Volume/Mute), and Speed controls.
 - **PropsEditor**: Schema-aware property editor with fallback to JSON/Form inputs.
 - **AssetsPanel**: Drag-and-drop asset management with rich previews for Video, Audio, and Fonts.
-- **CaptionsPanel**: SRT import and visualization panel.
+- **CaptionsPanel**: SRT import and visualization panel (synced with Helios Core state).
 - **RendersPanel**: Render job management (start, cancel, download).
 - **Stage**: Canvas/DOM preview area with Pan/Zoom, Transparency Grid, and Snapshot controls.
 - **KeyboardShortcutsModal**: Modal dialog displaying available keyboard shortcuts.
 
 ## E. Integration
-- **Core**: Consumes `Helios` class for state management.
+- **Core**: Consumes `Helios` class for state management, including `HeliosState.captions`.
 - **Player**: Uses `<helios-player>` for preview.
 - **Renderer**: Triggers render jobs via `/api/render`.

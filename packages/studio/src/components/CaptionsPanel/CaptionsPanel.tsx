@@ -19,8 +19,8 @@ const formatTime = (ms: number) => {
 };
 
 export const CaptionsPanel: React.FC = () => {
-  const { playerState, setPlayerState } = useStudio();
-  const captions: CaptionCue[] = playerState.inputProps?.captions || [];
+  const { playerState, controller } = useStudio();
+  const captions: CaptionCue[] = playerState.captions || [];
 
   const handleFileUpload = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -32,13 +32,19 @@ export const CaptionsPanel: React.FC = () => {
       if (text) {
         try {
           const cues = parseSrt(text);
-          setPlayerState((prev) => ({
-            ...prev,
-            inputProps: {
-              ...prev.inputProps,
-              captions: cues
+
+          if (controller) {
+            // Attempt to use DirectController's instance if available
+            if ('instance' in controller && typeof (controller as any).instance.setCaptions === 'function') {
+              (controller as any).instance.setCaptions(cues);
+            } else {
+              // Fallback to inputProps
+              controller.setInputProps({
+                ...playerState.inputProps,
+                captions: cues
+              });
             }
-          }));
+          }
         } catch (err) {
           console.error("Failed to parse SRT", err);
           alert("Failed to parse SRT file.");
@@ -51,13 +57,16 @@ export const CaptionsPanel: React.FC = () => {
   };
 
   const handleClear = () => {
-      setPlayerState((prev) => ({
-          ...prev,
-          inputProps: {
-              ...prev.inputProps,
-              captions: []
-          }
-      }));
+      if (controller) {
+        if ('instance' in controller && typeof (controller as any).instance.setCaptions === 'function') {
+          (controller as any).instance.setCaptions([]);
+        } else {
+          controller.setInputProps({
+            ...playerState.inputProps,
+            captions: []
+          });
+        }
+      }
   };
 
   return (
