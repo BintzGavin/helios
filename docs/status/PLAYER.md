@@ -1,4 +1,4 @@
-**Version**: 0.19.0
+**Version**: 0.19.1
 
 # Status: PLAYER
 
@@ -26,6 +26,7 @@
 ## Critical Task
 - **None**: Recent task completed.
 
+[v0.19.1] ✅ Completed: Verify WebM Export - Verified that WebM export functionality works correctly by running tests and ensuring dependencies are installed.
 [v0.19.0] ✅ Completed: Implement Standard Media API - Implemented standard media properties (currentTime, duration, etc.) and events (play, pause, timeupdate) for improved interoperability.
 [v0.18.0] ✅ Completed: WebM Export - Implemented `export-format` attribute to support WebM (VP9/Opus) video export alongside MP4.
 [v0.17.1] ✅ Completed: Touch Support - Added touch event listeners to the scrubber to support smooth seeking on mobile devices.
