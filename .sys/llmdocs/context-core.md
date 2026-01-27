@@ -33,7 +33,9 @@ packages/core/src/
 ├── sequencing.test.ts
 ├── sequencing.ts
 ├── signals.test.ts
-└── signals.ts
+├── signals.ts
+├── timecode.test.ts
+└── timecode.ts
 
 ## C. Type Definitions
 
@@ -123,7 +125,8 @@ export enum HeliosErrorCode {
   INVALID_SRT_FORMAT = 'INVALID_SRT_FORMAT',
   INVALID_INPUT_PROPS = 'INVALID_INPUT_PROPS',
   INVALID_RESOLUTION = 'INVALID_RESOLUTION',
-  INVALID_COLOR_FORMAT = 'INVALID_COLOR_FORMAT'
+  INVALID_COLOR_FORMAT = 'INVALID_COLOR_FORMAT',
+  INVALID_TIMECODE_FORMAT = 'INVALID_TIMECODE_FORMAT'
 }
 ```
 
@@ -180,4 +183,13 @@ export class Helios {
   public bindToDocumentTimeline(): void;
   public unbindFromDocumentTimeline(): void;
 }
+```
+
+## E. Exported Utilities
+
+```typescript
+// packages/core/src/timecode.ts
+export function framesToTimecode(frame: number, fps: number): string;
+export function timecodeToFrames(timecode: string, fps: number): number;
+export function framesToTimestamp(frame: number, fps: number): string;
 ```

@@ -1,5 +1,8 @@
 # CORE Progress Log
 
+## CORE v1.29.0
+- ✅ Completed: Implement Timecode Utilities - Implemented `framesToTimecode`, `timecodeToFrames`, and `framesToTimestamp` utilities.
+
 ## CORE v1.28.0
 - ✅ Completed: Implement Dynamic Timing - Implemented `setDuration` and `setFps` methods in `Helios` class, allowing runtime updates to composition timing.
 
