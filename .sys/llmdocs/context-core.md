@@ -1,36 +1,44 @@
-# Core Context
+# Context: Core
 
 ## A. Architecture
 
-The `packages/core` module is the heart of the Helios system. It implements a **Helios State Machine** pattern.
-
-- **Store**: The `Helios` class holds the state (`currentFrame`, `isPlaying`, `inputProps`, `playbackRate`, `volume`, `muted`, `activeCaptions`, `width`, `height`) using **Signals** (observable state primitives).
-- **Actions**: Methods like `play()`, `pause()`, `seek()`, `setInputProps()`, `setAudioVolume()`, `setCaptions()`, `setSize()` modify the state.
-- **Subscribers**: The UI (Studio, Player) and Drivers subscribe to state changes to update the DOM or other outputs.
-- **Drivers**: `TimeDriver` implementations (like `DomDriver`) synchronize the internal timeline with external systems (like WAAPI or HTMLMediaElements). `DomDriver` supports relative audio mixing, preserving user-set volume levels while applying master scaling.
-- **Ticker**: A `Ticker` (RafTicker or TimeoutTicker) drives the frame advancement loop when playing.
-- **Schema**: An optional `HeliosSchema` defines the structure and types of `inputProps` for validation.
+The Core package follows the "Helios State Machine" pattern:
+1.  **Store**: Reactive state using lightweight Signals (`currentFrame`, `isPlaying`, etc.).
+2.  **Actions**: Public methods (`play`, `seek`, `setInputProps`) that mutate state.
+3.  **Subscribers**: External consumers (Renderer, Player) subscribe to state changes or frames.
+4.  **Drivers**: Abstracted time control via `TimeDriver` (DOM-based, WAAPI-based, or Noop).
 
 ## B. File Tree
 
-```
 packages/core/src/
-├── animation.ts       # Animation helpers (spring, interpolate)
-├── captions.ts        # SRT parsing, serialization, and cue helpers
-├── color.ts           # Color parsing and interpolation
-├── drivers/           # TimeDriver implementations (DomDriver, etc.)
-├── easing.ts          # Easing functions
-├── errors.ts          # Structured Error Handling
-├── index.ts           # Public API entry point (Helios class)
-├── random.ts          # Deterministic PRNG
-├── schema.ts          # Schema definition and validation
-├── sequencing.ts      # Sequencing helpers (sequence, series)
-└── signals.ts         # Signal/Effect implementation
-```
+├── drivers/
+├── animation.test.ts
+├── animation.ts
+├── audio.test.ts
+├── captions.test.ts
+├── captions.ts
+├── color.test.ts
+├── color.ts
+├── easing.test.ts
+├── easing.ts
+├── errors.ts
+├── index-signals.test.ts
+├── index.test.ts
+├── index.ts
+├── node-runtime.test.ts
+├── random.test.ts
+├── random.ts
+├── schema.test.ts
+├── schema.ts
+├── sequencing.test.ts
+├── sequencing.ts
+├── signals.test.ts
+└── signals.ts
 
 ## C. Type Definitions
 
 ```typescript
+// packages/core/src/index.ts
 export type HeliosState = {
   width: number;
   height: number;
@@ -46,21 +54,6 @@ export type HeliosState = {
 };
 
 export type HeliosSubscriber = (state: HeliosState) => void;
-
-export type PropType = 'string' | 'number' | 'boolean' | 'object' | 'array' | 'color';
-
-export interface PropDefinition {
-  type: PropType;
-  optional?: boolean;
-  default?: any;
-  minimum?: number;
-  maximum?: number;
-  enum?: (string | number)[];
-  label?: string;
-  description?: string;
-}
-
-export type HeliosSchema = Record<string, PropDefinition>;
 
 export interface HeliosOptions {
   width?: number;
@@ -87,6 +80,23 @@ export interface DiagnosticReport {
   userAgent: string;
 }
 
+// packages/core/src/schema.ts
+export type PropType = 'string' | 'number' | 'boolean' | 'object' | 'array' | 'color';
+
+export interface PropDefinition {
+  type: PropType;
+  optional?: boolean;
+  default?: any;
+  minimum?: number;
+  maximum?: number;
+  enum?: (string | number)[];
+  label?: string;
+  description?: string;
+}
+
+export type HeliosSchema = Record<string, PropDefinition>;
+
+// packages/core/src/captions.ts
 export interface CaptionCue {
   id: string;
   startTime: number; // in milliseconds
@@ -94,65 +104,32 @@ export interface CaptionCue {
   text: string;
 }
 
-export type ExtrapolateType = 'extend' | 'clamp' | 'identity';
-
-export interface InterpolateOptions {
-  extrapolateLeft?: ExtrapolateType;
-  extrapolateRight?: ExtrapolateType;
-  easing?: (t: number) => number;
+// packages/core/src/signals.ts
+export interface ReadonlySignal<T> {
+  readonly value: T;
+  peek(): T;
+  subscribe(fn: (value: T) => void): () => void;
 }
 
-export interface SpringConfig {
-  mass?: number;
-  stiffness?: number;
-  damping?: number;
-  overshootClamping?: boolean;
-}
-
-export interface SpringOptions {
-  frame: number;
-  fps: number;
-  config?: SpringConfig;
-  from?: number;
-  to?: number;
-  durationInFrames?: number;
-}
-
-export interface SequenceOptions {
-  frame: number;
-  from: number;
-  durationInFrames?: number;
-}
-
-export interface SequenceResult {
-  localFrame: number;
-  relativeFrame: number;
-  progress: number;
-  isActive: boolean;
-}
-
-export interface SeriesItem {
-  durationInFrames: number;
-  offset?: number;
-}
-
-export interface RgbaColor {
-  r: number;
-  g: number;
-  b: number;
-  a: number;
+// packages/core/src/errors.ts
+export enum HeliosErrorCode {
+  INVALID_DURATION = 'INVALID_DURATION',
+  INVALID_FPS = 'INVALID_FPS',
+  INVALID_INPUT_RANGE = 'INVALID_INPUT_RANGE',
+  INVALID_OUTPUT_RANGE = 'INVALID_OUTPUT_RANGE',
+  UNSORTED_INPUT_RANGE = 'UNSORTED_INPUT_RANGE',
+  INVALID_SPRING_CONFIG = 'INVALID_SPRING_CONFIG',
+  INVALID_SRT_FORMAT = 'INVALID_SRT_FORMAT',
+  INVALID_INPUT_PROPS = 'INVALID_INPUT_PROPS',
+  INVALID_RESOLUTION = 'INVALID_RESOLUTION',
+  INVALID_COLOR_FORMAT = 'INVALID_COLOR_FORMAT'
 }
 ```
 
 ## D. Public Methods
 
 ```typescript
-class Helios {
-  // Properties
-  public readonly duration: number;
-  public readonly fps: number;
-  public readonly schema?: HeliosSchema;
-
+export class Helios {
   // Readonly Signals
   public get currentFrame(): ReadonlySignal<number>;
   public get isPlaying(): ReadonlySignal<boolean>;
@@ -171,10 +148,10 @@ class Helios {
   constructor(options: HeliosOptions);
   public dispose(): void;
 
-  // Accessors
+  // State Access
   public getState(): Readonly<HeliosState>;
 
-  // State Modifiers
+  // Actions
   public setSize(width: number, height: number): void;
   public setInputProps(props: Record<string, any>): void;
   public setPlaybackRate(rate: number): void;
@@ -191,57 +168,8 @@ class Helios {
   public pause(): void;
   public seek(frame: number): void;
 
-  // Timeline Synchronization
+  // Timeline Binding
   public bindToDocumentTimeline(): void;
   public unbindFromDocumentTimeline(): void;
 }
-```
-
-## E. Public Utilities
-
-```typescript
-/**
- * Generates a deterministic random number between 0 and 1 based on a seed.
- */
-export function random(seed: number | string): number;
-
-/**
- * Maps an input value within a range to an output value.
- */
-export function interpolate(
-  input: number,
-  inputRange: number[],
-  outputRange: number[],
-  options?: InterpolateOptions
-): number;
-
-/**
- * Parses a color string into an RGBA object.
- */
-export function parseColor(color: string): RgbaColor;
-
-/**
- * Interpolates between colors based on an input value.
- */
-export function interpolateColors(
-  input: number,
-  inputRange: number[],
-  outputRange: string[],
-  options?: InterpolateOptions
-): string;
-
-/**
- * Calculates the value of a spring physics simulation.
- */
-export function spring(options: SpringOptions): number;
-
-/**
- * Calculates the local time and progress of a sequence relative to a start frame.
- */
-export function sequence(options: SequenceOptions): SequenceResult;
-
-/**
- * Calculates a sequence of start frames for a list of items.
- */
-export function series<T extends SeriesItem>(items: T[], startFrame?: number): (T & { from: number })[];
 ```
