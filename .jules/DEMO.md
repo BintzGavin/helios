@@ -51,3 +51,7 @@
 ## [1.31.0] - D3 Integration Architecture
 **Learning:** Integrating D3.js requires bypassing its internal timer-based transitions (`d3.transition()`) because they drift from Helios's frame clock. The correct pattern is to drive D3 selections directly via `helios.subscribe()`.
 **Action:** Created `examples/d3-animation` plan with explicit instructions to use `helios.subscribe` instead of D3 transitions.
+
+## [v1.34.0] - Tailwind Shared Config
+**Learning:** Adding Tailwind support requires modifying root `package.json` and adding `postcss.config.js` to the root, which affects the shared build pipeline.
+**Action:** Scoped `tailwind.config.js` content strictly to the example directory to prevent side effects on other examples, and accepted the root dependency addition as necessary for "Use What You Know" support.
