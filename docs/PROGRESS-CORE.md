@@ -1,5 +1,8 @@
 # CORE Progress Log
 
+## CORE v1.28.0
+- ✅ Completed: Implement Dynamic Timing - Implemented `setDuration` and `setFps` methods in `Helios` class, allowing runtime updates to composition timing.
+
 ## CORE v1.27.0
 - ✅ Completed: Expose Captions - Exposed full caption list in `HeliosState` and enabled array input for captions in constructor and `setCaptions`.
 
