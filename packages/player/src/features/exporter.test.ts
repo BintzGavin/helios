@@ -69,6 +69,17 @@ class MockAudioData {
 }
 vi.stubGlobal('AudioData', MockAudioData);
 
+// Spies for GainNode
+const gainNodes: any[] = [];
+const createGainSpy = vi.fn().mockImplementation(() => {
+    const node = {
+        gain: { value: 1 },
+        connect: vi.fn()
+    };
+    gainNodes.push(node);
+    return node;
+});
+
 // Mock OfflineAudioContext
 class MockOfflineAudioContext {
     createBufferSource = vi.fn().mockReturnValue({
@@ -76,6 +87,7 @@ class MockOfflineAudioContext {
         connect: vi.fn(),
         start: vi.fn()
     });
+    createGain = createGainSpy;
     destination = {};
     decodeAudioData = vi.fn().mockResolvedValue({
         length: 100,
@@ -117,6 +129,7 @@ describe('ClientSideExporter', () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
+        gainNodes.length = 0; // Clear gain nodes
         // Reset default implementation
         (VideoEncoder.isConfigSupported as any).mockResolvedValue(true);
 
@@ -288,5 +301,22 @@ describe('ClientSideExporter', () => {
         await expect(exporter.export({ onProgress, signal, mode: 'canvas' }))
             .rejects
             .toThrow(/Unsupported VideoEncoder config/);
+    });
+
+    it('should apply volume and mute settings to audio export', async () => {
+        const onProgress = vi.fn();
+        const signal = new AbortController().signal;
+
+        (mockController.getAudioTracks as any).mockResolvedValue([
+            { buffer: new ArrayBuffer(8), mimeType: 'audio/mp3', volume: 0.5, muted: false },
+            { buffer: new ArrayBuffer(8), mimeType: 'audio/mp3', volume: 1, muted: true }
+        ]);
+
+        await exporter.export({ onProgress, signal, mode: 'canvas', format: 'mp4' });
+
+        expect(createGainSpy).toHaveBeenCalledTimes(2);
+        expect(gainNodes).toHaveLength(2);
+        expect(gainNodes[0].gain.value).toBe(0.5);
+        expect(gainNodes[1].gain.value).toBe(0);
     });
 });

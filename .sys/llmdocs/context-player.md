@@ -6,7 +6,7 @@ The `@helios-project/player` package provides the `<helios-player>` Web Componen
 ## Architecture
 - **Web Component**: `<helios-player>` (Shadow DOM)
 - **Controller**: `HeliosController` (Interface for `DirectController` and `BridgeController`)
-- **Exporter**: `ClientSideExporter` (WebCodecs-based export)
+- **Exporter**: `ClientSideExporter` (WebCodecs-based export, supports Canvas/DOM modes, MP4/WebM formats, and audio mixing with volume control)
 - **Bridge**: `postMessage` protocol for cross-origin communication
 
 ## Component Structure

@@ -1,5 +1,8 @@
 # PLAYER Progress Log
 
+## PLAYER v0.20.0
+- ✅ Completed: Client Side Audio Volume - Updated exporter to respect `volume` and `muted` attributes of audio elements during client-side export.
+
 ## PLAYER v0.19.1
 - ✅ Completed: Verify WebM Export - Verified that WebM export functionality works correctly by running tests and ensuring dependencies are installed.
 
