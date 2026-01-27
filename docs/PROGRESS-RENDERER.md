@@ -1,7 +1,10 @@
 # RENDERER Progress Log
 
+## RENDERER v1.26.0
+- ✅ Completed: SeekTimeDriver Media Sync - Verified and tested synchronization of <video> and <audio> elements in SeekTimeDriver, ensuring media aligns with the timeline by pausing and setting currentTime.
+
 ## RENDERER v1.25.0
-- ✅ Completed: SeekTimeDriver Media Sync - Implemented synchronization of <video> and <audio> elements in SeekTimeDriver by manually pausing and seeking them to the target virtual time, ensuring media aligns with the timeline.
+- ✅ Completed: Implement Caption Burning - Implemented `videoCodec: 'libx264'` check to enable `subtitles` filter in FFmpeg for caption burning, while throwing clear error if incompatible 'copy' codec is used.
 
 ## RENDERER v1.24.2
 - ✅ Completed: Refactor Smart Codec Selection Types - Fixed implicit `any` types in `CanvasStrategy.ts` and updated verification script `verify-smart-codec-selection.ts` to match expected data structure, ensuring robust type safety and test correctness.
