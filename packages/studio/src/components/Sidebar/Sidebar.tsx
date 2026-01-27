@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
+import { useStudio } from '../../context/StudioContext';
 import './Sidebar.css';
 import { AssetsPanel } from '../AssetsPanel/AssetsPanel';
 import { RendersPanel } from '../RendersPanel/RendersPanel';
 import { CaptionsPanel } from '../CaptionsPanel/CaptionsPanel';
 
 export const Sidebar: React.FC = () => {
+  const { setHelpOpen } = useStudio();
   const [activeTab, setActiveTab] = useState<'assets' | 'renders' | 'captions'>('assets');
 
   return (
@@ -33,6 +35,15 @@ export const Sidebar: React.FC = () => {
         {activeTab === 'assets' && <AssetsPanel />}
         {activeTab === 'captions' && <CaptionsPanel />}
         {activeTab === 'renders' && <RendersPanel />}
+      </div>
+      <div className="sidebar-footer">
+        <button
+          className="sidebar-help-button"
+          onClick={() => setHelpOpen(true)}
+          title="Keyboard Shortcuts (?)"
+        >
+          ?
+        </button>
       </div>
     </div>
   );
