@@ -33,6 +33,7 @@
 - `export-mode`: `auto` | `canvas` | `dom` (default: `auto`).
 - `canvas-selector`: CSS selector for the canvas element (default: `canvas`).
 - `export-format`: `mp4` | `webm` (default: `mp4`).
+- `input-props`: JSON string of dynamic properties to pass to the composition.
 
 ## 3. Interfaces & Public API
 

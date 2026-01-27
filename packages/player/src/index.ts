@@ -290,6 +290,7 @@ export class HeliosPlayer extends HTMLElement {
   private isScrubbing: boolean = false;
   private wasPlayingBeforeScrub: boolean = false;
   private lastState: any = null;
+  private pendingProps: Record<string, any> | null = null;
 
   // --- Standard Media API ---
 
@@ -379,7 +380,7 @@ export class HeliosPlayer extends HTMLElement {
   }
 
   static get observedAttributes() {
-    return ["src", "width", "height", "autoplay", "loop", "controls", "export-format"];
+    return ["src", "width", "height", "autoplay", "loop", "controls", "export-format", "input-props"];
   }
 
   constructor() {
@@ -422,6 +423,29 @@ export class HeliosPlayer extends HTMLElement {
 
     if (name === "width" || name === "height") {
       this.updateAspectRatio();
+    }
+
+    if (name === "input-props") {
+      try {
+        const props = JSON.parse(newVal);
+        this.pendingProps = props;
+        if (this.controller) {
+          this.controller.setInputProps(props);
+        }
+      } catch (e) {
+        console.warn("HeliosPlayer: Invalid JSON in input-props", e);
+      }
+    }
+  }
+
+  public get inputProps(): Record<string, any> | null {
+    return this.pendingProps;
+  }
+
+  public set inputProps(val: Record<string, any> | null) {
+    this.pendingProps = val;
+    if (this.controller && val) {
+      this.controller.setInputProps(val);
     }
   }
 
@@ -581,6 +605,10 @@ export class HeliosPlayer extends HTMLElement {
 
       this.controller = controller;
       this.setControlsDisabled(false);
+
+      if (this.pendingProps) {
+        this.controller.setInputProps(this.pendingProps);
+      }
 
       const state = this.controller.getState();
       if (state) {

@@ -1,5 +1,11 @@
 # PLAYER Progress Log
 
+## PLAYER v0.23.0
+- ✅ Completed: Implement Input Props - Implemented `input-props` attribute/property on `<helios-player>` to pass dynamic data to the composition controller.
+
+## PLAYER v0.22.0
+- ✅ Completed: Export Burn-In Captions - Implemented caption rendering (burn-in) for client-side export using intermediate OffscreenCanvas.
+
 ## PLAYER v0.21.0
 - ✅ Completed: Video Inlining - Implemented `inlineVideos` to capture `<video>` elements as images during client-side export, ensuring visual fidelity.
 
