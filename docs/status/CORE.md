@@ -1,11 +1,12 @@
 # Status: CORE
 
-**Version**: 1.26.0
+**Version**: 1.26.1
 
 - **Status**: Active
 - **Current Focus**: Maintenance and Optimization
-- **Last Updated**: 2026-03-03
+- **Last Updated**: 2026-03-14
 
+[v1.26.1] ✅ Completed: Verify Core Package Integrity - Verified build, tests, and artifacts for `packages/core`.
 [v1.26.0] ✅ Completed: Implement Initial Frame - Added `initialFrame` to `HeliosOptions` and updated constructor to initialize state and sync driver, enabling HMR state preservation.
 [v1.25.0] ✅ Completed: Implement Color Interpolation - Implemented `interpolateColors` and `parseColor` utilities supporting Hex, RGB, and HSL formats.
 [v1.24.0] ✅ Completed: Implement Relative Audio Mixing - Implemented relative volume and mute handling in `DomDriver`, allowing master volume/mute to mix with user-set values instead of overriding them.
