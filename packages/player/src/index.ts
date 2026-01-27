@@ -1081,7 +1081,8 @@ export class HeliosPlayer extends HTMLElement {
             signal: this.abortController.signal,
             mode: exportMode,
             canvasSelector: canvasSelector,
-            format: exportFormat
+            format: exportFormat,
+            includeCaptions: this.showCaptions
         });
     } catch (e: any) {
         if (e.message !== "Export aborted") {

@@ -16,8 +16,9 @@ export class ClientSideExporter {
     mode?: 'auto' | 'canvas' | 'dom';
     canvasSelector?: string;
     format?: 'mp4' | 'webm';
+    includeCaptions?: boolean;
   }): Promise<void> {
-    const { onProgress, signal, mode = 'auto', canvasSelector = 'canvas', format = 'mp4' } = options;
+    const { onProgress, signal, mode = 'auto', canvasSelector = 'canvas', format = 'mp4', includeCaptions = true } = options;
 
     console.log(`Client-side rendering started! Format: ${format}`);
     this.controller.pause();
@@ -205,7 +206,7 @@ export class ClientSideExporter {
 
       // Encode first frame
       let frameToEncode = firstFrame;
-      if (firstCaptions && firstCaptions.length > 0) {
+      if (includeCaptions && firstCaptions && firstCaptions.length > 0) {
           frameToEncode = await this.drawCaptions(firstFrame, firstCaptions);
           firstFrame.close();
       }
@@ -233,7 +234,7 @@ export class ClientSideExporter {
         const keyFrame = i % (state.fps * 2) === 0;
 
         let finalFrame = videoFrame;
-        if (captions && captions.length > 0) {
+        if (includeCaptions && captions && captions.length > 0) {
              finalFrame = await this.drawCaptions(videoFrame, captions);
              videoFrame.close();
         }
@@ -290,26 +291,45 @@ export class ClientSideExporter {
 
       // Responsive font size (approx 5% of height)
       const fontSize = Math.max(16, Math.round(height * 0.05));
+      const padding = fontSize * 0.5;
+      const lineHeight = fontSize * 1.2;
+      const bottomMargin = height * 0.05;
+
       ctx.font = `${fontSize}px sans-serif`;
       ctx.textAlign = 'center';
-      ctx.textBaseline = 'bottom';
+      ctx.textBaseline = 'top'; // Easier for multiline calc
 
-      captions.forEach(cue => {
-          const text = cue.text;
-          const x = width / 2;
-          const y = height - (height * 0.05);
+      // Stack from bottom up
+      let currentBottomY = height - bottomMargin;
 
-          // Background for better visibility
-          const metrics = ctx!.measureText(text);
-          const bgHeight = fontSize * 1.4;
-          const bgWidth = metrics.width + (fontSize * 1.0);
+      // Reverse captions so we process from bottom-most (last) to top-most
+      const reversedCaptions = [...captions].reverse();
+
+      reversedCaptions.forEach(cue => {
+          const lines = cue.text.split('\n');
+          const cueHeight = lines.length * lineHeight + (padding * 2);
+
+          let maxLineWidth = 0;
+          lines.forEach(line => {
+             const m = ctx!.measureText(line);
+             if (m.width > maxLineWidth) maxLineWidth = m.width;
+          });
+
+          const bgWidth = maxLineWidth + (fontSize * 1.0);
+          const bgTopY = currentBottomY - cueHeight;
 
           ctx!.fillStyle = 'rgba(0, 0, 0, 0.7)';
           // Centered background rect
-          ctx!.fillRect(x - bgWidth / 2, y - bgHeight + (bgHeight * 0.25), bgWidth, bgHeight);
+          ctx!.fillRect((width / 2) - (bgWidth / 2), bgTopY, bgWidth, cueHeight);
 
           ctx!.fillStyle = 'white';
-          ctx!.fillText(text, x, y);
+          lines.forEach((line, i) => {
+              const y = bgTopY + padding + (i * lineHeight);
+              ctx!.fillText(line, width / 2, y);
+          });
+
+          // Move up for next cue
+          currentBottomY -= (cueHeight + 4);
       });
 
       return new VideoFrame(canvas, { timestamp: frame.timestamp });

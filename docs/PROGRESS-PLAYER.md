@@ -1,5 +1,8 @@
 # PLAYER Progress Log
 
+## PLAYER v0.25.1
+- ✅ Completed: Refine Burn-In Captions - Added multiline caption support and respect for player caption visibility toggle during client-side export.
+
 ## PLAYER v0.25.0
 - ✅ Completed: Responsive Controls - Implemented `ResizeObserver` to adapt player controls for smaller widths (compact/tiny modes) to prevent overflow.
 
