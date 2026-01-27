@@ -55,3 +55,7 @@
 ## [v1.34.0] - Tailwind Shared Config
 **Learning:** Adding Tailwind support requires modifying root `package.json` and adding `postcss.config.js` to the root, which affects the shared build pipeline.
 **Action:** Scoped `tailwind.config.js` content strictly to the example directory to prevent side effects on other examples, and accepted the root dependency addition as necessary for "Use What You Know" support.
+
+## [v1.36.0] - File Path Permissions
+**Learning:** Writing to absolute paths starting with `/` (e.g. `/.sys/plans/...`) fails with permission denied. Must use relative paths (e.g. `.sys/plans/...`) or `./`.
+**Action:** Always use relative paths when creating plan files.
