@@ -23,10 +23,14 @@ The SKILLS agent (unified planning/execution) runs **once per day** to maintain 
 ### Daily: LLM Context Maintenance
 The LLMS agent (unified planning/execution) runs **once per day** to maintain the `llms.txt` file—a standardized LLM-facing overview document that helps AI assistants quickly understand the project. The LLMS agent ensures this file stays synchronized with the codebase, with accurate API examples, current roadmap status, and valid file paths.
 
+### Daily: Refactoring Review
+The REFACTOR agent (planning-only) runs **once per day** to identify technical debt, code smells, and refactoring opportunities across all domains using the Red-Green-Refactor methodology. It creates detailed plans in `/.sys/plans/refactor/` and updates the backlog—but **never writes code**. Domain owners (CORE, RENDERER, PLAYER, DEMO, STUDIO execution agents) pick up and implement these plans as time allows.
+
 **Cycle**: Planning (1h) → Execution (1h) → Planning (1h) → Execution (1h) → ... (continuous loop)
 **Documentation**: DOCS runs once daily for comprehensive user-facing documentation review
 **Skills**: SKILLS runs once daily for comprehensive agent-facing skills maintenance
 **LLMS**: LLMS runs once daily for comprehensive llms.txt maintenance
+**Refactoring**: REFACTOR runs once daily for technical debt identification and planning
 
 ## Scheduling & Autonomy
 
@@ -58,6 +62,7 @@ The system uses individual prompts for each agent role:
 - **[Documentation Prompt](./docs.md)** - Unified prompt for user-facing documentation agent (no planning/execution separation)
 - **[Skills Prompt](./skills.md)** - Unified prompt for agent-facing skills agent (no planning/execution separation)
 - **[LLMS Prompt](./llms.md)** - Unified prompt for llms.txt maintainer (no planning/execution separation)
+- **[Refactor Prompt](./refactor.md)** - Planning-only agent for identifying technical debt and creating refactoring roadmaps using Red-Green-Refactor methodology (domain owners implement)
 - **[Role Definitions](./roles.md)** - Domain-specific role configurations (reference only)
 
 **Note**: 
@@ -66,7 +71,8 @@ The system uses individual prompts for each agent role:
 - The DOCS agent runs **once per day** to perform a comprehensive review and update of all user-facing documentation, ensuring the entire documentation site stays synchronized with the codebase.
 - The SKILLS agent runs **once per day** to maintain agent-facing skills, ensuring AI agents can effectively use Helios APIs with specialized, LLM-optimized guidance.
 - The LLMS agent runs **once per day** to maintain the `llms.txt` file, ensuring AI assistants can quickly and accurately understand the project's capabilities, APIs, and structure.
-- Each role maintains its own semantic version (e.g., CORE: 1.2.3, DOCS: 2.1.0, SKILLS: 1.0.0, LLMS: 1.0.0) instead of using timestamps, which are unreliable in agent workflows.
+- The REFACTOR agent runs **once per day** to identify technical debt and create refactoring plans using Red-Green-Refactor methodology. It only updates markdown files and roadmaps—domain owners implement the actual code changes.
+- Each role maintains its own semantic version (e.g., CORE: 1.2.3, DOCS: 2.1.0, SKILLS: 1.0.0, LLMS: 1.0.0, REFACTOR: 1.0.0) instead of using timestamps, which are unreliable in agent workflows.
 
 ## Design Principles
 

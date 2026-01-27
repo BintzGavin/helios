@@ -37,3 +37,7 @@
 - [x] Implement Studio UI (Timeline, Props).
 - [x] Implement CLI integration.
 - [x] Implement Asset Discovery (Backend & UI).
+
+### 8. Refactoring
+<!-- Managed by REFACTOR agent. Domain owners pick up tasks as time allows. -->
+<!-- Format: - [ ] [DOMAIN] [Priority]: [Task description] (Plan: .sys/plans/refactor/[file].md) -->
