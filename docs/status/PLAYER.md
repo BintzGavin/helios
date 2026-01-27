@@ -1,4 +1,4 @@
-**Version**: 0.20.0
+**Version**: 0.20.1
 
 # Status: PLAYER
 
@@ -27,6 +27,7 @@
 ## Critical Task
 - **None**: Recent task completed.
 
+[v0.20.1] ✅ Completed: Project Cleanup - Added explicit `vitest` dependency and removed obsolete plan file.
 [v0.20.0] ✅ Completed: Client Side Audio Volume - Updated exporter to respect `volume` and `muted` attributes of audio elements during client-side export.
 [v0.19.1] ✅ Completed: Verify WebM Export - Verified that WebM export functionality works correctly by running tests and ensuring dependencies are installed.
 [v0.19.0] ✅ Completed: Implement Standard Media API - Implemented standard media properties (currentTime, duration, etc.) and events (play, pause, timeupdate) for improved interoperability.

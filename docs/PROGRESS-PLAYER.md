@@ -1,5 +1,8 @@
 # PLAYER Progress Log
 
+## PLAYER v0.20.1
+- ✅ Completed: Project Cleanup - Added explicit `vitest` dependency and removed obsolete plan file.
+
 ## PLAYER v0.20.0
 - ✅ Completed: Client Side Audio Volume - Updated exporter to respect `volume` and `muted` attributes of audio elements during client-side export.
 
