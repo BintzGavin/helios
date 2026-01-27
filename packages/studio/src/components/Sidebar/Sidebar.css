@@ -42,3 +42,32 @@
   overflow: hidden;
   position: relative;
 }
+
+.sidebar-footer {
+  padding: 8px;
+  border-top: 1px solid #333;
+  display: flex;
+  justify-content: flex-end;
+  background-color: #252526;
+}
+
+.sidebar-help-button {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 1px solid #444;
+  background: none;
+  color: #888;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+
+.sidebar-help-button:hover {
+  border-color: #666;
+  color: #fff;
+  background-color: #333;
+}

@@ -7,6 +7,7 @@ import { PropsEditor } from './components/PropsEditor'
 import { PlaybackControls } from './components/Controls/PlaybackControls'
 import { StudioProvider, useStudio } from './context/StudioContext'
 import { CompositionSwitcher } from './components/CompositionSwitcher'
+import { KeyboardShortcutsModal } from './components/KeyboardShortcutsModal'
 import { useKeyboardShortcut } from './hooks/useKeyboardShortcut'
 import { Stage } from './components/Stage/Stage'
 import { Sidebar } from './components/Sidebar/Sidebar'
@@ -15,6 +16,7 @@ function AppContent() {
   const {
     activeComposition,
     setSwitcherOpen,
+    setHelpOpen,
     controller,
     playerState,
     setPlayerState,
@@ -28,6 +30,12 @@ function AppContent() {
     e.preventDefault();
     setSwitcherOpen(true);
   }, { ctrlOrCmd: true });
+
+  // Open Help with ?
+  useKeyboardShortcut('?', (e) => {
+    e.preventDefault();
+    setHelpOpen(true);
+  }, { ignoreInput: true });
 
   // Playback Shortcuts
   useKeyboardShortcut(' ', () => {
@@ -134,6 +142,7 @@ function AppContent() {
         }
       />
       <CompositionSwitcher />
+      <KeyboardShortcutsModal />
     </>
   )
 }
