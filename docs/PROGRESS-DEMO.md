@@ -69,3 +69,6 @@
 
 ## DEMO v1.39.0
 - ✅ Completed: Scaffold Audio Visualization Example - Created `examples/audio-visualization` demonstrating synchronous audio generation and visualization using Canvas.
+
+## DEMO v1.40.0
+- ✅ Completed: Scaffold Procedural Generation Example - Created `examples/procedural-generation` demonstrating deterministic `random` and `interpolateColors` utilities.
