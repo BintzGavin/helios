@@ -1,5 +1,8 @@
 # Studio Progress Log
 
+## STUDIO v0.29.0
+- ✅ Completed: Schema-Aware Props Editor - Implemented specialized UI inputs (Enum, Range, Color, Boolean) driven by `HeliosSchema`, with fallback to standard inputs.
+
 ## STUDIO v0.28.0
 - ✅ Completed: Captions Panel - Implemented SRT import panel and timeline markers for captions using Core's `parseSrt` and `inputProps` injection.
 
