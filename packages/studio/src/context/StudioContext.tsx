@@ -269,8 +269,10 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     const mode = renderConfig.mode;
 
     try {
-      const videoFrame = await controller.captureFrame(frameNumber, { mode });
-      if (!videoFrame) return;
+      const result = await controller.captureFrame(frameNumber, { mode });
+      if (!result || !result.frame) return;
+
+      const { frame: videoFrame } = result;
 
       const canvas = document.createElement('canvas');
       canvas.width = videoFrame.displayWidth;

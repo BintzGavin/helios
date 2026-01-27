@@ -1,5 +1,8 @@
 # Studio Progress Log
 
+## STUDIO v0.27.1
+- ✅ Fixed: Snapshot - Fixed type error in "Take Snapshot" implementation where `captureFrame` return value was mishandled.
+
 ## STUDIO v0.27.0
 - ✅ Completed: Snapshot - Implemented "Take Snapshot" feature in Stage Toolbar to capture and download current frame as PNG.
 

@@ -1,4 +1,4 @@
-**Version**: 0.27.0
+**Version**: 0.27.1
 
 # Studio Domain Status
 
@@ -7,6 +7,7 @@
 **Focus**: UI Implementation & CLI
 
 ## Recent Updates
+- [v0.27.1] ✅ Fixed: Snapshot - Fixed type error in "Take Snapshot" implementation where `captureFrame` return value was mishandled.
 - [v0.27.0] ✅ Completed: Snapshot - Implemented "Take Snapshot" feature in Stage Toolbar to capture and download current frame as PNG.
 - [v0.26.0] ✅ Completed: Audio Controls - Added Volume slider and Mute button to Playback Controls, updating `StudioContext` to track audio state.
 - [v0.25.0] ✅ Completed: Enhance Asset Previews - Implemented rich previews for video (hover-play), audio (click-play), and fonts (custom sample) in Assets Panel.

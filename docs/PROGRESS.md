@@ -78,6 +78,9 @@ Each agent should update **their own dedicated progress file** instead of this f
 - If this is a new version, create the section at the top of the file (after any existing content)
 - Group multiple completions under the same version section if they're part of the same release
 
+### STUDIO v0.27.1
+- ✅ Fixed: Snapshot - Fixed type error in "Take Snapshot" implementation where `captureFrame` return value was mishandled.
+
 ### SKILLS Agent
 - **Your progress file**: `docs/PROGRESS-SKILLS.md`
 - Find or create a version section: `## SKILLS vX.Y.Z`
