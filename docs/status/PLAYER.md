@@ -1,4 +1,4 @@
-**Version**: 0.20.1
+**Version**: 0.21.0
 
 # Status: PLAYER
 
@@ -21,12 +21,14 @@
 - Supports Volume and Mute controls via UI and Bridge.
 - Supports caption rendering overlay with toggleable "CC" button.
 - Supports WebM (VP9/Opus) client-side export via `export-format` attribute.
-- **New**: Implements Standard Media API (play, pause, currentTime, events) for better interoperability.
-- **New**: Client-side audio export now respects `volume` and `muted` properties of audio elements.
+- Implements Standard Media API (play, pause, currentTime, events) for better interoperability.
+- Client-side audio export respects `volume` and `muted` properties of audio elements.
+- **New**: Client-side export (DOM mode) now inlines `<video>` elements as static images, ensuring they are visible in the exported output.
 
 ## Critical Task
 - **None**: Recent task completed.
 
+[v0.21.0] ✅ Completed: Video Inlining - Implemented `inlineVideos` to capture `<video>` elements as images during client-side export, ensuring visual fidelity.
 [v0.20.1] ✅ Completed: Project Cleanup - Added explicit `vitest` dependency and removed obsolete plan file.
 [v0.20.0] ✅ Completed: Client Side Audio Volume - Updated exporter to respect `volume` and `muted` attributes of audio elements during client-side export.
 [v0.19.1] ✅ Completed: Verify WebM Export - Verified that WebM export functionality works correctly by running tests and ensuring dependencies are installed.
@@ -69,6 +71,7 @@
 - [x] Enable Image Inlining for DOM Export.
 - [x] Enable CSS Asset Inlining for DOM Export.
 - [x] Enable Canvas Inlining for DOM Export.
+- [x] Enable Video Inlining for DOM Export.
 
 [2026-01-20] ✅ Completed: Refactor Player Control Logic - Verified `<helios-player>` uses `window.helios` and supports client-side export.
 [2026-01-21] ✅ Completed: Sandbox and Bridge - Implemented `postMessage` bridge and sandboxed iframe support.

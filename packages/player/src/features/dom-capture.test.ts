@@ -271,4 +271,61 @@ describe('dom-capture', () => {
 
         document.body.removeChild(canvas);
     });
+
+    it('should inline video elements', async () => {
+        const mockDrawImage = vi.fn();
+        const mockToDataURL = vi.fn().mockReturnValue('data:image/png;base64,mockVideoData');
+
+        // We intercept createElement to return a controlled canvas
+        const originalCreateElement = document.createElement.bind(document);
+        const createElementSpy = vi.spyOn(document, 'createElement').mockImplementation((tagName: string, options?: ElementCreationOptions) => {
+             const el = originalCreateElement(tagName, options);
+             if (tagName === 'canvas') {
+                 (el as HTMLCanvasElement).getContext = vi.fn().mockReturnValue({
+                     drawImage: mockDrawImage
+                 });
+                 (el as HTMLCanvasElement).toDataURL = mockToDataURL;
+             }
+             return el;
+        });
+
+        const video = document.createElement('video');
+        // Define properties that are read-only or not set by default
+        Object.defineProperty(video, 'readyState', { value: 2, writable: true });
+        Object.defineProperty(video, 'videoWidth', { value: 300 });
+        Object.defineProperty(video, 'videoHeight', { value: 150 });
+        video.style.width = '300px';
+        video.className = 'my-video';
+
+        container.appendChild(video);
+
+        await captureDomToBitmap(container);
+
+        expect(mockDrawImage).toHaveBeenCalledWith(video, 0, 0, 300, 150);
+        expect(mockToDataURL).toHaveBeenCalled();
+
+        const blob = (URL.createObjectURL as any).mock.calls[0][0] as Blob;
+        const text = await readBlob(blob);
+
+        expect(text).toContain('data:image/png;base64,mockVideoData');
+        expect(text).toContain('<img');
+        expect(text).toContain('class="my-video"');
+        expect(text).not.toContain('<video');
+
+        createElementSpy.mockRestore();
+    });
+
+    it('should skip inlining video if not ready', async () => {
+        const video = document.createElement('video');
+        Object.defineProperty(video, 'readyState', { value: 0, writable: true }); // HAVE_NOTHING
+        container.appendChild(video);
+
+        await captureDomToBitmap(container);
+
+        const blob = (URL.createObjectURL as any).mock.calls[0][0] as Blob;
+        const text = await readBlob(blob);
+
+        // Should still contain video tag
+        expect(text).toContain('<video');
+    });
 });
