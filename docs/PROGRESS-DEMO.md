@@ -48,3 +48,6 @@
 
 ## DEMO v1.29.0
 - ✅ Completed: Scaffold React CSS Animation Example - Created `examples/react-css-animation` demonstrating standard CSS animations with `autoSyncAnimations: true`.
+
+## DEMO v1.30.0
+- ✅ Completed: Scaffold Dynamic Props Example - Created `examples/dynamic-props-animation` demonstrating `inputProps` and `schema` validation with a React frontend.

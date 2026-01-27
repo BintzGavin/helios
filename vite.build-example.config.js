@@ -35,6 +35,7 @@ export default defineConfig({
         motion_one: resolve(__dirname, "examples/motion-one-animation/composition.html"),
         captions_animation: resolve(__dirname, "examples/captions-animation/composition.html"),
         signals_animation: resolve(__dirname, "examples/signals-animation/composition.html"),
+        dynamic_props: resolve(__dirname, "examples/dynamic-props-animation/composition.html"),
       },
     },
   },

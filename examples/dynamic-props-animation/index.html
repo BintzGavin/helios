@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Helios Dynamic Props Example</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background-color: #f4f4f9;
+      margin: 0;
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    h1 {
+      color: #333;
+    }
+    helios-player {
+      width: 80%;
+      max-width: 600px;
+      aspect-ratio: 1 / 1;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Helios Dynamic Props Demo</h1>
+
+  <helios-player
+    src="./composition.html"
+    duration="5"
+    fps="30">
+  </helios-player>
+
+  <script type="module" src="../../packages/player/src/index.ts"></script>
+
+</body>
+</html>
