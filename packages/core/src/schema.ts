@@ -1,6 +1,16 @@
 import { HeliosError, HeliosErrorCode } from './errors';
 
-export type PropType = 'string' | 'number' | 'boolean' | 'object' | 'array' | 'color';
+export type PropType =
+  | 'string'
+  | 'number'
+  | 'boolean'
+  | 'object'
+  | 'array'
+  | 'color'
+  | 'image'
+  | 'video'
+  | 'audio'
+  | 'font';
 
 export interface PropDefinition {
   type: PropType;
@@ -41,8 +51,13 @@ export function validateProps(props: Record<string, any>, schema?: HeliosSchema)
     if (def.type === 'boolean' && typeof val !== 'boolean') throwError(key, 'boolean');
     if (def.type === 'array' && !Array.isArray(val)) throwError(key, 'array');
     if (def.type === 'object' && (typeof val !== 'object' || Array.isArray(val) || val === null)) throwError(key, 'object');
-    // Color is treated as string for runtime check
-    if (def.type === 'color' && typeof val !== 'string') throwError(key, 'color (string)');
+    // Color and Assets are treated as strings for runtime check
+    if (
+      ['color', 'image', 'video', 'audio', 'font'].includes(def.type) &&
+      typeof val !== 'string'
+    ) {
+      throwError(key, `${def.type} (string)`);
+    }
 
     // Enum Check
     if (def.enum && !def.enum.includes(val)) {

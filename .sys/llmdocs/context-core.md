@@ -1,58 +1,83 @@
-# CORE Domain Context
+# Core Context
 
 ## A. Architecture
 
-The **Helios State Machine** follows a "Store -> Actions -> Subscribers" pattern:
-
-- **Store**: The `Helios` class maintains internal reactive state using signals (e.g., `_currentFrame`, `_isPlaying`, `_inputProps`). This ensures thread-safe and consistent state updates.
-- **Actions**: Public methods (e.g., `seek`, `play`, `setInputProps`) modify these signals and coordinate side effects. This often involves invoking the configured `TimeDriver` to synchronize external systems (like DOM elements or WAAPI animations).
-- **Subscribers**: External components (like the Studio UI or Renderer) subscribe to state changes via `subscribe(callback)`. This creates a reactive loop where UI updates reflect the underlying engine state.
+The Core package follows a **Helios State Machine** pattern:
+1.  **Store**: Holds the state (current frame, playback status, inputs) using signals.
+2.  **Actions**: Methods on the `Helios` class (e.g., `play()`, `seek()`) that modify the state.
+3.  **Subscribers**: External components subscribe to state changes to update the UI or rendering.
+4.  **Drivers**: Strategies for syncing the internal time with the environment (e.g., `DomDriver` for WAAPI/MediaElements).
 
 ## B. File Tree
 
 ```
 packages/core/src/
 ├── animation.ts
-├── animation.test.ts
-├── audio.test.ts
+├── audio.ts
 ├── captions.ts
-├── captions.test.ts
 ├── color.ts
-├── color.test.ts
 ├── drivers/
 │   ├── DomDriver.ts
-│   ├── DomDriver.test.ts
-│   ├── ManualTicker.ts
 │   ├── NoopDriver.ts
 │   ├── RafTicker.ts
-│   ├── Ticker.ts
-│   ├── TimeDriver.ts
 │   ├── TimeoutTicker.ts
-│   └── WaapiDriver.ts
+│   ├── WaapiDriver.ts
+│   ├── index.ts
+│   └── types.ts
 ├── easing.ts
-├── easing.test.ts
 ├── errors.ts
 ├── index.ts
-├── index.test.ts
-├── index-signals.test.ts
 ├── markers.ts
-├── markers.test.ts
-├── node-runtime.test.ts
+├── node-runtime.ts
 ├── random.ts
-├── random.test.ts
 ├── schema.ts
-├── schema.test.ts
 ├── sequencing.ts
-├── sequencing.test.ts
 ├── signals.ts
-├── signals.test.ts
 ├── timecode.ts
-└── timecode.test.ts
 ```
 
 ## C. Type Definitions
 
 ```typescript
+export type PropType =
+  | 'string'
+  | 'number'
+  | 'boolean'
+  | 'object'
+  | 'array'
+  | 'color'
+  | 'image'
+  | 'video'
+  | 'audio'
+  | 'font';
+
+export interface PropDefinition {
+  type: PropType;
+  optional?: boolean;
+  default?: any;
+  minimum?: number;
+  maximum?: number;
+  enum?: (string | number)[];
+  label?: string;
+  description?: string;
+}
+
+export type HeliosSchema = Record<string, PropDefinition>;
+
+export interface CaptionCue {
+  id: string;
+  startTime: number; // in milliseconds
+  endTime: number; // in milliseconds
+  text: string;
+}
+
+export interface Marker {
+  id: string;
+  time: number; // in seconds
+  label: string;
+  color?: string; // hex
+}
+
 export type HeliosState = {
   width: number;
   height: number;
@@ -103,50 +128,36 @@ export interface DiagnosticReport {
 ## D. Public Methods
 
 ```typescript
-class Helios {
-  public get currentFrame(): ReadonlySignal<number>;
-  public get loop(): ReadonlySignal<boolean>;
-  public get isPlaying(): ReadonlySignal<boolean>;
-  public get inputProps(): ReadonlySignal<Record<string, any>>;
-  public get playbackRate(): ReadonlySignal<number>;
-  public get volume(): ReadonlySignal<number>;
-  public get muted(): ReadonlySignal<boolean>;
-  public get captions(): ReadonlySignal<CaptionCue[]>;
-  public get activeCaptions(): ReadonlySignal<CaptionCue[]>;
-  public get markers(): ReadonlySignal<Marker[]>;
-  public get width(): ReadonlySignal<number>;
-  public get height(): ReadonlySignal<number>;
-  public get duration(): number;
-  public get fps(): number;
-
+export class Helios {
   static diagnose(): Promise<DiagnosticReport>;
-
   constructor(options: HeliosOptions);
 
-  public getState(): Readonly<HeliosState>;
-  public setSize(width: number, height: number): void;
-  public setLoop(shouldLoop: boolean): void;
-  public setDuration(seconds: number): void;
-  public setFps(fps: number): void;
-  public setInputProps(props: Record<string, any>): void;
-  public setPlaybackRate(rate: number): void;
-  public setAudioVolume(volume: number): void;
-  public setAudioMuted(muted: boolean): void;
-  public setCaptions(captions: string | CaptionCue[]): void;
-  public setMarkers(markers: Marker[]): void;
-  public addMarker(marker: Marker): void;
-  public removeMarker(id: string): void;
-  public seekToMarker(id: string): void;
+  getState(): Readonly<HeliosState>;
+  setSize(width: number, height: number): void;
+  setLoop(shouldLoop: boolean): void;
+  setDuration(seconds: number): void;
+  setFps(fps: number): void;
+  setInputProps(props: Record<string, any>): void;
+  setPlaybackRate(rate: number): void;
+  setAudioVolume(volume: number): void;
+  setAudioMuted(muted: boolean): void;
+  setCaptions(captions: string | CaptionCue[]): void;
+  setMarkers(markers: Marker[]): void;
+  addMarker(marker: Marker): void;
+  removeMarker(id: string): void;
+  seekToMarker(id: string): void;
 
-  public subscribe(callback: HeliosSubscriber): () => void;
-  public unsubscribe(callback: HeliosSubscriber): void;
+  subscribe(callback: HeliosSubscriber): () => void;
+  unsubscribe(callback: HeliosSubscriber): void;
 
-  public play(): void;
-  public pause(): void;
-  public seek(frame: number): void;
+  play(): void;
+  pause(): void;
+  seek(frame: number): void;
 
-  public bindToDocumentTimeline(): void;
-  public unbindFromDocumentTimeline(): void;
-  public dispose(): void;
+  bindToDocumentTimeline(): void;
+  unbindFromDocumentTimeline(): void;
+  dispose(): void;
+
+  // Signals are also exposed as readonly properties (e.g. currentFrame, isPlaying, etc.)
 }
 ```

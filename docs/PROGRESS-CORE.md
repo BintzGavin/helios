@@ -1,5 +1,8 @@
 # CORE Progress Log
 
+## CORE v1.32.0
+- ✅ Completed: Implement Schema Asset Types - Added `image`, `video`, `audio`, `font` to `PropType` and validation, enabling asset selection in Studio.
+
 ## CORE v1.31.0
 - ✅ Completed: Optimize DomDriver - Implemented MutationObserver caching and disposal in DomDriver, reducing DOM queries and improving performance.
 
