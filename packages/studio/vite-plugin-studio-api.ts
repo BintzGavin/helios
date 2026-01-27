@@ -41,7 +41,10 @@ export function studioApiPlugin(): Plugin {
       });
 
       server.middlewares.use('/api/assets', async (req, res, next) => {
-        if (req.url === '/' || req.url === '') {
+        const url = req.url || '/';
+        const pathOnly = url.split('?')[0];
+
+        if (pathOnly === '/' || pathOnly === '') {
           // GET: List assets
           if (req.method === 'GET') {
             try {
@@ -59,9 +62,20 @@ export function studioApiPlugin(): Plugin {
           // DELETE: Delete asset
           if (req.method === 'DELETE') {
             try {
-              const body = await getBody(req);
-              console.log('DELETE /api/assets body:', body);
-              const { id } = body;
+              let id: string | null = null;
+
+              // Try query param
+              const qIndex = req.url?.indexOf('?');
+              if (qIndex !== undefined && qIndex !== -1) {
+                  const params = new URLSearchParams(req.url?.substring(qIndex));
+                  id = params.get('id');
+              }
+
+              // Fallback to body if needed (but prefer query for DELETE)
+              if (!id) {
+                  const body = await getBody(req);
+                  id = body.id;
+              }
 
               if (!id) {
                 res.statusCode = 400;

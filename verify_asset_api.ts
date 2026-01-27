@@ -14,12 +14,21 @@ async function wait(ms: number) {
 
 async function request(method: string, path: string, headers: any = {}, body?: any) {
   return new Promise((resolve, reject) => {
+    let content = body;
+    if (body && !(body instanceof Buffer) && typeof body !== 'string') {
+        content = JSON.stringify(body);
+    }
+
+    if (content) {
+        headers['Content-Length'] = Buffer.byteLength(content);
+    }
+
     const options = {
       hostname: 'localhost',
       port: PORT,
       path: path,
       method: method,
-      headers: headers
+      headers: { ...headers, Connection: 'close' }
     };
 
     const req = http.request(options, (res) => {
@@ -32,12 +41,8 @@ async function request(method: string, path: string, headers: any = {}, body?: a
 
     req.on('error', reject);
 
-    if (body) {
-        if (body instanceof Buffer || typeof body === 'string') {
-            req.write(body);
-        } else {
-            req.write(JSON.stringify(body));
-        }
+    if (content) {
+        req.write(content);
     }
     req.end();
   });
@@ -50,13 +55,13 @@ async function main() {
       fs.mkdirSync('public');
   }
 
-  const studio = spawn('npm', ['run', 'dev'], {
+  const studio = spawn('npm', ['run', 'dev', '--', '--port', '5173', '--strictPort'], {
       cwd: STUDIO_DIR,
       env: { ...process.env, HELIOS_PROJECT_ROOT: process.cwd() }
   });
 
   // Suppress output unless error
-  studio.stdout.on('data', d => {});
+  studio.stdout.on('data', d => process.stdout.write(`[Studio Out] ${d}`));
   studio.stderr.on('data', d => process.stderr.write(`[Studio Err] ${d}`));
 
   // Wait for server to start
@@ -98,9 +103,7 @@ async function main() {
     console.log('Found asset:', asset.id);
 
     console.log('--- TEST: DELETE ---');
-    const deleteRes: any = await request('DELETE', '/api/assets', {
-        'Content-Type': 'application/json'
-    }, JSON.stringify({ id: asset.id }));
+    const deleteRes: any = await request('DELETE', `/api/assets?id=${encodeURIComponent(asset.id)}`);
 
     console.log('Delete Response:', deleteRes.statusCode, deleteRes.body);
 
@@ -115,6 +118,7 @@ async function main() {
 
   } catch (e) {
     console.error('Test Failed:', e);
+    studio.kill();
     process.exit(1);
   } finally {
     studio.kill();

@@ -1,5 +1,8 @@
 # Studio Progress Log
 
+## STUDIO v0.23.1
+- ✅ Fixed: Asset Deletion - Switched DELETE API to use query parameters to resolve body parsing timeouts.
+
 ## STUDIO v0.23.0
 - ✅ Completed: Asset Management - Implemented asset upload (Drag & Drop) and delete functionality in Assets Panel, backed by new API endpoints.
 
