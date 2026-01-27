@@ -1,11 +1,12 @@
 # Status: CORE
 
-**Version**: 1.23.0
+**Version**: 1.24.0
 
 - **Status**: Active
 - **Current Focus**: Maintenance and Optimization
 - **Last Updated**: 2026-03-03
 
+[v1.24.0] ✅ Completed: Implement Relative Audio Mixing - Implemented relative volume and mute handling in `DomDriver`, allowing master volume/mute to mix with user-set values instead of overriding them.
 [v1.23.0] ✅ Completed: Implement Resolution Awareness - Added `width`/`height` to state/options, `setSize` method, and `INVALID_RESOLUTION` error.
 [v1.22.0] ✅ Completed: Expand Input Schema Validation - Added `minimum`, `maximum`, and `enum` constraints to `HeliosSchema` and updated `validateProps`.
 [v1.21.0] ✅ Completed: Implement Deterministic Randomness - Added `random` utility with Mulberry32 PRNG and string seeding support.

@@ -7,7 +7,7 @@ The `packages/core` module is the heart of the Helios system. It implements a **
 - **Store**: The `Helios` class holds the state (`currentFrame`, `isPlaying`, `inputProps`, `playbackRate`, `volume`, `muted`, `activeCaptions`, `width`, `height`) using **Signals** (observable state primitives).
 - **Actions**: Methods like `play()`, `pause()`, `seek()`, `setInputProps()`, `setAudioVolume()`, `setCaptions()`, `setSize()` modify the state.
 - **Subscribers**: The UI (Studio, Player) and Drivers subscribe to state changes to update the DOM or other outputs.
-- **Drivers**: `TimeDriver` implementations (like `DomDriver`) synchronize the internal timeline with external systems (like WAAPI or HTMLMediaElements).
+- **Drivers**: `TimeDriver` implementations (like `DomDriver`) synchronize the internal timeline with external systems (like WAAPI or HTMLMediaElements). `DomDriver` supports relative audio mixing, preserving user-set volume levels while applying master scaling.
 - **Ticker**: A `Ticker` (RafTicker or TimeoutTicker) drives the frame advancement loop when playing.
 - **Schema**: An optional `HeliosSchema` defines the structure and types of `inputProps` for validation.
 

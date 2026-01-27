@@ -120,4 +120,86 @@ describe('DomDriver', () => {
 
     expect(mockAudio.volume).toBe(1);
   });
+
+  // New Tests for Relative Volume/Mute Logic
+
+  it('should handle relative volume mixing', () => {
+    const mockAudio = document.createElement('audio');
+    Object.defineProperty(mockAudio, 'volume', { value: 0.5, writable: true });
+    scope.appendChild(mockAudio);
+
+    // Master volume 0.5 * Base 0.5 = 0.25
+    driver.update(0, { isPlaying: false, playbackRate: 1, volume: 0.5 });
+
+    expect(mockAudio.volume).toBe(0.25);
+  });
+
+  it('should respect external volume changes', () => {
+    const mockAudio = document.createElement('audio');
+    Object.defineProperty(mockAudio, 'volume', { value: 1.0, writable: true });
+    scope.appendChild(mockAudio);
+
+    // Initial update: master 1.0 -> effective 1.0
+    driver.update(0, { isPlaying: false, playbackRate: 1, volume: 1.0 });
+    expect(mockAudio.volume).toBe(1.0);
+
+    // User changes volume to 0.8 externally
+    mockAudio.volume = 0.8;
+
+    // Next update: master 0.5 -> effective 0.4 (assuming base became 0.8)
+    driver.update(0, { isPlaying: false, playbackRate: 1, volume: 0.5 });
+
+    expect(mockAudio.volume).toBe(0.4);
+  });
+
+  it('should handle relative mute logic', () => {
+     const mockAudio = document.createElement('audio');
+     Object.defineProperty(mockAudio, 'muted', { value: false, writable: true }); // Unmuted
+     scope.appendChild(mockAudio);
+
+     // Master muted
+     driver.update(0, { isPlaying: false, playbackRate: 1, muted: true });
+     expect(mockAudio.muted).toBe(true);
+
+     // Master unmuted
+     driver.update(0, { isPlaying: false, playbackRate: 1, muted: false });
+     expect(mockAudio.muted).toBe(false); // Should return to base (false)
+  });
+
+  it('should respect external mute changes', () => {
+     const mockAudio = document.createElement('audio');
+     Object.defineProperty(mockAudio, 'muted', { value: false, writable: true });
+     scope.appendChild(mockAudio);
+
+     // Master unmuted
+     driver.update(0, { isPlaying: false, playbackRate: 1, muted: false });
+     expect(mockAudio.muted).toBe(false);
+
+     // User manually mutes
+     mockAudio.muted = true;
+
+     // Master still unmuted
+     driver.update(0, { isPlaying: false, playbackRate: 1, muted: false });
+
+     // Should stay muted (user override)
+     expect(mockAudio.muted).toBe(true);
+  });
+
+  it('should preserve element mute state when master is toggled', () => {
+     const mockAudio = document.createElement('audio');
+     Object.defineProperty(mockAudio, 'muted', { value: true, writable: true }); // Muted by default
+     scope.appendChild(mockAudio);
+
+     // Master unmuted
+     driver.update(0, { isPlaying: false, playbackRate: 1, muted: false });
+     expect(mockAudio.muted).toBe(true); // Should stay muted
+
+     // Master muted
+     driver.update(0, { isPlaying: false, playbackRate: 1, muted: true });
+     expect(mockAudio.muted).toBe(true);
+
+     // Master unmuted again
+     driver.update(0, { isPlaying: false, playbackRate: 1, muted: false });
+     expect(mockAudio.muted).toBe(true); // Should return to base (true)
+  });
 });
