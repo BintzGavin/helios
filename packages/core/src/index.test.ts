@@ -597,4 +597,37 @@ Dynamic`;
       expect(helios.getState().activeCaptions[0].text).toBe('Dynamic');
     });
   });
+
+  describe('Initial Frame', () => {
+    it('should initialize with correct initialFrame', () => {
+      const helios = new Helios({ duration: 10, fps: 30, initialFrame: 30 });
+      expect(helios.currentFrame.peek()).toBe(30);
+      expect(helios.getState().currentFrame).toBe(30);
+    });
+
+    it('should clamp negative initialFrame to 0', () => {
+      const helios = new Helios({ duration: 10, fps: 30, initialFrame: -50 });
+      expect(helios.currentFrame.peek()).toBe(0);
+    });
+
+    it('should clamp initialFrame to total frames', () => {
+      // 10s * 30fps = 300 frames
+      const helios = new Helios({ duration: 10, fps: 30, initialFrame: 500 });
+      expect(helios.currentFrame.peek()).toBe(300);
+    });
+
+    it('should sync driver with initialFrame', () => {
+      const mockDriver: TimeDriver = {
+         init: vi.fn(),
+         update: vi.fn()
+      };
+
+      new Helios({ duration: 10, fps: 30, initialFrame: 30, driver: mockDriver });
+
+      // 30 frames / 30 fps = 1 second = 1000ms
+      expect(mockDriver.update).toHaveBeenCalledWith(1000, expect.objectContaining({
+        isPlaying: false
+      }));
+    });
+  });
 });
