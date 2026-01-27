@@ -1,5 +1,8 @@
 # PLAYER Progress Log
 
+## PLAYER v0.21.0
+- ✅ Completed: Video Inlining - Implemented `inlineVideos` to capture `<video>` elements as images during client-side export, ensuring visual fidelity.
+
 ## PLAYER v0.20.1
 - ✅ Completed: Project Cleanup - Added explicit `vitest` dependency and removed obsolete plan file.
 

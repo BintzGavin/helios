@@ -5,6 +5,7 @@ export async function captureDomToBitmap(element: HTMLElement): Promise<ImageBit
   let clone = element.cloneNode(true) as HTMLElement;
   await inlineImages(clone);
   clone = inlineCanvases(element, clone);
+  clone = inlineVideos(element, clone);
 
   // 2. Serialize DOM
   const serializer = new XMLSerializer();
@@ -226,4 +227,58 @@ function inlineCanvases(original: HTMLElement, clone: HTMLElement): HTMLElement 
   }
 
   return clone;
+}
+
+function inlineVideos(original: HTMLElement, clone: HTMLElement): HTMLElement {
+  // Handle root element being a video
+  if (original instanceof HTMLVideoElement && clone instanceof HTMLVideoElement) {
+    if (original.readyState >= 2) {
+      const img = videoToImage(original);
+      if (img) return img;
+    }
+    return clone;
+  }
+
+  const originals = Array.from(original.querySelectorAll('video'));
+  const clones = Array.from(clone.querySelectorAll('video'));
+
+  for (let i = 0; i < Math.min(originals.length, clones.length); i++) {
+    const video = originals[i];
+    const target = clones[i];
+
+    if (video.readyState < 2) continue; // Skip if no data
+
+    const img = videoToImage(video);
+    if (img) {
+      target.parentNode?.replaceChild(img, target);
+    }
+  }
+
+  return clone;
+}
+
+function videoToImage(video: HTMLVideoElement): HTMLImageElement | null {
+  try {
+    const canvas = document.createElement('canvas');
+    canvas.width = video.videoWidth || 300;
+    canvas.height = video.videoHeight || 150;
+    const ctx = canvas.getContext('2d');
+    if (ctx) {
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      const dataUri = canvas.toDataURL();
+
+      const img = document.createElement('img');
+      img.src = dataUri;
+      img.style.cssText = video.style.cssText;
+      img.className = video.className;
+      if (video.id) img.id = video.id;
+      if (video.hasAttribute('width')) img.setAttribute('width', video.getAttribute('width')!);
+      if (video.hasAttribute('height')) img.setAttribute('height', video.getAttribute('height')!);
+
+      return img;
+    }
+  } catch (e) {
+    console.warn('Helios: Failed to inline video:', e);
+  }
+  return null;
 }
