@@ -17,6 +17,7 @@ The Renderer uses the Strategy pattern to support two distinct rendering modes:
     *   Captures frames using `page.screenshot()` (currently, pending `Element.capture` or similar).
     *   Injects polyfills via `SeekTimeDriver.init()` to ensure `requestAnimationFrame`, `Date.now`, and `performance.now` are deterministic from frame 0.
     *   **Implicit Audio Discovery**: Automatically detects `<audio>` and `<video>` elements in the DOM and includes their audio tracks in the final render.
+    *   **Media Synchronization**: Manually syncs `<video>` and `<audio>` elements to the virtual timeline in SeekTimeDriver to prevent drift.
 
 ## B. File Tree
 ```
