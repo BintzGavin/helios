@@ -1,12 +1,28 @@
 {
   "name": "@helios-project/player",
   "version": "0.5.1",
+  "description": "Web Component player for Helios compositions.",
+  "author": "Gavin Bintz <me@gavinbintz.com>",
+  "license": "ELv2",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BintzGavin/helios.git"
+  },
+  "bugs": {
+    "url": "https://github.com/BintzGavin/helios/issues"
+  },
+  "homepage": "https://github.com/BintzGavin/helios#readme",
+  "publishConfig": {
+    "access": "public"
+  },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
   "exports": {
     ".": "./dist/index.js",
-    "./bridge": "./dist/bridge.js",
-    "./src/bridge": "./src/bridge.ts"
+    "./bridge": "./dist/bridge.js"
   },
   "scripts": {
     "build": "tsc",
