@@ -12,7 +12,7 @@ Helios Studio is a browser-based development environment for video composition. 
 packages/studio/
 ├── scripts/
 ├── src/
-│   ├── components/         # UI Components (Timeline, PropsEditor, CaptionsPanel, SchemaInputs, etc.)
+│   ├── components/         # UI Components (Timeline, PropsEditor, CaptionsPanel, KeyboardShortcutsModal, etc.)
 │   ├── context/            # Global State (StudioContext)
 │   ├── hooks/              # Custom Hooks
 │   ├── server/             # Backend logic (if any specific)
@@ -42,6 +42,7 @@ The studio is launched via the `@helios-project/cli` package.
 - **CaptionsPanel**: SRT import and visualization panel.
 - **RendersPanel**: Render job management (start, cancel, download).
 - **Stage**: Canvas/DOM preview area with Pan/Zoom, Transparency Grid, and Snapshot controls.
+- **KeyboardShortcutsModal**: Modal dialog displaying available keyboard shortcuts.
 
 ## E. Integration
 - **Core**: Consumes `Helios` class for state management.
