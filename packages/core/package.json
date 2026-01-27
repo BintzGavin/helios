@@ -1,8 +1,28 @@
 {
   "name": "@helios-project/core",
   "version": "0.0.1",
+  "description": "Core library for Helios video engine.",
+  "author": "Gavin Bintz <me@gavinbintz.com>",
+  "license": "ELv2",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BintzGavin/helios.git"
+  },
+  "bugs": {
+    "url": "https://github.com/BintzGavin/helios/issues"
+  },
+  "homepage": "https://github.com/BintzGavin/helios#readme",
+  "publishConfig": {
+    "access": "public"
+  },
   "main": "dist/index.js",
+  "exports": {
+    ".": "./dist/index.js"
+  },
   "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsc",
     "dev": "tsc -w",
