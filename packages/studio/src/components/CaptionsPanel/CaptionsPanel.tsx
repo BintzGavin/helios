@@ -18,9 +18,45 @@ const formatTime = (ms: number) => {
   return `${hours}:${minutes}:${seconds}.${milliseconds}`;
 };
 
+const parseTime = (timeStr: string): number => {
+    const parts = timeStr.split(':');
+    let seconds = 0;
+    if (parts.length === 3) {
+        seconds += parseInt(parts[0]) * 3600;
+        seconds += parseInt(parts[1]) * 60;
+        seconds += parseFloat(parts[2]);
+    } else if (parts.length === 2) {
+        seconds += parseInt(parts[0]) * 60;
+        seconds += parseFloat(parts[1]);
+    } else {
+        // Fallback: try parsing as simple seconds or milliseconds?
+        // Let's assume input is valid-ish. If fail, return NaN
+        const val = parseFloat(timeStr);
+        if (!isNaN(val)) return Math.round(val * 1000); // treat as seconds?
+        return 0;
+    }
+    return Math.round(seconds * 1000);
+};
+
 export const CaptionsPanel: React.FC = () => {
   const { playerState, controller } = useStudio();
   const captions: CaptionCue[] = playerState.captions || [];
+
+  const updateCaptions = (newCaptions: CaptionCue[]) => {
+      // Sort by startTime
+      newCaptions.sort((a, b) => a.startTime - b.startTime);
+
+      if (controller) {
+          if ('instance' in controller && typeof (controller as any).instance.setCaptions === 'function') {
+              (controller as any).instance.setCaptions(newCaptions);
+          } else {
+              controller.setInputProps({
+                  ...playerState.inputProps,
+                  captions: newCaptions
+              });
+          }
+      }
+  };
 
   const handleFileUpload = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -32,19 +68,7 @@ export const CaptionsPanel: React.FC = () => {
       if (text) {
         try {
           const cues = parseSrt(text);
-
-          if (controller) {
-            // Attempt to use DirectController's instance if available
-            if ('instance' in controller && typeof (controller as any).instance.setCaptions === 'function') {
-              (controller as any).instance.setCaptions(cues);
-            } else {
-              // Fallback to inputProps
-              controller.setInputProps({
-                ...playerState.inputProps,
-                captions: cues
-              });
-            }
-          }
+          updateCaptions(cues);
         } catch (err) {
           console.error("Failed to parse SRT", err);
           alert("Failed to parse SRT file.");
@@ -57,21 +81,51 @@ export const CaptionsPanel: React.FC = () => {
   };
 
   const handleClear = () => {
-      if (controller) {
-        if ('instance' in controller && typeof (controller as any).instance.setCaptions === 'function') {
-          (controller as any).instance.setCaptions([]);
-        } else {
-          controller.setInputProps({
-            ...playerState.inputProps,
-            captions: []
-          });
-        }
+      updateCaptions([]);
+  };
+
+  const handleAdd = () => {
+      const currentTime = Math.round((playerState.currentFrame / playerState.fps) * 1000) || 0;
+      const newCue: CaptionCue = {
+          startTime: currentTime,
+          endTime: currentTime + 2000,
+          text: "New Caption"
+      };
+      updateCaptions([...captions, newCue]);
+  };
+
+  const handleUpdate = (index: number, field: keyof CaptionCue, value: string) => {
+      const updated = [...captions];
+      let newValue: string | number = value;
+
+      if (field === 'startTime' || field === 'endTime') {
+          newValue = parseTime(value);
       }
+
+      updated[index] = { ...updated[index], [field]: newValue };
+      updateCaptions(updated);
+  };
+
+  const handleDelete = (index: number) => {
+      const updated = captions.filter((_, i) => i !== index);
+      updateCaptions(updated);
   };
 
   return (
     <div className="captions-panel">
-      <h2>Captions</h2>
+      <div className="captions-header">
+        <h2>Captions</h2>
+        <div className="captions-actions">
+             <button onClick={handleAdd} className="add-button">
+                + Add
+             </button>
+             {captions.length > 0 && (
+                <button onClick={handleClear} className="clear-button">
+                    Clear
+                </button>
+            )}
+        </div>
+      </div>
 
       <div className="upload-section">
         <label>Import SRT</label>
@@ -81,24 +135,6 @@ export const CaptionsPanel: React.FC = () => {
           onChange={handleFileUpload}
           className="file-input"
         />
-        {captions.length > 0 && (
-            <button
-                onClick={handleClear}
-                style={{
-                    marginTop: '8px',
-                    padding: '4px 8px',
-                    background: '#d32f2f',
-                    border: 'none',
-                    borderRadius: '4px',
-                    color: 'white',
-                    cursor: 'pointer',
-                    alignSelf: 'flex-start',
-                    fontSize: '12px'
-                }}
-            >
-                Clear Captions
-            </button>
-        )}
       </div>
 
       <div className="captions-list">
@@ -107,10 +143,37 @@ export const CaptionsPanel: React.FC = () => {
         ) : (
           captions.map((cue, index) => (
             <div key={index} className="caption-item">
-              <div className="caption-time">
-                {formatTime(cue.startTime)} - {formatTime(cue.endTime)}
+              <div className="caption-times">
+                <input
+                    className="time-input"
+                    defaultValue={formatTime(cue.startTime)}
+                    onBlur={(e) => handleUpdate(index, 'startTime', e.target.value)}
+                    key={`start-${index}-${cue.startTime}`} // force re-render on external update
+                />
+                <span className="time-separator">-</span>
+                <input
+                    className="time-input"
+                    defaultValue={formatTime(cue.endTime)}
+                    onBlur={(e) => handleUpdate(index, 'endTime', e.target.value)}
+                    key={`end-${index}-${cue.endTime}`}
+                />
               </div>
-              <div className="caption-text">{cue.text}</div>
+              <div className="caption-content">
+                  <textarea
+                    className="text-input"
+                    defaultValue={cue.text}
+                    onBlur={(e) => handleUpdate(index, 'text', e.target.value)}
+                    rows={2}
+                    key={`text-${index}-${cue.text}`}
+                  />
+                  <button
+                    className="delete-button"
+                    onClick={() => handleDelete(index)}
+                    title="Delete caption"
+                  >
+                    ×
+                  </button>
+              </div>
             </div>
           ))
         )}

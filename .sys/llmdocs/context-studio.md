@@ -39,7 +39,7 @@ The studio is launched via the `@helios-project/cli` package.
 - **PlaybackControls**: Includes Play/Pause, Frame Step, Loop, Audio (Volume/Mute), and Speed controls.
 - **PropsEditor**: Schema-aware property editor with fallback to JSON/Form inputs.
 - **AssetsPanel**: Drag-and-drop asset management with rich previews for Video, Audio, and Fonts.
-- **CaptionsPanel**: SRT import and visualization panel (synced with Helios Core state).
+- **CaptionsPanel**: SRT import, editing (Add/Edit/Delete), and visualization panel (synced with Helios Core state).
 - **RendersPanel**: Render job management (start, cancel, download).
 - **Stage**: Canvas/DOM preview area with Pan/Zoom, Transparency Grid, and Snapshot controls.
 - **KeyboardShortcutsModal**: Modal dialog displaying available keyboard shortcuts.
