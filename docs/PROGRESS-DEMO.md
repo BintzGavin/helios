@@ -54,3 +54,6 @@
 
 ## DEMO v1.31.0
 - ✅ Completed: Scaffold Media Element Example - Created `examples/media-element-animation` demonstrating `DomDriver` synchronization of native `<video>` and `<audio>` elements.
+
+## DEMO v1.35.0
+- ✅ Completed: Scaffold Tailwind CSS Example - Created `examples/tailwind-animation` demonstrating Tailwind v3 integration with proper scoping and build configuration.

@@ -27,6 +27,7 @@ const CASES = [
   { name: 'Dynamic Props', relativePath: 'examples/dynamic-props-animation/composition.html', mode: 'dom' as const },
   { name: 'Media Element', relativePath: 'examples/media-element-animation/composition.html', mode: 'dom' as const },
   { name: 'D3 Animation', relativePath: 'examples/d3-animation/composition.html', mode: 'dom' as const },
+  { name: 'Tailwind Animation', relativePath: 'examples/tailwind-animation/composition.html', mode: 'dom' as const },
 ];
 
 async function main() {
