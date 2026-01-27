@@ -53,3 +53,7 @@
 ## 2026-02-28 - Set Plan Format Strictness
 **Learning:** The `set_plan` tool strictly requires a Markdown list (numbered) and fails if headers or other formats are used. This differs from the "Spec File" format which uses headers.
 **Action:** When using `set_plan` for the execution plan, strictly use `1. Step Name` format and put the detailed spec in the *file creation* step, not the plan description itself.
+
+## 0.19.1 - Status Check Importance
+**Learning:** I encountered a situation where a plan file existed for a task that was already completed and documented in `docs/status/PLAYER.md`. I wasted time investigating and planning for work that was already done, although I did find and fix a missing dependency installation and verified the tests.
+**Action:** Always check the current version and completed tasks in `docs/status/PLAYER.md` before starting work on a plan, to avoid redundancy and confusion.
