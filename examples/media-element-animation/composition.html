@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Media Element Animation</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      background-color: #222;
+      color: white;
+      font-family: sans-serif;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    video {
+      width: 320px;
+      height: 240px;
+      border: 2px solid #444;
+      background: black;
+      margin-bottom: 20px;
+    }
+    .info {
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <h1>Media Sync Test</h1>
+  <video id="my-video" loop muted playsinline></video>
+  <audio id="my-audio" loop></audio>
+  <div class="info">
+    <p>Video and Audio should sync with scrubber.</p>
+  </div>
+
+  <script type="module">
+    import { Helios } from '../../packages/core/dist/index.js';
+
+    // Minimal 1x1 pixel MP4 (Black)
+    const VIDEO_SRC = "data:video/mp4;base64,AAAAIGZ0eXBpc29tAAACAGlzb21pc28yYXZjMW1wNDEAAAAIZnJlZQAAAAZmcmVlAAAAO21kYXQAAAABBgAAAAAAAgAAAABnYXZjMQAAAABgAAAAAQAAAAAAAAAAAAAAAAAAAABhAAAAAA==";
+
+    // Minimal WAV (Silence)
+    const AUDIO_SRC = "data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA";
+
+    const video = document.getElementById('my-video');
+    const audio = document.getElementById('my-audio');
+
+    video.src = VIDEO_SRC;
+    audio.src = AUDIO_SRC;
+
+    const helios = new Helios({
+      duration: 5,
+      fps: 30,
+      autoSyncAnimations: true // This triggers DomDriver to sync media elements
+    });
+
+    window.helios = helios;
+    helios.bindToDocumentTimeline();
+  </script>
+</body>
+</html>

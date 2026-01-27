@@ -1,5 +1,5 @@
 # Status: DEMO (Executor)
-**Version**: 1.30.0
+**Version**: 1.31.0
 
 ## Vision
 To provide comprehensive, idiomatic examples for every major framework (React, Vue, Svelte, Vanilla) and robust end-to-end testing to ensure the Helios engine delivers on its "Use What You Know" promise.
@@ -7,6 +7,7 @@ To provide comprehensive, idiomatic examples for every major framework (React, V
 ## Current State
 - **Vanilla JS (Canvas)**: ✅ `examples/simple-canvas-animation` exists and works.
 - **Vanilla JS (DOM)**: ✅ `examples/simple-animation` exists and works.
+- **Media Element**: ✅ `examples/media-element-animation` exists and works (Demonstrates `<video>`/`<audio>` sync).
 - **GSAP**: ✅ `examples/gsap-animation` exists and works.
 - **Framer Motion**: ✅ `examples/framer-motion-animation` exists and works.
 - **Lottie**: ✅ `examples/lottie-animation` exists and works.
@@ -29,6 +30,7 @@ To provide comprehensive, idiomatic examples for every major framework (React, V
 - **E2E Tests**: ✅ Verified all existing examples via `tests/e2e/verify-render.ts`.
 
 ## Backlog
+- [x] Scaffold Media Element Example (`examples/media-element-animation`)
 - [x] Scaffold Captions Animation Example (`examples/captions-animation`)
 - [x] Scaffold Svelte Animation Helpers (`examples/svelte-animation-helpers`)
 - [x] Scaffold Animation Helpers Example (`examples/animation-helpers`)
@@ -51,6 +53,7 @@ To provide comprehensive, idiomatic examples for every major framework (React, V
 None.
 
 ## Log
+- [v1.31.0] ✅ Completed: Scaffold Media Element Example - Created `examples/media-element-animation` demonstrating `DomDriver` synchronization of native `<video>` and `<audio>` elements.
 - [v1.30.0] ✅ Completed: Scaffold Dynamic Props Example - Created `examples/dynamic-props-animation` demonstrating `inputProps` and `schema` validation with a React frontend.
 - [v1.29.0] ✅ Completed: Scaffold React CSS Animation Example - Created `examples/react-css-animation` demonstrating standard CSS animations with `autoSyncAnimations: true`.
 - [v1.28.0] ✅ Completed: Scaffold Signals Animation Example - Created `examples/signals-animation` demonstrating fine-grained reactivity using core signals.

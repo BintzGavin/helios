@@ -25,6 +25,7 @@ const CASES = [
   { name: 'Captions', relativePath: 'examples/captions-animation/composition.html', mode: 'dom' as const },
   { name: 'Signals', relativePath: 'examples/signals-animation/composition.html', mode: 'dom' as const },
   { name: 'Dynamic Props', relativePath: 'examples/dynamic-props-animation/composition.html', mode: 'dom' as const },
+  { name: 'Media Element', relativePath: 'examples/media-element-animation/composition.html', mode: 'dom' as const },
 ];
 
 async function main() {
