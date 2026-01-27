@@ -1,46 +1,58 @@
-# Context: Core
+# CORE Domain Context
 
 ## A. Architecture
 
-The Core package follows the "Helios State Machine" pattern:
-1.  **Store**: Reactive state using lightweight Signals (`currentFrame`, `isPlaying`, etc.).
-2.  **Actions**: Public methods (`play`, `seek`, `setInputProps`) that mutate state.
-3.  **Subscribers**: External consumers (Renderer, Player) subscribe to state changes or frames.
-4.  **Drivers**: Abstracted time control via `TimeDriver` (DOM-based, WAAPI-based, or Noop).
+The **Helios State Machine** follows a "Store -> Actions -> Subscribers" pattern:
+
+- **Store**: The `Helios` class maintains internal reactive state using signals (e.g., `_currentFrame`, `_isPlaying`, `_inputProps`). This ensures thread-safe and consistent state updates.
+- **Actions**: Public methods (e.g., `seek`, `play`, `setInputProps`) modify these signals and coordinate side effects. This often involves invoking the configured `TimeDriver` to synchronize external systems (like DOM elements or WAAPI animations).
+- **Subscribers**: External components (like the Studio UI or Renderer) subscribe to state changes via `subscribe(callback)`. This creates a reactive loop where UI updates reflect the underlying engine state.
 
 ## B. File Tree
 
+```
 packages/core/src/
-├── drivers/
-├── animation.test.ts
 ├── animation.ts
+├── animation.test.ts
 ├── audio.test.ts
-├── captions.test.ts
 ├── captions.ts
-├── color.test.ts
+├── captions.test.ts
 ├── color.ts
-├── easing.test.ts
+├── color.test.ts
+├── drivers/
+│   ├── DomDriver.ts
+│   ├── DomDriver.test.ts
+│   ├── ManualTicker.ts
+│   ├── NoopDriver.ts
+│   ├── RafTicker.ts
+│   ├── Ticker.ts
+│   ├── TimeDriver.ts
+│   ├── TimeoutTicker.ts
+│   └── WaapiDriver.ts
 ├── easing.ts
+├── easing.test.ts
 ├── errors.ts
-├── index-signals.test.ts
-├── index.test.ts
 ├── index.ts
+├── index.test.ts
+├── index-signals.test.ts
+├── markers.ts
+├── markers.test.ts
 ├── node-runtime.test.ts
-├── random.test.ts
 ├── random.ts
-├── schema.test.ts
+├── random.test.ts
 ├── schema.ts
-├── sequencing.test.ts
+├── schema.test.ts
 ├── sequencing.ts
-├── signals.test.ts
+├── sequencing.test.ts
 ├── signals.ts
-├── timecode.test.ts
-└── timecode.ts
+├── signals.test.ts
+├── timecode.ts
+└── timecode.test.ts
+```
 
 ## C. Type Definitions
 
 ```typescript
-// packages/core/src/index.ts
 export type HeliosState = {
   width: number;
   height: number;
@@ -55,6 +67,7 @@ export type HeliosState = {
   muted: boolean;
   captions: CaptionCue[];
   activeCaptions: CaptionCue[];
+  markers: Marker[];
 };
 
 export type HeliosSubscriber = (state: HeliosState) => void;
@@ -74,6 +87,7 @@ export interface HeliosOptions {
   volume?: number;
   muted?: boolean;
   captions?: string | CaptionCue[];
+  markers?: Marker[];
   driver?: TimeDriver;
   ticker?: Ticker;
 }
@@ -84,63 +98,12 @@ export interface DiagnosticReport {
   offscreenCanvas: boolean;
   userAgent: string;
 }
-
-// packages/core/src/schema.ts
-export type PropType = 'string' | 'number' | 'boolean' | 'object' | 'array' | 'color';
-
-export interface PropDefinition {
-  type: PropType;
-  optional?: boolean;
-  default?: any;
-  minimum?: number;
-  maximum?: number;
-  enum?: (string | number)[];
-  label?: string;
-  description?: string;
-}
-
-export type HeliosSchema = Record<string, PropDefinition>;
-
-// packages/core/src/captions.ts
-export interface CaptionCue {
-  id: string;
-  startTime: number; // in milliseconds
-  endTime: number;   // in milliseconds
-  text: string;
-}
-
-// packages/core/src/signals.ts
-export interface ReadonlySignal<T> {
-  readonly value: T;
-  peek(): T;
-  subscribe(fn: (value: T) => void): () => void;
-}
-
-// packages/core/src/errors.ts
-export enum HeliosErrorCode {
-  INVALID_DURATION = 'INVALID_DURATION',
-  INVALID_FPS = 'INVALID_FPS',
-  INVALID_INPUT_RANGE = 'INVALID_INPUT_RANGE',
-  INVALID_OUTPUT_RANGE = 'INVALID_OUTPUT_RANGE',
-  UNSORTED_INPUT_RANGE = 'UNSORTED_INPUT_RANGE',
-  INVALID_SPRING_CONFIG = 'INVALID_SPRING_CONFIG',
-  INVALID_SRT_FORMAT = 'INVALID_SRT_FORMAT',
-  INVALID_INPUT_PROPS = 'INVALID_INPUT_PROPS',
-  INVALID_RESOLUTION = 'INVALID_RESOLUTION',
-  INVALID_COLOR_FORMAT = 'INVALID_COLOR_FORMAT',
-  INVALID_TIMECODE_FORMAT = 'INVALID_TIMECODE_FORMAT'
-}
 ```
 
 ## D. Public Methods
 
 ```typescript
-export class Helios {
-  // Constants (Getters)
-  public get duration(): number;
-  public get fps(): number;
-
-  // Readonly Signals
+class Helios {
   public get currentFrame(): ReadonlySignal<number>;
   public get loop(): ReadonlySignal<boolean>;
   public get isPlaying(): ReadonlySignal<boolean>;
@@ -150,20 +113,17 @@ export class Helios {
   public get muted(): ReadonlySignal<boolean>;
   public get captions(): ReadonlySignal<CaptionCue[]>;
   public get activeCaptions(): ReadonlySignal<CaptionCue[]>;
+  public get markers(): ReadonlySignal<Marker[]>;
   public get width(): ReadonlySignal<number>;
   public get height(): ReadonlySignal<number>;
+  public get duration(): number;
+  public get fps(): number;
 
-  // Static Methods
   static diagnose(): Promise<DiagnosticReport>;
 
-  // Lifecycle
   constructor(options: HeliosOptions);
-  public dispose(): void;
 
-  // State Access
   public getState(): Readonly<HeliosState>;
-
-  // Actions
   public setSize(width: number, height: number): void;
   public setLoop(shouldLoop: boolean): void;
   public setDuration(seconds: number): void;
@@ -173,27 +133,20 @@ export class Helios {
   public setAudioVolume(volume: number): void;
   public setAudioMuted(muted: boolean): void;
   public setCaptions(captions: string | CaptionCue[]): void;
+  public setMarkers(markers: Marker[]): void;
+  public addMarker(marker: Marker): void;
+  public removeMarker(id: string): void;
+  public seekToMarker(id: string): void;
 
-  // Subscription
   public subscribe(callback: HeliosSubscriber): () => void;
   public unsubscribe(callback: HeliosSubscriber): void;
 
-  // Playback Controls
   public play(): void;
   public pause(): void;
   public seek(frame: number): void;
 
-  // Timeline Binding
   public bindToDocumentTimeline(): void;
   public unbindFromDocumentTimeline(): void;
+  public dispose(): void;
 }
-```
-
-## E. Exported Utilities
-
-```typescript
-// packages/core/src/timecode.ts
-export function framesToTimecode(frame: number, fps: number): string;
-export function timecodeToFrames(timecode: string, fps: number): number;
-export function framesToTimestamp(frame: number, fps: number): string;
 ```

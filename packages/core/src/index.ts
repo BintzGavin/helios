@@ -568,6 +568,7 @@ export class Helios {
     this.pause();
     this.ticker.stop();
     this.unbindFromDocumentTimeline();
+    this.driver.dispose?.();
 
     this.subscriberMap.forEach((dispose) => dispose());
     this.subscriberMap.clear();
