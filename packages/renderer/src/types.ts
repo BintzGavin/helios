@@ -57,6 +57,18 @@ export interface RendererOptions {
   audioTracks?: (string | AudioTrackConfig)[];
 
   /**
+   * The audio codec to use.
+   * Defaults to 'aac' (unless videoCodec implies WebM, then 'libvorbis').
+   */
+  audioCodec?: string;
+
+  /**
+   * The audio bitrate (e.g., '128k', '192k').
+   * If not provided, FFmpeg defaults will be used.
+   */
+  audioBitrate?: string;
+
+  /**
    * The video codec to use. Defaults to 'libx264'.
    */
   videoCodec?: string;

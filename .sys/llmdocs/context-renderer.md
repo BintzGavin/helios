@@ -41,6 +41,8 @@ The `RendererOptions` interface controls the rendering process:
 - `pixelFormat`: Output pixel format (e.g., `'yuv420p'`, `'yuva420p'`).
 - `intermediateVideoCodec`: Codec for WebCodecs capture (e.g., `'avc1'`, `'vp9'`, `'av01'`).
 - `videoBitrate`: Target bitrate (e.g., `2500000`).
+- `audioCodec`: Output audio codec (e.g., `'aac'`, `'libvorbis'`).
+- `audioBitrate`: Output audio bitrate (e.g., `'192k'`).
 - `audioFilePath`: Path to background audio file.
 - `audioTracks`: Array of audio tracks for mixing.
 - `inputProps`: Object injected into the page as `window.__HELIOS_PROPS__`.

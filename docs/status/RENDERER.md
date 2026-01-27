@@ -1,8 +1,9 @@
-**Version**: 1.20.1
+**Version**: 1.21.0
 
 # Renderer Agent Status
 
 ## Progress Log
+- [1.21.0] ✅ Completed: Configurable Audio Codecs - Added `audioCodec` and `audioBitrate` to `RendererOptions` and updated `FFmpegBuilder` to support smart defaults (e.g., auto-switching to `libvorbis` for WebM) and custom configurations.
 - [1.20.1] ✅ Completed: Optimize Canvas Quality - Updated `CanvasStrategy` to auto-calculate intermediate bitrate based on resolution/FPS (e.g. ~100Mbps for 4K) and wait for fonts to load, ensuring high-quality output and no font glitches.
 - [1.20.0] ✅ Completed: Enable Stream Copy - Updated `FFmpegBuilder` to conditionally omit encoding flags (`-pix_fmt`, `-crf`, `-preset`) when `videoCodec` is `'copy'`, enabling efficient stream passthrough for H.264 WebCodecs.
 - [1.19.1] ✅ Completed: SeekTimeDriver Initialization - Added `init(page)` to `TimeDriver` interface and updated `SeekTimeDriver` to inject polyfills before `page.goto`, ensuring deterministic time for `requestAnimationFrame` and `Date.now` from the first frame.

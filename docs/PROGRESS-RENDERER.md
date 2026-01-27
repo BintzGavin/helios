@@ -1,5 +1,8 @@
 # RENDERER Progress Log
 
+## RENDERER v1.21.0
+- ✅ Completed: Configurable Audio Codecs - Added `audioCodec` and `audioBitrate` to `RendererOptions` and updated `FFmpegBuilder` to support smart defaults (e.g., auto-switching to `libvorbis` for WebM) and custom configurations.
+
 ## RENDERER v1.20.0
 - ✅ Completed: Enable Stream Copy - Updated `FFmpegBuilder` to conditionally omit encoding flags (`-pix_fmt`, `-crf`, `-preset`) when `videoCodec` is `'copy'`, enabling efficient stream passthrough for H.264 WebCodecs.
 
