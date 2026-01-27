@@ -1,5 +1,5 @@
 # Status: DEMO (Executor)
-**Version**: 1.37.0
+**Version**: 1.38.0
 
 ## Vision
 To provide comprehensive, idiomatic examples for every major framework (React, Vue, Svelte, Vanilla) and robust end-to-end testing to ensure the Helios engine delivers on its "Use What You Know" promise.
@@ -61,6 +61,7 @@ To provide comprehensive, idiomatic examples for every major framework (React, V
 None.
 
 ## Log
+- [v1.38.0] 📋 Planned: Scaffold Audio Visualization Example - Created spec file `/.sys/plans/2025-02-22-DEMO-Audio-Visualization.md` to guide implementation of audio data visualization.
 - [v1.37.0] ✅ Completed: Scaffold P5.js Example - Created `examples/p5-canvas-animation` demonstrating integration with P5.js in Instance Mode.
 - [v1.36.0] ✅ Completed: Scaffold WAAPI Animation Example - Created `examples/waapi-animation` demonstrating standard Web Animations API integration with `autoSyncAnimations`.
 - [v1.35.0] ✅ Completed: Scaffold Tailwind CSS Example - Created `examples/tailwind-animation` demonstrating Tailwind v3 integration with proper scoping and build configuration.
