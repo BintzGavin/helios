@@ -1,7 +1,15 @@
 import { TimeDriver } from './TimeDriver';
 
+interface TrackState {
+  baseVolume: number;
+  lastSetVolume: number;
+  baseMuted: boolean;
+  lastSetMuted: boolean;
+}
+
 export class DomDriver implements TimeDriver {
   private scope: HTMLElement | Document | null = null;
+  private trackStates = new WeakMap<HTMLMediaElement, TrackState>();
 
   init(scope: HTMLElement | Document) {
     this.scope = scope;
@@ -53,19 +61,57 @@ export class DomDriver implements TimeDriver {
     mediaElements.forEach((media: Element) => {
       const el = media as HTMLMediaElement;
 
-      // Sync Volume and Muted if provided
-      if (volume !== undefined) {
-        const clampedVolume = Math.max(0, Math.min(1, volume));
-        if (Math.abs(el.volume - clampedVolume) > 0.0001) {
-          el.volume = clampedVolume;
+      let state = this.trackStates.get(el);
+
+      // --- Volume Logic ---
+      const currentVol = el.volume;
+      let baseVol = currentVol;
+
+      if (state) {
+        // If current volume differs from what we last set, assume external change
+        if (Math.abs(currentVol - state.lastSetVolume) > 0.0001) {
+          baseVol = currentVol;
+        } else {
+          baseVol = state.baseVolume;
         }
       }
 
-      if (muted !== undefined) {
-        if (el.muted !== muted) {
-          el.muted = muted;
+      // If master volume is provided, use it; otherwise assume 1 (no scaling)
+      const masterVolume = volume ?? 1;
+      const effectiveVol = Math.max(0, Math.min(1, baseVol * masterVolume));
+
+      if (Math.abs(el.volume - effectiveVol) > 0.0001) {
+        el.volume = effectiveVol;
+      }
+
+      // --- Mute Logic ---
+      const currentMuted = el.muted;
+      let baseMuted = currentMuted;
+
+      if (state) {
+        // If current muted state differs from what we last set, assume external change
+        if (currentMuted !== state.lastSetMuted) {
+          baseMuted = currentMuted;
+        } else {
+          baseMuted = state.baseMuted;
         }
       }
+
+      // If master muted is provided, use it; otherwise assume false (no forced mute)
+      const masterMuted = muted ?? false;
+      const effectiveMuted = baseMuted || masterMuted;
+
+      if (el.muted !== effectiveMuted) {
+        el.muted = effectiveMuted;
+      }
+
+      // Update state
+      this.trackStates.set(el, {
+        baseVolume: baseVol,
+        lastSetVolume: effectiveVol,
+        baseMuted: baseMuted,
+        lastSetMuted: effectiveMuted
+      });
 
       // Sync Playback Rate
       if (el.playbackRate !== playbackRate) {

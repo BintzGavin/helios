@@ -1,5 +1,8 @@
 # CORE Progress Log
 
+## CORE v1.24.0
+- ✅ Completed: Implement Relative Audio Mixing - Implemented relative volume and mute handling in `DomDriver`.
+
 ## CORE v1.23.0
 - ✅ Completed: Implement Resolution Awareness - Added `width`/`height` to state/options, `setSize` method, and `INVALID_RESOLUTION` error.
 
