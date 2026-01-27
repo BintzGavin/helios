@@ -19,16 +19,30 @@ This will start a local server (typically at `http://localhost:5173`) where you 
 
 ## Features
 
-- **Project Root Resolution:** Automatically detects your project root via `HELIOS_PROJECT_ROOT` or `process.cwd()`.
-- **Vite Integration:** Uses Vite for fast HMR (Hot Module Replacement) and efficient bundling.
-- **Composition Discovery:** Scans your project for valid composition entry points (e.g., `index.html`, `composition.html`).
-- **Embedded Player:** Wraps your composition in the `<helios-player>` component for full playback control.
+### Playback & Preview
+- **Interactive Timeline:** Scrub through your animation frame-by-frame.
+- **Hot Reloading:** Preserves timeline state (current frame) when you edit code.
+- **Audio Controls:** Volume slider and Mute toggle.
+- **Keyboard Shortcuts:**
+  - `Space`: Play/Pause
+  - `Arrow Left/Right`: Step 1 frame
+  - `Shift + Arrow`: Step 10 frames
+  - `Home`: Seek to start
 
-## Usage
+### Assets Management
+- **Assets Panel:** View and manage files in your `assets/` directory.
+- **Upload:** Drag & drop files to upload them to your project.
+- **Previews:** Rich previews for video (hover-play), audio, and fonts.
 
-1. **Setup:** Ensure you have a valid Helios composition (HTML + JS/TS) in your project.
-2. **Launch:** Run `npx helios studio`.
-3. **Develop:** Edit your source files. The Studio will automatically reload the composition while preserving timeline state (where possible).
+### Composition Controls
+- **Props Editor:** JSON-based editor to modify `inputProps` dynamically without changing code.
+- **Resolution:** Switch between presets (1080p, 720p, Instagram, etc.) or set custom canvas sizes.
+- **Snapshots:** Take a PNG snapshot of the current frame (Camera icon).
+
+### Render Management
+- **Renders Panel:** Trigger server-side renders directly from the UI.
+- **Configuration:** Select format (MP4/WebM), resolution, and codec.
+- **Progress:** Track render progress and cancel jobs if needed.
 
 ## Environment Variables
 

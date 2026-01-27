@@ -17,7 +17,8 @@ const renderer = new Renderer({
   height: 1080,
   fps: 30,
   durationInSeconds: 10,
-  mode: 'canvas' // or 'dom'
+  mode: 'canvas', // or 'dom'
+  inputProps: { title: "Render Job 1" }
 });
 
 await renderer.render(
@@ -43,9 +44,15 @@ interface RendererOptions {
   durationInSeconds: number; // Duration of the clip
   startFrame?: number;     // Frame to start rendering from (default: 0)
   mode?: 'dom' | 'canvas'; // Rendering strategy (default: 'canvas')
+  inputProps?: Record<string, any>; // Inject props into window.__HELIOS_PROPS__
 
-  // Audio & Encoding
-  audioFilePath?: string;        // Path to audio file to mix
+  // Audio Configuration
+  audioFilePath?: string;        // Path to single audio file
+  audioTracks?: (string | AudioTrackConfig)[]; // List of audio tracks
+  audioCodec?: string;           // e.g., 'aac', 'libvorbis'
+  audioBitrate?: string;         // e.g., '128k', '192k'
+
+  // Video Encoding
   videoCodec?: string;           // e.g., 'libx264' (default), 'libvpx'
   pixelFormat?: string;          // e.g., 'yuv420p' (default)
   crf?: number;                  // Constant Rate Factor (quality control)
@@ -53,6 +60,13 @@ interface RendererOptions {
   videoBitrate?: string;         // e.g., '5M', '1000k'
   intermediateVideoCodec?: string; // Capture codec ('vp8', 'vp9', 'av1')
   ffmpegPath?: string;           // Custom FFmpeg binary path
+}
+
+interface AudioTrackConfig {
+  path: string;
+  volume?: number; // 0.0 to 1.0
+  offset?: number; // Start time in composition (seconds)
+  seek?: number;   // Start time in source file (seconds)
 }
 ```
 
@@ -75,6 +89,14 @@ interface RenderJobOptions {
 }
 ```
 
+#### Diagnose
+Check the rendering environment (Playwright, WebCodecs support, etc.).
+
+```typescript
+// Returns a diagnostic report from the browser context
+const diagnostics = await renderer.diagnose();
+```
+
 ## Rendering Modes
 
 ### Canvas Mode (`mode: 'canvas'`)
@@ -86,8 +108,33 @@ interface RenderJobOptions {
 - **Best for:** CSS Animations, HTML/DOM elements.
 - **Mechanism:** Uses `SeekTimeDriver` (seek & screenshot) to ensure DOM layouts settle.
 - **Performance:** Slower than Canvas mode due to full-page screenshots.
+- **Implicit Audio:** Automatically discovers `<audio>` and `<video>` tags in the DOM and includes their audio in the render.
+
+## Utilities
+
+### Concatenate Videos
+Combine multiple video files into one.
+
+```typescript
+import { concatenateVideos } from '@helios-project/renderer';
+
+await concatenateVideos(['part1.mp4', 'part2.mp4'], 'full-video.mp4');
+```
 
 ## Common Patterns
+
+### Audio Mixing
+Mix multiple audio tracks with offsets and volume control.
+
+```typescript
+const renderer = new Renderer({
+  // ...
+  audioTracks: [
+    { path: 'music.mp3', volume: 0.5 },
+    { path: 'voiceover.wav', volume: 1.0, offset: 2 } // Start voice at 2s
+  ]
+});
+```
 
 ### Cancellable Render
 
@@ -120,3 +167,4 @@ Then view `trace.zip` at [trace.playwright.dev](https://trace.playwright.dev/).
 
 - Main class: `packages/renderer/src/index.ts`
 - Strategies: `packages/renderer/src/strategies/`
+- Types: `packages/renderer/src/types.ts`

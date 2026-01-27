@@ -16,6 +16,8 @@ import { Helios } from '@helios-project/core';
 const helios = new Helios({
   duration: 10,  // seconds
   fps: 30,
+  width: 1920,
+  height: 1080,
   playbackRate: 1,
   inputProps: { text: "Hello World" }
 });
@@ -42,12 +44,17 @@ new Helios(options: HeliosOptions)
 interface HeliosOptions {
   duration: number;              // Duration in seconds (must be >= 0)
   fps: number;                   // Frames per second (must be > 0)
+  width?: number;                // Canvas width (default: 1920)
+  height?: number;               // Canvas height (default: 1080)
+  initialFrame?: number;         // Start frame (default: 0)
   autoSyncAnimations?: boolean;  // Auto-sync DOM animations (WAAPI) to timeline
   animationScope?: HTMLElement;  // Scope for animation syncing
   inputProps?: Record<string, any>; // Initial input properties
+  schema?: HeliosSchema;         // JSON schema for inputProps validation
   playbackRate?: number;         // Initial playback rate (default: 1)
   volume?: number;               // Initial volume (0.0 to 1.0)
   muted?: boolean;               // Initial muted state
+  captions?: string | CaptionCue[]; // SRT string or cue array
   driver?: TimeDriver;           // Custom time driver (mostly internal use)
 }
 ```
@@ -58,6 +65,8 @@ interface HeliosOptions {
 helios.getState(): Readonly<HeliosState>
 
 interface HeliosState {
+  width: number;
+  height: number;
   duration: number;
   fps: number;
   currentFrame: number;
@@ -66,6 +75,8 @@ interface HeliosState {
   playbackRate: number;
   volume: number;
   muted: boolean;
+  captions: CaptionCue[];
+  activeCaptions: CaptionCue[];
 }
 ```
 
@@ -79,15 +90,28 @@ helios.seek(frame: number)    // Jump to specific frame
 helios.setPlaybackRate(rate: number) // Change playback speed (e.g., 0.5, 2.0)
 ```
 
+#### Resolution Control
+```typescript
+helios.setSize(width: number, height: number) // Update canvas dimensions
+```
+
 #### Audio Control
 ```typescript
 helios.setAudioVolume(volume: number) // Set volume (0.0 to 1.0)
 helios.setAudioMuted(muted: boolean)  // Set muted state
 ```
 
-#### Data Input
+#### Data Input & Validation
 ```typescript
-helios.setInputProps(props: Record<string, any>) // Update input properties (triggers subscribers)
+// Update input properties (triggers subscribers)
+// Validates against schema if one was provided in constructor
+helios.setInputProps(props: Record<string, any>)
+```
+
+#### Captions
+```typescript
+// Set captions using SRT string or CaptionCue array
+helios.setCaptions(captions: string | CaptionCue[])
 ```
 
 #### Subscription
@@ -137,6 +161,32 @@ helios.inputProps: ReadonlySignal<Record<string, any>>
 helios.playbackRate: ReadonlySignal<number>
 helios.volume: ReadonlySignal<number>
 helios.muted: ReadonlySignal<boolean>
+helios.captions: ReadonlySignal<CaptionCue[]>
+helios.activeCaptions: ReadonlySignal<CaptionCue[]>
+helios.width: ReadonlySignal<number>
+helios.height: ReadonlySignal<number>
+```
+
+## Utilities
+
+### Color Interpolation
+Interpolate between two colors (Hex, RGB, HSL).
+
+```typescript
+import { interpolateColors } from '@helios-project/core';
+
+const color = interpolateColors('#ff0000', '#0000ff', 0.5); // Returns rgba(...)
+```
+
+### Deterministic Randomness
+Generate reproducible random numbers based on a seed.
+
+```typescript
+import { random } from '@helios-project/core';
+
+const rng = random("my-seed");
+const val = rng.next(); // Always the same sequence for "my-seed"
+const num = rng.range(10, 20); // Random number between 10 and 20
 ```
 
 ## Common Patterns
@@ -155,23 +205,33 @@ helios.subscribe(({ currentFrame, duration, fps }) => {
 });
 ```
 
-### DOM Animation Sync
+### Schema Validation
 
-Automatically sync CSS/WAAPI animations to Helios timeline.
+Ensure input properties match expected types.
 
 ```typescript
+const schema = {
+  type: 'object',
+  properties: {
+    title: { type: 'string' },
+    count: { type: 'number', minimum: 0 }
+  },
+  required: ['title']
+};
+
 const helios = new Helios({
   duration: 10,
   fps: 30,
-  autoSyncAnimations: true,
-  animationScope: document.querySelector('#scene')
+  schema: schema,
+  inputProps: { title: "Intro", count: 5 } // Valid
 });
 
-// CSS animations inside #scene will now sync to helios.seek()
-helios.seek(150);
+// Will throw error if invalid
+helios.setInputProps({ title: "Intro", count: -1 });
 ```
 
 ## Source Files
 
 - Main class: `packages/core/src/index.ts`
 - Signals: `packages/core/src/signals.ts`
+- Utilities: `packages/core/src/color.ts`, `packages/core/src/random.ts`
