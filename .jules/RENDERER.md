@@ -67,3 +67,7 @@
 ## [2026-03-10] - SeekTimeDriver Initialization Timing
 **Learning:** `page.addInitScript` must be called *before* `page.goto` to affect the page load. `SeekTimeDriver.prepare` uses it, but `Renderer.ts` calls `prepare` after `goto`, rendering the polyfill ineffective for the initial state.
 **Action:** Split `TimeDriver` initialization into `init` (pre-load) and `prepare` (post-load) to handle script injection correctly.
+
+## [2026-03-12] - FFmpegBuilder Stream Copy Limitation
+**Learning:** `FFmpegBuilder` forces encoding flags (`-pix_fmt`, etc.) even when `videoCodec` is set to `'copy'`, preventing efficient H.264 passthrough from WebCodecs.
+**Action:** Refactor `FFmpegBuilder` to conditionally omit incompatible flags when `videoCodec === 'copy'`.
