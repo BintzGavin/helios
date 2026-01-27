@@ -1,5 +1,8 @@
 # PLAYER Progress Log
 
+## PLAYER v0.25.2
+- ✅ Completed: Polish Burn-In Captions - Added text shadow to exported captions to match player UI styling and improved code hygiene by preventing canvas state leaks.
+
 ## PLAYER v0.25.1
 - ✅ Completed: Refine Burn-In Captions - Added multiline caption support and respect for player caption visibility toggle during client-side export.
 

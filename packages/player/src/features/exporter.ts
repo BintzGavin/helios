@@ -289,6 +289,8 @@ export class ClientSideExporter {
 
       ctx.drawImage(frame, 0, 0);
 
+      ctx.save();
+
       // Responsive font size (approx 5% of height)
       const fontSize = Math.max(16, Math.round(height * 0.05));
       const padding = fontSize * 0.5;
@@ -318,10 +320,16 @@ export class ClientSideExporter {
           const bgWidth = maxLineWidth + (fontSize * 1.0);
           const bgTopY = currentBottomY - cueHeight;
 
+          // Disable shadow for background
+          ctx!.shadowColor = 'transparent';
           ctx!.fillStyle = 'rgba(0, 0, 0, 0.7)';
           // Centered background rect
           ctx!.fillRect((width / 2) - (bgWidth / 2), bgTopY, bgWidth, cueHeight);
 
+          // Enable shadow for text
+          ctx!.shadowColor = 'black';
+          ctx!.shadowBlur = 2;
+          ctx!.shadowOffsetY = 1;
           ctx!.fillStyle = 'white';
           lines.forEach((line, i) => {
               const y = bgTopY + padding + (i * lineHeight);
@@ -331,6 +339,8 @@ export class ClientSideExporter {
           // Move up for next cue
           currentBottomY -= (cueHeight + 4);
       });
+
+      ctx.restore();
 
       return new VideoFrame(canvas, { timestamp: frame.timestamp });
   }
