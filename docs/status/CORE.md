@@ -1,11 +1,12 @@
 # Status: CORE
 
-**Version**: 1.26.1
+**Version**: 1.26.2
 
 - **Status**: Active
 - **Current Focus**: Maintenance and Optimization
 - **Last Updated**: 2026-03-14
 
+[v1.26.2] ✅ Completed: Restore Context File - Restored missing `/.sys/llmdocs/context-core.md` and verified package integrity.
 [v1.26.1] ✅ Completed: Verify Core Package Integrity - Verified build, tests, and artifacts for `packages/core`.
 [v1.26.0] ✅ Completed: Implement Initial Frame - Added `initialFrame` to `HeliosOptions` and updated constructor to initialize state and sync driver, enabling HMR state preservation.
 [v1.25.0] ✅ Completed: Implement Color Interpolation - Implemented `interpolateColors` and `parseColor` utilities supporting Hex, RGB, and HSL formats.

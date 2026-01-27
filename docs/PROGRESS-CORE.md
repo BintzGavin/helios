@@ -1,5 +1,8 @@
 # CORE Progress Log
 
+## CORE v1.26.2
+- ✅ Completed: Restore Context File - Restored missing `/.sys/llmdocs/context-core.md` and verified package integrity.
+
 ## CORE v1.26.1
 - ✅ Completed: Verify Core Package Integrity - Verified build, tests, and artifacts for `packages/core`.
 
