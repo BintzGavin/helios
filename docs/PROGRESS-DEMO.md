@@ -78,3 +78,6 @@
 
 ## DEMO v1.42.0
 - ✅ Completed: Document Social Media Story Example - Documented `examples/social-media-story` demonstrating React integration with `autoSyncAnimations` and component composition.
+
+## DEMO v1.44.0
+- ✅ Completed: Scaffold React Three Fiber Example - Created `examples/react-three-fiber` demonstrating integration with `@react-three/fiber` using `frameloop="never"` and manual state advancement.

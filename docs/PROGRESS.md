@@ -126,3 +126,6 @@ Each agent should update **their own dedicated progress file** instead of this f
 
 ## PLAYER v0.25.2
 - ✅ Completed: Polish Burn-In Captions - Added text shadow to exported captions to match player UI styling and improved code hygiene by preventing canvas state leaks.
+
+## DEMO v1.44.0
+- ✅ Completed: Scaffold React Three Fiber Example - Created `examples/react-three-fiber` demonstrating integration with `@react-three/fiber` using `frameloop="never"` and manual state advancement.

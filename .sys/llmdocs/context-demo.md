@@ -30,6 +30,7 @@
 - `examples/svelte-dom-animation`: Svelte DOM.
 - `examples/svelte-animation-helpers`: Svelte `<Sequence>`, `<Series>`.
 - `examples/threejs-canvas-animation`: Three.js (3D).
+- `examples/react-three-fiber`: React Three Fiber (R3F) integration.
 - `examples/pixi-canvas-animation`: PixiJS (2D).
 - `examples/p5-canvas-animation`: P5.js (Instance Mode).
 - `examples/tailwind-animation`: Tailwind CSS v3 integration.
