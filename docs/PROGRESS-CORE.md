@@ -1,5 +1,8 @@
 # CORE Progress Log
 
+## CORE v1.26.1
+- ✅ Completed: Verify Core Package Integrity - Verified build, tests, and artifacts for `packages/core`.
+
 ## CORE v1.26.0
 - ✅ Completed: Implement Initial Frame - Added `initialFrame` to `HeliosOptions` and updated constructor to initialize state and sync driver, enabling HMR state preservation.
 
