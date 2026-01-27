@@ -71,3 +71,7 @@
 ## [v1.42.0] - Documentation Sync
 **Learning:** Completed features (like `social-media-story`) can sometimes be missed in status updates, leading to a discrepancy between the codebase and documentation.
 **Action:** Always cross-reference the `examples/` directory with `docs/status/DEMO.md` during "Locate" phase to catch these discrepancies early.
+
+## [v1.43.0] - React Transition Pattern
+**Learning:** `autoSyncAnimations` aligns CSS animations to the *global* document timeline. To implement relative start times (e.g. for `Sequence` transitions), one must explicitly set `animation-delay` based on the sequence's start frame to offset the global time.
+**Action:** The React Transitions example explicitly uses this pattern (`animationDelay: ${from / fps}s`) to ensure correct relative timing.
