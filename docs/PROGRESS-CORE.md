@@ -1,5 +1,8 @@
 # CORE Progress Log
 
+## CORE v1.26.0
+- ✅ Completed: Implement Initial Frame - Added `initialFrame` to `HeliosOptions` and updated constructor to initialize state and sync driver, enabling HMR state preservation.
+
 ## CORE v1.25.0
 - ✅ Completed: Implement Color Interpolation - Implemented `interpolateColors` and `parseColor` utilities supporting Hex, RGB, and HSL formats.
 

@@ -65,6 +65,7 @@ export type HeliosSchema = Record<string, PropDefinition>;
 export interface HeliosOptions {
   width?: number;
   height?: number;
+  initialFrame?: number;
   duration: number; // in seconds
   fps: number;
   autoSyncAnimations?: boolean;

@@ -23,6 +23,7 @@ export type HeliosSubscriber = (state: HeliosState) => void;
 export interface HeliosOptions {
   width?: number;
   height?: number;
+  initialFrame?: number;
   duration: number; // in seconds
   fps: number;
   autoSyncAnimations?: boolean;
@@ -194,8 +195,13 @@ export class Helios {
     const initialProps = validateProps(options.inputProps || {}, this.schema);
     const initialCaptions = options.captions ? parseSrt(options.captions) : [];
 
+    // Initialize Initial Frame
+    const totalFrames = options.duration * options.fps;
+    const initialFrameRaw = options.initialFrame || 0;
+    const initialFrame = Math.max(0, Math.min(initialFrameRaw, totalFrames));
+
     // Initialize signals
-    this._currentFrame = signal(0);
+    this._currentFrame = signal(initialFrame);
     this._isPlaying = signal(false);
     this._inputProps = signal(initialProps);
     this._playbackRate = signal(options.playbackRate ?? 1);
@@ -231,6 +237,14 @@ export class Helios {
     }
 
     this.driver.init(this.animationScope);
+
+    // Sync driver with initial state
+    this.driver.update((this._currentFrame.value / this.fps) * 1000, {
+      isPlaying: this._isPlaying.value,
+      playbackRate: this._playbackRate.value,
+      volume: this._volume.value,
+      muted: this._muted.value
+    });
 
     // Ticker Selection
     this.ticker = options.ticker || (typeof requestAnimationFrame !== 'undefined' ? new RafTicker() : new TimeoutTicker());
