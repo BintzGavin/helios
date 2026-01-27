@@ -1,6 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { useStudio } from '../context/StudioContext';
 import { useKeyboardShortcut } from '../hooks/useKeyboardShortcut';
+import { CaptionCue } from '@helios-project/core';
 import './Timeline.css';
 
 export const Timeline: React.FC = () => {
@@ -15,6 +16,7 @@ export const Timeline: React.FC = () => {
 
   const { currentFrame, duration, fps } = playerState;
   const totalFrames = duration * fps || 100; // Default to 100 to avoid div by zero
+  const captions = (playerState.inputProps?.captions || []) as CaptionCue[];
 
   const trackRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState<'playhead' | 'in' | 'out' | null>(null);
@@ -115,6 +117,25 @@ export const Timeline: React.FC = () => {
         onMouseDown={(e) => handleMouseDown(e, 'playhead')}
       >
         <div className="timeline-track" />
+
+        {/* Caption Markers */}
+        {captions.map((cue, i) => {
+            const startFrame = (cue.startTime / 1000) * fps;
+            const endFrame = (cue.endTime / 1000) * fps;
+            const durationFrame = endFrame - startFrame;
+
+            return (
+                <div
+                    key={i}
+                    className="timeline-caption-marker"
+                    style={{
+                        left: `${getPercent(startFrame)}%`,
+                        width: `${Math.max(0.5, (durationFrame / totalFrames) * 100)}%`
+                    }}
+                    title={cue.text}
+                />
+            );
+        })}
 
         {/* Render Region */}
         <div

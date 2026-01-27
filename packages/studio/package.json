@@ -10,6 +10,7 @@
     "test": "vitest"
   },
   "dependencies": {
+    "@helios-project/core": "*",
     "@helios-project/player": "*",
     "@helios-project/renderer": "*",
     "react": "^19.2.3",

@@ -1,0 +1,67 @@
+.captions-panel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  color: #e0e0e0;
+  padding: 10px;
+  overflow: hidden;
+}
+
+.captions-panel h2 {
+  font-size: 16px;
+  margin-top: 0;
+  margin-bottom: 10px;
+  border-bottom: 1px solid #444;
+  padding-bottom: 5px;
+}
+
+.upload-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 15px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #444;
+}
+
+.file-input {
+  background: #333;
+  padding: 5px;
+  border-radius: 4px;
+  color: #ccc;
+  font-size: 12px;
+}
+
+.captions-list {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.caption-item {
+  background: #2a2a2a;
+  padding: 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  border-left: 3px solid #007bff;
+}
+
+.caption-time {
+  color: #888;
+  font-family: monospace;
+  margin-bottom: 4px;
+  font-size: 11px;
+}
+
+.caption-text {
+  white-space: pre-wrap;
+}
+
+.no-captions {
+  color: #666;
+  font-style: italic;
+  text-align: center;
+  margin-top: 20px;
+}
