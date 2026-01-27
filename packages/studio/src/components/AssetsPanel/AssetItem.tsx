@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Asset, useStudio } from '../../context/StudioContext';
+import './AssetItem.css';
 
 interface AssetItemProps {
   asset: Asset;
@@ -8,6 +9,41 @@ interface AssetItemProps {
 export const AssetItem: React.FC<AssetItemProps> = ({ asset }) => {
   const { deleteAsset } = useStudio();
   const [isHovering, setIsHovering] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  // Audio Cleanup
+  useEffect(() => {
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
+    };
+  }, []);
+
+  // Font Loading
+  useEffect(() => {
+    if (asset.type === 'font') {
+      const fontName = `font-${asset.id}`;
+      const font = new FontFace(fontName, `url(${asset.url})`);
+
+      const loadPromise = font.load();
+
+      loadPromise.then((loadedFont) => {
+        document.fonts.add(loadedFont);
+      }).catch(err => {
+        console.error('Failed to load font:', err);
+      });
+
+      return () => {
+        loadPromise.then((loadedFont) => {
+          document.fonts.delete(loadedFont);
+        }).catch(() => {});
+      };
+    }
+  }, [asset]);
 
   const handleDelete = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -16,85 +52,94 @@ export const AssetItem: React.FC<AssetItemProps> = ({ asset }) => {
     }
   };
 
+  const handleVideoEnter = () => {
+    setIsHovering(true);
+    if (videoRef.current) {
+        videoRef.current.play().catch(() => {
+            // Ignore auto-play errors
+        });
+    }
+  };
+
+  const handleVideoLeave = () => {
+    setIsHovering(false);
+    if (videoRef.current) {
+        videoRef.current.pause();
+        videoRef.current.currentTime = 0;
+    }
+  };
+
+  const toggleAudio = (e: React.MouseEvent) => {
+      e.stopPropagation();
+      if (isPlaying && audioRef.current) {
+          audioRef.current.pause();
+          setIsPlaying(false);
+      } else {
+          if (!audioRef.current) {
+              audioRef.current = new Audio(asset.url);
+              audioRef.current.onended = () => setIsPlaying(false);
+          }
+          audioRef.current.play().catch(console.error);
+          setIsPlaying(true);
+      }
+  };
+
+  const renderPreview = () => {
+    switch (asset.type) {
+        case 'image':
+            return <img src={asset.url} alt={asset.name} />;
+        case 'video':
+            return (
+                <video
+                    ref={videoRef}
+                    src={asset.url}
+                    muted
+                    loop
+                    playsInline
+                    style={{ pointerEvents: 'none' }}
+                />
+            );
+        case 'audio':
+            return (
+                <div
+                    className={`audio-preview ${isPlaying ? 'playing' : ''}`}
+                    onClick={toggleAudio}
+                    title="Click to Play/Pause"
+                >
+                    {isPlaying ? '🔊' : '🎵'}
+                </div>
+            );
+        case 'font':
+            return (
+                <div className="font-preview" style={{ fontFamily: `font-${asset.id}, sans-serif` }}>
+                    Aa
+                </div>
+            );
+        default:
+             return <div style={{ color: '#666', fontSize: '24px' }}>📄</div>;
+    }
+  };
+
   return (
     <div
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        padding: '8px',
-        border: '1px solid #333',
-        borderRadius: '4px',
-        cursor: 'pointer',
-        background: '#222',
-        gap: '4px',
-        width: '100px',
-        overflow: 'hidden',
-        position: 'relative'
-      }}
+      className="asset-item"
       title={asset.name}
-      onMouseEnter={() => setIsHovering(true)}
-      onMouseLeave={() => setIsHovering(false)}
+      onMouseEnter={asset.type === 'video' ? handleVideoEnter : () => setIsHovering(true)}
+      onMouseLeave={asset.type === 'video' ? handleVideoLeave : () => setIsHovering(false)}
     >
       {isHovering && (
         <div
+            className="delete-btn"
             onClick={handleDelete}
-            style={{
-                position: 'absolute',
-                top: '4px',
-                right: '4px',
-                width: '20px',
-                height: '20px',
-                background: 'rgba(0,0,0,0.7)',
-                borderRadius: '50%',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: '#ff4444',
-                fontSize: '14px',
-                cursor: 'pointer',
-                zIndex: 10
-            }}
             title="Delete Asset"
         >
             ×
         </div>
       )}
-      <div
-        style={{
-          width: '100%',
-          height: '60px',
-          background: '#000',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          overflow: 'hidden',
-          borderRadius: '2px'
-        }}
-      >
-        {asset.type === 'image' ? (
-          <img
-            src={asset.url}
-            alt={asset.name}
-            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-          />
-        ) : (
-            <div style={{ color: '#666', fontSize: '24px' }}>
-                {asset.type === 'audio' ? '🎵' : '📄'}
-            </div>
-        )}
+      <div className="asset-preview">
+        {renderPreview()}
       </div>
-      <span
-        style={{
-          fontSize: '0.8em',
-          whiteSpace: 'nowrap',
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-          width: '100%',
-          textAlign: 'center',
-          color: '#ccc'
-        }}
-      >
+      <span className="asset-name">
         {asset.name}
       </span>
     </div>

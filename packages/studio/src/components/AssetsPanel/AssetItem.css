@@ -1,0 +1,92 @@
+.asset-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 8px;
+  border: 1px solid #333;
+  border-radius: 4px;
+  cursor: pointer;
+  background: #222;
+  gap: 4px;
+  width: 100px;
+  overflow: hidden;
+  position: relative;
+  transition: border-color 0.2s;
+}
+
+.asset-item:hover {
+  border-color: #555;
+}
+
+.delete-btn {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 20px;
+  height: 20px;
+  background: rgba(0, 0, 0, 0.7);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ff4444;
+  font-size: 14px;
+  cursor: pointer;
+  z-index: 10;
+}
+
+.asset-preview {
+  width: 100%;
+  height: 60px;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 2px;
+  position: relative;
+}
+
+.asset-preview img,
+.asset-preview video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.asset-name {
+  font-size: 0.8em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+  text-align: center;
+  color: #ccc;
+}
+
+.audio-preview {
+  font-size: 24px;
+  color: #666;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+}
+
+.audio-preview.playing {
+  color: #3296ff;
+  animation: pulse 1s infinite;
+}
+
+.font-preview {
+  font-size: 24px;
+  color: #fff;
+}
+
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.6; }
+  100% { opacity: 1; }
+}
