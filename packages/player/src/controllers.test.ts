@@ -102,30 +102,34 @@ describe('DirectController', () => {
         const mockBitmap = {} as ImageBitmap;
         vi.mocked(domCapture.captureDomToBitmap).mockResolvedValue(mockBitmap);
 
-        const frame = await controller.captureFrame(5, { mode: 'dom' });
+        const result = await controller.captureFrame(5, { mode: 'dom' });
 
         expect(mockHeliosInstance.seek).toHaveBeenCalledWith(5);
         expect(domCapture.captureDomToBitmap).toHaveBeenCalled();
-        expect(frame).toBeInstanceOf(VideoFrame);
+        expect(result).not.toBeNull();
+        expect(result!.frame).toBeInstanceOf(VideoFrame);
+        expect(result!.captions).toEqual([]);
     });
 
     it('should capture Canvas frame', async () => {
         const mockCanvas = document.createElement('canvas');
         (mockIframe.contentDocument!.querySelector as any).mockReturnValue(mockCanvas);
 
-        const frame = await controller.captureFrame(5, { mode: 'canvas', selector: 'canvas' });
+        const result = await controller.captureFrame(5, { mode: 'canvas', selector: 'canvas' });
 
         expect(mockHeliosInstance.seek).toHaveBeenCalledWith(5);
-        expect(frame).toBeInstanceOf(VideoFrame);
+        expect(result).not.toBeNull();
+        expect(result!.frame).toBeInstanceOf(VideoFrame);
         // source of VideoFrame should be canvas
-        expect((frame as any).source).toBe(mockCanvas);
+        expect((result!.frame as any).source).toBe(mockCanvas);
+        expect(result!.captions).toEqual([]);
     });
 
     it('should return null if canvas not found', async () => {
         (mockIframe.contentDocument!.querySelector as any).mockReturnValue(null);
 
-        const frame = await controller.captureFrame(5, { mode: 'canvas' });
-        expect(frame).toBeNull();
+        const result = await controller.captureFrame(5, { mode: 'canvas' });
+        expect(result).toBeNull();
     });
 });
 
@@ -215,16 +219,20 @@ describe('BridgeController', () => {
         }, '*');
 
         const mockBitmap = {} as ImageBitmap;
+        const mockCaptions = [{ id: '1', startTime: 0, endTime: 100, text: 'Hi' }];
         triggerMessage({
             type: 'HELIOS_FRAME_DATA',
             frame: 10,
             success: true,
-            bitmap: mockBitmap
+            bitmap: mockBitmap,
+            captions: mockCaptions
         });
 
-        const frame = await promise;
-        expect(frame).toBeInstanceOf(VideoFrame);
-        expect((frame as any).source).toBe(mockBitmap);
+        const result = await promise;
+        expect(result).not.toBeNull();
+        expect(result!.frame).toBeInstanceOf(VideoFrame);
+        expect((result!.frame as any).source).toBe(mockBitmap);
+        expect(result!.captions).toEqual(mockCaptions);
     });
 
     it('should handle bridge capture failure', async () => {
@@ -237,7 +245,7 @@ describe('BridgeController', () => {
              error: "Boom"
          });
 
-         const frame = await promise;
-         expect(frame).toBeNull();
+         const result = await promise;
+         expect(result).toBeNull();
     });
 });

@@ -1,4 +1,4 @@
-**Version**: 0.21.0
+**Version**: v0.22.0
 
 # Status: PLAYER
 
@@ -28,6 +28,7 @@
 ## Critical Task
 - **None**: Recent task completed.
 
+[v0.22.0] ✅ Completed: Export Burn-In Captions - Implemented caption rendering (burn-in) for client-side export using intermediate OffscreenCanvas.
 [v0.21.0] ✅ Completed: Video Inlining - Implemented `inlineVideos` to capture `<video>` elements as images during client-side export, ensuring visual fidelity.
 [v0.20.1] ✅ Completed: Project Cleanup - Added explicit `vitest` dependency and removed obsolete plan file.
 [v0.20.0] ✅ Completed: Client Side Audio Volume - Updated exporter to respect `volume` and `muted` attributes of audio elements during client-side export.
