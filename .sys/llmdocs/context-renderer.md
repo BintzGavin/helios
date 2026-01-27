@@ -5,6 +5,7 @@ The Renderer uses the Strategy pattern to support two distinct rendering modes:
 1.  **Canvas Strategy**:
     *   Optimized for `<canvas>`-based animations (WebGL, Three.js, PixiJS).
     *   Uses **WebCodecs API** (`VideoEncoder`) to capture frames directly from the canvas context.
+    *   **Data Transfer Optimization**: Uses `Blob` and `FileReader` for efficient zero-copy-like transfer of encoded chunks from browser to Node.js.
     *   Encoding happens in-browser, and encoded chunks are piped to FFmpeg.
     *   **Smart Codec Selection**: Automatically prioritizes `avc1` (H.264 Annex B) when `videoCodec: 'copy'` is requested to enable direct stream copy, falling back to `vp8` (IVF) if unsupported.
     *   Supports `avc1` (H.264), `vp9`, and `av01` (AV1) intermediate codecs.

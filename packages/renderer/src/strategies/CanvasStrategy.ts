@@ -268,7 +268,7 @@ export class CanvasStrategy implements RenderStrategy {
   }
 
   private async captureWebCodecs(page: Page, frameTime: number): Promise<Buffer> {
-    const chunkData = await page.evaluate(async (time) => {
+    const chunkData = await page.evaluate<string, number>(async (time) => {
       const context = (window as any).heliosWebCodecs;
 
       if (context.error) {
@@ -295,34 +295,21 @@ export class CanvasStrategy implements RenderStrategy {
         return ''; // Return empty string
       }
 
-      // Serialize chunks for transfer (they are ArrayBuffers)
-      // We can return an array of number[] or base64.
-      // ArrayBuffer[] is not directly transferrable via evaluate unless we use handle,
-      // but returning { data: [...] } works if small.
-      // Better: concat into one big buffer in browser then return.
+      // Optimize transfer using Blob and FileReader
+      const blob = new Blob(chunks, { type: 'application/octet-stream' });
+      context.chunks = []; // Clear buffer immediately
 
-      const totalLen = chunks.reduce((acc: number, c: ArrayBuffer) => acc + c.byteLength, 0);
-      const combined = new Uint8Array(totalLen);
-      let offset = 0;
-      for (const c of chunks) {
-        combined.set(new Uint8Array(c), offset);
-        offset += c.byteLength;
-      }
-
-      // Clear chunks
-      context.chunks = [];
-
-      // Transfer as standard array (slow?) or Base64?
-      // Playwright handles Uint8Array return by serializing.
-      // Base64 is safer for binary integrity usually.
-
-      // Let's use Base64 to be safe and robust.
-      let binary = '';
-      const len = combined.byteLength;
-      for (let i = 0; i < len; i++) {
-        binary += String.fromCharCode(combined[i]);
-      }
-      return btoa(binary);
+      return await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onloadend = () => {
+              const result = reader.result as string;
+              // result format: "data:application/octet-stream;base64,ABC..."
+              const base64 = result.split(',')[1];
+              resolve(base64);
+          };
+          reader.onerror = () => reject(new Error('Failed to read blob'));
+          reader.readAsDataURL(blob);
+      });
 
     }, frameTime);
 
@@ -360,7 +347,7 @@ export class CanvasStrategy implements RenderStrategy {
 
   async finish(page: Page): Promise<Buffer | void> {
     if (this.useWebCodecs) {
-      const chunkData = await page.evaluate(async () => {
+      const chunkData = await page.evaluate<string>(async () => {
         const context = (window as any).heliosWebCodecs;
         if (!context || !context.encoder) return '';
 
@@ -369,21 +356,21 @@ export class CanvasStrategy implements RenderStrategy {
         const chunks = context.chunks;
         if (chunks.length === 0) return '';
 
-        const totalLen = chunks.reduce((acc: number, c: ArrayBuffer) => acc + c.byteLength, 0);
-        const combined = new Uint8Array(totalLen);
-        let offset = 0;
-        for (const c of chunks) {
-          combined.set(new Uint8Array(c), offset);
-          offset += c.byteLength;
-        }
-        context.chunks = [];
+        // Optimize transfer using Blob and FileReader
+        const blob = new Blob(chunks, { type: 'application/octet-stream' });
+        context.chunks = []; // Clear buffer immediately
 
-        let binary = '';
-        const len = combined.byteLength;
-        for (let i = 0; i < len; i++) {
-          binary += String.fromCharCode(combined[i]);
-        }
-        return btoa(binary);
+        return await new Promise<string>((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                const result = reader.result as string;
+                // result format: "data:application/octet-stream;base64,ABC..."
+                const base64 = result.split(',')[1];
+                resolve(base64);
+            };
+            reader.onerror = () => reject(new Error('Failed to read blob'));
+            reader.readAsDataURL(blob);
+        });
       });
 
       if (chunkData && chunkData.length > 0) {
