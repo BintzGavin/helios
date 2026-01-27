@@ -1,5 +1,5 @@
 # Status: DEMO (Executor)
-**Version**: 1.34.0
+**Version**: 1.35.0
 
 ## Vision
 To provide comprehensive, idiomatic examples for every major framework (React, Vue, Svelte, Vanilla) and robust end-to-end testing to ensure the Helios engine delivers on its "Use What You Know" promise.
@@ -21,6 +21,7 @@ To provide comprehensive, idiomatic examples for every major framework (React, V
 - **React (DOM)**: ✅ `examples/react-dom-animation` exists and works.
 - **React (CSS)**: ✅ `examples/react-css-animation` exists and works (Demonstrates `autoSyncAnimations: true`).
 - **React (Helpers)**: ✅ `examples/react-animation-helpers` exists and works (Demonstrates `<Sequence>`, `<Series>`).
+- **Tailwind CSS**: ✅ `examples/tailwind-animation` exists and works (Demonstrates Tailwind v3 integration with `autoSyncAnimations`).
 - **Vue (Canvas)**: ✅ `examples/vue-canvas-animation` exists and works.
 - **Vue (DOM)**: ✅ `examples/vue-dom-animation` exists and works.
 - **Vue (Helpers)**: ✅ `examples/vue-animation-helpers` exists and works (Demonstrates `<Sequence>`, `<Series>`).
@@ -50,11 +51,13 @@ To provide comprehensive, idiomatic examples for every major framework (React, V
 - [x] Scaffold React CSS Animation Example
 - [x] Scaffold Dynamic Props Example
 - [x] Scaffold D3 Animation Example
+- [x] Scaffold Tailwind CSS Example
 
 ## Known Issues
 None.
 
 ## Log
+- [v1.35.0] ✅ Completed: Scaffold Tailwind CSS Example - Created `examples/tailwind-animation` demonstrating Tailwind v3 integration with proper scoping and build configuration.
 - [v1.34.0] 📋 Planned: Scaffold Tailwind CSS Example - Created spec file `/.sys/plans/2025-02-22-DEMO-TailwindAnimation.md` to guide implementation of Tailwind CSS integration.
 - [v1.33.0] ✅ Completed: Scaffold D3 Animation Example - Created `examples/d3-animation` demonstrating data visualization with D3.js and frame-based updates.
 - [v1.32.0] 📋 Planned: Scaffold D3 Animation Example - Created spec file `/.sys/plans/2025-02-21-DEMO-D3-Animation.md` to guide implementation of data visualization example using D3.js.

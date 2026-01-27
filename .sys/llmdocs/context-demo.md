@@ -1,48 +1,39 @@
-# DEMO Domain Context
+# Context: DEMO Domain
 
 ## A. Examples
-
-| Example | Description | Strategy |
-| :--- | :--- | :--- |
-| `examples/simple-canvas-animation` | Vanilla JS canvas animation. | Canvas |
-| `examples/simple-animation` | Vanilla JS DOM animation using CSS `@keyframes`. | DOM |
-| `examples/gsap-animation` | Integration with GSAP timelines. | DOM |
-| `examples/framer-motion-animation` | Integration with Framer Motion via `useMotionValue`. | DOM |
-| `examples/lottie-animation` | Integration with Lottie (`lottie-web`) via frame seeking. | DOM |
-| `examples/motion-one-animation` | Integration with Motion One via `autoSyncAnimations`. | DOM |
-| `examples/d3-animation` | Data visualization with D3.js. | DOM |
-| `examples/captions-animation` | Integration with built-in SRT captions. | DOM |
-| `examples/signals-animation` | Vanilla JS signals (`signal`, `computed`, `effect`). | DOM |
-| `examples/dynamic-props-animation` | React example for `inputProps` and schema validation. | DOM |
-| `examples/media-element-animation` | Vanilla JS media sync (`<video>`, `<audio>`). | DOM |
-| `examples/animation-helpers` | Vanilla JS reference for `interpolate`, `spring`, `sequence`, `series`. | Canvas |
-| `examples/react-canvas-animation` | React canvas animation. | Canvas |
-| `examples/react-dom-animation` | React DOM animation. | DOM |
-| `examples/react-css-animation` | React CSS animation via `autoSyncAnimations`. | DOM |
-| `examples/react-animation-helpers` | React helpers (`<Sequence>`, `<Series>`) for composition. | DOM |
-| `examples/vue-canvas-animation` | Vue canvas animation. | Canvas |
-| `examples/vue-dom-animation` | Vue DOM animation. | DOM |
-| `examples/vue-animation-helpers` | Vue helpers (`<Sequence>`, `<Series>`) for composition. | DOM |
-| `examples/svelte-canvas-animation` | Svelte canvas animation. | Canvas |
-| `examples/svelte-dom-animation` | Svelte DOM animation. | DOM |
-| `examples/svelte-animation-helpers` | Svelte helpers (`<Sequence>`, `<Series>`) for composition. | DOM |
-| `examples/threejs-canvas-animation` | Three.js integration. | Canvas |
-| `examples/pixi-canvas-animation` | Pixi.js integration. | Canvas |
+- `examples/simple-canvas-animation`: Vanilla JS Canvas API.
+- `examples/simple-animation`: Vanilla JS DOM + CSS Animations.
+- `examples/media-element-animation`: Native `<video>`/`<audio>` synchronization.
+- `examples/gsap-animation`: GreenSock Animation Platform (GSAP).
+- `examples/framer-motion-animation`: React Framer Motion.
+- `examples/lottie-animation`: Airbnb Lottie (lottie-web).
+- `examples/motion-one-animation`: Motion One (motion).
+- `examples/d3-animation`: D3.js data visualization.
+- `examples/captions-animation`: Built-in SRT captions.
+- `examples/signals-animation`: Fine-grained reactivity (signals).
+- `examples/dynamic-props-animation`: Input props and schema validation.
+- `examples/animation-helpers`: Core helpers (interpolate, spring).
+- `examples/react-canvas-animation`: React Canvas.
+- `examples/react-dom-animation`: React DOM.
+- `examples/react-css-animation`: React CSS Animations.
+- `examples/react-animation-helpers`: React `<Sequence>`, `<Series>`.
+- `examples/vue-canvas-animation`: Vue Canvas.
+- `examples/vue-dom-animation`: Vue DOM.
+- `examples/vue-animation-helpers`: Vue `<Sequence>`, `<Series>`.
+- `examples/svelte-canvas-animation`: Svelte Canvas.
+- `examples/svelte-dom-animation`: Svelte DOM.
+- `examples/svelte-animation-helpers`: Svelte `<Sequence>`, `<Series>`.
+- `examples/threejs-canvas-animation`: Three.js (3D).
+- `examples/pixi-canvas-animation`: PixiJS (2D).
+- `examples/tailwind-animation`: Tailwind CSS v3 integration.
 
 ## B. Build Config
-
-- **Root Config**: `vite.config.js` (dev server), `vite.build-example.config.js` (production build).
-- **Tooling**: Vite, Rollup.
-- **Output**: `output/example-build/`
-- **Pattern**: Examples reference core via relative paths (`../../packages/core/dist/index.js`) to verify local builds.
+- **Root Config**: `vite.config.js` (shared settings).
+- **Example Build**: `vite.build-example.config.js` defines entry points for all examples.
+- **Frameworks**: React, Vue, Svelte supported via Vite plugins.
+- **PostCSS/Tailwind**: Root `postcss.config.js` and `tailwind.config.js` (scoped content).
 
 ## C. E2E Tests
-
-- **Script**: `tests/e2e/verify-render.ts`
-- **Runner**: Playwright + FFmpeg
-- **Verification**:
-  - Builds all examples via `npm run build:examples`.
-  - Renders each example using `packages/renderer`.
-  - Checks for successful video generation (`.mp4`).
-  - Covers both Canvas and DOM strategies.
-  - **Note**: Must run with `ts-node` to avoid `__name` reference errors in DOM strategy.
+- **File**: `tests/e2e/verify-render.ts`
+- **Methodology**: Builds all examples using `vite.build-example.config.js`, then uses `Renderer` (headless browser + FFmpeg) to render a 5-second video for each.
+- **Verification**: Checks that render completes without error and output file exists.

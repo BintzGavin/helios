@@ -38,6 +38,7 @@ export default defineConfig({
         dynamic_props: resolve(__dirname, "examples/dynamic-props-animation/composition.html"),
         media_element: resolve(__dirname, "examples/media-element-animation/composition.html"),
         d3_animation: resolve(__dirname, "examples/d3-animation/composition.html"),
+        tailwind_animation: resolve(__dirname, "examples/tailwind-animation/composition.html"),
       },
     },
   },
