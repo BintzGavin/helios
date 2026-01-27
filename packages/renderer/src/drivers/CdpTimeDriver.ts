@@ -5,6 +5,10 @@ export class CdpTimeDriver implements TimeDriver {
   private client: CDPSession | null = null;
   private currentTime: number = 0;
 
+  async init(page: Page): Promise<void> {
+    // No-op for CdpTimeDriver
+  }
+
   async prepare(page: Page): Promise<void> {
     this.client = await page.context().newCDPSession(page);
     // Initialize virtual time policy to 'pause' to take control of the clock.

@@ -2,7 +2,13 @@ import { Page } from 'playwright';
 
 export interface TimeDriver {
   /**
-   * Prepares the driver (e.g., setting up CDP session or initial overrides).
+   * Initialize the driver before navigation (e.g., injecting scripts).
+   * @param page The Playwright page instance.
+   */
+  init(page: Page): Promise<void>;
+
+  /**
+   * Prepares the driver after navigation (e.g., setting up CDP session or initial overrides).
    */
   prepare(page: Page): Promise<void>;
 

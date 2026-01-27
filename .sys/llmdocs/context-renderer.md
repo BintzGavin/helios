@@ -1,75 +1,63 @@
 # Renderer Context
 
 ## A. Strategy: Dual-Path Architecture
-The renderer supports two distinct strategies for capturing frames:
+The Renderer uses the Strategy pattern to support two distinct rendering modes:
+1.  **Canvas Strategy**:
+    *   Optimized for `<canvas>`-based animations (WebGL, Three.js, PixiJS).
+    *   Uses **WebCodecs API** (`VideoEncoder`) to capture frames directly from the canvas context.
+    *   Encoding happens in-browser, and encoded chunks are piped to FFmpeg.
+    *   Supports `avc1` (H.264), `vp9`, and `av01` (AV1) intermediate codecs.
+    *   Uses `CdpTimeDriver` (Chrome DevTools Protocol) for precise, deterministic time control.
 
-1.  **CanvasStrategy** (Default):
-    -   Best for: High-performance canvas-based animations (WebGL, Three.js, PixiJS).
-    -   Mechanism: Uses `WebCodecs` (VideoEncoder) to capture frames directly from the canvas context.
-    -   Optimizations:
-        -   Supports VP8/VP9/AV1 via IVF container.
-        -   Supports H.264 (avc1) via raw Annex B stream (no container).
-        -   Falls back to `canvas.toDataURL()` if WebCodecs is unavailable.
-    -   Transparency: Supported (if `pixelFormat` is `yuva420p` or similar).
-
-2.  **DomStrategy**:
-    -   Best for: CSS/DOM-based animations.
-    -   Mechanism: Uses `page.screenshot()` (via Playwright) to capture the viewport.
-    -   Features: Includes asset preloading (images, fonts, media) to prevent artifacts.
-
-Both strategies pipe captured frames to a persistent FFmpeg process via stdin.
+2.  **DOM Strategy**:
+    *   Optimized for HTML/CSS animations.
+    *   Uses `SeekTimeDriver` (WAAPI) to advance time.
+    *   Captures frames using `page.screenshot()` (currently, pending `Element.capture` or similar).
+    *   Injects polyfills via `SeekTimeDriver.init()` to ensure `requestAnimationFrame`, `Date.now`, and `performance.now` are deterministic from frame 0.
 
 ## B. File Tree
 ```
-packages/renderer/
-├── src/
-│   ├── strategies/
-│   │   ├── RenderStrategy.ts      # Interface
-│   │   ├── CanvasStrategy.ts      # WebCodecs/Canvas implementation
-│   │   ├── DomStrategy.ts         # Screenshot implementation
-│   ├── drivers/
-│   │   ├── TimeDriver.ts          # Interface for time control
-│   │   ├── CdpTimeDriver.ts       # CDP-based deterministic timing
-│   │   └── SeekTimeDriver.ts      # RAF/Polyfill-based timing
-│   ├── utils/
-│   │   └── FFmpegBuilder.ts       # FFmpeg argument generation logic
-│   ├── index.ts                   # Main entry point (Renderer class)
-│   ├── types.ts                   # Shared interfaces
-│   └── concat.ts                  # Video concatenation utility
-└── tests/                         # Verification scripts
+packages/renderer/src/
+├── drivers/
+│   ├── CdpTimeDriver.ts       # CDP-based time control
+│   ├── SeekTimeDriver.ts      # WAAPI-based time control with polyfills
+│   └── TimeDriver.ts          # Interface for time drivers
+├── strategies/
+│   ├── CanvasStrategy.ts      # WebCodecs capture implementation
+│   ├── DomStrategy.ts         # DOM/Screenshot capture implementation
+│   └── RenderStrategy.ts      # Interface for strategies
+├── utils/
+│   ├── FFmpegBuilder.ts       # Centralized FFmpeg argument generation
+│   └── concat.ts              # Video concatenation utility
+├── index.ts                   # Main entry point (Renderer class)
+└── types.ts                   # Type definitions (RendererOptions, etc.)
 ```
 
-## C. Configuration
-The `Renderer` is configured via `RendererOptions`:
-
-```typescript
-interface RendererOptions {
-  width: number;
-  height: number;
-  fps: number;
-  durationInSeconds: number;
-  mode?: 'canvas' | 'dom';
-  intermediateVideoCodec?: string; // e.g., 'vp8', 'avc1.42001f'
-  videoBitrate?: string;           // e.g., '5M'
-  pixelFormat?: string;            // e.g., 'yuv420p', 'yuva420p'
-  audioFilePath?: string;          // Single track
-  audioTracks?: (string | AudioTrackConfig)[]; // Multi-track mixing
-  inputProps?: Record<string, any>; // Dynamic props injection
-  ffmpegPath?: string;
-  startFrame?: number;             // For distributed rendering
-  // ... (crf, preset, videoCodec)
-}
-```
+## C. Configuration: RendererOptions
+The `RendererOptions` interface controls the rendering process:
+- `width`, `height`, `fps`, `durationInSeconds`: Basic video properties.
+- `mode`: `'canvas'` or `'dom'`.
+- `videoCodec`: Output codec (e.g., `'libx264'`, `'libvpx-vp9'`).
+- `pixelFormat`: Output pixel format (e.g., `'yuv420p'`, `'yuva420p'`).
+- `intermediateVideoCodec`: Codec for WebCodecs capture (e.g., `'avc1'`, `'vp9'`, `'av01'`).
+- `videoBitrate`: Target bitrate (e.g., `2500000`).
+- `audioFilePath`: Path to background audio file.
+- `audioTracks`: Array of audio tracks for mixing.
+- `inputProps`: Object injected into the page as `window.__HELIOS_PROPS__`.
+- `ffmpegPath`: Custom path to FFmpeg binary.
+- `startFrame`: Frame index to start rendering from.
 
 ## D. FFmpeg Interface
-The renderer spawns FFmpeg with arguments generated by `FFmpegBuilder`.
-- **Inputs**:
-    -   Video: Pipes from stdin (`-f ivf` for VPx, `-f h264` for AVC, or `-f image2pipe` for screenshots).
-    -   Audio: `-i <path>` for each track.
-- **Filters**:
-    -   `adelay`: For audio offsets.
-    -   `volume`: For track volume.
-    -   `amix`: For mixing multiple tracks.
-- **Output**:
-    -   Encodes to H.264 (MP4) by default, configurable via `videoCodec`.
-    -   Writes to the specified `outputPath`.
+The Renderer spawns FFmpeg with arguments generated by `FFmpegBuilder`. Common flags include:
+- Inputs:
+    - `-f ivf` or `-f h264` (for WebCodecs input stream)
+    - `-f image2pipe` (for DOM screenshot stream)
+    - `-i pipe:0` (read from stdin)
+    - `-i <audio_file>` (for audio tracks)
+- Filters:
+    - `-vf` / `-filter_complex`: Used for scaling, pixel format conversion, and audio mixing (`amix`, `adelay`, `volume`).
+- Output:
+    - `-c:v <videoCodec>` (e.g., `libx264`)
+    - `-pix_fmt <pixelFormat>` (e.g., `yuv420p`)
+    - `-movflags +faststart` (for MP4)
+    - `-y` (overwrite output)
