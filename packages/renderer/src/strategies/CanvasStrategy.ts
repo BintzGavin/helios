@@ -35,6 +35,9 @@ export class CanvasStrategy implements RenderStrategy {
   }
 
   async prepare(page: Page): Promise<void> {
+    // Ensure fonts are loaded before capture starts
+    await page.evaluate(() => document.fonts.ready);
+
     // Detect WebCodecs support and initialize if possible
     const width = page.viewportSize()?.width || 1920;
     const height = page.viewportSize()?.height || 1080;
@@ -44,7 +47,15 @@ export class CanvasStrategy implements RenderStrategy {
     if (this.options.videoBitrate) {
       targetBitrate = this.parseBitrate(this.options.videoBitrate);
     }
-    const intermediateBitrate = Math.max(25_000_000, targetBitrate);
+
+    // Heuristic: 0.2 bits per pixel per frame (approx high quality)
+    // 1920x1080 @ 60fps ~= 25 Mbps
+    // 3840x2160 @ 60fps ~= 100 Mbps
+    // Actually 0.2 bpp is very high quality for H.264/VP9.
+    const fps = this.options.fps || 60;
+    const autoBitrate = Math.floor(width * height * fps * 0.2);
+
+    const intermediateBitrate = Math.max(25_000_000, targetBitrate, autoBitrate);
 
     // Resolve codec and FourCC
     let codecString = 'vp8';
