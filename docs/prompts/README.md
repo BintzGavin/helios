@@ -20,9 +20,13 @@ The DOCS agent (unified planning/execution) runs **once per day** to perform a c
 ### Daily: Agent Skills Maintenance
 The SKILLS agent (unified planning/execution) runs **once per day** to maintain agent-facing skills—specialized "onboarding guides" that enable AI agents to effectively use Helios APIs. Unlike user documentation, skills are optimized for LLM consumption: concise, procedural, and actionable. The SKILLS agent ensures agents can discover, understand, and execute tasks efficiently in a single run.
 
+### Daily: LLM Context Maintenance
+The LLMS agent (unified planning/execution) runs **once per day** to maintain the `llms.txt` file—a standardized LLM-facing overview document that helps AI assistants quickly understand the project. The LLMS agent ensures this file stays synchronized with the codebase, with accurate API examples, current roadmap status, and valid file paths.
+
 **Cycle**: Planning (1h) → Execution (1h) → Planning (1h) → Execution (1h) → ... (continuous loop)
 **Documentation**: DOCS runs once daily for comprehensive user-facing documentation review
 **Skills**: SKILLS runs once daily for comprehensive agent-facing skills maintenance
+**LLMS**: LLMS runs once daily for comprehensive llms.txt maintenance
 
 ## Scheduling & Autonomy
 
@@ -53,6 +57,7 @@ The system uses individual prompts for each agent role:
 **Other Prompts:**
 - **[Documentation Prompt](./docs.md)** - Unified prompt for user-facing documentation agent (no planning/execution separation)
 - **[Skills Prompt](./skills.md)** - Unified prompt for agent-facing skills agent (no planning/execution separation)
+- **[LLMS Prompt](./llms.md)** - Unified prompt for llms.txt maintainer (no planning/execution separation)
 - **[Role Definitions](./roles.md)** - Domain-specific role configurations (reference only)
 
 **Note**: 
@@ -60,7 +65,8 @@ The system uses individual prompts for each agent role:
 - Execution agents (CORE/RENDERER/PLAYER/DEMO/STUDIO) update progress logs, context files, backlog, and system context immediately upon completing work, eliminating the need for a separate scribe agent.
 - The DOCS agent runs **once per day** to perform a comprehensive review and update of all user-facing documentation, ensuring the entire documentation site stays synchronized with the codebase.
 - The SKILLS agent runs **once per day** to maintain agent-facing skills, ensuring AI agents can effectively use Helios APIs with specialized, LLM-optimized guidance.
-- Each role maintains its own semantic version (e.g., CORE: 1.2.3, DOCS: 2.1.0, SKILLS: 1.0.0) instead of using timestamps, which are unreliable in agent workflows.
+- The LLMS agent runs **once per day** to maintain the `llms.txt` file, ensuring AI assistants can quickly and accurately understand the project's capabilities, APIs, and structure.
+- Each role maintains its own semantic version (e.g., CORE: 1.2.3, DOCS: 2.1.0, SKILLS: 1.0.0, LLMS: 1.0.0) instead of using timestamps, which are unreliable in agent workflows.
 
 ## Design Principles
 
