@@ -17,6 +17,11 @@ export declare class HeliosPlayer extends HTMLElement {
     private captionsContainer;
     private ccBtn;
     private showCaptions;
+    private posterContainer;
+    private posterImage;
+    private bigPlayBtn;
+    private pendingSrc;
+    private isLoaded;
     private controller;
     private directHelios;
     private unsubscribe;
@@ -42,6 +47,7 @@ export declare class HeliosPlayer extends HTMLElement {
     set playbackRate(val: number);
     get fps(): number;
     play(): Promise<void>;
+    load(): void;
     pause(): void;
     static get observedAttributes(): string[];
     constructor();
@@ -50,6 +56,9 @@ export declare class HeliosPlayer extends HTMLElement {
     set inputProps(val: Record<string, any> | null);
     connectedCallback(): void;
     disconnectedCallback(): void;
+    private loadIframe;
+    private handleBigPlayClick;
+    private updatePosterVisibility;
     private setControlsDisabled;
     private lockPlaybackControls;
     private handleIframeLoad;

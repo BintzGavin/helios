@@ -1,5 +1,8 @@
 # PLAYER Progress Log
 
+## PLAYER v0.24.0
+- ✅ Completed: Implement Poster and Preload - Implemented `poster` attribute for custom preview images and `preload` attribute to control loading behavior (including deferred loading with "Big Play Button").
+
 ## PLAYER v0.23.0
 - ✅ Completed: Implement Input Props - Implemented `input-props` attribute/property on `<helios-player>` to pass dynamic data to the composition controller.
 

@@ -10,6 +10,7 @@
 ### A. Component Structure
 - **Shadow DOM**:
   - `<iframe>`: Renders the user's composition (sandboxed).
+  - `.poster-container`: Overlay displaying custom preview image and play button (when `preload="none"`).
   - `.status-overlay`: Displays loading/error states.
   - `.controls`: Overlay UI for playback (play, seek, volume, speed, fullscreen, captions, export).
   - `.captions-container`: Overlay for rendering burn-in style captions during preview.
@@ -30,6 +31,8 @@
 - `autoplay`: Auto-start playback on load.
 - `loop`: Loop playback.
 - `controls`: Show/hide default UI controls.
+- `poster`: URL of the poster image to display before loading.
+- `preload`: `auto` | `none`. Defaults to `auto`. If `none`, defers iframe loading.
 - `export-mode`: `auto` | `canvas` | `dom` (default: `auto`).
 - `canvas-selector`: CSS selector for the canvas element (default: `canvas`).
 - `export-format`: `mp4` | `webm` (default: `mp4`).

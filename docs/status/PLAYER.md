@@ -1,4 +1,4 @@
-**Version**: v0.23.0
+**Version**: v0.24.0
 
 # Status: PLAYER
 
@@ -24,11 +24,13 @@
 - Implements Standard Media API (play, pause, currentTime, events) for better interoperability.
 - Client-side audio export respects `volume` and `muted` properties of audio elements.
 - Client-side export (DOM mode) now inlines `<video>` elements as static images, ensuring they are visible in the exported output.
-- **New**: Supports declarative data binding via `input-props` attribute (JSON string) and property, enabling dynamic composition updates.
+- Supports declarative data binding via `input-props` attribute (JSON string) and property, enabling dynamic composition updates.
+- **New**: Supports `poster` and `preload` attributes. `preload="none"` defers iframe loading until the user interacts with the new "Big Play Button".
 
 ## Critical Task
 - **None**: Recent task completed.
 
+[v0.24.0] ✅ Completed: Implement Poster and Preload - Implemented `poster` attribute for custom preview images and `preload` attribute to control loading behavior (including deferred loading with "Big Play Button").
 [v0.23.0] ✅ Completed: Implement Input Props - Implemented `input-props` attribute/property on `<helios-player>` to pass dynamic data to the composition controller.
 [v0.22.0] ✅ Completed: Export Burn-In Captions - Implemented caption rendering (burn-in) for client-side export using intermediate OffscreenCanvas.
 [v0.21.0] ✅ Completed: Video Inlining - Implemented `inlineVideos` to capture `<video>` elements as images during client-side export, ensuring visual fidelity.
