@@ -1,10 +1,11 @@
 # Status: DEMO (Executor)
-**Version**: 1.41.0
+**Version**: 1.42.0
 
 ## Vision
 To provide comprehensive, idiomatic examples for every major framework (React, Vue, Svelte, Vanilla) and robust end-to-end testing to ensure the Helios engine delivers on its "Use What You Know" promise.
 
 ## Current State
+- **Social Media Story**: ✅ `examples/social-media-story` exists and works (Demonstrates `autoSyncAnimations` with `<video>` and sequence composition).
 - **Chart.js**: ✅ `examples/chartjs-animation` exists and works (Demonstrates synchronous update via `chart.update('none')`).
 - **Procedural Generation**: ✅ `examples/procedural-generation` exists and works (Demonstrates `random` and `interpolateColors`).
 - **Vanilla JS (Canvas)**: ✅ `examples/simple-canvas-animation` exists and works.
@@ -66,6 +67,7 @@ To provide comprehensive, idiomatic examples for every major framework (React, V
 None.
 
 ## Log
+- [v1.42.0] ✅ Completed: Document Social Media Story Example - Documented `examples/social-media-story` demonstrating React integration with `autoSyncAnimations` and component composition.
 - [v1.41.0] ✅ Completed: Scaffold Chart.js Animation Example - Created `examples/chartjs-animation` demonstrating integration with Chart.js using synchronous updates.
 - [v1.40.0] ✅ Completed: Scaffold Procedural Generation Example - Created `examples/procedural-generation` demonstrating deterministic `random` and `interpolateColors` utilities.
 - [v1.39.0] ✅ Completed: Scaffold Audio Visualization Example - Created `examples/audio-visualization` demonstrating synchronous audio generation and visualization using Canvas.

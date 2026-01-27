@@ -13,6 +13,7 @@
 - `examples/motion-one-animation`: Motion One (motion).
 - `examples/d3-animation`: D3.js data visualization.
 - `examples/chartjs-animation`: Chart.js data visualization.
+- `examples/social-media-story`: React-based social media story (9:16) with video sync.
 - `examples/captions-animation`: Built-in SRT captions.
 - `examples/signals-animation`: Fine-grained reactivity (signals).
 - `examples/dynamic-props-animation`: Input props and schema validation.

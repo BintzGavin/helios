@@ -75,3 +75,6 @@
 
 ## DEMO v1.41.0
 - ✅ Completed: Scaffold Chart.js Animation Example - Created `examples/chartjs-animation` demonstrating integration with Chart.js using synchronous updates.
+
+## DEMO v1.42.0
+- ✅ Completed: Document Social Media Story Example - Documented `examples/social-media-story` demonstrating React integration with `autoSyncAnimations` and component composition.
