@@ -40,6 +40,7 @@
     "@vitejs/plugin-react": "^5.1.2",
     "@vitejs/plugin-vue": "^6.0.3",
     "autoprefixer": "^10.4.23",
+    "chart.js": "^4.5.1",
     "d3": "^7.9.0",
     "framer-motion": "^12.29.2",
     "gsap": "^3.12.0",
