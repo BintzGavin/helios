@@ -120,3 +120,6 @@ Each agent should update **their own dedicated progress file** instead of this f
 
 ## DEMO v1.43.0
 - ✅ Completed: Create React Transitions Example - Created `examples/react-transitions` demonstrating how to synchronize CSS animations with Helios timeline using `autoSyncAnimations` and `animation-delay`.
+
+## PLAYER v0.25.2
+- ✅ Completed: Polish Burn-In Captions - Added text shadow to exported captions to match player UI styling and improved code hygiene by preventing canvas state leaks.

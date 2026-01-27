@@ -1,4 +1,4 @@
-**Version**: v0.25.1
+**Version**: v0.25.2
 
 # Status: PLAYER
 
@@ -31,6 +31,7 @@
 ## Critical Task
 - **None**: Recent task completed.
 
+[v0.25.2] ✅ Completed: Polish Burn-In Captions - Added text shadow to exported captions to match player UI styling and improved code hygiene by preventing canvas state leaks.
 [v0.25.1] ✅ Completed: Refine Burn-In Captions - Added multiline caption support and respect for player caption visibility toggle during client-side export.
 [v0.25.0] ✅ Completed: Responsive Controls - Implemented `ResizeObserver` to adapt player controls for smaller widths (compact/tiny modes) to prevent overflow.
 [v0.24.1] ✅ Completed: Documentation Update - Added missing attributes (poster, preload, input-props), Standard Media API, and Events documentation to README.

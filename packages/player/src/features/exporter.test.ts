@@ -112,6 +112,8 @@ class MockOffscreenCanvas {
         measureText: vi.fn().mockReturnValue({ width: 10 }),
         fillRect: fillRectSpy,
         fillText: fillTextSpy,
+        save: vi.fn(),
+        restore: vi.fn(),
     });
 }
 vi.stubGlobal('OffscreenCanvas', MockOffscreenCanvas);
