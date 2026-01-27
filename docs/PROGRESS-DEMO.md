@@ -51,3 +51,6 @@
 
 ## DEMO v1.30.0
 - ✅ Completed: Scaffold Dynamic Props Example - Created `examples/dynamic-props-animation` demonstrating `inputProps` and `schema` validation with a React frontend.
+
+## DEMO v1.31.0
+- ✅ Completed: Scaffold Media Element Example - Created `examples/media-element-animation` demonstrating `DomDriver` synchronization of native `<video>` and `<audio>` elements.

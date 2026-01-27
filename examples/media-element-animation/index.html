@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Media Element Animation Example</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background-color: #f4f4f9;
+      margin: 0;
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    h1 {
+      color: #333;
+    }
+    .player-container {
+      width: 80%;
+      max-width: 960px;
+      margin-bottom: 2rem;
+    }
+    helios-player {
+      width: 100%;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Helios Media Element Demo</h1>
+
+  <div class="player-container">
+      <helios-player
+        src="./composition.html"
+        duration="5"
+        fps="30"
+        width="640"
+        height="480">
+      </helios-player>
+  </div>
+
+  <script type="module">
+    import "../../packages/player/dist/index.js";
+  </script>
+
+</body>
+</html>

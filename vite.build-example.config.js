@@ -36,6 +36,7 @@ export default defineConfig({
         captions_animation: resolve(__dirname, "examples/captions-animation/composition.html"),
         signals_animation: resolve(__dirname, "examples/signals-animation/composition.html"),
         dynamic_props: resolve(__dirname, "examples/dynamic-props-animation/composition.html"),
+        media_element: resolve(__dirname, "examples/media-element-animation/composition.html"),
       },
     },
   },
