@@ -4,6 +4,7 @@
 - `examples/simple-canvas-animation`: Vanilla JS Canvas API.
 - `examples/simple-animation`: Vanilla JS DOM + CSS Animations.
 - `examples/waapi-animation`: Web Animations API (element.animate()).
+- `examples/audio-visualization`: Raw audio data visualization (Canvas).
 - `examples/media-element-animation`: Native `<video>`/`<audio>` synchronization.
 - `examples/gsap-animation`: GreenSock Animation Platform (GSAP).
 - `examples/framer-motion-animation`: React Framer Motion.

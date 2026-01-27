@@ -66,3 +66,6 @@
 
 ## DEMO v1.38.0
 - 📋 Planned: Scaffold Audio Visualization Example - Created spec file.
+
+## DEMO v1.39.0
+- ✅ Completed: Scaffold Audio Visualization Example - Created `examples/audio-visualization` demonstrating synchronous audio generation and visualization using Canvas.
