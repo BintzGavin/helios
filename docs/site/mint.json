@@ -36,7 +36,9 @@
         "examples/canvas-example",
         "examples/threejs-example",
         "examples/animation-libraries",
-        "examples/animation-helpers"
+        "examples/animation-helpers",
+        "examples/styling",
+        "examples/advanced"
       ]
     },
     {

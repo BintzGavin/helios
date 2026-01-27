@@ -5,6 +5,30 @@ description: "Changelog for the Core package"
 
 # Core Changelog
 
+## v1.27.0
+- **Expose Captions**: Exposed full caption list in `HeliosState` and enabled array input for captions in constructor and `setCaptions`.
+
+## v1.26.0
+- **Implement Initial Frame**: Added `initialFrame` to `HeliosOptions` and updated constructor to initialize state and sync driver, enabling HMR state preservation.
+
+## v1.25.0
+- **Implement Color Interpolation**: Implemented `interpolateColors` and `parseColor` utilities supporting Hex, RGB, and HSL formats.
+
+## v1.24.0
+- **Implement Relative Audio Mixing**: Implemented relative volume and mute handling in `DomDriver`.
+
+## v1.23.0
+- **Implement Resolution Awareness**: Added `width`/`height` to state/options, `setSize` method, and `INVALID_RESOLUTION` error.
+
+## v1.22.0
+- **Expand Input Schema Validation**: Added `minimum`, `maximum`, and `enum` constraints to `HeliosSchema` and updated `validateProps`.
+
+## v1.21.0
+- **Implement Deterministic Randomness**: Added `random` utility with Mulberry32 PRNG and string seeding support.
+
+## v1.20.0
+- **Implement Active Captions**: Added `activeCaptions` signal, `setCaptions`, and `findActiveCues` with glitch-free updates.
+
 ## v1.19.0
 - **Implement Audio Volume Control**: Added `volume` and `muted` state to `Helios` and updated `DomDriver` to sync with HTMLMediaElements.
 

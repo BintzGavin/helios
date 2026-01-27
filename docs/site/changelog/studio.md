@@ -5,6 +5,42 @@ description: "Changelog for the Studio package"
 
 # Studio Changelog
 
+## v0.27.1
+- **Fixed: Snapshot**: Fixed type error in "Take Snapshot" implementation where `captureFrame` return value was mishandled.
+
+## v0.27.0
+- **Snapshot**: Implemented "Take Snapshot" feature in Stage Toolbar to capture and download current frame as PNG.
+
+## v0.26.0
+- **Audio Controls**: Added Volume slider and Mute button to Playback Controls, updating `StudioContext` to track audio state.
+
+## v0.25.0
+- **Enhance Asset Previews**: Implemented rich previews for video (hover-play), audio (click-play), and fonts (custom sample) in Assets Panel.
+
+## v0.24.0
+- **Scaffold Unit Tests**: Added Vitest, JSDOM, and Testing Library infrastructure; implemented initial tests for Timeline component.
+
+## v0.23.2
+- **Enable External Project Support**: Configured Vite and Render Manager to respect HELIOS_PROJECT_ROOT for file serving and output.
+
+## v0.23.1
+- **Fixed: Asset Deletion**: Switched DELETE API to use query parameters to resolve body parsing timeouts.
+
+## v0.23.0
+- **Asset Management**: Implemented asset upload (Drag & Drop) and delete functionality in Assets Panel, backed by new API endpoints.
+
+## v0.22.0
+- **Global Shortcuts & Frame Stepping**: Added Shift+Arrow shortcuts (10-frame jump) and Prev/Next Frame buttons to the UI.
+
+## v0.21.0
+- **Implement Render Job Management**: Added ability to Cancel and Delete render jobs via UI and API, including aborting FFmpeg processes.
+
+## v0.20.0
+- **Pass inputProps to Render Job**: Updated `StudioContext` and `render-manager` to forward `inputProps` from the player state to the backend and Renderer.
+
+## v0.19.0
+- **Hot Reload State Preservation**: Implemented state restoration (frame, playback status) for `Stage` when HMR triggers a controller reload.
+
 ## v0.18.0
 - **Render Configuration UI**: Added UI for selecting render mode (DOM/Canvas), bitrate, and codec, and updated backend to respect these settings.
 
