@@ -646,6 +646,7 @@ describe('HeliosPlayer', () => {
             getAudioTracks: vi.fn()
         };
         (player as any).setController(mockController);
+        (player as any).isLoaded = true;
     });
 
     it('should expose currentTime', () => {
@@ -871,6 +872,110 @@ describe('HeliosPlayer', () => {
 
     it('should observe input-props', () => {
         expect(HeliosPlayer.observedAttributes).toContain('input-props');
+    });
+  });
+
+  describe('Poster and Preload', () => {
+    let mockController: any;
+
+    beforeEach(() => {
+        mockController = {
+            getState: vi.fn().mockReturnValue({ currentFrame: 0, duration: 10, fps: 30, isPlaying: false }),
+            play: vi.fn(),
+            pause: vi.fn(),
+            seek: vi.fn(),
+            subscribe: vi.fn().mockReturnValue(() => {}),
+            dispose: vi.fn(),
+            setPlaybackRate: vi.fn(),
+            setInputProps: vi.fn()
+        };
+    });
+
+    it('should show poster and defer load when preload="none"', () => {
+        player.setAttribute('preload', 'none');
+        player.setAttribute('src', 'test.html');
+        player.setAttribute('poster', 'poster.jpg');
+
+        const iframe = player.shadowRoot!.querySelector('iframe');
+        const posterContainer = player.shadowRoot!.querySelector('.poster-container');
+        const posterImage = player.shadowRoot!.querySelector('.poster-image') as HTMLImageElement;
+
+        // Should not have src yet
+        expect(iframe!.getAttribute('src')).toBeFalsy();
+
+        // Poster should be visible
+        expect(posterContainer!.classList.contains('hidden')).toBe(false);
+        expect(posterImage.src).toContain('poster.jpg');
+    });
+
+    it('should load immediately when preload="auto" (default)', () => {
+        player.setAttribute('src', 'test.html'); // preload default is auto
+
+        const iframe = player.shadowRoot!.querySelector('iframe');
+        expect(iframe!.getAttribute('src')).toBe('test.html');
+    });
+
+    it('should update poster image when attribute changes', () => {
+        player.setAttribute('poster', 'initial.jpg');
+        const posterImage = player.shadowRoot!.querySelector('.poster-image') as HTMLImageElement;
+        expect(posterImage.src).toContain('initial.jpg');
+
+        player.setAttribute('poster', 'updated.jpg');
+        expect(posterImage.src).toContain('updated.jpg');
+    });
+
+    it('should load and set autoplay when big play button is clicked', () => {
+        player.setAttribute('preload', 'none');
+        player.setAttribute('src', 'test.html');
+
+        const bigPlayBtn = player.shadowRoot!.querySelector('.big-play-btn') as HTMLDivElement;
+        const iframe = player.shadowRoot!.querySelector('iframe');
+
+        // Click big play
+        bigPlayBtn.click();
+
+        // Should load iframe
+        expect(iframe!.src).toContain('test.html');
+
+        // Should set autoplay so it starts when connected
+        expect(player.hasAttribute('autoplay')).toBe(true);
+    });
+
+    it('should load and set autoplay when play() is called programmatically', async () => {
+        player.setAttribute('preload', 'none');
+        player.setAttribute('src', 'test.html');
+
+        const iframe = player.shadowRoot!.querySelector('iframe');
+
+        // Call play
+        await player.play();
+
+        // Should load iframe
+        expect(iframe!.src).toContain('test.html');
+
+        // Should set autoplay
+        expect(player.hasAttribute('autoplay')).toBe(true);
+    });
+
+    it('should hide poster when playing starts', () => {
+        player.setAttribute('preload', 'none');
+        player.setAttribute('poster', 'poster.jpg');
+        player.setAttribute('src', 'test.html');
+
+        // Initial state: visible
+        const posterContainer = player.shadowRoot!.querySelector('.poster-container');
+        expect(posterContainer!.classList.contains('hidden')).toBe(false);
+
+        // Load and connect controller
+        player.load();
+        (player as any).setController(mockController);
+
+        // Update UI with playing state
+        mockController.getState.mockReturnValue({ currentFrame: 0, duration: 10, fps: 30, isPlaying: true });
+        (player as any).updateUI(mockController.getState());
+
+        // Poster should be hidden
+        expect(posterContainer!.classList.contains('hidden')).toBe(true);
     });
   });
 });

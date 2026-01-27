@@ -235,10 +235,56 @@ template.innerHTML = `
       color: #007bff;
       border-bottom: 2px solid #007bff;
     }
+    .poster-container {
+      position: absolute;
+      inset: 0;
+      background-color: black;
+      z-index: 5;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: opacity 0.3s;
+    }
+    .poster-container.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+    .poster-image {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.6;
+    }
+    .big-play-btn {
+      position: relative;
+      z-index: 10;
+      background: rgba(0, 0, 0, 0.7);
+      border: 2px solid white;
+      border-radius: 50%;
+      width: 80px;
+      height: 80px;
+      color: white;
+      font-size: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    .big-play-btn:hover {
+        transform: scale(1.1);
+    }
   </style>
   <div class="status-overlay" part="overlay">
     <div class="status-text">Connecting...</div>
     <button class="retry-btn" style="display: none">Retry</button>
+  </div>
+  <div class="poster-container hidden" part="poster">
+    <img class="poster-image" alt="Video poster" />
+    <div class="big-play-btn" aria-label="Play video">▶</div>
   </div>
   <iframe part="iframe" sandbox="allow-scripts allow-same-origin" title="Helios Composition Preview"></iframe>
   <div class="captions-container" part="captions"></div>
@@ -279,6 +325,12 @@ export class HeliosPlayer extends HTMLElement {
   private captionsContainer: HTMLDivElement;
   private ccBtn: HTMLButtonElement;
   private showCaptions: boolean = false;
+
+  private posterContainer: HTMLDivElement;
+  private posterImage: HTMLImageElement;
+  private bigPlayBtn: HTMLDivElement;
+  private pendingSrc: string | null = null;
+  private isLoaded: boolean = false;
 
   private controller: HeliosController | null = null;
   // Keep track if we have direct access (optional, mainly for debugging/logging)
@@ -368,8 +420,19 @@ export class HeliosPlayer extends HTMLElement {
   }
 
   public async play(): Promise<void> {
-    if (this.controller) {
+    if (!this.isLoaded) {
+      this.setAttribute("autoplay", "");
+      this.load();
+    } else if (this.controller) {
       this.controller.play();
+    }
+  }
+
+  public load(): void {
+    if (this.pendingSrc) {
+      const src = this.pendingSrc;
+      this.pendingSrc = null;
+      this.loadIframe(src);
     }
   }
 
@@ -380,7 +443,7 @@ export class HeliosPlayer extends HTMLElement {
   }
 
   static get observedAttributes() {
-    return ["src", "width", "height", "autoplay", "loop", "controls", "export-format", "input-props"];
+    return ["src", "width", "height", "autoplay", "loop", "controls", "export-format", "input-props", "poster"];
   }
 
   constructor() {
@@ -403,6 +466,10 @@ export class HeliosPlayer extends HTMLElement {
     this.captionsContainer = this.shadowRoot!.querySelector(".captions-container")!;
     this.ccBtn = this.shadowRoot!.querySelector(".cc-btn")!;
 
+    this.posterContainer = this.shadowRoot!.querySelector(".poster-container")!;
+    this.posterImage = this.shadowRoot!.querySelector(".poster-image")!;
+    this.bigPlayBtn = this.shadowRoot!.querySelector(".big-play-btn")!;
+
     this.retryAction = () => this.retryConnection();
     this.retryBtn.onclick = () => this.retryAction();
   }
@@ -410,15 +477,21 @@ export class HeliosPlayer extends HTMLElement {
   attributeChangedCallback(name: string, oldVal: string, newVal: string) {
     if (oldVal === newVal) return;
 
+    if (name === "poster") {
+      this.posterImage.src = newVal;
+      this.updatePosterVisibility();
+    }
+
     if (name === "src") {
-      this.iframe.src = newVal;
-      if (this.controller) {
-        this.controller.pause();
-        this.controller.dispose();
-        this.controller = null;
+      const preload = this.getAttribute("preload") || "auto";
+      if (preload === "none" && !this.isLoaded) {
+        this.pendingSrc = newVal;
+        this.updatePosterVisibility();
+        // Hide loading/connecting status since we are deferring load
+        this.hideStatus();
+      } else {
+        this.loadIframe(newVal);
       }
-      this.setControlsDisabled(true);
-      this.showStatus("Loading...", false);
     }
 
     if (name === "width" || name === "height") {
@@ -469,12 +542,20 @@ export class HeliosPlayer extends HTMLElement {
     this.speedSelector.addEventListener("change", this.handleSpeedChange);
     this.fullscreenBtn.addEventListener("click", this.toggleFullscreen);
     this.ccBtn.addEventListener("click", this.toggleCaptions);
+    this.bigPlayBtn.addEventListener("click", this.handleBigPlayClick);
+    this.posterContainer.addEventListener("click", this.handleBigPlayClick);
 
     // Initial state: disabled until connected
     this.setControlsDisabled(true);
+
     // Only show connecting if we haven't already shown "Loading..." via attributeChangedCallback
-    if (this.overlay.classList.contains("hidden")) {
+    // AND we are not deferring load (pendingSrc is null)
+    if (this.overlay.classList.contains("hidden") && !this.pendingSrc) {
         this.showStatus("Connecting...", false);
+    }
+
+    if (this.pendingSrc) {
+       this.updatePosterVisibility();
     }
 
     // Ensure aspect ratio is correct on connect
@@ -499,6 +580,8 @@ export class HeliosPlayer extends HTMLElement {
     this.speedSelector.removeEventListener("change", this.handleSpeedChange);
     this.fullscreenBtn.removeEventListener("click", this.toggleFullscreen);
     this.ccBtn.removeEventListener("click", this.toggleCaptions);
+    this.bigPlayBtn.removeEventListener("click", this.handleBigPlayClick);
+    this.posterContainer.removeEventListener("click", this.handleBigPlayClick);
 
     if (this.unsubscribe) {
         this.unsubscribe();
@@ -506,6 +589,38 @@ export class HeliosPlayer extends HTMLElement {
     if (this.controller) {
         this.controller.pause();
         this.controller.dispose();
+    }
+  }
+
+  private loadIframe(src: string) {
+    this.iframe.src = src;
+    this.isLoaded = true;
+    if (this.controller) {
+      this.controller.pause();
+      this.controller.dispose();
+      this.controller = null;
+    }
+    this.setControlsDisabled(true);
+    this.showStatus("Loading...", false);
+    this.updatePosterVisibility();
+  }
+
+  private handleBigPlayClick = () => {
+     this.load();
+     // If we are already loaded, just play
+     if (this.controller) {
+       this.controller.play();
+     } else {
+       // Set autoplay so the controller will play once connected
+       this.setAttribute("autoplay", "");
+     }
+  }
+
+  private updatePosterVisibility() {
+    if (this.pendingSrc || (this.hasAttribute("poster") && !this.isLoaded)) {
+       this.posterContainer.classList.remove("hidden");
+    } else {
+       this.posterContainer.classList.add("hidden");
     }
   }
 
@@ -783,6 +898,11 @@ export class HeliosPlayer extends HTMLElement {
   };
 
   private updateUI(state: any) {
+      // Hide poster if we are playing or have advanced
+      if (state.isPlaying || state.currentFrame > 0) {
+         this.posterContainer.classList.add("hidden");
+      }
+
       // Event Dispatching
       if (this.lastState) {
         if (state.isPlaying !== this.lastState.isPlaying) {
