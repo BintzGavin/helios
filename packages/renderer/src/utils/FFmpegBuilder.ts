@@ -74,8 +74,23 @@ export class FFmpegBuilder {
 
     let audioOutputArgs: string[] = [];
     if (tracks.length > 0) {
+      // Determine Audio Codec
+      let audioCodec = options.audioCodec;
+      if (!audioCodec) {
+        const videoCodec = options.videoCodec || 'libx264';
+        if (videoCodec.startsWith('libvpx')) {
+          audioCodec = 'libvorbis';
+        } else {
+          audioCodec = 'aac';
+        }
+      }
+
       // Common audio encoding args
-      audioOutputArgs.push('-c:a', 'aac', '-t', options.durationInSeconds.toString());
+      audioOutputArgs.push('-c:a', audioCodec, '-t', options.durationInSeconds.toString());
+
+      if (options.audioBitrate) {
+        audioOutputArgs.push('-b:a', options.audioBitrate);
+      }
 
       if (tracks.length === 1) {
         // Single track: Just map the processed stream
