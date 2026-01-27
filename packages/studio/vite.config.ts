@@ -15,6 +15,8 @@ export default defineConfig({
   ],
   resolve: {
     alias: {
+      '@helios-project/core': path.resolve(__dirname, '../core/src/index.ts'),
+      '@helios-project/player': path.resolve(__dirname, '../player/src/index.ts'),
       '@helios-project/renderer': path.resolve(__dirname, '../renderer/src/index.ts')
     }
   },

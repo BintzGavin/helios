@@ -1,4 +1,4 @@
-**Version**: 0.33.0
+**Version**: 0.33.1
 
 # Studio Domain Status
 
@@ -7,6 +7,7 @@
 **Focus**: UI Implementation & CLI
 
 ## Recent Updates
+- [v0.33.1] ✅ Verified: Test Environment - Fixed test environment configuration by adding module aliases for Core and Player in Vite/Vitest, ensuring all tests pass.
 - [v0.33.0] ✅ Completed: SRT Export - Implemented functionality to export current captions as an SRT file from the Captions Panel, adding a client-side utility and "Export SRT" button.
 - [v0.32.0] ✅ Completed: Editable Captions Panel - Implemented editable inputs for captions (time/text), add/delete functionality, and syncing with Core via `controller.setCaptions` or `inputProps`.
 - [v0.31.0] ✅ Completed: Integrate Core Captions - Updated Studio to use `HeliosState.captions` for Timeline and Captions Panel, ensuring full sync with Core's caption logic.
