@@ -10,6 +10,7 @@
 | `examples/framer-motion-animation` | Integration with Framer Motion via `useMotionValue`. | DOM |
 | `examples/lottie-animation` | Integration with Lottie (`lottie-web`) via frame seeking. | DOM |
 | `examples/motion-one-animation` | Integration with Motion One via `autoSyncAnimations`. | DOM |
+| `examples/d3-animation` | Data visualization with D3.js. | DOM |
 | `examples/captions-animation` | Integration with built-in SRT captions. | DOM |
 | `examples/signals-animation` | Vanilla JS signals (`signal`, `computed`, `effect`). | DOM |
 | `examples/dynamic-props-animation` | React example for `inputProps` and schema validation. | DOM |
