@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import './Sidebar.css';
 import { AssetsPanel } from '../AssetsPanel/AssetsPanel';
-// Will be created in next step
 import { RendersPanel } from '../RendersPanel/RendersPanel';
+import { CaptionsPanel } from '../CaptionsPanel/CaptionsPanel';
 
 export const Sidebar: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'assets' | 'renders'>('assets');
+  const [activeTab, setActiveTab] = useState<'assets' | 'renders' | 'captions'>('assets');
 
   return (
     <div className="studio-sidebar">
@@ -17,6 +17,12 @@ export const Sidebar: React.FC = () => {
           Assets
         </button>
         <button
+          className={`sidebar-tab ${activeTab === 'captions' ? 'active' : ''}`}
+          onClick={() => setActiveTab('captions')}
+        >
+          Captions
+        </button>
+        <button
           className={`sidebar-tab ${activeTab === 'renders' ? 'active' : ''}`}
           onClick={() => setActiveTab('renders')}
         >
@@ -24,7 +30,9 @@ export const Sidebar: React.FC = () => {
         </button>
       </div>
       <div className="sidebar-content">
-        {activeTab === 'assets' ? <AssetsPanel /> : <RendersPanel />}
+        {activeTab === 'assets' && <AssetsPanel />}
+        {activeTab === 'captions' && <CaptionsPanel />}
+        {activeTab === 'renders' && <RendersPanel />}
       </div>
     </div>
   );

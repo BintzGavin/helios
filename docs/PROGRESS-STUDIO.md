@@ -1,5 +1,8 @@
 # Studio Progress Log
 
+## STUDIO v0.28.0
+- ✅ Completed: Captions Panel - Implemented SRT import panel and timeline markers for captions using Core's `parseSrt` and `inputProps` injection.
+
 ## STUDIO v0.27.1
 - ✅ Fixed: Snapshot - Fixed type error in "Take Snapshot" implementation where `captureFrame` return value was mishandled.
 
