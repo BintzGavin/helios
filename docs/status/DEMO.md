@@ -1,5 +1,5 @@
 # Status: DEMO (Executor)
-**Version**: 1.35.0
+**Version**: 1.36.0
 
 ## Vision
 To provide comprehensive, idiomatic examples for every major framework (React, Vue, Svelte, Vanilla) and robust end-to-end testing to ensure the Helios engine delivers on its "Use What You Know" promise.
@@ -7,6 +7,7 @@ To provide comprehensive, idiomatic examples for every major framework (React, V
 ## Current State
 - **Vanilla JS (Canvas)**: ✅ `examples/simple-canvas-animation` exists and works.
 - **Vanilla JS (DOM)**: ✅ `examples/simple-animation` exists and works.
+- **WAAPI**: ✅ `examples/waapi-animation` exists and works (Demonstrates `element.animate()` integration).
 - **Media Element**: ✅ `examples/media-element-animation` exists and works (Demonstrates `<video>`/`<audio>` sync).
 - **GSAP**: ✅ `examples/gsap-animation` exists and works.
 - **Framer Motion**: ✅ `examples/framer-motion-animation` exists and works.
@@ -52,11 +53,13 @@ To provide comprehensive, idiomatic examples for every major framework (React, V
 - [x] Scaffold Dynamic Props Example
 - [x] Scaffold D3 Animation Example
 - [x] Scaffold Tailwind CSS Example
+- [x] Scaffold WAAPI Animation Example
 
 ## Known Issues
 None.
 
 ## Log
+- [v1.36.0] ✅ Completed: Scaffold WAAPI Animation Example - Created `examples/waapi-animation` demonstrating standard Web Animations API integration with `autoSyncAnimations`.
 - [v1.35.0] ✅ Completed: Scaffold Tailwind CSS Example - Created `examples/tailwind-animation` demonstrating Tailwind v3 integration with proper scoping and build configuration.
 - [v1.34.0] 📋 Planned: Scaffold Tailwind CSS Example - Created spec file `/.sys/plans/2025-02-22-DEMO-TailwindAnimation.md` to guide implementation of Tailwind CSS integration.
 - [v1.33.0] ✅ Completed: Scaffold D3 Animation Example - Created `examples/d3-animation` demonstrating data visualization with D3.js and frame-based updates.

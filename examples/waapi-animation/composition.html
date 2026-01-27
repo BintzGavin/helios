@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WAAPI Composition</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      background-color: #eee;
+    }
+    .box {
+      width: 150px;
+      height: 150px;
+      background-color: #ff0055;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      border-radius: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="box"></div>
+
+  <script type="module">
+    import { Helios } from '../../packages/core/dist/index.js';
+
+    // 1. Create elements
+    const box = document.querySelector('.box');
+
+    // 2. Create WAAPI animation
+    // IMPORTANT: We do not need to store the reference. Helios finds it via autoSyncAnimations.
+    // We set duration to match or exceed composition, and loop it.
+    box.animate(
+      [
+        { transform: 'translate(-50%, -50%) rotate(0deg)', backgroundColor: '#ff0055', offset: 0 },
+        { transform: 'translate(calc(-50% + 100px), -50%) rotate(180deg)', backgroundColor: '#00eeff', offset: 0.5 },
+        { transform: 'translate(-50%, -50%) rotate(360deg)', backgroundColor: '#ff0055', offset: 1 }
+      ],
+      {
+        duration: 4000,
+        iterations: Infinity,
+        easing: 'ease-in-out'
+      }
+    );
+
+    // 3. Initialize Helios engine
+    const helios = new Helios({
+      duration: 4,
+      fps: 30,
+      autoSyncAnimations: true
+    });
+
+    // Expose for the Player and debugging
+    window.helios = helios;
+
+    // Enable external control (e.g. from Renderer)
+    helios.bindToDocumentTimeline();
+  </script>
+</body>
+</html>
