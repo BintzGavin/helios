@@ -35,6 +35,7 @@ const CASES = [
   { name: 'ChartJS', relativePath: 'examples/chartjs-animation/composition.html', mode: 'dom' as const },
   { name: 'Social Media Story', relativePath: 'examples/social-media-story/composition.html', mode: 'dom' as const },
   { name: 'React Transitions', relativePath: 'examples/react-transitions/composition.html', mode: 'dom' as const },
+  { name: 'React Three Fiber', relativePath: 'examples/react-three-fiber/composition.html', mode: 'canvas' as const },
 ];
 
 async function main() {

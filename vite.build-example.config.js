@@ -46,6 +46,7 @@ export default defineConfig({
         chartjs_animation: resolve(__dirname, "examples/chartjs-animation/composition.html"),
         social_media_story: resolve(__dirname, "examples/social-media-story/composition.html"),
         react_transitions: resolve(__dirname, "examples/react-transitions/composition.html"),
+        react_three_fiber: resolve(__dirname, "examples/react-three-fiber/composition.html"),
       },
     },
   },

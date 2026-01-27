@@ -1,5 +1,5 @@
 # Status: DEMO (Executor)
-**Version**: 1.43.0
+**Version**: 1.44.0
 
 ## Vision
 To provide comprehensive, idiomatic examples for every major framework (React, Vue, Svelte, Vanilla) and robust end-to-end testing to ensure the Helios engine delivers on its "Use What You Know" promise.
@@ -35,10 +35,12 @@ To provide comprehensive, idiomatic examples for every major framework (React, V
 - **Svelte**: ✅ `examples/svelte-canvas-animation` exists and works.
 - **Svelte (Helpers)**: ✅ `examples/svelte-animation-helpers` exists and works (Demonstrates `<Sequence>`, `<Series>`).
 - **Three.js**: ✅ `examples/threejs-canvas-animation` exists and works.
+- **React Three Fiber**: ✅ `examples/react-three-fiber` exists and works (Demonstrates integration with `@react-three/fiber` via manual `frameloop`).
 - **Pixi.js**: ✅ `examples/pixi-canvas-animation` exists and works.
 - **E2E Tests**: ✅ Verified all existing examples via `tests/e2e/verify-render.ts`.
 
 ## Backlog
+- [x] Scaffold React Three Fiber Example (`examples/react-three-fiber`)
 - [x] Scaffold Chart.js Animation Example (`examples/chartjs-animation`)
 - [x] Scaffold Procedural Generation Example (`examples/procedural-generation`)
 - [x] Scaffold Media Element Example (`examples/media-element-animation`)
@@ -68,6 +70,7 @@ To provide comprehensive, idiomatic examples for every major framework (React, V
 None.
 
 ## Log
+- [v1.44.0] ✅ Completed: Scaffold React Three Fiber Example - Created `examples/react-three-fiber` demonstrating integration with `@react-three/fiber` using `frameloop="never"` and manual state advancement.
 - [v1.43.0] ✅ Completed: Create React Transitions Example - Created `examples/react-transitions` demonstrating how to synchronize CSS animations with Helios timeline using `autoSyncAnimations` and `animation-delay`.
 - [v1.42.0] ✅ Completed: Document Social Media Story Example - Documented `examples/social-media-story` demonstrating React integration with `autoSyncAnimations` and component composition.
 - [v1.41.0] ✅ Completed: Scaffold Chart.js Animation Example - Created `examples/chartjs-animation` demonstrating integration with Chart.js using synchronous updates.
