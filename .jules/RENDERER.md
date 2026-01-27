@@ -79,3 +79,7 @@
 ## [2026-03-13] - CanvasStrategy Quality Gaps
 **Learning:** `CanvasStrategy` defaults to a 25Mbps bitrate floor for intermediate WebCodecs capture, which is insufficient for 4K/60fps rendering. It also lacks font preloading (unlike `DomStrategy`), which can lead to visual artifacts on the first frame.
 **Action:** Implement adaptive bitrate calculation (`width * height * fps * 0.2`) and inject `document.fonts.ready` waiting in `CanvasStrategy.prepare`.
+
+## [2026-03-14] - DOM Capture Performance Gap
+**Learning:** `DomStrategy` defaults to PNG capture (`page.screenshot`) which is slow and produces large temporary buffers. This bottlenecks performance for high-resolution DOM renders, violating the vision of "Performance When It Matters".
+**Action:** Introduced configurable `intermediateImageFormat` ('jpeg' | 'png') and `intermediateImageQuality` to allow trading visual quality for speed.
