@@ -44,6 +44,14 @@ export class SeekTimeDriver implements TimeDriver {
         (document.timeline as any).currentTime = timeInMs;
       }
 
+      // Synchronize media elements (video, audio)
+      const mediaElements = document.querySelectorAll('video, audio');
+      mediaElements.forEach((el) => {
+        const mediaEl = el as HTMLMediaElement;
+        mediaEl.pause();
+        mediaEl.currentTime = t;
+      });
+
       // Wait for a frame to ensure the new time is propagated
       return new Promise<void>(resolve => {
         requestAnimationFrame(() => resolve());
