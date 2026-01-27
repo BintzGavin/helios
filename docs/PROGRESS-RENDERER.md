@@ -1,5 +1,8 @@
 # RENDERER Progress Log
 
+## RENDERER v1.24.1
+- ✅ Completed: Optimize Canvas Transfer - Updated `CanvasStrategy` to replace slow `String.fromCharCode` serialization with `Blob` and `FileReader` APIs, significantly improving data transfer performance from browser to Node.js.
+
 ## RENDERER v1.24.0
 - ✅ Completed: Smart Codec Selection - Updated `CanvasStrategy` to intelligently select H.264 (Annex B) when `videoCodec: 'copy'` is requested, prioritizing direct stream copy while falling back to VP8 (IVF) if unsupported.
 
