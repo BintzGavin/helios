@@ -16,7 +16,7 @@ export const Timeline: React.FC = () => {
 
   const { currentFrame, duration, fps } = playerState;
   const totalFrames = duration * fps || 100; // Default to 100 to avoid div by zero
-  const captions = (playerState.inputProps?.captions || []) as CaptionCue[];
+  const captions = playerState.captions || [];
 
   const trackRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState<'playhead' | 'in' | 'out' | null>(null);

@@ -114,4 +114,23 @@ describe('Timeline', () => {
 
      expect(mockSetOutPoint).toHaveBeenCalledWith(1);
   });
+
+  it('renders caption markers from playerState.captions', () => {
+      const captions = [
+          { startTime: 0, endTime: 1000, text: 'Hello' },
+          { startTime: 2000, endTime: 3000, text: 'World' }
+      ];
+
+      (StudioContext.useStudio as any).mockReturnValue({
+        ...defaultContext,
+        playerState: { ...defaultPlayerState, captions }
+      });
+
+      const { container } = render(<Timeline />);
+      const markers = container.querySelectorAll('.timeline-caption-marker');
+
+      expect(markers).toHaveLength(2);
+      expect(markers[0]).toHaveAttribute('title', 'Hello');
+      expect(markers[1]).toHaveAttribute('title', 'World');
+  });
 });

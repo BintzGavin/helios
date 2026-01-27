@@ -1,5 +1,8 @@
 # Studio Progress Log
 
+## STUDIO v0.31.0
+- ✅ Completed: Integrate Core Captions - Updated Studio to use `HeliosState.captions` for Timeline and Captions Panel, ensuring full sync with Core's caption logic.
+
 ## STUDIO v0.30.1
 - ✅ Verified: Keyboard Shortcuts & Snapshot - Added unit tests for KeyboardShortcutsModal and StudioContext snapshot logic.
 
