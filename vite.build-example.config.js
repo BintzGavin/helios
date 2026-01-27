@@ -37,6 +37,7 @@ export default defineConfig({
         signals_animation: resolve(__dirname, "examples/signals-animation/composition.html"),
         dynamic_props: resolve(__dirname, "examples/dynamic-props-animation/composition.html"),
         media_element: resolve(__dirname, "examples/media-element-animation/composition.html"),
+        d3_animation: resolve(__dirname, "examples/d3-animation/composition.html"),
       },
     },
   },

@@ -1,5 +1,5 @@
 # Status: DEMO (Executor)
-**Version**: 1.32.0
+**Version**: 1.33.0
 
 ## Vision
 To provide comprehensive, idiomatic examples for every major framework (React, Vue, Svelte, Vanilla) and robust end-to-end testing to ensure the Helios engine delivers on its "Use What You Know" promise.
@@ -12,6 +12,7 @@ To provide comprehensive, idiomatic examples for every major framework (React, V
 - **Framer Motion**: ✅ `examples/framer-motion-animation` exists and works.
 - **Lottie**: ✅ `examples/lottie-animation` exists and works.
 - **Motion One**: ✅ `examples/motion-one-animation` exists and works.
+- **D3.js**: ✅ `examples/d3-animation` exists and works (Demonstrates data visualization).
 - **Captions**: ✅ `examples/captions-animation` exists and works (Demonstrates built-in SRT captions).
 - **Signals**: ✅ `examples/signals-animation` exists and works (Demonstrates `signal`, `computed`, `effect`).
 - **Dynamic Props**: ✅ `examples/dynamic-props-animation` exists and works (Demonstrates `inputProps` and `schema`).
@@ -48,11 +49,13 @@ To provide comprehensive, idiomatic examples for every major framework (React, V
 - [x] Scaffold Signals Animation Example
 - [x] Scaffold React CSS Animation Example
 - [x] Scaffold Dynamic Props Example
+- [x] Scaffold D3 Animation Example
 
 ## Known Issues
 None.
 
 ## Log
+- [v1.33.0] ✅ Completed: Scaffold D3 Animation Example - Created `examples/d3-animation` demonstrating data visualization with D3.js and frame-based updates.
 - [v1.32.0] 📋 Planned: Scaffold D3 Animation Example - Created spec file `/.sys/plans/2025-02-21-DEMO-D3-Animation.md` to guide implementation of data visualization example using D3.js.
 - [v1.31.0] ✅ Completed: Scaffold Media Element Example - Created `examples/media-element-animation` demonstrating `DomDriver` synchronization of native `<video>` and `<audio>` elements.
 - [v1.30.0] ✅ Completed: Scaffold Dynamic Props Example - Created `examples/dynamic-props-animation` demonstrating `inputProps` and `schema` validation with a React frontend.
