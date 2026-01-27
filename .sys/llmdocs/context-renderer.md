@@ -41,6 +41,8 @@ The `RendererOptions` interface controls the rendering process:
 - `videoCodec`: Output codec (e.g., `'libx264'`, `'libvpx-vp9'`).
 - `pixelFormat`: Output pixel format (e.g., `'yuv420p'`, `'yuva420p'`).
 - `intermediateVideoCodec`: Codec for WebCodecs capture (e.g., `'avc1'`, `'vp9'`, `'av01'`).
+- `intermediateImageFormat`: Capture format for DOM mode (`'png'` or `'jpeg'`).
+- `intermediateImageQuality`: Quality (0-100) for JPEG capture.
 - `videoBitrate`: Target bitrate (e.g., `2500000`).
 - `audioCodec`: Output audio codec (e.g., `'aac'`, `'libvorbis'`).
 - `audioBitrate`: Output audio bitrate (e.g., `'192k'`).

@@ -6,6 +6,8 @@ import { FFmpegBuilder } from '../utils/FFmpegBuilder';
 export class DomStrategy implements RenderStrategy {
   private discoveredAudioTracks: AudioTrackConfig[] = [];
 
+  constructor(private options: RendererOptions) {}
+
   async diagnose(page: Page): Promise<any> {
     return await page.evaluate(() => {
       console.log('[Helios Diagnostics] Checking DOM environment...');
@@ -134,7 +136,14 @@ export class DomStrategy implements RenderStrategy {
   }
 
   async capture(page: Page, frameTime: number): Promise<Buffer> {
-    return await page.screenshot({ type: 'png' });
+    const format = this.options.intermediateImageFormat || 'png';
+    const quality = this.options.intermediateImageQuality;
+
+    if (format === 'jpeg') {
+      return await page.screenshot({ type: 'jpeg', quality: quality });
+    } else {
+      return await page.screenshot({ type: 'png' });
+    }
   }
 
   async finish(page: Page): Promise<void> {

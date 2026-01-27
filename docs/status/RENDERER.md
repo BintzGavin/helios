@@ -1,8 +1,9 @@
-**Version**: 1.22.0
+**Version**: 1.23.0
 
 # Renderer Agent Status
 
 ## Progress Log
+- [1.23.0] ✅ Completed: Configurable Screenshot Format - Added `intermediateImageFormat` and `intermediateImageQuality` to `RendererOptions`, enabling faster JPEG capture for DOM rendering (vs default PNG) when performance matters.
 - [1.22.0] ✅ Completed: Implicit Audio Discovery - Updated `DomStrategy` to automatically detect `<audio>` and `<video>` elements in the DOM and include their audio tracks in the FFmpeg render, improving "Use What You Know" functionality.
 - [1.21.0] ✅ Completed: Configurable Audio Codecs - Added `audioCodec` and `audioBitrate` to `RendererOptions` and updated `FFmpegBuilder` to support smart defaults (e.g., auto-switching to `libvorbis` for WebM) and custom configurations.
 - [1.20.1] ✅ Completed: Optimize Canvas Quality - Updated `CanvasStrategy` to auto-calculate intermediate bitrate based on resolution/FPS (e.g. ~100Mbps for 4K) and wait for fonts to load, ensuring high-quality output and no font glitches.

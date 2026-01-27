@@ -20,7 +20,7 @@ export class Renderer {
   constructor(options: RendererOptions) {
     this.options = options;
     if (this.options.mode === 'dom') {
-      this.strategy = new DomStrategy();
+      this.strategy = new DomStrategy(this.options);
       this.timeDriver = new SeekTimeDriver();
     } else {
       this.strategy = new CanvasStrategy(this.options);

@@ -106,6 +106,22 @@ export interface RendererOptions {
   intermediateVideoCodec?: string;
 
   /**
+   * The image format to use for intermediate capture in 'dom' mode,
+   * or as a fallback in 'canvas' mode if WebCodecs is not available.
+   *
+   * Defaults to 'png'.
+   */
+  intermediateImageFormat?: 'png' | 'jpeg';
+
+  /**
+   * The quality of the intermediate image (0-100).
+   * Only applicable if `intermediateImageFormat` is 'jpeg'.
+   *
+   * Defaults to undefined (browser default).
+   */
+  intermediateImageQuality?: number;
+
+  /**
    * Path to the FFmpeg binary.
    * Defaults to the binary provided by @ffmpeg-installer/ffmpeg.
    */
