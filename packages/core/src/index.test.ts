@@ -680,4 +680,81 @@ Updated`;
       }));
     });
   });
+
+  describe('Dynamic Timing', () => {
+    it('should update duration via setDuration', () => {
+      const helios = new Helios({ duration: 10, fps: 30 });
+      helios.setDuration(20);
+      expect(helios.duration).toBe(20);
+      expect(helios.getState().duration).toBe(20);
+    });
+
+    it('should throw for invalid duration in setDuration', () => {
+      const helios = new Helios({ duration: 10, fps: 30 });
+      expect(() => helios.setDuration(-5)).toThrow(HeliosError);
+    });
+
+    it('should clamp currentFrame when duration is reduced', () => {
+      const helios = new Helios({ duration: 10, fps: 30 }); // 300 frames
+      helios.seek(250); // Frame 250 (8.33s)
+
+      // Reduce duration to 5s (150 frames)
+      helios.setDuration(5);
+
+      expect(helios.currentFrame.peek()).toBe(150);
+      expect(helios.getState().currentFrame).toBe(150);
+    });
+
+    it('should not affect currentFrame when duration is increased', () => {
+      const helios = new Helios({ duration: 10, fps: 30 });
+      helios.seek(150);
+
+      helios.setDuration(20);
+
+      expect(helios.currentFrame.peek()).toBe(150);
+    });
+
+    it('should update fps via setFps', () => {
+      const helios = new Helios({ duration: 10, fps: 30 });
+      helios.setFps(60);
+      expect(helios.fps).toBe(60);
+      expect(helios.getState().fps).toBe(60);
+    });
+
+    it('should throw for invalid fps in setFps', () => {
+      const helios = new Helios({ duration: 10, fps: 30 });
+      expect(() => helios.setFps(0)).toThrow(HeliosError);
+      expect(() => helios.setFps(-10)).toThrow(HeliosError);
+    });
+
+    it('should adjust currentFrame to preserve time when changing fps', () => {
+      const helios = new Helios({ duration: 10, fps: 30 });
+      // 1 second in (frame 30)
+      helios.seek(30);
+
+      // Change to 60fps
+      helios.setFps(60);
+
+      // Should still be 1 second in, so frame should be 60
+      expect(helios.currentFrame.peek()).toBe(60);
+
+      // Change to 10fps
+      helios.setFps(10);
+
+      // Should still be 1 second in, so frame should be 10
+      expect(helios.currentFrame.peek()).toBe(10);
+    });
+
+    it('should handle fractional frames when changing fps', () => {
+      const helios = new Helios({ duration: 10, fps: 30 });
+      // 0.5 seconds (frame 15)
+      helios.seek(15);
+
+      // Change to 24fps
+      helios.setFps(24);
+
+      // 0.5 * 24 = 12
+      expect(helios.currentFrame.peek()).toBe(12);
+    });
+  });
 });

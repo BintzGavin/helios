@@ -59,11 +59,11 @@ export * from './color';
 
 export class Helios {
   // Constants
-  public readonly duration: number;
-  public readonly fps: number;
   public readonly schema?: HeliosSchema;
 
   // Internal Signals
+  private _duration: Signal<number>;
+  private _fps: Signal<number>;
   private _currentFrame: Signal<number>;
   private _isPlaying: Signal<boolean>;
   private _inputProps: Signal<Record<string, any>>;
@@ -139,6 +139,16 @@ export class Helios {
    */
   public get height(): ReadonlySignal<number> { return this._height; }
 
+  /**
+   * The duration of the composition in seconds.
+   */
+  public get duration(): number { return this._duration.value; }
+
+  /**
+   * The frame rate of the composition in frames per second.
+   */
+  public get fps(): number { return this._fps.value; }
+
   // Other internals
   private syncWithDocumentTimeline = false;
   private autoSyncAnimations = false;
@@ -195,8 +205,6 @@ export class Helios {
       );
     }
 
-    this.duration = options.duration;
-    this.fps = options.fps;
     this.schema = options.schema;
 
     const initialProps = validateProps(options.inputProps || {}, this.schema);
@@ -210,6 +218,8 @@ export class Helios {
     const initialFrame = Math.max(0, Math.min(initialFrameRaw, totalFrames));
 
     // Initialize signals
+    this._duration = signal(options.duration);
+    this._fps = signal(options.fps);
     this._currentFrame = signal(initialFrame);
     this._isPlaying = signal(false);
     this._inputProps = signal(initialProps);
@@ -263,8 +273,8 @@ export class Helios {
     return {
       width: this._width.value,
       height: this._height.value,
-      duration: this.duration,
-      fps: this.fps,
+      duration: this._duration.value,
+      fps: this._fps.value,
       currentFrame: this._currentFrame.value,
       isPlaying: this._isPlaying.value,
       inputProps: this._inputProps.value,
@@ -286,6 +296,54 @@ export class Helios {
     }
     this._width.value = width;
     this._height.value = height;
+  }
+
+  public setDuration(seconds: number) {
+    if (seconds < 0) {
+      throw new HeliosError(
+        HeliosErrorCode.INVALID_DURATION,
+        "Duration must be non-negative",
+        "Ensure the duration passed to setDuration is >= 0."
+      );
+    }
+    this._duration.value = seconds;
+
+    const totalFrames = seconds * this.fps;
+    // Clamp current frame if it exceeds new duration
+    if (this._currentFrame.peek() > totalFrames) {
+      this.seek(totalFrames);
+    } else {
+      this.driver.update((this._currentFrame.peek() / this.fps) * 1000, {
+        isPlaying: this._isPlaying.peek(),
+        playbackRate: this._playbackRate.peek(),
+        volume: this._volume.peek(),
+        muted: this._muted.peek()
+      });
+    }
+  }
+
+  public setFps(fps: number) {
+    if (fps <= 0) {
+      throw new HeliosError(
+        HeliosErrorCode.INVALID_FPS,
+        "FPS must be greater than 0",
+        "Ensure the fps passed to setFps is > 0."
+      );
+    }
+    const oldFps = this.fps;
+    const currentTime = this._currentFrame.peek() / oldFps;
+
+    this._fps.value = fps;
+
+    // Recalculate frame to match time
+    this._currentFrame.value = currentTime * fps;
+
+    this.driver.update(currentTime * 1000, {
+      isPlaying: this._isPlaying.peek(),
+      playbackRate: this._playbackRate.peek(),
+      volume: this._volume.peek(),
+      muted: this._muted.peek()
+    });
   }
 
   /**

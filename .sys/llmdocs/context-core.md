@@ -131,6 +131,10 @@ export enum HeliosErrorCode {
 
 ```typescript
 export class Helios {
+  // Constants (Getters)
+  public get duration(): number;
+  public get fps(): number;
+
   // Readonly Signals
   public get currentFrame(): ReadonlySignal<number>;
   public get isPlaying(): ReadonlySignal<boolean>;
@@ -155,6 +159,8 @@ export class Helios {
 
   // Actions
   public setSize(width: number, height: number): void;
+  public setDuration(seconds: number): void;
+  public setFps(fps: number): void;
   public setInputProps(props: Record<string, any>): void;
   public setPlaybackRate(rate: number): void;
   public setAudioVolume(volume: number): void;

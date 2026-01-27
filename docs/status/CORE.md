@@ -1,11 +1,12 @@
 # Status: CORE
 
-**Version**: 1.27.0
+**Version**: 1.28.0
 
 - **Status**: Active
 - **Current Focus**: Maintenance and Optimization
-- **Last Updated**: 2026-03-16
+- **Last Updated**: 2026-03-18
 
+[v1.28.0] ✅ Completed: Implement Dynamic Timing - Implemented `setDuration` and `setFps` methods in `Helios` class, allowing runtime updates to composition timing.
 [v1.27.0] ✅ Completed: Expose Captions - Exposed full caption list in `HeliosState` and enabled array input for captions in constructor and `setCaptions`.
 [v1.26.2] ✅ Completed: Restore Context File - Restored missing `/.sys/llmdocs/context-core.md` and verified package integrity.
 [v1.26.1] ✅ Completed: Verify Core Package Integrity - Verified build, tests, and artifacts for `packages/core`.
