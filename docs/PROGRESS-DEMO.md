@@ -72,3 +72,6 @@
 
 ## DEMO v1.40.0
 - ✅ Completed: Scaffold Procedural Generation Example - Created `examples/procedural-generation` demonstrating deterministic `random` and `interpolateColors` utilities.
+
+## DEMO v1.41.0
+- ✅ Completed: Scaffold Chart.js Animation Example - Created `examples/chartjs-animation` demonstrating integration with Chart.js using synchronous updates.

@@ -12,6 +12,7 @@
 - `examples/lottie-animation`: Airbnb Lottie (lottie-web).
 - `examples/motion-one-animation`: Motion One (motion).
 - `examples/d3-animation`: D3.js data visualization.
+- `examples/chartjs-animation`: Chart.js data visualization.
 - `examples/captions-animation`: Built-in SRT captions.
 - `examples/signals-animation`: Fine-grained reactivity (signals).
 - `examples/dynamic-props-animation`: Input props and schema validation.

@@ -43,6 +43,7 @@ export default defineConfig({
         waapi_animation: resolve(__dirname, "examples/waapi-animation/composition.html"),
         audio_visualization: resolve(__dirname, "examples/audio-visualization/composition.html"),
         procedural_generation: resolve(__dirname, "examples/procedural-generation/composition.html"),
+        chartjs_animation: resolve(__dirname, "examples/chartjs-animation/composition.html"),
       },
     },
   },

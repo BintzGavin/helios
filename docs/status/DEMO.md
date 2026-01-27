@@ -1,10 +1,11 @@
 # Status: DEMO (Executor)
-**Version**: 1.40.0
+**Version**: 1.41.0
 
 ## Vision
 To provide comprehensive, idiomatic examples for every major framework (React, Vue, Svelte, Vanilla) and robust end-to-end testing to ensure the Helios engine delivers on its "Use What You Know" promise.
 
 ## Current State
+- **Chart.js**: ✅ `examples/chartjs-animation` exists and works (Demonstrates synchronous update via `chart.update('none')`).
 - **Procedural Generation**: ✅ `examples/procedural-generation` exists and works (Demonstrates `random` and `interpolateColors`).
 - **Vanilla JS (Canvas)**: ✅ `examples/simple-canvas-animation` exists and works.
 - **Vanilla JS (DOM)**: ✅ `examples/simple-animation` exists and works.
@@ -36,6 +37,7 @@ To provide comprehensive, idiomatic examples for every major framework (React, V
 - **E2E Tests**: ✅ Verified all existing examples via `tests/e2e/verify-render.ts`.
 
 ## Backlog
+- [x] Scaffold Chart.js Animation Example (`examples/chartjs-animation`)
 - [x] Scaffold Procedural Generation Example (`examples/procedural-generation`)
 - [x] Scaffold Media Element Example (`examples/media-element-animation`)
 - [x] Scaffold Captions Animation Example (`examples/captions-animation`)
@@ -64,6 +66,7 @@ To provide comprehensive, idiomatic examples for every major framework (React, V
 None.
 
 ## Log
+- [v1.41.0] ✅ Completed: Scaffold Chart.js Animation Example - Created `examples/chartjs-animation` demonstrating integration with Chart.js using synchronous updates.
 - [v1.40.0] ✅ Completed: Scaffold Procedural Generation Example - Created `examples/procedural-generation` demonstrating deterministic `random` and `interpolateColors` utilities.
 - [v1.39.0] ✅ Completed: Scaffold Audio Visualization Example - Created `examples/audio-visualization` demonstrating synchronous audio generation and visualization using Canvas.
 - [v1.38.0] 📋 Planned: Scaffold Audio Visualization Example - Created spec file `/.sys/plans/2025-02-22-DEMO-Audio-Visualization.md` to guide implementation of audio data visualization.
