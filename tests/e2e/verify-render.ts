@@ -33,6 +33,7 @@ const CASES = [
   { name: 'Audio Visualization', relativePath: 'examples/audio-visualization/composition.html', mode: 'canvas' as const },
   { name: 'Procedural Generation', relativePath: 'examples/procedural-generation/composition.html', mode: 'canvas' as const },
   { name: 'ChartJS', relativePath: 'examples/chartjs-animation/composition.html', mode: 'dom' as const },
+  { name: 'Social Media Story', relativePath: 'examples/social-media-story/composition.html', mode: 'dom' as const },
 ];
 
 async function main() {

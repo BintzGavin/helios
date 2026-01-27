@@ -44,6 +44,7 @@ export default defineConfig({
         audio_visualization: resolve(__dirname, "examples/audio-visualization/composition.html"),
         procedural_generation: resolve(__dirname, "examples/procedural-generation/composition.html"),
         chartjs_animation: resolve(__dirname, "examples/chartjs-animation/composition.html"),
+        social_media_story: resolve(__dirname, "examples/social-media-story/composition.html"),
       },
     },
   },
