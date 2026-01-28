@@ -1,3 +1,5 @@
+## STUDIO v0.41.0
+- ✅ Completed: Asset Input - Implemented `AssetInput` in Props Editor with asset discovery integration.
 
 ## STUDIO v0.40.1
 - ✅ Completed: Documentation & Verification - Added package README, updated version, and implemented Playwright-based verification script.

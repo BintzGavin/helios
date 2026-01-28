@@ -24,6 +24,7 @@ packages/studio/
       GlobalShortcuts.tsx
       KeyboardShortcutsModal.tsx
       PropsEditor.tsx
+      SchemaInputs.tsx
       Timeline.tsx
     context/
       StudioContext.tsx
@@ -45,7 +46,7 @@ Options:
 
 ## D. UI Components
 - **Timeline**: Visual track of the video, supports markers, captions, zooming.
-- **PropsEditor**: Auto-generated inputs based on composition schema.
+- **PropsEditor**: Auto-generated inputs based on composition schema (supports Asset selection).
 - **Stage**: Renders the `<helios-player>` or canvas.
 - **GlobalShortcuts**: Headless component managing keyboard interactions.
 - **PlaybackControls**: Buttons for play, pause, seek, loop, volume.

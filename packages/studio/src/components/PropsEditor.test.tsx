@@ -137,4 +137,42 @@ describe('PropsEditor', () => {
       expect(screen.getByDisplayValue('A')).toBeInTheDocument();
       expect(screen.getByDisplayValue('B')).toBeInTheDocument();
   });
+
+  it('renders asset inputs with suggestions', () => {
+    const schema: HeliosSchema = {
+      imageProp: { type: 'image' }
+    };
+
+    const assets = [
+      { id: '1', name: 'image.png', url: '/assets/image.png', type: 'image' },
+      { id: '2', name: 'video.mp4', url: '/assets/video.mp4', type: 'video' }
+    ];
+
+    (StudioContext.useStudio as any).mockReturnValue({
+      ...defaultContext,
+      assets,
+      playerState: {
+        inputProps: {
+          imageProp: '/assets/old.png'
+        },
+        schema
+      }
+    });
+
+    const { container } = render(<PropsEditor />);
+
+    const input = screen.getByDisplayValue('/assets/old.png');
+    expect(input).toBeInTheDocument();
+    expect(input).toHaveAttribute('list');
+    expect(input).toHaveAttribute('placeholder', 'Select image or enter URL...');
+
+    // Verify datalist options are present in the DOM
+    // Note: datalist id is generated via useId, so we can't easily query by ID.
+    // But we can look for options with specific values.
+    // We expect ONLY the image asset to be suggested.
+    const options = container.querySelectorAll('option');
+    const optionValues = Array.from(options).map(o => o.value);
+    expect(optionValues).toContain('/assets/image.png');
+    expect(optionValues).not.toContain('/assets/video.mp4');
+  });
 });

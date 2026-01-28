@@ -1,5 +1,6 @@
 import React from 'react';
-import type { PropDefinition } from '@helios-project/core';
+import type { PropDefinition, PropType } from '@helios-project/core';
+import { useStudio } from '../context/StudioContext';
 import './PropsEditor.css'; // Re-use styles
 
 interface SchemaInputProps {
@@ -22,6 +23,11 @@ export const SchemaInput: React.FC<SchemaInputProps> = ({ definition, value, onC
       return <BooleanInput value={value} onChange={onChange} />;
     case 'color':
       return <ColorInput value={value} onChange={onChange} />;
+    case 'image':
+    case 'video':
+    case 'audio':
+    case 'font':
+      return <AssetInput type={definition.type} value={value} onChange={onChange} />;
     case 'object':
     case 'array':
         // Fallback to JSON editor for complex types
@@ -32,6 +38,37 @@ export const SchemaInput: React.FC<SchemaInputProps> = ({ definition, value, onC
     default:
       return <div className="unsupported-type">Unsupported schema type: {definition.type}</div>;
   }
+};
+
+const AssetInput: React.FC<{ type: PropType; value: string; onChange: (val: string) => void }> = ({
+  type,
+  value,
+  onChange
+}) => {
+  const { assets } = useStudio();
+  const listId = React.useId();
+
+  const filteredAssets = assets.filter((a) => a.type === type);
+
+  return (
+    <>
+      <input
+        type="text"
+        list={listId}
+        className="prop-input"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={`Select ${type} or enter URL...`}
+      />
+      <datalist id={listId}>
+        {filteredAssets.map((asset) => (
+          <option key={asset.id} value={asset.url}>
+            {asset.name}
+          </option>
+        ))}
+      </datalist>
+    </>
+  );
 };
 
 const EnumInput: React.FC<{ options: (string | number)[], value: any, onChange: (val: any) => void }> = ({ options, value, onChange }) => {

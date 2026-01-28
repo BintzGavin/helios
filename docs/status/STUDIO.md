@@ -1,4 +1,4 @@
-**Version**: 0.40.1
+**Version**: 0.41.0
 
 # Studio Domain Status
 
@@ -7,6 +7,7 @@
 **Focus**: UI Implementation & CLI
 
 ## Recent Updates
+- [v0.41.0] ✅ Completed: Asset Input - Implemented `AssetInput` in Props Editor with asset discovery integration (autocomplete via datalist) for image, video, audio, and font types.
 - [v0.40.1] ✅ Completed: Documentation & Verification - Added package README, updated version, and implemented Playwright-based verification script.
 - [v0.40.0] ✅ Completed: Global Shortcuts Refactor - Centralized all keyboard shortcuts into `GlobalShortcuts.tsx` and added Loop Toggle ('L').
 - [v0.39.0] ✅ Completed: Marker Visualization - Implemented visual markers in Timeline with click-to-seek functionality.
