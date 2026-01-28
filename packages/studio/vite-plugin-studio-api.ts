@@ -3,7 +3,7 @@ import { AddressInfo } from 'net';
 import fs from 'fs';
 import path from 'path';
 import { findCompositions, findAssets, getProjectRoot } from './src/server/discovery';
-import { startRender, getJob, getJobs, cancelJob, deleteJob } from './src/server/render-manager';
+import { startRender, getJob, getJobs, cancelJob, deleteJob, diagnoseServer } from './src/server/render-manager';
 
 export function studioApiPlugin(): Plugin {
   return {
@@ -34,6 +34,22 @@ export function studioApiPlugin(): Plugin {
             console.error(e);
             res.statusCode = 500;
             res.end(JSON.stringify({ error: 'Failed to scan compositions' }));
+          }
+          return;
+        }
+        next();
+      });
+
+      server.middlewares.use('/api/diagnose', async (req, res, next) => {
+        if (req.url === '/' || req.url === '') {
+          try {
+            const report = await diagnoseServer();
+            res.setHeader('Content-Type', 'application/json');
+            res.end(JSON.stringify(report));
+          } catch (e: any) {
+            console.error(e);
+            res.statusCode = 500;
+            res.end(JSON.stringify({ error: e.message || 'Diagnostics failed' }));
           }
           return;
         }

@@ -1,0 +1,146 @@
+.diagnostics-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+  backdrop-filter: blur(2px);
+}
+
+.diagnostics-modal {
+  background: #1e1e1e;
+  border: 1px solid #333;
+  border-radius: 8px;
+  width: 800px;
+  max-width: 90vw;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+}
+
+.diagnostics-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  border-bottom: 1px solid #333;
+  background: #252525;
+}
+
+.diagnostics-header h2 {
+  margin: 0;
+  font-size: 1.2rem;
+  color: #fff;
+}
+
+.diagnostics-close-button {
+  background: none;
+  border: none;
+  color: #888;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 4px;
+  line-height: 1;
+}
+
+.diagnostics-close-button:hover {
+  color: #fff;
+}
+
+.diagnostics-content {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.diagnostics-column {
+  flex: 1;
+  padding: 24px;
+  overflow-y: auto;
+}
+
+.diagnostics-column:first-child {
+  border-right: 1px solid #333;
+}
+
+.diagnostics-column-header {
+  font-size: 1rem;
+  font-weight: bold;
+  margin-bottom: 16px;
+  color: #bbb;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.diagnostics-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  border-bottom: 1px solid #2a2a2a;
+}
+
+.diagnostics-item:last-child {
+  border-bottom: none;
+}
+
+.diagnostics-label {
+  color: #ccc;
+  font-weight: 500;
+}
+
+.diagnostics-value {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.status-icon {
+  font-size: 1.2rem;
+}
+
+.status-check {
+  color: #4caf50;
+}
+
+.status-cross {
+  color: #f44336;
+}
+
+.user-agent {
+  font-family: monospace;
+  font-size: 0.8rem;
+  color: #888;
+  background: #111;
+  padding: 8px;
+  border-radius: 4px;
+  margin-top: 8px;
+  word-break: break-all;
+  line-height: 1.4;
+}
+
+.loading-spinner {
+  color: #888;
+  font-style: italic;
+  padding: 20px;
+  text-align: center;
+}
+
+.error-message {
+  color: #f44336;
+  background: rgba(244, 67, 54, 0.1);
+  padding: 12px;
+  border-radius: 4px;
+  border: 1px solid rgba(244, 67, 54, 0.3);
+  font-size: 0.9rem;
+}

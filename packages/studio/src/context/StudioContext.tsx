@@ -71,6 +71,9 @@ interface StudioContextType {
   isHelpOpen: boolean;
   setHelpOpen: (isOpen: boolean) => void;
 
+  isDiagnosticsOpen: boolean;
+  setDiagnosticsOpen: (isOpen: boolean) => void;
+
   // Assets
   assets: Asset[];
   uploadAsset: (file: File) => Promise<void>;
@@ -118,6 +121,7 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [activeComposition, setActiveComposition] = useState<Composition | null>(null);
   const [isSwitcherOpen, setSwitcherOpen] = useState(false);
   const [isHelpOpen, setHelpOpen] = useState(false);
+  const [isDiagnosticsOpen, setDiagnosticsOpen] = useState(false);
   const [canvasSize, setCanvasSize] = useState({ width: 1920, height: 1080 });
   const [renderConfig, setRenderConfig] = useState<RenderConfig>({ mode: 'canvas' });
 
@@ -320,6 +324,8 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         setSwitcherOpen,
         isHelpOpen,
         setHelpOpen,
+        isDiagnosticsOpen,
+        setDiagnosticsOpen,
         renderJobs,
         startRender,
         cancelRender,
