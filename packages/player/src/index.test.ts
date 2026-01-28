@@ -1007,4 +1007,51 @@ describe('HeliosPlayer', () => {
         expect(overlay!.classList.contains('hidden')).toBe(true);
     });
   });
+
+  describe('Muted Attribute', () => {
+    let mockController: any;
+
+    beforeEach(() => {
+        mockController = {
+            getState: vi.fn().mockReturnValue({ currentFrame: 0, duration: 10, fps: 30, isPlaying: false, muted: false }),
+            play: vi.fn(),
+            pause: vi.fn(),
+            seek: vi.fn(),
+            setAudioVolume: vi.fn(),
+            setAudioMuted: vi.fn(),
+            setPlaybackRate: vi.fn(),
+            subscribe: vi.fn().mockReturnValue(() => {}),
+            onError: vi.fn().mockReturnValue(() => {}),
+            dispose: vi.fn(),
+            setInputProps: vi.fn(),
+            captureFrame: vi.fn(),
+            getAudioTracks: vi.fn()
+        };
+    });
+
+    it('should set muted on controller when attribute is present during initialization', () => {
+        player.setAttribute('muted', '');
+        (player as any).setController(mockController);
+        expect(mockController.setAudioMuted).toHaveBeenCalledWith(true);
+    });
+
+    it('should set muted on controller when attribute is added dynamically', () => {
+        (player as any).setController(mockController);
+        player.setAttribute('muted', '');
+        expect(mockController.setAudioMuted).toHaveBeenCalledWith(true);
+    });
+
+    it('should unmute on controller when attribute is removed dynamically', () => {
+        player.setAttribute('muted', '');
+        (player as any).setController(mockController);
+        mockController.setAudioMuted.mockClear();
+
+        player.removeAttribute('muted');
+        expect(mockController.setAudioMuted).toHaveBeenCalledWith(false);
+    });
+
+    it('should observe muted attribute', () => {
+        expect(HeliosPlayer.observedAttributes).toContain('muted');
+    });
+  });
 });
