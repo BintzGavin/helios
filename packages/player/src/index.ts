@@ -349,7 +349,7 @@ export class HeliosPlayer extends HTMLElement {
   // Keep track if we have direct access (optional, mainly for debugging/logging)
   private directHelios: Helios | null = null;
   private unsubscribe: (() => void) | null = null;
-  private connectionTimeout: number | null = null;
+  private connectionInterval: number | null = null;
   private abortController: AbortController | null = null;
   private isExporting: boolean = false;
   private isScrubbing: boolean = false;
@@ -617,6 +617,8 @@ export class HeliosPlayer extends HTMLElement {
     this.bigPlayBtn.removeEventListener("click", this.handleBigPlayClick);
     this.posterContainer.removeEventListener("click", this.handleBigPlayClick);
 
+    this.stopConnectionAttempts();
+
     if (this.unsubscribe) {
         this.unsubscribe();
     }
@@ -704,45 +706,73 @@ export class HeliosPlayer extends HTMLElement {
 
   private handleIframeLoad = () => {
     if (!this.iframe.contentWindow) return;
+    this.startConnectionAttempts();
+  };
 
-    // Clear any existing timeout
-    if (this.connectionTimeout) window.clearTimeout(this.connectionTimeout);
+  private startConnectionAttempts() {
+    this.stopConnectionAttempts();
 
-    // 1. Try Direct Mode (Legacy/Local)
-    let directInstance: Helios | undefined;
-    try {
+    // 1. Bridge Mode (Fire and forget, wait for message)
+    // We send this immediately so if the iframe is listening it can respond.
+    this.iframe.contentWindow?.postMessage({ type: 'HELIOS_CONNECT' }, '*');
+
+    // 2. Direct Mode (Polling)
+    const checkDirect = () => {
+      let directInstance: Helios | undefined;
+      try {
         directInstance = (this.iframe.contentWindow as any).helios as Helios | undefined;
-    } catch (e) {
+      } catch (e) {
         // Access denied (Cross-origin)
-        console.log("HeliosPlayer: Direct access to iframe denied (likely cross-origin).");
-    }
+      }
 
-    if (directInstance) {
+      if (directInstance) {
         console.log("HeliosPlayer: Connected via Direct Mode.");
+        this.stopConnectionAttempts();
         this.hideStatus();
         this.directHelios = directInstance;
         this.setController(new DirectController(directInstance, this.iframe));
         this.exportBtn.disabled = false;
-        return;
-    } else {
-        this.directHelios = null;
-        this.exportBtn.disabled = true; // Wait for bridge connection
-        console.log("HeliosPlayer: Waiting for Bridge connection...");
-    }
+        return true;
+      }
+      return false;
+    };
 
-    // Start timeout for bridge
-    this.connectionTimeout = window.setTimeout(() => {
-      this.showStatus("Connection Failed. Ensure window.helios is set or connectToParent() is called.", true);
-    }, 3000);
+    // Check immediately to avoid unnecessary delay
+    if (checkDirect()) return;
 
-    // 2. Initiate Bridge Mode (always try to connect)
-    this.iframe.contentWindow.postMessage({ type: 'HELIOS_CONNECT' }, '*');
-  };
+    // We poll because window.helios might be set asynchronously.
+    const startTime = Date.now();
+    this.connectionInterval = window.setInterval(() => {
+        // If we connected via Bridge in the meantime, stop polling
+        if (this.controller) {
+            this.stopConnectionAttempts();
+            return;
+        }
+
+        if (checkDirect()) return;
+
+        // Timeout check (5 seconds)
+        if (Date.now() - startTime > 5000) {
+             this.stopConnectionAttempts();
+             if (!this.controller) {
+                 this.showStatus("Connection Failed. Ensure window.helios is set or connectToParent() is called.", true);
+             }
+        }
+    }, 100);
+  }
+
+  private stopConnectionAttempts() {
+      if (this.connectionInterval) {
+          window.clearInterval(this.connectionInterval);
+          this.connectionInterval = null;
+      }
+  }
 
   private handleWindowMessage = (event: MessageEvent) => {
       // Check if this message is a handshake response
       if (event.data?.type === 'HELIOS_READY') {
-          if (this.connectionTimeout) window.clearTimeout(this.connectionTimeout);
+          // If we receive a ready signal, we stop polling for direct access
+          this.stopConnectionAttempts();
           this.hideStatus();
 
           // If we already have a controller (e.g. Direct Mode), we might stick with it

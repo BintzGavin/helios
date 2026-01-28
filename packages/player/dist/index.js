@@ -341,7 +341,7 @@ export class HeliosPlayer extends HTMLElement {
     // Keep track if we have direct access (optional, mainly for debugging/logging)
     directHelios = null;
     unsubscribe = null;
-    connectionTimeout = null;
+    connectionInterval = null;
     abortController = null;
     isExporting = false;
     isScrubbing = false;
@@ -432,7 +432,7 @@ export class HeliosPlayer extends HTMLElement {
         }
     }
     static get observedAttributes() {
-        return ["src", "width", "height", "autoplay", "loop", "controls", "export-format", "input-props", "poster"];
+        return ["src", "width", "height", "autoplay", "loop", "controls", "export-format", "input-props", "poster", "muted"];
     }
     constructor() {
         super();
@@ -502,6 +502,11 @@ export class HeliosPlayer extends HTMLElement {
                 console.warn("HeliosPlayer: Invalid JSON in input-props", e);
             }
         }
+        if (name === "muted") {
+            if (this.controller) {
+                this.controller.setAudioMuted(this.hasAttribute("muted"));
+            }
+        }
     }
     get inputProps() {
         return this.pendingProps;
@@ -569,6 +574,7 @@ export class HeliosPlayer extends HTMLElement {
         this.ccBtn.removeEventListener("click", this.toggleCaptions);
         this.bigPlayBtn.removeEventListener("click", this.handleBigPlayClick);
         this.posterContainer.removeEventListener("click", this.handleBigPlayClick);
+        this.stopConnectionAttempts();
         if (this.unsubscribe) {
             this.unsubscribe();
         }
@@ -652,43 +658,66 @@ export class HeliosPlayer extends HTMLElement {
     handleIframeLoad = () => {
         if (!this.iframe.contentWindow)
             return;
-        // Clear any existing timeout
-        if (this.connectionTimeout)
-            window.clearTimeout(this.connectionTimeout);
-        // 1. Try Direct Mode (Legacy/Local)
-        let directInstance;
-        try {
-            directInstance = this.iframe.contentWindow.helios;
-        }
-        catch (e) {
-            // Access denied (Cross-origin)
-            console.log("HeliosPlayer: Direct access to iframe denied (likely cross-origin).");
-        }
-        if (directInstance) {
-            console.log("HeliosPlayer: Connected via Direct Mode.");
-            this.hideStatus();
-            this.directHelios = directInstance;
-            this.setController(new DirectController(directInstance, this.iframe));
-            this.exportBtn.disabled = false;
-            return;
-        }
-        else {
-            this.directHelios = null;
-            this.exportBtn.disabled = true; // Wait for bridge connection
-            console.log("HeliosPlayer: Waiting for Bridge connection...");
-        }
-        // Start timeout for bridge
-        this.connectionTimeout = window.setTimeout(() => {
-            this.showStatus("Connection Failed. Ensure window.helios is set or connectToParent() is called.", true);
-        }, 3000);
-        // 2. Initiate Bridge Mode (always try to connect)
-        this.iframe.contentWindow.postMessage({ type: 'HELIOS_CONNECT' }, '*');
+        this.startConnectionAttempts();
     };
+    startConnectionAttempts() {
+        this.stopConnectionAttempts();
+        // 1. Bridge Mode (Fire and forget, wait for message)
+        // We send this immediately so if the iframe is listening it can respond.
+        this.iframe.contentWindow?.postMessage({ type: 'HELIOS_CONNECT' }, '*');
+        // 2. Direct Mode (Polling)
+        const checkDirect = () => {
+            let directInstance;
+            try {
+                directInstance = this.iframe.contentWindow.helios;
+            }
+            catch (e) {
+                // Access denied (Cross-origin)
+            }
+            if (directInstance) {
+                console.log("HeliosPlayer: Connected via Direct Mode.");
+                this.stopConnectionAttempts();
+                this.hideStatus();
+                this.directHelios = directInstance;
+                this.setController(new DirectController(directInstance, this.iframe));
+                this.exportBtn.disabled = false;
+                return true;
+            }
+            return false;
+        };
+        // Check immediately to avoid unnecessary delay
+        if (checkDirect())
+            return;
+        // We poll because window.helios might be set asynchronously.
+        const startTime = Date.now();
+        this.connectionInterval = window.setInterval(() => {
+            // If we connected via Bridge in the meantime, stop polling
+            if (this.controller) {
+                this.stopConnectionAttempts();
+                return;
+            }
+            if (checkDirect())
+                return;
+            // Timeout check (5 seconds)
+            if (Date.now() - startTime > 5000) {
+                this.stopConnectionAttempts();
+                if (!this.controller) {
+                    this.showStatus("Connection Failed. Ensure window.helios is set or connectToParent() is called.", true);
+                }
+            }
+        }, 100);
+    }
+    stopConnectionAttempts() {
+        if (this.connectionInterval) {
+            window.clearInterval(this.connectionInterval);
+            this.connectionInterval = null;
+        }
+    }
     handleWindowMessage = (event) => {
         // Check if this message is a handshake response
         if (event.data?.type === 'HELIOS_READY') {
-            if (this.connectionTimeout)
-                window.clearTimeout(this.connectionTimeout);
+            // If we receive a ready signal, we stop polling for direct access
+            this.stopConnectionAttempts();
             this.hideStatus();
             // If we already have a controller (e.g. Direct Mode), we might stick with it
             if (!this.controller) {
@@ -719,6 +748,9 @@ export class HeliosPlayer extends HTMLElement {
         this.setControlsDisabled(false);
         if (this.pendingProps) {
             this.controller.setInputProps(this.pendingProps);
+        }
+        if (this.hasAttribute("muted")) {
+            this.controller.setAudioMuted(true);
         }
         const state = this.controller.getState();
         if (state) {
