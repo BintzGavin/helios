@@ -13,7 +13,7 @@ interface HeliosPlayerElement extends HTMLElement {
 }
 
 export const Stage: React.FC<StageProps> = ({ src }) => {
-  const { setController, canvasSize, setCanvasSize } = useStudio();
+  const { setController, canvasSize, setCanvasSize, playerState } = useStudio();
   const playerRef = useRef<HeliosPlayerElement>(null);
 
   // State
@@ -23,21 +23,46 @@ export const Stage: React.FC<StageProps> = ({ src }) => {
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
 
-  // Controller Connection Logic
+  // Refs for HMR state preservation
+  const playerStateRef = useRef(playerState);
+  playerStateRef.current = playerState;
+  const knownControllerRef = useRef<HeliosController | null>(null);
+
+  // Reset known controller when src changes (composition switch)
+  useEffect(() => {
+    knownControllerRef.current = null;
+    setController(null);
+  }, [src, setController]);
+
+  // Controller Connection Logic & HMR State Preservation
   useEffect(() => {
     const el = playerRef.current;
     if (!el || !src) return;
 
-    // Reset controller when src changes
-    setController(null);
-
     const interval = setInterval(() => {
       const ctrl = el.getController();
-      if (ctrl) {
-        setController(ctrl);
-        clearInterval(interval);
+
+      // Detect controller change
+      if (ctrl !== knownControllerRef.current) {
+        if (ctrl) {
+          // If we previously had a controller, this is likely an HMR reload
+          // so we attempt to restore the state.
+          if (knownControllerRef.current) {
+            const { currentFrame, isPlaying } = playerStateRef.current;
+            try {
+              ctrl.seek(currentFrame);
+              if (isPlaying) {
+                ctrl.play();
+              }
+            } catch (e) {
+              console.warn('Failed to restore playback state after HMR', e);
+            }
+          }
+          setController(ctrl);
+        }
+        knownControllerRef.current = ctrl;
       }
-    }, 200);
+    }, 100);
 
     return () => clearInterval(interval);
   }, [src, setController]);

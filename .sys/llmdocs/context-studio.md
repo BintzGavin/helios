@@ -10,6 +10,7 @@ The Studio is a React 19 application built with Vite. It serves as the IDE for v
 - **Framework**: React 19
 - **Build Tool**: Vite
 - **Preview**: Integrated via `<helios-player>` web component, wrapped in a `Stage` component for zoom/pan controls.
+- **HMR**: Supports Hot Module Replacement with state preservation (frame, playback status) to improve developer experience.
 - **State Management**: `StudioContext` provides centralized access to `HeliosController`, player state (frame, playing, props), and Studio settings (loop, active composition, assets, render jobs, timeline range, canvas size).
 
 ## B. File Tree
@@ -51,6 +52,7 @@ packages/studio/
         │   └── PlaybackControls.tsx
         ├── Stage/
         │   ├── Stage.css
+        │   ├── Stage.test.tsx
         │   ├── Stage.tsx
         │   └── StageToolbar.tsx
         └── Layout/
@@ -84,7 +86,7 @@ Internal scripts:
 - **Sidebar**: `components/Sidebar/Sidebar.tsx` manages tabs (Assets, Renders) in the sidebar area.
 - **AssetsPanel**: `components/AssetsPanel/AssetsPanel.tsx` displays a grid of available assets (fetched from `/api/assets`).
 - **RendersPanel**: `components/RendersPanel/RendersPanel.tsx` displays a list of render jobs and status.
-- **Stage**: `components/Stage/Stage.tsx` wraps `<helios-player>`, handling controller connection, zoom, pan, and transparency toggling. It applies specific pixel dimensions to the player based on the configured canvas size.
+- **Stage**: `components/Stage/Stage.tsx` wraps `<helios-player>`, handling controller connection, zoom, pan, and transparency toggling. It implements HMR state preservation.
 - **StageToolbar**: `components/Stage/StageToolbar.tsx` provides floating controls for the Stage, including zoom, transparency, and resolution controls (presets + custom input).
 - **Panel**: `components/Layout/Panel.tsx` is a generic container for UI panels.
 - **Timeline**: `components/Timeline.tsx` provides a visual timeline with draggable in/out markers and keyboard shortcuts (I/O).

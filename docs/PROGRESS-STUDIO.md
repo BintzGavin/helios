@@ -1,5 +1,8 @@
 # Studio Progress Log
 
+## STUDIO v0.18.0
+- ✅ Completed: Hot Reload State Preservation - Implemented state restoration (frame/playback) for HMR updates in Studio.
+
 ## STUDIO v0.17.0
 - ✅ Completed: Inject HELIOS_PROJECT_ROOT in CLI - Modified CLI to pass user's CWD to Studio process, enabling "Studio as a Tool".
 

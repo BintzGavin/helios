@@ -23,5 +23,9 @@ export default defineConfig({
       // Allow serving files from the project root
       allow: [projectRoot]
     }
+  },
+  test: {
+    environment: 'jsdom',
+    globals: true
   }
-})
+} as any)
