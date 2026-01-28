@@ -37,6 +37,8 @@ A custom element that embeds a composition (via iframe) and provides a rich play
 - **`controls`** (boolean): If present, displays the playback controls (play/pause, scrubber, speed, export, CC).
 - **`autoplay`** (boolean): If present, starts playback automatically.
 - **`loop`** (boolean): If present, loops playback.
+- **`muted`** (boolean): If present, initializes the player in muted state.
+- **`poster`** (string): URL of an image to show before playback starts.
 - **`export-mode`** (string): `'auto'`, `'canvas'`, or `'dom'`. Determines how frames are captured for client-side export.
 - **`export-format`** (string): `'mp4'` (default) or `'webm'`. The output video format.
 - **`canvas-selector`** (string): CSS selector for the canvas element (required for `export-mode="canvas"`).
@@ -69,6 +71,28 @@ The player supports client-side video export (rendering to WebM/MP4 in the brows
 - Locks the UI during export.
 - Supports audio export via OfflineAudioContext.
 - Supports "Burn-In" captions during export.
+
+#### `ClientSideExporter`
+
+You can also access the exporter programmatically.
+
+```typescript
+import { ClientSideExporter } from '@helios-project/player';
+
+const player = document.querySelector('helios-player');
+const controller = player.getController();
+
+if (controller) {
+  const exporter = new ClientSideExporter(controller, player.shadowRoot.querySelector('iframe'));
+
+  await exporter.export({
+    format: 'mp4',
+    mode: 'auto',
+    onProgress: (p) => console.log(p),
+    includeCaptions: true
+  });
+}
+```
 
 ### Keyboard Shortcuts
 

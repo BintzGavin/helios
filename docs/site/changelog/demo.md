@@ -5,6 +5,15 @@ description: "Changelog for the Demo package and examples"
 
 # Demo Changelog
 
+## v1.46.0
+- **Vue Transitions Example**: Created `examples/vue-transitions` demonstrating how to synchronize standard CSS animations in Vue using `autoSyncAnimations` and `animation-delay` with proper seeking support.
+
+## v1.44.0
+- **Scaffold React Three Fiber Example**: Created `examples/react-three-fiber` demonstrating integration with `@react-three/fiber` using `frameloop="never"` and manual state advancement.
+
+## v1.43.0
+- **Create React Transitions Example**: Created `examples/react-transitions` demonstrating how to synchronize CSS animations with Helios timeline using `autoSyncAnimations` and `animation-delay`.
+
 ## v1.37.0
 - **Scaffold P5.js Example**: Created `examples/p5-canvas-animation` demonstrating integration with P5.js in Instance Mode.
 
@@ -13,6 +22,9 @@ description: "Changelog for the Demo package and examples"
 
 ## v1.35.0
 - **Scaffold Tailwind CSS Example**: Created `examples/tailwind-animation` demonstrating Tailwind v3 integration with proper scoping and build configuration.
+
+## v1.33.0
+- **Scaffold D3 Animation Example**: Created `examples/d3-animation` demonstrating data visualization with D3.js and frame-based updates.
 
 ## v1.31.0
 - **Scaffold Media Element Example**: Created `examples/media-element-animation` demonstrating `DomDriver` synchronization of native `<video>` and `<audio>` elements.

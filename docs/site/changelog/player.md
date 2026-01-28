@@ -5,6 +5,15 @@ description: "Changelog for the Player package"
 
 # Player Changelog
 
+## v0.26.1
+- **Poster Visibility**: Refined logic to prioritize poster visibility over "Loading/Connecting" status overlay during initialization.
+
+## v0.26.0
+- **Bridge Error Propagation**: Implemented global error handling in `bridge.ts` and `HeliosController`.
+
+## v0.25.2
+- **Polish Burn-In Captions**: Added text shadow to exported captions to match player UI styling and improved code hygiene by preventing canvas state leaks.
+
 ## v0.23.0
 - **Implement Input Props**: Implemented `input-props` attribute/property on `<helios-player>` to pass dynamic data to the composition controller.
 

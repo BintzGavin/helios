@@ -5,6 +5,15 @@ description: "Changelog for the Core package"
 
 # Core Changelog
 
+## v2.0.0
+- **WaitUntilStable Interface**: Made `waitUntilStable` required in `TimeDriver` interface and strict in `Helios` to ensure reliable rendering.
+
+## v1.33.0
+- **Implement WaitUntilStable**: Implemented `waitUntilStable` in `Helios` and `DomDriver` to ensure deterministic rendering by waiting for fonts, images, and media readiness.
+
+## v1.32.1
+- **Document Dynamic Timing**: Verified implementation, added JSDoc, and cleaned up plan artifacts.
+
 ## v1.27.0
 - **Expose Captions**: Exposed full caption list in `HeliosState` and enabled array input for captions in constructor and `setCaptions`.
 
