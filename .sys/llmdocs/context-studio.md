@@ -28,6 +28,7 @@ packages/studio/
 │   │   ├── CompositionSwitcher.tsx
 │   │   ├── DiagnosticsModal.tsx
 │   │   ├── KeyboardShortcutsModal.tsx
+│   │   ├── SystemPromptModal.tsx
 │   │   ├── PropsEditor.tsx
 │   │   ├── SchemaInputs.tsx
 │   │   └── Timeline.tsx
@@ -58,6 +59,7 @@ Run via `npx helios studio` (or `npm run dev` in `packages/studio` during develo
 - **Timeline**: Visual timeline for scrubbing, playback control, marker management, and zooming.
 - **PropsEditor**: Schema-aware editor for composition input props.
 - **DiagnosticsModal**: Displays system capabilities for Client (Preview) and Server (Renderer).
+- **SystemPromptModal**: Generates optimized LLM system prompts for the current composition.
 - **CompositionSwitcher**: Command palette (Cmd+K) to switch between compositions.
 
 ## E. Integration

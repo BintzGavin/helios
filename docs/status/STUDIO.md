@@ -1,4 +1,4 @@
-**Version**: 0.37.0
+**Version**: 0.38.0
 
 # Studio Domain Status
 
@@ -7,6 +7,7 @@
 **Focus**: UI Implementation & CLI
 
 ## Recent Updates
+- [v0.38.0] ✅ Completed: AI System Prompt - Implemented a modal generator for LLM system prompts, combining static Helios context with dynamic composition schema.
 - [v0.37.0] ✅ Completed: Timeline Zoom - Implemented zoom slider and scrollable timeline track for precise editing.
 - [v0.36.0] ✅ Completed: Client-Side Export - Implemented in-browser MP4/WebM export functionality in Renders Panel using WebCodecs.
 - [v0.35.0] ✅ Completed: Assets Extension - Added support for discovering and displaying 3D models (.glb, .gltf), JSON data (.json), and Shaders (.glsl, .vert, .frag) in the Assets Panel.
