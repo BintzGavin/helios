@@ -1,54 +1,54 @@
-# Context & Goal
-- **Objective**: Scaffold `examples/podcast-visualizer` to verify multi-track audio mixing, `muted` attribute support, and `data-helios-offset` timing in the Renderer.
-- **Trigger**: Vision gap identified in `docs/status/DEMO.md` (Audio Mixing Verification Gap) and lack of realistic examples for complex renderer features.
-- **Impact**: Verifies `DomStrategy` correctly handles multiple audio sources, respecting offsets and mute states, ensuring robust audio support for the renderer.
+# 2025-02-23-DEMO-PodcastVisualizer.md
 
-# File Inventory
+## 1. Context & Goal
+- **Objective**: Scaffold the `examples/podcast-visualizer` example to verify multi-track audio mixing, `muted` attribute handling, and `data-helios-offset` timing in the Renderer.
+- **Trigger**: Vision gap "Audio Mixing Verification Gap" and missing implementation.
+- **Impact**: Provides a dedicated test case for advanced audio features (mixing, offset, mute) in the rendering pipeline.
+
+## 2. File Inventory
 - **Create**:
-  - `examples/podcast-visualizer/composition.html`: The main composition file with multi-track audio and visualization.
-  - `examples/podcast-visualizer/vite.config.js`: Build configuration for the example.
+  - `examples/podcast-visualizer/composition.html`: The example source code.
 - **Modify**:
-  - `vite.build-example.config.js`: Add `podcast_visualizer` to the build inputs.
-  - `tests/e2e/verify-render.ts`: Add `Podcast Visualizer` to the verification list.
-- **Read-Only**:
-  - `packages/core/src/index.ts`
-  - `packages/renderer/src/index.ts`
+  - `vite.build-example.config.js`: Add the new example to the build input.
+  - `tests/e2e/verify-render.ts`: Add a verification test case for this example.
 
-# Implementation Spec
-- **Architecture**:
-  - Use `Helios` core with `autoSyncAnimations` enabled to drive the timeline.
-  - Use standard HTML `<audio>` elements for source tracks to allow `DomStrategy` to discover and mix them via FFmpeg.
-  - Use Web Audio API (`createMediaElementSource`) for visualization in the preview (Player), connecting the audio elements to an analyzer node.
-  - Use Base64 Data URIs for audio sources to ensure the example is self-contained and does not require external file fetches.
+## 3. Implementation Spec
 
-- **Pseudo-Code**:
-  - **Asset Preparation**:
-    - Generate a Base64 string representing a short (0.5s) valid WAV file (e.g., 8kHz mono beep) to serve as the audio source.
-  - **Composition Logic (composition.html)**:
-    - Define two `<audio>` elements in the DOM:
-      - `Host Track`: Uses the Base64 source.
-      - `Background Track`: Uses the Base64 source but with the `muted` attribute (should be silent in output).
-      - `Guest Track` (Optional): Uses the Base64 source with `data-helios-offset` set to a specific time (e.g., 1s) to test staggered start.
-    - Initialize `Helios` instance with a fixed duration (e.g., 5s) and FPS.
-    - Bind `Helios` to the document timeline.
-    - Subscribe to `Helios` updates to drive a Canvas-based visualization (e.g., drawing bars or waves) based on the audio data from the Web Audio API analyzer.
-  - **Build Configuration (vite.build-example.config.js)**:
-    - Import the `resolve` function.
-    - Add a new entry to the `rollupOptions.input` object pointing to the new `composition.html` path.
-  - **Verification Logic (tests/e2e/verify-render.ts)**:
-    - Add a new test case object to the `CASES` array with the name 'Podcast Visualizer', the correct relative path, and mode set to 'dom'.
+### A. Example Composition (`examples/podcast-visualizer/composition.html`)
+- **Structure**:
+  - Use `Helios` with `autoSyncAnimations: true` and `bindToDocumentTimeline`.
+  - Duration: 5 seconds, 30 FPS.
+  - Layout: Simple status display.
+- **Audio Generation (In-Browser)**:
+  - Include a script to generate simple WAV Base64 Data URIs (sine waves) to avoid external assets.
+  - `function createBeep(freq, duration)` -> returns Data URI.
+- **Tracks**:
+  - **Track 1 (Background Music)**: 440Hz, Loop, Volume 0.3.
+  - **Track 2 (Voice)**: 880Hz, Starts at 2.0s via `data-helios-offset="2"`, Volume 1.0. ID: `voice-track`.
+  - **Track 3 (Muted)**: 220Hz, Muted attribute present.
+- **Visualization**:
+  - **Voice Indicator**: A DOM element that changes opacity based on frame count (simulating visualization of Track 2).
+    - Logic: `helios.subscribe(state => indicator.style.opacity = state.currentFrame >= 60 ? 1 : 0.2)`
+  - **Music Indicator**: CSS Animation (pulsing) running continuously.
+- **Warning**:
+  - Display text: "Note: Audio offsets rely on Renderer. In browser preview, all tracks may start immediately."
 
-- **Public API Changes**: None.
-- **Dependencies**: None.
+### B. Build Config (`vite.build-example.config.js`)
+- Add entry to `rollupOptions.input`:
+  ```javascript
+  podcast_visualizer: resolve(__dirname, "examples/podcast-visualizer/composition.html"),
+  ```
 
-# Test Plan
-- **Verification**:
-  - Run `npm run build:examples` to ensure the new example is included in the build artifacts.
-  - Run `npx tsx tests/e2e/verify-render.ts` to execute the verification script.
+### C. Verification Script (`tests/e2e/verify-render.ts`)
+- Add test case to `CASES` array:
+  ```typescript
+  { name: 'Podcast Visualizer', relativePath: 'examples/podcast-visualizer/composition.html', mode: 'dom' }
+  ```
+
+## 4. Test Plan
+- **Verification**: Run `npm run build:examples` followed by `npx ts-node --esm tests/e2e/verify-render.ts`.
 - **Success Criteria**:
-  - The build process completes successfully.
-  - The verification script outputs `✅ Podcast Visualizer Passed!`.
-  - A video file `output/podcast-visualizer-render-verified.mp4` is generated.
-- **Edge Cases**:
-  - Verify that the `muted` track does not introduce audible audio (this is implicitly tested by the renderer not crashing, though audible verification is manual).
-  - Verify that the offset track plays at the correct time (visual/manual verification of the output video).
+  - Build succeeds.
+  - Render completes without error.
+  - `output/podcast-visualizer-render-verified.mp4` exists.
+  - (Manual Check): Video should have background beep throughout, voice beep starting at 2s, and NO third beep.
