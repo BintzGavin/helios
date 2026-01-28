@@ -284,4 +284,111 @@ describe('DomDriver', () => {
       expect(mockAudio.volume).toBe(1);
       expect(newAudio.volume).toBe(1);
   });
+
+  describe('waitUntilStable', () => {
+    beforeEach(() => {
+      // Mock document.fonts
+      // @ts-ignore
+      document.fonts = {
+        ready: Promise.resolve(),
+      };
+    });
+
+    afterEach(() => {
+      // @ts-ignore
+      delete document.fonts;
+    });
+
+    it('should resolve immediately if no media', async () => {
+      await expect(driver.waitUntilStable()).resolves.toBeUndefined();
+    });
+
+    it('should wait for media elements to be ready (seeked)', async () => {
+      const mockVideo = document.createElement('video');
+      Object.defineProperty(mockVideo, 'seeking', { value: true, writable: true });
+      Object.defineProperty(mockVideo, 'readyState', { value: 1, writable: true }); // HAVE_METADATA
+
+      // Add event listeners support
+      const listeners: Record<string, Function[]> = {};
+      mockVideo.addEventListener = vi.fn((event, callback) => {
+        if (!listeners[event]) listeners[event] = [];
+        listeners[event].push(callback as Function);
+      });
+      mockVideo.removeEventListener = vi.fn((event, callback) => {
+        if (!listeners[event]) return;
+        listeners[event] = listeners[event].filter((cb) => cb !== callback);
+      });
+
+      scope.appendChild(mockVideo);
+      await new Promise((resolve) => setTimeout(resolve, 20)); // Let observer pick it up
+
+      const promise = driver.waitUntilStable();
+      let resolved = false;
+      promise.then(() => {
+        resolved = true;
+      });
+
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      expect(resolved).toBe(false);
+
+      // Simulate seeked
+      Object.defineProperty(mockVideo, 'seeking', { value: false });
+      Object.defineProperty(mockVideo, 'readyState', { value: 2 }); // HAVE_CURRENT_DATA
+      listeners['seeked']?.forEach((cb) => cb());
+
+      await promise;
+      expect(resolved).toBe(true);
+    });
+
+    it('should wait for media elements to be ready (canplay)', async () => {
+      const mockVideo = document.createElement('video');
+      Object.defineProperty(mockVideo, 'seeking', { value: false, writable: true });
+      Object.defineProperty(mockVideo, 'readyState', { value: 0, writable: true }); // HAVE_NOTHING
+
+      // Add event listeners support
+      const listeners: Record<string, Function[]> = {};
+      mockVideo.addEventListener = vi.fn((event, callback) => {
+        if (!listeners[event]) listeners[event] = [];
+        listeners[event].push(callback as Function);
+      });
+      mockVideo.removeEventListener = vi.fn((event, callback) => {
+        if (!listeners[event]) return;
+        listeners[event] = listeners[event].filter((cb) => cb !== callback);
+      });
+
+      scope.appendChild(mockVideo);
+      await new Promise((resolve) => setTimeout(resolve, 20)); // Let observer pick it up
+
+      const promise = driver.waitUntilStable();
+      let resolved = false;
+      promise.then(() => {
+        resolved = true;
+      });
+
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      expect(resolved).toBe(false);
+
+      // Simulate canplay
+      Object.defineProperty(mockVideo, 'readyState', { value: 2 }); // HAVE_CURRENT_DATA
+      listeners['canplay']?.forEach((cb) => cb());
+
+      await promise;
+      expect(resolved).toBe(true);
+    });
+
+    it('should resolve if image decoding fails', async () => {
+      const mockImg = document.createElement('img');
+      Object.defineProperty(mockImg, 'complete', { value: false });
+      mockImg.decode = vi.fn().mockRejectedValue(new Error('Decode failed'));
+
+      // Mock querySelectorAll for images on scope
+      scope.querySelectorAll = vi.fn((selector) => {
+        if (selector === 'img') return [mockImg] as any;
+        return [] as any;
+      });
+
+      const promise = driver.waitUntilStable();
+      await expect(promise).resolves.toBeUndefined();
+    });
+  });
 });

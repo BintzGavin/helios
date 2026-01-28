@@ -38,4 +38,8 @@ export class WaapiDriver implements TimeDriver {
       }
     });
   }
+
+  waitUntilStable(): Promise<void> {
+    return Promise.resolve();
+  }
 }

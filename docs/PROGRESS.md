@@ -138,3 +138,6 @@ Each agent should update **their own dedicated progress file** instead of this f
 
 ## CORE v1.32.1
 - ✅ Completed: Document Dynamic Timing - Verified implementation, added JSDoc, and cleaned up plan artifacts.
+
+## CORE v1.33.0
+- ✅ Completed: Implement WaitUntilStable - Implemented `waitUntilStable` in `Helios` and `DomDriver` to ensure deterministic rendering by waiting for fonts, images, and media readiness.
