@@ -1,0 +1,45 @@
+@import url('https://fonts.googleapis.com/css2?family=Recursive:slnt,wght,CASL,CRSV,MONO@-15..0,300..1000,0..1,0..1,0..1&display=swap');
+
+body {
+  margin: 0;
+  background: #222;
+  overflow: hidden;
+}
+
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.title {
+  font-family: 'Recursive', sans-serif;
+  font-size: 5rem;
+  text-align: center;
+  /* Initial state */
+  font-variation-settings: 'wght' 300, 'slnt' 0, 'CASL' 0;
+  color: #333;
+}
+
+@keyframes breathe {
+  0% {
+    font-variation-settings: 'wght' 300, 'slnt' 0, 'CASL' 0;
+    color: #e0e0e0;
+    transform: scale(1);
+  }
+  50% {
+    font-variation-settings: 'wght' 1000, 'slnt' -15, 'CASL' 1;
+    color: #ff0055;
+    transform: scale(1.1);
+  }
+  100% {
+    font-variation-settings: 'wght' 300, 'slnt' 0, 'CASL' 0;
+    color: #e0e0e0;
+    transform: scale(1);
+  }
+}
+
+.animate-font {
+  animation: breathe 4s ease-in-out infinite;
+}
