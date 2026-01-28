@@ -95,6 +95,7 @@ export class SeekTimeDriver implements TimeDriver {
       })(${timeInSeconds})
     `;
 
-    await page.evaluate(script);
+    const frames = page.frames();
+    await Promise.all(frames.map((frame) => frame.evaluate(script)));
   }
 }
