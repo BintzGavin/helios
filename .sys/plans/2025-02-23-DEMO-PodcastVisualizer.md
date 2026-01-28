@@ -1,42 +1,54 @@
-# 2025-02-23-DEMO-PodcastVisualizer.md
+# Context & Goal
+- **Objective**: Scaffold `examples/podcast-visualizer` to verify multi-track audio mixing, `muted` attribute support, and `data-helios-offset` timing in the Renderer.
+- **Trigger**: Vision gap identified in `docs/status/DEMO.md` (Audio Mixing Verification Gap) and lack of realistic examples for complex renderer features.
+- **Impact**: Verifies `DomStrategy` correctly handles multiple audio sources, respecting offsets and mute states, ensuring robust audio support for the renderer.
 
-## 1. Context & Goal
-- **Objective**: Create `examples/podcast-visualizer` to demonstrate multi-track audio mixing and kinetic typography.
-- **Trigger**: The README promises "Basic (FFmpeg)" audio mixing and "Realistic" examples, but no current example demonstrates mixing multiple audio tracks (e.g., voiceover + background music) or "Kinetic Typography" style animation.
-- **Impact**: This example will verify the renderer's ability to mix multiple audio sources and provide a template for "Use What You Know" content creation (podcasts, social clips).
-
-## 2. File Inventory
+# File Inventory
 - **Create**:
-  - `examples/podcast-visualizer/vite.config.js`: Standard Vite config for the example.
-  - `examples/podcast-visualizer/composition.html`: HTML entry point.
-  - `examples/podcast-visualizer/src/main.jsx`: React application entry.
-  - `examples/podcast-visualizer/src/App.jsx`: Main composition logic (Audio + Typography).
-  - `examples/podcast-visualizer/src/assets/media.js`: Contains Base64 strings for "Background Music" and "Voiceover".
+  - `examples/podcast-visualizer/composition.html`: The main composition file with multi-track audio and visualization.
+  - `examples/podcast-visualizer/vite.config.js`: Build configuration for the example.
 - **Modify**:
-  - `vite.build-example.config.js`: Add `podcast_visualizer` to the rollup input options.
+  - `vite.build-example.config.js`: Add `podcast_visualizer` to the build inputs.
+  - `tests/e2e/verify-render.ts`: Add `Podcast Visualizer` to the verification list.
 - **Read-Only**:
-  - `examples/social-media-story/src/main.jsx` (Reference for setup)
+  - `packages/core/src/index.ts`
+  - `packages/renderer/src/index.ts`
 
-## 3. Implementation Spec
+# Implementation Spec
 - **Architecture**:
-  - React-based composition.
-  - Uses `autoSyncAnimations: true` to drive two `<audio>` elements via `DomDriver`.
-  - Uses `interpolate` and `spring` to drive CSS transforms for typography.
-- **Pseudo-Code (App.jsx)**:
-  - Import `Helios` from `../../../packages/core/src/index.ts`.
-  - Initialize Helios with `autoSyncAnimations: true`.
-  - Define `MUSIC_SRC` and `VOICE_SRC` (Base64 WAVs) in `media.js`.
-  - In `App.jsx`, render:
-    - `<audio src={MUSIC} loop volume={0.2} />`
-    - `<audio src={VOICE} volume={1.0} />`
-    - Typography components that animate based on `useVideoFrame`.
-  - Sync Logic:
-    - Text "Welcome to the show" appears at frame 0.
-    - Text "Today we talk about..." appears at frame 60 (simulated voice start).
+  - Use `Helios` core with `autoSyncAnimations` enabled to drive the timeline.
+  - Use standard HTML `<audio>` elements for source tracks to allow `DomStrategy` to discover and mix them via FFmpeg.
+  - Use Web Audio API (`createMediaElementSource`) for visualization in the preview (Player), connecting the audio elements to an analyzer node.
+  - Use Base64 Data URIs for audio sources to ensure the example is self-contained and does not require external file fetches.
+
+- **Pseudo-Code**:
+  - **Asset Preparation**:
+    - Generate a Base64 string representing a short (0.5s) valid WAV file (e.g., 8kHz mono beep) to serve as the audio source.
+  - **Composition Logic (composition.html)**:
+    - Define two `<audio>` elements in the DOM:
+      - `Host Track`: Uses the Base64 source.
+      - `Background Track`: Uses the Base64 source but with the `muted` attribute (should be silent in output).
+      - `Guest Track` (Optional): Uses the Base64 source with `data-helios-offset` set to a specific time (e.g., 1s) to test staggered start.
+    - Initialize `Helios` instance with a fixed duration (e.g., 5s) and FPS.
+    - Bind `Helios` to the document timeline.
+    - Subscribe to `Helios` updates to drive a Canvas-based visualization (e.g., drawing bars or waves) based on the audio data from the Web Audio API analyzer.
+  - **Build Configuration (vite.build-example.config.js)**:
+    - Import the `resolve` function.
+    - Add a new entry to the `rollupOptions.input` object pointing to the new `composition.html` path.
+  - **Verification Logic (tests/e2e/verify-render.ts)**:
+    - Add a new test case object to the `CASES` array with the name 'Podcast Visualizer', the correct relative path, and mode set to 'dom'.
+
 - **Public API Changes**: None.
 - **Dependencies**: None.
 
-## 4. Test Plan
-- **Verification**: Run `npm run build:examples`.
-- **Success Criteria**: The build completes successfully, and `output/example-build` contains the compiled `podcast_visualizer` entry.
-- **Edge Cases**: Ensure Base64 assets are valid and do not cause memory issues during build.
+# Test Plan
+- **Verification**:
+  - Run `npm run build:examples` to ensure the new example is included in the build artifacts.
+  - Run `npx tsx tests/e2e/verify-render.ts` to execute the verification script.
+- **Success Criteria**:
+  - The build process completes successfully.
+  - The verification script outputs `✅ Podcast Visualizer Passed!`.
+  - A video file `output/podcast-visualizer-render-verified.mp4` is generated.
+- **Edge Cases**:
+  - Verify that the `muted` track does not introduce audible audio (this is implicitly tested by the renderer not crashing, though audible verification is manual).
+  - Verify that the offset track plays at the correct time (visual/manual verification of the output video).
