@@ -8,7 +8,8 @@ describe('Helios Audio', () => {
   beforeEach(() => {
     mockDriver = {
       init: vi.fn(),
-      update: vi.fn()
+      update: vi.fn(),
+      waitUntilStable: vi.fn().mockResolvedValue(undefined)
     };
   });
 
