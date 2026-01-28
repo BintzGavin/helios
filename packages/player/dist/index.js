@@ -433,6 +433,57 @@ export class HeliosPlayer extends HTMLElement {
     get fps() {
         return this.controller ? this.controller.getState().fps : 0;
     }
+    get src() {
+        return this.getAttribute("src") || "";
+    }
+    set src(val) {
+        this.setAttribute("src", val);
+    }
+    get autoplay() {
+        return this.hasAttribute("autoplay");
+    }
+    set autoplay(val) {
+        if (val) {
+            this.setAttribute("autoplay", "");
+        }
+        else {
+            this.removeAttribute("autoplay");
+        }
+    }
+    get loop() {
+        return this.hasAttribute("loop");
+    }
+    set loop(val) {
+        if (val) {
+            this.setAttribute("loop", "");
+        }
+        else {
+            this.removeAttribute("loop");
+        }
+    }
+    get controls() {
+        return this.hasAttribute("controls");
+    }
+    set controls(val) {
+        if (val) {
+            this.setAttribute("controls", "");
+        }
+        else {
+            this.removeAttribute("controls");
+        }
+    }
+    get poster() {
+        return this.getAttribute("poster") || "";
+    }
+    set poster(val) {
+        this.setAttribute("poster", val);
+    }
+    get preload() {
+        return this.getAttribute("preload") || "auto";
+    }
+    set preload(val) {
+        this.setAttribute("preload", val);
+    }
     async play() {
         if (!this.isLoaded) {
             this.setAttribute("autoplay", "");

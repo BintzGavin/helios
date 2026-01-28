@@ -52,6 +52,18 @@ export declare class HeliosPlayer extends HTMLElement {
     get playbackRate(): number;
     set playbackRate(val: number);
     get fps(): number;
+    get src(): string;
+    set src(val: string);
+    get autoplay(): boolean;
+    set autoplay(val: boolean);
+    get loop(): boolean;
+    set loop(val: boolean);
+    get controls(): boolean;
+    set controls(val: boolean);
+    get poster(): string;
+    set poster(val: string);
+    get preload(): string;
+    set preload(val: string);
     play(): Promise<void>;
     load(): void;
     pause(): void;

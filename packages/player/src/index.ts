@@ -456,6 +456,66 @@ export class HeliosPlayer extends HTMLElement {
     return this.controller ? this.controller.getState().fps : 0;
   }
 
+  public get src(): string {
+    return this.getAttribute("src") || "";
+  }
+
+  public set src(val: string) {
+    this.setAttribute("src", val);
+  }
+
+  public get autoplay(): boolean {
+    return this.hasAttribute("autoplay");
+  }
+
+  public set autoplay(val: boolean) {
+    if (val) {
+      this.setAttribute("autoplay", "");
+    } else {
+      this.removeAttribute("autoplay");
+    }
+  }
+
+  public get loop(): boolean {
+    return this.hasAttribute("loop");
+  }
+
+  public set loop(val: boolean) {
+    if (val) {
+      this.setAttribute("loop", "");
+    } else {
+      this.removeAttribute("loop");
+    }
+  }
+
+  public get controls(): boolean {
+    return this.hasAttribute("controls");
+  }
+
+  public set controls(val: boolean) {
+    if (val) {
+      this.setAttribute("controls", "");
+    } else {
+      this.removeAttribute("controls");
+    }
+  }
+
+  public get poster(): string {
+    return this.getAttribute("poster") || "";
+  }
+
+  public set poster(val: string) {
+    this.setAttribute("poster", val);
+  }
+
+  public get preload(): string {
+    return this.getAttribute("preload") || "auto";
+  }
+
+  public set preload(val: string) {
+    this.setAttribute("preload", val);
+  }
+
   public async play(): Promise<void> {
     if (!this.isLoaded) {
       this.setAttribute("autoplay", "");
@@ -480,7 +540,7 @@ export class HeliosPlayer extends HTMLElement {
   }
 
   static get observedAttributes() {
-    return ["src", "width", "height", "autoplay", "loop", "controls", "export-format", "input-props", "poster", "muted", "interactive"];
+    return ["src", "width", "height", "autoplay", "loop", "controls", "export-format", "input-props", "poster", "muted", "interactive", "preload"];
   }
 
   constructor() {
