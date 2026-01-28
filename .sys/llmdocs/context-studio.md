@@ -8,6 +8,7 @@ Key components:
 - **Server**: Discovery logic for compositions and assets.
 - **UI**: React app with Timeline, Props Editor, Preview Stage.
 - **Controller**: Manages `Helios` instance via `useStudio` context.
+- **Verification**: `npm run verify` checks UI integrity using Playwright.
 
 ## B. File Tree
 packages/studio/
@@ -31,12 +32,15 @@ packages/studio/
     server/
     App.tsx
     main.tsx
+  scripts/
+    verify-ui.ts
+  README.md
 
 ## C. CLI Interface
 `npx helios studio [options]`
 
 Options:
-- `--port <number>`: Port to run on (default: 3000)
+- `--port <number>`: Port to run on (default: 5173)
 - `--root <path>`: Project root directory
 
 ## D. UI Components
@@ -46,6 +50,9 @@ Options:
 - **GlobalShortcuts**: Headless component managing keyboard interactions.
 - **PlaybackControls**: Buttons for play, pause, seek, loop, volume.
 - **KeyboardShortcutsModal**: Displays available shortcuts.
+- **AssetsPanel**: Drag-and-drop asset management.
+- **RendersPanel**: Render job management and client-side export.
+- **DiagnosticsPanel**: Environment checks.
 
 ## E. Integration
 - **Core**: Consumes `Helios` instance and state.

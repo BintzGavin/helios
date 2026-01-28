@@ -1,4 +1,4 @@
-**Version**: 0.40.0
+**Version**: 0.40.1
 
 # Studio Domain Status
 
@@ -7,6 +7,7 @@
 **Focus**: UI Implementation & CLI
 
 ## Recent Updates
+- [v0.40.1] ✅ Completed: Documentation & Verification - Added package README, updated version, and implemented Playwright-based verification script.
 - [v0.40.0] ✅ Completed: Global Shortcuts Refactor - Centralized all keyboard shortcuts into `GlobalShortcuts.tsx` and added Loop Toggle ('L').
 - [v0.39.0] ✅ Completed: Marker Visualization - Implemented visual markers in Timeline with click-to-seek functionality.
 - [v0.38.0] ✅ Completed: AI System Prompt - Implemented a modal generator for LLM system prompts, combining static Helios context with dynamic composition schema.
