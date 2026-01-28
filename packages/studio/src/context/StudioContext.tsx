@@ -13,7 +13,7 @@ export interface Asset {
   id: string;
   name: string;
   url: string;
-  type: 'image' | 'video' | 'audio' | 'font' | 'other';
+  type: 'image' | 'video' | 'audio' | 'font' | 'model' | 'json' | 'shader' | 'other';
 }
 
 export interface RenderConfig {

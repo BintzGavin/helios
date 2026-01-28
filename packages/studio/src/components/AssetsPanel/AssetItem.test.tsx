@@ -111,4 +111,22 @@ describe('AssetItem', () => {
     fireEvent.click(deleteBtn!);
     expect(mockDeleteAsset).toHaveBeenCalledWith('1');
   });
+
+  it('renders new asset types (model, json, shader) correctly', () => {
+    const model: Asset = { id: 'm1', name: 'box.glb', url: '/box.glb', type: 'model' };
+    const json: Asset = { id: 'j1', name: 'data.json', url: '/data.json', type: 'json' };
+    const shader: Asset = { id: 's1', name: 'frag.glsl', url: '/frag.glsl', type: 'shader' };
+
+    const { rerender } = render(<AssetItem asset={model} />);
+    expect(screen.getByText('📦')).toBeInTheDocument();
+    expect(screen.getByTitle('3D Model')).toBeInTheDocument();
+
+    rerender(<AssetItem asset={json} />);
+    expect(screen.getByText('{}')).toBeInTheDocument();
+    expect(screen.getByTitle('JSON Data')).toBeInTheDocument();
+
+    rerender(<AssetItem asset={shader} />);
+    expect(screen.getByText('⚡')).toBeInTheDocument();
+    expect(screen.getByTitle('Shader')).toBeInTheDocument();
+  });
 });

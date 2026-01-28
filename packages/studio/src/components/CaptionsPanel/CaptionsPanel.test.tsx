@@ -45,8 +45,8 @@ describe('CaptionsPanel', () => {
 
   it('renders existing captions correctly', () => {
     const captions = [
-        { startTime: 0, endTime: 1000, text: 'Hello' },
-        { startTime: 2000, endTime: 3000, text: 'World' }
+        { id: '1', startTime: 0, endTime: 1000, text: 'Hello' },
+        { id: '2', startTime: 2000, endTime: 3000, text: 'World' }
     ];
 
     (StudioContext.useStudio as any).mockReturnValue({
@@ -79,7 +79,7 @@ describe('CaptionsPanel', () => {
 
   it('updates a caption on blur', () => {
     const captions = [
-        { startTime: 0, endTime: 1000, text: 'Hello' }
+        { id: '1', startTime: 0, endTime: 1000, text: 'Hello' }
     ];
 
     (StudioContext.useStudio as any).mockReturnValue({
@@ -100,7 +100,7 @@ describe('CaptionsPanel', () => {
 
   it('deletes a caption', () => {
     const captions = [
-        { startTime: 0, endTime: 1000, text: 'Hello' }
+        { id: '1', startTime: 0, endTime: 1000, text: 'Hello' }
     ];
 
     (StudioContext.useStudio as any).mockReturnValue({
@@ -138,8 +138,8 @@ describe('CaptionsPanel', () => {
 
   it('exports captions as SRT', () => {
     const captions = [
-        { startTime: 0, endTime: 1000, text: 'Hello' },
-        { startTime: 2000, endTime: 3000, text: 'World' }
+        { id: '1', startTime: 0, endTime: 1000, text: 'Hello' },
+        { id: '2', startTime: 2000, endTime: 3000, text: 'World' }
     ];
 
     (StudioContext.useStudio as any).mockReturnValue({
@@ -175,7 +175,7 @@ describe('CaptionsPanel', () => {
     fireEvent.click(exportButton);
 
     expect(createObjectURLMock).toHaveBeenCalledTimes(1);
-    const blob = createObjectURLMock.mock.calls[0][0];
+    const blob = (createObjectURLMock.mock.calls[0] as any)[0];
     expect(blob).toBeInstanceOf(Blob);
 
     // Verify click was called on the anchor

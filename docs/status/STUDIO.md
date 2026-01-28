@@ -1,4 +1,4 @@
-**Version**: 0.34.0
+**Version**: 0.35.0
 
 # Studio Domain Status
 
@@ -7,6 +7,7 @@
 **Focus**: UI Implementation & CLI
 
 ## Recent Updates
+- [v0.35.0] ✅ Completed: Assets Extension - Added support for discovering and displaying 3D models (.glb, .gltf), JSON data (.json), and Shaders (.glsl, .vert, .frag) in the Assets Panel.
 - [v0.34.0] ✅ Completed: Diagnostics Panel - Implemented system diagnostics panel showing both Client (Preview) and Server (Renderer) capabilities, accessible via Sidebar.
 - [v0.33.1] ✅ Verified: Test Environment - Fixed test environment configuration by adding module aliases for Core and Player in Vite/Vitest, ensuring all tests pass.
 - [v0.33.0] ✅ Completed: SRT Export - Implemented functionality to export current captions as an SRT file from the Captions Panel, adding a client-side utility and "Export SRT" button.
