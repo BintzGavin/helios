@@ -55,7 +55,7 @@ Run via `npx helios studio` (or `npm run dev` in `packages/studio` during develo
 - **Sidebar**: Navigation tabs (Assets, Captions, Renders) and tools (Diagnostics, Help).
 - **RendersPanel**: Manages server-side render jobs and initiates client-side exports (WebCodecs).
 - **Stage**: The main preview area containing the `<helios-player>`. Supports pan/zoom.
-- **Timeline**: Visual timeline for scrubbing, playback control, and marker management.
+- **Timeline**: Visual timeline for scrubbing, playback control, marker management, and zooming.
 - **PropsEditor**: Schema-aware editor for composition input props.
 - **DiagnosticsModal**: Displays system capabilities for Client (Preview) and Server (Renderer).
 - **CompositionSwitcher**: Command palette (Cmd+K) to switch between compositions.

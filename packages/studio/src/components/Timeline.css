@@ -24,12 +24,48 @@
   align-items: center;
 }
 
+.timeline-header-left {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.timeline-header-right {
+  display: flex;
+  gap: 8px;
+}
+
+.timeline-zoom-control {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.timeline-zoom-label {
+  font-size: 10px;
+  color: #888;
+}
+
+.timeline-zoom-slider {
+  width: 80px;
+  height: 6px;
+  cursor: pointer;
+}
+
 .timeline-track-area {
   flex: 1;
   position: relative;
   margin: 0;
   cursor: pointer;
   background: #1e1e1e;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.timeline-content {
+  position: relative;
+  height: 100%;
+  min-width: 100%;
 }
 
 .timeline-track {

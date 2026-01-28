@@ -1,3 +1,6 @@
+## STUDIO v0.37.0
+- ✅ Completed: Timeline Zoom - Implemented zoom slider and scrollable timeline track for precise editing.
+
 ## STUDIO v0.36.0
 - ✅ Completed: Client-Side Export - Implemented in-browser MP4/WebM export functionality in Renders Panel using WebCodecs.
 
@@ -9,6 +12,9 @@
 
 ## STUDIO v0.33.1
 - ✅ Verified: Test Environment - Fixed test environment configuration by adding module aliases for Core and Player in Vite/Vitest, ensuring all tests pass.
+
+## STUDIO v0.33.0
+- ✅ Completed: SRT Export - Implemented functionality to export current captions as an SRT file from the Captions Panel, adding a client-side utility and "Export SRT" button.
 
 ## STUDIO v0.32.0
 - ✅ Completed: Editable Captions Panel - Implemented editable inputs for captions (time/text), add/delete functionality, and syncing with Core via `controller.setCaptions` or `inputProps`.
