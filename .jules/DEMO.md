@@ -79,3 +79,7 @@
 ## [v1.44.0] - Svelte Transitions Pattern
 **Learning:** Similar to React, Svelte's native transitions (`transition:fade`) are state-driven and hard to seek. The preferred "Use What You Know" pattern for Svelte with Helios is to use standard CSS animations within a `<Sequence>` component that injects a CSS variable (e.g., `--sequence-start`) for `animation-delay`.
 **Action:** Creating `examples/svelte-transitions` to demonstrate this specific pattern, proving that standard CSS Keyframes are superior to framework-specific transitions for timeline-based video.
+
+## [v1.45.0] - Vue Transitions Gap
+**Learning:** React and Svelte have "Transitions" examples demonstrating `autoSyncAnimations` with CSS variables, but Vue lacked this, relying on manual inline styles in `vue-dom-animation`.
+**Action:** Created `2026-01-28-DEMO-VueTransitions.md` to scaffold `examples/vue-transitions` and close this gap.
