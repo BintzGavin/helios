@@ -46,12 +46,12 @@ Options:
 
 ## D. UI Components
 - **Timeline**: Visual track of the video, supports markers, captions, zooming.
-- **PropsEditor**: Auto-generated inputs based on composition schema (supports Asset selection).
+- **PropsEditor**: Auto-generated inputs based on composition schema (supports Asset selection, Drag & Drop).
 - **Stage**: Renders the `<helios-player>` or canvas.
 - **GlobalShortcuts**: Headless component managing keyboard interactions.
 - **PlaybackControls**: Buttons for play, pause, seek, loop, volume.
 - **KeyboardShortcutsModal**: Displays available shortcuts.
-- **AssetsPanel**: Drag-and-drop asset management.
+- **AssetsPanel**: Drag-and-drop asset management (upload & drag to props).
 - **RendersPanel**: Render job management and client-side export.
 - **DiagnosticsPanel**: Environment checks.
 

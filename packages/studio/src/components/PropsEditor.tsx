@@ -98,6 +98,7 @@ const JsonPropInput: React.FC<{ value: any, onChange: (val: any) => void }> = ({
 
 const PropInput: React.FC<{ value: any, onChange: (val: any) => void }> = ({ value, onChange }) => {
   const type = typeof value;
+  const [isDragOver, setIsDragOver] = useState(false);
 
   if (value === null) {
       return <JsonPropInput value={value} onChange={onChange} />;
@@ -150,9 +151,17 @@ const PropInput: React.FC<{ value: any, onChange: (val: any) => void }> = ({ val
      return (
        <input
          type="text"
-         className="prop-input"
+         className={`prop-input ${isDragOver ? 'drag-over' : ''}`}
          value={value}
          onChange={(e) => onChange(e.target.value)}
+         onDragOver={(e) => { e.preventDefault(); setIsDragOver(true); }}
+         onDragLeave={() => setIsDragOver(false)}
+         onDrop={(e) => {
+             e.preventDefault();
+             setIsDragOver(false);
+             const text = e.dataTransfer.getData('text/plain');
+             if (text) onChange(text);
+         }}
        />
      );
   }

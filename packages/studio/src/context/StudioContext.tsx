@@ -124,7 +124,7 @@ interface StudioContextType {
   cancelExport: () => void;
 }
 
-const StudioContext = createContext<StudioContextType | undefined>(undefined);
+export const StudioContext = createContext<StudioContextType | undefined>(undefined);
 
 export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [compositions, setCompositions] = useState<Composition[]>([]);
