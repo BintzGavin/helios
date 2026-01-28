@@ -28,7 +28,7 @@ export declare class HeliosPlayer extends HTMLElement {
     private controller;
     private directHelios;
     private unsubscribe;
-    private connectionTimeout;
+    private connectionInterval;
     private abortController;
     private isExporting;
     private isScrubbing;
@@ -65,6 +65,8 @@ export declare class HeliosPlayer extends HTMLElement {
     private setControlsDisabled;
     private lockPlaybackControls;
     private handleIframeLoad;
+    private startConnectionAttempts;
+    private stopConnectionAttempts;
     private handleWindowMessage;
     private setController;
     private updateAspectRatio;

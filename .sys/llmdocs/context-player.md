@@ -5,6 +5,12 @@
 - **Domain**: `packages/player`
 - **Responsibility**: `<helios-player>` Web Component, UI controls, iframe bridge.
 
+## Architecture
+The `<helios-player>` uses a robust connection strategy:
+- **Direct Mode**: Polls the iframe content for `window.helios` every 100ms (up to 5s) to support asynchronous composition initialization.
+- **Bridge Mode**: Simultaneously attempts to connect via `postMessage` for cross-origin or sandboxed scenarios.
+- **Controller Pattern**: Abstracts the connection (Direct or Bridge) behind a unified `HeliosController` interface.
+
 ## Component Structure
 The `<helios-player>` component uses a Shadow DOM with the following structure:
 - `.status-overlay`: Displays loading, error, and connection states (hidden by default).

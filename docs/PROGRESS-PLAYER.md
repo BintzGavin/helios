@@ -1,5 +1,8 @@
 # PLAYER Progress Log
 
+## PLAYER v0.28.0
+- ✅ Completed: Harden Player Connection - Implemented polling logic for Direct Mode connection to handle asynchronous composition initialization.
+
 ## PLAYER v0.27.0
 - ✅ Completed: Implement Muted Attribute - Added support for the `muted` attribute to `<helios-player>`, enabling declarative control of audio mute state.
 
