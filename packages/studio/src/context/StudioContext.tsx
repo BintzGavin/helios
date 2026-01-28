@@ -74,6 +74,9 @@ interface StudioContextType {
   isDiagnosticsOpen: boolean;
   setDiagnosticsOpen: (isOpen: boolean) => void;
 
+  isPromptOpen: boolean;
+  setPromptOpen: (isOpen: boolean) => void;
+
   // Assets
   assets: Asset[];
   uploadAsset: (file: File) => Promise<void>;
@@ -128,6 +131,7 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [isSwitcherOpen, setSwitcherOpen] = useState(false);
   const [isHelpOpen, setHelpOpen] = useState(false);
   const [isDiagnosticsOpen, setDiagnosticsOpen] = useState(false);
+  const [isPromptOpen, setPromptOpen] = useState(false);
   const [canvasSize, setCanvasSize] = useState({ width: 1920, height: 1080 });
   const [renderConfig, setRenderConfig] = useState<RenderConfig>({ mode: 'canvas' });
 
@@ -378,6 +382,8 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         setHelpOpen,
         isDiagnosticsOpen,
         setDiagnosticsOpen,
+        isPromptOpen,
+        setPromptOpen,
         renderJobs,
         startRender,
         cancelRender,

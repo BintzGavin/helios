@@ -1,3 +1,6 @@
+## STUDIO v0.38.0
+- ✅ Completed: AI System Prompt - Implemented a modal generator for LLM system prompts, combining static Helios context with dynamic composition schema.
+
 ## STUDIO v0.37.0
 - ✅ Completed: Timeline Zoom - Implemented zoom slider and scrollable timeline track for precise editing.
 

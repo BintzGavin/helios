@@ -17,11 +17,11 @@
     "react-dom": "^19.2.3"
   },
   "devDependencies": {
+    "@testing-library/jest-dom": "^6.0.0",
+    "@testing-library/react": "^16.0.0",
     "@types/react": "^19.0.8",
     "@types/react-dom": "^19.0.3",
     "@vitejs/plugin-react": "^5.1.2",
-    "@testing-library/jest-dom": "^6.0.0",
-    "@testing-library/react": "^16.0.0",
     "jsdom": "^24.0.0",
     "typescript": "^5.0.0",
     "vite": "^7.1.2",
