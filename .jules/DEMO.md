@@ -75,3 +75,7 @@
 ## [v1.43.0] - React Transition Pattern
 **Learning:** `autoSyncAnimations` aligns CSS animations to the *global* document timeline. To implement relative start times (e.g. for `Sequence` transitions), one must explicitly set `animation-delay` based on the sequence's start frame to offset the global time.
 **Action:** The React Transitions example explicitly uses this pattern (`animationDelay: ${from / fps}s`) to ensure correct relative timing.
+
+## [v1.44.0] - Svelte Transitions Pattern
+**Learning:** Similar to React, Svelte's native transitions (`transition:fade`) are state-driven and hard to seek. The preferred "Use What You Know" pattern for Svelte with Helios is to use standard CSS animations within a `<Sequence>` component that injects a CSS variable (e.g., `--sequence-start`) for `animation-delay`.
+**Action:** Creating `examples/svelte-transitions` to demonstrate this specific pattern, proving that standard CSS Keyframes are superior to framework-specific transitions for timeline-based video.
