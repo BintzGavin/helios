@@ -4,7 +4,7 @@
 The Studio is a Vite-based single-page application (SPA) that serves as the development environment for Helios compositions. It allows users to:
 1. Preview compositions with real-time feedback.
 2. Edit props, captions, and timeline markers.
-3. Manage assets and render jobs.
+3. Manage assets, render jobs, and client-side exports.
 4. Diagnose environment capabilities.
 
 It consists of:
@@ -53,6 +53,7 @@ Run via `npx helios studio` (or `npm run dev` in `packages/studio` during develo
 
 ## D. UI Components
 - **Sidebar**: Navigation tabs (Assets, Captions, Renders) and tools (Diagnostics, Help).
+- **RendersPanel**: Manages server-side render jobs and initiates client-side exports (WebCodecs).
 - **Stage**: The main preview area containing the `<helios-player>`. Supports pan/zoom.
 - **Timeline**: Visual timeline for scrubbing, playback control, and marker management.
 - **PropsEditor**: Schema-aware editor for composition input props.

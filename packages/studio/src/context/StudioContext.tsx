@@ -1,5 +1,5 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import type { HeliosController } from '@helios-project/player';
+import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
+import { type HeliosController, ClientSideExporter } from '@helios-project/player';
 import type { HeliosSchema, CaptionCue } from '@helios-project/core';
 
 export interface Composition {
@@ -111,6 +111,12 @@ interface StudioContextType {
 
   // Snapshot
   takeSnapshot: () => Promise<void>;
+
+  // Client-Side Export
+  isExporting: boolean;
+  exportProgress: number;
+  exportVideo: (format: 'mp4' | 'webm') => Promise<void>;
+  cancelExport: () => void;
 }
 
 const StudioContext = createContext<StudioContextType | undefined>(undefined);
@@ -126,6 +132,11 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [renderConfig, setRenderConfig] = useState<RenderConfig>({ mode: 'canvas' });
 
   const [renderJobs, setRenderJobs] = useState<RenderJob[]>([]);
+
+  // Client-Side Export State
+  const [isExporting, setIsExporting] = useState(false);
+  const [exportProgress, setExportProgress] = useState(0);
+  const exportAbortControllerRef = useRef<AbortController | null>(null);
 
   const [inPoint, setInPoint] = useState(0);
   const [outPoint, setOutPoint] = useState(0);
@@ -311,6 +322,47 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     }
   };
 
+  const exportVideo = async (format: 'mp4' | 'webm') => {
+    if (!controller) return;
+
+    // Reset state
+    setIsExporting(true);
+    setExportProgress(0);
+
+    // Create new abort controller
+    exportAbortControllerRef.current = new AbortController();
+
+    // Instantiate exporter with dummy iframe (unused in export method)
+    // Note: We cast to unknown then HTMLIFrameElement to satisfy type requirements
+    const dummyIframe = document.createElement('iframe');
+    const exporter = new ClientSideExporter(controller, dummyIframe);
+
+    try {
+      await exporter.export({
+        format,
+        mode: renderConfig.mode === 'dom' ? 'dom' : 'canvas',
+        onProgress: (p: number) => setExportProgress(p),
+        signal: exportAbortControllerRef.current.signal,
+        includeCaptions: true // Or expose as option if needed
+      });
+    } catch (e: any) {
+      if (e.message !== "Export aborted") {
+        console.error("Export failed:", e);
+        // We could expose an error state here if desired
+      }
+    } finally {
+      setIsExporting(false);
+      setExportProgress(0);
+      exportAbortControllerRef.current = null;
+    }
+  };
+
+  const cancelExport = () => {
+    if (exportAbortControllerRef.current) {
+      exportAbortControllerRef.current.abort();
+    }
+  };
+
   return (
     <StudioContext.Provider
       value={{
@@ -344,7 +396,11 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         setCanvasSize,
         renderConfig,
         setRenderConfig,
-        takeSnapshot
+        takeSnapshot,
+        isExporting,
+        exportProgress,
+        exportVideo,
+        cancelExport
       }}
     >
       {children}

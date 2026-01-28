@@ -78,6 +78,9 @@ Each agent should update **their own dedicated progress file** instead of this f
 - If this is a new version, create the section at the top of the file (after any existing content)
 - Group multiple completions under the same version section if they're part of the same release
 
+### STUDIO v0.36.0
+- ✅ Completed: Client-Side Export - Implemented in-browser MP4/WebM export functionality in Renders Panel using WebCodecs.
+
 ### STUDIO v0.35.0
 - ✅ Completed: Assets Extension - Added support for discovering and displaying 3D models (.glb, .gltf), JSON data (.json), and Shaders (.glsl, .vert, .frag) in the Assets Panel.
 

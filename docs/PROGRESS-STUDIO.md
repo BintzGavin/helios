@@ -1,3 +1,6 @@
+## STUDIO v0.36.0
+- ✅ Completed: Client-Side Export - Implemented in-browser MP4/WebM export functionality in Renders Panel using WebCodecs.
+
 ## STUDIO v0.35.0
 - ✅ Completed: Assets Extension - Added support for discovering and displaying 3D models (.glb, .gltf), JSON data (.json), and Shaders (.glsl, .vert, .frag) in the Assets Panel.
 
