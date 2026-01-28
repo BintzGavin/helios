@@ -1,5 +1,5 @@
 # Status: DEMO (Executor)
-**Version**: 1.49.1
+**Version**: 1.50.0
 
 ## Vision
 To provide comprehensive, idiomatic examples for every major framework (React, Vue, Svelte, Vanilla) and robust end-to-end testing to ensure the Helios engine delivers on its "Use What You Know" promise.
@@ -75,6 +75,7 @@ To provide comprehensive, idiomatic examples for every major framework (React, V
 None.
 
 ## Log
+- [v1.50.0] ✅ Completed: Podcast Visualizer - Created `examples/podcast-visualizer` demonstrating multi-track audio mixing and sync verification.
 - [v1.49.1] ✅ Completed: Solid Canvas Documentation - Added README for SolidJS example and verified E2E tests.
 - [v1.49.0] ✅ Completed: Solid Canvas Example - Created `examples/solid-canvas-animation` demonstrating integration with SolidJS and `createHeliosSignal` adapter.
 - [v1.48.0] ✅ Completed: React Styled Components Example - Created `examples/react-styled-components` demonstrating integration with `styled-components` via `autoSyncAnimations` and refactored all examples to use source imports.

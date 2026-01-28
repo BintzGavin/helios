@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Podcast Visualizer</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      background-color: #1a1a1a;
+      color: white;
+      font-family: sans-serif;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .track-container {
+      display: flex;
+      align-items: center;
+      margin: 10px;
+      width: 400px;
+      background: #333;
+      padding: 10px;
+      border-radius: 8px;
+    }
+    .track-label {
+      width: 100px;
+      font-weight: bold;
+    }
+    .visualizer {
+      flex-grow: 1;
+      height: 20px;
+      background: #222;
+      border-radius: 4px;
+      overflow: hidden;
+      position: relative;
+    }
+    .bar {
+      height: 100%;
+      background: #4CAF50;
+      width: 0%;
+      transition: width 0.1s linear;
+    }
+    .music-bar {
+      animation: pulse 1s infinite alternate;
+      width: 100%;
+    }
+    @keyframes pulse {
+      from { opacity: 0.5; }
+      to { opacity: 1; }
+    }
+    .voice-indicator {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #FF5722;
+      opacity: 0;
+      transition: opacity 0.1s;
+    }
+    .muted-indicator {
+      width: 20px;
+      height: 20px;
+      background: #9E9E9E;
+    }
+    .warning {
+      position: absolute;
+      bottom: 20px;
+      font-size: 12px;
+      color: #aaa;
+      max-width: 600px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <h1>Podcast Visualizer</h1>
+
+  <div class="track-container">
+    <div class="track-label">Music</div>
+    <div class="visualizer">
+      <div class="bar music-bar"></div>
+    </div>
+    <!-- Track 1: Music (Looping, Offset 0) -->
+    <audio id="music-track" loop data-helios-offset="0"></audio>
+  </div>
+
+  <div class="track-container">
+    <div class="track-label">Voice</div>
+    <div class="visualizer" style="display: flex; justify-content: center; align-items: center;">
+      <div id="voice-visual" class="voice-indicator"></div>
+    </div>
+    <!-- Track 2: Voice (Starts at 2s) -->
+    <audio id="voice-track" data-helios-offset="2"></audio>
+  </div>
+
+  <div class="track-container">
+    <div class="track-label">Muted</div>
+    <div class="visualizer" style="display: flex; justify-content: center; align-items: center;">
+       <div class="muted-indicator"></div>
+    </div>
+    <!-- Track 3: Muted -->
+    <audio id="muted-track" muted loop></audio>
+  </div>
+
+  <div class="warning">
+    Note: In browser preview, 'Voice' track will play immediately or be out of sync due to DomDriver limitations with offset.
+    Use 'npm run verify' to check correct audio timing in Renderer.
+  </div>
+
+  <script type="module">
+    import { Helios } from '../../packages/core/src/index.ts';
+
+    // Minimal WAV (Silence)
+    const AUDIO_SRC = "data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA";
+
+    const musicTrack = document.getElementById('music-track');
+    const voiceTrack = document.getElementById('voice-track');
+    const mutedTrack = document.getElementById('muted-track');
+
+    const voiceVisual = document.getElementById('voice-visual');
+
+    // Set Sources
+    musicTrack.src = AUDIO_SRC;
+    voiceTrack.src = AUDIO_SRC;
+    mutedTrack.src = AUDIO_SRC;
+
+    // Set Volume
+    musicTrack.volume = 0.5;
+    voiceTrack.volume = 1.0;
+    // mutedTrack is muted via attribute
+
+    const helios = new Helios({
+      duration: 5,
+      fps: 30,
+      autoSyncAnimations: true
+    });
+
+    window.helios = helios;
+
+    // Subscribe to update visual indicators
+    helios.subscribe((state) => {
+      // Voice Indicator Logic: Visible after 2 seconds
+      if (state.currentTime >= 2) {
+        voiceVisual.style.opacity = 1;
+      } else {
+        voiceVisual.style.opacity = 0;
+      }
+    });
+
+    helios.bindToDocumentTimeline();
+  </script>
+</body>
+</html>
