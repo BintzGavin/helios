@@ -1,4 +1,6 @@
 import type { HeliosController } from "./controllers";
+import { ClientSideExporter } from "./features/exporter";
+export { ClientSideExporter };
 export type { HeliosController };
 export declare class HeliosPlayer extends HTMLElement {
     private iframe;

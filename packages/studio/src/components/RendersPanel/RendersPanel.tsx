@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useStudio } from '../../context/StudioContext';
 import { RenderConfig } from './RenderConfig';
 import './RendersPanel.css';
@@ -13,8 +13,14 @@ export const RendersPanel: React.FC = () => {
     renderConfig,
     setRenderConfig,
     cancelRender,
-    deleteRender
+    deleteRender,
+    isExporting,
+    exportProgress,
+    exportVideo,
+    cancelExport
   } = useStudio();
+
+  const [exportFormat, setExportFormat] = useState<'mp4' | 'webm'>('mp4');
 
   const handleTestRender = () => {
     if (activeComposition) {
@@ -24,13 +30,56 @@ export const RendersPanel: React.FC = () => {
 
   return (
     <div className="renders-panel">
-      <RenderConfig config={renderConfig} onChange={setRenderConfig} />
-      <button className="start-render-btn" onClick={handleTestRender} disabled={!activeComposition}>
-        Start Test Render
-      </button>
+      {/* Client-Side Export Section */}
+      <div className="client-export-section" style={{ padding: '10px', borderBottom: '1px solid #333', marginBottom: '10px', background: '#1e1e1e', borderRadius: '4px' }}>
+          <h3 style={{ margin: '0 0 8px 0', fontSize: '12px', color: '#ccc', fontWeight: 'bold' }}>Client-Side Export</h3>
+          <div style={{ display: 'flex', gap: '8px', marginBottom: '8px' }}>
+              <select
+                  value={exportFormat}
+                  onChange={(e) => setExportFormat(e.target.value as 'mp4' | 'webm')}
+                  disabled={isExporting}
+                  style={{ flex: 1, background: '#222', color: 'white', border: '1px solid #444', borderRadius: '4px', padding: '4px' }}
+              >
+                  <option value="mp4">MP4 (H.264)</option>
+                  <option value="webm">WebM (VP9)</option>
+              </select>
+              {isExporting ? (
+                  <button
+                      onClick={cancelExport}
+                      style={{ background: '#d32f2f', color: 'white', border: 'none', borderRadius: '4px', padding: '4px 12px', cursor: 'pointer' }}
+                  >
+                      Cancel
+                  </button>
+              ) : (
+                  <button
+                      onClick={() => exportVideo(exportFormat)}
+                      disabled={!activeComposition}
+                      style={{ background: '#007bff', color: 'white', border: 'none', borderRadius: '4px', padding: '4px 12px', cursor: 'pointer', opacity: !activeComposition ? 0.5 : 1 }}
+                  >
+                      Export
+                  </button>
+              )}
+          </div>
+          {isExporting && (
+             <div className="render-progress-bar">
+               <div
+                 className="render-progress-fill"
+                 style={{ width: `${exportProgress * 100}%` }}
+               />
+             </div>
+          )}
+      </div>
 
-      <div style={{ fontSize: '10px', color: '#888', marginBottom: '8px', textAlign: 'center' }}>
-        Range: {inPoint} - {outPoint}
+      <div style={{ borderTop: '1px solid #333', paddingTop: '10px', marginTop: '10px' }}>
+          <h3 style={{ margin: '0 0 8px 0', fontSize: '12px', color: '#ccc', fontWeight: 'bold' }}>Server-Side Render</h3>
+          <RenderConfig config={renderConfig} onChange={setRenderConfig} />
+          <button className="start-render-btn" onClick={handleTestRender} disabled={!activeComposition}>
+            Start Render Job
+          </button>
+
+          <div style={{ fontSize: '10px', color: '#888', marginBottom: '8px', textAlign: 'center' }}>
+            Range: {inPoint} - {outPoint}
+          </div>
       </div>
 
       {renderJobs.length === 0 && (

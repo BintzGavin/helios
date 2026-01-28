@@ -3,6 +3,7 @@ import { DirectController, BridgeController } from "./controllers";
 import type { HeliosController } from "./controllers";
 import { ClientSideExporter } from "./features/exporter";
 
+export { ClientSideExporter };
 export type { HeliosController };
 
 const template = document.createElement("template");

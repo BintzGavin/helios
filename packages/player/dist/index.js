@@ -1,5 +1,6 @@
 import { DirectController, BridgeController } from "./controllers";
 import { ClientSideExporter } from "./features/exporter";
+export { ClientSideExporter };
 const template = document.createElement("template");
 template.innerHTML = `
   <style>
@@ -284,7 +285,7 @@ template.innerHTML = `
       display: none;
     }
   </style>
-  <div class="status-overlay" part="overlay">
+  <div class="status-overlay hidden" part="overlay">
     <div class="status-text">Connecting...</div>
     <button class="retry-btn" style="display: none">Retry</button>
   </div>
