@@ -1,10 +1,11 @@
 # Status: DEMO (Executor)
-**Version**: 1.45.0
+**Version**: 1.46.0
 
 ## Vision
 To provide comprehensive, idiomatic examples for every major framework (React, Vue, Svelte, Vanilla) and robust end-to-end testing to ensure the Helios engine delivers on its "Use What You Know" promise.
 
 ## Current State
+- **Vue Transitions**: ✅ `examples/vue-transitions` exists and works (Demonstrates synchronizing CSS animations using `autoSyncAnimations` and `animation-delay` in Vue).
 - **Svelte Transitions**: ✅ `examples/svelte-transitions` exists and works (Demonstrates synchronizing CSS animations using `autoSyncAnimations` and `animation-delay` in Svelte).
 - **React Transitions**: ✅ `examples/react-transitions` exists and works (Demonstrates synchronizing CSS animations using `autoSyncAnimations` and manual time offsets).
 - **Social Media Story**: ✅ `examples/social-media-story` exists and works (Demonstrates `autoSyncAnimations` with `<video>` and sequence composition).
@@ -71,6 +72,7 @@ To provide comprehensive, idiomatic examples for every major framework (React, V
 None.
 
 ## Log
+- [v1.46.0] ✅ Completed: Scaffold Vue Transitions Example - Created `examples/vue-transitions` demonstrating how to synchronize standard CSS animations in Vue using `autoSyncAnimations` and `animation-delay` with proper seeking support.
 - [v1.45.0] ✅ Completed: Svelte Transitions Example - Created `examples/svelte-transitions` demonstrating how to synchronize standard CSS animations in Svelte using `autoSyncAnimations` and `animation-delay` with proper seeking support.
 - [v1.44.0] ✅ Completed: Scaffold React Three Fiber Example - Created `examples/react-three-fiber` demonstrating integration with `@react-three/fiber` using `frameloop="never"` and manual state advancement.
 - [v1.43.0] ✅ Completed: Create React Transitions Example - Created `examples/react-transitions` demonstrating how to synchronize CSS animations with Helios timeline using `autoSyncAnimations` and `animation-delay`.

@@ -25,6 +25,7 @@
 - `examples/react-animation-helpers`: React `<Sequence>`, `<Series>`.
 - `examples/vue-canvas-animation`: Vue Canvas.
 - `examples/vue-dom-animation`: Vue DOM.
+- `examples/vue-transitions`: Vue transitions (CSS animation synchronization).
 - `examples/vue-animation-helpers`: Vue `<Sequence>`, `<Series>`.
 - `examples/svelte-canvas-animation`: Svelte Canvas.
 - `examples/svelte-dom-animation`: Svelte DOM.

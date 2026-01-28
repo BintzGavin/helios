@@ -135,3 +135,6 @@ Each agent should update **their own dedicated progress file** instead of this f
 
 ## CORE v1.32.1
 - ✅ Completed: Document Dynamic Timing - Verified implementation, added JSDoc, and cleaned up plan artifacts.
+
+## DEMO v1.46.0
+- ✅ Completed: Scaffold Vue Transitions Example - Created `examples/vue-transitions` demonstrating how to synchronize standard CSS animations in Vue using `autoSyncAnimations` and `animation-delay` with proper seeking support.
