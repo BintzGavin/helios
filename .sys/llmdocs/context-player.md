@@ -16,6 +16,7 @@ The `<helios-player>` component uses a Shadow DOM with the following structure:
 - `.status-overlay`: Displays loading, error, and connection states (hidden by default).
 - `.poster-container`: Displays the poster image and a "Big Play Button" for deferred loading.
 - `iframe`: The sandboxed iframe that loads the composition.
+- `.click-layer`: Transparent overlay that intercepts clicks (standard video behavior) or allows them to pass through (interactive mode).
 - `.captions-container`: Overlay for rendering caption cues.
 - `.controls`: The playback control bar (Play/Pause, Volume, Captions, Export, Speed, Scrubber, Time, Fullscreen).
 
@@ -43,6 +44,7 @@ The `<helios-player>` observes the following attributes:
 - `poster`: URL of an image to show before loading or playing.
 - `preload`: `auto` (default) or `none` (defer loading until interaction).
 - `muted`: Mute the audio by default.
+- `interactive`: Enable direct interaction with the composition content.
 
 ## Public API
 The `HeliosPlayer` class exposes the following properties and methods:
@@ -58,4 +60,5 @@ The `HeliosPlayer` class exposes the following properties and methods:
 - `playbackRate`: number (get/set)
 - `fps`: number (readonly)
 - `inputProps`: Record<string, any> | null (get/set)
+- `interactive`: boolean (get/set)
 - `load(): void`

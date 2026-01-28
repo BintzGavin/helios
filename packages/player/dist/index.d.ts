@@ -19,6 +19,7 @@ export declare class HeliosPlayer extends HTMLElement {
     private captionsContainer;
     private ccBtn;
     private showCaptions;
+    private clickLayer;
     private posterContainer;
     private posterImage;
     private bigPlayBtn;
@@ -46,6 +47,8 @@ export declare class HeliosPlayer extends HTMLElement {
     set volume(val: number);
     get muted(): boolean;
     set muted(val: boolean);
+    get interactive(): boolean;
+    set interactive(val: boolean);
     get playbackRate(): number;
     set playbackRate(val: number);
     get fps(): number;

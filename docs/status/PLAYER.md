@@ -1,4 +1,4 @@
-**Version**: v0.28.0
+**Version**: v0.29.0
 
 # Status: PLAYER
 
@@ -32,6 +32,7 @@
 ## Critical Task
 - **None**: Recent task completed.
 
+[v0.29.0] ✅ Completed: Interactive Mode - Implemented `interactive` attribute to toggle between standard video controls and direct iframe interaction.
 [v0.28.0] ✅ Completed: Harden Player Connection - Implemented polling logic for Direct Mode connection to handle asynchronous composition initialization.
 [v0.27.0] ✅ Completed: Implement Muted Attribute - Added support for the `muted` attribute to `<helios-player>`, enabling declarative control of audio mute state.
 [v0.26.1] ✅ Completed: Poster Visibility - Refined logic to prioritize poster visibility over "Loading/Connecting" status overlay during initialization.

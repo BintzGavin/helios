@@ -1,5 +1,8 @@
 # PLAYER Progress Log
 
+## PLAYER v0.29.0
+- ✅ Completed: Interactive Mode - Implemented `interactive` attribute to toggle between standard video controls and direct iframe interaction.
+
 ## PLAYER v0.28.0
 - ✅ Completed: Harden Player Connection - Implemented polling logic for Direct Mode connection to handle asynchronous composition initialization.
 

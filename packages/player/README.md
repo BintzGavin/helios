@@ -64,6 +64,7 @@ The player will automatically attempt to access `window.helios` on the iframe's 
 | `poster` | URL of an image to display before playback starts. | - |
 | `preload` | `auto` or `none`. If `none`, defers loading the iframe until interaction. | `auto` |
 | `input-props` | JSON string of properties to pass to the composition. | - |
+| `interactive` | Enable direct interaction with the composition (disables click-to-pause). | `false` |
 
 ## Standard Media API
 
