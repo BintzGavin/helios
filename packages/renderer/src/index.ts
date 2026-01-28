@@ -7,6 +7,7 @@ import { DomStrategy } from './strategies/DomStrategy.js';
 import { TimeDriver } from './drivers/TimeDriver.js';
 import { CdpTimeDriver } from './drivers/CdpTimeDriver.js';
 import { SeekTimeDriver } from './drivers/SeekTimeDriver.js';
+import { FFmpegInspector } from './utils/FFmpegInspector.js';
 import { RendererOptions, RenderJobOptions } from './types.js';
 
 export { RendererOptions, RenderJobOptions } from './types.js';
@@ -46,7 +47,15 @@ export class Renderer {
     try {
       const page = await browser.newPage();
       await page.goto('about:blank');
-      return await this.strategy.diagnose(page);
+      const browserDiagnostics = await this.strategy.diagnose(page);
+
+      const ffmpegPath = this.options.ffmpegPath || ffmpeg.path;
+      const ffmpegDiagnostics = FFmpegInspector.inspect(ffmpegPath);
+
+      return {
+        browser: browserDiagnostics,
+        ffmpeg: ffmpegDiagnostics,
+      };
     } finally {
       await browser.close();
     }

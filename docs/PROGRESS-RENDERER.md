@@ -1,5 +1,8 @@
 # RENDERER Progress Log
 
+## RENDERER v1.32.0
+- ✅ Completed: FFmpeg Diagnostics - Implemented `FFmpegInspector` and updated `Renderer.diagnose()` to return comprehensive diagnostics including FFmpeg version, supported encoders (like `libx264`), and filters, resolving the Vision Gap.
+
 ## RENDERER v1.31.0
 - ✅ Completed: DomStrategy Media Attributes - Updated `DomStrategy` to discover and respect `data-helios-offset`, `data-helios-seek`, and the `muted` attribute on `<audio>` and `<video>` elements, enabling precise timing and volume control from the DOM.
 

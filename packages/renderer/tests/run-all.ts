@@ -2,6 +2,7 @@ import { spawnSync } from 'child_process';
 import * as path from 'path';
 
 const tests = [
+  'tests/verify-diagnose-ffmpeg.ts',
   'tests/verify-seek-driver-determinism.ts',
   'tests/verify-media-sync.ts',
   'tests/verify-iframe-sync.ts',
