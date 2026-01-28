@@ -29,6 +29,7 @@
 - `examples/svelte-canvas-animation`: Svelte Canvas.
 - `examples/svelte-dom-animation`: Svelte DOM.
 - `examples/svelte-animation-helpers`: Svelte `<Sequence>`, `<Series>`.
+- `examples/svelte-transitions`: Svelte transitions (CSS animation synchronization).
 - `examples/threejs-canvas-animation`: Three.js (3D).
 - `examples/react-three-fiber`: React Three Fiber (R3F) integration.
 - `examples/pixi-canvas-animation`: PixiJS (2D).

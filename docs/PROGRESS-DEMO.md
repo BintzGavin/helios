@@ -81,3 +81,6 @@
 
 ## DEMO v1.44.0
 - ✅ Completed: Scaffold React Three Fiber Example - Created `examples/react-three-fiber` demonstrating integration with `@react-three/fiber` using `frameloop="never"` and manual state advancement.
+
+## DEMO v1.45.0
+- ✅ Completed: Svelte Transitions Example - Created `examples/svelte-transitions` demonstrating how to synchronize standard CSS animations in Svelte using `autoSyncAnimations` and `animation-delay` with proper seeking support.
