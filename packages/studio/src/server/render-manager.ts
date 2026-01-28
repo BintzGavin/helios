@@ -160,3 +160,14 @@ export function deleteJob(id: string): boolean {
   }
   return true;
 }
+
+export async function diagnoseServer(): Promise<any> {
+  console.log('[RenderManager] Running server diagnostics...');
+  try {
+    const renderer = new Renderer({ mode: 'canvas', width: 100, height: 100, fps: 30, durationInSeconds: 1 });
+    return await renderer.diagnose();
+  } catch (e: any) {
+    console.error('[RenderManager] Diagnostics failed:', e);
+    throw e;
+  }
+}

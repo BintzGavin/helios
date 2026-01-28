@@ -1,3 +1,6 @@
+## STUDIO v0.34.0
+- ✅ Completed: Diagnostics Panel - Implemented system diagnostics panel showing both Client (Preview) and Server (Renderer) capabilities, accessible via Sidebar.
+
 ## STUDIO v0.33.1
 - ✅ Verified: Test Environment - Fixed test environment configuration by adding module aliases for Core and Player in Vite/Vitest, ensuring all tests pass.
 
