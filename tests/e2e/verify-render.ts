@@ -1,4 +1,4 @@
-import { Renderer } from '../../packages/renderer/src/index';
+import { Renderer } from '../../packages/renderer/dist/index.js';
 import * as path from 'path';
 import * as fs from 'fs/promises';
 
@@ -37,6 +37,7 @@ const CASES = [
   { name: 'Social Media Story', relativePath: 'examples/social-media-story/composition.html', mode: 'dom' as const },
   { name: 'React Transitions', relativePath: 'examples/react-transitions/composition.html', mode: 'dom' as const },
   { name: 'React Three Fiber', relativePath: 'examples/react-three-fiber/composition.html', mode: 'canvas' as const },
+  { name: 'Vue Transitions', relativePath: 'examples/vue-transitions/composition.html', mode: 'dom' as const },
 ];
 
 async function main() {

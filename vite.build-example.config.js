@@ -48,6 +48,7 @@ export default defineConfig({
         react_transitions: resolve(__dirname, "examples/react-transitions/composition.html"),
         react_three_fiber: resolve(__dirname, "examples/react-three-fiber/composition.html"),
         svelte_transitions: resolve(__dirname, "examples/svelte-transitions/composition.html"),
+        vue_transitions: resolve(__dirname, "examples/vue-transitions/composition.html"),
       },
     },
   },
