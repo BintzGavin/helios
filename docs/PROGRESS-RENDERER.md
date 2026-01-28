@@ -1,5 +1,8 @@
 # RENDERER Progress Log
 
+## RENDERER v1.27.1
+- ✅ Completed: Fix SeekTimeDriver and Testing - Refactored `SeekTimeDriver` to use string-based evaluation to prevent transpiler artifacts (like `esbuild`'s `__name`) in Playwright. Added `tsx` and a unified test runner (`npm test`) to `packages/renderer`.
+
 ## RENDERER v1.27.0
 - ✅ Completed: Robust Seek Wait - Updated `SeekTimeDriver` to wait for fonts and media `seeked` events, ensuring deterministic frame capture for DOM rendering. Also standardized source imports to use `.js` extensions for ESM compatibility.
 

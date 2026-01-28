@@ -33,64 +33,68 @@ export class SeekTimeDriver implements TimeDriver {
   }
 
   async setTime(page: Page, timeInSeconds: number): Promise<void> {
-    await page.evaluate(async (t) => {
-      const timeInMs = t * 1000;
+    // We use a string-based evaluation to avoid build-tool artifacts (like esbuild's __name helper)
+    // interfering with the client-side execution in Playwright.
+    const script = `
+      (async (t) => {
+        const timeInMs = t * 1000;
 
-      // Update the global virtual time
-      (window as any).__HELIOS_VIRTUAL_TIME__ = timeInMs;
+        // Update the global virtual time
+        window.__HELIOS_VIRTUAL_TIME__ = timeInMs;
 
-      // Synchronize document timeline (WAAPI)
-      if (document.timeline) {
-        (document.timeline as any).currentTime = timeInMs;
-      }
-
-      const promises: Promise<any>[] = [];
-
-      // 1. Wait for Fonts
-      if (document.fonts && document.fonts.ready) {
-        promises.push(document.fonts.ready);
-      }
-
-      // 2. Synchronize media elements (video, audio)
-      const mediaElements = document.querySelectorAll('video, audio');
-      mediaElements.forEach((el) => {
-        const mediaEl = el as HTMLMediaElement;
-        mediaEl.pause();
-        mediaEl.currentTime = t;
-
-        // Check if we need to wait for seeking to complete
-        // readyState < 2 (HAVE_CURRENT_DATA) means we don't have the frame yet
-        if (mediaEl.seeking || mediaEl.readyState < 2) {
-          const p = new Promise<void>((resolve) => {
-            let resolved = false;
-            const finish = () => {
-              if (resolved) return;
-              resolved = true;
-              cleanup();
-              resolve();
-            };
-            const cleanup = () => {
-              mediaEl.removeEventListener('seeked', finish);
-              mediaEl.removeEventListener('canplay', finish);
-              mediaEl.removeEventListener('error', finish);
-            };
-            mediaEl.addEventListener('seeked', finish);
-            mediaEl.addEventListener('canplay', finish);
-            mediaEl.addEventListener('error', finish);
-          });
-          promises.push(p);
+        // Synchronize document timeline (WAAPI)
+        if (document.timeline) {
+          document.timeline.currentTime = timeInMs;
         }
-      });
 
-      // 3. Wait for stability with a safety timeout
-      const allReady = Promise.all(promises);
-      const timeout = new Promise((resolve) => setTimeout(resolve, 3000));
-      await Promise.race([allReady, timeout]);
+        const promises = [];
 
-      // Wait for a frame to ensure the new time is propagated
-      return new Promise<void>(resolve => {
-        requestAnimationFrame(() => resolve());
-      });
-    }, timeInSeconds);
+        // 1. Wait for Fonts
+        if (document.fonts && document.fonts.ready) {
+          promises.push(document.fonts.ready);
+        }
+
+        // 2. Synchronize media elements (video, audio)
+        const mediaElements = document.querySelectorAll('video, audio');
+        mediaElements.forEach((el) => {
+          el.pause();
+          el.currentTime = t;
+
+          // Check if we need to wait for seeking to complete
+          // readyState < 2 (HAVE_CURRENT_DATA) means we don't have the frame yet
+          if (el.seeking || el.readyState < 2) {
+            promises.push(new Promise((resolve) => {
+              let resolved = false;
+              const finish = () => {
+                if (resolved) return;
+                resolved = true;
+                cleanup();
+                resolve();
+              };
+              const cleanup = () => {
+                el.removeEventListener('seeked', finish);
+                el.removeEventListener('canplay', finish);
+                el.removeEventListener('error', finish);
+              };
+              el.addEventListener('seeked', finish);
+              el.addEventListener('canplay', finish);
+              el.addEventListener('error', finish);
+            }));
+          }
+        });
+
+        // 3. Wait for stability with a safety timeout
+        const allReady = Promise.all(promises);
+        const timeout = new Promise((resolve) => setTimeout(resolve, 3000));
+        await Promise.race([allReady, timeout]);
+
+        // Wait for a frame to ensure the new time is propagated
+        await new Promise((resolve) => {
+          requestAnimationFrame(() => resolve());
+        });
+      })(${timeInSeconds})
+    `;
+
+    await page.evaluate(script);
   }
 }
