@@ -3,6 +3,7 @@
 ## A. Examples
 - `examples/simple-canvas-animation`: Vanilla JS Canvas API.
 - `examples/simple-animation`: Vanilla JS DOM + CSS Animations.
+- `examples/variable-font-animation`: Variable Font animation using CSS.
 - `examples/waapi-animation`: Web Animations API (element.animate()).
 - `examples/procedural-generation`: Deterministic `random` and `interpolateColors` (Canvas).
 - `examples/audio-visualization`: Raw audio data visualization (Canvas).

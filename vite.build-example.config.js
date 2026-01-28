@@ -49,6 +49,7 @@ export default defineConfig({
         react_three_fiber: resolve(__dirname, "examples/react-three-fiber/composition.html"),
         svelte_transitions: resolve(__dirname, "examples/svelte-transitions/composition.html"),
         vue_transitions: resolve(__dirname, "examples/vue-transitions/composition.html"),
+        variable_font: resolve(__dirname, "examples/variable-font-animation/composition.html"),
       },
     },
   },

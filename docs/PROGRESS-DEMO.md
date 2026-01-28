@@ -84,3 +84,9 @@
 
 ## DEMO v1.45.0
 - ✅ Completed: Svelte Transitions Example - Created `examples/svelte-transitions` demonstrating how to synchronize standard CSS animations in Svelte using `autoSyncAnimations` and `animation-delay` with proper seeking support.
+
+## DEMO v1.46.0
+- ✅ Completed: Vue Transitions Example - Created `examples/vue-transitions` demonstrating how to synchronize standard CSS animations in Vue using `autoSyncAnimations` and `animation-delay` with proper seeking support.
+
+## DEMO v1.47.0
+- ✅ Completed: Variable Font Animation Example - Created `examples/variable-font-animation` demonstrating how to synchronize CSS Variable Font animations using `autoSyncAnimations` with proper seeking support.
