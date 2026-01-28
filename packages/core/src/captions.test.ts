@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { parseSrt, stringifySrt, findActiveCues, CaptionCue } from './captions';
-import { HeliosError, HeliosErrorCode } from './errors';
+import { parseSrt, stringifySrt, findActiveCues, CaptionCue } from './captions.js';
+import { HeliosError, HeliosErrorCode } from './errors.js';
 
 describe('captions', () => {
   describe('parseSrt', () => {

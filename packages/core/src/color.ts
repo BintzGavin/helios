@@ -1,5 +1,5 @@
-import { HeliosError, HeliosErrorCode } from './errors';
-import { InterpolateOptions } from './animation';
+import { HeliosError, HeliosErrorCode } from './errors.js';
+import { InterpolateOptions } from './animation.js';
 
 export interface RgbaColor {
   r: number;

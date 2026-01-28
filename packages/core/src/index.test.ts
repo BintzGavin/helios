@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { Helios, HeliosState, HeliosSubscriber } from './index';
-import { TimeDriver, ManualTicker } from './drivers';
-import { HeliosError, HeliosErrorCode } from './errors';
+import { Helios, HeliosState, HeliosSubscriber } from './index.js';
+import { TimeDriver, ManualTicker } from './drivers/index.js';
+import { HeliosError, HeliosErrorCode } from './errors.js';
 
 describe('Helios Core', () => {
   it('should initialize with correct state', () => {

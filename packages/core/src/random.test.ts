@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { random } from './random';
+import { random } from './random.js';
 
 describe('random', () => {
   it('should be deterministic', () => {

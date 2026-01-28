@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { interpolate, spring } from './animation';
-import { HeliosError, HeliosErrorCode } from './errors';
+import { interpolate, spring } from './animation.js';
+import { HeliosError, HeliosErrorCode } from './errors.js';
 
 describe('interpolate', () => {
   it('interpolates within range', () => {

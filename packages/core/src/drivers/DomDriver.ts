@@ -1,4 +1,4 @@
-import { TimeDriver } from './TimeDriver';
+import { TimeDriver } from './TimeDriver.js';
 
 interface TrackState {
   baseVolume: number;

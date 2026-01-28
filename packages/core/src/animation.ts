@@ -1,4 +1,4 @@
-import { HeliosError, HeliosErrorCode } from './errors';
+import { HeliosError, HeliosErrorCode } from './errors.js';
 
 export type ExtrapolateType = 'extend' | 'clamp' | 'identity';
 

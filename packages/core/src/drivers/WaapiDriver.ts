@@ -1,4 +1,4 @@
-import { TimeDriver } from './TimeDriver';
+import { TimeDriver } from './TimeDriver.js';
 
 /**
  * @deprecated Use DomDriver instead, which supports both WAAPI and HTMLMediaElements.

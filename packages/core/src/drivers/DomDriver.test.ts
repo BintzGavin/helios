@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
-import { DomDriver } from './DomDriver';
+import { DomDriver } from './DomDriver.js';
 
 describe('DomDriver', () => {
   let driver: DomDriver;

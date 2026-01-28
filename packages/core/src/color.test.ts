@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { interpolateColors, parseColor } from './color';
-import { HeliosError, HeliosErrorCode } from './errors';
+import { interpolateColors, parseColor } from './color.js';
+import { HeliosError, HeliosErrorCode } from './errors.js';
 
 describe('color', () => {
   describe('parseColor', () => {

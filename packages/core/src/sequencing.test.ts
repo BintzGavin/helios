@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { sequence, series } from './sequencing';
+import { sequence, series } from './sequencing.js';
 
 describe('sequence', () => {
   it('handles finite duration correctly', () => {

@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { validateMarker, validateMarkers, Marker } from './markers';
-import { HeliosErrorCode } from './errors';
+import { validateMarker, validateMarkers, Marker } from './markers.js';
+import { HeliosErrorCode } from './errors.js';
 
 describe('markers', () => {
   describe('validateMarker', () => {

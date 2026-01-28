@@ -1,6 +1,6 @@
 // @vitest-environment node
 import { describe, it, expect } from 'vitest';
-import { Helios } from './index';
+import { Helios } from './index.js';
 
 describe('Helios - Node Runtime Support', () => {
   it('should initialize without crashing in Node environment', () => {

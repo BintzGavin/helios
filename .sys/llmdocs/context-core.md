@@ -15,7 +15,6 @@ The Core domain implements the "Helios State Machine" pattern. It is a pure logi
 ```
 packages/core/src/
 ├── animation.ts
-├── audio.ts
 ├── captions.ts
 ├── color.ts
 ├── drivers
@@ -37,7 +36,6 @@ packages/core/src/
 ├── sequencing.ts
 ├── signals.ts
 ├── timecode.ts
-└── types.ts
 ```
 
 ## C. Type Definitions
