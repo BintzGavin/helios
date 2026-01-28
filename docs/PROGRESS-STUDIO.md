@@ -1,3 +1,6 @@
+## STUDIO v0.39.0
+- ✅ Completed: Marker Visualization - Implemented visual markers in Timeline with click-to-seek functionality.
+
 ## STUDIO v0.38.0
 - ✅ Completed: AI System Prompt - Implemented a modal generator for LLM system prompts, combining static Helios context with dynamic composition schema.
 

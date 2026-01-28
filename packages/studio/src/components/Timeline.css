@@ -152,3 +152,20 @@
   z-index: 2;
   border-radius: 2px;
 }
+
+.timeline-marker-comp {
+  position: absolute;
+  top: 50%;
+  width: 8px;
+  height: 8px;
+  transform: translate(-50%, -50%) rotate(45deg);
+  cursor: pointer;
+  z-index: 8;
+  border: 1px solid rgba(0, 0, 0, 0.3);
+}
+
+.timeline-marker-comp:hover {
+  transform: translate(-50%, -50%) rotate(45deg) scale(1.2);
+  z-index: 20;
+  border-color: white;
+}

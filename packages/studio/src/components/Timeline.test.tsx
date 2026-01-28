@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent, act } from '@testing-library/react';
+import { render, screen, fireEvent, act, createEvent } from '@testing-library/react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { Timeline } from './Timeline';
 import * as StudioContext from '../context/StudioContext';
@@ -148,5 +148,36 @@ describe('Timeline', () => {
       expect(markers).toHaveLength(2);
       expect(markers[0]).toHaveAttribute('title', 'Hello');
       expect(markers[1]).toHaveAttribute('title', 'World');
+  });
+
+  it('renders composition markers from playerState.markers', () => {
+    const markers = [
+      { id: 'm1', time: 1, label: 'Start', color: '#ff0000' },
+      { id: 'm2', time: 5, label: 'Mid', color: '#00ff00' }
+    ];
+
+    (StudioContext.useStudio as any).mockReturnValue({
+      ...defaultContext,
+      playerState: { ...defaultPlayerState, markers }
+    });
+
+    const { container } = render(<Timeline />);
+    const renderedMarkers = container.querySelectorAll('.timeline-marker-comp');
+
+    expect(renderedMarkers).toHaveLength(2);
+    expect(renderedMarkers[0]).toHaveAttribute('title', 'Start (m1)');
+    // Note: styles are sometimes converted to rgb/rgba by jsdom
+    // expect(renderedMarkers[0]).toHaveStyle('background-color: #ff0000');
+
+    expect(renderedMarkers[1]).toHaveAttribute('title', 'Mid (m2)');
+
+    // Test click
+    const marker = renderedMarkers[1];
+    const event = createEvent.mouseDown(marker);
+    event.stopPropagation = vi.fn();
+    fireEvent(marker, event);
+
+    expect(event.stopPropagation).toHaveBeenCalled();
+    expect(mockSeek).toHaveBeenCalledWith(150); // 5s * 30fps = 150
   });
 });

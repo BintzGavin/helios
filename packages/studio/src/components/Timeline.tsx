@@ -17,6 +17,7 @@ export const Timeline: React.FC = () => {
   const { currentFrame, duration, fps } = playerState;
   const totalFrames = duration * fps || 100; // Default to 100 to avoid div by zero
   const captions = playerState.captions || [];
+  const markers = playerState.markers || [];
 
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
@@ -161,6 +162,23 @@ export const Timeline: React.FC = () => {
                     />
                 );
             })}
+
+            {/* Composition Markers */}
+            {markers.map((marker) => (
+              <div
+                key={marker.id}
+                className="timeline-marker-comp"
+                style={{
+                  left: `${getPercent(marker.time * fps)}%`,
+                  backgroundColor: marker.color || '#ff9800'
+                }}
+                title={`${marker.label} (${marker.id})`}
+                onMouseDown={(e) => {
+                  e.stopPropagation();
+                  if (controller) controller.seek(marker.time * fps);
+                }}
+              />
+            ))}
 
             {/* Render Region */}
             <div

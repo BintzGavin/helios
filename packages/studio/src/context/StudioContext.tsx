@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { type HeliosController, ClientSideExporter } from '@helios-project/player';
-import type { HeliosSchema, CaptionCue } from '@helios-project/core';
+import type { HeliosSchema, CaptionCue, Marker } from '@helios-project/core';
 
 export interface Composition {
   id: string;
@@ -46,6 +46,7 @@ export interface PlayerState {
   inputProps: Record<string, any>;
   schema?: HeliosSchema;
   captions: CaptionCue[];
+  markers: Marker[];
 }
 
 const DEFAULT_PLAYER_STATE: PlayerState = {
@@ -58,7 +59,8 @@ const DEFAULT_PLAYER_STATE: PlayerState = {
   muted: false,
   inputProps: {},
   schema: undefined,
-  captions: []
+  captions: [],
+  markers: []
 };
 
 interface StudioContextType {
