@@ -1,5 +1,5 @@
 import { Page, CDPSession } from 'playwright';
-import { TimeDriver } from './TimeDriver';
+import { TimeDriver } from './TimeDriver.js';
 
 export class CdpTimeDriver implements TimeDriver {
   private client: CDPSession | null = null;

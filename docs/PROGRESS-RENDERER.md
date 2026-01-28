@@ -1,5 +1,8 @@
 # RENDERER Progress Log
 
+## RENDERER v1.27.0
+- ✅ Completed: Robust Seek Wait - Updated `SeekTimeDriver` to wait for fonts and media `seeked` events, ensuring deterministic frame capture for DOM rendering. Also standardized source imports to use `.js` extensions for ESM compatibility.
+
 ## RENDERER v1.26.1
 - ✅ Completed: Create README - Created comprehensive `packages/renderer/README.md` documenting the Dual-Path Architecture, Zero Disk I/O pipeline, Smart Codec Selection, and usage instructions.
 

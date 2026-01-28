@@ -1,5 +1,5 @@
 import { Page } from 'playwright';
-import { RendererOptions } from '../types';
+import { RendererOptions } from '../types.js';
 
 export interface RenderStrategy {
   /**
