@@ -1,5 +1,8 @@
 # RENDERER Progress Log
 
+## RENDERER v1.31.0
+- ✅ Completed: DomStrategy Media Attributes - Updated `DomStrategy` to discover and respect `data-helios-offset`, `data-helios-seek`, and the `muted` attribute on `<audio>` and `<video>` elements, enabling precise timing and volume control from the DOM.
+
 ## RENDERER v1.30.0
 - ✅ Completed: Deep Dom Strategy - Updated `DomStrategy` to perform asset preloading (fonts, images, media) and audio track discovery across all frames (including iframes), ensuring robust rendering for nested compositions.
 
