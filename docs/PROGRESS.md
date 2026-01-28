@@ -153,3 +153,6 @@ Each agent should update **their own dedicated progress file** instead of this f
 
 ## PLAYER v0.26.0
 - ✅ Completed: Bridge Error Propagation - Implemented global error handling in `bridge.ts` and `HeliosController`.
+
+## DEMO v1.47.0
+- ✅ Completed: Variable Font Animation Example - Created `examples/variable-font-animation` demonstrating the animation of Variable Font axes (Weight, Slant, Casual) using standard CSS Keyframes and Helios's `autoSyncAnimations`.

@@ -1,10 +1,11 @@
 # Status: DEMO (Executor)
-**Version**: 1.46.0
+**Version**: 1.47.0
 
 ## Vision
 To provide comprehensive, idiomatic examples for every major framework (React, Vue, Svelte, Vanilla) and robust end-to-end testing to ensure the Helios engine delivers on its "Use What You Know" promise.
 
 ## Current State
+- **Variable Font**: ✅ `examples/variable-font-animation` exists and works (Demonstrates animation of Variable Font axes using CSS Keyframes and `autoSyncAnimations`).
 - **Vue Transitions**: ✅ `examples/vue-transitions` exists and works (Demonstrates synchronizing CSS animations using `autoSyncAnimations` and `animation-delay` in Vue).
 - **Svelte Transitions**: ✅ `examples/svelte-transitions` exists and works (Demonstrates synchronizing CSS animations using `autoSyncAnimations` and `animation-delay` in Svelte).
 - **React Transitions**: ✅ `examples/react-transitions` exists and works (Demonstrates synchronizing CSS animations using `autoSyncAnimations` and manual time offsets).
@@ -72,6 +73,7 @@ To provide comprehensive, idiomatic examples for every major framework (React, V
 None.
 
 ## Log
+- [v1.47.0] ✅ Completed: Variable Font Animation Example - Created `examples/variable-font-animation` demonstrating the animation of Variable Font axes (Weight, Slant, Casual) using standard CSS Keyframes and Helios's `autoSyncAnimations`.
 - [v1.46.0] ✅ Completed: Vue Transitions Example - Created `examples/vue-transitions` demonstrating how to synchronize standard CSS animations in Vue using `autoSyncAnimations` and `animation-delay` with proper seeking support.
 - [v1.45.0] ✅ Completed: Svelte Transitions Example - Created `examples/svelte-transitions` demonstrating how to synchronize standard CSS animations in Svelte using `autoSyncAnimations` and `animation-delay` with proper seeking support.
 - [v1.44.0] ✅ Completed: Scaffold React Three Fiber Example - Created `examples/react-three-fiber` demonstrating integration with `@react-three/fiber` using `frameloop="never"` and manual state advancement.

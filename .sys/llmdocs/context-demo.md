@@ -36,6 +36,7 @@
 - `examples/pixi-canvas-animation`: PixiJS (2D).
 - `examples/p5-canvas-animation`: P5.js (Instance Mode).
 - `examples/tailwind-animation`: Tailwind CSS v3 integration.
+- `examples/variable-font-animation`: Variable Font axes using CSS Keyframes.
 
 ## B. Build Config
 - **Root Config**: `vite.config.js` (shared settings).
