@@ -40,6 +40,7 @@ const CASES = [
   { name: 'Vue Transitions', relativePath: 'examples/vue-transitions/composition.html', mode: 'dom' as const },
   { name: 'Variable Font', relativePath: 'examples/variable-font-animation/composition.html', mode: 'dom' as const },
   { name: 'React Styled Components', relativePath: 'examples/react-styled-components/composition.html', mode: 'dom' as const },
+  { name: 'Solid Canvas', relativePath: 'examples/solid-canvas-animation/composition.html', mode: 'canvas' as const },
 ];
 
 async function main() {

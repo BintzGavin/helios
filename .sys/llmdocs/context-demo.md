@@ -33,6 +33,7 @@
 - `examples/svelte-dom-animation`: Svelte DOM.
 - `examples/svelte-animation-helpers`: Svelte `<Sequence>`, `<Series>`.
 - `examples/svelte-transitions`: Svelte transitions (CSS animation synchronization).
+- `examples/solid-canvas-animation`: SolidJS Canvas (Signals adapter).
 - `examples/threejs-canvas-animation`: Three.js (3D).
 - `examples/react-three-fiber`: React Three Fiber (R3F) integration.
 - `examples/pixi-canvas-animation`: PixiJS (2D).
@@ -42,7 +43,7 @@
 ## B. Build Config
 - **Root Config**: `vite.config.js` (shared settings).
 - **Example Build**: `vite.build-example.config.js` defines entry points for all examples.
-- **Frameworks**: React, Vue, Svelte supported via Vite plugins.
+- **Frameworks**: React, Vue, Svelte, Solid supported via Vite plugins.
 - **PostCSS/Tailwind**: Root `postcss.config.js` and `tailwind.config.js` (scoped content).
 
 ## C. E2E Tests

@@ -172,3 +172,6 @@ Each agent should update **their own dedicated progress file** instead of this f
 
 ## RENDERER v1.29.0
 - ✅ Completed: Caption Burning - Added `subtitles` option to `RendererOptions` and updated `FFmpegBuilder` to burn SRT subtitles into the video, including proper path escaping and filter complex management.
+
+## DEMO v1.49.0
+- ✅ Completed: Solid Canvas Example - Created `examples/solid-canvas-animation` demonstrating integration with SolidJS and `createHeliosSignal` adapter.
