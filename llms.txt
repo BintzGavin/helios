@@ -5,7 +5,6 @@
 Helios is a modern engine for creating videos programmatically using standard web technologies—HTML, CSS, and JavaScript. Unlike Remotion (React-only), Helios works with any framework or vanilla JS.
 
 ## Quick Facts
-
 - **License**: Elastic License 2.0 (free commercial use, no SaaS resale)
 - **Status**: Alpha
 - **Frameworks**: React, Vue, Svelte, vanilla JS
@@ -14,32 +13,34 @@ Helios is a modern engine for creating videos programmatically using standard we
 ## Core API
 
 ```typescript
-import { Helios } from '@helios-engine/core';
+import { Helios } from '@helios-project/core';
 
 const helios = new Helios({
   duration: 10,  // seconds
   fps: 30,
-  autoSyncAnimations: true
+  autoSyncAnimations: true,
+  inputProps: { title: "Hello World" }, // Dynamic data
+  captions: [{ id: "1", time: 0, text: "Welcome" }] // SRT or objects
 });
 
-helios.subscribe(({ currentFrame, duration, fps }) => {
-  const progress = currentFrame / (duration * fps);
-  // Drive animations with progress (0-1)
+helios.subscribe(({ currentFrame, inputProps }) => {
+  // Drive animations with progress or props
 });
+
+// Ensure fonts, images, and media are ready before rendering
+await helios.waitUntilStable();
 
 helios.play();
-helios.pause();
-helios.seek(150);  // Jump to frame 150
 ```
 
 ## Packages
-
-- `@helios-engine/core` - Headless video engine (state, timeline, subscriptions)
-- `@helios-engine/player` - Web Component player (`<helios-player>`)
-- `@helios-engine/renderer` - Server-side rendering (Playwright, FFmpeg)
+- `@helios-project/core` - Headless video engine (state, timeline, subscriptions)
+- `@helios-project/player` - Web Component player (`<helios-player>`)
+- `@helios-project/renderer` - Server-side rendering (Playwright, FFmpeg)
+- `@helios-project/studio` - Visual editor and asset manager (Alpha)
+- `@helios-project/cli` - Command-line interface
 
 ## Animation Approach
-
 Helios uses native browser APIs, not proprietary hooks:
 
 ```css
@@ -48,28 +49,22 @@ Helios uses native browser APIs, not proprietary hooks:
   from { opacity: 0; }
   to { opacity: 1; }
 }
-
 .element { animation: fadeIn 1s ease-out; }
 ```
-
 The engine controls `document.timeline.currentTime` to seek animations frame-accurately.
 
 ## Architecture
-
 ### Rendering Paths
-
 1. **Canvas-to-Video** (MVP): WebCodecs API for Three.js, Pixi.js, WebGL
-2. **DOM-to-Video** (planned): Playwright screenshots for HTML/CSS/SVG
+2. **DOM-to-Video**: Playwright screenshots for HTML/CSS/SVG
 
 ### Components
-
 - **Helios class**: Headless state machine (currentFrame, isPlaying, etc.)
 - **Framework adapters**: React hook, Vue composable, Svelte store
 - **Web Component**: `<helios-player>` for browser preview
 - **Renderer**: FFmpeg with piped frames (no temp files)
 
 ## vs Remotion
-
 | | Helios | Remotion |
 |---|--------|----------|
 | Framework | Any | React only |
@@ -79,16 +74,14 @@ The engine controls `document.timeline.currentTime` to seek animations frame-acc
 | Distributed rendering | Planned | Available |
 
 ## Agent Skills
-
 Skills for AI agents are in `.agents/skills/helios/`:
-
 - `core/SKILL.md` - Core API patterns, state management, subscriptions
-- `renderer/SKILL.md` - Rendering pipeline (planned)
-- `player/SKILL.md` - Player component (planned)
+- `renderer/SKILL.md` - Rendering pipeline usage
+- `player/SKILL.md` - Player component usage
+- `studio/SKILL.md` - Studio usage and extensions
 
 ## Key Files for Agents
-
-- `README.md` - Vision document (planning agents scan this)
+- `README.md` - Vision document
 - `docs/BACKLOG.md` - Feature backlog
 - `docs/PROGRESS.md` - Completed work
 - `docs/status/[ROLE].md` - Domain-specific status
@@ -98,18 +91,16 @@ Skills for AI agents are in `.agents/skills/helios/`:
 - `packages/renderer/src/index.ts` - Renderer public API
 
 ## Diagnostics
-
 ```typescript
 const report = await Helios.diagnose();
 // { waapi: boolean, webCodecs: boolean, offscreenCanvas: boolean, userAgent: string }
 ```
 
 ## Roadmap
-
-### V1.x
-- Helios Studio (framework-agnostic IDE)
-- Optional animation helpers (interpolate, spring, Sequence)
-- Captions/subtitles
+### V1.x (Current)
+- Helios Studio (Alpha released)
+- Captions/subtitles (Implemented)
+- Optional animation helpers
 - MCP Server for AI assistants
 - Publishable Agent Skills
 
@@ -121,7 +112,6 @@ const report = await Helios.diagnose();
 - Native Node.js encoding (beamcoder)
 
 ## Links
-
 - Repository: https://github.com/gavinbintz/helios
 - Documentation: ./docs/
 - Examples: ./examples/
