@@ -83,3 +83,7 @@
 ## [v1.45.0] - Vue Transitions Gap
 **Learning:** React and Svelte have "Transitions" examples demonstrating `autoSyncAnimations` with CSS variables, but Vue lacked this, relying on manual inline styles in `vue-dom-animation`.
 **Action:** Created `2026-01-28-DEMO-VueTransitions.md` to scaffold `examples/vue-transitions` and close this gap.
+
+## [v1.49.0] - Audio Mixing Verification Gap
+**Learning:** The "Basic (FFmpeg)" audio mixing capability is undocumented and unverified. `DomStrategy` discovers tracks but may have issues with `muted` attributes (potentially ignoring them).
+**Action:** Created `examples/podcast-visualizer` to verify multi-track mixing and potentially expose the mute bug. Future plans should specifically target "realistic" use cases that exercise complex renderer features.

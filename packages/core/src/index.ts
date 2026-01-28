@@ -65,6 +65,7 @@ export * from './random.js';
 export * from './color.js';
 export * from './timecode.js';
 export * from './markers.js';
+export * from './transitions.js';
 
 export class Helios {
   // Constants

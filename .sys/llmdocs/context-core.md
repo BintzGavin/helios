@@ -36,6 +36,7 @@ packages/core/src/
 ├── sequencing.ts
 ├── signals.ts
 ├── timecode.ts
+├── transitions.ts
 ```
 
 ## C. Type Definitions
@@ -89,6 +90,17 @@ export interface DiagnosticReport {
   webCodecs: boolean;
   offscreenCanvas: boolean;
   userAgent: string;
+}
+
+// packages/core/src/transitions.ts
+
+export interface TransitionOptions {
+  easing?: (t: number) => number;
+}
+
+export interface CrossfadeResult {
+  in: number;
+  out: number;
 }
 
 // packages/core/src/drivers/TimeDriver.ts

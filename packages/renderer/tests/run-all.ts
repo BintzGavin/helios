@@ -4,6 +4,9 @@ import * as path from 'path';
 const tests = [
   'tests/verify-seek-driver-determinism.ts',
   'tests/verify-media-sync.ts',
+  'tests/verify-iframe-sync.ts',
+  'tests/verify-implicit-audio.ts',
+  'tests/verify-deep-dom.ts',
   'tests/verify-smart-codec-selection.ts',
   'tests/verify-captions.ts',
   'scripts/verify-error-handling.ts',
