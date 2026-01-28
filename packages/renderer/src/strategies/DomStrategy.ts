@@ -1,7 +1,7 @@
 import { Page } from 'playwright';
-import { RenderStrategy } from './RenderStrategy';
-import { RendererOptions, AudioTrackConfig } from '../types';
-import { FFmpegBuilder } from '../utils/FFmpegBuilder';
+import { RenderStrategy } from './RenderStrategy.js';
+import { RendererOptions, AudioTrackConfig } from '../types.js';
+import { FFmpegBuilder } from '../utils/FFmpegBuilder.js';
 
 export class DomStrategy implements RenderStrategy {
   private discoveredAudioTracks: AudioTrackConfig[] = [];

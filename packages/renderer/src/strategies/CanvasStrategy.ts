@@ -1,7 +1,7 @@
 import { Page } from 'playwright';
-import { RenderStrategy } from './RenderStrategy';
-import { RendererOptions } from '../types';
-import { FFmpegBuilder } from '../utils/FFmpegBuilder';
+import { RenderStrategy } from './RenderStrategy.js';
+import { RendererOptions } from '../types.js';
+import { FFmpegBuilder } from '../utils/FFmpegBuilder.js';
 
 export class CanvasStrategy implements RenderStrategy {
   private useWebCodecs = false;

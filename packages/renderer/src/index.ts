@@ -1,16 +1,16 @@
 import { spawn } from 'child_process';
 import { chromium, Browser, Page, ConsoleMessage } from 'playwright';
 import ffmpeg from '@ffmpeg-installer/ffmpeg';
-import { RenderStrategy } from './strategies/RenderStrategy';
-import { CanvasStrategy } from './strategies/CanvasStrategy';
-import { DomStrategy } from './strategies/DomStrategy';
-import { TimeDriver } from './drivers/TimeDriver';
-import { CdpTimeDriver } from './drivers/CdpTimeDriver';
-import { SeekTimeDriver } from './drivers/SeekTimeDriver';
-import { RendererOptions, RenderJobOptions } from './types';
+import { RenderStrategy } from './strategies/RenderStrategy.js';
+import { CanvasStrategy } from './strategies/CanvasStrategy.js';
+import { DomStrategy } from './strategies/DomStrategy.js';
+import { TimeDriver } from './drivers/TimeDriver.js';
+import { CdpTimeDriver } from './drivers/CdpTimeDriver.js';
+import { SeekTimeDriver } from './drivers/SeekTimeDriver.js';
+import { RendererOptions, RenderJobOptions } from './types.js';
 
-export { RendererOptions, RenderJobOptions } from './types';
-export { concatenateVideos } from './concat';
+export { RendererOptions, RenderJobOptions } from './types.js';
+export { concatenateVideos } from './concat.js';
 
 export class Renderer {
   private options: RendererOptions;

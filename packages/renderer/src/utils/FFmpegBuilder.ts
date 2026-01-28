@@ -1,4 +1,4 @@
-import { RendererOptions, AudioTrackConfig } from '../types';
+import { RendererOptions, AudioTrackConfig } from '../types.js';
 
 export class FFmpegBuilder {
   static getArgs(options: RendererOptions, outputPath: string, videoInputArgs: string[]): string[] {

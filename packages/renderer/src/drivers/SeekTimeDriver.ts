@@ -1,5 +1,5 @@
 import { Page } from 'playwright';
-import { TimeDriver } from './TimeDriver';
+import { TimeDriver } from './TimeDriver.js';
 
 export class SeekTimeDriver implements TimeDriver {
   async init(page: Page): Promise<void> {
@@ -33,7 +33,7 @@ export class SeekTimeDriver implements TimeDriver {
   }
 
   async setTime(page: Page, timeInSeconds: number): Promise<void> {
-    await page.evaluate((t) => {
+    await page.evaluate(async (t) => {
       const timeInMs = t * 1000;
 
       // Update the global virtual time
@@ -44,13 +44,48 @@ export class SeekTimeDriver implements TimeDriver {
         (document.timeline as any).currentTime = timeInMs;
       }
 
-      // Synchronize media elements (video, audio)
+      const promises: Promise<any>[] = [];
+
+      // 1. Wait for Fonts
+      if (document.fonts && document.fonts.ready) {
+        promises.push(document.fonts.ready);
+      }
+
+      // 2. Synchronize media elements (video, audio)
       const mediaElements = document.querySelectorAll('video, audio');
       mediaElements.forEach((el) => {
         const mediaEl = el as HTMLMediaElement;
         mediaEl.pause();
         mediaEl.currentTime = t;
+
+        // Check if we need to wait for seeking to complete
+        // readyState < 2 (HAVE_CURRENT_DATA) means we don't have the frame yet
+        if (mediaEl.seeking || mediaEl.readyState < 2) {
+          const p = new Promise<void>((resolve) => {
+            let resolved = false;
+            const finish = () => {
+              if (resolved) return;
+              resolved = true;
+              cleanup();
+              resolve();
+            };
+            const cleanup = () => {
+              mediaEl.removeEventListener('seeked', finish);
+              mediaEl.removeEventListener('canplay', finish);
+              mediaEl.removeEventListener('error', finish);
+            };
+            mediaEl.addEventListener('seeked', finish);
+            mediaEl.addEventListener('canplay', finish);
+            mediaEl.addEventListener('error', finish);
+          });
+          promises.push(p);
+        }
       });
+
+      // 3. Wait for stability with a safety timeout
+      const allReady = Promise.all(promises);
+      const timeout = new Promise((resolve) => setTimeout(resolve, 3000));
+      await Promise.race([allReady, timeout]);
 
       // Wait for a frame to ensure the new time is propagated
       return new Promise<void>(resolve => {
