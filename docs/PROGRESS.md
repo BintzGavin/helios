@@ -141,3 +141,9 @@ Each agent should update **their own dedicated progress file** instead of this f
 
 ## CORE v1.33.0
 - ✅ Completed: Implement WaitUntilStable - Implemented `waitUntilStable` in `Helios` and `DomDriver` to ensure deterministic rendering by waiting for fonts, images, and media readiness.
+
+## PLAYER v0.26.1
+- ✅ Completed: Poster Visibility - Refined logic to prioritize poster visibility over "Loading/Connecting" status overlay during initialization.
+
+## PLAYER v0.26.0
+- ✅ Completed: Bridge Error Propagation - Implemented global error handling in `bridge.ts` and `HeliosController`.

@@ -1,4 +1,4 @@
-**Version**: v0.26.0
+**Version**: v0.26.1
 
 # Status: PLAYER
 
@@ -27,11 +27,12 @@
 - Supports declarative data binding via `input-props` attribute (JSON string) and property, enabling dynamic composition updates.
 - Supports `poster` and `preload` attributes. `preload="none"` defers iframe loading until the user interacts with the new "Big Play Button".
 - Implements responsive controls using `ResizeObserver`, adapting UI layout for smaller widths (hiding volume/speed controls).
-- **New**: Supports Bridge Error Propagation, capturing global errors and unhandled rejections from the iframe and displaying them in the player UI with a "Reload" action.
+- **New**: Refined Poster Visibility logic ensures user-defined poster images are not obscured by "Loading/Connecting" status overlays during initialization.
 
 ## Critical Task
 - **None**: Recent task completed.
 
+[v0.26.1] ✅ Completed: Poster Visibility - Refined logic to prioritize poster visibility over "Loading/Connecting" status overlay during initialization.
 [v0.26.0] ✅ Completed: Bridge Error Propagation - Implemented global error handling in `bridge.ts` and `HeliosController`, enabling the player UI to display runtime errors from the composition.
 [v0.25.2] ✅ Completed: Polish Burn-In Captions - Added text shadow to exported captions to match player UI styling and improved code hygiene by preventing canvas state leaks.
 [v0.25.1] ✅ Completed: Refine Burn-In Captions - Added multiline caption support and respect for player caption visibility toggle during client-side export.
