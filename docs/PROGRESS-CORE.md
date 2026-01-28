@@ -1,5 +1,8 @@
 # CORE Progress Log
 
+## CORE v2.5.0
+- ✅ Completed: Maintenance and Robustness - Fixed memory leak in Helios constructor, enhanced color schema validation, and synced package version.
+
 ## CORE v2.4.0
 - ✅ Completed: Implement Spring Duration - Added `calculateSpringDuration` utility and exported `DEFAULT_SPRING_CONFIG` in `packages/core`.
 

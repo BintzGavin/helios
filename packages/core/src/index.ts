@@ -88,6 +88,8 @@ export class Helios {
   private _height: Signal<number>;
   private _playbackRange: Signal<[number, number] | null>;
 
+  private _disposeActiveCaptionsEffect: () => void;
+
   // Public Readonly Signals
 
   /**
@@ -279,7 +281,7 @@ export class Helios {
 
     this._activeCaptions = signal(findActiveCues(initialCaptions, 0));
 
-    effect(() => {
+    this._disposeActiveCaptionsEffect = effect(() => {
       const timeMs = (this._currentFrame.value / this.fps) * 1000;
       const active = findActiveCues(this._captions.value, timeMs);
 
@@ -627,6 +629,7 @@ export class Helios {
     this.ticker.stop();
     this.unbindFromDocumentTimeline();
     this.driver.dispose?.();
+    this._disposeActiveCaptionsEffect?.();
 
     this.subscriberMap.forEach((dispose) => dispose());
     this.subscriberMap.clear();

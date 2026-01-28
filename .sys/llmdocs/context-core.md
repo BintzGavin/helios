@@ -1,18 +1,27 @@
 # Context: CORE
 
 ## A. Architecture
-The Core package implements the "Helios State Machine" pattern:
-- **State Store**: Centralized state (HeliosState) managed via Signals.
-- **Actions**: Public methods on the Helios class modify state.
-- **Subscribers**: External components (Renderer, Studio) subscribe to state changes.
-- **Drivers**: TimeDrivers (DomDriver, etc.) sync external time sources (WAAPI, Audio) with internal frame state.
+
+Helios Core employs a reactive state machine architecture:
+1.  **State**: Internal state (`currentFrame`, `isPlaying`, etc.) is managed using `Signal` primitives, ensuring atomic updates and dependency tracking.
+2.  **Drivers**: The `TimeDriver` interface abstracts the underlying timing mechanism (e.g., `DomDriver` for WAAPI/media sync, `NoopDriver` for testing).
+3.  **Synchronization**: The `Helios` class synchronizes the driver with its internal state signals.
+4.  **Subscribers**: External consumers subscribe to state changes via the `subscribe` method.
 
 ## B. File Tree
+
+```text
 packages/core/src/
 ├── drivers/
 │   ├── DomDriver.ts
-│   ├── index.ts
-│   └── ...
+│   ├── ManualTicker.ts
+│   ├── NoopDriver.ts
+│   ├── RafTicker.ts
+│   ├── Ticker.ts
+│   ├── TimeDriver.ts
+│   ├── TimeoutTicker.ts
+│   ├── WaapiDriver.ts
+│   └── index.ts
 ├── animation.ts
 ├── captions.ts
 ├── color.ts
@@ -26,10 +35,14 @@ packages/core/src/
 ├── signals.ts
 ├── timecode.ts
 └── transitions.ts
+```
 
 ## C. Type Definitions
+
 ```typescript
-export interface HeliosState {
+// From packages/core/src/index.ts
+
+export type HeliosState = {
   width: number;
   height: number;
   duration: number;
@@ -45,7 +58,9 @@ export interface HeliosState {
   activeCaptions: CaptionCue[];
   markers: Marker[];
   playbackRange: [number, number] | null;
-}
+};
+
+export type HeliosSubscriber = (state: HeliosState) => void;
 
 export interface HeliosOptions {
   width?: number;
@@ -68,88 +83,89 @@ export interface HeliosOptions {
   ticker?: Ticker;
 }
 
-export interface SpringConfig {
-  mass?: number;
-  stiffness?: number;
-  damping?: number;
-  overshootClamping?: boolean;
+export interface DiagnosticReport {
+  waapi: boolean;
+  webCodecs: boolean;
+  offscreenCanvas: boolean;
+  userAgent: string;
 }
 
-export interface SpringOptions {
-  frame: number;
-  fps: number;
-  config?: SpringConfig;
-  from?: number;
-  to?: number;
-  durationInFrames?: number;
+// From packages/core/src/schema.ts
+
+export type PropType =
+  | 'string'
+  | 'number'
+  | 'boolean'
+  | 'object'
+  | 'array'
+  | 'color'
+  | 'image'
+  | 'video'
+  | 'audio'
+  | 'font';
+
+export interface PropDefinition {
+  type: PropType;
+  optional?: boolean;
+  default?: any;
+  minimum?: number;
+  maximum?: number;
+  enum?: (string | number)[];
+  label?: string;
+  description?: string;
 }
+
+export type HeliosSchema = Record<string, PropDefinition>;
 ```
 
-## D. Public Methods (Helios Class)
+## D. Public Methods
+
 ```typescript
-class Helios {
-  constructor(options: HeliosOptions);
+// Helios Class
 
-  // Getters (Signals)
-  get currentFrame(): ReadonlySignal<number>;
-  get loop(): ReadonlySignal<boolean>;
-  get isPlaying(): ReadonlySignal<boolean>;
-  get inputProps(): ReadonlySignal<Record<string, any>>;
-  get playbackRate(): ReadonlySignal<number>;
-  get volume(): ReadonlySignal<number>;
-  get muted(): ReadonlySignal<boolean>;
-  get captions(): ReadonlySignal<CaptionCue[]>;
-  get activeCaptions(): ReadonlySignal<CaptionCue[]>;
-  get markers(): ReadonlySignal<Marker[]>;
-  get playbackRange(): ReadonlySignal<[number, number] | null>;
-  get width(): ReadonlySignal<number>;
-  get height(): ReadonlySignal<number>;
-  get duration(): number;
-  get fps(): number;
+static diagnose(): Promise<DiagnosticReport>;
 
-  // Actions
-  getState(): Readonly<HeliosState>;
-  setSize(width: number, height: number): void;
-  setLoop(shouldLoop: boolean): void;
-  setDuration(seconds: number): void;
-  setFps(fps: number): void;
-  setInputProps(props: Record<string, any>): void;
-  setPlaybackRate(rate: number): void;
-  setAudioVolume(volume: number): void;
-  setAudioMuted(muted: boolean): void;
-  setCaptions(captions: string | CaptionCue[]): void;
-  setMarkers(markers: Marker[]): void;
-  addMarker(marker: Marker): void;
-  removeMarker(id: string): void;
-  seekToMarker(id: string): void;
-  setPlaybackRange(startFrame: number, endFrame: number): void;
-  clearPlaybackRange(): void;
+constructor(options: HeliosOptions);
 
-  // Playback
-  play(): void;
-  pause(): void;
-  seek(frame: number): void;
-  waitUntilStable(): Promise<void>;
+get currentFrame(): ReadonlySignal<number>;
+get loop(): ReadonlySignal<boolean>;
+get isPlaying(): ReadonlySignal<boolean>;
+get inputProps(): ReadonlySignal<Record<string, any>>;
+get playbackRate(): ReadonlySignal<number>;
+get volume(): ReadonlySignal<number>;
+get muted(): ReadonlySignal<boolean>;
+get captions(): ReadonlySignal<CaptionCue[]>;
+get activeCaptions(): ReadonlySignal<CaptionCue[]>;
+get markers(): ReadonlySignal<Marker[]>;
+get playbackRange(): ReadonlySignal<[number, number] | null>;
+get width(): ReadonlySignal<number>;
+get height(): ReadonlySignal<number>;
+get duration(): number;
+get fps(): number;
 
-  // Timeline Binding
-  bindToDocumentTimeline(): void;
-  unbindFromDocumentTimeline(): void;
-
-  // Subscription
-  subscribe(callback: HeliosSubscriber): () => void;
-  unsubscribe(callback: HeliosSubscriber): void;
-
-  // Lifecycle
-  dispose(): void;
-
-  static diagnose(): Promise<DiagnosticReport>;
-}
-```
-
-## E. Exported Utilities (Selected)
-```typescript
-// Animation
-function spring(options: SpringOptions): number;
-function calculateSpringDuration(options: Omit<SpringOptions, 'frame'>, threshold?: number): number;
-function interpolate(input: number, inputRange: number[], outputRange: number[], options?: InterpolateOptions): number;
+getState(): Readonly<HeliosState>;
+setSize(width: number, height: number): void;
+setLoop(shouldLoop: boolean): void;
+setDuration(seconds: number): void;
+setFps(fps: number): void;
+setInputProps(props: Record<string, any>): void;
+setPlaybackRate(rate: number): void;
+setAudioVolume(volume: number): void;
+setAudioMuted(muted: boolean): void;
+setCaptions(captions: string | CaptionCue[]): void;
+setMarkers(markers: Marker[]): void;
+addMarker(marker: Marker): void;
+removeMarker(id: string): void;
+seekToMarker(id: string): void;
+setPlaybackRange(startFrame: number, endFrame: number): void;
+clearPlaybackRange(): void;
+subscribe(callback: HeliosSubscriber): () => void;
+unsubscribe(callback: HeliosSubscriber): void;
+play(): void;
+pause(): void;
+seek(frame: number): void;
+waitUntilStable(): Promise<void>;
+bindToDocumentTimeline(): void;
+unbindFromDocumentTimeline(): void;
+dispose(): void;
 ```

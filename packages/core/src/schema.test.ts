@@ -125,4 +125,22 @@ describe('validateProps', () => {
     expect(() => validateProps({ aud: true }, schema)).toThrow(HeliosError);
     expect(() => validateProps({ fnt: [] }, schema)).toThrow(HeliosError);
   });
+
+  it('should validate color formats', () => {
+    const schema = {
+        col: { type: 'color' as const }
+    };
+
+    // Valid formats
+    expect(validateProps({ col: '#f00' }, schema)).toEqual({ col: '#f00' });
+    expect(validateProps({ col: '#ff0000' }, schema)).toEqual({ col: '#ff0000' });
+    expect(validateProps({ col: 'rgb(255, 0, 0)' }, schema)).toEqual({ col: 'rgb(255, 0, 0)' });
+    expect(validateProps({ col: 'hsl(0, 100%, 50%)' }, schema)).toEqual({ col: 'hsl(0, 100%, 50%)' });
+
+    // Invalid formats
+    expect(() => validateProps({ col: '#gg' }, schema)).toThrow(HeliosError); // Invalid hex
+    expect(() => validateProps({ col: 'red' }, schema)).toThrow(HeliosError); // Named colors not supported yet
+    expect(() => validateProps({ col: '123' }, schema)).toThrow(HeliosError); // Just numbers
+    expect(() => validateProps({ col: 123 }, schema)).toThrow(HeliosError); // Wrong type
+  });
 });

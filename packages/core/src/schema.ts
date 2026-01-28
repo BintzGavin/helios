@@ -1,4 +1,5 @@
 import { HeliosError, HeliosErrorCode } from './errors.js';
+import { parseColor } from './color.js';
 
 export type PropType =
   | 'string'
@@ -57,6 +58,11 @@ export function validateProps(props: Record<string, any>, schema?: HeliosSchema)
       typeof val !== 'string'
     ) {
       throwError(key, `${def.type} (string)`);
+    }
+
+    // Color Format Check
+    if (def.type === 'color' && typeof val === 'string') {
+        parseColor(val); // Will throw if invalid
     }
 
     // Enum Check
