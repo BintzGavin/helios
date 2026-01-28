@@ -162,3 +162,6 @@ Each agent should update **their own dedicated progress file** instead of this f
 
 ## RENDERER v1.28.0
 - ✅ Completed: Multi-Frame Seek - Updated SeekTimeDriver to synchronize virtual time across all frames (including iframes), enabling deterministic rendering for complex compositions.
+
+## RENDERER v1.29.0
+- ✅ Completed: Caption Burning - Added `subtitles` option to `RendererOptions` and updated `FFmpegBuilder` to burn SRT subtitles into the video, including proper path escaping and filter complex management.

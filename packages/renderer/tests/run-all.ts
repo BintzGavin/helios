@@ -5,6 +5,7 @@ const tests = [
   'tests/verify-seek-driver-determinism.ts',
   'tests/verify-media-sync.ts',
   'tests/verify-smart-codec-selection.ts',
+  'tests/verify-captions.ts',
   'scripts/verify-error-handling.ts',
 ];
 

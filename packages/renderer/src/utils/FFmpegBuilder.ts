@@ -72,12 +72,99 @@ export class FFmpegBuilder {
       audioFilterChains.push(`[${inputId}]${filters.join(',')}[${outputLabel}]`);
     });
 
-    let audioOutputArgs: string[] = [];
+    // 3. Prepare Video Filters (Subtitles)
+    let videoFilterGraph = '';
+    let videoMap = '0:v';
+    const videoCodec = options.videoCodec || 'libx264';
+
+    if (options.subtitles) {
+      if (videoCodec === 'copy') {
+        throw new Error('Cannot burn subtitles when videoCodec is set to "copy". Please use a transcoding codec (e.g. libx264).');
+      }
+
+      // Escape path for FFmpeg filter
+      // 1. Replace backslashes with forward slashes
+      // 2. Escape colons (for Windows drive letters like C:)
+      // 3. Escape single quotes
+      const escapedPath = options.subtitles
+        .replace(/\\/g, '/')
+        .replace(/:/g, '\\:')
+        .replace(/'/g, "\\'");
+
+      videoFilterGraph = `[0:v]subtitles='${escapedPath}'[vout]`;
+      videoMap = '[vout]';
+    }
+
+    // 4. Prepare Audio Filters
+    let audioFilterGraph = '';
+    let audioMap = '';
+
     if (tracks.length > 0) {
-      // Determine Audio Codec
+      if (tracks.length === 1) {
+        audioFilterGraph = audioFilterChains[0];
+        audioMap = '[a0]';
+      } else {
+        // Multiple tracks: Mix them using amix
+        let graph = audioFilterChains.join(';');
+        // Mix step: combine all [aX] outputs
+        const mixInputs = tracks.map((_, i) => `[a${i}]`).join('');
+        // inputs=N:duration=longest
+        graph += `;${mixInputs}amix=inputs=${tracks.length}:duration=longest[aout]`;
+
+        audioFilterGraph = graph;
+        audioMap = '[aout]';
+      }
+    }
+
+    // 5. Construct Final Arguments
+    const finalArgs: string[] = ['-y', ...videoInputArgs, ...audioInputArgs];
+
+    // Combine filters
+    const complexFilters: string[] = [];
+    if (videoFilterGraph) complexFilters.push(videoFilterGraph);
+    if (audioFilterGraph) complexFilters.push(audioFilterGraph);
+
+    if (complexFilters.length > 0) {
+      finalArgs.push('-filter_complex', complexFilters.join(';'));
+    }
+
+    // Map Video
+    finalArgs.push('-map', videoMap);
+
+    // Map Audio (if exists)
+    if (audioMap) {
+      finalArgs.push('-map', audioMap);
+    }
+
+    // Video Encoding Args
+    finalArgs.push('-c:v', videoCodec);
+
+    if (videoCodec === 'copy') {
+      finalArgs.push('-movflags', '+faststart');
+    } else {
+      const pixelFormat = options.pixelFormat || 'yuv420p';
+      finalArgs.push(
+        '-pix_fmt', pixelFormat,
+        '-movflags', '+faststart',
+      );
+
+      if (options.crf !== undefined) {
+        finalArgs.push('-crf', options.crf.toString());
+      }
+
+      if (options.preset) {
+        finalArgs.push('-preset', options.preset);
+      }
+
+      if (options.videoBitrate) {
+        finalArgs.push('-b:v', options.videoBitrate);
+      }
+    }
+
+    // Audio Encoding Args
+    if (audioMap) {
       let audioCodec = options.audioCodec;
       if (!audioCodec) {
-        const videoCodec = options.videoCodec || 'libx264';
         if (videoCodec.startsWith('libvpx')) {
           audioCodec = 'libvorbis';
         } else {
@@ -85,69 +172,15 @@ export class FFmpegBuilder {
         }
       }
 
-      // Common audio encoding args
-      audioOutputArgs.push('-c:a', audioCodec, '-t', options.durationInSeconds.toString());
+      finalArgs.push('-c:a', audioCodec, '-t', options.durationInSeconds.toString());
 
       if (options.audioBitrate) {
-        audioOutputArgs.push('-b:a', options.audioBitrate);
-      }
-
-      if (tracks.length === 1) {
-        // Single track: Just map the processed stream
-        const filterGraph = audioFilterChains[0];
-        audioOutputArgs.push(
-          '-filter_complex', filterGraph,
-          '-map', '0:v',
-          '-map', '[a0]'
-        );
-      } else {
-        // Multiple tracks: Mix them using amix
-        let filterGraph = audioFilterChains.join(';');
-
-        // Mix step: combine all [aX] outputs
-        const mixInputs = tracks.map((_, i) => `[a${i}]`).join('');
-        // inputs=N:duration=longest
-        filterGraph += `;${mixInputs}amix=inputs=${tracks.length}:duration=longest[aout]`;
-
-        audioOutputArgs.push(
-          '-filter_complex', filterGraph,
-          '-map', '0:v',
-          '-map', '[aout]'
-        );
+        finalArgs.push('-b:a', options.audioBitrate);
       }
     }
 
-    const videoCodec = options.videoCodec || 'libx264';
-    const encodingArgs: string[] = ['-c:v', videoCodec];
+    finalArgs.push(outputPath);
 
-    if (videoCodec === 'copy') {
-      encodingArgs.push('-movflags', '+faststart');
-    } else {
-      const pixelFormat = options.pixelFormat || 'yuv420p';
-      encodingArgs.push(
-        '-pix_fmt', pixelFormat,
-        '-movflags', '+faststart',
-      );
-
-      if (options.crf !== undefined) {
-        encodingArgs.push('-crf', options.crf.toString());
-      }
-
-      if (options.preset) {
-        encodingArgs.push('-preset', options.preset);
-      }
-
-      if (options.videoBitrate) {
-        encodingArgs.push('-b:v', options.videoBitrate);
-      }
-    }
-
-    const outputArgs = [
-      ...encodingArgs,
-      ...audioOutputArgs,
-      outputPath,
-    ];
-
-    return ['-y', ...videoInputArgs, ...audioInputArgs, ...outputArgs];
+    return finalArgs;
   }
 }
