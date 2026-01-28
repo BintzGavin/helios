@@ -1,5 +1,8 @@
 # CORE Progress Log
 
+## CORE v2.3.0
+- ✅ Completed: Implement Transitions Library - Implemented standard transition and crossfade functions, and corrected README installation instructions.
+
 ## CORE v2.2.0
 - ✅ Completed: Implement Playback Range - Added `playbackRange` to `HeliosState`, enabling loop and clamp behavior within a specific frame range.
 
