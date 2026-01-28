@@ -20,6 +20,7 @@ export type HeliosState = {
   captions: CaptionCue[];
   activeCaptions: CaptionCue[];
   markers: Marker[];
+  playbackRange: [number, number] | null;
 };
 
 export type HeliosSubscriber = (state: HeliosState) => void;
@@ -31,6 +32,7 @@ export interface HeliosOptions {
   duration: number; // in seconds
   fps: number;
   loop?: boolean;
+  playbackRange?: [number, number];
   autoSyncAnimations?: boolean;
   animationScope?: HTMLElement;
   inputProps?: Record<string, any>;
@@ -83,6 +85,7 @@ export class Helios {
   private _markers: Signal<Marker[]>;
   private _width: Signal<number>;
   private _height: Signal<number>;
+  private _playbackRange: Signal<[number, number] | null>;
 
   // Public Readonly Signals
 
@@ -147,6 +150,12 @@ export class Helios {
    * Can be subscribed to for reactive updates.
    */
   public get markers(): ReadonlySignal<Marker[]> { return this._markers; }
+
+  /**
+   * Signal for the playback range (start frame, end frame) or null if full duration.
+   * Can be subscribed to for reactive updates.
+   */
+  public get playbackRange(): ReadonlySignal<[number, number] | null> { return this._playbackRange; }
 
   /**
    * Signal for the canvas width.
@@ -240,6 +249,17 @@ export class Helios {
     const initialFrameRaw = options.initialFrame || 0;
     const initialFrame = Math.max(0, Math.min(initialFrameRaw, totalFrames));
 
+    if (options.playbackRange) {
+        const [start, end] = options.playbackRange;
+        if (start < 0 || end <= start) {
+            throw new HeliosError(
+                HeliosErrorCode.INVALID_PLAYBACK_RANGE,
+                `Invalid playback range: [${start}, ${end}]`,
+                "Ensure start >= 0 and end > start."
+            );
+        }
+    }
+
     // Initialize signals
     this._duration = signal(options.duration);
     this._fps = signal(options.fps);
@@ -254,6 +274,7 @@ export class Helios {
     this._markers = signal(initialMarkers);
     this._width = signal(width);
     this._height = signal(height);
+    this._playbackRange = signal(options.playbackRange || null);
 
     this._activeCaptions = signal(findActiveCues(initialCaptions, 0));
 
@@ -310,6 +331,7 @@ export class Helios {
       captions: this._captions.value,
       activeCaptions: this.activeCaptions.value,
       markers: this._markers.value,
+      playbackRange: this._playbackRange.value,
     };
   }
 
@@ -477,6 +499,21 @@ export class Helios {
     this.seek(frame);
   }
 
+  public setPlaybackRange(startFrame: number, endFrame: number) {
+    if (startFrame < 0 || endFrame <= startFrame) {
+      throw new HeliosError(
+        HeliosErrorCode.INVALID_PLAYBACK_RANGE,
+        `Invalid playback range: [${startFrame}, ${endFrame}]`,
+        "Ensure start >= 0 and end > start."
+      );
+    }
+    this._playbackRange.value = [startFrame, endFrame];
+  }
+
+  public clearPlaybackRange() {
+    this._playbackRange.value = null;
+  }
+
   // --- Subscription ---
   public subscribe(callback: HeliosSubscriber): () => void {
     const dispose = effect(() => {
@@ -607,32 +644,45 @@ export class Helios {
     const frameDelta = (deltaTime / 1000) * this.fps * playbackRate;
     const nextFrame = this._currentFrame.peek() + frameDelta;
     const shouldLoop = this._loop.peek();
+    const range = this._playbackRange.peek();
 
-    if (shouldLoop && totalFrames > 0) {
-      if (playbackRate > 0 && nextFrame >= totalFrames) {
+    const startFrame = range ? range[0] : 0;
+    const endFrame = range ? range[1] : totalFrames;
+    const rangeDuration = endFrame - startFrame;
+
+    if (shouldLoop && rangeDuration > 0) {
+      if (playbackRate > 0 && nextFrame >= endFrame) {
         // Wrap around
-        this._currentFrame.value = nextFrame % totalFrames;
-      } else if (playbackRate < 0 && nextFrame < 0) {
-        // Wrap around (handling negative modulo behavior in JS)
-        this._currentFrame.value = totalFrames + (nextFrame % totalFrames);
+        const overflow = nextFrame - startFrame;
+        this._currentFrame.value = startFrame + (overflow % rangeDuration);
+      } else if (playbackRate < 0 && nextFrame < startFrame) {
+        // Wrap around
+        const overflow = nextFrame - startFrame;
+        // JS modulo of negative is negative, so add rangeDuration to ensure positive
+        this._currentFrame.value = startFrame + (rangeDuration + (overflow % rangeDuration)) % rangeDuration;
       } else {
         this._currentFrame.value = nextFrame;
       }
     } else {
       if (playbackRate > 0) {
-        if (nextFrame >= totalFrames) {
-          this._currentFrame.value = totalFrames - 1;
-          this.pause();
-          return;
+        if (nextFrame >= endFrame) {
+          this._currentFrame.value = Math.max(startFrame, Math.min(nextFrame, endFrame));
+          if (this._currentFrame.value === endFrame) {
+            this.pause();
+            return;
+          }
+        } else {
+          this._currentFrame.value = nextFrame;
         }
       } else {
-        if (nextFrame <= 0) {
-          this._currentFrame.value = 0;
+        if (nextFrame <= startFrame) {
+          this._currentFrame.value = startFrame;
           this.pause();
           return;
+        } else {
+             this._currentFrame.value = nextFrame;
         }
       }
-      this._currentFrame.value = nextFrame;
     }
 
     this.driver.update((this._currentFrame.peek() / this.fps) * 1000, {

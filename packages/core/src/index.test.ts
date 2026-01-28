@@ -21,6 +21,7 @@ describe('Helios Core', () => {
       captions: [],
       activeCaptions: [],
       markers: [],
+      playbackRange: null,
     });
   });
 
@@ -342,7 +343,7 @@ describe('Helios Core', () => {
 
         ticker.tick(3000); // 3 seconds, should overshoot
 
-        expect(helios.getState().currentFrame).toBe(59); // clamped to totalFrames - 1
+        expect(helios.getState().currentFrame).toBe(60); // clamped to totalFrames (end)
         expect(helios.getState().isPlaying).toBe(false);
     });
   });
@@ -827,7 +828,7 @@ Updated`;
 
       ticker.tick(1000 / 30);
 
-      expect(helios.getState().currentFrame).toBe(59); // Clamped
+      expect(helios.getState().currentFrame).toBe(60); // Clamped to end
       expect(helios.getState().isPlaying).toBe(false); // Paused
     });
 
@@ -903,6 +904,108 @@ Updated`;
       const markers = helios.markers.peek();
       expect(markers[0].id).toBe('m1');
       expect(markers[1].id).toBe('m2');
+    });
+  });
+
+  describe('Playback Range', () => {
+    it('should initialize with default null range', () => {
+      const helios = new Helios({ duration: 10, fps: 30 });
+      expect(helios.playbackRange.peek()).toBeNull();
+      expect(helios.getState().playbackRange).toBeNull();
+    });
+
+    it('should initialize with provided range', () => {
+      const helios = new Helios({ duration: 10, fps: 30, playbackRange: [30, 60] });
+      expect(helios.playbackRange.peek()).toEqual([30, 60]);
+    });
+
+    it('should throw for invalid range in constructor', () => {
+      expect(() => new Helios({ duration: 10, fps: 30, playbackRange: [-10, 20] })).toThrow(HeliosError);
+      expect(() => new Helios({ duration: 10, fps: 30, playbackRange: [20, 20] })).toThrow(HeliosError);
+      expect(() => new Helios({ duration: 10, fps: 30, playbackRange: [30, 20] })).toThrow(HeliosError);
+    });
+
+    it('should update range via setPlaybackRange', () => {
+      const helios = new Helios({ duration: 10, fps: 30 });
+      helios.setPlaybackRange(10, 20);
+      expect(helios.playbackRange.peek()).toEqual([10, 20]);
+    });
+
+    it('should throw for invalid range in setPlaybackRange', () => {
+      const helios = new Helios({ duration: 10, fps: 30 });
+      expect(() => helios.setPlaybackRange(-5, 10)).toThrow(HeliosError);
+      expect(() => helios.setPlaybackRange(10, 5)).toThrow(HeliosError);
+    });
+
+    it('should clear range via clearPlaybackRange', () => {
+      const helios = new Helios({ duration: 10, fps: 30, playbackRange: [10, 20] });
+      helios.clearPlaybackRange();
+      expect(helios.playbackRange.peek()).toBeNull();
+    });
+
+    it('should loop within range', () => {
+      const ticker = new ManualTicker();
+      const helios = new Helios({ duration: 10, fps: 30, loop: true, playbackRange: [30, 60], ticker });
+
+      // Start just before end of range
+      helios.seek(59);
+      helios.play();
+
+      // Tick 2 frames (66.6ms) => +2 frames
+      ticker.tick(2000 / 30);
+
+      // 59 + 2 = 61.
+      // Range duration = 30.
+      // 61 >= 60. Overflow = 61 - 30 = 31.
+      // 30 + (31 % 30) = 30 + 1 = 31.
+      expect(helios.getState().currentFrame).toBeCloseTo(31, 0);
+    });
+
+    it('should clamp to end of range when not looping', () => {
+      const ticker = new ManualTicker();
+      const helios = new Helios({ duration: 10, fps: 30, loop: false, playbackRange: [30, 60], ticker });
+
+      helios.seek(59);
+      helios.play();
+
+      ticker.tick(2000 / 30); // +2 frames => 61
+
+      // Should clamp to 60 and pause
+      expect(helios.getState().currentFrame).toBe(60);
+      expect(helios.getState().isPlaying).toBe(false);
+    });
+
+    it('should wrap correctly when playing backwards in range', () => {
+        const ticker = new ManualTicker();
+        const helios = new Helios({ duration: 10, fps: 30, loop: true, playbackRange: [30, 60], ticker });
+
+        helios.seek(31);
+        helios.setPlaybackRate(-1);
+        helios.play();
+
+        // Tick 2 frames backwards
+        ticker.tick(2000 / 30);
+
+        // 31 - 2 = 29.
+        // 29 < 30.
+        // Overflow = 29 - 30 = -1.
+        // Duration = 30.
+        // 30 + (30 + -1) % 30 = 30 + 29 = 59.
+        expect(helios.getState().currentFrame).toBeCloseTo(59, 0);
+    });
+
+    it('should clamp start when playing backwards without loop', () => {
+        const ticker = new ManualTicker();
+        const helios = new Helios({ duration: 10, fps: 30, loop: false, playbackRange: [30, 60], ticker });
+
+        helios.seek(31);
+        helios.setPlaybackRate(-1);
+        helios.play();
+
+        ticker.tick(2000 / 30); // -2 frames => 29
+
+        expect(helios.getState().currentFrame).toBe(30);
+        expect(helios.getState().isPlaying).toBe(false);
     });
   });
 });
