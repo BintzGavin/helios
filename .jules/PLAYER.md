@@ -17,3 +17,7 @@
 ## 2026-03-01 - Memory Hallucination
 **Learning:** The memory stated that `interactive` attribute was implemented, but the code lacked it. Memories can hallucinate features.
 **Action:** Always verify "known" features against the actual codebase (`read_file`) before assuming they exist.
+
+## 2026-01-28 - Standard Media API Completeness
+**Learning:** "Standard Media API" compliance requires both methods (play, pause) AND properties (src, loop, autoplay) that reflect attributes. Missing properties force developers to use `setAttribute`, breaking expected patterns.
+**Action:** When auditing standard compliance, check `HTMLMediaElement` interface for both methods and properties.
