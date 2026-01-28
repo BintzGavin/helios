@@ -613,6 +613,13 @@ export class Helios {
             if (frame !== this._currentFrame.peek()) {
                  this._currentFrame.value = frame;
             }
+
+            this.driver.update(currentTime, {
+                isPlaying: false,
+                playbackRate: this._playbackRate.peek(),
+                volume: this._volume.peek(),
+                muted: this._muted.peek()
+            });
         }
         requestAnimationFrame(poll);
     };

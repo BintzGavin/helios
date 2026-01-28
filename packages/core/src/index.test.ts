@@ -160,6 +160,30 @@ describe('Helios Core', () => {
 
         helios.unbindFromDocumentTimeline();
     });
+
+    it('should propagate document timeline updates to driver', async () => {
+        const mockDriver: TimeDriver = {
+           init: vi.fn(),
+           update: vi.fn(),
+           waitUntilStable: vi.fn().mockResolvedValue(undefined)
+        };
+
+        const helios = new Helios({ duration: 10, fps: 30, driver: mockDriver });
+        helios.bindToDocumentTimeline();
+
+        // Simulate time passing in document.timeline
+        (document.timeline as any).currentTime = 1000; // 1 second
+
+        // Wait for polling loop
+        await new Promise(resolve => setTimeout(resolve, 50));
+
+        // Expect driver update to be called with correct time
+        expect(mockDriver.update).toHaveBeenCalledWith(1000, expect.objectContaining({
+            isPlaying: false
+        }));
+
+        helios.unbindFromDocumentTimeline();
+    });
   });
 
   describe('WAAPI Synchronization', () => {
