@@ -9,3 +9,7 @@
 ## 2026-03-01 - Test Plan Specificity
 **Learning:** If the Test Plan mentions adding or modifying specific test files (e.g., `controllers.test.ts`), those files MUST be listed in the "Modify" section of the File Inventory, and they MUST be read during the Exploration phase.
 **Action:** Always cross-reference the Test Plan with the File Inventory and Exploration steps.
+
+## 2026-03-01 - Interactive Mode Default
+**Learning:** Defaulting to standard video behavior (click-to-pause) is safer for a "Player" component to align with user expectations, even if it changes existing behavior (clicks passing through), provided an opt-out (`interactive` attribute) is available.
+**Action:** When refining UI components, prioritize standard UX patterns over incidental behaviors (like click-through), but provide configuration for the alternative.
