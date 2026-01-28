@@ -1,7 +1,7 @@
 <script>
   import { setContext } from 'svelte';
   import { derived } from 'svelte/store';
-  import { Helios } from '../../../packages/core/dist/index.js';
+  import { Helios } from '../../../packages/core/src/index.ts';
   import { createHeliosStore } from './lib/store';
   import { FRAME_CONTEXT_KEY } from './lib/context';
   import Sequence from './lib/Sequence.svelte';

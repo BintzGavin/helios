@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Helios } from '../../../packages/core/dist/index.js';
+import { Helios } from '../../../packages/core/src/index.ts';
 import { Sequence } from './components/Sequence';
 
 // Initialize Helios outside component to avoid recreation

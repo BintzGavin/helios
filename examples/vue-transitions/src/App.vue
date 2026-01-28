@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted, onUnmounted, provide } from 'vue';
-import { Helios } from '../../../packages/core/dist/index.js';
+import { Helios } from '../../../packages/core/src/index.ts';
 import Sequence from './components/Sequence.vue';
 
 const currentFrame = ref(0);

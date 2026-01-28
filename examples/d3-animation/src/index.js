@@ -1,4 +1,4 @@
-import { Helios } from '../../../packages/core/dist/index.js';
+import { Helios } from '../../../packages/core/src/index.ts';
 import * as d3 from 'd3';
 import { DATA_SERIES } from './data.js';
 

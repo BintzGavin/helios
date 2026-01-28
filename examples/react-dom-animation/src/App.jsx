@@ -1,5 +1,5 @@
 import React from 'react';
-import { Helios } from '../../../packages/core/dist/index.js';
+import { Helios } from '../../../packages/core/src/index.ts';
 import { useVideoFrame } from './hooks/useVideoFrame';
 
 const duration = 5;

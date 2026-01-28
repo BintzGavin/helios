@@ -50,6 +50,7 @@ export default defineConfig({
         svelte_transitions: resolve(__dirname, "examples/svelte-transitions/composition.html"),
         vue_transitions: resolve(__dirname, "examples/vue-transitions/composition.html"),
         variable_font: resolve(__dirname, "examples/variable-font-animation/composition.html"),
+        react_styled_components: resolve(__dirname, "examples/react-styled-components/composition.html"),
       },
     },
   },

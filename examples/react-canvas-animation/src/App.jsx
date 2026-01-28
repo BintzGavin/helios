@@ -1,5 +1,5 @@
 import React, { useRef, useEffect } from 'react';
-import { Helios } from '../../../packages/core/dist/index.js';
+import { Helios } from '../../../packages/core/src/index.ts';
 import { useVideoFrame } from './hooks/useVideoFrame';
 
 // Initialize Helios outside the component to keep a stable instance

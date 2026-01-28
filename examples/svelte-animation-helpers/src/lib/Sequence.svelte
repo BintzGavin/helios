@@ -1,7 +1,7 @@
 <script>
   import { getContext, setContext, onDestroy } from 'svelte';
   import { derived, writable } from 'svelte/store';
-  import { sequence } from '../../../../packages/core/dist/index.js';
+  import { sequence } from '../../../../packages/core/src/index.ts';
   import { FRAME_CONTEXT_KEY, SERIES_CONTEXT_KEY } from './context';
 
   export let from = 0;

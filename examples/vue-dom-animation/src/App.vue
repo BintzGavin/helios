@@ -1,5 +1,5 @@
 <script setup>
-import { Helios } from '../../../packages/core/dist/index.js';
+import { Helios } from '../../../packages/core/src/index.ts';
 import { useVideoFrame } from './composables/useVideoFrame';
 
 // Initialize Helios singleton

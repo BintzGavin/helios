@@ -1,5 +1,5 @@
 import { useContext } from 'react';
-import { sequence } from '../../../../packages/core/dist/index.js';
+import { sequence } from '../../../../packages/core/src/index.ts';
 import { FrameContext } from './FrameContext';
 
 export const Sequence = ({ from, durationInFrames, children }) => {

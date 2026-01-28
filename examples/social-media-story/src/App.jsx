@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Helios, spring, interpolate } from '../../../packages/core/dist/index.js';
+import { Helios, spring, interpolate } from '../../../packages/core/src/index.ts';
 import { FrameContext } from './context/FrameContext';
 import { useVideoFrame } from './hooks/useVideoFrame';
 import { StorySequence } from './components/StorySequence';

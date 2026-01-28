@@ -1,4 +1,4 @@
-import { Helios } from '../../../packages/core/dist/index.js';
+import { Helios } from '../../../packages/core/src/index.ts';
 import Chart from 'chart.js/auto';
 
 // Init Helios
