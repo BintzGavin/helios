@@ -547,7 +547,7 @@ export class Helios {
    * Useful for deterministic rendering.
    */
   public async waitUntilStable(): Promise<void> {
-    return this.driver.waitUntilStable?.() ?? Promise.resolve();
+    return this.driver.waitUntilStable();
   }
 
   /**

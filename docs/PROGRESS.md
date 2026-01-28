@@ -153,3 +153,6 @@ Each agent should update **their own dedicated progress file** instead of this f
 
 ## PLAYER v0.26.0
 - ✅ Completed: Bridge Error Propagation - Implemented global error handling in `bridge.ts` and `HeliosController`.
+
+## CORE v2.0.0
+- ✅ Completed: WaitUntilStable Interface - Made `waitUntilStable` required in `TimeDriver` interface and strict in `Helios` to ensure reliable rendering.
