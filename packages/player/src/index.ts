@@ -456,7 +456,7 @@ export class HeliosPlayer extends HTMLElement {
   }
 
   static get observedAttributes() {
-    return ["src", "width", "height", "autoplay", "loop", "controls", "export-format", "input-props", "poster"];
+    return ["src", "width", "height", "autoplay", "loop", "controls", "export-format", "input-props", "poster", "muted"];
   }
 
   constructor() {
@@ -531,6 +531,12 @@ export class HeliosPlayer extends HTMLElement {
         }
       } catch (e) {
         console.warn("HeliosPlayer: Invalid JSON in input-props", e);
+      }
+    }
+
+    if (name === "muted") {
+      if (this.controller) {
+        this.controller.setAudioMuted(this.hasAttribute("muted"));
       }
     }
   }
@@ -771,6 +777,10 @@ export class HeliosPlayer extends HTMLElement {
 
       if (this.pendingProps) {
         this.controller.setInputProps(this.pendingProps);
+      }
+
+      if (this.hasAttribute("muted")) {
+        this.controller.setAudioMuted(true);
       }
 
       const state = this.controller.getState();

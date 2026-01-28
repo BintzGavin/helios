@@ -1,5 +1,8 @@
 # PLAYER Progress Log
 
+## PLAYER v0.27.0
+- ✅ Completed: Implement Muted Attribute - Added support for the `muted` attribute to `<helios-player>`, enabling declarative control of audio mute state.
+
 ## PLAYER v0.26.0
 - ✅ Completed: Bridge Error Propagation - Implemented global error handling in `bridge.ts` and `HeliosController`, enabling the player UI to display runtime errors from the composition.
 

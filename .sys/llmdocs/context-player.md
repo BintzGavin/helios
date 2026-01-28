@@ -36,6 +36,7 @@ The `<helios-player>` observes the following attributes:
 - `input-props`: JSON string of input properties to pass to the composition.
 - `poster`: URL of an image to show before loading or playing.
 - `preload`: `auto` (default) or `none` (defer loading until interaction).
+- `muted`: Mute the audio by default.
 
 ## Public API
 The `HeliosPlayer` class exposes the following properties and methods:
