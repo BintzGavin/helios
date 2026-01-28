@@ -5,10 +5,11 @@ The Studio is a Vite-based React application that provides a development environ
 
 Key components:
 - **CLI**: `npx helios studio` starts the Vite dev server.
+- **Preview**: `npm run preview` runs a production-like server with file system access.
 - **Server**: Discovery logic for compositions and assets.
 - **UI**: React app with Timeline, Props Editor, Preview Stage.
 - **Controller**: Manages `Helios` instance via `useStudio` context.
-- **Verification**: `npm run verify` checks UI integrity using Playwright.
+- **Verification**: `npm run verify` checks UI integrity using Playwright (supports `MODE=preview`).
 
 ## B. File Tree
 packages/studio/

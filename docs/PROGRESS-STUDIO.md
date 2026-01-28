@@ -1,3 +1,6 @@
+## STUDIO v0.42.0
+- ✅ Completed: Production Preview - Enabled production preview server with `/@fs/` middleware and verified functionality.
+
 ## STUDIO v0.41.0
 - ✅ Completed: Asset Input - Implemented `AssetInput` in Props Editor with asset discovery integration.
 

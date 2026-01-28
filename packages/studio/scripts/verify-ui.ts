@@ -7,7 +7,8 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const PORT = 5173;
+const MODE = process.env.MODE || 'dev';
+const PORT = process.env.PORT ? parseInt(process.env.PORT) : (MODE === 'preview' ? 4173 : 5173);
 const URL = `http://localhost:${PORT}`;
 const STUDIO_DIR = path.resolve(__dirname, '..');
 
@@ -26,11 +27,13 @@ async function waitForServer(url: string, timeout = 30000): Promise<boolean> {
 }
 
 async function verifyStudio() {
-  console.log('Starting Studio verification...');
+  console.log(`Starting Studio verification in ${MODE} mode on port ${PORT}...`);
 
   // Start the server
-  console.log('Launching dev server...');
-  const server: ChildProcess = spawn('npm', ['run', 'dev'], {
+  console.log(`Launching ${MODE} server...`);
+  const npmScript = MODE === 'preview' ? 'preview' : 'dev';
+
+  const server: ChildProcess = spawn('npm', ['run', npmScript, '--', '--port', String(PORT)], {
     cwd: STUDIO_DIR,
     stdio: 'ignore',
     shell: true,
