@@ -1,4 +1,4 @@
-import { TimeDriver } from './TimeDriver';
+import { TimeDriver } from './TimeDriver.js';
 
 export class NoopDriver implements TimeDriver {
   init(scope: HTMLElement | Document) {

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { Easing } from './easing';
+import { Easing } from './easing.js';
 
 describe('Easing', () => {
   it('Easing.linear', () => {

@@ -1,9 +1,9 @@
-import { TimeDriver, WaapiDriver, DomDriver, NoopDriver, Ticker, RafTicker, TimeoutTicker } from './drivers';
-import { signal, effect, computed, Signal, ReadonlySignal } from './signals';
-import { HeliosError, HeliosErrorCode } from './errors';
-import { HeliosSchema, validateProps } from './schema';
-import { CaptionCue, parseSrt, findActiveCues, areCuesEqual } from './captions';
-import { Marker, validateMarker, validateMarkers } from './markers';
+import { TimeDriver, WaapiDriver, DomDriver, NoopDriver, Ticker, RafTicker, TimeoutTicker } from './drivers/index.js';
+import { signal, effect, computed, Signal, ReadonlySignal } from './signals.js';
+import { HeliosError, HeliosErrorCode } from './errors.js';
+import { HeliosSchema, validateProps } from './schema.js';
+import { CaptionCue, parseSrt, findActiveCues, areCuesEqual } from './captions.js';
+import { Marker, validateMarker, validateMarkers } from './markers.js';
 
 export type HeliosState = {
   width: number;
@@ -51,18 +51,18 @@ export interface DiagnosticReport {
   userAgent: string;
 }
 
-export * from './animation';
-export * from './drivers';
-export * from './easing';
-export * from './sequencing';
-export * from './signals';
-export * from './errors';
-export * from './captions';
-export * from './schema';
-export * from './random';
-export * from './color';
-export * from './timecode';
-export * from './markers';
+export * from './animation.js';
+export * from './drivers/index.js';
+export * from './easing.js';
+export * from './sequencing.js';
+export * from './signals.js';
+export * from './errors.js';
+export * from './captions.js';
+export * from './schema.js';
+export * from './random.js';
+export * from './color.js';
+export * from './timecode.js';
+export * from './markers.js';
 
 export class Helios {
   // Constants

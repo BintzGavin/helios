@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { Helios } from './index';
-import { TimeDriver } from './drivers';
+import { Helios } from './index.js';
+import { TimeDriver } from './drivers/index.js';
 
 describe('Helios Audio', () => {
   let mockDriver: TimeDriver;

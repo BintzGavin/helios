@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { validateProps } from './schema';
-import { HeliosError, HeliosErrorCode } from './errors';
+import { validateProps } from './schema.js';
+import { HeliosError, HeliosErrorCode } from './errors.js';
 
 describe('validateProps', () => {
   it('should return props as-is if no schema is provided', () => {

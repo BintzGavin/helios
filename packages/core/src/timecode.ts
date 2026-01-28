@@ -1,4 +1,4 @@
-import { HeliosError, HeliosErrorCode } from './errors';
+import { HeliosError, HeliosErrorCode } from './errors.js';
 
 export function framesToTimecode(frame: number, fps: number): string {
   if (fps <= 0) {

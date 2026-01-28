@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { Helios } from './index';
-import { effect } from './signals';
+import { Helios } from './index.js';
+import { effect } from './signals.js';
 
 describe('Helios Signals API', () => {
   beforeEach(() => {

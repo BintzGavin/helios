@@ -1,4 +1,4 @@
-import { Ticker, TickCallback } from './Ticker';
+import { Ticker, TickCallback } from './Ticker.js';
 
 export class TimeoutTicker implements Ticker {
   private running = false;

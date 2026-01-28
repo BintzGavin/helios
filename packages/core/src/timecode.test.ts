@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { framesToTimecode, timecodeToFrames, framesToTimestamp } from './timecode';
-import { HeliosError, HeliosErrorCode } from './errors';
+import { framesToTimecode, timecodeToFrames, framesToTimestamp } from './timecode.js';
+import { HeliosError, HeliosErrorCode } from './errors.js';
 
 describe('Timecode Utilities', () => {
   describe('framesToTimecode', () => {

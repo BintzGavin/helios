@@ -1,4 +1,4 @@
-import { Ticker, TickCallback } from './Ticker';
+import { Ticker, TickCallback } from './Ticker.js';
 
 export class ManualTicker implements Ticker {
   private callback: TickCallback | null = null;
