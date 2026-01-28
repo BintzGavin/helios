@@ -119,3 +119,6 @@
 
 ## [2026-01-15] CORE
 - Updated `Helios` class in `packages/core` to support `bindToDocumentTimeline()`. Added unit tests.
+
+### CORE v1.33.0
+- ✅ Completed: Implement WaitUntilStable - Implemented `waitUntilStable` in `Helios` and `DomDriver` to ensure deterministic rendering by waiting for fonts, images, and media readiness.

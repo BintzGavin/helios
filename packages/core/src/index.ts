@@ -541,6 +541,16 @@ export class Helios {
   }
 
   /**
+   * Waits for the composition to stabilize.
+   * This ensures that all asynchronous operations (like image loading, font loading,
+   * and media seeking) triggered by the last seek/update are complete.
+   * Useful for deterministic rendering.
+   */
+  public async waitUntilStable(): Promise<void> {
+    return this.driver.waitUntilStable?.() ?? Promise.resolve();
+  }
+
+  /**
    * Binds the Helios instance to document.timeline.
    * This is useful when the timeline is being driven externally (e.g. by the Renderer).
    * Helios will poll document.timeline.currentTime and update its internal state.

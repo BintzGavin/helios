@@ -77,6 +77,65 @@ export class DomDriver implements TimeDriver {
     this.syncMediaElements(timeInMs, options);
   }
 
+  async waitUntilStable(): Promise<void> {
+    if (!this.scope) return;
+    if (typeof document === 'undefined') return;
+
+    // 1. Fonts
+    // @ts-ignore - document.fonts might not be in all TS defs
+    const fontPromise = document.fonts ? document.fonts.ready : Promise.resolve();
+
+    // 2. Images
+    const getImages = () => {
+      if (this.scope instanceof Document) return Array.from(this.scope.images);
+      if (this.scope && 'querySelectorAll' in this.scope) {
+        return Array.from((this.scope as Element).querySelectorAll('img'));
+      }
+      return [];
+    };
+
+    const imagePromises = getImages().map((img: HTMLImageElement) => {
+      if (img.complete) return Promise.resolve();
+      return img.decode().catch(() => {});
+    });
+
+    // 3. Media
+    const mediaPromises = Array.from(this.mediaElements).map(el => {
+      return new Promise<void>((resolve) => {
+        if (el.error) return resolve(); // Don't block on error
+
+        // Check if ready
+        // readyState 2 = HAVE_CURRENT_DATA
+        // If we are seeking, we must wait for 'seeked'.
+        // If we are not seeking, but have no data, we wait for 'canplay'.
+        const isReady = !el.seeking && el.readyState >= 2;
+        if (isReady) return resolve();
+
+        const onReady = () => {
+          cleanup();
+          resolve();
+        };
+
+        const onError = () => {
+          cleanup();
+          resolve();
+        };
+
+        const cleanup = () => {
+          el.removeEventListener('seeked', onReady);
+          el.removeEventListener('canplay', onReady);
+          el.removeEventListener('error', onError);
+        };
+
+        el.addEventListener('seeked', onReady);
+        el.addEventListener('canplay', onReady);
+        el.addEventListener('error', onError);
+      });
+    });
+
+    await Promise.all([fontPromise, ...imagePromises, ...mediaPromises]);
+  }
+
   private syncWaapiAnimations(timeInMs: number) {
     let anims: Animation[] = [];
 
