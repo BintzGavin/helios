@@ -1,11 +1,12 @@
 # Status: CORE
 
-**Version**: 2.3.0
+**Version**: 2.4.0
 
 - **Status**: Active
 - **Current Focus**: Maintenance and Optimization
 - **Last Updated**: 2026-03-31
 
+[v2.4.0] ✅ Completed: Implement Spring Duration - Added `calculateSpringDuration` utility and exported `DEFAULT_SPRING_CONFIG` in `packages/core`.
 [v2.3.0] ✅ Completed: Implement Transitions Library - Implemented standard transition and crossfade functions, and corrected README installation instructions.
 [v2.2.0] ✅ Completed: Implement Playback Range - Added `playbackRange` to `HeliosState`, enabling loop and clamp behavior within a specific frame range.
 [v2.1.0] ✅ Completed: ESM Compliance - Converted package to native ESM with "type": "module", "moduleResolution": "node16", and explicit .js extensions.

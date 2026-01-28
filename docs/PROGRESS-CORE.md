@@ -1,5 +1,8 @@
 # CORE Progress Log
 
+## CORE v2.4.0
+- ✅ Completed: Implement Spring Duration - Added `calculateSpringDuration` utility and exported `DEFAULT_SPRING_CONFIG` in `packages/core`.
+
 ## CORE v2.3.0
 - ✅ Completed: Implement Transitions Library - Implemented standard transition and crossfade functions, and corrected README installation instructions.
 

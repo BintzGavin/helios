@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { interpolate, spring } from './animation.js';
+import { interpolate, spring, calculateSpringDuration } from './animation.js';
 import { HeliosError, HeliosErrorCode } from './errors.js';
 
 describe('interpolate', () => {
@@ -81,6 +81,75 @@ describe('interpolate', () => {
     } catch (e) {
       expect(e).toBeInstanceOf(HeliosError);
       expect((e as HeliosError).code).toBe(HeliosErrorCode.UNSORTED_INPUT_RANGE);
+    }
+  });
+});
+
+describe('calculateSpringDuration', () => {
+  it('returns 0 if from equals to', () => {
+    expect(calculateSpringDuration({ fps: 30, from: 10, to: 10 })).toBe(0);
+  });
+
+  it('calculates duration for default spring', () => {
+    const duration = calculateSpringDuration({ fps: 30, from: 0, to: 100 });
+    expect(duration).toBeGreaterThan(0);
+
+    // Verify settling
+    const val = spring({ frame: duration, fps: 30, from: 0, to: 100 });
+    expect(Math.abs(val - 100)).toBeLessThan(0.001);
+  });
+
+  it('returns valid duration for overdamped spring', () => {
+    const config = { damping: 50, stiffness: 100, mass: 1 }; // Overdamped
+    const duration = calculateSpringDuration({ fps: 30, from: 0, to: 100, config });
+
+    const val = spring({ frame: duration, fps: 30, from: 0, to: 100, config });
+    expect(Math.abs(val - 100)).toBeLessThan(0.001);
+  });
+
+  it('returns valid duration for critically damped spring', () => {
+    const config = { damping: 20, stiffness: 100, mass: 1 }; // Critical
+    const duration = calculateSpringDuration({ fps: 30, from: 0, to: 100, config });
+
+    const val = spring({ frame: duration, fps: 30, from: 0, to: 100, config });
+    expect(Math.abs(val - 100)).toBeLessThan(0.001);
+  });
+
+  it('respects overshootClamping', () => {
+    const config = { damping: 2, stiffness: 100, mass: 1, overshootClamping: true };
+    const duration = calculateSpringDuration({ fps: 30, from: 0, to: 100, config });
+
+    const val = spring({ frame: duration, fps: 30, from: 0, to: 100, config });
+    expect(val).toBe(100); // Should be exactly clamped
+
+    // Duration should be relatively short (first crossing)
+    expect(duration).toBeLessThan(60 * 30);
+  });
+
+  it('respects custom threshold', () => {
+    const config = { damping: 10, stiffness: 100, mass: 1 };
+    const durStrict = calculateSpringDuration({ fps: 30, from: 0, to: 100, config }, 0.001);
+    const durLoose = calculateSpringDuration({ fps: 30, from: 0, to: 100, config }, 10.0);
+
+    expect(durLoose).toBeLessThan(durStrict);
+  });
+
+  it('throws on invalid inputs', () => {
+    expect.assertions(3);
+    try {
+      calculateSpringDuration({ fps: -1 });
+    } catch (e) {
+      expect((e as HeliosError).code).toBe(HeliosErrorCode.INVALID_FPS);
+    }
+    try {
+        calculateSpringDuration({ fps: 30, config: { mass: -1 } });
+    } catch (e) {
+        expect((e as HeliosError).code).toBe(HeliosErrorCode.INVALID_SPRING_CONFIG);
+    }
+    try {
+        calculateSpringDuration({ fps: 30, config: { stiffness: -1 } });
+    } catch (e) {
+        expect((e as HeliosError).code).toBe(HeliosErrorCode.INVALID_SPRING_CONFIG);
     }
   });
 });

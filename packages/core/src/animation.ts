@@ -108,6 +108,13 @@ export interface SpringConfig {
   overshootClamping?: boolean; // default: false
 }
 
+export const DEFAULT_SPRING_CONFIG: Required<SpringConfig> = {
+  mass: 1,
+  stiffness: 100,
+  damping: 10,
+  overshootClamping: false
+};
+
 export interface SpringOptions {
   frame: number;
   fps: number;
@@ -138,7 +145,12 @@ export function spring(options: SpringOptions): number {
   const t = frame / fps;
   if (t <= 0) return from;
 
-  const { mass = 1, stiffness = 100, damping = 10, overshootClamping = false } = config;
+  const {
+    mass = DEFAULT_SPRING_CONFIG.mass,
+    stiffness = DEFAULT_SPRING_CONFIG.stiffness,
+    damping = DEFAULT_SPRING_CONFIG.damping,
+    overshootClamping = DEFAULT_SPRING_CONFIG.overshootClamping
+  } = config;
 
   if (mass <= 0) throw new HeliosError(HeliosErrorCode.INVALID_SPRING_CONFIG, "Spring mass must be > 0", "Set mass to a positive number.");
   if (stiffness <= 0) throw new HeliosError(HeliosErrorCode.INVALID_SPRING_CONFIG, "Spring stiffness must be > 0", "Set stiffness to a positive number.");
@@ -174,4 +186,57 @@ export function spring(options: SpringOptions): number {
   }
 
   return value;
+}
+
+/**
+ * Calculates the number of frames required for a spring simulation to settle within a threshold.
+ *
+ * @param options Spring configuration options (excluding frame).
+ * @param threshold The distance from the target value to consider settled (default: 0.001).
+ * @returns The estimated duration in frames.
+ */
+export function calculateSpringDuration(options: Omit<SpringOptions, 'frame'>, threshold = 0.001): number {
+  const { fps, config = {}, from = 0, to = 1 } = options;
+  const {
+    mass = DEFAULT_SPRING_CONFIG.mass,
+    stiffness = DEFAULT_SPRING_CONFIG.stiffness,
+    damping = DEFAULT_SPRING_CONFIG.damping,
+    overshootClamping = DEFAULT_SPRING_CONFIG.overshootClamping
+  } = config;
+
+  if (from === to) return 0;
+  if (fps <= 0) throw new HeliosError(HeliosErrorCode.INVALID_FPS, "FPS must be > 0", "Set fps to a positive number.");
+  if (mass <= 0) throw new HeliosError(HeliosErrorCode.INVALID_SPRING_CONFIG, "Spring mass must be > 0", "Set mass to a positive number.");
+  if (stiffness <= 0) throw new HeliosError(HeliosErrorCode.INVALID_SPRING_CONFIG, "Spring stiffness must be > 0", "Set stiffness to a positive number.");
+
+  const diff = Math.abs(to - from);
+  const omega_n = Math.sqrt(stiffness / mass);
+  const zeta = damping / (2 * Math.sqrt(stiffness * mass));
+
+  // Envelope method for underdamped springs without clamping
+  if (zeta < 1 && !overshootClamping) {
+    if (Math.abs(zeta * omega_n) < 1e-6) return fps * 60; // Damping approx 0, never settles
+    const t = -Math.log(threshold / diff) / (zeta * omega_n);
+    return Math.ceil(Math.max(0, t * fps));
+  }
+
+  // Iterative method for other cases (clamped, critically damped, overdamped)
+  // We cap iteration at 60 seconds to prevent infinite loops in edge cases
+  const maxFrames = fps * 60;
+
+  for (let f = 0; f < maxFrames; f++) {
+    const val = spring({ ...options, frame: f });
+
+    // If clamping is enabled, spring() returns 'to' when it overshoots.
+    if (overshootClamping && val === to) {
+      return f;
+    }
+
+    if (Math.abs(val - to) < threshold) {
+      // For overdamped/critical, settling is monotonic once close.
+      return f;
+    }
+  }
+
+  return maxFrames;
 }
