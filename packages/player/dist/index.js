@@ -704,7 +704,18 @@ export class HeliosPlayer extends HTMLElement {
             this.scrubber.max = String(state.duration * state.fps);
             this.updateUI(state);
         }
-        this.unsubscribe = this.controller.subscribe((s) => this.updateUI(s));
+        const unsubState = this.controller.subscribe((s) => this.updateUI(s));
+        const unsubError = this.controller.onError((err) => {
+            this.showStatus("Error: " + (err.message || String(err)), true, {
+                label: "Reload",
+                handler: () => this.retryConnection()
+            });
+            this.dispatchEvent(new CustomEvent('error', { detail: err }));
+        });
+        this.unsubscribe = () => {
+            unsubState();
+            unsubError();
+        };
         if (this.hasAttribute("autoplay")) {
             this.controller.play();
         }
@@ -991,7 +1002,8 @@ export class HeliosPlayer extends HTMLElement {
                 signal: this.abortController.signal,
                 mode: exportMode,
                 canvasSelector: canvasSelector,
-                format: exportFormat
+                format: exportFormat,
+                includeCaptions: this.showCaptions
             });
         }
         catch (e) {

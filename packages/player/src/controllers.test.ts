@@ -30,9 +30,11 @@ describe('DirectController', () => {
     let mockHeliosInstance: any;
     let controller: DirectController;
     let mockIframe: HTMLIFrameElement;
+    let iframeListeners: Record<string, EventListener[]> = {};
 
     beforeEach(() => {
         vi.clearAllMocks();
+        iframeListeners = {};
 
         mockHeliosInstance = {
             play: vi.fn(),
@@ -54,12 +56,21 @@ describe('DirectController', () => {
 
         const helios = new Helios({} as any);
 
-        // Mock iframe with RAF
+        // Mock iframe with RAF and EventListeners
         mockIframe = {
             contentWindow: {
                 requestAnimationFrame: (cb: Function) => {
                     cb();
                     return 1;
+                },
+                addEventListener: (event: string, handler: EventListener) => {
+                    if (!iframeListeners[event]) iframeListeners[event] = [];
+                    iframeListeners[event].push(handler);
+                },
+                removeEventListener: (event: string, handler: EventListener) => {
+                    if (iframeListeners[event]) {
+                        iframeListeners[event] = iframeListeners[event].filter(h => h !== handler);
+                    }
                 }
             },
             contentDocument: {
@@ -130,6 +141,32 @@ describe('DirectController', () => {
 
         const result = await controller.captureFrame(5, { mode: 'canvas' });
         expect(result).toBeNull();
+    });
+
+    it('should handle iframe errors', () => {
+        const onError = vi.fn();
+        const cleanup = controller.onError(onError);
+
+        expect(iframeListeners['error']).toHaveLength(1);
+        expect(iframeListeners['unhandledrejection']).toHaveLength(1);
+
+        // Simulate error
+        const errorEvent = {
+            message: 'Test Error',
+            filename: 'test.js',
+            lineno: 10,
+            colno: 5,
+            error: { stack: 'Stack trace' }
+        };
+        iframeListeners['error'][0](errorEvent as any);
+
+        expect(onError).toHaveBeenCalledWith(expect.objectContaining({
+            message: 'Test Error',
+            filename: 'test.js'
+        }));
+
+        cleanup();
+        expect(iframeListeners['error']).toHaveLength(0);
     });
 });
 
@@ -206,6 +243,21 @@ describe('BridgeController', () => {
         triggerMessage({ type: 'HELIOS_STATE', state: newState });
 
         expect(spy).toHaveBeenCalledWith(newState);
+    });
+
+    it('should notify error subscribers on HELIOS_ERROR', () => {
+        const spy = vi.fn();
+        const cleanup = controller.onError(spy);
+
+        const errorData = { message: 'Bridge Error' };
+        triggerMessage({ type: 'HELIOS_ERROR', error: errorData });
+
+        expect(spy).toHaveBeenCalledWith(errorData);
+
+        cleanup();
+
+        triggerMessage({ type: 'HELIOS_ERROR', error: { message: 'Ignored' } });
+        expect(spy).toHaveBeenCalledTimes(1);
     });
 
     it('should capture frame via bridge', async () => {

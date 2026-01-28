@@ -11,6 +11,7 @@ export interface HeliosController {
   setPlaybackRate(rate: number): void;
   setInputProps(props: Record<string, any>): void;
   subscribe(callback: (state: any) => void): () => void;
+  onError(callback: (err: any) => void): () => void;
   getState(): any;
   dispose(): void;
   captureFrame(frame: number, options?: { selector?: string, mode?: 'canvas' | 'dom' }): Promise<{ frame: VideoFrame, captions: CaptionCue[] } | null>;
@@ -29,6 +30,35 @@ export class DirectController implements HeliosController {
   subscribe(callback: (state: any) => void) { return this.instance.subscribe(callback); }
   getState() { return this.instance.getState(); }
   dispose() { /* No-op for direct */ }
+
+  onError(callback: (err: any) => void): () => void {
+    const target = this.iframe?.contentWindow || window;
+
+    const errorHandler = (event: ErrorEvent) => {
+      callback({
+        message: event.message,
+        filename: event.filename,
+        lineno: event.lineno,
+        colno: event.colno,
+        stack: event.error?.stack
+      });
+    };
+
+    const rejectionHandler = (event: PromiseRejectionEvent) => {
+      callback({
+        message: event.reason?.message || String(event.reason),
+        stack: event.reason?.stack
+      });
+    };
+
+    target.addEventListener('error', errorHandler as EventListener);
+    target.addEventListener('unhandledrejection', rejectionHandler as EventListener);
+
+    return () => {
+      target.removeEventListener('error', errorHandler as EventListener);
+      target.removeEventListener('unhandledrejection', rejectionHandler as EventListener);
+    };
+  }
 
   async getAudioTracks(): Promise<AudioAsset[]> {
      const doc = this.iframe?.contentDocument || document;
@@ -77,6 +107,7 @@ export class DirectController implements HeliosController {
 
 export class BridgeController implements HeliosController {
   private listeners: ((state: any) => void)[] = [];
+  private errorListeners: ((err: any) => void)[] = [];
   private lastState: any;
 
   constructor(private iframeWindow: Window, initialState?: any) {
@@ -89,11 +120,17 @@ export class BridgeController implements HeliosController {
     if (event.data?.type === 'HELIOS_STATE') {
       this.lastState = event.data.state;
       this.notifyListeners();
+    } else if (event.data?.type === 'HELIOS_ERROR') {
+      this.notifyErrorListeners(event.data.error);
     }
   }
 
   private notifyListeners() {
     this.listeners.forEach(cb => cb(this.lastState));
+  }
+
+  private notifyErrorListeners(err: any) {
+    this.errorListeners.forEach(cb => cb(err));
   }
 
   play() { this.iframeWindow.postMessage({ type: 'HELIOS_PLAY' }, '*'); }
@@ -113,10 +150,19 @@ export class BridgeController implements HeliosController {
     };
   }
 
+  onError(callback: (err: any) => void) {
+    this.errorListeners.push(callback);
+    return () => {
+      this.errorListeners = this.errorListeners.filter(l => l !== callback);
+    };
+  }
+
   getState() { return this.lastState; }
 
   dispose() {
       window.removeEventListener('message', this.handleMessage);
+      this.listeners = [];
+      this.errorListeners = [];
   }
 
   async captureFrame(frame: number, options?: { selector?: string, mode?: 'canvas' | 'dom' }): Promise<{ frame: VideoFrame, captions: CaptionCue[] } | null> {

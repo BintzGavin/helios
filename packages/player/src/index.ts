@@ -757,7 +757,20 @@ export class HeliosPlayer extends HTMLElement {
           this.updateUI(state);
       }
 
-      this.unsubscribe = this.controller.subscribe((s) => this.updateUI(s));
+      const unsubState = this.controller.subscribe((s) => this.updateUI(s));
+
+      const unsubError = this.controller.onError((err) => {
+        this.showStatus("Error: " + (err.message || String(err)), true, {
+            label: "Reload",
+            handler: () => this.retryConnection()
+        });
+        this.dispatchEvent(new CustomEvent('error', { detail: err }));
+      });
+
+      this.unsubscribe = () => {
+        unsubState();
+        unsubError();
+      };
 
       if (this.hasAttribute("autoplay")) {
         this.controller.play();
