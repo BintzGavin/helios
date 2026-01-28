@@ -84,6 +84,12 @@ export const AssetItem: React.FC<AssetItemProps> = ({ asset }) => {
       }
   };
 
+  const handleDragStart = (e: React.DragEvent) => {
+    e.dataTransfer.setData('application/helios-asset', JSON.stringify(asset));
+    e.dataTransfer.setData('text/plain', asset.url);
+    e.dataTransfer.effectAllowed = 'copy';
+  };
+
   const renderPreview = () => {
     switch (asset.type) {
         case 'image':
@@ -130,6 +136,8 @@ export const AssetItem: React.FC<AssetItemProps> = ({ asset }) => {
     <div
       className="asset-item"
       title={asset.name}
+      draggable={true}
+      onDragStart={handleDragStart}
       onMouseEnter={asset.type === 'video' ? handleVideoEnter : () => setIsHovering(true)}
       onMouseLeave={asset.type === 'video' ? handleVideoLeave : () => setIsHovering(false)}
     >

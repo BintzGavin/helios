@@ -113,3 +113,9 @@
   flex: 1;
   cursor: pointer;
 }
+
+.prop-input.drag-over {
+  border-color: #3296ff;
+  background-color: rgba(50, 150, 255, 0.1);
+  box-shadow: 0 0 0 2px rgba(50, 150, 255, 0.2);
+}

@@ -47,18 +47,52 @@ const AssetInput: React.FC<{ type: PropType; value: string; onChange: (val: stri
 }) => {
   const { assets } = useStudio();
   const listId = React.useId();
+  const [isDragOver, setIsDragOver] = React.useState(false);
 
   const filteredAssets = assets.filter((a) => a.type === type);
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(true);
+  };
+
+  const handleDragLeave = () => {
+    setIsDragOver(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(false);
+
+    const assetData = e.dataTransfer.getData('application/helios-asset');
+    if (assetData) {
+        try {
+            const asset = JSON.parse(assetData);
+            if (asset.type === type) {
+                onChange(asset.url);
+            }
+        } catch (e) {
+            console.error('Invalid asset data', e);
+        }
+    } else {
+        // Fallback for generic text
+        const text = e.dataTransfer.getData('text/plain');
+        if (text) onChange(text);
+    }
+  };
 
   return (
     <>
       <input
         type="text"
         list={listId}
-        className="prop-input"
+        className={`prop-input ${isDragOver ? 'drag-over' : ''}`}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={`Select ${type} or enter URL...`}
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+        onDrop={handleDrop}
       />
       <datalist id={listId}>
         {filteredAssets.map((asset) => (
@@ -153,12 +187,33 @@ const ColorInput: React.FC<{ value: string, onChange: (val: string) => void }> =
 };
 
 const StringInput: React.FC<{ value: string, onChange: (val: string) => void }> = ({ value, onChange }) => {
+  const [isDragOver, setIsDragOver] = React.useState(false);
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(true);
+  };
+
+  const handleDragLeave = () => {
+    setIsDragOver(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(false);
+    const text = e.dataTransfer.getData('text/plain');
+    if (text) onChange(text);
+  };
+
   return (
     <input
       type="text"
-      className="prop-input"
+      className={`prop-input ${isDragOver ? 'drag-over' : ''}`}
       value={value}
       onChange={(e) => onChange(e.target.value)}
+      onDragOver={handleDragOver}
+      onDragLeave={handleDragLeave}
+      onDrop={handleDrop}
     />
   );
 };
