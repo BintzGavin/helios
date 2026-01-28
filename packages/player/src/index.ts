@@ -289,7 +289,7 @@ template.innerHTML = `
       display: none;
     }
   </style>
-  <div class="status-overlay" part="overlay">
+  <div class="status-overlay hidden" part="overlay">
     <div class="status-text">Connecting...</div>
     <button class="retry-btn" style="display: none">Retry</button>
   </div>
@@ -573,7 +573,8 @@ export class HeliosPlayer extends HTMLElement {
 
     // Only show connecting if we haven't already shown "Loading..." via attributeChangedCallback
     // AND we are not deferring load (pendingSrc is null)
-    if (this.overlay.classList.contains("hidden") && !this.pendingSrc) {
+    // AND we don't have a poster (which should take precedence visually)
+    if (this.overlay.classList.contains("hidden") && !this.pendingSrc && !this.hasAttribute("poster")) {
         this.showStatus("Connecting...", false);
     }
 
@@ -627,7 +628,10 @@ export class HeliosPlayer extends HTMLElement {
       this.controller = null;
     }
     this.setControlsDisabled(true);
-    this.showStatus("Loading...", false);
+    // Only show status if no poster, to avoid flashing/overlaying
+    if (!this.hasAttribute("poster")) {
+      this.showStatus("Loading...", false);
+    }
     this.updatePosterVisibility();
   }
 
@@ -643,10 +647,27 @@ export class HeliosPlayer extends HTMLElement {
   }
 
   private updatePosterVisibility() {
-    if (this.pendingSrc || (this.hasAttribute("poster") && !this.isLoaded)) {
-       this.posterContainer.classList.remove("hidden");
+    if (this.pendingSrc) {
+      this.posterContainer.classList.remove("hidden");
+      return;
+    }
+
+    if (this.hasAttribute("poster")) {
+      let shouldHide = false;
+      if (this.controller) {
+        const state = this.controller.getState();
+        if (state.isPlaying || state.currentFrame > 0) {
+          shouldHide = true;
+        }
+      }
+
+      if (shouldHide) {
+        this.posterContainer.classList.add("hidden");
+      } else {
+        this.posterContainer.classList.remove("hidden");
+      }
     } else {
-       this.posterContainer.classList.add("hidden");
+      this.posterContainer.classList.add("hidden");
     }
   }
 

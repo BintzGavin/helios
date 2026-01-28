@@ -996,5 +996,15 @@ describe('HeliosPlayer', () => {
         // Poster should be hidden
         expect(posterContainer!.classList.contains('hidden')).toBe(true);
     });
+
+    it('should hide status overlay when poster is present (initial load)', () => {
+        const p = new HeliosPlayer();
+        p.setAttribute('poster', 'poster.jpg');
+        document.body.appendChild(p);
+
+        // Initial state
+        const overlay = p.shadowRoot!.querySelector('.status-overlay');
+        expect(overlay!.classList.contains('hidden')).toBe(true);
+    });
   });
 });

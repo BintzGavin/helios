@@ -7,7 +7,7 @@
 
 ## Component Structure
 The `<helios-player>` component uses a Shadow DOM with the following structure:
-- `.status-overlay`: Displays loading, error, and connection states.
+- `.status-overlay`: Displays loading, error, and connection states (hidden by default).
 - `.poster-container`: Displays the poster image and a "Big Play Button" for deferred loading.
 - `iframe`: The sandboxed iframe that loads the composition.
 - `.captions-container`: Overlay for rendering caption cues.
