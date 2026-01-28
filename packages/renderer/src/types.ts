@@ -122,6 +122,12 @@ export interface RendererOptions {
   intermediateImageQuality?: number;
 
   /**
+   * Path to a subtitle file (.srt) to burn into the video.
+   * Note: This requires re-encoding, so videoCodec cannot be 'copy'.
+   */
+  subtitles?: string;
+
+  /**
    * Path to the FFmpeg binary.
    * Defaults to the binary provided by @ffmpeg-installer/ffmpeg.
    */

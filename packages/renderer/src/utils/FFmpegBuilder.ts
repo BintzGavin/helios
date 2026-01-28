@@ -72,51 +72,49 @@ export class FFmpegBuilder {
       audioFilterChains.push(`[${inputId}]${filters.join(',')}[${outputLabel}]`);
     });
 
-    let audioOutputArgs: string[] = [];
+    // 3. Build Video Filters (Subtitles)
+    let videoFilterPart = '';
+    let videoMap = '0:v';
+
+    if (options.subtitles) {
+      if (options.videoCodec === 'copy') {
+        throw new Error("Cannot burn subtitles when videoCodec is 'copy'. Please use a re-encoding codec like 'libx264'.");
+      }
+      // Escape path for FFmpeg filter
+      // Windows paths need backslashes converted to forward slashes
+      // Colons (drive letters) need escaping
+      // Quotes need escaping
+      const escapedPath = options.subtitles
+        .replace(/\\/g, '/')
+        .replace(/:/g, '\\:')
+        .replace(/'/g, "\\'");
+
+      videoFilterPart = `[0:v]subtitles='${escapedPath}'[vout]`;
+      videoMap = '[vout]';
+    }
+
+    // 4. Build Audio Filters Logic
+    let audioFilterPart = '';
+    let audioMap = '';
+
     if (tracks.length > 0) {
-      // Determine Audio Codec
-      let audioCodec = options.audioCodec;
-      if (!audioCodec) {
-        const videoCodec = options.videoCodec || 'libx264';
-        if (videoCodec.startsWith('libvpx')) {
-          audioCodec = 'libvorbis';
-        } else {
-          audioCodec = 'aac';
-        }
-      }
-
-      // Common audio encoding args
-      audioOutputArgs.push('-c:a', audioCodec, '-t', options.durationInSeconds.toString());
-
-      if (options.audioBitrate) {
-        audioOutputArgs.push('-b:a', options.audioBitrate);
-      }
-
       if (tracks.length === 1) {
-        // Single track: Just map the processed stream
-        const filterGraph = audioFilterChains[0];
-        audioOutputArgs.push(
-          '-filter_complex', filterGraph,
-          '-map', '0:v',
-          '-map', '[a0]'
-        );
+        // Single track
+        audioFilterPart = audioFilterChains[0];
+        audioMap = '[a0]';
       } else {
         // Multiple tracks: Mix them using amix
         let filterGraph = audioFilterChains.join(';');
-
-        // Mix step: combine all [aX] outputs
         const mixInputs = tracks.map((_, i) => `[a${i}]`).join('');
         // inputs=N:duration=longest
         filterGraph += `;${mixInputs}amix=inputs=${tracks.length}:duration=longest[aout]`;
 
-        audioOutputArgs.push(
-          '-filter_complex', filterGraph,
-          '-map', '0:v',
-          '-map', '[aout]'
-        );
+        audioFilterPart = filterGraph;
+        audioMap = '[aout]';
       }
     }
 
+    // 5. Determine Codecs and Encoding Args
     const videoCodec = options.videoCodec || 'libx264';
     const encodingArgs: string[] = ['-c:v', videoCodec];
 
@@ -142,7 +140,43 @@ export class FFmpegBuilder {
       }
     }
 
+    const audioOutputArgs: string[] = [];
+    if (tracks.length > 0) {
+      // Determine Audio Codec
+      let audioCodec = options.audioCodec;
+      if (!audioCodec) {
+        if (videoCodec.startsWith('libvpx')) {
+          audioCodec = 'libvorbis';
+        } else {
+          audioCodec = 'aac';
+        }
+      }
+
+      // Common audio encoding args
+      audioOutputArgs.push('-c:a', audioCodec, '-t', options.durationInSeconds.toString());
+
+      if (options.audioBitrate) {
+        audioOutputArgs.push('-b:a', options.audioBitrate);
+      }
+    }
+
+    // 6. Combine Filters and Maps
+    const complexFilters: string[] = [];
+    if (videoFilterPart) complexFilters.push(videoFilterPart);
+    if (audioFilterPart) complexFilters.push(audioFilterPart);
+
+    const filterComplexArgs: string[] = [];
+    if (complexFilters.length > 0) {
+      filterComplexArgs.push('-filter_complex', complexFilters.join(';'));
+    }
+
+    const mappingArgs: string[] = [];
+    mappingArgs.push('-map', videoMap);
+    if (audioMap) mappingArgs.push('-map', audioMap);
+
     const outputArgs = [
+      ...filterComplexArgs,
+      ...mappingArgs,
       ...encodingArgs,
       ...audioOutputArgs,
       outputPath,

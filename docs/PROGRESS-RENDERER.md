@@ -1,5 +1,8 @@
 # RENDERER Progress Log
 
+## RENDERER v1.28.0
+- ✅ Completed: Caption Burning - Added `subtitles` to `RendererOptions` and updated `FFmpegBuilder` to support burning subtitles into video using the `subtitles` filter with robust path escaping and error handling.
+
 ## RENDERER v1.27.0
 - ✅ Completed: Robust Seek Wait - Updated `SeekTimeDriver` to wait for fonts and media `seeked` events, ensuring deterministic frame capture for DOM rendering. Also standardized source imports to use `.js` extensions for ESM compatibility.
 

@@ -141,3 +141,6 @@ Each agent should update **their own dedicated progress file** instead of this f
 
 ## CORE v1.33.0
 - ✅ Completed: Implement WaitUntilStable - Implemented `waitUntilStable` in `Helios` and `DomDriver` to ensure deterministic rendering by waiting for fonts, images, and media readiness.
+
+## RENDERER v1.28.0
+- ✅ Completed: Caption Burning - Added `subtitles` to `RendererOptions` and updated `FFmpegBuilder` to support burning subtitles into video using the `subtitles` filter with robust path escaping and error handling.
