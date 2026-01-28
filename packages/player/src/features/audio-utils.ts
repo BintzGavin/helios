@@ -4,6 +4,8 @@ export interface AudioAsset {
   mimeType: string | null;
   volume?: number;
   muted?: boolean;
+  loop?: boolean;
+  startTime?: number;
 }
 
 export async function getAudioAssets(doc: Document): Promise<AudioAsset[]> {
@@ -12,11 +14,15 @@ export async function getAudioAssets(doc: Document): Promise<AudioAsset[]> {
     if (!tag.src) return { buffer: new ArrayBuffer(0), mimeType: null };
     try {
         const res = await fetch(tag.src);
+        const volumeAttr = tag.getAttribute('volume');
         return {
             buffer: await res.arrayBuffer(),
             mimeType: res.headers.get('content-type'),
-            volume: tag.volume,
-            muted: tag.muted
+            // Support non-standard 'volume' attribute for declarative usage, fallback to DOM property
+            volume: volumeAttr !== null ? parseFloat(volumeAttr) : tag.volume,
+            muted: tag.muted,
+            loop: tag.loop,
+            startTime: parseFloat(tag.getAttribute('data-start-time') || '0') || 0
         };
     } catch (e) {
         console.warn("Failed to fetch audio asset:", tag.src, e);
@@ -45,6 +51,7 @@ export async function mixAudio(assets: AudioAsset[], duration: number, sampleRat
             const audioBuffer = await ctx.decodeAudioData(asset.buffer.slice(0));
             const source = ctx.createBufferSource();
             source.buffer = audioBuffer;
+            source.loop = !!asset.loop;
 
             const gainNode = ctx.createGain();
             const volume = asset.muted ? 0 : (typeof asset.volume === 'number' ? asset.volume : 1);
@@ -53,7 +60,7 @@ export async function mixAudio(assets: AudioAsset[], duration: number, sampleRat
             source.connect(gainNode);
             gainNode.connect(ctx.destination);
 
-            source.start(0);
+            source.start(asset.startTime || 0);
         } catch (e) {
             console.warn("Failed to decode audio asset:", e);
         }
