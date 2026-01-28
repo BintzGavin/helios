@@ -5,3 +5,7 @@
 ## [0.27.0] - Bypassing Core Gaps with inputProps
 **Learning:** When Core lacks a dedicated API (e.g., `setCaptions`), Studio can often bridge the gap by injecting data directly into `inputProps`, allowing user code to consume it without waiting for Core updates.
 **Action:** Look for `inputProps` injection opportunities when faced with Core API limitations for data-driven features.
+
+## [0.36.0] - Unused Controller Arguments
+**Learning:** `ClientSideExporter` requires an `iframe` in its constructor for legacy reasons but does not use it in the `export` method. This allows us to pass a dummy or null value when using it in a headless or pure-controller context (like Studio).
+**Action:** When integrating Player features into Studio, check the implementation details to see if required arguments are actually used or if they can be mocked/bypassed.
