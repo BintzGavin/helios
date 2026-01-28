@@ -274,6 +274,16 @@ template.innerHTML = `
         transform: scale(1.1);
     }
 
+    .click-layer {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      background: transparent;
+    }
+    :host([interactive]) .click-layer {
+      pointer-events: none;
+    }
+
     /* Responsive Layouts */
     .controls.layout-compact .volume-slider {
       display: none;
@@ -294,6 +304,7 @@ template.innerHTML = `
     <div class="big-play-btn" aria-label="Play video">▶</div>
   </div>
   <iframe part="iframe" sandbox="allow-scripts allow-same-origin" title="Helios Composition Preview"></iframe>
+  <div class="click-layer" part="click-layer"></div>
   <div class="captions-container" part="captions"></div>
   <div class="controls" role="toolbar" aria-label="Playback Controls">
     <button class="play-pause-btn" part="play-pause-button" aria-label="Play">▶</button>
@@ -331,6 +342,7 @@ export class HeliosPlayer extends HTMLElement {
     captionsContainer;
     ccBtn;
     showCaptions = false;
+    clickLayer;
     posterContainer;
     posterImage;
     bigPlayBtn;
@@ -399,6 +411,17 @@ export class HeliosPlayer extends HTMLElement {
             this.controller.setAudioMuted(val);
         }
     }
+    get interactive() {
+        return this.hasAttribute("interactive");
+    }
+    set interactive(val) {
+        if (val) {
+            this.setAttribute("interactive", "");
+        }
+        else {
+            this.removeAttribute("interactive");
+        }
+    }
     get playbackRate() {
         return this.controller ? this.controller.getState().playbackRate ?? 1 : 1;
     }
@@ -432,7 +455,7 @@ export class HeliosPlayer extends HTMLElement {
         }
     }
     static get observedAttributes() {
-        return ["src", "width", "height", "autoplay", "loop", "controls", "export-format", "input-props", "poster", "muted"];
+        return ["src", "width", "height", "autoplay", "loop", "controls", "export-format", "input-props", "poster", "muted", "interactive"];
     }
     constructor() {
         super();
@@ -452,11 +475,14 @@ export class HeliosPlayer extends HTMLElement {
         this.fullscreenBtn = this.shadowRoot.querySelector(".fullscreen-btn");
         this.captionsContainer = this.shadowRoot.querySelector(".captions-container");
         this.ccBtn = this.shadowRoot.querySelector(".cc-btn");
+        this.clickLayer = this.shadowRoot.querySelector(".click-layer");
         this.posterContainer = this.shadowRoot.querySelector(".poster-container");
         this.posterImage = this.shadowRoot.querySelector(".poster-image");
         this.bigPlayBtn = this.shadowRoot.querySelector(".big-play-btn");
         this.retryAction = () => this.retryConnection();
         this.retryBtn.onclick = () => this.retryAction();
+        this.clickLayer.addEventListener("click", () => this.togglePlayPause());
+        this.clickLayer.addEventListener("dblclick", () => this.toggleFullscreen());
         this.resizeObserver = new ResizeObserver((entries) => {
             for (const entry of entries) {
                 const width = entry.contentRect.width;
