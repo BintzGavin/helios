@@ -95,6 +95,7 @@ describe('HeliosPlayer', () => {
         pause: vi.fn(),
         seek: vi.fn(),
         subscribe: vi.fn().mockReturnValue(() => {}),
+        onError: vi.fn().mockReturnValue(() => {}),
         dispose: vi.fn(),
         setPlaybackRate: vi.fn()
     };
@@ -178,6 +179,7 @@ describe('HeliosPlayer', () => {
         pause: vi.fn(),
         seek: vi.fn(),
         subscribe: vi.fn().mockReturnValue(() => {}),
+        onError: vi.fn().mockReturnValue(() => {}),
         dispose: vi.fn(),
         setPlaybackRate: vi.fn()
     };
@@ -250,6 +252,7 @@ describe('HeliosPlayer', () => {
       pause: vi.fn(),
       seek: vi.fn(),
       subscribe: vi.fn().mockReturnValue(() => {}),
+      onError: vi.fn().mockReturnValue(() => {}),
       dispose: vi.fn(),
       setPlaybackRate: vi.fn()
     };
@@ -296,6 +299,7 @@ describe('HeliosPlayer', () => {
             pause: vi.fn(),
             seek: vi.fn(),
             subscribe: vi.fn().mockReturnValue(() => {}),
+            onError: vi.fn().mockReturnValue(() => {}),
             dispose: vi.fn(),
             setPlaybackRate: vi.fn()
         };
@@ -425,6 +429,7 @@ describe('HeliosPlayer', () => {
         pause: vi.fn(),
         seek: vi.fn(),
         subscribe: vi.fn().mockReturnValue(() => {}),
+        onError: vi.fn().mockReturnValue(() => {}),
         dispose: vi.fn(),
         setPlaybackRate: vi.fn()
       };
@@ -452,6 +457,7 @@ describe('HeliosPlayer', () => {
         pause: vi.fn(),
         seek: vi.fn(),
         subscribe: vi.fn().mockReturnValue(() => {}),
+        onError: vi.fn().mockReturnValue(() => {}),
         dispose: vi.fn(),
         setPlaybackRate: vi.fn()
       };
@@ -480,6 +486,7 @@ describe('HeliosPlayer', () => {
             pause: vi.fn(),
             seek: vi.fn(),
             subscribe: vi.fn().mockReturnValue(() => {}),
+            onError: vi.fn().mockReturnValue(() => {}),
             dispose: vi.fn(),
             setPlaybackRate: vi.fn()
         };
@@ -517,6 +524,7 @@ describe('HeliosPlayer', () => {
             pause: vi.fn(),
             seek: vi.fn(),
             subscribe: vi.fn().mockReturnValue(() => {}),
+            onError: vi.fn().mockReturnValue(() => {}),
             dispose: vi.fn(),
             setPlaybackRate: vi.fn()
         };
@@ -551,6 +559,7 @@ describe('HeliosPlayer', () => {
             pause: vi.fn(),
             seek: vi.fn(),
             subscribe: vi.fn().mockReturnValue(() => {}),
+            onError: vi.fn().mockReturnValue(() => {}),
             dispose: vi.fn(),
             setPlaybackRate: vi.fn(),
             setAudioVolume: vi.fn(),
@@ -647,6 +656,7 @@ describe('HeliosPlayer', () => {
             setAudioMuted: vi.fn(),
             setPlaybackRate: vi.fn(),
             subscribe: vi.fn().mockReturnValue(() => {}),
+            onError: vi.fn().mockReturnValue(() => {}),
             dispose: vi.fn(),
             setInputProps: vi.fn(),
             captureFrame: vi.fn(),
@@ -828,6 +838,7 @@ describe('HeliosPlayer', () => {
             setAudioMuted: vi.fn(),
             setPlaybackRate: vi.fn(),
             subscribe: vi.fn().mockReturnValue(() => {}),
+            onError: vi.fn().mockReturnValue(() => {}),
             dispose: vi.fn(),
             setInputProps: vi.fn(),
             captureFrame: vi.fn(),
@@ -892,6 +903,7 @@ describe('HeliosPlayer', () => {
             pause: vi.fn(),
             seek: vi.fn(),
             subscribe: vi.fn().mockReturnValue(() => {}),
+            onError: vi.fn().mockReturnValue(() => {}),
             dispose: vi.fn(),
             setPlaybackRate: vi.fn(),
             setInputProps: vi.fn()

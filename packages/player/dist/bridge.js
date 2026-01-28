@@ -58,6 +58,28 @@ export function connectToParent(helios) {
     helios.subscribe((state) => {
         window.parent.postMessage({ type: 'HELIOS_STATE', state }, '*');
     });
+    // 4. Capture Global Errors
+    window.addEventListener('error', (e) => {
+        window.parent.postMessage({
+            type: 'HELIOS_ERROR',
+            error: {
+                message: e.message,
+                filename: e.filename,
+                lineno: e.lineno,
+                colno: e.colno,
+                stack: e.error?.stack
+            }
+        }, '*');
+    });
+    window.addEventListener('unhandledrejection', (e) => {
+        window.parent.postMessage({
+            type: 'HELIOS_ERROR',
+            error: {
+                message: e.reason?.message || String(e.reason),
+                stack: e.reason?.stack
+            }
+        }, '*');
+    });
 }
 async function handleCaptureFrame(helios, data) {
     const { frame, selector, mode } = data;

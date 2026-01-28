@@ -1,5 +1,8 @@
 # PLAYER Progress Log
 
+## PLAYER v0.26.0
+- ✅ Completed: Bridge Error Propagation - Implemented global error handling in `bridge.ts` and `HeliosController`, enabling the player UI to display runtime errors from the composition.
+
 ## PLAYER v0.25.2
 - ✅ Completed: Polish Burn-In Captions - Added text shadow to exported captions to match player UI styling and improved code hygiene by preventing canvas state leaks.
 
