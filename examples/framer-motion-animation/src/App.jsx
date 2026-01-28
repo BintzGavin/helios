@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { motion, useMotionValue, useTransform } from 'framer-motion';
-import { Helios } from '../../../packages/core/dist/index.js';
+import { Helios } from '../../../packages/core/src/index.ts';
 import { useVideoFrame } from './hooks/useVideoFrame';
 
 const duration = 5;

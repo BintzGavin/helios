@@ -1,10 +1,11 @@
 # Status: DEMO (Executor)
-**Version**: 1.47.0
+**Version**: 1.48.0
 
 ## Vision
 To provide comprehensive, idiomatic examples for every major framework (React, Vue, Svelte, Vanilla) and robust end-to-end testing to ensure the Helios engine delivers on its "Use What You Know" promise.
 
 ## Current State
+- **React Styled Components**: ✅ `examples/react-styled-components` exists and works (Demonstrates `styled-components` integration with `autoSyncAnimations`).
 - **Variable Font**: ✅ `examples/variable-font-animation` exists and works (Demonstrates `autoSyncAnimations` driving CSS `font-variation-settings`).
 - **Vue Transitions**: ✅ `examples/vue-transitions` exists and works (Demonstrates synchronizing CSS animations using `autoSyncAnimations` and `animation-delay` in Vue).
 - **Svelte Transitions**: ✅ `examples/svelte-transitions` exists and works (Demonstrates synchronizing CSS animations using `autoSyncAnimations` and `animation-delay` in Svelte).
@@ -73,6 +74,7 @@ To provide comprehensive, idiomatic examples for every major framework (React, V
 None.
 
 ## Log
+- [v1.48.0] ✅ Completed: React Styled Components Example - Created `examples/react-styled-components` demonstrating integration with `styled-components` via `autoSyncAnimations` and refactored all examples to use source imports.
 - [v1.47.0] ✅ Completed: Variable Font Animation Example - Created `examples/variable-font-animation` demonstrating how to synchronize CSS Variable Font animations using `autoSyncAnimations` with proper seeking support.
 - [v1.46.0] ✅ Completed: Vue Transitions Example - Created `examples/vue-transitions` demonstrating how to synchronize standard CSS animations in Vue using `autoSyncAnimations` and `animation-delay` with proper seeking support.
 - [v1.45.0] ✅ Completed: Svelte Transitions Example - Created `examples/svelte-transitions` demonstrating how to synchronize standard CSS animations in Svelte using `autoSyncAnimations` and `animation-delay` with proper seeking support.

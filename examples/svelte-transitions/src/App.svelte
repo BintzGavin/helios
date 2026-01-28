@@ -1,6 +1,6 @@
 <script>
   import { onMount } from 'svelte';
-  import { Helios } from '../../../packages/core/dist/index.js';
+  import { Helios } from '../../../packages/core/src/index.ts';
   import { createHeliosStore } from './lib/store';
   import Sequence from './lib/Sequence.svelte';
 

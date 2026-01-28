@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
 import './style.css';
-import { Helios } from '../../../packages/core/dist/index.js';
+import { Helios } from '../../../packages/core/src/index.ts';
 
 // Initialize Helios with autoSyncAnimations: true
 // This tells Helios to hijack all CSS animations on the page

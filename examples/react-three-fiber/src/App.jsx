@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Canvas } from '@react-three/fiber';
-import { Helios } from '../../../packages/core/dist/index.js';
+import { Helios } from '../../../packages/core/src/index.ts';
 import Scene from './Scene';
 
 // Singleton Helios instance

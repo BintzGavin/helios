@@ -90,3 +90,6 @@
 
 ## DEMO v1.47.0
 - ✅ Completed: Variable Font Animation Example - Created `examples/variable-font-animation` demonstrating how to synchronize CSS Variable Font animations using `autoSyncAnimations` with proper seeking support.
+
+## DEMO v1.48.0
+- ✅ Completed: React Styled Components Example - Created `examples/react-styled-components` demonstrating integration with `styled-components` via `autoSyncAnimations` and refactored all examples to use source imports.

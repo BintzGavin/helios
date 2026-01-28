@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Helios } from '../../../packages/core/dist/index.js';
+import { Helios } from '../../../packages/core/src/index.ts';
 import { Sequence } from './components/Sequence';
 import { Series } from './components/Series';
 import { FrameContext } from './components/FrameContext';
