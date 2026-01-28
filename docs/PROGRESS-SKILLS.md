@@ -1,5 +1,11 @@
 # SKILLS Progress Log
 
+## SKILLS v1.4.0
+- ✅ Completed: Daily Skills Review
+  - Updated API skills for `core` (Markers, Playback Range, setFps details)
+  - Updated API skills for `renderer` (intermediateVideoCodec, intermediateImageFormat, ffmpegPath)
+  - Created example skill for `threejs` (Vanilla Three.js + React Three Fiber)
+
 ## SKILLS v1.3.0
 - ✅ Completed: Daily Skills Review
   - Updated API skills for `core` (inputProps, activeCaptions, utilities)

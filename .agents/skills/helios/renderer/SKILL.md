@@ -58,7 +58,15 @@ interface RendererOptions {
   crf?: number;                  // Constant Rate Factor (quality control)
   preset?: string;               // Encoding preset (e.g., 'fast')
   videoBitrate?: string;         // e.g., '5M', '1000k'
-  intermediateVideoCodec?: string; // Capture codec ('vp8', 'vp9', 'av1')
+
+  // Intermediate Capture (Canvas Mode)
+  intermediateVideoCodec?: string; // 'vp8' (default), 'vp9', 'av1'
+
+  // Intermediate Capture (DOM Mode)
+  intermediateImageFormat?: 'png' | 'jpeg'; // Default: 'png'
+  intermediateImageQuality?: number;        // 0-100 (only for jpeg)
+
+  // System
   ffmpegPath?: string;           // Custom FFmpeg binary path
 }
 
