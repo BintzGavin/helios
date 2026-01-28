@@ -55,6 +55,8 @@ interface HeliosOptions {
   volume?: number;               // Initial volume (0.0 to 1.0)
   muted?: boolean;               // Initial muted state
   captions?: string | CaptionCue[]; // SRT string or cue array
+  markers?: Marker[];            // Initial timeline markers
+  playbackRange?: [number, number]; // Restrict playback to [startFrame, endFrame]
   driver?: TimeDriver;           // Custom time driver (mostly internal use)
 }
 ```
@@ -77,6 +79,8 @@ interface HeliosState {
   muted: boolean;
   captions: CaptionCue[];
   activeCaptions: CaptionCue[];
+  markers: Marker[];
+  playbackRange: [number, number] | null;
 }
 ```
 
@@ -88,6 +92,17 @@ helios.play()                 // Start playback
 helios.pause()                // Pause playback
 helios.seek(frame: number)    // Jump to specific frame
 helios.setPlaybackRate(rate: number) // Change playback speed (e.g., 0.5, 2.0)
+
+// Set Playback Range (Loop/Play only within these frames)
+helios.setPlaybackRange(startFrame: number, endFrame: number)
+helios.clearPlaybackRange()
+```
+
+#### Timeline Configuration
+```typescript
+helios.setDuration(seconds: number) // Update total duration
+helios.setFps(fps: number)          // Update frame rate (preserves current playback time)
+helios.setLoop(shouldLoop: boolean) // Toggle looping
 ```
 
 #### Resolution Control
@@ -112,6 +127,23 @@ helios.setInputProps(props: Record<string, any>)
 ```typescript
 // Set captions using SRT string or CaptionCue array
 helios.setCaptions(captions: string | CaptionCue[])
+```
+
+#### Markers
+Manage timeline markers for key events.
+
+```typescript
+interface Marker {
+  id: string;
+  time: number; // Time in seconds
+  label?: string;
+  color?: string;
+}
+
+helios.setMarkers(markers: Marker[])
+helios.addMarker(marker: Marker)
+helios.removeMarker(id: string)
+helios.seekToMarker(id: string)
 ```
 
 #### Subscription
@@ -163,6 +195,8 @@ helios.volume: ReadonlySignal<number>
 helios.muted: ReadonlySignal<boolean>
 helios.captions: ReadonlySignal<CaptionCue[]>
 helios.activeCaptions: ReadonlySignal<CaptionCue[]>
+helios.markers: ReadonlySignal<Marker[]>
+helios.playbackRange: ReadonlySignal<[number, number] | null>
 helios.width: ReadonlySignal<number>
 helios.height: ReadonlySignal<number>
 ```
