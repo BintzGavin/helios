@@ -149,7 +149,7 @@ We named this engine after the sun because video is, fundamentally, *light over 
 ### Installation
 
 ```bash
-npm install @helios-engine/core @helios-engine/player
+npm install @helios-project/core @helios-project/player
 ```
 
 ### Create a Composition
@@ -196,7 +196,7 @@ helios.seek(150); // Jump to frame 150
 ```html
 <!-- Drop-in Web Component works anywhere -->
 <helios-player src="./composition.html" width="1920" height="1080"></helios-player>
-<script type="module" src="@helios-engine/player"></script>
+<script type="module" src="@helios-project/player"></script>
 ```
 
 ### Render to Video
@@ -361,7 +361,7 @@ Both Helios and [Remotion](https://www.remotion.dev/) enable programmatic video 
 | **Audio mixing** | 🟡 Basic (FFmpeg) | 🟢 Advanced |
 | **MCP Server** | 🟡 Planned | 🟢 Available |
 | **Agent Skills** | 🟡 Local only | 🟢 `npx skills add` |
-| **Transitions library** | 🔴 Not yet | 🟢 `@remotion/transitions` |
+| **Transitions library** | 🟢 Available | 🟢 `@remotion/transitions` |
 | **Sequence/Series** | 🔴 Not yet | 🟢 Built-in components |
 
 ### Where Helios Wins
