@@ -391,4 +391,85 @@ describe('DomDriver', () => {
       await expect(promise).resolves.toBeUndefined();
     });
   });
+
+  describe('Media Offset and Seek', () => {
+    it('should respect data-helios-offset', async () => {
+      const mockVideo = document.createElement('video');
+      mockVideo.setAttribute('data-helios-offset', '2'); // Starts at 2s
+      Object.defineProperty(mockVideo, 'currentTime', { value: 0, writable: true });
+
+      // Smart mock for paused state
+      let isPaused = true;
+      Object.defineProperty(mockVideo, 'paused', { get: () => isPaused });
+
+      mockVideo.play = vi.fn().mockImplementation(async () => { isPaused = false; });
+      mockVideo.pause = vi.fn().mockImplementation(() => { isPaused = true; });
+
+      scope.appendChild(mockVideo);
+      await new Promise(resolve => setTimeout(resolve, 20));
+
+      // START PLAYING
+      // We start in a paused state.
+      // Time 1s: < offset 2s. Should force pause (or ensure it stays paused).
+      // Since it is already paused, pause() might NOT be called depending on implementation optimization.
+      // But we verify it does NOT play.
+      driver.update(1000, { isPlaying: true, playbackRate: 1 });
+      expect(mockVideo.play).not.toHaveBeenCalled();
+      expect(mockVideo.currentTime).toBe(0);
+
+      // Verify it is indeed paused
+      expect(mockVideo.paused).toBe(true);
+
+      // Time 3s: > offset 2s. Effective time = 3 - 2 = 1s.
+      driver.update(3000, { isPlaying: true, playbackRate: 1 });
+      expect(mockVideo.play).toHaveBeenCalled();
+      expect(mockVideo.currentTime).toBe(1);
+      expect(mockVideo.paused).toBe(false);
+    });
+
+    it('should respect data-helios-seek', async () => {
+      const mockVideo = document.createElement('video');
+      mockVideo.setAttribute('data-helios-seek', '5'); // Starts from 5s mark
+      Object.defineProperty(mockVideo, 'currentTime', { value: 0, writable: true });
+      Object.defineProperty(mockVideo, 'paused', { value: true, writable: true });
+      mockVideo.play = vi.fn().mockResolvedValue(undefined);
+      mockVideo.pause = vi.fn();
+
+      scope.appendChild(mockVideo);
+      await new Promise(resolve => setTimeout(resolve, 20));
+
+      // Time 1s. Effective time = 1 + 5 = 6s.
+      driver.update(1000, { isPlaying: true, playbackRate: 1 });
+      expect(mockVideo.play).toHaveBeenCalled();
+      expect(mockVideo.currentTime).toBe(6);
+    });
+
+    it('should respect both offset and seek', async () => {
+      const mockVideo = document.createElement('video');
+      mockVideo.setAttribute('data-helios-offset', '2'); // Start at 2s
+      mockVideo.setAttribute('data-helios-seek', '10'); // Skip first 10s of source
+      Object.defineProperty(mockVideo, 'currentTime', { value: 0, writable: true });
+
+      // Smart mock
+      let isPaused = true;
+      Object.defineProperty(mockVideo, 'paused', { get: () => isPaused });
+      mockVideo.play = vi.fn().mockImplementation(async () => { isPaused = false; });
+      mockVideo.pause = vi.fn().mockImplementation(() => { isPaused = true; });
+
+      scope.appendChild(mockVideo);
+      await new Promise(resolve => setTimeout(resolve, 20));
+
+      // Time 1s (< 2s). Should be paused at seek time (10s).
+      driver.update(1000, { isPlaying: true, playbackRate: 1 });
+      expect(mockVideo.play).not.toHaveBeenCalled();
+      expect(mockVideo.currentTime).toBe(10);
+      expect(mockVideo.paused).toBe(true);
+
+      // Time 4s (> 2s). Effective = 4 - 2 + 10 = 12s.
+      driver.update(4000, { isPlaying: true, playbackRate: 1 });
+      expect(mockVideo.play).toHaveBeenCalled();
+      expect(mockVideo.currentTime).toBe(12);
+      expect(mockVideo.paused).toBe(false);
+    });
+  });
 });

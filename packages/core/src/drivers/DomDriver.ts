@@ -221,12 +221,24 @@ export class DomDriver implements TimeDriver {
         lastSetMuted: effectiveMuted
       });
 
+      // --- Offset & Seek Logic ---
+      const offset = parseFloat(el.getAttribute('data-helios-offset') || '0');
+      const seek = parseFloat(el.getAttribute('data-helios-seek') || '0');
+
+      // Check if we are before the start time
+      const timeRelToStart = timeInSeconds - offset;
+      const isBeforeStart = timeRelToStart < 0;
+
+      // effectiveTime is where the media element should be.
+      // If before start, we hold at the in-point (seek).
+      const targetTime = Math.max(0, timeRelToStart + seek);
+
       // Sync Playback Rate
       if (el.playbackRate !== playbackRate) {
         el.playbackRate = playbackRate;
       }
 
-      if (isPlaying) {
+      if (isPlaying && !isBeforeStart) {
         // Playback Mode
         if (el.paused) {
              el.play().catch(() => {
@@ -235,19 +247,22 @@ export class DomDriver implements TimeDriver {
         }
 
         // Drift Correction (only seek if significantly off)
-        const diff = Math.abs(el.currentTime - timeInSeconds);
+        const diff = Math.abs(el.currentTime - targetTime);
         if (diff > 0.25) { // 250ms tolerance
-          el.currentTime = timeInSeconds;
+          el.currentTime = targetTime;
         }
       } else {
-        // Scrubbing Mode
+        // Scrubbing Mode OR Before Start
         if (!el.paused) {
             el.pause();
         }
 
         // Always seek to exact time
-        if (Math.abs(el.currentTime - timeInSeconds) > 0.001) {
-            el.currentTime = timeInSeconds;
+        // If before start, we hold at seek time (in-point)
+        const scrubTime = isBeforeStart ? seek : targetTime;
+
+        if (Math.abs(el.currentTime - scrubTime) > 0.001) {
+            el.currentTime = scrubTime;
         }
       }
     });
