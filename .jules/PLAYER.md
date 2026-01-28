@@ -13,3 +13,7 @@
 ## 2026-03-01 - Interactive Mode Default
 **Learning:** Defaulting to standard video behavior (click-to-pause) is safer for a "Player" component to align with user expectations, even if it changes existing behavior (clicks passing through), provided an opt-out (`interactive` attribute) is available.
 **Action:** When refining UI components, prioritize standard UX patterns over incidental behaviors (like click-through), but provide configuration for the alternative.
+
+## 2026-03-01 - Memory Hallucination
+**Learning:** The memory stated that `interactive` attribute was implemented, but the code lacked it. Memories can hallucinate features.
+**Action:** Always verify "known" features against the actual codebase (`read_file`) before assuming they exist.
