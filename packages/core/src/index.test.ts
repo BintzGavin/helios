@@ -411,7 +411,8 @@ describe('Helios Core', () => {
         captions: [],
         activeCaptions: [],
         loop: false,
-        markers: []
+        markers: [],
+        playbackRange: null
       };
 
       const subscriber: HeliosSubscriber = (s: HeliosState) => {

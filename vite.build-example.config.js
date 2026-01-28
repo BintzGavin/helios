@@ -3,9 +3,19 @@ import { resolve } from "path";
 import react from "@vitejs/plugin-react";
 import vue from "@vitejs/plugin-vue";
 import { svelte } from "@sveltejs/vite-plugin-svelte";
+import solidPlugin from "vite-plugin-solid";
 
 export default defineConfig({
-  plugins: [react(), vue(), svelte()],
+  plugins: [
+    react({
+      exclude: /examples\/solid-canvas-animation/,
+    }),
+    vue(),
+    svelte(),
+    solidPlugin({
+      include: /examples\/solid-canvas-animation/,
+    })
+  ],
   // Root of the project
   root: ".",
   base: "./",
@@ -51,6 +61,7 @@ export default defineConfig({
         vue_transitions: resolve(__dirname, "examples/vue-transitions/composition.html"),
         variable_font: resolve(__dirname, "examples/variable-font-animation/composition.html"),
         react_styled_components: resolve(__dirname, "examples/react-styled-components/composition.html"),
+        solid_canvas: resolve(__dirname, "examples/solid-canvas-animation/composition.html"),
       },
     },
   },
