@@ -1,5 +1,8 @@
 # RENDERER Progress Log
 
+## RENDERER v1.33.1
+- ✅ Completed: Fix FFmpeg Diagnostics Dependencies - Fixed dependency version mismatch for `@helios-project/core` in `packages/renderer` and `packages/player` and verified FFmpeg diagnostics implementation.
+
 ## RENDERER v1.33.0
 - ✅ Completed: Enable DOM Transparency - Updated `DomStrategy` to support transparent video export by using `omitBackground: true` in Playwright when `pixelFormat` suggests alpha (e.g. `yuva420p`, `rgba`), allowing creation of transparent overlays and lower-thirds.
 

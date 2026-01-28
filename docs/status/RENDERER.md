@@ -1,8 +1,9 @@
-**Version**: 1.33.0
+**Version**: 1.33.1
 
 # Renderer Agent Status
 
 ## Progress Log
+- [1.33.1] ✅ Completed: Fix FFmpeg Diagnostics Dependencies - Fixed dependency version mismatch for `@helios-project/core` in `packages/renderer` and `packages/player` and verified FFmpeg diagnostics implementation.
 - [1.33.0] ✅ Completed: Enable DOM Transparency - Updated `DomStrategy` to support transparent video export by using `omitBackground: true` in Playwright when `pixelFormat` suggests alpha (e.g. `yuva420p`, `rgba`), allowing creation of transparent overlays and lower-thirds.
 - [1.32.0] ✅ Completed: FFmpeg Diagnostics - Implemented `FFmpegInspector` and updated `Renderer.diagnose()` to return comprehensive diagnostics including FFmpeg version, supported encoders (like `libx264`), and filters, resolving the Vision Gap.
 - [1.31.0] ✅ Completed: DomStrategy Media Attributes - Updated `DomStrategy` to discover and respect `data-helios-offset`, `data-helios-seek`, and the `muted` attribute on `<audio>` and `<video>` elements, enabling precise timing and volume control from the DOM.
