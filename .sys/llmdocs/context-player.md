@@ -47,5 +47,11 @@
 - `muted`: boolean (get/set)
 - `playbackRate`: number (get/set)
 - `interactive`: boolean (get/set)
+- `src`: string (get/set)
+- `autoplay`: boolean (get/set)
+- `loop`: boolean (get/set)
+- `controls`: boolean (get/set)
+- `poster`: string (get/set)
+- `preload`: string (get/set)
 - `inputProps`: Record<string, any> (get/set)
 - `getController(): HeliosController | null`

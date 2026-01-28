@@ -1,4 +1,4 @@
-**Version**: v0.30.0
+**Version**: v0.31.0
 
 # Status: PLAYER
 
@@ -27,7 +27,12 @@
 - Supports declarative data binding via `input-props` attribute (JSON string) and property, enabling dynamic composition updates.
 - Supports `poster` and `preload` attributes. `preload="none"` defers iframe loading until the user interacts with the new "Big Play Button".
 - Implements responsive controls using `ResizeObserver`, adapting UI layout for smaller widths (hiding volume/speed controls).
-- **New**: Implemented `muted` attribute support on `<helios-player>` to control initial mute state and reflect changes, closing a Standard Media API gap.
+- **New**: Fully implemented Standard Media API properties (`src`, `autoplay`, `loop`, `controls`, `poster`, `preload`) as getters/setters on `HeliosPlayer`, reflecting to attributes and ensuring `preload` is observed.
+
+## Critical Task
+- **None**: Recent task completed.
+
+[v0.31.0] ✅ Completed: Implement Standard Media API properties - Added missing properties `src`, `autoplay`, `loop`, `controls`, `poster`, `preload` to `HeliosPlayer` class to fully comply with HTMLMediaElement interface expectations. Updated `observedAttributes` to include `preload`. Updated dependencies to fix build issues.
 
 ## Critical Task
 - **None**: Recent task completed.
