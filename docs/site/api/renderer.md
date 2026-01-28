@@ -33,6 +33,9 @@ const options: RendererOptions = {
   audioBitrate: '192k',
   audioTracks: ['./voiceover.mp3', './music.mp3'], // For mixing multiple tracks
 
+  // Captions
+  subtitles: './captions.srt', // Path to SRT file for burn-in subtitles
+
   // Input Injection
   inputProps: { title: "Rendered Video" },
 
@@ -47,7 +50,7 @@ const renderer = new Renderer(options);
 
 ### `render(url, output, jobOptions)`
 
-Renders a composition from a URL to a video file.
+Renders a composition from a URL to a video file. Supports automatic burning of subtitles if provided in options.
 
 - **`url`** (string): The URL of the composition to render (e.g., `http://localhost:3000`).
 - **`output`** (string): The output file path (e.g., `./output/video.mp4`).

@@ -36,6 +36,10 @@
         "examples/canvas-example",
         "examples/threejs-example",
         "examples/animation-libraries",
+        "examples/vue-transitions",
+        "examples/react-transitions",
+        "examples/react-three-fiber",
+        "examples/d3-animation",
         "examples/animation-helpers",
         "examples/styling",
         "examples/advanced"

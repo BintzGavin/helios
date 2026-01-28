@@ -23,12 +23,26 @@ The Studio will start a local server (typically at `http://localhost:3000`) and 
 
 The Studio automatically scans your project (based on `HELIOS_PROJECT_ROOT` or current directory) to find available compositions. It lists them in the sidebar or command palette for easy navigation.
 
+### Diagnostics Panel
+
+Accessible from the sidebar, this panel provides real-time information about your system capabilities:
+-   **Client (Preview)**: Checks for WebCodecs, WebGL, and WAAPI support in your browser.
+-   **Server (Renderer)**: Verifies FFmpeg availability and server-side rendering capabilities.
+
 ### Visual Timeline
 
 -   **Scrubbing**: Drag the playhead to scrub through your animation.
 -   **Playback**: Use the Play/Pause controls or keyboard shortcuts.
 -   **Frame Stepping**: Move frame-by-frame to inspect exact details.
 -   **Range Markers**: Set In (`I`) and Out (`O`) points to loop a specific section of your animation.
+-   **Zooming**: Use the zoom slider to expand the timeline for precise frame-level editing. The track is scrollable when zoomed in.
+
+### Assets Panel
+
+Manage your project's assets directly from the Studio.
+-   **Discovery**: Automatically lists files in your project's `assets/` directory.
+-   **Upload**: Drag and drop files to upload them.
+-   **Preview**: Rich previews for Images, Video, Audio, Fonts, 3D Models (.glb/.gltf), JSON data, and Shaders.
 
 ### Props Editor
 
@@ -45,6 +59,13 @@ The **Render** panel allows you to configure output settings without touching co
 ### Rendering
 
 You can trigger a render job directly from the Studio UI. The progress is displayed in the sidebar, and the output file is saved to your project directory.
+
+#### Client-Side Export
+
+For quick previews or sharing, you can also perform a **Client-Side Export** directly in the browser (using WebCodecs). This avoids spinning up a server-side FFmpeg process and is great for shorter clips.
+- Select **Client Export** in the Render Panel.
+- Supports MP4 and WebM formats.
+- Includes audio and burned-in captions.
 
 ## Keyboard Shortcuts
 

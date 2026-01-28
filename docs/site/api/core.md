@@ -67,6 +67,15 @@ Starts or stops playback.
 #### `seek(frame)`
 Jumps to a specific frame index.
 
+#### `waitUntilStable()`
+Waits for the composition to stabilize. This ensures that all asynchronous operations (like image loading, font loading, and media seeking) triggered by the last seek/update are complete. Returns a `Promise<void>`. Useful for deterministic rendering.
+
+```typescript
+await helios.seek(100);
+await helios.waitUntilStable();
+// Now it is safe to capture the frame
+```
+
 #### `setPlaybackRate(rate)`
 Sets the playback speed (e.g., `0.5`, `1`, `2`).
 
@@ -87,6 +96,7 @@ Updates the composition resolution.
 
 #### `bindToDocumentTimeline()`
 Binds the Helios instance to `document.timeline`. Useful when the timeline is driven externally (e.g., by the Renderer or Studio).
+Helios will poll `document.timeline.currentTime` and update its internal state.
 
 #### `unbindFromDocumentTimeline()`
 Stops syncing with `document.timeline`.

@@ -5,11 +5,23 @@ description: "Changelog for the Renderer package"
 
 # Renderer Changelog
 
+## v1.29.0
+- **Caption Burning**: Added `subtitles` option to `RendererOptions` and updated `FFmpegBuilder` to burn SRT subtitles into the video, including proper path escaping and filter complex management.
+
+## v1.28.0
+- **Multi-Frame Seek**: Updated SeekTimeDriver to synchronize virtual time across all frames (including iframes), enabling deterministic rendering for complex compositions.
+
+## v1.24.0
+- **Smart Codec Selection**: Updated `CanvasStrategy` to intelligently select H.264 (Annex B) when `videoCodec: 'copy'` is requested, prioritizing direct stream copy while falling back to VP8 (IVF) if unsupported.
+
 ## v1.22.0
 - **Implicit Audio Discovery**: Updated `DomStrategy` to automatically detect `<audio>` and `<video>` elements in the DOM and include their audio tracks in the FFmpeg render.
 
 ## v1.21.0
 - **Configurable Audio Codecs**: Added `audioCodec` and `audioBitrate` to `RendererOptions` and updated `FFmpegBuilder` to support smart defaults and custom configurations.
+
+## v1.20.1
+- **Optimize Canvas Quality**: Updated `CanvasStrategy` to auto-calculate intermediate bitrate based on resolution/FPS (e.g. ~100Mbps for 4K) and wait for fonts to load, ensuring high-quality output and no font glitches.
 
 ## v1.20.0
 - **Enable Stream Copy**: Updated `FFmpegBuilder` to conditionally omit encoding flags when `videoCodec` is `'copy'`, enabling efficient stream passthrough for H.264 WebCodecs.
