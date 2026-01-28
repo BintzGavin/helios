@@ -172,3 +172,6 @@ Each agent should update **their own dedicated progress file** instead of this f
 
 ## RENDERER v1.29.0
 - ✅ Completed: Caption Burning - Added `subtitles` option to `RendererOptions` and updated `FFmpegBuilder` to burn SRT subtitles into the video, including proper path escaping and filter complex management.
+
+## RENDERER v1.30.0
+- ✅ Completed: Deep Dom Strategy - Updated `DomStrategy` to perform asset preloading (fonts, images, media) and audio track discovery across all frames (including iframes), ensuring robust rendering for nested compositions.
