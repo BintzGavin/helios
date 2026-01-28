@@ -58,6 +58,7 @@ export type HeliosState = {
   captions: CaptionCue[];
   activeCaptions: CaptionCue[];
   markers: Marker[];
+  playbackRange: [number, number] | null;
 };
 
 export type HeliosSubscriber = (state: HeliosState) => void;
@@ -69,6 +70,7 @@ export interface HeliosOptions {
   duration: number; // in seconds
   fps: number;
   loop?: boolean;
+  playbackRange?: [number, number];
   autoSyncAnimations?: boolean;
   animationScope?: HTMLElement;
   inputProps?: Record<string, any>;
@@ -116,6 +118,7 @@ export class Helios {
   public get captions(): ReadonlySignal<CaptionCue[]>;
   public get activeCaptions(): ReadonlySignal<CaptionCue[]>;
   public get markers(): ReadonlySignal<Marker[]>;
+  public get playbackRange(): ReadonlySignal<[number, number] | null>;
   public get width(): ReadonlySignal<number>;
   public get height(): ReadonlySignal<number>;
   public get duration(): number;
@@ -139,6 +142,8 @@ export class Helios {
   public addMarker(marker: Marker): void;
   public removeMarker(id: string): void;
   public seekToMarker(id: string): void;
+  public setPlaybackRange(startFrame: number, endFrame: number): void;
+  public clearPlaybackRange(): void;
   public subscribe(callback: HeliosSubscriber): () => void;
   public unsubscribe(callback: HeliosSubscriber): void;
   public play(): void;

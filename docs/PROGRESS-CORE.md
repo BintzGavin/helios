@@ -1,5 +1,8 @@
 # CORE Progress Log
 
+## CORE v2.2.0
+- ✅ Completed: Implement Playback Range - Added `playbackRange` to `HeliosState`, enabling loop and clamp behavior within a specific frame range.
+
 ## CORE v2.1.0
 - ✅ Completed: ESM Compliance - Converted package to native ESM with "type": "module", "moduleResolution": "node16", and explicit .js extensions.
 
