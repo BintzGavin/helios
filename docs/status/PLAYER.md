@@ -1,4 +1,4 @@
-**Version**: v0.31.0
+**Version**: v0.32.0
 
 # Status: PLAYER
 
@@ -27,16 +27,18 @@
 - Supports declarative data binding via `input-props` attribute (JSON string) and property, enabling dynamic composition updates.
 - Supports `poster` and `preload` attributes. `preload="none"` defers iframe loading until the user interacts with the new "Big Play Button".
 - Implements responsive controls using `ResizeObserver`, adapting UI layout for smaller widths (hiding volume/speed controls).
-- **New**: Fully implemented Standard Media API properties (`src`, `autoplay`, `loop`, `controls`, `poster`, `preload`) as getters/setters on `HeliosPlayer`, reflecting to attributes and ensuring `preload` is observed.
+- Fully implemented Standard Media API properties (`src`, `autoplay`, `loop`, `controls`, `poster`, `preload`) as getters/setters on `HeliosPlayer`.
+- **New**: Implemented `readyState` and `networkState` properties and standard lifecycle events (`loadstart`, `loadedmetadata`, `canplay`, etc.), aligning with HTMLMediaElement specifications.
+
+## Critical Task
+- **None**: Recent task completed.
+
+[v0.32.0] ✅ Completed: Implement Standard Media States - Added `readyState`, `networkState` properties and constants, along with lifecycle events (`loadstart`, `loadedmetadata`, `canplay`, `canplaythrough`) to `<helios-player>`.
 
 ## Critical Task
 - **None**: Recent task completed.
 
 [v0.31.0] ✅ Completed: Implement Standard Media API properties - Added missing properties `src`, `autoplay`, `loop`, `controls`, `poster`, `preload` to `HeliosPlayer` class to fully comply with HTMLMediaElement interface expectations. Updated `observedAttributes` to include `preload`. Updated dependencies to fix build issues.
-
-## Critical Task
-- **None**: Recent task completed.
-
 [v0.30.0] ✅ Completed: Audio Export Enhancements - Implemented `loop` and `startTime` support for client-side audio export, plus declarative `volume` attribute parsing.
 [v0.29.0] ✅ Completed: Interactive Mode - Implemented `interactive` attribute to toggle between standard video controls and direct iframe interaction.
 [v0.28.0] ✅ Completed: Harden Player Connection - Implemented polling logic for Direct Mode connection to handle asynchronous composition initialization.

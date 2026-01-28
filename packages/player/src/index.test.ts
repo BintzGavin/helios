@@ -1129,4 +1129,89 @@ describe('HeliosPlayer', () => {
         expect(HeliosPlayer.observedAttributes).toContain('muted');
     });
   });
+
+  describe('Standard Media States', () => {
+    let mockController: any;
+
+    beforeEach(() => {
+        mockController = {
+            getState: vi.fn().mockReturnValue({ currentFrame: 0, duration: 10, fps: 30, isPlaying: false }),
+            play: vi.fn(),
+            pause: vi.fn(),
+            seek: vi.fn(),
+            subscribe: vi.fn().mockReturnValue(() => {}),
+            onError: vi.fn().mockReturnValue(() => {}),
+            dispose: vi.fn(),
+            setPlaybackRate: vi.fn(),
+            setInputProps: vi.fn(),
+            setAudioMuted: vi.fn()
+        };
+    });
+
+    it('should have initial states', () => {
+        expect(player.readyState).toBe(HeliosPlayer.HAVE_NOTHING);
+        expect(player.networkState).toBe(HeliosPlayer.NETWORK_EMPTY);
+    });
+
+    it('should transition to loading state and dispatch loadstart when src is set', () => {
+        const loadStartSpy = vi.fn();
+        player.addEventListener('loadstart', loadStartSpy);
+
+        player.setAttribute('src', 'test.html');
+
+        expect(player.networkState).toBe(HeliosPlayer.NETWORK_LOADING);
+        expect(player.readyState).toBe(HeliosPlayer.HAVE_NOTHING);
+        expect(loadStartSpy).toHaveBeenCalled();
+    });
+
+    it('should transition to ready state and dispatch events when controller connects', () => {
+        // Set src first to get into loading state
+        player.setAttribute('src', 'test.html');
+
+        const metadataSpy = vi.fn();
+        const loadedDataSpy = vi.fn();
+        const canPlaySpy = vi.fn();
+        const canPlayThroughSpy = vi.fn();
+
+        player.addEventListener('loadedmetadata', metadataSpy);
+        player.addEventListener('loadeddata', loadedDataSpy);
+        player.addEventListener('canplay', canPlaySpy);
+        player.addEventListener('canplaythrough', canPlayThroughSpy);
+
+        // Connect controller
+        (player as any).setController(mockController);
+
+        expect(player.networkState).toBe(HeliosPlayer.NETWORK_IDLE);
+        expect(player.readyState).toBe(HeliosPlayer.HAVE_ENOUGH_DATA);
+
+        expect(metadataSpy).toHaveBeenCalled();
+        expect(loadedDataSpy).toHaveBeenCalled();
+        expect(canPlaySpy).toHaveBeenCalled();
+        expect(canPlayThroughSpy).toHaveBeenCalled();
+
+        // Check order
+        expect(metadataSpy.mock.invocationCallOrder[0]).toBeLessThan(loadedDataSpy.mock.invocationCallOrder[0]);
+        expect(loadedDataSpy.mock.invocationCallOrder[0]).toBeLessThan(canPlaySpy.mock.invocationCallOrder[0]);
+        expect(canPlaySpy.mock.invocationCallOrder[0]).toBeLessThan(canPlayThroughSpy.mock.invocationCallOrder[0]);
+    });
+
+    it('should reset states when src changes', () => {
+        // 1. Load first src
+        player.setAttribute('src', 'first.html');
+        (player as any).setController(mockController);
+
+        expect(player.readyState).toBe(HeliosPlayer.HAVE_ENOUGH_DATA);
+        expect(player.networkState).toBe(HeliosPlayer.NETWORK_IDLE);
+
+        // 2. Change src
+        const loadStartSpy = vi.fn();
+        player.addEventListener('loadstart', loadStartSpy);
+
+        player.setAttribute('src', 'second.html');
+
+        expect(player.networkState).toBe(HeliosPlayer.NETWORK_LOADING);
+        expect(player.readyState).toBe(HeliosPlayer.HAVE_NOTHING);
+        expect(loadStartSpy).toHaveBeenCalled();
+    });
+  });
 });

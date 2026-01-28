@@ -369,6 +369,30 @@ export class HeliosPlayer extends HTMLElement {
   private lastState: any = null;
   private pendingProps: Record<string, any> | null = null;
 
+  // --- Standard Media API States ---
+
+  public static readonly HAVE_NOTHING = 0;
+  public static readonly HAVE_METADATA = 1;
+  public static readonly HAVE_CURRENT_DATA = 2;
+  public static readonly HAVE_FUTURE_DATA = 3;
+  public static readonly HAVE_ENOUGH_DATA = 4;
+
+  public static readonly NETWORK_EMPTY = 0;
+  public static readonly NETWORK_IDLE = 1;
+  public static readonly NETWORK_LOADING = 2;
+  public static readonly NETWORK_NO_SOURCE = 3;
+
+  private _readyState: number = HeliosPlayer.HAVE_NOTHING;
+  private _networkState: number = HeliosPlayer.NETWORK_EMPTY;
+
+  public get readyState(): number {
+    return this._readyState;
+  }
+
+  public get networkState(): number {
+    return this._networkState;
+  }
+
   // --- Standard Media API ---
 
   public get currentTime(): number {
@@ -717,6 +741,10 @@ export class HeliosPlayer extends HTMLElement {
   }
 
   private loadIframe(src: string) {
+    this._networkState = HeliosPlayer.NETWORK_LOADING;
+    this._readyState = HeliosPlayer.HAVE_NOTHING;
+    this.dispatchEvent(new Event('loadstart'));
+
     this.iframe.src = src;
     this.isLoaded = true;
     if (this.controller) {
@@ -891,6 +919,17 @@ export class HeliosPlayer extends HTMLElement {
       }
 
       this.controller = controller;
+
+      // Update States
+      this._networkState = HeliosPlayer.NETWORK_IDLE;
+      this._readyState = HeliosPlayer.HAVE_ENOUGH_DATA;
+
+      // Dispatch Lifecycle Events
+      this.dispatchEvent(new Event('loadedmetadata'));
+      this.dispatchEvent(new Event('loadeddata'));
+      this.dispatchEvent(new Event('canplay'));
+      this.dispatchEvent(new Event('canplaythrough'));
+
       this.setControlsDisabled(false);
 
       if (this.pendingProps) {
