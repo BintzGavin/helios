@@ -1,8 +1,9 @@
-**Version**: 1.26.0
+**Version**: 1.26.1
 
 # Renderer Agent Status
 
 ## Progress Log
+- [1.26.1] ✅ Completed: Create README - Created comprehensive `packages/renderer/README.md` documenting the Dual-Path Architecture, Zero Disk I/O pipeline, Smart Codec Selection, and usage instructions.
 - [1.26.0] ✅ Completed: SeekTimeDriver Media Sync - Verified and tested synchronization of <video> and <audio> elements in SeekTimeDriver, ensuring media aligns with the timeline by pausing and setting currentTime.
 - [1.25.0] ✅ Completed: Implement Caption Burning - Implemented `videoCodec: 'libx264'` check to enable `subtitles` filter in FFmpeg for caption burning, while throwing clear error if incompatible 'copy' codec is used.
 - [1.24.2] ✅ Completed: Refactor Smart Codec Selection Types - Fixed implicit `any` types in `CanvasStrategy.ts` and updated verification script `verify-smart-codec-selection.ts` to match expected data structure, ensuring robust type safety and test correctness.
