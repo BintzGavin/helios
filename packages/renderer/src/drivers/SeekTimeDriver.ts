@@ -58,7 +58,16 @@ export class SeekTimeDriver implements TimeDriver {
         const mediaElements = document.querySelectorAll('video, audio');
         mediaElements.forEach((el) => {
           el.pause();
-          el.currentTime = t;
+
+          // Parse attributes (default to 0)
+          const offset = parseFloat(el.getAttribute('data-helios-offset') || '0');
+          const seek = parseFloat(el.getAttribute('data-helios-seek') || '0');
+
+          // Calculate target time
+          // Formula: GlobalTime - Offset + InPoint
+          const targetTime = Math.max(0, t - offset + seek);
+
+          el.currentTime = targetTime;
 
           // Check if we need to wait for seeking to complete
           // readyState < 2 (HAVE_CURRENT_DATA) means we don't have the frame yet
