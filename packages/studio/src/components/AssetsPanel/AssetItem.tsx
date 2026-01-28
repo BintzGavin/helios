@@ -115,6 +115,12 @@ export const AssetItem: React.FC<AssetItemProps> = ({ asset }) => {
                     Aa
                 </div>
             );
+        case 'model':
+            return <div style={{ color: '#aaa', fontSize: '24px' }} title="3D Model">📦</div>;
+        case 'json':
+            return <div style={{ color: '#aaa', fontSize: '24px' }} title="JSON Data">{`{}`}</div>;
+        case 'shader':
+            return <div style={{ color: '#aaa', fontSize: '24px' }} title="Shader">⚡</div>;
         default:
              return <div style={{ color: '#666', fontSize: '24px' }}>📄</div>;
     }

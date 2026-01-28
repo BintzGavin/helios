@@ -12,7 +12,7 @@ export interface AssetInfo {
   id: string;
   name: string;
   url: string;
-  type: 'image' | 'video' | 'audio' | 'font' | 'other';
+  type: 'image' | 'video' | 'audio' | 'font' | 'model' | 'json' | 'shader' | 'other';
 }
 
 export function getProjectRoot(cwd: string): string {
@@ -63,11 +63,17 @@ function getAssetType(ext: string): AssetInfo['type'] {
   const videos = ['.mp4', '.webm', '.mov'];
   const audio = ['.mp3', '.wav', '.aac', '.ogg'];
   const fonts = ['.ttf', '.otf', '.woff', '.woff2'];
+  const models = ['.glb', '.gltf'];
+  const json = ['.json'];
+  const shaders = ['.glsl', '.vert', '.frag'];
 
   if (images.includes(ext)) return 'image';
   if (videos.includes(ext)) return 'video';
   if (audio.includes(ext)) return 'audio';
   if (fonts.includes(ext)) return 'font';
+  if (models.includes(ext)) return 'model';
+  if (json.includes(ext)) return 'json';
+  if (shaders.includes(ext)) return 'shader';
   return 'other';
 }
 

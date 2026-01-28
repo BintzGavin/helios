@@ -100,6 +100,7 @@ export const CaptionsPanel: React.FC = () => {
   const handleAdd = () => {
       const currentTime = Math.round((playerState.currentFrame / playerState.fps) * 1000) || 0;
       const newCue: CaptionCue = {
+          id: Date.now().toString(),
           startTime: currentTime,
           endTime: currentTime + 2000,
           text: "New Caption"
