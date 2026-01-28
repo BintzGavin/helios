@@ -18,8 +18,12 @@ export const Timeline: React.FC = () => {
   const totalFrames = duration * fps || 100; // Default to 100 to avoid div by zero
   const captions = playerState.captions || [];
 
-  const trackRef = useRef<HTMLDivElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState<'playhead' | 'in' | 'out' | null>(null);
+  const [zoom, setZoom] = useState(0);
+
+  const pixelsPerFrame = zoom === 0 ? 0 : 0.5 * Math.pow(1.04, zoom);
 
   const formatTime = (frame: number, fps: number) => {
     if (!fps) return "0:00.00";
@@ -30,8 +34,8 @@ export const Timeline: React.FC = () => {
   };
 
   const getFrameFromEvent = (e: MouseEvent | React.MouseEvent) => {
-    if (!trackRef.current) return 0;
-    const rect = trackRef.current.getBoundingClientRect();
+    if (!contentRef.current) return 0;
+    const rect = contentRef.current.getBoundingClientRect();
     const x = Math.max(0, Math.min(e.clientX - rect.left, rect.width));
     const percentage = x / rect.width;
     return Math.round(percentage * totalFrames);
@@ -101,10 +105,24 @@ export const Timeline: React.FC = () => {
   return (
     <div className="timeline-container">
       <div className="timeline-header">
-        <div>
-          {formatTime(currentFrame, fps)} / {formatTime(totalFrames, fps)}
+        <div className="timeline-header-left">
+          <span>{formatTime(currentFrame, fps)} / {formatTime(totalFrames, fps)}</span>
+          <div className="timeline-zoom-control">
+            <span className="timeline-zoom-label">Fit</span>
+            <input
+              type="range"
+              min="0"
+              max="100"
+              step="1"
+              value={zoom}
+              onChange={(e) => setZoom(Number(e.target.value))}
+              className="timeline-zoom-slider"
+              title="Zoom Timeline"
+            />
+            <span className="timeline-zoom-label">Zoom</span>
+          </div>
         </div>
-        <div style={{ display: 'flex', gap: '8px' }}>
+        <div className="timeline-header-right">
           <span>In: {inPoint}</span>
           <span>Out: {outPoint}</span>
           <span>Fr: {Math.round(currentFrame)}</span>
@@ -113,60 +131,68 @@ export const Timeline: React.FC = () => {
 
       <div
         className="timeline-track-area"
-        ref={trackRef}
-        onMouseDown={(e) => handleMouseDown(e, 'playhead')}
+        ref={scrollContainerRef}
       >
-        <div className="timeline-track" />
-
-        {/* Caption Markers */}
-        {captions.map((cue, i) => {
-            const startFrame = (cue.startTime / 1000) * fps;
-            const endFrame = (cue.endTime / 1000) * fps;
-            const durationFrame = endFrame - startFrame;
-
-            return (
-                <div
-                    key={i}
-                    className="timeline-caption-marker"
-                    style={{
-                        left: `${getPercent(startFrame)}%`,
-                        width: `${Math.max(0.5, (durationFrame / totalFrames) * 100)}%`
-                    }}
-                    title={cue.text}
-                />
-            );
-        })}
-
-        {/* Render Region */}
         <div
-          className="timeline-region"
-          style={{
-            left: `${getPercent(inPoint)}%`,
-            width: `${getPercent(outPoint - inPoint)}%`
-          }}
-        />
+            className="timeline-content"
+            ref={contentRef}
+            style={{
+                width: zoom === 0 ? '100%' : `${totalFrames * pixelsPerFrame}px`
+            }}
+            onMouseDown={(e) => handleMouseDown(e, 'playhead')}
+        >
+            <div className="timeline-track" />
 
-        {/* In Marker */}
-        <div
-          className="timeline-marker in"
-          style={{ left: `${getPercent(inPoint)}%` }}
-          onMouseDown={(e) => { e.stopPropagation(); handleMouseDown(e, 'in'); }}
-          title="In Point (I)"
-        />
+            {/* Caption Markers */}
+            {captions.map((cue, i) => {
+                const startFrame = (cue.startTime / 1000) * fps;
+                const endFrame = (cue.endTime / 1000) * fps;
+                const durationFrame = endFrame - startFrame;
 
-        {/* Out Marker */}
-        <div
-          className="timeline-marker out"
-          style={{ left: `${getPercent(outPoint)}%` }}
-          onMouseDown={(e) => { e.stopPropagation(); handleMouseDown(e, 'out'); }}
-          title="Out Point (O)"
-        />
+                return (
+                    <div
+                        key={i}
+                        className="timeline-caption-marker"
+                        style={{
+                            left: `${getPercent(startFrame)}%`,
+                            width: `${Math.max(0.5, (durationFrame / totalFrames) * 100)}%`
+                        }}
+                        title={cue.text}
+                    />
+                );
+            })}
 
-        {/* Playhead */}
-        <div
-          className="timeline-playhead"
-          style={{ left: `${getPercent(currentFrame)}%` }}
-        />
+            {/* Render Region */}
+            <div
+            className="timeline-region"
+            style={{
+                left: `${getPercent(inPoint)}%`,
+                width: `${getPercent(outPoint - inPoint)}%`
+            }}
+            />
+
+            {/* In Marker */}
+            <div
+            className="timeline-marker in"
+            style={{ left: `${getPercent(inPoint)}%` }}
+            onMouseDown={(e) => { e.stopPropagation(); handleMouseDown(e, 'in'); }}
+            title="In Point (I)"
+            />
+
+            {/* Out Marker */}
+            <div
+            className="timeline-marker out"
+            style={{ left: `${getPercent(outPoint)}%` }}
+            onMouseDown={(e) => { e.stopPropagation(); handleMouseDown(e, 'out'); }}
+            title="Out Point (O)"
+            />
+
+            {/* Playhead */}
+            <div
+            className="timeline-playhead"
+            style={{ left: `${getPercent(currentFrame)}%` }}
+            />
+        </div>
       </div>
     </div>
   );

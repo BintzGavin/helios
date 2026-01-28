@@ -49,15 +49,20 @@ describe('Timeline', () => {
     expect(screen.getByText(/Fr: 30/)).toBeInTheDocument();
   });
 
-  it('seeks when clicking on the track', () => {
+  it('renders zoom control', () => {
+    render(<Timeline />);
+    expect(screen.getByTitle('Zoom Timeline')).toBeInTheDocument();
+  });
+
+  it('seeks when clicking on the content', () => {
     const { container } = render(<Timeline />);
-    const trackArea = container.querySelector('.timeline-track-area');
+    const content = container.querySelector('.timeline-content');
 
-    expect(trackArea).toBeInTheDocument();
+    expect(content).toBeInTheDocument();
 
-    if (trackArea) {
+    if (content) {
       // Mock getBoundingClientRect
-      trackArea.getBoundingClientRect = vi.fn(() => ({
+      content.getBoundingClientRect = vi.fn(() => ({
         left: 0,
         top: 0,
         width: 1000,
@@ -69,24 +74,38 @@ describe('Timeline', () => {
         toJSON: () => {}
       }));
 
-      // Click at 50% (x=500) -> Frame 150
-      fireEvent.mouseDown(trackArea, { clientX: 500 });
+      // Click at 50% (x=500) -> Frame 150 (300 total frames * 0.5)
+      // defaultContext has 300 frames (10s * 30fps)
+      fireEvent.mouseDown(content, { clientX: 500 });
 
       expect(mockSeek).toHaveBeenCalledWith(150);
     }
   });
 
+  it('updates width when zoom changes', () => {
+    const { container } = render(<Timeline />);
+    const slider = screen.getByTitle('Zoom Timeline');
+    const content = container.querySelector('.timeline-content');
+
+    // Default zoom 0 -> width 100%
+    expect(content).toHaveStyle('width: 100%');
+
+    // Change zoom
+    fireEvent.change(slider, { target: { value: '50' } });
+
+    // Check style updated.
+    // It should effectively be pixel based now.
+    // Note: JS DOM might not compute the exact pixels without layout engine,
+    // but the inline style should reflect the calculation.
+    expect(content).not.toHaveStyle('width: 100%');
+
+    // We can inspect the style attribute directly
+    const style = content?.getAttribute('style');
+    expect(style).toContain('width:');
+    expect(style).toMatch(/px/);
+  });
+
   it('clamps In point so it cannot exceed Out point - 1', () => {
-     // Mocking state update by just checking the call
-     // But wait, the component clamps inside the event handler.
-     // If we use keyboard shortcut 'i'
-
-     // Scenario: currentFrame is 299. OutPoint is 300.
-     // 'i' should set InPoint to 299.
-
-     // Scenario: currentFrame is 300 (OutPoint).
-     // 'i' should set InPoint to 299 (OutPoint - 1).
-
      (StudioContext.useStudio as any).mockReturnValue({
         ...defaultContext,
         playerState: { ...defaultPlayerState, currentFrame: 300 }
@@ -100,9 +119,6 @@ describe('Timeline', () => {
   });
 
   it('clamps Out point so it cannot be less than In point + 1', () => {
-      // Scenario: currentFrame is 0. InPoint is 0.
-      // 'o' should set OutPoint to 1 (InPoint + 1).
-
       (StudioContext.useStudio as any).mockReturnValue({
         ...defaultContext,
         playerState: { ...defaultPlayerState, currentFrame: 0 }
