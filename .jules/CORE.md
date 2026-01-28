@@ -77,3 +77,7 @@
 ## 2026-01-28 - Hybrid Composition Stability Gap
 **Learning:** `Helios.waitUntilStable()` delegated strictly to the active driver (usually `DomDriver`), which meant Canvas/WebGL or async data fetches were ignored during stability checks, risking render artifacts.
 **Action:** Planned `2026-01-28-CORE-StabilityAPI.md` to introduce `registerStabilityCheck`, enabling a hybrid stability model (Driver + Custom Checks).
+
+## 2026-01-28 - Package Metadata Discrepancy
+**Learning:** `packages/core/package.json` version (0.0.1) lagged behind `docs/status/CORE.md` (2.2.0), and `README.md` listed incorrect license (MIT vs ELv2).
+**Action:** Created plan `2026-01-28-CORE-VersionSync.md` to synchronize version and license to ensure package integrity.
