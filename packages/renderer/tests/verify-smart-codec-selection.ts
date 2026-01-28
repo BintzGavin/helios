@@ -1,5 +1,5 @@
-import { CanvasStrategy } from '../src/strategies/CanvasStrategy';
-import { RendererOptions } from '../src/types';
+import { CanvasStrategy } from '../src/strategies/CanvasStrategy.js';
+import { RendererOptions } from '../src/types.js';
 import * as assert from 'assert';
 
 async function runTest() {

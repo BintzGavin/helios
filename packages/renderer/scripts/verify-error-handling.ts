@@ -1,5 +1,5 @@
-import { Renderer } from '../src/index';
-import { RendererOptions } from '../src/types';
+import { Renderer } from '../src/index.js';
+import { RendererOptions } from '../src/types.js';
 import path from 'path';
 import fs from 'fs';
 

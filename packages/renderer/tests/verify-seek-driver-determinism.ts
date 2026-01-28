@@ -1,5 +1,5 @@
 import { chromium } from 'playwright';
-import { SeekTimeDriver } from '../src/drivers/SeekTimeDriver';
+import { SeekTimeDriver } from '../src/drivers/SeekTimeDriver.js';
 
 async function verifyDeterminism() {
   console.log('Starting SeekTimeDriver determinism verification...');
@@ -10,7 +10,7 @@ async function verifyDeterminism() {
   const driver = new SeekTimeDriver();
   await driver.init(page);
 
-  // Define a simple animation page that logs performance.now()
+  // Define a simple animation page that logs performance.now() and raf timestamp
   const htmlContent = `
     <!DOCTYPE html>
     <html>
@@ -18,12 +18,6 @@ async function verifyDeterminism() {
       <div id="box"></div>
       <script>
         window.logs = [];
-        window.logTime = () => {
-          window.logs.push({
-            perf: performance.now(),
-            date: Date.now()
-          });
-        };
 
         function loop(timestamp) {
            window.logs.push({
@@ -45,75 +39,65 @@ async function verifyDeterminism() {
 
   const fps = 30;
   const frameDuration = 1 / fps;
-  const totalFrames = 10;
-  const expectedLogs: any[] = [];
+  const totalFrames = 10; // 0 to 9
 
   console.log(`Simulating ${totalFrames} frames at ${fps} FPS...`);
 
+  const setTimes: number[] = [];
   for (let i = 0; i < totalFrames; i++) {
     const time = i * frameDuration;
+    setTimes.push(time * 1000); // ms
     await driver.setTime(page, time);
 
-    // We add a small delay to induce potential drift if using wall clock
-    await new Promise(r => setTimeout(r, 50));
+    // Add delay to prove wall clock doesn't matter
+    await new Promise(r => setTimeout(r, 20));
   }
 
   // Retrieve logs from the page
   const logs = await page.evaluate(() => (window as any).logs);
 
-  console.log(`Captured ${logs.length} frame logs.`);
+  console.log(`Captured ${logs.length} RAF logs.`);
 
-  // Analyze logs
   let failures = 0;
 
-  // We expect roughly one log per setTime call (since setTime waits for RAF).
-  // Note: The first RAF might fire immediately on load, so we might have an initial log at ~0.
-  // The driver calls 'requestAnimationFrame' inside setTime, but our loop also calls it.
-
-  // Let's just check the last few logs to see if they match the expected time.
-  // Specifically, we want to check if performance.now() matches the virtual time exactly.
-
-  logs.forEach((log: any, index: number) => {
-    // We can't easily map index to exact frame because of startup transients,
-    // but we can check if the values look quantized to frame intervals.
-
-    // However, the critical check is:
-    // Is performance.now() == rafTimestamp? (Standard behavior)
-    // Is performance.now() exactly equal to the set time?
-
-    // With the polyfill, performance.now() should be EXACTLY time * 1000.
-    // Without the polyfill, it will be wall clock time.
-
-    console.log(`Frame ${index}: perf=${log.perf.toFixed(2)}, raf=${log.rafTimestamp.toFixed(2)}`);
+  // Check 1: RAF Timestamp must match performance.now()
+  logs.forEach((log: any, i: number) => {
+      if (Math.abs(log.rafTimestamp - log.perf) > 0.001) {
+          console.error(`❌ Frame ${i}: RAF timestamp (${log.rafTimestamp}) != performance.now() (${log.perf})`);
+          failures++;
+      }
   });
 
-  // Strict check: Find a log entry that corresponds to frame 5 (approx 166.66ms)
-  // If it's deterministc, we should find exact matches.
+  // Check 2: We must find a log entry for EACH set time
+  setTimes.forEach((targetTime) => {
+      const match = logs.find((l: any) => Math.abs(l.perf - targetTime) < 0.001);
+      if (!match) {
+           console.error(`❌ Missing frame: No log entry found for time ${targetTime.toFixed(3)}ms`);
+           failures++;
+      }
+  });
 
-  // Actually, let's just check if we have distinct values that are perfectly spaced?
-  // Or simpler: check if the difference between logs is exactly 33.333... ms?
+  // Check 3: Date.now() should be anchored
+  // It's harder to check exact value without knowing start time, but delta should match
+  if (logs.length > 1) {
+      const first = logs[0];
+      const last = logs[logs.length - 1];
+      const perfDelta = last.perf - first.perf;
+      const dateDelta = last.date - first.date;
 
-  // Let's refine the success criteria:
-  // If polyfill is working, performance.now() should equal the time we set.
-
-  // To verify this rigorously, let's verify that for the LAST frame we set (frame 9 = 0.3s),
-  // we have a log entry with exactly 300ms (or 299.999...).
-
-  const lastTime = (totalFrames - 1) * frameDuration * 1000;
-  const matchingLog = logs.find((l: any) => Math.abs(l.perf - lastTime) < 0.001);
-
-  if (matchingLog) {
-    console.log(`✅ SUCCESS: Found log entry matching target time ${lastTime.toFixed(2)}ms`);
-  } else {
-    console.log(`❌ FAILURE: No log entry found matching target time ${lastTime.toFixed(2)}ms`);
-    console.log(`(This is expected before the fix)`);
-    failures++;
+      if (Math.abs(perfDelta - dateDelta) > 1.0) {
+          console.error(`❌ Date.now() drift: perfDelta=${perfDelta}, dateDelta=${dateDelta}`);
+          failures++;
+      }
   }
 
   await browser.close();
 
   if (failures > 0) {
+    console.error(`❌ verification failed with ${failures} errors.`);
     process.exit(1);
+  } else {
+    console.log(`✅ SUCCESS: SeekTimeDriver is deterministic.`);
   }
 }
 

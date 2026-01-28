@@ -26,7 +26,8 @@
   "scripts": {
     "build": "tsc",
     "dev": "tsc -w",
-    "verify:error": "ts-node scripts/verify-error-handling.ts"
+    "verify:error": "tsx scripts/verify-error-handling.ts",
+    "test": "npx tsx tests/run-all.ts"
   },
   "dependencies": {
     "@ffmpeg-installer/ffmpeg": "^1.1.0",
@@ -36,6 +37,7 @@
   "devDependencies": {
     "@types/node": "^20.11.24",
     "ts-node": "^10.9.2",
+    "tsx": "^4.21.0",
     "typescript": "^5.0.0"
   }
 }

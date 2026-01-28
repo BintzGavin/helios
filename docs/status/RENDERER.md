@@ -1,8 +1,9 @@
-**Version**: 1.27.0
+**Version**: 1.27.1
 
 # Renderer Agent Status
 
 ## Progress Log
+- [1.27.1] ✅ Completed: Fix SeekTimeDriver and Testing - Refactored `SeekTimeDriver` to use string-based evaluation to prevent transpiler artifacts (like `esbuild`'s `__name`) in Playwright. Added `tsx` and a unified test runner (`npm test`) to `packages/renderer`.
 - [1.27.0] ✅ Completed: Robust Seek Wait - Updated `SeekTimeDriver` to wait for fonts and media `seeked` events, ensuring deterministic frame capture for DOM rendering. Also standardized source imports to use `.js` extensions for ESM compatibility.
 - [1.26.1] ✅ Completed: Create README - Created comprehensive `packages/renderer/README.md` documenting the Dual-Path Architecture, Zero Disk I/O pipeline, Smart Codec Selection, and usage instructions.
 - [1.26.0] ✅ Completed: SeekTimeDriver Media Sync - Verified and tested synchronization of <video> and <audio> elements in SeekTimeDriver, ensuring media aligns with the timeline by pausing and setting currentTime.

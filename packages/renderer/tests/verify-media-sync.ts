@@ -1,5 +1,5 @@
 import { chromium } from 'playwright';
-import { SeekTimeDriver } from '../src/drivers/SeekTimeDriver';
+import { SeekTimeDriver } from '../src/drivers/SeekTimeDriver.js';
 
 async function verifyMediaSync() {
   console.log('Starting Media Sync verification...');
