@@ -9,6 +9,7 @@ const tests = [
   'tests/verify-implicit-audio.ts',
   'tests/verify-deep-dom.ts',
   'tests/verify-dom-media-attributes.ts',
+  'tests/verify-dom-transparency.ts',
   'tests/verify-smart-codec-selection.ts',
   'tests/verify-captions.ts',
   'scripts/verify-error-handling.ts',

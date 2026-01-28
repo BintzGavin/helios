@@ -15,6 +15,7 @@ The Renderer uses the Strategy pattern to support two distinct rendering modes:
     *   Optimized for HTML/CSS animations.
     *   Uses `SeekTimeDriver` (WAAPI) to advance time.
     *   Captures frames using `page.screenshot()` (currently, pending `Element.capture` or similar).
+    *   **Transparent Video Export**: Supports transparency (alpha channel) by detecting `yuva` or `rgba` pixel formats and configuring Playwright to `omitBackground`.
     *   Injects polyfills via `SeekTimeDriver.init()` to ensure `requestAnimationFrame`, `Date.now`, and `performance.now` are deterministic from frame 0.
     *   **Deep DOM Discovery**: Automatically detects `<audio>` and `<video>` elements, and preloads fonts/images across **all frames** (including iframes), aggregating audio tracks for the final render.
     *   **Media Attributes**: Respects `data-helios-offset`, `data-helios-seek`, and `muted` attributes on media elements for precise timing and volume control.

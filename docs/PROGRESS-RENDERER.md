@@ -1,5 +1,8 @@
 # RENDERER Progress Log
 
+## RENDERER v1.33.0
+- ✅ Completed: Enable DOM Transparency - Updated `DomStrategy` to support transparent video export by using `omitBackground: true` in Playwright when `pixelFormat` suggests alpha (e.g. `yuva420p`, `rgba`), allowing creation of transparent overlays and lower-thirds.
+
 ## RENDERER v1.32.0
 - ✅ Completed: FFmpeg Diagnostics - Implemented `FFmpegInspector` and updated `Renderer.diagnose()` to return comprehensive diagnostics including FFmpeg version, supported encoders (like `libx264`), and filters, resolving the Vision Gap.
 
