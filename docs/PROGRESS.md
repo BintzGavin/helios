@@ -159,3 +159,6 @@ Each agent should update **their own dedicated progress file** instead of this f
 
 ## CORE v2.0.0
 - ✅ Completed: WaitUntilStable Interface - Made `waitUntilStable` required in `TimeDriver` interface and strict in `Helios` to ensure reliable rendering.
+
+## RENDERER v1.28.0
+- ✅ Completed: Multi-Frame Seek - Updated SeekTimeDriver to synchronize virtual time across all frames (including iframes), enabling deterministic rendering for complex compositions.
