@@ -1,6 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { useStudio } from '../context/StudioContext';
-import { useKeyboardShortcut } from '../hooks/useKeyboardShortcut';
 import { CaptionCue } from '@helios-project/core';
 import './Timeline.css';
 
@@ -84,19 +83,6 @@ export const Timeline: React.FC = () => {
       document.removeEventListener('mouseup', handleMouseUp);
     };
   }, [isDragging, controller, totalFrames, inPoint, outPoint, setInPoint, setOutPoint]);
-
-  // Keyboard Shortcuts
-  useKeyboardShortcut('i', () => {
-    // Clamp
-    const newIn = Math.max(0, Math.min(Math.round(currentFrame), outPoint - 1));
-    setInPoint(newIn);
-  }, { ignoreInput: true });
-
-  useKeyboardShortcut('o', () => {
-    // Clamp
-    const newOut = Math.max(inPoint + 1, Math.min(Math.round(currentFrame), totalFrames));
-    setOutPoint(newOut);
-  }, { ignoreInput: true });
 
   const getPercent = (frame: number) => {
     const p = (frame / totalFrames) * 100;

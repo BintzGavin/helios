@@ -10,7 +10,7 @@ import { CompositionSwitcher } from './components/CompositionSwitcher'
 import { KeyboardShortcutsModal } from './components/KeyboardShortcutsModal'
 import { DiagnosticsModal } from './components/DiagnosticsModal'
 import { SystemPromptModal } from './components/SystemPromptModal'
-import { useKeyboardShortcut } from './hooks/useKeyboardShortcut'
+import { GlobalShortcuts } from './components/GlobalShortcuts'
 import { Stage } from './components/Stage/Stage'
 import { Sidebar } from './components/Sidebar/Sidebar'
 
@@ -18,7 +18,6 @@ function AppContent() {
   const {
     activeComposition,
     setSwitcherOpen,
-    setHelpOpen,
     controller,
     playerState,
     setPlayerState,
@@ -26,45 +25,6 @@ function AppContent() {
   } = useStudio();
 
   const src = activeComposition?.url || '';
-
-  // Open switcher with Cmd+K
-  useKeyboardShortcut('k', (e) => {
-    e.preventDefault();
-    setSwitcherOpen(true);
-  }, { ctrlOrCmd: true });
-
-  // Open Help with ?
-  useKeyboardShortcut('?', (e) => {
-    e.preventDefault();
-    setHelpOpen(true);
-  }, { ignoreInput: true });
-
-  // Playback Shortcuts
-  useKeyboardShortcut(' ', () => {
-    if (!controller) return;
-    if (playerState.isPlaying) {
-      controller.pause();
-    } else {
-      controller.play();
-    }
-  }, { ignoreInput: true, preventDefault: true });
-
-  useKeyboardShortcut('ArrowLeft', (e) => {
-    if (!controller) return;
-    const amount = e.shiftKey ? 10 : 1;
-    controller.seek(Math.max(0, playerState.currentFrame - amount));
-  }, { ignoreInput: true, preventDefault: true });
-
-  useKeyboardShortcut('ArrowRight', (e) => {
-    if (!controller) return;
-    const amount = e.shiftKey ? 10 : 1;
-    controller.seek(playerState.currentFrame + amount);
-  }, { ignoreInput: true, preventDefault: true });
-
-  useKeyboardShortcut('Home', () => {
-    if (!controller) return;
-    controller.seek(0);
-  }, { ignoreInput: true, preventDefault: true });
 
   useEffect(() => {
     if (!controller) return;
@@ -147,6 +107,7 @@ function AppContent() {
       <KeyboardShortcutsModal />
       <DiagnosticsModal />
       <SystemPromptModal />
+      <GlobalShortcuts />
     </>
   )
 }
