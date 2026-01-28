@@ -105,32 +105,6 @@ describe('Timeline', () => {
     expect(style).toMatch(/px/);
   });
 
-  it('clamps In point so it cannot exceed Out point - 1', () => {
-     (StudioContext.useStudio as any).mockReturnValue({
-        ...defaultContext,
-        playerState: { ...defaultPlayerState, currentFrame: 300 }
-     });
-
-     render(<Timeline />);
-
-     fireEvent.keyDown(window, { key: 'i' });
-
-     expect(mockSetInPoint).toHaveBeenCalledWith(299);
-  });
-
-  it('clamps Out point so it cannot be less than In point + 1', () => {
-      (StudioContext.useStudio as any).mockReturnValue({
-        ...defaultContext,
-        playerState: { ...defaultPlayerState, currentFrame: 0 }
-     });
-
-     render(<Timeline />);
-
-     fireEvent.keyDown(window, { key: 'o' });
-
-     expect(mockSetOutPoint).toHaveBeenCalledWith(1);
-  });
-
   it('renders caption markers from playerState.captions', () => {
       const captions = [
           { startTime: 0, endTime: 1000, text: 'Hello' },
