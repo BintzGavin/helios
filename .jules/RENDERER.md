@@ -87,3 +87,7 @@
 ## [2026-03-25] - SeekTimeDriver Media Sync Gap
 **Learning:** `DomStrategy` relies on `SeekTimeDriver` which polyfills `performance.now` but fails to sync `<video>` and `<audio>` elements, causing them to play at wall-clock speed or drift during slow frame capture in non-Helios pages.
 **Action:** Implement explicit media element synchronization (pause + seek) in `SeekTimeDriver.setTime` to force all media to the virtual time.
+
+## 2026-03-26 - DomStrategy Media Attributes Gap
+**Learning:** `DomStrategy` discovers media elements but ignores `data-helios-offset`, `data-helios-seek`, and `muted` attributes, causing all media to play from T=0 at full volume.
+**Action:** Created plan to parse these attributes in `DomStrategy.prepare()` and pass them to `FFmpegBuilder`.
