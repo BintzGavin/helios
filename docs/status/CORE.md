@@ -1,11 +1,12 @@
 # Status: CORE
 
-**Version**: 2.4.0
+**Version**: 2.5.0
 
 - **Status**: Active
 - **Current Focus**: Maintenance and Optimization
-- **Last Updated**: 2026-03-31
+- **Last Updated**: 2026-04-01
 
+[v2.5.0] ✅ Completed: Maintenance and Robustness - Fixed memory leak in Helios constructor, enhanced color schema validation, and synced package version.
 [v2.4.0] ✅ Completed: Implement Spring Duration - Added `calculateSpringDuration` utility and exported `DEFAULT_SPRING_CONFIG` in `packages/core`.
 [v2.3.0] ✅ Completed: Implement Transitions Library - Implemented standard transition and crossfade functions, and corrected README installation instructions.
 [v2.2.0] ✅ Completed: Implement Playback Range - Added `playbackRange` to `HeliosState`, enabling loop and clamp behavior within a specific frame range.
