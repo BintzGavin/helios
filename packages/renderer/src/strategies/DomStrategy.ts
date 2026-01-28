@@ -111,9 +111,16 @@ export class DomStrategy implements RenderStrategy {
           mediaElements.forEach(el => {
             const src = el.currentSrc || el.src;
             if (src) {
+              // Parse attributes
+              const offset = el.dataset.heliosOffset ? parseFloat(el.dataset.heliosOffset) : 0;
+              const seek = el.dataset.heliosSeek ? parseFloat(el.dataset.heliosSeek) : 0;
+              const volume = el.muted ? 0 : el.volume;
+
               tracks.push({
                 path: src,
-                volume: el.volume
+                volume: volume,
+                offset: isNaN(offset) ? 0 : offset,
+                seek: isNaN(seek) ? 0 : seek
               });
             }
           });
@@ -136,6 +143,8 @@ export class DomStrategy implements RenderStrategy {
       .map(track => ({
         path: track.path,
         volume: track.volume,
+        offset: track.offset,
+        seek: track.seek,
       }));
 
     if (this.discoveredAudioTracks.length > 0) {
