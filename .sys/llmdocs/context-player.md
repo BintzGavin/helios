@@ -1,64 +1,51 @@
-# PLAYER Context
+# Context: Player
 
-## Identity
-- **Role**: Frontend / Player Agent
-- **Domain**: `packages/player`
-- **Responsibility**: `<helios-player>` Web Component, UI controls, iframe bridge.
+## A. Component Structure
+- **Shadow DOM**:
+  - `div.status-overlay` (Loading/Error feedback)
+  - `div.poster-container` (Poster image + Big Play Button)
+  - `iframe` (Sandboxed composition)
+  - `div.click-layer` (Transparent overlay for standard interactions)
+  - `div.captions-container` (Burn-in captions overlay)
+  - `div.controls` (Playback controls)
 
-## Architecture
-The `<helios-player>` uses a robust connection strategy:
-- **Direct Mode**: Polls the iframe content for `window.helios` every 100ms (up to 5s) to support asynchronous composition initialization.
-- **Bridge Mode**: Simultaneously attempts to connect via `postMessage` for cross-origin or sandboxed scenarios.
-- **Controller Pattern**: Abstracts the connection (Direct or Bridge) behind a unified `HeliosController` interface.
+## B. Attributes
+- `src` (string): URL of the composition.
+- `width` (number): Player width.
+- `height` (number): Player height.
+- `autoplay` (boolean): Auto-start playback.
+- `loop` (boolean): Loop playback.
+- `controls` (boolean): Show/hide controls.
+- `muted` (boolean): Mute audio.
+- `interactive` (boolean): Disable click layer to allow direct iframe interaction.
+- `poster` (string): URL of poster image.
+- `preload` (string): 'auto' or 'none'.
+- `input-props` (string): JSON string of input properties.
+- `export-format` (string): 'mp4' or 'webm'.
+- `export-mode` (string): 'auto', 'canvas', or 'dom'.
+- `canvas-selector` (string): CSS selector for canvas in 'canvas' mode.
 
-## Component Structure
-The `<helios-player>` component uses a Shadow DOM with the following structure:
-- `.status-overlay`: Displays loading, error, and connection states (hidden by default).
-- `.poster-container`: Displays the poster image and a "Big Play Button" for deferred loading.
-- `iframe`: The sandboxed iframe that loads the composition.
-- `.click-layer`: Transparent overlay that intercepts clicks (standard video behavior) or allows them to pass through (interactive mode).
-- `.captions-container`: Overlay for rendering caption cues.
-- `.controls`: The playback control bar (Play/Pause, Volume, Captions, Export, Speed, Scrubber, Time, Fullscreen).
+## C. Events
+- `play`: Playback started.
+- `pause`: Playback paused.
+- `ended`: Playback ended.
+- `timeupdate`: Current time changed.
+- `volumechange`: Volume or mute state changed.
+- `ratechange`: Playback rate changed.
+- `durationchange`: Duration changed.
+- `error`: Error occurred.
 
-## Events
-The `<helios-player>` dispatches the following custom events:
-- `play`: Fired when playback starts.
-- `pause`: Fired when playback pauses.
-- `ended`: Fired when playback reaches the end.
-- `timeupdate`: Fired when the current frame changes.
-- `volumechange`: Fired when volume or mute state changes.
-- `ratechange`: Fired when playback rate changes.
-- `durationchange`: Fired when the duration changes.
-- `error`: Fired when a runtime error occurs in the bridge or iframe.
-
-## Attributes
-The `<helios-player>` observes the following attributes:
-- `src`: URL of the composition to load.
-- `width`: Width of the player (aspect ratio).
-- `height`: Height of the player (aspect ratio).
-- `autoplay`: Automatically start playback when loaded.
-- `loop`: Loop playback when finished.
-- `controls`: Show/hide the control bar.
-- `export-format`: Format for client-side export (`mp4` or `webm`).
-- `input-props`: JSON string of input properties to pass to the composition.
-- `poster`: URL of an image to show before loading or playing.
-- `preload`: `auto` (default) or `none` (defer loading until interaction).
-- `muted`: Mute the audio by default.
-- `interactive`: Enable direct interaction with the composition content.
-
-## Public API
-The `HeliosPlayer` class exposes the following properties and methods:
+## D. Public API
 - `play(): Promise<void>`
 - `pause(): void`
+- `load(): void`
 - `currentTime`: number (get/set)
-- `currentFrame`: number (get/set)
-- `duration`: number (readonly)
-- `paused`: boolean (readonly)
-- `ended`: boolean (readonly)
+- `duration`: number (get)
+- `paused`: boolean (get)
+- `ended`: boolean (get)
 - `volume`: number (get/set)
 - `muted`: boolean (get/set)
 - `playbackRate`: number (get/set)
-- `fps`: number (readonly)
-- `inputProps`: Record<string, any> | null (get/set)
 - `interactive`: boolean (get/set)
-- `load(): void`
+- `inputProps`: Record<string, any> (get/set)
+- `getController(): HeliosController | null`
