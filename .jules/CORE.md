@@ -73,3 +73,7 @@
 ## 2026-01-26 - Time Discrepancy in Status Files
 **Learning:** `docs/status/CORE.md` contains entries dated in the future (e.g., March 2026) relative to the system date (January 2026). This causes confusion when naming plan files sequentially.
 **Action:** Trust the system date (`date` command) for new plan filenames to ensure accuracy to the current execution context, regardless of the "future" status logs.
+
+## 2026-01-28 - Hybrid Composition Stability Gap
+**Learning:** `Helios.waitUntilStable()` delegated strictly to the active driver (usually `DomDriver`), which meant Canvas/WebGL or async data fetches were ignored during stability checks, risking render artifacts.
+**Action:** Planned `2026-01-28-CORE-StabilityAPI.md` to introduce `registerStabilityCheck`, enabling a hybrid stability model (Driver + Custom Checks).
