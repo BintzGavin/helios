@@ -1,3 +1,6 @@
+## DEMO v1.50.0
+- ✅ Completed: Podcast Visualizer - Created `examples/podcast-visualizer` demonstrating multi-track audio mixing and sync verification.
+
 ## DEMO v1.13.0
 - ✅ Completed: Verify Svelte Animation Helpers - Verified `examples/svelte-animation-helpers` and enabled E2E test.
 

@@ -30,7 +30,7 @@
     "test": "vitest"
   },
   "dependencies": {
-    "@helios-project/core": "2.5.0",
+    "@helios-project/core": "2.6.0",
     "mp4-muxer": "^2.0.1",
     "webm-muxer": "^5.1.4"
   },
