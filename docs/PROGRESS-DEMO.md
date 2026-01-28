@@ -94,5 +94,8 @@
 ## DEMO v1.48.0
 - ✅ Completed: React Styled Components Example - Created `examples/react-styled-components` demonstrating integration with `styled-components` via `autoSyncAnimations` and refactored all examples to use source imports.
 
+## DEMO v1.49.1
+- ✅ Completed: Solid Canvas Documentation - Added README for SolidJS example and verified E2E tests.
+
 ## DEMO v1.49.0
 - ✅ Completed: Solid Canvas Example - Created `examples/solid-canvas-animation` demonstrating integration with SolidJS and `createHeliosSignal` adapter.
