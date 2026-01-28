@@ -290,7 +290,7 @@ describe('DomDriver', () => {
       // Mock document.fonts
       // @ts-ignore
       document.fonts = {
-        ready: Promise.resolve(),
+        ready: Promise.resolve() as unknown as Promise<FontFaceSet>,
       };
     });
 

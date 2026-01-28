@@ -1,5 +1,11 @@
 # CORE Progress Log
 
+## CORE v1.33.1
+- ✅ Completed: Refine WaitUntilStable Interface - Made `waitUntilStable` required in `TimeDriver` interface and updated `Helios` to enforce it, ensuring type safety and consistency across drivers.
+
+## CORE v1.33.0
+- ✅ Completed: Implement WaitUntilStable - Implemented `waitUntilStable` in `Helios` and `DomDriver` to ensure deterministic rendering by waiting for fonts, images, and media readiness.
+
 ## CORE v1.32.1
 - ✅ Completed: Document Dynamic Timing - Verified implementation, added JSDoc, and cleaned up plan artifacts.
 
@@ -119,6 +125,3 @@
 
 ## [2026-01-15] CORE
 - Updated `Helios` class in `packages/core` to support `bindToDocumentTimeline()`. Added unit tests.
-
-### CORE v1.33.0
-- ✅ Completed: Implement WaitUntilStable - Implemented `waitUntilStable` in `Helios` and `DomDriver` to ensure deterministic rendering by waiting for fonts, images, and media readiness.

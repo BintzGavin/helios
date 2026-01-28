@@ -353,7 +353,8 @@ describe('Helios Core', () => {
     beforeEach(() => {
        mockDriver = {
          init: vi.fn(),
-         update: vi.fn()
+         update: vi.fn(),
+         waitUntilStable: vi.fn().mockResolvedValue(undefined)
        };
     });
 
@@ -674,7 +675,8 @@ Updated`;
     it('should sync driver with initialFrame', () => {
       const mockDriver: TimeDriver = {
          init: vi.fn(),
-         update: vi.fn()
+         update: vi.fn(),
+         waitUntilStable: vi.fn().mockResolvedValue(undefined)
       };
 
       new Helios({ duration: 10, fps: 30, initialFrame: 30, driver: mockDriver });

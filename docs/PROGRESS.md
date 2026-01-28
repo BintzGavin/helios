@@ -141,3 +141,6 @@ Each agent should update **their own dedicated progress file** instead of this f
 
 ## CORE v1.33.0
 - ✅ Completed: Implement WaitUntilStable - Implemented `waitUntilStable` in `Helios` and `DomDriver` to ensure deterministic rendering by waiting for fonts, images, and media readiness.
+
+## CORE v1.33.1
+- ✅ Completed: Refine WaitUntilStable Interface - Made `waitUntilStable` required in `TimeDriver` interface and updated `Helios` to enforce it, ensuring type safety and consistency across drivers.
