@@ -1,5 +1,8 @@
 # CORE Progress Log
 
+## CORE v2.6.0
+- ✅ Completed: Implement DomDriver Media Attributes - Implemented `data-helios-offset` and `data-helios-seek` support in `DomDriver` for accurate in-browser preview timing.
+
 ## CORE v2.5.0
 - ✅ Completed: Maintenance and Robustness - Fixed memory leak in Helios constructor, enhanced color schema validation, and synced package version.
 
