@@ -329,6 +329,11 @@ export class Helios {
     this._loop.value = shouldLoop;
   }
 
+  /**
+   * Updates the duration of the composition in seconds.
+   * If the new duration is shorter than the current playback time, the current frame will be clamped.
+   * @param seconds The new duration in seconds (must be non-negative).
+   */
   public setDuration(seconds: number) {
     if (seconds < 0) {
       throw new HeliosError(
@@ -353,6 +358,11 @@ export class Helios {
     }
   }
 
+  /**
+   * Updates the frame rate of the composition.
+   * This preserves the current playback time in seconds, adjusting the current frame number accordingly.
+   * @param fps The new frame rate (must be greater than 0).
+   */
   public setFps(fps: number) {
     if (fps <= 0) {
       throw new HeliosError(

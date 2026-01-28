@@ -132,3 +132,6 @@ Each agent should update **their own dedicated progress file** instead of this f
 
 ## DEMO v1.44.0
 - ✅ Completed: Scaffold React Three Fiber Example - Created `examples/react-three-fiber` demonstrating integration with `@react-three/fiber` using `frameloop="never"` and manual state advancement.
+
+## CORE v1.32.1
+- ✅ Completed: Document Dynamic Timing - Verified implementation, added JSDoc, and cleaned up plan artifacts.

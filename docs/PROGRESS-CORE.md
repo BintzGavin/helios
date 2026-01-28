@@ -1,5 +1,8 @@
 # CORE Progress Log
 
+## CORE v1.32.1
+- ✅ Completed: Document Dynamic Timing - Verified implementation, added JSDoc, and cleaned up plan artifacts.
+
 ## CORE v1.32.0
 - ✅ Completed: Implement Schema Asset Types - Added `image`, `video`, `audio`, `font` to `PropType` and validation, enabling asset selection in Studio.
 
