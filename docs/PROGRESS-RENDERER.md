@@ -1,5 +1,8 @@
 # RENDERER Progress Log
 
+## RENDERER v1.34.0
+- ✅ Completed: Seek Driver Offsets - Updated `SeekTimeDriver` to respect `data-helios-offset` and `data-helios-seek` attributes, calculating correct `currentTime` for visual media synchronization.
+
 ## RENDERER v1.33.0
 - ✅ Completed: Enable DOM Transparency - Updated `DomStrategy` to support transparent video export by using `omitBackground: true` in Playwright when `pixelFormat` suggests alpha (e.g. `yuva420p`, `rgba`), allowing creation of transparent overlays and lower-thirds.
 
