@@ -57,6 +57,12 @@ export interface RendererOptions {
   audioTracks?: (string | AudioTrackConfig)[];
 
   /**
+   * Path to an SRT file to burn into the video as subtitles.
+   * Note: This requires video transcoding (videoCodec cannot be 'copy').
+   */
+  subtitles?: string;
+
+  /**
    * The audio codec to use.
    * Defaults to 'aac' (unless videoCodec implies WebM, then 'libvorbis').
    */
