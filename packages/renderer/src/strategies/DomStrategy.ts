@@ -155,11 +155,22 @@ export class DomStrategy implements RenderStrategy {
   async capture(page: Page, frameTime: number): Promise<Buffer> {
     const format = this.options.intermediateImageFormat || 'png';
     const quality = this.options.intermediateImageQuality;
+    const pixelFormat = this.options.pixelFormat || 'yuv420p';
 
     if (format === 'jpeg') {
       return await page.screenshot({ type: 'jpeg', quality: quality });
     } else {
-      return await page.screenshot({ type: 'png' });
+      // Check if the requested pixel format supports alpha
+      const hasAlpha = pixelFormat.includes('yuva') ||
+                       pixelFormat.includes('rgba') ||
+                       pixelFormat.includes('bgra') ||
+                       pixelFormat.includes('argb') ||
+                       pixelFormat.includes('abgr');
+
+      return await page.screenshot({
+        type: 'png',
+        omitBackground: hasAlpha
+      });
     }
   }
 
