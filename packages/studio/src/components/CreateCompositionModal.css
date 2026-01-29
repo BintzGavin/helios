@@ -41,7 +41,8 @@
   color: #aaa;
 }
 
-.create-modal-input {
+.create-modal-input,
+.create-modal-select {
   padding: 10px;
   background-color: #111;
   border: 1px solid #333;
@@ -51,7 +52,8 @@
   outline: none;
 }
 
-.create-modal-input:focus {
+.create-modal-input:focus,
+.create-modal-select:focus {
   border-color: #555;
 }
 
