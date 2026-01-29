@@ -1,5 +1,8 @@
 # PLAYER Progress Log
 
+## PLAYER v0.32.2
+- ✅ Completed: Polish Click-To-Play & Fix Z-Index - Fixed bug where controls were blocked by click-layer and ensured player grabs focus on click.
+
 ## PLAYER v0.32.1
 - ✅ Completed: Fix Player Dependencies - Updated @helios-project/core dependency and fixed build environment to enable verification.
 
