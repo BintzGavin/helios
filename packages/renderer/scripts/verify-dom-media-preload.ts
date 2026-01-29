@@ -2,10 +2,30 @@ import { Renderer } from '../src/index';
 import { RendererOptions } from '../src/types';
 import fs from 'fs';
 import path from 'path';
+import { spawnSync } from 'child_process';
+import ffmpeg from '@ffmpeg-installer/ffmpeg';
 
-const TEST_VIDEO_URL = 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4';
+async function run() {
+  const tempDir = path.join(__dirname, '../temp');
+  if (!fs.existsSync(tempDir)) {
+    fs.mkdirSync(tempDir, { recursive: true });
+  }
 
-const htmlContent = `
+  // Generate dummy video locally to avoid network flakiness/errors
+  const dummyVideoPath = path.join(tempDir, 'dummy-preload.mp4');
+  if (!fs.existsSync(dummyVideoPath)) {
+    console.log('Generating dummy video for test...');
+    spawnSync(ffmpeg.path, [
+      '-y',
+      '-f', 'lavfi', '-i', 'testsrc=duration=5:size=1280x720:rate=30',
+      '-f', 'lavfi', '-i', 'sine=frequency=440:duration=5',
+      '-c:v', 'libx264', '-c:a', 'aac',
+      dummyVideoPath
+    ]);
+  }
+  const TEST_VIDEO_URL = `file://${dummyVideoPath}`;
+
+  const htmlContent = `
 <!DOCTYPE html>
 <html>
 <head>
@@ -23,12 +43,6 @@ const htmlContent = `
 </body>
 </html>
 `;
-
-async function run() {
-  const tempDir = path.join(__dirname, '../temp');
-  if (!fs.existsSync(tempDir)) {
-    fs.mkdirSync(tempDir, { recursive: true });
-  }
 
   const htmlPath = path.join(tempDir, 'media-preload-test.html');
   // Need absolute path for file://
@@ -54,8 +68,10 @@ async function run() {
   console.log = (...args) => {
     const msg = args.join(' ');
     originalLog(msg);
-    // Check for the expected log message structure from the Renderer
-    if (msg.includes('PAGE LOG: [DomStrategy] Preloading') && msg.includes('media elements')) {
+    // Check for the expected log message structure from the Renderer (now from DomScanner)
+    // Looking for "PAGE LOG: [DomScanner] Found 1 media elements. Waiting for readiness..."
+    // or "[DomScanner] Media elements ready."
+    if (msg.includes('[DomScanner]') && msg.includes('Found') && msg.includes('media elements')) {
       preloadDetected = true;
     }
   };

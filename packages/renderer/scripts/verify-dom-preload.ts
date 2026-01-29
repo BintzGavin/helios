@@ -14,8 +14,8 @@ async function main() {
   });
 
   const compositionPath = path.resolve(
-    process.cwd(),
-    'packages/renderer/scripts/fixtures/background-image.html'
+    __dirname,
+    'fixtures/background-image.html'
   );
   const compositionUrl = `file://${compositionPath}`;
 

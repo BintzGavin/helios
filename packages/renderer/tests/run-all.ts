@@ -25,7 +25,13 @@ const tests = [
   'tests/verify-seek-driver-stability.ts',
   'tests/verify-smart-codec-selection.ts',
   'tests/verify-stream-copy.ts',
+  'scripts/verify-advanced-audio.ts',
+  'scripts/verify-audio-args.ts',
+  'scripts/verify-audio-mixing.ts',
+  'scripts/verify-dom-media-preload.ts',
+  'scripts/verify-dom-preload.ts',
   'scripts/verify-error-handling.ts',
+  'scripts/verify-transparency.ts',
 ];
 
 console.log('Running Renderer Verification Suite...');
