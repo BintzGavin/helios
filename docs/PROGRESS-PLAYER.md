@@ -1,5 +1,8 @@
 # PLAYER Progress Log
 
+## PLAYER v0.33.1
+- ✅ Completed: Fix Player Metadata - Synced package.json version with status file (0.5.2 -> 0.33.1) and updated @helios-project/core dependency to 2.7.0.
+
 ## PLAYER v0.33.0
 - ✅ Completed: Deep API Parity - Implemented `videoWidth`, `videoHeight`, `buffered`, `seekable`, `seeking` properties on `<helios-player>` for compatibility with third-party wrappers.
 
