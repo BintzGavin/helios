@@ -1,4 +1,4 @@
-**Version**: 0.42.0
+**Version**: 0.43.0
 
 # Studio Domain Status
 
@@ -7,6 +7,7 @@
 **Focus**: UI Implementation & CLI
 
 ## Recent Updates
+- [v0.43.0] ✅ Completed: Create Composition - Implemented "Create Composition" feature with UI modal, API endpoint, and file generation logic.
 - [v0.42.0] ✅ Completed: Drag & Drop Assets - Implemented drag and drop support from Assets Panel to Props Editor inputs (typed and generic).
 - [v0.41.0] ✅ Completed: Asset Input - Implemented `AssetInput` in Props Editor with asset discovery integration (autocomplete via datalist) for image, video, audio, and font types.
 - [v0.40.1] ✅ Completed: Documentation & Verification - Added package README, updated version, and implemented Playwright-based verification script.

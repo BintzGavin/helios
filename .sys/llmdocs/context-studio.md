@@ -21,6 +21,7 @@ packages/studio/
       Layout/
       Sidebar/
       Stage/
+      CreateCompositionModal.tsx
       GlobalShortcuts.tsx
       KeyboardShortcutsModal.tsx
       PropsEditor.tsx
@@ -51,6 +52,7 @@ Options:
 - **GlobalShortcuts**: Headless component managing keyboard interactions.
 - **PlaybackControls**: Buttons for play, pause, seek, loop, volume.
 - **KeyboardShortcutsModal**: Displays available shortcuts.
+- **CreateCompositionModal**: Modal for creating new compositions.
 - **AssetsPanel**: Drag-and-drop asset management (upload & drag to props).
 - **RendersPanel**: Render job management and client-side export.
 - **DiagnosticsPanel**: Environment checks.

@@ -1,3 +1,6 @@
+## STUDIO v0.43.0
+- ✅ Completed: Create Composition - Implemented "Create Composition" feature with UI modal, API endpoint, and file generation logic.
+
 ## STUDIO v0.42.0
 - ✅ Completed: Drag & Drop Assets - Implemented drag and drop support from Assets Panel to Props Editor inputs (typed and generic).
 

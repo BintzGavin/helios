@@ -2,30 +2,51 @@ import { Plugin } from 'vite';
 import { AddressInfo } from 'net';
 import fs from 'fs';
 import path from 'path';
-import { findCompositions, findAssets, getProjectRoot } from './src/server/discovery';
+import { findCompositions, findAssets, getProjectRoot, createComposition } from './src/server/discovery';
 import { startRender, getJob, getJobs, cancelJob, deleteJob, diagnoseServer } from './src/server/render-manager';
+
+const getBody = async (req: any) => {
+  return new Promise<any>((resolve, reject) => {
+      const chunks: any[] = [];
+      req.on('data', (chunk: any) => chunks.push(chunk));
+      req.on('end', () => {
+          try {
+              resolve(JSON.parse(Buffer.concat(chunks).toString()));
+          } catch (e) {
+              resolve({});
+          }
+      });
+      req.on('error', reject);
+  });
+};
 
 export function studioApiPlugin(): Plugin {
   return {
     name: 'helios-studio-api',
     configureServer(server) {
-      const getBody = async (req: any) => {
-        return new Promise<any>((resolve, reject) => {
-            let body = '';
-            req.on('data', (chunk: any) => body += chunk.toString());
-            req.on('end', () => {
-                try {
-                    resolve(JSON.parse(body));
-                } catch (e) {
-                    resolve({});
-                }
-            });
-            req.on('error', reject);
-        });
-      };
-
       server.middlewares.use('/api/compositions', async (req, res, next) => {
         if (req.url === '/' || req.url === '') {
+          if (req.method === 'POST') {
+             try {
+                const body = await getBody(req);
+                const { name } = body;
+                if (!name) {
+                  res.statusCode = 400;
+                  res.end(JSON.stringify({ error: 'Name is required' }));
+                  return;
+                }
+
+                const newComp = createComposition(process.cwd(), name);
+                res.setHeader('Content-Type', 'application/json');
+                res.end(JSON.stringify(newComp));
+             } catch (e: any) {
+                console.error(e);
+                res.statusCode = 500;
+                res.end(JSON.stringify({ error: e.message }));
+             }
+             return;
+          }
+
           try {
             const comps = findCompositions(process.cwd());
             res.setHeader('Content-Type', 'application/json');
