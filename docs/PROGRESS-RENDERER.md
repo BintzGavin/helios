@@ -1,3 +1,6 @@
+## RENDERER v1.37.0
+- ✅ Completed: CdpTimeDriver Stability - Updated `CdpTimeDriver` to detect and await `window.helios.waitUntilStable()`, enabling robust synchronization with custom stability checks for Canvas-based rendering.
+
 ## RENDERER v1.36.0
 - ✅ Completed: Enable Full Test Coverage - Updated `run-all.ts` to include all verification scripts, refactored `verify-concat.ts` to be self-contained using Data URIs, and improved `CanvasStrategy` robustness against `esbuild` artifacts by using string-based evaluation.
 
