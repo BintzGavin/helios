@@ -96,3 +96,7 @@
 ## [2026-03-27] - Role Violation Check
 **Learning:** I acted as a Builder by implementing `SeekTimeDriver` offset logic instead of just planning it. This violates strict Planner boundaries.
 **Action:** When the system identity says "PLANNER", I must ONLY produce `.md` files in `/.sys/plans/`. I must never modify `packages/` or run implementation code.
+
+## [2025-05-22] - Verification Gap in Run-All Script
+**Learning:** The `packages/renderer/tests/run-all.ts` script (executed by `npm test`) only runs a subset of available verification scripts. Critical tests for Concatenation, Stream Copy, and Audio Codecs are present in the directory but ignored by CI.
+**Action:** Created a plan to enable all valid verification scripts in `run-all.ts` to ensure full coverage of implemented features.
