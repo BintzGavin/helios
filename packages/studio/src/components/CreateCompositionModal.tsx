@@ -6,6 +6,11 @@ export const CreateCompositionModal: React.FC = () => {
   const { isCreateOpen, setCreateOpen, createComposition } = useStudio();
   const [name, setName] = useState('');
   const [template, setTemplate] = useState('vanilla');
+  const [width, setWidth] = useState(1920);
+  const [height, setHeight] = useState(1080);
+  const [fps, setFps] = useState(30);
+  const [duration, setDuration] = useState(5);
+
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -14,6 +19,10 @@ export const CreateCompositionModal: React.FC = () => {
     if (isCreateOpen) {
       setName('');
       setTemplate('vanilla');
+      setWidth(1920);
+      setHeight(1080);
+      setFps(30);
+      setDuration(5);
       setError(null);
       setLoading(false);
       setTimeout(() => inputRef.current?.focus(), 10);
@@ -28,7 +37,7 @@ export const CreateCompositionModal: React.FC = () => {
     setError(null);
 
     try {
-      await createComposition(name, template);
+      await createComposition(name, template, { width, height, fps, duration });
       // Modal closes automatically via context update in createComposition
     } catch (err: any) {
       setError(err.message || 'Failed to create composition');
@@ -66,7 +75,55 @@ export const CreateCompositionModal: React.FC = () => {
             >
               <option value="vanilla">Vanilla JS</option>
               <option value="react">React</option>
+              <option value="vue">Vue</option>
+              <option value="svelte">Svelte</option>
             </select>
+          </div>
+
+          <div className="create-modal-row">
+            <div className="create-modal-input-group">
+              <label>Width</label>
+              <input
+                type="number"
+                className="create-modal-input"
+                value={width}
+                onChange={e => setWidth(Number(e.target.value))}
+                disabled={loading}
+              />
+            </div>
+            <div className="create-modal-input-group">
+              <label>Height</label>
+              <input
+                type="number"
+                className="create-modal-input"
+                value={height}
+                onChange={e => setHeight(Number(e.target.value))}
+                disabled={loading}
+              />
+            </div>
+          </div>
+
+          <div className="create-modal-row">
+            <div className="create-modal-input-group">
+              <label>FPS</label>
+              <input
+                type="number"
+                className="create-modal-input"
+                value={fps}
+                onChange={e => setFps(Number(e.target.value))}
+                disabled={loading}
+              />
+            </div>
+            <div className="create-modal-input-group">
+              <label>Duration (sec)</label>
+              <input
+                type="number"
+                className="create-modal-input"
+                value={duration}
+                onChange={e => setDuration(Number(e.target.value))}
+                disabled={loading}
+              />
+            </div>
           </div>
 
           {error && <div className="create-modal-error">{error}</div>}

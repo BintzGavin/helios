@@ -1,9 +1,10 @@
-import { Template } from './types';
+import { Template, CompositionOptions } from './types';
 
 export const vanillaTemplate: Template = {
   id: 'vanilla',
   label: 'Vanilla JS',
-  generate: (name: string) => {
+  generate: (name: string, options: CompositionOptions) => {
+    const { fps, duration } = options;
     const content = `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -24,13 +25,14 @@ export const vanillaTemplate: Template = {
     const ctx = canvas.getContext('2d');
 
     const resize = () => {
+      // In a real scenario, this might listen to the container, but for full screen:
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
     };
     window.addEventListener('resize', resize);
     resize();
 
-    const helios = new Helios({ duration: 5, fps: 30 });
+    const helios = new Helios({ duration: ${duration}, fps: ${fps} });
     helios.bindToDocumentTimeline();
 
     helios.subscribe((state) => {

@@ -1,12 +1,14 @@
 import fs from 'fs';
 import path from 'path';
 import { templates, TemplateId } from './templates';
+import { CompositionOptions } from './templates/types';
 
 export interface CompositionInfo {
   id: string;
   name: string;
   url: string;
   description?: string;
+  metadata?: CompositionOptions;
 }
 
 export interface AssetInfo {
@@ -37,7 +39,9 @@ export function findCompositions(rootDir: string): CompositionInfo[] {
 
   for (const entry of entries) {
     if (entry.isDirectory()) {
-      const compPath = path.join(projectRoot, entry.name, 'composition.html');
+      const compDir = path.join(projectRoot, entry.name);
+      const compPath = path.join(compDir, 'composition.html');
+
       if (fs.existsSync(compPath)) {
         // Format name: "simple-canvas-animation" -> "Simple Canvas Animation"
         const name = entry.name
@@ -45,13 +49,25 @@ export function findCompositions(rootDir: string): CompositionInfo[] {
           .map(word => word.charAt(0).toUpperCase() + word.slice(1))
           .join(' ');
 
+        // Read metadata if exists
+        let metadata: CompositionOptions | undefined;
+        const metaPath = path.join(compDir, 'composition.json');
+        if (fs.existsSync(metaPath)) {
+            try {
+                metadata = JSON.parse(fs.readFileSync(metaPath, 'utf-8'));
+            } catch (e) {
+                console.warn(`Failed to parse metadata for ${entry.name}`, e);
+            }
+        }
+
         compositions.push({
           id: entry.name,
           name: name,
           // Use /@fs/ prefix with absolute path so Vite can serve files outside root
           // Ensure we don't double slash if path starts with /
           url: `/@fs${compPath}`,
-          description: `Example: ${name}`
+          description: `Example: ${name}`,
+          metadata
         });
       }
     }
@@ -80,7 +96,12 @@ export function deleteComposition(rootDir: string, id: string): void {
   fs.rmSync(compDir, { recursive: true, force: true });
 }
 
-export function createComposition(rootDir: string, name: string, templateId: string = 'vanilla'): CompositionInfo {
+export function createComposition(
+    rootDir: string,
+    name: string,
+    templateId: string = 'vanilla',
+    options?: CompositionOptions
+): CompositionInfo {
   const projectRoot = getProjectRoot(rootDir);
 
   // Sanitize name: lowercase, replace spaces with hyphens, remove special chars
@@ -100,12 +121,28 @@ export function createComposition(rootDir: string, name: string, templateId: str
       throw new Error(`Template "${templateId}" not found`);
   }
 
+  // Default options if not provided
+  const compOptions: CompositionOptions = options || {
+      width: 1920,
+      height: 1080,
+      fps: 30,
+      duration: 5
+  };
+
   fs.mkdirSync(compDir, { recursive: true });
 
-  const files = template.generate(name);
+  const files = template.generate(name, compOptions);
   for (const file of files) {
-      fs.writeFileSync(path.join(compDir, file.path), file.content);
+      const filePath = path.join(compDir, file.path);
+      const fileDir = path.dirname(filePath);
+      if (!fs.existsSync(fileDir)) {
+          fs.mkdirSync(fileDir, { recursive: true });
+      }
+      fs.writeFileSync(filePath, file.content);
   }
+
+  // Write composition.json
+  fs.writeFileSync(path.join(compDir, 'composition.json'), JSON.stringify(compOptions, null, 2));
 
   // Return the new composition info
   const displayName = dirName
@@ -117,7 +154,8 @@ export function createComposition(rootDir: string, name: string, templateId: str
     id: dirName,
     name: displayName,
     url: `/@fs${path.join(compDir, 'composition.html')}`,
-    description: `Example: ${displayName}`
+    description: `Example: ${displayName}`,
+    metadata: compOptions
   };
 }
 
