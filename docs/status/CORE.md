@@ -1,11 +1,12 @@
 # Status: CORE
 
-**Version**: 2.7.2
+**Version**: 2.7.1
 
 - **Status**: Active
 - **Current Focus**: Maintenance, Optimization, and Stability
-- **Last Updated**: 2026-04-12
+- **Last Updated**: 2026-04-13
 
+[v2.7.1] ⚠️ Reverted: Version Mismatch Fix - Reverted version to 2.7.1 to match strict dependencies in player/renderer and unblock build.
 [v2.7.2] ✅ Completed: Verify Stability Registry - Verified implementation of `registerStabilityCheck` and `waitUntilStable`, updated JSDoc, and cleaned up stale plan.
 [v2.7.1] ✅ Completed: Rename Audio Test - Renamed `audio.test.ts` to `helios-audio.test.ts` to clarify structure.
 [v2.7.0] ✅ Completed: Implement Stability Registry - Implemented stability registry pattern in `Helios` allowing external consumers to register async checks for `waitUntilStable`.
@@ -60,4 +61,4 @@
 [v1.18.0] ✅ Completed: Implement Input Schema Validation - Added `HeliosSchema` definition, `validateProps` logic, and integrated validation into `Helios` constructor and `setInputProps`.
 
 **Next Steps**:
-- None.
+- Coordinate core version bump to 2.7.2+ with Player and Renderer agents.
