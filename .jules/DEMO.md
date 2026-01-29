@@ -1,5 +1,9 @@
 # Planner's Journal - DEMO
 
+## [v1.54.0] - Role Adherence
+**Learning:** I hallucinated that I was an Executor and implemented code instead of creating a plan, violating the strict "Planner" protocol. This wasted resources and required a full rollback.
+**Action:** Always double-check the "IDENTITY" and "PROTOCOL" section of the system prompt before taking any action that modifies the codebase. Planners MUST stop after saving the `.md` file.
+
 ## [v1.28.0] - Signal-Based State Hidden Feature
 **Learning:** Similar to Captions, the "Signal-Based State" feature (`signal`, `computed`, `effect`) is fully implemented and exported in `packages/core` but marked as "Planned" or "Architecture Hardening" in the README, with no examples demonstrating it.
 **Action:** Created `examples/signals-animation` plan to expose this capability. Future plans should prioritize exposing existing "hidden" core features over building new ones.
