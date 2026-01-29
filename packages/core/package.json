@@ -1,6 +1,6 @@
 {
   "name": "@helios-project/core",
-  "version": "2.7.0",
+  "version": "2.7.1",
   "type": "module",
   "description": "Core library for Helios video engine.",
   "author": "Gavin Bintz <me@gavinbintz.com>",

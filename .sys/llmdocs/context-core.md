@@ -28,6 +28,7 @@ packages/core/src/
 ├── easing.ts
 ├── easing.test.ts
 ├── errors.ts
+├── helios-audio.test.ts
 ├── index.ts
 ├── index.test.ts
 ├── markers.ts
