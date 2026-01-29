@@ -1,3 +1,6 @@
+## DEMO v1.54.0
+- ✅ Completed: Text Effects Animation Example - Created `examples/text-effects-animation` demonstrating Typewriter and Staggered Reveal effects.
+
 ## DEMO v1.53.1
 - ✅ Completed: Verify Podcast Visualizer - Validated `examples/podcast-visualizer` with E2E tests and fixed workspace dependencies in `renderer` and `player`.
 

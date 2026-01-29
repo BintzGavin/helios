@@ -44,6 +44,7 @@ const CASES = [
   { name: 'Podcast Visualizer', relativePath: 'examples/podcast-visualizer/composition.html', mode: 'dom' as const },
   { name: 'Map Animation', relativePath: 'examples/map-animation/composition.html', mode: 'dom' as const },
   { name: 'Solid DOM', relativePath: 'examples/solid-dom-animation/composition.html', mode: 'dom' as const },
+  { name: 'Text Effects', relativePath: 'examples/text-effects-animation/composition.html', mode: 'dom' as const },
 ];
 
 async function main() {

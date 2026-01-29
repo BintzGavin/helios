@@ -1,0 +1,29 @@
+body {
+    font-family: 'Inter', sans-serif;
+    color: white;
+}
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    gap: 2rem;
+}
+.effect-box {
+    text-align: center;
+}
+.label {
+    font-size: 0.8rem;
+    color: #888;
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+.text {
+    font-size: 3rem;
+    font-weight: 700;
+}
+.char {
+    display: inline-block;
+}
