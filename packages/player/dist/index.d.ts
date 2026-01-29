@@ -2,6 +2,14 @@ import type { HeliosController } from "./controllers";
 import { ClientSideExporter } from "./features/exporter";
 export { ClientSideExporter };
 export type { HeliosController };
+interface MediaError {
+    readonly code: number;
+    readonly message: string;
+    readonly MEDIA_ERR_ABORTED: number;
+    readonly MEDIA_ERR_NETWORK: number;
+    readonly MEDIA_ERR_DECODE: number;
+    readonly MEDIA_ERR_SRC_NOT_SUPPORTED: number;
+}
 export declare class HeliosPlayer extends HTMLElement {
     private iframe;
     private playPauseBtn;
@@ -36,6 +44,7 @@ export declare class HeliosPlayer extends HTMLElement {
     private wasPlayingBeforeScrub;
     private lastState;
     private pendingProps;
+    private _error;
     static readonly HAVE_NOTHING = 0;
     static readonly HAVE_METADATA = 1;
     static readonly HAVE_CURRENT_DATA = 2;
@@ -49,6 +58,8 @@ export declare class HeliosPlayer extends HTMLElement {
     private _networkState;
     get readyState(): number;
     get networkState(): number;
+    get error(): MediaError | null;
+    get currentSrc(): string;
     get seeking(): boolean;
     get buffered(): TimeRanges;
     get seekable(): TimeRanges;
@@ -89,6 +100,7 @@ export declare class HeliosPlayer extends HTMLElement {
     static get observedAttributes(): string[];
     constructor();
     attributeChangedCallback(name: string, oldVal: string, newVal: string): void;
+    private updateControlsVisibility;
     get inputProps(): Record<string, any> | null;
     set inputProps(val: Record<string, any> | null);
     connectedCallback(): void;
