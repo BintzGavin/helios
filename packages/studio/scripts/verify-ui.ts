@@ -7,9 +7,10 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const PORT = 5173;
+const PORT = process.env.PORT ? parseInt(process.env.PORT) : 5173;
 const URL = `http://localhost:${PORT}`;
 const STUDIO_DIR = path.resolve(__dirname, '..');
+const SKIP_SPAWN = process.env.SKIP_SPAWN === 'true';
 
 async function waitForServer(url: string, timeout = 30000): Promise<boolean> {
   const start = Date.now();
@@ -26,17 +27,22 @@ async function waitForServer(url: string, timeout = 30000): Promise<boolean> {
 }
 
 async function verifyStudio() {
-  console.log('Starting Studio verification...');
+  console.log(`Starting Studio verification on port ${PORT}...`);
+  let server: ChildProcess | null = null;
 
-  // Start the server
-  console.log('Launching dev server...');
-  const server: ChildProcess = spawn('npm', ['run', 'dev'], {
-    cwd: STUDIO_DIR,
-    stdio: 'ignore',
-    shell: true,
-    detached: true, // Needed to kill process group
-    env: { ...process.env, PORT: String(PORT) }
-  });
+  if (!SKIP_SPAWN) {
+      // Start the server
+      console.log('Launching dev server...');
+      server = spawn('npm', ['run', 'dev'], {
+        cwd: STUDIO_DIR,
+        stdio: 'ignore',
+        shell: true,
+        detached: true, // Needed to kill process group
+        env: { ...process.env, PORT: String(PORT) }
+      });
+  } else {
+      console.log('Skipping server spawn (SKIP_SPAWN=true). Waiting for external server...');
+  }
 
   let browser: Browser | null = null;
 
@@ -49,6 +55,10 @@ async function verifyStudio() {
 
     browser = await chromium.launch();
     const page: Page = await browser.newPage();
+
+    // Subscribe to console logs
+    page.on('console', msg => console.log('BROWSER LOG:', msg.text()));
+    page.on('pageerror', err => console.log('BROWSER ERROR:', err));
 
     console.log(`Navigating to ${URL}...`);
     await page.goto(URL);

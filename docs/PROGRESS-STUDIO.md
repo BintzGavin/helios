@@ -1,3 +1,6 @@
+## STUDIO v0.44.0
+- ✅ Completed: Enable Production Preview - Configured `vite-plugin-studio-api` to serve project files in preview mode and updated verification scripts.
+
 ## STUDIO v0.43.0
 - ✅ Completed: Create Composition - Implemented "Create Composition" feature with UI modal, API endpoint, and file generation logic.
 

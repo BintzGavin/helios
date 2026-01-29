@@ -1,4 +1,4 @@
-import { Plugin } from 'vite';
+import { Plugin, ViteDevServer, PreviewServer } from 'vite';
 import { AddressInfo } from 'net';
 import fs from 'fs';
 import path from 'path';
@@ -20,10 +20,62 @@ const getBody = async (req: any) => {
   });
 };
 
-export function studioApiPlugin(): Plugin {
-  return {
-    name: 'helios-studio-api',
-    configureServer(server) {
+const MIME_TYPES: Record<string, string> = {
+  '.html': 'text/html',
+  '.js': 'application/javascript',
+  '.mjs': 'application/javascript',
+  '.ts': 'text/plain', // Browser cannot run TS, but serve as text
+  '.tsx': 'text/plain',
+  '.css': 'text/css',
+  '.json': 'application/json',
+  '.png': 'image/png',
+  '.jpg': 'image/jpeg',
+  '.jpeg': 'image/jpeg',
+  '.gif': 'image/gif',
+  '.svg': 'image/svg+xml',
+  '.mp4': 'video/mp4',
+  '.webm': 'video/webm',
+  '.mp3': 'audio/mpeg',
+  '.wav': 'audio/wav',
+  '.txt': 'text/plain',
+  '.ttf': 'font/ttf',
+  '.woff': 'font/woff',
+  '.woff2': 'font/woff2',
+};
+
+function configureMiddlewares(server: ViteDevServer | PreviewServer, isPreview: boolean) {
+      // NEW: Middleware for /@fs/ (Project File Serving)
+      // Only enabled in PREVIEW mode because Vite Dev server handles /@fs/ natively with HMR support.
+      if (isPreview) {
+        server.middlewares.use('/@fs', (req, res, next) => {
+            if (!req.url) return next();
+
+            // Decode the URL (it comes as /Path/To/File%20Name.ext)
+            const decodedUrl = decodeURIComponent(req.url);
+
+            // Remove leading slash if it precedes a drive letter (Windows fix)
+            // e.g. /C:/Windows -> C:/Windows
+            let fsPath = decodedUrl;
+            if (process.platform === 'win32' && /^\/[a-zA-Z]:/.test(fsPath)) {
+              fsPath = fsPath.slice(1);
+            } else if (fsPath.startsWith('/')) {
+              // For non-windows (or absolute paths on unix), ensure it treats it as absolute path
+            }
+
+            if (fs.existsSync(fsPath) && fs.statSync(fsPath).isFile()) {
+              const ext = path.extname(fsPath).toLowerCase();
+              const contentType = MIME_TYPES[ext] || 'application/octet-stream';
+
+              res.setHeader('Content-Type', contentType);
+              const stream = fs.createReadStream(fsPath);
+              stream.pipe(res);
+              return;
+            }
+
+            next();
+        });
+      }
+
       server.middlewares.use('/api/compositions', async (req, res, next) => {
         if (req.url === '/' || req.url === '') {
           if (req.method === 'POST') {
@@ -285,6 +337,12 @@ export function studioApiPlugin(): Plugin {
         }
         next();
       });
-    }
-  }
+}
+
+export function studioApiPlugin(): Plugin {
+  return {
+    name: 'helios-studio-api',
+    configureServer: (server) => configureMiddlewares(server, false),
+    configurePreviewServer: (server) => configureMiddlewares(server, true)
+  };
 }

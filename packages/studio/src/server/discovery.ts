@@ -134,7 +134,7 @@ export function createComposition(rootDir: string, name: string): CompositionInf
     id: dirName,
     name: displayName,
     url: `/@fs${path.join(compDir, 'composition.html')}`,
-    description: \`Example: \${displayName}\`
+    description: `Example: ${displayName}`
   };
 }
 
