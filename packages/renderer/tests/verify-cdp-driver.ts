@@ -12,6 +12,10 @@ async function test() {
 
   console.log('Driver prepared. Virtual time policy set to PAUSE.');
 
+  // Capture initial time drift (time elapsed before prepare was called)
+  const initialPageTime = await page.evaluate(() => document.timeline.currentTime) as number || 0;
+  console.log(`Initial page time (drift): ${initialPageTime}ms`);
+
   // Set time to 1.0 second
   console.log('Advancing time to 1.0s...');
   const startTime = Date.now();
@@ -21,34 +25,33 @@ async function test() {
   console.log(`Real time elapsed during setTime: ${elapsedRealTime}ms (should be significantly less than 1000ms if virtualized)`);
 
   // Verify within page using document.timeline.currentTime
-  // Note: document.timeline.currentTime returns null if timeline is inactive, or a number in ms.
-  const pageTime = await page.evaluate(() => document.timeline.currentTime);
+  const pageTime = await page.evaluate(() => document.timeline.currentTime) as number;
   console.log(`Page document.timeline.currentTime: ${pageTime}ms`);
 
-  // We expect roughly 1000ms.
-  // Note: If the page is empty, there might be no timeline?
-  // document.timeline is always present in modern browsers.
+  // We expect roughly 1000ms + initial drift.
+  const expectedTime = 1000 + initialPageTime;
+  const diff = Math.abs(pageTime - expectedTime);
 
-  if (typeof pageTime === 'number' && Math.abs(pageTime - 1000) < 50) {
-    console.log('✅ Time advanced correctly.');
+  if (diff < 50) {
+    console.log(`✅ Time advanced correctly (diff: ${diff}ms).`);
   } else {
-    console.error(`❌ Time did not advance correctly. Expected ~1000ms, got ${pageTime}`);
-    // If it's null, it might be because the page hasn't painted or started?
-    // Let's try adding a simple animation to force timeline activity if needed.
-    // But usually it works.
+    console.error(`❌ Time did not advance correctly. Expected ~${expectedTime}ms, got ${pageTime}ms (diff: ${diff}ms)`);
     process.exit(1);
   }
 
   // Advance again to 2.0s
   console.log('Advancing time to 2.0s...');
   await driver.setTime(page, 2.0);
-  const pageTime2 = await page.evaluate(() => document.timeline.currentTime);
+  const pageTime2 = await page.evaluate(() => document.timeline.currentTime) as number;
   console.log(`Page document.timeline.currentTime: ${pageTime2}ms`);
 
-   if (typeof pageTime2 === 'number' && Math.abs(pageTime2 - 2000) < 50) {
-    console.log('✅ Time advanced correctly to 2.0s.');
+  const expectedTime2 = 2000 + initialPageTime;
+  const diff2 = Math.abs(pageTime2 - expectedTime2);
+
+   if (diff2 < 50) {
+    console.log(`✅ Time advanced correctly to 2.0s (diff: ${diff2}ms).`);
   } else {
-    console.error(`❌ Time did not advance correctly. Expected ~2000ms, got ${pageTime2}`);
+    console.error(`❌ Time did not advance correctly. Expected ~${expectedTime2}ms, got ${pageTime2}ms (diff: ${diff2}ms)`);
     process.exit(1);
   }
 

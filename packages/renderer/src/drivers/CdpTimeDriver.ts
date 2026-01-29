@@ -42,11 +42,32 @@ export class CdpTimeDriver implements TimeDriver {
     // Wait for custom stability checks
     // We use a string-based evaluation to avoid build-tool artifacts
     const script = `
-      (async () => {
+      (async (t) => {
+        // Synchronize media elements (video, audio)
+        // We do this manually because virtual time might not automatically sync media element timelines exactly as desired,
+        // and we need to respect custom offsets.
+        const mediaElements = document.querySelectorAll('video, audio');
+        mediaElements.forEach((el) => {
+          el.pause(); // Ensure we are in control
+
+          // Parse attributes (default to 0)
+          const offset = parseFloat(el.getAttribute('data-helios-offset') || '0');
+          const seek = parseFloat(el.getAttribute('data-helios-seek') || '0');
+
+          // Calculate target time
+          // Formula: GlobalTime - Offset + InPoint
+          const targetTime = Math.max(0, t - offset + seek);
+
+          el.currentTime = targetTime;
+          // Note: We intentionally do NOT await 'seeked' here because CDP virtual time is paused.
+          // Awaiting async events would cause a deadlock in the frozen task runner.
+          // We rely on the browser to update the frame synchronously enough for the snapshot.
+        });
+
         if (typeof window.helios !== 'undefined' && typeof window.helios.waitUntilStable === 'function') {
           await window.helios.waitUntilStable();
         }
-      })()
+      })(${timeInSeconds})
     `;
     await page.evaluate(script);
   }
