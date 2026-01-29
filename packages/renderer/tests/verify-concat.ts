@@ -8,30 +8,32 @@ async function main() {
   const duration = 0.5; // Render 0.5 seconds per clip
   const fps = 30;
 
-  // We will generate two clips:
-  // Clip 1: Frames 0-14
-  // Clip 2: Frames 15-29
-
-  const rootDir = path.resolve(__dirname, '../../..');
-  let compositionPath = path.resolve(
-    rootDir,
-    'output/example-build/examples/simple-canvas-animation/composition.html'
-  );
-
-  if (!fs.existsSync(compositionPath)) {
-      console.log('Build artifact not found, trying source...');
-      compositionPath = path.resolve(
-          rootDir,
-          'examples/simple-canvas-animation/composition.html'
-      );
+  // Minimal Composition (Red Background, White Text)
+  const html = `
+<!DOCTYPE html>
+<html>
+<body style="margin:0; overflow:hidden;">
+<canvas id="c"></canvas>
+<script>
+  const canvas = document.getElementById('c');
+  canvas.width = 600;
+  canvas.height = 600;
+  const ctx = canvas.getContext('2d');
+  function draw(time) {
+      ctx.fillStyle = 'red';
+      ctx.fillRect(0, 0, 600, 600);
+      ctx.fillStyle = 'white';
+      ctx.font = '40px Arial';
+      ctx.fillText(time, 50, 50);
+      requestAnimationFrame(draw);
   }
+  requestAnimationFrame(draw);
+</script>
+</body>
+</html>
+  `;
+  const compositionUrl = `data:text/html;charset=utf-8,${encodeURIComponent(html)}`;
 
-  if (!fs.existsSync(compositionPath)) {
-      console.error(`❌ Composition file not found at: ${compositionPath}`);
-      process.exit(1);
-  }
-
-  const compositionUrl = `file://${compositionPath}`;
   const clip1Path = path.resolve(__dirname, 'test-output-clip1.mp4');
   const clip2Path = path.resolve(__dirname, 'test-output-clip2.mp4');
   const finalPath = path.resolve(__dirname, 'test-output-concat.mp4');

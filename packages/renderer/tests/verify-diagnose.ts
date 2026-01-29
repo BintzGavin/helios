@@ -17,8 +17,8 @@ async function main() {
     try {
       const report = await renderer.diagnose();
       console.log('Canvas Diagnostics:', report);
-      if (report.videoEncoder === undefined) {
-        throw new Error('Canvas diagnostics missing videoEncoder');
+      if (report.browser?.videoEncoder === undefined) {
+        throw new Error('Canvas diagnostics missing browser.videoEncoder');
       }
     } catch (err) {
       console.error('Canvas diagnose failed:', err);
@@ -40,8 +40,8 @@ async function main() {
     try {
       const report = await renderer.diagnose();
       console.log('DOM Diagnostics:', report);
-      if (report.waapi === undefined) {
-        throw new Error('DOM diagnostics missing waapi');
+      if (report.browser?.waapi === undefined) {
+        throw new Error('DOM diagnostics missing browser.waapi');
       }
     } catch (err) {
       console.error('DOM diagnose failed:', err);

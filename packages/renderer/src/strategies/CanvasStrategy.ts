@@ -23,7 +23,7 @@ export class CanvasStrategy implements RenderStrategy {
   }
 
   async diagnose(page: Page): Promise<any> {
-    return await page.evaluate(() => {
+    return await page.evaluate(function() {
       console.log('[Helios Diagnostics] Checking Canvas environment...');
       const report = {
         videoEncoder: typeof VideoEncoder !== 'undefined',
@@ -36,7 +36,7 @@ export class CanvasStrategy implements RenderStrategy {
 
   async prepare(page: Page): Promise<void> {
     // Ensure fonts are loaded before capture starts
-    await page.evaluate(() => document.fonts.ready);
+    await page.evaluate(function() { return document.fonts.ready; });
 
     // Detect WebCodecs support and initialize if possible
     const width = page.viewportSize()?.width || 1920;
@@ -116,138 +116,132 @@ export class CanvasStrategy implements RenderStrategy {
                      pixelFormat.includes('abgr');
     const alphaMode = hasAlpha ? 'keep' : 'discard';
 
-    const result = await page.evaluate(async (config: { width: number, height: number, bitrate: number, candidates: any[], alphaMode: string }) => {
-      if (typeof VideoEncoder === 'undefined') {
-        return { supported: false, reason: 'VideoEncoder not found' };
-      }
-
-      // Helper to try configuring a candidate
-      const tryConfig = async (candidate: { codecString: string, isH264: boolean, fourCC: string }) => {
-          const encoderConfig: any = {
-            codec: candidate.codecString,
-            width: config.width,
-            height: config.height,
-            bitrate: config.bitrate,
-            alpha: config.alphaMode,
-          };
-
-          if (candidate.isH264) {
-             encoderConfig.avc = { format: 'annexb' };
-          }
-
-          try {
-            const support = await VideoEncoder.isConfigSupported(encoderConfig);
-            if (support.supported) {
-                return { supported: true, config: encoderConfig, candidate };
-            }
-          } catch (e) {
-             // Ignore error and try next
-          }
-          return { supported: false };
-      };
-
-      let selected: any = null;
-      for (const candidate of config.candidates) {
-          const res = await tryConfig(candidate);
-          if (res.supported) {
-              selected = res;
-              break;
-          }
-      }
-
-      if (!selected) {
-          return { supported: false, reason: 'No supported codec found among candidates' };
-      }
-
-      const { config: encoderConfig, candidate: selectedCandidate } = selected;
-
-      // Initialize global state for accumulation
-      (window as any).heliosWebCodecs = {
-        chunks: [], // Array of ArrayBuffers
-        error: null,
-      };
-
-      if (!selectedCandidate.isH264) {
-        // Create IVF File Header (32 bytes)
-        // Little-endian
-        const ivfHeader = new ArrayBuffer(32);
-        const view = new DataView(ivfHeader);
-        // 0-3: 'DKIF'
-        view.setUint8(0, 'D'.charCodeAt(0));
-        view.setUint8(1, 'K'.charCodeAt(0));
-        view.setUint8(2, 'I'.charCodeAt(0));
-        view.setUint8(3, 'F'.charCodeAt(0));
-        // 4-5: Version 0
-        view.setUint16(4, 0, true);
-        // 6-7: Header length 32
-        view.setUint16(6, 32, true);
-
-        // 8-11: FourCC
-        const fourCCStr = selectedCandidate.fourCC;
-        view.setUint8(8, fourCCStr.charCodeAt(0));
-        view.setUint8(9, fourCCStr.charCodeAt(1));
-        view.setUint8(10, fourCCStr.charCodeAt(2));
-        view.setUint8(11, fourCCStr.charCodeAt(3));
-
-        // 12-13: Width
-        view.setUint16(12, config.width, true);
-        // 14-15: Height
-        view.setUint16(14, config.height, true);
-        // 16-19: Rate (1,000,000) - To match microsecond timestamps from VideoEncoder
-        view.setUint32(16, 1000000, true);
-        // 20-23: Scale (1)
-        view.setUint32(20, 1, true);
-        // 24-27: Frame count (placeholder, updated later or ignored)
-        view.setUint32(24, 0, true);
-
-        (window as any).heliosWebCodecs.chunks.push(ivfHeader);
-      }
-
-      const encoder = new VideoEncoder({
-        output: (chunk, meta) => {
-          const context = (window as any).heliosWebCodecs;
-
-          if (!selectedCandidate.isH264) {
-            // Create IVF Frame Header (12 bytes)
-            const frameHeader = new ArrayBuffer(12);
-            const view = new DataView(frameHeader);
-
-            // 0-3: Frame size in bytes
-            view.setUint32(0, chunk.byteLength, true);
-
-            // 4-11: Timestamp (64-bit)
-            // chunk.timestamp is in microseconds.
-            view.setBigUint64(4, BigInt(chunk.timestamp || 0), true);
-
-            context.chunks.push(frameHeader);
-          }
-
-          const chunkData = new ArrayBuffer(chunk.byteLength);
-          chunk.copyTo(chunkData);
-          context.chunks.push(chunkData);
-        },
-        error: (e) => {
-          console.error('VideoEncoder error:', e);
-          (window as any).heliosWebCodecs.error = e.message || 'Unknown VideoEncoder error';
-        },
-      });
-
-      encoder.configure(encoderConfig);
-      (window as any).heliosWebCodecs.encoder = encoder;
-
-      return {
-          supported: true,
-          codec: encoderConfig.codec,
-          isH264: selectedCandidate.isH264
-      };
-
-    }, {
+    const args = {
         width,
         height,
         bitrate: intermediateBitrate,
         candidates,
         alphaMode
-    });
+    };
+
+    const result = await page.evaluate(`
+      (async (config) => {
+        if (typeof VideoEncoder === 'undefined') {
+          return { supported: false, reason: 'VideoEncoder not found' };
+        }
+
+        let selected = null;
+        for (const candidate of config.candidates) {
+            const encoderConfig = {
+              codec: candidate.codecString,
+              width: config.width,
+              height: config.height,
+              bitrate: config.bitrate,
+              alpha: config.alphaMode,
+            };
+
+            if (candidate.isH264) {
+               encoderConfig.avc = { format: 'annexb' };
+            }
+
+            try {
+              const support = await VideoEncoder.isConfigSupported(encoderConfig);
+              if (support.supported) {
+                  selected = { supported: true, config: encoderConfig, candidate };
+                  break;
+              }
+            } catch (e) {
+               // Ignore error
+            }
+        }
+
+        if (!selected) {
+            return { supported: false, reason: 'No supported codec found among candidates' };
+        }
+
+        const { config: encoderConfig, candidate: selectedCandidate } = selected;
+
+        // Initialize global state for accumulation
+        window.heliosWebCodecs = {
+          chunks: [], // Array of ArrayBuffers
+          error: null,
+        };
+
+        if (!selectedCandidate.isH264) {
+          // Create IVF File Header (32 bytes)
+          // Little-endian
+          const ivfHeader = new ArrayBuffer(32);
+          const view = new DataView(ivfHeader);
+          // 0-3: 'DKIF'
+          view.setUint8(0, 'D'.charCodeAt(0));
+          view.setUint8(1, 'K'.charCodeAt(0));
+          view.setUint8(2, 'I'.charCodeAt(0));
+          view.setUint8(3, 'F'.charCodeAt(0));
+          // 4-5: Version 0
+          view.setUint16(4, 0, true);
+          // 6-7: Header length 32
+          view.setUint16(6, 32, true);
+
+          // 8-11: FourCC
+          const fourCCStr = selectedCandidate.fourCC;
+          view.setUint8(8, fourCCStr.charCodeAt(0));
+          view.setUint8(9, fourCCStr.charCodeAt(1));
+          view.setUint8(10, fourCCStr.charCodeAt(2));
+          view.setUint8(11, fourCCStr.charCodeAt(3));
+
+          // 12-13: Width
+          view.setUint16(12, config.width, true);
+          // 14-15: Height
+          view.setUint16(14, config.height, true);
+          // 16-19: Rate (1,000,000) - To match microsecond timestamps from VideoEncoder
+          view.setUint32(16, 1000000, true);
+          // 20-23: Scale (1)
+          view.setUint32(20, 1, true);
+          // 24-27: Frame count (placeholder, updated later or ignored)
+          view.setUint32(24, 0, true);
+
+          window.heliosWebCodecs.chunks.push(ivfHeader);
+        }
+
+        const encoder = new VideoEncoder({
+          output: (chunk, meta) => {
+            const context = window.heliosWebCodecs;
+
+            if (!selectedCandidate.isH264) {
+              // Create IVF Frame Header (12 bytes)
+              const frameHeader = new ArrayBuffer(12);
+              const view = new DataView(frameHeader);
+
+              // 0-3: Frame size in bytes
+              view.setUint32(0, chunk.byteLength, true);
+
+              // 4-11: Timestamp (64-bit)
+              // chunk.timestamp is in microseconds.
+              view.setBigUint64(4, BigInt(chunk.timestamp || 0), true);
+
+              context.chunks.push(frameHeader);
+            }
+
+            const chunkData = new ArrayBuffer(chunk.byteLength);
+            chunk.copyTo(chunkData);
+            context.chunks.push(chunkData);
+          },
+          error: (e) => {
+            console.error('VideoEncoder error:', e);
+            window.heliosWebCodecs.error = e.message || 'Unknown VideoEncoder error';
+          },
+        });
+
+        encoder.configure(encoderConfig);
+        window.heliosWebCodecs.encoder = encoder;
+
+        return {
+            supported: true,
+            codec: encoderConfig.codec,
+            isH264: selectedCandidate.isH264
+        };
+      })(${JSON.stringify(args)})
+    `);
 
     if (result.supported) {
       this.useWebCodecs = true;
@@ -268,7 +262,7 @@ export class CanvasStrategy implements RenderStrategy {
   }
 
   private async captureWebCodecs(page: Page, frameTime: number): Promise<Buffer> {
-    const chunkData = await page.evaluate<string, number>(async (time: number) => {
+    const chunkData = await page.evaluate<string, number>(async function(time: number) {
       const context = (window as any).heliosWebCodecs;
 
       if (context.error) {
@@ -323,7 +317,7 @@ export class CanvasStrategy implements RenderStrategy {
     const format = this.options.intermediateImageFormat || 'png';
     const quality = this.options.intermediateImageQuality;
 
-    const dataUrl = await page.evaluate((args: { format: string, quality?: number }) => {
+    const dataUrl = await page.evaluate(function(args: { format: string, quality?: number }) {
       const canvas = document.querySelector('canvas');
       if (!canvas) return 'error:canvas-not-found';
 
@@ -347,7 +341,7 @@ export class CanvasStrategy implements RenderStrategy {
 
   async finish(page: Page): Promise<Buffer | void> {
     if (this.useWebCodecs) {
-      const chunkData = await page.evaluate<string>(async () => {
+      const chunkData = await page.evaluate<string>(async function() {
         const context = (window as any).heliosWebCodecs;
         if (!context || !context.encoder) return '';
 
