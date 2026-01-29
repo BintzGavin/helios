@@ -1,8 +1,9 @@
-**Version**: 1.40.0
+**Version**: 1.40.1
 
 # Renderer Agent Status
 
 ## Progress Log
+- [1.40.1] ✅ Completed: Enable Full Verification Coverage - Updated `run-all.ts` to include 6 additional verification scripts, and fixed `verify-dom-media-preload.ts` and `verify-dom-preload.ts` to be robust and self-contained.
 - [1.40.0] ✅ Completed: Implement WAAPI Sync - Updated `SeekTimeDriver` to manually iterate over `document.getAnimations()` and set `currentTime`, ensuring correct synchronization of CSS animations and transitions for DOM-based rendering.
 - [1.39.0] ✅ Completed: CdpTimeDriver Media Sync - Implemented manual synchronization for `<video>` and `<audio>` elements in `CdpTimeDriver` to respect `data-helios-offset` and `data-helios-seek`, and fixed regression tests to handle initial timeline drift.
 - [1.38.1] ✅ Completed: Fix Build and Dependencies - Updated `@helios-project/core` dependency to `2.7.1` in `packages/renderer`, modernized render script to use `tsx`, and fixed `verify-smart-codec-selection` test mock to support frame scanning.
