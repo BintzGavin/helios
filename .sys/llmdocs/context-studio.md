@@ -15,7 +15,7 @@ packages/studio/
 │   ├── components/         # UI Components (Timeline, PropsEditor, etc.)
 │   ├── context/            # React Context (StudioContext)
 │   ├── server/             # Backend logic (Discovery, Templates, Render Manager)
-│   │   ├── templates/      # Composition templates (Vanilla, React)
+│   │   ├── templates/      # Composition templates (Vanilla, React, Vue, Svelte)
 │   │   ├── discovery.ts    # File system discovery
 │   │   └── render-manager.ts # Render job orchestration
 │   ├── App.tsx             # Main application component
@@ -40,7 +40,7 @@ npx helios studio [options]
 -   **Assets Panel**: Manages project assets (images, video, audio, etc.).
 -   **Compositions Switcher**: Dropdown/Modal to switch between compositions.
 -   **Render Panel**: Manages render jobs and downloads.
--   **Create Modal**: Creates new compositions using templates (Vanilla JS, React).
+-   **Create Modal**: Creates new compositions using templates (Vanilla JS, React, Vue, Svelte).
 
 ## E. Integration
 -   **Core**: Consumes `HeliosSchema` and `Helios` types.
