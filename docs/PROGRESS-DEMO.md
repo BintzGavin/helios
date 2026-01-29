@@ -126,3 +126,6 @@
 
 ## DEMO v1.57.0
 - ✅ Completed: Verify Podcast Visualizer - Found and fixed a bug in `examples/podcast-visualizer` (incorrect usage of `state.currentTime`) and re-verified visual correctness with a custom script.
+
+## DEMO v1.58.0
+- ✅ Completed: Refine Podcast Visualizer - Updated audio source to a 440Hz sine wave to enable audible verification of mixing logic.
