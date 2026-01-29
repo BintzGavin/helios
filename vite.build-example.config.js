@@ -8,12 +8,12 @@ import solidPlugin from "vite-plugin-solid";
 export default defineConfig({
   plugins: [
     react({
-      exclude: /examples\/solid-(canvas|dom)-animation|examples\/solid-animation-helpers/,
+      exclude: /examples\/solid-(canvas|dom)-animation|examples\/solid-transitions|examples\/solid-animation-helpers/,
     }),
     vue(),
     svelte(),
     solidPlugin({
-      include: /examples\/solid-(canvas|dom)-animation|examples\/solid-animation-helpers/,
+      include: /examples\/solid-(canvas|dom)-animation|examples\/solid-transitions|examples\/solid-animation-helpers/,
     })
   ],
   // Root of the project
@@ -65,6 +65,7 @@ export default defineConfig({
         solid_canvas: resolve(__dirname, "examples/solid-canvas-animation/composition.html"),
         solid_dom: resolve(__dirname, "examples/solid-dom-animation/composition.html"),
         solid_helpers: resolve(__dirname, "examples/solid-animation-helpers/composition.html"),
+        solid_transitions: resolve(__dirname, "examples/solid-transitions/composition.html"),
         podcast_visualizer: resolve(__dirname, "examples/podcast-visualizer/composition.html"),
         map_animation: resolve(__dirname, "examples/map-animation/composition.html"),
         text_effects: resolve(__dirname, "examples/text-effects-animation/composition.html"),
