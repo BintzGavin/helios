@@ -49,24 +49,6 @@ function AppContent() {
     };
   }, [controller, setPlayerState]);
 
-  // Loop logic
-  useEffect(() => {
-    if (!loop || !controller) return;
-
-    const { isPlaying, currentFrame, duration, fps } = playerState;
-    if (!isPlaying) return;
-
-    const totalFrames = duration * fps;
-    const loopEnd = outPoint > 0 ? outPoint : totalFrames;
-
-    if (currentFrame >= loopEnd - 1) {
-      // Seek to inPoint and play to loop
-      controller.seek(inPoint);
-      controller.play();
-    }
-  }, [playerState, loop, controller, inPoint, outPoint]);
-
-
   return (
     <>
       <StudioLayout
