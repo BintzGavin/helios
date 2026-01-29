@@ -4,6 +4,7 @@
 The Renderer operates on a "Dual-Path" architecture to support different use cases:
 1. **DOM Strategy (`DomStrategy`)**: Used for HTML/CSS-heavy compositions. It uses Playwright to capture screenshots of the page at each frame.
    - **Drivers**: Uses `SeekTimeDriver` to manipulate `document.timeline` and sync media/CSS animations.
+   - **Discovery**: Uses `dom-scanner` to recursively discover media elements (including Shadow DOM).
    - **Output**: Best for sharp text and vector graphics.
 2. **Canvas Strategy (`CanvasStrategy`)**: Used for WebGL/Canvas-heavy compositions (e.g., Three.js, PixiJS). It captures the `<canvas>` context directly.
    - **Drivers**: Uses `CdpTimeDriver` (Chrome DevTools Protocol) for precise virtual time control.
