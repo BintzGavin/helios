@@ -1,5 +1,8 @@
 # CORE Progress Log
 
+## CORE v2.7.1
+- ⚠️ Reverted: Version Mismatch Fix - Reverted version to 2.7.1 to match strict dependencies in player/renderer and unblock build.
+
 ## CORE v2.7.2
 - ✅ Completed: Verify Stability Registry - Verified implementation of `registerStabilityCheck` and `waitUntilStable`, updated JSDoc, and cleaned up stale plan.
 

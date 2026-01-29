@@ -1,57 +1,51 @@
-# CORE Domain Context
+# Context: CORE
 
 ## A. Architecture
-
-The Core domain implements the "Helios State Machine" pattern, serving as the headless logic engine for the video creation framework. It is strictly decoupled from the view layer (DOM/Canvas).
-
-- **Store**: State is managed via reactive signals (`packages/core/src/signals.ts`), ensuring efficient updates.
-- **Actions**: The `Helios` class exposes methods to mutate state (e.g., `seek()`, `setDuration()`).
-- **Subscribers**: External consumers (Renderer, Player) subscribe to state changes to update the view.
-- **Drivers**: Timing is abstracted via `TimeDriver` (e.g., `DomDriver` for WAAPI sync, `NoopDriver` for headless).
+The Core package implements the "Helios State Machine" pattern. Central state is managed via Signals (Observer pattern) in the `Helios` class. Updates flow from Actions (methods) -> State (Signals) -> Subscribers (via `subscribe`). Timing is driven by a pluggable `TimeDriver`.
 
 ## B. File Tree
-
 ```
 packages/core/src/
+├── animation.test.ts
+├── animation.ts
+├── captions.test.ts
+├── captions.ts
+├── color.test.ts
+├── color.ts
 ├── drivers/
-│   ├── DomDriver.ts
 │   ├── DomDriver.test.ts
+│   ├── DomDriver.ts
+│   ├── NoopDriver.ts
 │   ├── TimeDriver.ts
+│   ├── TimeoutTicker.ts
 │   ├── WaapiDriver.ts
 │   └── index.ts
-├── animation.ts
-├── animation.test.ts
-├── captions.ts
-├── captions.test.ts
-├── color.ts
-├── color.test.ts
-├── easing.ts
 ├── easing.test.ts
+├── easing.ts
 ├── errors.ts
 ├── helios-audio.test.ts
 ├── index-signals.test.ts
-├── index.ts
 ├── index.test.ts
-├── markers.ts
+├── index.ts
 ├── markers.test.ts
+├── markers.ts
 ├── node-runtime.test.ts
-├── random.ts
 ├── random.test.ts
-├── schema.ts
+├── random.ts
 ├── schema.test.ts
-├── sequencing.ts
+├── schema.ts
 ├── sequencing.test.ts
-├── signals.ts
+├── sequencing.ts
 ├── signals.test.ts
+├── signals.ts
 ├── stability.test.ts
-├── timecode.ts
 ├── timecode.test.ts
-├── transitions.ts
-└── transitions.test.ts
+├── timecode.ts
+├── transitions.test.ts
+└── transitions.ts
 ```
 
 ## C. Type Definitions
-
 ```typescript
 export type HeliosState = {
   width: number;
@@ -102,51 +96,11 @@ export interface DiagnosticReport {
   offscreenCanvas: boolean;
   userAgent: string;
 }
-
-// From signals.ts
-export interface Signal<T> {
-  value: T;
-  peek(): T;
-}
-export interface ReadonlySignal<T> {
-  value: T;
-  peek(): T;
-}
-
-// From schema.ts
-export type PropType = 'string' | 'number' | 'boolean' | 'color' | 'enum' | 'image' | 'video' | 'audio' | 'font';
-export interface PropSchema {
-  type: PropType;
-  default?: any;
-  label?: string;
-  minimum?: number;
-  maximum?: number;
-  enum?: string[];
-}
-export type HeliosSchema = Record<string, PropSchema>;
-
-// From captions.ts
-export interface CaptionCue {
-  id: string;
-  startTime: number; // ms
-  endTime: number; // ms
-  text: string;
-}
-
-// From markers.ts
-export interface Marker {
-  id: string;
-  time: number; // seconds
-  label?: string;
-  color?: string;
-}
 ```
 
-## D. Public Methods (Helios Class)
-
+## D. Public Methods
 ```typescript
 class Helios {
-  // Signals
   public get currentFrame(): ReadonlySignal<number>;
   public get loop(): ReadonlySignal<boolean>;
   public get isPlaying(): ReadonlySignal<boolean>;
@@ -163,7 +117,6 @@ class Helios {
   public get duration(): number;
   public get fps(): number;
 
-  // Static
   static async diagnose(): Promise<DiagnosticReport>;
 
   constructor(options: HeliosOptions);
@@ -184,22 +137,19 @@ class Helios {
   public seekToMarker(id: string): void;
   public setPlaybackRange(startFrame: number, endFrame: number): void;
   public clearPlaybackRange(): void;
+
   public subscribe(callback: HeliosSubscriber): () => void;
   public unsubscribe(callback: HeliosSubscriber): void;
 
-  // Stability
   public registerStabilityCheck(check: StabilityCheck): () => void;
-  public async waitUntilStable(): Promise<void>;
 
-  // Playback
   public play(): void;
   public pause(): void;
   public seek(frame: number): void;
+  public waitUntilStable(): Promise<void>;
 
-  // External Sync
   public bindToDocumentTimeline(): void;
   public unbindFromDocumentTimeline(): void;
-
   public dispose(): void;
 }
 ```
