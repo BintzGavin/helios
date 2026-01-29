@@ -56,11 +56,21 @@ player.currentFrame = 150; // Seek to frame 150
 player.volume = 0.5; // 0.0 to 1.0
 player.muted = true;
 
-// Properties
+// Writable Properties
 console.log(player.duration);     // Total duration in seconds
 console.log(player.paused);       // Boolean
 console.log(player.playbackRate); // Speed multiplier
 console.log(player.fps);          // Composition FPS
+
+// Read-Only Properties
+console.log(player.videoWidth);   // Intrinsic width
+console.log(player.videoHeight);  // Intrinsic height
+console.log(player.readyState);   // 0-4 (HAVE_NOTHING to HAVE_ENOUGH_DATA)
+console.log(player.networkState); // 0-3 (EMPTY, IDLE, LOADING, NO_SOURCE)
+console.log(player.seeking);      // Boolean (true while scrubbing)
+console.log(player.played);       // TimeRanges object of played segments
+console.log(player.buffered);     // TimeRanges object of buffered segments
+console.log(player.seekable);     // TimeRanges object of seekable segments
 
 // Input Props
 player.inputProps = { title: "Updated Title" };
@@ -68,10 +78,12 @@ player.inputProps = { title: "Updated Title" };
 
 #### Events
 The player dispatches standard media events:
-- `play`, `pause`, `ended`
-- `timeupdate`
+- `loadstart`, `loadedmetadata`, `loadeddata`, `canplay`, `canplaythrough`
+- `play`, `pause`, `ended`, `playing`
+- `timeupdate`, `seeking`, `seeked`
 - `volumechange`
 - `durationchange`, `ratechange`
+- `error`
 
 #### Advanced Control
 For low-level access to the Helios state, use `getController()`.
