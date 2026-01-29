@@ -62,3 +62,4 @@
 
 **Next Steps**:
 - Maintain version alignment with Player and Renderer.
+- Note: Added plan `/.sys/plans/2026-01-29-CORE-Bind-Virtual-Time.md` to ensure `bindToDocumentTimeline` prefers `__HELIOS_VIRTUAL_TIME__` when present (DOM render sync).
