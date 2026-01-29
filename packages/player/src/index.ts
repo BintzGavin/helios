@@ -6,6 +6,16 @@ import { ClientSideExporter } from "./features/exporter";
 export { ClientSideExporter };
 export type { HeliosController };
 
+// Helper to match MediaError interface if not globally available in all envs
+interface MediaError {
+  readonly code: number;
+  readonly message: string;
+  readonly MEDIA_ERR_ABORTED: number;
+  readonly MEDIA_ERR_NETWORK: number;
+  readonly MEDIA_ERR_DECODE: number;
+  readonly MEDIA_ERR_SRC_NOT_SUPPORTED: number;
+}
+
 class StaticTimeRange implements TimeRanges {
   constructor(private startVal: number, private endVal: number) {}
 
@@ -387,6 +397,7 @@ export class HeliosPlayer extends HTMLElement {
   private wasPlayingBeforeScrub: boolean = false;
   private lastState: any = null;
   private pendingProps: Record<string, any> | null = null;
+  private _error: MediaError | null = null;
 
   // --- Standard Media API States ---
 
@@ -410,6 +421,14 @@ export class HeliosPlayer extends HTMLElement {
 
   public get networkState(): number {
     return this._networkState;
+  }
+
+  public get error(): MediaError | null {
+    return this._error;
+  }
+
+  public get currentSrc(): string {
+    return this.src;
   }
 
   // --- Standard Media API ---
@@ -803,6 +822,7 @@ export class HeliosPlayer extends HTMLElement {
   }
 
   private loadIframe(src: string) {
+    this._error = null;
     this._networkState = HeliosPlayer.NETWORK_LOADING;
     this._readyState = HeliosPlayer.HAVE_NOTHING;
     this.dispatchEvent(new Event('loadstart'));
@@ -1011,7 +1031,16 @@ export class HeliosPlayer extends HTMLElement {
       const unsubState = this.controller.subscribe((s) => this.updateUI(s));
 
       const unsubError = this.controller.onError((err) => {
-        this.showStatus("Error: " + (err.message || String(err)), true, {
+        const message = err.message || String(err);
+        this._error = {
+          code: 4, // MEDIA_ERR_SRC_NOT_SUPPORTED as generic default
+          message: message,
+          MEDIA_ERR_ABORTED: 1,
+          MEDIA_ERR_NETWORK: 2,
+          MEDIA_ERR_DECODE: 3,
+          MEDIA_ERR_SRC_NOT_SUPPORTED: 4
+        };
+        this.showStatus("Error: " + message, true, {
             label: "Reload",
             handler: () => this.retryConnection()
         });
