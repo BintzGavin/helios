@@ -6,6 +6,24 @@ import { ClientSideExporter } from "./features/exporter";
 export { ClientSideExporter };
 export type { HeliosController };
 
+class StaticTimeRange implements TimeRanges {
+  constructor(private startVal: number, private endVal: number) {}
+
+  get length() {
+    return this.endVal > 0 ? 1 : 0;
+  }
+
+  start(index: number) {
+    if (index !== 0 || this.length === 0) throw new Error("IndexSizeError");
+    return this.startVal;
+  }
+
+  end(index: number) {
+    if (index !== 0 || this.length === 0) throw new Error("IndexSizeError");
+    return this.endVal;
+  }
+}
+
 const template = document.createElement("template");
 template.innerHTML = `
   <style>
@@ -395,6 +413,34 @@ export class HeliosPlayer extends HTMLElement {
   }
 
   // --- Standard Media API ---
+
+  public get seeking(): boolean {
+    return this.isScrubbing;
+  }
+
+  public get buffered(): TimeRanges {
+    return new StaticTimeRange(0, this.duration);
+  }
+
+  public get seekable(): TimeRanges {
+    return new StaticTimeRange(0, this.duration);
+  }
+
+  public get videoWidth(): number {
+    if (this.controller) {
+      const state = this.controller.getState();
+      if (state.width) return state.width;
+    }
+    return parseFloat(this.getAttribute("width") || "0");
+  }
+
+  public get videoHeight(): number {
+    if (this.controller) {
+      const state = this.controller.getState();
+      if (state.height) return state.height;
+    }
+    return parseFloat(this.getAttribute("height") || "0");
+  }
 
   public get currentTime(): number {
     if (!this.controller) return 0;

@@ -53,5 +53,5 @@ Attributes are synchronized with properties and reflect the component state:
 
 ## D. Standard Media API
 The component implements a subset of the `HTMLMediaElement` interface for compatibility:
-- **Properties**: `currentTime`, `duration`, `paused`, `ended`, `volume`, `muted`, `playbackRate`, `readyState`, `networkState`.
+- **Properties**: `currentTime`, `duration`, `paused`, `ended`, `volume`, `muted`, `playbackRate`, `readyState`, `networkState`, `videoWidth`, `videoHeight`, `buffered`, `seekable`, `seeking`.
 - **Methods**: `play()`, `pause()`, `load()`.

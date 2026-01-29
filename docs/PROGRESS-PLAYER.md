@@ -1,5 +1,8 @@
 # PLAYER Progress Log
 
+## PLAYER v0.33.0
+- ✅ Completed: Deep API Parity - Implemented `videoWidth`, `videoHeight`, `buffered`, `seekable`, `seeking` properties on `<helios-player>` for compatibility with third-party wrappers.
+
 ## PLAYER v0.32.2
 - ✅ Completed: Polish Click-To-Play & Fix Z-Index - Fixed bug where controls were blocked by click-layer and ensured player grabs focus on click.
 
