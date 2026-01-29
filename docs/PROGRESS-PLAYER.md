@@ -1,5 +1,8 @@
 # PLAYER Progress Log
 
+## PLAYER v0.38.0
+- ✅ Completed: Visualize Playback Range - Implemented visual indicator for playback range on the timeline scrubber using CSS gradients and `updateUI` logic.
+
 ## PLAYER v0.37.0
 - ✅ Completed: CSS Variables for Theming - Exposed CSS variables to enable theming of the player controls and UI.
 

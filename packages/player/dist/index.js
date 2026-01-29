@@ -38,6 +38,8 @@ template.innerHTML = `
       --helios-text-color: white;
       --helios-accent-color: #007bff;
       --helios-range-track-color: #555;
+      --helios-range-selected-color: rgba(255, 255, 255, 0.2);
+      --helios-range-unselected-color: var(--helios-range-track-color);
       --helios-font-family: sans-serif;
     }
     iframe {
@@ -1201,6 +1203,28 @@ export class HeliosPlayer extends HTMLElement {
         this.scrubber.setAttribute("aria-valuetext", `${currentTime} of ${totalTime} seconds`);
         if (state.playbackRate !== undefined) {
             this.speedSelector.value = String(state.playbackRate);
+        }
+        if (state.playbackRange) {
+            const totalFrames = state.duration * state.fps;
+            if (totalFrames > 0) {
+                const [start, end] = state.playbackRange;
+                const startPct = (start / totalFrames) * 100;
+                const endPct = (end / totalFrames) * 100;
+                this.scrubber.style.background = `linear-gradient(to right,
+            var(--helios-range-unselected-color) 0%,
+            var(--helios-range-unselected-color) ${startPct}%,
+            var(--helios-range-selected-color) ${startPct}%,
+            var(--helios-range-selected-color) ${endPct}%,
+            var(--helios-range-unselected-color) ${endPct}%,
+            var(--helios-range-unselected-color) 100%
+          )`;
+            }
+            else {
+                this.scrubber.style.background = '';
+            }
+        }
+        else {
+            this.scrubber.style.background = '';
         }
         this.captionsContainer.innerHTML = '';
         if (this.showCaptions && state.activeCaptions && state.activeCaptions.length > 0) {

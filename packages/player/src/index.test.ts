@@ -1271,4 +1271,78 @@ describe('HeliosPlayer', () => {
         expect(fullscreenBtn.style.display).toBe('none');
     });
   });
+
+  describe('Playback Range Visualization', () => {
+    let mockController: any;
+
+    beforeEach(() => {
+        mockController = {
+            getState: vi.fn().mockReturnValue({ currentFrame: 0, duration: 10, fps: 30, isPlaying: false }),
+            play: vi.fn(),
+            pause: vi.fn(),
+            seek: vi.fn(),
+            subscribe: vi.fn().mockReturnValue(() => {}),
+            onError: vi.fn().mockReturnValue(() => {}),
+            dispose: vi.fn(),
+            setPlaybackRate: vi.fn(),
+            setInputProps: vi.fn(),
+            setAudioMuted: vi.fn()
+        };
+        (player as any).setController(mockController);
+    });
+
+    it('should update scrubber background when playbackRange is set', () => {
+        // Range: Frame 100 to 200. Total 300 frames.
+        // 100/300 * 100 = 33.33333333333333
+        // 200/300 * 100 = 66.66666666666666
+        mockController.getState.mockReturnValue({
+            currentFrame: 0,
+            duration: 10,
+            fps: 30,
+            isPlaying: false,
+            playbackRange: [100, 200]
+        });
+
+        (player as any).updateUI(mockController.getState());
+
+        const scrubber = player.shadowRoot!.querySelector('.scrubber') as HTMLInputElement;
+        const bg = scrubber.style.background;
+
+        expect(bg).toContain('linear-gradient');
+        // Check for presence of CSS variables to ensure the gradient is constructed using them
+        expect(bg).toContain('var(--helios-range-unselected-color)');
+        expect(bg).toContain('var(--helios-range-selected-color)');
+
+        // Basic checks for percentages
+        expect(bg).toMatch(/33\.333/);
+        expect(bg).toMatch(/66\.666/);
+    });
+
+    it('should reset scrubber background when playbackRange is null', () => {
+        // Set range first
+        mockController.getState.mockReturnValue({
+            currentFrame: 0,
+            duration: 10,
+            fps: 30,
+            isPlaying: false,
+            playbackRange: [100, 200]
+        });
+        (player as any).updateUI(mockController.getState());
+
+        const scrubber = player.shadowRoot!.querySelector('.scrubber') as HTMLInputElement;
+        expect(scrubber.style.background).toContain('linear-gradient');
+
+        // Now clear range
+        mockController.getState.mockReturnValue({
+            currentFrame: 0,
+            duration: 10,
+            fps: 30,
+            isPlaying: false,
+            playbackRange: null
+        });
+        (player as any).updateUI(mockController.getState());
+
+        expect(scrubber.style.background).toBe('');
+    });
+  });
 });
