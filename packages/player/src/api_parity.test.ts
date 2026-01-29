@@ -90,4 +90,61 @@ describe('HeliosPlayer API Parity', () => {
     player.preload = 'auto';
     expect(player.getAttribute('preload')).toBe('auto');
   });
+
+  it('should support videoWidth and videoHeight', () => {
+    // Default 0
+    expect(player.videoWidth).toBe(0);
+    expect(player.videoHeight).toBe(0);
+
+    // Fallback to attributes
+    player.setAttribute('width', '1920');
+    player.setAttribute('height', '1080');
+    expect(player.videoWidth).toBe(1920);
+    expect(player.videoHeight).toBe(1080);
+
+    // Controller state should take precedence
+    const mockController = {
+      getState: () => ({ width: 1280, height: 720 }),
+      pause: vi.fn(),
+      dispose: vi.fn(),
+    };
+    (player as any).controller = mockController;
+    expect(player.videoWidth).toBe(1280);
+    expect(player.videoHeight).toBe(720);
+  });
+
+  it('should support buffered and seekable', () => {
+    const buffered = player.buffered;
+    expect(buffered).toBeDefined();
+    // Initially duration is 0, so length is 0 (StaticTimeRange logic: endVal > 0 ? 1 : 0)
+    expect(buffered.length).toBe(0);
+
+    const seekable = player.seekable;
+    expect(seekable).toBeDefined();
+    expect(seekable.length).toBe(0);
+
+    // Mock duration via controller
+    const mockController = {
+      getState: () => ({ duration: 10, width: 0, height: 0 }),
+      pause: vi.fn(),
+      dispose: vi.fn(),
+    };
+    (player as any).controller = mockController;
+
+    expect(player.buffered.length).toBe(1);
+    expect(player.buffered.start(0)).toBe(0);
+    expect(player.buffered.end(0)).toBe(10);
+
+    expect(player.seekable.length).toBe(1);
+    expect(player.seekable.start(0)).toBe(0);
+    expect(player.seekable.end(0)).toBe(10);
+  });
+
+  it('should support seeking property', () => {
+    expect(player.seeking).toBe(false);
+
+    // Simulate scrubbing
+    (player as any).isScrubbing = true;
+    expect(player.seeking).toBe(true);
+  });
 });
