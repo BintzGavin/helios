@@ -100,3 +100,7 @@
 ## [2025-05-22] - Verification Gap in Run-All Script
 **Learning:** The `packages/renderer/tests/run-all.ts` script (executed by `npm test`) only runs a subset of available verification scripts. Critical tests for Concatenation, Stream Copy, and Audio Codecs are present in the directory but ignored by CI.
 **Action:** Created a plan to enable all valid verification scripts in `run-all.ts` to ensure full coverage of implemented features.
+
+## [2026-03-27] - CdpTimeDriver Event Loop Deadlock
+**Learning:** In `CdpTimeDriver` (using `Emulation.setVirtualTimePolicy` with `pause`), waiting for async events like `seeked` or `setTimeout` causes a deadlock because the browser task runner is effectively frozen.
+**Action:** When implementing media sync in `CdpTimeDriver`, set `currentTime` synchronously but DO NOT await `seeked` events. Accept that "frame readiness" is best-effort in Canvas mode, unlike the stricter `SeekTimeDriver` used for DOM mode.
