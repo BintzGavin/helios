@@ -87,3 +87,7 @@
 ## [v1.49.0] - Audio Mixing Verification Gap
 **Learning:** The "Basic (FFmpeg)" audio mixing capability is undocumented and unverified. `DomStrategy` discovers tracks but may have issues with `muted` attributes (potentially ignoring them).
 **Action:** Created `examples/podcast-visualizer` to verify multi-track mixing and potentially expose the mute bug. Future plans should specifically target "realistic" use cases that exercise complex renderer features.
+
+## [v1.53.0] - Verification Coverage Gap
+**Learning:** Status logs claimed "Solid DOM" was completed and working, but it was missing from `verify-render.ts`. Status files can drift from verification reality.
+**Action:** Always cross-reference "Completed" examples against the `CASES` array in `verify-render.ts` during the "Discover" phase.
