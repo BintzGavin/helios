@@ -1,5 +1,7 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import vue from '@vitejs/plugin-vue'
+import { svelte } from '@sveltejs/vite-plugin-svelte'
 import { studioApiPlugin } from './vite-plugin-studio-api'
 import path from 'path'
 
@@ -11,6 +13,8 @@ const projectRoot = process.env.HELIOS_PROJECT_ROOT
 export default defineConfig({
   plugins: [
     react(),
+    vue(),
+    svelte(),
     studioApiPlugin()
   ],
   resolve: {

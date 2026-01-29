@@ -1,3 +1,6 @@
+## STUDIO v0.50.0
+- ✅ Completed: Vue & Svelte Templates - Implemented Vue and Svelte templates for the composition creator, including support for Vue 3 Composition API and Svelte 5 Runes.
+
 ## STUDIO v0.49.0
 - ✅ Completed: Composition Templates - Implemented template system (Vanilla JS, React) for creating new compositions, adding a template selector to the creation modal.
 
