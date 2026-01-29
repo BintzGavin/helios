@@ -1,8 +1,9 @@
-**Version**: 1.41.0
+**Version**: 1.41.1
 
 # Renderer Agent Status
 
 ## Progress Log
+- [1.41.1] ✅ Completed: Restore Environment and Verify - Restored missing `node_modules` by resolving workspace dependency conflicts (temporarily aligning versions), installed Playwright browsers, and verified full test suite passes.
 - [1.41.0] ✅ Completed: Support Shadow DOM Audio Discovery - Updated `scanForAudioTracks` utility to recursively traverse Shadow DOM for media elements using `TreeWalker`, ensuring audio in Web Components is detected.
 - [1.40.1] ✅ Completed: Enable Full Verification Coverage - Updated `run-all.ts` to include 6 additional verification scripts, and fixed `verify-dom-media-preload.ts` and `verify-dom-preload.ts` to be robust and self-contained.
 - [1.40.0] ✅ Completed: Implement WAAPI Sync - Updated `SeekTimeDriver` to manually iterate over `document.getAnimations()` and set `currentTime`, ensuring correct synchronization of CSS animations and transitions for DOM-based rendering.
@@ -12,7 +13,7 @@
 - [1.37.1] ✅ Completed: Fix Workspace Dependency - Updated `@helios-project/core` dependency to `2.7.0` in `packages/renderer/package.json` to match local workspace version, restoring verification environment.
 - [1.37.0] ✅ Completed: CdpTimeDriver Stability - Updated `CdpTimeDriver` to detect and await `window.helios.waitUntilStable()`, enabling robust synchronization with custom stability checks for Canvas-based rendering.
 - [1.36.0] ✅ Completed: Enable Full Test Coverage - Updated `run-all.ts` to include all verification scripts, refactored `verify-concat.ts` to be self-contained using Data URIs, and improved `CanvasStrategy` robustness against `esbuild` artifacts by using string-based evaluation.
-- [1.35.0] ✅ Completed: Support Helios Stability Registry - Updated `SeekTimeDriver` to detect and await `window.helios.waitUntilStable()`, enabling robust synchronization with custom stability checks registered in the core engine.
+- [1.35.0] ✅ Completed: Support Helios Stability Registry - Updated `SeekTimeDriver` to detect and await `window.helios.waitUntilStable()`, enabling robust synchronization with custom stability checks for Canvas-based rendering.
 - [1.34.0] ✅ Completed: Seek Driver Offsets - Updated `SeekTimeDriver` to respect `data-helios-offset` and `data-helios-seek` attributes, calculating correct `currentTime` for visual media synchronization.
 - [1.33.0] ✅ Completed: Enable DOM Transparency - Updated `DomStrategy` to support transparent video export by using `omitBackground: true` in Playwright when `pixelFormat` suggests alpha (e.g. `yuva420p`, `rgba`), allowing creation of transparent overlays and lower-thirds.
 - [1.32.0] ✅ Completed: FFmpeg Diagnostics - Implemented `FFmpegInspector` and updated `Renderer.diagnose()` to return comprehensive diagnostics including FFmpeg version, supported encoders (like `libx264`), and filters, resolving the Vision Gap.

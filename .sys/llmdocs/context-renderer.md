@@ -31,7 +31,9 @@ packages/renderer/
 │   ├── index.ts                # Main Renderer class
 │   └── types.ts                # Configuration interfaces
 └── tests/
+    ├── run-all.ts              # Test runner
     ├── verify-waapi-sync.ts    # CSS animation sync test
+    ├── verify-shadow-dom-audio.ts # Shadow DOM audio test
     └── ...                     # Other verification scripts
 ```
 
