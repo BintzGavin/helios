@@ -1,26 +1,31 @@
-# 2026-01-29-CORE-Maintenance.md
+# 2026-01-29-CORE-Maintenance
 
-#### 1. Context & Goal
-- **Objective**: Synchronize `packages/core/package.json` version with implemented features (v2.7.0), correct the license in `packages/core/README.md` to match the project's ELv2, and rename `audio.test.ts` to reflect its scope.
-- **Trigger**: Discrepancy between `docs/status/CORE.md` (v2.7.0), `package.json` (v2.6.1), and `README.md` (MIT License).
-- **Impact**: Ensures legal compliance, package integrity, and reduces developer confusion regarding the missing `audio.ts` file.
+## 1. Context & Goal
+- **Objective**: Fix critical documentation discrepancies (License mismatch) and improve "Headless" quality by silencing `Helios.diagnose()` console output.
+- **Trigger**: "Vision vs Reality" check revealed README states MIT License (Reality is ELv2) and `diagnose()` forces console logging.
+- **Impact**: Ensures legal clarity for consumers and improves the developer experience (DX) by making the library less "chatty".
 
-#### 2. File Inventory
-- **Modify**: `packages/core/package.json` (Bump version to 2.7.0)
-- **Modify**: `packages/core/README.md` (Update License to ELv2)
-- **Rename**: `packages/core/src/audio.test.ts` -> `packages/core/src/helios-audio.test.ts`
+## 2. File Inventory
+- **Modify**:
+    - `packages/core/README.md`: Update License to ELv2 and clarify TimeDriver support.
+    - `packages/core/src/index.ts`: Refactor `diagnose()` to remove console logging.
+- **Read-Only**:
+    - `packages/core/src/drivers/DomDriver.ts`
+    - `packages/core/package.json`
 
-#### 3. Implementation Spec
-- **Version Update**: Update `version` field in `packages/core/package.json` from `2.6.1` to `2.7.0`.
-- **License Fix**: Update "License" section in `packages/core/README.md` to state "Elastic License 2.0 (ELv2)" instead of "MIT".
-- **Test Rename**: Rename `packages/core/src/audio.test.ts` to `packages/core/src/helios-audio.test.ts` to clarify it tests the `Helios` class audio signals, not a standalone `audio` module.
+## 3. Implementation Spec
+- **Documentation**:
+    - Change "License: MIT" to "License: Elastic License 2.0 (ELv2)".
+    - Update "Time Driver" feature description to emphasize `DomDriver` as the default engine that supports WAAPI.
+- **Helios.diagnose()**:
+    - Remove `console.group`, `console.log`, `console.warn` calls within the `diagnose` static method.
+    - Function should only return the `DiagnosticReport` object.
+    - **Public API Changes**: None (return type remains `Promise<DiagnosticReport>`). Logic change only (side-effect removal).
 
-#### 4. Test Plan
+## 4. Test Plan
 - **Verification**: `npm test -w packages/core`
-- **Success Criteria**: All tests pass, including the renamed test file.
-- **Verification**: `list_files packages/core/src`
-    - Check that `helios-audio.test.ts` exists and `audio.test.ts` is gone.
-- **Verification**: `read_file packages/core/package.json`
-    - Check for `"version": "2.7.0"`.
-- **Verification**: `read_file packages/core/README.md`
-    - Check for "Elastic License 2.0 (ELv2)".
+- **Success Criteria**:
+    - `npm test` passes without error.
+    - `Helios.diagnose()` returns correct report object in tests.
+    - No console output observed during test execution (related to diagnostics).
+    - `README.md` shows "License: Elastic License 2.0 (ELv2)".
