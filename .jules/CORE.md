@@ -85,3 +85,7 @@
 ## 2.7.0 - Task Already Completed
 **Learning:** The plan file `2026-04-12-CORE-Implement-Stability-Registry.md` existed, but the code was already fully implemented and documented in status files. This suggests the plan wasn't cleaned up or the agent cycle was interrupted after implementation but before cleanup.
 **Action:** Always verify the codebase state against the plan before starting implementation to avoid redundant work. If implemented, focus on verification.
+
+## 2026-01-29 - Status File Future Date & License Contradiction
+**Learning:** `docs/status/CORE.md` lists `v2.7.0` and `2026-04-12` (future date), while `package.json` is `2.6.1` and `README.md` has the wrong license (MIT vs ELv2). The status file claimed license was fixed in v1.28.0 but it wasn't.
+**Action:** Trust `date` command for file naming. Created `2026-01-29-CORE-Maintenance.md` to enforce reality (ELv2, v2.7.0) to match the vision and status claims.
