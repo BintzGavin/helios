@@ -124,7 +124,7 @@ export class CanvasStrategy implements RenderStrategy {
         alphaMode
     };
 
-    const result = await page.evaluate(`
+    const result = await page.evaluate<{ supported: boolean; codec?: string; isH264: boolean; reason?: string }>(`
       (async (config) => {
         if (typeof VideoEncoder === 'undefined') {
           return { supported: false, reason: 'VideoEncoder not found' };
