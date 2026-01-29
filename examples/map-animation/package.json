@@ -1,0 +1,12 @@
+{
+  "name": "map-animation",
+  "private": true,
+  "version": "0.0.0",
+  "dependencies": {
+    "leaflet": "^1.9.4"
+  },
+  "devDependencies": {
+    "@types/leaflet": "^1.9.12",
+    "vite": "^5.0.0"
+  }
+}

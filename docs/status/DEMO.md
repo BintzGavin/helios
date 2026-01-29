@@ -1,10 +1,11 @@
 # Status: DEMO (Executor)
-**Version**: 1.51.0
+**Version**: 1.52.0
 
 ## Vision
 To provide comprehensive, idiomatic examples for every major framework (React, Vue, Svelte, Vanilla) and robust end-to-end testing to ensure the Helios engine delivers on its "Use What You Know" promise.
 
 ## Current State
+- **Map Animation**: ✅ `examples/map-animation` exists and works (Demonstrates Leaflet integration with stability checks).
 - **Solid DOM**: ✅ `examples/solid-dom-animation` exists and works (Demonstrates integration with SolidJS signals for DOM updates).
 - **Solid Canvas**: ✅ `examples/solid-canvas-animation` exists and works (Demonstrates integration with SolidJS signals via `createHeliosSignal` adapter).
 - **React Styled Components**: ✅ `examples/react-styled-components` exists and works (Demonstrates `styled-components` integration with `autoSyncAnimations`).
@@ -77,6 +78,7 @@ To provide comprehensive, idiomatic examples for every major framework (React, V
 None.
 
 ## Log
+- [v1.52.0] ✅ Completed: Map Animation Example - Created `examples/map-animation` demonstrating Leaflet integration.
 - [v1.51.0] ✅ Completed: Solid DOM Example - Created `examples/solid-dom-animation` demonstrating integration with SolidJS signals for DOM updates.
 - [v1.50.0] ✅ Completed: Podcast Visualizer - Created `examples/podcast-visualizer` demonstrating multi-track audio mixing and sync verification.
 - [v1.49.1] ✅ Completed: Solid Canvas Documentation - Added README for SolidJS example and verified E2E tests.

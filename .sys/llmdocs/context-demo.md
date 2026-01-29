@@ -36,6 +36,7 @@
 - `examples/svelte-transitions`: Svelte transitions (CSS animation synchronization).
 - `examples/solid-canvas-animation`: SolidJS Canvas (Signals adapter).
 - `examples/solid-dom-animation`: SolidJS DOM (Signals + CSS).
+- `examples/map-animation`: Leaflet Maps (DOM).
 - `examples/threejs-canvas-animation`: Three.js (3D).
 - `examples/react-three-fiber`: React Three Fiber (R3F) integration.
 - `examples/pixi-canvas-animation`: PixiJS (2D).
