@@ -38,6 +38,7 @@
 - `examples/solid-canvas-animation`: SolidJS Canvas (Signals adapter).
 - `examples/solid-dom-animation`: SolidJS DOM (Signals + CSS).
 - `examples/solid-animation-helpers`: SolidJS Helpers (<Sequence>).
+- `examples/solid-transitions`: SolidJS transitions (CSS animation synchronization).
 - `examples/map-animation`: Leaflet Maps (DOM).
 - `examples/text-effects-animation`: Text Effects (Typewriter, Staggered Reveal).
 - `examples/threejs-canvas-animation`: Three.js (3D).

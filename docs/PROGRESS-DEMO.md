@@ -1,3 +1,6 @@
+## DEMO v1.59.0
+- ✅ Completed: Solid Transitions Example - Created `examples/solid-transitions` demonstrating how to synchronize CSS animations in SolidJS using `autoSyncAnimations: true` and `animation-delay`. Verified with E2E tests.
+
 ## DEMO v1.56.0
 - ✅ Completed: Solid Animation Helpers Example - Created `examples/solid-animation-helpers` demonstrating idiomatic Sequence component composition in SolidJS.
 
