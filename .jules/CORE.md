@@ -72,7 +72,7 @@
 
 ## 2026-01-26 - Time Discrepancy in Status Files
 **Learning:** `docs/status/CORE.md` contains entries dated in the future (e.g., March 2026) relative to the system date (January 2026). This causes confusion when naming plan files sequentially.
-**Action:** Trust the system date (`date` command) for new plan filenames to ensure accuracy to the current execution context, regardless of the "future" status logs.
+**Action:** Trust the system date (`date` command) for file naming.
 
 ## 2026-01-28 - Hybrid Composition Stability Gap
 **Learning:** `Helios.waitUntilStable()` delegated strictly to the active driver (usually `DomDriver`), which meant Canvas/WebGL or async data fetches were ignored during stability checks, risking render artifacts.
@@ -97,3 +97,7 @@
 ## 2.7.1 - Zombie Plan & Reviewer Confusion
 **Learning:** The plan `2026-04-12-CORE-Implement-Stability-Registry.md` was still present despite the status file marking v2.7.0 as complete and the code being present. The Reviewer (AI) flagged the submission as "Incorrect" because it expected code creation from scratch, not verification/cleanup.
 **Action:** When a plan is stale/already implemented, explicitly state in the commit that this is a "Verification and Cleanup" task. Force the code into the diff (e.g. via JSDoc updates or Refactoring) to prove existence to automated review systems.
+
+## 2.8.0 - Virtual Time and Test Environment
+**Learning:** In `vitest` (node environment), `window` is undefined, but `document` was stubbed. This caused tests relying on `__HELIOS_VIRTUAL_TIME__` (on `window`) to fail or behave unexpectedly. Stubbing `document` without `window` created an inconsistent environment.
+**Action:** When testing browser-specific globals like `window.__HELIOS_VIRTUAL_TIME__`, explicitly stub `window` in `beforeEach` to ensure a consistent test environment.

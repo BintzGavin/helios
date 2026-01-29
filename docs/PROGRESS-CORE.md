@@ -1,5 +1,8 @@
 # CORE Progress Log
 
+## CORE v2.8.0
+- ✅ Completed: Bind Virtual Time - Updated `bindToDocumentTimeline` to support `__HELIOS_VIRTUAL_TIME__` for precise synchronization in renderer environments.
+
 ## CORE v2.7.2
 - ✅ Completed: Synchronize Version - Updated version to 2.7.2 to match dependencies in player/renderer, verified tests pass.
 
