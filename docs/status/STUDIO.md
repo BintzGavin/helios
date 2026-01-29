@@ -1,4 +1,4 @@
-**Version**: 0.47.0
+**Version**: 0.48.0
 
 # Studio Domain Status
 
@@ -7,6 +7,7 @@
 **Focus**: UI Implementation & CLI
 
 ## Recent Updates
+- [v0.48.0] ✅ Completed: Timecode & Range - Implemented SMPTE timecode display in Timeline and enforced In/Out points for looping and navigation (Rewind/Home).
 - [v0.47.0] ✅ Completed: Safe Area Guides - Implemented toggleable Safe Area Guides (Action Safe, Title Safe, Crosshair) in the Studio Stage with toolbar button and keyboard shortcut.
 - [v0.46.0] ✅ Completed: Verify Audio Controls - Added unit tests for PlaybackControls to verify volume and mute functionality.
 - [v0.45.0] ✅ Completed: Delete Composition - Implemented ability to delete compositions from the UI with backend support and confirmation.

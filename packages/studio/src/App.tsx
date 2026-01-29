@@ -23,7 +23,9 @@ function AppContent() {
     controller,
     playerState,
     setPlayerState,
-    loop
+    loop,
+    inPoint,
+    outPoint
   } = useStudio();
 
   const src = activeComposition?.url || '';
@@ -55,12 +57,14 @@ function AppContent() {
     if (!isPlaying) return;
 
     const totalFrames = duration * fps;
-    if (currentFrame >= totalFrames - 1) {
-      // Seek to 0 and play to loop
-      controller.seek(0);
+    const loopEnd = outPoint > 0 ? outPoint : totalFrames;
+
+    if (currentFrame >= loopEnd - 1) {
+      // Seek to inPoint and play to loop
+      controller.seek(inPoint);
       controller.play();
     }
-  }, [playerState, loop, controller]);
+  }, [playerState, loop, controller, inPoint, outPoint]);
 
 
   return (

@@ -45,7 +45,7 @@ export const GlobalShortcuts: React.FC = () => {
   // Home: Rewind
   useKeyboardShortcut('Home', () => {
     if (!controller) return;
-    controller.seek(0);
+    controller.seek(inPoint);
   }, { ignoreInput: true, preventDefault: true });
 
   // ?: Help

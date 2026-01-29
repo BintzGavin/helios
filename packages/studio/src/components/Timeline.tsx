@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { useStudio } from '../context/StudioContext';
-import { CaptionCue } from '@helios-project/core';
+import { CaptionCue, framesToTimecode } from '@helios-project/core';
 import './Timeline.css';
 
 export const Timeline: React.FC = () => {
@@ -26,11 +26,12 @@ export const Timeline: React.FC = () => {
   const pixelsPerFrame = zoom === 0 ? 0 : 0.5 * Math.pow(1.04, zoom);
 
   const formatTime = (frame: number, fps: number) => {
-    if (!fps) return "0:00.00";
-    const totalSeconds = frame / fps;
-    const mins = Math.floor(totalSeconds / 60);
-    const secs = (totalSeconds % 60).toFixed(2);
-    return `${mins}:${secs.padStart(5, '0')}`;
+    if (!fps || fps <= 0) return "00:00:00:00";
+    try {
+      return framesToTimecode(frame, fps);
+    } catch (e) {
+      return "00:00:00:00";
+    }
   };
 
   const getFrameFromEvent = (e: MouseEvent | React.MouseEvent) => {

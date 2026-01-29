@@ -41,7 +41,7 @@ describe('Timeline', () => {
     render(<Timeline />);
 
     // Check time display: 30 frames / 30 fps = 1.00s
-    expect(screen.getByText(/0:01.00/)).toBeInTheDocument();
+    expect(screen.getByText(/00:00:01:00/)).toBeInTheDocument();
 
     // Check In/Out markers display
     expect(screen.getByText(/In: 0/)).toBeInTheDocument();
