@@ -5,10 +5,10 @@ The Studio is a Vite-based React application that provides a development environ
 
 Key components:
 - **CLI**: `npx helios studio` starts the Vite dev server.
-- **Server**: Discovery logic for compositions and assets.
+- **Server**: Discovery logic for compositions and assets. API middleware (`vite-plugin-studio-api`) handles file serving (`/@fs/` support for both Dev and Preview) and backend operations.
 - **UI**: React app with Timeline, Props Editor, Preview Stage.
 - **Controller**: Manages `Helios` instance via `useStudio` context.
-- **Verification**: `npm run verify` checks UI integrity using Playwright.
+- **Verification**: `npm run verify` checks UI integrity using Playwright (supports Dev and Preview modes).
 
 ## B. File Tree
 packages/studio/
@@ -32,10 +32,13 @@ packages/studio/
     hooks/
       useKeyboardShortcut.ts
     server/
+      discovery.ts
+      render-manager.ts
     App.tsx
     main.tsx
   scripts/
     verify-ui.ts
+  vite-plugin-studio-api.ts
   README.md
 
 ## C. CLI Interface
