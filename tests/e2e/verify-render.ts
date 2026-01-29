@@ -43,6 +43,7 @@ const CASES = [
   { name: 'Solid Canvas', relativePath: 'examples/solid-canvas-animation/composition.html', mode: 'canvas' as const },
   { name: 'Podcast Visualizer', relativePath: 'examples/podcast-visualizer/composition.html', mode: 'dom' as const },
   { name: 'Map Animation', relativePath: 'examples/map-animation/composition.html', mode: 'dom' as const },
+  { name: 'Solid DOM', relativePath: 'examples/solid-dom-animation/composition.html', mode: 'dom' as const },
 ];
 
 async function main() {

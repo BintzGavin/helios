@@ -1,3 +1,6 @@
+## DEMO v1.53.0
+- ✅ Completed: Verify Solid DOM Example - Added Solid DOM to verification registry and verified it passes.
+
 ## DEMO v1.52.0
 - ✅ Completed: Map Animation Example - Created `examples/map-animation` demonstrating Leaflet integration.
 
