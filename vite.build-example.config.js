@@ -33,6 +33,7 @@ export default defineConfig({
         vue_dom: resolve(__dirname, "examples/vue-dom-animation/composition.html"),
         svelte_composition: resolve(__dirname, "examples/svelte-canvas-animation/composition.html"),
         svelte_dom: resolve(__dirname, "examples/svelte-dom-animation/composition.html"),
+        svelte_runes: resolve(__dirname, "examples/svelte-runes-animation/composition.html"),
         threejs_composition: resolve(__dirname, "examples/threejs-canvas-animation/composition.html"),
         pixi_composition: resolve(__dirname, "examples/pixi-canvas-animation/composition.html"),
         p5_composition: resolve(__dirname, "examples/p5-canvas-animation/composition.html"),

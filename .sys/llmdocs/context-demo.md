@@ -34,6 +34,7 @@
 - `examples/svelte-dom-animation`: Svelte DOM.
 - `examples/svelte-animation-helpers`: Svelte `<Sequence>`, `<Series>`.
 - `examples/svelte-transitions`: Svelte transitions (CSS animation synchronization).
+- `examples/svelte-runes-animation`: Svelte 5 Runes ($state, $derived).
 - `examples/solid-canvas-animation`: SolidJS Canvas (Signals adapter).
 - `examples/solid-dom-animation`: SolidJS DOM (Signals + CSS).
 - `examples/map-animation`: Leaflet Maps (DOM).
