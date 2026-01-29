@@ -638,8 +638,25 @@ export class Helios {
     const poll = () => {
         if (!this.syncWithDocumentTimeline) return;
 
-        const currentTime = document.timeline.currentTime;
-        if (currentTime !== null && typeof currentTime === 'number') {
+        let currentTime: number | null = null;
+
+        // Check for virtual time first (Renderer environment)
+        if (typeof window !== 'undefined' && typeof (window as any).__HELIOS_VIRTUAL_TIME__ === 'number') {
+            const virtualTime = (window as any).__HELIOS_VIRTUAL_TIME__;
+            if (Number.isFinite(virtualTime)) {
+                currentTime = virtualTime;
+            }
+        }
+
+        // Fallback to document timeline
+        if (currentTime === null) {
+            const tlTime = document.timeline.currentTime;
+            if (tlTime !== null && typeof tlTime === 'number') {
+                currentTime = tlTime;
+            }
+        }
+
+        if (currentTime !== null) {
             const frame = (currentTime / 1000) * this.fps;
             if (frame !== this._currentFrame.peek()) {
                  this._currentFrame.value = frame;

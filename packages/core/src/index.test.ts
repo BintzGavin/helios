@@ -117,6 +117,7 @@ describe('Helios Core', () => {
                 currentTime: 0
             }
         });
+        vi.stubGlobal('window', {});
         vi.stubGlobal('requestAnimationFrame', (cb: any) => setTimeout(cb, 0));
         vi.stubGlobal('cancelAnimationFrame', (id: any) => clearTimeout(id));
     });
@@ -182,6 +183,55 @@ describe('Helios Core', () => {
             isPlaying: false
         }));
 
+        helios.unbindFromDocumentTimeline();
+    });
+
+    it('should prefer __HELIOS_VIRTUAL_TIME__ when available', async () => {
+        const helios = new Helios({ duration: 10, fps: 30 });
+        helios.bindToDocumentTimeline();
+
+        (document.timeline as any).currentTime = 1000;
+
+        // Inject virtual time
+        (window as any).__HELIOS_VIRTUAL_TIME__ = 5000;
+
+        await new Promise(resolve => setTimeout(resolve, 50));
+
+        expect(helios.getState().currentFrame).toBe(150); // 5000ms * 30fps / 1000 = 150
+
+        // Cleanup
+        delete (window as any).__HELIOS_VIRTUAL_TIME__;
+        helios.unbindFromDocumentTimeline();
+    });
+
+    it('should fall back to document.timeline when virtual time is undefined', async () => {
+        const helios = new Helios({ duration: 10, fps: 30 });
+        helios.bindToDocumentTimeline();
+
+        (document.timeline as any).currentTime = 1000;
+
+        delete (window as any).__HELIOS_VIRTUAL_TIME__;
+
+        await new Promise(resolve => setTimeout(resolve, 50));
+
+        expect(helios.getState().currentFrame).toBe(30); // 1000ms * 30fps / 1000 = 30
+
+        helios.unbindFromDocumentTimeline();
+    });
+
+    it('should fall back if virtual time is infinite', async () => {
+        const helios = new Helios({ duration: 10, fps: 30 });
+        helios.bindToDocumentTimeline();
+
+        (document.timeline as any).currentTime = 1000;
+
+        (window as any).__HELIOS_VIRTUAL_TIME__ = Infinity;
+
+        await new Promise(resolve => setTimeout(resolve, 50));
+
+        expect(helios.getState().currentFrame).toBe(30);
+
+        delete (window as any).__HELIOS_VIRTUAL_TIME__;
         helios.unbindFromDocumentTimeline();
     });
   });
