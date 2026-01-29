@@ -123,3 +123,6 @@
 
 ## DEMO v1.49.0
 - ✅ Completed: Solid Canvas Example - Created `examples/solid-canvas-animation` demonstrating integration with SolidJS and `createHeliosSignal` adapter.
+
+## DEMO v1.57.0
+- ✅ Completed: Verify Podcast Visualizer - Found and fixed a bug in `examples/podcast-visualizer` (incorrect usage of `state.currentTime`) and re-verified visual correctness with a custom script.
