@@ -1,5 +1,8 @@
 # CORE Progress Log
 
+## CORE v2.9.0
+- ✅ Completed: Implement Recursive Schema - Updated `PropDefinition` to support `items` and `properties` for nested array/object validation, and refactored `validateProps`.
+
 ## CORE v2.8.0
 - ✅ Completed: Bind Virtual Time - Updated `bindToDocumentTimeline` to support `__HELIOS_VIRTUAL_TIME__` for precise synchronization in renderer environments.
 
@@ -42,6 +45,9 @@
 ## CORE v2.0.0
 - ✅ Completed: WaitUntilStable Interface - Made `waitUntilStable` required in `TimeDriver` interface and strict in `Helios` to ensure reliable rendering.
 
+## CORE v1.33.0
+- ✅ Completed: Implement WaitUntilStable - Implemented `waitUntilStable` in `Helios` and `DomDriver` to ensure deterministic rendering by waiting for fonts, images, and media readiness.
+
 ## CORE v1.32.1
 - ✅ Completed: Document Dynamic Timing - Verified implementation, added JSDoc, and cleaned up plan artifacts.
 
@@ -76,7 +82,7 @@
 - ✅ Completed: Implement Color Interpolation - Implemented `interpolateColors` and `parseColor` utilities supporting Hex, RGB, and HSL formats.
 
 ## CORE v1.24.0
-- ✅ Completed: Implement Relative Audio Mixing - Implemented relative volume and mute handling in `DomDriver`.
+- ✅ Completed: Implement Relative Audio Mixing - Implemented relative volume and mute handling in `DomDriver`, allowing master volume/mute to mix with user-set values instead of overriding them.
 
 ## CORE v1.23.0
 - ✅ Completed: Implement Resolution Awareness - Added `width`/`height` to state/options, `setSize` method, and `INVALID_RESOLUTION` error.
@@ -88,7 +94,7 @@
 - ✅ Completed: Implement Deterministic Randomness - Added `random` utility with Mulberry32 PRNG and string seeding support.
 
 ## CORE v1.20.0
-- ✅ Completed: Implement Active Captions - Added `activeCaptions` signal, `setCaptions`, and `findActiveCues` with glitch-free updates.
+- ✅ Completed: Implement Active Captions - Added `activeCaptions` signal to `Helios`, `setCaptions` method, and `findActiveCues` utility.
 
 ## CORE v1.19.0
 - ✅ Completed: Implement Audio Volume Control - Added `volume` and `muted` state to `Helios` and updated `DomDriver` to sync with HTMLMediaElements.

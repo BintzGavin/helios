@@ -143,4 +143,74 @@ describe('validateProps', () => {
     expect(() => validateProps({ col: '123' }, schema)).toThrow(HeliosError); // Just numbers
     expect(() => validateProps({ col: 123 }, schema)).toThrow(HeliosError); // Wrong type
   });
+
+  it('should validate array items', () => {
+    const schema = {
+      tags: {
+        type: 'array' as const,
+        items: { type: 'string' as const }
+      }
+    };
+    expect(validateProps({ tags: ['a', 'b'] }, schema)).toEqual({ tags: ['a', 'b'] });
+    expect(() => validateProps({ tags: ['a', 123] }, schema)).toThrow(HeliosError);
+    expect(() => validateProps({ tags: ['a', 123] }, schema)).toThrow(/Invalid type for prop 'tags\[1\]'. Expected string/);
+  });
+
+  it('should validate array of objects', () => {
+    const schema = {
+      users: {
+        type: 'array' as const,
+        items: {
+          type: 'object' as const,
+          properties: {
+            name: { type: 'string' as const },
+            age: { type: 'number' as const }
+          }
+        }
+      }
+    };
+    const valid = { users: [{ name: 'Alice', age: 30 }, { name: 'Bob', age: 25 }] };
+    expect(validateProps(valid, schema)).toEqual(valid);
+
+    expect(() => validateProps({ users: [{ name: 'Alice' }] }, schema)).toThrow(/Missing required prop: users\[0\].age/);
+  });
+
+  it('should validate nested objects', () => {
+    const schema = {
+      config: {
+        type: 'object' as const,
+        properties: {
+          theme: { type: 'string' as const, enum: ['dark', 'light'] },
+          retry: { type: 'number' as const, default: 3 }
+        }
+      }
+    };
+
+    expect(validateProps({ config: { theme: 'dark' } }, schema)).toEqual({ config: { theme: 'dark', retry: 3 } });
+    expect(() => validateProps({ config: { theme: 'blue' } }, schema)).toThrow(/Prop 'config.theme' must be one of: dark, light/);
+  });
+
+  it('should handle deep nesting', () => {
+      const schema = {
+          level1: {
+              type: 'object' as const,
+              properties: {
+                  level2: {
+                      type: 'array' as const,
+                      items: {
+                          type: 'object' as const,
+                          properties: {
+                              val: { type: 'number' as const, minimum: 0 }
+                          }
+                      }
+                  }
+              }
+          }
+      };
+
+      const valid = { level1: { level2: [{ val: 10 }, { val: 0 }] } };
+      expect(validateProps(valid, schema)).toEqual(valid);
+
+      expect(() => validateProps({ level1: { level2: [{ val: -1 }] } }, schema)).toThrow(/Prop 'level1.level2\[0\].val' must be >= 0/);
+  });
 });
