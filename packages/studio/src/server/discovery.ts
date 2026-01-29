@@ -58,6 +58,86 @@ export function findCompositions(rootDir: string): CompositionInfo[] {
   return compositions;
 }
 
+export function createComposition(rootDir: string, name: string): CompositionInfo {
+  const projectRoot = getProjectRoot(rootDir);
+
+  // Sanitize name: lowercase, replace spaces with hyphens, remove special chars
+  const dirName = name.toLowerCase().replace(/[^a-z0-9-]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
+
+  if (!dirName) {
+    throw new Error('Invalid composition name');
+  }
+
+  const compDir = path.join(projectRoot, dirName);
+  if (fs.existsSync(compDir)) {
+    throw new Error(`Composition "${name}" (directory: ${dirName}) already exists`);
+  }
+
+  fs.mkdirSync(compDir, { recursive: true });
+
+  const template = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${name}</title>
+  <style>
+    body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background-color: #000; }
+    canvas { display: block; width: 100%; height: 100%; }
+  </style>
+</head>
+<body>
+  <canvas id="canvas"></canvas>
+  <script type="module">
+    import { Helios } from '@helios-project/core';
+
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+
+    const resize = () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    };
+    window.addEventListener('resize', resize);
+    resize();
+
+    const helios = new Helios({ duration: 5, fps: 30 });
+    helios.bindToDocumentTimeline();
+
+    helios.subscribe((state) => {
+      const { width, height } = canvas;
+      const t = state.time; // in seconds
+
+      ctx.fillStyle = '#000';
+      ctx.fillRect(0, 0, width, height);
+
+      ctx.fillStyle = '#fff';
+      const x = (Math.sin(t) + 1) / 2 * (width - 100) + 50;
+      const y = height / 2;
+      ctx.beginPath();
+      ctx.arc(x, y, 50, 0, Math.PI * 2);
+      ctx.fill();
+    });
+  </script>
+</body>
+</html>`;
+
+  fs.writeFileSync(path.join(compDir, 'composition.html'), template);
+
+  // Return the new composition info
+  const displayName = dirName
+    .split('-')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+
+  return {
+    id: dirName,
+    name: displayName,
+    url: `/@fs${path.join(compDir, 'composition.html')}`,
+    description: \`Example: \${displayName}\`
+  };
+}
+
 function getAssetType(ext: string): AssetInfo['type'] {
   const images = ['.png', '.jpg', '.jpeg', '.gif', '.svg', '.webp'];
   const videos = ['.mp4', '.webm', '.mov'];

@@ -79,6 +79,10 @@ interface StudioContextType {
   isPromptOpen: boolean;
   setPromptOpen: (isOpen: boolean) => void;
 
+  isCreateOpen: boolean;
+  setCreateOpen: (isOpen: boolean) => void;
+  createComposition: (name: string) => Promise<void>;
+
   // Assets
   assets: Asset[];
   uploadAsset: (file: File) => Promise<void>;
@@ -134,6 +138,7 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [isHelpOpen, setHelpOpen] = useState(false);
   const [isDiagnosticsOpen, setDiagnosticsOpen] = useState(false);
   const [isPromptOpen, setPromptOpen] = useState(false);
+  const [isCreateOpen, setCreateOpen] = useState(false);
   const [canvasSize, setCanvasSize] = useState({ width: 1920, height: 1080 });
   const [renderConfig, setRenderConfig] = useState<RenderConfig>({ mode: 'canvas' });
 
@@ -193,6 +198,42 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       fetchAssets();
     } catch (e) {
       console.error('Failed to delete asset:', e);
+    }
+  };
+
+  const createComposition = async (name: string) => {
+    try {
+      const res = await fetch('/api/compositions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name })
+      });
+
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || 'Failed to create composition');
+      }
+
+      const newComp = await res.json();
+
+      // Refresh list
+      const listRes = await fetch('/api/compositions');
+      const data = await listRes.json();
+      setCompositions(data);
+
+      // Set active
+      // Find the new comp in the refreshed list to ensure we have the correct object reference if needed
+      const found = data.find((c: Composition) => c.id === newComp.id);
+      if (found) {
+        setActiveComposition(found);
+      } else {
+        setActiveComposition(newComp);
+      }
+
+      setCreateOpen(false);
+    } catch (e) {
+      console.error(e);
+      throw e;
     }
   };
 
@@ -386,6 +427,9 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         setDiagnosticsOpen,
         isPromptOpen,
         setPromptOpen,
+        isCreateOpen,
+        setCreateOpen,
+        createComposition,
         renderJobs,
         startRender,
         cancelRender,

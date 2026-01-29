@@ -7,6 +7,7 @@ import { PropsEditor } from './components/PropsEditor'
 import { PlaybackControls } from './components/Controls/PlaybackControls'
 import { StudioProvider, useStudio } from './context/StudioContext'
 import { CompositionSwitcher } from './components/CompositionSwitcher'
+import { CreateCompositionModal } from './components/CreateCompositionModal'
 import { KeyboardShortcutsModal } from './components/KeyboardShortcutsModal'
 import { DiagnosticsModal } from './components/DiagnosticsModal'
 import { SystemPromptModal } from './components/SystemPromptModal'
@@ -18,6 +19,7 @@ function AppContent() {
   const {
     activeComposition,
     setSwitcherOpen,
+    setCreateOpen,
     controller,
     playerState,
     setPlayerState,
@@ -85,6 +87,25 @@ function AppContent() {
               <span>{activeComposition?.name || 'Select Composition...'}</span>
               <span style={{ fontSize: '0.8em', color: '#888', marginLeft: 'auto' }}>⌘K</span>
             </button>
+            <button
+              onClick={() => setCreateOpen(true)}
+              title="New Composition"
+              style={{
+                background: '#333',
+                border: '1px solid #444',
+                color: '#fff',
+                width: '32px',
+                height: '32px',
+                borderRadius: '4px',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '20px'
+              }}
+            >
+              +
+            </button>
           </div>
         }
         sidebar={<Sidebar />}
@@ -104,6 +125,7 @@ function AppContent() {
         }
       />
       <CompositionSwitcher />
+      <CreateCompositionModal />
       <KeyboardShortcutsModal />
       <DiagnosticsModal />
       <SystemPromptModal />
