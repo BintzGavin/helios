@@ -1,3 +1,6 @@
+## STUDIO v0.46.0
+- ✅ Completed: Verify Audio Controls - Added unit tests for PlaybackControls to verify volume and mute functionality.
+
 ## STUDIO v0.45.0
 - ✅ Completed: Delete Composition - Implemented ability to delete compositions from the UI with backend support and confirmation.
 
