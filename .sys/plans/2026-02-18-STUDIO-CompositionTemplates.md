@@ -1,67 +1,107 @@
-# 2026-02-18-STUDIO-CompositionTemplates.md
+# Context & Goal
+- **Objective**: Implement a template system for creating new compositions in Helios Studio, supporting Vanilla JS and React initially.
+- **Trigger**: The "Create Composition" feature currently hardcodes a Vanilla JS template, but the vision is framework-agnostic.
+- **Impact**: Enables users to quickly bootstrap compositions in their preferred framework (React, etc.) directly from the Studio UI.
 
-## 1. Context & Goal
-- **Objective**: Enable users to select from multiple templates (Vanilla Canvas, Vanilla DOM, React Canvas, React DOM) when creating a new composition in Helios Studio.
-- **Trigger**: Vision Gap - The `README.md` promises a "Framework-agnostic" environment, but currently, the "Create Composition" feature only generates a hardcoded Vanilla JS + Canvas template. This forces users to manually delete and rewrite code for other use cases.
-- **Impact**: Significantly improves Developer Experience (DX) by providing "batteries-included" starting points for the most common workflows, validating the "Framework-agnostic" vision.
+# File Inventory
+- **Create**:
+  - `packages/studio/src/server/templates/index.ts`: Registry of available templates.
+  - `packages/studio/src/server/templates/vanilla.ts`: Vanilla JS template definition.
+  - `packages/studio/src/server/templates/react.ts`: React template definition.
+  - `packages/studio/src/server/templates/types.ts`: Type definitions for templates.
+- **Modify**:
+  - `packages/studio/src/components/CreateCompositionModal.tsx`: Add template selection dropdown.
+  - `packages/studio/src/server/discovery.ts`: Update `createComposition` to accept `template` argument and use the template system.
+  - `packages/studio/vite-plugin-studio-api.ts`: Update POST `/api/compositions` handler to parse `template` from body.
+  - `packages/studio/src/context/StudioContext.tsx`: Update `createComposition` signature to accept `template`.
+- **Read-Only**:
+  - `packages/studio/src/context/StudioContext.tsx`: Check for context updates.
 
-## 2. File Inventory
-- **Modify**: `packages/studio/src/server/discovery.ts` (Add template logic and file definitions)
-- **Modify**: `packages/studio/vite-plugin-studio-api.ts` (Update API to accept `template` parameter)
-- **Modify**: `packages/studio/src/context/StudioContext.tsx` (Update `createComposition` signature)
-- **Modify**: `packages/studio/src/components/CreateCompositionModal.tsx` (Add template selection UI)
+# Implementation Spec
 
-## 3. Implementation Spec
+## Architecture
+- **Template Pattern**: Use a Strategy pattern for templates. Each template exports a function that returns a list of files (path + content) to generate.
+- **API Update**: The `createComposition` API will accept an optional `template` string (defaulting to 'vanilla').
 
-### Architecture
-- **Backend (`discovery.ts`)**: Introduce a `TEMPLATES` registry mapping template IDs to a file structure generator. The `createComposition` function will use this registry to populate the new directory.
-- **API**: The POST `/api/compositions` endpoint will accept an optional `template` string in the request body.
-- **Frontend**: The Creation Modal will expose a `<select>` dropdown populated with available templates.
+## Pseudo-Code
 
-### Templates
-1.  **Vanilla Canvas** (Default): Existing behavior (single `composition.html` with inline script).
-2.  **Vanilla DOM**: `composition.html` + `src/main.js` (HTML/CSS animation).
-3.  **React Canvas**: `composition.html` + `src/main.tsx` (React mounting a Canvas).
-4.  **React DOM**: `composition.html` + `src/main.tsx` (React mounting DOM elements).
-
-### Pseudo-Code
-
-**`packages/studio/src/server/discovery.ts`**
+### `packages/studio/src/server/templates/types.ts`
 ```typescript
-const TEMPLATES = {
-  'vanilla-canvas': { ... },
-  'vanilla-dom': { ... },
-  'react-canvas': { ... },
-  'react-dom': { ... }
-};
+export interface TemplateFile {
+  path: string;
+  content: string;
+}
 
-export function createComposition(rootDir: string, name: string, templateId = 'vanilla-canvas') {
-  // ... validation ...
-  const template = TEMPLATES[templateId] || TEMPLATES['vanilla-canvas'];
-  // ... write files recursively ...
+export interface Template {
+  id: string;
+  label: string;
+  generate: (name: string) => TemplateFile[];
 }
 ```
 
-**`packages/studio/src/components/CreateCompositionModal.tsx`**
-- Add state `template` (default 'vanilla-canvas').
-- Add `<select>` element to UI.
-- Pass `template` to `createComposition(name, template)`.
+### `packages/studio/src/server/templates/index.ts`
+```typescript
+import { vanillaTemplate } from './vanilla';
+import { reactTemplate } from './react';
 
-### Dependencies
-- None. Relies on existing Studio Vite config (which already includes `@vitejs/plugin-react`) to serve React templates.
+export const templates = {
+  vanilla: vanillaTemplate,
+  react: reactTemplate
+};
 
-## 4. Test Plan
+export type TemplateId = keyof typeof templates;
+```
+
+### `packages/studio/src/server/templates/vanilla.ts`
+- Implement `generate` to return the existing `composition.html` content.
+
+### `packages/studio/src/server/templates/react.ts`
+- Implement `generate` to return:
+  - `composition.html` (with root div and script src="./index.tsx")
+  - `index.tsx` (React mount code)
+
+### `packages/studio/src/server/discovery.ts`
+- Import `templates` from `./templates`.
+- Update `createComposition(rootDir, name, templateId)`:
+  - Validate `templateId` (default 'vanilla').
+  - Get template generator.
+  - Call `generator(name)` to get files.
+  - `fs.mkdirSync` for the directory.
+  - Loop through files and `fs.writeFileSync`.
+
+### `packages/studio/vite-plugin-studio-api.ts`
+- In `POST /api/compositions`:
+  - Extract `template` from body.
+  - Pass it to `createComposition`.
+
+### `packages/studio/src/context/StudioContext.tsx`
+- Update `StudioContextType` interface: `createComposition: (name: string, template?: string) => Promise<void>;`
+- Update `createComposition` implementation to accept `template` argument and include it in the POST body.
+
+### `packages/studio/src/components/CreateCompositionModal.tsx`
+- Add `template` state (default 'vanilla').
+- Add `<select>` for template choices:
+  - Vanilla JS
+  - React
+- Pass `template` in `createComposition` context call.
+
+## Public API Changes
+- `POST /api/compositions` body now accepts `{ name: string, template?: string }`.
+
+## Dependencies
+- None.
+
+# Test Plan
 - **Verification**:
-    1.  Start Studio: `npm run dev` in `packages/studio`.
-    2.  Open "Create Composition" modal.
-    3.  Select "React DOM" and create "My React Comp".
-    4.  Verify the folder structure is created (has `src/main.tsx`).
-    5.  Verify the composition loads in the preview iframe (React renders).
-    6.  Repeat for "Vanilla DOM" and "Vanilla Canvas".
+  1. Run `npx helios studio` (or `npm run dev` in studio package).
+  2. Open "New Composition" modal.
+  3. Verify "Template" dropdown exists with "Vanilla" and "React".
+  4. Create a "Vanilla" composition -> Verify `composition.html` created with vanilla code.
+  5. Create a "React" composition -> Verify `composition.html` and `index.tsx` created.
+  6. Verify React composition loads and renders in the player (requires React env).
 - **Success Criteria**:
-    -  User can select a template.
-    -  Files are generated correctly for the selected template.
-    -  Preview loads without errors for all supported templates.
+  - Can create distinct Vanilla and React compositions.
+  - New compositions appear in the switcher immediately.
 - **Edge Cases**:
-    -  Invalid template ID sent to API (should fallback to default).
-    -  React template loading in an environment without React plugin (should work in Studio as it has the plugin).
+  - Invalid template ID (should fallback or error).
+  - File name collisions (handled by existing logic).
