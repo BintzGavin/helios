@@ -415,6 +415,7 @@ export class HeliosPlayer extends HTMLElement {
   // --- Standard Media API ---
 
   public get seeking(): boolean {
+    // Return internal scrubbing state as seeking
     return this.isScrubbing;
   }
 
@@ -427,6 +428,7 @@ export class HeliosPlayer extends HTMLElement {
   }
 
   public get played(): TimeRanges {
+    // Standard Media API: played range matches duration
     return new StaticTimeRange(0, this.duration);
   }
 
@@ -456,6 +458,7 @@ export class HeliosPlayer extends HTMLElement {
     if (this.controller) {
       const s = this.controller.getState();
       if (s.fps) {
+        // Dispatch events to satisfy Standard Media API expectations
         this.dispatchEvent(new Event("seeking"));
         this.controller.seek(Math.floor(val * s.fps));
         this.dispatchEvent(new Event("seeked"));
@@ -469,6 +472,7 @@ export class HeliosPlayer extends HTMLElement {
 
   public set currentFrame(val: number) {
     if (this.controller) {
+      // Dispatch events to satisfy Standard Media API expectations
       this.dispatchEvent(new Event("seeking"));
       this.controller.seek(Math.floor(val));
       this.dispatchEvent(new Event("seeked"));

@@ -43,6 +43,8 @@ describe('DirectController', () => {
             setAudioVolume: vi.fn(),
             setAudioMuted: vi.fn(),
             setPlaybackRate: vi.fn(),
+            setPlaybackRange: vi.fn(),
+            clearPlaybackRange: vi.fn(),
             setInputProps: vi.fn(),
             subscribe: vi.fn((cb) => {
                  return vi.fn();
@@ -107,6 +109,14 @@ describe('DirectController', () => {
 
         controller.setAudioMuted(true);
         expect(mockHeliosInstance.setAudioMuted).toHaveBeenCalledWith(true);
+    });
+
+    it('should set playback range', () => {
+        controller.setPlaybackRange(10, 50);
+        expect(mockHeliosInstance.setPlaybackRange).toHaveBeenCalledWith(10, 50);
+
+        controller.clearPlaybackRange();
+        expect(mockHeliosInstance.clearPlaybackRange).toHaveBeenCalled();
     });
 
     it('should capture DOM frame', async () => {
@@ -223,6 +233,14 @@ describe('BridgeController', () => {
 
         controller.setAudioMuted(true);
         expect(mockWindow.postMessage).toHaveBeenCalledWith({ type: 'HELIOS_SET_MUTED', muted: true }, '*');
+    });
+
+    it('should post messages for playback range', () => {
+        controller.setPlaybackRange(10, 50);
+        expect(mockWindow.postMessage).toHaveBeenCalledWith({ type: 'HELIOS_SET_PLAYBACK_RANGE', start: 10, end: 50 }, '*');
+
+        controller.clearPlaybackRange();
+        expect(mockWindow.postMessage).toHaveBeenCalledWith({ type: 'HELIOS_CLEAR_PLAYBACK_RANGE' }, '*');
     });
 
     it('should update state on HELIOS_STATE message', () => {

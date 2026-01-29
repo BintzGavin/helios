@@ -402,12 +402,17 @@ export class HeliosPlayer extends HTMLElement {
     }
     // --- Standard Media API ---
     get seeking() {
+        // Return internal scrubbing state as seeking
         return this.isScrubbing;
     }
     get buffered() {
         return new StaticTimeRange(0, this.duration);
     }
     get seekable() {
+        return new StaticTimeRange(0, this.duration);
+    }
+    get played() {
+        // Standard Media API: played range matches duration
         return new StaticTimeRange(0, this.duration);
     }
     get videoWidth() {
@@ -436,7 +441,10 @@ export class HeliosPlayer extends HTMLElement {
         if (this.controller) {
             const s = this.controller.getState();
             if (s.fps) {
+                // Dispatch events to satisfy Standard Media API expectations
+                this.dispatchEvent(new Event("seeking"));
                 this.controller.seek(Math.floor(val * s.fps));
+                this.dispatchEvent(new Event("seeked"));
             }
         }
     }
@@ -445,7 +453,10 @@ export class HeliosPlayer extends HTMLElement {
     }
     set currentFrame(val) {
         if (this.controller) {
+            // Dispatch events to satisfy Standard Media API expectations
+            this.dispatchEvent(new Event("seeking"));
             this.controller.seek(Math.floor(val));
+            this.dispatchEvent(new Event("seeked"));
         }
     }
     get duration() {
@@ -981,6 +992,7 @@ export class HeliosPlayer extends HTMLElement {
         if (!this.controller)
             return;
         this.isScrubbing = true;
+        this.dispatchEvent(new Event("seeking"));
         const state = this.controller.getState();
         this.wasPlayingBeforeScrub = state.isPlaying;
         if (this.wasPlayingBeforeScrub) {
@@ -991,6 +1003,7 @@ export class HeliosPlayer extends HTMLElement {
         if (!this.controller)
             return;
         this.isScrubbing = false;
+        this.dispatchEvent(new Event("seeked"));
         if (this.wasPlayingBeforeScrub) {
             this.controller.play();
         }
