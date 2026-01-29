@@ -1,3 +1,6 @@
+## RENDERER v1.42.0
+- ✅ Completed: Enable Browser Launch Configuration - Added `browserConfig` to `RendererOptions` to allow customizing Playwright launch arguments.
+
 ## RENDERER v1.41.0
 - ✅ Completed: Support Shadow DOM Audio Discovery - Updated `scanForAudioTracks` utility to recursively traverse Shadow DOM for media elements using `TreeWalker`.
 

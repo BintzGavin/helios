@@ -1,8 +1,9 @@
-**Version**: 1.41.1
+**Version**: 1.42.0
 
 # Renderer Agent Status
 
 ## Progress Log
+- [1.42.0] ✅ Completed: Enable Browser Launch Configuration - Added `browserConfig` to `RendererOptions` to allow customizing Playwright launch arguments (headless, executablePath, args), and fixed workspace dependency issues.
 - [1.41.1] ✅ Completed: Restore Environment and Verify - Restored missing `node_modules` by resolving workspace dependency conflicts (temporarily aligning versions), installed Playwright browsers, and verified full test suite passes.
 - [1.41.0] ✅ Completed: Support Shadow DOM Audio Discovery - Updated `scanForAudioTracks` utility to recursively traverse Shadow DOM for media elements using `TreeWalker`, ensuring audio in Web Components is detected.
 - [1.40.1] ✅ Completed: Enable Full Verification Coverage - Updated `run-all.ts` to include 6 additional verification scripts, and fixed `verify-dom-media-preload.ts` and `verify-dom-preload.ts` to be robust and self-contained.

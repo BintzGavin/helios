@@ -13,6 +13,15 @@ import { RendererOptions, RenderJobOptions } from './types.js';
 export { RendererOptions, RenderJobOptions } from './types.js';
 export { concatenateVideos } from './concat.js';
 
+const DEFAULT_BROWSER_ARGS = [
+  '--use-gl=egl',
+  '--ignore-gpu-blocklist',
+  '--enable-gpu-rasterization',
+  '--enable-zero-copy',
+  '--disable-web-security',
+  '--allow-file-access-from-files',
+];
+
 export class Renderer {
   private options: RendererOptions;
   private strategy: RenderStrategy;
@@ -29,20 +38,20 @@ export class Renderer {
     }
   }
 
+  private getLaunchOptions() {
+    const config = this.options.browserConfig || {};
+    const userArgs = config.args || [];
+    return {
+      headless: config.headless ?? true,
+      executablePath: config.executablePath,
+      args: [...DEFAULT_BROWSER_ARGS, ...userArgs],
+    };
+  }
+
   public async diagnose(): Promise<any> {
     console.log(`Starting diagnostics (Mode: ${this.options.mode || 'canvas'})`);
 
-    const browser = await chromium.launch({
-      headless: true,
-      args: [
-        '--use-gl=egl',
-        '--ignore-gpu-blocklist',
-        '--enable-gpu-rasterization',
-        '--enable-zero-copy',
-        '--disable-web-security',
-        '--allow-file-access-from-files',
-      ],
-    });
+    const browser = await chromium.launch(this.getLaunchOptions());
 
     try {
       const page = await browser.newPage();
@@ -64,17 +73,7 @@ export class Renderer {
   public async render(compositionUrl: string, outputPath: string, jobOptions?: RenderJobOptions): Promise<void> {
     console.log(`Starting render for composition: ${compositionUrl} (Mode: ${this.options.mode || 'canvas'})`);
 
-    const browser = await chromium.launch({
-      headless: true,
-      args: [
-        '--use-gl=egl',
-        '--ignore-gpu-blocklist',
-        '--enable-gpu-rasterization',
-        '--enable-zero-copy',
-        '--disable-web-security',
-        '--allow-file-access-from-files',
-      ],
-    });
+    const browser = await chromium.launch(this.getLaunchOptions());
 
     const context = await browser.newContext({
       viewport: {
