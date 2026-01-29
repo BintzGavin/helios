@@ -360,6 +360,24 @@ export class HeliosPlayer extends HTMLElement {
     wasPlayingBeforeScrub = false;
     lastState = null;
     pendingProps = null;
+    // --- Standard Media API States ---
+    static HAVE_NOTHING = 0;
+    static HAVE_METADATA = 1;
+    static HAVE_CURRENT_DATA = 2;
+    static HAVE_FUTURE_DATA = 3;
+    static HAVE_ENOUGH_DATA = 4;
+    static NETWORK_EMPTY = 0;
+    static NETWORK_IDLE = 1;
+    static NETWORK_LOADING = 2;
+    static NETWORK_NO_SOURCE = 3;
+    _readyState = HeliosPlayer.HAVE_NOTHING;
+    _networkState = HeliosPlayer.NETWORK_EMPTY;
+    get readyState() {
+        return this._readyState;
+    }
+    get networkState() {
+        return this._networkState;
+    }
     // --- Standard Media API ---
     get currentTime() {
         if (!this.controller)
@@ -506,7 +524,7 @@ export class HeliosPlayer extends HTMLElement {
         }
     }
     static get observedAttributes() {
-        return ["src", "width", "height", "autoplay", "loop", "controls", "export-format", "input-props", "poster", "muted", "interactive"];
+        return ["src", "width", "height", "autoplay", "loop", "controls", "export-format", "input-props", "poster", "muted", "interactive", "preload"];
     }
     constructor() {
         super();
@@ -661,6 +679,9 @@ export class HeliosPlayer extends HTMLElement {
         }
     }
     loadIframe(src) {
+        this._networkState = HeliosPlayer.NETWORK_LOADING;
+        this._readyState = HeliosPlayer.HAVE_NOTHING;
+        this.dispatchEvent(new Event('loadstart'));
         this.iframe.src = src;
         this.isLoaded = true;
         if (this.controller) {
@@ -822,6 +843,14 @@ export class HeliosPlayer extends HTMLElement {
             this.unsubscribe = null;
         }
         this.controller = controller;
+        // Update States
+        this._networkState = HeliosPlayer.NETWORK_IDLE;
+        this._readyState = HeliosPlayer.HAVE_ENOUGH_DATA;
+        // Dispatch Lifecycle Events
+        this.dispatchEvent(new Event('loadedmetadata'));
+        this.dispatchEvent(new Event('loadeddata'));
+        this.dispatchEvent(new Event('canplay'));
+        this.dispatchEvent(new Event('canplaythrough'));
         this.setControlsDisabled(false);
         if (this.pendingProps) {
             this.controller.setInputProps(this.pendingProps);

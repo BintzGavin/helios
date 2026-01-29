@@ -1,4 +1,4 @@
-**Version**: v0.32.0
+**Version**: v0.32.1
 
 # Status: PLAYER
 
@@ -28,16 +28,13 @@
 - Supports `poster` and `preload` attributes. `preload="none"` defers iframe loading until the user interacts with the new "Big Play Button".
 - Implements responsive controls using `ResizeObserver`, adapting UI layout for smaller widths (hiding volume/speed controls).
 - Fully implemented Standard Media API properties (`src`, `autoplay`, `loop`, `controls`, `poster`, `preload`) as getters/setters on `HeliosPlayer`.
-- **New**: Implemented `readyState` and `networkState` properties and standard lifecycle events (`loadstart`, `loadedmetadata`, `canplay`, etc.), aligning with HTMLMediaElement specifications.
+- Implemented `readyState` and `networkState` properties and standard lifecycle events (`loadstart`, `loadedmetadata`, `canplay`, etc.), aligning with HTMLMediaElement specifications.
 
 ## Critical Task
 - **None**: Recent task completed.
 
+[v0.32.1] ✅ Completed: Fix Player Dependencies - Updated @helios-project/core dependency and fixed build environment to enable verification.
 [v0.32.0] ✅ Completed: Implement Standard Media States - Added `readyState`, `networkState` properties and constants, along with lifecycle events (`loadstart`, `loadedmetadata`, `canplay`, `canplaythrough`) to `<helios-player>`.
-
-## Critical Task
-- **None**: Recent task completed.
-
 [v0.31.0] ✅ Completed: Implement Standard Media API properties - Added missing properties `src`, `autoplay`, `loop`, `controls`, `poster`, `preload` to `HeliosPlayer` class to fully comply with HTMLMediaElement interface expectations. Updated `observedAttributes` to include `preload`. Updated dependencies to fix build issues.
 [v0.30.0] ✅ Completed: Audio Export Enhancements - Implemented `loop` and `startTime` support for client-side audio export, plus declarative `volume` attribute parsing.
 [v0.29.0] ✅ Completed: Interactive Mode - Implemented `interactive` attribute to toggle between standard video controls and direct iframe interaction.
@@ -97,13 +94,3 @@
 - [x] Enable Canvas Inlining for DOM Export.
 - [x] Enable Video Inlining for DOM Export.
 - [x] Implement Bridge Error Propagation.
-
-[2026-01-20] ✅ Completed: Refactor Player Control Logic - Verified `<helios-player>` uses `window.helios` and supports client-side export.
-[2026-01-21] ✅ Completed: Sandbox and Bridge - Implemented `postMessage` bridge and sandboxed iframe support.
-[v0.2.0] ✅ Completed: Refactor Player Export - Extracted `ClientSideExporter`, added cancellation support, and modularized controllers.
-[v0.3.0] ✅ Completed: Export Config - Added `export-mode` and `canvas-selector` attributes for explicit export control.
-[v0.3.1] ✅ Completed: Loading UI - Verified implementation of loading and error state overlays.
-[v0.3.2] ✅ Completed: Variable Speed - Added `setPlaybackRate` to `HeliosController` and Speed Selector UI to `<helios-player>`.
-[v0.3.3] ✅ Completed: Sync player state with engine state - Updated Bridge Protocol to include initial state in handshake.
-[v0.4.0] ✅ Completed: Robust DOM Export - Implemented XMLSerializer/SVG-based DOM capture for high-fidelity export in Direct and Bridge modes.
-[v0.5.0] ✅ Completed: Dynamic Sizing - Implemented `observedAttributes` for `src`, `width`, and `height` to allow dynamic player updates.

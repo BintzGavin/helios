@@ -1,5 +1,8 @@
 # PLAYER Progress Log
 
+## PLAYER v0.32.1
+- ✅ Completed: Fix Player Dependencies - Updated @helios-project/core dependency and fixed build environment to enable verification.
+
 ## PLAYER v0.32.0
 - ✅ Completed: Implement Standard Media States - Added `readyState`, `networkState` properties and constants, along with lifecycle events (`loadstart`, `loadedmetadata`, `canplay`, `canplaythrough`) to `<helios-player>`.
 

@@ -1,79 +1,57 @@
-# Context: PLAYER (`packages/player`)
+# Player Context
 
 ## A. Component Structure
-The `<helios-player>` Web Component utilizes a Shadow DOM with the following structure:
-- **Wrapper**: Container for aspect ratio management.
-- **Iframe**: Sandboxed iframe loading the Helios composition (`src`).
-- **Poster Container**: Displays the poster image and Big Play Button when not playing.
-- **Status Overlay**: Displays "Loading...", "Connecting...", or error messages.
-- **Click Layer**: Transparent overlay to handle click-to-play/pause and double-click fullscreen.
-- **Captions Container**: Renders burn-in captions over the video.
-- **Controls Overlay**: Flexbox toolbar containing:
-  - Play/Pause Button
-  - Volume Toggle & Slider
-  - CC Toggle
-  - Export Button
-  - Speed Selector
-  - Scrubber (Range Input)
-  - Time Display
-  - Fullscreen Toggle
+The `<helios-player>` component encapsulates a sandboxed `<iframe>` for rendering Helios compositions, overlaid with a UI layer for controls and feedback.
+
+**Shadow DOM Layout:**
+- **Status Overlay**: Displays loading states (`Loading...`, `Connecting...`) and error messages with retry actions.
+- **Poster Container**: Displays a poster image and "Big Play Button" when `poster` is set or playback hasn't started.
+- **Iframe**: Sandboxed (`allow-scripts allow-same-origin`) rendering surface.
+- **Click Layer**: Transparent overlay to capture clicks for Play/Pause and Double-Click for Fullscreen. Controlled by `interactive` attribute.
+- **Captions Container**: Renders active captions/subtitles.
+- **Controls Toolbar**:
+  - Play/Pause/Restart button.
+  - Volume control (Mute toggle + Slider).
+  - CC toggle.
+  - Export button (Client-side WebCodecs export).
+  - Playback Speed selector (0.25x - 2x).
+  - Scrubber (Input range) & Time Display.
+  - Fullscreen toggle.
 
 ## B. Events
-The component dispatches standard HTMLMediaElement events:
-- `play`: Playback has started.
-- `pause`: Playback has paused.
-- `ended`: Playback has reached the end.
-- `timeupdate`: The `currentTime` has changed.
-- `volumechange`: Volume or Mute state has changed.
-- `ratechange`: Playback rate has changed.
-- `durationchange`: The duration attribute has been updated.
-- `loadstart`: The user agent has begun looking for media data (src changed).
-- `loadedmetadata`: The metadata has been loaded.
-- `loadeddata`: The first frame of the media has finished loading.
-- `canplay`: The browser can resume playback of the media data.
-- `canplaythrough`: The browser estimates it can play the media up to its end without stopping for content buffering.
-- `error`: An error occurred (detail contains error info).
+The component dispatches standard HTMLMediaElement events and custom events:
+- `loadstart`: Loading process started.
+- `loadedmetadata`: Metadata (duration, dimensions) loaded.
+- `loadeddata`: First frame ready.
+- `canplay`: Ready to play.
+- `canplaythrough`: Ready to play without buffering.
+- `play`: Playback started.
+- `pause`: Playback paused.
+- `ended`: Playback finished.
+- `timeupdate`: Current time changed.
+- `volumechange`: Volume or mute state changed.
+- `ratechange`: Playback rate changed.
+- `durationchange`: Duration changed.
+- `error`: A critical error occurred (details in `event.detail`).
 
-## C. Attributes & Properties
-### Attributes
-- `src`: URL of the Helios composition to load.
-- `width`, `height`: Aspect ratio dimensions.
-- `autoplay`: Boolean attribute to start playback automatically.
-- `loop`: Boolean attribute to loop playback.
-- `controls`: Boolean attribute to show/hide UI controls.
-- `muted`: Boolean attribute to default to muted state.
-- `poster`: URL of an image to show while downloading.
-- `preload`: Hint to the user agent (`auto`, `metadata`, `none`).
-- `interactive`: Boolean attribute to enable direct interaction with the iframe content.
-- `export-mode`: `auto` (default), `dom`, or `canvas`.
-- `export-format`: `mp4` (default) or `webm`.
-- `canvas-selector`: CSS selector for the canvas (default: `canvas`).
-- `input-props`: JSON string of properties to pass to the controller.
+## C. Attributes
+Attributes are synchronized with properties and reflect the component state:
+- `src` (string): URL of the Helios composition to load.
+- `width` (number): Width of the player (aspect ratio calculation).
+- `height` (number): Height of the player.
+- `autoplay` (boolean): Automatically start playback when ready.
+- `loop` (boolean): Loop playback when finished.
+- `controls` (boolean): Show/hide the controls toolbar.
+- `muted` (boolean): Mute audio initially.
+- `poster` (string): URL of an image to show before playback.
+- `preload` (string): `auto` (load immediately) or `none` (wait for interaction).
+- `interactive` (boolean): If present, disables the Click Layer, allowing direct interaction with the iframe content.
+- `input-props` (JSON string): Dynamic data passed to the composition controller.
+- `export-format` (string): `mp4` (default) or `webm`.
+- `export-mode` (string): `auto`, `canvas`, or `dom` (export strategy hint).
+- `canvas-selector` (string): CSS selector for the canvas to export (in `canvas` mode).
 
-### Properties (Getters/Setters)
-- `currentTime` (number)
-- `duration` (readonly number)
-- `paused` (readonly boolean)
-- `ended` (readonly boolean)
-- `volume` (number 0-1)
-- `muted` (boolean)
-- `playbackRate` (number)
-- `currentFrame` (number)
-- `fps` (readonly number)
-- `readyState` (readonly number)
-- `networkState` (readonly number)
-- `inputProps` (object)
-
-## D. Constants
-### Ready States
-- `HAVE_NOTHING` (0)
-- `HAVE_METADATA` (1)
-- `HAVE_CURRENT_DATA` (2)
-- `HAVE_FUTURE_DATA` (3)
-- `HAVE_ENOUGH_DATA` (4)
-
-### Network States
-- `NETWORK_EMPTY` (0)
-- `NETWORK_IDLE` (1)
-- `NETWORK_LOADING` (2)
-- `NETWORK_NO_SOURCE` (3)
+## D. Standard Media API
+The component implements a subset of the `HTMLMediaElement` interface for compatibility:
+- **Properties**: `currentTime`, `duration`, `paused`, `ended`, `volume`, `muted`, `playbackRate`, `readyState`, `networkState`.
+- **Methods**: `play()`, `pause()`, `load()`.
