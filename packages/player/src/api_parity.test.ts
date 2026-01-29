@@ -215,4 +215,38 @@ describe('HeliosPlayer API Parity', () => {
     expect(mockController.seek).toHaveBeenCalledWith(10);
     expect(seekedSpy).toHaveBeenCalledTimes(2);
   });
+
+  it('should support currentSrc property', () => {
+    player.src = 'test.html';
+    expect(player.currentSrc).toBe('test.html');
+  });
+
+  it('should support error property', () => {
+    expect(player.error).toBeNull();
+
+    // Mock controller error
+    const mockController = {
+      getState: () => ({ duration: 10, fps: 30, isPlaying: false }),
+      pause: vi.fn(),
+      play: vi.fn(),
+      dispose: vi.fn(),
+      subscribe: vi.fn(() => vi.fn()),
+      onError: vi.fn((cb) => {
+        // Trigger error immediately
+        cb({ message: "Test Error" });
+        return vi.fn();
+      }),
+      setInputProps: vi.fn(),
+      setAudioMuted: vi.fn(),
+    };
+    (player as any).setController(mockController);
+
+    expect(player.error).not.toBeNull();
+    expect(player.error?.message).toBe("Test Error");
+    expect(player.error?.code).toBe(4);
+
+    // Should clear on load
+    (player as any).loadIframe("new.html");
+    expect(player.error).toBeNull();
+  });
 });

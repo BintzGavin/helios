@@ -45,3 +45,10 @@ The component dispatches standard HTMLMediaElement events:
 - **input-props**: JSON string of properties to pass to the composition.
 - **export-format**: `mp4` | `webm` (defaults to `mp4`).
 - **canvas-selector**: CSS selector for canvas to capture (export mode).
+
+## D. Properties
+The component implements the `HTMLMediaElement` interface (partial):
+- **Playback**: `play()`, `pause()`, `currentTime`, `duration`, `paused`, `ended`, `playbackRate`, `loop`, `autoplay`, `muted`, `volume`
+- **State**: `readyState`, `networkState`, `error`, `src`, `currentSrc`, `preload`, `buffered`, `seekable`, `seeking`, `played`
+- **Video**: `videoWidth`, `videoHeight`, `poster`
+- **Helios Specific**: `currentFrame`, `fps`, `interactive`, `inputProps`

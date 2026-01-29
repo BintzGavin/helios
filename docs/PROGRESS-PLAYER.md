@@ -1,5 +1,8 @@
 # PLAYER Progress Log
 
+## PLAYER v0.35.1
+- ✅ Completed: Implement error and currentSrc properties - Added `error` and `currentSrc` getters to `HeliosPlayer` to complete HTMLMediaElement parity.
+
 ## PLAYER v0.35.0
 - ✅ Completed: Implement Playback Range - Implemented setPlaybackRange and clearPlaybackRange in HeliosController and Bridge protocol.
 
