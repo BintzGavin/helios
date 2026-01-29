@@ -1,51 +1,43 @@
-# Context: CORE
+# Core Context
 
 ## A. Architecture
-The Core package implements the "Helios State Machine" pattern. Central state is managed via Signals (Observer pattern) in the `Helios` class. Updates flow from Actions (methods) -> State (Signals) -> Subscribers (via `subscribe`). Timing is driven by a pluggable `TimeDriver`.
+
+The `@helios-project/core` package is the pure TypeScript engine that drives the animation state. It follows the **Helios State Machine** pattern:
+
+1.  **Store (`Helios` class)**: The single source of truth for the composition state (current frame, duration, fps, playback status). It uses **Signals** for reactive state management.
+2.  **Drivers (`TimeDriver` interface)**: The engine uses the Strategy Pattern to synchronize external systems.
+    -   `DomDriver`: Syncs HTML DOM elements (video/audio) and Web Animations API.
+    -   `NoopDriver`: Runs without side effects (for testing or headless calculation).
+3.  **Subscribers**: UI components or other systems subscribe to state changes.
+4.  **Loop**: The engine runs a ticker (RAF or Timeout) to advance time and update the driver.
 
 ## B. File Tree
+
 ```
 packages/core/src/
-├── animation.test.ts
-├── animation.ts
-├── captions.test.ts
-├── captions.ts
-├── color.test.ts
-├── color.ts
-├── drivers/
-│   ├── DomDriver.test.ts
+├── animation.ts       # Animation primitives
+├── captions.ts        # Caption/SRT parsing and active cue logic
+├── color.ts           # Color parsing and interpolation
+├── drivers/           # TimeDriver implementations
 │   ├── DomDriver.ts
-│   ├── NoopDriver.ts
 │   ├── TimeDriver.ts
-│   ├── TimeoutTicker.ts
 │   ├── WaapiDriver.ts
 │   └── index.ts
-├── easing.test.ts
-├── easing.ts
-├── errors.ts
-├── helios-audio.test.ts
-├── index-signals.test.ts
-├── index.test.ts
-├── index.ts
-├── markers.test.ts
-├── markers.ts
-├── node-runtime.test.ts
-├── random.test.ts
-├── random.ts
-├── schema.test.ts
-├── schema.ts
-├── sequencing.test.ts
-├── sequencing.ts
-├── signals.test.ts
-├── signals.ts
-├── stability.test.ts
-├── timecode.test.ts
-├── timecode.ts
-├── transitions.test.ts
-└── transitions.ts
+├── easing.ts          # Easing functions
+├── errors.ts          # Error handling
+├── index.ts           # Public API entry point
+├── markers.ts         # Marker management
+├── random.ts          # Deterministic PRNG
+├── schema.ts          # Input prop validation schema
+├── sequencing.ts      # Sequence/Series helpers
+├── signals.ts         # Reactive primitives
+├── timecode.ts        # Timecode utilities
+├── transitions.ts     # Transition helpers
+└── types.ts           # Shared types
 ```
 
 ## C. Type Definitions
+
 ```typescript
 export type HeliosState = {
   width: number;
@@ -98,9 +90,11 @@ export interface DiagnosticReport {
 }
 ```
 
-## D. Public Methods
+## D. Public Methods (Helios Class)
+
 ```typescript
 class Helios {
+  // Signals (Readonly)
   public get currentFrame(): ReadonlySignal<number>;
   public get loop(): ReadonlySignal<boolean>;
   public get isPlaying(): ReadonlySignal<boolean>;
@@ -114,10 +108,13 @@ class Helios {
   public get playbackRange(): ReadonlySignal<[number, number] | null>;
   public get width(): ReadonlySignal<number>;
   public get height(): ReadonlySignal<number>;
+
+  // Getters
   public get duration(): number;
   public get fps(): number;
 
-  static async diagnose(): Promise<DiagnosticReport>;
+  // Static
+  static diagnose(): Promise<DiagnosticReport>;
 
   constructor(options: HeliosOptions);
 
@@ -150,6 +147,7 @@ class Helios {
 
   public bindToDocumentTimeline(): void;
   public unbindFromDocumentTimeline(): void;
+
   public dispose(): void;
 }
 ```
