@@ -68,6 +68,7 @@ export default defineConfig({
         podcast_visualizer: resolve(__dirname, "examples/podcast-visualizer/composition.html"),
         map_animation: resolve(__dirname, "examples/map-animation/composition.html"),
         text_effects: resolve(__dirname, "examples/text-effects-animation/composition.html"),
+        promo_video: resolve(__dirname, "examples/promo-video/composition.html"),
       },
     },
   },

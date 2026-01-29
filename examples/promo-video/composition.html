@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Helios Promo Video</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body, html {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    #scene {
+      width: 100vw;
+      height: 100vh;
+      background: linear-gradient(135deg, #0a0a0f 0%, #0f0f1a 50%, #0a0a0f 100%);
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* ===== SCENE 1: Logo Reveal ===== */
+    .logo-container {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      z-index: 10;
+    }
+
+    .sun-icon {
+      font-size: 120px;
+      margin-bottom: 20px;
+      opacity: 0;
+      filter: drop-shadow(0 0 60px rgba(255, 200, 50, 0.8));
+    }
+
+    .logo-text {
+      font-size: 140px;
+      font-weight: 900;
+      letter-spacing: 0.05em;
+      background: linear-gradient(135deg, #3770FF 0%, #7B9FFF 50%, #3770FF 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      opacity: 0;
+      filter: drop-shadow(0 0 40px rgba(55, 112, 255, 0.5));
+    }
+
+    /* Sun rays */
+    .rays-container {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 800px;
+      height: 800px;
+      pointer-events: none;
+    }
+
+    .ray {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 4px;
+      height: 400px;
+      background: linear-gradient(to bottom, rgba(255, 200, 50, 0.8) 0%, transparent 100%);
+      transform-origin: center top;
+      opacity: 0;
+    }
+
+    /* ===== SCENE 2: Tagline ===== */
+    .tagline-container {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      z-index: 10;
+    }
+
+    .tagline {
+      font-size: 72px;
+      font-weight: 300;
+      color: white;
+      letter-spacing: 0.02em;
+      opacity: 0;
+    }
+
+    .tagline .highlight {
+      font-weight: 700;
+      background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* ===== SCENE 3: Code to Video ===== */
+    .code-container {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      display: flex;
+      align-items: center;
+      gap: 80px;
+      z-index: 10;
+      opacity: 0;
+    }
+
+    .code-block {
+      background: #1a1a2e;
+      border-radius: 16px;
+      padding: 40px;
+      font-family: 'JetBrains Mono', 'Fira Code', monospace;
+      font-size: 24px;
+      line-height: 1.6;
+      border: 1px solid rgba(55, 112, 255, 0.3);
+      box-shadow: 0 0 60px rgba(55, 112, 255, 0.2);
+      min-width: 500px;
+    }
+
+    .code-block .keyword { color: #c678dd; }
+    .code-block .function { color: #61afef; }
+    .code-block .string { color: #98c379; }
+    .code-block .number { color: #d19a66; }
+    .code-block .comment { color: #5c6370; }
+    .code-block .bracket { color: #e5c07b; }
+
+    .arrow {
+      font-size: 80px;
+      color: #3770FF;
+      opacity: 0;
+      filter: drop-shadow(0 0 20px rgba(55, 112, 255, 0.5));
+    }
+
+    .video-preview {
+      width: 400px;
+      height: 225px;
+      background: linear-gradient(135deg, #1a1a2e 0%, #2a2a4e 100%);
+      border-radius: 16px;
+      border: 2px solid rgba(55, 112, 255, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 0 60px rgba(55, 112, 255, 0.3);
+    }
+
+    .play-icon {
+      width: 80px;
+      height: 80px;
+      background: rgba(55, 112, 255, 0.9);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .play-icon::after {
+      content: '';
+      width: 0;
+      height: 0;
+      border-left: 30px solid white;
+      border-top: 18px solid transparent;
+      border-bottom: 18px solid transparent;
+      margin-left: 8px;
+    }
+
+    .mp4-badge {
+      position: absolute;
+      bottom: 16px;
+      right: 16px;
+      background: rgba(55, 112, 255, 0.9);
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 18px;
+      font-weight: 700;
+      color: white;
+    }
+
+    /* ===== SCENE 4: Frameworks ===== */
+    .frameworks-container {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      z-index: 10;
+      opacity: 0;
+    }
+
+    .frameworks-title {
+      font-size: 48px;
+      font-weight: 600;
+      color: white;
+      margin-bottom: 60px;
+      opacity: 0;
+    }
+
+    .framework-grid {
+      display: flex;
+      gap: 60px;
+      justify-content: center;
+      flex-wrap: wrap;
+      max-width: 1200px;
+    }
+
+    .framework-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      opacity: 0;
+      transform: translateY(40px);
+    }
+
+    .framework-icon {
+      width: 100px;
+      height: 100px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 50px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .framework-name {
+      font-size: 24px;
+      font-weight: 500;
+      color: white;
+    }
+
+    /* Framework colors */
+    .react .framework-icon { background: rgba(97, 218, 251, 0.15); color: #61dafb; }
+    .vue .framework-icon { background: rgba(65, 184, 131, 0.15); color: #41b883; }
+    .svelte .framework-icon { background: rgba(255, 62, 0, 0.15); color: #ff3e00; }
+    .vanilla .framework-icon { background: rgba(255, 215, 0, 0.15); color: #f7df1e; }
+
+    /* ===== SCENE 5: CTA ===== */
+    .cta-container {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      z-index: 10;
+      opacity: 0;
+    }
+
+    .cta-text {
+      font-size: 64px;
+      font-weight: 700;
+      color: white;
+      margin-bottom: 40px;
+      opacity: 0;
+    }
+
+    .cta-highlight {
+      background: linear-gradient(135deg, #3770FF 0%, #7B9FFF 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .cta-sub {
+      font-size: 32px;
+      font-weight: 400;
+      color: rgba(255, 255, 255, 0.7);
+      opacity: 0;
+    }
+
+    /* ===== SCENE 6: End Card ===== */
+    .end-card {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      z-index: 10;
+      opacity: 0;
+    }
+
+    .end-logo {
+      font-size: 100px;
+      font-weight: 900;
+      background: linear-gradient(135deg, #3770FF 0%, #7B9FFF 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 20px;
+    }
+
+    .end-url {
+      font-size: 28px;
+      color: rgba(255, 255, 255, 0.6);
+      font-weight: 400;
+    }
+
+    /* Background particles */
+    .particles {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .particle {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      background: rgba(55, 112, 255, 0.5);
+      border-radius: 50%;
+      opacity: 0;
+    }
+
+    /* Gradient orbs */
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.3;
+    }
+
+    .orb-1 {
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(55, 112, 255, 0.4) 0%, transparent 70%);
+      top: -200px;
+      right: -200px;
+    }
+
+    .orb-2 {
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, rgba(139, 92, 246, 0.3) 0%, transparent 70%);
+      bottom: -150px;
+      left: -150px;
+    }
+  </style>
+</head>
+<body>
+  <div id="scene">
+    <!-- Background elements -->
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="particles" id="particles"></div>
+    
+    <!-- Scene 1: Logo Reveal -->
+    <div class="rays-container" id="rays-container"></div>
+    <div class="logo-container" id="logo-container">
+      <div class="sun-icon">☀️</div>
+      <div class="logo-text">HELIOS</div>
+    </div>
+
+    <!-- Scene 2: Tagline -->
+    <div class="tagline-container" id="tagline-container">
+      <div class="tagline">
+        Video is <span class="highlight">Light</span> Over Time
+      </div>
+    </div>
+
+    <!-- Scene 3: Code to Video -->
+    <div class="code-container" id="code-container">
+      <div class="code-block">
+        <span class="comment">// Your animation code</span><br>
+        <span class="keyword">const</span> <span class="function">helios</span> = <span class="keyword">new</span> <span class="function">Helios</span><span class="bracket">({</span><br>
+        &nbsp;&nbsp;fps: <span class="number">30</span>,<br>
+        &nbsp;&nbsp;duration: <span class="number">10</span><br>
+        <span class="bracket">})</span>;
+      </div>
+      <div class="arrow">→</div>
+      <div class="video-preview">
+        <div class="play-icon"></div>
+        <div class="mp4-badge">.MP4</div>
+      </div>
+    </div>
+
+    <!-- Scene 4: Frameworks -->
+    <div class="frameworks-container" id="frameworks-container">
+      <div class="frameworks-title">Works with your favorite tools</div>
+      <div class="framework-grid">
+        <div class="framework-item react">
+          <div class="framework-icon">⚛️</div>
+          <div class="framework-name">React</div>
+        </div>
+        <div class="framework-item vue">
+          <div class="framework-icon">🟢</div>
+          <div class="framework-name">Vue</div>
+        </div>
+        <div class="framework-item svelte">
+          <div class="framework-icon">🔥</div>
+          <div class="framework-name">Svelte</div>
+        </div>
+        <div class="framework-item vanilla">
+          <div class="framework-icon">⚡</div>
+          <div class="framework-name">Vanilla JS</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scene 5: CTA -->
+    <div class="cta-container" id="cta-container">
+      <div class="cta-text">
+        Build videos with<br>
+        <span class="cta-highlight">web standards</span>
+      </div>
+      <div class="cta-sub">HTML • CSS • JavaScript</div>
+    </div>
+
+    <!-- Scene 6: End Card -->
+    <div class="end-card" id="end-card">
+      <div class="sun-icon" style="opacity: 1; font-size: 80px; margin-bottom: 20px;">☀️</div>
+      <div class="end-logo">HELIOS</div>
+      <div class="end-url">helios.video</div>
+    </div>
+  </div>
+
+  <script type="module" src="./src/main.js"></script>
+</body>
+</html>
