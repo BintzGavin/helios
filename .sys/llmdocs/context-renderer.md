@@ -9,6 +9,7 @@ The Renderer uses the Strategy pattern to support two distinct rendering modes:
     *   Encoding happens in-browser, and encoded chunks are piped to FFmpeg.
     *   **Smart Codec Selection**: Automatically prioritizes `avc1` (H.264 Annex B) when `videoCodec: 'copy'` is requested to enable direct stream copy, falling back to `vp8` (IVF) if unsupported.
     *   Supports `avc1` (H.264), `vp9`, and `av01` (AV1) intermediate codecs.
+    *   **Implicit Audio Discovery**: Automatically detects `<audio>` and `<video>` elements in the DOM and includes their audio tracks in the render, unifying behavior with DOM Strategy.
     *   Uses `CdpTimeDriver` (Chrome DevTools Protocol) for precise, deterministic time control, including support for `window.helios.waitUntilStable()` to await custom stability checks.
 
 2.  **DOM Strategy**:
@@ -37,7 +38,8 @@ packages/renderer/src/
 ├── utils/
 │   ├── FFmpegBuilder.ts       # Centralized FFmpeg argument generation
 │   ├── FFmpegInspector.ts     # FFmpeg capabilities probe
-│   └── concat.ts              # Video concatenation utility
+│   ├── concat.ts              # Video concatenation utility
+│   └── dom-scanner.ts         # Shared DOM media discovery utility
 ├── index.ts                   # Main entry point (Renderer class)
 └── types.ts                   # Type definitions (RendererOptions, etc.)
 ```

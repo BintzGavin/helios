@@ -1,11 +1,13 @@
 import { Page } from 'playwright';
 import { RenderStrategy } from './RenderStrategy.js';
-import { RendererOptions } from '../types.js';
+import { RendererOptions, AudioTrackConfig } from '../types.js';
 import { FFmpegBuilder } from '../utils/FFmpegBuilder.js';
+import { scanForAudioTracks } from '../utils/dom-scanner.js';
 
 export class CanvasStrategy implements RenderStrategy {
   private useWebCodecs = false;
   private useH264 = false;
+  private discoveredAudioTracks: AudioTrackConfig[] = [];
 
   constructor(private options: RendererOptions) {}
 
@@ -37,6 +39,9 @@ export class CanvasStrategy implements RenderStrategy {
   async prepare(page: Page): Promise<void> {
     // Ensure fonts are loaded before capture starts
     await page.evaluate(function() { return document.fonts.ready; });
+
+    // Scan for audio tracks using the shared utility
+    this.discoveredAudioTracks = await scanForAudioTracks(page);
 
     // Detect WebCodecs support and initialize if possible
     const width = page.viewportSize()?.width || 1920;
@@ -387,6 +392,14 @@ export class CanvasStrategy implements RenderStrategy {
       videoInputArgs = ['-f', 'image2pipe', '-framerate', `${options.fps}`, '-i', '-'];
     }
 
-    return FFmpegBuilder.getArgs(options, outputPath, videoInputArgs);
+    const combinedOptions: RendererOptions = {
+      ...options,
+      audioTracks: [
+        ...(options.audioTracks || []),
+        ...this.discoveredAudioTracks
+      ]
+    };
+
+    return FFmpegBuilder.getArgs(combinedOptions, outputPath, videoInputArgs);
   }
 }

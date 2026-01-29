@@ -4,6 +4,7 @@ import * as path from 'path';
 const tests = [
   'tests/verify-audio-codecs.ts',
   'tests/verify-bitrate.ts',
+  'tests/verify-canvas-implicit-audio.ts',
   'tests/verify-canvas-strategy.ts',
   'tests/verify-captions.ts',
   'tests/verify-cdp-driver.ts',

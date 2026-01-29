@@ -1,3 +1,6 @@
+## RENDERER v1.38.0
+- ✅ Completed: Canvas Implicit Audio - Implemented `scanForAudioTracks` utility and updated `CanvasStrategy` to automatically discover and include DOM-based audio/video elements in the render, unifying behavior with `DomStrategy`.
+
 ## RENDERER v1.37.1
 - ✅ Completed: Fix Workspace Dependency - Updated `@helios-project/core` dependency to `2.7.0` in `packages/renderer/package.json` to match local workspace version, restoring verification environment.
 
