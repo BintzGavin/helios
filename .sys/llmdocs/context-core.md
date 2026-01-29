@@ -29,10 +29,12 @@ packages/core/src/
 ├── easing.test.ts
 ├── errors.ts
 ├── helios-audio.test.ts
+├── index-signals.test.ts
 ├── index.ts
 ├── index.test.ts
 ├── markers.ts
 ├── markers.test.ts
+├── node-runtime.test.ts
 ├── random.ts
 ├── random.test.ts
 ├── schema.ts
