@@ -1,4 +1,4 @@
-**Version**: 0.48.0
+**Version**: 0.48.1
 
 # Studio Domain Status
 
@@ -7,6 +7,7 @@
 **Focus**: UI Implementation & CLI
 
 ## Recent Updates
+- [v0.48.1] ✅ Completed: Refactor Loop Logic - Moved loop enforcement logic from `App.tsx` to `StudioContext.tsx` to centralize playback state management.
 - [v0.48.0] ✅ Verified: Maintenance - Synced package.json version and fixed test environment by mocking ResizeObserver.
 - [v0.48.0] ✅ Completed: Timecode & Range - Implemented SMPTE timecode display in Timeline and enforced In/Out points for looping and navigation (Rewind/Home).
 - [v0.47.0] ✅ Completed: Safe Area Guides - Implemented toggleable Safe Area Guides (Action Safe, Title Safe, Crosshair) in the Studio Stage with toolbar button and keyboard shortcut.

@@ -1,84 +1,67 @@
-# Studio Context
+# STUDIO Domain Context
+
+**Version**: 0.48.1
 
 ## A. Architecture
 
-Helios Studio is a browser-based development environment for programmatic video. It serves as a visual host for the Helios Player, allowing users to verify compositions, adjust properties, and manage assets.
+Helios Studio is a web-based integrated development environment (IDE) for creating video compositions with the Helios engine. It follows a client-server architecture:
 
-- **Frontend**: A React application (`packages/studio/src`) that wraps the `<helios-player>` web component.
-- **Backend**: A Vite plugin (`vite-plugin-studio-api.ts`) that adds middleware to the development server. This API handles file system operations (finding compositions, managing assets, orchestration of renders).
-- **State Management**: `StudioContext` manages global state (playback, active composition, assets) and syncs with the Player via the `HeliosController`.
+- **Server**: A Vite-based development server that serves the Studio UI and handles API requests for file operations (upload, delete, list compositions).
+- **Client**: A React application that provides the visual interface (Timeline, Props Editor, Stage).
+- **Integration**: The Studio integrates with `packages/core` (Engine) and `packages/player` (Web Component) to render and control the composition.
 
 ## B. File Tree
 
 ```
 packages/studio/
-├── scripts/
-│   ├── verify-assets.ts
-│   └── verify-ui.ts
+├── bin/
+│   └── studio.js          # CLI entry point
 ├── src/
-│   ├── components/
+│   ├── components/        # UI Components
 │   │   ├── AssetsPanel/
 │   │   ├── CaptionsPanel/
 │   │   ├── Controls/
 │   │   ├── Layout/
-│   │   ├── RendersPanel/
+│   │   ├── PropsEditor/
 │   │   ├── Sidebar/
 │   │   ├── Stage/
-│   │   ├── CompositionSwitcher.tsx
-│   │   ├── PropsEditor.tsx
-│   │   ├── Timeline.tsx
-│   │   └── ...
+│   │   └── Timeline/
 │   ├── context/
-│   ├── server/
-│   │   ├── discovery.ts
-│   │   └── render-manager.ts
-│   ├── utils/
-│   ├── App.tsx
-│   └── main.tsx
-├── vite-plugin-studio-api.ts
-├── vite.config.ts
+│   │   └── StudioContext.tsx # Global state (Player, Assets, Compositions)
+│   ├── server/            # Backend logic
+│   │   ├── discovery.ts   # File system discovery
+│   │   └── render-manager.ts # Render job management
+│   ├── ui/                # Shared UI primitives
+│   ├── utils/             # Helper functions
+│   ├── App.tsx            # Main application component
+│   └── cli.ts             # CLI implementation
+├── vite-plugin-studio-api.ts # Vite middleware for API
+├── vite.config.ts         # Vite configuration
 └── package.json
 ```
 
 ## C. CLI Interface
 
-The Studio is typically launched via the root CLI:
+The Studio is launched via the CLI:
 
 ```bash
 npx helios studio [options]
 ```
 
-It can also be run locally for development:
-```bash
-npm run dev -w packages/studio
-```
+- **Usage**: Starts the Studio server and opens the UI in the browser.
+- **Environment**: Respects `HELIOS_PROJECT_ROOT` to determine the project directory.
 
 ## D. UI Components
 
-- **Stage**: The central canvas area hosting the `<helios-player>`. Supports pan/zoom and safe area guides.
-- **Timeline**: Visual representation of the video duration, current time, and caption tracks. Supports scrubbing and range selection.
-- **Props Editor**: A schema-aware editor that auto-generates inputs based on the composition's `defaultProps`.
-- **Assets Panel**: A drag-and-drop interface for managing project assets (images, video, audio, fonts).
-- **Renders Panel**: Displays render job status and history. Supports client-side export.
-- **Captions Panel**: interface for editing and managing SRT captions.
+- **Stage**: Renders the composition using `<helios-player>`. Supports zoom, pan, and safe area guides.
+- **Timeline**: A track-based timeline for navigating time. Supports markers, loop range (In/Out), and scrubbing.
+- **Props Editor**: A dynamic form for editing composition props. Supports schema-aware inputs (Color, Range, Boolean, Enum) and Asset inputs.
+- **Assets Panel**: Displays assets from the project. Supports drag-and-drop upload and deletion.
+- **Captions Panel**: interface for creating and editing subtitles/captions.
+- **Renders Panel**: Manages render jobs (start, cancel, delete) and client-side exports.
 
 ## E. Integration
 
-Studio integrates with the core packages:
-
-- **@helios-project/core**: Provides types and the `Helios` engine.
-- **@helios-project/player**: Provides the `<helios-player>` web component.
-- **@helios-project/renderer**: Invoked by the `render-manager` to execute server-side renders via FFmpeg.
-
-**API Endpoints (`vite-plugin-studio-api`):**
-
-- `GET /api/compositions`: List available compositions.
-- `POST /api/compositions`: Create a new composition.
-- `DELETE /api/compositions`: Delete a composition.
-- `GET /api/assets`: List assets in the project.
-- `POST /api/assets/upload`: Upload a new asset.
-- `DELETE /api/assets`: Delete an asset.
-- `POST /api/render`: Start a render job.
-- `GET /api/jobs`: List active and past jobs.
-- `POST /api/jobs/:id/cancel`: Cancel a running job.
-- `GET /api/diagnose`: Check system capabilities (FFmpeg, GPU).
+- **Core**: Uses `Helios` types (`HeliosSchema`, `CaptionCue`, `Marker`) for type safety.
+- **Player**: Uses `HeliosController` to control playback (play, pause, seek) and listen to state changes.
+- **Renderer**: Communicates with the backend to trigger FFmpeg renders via `render-manager.ts`.

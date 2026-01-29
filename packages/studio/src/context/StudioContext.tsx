@@ -358,6 +358,23 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
   const toggleLoop = () => setLoop(prev => !prev);
 
+  // Loop logic: Enforce loop range when enabled
+  useEffect(() => {
+    if (!loop || !controller) return;
+
+    const { isPlaying, currentFrame, duration, fps } = playerState;
+    if (!isPlaying) return;
+
+    const totalFrames = duration * fps;
+    const loopEnd = outPoint > 0 ? outPoint : totalFrames;
+
+    if (currentFrame >= loopEnd - 1) {
+      // Seek to inPoint and play to loop
+      controller.seek(inPoint);
+      controller.play();
+    }
+  }, [playerState, loop, controller, inPoint, outPoint]);
+
   const takeSnapshot = async () => {
     if (!controller) return;
 
