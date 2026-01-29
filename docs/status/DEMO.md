@@ -1,5 +1,5 @@
 # Status: DEMO (Executor)
-**Version**: 1.57.0
+**Version**: 1.58.0
 
 ## Vision
 To provide comprehensive, idiomatic examples for every major framework (React, Vue, Svelte, Vanilla) and robust end-to-end testing to ensure the Helios engine delivers on its "Use What You Know" promise.
@@ -82,6 +82,7 @@ To provide comprehensive, idiomatic examples for every major framework (React, V
 None.
 
 ## Log
+- [v1.58.0] ✅ Completed: Refine Podcast Visualizer - Updated audio source to a 440Hz sine wave to enable audible verification of mixing logic.
 - [v1.57.0] ✅ Completed: Verify Podcast Visualizer - Found and fixed a bug in `examples/podcast-visualizer` (incorrect usage of `state.currentTime`) and re-verified visual correctness with a custom script.
 - [v1.56.0] ✅ Completed: Solid Animation Helpers Example - Created `examples/solid-animation-helpers` demonstrating idiomatic Sequence component composition in SolidJS.
 - [v1.55.0] ✅ Completed: Svelte Runes Animation Example - Created `examples/svelte-runes-animation` demonstrating Svelte 5 Runes (`$state`, `$derived`) integration.
