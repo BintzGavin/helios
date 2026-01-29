@@ -1,5 +1,8 @@
 # PLAYER Progress Log
 
+## PLAYER v0.33.2
+- ✅ Completed: Verify Deep API Parity - Fixed test environment, verified Deep API Parity tests pass, and updated README with new API members.
+
 ## PLAYER v0.33.1
 - ✅ Completed: Fix Player Metadata - Synced package.json version with status file (0.5.2 -> 0.33.1) and updated @helios-project/core dependency to 2.7.0.
 

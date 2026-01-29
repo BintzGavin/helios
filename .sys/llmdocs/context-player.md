@@ -1,70 +1,73 @@
-# Context: PLAYER
+# PLAYER Domain Context
 
 ## A. Component Structure
-The `<helios-player>` Web Component encapsulates the playback engine and UI.
-- **Shadow Root**: `open`
-  - **Status Overlay**: Displays loading/error states (e.g., "Connecting...", "Error: ...").
-  - **Poster Container**: Displays poster image and "Big Play Button" before playback starts.
-  - **Iframe**: Hosts the composition (sandboxed).
-  - **Click Layer**: Transparent overlay to capture clicks for play/pause and focus management.
-  - **Captions Container**: Displays burn-in captions.
-  - **Controls Overlay**: Standard playback controls (Play/Pause, Volume, Scrubber, Speed, Fullscreen, CC, Export).
-    - Responsive layouts: `layout-compact` (<500px), `layout-tiny` (<350px).
+- **Tag**: `<helios-player>`
+- **Shadow DOM**:
+  - `.poster-container`: Displays poster image and "Big Play Button".
+  - `iframe`: Hosts the composition (sandbox: `allow-scripts allow-same-origin`).
+  - `.click-layer`: Captures clicks for play/pause (z-index: 1).
+  - `.controls`: UI overlay (z-index: 2).
+  - `.status-overlay`: Visual feedback for loading/error states.
+  - `.captions-container`: Displays burn-in captions.
 
-## B. Public API (Properties & Methods)
-The component exposes a standard HTMLMediaElement-like API.
-
-### Properties
-- `src` (string): URL of the composition.
-- `currentTime` (number): Current playback time in seconds.
-- `duration` (number): Total duration in seconds.
-- `paused` (boolean): Whether playback is paused.
-- `ended` (boolean): Whether playback has reached the end.
-- `volume` (number): Audio volume (0.0 to 1.0).
-- `muted` (boolean): Whether audio is muted.
-- `playbackRate` (number): Playback speed multiplier (default 1.0).
-- `loop` (boolean): Whether to restart upon ending.
-- `autoplay` (boolean): Whether to start playing automatically.
-- `controls` (boolean): Whether to show built-in controls.
-- `poster` (string): URL of the poster image.
-- `preload` (string): Loading strategy ('auto', 'none').
-- `interactive` (boolean): Whether to pass pointer events to the iframe (disables click-layer).
-- `inputProps` (object): Key-value pairs passed to the composition controller.
-- `videoWidth` (number): Native width of the composition.
-- `videoHeight` (number): Native height of the composition.
-- `buffered` (TimeRanges): Ranges of buffered content (simulated).
-- `seekable` (TimeRanges): Ranges of seekable content (simulated).
-- `seeking` (boolean): Whether the user is currently scrubbing.
-- `readyState` (number): Current readiness state (HAVE_NOTHING to HAVE_ENOUGH_DATA).
-- `networkState` (number): Current network state (NETWORK_EMPTY to NETWORK_IDLE).
-- `currentFrame` (number): Current frame index.
-- `fps` (number): Frames per second of the composition.
-
-### Methods
-- `play()`: Promise<void> - Starts playback.
-- `pause()`: void - Pauses playback.
-- `load()`: void - Reloads the composition source.
-- `getController()`: HeliosController | null - Returns the internal controller instance.
+## B. Events
+- `play`: Playback started.
+- `pause`: Playback paused.
+- `ended`: Playback completed.
+- `timeupdate`: Current frame changed.
+- `volumechange`: Volume or mute state changed.
+- `ratechange`: Playback rate changed.
+- `durationchange`: Duration changed.
+- `loadstart`: Loading started.
+- `loadedmetadata`: Metadata (duration, dims) available.
+- `loadeddata`: Frame data available.
+- `canplay`: Ready to resume.
+- `canplaythrough`: Ready to play without buffering.
+- `error`: Error occurred (detail contains error info).
 
 ## C. Attributes
-- `src`: Composition URL.
-- `width`: Display width (CSS).
-- `height`: Display height (CSS).
-- `autoplay`: Boolean attribute.
-- `loop`: Boolean attribute.
-- `controls`: Boolean attribute.
-- `poster`: Image URL.
-- `preload`: 'auto' | 'none'.
-- `muted`: Boolean attribute.
-- `interactive`: Boolean attribute.
-- `export-format`: 'mp4' | 'webm' (for client-side export).
-- `export-mode`: 'auto' | 'canvas' | 'dom' (export strategy).
-- `canvas-selector`: CSS selector for canvas capture.
-- `input-props`: JSON string for composition input props.
+- `src` (string): Composition URL.
+- `width` (number): Player width.
+- `height` (number): Player height.
+- `autoplay` (boolean): Auto-start.
+- `loop` (boolean): Loop playback.
+- `controls` (boolean): Show UI.
+- `muted` (boolean): Mute audio.
+- `poster` (string): Poster image URL.
+- `preload` (string): 'auto' | 'none'.
+- `interactive` (boolean): Enable direct interaction.
+- `input-props` (json): Dynamic properties.
+- `export-mode` (string): 'auto' | 'canvas' | 'dom'.
+- `export-format` (string): 'mp4' | 'webm'.
+- `canvas-selector` (string): CSS selector for canvas export.
 
-## D. Events
-Dispatches standard Media Events:
-- `loadstart`, `loadedmetadata`, `loadeddata`, `canplay`, `canplaythrough`
-- `play`, `pause`, `ended`, `timeupdate`
-- `volumechange`, `ratechange`, `durationchange`
-- `error` (CustomEvent with detail)
+## D. Public API (HeliosPlayer)
+```typescript
+interface HeliosPlayer extends HTMLElement {
+  // Methods
+  play(): Promise<void>;
+  pause(): void;
+  load(): void;
+
+  // Properties
+  currentTime: number; // Get/Set (seconds)
+  currentFrame: number; // Get/Set (frames)
+  volume: number; // Get/Set (0-1)
+  muted: boolean; // Get/Set
+  playbackRate: number; // Get/Set
+  inputProps: Record<string, any>; // Get/Set
+
+  // Read-Only
+  readonly duration: number;
+  readonly paused: boolean;
+  readonly ended: boolean;
+  readonly fps: number;
+  readonly videoWidth: number;
+  readonly videoHeight: number;
+  readonly readyState: number;
+  readonly networkState: number;
+  readonly buffered: TimeRanges;
+  readonly seekable: TimeRanges;
+  readonly seeking: boolean;
+}
+```

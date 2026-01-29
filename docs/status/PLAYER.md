@@ -1,4 +1,4 @@
-**Version**: v0.33.1
+**Version**: v0.33.2
 
 # Status: PLAYER
 
@@ -34,6 +34,7 @@
 ## Critical Task
 - **None**: Recent task completed.
 
+[v0.33.2] ✅ Completed: Verify Deep API Parity - Fixed test environment, verified Deep API Parity tests pass, and updated README with new API members.
 [v0.33.1] ✅ Completed: Fix Player Metadata - Synced package.json version with status file (0.5.2 -> 0.33.1) and updated @helios-project/core dependency to 2.7.0.
 [v0.33.0] ✅ Completed: Deep API Parity - Implemented `videoWidth`, `videoHeight`, `buffered`, `seekable`, `seeking` properties on `<helios-player>` for compatibility with third-party wrappers.
 [v0.32.2] ✅ Completed: Polish Click-To-Play & Fix Z-Index - Fixed bug where controls were blocked by click-layer and ensured player grabs focus on click.

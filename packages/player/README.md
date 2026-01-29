@@ -85,6 +85,13 @@ The `<helios-player>` element implements a subset of the HTMLMediaElement interf
 - `volume` (number): Audio volume (0.0 to 1.0).
 - `muted` (boolean): Audio mute state.
 - `playbackRate` (number): Playback speed (default 1.0).
+- `videoWidth` (number, read-only): The intrinsic width of the video (from controller state or attributes).
+- `videoHeight` (number, read-only): The intrinsic height of the video (from controller state or attributes).
+- `buffered` (TimeRanges, read-only): Returns a TimeRanges object representing buffered content (always 0-duration).
+- `seekable` (TimeRanges, read-only): Returns a TimeRanges object representing seekable content (always 0-duration).
+- `seeking` (boolean, read-only): Whether the player is currently seeking (scrubbing).
+- `readyState` (number, read-only): The current readiness state of the media (0-4).
+- `networkState` (number, read-only): The current network state (0-3).
 - `fps` (number, read-only): Frames per second of the composition.
 - `currentFrame` (number): Current frame index.
 - `inputProps` (object): Get or set the input properties passed to the composition.
@@ -100,6 +107,11 @@ The element dispatches the following custom events:
 - `volumechange`: Fired when volume or mute state changes.
 - `ratechange`: Fired when playback rate changes.
 - `durationchange`: Fired when the duration of the composition changes.
+- `loadstart`: Fired when the browser begins looking for media data.
+- `loadedmetadata`: Fired when the duration and dimensions of the media have been determined.
+- `loadeddata`: Fired when data for the current frame is available.
+- `canplay`: Fired when the browser can resume playback of the media.
+- `canplaythrough`: Fired when the browser estimates it can play through the media without buffering.
 
 ## Client-Side Export
 
