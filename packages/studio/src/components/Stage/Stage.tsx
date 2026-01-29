@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect, MouseEvent, WheelEvent } from 'reac
 import type { HeliosController } from '@helios-project/player';
 import { useStudio } from '../../context/StudioContext';
 import { StageToolbar } from './StageToolbar';
+import { useKeyboardShortcut } from '../../hooks/useKeyboardShortcut';
 import './Stage.css';
 
 interface StageProps {
@@ -20,8 +21,11 @@ export const Stage: React.FC<StageProps> = ({ src }) => {
   const [zoom, setZoom] = useState(1);
   const [pan, setPan] = useState({ x: 0, y: 0 });
   const [isTransparent, setIsTransparent] = useState(true);
+  const [showGuides, setShowGuides] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+
+  useKeyboardShortcut("'", () => setShowGuides(p => !p), { ignoreInput: true });
 
   // HMR State Preservation
   const lastStateRef = useRef({ frame: 0, isPlaying: false, src: '' });
@@ -133,17 +137,33 @@ export const Stage: React.FC<StageProps> = ({ src }) => {
             }}
         >
             {src ? (
-              <helios-player
-                ref={playerRef}
-                key={src}
-                src={src}
-                style={{
-                  width: `${canvasSize.width}px`,
-                  height: `${canvasSize.height}px`,
-                  display: 'block',
-                  boxShadow: '0 0 20px rgba(0,0,0,0.5)'
-                }}
-              ></helios-player>
+              <>
+                <helios-player
+                  ref={playerRef}
+                  key={src}
+                  src={src}
+                  style={{
+                    width: `${canvasSize.width}px`,
+                    height: `${canvasSize.height}px`,
+                    display: 'block',
+                    boxShadow: '0 0 20px rgba(0,0,0,0.5)'
+                  }}
+                ></helios-player>
+                {showGuides && (
+                  <div
+                    className="stage-guides-overlay"
+                    style={{
+                      width: `${canvasSize.width}px`,
+                      height: `${canvasSize.height}px`
+                    }}
+                  >
+                    <div className="guide-action-safe" />
+                    <div className="guide-title-safe" />
+                    <div className="guide-crosshair-x" />
+                    <div className="guide-crosshair-y" />
+                  </div>
+                )}
+              </>
             ) : (
                 <div style={{ color: '#888' }}>No composition selected</div>
             )}
@@ -157,6 +177,8 @@ export const Stage: React.FC<StageProps> = ({ src }) => {
             canvasSize={canvasSize}
             onCanvasSizeChange={setCanvasSize}
             onSnapshot={takeSnapshot}
+            showGuides={showGuides}
+            onToggleGuides={() => setShowGuides(!showGuides)}
         />
     </div>
   );

@@ -22,6 +22,9 @@ packages/studio/
       Layout/
       Sidebar/
       Stage/
+        Stage.tsx
+        Stage.css
+        StageToolbar.tsx
       CreateCompositionModal.tsx
       GlobalShortcuts.tsx
       KeyboardShortcutsModal.tsx
@@ -52,7 +55,8 @@ Options:
 ## D. UI Components
 - **Timeline**: Visual track of the video, supports markers, captions, zooming.
 - **PropsEditor**: Auto-generated inputs based on composition schema (supports Asset selection, Drag & Drop).
-- **Stage**: Renders the `<helios-player>` or canvas.
+- **Stage**: Renders the `<helios-player>` or canvas. Supports Safe Area Guides and Transparency Grid.
+- **StageToolbar**: Controls for Zoom, Fit, Transparency Grid, Snapshot, and Safe Area Guides.
 - **GlobalShortcuts**: Headless component managing keyboard interactions.
 - **CompositionSwitcher**: Modal to switch between compositions (Cmd+K), supports deletion.
 - **PlaybackControls**: Buttons for play, pause, seek, loop, volume.

@@ -1,6 +1,27 @@
 import { DirectController, BridgeController } from "./controllers";
 import { ClientSideExporter } from "./features/exporter";
 export { ClientSideExporter };
+class StaticTimeRange {
+    startVal;
+    endVal;
+    constructor(startVal, endVal) {
+        this.startVal = startVal;
+        this.endVal = endVal;
+    }
+    get length() {
+        return this.endVal > 0 ? 1 : 0;
+    }
+    start(index) {
+        if (index !== 0 || this.length === 0)
+            throw new Error("IndexSizeError");
+        return this.startVal;
+    }
+    end(index) {
+        if (index !== 0 || this.length === 0)
+            throw new Error("IndexSizeError");
+        return this.endVal;
+    }
+}
 const template = document.createElement("template");
 template.innerHTML = `
   <style>
@@ -380,6 +401,31 @@ export class HeliosPlayer extends HTMLElement {
         return this._networkState;
     }
     // --- Standard Media API ---
+    get seeking() {
+        return this.isScrubbing;
+    }
+    get buffered() {
+        return new StaticTimeRange(0, this.duration);
+    }
+    get seekable() {
+        return new StaticTimeRange(0, this.duration);
+    }
+    get videoWidth() {
+        if (this.controller) {
+            const state = this.controller.getState();
+            if (state.width)
+                return state.width;
+        }
+        return parseFloat(this.getAttribute("width") || "0");
+    }
+    get videoHeight() {
+        if (this.controller) {
+            const state = this.controller.getState();
+            if (state.height)
+                return state.height;
+        }
+        return parseFloat(this.getAttribute("height") || "0");
+    }
     get currentTime() {
         if (!this.controller)
             return 0;
