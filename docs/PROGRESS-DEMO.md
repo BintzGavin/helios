@@ -1,3 +1,6 @@
+## DEMO v1.51.0
+- ✅ Completed: Solid DOM Example - Created `examples/solid-dom-animation` demonstrating integration with SolidJS signals for DOM updates.
+
 ## DEMO v1.50.0
 - ✅ Completed: Podcast Visualizer - Created `examples/podcast-visualizer` demonstrating multi-track audio mixing and sync verification.
 
