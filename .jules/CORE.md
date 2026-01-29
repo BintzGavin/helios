@@ -81,3 +81,7 @@
 ## 2026-01-28 - Package Metadata Discrepancy
 **Learning:** `packages/core/package.json` version (0.0.1) lagged behind `docs/status/CORE.md` (2.2.0), and `README.md` listed incorrect license (MIT vs ELv2).
 **Action:** Created plan `2026-01-28-CORE-VersionSync.md` to synchronize version and license to ensure package integrity.
+
+## 2.7.0 - Task Already Completed
+**Learning:** The plan file `2026-04-12-CORE-Implement-Stability-Registry.md` existed, but the code was already fully implemented and documented in status files. This suggests the plan wasn't cleaned up or the agent cycle was interrupted after implementation but before cleanup.
+**Action:** Always verify the codebase state against the plan before starting implementation to avoid redundant work. If implemented, focus on verification.
