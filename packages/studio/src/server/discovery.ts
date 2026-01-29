@@ -58,6 +58,27 @@ export function findCompositions(rootDir: string): CompositionInfo[] {
   return compositions;
 }
 
+export function deleteComposition(rootDir: string, id: string): void {
+  const projectRoot = getProjectRoot(rootDir);
+  const compDir = path.resolve(projectRoot, id);
+
+  // Security check: ensure path is within project root
+  if (!compDir.startsWith(projectRoot)) {
+    throw new Error('Access denied: Cannot delete outside project root');
+  }
+
+  if (!fs.existsSync(compDir)) {
+    throw new Error(`Composition "${id}" not found`);
+  }
+
+  // Sanity check: ensure it looks like a composition
+  if (!fs.existsSync(path.join(compDir, 'composition.html'))) {
+    throw new Error(`Directory "${id}" is not a valid composition (missing composition.html)`);
+  }
+
+  fs.rmSync(compDir, { recursive: true, force: true });
+}
+
 export function createComposition(rootDir: string, name: string): CompositionInfo {
   const projectRoot = getProjectRoot(rootDir);
 

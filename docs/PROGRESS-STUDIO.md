@@ -1,3 +1,6 @@
+## STUDIO v0.45.0
+- ✅ Completed: Delete Composition - Implemented ability to delete compositions from the UI with backend support and confirmation.
+
 ## STUDIO v0.44.0
 - ✅ Completed: Enable Production Preview - Configured `vite-plugin-studio-api` to serve project files in preview mode and updated verification scripts.
 

@@ -1,6 +1,6 @@
 // @vitest-environment node
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { findAssets } from './discovery';
+import { findAssets, deleteComposition } from './discovery';
 import fs from 'fs';
 import path from 'path';
 
@@ -52,5 +52,54 @@ describe('findAssets', () => {
     expect(assetMap.get('model.glb')).toBe('model');
     expect(assetMap.get('data.json')).toBe('json');
     expect(assetMap.get('shader.frag')).toBe('shader');
+  });
+});
+
+describe('deleteComposition', () => {
+  const originalEnv = process.env;
+
+  beforeEach(() => {
+    vi.resetAllMocks();
+    process.env = { ...originalEnv, HELIOS_PROJECT_ROOT: path.resolve('/mock/project') };
+  });
+
+  afterEach(() => {
+    process.env = originalEnv;
+  });
+
+  it('should delete a valid composition directory', () => {
+    const compId = 'my-composition';
+    const compPath = path.resolve('/mock/project', compId);
+
+    // Mock existsSync
+    vi.mocked(fs.existsSync).mockImplementation((p) => {
+        // Project root check
+        if (p === path.resolve('/mock/project')) return true;
+        // Composition check
+        if (p === compPath) return true;
+        // composition.html check
+        if (p === path.join(compPath, 'composition.html')) return true;
+        return false;
+    });
+
+    // Mock rmSync
+    vi.mocked(fs.rmSync).mockReturnValue(undefined);
+
+    deleteComposition('.', compId);
+
+    expect(fs.rmSync).toHaveBeenCalledWith(compPath, { recursive: true, force: true });
+  });
+
+  it('should throw error if composition does not exist', () => {
+     vi.mocked(fs.existsSync).mockImplementation((p) => {
+        if (p === path.resolve('/mock/project')) return true;
+        return false;
+     });
+
+     expect(() => deleteComposition('.', 'unknown-comp')).toThrow(/not found/);
+  });
+
+  it('should throw error if access denied (outside project root)', () => {
+     expect(() => deleteComposition('.', '../outside')).toThrow(/Access denied/);
   });
 });

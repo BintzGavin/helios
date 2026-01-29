@@ -1,4 +1,4 @@
-**Version**: 0.44.0
+**Version**: 0.45.0
 
 # Studio Domain Status
 
@@ -7,6 +7,7 @@
 **Focus**: UI Implementation & CLI
 
 ## Recent Updates
+- [v0.45.0] ✅ Completed: Delete Composition - Implemented ability to delete compositions from the UI with backend support and confirmation.
 - [v0.44.0] ✅ Completed: Enable Production Preview - Configured `vite-plugin-studio-api` to serve project files in preview mode and updated verification scripts.
 - [v0.43.0] ✅ Completed: Create Composition - Implemented "Create Composition" feature with UI modal, API endpoint, and file generation logic.
 - [v0.42.0] ✅ Completed: Drag & Drop Assets - Implemented drag and drop support from Assets Panel to Props Editor inputs (typed and generic).
