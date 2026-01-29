@@ -1,5 +1,8 @@
 # RENDERER Progress Log
 
+## RENDERER v1.35.0
+- ✅ Completed: Support Helios Stability Registry - Updated `SeekTimeDriver` to detect and await `window.helios.waitUntilStable()`, enabling robust synchronization with custom stability checks registered in the core engine.
+
 ## RENDERER v1.34.0
 - ✅ Completed: Seek Driver Offsets - Updated `SeekTimeDriver` to respect `data-helios-offset` and `data-helios-seek` attributes, calculating correct `currentTime` for visual media synchronization.
 

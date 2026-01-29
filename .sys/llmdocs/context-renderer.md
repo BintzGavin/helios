@@ -21,7 +21,7 @@ The Renderer uses the Strategy pattern to support two distinct rendering modes:
     *   **Media Attributes**: Respects `data-helios-offset`, `data-helios-seek`, and `muted` attributes on media elements for precise timing and volume control.
     *   **Media Synchronization**: Manually syncs `<video>` and `<audio>` elements to the virtual timeline in SeekTimeDriver, respecting offset and seek attributes.
     *   **Frame Synchronization**: `SeekTimeDriver` iterates over all attached frames (including iframes) to inject polyfills and synchronize virtual time, ensuring complex compositions render correctly.
-    *   **Stability Wait**: Waits for `document.fonts.ready` and media element `seeked` events (with timeout) after every seek to ensure deterministic frame capture without artifacts.
+    *   **Stability Wait**: Waits for `document.fonts.ready`, media element `seeked` events, and `helios.waitUntilStable()` (if available) after every seek, ensuring deterministic frame capture that respects custom stability checks.
 
 ## B. File Tree
 ```
