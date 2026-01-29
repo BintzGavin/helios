@@ -92,7 +92,12 @@ export class SeekTimeDriver implements TimeDriver {
           }
         });
 
-        // 3. Wait for stability with a safety timeout
+        // 3. Wait for Helios Stability (Custom Checks)
+        if (typeof window.helios !== 'undefined' && typeof window.helios.waitUntilStable === 'function') {
+          promises.push(window.helios.waitUntilStable());
+        }
+
+        // 4. Wait for stability with a safety timeout
         const allReady = Promise.all(promises);
         const timeout = new Promise((resolve) => setTimeout(resolve, 3000));
         await Promise.race([allReady, timeout]);
