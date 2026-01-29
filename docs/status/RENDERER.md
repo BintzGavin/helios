@@ -1,8 +1,9 @@
-**Version**: 1.35.0
+**Version**: 1.36.0
 
 # Renderer Agent Status
 
 ## Progress Log
+- [1.36.0] ✅ Completed: Enable Full Test Coverage - Updated `run-all.ts` to include all verification scripts, refactored `verify-concat.ts` to be self-contained using Data URIs, and improved `CanvasStrategy` robustness against `esbuild` artifacts by using string-based evaluation.
 - [1.35.0] ✅ Completed: Support Helios Stability Registry - Updated `SeekTimeDriver` to detect and await `window.helios.waitUntilStable()`, enabling robust synchronization with custom stability checks registered in the core engine.
 - [1.34.0] ✅ Completed: Seek Driver Offsets - Updated `SeekTimeDriver` to respect `data-helios-offset` and `data-helios-seek` attributes, calculating correct `currentTime` for visual media synchronization.
 - [1.33.0] ✅ Completed: Enable DOM Transparency - Updated `DomStrategy` to support transparent video export by using `omitBackground: true` in Playwright when `pixelFormat` suggests alpha (e.g. `yuva420p`, `rgba`), allowing creation of transparent overlays and lower-thirds.

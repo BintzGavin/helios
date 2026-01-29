@@ -1,4 +1,5 @@
-# RENDERER Progress Log
+## RENDERER v1.36.0
+- ✅ Completed: Enable Full Test Coverage - Updated `run-all.ts` to include all verification scripts, refactored `verify-concat.ts` to be self-contained using Data URIs, and improved `CanvasStrategy` robustness against `esbuild` artifacts by using string-based evaluation.
 
 ## RENDERER v1.35.0
 - ✅ Completed: Support Helios Stability Registry - Updated `SeekTimeDriver` to detect and await `window.helios.waitUntilStable()`, enabling robust synchronization with custom stability checks registered in the core engine.
