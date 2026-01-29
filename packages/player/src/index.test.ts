@@ -1214,4 +1214,61 @@ describe('HeliosPlayer', () => {
         expect(loadStartSpy).toHaveBeenCalled();
     });
   });
+
+  describe('ControlsList', () => {
+    it('should hide export button when controlslist="nodownload"', () => {
+        player.setAttribute('controlslist', 'nodownload');
+        const exportBtn = player.shadowRoot!.querySelector('.export-btn') as HTMLButtonElement;
+        expect(exportBtn.style.display).toBe('none');
+    });
+
+    it('should hide fullscreen button when controlslist="nofullscreen"', () => {
+        player.setAttribute('controlslist', 'nofullscreen');
+        const fullscreenBtn = player.shadowRoot!.querySelector('.fullscreen-btn') as HTMLButtonElement;
+        expect(fullscreenBtn.style.display).toBe('none');
+    });
+
+    it('should support multiple tokens', () => {
+        player.setAttribute('controlslist', 'nodownload nofullscreen');
+        const exportBtn = player.shadowRoot!.querySelector('.export-btn') as HTMLButtonElement;
+        const fullscreenBtn = player.shadowRoot!.querySelector('.fullscreen-btn') as HTMLButtonElement;
+
+        expect(exportBtn.style.display).toBe('none');
+        expect(fullscreenBtn.style.display).toBe('none');
+    });
+
+    it('should restore buttons when attribute is removed', () => {
+        // 1. Hide
+        player.setAttribute('controlslist', 'nodownload nofullscreen');
+        const exportBtn = player.shadowRoot!.querySelector('.export-btn') as HTMLButtonElement;
+        const fullscreenBtn = player.shadowRoot!.querySelector('.fullscreen-btn') as HTMLButtonElement;
+
+        expect(exportBtn.style.display).toBe('none');
+        expect(fullscreenBtn.style.display).toBe('none');
+
+        // 2. Remove
+        player.removeAttribute('controlslist');
+
+        expect(exportBtn.style.display).toBe('');
+        expect(fullscreenBtn.style.display).toBe('');
+    });
+
+    it('should be case insensitive', () => {
+        player.setAttribute('controlslist', 'NoDownload NOFULLSCREEN');
+        const exportBtn = player.shadowRoot!.querySelector('.export-btn') as HTMLButtonElement;
+        const fullscreenBtn = player.shadowRoot!.querySelector('.fullscreen-btn') as HTMLButtonElement;
+
+        expect(exportBtn.style.display).toBe('none');
+        expect(fullscreenBtn.style.display).toBe('none');
+    });
+
+    it('should handle extra whitespace', () => {
+        player.setAttribute('controlslist', '  nodownload   nofullscreen  ');
+        const exportBtn = player.shadowRoot!.querySelector('.export-btn') as HTMLButtonElement;
+        const fullscreenBtn = player.shadowRoot!.querySelector('.fullscreen-btn') as HTMLButtonElement;
+
+        expect(exportBtn.style.display).toBe('none');
+        expect(fullscreenBtn.style.display).toBe('none');
+    });
+  });
 });

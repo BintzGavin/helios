@@ -642,7 +642,7 @@ export class HeliosPlayer extends HTMLElement {
   }
 
   static get observedAttributes() {
-    return ["src", "width", "height", "autoplay", "loop", "controls", "export-format", "input-props", "poster", "muted", "interactive", "preload"];
+    return ["src", "width", "height", "autoplay", "loop", "controls", "export-format", "input-props", "poster", "muted", "interactive", "preload", "controlslist"];
   }
 
   constructor() {
@@ -732,6 +732,29 @@ export class HeliosPlayer extends HTMLElement {
         this.controller.setAudioMuted(this.hasAttribute("muted"));
       }
     }
+
+    if (name === "controlslist") {
+      this.updateControlsVisibility();
+    }
+  }
+
+  private updateControlsVisibility() {
+    if (!this.exportBtn || !this.fullscreenBtn) return;
+
+    const attr = this.getAttribute("controlslist") || "";
+    const tokens = attr.toLowerCase().split(/\s+/);
+
+    if (tokens.includes("nodownload")) {
+      this.exportBtn.style.display = "none";
+    } else {
+      this.exportBtn.style.removeProperty("display");
+    }
+
+    if (tokens.includes("nofullscreen")) {
+      this.fullscreenBtn.style.display = "none";
+    } else {
+      this.fullscreenBtn.style.removeProperty("display");
+    }
   }
 
   public get inputProps(): Record<string, any> | null {
@@ -785,6 +808,7 @@ export class HeliosPlayer extends HTMLElement {
     // Ensure aspect ratio is correct on connect
     this.updateAspectRatio();
 
+    this.updateControlsVisibility();
     this.resizeObserver.observe(this);
   }
 

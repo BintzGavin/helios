@@ -1,54 +1,49 @@
 # Context: PLAYER
 
-## Identity
-- **Role**: Frontend / Player Agent
-- **Domain**: `packages/player`
-- **Responsibility**: `<helios-player>` Web Component, UI controls, iframe bridge.
-
 ## A. Component Structure
-The `<helios-player>` component uses a Shadow DOM with the following structure:
-- **Style**: Scoped CSS.
-- **Status Overlay**: Displays "Connecting...", "Loading...", or Error messages.
-- **Poster Container**: Displays poster image and "Big Play Button".
-- **Iframe**: Sandbox for the composition (`allow-scripts allow-same-origin`).
-- **Click Layer**: Transparent overlay for click-to-play/pause interactions.
-- **Captions Container**: Overlays active captions.
-- **Controls**:
-    - Play/Pause Button
-    - Volume Control (Mute Button + Slider)
-    - CC Button (Toggle Captions)
-    - Export Button (Client-side WebCodecs export)
-    - Speed Selector (0.25x - 2x)
-    - Scrubber (Range input)
-    - Time Display (Current / Total)
-    - Fullscreen Button
+The `<helios-player>` component uses a Shadow DOM to encapsulate its styles and structure.
+
+**Shadow Root:**
+- `<style>`: Encapsulated CSS.
+- `.status-overlay`: Displays loading, connecting, and error states.
+- `.poster-container`: Displays the poster image and "Big Play Button".
+- `<iframe>`: Hosts the Helios composition (sandboxed).
+- `.click-layer`: Captures clicks for play/pause and double-clicks for fullscreen.
+- `.captions-container`: Displays active captions.
+- `.controls` (role="toolbar"): Contains playback controls (Play/Pause, Volume, Captions, Export, Speed, Scrubber, Time Display, Fullscreen).
 
 ## B. Events
 The component dispatches standard HTMLMediaElement events:
-- **Playback**: `play`, `pause`, `ended`, `seeking`, `seeked`
-- **Time**: `timeupdate`, `durationchange`
-- **State**: `ratechange`, `volumechange`
-- **Lifecycle**: `loadstart`, `loadedmetadata`, `loadeddata`, `canplay`, `canplaythrough`
-- **Error**: `error`
+
+- `play`: Playback has started.
+- `pause`: Playback has paused.
+- `ended`: Playback has reached the end.
+- `timeupdate`: The `currentTime` has changed.
+- `volumechange`: Volume or muted state has changed.
+- `ratechange`: Playback rate has changed.
+- `durationchange`: Duration has changed.
+- `seeking`: A seek operation has started.
+- `seeked`: A seek operation has completed.
+- `loadstart`: Loading has started.
+- `loadedmetadata`: Metadata (duration, dimensions) is loaded.
+- `loadeddata`: Initial data is loaded.
+- `canplay`: The player can start playing.
+- `canplaythrough`: The player can play through without buffering.
+- `error`: An error occurred.
 
 ## C. Attributes
-- **src**: URL of the composition (iframe source).
-- **width**: Player width (pixels).
-- **height**: Player height (pixels).
-- **autoplay**: Boolean attribute (starts playback automatically).
-- **loop**: Boolean attribute (loops playback).
-- **controls**: Boolean attribute (shows/hides UI).
-- **muted**: Boolean attribute (initial mute state).
-- **poster**: URL of image to show before playback.
-- **preload**: `auto` | `none` (defaults to `auto`).
-- **interactive**: Boolean attribute (disables click layer to allow iframe interaction).
-- **input-props**: JSON string of properties to pass to the composition.
-- **export-format**: `mp4` | `webm` (defaults to `mp4`).
-- **canvas-selector**: CSS selector for canvas to capture (export mode).
+The component observes the following attributes:
 
-## D. Properties
-The component implements the `HTMLMediaElement` interface (partial):
-- **Playback**: `play()`, `pause()`, `currentTime`, `duration`, `paused`, `ended`, `playbackRate`, `loop`, `autoplay`, `muted`, `volume`
-- **State**: `readyState`, `networkState`, `error`, `src`, `currentSrc`, `preload`, `buffered`, `seekable`, `seeking`, `played`
-- **Video**: `videoWidth`, `videoHeight`, `poster`
-- **Helios Specific**: `currentFrame`, `fps`, `interactive`, `inputProps`
+- `src`: URL of the Helios composition to load.
+- `width`: Width of the player (aspect-ratio calculation).
+- `height`: Height of the player (aspect-ratio calculation).
+- `autoplay`: Boolean attribute to start playback automatically.
+- `loop`: Boolean attribute to loop playback.
+- `controls`: Boolean attribute to show/hide controls.
+- `muted`: Boolean attribute to start muted.
+- `interactive`: Boolean attribute to allow direct interaction with the iframe.
+- `poster`: URL of the poster image to show before loading/playing.
+- `preload`: Hint for preloading behavior (`auto`, `metadata`, `none`).
+- `export-format`: Format for client-side export (`mp4`, `webm`).
+- `input-props`: JSON string of properties to pass to the composition.
+- `controlslist`: Space-separated tokens to customize UI (`nodownload`, `nofullscreen`).

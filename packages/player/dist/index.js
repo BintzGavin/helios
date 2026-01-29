@@ -382,6 +382,7 @@ export class HeliosPlayer extends HTMLElement {
     wasPlayingBeforeScrub = false;
     lastState = null;
     pendingProps = null;
+    _error = null;
     // --- Standard Media API States ---
     static HAVE_NOTHING = 0;
     static HAVE_METADATA = 1;
@@ -399,6 +400,12 @@ export class HeliosPlayer extends HTMLElement {
     }
     get networkState() {
         return this._networkState;
+    }
+    get error() {
+        return this._error;
+    }
+    get currentSrc() {
+        return this.src;
     }
     // --- Standard Media API ---
     get seeking() {
@@ -582,7 +589,7 @@ export class HeliosPlayer extends HTMLElement {
         }
     }
     static get observedAttributes() {
-        return ["src", "width", "height", "autoplay", "loop", "controls", "export-format", "input-props", "poster", "muted", "interactive", "preload"];
+        return ["src", "width", "height", "autoplay", "loop", "controls", "export-format", "input-props", "poster", "muted", "interactive", "preload", "controlslist"];
     }
     constructor() {
         super();
@@ -663,6 +670,27 @@ export class HeliosPlayer extends HTMLElement {
                 this.controller.setAudioMuted(this.hasAttribute("muted"));
             }
         }
+        if (name === "controlslist") {
+            this.updateControlsVisibility();
+        }
+    }
+    updateControlsVisibility() {
+        if (!this.exportBtn || !this.fullscreenBtn)
+            return;
+        const attr = this.getAttribute("controlslist") || "";
+        const tokens = attr.toLowerCase().split(/\s+/);
+        if (tokens.includes("nodownload")) {
+            this.exportBtn.style.display = "none";
+        }
+        else {
+            this.exportBtn.style.removeProperty("display");
+        }
+        if (tokens.includes("nofullscreen")) {
+            this.fullscreenBtn.style.display = "none";
+        }
+        else {
+            this.fullscreenBtn.style.removeProperty("display");
+        }
     }
     get inputProps() {
         return this.pendingProps;
@@ -707,6 +735,7 @@ export class HeliosPlayer extends HTMLElement {
         }
         // Ensure aspect ratio is correct on connect
         this.updateAspectRatio();
+        this.updateControlsVisibility();
         this.resizeObserver.observe(this);
     }
     disconnectedCallback() {
@@ -740,6 +769,7 @@ export class HeliosPlayer extends HTMLElement {
         }
     }
     loadIframe(src) {
+        this._error = null;
         this._networkState = HeliosPlayer.NETWORK_LOADING;
         this._readyState = HeliosPlayer.HAVE_NOTHING;
         this.dispatchEvent(new Event('loadstart'));
@@ -926,7 +956,16 @@ export class HeliosPlayer extends HTMLElement {
         }
         const unsubState = this.controller.subscribe((s) => this.updateUI(s));
         const unsubError = this.controller.onError((err) => {
-            this.showStatus("Error: " + (err.message || String(err)), true, {
+            const message = err.message || String(err);
+            this._error = {
+                code: 4, // MEDIA_ERR_SRC_NOT_SUPPORTED as generic default
+                message: message,
+                MEDIA_ERR_ABORTED: 1,
+                MEDIA_ERR_NETWORK: 2,
+                MEDIA_ERR_DECODE: 3,
+                MEDIA_ERR_SRC_NOT_SUPPORTED: 4
+            };
+            this.showStatus("Error: " + message, true, {
                 label: "Reload",
                 handler: () => this.retryConnection()
             });
