@@ -134,6 +134,12 @@ export interface RendererOptions {
   ffmpegPath?: string;
 
   /**
+   * Timeout in milliseconds to wait for the frame to stabilize (e.g., loading fonts, images, custom hooks).
+   * Defaults to 30000ms.
+   */
+  stabilityTimeout?: number;
+
+  /**
    * Optional props to inject into the composition.
    * These will be available as `window.__HELIOS_PROPS__`.
    */

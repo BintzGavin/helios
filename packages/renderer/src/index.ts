@@ -22,7 +22,7 @@ export class Renderer {
     this.options = options;
     if (this.options.mode === 'dom') {
       this.strategy = new DomStrategy(this.options);
-      this.timeDriver = new SeekTimeDriver();
+      this.timeDriver = new SeekTimeDriver(this.options.stabilityTimeout);
     } else {
       this.strategy = new CanvasStrategy(this.options);
       this.timeDriver = new CdpTimeDriver();

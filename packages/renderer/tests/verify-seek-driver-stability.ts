@@ -5,67 +5,105 @@ async function verifyStability() {
   console.log('Starting SeekTimeDriver stability verification...');
 
   const browser = await chromium.launch();
-  const page = await browser.newPage();
-
-  const driver = new SeekTimeDriver();
-  await driver.init(page);
-
-  // Define a page that mocks window.helios
-  const htmlContent = `
-    <!DOCTYPE html>
-    <html>
-    <body>
-      <script>
-        // Mock Helios
-        window.helios = {
-          waitUntilStable: () => {
-             // Set a flag that we were called
-             window.__helios_stable_called = true;
-             // Simulate work
-             return new Promise(resolve => setTimeout(resolve, 500));
-          }
-        };
-        window.__helios_stable_called = false;
-      </script>
-    </body>
-    </html>
-  `;
-
-  await page.goto(`data:text/html,${encodeURIComponent(htmlContent)}`);
-
-  const startTime = Date.now();
-  console.log('Setting time to 1.0s...');
-  await driver.setTime(page, 1.0);
-  const endTime = Date.now();
-  const elapsed = endTime - startTime;
-
-  console.log(`setTime took ${elapsed}ms`);
-
-  // Assertions
-  const wasCalled = await page.evaluate(() => (window as any).__helios_stable_called);
-
   let failures = 0;
 
-  if (!wasCalled) {
-    console.error('❌ FAILURE: window.helios.waitUntilStable() was NOT called.');
-    failures++;
-  } else {
-    console.log('✅ window.helios.waitUntilStable() was called.');
+  // --- Test 1: Default Timeout (should wait for 500ms) ---
+  {
+    console.log('\n--- Test 1: Default Timeout (30s) vs 500ms delay ---');
+    const page = await browser.newPage();
+    const driver = new SeekTimeDriver(); // Default timeout
+    await driver.init(page);
+
+    const htmlContent = `
+      <!DOCTYPE html>
+      <html><body><script>
+        window.helios = {
+          waitUntilStable: () => new Promise(resolve => setTimeout(resolve, 500))
+        };
+      </script></body></html>
+    `;
+    await page.goto(`data:text/html,${encodeURIComponent(htmlContent)}`);
+
+    const start = Date.now();
+    await driver.setTime(page, 1.0);
+    const elapsed = Date.now() - start;
+
+    if (elapsed < 450) {
+      console.error(`❌ FAILURE: setTime returned too quickly (${elapsed}ms). Expected ~500ms.`);
+      failures++;
+    } else {
+      console.log(`✅ setTime waited ${elapsed}ms (Expected ~500ms).`);
+    }
+    await page.close();
   }
 
-  if (elapsed < 450) { // Allow some jitter, but should be close to 500ms
-    console.error(`❌ FAILURE: setTime returned too quickly (${elapsed}ms). Expected > 500ms.`);
-    failures++;
-  } else {
-    console.log('✅ setTime waited for stability check.');
+  // --- Test 2: Short Timeout (should timeout early) ---
+  {
+    console.log('\n--- Test 2: Short Timeout (200ms) vs 1000ms delay ---');
+    const page = await browser.newPage();
+    const driver = new SeekTimeDriver(200); // 200ms timeout
+    await driver.init(page);
+
+    const htmlContent = `
+      <!DOCTYPE html>
+      <html><body><script>
+        window.helios = {
+          waitUntilStable: () => new Promise(resolve => setTimeout(resolve, 1000))
+        };
+      </script></body></html>
+    `;
+    await page.goto(`data:text/html,${encodeURIComponent(htmlContent)}`);
+
+    const start = Date.now();
+    await driver.setTime(page, 1.0);
+    const elapsed = Date.now() - start;
+
+    if (elapsed > 800) {
+      console.error(`❌ FAILURE: setTime waited too long (${elapsed}ms). Expected ~200ms (timeout).`);
+      failures++;
+    } else {
+      console.log(`✅ setTime timed out early at ${elapsed}ms (Expected ~200ms).`);
+    }
+    await page.close();
+  }
+
+  // --- Test 3: Long Timeout (should wait for long delay) ---
+  {
+    console.log('\n--- Test 3: Long Timeout (5000ms) vs 2000ms delay ---');
+    const page = await browser.newPage();
+    const driver = new SeekTimeDriver(5000); // 5s timeout
+    await driver.init(page);
+
+    const htmlContent = `
+      <!DOCTYPE html>
+      <html><body><script>
+        window.helios = {
+          waitUntilStable: () => new Promise(resolve => setTimeout(resolve, 2000))
+        };
+      </script></body></html>
+    `;
+    await page.goto(`data:text/html,${encodeURIComponent(htmlContent)}`);
+
+    const start = Date.now();
+    await driver.setTime(page, 1.0);
+    const elapsed = Date.now() - start;
+
+    if (elapsed < 1900) {
+      console.error(`❌ FAILURE: setTime returned too quickly (${elapsed}ms). Expected ~2000ms.`);
+      failures++;
+    } else {
+      console.log(`✅ setTime waited ${elapsed}ms (Expected ~2000ms).`);
+    }
+    await page.close();
   }
 
   await browser.close();
 
   if (failures > 0) {
+    console.error(`\n❌ ${failures} tests failed.`);
     process.exit(1);
   } else {
-    console.log('✅ SUCCESS: SeekTimeDriver respects helios.waitUntilStable()');
+    console.log('\n✅ ALL SUCCESS: SeekTimeDriver respects stabilityTimeout.');
   }
 }
 

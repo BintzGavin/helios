@@ -2,6 +2,8 @@ import { Page } from 'playwright';
 import { TimeDriver } from './TimeDriver.js';
 
 export class SeekTimeDriver implements TimeDriver {
+  constructor(private timeout: number = 30000) {}
+
   async init(page: Page): Promise<void> {
     await page.addInitScript(() => {
       // Initialize virtual time
@@ -36,7 +38,7 @@ export class SeekTimeDriver implements TimeDriver {
     // We use a string-based evaluation to avoid build-tool artifacts (like esbuild's __name helper)
     // interfering with the client-side execution in Playwright.
     const script = `
-      (async (t) => {
+      (async (t, timeoutMs) => {
         const timeInMs = t * 1000;
 
         // Update the global virtual time
@@ -104,14 +106,14 @@ export class SeekTimeDriver implements TimeDriver {
 
         // 4. Wait for stability with a safety timeout
         const allReady = Promise.all(promises);
-        const timeout = new Promise((resolve) => setTimeout(resolve, 3000));
+        const timeout = new Promise((resolve) => setTimeout(resolve, timeoutMs));
         await Promise.race([allReady, timeout]);
 
         // Wait for a frame to ensure the new time is propagated
         await new Promise((resolve) => {
           requestAnimationFrame(() => resolve());
         });
-      })(${timeInSeconds})
+      })(${timeInSeconds}, ${this.timeout})
     `;
 
     const frames = page.frames();
