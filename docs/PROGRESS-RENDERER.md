@@ -1,3 +1,6 @@
+## RENDERER v1.37.1
+- ✅ Completed: Fix Workspace Dependency - Updated `@helios-project/core` dependency to `2.7.0` in `packages/renderer/package.json` to match local workspace version, restoring verification environment.
+
 ## RENDERER v1.37.0
 - ✅ Completed: CdpTimeDriver Stability - Updated `CdpTimeDriver` to detect and await `window.helios.waitUntilStable()`, enabling robust synchronization with custom stability checks for Canvas-based rendering.
 
