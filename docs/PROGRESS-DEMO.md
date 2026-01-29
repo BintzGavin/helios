@@ -1,3 +1,6 @@
+## DEMO v1.52.0
+- ✅ Completed: Map Animation Example - Created `examples/map-animation` demonstrating Leaflet integration.
+
 ## DEMO v1.51.0
 - ✅ Completed: Solid DOM Example - Created `examples/solid-dom-animation` demonstrating integration with SolidJS signals for DOM updates.
 

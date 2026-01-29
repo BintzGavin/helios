@@ -64,6 +64,7 @@ export default defineConfig({
         solid_canvas: resolve(__dirname, "examples/solid-canvas-animation/composition.html"),
         solid_dom: resolve(__dirname, "examples/solid-dom-animation/composition.html"),
         podcast_visualizer: resolve(__dirname, "examples/podcast-visualizer/composition.html"),
+        map_animation: resolve(__dirname, "examples/map-animation/composition.html"),
       },
     },
   },
