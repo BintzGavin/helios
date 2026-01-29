@@ -1,44 +1,49 @@
+# 2026-03-01-PLAYER-StandardMediaStates.md
+
 #### 1. Context & Goal
-- **Objective**: Implement `readyState` and `networkState` properties and associated lifecycle events (`loadstart`, `loadedmetadata`, `canplay`, etc.) in `<helios-player>`.
-- **Trigger**: Vision gap - "Standard Media API" parity is incomplete without these loading states, limiting compatibility with external video libraries.
-- **Impact**: Improves robustness and "drop-in" compatibility; enables developers/agents to programmatically check if the player is ready.
+- **Objective**: Implement `error` and `currentSrc` properties on `<helios-player>` to satisfy `HTMLMediaElement` interface requirements.
+- **Trigger**: Journal entry identifying missing properties ("Deep API Parity") that cause compatibility issues with video wrapper libraries.
+- **Impact**: Enables third-party video libraries (e.g., React Player, Video.js wrappers) to correctly detect errors and resolved source URLs.
 
 #### 2. File Inventory
-- **Modify**: `packages/player/src/index.ts` (Add constants, state logic, event dispatching)
-- **Modify**: `packages/player/src/index.test.ts` (Add tests for new states and events)
+- **Modify**: `packages/player/src/index.ts` (Add properties and state management)
+- **Modify**: `packages/player/src/api_parity.test.ts` (Add verification tests)
+- **Read-Only**: `packages/player/src/controllers.ts`
 
 #### 3. Implementation Spec
 - **Architecture**:
-  - Implement `HTMLMediaElement` loading state constants and properties.
-  - Map `HeliosPlayer` lifecycle (iframe load -> connection -> ready) to standard media states.
-- **Pseudo-Code**:
-  - Add static constants: `HAVE_NOTHING` (0), `HAVE_METADATA` (1), `HAVE_CURRENT_DATA` (2), `HAVE_FUTURE_DATA` (3), `HAVE_ENOUGH_DATA` (4).
-  - Add static constants: `NETWORK_EMPTY` (0), `NETWORK_IDLE` (1), `NETWORK_LOADING` (2), `NETWORK_NO_SOURCE` (3).
-  - Add private properties `_readyState` (init 0) and `_networkState` (init 0).
-  - Add getters `readyState` and `networkState` returning private values.
-  - In `loadIframe(src)`:
-    - Set `_networkState = NETWORK_LOADING`.
-    - Set `_readyState = HAVE_NOTHING`.
-    - Dispatch `loadstart` event.
-  - In `setController(controller)` (on successful connection):
-    - Set `_networkState = NETWORK_IDLE`.
-    - Set `_readyState = HAVE_ENOUGH_DATA`.
-    - Dispatch `loadedmetadata` event.
-    - Dispatch `loadeddata` event.
-    - Dispatch `canplay` event.
-    - Dispatch `canplaythrough` event.
+  - `currentSrc`: Expose the `iframe.src` property (which returns the fully resolved URL) to match `HTMLMediaElement.currentSrc`.
+  - `error`: Manage an internal `_error` state of type `MediaError | null`.
+  - Map internal Helios errors to standard `MediaError` codes where possible (defaulting to `MEDIA_ERR_NETWORK` for connection issues).
 - **Public API Changes**:
-  - New Read-only Properties: `readyState`, `networkState`.
-  - New Static Constants on `HeliosPlayer` class.
-  - New Events Dispatched: `loadstart`, `loadedmetadata`, `loadeddata`, `canplay`, `canplaythrough`.
+  - `readonly error: MediaError | null`
+  - `readonly currentSrc: string`
+- **Pseudo-Code**:
+  ```typescript
+  class HeliosPlayer {
+    private _error: MediaError | null = null;
+
+    // ... in loadIframe()
+    this._error = null; // Clear error on new load
+
+    // ... in setController error handler
+    // We can cast a plain object to MediaError since the constructor isn't standard
+    this._error = { code: 2, message: err.message } as MediaError; // MEDIA_ERR_NETWORK
+
+    get error() { return this._error; }
+
+    get currentSrc() { return this.iframe.src; }
+  }
+  ```
 - **Dependencies**: None.
 
 #### 4. Test Plan
-- **Verification**: `npm test packages/player/src/index.test.ts`
+- **Verification**: `npm test -w packages/player`
 - **Success Criteria**:
-  - `readyState` is 0 initially.
-  - `networkState` becomes 2 (LOADING) when `src` is set.
-  - `readyState` becomes 4 (HAVE_ENOUGH_DATA) when controller connects.
-  - Events fire in order: `loadstart` -> `loadedmetadata` -> `canplay`.
+  - `currentSrc` returns absolute URL when `src` attribute is relative.
+  - `error` is null initially.
+  - `error` returns an object with `code` and `message` after a simulated error.
+  - `error` is cleared when `src` changes.
 - **Edge Cases**:
-  - Changing `src` resets states correctly.
+  - Accessing `currentSrc` before `src` is set (should be empty string).
+  - Error occurring before controller connection (e.g., timeout).
