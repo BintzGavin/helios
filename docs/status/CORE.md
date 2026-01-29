@@ -1,12 +1,12 @@
 # Status: CORE
 
-**Version**: 2.7.1
+**Version**: 2.7.2
 
 - **Status**: Active
 - **Current Focus**: Maintenance, Optimization, and Stability
 - **Last Updated**: 2026-04-13
 
-[v2.7.1] ⚠️ Reverted: Version Mismatch Fix - Reverted version to 2.7.1 to match strict dependencies in player/renderer and unblock build.
+[v2.7.2] ✅ Completed: Synchronize Version - Updated version to 2.7.2 to match dependencies in player/renderer, verified tests pass.
 [v2.7.2] ✅ Completed: Verify Stability Registry - Verified implementation of `registerStabilityCheck` and `waitUntilStable`, updated JSDoc, and cleaned up stale plan.
 [v2.7.1] ✅ Completed: Rename Audio Test - Renamed `audio.test.ts` to `helios-audio.test.ts` to clarify structure.
 [v2.7.0] ✅ Completed: Implement Stability Registry - Implemented stability registry pattern in `Helios` allowing external consumers to register async checks for `waitUntilStable`.
@@ -47,7 +47,7 @@
 [v1.7.0] ✅ Completed: Implement Sequencing Primitives - Implemented `sequence` function and interfaces in `packages/core`.
 [v1.8.0] ✅ Completed: Implement Series Helper - Implemented `series` function for sequential layout of composition elements.
 [v1.9.0] ✅ Completed: Implement Signals - Implemented `signal`, `computed`, and `effect` primitives with memory safety and consistency guarantees.
-[v1.10.0] ✅ Completed: Refactor Helios to use Signals - Replaced internal state with signals, exposed ReadonlySignal getters, and maintained backward compatibility.
+[v10.0] ✅ Completed: Refactor Helios to use Signals - Replaced internal state with signals, exposed ReadonlySignal getters, and maintained backward compatibility.
 [v1.11.0] ✅ Completed: Implement Easing Functions - Implemented standard easing functions (linear, quad, cubic, quart, quint, sine, expo, circ, back, elastic, bounce) and cubic-bezier solver.
 [v1.11.1] ✅ Completed: Refactor Helios Signals - Added JSDoc documentation to public signal properties and verified signal implementation.
 [v1.11.2] ✅ Completed: Verify Signals and Cleanup Plans - Verified signal integration and cleaned up completed plan files.
@@ -61,4 +61,4 @@
 [v1.18.0] ✅ Completed: Implement Input Schema Validation - Added `HeliosSchema` definition, `validateProps` logic, and integrated validation into `Helios` constructor and `setInputProps`.
 
 **Next Steps**:
-- Coordinate core version bump to 2.7.2+ with Player and Renderer agents.
+- Maintain version alignment with Player and Renderer.

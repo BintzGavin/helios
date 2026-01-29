@@ -39,4 +39,4 @@
 - [x] Implement Asset Discovery (Backend & UI).
 
 ### 8. Maintenance
-- [ ] Synchronize package versions (Fix CORE 2.7.1 dependency mismatch in PLAYER/RENDERER).
+- [x] Synchronize package versions (Fix CORE 2.7.1 dependency mismatch in PLAYER/RENDERER).
