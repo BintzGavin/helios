@@ -25,6 +25,8 @@ export type HeliosState = {
 
 export type HeliosSubscriber = (state: HeliosState) => void;
 
+export type StabilityCheck = () => Promise<void>;
+
 export interface HeliosOptions {
   width?: number;
   height?: number;
@@ -87,6 +89,7 @@ export class Helios {
   private _width: Signal<number>;
   private _height: Signal<number>;
   private _playbackRange: Signal<[number, number] | null>;
+  private _stabilityChecks = new Set<StabilityCheck>();
 
   private _disposeActiveCaptionsEffect: () => void;
 
@@ -536,6 +539,21 @@ export class Helios {
     }
   }
 
+  // --- Stability Registry ---
+
+  /**
+   * Registers a custom stability check.
+   * The check function should return a Promise that resolves when the custom system is stable.
+   * @param check The async function to run during waitUntilStable.
+   * @returns A disposal function to unregister the check.
+   */
+  public registerStabilityCheck(check: StabilityCheck): () => void {
+    this._stabilityChecks.add(check);
+    return () => {
+      this._stabilityChecks.delete(check);
+    };
+  }
+
   // --- Playback Controls ---
   public play() {
     if (this._isPlaying.peek()) return;
@@ -587,7 +605,9 @@ export class Helios {
    * Useful for deterministic rendering.
    */
   public async waitUntilStable(): Promise<void> {
-    return this.driver.waitUntilStable();
+    const driverPromise = this.driver.waitUntilStable();
+    const checkPromises = Array.from(this._stabilityChecks).map(check => check());
+    await Promise.all([driverPromise, ...checkPromises]);
   }
 
   /**
@@ -640,6 +660,7 @@ export class Helios {
 
     this.subscriberMap.forEach((dispose) => dispose());
     this.subscriberMap.clear();
+    this._stabilityChecks.clear();
   }
 
   private onTick = (deltaTime: number) => {
