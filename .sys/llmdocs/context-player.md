@@ -23,6 +23,8 @@
 - `loadeddata`: Frame data available.
 - `canplay`: Ready to resume.
 - `canplaythrough`: Ready to play without buffering.
+- `seeking`: Seek operation started.
+- `seeked`: Seek operation completed.
 - `error`: Error occurred (detail contains error info).
 
 ## C. Attributes
@@ -68,6 +70,7 @@ interface HeliosPlayer extends HTMLElement {
   readonly networkState: number;
   readonly buffered: TimeRanges;
   readonly seekable: TimeRanges;
+  readonly played: TimeRanges;
   readonly seeking: boolean;
 }
 ```
