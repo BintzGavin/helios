@@ -38,5 +38,16 @@ export class CdpTimeDriver implements TimeDriver {
     });
 
     this.currentTime = timeInSeconds;
+
+    // Wait for custom stability checks
+    // We use a string-based evaluation to avoid build-tool artifacts
+    const script = `
+      (async () => {
+        if (typeof window.helios !== 'undefined' && typeof window.helios.waitUntilStable === 'function') {
+          await window.helios.waitUntilStable();
+        }
+      })()
+    `;
+    await page.evaluate(script);
   }
 }

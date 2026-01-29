@@ -7,6 +7,7 @@ const tests = [
   'tests/verify-canvas-strategy.ts',
   'tests/verify-captions.ts',
   'tests/verify-cdp-driver.ts',
+  'tests/verify-cdp-driver-stability.ts',
   'tests/verify-codecs.ts',
   'tests/verify-concat.ts',
   'tests/verify-deep-dom.ts',
