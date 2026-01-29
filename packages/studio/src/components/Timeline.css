@@ -2,7 +2,7 @@
   display: flex;
   flex-direction: column;
   width: 100%;
-  height: 60px;
+  height: 80px;
   background: #1e1e1e;
   position: relative;
   user-select: none;
@@ -22,6 +22,7 @@
   border-bottom: 1px solid #333;
   height: 24px;
   align-items: center;
+  flex-shrink: 0;
 }
 
 .timeline-header-left {
@@ -68,9 +69,45 @@
   min-width: 100%;
 }
 
+.timeline-ruler {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 20px;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.timeline-tick {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+}
+
+.timeline-tick-line {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1px;
+  height: 6px;
+  background: #555;
+}
+
+.timeline-tick-label {
+  position: absolute;
+  left: 4px;
+  top: 0;
+  font-size: 9px;
+  color: #666;
+  white-space: nowrap;
+}
+
+/* Adjust vertical alignment to account for ruler */
 .timeline-track {
   position: absolute;
-  top: 50%;
+  top: 60%;
   left: 0;
   right: 0;
   height: 4px;
@@ -81,7 +118,7 @@
 
 .timeline-region {
   position: absolute;
-  top: 50%;
+  top: 60%;
   height: 4px;
   transform: translateY(-50%);
   background: #007bff;
@@ -91,7 +128,7 @@
 
 .timeline-marker {
   position: absolute;
-  top: 50%;
+  top: 60%;
   width: 4px;
   height: 16px;
   background: #007bff;
@@ -133,7 +170,7 @@
 .timeline-playhead::after {
   content: '';
   position: absolute;
-  top: 0;
+  top: 20px; /* Below ruler */
   left: 50%;
   transform: translateX(-50%);
   border-left: 4px solid transparent;
@@ -143,7 +180,7 @@
 
 .timeline-caption-marker {
   position: absolute;
-  top: 50%;
+  top: 60%;
   height: 8px;
   background: #4caf50;
   transform: translateY(-50%);
@@ -155,7 +192,7 @@
 
 .timeline-marker-comp {
   position: absolute;
-  top: 50%;
+  top: 60%;
   width: 8px;
   height: 8px;
   transform: translate(-50%, -50%) rotate(45deg);
@@ -168,4 +205,32 @@
   transform: translate(-50%, -50%) rotate(45deg) scale(1.2);
   z-index: 20;
   border-color: white;
+}
+
+.timeline-hover-guide {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: rgba(255, 255, 255, 0.2);
+  pointer-events: none;
+  z-index: 100;
+  border-left: 1px dashed rgba(255, 255, 255, 0.5);
+}
+
+.timeline-hover-tooltip {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #333;
+  color: #ddd;
+  padding: 2px 4px;
+  font-size: 10px;
+  border-radius: 2px;
+  white-space: nowrap;
+  pointer-events: none;
+  margin-bottom: 2px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+  border: 1px solid #444;
 }
