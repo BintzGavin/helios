@@ -1,5 +1,8 @@
 # CORE Progress Log
 
+## CORE v2.7.2
+- ✅ Completed: Verify Stability Registry - Verified implementation of `registerStabilityCheck` and `waitUntilStable`, updated JSDoc, and cleaned up stale plan.
+
 ## CORE v2.7.1
 - ✅ Completed: Rename Audio Test - Renamed `audio.test.ts` to `helios-audio.test.ts` to clarify structure.
 

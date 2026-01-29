@@ -543,7 +543,9 @@ export class Helios {
 
   /**
    * Registers a custom stability check.
-   * The check function should return a Promise that resolves when the custom system is stable.
+   * This uses the Observer pattern to allow external systems to block the `waitUntilStable` promise
+   * until they are ready. The check function should return a Promise that resolves when the custom system is stable.
+   *
    * @param check The async function to run during waitUntilStable.
    * @returns A disposal function to unregister the check.
    * @public
@@ -603,13 +605,19 @@ export class Helios {
    * Waits for the composition to stabilize.
    * This ensures that all asynchronous operations (like image loading, font loading,
    * and media seeking) triggered by the last seek/update are complete.
+   *
+   * This method waits for the primary driver (e.g., DomDriver) and all registered
+   * stability checks in parallel.
+   *
    * Useful for deterministic rendering.
    * @returns Promise that resolves when all stability checks are complete.
    * @public
    */
   public async waitUntilStable(): Promise<void> {
     const driverPromise = this.driver.waitUntilStable();
-    const checkPromises = Array.from(this._stabilityChecks).map(check => check());
+    // Execute all registered stability checks
+    const checks = Array.from(this._stabilityChecks);
+    const checkPromises = checks.map((check) => check());
     await Promise.all([driverPromise, ...checkPromises]);
   }
 

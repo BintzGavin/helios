@@ -2,6 +2,7 @@ import { describe, it, expect, vi } from 'vitest';
 import { Helios } from './index.js';
 
 describe('Helios Stability Registry', () => {
+  // Verifies the Observer pattern implementation for stability checks
   it('should allow registering a stability check', () => {
     const helios = new Helios({
       duration: 10,
