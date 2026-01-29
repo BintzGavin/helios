@@ -1,38 +1,38 @@
-# Core Domain Context
+# Architectural Context: Core
 
 ## A. Architecture
 
-**Helios State Machine**
-The Core domain implements the "Helios State Machine" pattern.
-1.  **Store**: The `Helios` class holds the application state (e.g., `currentFrame`, `isPlaying`, `duration`) using reactive Signals.
-2.  **Actions**: Public methods (e.g., `play()`, `seek()`, `setDuration()`) modify these internal signals.
-3.  **Subscribers**: External consumers subscribe to state changes via `helios.subscribe()`. The state is exposed as a read-only snapshot.
-4.  **Drivers**: A `TimeDriver` strategy manages synchronization with the environment (e.g., `DomDriver` for WAAPI/MediaElements, `NoopDriver` for headless).
+The Core package (`@helios-project/core`) is the pure TypeScript logic engine for Helios. It manages state, time, and synchronization without depending on any rendering environment (DOM, Canvas, etc.).
+
+**Pattern: Signals & Drivers**
+- **State**: Managed via signals (`_currentFrame`, `_isPlaying`, etc.), exposed as `ReadonlySignal` getters for reactive UI updates.
+- **Time**: Time is advanced by a `Ticker` (RAF or Timeout) and synchronized via a `TimeDriver` (DOM, WAAPI, or No-op).
+- **Synchronization**: The `Helios` instance can drive time (`play()`) or be driven by an external timeline (`bindToDocumentTimeline()`).
 
 ## B. File Tree
 
 ```
 packages/core/src/
 ├── drivers/           # TimeDriver implementations (DomDriver, etc.)
-├── animation.ts       # Animation utilities
-├── captions.ts        # SRT parsing and caption logic
-├── color.ts           # Color parsing and interpolation
+├── animation.ts       # Animation loop logic
+├── captions.ts        # SRT parsing and active cue logic
+├── color.ts           # Color interpolation utilities
 ├── easing.ts          # Easing functions
-├── errors.ts          # Structured error classes
-├── index.ts           # Main entry point and Helios class
+├── errors.ts          # Structured error definitions
+├── index.ts           # Public API entry point (Helios class)
 ├── markers.ts         # Timeline marker logic
 ├── random.ts          # Deterministic PRNG
-├── schema.ts          # Schema validation logic
-├── sequencing.ts      # Sequencing primitives
+├── schema.ts          # Input property schema validation
+├── sequencing.ts      # Sequence/Series helpers
 ├── signals.ts         # Reactive signal implementation
 ├── timecode.ts        # Timecode conversion utilities
-└── transitions.ts     # Transition effects
+└── transitions.ts     # Transition helpers
 ```
 
 ## C. Type Definitions
 
 ```typescript
-// From index.ts
+// index.ts
 export type HeliosState = {
   width: number;
   height: number;
@@ -52,7 +52,6 @@ export type HeliosState = {
 };
 
 export type HeliosSubscriber = (state: HeliosState) => void;
-
 export type StabilityCheck = () => Promise<void>;
 
 export interface HeliosOptions {
@@ -83,18 +82,8 @@ export interface DiagnosticReport {
   userAgent: string;
 }
 
-// From schema.ts
-export type PropType =
-  | 'string'
-  | 'number'
-  | 'boolean'
-  | 'object'
-  | 'array'
-  | 'color'
-  | 'image'
-  | 'video'
-  | 'audio'
-  | 'font';
+// schema.ts
+export type PropType = 'string' | 'number' | 'boolean' | 'object' | 'array' | 'color' | 'image' | 'video' | 'audio' | 'font';
 
 export interface PropDefinition {
   type: PropType;
@@ -111,28 +100,31 @@ export interface PropDefinition {
 
 export type HeliosSchema = Record<string, PropDefinition>;
 
-// From captions.ts
-export interface CaptionCue {
-  id: string;
-  startTime: number; // in milliseconds
-  endTime: number;   // in milliseconds
-  text: string;
-}
-
-// From markers.ts
+// markers.ts
 export interface Marker {
   id: string;
-  time: number; // in seconds
-  label: string;
-  color?: string; // hex code
+  time: number; // seconds
+  label?: string;
+  color?: string;
+}
+
+// captions.ts
+export interface CaptionCue {
+  id: string;
+  start: number;
+  end: number;
+  text: string;
 }
 ```
 
 ## D. Public Methods
 
 ```typescript
-export class Helios {
-  // Readonly Signals
+class Helios {
+  // Static
+  static diagnose(): Promise<DiagnosticReport>;
+
+  // Getters (ReadonlySignal)
   get currentFrame(): ReadonlySignal<number>;
   get loop(): ReadonlySignal<boolean>;
   get isPlaying(): ReadonlySignal<boolean>;
@@ -149,10 +141,11 @@ export class Helios {
   get duration(): number;
   get fps(): number;
 
-  static diagnose(): Promise<DiagnosticReport>;
-
+  // Lifecycle
   constructor(options: HeliosOptions);
+  dispose(): void;
 
+  // State
   getState(): Readonly<HeliosState>;
   setSize(width: number, height: number): void;
   setLoop(shouldLoop: boolean): void;
@@ -169,15 +162,20 @@ export class Helios {
   seekToMarker(id: string): void;
   setPlaybackRange(startFrame: number, endFrame: number): void;
   clearPlaybackRange(): void;
+
+  // Subscription
   subscribe(callback: HeliosSubscriber): () => void;
   unsubscribe(callback: HeliosSubscriber): void;
   registerStabilityCheck(check: StabilityCheck): () => void;
+
+  // Playback
   play(): void;
   pause(): void;
   seek(frame: number): void;
   waitUntilStable(): Promise<void>;
+
+  // Synchronization
   bindToDocumentTimeline(): void;
   unbindFromDocumentTimeline(): void;
-  dispose(): void;
 }
 ```
