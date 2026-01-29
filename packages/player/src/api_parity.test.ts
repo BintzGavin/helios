@@ -140,11 +140,79 @@ describe('HeliosPlayer API Parity', () => {
     expect(player.seekable.end(0)).toBe(10);
   });
 
+  it('should support played property', () => {
+    const played = player.played;
+    expect(played).toBeDefined();
+    expect(played.length).toBe(0);
+
+    // Mock duration via controller
+    const mockController = {
+      getState: () => ({ duration: 10, width: 0, height: 0 }),
+      pause: vi.fn(),
+      dispose: vi.fn(),
+    };
+    (player as any).controller = mockController;
+
+    expect(player.played.length).toBe(1);
+    expect(player.played.start(0)).toBe(0);
+    expect(player.played.end(0)).toBe(10);
+  });
+
   it('should support seeking property', () => {
     expect(player.seeking).toBe(false);
 
     // Simulate scrubbing
     (player as any).isScrubbing = true;
     expect(player.seeking).toBe(true);
+  });
+
+  it('should dispatch seeking and seeked events during scrubbing', () => {
+    const seekingSpy = vi.fn();
+    const seekedSpy = vi.fn();
+    player.addEventListener('seeking', seekingSpy);
+    player.addEventListener('seeked', seekedSpy);
+
+    const mockController = {
+      getState: () => ({ isPlaying: false }),
+      pause: vi.fn(),
+      play: vi.fn(),
+      dispose: vi.fn(),
+    };
+    (player as any).controller = mockController;
+
+    // Simulate start scrub
+    (player as any).handleScrubStart();
+    expect(seekingSpy).toHaveBeenCalledTimes(1);
+    expect(player.seeking).toBe(true);
+
+    // Simulate end scrub
+    (player as any).handleScrubEnd();
+    expect(seekedSpy).toHaveBeenCalledTimes(1);
+    expect(player.seeking).toBe(false);
+  });
+
+  it('should dispatch seeking and seeked events during programmatic seek', () => {
+    const seekingSpy = vi.fn();
+    const seekedSpy = vi.fn();
+    player.addEventListener('seeking', seekingSpy);
+    player.addEventListener('seeked', seekedSpy);
+
+    const mockController = {
+      getState: () => ({ fps: 30, duration: 10 }),
+      seek: vi.fn(),
+      pause: vi.fn(),
+      dispose: vi.fn(),
+    };
+    (player as any).controller = mockController;
+
+    player.currentTime = 5;
+    expect(seekingSpy).toHaveBeenCalledTimes(1);
+    expect(mockController.seek).toHaveBeenCalledWith(150); // 5 * 30
+    expect(seekedSpy).toHaveBeenCalledTimes(1);
+
+    player.currentFrame = 10;
+    expect(seekingSpy).toHaveBeenCalledTimes(2);
+    expect(mockController.seek).toHaveBeenCalledWith(10);
+    expect(seekedSpy).toHaveBeenCalledTimes(2);
   });
 });

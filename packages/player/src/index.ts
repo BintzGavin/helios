@@ -426,6 +426,10 @@ export class HeliosPlayer extends HTMLElement {
     return new StaticTimeRange(0, this.duration);
   }
 
+  public get played(): TimeRanges {
+    return new StaticTimeRange(0, this.duration);
+  }
+
   public get videoWidth(): number {
     if (this.controller) {
       const state = this.controller.getState();
@@ -452,7 +456,9 @@ export class HeliosPlayer extends HTMLElement {
     if (this.controller) {
       const s = this.controller.getState();
       if (s.fps) {
+        this.dispatchEvent(new Event("seeking"));
         this.controller.seek(Math.floor(val * s.fps));
+        this.dispatchEvent(new Event("seeked"));
       }
     }
   }
@@ -463,7 +469,9 @@ export class HeliosPlayer extends HTMLElement {
 
   public set currentFrame(val: number) {
     if (this.controller) {
+      this.dispatchEvent(new Event("seeking"));
       this.controller.seek(Math.floor(val));
+      this.dispatchEvent(new Event("seeked"));
     }
   }
 
@@ -1069,6 +1077,7 @@ export class HeliosPlayer extends HTMLElement {
   private handleScrubStart = () => {
     if (!this.controller) return;
     this.isScrubbing = true;
+    this.dispatchEvent(new Event("seeking"));
     const state = this.controller.getState();
     this.wasPlayingBeforeScrub = state.isPlaying;
 
@@ -1080,6 +1089,7 @@ export class HeliosPlayer extends HTMLElement {
   private handleScrubEnd = () => {
     if (!this.controller) return;
     this.isScrubbing = false;
+    this.dispatchEvent(new Event("seeked"));
 
     if (this.wasPlayingBeforeScrub) {
       this.controller.play();
