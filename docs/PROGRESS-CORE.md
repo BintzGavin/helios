@@ -1,5 +1,8 @@
 # CORE Progress Log
 
+## CORE v2.7.0
+- ✅ Completed: Implement Stability Registry - Implemented stability registry pattern in `Helios` allowing external consumers to register async checks for `waitUntilStable`.
+
 ## CORE v2.6.1
 - ✅ Completed: Fix bindToDocumentTimeline Sync - Updated `Helios.bindToDocumentTimeline` to propagate time updates to the active `TimeDriver`, ensuring media synchronization when driven externally.
 
