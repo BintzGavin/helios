@@ -1,10 +1,11 @@
 # Status: DEMO (Executor)
-**Version**: 1.50.0
+**Version**: 1.51.0
 
 ## Vision
 To provide comprehensive, idiomatic examples for every major framework (React, Vue, Svelte, Vanilla) and robust end-to-end testing to ensure the Helios engine delivers on its "Use What You Know" promise.
 
 ## Current State
+- **Solid DOM**: ✅ `examples/solid-dom-animation` exists and works (Demonstrates integration with SolidJS signals for DOM updates).
 - **Solid Canvas**: ✅ `examples/solid-canvas-animation` exists and works (Demonstrates integration with SolidJS signals via `createHeliosSignal` adapter).
 - **React Styled Components**: ✅ `examples/react-styled-components` exists and works (Demonstrates `styled-components` integration with `autoSyncAnimations`).
 - **Variable Font**: ✅ `examples/variable-font-animation` exists and works (Demonstrates `autoSyncAnimations` driving CSS `font-variation-settings`).
@@ -45,6 +46,7 @@ To provide comprehensive, idiomatic examples for every major framework (React, V
 - **E2E Tests**: ✅ Verified all existing examples via `tests/e2e/verify-render.ts`.
 
 ## Backlog
+- [x] Scaffold Solid DOM Example (`examples/solid-dom-animation`)
 - [x] Scaffold React Three Fiber Example (`examples/react-three-fiber`)
 - [x] Scaffold Chart.js Animation Example (`examples/chartjs-animation`)
 - [x] Scaffold Procedural Generation Example (`examples/procedural-generation`)
@@ -75,6 +77,7 @@ To provide comprehensive, idiomatic examples for every major framework (React, V
 None.
 
 ## Log
+- [v1.51.0] ✅ Completed: Solid DOM Example - Created `examples/solid-dom-animation` demonstrating integration with SolidJS signals for DOM updates.
 - [v1.50.0] ✅ Completed: Podcast Visualizer - Created `examples/podcast-visualizer` demonstrating multi-track audio mixing and sync verification.
 - [v1.49.1] ✅ Completed: Solid Canvas Documentation - Added README for SolidJS example and verified E2E tests.
 - [v1.49.0] ✅ Completed: Solid Canvas Example - Created `examples/solid-canvas-animation` demonstrating integration with SolidJS and `createHeliosSignal` adapter.
