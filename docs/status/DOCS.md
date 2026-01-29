@@ -1,8 +1,15 @@
-**Version**: 1.3.0
+**Version**: 1.4.0
 
 # DOCS Status
 
 ## Recent Updates
+[v1.4.0] ✅ Completed: Daily Documentation Review - Comprehensive sync.
+- Updated all Changelogs (Core v2.7.2, Renderer v1.38.1, Player v0.33.2, Demo v1.54.0, Studio v0.48.0).
+- Updated API Docs: Core (`registerStabilityCheck`), Player (`videoWidth`, `videoHeight`, `buffered`, etc.).
+- Updated Studio Guide: Added sections for Create/Delete Composition, Timecode, Safe Areas, and Asset Drag & Drop.
+- Created Example Docs: Map Animation, Solid DOM Animation, Podcast Visualizer.
+- Updated `mint.json` navigation.
+
 [v1.3.0] ✅ Completed: Daily Documentation Review - Comprehensive sync.
 - Updated all Changelogs (Core v2.0.0, Renderer v1.29.0, Player v0.26.1, Demo v1.46.0, Studio v0.37.0).
 - Updated API Docs: Core (`waitUntilStable`, `bindToDocumentTimeline`), Renderer (Subtitles), Player (`ClientSideExporter`, attributes).

@@ -42,7 +42,10 @@
         "examples/d3-animation",
         "examples/animation-helpers",
         "examples/styling",
-        "examples/advanced"
+        "examples/advanced",
+        "examples/map-animation",
+        "examples/solid-dom-animation",
+        "examples/podcast-visualizer"
       ]
     },
     {
