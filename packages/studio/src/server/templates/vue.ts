@@ -1,9 +1,10 @@
-import { Template } from './types';
+import { Template, CompositionOptions } from './types';
 
 export const vueTemplate: Template = {
   id: 'vue',
   label: 'Vue',
-  generate: (name: string) => {
+  generate: (name: string, options: CompositionOptions) => {
+    const { fps, duration } = options;
     const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -32,8 +33,8 @@ import { Helios } from '@helios-project/core';
 import { useVideoFrame } from './composables/useVideoFrame';
 
 // Initialize Helios singleton
-const duration = 5;
-const fps = 30;
+const duration = ${duration};
+const fps = ${fps};
 const helios = new Helios({ duration, fps });
 helios.bindToDocumentTimeline();
 

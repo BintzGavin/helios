@@ -1,3 +1,6 @@
+## STUDIO v0.51.0
+- ✅ Completed: Composition Metadata - Implemented support for defining and persisting composition metadata (Width, Height, FPS, Duration) during creation, and respecting these settings in the Studio UI.
+
 ## STUDIO v0.50.0
 - ✅ Completed: Vue & Svelte Templates - Implemented Vue and Svelte templates for the composition creator, including support for Vue 3 Composition API and Svelte 5 Runes.
 

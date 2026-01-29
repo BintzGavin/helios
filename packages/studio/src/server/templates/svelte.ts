@@ -1,9 +1,10 @@
-import { Template } from './types';
+import { Template, CompositionOptions } from './types';
 
 export const svelteTemplate: Template = {
   id: 'svelte',
   label: 'Svelte',
-  generate: (name: string) => {
+  generate: (name: string, options: CompositionOptions) => {
+    const { fps, duration } = options;
     const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -35,8 +36,8 @@ export default app;
   import { Helios } from '@helios-project/core';
   import { createHeliosStore } from './lib/store';
 
-  const duration = 5;
-  const fps = 30;
+  const duration = ${duration};
+  const fps = ${fps};
 
   // Initialize Helios
   const helios = new Helios({

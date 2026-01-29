@@ -36,6 +36,15 @@
   gap: 8px;
 }
 
+.create-modal-row {
+  display: flex;
+  gap: 10px;
+}
+
+.create-modal-row .create-modal-input-group {
+  flex: 1;
+}
+
 .create-modal-input-group label {
   font-size: 14px;
   color: #aaa;

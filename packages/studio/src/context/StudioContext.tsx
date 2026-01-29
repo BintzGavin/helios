@@ -2,11 +2,19 @@ import React, { createContext, useContext, useState, useEffect, useRef } from 'r
 import { type HeliosController, ClientSideExporter } from '@helios-project/player';
 import type { HeliosSchema, CaptionCue, Marker } from '@helios-project/core';
 
+export interface CompositionMetadata {
+  width: number;
+  height: number;
+  fps: number;
+  duration: number;
+}
+
 export interface Composition {
   id: string;
   name: string;
   url: string;
   description?: string;
+  metadata?: CompositionMetadata;
 }
 
 export interface Asset {
@@ -81,7 +89,7 @@ interface StudioContextType {
 
   isCreateOpen: boolean;
   setCreateOpen: (isOpen: boolean) => void;
-  createComposition: (name: string, template?: string) => Promise<void>;
+  createComposition: (name: string, template?: string, options?: CompositionMetadata) => Promise<void>;
   deleteComposition: (id: string) => Promise<void>;
 
   // Assets
@@ -202,12 +210,12 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     }
   };
 
-  const createComposition = async (name: string, template?: string) => {
+  const createComposition = async (name: string, template?: string, options?: CompositionMetadata) => {
     try {
       const res = await fetch('/api/compositions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, template })
+        body: JSON.stringify({ name, template, ...options })
       });
 
       if (!res.ok) {
@@ -284,6 +292,14 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     setInPoint(0);
     setOutPoint(0);
   }, [activeComposition?.id]);
+
+  // Update canvas size when composition metadata is available
+  useEffect(() => {
+    if (activeComposition?.metadata) {
+      const { width, height } = activeComposition.metadata;
+      setCanvasSize({ width, height });
+    }
+  }, [activeComposition]);
 
   // Initialize outPoint when duration becomes available
   useEffect(() => {

@@ -1,9 +1,10 @@
-import { Template } from './types';
+import { Template, CompositionOptions } from './types';
 
 export const reactTemplate: Template = {
   id: 'react',
   label: 'React',
-  generate: (name: string) => {
+  generate: (name: string, options: CompositionOptions) => {
+    const { fps, duration } = options;
     const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -29,7 +30,7 @@ const App = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
-    const helios = new Helios({ duration: 5, fps: 30 });
+    const helios = new Helios({ duration: ${duration}, fps: ${fps} });
     helios.bindToDocumentTimeline();
 
     const canvas = canvasRef.current;

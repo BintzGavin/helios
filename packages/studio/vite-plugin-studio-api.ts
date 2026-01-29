@@ -81,14 +81,21 @@ function configureMiddlewares(server: ViteDevServer | PreviewServer, isPreview: 
           if (req.method === 'POST') {
              try {
                 const body = await getBody(req);
-                const { name, template } = body;
+                const { name, template, width, height, fps, duration } = body;
                 if (!name) {
                   res.statusCode = 400;
                   res.end(JSON.stringify({ error: 'Name is required' }));
                   return;
                 }
 
-                const newComp = createComposition(process.cwd(), name, template);
+                const options = (width && height && fps && duration) ? {
+                    width: Number(width),
+                    height: Number(height),
+                    fps: Number(fps),
+                    duration: Number(duration)
+                } : undefined;
+
+                const newComp = createComposition(process.cwd(), name, template, options);
                 res.setHeader('Content-Type', 'application/json');
                 res.end(JSON.stringify(newComp));
              } catch (e: any) {
