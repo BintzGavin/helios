@@ -1,3 +1,6 @@
+## RENDERER v1.38.1
+- ✅ Completed: Fix Build and Dependencies - Updated `@helios-project/core` dependency to `2.7.1` in `packages/renderer`, modernized render script to use `tsx`, and fixed `verify-smart-codec-selection` test mock to support frame scanning.
+
 ## RENDERER v1.38.0
 - ✅ Completed: Canvas Implicit Audio - Implemented `scanForAudioTracks` utility and updated `CanvasStrategy` to automatically discover and include DOM-based audio/video elements in the render, unifying behavior with `DomStrategy`.
 

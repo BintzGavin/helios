@@ -31,7 +31,7 @@
     "dev:d3": "vite serve examples/d3-animation",
     "dev:procedural": "vite serve examples/procedural-generation",
     "build:examples": "vite build -c vite.build-example.config.js",
-    "render:canvas-example": "npm run build:examples && ts-node packages/renderer/scripts/render.ts"
+    "render:canvas-example": "npm run build:examples && npx tsx packages/renderer/scripts/render.ts"
   },
   "devDependencies": {
     "@playwright/test": "^1.58.0",
