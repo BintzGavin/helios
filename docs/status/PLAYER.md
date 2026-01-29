@@ -1,4 +1,4 @@
-**Version**: v0.37.0
+**Version**: v0.38.0
 
 # Status: PLAYER
 
@@ -36,6 +36,7 @@
 ## Critical Task
 - **None**: Recent task completed.
 
+[v0.38.0] ✅ Completed: Visualize Playback Range - Implemented visual indicator for playback range on the timeline scrubber using CSS gradients and `updateUI` logic.
 [v0.37.0] ✅ Completed: CSS Variables for Theming - Exposed CSS variables to enable theming of the player controls and UI.
 [v0.36.0] ✅ Completed: ControlsList Support - Implemented `controlslist` attribute support to allow hiding Export and Fullscreen buttons (`nodownload`, `nofullscreen`).
 [v0.35.1] ✅ Completed: Implement error and currentSrc properties - Added `error` and `currentSrc` getters to `HeliosPlayer` to complete HTMLMediaElement parity.

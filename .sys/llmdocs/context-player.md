@@ -55,4 +55,6 @@ The component exposes the following CSS variables for theming:
 - `--helios-text-color`: Text and icon color.
 - `--helios-accent-color`: Accent color (e.g., active states, buttons).
 - `--helios-range-track-color`: Background color of sliders/scrubbers.
+- `--helios-range-selected-color`: Color of the playback range region on the scrubber.
+- `--helios-range-unselected-color`: Color of the scrubber track outside the range.
 - `--helios-font-family`: Font family for the player UI.
