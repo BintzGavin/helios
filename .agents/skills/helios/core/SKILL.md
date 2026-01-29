@@ -167,6 +167,21 @@ helios.bindToDocumentTimeline()    // Start polling document.timeline
 helios.unbindFromDocumentTimeline() // Stop polling
 ```
 
+#### Stability Registry
+Register asynchronous checks that the Renderer must await before capturing frames (e.g., loading fonts, models, or data).
+
+```typescript
+// Register a promise that resolves when ready
+helios.registerStabilityCheck(
+  fetch('/data.json').then(r => r.json()).then(data => {
+    // Process data...
+  })
+);
+
+// Renderer calls this internally to ensure readiness
+await helios.waitUntilStable();
+```
+
 #### Diagnostics
 Check browser capabilities for rendering.
 

@@ -58,6 +58,7 @@ interface RendererOptions {
   crf?: number;                  // Constant Rate Factor (quality control)
   preset?: string;               // Encoding preset (e.g., 'fast')
   videoBitrate?: string;         // e.g., '5M', '1000k'
+  subtitles?: boolean;           // Burn subtitles into video (requires libx264)
 
   // Intermediate Capture (Canvas Mode)
   intermediateVideoCodec?: string; // 'vp8' (default), 'vp9', 'av1'
@@ -98,10 +99,10 @@ interface RenderJobOptions {
 ```
 
 #### Diagnose
-Check the rendering environment (Playwright, WebCodecs support, etc.).
+Check the rendering environment (Playwright, WebCodecs support, FFmpeg).
 
 ```typescript
-// Returns a diagnostic report from the browser context
+// Returns a diagnostic report from the browser context and local environment
 const diagnostics = await renderer.diagnose();
 ```
 
@@ -113,10 +114,15 @@ const diagnostics = await renderer.diagnose();
 - **Performance:** High. Fast capture via CDP.
 
 ### DOM Mode (`mode: 'dom'`)
-- **Best for:** CSS Animations, HTML/DOM elements.
+- **Best for:** CSS Animations, HTML/DOM elements, complex video/audio compositions.
 - **Mechanism:** Uses `SeekTimeDriver` (seek & screenshot) to ensure DOM layouts settle.
 - **Performance:** Slower than Canvas mode due to full-page screenshots.
 - **Implicit Audio:** Automatically discovers `<audio>` and `<video>` tags in the DOM and includes their audio in the render.
+- **Media Synchronization:** Supports precise control over nested media elements using attributes:
+  - `data-helios-offset="2.5"`: Delay playback start by 2.5 seconds.
+  - `data-helios-seek="10"`: Start playing from 10s into the source file.
+  - `muted`: Respects the HTML `muted` attribute.
+- **Stability:** Waits for `seeked` events on all media elements (Multi-Frame Seek) to ensure frames are perfectly aligned before capturing.
 
 ## Utilities
 
@@ -130,6 +136,17 @@ await concatenateVideos(['part1.mp4', 'part2.mp4'], 'full-video.mp4');
 ```
 
 ## Common Patterns
+
+### Caption Burning
+Burn subtitles (e.g. from the player) into the video output. Requires `videoCodec: 'libx264'`.
+
+```typescript
+const renderer = new Renderer({
+  // ...
+  videoCodec: 'libx264',
+  subtitles: true
+});
+```
 
 ### Audio Mixing
 Mix multiple audio tracks with offsets and volume control.

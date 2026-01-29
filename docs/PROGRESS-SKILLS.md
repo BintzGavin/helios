@@ -1,5 +1,15 @@
 # SKILLS Progress Log
 
+## SKILLS v1.5.0
+- ✅ Completed: Daily Skills Review
+  - Updated API skills for `core` (Stability Registry)
+  - Updated API skills for `renderer` (Subtitles, Media Attributes, Diagnose)
+  - Updated API skills for `player` (Read-only properties, Events)
+  - Created example skill for `solid` (Helios Signal pattern)
+  - Created example skill for `pixi` (Timeline binding)
+  - Created example skill for `chartjs` (Animation disabling)
+  - Created example skill for `lottie` (Time-based seeking)
+
 ## SKILLS v1.4.0
 - ✅ Completed: Daily Skills Review
   - Updated API skills for `core` (Markers, Playback Range, setFps details)
