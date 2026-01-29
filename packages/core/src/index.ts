@@ -201,16 +201,6 @@ export class Helios {
       userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : 'Node/Server',
     };
 
-    console.group('Helios Diagnostics');
-    console.log('WAAPI Support:', report.waapi ? '✅' : '❌');
-    console.log('WebCodecs Support:', report.webCodecs ? '✅' : '❌');
-    console.log('OffscreenCanvas Support:', report.offscreenCanvas ? '✅' : '❌');
-    console.log('User Agent:', report.userAgent);
-
-    if (!report.webCodecs) console.warn('Hardware accelerated rendering requires WebCodecs.');
-    console.log('To verify GPU acceleration, please visit: chrome://gpu');
-    console.groupEnd();
-
     return report;
   }
 

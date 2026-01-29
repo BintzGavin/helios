@@ -5,7 +5,7 @@ The headless logic engine for Helios. This package provides the core state manag
 ## Features
 
 - **Headless State Machine**: Manages frame, playback state, and input properties via reactive Signals.
-- **Time Driver**: Abstracted time control supporting `requestAnimationFrame` (Browser), `setImmediate` (Node), and Web Animations API (WAAPI).
+- **Time Driver**: Abstracted time control via `DomDriver` (Browser default, supports WAAPI & Media Elements) and `TimeoutTicker` (Node.js).
 - **Sequencing**: Helpers for relative timing (`sequence`) and sequential layout (`series`).
 - **Animation Helpers**: Functions for `interpolate` (with easing) and `spring` physics.
 - **Diagnostics**: Environment capability detection (`diagnose`).
@@ -126,4 +126,4 @@ Helios.diagnose().then((report) => {
 
 ## License
 
-MIT
+Elastic License 2.0 (ELv2)
