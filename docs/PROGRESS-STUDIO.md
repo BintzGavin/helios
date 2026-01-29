@@ -1,3 +1,6 @@
+## STUDIO v0.49.0
+- ✅ Completed: Composition Templates - Implemented template system (Vanilla JS, React) for creating new compositions, adding a template selector to the creation modal.
+
 ## STUDIO v0.48.1
 - ✅ Completed: Refactor Loop Logic - Moved loop enforcement logic from `App.tsx` to `StudioContext.tsx` to centralize playback state management.
 

@@ -81,14 +81,14 @@ function configureMiddlewares(server: ViteDevServer | PreviewServer, isPreview: 
           if (req.method === 'POST') {
              try {
                 const body = await getBody(req);
-                const { name } = body;
+                const { name, template } = body;
                 if (!name) {
                   res.statusCode = 400;
                   res.end(JSON.stringify({ error: 'Name is required' }));
                   return;
                 }
 
-                const newComp = createComposition(process.cwd(), name);
+                const newComp = createComposition(process.cwd(), name, template);
                 res.setHeader('Content-Type', 'application/json');
                 res.end(JSON.stringify(newComp));
              } catch (e: any) {

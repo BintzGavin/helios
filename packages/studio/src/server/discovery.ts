@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import { templates, TemplateId } from './templates';
 
 export interface CompositionInfo {
   id: string;
@@ -79,7 +80,7 @@ export function deleteComposition(rootDir: string, id: string): void {
   fs.rmSync(compDir, { recursive: true, force: true });
 }
 
-export function createComposition(rootDir: string, name: string): CompositionInfo {
+export function createComposition(rootDir: string, name: string, templateId: string = 'vanilla'): CompositionInfo {
   const projectRoot = getProjectRoot(rootDir);
 
   // Sanitize name: lowercase, replace spaces with hyphens, remove special chars
@@ -94,56 +95,17 @@ export function createComposition(rootDir: string, name: string): CompositionInf
     throw new Error(`Composition "${name}" (directory: ${dirName}) already exists`);
   }
 
+  const template = templates[templateId] || templates['vanilla'];
+  if (!template) {
+      throw new Error(`Template "${templateId}" not found`);
+  }
+
   fs.mkdirSync(compDir, { recursive: true });
 
-  const template = `<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${name}</title>
-  <style>
-    body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background-color: #000; }
-    canvas { display: block; width: 100%; height: 100%; }
-  </style>
-</head>
-<body>
-  <canvas id="canvas"></canvas>
-  <script type="module">
-    import { Helios } from '@helios-project/core';
-
-    const canvas = document.getElementById('canvas');
-    const ctx = canvas.getContext('2d');
-
-    const resize = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-    };
-    window.addEventListener('resize', resize);
-    resize();
-
-    const helios = new Helios({ duration: 5, fps: 30 });
-    helios.bindToDocumentTimeline();
-
-    helios.subscribe((state) => {
-      const { width, height } = canvas;
-      const t = state.time; // in seconds
-
-      ctx.fillStyle = '#000';
-      ctx.fillRect(0, 0, width, height);
-
-      ctx.fillStyle = '#fff';
-      const x = (Math.sin(t) + 1) / 2 * (width - 100) + 50;
-      const y = height / 2;
-      ctx.beginPath();
-      ctx.arc(x, y, 50, 0, Math.PI * 2);
-      ctx.fill();
-    });
-  </script>
-</body>
-</html>`;
-
-  fs.writeFileSync(path.join(compDir, 'composition.html'), template);
+  const files = template.generate(name);
+  for (const file of files) {
+      fs.writeFileSync(path.join(compDir, file.path), file.content);
+  }
 
   // Return the new composition info
   const displayName = dirName

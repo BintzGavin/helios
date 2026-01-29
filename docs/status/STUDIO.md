@@ -1,4 +1,4 @@
-**Version**: 0.48.1
+**Version**: 0.49.0
 
 # Studio Domain Status
 
@@ -7,6 +7,7 @@
 **Focus**: UI Implementation & CLI
 
 ## Recent Updates
+- [v0.49.0] ✅ Completed: Composition Templates - Implemented template system (Vanilla JS, React) for creating new compositions, adding a template selector to the creation modal.
 - [v0.48.1] ✅ Completed: Timeline Polish - Implemented Ruler with dynamic ticks, Hover Guide with timecode tooltip, and Magnetic Snapping (to markers/in/out) for the Timeline.
 - [v0.48.1] ✅ Completed: Refactor Loop Logic - Moved loop enforcement logic from `App.tsx` to `StudioContext.tsx` to centralize playback state management.
 - [v0.48.0] ✅ Verified: Maintenance - Synced package.json version and fixed test environment by mocking ResizeObserver.

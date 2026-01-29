@@ -81,7 +81,7 @@ interface StudioContextType {
 
   isCreateOpen: boolean;
   setCreateOpen: (isOpen: boolean) => void;
-  createComposition: (name: string) => Promise<void>;
+  createComposition: (name: string, template?: string) => Promise<void>;
   deleteComposition: (id: string) => Promise<void>;
 
   // Assets
@@ -202,12 +202,12 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     }
   };
 
-  const createComposition = async (name: string) => {
+  const createComposition = async (name: string, template?: string) => {
     try {
       const res = await fetch('/api/compositions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name })
+        body: JSON.stringify({ name, template })
       });
 
       if (!res.ok) {
