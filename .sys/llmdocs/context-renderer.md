@@ -43,6 +43,7 @@ The `RendererOptions` interface controls the render pipeline:
 - `fps`: Target frame rate.
 - `durationInSeconds`: Total length of the video.
 - `mode`: `'dom'` or `'canvas'`.
+- `browserConfig`: Object to customize Playwright browser launch (`headless`, `args`, `executablePath`).
 - `videoCodec`: `'libx264'` (default), `'copy'`, or others.
 - `audioCodec`: `'aac'` (default), `'libvorbis'`, etc.
 - `audioFilePath`: Path to external audio file to mix in.

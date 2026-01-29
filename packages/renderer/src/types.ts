@@ -23,7 +23,30 @@ export interface AudioTrackConfig {
   seek?: number;
 }
 
+export interface BrowserConfig {
+  /**
+   * Whether to run the browser in headless mode. Defaults to true.
+   */
+  headless?: boolean;
+
+  /**
+   * Path to a browser executable to use instead of the bundled Chromium.
+   */
+  executablePath?: string;
+
+  /**
+   * Additional arguments to pass to the browser instance.
+   * These will be merged with the default arguments.
+   */
+  args?: string[];
+}
+
 export interface RendererOptions {
+  /**
+   * Configuration for the Playwright browser instance.
+   */
+  browserConfig?: BrowserConfig;
+
   width: number;
   height: number;
   fps: number;
