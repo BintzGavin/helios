@@ -2,7 +2,7 @@ import React from 'react';
 import { useStudio } from '../../context/StudioContext';
 
 export const PlaybackControls: React.FC = () => {
-  const { controller, playerState, loop, toggleLoop } = useStudio();
+  const { controller, playerState, loop, toggleLoop, inPoint, outPoint } = useStudio();
   const { isPlaying, currentFrame, duration, fps, playbackRate, volume, muted } = playerState;
   const totalFrames = duration * fps;
 
@@ -32,8 +32,9 @@ export const PlaybackControls: React.FC = () => {
       controller.pause();
     } else {
       // If at end, restart
-      if (currentFrame >= totalFrames - 1) {
-        controller.seek(0);
+      const loopEnd = outPoint > 0 ? outPoint : totalFrames;
+      if (currentFrame >= loopEnd - 1) {
+        controller.seek(inPoint);
       }
       controller.play();
     }
@@ -41,7 +42,7 @@ export const PlaybackControls: React.FC = () => {
 
   const handleRewind = () => {
     if (controller) {
-      controller.seek(0);
+      controller.seek(inPoint);
     }
   };
 

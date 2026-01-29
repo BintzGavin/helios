@@ -90,9 +90,13 @@ describe('GlobalShortcuts', () => {
   });
 
   it('rewinds with Home', () => {
+    (StudioContext.useStudio as any).mockReturnValue({
+      ...defaultContext,
+      inPoint: 50
+    });
     render(<GlobalShortcuts />);
     fireEvent.keyDown(window, { key: 'Home' });
-    expect(mockSeek).toHaveBeenCalledWith(0);
+    expect(mockSeek).toHaveBeenCalledWith(50);
   });
 
   it('toggles loop with L', () => {

@@ -53,13 +53,13 @@ Options:
 - `--root <path>`: Project root directory
 
 ## D. UI Components
-- **Timeline**: Visual track of the video, supports markers, captions, zooming.
+- **Timeline**: Visual track of the video, supports markers, captions, zooming, SMPTE timecode display, and In/Out points.
 - **PropsEditor**: Auto-generated inputs based on composition schema (supports Asset selection, Drag & Drop).
 - **Stage**: Renders the `<helios-player>` or canvas. Supports Safe Area Guides and Transparency Grid.
 - **StageToolbar**: Controls for Zoom, Fit, Transparency Grid, Snapshot, and Safe Area Guides.
 - **GlobalShortcuts**: Headless component managing keyboard interactions.
 - **CompositionSwitcher**: Modal to switch between compositions (Cmd+K), supports deletion.
-- **PlaybackControls**: Buttons for play, pause, seek, loop, volume.
+- **PlaybackControls**: Buttons for play, pause, seek, loop, volume, Rewind to In Point.
 - **KeyboardShortcutsModal**: Displays available shortcuts.
 - **CreateCompositionModal**: Modal for creating new compositions.
 - **AssetsPanel**: Drag-and-drop asset management (upload & drag to props).
