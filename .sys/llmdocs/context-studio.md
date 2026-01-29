@@ -17,6 +17,7 @@ packages/studio/
       AssetsPanel/
       CaptionsPanel/
       Controls/
+        PlaybackControls.test.tsx
         PlaybackControls.tsx
       Layout/
       Sidebar/
