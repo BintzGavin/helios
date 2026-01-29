@@ -47,3 +47,12 @@ The component observes the following attributes:
 - `export-format`: Format for client-side export (`mp4`, `webm`).
 - `input-props`: JSON string of properties to pass to the composition.
 - `controlslist`: Space-separated tokens to customize UI (`nodownload`, `nofullscreen`).
+
+## D. Styling
+The component exposes the following CSS variables for theming:
+
+- `--helios-controls-bg`: Background color of the controls bar.
+- `--helios-text-color`: Text and icon color.
+- `--helios-accent-color`: Accent color (e.g., active states, buttons).
+- `--helios-range-track-color`: Background color of sliders/scrubbers.
+- `--helios-font-family`: Font family for the player UI.

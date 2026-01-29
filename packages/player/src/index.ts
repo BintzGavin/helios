@@ -43,7 +43,14 @@ template.innerHTML = `
       aspect-ratio: 16 / 9;
       background-color: #f0f0f0;
       position: relative;
-      font-family: sans-serif;
+      font-family: var(--helios-font-family, sans-serif);
+
+      /* CSS Variables for Theming */
+      --helios-controls-bg: rgba(0, 0, 0, 0.6);
+      --helios-text-color: white;
+      --helios-accent-color: #007bff;
+      --helios-range-track-color: #555;
+      --helios-font-family: sans-serif;
     }
     iframe {
       width: 100%;
@@ -55,11 +62,11 @@ template.innerHTML = `
       bottom: 0;
       left: 0;
       right: 0;
-      background: rgba(0, 0, 0, 0.6);
+      background: var(--helios-controls-bg);
       display: flex;
       align-items: center;
       padding: 8px;
-      color: white;
+      color: var(--helios-text-color);
       transition: opacity 0.3s;
       z-index: 2;
     }
@@ -70,7 +77,7 @@ template.innerHTML = `
     .play-pause-btn {
       background: none;
       border: none;
-      color: white;
+      color: var(--helios-text-color);
       font-size: 24px;
       cursor: pointer;
       width: 40px;
@@ -84,7 +91,7 @@ template.innerHTML = `
     .volume-btn {
       background: none;
       border: none;
-      color: white;
+      color: var(--helios-text-color);
       font-size: 20px;
       cursor: pointer;
       width: 32px;
@@ -98,7 +105,7 @@ template.innerHTML = `
       margin-left: 4px;
       height: 4px;
       -webkit-appearance: none;
-      background: #555;
+      background: var(--helios-range-track-color);
       outline: none;
       border-radius: 2px;
     }
@@ -107,14 +114,14 @@ template.innerHTML = `
       appearance: none;
       width: 12px;
       height: 12px;
-      background: #fff;
+      background: var(--helios-text-color);
       cursor: pointer;
       border-radius: 50%;
     }
     .export-btn {
-      background-color: #007bff;
+      background-color: var(--helios-accent-color);
       border: none;
-      color: white;
+      color: var(--helios-text-color);
       font-size: 14px;
       font-weight: bold;
       cursor: pointer;
@@ -123,7 +130,7 @@ template.innerHTML = `
       border-radius: 4px;
     }
     .export-btn:hover {
-      background-color: #0056b3;
+      filter: brightness(0.9);
     }
     .export-btn:disabled {
       background-color: #666;
@@ -135,7 +142,7 @@ template.innerHTML = `
       -webkit-appearance: none;
       width: 100%;
       height: 8px;
-      background: #555;
+      background: var(--helios-range-track-color);
       outline: none;
       opacity: 0.9;
       transition: opacity .2s;
@@ -145,7 +152,7 @@ template.innerHTML = `
       appearance: none;
       width: 16px;
       height: 16px;
-      background: #007bff;
+      background: var(--helios-accent-color);
       cursor: pointer;
       border-radius: 50%;
     }
@@ -191,8 +198,8 @@ template.innerHTML = `
     }
     .speed-selector {
       background: rgba(0, 0, 0, 0.4);
-      color: white;
-      border: 1px solid #555;
+      color: var(--helios-text-color);
+      border: 1px solid var(--helios-range-track-color);
       border-radius: 4px;
       padding: 4px 8px;
       margin-left: 8px;
@@ -204,12 +211,12 @@ template.innerHTML = `
     }
     .speed-selector:focus {
       outline: none;
-      border-color: #007bff;
+      border-color: var(--helios-accent-color);
     }
     .fullscreen-btn {
       background: none;
       border: none;
-      color: white;
+      color: var(--helios-text-color);
       font-size: 20px;
       cursor: pointer;
       width: 40px;
@@ -217,7 +224,7 @@ template.innerHTML = `
       margin-left: 8px;
     }
     .fullscreen-btn:hover {
-      color: #007bff;
+      color: var(--helios-accent-color);
     }
     .captions-container {
       position: absolute;
@@ -245,7 +252,7 @@ template.innerHTML = `
     .cc-btn {
       background: none;
       border: none;
-      color: white;
+      color: var(--helios-text-color);
       font-size: 14px;
       font-weight: bold;
       cursor: pointer;
@@ -262,8 +269,8 @@ template.innerHTML = `
     }
     .cc-btn.active {
       opacity: 1;
-      color: #007bff;
-      border-bottom: 2px solid #007bff;
+      color: var(--helios-accent-color);
+      border-bottom: 2px solid var(--helios-accent-color);
     }
     .poster-container {
       position: absolute;
