@@ -546,6 +546,7 @@ export class Helios {
    * The check function should return a Promise that resolves when the custom system is stable.
    * @param check The async function to run during waitUntilStable.
    * @returns A disposal function to unregister the check.
+   * @public
    */
   public registerStabilityCheck(check: StabilityCheck): () => void {
     this._stabilityChecks.add(check);
@@ -603,6 +604,8 @@ export class Helios {
    * This ensures that all asynchronous operations (like image loading, font loading,
    * and media seeking) triggered by the last seek/update are complete.
    * Useful for deterministic rendering.
+   * @returns Promise that resolves when all stability checks are complete.
+   * @public
    */
   public async waitUntilStable(): Promise<void> {
     const driverPromise = this.driver.waitUntilStable();

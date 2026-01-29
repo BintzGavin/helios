@@ -3,7 +3,7 @@
 **Version**: 2.7.0
 
 - **Status**: Active
-- **Current Focus**: Maintenance and Optimization
+- **Current Focus**: Maintenance, Optimization, and Stability
 - **Last Updated**: 2026-04-12
 
 [v2.7.0] ✅ Completed: Implement Stability Registry - Implemented stability registry pattern in `Helios` allowing external consumers to register async checks for `waitUntilStable`.
