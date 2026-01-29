@@ -45,6 +45,9 @@ Each agent should update **their own dedicated progress file** instead of this f
 - If this is a new version, create the section at the top of the file (after any existing content)
 - Group multiple completions under the same version section if they're part of the same release
 
+### PLAYER v0.32.1
+- ✅ Completed: Fix Player Dependencies - Updated @helios-project/core dependency and fixed build environment to enable verification.
+
 ### PLAYER v0.30.0
 - ✅ Completed: Audio Export Enhancements - Implemented `loop` and `startTime` support for client-side audio export, plus declarative `volume` attribute parsing.
 
