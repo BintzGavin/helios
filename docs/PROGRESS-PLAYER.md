@@ -1,5 +1,11 @@
 # PLAYER Progress Log
 
+## PLAYER v0.35.0
+- ✅ Completed: Implement Playback Range - Implemented setPlaybackRange and clearPlaybackRange in HeliosController and Bridge protocol.
+
+## PLAYER v0.34.0
+- ✅ Completed: Implement Seeking Events & Played Property - Implemented seeking/seeked events and played property to complete HTMLMediaElement parity.
+
 ## PLAYER v0.33.2
 - ✅ Completed: Verify Deep API Parity - Fixed test environment, verified Deep API Parity tests pass, and updated README with new API members.
 

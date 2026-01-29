@@ -9,6 +9,8 @@ export interface HeliosController {
   setAudioVolume(volume: number): void;
   setAudioMuted(muted: boolean): void;
   setPlaybackRate(rate: number): void;
+  setPlaybackRange(startFrame: number, endFrame: number): void;
+  clearPlaybackRange(): void;
   setInputProps(props: Record<string, any>): void;
   subscribe(callback: (state: any) => void): () => void;
   onError(callback: (err: any) => void): () => void;
@@ -26,6 +28,8 @@ export class DirectController implements HeliosController {
   setAudioVolume(volume: number) { this.instance.setAudioVolume(volume); }
   setAudioMuted(muted: boolean) { this.instance.setAudioMuted(muted); }
   setPlaybackRate(rate: number) { this.instance.setPlaybackRate(rate); }
+  setPlaybackRange(start: number, end: number) { this.instance.setPlaybackRange(start, end); }
+  clearPlaybackRange() { this.instance.clearPlaybackRange(); }
   setInputProps(props: Record<string, any>) { this.instance.setInputProps(props); }
   subscribe(callback: (state: any) => void) { return this.instance.subscribe(callback); }
   getState() { return this.instance.getState(); }
@@ -139,6 +143,8 @@ export class BridgeController implements HeliosController {
   setAudioVolume(volume: number) { this.iframeWindow.postMessage({ type: 'HELIOS_SET_VOLUME', volume }, '*'); }
   setAudioMuted(muted: boolean) { this.iframeWindow.postMessage({ type: 'HELIOS_SET_MUTED', muted }, '*'); }
   setPlaybackRate(rate: number) { this.iframeWindow.postMessage({ type: 'HELIOS_SET_PLAYBACK_RATE', rate }, '*'); }
+  setPlaybackRange(start: number, end: number) { this.iframeWindow.postMessage({ type: 'HELIOS_SET_PLAYBACK_RANGE', start, end }, '*'); }
+  clearPlaybackRange() { this.iframeWindow.postMessage({ type: 'HELIOS_CLEAR_PLAYBACK_RANGE' }, '*'); }
   setInputProps(props: Record<string, any>) { this.iframeWindow.postMessage({ type: 'HELIOS_SET_PROPS', props }, '*'); }
 
   subscribe(callback: (state: any) => void) {

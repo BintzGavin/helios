@@ -33,6 +33,15 @@ export function connectToParent(helios: Helios) {
             helios.setPlaybackRate(event.data.rate);
         }
         break;
+      case 'HELIOS_SET_PLAYBACK_RANGE':
+        const { start, end } = event.data;
+        if (typeof start === 'number' && typeof end === 'number') {
+          helios.setPlaybackRange(start, end);
+        }
+        break;
+      case 'HELIOS_CLEAR_PLAYBACK_RANGE':
+        helios.clearPlaybackRange();
+        break;
       case 'HELIOS_SET_VOLUME':
         if (typeof event.data.volume === 'number') {
             helios.setAudioVolume(event.data.volume);

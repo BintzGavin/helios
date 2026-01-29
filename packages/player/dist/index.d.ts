@@ -52,6 +52,7 @@ export declare class HeliosPlayer extends HTMLElement {
     get seeking(): boolean;
     get buffered(): TimeRanges;
     get seekable(): TimeRanges;
+    get played(): TimeRanges;
     get videoWidth(): number;
     get videoHeight(): number;
     get currentTime(): number;
