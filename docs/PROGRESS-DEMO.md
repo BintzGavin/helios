@@ -1,3 +1,6 @@
+## DEMO v1.56.0
+- ✅ Completed: Solid Animation Helpers Example - Created `examples/solid-animation-helpers` demonstrating idiomatic Sequence component composition in SolidJS.
+
 ## DEMO v1.55.0
 - ✅ Completed: Svelte Runes Animation Example - Created `examples/svelte-runes-animation` demonstrating Svelte 5 Runes (`$state`, `$derived`) integration.
 
