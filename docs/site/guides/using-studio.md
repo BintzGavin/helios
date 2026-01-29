@@ -23,6 +23,9 @@ The Studio will start a local server (typically at `http://localhost:3000`) and 
 
 The Studio automatically scans your project (based on `HELIOS_PROJECT_ROOT` or current directory) to find available compositions. It lists them in the sidebar or command palette for easy navigation.
 
+- **Create Composition**: You can create new compositions directly from the UI.
+- **Delete Composition**: You can delete existing compositions (requires confirmation).
+
 ### Diagnostics Panel
 
 Accessible from the sidebar, this panel provides real-time information about your system capabilities:
@@ -36,6 +39,13 @@ Accessible from the sidebar, this panel provides real-time information about you
 -   **Frame Stepping**: Move frame-by-frame to inspect exact details.
 -   **Range Markers**: Set In (`I`) and Out (`O`) points to loop a specific section of your animation.
 -   **Zooming**: Use the zoom slider to expand the timeline for precise frame-level editing. The track is scrollable when zoomed in.
+-   **Timecode**: Displays current time in SMPTE format (HH:MM:SS:FF) for professional timing reference.
+
+### Stage Toolbar
+
+-   **Safe Areas**: Toggle Title Safe and Action Safe guides to ensure your content is positioned correctly for broadcast or social media.
+-   **Snapshot**: Take a PNG snapshot of the current frame.
+-   **Background**: Toggle transparency grid or background color.
 
 ### Assets Panel
 
@@ -43,6 +53,7 @@ Manage your project's assets directly from the Studio.
 -   **Discovery**: Automatically lists files in your project's `assets/` directory.
 -   **Upload**: Drag and drop files to upload them.
 -   **Preview**: Rich previews for Images, Video, Audio, Fonts, 3D Models (.glb/.gltf), JSON data, and Shaders.
+-   **Drag & Drop**: You can drag assets from the panel directly into the Props Editor to assign them to image/video/audio inputs.
 
 ### Props Editor
 

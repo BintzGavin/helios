@@ -5,6 +5,36 @@ description: "Changelog for the Studio package"
 
 # Studio Changelog
 
+## v0.48.0
+- **Timecode & Range**: Implemented SMPTE timecode display in Timeline and enforced In/Out points for looping and navigation (Rewind/Home).
+
+## v0.47.0
+- **Safe Area Guides**: Implemented toggleable Safe Area Guides (Action Safe, Title Safe, Crosshair) in the Studio Stage with toolbar button and keyboard shortcut.
+
+## v0.46.0
+- **Verify Audio Controls**: Added unit tests for PlaybackControls to verify volume and mute functionality.
+
+## v0.45.0
+- **Delete Composition**: Implemented ability to delete compositions from the UI with backend support and confirmation.
+
+## v0.44.0
+- **Enable Production Preview**: Configured `vite-plugin-studio-api` to serve project files in preview mode and updated verification scripts.
+
+## v0.43.0
+- **Create Composition**: Implemented "Create Composition" feature with UI modal, API endpoint, and file generation logic.
+
+## v0.42.0
+- **Drag & Drop Assets**: Implemented drag and drop support from Assets Panel to Props Editor inputs (typed and generic).
+
+## v0.41.0
+- **Asset Input**: Implemented `AssetInput` in Props Editor with asset discovery integration.
+
+## v0.40.1
+- **Documentation & Verification**: Added package README, updated version, and implemented Playwright-based verification script.
+
+## v0.40.0
+- **Global Shortcuts Refactor**: Centralized all keyboard shortcuts into `GlobalShortcuts.tsx` and added Loop Toggle ('L').
+
 ## v0.37.0
 - **Timeline Zoom**: Implemented zoom slider and scrollable timeline track for precise editing.
 

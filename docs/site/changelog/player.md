@@ -5,6 +5,39 @@ description: "Changelog for the Player package"
 
 # Player Changelog
 
+## v0.33.2
+- **Verify Deep API Parity**: Fixed test environment, verified Deep API Parity tests pass, and updated README with new API members.
+
+## v0.33.1
+- **Fix Player Metadata**: Synced package.json version with status file (0.5.2 -> 0.33.1) and updated @helios-project/core dependency to 2.7.0.
+
+## v0.33.0
+- **Deep API Parity**: Implemented `videoWidth`, `videoHeight`, `buffered`, `seekable`, `seeking` properties on `<helios-player>` for compatibility with third-party wrappers.
+
+## v0.32.2
+- **Polish Click-To-Play & Fix Z-Index**: Fixed bug where controls were blocked by click-layer and ensured player grabs focus on click.
+
+## v0.32.1
+- **Fix Player Dependencies**: Updated @helios-project/core dependency and fixed build environment to enable verification.
+
+## v0.32.0
+- **Implement Standard Media States**: Added `readyState`, `networkState` properties and constants, along with lifecycle events (`loadstart`, `loadedmetadata`, `canplay`, `canplaythrough`) to `<helios-player>`.
+
+## v0.31.0
+- **Implement Standard Media API properties**: Added missing properties `src`, `autoplay`, `loop`, `controls`, `poster`, `preload` to `HeliosPlayer` class to fully comply with HTMLMediaElement interface expectations. Updated `observedAttributes` to include `preload`. Updated dependencies to fix build issues.
+
+## v0.30.0
+- **Audio Export Enhancements**: Implemented `loop` and `startTime` support for client-side audio export, plus declarative `volume` attribute parsing.
+
+## v0.29.0
+- **Interactive Mode**: Implemented `interactive` attribute to toggle between standard video controls and direct iframe interaction.
+
+## v0.28.0
+- **Harden Player Connection**: Implemented polling logic for Direct Mode connection to handle asynchronous composition initialization.
+
+## v0.27.0
+- **Implement Muted Attribute**: Added support for the `muted` attribute to `<helios-player>`, enabling declarative control of audio mute state.
+
 ## v0.26.1
 - **Poster Visibility**: Refined logic to prioritize poster visibility over "Loading/Connecting" status overlay during initialization.
 

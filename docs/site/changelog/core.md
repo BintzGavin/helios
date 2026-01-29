@@ -5,6 +5,36 @@ description: "Changelog for the Core package"
 
 # Core Changelog
 
+## v2.7.2
+- **Verify Stability Registry**: Verified implementation of `registerStabilityCheck` and `waitUntilStable`, updated JSDoc, and cleaned up stale plan.
+
+## v2.7.1
+- **Rename Audio Test**: Renamed `audio.test.ts` to `helios-audio.test.ts` to clarify structure.
+
+## v2.7.0
+- **Implement Stability Registry**: Implemented stability registry pattern in `Helios` allowing external consumers to register async checks for `waitUntilStable`.
+
+## v2.6.1
+- **Fix bindToDocumentTimeline Sync**: Updated `Helios.bindToDocumentTimeline` to propagate time updates to the active `TimeDriver`, ensuring media synchronization when driven externally.
+
+## v2.6.0
+- **Implement DomDriver Media Attributes**: Implemented `data-helios-offset` and `data-helios-seek` support in `DomDriver` for accurate in-browser preview timing.
+
+## v2.5.0
+- **Maintenance and Robustness**: Fixed memory leak in Helios constructor, enhanced color schema validation, and synced package version.
+
+## v2.4.0
+- **Implement Spring Duration**: Added `calculateSpringDuration` utility and exported `DEFAULT_SPRING_CONFIG` in `packages/core`.
+
+## v2.3.0
+- **Implement Transitions Library**: Implemented standard transition and crossfade functions, and corrected README installation instructions.
+
+## v2.2.0
+- **Implement Playback Range**: Added `playbackRange` to `HeliosState`, enabling loop and clamp behavior within a specific frame range.
+
+## v2.1.0
+- **ESM Compliance**: Converted package to native ESM with "type": "module", "moduleResolution": "node16", and explicit .js extensions.
+
 ## v2.0.0
 - **WaitUntilStable Interface**: Made `waitUntilStable` required in `TimeDriver` interface and strict in `Helios` to ensure reliable rendering.
 

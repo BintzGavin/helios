@@ -5,6 +5,39 @@ description: "Changelog for the Renderer package"
 
 # Renderer Changelog
 
+## v1.38.1
+- **Fix Build and Dependencies**: Updated `@helios-project/core` dependency to `2.7.1` in `packages/renderer`, modernized render script to use `tsx`, and fixed `verify-smart-codec-selection` test mock to support frame scanning.
+
+## v1.38.0
+- **Canvas Implicit Audio**: Implemented `scanForAudioTracks` utility and updated `CanvasStrategy` to automatically discover and include DOM-based audio/video elements in the render, unifying behavior with `DomStrategy`.
+
+## v1.37.1
+- **Fix Workspace Dependency**: Updated `@helios-project/core` dependency to `2.7.0` in `packages/renderer/package.json` to match local workspace version, restoring verification environment.
+
+## v1.37.0
+- **CdpTimeDriver Stability**: Updated `CdpTimeDriver` to detect and await `window.helios.waitUntilStable()`, enabling robust synchronization with custom stability checks for Canvas-based rendering.
+
+## v1.36.0
+- **Enable Full Test Coverage**: Updated `run-all.ts` to include all verification scripts, refactored `verify-concat.ts` to be self-contained using Data URIs, and improved `CanvasStrategy` robustness against `esbuild` artifacts by using string-based evaluation.
+
+## v1.35.0
+- **Support Helios Stability Registry**: Updated `SeekTimeDriver` to detect and await `window.helios.waitUntilStable()`, enabling robust synchronization with custom stability checks registered in the core engine.
+
+## v1.34.0
+- **Seek Driver Offsets**: Updated `SeekTimeDriver` to respect `data-helios-offset` and `data-helios-seek` attributes, calculating correct `currentTime` for visual media synchronization.
+
+## v1.33.0
+- **Enable DOM Transparency**: Updated `DomStrategy` to support transparent video export by using `omitBackground: true` in Playwright when `pixelFormat` suggests alpha (e.g. `yuva420p`, `rgba`), allowing creation of transparent overlays and lower-thirds.
+
+## v1.32.0
+- **FFmpeg Diagnostics**: Implemented `FFmpegInspector` and updated `Renderer.diagnose()` to return comprehensive diagnostics including FFmpeg version, supported encoders (like `libx264`), and filters, resolving the Vision Gap.
+
+## v1.31.0
+- **DomStrategy Media Attributes**: Updated `DomStrategy` to discover and respect `data-helios-offset`, `data-helios-seek`, and the `muted` attribute on `<audio>` and `<video>` elements, enabling precise timing and volume control from the DOM.
+
+## v1.30.0
+- **Deep Dom Strategy**: Updated `DomStrategy` to perform asset preloading (fonts, images, media) and audio track discovery across all frames (including iframes), ensuring robust rendering for nested compositions.
+
 ## v1.29.0
 - **Caption Burning**: Added `subtitles` option to `RendererOptions` and updated `FFmpegBuilder` to burn SRT subtitles into the video, including proper path escaping and filter complex management.
 

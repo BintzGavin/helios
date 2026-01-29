@@ -58,6 +58,14 @@ The `<helios-player>` element implements a subset of the HTMLMediaElement API, a
 - **`playbackRate`** (number): Playback speed multiplier.
 - **`fps`** (number, readonly): The composition's frame rate.
 - **`currentFrame`** (number): Current frame index. Can be set to seek by frame.
+- **`videoWidth`** (number, readonly): The width of the video in pixels.
+- **`videoHeight`** (number, readonly): The height of the video in pixels.
+- **`buffered`** (TimeRanges, readonly): The buffered time ranges.
+- **`seekable`** (TimeRanges, readonly): The seekable time ranges.
+- **`seeking`** (boolean, readonly): Whether the player is currently seeking.
+- **`playing`** (boolean, readonly): Whether the media is playing.
+- **`readyState`** (number, readonly): The current readiness state of the media.
+- **`networkState`** (number, readonly): The current network state of the media.
 
 #### Methods
 - **`play()`**: Starts playback. Returns a Promise.

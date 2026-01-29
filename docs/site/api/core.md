@@ -76,6 +76,15 @@ await helios.waitUntilStable();
 // Now it is safe to capture the frame
 ```
 
+#### `registerStabilityCheck(check)`
+Registers an asynchronous check that `waitUntilStable` must wait for. Useful for custom resources like map tiles or 3D models.
+
+```typescript
+helios.registerStabilityCheck(async () => {
+  await myCustomResource.load();
+});
+```
+
 #### `setPlaybackRate(rate)`
 Sets the playback speed (e.g., `0.5`, `1`, `2`).
 

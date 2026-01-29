@@ -5,6 +5,36 @@ description: "Changelog for the Demo package and examples"
 
 # Demo Changelog
 
+## v1.54.0
+- **Text Effects Animation Example**: Created `examples/text-effects-animation` demonstrating Typewriter and Staggered Reveal effects.
+
+## v1.53.1
+- **Verify Podcast Visualizer**: Validated `examples/podcast-visualizer` with E2E tests and fixed workspace dependencies in `renderer` and `player`.
+
+## v1.53.0
+- **Verify Solid DOM Example**: Added Solid DOM to verification registry and verified it passes.
+
+## v1.52.0
+- **Map Animation Example**: Created `examples/map-animation` demonstrating Leaflet integration.
+
+## v1.51.0
+- **Solid DOM Example**: Created `examples/solid-dom-animation` demonstrating integration with SolidJS signals for DOM updates.
+
+## v1.50.0
+- **Podcast Visualizer**: Created `examples/podcast-visualizer` demonstrating multi-track audio mixing and sync verification.
+
+## v1.49.1
+- **Solid Canvas Documentation**: Added README for SolidJS example and verified E2E tests.
+
+## v1.49.0
+- **Solid Canvas Example**: Created `examples/solid-canvas-animation` demonstrating integration with SolidJS and `createHeliosSignal` adapter.
+
+## v1.48.0
+- **React Styled Components Example**: Created `examples/react-styled-components` demonstrating integration with `styled-components` via `autoSyncAnimations` and refactored all examples to use source imports.
+
+## v1.47.0
+- **Variable Font Animation Example**: Created `examples/variable-font-animation` demonstrating how to synchronize CSS Variable Font animations using `autoSyncAnimations` with proper seeking support.
+
 ## v1.46.0
 - **Vue Transitions Example**: Created `examples/vue-transitions` demonstrating how to synchronize standard CSS animations in Vue using `autoSyncAnimations` and `animation-delay` with proper seeking support.
 
