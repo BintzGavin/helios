@@ -43,8 +43,13 @@ export class SeekTimeDriver implements TimeDriver {
         window.__HELIOS_VIRTUAL_TIME__ = timeInMs;
 
         // Synchronize document timeline (WAAPI)
-        if (document.timeline) {
-          document.timeline.currentTime = timeInMs;
+        // document.timeline.currentTime is read-only in many contexts or doesn't control CSS animations reliably.
+        // We must iterate over all animations and set their currentTime explicitly.
+        if (document.getAnimations) {
+          document.getAnimations().forEach((anim) => {
+            anim.currentTime = timeInMs;
+            anim.pause();
+          });
         }
 
         const promises = [];
