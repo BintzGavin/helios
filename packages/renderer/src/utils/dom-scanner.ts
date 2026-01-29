@@ -4,8 +4,32 @@ import { AudioTrackConfig } from '../types.js';
 export async function scanForAudioTracks(page: Page): Promise<AudioTrackConfig[]> {
   const script = `
     (async () => {
+      // Helper to find all media elements, including in Shadow DOM
+      function findAllMedia(rootNode) {
+        const media = [];
+        // Check rootNode (if it is an Element)
+        if (rootNode.nodeType === Node.ELEMENT_NODE) {
+          const tagName = rootNode.tagName;
+          if (tagName === 'AUDIO' || tagName === 'VIDEO') {
+            media.push(rootNode);
+          }
+        }
+
+        const walker = document.createTreeWalker(rootNode, NodeFilter.SHOW_ELEMENT);
+        while (walker.nextNode()) {
+          const node = walker.currentNode;
+          if (node.tagName === 'AUDIO' || node.tagName === 'VIDEO') {
+            media.push(node);
+          }
+          if (node.shadowRoot) {
+            media.push(...findAllMedia(node.shadowRoot));
+          }
+        }
+        return media;
+      }
+
       // Wait for media elements (video/audio)
-      const mediaElements = Array.from(document.querySelectorAll('video, audio'));
+      const mediaElements = findAllMedia(document);
       const tracks = [];
 
       if (mediaElements.length > 0) {
