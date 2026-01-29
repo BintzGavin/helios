@@ -82,6 +82,7 @@ interface StudioContextType {
   isCreateOpen: boolean;
   setCreateOpen: (isOpen: boolean) => void;
   createComposition: (name: string) => Promise<void>;
+  deleteComposition: (id: string) => Promise<void>;
 
   // Assets
   assets: Asset[];
@@ -231,6 +232,30 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       }
 
       setCreateOpen(false);
+    } catch (e) {
+      console.error(e);
+      throw e;
+    }
+  };
+
+  const deleteComposition = async (id: string) => {
+    try {
+      const res = await fetch(`/api/compositions?id=${encodeURIComponent(id)}`, {
+        method: 'DELETE'
+      });
+
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || 'Failed to delete composition');
+      }
+
+      setCompositions(prev => {
+        const next = prev.filter(c => c.id !== id);
+        if (activeComposition?.id === id) {
+           setActiveComposition(next.length > 0 ? next[0] : null);
+        }
+        return next;
+      });
     } catch (e) {
       console.error(e);
       throw e;
@@ -430,6 +455,7 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         isCreateOpen,
         setCreateOpen,
         createComposition,
+        deleteComposition,
         renderJobs,
         startRender,
         cancelRender,

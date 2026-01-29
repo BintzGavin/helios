@@ -3,7 +3,7 @@ import { useStudio, Composition } from '../context/StudioContext';
 import { useKeyboardShortcut } from '../hooks/useKeyboardShortcut';
 
 export const CompositionSwitcher: React.FC = () => {
-  const { compositions, setActiveComposition, isSwitcherOpen, setSwitcherOpen } = useStudio();
+  const { compositions, setActiveComposition, isSwitcherOpen, setSwitcherOpen, deleteComposition } = useStudio();
   const [filter, setFilter] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -116,7 +116,29 @@ export const CompositionSwitcher: React.FC = () => {
                   <div style={{ color: 'white' }}>{comp.name}</div>
                   <div style={{ fontSize: '12px', color: '#888' }}>{comp.description || comp.id}</div>
                 </div>
-                {index === selectedIndex && <div style={{ fontSize: '12px', color: '#aaa' }}>Enter ↵</div>}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  {index === selectedIndex && <div style={{ fontSize: '12px', color: '#aaa' }}>Enter ↵</div>}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (window.confirm(`Are you sure you want to delete "${comp.name}"? This cannot be undone.`)) {
+                        deleteComposition(comp.id).catch(err => alert(err.message));
+                      }
+                    }}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      color: '#666',
+                      cursor: 'pointer',
+                      fontSize: '14px',
+                      padding: '4px',
+                      opacity: index === selectedIndex ? 1 : 0.5
+                    }}
+                    title="Delete Composition"
+                  >
+                    🗑
+                  </button>
+                </div>
               </div>
             ))
           )}

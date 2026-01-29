@@ -5,7 +5,7 @@ The Studio is a Vite-based React application that provides a development environ
 
 Key components:
 - **CLI**: `npx helios studio` starts the Vite dev server.
-- **Server**: Discovery logic for compositions and assets. API middleware (`vite-plugin-studio-api`) handles file serving (`/@fs/` support for both Dev and Preview) and backend operations.
+- **Server**: Discovery logic for compositions and assets (create, delete, list). API middleware (`vite-plugin-studio-api`) handles file serving (`/@fs/` support for both Dev and Preview) and backend operations.
 - **UI**: React app with Timeline, Props Editor, Preview Stage.
 - **Controller**: Manages `Helios` instance via `useStudio` context.
 - **Verification**: `npm run verify` checks UI integrity using Playwright (supports Dev and Preview modes).
@@ -53,6 +53,7 @@ Options:
 - **PropsEditor**: Auto-generated inputs based on composition schema (supports Asset selection, Drag & Drop).
 - **Stage**: Renders the `<helios-player>` or canvas.
 - **GlobalShortcuts**: Headless component managing keyboard interactions.
+- **CompositionSwitcher**: Modal to switch between compositions (Cmd+K), supports deletion.
 - **PlaybackControls**: Buttons for play, pause, seek, loop, volume.
 - **KeyboardShortcutsModal**: Displays available shortcuts.
 - **CreateCompositionModal**: Modal for creating new compositions.

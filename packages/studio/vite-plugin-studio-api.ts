@@ -2,7 +2,7 @@ import { Plugin, ViteDevServer, PreviewServer } from 'vite';
 import { AddressInfo } from 'net';
 import fs from 'fs';
 import path from 'path';
-import { findCompositions, findAssets, getProjectRoot, createComposition } from './src/server/discovery';
+import { findCompositions, findAssets, getProjectRoot, createComposition, deleteComposition } from './src/server/discovery';
 import { startRender, getJob, getJobs, cancelJob, deleteJob, diagnoseServer } from './src/server/render-manager';
 
 const getBody = async (req: any) => {
@@ -97,6 +97,38 @@ function configureMiddlewares(server: ViteDevServer | PreviewServer, isPreview: 
                 res.end(JSON.stringify({ error: e.message }));
              }
              return;
+          }
+
+          if (req.method === 'DELETE') {
+            try {
+              let id: string | null = null;
+              const qIndex = req.url?.indexOf('?');
+              if (qIndex !== undefined && qIndex !== -1) {
+                  const params = new URLSearchParams(req.url?.substring(qIndex));
+                  id = params.get('id');
+              }
+
+              if (!id) {
+                res.statusCode = 400;
+                res.end(JSON.stringify({ error: 'Missing composition ID' }));
+                return;
+              }
+
+              deleteComposition(process.cwd(), id);
+              res.setHeader('Content-Type', 'application/json');
+              res.end(JSON.stringify({ success: true }));
+            } catch (e: any) {
+              console.error(e);
+              const isAccessDenied = e.message.includes('Access denied');
+              const isNotFound = e.message.includes('not found') || e.message.includes('not a valid');
+
+              if (isAccessDenied) res.statusCode = 403;
+              else if (isNotFound) res.statusCode = 404;
+              else res.statusCode = 500;
+
+              res.end(JSON.stringify({ error: e.message }));
+            }
+            return;
           }
 
           try {
