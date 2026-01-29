@@ -13,3 +13,7 @@
 ## [0.43.0] - Protocol Violation
 **Learning:** I mistakenly implemented code instead of just writing the plan. I must strictly adhere to the "PLANNER" role and "never modify source code" rule.
 **Action:** Double-check role boundaries before starting execution. If assigned "Planner", ONLY write `.md` files.
+
+## [0.44.0] - Controller API Gaps
+**Learning:** `HeliosController` (used by Player/Studio) does not expose all methods of the `Helios` core class, specifically `addMarker`. This prevents Studio from implementing features that rely on those core methods without updating the Player package first.
+**Action:** Check `packages/player/src/controllers.ts` before planning features that depend on Core APIs to ensure they are exposed via the Controller bridge.
