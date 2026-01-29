@@ -49,6 +49,11 @@ export declare class HeliosPlayer extends HTMLElement {
     private _networkState;
     get readyState(): number;
     get networkState(): number;
+    get seeking(): boolean;
+    get buffered(): TimeRanges;
+    get seekable(): TimeRanges;
+    get videoWidth(): number;
+    get videoHeight(): number;
     get currentTime(): number;
     set currentTime(val: number);
     get currentFrame(): number;

@@ -9,6 +9,8 @@ interface StageToolbarProps {
   canvasSize: { width: number; height: number };
   onCanvasSizeChange: (size: { width: number; height: number }) => void;
   onSnapshot: () => void;
+  showGuides: boolean;
+  onToggleGuides: () => void;
 }
 
 export const StageToolbar: React.FC<StageToolbarProps> = ({
@@ -19,7 +21,9 @@ export const StageToolbar: React.FC<StageToolbarProps> = ({
   onToggleTransparent,
   canvasSize,
   onCanvasSizeChange,
-  onSnapshot
+  onSnapshot,
+  showGuides,
+  onToggleGuides
 }) => {
   const styles = {
     container: {
@@ -167,6 +171,14 @@ export const StageToolbar: React.FC<StageToolbarProps> = ({
         title="Toggle Transparency Grid"
       >
         🏁
+      </button>
+      <div style={{ width: '1px', background: '#555', margin: '0 4px' }} />
+      <button
+        style={{ ...styles.button, background: showGuides ? '#444' : 'transparent' }}
+        onClick={onToggleGuides}
+        title="Toggle Safe Area Guides (')"
+      >
+        #
       </button>
     </div>
   );

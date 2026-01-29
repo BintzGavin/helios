@@ -1,3 +1,6 @@
+## STUDIO v0.47.0
+- ✅ Completed: Safe Area Guides - Implemented toggleable Safe Area Guides (Action Safe, Title Safe, Crosshair) in the Studio Stage with toolbar button and keyboard shortcut.
+
 ## STUDIO v0.46.0
 - ✅ Completed: Verify Audio Controls - Added unit tests for PlaybackControls to verify volume and mute functionality.
 
