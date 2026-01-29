@@ -1,3 +1,6 @@
+## DEMO v1.55.0
+- ✅ Completed: Svelte Runes Animation Example - Created `examples/svelte-runes-animation` demonstrating Svelte 5 Runes (`$state`, `$derived`) integration.
+
 ## DEMO v1.54.0
 - ✅ Completed: Text Effects Animation Example - Created `examples/text-effects-animation` demonstrating Typewriter and Staggered Reveal effects.
 
