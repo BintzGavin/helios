@@ -1,5 +1,8 @@
 # PLAYER Progress Log
 
+## PLAYER v0.37.0
+- ✅ Completed: CSS Variables for Theming - Exposed CSS variables to enable theming of the player controls and UI.
+
 ## PLAYER v0.36.0
 - ✅ Completed: ControlsList Support - Implemented `controlslist` attribute support to allow hiding Export and Fullscreen buttons (`nodownload`, `nofullscreen`).
 
