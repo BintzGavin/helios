@@ -28,6 +28,7 @@ template.innerHTML = `
       padding: 8px;
       color: white;
       transition: opacity 0.3s;
+      z-index: 2;
     }
     :host(:not([controls])) .controls {
       display: none;
@@ -550,7 +551,10 @@ export class HeliosPlayer extends HTMLElement {
         this.bigPlayBtn = this.shadowRoot.querySelector(".big-play-btn");
         this.retryAction = () => this.retryConnection();
         this.retryBtn.onclick = () => this.retryAction();
-        this.clickLayer.addEventListener("click", () => this.togglePlayPause());
+        this.clickLayer.addEventListener("click", () => {
+            this.focus();
+            this.togglePlayPause();
+        });
         this.clickLayer.addEventListener("dblclick", () => this.toggleFullscreen());
         this.resizeObserver = new ResizeObserver((entries) => {
             for (const entry of entries) {
