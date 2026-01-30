@@ -1,3 +1,7 @@
+## DEMO v1.64.1
+- ✅ Completed: Verify Podcast Visualizer - Re-verified `examples/podcast-visualizer` implementation, ensuring multi-track audio mixing, muted attribute handling, and offset timing work correctly in the E2E pipeline.
+- 🔧 Fixed: Core Build Issues - Fixed TypeScript errors in `packages/core` (missing `currentTime` in tests, `experimental-webgl` casting, `VideoEncoder` check) to enable successful build and verification.
+
 ## DEMO v1.64.0
 - ✅ Completed: Implement SolidJS Series Component - Added `<Series>` component to `examples/solid-animation-helpers` and updated example to demonstrate it.
 
