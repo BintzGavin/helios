@@ -1,5 +1,8 @@
 # PLAYER Progress Log
 
+## PLAYER v0.41.0
+- ✅ Completed: Standard Media API Gap Fill - Implemented `canPlayType`, `defaultMuted`, `defaultPlaybackRate`, `preservesPitch`, `srcObject`, and `crossOrigin` for fuller `HTMLMediaElement` parity.
+
 ## PLAYER v0.40.0
 - ✅ Completed: Range-Based Export - Client-side export now respects the active 'playbackRange' (loop region), exporting only the selected portion of the timeline.
 

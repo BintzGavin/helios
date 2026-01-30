@@ -47,6 +47,7 @@ The component observes the following attributes:
 - `export-format`: Format for client-side export (`mp4`, `webm`).
 - `input-props`: JSON string of properties to pass to the composition.
 - `controlslist`: Space-separated tokens to customize UI (`nodownload`, `nofullscreen`).
+- `crossorigin`: CORS setting for the element (`anonymous`, `use-credentials`).
 
 ## D. Styling
 The component exposes the following CSS variables for theming:
