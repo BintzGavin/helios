@@ -1,38 +1,44 @@
-# Architectural Context: Core
+# Context: Core
 
 ## A. Architecture
 
-The Core package (`@helios-project/core`) is the pure TypeScript logic engine for Helios. It manages state, time, and synchronization without depending on any rendering environment (DOM, Canvas, etc.).
+The Core domain implements the **Helios State Machine**, a framework-agnostic engine that manages the timeline, state (`currentFrame`, `isPlaying`, `inputProps`, etc.), and synchronization strategies.
 
-**Pattern: Signals & Drivers**
-- **State**: Managed via signals (`_currentFrame`, `_isPlaying`, etc.), exposed as `ReadonlySignal` getters for reactive UI updates.
-- **Time**: Time is advanced by a `Ticker` (RAF or Timeout) and synchronized via a `TimeDriver` (DOM, WAAPI, or No-op).
-- **Synchronization**: The `Helios` instance can drive time (`play()`) or be driven by an external timeline (`bindToDocumentTimeline()`).
+It follows the **Store -> Actions -> Subscribers** pattern:
+1.  **Store**: Internal state is managed using Signals (`packages/core/src/signals.ts`) for reactivity.
+2.  **Actions**: Public methods on the `Helios` class (e.g., `seek`, `play`, `setInputProps`) modify this internal state.
+3.  **Subscribers**: External consumers (Renderer, Player, Studio) subscribe to state changes via `subscribe()`.
+
+The engine supports pluggable **TimeDrivers** (`DomDriver`, `WaapiDriver`, `NoopDriver`) to synchronize the internal frame counter with external time sources (like `requestAnimationFrame`, `HTMLMediaElement`, or `document.timeline`).
 
 ## B. File Tree
 
 ```
 packages/core/src/
-├── drivers/           # TimeDriver implementations (DomDriver, etc.)
-├── animation.ts       # Animation loop logic
-├── captions.ts        # SRT parsing and active cue logic
-├── color.ts           # Color interpolation utilities
-├── easing.ts          # Easing functions
-├── errors.ts          # Structured error definitions
-├── index.ts           # Public API entry point (Helios class)
-├── markers.ts         # Timeline marker logic
-├── random.ts          # Deterministic PRNG
-├── schema.ts          # Input property schema validation
-├── sequencing.ts      # Sequence/Series helpers
-├── signals.ts         # Reactive signal implementation
-├── timecode.ts        # Timecode conversion utilities
-└── transitions.ts     # Transition helpers
+├── drivers/
+│   ├── DomDriver.ts
+│   ├── NoopDriver.ts
+│   ├── TimeDriver.ts
+│   └── index.ts
+├── animation.ts
+├── captions.ts
+├── color.ts
+├── easing.ts
+├── errors.ts
+├── index.ts
+├── markers.ts
+├── random.ts
+├── render-session.ts
+├── schema.ts
+├── sequencing.ts
+├── signals.ts
+├── timecode.ts
+└── transitions.ts
 ```
 
 ## C. Type Definitions
 
 ```typescript
-// index.ts
 export type HeliosState = {
   width: number;
   height: number;
@@ -52,6 +58,7 @@ export type HeliosState = {
 };
 
 export type HeliosSubscriber = (state: HeliosState) => void;
+
 export type StabilityCheck = () => Promise<void>;
 
 export interface HeliosOptions {
@@ -82,71 +89,28 @@ export interface DiagnosticReport {
   userAgent: string;
 }
 
-// schema.ts
-export type PropType = 'string' | 'number' | 'boolean' | 'object' | 'array' | 'color' | 'image' | 'video' | 'audio' | 'font';
-
-export interface PropDefinition {
-  type: PropType;
-  optional?: boolean;
-  default?: any;
-  minimum?: number;
-  maximum?: number;
-  enum?: (string | number)[];
-  label?: string;
-  description?: string;
-  items?: PropDefinition;
-  properties?: HeliosSchema;
-}
-
-export type HeliosSchema = Record<string, PropDefinition>;
-
-// markers.ts
-export interface Marker {
-  id: string;
-  time: number; // seconds
-  label?: string;
-  color?: string;
-}
-
-// captions.ts
-export interface CaptionCue {
-  id: string;
-  start: number;
-  end: number;
-  text: string;
+export interface RenderSessionOptions {
+  startFrame: number;
+  endFrame: number;
+  abortSignal?: AbortSignal;
 }
 ```
 
 ## D. Public Methods
+
+### `Helios` Class
 
 ```typescript
 class Helios {
   // Static
   static diagnose(): Promise<DiagnosticReport>;
 
-  // Getters (ReadonlySignal)
-  get currentFrame(): ReadonlySignal<number>;
-  get loop(): ReadonlySignal<boolean>;
-  get isPlaying(): ReadonlySignal<boolean>;
-  get inputProps(): ReadonlySignal<Record<string, any>>;
-  get playbackRate(): ReadonlySignal<number>;
-  get volume(): ReadonlySignal<number>;
-  get muted(): ReadonlySignal<boolean>;
-  get captions(): ReadonlySignal<CaptionCue[]>;
-  get activeCaptions(): ReadonlySignal<CaptionCue[]>;
-  get markers(): ReadonlySignal<Marker[]>;
-  get playbackRange(): ReadonlySignal<[number, number] | null>;
-  get width(): ReadonlySignal<number>;
-  get height(): ReadonlySignal<number>;
-  get duration(): number;
-  get fps(): number;
-
-  // Lifecycle
   constructor(options: HeliosOptions);
-  dispose(): void;
 
-  // State
+  // State Access
   getState(): Readonly<HeliosState>;
+
+  // Configuration
   setSize(width: number, height: number): void;
   setLoop(shouldLoop: boolean): void;
   setDuration(seconds: number): void;
@@ -157,25 +121,41 @@ class Helios {
   setAudioMuted(muted: boolean): void;
   setCaptions(captions: string | CaptionCue[]): void;
   setMarkers(markers: Marker[]): void;
+  setPlaybackRange(startFrame: number, endFrame: number): void;
+  clearPlaybackRange(): void;
+
+  // Markers
   addMarker(marker: Marker): void;
   removeMarker(id: string): void;
   seekToMarker(id: string): void;
-  setPlaybackRange(startFrame: number, endFrame: number): void;
-  clearPlaybackRange(): void;
 
   // Subscription
   subscribe(callback: HeliosSubscriber): () => void;
   unsubscribe(callback: HeliosSubscriber): void;
+
+  // Stability
   registerStabilityCheck(check: StabilityCheck): () => void;
+  waitUntilStable(): Promise<void>;
 
   // Playback
   play(): void;
   pause(): void;
   seek(frame: number): void;
-  waitUntilStable(): Promise<void>;
 
   // Synchronization
   bindToDocumentTimeline(): void;
   unbindFromDocumentTimeline(): void;
+
+  // Lifecycle
+  dispose(): void;
+}
+```
+
+### `RenderSession` Class
+
+```typescript
+class RenderSession implements AsyncIterable<number> {
+  constructor(helios: Helios, options: RenderSessionOptions);
+  [Symbol.asyncIterator](): AsyncIterator<number>;
 }
 ```
