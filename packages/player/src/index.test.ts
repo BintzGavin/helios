@@ -96,7 +96,7 @@ describe('HeliosPlayer', () => {
         seek: vi.fn(),
         subscribe: vi.fn().mockReturnValue(() => {}),
         onError: vi.fn().mockReturnValue(() => {}),
-        dispose: vi.fn(),
+        dispose: vi.fn(), setCaptions: vi.fn(),
         setPlaybackRate: vi.fn()
     };
 
@@ -180,7 +180,7 @@ describe('HeliosPlayer', () => {
         seek: vi.fn(),
         subscribe: vi.fn().mockReturnValue(() => {}),
         onError: vi.fn().mockReturnValue(() => {}),
-        dispose: vi.fn(),
+        dispose: vi.fn(), setCaptions: vi.fn(),
         setPlaybackRate: vi.fn()
     };
     (player as any).setController(mockController);
@@ -253,7 +253,7 @@ describe('HeliosPlayer', () => {
       seek: vi.fn(),
       subscribe: vi.fn().mockReturnValue(() => {}),
       onError: vi.fn().mockReturnValue(() => {}),
-      dispose: vi.fn(),
+      dispose: vi.fn(), setCaptions: vi.fn(),
       setPlaybackRate: vi.fn()
     };
     (player as any).setController(mockController);
@@ -300,7 +300,7 @@ describe('HeliosPlayer', () => {
             seek: vi.fn(),
             subscribe: vi.fn().mockReturnValue(() => {}),
             onError: vi.fn().mockReturnValue(() => {}),
-            dispose: vi.fn(),
+            dispose: vi.fn(), setCaptions: vi.fn(),
             setPlaybackRate: vi.fn()
         };
         (player as any).setController(mockController);
@@ -417,7 +417,7 @@ describe('HeliosPlayer', () => {
             seek: vi.fn(),
             subscribe: vi.fn().mockReturnValue(() => {}),
             onError: vi.fn().mockReturnValue(() => {}),
-            dispose: vi.fn(),
+            dispose: vi.fn(), setCaptions: vi.fn(),
             setPlaybackRate: vi.fn(),
             setInputProps: vi.fn(),
             setAudioMuted: vi.fn()
@@ -505,7 +505,7 @@ describe('HeliosPlayer', () => {
         seek: vi.fn(),
         subscribe: vi.fn().mockReturnValue(() => {}),
         onError: vi.fn().mockReturnValue(() => {}),
-        dispose: vi.fn(),
+        dispose: vi.fn(), setCaptions: vi.fn(),
         setPlaybackRate: vi.fn()
       };
       (player as any).setController(mockController);
@@ -533,7 +533,7 @@ describe('HeliosPlayer', () => {
         seek: vi.fn(),
         subscribe: vi.fn().mockReturnValue(() => {}),
         onError: vi.fn().mockReturnValue(() => {}),
-        dispose: vi.fn(),
+        dispose: vi.fn(), setCaptions: vi.fn(),
         setPlaybackRate: vi.fn()
       };
       (player as any).setController(mockController);
@@ -562,7 +562,7 @@ describe('HeliosPlayer', () => {
             seek: vi.fn(),
             subscribe: vi.fn().mockReturnValue(() => {}),
             onError: vi.fn().mockReturnValue(() => {}),
-            dispose: vi.fn(),
+            dispose: vi.fn(), setCaptions: vi.fn(),
             setPlaybackRate: vi.fn()
         };
         (player as any).setController(mockController);
@@ -600,7 +600,7 @@ describe('HeliosPlayer', () => {
             seek: vi.fn(),
             subscribe: vi.fn().mockReturnValue(() => {}),
             onError: vi.fn().mockReturnValue(() => {}),
-            dispose: vi.fn(),
+            dispose: vi.fn(), setCaptions: vi.fn(),
             setPlaybackRate: vi.fn()
         };
         (player as any).setController(mockController);
@@ -635,7 +635,7 @@ describe('HeliosPlayer', () => {
             seek: vi.fn(),
             subscribe: vi.fn().mockReturnValue(() => {}),
             onError: vi.fn().mockReturnValue(() => {}),
-            dispose: vi.fn(),
+            dispose: vi.fn(), setCaptions: vi.fn(),
             setPlaybackRate: vi.fn(),
             setAudioVolume: vi.fn(),
             setAudioMuted: vi.fn(),
@@ -732,7 +732,7 @@ describe('HeliosPlayer', () => {
             setPlaybackRate: vi.fn(),
             subscribe: vi.fn().mockReturnValue(() => {}),
             onError: vi.fn().mockReturnValue(() => {}),
-            dispose: vi.fn(),
+            dispose: vi.fn(), setCaptions: vi.fn(),
             setInputProps: vi.fn(),
             captureFrame: vi.fn(),
             getAudioTracks: vi.fn()
@@ -914,7 +914,7 @@ describe('HeliosPlayer', () => {
             setPlaybackRate: vi.fn(),
             subscribe: vi.fn().mockReturnValue(() => {}),
             onError: vi.fn().mockReturnValue(() => {}),
-            dispose: vi.fn(),
+            dispose: vi.fn(), setCaptions: vi.fn(),
             setInputProps: vi.fn(),
             captureFrame: vi.fn(),
             getAudioTracks: vi.fn()
@@ -979,7 +979,7 @@ describe('HeliosPlayer', () => {
             seek: vi.fn(),
             subscribe: vi.fn().mockReturnValue(() => {}),
             onError: vi.fn().mockReturnValue(() => {}),
-            dispose: vi.fn(),
+            dispose: vi.fn(), setCaptions: vi.fn(),
             setPlaybackRate: vi.fn(),
             setInputProps: vi.fn()
         };
@@ -1097,7 +1097,7 @@ describe('HeliosPlayer', () => {
             setPlaybackRate: vi.fn(),
             subscribe: vi.fn().mockReturnValue(() => {}),
             onError: vi.fn().mockReturnValue(() => {}),
-            dispose: vi.fn(),
+            dispose: vi.fn(), setCaptions: vi.fn(),
             setInputProps: vi.fn(),
             captureFrame: vi.fn(),
             getAudioTracks: vi.fn()
@@ -1141,7 +1141,7 @@ describe('HeliosPlayer', () => {
             seek: vi.fn(),
             subscribe: vi.fn().mockReturnValue(() => {}),
             onError: vi.fn().mockReturnValue(() => {}),
-            dispose: vi.fn(),
+            dispose: vi.fn(), setCaptions: vi.fn(),
             setPlaybackRate: vi.fn(),
             setInputProps: vi.fn(),
             setAudioMuted: vi.fn()
@@ -1283,7 +1283,7 @@ describe('HeliosPlayer', () => {
             seek: vi.fn(),
             subscribe: vi.fn().mockReturnValue(() => {}),
             onError: vi.fn().mockReturnValue(() => {}),
-            dispose: vi.fn(),
+            dispose: vi.fn(), setCaptions: vi.fn(),
             setPlaybackRate: vi.fn(),
             setInputProps: vi.fn(),
             setAudioMuted: vi.fn()

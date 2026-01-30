@@ -337,7 +337,11 @@ template.innerHTML = `
     .controls.layout-tiny .speed-selector {
       display: none;
     }
+    slot {
+      display: none;
+    }
   </style>
+  <slot></slot>
   <div class="status-overlay hidden" part="overlay">
     <div class="status-text">Connecting...</div>
     <button class="retry-btn" style="display: none">Retry</button>
@@ -865,6 +869,13 @@ export class HeliosPlayer extends HTMLElement {
     this.bigPlayBtn.addEventListener("click", this.handleBigPlayClick);
     this.posterContainer.addEventListener("click", this.handleBigPlayClick);
 
+    const slot = this.shadowRoot!.querySelector("slot");
+    if (slot) {
+        slot.addEventListener("slotchange", this.handleSlotChange);
+        // Initial check
+        this.handleSlotChange();
+    }
+
     // Initial state: disabled until connected
     this.setControlsDisabled(true);
 
@@ -907,6 +918,11 @@ export class HeliosPlayer extends HTMLElement {
     this.ccBtn.removeEventListener("click", this.toggleCaptions);
     this.bigPlayBtn.removeEventListener("click", this.handleBigPlayClick);
     this.posterContainer.removeEventListener("click", this.handleBigPlayClick);
+
+    const slot = this.shadowRoot!.querySelector("slot");
+    if (slot) {
+        slot.removeEventListener("slotchange", this.handleSlotChange);
+    }
 
     this.stopConnectionAttempts();
 
@@ -1088,6 +1104,37 @@ export class HeliosPlayer extends HTMLElement {
       }
   };
 
+  private handleSlotChange = () => {
+    const slot = this.shadowRoot!.querySelector("slot");
+    if (!slot) return;
+
+    const tracks = slot.assignedElements();
+    // Find first default caption track
+    const captionTrack = tracks.find(
+        (t) => t.tagName === "TRACK" && t.getAttribute("kind") === "captions" && t.hasAttribute("default")
+    ) as HTMLTrackElement | undefined;
+
+    if (this.controller) {
+      if (captionTrack && captionTrack.src) {
+        fetch(captionTrack.src)
+          .then((res) => {
+            if (!res.ok) throw new Error(`Status ${res.status}`);
+            return res.text();
+          })
+          .then((srt) => {
+            // Ensure controller still exists and we are still aiming for this track
+            // (Note: race conditions possible if rapid changes, but this is basic support)
+            if (this.controller) {
+              this.controller.setCaptions(srt);
+            }
+          })
+          .catch((err) => console.error("HeliosPlayer: Failed to load captions", err));
+      } else {
+        this.controller.setCaptions([]);
+      }
+    }
+  };
+
   private setController(controller: HeliosController) {
       // Clean up old controller
       if (this.controller) {
@@ -1099,6 +1146,9 @@ export class HeliosPlayer extends HTMLElement {
       }
 
       this.controller = controller;
+
+      // Check for pending captions
+      this.handleSlotChange();
 
       // Update States
       this._networkState = HeliosPlayer.NETWORK_IDLE;

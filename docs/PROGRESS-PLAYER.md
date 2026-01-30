@@ -182,3 +182,6 @@
 
 ## [2026-01-20] PLAYER
 - ✅ Completed: Refactor Player Control Logic - Verified `<helios-player>` uses `window.helios` and supports client-side export.
+
+## PLAYER v0.42.0
+- ✅ Completed: Import SRT Captions - Implemented support for <track> elements to import SRT captions via the setCaptions API.
