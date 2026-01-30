@@ -1,6 +1,6 @@
 // @vitest-environment node
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { findAssets, deleteComposition } from './discovery';
+import { findAssets, deleteComposition, createComposition } from './discovery';
 import fs from 'fs';
 import path from 'path';
 
@@ -101,5 +101,53 @@ describe('deleteComposition', () => {
 
   it('should throw error if access denied (outside project root)', () => {
      expect(() => deleteComposition('.', '../outside')).toThrow(/Access denied/);
+  });
+});
+
+describe('createComposition', () => {
+  const originalEnv = process.env;
+
+  beforeEach(() => {
+    vi.resetAllMocks();
+    process.env = { ...originalEnv, HELIOS_PROJECT_ROOT: path.resolve('/mock/project') };
+    vi.mocked(fs.existsSync).mockReturnValue(false); // Default to not existing
+    vi.mocked(fs.mkdirSync).mockReturnValue(undefined);
+    vi.mocked(fs.writeFileSync).mockReturnValue(undefined);
+  });
+
+  afterEach(() => {
+    process.env = originalEnv;
+  });
+
+  it('should create a directory with -solid suffix for Solid template if missing', () => {
+    const name = 'My Composition';
+    const expectedPath = path.resolve('/mock/project', 'my-composition-solid');
+
+    createComposition('.', name, 'solid');
+
+    expect(fs.mkdirSync).toHaveBeenCalledWith(expectedPath, { recursive: true });
+    // Also verify files are written
+    expect(fs.writeFileSync).toHaveBeenCalledWith(
+        expect.stringContaining('my-composition-solid'),
+        expect.any(String)
+    );
+  });
+
+  it('should not double append -solid suffix if already present', () => {
+    const name = 'My Composition Solid';
+    const expectedPath = path.resolve('/mock/project', 'my-composition-solid');
+
+    createComposition('.', name, 'solid');
+
+    expect(fs.mkdirSync).toHaveBeenCalledWith(expectedPath, { recursive: true });
+  });
+
+  it('should not append suffix for other templates', () => {
+    const name = 'My Composition';
+    const expectedPath = path.resolve('/mock/project', 'my-composition');
+
+    createComposition('.', name, 'vanilla');
+
+    expect(fs.mkdirSync).toHaveBeenCalledWith(expectedPath, { recursive: true });
   });
 });

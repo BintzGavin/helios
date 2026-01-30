@@ -105,7 +105,12 @@ export function createComposition(
   const projectRoot = getProjectRoot(rootDir);
 
   // Sanitize name: lowercase, replace spaces with hyphens, remove special chars
-  const dirName = name.toLowerCase().replace(/[^a-z0-9-]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
+  let dirName = name.toLowerCase().replace(/[^a-z0-9-]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
+
+  // Enforce -solid suffix for Solid template to allow vite.config.ts regex to separate frameworks
+  if (templateId === 'solid' && !dirName.includes('solid')) {
+      dirName = `${dirName}-solid`;
+  }
 
   if (!dirName) {
     throw new Error('Invalid composition name');
