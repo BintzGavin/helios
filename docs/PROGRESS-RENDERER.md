@@ -1,3 +1,6 @@
+## RENDERER v1.46.0
+- ✅ Completed: CdpTimeDriver Determinism - Updated `CdpTimeDriver` to enforce deterministic `Date.now()` by setting `initialVirtualTime` to Jan 1, 2024 (UTC), ensuring frame consistency across runs.
+
 ## RENDERER v1.45.0
 - ✅ Completed: CdpTimeDriver Shadow DOM Sync - Updated `CdpTimeDriver` to recursively traverse Shadow DOMs using `TreeWalker` to find and synchronize `<video>` and `<audio>` elements, ensuring media sync in Canvas mode.
 
