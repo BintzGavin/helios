@@ -233,13 +233,13 @@ export class Helios {
     if (typeof document !== 'undefined') {
       try {
         const canvas = document.createElement('canvas');
-        report.webgl = !!(canvas.getContext('webgl') || canvas.getContext('experimental-webgl'));
+        report.webgl = !!(canvas.getContext('webgl') || canvas.getContext('experimental-webgl' as any));
         report.webgl2 = !!canvas.getContext('webgl2');
       } catch (e) { /* ignore */ }
     } else if (typeof OffscreenCanvas !== 'undefined') {
       try {
         const canvas = new OffscreenCanvas(1, 1);
-        report.webgl = !!(canvas.getContext('webgl') || canvas.getContext('experimental-webgl'));
+        report.webgl = !!(canvas.getContext('webgl') || canvas.getContext('experimental-webgl' as any));
         report.webgl2 = !!canvas.getContext('webgl2');
       } catch (e) { /* ignore */ }
     }
@@ -261,7 +261,7 @@ export class Helios {
         const check = async (config: any) => {
           try {
             const support = await VideoEncoder.isConfigSupported(config);
-            return support.supported;
+            return support.supported ?? false;
           } catch (e) {
             return false;
           }

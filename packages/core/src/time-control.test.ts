@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { Helios } from './index';
+import { Helios } from './index.js';
 
 describe('Helios Time Control', () => {
   it('should initialize currentTime to 0', () => {

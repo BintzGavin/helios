@@ -1,6 +1,6 @@
 # Status: DEMO Domain
 
-**Version**: 1.64.0
+**Version**: 1.64.1
 
 ## Vision
 The DEMO domain is responsible for:
@@ -15,6 +15,7 @@ The DEMO domain is responsible for:
 - None
 
 ## Completed Tasks
+- [v1.64.1] ✅ Completed: Verify Podcast Visualizer - Re-verified multi-track audio mixing and offset timing in the E2E pipeline.
 - [v1.64.0] ✅ Completed: Implement SolidJS Series Component - Added Series component and updated SolidJS helpers example.
 - [v1.63.0] ✅ Completed: Verify Podcast Visualizer - Verified multi-track audio mixing, muted attribute, and offset timing in the E2E pipeline.
 - [v1.62.1] ✅ Completed: Verify Dom Render - Verified that DOM-based compositions render correctly in the E2E pipeline.
