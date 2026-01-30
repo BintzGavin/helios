@@ -91,9 +91,16 @@ export class CdpTimeDriver implements TimeDriver {
 
     // 2. Advance virtual time
     // This triggers the browser event loop and requestAnimationFrame
-    await this.client.send('Emulation.setVirtualTimePolicy', {
-      policy: 'advance',
-      budget: budget
+    await new Promise<void>((resolve, reject) => {
+      if (!this.client) return resolve();
+
+      // Use 'once' to avoid leaking listeners
+      this.client.once('Emulation.virtualTimeBudgetExpired', () => resolve());
+
+      this.client.send('Emulation.setVirtualTimePolicy', {
+        policy: 'advance',
+        budget: budget
+      }).catch(reject);
     });
 
     this.currentTime = timeInSeconds;

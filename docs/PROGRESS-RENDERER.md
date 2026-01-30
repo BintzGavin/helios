@@ -1,3 +1,6 @@
+## RENDERER v1.47.2
+- ✅ Completed: CdpTimeDriver Budget - Updated `CdpTimeDriver` to wait for `virtualTimeBudgetExpired` event, ensuring the browser fully processes the time budget before capturing the frame.
+
 ## RENDERER v1.47.1
 - ✅ Completed: CdpTimeDriver Media Sync Timing - Updated `CdpTimeDriver` to synchronize media elements before advancing virtual time, ensuring correct frame capture.
 
