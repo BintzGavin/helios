@@ -21,6 +21,7 @@ export type HeliosState = {
   activeCaptions: CaptionCue[];
   markers: Marker[];
   playbackRange: [number, number] | null;
+  currentTime: number;
 };
 
 export type HeliosSubscriber = (state: HeliosState) => void;
@@ -99,6 +100,7 @@ export class Helios {
   private _width: Signal<number>;
   private _height: Signal<number>;
   private _playbackRange: Signal<[number, number] | null>;
+  private _currentTime: ReadonlySignal<number>;
   private _stabilityChecks = new Set<StabilityCheck>();
 
   private _disposeActiveCaptionsEffect: () => void;
@@ -110,6 +112,12 @@ export class Helios {
    * Can be subscribed to for reactive updates.
    */
   public get currentFrame(): ReadonlySignal<number> { return this._currentFrame; }
+
+  /**
+   * Signal for the current time in seconds.
+   * Can be subscribed to for reactive updates.
+   */
+  public get currentTime(): ReadonlySignal<number> { return this._currentTime; }
 
   /**
    * Signal for the loop state.
@@ -346,6 +354,8 @@ export class Helios {
     this._height = signal(height);
     this._playbackRange = signal(options.playbackRange || null);
 
+    this._currentTime = computed(() => this._currentFrame.value / this._fps.value);
+
     this._activeCaptions = signal(findActiveCues(initialCaptions, 0));
 
     this._disposeActiveCaptionsEffect = effect(() => {
@@ -402,6 +412,7 @@ export class Helios {
       activeCaptions: this.activeCaptions.value,
       markers: this._markers.value,
       playbackRange: this._playbackRange.value,
+      currentTime: this._currentTime.value,
     };
   }
 
@@ -566,6 +577,16 @@ export class Helios {
       );
     }
     const frame = marker.time * this.fps;
+    this.seek(frame);
+  }
+
+  /**
+   * Seeks to a specific time in seconds.
+   * This is a convenience wrapper around seek(frame).
+   * @param seconds The time in seconds to seek to.
+   */
+  public seekToTime(seconds: number) {
+    const frame = seconds * this.fps;
     this.seek(frame);
   }
 

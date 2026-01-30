@@ -1,11 +1,12 @@
 # Status: CORE
 
-**Version**: 2.15.0
+**Version**: 2.16.0
 
 - **Status**: Active
 - **Current Focus**: Maintenance, Optimization, and Stability
-- **Last Updated**: 2026-04-25
+- **Last Updated**: 2026-04-26
 
+[v2.16.0] ✅ Completed: Time-Based Control - Added `currentTime` signal and `seekToTime()` method to `Helios` class for direct time manipulation.
 [v2.15.0] ✅ Completed: Enhance Diagnose - Expanded `Helios.diagnose()` to include WebGL, WebAudio, Color Gamut, and Video Codec support.
 [v2.14.0] ✅ Completed: Implement Missing Asset Types - Added `model`, `json`, and `shader` to supported `PropType` values and validation logic.
 [v2.13.0] ✅ Completed: Validate Schema Defaults - Implemented `validateSchema` to ensure schema defaults match their defined types, adding `INVALID_SCHEMA` error code.

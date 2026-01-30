@@ -53,6 +53,7 @@ export type HeliosState = {
   activeCaptions: CaptionCue[];
   markers: Marker[];
   playbackRange: [number, number] | null;
+  currentTime: number;
 };
 
 export type HeliosSubscriber = (state: HeliosState) => void;
@@ -168,6 +169,7 @@ export enum HeliosErrorCode {
 class Helios {
   // Signals
   get currentFrame(): ReadonlySignal<number>;
+  get currentTime(): ReadonlySignal<number>;
   get loop(): ReadonlySignal<boolean>;
   get isPlaying(): ReadonlySignal<boolean>;
   get inputProps(): ReadonlySignal<Record<string, any>>;
@@ -201,6 +203,7 @@ class Helios {
   addMarker(marker: Marker): void;
   removeMarker(id: string): void;
   seekToMarker(id: string): void;
+  seekToTime(seconds: number): void;
   setPlaybackRange(startFrame: number, endFrame: number): void;
   clearPlaybackRange(): void;
   subscribe(callback: HeliosSubscriber): () => void;
