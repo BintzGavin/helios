@@ -38,10 +38,26 @@ export class DomStrategy implements RenderStrategy {
         }));
 
         // 3. Wait for CSS background images
-        const getAllElements = () => Array.from(document.querySelectorAll('*'));
+        function findAllElements(root, elements) {
+          elements = elements || [];
+          if (root.nodeType === Node.ELEMENT_NODE) {
+            elements.push(root);
+          }
+          const walker = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT);
+          while (walker.nextNode()) {
+            const node = walker.currentNode;
+            elements.push(node);
+            if (node.shadowRoot) {
+              findAllElements(node.shadowRoot, elements);
+            }
+          }
+          return elements;
+        }
+
+        const allElements = findAllElements(document);
         const backgroundUrls = new Set();
 
-        getAllElements().forEach((el) => {
+        allElements.forEach((el) => {
           const style = window.getComputedStyle(el);
           const bgImage = style.backgroundImage;
           if (bgImage && bgImage !== 'none') {
