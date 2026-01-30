@@ -98,7 +98,7 @@ const report = await Helios.diagnose();
 
 ## Roadmap
 ### V1.x (Active)
-- **Helios Studio**: Alpha v0.45+ (Drag & Drop, Props Editor, Client-Side Export)
+- **Helios Studio**: Alpha v0.48+ (Timeline Polish, Safe Areas, Client-Side Export)
 - **Core**: Stability Registry, Signals, TimeDriver (Completed)
 - **Player**: Deep API Parity, Standard Media Events (Completed)
 - **AI**: MCP Server, Agent Skills (Planned)
