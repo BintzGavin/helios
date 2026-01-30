@@ -1,10 +1,11 @@
 # Status: DEMO (Executor)
-**Version**: 1.60.0
+**Version**: 1.61.0
 
 ## Vision
 To provide comprehensive, idiomatic examples for every major framework (React, Vue, Svelte, Vanilla) and robust end-to-end testing to ensure the Helios engine delivers on its "Use What You Know" promise.
 
 ## Current State
+- **Web Component**: ✅ `examples/web-component-animation` exists and works (Demonstrates Shadow DOM and CSS animation integration).
 - **Solid Transitions**: ✅ `examples/solid-transitions` exists and works (Demonstrates synchronizing CSS animations in SolidJS using `autoSyncAnimations`).
 - **Solid Animation Helpers**: ✅ `examples/solid-animation-helpers` exists and works (Demonstrates idiomatic Sequence component composition in SolidJS).
 - **Svelte Runes**: ✅ `examples/svelte-runes-animation` exists and works (Demonstrates Svelte 5 Runes integration with `HeliosState` adapter).
@@ -84,6 +85,7 @@ To provide comprehensive, idiomatic examples for every major framework (React, V
 None.
 
 ## Log
+- [v1.61.0] ✅ Completed: Web Component Animation - Created `examples/web-component-animation` demonstrating Shadow DOM and CSS animation integration.
 - [v1.60.0] ✅ Completed: Verify Promo Video - Integrated `examples/promo-video` into verification pipeline and documentation.
 - [v1.59.1] ✅ Completed: Verify Podcast Visualizer - Verified `examples/podcast-visualizer` implementation matches spec and passes E2E verification.
 - [v1.59.0] ✅ Completed: Solid Transitions Example - Created `examples/solid-transitions` demonstrating how to synchronize CSS animations in SolidJS using `autoSyncAnimations: true` and `animation-delay`. Verified with E2E tests.

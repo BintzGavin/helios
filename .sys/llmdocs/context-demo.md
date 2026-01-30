@@ -1,6 +1,7 @@
 # Context: DEMO Domain
 
 ## A. Examples
+- `examples/web-component-animation`: Native Web Components (Shadow DOM + CSS).
 - `examples/simple-canvas-animation`: Vanilla JS Canvas API.
 - `examples/simple-animation`: Vanilla JS DOM + CSS Animations.
 - `examples/variable-font-animation`: Variable Font animation using CSS.

@@ -6,6 +6,11 @@ import { svelte } from "@sveltejs/vite-plugin-svelte";
 import solidPlugin from "vite-plugin-solid";
 
 export default defineConfig({
+  resolve: {
+    alias: {
+      "@helios-project/core": resolve(__dirname, "packages/core/src/index.ts"),
+    },
+  },
   plugins: [
     react({
       exclude: /examples\/solid-(canvas|dom)-animation|examples\/solid-transitions|examples\/solid-animation-helpers/,
@@ -70,6 +75,7 @@ export default defineConfig({
         map_animation: resolve(__dirname, "examples/map-animation/composition.html"),
         text_effects: resolve(__dirname, "examples/text-effects-animation/composition.html"),
         promo_video: resolve(__dirname, "examples/promo-video/composition.html"),
+        web_component: resolve(__dirname, "examples/web-component-animation/composition.html"),
       },
     },
   },
