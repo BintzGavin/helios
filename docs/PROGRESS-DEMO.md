@@ -1,3 +1,6 @@
+## DEMO v1.62.0
+- ✅ Completed: Stress Test Animation - Created `examples/stress-test-animation/composition.html` with 2500 elements and updated build config.
+
 ## DEMO v1.61.1
 - ✅ Completed: Verify Solid Animation Helpers - Added `examples/solid-animation-helpers` to `tests/e2e/verify-render.ts`. Verified all 47 examples pass.
 
