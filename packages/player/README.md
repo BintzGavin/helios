@@ -65,6 +65,20 @@ The player will automatically attempt to access `window.helios` on the iframe's 
 | `preload` | `auto` or `none`. If `none`, defers loading the iframe until interaction. | `auto` |
 | `input-props` | JSON string of properties to pass to the composition. | - |
 | `interactive` | Enable direct interaction with the composition (disables click-to-pause). | `false` |
+| `controlslist` | Space-separated list of features to disable: `nodownload`, `nofullscreen`. | - |
+| `sandbox` | Security flags for the iframe. | `allow-scripts allow-same-origin` |
+
+## CSS Variables
+
+The player exposes several CSS variables to allow theming of the controls:
+
+| Variable | Default | Description |
+|---|---|---|
+| `--helios-controls-bg` | `rgba(0, 0, 0, 0.6)` | Background color of the controls bar. |
+| `--helios-text-color` | `white` | Text and icon color. |
+| `--helios-accent-color` | `#007bff` | Accent color for active elements (scrubber, buttons). |
+| `--helios-range-track-color` | `#555` | Background color of the scrubber track. |
+| `--helios-font-family` | `sans-serif` | Font family for the player UI. |
 
 ## Standard Media API
 
@@ -75,9 +89,11 @@ The `<helios-player>` element implements a subset of the HTMLMediaElement interf
 - `play(): Promise<void>` - Starts playback.
 - `pause(): void` - Pauses playback.
 - `load(): void` - Reloads the iframe (useful if `src` changed or to retry connection).
+- `addTextTrack(kind: string, label?: string, language?: string): TextTrack` - Adds a new text track to the media element.
 
 ### Properties
 
+- `textTracks` (TextTrackList, read-only): The text tracks associated with the media element.
 - `currentTime` (number): Current playback position in seconds.
 - `duration` (number, read-only): Total duration in seconds.
 - `paused` (boolean, read-only): Whether playback is paused.
