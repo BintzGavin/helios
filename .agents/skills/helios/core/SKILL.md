@@ -1,6 +1,6 @@
 ---
 name: helios-core
-description: Core API for Helios video engine. Use when creating compositions, managing timeline state, controlling playback, or subscribing to frame updates. Covers Helios class instantiation, play/pause/seek controls, state subscription, and DOM animation synchronization.
+description: Core API for Helios video engine. Use when creating compositions, managing timeline state, controlling playback, or subscribing to frame updates. Covers Helios class instantiation, signals, animation helpers, and DOM synchronization.
 ---
 
 # Helios Core API
@@ -18,7 +18,6 @@ const helios = new Helios({
   fps: 30,
   width: 1920,
   height: 1080,
-  playbackRate: 1,
   inputProps: { text: "Hello World" }
 });
 
@@ -29,9 +28,6 @@ const unsubscribe = helios.subscribe((state) => {
 
 // Control playback
 helios.play();
-helios.pause();
-helios.seek(150);  // Jump to frame 150
-helios.setPlaybackRate(2); // 2x speed
 ```
 
 ## API Reference
@@ -47,6 +43,7 @@ interface HeliosOptions {
   width?: number;                // Canvas width (default: 1920)
   height?: number;               // Canvas height (default: 1080)
   initialFrame?: number;         // Start frame (default: 0)
+  loop?: boolean;                // Loop playback (default: false)
   autoSyncAnimations?: boolean;  // Auto-sync DOM animations (WAAPI) to timeline
   animationScope?: HTMLElement;  // Scope for animation syncing
   inputProps?: Record<string, any>; // Initial input properties
@@ -72,6 +69,7 @@ interface HeliosState {
   duration: number;
   fps: number;
   currentFrame: number;
+  loop: boolean;
   isPlaying: boolean;
   inputProps: Record<string, any>;
   playbackRate: number;
@@ -163,7 +161,8 @@ unsubscribe();
 Bind Helios to `document.timeline` when the timeline is driven externally (e.g., by the Renderer or Studio).
 
 ```typescript
-helios.bindToDocumentTimeline()    // Start polling document.timeline
+// Start polling document.timeline (or __HELIOS_VIRTUAL_TIME__ in Renderer)
+helios.bindToDocumentTimeline()
 helios.unbindFromDocumentTimeline() // Stop polling
 ```
 
@@ -196,12 +195,32 @@ interface DiagnosticReport {
 }
 ```
 
-## Signals (Advanced)
+## Signals
 
-The `Helios` class exposes reactive signals for granular state management.
+The `Helios` class exposes reactive signals for granular state management. You can also create your own signals.
 
 ```typescript
-// Read-only signals
+import { signal, computed, effect, ReadonlySignal } from '@helios-project/core';
+
+// 1. Create a signal
+const count = signal(0);
+
+// 2. Create a computed value (updates automatically when deps change)
+const double = computed(() => count.value * 2);
+
+// 3. React to changes
+effect(() => {
+  console.log(`Count: ${count.value}, Double: ${double.value}`);
+});
+
+// Update signal
+count.value = 1; // Logs: "Count: 1, Double: 2"
+```
+
+### Public Helios Signals
+All Helios state properties are available as read-only signals on the instance:
+
+```typescript
 helios.currentFrame: ReadonlySignal<number>
 helios.isPlaying: ReadonlySignal<boolean>
 helios.inputProps: ReadonlySignal<Record<string, any>>
@@ -214,73 +233,89 @@ helios.markers: ReadonlySignal<Marker[]>
 helios.playbackRange: ReadonlySignal<[number, number] | null>
 helios.width: ReadonlySignal<number>
 helios.height: ReadonlySignal<number>
+helios.loop: ReadonlySignal<boolean>
 ```
 
-## Utilities
+## Animation Helpers
 
-### Color Interpolation
-Interpolate between two colors (Hex, RGB, HSL).
-
-```typescript
-import { interpolateColors } from '@helios-project/core';
-
-const color = interpolateColors('#ff0000', '#0000ff', 0.5); // Returns rgba(...)
-```
-
-### Deterministic Randomness
-Generate reproducible random numbers based on a seed.
+### Spring Physics
+Simulate a damped harmonic oscillator.
 
 ```typescript
-import { random } from '@helios-project/core';
+import { spring, calculateSpringDuration } from '@helios-project/core';
 
-const rng = random("my-seed");
-const val = rng.next(); // Always the same sequence for "my-seed"
-const num = rng.range(10, 20); // Random number between 10 and 20
-```
+const val = spring({
+  frame: currentFrame,
+  fps: 30,
+  from: 0,
+  to: 100,
+  config: { stiffness: 100, damping: 10, mass: 1 }
+});
 
-## Common Patterns
-
-### Frame-Based Rendering
-
-```typescript
-const helios = new Helios({ duration: 5, fps: 60 });
-
-helios.subscribe(({ currentFrame, duration, fps }) => {
-  const timeInSeconds = currentFrame / fps;
-  const progress = timeInSeconds / duration; // 0 to 1
-  
-  // Update your visualization
-  renderScene(progress);
+// Calculate how long (in frames) the spring takes to settle
+const duration = calculateSpringDuration({
+  fps: 30,
+  from: 0,
+  to: 100,
+  config: { stiffness: 100, damping: 10 }
 });
 ```
 
-### Schema Validation
+### Series (Sequencing)
+Arrange multiple items in a timeline sequence.
 
-Ensure input properties match expected types.
+```typescript
+import { series } from '@helios-project/core';
+
+const items = [
+  { id: 'a', durationInFrames: 30 },
+  { id: 'b', durationInFrames: 60, offset: -10 } // Overlap by 10 frames
+];
+
+const sequenced = series(items, 0);
+// Result:
+// [
+//   { id: 'a', durationInFrames: 30, from: 0 },
+//   { id: 'b', durationInFrames: 60, offset: -10, from: 20 } // 0 + 30 - 10
+// ]
+```
+
+### Interpolation
+Map values from one range to another.
+
+```typescript
+import { interpolate } from '@helios-project/core';
+
+const opacity = interpolate(frame, [0, 30], [0, 1], {
+  extrapolateRight: 'clamp'
+});
+```
+
+## Schema Validation
+
+Define input types for validation and UI generation in Studio. Supported types now include `model`, `json`, and `shader`.
 
 ```typescript
 const schema = {
   type: 'object',
   properties: {
     title: { type: 'string' },
-    count: { type: 'number', minimum: 0 }
-  },
-  required: ['title']
+    logo: { type: 'image' },
+    video: { type: 'video' },
+    audio: { type: 'audio' },
+    font: { type: 'font' },
+    model: { type: 'model' },    // 3D Model URL (.glb, .gltf)
+    config: { type: 'json' },    // JSON Data URL
+    effect: { type: 'shader' },  // Shader URL (.glsl)
+    count: { type: 'number', minimum: 0, step: 1 }
+  }
 };
-
-const helios = new Helios({
-  duration: 10,
-  fps: 30,
-  schema: schema,
-  inputProps: { title: "Intro", count: 5 } // Valid
-});
-
-// Will throw error if invalid
-helios.setInputProps({ title: "Intro", count: -1 });
 ```
 
 ## Source Files
 
 - Main class: `packages/core/src/index.ts`
 - Signals: `packages/core/src/signals.ts`
-- Utilities: `packages/core/src/color.ts`, `packages/core/src/random.ts`
+- Animation: `packages/core/src/animation.ts`
+- Sequencing: `packages/core/src/sequencing.ts`
+- Validation: `packages/core/src/schema.ts`

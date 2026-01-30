@@ -1,6 +1,6 @@
 ---
 name: helios-studio
-description: Studio tool for developing and previewing Helios compositions. Use when you want to launch the interactive development environment.
+description: Studio tool for developing and previewing Helios compositions. Use when you want to launch the interactive development environment or manage assets.
 ---
 
 # Helios Studio
@@ -23,26 +23,48 @@ This will start a local server (typically at `http://localhost:5173`) where you 
 - **Interactive Timeline:** Scrub through your animation frame-by-frame.
 - **Hot Reloading:** Preserves timeline state (current frame) when you edit code.
 - **Audio Controls:** Volume slider and Mute toggle.
+- **Safe Area Guides:** Toggle Action/Title Safe guides and Crosshair.
 - **Keyboard Shortcuts:**
   - `Space`: Play/Pause
   - `Arrow Left/Right`: Step 1 frame
   - `Shift + Arrow`: Step 10 frames
   - `Home`: Seek to start
+  - `I` / `O`: Set In / Out points (Playback Range)
+  - `L`: Toggle Loop
+
+### Props Editor
+The Props Editor generates a UI based on your `HeliosSchema`.
+
+- **Schema-Aware Inputs:**
+  - `number`: Slider (if min/max set), Stepped Slider (if step set).
+  - `color`: Color picker.
+  - `boolean`: Toggle switch.
+  - `string`: Text input or Enum dropdown.
+  - `image`, `video`, `audio`, `font`: Asset selector with preview.
+  - `model`: 3D Model selector (.glb, .gltf).
+  - `json`: JSON file selector.
+  - `shader`: Shader file selector (.glsl).
+  - **Recursive Support:** Generates nested UIs for `object` and `array` types.
+- **Drag & Drop:** Drag assets from the Assets Panel directly into compatible inputs.
+- **Metadata Editing:** Click "Edit Composition" to change Width, Height, FPS, and Duration.
 
 ### Assets Management
 - **Assets Panel:** View and manage files in your `assets/` directory.
-- **Upload:** Drag & drop files to upload them to your project.
-- **Previews:** Rich previews for video (hover-play), audio, and fonts.
-
-### Composition Controls
-- **Props Editor:** JSON-based editor to modify `inputProps` dynamically without changing code.
-- **Resolution:** Switch between presets (1080p, 720p, Instagram, etc.) or set custom canvas sizes.
-- **Snapshots:** Take a PNG snapshot of the current frame (Camera icon).
+- **Upload:** Drag & drop files onto the panel to upload them.
+- **Previews:** Rich previews for video (hover-play), audio, fonts, and images.
+- **Supported Types:**
+  - Images: jpg, png, svg, webp
+  - Audio: mp3, wav, ogg
+  - Video: mp4, webm
+  - 3D: glb, gltf
+  - Data: json
+  - Shaders: glsl, vert, frag
 
 ### Render Management
 - **Renders Panel:** Trigger server-side renders directly from the UI.
 - **Configuration:** Select format (MP4/WebM), resolution, and codec.
 - **Progress:** Track render progress and cancel jobs if needed.
+- **Client-Side Export:** Export directly from the browser using WebCodecs.
 
 ## Environment Variables
 

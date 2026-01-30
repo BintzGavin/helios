@@ -32,16 +32,36 @@ The `<helios-player>` Web Component allows you to embed and control Helios compo
 | `width` | number | Display width (maintains aspect ratio if height also set) |
 | `height` | number | Display height |
 | `controls` | boolean | Show built-in playback controls (Play, Volume, Captions, Export) |
+| `controlslist` | string | Space-separated list of features to hide: `nodownload`, `nofullscreen` |
 | `autoplay` | boolean | Start playing immediately when ready |
 | `loop` | boolean | Loop playback when finished |
+| `muted` | boolean | Mute audio initially |
+| `poster` | string | URL of an image to show before playback |
+| `preload` | 'auto' \| 'none' | Preload behavior (default: 'auto') |
+| `interactive`| boolean | Allow direct interaction with the iframe content (disables overlay) |
 | `input-props` | JSON string | Pass initial properties to the composition |
 | `export-mode` | 'auto' \| 'canvas' \| 'dom' | Strategy for client-side export (default: 'auto') |
 | `export-format` | 'mp4' \| 'webm' | Output format for client-side export (default: 'mp4') |
 | `canvas-selector`| string | CSS selector for the canvas element (default: 'canvas') |
 
+### CSS Variables (Theming)
+
+You can customize the player's appearance using CSS variables:
+
+```css
+helios-player {
+  --helios-controls-bg: rgba(0, 0, 0, 0.8);
+  --helios-text-color: #ffffff;
+  --helios-accent-color: #ff0000;
+  --helios-range-track-color: #555555;
+  --helios-range-selected-color: rgba(255, 255, 255, 0.5);
+  --helios-font-family: 'Helvetica', sans-serif;
+}
+```
+
 ### JavaScript API
 
-The element implements a Standard Media API-like interface for easy integration.
+The element implements a Standard Media API-like interface for easy integration with video wrappers.
 
 ```typescript
 const player = document.querySelector('helios-player');
@@ -49,6 +69,7 @@ const player = document.querySelector('helios-player');
 // Playback Control
 player.play();
 player.pause();
+player.load();
 player.currentTime = 5.0; // Seek to 5 seconds
 player.currentFrame = 150; // Seek to frame 150
 
@@ -61,6 +82,8 @@ console.log(player.duration);     // Total duration in seconds
 console.log(player.paused);       // Boolean
 console.log(player.playbackRate); // Speed multiplier
 console.log(player.fps);          // Composition FPS
+console.log(player.loop);         // Loop state
+console.log(player.autoplay);     // Autoplay state
 
 // Read-Only Properties
 console.log(player.videoWidth);   // Intrinsic width
@@ -71,6 +94,7 @@ console.log(player.seeking);      // Boolean (true while scrubbing)
 console.log(player.played);       // TimeRanges object of played segments
 console.log(player.buffered);     // TimeRanges object of buffered segments
 console.log(player.seekable);     // TimeRanges object of seekable segments
+console.log(player.error);        // MediaError object if failed
 
 // Input Props
 player.inputProps = { title: "Updated Title" };
@@ -97,6 +121,16 @@ if (controller) {
 }
 ```
 
+#### Captions
+You can provide captions by adding a `<track>` element as a child.
+
+```html
+<helios-player src="...">
+  <track kind="captions" src="captions.srt" default>
+</helios-player>
+```
+The player will fetch the SRT file and pass it to the Helios controller.
+
 ## Client-Side Export
 
 The player supports exporting videos directly in the browser (using `VideoEncoder`).
@@ -104,7 +138,7 @@ The player supports exporting videos directly in the browser (using `VideoEncode
 1. **Formats:** Supports `mp4` (H.264/AAC) and `webm` (VP9/Opus).
 2. **Audio:** Captures audio from `<audio>` elements (must be CORS-enabled).
 3. **Captions:** Supports "burning in" captions if they are active.
-4. **Usage:** User clicks "Export" in controls, or via custom logic.
+4. **Usage:** User clicks "Export" in controls, or call `clientSideExporter` manually (internal API).
 
 ## UI Features
 
@@ -112,6 +146,8 @@ The player supports exporting videos directly in the browser (using `VideoEncode
 - **Volume:** Slider and Mute toggle.
 - **Speed:** Selector for playback rate (0.25x - 2x).
 - **Fullscreen:** Toggle fullscreen mode.
+- **Scrubber:** Visual playback range indication.
+- **Responsive:** Controls adapt to small widths (compact/tiny modes).
 
 ## Common Issues
 

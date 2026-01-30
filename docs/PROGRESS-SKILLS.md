@@ -1,5 +1,13 @@
 # SKILLS Progress Log
 
+## SKILLS v1.6.0
+- ✅ Completed: Daily Skills Review
+  - Updated API skills for `core` (Signals, Spring, Series, Validation)
+  - Updated API skills for `renderer` (Diagnostics, Options, Recursive Sync)
+  - Updated API skills for `player` (Standard Media API, Captions via Track, Attributes)
+  - Updated `studio` skill (Props Editor, Assets, CLI)
+  - Created workflow skill for `podcast-visualizer` (DOM Audio Mixing)
+
 ## SKILLS v1.5.0
 - ✅ Completed: Daily Skills Review
   - Updated API skills for `core` (Stability Registry)
