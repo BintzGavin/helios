@@ -31,7 +31,7 @@ export async function getAudioAssets(doc: Document): Promise<AudioAsset[]> {
   }));
 }
 
-export async function mixAudio(assets: AudioAsset[], duration: number, sampleRate: number): Promise<AudioBuffer> {
+export async function mixAudio(assets: AudioAsset[], duration: number, sampleRate: number, rangeStart: number = 0): Promise<AudioBuffer> {
     if (typeof OfflineAudioContext === 'undefined') {
         throw new Error("OfflineAudioContext not supported in this environment");
     }
@@ -60,7 +60,19 @@ export async function mixAudio(assets: AudioAsset[], duration: number, sampleRat
             source.connect(gainNode);
             gainNode.connect(ctx.destination);
 
-            source.start(asset.startTime || 0);
+            const assetStart = asset.startTime || 0;
+            // Calculate when this clip should play relative to the export window
+            let playbackStart = assetStart - rangeStart;
+            let startOffset = 0;
+
+            if (playbackStart < 0) {
+                // If the clip starts before the window, we need to skip the beginning
+                startOffset = -playbackStart;
+                playbackStart = 0;
+            }
+
+            // source.start(when, offset)
+            source.start(playbackStart, startOffset);
         } catch (e) {
             console.warn("Failed to decode audio asset:", e);
         }

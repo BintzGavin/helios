@@ -1,5 +1,8 @@
 # PLAYER Progress Log
 
+## PLAYER v0.40.0
+- ✅ Completed: Range-Based Export - Client-side export now respects the active 'playbackRange' (loop region), exporting only the selected portion of the timeline.
+
 ## PLAYER v0.39.0
 - ✅ Completed: Native Loop Support - Refactored `HeliosController` and `bridge` to use `helios.setLoop()` natively, removing manual client-side looping logic.
 
