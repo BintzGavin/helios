@@ -105,6 +105,26 @@ describe('validateProps', () => {
     expect(validateProps({ val: 'ok' }, schema)).toEqual({ val: 'ok' });
   });
 
+  it('should accept UI hint fields (step, format)', () => {
+    const schema = {
+      opacity: {
+        type: 'number' as const,
+        minimum: 0,
+        maximum: 1,
+        step: 0.1,
+        label: 'Opacity'
+      },
+      description: {
+        type: 'string' as const,
+        format: 'multiline',
+        label: 'Description'
+      }
+    };
+
+    const props = { opacity: 0.5, description: 'Line 1\nLine 2' };
+    expect(validateProps(props, schema)).toEqual(props);
+  });
+
   it('should validate asset types', () => {
     const schema = {
       img: { type: 'image' as const },
