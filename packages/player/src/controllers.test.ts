@@ -51,6 +51,7 @@ describe('DirectController', () => {
                  return vi.fn();
             }),
             getState: vi.fn().mockReturnValue({ fps: 30, duration: 10, currentFrame: 0 }),
+            schema: { someProp: { type: 'string' } },
         };
 
         (Helios as unknown as any).mockImplementation(function() {
@@ -123,6 +124,11 @@ describe('DirectController', () => {
 
         controller.clearPlaybackRange();
         expect(mockHeliosInstance.clearPlaybackRange).toHaveBeenCalled();
+    });
+
+    it('should return schema', async () => {
+        const schema = await controller.getSchema();
+        expect(schema).toEqual({ someProp: { type: 'string' } });
     });
 
     it('should capture DOM frame', async () => {
@@ -272,6 +278,17 @@ describe('BridgeController', () => {
         triggerMessage({ type: 'HELIOS_STATE', state: newState });
 
         expect(spy).toHaveBeenCalledWith(newState);
+    });
+
+    it('should get schema via bridge', async () => {
+        const promise = controller.getSchema();
+
+        expect(mockWindow.postMessage).toHaveBeenCalledWith({ type: 'HELIOS_GET_SCHEMA' }, '*');
+
+        triggerMessage({ type: 'HELIOS_SCHEMA', schema: { foo: 'bar' } });
+
+        const result = await promise;
+        expect(result).toEqual({ foo: 'bar' });
     });
 
     it('should notify error subscribers on HELIOS_ERROR', () => {

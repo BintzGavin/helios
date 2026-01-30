@@ -1,4 +1,4 @@
-import { Helios } from "@helios-project/core";
+import { Helios, HeliosSchema } from "@helios-project/core";
 import { DirectController, BridgeController } from "./controllers";
 import type { HeliosController } from "./controllers";
 import { ClientSideExporter } from "./features/exporter";
@@ -1387,6 +1387,13 @@ export class HeliosPlayer extends HTMLElement {
 
   public getController(): HeliosController | null {
     return this.controller;
+  }
+
+  public async getSchema(): Promise<HeliosSchema | undefined> {
+    if (this.controller) {
+      return this.controller.getSchema();
+    }
+    return undefined;
   }
 
   private retryConnection() {
