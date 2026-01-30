@@ -16,9 +16,9 @@ export const SchemaInput: React.FC<SchemaInputProps> = ({ definition, value, onC
 
   switch (definition.type) {
     case 'string':
-      return <StringInput value={value} onChange={onChange} />;
+      return <StringInput value={value} onChange={onChange} format={definition.format} />;
     case 'number':
-      return <NumberRangeInput min={definition.minimum} max={definition.maximum} value={value} onChange={onChange} />;
+      return <NumberRangeInput min={definition.minimum} max={definition.maximum} step={definition.step} value={value} onChange={onChange} />;
     case 'boolean':
       return <BooleanInput value={value} onChange={onChange} />;
     case 'color':
@@ -228,8 +228,10 @@ const EnumInput: React.FC<{ options: (string | number)[], value: any, onChange: 
   );
 };
 
-const NumberRangeInput: React.FC<{ min?: number, max?: number, value: number, onChange: (val: number) => void }> = ({ min, max, value, onChange }) => {
+const NumberRangeInput: React.FC<{ min?: number, max?: number, step?: number, value: number, onChange: (val: number) => void }> = ({ min, max, step, value, onChange }) => {
   const hasRange = min !== undefined && max !== undefined;
+  // If step is not provided, default to 1% of range, or default browser behavior if no range
+  const rangeStep = step !== undefined ? step : (hasRange ? (max! - min!) / 100 : undefined);
 
   return (
     <div className={`prop-number-container ${hasRange ? 'has-range' : ''}`}>
@@ -239,7 +241,7 @@ const NumberRangeInput: React.FC<{ min?: number, max?: number, value: number, on
           className="prop-range"
           min={min}
           max={max}
-          step={(max! - min!) / 100}
+          step={rangeStep}
           value={value}
           onChange={(e) => onChange(parseFloat(e.target.value))}
         />
@@ -249,6 +251,7 @@ const NumberRangeInput: React.FC<{ min?: number, max?: number, value: number, on
         className="prop-input prop-number"
         min={min}
         max={max}
+        step={step}
         value={value}
         onChange={(e) => onChange(parseFloat(e.target.value))}
       />
@@ -288,7 +291,7 @@ const ColorInput: React.FC<{ value: string, onChange: (val: string) => void }> =
   );
 };
 
-const StringInput: React.FC<{ value: string, onChange: (val: string) => void }> = ({ value, onChange }) => {
+const StringInput: React.FC<{ value: string, onChange: (val: string) => void, format?: string }> = ({ value, onChange, format }) => {
   const [isDragOver, setIsDragOver] = React.useState(false);
 
   const handleDragOver = (e: React.DragEvent) => {
@@ -307,9 +310,19 @@ const StringInput: React.FC<{ value: string, onChange: (val: string) => void }> 
     if (text) onChange(text);
   };
 
+  let inputType = 'text';
+  if (format) {
+      if (format === 'date') inputType = 'date';
+      else if (format === 'time') inputType = 'time';
+      else if (format === 'date-time') inputType = 'datetime-local';
+      else if (format === 'email') inputType = 'email';
+      else if (format === 'uri' || format === 'url') inputType = 'url';
+      else if (format === 'color') inputType = 'color';
+  }
+
   return (
     <input
-      type="text"
+      type={inputType}
       className={`prop-input ${isDragOver ? 'drag-over' : ''}`}
       value={value}
       onChange={(e) => onChange(e.target.value)}
