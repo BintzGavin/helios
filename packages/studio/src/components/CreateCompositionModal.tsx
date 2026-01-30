@@ -77,6 +77,7 @@ export const CreateCompositionModal: React.FC = () => {
               <option value="react">React</option>
               <option value="vue">Vue</option>
               <option value="svelte">Svelte</option>
+              <option value="threejs">Three.js</option>
             </select>
           </div>
 

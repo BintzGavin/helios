@@ -1,3 +1,6 @@
+## STUDIO v0.58.0
+- ✅ Completed: Three.js Template - Implemented a "Three.js" template for the Composition Creator, enabling users to quickly bootstrap 3D compositions.
+
 ## STUDIO v0.57.0
 - ✅ Completed: Asset Filtering - Implemented search bar and type filter in Assets Panel to improve asset management.
 
