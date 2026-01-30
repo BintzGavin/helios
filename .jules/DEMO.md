@@ -15,3 +15,7 @@
 ## [1.64.2] - Client-Side Verification Gap
 **Learning:** The "Client-Side Export" feature (WebCodecs) is a "Current Capability" and "Primary Export Path" in the Vision, yet it had zero automated E2E coverage. E2E tests focused entirely on the server-side `Renderer` class.
 **Action:** Ensure E2E tests cover not just the `Renderer` pipeline but also the `<helios-player>` features (export, controls, interactivity) by running tests against built client artifacts.
+
+## [1.66.1] - Player Export Gaps
+**Learning:** The `@helios-project/player` package does not export `BridgeController` or `DirectController`, making it impossible for users to implement custom integrations or use `ClientSideExporter` programmatically without using the `<helios-player>` Web Component.
+**Action:** Created `examples/client-export-api` using source aliases to bypass this, but this gap should be flagged for the PLAYER domain to fix by exporting controllers.
