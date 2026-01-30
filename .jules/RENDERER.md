@@ -104,3 +104,7 @@
 ## [2026-03-27] - CdpTimeDriver Event Loop Deadlock
 **Learning:** In `CdpTimeDriver` (using `Emulation.setVirtualTimePolicy` with `pause`), waiting for async events like `seeked` or `setTimeout` causes a deadlock because the browser task runner is effectively frozen.
 **Action:** When implementing media sync in `CdpTimeDriver`, set `currentTime` synchronously but DO NOT await `seeked` events. Accept that "frame readiness" is best-effort in Canvas mode, unlike the stricter `SeekTimeDriver` used for DOM mode.
+
+## [1.44.0] - CdpTimeDriver Shadow DOM Gap
+**Learning:** While `SeekTimeDriver` (DOM mode) was updated to support Shadow DOM media sync, `CdpTimeDriver` (Canvas mode) still uses `document.querySelectorAll` and fails to synchronize media inside Shadow DOMs.
+**Action:** Future task: Update `CdpTimeDriver` to use the recursive `scanForAudioTracks`-style media discovery logic.
