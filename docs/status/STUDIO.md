@@ -1,4 +1,4 @@
-**Version**: 0.52.0
+**Version**: 0.53.0
 
 # Studio Domain Status
 
@@ -7,6 +7,7 @@
 **Focus**: UI Implementation & CLI
 
 ## Recent Updates
+- [v0.53.0] ✅ Completed: Recursive Schema Support - Implemented `ObjectInput` and `ArrayInput` in Props Editor to support nested object and array schemas with recursive UI generation.
 - [v0.52.0] ✅ Completed: Composition Settings Modal - Implemented a modal to edit composition metadata (Width, Height, FPS, Duration) of existing compositions, persisting changes to `composition.json`.
 - [v0.51.0] ✅ Completed: Composition Metadata - Implemented support for defining and persisting composition metadata (Width, Height, FPS, Duration) during creation, and respecting these settings in the Studio UI.
 - [v0.50.0] ✅ Completed: Vue & Svelte Templates - Implemented Vue and Svelte templates for the composition creator, including support for Vue 3 Composition API and Svelte 5 Runes.

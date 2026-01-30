@@ -47,7 +47,7 @@ packages/studio
 ## UI Components
 - **Stage**: Visual preview with zoom, pan, safe area guides, and transparency toggle.
 - **Timeline**: Track-based timeline with scrubbing, zooming, markers, and timecode display.
-- **Props Editor**: Auto-generated inputs based on composition schema.
+- **Props Editor**: Auto-generated inputs based on composition schema (supports recursive objects and arrays).
 - **Assets Panel**: Drag-and-drop asset management.
 - **Renders Panel**: Manage render jobs and download outputs.
 - **Captions Panel**: Edit and export captions (SRT).

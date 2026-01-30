@@ -175,4 +175,45 @@ describe('PropsEditor', () => {
     expect(optionValues).toContain('/assets/image.png');
     expect(optionValues).not.toContain('/assets/video.mp4');
   });
+
+  it('renders nested schema inputs', () => {
+    const schema: HeliosSchema = {
+      nestedObj: {
+        type: 'object',
+        properties: {
+          subProp: { type: 'string', label: 'Sub Property' }
+        }
+      },
+      listProp: {
+        type: 'array',
+        items: { type: 'string' }
+      }
+    };
+
+    (StudioContext.useStudio as any).mockReturnValue({
+      ...defaultContext,
+      playerState: {
+        inputProps: {
+          nestedObj: { subProp: 'sub-value' },
+          listProp: ['item1', 'item2']
+        },
+        schema
+      }
+    });
+
+    render(<PropsEditor />);
+
+    // Check nested object
+    expect(screen.getByText('Sub Property')).toBeInTheDocument();
+    expect(screen.getByDisplayValue('sub-value')).toBeInTheDocument();
+
+    // Check array items
+    expect(screen.getByDisplayValue('item1')).toBeInTheDocument();
+    expect(screen.getByDisplayValue('item2')).toBeInTheDocument();
+
+    // Check array controls
+    expect(screen.getByText('+ Add Item')).toBeInTheDocument();
+    const removeButtons = screen.getAllByText('Remove');
+    expect(removeButtons).toHaveLength(2);
+  });
 });
