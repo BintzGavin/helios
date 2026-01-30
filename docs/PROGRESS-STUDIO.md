@@ -1,3 +1,6 @@
+## STUDIO v0.59.0
+- ✅ Completed: Show Render Errors - Implemented error display in Renders Panel, enabling users to debug failed render jobs.
+
 ## STUDIO v0.58.0
 - ✅ Completed: Three.js Template - Implemented a "Three.js" template for the Composition Creator, enabling users to quickly bootstrap 3D compositions.
 
@@ -30,6 +33,7 @@
 
 ## STUDIO v0.48.1
 - ✅ Completed: Refactor Loop Logic - Moved loop enforcement logic from `App.tsx` to `StudioContext.tsx` to centralize playback state management.
+- ✅ Completed: Timeline Polish - Implemented Ruler with dynamic ticks, Hover Guide with timecode tooltip, and Magnetic Snapping (to markers/in/out) for the Timeline.
 
 ## STUDIO v0.48.0
 - ✅ Completed: Timecode & Range - Implemented SMPTE timecode display in Timeline and enforced In/Out points for looping and navigation (Rewind/Home).
