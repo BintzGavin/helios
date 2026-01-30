@@ -9,8 +9,8 @@ export class SeekTimeDriver implements TimeDriver {
       // Initialize virtual time
       (window as any).__HELIOS_VIRTUAL_TIME__ = 0;
 
-      // Capture initial wall clock to anchor Date.now()
-      const initialDate = Date.now();
+      // Use a fixed epoch to ensure deterministic Date.now() across runs
+      const initialDate = 1704067200000; // 2024-01-01T00:00:00.000Z
 
       // Override performance.now()
       // We don't need to keep the original because we want full control
