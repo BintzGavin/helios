@@ -38,7 +38,7 @@
 - `examples/svelte-runes-animation`: Svelte 5 Runes ($state, $derived).
 - `examples/solid-canvas-animation`: SolidJS Canvas (Signals adapter).
 - `examples/solid-dom-animation`: SolidJS DOM (Signals + CSS).
-- `examples/solid-animation-helpers`: SolidJS Helpers (<Sequence>).
+- `examples/solid-animation-helpers`: SolidJS Helpers (`<Sequence>`, `<Series>`).
 - `examples/solid-transitions`: SolidJS transitions (CSS animation synchronization).
 - `examples/map-animation`: Leaflet Maps (DOM).
 - `examples/text-effects-animation`: Text Effects (Typewriter, Staggered Reveal).

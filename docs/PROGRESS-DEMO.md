@@ -1,3 +1,6 @@
+## DEMO v1.64.0
+- ✅ Completed: Implement SolidJS Series Component - Added `<Series>` component to `examples/solid-animation-helpers` and updated example to demonstrate it.
+
 ## DEMO v1.63.0
 - ✅ Completed: Verify Podcast Visualizer - Verified `examples/podcast-visualizer` implementation, specifically testing multi-track audio mixing, muted attribute handling, and offset timing in the E2E pipeline.
 
