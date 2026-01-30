@@ -1,160 +1,19 @@
-# Status: DEMO (Executor)
-**Version**: 1.61.1
+# Status: DEMO Domain
+
+**Current Version:** 1.0.1
 
 ## Vision
-To provide comprehensive, idiomatic examples for every major framework (React, Vue, Svelte, Vanilla) and robust end-to-end testing to ensure the Helios engine delivers on its "Use What You Know" promise.
+The DEMO domain is responsible for:
+1.  **Examples:** Providing clear, idiomatic usage examples for all supported frameworks (React, Vue, Svelte, Vanilla).
+2.  **E2E Testing:** Ensuring the rendering pipeline works across all configurations.
+3.  **Build Config:** Maintaining the root `vite.config.js` and build scripts to support the examples.
 
 ## Blocked Items
-- [ ] **Workspace Dependency Mismatch**: `packages/renderer` and `packages/player` depend on `@helios-project/core@2.9.0`, but the workspace version is `2.10.0`. This prevents `npm install` from succeeding, blocking clean builds and verification. Temporary local fix was required to verify changes.
+- None
 
-## Current State
-- **Web Component**: ✅ `examples/web-component-animation` exists and works (Demonstrates Shadow DOM and CSS animation integration).
-- **Solid Transitions**: ✅ `examples/solid-transitions` exists and works (Demonstrates synchronizing CSS animations in SolidJS using `autoSyncAnimations`).
-- **Solid Animation Helpers**: ✅ `examples/solid-animation-helpers` exists and works (Demonstrates idiomatic Sequence component composition in SolidJS).
-- **Svelte Runes**: ✅ `examples/svelte-runes-animation` exists and works (Demonstrates Svelte 5 Runes integration with `HeliosState` adapter).
-- **Map Animation**: ✅ `examples/map-animation` exists and works (Demonstrates Leaflet integration with stability checks).
-- **Promo Video**: ✅ `examples/promo-video` exists and works (Demonstrates complex multi-scene GSAP animation).
-- **Text Effects**: ✅ `examples/text-effects-animation` exists and works (Demonstrates Typewriter and Staggered Reveal effects).
-- **Solid DOM**: ✅ `examples/solid-dom-animation` exists and works (Demonstrates integration with SolidJS signals for DOM updates).
-- **Solid Canvas**: ✅ `examples/solid-canvas-animation` exists and works (Demonstrates integration with SolidJS signals via `createHeliosSignal` adapter).
-- **React Styled Components**: ✅ `examples/react-styled-components` exists and works (Demonstrates `styled-components` integration with `autoSyncAnimations`).
-- **Variable Font**: ✅ `examples/variable-font-animation` exists and works (Demonstrates `autoSyncAnimations` driving CSS `font-variation-settings`).
-- **Vue Transitions**: ✅ `examples/vue-transitions` exists and works (Demonstrates synchronizing CSS animations using `autoSyncAnimations` and `animation-delay` in Vue).
-- **Svelte Transitions**: ✅ `examples/svelte-transitions` exists and works (Demonstrates synchronizing CSS animations using `autoSyncAnimations` and `animation-delay` in Svelte).
-- **React Transitions**: ✅ `examples/react-transitions` exists and works (Demonstrates synchronizing CSS animations using `autoSyncAnimations` and manual time offsets).
-- **Social Media Story**: ✅ `examples/social-media-story` exists and works (Demonstrates `autoSyncAnimations` with `<video>` and sequence composition).
-- **Chart.js**: ✅ `examples/chartjs-animation` exists and works (Demonstrates synchronous update via `chart.update('none')`).
-- **Procedural Generation**: ✅ `examples/procedural-generation` exists and works (Demonstrates `random` and `interpolateColors`).
-- **Vanilla JS (Canvas)**: ✅ `examples/simple-canvas-animation` exists and works.
-- **Vanilla JS (DOM)**: ✅ `examples/simple-animation` exists and works.
-- **WAAPI**: ✅ `examples/waapi-animation` exists and works (Demonstrates `element.animate()` integration).
-- **Audio Visualization**: ✅ `examples/audio-visualization` exists and works (Demonstrates raw audio data visualization).
-- **Media Element**: ✅ `examples/media-element-animation` exists and works (Demonstrates `<video>`/`<audio>` sync).
-- **GSAP**: ✅ `examples/gsap-animation` exists and works.
-- **Framer Motion**: ✅ `examples/framer-motion-animation` exists and works.
-- **Lottie**: ✅ `examples/lottie-animation` exists and works.
-- **Motion One**: ✅ `examples/motion-one-animation` exists and works.
-- **P5.js**: ✅ `examples/p5-canvas-animation` exists and works (Demonstrates Instance Mode integration).
-- **D3.js**: ✅ `examples/d3-animation` exists and works (Demonstrates data visualization).
-- **Captions**: ✅ `examples/captions-animation` exists and works (Demonstrates built-in SRT captions).
-- **Signals**: ✅ `examples/signals-animation` exists and works (Demonstrates `signal`, `computed`, `effect`).
-- **Dynamic Props**: ✅ `examples/dynamic-props-animation` exists and works (Demonstrates `inputProps` and `schema`).
-- **Animation Helpers**: ✅ `examples/animation-helpers` exists and works (Demonstrates `interpolate`, `spring`, `sequence`, `series`).
-- **React (Canvas)**: ✅ `examples/react-canvas-animation` exists and works.
-- **React (DOM)**: ✅ `examples/react-dom-animation` exists and works.
-- **React (CSS)**: ✅ `examples/react-css-animation` exists and works (Demonstrates `autoSyncAnimations: true`).
-- **React (Helpers)**: ✅ `examples/react-animation-helpers` exists and works (Demonstrates `<Sequence>`, `<Series>`).
-- **Tailwind CSS**: ✅ `examples/tailwind-animation` exists and works (Demonstrates Tailwind v3 integration with `autoSyncAnimations`).
-- **Vue (Canvas)**: ✅ `examples/vue-canvas-animation` exists and works.
-- **Vue (DOM)**: ✅ `examples/vue-dom-animation` exists and works.
-- **Vue (Helpers)**: ✅ `examples/vue-animation-helpers` exists and works (Demonstrates `<Sequence>`, `<Series>`).
-- **Svelte**: ✅ `examples/svelte-canvas-animation` exists and works.
-- **Svelte (Helpers)**: ✅ `examples/svelte-animation-helpers` exists and works (Demonstrates `<Sequence>`, `<Series>`).
-- **Three.js**: ✅ `examples/threejs-canvas-animation` exists and works.
-- **React Three Fiber**: ✅ `examples/react-three-fiber` exists and works (Demonstrates integration with `@react-three/fiber` via manual `frameloop`).
-- **Pixi.js**: ✅ `examples/pixi-canvas-animation` exists and works.
-- **Podcast Visualizer**: ✅ `examples/podcast-visualizer` exists and works (Demonstrates multi-track audio mixing and sync verification).
-- **E2E Tests**: ✅ Verified all existing examples via `tests/e2e/verify-render.ts`.
+## Active Tasks
+- None
 
-## Backlog
-- [x] Scaffold Solid DOM Example (`examples/solid-dom-animation`)
-- [x] Scaffold React Three Fiber Example (`examples/react-three-fiber`)
-- [x] Scaffold Chart.js Animation Example (`examples/chartjs-animation`)
-- [x] Scaffold Procedural Generation Example (`examples/procedural-generation`)
-- [x] Scaffold Media Element Example (`examples/media-element-animation`)
-- [x] Scaffold Captions Animation Example (`examples/captions-animation`)
-- [x] Scaffold Svelte Animation Helpers (`examples/svelte-animation-helpers`)
-- [x] Scaffold Animation Helpers Example (`examples/animation-helpers`)
-- [x] Scaffold Three.js Example (`examples/threejs-canvas-animation`)
-- [x] Scaffold Pixi.js Example (`examples/pixi-canvas-animation`)
-- [x] Scaffold React Example (`examples/react-canvas-animation`)
-- [x] Scaffold Vue Example (`examples/vue-canvas-animation`)
-- [x] Scaffold Vue DOM Example (`examples/vue-dom-animation`)
-- [x] Scaffold Svelte Example
-- [x] Verify E2E tests for examples
-- [x] Verify DOM rendering example
-- [x] Scaffold Framer Motion Example
-- [x] Scaffold Lottie Animation Example
-- [x] Scaffold Motion One Example
-- [x] Scaffold P5.js Animation Example
-- [x] Scaffold Signals Animation Example
-- [x] Scaffold React CSS Animation Example
-- [x] Scaffold Dynamic Props Example
-- [x] Scaffold D3 Animation Example
-- [x] Scaffold Tailwind CSS Example
-- [x] Scaffold WAAPI Animation Example
-
-## Known Issues
-None.
-
-## Log
-- [v1.61.1] ✅ Completed: Verify Solid Animation Helpers - Added `examples/solid-animation-helpers` to `tests/e2e/verify-render.ts`. Verified all 47 examples pass (requires dependency fix).
-- [v1.61.0] ✅ Completed: Web Component Animation - Created `examples/web-component-animation` demonstrating Shadow DOM and CSS animation integration.
-- [v1.60.0] ✅ Completed: Verify Promo Video - Integrated `examples/promo-video` into verification pipeline and documentation.
-- [v1.59.1] ✅ Completed: Verify Podcast Visualizer - Verified `examples/podcast-visualizer` implementation matches spec and passes E2E verification.
-- [v1.59.0] ✅ Completed: Solid Transitions Example - Created `examples/solid-transitions` demonstrating how to synchronize CSS animations in SolidJS using `autoSyncAnimations: true` and `animation-delay`. Verified with E2E tests.
-- [v1.58.0] ✅ Completed: Refine Podcast Visualizer - Updated audio source to a 440Hz sine wave to enable audible verification of mixing logic.
-- [v1.57.0] ✅ Completed: Verify Podcast Visualizer - Found and fixed a bug in `examples/podcast-visualizer` (incorrect usage of `state.currentTime`) and re-verified visual correctness with a custom script.
-- [v1.56.0] ✅ Completed: Solid Animation Helpers Example - Created `examples/solid-animation-helpers` demonstrating idiomatic Sequence component composition in SolidJS.
-- [v1.55.0] ✅ Completed: Svelte Runes Animation Example - Created `examples/svelte-runes-animation` demonstrating Svelte 5 Runes (`$state`, `$derived`) integration.
-- [v1.54.0] ✅ Completed: Text Effects Animation Example - Created `examples/text-effects-animation` demonstrating Typewriter and Staggered Reveal effects.
-- [v1.53.1] ✅ Completed: Verify Podcast Visualizer - Validated `examples/podcast-visualizer` with E2E tests and fixed workspace dependencies in `renderer` and `player`.
-- [v1.53.0] ✅ Completed: Verify Solid DOM Example - Added Solid DOM to verification registry and verified it passes.
-- [v1.52.0] ✅ Completed: Map Animation Example - Created `examples/map-animation` demonstrating Leaflet integration.
-- [v1.51.0] ✅ Completed: Solid DOM Example - Created `examples/solid-dom-animation` demonstrating integration with SolidJS signals for DOM updates.
-- [v1.50.0] ✅ Completed: Podcast Visualizer - Created `examples/podcast-visualizer` demonstrating multi-track audio mixing and sync verification.
-- [v1.49.1] ✅ Completed: Solid Canvas Documentation - Added README for SolidJS example and verified E2E tests.
-- [v1.49.0] ✅ Completed: Solid Canvas Example - Created `examples/solid-canvas-animation` demonstrating integration with SolidJS and `createHeliosSignal` adapter.
-- [v1.48.0] ✅ Completed: React Styled Components Example - Created `examples/react-styled-components` demonstrating integration with `styled-components` via `autoSyncAnimations` and refactored all examples to use source imports.
-- [v1.47.0] ✅ Completed: Variable Font Animation Example - Created `examples/variable-font-animation` demonstrating how to synchronize CSS Variable Font animations using `autoSyncAnimations` with proper seeking support.
-- [v1.46.0] ✅ Completed: Vue Transitions Example - Created `examples/vue-transitions` demonstrating how to synchronize standard CSS animations in Vue using `autoSyncAnimations` and `animation-delay` in Vue.
-- [v1.45.0] ✅ Completed: Svelte Transitions Example - Created `examples/svelte-transitions` demonstrating how to synchronize standard CSS animations in Svelte using `autoSyncAnimations` and `animation-delay`.
-- [v1.44.0] ✅ Completed: Scaffold React Three Fiber Example - Created `examples/react-three-fiber` demonstrating integration with `@react-three/fiber` using `frameloop="never"` and manual state advancement.
-- [v1.43.0] ✅ Completed: Create React Transitions Example - Created `examples/react-transitions` demonstrating how to synchronize CSS animations with Helios timeline using `autoSyncAnimations` and `animation-delay`.
-- [v1.42.0] ✅ Completed: Document Social Media Story Example - Documented `examples/social-media-story` demonstrating React integration with `autoSyncAnimations` and component composition.
-- [v1.41.0] ✅ Completed: Scaffold Chart.js Animation Example - Created `examples/chartjs-animation` demonstrating integration with Chart.js using synchronous updates.
-- [v1.40.0] ✅ Completed: Scaffold Procedural Generation Example - Created `examples/procedural-generation` demonstrating deterministic `random` and `interpolateColors` utilities.
-- [v1.39.0] ✅ Completed: Scaffold Audio Visualization Example - Created `examples/audio-visualization` demonstrating synchronous audio generation and visualization using Canvas.
-- [v1.38.0] 📋 Planned: Scaffold Audio Visualization Example - Created spec file `/.sys/plans/2025-02-22-DEMO-Audio-Visualization.md` to guide implementation of audio data visualization.
-- [v1.37.0] ✅ Completed: Scaffold P5.js Example - Created `examples/p5-canvas-animation` demonstrating integration with P5.js in Instance Mode.
-- [v1.36.0] ✅ Completed: Scaffold WAAPI Animation Example - Created `examples/waapi-animation` demonstrating standard Web Animations API integration with `autoSyncAnimations`.
-- [v1.35.0] ✅ Completed: Scaffold Tailwind CSS Example - Created `examples/tailwind-animation` demonstrating Tailwind v3 integration with proper scoping and build configuration.
-- [v1.34.0] 📋 Planned: Scaffold Tailwind CSS Example - Created spec file `/.sys/plans/2025-02-22-DEMO-TailwindAnimation.md` to guide implementation of Tailwind CSS integration.
-- [v1.33.0] ✅ Completed: Scaffold D3 Animation Example - Created `examples/d3-animation` demonstrating data visualization with D3.js and frame-based updates.
-- [v1.32.0] 📋 Planned: Scaffold D3 Animation Example - Created spec file `/.sys/plans/2025-02-21-DEMO-D3-Animation.md` to guide implementation of data visualization example using D3.js.
-- [v1.31.0] ✅ Completed: Scaffold Media Element Example - Created `examples/media-element-animation` demonstrating `DomDriver` synchronization of native `<video>` and `<audio>` elements.
-- [v1.30.0] ✅ Completed: Scaffold Dynamic Props Example - Created `examples/dynamic-props-animation` demonstrating `inputProps` and `schema` validation with a React frontend.
-- [v1.29.0] ✅ Completed: Scaffold React CSS Animation Example - Created `examples/react-css-animation` demonstrating standard CSS animations with `autoSyncAnimations: true`.
-- [v1.28.0] ✅ Completed: Scaffold Signals Animation Example - Created `examples/signals-animation` demonstrating fine-grained reactivity using core signals.
-- [v1.28.0] 📋 Planned: Scaffold Signals Animation Example - Created spec file `/.sys/plans/2026-01-26-DEMO-SignalsAnimation.md` to guide implementation of high-performance signal-based animation.
-- [v1.27.0] ✅ Completed: Scaffold Captions Animation Example - Created `examples/captions-animation` demonstrating built-in SRT caption support.
-- [v1.26.1] 📋 Planned: Scaffold Captions Animation Example - Created spec file `/.sys/plans/2025-02-19-DEMO-CaptionsAnimation.md` to guide implementation of built-in SRT caption support.
-- [v1.26.0] ✅ Completed: Scaffold Motion One Example - Created `examples/motion-one-animation` demonstrating integration with `motion` library via `autoSyncAnimations: true`.
-- [v1.25.0] ✅ Completed: Verify React Series Component - Verified implementation of `<Series>` component in `examples/react-animation-helpers` and confirmed E2E tests pass using `ts-node`.
-- [v1.24.0] 📋 Planned: Scaffold Motion One Example - Created spec file `/.sys/plans/2026-01-26-DEMO-MotionOne.md` to guide integration with `motion` library.
-- [v1.23.0] ✅ Completed: Scaffold Lottie Animation Example - Created `examples/lottie-animation` demonstrating integration with `lottie-web` via time-based seeking.
-- [v1.22.0] ✅ Completed: Scaffold Framer Motion Example - Created `examples/framer-motion-animation` demonstrating integration with `framer-motion` via `useMotionValue` and manual time syncing.
-- [v1.21.0] ✅ Completed: GSAP Example - Created `examples/gsap-animation` demonstrating integration with GSAP timelines.
-- [v1.20.0] ✅ Completed: Refactor Simple Animation - Updated `examples/simple-animation` to use native CSS `@keyframes` and `autoSyncAnimations: true` instead of JS-driven CSS variables.
-- [v1.19.0] ✅ Completed: Implement Svelte Series Component - Added `<Series>` component to `examples/svelte-animation-helpers` and updated example to use it.
-- [v1.18.0] ✅ Completed: Implement React Series Component - Implemented `<Series>` component in `examples/react-animation-helpers` and verified with E2E tests.
-- [v1.17.0] ✅ Completed: Implement Vue Series Component - Added `<Series>` component to `examples/vue-animation-helpers` and updated example to demonstrate it.
-- [v1.16.0] ✅ Completed: Implement React Series Component - Added `<Series>` component to `examples/react-animation-helpers` and updated example to demonstrate it.
-- [v1.15.0] ✅ Completed: Enable E2E verification for DOM examples - Uncommented DOM test cases in `verify-render.ts`, verified all 14 examples pass (using `SeekTimeDriver` for DOM), and fixed a bug in Pixi example.
-- [v1.14.0] ✅ Completed: Scaffold Vue Animation Helpers - Created `examples/vue-animation-helpers` with `<Sequence>` component and Provide/Inject timing.
-- [v1.13.0] ✅ Completed: Verify Svelte Animation Helpers - Verified `examples/svelte-animation-helpers` and enabled E2E test.
-- [v1.12.0] ✅ Completed: Update Animation Helpers - Updated `examples/animation-helpers` to demonstrate `sequence` and `series` core functions.
-- [v1.11.0] ✅ Completed: Scaffold React Animation Helpers - Created `examples/react-animation-helpers` with `<Sequence>` component and Context-based timing.
-- [v1.10.0] ✅ Completed: Scaffold Svelte DOM Example - Created `examples/svelte-dom-animation` and verified with E2E (commented out).
-- [v2.0.0] 📋 Planned: Scaffold Svelte DOM Example - Created spec file `/.sys/plans/2025-02-19-DEMO-SvelteDOM.md` to guide implementation.
-- [v1.9.0] ✅ Completed: Scaffold Vue DOM Example - Created `examples/vue-dom-animation` and added E2E verification case (blocked).
-- [v1.8.1] ✅ Completed: Scaffold React DOM Example - Updated `verify-render.ts` to document blocking issue.
-- [v1.8.0] ✅ Completed: Scaffold React DOM Example - Created `examples/react-dom-animation` and added E2E verification case.
-- [v1.7.0] ✅ Completed: Scaffold Pixi.js Example - Created `examples/pixi-canvas-animation` with `pixi.js` dependency and verification script.
-- [v1.6.0] ✅ Completed: Scaffold Animation Helpers Example - Created `examples/animation-helpers` demonstrating `interpolate` and `spring` from Core.
-- [v1.5.0] ✅ Completed: Scaffold Three.js Example - Created `examples/threejs-canvas-animation` with `three` dependency and verification script.
-- [v1.4.0] 📋 Planned: Scaffold Three.js Example - Created spec file `/.sys/plans/2025-02-14-DEMO-ThreeJS.md` to guide implementation of the missing Three.js example.
-- [v1.3.0] ✅ Completed: Verify DOM Render - Updated `tests/e2e/verify-render.ts` to include the DOM rendering test case and verified it passes.
-- [v1.2.0] ✅ Completed: Expand E2E Tests - Refactored `tests/e2e/verify-render.ts` to verify all 4 examples (Canvas, React, Vue, Svelte).
-- [v1.1.0] ✅ Completed: Scaffold Svelte Example - Created `examples/svelte-canvas-animation` and verification script.
-- [2026-01-22] ✅ Completed: Verify Vue Example - Verified build and render of `examples/vue-canvas-animation`. Created `tests/e2e/verify-render.ts`.
+## Completed Tasks
+- [2026-01-30] Created plan for `stress-test-animation` example to validate performance claims.
+- [2026-01-30] Initialized domain status and journal.
