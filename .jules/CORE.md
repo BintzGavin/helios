@@ -5,3 +5,7 @@
 ## [2.10.0] - Plan Specificity
 **Learning:** When using `set_plan` or `request_plan_review` to create a spec file, the plan step must explicitly contain the full text content of the file to be created, rather than just a description of what it will contain.
 **Action:** Always include the full Markdown content in the plan step description when the task is to create a specific file.
+
+## [2.13.0] - Missing Asset Types
+**Learning:** Found that `packages/studio` supports `model`, `json`, `shader` asset types, but `packages/core` schema validation rejected them.
+**Action:** When defining schemas in Core, always cross-reference with Studio's supported asset discovery types to ensure compatibility.
