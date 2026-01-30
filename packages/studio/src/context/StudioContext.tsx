@@ -89,7 +89,10 @@ interface StudioContextType {
 
   isCreateOpen: boolean;
   setCreateOpen: (isOpen: boolean) => void;
+  isSettingsOpen: boolean;
+  setSettingsOpen: (isOpen: boolean) => void;
   createComposition: (name: string, template?: string, options?: CompositionMetadata) => Promise<void>;
+  updateCompositionMetadata: (id: string, metadata: CompositionMetadata) => Promise<void>;
   deleteComposition: (id: string) => Promise<void>;
 
   // Assets
@@ -148,6 +151,7 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [isDiagnosticsOpen, setDiagnosticsOpen] = useState(false);
   const [isPromptOpen, setPromptOpen] = useState(false);
   const [isCreateOpen, setCreateOpen] = useState(false);
+  const [isSettingsOpen, setSettingsOpen] = useState(false);
   const [canvasSize, setCanvasSize] = useState({ width: 1920, height: 1080 });
   const [renderConfig, setRenderConfig] = useState<RenderConfig>({ mode: 'canvas' });
 
@@ -246,6 +250,32 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     }
   };
 
+  const updateCompositionMetadata = async (id: string, metadata: CompositionMetadata) => {
+    try {
+      const res = await fetch('/api/compositions', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, ...metadata })
+      });
+
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || 'Failed to update composition');
+      }
+
+      const updatedComp = await res.json();
+
+      setCompositions((prev: Composition[]) => prev.map(c => c.id === id ? updatedComp : c));
+
+      if (activeComposition?.id === id) {
+        setActiveComposition(updatedComp);
+      }
+    } catch (e) {
+      console.error(e);
+      throw e;
+    }
+  };
+
   const deleteComposition = async (id: string) => {
     try {
       const res = await fetch(`/api/compositions?id=${encodeURIComponent(id)}`, {
@@ -257,7 +287,7 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         throw new Error(err.error || 'Failed to delete composition');
       }
 
-      setCompositions(prev => {
+      setCompositions((prev: Composition[]) => {
         const next = prev.filter(c => c.id !== id);
         if (activeComposition?.id === id) {
            setActiveComposition(next.length > 0 ? next[0] : null);
@@ -487,7 +517,10 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         setPromptOpen,
         isCreateOpen,
         setCreateOpen,
+        isSettingsOpen,
+        setSettingsOpen,
         createComposition,
+        updateCompositionMetadata,
         deleteComposition,
         renderJobs,
         startRender,

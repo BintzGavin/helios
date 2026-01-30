@@ -2,7 +2,7 @@ import { Plugin, ViteDevServer, PreviewServer } from 'vite';
 import { AddressInfo } from 'net';
 import fs from 'fs';
 import path from 'path';
-import { findCompositions, findAssets, getProjectRoot, createComposition, deleteComposition } from './src/server/discovery';
+import { findCompositions, findAssets, getProjectRoot, createComposition, deleteComposition, updateCompositionMetadata } from './src/server/discovery';
 import { startRender, getJob, getJobs, cancelJob, deleteJob, diagnoseServer } from './src/server/render-manager';
 
 const getBody = async (req: any) => {
@@ -104,6 +104,34 @@ function configureMiddlewares(server: ViteDevServer | PreviewServer, isPreview: 
                 res.end(JSON.stringify({ error: e.message }));
              }
              return;
+          }
+
+          if (req.method === 'PATCH') {
+            try {
+              const body = await getBody(req);
+              const { id, width, height, fps, duration } = body;
+
+              if (!id) {
+                res.statusCode = 400;
+                res.end(JSON.stringify({ error: 'ID is required' }));
+                return;
+              }
+
+              const options: any = {};
+              if (width !== undefined) options.width = Number(width);
+              if (height !== undefined) options.height = Number(height);
+              if (fps !== undefined) options.fps = Number(fps);
+              if (duration !== undefined) options.duration = Number(duration);
+
+              const updatedComp = updateCompositionMetadata(process.cwd(), id, options);
+              res.setHeader('Content-Type', 'application/json');
+              res.end(JSON.stringify(updatedComp));
+            } catch (e: any) {
+              console.error(e);
+              res.statusCode = 500;
+              res.end(JSON.stringify({ error: e.message }));
+            }
+            return;
           }
 
           if (req.method === 'DELETE') {

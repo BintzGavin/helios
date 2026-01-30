@@ -216,3 +216,63 @@ export function findAssets(rootDir: string): AssetInfo[] {
   scan(projectRoot);
   return assets;
 }
+
+export function updateCompositionMetadata(
+  rootDir: string,
+  id: string,
+  metadata: CompositionOptions
+): CompositionInfo {
+  const projectRoot = getProjectRoot(rootDir);
+  const compDir = path.resolve(projectRoot, id);
+
+  // Security check: ensure path is within project root
+  if (!compDir.startsWith(projectRoot)) {
+    throw new Error('Access denied: Cannot update outside project root');
+  }
+
+  if (!fs.existsSync(compDir)) {
+    throw new Error(`Composition "${id}" not found`);
+  }
+
+  // Read existing metadata
+  const metaPath = path.join(compDir, 'composition.json');
+  let currentMetadata: CompositionOptions = {
+    width: 1920,
+    height: 1080,
+    fps: 30,
+    duration: 5
+  };
+
+  if (fs.existsSync(metaPath)) {
+    try {
+      currentMetadata = JSON.parse(fs.readFileSync(metaPath, 'utf-8'));
+    } catch (e) {
+      console.warn(`Failed to parse metadata for ${id}, using defaults`, e);
+    }
+  }
+
+  // Merge metadata
+  const newMetadata = {
+    ...currentMetadata,
+    ...metadata
+  };
+
+  // Write back
+  fs.writeFileSync(metaPath, JSON.stringify(newMetadata, null, 2));
+
+  // Return updated info
+  const name = id
+    .split('-')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+
+  const compPath = path.join(compDir, 'composition.html');
+
+  return {
+    id: id,
+    name: name,
+    url: `/@fs${compPath}`,
+    description: `Example: ${name}`,
+    metadata: newMetadata
+  };
+}

@@ -8,6 +8,7 @@ import { PlaybackControls } from './components/Controls/PlaybackControls'
 import { StudioProvider, useStudio } from './context/StudioContext'
 import { CompositionSwitcher } from './components/CompositionSwitcher'
 import { CreateCompositionModal } from './components/CreateCompositionModal'
+import { CompositionSettingsModal } from './components/CompositionSettingsModal'
 import { KeyboardShortcutsModal } from './components/KeyboardShortcutsModal'
 import { DiagnosticsModal } from './components/DiagnosticsModal'
 import { SystemPromptModal } from './components/SystemPromptModal'
@@ -112,6 +113,7 @@ function AppContent() {
       />
       <CompositionSwitcher />
       <CreateCompositionModal />
+      <CompositionSettingsModal />
       <KeyboardShortcutsModal />
       <DiagnosticsModal />
       <SystemPromptModal />
