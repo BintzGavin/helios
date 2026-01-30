@@ -28,7 +28,7 @@ export const Stage: React.FC<StageProps> = ({ src }) => {
   useKeyboardShortcut("'", () => setShowGuides(p => !p), { ignoreInput: true });
 
   // HMR State Preservation
-  const lastStateRef = useRef({ frame: 0, isPlaying: false, src: '' });
+  const lastStateRef = useRef<{ frame: number, isPlaying: boolean, src: string, inputProps: Record<string, any> | null }>({ frame: 0, isPlaying: false, src: '', inputProps: null });
 
   // Track latest state
   useEffect(() => {
@@ -36,10 +36,11 @@ export const Stage: React.FC<StageProps> = ({ src }) => {
       lastStateRef.current = {
         frame: playerState.currentFrame,
         isPlaying: playerState.isPlaying,
-        src: src
+        src: src,
+        inputProps: playerState.inputProps
       };
     }
-  }, [playerState.currentFrame, playerState.isPlaying, src, controller]);
+  }, [playerState.currentFrame, playerState.isPlaying, src, controller, playerState.inputProps]);
 
   // Reset controller when composition changes
   useEffect(() => {
@@ -64,10 +65,13 @@ export const Stage: React.FC<StageProps> = ({ src }) => {
         // If we found a new controller, check if we should restore state
         if (lastStateRef.current.src === src) {
           // Restore state
-          const { frame, isPlaying } = lastStateRef.current;
+          const { frame, isPlaying, inputProps } = lastStateRef.current;
           // Use try-catch as seeking immediately might sometimes fail if not ready,
           // though freshCtrl usually implies ready in Helios.
           try {
+            if (inputProps && Object.keys(inputProps).length > 0) {
+              freshCtrl.setInputProps(inputProps);
+            }
             if (frame > 0) freshCtrl.seek(frame);
             if (isPlaying) freshCtrl.play();
           } catch (e) {

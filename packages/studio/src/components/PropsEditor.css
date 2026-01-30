@@ -179,3 +179,36 @@
 .prop-array-add:hover {
   background-color: #bbdefb;
 }
+
+/* Props Toolbar */
+.props-toolbar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #eee;
+}
+
+.props-toolbar-btn {
+  padding: 4px 8px;
+  border: 1px solid #ddd;
+  background-color: #f5f5f5;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.8em;
+  color: #333;
+}
+
+.props-toolbar-btn:hover {
+  background-color: #e0e0e0;
+}
+
+.props-toolbar-btn.danger {
+  color: #c62828;
+  border-color: #ffcdd2;
+  background-color: #ffebee;
+}
+
+.props-toolbar-btn.danger:hover {
+  background-color: #ffcdd2;
+}
