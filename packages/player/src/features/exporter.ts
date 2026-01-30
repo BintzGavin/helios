@@ -27,15 +27,24 @@ export class ClientSideExporter {
 
     try {
       const state = this.controller.getState();
-      const totalFrames = state.duration * state.fps;
+
+      let startFrame = 0;
+      let totalFrames = state.duration * state.fps;
+
+      if (state.playbackRange && state.playbackRange.length === 2) {
+          startFrame = state.playbackRange[0];
+          const endFrame = state.playbackRange[1];
+          // Determine duration based on range
+          totalFrames = endFrame - startFrame;
+      }
 
       // 1. Determine effective mode
       let effectiveMode = mode;
 
       // If auto, try to find a canvas first. If not found, assume DOM.
       if (effectiveMode === 'auto') {
-          // Try to capture frame 0 in canvas mode
-          const result = await this.controller.captureFrame(0, {
+          // Try to capture frame 0 (or startFrame) in canvas mode
+          const result = await this.controller.captureFrame(startFrame, {
               selector: canvasSelector,
               mode: 'canvas'
           });
@@ -50,7 +59,7 @@ export class ClientSideExporter {
       }
 
       // 2. Capture first frame to determine dimensions and validate
-      const firstResult = await this.controller.captureFrame(0, {
+      const firstResult = await this.controller.captureFrame(startFrame, {
           selector: canvasSelector,
           mode: effectiveMode as 'canvas' | 'dom'
       });
@@ -137,7 +146,9 @@ export class ClientSideExporter {
 
               const audioTracks = await this.controller.getAudioTracks();
               if (audioTracks && audioTracks.length > 0) {
-                  const audioBuffer = await mixAudio(audioTracks, state.duration, 48000);
+                  const durationInSeconds = totalFrames / state.fps;
+                  const rangeStartInSeconds = startFrame / state.fps;
+                  const audioBuffer = await mixAudio(audioTracks, durationInSeconds, 48000, rangeStartInSeconds);
                   const c0 = audioBuffer.getChannelData(0);
                   const c1 = audioBuffer.getChannelData(1);
                   const planarData = new Float32Array(c0.length + c1.length);
@@ -221,13 +232,15 @@ export class ClientSideExporter {
             throw new Error("Export aborted");
         }
 
-        const result = await this.controller.captureFrame(i, {
+        const frameIndex = startFrame + i;
+
+        const result = await this.controller.captureFrame(frameIndex, {
             selector: canvasSelector,
             mode: effectiveMode as 'canvas' | 'dom'
         });
 
         if (!result || !result.frame) {
-            throw new Error(`Frame ${i} missing during export.`);
+            throw new Error(`Frame ${frameIndex} missing during export.`);
         }
 
         const { frame: videoFrame, captions } = result;

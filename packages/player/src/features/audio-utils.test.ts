@@ -119,7 +119,7 @@ describe('audio-utils', () => {
 
       await mixAudio(assets, 10, 44100);
 
-      expect(mockSource.start).toHaveBeenCalledWith(2.5);
+      expect(mockSource.start).toHaveBeenCalledWith(2.5, 0);
     });
 
     it('should default startTime to 0', async () => {
@@ -130,7 +130,36 @@ describe('audio-utils', () => {
 
         await mixAudio(assets, 10, 44100);
 
-        expect(mockSource.start).toHaveBeenCalledWith(0);
-      });
+        expect(mockSource.start).toHaveBeenCalledWith(0, 0);
+    });
+
+    it('should offset playback by rangeStart when asset starts after range', async () => {
+      const assets = [{
+        buffer: new ArrayBuffer(8),
+        mimeType: 'audio/mpeg',
+        startTime: 5.0
+      }];
+      // Export window starts at 2.0
+      await mixAudio(assets, 10, 44100, 2.0);
+
+      // Should start at 5.0 - 2.0 = 3.0 relative to buffer
+      expect(mockSource.start).toHaveBeenCalledWith(3.0, 0);
+    });
+
+    it('should skip beginning of asset if it starts before range', async () => {
+      const assets = [{
+        buffer: new ArrayBuffer(8),
+        mimeType: 'audio/mpeg',
+        startTime: 1.0
+      }];
+      // Export window starts at 3.0
+      await mixAudio(assets, 10, 44100, 3.0);
+
+      // Asset starts at 1.0. Range starts at 3.0.
+      // We are 2.0 seconds into the asset when the range starts.
+      // playbackStart should be 0 (play immediately at start of range)
+      // offset should be 2.0 (skip first 2 seconds of audio)
+      expect(mockSource.start).toHaveBeenCalledWith(0, 2.0);
+    });
   });
 });

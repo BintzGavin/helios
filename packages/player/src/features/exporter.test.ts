@@ -393,4 +393,29 @@ describe('ClientSideExporter', () => {
         expect(fillTextSpy).toHaveBeenCalledWith('Line 1', expect.any(Number), expect.any(Number));
         expect(fillTextSpy).toHaveBeenCalledWith('Line 2', expect.any(Number), expect.any(Number));
     });
+
+    it('should respect playbackRange if set', async () => {
+        const onProgress = vi.fn();
+        const signal = new AbortController().signal;
+
+        // Mock state with playbackRange
+        // Duration 10 seconds, fps 10 = 100 frames.
+        // Range 20 to 30.
+        mockController.getState = vi.fn().mockReturnValue({
+            duration: 10,
+            fps: 10,
+            playbackRange: [20, 30] // 10 frames
+        });
+
+        await exporter.export({ onProgress, signal, mode: 'canvas' });
+
+        // Setup captures startFrame (20).
+        // Loop captures 21..29.
+        expect(mockController.captureFrame).toHaveBeenCalledWith(20, expect.anything());
+        expect(mockController.captureFrame).toHaveBeenCalledWith(29, expect.anything());
+        expect(mockController.captureFrame).not.toHaveBeenCalledWith(19, expect.anything());
+        expect(mockController.captureFrame).not.toHaveBeenCalledWith(30, expect.anything());
+
+        expect(encodeSpy).toHaveBeenCalledTimes(10);
+    });
 });
