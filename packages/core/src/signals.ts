@@ -28,6 +28,16 @@ type Subscribable = {
 // Global context
 let activeSubscriber: Subscriber | null = null;
 
+export function untracked<T>(fn: () => T): T {
+  const prevActive = activeSubscriber;
+  activeSubscriber = null;
+  try {
+    return fn();
+  } finally {
+    activeSubscriber = prevActive;
+  }
+}
+
 class SignalImpl<T> implements Signal<T>, Subscribable {
   private _value: T;
   private _subscribers = new Set<Subscriber>();
@@ -61,8 +71,13 @@ class SignalImpl<T> implements Signal<T>, Subscribable {
   }
 
   subscribe(fn: (value: T) => void): () => void {
-    const dispose = effect(() => fn(this.value));
-    return dispose;
+    const sub: Subscriber = {
+      notify: () => untracked(() => fn(this.peek())),
+      addDependency: () => {},
+    };
+    this.addSubscriber(sub);
+    untracked(() => fn(this.peek()));
+    return () => this.removeSubscriber(sub);
   }
 
   addSubscriber(sub: Subscriber) {
@@ -204,8 +219,13 @@ class ComputedImpl<T> implements ReadonlySignal<T>, Subscriber, Subscribable {
   }
 
   subscribe(fn: (value: T) => void): () => void {
-    const dispose = effect(() => fn(this.value));
-    return dispose;
+    const sub: Subscriber = {
+      notify: () => untracked(() => fn(this.peek())),
+      addDependency: () => {},
+    };
+    this.addSubscriber(sub);
+    untracked(() => fn(this.peek()));
+    return () => this.removeSubscriber(sub);
   }
 
   addSubscriber(sub: Subscriber) {
