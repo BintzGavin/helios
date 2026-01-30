@@ -1,5 +1,8 @@
 # CORE Progress Log
 
+## CORE v2.13.0
+- ✅ Completed: Validate Schema Defaults - Implemented `validateSchema` to ensure schema defaults match their defined types, adding `INVALID_SCHEMA` error code.
+
 ## CORE v2.12.0
 - ✅ Completed: Schema Enhancements - Added `step` and `format` properties to `PropDefinition` to support UI generation hints.
 

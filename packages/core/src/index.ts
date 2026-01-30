@@ -1,7 +1,7 @@
 import { TimeDriver, WaapiDriver, DomDriver, NoopDriver, Ticker, RafTicker, TimeoutTicker } from './drivers/index.js';
 import { signal, effect, computed, Signal, ReadonlySignal } from './signals.js';
 import { HeliosError, HeliosErrorCode } from './errors.js';
-import { HeliosSchema, validateProps } from './schema.js';
+import { HeliosSchema, validateProps, validateSchema } from './schema.js';
 import { CaptionCue, parseSrt, findActiveCues, areCuesEqual } from './captions.js';
 import { Marker, validateMarker, validateMarkers } from './markers.js';
 
@@ -232,6 +232,9 @@ export class Helios {
     }
 
     this.schema = options.schema;
+
+    // Validate the schema definition itself (check defaults)
+    validateSchema(this.schema);
 
     const initialProps = validateProps(options.inputProps || {}, this.schema);
     const initialCaptions = options.captions
