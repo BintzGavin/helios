@@ -1,4 +1,4 @@
-**Version**: v0.43.0
+**Version**: v0.44.0
 
 # Status: PLAYER
 
@@ -34,10 +34,12 @@
 - Implements CSS Variables (custom properties) for theming the player UI (`--helios-controls-bg`, `--helios-accent-color`, etc.).
 - Supports Native Loop via `setLoop` in Controller/Bridge, removing client-side loop hacks.
 - Supports importing SRT captions via standard `<track kind="captions">` child elements and exposes standard `textTracks` / `addTextTrack` API.
+- Supports `sandbox` attribute to customize iframe security flags (default: `allow-scripts allow-same-origin`).
 
 ## Critical Task
 - **None**: Recent task completed.
 
+[v0.44.0] ✅ Completed: Configurable Sandbox - Implemented `sandbox` attribute on `<helios-player>` to allow customizing iframe security flags (defaulting to `allow-scripts allow-same-origin`).
 [v0.43.0] ✅ Completed: Implement TextTracks API - Added `textTracks` property and `addTextTrack` method to `HeliosPlayer`, along with a robust SRT parser and `HeliosTextTrack` implementation for better HTMLMediaElement parity.
 [v0.42.0] ✅ Completed: Import SRT Captions - Implemented support for `<track>` elements to import SRT captions via the setCaptions API.
 [v0.41.0] ✅ Completed: Standard Media API Gap Fill - Implemented `canPlayType`, `defaultMuted`, `defaultPlaybackRate`, `preservesPitch`, `srcObject`, and `crossOrigin` for fuller `HTMLMediaElement` parity.
@@ -93,25 +95,3 @@
 [v0.6.0] ✅ Completed: Keyboard & Fullscreen Support - Implemented standard keyboard shortcuts (Space, F, Arrows) and Fullscreen UI/logic.
 [v0.5.2] ✅ Completed: Scaffold Tests - Added unit test suite for controllers and exporter using Vitest.
 [v0.5.1] ✅ Completed: Standard Attributes - Implemented `autoplay`, `loop`, and `controls` attributes. Synced version and artifacts.
-
-## Backlog
-- [x] Implement Standard Media API (play, pause, currentTime, events).
-- [x] Implement Caption Rendering.
-- [x] Implement Volume Controls.
-- [x] Implement Client Side Audio Export.
-- [x] Implement Dynamic Sizing & Reactive Attributes.
-- [x] Sync player state with engine state (Bridge Initialization Fix).
-- [x] Implement Variable Playback Speed controls (API + UI).
-- [x] Refactor `HeliosPlayer` to support `window.helios`.
-- [x] Implement robust Client-Side Export (WebCodecs) using the correct `seek` mechanism.
-- [x] Implement Sandbox and Bridge support.
-- [x] Refactor Export logic into dedicated `ClientSideExporter` with cancellation.
-- [x] Implement Export Configuration (`export-mode`, `canvas-selector`).
-- [x] Add proper UI feedback for "Loading" state.
-- [x] Enable External Stylesheets for DOM Export.
-- [x] Enable Image Inlining for DOM Export.
-- [x] Enable CSS Asset Inlining for DOM Export.
-- [x] Enable Canvas Inlining for DOM Export.
-- [x] Enable Video Inlining for DOM Export.
-- [x] Implement Bridge Error Propagation.
-- [x] Implement `<track>` support for SRT captions.

@@ -365,6 +365,7 @@ template.innerHTML = `
 export class HeliosPlayer extends HTMLElement {
     iframe;
     _textTracks;
+    _domTracks = new Map();
     playPauseBtn;
     volumeBtn;
     volumeSlider;
@@ -633,6 +634,12 @@ export class HeliosPlayer extends HTMLElement {
     set preload(val) {
         this.setAttribute("preload", val);
     }
+    get sandbox() {
+        return this.getAttribute("sandbox") || "allow-scripts allow-same-origin";
+    }
+    set sandbox(val) {
+        this.setAttribute("sandbox", val);
+    }
     async play() {
         if (!this.isLoaded) {
             this.setAttribute("autoplay", "");
@@ -655,7 +662,7 @@ export class HeliosPlayer extends HTMLElement {
         }
     }
     static get observedAttributes() {
-        return ["src", "width", "height", "autoplay", "loop", "controls", "export-format", "input-props", "poster", "muted", "interactive", "preload", "controlslist"];
+        return ["src", "width", "height", "autoplay", "loop", "controls", "export-format", "input-props", "poster", "muted", "interactive", "preload", "controlslist", "sandbox"];
     }
     constructor() {
         super();
@@ -791,6 +798,19 @@ export class HeliosPlayer extends HTMLElement {
         if (name === "controlslist") {
             this.updateControlsVisibility();
         }
+        if (name === "sandbox") {
+            const newValOrNull = this.getAttribute("sandbox");
+            // If attribute is missing (null), use default.
+            // If present (even if empty string ""), use it as is.
+            const flags = newValOrNull === null ? "allow-scripts allow-same-origin" : newValOrNull;
+            if (this.iframe.getAttribute("sandbox") !== flags) {
+                this.iframe.setAttribute("sandbox", flags);
+                // If we have a source, we must reload for new sandbox flags to apply
+                if (this.getAttribute("src")) {
+                    this.loadIframe(this.getAttribute("src"));
+                }
+            }
+        }
     }
     updateControlsVisibility() {
         if (!this.exportBtn || !this.fullscreenBtn)
@@ -848,6 +868,12 @@ export class HeliosPlayer extends HTMLElement {
         }
         // Initial state: disabled until connected
         this.setControlsDisabled(true);
+        // Ensure sandbox flags are correct on connect (handling if attribute was present before upgrade)
+        const sandboxAttr = this.getAttribute("sandbox");
+        const sandboxFlags = sandboxAttr === null ? "allow-scripts allow-same-origin" : sandboxAttr;
+        if (this.iframe.getAttribute("sandbox") !== sandboxFlags) {
+            this.iframe.setAttribute("sandbox", sandboxFlags);
+        }
         // Only show connecting if we haven't already shown "Loading..." via attributeChangedCallback
         // AND we are not deferring load (pendingSrc is null)
         // AND we don't have a poster (which should take precedence visually)
@@ -1057,11 +1083,13 @@ export class HeliosPlayer extends HTMLElement {
         if (!slot)
             return;
         const elements = slot.assignedElements();
+        const currentTrackElements = new Set();
         elements.forEach((el) => {
             if (el.tagName === "TRACK") {
                 const t = el;
+                currentTrackElements.add(t);
                 // Prevent duplicate track creation
-                if (t._heliosTrack)
+                if (this._domTracks.has(t))
                     return;
                 const kind = t.getAttribute("kind") || "captions";
                 const label = t.getAttribute("label") || "";
@@ -1069,7 +1097,7 @@ export class HeliosPlayer extends HTMLElement {
                 const src = t.getAttribute("src");
                 const isDefault = t.hasAttribute("default");
                 const textTrack = this.addTextTrack(kind, label, lang);
-                t._heliosTrack = textTrack;
+                this._domTracks.set(t, textTrack);
                 if (src) {
                     fetch(src)
                         .then((res) => {
@@ -1093,6 +1121,16 @@ export class HeliosPlayer extends HTMLElement {
                 }
             }
         });
+        // Remove tracks that are no longer in the DOM
+        for (const [el, track] of this._domTracks.entries()) {
+            if (!currentTrackElements.has(el)) {
+                if (track.mode === 'showing') {
+                    track.mode = 'hidden';
+                }
+                this._textTracks.removeTrack(track);
+                this._domTracks.delete(el);
+            }
+        }
     };
     setController(controller) {
         // Clean up old controller

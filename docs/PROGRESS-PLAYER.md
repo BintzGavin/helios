@@ -1,5 +1,8 @@
 # PLAYER Progress Log
 
+## PLAYER v0.44.0
+- ✅ Completed: Configurable Sandbox - Implemented `sandbox` attribute on `<helios-player>` to allow customizing iframe security flags (defaulting to `allow-scripts allow-same-origin`).
+
 ## PLAYER v0.43.0
 - ✅ Completed: Implement TextTracks API - Added `textTracks` property and `addTextTrack` method to `HeliosPlayer`, along with a robust SRT parser and `HeliosTextTrack` implementation for better HTMLMediaElement parity.
 

@@ -49,6 +49,7 @@ The component observes the following attributes:
 - `input-props`: JSON string of properties to pass to the composition.
 - `controlslist`: Space-separated tokens to customize UI (`nodownload`, `nofullscreen`).
 - `crossorigin`: CORS setting for the element (`anonymous`, `use-credentials`).
+- `sandbox`: Space-separated tokens for iframe security flags (default: `allow-scripts allow-same-origin`).
 
 ## D. Child Elements
 - `<track>`: Standard HTMLTrackElement for importing captions (kind="captions"). Requires `src` (SRT file). Automatically populates the `textTracks` list.
