@@ -1,5 +1,8 @@
 # PLAYER Progress Log
 
+## PLAYER v0.45.0
+- ✅ Completed: Interactive Playback Range - Implemented `I` (In), `O` (Out), and `X` (Clear) keyboard shortcuts to set the playback loop range interactively.
+
 ## PLAYER v0.44.2
 - ✅ Completed: Fix load() Behavior - Updated `load()` to reload the current source if no pending source exists, and refactored `retryConnection` to use this standard method.
 

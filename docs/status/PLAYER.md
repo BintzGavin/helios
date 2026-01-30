@@ -1,4 +1,4 @@
-**Version**: v0.44.2
+**Version**: v0.45.0
 
 # Status: PLAYER
 
@@ -17,6 +17,7 @@
 - Supports dynamic sizing via `width`/`height` attributes and `src` changes.
 - Supports standard keyboard shortcuts (Space/K, F, Arrows) and Fullscreen toggle.
 - Supports frame-by-frame navigation via `.` and `,` keys, and Shift modifier for 10-frame jumps.
+- Supports Interactive Playback Range via keyboard shortcuts (`I`, `O`, `X`).
 - Displays actionable error messages with "Dismiss" option for failed client-side exports.
 - Supports Volume and Mute controls via UI and Bridge.
 - Supports caption rendering overlay with toggleable "CC" button.
@@ -40,6 +41,7 @@
 ## Critical Task
 - **None**: Recent task completed.
 
+[v0.45.0] ✅ Completed: Interactive Playback Range - Implemented `I` (In), `O` (Out), and `X` (Clear) keyboard shortcuts to set the playback loop range interactively.
 [v0.44.2] ✅ Completed: Fix load() Behavior - Updated `load()` to reload the current source if no pending source exists, and refactored `retryConnection` to use this standard method.
 [v0.44.1] ✅ Completed: Documentation Update - Synced package.json version and documented missing features (sandbox, controlslist, textTracks, CSS vars).
 [v0.44.0] ✅ Completed: Configurable Sandbox - Implemented `sandbox` attribute on `<helios-player>` to allow customizing iframe security flags (defaulting to `allow-scripts allow-same-origin`).

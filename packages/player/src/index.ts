@@ -1458,6 +1458,35 @@ export class HeliosPlayer extends HTMLElement implements TrackHost {
       case ",":
         this.seekRelative(-1);
         break;
+      case "i":
+      case "I": {
+        const s = this.controller.getState();
+        const start = Math.floor(s.currentFrame);
+        const totalFrames = s.duration * s.fps;
+        let end = s.playbackRange ? s.playbackRange[1] : totalFrames;
+
+        if (start >= end) {
+          end = totalFrames;
+        }
+        this.controller.setPlaybackRange(start, end);
+        break;
+      }
+      case "o":
+      case "O": {
+        const s = this.controller.getState();
+        const end = Math.floor(s.currentFrame);
+        let start = s.playbackRange ? s.playbackRange[0] : 0;
+
+        if (end <= start) {
+          start = 0;
+        }
+        this.controller.setPlaybackRange(start, end);
+        break;
+      }
+      case "x":
+      case "X":
+        this.controller.clearPlaybackRange();
+        break;
     }
   };
 
