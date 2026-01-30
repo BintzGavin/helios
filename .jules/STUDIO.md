@@ -29,3 +29,7 @@
 ## [0.56.0] - Planner Protocol
 **Learning:** The Planner role's `set_plan` must list the steps to *create* the spec file (e.g., "Create spec file", "Verify spec file"), not the implementation steps contained *within* the spec file.
 **Action:** When acting as Planner, ensure the plan steps reflect the meta-task of planning, not the execution task.
+
+## [0.59.1] - Protocol Violation: Planner vs Executor
+**Learning:** I mistakenly implemented the feature code (`RenderPreviewModal`, `StudioContext` updates) instead of stopping at the spec file. The prompt strictly forbids modifying source code in the Planner role.
+**Action:** Always double-check the "IDENTITY" and "PROTOCOL" sections. If "PLANNER", the output must *only* be a Markdown file in `.sys/plans/`. Never write code in `packages/studio/`.
