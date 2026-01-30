@@ -1,5 +1,8 @@
 # CORE Progress Log
 
+## CORE v2.16.0
+- ✅ Completed: Time-Based Control - Added `currentTime` signal and `seekToTime()` method to `Helios` class for direct time manipulation.
+
 ## CORE v2.15.0
 - ✅ Completed: Enhance Diagnose - Expanded `Helios.diagnose()` to include WebGL, WebAudio, Color Gamut, and Video Codec support.
 
