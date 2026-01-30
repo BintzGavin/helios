@@ -25,3 +25,7 @@
 ## [0.51.1] - Missing Studio Plan for Core Feature
 **Learning:** Core implemented "Recursive Schema" support (v2.x), but Studio had no corresponding plan to update the UI, leaving a gap where complex props fell back to JSON.
 **Action:** When Core introduces new schema capabilities, verify if Studio needs a corresponding UI update plan.
+
+## [0.56.0] - Planner Protocol
+**Learning:** The Planner role's `set_plan` must list the steps to *create* the spec file (e.g., "Create spec file", "Verify spec file"), not the implementation steps contained *within* the spec file.
+**Action:** When acting as Planner, ensure the plan steps reflect the meta-task of planning, not the execution task.
