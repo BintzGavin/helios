@@ -133,6 +133,10 @@ interface StudioContextType {
   // Snapshot
   takeSnapshot: () => Promise<void>;
 
+  // Render Preview
+  previewUrl: string | null;
+  setPreviewUrl: (url: string | null) => void;
+
   // Client-Side Export
   isExporting: boolean;
   exportProgress: number;
@@ -154,6 +158,7 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [isSettingsOpen, setSettingsOpen] = useState(false);
   const [canvasSize, setCanvasSize] = useState({ width: 1920, height: 1080 });
   const [renderConfig, setRenderConfig] = useState<RenderConfig>({ mode: 'canvas' });
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   const [renderJobs, setRenderJobs] = useState<RenderJob[]>([]);
 
@@ -541,6 +546,8 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         renderConfig,
         setRenderConfig,
         takeSnapshot,
+        previewUrl,
+        setPreviewUrl,
         isExporting,
         exportProgress,
         exportVideo,

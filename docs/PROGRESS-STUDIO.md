@@ -1,3 +1,6 @@
+## STUDIO v0.60.0
+- ✅ Completed: Render Preview - Implemented a modal to preview rendered videos directly within the Studio UI.
+
 ## STUDIO v0.59.0
 - ✅ Completed: Show Render Errors - Implemented error display in Renders Panel, enabling users to debug failed render jobs.
 

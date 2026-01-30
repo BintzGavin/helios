@@ -17,7 +17,8 @@ export const RendersPanel: React.FC = () => {
     isExporting,
     exportProgress,
     exportVideo,
-    cancelExport
+    cancelExport,
+    setPreviewUrl
   } = useStudio();
 
   const [exportFormat, setExportFormat] = useState<'mp4' | 'webm'>('mp4');
@@ -147,25 +148,43 @@ export const RendersPanel: React.FC = () => {
           {job.status === 'completed' && (
              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '4px' }}>
                 <div style={{ fontSize: '10px', color: '#4caf50' }}>Done</div>
-                {job.outputUrl && (
-                    <a
-                        href={job.outputUrl}
-                        download
-                        target="_blank"
-                        rel="noreferrer"
-                        style={{
-                            fontSize: '10px',
-                            color: '#66b2ff',
-                            textDecoration: 'none',
-                            border: '1px solid #66b2ff',
-                            padding: '2px 6px',
-                            borderRadius: '4px',
-                            background: 'rgba(0, 123, 255, 0.1)'
-                        }}
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  {job.outputUrl && (
+                    <button
+                      onClick={() => setPreviewUrl(job.outputUrl!)}
+                      style={{
+                        fontSize: '10px',
+                        color: '#fff',
+                        border: 'none',
+                        padding: '3px 8px',
+                        borderRadius: '4px',
+                        background: '#2196f3',
+                        cursor: 'pointer'
+                      }}
                     >
-                        Download
-                    </a>
-                )}
+                      Preview
+                    </button>
+                  )}
+                  {job.outputUrl && (
+                      <a
+                          href={job.outputUrl}
+                          download
+                          target="_blank"
+                          rel="noreferrer"
+                          style={{
+                              fontSize: '10px',
+                              color: '#66b2ff',
+                              textDecoration: 'none',
+                              border: '1px solid #66b2ff',
+                              padding: '2px 6px',
+                              borderRadius: '4px',
+                              background: 'rgba(0, 123, 255, 0.1)'
+                          }}
+                      >
+                          Download
+                      </a>
+                  )}
+                </div>
              </div>
           )}
           {job.status === 'cancelled' && (

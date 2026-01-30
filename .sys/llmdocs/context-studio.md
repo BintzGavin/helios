@@ -57,10 +57,11 @@ packages/studio
 - **Timeline**: Track-based timeline with scrubbing, zooming, markers, and timecode display.
 - **Props Editor**: Auto-generated inputs based on composition schema (supports recursive objects and arrays, copy/reset tools, step constraints, specialized formats like date/color, and diverse asset types like model/json/shader).
 - **Assets Panel**: Drag-and-drop asset management with search and type filtering.
-- **Renders Panel**: Manage render jobs, view error details for failed jobs, and download outputs.
+- **Renders Panel**: Manage render jobs, view error details for failed jobs, preview outputs in a modal, and download outputs.
 - **Captions Panel**: Edit and export captions (SRT).
 - **Diagnostics Panel**: View system capabilities (FFmpeg, GPU).
 - **Composition Settings Modal**: Edit width, height, FPS, and duration of the active composition.
+- **Render Preview Modal**: Instant playback of rendered video files.
 - **Create Composition Modal**: Create new compositions using templates (Vanilla JS, React, Vue, Svelte, Three.js).
 - **Global Shortcuts**: Configure keyboard shortcuts for actions.
 
