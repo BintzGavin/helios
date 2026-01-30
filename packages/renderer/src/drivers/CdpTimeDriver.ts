@@ -43,10 +43,35 @@ export class CdpTimeDriver implements TimeDriver {
     // We use a string-based evaluation to avoid build-tool artifacts
     const script = `
       (async (t) => {
+        // Helper to find all media elements, including in Shadow DOM
+        function findAllMedia(rootNode) {
+          const media = [];
+          // Check rootNode (if it is an Element)
+          if (rootNode.nodeType === Node.ELEMENT_NODE) {
+            const tagName = rootNode.tagName;
+            if (tagName === 'AUDIO' || tagName === 'VIDEO') {
+              media.push(rootNode);
+            }
+          }
+
+          const walker = document.createTreeWalker(rootNode, NodeFilter.SHOW_ELEMENT);
+          while (walker.nextNode()) {
+            const node = walker.currentNode;
+            if (node.tagName === 'AUDIO' || node.tagName === 'VIDEO') {
+              media.push(node);
+            }
+            if (node.shadowRoot) {
+              media.push(...findAllMedia(node.shadowRoot));
+            }
+          }
+          return media;
+        }
+
         // Synchronize media elements (video, audio)
         // We do this manually because virtual time might not automatically sync media element timelines exactly as desired,
         // and we need to respect custom offsets.
-        const mediaElements = document.querySelectorAll('video, audio');
+        const mediaElements = findAllMedia(document);
+
         mediaElements.forEach((el) => {
           el.pause(); // Ensure we are in control
 
