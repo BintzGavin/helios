@@ -105,7 +105,61 @@ describe('Helios Core', () => {
       expect(report).toHaveProperty('waapi');
       expect(report).toHaveProperty('webCodecs');
       expect(report).toHaveProperty('offscreenCanvas');
+      expect(report).toHaveProperty('webgl');
+      expect(report).toHaveProperty('webgl2');
+      expect(report).toHaveProperty('webAudio');
+      expect(report).toHaveProperty('colorGamut');
+      expect(report).toHaveProperty('videoCodecs');
+      expect(report.videoCodecs).toHaveProperty('h264');
+      expect(report.videoCodecs).toHaveProperty('vp8');
+      expect(report.videoCodecs).toHaveProperty('vp9');
+      expect(report.videoCodecs).toHaveProperty('av1');
       expect(report).toHaveProperty('userAgent');
+    });
+
+    it('should detect WebAudio support if AudioContext is present', async () => {
+      vi.stubGlobal('window', { AudioContext: class {} });
+      const report = await Helios.diagnose();
+      expect(report.webAudio).toBe(true);
+      vi.unstubAllGlobals();
+    });
+
+    it('should detect WebGL support if canvas context is available', async () => {
+      const mockCanvas = {
+        getContext: vi.fn((contextId) => {
+          if (contextId === 'webgl') return {};
+          return null;
+        })
+      };
+      vi.stubGlobal('document', {
+        createElement: vi.fn(() => mockCanvas),
+        timeline: {}
+      });
+
+      const report = await Helios.diagnose();
+      expect(report.webgl).toBe(true);
+      vi.unstubAllGlobals();
+    });
+
+    it('should handle missing VideoEncoder gracefully', async () => {
+      vi.stubGlobal('VideoEncoder', undefined);
+      const report = await Helios.diagnose();
+      expect(report.webCodecs).toBe(false);
+      expect(report.videoCodecs.h264).toBe(false);
+      vi.unstubAllGlobals();
+    });
+
+    it('should detect video codecs if VideoEncoder is supported', async () => {
+      const mockIsConfigSupported = vi.fn().mockResolvedValue({ supported: true });
+      vi.stubGlobal('VideoEncoder', {
+        isConfigSupported: mockIsConfigSupported
+      });
+
+      const report = await Helios.diagnose();
+      expect(report.webCodecs).toBe(true);
+      expect(report.videoCodecs.h264).toBe(true);
+      expect(mockIsConfigSupported).toHaveBeenCalledTimes(4);
+      vi.unstubAllGlobals();
     });
   });
 

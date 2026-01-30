@@ -52,6 +52,16 @@ export interface DiagnosticReport {
   waapi: boolean;
   webCodecs: boolean;
   offscreenCanvas: boolean;
+  webgl: boolean;
+  webgl2: boolean;
+  webAudio: boolean;
+  colorGamut: 'srgb' | 'p3' | 'rec2020' | null;
+  videoCodecs: {
+    h264: boolean;
+    vp8: boolean;
+    vp9: boolean;
+    av1: boolean;
+  };
   userAgent: string;
 }
 
@@ -198,8 +208,69 @@ export class Helios {
       waapi: typeof document !== 'undefined' && 'timeline' in document,
       webCodecs: typeof VideoEncoder !== 'undefined',
       offscreenCanvas: typeof OffscreenCanvas !== 'undefined',
+      webgl: false,
+      webgl2: false,
+      webAudio: false,
+      colorGamut: null,
+      videoCodecs: {
+        h264: false,
+        vp8: false,
+        vp9: false,
+        av1: false,
+      },
       userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : 'Node/Server',
     };
+
+    // Check WebGL support
+    if (typeof document !== 'undefined') {
+      try {
+        const canvas = document.createElement('canvas');
+        report.webgl = !!(canvas.getContext('webgl') || canvas.getContext('experimental-webgl'));
+        report.webgl2 = !!canvas.getContext('webgl2');
+      } catch (e) { /* ignore */ }
+    } else if (typeof OffscreenCanvas !== 'undefined') {
+      try {
+        const canvas = new OffscreenCanvas(1, 1);
+        report.webgl = !!(canvas.getContext('webgl') || canvas.getContext('experimental-webgl'));
+        report.webgl2 = !!canvas.getContext('webgl2');
+      } catch (e) { /* ignore */ }
+    }
+
+    // Check WebAudio and Color Gamut
+    if (typeof window !== 'undefined') {
+      report.webAudio = 'AudioContext' in window || 'webkitAudioContext' in window;
+
+      if (window.matchMedia) {
+        if (window.matchMedia('(color-gamut: rec2020)').matches) report.colorGamut = 'rec2020';
+        else if (window.matchMedia('(color-gamut: p3)').matches) report.colorGamut = 'p3';
+        else if (window.matchMedia('(color-gamut: srgb)').matches) report.colorGamut = 'srgb';
+      }
+    }
+
+    // Check Video Codecs
+    if (typeof VideoEncoder !== 'undefined') {
+      try {
+        const check = async (config: any) => {
+          try {
+            const support = await VideoEncoder.isConfigSupported(config);
+            return support.supported;
+          } catch (e) {
+            return false;
+          }
+        };
+
+        const [h264, vp8, vp9, av1] = await Promise.all([
+          check({ codec: 'avc1.42001E', width: 1920, height: 1080, bitrate: 2_000_000, framerate: 30 }),
+          check({ codec: 'vp8', width: 1920, height: 1080, bitrate: 2_000_000, framerate: 30 }),
+          check({ codec: 'vp09.00.10.08', width: 1920, height: 1080, bitrate: 2_000_000, framerate: 30 }),
+          check({ codec: 'av01.0.04M.08', width: 1920, height: 1080, bitrate: 2_000_000, framerate: 30 })
+        ]);
+
+        report.videoCodecs = { h264, vp8, vp9, av1 };
+      } catch (e) {
+        // Ignore errors during codec check
+      }
+    }
 
     return report;
   }

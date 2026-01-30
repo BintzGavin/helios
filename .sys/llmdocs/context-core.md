@@ -84,6 +84,16 @@ export interface DiagnosticReport {
   waapi: boolean;
   webCodecs: boolean;
   offscreenCanvas: boolean;
+  webgl: boolean;
+  webgl2: boolean;
+  webAudio: boolean;
+  colorGamut: 'srgb' | 'p3' | 'rec2020' | null;
+  videoCodecs: {
+    h264: boolean;
+    vp8: boolean;
+    vp9: boolean;
+    av1: boolean;
+  };
   userAgent: string;
 }
 
