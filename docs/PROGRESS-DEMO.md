@@ -1,3 +1,6 @@
+## DEMO v1.67.0
+- ✅ Completed: Client-Side Export API Example - Created `examples/client-export-api` demonstrating `ClientSideExporter` usage.
+
 ## DEMO v1.66.0
 - ✅ Completed: Solid Canvas Example - Verified existing implementation of `examples/solid-canvas-animation` matches spec and passes E2E tests.
 
