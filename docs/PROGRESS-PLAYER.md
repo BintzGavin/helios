@@ -1,5 +1,8 @@
 # PLAYER Progress Log
 
+## PLAYER v0.39.0
+- ✅ Completed: Native Loop Support - Refactored `HeliosController` and `bridge` to use `helios.setLoop()` natively, removing manual client-side looping logic.
+
 ## PLAYER v0.38.0
 - ✅ Completed: Visualize Playback Range - Implemented visual indicator for playback range on the timeline scrubber using CSS gradients and `updateUI` logic.
 

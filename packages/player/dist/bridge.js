@@ -50,6 +50,11 @@ export function connectToParent(helios) {
                     helios.setAudioMuted(event.data.muted);
                 }
                 break;
+            case 'HELIOS_SET_LOOP':
+                if (typeof event.data.loop === 'boolean') {
+                    helios.setLoop(event.data.loop);
+                }
+                break;
             case 'HELIOS_SET_PROPS':
                 if (event.data.props) {
                     helios.setInputProps(event.data.props);

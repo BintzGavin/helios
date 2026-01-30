@@ -662,6 +662,11 @@ export class HeliosPlayer extends HTMLElement {
         if (name === "width" || name === "height") {
             this.updateAspectRatio();
         }
+        if (name === "loop") {
+            if (this.controller) {
+                this.controller.setLoop(this.hasAttribute("loop"));
+            }
+        }
         if (name === "input-props") {
             try {
                 const props = JSON.parse(newVal);
@@ -958,6 +963,9 @@ export class HeliosPlayer extends HTMLElement {
         if (this.hasAttribute("muted")) {
             this.controller.setAudioMuted(true);
         }
+        if (this.hasAttribute("loop")) {
+            this.controller.setLoop(true);
+        }
         const state = this.controller.getState();
         if (state) {
             this.scrubber.max = String(state.duration * state.fps);
@@ -1171,14 +1179,6 @@ export class HeliosPlayer extends HTMLElement {
         }
         this.lastState = state;
         const isFinished = state.currentFrame >= state.duration * state.fps - 1;
-        if (isFinished && this.hasAttribute("loop")) {
-            // Prevent infinite loop if something goes wrong, only restart if we stopped
-            if (!state.isPlaying) {
-                this.controller.seek(0);
-                this.controller.play();
-                return;
-            }
-        }
         if (isFinished) {
             this.playPauseBtn.textContent = "🔄"; // Restart button
             this.playPauseBtn.setAttribute("aria-label", "Restart");

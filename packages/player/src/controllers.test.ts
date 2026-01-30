@@ -42,6 +42,7 @@ describe('DirectController', () => {
             seek: vi.fn(),
             setAudioVolume: vi.fn(),
             setAudioMuted: vi.fn(),
+            setLoop: vi.fn(),
             setPlaybackRate: vi.fn(),
             setPlaybackRange: vi.fn(),
             clearPlaybackRange: vi.fn(),
@@ -109,6 +110,11 @@ describe('DirectController', () => {
 
         controller.setAudioMuted(true);
         expect(mockHeliosInstance.setAudioMuted).toHaveBeenCalledWith(true);
+    });
+
+    it('should set loop', () => {
+        controller.setLoop(true);
+        expect(mockHeliosInstance.setLoop).toHaveBeenCalledWith(true);
     });
 
     it('should set playback range', () => {
@@ -233,6 +239,11 @@ describe('BridgeController', () => {
 
         controller.setAudioMuted(true);
         expect(mockWindow.postMessage).toHaveBeenCalledWith({ type: 'HELIOS_SET_MUTED', muted: true }, '*');
+    });
+
+    it('should post messages for loop', () => {
+        controller.setLoop(true);
+        expect(mockWindow.postMessage).toHaveBeenCalledWith({ type: 'HELIOS_SET_LOOP', loop: true }, '*');
     });
 
     it('should post messages for playback range', () => {
