@@ -30,6 +30,40 @@ export interface PropDefinition {
 
 export type HeliosSchema = Record<string, PropDefinition>;
 
+export function validateSchema(schema: HeliosSchema | undefined, parentKey = ''): void {
+  if (!schema) return;
+
+  for (const [key, def] of Object.entries(schema)) {
+    const path = parentKey ? `${parentKey}.${key}` : key;
+
+    // Validate default value if present
+    if (def.default !== undefined) {
+      try {
+        validateValue(def.default, def, path);
+      } catch (e: any) {
+        // Wrap error to indicate it's a schema definition issue
+        const message = e.message || String(e);
+        // Strip "Invalid type for prop 'path'. " prefix if present to avoid redundancy
+        const cleanMessage = message.replace(/^Invalid type for prop '.*'\.\s*/, '');
+        throw new HeliosError(
+          HeliosErrorCode.INVALID_SCHEMA,
+          `Schema default for '${path}' is invalid: ${cleanMessage}`
+        );
+      }
+    }
+
+    // Recurse for array items with properties (array of objects)
+    if (def.type === 'array' && def.items && def.items.properties) {
+      validateSchema(def.items.properties, `${path}[]`);
+    }
+
+    // Recurse for object properties
+    if (def.type === 'object' && def.properties) {
+      validateSchema(def.properties, path);
+    }
+  }
+}
+
 export function validateProps(props: Record<string, any>, schema?: HeliosSchema): Record<string, any> {
   if (!schema) return props;
 

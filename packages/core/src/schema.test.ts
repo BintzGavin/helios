@@ -1,6 +1,112 @@
 import { describe, it, expect } from 'vitest';
-import { validateProps } from './schema.js';
+import { validateProps, validateSchema } from './schema.js';
 import { HeliosError, HeliosErrorCode } from './errors.js';
+
+describe('validateSchema', () => {
+  it('should pass if schema defaults are valid', () => {
+    const schema = {
+      name: { type: 'string' as const, default: 'Alice' },
+      age: { type: 'number' as const, default: 30 },
+      isActive: { type: 'boolean' as const, default: true }
+    };
+    expect(() => validateSchema(schema)).not.toThrow();
+  });
+
+  it('should throw INVALID_SCHEMA if default value type is wrong', () => {
+    const schema = {
+      age: { type: 'number' as const, default: '30' } // String instead of number
+    };
+    expect(() => validateSchema(schema)).toThrow(HeliosError);
+    try {
+      validateSchema(schema);
+    } catch (e: any) {
+      expect(e.code).toBe(HeliosErrorCode.INVALID_SCHEMA);
+      expect(e.message).toContain("Schema default for 'age' is invalid");
+      expect(e.message).toContain("Expected number");
+    }
+  });
+
+  it('should validate defaults in nested objects', () => {
+    const schema = {
+      config: {
+        type: 'object' as const,
+        properties: {
+          retry: { type: 'number' as const, default: 'infinite' } // Invalid
+        }
+      }
+    };
+    expect(() => validateSchema(schema)).toThrow(HeliosError);
+    try {
+      validateSchema(schema);
+    } catch (e: any) {
+      expect(e.code).toBe(HeliosErrorCode.INVALID_SCHEMA);
+      expect(e.message).toContain("Schema default for 'config.retry' is invalid");
+    }
+  });
+
+  it('should validate defaults in nested arrays', () => {
+      // Note: Array items typically don't have 'default' in this way unless we support default values for items?
+      // But validateSchema recurses into items.properties for array of objects.
+      // Let's test properties inside array items.
+      const schema = {
+        users: {
+          type: 'array' as const,
+          items: {
+            type: 'object' as const,
+            properties: {
+              age: { type: 'number' as const, default: 'unknown' } // Invalid
+            }
+          }
+        }
+      };
+      expect(() => validateSchema(schema)).toThrow(HeliosError);
+      try {
+        validateSchema(schema);
+      } catch (e: any) {
+        expect(e.code).toBe(HeliosErrorCode.INVALID_SCHEMA);
+        expect(e.message).toContain("Schema default for 'users[].age' is invalid");
+      }
+  });
+
+  it('should validate enum defaults', () => {
+    const schema = {
+      role: { type: 'string' as const, enum: ['admin', 'user'], default: 'guest' } // 'guest' not in enum
+    };
+    expect(() => validateSchema(schema)).toThrow(HeliosError);
+    try {
+      validateSchema(schema);
+    } catch (e: any) {
+      expect(e.code).toBe(HeliosErrorCode.INVALID_SCHEMA);
+      expect(e.message).toContain("must be one of: admin, user");
+    }
+  });
+
+  it('should validate numeric range defaults', () => {
+    const schema = {
+      score: { type: 'number' as const, minimum: 0, default: -1 }
+    };
+    expect(() => validateSchema(schema)).toThrow(HeliosError);
+    try {
+      validateSchema(schema);
+    } catch (e: any) {
+      expect(e.code).toBe(HeliosErrorCode.INVALID_SCHEMA);
+      expect(e.message).toContain("must be >= 0");
+    }
+  });
+
+  it('should validate color defaults', () => {
+    const schema = {
+      color: { type: 'color' as const, default: 'invalid-color' }
+    };
+    expect(() => validateSchema(schema)).toThrow(HeliosError);
+    try {
+      validateSchema(schema);
+    } catch (e: any) {
+      expect(e.code).toBe(HeliosErrorCode.INVALID_SCHEMA);
+      expect(e.message).toContain("Invalid color format");
+    }
+  });
+});
 
 describe('validateProps', () => {
   it('should return props as-is if no schema is provided', () => {

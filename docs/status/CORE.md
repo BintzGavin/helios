@@ -1,11 +1,12 @@
 # Status: CORE
 
-**Version**: 2.12.0
+**Version**: 2.13.0
 
 - **Status**: Active
 - **Current Focus**: Maintenance, Optimization, and Stability
-- **Last Updated**: 2026-04-18
+- **Last Updated**: 2026-04-20
 
+[v2.13.0] ✅ Completed: Validate Schema Defaults - Implemented `validateSchema` to ensure schema defaults match their defined types, adding `INVALID_SCHEMA` error code.
 [v2.12.0] ✅ Completed: Schema Enhancements - Added `step` and `format` properties to `PropDefinition` to support UI generation hints.
 [v2.11.0] ✅ Completed: Recursive Animation & Media Discovery - Implemented robust recursive Shadow DOM discovery in `DomDriver` with dynamic `MutationObserver` support.
 [v2.10.0] ✅ Completed: Version Sync - Synced package.json version to 2.10.0 and updated context documentation.
