@@ -1,3 +1,6 @@
+## DEMO v1.66.0
+- ✅ Completed: Solid Canvas Example - Verified existing implementation of `examples/solid-canvas-animation` matches spec and passes E2E tests.
+
 ## DEMO v1.65.0
 - ✅ Completed: Scaffold React Example - Verified existing implementation of `examples/react-canvas-animation`.
 

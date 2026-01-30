@@ -1,6 +1,6 @@
 # Status: DEMO Domain
 
-**Version**: 1.65.0
+**Version**: 1.66.0
 
 ## Vision
 The DEMO domain is responsible for:
@@ -15,6 +15,7 @@ The DEMO domain is responsible for:
 - None
 
 ## Completed Tasks
+- [v1.66.0] ✅ Completed: Solid Canvas Example - Verified existing implementation matches spec.
 - [v1.65.0] ✅ Completed: Scaffold React Example - Verified existing implementation.
 - [v1.64.1] ✅ Completed: Verify Podcast Visualizer - Re-verified multi-track audio mixing and offset timing in the E2E pipeline.
 - [v1.64.0] ✅ Completed: Implement SolidJS Series Component - Added Series component and updated SolidJS helpers example.
