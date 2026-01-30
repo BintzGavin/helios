@@ -1,8 +1,9 @@
-**Version**: 1.46.0
+**Version**: 1.47.0
 
 # Renderer Agent Status
 
 ## Progress Log
+- [1.47.0] ✅ Completed: SeekTimeDriver Determinism - Updated `SeekTimeDriver` to enforce deterministic `Date.now()` by setting a fixed epoch (Jan 1, 2024), aligning DOM-based rendering determinism with Canvas-based rendering.
 - [1.46.0] ✅ Completed: CdpTimeDriver Determinism - Updated `CdpTimeDriver` to enforce deterministic `Date.now()` by setting `initialVirtualTime` to Jan 1, 2024 (UTC), ensuring frame consistency across runs.
 - [1.45.0] ✅ Completed: CdpTimeDriver Shadow DOM Sync - Updated `CdpTimeDriver` to recursively traverse Shadow DOMs using `TreeWalker` to find and synchronize `<video>` and `<audio>` elements, ensuring media sync in Canvas mode.
 - [1.44.0] ✅ Completed: Recursive Animation Discovery - Updated `SeekTimeDriver` to recursively traverse Shadow DOMs using `TreeWalker` to find and synchronize CSS animations and WAAPI animations, ensuring parity with media element sync.
@@ -36,7 +37,7 @@
 - [1.24.1] ✅ Completed: Optimize Canvas Transfer - Updated `CanvasStrategy` to replace slow `String.fromCharCode` serialization with `Blob` and `FileReader` APIs, significantly improving data transfer performance from browser to Node.js.
 - [1.24.0] ✅ Completed: Smart Codec Selection - Updated `CanvasStrategy` to intelligently select H.264 (Annex B) when `videoCodec: 'copy'` is requested, prioritizing direct stream copy while falling back to VP8 (IVF) if unsupported.
 - [1.23.0] ✅ Completed: Configurable Screenshot Format - Added `intermediateImageFormat` and `intermediateImageQuality` to `RendererOptions`, enabling faster JPEG capture for DOM rendering (vs default PNG) when performance matters.
-- [1.22.0] ✅ Completed: Implicit Audio Discovery - Updated `DomStrategy` to automatically detect `<audio>` and `<video>` elements in the DOM and include their audio tracks in the FFmpeg render, improving "Use What You Know" functionality.
+- [1.22.0] ✅ Completed: Implicit Audio Discovery - Updated `DomStrategy` to automatically detect `<audio>` and `<video>` elements in the DOM and include their audio tracks in the FFmpeg output mix, improving "Use What You Know" functionality.
 - [1.21.0] ✅ Completed: Configurable Audio Codecs - Added `audioCodec` and `audioBitrate` to `RendererOptions` and updated `FFmpegBuilder` to support smart defaults (e.g., auto-switching to `libvorbis` for WebM) and custom configurations.
 - [1.20.1] ✅ Completed: Optimize Canvas Quality - Updated `CanvasStrategy` to auto-calculate intermediate bitrate based on resolution/FPS (e.g. ~100Mbps for 4K) and wait for fonts to load, ensuring high-quality output and no font glitches.
 - [1.20.0] ✅ Completed: Enable Stream Copy - Updated `FFmpegBuilder` to conditionally omit encoding flags (`-pix_fmt`, `-crf`, `-preset`) when `videoCodec` is `'copy'`, enabling efficient stream passthrough for H.264 WebCodecs.
