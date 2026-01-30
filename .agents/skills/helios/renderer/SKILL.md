@@ -69,6 +69,11 @@ interface RendererOptions {
 
   // System
   ffmpegPath?: string;           // Custom FFmpeg binary path
+  browserConfig?: {              // Playwright Launch Options
+    headless?: boolean;
+    executablePath?: string;
+    args?: string[];
+  };
 }
 
 interface AudioTrackConfig {
@@ -102,8 +107,24 @@ interface RenderJobOptions {
 Check the rendering environment (Playwright, WebCodecs support, FFmpeg).
 
 ```typescript
-// Returns a diagnostic report from the browser context and local environment
+// Returns a comprehensive diagnostic report
 const diagnostics = await renderer.diagnose();
+
+/*
+{
+  browser: {
+    waapi: boolean,
+    webCodecs: boolean,
+    offscreenCanvas: boolean,
+    userAgent: string
+  },
+  ffmpeg: {
+    version: string,
+    encoders: string[],
+    filters: string[]
+  }
+}
+*/
 ```
 
 ## Rendering Modes
@@ -112,6 +133,7 @@ const diagnostics = await renderer.diagnose();
 - **Best for:** WebGL, Three.js, Pixi.js, 2D Canvas.
 - **Mechanism:** Uses `CdpTimeDriver` to control time and `CanvasStrategy` to capture the canvas context directly.
 - **Performance:** High. Fast capture via CDP.
+- **Sync:** Uses `TreeWalker` to recursively discover and sync media in Shadow DOMs.
 
 ### DOM Mode (`mode: 'dom'`)
 - **Best for:** CSS Animations, HTML/DOM elements, complex video/audio compositions.
@@ -122,6 +144,7 @@ const diagnostics = await renderer.diagnose();
   - `data-helios-offset="2.5"`: Delay playback start by 2.5 seconds.
   - `data-helios-seek="10"`: Start playing from 10s into the source file.
   - `muted`: Respects the HTML `muted` attribute.
+- **Recursive Sync:** Traverses Shadow DOMs (open and closed) to find and synchronize animations and media elements.
 - **Stability:** Waits for `seeked` events on all media elements (Multi-Frame Seek) to ensure frames are perfectly aligned before capturing.
 
 ## Utilities
@@ -148,6 +171,30 @@ const renderer = new Renderer({
 });
 ```
 
+### Range Rendering
+Render only a specific section of the composition (e.g., for distributed rendering).
+
+```typescript
+const renderer = new Renderer({
+  // ...
+  startFrame: 0,
+  durationInSeconds: 5 // Render only first 5 seconds
+});
+// To render the next 5 seconds:
+// startFrame: 150, durationInSeconds: 5
+```
+
+### Fast Draft Renders (DOM Mode)
+Use JPEG instead of PNG for faster intermediate screenshots during DOM rendering.
+
+```typescript
+const renderer = new Renderer({
+  mode: 'dom',
+  intermediateImageFormat: 'jpeg',
+  intermediateImageQuality: 80
+});
+```
+
 ### Audio Mixing
 Mix multiple audio tracks with offsets and volume control.
 
@@ -160,33 +207,6 @@ const renderer = new Renderer({
   ]
 });
 ```
-
-### Cancellable Render
-
-```typescript
-const controller = new AbortController();
-
-// Start render
-renderer.render(url, output, { signal: controller.signal })
-  .catch(err => {
-    if (err.message === 'Aborted') console.log('Render cancelled');
-    else console.error(err);
-  });
-
-// Cancel later
-setTimeout(() => controller.abort(), 2000);
-```
-
-### Debugging with Traces
-
-If a render fails or looks wrong, enable Playwright tracing:
-
-```typescript
-await renderer.render(url, output, {
-  tracePath: './trace.zip'
-});
-```
-Then view `trace.zip` at [trace.playwright.dev](https://trace.playwright.dev/).
 
 ## Source Files
 
