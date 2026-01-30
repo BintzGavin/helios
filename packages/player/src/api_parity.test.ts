@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { HeliosPlayer } from './index';
+import { CueClass } from './features/text-tracks';
 
 // Mock ResizeObserver
 global.ResizeObserver = class {
@@ -323,5 +324,69 @@ describe('HeliosPlayer API Parity', () => {
   it('should support canPlayType method', () => {
     expect(player.canPlayType("video/mp4")).toBe("");
     expect(player.canPlayType("application/json")).toBe("");
+  });
+
+  it('should support textTracks API', () => {
+    expect(player.textTracks).toBeDefined();
+    expect(player.textTracks.length).toBe(0);
+
+    const track = player.addTextTrack("captions", "English", "en");
+    expect(player.textTracks.length).toBe(1);
+    expect(track.kind).toBe("captions");
+    expect(track.label).toBe("English");
+    expect(track.language).toBe("en");
+    expect(track.mode).toBe("disabled");
+  });
+
+  it('should update controller when text track mode changes', () => {
+     const mockController = {
+        getState: () => ({}),
+        pause: vi.fn(),
+        dispose: vi.fn(),
+        setCaptions: vi.fn(),
+        subscribe: vi.fn(),
+        onError: vi.fn(),
+     };
+     (player as any).controller = mockController;
+
+     const track = player.addTextTrack("captions", "English", "en");
+     track.addCue(new CueClass(0, 5, "Hello"));
+
+     // Initially disabled, setCaptions not called
+     expect(mockController.setCaptions).not.toHaveBeenCalled();
+
+     // Show track
+     track.mode = "showing";
+     expect(mockController.setCaptions).toHaveBeenCalledWith([
+         expect.objectContaining({ text: "Hello", startTime: 0, endTime: 5000 })
+     ]);
+
+     // Hide track
+     mockController.setCaptions.mockClear();
+     track.mode = "hidden";
+     expect(mockController.setCaptions).toHaveBeenCalledWith([]);
+  });
+
+  it('should enforce mutual exclusivity for caption tracks', () => {
+      const mockController = {
+        getState: () => ({}),
+        pause: vi.fn(),
+        dispose: vi.fn(),
+        setCaptions: vi.fn(),
+        subscribe: vi.fn(),
+        onError: vi.fn(),
+     };
+     (player as any).controller = mockController;
+
+     const track1 = player.addTextTrack("captions", "English", "en");
+     const track2 = player.addTextTrack("captions", "Spanish", "es");
+
+     track1.mode = "showing";
+     expect(track1.mode).toBe("showing");
+     expect(track2.mode).toBe("disabled");
+
+     track2.mode = "showing";
+     expect(track2.mode).toBe("showing");
+     expect(track1.mode).toBe("hidden"); // Our logic sets it to hidden
   });
 });

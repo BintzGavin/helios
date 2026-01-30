@@ -1,5 +1,7 @@
 import { DirectController, BridgeController } from "./controllers";
 import { ClientSideExporter } from "./features/exporter";
+import { HeliosTextTrack, HeliosTextTrackList, CueClass } from "./features/text-tracks";
+import { parseSRT } from "./features/srt-parser";
 export { ClientSideExporter };
 class StaticTimeRange {
     startVal;
@@ -325,7 +327,11 @@ template.innerHTML = `
     .controls.layout-tiny .speed-selector {
       display: none;
     }
+    slot {
+      display: none;
+    }
   </style>
+  <slot></slot>
   <div class="status-overlay hidden" part="overlay">
     <div class="status-text">Connecting...</div>
     <button class="retry-btn" style="display: none">Retry</button>
@@ -358,6 +364,7 @@ template.innerHTML = `
 `;
 export class HeliosPlayer extends HTMLElement {
     iframe;
+    _textTracks;
     playPauseBtn;
     volumeBtn;
     volumeSlider;
@@ -417,6 +424,56 @@ export class HeliosPlayer extends HTMLElement {
         return this.src;
     }
     // --- Standard Media API ---
+    canPlayType(type) {
+        // We strictly play Helios compositions, not standard video MIME types.
+        // Return empty string to be spec-compliant for video/mp4 etc.
+        return "";
+    }
+    get defaultMuted() {
+        return this.hasAttribute("muted");
+    }
+    set defaultMuted(val) {
+        if (val) {
+            this.setAttribute("muted", "");
+        }
+        else {
+            this.removeAttribute("muted");
+        }
+    }
+    _defaultPlaybackRate = 1.0;
+    get defaultPlaybackRate() {
+        return this._defaultPlaybackRate;
+    }
+    set defaultPlaybackRate(val) {
+        if (this._defaultPlaybackRate !== val) {
+            this._defaultPlaybackRate = val;
+            this.dispatchEvent(new Event("ratechange"));
+        }
+    }
+    _preservesPitch = true;
+    get preservesPitch() {
+        return this._preservesPitch;
+    }
+    set preservesPitch(val) {
+        this._preservesPitch = val;
+    }
+    get srcObject() {
+        return null;
+    }
+    set srcObject(val) {
+        console.warn("HeliosPlayer does not support srcObject");
+    }
+    get crossOrigin() {
+        return this.getAttribute("crossorigin");
+    }
+    set crossOrigin(val) {
+        if (val !== null) {
+            this.setAttribute("crossorigin", val);
+        }
+        else {
+            this.removeAttribute("crossorigin");
+        }
+    }
     get seeking() {
         // Return internal scrubbing state as seeking
         return this.isScrubbing;
@@ -629,6 +686,7 @@ export class HeliosPlayer extends HTMLElement {
             this.togglePlayPause();
         });
         this.clickLayer.addEventListener("dblclick", () => this.toggleFullscreen());
+        this._textTracks = new HeliosTextTrackList();
         this.resizeObserver = new ResizeObserver((entries) => {
             for (const entry of entries) {
                 const width = entry.contentRect.width;
@@ -639,6 +697,52 @@ export class HeliosPlayer extends HTMLElement {
                 }
             }
         });
+    }
+    get textTracks() {
+        return this._textTracks;
+    }
+    addTextTrack(kind, label = "", language = "") {
+        const track = new HeliosTextTrack(kind, label, language, this);
+        this._textTracks.addTrack(track);
+        return track;
+    }
+    handleTrackModeChange(track) {
+        if (!this.controller)
+            return;
+        if (track.mode === 'showing') {
+            // Enforce mutual exclusivity for 'captions'
+            if (track.kind === 'captions') {
+                for (const t of this._textTracks) {
+                    if (t !== track && t.kind === 'captions' && t.mode === 'showing') {
+                        t.mode = 'hidden';
+                    }
+                }
+            }
+            // Extract cues into the format Helios expects
+            const captions = track.cues.map((cue, index) => ({
+                id: cue.id || String(index + 1),
+                startTime: cue.startTime * 1000, // Convert seconds to milliseconds
+                endTime: cue.endTime * 1000, // Convert seconds to milliseconds
+                text: cue.text
+            }));
+            this.controller.setCaptions(captions);
+        }
+        else {
+            // If hiding/disabling, check if any other track is showing
+            const showingTrack = Array.from(this._textTracks).find(t => t.mode === 'showing' && t.kind === 'captions');
+            if (showingTrack) {
+                const captions = showingTrack.cues.map((cue, index) => ({
+                    id: cue.id || String(index + 1),
+                    startTime: cue.startTime * 1000, // Convert seconds to milliseconds
+                    endTime: cue.endTime * 1000, // Convert seconds to milliseconds
+                    text: cue.text
+                }));
+                this.controller.setCaptions(captions);
+            }
+            else {
+                this.controller.setCaptions([]);
+            }
+        }
     }
     attributeChangedCallback(name, oldVal, newVal) {
         if (oldVal === newVal)
@@ -736,6 +840,12 @@ export class HeliosPlayer extends HTMLElement {
         this.ccBtn.addEventListener("click", this.toggleCaptions);
         this.bigPlayBtn.addEventListener("click", this.handleBigPlayClick);
         this.posterContainer.addEventListener("click", this.handleBigPlayClick);
+        const slot = this.shadowRoot.querySelector("slot");
+        if (slot) {
+            slot.addEventListener("slotchange", this.handleSlotChange);
+            // Initial check
+            this.handleSlotChange();
+        }
         // Initial state: disabled until connected
         this.setControlsDisabled(true);
         // Only show connecting if we haven't already shown "Loading..." via attributeChangedCallback
@@ -773,6 +883,10 @@ export class HeliosPlayer extends HTMLElement {
         this.ccBtn.removeEventListener("click", this.toggleCaptions);
         this.bigPlayBtn.removeEventListener("click", this.handleBigPlayClick);
         this.posterContainer.removeEventListener("click", this.handleBigPlayClick);
+        const slot = this.shadowRoot.querySelector("slot");
+        if (slot) {
+            slot.removeEventListener("slotchange", this.handleSlotChange);
+        }
         this.stopConnectionAttempts();
         if (this.unsubscribe) {
             this.unsubscribe();
@@ -938,6 +1052,48 @@ export class HeliosPlayer extends HTMLElement {
             }
         }
     };
+    handleSlotChange = () => {
+        const slot = this.shadowRoot.querySelector("slot");
+        if (!slot)
+            return;
+        const elements = slot.assignedElements();
+        elements.forEach((el) => {
+            if (el.tagName === "TRACK") {
+                const t = el;
+                // Prevent duplicate track creation
+                if (t._heliosTrack)
+                    return;
+                const kind = t.getAttribute("kind") || "captions";
+                const label = t.getAttribute("label") || "";
+                const lang = t.getAttribute("srclang") || "";
+                const src = t.getAttribute("src");
+                const isDefault = t.hasAttribute("default");
+                const textTrack = this.addTextTrack(kind, label, lang);
+                t._heliosTrack = textTrack;
+                if (src) {
+                    fetch(src)
+                        .then((res) => {
+                        if (!res.ok)
+                            throw new Error(`Status ${res.status}`);
+                        return res.text();
+                    })
+                        .then((srt) => {
+                        const cues = parseSRT(srt);
+                        cues.forEach(c => {
+                            textTrack.addCue(new CueClass(c.startTime, c.endTime, c.text));
+                        });
+                        if (isDefault) {
+                            textTrack.mode = 'showing';
+                        }
+                        else {
+                            textTrack.mode = 'disabled';
+                        }
+                    })
+                        .catch((err) => console.error("HeliosPlayer: Failed to load captions", err));
+                }
+            }
+        });
+    };
     setController(controller) {
         // Clean up old controller
         if (this.controller) {
@@ -948,6 +1104,8 @@ export class HeliosPlayer extends HTMLElement {
             this.unsubscribe = null;
         }
         this.controller = controller;
+        // Check for pending captions
+        this.handleSlotChange();
         // Update States
         this._networkState = HeliosPlayer.NETWORK_IDLE;
         this._readyState = HeliosPlayer.HAVE_ENOUGH_DATA;
@@ -1257,6 +1415,12 @@ export class HeliosPlayer extends HTMLElement {
     }
     getController() {
         return this.controller;
+    }
+    async getSchema() {
+        if (this.controller) {
+            return this.controller.getSchema();
+        }
+        return undefined;
     }
     retryConnection() {
         this.showStatus("Retrying...", false);
