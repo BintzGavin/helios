@@ -48,6 +48,7 @@
 - `examples/pixi-canvas-animation`: PixiJS (2D).
 - `examples/p5-canvas-animation`: P5.js (Instance Mode).
 - `examples/tailwind-animation`: Tailwind CSS v3 integration.
+- `examples/stress-test-animation`: Stress test with 2500+ animated elements (Signals).
 
 ## B. Build Config
 - **Root Config**: `vite.config.js` (shared settings).

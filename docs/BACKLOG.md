@@ -40,3 +40,4 @@
 
 ### 8. Maintenance
 - [x] Synchronize package versions (Fix CORE 2.7.1 dependency mismatch in PLAYER/RENDERER).
+- [ ] Fix workspace version mismatch between packages/renderer and packages/core (Core 2.11.0 vs Renderer req 2.10.0).

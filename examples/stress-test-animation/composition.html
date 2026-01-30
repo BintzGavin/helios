@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stress Test Animation</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      background: #111;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-content: center;
+      width: 1920px;
+      height: 1080px;
+    }
+    .box {
+      width: 15px;
+      height: 15px;
+      margin: 2px;
+      border-radius: 2px;
+      will-change: transform, background-color;
+    }
+  </style>
+</head>
+<body>
+  <script type="module">
+    import { Helios, computed, effect } from '../../packages/core/src/index.ts';
+
+    const helios = new Helios({
+      duration: 5,
+      fps: 30,
+      width: 1920,
+      height: 1080
+    });
+
+    const rows = 50;
+    const cols = 50;
+    const count = rows * cols;
+
+    // Create elements
+    for (let i = 0; i < count; i++) {
+      const div = document.createElement('div');
+      div.className = 'box';
+      document.body.appendChild(div);
+
+      // Create computed signal for this element
+      const transform = computed(() => {
+        const frame = helios.currentFrame.value;
+        const row = Math.floor(i / cols);
+        const col = i % cols;
+
+        // Calculate a wave effect based on position
+        const dist = Math.sqrt(Math.pow(row - rows/2, 2) + Math.pow(col - cols/2, 2));
+        const offset = Math.sin(frame * 0.1 - dist * 0.2) * 5;
+        const scale = 1 + Math.sin(frame * 0.1 + dist * 0.1) * 0.5;
+
+        // Color shift based on frame and position
+        const hue = (frame * 2 + dist * 5) % 360;
+
+        return {
+          transform: `translateY(${offset}px) scale(${scale})`,
+          background: `hsl(${hue}, 70%, 60%)`
+        };
+      });
+
+      // Bind signal to DOM
+      effect(() => {
+        const style = transform.value;
+        div.style.transform = style.transform;
+        div.style.background = style.background;
+      });
+    }
+
+    helios.bindToDocumentTimeline();
+    window.helios = helios;
+  </script>
+</body>
+</html>

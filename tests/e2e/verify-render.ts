@@ -27,6 +27,7 @@ const CASES = [
   { name: 'Motion One', relativePath: 'examples/motion-one-animation/composition.html', mode: 'dom' as const },
   { name: 'Captions', relativePath: 'examples/captions-animation/composition.html', mode: 'dom' as const },
   { name: 'Signals', relativePath: 'examples/signals-animation/composition.html', mode: 'dom' as const },
+  { name: 'Stress Test', relativePath: 'examples/stress-test-animation/composition.html', mode: 'dom' as const },
   { name: 'Dynamic Props', relativePath: 'examples/dynamic-props-animation/composition.html', mode: 'dom' as const },
   { name: 'Media Element', relativePath: 'examples/media-element-animation/composition.html', mode: 'dom' as const },
   { name: 'D3 Animation', relativePath: 'examples/d3-animation/composition.html', mode: 'dom' as const },
