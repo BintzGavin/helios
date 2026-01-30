@@ -10,3 +10,7 @@
 ## v0.33.1 - HTMLMediaElement Parity Gaps
 **Learning:** "Deep API Parity" was marked complete, but critical properties like `error` and `currentSrc` were missed. Wrappers rely on `error` property to diagnose failures after an event.
 **Action:** Audit `HTMLMediaElement` spec line-by-line when claiming parity, especially for error handling and source resolution properties.
+
+## v0.38.0 - Native Engine Capabilities
+**Learning:** The player was implementing client-side looping logic which was redundant because the core engine supports `setLoop` natively.
+**Action:** Always check the core engine capabilities (via memory or docs) before implementing logic in the player view layer to avoid redundancy and synchronization issues.
