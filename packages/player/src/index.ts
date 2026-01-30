@@ -716,6 +716,11 @@ export class HeliosPlayer extends HTMLElement implements TrackHost {
       const src = this.pendingSrc;
       this.pendingSrc = null;
       this.loadIframe(src);
+    } else {
+      const src = this.getAttribute("src");
+      if (src) {
+        this.loadIframe(src);
+      }
     }
   }
 
@@ -1621,8 +1626,7 @@ export class HeliosPlayer extends HTMLElement implements TrackHost {
   private retryConnection() {
     this.showStatus("Retrying...", false);
     // Reload iframe to force fresh start
-    const src = this.iframe.src;
-    this.iframe.src = src;
+    this.load();
   }
 
   private renderClientSide = async () => {
