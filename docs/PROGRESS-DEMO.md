@@ -1,3 +1,6 @@
+## DEMO v1.61.1
+- ✅ Completed: Verify Solid Animation Helpers - Added `examples/solid-animation-helpers` to `tests/e2e/verify-render.ts`. Verified all 47 examples pass.
+
 ## DEMO v1.61.0
 - ✅ Completed: Web Component Animation - Created `examples/web-component-animation` demonstrating Shadow DOM and CSS animation integration.
 
