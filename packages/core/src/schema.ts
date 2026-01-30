@@ -11,7 +11,10 @@ export type PropType =
   | 'image'
   | 'video'
   | 'audio'
-  | 'font';
+  | 'font'
+  | 'model'
+  | 'json'
+  | 'shader';
 
 export interface PropDefinition {
   type: PropType;
@@ -108,7 +111,7 @@ function validateValue(val: any, def: PropDefinition, keyPath: string): any {
 
   // Color and Assets are treated as strings for runtime check
   if (
-    ['color', 'image', 'video', 'audio', 'font'].includes(def.type) &&
+    ['color', 'image', 'video', 'audio', 'font', 'model', 'json', 'shader'].includes(def.type) &&
     typeof val !== 'string'
   ) {
     throwError(keyPath, `${def.type} (string)`);

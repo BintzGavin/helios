@@ -1,11 +1,12 @@
 # Status: CORE
 
-**Version**: 2.13.0
+**Version**: 2.14.0
 
 - **Status**: Active
 - **Current Focus**: Maintenance, Optimization, and Stability
-- **Last Updated**: 2026-04-20
+- **Last Updated**: 2026-04-21
 
+[v2.14.0] ✅ Completed: Implement Missing Asset Types - Added `model`, `json`, and `shader` to supported `PropType` values and validation logic.
 [v2.13.0] ✅ Completed: Validate Schema Defaults - Implemented `validateSchema` to ensure schema defaults match their defined types, adding `INVALID_SCHEMA` error code.
 [v2.12.0] ✅ Completed: Schema Enhancements - Added `step` and `format` properties to `PropDefinition` to support UI generation hints.
 [v2.11.0] ✅ Completed: Recursive Animation & Media Discovery - Implemented robust recursive Shadow DOM discovery in `DomDriver` with dynamic `MutationObserver` support.

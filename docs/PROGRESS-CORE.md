@@ -1,5 +1,8 @@
 # CORE Progress Log
 
+## CORE v2.14.0
+- ✅ Completed: Implement Missing Asset Types - Added `model`, `json`, and `shader` to supported `PropType` values and validation logic.
+
 ## CORE v2.13.0
 - ✅ Completed: Validate Schema Defaults - Implemented `validateSchema` to ensure schema defaults match their defined types, adding `INVALID_SCHEMA` error code.
 

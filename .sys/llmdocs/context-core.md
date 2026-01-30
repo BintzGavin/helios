@@ -97,7 +97,10 @@ export type PropType =
   | 'image'
   | 'video'
   | 'audio'
-  | 'font';
+  | 'font'
+  | 'model'
+  | 'json'
+  | 'shader';
 
 export interface PropDefinition {
   type: PropType;

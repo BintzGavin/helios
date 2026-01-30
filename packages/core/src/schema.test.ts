@@ -252,6 +252,24 @@ describe('validateProps', () => {
     expect(() => validateProps({ fnt: [] }, schema)).toThrow(HeliosError);
   });
 
+  it('should validate new asset types (model, json, shader)', () => {
+    const schema = {
+      mdl: { type: 'model' as const },
+      dat: { type: 'json' as const },
+      shd: { type: 'shader' as const },
+    };
+    const valid = {
+      mdl: 'path/to/model.glb',
+      dat: 'path/to/data.json',
+      shd: 'path/to/shader.glsl',
+    };
+    expect(validateProps(valid, schema)).toEqual(valid);
+
+    expect(() => validateProps({ mdl: 123 }, schema)).toThrow(HeliosError);
+    expect(() => validateProps({ dat: {} }, schema)).toThrow(HeliosError);
+    expect(() => validateProps({ shd: true }, schema)).toThrow(HeliosError);
+  });
+
   it('should validate color formats', () => {
     const schema = {
         col: { type: 'color' as const }
