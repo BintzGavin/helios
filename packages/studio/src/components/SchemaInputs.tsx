@@ -3,6 +3,9 @@ import type { PropDefinition, PropType } from '@helios-project/core';
 import { useStudio } from '../context/StudioContext';
 import './PropsEditor.css'; // Re-use styles
 
+// Extended PropType to support future types not yet in Core
+type ExtendedPropType = PropType | 'model' | 'json' | 'shader';
+
 interface SchemaInputProps {
   definition: PropDefinition;
   value: any;
@@ -14,7 +17,10 @@ export const SchemaInput: React.FC<SchemaInputProps> = ({ definition, value, onC
     return <EnumInput options={definition.enum} value={value} onChange={onChange} />;
   }
 
-  switch (definition.type) {
+  // Cast to ExtendedPropType to allow handling new types
+  const type = definition.type as ExtendedPropType;
+
+  switch (type) {
     case 'string':
       return <StringInput value={value} onChange={onChange} format={definition.format} />;
     case 'number':
@@ -27,7 +33,10 @@ export const SchemaInput: React.FC<SchemaInputProps> = ({ definition, value, onC
     case 'video':
     case 'audio':
     case 'font':
-      return <AssetInput type={definition.type} value={value} onChange={onChange} />;
+    case 'model':
+    case 'json':
+    case 'shader':
+      return <AssetInput type={type} value={value} onChange={onChange} />;
     case 'object':
         if (definition.properties) {
             return <ObjectInput definition={definition} value={value} onChange={onChange} />;
@@ -45,7 +54,9 @@ export const SchemaInput: React.FC<SchemaInputProps> = ({ definition, value, onC
 
 // Helper to get safe default values
 export const getDefaultValueForType = (type: PropType): any => {
-    switch (type) {
+    // Cast to allow extended types
+    const extendedType = type as ExtendedPropType;
+    switch (extendedType) {
         case 'string': return '';
         case 'number': return 0;
         case 'boolean': return false;
@@ -56,6 +67,9 @@ export const getDefaultValueForType = (type: PropType): any => {
         case 'video':
         case 'audio':
         case 'font':
+        case 'model':
+        case 'json':
+        case 'shader':
             return '';
         default: return undefined;
     }
@@ -142,7 +156,7 @@ const ArrayInput: React.FC<{ definition: PropDefinition; value: any; onChange: (
     );
 };
 
-const AssetInput: React.FC<{ type: PropType; value: string; onChange: (val: string) => void }> = ({
+const AssetInput: React.FC<{ type: ExtendedPropType; value: string; onChange: (val: string) => void }> = ({
   type,
   value,
   onChange
