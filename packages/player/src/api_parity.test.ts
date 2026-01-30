@@ -389,4 +389,13 @@ describe('HeliosPlayer API Parity', () => {
      expect(track2.mode).toBe("showing");
      expect(track1.mode).toBe("hidden"); // Our logic sets it to hidden
   });
+
+  it('should reload current src when load() is called', () => {
+    player.src = 'test.html';
+    // Accessing private method via (player as any)
+    const loadIframeSpy = vi.spyOn(player as any, 'loadIframe');
+
+    player.load();
+    expect(loadIframeSpy).toHaveBeenCalledWith('test.html');
+  });
 });

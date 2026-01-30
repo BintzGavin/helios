@@ -72,6 +72,7 @@ Properties and methods available on the `HeliosPlayer` element instance:
 - `addTextTrack(kind, label, language)`: Creates and returns a new `HeliosTextTrack`.
 - `play()`: Starts playback.
 - `pause()`: Pauses playback.
+- `load()`: Reloads the current source (or loads pending source).
 - `currentTime`: Get/Set current time in seconds.
 - `duration`: Get duration in seconds.
 - `paused`: Boolean indicating if paused.

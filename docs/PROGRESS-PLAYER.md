@@ -1,5 +1,8 @@
 # PLAYER Progress Log
 
+## PLAYER v0.44.2
+- ✅ Completed: Fix load() Behavior - Updated `load()` to reload the current source if no pending source exists, and refactored `retryConnection` to use this standard method.
+
 ## PLAYER v0.44.1
 - ✅ Completed: Documentation Update - Synced package.json version and documented missing features (sandbox, controlslist, textTracks, CSS vars).
 
