@@ -1,0 +1,31 @@
+.timecode-display {
+  cursor: text;
+  padding: 0 4px;
+  border-radius: 2px;
+  display: inline-block;
+  min-width: 80px;
+  text-align: center;
+}
+
+.timecode-display:hover {
+  background: #333;
+}
+
+.timecode-input {
+  font-family: monospace;
+  font-size: 11px;
+  color: #fff;
+  background: #111;
+  border: 1px solid #007bff;
+  padding: 0 4px;
+  width: 80px;
+  outline: none;
+  border-radius: 2px;
+  text-align: center;
+}
+
+/* Ensure placeholder and selection color */
+.timecode-input::selection {
+  background: #007bff;
+  color: white;
+}

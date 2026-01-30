@@ -1,6 +1,7 @@
 import React, { useRef, useState, useEffect, useMemo } from 'react';
 import { useStudio } from '../context/StudioContext';
 import { framesToTimecode } from '@helios-project/core';
+import { TimecodeDisplay } from './Controls/TimecodeDisplay';
 import './Timeline.css';
 
 interface Tick {
@@ -226,7 +227,14 @@ export const Timeline: React.FC = () => {
     <div className="timeline-container">
       <div className="timeline-header">
         <div className="timeline-header-left">
-          <span>{formatTime(currentFrame, fps)} / {formatTime(totalFrames, fps)}</span>
+          <TimecodeDisplay
+            frame={currentFrame}
+            fps={fps}
+            totalFrames={totalFrames}
+            onChange={(f) => controller?.seek(f)}
+          />
+          <span style={{ margin: '0 4px', color: '#666' }}>/</span>
+          <span>{formatTime(totalFrames, fps)}</span>
           <div className="timeline-zoom-control">
             <span className="timeline-zoom-label">Fit</span>
             <input
