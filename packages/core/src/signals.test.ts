@@ -180,4 +180,31 @@ describe('Signals', () => {
       // Should NOT update because peek doesn't subscribe
       expect(spy).toHaveBeenCalledTimes(1);
   });
+
+  it('should not track dependencies in subscribe callback', () => {
+    const s1 = signal(1);
+    const s2 = signal(10);
+    const spy = vi.fn();
+
+    // Subscribe to s1
+    s1.subscribe(() => {
+      // Access s2 inside the callback
+      // This should NOT cause this callback to run when s2 changes
+      spy(s2.value);
+    });
+
+    expect(spy).toHaveBeenCalledWith(10);
+    expect(spy).toHaveBeenCalledTimes(1);
+
+    // Update s2
+    s2.value = 20;
+
+    // Should NOT have triggered the s1 subscriber again
+    expect(spy).toHaveBeenCalledTimes(1);
+
+    // Update s1
+    s1.value = 2;
+    expect(spy).toHaveBeenCalledWith(20);
+    expect(spy).toHaveBeenCalledTimes(2);
+  });
 });

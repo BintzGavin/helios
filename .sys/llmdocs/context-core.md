@@ -227,3 +227,24 @@ class Helios {
   dispose(): void;
 }
 ```
+
+## E. Signals API
+
+```typescript
+export interface Signal<T> {
+  value: T;
+  peek(): T;
+  subscribe(fn: (value: T) => void): () => void;
+}
+
+export interface ReadonlySignal<T> {
+  readonly value: T;
+  peek(): T;
+  subscribe(fn: (value: T) => void): () => void;
+}
+
+export function signal<T>(value: T): Signal<T>;
+export function computed<T>(fn: () => T): ReadonlySignal<T>;
+export function effect(fn: () => void): () => void;
+export function untracked<T>(fn: () => T): T;
+```

@@ -107,3 +107,6 @@ Each agent should update **their own dedicated progress file** instead of this f
 
 ## CORE v2.17.0
 - ✅ Completed: Implement Typed Arrays - Added support for Typed Arrays (Float32Array, etc.) in HeliosSchema and validateProps.
+
+## CORE v2.17.1
+- ✅ Completed: Fix Leaky Signal Subscriptions - Implemented `untracked` and updated `subscribe` to prevent dependency tracking within callbacks.

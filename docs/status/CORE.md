@@ -1,11 +1,12 @@
 # Status: CORE
 
-**Version**: 2.17.0
+**Version**: 2.17.1
 
 - **Status**: Active
 - **Current Focus**: Maintenance, Optimization, and Stability
-- **Last Updated**: 2026-04-26
+- **Last Updated**: 2026-05-23
 
+[v2.17.1] ✅ Completed: Fix Leaky Signal Subscriptions - Implemented `untracked` and updated `subscribe` to prevent dependency tracking within callbacks.
 [v2.17.0] ✅ Completed: Implement Typed Arrays - Added support for Typed Arrays (Float32Array, etc.) in HeliosSchema and validateProps.
 [v2.16.0] ✅ Completed: Time-Based Control - Added `currentTime` signal and `seekToTime()` method to `Helios` class for direct time manipulation.
 [v2.15.0] ✅ Completed: Enhance Diagnose - Expanded `Helios.diagnose()` to include WebGL, WebAudio, Color Gamut, and Video Codec support.
@@ -61,7 +62,7 @@
 [v10.0] ✅ Completed: Refactor Helios to use Signals - Replaced internal state with signals, exposed ReadonlySignal getters, and maintained backward compatibility.
 [v1.11.0] ✅ Completed: Implement Easing Functions - Implemented standard easing functions (linear, quad, cubic, quart, quint, sine, expo, circ, back, elastic, bounce) and cubic-bezier solver.
 [v1.11.1] ✅ Completed: Refactor Helios Signals - Added JSDoc documentation to public signal properties and verified signal implementation.
-[v1.11.2] ✅ Completed: Verify Signals and Cleanup Plans - Verified signal integration and cleaned up completed plan files.
+[v1.11.2] ✅ Completed: Verify Signals and Cleanup Plans - Verified signal integration and cleaned up plan files.
 [v1.11.3] ✅ Completed: Add Documentation - Created comprehensive `README.md` for `packages/core`.
 [v1.12.0] ✅ Completed: Implement DomDriver - Implemented `DomDriver` to sync WAAPI and HTMLMediaElements, updated `Helios` to use it by default, and deprecated `WaapiDriver`.
 [v1.13.0] ✅ Completed: Export Types - Exported `HeliosState` and `HeliosSubscriber` types from `packages/core` to improve DX.
