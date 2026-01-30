@@ -29,15 +29,117 @@ export const SchemaInput: React.FC<SchemaInputProps> = ({ definition, value, onC
     case 'font':
       return <AssetInput type={definition.type} value={value} onChange={onChange} />;
     case 'object':
+        if (definition.properties) {
+            return <ObjectInput definition={definition} value={value} onChange={onChange} />;
+        }
+        return <JsonInput value={value} onChange={onChange} />;
     case 'array':
-        // Fallback to JSON editor for complex types
-        // We can reuse the JsonPropInput logic but need to expose it or duplicate it?
-        // For now, let's just return null and let PropsEditor handle it via fallback if this returns null?
-        // Or better, implement a simple text area here.
+        if (definition.items) {
+             return <ArrayInput definition={definition} value={value} onChange={onChange} />;
+        }
         return <JsonInput value={value} onChange={onChange} />;
     default:
       return <div className="unsupported-type">Unsupported schema type: {definition.type}</div>;
   }
+};
+
+// Helper to get safe default values
+const getDefaultValueForType = (type: PropType): any => {
+    switch (type) {
+        case 'string': return '';
+        case 'number': return 0;
+        case 'boolean': return false;
+        case 'object': return {};
+        case 'array': return [];
+        case 'color': return '#000000';
+        case 'image':
+        case 'video':
+        case 'audio':
+        case 'font':
+            return '';
+        default: return undefined;
+    }
+};
+
+const ObjectInput: React.FC<{ definition: PropDefinition; value: any; onChange: (val: any) => void }> = ({ definition, value, onChange }) => {
+    // If value is null/undefined or not an object, initialize it
+    const safeValue = (typeof value === 'object' && value !== null && !Array.isArray(value)) ? value : {};
+
+    const handlePropChange = (key: string, newVal: any) => {
+        onChange({ ...safeValue, [key]: newVal });
+    };
+
+    return (
+        <div className="prop-object-container">
+            {definition.properties && Object.entries(definition.properties).map(([key, propDef]) => (
+                <div key={key} className="prop-row">
+                    <label className="prop-label">{propDef.label || key}</label>
+                    <SchemaInput
+                        definition={propDef}
+                        value={safeValue[key] ?? propDef.default ?? getDefaultValueForType(propDef.type)}
+                        onChange={(val) => handlePropChange(key, val)}
+                    />
+                </div>
+            ))}
+        </div>
+    );
+};
+
+const ArrayInput: React.FC<{ definition: PropDefinition; value: any; onChange: (val: any) => void }> = ({ definition, value, onChange }) => {
+    // If value is not an array, initialize it
+    const safeValue = Array.isArray(value) ? value : [];
+
+    const handleItemChange = (index: number, newVal: any) => {
+        const copy = [...safeValue];
+        copy[index] = newVal;
+        onChange(copy);
+    };
+
+    const handleAdd = () => {
+        // Determine default value based on item type
+        let defaultVal: any = undefined;
+        if (definition.items?.default !== undefined) {
+             defaultVal = definition.items.default;
+        } else if (definition.items) {
+             defaultVal = getDefaultValueForType(definition.items.type);
+        }
+
+        onChange([...safeValue, defaultVal]);
+    };
+
+    const handleRemove = (index: number) => {
+        const copy = [...safeValue];
+        copy.splice(index, 1);
+        onChange(copy);
+    };
+
+    return (
+        <div className="prop-array-container">
+            {safeValue.map((item: any, index: number) => (
+                <div key={index} className="prop-array-item">
+                     <div className="prop-array-item-content">
+                        {definition.items && (
+                            <SchemaInput
+                                definition={definition.items}
+                                value={item}
+                                onChange={(val) => handleItemChange(index, val)}
+                            />
+                        )}
+                     </div>
+                     <button
+                        className="prop-array-remove"
+                        onClick={() => handleRemove(index)}
+                        title="Remove Item"
+                     >
+                        Remove
+                     </button>
+                </div>
+            ))}
+            <button className="prop-array-add" onClick={handleAdd}>
+                + Add Item
+            </button>
+        </div>
+    );
 };
 
 const AssetInput: React.FC<{ type: PropType; value: string; onChange: (val: string) => void }> = ({
