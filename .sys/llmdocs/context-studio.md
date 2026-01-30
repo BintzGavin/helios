@@ -28,6 +28,14 @@ packages/studio
 │   ├── hooks
 │   ├── main.tsx
 │   ├── server
+│   │   ├── templates
+│   │   │   ├── index.ts
+│   │   │   ├── react.ts
+│   │   │   ├── svelte.ts
+│   │   │   ├── threejs.ts
+│   │   │   ├── types.ts
+│   │   │   ├── vanilla.ts
+│   │   │   └── vue.ts
 │   ├── setupTests.ts
 │   ├── utils
 │   └── vite-env.d.ts
@@ -53,6 +61,7 @@ packages/studio
 - **Captions Panel**: Edit and export captions (SRT).
 - **Diagnostics Panel**: View system capabilities (FFmpeg, GPU).
 - **Composition Settings Modal**: Edit width, height, FPS, and duration of the active composition.
+- **Create Composition Modal**: Create new compositions using templates (Vanilla JS, React, Vue, Svelte, Three.js).
 - **Global Shortcuts**: Configure keyboard shortcuts for actions.
 
 ## Integration
