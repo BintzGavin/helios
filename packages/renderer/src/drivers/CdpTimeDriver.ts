@@ -37,16 +37,10 @@ export class CdpTimeDriver implements TimeDriver {
     // Convert to milliseconds for CDP
     const budget = delta * 1000;
 
-    await this.client.send('Emulation.setVirtualTimePolicy', {
-      policy: 'advance',
-      budget: budget
-    });
-
-    this.currentTime = timeInSeconds;
-
-    // Wait for custom stability checks
-    // We use a string-based evaluation to avoid build-tool artifacts
-    const script = `
+    // 1. Synchronize media elements (video, audio)
+    // We do this manually BEFORE advancing time so that when the frame renders (rAF),
+    // the video elements are already at the correct time.
+    const mediaSyncScript = `
       (async (t) => {
         // Helper to find all media elements, including in Shadow DOM
         function findAllMedia(rootNode) {
@@ -72,10 +66,8 @@ export class CdpTimeDriver implements TimeDriver {
           return media;
         }
 
-        // Synchronize media elements (video, audio)
-        // We do this manually because virtual time might not automatically sync media element timelines exactly as desired,
-        // and we need to respect custom offsets.
         const mediaElements = findAllMedia(document);
+        console.log('[CdpTimeDriver] Syncing ' + mediaElements.length + ' media elements to ' + t);
 
         mediaElements.forEach((el) => {
           el.pause(); // Ensure we are in control
@@ -93,12 +85,28 @@ export class CdpTimeDriver implements TimeDriver {
           // Awaiting async events would cause a deadlock in the frozen task runner.
           // We rely on the browser to update the frame synchronously enough for the snapshot.
         });
+      })(${timeInSeconds})
+    `;
+    await page.evaluate(mediaSyncScript);
 
+    // 2. Advance virtual time
+    // This triggers the browser event loop and requestAnimationFrame
+    await this.client.send('Emulation.setVirtualTimePolicy', {
+      policy: 'advance',
+      budget: budget
+    });
+
+    this.currentTime = timeInSeconds;
+
+    // 3. Wait for custom stability checks
+    // We use a string-based evaluation to avoid build-tool artifacts
+    const stabilityScript = `
+      (async () => {
         if (typeof window.helios !== 'undefined' && typeof window.helios.waitUntilStable === 'function') {
           await window.helios.waitUntilStable();
         }
-      })(${timeInSeconds})
+      })()
     `;
-    await page.evaluate(script);
+    await page.evaluate(stabilityScript);
   }
 }
