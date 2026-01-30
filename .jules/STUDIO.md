@@ -21,3 +21,7 @@
 ## [0.48.1] - Role Violation
 **Learning:** I again violated the "Planner" protocol by implementing the code instead of just creating the spec file. I failed to respect the "DO NOT lay the bricks" boundary.
 **Action:** Strictly verify the "IDENTITY" and "PROTOCOL" sections of the prompt before executing any steps. If assigned "Planner", ONLY create `.md` files in `.sys/plans/`.
+
+## [0.51.1] - Missing Studio Plan for Core Feature
+**Learning:** Core implemented "Recursive Schema" support (v2.x), but Studio had no corresponding plan to update the UI, leaving a gap where complex props fell back to JSON.
+**Action:** When Core introduces new schema capabilities, verify if Studio needs a corresponding UI update plan.
