@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { sequence, series } from './sequencing.js';
+import { sequence, series, stagger, shift } from './sequencing.js';
 
 describe('sequence', () => {
   it('handles finite duration correctly', () => {
@@ -144,5 +144,71 @@ describe('series', () => {
 
     expect(result[0].from).toBe(0);
     expect(result[1].from).toBe(0); // 0 + 0 = 0
+  });
+});
+
+describe('stagger', () => {
+  it('assigns start times based on interval', () => {
+    const items = [{ id: 1 }, { id: 2 }, { id: 3 }];
+    const result = stagger(items, 5);
+
+    expect(result[0].from).toBe(0);
+    expect(result[1].from).toBe(5);
+    expect(result[2].from).toBe(10);
+    expect(result[0].id).toBe(1);
+  });
+
+  it('respects startFrame', () => {
+    const items = [{}, {}];
+    const result = stagger(items, 10, 100);
+
+    expect(result[0].from).toBe(100);
+    expect(result[1].from).toBe(110);
+  });
+
+  it('handles empty array', () => {
+    const result = stagger([], 10);
+    expect(result).toHaveLength(0);
+  });
+
+  it('handles zero interval', () => {
+    const items = [{}, {}];
+    const result = stagger(items, 0);
+
+    expect(result[0].from).toBe(0);
+    expect(result[1].from).toBe(0);
+  });
+});
+
+describe('shift', () => {
+  it('shifts start times by offset', () => {
+    const items = [{ from: 0 }, { from: 10 }];
+    const result = shift(items, 5);
+
+    expect(result[0].from).toBe(5);
+    expect(result[1].from).toBe(15);
+  });
+
+  it('handles negative offset', () => {
+    const items = [{ from: 10 }, { from: 20 }];
+    const result = shift(items, -5);
+
+    expect(result[0].from).toBe(5);
+    expect(result[1].from).toBe(15);
+  });
+
+  it('handles empty array', () => {
+    const result = shift([], 10);
+    expect(result).toHaveLength(0);
+  });
+
+  it('works with stagger', () => {
+    const items = [{}, {}, {}];
+    const staggered = stagger(items, 10); // 0, 10, 20
+    const shifted = shift(staggered, 100); // 100, 110, 120
+
+    expect(shifted[0].from).toBe(100);
+    expect(shifted[1].from).toBe(110);
+    expect(shifted[2].from).toBe(120);
   });
 });
