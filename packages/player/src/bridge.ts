@@ -62,6 +62,11 @@ export function connectToParent(helios: Helios) {
             helios.setInputProps(event.data.props);
         }
         break;
+      case 'HELIOS_SET_CAPTIONS':
+        if (event.data.captions !== undefined) {
+            helios.setCaptions(event.data.captions);
+        }
+        break;
       case 'HELIOS_GET_SCHEMA':
         window.parent.postMessage({ type: 'HELIOS_SCHEMA', schema: helios.schema }, '*');
         break;

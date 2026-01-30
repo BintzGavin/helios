@@ -236,7 +236,7 @@ describe('HeliosPlayer API Parity', () => {
         cb({ message: "Test Error" });
         return vi.fn();
       }),
-      setInputProps: vi.fn(),
+      setInputProps: vi.fn(), setCaptions: vi.fn(),
       setAudioMuted: vi.fn(),
     };
     (player as any).setController(mockController);

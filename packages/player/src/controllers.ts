@@ -12,6 +12,7 @@ export interface HeliosController {
   setPlaybackRate(rate: number): void;
   setPlaybackRange(startFrame: number, endFrame: number): void;
   clearPlaybackRange(): void;
+  setCaptions(captions: string | CaptionCue[]): void;
   setInputProps(props: Record<string, any>): void;
   subscribe(callback: (state: any) => void): () => void;
   onError(callback: (err: any) => void): () => void;
@@ -33,6 +34,7 @@ export class DirectController implements HeliosController {
   setPlaybackRate(rate: number) { this.instance.setPlaybackRate(rate); }
   setPlaybackRange(start: number, end: number) { this.instance.setPlaybackRange(start, end); }
   clearPlaybackRange() { this.instance.clearPlaybackRange(); }
+  setCaptions(captions: string | CaptionCue[]) { this.instance.setCaptions(captions); }
   setInputProps(props: Record<string, any>) { this.instance.setInputProps(props); }
   subscribe(callback: (state: any) => void) { return this.instance.subscribe(callback); }
   getState() { return this.instance.getState(); }
@@ -153,6 +155,7 @@ export class BridgeController implements HeliosController {
   setPlaybackRate(rate: number) { this.iframeWindow.postMessage({ type: 'HELIOS_SET_PLAYBACK_RATE', rate }, '*'); }
   setPlaybackRange(start: number, end: number) { this.iframeWindow.postMessage({ type: 'HELIOS_SET_PLAYBACK_RANGE', start, end }, '*'); }
   clearPlaybackRange() { this.iframeWindow.postMessage({ type: 'HELIOS_CLEAR_PLAYBACK_RANGE' }, '*'); }
+  setCaptions(captions: string | CaptionCue[]) { this.iframeWindow.postMessage({ type: 'HELIOS_SET_CAPTIONS', captions }, '*'); }
   setInputProps(props: Record<string, any>) { this.iframeWindow.postMessage({ type: 'HELIOS_SET_PROPS', props }, '*'); }
 
   subscribe(callback: (state: any) => void) {

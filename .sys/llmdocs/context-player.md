@@ -5,6 +5,7 @@ The `<helios-player>` component uses a Shadow DOM to encapsulate its styles and 
 
 **Shadow Root:**
 - `<style>`: Encapsulated CSS.
+- `<slot>`: (Hidden) Accepts light DOM children like `<track>` elements.
 - `.status-overlay`: Displays loading, connecting, and error states.
 - `.poster-container`: Displays the poster image and "Big Play Button".
 - `<iframe>`: Hosts the Helios composition (sandboxed).
@@ -49,7 +50,10 @@ The component observes the following attributes:
 - `controlslist`: Space-separated tokens to customize UI (`nodownload`, `nofullscreen`).
 - `crossorigin`: CORS setting for the element (`anonymous`, `use-credentials`).
 
-## D. Styling
+## D. Child Elements
+- `<track>`: Standard HTMLTrackElement for importing captions (kind="captions"). Requires `src` (SRT file) and `default` attribute to be active.
+
+## E. Styling
 The component exposes the following CSS variables for theming:
 
 - `--helios-controls-bg`: Background color of the controls bar.
