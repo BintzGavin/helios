@@ -1,6 +1,7 @@
 # Context: DEMO Domain
 
 ## A. Examples
+- `examples/client-export-api`: Direct use of `ClientSideExporter` and `BridgeController` for in-browser export.
 - `examples/web-component-animation`: Native Web Components (Shadow DOM + CSS).
 - `examples/simple-canvas-animation`: Vanilla JS Canvas API.
 - `examples/simple-animation`: Vanilla JS DOM + CSS Animations.

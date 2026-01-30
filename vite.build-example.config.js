@@ -9,6 +9,7 @@ export default defineConfig({
   resolve: {
     alias: {
       "@helios-project/core": resolve(__dirname, "packages/core/src/index.ts"),
+      "@helios-project/player": resolve(__dirname, "packages/player/src"),
     },
   },
   plugins: [
@@ -77,6 +78,8 @@ export default defineConfig({
         text_effects: resolve(__dirname, "examples/text-effects-animation/composition.html"),
         promo_video: resolve(__dirname, "examples/promo-video/composition.html"),
         web_component: resolve(__dirname, "examples/web-component-animation/composition.html"),
+        client_export_comp: resolve(__dirname, "examples/client-export-api/composition.html"),
+        client_export_app: resolve(__dirname, "examples/client-export-api/index.html"),
       },
     },
   },
