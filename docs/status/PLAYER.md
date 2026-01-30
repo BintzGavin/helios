@@ -1,4 +1,4 @@
-**Version**: v0.38.0
+**Version**: v0.39.0
 
 # Status: PLAYER
 
@@ -32,10 +32,12 @@
 - Implements Deep API Parity (`videoWidth`, `videoHeight`, `buffered`, `seekable`, `seeking`) to support integration with standard video wrappers.
 - Implements `controlslist` attribute support (`nodownload`, `nofullscreen`) to customize UI visibility.
 - Implements CSS Variables (custom properties) for theming the player UI (`--helios-controls-bg`, `--helios-accent-color`, etc.).
+- Supports Native Loop via `setLoop` in Controller/Bridge, removing client-side loop hacks.
 
 ## Critical Task
 - **None**: Recent task completed.
 
+[v0.39.0] ✅ Completed: Native Loop Support - Refactored `HeliosController` and `bridge` to use `helios.setLoop()` natively, removing manual client-side looping logic.
 [v0.38.0] ✅ Completed: Visualize Playback Range - Implemented visual indicator for playback range on the timeline scrubber using CSS gradients and `updateUI` logic.
 [v0.37.0] ✅ Completed: CSS Variables for Theming - Exposed CSS variables to enable theming of the player controls and UI.
 [v0.36.0] ✅ Completed: ControlsList Support - Implemented `controlslist` attribute support to allow hiding Export and Fullscreen buttons (`nodownload`, `nofullscreen`).

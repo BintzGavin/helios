@@ -8,6 +8,7 @@ export interface HeliosController {
   seek(frame: number): void;
   setAudioVolume(volume: number): void;
   setAudioMuted(muted: boolean): void;
+  setLoop(loop: boolean): void;
   setPlaybackRate(rate: number): void;
   setPlaybackRange(startFrame: number, endFrame: number): void;
   clearPlaybackRange(): void;
@@ -27,6 +28,7 @@ export class DirectController implements HeliosController {
   seek(frame: number) { this.instance.seek(frame); }
   setAudioVolume(volume: number) { this.instance.setAudioVolume(volume); }
   setAudioMuted(muted: boolean) { this.instance.setAudioMuted(muted); }
+  setLoop(loop: boolean) { this.instance.setLoop(loop); }
   setPlaybackRate(rate: number) { this.instance.setPlaybackRate(rate); }
   setPlaybackRange(start: number, end: number) { this.instance.setPlaybackRange(start, end); }
   clearPlaybackRange() { this.instance.clearPlaybackRange(); }
@@ -142,6 +144,7 @@ export class BridgeController implements HeliosController {
   seek(frame: number) { this.iframeWindow.postMessage({ type: 'HELIOS_SEEK', frame }, '*'); }
   setAudioVolume(volume: number) { this.iframeWindow.postMessage({ type: 'HELIOS_SET_VOLUME', volume }, '*'); }
   setAudioMuted(muted: boolean) { this.iframeWindow.postMessage({ type: 'HELIOS_SET_MUTED', muted }, '*'); }
+  setLoop(loop: boolean) { this.iframeWindow.postMessage({ type: 'HELIOS_SET_LOOP', loop }, '*'); }
   setPlaybackRate(rate: number) { this.iframeWindow.postMessage({ type: 'HELIOS_SET_PLAYBACK_RATE', rate }, '*'); }
   setPlaybackRange(start: number, end: number) { this.iframeWindow.postMessage({ type: 'HELIOS_SET_PLAYBACK_RANGE', start, end }, '*'); }
   clearPlaybackRange() { this.iframeWindow.postMessage({ type: 'HELIOS_CLEAR_PLAYBACK_RANGE' }, '*'); }
