@@ -249,4 +249,19 @@ describe('HeliosPlayer API Parity', () => {
     (player as any).loadIframe("new.html");
     expect(player.error).toBeNull();
   });
+
+  it('should support getSchema', async () => {
+    const mockSchema = { prop: { type: 'string' } };
+    const mockController = {
+        getState: () => ({}),
+        pause: vi.fn(),
+        dispose: vi.fn(),
+        getSchema: vi.fn().mockResolvedValue(mockSchema)
+    };
+    (player as any).controller = mockController;
+
+    const schema = await player.getSchema();
+    expect(schema).toBe(mockSchema);
+    expect(mockController.getSchema).toHaveBeenCalled();
+  });
 });

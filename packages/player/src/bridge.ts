@@ -62,6 +62,9 @@ export function connectToParent(helios: Helios) {
             helios.setInputProps(event.data.props);
         }
         break;
+      case 'HELIOS_GET_SCHEMA':
+        window.parent.postMessage({ type: 'HELIOS_SCHEMA', schema: helios.schema }, '*');
+        break;
       case 'HELIOS_CAPTURE_FRAME':
         handleCaptureFrame(helios, event.data);
         break;

@@ -1,4 +1,4 @@
-import { Helios, CaptionCue } from "@helios-project/core";
+import { Helios, CaptionCue, HeliosSchema } from "@helios-project/core";
 import { captureDomToBitmap } from "./features/dom-capture";
 import { getAudioAssets, AudioAsset } from "./features/audio-utils";
 
@@ -19,6 +19,7 @@ export interface HeliosController {
   dispose(): void;
   captureFrame(frame: number, options?: { selector?: string, mode?: 'canvas' | 'dom' }): Promise<{ frame: VideoFrame, captions: CaptionCue[] } | null>;
   getAudioTracks(): Promise<AudioAsset[]>;
+  getSchema(): Promise<HeliosSchema | undefined>;
 }
 
 export class DirectController implements HeliosController {
@@ -69,6 +70,10 @@ export class DirectController implements HeliosController {
   async getAudioTracks(): Promise<AudioAsset[]> {
      const doc = this.iframe?.contentDocument || document;
      return getAudioAssets(doc);
+  }
+
+  async getSchema(): Promise<HeliosSchema | undefined> {
+    return this.instance.schema;
   }
 
   async captureFrame(frame: number, options?: { selector?: string, mode?: 'canvas' | 'dom' }): Promise<{ frame: VideoFrame, captions: CaptionCue[] } | null> {
@@ -224,6 +229,27 @@ export class BridgeController implements HeliosController {
           setTimeout(() => {
               window.removeEventListener('message', handler);
               resolve([]);
+          }, 5000);
+      });
+  }
+
+  async getSchema(): Promise<HeliosSchema | undefined> {
+      return new Promise((resolve) => {
+          let timeoutId: number;
+          const handler = (event: MessageEvent) => {
+              if (event.data?.type === 'HELIOS_SCHEMA') {
+                  window.removeEventListener('message', handler);
+                  clearTimeout(timeoutId);
+                  resolve(event.data.schema);
+              }
+          };
+          window.addEventListener('message', handler);
+          this.iframeWindow.postMessage({ type: 'HELIOS_GET_SCHEMA' }, '*');
+
+          // Timeout
+          timeoutId = window.setTimeout(() => {
+              window.removeEventListener('message', handler);
+              resolve(undefined);
           }, 5000);
       });
   }
