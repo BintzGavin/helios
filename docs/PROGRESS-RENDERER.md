@@ -1,3 +1,6 @@
+## RENDERER v1.43.0
+- ✅ Completed: Enable Shadow DOM Media Sync - Updated `SeekTimeDriver` to recursively traverse Shadow DOMs using `TreeWalker` to find and synchronize `<video>` and `<audio>` elements.
+
 ## RENDERER v1.42.0
 - ✅ Completed: Enable Browser Launch Configuration - Added `browserConfig` to `RendererOptions` to allow customizing Playwright launch arguments.
 

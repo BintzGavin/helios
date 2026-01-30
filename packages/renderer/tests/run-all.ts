@@ -23,6 +23,7 @@ const tests = [
   'tests/verify-seek-driver-determinism.ts',
   'tests/verify-seek-driver-offsets.ts',
   'tests/verify-seek-driver-stability.ts',
+  'tests/verify-shadow-dom-sync.ts',
   'tests/verify-smart-codec-selection.ts',
   'tests/verify-stream-copy.ts',
   'scripts/verify-advanced-audio.ts',
