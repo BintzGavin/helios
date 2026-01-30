@@ -1,3 +1,6 @@
+## DEMO v1.60.0
+- ✅ Completed: Verify Promo Video - Integrated `examples/promo-video` into verification pipeline and documentation.
+
 ## DEMO v1.59.1
 - ✅ Completed: Verify Podcast Visualizer - Verified `examples/podcast-visualizer` implementation matches spec and passes E2E verification.
 

@@ -30,6 +30,7 @@
     "dev:p5": "vite serve examples/p5-canvas-animation",
     "dev:d3": "vite serve examples/d3-animation",
     "dev:procedural": "vite serve examples/procedural-generation",
+    "dev:promo": "vite serve examples/promo-video",
     "build:examples": "vite build -c vite.build-example.config.js",
     "render:canvas-example": "npm run build:examples && npx tsx packages/renderer/scripts/render.ts"
   },
