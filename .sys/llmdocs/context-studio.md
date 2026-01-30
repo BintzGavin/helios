@@ -48,7 +48,7 @@ packages/studio
 - **Stage**: Visual preview with zoom, pan, safe area guides, and transparency toggle.
 - **Timeline**: Track-based timeline with scrubbing, zooming, markers, and timecode display.
 - **Props Editor**: Auto-generated inputs based on composition schema (supports recursive objects and arrays, copy/reset tools, step constraints, specialized formats like date/color, and diverse asset types like model/json/shader).
-- **Assets Panel**: Drag-and-drop asset management.
+- **Assets Panel**: Drag-and-drop asset management with search and type filtering.
 - **Renders Panel**: Manage render jobs and download outputs.
 - **Captions Panel**: Edit and export captions (SRT).
 - **Diagnostics Panel**: View system capabilities (FFmpeg, GPU).

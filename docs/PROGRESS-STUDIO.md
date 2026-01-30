@@ -1,3 +1,6 @@
+## STUDIO v0.57.0
+- ✅ Completed: Asset Filtering - Implemented search bar and type filter in Assets Panel to improve asset management.
+
 ## STUDIO v0.56.0
 - ✅ Completed: Missing Asset Types - Implemented support for `model`, `json`, and `shader` types in Studio schema inputs, enabling asset discovery and usage.
 
