@@ -44,7 +44,7 @@ export const SchemaInput: React.FC<SchemaInputProps> = ({ definition, value, onC
 };
 
 // Helper to get safe default values
-const getDefaultValueForType = (type: PropType): any => {
+export const getDefaultValueForType = (type: PropType): any => {
     switch (type) {
         case 'string': return '';
         case 'number': return 0;

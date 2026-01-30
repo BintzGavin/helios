@@ -1,7 +1,31 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useStudio } from '../context/StudioContext';
-import { SchemaInput } from './SchemaInputs';
+import { SchemaInput, getDefaultValueForType } from './SchemaInputs';
 import './PropsEditor.css';
+
+const PropsToolbar: React.FC<{
+  onCopy: () => void;
+  onReset: () => void;
+}> = ({ onCopy, onReset }) => {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = () => {
+    onCopy();
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  return (
+    <div className="props-toolbar">
+      <button className="props-toolbar-btn" onClick={handleCopy} title="Copy JSON">
+        {copied ? 'Copied!' : 'Copy JSON'}
+      </button>
+      <button className="props-toolbar-btn danger" onClick={onReset} title="Reset to Defaults">
+        Reset
+      </button>
+    </div>
+  );
+};
 
 export const PropsEditor: React.FC = () => {
   const { controller, playerState } = useStudio();
@@ -20,8 +44,25 @@ export const PropsEditor: React.FC = () => {
     controller.setInputProps(newProps);
   };
 
+  const handleCopy = () => {
+    if (inputProps) {
+      navigator.clipboard.writeText(JSON.stringify(inputProps, null, 2));
+    }
+  };
+
+  const handleReset = () => {
+    if (!schema || !controller) return;
+    const defaults: Record<string, any> = {};
+    Object.keys(schema).forEach(key => {
+      const def = schema[key];
+      defaults[key] = def.default ?? getDefaultValueForType(def.type);
+    });
+    controller.setInputProps(defaults);
+  };
+
   return (
     <div className="props-editor">
+      <PropsToolbar onCopy={handleCopy} onReset={handleReset} />
       {Object.entries(inputProps).map(([key, value]) => {
         const def = schema ? schema[key] : undefined;
 

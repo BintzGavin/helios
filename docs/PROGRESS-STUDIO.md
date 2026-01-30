@@ -1,3 +1,9 @@
+## STUDIO v0.54.0
+- ✅ Completed: Props Editor Polish - Implemented Props Toolbar with "Copy JSON" and "Reset" buttons, and ensured `inputProps` persist across Hot Module Reloading (HMR).
+
+## STUDIO v0.53.0
+- ✅ Completed: Recursive Schema Support - Implemented ObjectInput and ArrayInput for recursive UI generation in Props Editor.
+
 ## STUDIO v0.52.0
 - ✅ Completed: Composition Settings Modal - Implemented a modal to edit composition metadata (Width, Height, FPS, Duration) of existing compositions, persisting changes to `composition.json`.
 
