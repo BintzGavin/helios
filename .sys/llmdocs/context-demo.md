@@ -41,6 +41,7 @@
 - `examples/solid-transitions`: SolidJS transitions (CSS animation synchronization).
 - `examples/map-animation`: Leaflet Maps (DOM).
 - `examples/text-effects-animation`: Text Effects (Typewriter, Staggered Reveal).
+- `examples/promo-video`: Promo video (Multi-scene GSAP animation).
 - `examples/threejs-canvas-animation`: Three.js (3D).
 - `examples/react-three-fiber`: React Three Fiber (R3F) integration.
 - `examples/pixi-canvas-animation`: PixiJS (2D).

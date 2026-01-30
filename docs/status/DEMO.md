@@ -1,5 +1,5 @@
 # Status: DEMO (Executor)
-**Version**: 1.59.1
+**Version**: 1.60.0
 
 ## Vision
 To provide comprehensive, idiomatic examples for every major framework (React, Vue, Svelte, Vanilla) and robust end-to-end testing to ensure the Helios engine delivers on its "Use What You Know" promise.
@@ -9,6 +9,7 @@ To provide comprehensive, idiomatic examples for every major framework (React, V
 - **Solid Animation Helpers**: ✅ `examples/solid-animation-helpers` exists and works (Demonstrates idiomatic Sequence component composition in SolidJS).
 - **Svelte Runes**: ✅ `examples/svelte-runes-animation` exists and works (Demonstrates Svelte 5 Runes integration with `HeliosState` adapter).
 - **Map Animation**: ✅ `examples/map-animation` exists and works (Demonstrates Leaflet integration with stability checks).
+- **Promo Video**: ✅ `examples/promo-video` exists and works (Demonstrates complex multi-scene GSAP animation).
 - **Text Effects**: ✅ `examples/text-effects-animation` exists and works (Demonstrates Typewriter and Staggered Reveal effects).
 - **Solid DOM**: ✅ `examples/solid-dom-animation` exists and works (Demonstrates integration with SolidJS signals for DOM updates).
 - **Solid Canvas**: ✅ `examples/solid-canvas-animation` exists and works (Demonstrates integration with SolidJS signals via `createHeliosSignal` adapter).
@@ -83,6 +84,7 @@ To provide comprehensive, idiomatic examples for every major framework (React, V
 None.
 
 ## Log
+- [v1.60.0] ✅ Completed: Verify Promo Video - Integrated `examples/promo-video` into verification pipeline and documentation.
 - [v1.59.1] ✅ Completed: Verify Podcast Visualizer - Verified `examples/podcast-visualizer` implementation matches spec and passes E2E verification.
 - [v1.59.0] ✅ Completed: Solid Transitions Example - Created `examples/solid-transitions` demonstrating how to synchronize CSS animations in SolidJS using `autoSyncAnimations: true` and `animation-delay`. Verified with E2E tests.
 - [v1.58.0] ✅ Completed: Refine Podcast Visualizer - Updated audio source to a 440Hz sine wave to enable audible verification of mixing logic.
