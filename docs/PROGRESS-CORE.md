@@ -1,5 +1,8 @@
 # CORE Progress Log
 
+## CORE v2.15.0
+- ✅ Completed: Enhance Diagnose - Expanded `Helios.diagnose()` to include WebGL, WebAudio, Color Gamut, and Video Codec support.
+
 ## CORE v2.14.0
 - ✅ Completed: Implement Missing Asset Types - Added `model`, `json`, and `shader` to supported `PropType` values and validation logic.
 
