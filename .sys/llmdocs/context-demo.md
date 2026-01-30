@@ -9,7 +9,7 @@
 - `examples/procedural-generation`: Deterministic `random` and `interpolateColors` (Canvas).
 - `examples/audio-visualization`: Raw audio data visualization (Canvas).
 - `examples/media-element-animation`: Native `<video>`/`<audio>` synchronization.
-- `examples/podcast-visualizer`: Multi-track audio mixing and synchronization.
+- `examples/podcast-visualizer`: Multi-track audio mixing (volume, muted, offset) and synchronization.
 - `examples/gsap-animation`: GreenSock Animation Platform (GSAP).
 - `examples/framer-motion-animation`: React Framer Motion.
 - `examples/lottie-animation`: Airbnb Lottie (lottie-web).

@@ -1,3 +1,6 @@
+## DEMO v1.63.0
+- ✅ Completed: Verify Podcast Visualizer - Verified `examples/podcast-visualizer` implementation, specifically testing multi-track audio mixing, muted attribute handling, and offset timing in the E2E pipeline.
+
 ## DEMO v1.62.1
 - ✅ Completed: Verify Dom Render - Verified that DOM-based compositions render correctly in the E2E pipeline.
 
