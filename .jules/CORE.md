@@ -25,3 +25,7 @@
 ## [2.16.0] - Planner Role Clarity
 **Learning:** The Planner Agent's `set_plan` steps must be "Create the spec file" and "Verify the spec file", NOT "Implement the code". The plan content goes *inside* the spec file.
 **Action:** Ensure `set_plan` steps focus on the *meta-task* of planning (creating documentation), not the execution of the plan itself.
+
+## [2.17.0] - Leaky Signal Subscriptions
+**Learning:** The implementation of `Signal.subscribe` using `effect` caused a leaky abstraction where the subscription implicitly tracked dependencies accessed within the callback.
+**Action:** When implementing reactive primitives, ensure that explicit subscriptions (like `subscribe`) execute their callbacks in an untracked context to prevent accidental dependency collection.
