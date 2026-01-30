@@ -216,4 +216,47 @@ describe('PropsEditor', () => {
     const removeButtons = screen.getAllByText('Remove');
     expect(removeButtons).toHaveLength(2);
   });
+
+  it('respects step and format props', () => {
+    const schema: HeliosSchema = {
+      steppedNumber: { type: 'number', minimum: 0, maximum: 10, step: 0.5 },
+      dateString: { type: 'string', format: 'date' },
+      colorString: { type: 'string', format: 'color' }
+    };
+
+    (StudioContext.useStudio as any).mockReturnValue({
+      ...defaultContext,
+      playerState: {
+        inputProps: {
+          steppedNumber: 5,
+          dateString: '2023-01-01',
+          colorString: '#ff0000'
+        },
+        schema
+      }
+    });
+
+    render(<PropsEditor />);
+
+    // Check Number Step (NumberRangeInput renders both a range and a number input)
+    // We can query by role 'spinbutton' for the number input
+    const numberInput = screen.getByRole('spinbutton');
+    expect(numberInput).toHaveValue(5);
+    expect(numberInput).toHaveAttribute('step', '0.5');
+
+    // Check Range Step (if rendered) - Range input has slider role
+    const slider = screen.getByRole('slider');
+    expect(slider).toHaveValue('5');
+    expect(slider).toHaveAttribute('step', '0.5');
+
+    // Check Date Format
+    const dateInput = screen.getByDisplayValue('2023-01-01');
+    expect(dateInput).toHaveAttribute('type', 'date');
+
+    // Check Color Format
+    // In this test case, `colorString` is defined as `type: 'string', format: 'color'`.
+    // So it should render as a StringInput with type="color".
+    const colorInput = screen.getByDisplayValue('#ff0000');
+    expect(colorInput).toHaveAttribute('type', 'color');
+  });
 });
