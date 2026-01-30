@@ -442,6 +442,65 @@ export class HeliosPlayer extends HTMLElement {
 
   // --- Standard Media API ---
 
+  public canPlayType(type: string): CanPlayTypeResult {
+    // We strictly play Helios compositions, not standard video MIME types.
+    // Return empty string to be spec-compliant for video/mp4 etc.
+    return "";
+  }
+
+  public get defaultMuted(): boolean {
+    return this.hasAttribute("muted");
+  }
+
+  public set defaultMuted(val: boolean) {
+    if (val) {
+      this.setAttribute("muted", "");
+    } else {
+      this.removeAttribute("muted");
+    }
+  }
+
+  private _defaultPlaybackRate = 1.0;
+  public get defaultPlaybackRate(): number {
+    return this._defaultPlaybackRate;
+  }
+
+  public set defaultPlaybackRate(val: number) {
+    if (this._defaultPlaybackRate !== val) {
+      this._defaultPlaybackRate = val;
+      this.dispatchEvent(new Event("ratechange"));
+    }
+  }
+
+  private _preservesPitch = true;
+  public get preservesPitch(): boolean {
+    return this._preservesPitch;
+  }
+
+  public set preservesPitch(val: boolean) {
+    this._preservesPitch = val;
+  }
+
+  public get srcObject(): MediaProvider | null {
+    return null;
+  }
+
+  public set srcObject(val: MediaProvider | null) {
+    console.warn("HeliosPlayer does not support srcObject");
+  }
+
+  public get crossOrigin(): string | null {
+    return this.getAttribute("crossorigin");
+  }
+
+  public set crossOrigin(val: string | null) {
+    if (val !== null) {
+      this.setAttribute("crossorigin", val);
+    } else {
+      this.removeAttribute("crossorigin");
+    }
+  }
+
   public get seeking(): boolean {
     // Return internal scrubbing state as seeking
     return this.isScrubbing;

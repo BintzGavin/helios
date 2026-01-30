@@ -264,4 +264,64 @@ describe('HeliosPlayer API Parity', () => {
     expect(schema).toBe(mockSchema);
     expect(mockController.getSchema).toHaveBeenCalled();
   });
+
+  it('should support defaultMuted property', () => {
+    expect(player.defaultMuted).toBe(false);
+
+    player.defaultMuted = true;
+    expect(player.hasAttribute('muted')).toBe(true);
+    expect(player.defaultMuted).toBe(true);
+
+    player.defaultMuted = false;
+    expect(player.hasAttribute('muted')).toBe(false);
+    expect(player.defaultMuted).toBe(false);
+  });
+
+  it('should support defaultPlaybackRate property', () => {
+    const rateSpy = vi.fn();
+    player.addEventListener('ratechange', rateSpy);
+
+    expect(player.defaultPlaybackRate).toBe(1.0);
+
+    player.defaultPlaybackRate = 2.0;
+    expect(player.defaultPlaybackRate).toBe(2.0);
+    expect(rateSpy).toHaveBeenCalledTimes(1);
+
+    // Setting same value should not dispatch event
+    player.defaultPlaybackRate = 2.0;
+    expect(rateSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it('should support preservesPitch property', () => {
+    expect(player.preservesPitch).toBe(true);
+
+    player.preservesPitch = false;
+    expect(player.preservesPitch).toBe(false);
+  });
+
+  it('should support srcObject property', () => {
+    const consoleSpy = vi.spyOn(console, 'warn');
+    expect(player.srcObject).toBeNull();
+
+    player.srcObject = {} as any;
+    expect(consoleSpy).toHaveBeenCalledWith("HeliosPlayer does not support srcObject");
+    expect(player.srcObject).toBeNull();
+  });
+
+  it('should support crossOrigin property', () => {
+    expect(player.crossOrigin).toBeNull();
+
+    player.crossOrigin = "anonymous";
+    expect(player.getAttribute("crossorigin")).toBe("anonymous");
+    expect(player.crossOrigin).toBe("anonymous");
+
+    player.crossOrigin = null;
+    expect(player.hasAttribute("crossorigin")).toBe(false);
+    expect(player.crossOrigin).toBeNull();
+  });
+
+  it('should support canPlayType method', () => {
+    expect(player.canPlayType("video/mp4")).toBe("");
+    expect(player.canPlayType("application/json")).toBe("");
+  });
 });
