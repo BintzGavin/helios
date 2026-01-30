@@ -1,5 +1,8 @@
 # CORE Progress Log
 
+## CORE v2.19.0
+- ✅ Completed: Implement Sequencing Helpers - Added `stagger` and `shift` utilities to `packages/core` to simplify animation timing.
+
 ## CORE v2.18.0
 - ✅ Completed: Schema Constraints - Added `minItems`, `maxItems`, `minLength`, `maxLength` constraints to `PropDefinition` and implemented validation logic.
 

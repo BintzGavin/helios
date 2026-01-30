@@ -252,3 +252,17 @@ export function computed<T>(fn: () => T): ReadonlySignal<T>;
 export function effect(fn: () => void): () => void;
 export function untracked<T>(fn: () => T): T;
 ```
+
+## F. Exported Utilities
+
+```typescript
+// Sequencing
+function sequence(options: SequenceOptions): SequenceResult;
+function series<T extends SeriesItem>(items: T[], startFrame?: number): (T & { from: number })[];
+function stagger<T>(items: T[], interval: number, startFrame?: number): (T & { from: number })[];
+function shift<T extends { from: number }>(items: T[], offset: number): T[];
+
+// Animation
+function interpolate(frame: number, inputRange: number[], outputRange: number[], options?: InterpolateOptions): number;
+function spring(options: SpringOptions): number;
+```

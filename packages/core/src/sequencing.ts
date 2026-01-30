@@ -74,3 +74,32 @@ export function series<T extends SeriesItem>(items: T[], startFrame = 0): (T & {
     return { ...item, from };
   });
 }
+
+/**
+ * Staggers a list of items by a fixed interval.
+ * Assigns a 'from' time to each item based on its index.
+ *
+ * @param items The array of items to stagger.
+ * @param interval The number of frames to stagger each item by.
+ * @param startFrame The frame to start the first item at (default: 0).
+ */
+export function stagger<T>(items: T[], interval: number, startFrame = 0): (T & { from: number })[] {
+  return items.map((item, i) => ({
+    ...item,
+    from: startFrame + (i * interval)
+  }));
+}
+
+/**
+ * Shifts the start time of a list of sequenced items.
+ * Useful for delaying a group of animations relative to another.
+ *
+ * @param items Array of items with a 'from' property.
+ * @param offset The number of frames to shift by (can be negative).
+ */
+export function shift<T extends { from: number }>(items: T[], offset: number): T[] {
+  return items.map(item => ({
+    ...item,
+    from: item.from + offset
+  }));
+}
