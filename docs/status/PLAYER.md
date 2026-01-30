@@ -1,4 +1,4 @@
-**Version**: v0.42.0
+**Version**: v0.43.0
 
 # Status: PLAYER
 
@@ -33,11 +33,12 @@
 - Implements `controlslist` attribute support (`nodownload`, `nofullscreen`) to customize UI visibility.
 - Implements CSS Variables (custom properties) for theming the player UI (`--helios-controls-bg`, `--helios-accent-color`, etc.).
 - Supports Native Loop via `setLoop` in Controller/Bridge, removing client-side loop hacks.
-- Supports importing SRT captions via standard `<track kind="captions">` child elements.
+- Supports importing SRT captions via standard `<track kind="captions">` child elements and exposes standard `textTracks` / `addTextTrack` API.
 
 ## Critical Task
 - **None**: Recent task completed.
 
+[v0.43.0] ✅ Completed: Implement TextTracks API - Added `textTracks` property and `addTextTrack` method to `HeliosPlayer`, along with a robust SRT parser and `HeliosTextTrack` implementation for better HTMLMediaElement parity.
 [v0.42.0] ✅ Completed: Import SRT Captions - Implemented support for `<track>` elements to import SRT captions via the setCaptions API.
 [v0.41.0] ✅ Completed: Standard Media API Gap Fill - Implemented `canPlayType`, `defaultMuted`, `defaultPlaybackRate`, `preservesPitch`, `srcObject`, and `crossOrigin` for fuller `HTMLMediaElement` parity.
 [v0.40.0] ✅ Completed: Range-Based Export - Client-side export now respects the active 'playbackRange' (loop region), exporting only the selected portion of the timeline.

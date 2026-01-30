@@ -2,6 +2,8 @@ import { Helios, HeliosSchema } from "@helios-project/core";
 import { DirectController, BridgeController } from "./controllers";
 import type { HeliosController } from "./controllers";
 import { ClientSideExporter } from "./features/exporter";
+import { HeliosTextTrack, HeliosTextTrackList, CueClass, TrackHost } from "./features/text-tracks";
+import { parseSRT } from "./features/srt-parser";
 
 export { ClientSideExporter };
 export type { HeliosController };
@@ -373,8 +375,10 @@ template.innerHTML = `
   </div>
 `;
 
-export class HeliosPlayer extends HTMLElement {
+export class HeliosPlayer extends HTMLElement implements TrackHost {
   private iframe: HTMLIFrameElement;
+  private _textTracks: HeliosTextTrackList;
+  private _domTracks = new Map<HTMLTrackElement, HeliosTextTrack>();
   private playPauseBtn: HTMLButtonElement;
   private volumeBtn: HTMLButtonElement;
   private volumeSlider: HTMLInputElement;
@@ -751,6 +755,8 @@ export class HeliosPlayer extends HTMLElement {
     });
     this.clickLayer.addEventListener("dblclick", () => this.toggleFullscreen());
 
+    this._textTracks = new HeliosTextTrackList();
+
     this.resizeObserver = new ResizeObserver((entries) => {
       for (const entry of entries) {
         const width = entry.contentRect.width;
@@ -761,6 +767,54 @@ export class HeliosPlayer extends HTMLElement {
         }
       }
     });
+  }
+
+  public get textTracks(): HeliosTextTrackList {
+    return this._textTracks;
+  }
+
+  public addTextTrack(kind: string, label: string = "", language: string = ""): HeliosTextTrack {
+    const track = new HeliosTextTrack(kind, label, language, this);
+    this._textTracks.addTrack(track);
+    return track;
+  }
+
+  public handleTrackModeChange(track: HeliosTextTrack) {
+    if (!this.controller) return;
+
+    if (track.mode === 'showing') {
+        // Enforce mutual exclusivity for 'captions'
+        if (track.kind === 'captions') {
+            for (const t of this._textTracks) {
+                if (t !== track && t.kind === 'captions' && t.mode === 'showing') {
+                    t.mode = 'hidden';
+                }
+            }
+        }
+
+        // Extract cues into the format Helios expects
+        const captions = track.cues.map((cue: any, index: number) => ({
+            id: cue.id || String(index + 1),
+            startTime: cue.startTime * 1000, // Convert seconds to milliseconds
+            endTime: cue.endTime * 1000,     // Convert seconds to milliseconds
+            text: cue.text
+        }));
+        this.controller.setCaptions(captions);
+    } else {
+        // If hiding/disabling, check if any other track is showing
+        const showingTrack = Array.from(this._textTracks).find(t => t.mode === 'showing' && t.kind === 'captions');
+        if (showingTrack) {
+             const captions = showingTrack.cues.map((cue: any, index: number) => ({
+                id: cue.id || String(index + 1),
+                startTime: cue.startTime * 1000, // Convert seconds to milliseconds
+                endTime: cue.endTime * 1000,     // Convert seconds to milliseconds
+                text: cue.text
+            }));
+             this.controller.setCaptions(captions);
+        } else {
+             this.controller.setCaptions([]);
+        }
+    }
   }
 
   attributeChangedCallback(name: string, oldVal: string, newVal: string) {
@@ -1108,30 +1162,58 @@ export class HeliosPlayer extends HTMLElement {
     const slot = this.shadowRoot!.querySelector("slot");
     if (!slot) return;
 
-    const tracks = slot.assignedElements();
-    // Find first default caption track
-    const captionTrack = tracks.find(
-        (t) => t.tagName === "TRACK" && t.getAttribute("kind") === "captions" && t.hasAttribute("default")
-    ) as HTMLTrackElement | undefined;
+    const elements = slot.assignedElements();
+    const currentTrackElements = new Set<HTMLTrackElement>();
 
-    if (this.controller) {
-      if (captionTrack && captionTrack.src) {
-        fetch(captionTrack.src)
-          .then((res) => {
-            if (!res.ok) throw new Error(`Status ${res.status}`);
-            return res.text();
-          })
-          .then((srt) => {
-            // Ensure controller still exists and we are still aiming for this track
-            // (Note: race conditions possible if rapid changes, but this is basic support)
-            if (this.controller) {
-              this.controller.setCaptions(srt);
+    elements.forEach((el) => {
+        if (el.tagName === "TRACK") {
+            const t = el as HTMLTrackElement;
+            currentTrackElements.add(t);
+
+            // Prevent duplicate track creation
+            if (this._domTracks.has(t)) return;
+
+            const kind = t.getAttribute("kind") || "captions";
+            const label = t.getAttribute("label") || "";
+            const lang = t.getAttribute("srclang") || "";
+            const src = t.getAttribute("src");
+            const isDefault = t.hasAttribute("default");
+
+            const textTrack = this.addTextTrack(kind, label, lang);
+            this._domTracks.set(t, textTrack);
+
+            if (src) {
+                fetch(src)
+                .then((res) => {
+                    if (!res.ok) throw new Error(`Status ${res.status}`);
+                    return res.text();
+                })
+                .then((srt) => {
+                    const cues = parseSRT(srt);
+                    cues.forEach(c => {
+                        textTrack.addCue(new CueClass(c.startTime, c.endTime, c.text));
+                    });
+
+                    if (isDefault) {
+                        textTrack.mode = 'showing';
+                    } else {
+                        textTrack.mode = 'disabled';
+                    }
+                })
+                .catch((err) => console.error("HeliosPlayer: Failed to load captions", err));
             }
-          })
-          .catch((err) => console.error("HeliosPlayer: Failed to load captions", err));
-      } else {
-        this.controller.setCaptions([]);
-      }
+        }
+    });
+
+    // Remove tracks that are no longer in the DOM
+    for (const [el, track] of this._domTracks.entries()) {
+        if (!currentTrackElements.has(el)) {
+            if (track.mode === 'showing') {
+                track.mode = 'hidden';
+            }
+            this._textTracks.removeTrack(track);
+            this._domTracks.delete(el);
+        }
     }
   };
 

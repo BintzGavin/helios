@@ -60,6 +60,14 @@ export function connectToParent(helios) {
                     helios.setInputProps(event.data.props);
                 }
                 break;
+            case 'HELIOS_SET_CAPTIONS':
+                if (event.data.captions !== undefined) {
+                    helios.setCaptions(event.data.captions);
+                }
+                break;
+            case 'HELIOS_GET_SCHEMA':
+                window.parent.postMessage({ type: 'HELIOS_SCHEMA', schema: helios.schema }, '*');
+                break;
             case 'HELIOS_CAPTURE_FRAME':
                 handleCaptureFrame(helios, event.data);
                 break;

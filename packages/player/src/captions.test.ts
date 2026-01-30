@@ -15,7 +15,10 @@ describe('HeliosPlayer Captions', () => {
     } as any;
 
     // Mock Fetch
-    global.fetch = vi.fn();
+    global.fetch = vi.fn().mockResolvedValue({
+        ok: true,
+        text: () => Promise.resolve("")
+    });
 
     // Mock Controller
     mockController = {
@@ -75,7 +78,14 @@ describe('HeliosPlayer Captions', () => {
     await new Promise(resolve => setTimeout(resolve, 100));
 
     expect(global.fetch).toHaveBeenCalledWith(expect.stringMatching(/subs.srt$/));
-    expect(mockController.setCaptions).toHaveBeenCalledWith(srtContent);
+    expect(mockController.setCaptions).toHaveBeenCalledWith([
+        expect.objectContaining({
+            id: "1",
+            startTime: 1000,
+            endTime: 2000,
+            text: "Hello World"
+        })
+    ]);
   });
 
   it('should clear captions if no default track is found', async () => {
@@ -88,9 +98,10 @@ describe('HeliosPlayer Captions', () => {
 
     await new Promise(resolve => setTimeout(resolve, 100));
 
-    expect(global.fetch).not.toHaveBeenCalled();
-    // It should be called with empty array because logic says "if no default track, clear captions"
-    expect(mockController.setCaptions).toHaveBeenCalledWith([]);
+    // We fetch but do not show
+    expect(global.fetch).toHaveBeenCalled();
+    // setCaptions not called because track is disabled
+    expect(mockController.setCaptions).not.toHaveBeenCalled();
   });
 
   it('should clear captions when track is removed', async () => {
@@ -106,10 +117,18 @@ describe('HeliosPlayer Captions', () => {
     track.setAttribute('default', '');
     player.appendChild(track);
     await new Promise(resolve => setTimeout(resolve, 50));
-    expect(mockController.setCaptions).toHaveBeenCalledWith(srtContent);
+    expect(mockController.setCaptions).toHaveBeenCalledWith([
+        expect.objectContaining({
+            id: "1",
+            startTime: 1000,
+            endTime: 2000,
+            text: "Hello World"
+        })
+    ]);
 
     // 2. Remove track
     player.removeChild(track);
+    // Allow mutation observer/slotchange to fire
     await new Promise(resolve => setTimeout(resolve, 50));
     expect(mockController.setCaptions).toHaveBeenCalledWith([]);
   });

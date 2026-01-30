@@ -1,5 +1,7 @@
+import { HeliosSchema } from "@helios-project/core";
 import type { HeliosController } from "./controllers";
 import { ClientSideExporter } from "./features/exporter";
+import { HeliosTextTrack, HeliosTextTrackList, TrackHost } from "./features/text-tracks";
 export { ClientSideExporter };
 export type { HeliosController };
 interface MediaError {
@@ -10,8 +12,9 @@ interface MediaError {
     readonly MEDIA_ERR_DECODE: number;
     readonly MEDIA_ERR_SRC_NOT_SUPPORTED: number;
 }
-export declare class HeliosPlayer extends HTMLElement {
+export declare class HeliosPlayer extends HTMLElement implements TrackHost {
     private iframe;
+    private _textTracks;
     private playPauseBtn;
     private volumeBtn;
     private volumeSlider;
@@ -60,6 +63,19 @@ export declare class HeliosPlayer extends HTMLElement {
     get networkState(): number;
     get error(): MediaError | null;
     get currentSrc(): string;
+    canPlayType(type: string): CanPlayTypeResult;
+    get defaultMuted(): boolean;
+    set defaultMuted(val: boolean);
+    private _defaultPlaybackRate;
+    get defaultPlaybackRate(): number;
+    set defaultPlaybackRate(val: number);
+    private _preservesPitch;
+    get preservesPitch(): boolean;
+    set preservesPitch(val: boolean);
+    get srcObject(): MediaProvider | null;
+    set srcObject(val: MediaProvider | null);
+    get crossOrigin(): string | null;
+    set crossOrigin(val: string | null);
     get seeking(): boolean;
     get buffered(): TimeRanges;
     get seekable(): TimeRanges;
@@ -99,6 +115,9 @@ export declare class HeliosPlayer extends HTMLElement {
     pause(): void;
     static get observedAttributes(): string[];
     constructor();
+    get textTracks(): HeliosTextTrackList;
+    addTextTrack(kind: string, label?: string, language?: string): HeliosTextTrack;
+    handleTrackModeChange(track: HeliosTextTrack): void;
     attributeChangedCallback(name: string, oldVal: string, newVal: string): void;
     private updateControlsVisibility;
     get inputProps(): Record<string, any> | null;
@@ -114,6 +133,7 @@ export declare class HeliosPlayer extends HTMLElement {
     private startConnectionAttempts;
     private stopConnectionAttempts;
     private handleWindowMessage;
+    private handleSlotChange;
     private setController;
     private updateAspectRatio;
     private togglePlayPause;
@@ -132,6 +152,7 @@ export declare class HeliosPlayer extends HTMLElement {
     private showStatus;
     private hideStatus;
     getController(): HeliosController | null;
+    getSchema(): Promise<HeliosSchema | undefined>;
     private retryConnection;
     private renderClientSide;
 }

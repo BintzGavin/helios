@@ -51,7 +51,7 @@ The component observes the following attributes:
 - `crossorigin`: CORS setting for the element (`anonymous`, `use-credentials`).
 
 ## D. Child Elements
-- `<track>`: Standard HTMLTrackElement for importing captions (kind="captions"). Requires `src` (SRT file) and `default` attribute to be active.
+- `<track>`: Standard HTMLTrackElement for importing captions (kind="captions"). Requires `src` (SRT file). Automatically populates the `textTracks` list.
 
 ## E. Styling
 The component exposes the following CSS variables for theming:
@@ -63,3 +63,17 @@ The component exposes the following CSS variables for theming:
 - `--helios-range-selected-color`: Color of the playback range region on the scrubber.
 - `--helios-range-unselected-color`: Color of the scrubber track outside the range.
 - `--helios-font-family`: Font family for the player UI.
+
+## F. Public API Members
+Properties and methods available on the `HeliosPlayer` element instance:
+
+- `textTracks`: Returns a `HeliosTextTrackList` object containing `HeliosTextTrack` instances.
+- `addTextTrack(kind, label, language)`: Creates and returns a new `HeliosTextTrack`.
+- `play()`: Starts playback.
+- `pause()`: Pauses playback.
+- `currentTime`: Get/Set current time in seconds.
+- `duration`: Get duration in seconds.
+- `paused`: Boolean indicating if paused.
+- `ended`: Boolean indicating if playback finished.
+- `videoWidth` / `videoHeight`: Dimensions of the composition.
+- `canPlayType(type)`: Returns string indicating support (always empty for video MIME types).
