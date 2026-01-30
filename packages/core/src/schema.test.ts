@@ -357,4 +357,41 @@ describe('validateProps', () => {
 
       expect(() => validateProps({ level1: { level2: [{ val: -1 }] } }, schema)).toThrow(/Prop 'level1.level2\[0\].val' must be >= 0/);
   });
+
+  it('should validate Typed Arrays', () => {
+    const schema = {
+      i8: { type: 'int8array' as const, optional: true },
+      u8: { type: 'uint8array' as const, optional: true },
+      u8c: { type: 'uint8clampedarray' as const, optional: true },
+      i16: { type: 'int16array' as const, optional: true },
+      u16: { type: 'uint16array' as const, optional: true },
+      i32: { type: 'int32array' as const, optional: true },
+      u32: { type: 'uint32array' as const, optional: true },
+      f32: { type: 'float32array' as const, optional: true },
+      f64: { type: 'float64array' as const, optional: true },
+    };
+
+    const valid = {
+      i8: new Int8Array([1]),
+      u8: new Uint8Array([1]),
+      u8c: new Uint8ClampedArray([1]),
+      i16: new Int16Array([1]),
+      u16: new Uint16Array([1]),
+      i32: new Int32Array([1]),
+      u32: new Uint32Array([1]),
+      f32: new Float32Array([1.0]),
+      f64: new Float64Array([1.0]),
+    };
+    expect(validateProps(valid, schema)).toEqual(valid);
+
+    // Invalid types (plain arrays)
+    expect(() => validateProps({ i8: [] }, schema)).toThrow(HeliosError);
+
+    // Mismatched Typed Arrays
+    expect(() => validateProps({ f32: new Float64Array([1.0]) }, schema)).toThrow(HeliosError);
+    expect(() => validateProps({ f32: new Float64Array([1.0]) }, schema)).toThrow(/Expected Float32Array/);
+
+    expect(() => validateProps({ u8: new Int8Array([1]) }, schema)).toThrow(HeliosError);
+    expect(() => validateProps({ u8: new Int8Array([1]) }, schema)).toThrow(/Expected Uint8Array/);
+  });
 });

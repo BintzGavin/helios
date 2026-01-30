@@ -14,7 +14,16 @@ export type PropType =
   | 'font'
   | 'model'
   | 'json'
-  | 'shader';
+  | 'shader'
+  | 'int8array'
+  | 'uint8array'
+  | 'uint8clampedarray'
+  | 'int16array'
+  | 'uint16array'
+  | 'int32array'
+  | 'uint32array'
+  | 'float32array'
+  | 'float64array';
 
 export interface PropDefinition {
   type: PropType;
@@ -108,6 +117,17 @@ function validateValue(val: any, def: PropDefinition, keyPath: string): any {
   if (def.type === 'boolean' && typeof val !== 'boolean') throwError(keyPath, 'boolean');
   if (def.type === 'array' && !Array.isArray(val)) throwError(keyPath, 'array');
   if (def.type === 'object' && (typeof val !== 'object' || Array.isArray(val) || val === null)) throwError(keyPath, 'object');
+
+  // Typed Arrays
+  if (def.type === 'int8array' && !(val instanceof Int8Array)) throwError(keyPath, 'Int8Array');
+  if (def.type === 'uint8array' && !(val instanceof Uint8Array)) throwError(keyPath, 'Uint8Array');
+  if (def.type === 'uint8clampedarray' && !(val instanceof Uint8ClampedArray)) throwError(keyPath, 'Uint8ClampedArray');
+  if (def.type === 'int16array' && !(val instanceof Int16Array)) throwError(keyPath, 'Int16Array');
+  if (def.type === 'uint16array' && !(val instanceof Uint16Array)) throwError(keyPath, 'Uint16Array');
+  if (def.type === 'int32array' && !(val instanceof Int32Array)) throwError(keyPath, 'Int32Array');
+  if (def.type === 'uint32array' && !(val instanceof Uint32Array)) throwError(keyPath, 'Uint32Array');
+  if (def.type === 'float32array' && !(val instanceof Float32Array)) throwError(keyPath, 'Float32Array');
+  if (def.type === 'float64array' && !(val instanceof Float64Array)) throwError(keyPath, 'Float64Array');
 
   // Color and Assets are treated as strings for runtime check
   if (

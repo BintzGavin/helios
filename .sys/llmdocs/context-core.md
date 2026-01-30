@@ -111,7 +111,16 @@ export type PropType =
   | 'font'
   | 'model'
   | 'json'
-  | 'shader';
+  | 'shader'
+  | 'int8array'
+  | 'uint8array'
+  | 'uint8clampedarray'
+  | 'int16array'
+  | 'uint16array'
+  | 'int32array'
+  | 'uint32array'
+  | 'float32array'
+  | 'float64array';
 
 export interface PropDefinition {
   type: PropType;
