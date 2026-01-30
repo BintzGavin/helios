@@ -1,3 +1,6 @@
+## DEMO v1.62.1
+- ✅ Completed: Verify Dom Render - Verified that DOM-based compositions render correctly in the E2E pipeline.
+
 ## DEMO v1.62.0
 - ✅ Completed: Stress Test Animation - Created `examples/stress-test-animation/composition.html` with 2500 elements and updated build config.
 

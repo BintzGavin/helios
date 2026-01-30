@@ -58,5 +58,5 @@
 
 ## C. E2E Tests
 - **File**: `tests/e2e/verify-render.ts`
-- **Methodology**: Builds all examples using `vite.build-example.config.js`, then uses `Renderer` (headless browser + FFmpeg) to render a 5-second video for each.
+- **Methodology**: Builds all examples using `vite.build-example.config.js`, then uses `Renderer` (headless browser + FFmpeg) to render a 5-second video for each, supporting both 'canvas' and 'dom' modes.
 - **Verification**: Checks that render completes without error and output file exists. Does NOT verify visual content correctness (opacity, etc).
