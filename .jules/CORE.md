@@ -9,3 +9,7 @@
 ## [2.13.0] - Missing Asset Types
 **Learning:** Found that `packages/studio` supports `model`, `json`, `shader` asset types, but `packages/core` schema validation rejected them.
 **Action:** When defining schemas in Core, always cross-reference with Studio's supported asset discovery types to ensure compatibility.
+
+## [2.15.0] - AI Diagnostics Gap
+**Learning:** The "AI Integration Parity" vision requires robust environment diagnostics (`webgl`, `codecs`), but `Helios.diagnose()` was minimal.
+**Action:** When auditing for AI parity, check `Helios.diagnose()` completeness against modern browser capabilities (WebCodecs, WebGL, WebAudio) to ensure agents can self-debug effectively.
