@@ -128,6 +128,10 @@ export interface PropDefinition {
   default?: any;
   minimum?: number;
   maximum?: number;
+  minItems?: number;
+  maxItems?: number;
+  minLength?: number;
+  maxLength?: number;
   enum?: (string | number)[];
   label?: string;
   description?: string;

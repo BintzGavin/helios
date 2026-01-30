@@ -31,6 +31,10 @@ export interface PropDefinition {
   default?: any;
   minimum?: number;
   maximum?: number;
+  minItems?: number;
+  maxItems?: number;
+  minLength?: number;
+  maxLength?: number;
   enum?: (string | number)[];
   label?: string;
   description?: string;
@@ -47,6 +51,39 @@ export function validateSchema(schema: HeliosSchema | undefined, parentKey = '')
 
   for (const [key, def] of Object.entries(schema)) {
     const path = parentKey ? `${parentKey}.${key}` : key;
+
+    // Validate Array/TypedArray constraints
+    if (def.minItems !== undefined || def.maxItems !== undefined) {
+      const isArray = def.type === 'array' || def.type.endsWith('array');
+      if (!isArray) {
+        throw new HeliosError(HeliosErrorCode.INVALID_SCHEMA, `Prop '${path}' defines minItems/maxItems but is not an array type.`);
+      }
+      if (def.minItems !== undefined && def.minItems < 0) {
+        throw new HeliosError(HeliosErrorCode.INVALID_SCHEMA, `Prop '${path}' minItems must be non-negative.`);
+      }
+      if (def.maxItems !== undefined && def.maxItems < 0) {
+        throw new HeliosError(HeliosErrorCode.INVALID_SCHEMA, `Prop '${path}' maxItems must be non-negative.`);
+      }
+      if (def.minItems !== undefined && def.maxItems !== undefined && def.minItems > def.maxItems) {
+        throw new HeliosError(HeliosErrorCode.INVALID_SCHEMA, `Prop '${path}' minItems cannot be greater than maxItems.`);
+      }
+    }
+
+    // Validate String constraints
+    if (def.minLength !== undefined || def.maxLength !== undefined) {
+      if (def.type !== 'string') {
+        throw new HeliosError(HeliosErrorCode.INVALID_SCHEMA, `Prop '${path}' defines minLength/maxLength but is not a string type.`);
+      }
+      if (def.minLength !== undefined && def.minLength < 0) {
+        throw new HeliosError(HeliosErrorCode.INVALID_SCHEMA, `Prop '${path}' minLength must be non-negative.`);
+      }
+      if (def.maxLength !== undefined && def.maxLength < 0) {
+        throw new HeliosError(HeliosErrorCode.INVALID_SCHEMA, `Prop '${path}' maxLength must be non-negative.`);
+      }
+      if (def.minLength !== undefined && def.maxLength !== undefined && def.minLength > def.maxLength) {
+        throw new HeliosError(HeliosErrorCode.INVALID_SCHEMA, `Prop '${path}' minLength cannot be greater than maxLength.`);
+      }
+    }
 
     // Validate default value if present
     if (def.default !== undefined) {
@@ -135,6 +172,30 @@ function validateValue(val: any, def: PropDefinition, keyPath: string): any {
     typeof val !== 'string'
   ) {
     throwError(keyPath, `${def.type} (string)`);
+  }
+
+  // String Length Check
+  if (def.type === 'string' && typeof val === 'string') {
+    if (def.minLength !== undefined && val.length < def.minLength) {
+      throw new HeliosError(HeliosErrorCode.INVALID_INPUT_PROPS, `Prop '${keyPath}' must be at least ${def.minLength} characters.`);
+    }
+    if (def.maxLength !== undefined && val.length > def.maxLength) {
+      throw new HeliosError(HeliosErrorCode.INVALID_INPUT_PROPS, `Prop '${keyPath}' must be at most ${def.maxLength} characters.`);
+    }
+  }
+
+  // Array/TypedArray Length Check
+  const isArray = def.type === 'array' || def.type.endsWith('array');
+  if (isArray) {
+    // Array.isArray or TypedArray check passed above, so we can access .lengthSafely
+    // TypedArrays have a .length property just like arrays
+    const len = (val as { length: number }).length;
+    if (def.minItems !== undefined && len < def.minItems) {
+      throw new HeliosError(HeliosErrorCode.INVALID_INPUT_PROPS, `Prop '${keyPath}' must have at least ${def.minItems} items.`);
+    }
+    if (def.maxItems !== undefined && len > def.maxItems) {
+      throw new HeliosError(HeliosErrorCode.INVALID_INPUT_PROPS, `Prop '${keyPath}' must have at most ${def.maxItems} items.`);
+    }
   }
 
   // Color Format Check

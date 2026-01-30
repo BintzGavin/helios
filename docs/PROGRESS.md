@@ -110,3 +110,6 @@ Each agent should update **their own dedicated progress file** instead of this f
 
 ## CORE v2.17.1
 - ✅ Completed: Fix Leaky Signal Subscriptions - Implemented `untracked` and updated `subscribe` to prevent dependency tracking within callbacks.
+
+## CORE v2.18.0
+- ✅ Completed: Schema Constraints - Added `minItems`, `maxItems`, `minLength`, `maxLength` constraints to `PropDefinition` and implemented validation logic.
