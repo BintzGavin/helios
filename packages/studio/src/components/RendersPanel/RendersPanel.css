@@ -64,3 +64,34 @@
 .start-render-btn:hover {
   background-color: #005f9e;
 }
+
+.error-details {
+  margin-top: 4px;
+  font-size: 10px;
+  color: #f44336;
+}
+
+.error-details summary {
+  cursor: pointer;
+  outline: none;
+  font-weight: bold;
+  opacity: 0.8;
+}
+
+.error-details summary:hover {
+  opacity: 1;
+  text-decoration: underline;
+}
+
+.error-details pre {
+  margin: 4px 0 0 0;
+  white-space: pre-wrap;
+  word-break: break-all;
+  background: rgba(244, 67, 54, 0.1);
+  padding: 4px;
+  border-radius: 2px;
+  color: #ffcdd2;
+  max-height: 100px;
+  overflow-y: auto;
+  font-family: monospace;
+}

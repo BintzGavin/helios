@@ -172,7 +172,15 @@ export const RendersPanel: React.FC = () => {
              <div style={{ fontSize: '10px', color: '#ff9800' }}>Cancelled</div>
           )}
           {job.status === 'failed' && (
-             <div style={{ fontSize: '10px', color: '#f44336' }}>Failed</div>
+             <div className="render-job-failed">
+               <div style={{ fontSize: '10px', color: '#f44336' }}>Failed</div>
+               {job.error && (
+                 <details className="error-details">
+                   <summary>Show Error</summary>
+                   <pre>{job.error}</pre>
+                 </details>
+               )}
+             </div>
           )}
         </div>
       ))}
