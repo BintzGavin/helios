@@ -1,5 +1,14 @@
 # CORE Progress Log
 
+## CORE v2.18.0
+- ✅ Completed: Schema Constraints - Added `minItems`, `maxItems`, `minLength`, `maxLength` constraints to `PropDefinition` and implemented validation logic.
+
+## CORE v2.17.1
+- ✅ Completed: Fix Leaky Signal Subscriptions - Implemented `untracked` and updated `subscribe` to prevent dependency tracking within callbacks.
+
+## CORE v2.17.0
+- ✅ Completed: Implement Typed Arrays - Added support for Typed Arrays (Float32Array, etc.) in HeliosSchema and validateProps.
+
 ## CORE v2.16.0
 - ✅ Completed: Time-Based Control - Added `currentTime` signal and `seekToTime()` method to `Helios` class for direct time manipulation.
 

@@ -106,6 +106,39 @@ describe('validateSchema', () => {
       expect(e.message).toContain("Invalid color format");
     }
   });
+
+  // --- NEW TESTS FOR SCHEMA DEFINITION ---
+
+  it('should validate minItems/maxItems usage', () => {
+    // Correct usage
+    expect(() => validateSchema({ arr: { type: 'array' as const, minItems: 1, maxItems: 5 } })).not.toThrow();
+    expect(() => validateSchema({ vec: { type: 'float32array' as const, minItems: 3, maxItems: 3 } })).not.toThrow();
+
+    // Invalid type
+    expect(() => validateSchema({ str: { type: 'string' as const, minItems: 1 } })).toThrow(/defines minItems\/maxItems but is not an array type/);
+
+    // Negative values
+    expect(() => validateSchema({ arr: { type: 'array' as const, minItems: -1 } })).toThrow(/minItems must be non-negative/);
+    expect(() => validateSchema({ arr: { type: 'array' as const, maxItems: -1 } })).toThrow(/maxItems must be non-negative/);
+
+    // Min > Max
+    expect(() => validateSchema({ arr: { type: 'array' as const, minItems: 5, maxItems: 2 } })).toThrow(/minItems cannot be greater than maxItems/);
+  });
+
+  it('should validate minLength/maxLength usage', () => {
+    // Correct usage
+    expect(() => validateSchema({ str: { type: 'string' as const, minLength: 1, maxLength: 10 } })).not.toThrow();
+
+    // Invalid type
+    expect(() => validateSchema({ num: { type: 'number' as const, minLength: 1 } })).toThrow(/defines minLength\/maxLength but is not a string type/);
+
+    // Negative values
+    expect(() => validateSchema({ str: { type: 'string' as const, minLength: -1 } })).toThrow(/minLength must be non-negative/);
+    expect(() => validateSchema({ str: { type: 'string' as const, maxLength: -1 } })).toThrow(/maxLength must be non-negative/);
+
+    // Min > Max
+    expect(() => validateSchema({ str: { type: 'string' as const, minLength: 10, maxLength: 5 } })).toThrow(/minLength cannot be greater than maxLength/);
+  });
 });
 
 describe('validateProps', () => {
@@ -393,5 +426,37 @@ describe('validateProps', () => {
 
     expect(() => validateProps({ u8: new Int8Array([1]) }, schema)).toThrow(HeliosError);
     expect(() => validateProps({ u8: new Int8Array([1]) }, schema)).toThrow(/Expected Uint8Array/);
+  });
+
+  // --- NEW TESTS FOR RUNTIME VALIDATION ---
+
+  it('should validate string length', () => {
+    const schema = {
+      username: { type: 'string' as const, minLength: 3, maxLength: 8 }
+    };
+    expect(validateProps({ username: 'alice' }, schema)).toEqual({ username: 'alice' });
+    expect(() => validateProps({ username: 'bo' }, schema)).toThrow(/must be at least 3 characters/);
+    expect(() => validateProps({ username: 'verylongname' }, schema)).toThrow(/must be at most 8 characters/);
+  });
+
+  it('should validate array length', () => {
+    const schema = {
+      tags: { type: 'array' as const, minItems: 1, maxItems: 3 }
+    };
+    expect(validateProps({ tags: [1] }, schema)).toEqual({ tags: [1] });
+    expect(validateProps({ tags: [1, 2, 3] }, schema)).toEqual({ tags: [1, 2, 3] });
+    expect(() => validateProps({ tags: [] }, schema)).toThrow(/must have at least 1 items/);
+    expect(() => validateProps({ tags: [1, 2, 3, 4] }, schema)).toThrow(/must have at most 3 items/);
+  });
+
+  it('should validate TypedArray length', () => {
+    const schema = {
+      vec3: { type: 'float32array' as const, minItems: 3, maxItems: 3 }
+    };
+    const valid = new Float32Array([1, 2, 3]);
+    expect(validateProps({ vec3: valid }, schema)).toEqual({ vec3: valid });
+
+    expect(() => validateProps({ vec3: new Float32Array([1, 2]) }, schema)).toThrow(/must have at least 3 items/);
+    expect(() => validateProps({ vec3: new Float32Array([1, 2, 3, 4]) }, schema)).toThrow(/must have at most 3 items/);
   });
 });
