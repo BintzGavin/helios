@@ -1,6 +1,8 @@
 import { chromium } from 'playwright';
 import { SeekTimeDriver } from '../src/drivers/SeekTimeDriver.js';
 
+const FIXED_EPOCH = 1704067200000;
+
 async function verifyDeterminism() {
   console.log('Starting SeekTimeDriver determinism verification...');
 
@@ -77,10 +79,19 @@ async function verifyDeterminism() {
       }
   });
 
-  // Check 3: Date.now() should be anchored
-  // It's harder to check exact value without knowing start time, but delta should match
-  if (logs.length > 1) {
+  // Check 3: Date.now() should be anchored to FIXED_EPOCH
+  if (logs.length > 0) {
       const first = logs[0];
+      // The first frame is at time=0 (or close to it), so Date.now() should be close to FIXED_EPOCH
+      // We check if it matches exactly for time=0, but since raf might fire slightly later, we check delta.
+      // Actually, our driver sets time explicitly.
+
+      // Since we set time 0, perf should be 0, and date should be FIXED_EPOCH.
+      if (Math.abs(first.date - FIXED_EPOCH) > 100) {
+           console.error(`❌ Date.now() anchor mismatch: Expected ~${FIXED_EPOCH}, got ${first.date}`);
+           failures++;
+      }
+
       const last = logs[logs.length - 1];
       const perfDelta = last.perf - first.perf;
       const dateDelta = last.date - first.date;
