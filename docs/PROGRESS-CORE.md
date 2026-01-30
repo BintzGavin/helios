@@ -1,5 +1,8 @@
 # CORE Progress Log
 
+## CORE v2.11.0
+- ✅ Completed: Recursive Animation & Media Discovery - Implemented robust recursive Shadow DOM discovery in `DomDriver` with dynamic `MutationObserver` support.
+
 ## CORE v2.10.0
 - ✅ Completed: Version Sync - Synced package.json version to 2.10.0 and updated context documentation.
 - ✅ Completed: Implement RenderSession - Added RenderSession class for standardized frame iteration and stability orchestration.
@@ -15,11 +18,11 @@
 ## CORE v2.7.2
 - ✅ Completed: Synchronize Version - Updated version to 2.7.2 to match dependencies in player/renderer, verified tests pass.
 
-## CORE v2.7.1
-- ⚠️ Reverted: Version Mismatch Fix - Reverted version to 2.7.1 to match strict dependencies in player/renderer and unblock build.
-
 ## CORE v2.7.2
 - ✅ Completed: Verify Stability Registry - Verified implementation of `registerStabilityCheck` and `waitUntilStable`, updated JSDoc, and cleaned up stale plan.
+
+## CORE v2.7.1
+- ⚠️ Reverted: Version Mismatch Fix - Reverted version to 2.7.1 to match strict dependencies in player/renderer and unblock build.
 
 ## CORE v2.7.1
 - ✅ Completed: Rename Audio Test - Renamed `audio.test.ts` to `helios-audio.test.ts` to clarify structure.

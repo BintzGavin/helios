@@ -472,4 +472,103 @@ describe('DomDriver', () => {
       expect(mockVideo.paused).toBe(false);
     });
   });
+
+  describe('Shadow DOM Support', () => {
+    it('should sync animations inside Shadow DOM', async () => {
+      const host = document.createElement('div');
+      scope.appendChild(host);
+
+      const shadow = host.attachShadow({ mode: 'open' });
+      const innerDiv = document.createElement('div');
+      shadow.appendChild(innerDiv);
+
+      const mockAnim = {
+        currentTime: 0,
+        playState: 'running',
+        pause: vi.fn(),
+      } as unknown as Animation;
+
+      // JSDOM might not put getAnimations on ShadowRoot by default or implement it fully
+      // so we mock it.
+      (shadow as any).getAnimations = vi.fn().mockReturnValue([mockAnim]);
+
+      // Trigger mutation observer (async)
+      await new Promise(resolve => setTimeout(resolve, 20));
+
+      driver.update(1500);
+
+      expect((shadow as any).getAnimations).toHaveBeenCalled();
+      expect(mockAnim.currentTime).toBe(1500);
+      expect(mockAnim.pause).toHaveBeenCalled();
+    });
+
+    it('should discover media elements inside Shadow DOM', async () => {
+      const host = document.createElement('div');
+      scope.appendChild(host);
+
+      const shadow = host.attachShadow({ mode: 'open' });
+      const mockVideo = document.createElement('video');
+      Object.defineProperty(mockVideo, 'currentTime', { value: 0, writable: true });
+      Object.defineProperty(mockVideo, 'paused', { value: true, writable: true });
+      mockVideo.play = vi.fn().mockResolvedValue(undefined);
+      mockVideo.pause = vi.fn();
+
+      shadow.appendChild(mockVideo);
+
+      // Wait for observer
+      await new Promise(resolve => setTimeout(resolve, 20));
+
+      // Update
+      driver.update(2000, { isPlaying: true, playbackRate: 1 });
+
+      expect(mockVideo.play).toHaveBeenCalled();
+      expect(mockVideo.currentTime).toBe(2);
+    });
+
+    it('should recursively discover nested Shadow DOMs', async () => {
+        const host1 = document.createElement('div');
+        scope.appendChild(host1);
+        const shadow1 = host1.attachShadow({ mode: 'open' });
+
+        const host2 = document.createElement('div');
+        shadow1.appendChild(host2);
+        const shadow2 = host2.attachShadow({ mode: 'open' });
+
+        const mockVideo = document.createElement('video');
+        Object.defineProperty(mockVideo, 'currentTime', { value: 0, writable: true });
+        Object.defineProperty(mockVideo, 'paused', { value: true, writable: true });
+        mockVideo.play = vi.fn().mockResolvedValue(undefined);
+        mockVideo.pause = vi.fn();
+
+        shadow2.appendChild(mockVideo);
+
+        await new Promise(resolve => setTimeout(resolve, 20));
+
+        driver.update(3000, { isPlaying: true, playbackRate: 1 });
+
+        expect(mockVideo.play).toHaveBeenCalled();
+        expect(mockVideo.currentTime).toBe(3);
+    });
+
+    it('should detect dynamic additions inside Shadow DOM', async () => {
+        const host = document.createElement('div');
+        scope.appendChild(host);
+        const shadow = host.attachShadow({ mode: 'open' });
+
+        // Wait for host detection
+        await new Promise(resolve => setTimeout(resolve, 20));
+
+        // Now append video to shadow
+        const mockVideo = document.createElement('video');
+        Object.defineProperty(mockVideo, 'volume', { value: 1, writable: true });
+        shadow.appendChild(mockVideo);
+
+        // Wait for shadow detection (MutationObserver on shadow root)
+        await new Promise(resolve => setTimeout(resolve, 20));
+
+        driver.update(0, { isPlaying: false, playbackRate: 1, volume: 0.5 });
+
+        expect(mockVideo.volume).toBe(0.5);
+    });
+  });
 });

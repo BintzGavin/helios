@@ -9,21 +9,27 @@ interface TrackState {
 
 export class DomDriver implements TimeDriver {
   private scope: HTMLElement | Document | null = null;
+  private scopes = new Set<Node>();
+  private observers = new Map<Node, MutationObserver>();
   private trackStates = new WeakMap<HTMLMediaElement, TrackState>();
   private mediaElements = new Set<HTMLMediaElement>();
-  private observer: MutationObserver | null = null;
 
   init(scope: HTMLElement | Document) {
     this.scope = scope;
     this.mediaElements.clear();
+    this.scopes.clear();
+    this.observers.clear();
 
-    if (typeof (this.scope as any).querySelectorAll === 'function') {
-      const initial = (this.scope as any).querySelectorAll('audio, video');
-      initial.forEach((el: Element) => this.mediaElements.add(el as HTMLMediaElement));
-    }
+    this.addScope(scope);
+    this.scanAndAdd(scope);
+  }
 
-    if (typeof MutationObserver !== 'undefined' && (this.scope instanceof Element || this.scope instanceof Document)) {
-      this.observer = new MutationObserver((mutations) => {
+  private addScope(scope: Node) {
+    if (this.scopes.has(scope)) return;
+    this.scopes.add(scope);
+
+    if (typeof MutationObserver !== 'undefined') {
+      const observer = new MutationObserver((mutations) => {
         mutations.forEach((m) => {
           m.addedNodes.forEach((node) => {
             this.scanAndAdd(node);
@@ -33,40 +39,83 @@ export class DomDriver implements TimeDriver {
           });
         });
       });
-      // Cast scope to Node because Document inherits from Node in DOM types
-      // even if TS strictness might complain about Document vs Node
-      this.observer.observe(this.scope as Node, { childList: true, subtree: true });
+      observer.observe(scope, { childList: true, subtree: true });
+      this.observers.set(scope, observer);
+    }
+  }
+
+  private removeScope(scope: Node) {
+    if (!this.scopes.has(scope)) return;
+    this.scopes.delete(scope);
+
+    const observer = this.observers.get(scope);
+    if (observer) {
+      observer.disconnect();
+      this.observers.delete(scope);
     }
   }
 
   private scanAndAdd(node: Node) {
-    if (node.nodeName === 'AUDIO' || node.nodeName === 'VIDEO') {
-      this.mediaElements.add(node as HTMLMediaElement);
-    }
-    if (node instanceof Element) {
-      if (node.querySelectorAll) {
-        const children = node.querySelectorAll('audio, video');
-        children.forEach((el) => this.mediaElements.add(el as HTMLMediaElement));
+    const processElement = (el: Element) => {
+      // Add media element
+      if (el.nodeName === 'AUDIO' || el.nodeName === 'VIDEO') {
+        this.mediaElements.add(el as HTMLMediaElement);
       }
+
+      // Discover shadow root
+      if (el.shadowRoot) {
+        if (!this.scopes.has(el.shadowRoot)) {
+            this.addScope(el.shadowRoot);
+            // Recursively scan the shadow root
+            this.scanAndAdd(el.shadowRoot);
+        }
+      }
+    };
+
+    // 1. Process the node itself if it's an element
+    if (typeof Element !== 'undefined' && node instanceof Element) {
+      processElement(node);
+    }
+
+    // 2. Process descendants
+    // If node is Element or DocumentFragment (ShadowRoot), it supports querySelectorAll
+    if ('querySelectorAll' in node) {
+       // We use querySelectorAll('*') to find all descendants in the current scope (Light DOM)
+       // This is efficient and handles nested structure within this scope.
+       // It will NOT pierce into Shadow Roots, which is why we check el.shadowRoot above.
+       const descendants = (node as Element | DocumentFragment).querySelectorAll('*');
+       descendants.forEach(el => processElement(el));
     }
   }
 
   private scanAndRemove(node: Node) {
-    if (node.nodeName === 'AUDIO' || node.nodeName === 'VIDEO') {
-      this.mediaElements.delete(node as HTMLMediaElement);
-    }
-    if (node instanceof Element) {
-      if (node.querySelectorAll) {
-        const children = node.querySelectorAll('audio, video');
-        children.forEach((el) => this.mediaElements.delete(el as HTMLMediaElement));
+     const processElement = (el: Element) => {
+      if (el.nodeName === 'AUDIO' || el.nodeName === 'VIDEO') {
+        this.mediaElements.delete(el as HTMLMediaElement);
       }
+      if (el.shadowRoot) {
+        if (this.scopes.has(el.shadowRoot)) {
+            this.removeScope(el.shadowRoot);
+            this.scanAndRemove(el.shadowRoot);
+        }
+      }
+    };
+
+    if (typeof Element !== 'undefined' && node instanceof Element) {
+      processElement(node);
+    }
+
+    if ('querySelectorAll' in node) {
+       const descendants = (node as Element | DocumentFragment).querySelectorAll('*');
+       descendants.forEach(el => processElement(el));
     }
   }
 
   dispose() {
-    this.observer?.disconnect();
-    this.observer = null;
+    this.observers.forEach((obs) => obs.disconnect());
+    this.observers.clear();
     this.mediaElements.clear();
+    this.scopes.clear();
   }
 
   update(timeInMs: number, options: { isPlaying: boolean; playbackRate: number; volume?: number; muted?: boolean } = { isPlaying: false, playbackRate: 1 }) {
@@ -87,7 +136,7 @@ export class DomDriver implements TimeDriver {
 
     // 2. Images
     const getImages = () => {
-      if (this.scope instanceof Document) return Array.from(this.scope.images);
+      if (typeof Document !== 'undefined' && this.scope instanceof Document) return Array.from(this.scope.images);
       if (this.scope && 'querySelectorAll' in this.scope) {
         return Array.from((this.scope as Element).querySelectorAll('img'));
       }
@@ -139,18 +188,12 @@ export class DomDriver implements TimeDriver {
   private syncWaapiAnimations(timeInMs: number) {
     let anims: Animation[] = [];
 
-    // Check if animationScope is Document
-    const isDocument = typeof Document !== 'undefined' && this.scope instanceof Document;
-
-    if (isDocument) {
-      if (typeof (this.scope as Document).getAnimations === 'function') {
-        anims = (this.scope as Document).getAnimations();
-      }
-    } else {
-      // Assume HTMLElement or similar interface
-      if (typeof (this.scope as any).getAnimations === 'function') {
-        anims = (this.scope as any).getAnimations({ subtree: true });
-      }
+    // Iterate all discovered scopes (Document + ShadowRoots)
+    for (const scope of this.scopes) {
+        if (typeof (scope as any).getAnimations === 'function') {
+            const scopeAnims = (scope as any).getAnimations({ subtree: true });
+            scopeAnims.forEach((a: Animation) => anims.push(a));
+        }
     }
 
     anims.forEach((anim: Animation) => {
