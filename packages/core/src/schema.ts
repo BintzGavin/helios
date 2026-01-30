@@ -22,6 +22,8 @@ export interface PropDefinition {
   enum?: (string | number)[];
   label?: string;
   description?: string;
+  step?: number;
+  format?: string;
   items?: PropDefinition;
   properties?: HeliosSchema;
 }

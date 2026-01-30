@@ -1,5 +1,8 @@
 # CORE Progress Log
 
+## CORE v2.12.0
+- ✅ Completed: Schema Enhancements - Added `step` and `format` properties to `PropDefinition` to support UI generation hints.
+
 ## CORE v2.11.0
 - ✅ Completed: Recursive Animation & Media Discovery - Implemented robust recursive Shadow DOM discovery in `DomDriver` with dynamic `MutationObserver` support.
 

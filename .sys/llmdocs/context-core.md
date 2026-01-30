@@ -1,50 +1,37 @@
-# Context: CORE
+# Core Context
 
 ## A. Architecture
 
-**Helios State Machine**
-- Central class: `Helios`
-- State Management: Uses reactive `signals` (Observer pattern) for all internal state (e.g., `currentFrame`, `isPlaying`).
-- Public API: Exposes `ReadonlySignal` getters for reactive consumption.
-- Subscription: `subscribe(callback)` allows listening to state changes.
-- Timing: Controlled by `Ticker` (RAF or Timeout) and `TimeDriver` (syncs with external world).
+The Core package implements the "Helios State Machine" pattern. It is designed as a headless logic engine that manages the timeline, state, and synchronization, without containing any rendering logic.
 
-**TimeDrivers**
-- `TimeDriver` interface abstracts the synchronization target.
-- `DomDriver`: Default driver. Syncs Web Animations API (`document.timeline`) and `HTMLMediaElement`s (Audio/Video).
-  - Supports recursive Shadow DOM discovery for `getAnimations` and media elements.
-  - Handles `data-helios-offset` and `data-helios-seek` attributes on media elements.
-- `NoopDriver`: Used when no synchronization is needed.
-
-**Stability**
-- `waitUntilStable()`: Promise that resolves when the scene is ready for rendering (fonts loaded, images decoded, media seeked).
-- `registerStabilityCheck()`: Allows external systems to register async checks.
+1.  **Store**: The `Helios` class maintains the source of truth for all state (current frame, playback status, inputs, etc.) using fine-grained Signals.
+2.  **Actions**: Public methods (e.g., `seek()`, `play()`, `setDuration()`) modify the signals.
+3.  **Subscribers**: External consumers (Renderer, Player, Studio) subscribe to state changes or read signals directly to update their views.
+4.  **Drivers**: Time synchronization is handled by pluggable `TimeDriver` strategies (e.g., `DomDriver` for Web Animations API, `WaapiDriver` for pure WAAPI, `NoopDriver` for headless).
 
 ## B. File Tree
 
 ```
 packages/core/src/
-├── animation.ts       # Animation helpers (interpolate, spring)
-├── captions.ts        # SRT parsing and caption logic
-├── color.ts           # Color interpolation and parsing
 ├── drivers/
-│   ├── DomDriver.ts   # Syncs WAAPI and Media Elements (supports Shadow DOM)
-│   ├── TimeDriver.ts  # Interface definition
-│   ├── WaapiDriver.ts # Deprecated (merged into DomDriver)
-│   └── index.ts
-├── easing.ts          # Easing functions
-├── errors.ts          # HeliosError definition
-├── index.ts           # Main entry point, Helios class
-├── markers.ts         # Marker validation and types
-├── node-runtime.ts    # Node.js specific runtime helpers
-├── random.ts          # Deterministic PRNG
-├── render-session.ts  # RenderSession class
-├── schema.ts          # Input prop validation schema
-├── sequencing.ts      # Sequence and series helpers
-├── signals.ts         # Reactive signal implementation
-├── timecode.ts        # Timecode utilities
-├── transitions.ts     # Transition helpers
-└── types.ts           # (If exists, else types are in index/respective files)
+│   ├── index.ts
+│   ├── DomDriver.ts
+│   ├── WaapiDriver.ts
+│   └── ...
+├── animation.ts
+├── captions.ts
+├── color.ts
+├── easing.ts
+├── errors.ts
+├── index.ts
+├── markers.ts
+├── random.ts
+├── render-session.ts
+├── schema.ts
+├── sequencing.ts
+├── signals.ts
+├── timecode.ts
+└── transitions.ts
 ```
 
 ## C. Type Definitions
@@ -69,13 +56,14 @@ export type HeliosState = {
 };
 
 export type HeliosSubscriber = (state: HeliosState) => void;
+
 export type StabilityCheck = () => Promise<void>;
 
 export interface HeliosOptions {
   width?: number;
   height?: number;
   initialFrame?: number;
-  duration: number;
+  duration: number; // in seconds
   fps: number;
   loop?: boolean;
   playbackRange?: [number, number];
@@ -98,13 +86,56 @@ export interface DiagnosticReport {
   offscreenCanvas: boolean;
   userAgent: string;
 }
+
+export type PropType =
+  | 'string'
+  | 'number'
+  | 'boolean'
+  | 'object'
+  | 'array'
+  | 'color'
+  | 'image'
+  | 'video'
+  | 'audio'
+  | 'font';
+
+export interface PropDefinition {
+  type: PropType;
+  optional?: boolean;
+  default?: any;
+  minimum?: number;
+  maximum?: number;
+  enum?: (string | number)[];
+  label?: string;
+  description?: string;
+  step?: number;
+  format?: string;
+  items?: PropDefinition;
+  properties?: HeliosSchema;
+}
+
+export type HeliosSchema = Record<string, PropDefinition>;
+
+export interface CaptionCue {
+  id: string;
+  start: number; // ms
+  end: number;   // ms
+  text: string;
+}
+
+export interface Marker {
+  id: string;
+  time: number; // seconds
+  label?: string;
+  color?: string;
+}
 ```
 
-## D. Public Methods (Helios)
+## D. Public Methods
 
 ```typescript
 class Helios {
-  // Readonly Signals
+  // Signals
   get currentFrame(): ReadonlySignal<number>;
   get loop(): ReadonlySignal<boolean>;
   get isPlaying(): ReadonlySignal<boolean>;
@@ -141,17 +172,13 @@ class Helios {
   seekToMarker(id: string): void;
   setPlaybackRange(startFrame: number, endFrame: number): void;
   clearPlaybackRange(): void;
-
   subscribe(callback: HeliosSubscriber): () => void;
   unsubscribe(callback: HeliosSubscriber): void;
-
   registerStabilityCheck(check: StabilityCheck): () => void;
-
   play(): void;
   pause(): void;
   seek(frame: number): void;
   waitUntilStable(): Promise<void>;
-
   bindToDocumentTimeline(): void;
   unbindFromDocumentTimeline(): void;
   dispose(): void;
