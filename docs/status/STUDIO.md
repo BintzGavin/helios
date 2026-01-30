@@ -1,4 +1,4 @@
-**Version**: 0.59.0
+**Version**: 0.60.0
 
 # Studio Domain Status
 
@@ -7,6 +7,7 @@
 **Focus**: UI Implementation & CLI
 
 ## Recent Updates
+- [v0.60.0] ✅ Completed: Render Preview - Implemented a modal to preview rendered videos directly within the Studio UI.
 - [v0.59.0] ✅ Completed: Show Render Errors - Implemented error display in Renders Panel, enabling users to debug failed render jobs.
 - [v0.58.0] ✅ Completed: Three.js Template - Implemented a "Three.js" template for the Composition Creator, enabling users to quickly bootstrap 3D compositions.
 - [v0.57.0] ✅ Completed: Asset Filtering - Implemented search bar and type filter in Assets Panel to improve asset management.

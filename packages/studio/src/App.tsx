@@ -12,6 +12,7 @@ import { CompositionSettingsModal } from './components/CompositionSettingsModal'
 import { KeyboardShortcutsModal } from './components/KeyboardShortcutsModal'
 import { DiagnosticsModal } from './components/DiagnosticsModal'
 import { SystemPromptModal } from './components/SystemPromptModal'
+import { RenderPreviewModal } from './components/RenderPreviewModal'
 import { GlobalShortcuts } from './components/GlobalShortcuts'
 import { Stage } from './components/Stage/Stage'
 import { Sidebar } from './components/Sidebar/Sidebar'
@@ -117,6 +118,7 @@ function AppContent() {
       <KeyboardShortcutsModal />
       <DiagnosticsModal />
       <SystemPromptModal />
+      <RenderPreviewModal />
       <GlobalShortcuts />
     </>
   )
