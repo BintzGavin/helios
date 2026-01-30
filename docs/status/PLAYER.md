@@ -1,4 +1,4 @@
-**Version**: v0.40.0
+**Version**: v0.41.0
 
 # Status: PLAYER
 
@@ -37,6 +37,7 @@
 ## Critical Task
 - **None**: Recent task completed.
 
+[v0.41.0] ✅ Completed: Standard Media API Gap Fill - Implemented defaultMuted, defaultPlaybackRate, preservesPitch, srcObject, crossOrigin, and canPlayType.
 [v0.40.0] ✅ Completed: Range-Based Export - Client-side export now respects the active 'playbackRange' (loop region), exporting only the selected portion of the timeline.
 [v0.39.0] ✅ Completed: Native Loop Support - Refactored `HeliosController` and `bridge` to use `helios.setLoop()` natively, removing manual client-side looping logic.
 [v0.38.0] ✅ Completed: Visualize Playback Range - Implemented visual indicator for playback range on the timeline scrubber using CSS gradients and `updateUI` logic.

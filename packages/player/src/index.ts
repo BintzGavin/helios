@@ -442,6 +442,64 @@ export class HeliosPlayer extends HTMLElement {
 
   // --- Standard Media API ---
 
+  public canPlayType(type: string): CanPlayTypeResult {
+    // Helios strictly plays compositions, not standard video MIME types.
+    return "";
+  }
+
+  public get defaultMuted(): boolean {
+    return this.hasAttribute("muted");
+  }
+
+  public set defaultMuted(val: boolean) {
+    if (val) {
+      this.setAttribute("muted", "");
+    } else {
+      this.removeAttribute("muted");
+    }
+  }
+
+  private _defaultPlaybackRate: number = 1.0;
+  public get defaultPlaybackRate(): number {
+    return this._defaultPlaybackRate;
+  }
+
+  public set defaultPlaybackRate(val: number) {
+    if (this._defaultPlaybackRate !== val) {
+      this._defaultPlaybackRate = val;
+      this.dispatchEvent(new Event("ratechange"));
+    }
+  }
+
+  private _preservesPitch: boolean = true;
+  public get preservesPitch(): boolean {
+    return this._preservesPitch;
+  }
+
+  public set preservesPitch(val: boolean) {
+    this._preservesPitch = val;
+  }
+
+  public get srcObject(): MediaStream | MediaSource | Blob | null {
+    return null;
+  }
+
+  public set srcObject(val: MediaStream | MediaSource | Blob | null) {
+    console.warn("HeliosPlayer: srcObject is not supported. Use src attribute.");
+  }
+
+  public get crossOrigin(): string | null {
+    return this.getAttribute("crossorigin");
+  }
+
+  public set crossOrigin(val: string | null) {
+    if (val !== null) {
+      this.setAttribute("crossorigin", val);
+    } else {
+      this.removeAttribute("crossorigin");
+    }
+  }
+
   public get seeking(): boolean {
     // Return internal scrubbing state as seeking
     return this.isScrubbing;

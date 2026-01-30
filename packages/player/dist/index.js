@@ -417,6 +417,55 @@ export class HeliosPlayer extends HTMLElement {
         return this.src;
     }
     // --- Standard Media API ---
+    canPlayType(type) {
+        // Helios strictly plays compositions, not standard video MIME types.
+        return "";
+    }
+    get defaultMuted() {
+        return this.hasAttribute("muted");
+    }
+    set defaultMuted(val) {
+        if (val) {
+            this.setAttribute("muted", "");
+        }
+        else {
+            this.removeAttribute("muted");
+        }
+    }
+    _defaultPlaybackRate = 1.0;
+    get defaultPlaybackRate() {
+        return this._defaultPlaybackRate;
+    }
+    set defaultPlaybackRate(val) {
+        if (this._defaultPlaybackRate !== val) {
+            this._defaultPlaybackRate = val;
+            this.dispatchEvent(new Event("ratechange"));
+        }
+    }
+    _preservesPitch = true;
+    get preservesPitch() {
+        return this._preservesPitch;
+    }
+    set preservesPitch(val) {
+        this._preservesPitch = val;
+    }
+    get srcObject() {
+        return null;
+    }
+    set srcObject(val) {
+        console.warn("HeliosPlayer: srcObject is not supported. Use src attribute.");
+    }
+    get crossOrigin() {
+        return this.getAttribute("crossorigin");
+    }
+    set crossOrigin(val) {
+        if (val !== null) {
+            this.setAttribute("crossorigin", val);
+        }
+        else {
+            this.removeAttribute("crossorigin");
+        }
+    }
     get seeking() {
         // Return internal scrubbing state as seeking
         return this.isScrubbing;

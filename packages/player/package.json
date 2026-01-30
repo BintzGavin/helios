@@ -1,6 +1,6 @@
 {
   "name": "@helios-project/player",
-  "version": "0.36.0",
+  "version": "0.41.0",
   "description": "Web Component player for Helios compositions.",
   "author": "Gavin Bintz <me@gavinbintz.com>",
   "license": "ELv2",
@@ -30,7 +30,7 @@
     "test": "vitest"
   },
   "dependencies": {
-    "@helios-project/core": "2.10.0",
+    "@helios-project/core": "2.11.0",
     "mp4-muxer": "^2.0.1",
     "webm-muxer": "^5.1.4"
   },
