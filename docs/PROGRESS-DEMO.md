@@ -1,3 +1,6 @@
+## DEMO v1.65.0
+- ✅ Completed: Scaffold React Example - Verified existing implementation of `examples/react-canvas-animation`.
+
 ## DEMO v1.64.1
 - ✅ Completed: Verify Podcast Visualizer - Re-verified `examples/podcast-visualizer` implementation, ensuring multi-track audio mixing, muted attribute handling, and offset timing work correctly in the E2E pipeline.
 - 🔧 Fixed: Core Build Issues - Fixed TypeScript errors in `packages/core` (missing `currentTime` in tests, `experimental-webgl` casting, `VideoEncoder` check) to enable successful build and verification.
