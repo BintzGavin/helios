@@ -45,6 +45,7 @@ const CASES = [
   { name: 'Podcast Visualizer', relativePath: 'examples/podcast-visualizer/composition.html', mode: 'dom' as const },
   { name: 'Map Animation', relativePath: 'examples/map-animation/composition.html', mode: 'dom' as const },
   { name: 'Solid DOM', relativePath: 'examples/solid-dom-animation/composition.html', mode: 'dom' as const },
+  { name: 'Solid Helpers', relativePath: 'examples/solid-animation-helpers/composition.html', mode: 'dom' as const },
   { name: 'Solid Transitions', relativePath: 'examples/solid-transitions/composition.html', mode: 'dom' as const },
   { name: 'Text Effects', relativePath: 'examples/text-effects-animation/composition.html', mode: 'dom' as const },
   { name: 'Promo Video', relativePath: 'examples/promo-video/composition.html', mode: 'dom' as const },
