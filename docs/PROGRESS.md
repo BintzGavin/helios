@@ -104,3 +104,6 @@ Each agent should update **their own dedicated progress file** instead of this f
 - Group multiple completions under the same version section if they're part of the same release
 ## STUDIO v0.53.0
 - ✅ Completed: Recursive Schema Support - Implemented ObjectInput and ArrayInput for recursive UI generation in Props Editor.
+
+## CORE v2.17.0
+- ✅ Completed: Implement Typed Arrays - Added support for Typed Arrays (Float32Array, etc.) in HeliosSchema and validateProps.
