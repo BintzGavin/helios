@@ -1,3 +1,6 @@
+## DEMO v1.61.0
+- ✅ Completed: Web Component Animation - Created `examples/web-component-animation` demonstrating Shadow DOM and CSS animation integration.
+
 ## DEMO v1.60.0
 - ✅ Completed: Verify Promo Video - Integrated `examples/promo-video` into verification pipeline and documentation.
 

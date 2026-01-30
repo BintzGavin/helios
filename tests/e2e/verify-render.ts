@@ -48,6 +48,7 @@ const CASES = [
   { name: 'Solid Transitions', relativePath: 'examples/solid-transitions/composition.html', mode: 'dom' as const },
   { name: 'Text Effects', relativePath: 'examples/text-effects-animation/composition.html', mode: 'dom' as const },
   { name: 'Promo Video', relativePath: 'examples/promo-video/composition.html', mode: 'dom' as const },
+  { name: 'Web Component', relativePath: 'examples/web-component-animation/composition.html', mode: 'dom' as const },
 ];
 
 async function main() {
