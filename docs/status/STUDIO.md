@@ -1,4 +1,4 @@
-**Version**: 0.55.0
+**Version**: 0.56.0
 
 # Studio Domain Status
 
@@ -7,6 +7,7 @@
 **Focus**: UI Implementation & CLI
 
 ## Recent Updates
+- [v0.56.0] ✅ Completed: Missing Asset Types - Implemented support for `model`, `json`, and `shader` types in Studio schema inputs, enabling asset discovery and usage.
 - [v0.55.0] ✅ Completed: Props Step Format - Implemented support for `step` (number) and `format` (string) properties in the Props Editor, enabling specialized inputs like date, color, and stepped sliders.
 - [v0.54.0] ✅ Completed: Props Editor Polish - Implemented Props Toolbar with "Copy JSON" and "Reset" buttons, and ensured `inputProps` persist across Hot Module Reloading (HMR).
 - [v0.53.0] ✅ Completed: Recursive Schema Support - Implemented `ObjectInput` and `ArrayInput` in Props Editor to support nested object and array schemas with recursive UI generation.

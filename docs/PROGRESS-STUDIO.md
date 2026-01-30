@@ -1,3 +1,6 @@
+## STUDIO v0.56.0
+- ✅ Completed: Missing Asset Types - Implemented support for `model`, `json`, and `shader` types in Studio schema inputs, enabling asset discovery and usage.
+
 ## STUDIO v0.55.0
 - ✅ Completed: Props Step Format - Implemented support for `step` (number) and `format` (string) properties in the Props Editor, enabling specialized inputs like date, color, and stepped sliders.
 
