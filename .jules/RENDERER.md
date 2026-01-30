@@ -108,3 +108,7 @@
 ## [1.44.0] - CdpTimeDriver Shadow DOM Gap
 **Learning:** While `SeekTimeDriver` (DOM mode) was updated to support Shadow DOM media sync, `CdpTimeDriver` (Canvas mode) still uses `document.querySelectorAll` and fails to synchronize media inside Shadow DOMs.
 **Action:** Future task: Update `CdpTimeDriver` to use the recursive `scanForAudioTracks`-style media discovery logic.
+
+## [2026-04-22] - CdpTimeDriver Determinism
+**Learning:** `CdpTimeDriver` initializes virtual time policy without a fixed epoch (`initialVirtualTime`), causing `Date.now()` to return inconsistent values across runs (based on wall clock). This violates the "Deterministic Rendering" vision.
+**Action:** Created a plan to set `initialVirtualTime` to a fixed epoch (e.g. Jan 1 2024) in `CdpTimeDriver.prepare`, ensuring bit-identical outputs for time-dependent animations.
