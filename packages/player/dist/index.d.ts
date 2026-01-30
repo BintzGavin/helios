@@ -15,6 +15,7 @@ interface MediaError {
 export declare class HeliosPlayer extends HTMLElement implements TrackHost {
     private iframe;
     private _textTracks;
+    private _domTracks;
     private playPauseBtn;
     private volumeBtn;
     private volumeSlider;
@@ -110,6 +111,8 @@ export declare class HeliosPlayer extends HTMLElement implements TrackHost {
     set poster(val: string);
     get preload(): string;
     set preload(val: string);
+    get sandbox(): string;
+    set sandbox(val: string);
     play(): Promise<void>;
     load(): void;
     pause(): void;

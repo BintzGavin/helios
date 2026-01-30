@@ -694,6 +694,14 @@ export class HeliosPlayer extends HTMLElement implements TrackHost {
     this.setAttribute("preload", val);
   }
 
+  public get sandbox(): string {
+    return this.getAttribute("sandbox") || "allow-scripts allow-same-origin";
+  }
+
+  public set sandbox(val: string) {
+    this.setAttribute("sandbox", val);
+  }
+
   public async play(): Promise<void> {
     if (!this.isLoaded) {
       this.setAttribute("autoplay", "");
@@ -718,7 +726,7 @@ export class HeliosPlayer extends HTMLElement implements TrackHost {
   }
 
   static get observedAttributes() {
-    return ["src", "width", "height", "autoplay", "loop", "controls", "export-format", "input-props", "poster", "muted", "interactive", "preload", "controlslist"];
+    return ["src", "width", "height", "autoplay", "loop", "controls", "export-format", "input-props", "poster", "muted", "interactive", "preload", "controlslist", "sandbox"];
   }
 
   constructor() {
@@ -868,6 +876,22 @@ export class HeliosPlayer extends HTMLElement implements TrackHost {
     if (name === "controlslist") {
       this.updateControlsVisibility();
     }
+
+    if (name === "sandbox") {
+      const newValOrNull = this.getAttribute("sandbox");
+      // If attribute is missing (null), use default.
+      // If present (even if empty string ""), use it as is.
+      const flags = newValOrNull === null ? "allow-scripts allow-same-origin" : newValOrNull;
+
+      if (this.iframe.getAttribute("sandbox") !== flags) {
+        this.iframe.setAttribute("sandbox", flags);
+
+        // If we have a source, we must reload for new sandbox flags to apply
+        if (this.getAttribute("src")) {
+           this.loadIframe(this.getAttribute("src")!);
+        }
+      }
+    }
   }
 
   private updateControlsVisibility() {
@@ -932,6 +956,13 @@ export class HeliosPlayer extends HTMLElement implements TrackHost {
 
     // Initial state: disabled until connected
     this.setControlsDisabled(true);
+
+    // Ensure sandbox flags are correct on connect (handling if attribute was present before upgrade)
+    const sandboxAttr = this.getAttribute("sandbox");
+    const sandboxFlags = sandboxAttr === null ? "allow-scripts allow-same-origin" : sandboxAttr;
+    if (this.iframe.getAttribute("sandbox") !== sandboxFlags) {
+        this.iframe.setAttribute("sandbox", sandboxFlags);
+    }
 
     // Only show connecting if we haven't already shown "Loading..." via attributeChangedCallback
     // AND we are not deferring load (pendingSrc is null)
