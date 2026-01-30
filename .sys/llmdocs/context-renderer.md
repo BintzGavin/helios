@@ -33,6 +33,7 @@ packages/renderer/
 └── tests/
     ├── run-all.ts              # Test runner
     ├── verify-waapi-sync.ts    # CSS animation sync test
+    ├── verify-shadow-dom-animations.ts # Shadow DOM animation sync test
     ├── verify-shadow-dom-audio.ts # Shadow DOM audio test
     ├── verify-shadow-dom-sync.ts  # Shadow DOM sync test
     └── ...                     # Other verification scripts

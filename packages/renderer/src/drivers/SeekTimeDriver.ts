@@ -44,15 +44,31 @@ export class SeekTimeDriver implements TimeDriver {
         // Update the global virtual time
         window.__HELIOS_VIRTUAL_TIME__ = timeInMs;
 
-        // Synchronize document timeline (WAAPI)
+        // Helper to find all scopes (Document + ShadowRoots)
+        function findAllScopes(rootNode) {
+          const scopes = [rootNode];
+          const walker = document.createTreeWalker(rootNode, NodeFilter.SHOW_ELEMENT);
+          while (walker.nextNode()) {
+            const node = walker.currentNode;
+            if (node.shadowRoot) {
+              scopes.push.apply(scopes, findAllScopes(node.shadowRoot));
+            }
+          }
+          return scopes;
+        }
+
+        // Synchronize document timeline (WAAPI) across all scopes
         // document.timeline.currentTime is read-only in many contexts or doesn't control CSS animations reliably.
         // We must iterate over all animations and set their currentTime explicitly.
-        if (document.getAnimations) {
-          document.getAnimations().forEach((anim) => {
-            anim.currentTime = timeInMs;
-            anim.pause();
-          });
-        }
+        const allScopes = findAllScopes(document);
+        allScopes.forEach((scope) => {
+          if (scope.getAnimations) {
+            scope.getAnimations().forEach((anim) => {
+              anim.currentTime = timeInMs;
+              anim.pause();
+            });
+          }
+        });
 
         const promises = [];
 
@@ -79,7 +95,7 @@ export class SeekTimeDriver implements TimeDriver {
               media.push(node);
             }
             if (node.shadowRoot) {
-              media.push(...findAllMedia(node.shadowRoot));
+              media.push.apply(media, findAllMedia(node.shadowRoot));
             }
           }
           return media;

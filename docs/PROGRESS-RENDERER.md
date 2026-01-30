@@ -1,3 +1,6 @@
+## RENDERER v1.44.0
+- ✅ Completed: Recursive Animation Discovery - Updated `SeekTimeDriver` to recursively traverse Shadow DOMs using `TreeWalker` to find and synchronize CSS animations and WAAPI animations.
+
 ## RENDERER v1.43.1
 - ✅ Verified: Full Test Coverage - Executed full verification suite including FFmpeg diagnostics and CdpTimeDriver media sync, confirming all systems operational.
 
