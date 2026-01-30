@@ -1,5 +1,8 @@
 # PLAYER Progress Log
 
+## PLAYER v0.44.1
+- ✅ Completed: Documentation Update - Synced package.json version and documented missing features (sandbox, controlslist, textTracks, CSS vars).
+
 ## PLAYER v0.44.0
 - ✅ Completed: Configurable Sandbox - Implemented `sandbox` attribute on `<helios-player>` to allow customizing iframe security flags (defaulting to `allow-scripts allow-same-origin`).
 
