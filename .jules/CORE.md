@@ -1,3 +1,7 @@
+## [2026-04-26] - Vision Alignment Gaps
+**Learning:** Vision gaps can be subtle API misalignments, not just missing features. The vision "Video is Light Over Time" implies a time-based API (`currentTime`), but the reality was frame-based (`currentFrame`).
+**Action:** When auditing, check if the *DX* aligns with the vision, not just the feature checklist.
+
 ## [2.8.0] - Recursive Schema Plan
 **Learning:** Plans in `.sys/plans` can be stale or unexecuted. I found `2026-01-29-CORE-Recursive-Schema.md` which addressed a critical gap but wasn't implemented in the code.
 **Action:** When identifying gaps, cross-reference `.sys/plans` with `src` code. If a plan exists but isn't implemented, re-issue the plan (regenerate) to trigger execution, rather than assuming it's done or ignoring it.
