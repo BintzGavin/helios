@@ -11,6 +11,8 @@ It follows the **Store -> Actions -> Subscribers** pattern:
 
 The engine supports pluggable **TimeDrivers** (`DomDriver`, `WaapiDriver`, `NoopDriver`) to synchronize the internal frame counter with external time sources (like `requestAnimationFrame`, `HTMLMediaElement`, or `document.timeline`).
 
+Additionally, the **RenderSession** primitive orchestrates frame-by-frame rendering loops, ensuring deterministic stability checks (`waitUntilStable`) for export scenarios.
+
 ## B. File Tree
 
 ```
@@ -28,6 +30,7 @@ packages/core/src/
 ├── index.ts
 ├── markers.ts
 ├── random.ts
+├── render-session.test.ts
 ├── render-session.ts
 ├── schema.ts
 ├── sequencing.ts
