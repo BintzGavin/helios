@@ -17,3 +17,11 @@
 ## [2.15.0] - AI Diagnostics Gap
 **Learning:** The "AI Integration Parity" vision requires robust environment diagnostics (`webgl`, `codecs`), but `Helios.diagnose()` was minimal.
 **Action:** When auditing for AI parity, check `Helios.diagnose()` completeness against modern browser capabilities (WebCodecs, WebGL, WebAudio) to ensure agents can self-debug effectively.
+
+## [2.16.0] - Typed Arrays Gap
+**Learning:** The vision emphasizes "Performance When It Matters" (WebGL/WebCodecs), but `PropType` lacked support for Typed Arrays (`Float32Array`, etc.), forcing users to use generic `object` types and bypassing validation.
+**Action:** When implementing high-performance features, ensure the Schema system explicitly supports the necessary data structures (like Typed Arrays) to maintain type safety without sacrificing raw access.
+
+## [2.16.0] - Planner Role Clarity
+**Learning:** The Planner Agent's `set_plan` steps must be "Create the spec file" and "Verify the spec file", NOT "Implement the code". The plan content goes *inside* the spec file.
+**Action:** Ensure `set_plan` steps focus on the *meta-task* of planning (creating documentation), not the execution of the plan itself.
