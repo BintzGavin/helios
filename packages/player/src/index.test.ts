@@ -172,6 +172,74 @@ describe('HeliosPlayer', () => {
     expect(mockController.seek).toHaveBeenCalledWith(9); // 10 - 1
   });
 
+  it('should handle playback range shortcuts', () => {
+    const mockController = {
+        getState: vi.fn().mockReturnValue({ currentFrame: 0, duration: 10, fps: 30, isPlaying: false }),
+        play: vi.fn(),
+        pause: vi.fn(),
+        seek: vi.fn(),
+        subscribe: vi.fn().mockReturnValue(() => {}),
+        onError: vi.fn().mockReturnValue(() => {}),
+        dispose: vi.fn(), setCaptions: vi.fn(),
+        setPlaybackRate: vi.fn(),
+        setPlaybackRange: vi.fn(),
+        clearPlaybackRange: vi.fn()
+    };
+    (player as any).setController(mockController);
+
+    const dispatchKey = (key: string) => {
+        const event = new KeyboardEvent('keydown', {
+            key,
+            bubbles: true,
+            composed: true
+        });
+        Object.defineProperty(event, 'composedPath', {
+            value: () => [player]
+        });
+        player.dispatchEvent(event);
+    };
+
+    // I: Set Start (No existing range)
+    mockController.getState.mockReturnValue({ currentFrame: 50, duration: 10, fps: 30, isPlaying: false, playbackRange: null });
+    dispatchKey('i');
+    // Start=50, End=Total (300)
+    expect(mockController.setPlaybackRange).toHaveBeenCalledWith(50, 300);
+
+    // I: Set Start (Existing range)
+    mockController.getState.mockReturnValue({ currentFrame: 60, duration: 10, fps: 30, isPlaying: false, playbackRange: [50, 200] });
+    dispatchKey('i');
+    // Start=60, End=200
+    expect(mockController.setPlaybackRange).toHaveBeenCalledWith(60, 200);
+
+    // I: Set Start >= End (Reset End)
+    mockController.getState.mockReturnValue({ currentFrame: 250, duration: 10, fps: 30, isPlaying: false, playbackRange: [50, 200] });
+    dispatchKey('i');
+    // Start=250, End=300 (Total)
+    expect(mockController.setPlaybackRange).toHaveBeenCalledWith(250, 300);
+
+    // O: Set End (No existing range)
+    mockController.getState.mockReturnValue({ currentFrame: 200, duration: 10, fps: 30, isPlaying: false, playbackRange: null });
+    dispatchKey('o');
+    // Start=0, End=200
+    expect(mockController.setPlaybackRange).toHaveBeenCalledWith(0, 200);
+
+    // O: Set End (Existing range)
+    mockController.getState.mockReturnValue({ currentFrame: 150, duration: 10, fps: 30, isPlaying: false, playbackRange: [50, 200] });
+    dispatchKey('o');
+    // Start=50, End=150
+    expect(mockController.setPlaybackRange).toHaveBeenCalledWith(50, 150);
+
+    // O: Set End <= Start (Reset Start)
+    mockController.getState.mockReturnValue({ currentFrame: 30, duration: 10, fps: 30, isPlaying: false, playbackRange: [50, 200] });
+    dispatchKey('o');
+    // Start=0, End=30
+    expect(mockController.setPlaybackRange).toHaveBeenCalledWith(0, 30);
+
+    // X: Clear Range
+    dispatchKey('x');
+    expect(mockController.clearPlaybackRange).toHaveBeenCalled();
+  });
+
   it('should allow keyboard events from non-input children but ignore inputs', () => {
     const mockController = {
         getState: vi.fn().mockReturnValue({ currentFrame: 0, duration: 10, fps: 30, isPlaying: false }),

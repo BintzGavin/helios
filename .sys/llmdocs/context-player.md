@@ -78,4 +78,26 @@ Properties and methods available on the `HeliosPlayer` element instance:
 - `paused`: Boolean indicating if paused.
 - `ended`: Boolean indicating if playback finished.
 - `videoWidth` / `videoHeight`: Dimensions of the composition.
+- `buffered`: Returns a `TimeRanges` object.
+- `seekable`: Returns a `TimeRanges` object.
+- `seeking`: Boolean indicating if seeking is active.
+- `readyState`: Number indicating readiness state.
+- `networkState`: Number indicating network state.
+- `error`: `MediaError` object or null.
+- `currentSrc`: The current absolute URL of the source.
+- `volume`: Get/Set audio volume (0.0 to 1.0).
+- `muted`: Get/Set muted state (boolean).
+- `playbackRate`: Get/Set playback speed.
+- `defaultMuted`: Get/Set default muted state.
+- `defaultPlaybackRate`: Get/Set default playback speed.
 - `canPlayType(type)`: Returns string indicating support (always empty for video MIME types).
+
+## G. Interaction
+- **Keyboard Shortcuts**:
+  - `Space` / `K`: Play/Pause
+  - `F`: Toggle Fullscreen
+  - `Left` / `Right`: Seek -1/+1 frame (Shift: -10/+10)
+  - `,` / `.`: Seek -1/+1 frame
+  - `I`: Set In-point (Playback Range Start)
+  - `O`: Set Out-point (Playback Range End)
+  - `X`: Clear Playback Range
