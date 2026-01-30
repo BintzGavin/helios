@@ -11,6 +11,7 @@ interface StageToolbarProps {
   onSnapshot: () => void;
   showGuides: boolean;
   onToggleGuides: () => void;
+  onOpenSettings: () => void;
 }
 
 export const StageToolbar: React.FC<StageToolbarProps> = ({
@@ -23,7 +24,8 @@ export const StageToolbar: React.FC<StageToolbarProps> = ({
   onCanvasSizeChange,
   onSnapshot,
   showGuides,
-  onToggleGuides
+  onToggleGuides,
+  onOpenSettings
 }) => {
   const styles = {
     container: {
@@ -179,6 +181,10 @@ export const StageToolbar: React.FC<StageToolbarProps> = ({
         title="Toggle Safe Area Guides (')"
       >
         #
+      </button>
+      <div style={{ width: '1px', background: '#555', margin: '0 4px' }} />
+      <button style={styles.button} onClick={onOpenSettings} title="Composition Settings">
+        ⚙️
       </button>
     </div>
   );
