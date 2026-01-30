@@ -1,10 +1,13 @@
 import React, { useState, useRef } from 'react';
-import { useStudio } from '../../context/StudioContext';
+import { useStudio, Asset } from '../../context/StudioContext';
 import { AssetItem } from './AssetItem';
+import './AssetsPanel.css';
 
 export const AssetsPanel: React.FC = () => {
   const { assets, uploadAsset } = useStudio();
   const [isDragging, setIsDragging] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filterType, setFilterType] = useState<Asset['type'] | 'all'>('all');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleDragOver = (e: React.DragEvent) => {
@@ -41,39 +44,26 @@ export const AssetsPanel: React.FC = () => {
       if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
+  const filteredAssets = assets.filter(asset => {
+    const matchesSearch = asset.name.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesType = filterType === 'all' || asset.type === filterType;
+    return matchesSearch && matchesType;
+  });
+
   return (
     <div
-        style={{
-            height: '100%',
-            display: 'flex',
-            flexDirection: 'column',
-            position: 'relative'
-        }}
+        className="assets-panel"
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
     >
         {isDragging && (
-            <div style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                background: 'rgba(50, 150, 255, 0.2)',
-                border: '2px dashed #3296ff',
-                zIndex: 10,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: '#fff',
-                pointerEvents: 'none'
-            }}>
+            <div className="assets-drop-overlay">
                 Drop files to upload
             </div>
         )}
 
-      <div style={{ padding: '8px', borderBottom: '1px solid #333' }}>
+      <div className="assets-header">
          <input
             type="file"
             ref={fileInputRef}
@@ -82,35 +72,49 @@ export const AssetsPanel: React.FC = () => {
             multiple
          />
          <button
+            className="assets-upload-btn"
             onClick={handleUploadClick}
-            style={{
-                width: '100%',
-                padding: '6px',
-                background: '#333',
-                color: '#fff',
-                border: 'none',
-                borderRadius: '4px',
-                cursor: 'pointer'
-            }}
          >
             Upload Asset
          </button>
+
+         <div className="assets-toolbar">
+            <input
+                type="text"
+                className="assets-search-input"
+                placeholder="Search assets..."
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+            />
+            <select
+                className="assets-filter-select"
+                value={filterType}
+                onChange={e => setFilterType(e.target.value as any)}
+            >
+                <option value="all">All</option>
+                <option value="image">Image</option>
+                <option value="video">Video</option>
+                <option value="audio">Audio</option>
+                <option value="font">Font</option>
+                <option value="model">Model</option>
+                <option value="json">JSON</option>
+                <option value="shader">Shader</option>
+                <option value="other">Other</option>
+            </select>
+         </div>
       </div>
 
-      <div style={{
-        flex: 1,
-        display: 'flex',
-        flexWrap: 'wrap',
-        gap: '8px',
-        padding: '8px',
-        overflowY: 'auto'
-      }}>
-        {assets.length === 0 ? (
-             <div style={{ color: '#666', fontSize: '0.9em', width: '100%', textAlign: 'center', marginTop: '20px' }}>
-                No assets found.<br/>Drag & drop to upload.
+      <div className="assets-list">
+        {filteredAssets.length === 0 ? (
+             <div className="assets-empty">
+                {assets.length === 0 ? (
+                    <>No assets found.<br/>Drag & drop to upload.</>
+                ) : (
+                    <>No matching assets found.</>
+                )}
              </div>
         ) : (
-            assets.map((asset) => (
+            filteredAssets.map((asset) => (
                 <AssetItem key={asset.id} asset={asset} />
             ))
         )}
