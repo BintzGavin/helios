@@ -45,3 +45,7 @@
 ## [0.64.0] - Implied Requirements in Vision
 **Learning:** The README vision "manage render jobs" implies persistence, even if not explicitly stated. "Manage" requires durability across sessions.
 **Action:** When interpreting "manage" in vision statements, assume persistence is a requirement unless stated otherwise.
+
+## [0.65.0] - Core Schema Parity
+**Learning:** `packages/core` schema definitions often evolve (e.g. adding `TypedArray` types) without immediate Studio UI updates, leading to "Unsupported schema type" errors.
+**Action:** When planning Studio features, cross-reference `packages/core/src/schema.ts` `PropType` definition against `packages/studio/src/components/SchemaInputs.tsx` to identify missing inputs.
