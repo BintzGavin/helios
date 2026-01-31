@@ -1,3 +1,6 @@
+## DEMO v1.68.0
+- ✅ Completed: Update React Animation Helpers - Updated `examples/react-animation-helpers` to demonstrate `interpolate` and `spring` helper functions. Enhanced `tests/e2e/verify-render.ts` to support filtering via command line arguments.
+
 ## DEMO v1.67.0
 - ✅ Completed: Client-Side Export API Example - Created `examples/client-export-api` demonstrating `ClientSideExporter` usage.
 
