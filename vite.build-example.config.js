@@ -9,6 +9,8 @@ export default defineConfig({
   resolve: {
     alias: {
       "@helios-project/core": resolve(__dirname, "packages/core/src/index.ts"),
+      "@helios-project/player/bridge": resolve(__dirname, "packages/player/src/bridge.ts"),
+      "@helios-project/player/controllers": resolve(__dirname, "packages/player/src/controllers.ts"),
       "@helios-project/player": resolve(__dirname, "packages/player/src"),
     },
   },

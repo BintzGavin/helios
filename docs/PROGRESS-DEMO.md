@@ -172,3 +172,6 @@
 
 ## DEMO v1.58.0
 - ✅ Completed: Refine Podcast Visualizer - Updated audio source to a 440Hz sine wave to enable audible verification of mixing logic.
+
+### DEMO v1.69.0
+- ✅ Completed: Verify Client-Side Export - Added E2E verification test `tests/e2e/verify-client-export.ts` and updated build config aliases.
