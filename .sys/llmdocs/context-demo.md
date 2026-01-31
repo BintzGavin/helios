@@ -58,6 +58,10 @@
 - **PostCSS/Tailwind**: Root `postcss.config.js` and `tailwind.config.js` (scoped content).
 
 ## C. E2E Tests
-- **File**: `tests/e2e/verify-render.ts`
-- **Methodology**: Builds all examples using `vite.build-example.config.js`, then uses `Renderer` (headless browser + FFmpeg) to render a 5-second video for each, supporting both 'canvas' and 'dom' modes.
-- **Verification**: Checks that render completes without error and output file exists. Does NOT verify visual content correctness (opacity, etc). Supports filtering test cases via CLI arguments.
+- **Render Verification**: `tests/e2e/verify-render.ts`
+  - **Methodology**: Builds all examples using `vite.build-example.config.js`, then uses `Renderer` (headless browser + FFmpeg) to render a 5-second video for each, supporting both 'canvas' and 'dom' modes.
+  - **Verification**: Checks that render completes without error and output file exists. Does NOT verify visual content correctness (opacity, etc). Supports filtering test cases via CLI arguments.
+
+- **Client-Side Export**: `tests/e2e/verify-client-export.ts`
+  - **Methodology**: Serves build artifacts via `vite preview` and uses Playwright to drive the `examples/client-export-api` page.
+  - **Verification**: Clicks the Export button and waits for the UI to indicate "Done!", confirming `ClientSideExporter` works in-browser.

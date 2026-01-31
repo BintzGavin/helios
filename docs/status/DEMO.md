@@ -1,6 +1,6 @@
 # Status: DEMO Domain
 
-**Version**: 1.68.0
+**Version**: 1.69.0
 
 ## Vision
 The DEMO domain is responsible for:
@@ -15,6 +15,7 @@ The DEMO domain is responsible for:
 - None
 
 ## Completed Tasks
+- [v1.69.0] ✅ Completed: Verify Client-Side Export - Added E2E verification test `tests/e2e/verify-client-export.ts` and updated build config aliases.
 - [v1.68.0] ✅ Completed: Update React Animation Helpers - Added interpolate and spring examples.
 - [v1.67.0] ✅ Completed: Client-Side Export API Example - Created `examples/client-export-api` demonstrating `ClientSideExporter` usage.
 - [v1.66.0] ✅ Completed: Solid Canvas Example - Verified existing implementation matches spec.
