@@ -1,3 +1,6 @@
+## STUDIO v0.67.0
+- ✅ Completed: Schema Constraints UI - Implemented UI support for schema constraints (`minLength`, `maxLength`, `pattern`, `minItems`, `maxItems`, `accept`) in the Props Editor, enabling validation feedback and asset filtering.
+
 ## STUDIO v0.66.0
 - ✅ Completed: TypedArray Support - Implemented support for TypedArray props (e.g., `float32array`, `int8array`) in the Props Editor using JSON serialization and added missing tests. Fixed a critical React Hook violation in PropsEditor.
 

@@ -370,4 +370,122 @@ describe('PropsEditor', () => {
     const callArgs = mockSetInputProps.mock.calls[0][0];
     expect(Array.from(callArgs.floatArray)).toEqual(newFloatArray);
   });
+
+  it('renders string inputs with constraints', () => {
+    const schema: HeliosSchema = {
+      constrainedString: {
+        type: 'string',
+        minLength: 5,
+        maxLength: 10,
+        pattern: '^[a-z]+$'
+      }
+    };
+
+    (StudioContext.useStudio as any).mockReturnValue({
+      ...defaultContext,
+      playerState: {
+        inputProps: {
+          constrainedString: 'hello'
+        },
+        schema
+      }
+    });
+
+    render(<PropsEditor />);
+
+    const input = screen.getByDisplayValue('hello');
+    expect(input).toHaveAttribute('minLength', '5');
+    expect(input).toHaveAttribute('maxLength', '10');
+    expect(input).toHaveAttribute('pattern', '^[a-z]+$');
+    expect(input).toHaveAttribute('title', 'Must match pattern: ^[a-z]+$');
+  });
+
+  it('renders array inputs with size constraints', () => {
+    const schema: HeliosSchema = {
+      constrainedList: {
+        type: 'array',
+        items: { type: 'string' },
+        minItems: 2,
+        maxItems: 3
+      }
+    };
+
+    (StudioContext.useStudio as any).mockReturnValue({
+      ...defaultContext,
+      playerState: {
+        inputProps: {
+          constrainedList: ['a', 'b', 'c'] // Max items reached
+        },
+        schema
+      }
+    });
+
+    render(<PropsEditor />);
+
+    // Max items reached (3 == 3). Add button should not be present.
+    expect(screen.queryByText('+ Add Item')).not.toBeInTheDocument();
+  });
+
+  it('disables remove button when minItems reached', () => {
+     const schema: HeliosSchema = {
+      constrainedList: {
+        type: 'array',
+        items: { type: 'string' },
+        minItems: 2
+      }
+    };
+
+    (StudioContext.useStudio as any).mockReturnValue({
+      ...defaultContext,
+      playerState: {
+        inputProps: {
+          constrainedList: ['a', 'b'] // length 2 == minItems
+        },
+        schema
+      }
+    });
+
+    render(<PropsEditor />);
+
+    const removeButtons = screen.getAllByText('Remove');
+    expect(removeButtons).toHaveLength(2);
+    expect(removeButtons[0]).toBeDisabled();
+    expect(removeButtons[1]).toBeDisabled();
+
+    // Add button should be present (no maxItems)
+    expect(screen.getByText('+ Add Item')).toBeInTheDocument();
+  });
+
+  it('renders asset inputs with accept constraint', () => {
+    const schema: HeliosSchema = {
+      imageProp: {
+          type: 'image',
+          accept: ['.png'] // Only PNGs
+      }
+    };
+
+    const assets = [
+      { id: '1', name: 'image.png', url: '/assets/image.png', type: 'image' },
+      { id: '2', name: 'image.jpg', url: '/assets/image.jpg', type: 'image' }
+    ];
+
+    (StudioContext.useStudio as any).mockReturnValue({
+      ...defaultContext,
+      assets,
+      playerState: {
+        inputProps: {
+          imageProp: '/assets/image.png'
+        },
+        schema
+      }
+    });
+
+    const { container } = render(<PropsEditor />);
+
+    // We expect ONLY the .png image asset to be suggested.
+    const options = container.querySelectorAll('option');
+    const optionValues = Array.from(options).map(o => o.value);
+    expect(optionValues).toContain('/assets/image.png');
+    expect(optionValues).not.toContain('/assets/image.jpg');
+  });
 });

@@ -22,7 +22,16 @@ export const SchemaInput: React.FC<SchemaInputProps> = ({ definition, value, onC
 
   switch (type) {
     case 'string':
-      return <StringInput value={value} onChange={onChange} format={definition.format} />;
+      return (
+        <StringInput
+          value={value}
+          onChange={onChange}
+          format={definition.format}
+          minLength={definition.minLength}
+          maxLength={definition.maxLength}
+          pattern={definition.pattern}
+        />
+      );
     case 'number':
       return <NumberRangeInput min={definition.minimum} max={definition.maximum} step={definition.step} value={value} onChange={onChange} />;
     case 'boolean':
@@ -36,7 +45,7 @@ export const SchemaInput: React.FC<SchemaInputProps> = ({ definition, value, onC
     case 'model':
     case 'json':
     case 'shader':
-      return <AssetInput type={type} value={value} onChange={onChange} />;
+      return <AssetInput type={type} value={value} onChange={onChange} accept={definition.accept} />;
     case 'object':
         if (definition.properties) {
             return <ObjectInput definition={definition} value={value} onChange={onChange} />;
@@ -44,7 +53,15 @@ export const SchemaInput: React.FC<SchemaInputProps> = ({ definition, value, onC
         return <JsonInput value={value} onChange={onChange} />;
     case 'array':
         if (definition.items) {
-             return <ArrayInput definition={definition} value={value} onChange={onChange} />;
+             return (
+               <ArrayInput
+                 definition={definition}
+                 value={value}
+                 onChange={onChange}
+                 minItems={definition.minItems}
+                 maxItems={definition.maxItems}
+               />
+             );
         }
         return <JsonInput value={value} onChange={onChange} />;
     case 'int8array':
@@ -118,9 +135,16 @@ const ObjectInput: React.FC<{ definition: PropDefinition; value: any; onChange: 
     );
 };
 
-const ArrayInput: React.FC<{ definition: PropDefinition; value: any; onChange: (val: any) => void }> = ({ definition, value, onChange }) => {
+const ArrayInput: React.FC<{
+  definition: PropDefinition;
+  value: any;
+  onChange: (val: any) => void;
+  minItems?: number;
+  maxItems?: number;
+}> = ({ definition, value, onChange, minItems, maxItems }) => {
     // If value is not an array, initialize it
     const safeValue = Array.isArray(value) ? value : [];
+    const canAdd = maxItems === undefined || safeValue.length < maxItems;
 
     const handleItemChange = (index: number, newVal: any) => {
         const copy = [...safeValue];
@@ -163,28 +187,43 @@ const ArrayInput: React.FC<{ definition: PropDefinition; value: any; onChange: (
                         className="prop-array-remove"
                         onClick={() => handleRemove(index)}
                         title="Remove Item"
+                        disabled={minItems !== undefined && safeValue.length <= minItems}
                      >
                         Remove
                      </button>
                 </div>
             ))}
-            <button className="prop-array-add" onClick={handleAdd}>
-                + Add Item
-            </button>
+            {canAdd && (
+                <button className="prop-array-add" onClick={handleAdd}>
+                    + Add Item
+                </button>
+            )}
         </div>
     );
 };
 
-const AssetInput: React.FC<{ type: ExtendedPropType; value: string; onChange: (val: string) => void }> = ({
+const AssetInput: React.FC<{
+  type: ExtendedPropType;
+  value: string;
+  onChange: (val: string) => void;
+  accept?: string[];
+}> = ({
   type,
   value,
-  onChange
+  onChange,
+  accept
 }) => {
   const { assets } = useStudio();
   const listId = React.useId();
   const [isDragOver, setIsDragOver] = React.useState(false);
 
-  const filteredAssets = assets.filter((a) => a.type === type);
+  const filteredAssets = assets.filter((a) => {
+    if (a.type !== type) return false;
+    if (accept && accept.length > 0) {
+      return accept.some((ext) => a.url.toLowerCase().endsWith(ext.toLowerCase()));
+    }
+    return true;
+  });
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
@@ -324,7 +363,14 @@ const ColorInput: React.FC<{ value: string, onChange: (val: string) => void }> =
   );
 };
 
-const StringInput: React.FC<{ value: string, onChange: (val: string) => void, format?: string }> = ({ value, onChange, format }) => {
+const StringInput: React.FC<{
+  value: string;
+  onChange: (val: string) => void;
+  format?: string;
+  minLength?: number;
+  maxLength?: number;
+  pattern?: string;
+}> = ({ value, onChange, format, minLength, maxLength, pattern }) => {
   const [isDragOver, setIsDragOver] = React.useState(false);
 
   const handleDragOver = (e: React.DragEvent) => {
@@ -362,6 +408,10 @@ const StringInput: React.FC<{ value: string, onChange: (val: string) => void, fo
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
+      minLength={minLength}
+      maxLength={maxLength}
+      pattern={pattern}
+      title={pattern ? `Must match pattern: ${pattern}` : undefined}
     />
   );
 };
