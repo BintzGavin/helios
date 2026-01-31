@@ -1,5 +1,8 @@
 # PLAYER Progress Log
 
+## PLAYER v0.48.2
+- ✅ Completed: Enforce Bridge Connection Security - Added missing `event.source` check in `connectToParent` (bridge.ts) to verify messages originate from the parent window, completing the bridge security hardening.
+
 ## PLAYER v0.48.1
 - ✅ Completed: Harden Bridge Security - Implemented explicit source verification for all postMessage listeners in HeliosPlayer and BridgeController to prevent cross-talk and improve security.
 
