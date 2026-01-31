@@ -1,3 +1,6 @@
+## DEMO v1.72.0
+- ✅ Completed: Verify Player - Added E2E verification for the `<helios-player>` Web Component.
+
 ## DEMO v1.71.0
 - ✅ Completed: Scaffold React Captions Animation - Created `examples/react-captions-animation` demonstrating `useCaptions` hook for integrating Helios SRT parsing with React.
 
