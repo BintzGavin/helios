@@ -1,5 +1,8 @@
 # PLAYER Progress Log
 
+## PLAYER v0.49.0
+- ✅ Completed: Picture-in-Picture - Implemented `requestPictureInPicture` API and UI toggle button for the player, supported in Direct/Same-Origin mode.
+
 ## PLAYER v0.48.4
 - ✅ Completed: Optimize Caption Rendering - Implemented state diffing to prevent unnecessary DOM updates during caption rendering, improving performance.
 

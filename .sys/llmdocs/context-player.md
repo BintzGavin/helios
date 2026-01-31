@@ -11,7 +11,8 @@ The `<helios-player>` component uses a Shadow DOM to encapsulate its styles and 
 - `<iframe>`: Hosts the Helios composition (sandboxed).
 - `.click-layer`: Captures clicks for play/pause and double-clicks for fullscreen.
 - `.captions-container`: Displays active captions.
-- `.controls` (role="toolbar"): Contains playback controls (Play/Pause, Volume, Captions, Export, Speed, Scrubber Wrapper, Time Display, Fullscreen).
+- `.pip-video`: Hidden video element used for Picture-in-Picture proxy.
+- `.controls` (role="toolbar"): Contains playback controls (Play/Pause, Volume, Captions, Export, Speed, Scrubber Wrapper, Time Display, Fullscreen, PiP).
   - `.scrubber-wrapper`: Container for the scrubber range input and markers.
     - `.scrubber-tooltip`: Displays timestamp on hover.
     - `.markers-container`: Overlays visual markers on the timeline track.
@@ -34,6 +35,8 @@ The component dispatches standard HTMLMediaElement events:
 - `loadeddata`: Initial data is loaded.
 - `canplay`: The player can start playing.
 - `canplaythrough`: The player can play through without buffering.
+- `enterpictureinpicture`: The player has entered Picture-in-Picture mode.
+- `leavepictureinpicture`: The player has left Picture-in-Picture mode.
 - `error`: An error occurred.
 
 ## C. Attributes
@@ -96,6 +99,7 @@ Properties and methods available on the `HeliosPlayer` element instance:
 - `defaultMuted`: Get/Set default muted state.
 - `defaultPlaybackRate`: Get/Set default playback speed.
 - `canPlayType(type)`: Returns string indicating support (always empty for video MIME types).
+- `requestPictureInPicture()`: Request Picture-in-Picture mode (returns Promise<PictureInPictureWindow>).
 
 ## G. Interaction
 - **Keyboard Shortcuts**:
