@@ -6,6 +6,7 @@ This directory contains reference implementations and examples for **Helios**, d
 These examples use plain JavaScript without any framework, demonstrating the core API directly.
 
 - **[simple-animation](./simple-animation/)**: A basic DOM animation example using CSS.
+- **[vanilla-typescript](./vanilla-typescript/)**: A basic TypeScript example with Vite integration.
 - **[simple-canvas-animation](./simple-canvas-animation/)**: A basic Canvas animation example.
 - **[waapi-animation](./waapi-animation/)**: Integration with the Web Animations API (WAAPI).
 - **[web-component-animation](./web-component-animation/)**: Using Helios inside a Shadow DOM web component.

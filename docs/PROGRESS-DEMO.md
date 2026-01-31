@@ -1,3 +1,6 @@
+## DEMO v1.75.0
+- ✅ Completed: Vanilla TypeScript Example - Created `examples/vanilla-typescript` to demonstrate idiomatic TypeScript usage without frameworks.
+
 ## DEMO v1.74.1
 - ✅ Completed: Create Examples Documentation - Added `examples/README.md` to catalog and describe all available examples.
 

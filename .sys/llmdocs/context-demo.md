@@ -47,6 +47,7 @@ The `examples/` directory contains reference implementations for various framewo
 - **tailwind-animation**: Tailwind CSS integration.
 - **text-effects-animation**: Typewriter and reveal effects.
 - **threejs-canvas-animation**: Integration with Three.js.
+- **vanilla-typescript**: Vanilla TypeScript example.
 - **variable-font-animation**: Animating variable fonts.
 - **vue-animation-helpers**: Vue components for sequencing.
 - **vue-canvas-animation**: Vue + Canvas example.
