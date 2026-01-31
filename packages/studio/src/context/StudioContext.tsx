@@ -90,9 +90,12 @@ interface StudioContextType {
 
   isCreateOpen: boolean;
   setCreateOpen: (isOpen: boolean) => void;
+  isDuplicateOpen: boolean;
+  setDuplicateOpen: (isOpen: boolean) => void;
   isSettingsOpen: boolean;
   setSettingsOpen: (isOpen: boolean) => void;
   createComposition: (name: string, template?: string, options?: CompositionMetadata) => Promise<void>;
+  duplicateComposition: (sourceId: string, newName: string) => Promise<void>;
   updateCompositionMetadata: (id: string, metadata: CompositionMetadata) => Promise<void>;
   deleteComposition: (id: string) => Promise<void>;
 
@@ -156,6 +159,7 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [isDiagnosticsOpen, setDiagnosticsOpen] = useState(false);
   const [isPromptOpen, setPromptOpen] = useState(false);
   const [isCreateOpen, setCreateOpen] = useState(false);
+  const [isDuplicateOpen, setDuplicateOpen] = useState(false);
   const [isSettingsOpen, setSettingsOpen] = useState(false);
   const [canvasSize, setCanvasSize] = useState({ width: 1920, height: 1080 });
   const [renderConfig, setRenderConfig] = useState<RenderConfig>({ mode: 'canvas' });
@@ -250,6 +254,41 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       }
 
       setCreateOpen(false);
+    } catch (e) {
+      console.error(e);
+      throw e;
+    }
+  };
+
+  const duplicateComposition = async (sourceId: string, newName: string) => {
+    try {
+      const res = await fetch('/api/compositions/duplicate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sourceId, newName })
+      });
+
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || 'Failed to duplicate composition');
+      }
+
+      const newComp = await res.json();
+
+      // Refresh list
+      const listRes = await fetch('/api/compositions');
+      const data = await listRes.json();
+      setCompositions(data);
+
+      // Set active to the new one
+      const found = data.find((c: Composition) => c.id === newComp.id);
+      if (found) {
+        setActiveComposition(found);
+      } else {
+        setActiveComposition(newComp);
+      }
+
+      setDuplicateOpen(false);
     } catch (e) {
       console.error(e);
       throw e;
@@ -523,9 +562,12 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         setPromptOpen,
         isCreateOpen,
         setCreateOpen,
+        isDuplicateOpen,
+        setDuplicateOpen,
         isSettingsOpen,
         setSettingsOpen,
         createComposition,
+        duplicateComposition,
         updateCompositionMetadata,
         deleteComposition,
         renderJobs,
