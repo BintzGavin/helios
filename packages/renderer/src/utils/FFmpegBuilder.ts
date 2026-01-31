@@ -17,6 +17,7 @@ export class FFmpegBuilder {
             seek: track.seek ?? 0,
             fadeInDuration: track.fadeInDuration ?? 0,
             fadeOutDuration: track.fadeOutDuration ?? 0,
+            loop: track.loop,
           });
         }
       });
@@ -52,6 +53,9 @@ export class FFmpegBuilder {
 
       // Add input arguments
       // Note: -ss before -i for fast seeking
+      if (track.loop) {
+        audioInputArgs.push('-stream_loop', '-1');
+      }
       audioInputArgs.push('-ss', inputSeek.toString(), '-i', track.path);
 
       // Build filter chain for this input

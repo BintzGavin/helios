@@ -1,8 +1,9 @@
-**Version**: 1.51.0
+**Version**: 1.52.0
 
 # Renderer Agent Status
 
 ## Progress Log
+- [1.52.0] ✅ Completed: Enable Audio Looping - Updated `DomScanner` and `FFmpegBuilder` to support the `loop` attribute on `<audio>` and `<video>` elements by injecting `-stream_loop -1` into FFmpeg input args.
 - [1.51.0] ✅ Completed: Enable Recursive Shadow DOM Image Preloading - Updated `DomStrategy` to recursively discover and preload `<img>` tags within Shadow DOMs using `TreeWalker`, ensuring images in Web Components are fully loaded before rendering.
 - [1.50.0] ✅ Completed: Enable Blob Audio - Implemented `blob-extractor` to bridge browser `blob:` URLs to FFmpeg by extracting content to temporary files, enabling support for dynamic client-side audio (e.g., text-to-speech).
 - [1.49.0] ✅ Completed: Precision Frame Control - Added `frameCount` to `RendererOptions`, enabling exact frame-count rendering for distributed rendering workflows, overriding floating-point duration calculations.
