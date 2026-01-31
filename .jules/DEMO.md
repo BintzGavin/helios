@@ -27,3 +27,7 @@
 ## [1.70.0] - Player E2E ESM Strategy
 **Learning:** Testing `<helios-player>` interaction requires a browser environment. Using an Import Map to alias `@helios-project/core` allows testing the ESM bundle directly in a static HTML fixture, avoiding complex test-bundling steps.
 **Action:** Use static server + Import Maps for lightweight Web Component E2E fixtures.
+
+## [1.72.1] - Client-Side Verification Parity
+**Learning:** The "Primary Export Path" (Client-Side WebCodecs) was only verified by a single static example, while the "Secondary" path (Server-Side) was verified dynamically against all examples. This created a coverage gap where we claimed "Primary" status without comprehensive verification.
+**Action:** When a feature is designated as "Primary", ensure its verification pipeline is at least as robust as the secondary/legacy path (e.g., dynamic discovery of all test cases).
