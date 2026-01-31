@@ -1,3 +1,6 @@
+## DEMO v1.74.1
+- ✅ Completed: Create Examples Documentation - Added `examples/README.md` to catalog and describe all available examples.
+
 ## DEMO v1.74.0
 - ✅ Completed: Upgrade Client-Side Export Verification - Refactored `verify-client-export.ts` to dynamically discover and test all examples using a generic `dynamic-player.html` fixture.
 

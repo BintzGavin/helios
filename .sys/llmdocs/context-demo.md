@@ -1,7 +1,7 @@
 # DEMO Domain Context
 
 ## A. Examples
-The `examples/` directory contains reference implementations for various frameworks and techniques.
+The `examples/` directory contains reference implementations for various frameworks and techniques. See `examples/README.md` for a categorized list.
 
 - **animation-helpers**: Demonstrates core animation utilities (`interpolate`, `spring`).
 - **audio-visualization**: Visualizes audio data using Canvas.
