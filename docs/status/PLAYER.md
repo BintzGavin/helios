@@ -1,4 +1,4 @@
-**Version**: v0.48.0
+**Version**: v0.48.1
 
 # Status: PLAYER
 
@@ -44,6 +44,7 @@
 ## Critical Task
 - **None**: All critical tasks completed.
 
+[v0.48.1] ✅ Completed: Harden Bridge Security - Implemented explicit source verification for all postMessage listeners in HeliosPlayer and BridgeController to prevent cross-talk and improve security.
 [v0.48.0] ✅ Completed: Implement SRT Export - Added `export-caption-mode` attribute to support exporting captions as separate `.srt` files instead of burning them in, and added `srt-parser` serialization logic.
 [v0.47.0] ✅ Completed: Scrubber Tooltip - Implemented hover tooltip for scrubber showing precise timestamp, and added 'M' key shortcut for muting. Updated package exports for better developer experience.
 [v0.46.1] ✅ Completed: Migrate Client-Side Export to Mediabunny - Replaced deprecated `mp4-muxer` and `webm-muxer` with `mediabunny`, modernizing the export pipeline.

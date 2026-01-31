@@ -129,7 +129,8 @@ export class BridgeController implements HeliosController {
   }
 
   private handleMessage = (event: MessageEvent) => {
-    // Only accept messages from valid sources?
+    if (event.source !== this.iframeWindow) return;
+
     if (event.data?.type === 'HELIOS_STATE') {
       this.lastState = event.data.state;
       this.notifyListeners();
@@ -185,6 +186,8 @@ export class BridgeController implements HeliosController {
   async captureFrame(frame: number, options?: { selector?: string, mode?: 'canvas' | 'dom' }): Promise<{ frame: VideoFrame, captions: CaptionCue[] } | null> {
       return new Promise((resolve) => {
           const handler = (event: MessageEvent) => {
+              if (event.source !== this.iframeWindow) return;
+
               if (event.data?.type === 'HELIOS_FRAME_DATA' && event.data.frame === frame) {
                   window.removeEventListener('message', handler);
                   if (event.data.success) {
@@ -220,6 +223,8 @@ export class BridgeController implements HeliosController {
   async getAudioTracks(): Promise<AudioAsset[]> {
       return new Promise((resolve) => {
           const handler = (event: MessageEvent) => {
+              if (event.source !== this.iframeWindow) return;
+
               if (event.data?.type === 'HELIOS_AUDIO_DATA') {
                   window.removeEventListener('message', handler);
                   resolve(event.data.assets || []);
@@ -240,6 +245,8 @@ export class BridgeController implements HeliosController {
       return new Promise((resolve) => {
           let timeoutId: number;
           const handler = (event: MessageEvent) => {
+              if (event.source !== this.iframeWindow) return;
+
               if (event.data?.type === 'HELIOS_SCHEMA') {
                   window.removeEventListener('message', handler);
                   clearTimeout(timeoutId);
