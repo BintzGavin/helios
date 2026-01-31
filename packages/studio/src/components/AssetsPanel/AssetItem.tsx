@@ -135,7 +135,7 @@ export const AssetItem: React.FC<AssetItemProps> = ({ asset }) => {
   return (
     <div
       className="asset-item"
-      title={asset.name}
+      title={asset.relativePath}
       draggable={true}
       onDragStart={handleDragStart}
       onMouseEnter={asset.type === 'video' ? handleVideoEnter : () => setIsHovering(true)}

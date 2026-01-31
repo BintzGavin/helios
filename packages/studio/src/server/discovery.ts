@@ -16,6 +16,7 @@ export interface AssetInfo {
   name: string;
   url: string;
   type: 'image' | 'video' | 'audio' | 'font' | 'model' | 'json' | 'shader' | 'other';
+  relativePath: string;
 }
 
 export function getProjectRoot(cwd: string): string {
@@ -208,6 +209,10 @@ export function findAssets(rootDir: string): AssetInfo[] {
     return [];
   }
 
+  const publicDir = path.join(projectRoot, 'public');
+  const hasPublic = fs.existsSync(publicDir);
+  const scanRoot = hasPublic ? publicDir : projectRoot;
+
   const assets: AssetInfo[] = [];
 
   function scan(dir: string) {
@@ -224,18 +229,22 @@ export function findAssets(rootDir: string): AssetInfo[] {
         const type = getAssetType(ext);
 
         if (type !== 'other') {
+           const relativePath = path.relative(scanRoot, fullPath).replace(/\\/g, '/');
+           const url = hasPublic ? `/${relativePath}` : `/@fs${fullPath}`;
+
            assets.push({
              id: fullPath,
              name: entry.name,
-             url: `/@fs${fullPath}`,
-             type
+             url,
+             type,
+             relativePath
            });
         }
       }
     }
   }
 
-  scan(projectRoot);
+  scan(scanRoot);
   return assets;
 }
 

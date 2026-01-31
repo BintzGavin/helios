@@ -44,17 +44,21 @@ describe('AssetItem', () => {
   });
 
   it('renders image asset correctly', () => {
-    const asset: Asset = { id: '1', name: 'test.png', url: '/test.png', type: 'image' };
+    const asset: Asset = { id: '1', name: 'test.png', url: '/test.png', type: 'image', relativePath: 'images/test.png' };
     render(<AssetItem asset={asset} />);
 
     const img = screen.getByRole('img');
     expect(img).toBeInTheDocument();
     expect(img).toHaveAttribute('src', '/test.png');
     expect(screen.getByText('test.png')).toBeInTheDocument();
+
+    // Verify tooltip shows relative path
+    const container = screen.getByText('test.png').closest('.asset-item');
+    expect(container).toHaveAttribute('title', 'images/test.png');
   });
 
   it('renders video asset correctly', () => {
-    const asset: Asset = { id: '2', name: 'test.mp4', url: '/test.mp4', type: 'video' };
+    const asset: Asset = { id: '2', name: 'test.mp4', url: '/test.mp4', type: 'video', relativePath: 'test.mp4' };
     render(<AssetItem asset={asset} />);
 
     const video = document.querySelector('video') as HTMLVideoElement;
@@ -65,7 +69,7 @@ describe('AssetItem', () => {
   });
 
   it('renders audio asset correctly', () => {
-    const asset: Asset = { id: '3', name: 'test.mp3', url: '/test.mp3', type: 'audio' };
+    const asset: Asset = { id: '3', name: 'test.mp3', url: '/test.mp3', type: 'audio', relativePath: 'audio/test.mp3' };
     render(<AssetItem asset={asset} />);
 
     const audioPreview = document.querySelector('.audio-preview');
@@ -73,7 +77,7 @@ describe('AssetItem', () => {
   });
 
   it('toggles audio playback on click', () => {
-    const asset: Asset = { id: '3', name: 'test.mp3', url: '/test.mp3', type: 'audio' };
+    const asset: Asset = { id: '3', name: 'test.mp3', url: '/test.mp3', type: 'audio', relativePath: 'audio/test.mp3' };
     render(<AssetItem asset={asset} />);
 
     const audioPreview = document.querySelector('.audio-preview')!;
@@ -87,7 +91,7 @@ describe('AssetItem', () => {
   });
 
   it('renders font asset correctly', () => {
-    const asset: Asset = { id: '4', name: 'test.ttf', url: '/test.ttf', type: 'font' };
+    const asset: Asset = { id: '4', name: 'test.ttf', url: '/test.ttf', type: 'font', relativePath: 'fonts/test.ttf' };
     render(<AssetItem asset={asset} />);
 
     const fontPreview = document.querySelector('.font-preview');
@@ -96,7 +100,7 @@ describe('AssetItem', () => {
   });
 
   it('shows delete button on hover and calls deleteAsset on click', () => {
-    const asset: Asset = { id: '1', name: 'test.png', url: '/test.png', type: 'image' };
+    const asset: Asset = { id: '1', name: 'test.png', url: '/test.png', type: 'image', relativePath: 'test.png' };
     render(<AssetItem asset={asset} />);
 
     const container = screen.getByText('test.png').closest('.asset-item')!;
@@ -113,20 +117,24 @@ describe('AssetItem', () => {
   });
 
   it('renders new asset types (model, json, shader) correctly', () => {
-    const model: Asset = { id: 'm1', name: 'box.glb', url: '/box.glb', type: 'model' };
-    const json: Asset = { id: 'j1', name: 'data.json', url: '/data.json', type: 'json' };
-    const shader: Asset = { id: 's1', name: 'frag.glsl', url: '/frag.glsl', type: 'shader' };
+    const model: Asset = { id: 'm1', name: 'box.glb', url: '/box.glb', type: 'model', relativePath: 'box.glb' };
+    const json: Asset = { id: 'j1', name: 'data.json', url: '/data.json', type: 'json', relativePath: 'data.json' };
+    const shader: Asset = { id: 's1', name: 'frag.glsl', url: '/frag.glsl', type: 'shader', relativePath: 'frag.glsl' };
 
     const { rerender } = render(<AssetItem asset={model} />);
     expect(screen.getByText('📦')).toBeInTheDocument();
-    expect(screen.getByTitle('3D Model')).toBeInTheDocument();
+    // Use closest to find the asset item container
+    const modelContainer = screen.getByText('📦').closest('.asset-item');
+    expect(modelContainer).toHaveAttribute('title', 'box.glb');
 
     rerender(<AssetItem asset={json} />);
     expect(screen.getByText('{}')).toBeInTheDocument();
-    expect(screen.getByTitle('JSON Data')).toBeInTheDocument();
+    const jsonContainer = screen.getByText('{}').closest('.asset-item');
+    expect(jsonContainer).toHaveAttribute('title', 'data.json');
 
     rerender(<AssetItem asset={shader} />);
     expect(screen.getByText('⚡')).toBeInTheDocument();
-    expect(screen.getByTitle('Shader')).toBeInTheDocument();
+    const shaderContainer = screen.getByText('⚡').closest('.asset-item');
+    expect(shaderContainer).toHaveAttribute('title', 'frag.glsl');
   });
 });

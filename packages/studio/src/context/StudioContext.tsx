@@ -22,6 +22,7 @@ export interface Asset {
   name: string;
   url: string;
   type: 'image' | 'video' | 'audio' | 'font' | 'model' | 'json' | 'shader' | 'other';
+  relativePath: string;
 }
 
 export interface RenderConfig {
