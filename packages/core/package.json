@@ -1,6 +1,6 @@
 {
   "name": "@helios-project/core",
-  "version": "3.1.0",
+  "version": "3.3.0",
   "type": "module",
   "description": "Core library for Helios video engine.",
   "author": "Gavin Bintz <me@gavinbintz.com>",
@@ -30,6 +30,7 @@
     "test": "vitest"
   },
   "devDependencies": {
-    "typescript": "^5.0.0"
+    "typescript": "^5.0.0",
+    "vitest": "^4.0.17"
   }
 }
