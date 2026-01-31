@@ -1,3 +1,6 @@
+## STUDIO v0.62.0
+- ✅ Completed: MCP Server Integration - Implemented Model Context Protocol server allowing AI agents to inspect, create, and render compositions.
+
 ## STUDIO v0.61.0
 - ✅ Completed: Recursive Composition Discovery - Implemented recursive directory scanning for composition discovery, allowing nested composition structures.
 
