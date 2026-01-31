@@ -259,4 +259,58 @@ describe('PropsEditor', () => {
     const colorInput = screen.getByDisplayValue('#ff0000');
     expect(colorInput).toHaveAttribute('type', 'color');
   });
+
+  it('groups props based on schema group property', () => {
+    const schema: HeliosSchema = {
+      ungrouped1: { type: 'string' },
+      grouped1: { type: 'string', group: 'My Group' },
+      grouped2: { type: 'number', group: 'My Group' },
+      ungrouped2: { type: 'boolean' },
+      anotherGrouped: { type: 'string', group: 'Other Group' }
+    };
+
+    (StudioContext.useStudio as any).mockReturnValue({
+      ...defaultContext,
+      playerState: {
+        inputProps: {
+          ungrouped1: 'val1',
+          grouped1: 'val2',
+          grouped2: 123,
+          ungrouped2: true,
+          anotherGrouped: 'val3'
+        },
+        schema
+      }
+    });
+
+    render(<PropsEditor />);
+
+    // Verify groups exist (headers)
+    expect(screen.getByText('My Group')).toBeInTheDocument();
+    expect(screen.getByText('Other Group')).toBeInTheDocument();
+
+    // Verify props are rendered
+    expect(screen.getByDisplayValue('val1')).toBeInTheDocument();
+    expect(screen.getByDisplayValue('val2')).toBeInTheDocument();
+    expect(screen.getByDisplayValue('123')).toBeInTheDocument();
+    expect(screen.getByDisplayValue('val3')).toBeInTheDocument();
+
+    // Verify structure via interaction (collapsing group)
+    const myGroupHeader = screen.getByText('My Group');
+    fireEvent.click(myGroupHeader);
+
+    // After collapse, val2 and 123 should be hidden
+    expect(screen.queryByDisplayValue('val2')).not.toBeInTheDocument();
+    expect(screen.queryByDisplayValue('123')).not.toBeInTheDocument();
+
+    // Ungrouped should still be visible
+    expect(screen.getByDisplayValue('val1')).toBeInTheDocument();
+
+    // Other group should still be visible
+    expect(screen.getByDisplayValue('val3')).toBeInTheDocument();
+
+    // Click again to expand
+    fireEvent.click(myGroupHeader);
+    expect(screen.getByDisplayValue('val2')).toBeInTheDocument();
+  });
 });

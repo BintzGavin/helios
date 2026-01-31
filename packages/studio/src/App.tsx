@@ -35,6 +35,13 @@ function AppContent() {
   useEffect(() => {
     if (!controller) return;
 
+    // Fetch schema separately since it's not in the high-frequency state stream
+    controller.getSchema().then((schema) => {
+      if (schema) {
+        setPlayerState((prev) => ({ ...prev, schema }));
+      }
+    });
+
     // Subscribe to state updates
     const unsubscribe = controller.subscribe((state: any) => {
       setPlayerState(state);

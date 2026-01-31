@@ -1,7 +1,20 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useStudio } from '../context/StudioContext';
 import { SchemaInput, getDefaultValueForType } from './SchemaInputs';
 import './PropsEditor.css';
+
+const PropGroup: React.FC<{ title: string; children: React.ReactNode }> = ({ title, children }) => {
+  const [collapsed, setCollapsed] = useState(false);
+  return (
+    <div className="prop-group">
+      <div className="prop-group-header" onClick={() => setCollapsed(!collapsed)}>
+        <span className={`prop-group-arrow ${collapsed ? 'collapsed' : ''}`}>▼</span>
+        <span className="prop-group-title">{title}</span>
+      </div>
+      {!collapsed && <div className="prop-group-content">{children}</div>}
+    </div>
+  );
+};
 
 const PropsToolbar: React.FC<{
   onCopy: () => void;
@@ -60,32 +73,62 @@ export const PropsEditor: React.FC = () => {
     controller.setInputProps(defaults);
   };
 
+  const groupedProps = useMemo(() => {
+    const groups: Record<string, string[]> = {};
+    const ungrouped: string[] = [];
+
+    // Iterate keys in order of inputProps to preserve rough ordering
+    Object.keys(inputProps).forEach(key => {
+      const def = schema?.[key];
+      if (def?.group) {
+        if (!groups[def.group]) groups[def.group] = [];
+        groups[def.group].push(key);
+      } else {
+        ungrouped.push(key);
+      }
+    });
+
+    return { groups, ungrouped };
+  }, [inputProps, schema]);
+
+  const renderRow = (key: string) => {
+    const value = inputProps[key];
+    const def = schema ? schema[key] : undefined;
+
+    return (
+      <div key={key} className="prop-row">
+        <label className="prop-label" title={def?.description}>
+          {def?.label || key}
+        </label>
+        {def ? (
+          <SchemaInput
+            definition={def}
+            value={value}
+            onChange={(newValue) => handleChange(key, newValue)}
+          />
+        ) : (
+          <PropInput
+            value={value}
+            onChange={(newValue) => handleChange(key, newValue)}
+          />
+        )}
+      </div>
+    );
+  };
+
   return (
     <div className="props-editor">
       <PropsToolbar onCopy={handleCopy} onReset={handleReset} />
-      {Object.entries(inputProps).map(([key, value]) => {
-        const def = schema ? schema[key] : undefined;
 
-        return (
-          <div key={key} className="prop-row">
-            <label className="prop-label" title={def?.description}>
-              {def?.label || key}
-            </label>
-            {def ? (
-              <SchemaInput
-                definition={def}
-                value={value}
-                onChange={(newValue) => handleChange(key, newValue)}
-              />
-            ) : (
-              <PropInput
-                value={value}
-                onChange={(newValue) => handleChange(key, newValue)}
-              />
-            )}
-          </div>
-        );
-      })}
+      {/* Render Ungrouped Props First */}
+      {groupedProps.ungrouped.map(key => renderRow(key))}
+
+      {/* Render Groups */}
+      {Object.entries(groupedProps.groups).map(([groupName, keys]) => (
+        <PropGroup key={groupName} title={groupName}>
+           {keys.map(key => renderRow(key))}
+        </PropGroup>
+      ))}
     </div>
   );
 };
