@@ -17,6 +17,11 @@
     "packages/*"
   ],
   "scripts": {
+    "build": "npm run build -w packages/core && npm run build -w packages/player && npm run build -w packages/cli && npm run build -w packages/renderer",
+    "test": "npm run test -w packages/core & npm run test -w packages/player & npm run test -w packages/renderer & wait",
+    "test:core": "npm run test -w packages/core",
+    "test:player": "npm run test -w packages/player",
+    "test:renderer": "npm run test -w packages/renderer",
     "dev": "npx vite ./examples/simple-canvas-animation",
     "dev:react": "vite serve examples/react-canvas-animation",
     "dev:react-dom": "vite serve examples/react-dom-animation",

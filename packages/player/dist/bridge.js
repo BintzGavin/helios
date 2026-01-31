@@ -3,6 +3,8 @@ import { getAudioAssets } from "./features/audio-utils";
 export function connectToParent(helios) {
     // 1. Listen for messages from parent
     window.addEventListener('message', async (event) => {
+        if (event.source !== window.parent)
+            return;
         const { type, frame } = event.data;
         switch (type) {
             case 'HELIOS_GET_AUDIO_TRACKS':

@@ -7,6 +7,19 @@ build/
 *.tsbuildinfo
 output/
 
+# Test outputs
+**/output-*/
+**/temp/
+**/tests/*.mp4
+**/tests/*.wav
+**/tests/*.webm
+**/scripts/*.mp4
+**/scripts/*.wav
+**/scripts/*.webm
+packages/renderer/output/
+packages/renderer/output-*/
+packages/renderer/temp/
+
 # Logs
 logs
 *.log
