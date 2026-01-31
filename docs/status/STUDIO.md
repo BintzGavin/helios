@@ -1,4 +1,4 @@
-**Version**: 0.63.0
+**Version**: 0.63.1
 
 # Studio Domain Status
 
@@ -7,6 +7,7 @@
 **Focus**: UI Implementation & CLI
 
 ## Recent Updates
+- [v0.63.1] ✅ Verified: Maintenance - Synced package.json version and verified Studio UI with Playwright.
 - [v0.63.0] ✅ Completed: Refine Assets Panel - Updated asset discovery to prioritize `public` directory and use relative paths/URLs, aligning with vision.
 - [v0.62.0] ✅ Completed: MCP Server Integration - Implemented Model Context Protocol server allowing AI agents to inspect, create, and render compositions.
 - [v0.61.0] ✅ Completed: Recursive Composition Discovery - Implemented recursive directory scanning for composition discovery, allowing nested composition structures.

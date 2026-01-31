@@ -44,7 +44,6 @@ packages/studio
 │   ├── utils
 │   └── vite-env.d.ts
 ├── tsconfig.json
-├── verification.png
 ├── vite-plugin-studio-api.ts
 ├── vite.config.ts
 └── vitest.config.ts

@@ -37,3 +37,7 @@
 ## [0.61.1] - Vision vs Implementation Gap: Assets
 **Learning:** The Assets Panel implementation scanned the entire project root recursively, contradicting the README vision of "manage assets from your project's public folder". This caused performance issues and clutter.
 **Action:** Always verify feature implementations against the README vision statement, especially for file system interactions in Studio.
+
+## [0.63.1] - React Infinite Loop Warning
+**Learning:** `npm run verify` logs "Maximum update depth exceeded" during the preview iframe verification. This suggests a potential state update loop in `StudioContext` or `Stage` components when interacting with `helios-player` or the preview modal, though functionality appears intact.
+**Action:** Investigate `StudioContext` state updates related to `controller` subscription and `playerState` to eliminate the loop in a future task.
