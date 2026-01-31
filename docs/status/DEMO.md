@@ -1,6 +1,6 @@
 # Status: DEMO Domain
 
-**Version**: 1.70.0
+**Version**: 1.70.1
 
 ## Vision
 The DEMO domain is responsible for:
@@ -15,6 +15,7 @@ The DEMO domain is responsible for:
 - None
 
 ## Completed Tasks
+- [v1.70.1] ✅ Completed: Re-verify Client-Side Export - Confirmed successful build and E2E verification of the client-side export example.
 - [v1.70.0] ✅ Completed: Dynamic Verification Pipeline - Refactored build and test scripts to dynamically discover examples, reducing maintenance burden and enabling unified verification via 'verify:e2e'.
 - [v1.69.1] ✅ Completed: Polish Client-Side Export Example - Added documentation comments to `examples/client-export-api` and re-verified functionality.
 - [v1.69.0] ✅ Completed: Verify Client-Side Export - Added E2E verification test `tests/e2e/verify-client-export.ts` and updated build config aliases.
