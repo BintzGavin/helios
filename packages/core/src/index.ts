@@ -67,6 +67,16 @@ export interface DiagnosticReport {
     aac: boolean;
     opus: boolean;
   };
+  videoDecoders: {
+    h264: boolean;
+    vp8: boolean;
+    vp9: boolean;
+    av1: boolean;
+  };
+  audioDecoders: {
+    aac: boolean;
+    opus: boolean;
+  };
   userAgent: string;
 }
 
@@ -239,6 +249,16 @@ export class Helios {
         aac: false,
         opus: false,
       },
+      videoDecoders: {
+        h264: false,
+        vp8: false,
+        vp9: false,
+        av1: false,
+      },
+      audioDecoders: {
+        aac: false,
+        opus: false,
+      },
       userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : 'Node/Server',
     };
 
@@ -311,6 +331,54 @@ export class Helios {
         ]);
 
         report.audioCodecs = { aac, opus };
+      } catch (e) {
+        // Ignore errors during codec check
+      }
+    }
+
+    // Check Video Decoders
+    if (typeof VideoDecoder !== 'undefined') {
+      try {
+        const checkDecoder = async (config: any) => {
+          try {
+            const support = await VideoDecoder.isConfigSupported(config);
+            return support.supported ?? false;
+          } catch (e) {
+            return false;
+          }
+        };
+
+        const [h264, vp8, vp9, av1] = await Promise.all([
+          checkDecoder({ codec: 'avc1.42001E', width: 1920, height: 1080, bitrate: 2_000_000, framerate: 30 }),
+          checkDecoder({ codec: 'vp8', width: 1920, height: 1080, bitrate: 2_000_000, framerate: 30 }),
+          checkDecoder({ codec: 'vp09.00.10.08', width: 1920, height: 1080, bitrate: 2_000_000, framerate: 30 }),
+          checkDecoder({ codec: 'av01.0.04M.08', width: 1920, height: 1080, bitrate: 2_000_000, framerate: 30 })
+        ]);
+
+        report.videoDecoders = { h264, vp8, vp9, av1 };
+      } catch (e) {
+        // Ignore errors during codec check
+      }
+    }
+
+    // Check Audio Decoders
+    if (typeof AudioDecoder !== 'undefined') {
+      try {
+        const checkAudioDecoder = async (config: any) => {
+          try {
+            const support = await AudioDecoder.isConfigSupported(config);
+            return support.supported ?? false;
+          } catch (e) {
+            return false;
+          }
+        };
+
+        const [aac, opus] = await Promise.all([
+          checkAudioDecoder({ codec: 'mp4a.40.2', sampleRate: 48000, numberOfChannels: 2, bitrate: 128000 }),
+          checkAudioDecoder({ codec: 'opus', sampleRate: 48000, numberOfChannels: 2, bitrate: 128000 })
+        ]);
+
+        report.audioDecoders = { aac, opus };
       } catch (e) {
         // Ignore errors during codec check
       }

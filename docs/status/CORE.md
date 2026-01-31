@@ -1,11 +1,12 @@
 # Status: CORE
 
-**Version**: 3.2.0
+**Version**: 3.3.0
 
 - **Status**: Active
 - **Current Focus**: Maintenance, Optimization, and Stability
-- **Last Updated**: 2026-05-29
+- **Last Updated**: 2026-05-31
 
+[v3.3.0] ✅ Completed: Decoder Diagnostics - Added `videoDecoders` (h264, vp8, vp9, av1) and `audioDecoders` (aac, opus) checks to `Helios.diagnose()` and `DiagnosticReport` using WebCodecs API.
 [v3.2.0] ✅ Completed: Implement AI System Prompt Generator - Added `createSystemPrompt` and `HELIOS_BASE_PROMPT` to programmatically generate context-aware system prompts for AI agents.
 [v3.1.0] ✅ Completed: Synchronize Version - Synced package.json version to 3.1.0 to match documentation and updated player/renderer dependencies.
 [v3.1.0] ✅ Completed: Enhance Schema UI Constraints - Added `pattern`, `accept`, and `group` to `PropDefinition` and implemented validation logic for regex and file extensions.
