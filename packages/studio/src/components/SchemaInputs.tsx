@@ -47,6 +47,16 @@ export const SchemaInput: React.FC<SchemaInputProps> = ({ definition, value, onC
              return <ArrayInput definition={definition} value={value} onChange={onChange} />;
         }
         return <JsonInput value={value} onChange={onChange} />;
+    case 'int8array':
+    case 'uint8array':
+    case 'uint8clampedarray':
+    case 'int16array':
+    case 'uint16array':
+    case 'int32array':
+    case 'uint32array':
+    case 'float32array':
+    case 'float64array':
+        return <TypedArrayInput type={type} value={value} onChange={onChange} />;
     default:
       return <div className="unsupported-type">Unsupported schema type: {definition.type}</div>;
   }
@@ -71,6 +81,15 @@ export const getDefaultValueForType = (type: PropType): any => {
         case 'json':
         case 'shader':
             return '';
+        case 'int8array': return new Int8Array(0);
+        case 'uint8array': return new Uint8Array(0);
+        case 'uint8clampedarray': return new Uint8ClampedArray(0);
+        case 'int16array': return new Int16Array(0);
+        case 'uint16array': return new Uint16Array(0);
+        case 'int32array': return new Int32Array(0);
+        case 'uint32array': return new Uint32Array(0);
+        case 'float32array': return new Float32Array(0);
+        case 'float64array': return new Float64Array(0);
         default: return undefined;
     }
 };
@@ -378,4 +397,36 @@ const JsonInput: React.FC<{ value: any, onChange: (val: any) => void }> = ({ val
             spellCheck={false}
         />
     );
+};
+
+// Map type string to Constructor
+const getTypedArrayConstructor = (type: ExtendedPropType) => {
+  switch(type) {
+    case 'float32array': return Float32Array;
+    case 'int8array': return Int8Array;
+    case 'uint8array': return Uint8Array;
+    case 'uint8clampedarray': return Uint8ClampedArray;
+    case 'int16array': return Int16Array;
+    case 'uint16array': return Uint16Array;
+    case 'int32array': return Int32Array;
+    case 'uint32array': return Uint32Array;
+    case 'float64array': return Float64Array;
+    default: return Float32Array;
+  }
+};
+
+const TypedArrayInput: React.FC<{ type: ExtendedPropType, value: any, onChange: (val: any) => void }> = ({ type, value, onChange }) => {
+  // Convert TypedArray to standard Array for friendly JSON editing (e.g. [1, 2] instead of {"0":1})
+  // value is expected to be a TypedArray instance, but handle potential mismatch
+  const arrayValue = (value && typeof value[Symbol.iterator] === 'function')
+    ? Array.from(value)
+    : [];
+
+  const handleChange = (newJsonValue: any) => {
+    if (!Array.isArray(newJsonValue)) return; // Logic to reject non-arrays
+    const Constructor = getTypedArrayConstructor(type);
+    onChange(new Constructor(newJsonValue));
+  };
+
+  return <JsonInput value={arrayValue} onChange={handleChange} />;
 };

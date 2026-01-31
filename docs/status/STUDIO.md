@@ -1,4 +1,4 @@
-**Version**: 0.65.0
+**Version**: 0.66.0
 
 # Studio Domain Status
 
@@ -7,6 +7,7 @@
 **Focus**: UI Implementation & CLI
 
 ## Recent Updates
+- [v0.66.0] ✅ Completed: TypedArray Support - Implemented support for TypedArray props (e.g., `float32array`, `int8array`) in the Props Editor using JSON serialization and added missing tests. Fixed a critical React Hook violation in PropsEditor.
 - [v0.65.0] ✅ Completed: Persistent Render Jobs - Implemented persistence of render jobs to `jobs.json` in the `renders` directory, ensuring history survives server restarts.
 - [v0.64.0] ✅ Completed: Props Grouping - Implemented collapsible groups in Props Editor based on schema `group` property.
 - [v0.63.1] ✅ Verified: Maintenance - Synced package.json version and verified Studio UI with Playwright.
