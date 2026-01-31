@@ -11,7 +11,7 @@ const runTest = () => {
   console.log('Verifying Advanced Audio Arguments Generation...');
 
   const outputPath = 'output.mp4';
-  const domStrategy = new DomStrategy();
+  const domStrategy = new DomStrategy({ width: 1920, height: 1080, fps: 30, durationInSeconds: 1 });
 
   // Test Case 1: Volume Control
   // Track 1: Volume 0.5
