@@ -75,10 +75,16 @@ interface HeliosState {
   playbackRate: number;
   volume: number;
   muted: boolean;
+  audioTracks: Record<string, AudioTrackState>;
   captions: CaptionCue[];
   activeCaptions: CaptionCue[];
   markers: Marker[];
   playbackRange: [number, number] | null;
+}
+
+type AudioTrackState = {
+  volume: number;
+  muted: boolean;
 }
 ```
 
@@ -112,6 +118,11 @@ helios.setSize(width: number, height: number) // Update canvas dimensions
 ```typescript
 helios.setAudioVolume(volume: number) // Set volume (0.0 to 1.0)
 helios.setAudioMuted(muted: boolean)  // Set muted state
+
+// Track-specific control
+// Use data-helios-track-id="myTrack" on DOM elements to group them
+helios.setAudioTrackVolume(trackId: string, volume: number)
+helios.setAudioTrackMuted(trackId: string, muted: boolean)
 ```
 
 #### Data Input & Validation
@@ -264,6 +275,7 @@ helios.inputProps: ReadonlySignal<Record<string, any>>
 helios.playbackRate: ReadonlySignal<number>
 helios.volume: ReadonlySignal<number>
 helios.muted: ReadonlySignal<boolean>
+helios.audioTracks: ReadonlySignal<Record<string, AudioTrackState>>
 helios.captions: ReadonlySignal<CaptionCue[]>
 helios.activeCaptions: ReadonlySignal<CaptionCue[]>
 helios.markers: ReadonlySignal<Marker[]>
@@ -375,6 +387,8 @@ const schema = {
     model: { type: 'model' },    // 3D Model URL (.glb, .gltf)
     config: { type: 'json' },    // JSON Data URL
     effect: { type: 'shader' },  // Shader URL (.glsl)
+    // Typed Arrays (float32array, uint8array, etc.)
+    data: { type: 'float32array' },
     count: { type: 'number', minimum: 0, step: 1 },
     email: { type: 'string', pattern: '^\\S+@\\S+\\.\\S+$' },
     avatar: { type: 'image', accept: '.png,.jpg' },
