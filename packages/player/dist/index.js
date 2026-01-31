@@ -157,6 +157,23 @@ template.innerHTML = `
       cursor: pointer;
       border-radius: 50%;
     }
+    .scrubber-tooltip {
+      position: absolute;
+      bottom: 100%;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.8);
+      color: white;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      pointer-events: none;
+      white-space: nowrap;
+      z-index: 10;
+      margin-bottom: 8px;
+    }
+    .scrubber-tooltip.hidden {
+      display: none;
+    }
     .markers-container {
       position: absolute;
       inset: 0;
@@ -178,22 +195,6 @@ template.innerHTML = `
     .marker:hover {
       transform: translateX(-50%) scale(1.2);
       z-index: 10;
-    }
-    .scrubber-tooltip {
-      position: absolute;
-      bottom: 20px;
-      transform: translateX(-50%);
-      background: rgba(0, 0, 0, 0.8);
-      color: white;
-      padding: 4px 8px;
-      border-radius: 4px;
-      font-size: 12px;
-      pointer-events: none;
-      white-space: nowrap;
-      z-index: 20;
-    }
-    .scrubber-tooltip.hidden {
-      display: none;
     }
     .time-display {
       min-width: 90px;
@@ -405,8 +406,8 @@ template.innerHTML = `
       <option value="2">2x</option>
     </select>
     <div class="scrubber-wrapper">
+      <div class="scrubber-tooltip hidden" part="tooltip"></div>
       <div class="markers-container" part="markers"></div>
-      <div class="scrubber-tooltip hidden" part="scrubber-tooltip"></div>
       <input type="range" class="scrubber" min="0" value="0" step="1" part="scrubber" aria-label="Seek time">
     </div>
     <div class="time-display" part="time-display">0.00 / 0.00</div>
@@ -422,8 +423,8 @@ export class HeliosPlayer extends HTMLElement {
     volumeSlider;
     scrubber;
     scrubberWrapper;
+    scrubberTooltip;
     markersContainer;
-    tooltip;
     timeDisplay;
     exportBtn;
     overlay;
@@ -732,10 +733,10 @@ export class HeliosPlayer extends HTMLElement {
         this.playPauseBtn = this.shadowRoot.querySelector(".play-pause-btn");
         this.volumeBtn = this.shadowRoot.querySelector(".volume-btn");
         this.volumeSlider = this.shadowRoot.querySelector(".volume-slider");
-        this.scrubberWrapper = this.shadowRoot.querySelector(".scrubber-wrapper");
         this.scrubber = this.shadowRoot.querySelector(".scrubber");
+        this.scrubberWrapper = this.shadowRoot.querySelector(".scrubber-wrapper");
+        this.scrubberTooltip = this.shadowRoot.querySelector(".scrubber-tooltip");
         this.markersContainer = this.shadowRoot.querySelector(".markers-container");
-        this.tooltip = this.shadowRoot.querySelector(".scrubber-tooltip");
         this.timeDisplay = this.shadowRoot.querySelector(".time-display");
         this.exportBtn = this.shadowRoot.querySelector(".export-btn");
         this.overlay = this.shadowRoot.querySelector(".status-overlay");
@@ -911,14 +912,14 @@ export class HeliosPlayer extends HTMLElement {
         this.playPauseBtn.addEventListener("click", this.togglePlayPause);
         this.volumeBtn.addEventListener("click", this.toggleMute);
         this.volumeSlider.addEventListener("input", this.handleVolumeInput);
-        this.scrubberWrapper.addEventListener("mousemove", this.handleScrubberHover);
-        this.scrubberWrapper.addEventListener("mouseleave", this.handleScrubberLeave);
         this.scrubber.addEventListener("input", this.handleScrubberInput);
         this.scrubber.addEventListener("mousedown", this.handleScrubStart);
         this.scrubber.addEventListener("change", this.handleScrubEnd);
         this.scrubber.addEventListener("touchstart", this.handleScrubStart, { passive: true });
         this.scrubber.addEventListener("touchend", this.handleScrubEnd);
         this.scrubber.addEventListener("touchcancel", this.handleScrubEnd);
+        this.scrubberWrapper.addEventListener("mousemove", this.handleScrubberHover);
+        this.scrubberWrapper.addEventListener("mouseleave", this.handleScrubberLeave);
         this.exportBtn.addEventListener("click", this.renderClientSide);
         this.speedSelector.addEventListener("change", this.handleSpeedChange);
         this.fullscreenBtn.addEventListener("click", this.toggleFullscreen);
@@ -962,14 +963,14 @@ export class HeliosPlayer extends HTMLElement {
         this.playPauseBtn.removeEventListener("click", this.togglePlayPause);
         this.volumeBtn.removeEventListener("click", this.toggleMute);
         this.volumeSlider.removeEventListener("input", this.handleVolumeInput);
-        this.scrubberWrapper.removeEventListener("mousemove", this.handleScrubberHover);
-        this.scrubberWrapper.removeEventListener("mouseleave", this.handleScrubberLeave);
         this.scrubber.removeEventListener("input", this.handleScrubberInput);
         this.scrubber.removeEventListener("mousedown", this.handleScrubStart);
         this.scrubber.removeEventListener("change", this.handleScrubEnd);
         this.scrubber.removeEventListener("touchstart", this.handleScrubStart);
         this.scrubber.removeEventListener("touchend", this.handleScrubEnd);
         this.scrubber.removeEventListener("touchcancel", this.handleScrubEnd);
+        this.scrubberWrapper.removeEventListener("mousemove", this.handleScrubberHover);
+        this.scrubberWrapper.removeEventListener("mouseleave", this.handleScrubberLeave);
         this.exportBtn.removeEventListener("click", this.renderClientSide);
         this.speedSelector.removeEventListener("change", this.handleSpeedChange);
         this.fullscreenBtn.removeEventListener("click", this.toggleFullscreen);
@@ -1327,6 +1328,22 @@ export class HeliosPlayer extends HTMLElement {
             this.controller.play();
         }
     };
+    handleScrubberHover = (e) => {
+        if (!this.controller)
+            return;
+        const state = this.controller.getState();
+        const rect = this.scrubberWrapper.getBoundingClientRect();
+        const offsetX = e.clientX - rect.left;
+        const width = rect.width;
+        const pct = Math.max(0, Math.min(1, offsetX / width));
+        const time = pct * state.duration;
+        this.scrubberTooltip.textContent = time.toFixed(2) + "s";
+        this.scrubberTooltip.style.left = `${offsetX}px`;
+        this.scrubberTooltip.classList.remove("hidden");
+    };
+    handleScrubberLeave = () => {
+        this.scrubberTooltip.classList.add("hidden");
+    };
     handleSpeedChange = () => {
         if (this.controller) {
             this.controller.setPlaybackRate(parseFloat(this.speedSelector.value));
@@ -1377,6 +1394,10 @@ export class HeliosPlayer extends HTMLElement {
             case "J":
                 this.seekRelative(e.shiftKey ? -10 : -1);
                 break;
+            case "m":
+            case "M":
+                this.toggleMute();
+                break;
             case ".":
                 this.seekRelative(1);
                 break;
@@ -1410,10 +1431,6 @@ export class HeliosPlayer extends HTMLElement {
             case "X":
                 this.controller.clearPlaybackRange();
                 break;
-            case "m":
-            case "M":
-                this.toggleMute();
-                break;
         }
     };
     seekRelative(frames) {
@@ -1432,28 +1449,6 @@ export class HeliosPlayer extends HTMLElement {
         else {
             document.exitFullscreen();
         }
-    };
-    handleScrubberHover = (e) => {
-        if (!this.controller)
-            return;
-        const state = this.controller.getState();
-        const duration = state.duration;
-        // If no duration, cannot calculate time
-        if (!duration || duration <= 0)
-            return;
-        const rect = this.scrubberWrapper.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const pct = Math.max(0, Math.min(1, x / rect.width));
-        const time = pct * duration;
-        this.tooltip.textContent = time.toFixed(2);
-        // Clamp tooltip position to prevent overflow at edges could be added,
-        // but centering via transform and clamping left handles most cases.
-        // For now, follow cursor.
-        this.tooltip.style.left = `${x}px`;
-        this.tooltip.classList.remove("hidden");
-    };
-    handleScrubberLeave = () => {
-        this.tooltip.classList.add("hidden");
     };
     updateFullscreenUI = () => {
         if (document.fullscreenElement === this) {
