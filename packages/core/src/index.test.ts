@@ -1215,4 +1215,70 @@ Updated`;
         expect(helios.getState().isPlaying).toBe(false);
     });
   });
+
+  describe('Helios Synchronization', () => {
+    it('should sync with master', () => {
+      const h1 = new Helios({ duration: 10, fps: 30 });
+      const h2 = new Helios({ duration: 10, fps: 30 });
+
+      h2.bindTo(h1);
+      h1.seek(30); // 1 second
+
+      expect(h2.currentFrame.peek()).toBe(30);
+      expect(h2.currentTime.peek()).toBe(1);
+    });
+
+    it('should sync playback state', () => {
+      const h1 = new Helios({ duration: 10, fps: 30 });
+      const h2 = new Helios({ duration: 10, fps: 30 });
+
+      h2.bindTo(h1);
+
+      h1.play();
+      expect(h2.isPlaying.peek()).toBe(true);
+
+      h1.pause();
+      expect(h2.isPlaying.peek()).toBe(false);
+
+      h1.setPlaybackRate(2);
+      expect(h2.playbackRate.peek()).toBe(2);
+    });
+
+    it('should stop syncing when unbound', () => {
+      const h1 = new Helios({ duration: 10, fps: 30 });
+      const h2 = new Helios({ duration: 10, fps: 30 });
+
+      h2.bindTo(h1);
+      h1.seek(30);
+      expect(h2.currentFrame.peek()).toBe(30);
+
+      h2.unbind();
+      h1.seek(60);
+      expect(h2.currentFrame.peek()).toBe(30); // Should stay at old frame
+    });
+
+    it('should sync with different FPS', () => {
+      const h1 = new Helios({ duration: 10, fps: 30 });
+      const h2 = new Helios({ duration: 10, fps: 60 }); // Double FPS
+
+      h2.bindTo(h1);
+      h1.seek(30); // 1 second
+
+      // h2 should be at 1 second * 60 fps = 60 frames
+      expect(h2.currentFrame.peek()).toBe(60);
+      expect(h2.currentTime.peek()).toBe(1);
+    });
+
+    it('should sync with different FPS (fractional)', () => {
+      const h1 = new Helios({ duration: 10, fps: 30 });
+      const h2 = new Helios({ duration: 10, fps: 24 });
+
+      h2.bindTo(h1);
+      h1.seek(15); // 0.5 seconds
+
+      // h2 should be at 0.5 * 24 = 12 frames
+      expect(h2.currentFrame.peek()).toBe(12);
+      expect(h2.currentTime.peek()).toBe(0.5);
+    });
+  });
 });
