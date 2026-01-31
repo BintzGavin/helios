@@ -17,11 +17,17 @@ export type HeliosState = {
   playbackRate: number;
   volume: number;
   muted: boolean;
+  audioTracks: Record<string, AudioTrackState>;
   captions: CaptionCue[];
   activeCaptions: CaptionCue[];
   markers: Marker[];
   playbackRange: [number, number] | null;
   currentTime: number;
+};
+
+export type AudioTrackState = {
+  volume: number;
+  muted: boolean;
 };
 
 export type HeliosSubscriber = (state: HeliosState) => void;
@@ -109,6 +115,7 @@ export class Helios {
   private _playbackRate: Signal<number>;
   private _volume: Signal<number>;
   private _muted: Signal<boolean>;
+  private _audioTracks: Signal<Record<string, AudioTrackState>>;
   private _captions: Signal<CaptionCue[]>;
   private _activeCaptions: Signal<CaptionCue[]>;
   private _markers: Signal<Marker[]>;
@@ -169,6 +176,12 @@ export class Helios {
    * Can be subscribed to for reactive updates.
    */
   public get muted(): ReadonlySignal<boolean> { return this._muted; }
+
+  /**
+   * Signal for the audio tracks state.
+   * Can be subscribed to for reactive updates.
+   */
+  public get audioTracks(): ReadonlySignal<Record<string, AudioTrackState>> { return this._audioTracks; }
 
   /**
    * Signal for the full list of captions.
@@ -452,6 +465,7 @@ export class Helios {
     this._playbackRate = signal(options.playbackRate ?? 1);
     this._volume = signal(options.volume ?? 1);
     this._muted = signal(options.muted ?? false);
+    this._audioTracks = signal({});
     this._captions = signal(initialCaptions);
     this._markers = signal(initialMarkers);
     this._width = signal(width);
@@ -492,7 +506,8 @@ export class Helios {
       isPlaying: this._isPlaying.value,
       playbackRate: this._playbackRate.value,
       volume: this._volume.value,
-      muted: this._muted.value
+      muted: this._muted.value,
+      audioTracks: this._audioTracks.value
     });
 
     // Ticker Selection
@@ -512,6 +527,7 @@ export class Helios {
       playbackRate: this._playbackRate.value,
       volume: this._volume.value,
       muted: this._muted.value,
+      audioTracks: this._audioTracks.value,
       captions: this._captions.value,
       activeCaptions: this.activeCaptions.value,
       markers: this._markers.value,
@@ -560,7 +576,8 @@ export class Helios {
         isPlaying: this._isPlaying.peek(),
         playbackRate: this._playbackRate.peek(),
         volume: this._volume.peek(),
-        muted: this._muted.peek()
+        muted: this._muted.peek(),
+        audioTracks: this._audioTracks.peek()
       });
     }
   }
@@ -590,7 +607,8 @@ export class Helios {
       isPlaying: this._isPlaying.peek(),
       playbackRate: this._playbackRate.peek(),
       volume: this._volume.peek(),
-      muted: this._muted.peek()
+      muted: this._muted.peek(),
+      audioTracks: this._audioTracks.peek()
     });
   }
 
@@ -617,7 +635,8 @@ export class Helios {
       isPlaying: this._isPlaying.peek(),
       playbackRate: this._playbackRate.peek(),
       volume: clamped,
-      muted: this._muted.peek()
+      muted: this._muted.peek(),
+      audioTracks: this._audioTracks.peek()
     });
   }
 
@@ -630,7 +649,49 @@ export class Helios {
       isPlaying: this._isPlaying.peek(),
       playbackRate: this._playbackRate.peek(),
       volume: this._volume.peek(),
-      muted: muted
+      muted: muted,
+      audioTracks: this._audioTracks.peek()
+    });
+  }
+
+  public setAudioTrackVolume(trackId: string, volume: number) {
+    const clamped = Math.max(0, Math.min(1, volume));
+    const currentTracks = this._audioTracks.peek();
+    const track = currentTracks[trackId] || { volume: 1, muted: false };
+
+    this._audioTracks.value = {
+      ...currentTracks,
+      [trackId]: { ...track, volume: clamped }
+    };
+
+    // Sync driver immediately
+    const currentFrame = this._currentFrame.peek();
+    this.driver.update((currentFrame / this._fps.value) * 1000, {
+      isPlaying: this._isPlaying.peek(),
+      playbackRate: this._playbackRate.peek(),
+      volume: this._volume.peek(),
+      muted: this._muted.peek(),
+      audioTracks: this._audioTracks.value
+    });
+  }
+
+  public setAudioTrackMuted(trackId: string, muted: boolean) {
+    const currentTracks = this._audioTracks.peek();
+    const track = currentTracks[trackId] || { volume: 1, muted: false };
+
+    this._audioTracks.value = {
+      ...currentTracks,
+      [trackId]: { ...track, muted }
+    };
+
+    // Sync driver immediately
+    const currentFrame = this._currentFrame.peek();
+    this.driver.update((currentFrame / this._fps.value) * 1000, {
+      isPlaying: this._isPlaying.peek(),
+      playbackRate: this._playbackRate.peek(),
+      volume: this._volume.peek(),
+      muted: this._muted.peek(),
+      audioTracks: this._audioTracks.value
     });
   }
 
@@ -757,7 +818,8 @@ export class Helios {
       isPlaying: true,
       playbackRate: this._playbackRate.peek(),
       volume: this._volume.peek(),
-      muted: this._muted.peek()
+      muted: this._muted.peek(),
+      audioTracks: this._audioTracks.peek()
     });
 
     this.ticker.start(this.onTick);
@@ -774,7 +836,8 @@ export class Helios {
       isPlaying: false,
       playbackRate: this._playbackRate.peek(),
       volume: this._volume.peek(),
-      muted: this._muted.peek()
+      muted: this._muted.peek(),
+      audioTracks: this._audioTracks.peek()
     });
   }
 
@@ -786,7 +849,8 @@ export class Helios {
       isPlaying: this._isPlaying.peek(),
       playbackRate: this._playbackRate.peek(),
       volume: this._volume.peek(),
-      muted: this._muted.peek()
+      muted: this._muted.peek(),
+      audioTracks: this._audioTracks.peek()
     });
   }
 
@@ -855,7 +919,8 @@ export class Helios {
                 isPlaying: false,
                 playbackRate: this._playbackRate.peek(),
                 volume: this._volume.peek(),
-                muted: this._muted.peek()
+                muted: this._muted.peek(),
+                audioTracks: this._audioTracks.peek()
             });
         }
         requestAnimationFrame(poll);
@@ -938,7 +1003,8 @@ export class Helios {
       isPlaying: true,
       playbackRate,
       volume: this._volume.peek(),
-      muted: this._muted.peek()
+      muted: this._muted.peek(),
+      audioTracks: this._audioTracks.peek()
     });
   }
 }

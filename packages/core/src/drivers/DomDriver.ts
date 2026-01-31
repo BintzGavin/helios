@@ -118,7 +118,13 @@ export class DomDriver implements TimeDriver {
     this.scopes.clear();
   }
 
-  update(timeInMs: number, options: { isPlaying: boolean; playbackRate: number; volume?: number; muted?: boolean } = { isPlaying: false, playbackRate: 1 }) {
+  update(timeInMs: number, options: {
+    isPlaying: boolean;
+    playbackRate: number;
+    volume?: number;
+    muted?: boolean;
+    audioTracks?: Record<string, { volume: number; muted: boolean }>;
+  } = { isPlaying: false, playbackRate: 1 }) {
     if (!this.scope) return;
     if (typeof document === 'undefined') return;
 
@@ -205,7 +211,13 @@ export class DomDriver implements TimeDriver {
     });
   }
 
-  private syncMediaElements(timeInMs: number, { isPlaying, playbackRate, volume, muted }: { isPlaying: boolean; playbackRate: number; volume?: number; muted?: boolean }) {
+  private syncMediaElements(timeInMs: number, { isPlaying, playbackRate, volume, muted, audioTracks }: {
+    isPlaying: boolean;
+    playbackRate: number;
+    volume?: number;
+    muted?: boolean;
+    audioTracks?: Record<string, { volume: number; muted: boolean }>;
+  }) {
     if (!this.scope) return;
 
     // Use cached mediaElements instead of querySelectorAll
@@ -213,6 +225,16 @@ export class DomDriver implements TimeDriver {
 
     this.mediaElements.forEach((el) => {
       let state = this.trackStates.get(el);
+
+      // --- Track Logic ---
+      const trackId = el.getAttribute('data-helios-track-id');
+      let trackVol = 1;
+      let trackMuted = false;
+
+      if (trackId && audioTracks && audioTracks[trackId]) {
+        trackVol = audioTracks[trackId].volume;
+        trackMuted = audioTracks[trackId].muted;
+      }
 
       // --- Volume Logic ---
       const currentVol = el.volume;
@@ -229,7 +251,7 @@ export class DomDriver implements TimeDriver {
 
       // If master volume is provided, use it; otherwise assume 1 (no scaling)
       const masterVolume = volume ?? 1;
-      const effectiveVol = Math.max(0, Math.min(1, baseVol * masterVolume));
+      const effectiveVol = Math.max(0, Math.min(1, baseVol * masterVolume * trackVol));
 
       if (Math.abs(el.volume - effectiveVol) > 0.0001) {
         el.volume = effectiveVol;
@@ -250,7 +272,7 @@ export class DomDriver implements TimeDriver {
 
       // If master muted is provided, use it; otherwise assume false (no forced mute)
       const masterMuted = muted ?? false;
-      const effectiveMuted = baseMuted || masterMuted;
+      const effectiveMuted = baseMuted || masterMuted || trackMuted;
 
       if (el.muted !== effectiveMuted) {
         el.muted = effectiveMuted;

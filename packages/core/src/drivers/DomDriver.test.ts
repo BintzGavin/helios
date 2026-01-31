@@ -571,4 +571,74 @@ describe('DomDriver', () => {
         expect(mockVideo.volume).toBe(0.5);
     });
   });
+
+  describe('Audio Tracks', () => {
+    it('should apply track volume from data-helios-track-id', async () => {
+      const mockAudio = document.createElement('audio');
+      Object.defineProperty(mockAudio, 'volume', { value: 1, writable: true });
+      mockAudio.setAttribute('data-helios-track-id', 'bgm');
+      scope.appendChild(mockAudio);
+      await new Promise(resolve => setTimeout(resolve, 20));
+
+      driver.update(0, {
+        isPlaying: false, playbackRate: 1, volume: 1,
+        audioTracks: {
+          'bgm': { volume: 0.5, muted: false }
+        }
+      });
+
+      expect(mockAudio.volume).toBe(0.5);
+    });
+
+    it('should mix master volume and track volume', async () => {
+      const mockAudio = document.createElement('audio');
+      Object.defineProperty(mockAudio, 'volume', { value: 1, writable: true });
+      mockAudio.setAttribute('data-helios-track-id', 'voice');
+      scope.appendChild(mockAudio);
+      await new Promise(resolve => setTimeout(resolve, 20));
+
+      // Master 0.5 * Track 0.5 = 0.25
+      driver.update(0, {
+        isPlaying: false, playbackRate: 1, volume: 0.5,
+        audioTracks: {
+          'voice': { volume: 0.5, muted: false }
+        }
+      });
+
+      expect(mockAudio.volume).toBe(0.25);
+    });
+
+    it('should apply track mute from data-helios-track-id', async () => {
+      const mockAudio = document.createElement('audio');
+      Object.defineProperty(mockAudio, 'muted', { value: false, writable: true });
+      mockAudio.setAttribute('data-helios-track-id', 'sfx');
+      scope.appendChild(mockAudio);
+      await new Promise(resolve => setTimeout(resolve, 20));
+
+      driver.update(0, {
+        isPlaying: false, playbackRate: 1,
+        audioTracks: {
+          'sfx': { volume: 1, muted: true }
+        }
+      });
+
+      expect(mockAudio.muted).toBe(true);
+    });
+
+    it('should NOT affect elements without track ID', async () => {
+      const mockAudio = document.createElement('audio');
+      Object.defineProperty(mockAudio, 'volume', { value: 1, writable: true });
+      scope.appendChild(mockAudio);
+      await new Promise(resolve => setTimeout(resolve, 20));
+
+      driver.update(0, {
+        isPlaying: false, playbackRate: 1, volume: 1,
+        audioTracks: {
+          'bgm': { volume: 0.1, muted: true }
+        }
+      });
+
+      expect(mockAudio.volume).toBe(1);
+    });
+  });
 });

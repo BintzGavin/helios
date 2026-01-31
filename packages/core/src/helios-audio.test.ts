@@ -89,4 +89,44 @@ describe('Helios Audio', () => {
       muted: true
     }));
   });
+
+  it('should set audio track volume and sync driver', () => {
+    const helios = new Helios({ duration: 10, fps: 30, driver: mockDriver });
+
+    helios.setAudioTrackVolume('bgm', 0.5);
+    expect(helios.getState().audioTracks['bgm']).toEqual(expect.objectContaining({ volume: 0.5 }));
+
+    expect(mockDriver.update).toHaveBeenCalledWith(expect.any(Number), expect.objectContaining({
+      audioTracks: expect.objectContaining({
+        'bgm': expect.objectContaining({ volume: 0.5 })
+      })
+    }));
+  });
+
+  it('should set audio track muted and sync driver', () => {
+    const helios = new Helios({ duration: 10, fps: 30, driver: mockDriver });
+
+    helios.setAudioTrackMuted('sfx', true);
+    expect(helios.getState().audioTracks['sfx']).toEqual(expect.objectContaining({ muted: true }));
+
+    expect(mockDriver.update).toHaveBeenCalledWith(expect.any(Number), expect.objectContaining({
+      audioTracks: expect.objectContaining({
+        'sfx': expect.objectContaining({ muted: true })
+      })
+    }));
+  });
+
+  it('should expose reactive signals for audio tracks', () => {
+    const helios = new Helios({ duration: 10, fps: 30 });
+    const spy = vi.fn();
+
+    helios.subscribe(spy);
+
+    helios.setAudioTrackVolume('bgm', 0.8);
+    expect(spy).toHaveBeenLastCalledWith(expect.objectContaining({
+      audioTracks: expect.objectContaining({
+        'bgm': expect.objectContaining({ volume: 0.8 })
+      })
+    }));
+  });
 });
