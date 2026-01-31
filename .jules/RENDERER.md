@@ -112,3 +112,7 @@
 ## [2026-04-22] - CdpTimeDriver Determinism
 **Learning:** `CdpTimeDriver` initializes virtual time policy without a fixed epoch (`initialVirtualTime`), causing `Date.now()` to return inconsistent values across runs (based on wall clock). This violates the "Deterministic Rendering" vision.
 **Action:** Created a plan to set `initialVirtualTime` to a fixed epoch (e.g. Jan 1 2024) in `CdpTimeDriver.prepare`, ensuring bit-identical outputs for time-dependent animations.
+
+## [2026-05-26] - CdpTimeDriver Stability Gap
+**Learning:** `CdpTimeDriver` (Canvas mode) awaits `window.helios.waitUntilStable()` indefinitely, unlike `SeekTimeDriver` which respects a timeout. This creates a risk of infinite hanging if user scripts fail to resolve.
+**Action:** Created plan to implement `stabilityTimeout` in `CdpTimeDriver` using `Promise.race`.
