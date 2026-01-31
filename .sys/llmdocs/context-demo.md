@@ -69,10 +69,11 @@ Tests are located in `tests/e2e/`.
     - Renders each example to MP4 using `Renderer`.
     - Supports filtering via command line arguments.
 - **verify-client-export.ts**: Verifies the client-side export pipeline.
-    - Spawns a Vite preview server.
+    - Dynamically discovers all examples in `examples/`.
+    - Spawns a local Node.js HTTP server.
     - Launches Playwright (Chromium).
-    - Navigates to `examples/client-export-api`.
-    - Clicks the "Export" button and waits for the "Done" state.
+    - Iterates through examples, loading each into a generic `<helios-player>` fixture (`tests/e2e/fixtures/dynamic-player.html`).
+    - Triggers export via the player UI and verifies the download event.
 - **verify-player.ts**: Verifies the `<helios-player>` Web Component.
     - Spawns a static file server.
     - Launches Playwright.

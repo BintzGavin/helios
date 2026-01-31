@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Helios Player Dynamic Verification</title>
+    <script type="importmap">
+    {
+        "imports": {
+            "@helios-project/core": "/packages/core/dist/index.js"
+        }
+    }
+    </script>
+    <script type="module" src="/packages/player/dist/helios-player.bundle.mjs"></script>
+    <style>
+        body { margin: 0; padding: 20px; font-family: sans-serif; }
+    </style>
+</head>
+<body>
+    <h1>Helios Player Dynamic Verification</h1>
+    <helios-player
+        width="800"
+        height="600"
+        controls
+        auto-plot
+    ></helios-player>
+
+    <script>
+        const player = document.querySelector('helios-player');
+        const params = new URLSearchParams(window.location.search);
+        const src = params.get('src');
+        const exportMode = params.get('export-mode');
+
+        if (src) {
+            console.log('Setting player src to:', src);
+            player.setAttribute('src', src);
+        } else {
+            console.error('No "src" query parameter provided.');
+            document.body.innerHTML += '<p style="color:red">Error: Missing "src" query parameter</p>';
+        }
+
+        if (exportMode) {
+            console.log('Setting export-mode to:', exportMode);
+            player.setAttribute('export-mode', exportMode);
+        }
+    </script>
+</body>
+</html>
