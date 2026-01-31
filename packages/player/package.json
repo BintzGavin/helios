@@ -16,6 +16,8 @@
     "access": "public"
   },
   "main": "dist/index.js",
+  "module": "dist/index.js",
+  "unpkg": "dist/helios-player.global.js",
   "types": "dist/index.d.ts",
   "files": [
     "dist"
@@ -24,10 +26,12 @@
     ".": "./dist/index.js",
     "./bridge": "./dist/bridge.js",
     "./controllers": "./dist/controllers.js",
-    "./features/exporter": "./dist/features/exporter.js"
+    "./features/exporter": "./dist/features/exporter.js",
+    "./bundle": "./dist/helios-player.bundle.mjs",
+    "./global": "./dist/helios-player.global.js"
   },
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && vite build",
     "dev": "tsc -w",
     "test": "vitest"
   },
