@@ -1,3 +1,6 @@
+## DEMO v1.70.1
+- ✅ Completed: Re-verify Client-Side Export - Confirmed successful build and E2E verification of the client-side export example.
+
 ## DEMO v1.70.0
 - ✅ Completed: Dynamic Verification Pipeline - Refactored build and test scripts to dynamically discover examples, reducing maintenance burden and enabling unified verification via 'verify:e2e'.
 
