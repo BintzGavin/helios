@@ -73,7 +73,8 @@ async function testCodec(codecOption: string | undefined, expectedFourCC: string
 
 async function run() {
   try {
-    await testCodec(undefined, 'VP80', 'Default (VP8)');
+    // Default is now H.264 (avc1), which does not use IVF header (NONE)
+    await testCodec(undefined, 'NONE', 'Default (H.264)');
     await testCodec('vp8', 'VP80', 'Explicit VP8');
     await testCodec('vp9', 'VP90', 'VP9');
     await testCodec('av1', 'AV01', 'AV1');
