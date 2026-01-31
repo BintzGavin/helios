@@ -23,6 +23,7 @@ The `examples/` directory contains reference implementations for various framewo
 - **promo-video**: A marketing video example.
 - **react-animation-helpers**: React components for sequencing and timing.
 - **react-canvas-animation**: Basic React + Canvas example.
+- **react-captions-animation**: React integration with Helios SRT captions.
 - **react-css-animation**: React with CSS animations.
 - **react-dom-animation**: Basic React + DOM example.
 - **react-styled-components**: React with Styled Components.

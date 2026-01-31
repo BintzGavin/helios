@@ -119,3 +119,6 @@ Each agent should update **their own dedicated progress file** instead of this f
 
 ## CORE v2.18.0
 - ✅ Completed: Schema Constraints - Added `minItems`, `maxItems`, `minLength`, `maxLength` constraints to `PropDefinition` and implemented validation logic.
+
+## DEMO v1.71.0
+- ✅ Completed: Scaffold React Captions Animation - Created `examples/react-captions-animation` demonstrating `useCaptions` hook for integrating Helios SRT parsing with React.
