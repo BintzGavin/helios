@@ -32,6 +32,7 @@ async function main() {
         height: 1080,
         fps: 30,
         durationInSeconds: 10,
+        // frameCount: 300, // Optional: Override durationInSeconds with exact frame count
         mode: 'canvas', // Use 'dom' if your animation uses CSS/HTML elements
 
         // Audio Configuration

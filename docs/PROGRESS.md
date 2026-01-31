@@ -122,3 +122,11 @@ Each agent should update **their own dedicated progress file** instead of this f
 
 ## DEMO v1.71.0
 - ✅ Completed: Scaffold React Captions Animation - Created `examples/react-captions-animation` demonstrating `useCaptions` hook for integrating Helios SRT parsing with React.
+
+## SKILLS v1.7.0
+- ✅ Completed: Daily Skills Review
+  - Updated API skills for `core` (AI Context, Schema Groups)
+  - Updated API skills for `renderer` (frameCount, H.264 priority)
+  - Updated API skills for `player` (export-caption-mode, Text Tracks)
+  - Updated API skills for `studio` (MCP, Persistent Jobs)
+  - Updated workflow skills for `render-video`

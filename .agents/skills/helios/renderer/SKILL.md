@@ -42,6 +42,7 @@ interface RendererOptions {
   height: number;          // Output height
   fps: number;             // Frames per second
   durationInSeconds: number; // Duration of the clip
+  frameCount?: number;     // Exact total frames (overrides durationInSeconds)
   startFrame?: number;     // Frame to start rendering from (default: 0)
   mode?: 'dom' | 'canvas'; // Rendering strategy (default: 'canvas')
   inputProps?: Record<string, any>; // Inject props into window.__HELIOS_PROPS__
@@ -53,7 +54,7 @@ interface RendererOptions {
   audioBitrate?: string;         // e.g., '128k', '192k'
 
   // Video Encoding
-  videoCodec?: string;           // e.g., 'libx264' (default), 'libvpx'
+  videoCodec?: string;           // e.g., 'libx264' (default, prioritized), 'libvpx'
   pixelFormat?: string;          // e.g., 'yuv420p' (default)
   crf?: number;                  // Constant Rate Factor (quality control)
   preset?: string;               // Encoding preset (e.g., 'fast')

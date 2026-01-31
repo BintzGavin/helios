@@ -32,9 +32,17 @@ This will start a local server (typically at `http://localhost:5173`) where you 
   - `I` / `O`: Set In / Out points (Playback Range)
   - `L`: Toggle Loop
 
+### MCP Server
+The Studio runs a Model Context Protocol (MCP) server, allowing AI agents to:
+- Inspect composition schemas.
+- Update input props.
+- Trigger renders.
+- Create new compositions.
+
 ### Props Editor
 The Props Editor generates a UI based on your `HeliosSchema`.
 
+- **Groups:** Organize props into collapsible sections using the `group` schema property.
 - **Schema-Aware Inputs:**
   - `number`: Slider (if min/max set), Stepped Slider (if step set).
   - `color`: Color picker.
@@ -64,6 +72,7 @@ The Props Editor generates a UI based on your `HeliosSchema`.
 - **Renders Panel:** Trigger server-side renders directly from the UI.
 - **Configuration:** Select format (MP4/WebM), resolution, and codec.
 - **Progress:** Track render progress and cancel jobs if needed.
+- **Persistent Jobs:** Render history persists across server restarts.
 - **Client-Side Export:** Export directly from the browser using WebCodecs.
 
 ## Environment Variables

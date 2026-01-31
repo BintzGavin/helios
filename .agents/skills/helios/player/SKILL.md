@@ -42,7 +42,9 @@ The `<helios-player>` Web Component allows you to embed and control Helios compo
 | `input-props` | JSON string | Pass initial properties to the composition |
 | `export-mode` | 'auto' \| 'canvas' \| 'dom' | Strategy for client-side export (default: 'auto') |
 | `export-format` | 'mp4' \| 'webm' | Output format for client-side export (default: 'mp4') |
+| `export-caption-mode` | 'burn-in' \| 'file' | How to handle captions during export (default: 'burn-in') |
 | `canvas-selector`| string | CSS selector for the canvas element (default: 'canvas') |
+| `sandbox` | string | Iframe sandbox flags (default: 'allow-scripts allow-same-origin') |
 
 ### CSS Variables (Theming)
 
@@ -98,6 +100,10 @@ console.log(player.error);        // MediaError object if failed
 
 // Input Props
 player.inputProps = { title: "Updated Title" };
+
+// Text Tracks
+console.log(player.textTracks);
+player.addTextTrack("captions", "English", "en");
 ```
 
 #### Events

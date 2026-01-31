@@ -1,10 +1,11 @@
 # Status: SKILLS
 
-**Version**: 1.6.0
+**Version**: 1.7.0
 - **Status**: Active
 - **Current Focus**: Comprehensive Skills Coverage
-- **Last Updated**: 2026-05-28
+- **Last Updated**: 2026-05-29
 
+[v1.7.0] ✅ Completed: Daily Skills Review - Updated Core with AI Context and Schema Groups. Updated Renderer with frameCount and H.264 priority. Updated Player with export-caption-mode and Text Tracks. Updated Studio with MCP and Persistent Jobs.
 [v1.6.0] ✅ Completed: Daily Skills Review - Updated API skills for Core (Signals, Animation), Renderer (Diagnostics, Options), Player (Standard Media API). Updated Studio skill with new features. Created Podcast Visualizer workflow skill.
 [v1.5.0] ✅ Completed: Daily Skills Review - Created Solid, Pixi, Chart.js, and Lottie skills. Updated Core with Stability Registry. Updated Renderer with subtitles and attributes. Updated Player with read-only props.
 [v1.4.0] ✅ Completed: Daily Skills Review - Added Three.js (Vanilla + R3F) skill. Updated Core skill with Marker and Playback Range APIs. Updated Renderer skill with advanced capture options.
