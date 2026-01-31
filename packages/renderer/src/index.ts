@@ -127,7 +127,9 @@ export class Renderer {
       console.log('Strategy prepared.');
 
       const ffmpegPath = this.options.ffmpegPath || ffmpeg.path;
-      const totalFrames = this.options.durationInSeconds * this.options.fps;
+      const totalFrames = this.options.frameCount
+        ? this.options.frameCount
+        : this.options.durationInSeconds * this.options.fps;
       const fps = this.options.fps;
       const startFrame = this.options.startFrame || 0;
 

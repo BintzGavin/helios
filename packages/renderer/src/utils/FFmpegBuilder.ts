@@ -172,7 +172,11 @@ export class FFmpegBuilder {
         }
       }
 
-      finalArgs.push('-c:a', audioCodec, '-t', options.durationInSeconds.toString());
+      const duration = options.frameCount
+        ? options.frameCount / options.fps
+        : options.durationInSeconds;
+
+      finalArgs.push('-c:a', audioCodec, '-t', duration.toString());
 
       if (options.audioBitrate) {
         finalArgs.push('-b:a', options.audioBitrate);
