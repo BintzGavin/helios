@@ -27,7 +27,7 @@
 - `examples/react-css-animation`: React CSS Animations.
 - `examples/react-transitions`: React transitions (CSS animation synchronization).
 - `examples/react-styled-components`: React Styled Components (CSS-in-JS).
-- `examples/react-animation-helpers`: React `<Sequence>`, `<Series>`.
+- `examples/react-animation-helpers`: React `<Sequence>`, `<Series>`, helpers (`interpolate`, `spring`).
 - `examples/vue-canvas-animation`: Vue Canvas.
 - `examples/vue-dom-animation`: Vue DOM.
 - `examples/vue-animation-helpers`: Vue `<Sequence>`, `<Series>`.
@@ -60,4 +60,4 @@
 ## C. E2E Tests
 - **File**: `tests/e2e/verify-render.ts`
 - **Methodology**: Builds all examples using `vite.build-example.config.js`, then uses `Renderer` (headless browser + FFmpeg) to render a 5-second video for each, supporting both 'canvas' and 'dom' modes.
-- **Verification**: Checks that render completes without error and output file exists. Does NOT verify visual content correctness (opacity, etc).
+- **Verification**: Checks that render completes without error and output file exists. Does NOT verify visual content correctness (opacity, etc). Supports filtering test cases via CLI arguments.

@@ -54,11 +54,18 @@ const CASES = [
 ];
 
 async function main() {
-  console.log('Starting E2E verification render for all examples...');
+  const filter = process.argv[2];
+  console.log('Starting E2E verification render...');
+
+  let casesToRun = CASES;
+  if (filter) {
+    console.log(`Filtering cases by "${filter}"...`);
+    casesToRun = CASES.filter(c => c.name.toLowerCase().includes(filter.toLowerCase()));
+  }
 
   let failedCases = 0;
 
-  for (const testCase of CASES) {
+  for (const testCase of casesToRun) {
     console.log(`\nVerifying ${testCase.name}...`);
 
     // Create a new renderer for each case to ensure clean state
@@ -106,7 +113,7 @@ async function main() {
     console.error(`❌ Verification finished with ${failedCases} failures.`);
     process.exit(1);
   } else {
-    console.log(`✅ All ${CASES.length} examples verified successfully!`);
+    console.log(`✅ All ${casesToRun.length} examples verified successfully!`);
     process.exit(0);
   }
 }

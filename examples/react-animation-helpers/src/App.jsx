@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Helios } from '../../../packages/core/src/index.ts';
+import { Helios, interpolate, spring } from '../../../packages/core/src/index.ts';
 import { Sequence } from './components/Sequence';
 import { Series } from './components/Series';
 import { FrameContext } from './components/FrameContext';
@@ -40,6 +40,36 @@ const MovingBox = ({ color, label }) => {
   );
 };
 
+const HelperDemo = () => {
+  const frame = useVideoFrame();
+
+  // Interpolate x position: 0 -> 200 over frames 0-60
+  const x = interpolate(frame, [0, 60], [0, 200], { extrapolateRight: 'clamp' });
+
+  // Spring scale: 0 -> 1 starting at frame 0
+  const scale = spring({ frame, fps: 30, from: 0, to: 1, config: { stiffness: 100 } });
+
+  return (
+    <div style={{
+      position: 'absolute',
+      top: '250px',
+      left: '50px',
+      transform: `translateX(${x}px) scale(${scale})`,
+      width: '100px',
+      height: '100px',
+      background: 'hotpink',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      color: 'white',
+      fontWeight: 'bold',
+      border: '2px solid white'
+    }}>
+      Helpers
+    </div>
+  );
+};
+
 export default function App() {
   const [frame, setFrame] = useState(0);
 
@@ -63,6 +93,8 @@ export default function App() {
             <MovingBox color="#4444ff" label="Seq 2" />
           </Sequence>
         </Series>
+
+        <HelperDemo />
       </div>
     </FrameContext.Provider>
   );
