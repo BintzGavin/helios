@@ -140,12 +140,21 @@ template.innerHTML = `
       background-color: #666;
       cursor: not-allowed;
     }
-    .scrubber {
+    .scrubber-wrapper {
       flex-grow: 1;
       margin: 0 16px;
-      -webkit-appearance: none;
-      width: 100%;
+      position: relative;
       height: 8px;
+      display: flex;
+      align-items: center;
+    }
+    .scrubber {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      position: relative;
+      z-index: 1;
+      -webkit-appearance: none;
       background: var(--helios-range-track-color);
       outline: none;
       opacity: 0.9;
@@ -159,6 +168,28 @@ template.innerHTML = `
       background: var(--helios-accent-color);
       cursor: pointer;
       border-radius: 50%;
+    }
+    .markers-container {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 2;
+    }
+    .marker {
+      position: absolute;
+      width: 4px;
+      height: 12px;
+      background-color: var(--helios-accent-color);
+      transform: translateX(-50%);
+      cursor: pointer;
+      pointer-events: auto;
+      border-radius: 2px;
+      top: -2px;
+      transition: transform 0.1s;
+    }
+    .marker:hover {
+      transform: translateX(-50%) scale(1.2);
+      z-index: 10;
     }
     .time-display {
       min-width: 90px;
@@ -369,7 +400,10 @@ template.innerHTML = `
       <option value="1" selected>1x</option>
       <option value="2">2x</option>
     </select>
-    <input type="range" class="scrubber" min="0" value="0" step="1" part="scrubber" aria-label="Seek time">
+    <div class="scrubber-wrapper">
+      <div class="markers-container" part="markers"></div>
+      <input type="range" class="scrubber" min="0" value="0" step="1" part="scrubber" aria-label="Seek time">
+    </div>
     <div class="time-display" part="time-display">0.00 / 0.00</div>
     <button class="fullscreen-btn" part="fullscreen-button" aria-label="Toggle fullscreen">⛶</button>
   </div>
@@ -383,6 +417,7 @@ export class HeliosPlayer extends HTMLElement implements TrackHost {
   private volumeBtn: HTMLButtonElement;
   private volumeSlider: HTMLInputElement;
   private scrubber: HTMLInputElement;
+  private markersContainer: HTMLDivElement;
   private timeDisplay: HTMLDivElement;
   private exportBtn: HTMLButtonElement;
   private overlay: HTMLElement;
@@ -744,6 +779,7 @@ export class HeliosPlayer extends HTMLElement implements TrackHost {
     this.volumeBtn = this.shadowRoot!.querySelector(".volume-btn")!;
     this.volumeSlider = this.shadowRoot!.querySelector(".volume-slider")!;
     this.scrubber = this.shadowRoot!.querySelector(".scrubber")!;
+    this.markersContainer = this.shadowRoot!.querySelector(".markers-container")!;
     this.timeDisplay = this.shadowRoot!.querySelector(".time-display")!;
     this.exportBtn = this.shadowRoot!.querySelector(".export-btn")!;
     this.overlay = this.shadowRoot!.querySelector(".status-overlay")!;
@@ -1551,7 +1587,6 @@ export class HeliosPlayer extends HTMLElement implements TrackHost {
             this.dispatchEvent(new Event("durationchange"));
         }
       }
-      this.lastState = state;
 
       const isFinished = state.currentFrame >= state.duration * state.fps - 1;
 
@@ -1585,6 +1620,33 @@ export class HeliosPlayer extends HTMLElement implements TrackHost {
           this.speedSelector.value = String(state.playbackRate);
       }
 
+      // Update Markers
+      const markersChanged = !this.lastState || state.markers !== this.lastState.markers;
+      if (markersChanged) {
+        this.markersContainer.innerHTML = "";
+        if (state.markers && state.duration > 0) {
+          state.markers.forEach((marker: any) => {
+            const pct = (marker.time / state.duration) * 100;
+            if (pct >= 0 && pct <= 100) {
+              const el = document.createElement("div");
+              el.className = "marker";
+              el.style.left = `${pct}%`;
+              if (marker.color) el.style.backgroundColor = marker.color;
+              el.title = marker.label || "";
+
+              el.addEventListener("click", (e) => {
+                e.stopPropagation();
+                if (this.controller) {
+                  this.controller.seek(Math.floor(marker.time * state.fps));
+                }
+              });
+
+              this.markersContainer.appendChild(el);
+            }
+          });
+        }
+      }
+
       if (state.playbackRange) {
         const totalFrames = state.duration * state.fps;
         if (totalFrames > 0) {
@@ -1616,6 +1678,8 @@ export class HeliosPlayer extends HTMLElement implements TrackHost {
           this.captionsContainer.appendChild(div);
         });
       }
+
+      this.lastState = state;
   }
 
   // --- Loading / Error UI Helpers ---

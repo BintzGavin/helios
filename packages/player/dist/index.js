@@ -128,12 +128,21 @@ template.innerHTML = `
       background-color: #666;
       cursor: not-allowed;
     }
-    .scrubber {
+    .scrubber-wrapper {
       flex-grow: 1;
       margin: 0 16px;
-      -webkit-appearance: none;
-      width: 100%;
+      position: relative;
       height: 8px;
+      display: flex;
+      align-items: center;
+    }
+    .scrubber {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      position: relative;
+      z-index: 1;
+      -webkit-appearance: none;
       background: var(--helios-range-track-color);
       outline: none;
       opacity: 0.9;
@@ -147,6 +156,28 @@ template.innerHTML = `
       background: var(--helios-accent-color);
       cursor: pointer;
       border-radius: 50%;
+    }
+    .markers-container {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 2;
+    }
+    .marker {
+      position: absolute;
+      width: 4px;
+      height: 12px;
+      background-color: var(--helios-accent-color);
+      transform: translateX(-50%);
+      cursor: pointer;
+      pointer-events: auto;
+      border-radius: 2px;
+      top: -2px;
+      transition: transform 0.1s;
+    }
+    .marker:hover {
+      transform: translateX(-50%) scale(1.2);
+      z-index: 10;
     }
     .time-display {
       min-width: 90px;
@@ -357,7 +388,10 @@ template.innerHTML = `
       <option value="1" selected>1x</option>
       <option value="2">2x</option>
     </select>
-    <input type="range" class="scrubber" min="0" value="0" step="1" part="scrubber" aria-label="Seek time">
+    <div class="scrubber-wrapper">
+      <div class="markers-container" part="markers"></div>
+      <input type="range" class="scrubber" min="0" value="0" step="1" part="scrubber" aria-label="Seek time">
+    </div>
     <div class="time-display" part="time-display">0.00 / 0.00</div>
     <button class="fullscreen-btn" part="fullscreen-button" aria-label="Toggle fullscreen">⛶</button>
   </div>
@@ -370,6 +404,7 @@ export class HeliosPlayer extends HTMLElement {
     volumeBtn;
     volumeSlider;
     scrubber;
+    markersContainer;
     timeDisplay;
     exportBtn;
     overlay;
@@ -655,6 +690,12 @@ export class HeliosPlayer extends HTMLElement {
             this.pendingSrc = null;
             this.loadIframe(src);
         }
+        else {
+            const src = this.getAttribute("src");
+            if (src) {
+                this.loadIframe(src);
+            }
+        }
     }
     pause() {
         if (this.controller) {
@@ -673,6 +714,7 @@ export class HeliosPlayer extends HTMLElement {
         this.volumeBtn = this.shadowRoot.querySelector(".volume-btn");
         this.volumeSlider = this.shadowRoot.querySelector(".volume-slider");
         this.scrubber = this.shadowRoot.querySelector(".scrubber");
+        this.markersContainer = this.shadowRoot.querySelector(".markers-container");
         this.timeDisplay = this.shadowRoot.querySelector(".time-display");
         this.exportBtn = this.shadowRoot.querySelector(".export-btn");
         this.overlay = this.shadowRoot.querySelector(".status-overlay");
@@ -1316,6 +1358,33 @@ export class HeliosPlayer extends HTMLElement {
             case ",":
                 this.seekRelative(-1);
                 break;
+            case "i":
+            case "I": {
+                const s = this.controller.getState();
+                const start = Math.floor(s.currentFrame);
+                const totalFrames = s.duration * s.fps;
+                let end = s.playbackRange ? s.playbackRange[1] : totalFrames;
+                if (start >= end) {
+                    end = totalFrames;
+                }
+                this.controller.setPlaybackRange(start, end);
+                break;
+            }
+            case "o":
+            case "O": {
+                const s = this.controller.getState();
+                const end = Math.floor(s.currentFrame);
+                let start = s.playbackRange ? s.playbackRange[0] : 0;
+                if (end <= start) {
+                    start = 0;
+                }
+                this.controller.setPlaybackRange(start, end);
+                break;
+            }
+            case "x":
+            case "X":
+                this.controller.clearPlaybackRange();
+                break;
         }
     };
     seekRelative(frames) {
@@ -1400,6 +1469,28 @@ export class HeliosPlayer extends HTMLElement {
         if (state.playbackRate !== undefined) {
             this.speedSelector.value = String(state.playbackRate);
         }
+        // Update Markers
+        this.markersContainer.innerHTML = "";
+        if (state.markers && state.duration > 0) {
+            state.markers.forEach((marker) => {
+                const pct = (marker.time / state.duration) * 100;
+                if (pct >= 0 && pct <= 100) {
+                    const el = document.createElement("div");
+                    el.className = "marker";
+                    el.style.left = `${pct}%`;
+                    if (marker.color)
+                        el.style.backgroundColor = marker.color;
+                    el.title = marker.label || "";
+                    el.addEventListener("click", (e) => {
+                        e.stopPropagation();
+                        if (this.controller) {
+                            this.controller.seek(Math.floor(marker.time * state.fps));
+                        }
+                    });
+                    this.markersContainer.appendChild(el);
+                }
+            });
+        }
         if (state.playbackRange) {
             const totalFrames = state.duration * state.fps;
             if (totalFrames > 0) {
@@ -1463,8 +1554,7 @@ export class HeliosPlayer extends HTMLElement {
     retryConnection() {
         this.showStatus("Retrying...", false);
         // Reload iframe to force fresh start
-        const src = this.iframe.src;
-        this.iframe.src = src;
+        this.load();
     }
     renderClientSide = async () => {
         // If we are already exporting, this is a cancel request

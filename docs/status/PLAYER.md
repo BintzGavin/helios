@@ -1,4 +1,4 @@
-**Version**: v0.45.0
+**Version**: v0.46.0
 
 # Status: PLAYER
 
@@ -37,10 +37,12 @@
 - Supports importing SRT captions via standard `<track kind="captions">` child elements and exposes standard `textTracks` / `addTextTrack` API.
 - Supports `sandbox` attribute to customize iframe security flags (default: `allow-scripts allow-same-origin`).
 - Implemented robust `load()` behavior that supports reloading the current `src` to facilitate programmatic retries.
+- Visualizes markers on the timeline, allowing users to identify and seek to specific points of interest.
 
 ## Critical Task
 - **None**: Recent task completed.
 
+[v0.46.0] ✅ Completed: Visualize Markers - Implemented visual rendering of timeline markers on the scrubber, including clickable interaction to seek to the marker's timestamp.
 [v0.45.0] ✅ Completed: Interactive Playback Range - Implemented `I` (In), `O` (Out), and `X` (Clear) keyboard shortcuts to set the playback loop range interactively.
 [v0.44.2] ✅ Completed: Fix load() Behavior - Updated `load()` to reload the current source if no pending source exists, and refactored `retryConnection` to use this standard method.
 [v0.44.1] ✅ Completed: Documentation Update - Synced package.json version and documented missing features (sandbox, controlslist, textTracks, CSS vars).

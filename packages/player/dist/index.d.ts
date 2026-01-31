@@ -20,6 +20,7 @@ export declare class HeliosPlayer extends HTMLElement implements TrackHost {
     private volumeBtn;
     private volumeSlider;
     private scrubber;
+    private markersContainer;
     private timeDisplay;
     private exportBtn;
     private overlay;
