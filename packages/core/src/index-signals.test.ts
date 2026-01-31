@@ -69,4 +69,38 @@ describe('Helios Signals API', () => {
     expect(currentProps).toEqual(props);
     expect(helios.inputProps.value).toEqual(props);
   });
+
+  it('should expose duration and fps as signals', () => {
+    const helios = new Helios({ duration: 10, fps: 30 });
+    expect(helios.duration.value).toBe(10);
+    expect(helios.fps.value).toBe(30);
+  });
+
+  it('should update duration signal on setDuration', () => {
+    const helios = new Helios({ duration: 10, fps: 30 });
+    let durationValue = -1;
+    effect(() => {
+      durationValue = helios.duration.value;
+    });
+
+    expect(durationValue).toBe(10);
+
+    helios.setDuration(20);
+    expect(durationValue).toBe(20);
+    expect(helios.duration.value).toBe(20);
+  });
+
+  it('should update fps signal on setFps', () => {
+    const helios = new Helios({ duration: 10, fps: 30 });
+    let fpsValue = -1;
+    effect(() => {
+      fpsValue = helios.fps.value;
+    });
+
+    expect(fpsValue).toBe(30);
+
+    helios.setFps(60);
+    expect(fpsValue).toBe(60);
+    expect(helios.fps.value).toBe(60);
+  });
 });

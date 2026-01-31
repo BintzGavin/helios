@@ -1,11 +1,12 @@
 # Status: CORE
 
-**Version**: 2.20.0
+**Version**: 3.0.0
 
 - **Status**: Active
 - **Current Focus**: Maintenance, Optimization, and Stability
-- **Last Updated**: 2026-05-25
+- **Last Updated**: 2026-05-26
 
+[v3.0.0] ✅ Completed: Expose Duration/FPS Signals - Changed `duration` and `fps` to return `ReadonlySignal<number>` for reactive updates (Breaking Change).
 [v2.20.0] ✅ Completed: Audio Diagnostics - Added audioCodecs (aac, opus) detection to Helios.diagnose() and DiagnosticReport.
 [v2.19.1] ✅ Completed: Update Documentation - Added usage examples for `stagger` and `shift` to README.
 [v2.19.0] ✅ Completed: Implement Sequencing Helpers - Added `stagger` and `shift` utilities to `packages/core` to simplify animation timing.

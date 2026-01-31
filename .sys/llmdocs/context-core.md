@@ -124,10 +124,8 @@ class Helios {
   public get playbackRange(): ReadonlySignal<[number, number] | null>;
   public get width(): ReadonlySignal<number>;
   public get height(): ReadonlySignal<number>;
-
-  // Getters
-  public get duration(): number;
-  public get fps(): number;
+  public get duration(): ReadonlySignal<number>;
+  public get fps(): ReadonlySignal<number>;
 
   // Static
   static diagnose(): Promise<DiagnosticReport>;

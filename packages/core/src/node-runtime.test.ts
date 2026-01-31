@@ -12,7 +12,7 @@ describe('Helios - Node Runtime Support', () => {
     });
 
     expect(helios).toBeDefined();
-    expect(helios.fps).toBe(30);
+    expect(helios.fps.value).toBe(30);
   });
 
   it('should play using TimeoutTicker in Node environment', async () => {
