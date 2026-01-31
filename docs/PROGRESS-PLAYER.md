@@ -1,5 +1,8 @@
 # PLAYER Progress Log
 
+## PLAYER v0.49.1
+- ✅ Completed: Persist Media Properties - Implemented persistence for `volume`, `playbackRate`, and `muted` properties so values set before the player loads are applied when the controller connects.
+
 ## PLAYER v0.49.0
 - ✅ Completed: Picture-in-Picture - Implemented `requestPictureInPicture` API and UI toggle button for the player, supported in Direct/Same-Origin mode.
 
