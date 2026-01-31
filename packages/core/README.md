@@ -62,7 +62,7 @@ helios.setInputProps({ text: 'Hello World' });
 Coordinate animations relative to a parent time or in a sequence.
 
 ```typescript
-import { sequence, series } from '@helios-project/core';
+import { sequence, series, stagger, shift } from '@helios-project/core';
 
 // Calculate local time for an item starting at frame 0 with duration 30
 const { localFrame, progress, isActive } = sequence({
@@ -86,6 +86,17 @@ const sequencedItems = series(items);
 // sequencedItems[0].from = 0
 // sequencedItems[1].from = 60
 // sequencedItems[2].from = 180
+
+// Stagger items by a fixed interval
+const letters = [{ char: 'H' }, { char: 'i' }];
+const staggered = stagger(letters, 5, 10); // interval: 5, startFrame: 10
+// staggered[0].from = 10
+// staggered[1].from = 15
+
+// Shift a group of items
+const shifted = shift(staggered, 100);
+// shifted[0].from = 110
+// shifted[1].from = 115
 ```
 
 ### Animation Helpers

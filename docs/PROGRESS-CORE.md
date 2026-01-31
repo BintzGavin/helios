@@ -1,5 +1,8 @@
 # CORE Progress Log
 
+## CORE v2.19.1
+- ✅ Completed: Update Documentation - Added usage examples for `stagger` and `shift` to README.
+
 ## CORE v2.19.0
 - ✅ Completed: Implement Sequencing Helpers - Added `stagger` and `shift` utilities to `packages/core` to simplify animation timing.
 

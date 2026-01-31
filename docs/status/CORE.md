@@ -1,11 +1,12 @@
 # Status: CORE
 
-**Version**: 2.19.0
+**Version**: 2.19.1
 
 - **Status**: Active
 - **Current Focus**: Maintenance, Optimization, and Stability
 - **Last Updated**: 2026-05-25
 
+[v2.19.1] ✅ Completed: Update Documentation - Added usage examples for `stagger` and `shift` to README.
 [v2.19.0] ✅ Completed: Implement Sequencing Helpers - Added `stagger` and `shift` utilities to `packages/core` to simplify animation timing.
 [v2.18.0] ✅ Completed: Schema Constraints - Added `minItems`, `maxItems`, `minLength`, `maxLength` constraints to `PropDefinition` and implemented validation logic.
 [v2.17.1] ✅ Completed: Fix Leaky Signal Subscriptions - Implemented `untracked` and updated `subscribe` to prevent dependency tracking within callbacks.
