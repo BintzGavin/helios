@@ -723,7 +723,7 @@ export class HeliosPlayer extends HTMLElement {
         }
     }
     static get observedAttributes() {
-        return ["src", "width", "height", "autoplay", "loop", "controls", "export-format", "input-props", "poster", "muted", "interactive", "preload", "controlslist", "sandbox"];
+        return ["src", "width", "height", "autoplay", "loop", "controls", "export-format", "input-props", "poster", "muted", "interactive", "preload", "controlslist", "sandbox", "export-caption-mode"];
     }
     constructor() {
         super();
@@ -1627,6 +1627,21 @@ export class HeliosPlayer extends HTMLElement {
         const exportMode = (this.getAttribute("export-mode") || "auto");
         const canvasSelector = this.getAttribute("canvas-selector") || "canvas";
         const exportFormat = (this.getAttribute("export-format") || "mp4");
+        const captionMode = (this.getAttribute("export-caption-mode") || "burn-in");
+        let includeCaptions = this.showCaptions;
+        if (this.showCaptions && captionMode === 'file') {
+            const showingTrack = Array.from(this._textTracks).find(t => t.mode === 'showing' && t.kind === 'captions');
+            if (showingTrack) {
+                // Convert TextTrackCueList to Array before mapping
+                const cues = Array.from(showingTrack.cues).map((cue) => ({
+                    startTime: cue.startTime,
+                    endTime: cue.endTime,
+                    text: cue.text
+                }));
+                exporter.saveCaptionsAsSRT(cues, "captions.srt");
+            }
+            includeCaptions = false;
+        }
         try {
             await exporter.export({
                 onProgress: (p) => {
@@ -1636,7 +1651,7 @@ export class HeliosPlayer extends HTMLElement {
                 mode: exportMode,
                 canvasSelector: canvasSelector,
                 format: exportFormat,
-                includeCaptions: this.showCaptions
+                includeCaptions: includeCaptions
             });
         }
         catch (e) {

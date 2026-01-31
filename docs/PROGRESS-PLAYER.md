@@ -1,5 +1,8 @@
 # PLAYER Progress Log
 
+## PLAYER v0.48.0
+- ✅ Completed: Implement SRT Export - Added `export-caption-mode` attribute to support exporting captions as separate `.srt` files instead of burning them in, and added `srt-parser` serialization logic.
+
 ## PLAYER v0.47.0
 - ✅ Completed: Scrubber Tooltip - Implemented hover tooltip for scrubber showing precise timestamp, and added 'M' key shortcut for muting. Updated package exports for better developer experience.
 

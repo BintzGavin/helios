@@ -1,5 +1,6 @@
 import { HeliosController } from "../controllers";
 import { CaptionCue } from "@helios-project/core";
+import { stringifySRT, SubtitleCue } from "./srt-parser";
 import {
   Output,
   BufferTarget,
@@ -277,5 +278,16 @@ export class ClientSideExporter {
       a.download = `video.${format}`;
       a.click();
       URL.revokeObjectURL(url);
+  }
+
+  public saveCaptionsAsSRT(cues: SubtitleCue[], filename: string) {
+    const srtContent = stringifySRT(cues);
+    const blob = new Blob([srtContent], { type: "text/srt" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(url);
   }
 }

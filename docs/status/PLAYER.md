@@ -1,4 +1,4 @@
-**Version**: v0.47.0
+**Version**: v0.48.0
 
 # Status: PLAYER
 
@@ -9,7 +9,8 @@
 
 ## Current State
 - `<helios-player>` uses a modular architecture with `HeliosController` (Direct/Bridge) and `ClientSideExporter`.
-- Client-side export supports explicit configuration via `export-mode` and `canvas-selector` attributes.
+- Client-side export supports explicit configuration via `export-mode`, `canvas-selector`, and `export-caption-mode` attributes.
+- Supports exporting captions as `.srt` files (`export-caption-mode="file"`) or burning them into the video (`burn-in`).
 - Supports sandboxed iframes and cross-origin usage via `postMessage` bridge.
 - Includes visual feedback for loading and error states (connection timeouts).
 - Supports variable playback speed via UI and Controller API.
@@ -43,6 +44,7 @@
 ## Critical Task
 - **None**: All critical tasks completed.
 
+[v0.48.0] ✅ Completed: Implement SRT Export - Added `export-caption-mode` attribute to support exporting captions as separate `.srt` files instead of burning them in, and added `srt-parser` serialization logic.
 [v0.47.0] ✅ Completed: Scrubber Tooltip - Implemented hover tooltip for scrubber showing precise timestamp, and added 'M' key shortcut for muting. Updated package exports for better developer experience.
 [v0.46.1] ✅ Completed: Migrate Client-Side Export to Mediabunny - Replaced deprecated `mp4-muxer` and `webm-muxer` with `mediabunny`, modernizing the export pipeline.
 [v0.46.0] ✅ Completed: Visualize Markers - Implemented visual rendering of timeline markers on the scrubber, including clickable interaction to seek to the marker's timestamp.

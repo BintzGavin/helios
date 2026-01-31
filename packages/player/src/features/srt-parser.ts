@@ -65,3 +65,31 @@ function parseTime(timeString: string): number {
   }
   return NaN;
 }
+
+export function stringifySRT(cues: SubtitleCue[]): string {
+  if (!cues || cues.length === 0) return "";
+
+  return cues
+    .map((cue, index) => {
+      const start = formatTime(cue.startTime);
+      const end = formatTime(cue.endTime);
+      return `${index + 1}\n${start} --> ${end}\n${cue.text}\n\n`;
+    })
+    .join("");
+}
+
+function formatTime(seconds: number): string {
+  const totalMs = Math.round(seconds * 1000);
+
+  const hours = Math.floor(totalMs / 3600000);
+  const minutes = Math.floor((totalMs % 3600000) / 60000);
+  const secs = Math.floor((totalMs % 60000) / 1000);
+  const ms = totalMs % 1000;
+
+  const hh = String(hours).padStart(2, "0");
+  const mm = String(minutes).padStart(2, "0");
+  const ss = String(secs).padStart(2, "0");
+  const mmm = String(ms).padStart(3, "0");
+
+  return `${hh}:${mm}:${ss},${mmm}`;
+}
