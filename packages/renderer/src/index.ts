@@ -34,7 +34,7 @@ export class Renderer {
       this.timeDriver = new SeekTimeDriver(this.options.stabilityTimeout);
     } else {
       this.strategy = new CanvasStrategy(this.options);
-      this.timeDriver = new CdpTimeDriver();
+      this.timeDriver = new CdpTimeDriver(this.options.stabilityTimeout);
     }
   }
 

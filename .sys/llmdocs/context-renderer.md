@@ -7,7 +7,7 @@ The Renderer operates on a "Dual-Path" architecture to support different use cas
    - **Discovery**: Uses `dom-scanner` to recursively discover media elements (including Shadow DOM).
    - **Output**: Best for sharp text and vector graphics.
 2. **Canvas Strategy (`CanvasStrategy`)**: Used for WebGL/Canvas-heavy compositions (e.g., Three.js, PixiJS). It captures the `<canvas>` context directly.
-   - **Drivers**: Uses `CdpTimeDriver` (Chrome DevTools Protocol) for precise virtual time control (supports Shadow DOM media sync, enforces deterministic Jan 2024 epoch, ensures sync-before-render order, waits for budget expiration).
+   - **Drivers**: Uses `CdpTimeDriver` (Chrome DevTools Protocol) for precise virtual time control (supports Shadow DOM media sync, enforces deterministic Jan 2024 epoch, ensures sync-before-render order, waits for budget expiration, enforces stability timeout via `Runtime.terminateExecution`).
    - **Optimization**: Prioritizes H.264 (AVC) intermediate codec for hardware acceleration, falling back to VP8.
    - **Output**: Best for high-performance 2D/3D graphics.
 
@@ -42,6 +42,7 @@ packages/renderer/
     ├── verify-shadow-dom-sync.ts  # Shadow DOM sync test (DOM Mode)
     ├── verify-cdp-shadow-dom-sync.ts # Shadow DOM media sync test (Canvas Mode)
     ├── verify-cdp-driver.ts    # CdpDriver budget test
+    ├── verify-cdp-driver-timeout.ts # CdpDriver stability timeout test
     └── ...                     # Other verification scripts
 ```
 
@@ -55,6 +56,7 @@ The `RendererOptions` interface controls the render pipeline:
 - `videoCodec`: `'libx264'` (default), `'copy'`, or others.
 - `audioCodec`: `'aac'` (default), `'libvorbis'`, etc.
 - `audioFilePath`: Path to external audio file to mix in.
+- `stabilityTimeout`: Timeout for frame stability (default 30000ms).
 - `inputProps`: Object injected into the page as `window.__HELIOS_PROPS__`.
 
 ## D. FFmpeg Interface

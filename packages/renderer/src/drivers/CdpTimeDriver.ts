@@ -4,6 +4,11 @@ import { TimeDriver } from './TimeDriver.js';
 export class CdpTimeDriver implements TimeDriver {
   private client: CDPSession | null = null;
   private currentTime: number = 0;
+  private timeout: number;
+
+  constructor(timeout: number = 30000) {
+    this.timeout = timeout;
+  }
 
   async init(page: Page): Promise<void> {
     // No-op for CdpTimeDriver
@@ -114,6 +119,34 @@ export class CdpTimeDriver implements TimeDriver {
         }
       })()
     `;
-    await page.evaluate(stabilityScript);
+
+    // We implement timeout in Node.js because setTimeout in the page
+    // does not work when CDP virtual time is paused.
+    let timeoutId: NodeJS.Timeout;
+    const timeoutPromise = new Promise<void>((_, reject) => {
+      timeoutId = setTimeout(() => {
+        reject(new Error('Stability check timed out'));
+      }, this.timeout);
+    });
+
+    try {
+      await Promise.race([
+        page.evaluate(stabilityScript),
+        timeoutPromise
+      ]);
+    } catch (e: any) {
+      if (e.message === 'Stability check timed out') {
+        console.warn(`[CdpTimeDriver] Stability check timed out after ${this.timeout}ms. Terminating execution.`);
+        try {
+          await this.client?.send('Runtime.terminateExecution');
+        } catch (termErr) {
+          console.warn('[CdpTimeDriver] Failed to terminate hanging script (might have finished race):', termErr);
+        }
+      } else {
+        throw e;
+      }
+    } finally {
+      clearTimeout(timeoutId!);
+    }
   }
 }
