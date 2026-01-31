@@ -116,3 +116,11 @@
 ## [2026-05-26] - CdpTimeDriver Stability Gap
 **Learning:** `CdpTimeDriver` (Canvas mode) awaits `window.helios.waitUntilStable()` indefinitely, unlike `SeekTimeDriver` which respects a timeout. This creates a risk of infinite hanging if user scripts fail to resolve.
 **Action:** Created plan to implement `stabilityTimeout` in `CdpTimeDriver` using `Promise.race`.
+
+## [2026-05-30] - Vision Gap: Blob Audio Support
+**Learning:** `DomScanner` filters out `blob:` URLs to avoid FFmpeg errors, but this silently drops audio for dynamically generated content (a common pattern). This contradicts the "Use What You Know" principle.
+**Action:** Future plan required to implement Blob audio extraction (fetch blob -> buffer -> pipe to FFmpeg) to support this "Native" web capability.
+
+## [2026-05-30] - Architectural Gap: DomStrategy lacks CDP
+**Learning:** `DomStrategy` relies on `SeekTimeDriver` (WAAPI) instead of `CdpTimeDriver` because `page.screenshot` hangs when CDP virtual time is paused. This means `mode: 'dom'` is not using the promised "Production Rendering" architecture (CDP), creating a divergence in time control mechanisms.
+**Action:** Investigate using `Emulation.setVirtualTimePolicy({ policy: 'advance', budget: ... })` combined with a non-hanging capture method, or accept this divergence as a permanent constraint of `page.screenshot`.
