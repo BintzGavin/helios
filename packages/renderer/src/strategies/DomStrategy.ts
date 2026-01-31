@@ -34,14 +34,32 @@ export class DomStrategy implements RenderStrategy {
         await document.fonts.ready;
 
         // 2. Wait for images
-        const images = Array.from(document.images);
-        await Promise.all(images.map((img) => {
-          if (img.complete) return;
-          return new Promise((resolve) => {
-            img.onload = resolve;
-            img.onerror = resolve; // Don't block on broken images
-          });
-        }));
+        function findAllImages(root) {
+          const images = [];
+          const walker = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT);
+          while (walker.nextNode()) {
+            const node = walker.currentNode;
+            if (node.tagName === 'IMG') {
+              images.push(node);
+            }
+            if (node.shadowRoot) {
+              images.push(...findAllImages(node.shadowRoot));
+            }
+          }
+          return images;
+        }
+
+        const images = findAllImages(document);
+        if (images.length > 0) {
+          console.log('[DomStrategy] Preloading ' + images.length + ' images...');
+          await Promise.all(images.map((img) => {
+            if (img.complete) return;
+            return new Promise((resolve) => {
+              img.onload = resolve;
+              img.onerror = resolve; // Don't block on broken images
+            });
+          }));
+        }
 
         // 3. Wait for CSS background images
         function findAllElements(root, elements) {
