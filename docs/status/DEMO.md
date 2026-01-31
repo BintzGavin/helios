@@ -12,7 +12,7 @@ The DEMO domain is responsible for:
 - None
 
 ## Active Tasks
-- None
+- [2026-06-07] 🚧 Planned: Diagnostics Example - Create `examples/diagnostics` to demonstrate `Helios.diagnose()` and provide a runnable environment check.
 
 ## Completed Tasks
 - [v1.75.0] ✅ Completed: Vanilla TypeScript Example - Created `examples/vanilla-typescript` to demonstrate idiomatic TypeScript usage without frameworks.
