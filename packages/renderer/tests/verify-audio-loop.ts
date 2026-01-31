@@ -30,6 +30,9 @@ async function run() {
 
       <!-- Track 3: Looped Video (should also work) -->
       <video src="loop-video.mp4" loop muted></video>
+
+      <!-- Track 4: Looped + Offset (Edge Case) -->
+      <audio src="loop-offset.mp3" loop data-helios-offset="2"></audio>
     </body>
     </html>
   `;
@@ -154,6 +157,45 @@ async function run() {
       // So it should be there.
       console.error('❌ loop-video.mp4 not found in args');
       failure = true;
+  }
+
+  // Check loop-offset.mp3
+  const loopOffsetArgIndex = args.findIndex(arg => arg.endsWith('loop-offset.mp3'));
+  if (loopOffsetArgIndex !== -1) {
+    const streamLoopIndex = args.lastIndexOf('-stream_loop', loopOffsetArgIndex);
+    const loopValueIndex = args.lastIndexOf('-1', loopOffsetArgIndex);
+
+    // Ensure -stream_loop -1 is associated with this input (after previous input)
+    // We use loopVideoArgIndex as the boundary (or onceMp3ArgIndex if video failed, but let's assume it passed or index is -1)
+    const prevIndex = loopVideoArgIndex !== -1 ? loopVideoArgIndex : onceMp3ArgIndex;
+
+    if (streamLoopIndex !== -1 && loopValueIndex === streamLoopIndex + 1 && streamLoopIndex > prevIndex) {
+      console.log('✅ loop-offset.mp3 has -stream_loop -1');
+    } else {
+      console.error('❌ loop-offset.mp3 missing -stream_loop -1');
+      failure = true;
+    }
+
+    // Check adelay filter
+    // We need to look at the -filter_complex argument
+    const filterComplexIndex = args.indexOf('-filter_complex');
+    if (filterComplexIndex !== -1) {
+      const filterComplex = args[filterComplexIndex + 1];
+      // Expect adelay=2000|2000
+      if (filterComplex.includes('adelay=2000|2000')) {
+         console.log('✅ loop-offset.mp3 has adelay=2000|2000');
+      } else {
+         console.error(`❌ loop-offset.mp3 missing adelay=2000|2000 in filter complex: ${filterComplex}`);
+         failure = true;
+      }
+    } else {
+       console.error('❌ -filter_complex not found');
+       failure = true;
+    }
+
+  } else {
+    console.error('❌ loop-offset.mp3 not found in args');
+    failure = true;
   }
 
   await browser.close();
