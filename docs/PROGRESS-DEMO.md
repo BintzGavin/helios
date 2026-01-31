@@ -1,3 +1,6 @@
+## DEMO v1.70.2
+- ✅ Completed: Document Client-Side Export - Added README to `examples/client-export-api` and re-verified functionality.
+
 ## DEMO v1.70.1
 - ✅ Completed: Re-verify Client-Side Export - Confirmed successful build and E2E verification of the client-side export example.
 

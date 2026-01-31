@@ -1,67 +1,73 @@
-# Context: DEMO Domain
+# DEMO Domain Context
 
 ## A. Examples
-- `examples/client-export-api`: Direct use of `ClientSideExporter` and `BridgeController` for in-browser export.
-- `examples/web-component-animation`: Native Web Components (Shadow DOM + CSS).
-- `examples/simple-canvas-animation`: Vanilla JS Canvas API.
-- `examples/simple-animation`: Vanilla JS DOM + CSS Animations.
-- `examples/variable-font-animation`: Variable Font animation using CSS.
-- `examples/waapi-animation`: Web Animations API (element.animate()).
-- `examples/procedural-generation`: Deterministic `random` and `interpolateColors` (Canvas).
-- `examples/audio-visualization`: Raw audio data visualization (Canvas).
-- `examples/media-element-animation`: Native `<video>`/`<audio>` synchronization.
-- `examples/podcast-visualizer`: Multi-track audio mixing (volume, muted, offset) and synchronization.
-- `examples/gsap-animation`: GreenSock Animation Platform (GSAP).
-- `examples/framer-motion-animation`: React Framer Motion.
-- `examples/lottie-animation`: Airbnb Lottie (lottie-web).
-- `examples/motion-one-animation`: Motion One (motion).
-- `examples/d3-animation`: D3.js data visualization.
-- `examples/chartjs-animation`: Chart.js data visualization.
-- `examples/social-media-story`: React-based social media story (9:16) with video sync.
-- `examples/captions-animation`: Built-in SRT captions.
-- `examples/signals-animation`: Fine-grained reactivity (signals).
-- `examples/dynamic-props-animation`: Input props and schema validation.
-- `examples/animation-helpers`: Core helpers (interpolate, spring).
-- `examples/react-canvas-animation`: React Canvas.
-- `examples/react-dom-animation`: React DOM.
-- `examples/react-css-animation`: React CSS Animations.
-- `examples/react-transitions`: React transitions (CSS animation synchronization).
-- `examples/react-styled-components`: React Styled Components (CSS-in-JS).
-- `examples/react-animation-helpers`: React `<Sequence>`, `<Series>`, helpers (`interpolate`, `spring`).
-- `examples/vue-canvas-animation`: Vue Canvas.
-- `examples/vue-dom-animation`: Vue DOM.
-- `examples/vue-animation-helpers`: Vue `<Sequence>`, `<Series>`.
-- `examples/vue-transitions`: Vue transitions (CSS animation synchronization).
-- `examples/svelte-canvas-animation`: Svelte Canvas.
-- `examples/svelte-dom-animation`: Svelte DOM.
-- `examples/svelte-animation-helpers`: Svelte `<Sequence>`, `<Series>`.
-- `examples/svelte-transitions`: Svelte transitions (CSS animation synchronization).
-- `examples/svelte-runes-animation`: Svelte 5 Runes ($state, $derived).
-- `examples/solid-canvas-animation`: SolidJS Canvas (Signals adapter).
-- `examples/solid-dom-animation`: SolidJS DOM (Signals + CSS).
-- `examples/solid-animation-helpers`: SolidJS Helpers (`<Sequence>`, `<Series>`).
-- `examples/solid-transitions`: SolidJS transitions (CSS animation synchronization).
-- `examples/map-animation`: Leaflet Maps (DOM).
-- `examples/text-effects-animation`: Text Effects (Typewriter, Staggered Reveal).
-- `examples/promo-video`: Promo video (Multi-scene GSAP animation).
-- `examples/threejs-canvas-animation`: Three.js (3D).
-- `examples/react-three-fiber`: React Three Fiber (R3F) integration.
-- `examples/pixi-canvas-animation`: PixiJS (2D).
-- `examples/p5-canvas-animation`: P5.js (Instance Mode).
-- `examples/tailwind-animation`: Tailwind CSS v3 integration.
-- `examples/stress-test-animation`: Stress test with 2500+ animated elements (Signals).
+The `examples/` directory contains reference implementations for various frameworks and techniques.
+
+- **animation-helpers**: Demonstrates core animation utilities (`interpolate`, `spring`).
+- **audio-visualization**: Visualizes audio data using Canvas.
+- **captions-animation**: Renders SRT captions.
+- **chartjs-animation**: Integration with Chart.js.
+- **client-export-api**: Demonstrates programmtic client-side export using `ClientSideExporter` and `BridgeController` without the default player UI.
+- **d3-animation**: Integration with D3.js.
+- **dynamic-props-animation**: Demonstrates `inputProps` and schema validation.
+- **framer-motion-animation**: Integration with Framer Motion.
+- **gsap-animation**: Integration with GSAP.
+- **lottie-animation**: Integration with Lottie.
+- **map-animation**: Integration with Leaflet maps.
+- **media-element-animation**: Synchronization of `<video>` and `<audio>` elements.
+- **motion-one-animation**: Integration with Motion One.
+- **p5-canvas-animation**: Integration with P5.js.
+- **pixi-canvas-animation**: Integration with PixiJS.
+- **podcast-visualizer**: Complex example with multi-track audio mixing.
+- **procedural-generation**: Deterministic randomness and procedural content.
+- **promo-video**: A marketing video example.
+- **react-animation-helpers**: React components for sequencing and timing.
+- **react-canvas-animation**: Basic React + Canvas example.
+- **react-css-animation**: React with CSS animations.
+- **react-dom-animation**: Basic React + DOM example.
+- **react-styled-components**: React with Styled Components.
+- **react-three-fiber**: Integration with React Three Fiber (R3F).
+- **react-transitions**: React transition group integration.
+- **signals-animation**: Fine-grained reactivity using Helios signals.
+- **simple-animation**: Vanilla JS DOM animation.
+- **simple-canvas-animation**: Vanilla JS Canvas animation.
+- **social-media-story**: Social media story format example.
+- **solid-animation-helpers**: SolidJS components for sequencing.
+- **solid-canvas-animation**: SolidJS + Canvas integration.
+- **solid-dom-animation**: SolidJS + DOM integration.
+- **solid-transitions**: SolidJS CSS transitions.
+- **stress-test-animation**: High-element count stress test.
+- **svelte-animation-helpers**: Svelte components for sequencing.
+- **svelte-canvas-animation**: Svelte + Canvas example.
+- **svelte-dom-animation**: Svelte + DOM example.
+- **svelte-runes-animation**: Svelte 5 Runes example.
+- **svelte-transitions**: Svelte CSS transitions.
+- **tailwind-animation**: Tailwind CSS integration.
+- **text-effects-animation**: Typewriter and reveal effects.
+- **threejs-canvas-animation**: Integration with Three.js.
+- **variable-font-animation**: Animating variable fonts.
+- **vue-animation-helpers**: Vue components for sequencing.
+- **vue-canvas-animation**: Vue + Canvas example.
+- **vue-dom-animation**: Vue + DOM example.
+- **vue-transitions**: Vue CSS transitions.
+- **waapi-animation**: Web Animations API integration.
+- **web-component-animation**: Shadow DOM and Web Component integration.
 
 ## B. Build Config
-- **Root Config**: `vite.config.js` (shared settings).
-- **Example Build**: `vite.build-example.config.js` defines entry points for all examples.
-- **Frameworks**: React, Vue, Svelte, Solid supported via Vite plugins.
-- **PostCSS/Tailwind**: Root `postcss.config.js` and `tailwind.config.js` (scoped content).
+- **Root**: `vite.config.js` (for dev) and `vite.build-example.config.js` (for build).
+- **Aliases**: Configured to point `@helios-project/core`, `@helios-project/player`, etc., to their source files (`packages/*/src`) to allow developing examples against the latest source without rebuilding packages.
+- **Discovery**: `vite.build-example.config.js` dynamically discovers examples by looking for `composition.html` in subdirectories of `examples/`. It also includes `index.html` for specific examples like `client-export-api`.
 
 ## C. E2E Tests
-- **Render Verification**: `tests/e2e/verify-render.ts`
-  - **Methodology**: Builds all examples using `vite.build-example.config.js`, then uses `Renderer` (headless browser + FFmpeg) to render a 5-second video for each, supporting both 'canvas' and 'dom' modes.
-  - **Verification**: Checks that render completes without error and output file exists. Does NOT verify visual content correctness (opacity, etc). Supports filtering test cases via CLI arguments.
+Tests are located in `tests/e2e/`.
 
-- **Client-Side Export**: `tests/e2e/verify-client-export.ts`
-  - **Methodology**: Serves build artifacts via `vite preview` and uses Playwright to drive the `examples/client-export-api` page.
-  - **Verification**: Clicks the Export button and waits for the UI to indicate "Done!", confirming `ClientSideExporter` works in-browser.
+- **verify-all.ts**: The master script (`npm run verify:e2e`). Builds Core/Renderer/Examples and runs all verifications.
+- **verify-render.ts**: Verifies server-side rendering using the `Renderer` class.
+    - Scans `output/example-build` for compositions.
+    - Renders each example to MP4 using `Renderer`.
+    - Supports filtering via command line arguments.
+- **verify-client-export.ts**: Verifies the client-side export pipeline.
+    - Spawns a Vite preview server.
+    - Launches Playwright (Chromium).
+    - Navigates to `examples/client-export-api`.
+    - Clicks the "Export" button and waits for the "Done" state.
