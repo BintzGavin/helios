@@ -3,9 +3,11 @@ import { RenderStrategy } from './RenderStrategy.js';
 import { RendererOptions, AudioTrackConfig } from '../types.js';
 import { FFmpegBuilder } from '../utils/FFmpegBuilder.js';
 import { scanForAudioTracks } from '../utils/dom-scanner.js';
+import { extractBlobTracks } from '../utils/blob-extractor.js';
 
 export class DomStrategy implements RenderStrategy {
   private discoveredAudioTracks: AudioTrackConfig[] = [];
+  private cleanupAudio: () => Promise<void> | void = () => {};
 
   constructor(private options: RendererOptions) {
     if (this.options.videoCodec === 'copy') {
@@ -100,7 +102,12 @@ export class DomStrategy implements RenderStrategy {
     ));
 
     // Scan for audio tracks using the shared utility
-    this.discoveredAudioTracks = await scanForAudioTracks(page);
+    const initialTracks = await scanForAudioTracks(page);
+
+    // Extract blobs to temp files
+    const extractionResult = await extractBlobTracks(page, initialTracks);
+    this.discoveredAudioTracks = extractionResult.tracks;
+    this.cleanupAudio = extractionResult.cleanup;
   }
 
   async capture(page: Page, frameTime: number): Promise<Buffer> {
@@ -126,7 +133,7 @@ export class DomStrategy implements RenderStrategy {
   }
 
   async finish(page: Page): Promise<void> {
-    // No-op for DomStrategy
+    // No-op for DomStrategy (cleanup happens in cleanup())
     return Promise.resolve();
   }
 
@@ -146,5 +153,9 @@ export class DomStrategy implements RenderStrategy {
     };
 
     return FFmpegBuilder.getArgs(combinedOptions, outputPath, videoInputArgs);
+  }
+
+  async cleanup(): Promise<void> {
+    await Promise.resolve(this.cleanupAudio());
   }
 }

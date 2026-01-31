@@ -28,7 +28,8 @@ packages/renderer/
 │   ├── utils/
 │   │   ├── FFmpegBuilder.ts    # Argument generator
 │   │   ├── FFmpegInspector.ts  # Environment diagnostics
-│   │   └── dom-scanner.ts      # Asset discovery
+│   │   ├── dom-scanner.ts      # Asset discovery
+│   │   └── blob-extractor.ts   # Blob URL extraction
 │   ├── index.ts                # Main Renderer class
 │   └── types.ts                # Configuration interfaces
 └── tests/
