@@ -1,3 +1,6 @@
+## DEMO v1.76.0
+- ✅ Completed: Diagnostics Example - Created `examples/diagnostics` to demonstrate `Helios.diagnose()` and provide a runnable environment check.
+
 ## DEMO v1.75.0
 - ✅ Completed: Vanilla TypeScript Example - Created `examples/vanilla-typescript` to demonstrate idiomatic TypeScript usage without frameworks.
 

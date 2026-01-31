@@ -10,6 +10,7 @@ The `examples/` directory contains reference implementations for various framewo
 - **client-export-api**: Demonstrates programmtic client-side export using `ClientSideExporter` and `BridgeController` without the default player UI.
 - **code-walkthrough**: Demonstrates syntax highlighting and line focusing for developer content.
 - **d3-animation**: Integration with D3.js.
+- **diagnostics**: System capability and WebCodecs support checker.
 - **dynamic-props-animation**: Demonstrates `inputProps` and schema validation.
 - **framer-motion-animation**: Integration with Framer Motion.
 - **gsap-animation**: Integration with GSAP.

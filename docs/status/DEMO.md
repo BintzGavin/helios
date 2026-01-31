@@ -1,6 +1,6 @@
 # Status: DEMO Domain
 
-**Version**: 1.75.0
+**Version**: 1.76.0
 
 ## Vision
 The DEMO domain is responsible for:
@@ -12,9 +12,10 @@ The DEMO domain is responsible for:
 - **⚠️ COORDINATION**: Promo video example (`examples/promo-video/`) currently renders black due to RENDERER bug in `SeekTimeDriver.ts` (GSAP timeline synchronization issue). RENDERER agent is fixing this - DEMO agent should verify the example works correctly after RENDERER completes the fix. See `docs/status/RENDERER.md` "Next Steps" for details.
 
 ## Active Tasks
-- [2026-06-07] 🚧 Planned: Diagnostics Example - Create `examples/diagnostics` to demonstrate `Helios.diagnose()` and provide a runnable environment check.
+- None
 
 ## Completed Tasks
+- [v1.76.0] ✅ Completed: Diagnostics Example - Created `examples/diagnostics` to demonstrate `Helios.diagnose()` and provide a runnable environment check.
 - [v1.75.0] ✅ Completed: Vanilla TypeScript Example - Created `examples/vanilla-typescript` to demonstrate idiomatic TypeScript usage without frameworks.
 - [v1.74.1] ✅ Completed: Create Examples Documentation - Added `examples/README.md` to catalog and describe all available examples.
 - [v1.74.0] ✅ Completed: Upgrade Client-Side Export Verification - Refactored `verify-client-export.ts` to dynamically discover and test all examples using a generic `dynamic-player.html` fixture.
