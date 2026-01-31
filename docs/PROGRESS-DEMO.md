@@ -1,3 +1,6 @@
+## DEMO v1.73.0
+- ✅ Completed: Code Walkthrough Example - Created `examples/code-walkthrough` demonstrating syntax highlighting and line focusing for developer content.
+
 ## DEMO v1.72.0
 - ✅ Completed: Verify Player - Added E2E verification for the `<helios-player>` Web Component.
 
@@ -5,7 +8,7 @@
 - ✅ Completed: Scaffold React Captions Animation - Created `examples/react-captions-animation` demonstrating `useCaptions` hook for integrating Helios SRT parsing with React.
 
 ## DEMO v1.70.2
-- ✅ Completed: Document Client-Side Export - Added README to `examples/client-export-api` and re-verified functionality.
+- ✅ Completed: Document Client-Side Export - Added README to `examples/client-export-api` explaining BridgeController and ClientSideExporter usage.
 
 ## DEMO v1.70.1
 - ✅ Completed: Re-verify Client-Side Export - Confirmed successful build and E2E verification of the client-side export example.
