@@ -10,7 +10,13 @@ export class WaapiDriver implements TimeDriver {
     this.scope = scope;
   }
 
-  update(timeInMs: number, options?: { isPlaying: boolean; playbackRate: number; volume?: number; muted?: boolean }) {
+  update(timeInMs: number, options?: {
+    isPlaying: boolean;
+    playbackRate: number;
+    volume?: number;
+    muted?: boolean;
+    audioTracks?: Record<string, { volume: number; muted: boolean }>;
+  }) {
     if (!this.scope) return;
     if (typeof document === 'undefined') return;
 

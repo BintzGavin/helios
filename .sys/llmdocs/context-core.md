@@ -47,11 +47,17 @@ export type HeliosState = {
   playbackRate: number;
   volume: number;
   muted: boolean;
+  audioTracks: Record<string, AudioTrackState>;
   captions: CaptionCue[];
   activeCaptions: CaptionCue[];
   markers: Marker[];
   playbackRange: [number, number] | null;
   currentTime: number;
+};
+
+export type AudioTrackState = {
+  volume: number;
+  muted: boolean;
 };
 
 export type HeliosSubscriber = (state: HeliosState) => void;
@@ -124,6 +130,7 @@ class Helios {
   get playbackRate(): ReadonlySignal<number>;
   get volume(): ReadonlySignal<number>;
   get muted(): ReadonlySignal<boolean>;
+  get audioTracks(): ReadonlySignal<Record<string, AudioTrackState>>;
   get captions(): ReadonlySignal<CaptionCue[]>;
   get activeCaptions(): ReadonlySignal<CaptionCue[]>;
   get markers(): ReadonlySignal<Marker[]>;
@@ -152,6 +159,8 @@ class Helios {
   setPlaybackRate(rate: number): void;
   setAudioVolume(volume: number): void;
   setAudioMuted(muted: boolean): void;
+  setAudioTrackVolume(trackId: string, volume: number): void;
+  setAudioTrackMuted(trackId: string, muted: boolean): void;
   setCaptions(captions: string | CaptionCue[]): void;
   setMarkers(markers: Marker[]): void;
   addMarker(marker: Marker): void;
