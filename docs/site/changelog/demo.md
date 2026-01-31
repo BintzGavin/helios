@@ -5,6 +5,70 @@ description: "Changelog for the Demo package and examples"
 
 # Demo Changelog
 
+## v1.71.0
+- **Scaffold React Captions Animation**: Created `examples/react-captions-animation` demonstrating `useCaptions` hook for integrating Helios SRT parsing with React.
+
+## v1.70.2
+- **Document Client-Side Export**: Added README to `examples/client-export-api` and re-verified functionality.
+
+## v1.70.1
+- **Re-verify Client-Side Export**: Confirmed successful build and E2E verification of the client-side export example.
+
+## v1.70.0
+- **Dynamic Verification Pipeline**: Refactored build and test scripts to dynamically discover examples, reducing maintenance burden and enabling unified verification via 'verify:e2e'.
+
+## v1.69.1
+- **Polish Client-Side Export Example**: Added documentation comments to `examples/client-export-api` and re-verified functionality.
+
+## v1.68.0
+- **Update React Animation Helpers**: Updated `examples/react-animation-helpers` to demonstrate `interpolate` and `spring` helper functions. Enhanced `tests/e2e/verify-render.ts` to support filtering via command line arguments.
+
+## v1.67.0
+- **Client-Side Export API Example**: Created `examples/client-export-api` demonstrating `ClientSideExporter` usage.
+
+## v1.66.0
+- **Solid Canvas Example**: Verified existing implementation of `examples/solid-canvas-animation` matches spec and passes E2E tests.
+
+## v1.65.0
+- **Scaffold React Example**: Verified existing implementation of `examples/react-canvas-animation`.
+
+## v1.64.1
+- **Verify Podcast Visualizer**: Re-verified `examples/podcast-visualizer` implementation, ensuring multi-track audio mixing, muted attribute handling, and offset timing work correctly in the E2E pipeline.
+- **Fixed Core Build Issues**: Fixed TypeScript errors in `packages/core` to enable successful build and verification.
+
+## v1.64.0
+- **Implement SolidJS Series Component**: Added `<Series>` component to `examples/solid-animation-helpers` and updated example to demonstrate it.
+
+## v1.63.0
+- **Verify Podcast Visualizer**: Verified `examples/podcast-visualizer` implementation, specifically testing multi-track audio mixing, muted attribute handling, and offset timing in the E2E pipeline.
+
+## v1.62.1
+- **Verify Dom Render**: Verified that DOM-based compositions render correctly in the E2E pipeline.
+
+## v1.62.0
+- **Stress Test Animation**: Created `examples/stress-test-animation/composition.html` with 2500 elements and updated build config.
+
+## v1.61.1
+- **Verify Solid Animation Helpers**: Added `examples/solid-animation-helpers` to `tests/e2e/verify-render.ts`. Verified all 47 examples pass.
+
+## v1.61.0
+- **Web Component Animation**: Created `examples/web-component-animation` demonstrating Shadow DOM and CSS animation integration.
+
+## v1.60.0
+- **Verify Promo Video**: Integrated `examples/promo-video` into verification pipeline and documentation.
+
+## v1.59.1
+- **Verify Podcast Visualizer**: Verified `examples/podcast-visualizer` implementation matches spec and passes E2E verification.
+
+## v1.59.0
+- **Solid Transitions Example**: Created `examples/solid-transitions` demonstrating how to synchronize CSS animations in SolidJS using `autoSyncAnimations: true` and `animation-delay`. Verified with E2E tests.
+
+## v1.56.0
+- **Solid Animation Helpers Example**: Created `examples/solid-animation-helpers` demonstrating idiomatic Sequence component composition in SolidJS.
+
+## v1.55.0
+- **Svelte Runes Animation Example**: Created `examples/svelte-runes-animation` demonstrating Svelte 5 Runes (`$state`, `$derived`) integration.
+
 ## v1.54.0
 - **Text Effects Animation Example**: Created `examples/text-effects-animation` demonstrating Typewriter and Staggered Reveal effects.
 

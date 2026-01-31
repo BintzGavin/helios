@@ -39,6 +39,55 @@ effect(() => {
 });
 ```
 
+### Stagger & Shift
+
+For more complex timing, use `stagger` and `shift`.
+
+```javascript
+import { stagger, shift } from '@helios-project/core';
+
+const items = [{ id: 1 }, { id: 2 }, { id: 3 }];
+
+// Stagger start times by 10 frames
+const staggered = stagger(items, 10);
+
+// Shift the whole group later by 30 frames
+const shifted = shift(staggered, 30);
+```
+
+## Defining Inputs (Schema)
+
+You can define a strongly-typed schema for your composition's inputs. This drives the Studio UI and enables runtime validation.
+
+```typescript
+import { Helios } from '@helios-project/core';
+
+const helios = new Helios({
+  fps: 30,
+  duration: 5,
+  schema: {
+    // Basic types
+    title: { type: 'string', default: 'My Video' },
+
+    // Grouping for Studio UI
+    color: { type: 'color', default: '#ff0000', group: 'Appearance' },
+
+    // Constraints
+    count: { type: 'number', min: 0, max: 10, step: 1 },
+    code: { type: 'string', pattern: '^[A-Z]{3}$', description: '3-letter code' },
+
+    // Asset types
+    background: { type: 'image', accept: ['.jpg', '.png'] },
+
+    // Arrays and Objects
+    tags: {
+      type: 'array',
+      items: { type: 'string' }
+    }
+  }
+});
+```
+
 ## Sequencing
 
 For long animations, it's tedious to calculate frame ranges manually. The `sequence` and `series` helpers make this easier.

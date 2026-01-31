@@ -41,6 +41,7 @@ const options: RendererOptions = {
 
   // Rendering Range
   startFrame: 0,
+  frameCount: 150, // Optional: Override duration to render exactly this many frames
 
   ffmpegPath: '/path/to/ffmpeg' // Optional
 };

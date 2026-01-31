@@ -163,6 +163,37 @@ Deterministic random number generator based on Mulberry32.
 ### `interpolateColors(value, inputRange, outputRange)`
 Interpolates between colors (Hex, RGB, HSL).
 
+### `stagger(items, interval, startFrame)`
+Staggers a list of items by a fixed interval.
+
+```typescript
+const items = [{ id: 1 }, { id: 2 }, { id: 3 }];
+const staggered = stagger(items, 10);
+// [{ id: 1, from: 0 }, { id: 2, from: 10 }, { id: 3, from: 20 }]
+```
+
+### `shift(items, offset)`
+Shifts the start time of a list of sequenced items.
+
+```typescript
+const shifted = shift(staggered, 30);
+// Shifts all items by 30 frames
+```
+
+## AI Utilities
+
+### `createSystemPrompt(helios)`
+Generates a context-aware system prompt for AI agents, including the current composition state (duration, FPS, resolution) and prop schema.
+
+```typescript
+import { createSystemPrompt } from '@helios-project/core';
+
+const prompt = createSystemPrompt(helios);
+```
+
+### `HELIOS_BASE_PROMPT`
+The base system prompt text used by `createSystemPrompt`.
+
 ## Captions (SRT)
 
 Utilities for parsing SRT files.
