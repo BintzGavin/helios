@@ -72,6 +72,8 @@ export async function scanForAudioTracks(page: Page): Promise<AudioTrackConfig[]
             // Parse attributes
             const offset = el.dataset.heliosOffset ? parseFloat(el.dataset.heliosOffset) : 0;
             const seek = el.dataset.heliosSeek ? parseFloat(el.dataset.heliosSeek) : 0;
+            const fadeIn = el.dataset.heliosFadeIn ? parseFloat(el.dataset.heliosFadeIn) : 0;
+            const fadeOut = el.dataset.heliosFadeOut ? parseFloat(el.dataset.heliosFadeOut) : 0;
             const volume = el.muted ? 0 : el.volume;
 
             tracks.push({
@@ -79,6 +81,8 @@ export async function scanForAudioTracks(page: Page): Promise<AudioTrackConfig[]
               volume: volume,
               offset: isNaN(offset) ? 0 : offset,
               seek: isNaN(seek) ? 0 : seek,
+              fadeInDuration: isNaN(fadeIn) ? 0 : fadeIn,
+              fadeOutDuration: isNaN(fadeOut) ? 0 : fadeOut,
               loop: el.loop
             });
           }
@@ -104,6 +108,8 @@ export async function scanForAudioTracks(page: Page): Promise<AudioTrackConfig[]
       volume: track.volume,
       offset: track.offset,
       seek: track.seek,
+      fadeInDuration: track.fadeInDuration,
+      fadeOutDuration: track.fadeOutDuration,
       loop: track.loop,
     }));
 
