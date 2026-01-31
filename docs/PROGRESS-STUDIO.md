@@ -1,3 +1,6 @@
+## STUDIO v0.65.0
+- ✅ Completed: Persistent Render Jobs - Implemented persistence of render jobs to `jobs.json` in the `renders` directory, ensuring history survives server restarts.
+
 ## STUDIO v0.64.0
 - ✅ Completed: Props Grouping - Implemented collapsible groups in Props Editor based on schema `group` property.
 

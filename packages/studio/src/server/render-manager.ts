@@ -20,6 +20,57 @@ export interface RenderJob {
 const jobs = new Map<string, RenderJob>();
 const jobControllers = new Map<string, AbortController>();
 
+const JOBS_FILE = 'jobs.json';
+
+function getJobsFilePath() {
+  const projectRoot = getProjectRoot(process.cwd());
+  return path.resolve(projectRoot, 'renders', JOBS_FILE);
+}
+
+function saveJobs() {
+  const file = getJobsFilePath();
+  const rendersDir = path.dirname(file);
+  if (!fs.existsSync(rendersDir)) {
+    fs.mkdirSync(rendersDir, { recursive: true });
+  }
+
+  try {
+    const jobList = Array.from(jobs.values());
+    fs.writeFileSync(file, JSON.stringify(jobList, null, 2));
+  } catch (e) {
+    console.error('[RenderManager] Failed to save jobs history:', e);
+  }
+}
+
+function loadJobs() {
+  const file = getJobsFilePath();
+  if (fs.existsSync(file)) {
+    try {
+      const data = JSON.parse(fs.readFileSync(file, 'utf-8'));
+      if (Array.isArray(data)) {
+        let changed = false;
+        for (const job of data) {
+           // Handle interrupted jobs
+           if (job.status === 'rendering' || job.status === 'queued') {
+              job.status = 'failed';
+              job.error = 'Server restarted during render';
+              changed = true;
+           }
+           jobs.set(job.id, job);
+        }
+        if (changed) {
+          saveJobs();
+        }
+      }
+    } catch (e) {
+      console.warn('[RenderManager] Failed to load jobs history:', e);
+    }
+  }
+}
+
+// Initialize jobs from disk
+loadJobs();
+
 export interface StartRenderOptions {
   compositionUrl: string; // The URL to visit (e.g. /@fs/...)
   width?: number;
@@ -60,6 +111,8 @@ export async function startRender(options: StartRenderOptions, serverPort: numbe
   };
 
   jobs.set(jobId, job);
+  saveJobs();
+
   const controller = new AbortController();
   jobControllers.set(jobId, controller);
 
@@ -67,6 +120,7 @@ export async function startRender(options: StartRenderOptions, serverPort: numbe
   (async () => {
     try {
       job.status = 'rendering';
+      saveJobs();
 
       const fullUrl = `http://localhost:${serverPort}${options.compositionUrl}`;
       console.log(`[RenderManager] Starting render job ${jobId} for ${fullUrl}`);
@@ -103,6 +157,7 @@ export async function startRender(options: StartRenderOptions, serverPort: numbe
 
       job.status = 'completed';
       job.progress = 1;
+      saveJobs();
       console.log(`[RenderManager] Job ${jobId} completed: ${outputPath}`);
     } catch (e: any) {
       if (e.message === 'Aborted') {
@@ -113,6 +168,7 @@ export async function startRender(options: StartRenderOptions, serverPort: numbe
         job.status = 'failed';
         job.error = e.message;
       }
+      saveJobs();
     } finally {
       jobControllers.delete(jobId);
     }
@@ -137,6 +193,7 @@ export function cancelJob(id: string): boolean {
     console.log(`[RenderManager] Cancelling job ${id}...`);
     controller.abort();
     job.status = 'cancelled';
+    saveJobs();
     return true;
   }
   return false;
@@ -150,6 +207,8 @@ export function deleteJob(id: string): boolean {
   if (job.status === 'rendering') return false;
 
   jobs.delete(id);
+  saveJobs();
+
   if (job.outputPath && fs.existsSync(job.outputPath)) {
     try {
       fs.unlinkSync(job.outputPath);

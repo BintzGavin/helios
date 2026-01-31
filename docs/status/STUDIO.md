@@ -1,4 +1,4 @@
-**Version**: 0.64.0
+**Version**: 0.65.0
 
 # Studio Domain Status
 
@@ -7,6 +7,7 @@
 **Focus**: UI Implementation & CLI
 
 ## Recent Updates
+- [v0.65.0] ✅ Completed: Persistent Render Jobs - Implemented persistence of render jobs to `jobs.json` in the `renders` directory, ensuring history survives server restarts.
 - [v0.64.0] ✅ Completed: Props Grouping - Implemented collapsible groups in Props Editor based on schema `group` property.
 - [v0.63.1] ✅ Verified: Maintenance - Synced package.json version and verified Studio UI with Playwright.
 - [v0.63.0] ✅ Completed: Refine Assets Panel - Updated asset discovery to prioritize `public` directory and use relative paths/URLs, aligning with vision.
