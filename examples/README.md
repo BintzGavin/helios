@@ -13,6 +13,7 @@ These examples use plain JavaScript without any framework, demonstrating the cor
 - **[client-export-api](./client-export-api/)**: Programmatic client-side export using `ClientSideExporter` and `BridgeController` without the default player UI.
 - **[code-walkthrough](./code-walkthrough/)**: Syntax highlighting and line focusing for developer content.
 - **[media-element-animation](./media-element-animation/)**: Synchronization of `<video>` and `<audio>` elements.
+- **[diagnostics](./diagnostics/)**: System capability and WebCodecs support checker.
 - **[stress-test-animation](./stress-test-animation/)**: High-element count stress test (2500+ elements).
 - **[text-effects-animation](./text-effects-animation/)**: Typewriter and reveal effects.
 - **[variable-font-animation](./variable-font-animation/)**: Animating variable font axes.
