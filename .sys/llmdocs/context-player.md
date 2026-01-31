@@ -50,6 +50,7 @@ The component observes the following attributes:
 - `poster`: URL of the poster image to show before loading/playing.
 - `preload`: Hint for preloading behavior (`auto`, `metadata`, `none`).
 - `export-format`: Format for client-side export (`mp4`, `webm`).
+- `export-caption-mode`: Mode for caption export (`burn-in` or `file`).
 - `input-props`: JSON string of properties to pass to the composition.
 - `controlslist`: Space-separated tokens to customize UI (`nodownload`, `nofullscreen`).
 - `crossorigin`: CORS setting for the element (`anonymous`, `use-credentials`).

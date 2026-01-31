@@ -786,7 +786,7 @@ export class HeliosPlayer extends HTMLElement implements TrackHost {
   }
 
   static get observedAttributes() {
-    return ["src", "width", "height", "autoplay", "loop", "controls", "export-format", "input-props", "poster", "muted", "interactive", "preload", "controlslist", "sandbox"];
+    return ["src", "width", "height", "autoplay", "loop", "controls", "export-format", "input-props", "poster", "muted", "interactive", "preload", "controlslist", "sandbox", "export-caption-mode"];
   }
 
   constructor() {
@@ -1797,6 +1797,23 @@ export class HeliosPlayer extends HTMLElement implements TrackHost {
     const exportMode = (this.getAttribute("export-mode") || "auto") as "auto" | "canvas" | "dom";
     const canvasSelector = this.getAttribute("canvas-selector") || "canvas";
     const exportFormat = (this.getAttribute("export-format") || "mp4") as "mp4" | "webm";
+    const captionMode = (this.getAttribute("export-caption-mode") || "burn-in") as "burn-in" | "file";
+
+    let includeCaptions = this.showCaptions;
+
+    if (this.showCaptions && captionMode === 'file') {
+      const showingTrack = Array.from(this._textTracks).find(t => t.mode === 'showing' && t.kind === 'captions');
+      if (showingTrack) {
+        // Convert TextTrackCueList to Array before mapping
+        const cues = Array.from(showingTrack.cues).map((cue: any) => ({
+          startTime: cue.startTime,
+          endTime: cue.endTime,
+          text: cue.text
+        }));
+        exporter.saveCaptionsAsSRT(cues, "captions.srt");
+      }
+      includeCaptions = false;
+    }
 
     try {
         await exporter.export({
@@ -1807,7 +1824,7 @@ export class HeliosPlayer extends HTMLElement implements TrackHost {
             mode: exportMode,
             canvasSelector: canvasSelector,
             format: exportFormat,
-            includeCaptions: this.showCaptions
+            includeCaptions: includeCaptions
         });
     } catch (e: any) {
         if (e.message !== "Export aborted") {
