@@ -1,3 +1,6 @@
+## STUDIO v0.61.0
+- ✅ Completed: Recursive Composition Discovery - Implemented recursive directory scanning for composition discovery, allowing nested composition structures.
+
 ## STUDIO v0.60.0
 - ✅ Completed: Render Preview - Implemented a modal to preview rendered videos directly within the Studio UI.
 

@@ -1,10 +1,103 @@
 // @vitest-environment node
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { findAssets, deleteComposition, createComposition } from './discovery';
+import { findAssets, deleteComposition, createComposition, findCompositions } from './discovery';
 import fs from 'fs';
 import path from 'path';
 
 vi.mock('fs');
+
+describe('findCompositions', () => {
+    const originalEnv = process.env;
+
+    beforeEach(() => {
+        vi.resetAllMocks();
+        process.env = { ...originalEnv, HELIOS_PROJECT_ROOT: path.resolve('/mock/project') };
+        vi.mocked(fs.existsSync).mockReturnValue(false);
+    });
+
+    afterEach(() => {
+        process.env = originalEnv;
+    });
+
+    it('should find nested compositions', () => {
+        // Mock directory structure:
+        // /mock/project/
+        //   comp1/ (composition)
+        //   folder/
+        //     comp2/ (composition)
+        //     subfolder/
+        //       comp3/ (composition)
+        //   node_modules/ (ignored)
+
+        vi.mocked(fs.readdirSync).mockImplementation((dirPath: any) => {
+            const dir = path.resolve(dirPath);
+            const root = path.resolve('/mock/project');
+
+            if (dir === root) {
+                return [
+                    { name: 'comp1', isDirectory: () => true },
+                    { name: 'folder', isDirectory: () => true },
+                    { name: 'node_modules', isDirectory: () => true }, // Should be ignored
+                    { name: 'random.txt', isDirectory: () => false }
+                ] as any;
+            }
+            if (dir === path.resolve(root, 'folder')) {
+                return [
+                    { name: 'comp2', isDirectory: () => true },
+                    { name: 'subfolder', isDirectory: () => true }
+                ] as any;
+            }
+            if (dir === path.resolve(root, 'folder/subfolder')) {
+                return [
+                    { name: 'comp3', isDirectory: () => true }
+                ] as any;
+            }
+            return [] as any;
+        });
+
+        vi.mocked(fs.existsSync).mockImplementation((filePath: any) => {
+            const p = path.resolve(filePath);
+            const root = path.resolve('/mock/project');
+
+            // Check for composition.html
+            if (p === path.resolve(root, 'comp1/composition.html')) return true;
+            if (p === path.resolve(root, 'folder/comp2/composition.html')) return true;
+            if (p === path.resolve(root, 'folder/subfolder/comp3/composition.html')) return true;
+
+            // Project root exists
+            if (p === root) return true;
+
+            return false;
+        });
+
+        vi.mocked(fs.readFileSync).mockImplementation(() => '{}'); // Mock metadata read
+
+        const compositions = findCompositions('.');
+
+        const ids = compositions.map(c => c.id).sort();
+
+        expect(ids).toContain('comp1');
+        expect(ids).toContain('folder/comp2');
+        expect(ids).toContain('folder/subfolder/comp3');
+        expect(ids).not.toContain('node_modules');
+
+        // Verify URLs are correct
+        const comp2 = compositions.find(c => c.id === 'folder/comp2');
+        expect(comp2).toBeDefined();
+        // The URL logic uses /@fs prefix
+        // On Windows, paths might differ, but our test environment is likely Posix or we used path.join
+        // However, findCompositions implementation uses `/@fs${compPath}`.
+        // compPath is constructed with path.join.
+        // For the test expectation, we can check if it contains the path.
+        expect(comp2?.url).toContain('folder/comp2/composition.html');
+
+        // Verify names
+        expect(comp2?.name).toBe('Comp2'); // Capitalized
+
+        // Verify description (should contain relative path)
+        expect(comp2?.description).toContain('folder/comp2');
+    });
+});
 
 describe('findAssets', () => {
   const originalEnv = process.env;

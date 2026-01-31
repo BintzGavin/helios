@@ -34,44 +34,61 @@ export function findCompositions(rootDir: string): CompositionInfo[] {
     return [];
   }
 
-  const entries = fs.readdirSync(projectRoot, { withFileTypes: true });
   const compositions: CompositionInfo[] = [];
 
-  for (const entry of entries) {
-    if (entry.isDirectory()) {
-      const compDir = path.join(projectRoot, entry.name);
-      const compPath = path.join(compDir, 'composition.html');
+  function scan(dir: string) {
+    const compPath = path.join(dir, 'composition.html');
 
-      if (fs.existsSync(compPath)) {
-        // Format name: "simple-canvas-animation" -> "Simple Canvas Animation"
-        const name = entry.name
-          .split('-')
-          .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-          .join(' ');
+    if (fs.existsSync(compPath)) {
+      // It is a composition
+      const relativePath = path.relative(projectRoot, dir);
+      // Ensure forward slashes for ID consistency across platforms
+      const id = relativePath.split(path.sep).join('/');
 
-        // Read metadata if exists
-        let metadata: CompositionOptions | undefined;
-        const metaPath = path.join(compDir, 'composition.json');
-        if (fs.existsSync(metaPath)) {
-            try {
-                metadata = JSON.parse(fs.readFileSync(metaPath, 'utf-8'));
-            } catch (e) {
-                console.warn(`Failed to parse metadata for ${entry.name}`, e);
-            }
+      // Format name: "simple-canvas-animation" -> "Simple Canvas Animation"
+      const name = path.basename(dir)
+        .split('-')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' ');
+
+      // Read metadata if exists
+      let metadata: CompositionOptions | undefined;
+      const metaPath = path.join(dir, 'composition.json');
+      if (fs.existsSync(metaPath)) {
+        try {
+          metadata = JSON.parse(fs.readFileSync(metaPath, 'utf-8'));
+        } catch (e) {
+          console.warn(`Failed to parse metadata for ${id}`, e);
         }
-
-        compositions.push({
-          id: entry.name,
-          name: name,
-          // Use /@fs/ prefix with absolute path so Vite can serve files outside root
-          // Ensure we don't double slash if path starts with /
-          url: `/@fs${compPath}`,
-          description: `Example: ${name}`,
-          metadata
-        });
       }
+
+      compositions.push({
+        id,
+        name,
+        // Use /@fs/ prefix with absolute path so Vite can serve files outside root
+        // Ensure we don't double slash if path starts with /
+        url: `/@fs${compPath}`,
+        description: id,
+        metadata
+      });
+      return;
+    }
+
+    // Recurse into subdirectories
+    try {
+      const entries = fs.readdirSync(dir, { withFileTypes: true });
+      for (const entry of entries) {
+        if (entry.isDirectory()) {
+          if (['node_modules', '.git', 'dist', 'build'].includes(entry.name)) continue;
+          scan(path.join(dir, entry.name));
+        }
+      }
+    } catch (e) {
+      console.warn(`Failed to scan directory: ${dir}`, e);
     }
   }
+
+  scan(projectRoot);
   return compositions;
 }
 

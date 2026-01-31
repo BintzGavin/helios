@@ -49,7 +49,7 @@ packages/studio
 ## CLI Interface
 `npx helios studio`
 - Starts the Studio server.
-- Scans the current directory (or `HELIOS_PROJECT_ROOT`) for compositions.
+- Scans the current directory (or `HELIOS_PROJECT_ROOT`) recursively for compositions.
 - Watches for file changes and updates the UI (HMR).
 
 ## UI Components
