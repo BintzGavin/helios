@@ -78,7 +78,8 @@ export async function scanForAudioTracks(page: Page): Promise<AudioTrackConfig[]
               path: src,
               volume: volume,
               offset: isNaN(offset) ? 0 : offset,
-              seek: isNaN(seek) ? 0 : seek
+              seek: isNaN(seek) ? 0 : seek,
+              loop: el.loop
             });
           }
         });
@@ -103,6 +104,7 @@ export async function scanForAudioTracks(page: Page): Promise<AudioTrackConfig[]
       volume: track.volume,
       offset: track.offset,
       seek: track.seek,
+      loop: track.loop,
     }));
 
   if (validTracks.length > 0) {

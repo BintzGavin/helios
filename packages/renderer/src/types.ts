@@ -33,6 +33,12 @@ export interface AudioTrackConfig {
    * Defaults to 0 (no fade out).
    */
   fadeOutDuration?: number;
+
+  /**
+   * Whether to loop the audio track indefinitely.
+   * Defaults to false.
+   */
+  loop?: boolean;
 }
 
 export interface BrowserConfig {
