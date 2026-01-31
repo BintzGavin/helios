@@ -49,3 +49,7 @@
 ## [0.65.0] - Core Schema Parity
 **Learning:** `packages/core` schema definitions often evolve (e.g. adding `TypedArray` types) without immediate Studio UI updates, leading to "Unsupported schema type" errors.
 **Action:** When planning Studio features, cross-reference `packages/core/src/schema.ts` `PropType` definition against `packages/studio/src/components/SchemaInputs.tsx` to identify missing inputs.
+
+## [0.63.1] - Version Mismatch
+**Learning:** `package.json` version (0.63.1) lagged behind `docs/status/STUDIO.md` (0.66.0). Previous agents updated the status but not the package file.
+**Action:** When updating the status file, always check and bump the `package.json` version to match.
