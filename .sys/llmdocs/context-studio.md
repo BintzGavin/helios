@@ -56,9 +56,9 @@ The CLI uses `HELIOS_PROJECT_ROOT` environment variable to determine the project
 -   **Stage**: Wraps `<helios-player>` and provides canvas controls (Zoom, Pan, Safe Areas).
 -   **Timeline**: Visualizes playback progress, markers, and captions. Supports seeking and scrubbing.
 -   **Props Editor**: auto-generated form based on the composition's `HeliosSchema`.
-    -   Supports primitives (string, number, boolean).
-    -   Supports assets (image, video, audio).
-    -   Supports complex types (object, array, typed arrays).
+    -   Supports primitives (string, number, boolean) with constraints (min/max/step, minLength/maxLength/pattern).
+    -   Supports assets (image, video, audio) with type and extension filtering.
+    -   Supports complex types (object, array, typed arrays) with size constraints (minItems/maxItems).
     -   Supports collapsible groups via `group` property.
 -   **Assets Panel**: Discovers and allows drag-and-drop of assets from the project.
 -   **Renders Panel**: Manages render jobs (Start, Cancel, Download).
