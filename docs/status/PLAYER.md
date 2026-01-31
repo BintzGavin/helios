@@ -1,4 +1,4 @@
-**Version**: v0.48.4
+**Version**: v0.49.0
 
 # Status: PLAYER
 
@@ -44,6 +44,7 @@
 ## Critical Task
 - **None**: All critical tasks completed.
 
+[v0.49.0] ✅ Completed: Picture-in-Picture - Implemented `requestPictureInPicture` API and UI toggle button for the player, supported in Direct/Same-Origin mode.
 [v0.48.4] ✅ Completed: Optimize Caption Rendering - Implemented state diffing to prevent unnecessary DOM updates during caption rendering, improving performance.
 [v0.48.3] ✅ Completed: Verify Player - Validated interactive playback (play/pause) via E2E test.
 [v0.48.2] ✅ Completed: Enforce Bridge Connection Security - Added missing `event.source` check in `connectToParent` (bridge.ts) to verify messages originate from the parent window, completing the bridge security hardening.

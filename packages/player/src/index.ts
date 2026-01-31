@@ -278,6 +278,26 @@ template.innerHTML = `
     .fullscreen-btn:hover {
       color: var(--helios-accent-color);
     }
+    .pip-video {
+      position: absolute;
+      width: 0;
+      height: 0;
+      opacity: 0;
+      pointer-events: none;
+    }
+    .pip-btn {
+      background: none;
+      border: none;
+      color: var(--helios-text-color);
+      font-size: 20px;
+      cursor: pointer;
+      width: 40px;
+      height: 40px;
+      margin-left: 8px;
+    }
+    .pip-btn:hover {
+      color: var(--helios-accent-color);
+    }
     .captions-container {
       position: absolute;
       bottom: 60px;
@@ -400,6 +420,7 @@ template.innerHTML = `
     <img class="poster-image" alt="Video poster" />
     <div class="big-play-btn" aria-label="Play video">▶</div>
   </div>
+  <video class="pip-video" playsinline muted autoplay></video>
   <iframe part="iframe" sandbox="allow-scripts allow-same-origin" title="Helios Composition Preview"></iframe>
   <div class="click-layer" part="click-layer"></div>
   <div class="captions-container" part="captions"></div>
@@ -424,11 +445,13 @@ template.innerHTML = `
     </div>
     <div class="time-display" part="time-display">0.00 / 0.00</div>
     <button class="fullscreen-btn" part="fullscreen-button" aria-label="Toggle fullscreen">⛶</button>
+    <button class="pip-btn" part="pip-button" aria-label="Picture-in-Picture">⏏</button>
   </div>
 `;
 
 export class HeliosPlayer extends HTMLElement implements TrackHost {
   private iframe: HTMLIFrameElement;
+  private pipVideo: HTMLVideoElement;
   private _textTracks: HeliosTextTrackList;
   private _domTracks = new Map<HTMLTrackElement, HeliosTextTrack>();
   private playPauseBtn: HTMLButtonElement;
@@ -446,6 +469,7 @@ export class HeliosPlayer extends HTMLElement implements TrackHost {
   private retryAction: () => void;
   private speedSelector: HTMLSelectElement;
   private fullscreenBtn: HTMLButtonElement;
+  private pipBtn: HTMLButtonElement;
   private captionsContainer: HTMLDivElement;
   private ccBtn: HTMLButtonElement;
   private showCaptions: boolean = false;
@@ -758,6 +782,54 @@ export class HeliosPlayer extends HTMLElement implements TrackHost {
     this.setAttribute("sandbox", val);
   }
 
+  public async requestPictureInPicture(): Promise<PictureInPictureWindow> {
+    if (!document.pictureInPictureEnabled) {
+      throw new Error("Picture-in-Picture not supported");
+    }
+
+    // Try to find the canvas
+    let canvas: HTMLCanvasElement | null = null;
+    try {
+        const doc = this.iframe.contentDocument || (this.iframe.contentWindow as any)?.document;
+        if (doc) {
+            const selector = this.getAttribute("canvas-selector") || "canvas";
+            canvas = doc.querySelector(selector);
+        }
+    } catch (e) {
+        // Access denied
+    }
+
+    if (!canvas) {
+        throw new Error("No canvas found for Picture-in-Picture (requires same-origin access).");
+    }
+
+    const stream = canvas.captureStream(this.fps || 30);
+    this.pipVideo.srcObject = stream;
+    await this.pipVideo.play();
+    return this.pipVideo.requestPictureInPicture();
+  }
+
+  private togglePip() {
+    if (document.pictureInPictureElement) {
+       document.exitPictureInPicture();
+    } else {
+       this.requestPictureInPicture().catch(e => {
+           console.warn("HeliosPlayer: PiP failed", e);
+       });
+    }
+  }
+
+  private onEnterPip = () => {
+    this.pipBtn.style.color = "var(--helios-accent-color)";
+    this.dispatchEvent(new Event("enterpictureinpicture"));
+  };
+
+  private onLeavePip = () => {
+    this.pipBtn.style.removeProperty("color");
+    this.pipVideo.pause();
+    this.dispatchEvent(new Event("leavepictureinpicture"));
+  };
+
   public async play(): Promise<void> {
     if (!this.isLoaded) {
       this.setAttribute("autoplay", "");
@@ -810,8 +882,11 @@ export class HeliosPlayer extends HTMLElement implements TrackHost {
     this.retryBtn = this.shadowRoot!.querySelector(".retry-btn")!;
     this.speedSelector = this.shadowRoot!.querySelector(".speed-selector")!;
     this.fullscreenBtn = this.shadowRoot!.querySelector(".fullscreen-btn")!;
+    this.pipBtn = this.shadowRoot!.querySelector(".pip-btn")!;
     this.captionsContainer = this.shadowRoot!.querySelector(".captions-container")!;
     this.ccBtn = this.shadowRoot!.querySelector(".cc-btn")!;
+
+    this.pipVideo = this.shadowRoot!.querySelector(".pip-video")!;
 
     this.clickLayer = this.shadowRoot!.querySelector(".click-layer")!;
     this.posterContainer = this.shadowRoot!.querySelector(".poster-container")!;
@@ -1009,8 +1084,11 @@ export class HeliosPlayer extends HTMLElement implements TrackHost {
     this.exportBtn.addEventListener("click", this.renderClientSide);
     this.speedSelector.addEventListener("change", this.handleSpeedChange);
     this.fullscreenBtn.addEventListener("click", this.toggleFullscreen);
+    this.pipBtn.addEventListener("click", () => this.togglePip());
     this.ccBtn.addEventListener("click", this.toggleCaptions);
     this.bigPlayBtn.addEventListener("click", this.handleBigPlayClick);
+    this.pipVideo.addEventListener("enterpictureinpicture", this.onEnterPip);
+    this.pipVideo.addEventListener("leavepictureinpicture", this.onLeavePip);
     this.posterContainer.addEventListener("click", this.handleBigPlayClick);
 
     const slot = this.shadowRoot!.querySelector("slot");
@@ -1070,6 +1148,8 @@ export class HeliosPlayer extends HTMLElement implements TrackHost {
     this.fullscreenBtn.removeEventListener("click", this.toggleFullscreen);
     this.ccBtn.removeEventListener("click", this.toggleCaptions);
     this.bigPlayBtn.removeEventListener("click", this.handleBigPlayClick);
+    this.pipVideo.removeEventListener("enterpictureinpicture", this.onEnterPip);
+    this.pipVideo.removeEventListener("leavepictureinpicture", this.onLeavePip);
     this.posterContainer.removeEventListener("click", this.handleBigPlayClick);
 
     const slot = this.shadowRoot!.querySelector("slot");
@@ -1152,6 +1232,7 @@ export class HeliosPlayer extends HTMLElement implements TrackHost {
       this.scrubber.disabled = disabled;
       this.speedSelector.disabled = disabled;
       this.fullscreenBtn.disabled = disabled;
+      this.pipBtn.disabled = disabled;
       this.ccBtn.disabled = disabled;
       // Export is managed separately based on connection state
       if (disabled) {
@@ -1166,6 +1247,7 @@ export class HeliosPlayer extends HTMLElement implements TrackHost {
       this.scrubber.disabled = locked;
       this.speedSelector.disabled = locked;
       this.fullscreenBtn.disabled = locked;
+      this.pipBtn.disabled = locked;
       this.ccBtn.disabled = locked;
   }
 
