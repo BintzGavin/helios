@@ -1,4 +1,4 @@
-**Version**: v0.49.0
+**Version**: v0.49.1
 
 # Status: PLAYER
 
@@ -40,10 +40,12 @@
 - Implemented robust `load()` behavior that supports reloading the current `src` to facilitate programmatic retries.
 - Visualizes markers on the timeline, allowing users to identify and seek to specific points of interest.
 - Migrated client-side export to use `mediabunny`, replacing deprecated `mp4-muxer` and `webm-muxer`.
+- Implemented persistence for `volume`, `playbackRate`, and `muted` properties, ensuring values set before connection are applied upon initialization.
 
 ## Critical Task
 - **None**: All critical tasks completed.
 
+[v0.49.1] ✅ Completed: Persist Media Properties - Implemented persistence for `volume`, `playbackRate`, and `muted` properties so values set before the player loads are applied when the controller connects.
 [v0.49.0] ✅ Completed: Picture-in-Picture - Implemented `requestPictureInPicture` API and UI toggle button for the player, supported in Direct/Same-Origin mode.
 [v0.48.4] ✅ Completed: Optimize Caption Rendering - Implemented state diffing to prevent unnecessary DOM updates during caption rendering, improving performance.
 [v0.48.3] ✅ Completed: Verify Player - Validated interactive playback (play/pause) via E2E test.
