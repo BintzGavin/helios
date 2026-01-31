@@ -40,6 +40,9 @@ export interface PropDefinition {
   description?: string;
   step?: number;
   format?: string;
+  pattern?: string;
+  accept?: string[];
+  group?: string;
   items?: PropDefinition;
   properties?: HeliosSchema;
 }
@@ -51,6 +54,31 @@ export function validateSchema(schema: HeliosSchema | undefined, parentKey = '')
 
   for (const [key, def] of Object.entries(schema)) {
     const path = parentKey ? `${parentKey}.${key}` : key;
+
+    // Validate Pattern constraint
+    if (def.pattern !== undefined) {
+      if (def.type !== 'string') {
+        throw new HeliosError(HeliosErrorCode.INVALID_SCHEMA, `Prop '${path}' defines pattern but is not a string type.`);
+      }
+      try {
+        new RegExp(def.pattern);
+      } catch (e) {
+        throw new HeliosError(HeliosErrorCode.INVALID_SCHEMA, `Prop '${path}' defines invalid pattern regex: ${def.pattern}`);
+      }
+    }
+
+    // Validate Accept constraint
+    if (def.accept !== undefined) {
+      if (def.type !== 'string' && !['image', 'video', 'audio', 'font', 'model', 'json', 'shader'].includes(def.type)) {
+        throw new HeliosError(HeliosErrorCode.INVALID_SCHEMA, `Prop '${path}' defines accept but is not a string or asset type.`);
+      }
+      if (!Array.isArray(def.accept)) {
+        throw new HeliosError(HeliosErrorCode.INVALID_SCHEMA, `Prop '${path}' accept must be an array of strings.`);
+      }
+      if (def.accept.some(ext => typeof ext !== 'string')) {
+        throw new HeliosError(HeliosErrorCode.INVALID_SCHEMA, `Prop '${path}' accept must contain only strings.`);
+      }
+    }
 
     // Validate Array/TypedArray constraints
     if (def.minItems !== undefined || def.maxItems !== undefined) {
@@ -181,6 +209,20 @@ function validateValue(val: any, def: PropDefinition, keyPath: string): any {
     }
     if (def.maxLength !== undefined && val.length > def.maxLength) {
       throw new HeliosError(HeliosErrorCode.INVALID_INPUT_PROPS, `Prop '${keyPath}' must be at most ${def.maxLength} characters.`);
+    }
+    if (def.pattern !== undefined) {
+      const regex = new RegExp(def.pattern);
+      if (!regex.test(val)) {
+        throw new HeliosError(HeliosErrorCode.INVALID_INPUT_PROPS, `Prop '${keyPath}' does not match pattern: ${def.pattern}`);
+      }
+    }
+  }
+
+  // Accept Check (String/Assets)
+  if (typeof val === 'string' && def.accept !== undefined) {
+    const match = def.accept.some(ext => val.toLowerCase().endsWith(ext.toLowerCase()));
+    if (!match) {
+      throw new HeliosError(HeliosErrorCode.INVALID_INPUT_PROPS, `Prop '${keyPath}' must have one of these extensions: ${def.accept.join(', ')}`);
     }
   }
 

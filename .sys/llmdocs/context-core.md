@@ -58,6 +58,37 @@ export type HeliosState = {
   currentTime: number;
 };
 
+export type PropType =
+  | 'string' | 'number' | 'boolean' | 'object' | 'array' | 'color'
+  | 'image' | 'video' | 'audio' | 'font' | 'model' | 'json' | 'shader'
+  | 'int8array' | 'uint8array' | 'uint8clampedarray'
+  | 'int16array' | 'uint16array' | 'int32array' | 'uint32array'
+  | 'float32array' | 'float64array';
+
+export interface PropDefinition {
+  type: PropType;
+  optional?: boolean;
+  default?: any;
+  minimum?: number;
+  maximum?: number;
+  minItems?: number;
+  maxItems?: number;
+  minLength?: number;
+  maxLength?: number;
+  enum?: (string | number)[];
+  label?: string;
+  description?: string;
+  step?: number;
+  format?: string;
+  pattern?: string;
+  accept?: string[];
+  group?: string;
+  items?: PropDefinition;
+  properties?: Record<string, PropDefinition>;
+}
+
+export type HeliosSchema = Record<string, PropDefinition>;
+
 export type HeliosSubscriber = (state: HeliosState) => void;
 
 export type StabilityCheck = () => Promise<void>;

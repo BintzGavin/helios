@@ -1,5 +1,8 @@
 # CORE Progress Log
 
+## CORE v3.1.0
+- ✅ Completed: Enhance Schema UI Constraints - Added `pattern`, `accept`, and `group` to `PropDefinition` and implemented validation logic for regex and file extensions.
+
 ## CORE v3.0.0
 - ✅ Completed: Expose Duration/FPS Signals - Changed `duration` and `fps` to return `ReadonlySignal<number>` for reactive updates (Breaking Change).
 
