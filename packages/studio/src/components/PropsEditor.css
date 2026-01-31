@@ -212,3 +212,47 @@
 .props-toolbar-btn.danger:hover {
   background-color: #ffcdd2;
 }
+
+/* Prop Groups */
+.prop-group {
+  border: 1px solid #eee;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.prop-group-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px;
+  background-color: #f5f5f5;
+  cursor: pointer;
+  user-select: none;
+  font-size: 0.9em;
+  font-weight: bold;
+  color: #333;
+}
+
+.prop-group-header:hover {
+  background-color: #eeeeee;
+}
+
+.prop-group-arrow {
+  display: inline-block;
+  font-size: 0.8em;
+  transition: transform 0.2s ease;
+  transform: rotate(0deg);
+}
+
+.prop-group-arrow.collapsed {
+  transform: rotate(-90deg);
+}
+
+.prop-group-content {
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background-color: #fff;
+  border-top: 1px solid #eee;
+}

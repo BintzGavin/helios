@@ -1,3 +1,6 @@
+## STUDIO v0.64.0
+- ✅ Completed: Props Grouping - Implemented collapsible groups in Props Editor based on schema `group` property.
+
 ## STUDIO v0.63.1
 - ✅ Verified: Maintenance - Synced package.json version and verified Studio UI with Playwright.
 

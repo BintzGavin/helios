@@ -1,4 +1,4 @@
-**Version**: 0.63.1
+**Version**: 0.64.0
 
 # Studio Domain Status
 
@@ -7,6 +7,7 @@
 **Focus**: UI Implementation & CLI
 
 ## Recent Updates
+- [v0.64.0] ✅ Completed: Props Grouping - Implemented collapsible groups in Props Editor based on schema `group` property.
 - [v0.63.1] ✅ Verified: Maintenance - Synced package.json version and verified Studio UI with Playwright.
 - [v0.63.0] ✅ Completed: Refine Assets Panel - Updated asset discovery to prioritize `public` directory and use relative paths/URLs, aligning with vision.
 - [v0.62.0] ✅ Completed: MCP Server Integration - Implemented Model Context Protocol server allowing AI agents to inspect, create, and render compositions.
