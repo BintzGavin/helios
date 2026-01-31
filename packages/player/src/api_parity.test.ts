@@ -239,6 +239,8 @@ describe('HeliosPlayer API Parity', () => {
       }),
       setInputProps: vi.fn(), setCaptions: vi.fn(),
       setAudioMuted: vi.fn(),
+      setAudioVolume: vi.fn(),
+      setPlaybackRate: vi.fn(),
     };
     (player as any).setController(mockController);
 
