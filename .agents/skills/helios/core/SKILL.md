@@ -191,6 +191,30 @@ interface DiagnosticReport {
   waapi: boolean;         // Web Animations API support
   webCodecs: boolean;     // VideoEncoder support
   offscreenCanvas: boolean;
+  webgl: boolean;
+  webgl2: boolean;
+  webAudio: boolean;
+  colorGamut: 'srgb' | 'p3' | 'rec2020' | null;
+  videoCodecs: {
+    h264: boolean;
+    vp8: boolean;
+    vp9: boolean;
+    av1: boolean;
+  };
+  audioCodecs: {
+    aac: boolean;
+    opus: boolean;
+  };
+  videoDecoders: {
+    h264: boolean;
+    vp8: boolean;
+    vp9: boolean;
+    av1: boolean;
+  };
+  audioDecoders: {
+    aac: boolean;
+    opus: boolean;
+  };
   userAgent: string;
 }
 ```
@@ -201,12 +225,11 @@ Generate a system prompt for AI agents that includes the current composition con
 ```typescript
 import { createSystemPrompt, HELIOS_BASE_PROMPT } from '@helios-project/core';
 
-const prompt = createSystemPrompt(helios, "You are a creative director.");
+const prompt = createSystemPrompt(helios);
 // Returns a string containing:
 // 1. HELIOS_BASE_PROMPT (Philosophy, API summary)
 // 2. Composition State (Duration, FPS, Resolution)
 // 3. Schema Definitions
-// 4. "You are a creative director."
 ```
 
 ## Signals
@@ -291,6 +314,37 @@ const sequenced = series(items, 0);
 // [
 //   { id: 'a', durationInFrames: 30, from: 0 },
 //   { id: 'b', durationInFrames: 60, offset: -10, from: 20 } // 0 + 30 - 10
+// ]
+```
+
+### Stagger
+Stagger the start time of a list of items by a fixed interval.
+
+```typescript
+import { stagger } from '@helios-project/core';
+
+const items = [{ id: 'a' }, { id: 'b' }, { id: 'c' }];
+const staggered = stagger(items, 5);
+// Result:
+// [
+//   { id: 'a', from: 0 },
+//   { id: 'b', from: 5 },
+//   { id: 'c', from: 10 }
+// ]
+```
+
+### Shift
+Shift the start time of a list of sequenced items.
+
+```typescript
+import { shift } from '@helios-project/core';
+
+const items = [{ from: 0 }, { from: 10 }];
+const shifted = shift(items, 30);
+// Result:
+// [
+//   { from: 30 },
+//   { from: 40 }
 // ]
 ```
 

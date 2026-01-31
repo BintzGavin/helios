@@ -1,11 +1,12 @@
 # Status: CORE
 
-**Version**: 3.3.0
+**Version**: 3.3.1
 
 - **Status**: Active
 - **Current Focus**: Maintenance, Optimization, and Stability
-- **Last Updated**: 2026-06-01
+- **Last Updated**: 2026-06-03
 
+[v3.3.1] ✅ Completed: Update Skill Docs - Updated .agents/skills/helios/core/SKILL.md to match v3.3.0 API (DiagnosticReport, Sequencing Helpers).
 [v3.3.0] ✅ Completed: Enable Testing & Sync Version - Added vitest to devDependencies, verified tests pass, and updated dependent packages (renderer, player) to use core version 3.3.0.
 [v3.3.0] ✅ Completed: Decoder Diagnostics - Added `videoDecoders` (h264, vp8, vp9, av1) and `audioDecoders` (aac, opus) checks to `Helios.diagnose()` and `DiagnosticReport` using WebCodecs API.
 [v3.2.0] ✅ Completed: Implement AI System Prompt Generator - Added `createSystemPrompt` and `HELIOS_BASE_PROMPT` to programmatically generate context-aware system prompts for AI agents.
