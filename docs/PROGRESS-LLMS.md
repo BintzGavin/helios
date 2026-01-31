@@ -1,5 +1,12 @@
 # LLMS Progress Log
 
+## LLMS v1.4.0
+- ✅ Completed: Daily llms.txt Review
+  - Quick Facts: Updated Status to "Core: Stable, Studio: Alpha".
+  - Core API: Corrected `captions` example to use `startTime`/`endTime` (ms).
+  - Roadmap: Updated to reflect Studio v0.63+ (MCP), Core v3.0+ (Signals), Player v0.48+ (SRT Export).
+  - Verified `llms.txt` content.
+
 ## LLMS v1.3.0
 - ✅ Completed: Daily llms.txt Review
   - Updated Roadmap: Reflected Studio v0.48+ features (Timeline Polish, Safe Areas, Client-Side Export).

@@ -6,7 +6,7 @@ Helios is a modern engine for creating videos programmatically using standard we
 
 ## Quick Facts
 - **License**: Elastic License 2.0 (free commercial use, no SaaS resale)
-- **Status**: Alpha / Self-Driving
+- **Status**: Core: Stable, Studio: Alpha
 - **Frameworks**: React, Vue, Svelte, vanilla JS
 - **Animation**: Standard CSS, Web Animations API (WAAPI), any animation library
 
@@ -20,7 +20,7 @@ const helios = new Helios({
   fps: 30,
   autoSyncAnimations: true,
   inputProps: { title: "Hello World" }, // Dynamic data
-  captions: [{ id: "1", time: 0, text: "Welcome" }] // SRT or objects
+  captions: [{ id: "1", startTime: 0, endTime: 1000, text: "Welcome" }] // SRT string or objects
 });
 
 helios.subscribe(({ currentFrame, inputProps }) => {
@@ -98,10 +98,10 @@ const report = await Helios.diagnose();
 
 ## Roadmap
 ### V1.x (Active)
-- **Helios Studio**: Alpha v0.48+ (Timeline Polish, Safe Areas, Client-Side Export)
-- **Core**: Stability Registry, Signals, TimeDriver (Completed)
-- **Player**: Deep API Parity, Standard Media Events (Completed)
-- **AI**: MCP Server, Agent Skills (Planned)
+- **Helios Studio**: Alpha v0.63+ (MCP Server, Recursive Discovery)
+- **Core**: Stable v3.0+ (Signals, Stability Registry)
+- **Player**: Feature Complete v0.48+ (SRT Export, Markers)
+- **AI**: Agent Skills (In Progress)
 
 ### V2 (Next)
 - Distributed rendering (Lambda, Cloud Run)
