@@ -10,6 +10,9 @@ if (buildCore.status !== 0) { console.error('❌ Core Build failed!'); process.e
 const buildRenderer = spawnSync('npm', ['run', 'build', '-w', 'packages/renderer'], { stdio: 'inherit', shell: true });
 if (buildRenderer.status !== 0) { console.error('❌ Renderer Build failed!'); process.exit(1); }
 
+const buildPlayer = spawnSync('npm', ['run', 'build', '-w', 'packages/player'], { stdio: 'inherit', shell: true });
+if (buildPlayer.status !== 0) { console.error('❌ Player Build failed!'); process.exit(1); }
+
 // 1. Build Examples
 console.log('\n📦 Step 1: Building Examples...');
 const build = spawnSync('npm', ['run', 'build:examples'], {
@@ -43,6 +46,18 @@ const verifyClient = spawnSync('npx', ['tsx', 'tests/e2e/verify-client-export.ts
 
 if (verifyClient.status !== 0) {
   console.error('❌ Client-Side Verification failed!');
+  process.exit(1);
+}
+
+// 4. Verify Player Web Component
+console.log('\n⏯️ Step 4: Verifying Player Web Component...');
+const verifyPlayer = spawnSync('npx', ['tsx', 'tests/e2e/verify-player.ts'], {
+  stdio: 'inherit',
+  shell: true,
+});
+
+if (verifyPlayer.status !== 0) {
+  console.error('❌ Player Verification failed!');
   process.exit(1);
 }
 

@@ -72,3 +72,8 @@ Tests are located in `tests/e2e/`.
     - Launches Playwright (Chromium).
     - Navigates to `examples/client-export-api`.
     - Clicks the "Export" button and waits for the "Done" state.
+- **verify-player.ts**: Verifies the `<helios-player>` Web Component.
+    - Spawns a static file server.
+    - Launches Playwright.
+    - Navigates to a fixture page loading the player and a simple composition.
+    - Verifies playback controls and time advancement.

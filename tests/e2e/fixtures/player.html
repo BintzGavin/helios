@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Helios Player Verification</title>
+    <script type="importmap">
+    {
+        "imports": {
+            "@helios-project/core": "/packages/core/dist/index.js"
+        }
+    }
+    </script>
+    <script type="module" src="/packages/player/dist/helios-player.bundle.mjs"></script>
+    <style>
+        body { margin: 0; padding: 20px; font-family: sans-serif; }
+    </style>
+</head>
+<body>
+    <h1>Helios Player Verification</h1>
+    <helios-player
+        src="/output/example-build/examples/simple-animation/composition.html"
+        width="800"
+        height="600"
+        controls
+    ></helios-player>
+</body>
+</html>
