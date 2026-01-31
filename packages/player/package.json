@@ -32,7 +32,7 @@
     "test": "vitest"
   },
   "dependencies": {
-    "@helios-project/core": "2.19.0",
+    "@helios-project/core": "3.1.0",
     "mediabunny": "^1.31.0"
   },
   "devDependencies": {

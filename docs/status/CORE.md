@@ -4,8 +4,9 @@
 
 - **Status**: Active
 - **Current Focus**: Maintenance, Optimization, and Stability
-- **Last Updated**: 2026-05-27
+- **Last Updated**: 2026-05-28
 
+[v3.1.0] ✅ Completed: Synchronize Version - Synced package.json version to 3.1.0 to match documentation and updated player/renderer dependencies.
 [v3.1.0] ✅ Completed: Enhance Schema UI Constraints - Added `pattern`, `accept`, and `group` to `PropDefinition` and implemented validation logic for regex and file extensions.
 [v3.0.0] ✅ Completed: Expose Duration/FPS Signals - Changed `duration` and `fps` to return `ReadonlySignal<number>` for reactive updates (Breaking Change).
 [v2.20.0] ✅ Completed: Audio Diagnostics - Added audioCodecs (aac, opus) detection to Helios.diagnose() and DiagnosticReport.

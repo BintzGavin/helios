@@ -1,6 +1,7 @@
 # CORE Progress Log
 
 ## CORE v3.1.0
+- ✅ Completed: Synchronize Version - Synced package.json version to 3.1.0 to match documentation and updated player/renderer dependencies.
 - ✅ Completed: Enhance Schema UI Constraints - Added `pattern`, `accept`, and `group` to `PropDefinition` and implemented validation logic for regex and file extensions.
 
 ## CORE v3.0.0
