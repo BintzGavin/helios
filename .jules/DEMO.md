@@ -39,3 +39,7 @@
 ## [1.72.3] - Dynamic Verification Pattern
 **Learning:** Hardcoded verification scripts (like the original `verify-client-export.ts`) are fragile and incomplete. The "Universal Player Fixture" pattern (using URL params to load compositions) is a powerful way to verify the entire example suite dynamically.
 **Action:** Always prefer dynamic discovery and generic fixtures over static, single-case tests for verification.
+
+## [1.74.0] - Vanilla Parity Gap
+**Learning:** The "Vanilla JS" examples (`simple-animation`) use legacy inline scripts and relative imports, failing to demonstrate the "Professional" Vite+TS pipeline promised by the Vision.
+**Action:** Created `examples/vanilla-typescript` to serve as the canonical reference for non-framework usage.
