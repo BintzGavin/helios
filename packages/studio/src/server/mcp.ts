@@ -36,16 +36,21 @@ export function createMcpServer(getPort: () => number) {
     },
     async (args) => {
       try {
+        // Only pass options if at least one is provided, otherwise let createComposition use defaults
+        const options = (args.width !== undefined || args.height !== undefined || args.fps !== undefined || args.duration !== undefined)
+          ? {
+              width: args.width ?? 1920,
+              height: args.height ?? 1080,
+              fps: args.fps ?? 30,
+              duration: args.duration ?? 5
+            }
+          : undefined;
+        
         const result = createComposition(
             process.cwd(),
             args.name,
             args.template || 'vanilla',
-            {
-                width: args.width,
-                height: args.height,
-                fps: args.fps,
-                duration: args.duration
-            }
+            options
         );
         return {
           content: [{ type: "text", text: JSON.stringify(result, null, 2) }]

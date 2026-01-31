@@ -1,25 +1,57 @@
 {
   "name": "@helios-project/studio",
   "version": "0.63.1",
-  "private": true,
+  "description": "Browser-based development environment for Helios video compositions.",
+  "author": "Gavin Bintz <me@gavinbintz.com>",
+  "license": "ELv2",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BintzGavin/helios.git"
+  },
+  "bugs": {
+    "url": "https://github.com/BintzGavin/helios/issues"
+  },
+  "homepage": "https://github.com/BintzGavin/helios#readme",
+  "publishConfig": {
+    "access": "public"
+  },
   "type": "module",
+  "bin": {
+    "helios-studio": "./bin/helios-studio.js"
+  },
+  "main": "dist/index.html",
+  "files": [
+    "bin",
+    "dist"
+  ],
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
     "test": "vitest",
-    "verify": "npx tsx scripts/verify-ui.ts"
+    "verify": "npx tsx scripts/verify-ui.ts",
+    "prepublishOnly": "npm run build"
   },
+  "keywords": [
+    "video",
+    "animation",
+    "programmatic-video",
+    "video-studio",
+    "video-editor",
+    "development-environment",
+    "helios"
+  ],
   "dependencies": {
-    "@helios-project/core": "*",
-    "@helios-project/player": "*",
-    "@helios-project/renderer": "*",
+    "@helios-project/core": "^3.3.0",
+    "@helios-project/player": "^0.48.3",
+    "@helios-project/renderer": "^0.0.1",
     "@modelcontextprotocol/sdk": "^1.25.3",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
     "solid-js": "^1.9.11",
     "svelte": "^5.48.2",
-    "vue": "^3.5.27"
+    "vue": "^3.5.27",
+    "vite": "^7.1.2"
   },
   "devDependencies": {
     "@playwright/test": "^1.58.0",
@@ -32,7 +64,6 @@
     "@vitejs/plugin-vue": "^6.0.3",
     "jsdom": "^24.0.0",
     "typescript": "^5.0.0",
-    "vite": "^7.1.2",
     "vite-plugin-solid": "^2.11.10",
     "vitest": "^4.0.17"
   }
