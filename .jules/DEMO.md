@@ -19,3 +19,7 @@
 ## [1.66.1] - Player Export Gaps
 **Learning:** The `@helios-project/player` package does not export `BridgeController` or `DirectController`, making it impossible for users to implement custom integrations or use `ClientSideExporter` programmatically without using the `<helios-player>` Web Component.
 **Action:** Created `examples/client-export-api` using source aliases to bypass this, but this gap should be flagged for the PLAYER domain to fix by exporting controllers.
+
+## [1.69.1] - Role Integrity
+**Learning:** As a Planner, I must strictly adhere to the "Design Only" protocol. Implementing code (even for verification) violates the agent architecture and boundaries.
+**Action:** Stop immediately after saving the `.md` plan file. Do not write implementation code or modify `examples/` directly.
