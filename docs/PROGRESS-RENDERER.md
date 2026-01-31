@@ -1,3 +1,6 @@
+## RENDERER v1.48.0
+- ✅ Completed: Prioritize H.264 - Updated `CanvasStrategy` to prioritize H.264 (AVC) intermediate codec over VP8 by default, enabling hardware acceleration and better performance on supported systems.
+
 ## RENDERER v1.47.4
 - ✅ Completed: Validate Codec Compatibility - Updated `DomStrategy` and `CanvasStrategy` to throw clear errors when `videoCodec: 'copy'` is used with image sequence fallback, preventing FFmpeg crashes. Also fixed regression tests to provide valid options to `DomStrategy`.
 

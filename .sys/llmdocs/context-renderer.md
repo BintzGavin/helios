@@ -7,7 +7,8 @@ The Renderer operates on a "Dual-Path" architecture to support different use cas
    - **Discovery**: Uses `dom-scanner` to recursively discover media elements (including Shadow DOM).
    - **Output**: Best for sharp text and vector graphics.
 2. **Canvas Strategy (`CanvasStrategy`)**: Used for WebGL/Canvas-heavy compositions (e.g., Three.js, PixiJS). It captures the `<canvas>` context directly.
-   - **Drivers**: Uses `CdpTimeDriver` (Chrome DevTools Protocol) for precise virtual time control (supports Shadow DOM media sync, enforces deterministic Jan 1 2024 epoch, ensures sync-before-render order, waits for budget expiration).
+   - **Drivers**: Uses `CdpTimeDriver` (Chrome DevTools Protocol) for precise virtual time control (supports Shadow DOM media sync, enforces deterministic Jan 2024 epoch, ensures sync-before-render order, waits for budget expiration).
+   - **Optimization**: Prioritizes H.264 (AVC) intermediate codec for hardware acceleration, falling back to VP8.
    - **Output**: Best for high-performance 2D/3D graphics.
 
 Both strategies pipe frame data directly to an FFmpeg process via stdin ("Zero Disk I/O"), ensuring high performance and low latency.

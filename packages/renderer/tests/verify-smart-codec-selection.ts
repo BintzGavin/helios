@@ -67,7 +67,7 @@ async function runTest() {
         console.log('✅ Copy mode checks passed');
     }
 
-     // Test 2: Default Mode -> Candidates should be VP8
+     // Test 2: Default Mode -> Candidates should prioritize H.264
     {
         console.log('Test 2: Default Mode');
         const options: RendererOptions = {
@@ -82,7 +82,8 @@ async function runTest() {
 
         const mockPage = createMockPage((args) => {
             capturedArgs = args;
-            return { supported: true, codec: 'vp8', isH264: false };
+            // Simulate H264 supported
+            return { supported: true, codec: 'avc1.4d002a', isH264: true };
         });
 
         await strategy.prepare(mockPage);
@@ -92,11 +93,12 @@ async function runTest() {
 
         console.log('Candidates:', codecs);
 
-        assert.strictEqual(codecs[0], 'vp8', 'VP8 should be first candidate');
+        assert.strictEqual(codecs[0], 'avc1.4d002a', 'H.264 should be first candidate');
+        assert.strictEqual(codecs[1], 'vp8', 'VP8 should be second candidate');
 
         const ffmpegArgs = strategy.getFFmpegArgs(options, 'out.mp4');
         const fIndex = ffmpegArgs.indexOf('-f');
-        assert.strictEqual(ffmpegArgs[fIndex + 1], 'ivf', 'Should use ivf format');
+        assert.strictEqual(ffmpegArgs[fIndex + 1], 'h264', 'Should use h264 format');
 
         console.log('✅ Default mode checks passed');
     }
