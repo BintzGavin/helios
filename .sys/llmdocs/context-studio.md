@@ -8,16 +8,21 @@ Helios Studio is a browser-based development environment for video composition. 
 3.  **Render**: Queue and manage high-quality video renders via `@helios-project/renderer`.
 
 **Core Components:**
--   **CLI**: `npx helios studio` starts the Vite-based dev server.
+-   **CLI**: 
+    - `npx helios studio` - Via main CLI (starts Vite dev server)
+    - `npx @helios-project/studio` or `helios-studio` - Standalone CLI (serves built dist via vite preview)
+-   **Bin Script**: `bin/helios-studio.js` - Executable script that serves the built Studio UI
 -   **Server**: A Vite plugin (`vite-plugin-studio-api.ts`) provides API endpoints for filesystem access (assets, compositions) and render management.
 -   **UI**: A React application (`packages/studio/src`) that consumes the API and controls the Player.
 -   **Communication**: The UI communicates with the Player via the `HeliosController` bridge (postMessage) and with the Server via HTTP API.
+-   **Publishing**: Studio is a publishable npm package (`publishConfig.access: "public"`) with `bin` field for CLI installation.
 
 ## B. File Tree
 
 ```
 packages/studio/
-├── bin/                 # CLI entry point
+├── bin/                 # CLI bin script (helios-studio.js)
+│   └── helios-studio.js # Executable script serving dist via vite preview
 ├── src/
 │   ├── components/      # UI Components (Timeline, PropsEditor, etc.)
 │   │   ├── AssetsPanel/
@@ -39,17 +44,38 @@ packages/studio/
 
 ## C. CLI Interface
 
-The Studio is launched via the `helios` CLI:
+The Studio can be launched in two ways:
 
+**Option 1: Via Main CLI** (Development Mode)
 ```bash
 npx helios studio [options]
 ```
 
+**Option 2: Direct Installation** (Production Mode)
+```bash
+# Install globally
+npm install -g @helios-project/studio
+
+# Run from any directory
+helios-studio
+```
+
+Or use with npx:
+```bash
+npx @helios-project/studio
+```
+
 **Options:**
 -   `--port <number>`: Port to run the server on (default: 3000 or 5173).
--   `--open`: Open browser on start.
+-   `--open`: Open browser on start (default: true for standalone CLI).
 
-The CLI uses `HELIOS_PROJECT_ROOT` environment variable to determine the project root for discovering compositions and assets.
+**Environment Variables:**
+-   `HELIOS_PROJECT_ROOT`: Determines the project root for discovering compositions and assets (defaults to `process.cwd()` for standalone CLI).
+
+**Bin Script:**
+-   Location: `bin/helios-studio.js`
+-   Serves the built `dist/` folder using `vite preview`
+-   Automatically detects project root from current working directory
 
 ## D. UI Components
 
@@ -78,3 +104,13 @@ The CLI uses `HELIOS_PROJECT_ROOT` environment variable to determine the project
 -   Studio triggers renders via POST `/api/render`.
 -   The backend spawns a Renderer process (using `RenderManager`) to generate MP4/WebM files.
 -   Render progress is polled via GET `/api/render`.
+
+## F. Publishing
+
+Studio is a **publishable npm package**:
+-   Package name: `@helios-project/studio`
+-   `publishConfig.access: "public"`
+-   Includes `bin` field for CLI installation: `"helios-studio": "./bin/helios-studio.js"`
+-   `prepublishOnly` script builds the package before publishing
+-   `files` array includes `bin` and `dist` directories
+-   Vite is in `dependencies` (needed for `vite preview` at runtime)
