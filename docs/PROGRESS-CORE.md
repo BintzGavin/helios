@@ -1,5 +1,8 @@
 # CORE Progress Log
 
+## CORE v3.0.0
+- ✅ Completed: Expose Duration/FPS Signals - Changed `duration` and `fps` to return `ReadonlySignal<number>` for reactive updates (Breaking Change).
+
 ## CORE v2.20.0
 - ✅ Completed: Audio Diagnostics - Added audioCodecs (aac, opus) detection to Helios.diagnose() and DiagnosticReport.
 

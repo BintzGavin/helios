@@ -850,7 +850,7 @@ Updated`;
     it('should update duration via setDuration', () => {
       const helios = new Helios({ duration: 10, fps: 30 });
       helios.setDuration(20);
-      expect(helios.duration).toBe(20);
+      expect(helios.duration.value).toBe(20);
       expect(helios.getState().duration).toBe(20);
     });
 
@@ -882,7 +882,7 @@ Updated`;
     it('should update fps via setFps', () => {
       const helios = new Helios({ duration: 10, fps: 30 });
       helios.setFps(60);
-      expect(helios.fps).toBe(60);
+      expect(helios.fps.value).toBe(60);
       expect(helios.getState().fps).toBe(60);
     });
 

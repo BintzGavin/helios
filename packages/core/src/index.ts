@@ -198,14 +198,18 @@ export class Helios {
   public get height(): ReadonlySignal<number> { return this._height; }
 
   /**
-   * The duration of the composition in seconds.
+   * Signal for the duration of the composition in seconds.
+   * Can be subscribed to for reactive updates.
+   * Access `.value` to get the current number.
    */
-  public get duration(): number { return this._duration.value; }
+  public get duration(): ReadonlySignal<number> { return this._duration; }
 
   /**
-   * The frame rate of the composition in frames per second.
+   * Signal for the frame rate of the composition in frames per second.
+   * Can be subscribed to for reactive updates.
+   * Access `.value` to get the current number.
    */
-  public get fps(): number { return this._fps.value; }
+  public get fps(): ReadonlySignal<number> { return this._fps; }
 
   // Other internals
   private syncWithDocumentTimeline = false;
@@ -390,7 +394,7 @@ export class Helios {
     this._activeCaptions = signal(findActiveCues(initialCaptions, 0));
 
     this._disposeActiveCaptionsEffect = effect(() => {
-      const timeMs = (this._currentFrame.value / this.fps) * 1000;
+      const timeMs = (this._currentFrame.value / this._fps.value) * 1000;
       const active = findActiveCues(this._captions.value, timeMs);
 
       if (!areCuesEqual(active, this._activeCaptions.peek())) {
@@ -415,7 +419,7 @@ export class Helios {
     this.driver.init(this.animationScope);
 
     // Sync driver with initial state
-    this.driver.update((this._currentFrame.value / this.fps) * 1000, {
+    this.driver.update((this._currentFrame.value / this._fps.value) * 1000, {
       isPlaying: this._isPlaying.value,
       playbackRate: this._playbackRate.value,
       volume: this._volume.value,
@@ -478,12 +482,12 @@ export class Helios {
     }
     this._duration.value = seconds;
 
-    const totalFrames = seconds * this.fps;
+    const totalFrames = seconds * this._fps.value;
     // Clamp current frame if it exceeds new duration
     if (this._currentFrame.peek() > totalFrames) {
       this.seek(totalFrames);
     } else {
-      this.driver.update((this._currentFrame.peek() / this.fps) * 1000, {
+      this.driver.update((this._currentFrame.peek() / this._fps.value) * 1000, {
         isPlaying: this._isPlaying.peek(),
         playbackRate: this._playbackRate.peek(),
         volume: this._volume.peek(),
@@ -505,7 +509,7 @@ export class Helios {
         "Ensure the fps passed to setFps is > 0."
       );
     }
-    const oldFps = this.fps;
+    const oldFps = this._fps.value;
     const currentTime = this._currentFrame.peek() / oldFps;
 
     this._fps.value = fps;
@@ -540,7 +544,7 @@ export class Helios {
 
     // Sync driver immediately
     const currentFrame = this._currentFrame.peek();
-    this.driver.update((currentFrame / this.fps) * 1000, {
+    this.driver.update((currentFrame / this._fps.value) * 1000, {
       isPlaying: this._isPlaying.peek(),
       playbackRate: this._playbackRate.peek(),
       volume: clamped,
@@ -553,7 +557,7 @@ export class Helios {
 
     // Sync driver immediately
     const currentFrame = this._currentFrame.peek();
-    this.driver.update((currentFrame / this.fps) * 1000, {
+    this.driver.update((currentFrame / this._fps.value) * 1000, {
       isPlaying: this._isPlaying.peek(),
       playbackRate: this._playbackRate.peek(),
       volume: this._volume.peek(),
@@ -607,7 +611,7 @@ export class Helios {
         'Ensure the marker ID exists before seeking.'
       );
     }
-    const frame = marker.time * this.fps;
+    const frame = marker.time * this._fps.value;
     this.seek(frame);
   }
 
@@ -617,7 +621,7 @@ export class Helios {
    * @param seconds The time in seconds to seek to.
    */
   public seekToTime(seconds: number) {
-    const frame = seconds * this.fps;
+    const frame = seconds * this._fps.value;
     this.seek(frame);
   }
 
@@ -680,7 +684,7 @@ export class Helios {
 
     // Sync driver immediately
     const currentFrame = this._currentFrame.peek();
-    this.driver.update((currentFrame / this.fps) * 1000, {
+    this.driver.update((currentFrame / this._fps.value) * 1000, {
       isPlaying: true,
       playbackRate: this._playbackRate.peek(),
       volume: this._volume.peek(),
@@ -697,7 +701,7 @@ export class Helios {
 
     // Sync driver to ensure media is paused
     const currentFrame = this._currentFrame.peek();
-    this.driver.update((currentFrame / this.fps) * 1000, {
+    this.driver.update((currentFrame / this._fps.value) * 1000, {
       isPlaying: false,
       playbackRate: this._playbackRate.peek(),
       volume: this._volume.peek(),
@@ -706,10 +710,10 @@ export class Helios {
   }
 
   public seek(frame: number) {
-    const newFrame = Math.max(0, Math.min(frame, this.duration * this.fps));
+    const newFrame = Math.max(0, Math.min(frame, this._duration.value * this._fps.value));
     this._currentFrame.value = newFrame;
 
-    this.driver.update((newFrame / this.fps) * 1000, {
+    this.driver.update((newFrame / this._fps.value) * 1000, {
       isPlaying: this._isPlaying.peek(),
       playbackRate: this._playbackRate.peek(),
       volume: this._volume.peek(),
@@ -773,7 +777,7 @@ export class Helios {
         }
 
         if (currentTime !== null) {
-            const frame = (currentTime / 1000) * this.fps;
+            const frame = (currentTime / 1000) * this._fps.value;
             if (frame !== this._currentFrame.peek()) {
                  this._currentFrame.value = frame;
             }
@@ -815,9 +819,9 @@ export class Helios {
         return;
     }
 
-    const totalFrames = this.duration * this.fps;
+    const totalFrames = this._duration.value * this._fps.value;
     const playbackRate = this._playbackRate.peek();
-    const frameDelta = (deltaTime / 1000) * this.fps * playbackRate;
+    const frameDelta = (deltaTime / 1000) * this._fps.value * playbackRate;
     const nextFrame = this._currentFrame.peek() + frameDelta;
     const shouldLoop = this._loop.peek();
     const range = this._playbackRange.peek();
@@ -861,7 +865,7 @@ export class Helios {
       }
     }
 
-    this.driver.update((this._currentFrame.peek() / this.fps) * 1000, {
+    this.driver.update((this._currentFrame.peek() / this._fps.value) * 1000, {
       isPlaying: true,
       playbackRate,
       volume: this._volume.peek(),
