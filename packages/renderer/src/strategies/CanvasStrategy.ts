@@ -109,6 +109,8 @@ export class CanvasStrategy implements RenderStrategy {
         addCandidate('vp8');
     } else {
         // Default behavior
+        // Prioritize H.264 (Hardware) -> VP8 (Software Fallback)
+        addCandidate('avc1.4d002a');
         addCandidate('vp8');
     }
 
