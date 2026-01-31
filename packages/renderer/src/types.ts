@@ -21,6 +21,18 @@ export interface AudioTrackConfig {
    * Defaults to 0.
    */
   seek?: number;
+
+  /**
+   * Duration in seconds to fade in the audio.
+   * Defaults to 0 (no fade in).
+   */
+  fadeInDuration?: number;
+
+  /**
+   * Duration in seconds to fade out the audio.
+   * Defaults to 0 (no fade out).
+   */
+  fadeOutDuration?: number;
 }
 
 export interface BrowserConfig {
