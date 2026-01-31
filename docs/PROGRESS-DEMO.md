@@ -1,3 +1,6 @@
+## DEMO v1.71.0
+- ✅ Completed: Scaffold React Captions Animation - Created `examples/react-captions-animation` demonstrating `useCaptions` hook for integrating Helios SRT parsing with React.
+
 ## DEMO v1.70.2
 - ✅ Completed: Document Client-Side Export - Added README to `examples/client-export-api` and re-verified functionality.
 

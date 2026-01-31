@@ -1,6 +1,6 @@
 # Status: DEMO Domain
 
-**Version**: 1.70.2
+**Version**: 1.71.0
 
 ## Vision
 The DEMO domain is responsible for:
@@ -15,6 +15,7 @@ The DEMO domain is responsible for:
 - None
 
 ## Completed Tasks
+- [v1.71.0] ✅ Completed: Scaffold React Captions Animation - Created `examples/react-captions-animation` demonstrating `useCaptions` hook for integrating Helios SRT parsing with React.
 - [v1.70.2] ✅ Completed: Document Client-Side Export - Added README to `examples/client-export-api` explaining BridgeController and ClientSideExporter usage.
 - [v1.70.1] ✅ Completed: Re-verify Client-Side Export - Confirmed successful build and E2E verification of the client-side export example.
 - [v1.70.0] ✅ Completed: Dynamic Verification Pipeline - Refactored build and test scripts to dynamically discover examples, reducing maintenance burden and enabling unified verification via 'verify:e2e'.
