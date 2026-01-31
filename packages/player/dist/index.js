@@ -436,6 +436,7 @@ export class HeliosPlayer extends HTMLElement {
     captionsContainer;
     ccBtn;
     showCaptions = false;
+    lastCaptionsHash = "";
     clickLayer;
     posterContainer;
     posterImage;
@@ -1563,14 +1564,19 @@ export class HeliosPlayer extends HTMLElement {
         else {
             this.scrubber.style.background = '';
         }
-        this.captionsContainer.innerHTML = '';
-        if (this.showCaptions && state.activeCaptions && state.activeCaptions.length > 0) {
-            state.activeCaptions.forEach((cue) => {
-                const div = document.createElement('div');
-                div.className = 'caption-cue';
-                div.textContent = cue.text;
-                this.captionsContainer.appendChild(div);
-            });
+        const active = state.activeCaptions || [];
+        const newHash = this.showCaptions ? active.map((c) => c.text).join("|||") : "HIDDEN";
+        if (newHash !== this.lastCaptionsHash) {
+            this.captionsContainer.innerHTML = '';
+            if (this.showCaptions && active.length > 0) {
+                active.forEach((cue) => {
+                    const div = document.createElement('div');
+                    div.className = 'caption-cue';
+                    div.textContent = cue.text;
+                    this.captionsContainer.appendChild(div);
+                });
+            }
+            this.lastCaptionsHash = newHash;
         }
         this.lastState = state;
     }
