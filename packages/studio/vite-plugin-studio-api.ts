@@ -4,7 +4,7 @@ import fs from 'fs';
 import path from 'path';
 import { SSEServerTransport } from "@modelcontextprotocol/sdk/server/sse.js";
 import { createMcpServer } from './src/server/mcp';
-import { findCompositions, findAssets, getProjectRoot, createComposition, deleteComposition, updateCompositionMetadata } from './src/server/discovery';
+import { findCompositions, findAssets, getProjectRoot, createComposition, deleteComposition, updateCompositionMetadata, duplicateComposition } from './src/server/discovery';
 import { startRender, getJob, getJobs, cancelJob, deleteJob, diagnoseServer } from './src/server/render-manager';
 
 const getBody = async (req: any) => {
@@ -123,6 +123,31 @@ function configureMiddlewares(server: ViteDevServer | PreviewServer, isPreview: 
             next();
         });
       }
+
+      server.middlewares.use('/api/compositions/duplicate', async (req, res, next) => {
+        if (req.method === 'POST') {
+            try {
+                const body = await getBody(req);
+                const { sourceId, newName } = body;
+
+                if (!sourceId || !newName) {
+                    res.statusCode = 400;
+                    res.end(JSON.stringify({ error: 'Source ID and New Name are required' }));
+                    return;
+                }
+
+                const newComp = duplicateComposition(process.cwd(), sourceId, newName);
+                res.setHeader('Content-Type', 'application/json');
+                res.end(JSON.stringify(newComp));
+            } catch (e: any) {
+                console.error(e);
+                res.statusCode = 500;
+                res.end(JSON.stringify({ error: e.message }));
+            }
+            return;
+        }
+        next();
+      });
 
       server.middlewares.use('/api/compositions', async (req, res, next) => {
         if (req.url === '/' || req.url === '') {

@@ -1,3 +1,6 @@
+## STUDIO v0.68.0
+- ✅ Completed: Duplicate Composition - Implemented "Duplicate Composition" feature with UI modal, API endpoint, and file copy logic.
+
 ## STUDIO v0.67.0
 - ✅ Completed: Schema Constraints UI - Implemented UI support for schema constraints (`minLength`, `maxLength`, `pattern`, `minItems`, `maxItems`, `accept`) in the Props Editor, enabling validation feedback and asset filtering.
 

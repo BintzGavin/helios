@@ -3,7 +3,7 @@ import { useStudio } from '../context/StudioContext';
 import './CompositionSettingsModal.css';
 
 export const CompositionSettingsModal: React.FC = () => {
-  const { isSettingsOpen, setSettingsOpen, updateCompositionMetadata, activeComposition } = useStudio();
+  const { isSettingsOpen, setSettingsOpen, updateCompositionMetadata, activeComposition, setDuplicateOpen } = useStudio();
   const [width, setWidth] = useState(1920);
   const [height, setHeight] = useState(1080);
   const [fps, setFps] = useState(30);
@@ -98,6 +98,18 @@ export const CompositionSettingsModal: React.FC = () => {
           {error && <div className="settings-modal-error">{error}</div>}
 
           <div className="settings-modal-actions">
+            <button
+              type="button"
+              className="settings-modal-button cancel"
+              onClick={() => {
+                setSettingsOpen(false);
+                setDuplicateOpen(true);
+              }}
+              disabled={loading}
+              style={{ marginRight: 'auto' }}
+            >
+              Duplicate
+            </button>
             <button
               type="button"
               className="settings-modal-button cancel"

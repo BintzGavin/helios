@@ -30,6 +30,9 @@ packages/studio/
 │   │   ├── Controls/
 │   │   ├── RendersPanel/
 │   │   ├── Stage/
+│   │   ├── CompositionSettingsModal.tsx
+│   │   ├── CreateCompositionModal.tsx
+│   │   ├── DuplicateCompositionModal.tsx
 │   │   ├── PropsEditor.tsx
 │   │   └── SchemaInputs.tsx
 │   ├── context/         # React Context (StudioContext)
@@ -89,6 +92,11 @@ npx @helios-project/studio
 -   **Assets Panel**: Discovers and allows drag-and-drop of assets from the project.
 -   **Renders Panel**: Manages render jobs (Start, Cancel, Download).
 -   **Captions Panel**: Edits SRT captions and syncs with Core.
+-   **Composition Management**:
+    -   **Switcher**: Cmd+K to switch active composition.
+    -   **Create**: Create new compositions from templates.
+    -   **Duplicate**: Clone existing compositions.
+    -   **Settings**: Edit metadata (resolution, FPS, duration).
 
 ## E. Integration
 

@@ -114,6 +114,64 @@ export function deleteComposition(rootDir: string, id: string): void {
   fs.rmSync(compDir, { recursive: true, force: true });
 }
 
+export function duplicateComposition(
+  rootDir: string,
+  sourceId: string,
+  newName: string
+): CompositionInfo {
+  const projectRoot = getProjectRoot(rootDir);
+  const sourceDir = path.resolve(projectRoot, sourceId);
+
+  // Security check
+  if (!sourceDir.startsWith(projectRoot)) {
+    throw new Error('Access denied: Cannot duplicate outside project root');
+  }
+
+  if (!fs.existsSync(sourceDir)) {
+    throw new Error(`Source composition "${sourceId}" not found`);
+  }
+
+  // Sanitize new name to create dirName
+  let dirName = newName.toLowerCase().replace(/[^a-z0-9-]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
+  if (!dirName) {
+    throw new Error('Invalid composition name');
+  }
+
+  const targetDir = path.join(projectRoot, dirName);
+  if (fs.existsSync(targetDir)) {
+    throw new Error(`Composition "${newName}" (directory: ${dirName}) already exists`);
+  }
+
+  // Copy directory
+  fs.cpSync(sourceDir, targetDir, { recursive: true });
+
+  // Read metadata to return correct info
+  let metadata: CompositionOptions | undefined;
+  const metaPath = path.join(targetDir, 'composition.json');
+  if (fs.existsSync(metaPath)) {
+    try {
+      metadata = JSON.parse(fs.readFileSync(metaPath, 'utf-8'));
+    } catch (e) {
+      console.warn(`Failed to parse metadata for ${dirName}`, e);
+    }
+  }
+
+  const displayName = dirName
+    .split('-')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+
+  const compPath = path.join(targetDir, 'composition.html');
+
+  return {
+    id: dirName,
+    name: displayName,
+    url: `/@fs${compPath}`,
+    description: `Example: ${displayName}`,
+    metadata
+  };
+}
+
 export function createComposition(
     rootDir: string,
     name: string,

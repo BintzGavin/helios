@@ -8,6 +8,7 @@ import { PlaybackControls } from './components/Controls/PlaybackControls'
 import { StudioProvider, useStudio } from './context/StudioContext'
 import { CompositionSwitcher } from './components/CompositionSwitcher'
 import { CreateCompositionModal } from './components/CreateCompositionModal'
+import { DuplicateCompositionModal } from './components/DuplicateCompositionModal'
 import { CompositionSettingsModal } from './components/CompositionSettingsModal'
 import { KeyboardShortcutsModal } from './components/KeyboardShortcutsModal'
 import { DiagnosticsModal } from './components/DiagnosticsModal'
@@ -36,7 +37,7 @@ function AppContent() {
     if (!controller) return;
 
     // Fetch schema separately since it's not in the high-frequency state stream
-    controller.getSchema().then((schema) => {
+    controller.getSchema().then((schema: any) => {
       if (schema) {
         setPlayerState((prev) => ({ ...prev, schema }));
       }
@@ -121,6 +122,7 @@ function AppContent() {
       />
       <CompositionSwitcher />
       <CreateCompositionModal />
+      <DuplicateCompositionModal />
       <CompositionSettingsModal />
       <KeyboardShortcutsModal />
       <DiagnosticsModal />
