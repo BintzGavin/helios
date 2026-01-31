@@ -23,7 +23,7 @@ The Studio will start a local server (typically at `http://localhost:3000`) and 
 
 The Studio automatically scans your project (based on `HELIOS_PROJECT_ROOT` or current directory) to find available compositions. It lists them in the sidebar or command palette for easy navigation.
 
-- **Create Composition**: You can create new compositions directly from the UI.
+- **Create Composition**: You can create new compositions directly from the UI using templates for Vanilla JS, React, Vue, Svelte, and Three.js.
 - **Delete Composition**: You can delete existing compositions (requires confirmation).
 
 ### Diagnostics Panel
@@ -59,6 +59,11 @@ Manage your project's assets directly from the Studio.
 
 If your composition defines an input schema or uses `inputProps`, the Studio generates a form to edit these values in real-time. Changes are reflected immediately in the preview.
 
+-   **Groups**: Props can be organized into collapsible groups using the `group` property in the schema.
+-   **Nested Objects/Arrays**: Supports deep editing of complex objects and arrays.
+-   **Validation**: Enforces constraints like `min`, `max`, `pattern`, and `accept` defined in your schema.
+-   **Asset Drag & Drop**: You can drag files from the Assets Panel directly into image/video/audio inputs.
+
 ### Render Configuration
 
 The **Render** panel allows you to configure output settings without touching code:
@@ -70,6 +75,10 @@ The **Render** panel allows you to configure output settings without touching co
 ### Rendering
 
 You can trigger a render job directly from the Studio UI. The progress is displayed in the sidebar, and the output file is saved to your project directory.
+
+-   **Persistence**: Render jobs are saved to disk, so your history is preserved even if you restart the Studio.
+-   **Preview**: Once a render is complete, you can click the thumbnail to watch the video in a modal directly within the Studio.
+-   **Error Reporting**: If a render fails, you can view the detailed error logs to diagnose the issue.
 
 #### Client-Side Export
 

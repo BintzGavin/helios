@@ -45,7 +45,10 @@
         "examples/advanced",
         "examples/map-animation",
         "examples/solid-dom-animation",
-        "examples/podcast-visualizer"
+        "examples/podcast-visualizer",
+        "examples/react-captions",
+        "examples/client-export",
+        "examples/web-component"
       ]
     },
     {

@@ -1,8 +1,15 @@
-**Version**: 1.4.0
+**Version**: 1.5.0
 
 # DOCS Status
 
 ## Recent Updates
+[v1.5.0] ✅ Completed: Daily Documentation Review - Major sync.
+- Updated all Changelogs with latest versions from PROGRESS files.
+- Updated API Docs: Core (System Prompt, Stagger/Shift, Schema), Player (TextTracks, Markers, Shortcuts), Renderer (FrameCount).
+- Created Example Docs: React Captions, Client Export, Web Components.
+- Updated Guides: Studio (Persistence, Preview, Groups), Compositions (Schema, Sequencing).
+- Updated Navigation (`mint.json`).
+
 [v1.4.0] ✅ Completed: Daily Documentation Review - Comprehensive sync.
 - Updated all Changelogs (Core v2.7.2, Renderer v1.38.1, Player v0.33.2, Demo v1.54.0, Studio v0.48.0).
 - Updated API Docs: Core (`registerStabilityCheck`), Player (`videoWidth`, `videoHeight`, `buffered`, etc.).

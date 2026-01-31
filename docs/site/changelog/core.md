@@ -5,6 +5,63 @@ description: "Changelog for the Core package"
 
 # Core Changelog
 
+## v3.2.0
+- **Implement AI System Prompt Generator**: Added `createSystemPrompt` and `HELIOS_BASE_PROMPT` to programmatically generate context-aware system prompts for AI agents.
+
+## v3.1.0
+- **Synchronize Version**: Synced package.json version to 3.1.0 to match documentation and updated player/renderer dependencies.
+- **Enhance Schema UI Constraints**: Added `pattern`, `accept`, and `group` to `PropDefinition` and implemented validation logic for regex and file extensions.
+
+## v3.0.0
+- **Expose Duration/FPS Signals**: Changed `duration` and `fps` to return `ReadonlySignal<number>` for reactive updates (Breaking Change).
+
+## v2.20.0
+- **Audio Diagnostics**: Added audioCodecs (aac, opus) detection to Helios.diagnose() and DiagnosticReport.
+
+## v2.19.1
+- **Update Documentation**: Added usage examples for `stagger` and `shift` to README.
+
+## v2.19.0
+- **Implement Sequencing Helpers**: Added `stagger` and `shift` utilities to `packages/core` to simplify animation timing.
+
+## v2.18.0
+- **Schema Constraints**: Added `minItems`, `maxItems`, `minLength`, `maxLength` constraints to `PropDefinition` and implemented validation logic.
+
+## v2.17.1
+- **Fix Leaky Signal Subscriptions**: Implemented `untracked` and updated `subscribe` to prevent dependency tracking within callbacks.
+
+## v2.17.0
+- **Implement Typed Arrays**: Added support for Typed Arrays (Float32Array, etc.) in HeliosSchema and validateProps.
+
+## v2.16.0
+- **Time-Based Control**: Added `currentTime` signal and `seekToTime()` method to `Helios` class for direct time manipulation.
+
+## v2.15.0
+- **Enhance Diagnose**: Expanded `Helios.diagnose()` to include WebGL, WebAudio, Color Gamut, and Video Codec support.
+
+## v2.14.0
+- **Implement Missing Asset Types**: Added `model`, `json`, and `shader` to supported `PropType` values and validation logic.
+
+## v2.13.0
+- **Validate Schema Defaults**: Implemented `validateSchema` to ensure schema defaults match their defined types, adding `INVALID_SCHEMA` error code.
+
+## v2.12.0
+- **Schema Enhancements**: Added `step` and `format` properties to `PropDefinition` to support UI generation hints.
+
+## v2.11.0
+- **Recursive Animation & Media Discovery**: Implemented robust recursive Shadow DOM discovery in `DomDriver` with dynamic `MutationObserver` support.
+
+## v2.10.0
+- **Version Sync**: Synced package.json version to 2.10.0 and updated context documentation.
+- **Implement RenderSession**: Added RenderSession class for standardized frame iteration and stability orchestration.
+
+## v2.9.0
+- **Synchronize Version**: Updated `package.json` to 2.9.0 and fixed flaky stability test.
+- **Implement Recursive Schema**: Updated `PropDefinition` to support `items` and `properties` for nested array/object validation, and refactored `validateProps`.
+
+## v2.8.0
+- **Bind Virtual Time**: Updated `bindToDocumentTimeline` to support `__HELIOS_VIRTUAL_TIME__` for precise synchronization in renderer environments.
+
 ## v2.7.2
 - **Verify Stability Registry**: Verified implementation of `registerStabilityCheck` and `waitUntilStable`, updated JSDoc, and cleaned up stale plan.
 

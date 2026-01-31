@@ -41,8 +41,12 @@ A custom element that embeds a composition (via iframe) and provides a rich play
 - **`poster`** (string): URL of an image to show before playback starts.
 - **`export-mode`** (string): `'auto'`, `'canvas'`, or `'dom'`. Determines how frames are captured for client-side export.
 - **`export-format`** (string): `'mp4'` (default) or `'webm'`. The output video format.
+- **`export-caption-mode`** (string): `'burn-in'` (default) or `'file'`. If `'file'`, exports a sidecar `.srt` file instead of burning captions into the video.
 - **`canvas-selector`** (string): CSS selector for the canvas element (required for `export-mode="canvas"`).
 - **`input-props`** (string): JSON string of input properties to pass to the composition.
+- **`sandbox`** (string): Sandbox flags for the iframe (default: `'allow-scripts allow-same-origin'`).
+- **`controlslist`** (string): Space-separated list of features to disable (e.g., `'nodownload nofullscreen'`).
+- **`interactive`** (boolean): If present, disables the click-layer to allow direct interaction with the iframe content.
 
 ### Standard Media API
 
@@ -66,10 +70,17 @@ The `<helios-player>` element implements a subset of the HTMLMediaElement API, a
 - **`playing`** (boolean, readonly): Whether the media is playing.
 - **`readyState`** (number, readonly): The current readiness state of the media.
 - **`networkState`** (number, readonly): The current network state of the media.
+- **`textTracks`** (TextTrackList, readonly): List of text tracks (captions).
 
 #### Methods
 - **`play()`**: Starts playback. Returns a Promise.
 - **`pause()`**: Pauses playback.
+- **`addTextTrack(kind, label, language)`**: Adds a new text track to the player.
+- **`seekToMarker(id)`**: Seeks to the marker with the specified ID.
+
+### Visual Markers
+
+You can visualize markers on the timeline scrubber by passing a `markers` array in the `HeliosOptions` (or via `setMarkers`). The player renders these as interactive points on the timeline. Hovering over the scrubber also displays a tooltip with the precise timestamp.
 
 ### Client-Side Export
 
@@ -109,6 +120,10 @@ if (controller) {
 - **Arrow Left / Right**: Seek -1 / +1 frame (hold Shift for 10 frames).
 - **J / L**: Seek -1 / +1 frame (hold Shift for 10 frames).
 - **. / ,**: Step forward / backward 1 frame.
+- **I**: Set "In" point (Loop Start).
+- **O**: Set "Out" point (Loop End).
+- **X**: Clear Loop Range.
+- **M**: Toggle Mute.
 
 ### Accessibility
 

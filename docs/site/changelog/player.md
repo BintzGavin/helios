@@ -5,6 +5,66 @@ description: "Changelog for the Player package"
 
 # Player Changelog
 
+## v0.48.1
+- **Harden Bridge Security**: Implemented explicit source verification for all postMessage listeners in HeliosPlayer and BridgeController to prevent cross-talk and improve security.
+
+## v0.48.0
+- **Implement SRT Export**: Added `export-caption-mode` attribute to support exporting captions as separate `.srt` files instead of burning them in, and added `srt-parser` serialization logic.
+
+## v0.47.0
+- **Scrubber Tooltip**: Implemented hover tooltip for scrubber showing precise timestamp, and added 'M' key shortcut for muting. Updated package exports for better developer experience.
+
+## v0.46.1
+- **Migrate Client-Side Export to Mediabunny**: Replaced deprecated `mp4-muxer` and `webm-muxer` with `mediabunny`, modernizing the export pipeline.
+
+## v0.46.0
+- **Visualize Markers**: Implemented visual rendering of timeline markers on the scrubber, including clickable interaction to seek to the marker's timestamp.
+
+## v0.45.0
+- **Interactive Playback Range**: Implemented `I` (In), `O` (Out), and `X` (Clear) keyboard shortcuts to set the playback loop range interactively.
+
+## v0.44.2
+- **Fix load() Behavior**: Updated `load()` to reload the current source if no pending source exists, and refactored `retryConnection` to use this standard method.
+
+## v0.44.1
+- **Documentation Update**: Synced package.json version and documented missing features (sandbox, controlslist, textTracks, CSS vars).
+
+## v0.44.0
+- **Configurable Sandbox**: Implemented `sandbox` attribute on `<helios-player>` to allow customizing iframe security flags (defaulting to `allow-scripts allow-same-origin`).
+
+## v0.43.0
+- **Implement TextTracks API**: Added `textTracks` property and `addTextTrack` method to `HeliosPlayer`, along with a robust SRT parser and `HeliosTextTrack` implementation for better HTMLMediaElement parity.
+
+## v0.42.0
+- **Import SRT Captions**: Implemented support for <track> elements to import SRT captions via the setCaptions API.
+
+## v0.41.0
+- **Standard Media API Gap Fill**: Implemented `canPlayType`, `defaultMuted`, `defaultPlaybackRate`, `preservesPitch`, `srcObject`, and `crossOrigin` for fuller `HTMLMediaElement` parity.
+
+## v0.40.0
+- **Range-Based Export**: Client-side export now respects the active 'playbackRange' (loop region), exporting only the selected portion of the timeline.
+
+## v0.39.0
+- **Native Loop Support**: Refactored `HeliosController` and `bridge` to use `helios.setLoop()` natively, removing manual client-side looping logic.
+
+## v0.38.0
+- **Visualize Playback Range**: Implemented visual indicator for playback range on the timeline scrubber using CSS gradients and `updateUI` logic.
+
+## v0.37.0
+- **CSS Variables for Theming**: Exposed CSS variables to enable theming of the player controls and UI.
+
+## v0.36.0
+- **ControlsList Support**: Implemented `controlslist` attribute support to allow hiding Export and Fullscreen buttons (`nodownload`, `nofullscreen`).
+
+## v0.35.1
+- **Implement error and currentSrc properties**: Added `error` and `currentSrc` getters to `HeliosPlayer` to complete HTMLMediaElement parity.
+
+## v0.35.0
+- **Implement Playback Range**: Implemented setPlaybackRange and clearPlaybackRange in HeliosController and Bridge protocol.
+
+## v0.34.0
+- **Implement Seeking Events & Played Property**: Implemented seeking/seeked events and played property to complete HTMLMediaElement parity.
+
 ## v0.33.2
 - **Verify Deep API Parity**: Fixed test environment, verified Deep API Parity tests pass, and updated README with new API members.
 

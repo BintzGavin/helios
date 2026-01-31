@@ -5,6 +5,63 @@ description: "Changelog for the Renderer package"
 
 # Renderer Changelog
 
+## v1.49.0
+- **Precision Frame Control**: Added `frameCount` to `RendererOptions`, enabling exact frame-count rendering for distributed rendering workflows, overriding floating-point duration calculations.
+
+## v1.48.2
+- **CdpTimeDriver Timeout**: Implemented configurable stability timeout in `CdpTimeDriver` using Node.js-based race condition and CDP `Runtime.terminateExecution` to handle hanging user checks when virtual time is paused.
+
+## v1.48.1
+- **Enable Comprehensive Verification Suite**: Updated `run-all.ts` to include 8 previously ignored verification scripts (CDP determinism, Shadow DOM sync, WAAPI sync), ensuring full test coverage. Also fixed `verify-canvas-strategy.ts` to align with the H.264 default.
+
+## v1.48.0
+- **Prioritize H.264**: Updated `CanvasStrategy` to prioritize H.264 (AVC) intermediate codec over VP8 by default, enabling hardware acceleration and better performance on supported systems.
+
+## v1.47.4
+- **Validate Codec Compatibility**: Updated `DomStrategy` and `CanvasStrategy` to throw clear errors when `videoCodec: 'copy'` is used with image sequence fallback, preventing FFmpeg crashes. Also fixed regression tests to provide valid options to `DomStrategy`.
+
+## v1.47.3
+- **Shadow DOM Background Preload**: Verified and enhanced `DomStrategy` to recursively find and preload CSS background images inside nested Shadow DOMs, ensuring zero-artifact rendering for Web Components.
+
+## v1.47.2
+- **CdpTimeDriver Budget**: Updated `CdpTimeDriver` to wait for `virtualTimeBudgetExpired` event, ensuring the browser fully processes the time budget before capturing the frame.
+
+## v1.47.1
+- **CdpTimeDriver Media Sync Timing**: Updated `CdpTimeDriver` to synchronize media elements before advancing virtual time, ensuring correct frame capture.
+
+## v1.47.0
+- **SeekTimeDriver Determinism**: Updated `SeekTimeDriver` to enforce deterministic `Date.now()` by setting a fixed epoch (Jan 1, 2024), aligning DOM-based rendering determinism with Canvas-based rendering.
+
+## v1.46.0
+- **CdpTimeDriver Determinism**: Updated `CdpTimeDriver` to enforce deterministic `Date.now()` by setting `initialVirtualTime` to Jan 1, 2024 (UTC), ensuring frame consistency across runs.
+
+## v1.45.0
+- **CdpTimeDriver Shadow DOM Sync**: Updated `CdpTimeDriver` to recursively traverse Shadow DOMs using `TreeWalker` to find and synchronize `<video>` and `<audio>` elements, ensuring media sync in Canvas mode.
+
+## v1.44.0
+- **Recursive Animation Discovery**: Updated `SeekTimeDriver` to recursively traverse Shadow DOMs using `TreeWalker` to find and synchronize CSS animations and WAAPI animations.
+
+## v1.43.1
+- **Full Test Coverage**: Executed full verification suite including FFmpeg diagnostics and CdpTimeDriver media sync, confirming all systems operational.
+
+## v1.43.0
+- **Enable Shadow DOM Media Sync**: Updated `SeekTimeDriver` to recursively traverse Shadow DOMs using `TreeWalker` to find and synchronize `<video>` and `<audio>` elements.
+
+## v1.42.0
+- **Enable Browser Launch Configuration**: Added `browserConfig` to `RendererOptions` to allow customizing Playwright launch arguments.
+
+## v1.41.0
+- **Support Shadow DOM Audio Discovery**: Updated `scanForAudioTracks` utility to recursively traverse Shadow DOM for media elements using `TreeWalker`.
+
+## v1.40.1
+- **Enable Full Verification Coverage**: Updated `run-all.ts` to include 6 additional verification scripts, and fixed `verify-dom-media-preload.ts` and `verify-dom-preload.ts` to be robust and self-contained.
+
+## v1.40.0
+- **Implement WAAPI Sync**: Updated `SeekTimeDriver` to manually iterate over `document.getAnimations()` and set `currentTime`, ensuring correct synchronization of CSS animations and transitions for DOM-based rendering.
+
+## v1.39.0
+- **CdpTimeDriver Media Sync**: Implemented manual synchronization for `<video>` and `<audio>` elements in `CdpTimeDriver` to respect `data-helios-offset` and `data-helios-seek`, enabling correct playback in Canvas renders.
+
 ## v1.38.1
 - **Fix Build and Dependencies**: Updated `@helios-project/core` dependency to `2.7.1` in `packages/renderer`, modernized render script to use `tsx`, and fixed `verify-smart-codec-selection` test mock to support frame scanning.
 
