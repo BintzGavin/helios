@@ -1,3 +1,10 @@
+/**
+ * E2E Verification Script for <helios-player>
+ *
+ * This script verifies the core interactive functionality of the Helios Player Web Component
+ * in a real browser environment. It serves a fixture (player.html) and uses Playwright
+ * to click the Play/Pause button and verify the time advances.
+ */
 import { chromium } from '@playwright/test';
 import * as http from 'http';
 import * as fs from 'fs';
