@@ -83,6 +83,7 @@ export * from './color.js';
 export * from './timecode.js';
 export * from './markers.js';
 export * from './transitions.js';
+export * from './ai.js';
 
 export class Helios {
   // Constants

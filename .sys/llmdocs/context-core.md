@@ -12,6 +12,7 @@ The `@helios-project/core` package implements the "Helios State Machine" pattern
 
 packages/core/src/
 ├── drivers/
+├── ai.ts
 ├── animation.ts
 ├── captions.ts
 ├── color.ts
