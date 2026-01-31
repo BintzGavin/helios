@@ -1,5 +1,8 @@
 # PLAYER Progress Log
 
+## PLAYER v0.49.2
+- ✅ Completed: Fix API Parity Tests - Updated `api_parity.test.ts` mock controller to match the `HeliosController` interface, ensuring tests pass with the new media persistence logic.
+
 ## PLAYER v0.49.1
 - ✅ Completed: Persist Media Properties - Implemented persistence for `volume`, `playbackRate`, and `muted` properties so values set before the player loads are applied when the controller connects.
 
