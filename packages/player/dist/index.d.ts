@@ -34,6 +34,7 @@ export declare class HeliosPlayer extends HTMLElement implements TrackHost {
     private captionsContainer;
     private ccBtn;
     private showCaptions;
+    private lastCaptionsHash;
     private clickLayer;
     private posterContainer;
     private posterImage;

@@ -1,5 +1,8 @@
 # PLAYER Progress Log
 
+## PLAYER v0.48.4
+- ✅ Completed: Optimize Caption Rendering - Implemented state diffing to prevent unnecessary DOM updates during caption rendering, improving performance.
+
 ## PLAYER v0.48.3
 - ✅ Completed: Verify Player - Validated interactive playback (play/pause) via E2E test.
 
