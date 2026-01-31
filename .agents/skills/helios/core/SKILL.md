@@ -195,6 +195,20 @@ interface DiagnosticReport {
 }
 ```
 
+#### AI Context
+Generate a system prompt for AI agents that includes the current composition context.
+
+```typescript
+import { createSystemPrompt, HELIOS_BASE_PROMPT } from '@helios-project/core';
+
+const prompt = createSystemPrompt(helios, "You are a creative director.");
+// Returns a string containing:
+// 1. HELIOS_BASE_PROMPT (Philosophy, API summary)
+// 2. Composition State (Duration, FPS, Resolution)
+// 3. Schema Definitions
+// 4. "You are a creative director."
+```
+
 ## Signals
 
 The `Helios` class exposes reactive signals for granular state management. You can also create your own signals.
@@ -307,7 +321,14 @@ const schema = {
     model: { type: 'model' },    // 3D Model URL (.glb, .gltf)
     config: { type: 'json' },    // JSON Data URL
     effect: { type: 'shader' },  // Shader URL (.glsl)
-    count: { type: 'number', minimum: 0, step: 1 }
+    count: { type: 'number', minimum: 0, step: 1 },
+    email: { type: 'string', pattern: '^\\S+@\\S+\\.\\S+$' },
+    avatar: { type: 'image', accept: '.png,.jpg' },
+    settings: {
+        type: 'object',
+        group: 'Advanced Settings', // Collapsible group in Studio
+        properties: { /* ... */ }
+    }
   }
 };
 ```
