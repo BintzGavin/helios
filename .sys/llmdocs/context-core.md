@@ -184,6 +184,8 @@ class Helios {
   seek(frame: number): void;
 
   // Timeline Binding
+  bindTo(master: Helios): void;
+  unbind(): void;
   bindToDocumentTimeline(): void;
   unbindFromDocumentTimeline(): void;
 }

@@ -1,5 +1,8 @@
 # CORE Progress Log
 
+## CORE v3.5.0
+- ✅ Completed: Implement Timeline Sync - Added `Helios.bindTo(master)` and `Helios.unbind()` for synchronizing multiple Helios instances.
+
 ## CORE v3.4.0
 - ✅ Completed: Implement Audio Tracks - Added support for audio tracks allowing independent volume/mute control for groups of elements using `data-helios-track-id`.
 - ✅ Completed: Update Skills and Version - Synced package.json version to 3.4.0 and updated SKILL.md with Audio Track API and TypedArray schema types.

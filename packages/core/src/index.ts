@@ -126,6 +126,7 @@ export class Helios {
   private _stabilityChecks = new Set<StabilityCheck>();
 
   private _disposeActiveCaptionsEffect: () => void;
+  private _syncDispose: (() => void) | null = null;
 
   // Public Readonly Signals
 
@@ -874,6 +875,38 @@ export class Helios {
     await Promise.all([driverPromise, ...checkPromises]);
   }
 
+  public bindTo(master: Helios) {
+    this.disposeSync();
+    this.unbindFromDocumentTimeline();
+    this.ticker.stop();
+
+    this._syncDispose = effect(() => {
+      const time = master.currentTime.value;
+      const fps = this._fps.value;
+      const masterPlaying = master.isPlaying.value;
+      const masterRate = master.playbackRate.value;
+
+      // Sync state
+      this._currentFrame.value = time * fps;
+      this._isPlaying.value = masterPlaying;
+      this._playbackRate.value = masterRate;
+
+      // Update driver immediately
+      this.driver.update(time * 1000, {
+        isPlaying: masterPlaying,
+        playbackRate: masterRate,
+        volume: this._volume.peek(),
+        muted: this._muted.peek(),
+        audioTracks: this._audioTracks.peek()
+      });
+    });
+  }
+
+  public unbind() {
+    this.disposeSync();
+    this.unbindFromDocumentTimeline();
+  }
+
   /**
    * Binds the Helios instance to document.timeline.
    * This is useful when the timeline is being driven externally (e.g. by the Renderer).
@@ -936,13 +969,20 @@ export class Helios {
   public dispose() {
     this.pause();
     this.ticker.stop();
-    this.unbindFromDocumentTimeline();
+    this.unbind();
     this.driver.dispose?.();
     this._disposeActiveCaptionsEffect?.();
 
     this.subscriberMap.forEach((dispose) => dispose());
     this.subscriberMap.clear();
     this._stabilityChecks.clear();
+  }
+
+  private disposeSync() {
+    if (this._syncDispose) {
+      this._syncDispose();
+      this._syncDispose = null;
+    }
   }
 
   private onTick = (deltaTime: number) => {
