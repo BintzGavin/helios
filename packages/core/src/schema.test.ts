@@ -139,6 +139,30 @@ describe('validateSchema', () => {
     // Min > Max
     expect(() => validateSchema({ str: { type: 'string' as const, minLength: 10, maxLength: 5 } })).toThrow(/minLength cannot be greater than maxLength/);
   });
+
+  it('should validate pattern usage', () => {
+    // Correct usage
+    expect(() => validateSchema({ email: { type: 'string' as const, pattern: '^\\S+@\\S+\\.\\S+$' } })).not.toThrow();
+
+    // Invalid type
+    expect(() => validateSchema({ age: { type: 'number' as const, pattern: '^\\d+$' } })).toThrow(/defines pattern but is not a string type/);
+
+    // Invalid regex
+    expect(() => validateSchema({ badRegex: { type: 'string' as const, pattern: '[' } })).toThrow(/defines invalid pattern regex/);
+  });
+
+  it('should validate accept usage', () => {
+    // Correct usage
+    expect(() => validateSchema({ img: { type: 'image' as const, accept: ['.png', '.jpg'] } })).not.toThrow();
+    expect(() => validateSchema({ file: { type: 'string' as const, accept: ['.txt'] } })).not.toThrow();
+
+    // Invalid type (number cannot have accept)
+    expect(() => validateSchema({ num: { type: 'number' as const, accept: ['.txt'] } })).toThrow(/defines accept but is not a string or asset type/);
+
+    // Invalid accept format
+    expect(() => validateSchema({ img: { type: 'image' as const, accept: '.png' as any } })).toThrow(/accept must be an array of strings/);
+    expect(() => validateSchema({ img: { type: 'image' as const, accept: [123] as any } })).toThrow(/accept must contain only strings/);
+  });
 });
 
 describe('validateProps', () => {
@@ -458,5 +482,34 @@ describe('validateProps', () => {
 
     expect(() => validateProps({ vec3: new Float32Array([1, 2]) }, schema)).toThrow(/must have at least 3 items/);
     expect(() => validateProps({ vec3: new Float32Array([1, 2, 3, 4]) }, schema)).toThrow(/must have at most 3 items/);
+  });
+
+  it('should validate pattern match', () => {
+    const schema = {
+      code: { type: 'string' as const, pattern: '^[A-Z]{3}$' }
+    };
+    expect(validateProps({ code: 'ABC' }, schema)).toEqual({ code: 'ABC' });
+
+    expect(() => validateProps({ code: 'abc' }, schema)).toThrow(/does not match pattern/);
+    expect(() => validateProps({ code: 'ABCD' }, schema)).toThrow(/does not match pattern/);
+  });
+
+  it('should validate accept extensions', () => {
+    const schema = {
+      avatar: { type: 'image' as const, accept: ['.png', '.jpg'] }
+    };
+
+    expect(validateProps({ avatar: 'user.png' }, schema)).toEqual({ avatar: 'user.png' });
+    expect(validateProps({ avatar: 'USER.JPG' }, schema)).toEqual({ avatar: 'USER.JPG' }); // Case insensitive
+
+    expect(() => validateProps({ avatar: 'user.gif' }, schema)).toThrow(/must have one of these extensions: .png, .jpg/);
+    expect(() => validateProps({ avatar: 'user' }, schema)).toThrow(/must have one of these extensions/);
+  });
+
+  it('should ignore group property', () => {
+     const schema = {
+      title: { type: 'string' as const, group: 'Meta' }
+    };
+    expect(validateProps({ title: 'Hello' }, schema)).toEqual({ title: 'Hello' });
   });
 });
