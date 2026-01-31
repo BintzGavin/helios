@@ -31,3 +31,11 @@
 ## [1.72.1] - Client-Side Verification Parity
 **Learning:** The "Primary Export Path" (Client-Side WebCodecs) was only verified by a single static example, while the "Secondary" path (Server-Side) was verified dynamically against all examples. This created a coverage gap where we claimed "Primary" status without comprehensive verification.
 **Action:** When a feature is designated as "Primary", ensure its verification pipeline is at least as robust as the secondary/legacy path (e.g., dynamic discovery of all test cases).
+
+## [1.72.2] - Plan Date Inconsistency
+**Learning:** The `.sys/plans/` directory contains files with future dates (e.g., 2026), making it difficult to determine the "current" date for new plans.
+**Action:** When creating new plans, use the most recent future date found in `.sys/plans/` + 1 day to maintain sorting order, even if the year is incorrect.
+
+## [1.72.3] - Dynamic Verification Pattern
+**Learning:** Hardcoded verification scripts (like the original `verify-client-export.ts`) are fragile and incomplete. The "Universal Player Fixture" pattern (using URL params to load compositions) is a powerful way to verify the entire example suite dynamically.
+**Action:** Always prefer dynamic discovery and generic fixtures over static, single-case tests for verification.
