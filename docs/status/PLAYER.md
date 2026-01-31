@@ -40,7 +40,7 @@
 - Visualizes markers on the timeline, allowing users to identify and seek to specific points of interest.
 
 ## Critical Task
-- **None**: Recent task completed.
+- **Migrate Client-Side Export to Mediabunny**: Replace deprecated `mp4-muxer` and `webm-muxer` dependencies with `mediabunny` to modernize the export pipeline and unify codec handling.
 
 [v0.46.0] ✅ Completed: Visualize Markers - Implemented visual rendering of timeline markers on the scrubber, including clickable interaction to seek to the marker's timestamp.
 [v0.45.0] ✅ Completed: Interactive Playback Range - Implemented `I` (In), `O` (Out), and `X` (Clear) keyboard shortcuts to set the playback loop range interactively.
