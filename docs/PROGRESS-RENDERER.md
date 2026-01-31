@@ -1,3 +1,6 @@
+## RENDERER v1.47.3
+- ✅ Completed: Shadow DOM Background Preload - Verified and enhanced `DomStrategy` to recursively find and preload CSS background images inside nested Shadow DOMs, ensuring zero-artifact rendering for Web Components.
+
 ## RENDERER v1.47.2
 - ✅ Completed: CdpTimeDriver Budget - Updated `CdpTimeDriver` to wait for `virtualTimeBudgetExpired` event, ensuring the browser fully processes the time budget before capturing the frame.
 
