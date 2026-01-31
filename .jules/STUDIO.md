@@ -41,3 +41,7 @@
 ## [0.63.1] - React Infinite Loop Warning
 **Learning:** `npm run verify` logs "Maximum update depth exceeded" during the preview iframe verification. This suggests a potential state update loop in `StudioContext` or `Stage` components when interacting with `helios-player` or the preview modal, though functionality appears intact.
 **Action:** Investigate `StudioContext` state updates related to `controller` subscription and `playerState` to eliminate the loop in a future task.
+
+## [0.64.0] - Implied Requirements in Vision
+**Learning:** The README vision "manage render jobs" implies persistence, even if not explicitly stated. "Manage" requires durability across sessions.
+**Action:** When interpreting "manage" in vision statements, assume persistence is a requirement unless stated otherwise.
