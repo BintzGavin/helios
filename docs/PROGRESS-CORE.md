@@ -2,6 +2,7 @@
 
 ## CORE v3.4.0
 - ✅ Completed: Implement Audio Tracks - Added support for audio tracks allowing independent volume/mute control for groups of elements using `data-helios-track-id`.
+- ✅ Completed: Update Skills and Version - Synced package.json version to 3.4.0 and updated SKILL.md with Audio Track API and TypedArray schema types.
 
 ## CORE v3.3.1
 - ✅ Completed: Update Skill Docs - Updated .agents/skills/helios/core/SKILL.md to match v3.3.0 API (DiagnosticReport, Sequencing Helpers).
