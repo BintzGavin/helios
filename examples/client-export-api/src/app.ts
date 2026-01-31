@@ -7,6 +7,7 @@ const progressFill = document.querySelector('.progress-fill') as HTMLDivElement;
 const progressText = document.getElementById('progress-text') as HTMLSpanElement;
 
 // Helper to check if controller is ready
+// We use BridgeController to communicate with the iframe's Helios instance via postMessage
 let controller: BridgeController | null = null;
 let exporter: ClientSideExporter | null = null;
 

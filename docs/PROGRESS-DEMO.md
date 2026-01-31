@@ -1,3 +1,6 @@
+## DEMO v1.69.1
+- ✅ Completed: Polish Client-Side Export Example - Added documentation comments to `examples/client-export-api` and re-verified functionality.
+
 ## DEMO v1.68.0
 - ✅ Completed: Update React Animation Helpers - Updated `examples/react-animation-helpers` to demonstrate `interpolate` and `spring` helper functions. Enhanced `tests/e2e/verify-render.ts` to support filtering via command line arguments.
 
