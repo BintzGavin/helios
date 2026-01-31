@@ -1,4 +1,4 @@
-**Version**: 0.68.0
+**Version**: 0.68.1
 
 # Studio Domain Status
 
@@ -7,6 +7,7 @@
 **Focus**: UI Implementation & CLI
 
 ## Recent Updates
+- [v0.68.1] ✅ Verified: Persistent Render Jobs - Verified implementation and updated documentation to reflect persistence behavior.
 - [v0.68.0] ✅ Completed: Duplicate Composition - Implemented "Duplicate Composition" feature with UI modal, API endpoint, and file copy logic.
 - [v0.67.0] ✅ Completed: Schema Constraints UI - Implemented UI support for schema constraints (`minLength`, `maxLength`, `pattern`, `minItems`, `maxItems`, `accept`) in the Props Editor, enabling validation feedback and asset filtering.
 - [v0.66.0] ✅ Completed: TypedArray Support - Implemented support for TypedArray props (e.g., `float32array`, `int8array`) in the Props Editor using JSON serialization and added missing tests. Fixed a critical React Hook violation in PropsEditor.

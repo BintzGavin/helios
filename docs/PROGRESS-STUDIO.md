@@ -1,3 +1,6 @@
+## STUDIO v0.68.1
+- ✅ Verified: Persistent Render Jobs - Verified implementation and updated documentation to reflect persistence behavior.
+
 ## STUDIO v0.68.0
 - ✅ Completed: Duplicate Composition - Implemented "Duplicate Composition" feature with UI modal, API endpoint, and file copy logic.
 

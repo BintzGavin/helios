@@ -12,7 +12,7 @@ Helios Studio is a browser-based development environment for video composition. 
     - `npx helios studio` - Via main CLI (starts Vite dev server)
     - `npx @helios-project/studio` or `helios-studio` - Standalone CLI (serves built dist via vite preview)
 -   **Bin Script**: `bin/helios-studio.js` - Executable script that serves the built Studio UI
--   **Server**: A Vite plugin (`vite-plugin-studio-api.ts`) provides API endpoints for filesystem access (assets, compositions) and render management.
+-   **Server**: A Vite plugin (`vite-plugin-studio-api.ts`) provides API endpoints for filesystem access (assets, compositions) and render management. It uses `RenderManager` to handle render jobs, persisting job history to `renders/jobs.json`.
 -   **UI**: A React application (`packages/studio/src`) that consumes the API and controls the Player.
 -   **Communication**: The UI communicates with the Player via the `HeliosController` bridge (postMessage) and with the Server via HTTP API.
 -   **Publishing**: Studio is a publishable npm package (`publishConfig.access: "public"`) with `bin` field for CLI installation.
@@ -111,7 +111,7 @@ npx @helios-project/studio
 **With Renderer:**
 -   Studio triggers renders via POST `/api/render`.
 -   The backend spawns a Renderer process (using `RenderManager`) to generate MP4/WebM files.
--   Render progress is polled via GET `/api/render`.
+-   Render progress and history are managed via `/api/jobs` and persisted to disk.
 
 ## F. Publishing
 
