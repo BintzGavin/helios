@@ -318,4 +318,15 @@ describe('ClientSideExporter', () => {
 
         expect(videoAddSpy).toHaveBeenCalledTimes(10);
     });
+
+    it('should save captions as SRT file', () => {
+        const cues = [{ id: '1', startTime: 0, endTime: 1000, text: 'Hello' }];
+        exporter.saveCaptionsAsSRT(cues, 'test.srt');
+
+        expect(URL.createObjectURL).toHaveBeenCalled();
+        expect(document.createElement).toHaveBeenCalledWith('a');
+        expect(mockAnchor.download).toBe('test.srt');
+        expect(mockAnchor.click).toHaveBeenCalled();
+        expect(URL.revokeObjectURL).toHaveBeenCalled();
+    });
 });
