@@ -2,22 +2,24 @@
 
 ## A. Architecture
 
-The Core package implements the "Helios State Machine" pattern. It is designed as a headless logic engine that manages the timeline, state, and synchronization, without containing any rendering logic.
-
-1.  **Store**: The `Helios` class maintains the source of truth for all state (current frame, playback status, inputs, etc.) using fine-grained Signals.
-2.  **Actions**: Public methods (e.g., `seek()`, `play()`, `setDuration()`) modify the signals.
-3.  **Subscribers**: External consumers (Renderer, Player, Studio) subscribe to state changes or read signals directly to update their views.
-4.  **Drivers**: Time synchronization is handled by pluggable `TimeDriver` strategies (e.g., `DomDriver` for Web Animations API, `WaapiDriver` for pure WAAPI, `NoopDriver` for headless).
+Helios Core implements a **Signal-based State Machine** for video orchestration.
+- **State**: Managed via reactive signals (`packages/core/src/signals.ts`).
+- **Drivers**: Uses the Strategy pattern for time control (`TimeDriver`), allowing pluggable drivers like `DomDriver` (for browser sync) and `WaapiDriver`.
+- **Reactivity**: Public properties (e.g., `currentFrame`) are ReadonlySignals that consumers can subscribe to.
+- **Timing**: De-couples "wall clock" time from "video time" to support rendering and scrubbing.
 
 ## B. File Tree
 
 ```
 packages/core/src/
 ├── drivers/
-│   ├── index.ts
 │   ├── DomDriver.ts
+│   ├── ManualTicker.ts
+│   ├── NoopDriver.ts
+│   ├── RafTicker.ts
+│   ├── TimeoutTicker.ts
 │   ├── WaapiDriver.ts
-│   └── ...
+│   └── index.ts
 ├── animation.ts
 ├── captions.ts
 ├── color.ts
@@ -95,174 +97,69 @@ export interface DiagnosticReport {
     vp9: boolean;
     av1: boolean;
   };
+  audioCodecs: {
+    aac: boolean;
+    opus: boolean;
+  };
   userAgent: string;
-}
-
-export type PropType =
-  | 'string'
-  | 'number'
-  | 'boolean'
-  | 'object'
-  | 'array'
-  | 'color'
-  | 'image'
-  | 'video'
-  | 'audio'
-  | 'font'
-  | 'model'
-  | 'json'
-  | 'shader'
-  | 'int8array'
-  | 'uint8array'
-  | 'uint8clampedarray'
-  | 'int16array'
-  | 'uint16array'
-  | 'int32array'
-  | 'uint32array'
-  | 'float32array'
-  | 'float64array';
-
-export interface PropDefinition {
-  type: PropType;
-  optional?: boolean;
-  default?: any;
-  minimum?: number;
-  maximum?: number;
-  minItems?: number;
-  maxItems?: number;
-  minLength?: number;
-  maxLength?: number;
-  enum?: (string | number)[];
-  label?: string;
-  description?: string;
-  step?: number;
-  format?: string;
-  items?: PropDefinition;
-  properties?: HeliosSchema;
-}
-
-export type HeliosSchema = Record<string, PropDefinition>;
-
-export interface CaptionCue {
-  id: string;
-  start: number; // ms
-  end: number;   // ms
-  text: string;
-}
-
-export interface Marker {
-  id: string;
-  time: number; // seconds
-  label?: string;
-  color?: string;
-}
-
-export enum HeliosErrorCode {
-  INVALID_DURATION = 'INVALID_DURATION',
-  INVALID_FPS = 'INVALID_FPS',
-  INVALID_PLAYBACK_RANGE = 'INVALID_PLAYBACK_RANGE',
-  INVALID_INPUT_RANGE = 'INVALID_INPUT_RANGE',
-  INVALID_OUTPUT_RANGE = 'INVALID_OUTPUT_RANGE',
-  UNSORTED_INPUT_RANGE = 'UNSORTED_INPUT_RANGE',
-  INVALID_SPRING_CONFIG = 'INVALID_SPRING_CONFIG',
-  INVALID_SRT_FORMAT = 'INVALID_SRT_FORMAT',
-  INVALID_INPUT_PROPS = 'INVALID_INPUT_PROPS',
-  INVALID_RESOLUTION = 'INVALID_RESOLUTION',
-  INVALID_COLOR_FORMAT = 'INVALID_COLOR_FORMAT',
-  INVALID_TIMECODE_FORMAT = 'INVALID_TIMECODE_FORMAT',
-  INVALID_MARKER = 'INVALID_MARKER',
-  MARKER_NOT_FOUND = 'MARKER_NOT_FOUND',
-  INVALID_SCHEMA = 'INVALID_SCHEMA'
 }
 ```
 
-## D. Public Methods
+## D. Public Methods (Helios Class)
 
 ```typescript
 class Helios {
   // Signals
-  get currentFrame(): ReadonlySignal<number>;
-  get currentTime(): ReadonlySignal<number>;
-  get loop(): ReadonlySignal<boolean>;
-  get isPlaying(): ReadonlySignal<boolean>;
-  get inputProps(): ReadonlySignal<Record<string, any>>;
-  get playbackRate(): ReadonlySignal<number>;
-  get volume(): ReadonlySignal<number>;
-  get muted(): ReadonlySignal<boolean>;
-  get captions(): ReadonlySignal<CaptionCue[]>;
-  get activeCaptions(): ReadonlySignal<CaptionCue[]>;
-  get markers(): ReadonlySignal<Marker[]>;
-  get playbackRange(): ReadonlySignal<[number, number] | null>;
-  get width(): ReadonlySignal<number>;
-  get height(): ReadonlySignal<number>;
-  get duration(): number;
-  get fps(): number;
+  public get currentFrame(): ReadonlySignal<number>;
+  public get currentTime(): ReadonlySignal<number>;
+  public get loop(): ReadonlySignal<boolean>;
+  public get isPlaying(): ReadonlySignal<boolean>;
+  public get inputProps(): ReadonlySignal<Record<string, any>>;
+  public get playbackRate(): ReadonlySignal<number>;
+  public get volume(): ReadonlySignal<number>;
+  public get muted(): ReadonlySignal<boolean>;
+  public get captions(): ReadonlySignal<CaptionCue[]>;
+  public get activeCaptions(): ReadonlySignal<CaptionCue[]>;
+  public get markers(): ReadonlySignal<Marker[]>;
+  public get playbackRange(): ReadonlySignal<[number, number] | null>;
+  public get width(): ReadonlySignal<number>;
+  public get height(): ReadonlySignal<number>;
 
+  // Getters
+  public get duration(): number;
+  public get fps(): number;
+
+  // Static
   static diagnose(): Promise<DiagnosticReport>;
 
+  // Methods
   constructor(options: HeliosOptions);
-
-  getState(): Readonly<HeliosState>;
-  setSize(width: number, height: number): void;
-  setLoop(shouldLoop: boolean): void;
-  setDuration(seconds: number): void;
-  setFps(fps: number): void;
-  setInputProps(props: Record<string, any>): void;
-  setPlaybackRate(rate: number): void;
-  setAudioVolume(volume: number): void;
-  setAudioMuted(muted: boolean): void;
-  setCaptions(captions: string | CaptionCue[]): void;
-  setMarkers(markers: Marker[]): void;
-  addMarker(marker: Marker): void;
-  removeMarker(id: string): void;
-  seekToMarker(id: string): void;
-  seekToTime(seconds: number): void;
-  setPlaybackRange(startFrame: number, endFrame: number): void;
-  clearPlaybackRange(): void;
-  subscribe(callback: HeliosSubscriber): () => void;
-  unsubscribe(callback: HeliosSubscriber): void;
-  registerStabilityCheck(check: StabilityCheck): () => void;
-  play(): void;
-  pause(): void;
-  seek(frame: number): void;
-  waitUntilStable(): Promise<void>;
-  bindToDocumentTimeline(): void;
-  unbindFromDocumentTimeline(): void;
-  dispose(): void;
+  public getState(): Readonly<HeliosState>;
+  public setSize(width: number, height: number): void;
+  public setLoop(shouldLoop: boolean): void;
+  public setDuration(seconds: number): void;
+  public setFps(fps: number): void;
+  public setInputProps(props: Record<string, any>): void;
+  public setPlaybackRate(rate: number): void;
+  public setAudioVolume(volume: number): void;
+  public setAudioMuted(muted: boolean): void;
+  public setCaptions(captions: string | CaptionCue[]): void;
+  public setMarkers(markers: Marker[]): void;
+  public addMarker(marker: Marker): void;
+  public removeMarker(id: string): void;
+  public seekToMarker(id: string): void;
+  public seekToTime(seconds: number): void;
+  public setPlaybackRange(startFrame: number, endFrame: number): void;
+  public clearPlaybackRange(): void;
+  public subscribe(callback: HeliosSubscriber): () => void;
+  public unsubscribe(callback: HeliosSubscriber): void;
+  public registerStabilityCheck(check: StabilityCheck): () => void;
+  public play(): void;
+  public pause(): void;
+  public seek(frame: number): void;
+  public waitUntilStable(): Promise<void>;
+  public bindToDocumentTimeline(): void;
+  public unbindFromDocumentTimeline(): void;
+  public dispose(): void;
 }
-```
-
-## E. Signals API
-
-```typescript
-export interface Signal<T> {
-  value: T;
-  peek(): T;
-  subscribe(fn: (value: T) => void): () => void;
-}
-
-export interface ReadonlySignal<T> {
-  readonly value: T;
-  peek(): T;
-  subscribe(fn: (value: T) => void): () => void;
-}
-
-export function signal<T>(value: T): Signal<T>;
-export function computed<T>(fn: () => T): ReadonlySignal<T>;
-export function effect(fn: () => void): () => void;
-export function untracked<T>(fn: () => T): T;
-```
-
-## F. Exported Utilities
-
-```typescript
-// Sequencing
-function sequence(options: SequenceOptions): SequenceResult;
-function series<T extends SeriesItem>(items: T[], startFrame?: number): (T & { from: number })[];
-function stagger<T>(items: T[], interval: number, startFrame?: number): (T & { from: number })[];
-function shift<T extends { from: number }>(items: T[], offset: number): T[];
-
-// Animation
-function interpolate(frame: number, inputRange: number[], outputRange: number[], options?: InterpolateOptions): number;
-function spring(options: SpringOptions): number;
 ```

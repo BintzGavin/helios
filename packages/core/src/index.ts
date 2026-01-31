@@ -63,6 +63,10 @@ export interface DiagnosticReport {
     vp9: boolean;
     av1: boolean;
   };
+  audioCodecs: {
+    aac: boolean;
+    opus: boolean;
+  };
   userAgent: string;
 }
 
@@ -226,6 +230,10 @@ export class Helios {
         vp9: false,
         av1: false,
       },
+      audioCodecs: {
+        aac: false,
+        opus: false,
+      },
       userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : 'Node/Server',
     };
 
@@ -275,6 +283,29 @@ export class Helios {
         ]);
 
         report.videoCodecs = { h264, vp8, vp9, av1 };
+      } catch (e) {
+        // Ignore errors during codec check
+      }
+    }
+
+    // Check Audio Codecs
+    if (typeof AudioEncoder !== 'undefined') {
+      try {
+        const checkAudio = async (config: any) => {
+          try {
+            const support = await AudioEncoder.isConfigSupported(config);
+            return support.supported ?? false;
+          } catch (e) {
+            return false;
+          }
+        };
+
+        const [aac, opus] = await Promise.all([
+          checkAudio({ codec: 'mp4a.40.2', sampleRate: 48000, numberOfChannels: 2, bitrate: 128000 }),
+          checkAudio({ codec: 'opus', sampleRate: 48000, numberOfChannels: 2, bitrate: 128000 })
+        ]);
+
+        report.audioCodecs = { aac, opus };
       } catch (e) {
         // Ignore errors during codec check
       }
