@@ -1413,4 +1413,124 @@ describe('HeliosPlayer', () => {
         expect(scrubber.style.background).toBe('');
     });
   });
+
+  describe('Markers', () => {
+    let mockController: any;
+
+    beforeEach(() => {
+        mockController = {
+            getState: vi.fn().mockReturnValue({ currentFrame: 0, duration: 10, fps: 30, isPlaying: false }),
+            play: vi.fn(),
+            pause: vi.fn(),
+            seek: vi.fn(),
+            subscribe: vi.fn().mockReturnValue(() => {}),
+            onError: vi.fn().mockReturnValue(() => {}),
+            dispose: vi.fn(), setCaptions: vi.fn(),
+            setPlaybackRate: vi.fn(),
+            setInputProps: vi.fn(),
+            setAudioMuted: vi.fn()
+        };
+        (player as any).setController(mockController);
+    });
+
+    it('should render markers correctly', () => {
+        const markers = [
+            { id: '1', time: 2.5, label: 'Intro' },
+            { id: '2', time: 7.5, label: 'Outro', color: '#ff0000' }
+        ];
+
+        mockController.getState.mockReturnValue({
+            currentFrame: 0,
+            duration: 10,
+            fps: 30,
+            isPlaying: false,
+            markers
+        });
+
+        (player as any).updateUI(mockController.getState());
+
+        const markersContainer = player.shadowRoot!.querySelector('.markers-container') as HTMLDivElement;
+        const markerEls = markersContainer.querySelectorAll('.marker');
+
+        expect(markerEls.length).toBe(2);
+
+        // Marker 1: 2.5s / 10s = 25%
+        const m1 = markerEls[0] as HTMLDivElement;
+        expect(m1.style.left).toBe('25%');
+        expect(m1.title).toBe('Intro');
+        // Should inherit color or use default (which is controlled by CSS var, usually checked via computed style, but inline style won't be set if not provided)
+        expect(m1.style.backgroundColor).toBe('');
+
+        // Marker 2: 7.5s / 10s = 75%
+        const m2 = markerEls[1] as HTMLDivElement;
+        expect(m2.style.left).toBe('75%');
+        expect(m2.title).toBe('Outro');
+        // Custom color
+        expect(m2.style.backgroundColor).toBe('rgb(255, 0, 0)'); // RGB serialization of #ff0000
+    });
+
+    it('should seek on marker click', () => {
+        const markers = [
+            { id: '1', time: 5.0, label: 'Middle' }
+        ];
+
+        mockController.getState.mockReturnValue({
+            currentFrame: 0,
+            duration: 10,
+            fps: 30,
+            isPlaying: false,
+            markers
+        });
+
+        (player as any).updateUI(mockController.getState());
+
+        const markerEl = player.shadowRoot!.querySelector('.marker') as HTMLDivElement;
+        markerEl.click();
+
+        // 5.0s * 30fps = 150 frames
+        expect(mockController.seek).toHaveBeenCalledWith(150);
+    });
+
+    it('should not render markers if duration is 0', () => {
+        const markers = [
+            { id: '1', time: 5.0, label: 'Middle' }
+        ];
+
+        mockController.getState.mockReturnValue({
+            currentFrame: 0,
+            duration: 0,
+            fps: 30,
+            isPlaying: false,
+            markers
+        });
+
+        (player as any).updateUI(mockController.getState());
+
+        const markersContainer = player.shadowRoot!.querySelector('.markers-container') as HTMLDivElement;
+        expect(markersContainer.children.length).toBe(0);
+    });
+
+    it('should ignore markers outside 0-100% range', () => {
+        const markers = [
+            { id: '1', time: -1, label: 'Before' },
+            { id: '2', time: 11, label: 'After' },
+            { id: '3', time: 5, label: 'Valid' }
+        ];
+
+        mockController.getState.mockReturnValue({
+            currentFrame: 0,
+            duration: 10,
+            fps: 30,
+            isPlaying: false,
+            markers
+        });
+
+        (player as any).updateUI(mockController.getState());
+
+        const markerEls = player.shadowRoot!.querySelectorAll('.marker');
+        expect(markerEls.length).toBe(1);
+        const m = markerEls[0] as HTMLDivElement;
+        expect(m.title).toBe('Valid');
+    });
+  });
 });

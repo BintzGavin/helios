@@ -11,7 +11,10 @@ The `<helios-player>` component uses a Shadow DOM to encapsulate its styles and 
 - `<iframe>`: Hosts the Helios composition (sandboxed).
 - `.click-layer`: Captures clicks for play/pause and double-clicks for fullscreen.
 - `.captions-container`: Displays active captions.
-- `.controls` (role="toolbar"): Contains playback controls (Play/Pause, Volume, Captions, Export, Speed, Scrubber, Time Display, Fullscreen).
+- `.controls` (role="toolbar"): Contains playback controls (Play/Pause, Volume, Captions, Export, Speed, Scrubber Wrapper, Time Display, Fullscreen).
+  - `.scrubber-wrapper`: Container for the scrubber range input and markers.
+    - `.markers-container`: Overlays visual markers on the timeline track.
+    - `.scrubber`: The seek range input.
 
 ## B. Events
 The component dispatches standard HTMLMediaElement events:
