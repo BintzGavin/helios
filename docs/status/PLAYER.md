@@ -1,4 +1,4 @@
-**Version**: v0.46.0
+**Version**: v0.46.1
 
 # Status: PLAYER
 
@@ -38,10 +38,12 @@
 - Supports `sandbox` attribute to customize iframe security flags (default: `allow-scripts allow-same-origin`).
 - Implemented robust `load()` behavior that supports reloading the current `src` to facilitate programmatic retries.
 - Visualizes markers on the timeline, allowing users to identify and seek to specific points of interest.
+- Migrated client-side export to use `mediabunny`, replacing deprecated `mp4-muxer` and `webm-muxer`.
 
 ## Critical Task
-- **Migrate Client-Side Export to Mediabunny**: Replace deprecated `mp4-muxer` and `webm-muxer` dependencies with `mediabunny` to modernize the export pipeline and unify codec handling.
+- **None**: All critical tasks completed.
 
+[v0.46.1] ✅ Completed: Migrate Client-Side Export to Mediabunny - Replaced deprecated `mp4-muxer` and `webm-muxer` with `mediabunny`, modernizing the export pipeline.
 [v0.46.0] ✅ Completed: Visualize Markers - Implemented visual rendering of timeline markers on the scrubber, including clickable interaction to seek to the marker's timestamp.
 [v0.45.0] ✅ Completed: Interactive Playback Range - Implemented `I` (In), `O` (Out), and `X` (Clear) keyboard shortcuts to set the playback loop range interactively.
 [v0.44.2] ✅ Completed: Fix load() Behavior - Updated `load()` to reload the current source if no pending source exists, and refactored `retryConnection` to use this standard method.
