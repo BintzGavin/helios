@@ -1,3 +1,6 @@
+## STUDIO v0.63.1
+- ✅ Verified: Maintenance - Synced package.json version and verified Studio UI with Playwright.
+
 ## STUDIO v0.63.0
 - ✅ Completed: Refine Assets Panel - Updated asset discovery to prioritize `public` directory and use relative paths/URLs, aligning with vision.
 
