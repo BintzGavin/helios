@@ -146,6 +146,64 @@ describe('findAssets', () => {
     expect(assetMap.get('data.json')).toBe('json');
     expect(assetMap.get('shader.frag')).toBe('shader');
   });
+
+  it('should prioritize public directory if it exists and use relative URLs', () => {
+    const root = path.resolve('/mock/project');
+    const publicDir = path.resolve(root, 'public');
+
+    vi.mocked(fs.existsSync).mockImplementation((p) => {
+        if (p === root) return true;
+        if (p === publicDir) return true;
+        return false;
+    });
+
+    vi.mocked(fs.readdirSync).mockImplementation((dir) => {
+        if (dir === publicDir) {
+            return [
+                { name: 'logo.png', isDirectory: () => false }
+            ] as any;
+        }
+        return [] as any;
+    });
+
+    const assets = findAssets('.');
+
+    expect(assets).toHaveLength(1);
+    expect(assets[0].name).toBe('logo.png');
+    // For public assets, URL should be relative (no /@fs)
+    expect(assets[0].url).toBe('/logo.png');
+    // Relative path should be correct
+    expect(assets[0].relativePath).toBe('logo.png');
+  });
+
+  it('should fall back to project root if public directory does not exist', () => {
+    const root = path.resolve('/mock/project');
+    const publicDir = path.resolve(root, 'public');
+
+    vi.mocked(fs.existsSync).mockImplementation((p) => {
+        if (p === root) return true;
+        if (p === publicDir) return false;
+        return false;
+    });
+
+    vi.mocked(fs.readdirSync).mockImplementation((dir) => {
+        if (dir === root) {
+            return [
+                { name: 'root-image.png', isDirectory: () => false }
+            ] as any;
+        }
+        return [] as any;
+    });
+
+    const assets = findAssets('.');
+
+    expect(assets).toHaveLength(1);
+    expect(assets[0].name).toBe('root-image.png');
+    // For root assets, URL should use /@fs
+    expect(assets[0].url).toContain('/@fs');
+    expect(assets[0].url).toContain('root-image.png');
+    expect(assets[0].relativePath).toBe('root-image.png');
+  });
 });
 
 describe('deleteComposition', () => {
