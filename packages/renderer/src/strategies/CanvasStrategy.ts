@@ -3,11 +3,13 @@ import { RenderStrategy } from './RenderStrategy.js';
 import { RendererOptions, AudioTrackConfig } from '../types.js';
 import { FFmpegBuilder } from '../utils/FFmpegBuilder.js';
 import { scanForAudioTracks } from '../utils/dom-scanner.js';
+import { extractBlobTracks } from '../utils/blob-extractor.js';
 
 export class CanvasStrategy implements RenderStrategy {
   private useWebCodecs = false;
   private useH264 = false;
   private discoveredAudioTracks: AudioTrackConfig[] = [];
+  private cleanupAudio: () => Promise<void> | void = () => {};
 
   constructor(private options: RendererOptions) {}
 
@@ -41,7 +43,12 @@ export class CanvasStrategy implements RenderStrategy {
     await page.evaluate(function() { return document.fonts.ready; });
 
     // Scan for audio tracks using the shared utility
-    this.discoveredAudioTracks = await scanForAudioTracks(page);
+    const initialTracks = await scanForAudioTracks(page);
+
+    // Extract blobs to temp files
+    const extractionResult = await extractBlobTracks(page, initialTracks);
+    this.discoveredAudioTracks = extractionResult.tracks;
+    this.cleanupAudio = extractionResult.cleanup;
 
     // Detect WebCodecs support and initialize if possible
     const width = page.viewportSize()?.width || 1920;
@@ -407,5 +414,9 @@ export class CanvasStrategy implements RenderStrategy {
     };
 
     return FFmpegBuilder.getArgs(combinedOptions, outputPath, videoInputArgs);
+  }
+
+  async cleanup(): Promise<void> {
+    await Promise.resolve(this.cleanupAudio());
   }
 }

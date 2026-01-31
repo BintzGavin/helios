@@ -124,3 +124,7 @@
 ## [2026-05-30] - Architectural Gap: DomStrategy lacks CDP
 **Learning:** `DomStrategy` relies on `SeekTimeDriver` (WAAPI) instead of `CdpTimeDriver` because `page.screenshot` hangs when CDP virtual time is paused. This means `mode: 'dom'` is not using the promised "Production Rendering" architecture (CDP), creating a divergence in time control mechanisms.
 **Action:** Investigate using `Emulation.setVirtualTimePolicy({ policy: 'advance', budget: ... })` combined with a non-hanging capture method, or accept this divergence as a permanent constraint of `page.screenshot`.
+
+## [1.50.0] - Resource Cleanup Timing
+**Learning:** Cleaning up temporary resources (like audio files) in `RenderStrategy.finish()` is premature because FFmpeg runs in parallel and may still be reading input files.
+**Action:** Always perform resource cleanup in a dedicated `cleanup()` method called by the Renderer *after* the FFmpeg process has exited (in the `finally` block).

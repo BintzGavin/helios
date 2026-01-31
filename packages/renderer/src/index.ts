@@ -262,6 +262,11 @@ export class Renderer {
       await context.close();
       await browser.close();
       console.log('Browser closed.');
+
+      if (this.strategy.cleanup) {
+        console.log('Cleaning up strategy resources...');
+        await this.strategy.cleanup();
+      }
     }
 
     console.log(`Render complete! Output saved to: ${outputPath}`);

@@ -41,4 +41,10 @@ export interface RenderStrategy {
    * @param outputPath The path to the output file.
    */
   getFFmpegArgs(options: RendererOptions, outputPath: string): string[];
+
+  /**
+   * Cleans up any temporary resources created by the strategy.
+   * This is called after the render process (including FFmpeg) has fully completed.
+   */
+  cleanup?(): Promise<void>;
 }

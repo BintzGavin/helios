@@ -97,7 +97,7 @@ export async function scanForAudioTracks(page: Page): Promise<AudioTrackConfig[]
 
   // Filter and map discovered tracks
   const validTracks = discoveredTracks
-    .filter(track => track.path && !track.path.startsWith('blob:'))
+    .filter(track => track.path)
     .map(track => ({
       path: track.path,
       volume: track.volume,
