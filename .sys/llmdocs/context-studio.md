@@ -96,7 +96,7 @@ npx @helios-project/studio
     -   **Switcher**: Cmd+K to switch active composition.
     -   **Create**: Create new compositions from templates.
     -   **Duplicate**: Clone existing compositions.
-    -   **Settings**: Edit metadata (resolution, FPS, duration).
+    -   **Settings**: Edit metadata (resolution, FPS, duration) and Rename composition.
 
 ## E. Integration
 

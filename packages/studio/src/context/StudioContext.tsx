@@ -96,7 +96,7 @@ interface StudioContextType {
   setSettingsOpen: (isOpen: boolean) => void;
   createComposition: (name: string, template?: string, options?: CompositionMetadata) => Promise<void>;
   duplicateComposition: (sourceId: string, newName: string) => Promise<void>;
-  updateCompositionMetadata: (id: string, metadata: CompositionMetadata) => Promise<void>;
+  updateCompositionMetadata: (id: string, metadata: CompositionMetadata, name?: string) => Promise<void>;
   deleteComposition: (id: string) => Promise<void>;
 
   // Assets
@@ -295,12 +295,15 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     }
   };
 
-  const updateCompositionMetadata = async (id: string, metadata: CompositionMetadata) => {
+  const updateCompositionMetadata = async (id: string, metadata: CompositionMetadata, name?: string) => {
     try {
+      const body: any = { id, ...metadata };
+      if (name) body.name = name;
+
       const res = await fetch('/api/compositions', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id, ...metadata })
+        body: JSON.stringify(body)
       });
 
       if (!res.ok) {

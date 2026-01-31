@@ -1,3 +1,6 @@
+## STUDIO v0.69.0
+- ✅ Completed: Rename Composition - Implemented ability to rename compositions from the Settings modal, including backend directory moving and ID updates.
+
 ## STUDIO v0.68.1
 - ✅ Verified: Persistent Render Jobs - Verified implementation and updated documentation to reflect persistence behavior.
 

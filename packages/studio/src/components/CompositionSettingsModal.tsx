@@ -4,6 +4,7 @@ import './CompositionSettingsModal.css';
 
 export const CompositionSettingsModal: React.FC = () => {
   const { isSettingsOpen, setSettingsOpen, updateCompositionMetadata, activeComposition, setDuplicateOpen } = useStudio();
+  const [name, setName] = useState('');
   const [width, setWidth] = useState(1920);
   const [height, setHeight] = useState(1080);
   const [fps, setFps] = useState(30);
@@ -14,6 +15,7 @@ export const CompositionSettingsModal: React.FC = () => {
 
   useEffect(() => {
     if (isSettingsOpen && activeComposition) {
+      setName(activeComposition.name);
       if (activeComposition.metadata) {
         setWidth(activeComposition.metadata.width);
         setHeight(activeComposition.metadata.height);
@@ -33,7 +35,7 @@ export const CompositionSettingsModal: React.FC = () => {
     setError(null);
 
     try {
-      await updateCompositionMetadata(activeComposition.id, { width, height, fps, duration });
+      await updateCompositionMetadata(activeComposition.id, { width, height, fps, duration }, name);
       setSettingsOpen(false);
     } catch (err: any) {
       setError(err.message || 'Failed to update settings');
@@ -49,6 +51,19 @@ export const CompositionSettingsModal: React.FC = () => {
         <div className="settings-modal-header">Composition Settings</div>
 
         <form onSubmit={handleSubmit}>
+          <div className="settings-modal-row">
+            <div className="settings-modal-input-group" style={{ flex: 1 }}>
+              <label>Name</label>
+              <input
+                type="text"
+                className="settings-modal-input"
+                value={name}
+                onChange={e => setName(e.target.value)}
+                disabled={loading}
+              />
+            </div>
+          </div>
+
           <div className="settings-modal-row">
             <div className="settings-modal-input-group">
               <label>Width</label>
