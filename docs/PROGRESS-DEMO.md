@@ -1,3 +1,6 @@
+## DEMO v1.70.0
+- ✅ Completed: Dynamic Verification Pipeline - Refactored build and test scripts to dynamically discover examples, reducing maintenance burden and enabling unified verification via 'verify:e2e'.
+
 ## DEMO v1.69.1
 - ✅ Completed: Polish Client-Side Export Example - Added documentation comments to `examples/client-export-api` and re-verified functionality.
 

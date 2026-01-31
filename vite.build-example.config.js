@@ -1,9 +1,43 @@
 import { defineConfig } from "vite";
-import { resolve } from "path";
+import { resolve, join } from "path";
+import fs from "fs";
 import react from "@vitejs/plugin-react";
 import vue from "@vitejs/plugin-vue";
 import { svelte } from "@sveltejs/vite-plugin-svelte";
 import solidPlugin from "vite-plugin-solid";
+
+function discoverExamples() {
+  const examplesDir = resolve(__dirname, "examples");
+  const inputs = {};
+
+  if (!fs.existsSync(examplesDir)) return inputs;
+
+  const entries = fs.readdirSync(examplesDir, { withFileTypes: true });
+
+  for (const entry of entries) {
+    if (entry.isDirectory()) {
+      const dirPath = join(examplesDir, entry.name);
+
+      // Check for composition.html
+      const compPath = join(dirPath, "composition.html");
+      if (fs.existsSync(compPath)) {
+        // Use structure-preserving key: examples/{dir}/composition
+        inputs[`examples/${entry.name}/composition`] = compPath;
+      }
+
+      // Check for index.html (custom apps only)
+      // HEURISTIC: Only include index.html for known app examples to avoid build errors with absolute paths
+      // like /src/main.ts in svelte-runes-animation
+      const indexPath = join(dirPath, "index.html");
+      if (fs.existsSync(indexPath)) {
+        if (entry.name === 'client-export-api') {
+           inputs[`examples/${entry.name}/index`] = indexPath;
+        }
+      }
+    }
+  }
+  return inputs;
+}
 
 export default defineConfig({
   resolve: {
@@ -31,58 +65,7 @@ export default defineConfig({
     outDir: "output/example-build",
     emptyOutDir: true,
     rollupOptions: {
-      input: {
-        simple_dom: resolve(__dirname, "examples/simple-animation/composition.html"),
-        simple_canvas: resolve(__dirname, "examples/simple-canvas-animation/composition.html"),
-        react_composition: resolve(__dirname, "examples/react-canvas-animation/composition.html"),
-        react_dom: resolve(__dirname, "examples/react-dom-animation/composition.html"),
-        react_css: resolve(__dirname, "examples/react-css-animation/composition.html"),
-        vue_composition: resolve(__dirname, "examples/vue-canvas-animation/composition.html"),
-        vue_dom: resolve(__dirname, "examples/vue-dom-animation/composition.html"),
-        svelte_composition: resolve(__dirname, "examples/svelte-canvas-animation/composition.html"),
-        svelte_dom: resolve(__dirname, "examples/svelte-dom-animation/composition.html"),
-        svelte_runes: resolve(__dirname, "examples/svelte-runes-animation/composition.html"),
-        threejs_composition: resolve(__dirname, "examples/threejs-canvas-animation/composition.html"),
-        pixi_composition: resolve(__dirname, "examples/pixi-canvas-animation/composition.html"),
-        p5_composition: resolve(__dirname, "examples/p5-canvas-animation/composition.html"),
-        animation_helpers: resolve(__dirname, "examples/animation-helpers/composition.html"),
-        react_helpers: resolve(__dirname, "examples/react-animation-helpers/composition.html"),
-        svelte_helpers: resolve(__dirname, "examples/svelte-animation-helpers/composition.html"),
-        vue_helpers: resolve(__dirname, "examples/vue-animation-helpers/composition.html"),
-        gsap_animation: resolve(__dirname, "examples/gsap-animation/composition.html"),
-        framer_motion: resolve(__dirname, "examples/framer-motion-animation/composition.html"),
-        lottie_animation: resolve(__dirname, "examples/lottie-animation/composition.html"),
-        motion_one: resolve(__dirname, "examples/motion-one-animation/composition.html"),
-        captions_animation: resolve(__dirname, "examples/captions-animation/composition.html"),
-        signals_animation: resolve(__dirname, "examples/signals-animation/composition.html"),
-        stress_test: resolve(__dirname, "examples/stress-test-animation/composition.html"),
-        dynamic_props: resolve(__dirname, "examples/dynamic-props-animation/composition.html"),
-        media_element: resolve(__dirname, "examples/media-element-animation/composition.html"),
-        d3_animation: resolve(__dirname, "examples/d3-animation/composition.html"),
-        tailwind_animation: resolve(__dirname, "examples/tailwind-animation/composition.html"),
-        waapi_animation: resolve(__dirname, "examples/waapi-animation/composition.html"),
-        audio_visualization: resolve(__dirname, "examples/audio-visualization/composition.html"),
-        procedural_generation: resolve(__dirname, "examples/procedural-generation/composition.html"),
-        chartjs_animation: resolve(__dirname, "examples/chartjs-animation/composition.html"),
-        social_media_story: resolve(__dirname, "examples/social-media-story/composition.html"),
-        react_transitions: resolve(__dirname, "examples/react-transitions/composition.html"),
-        react_three_fiber: resolve(__dirname, "examples/react-three-fiber/composition.html"),
-        svelte_transitions: resolve(__dirname, "examples/svelte-transitions/composition.html"),
-        vue_transitions: resolve(__dirname, "examples/vue-transitions/composition.html"),
-        variable_font: resolve(__dirname, "examples/variable-font-animation/composition.html"),
-        react_styled_components: resolve(__dirname, "examples/react-styled-components/composition.html"),
-        solid_canvas: resolve(__dirname, "examples/solid-canvas-animation/composition.html"),
-        solid_dom: resolve(__dirname, "examples/solid-dom-animation/composition.html"),
-        solid_helpers: resolve(__dirname, "examples/solid-animation-helpers/composition.html"),
-        solid_transitions: resolve(__dirname, "examples/solid-transitions/composition.html"),
-        podcast_visualizer: resolve(__dirname, "examples/podcast-visualizer/composition.html"),
-        map_animation: resolve(__dirname, "examples/map-animation/composition.html"),
-        text_effects: resolve(__dirname, "examples/text-effects-animation/composition.html"),
-        promo_video: resolve(__dirname, "examples/promo-video/composition.html"),
-        web_component: resolve(__dirname, "examples/web-component-animation/composition.html"),
-        client_export_comp: resolve(__dirname, "examples/client-export-api/composition.html"),
-        client_export_app: resolve(__dirname, "examples/client-export-api/index.html"),
-      },
+      input: discoverExamples(),
     },
   },
 });

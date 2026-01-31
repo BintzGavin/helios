@@ -1,72 +1,81 @@
 import { Renderer } from '../../packages/renderer/dist/index.js';
 import * as path from 'path';
 import * as fs from 'fs/promises';
+import { existsSync } from 'fs';
 
-const CASES = [
-  { name: 'Canvas', relativePath: 'examples/simple-canvas-animation/composition.html', mode: 'canvas' as const },
-  { name: 'DOM', relativePath: 'examples/simple-animation/composition.html', mode: 'dom' as const },
-  { name: 'React', relativePath: 'examples/react-canvas-animation/composition.html', mode: 'canvas' as const },
-  { name: 'React DOM', relativePath: 'examples/react-dom-animation/composition.html', mode: 'dom' as const },
-  { name: 'React CSS', relativePath: 'examples/react-css-animation/composition.html', mode: 'dom' as const },
-  { name: 'Vue', relativePath: 'examples/vue-canvas-animation/composition.html', mode: 'canvas' as const },
-  { name: 'Vue DOM', relativePath: 'examples/vue-dom-animation/composition.html', mode: 'dom' as const },
-  { name: 'Svelte', relativePath: 'examples/svelte-canvas-animation/composition.html', mode: 'canvas' as const },
-  { name: 'Svelte DOM', relativePath: 'examples/svelte-dom-animation/composition.html', mode: 'dom' as const },
-  { name: 'Svelte Transitions', relativePath: 'examples/svelte-transitions/composition.html', mode: 'dom' as const },
-  { name: 'Svelte Runes', relativePath: 'examples/svelte-runes-animation/composition.html', mode: 'dom' as const },
-  { name: 'ThreeJS', relativePath: 'examples/threejs-canvas-animation/composition.html', mode: 'canvas' as const },
-  { name: 'Pixi', relativePath: 'examples/pixi-canvas-animation/composition.html', mode: 'canvas' as const },
-  { name: 'P5', relativePath: 'examples/p5-canvas-animation/composition.html', mode: 'canvas' as const },
-  { name: 'Helpers', relativePath: 'examples/animation-helpers/composition.html', mode: 'canvas' as const },
-  { name: 'React Helpers', relativePath: 'examples/react-animation-helpers/composition.html', mode: 'dom' as const },
-  { name: 'Svelte Helpers', relativePath: 'examples/svelte-animation-helpers/composition.html', mode: 'dom' as const },
-  { name: 'Vue Helpers', relativePath: 'examples/vue-animation-helpers/composition.html', mode: 'dom' as const },
-  { name: 'GSAP', relativePath: 'examples/gsap-animation/composition.html', mode: 'dom' as const },
-  { name: 'Framer Motion', relativePath: 'examples/framer-motion-animation/composition.html', mode: 'dom' as const },
-  { name: 'Lottie', relativePath: 'examples/lottie-animation/composition.html', mode: 'dom' as const },
-  { name: 'Motion One', relativePath: 'examples/motion-one-animation/composition.html', mode: 'dom' as const },
-  { name: 'Captions', relativePath: 'examples/captions-animation/composition.html', mode: 'dom' as const },
-  { name: 'Signals', relativePath: 'examples/signals-animation/composition.html', mode: 'dom' as const },
-  { name: 'Stress Test', relativePath: 'examples/stress-test-animation/composition.html', mode: 'dom' as const },
-  { name: 'Dynamic Props', relativePath: 'examples/dynamic-props-animation/composition.html', mode: 'dom' as const },
-  { name: 'Media Element', relativePath: 'examples/media-element-animation/composition.html', mode: 'dom' as const },
-  { name: 'D3 Animation', relativePath: 'examples/d3-animation/composition.html', mode: 'dom' as const },
-  { name: 'Tailwind Animation', relativePath: 'examples/tailwind-animation/composition.html', mode: 'dom' as const },
-  { name: 'WAAPI Animation', relativePath: 'examples/waapi-animation/composition.html', mode: 'dom' as const },
-  { name: 'Audio Visualization', relativePath: 'examples/audio-visualization/composition.html', mode: 'canvas' as const },
-  { name: 'Procedural Generation', relativePath: 'examples/procedural-generation/composition.html', mode: 'canvas' as const },
-  { name: 'ChartJS', relativePath: 'examples/chartjs-animation/composition.html', mode: 'dom' as const },
-  { name: 'Social Media Story', relativePath: 'examples/social-media-story/composition.html', mode: 'dom' as const },
-  { name: 'React Transitions', relativePath: 'examples/react-transitions/composition.html', mode: 'dom' as const },
-  { name: 'React Three Fiber', relativePath: 'examples/react-three-fiber/composition.html', mode: 'canvas' as const },
-  { name: 'Vue Transitions', relativePath: 'examples/vue-transitions/composition.html', mode: 'dom' as const },
-  { name: 'Variable Font', relativePath: 'examples/variable-font-animation/composition.html', mode: 'dom' as const },
-  { name: 'React Styled Components', relativePath: 'examples/react-styled-components/composition.html', mode: 'dom' as const },
-  { name: 'Solid Canvas', relativePath: 'examples/solid-canvas-animation/composition.html', mode: 'canvas' as const },
-  { name: 'Podcast Visualizer', relativePath: 'examples/podcast-visualizer/composition.html', mode: 'dom' as const },
-  { name: 'Map Animation', relativePath: 'examples/map-animation/composition.html', mode: 'dom' as const },
-  { name: 'Solid DOM', relativePath: 'examples/solid-dom-animation/composition.html', mode: 'dom' as const },
-  { name: 'Solid Helpers', relativePath: 'examples/solid-animation-helpers/composition.html', mode: 'dom' as const },
-  { name: 'Solid Transitions', relativePath: 'examples/solid-transitions/composition.html', mode: 'dom' as const },
-  { name: 'Text Effects', relativePath: 'examples/text-effects-animation/composition.html', mode: 'dom' as const },
-  { name: 'Promo Video', relativePath: 'examples/promo-video/composition.html', mode: 'dom' as const },
-  { name: 'Web Component', relativePath: 'examples/web-component-animation/composition.html', mode: 'dom' as const },
-];
+// Specific overrides for mode
+const CANVAS_OVERRIDES = new Set([
+  'audio-visualization',
+  'procedural-generation',
+  'react-three-fiber',
+  'threejs-canvas-animation',
+  'pixi-canvas-animation',
+  'p5-canvas-animation',
+  'animation-helpers',
+  'simple-canvas-animation',
+  'react-canvas-animation',
+  'vue-canvas-animation',
+  'svelte-canvas-animation',
+  'solid-canvas-animation'
+]);
+
+// Helper to format name: "simple-animation" -> "Simple Animation"
+function formatName(dirName: string) {
+  return dirName
+    .split('-')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+}
+
+async function discoverCases() {
+  const examplesDir = path.resolve(process.cwd(), 'examples');
+  const entries = await fs.readdir(examplesDir, { withFileTypes: true });
+
+  const cases = [];
+
+  for (const entry of entries) {
+    if (entry.isDirectory()) {
+      const dirName = entry.name;
+      const compPath = path.join(examplesDir, dirName, 'composition.html');
+
+      // We only care if composition.html exists (for Renderer)
+      if (existsSync(compPath)) {
+        // Determine mode
+        let mode: 'dom' | 'canvas' = 'dom';
+        if (dirName.includes('canvas') || CANVAS_OVERRIDES.has(dirName)) {
+          mode = 'canvas';
+        }
+
+        cases.push({
+          name: formatName(dirName),
+          relativePath: `examples/${dirName}/composition.html`,
+          mode: mode
+        });
+      }
+    }
+  }
+  return cases.sort((a, b) => a.name.localeCompare(b.name));
+}
 
 async function main() {
   const filter = process.argv[2];
   console.log('Starting E2E verification render...');
+  console.log('Discovering examples...');
 
-  let casesToRun = CASES;
+  const allCases = await discoverCases();
+  let casesToRun = allCases;
+
   if (filter) {
     console.log(`Filtering cases by "${filter}"...`);
-    casesToRun = CASES.filter(c => c.name.toLowerCase().includes(filter.toLowerCase()));
+    casesToRun = allCases.filter(c => c.name.toLowerCase().includes(filter.toLowerCase()));
   }
+
+  console.log(`Found ${casesToRun.length} examples to verify.`);
 
   let failedCases = 0;
 
   for (const testCase of casesToRun) {
-    console.log(`\nVerifying ${testCase.name}...`);
+    console.log(`\nVerifying ${testCase.name} [${testCase.mode}]...`);
 
     // Create a new renderer for each case to ensure clean state
     const renderer = new Renderer({
@@ -74,7 +83,7 @@ async function main() {
       height: 600,
       fps: 30,
       durationInSeconds: 5,
-      mode: testCase.mode || 'canvas',
+      mode: testCase.mode,
     });
 
     const compositionPath = path.resolve(
