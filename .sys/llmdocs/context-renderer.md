@@ -32,7 +32,8 @@ packages/renderer/
 │   ├── index.ts                # Main Renderer class
 │   └── types.ts                # Configuration interfaces
 └── tests/
-    ├── run-all.ts              # Test runner
+    ├── run-all.ts              # Test runner (executes comprehensive suite)
+    ├── verify-browser-config.ts # Browser launch config test
     ├── verify-waapi-sync.ts    # CSS animation sync test
     ├── verify-seek-driver-determinism.ts # SeekDriver determinism test
     ├── verify-cdp-media-sync-timing.ts # CdpDriver media sync timing test
