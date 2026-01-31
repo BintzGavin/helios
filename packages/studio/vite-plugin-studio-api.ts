@@ -2,6 +2,8 @@ import { Plugin, ViteDevServer, PreviewServer } from 'vite';
 import { AddressInfo } from 'net';
 import fs from 'fs';
 import path from 'path';
+import { SSEServerTransport } from "@modelcontextprotocol/sdk/server/sse.js";
+import { createMcpServer } from './src/server/mcp';
 import { findCompositions, findAssets, getProjectRoot, createComposition, deleteComposition, updateCompositionMetadata } from './src/server/discovery';
 import { startRender, getJob, getJobs, cancelJob, deleteJob, diagnoseServer } from './src/server/render-manager';
 
@@ -44,6 +46,52 @@ const MIME_TYPES: Record<string, string> = {
 };
 
 function configureMiddlewares(server: ViteDevServer | PreviewServer, isPreview: boolean) {
+      // MCP Server Setup
+      const mcpServer = createMcpServer(() => {
+          const address = server.httpServer?.address();
+          return (typeof address === 'object' && address !== null) ? address.port : 5173;
+      });
+      const mcpTransports = new Map<string, SSEServerTransport>();
+
+      server.middlewares.use('/mcp/sse', async (req, res, next) => {
+          const transport = new SSEServerTransport("/mcp/messages", res);
+          const sessionId = transport.sessionId;
+          mcpTransports.set(sessionId, transport);
+
+          transport.onclose = () => {
+              mcpTransports.delete(sessionId);
+          };
+
+          await mcpServer.connect(transport);
+      });
+
+      server.middlewares.use('/mcp/messages', async (req, res, next) => {
+          if (req.method !== 'POST') return next();
+
+          const urlStr = req.url || '/';
+          const qIndex = urlStr.indexOf('?');
+          let sessionId: string | null = null;
+          if (qIndex !== -1) {
+              const params = new URLSearchParams(urlStr.substring(qIndex));
+              sessionId = params.get('sessionId');
+          }
+
+          if (!sessionId) {
+              res.statusCode = 400;
+              res.end("Missing sessionId");
+              return;
+          }
+
+          const transport = mcpTransports.get(sessionId);
+          if (!transport) {
+              res.statusCode = 404;
+              res.end("Session not found");
+              return;
+          }
+
+          await transport.handlePostMessage(req, res);
+      });
+
       // NEW: Middleware for /@fs/ (Project File Serving)
       // Only enabled in PREVIEW mode because Vite Dev server handles /@fs/ natively with HMR support.
       if (isPreview) {

@@ -3,7 +3,7 @@
 ## Architecture
 The Studio is a browser-based development environment for Helios compositions. It runs on Vite and communicates with the backend via API endpoints provided by `vite-plugin-studio-api.ts`.
 - **CLI**: `npx helios studio` (via `packages/cli` or similar) starts the Vite server.
-- **Backend**: `vite-plugin-studio-api.ts` handles file system operations (discovery, creation, update, deletion of compositions and assets) and render job management.
+- **Backend**: `vite-plugin-studio-api.ts` handles file system operations (discovery, creation, update, deletion of compositions and assets), render job management, and hosts a **Model Context Protocol (MCP)** server for AI agent integration.
 - **Frontend**: A React application located in `packages/studio/src`.
   - `StudioContext`: Centralized state management.
   - `Stage`: The main preview area using `<helios-player>`.
@@ -19,6 +19,7 @@ packages/studio
 ├── postcss.config.js
 ├── scripts
 │   ├── verify-assets.ts
+│   ├── verify-mcp.ts
 │   └── verify-ui.ts
 ├── src
 │   ├── App.tsx
@@ -28,6 +29,9 @@ packages/studio
 │   ├── hooks
 │   ├── main.tsx
 │   ├── server
+│   │   ├── discovery.ts
+│   │   ├── mcp.ts
+│   │   ├── render-manager.ts
 │   │   ├── templates
 │   │   │   ├── index.ts
 │   │   │   ├── react.ts
@@ -51,6 +55,7 @@ packages/studio
 - Starts the Studio server.
 - Scans the current directory (or `HELIOS_PROJECT_ROOT`) recursively for compositions.
 - Watches for file changes and updates the UI (HMR).
+- Exposes MCP endpoints at `/mcp/sse` and `/mcp/messages`.
 
 ## UI Components
 - **Stage**: Visual preview with zoom, pan, safe area guides, and transparency toggle.
@@ -69,3 +74,4 @@ packages/studio
 - **Core**: Uses `Helios` engine for rendering and schema definitions.
 - **Player**: Uses `<helios-player>` for preview.
 - **Renderer**: Communicates with `@helios-project/renderer` via backend API for exporting videos.
+- **MCP**: Exposes Studio capabilities to AI agents via `helios://compositions` resource and `render_composition`/`create_composition` tools (SSE/JSON-RPC).

@@ -1,4 +1,4 @@
-**Version**: 0.61.0
+**Version**: 0.62.0
 
 # Studio Domain Status
 
@@ -7,6 +7,7 @@
 **Focus**: UI Implementation & CLI
 
 ## Recent Updates
+- [v0.62.0] ✅ Completed: MCP Server Integration - Implemented Model Context Protocol server allowing AI agents to inspect, create, and render compositions.
 - [v0.61.0] ✅ Completed: Recursive Composition Discovery - Implemented recursive directory scanning for composition discovery, allowing nested composition structures.
 - [v0.60.0] ✅ Completed: Render Preview - Implemented a modal to preview rendered videos directly within the Studio UI.
 - [v0.59.0] ✅ Completed: Show Render Errors - Implemented error display in Renders Panel, enabling users to debug failed render jobs.
