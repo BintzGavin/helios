@@ -1,8 +1,9 @@
-**Version**: 1.47.2
+**Version**: 1.47.3
 
 # Renderer Agent Status
 
 ## Progress Log
+- [1.47.3] ✅ Completed: Shadow DOM Background Preload - Verified and enhanced `DomStrategy` to recursively find and preload CSS background images inside nested Shadow DOMs, ensuring zero-artifact rendering for Web Components.
 - [1.47.2] ✅ Completed: CdpTimeDriver Budget - Updated `CdpTimeDriver` to wait for `virtualTimeBudgetExpired` event, ensuring the browser fully processes the time budget before capturing the frame.
 - [1.47.1] ✅ Completed: CdpTimeDriver Media Sync Timing - Updated `CdpTimeDriver` to synchronize media elements before advancing virtual time, ensuring correct frame capture.
 - [1.47.0] ✅ Completed: SeekTimeDriver Determinism - Updated `SeekTimeDriver` to enforce deterministic `Date.now()` by setting a fixed epoch (Jan 1, 2024), aligning DOM-based rendering determinism with Canvas-based rendering.

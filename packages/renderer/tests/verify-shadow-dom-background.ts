@@ -3,7 +3,7 @@ import { DomStrategy } from '../src/strategies/DomStrategy';
 import { RendererOptions } from '../src/types';
 
 async function verify() {
-  console.log('Verifying Shadow DOM Background Image Discovery...');
+  console.log('Verifying Shadow DOM Background Image Discovery (Nested)...');
 
   // Launch browser
   const browser = await chromium.launch();
@@ -11,15 +11,16 @@ async function verify() {
 
   let requestMade = false;
   const targetUrl = 'https://example.com/shadow-bg.png';
+  const nestedTargetUrl = 'https://example.com/nested-shadow-bg.png';
 
   // Intercept requests
-  await page.route(targetUrl, (route: Route) => {
-    console.log('✅ Intercepted request for:', targetUrl);
-    requestMade = true;
+  await page.route('**/*.png', (route: Route) => {
+    const url = route.request().url();
+    console.log('✅ Intercepted request for:', url);
     route.fulfill({ status: 200, body: 'dummy image data', contentType: 'image/png' });
   });
 
-  // Create a page with a Custom Element containing a Shadow Root with a div having background-image
+  // Create a page with Nested Shadow DOMs
   await page.setContent(`
     <html>
       <head>
@@ -29,7 +30,8 @@ async function verify() {
       </head>
       <body>
         <script>
-          class BgComponent extends HTMLElement {
+          // Level 2: Child Component (Has the image)
+          class ChildComponent extends HTMLElement {
             constructor() {
               super();
               this.attachShadow({ mode: 'open' });
@@ -37,16 +39,34 @@ async function verify() {
             connectedCallback() {
               this.shadowRoot.innerHTML = \`
                 <div style="
-                  width: 100px;
-                  height: 100px;
-                  background-image: url('${targetUrl}');
+                  width: 50px;
+                  height: 50px;
+                  background-image: url('${nestedTargetUrl}');
                 "></div>
               \`;
             }
           }
-          customElements.define('bg-component', BgComponent);
+          customElements.define('child-component', ChildComponent);
+
+          // Level 1: Parent Component (Contains Child)
+          class ParentComponent extends HTMLElement {
+            constructor() {
+              super();
+              this.attachShadow({ mode: 'open' });
+            }
+            connectedCallback() {
+              this.shadowRoot.innerHTML = \`
+                <div style="padding: 10px; border: 1px solid red;">
+                  <child-component></child-component>
+                </div>
+              \`;
+            }
+          }
+          customElements.define('parent-component', ParentComponent);
         </script>
-        <bg-component></bg-component>
+
+        <!-- Use Parent Component -->
+        <parent-component></parent-component>
       </body>
     </html>
   `);
@@ -75,13 +95,14 @@ async function verify() {
     }
   });
 
-  // prepare() should trigger the preloading logic which makes a request to the background image
+  // prepare() should trigger the preloading logic
   await strategy.prepare(page);
 
   await browser.close();
 
+  // We expect 1 image to be found (the nested one)
   if (preloadCount === 1) {
-    console.log('✅ DomStrategy found the shadow DOM background image.');
+    console.log('✅ DomStrategy found the nested shadow DOM background image.');
     console.log('✅ Verification Passed');
     process.exit(0);
   } else {
