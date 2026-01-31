@@ -44,6 +44,26 @@ export const PropsEditor: React.FC = () => {
   const { controller, playerState } = useStudio();
   const { inputProps, schema } = playerState;
 
+  const groupedProps = useMemo(() => {
+    const groups: Record<string, string[]> = {};
+    const ungrouped: string[] = [];
+
+    if (!inputProps) return { groups, ungrouped };
+
+    // Iterate keys in order of inputProps to preserve rough ordering
+    Object.keys(inputProps).forEach(key => {
+      const def = schema?.[key];
+      if (def?.group) {
+        if (!groups[def.group]) groups[def.group] = [];
+        groups[def.group].push(key);
+      } else {
+        ungrouped.push(key);
+      }
+    });
+
+    return { groups, ungrouped };
+  }, [inputProps, schema]);
+
   if (!controller) {
     return <div className="editor-message">No active controller</div>;
   }
@@ -72,24 +92,6 @@ export const PropsEditor: React.FC = () => {
     });
     controller.setInputProps(defaults);
   };
-
-  const groupedProps = useMemo(() => {
-    const groups: Record<string, string[]> = {};
-    const ungrouped: string[] = [];
-
-    // Iterate keys in order of inputProps to preserve rough ordering
-    Object.keys(inputProps).forEach(key => {
-      const def = schema?.[key];
-      if (def?.group) {
-        if (!groups[def.group]) groups[def.group] = [];
-        groups[def.group].push(key);
-      } else {
-        ungrouped.push(key);
-      }
-    });
-
-    return { groups, ungrouped };
-  }, [inputProps, schema]);
 
   const renderRow = (key: string) => {
     const value = inputProps[key];

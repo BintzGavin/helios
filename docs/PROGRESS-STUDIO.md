@@ -1,3 +1,6 @@
+## STUDIO v0.66.0
+- ✅ Completed: TypedArray Support - Implemented support for TypedArray props (e.g., `float32array`, `int8array`) in the Props Editor using JSON serialization and added missing tests. Fixed a critical React Hook violation in PropsEditor.
+
 ## STUDIO v0.65.0
 - ✅ Completed: Persistent Render Jobs - Implemented persistence of render jobs to `jobs.json` in the `renders` directory, ensuring history survives server restarts.
 

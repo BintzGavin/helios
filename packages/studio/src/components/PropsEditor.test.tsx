@@ -313,4 +313,61 @@ describe('PropsEditor', () => {
     fireEvent.click(myGroupHeader);
     expect(screen.getByDisplayValue('val2')).toBeInTheDocument();
   });
+
+  it('renders TypedArray inputs', () => {
+    const schema: HeliosSchema = {
+      floatArray: { type: 'float32array' },
+      intArray: { type: 'int8array' }
+    };
+
+    // Use simple values to avoid float precision issues in text matching
+    const initialFloatArray = new Float32Array([1, 2, 3]);
+    const initialIntArray = new Int8Array([10, 20]);
+
+    (StudioContext.useStudio as any).mockReturnValue({
+      ...defaultContext,
+      playerState: {
+        inputProps: {
+          floatArray: initialFloatArray,
+          intArray: initialIntArray
+        },
+        schema
+      }
+    });
+
+    render(<PropsEditor />);
+
+    // Verify JSON content is rendered
+    // JsonInput formats with indentation (2 spaces)
+    const floatJson = JSON.stringify(Array.from(initialFloatArray), null, 2);
+    const intJson = JSON.stringify(Array.from(initialIntArray), null, 2);
+
+    // Get all textareas (JsonInputs)
+    const inputs = screen.getAllByRole('textbox');
+    expect(inputs).toHaveLength(2);
+
+    // Verify values (normalize newlines just in case)
+    expect(inputs[0]).toHaveValue(floatJson);
+    expect(inputs[1]).toHaveValue(intJson);
+
+    // Update FloatArray
+    const newFloatArray = [4, 5, 6];
+    const newFloatJson = JSON.stringify(newFloatArray, null, 2);
+
+    // Find the textarea for floatArray (first one)
+    const floatInput = inputs[0];
+    fireEvent.change(floatInput, { target: { value: newFloatJson } });
+    fireEvent.blur(floatInput); // JsonInput updates on blur
+
+    // Verify setInputProps called with correct TypedArray
+    expect(mockSetInputProps).toHaveBeenCalledWith(
+        expect.objectContaining({
+            floatArray: expect.any(Float32Array)
+        })
+    );
+
+    // Check content of the called argument
+    const callArgs = mockSetInputProps.mock.calls[0][0];
+    expect(Array.from(callArgs.floatArray)).toEqual(newFloatArray);
+  });
 });
