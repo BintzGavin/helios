@@ -1,0 +1,63 @@
+# 1. Context & Goal
+- **Objective**: Create a canonical "Vanilla TypeScript" example to fulfill the "Use What You Know" vision for non-framework users.
+- **Trigger**: The current "Vanilla" examples (`simple-animation`) use legacy inline JavaScript and relative imports, failing to demonstrate the "Professional" Vite+TS pipeline promised by the Vision. A previous plan (`2026-02-01`) identified this but was not executed.
+- **Impact**: Provides a valid reference for users who want to use Helios without a framework, demonstrating proper build pipeline integration and TypeScript usage.
+
+# 2. File Inventory
+- **Create**:
+  - `examples/vanilla-typescript/composition.html`: Entry point.
+  - `examples/vanilla-typescript/src/main.ts`: TypeScript logic demonstrating `Helios` usage.
+  - `examples/vanilla-typescript/src/vite-env.d.ts`: TypeScript environment types.
+  - `examples/vanilla-typescript/tsconfig.json`: TypeScript configuration extending the root config.
+- **Modify**:
+  - `examples/README.md`: Add the new example to the "Vanilla JS" section.
+- **Read-Only**: `vite.build-example.config.js`, `packages/core/src/index.ts`.
+
+# 3. Implementation Spec
+- **Architecture**:
+  - Standard Vite + TypeScript setup.
+  - Uses `@helios-project/core` alias (resolved by root Vite config).
+  - Demonstrates `Helios` class instantiation, subscription-based animation, and `bindToDocumentTimeline`.
+- **Pseudo-Code**:
+  ```typescript
+  // src/main.ts
+  import { Helios } from '@helios-project/core';
+
+  // Initialize engine
+  const helios = new Helios({
+    fps: 30,
+    duration: 5,
+    autoSyncAnimations: true
+  });
+
+  // Create DOM element
+  const box = document.createElement('div');
+  box.style.width = '100px';
+  box.style.height = '100px';
+  box.style.backgroundColor = 'red';
+  box.style.position = 'absolute';
+  document.body.appendChild(box);
+
+  // Animate using subscribe
+  helios.subscribe((state) => {
+     const progress = state.currentFrame / (state.duration * state.fps);
+     const x = progress * 500;
+     box.style.transform = `translateX(${x}px)`;
+  });
+
+  // Enable external control
+  helios.bindToDocumentTimeline();
+  // Expose for debugging
+  (window as any).helios = helios;
+  ```
+- **Dependencies**: None.
+
+# 4. Test Plan
+- **Verification**:
+  1. Run `npm run build:examples` to ensure the new example builds.
+  2. Run `npx tsx tests/e2e/verify-client-export.ts "Vanilla TypeScript"` to verify it renders and exports correctly.
+- **Success Criteria**:
+  - Build succeeds.
+  - Verification script reports `✅ Vanilla TypeScript Verified`.
+- **Edge Cases**:
+  - Verify that `bindToDocumentTimeline` works when running in a headless environment (covered by verification script).
