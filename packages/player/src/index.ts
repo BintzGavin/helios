@@ -169,6 +169,23 @@ template.innerHTML = `
       cursor: pointer;
       border-radius: 50%;
     }
+    .scrubber-tooltip {
+      position: absolute;
+      bottom: 100%;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.8);
+      color: white;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      pointer-events: none;
+      white-space: nowrap;
+      z-index: 10;
+      margin-bottom: 8px;
+    }
+    .scrubber-tooltip.hidden {
+      display: none;
+    }
     .markers-container {
       position: absolute;
       inset: 0;
@@ -401,6 +418,7 @@ template.innerHTML = `
       <option value="2">2x</option>
     </select>
     <div class="scrubber-wrapper">
+      <div class="scrubber-tooltip hidden" part="tooltip"></div>
       <div class="markers-container" part="markers"></div>
       <input type="range" class="scrubber" min="0" value="0" step="1" part="scrubber" aria-label="Seek time">
     </div>
@@ -417,6 +435,8 @@ export class HeliosPlayer extends HTMLElement implements TrackHost {
   private volumeBtn: HTMLButtonElement;
   private volumeSlider: HTMLInputElement;
   private scrubber: HTMLInputElement;
+  private scrubberWrapper: HTMLDivElement;
+  private scrubberTooltip: HTMLDivElement;
   private markersContainer: HTMLDivElement;
   private timeDisplay: HTMLDivElement;
   private exportBtn: HTMLButtonElement;
@@ -779,6 +799,8 @@ export class HeliosPlayer extends HTMLElement implements TrackHost {
     this.volumeBtn = this.shadowRoot!.querySelector(".volume-btn")!;
     this.volumeSlider = this.shadowRoot!.querySelector(".volume-slider")!;
     this.scrubber = this.shadowRoot!.querySelector(".scrubber")!;
+    this.scrubberWrapper = this.shadowRoot!.querySelector(".scrubber-wrapper")!;
+    this.scrubberTooltip = this.shadowRoot!.querySelector(".scrubber-tooltip")!;
     this.markersContainer = this.shadowRoot!.querySelector(".markers-container")!;
     this.timeDisplay = this.shadowRoot!.querySelector(".time-display")!;
     this.exportBtn = this.shadowRoot!.querySelector(".export-btn")!;
@@ -981,6 +1003,8 @@ export class HeliosPlayer extends HTMLElement implements TrackHost {
     this.scrubber.addEventListener("touchstart", this.handleScrubStart, { passive: true });
     this.scrubber.addEventListener("touchend", this.handleScrubEnd);
     this.scrubber.addEventListener("touchcancel", this.handleScrubEnd);
+    this.scrubberWrapper.addEventListener("mousemove", this.handleScrubberHover);
+    this.scrubberWrapper.addEventListener("mouseleave", this.handleScrubberLeave);
     this.exportBtn.addEventListener("click", this.renderClientSide);
     this.speedSelector.addEventListener("change", this.handleSpeedChange);
     this.fullscreenBtn.addEventListener("click", this.toggleFullscreen);
@@ -1038,6 +1062,8 @@ export class HeliosPlayer extends HTMLElement implements TrackHost {
     this.scrubber.removeEventListener("touchstart", this.handleScrubStart);
     this.scrubber.removeEventListener("touchend", this.handleScrubEnd);
     this.scrubber.removeEventListener("touchcancel", this.handleScrubEnd);
+    this.scrubberWrapper.removeEventListener("mousemove", this.handleScrubberHover);
+    this.scrubberWrapper.removeEventListener("mouseleave", this.handleScrubberLeave);
     this.exportBtn.removeEventListener("click", this.renderClientSide);
     this.speedSelector.removeEventListener("change", this.handleSpeedChange);
     this.fullscreenBtn.removeEventListener("click", this.toggleFullscreen);
@@ -1435,6 +1461,24 @@ export class HeliosPlayer extends HTMLElement implements TrackHost {
     }
   };
 
+  private handleScrubberHover = (e: MouseEvent) => {
+    if (!this.controller) return;
+    const state = this.controller.getState();
+    const rect = this.scrubberWrapper.getBoundingClientRect();
+    const offsetX = e.clientX - rect.left;
+    const width = rect.width;
+    const pct = Math.max(0, Math.min(1, offsetX / width));
+    const time = pct * state.duration;
+
+    this.scrubberTooltip.textContent = time.toFixed(2) + "s";
+    this.scrubberTooltip.style.left = `${offsetX}px`;
+    this.scrubberTooltip.classList.remove("hidden");
+  };
+
+  private handleScrubberLeave = () => {
+    this.scrubberTooltip.classList.add("hidden");
+  };
+
   private handleSpeedChange = () => {
     if (this.controller) {
       this.controller.setPlaybackRate(parseFloat(this.speedSelector.value));
@@ -1487,6 +1531,10 @@ export class HeliosPlayer extends HTMLElement implements TrackHost {
       case "j":
       case "J":
         this.seekRelative(e.shiftKey ? -10 : -1);
+        break;
+      case "m":
+      case "M":
+        this.toggleMute();
         break;
       case ".":
         this.seekRelative(1);

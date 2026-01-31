@@ -13,6 +13,7 @@ The `<helios-player>` component uses a Shadow DOM to encapsulate its styles and 
 - `.captions-container`: Displays active captions.
 - `.controls` (role="toolbar"): Contains playback controls (Play/Pause, Volume, Captions, Export, Speed, Scrubber Wrapper, Time Display, Fullscreen).
   - `.scrubber-wrapper`: Container for the scrubber range input and markers.
+    - `.scrubber-tooltip`: Displays timestamp on hover.
     - `.markers-container`: Overlays visual markers on the timeline track.
     - `.scrubber`: The seek range input.
 
@@ -98,6 +99,7 @@ Properties and methods available on the `HeliosPlayer` element instance:
 ## G. Interaction
 - **Keyboard Shortcuts**:
   - `Space` / `K`: Play/Pause
+  - `M`: Toggle Mute
   - `F`: Toggle Fullscreen
   - `Left` / `Right`: Seek -1/+1 frame (Shift: -10/+10)
   - `,` / `.`: Seek -1/+1 frame

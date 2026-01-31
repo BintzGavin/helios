@@ -21,8 +21,8 @@ export declare class HeliosPlayer extends HTMLElement implements TrackHost {
     private volumeSlider;
     private scrubber;
     private scrubberWrapper;
+    private scrubberTooltip;
     private markersContainer;
-    private tooltip;
     private timeDisplay;
     private exportBtn;
     private overlay;
@@ -148,13 +148,13 @@ export declare class HeliosPlayer extends HTMLElement implements TrackHost {
     private handleScrubberInput;
     private handleScrubStart;
     private handleScrubEnd;
+    private handleScrubberHover;
+    private handleScrubberLeave;
     private handleSpeedChange;
     private toggleCaptions;
     private handleKeydown;
     private seekRelative;
     private toggleFullscreen;
-    private handleScrubberHover;
-    private handleScrubberLeave;
     private updateFullscreenUI;
     private updateUI;
     private showStatus;

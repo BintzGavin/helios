@@ -22,7 +22,9 @@
   ],
   "exports": {
     ".": "./dist/index.js",
-    "./bridge": "./dist/bridge.js"
+    "./bridge": "./dist/bridge.js",
+    "./controllers": "./dist/controllers.js",
+    "./features/exporter": "./dist/features/exporter.js"
   },
   "scripts": {
     "build": "tsc",
