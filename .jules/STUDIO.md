@@ -33,3 +33,7 @@
 ## [0.59.1] - Protocol Violation: Planner vs Executor
 **Learning:** I mistakenly implemented the feature code (`RenderPreviewModal`, `StudioContext` updates) instead of stopping at the spec file. The prompt strictly forbids modifying source code in the Planner role.
 **Action:** Always double-check the "IDENTITY" and "PROTOCOL" sections. If "PLANNER", the output must *only* be a Markdown file in `.sys/plans/`. Never write code in `packages/studio/`.
+
+## [0.61.1] - Vision vs Implementation Gap: Assets
+**Learning:** The Assets Panel implementation scanned the entire project root recursively, contradicting the README vision of "manage assets from your project's public folder". This caused performance issues and clutter.
+**Action:** Always verify feature implementations against the README vision statement, especially for file system interactions in Studio.
