@@ -255,6 +255,10 @@ export class CanvasStrategy implements RenderStrategy {
     } else {
       this.useWebCodecs = false;
       console.log(`CanvasStrategy: WebCodecs not available (${result.reason}). Falling back to toDataURL.`);
+
+      if (this.options.videoCodec === 'copy') {
+        throw new Error("CanvasStrategy failed to initialize WebCodecs and fell back to image capture, which cannot be used with 'copy' codec. Ensure VideoEncoder is supported or use a transcoding codec.");
+      }
     }
   }
 

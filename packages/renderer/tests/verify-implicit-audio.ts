@@ -23,7 +23,7 @@ async function verify() {
     </html>
   `);
 
-  const strategy = new DomStrategy();
+  const strategy = new DomStrategy({ width: 1280, height: 720, fps: 30, durationInSeconds: 5, mode: 'dom' });
 
   console.log('Running strategy.prepare()...');
   await strategy.prepare(page);

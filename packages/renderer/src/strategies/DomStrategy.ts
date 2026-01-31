@@ -7,7 +7,11 @@ import { scanForAudioTracks } from '../utils/dom-scanner.js';
 export class DomStrategy implements RenderStrategy {
   private discoveredAudioTracks: AudioTrackConfig[] = [];
 
-  constructor(private options: RendererOptions) {}
+  constructor(private options: RendererOptions) {
+    if (this.options.videoCodec === 'copy') {
+      throw new Error("DomStrategy produces image sequences and cannot be used with 'copy' codec. Please use a transcoding codec like 'libx264' (default).");
+    }
+  }
 
   async diagnose(page: Page): Promise<any> {
     return await page.evaluate(() => {

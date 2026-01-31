@@ -29,7 +29,7 @@ const runTest = () => {
   const outputPath = 'output.mp4';
 
   // Test DomStrategy
-  const domStrategy = new DomStrategy();
+  const domStrategy = new DomStrategy({ width: 1920, height: 1080, fps: 30, durationInSeconds: 1 });
 
   // Case 1: DomStrategy with Audio
   const argsDomWithAudio = domStrategy.getFFmpegArgs(optionsWithAudio, outputPath);
