@@ -1,6 +1,7 @@
 # CORE Progress Log
 
 ## CORE v3.3.0
+- ✅ Completed: Enable Testing & Sync Version - Added vitest to devDependencies, verified tests pass, and updated dependent packages (renderer, player) to use core version 3.3.0.
 - ✅ Completed: Decoder Diagnostics - Added `videoDecoders` (h264, vp8, vp9, av1) and `audioDecoders` (aac, opus) checks to `Helios.diagnose()` and `DiagnosticReport` using WebCodecs API.
 
 ## CORE v3.2.0
