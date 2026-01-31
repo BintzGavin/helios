@@ -1,5 +1,8 @@
 # PLAYER Progress Log
 
+## PLAYER v0.48.1
+- ✅ Completed: Harden Bridge Security - Implemented explicit source verification for all postMessage listeners in HeliosPlayer and BridgeController to prevent cross-talk and improve security.
+
 ## PLAYER v0.48.0
 - ✅ Completed: Implement SRT Export - Added `export-caption-mode` attribute to support exporting captions as separate `.srt` files instead of burning them in, and added `srt-parser` serialization logic.
 

@@ -1233,6 +1233,8 @@ export class HeliosPlayer extends HTMLElement implements TrackHost {
   }
 
   private handleWindowMessage = (event: MessageEvent) => {
+      if (event.source !== this.iframe.contentWindow) return;
+
       // Check if this message is a handshake response
       if (event.data?.type === 'HELIOS_READY') {
           // If we receive a ready signal, we stop polling for direct access
@@ -1844,4 +1846,6 @@ export class HeliosPlayer extends HTMLElement implements TrackHost {
   };
 }
 
-customElements.define("helios-player", HeliosPlayer);
+if (!customElements.get("helios-player")) {
+  customElements.define("helios-player", HeliosPlayer);
+}

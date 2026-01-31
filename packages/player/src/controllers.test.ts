@@ -223,8 +223,8 @@ describe('BridgeController', () => {
         controller.dispose();
     });
 
-    const triggerMessage = (data: any) => {
-        const event = new MessageEvent('message', { data });
+    const triggerMessage = (data: any, source: Window = mockWindow) => {
+        const event = new MessageEvent('message', { data, source });
         messageHandlers.forEach(h => h(event));
     };
 
@@ -265,6 +265,16 @@ describe('BridgeController', () => {
         triggerMessage({ type: 'HELIOS_STATE', state: newState });
 
         expect(controller.getState()).toEqual(newState);
+    });
+
+    it('should ignore messages from other sources', () => {
+        const newState = { isPlaying: true, currentFrame: 999 };
+        const otherWindow = { postMessage: vi.fn() } as unknown as Window;
+
+        triggerMessage({ type: 'HELIOS_STATE', state: newState }, otherWindow);
+
+        // State should remain unchanged (default from constructor is frame 0)
+        expect(controller.getState().currentFrame).toBe(0);
     });
 
     it('should notify subscribers', () => {
