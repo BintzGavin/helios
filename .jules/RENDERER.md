@@ -128,3 +128,7 @@
 ## [1.50.0] - Resource Cleanup Timing
 **Learning:** Cleaning up temporary resources (like audio files) in `RenderStrategy.finish()` is premature because FFmpeg runs in parallel and may still be reading input files.
 **Action:** Always perform resource cleanup in a dedicated `cleanup()` method called by the Renderer *after* the FFmpeg process has exited (in the `finally` block).
+
+## 2026-06-01 - Incomplete Image Preloading
+**Learning:** `DomStrategy.prepare` relied on `document.images` for preloading, which is shallow and misses `<img>` elements inside Shadow DOMs, violating the "Zero-artifact rendering" vision for Web Components.
+**Action:** Planned to replace this with a recursive `TreeWalker` approach (similar to `scanForAudioTracks`) to ensure deep discovery of all image assets.
