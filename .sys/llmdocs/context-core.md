@@ -1,32 +1,36 @@
-# Context: CORE
+# Core Context
 
 ## A. Architecture
 
-The `@helios-project/core` package implements the "Helios State Machine" pattern.
-- **Store**: The `Helios` class holds state using reactive signals (e.g., `_currentFrame`, `_isPlaying`).
-- **Actions**: Public methods (e.g., `seek()`, `play()`) modify the internal signals.
-- **Subscribers**: External consumers can subscribe to state changes via `subscribe()` or by accessing `ReadonlySignal` properties.
-- **TimeDriver**: Abstracted timing logic (DomDriver, WaapiDriver) to sync with different environments (Browser, Renderer).
+The Core package (`@helios-project/core`) implements the **Helios State Machine**, a framework-agnostic engine for programmatic video creation. It manages the timeline, state, and synchronization of animation elements.
+
+**Key Principles:**
+- **Store**: State is held in reactive `Signal` primitives (via `signals.ts`).
+- **Actions**: Public methods (e.g., `seek()`, `play()`) modify signals.
+- **Subscribers**: The `subscribe()` method allows external systems (Renderer, Player) to react to state changes.
+- **Drivers**: A pluggable `TimeDriver` strategy handles the actual time progression (e.g., `DomDriver` for browsers, `WaapiDriver` for Web Animations).
 
 ## B. File Tree
 
+```
 packages/core/src/
-├── drivers/
-├── ai.ts
-├── animation.ts
-├── captions.ts
-├── color.ts
-├── easing.ts
-├── errors.ts
-├── index.ts
-├── markers.ts
-├── random.ts
-├── render-session.ts
-├── schema.ts
-├── sequencing.ts
-├── signals.ts
-├── timecode.ts
-└── transitions.ts
+├── drivers/           # TimeDriver implementations (Dom, Waapi, Noop)
+├── ai.ts              # AI prompt generation utilities
+├── animation.ts       # Animation interpolation helpers
+├── captions.ts        # SRT parsing and caption logic
+├── color.ts           # Color manipulation and interpolation
+├── easing.ts          # Easing functions
+├── errors.ts          # Structured error handling
+├── index.ts           # Main entry point and Helios class
+├── markers.ts         # Timeline marker logic
+├── random.ts          # Deterministic PRNG
+├── render-session.ts  # Frame iteration logic
+├── schema.ts          # Input property schema validation
+├── sequencing.ts      # Stagger/sequence utilities
+├── signals.ts         # Reactivity system
+├── timecode.ts        # Timecode conversion utilities
+└── transitions.ts     # Transition primitives
+```
 
 ## C. Type Definitions
 
@@ -51,13 +55,14 @@ export type HeliosState = {
 };
 
 export type HeliosSubscriber = (state: HeliosState) => void;
+
 export type StabilityCheck = () => Promise<void>;
 
 export interface HeliosOptions {
   width?: number;
   height?: number;
   initialFrame?: number;
-  duration: number;
+  duration: number; // in seconds
   fps: number;
   loop?: boolean;
   playbackRange?: [number, number];
@@ -82,17 +87,35 @@ export interface DiagnosticReport {
   webgl2: boolean;
   webAudio: boolean;
   colorGamut: 'srgb' | 'p3' | 'rec2020' | null;
-  videoCodecs: { h264: boolean; vp8: boolean; vp9: boolean; av1: boolean };
-  audioCodecs: { aac: boolean; opus: boolean };
+  videoCodecs: {
+    h264: boolean;
+    vp8: boolean;
+    vp9: boolean;
+    av1: boolean;
+  };
+  audioCodecs: {
+    aac: boolean;
+    opus: boolean;
+  };
+  videoDecoders: {
+    h264: boolean;
+    vp8: boolean;
+    vp9: boolean;
+    av1: boolean;
+  };
+  audioDecoders: {
+    aac: boolean;
+    opus: boolean;
+  };
   userAgent: string;
 }
 ```
 
-## D. Public Methods
+## D. Public Methods (Helios)
 
 ```typescript
 class Helios {
-  // Readonly Signals
+  // Signals
   get currentFrame(): ReadonlySignal<number>;
   get currentTime(): ReadonlySignal<number>;
   get loop(): ReadonlySignal<boolean>;
@@ -110,11 +133,17 @@ class Helios {
   get duration(): ReadonlySignal<number>;
   get fps(): ReadonlySignal<number>;
 
+  // Static
   static diagnose(): Promise<DiagnosticReport>;
 
+  // Lifecycle
   constructor(options: HeliosOptions);
+  dispose(): void;
 
+  // State
   getState(): Readonly<HeliosState>;
+
+  // Setters
   setSize(width: number, height: number): void;
   setLoop(shouldLoop: boolean): void;
   setDuration(seconds: number): void;
@@ -132,16 +161,21 @@ class Helios {
   setPlaybackRange(startFrame: number, endFrame: number): void;
   clearPlaybackRange(): void;
 
+  // Subscription
   subscribe(callback: HeliosSubscriber): () => void;
   unsubscribe(callback: HeliosSubscriber): void;
-  registerStabilityCheck(check: StabilityCheck): () => void;
 
+  // Stability
+  registerStabilityCheck(check: StabilityCheck): () => void;
+  waitUntilStable(): Promise<void>;
+
+  // Playback
   play(): void;
   pause(): void;
   seek(frame: number): void;
-  waitUntilStable(): Promise<void>;
+
+  // Timeline Binding
   bindToDocumentTimeline(): void;
   unbindFromDocumentTimeline(): void;
-  dispose(): void;
 }
 ```

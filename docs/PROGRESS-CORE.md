@@ -1,5 +1,8 @@
 # CORE Progress Log
 
+## CORE v3.3.0
+- ✅ Completed: Decoder Diagnostics - Added `videoDecoders` (h264, vp8, vp9, av1) and `audioDecoders` (aac, opus) checks to `Helios.diagnose()` and `DiagnosticReport` using WebCodecs API.
+
 ## CORE v3.2.0
 - ✅ Completed: Implement AI System Prompt Generator - Added `createSystemPrompt` and `HELIOS_BASE_PROMPT` to programmatically generate context-aware system prompts for AI agents.
 

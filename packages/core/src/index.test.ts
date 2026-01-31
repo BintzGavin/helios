@@ -120,6 +120,14 @@ describe('Helios Core', () => {
       expect(report).toHaveProperty('audioCodecs');
       expect(report.audioCodecs).toHaveProperty('aac');
       expect(report.audioCodecs).toHaveProperty('opus');
+      expect(report).toHaveProperty('videoDecoders');
+      expect(report.videoDecoders).toHaveProperty('h264');
+      expect(report.videoDecoders).toHaveProperty('vp8');
+      expect(report.videoDecoders).toHaveProperty('vp9');
+      expect(report.videoDecoders).toHaveProperty('av1');
+      expect(report).toHaveProperty('audioDecoders');
+      expect(report.audioDecoders).toHaveProperty('aac');
+      expect(report.audioDecoders).toHaveProperty('opus');
       expect(report).toHaveProperty('userAgent');
     });
 
@@ -185,6 +193,46 @@ describe('Helios Core', () => {
       const report = await Helios.diagnose();
       expect(report.audioCodecs.aac).toBe(true);
       expect(report.audioCodecs.opus).toBe(true);
+      expect(mockIsConfigSupported).toHaveBeenCalledTimes(2);
+      vi.unstubAllGlobals();
+    });
+
+    it('should handle missing VideoDecoder gracefully', async () => {
+      vi.stubGlobal('VideoDecoder', undefined);
+      const report = await Helios.diagnose();
+      expect(report.videoDecoders.h264).toBe(false);
+      vi.unstubAllGlobals();
+    });
+
+    it('should detect video decoders if VideoDecoder is supported', async () => {
+      const mockIsConfigSupported = vi.fn().mockResolvedValue({ supported: true });
+      vi.stubGlobal('VideoDecoder', {
+        isConfigSupported: mockIsConfigSupported
+      });
+
+      const report = await Helios.diagnose();
+      expect(report.videoDecoders.h264).toBe(true);
+      expect(mockIsConfigSupported).toHaveBeenCalledTimes(4);
+      vi.unstubAllGlobals();
+    });
+
+    it('should handle missing AudioDecoder gracefully', async () => {
+      vi.stubGlobal('AudioDecoder', undefined);
+      const report = await Helios.diagnose();
+      expect(report.audioDecoders.aac).toBe(false);
+      expect(report.audioDecoders.opus).toBe(false);
+      vi.unstubAllGlobals();
+    });
+
+    it('should detect audio decoders if AudioDecoder is supported', async () => {
+      const mockIsConfigSupported = vi.fn().mockResolvedValue({ supported: true });
+      vi.stubGlobal('AudioDecoder', {
+        isConfigSupported: mockIsConfigSupported
+      });
+
+      const report = await Helios.diagnose();
+      expect(report.audioDecoders.aac).toBe(true);
+      expect(report.audioDecoders.opus).toBe(true);
       expect(mockIsConfigSupported).toHaveBeenCalledTimes(2);
       vi.unstubAllGlobals();
     });
