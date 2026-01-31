@@ -1,8 +1,9 @@
-**Version**: 1.48.1
+**Version**: 1.48.2
 
 # Renderer Agent Status
 
 ## Progress Log
+- [1.48.2] ✅ Completed: CdpTimeDriver Timeout - Implemented configurable stability timeout in `CdpTimeDriver` using Node.js-based race condition and CDP `Runtime.terminateExecution` to handle hanging user checks when virtual time is paused.
 - [1.48.1] ✅ Completed: Enable Comprehensive Verification Suite - Updated `run-all.ts` to include 8 previously ignored verification scripts (CDP determinism, Shadow DOM sync, WAAPI sync), ensuring full test coverage. Also fixed `verify-canvas-strategy.ts` to align with the H.264 default.
 - [1.48.0] ✅ Completed: Prioritize H.264 - Updated `CanvasStrategy` to prioritize H.264 (AVC) intermediate codec over VP8 by default, enabling hardware acceleration and better performance on supported systems.
 - [1.47.4] ✅ Completed: Validate Codec Compatibility - Updated `DomStrategy` and `CanvasStrategy` to throw clear errors when `videoCodec: 'copy'` is used with image sequence fallback, preventing FFmpeg crashes. Also fixed regression tests to provide valid options to `DomStrategy`.

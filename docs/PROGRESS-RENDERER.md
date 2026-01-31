@@ -1,3 +1,9 @@
+## RENDERER v1.48.2
+- ✅ Completed: CdpTimeDriver Timeout - Implemented configurable stability timeout in `CdpTimeDriver` using Node.js-based race condition and CDP `Runtime.terminateExecution` to handle hanging user checks when virtual time is paused.
+
+## RENDERER v1.48.1
+- ✅ Completed: Enable Comprehensive Verification Suite - Updated `run-all.ts` to include 8 previously ignored verification scripts (CDP determinism, Shadow DOM sync, WAAPI sync), ensuring full test coverage. Also fixed `verify-canvas-strategy.ts` to align with the H.264 default.
+
 ## RENDERER v1.48.0
 - ✅ Completed: Prioritize H.264 - Updated `CanvasStrategy` to prioritize H.264 (AVC) intermediate codec over VP8 by default, enabling hardware acceleration and better performance on supported systems.
 
