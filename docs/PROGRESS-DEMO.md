@@ -1,3 +1,6 @@
+## DEMO v1.74.0
+- ✅ Completed: Upgrade Client-Side Export Verification - Refactored `verify-client-export.ts` to dynamically discover and test all examples using a generic `dynamic-player.html` fixture.
+
 ## DEMO v1.73.0
 - ✅ Completed: Code Walkthrough Example - Created `examples/code-walkthrough` demonstrating syntax highlighting and line focusing for developer content.
 
@@ -18,6 +21,9 @@
 
 ## DEMO v1.69.1
 - ✅ Completed: Polish Client-Side Export Example - Added documentation comments to `examples/client-export-api` and re-verified functionality.
+
+## DEMO v1.69.0
+- ✅ Completed: Verify Client-Side Export - Added E2E verification test `tests/e2e/verify-client-export.ts` and updated build config aliases.
 
 ## DEMO v1.68.0
 - ✅ Completed: Update React Animation Helpers - Updated `examples/react-animation-helpers` to demonstrate `interpolate` and `spring` helper functions. Enhanced `tests/e2e/verify-render.ts` to support filtering via command line arguments.
