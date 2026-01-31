@@ -23,3 +23,7 @@
 ## [1.69.1] - Role Integrity
 **Learning:** As a Planner, I must strictly adhere to the "Design Only" protocol. Implementing code (even for verification) violates the agent architecture and boundaries.
 **Action:** Stop immediately after saving the `.md` plan file. Do not write implementation code or modify `examples/` directly.
+
+## [1.70.0] - Player E2E ESM Strategy
+**Learning:** Testing `<helios-player>` interaction requires a browser environment. Using an Import Map to alias `@helios-project/core` allows testing the ESM bundle directly in a static HTML fixture, avoiding complex test-bundling steps.
+**Action:** Use static server + Import Maps for lightweight Web Component E2E fixtures.
