@@ -14,7 +14,9 @@ export class FFmpegBuilder {
             path: track.path,
             volume: track.volume ?? 1.0,
             offset: track.offset ?? 0,
-            seek: track.seek ?? 0
+            seek: track.seek ?? 0,
+            fadeInDuration: track.fadeInDuration ?? 0,
+            fadeOutDuration: track.fadeOutDuration ?? 0,
           });
         }
       });
@@ -25,6 +27,9 @@ export class FFmpegBuilder {
     const audioInputArgs: string[] = [];
     const audioFilterChains: string[] = [];
     const renderStartTime = (options.startFrame || 0) / options.fps;
+    const compositionDuration = options.frameCount
+      ? options.frameCount / options.fps
+      : options.durationInSeconds;
 
     // 2. Process each track to generate inputs and filters
     tracks.forEach((track, index) => {
@@ -66,6 +71,17 @@ export class FFmpegBuilder {
 
       if (track.volume !== undefined && track.volume !== 1.0) {
         filters.push(`volume=${track.volume}`);
+      }
+
+      if (track.fadeInDuration && track.fadeInDuration > 0) {
+        const startTime = delayMs / 1000;
+        filters.push(`afade=t=in:st=${startTime}:d=${track.fadeInDuration}`);
+      }
+
+      if (track.fadeOutDuration && track.fadeOutDuration > 0) {
+        let startTime = compositionDuration - track.fadeOutDuration;
+        if (startTime < 0) startTime = 0;
+        filters.push(`afade=t=out:st=${startTime}:d=${track.fadeOutDuration}`);
       }
 
       // Construct the chain: [in]filter,filter[out]
