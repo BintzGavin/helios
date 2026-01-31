@@ -1,3 +1,6 @@
+## RENDERER v1.49.0
+- ✅ Completed: Precision Frame Control - Added `frameCount` to `RendererOptions`, enabling exact frame-count rendering for distributed rendering workflows, overriding floating-point duration calculations.
+
 ## RENDERER v1.48.2
 - ✅ Completed: CdpTimeDriver Timeout - Implemented configurable stability timeout in `CdpTimeDriver` using Node.js-based race condition and CDP `Runtime.terminateExecution` to handle hanging user checks when virtual time is paused.
 

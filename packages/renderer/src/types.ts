@@ -67,6 +67,13 @@ export interface RendererOptions {
   startFrame?: number;
 
   /**
+   * The exact number of frames to render.
+   * If provided, this overrides `durationInSeconds` for calculating loop limits.
+   * Useful for precise distributed rendering to avoid floating point errors.
+   */
+  frameCount?: number;
+
+  /**
    * Path to an audio file to include in the output video.
    * If provided, the audio will be mixed with the video.
    */

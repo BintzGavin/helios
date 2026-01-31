@@ -50,7 +50,8 @@ packages/renderer/
 The `RendererOptions` interface controls the render pipeline:
 - `width`, `height`: Output resolution.
 - `fps`: Target frame rate.
-- `durationInSeconds`: Total length of the video.
+- `durationInSeconds`: Total length of the video (fallback if `frameCount` is not set).
+- `frameCount`: Exact number of frames to render (overrides `durationInSeconds`).
 - `mode`: `'dom'` or `'canvas'`.
 - `browserConfig`: Object to customize Playwright browser launch (`headless`, `args`, `executablePath`).
 - `videoCodec`: `'libx264'` (default), `'copy'`, or others.
