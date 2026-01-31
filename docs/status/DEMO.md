@@ -1,6 +1,6 @@
 # Status: DEMO Domain
 
-**Version**: 1.74.1
+**Version**: 1.75.0
 
 ## Vision
 The DEMO domain is responsible for:
@@ -15,6 +15,7 @@ The DEMO domain is responsible for:
 - None
 
 ## Completed Tasks
+- [v1.75.0] ✅ Completed: Vanilla TypeScript Example - Created `examples/vanilla-typescript` to demonstrate idiomatic TypeScript usage without frameworks.
 - [v1.74.1] ✅ Completed: Create Examples Documentation - Added `examples/README.md` to catalog and describe all available examples.
 - [v1.74.0] ✅ Completed: Upgrade Client-Side Export Verification - Refactored `verify-client-export.ts` to dynamically discover and test all examples using a generic `dynamic-player.html` fixture.
 - [v1.73.0] ✅ Completed: Code Walkthrough Example - Created `examples/code-walkthrough` demonstrating syntax highlighting and line focusing for developer content.

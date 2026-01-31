@@ -22,7 +22,8 @@ const CANVAS_OVERRIDES = new Set([
   'react-canvas-animation',
   'vue-canvas-animation',
   'svelte-canvas-animation',
-  'solid-canvas-animation'
+  'solid-canvas-animation',
+  'vanilla-typescript'
 ]);
 
 function formatName(dirName: string) {
@@ -145,8 +146,6 @@ async function main() {
         const fixtureUrl = `http://localhost:${PORT}/tests/e2e/fixtures/dynamic-player.html?src=${encodeURIComponent(compositionPath)}&export-mode=${testCase.mode}`;
 
         try {
-            await page.goto(fixtureUrl);
-
             // Log console messages
             page.on('console', msg => {
                 if (msg.type() === 'error') console.log(`    [Browser Error] ${msg.text()}`);
@@ -155,6 +154,8 @@ async function main() {
             page.on('pageerror', err => {
                 console.log(`    [Page Exception] ${err.message}`);
             });
+
+            await page.goto(fixtureUrl);
 
             // Wait for player to load
             await page.waitForSelector('helios-player', { timeout: 10000 });
