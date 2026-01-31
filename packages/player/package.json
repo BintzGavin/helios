@@ -33,10 +33,20 @@
   "scripts": {
     "build": "tsc && vite build",
     "dev": "tsc -w",
-    "test": "vitest"
+    "test": "vitest",
+    "prepublishOnly": "npm run build"
   },
+  "keywords": [
+    "video",
+    "animation",
+    "programmatic-video",
+    "video-player",
+    "web-component",
+    "custom-element",
+    "helios"
+  ],
   "dependencies": {
-    "@helios-project/core": "3.1.0",
+    "@helios-project/core": "^3.3.0",
     "mediabunny": "^1.31.0"
   },
   "devDependencies": {

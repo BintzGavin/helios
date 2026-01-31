@@ -27,8 +27,20 @@
   "scripts": {
     "build": "tsc",
     "dev": "tsc -w",
-    "test": "vitest"
+    "test": "vitest",
+    "prepublishOnly": "npm run build"
   },
+  "keywords": [
+    "video",
+    "animation",
+    "programmatic-video",
+    "video-engine",
+    "web-animations",
+    "css-animations",
+    "waapi",
+    "canvas",
+    "webgl"
+  ],
   "devDependencies": {
     "typescript": "^5.0.0",
     "vitest": "^4.0.17"
