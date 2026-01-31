@@ -179,6 +179,22 @@ template.innerHTML = `
       transform: translateX(-50%) scale(1.2);
       z-index: 10;
     }
+    .scrubber-tooltip {
+      position: absolute;
+      bottom: 20px;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.8);
+      color: white;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      pointer-events: none;
+      white-space: nowrap;
+      z-index: 20;
+    }
+    .scrubber-tooltip.hidden {
+      display: none;
+    }
     .time-display {
       min-width: 90px;
       text-align: center;
@@ -390,6 +406,7 @@ template.innerHTML = `
     </select>
     <div class="scrubber-wrapper">
       <div class="markers-container" part="markers"></div>
+      <div class="scrubber-tooltip hidden" part="scrubber-tooltip"></div>
       <input type="range" class="scrubber" min="0" value="0" step="1" part="scrubber" aria-label="Seek time">
     </div>
     <div class="time-display" part="time-display">0.00 / 0.00</div>
@@ -404,7 +421,9 @@ export class HeliosPlayer extends HTMLElement {
     volumeBtn;
     volumeSlider;
     scrubber;
+    scrubberWrapper;
     markersContainer;
+    tooltip;
     timeDisplay;
     exportBtn;
     overlay;
@@ -713,8 +732,10 @@ export class HeliosPlayer extends HTMLElement {
         this.playPauseBtn = this.shadowRoot.querySelector(".play-pause-btn");
         this.volumeBtn = this.shadowRoot.querySelector(".volume-btn");
         this.volumeSlider = this.shadowRoot.querySelector(".volume-slider");
+        this.scrubberWrapper = this.shadowRoot.querySelector(".scrubber-wrapper");
         this.scrubber = this.shadowRoot.querySelector(".scrubber");
         this.markersContainer = this.shadowRoot.querySelector(".markers-container");
+        this.tooltip = this.shadowRoot.querySelector(".scrubber-tooltip");
         this.timeDisplay = this.shadowRoot.querySelector(".time-display");
         this.exportBtn = this.shadowRoot.querySelector(".export-btn");
         this.overlay = this.shadowRoot.querySelector(".status-overlay");
@@ -890,6 +911,8 @@ export class HeliosPlayer extends HTMLElement {
         this.playPauseBtn.addEventListener("click", this.togglePlayPause);
         this.volumeBtn.addEventListener("click", this.toggleMute);
         this.volumeSlider.addEventListener("input", this.handleVolumeInput);
+        this.scrubberWrapper.addEventListener("mousemove", this.handleScrubberHover);
+        this.scrubberWrapper.addEventListener("mouseleave", this.handleScrubberLeave);
         this.scrubber.addEventListener("input", this.handleScrubberInput);
         this.scrubber.addEventListener("mousedown", this.handleScrubStart);
         this.scrubber.addEventListener("change", this.handleScrubEnd);
@@ -939,6 +962,8 @@ export class HeliosPlayer extends HTMLElement {
         this.playPauseBtn.removeEventListener("click", this.togglePlayPause);
         this.volumeBtn.removeEventListener("click", this.toggleMute);
         this.volumeSlider.removeEventListener("input", this.handleVolumeInput);
+        this.scrubberWrapper.removeEventListener("mousemove", this.handleScrubberHover);
+        this.scrubberWrapper.removeEventListener("mouseleave", this.handleScrubberLeave);
         this.scrubber.removeEventListener("input", this.handleScrubberInput);
         this.scrubber.removeEventListener("mousedown", this.handleScrubStart);
         this.scrubber.removeEventListener("change", this.handleScrubEnd);
@@ -1385,6 +1410,10 @@ export class HeliosPlayer extends HTMLElement {
             case "X":
                 this.controller.clearPlaybackRange();
                 break;
+            case "m":
+            case "M":
+                this.toggleMute();
+                break;
         }
     };
     seekRelative(frames) {
@@ -1403,6 +1432,28 @@ export class HeliosPlayer extends HTMLElement {
         else {
             document.exitFullscreen();
         }
+    };
+    handleScrubberHover = (e) => {
+        if (!this.controller)
+            return;
+        const state = this.controller.getState();
+        const duration = state.duration;
+        // If no duration, cannot calculate time
+        if (!duration || duration <= 0)
+            return;
+        const rect = this.scrubberWrapper.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const pct = Math.max(0, Math.min(1, x / rect.width));
+        const time = pct * duration;
+        this.tooltip.textContent = time.toFixed(2);
+        // Clamp tooltip position to prevent overflow at edges could be added,
+        // but centering via transform and clamping left handles most cases.
+        // For now, follow cursor.
+        this.tooltip.style.left = `${x}px`;
+        this.tooltip.classList.remove("hidden");
+    };
+    handleScrubberLeave = () => {
+        this.tooltip.classList.add("hidden");
     };
     updateFullscreenUI = () => {
         if (document.fullscreenElement === this) {
@@ -1442,7 +1493,6 @@ export class HeliosPlayer extends HTMLElement {
                 this.dispatchEvent(new Event("durationchange"));
             }
         }
-        this.lastState = state;
         const isFinished = state.currentFrame >= state.duration * state.fps - 1;
         if (isFinished) {
             this.playPauseBtn.textContent = "🔄"; // Restart button
@@ -1470,26 +1520,29 @@ export class HeliosPlayer extends HTMLElement {
             this.speedSelector.value = String(state.playbackRate);
         }
         // Update Markers
-        this.markersContainer.innerHTML = "";
-        if (state.markers && state.duration > 0) {
-            state.markers.forEach((marker) => {
-                const pct = (marker.time / state.duration) * 100;
-                if (pct >= 0 && pct <= 100) {
-                    const el = document.createElement("div");
-                    el.className = "marker";
-                    el.style.left = `${pct}%`;
-                    if (marker.color)
-                        el.style.backgroundColor = marker.color;
-                    el.title = marker.label || "";
-                    el.addEventListener("click", (e) => {
-                        e.stopPropagation();
-                        if (this.controller) {
-                            this.controller.seek(Math.floor(marker.time * state.fps));
-                        }
-                    });
-                    this.markersContainer.appendChild(el);
-                }
-            });
+        const markersChanged = !this.lastState || state.markers !== this.lastState.markers;
+        if (markersChanged) {
+            this.markersContainer.innerHTML = "";
+            if (state.markers && state.duration > 0) {
+                state.markers.forEach((marker) => {
+                    const pct = (marker.time / state.duration) * 100;
+                    if (pct >= 0 && pct <= 100) {
+                        const el = document.createElement("div");
+                        el.className = "marker";
+                        el.style.left = `${pct}%`;
+                        if (marker.color)
+                            el.style.backgroundColor = marker.color;
+                        el.title = marker.label || "";
+                        el.addEventListener("click", (e) => {
+                            e.stopPropagation();
+                            if (this.controller) {
+                                this.controller.seek(Math.floor(marker.time * state.fps));
+                            }
+                        });
+                        this.markersContainer.appendChild(el);
+                    }
+                });
+            }
         }
         if (state.playbackRange) {
             const totalFrames = state.duration * state.fps;
@@ -1522,6 +1575,7 @@ export class HeliosPlayer extends HTMLElement {
                 this.captionsContainer.appendChild(div);
             });
         }
+        this.lastState = state;
     }
     // --- Loading / Error UI Helpers ---
     showStatus(msg, isError, action) {
