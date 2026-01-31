@@ -1,6 +1,6 @@
 # Status: DEMO Domain
 
-**Version**: 1.72.0
+**Version**: 1.73.0
 
 ## Vision
 The DEMO domain is responsible for:
@@ -15,6 +15,7 @@ The DEMO domain is responsible for:
 - None
 
 ## Completed Tasks
+- [v1.73.0] ✅ Completed: Code Walkthrough Example - Created `examples/code-walkthrough` demonstrating syntax highlighting and line focusing for developer content.
 - [v1.72.0] ✅ Completed: Verify Player - Added E2E verification for the `<helios-player>` Web Component.
 - [v1.71.0] ✅ Completed: Scaffold React Captions Animation - Created `examples/react-captions-animation` demonstrating `useCaptions` hook for integrating Helios SRT parsing with React.
 - [v1.70.2] ✅ Completed: Document Client-Side Export - Added README to `examples/client-export-api` explaining BridgeController and ClientSideExporter usage.
