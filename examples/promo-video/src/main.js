@@ -310,6 +310,8 @@ helios.bindToDocumentTimeline();
 
 // ===== Expose for Detection =====
 window.helios = helios;
+// Expose GSAP timeline for renderer to seek directly
+window.__helios_gsap_timeline__ = tl;
 
 // ===== Initial State =====
 tl.seek(0);

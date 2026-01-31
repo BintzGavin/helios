@@ -81,3 +81,6 @@
 - [1.5.0] ✅ Completed: Implement Range Rendering - Added `startFrame` to `RendererOptions`, enabling rendering of partial animation ranges (distributed rendering support).
 - [1.5.1] ✅ Completed: Strict Error Propagation - Implemented "Fail Fast" mechanism to catch page errors, crashes, and WebCodecs failures immediately, and ensure proper FFmpeg process cleanup.
 - [1.5.2] ✅ Completed: Fix Audio Duration Logic - Replaced `-shortest` with `-t duration` to prevent video truncation when audio is short.
+
+## Next Steps
+- **🔴 CRITICAL**: Fix GSAP Timeline Synchronization in SeekTimeDriver - Promo video (`examples/promo-video/composition.html`) renders black because GSAP timeline animations aren't being seeked during rendering. Last worked in commit `9558e19` (Jan 29, 2026). Root causes: (1) `window.__helios_gsap_timeline__` not available when `setTime()` runs (ES module async loading), (2) `helios.subscribe()` callbacks may not fire synchronously during fast rendering, (3) `bindToDocumentTimeline()` polling loop may not run frequently enough. Files: `packages/renderer/src/drivers/SeekTimeDriver.ts` (primary), `packages/core/src/index.ts` (may need subscription timing adjustments). See `docs/BACKLOG.md` for full details.

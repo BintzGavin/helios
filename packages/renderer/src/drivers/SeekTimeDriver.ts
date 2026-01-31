@@ -32,6 +32,8 @@ export class SeekTimeDriver implements TimeDriver {
 
   async prepare(page: Page): Promise<void> {
     // No-op for SeekTimeDriver, but required by interface
+    // The page should already be fully loaded (waitUntil: 'networkidle')
+    // If GSAP timeline isn't available yet, we'll rely on Helios subscription
   }
 
   async setTime(page: Page, timeInSeconds: number): Promise<void> {
@@ -69,6 +71,38 @@ export class SeekTimeDriver implements TimeDriver {
             });
           }
         });
+
+        // CRITICAL: Trigger Helios state update FIRST to ensure subscriptions fire
+        // This is what the original working code relied on - the Helios subscription
+        // callback seeks the GSAP timeline. We call helios.seek() to trigger this.
+        if (typeof window.helios !== 'undefined' && window.helios.seek) {
+          try {
+            const helios = window.helios;
+            // fps is a ReadonlySignal, access via .value property
+            const fps = helios.fps ? helios.fps.value : 30;
+            const frame = Math.floor(t * fps);
+            
+            // Seek Helios - this updates the signal and triggers the effect/subscription
+            // The subscription callback will seek the GSAP timeline
+            helios.seek(frame);
+            
+            // Force the effect to run by reading the signal value
+            // This ensures the subscription callback executes synchronously
+            const _ = helios.currentFrame.value;
+          } catch (e) {
+            console.warn('[SeekTimeDriver] Error seeking Helios:', e);
+          }
+        }
+        
+        // Backup: Also try to seek GSAP timeline directly if it's available
+        // This is a safety net in case the subscription doesn't fire in time
+        if (window.__helios_gsap_timeline__ && typeof window.__helios_gsap_timeline__.seek === 'function') {
+          try {
+            window.__helios_gsap_timeline__.seek(t);
+          } catch (gsapError) {
+            // Ignore - subscription should handle it
+          }
+        }
 
         const promises = [];
 
@@ -149,9 +183,53 @@ export class SeekTimeDriver implements TimeDriver {
         const timeout = new Promise((resolve) => setTimeout(resolve, timeoutMs));
         await Promise.race([allReady, timeout]);
 
-        // Wait for a frame to ensure the new time is propagated
+        // 5. After stability, ensure GSAP timelines are seeked
+        // This is done after stability checks to ensure the timeline is fully initialized
+        
+        // CRITICAL: Seek GSAP timeline directly - this is the most reliable approach
+        // The Helios subscription approach relies on async polling which may not fire in time
+        // By this point, the page should be fully loaded, so the timeline should be available
+        if (!gsapTimelineSeeked && window.__helios_gsap_timeline__ && typeof window.__helios_gsap_timeline__.seek === 'function') {
+          try {
+            window.__helios_gsap_timeline__.seek(t);
+            gsapTimelineSeeked = true;
+          } catch (gsapError) {
+            console.error('[SeekTimeDriver] Error seeking GSAP timeline:', gsapError);
+          }
+        } else if (!gsapTimelineSeeked) {
+          // Timeline not available - this means main.js hasn't executed yet
+          // Fall back to Helios subscription approach (which should work once polling runs)
+          console.warn('[SeekTimeDriver] GSAP timeline not available - relying on Helios subscription');
+        }
+        
+        // Also ensure Helios state is updated (triggers subscriptions as backup)
+        if (typeof window.helios !== 'undefined' && window.helios.seek) {
+          try {
+            const helios = window.helios;
+            const fps = helios.fps ? helios.fps.value : 30;
+            const frame = Math.floor(t * fps);
+            helios.seek(frame);
+          } catch (e) {
+            console.warn('[SeekTimeDriver] Error seeking Helios:', e);
+          }
+        }
+
+        // Wait for frames to ensure:
+        // 1. WAAPI animations are synced
+        // 2. GSAP timeline updates have been applied to DOM
+        // 3. Helios polling loop has run (bindToDocumentTimeline polls via rAF)
+        // 4. All visual updates propagate to the DOM
+        // We need multiple rAFs to ensure GSAP has time to update the DOM
+        // GSAP's seek() is synchronous but DOM updates may need a frame to render
         await new Promise((resolve) => {
-          requestAnimationFrame(() => resolve());
+          requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+              requestAnimationFrame(() => {
+                // One more frame to ensure everything is fully rendered
+                requestAnimationFrame(() => resolve());
+              });
+            });
+          });
         });
       })(${timeInSeconds}, ${this.timeout})
     `;

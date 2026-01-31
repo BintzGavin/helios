@@ -88,5 +88,6 @@
 **Next Steps**:
 - Maintain version alignment with Player and Renderer.
 - Note: Added plan `/.sys/plans/2026-01-29-CORE-Bind-Virtual-Time.md` to ensure `bindToDocumentTimeline` prefers `__HELIOS_VIRTUAL_TIME__` when present (DOM render sync).
+- **⚠️ COORDINATION**: RENDERER agent investigating GSAP timeline sync issue - may need `bindToDocumentTimeline()` subscription timing adjustments if `helios.subscribe()` callbacks aren't firing synchronously during fast frame-by-frame rendering. See `docs/status/RENDERER.md` "Next Steps" for details.
 
 [v2.10.0] ✅ Completed: Implement RenderSession - Added RenderSession class for standardized frame iteration and stability orchestration.
