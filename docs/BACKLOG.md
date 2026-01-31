@@ -73,3 +73,15 @@
     5. Consider alternatives: If subscription approach is unreliable, consider using `CdpTimeDriver` instead of `SeekTimeDriver` for DOM mode (though it had hanging issues before), or ensure GSAP timeline is exposed and available before rendering starts
   - **Current State**: Render completes but produces black video. GSAP timeline is not being seeked, so all elements remain at `opacity: 0` (their initial CSS state).
   - **Success Criteria**: Promo video renders correctly with all scenes visible (Logo Reveal, Tagline, Code to Video, Frameworks, CTA, End Card). GSAP timeline animations are synchronized with frame capture. No regressions in other rendering scenarios.
+  - **VERIFICATION REQUIREMENTS** (MUST PASS):
+    1. **Render the video**: From `examples/promo-video/`, run `npx tsx render.ts` (ensure dev server is running on port 3002)
+    2. **Check output file**: Verify `examples/promo-video/output/helios-promo.mp4` exists and is ~15 seconds duration (not 0 bytes or corrupted)
+    3. **View the full video**: Open `examples/promo-video/output/helios-promo.mp4` in a video player and verify ALL scenes are visible (NOT just black frames with background):
+       - **Scene 1 (0-3s)**: Logo Reveal - Sun icon and "Helios" text should animate in
+       - **Scene 2 (3-5.5s)**: Tagline - "Programmatic Video" text should fade in
+       - **Scene 3 (5.5-9s)**: Code to Video - Code block and arrow animation should be visible
+       - **Scene 4 (9-11.5s)**: Frameworks - Framework logos (React, Vue, Svelte, etc.) should appear
+       - **Scene 5 (11.5-13.5s)**: CTA - Call-to-action text should be visible
+       - **Scene 6 (13.5-15s)**: End Card - Final card with branding should appear
+    4. **Check for black frames**: The video should NOT be entirely black or show only background particles. All animated elements (logo, text, code blocks, frameworks, CTA) must be visible at their respective timestamps.
+    5. **Success criteria**: The rendered video must match the visual output when viewing `composition.html` in a browser and scrubbing through the timeline manually. If the video is black or missing scenes, the fix is incomplete.

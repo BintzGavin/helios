@@ -9,7 +9,7 @@ The DEMO domain is responsible for:
 3.  **Build Config:** Maintaining the root `vite.config.js` and build scripts to support the examples.
 
 ## Blocked Items
-- None
+- **⚠️ COORDINATION**: Promo video example (`examples/promo-video/`) currently renders black due to RENDERER bug in `SeekTimeDriver.ts` (GSAP timeline synchronization issue). RENDERER agent is fixing this - DEMO agent should verify the example works correctly after RENDERER completes the fix. See `docs/status/RENDERER.md` "Next Steps" for details.
 
 ## Active Tasks
 - [2026-06-07] 🚧 Planned: Diagnostics Example - Create `examples/diagnostics` to demonstrate `Helios.diagnose()` and provide a runnable environment check.

@@ -83,4 +83,17 @@
 - [1.5.2] ✅ Completed: Fix Audio Duration Logic - Replaced `-shortest` with `-t duration` to prevent video truncation when audio is short.
 
 ## Next Steps
-- **🔴 CRITICAL**: Fix GSAP Timeline Synchronization in SeekTimeDriver - Promo video (`examples/promo-video/composition.html`) renders black because GSAP timeline animations aren't being seeked during rendering. Last worked in commit `9558e19` (Jan 29, 2026). Root causes: (1) `window.__helios_gsap_timeline__` not available when `setTime()` runs (ES module async loading), (2) `helios.subscribe()` callbacks may not fire synchronously during fast rendering, (3) `bindToDocumentTimeline()` polling loop may not run frequently enough. Files: `packages/renderer/src/drivers/SeekTimeDriver.ts` (primary), `packages/core/src/index.ts` (may need subscription timing adjustments). See `docs/BACKLOG.md` for full details.
+- **🔴 CRITICAL**: Fix GSAP Timeline Synchronization in SeekTimeDriver - Promo video (`examples/promo-video/composition.html`) renders black because GSAP timeline animations aren't being seeked during rendering. **Note**: While the example is owned by DEMO agent (`examples/promo-video/`), the bug is in RENDERER's `SeekTimeDriver.ts` - this is a rendering pipeline issue, not an example issue. Last worked in commit `9558e19` (Jan 29, 2026). Root causes: (1) `window.__helios_gsap_timeline__` not available when `setTime()` runs (ES module async loading), (2) `helios.subscribe()` callbacks may not fire synchronously during fast rendering, (3) `bindToDocumentTimeline()` polling loop may not run frequently enough. Files: `packages/renderer/src/drivers/SeekTimeDriver.ts` (primary), `packages/core/src/index.ts` (may need subscription timing adjustments). See `docs/BACKLOG.md` for full details.
+  
+  **VERIFICATION REQUIREMENTS** (MUST PASS):
+  1. **Render the video**: From `examples/promo-video/`, run `npx tsx render.ts` (ensure dev server is running on port 3002)
+  2. **Check output file**: Verify `examples/promo-video/output/helios-promo.mp4` exists and is ~15 seconds duration (not 0 bytes or corrupted)
+  3. **View the full video**: Open `examples/promo-video/output/helios-promo.mp4` in a video player and verify ALL scenes are visible (NOT just black frames with background):
+     - **Scene 1 (0-3s)**: Logo Reveal - Sun icon and "Helios" text should animate in
+     - **Scene 2 (3-5.5s)**: Tagline - "Programmatic Video" text should fade in
+     - **Scene 3 (5.5-9s)**: Code to Video - Code block and arrow animation should be visible
+     - **Scene 4 (9-11.5s)**: Frameworks - Framework logos (React, Vue, Svelte, etc.) should appear
+     - **Scene 5 (11.5-13.5s)**: CTA - Call-to-action text should be visible
+     - **Scene 6 (13.5-15s)**: End Card - Final card with branding should appear
+  4. **Check for black frames**: The video should NOT be entirely black or show only background particles. All animated elements (logo, text, code blocks, frameworks, CTA) must be visible at their respective timestamps.
+  5. **Success criteria**: The rendered video must match the visual output when viewing `composition.html` in a browser and scrubbing through the timeline manually. If the video is black or missing scenes, the fix is incomplete.
