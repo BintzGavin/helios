@@ -1,5 +1,8 @@
 # CORE Progress Log
 
+## CORE v2.20.0
+- ✅ Completed: Audio Diagnostics - Added audioCodecs (aac, opus) detection to Helios.diagnose() and DiagnosticReport.
+
 ## CORE v2.19.1
 - ✅ Completed: Update Documentation - Added usage examples for `stagger` and `shift` to README.
 

@@ -117,6 +117,9 @@ describe('Helios Core', () => {
       expect(report.videoCodecs).toHaveProperty('vp8');
       expect(report.videoCodecs).toHaveProperty('vp9');
       expect(report.videoCodecs).toHaveProperty('av1');
+      expect(report).toHaveProperty('audioCodecs');
+      expect(report.audioCodecs).toHaveProperty('aac');
+      expect(report.audioCodecs).toHaveProperty('opus');
       expect(report).toHaveProperty('userAgent');
     });
 
@@ -162,6 +165,27 @@ describe('Helios Core', () => {
       expect(report.webCodecs).toBe(true);
       expect(report.videoCodecs.h264).toBe(true);
       expect(mockIsConfigSupported).toHaveBeenCalledTimes(4);
+      vi.unstubAllGlobals();
+    });
+
+    it('should handle missing AudioEncoder gracefully', async () => {
+      vi.stubGlobal('AudioEncoder', undefined);
+      const report = await Helios.diagnose();
+      expect(report.audioCodecs.aac).toBe(false);
+      expect(report.audioCodecs.opus).toBe(false);
+      vi.unstubAllGlobals();
+    });
+
+    it('should detect audio codecs if AudioEncoder is supported', async () => {
+      const mockIsConfigSupported = vi.fn().mockResolvedValue({ supported: true });
+      vi.stubGlobal('AudioEncoder', {
+        isConfigSupported: mockIsConfigSupported
+      });
+
+      const report = await Helios.diagnose();
+      expect(report.audioCodecs.aac).toBe(true);
+      expect(report.audioCodecs.opus).toBe(true);
+      expect(mockIsConfigSupported).toHaveBeenCalledTimes(2);
       vi.unstubAllGlobals();
     });
   });
