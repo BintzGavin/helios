@@ -114,6 +114,84 @@ export function deleteComposition(rootDir: string, id: string): void {
   fs.rmSync(compDir, { recursive: true, force: true });
 }
 
+export function renameComposition(
+  rootDir: string,
+  id: string,
+  newName: string
+): CompositionInfo {
+  const projectRoot = getProjectRoot(rootDir);
+  const sourceDir = path.resolve(projectRoot, id);
+
+  // Security check
+  if (!sourceDir.startsWith(projectRoot)) {
+    throw new Error('Access denied: Cannot rename outside project root');
+  }
+
+  if (!fs.existsSync(sourceDir)) {
+    throw new Error(`Composition "${id}" not found`);
+  }
+
+  // Sanitize new name to create dirName
+  let dirName = newName.toLowerCase().replace(/[^a-z0-9-]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
+  if (!dirName) {
+    throw new Error('Invalid composition name');
+  }
+
+  // If the directory name is same (case insensitive or after sanitization), just return current info
+  // But wait, if they rename "My Comp" to "My  Comp", sanitization might make it same "my-comp".
+  // In that case, we should probably still update the DISPLAY name in metadata, but filesystem rename might fail or be no-op.
+  // Actually, renameComposition implies changing the ID/Directory.
+  // If the user wants to change display name only, that's strictly metadata.
+  // BUT, in this project, ID is derived from directory name.
+  // So if dirName is same as current ID, it's essentially a metadata update for "name" (which we don't store explicitly, we derive it).
+  // However, `findCompositions` derives name from directory name.
+  // So to change the name, we MUST change the directory name.
+
+  const targetDir = path.join(projectRoot, dirName);
+
+  if (targetDir === sourceDir) {
+     // No change in directory name
+     return {
+        id,
+        name: newName, // Return the requested name, although next scan will derive it from dir again
+        url: `/@fs${path.join(sourceDir, 'composition.html')}`
+     };
+  }
+
+  if (fs.existsSync(targetDir)) {
+    throw new Error(`Composition "${newName}" (directory: ${dirName}) already exists`);
+  }
+
+  fs.renameSync(sourceDir, targetDir);
+
+  // Return new info
+  const displayName = dirName
+    .split('-')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+
+  const compPath = path.join(targetDir, 'composition.html');
+
+  // Try to preserve metadata
+  let metadata: CompositionOptions | undefined;
+  const metaPath = path.join(targetDir, 'composition.json');
+  if (fs.existsSync(metaPath)) {
+    try {
+      metadata = JSON.parse(fs.readFileSync(metaPath, 'utf-8'));
+    } catch (e) {
+      console.warn(`Failed to parse metadata for ${dirName}`, e);
+    }
+  }
+
+  return {
+    id: dirName,
+    name: displayName,
+    url: `/@fs${compPath}`,
+    description: `Example: ${displayName}`,
+    metadata
+  };
+}
+
 export function duplicateComposition(
   rootDir: string,
   sourceId: string,

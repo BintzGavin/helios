@@ -4,7 +4,7 @@ import fs from 'fs';
 import path from 'path';
 import { SSEServerTransport } from "@modelcontextprotocol/sdk/server/sse.js";
 import { createMcpServer } from './src/server/mcp';
-import { findCompositions, findAssets, getProjectRoot, createComposition, deleteComposition, updateCompositionMetadata, duplicateComposition } from './src/server/discovery';
+import { findCompositions, findAssets, getProjectRoot, createComposition, deleteComposition, updateCompositionMetadata, duplicateComposition, renameComposition } from './src/server/discovery';
 import { startRender, getJob, getJobs, cancelJob, deleteJob, diagnoseServer } from './src/server/render-manager';
 
 const getBody = async (req: any) => {
@@ -182,12 +182,27 @@ function configureMiddlewares(server: ViteDevServer | PreviewServer, isPreview: 
           if (req.method === 'PATCH') {
             try {
               const body = await getBody(req);
-              const { id, width, height, fps, duration } = body;
+              const { id, name, width, height, fps, duration } = body;
 
               if (!id) {
                 res.statusCode = 400;
                 res.end(JSON.stringify({ error: 'ID is required' }));
                 return;
+              }
+
+              let currentId = id;
+
+              // Handle Rename
+              if (name) {
+                  const newComp = renameComposition(process.cwd(), id, name);
+                  currentId = newComp.id;
+
+                  // If no other metadata provided, just return the result of rename
+                  if (width === undefined && height === undefined && fps === undefined && duration === undefined) {
+                      res.setHeader('Content-Type', 'application/json');
+                      res.end(JSON.stringify(newComp));
+                      return;
+                  }
               }
 
               const options: any = {};
@@ -196,7 +211,7 @@ function configureMiddlewares(server: ViteDevServer | PreviewServer, isPreview: 
               if (fps !== undefined) options.fps = Number(fps);
               if (duration !== undefined) options.duration = Number(duration);
 
-              const updatedComp = updateCompositionMetadata(process.cwd(), id, options);
+              const updatedComp = updateCompositionMetadata(process.cwd(), currentId, options);
               res.setHeader('Content-Type', 'application/json');
               res.end(JSON.stringify(updatedComp));
             } catch (e: any) {
