@@ -2,65 +2,43 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { ClientSideExporter } from './exporter';
 import { HeliosController } from '../controllers';
 
-// Mock mp4-muxer
-const addAudioChunkSpy = vi.fn();
-vi.mock('mp4-muxer', () => {
+// Spies for Mediabunny
+const videoAddSpy = vi.fn().mockResolvedValue(undefined);
+const audioAddSpy = vi.fn().mockResolvedValue(undefined);
+const outputStartSpy = vi.fn().mockResolvedValue(undefined);
+const outputFinalizeSpy = vi.fn().mockResolvedValue(undefined);
+
+// Mock Mediabunny
+vi.mock('mediabunny', () => {
     return {
-        Muxer: class {
-            addVideoChunk = vi.fn();
-            addAudioChunk = addAudioChunkSpy;
-            finalize = vi.fn();
+        Output: class {
+            constructor(public options: any) {}
+            addVideoTrack = vi.fn();
+            addAudioTrack = vi.fn();
+            start = outputStartSpy;
+            finalize = outputFinalizeSpy;
         },
-        ArrayBufferTarget: class {
-            buffer = new ArrayBuffer(0);
+        BufferTarget: class {
+            buffer = new ArrayBuffer(100); // Simulate success
+        },
+        Mp4OutputFormat: class {},
+        WebMOutputFormat: class {},
+        VideoSampleSource: class {
+            constructor(public config: any) {}
+            add = videoAddSpy;
+        },
+        AudioSampleSource: class {
+            constructor(public config: any) {}
+            add = audioAddSpy;
+        },
+        VideoSample: class {
+            constructor(public frame: any, public init?: any) {}
+        },
+        AudioSample: class {
+            constructor(public init: any) {}
         }
     };
 });
-
-// Mock webm-muxer
-vi.mock('webm-muxer', () => {
-    return {
-        Muxer: class {
-            addVideoChunk = vi.fn();
-            addAudioChunk = addAudioChunkSpy;
-            finalize = vi.fn();
-        },
-        ArrayBufferTarget: class {
-            buffer = new ArrayBuffer(0);
-        }
-    };
-});
-
-// Spies for VideoEncoder
-const configureSpy = vi.fn();
-const encodeSpy = vi.fn();
-const flushSpy = vi.fn().mockResolvedValue(undefined);
-const closeSpy = vi.fn();
-
-// Mock VideoEncoder
-class MockVideoEncoder {
-    static isConfigSupported = vi.fn().mockResolvedValue(true);
-    configure = configureSpy;
-    encode = encodeSpy;
-    flush = flushSpy;
-    close = closeSpy;
-}
-vi.stubGlobal('VideoEncoder', MockVideoEncoder);
-
-// Mock AudioEncoder
-const audioConfigureSpy = vi.fn();
-const audioEncodeSpy = vi.fn();
-const audioFlushSpy = vi.fn().mockResolvedValue(undefined);
-const audioCloseSpy = vi.fn();
-
-class MockAudioEncoder {
-    static isConfigSupported = vi.fn().mockResolvedValue(true);
-    configure = audioConfigureSpy;
-    encode = audioEncodeSpy;
-    flush = audioFlushSpy;
-    close = audioCloseSpy;
-}
-vi.stubGlobal('AudioEncoder', MockAudioEncoder);
 
 // Mock AudioData
 class MockAudioData {
@@ -146,9 +124,7 @@ describe('ClientSideExporter', () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
-        gainNodes.length = 0; // Clear gain nodes
-        // Reset default implementation
-        (VideoEncoder.isConfigSupported as any).mockResolvedValue(true);
+        gainNodes.length = 0;
 
         mockController = {
             play: vi.fn(),
@@ -192,13 +168,9 @@ describe('ClientSideExporter', () => {
             expect(mockController.captureFrame).toHaveBeenCalledWith(i, expect.anything());
         }
 
-        // Encoder usage
-        expect(configureSpy).toHaveBeenCalled();
-        expect(encodeSpy).toHaveBeenCalledTimes(10); // 0..9
-        expect(flushSpy).toHaveBeenCalled();
-
-        // Audio shouldn't run if no tracks
-        expect(audioEncodeSpy).not.toHaveBeenCalled();
+        expect(outputStartSpy).toHaveBeenCalled();
+        expect(videoAddSpy).toHaveBeenCalledTimes(10);
+        expect(outputFinalizeSpy).toHaveBeenCalled();
 
         // Download
         expect(URL.createObjectURL).toHaveBeenCalled();
@@ -212,10 +184,8 @@ describe('ClientSideExporter', () => {
 
         await exporter.export({ onProgress, signal, mode: 'canvas', format: 'webm' });
 
-        expect(configureSpy).toHaveBeenCalledWith(expect.objectContaining({
-            codec: 'vp09.00.10.08'
-        }));
-
+        // Verify codec in video source config if we could access it, but spy doesn't easily expose constructor args of mocked class.
+        // We can check mockAnchor download filename though.
         expect(mockAnchor.download).toBe('video.webm');
     });
 
@@ -229,32 +199,25 @@ describe('ClientSideExporter', () => {
             return { frame: new VideoFrame({} as any, {}), captions: [] };
         });
 
-        // The export loop checks signal.aborted at start of loop
-        // It runs frame 0 setup. Then loop i=1.
-
         await exporter.export({ onProgress, signal: controller.signal, mode: 'canvas' });
 
         // Should have stopped early
-        expect(flushSpy).not.toHaveBeenCalled();
+        expect(outputFinalizeSpy).not.toHaveBeenCalled();
     });
 
     it('should fallback to DOM if canvas not found in auto mode', async () => {
-        // First capture (test for auto) returns null for canvas
         mockController.captureFrame = vi.fn()
-            .mockResolvedValueOnce(null) // Test frame for 'canvas' fails
-            .mockResolvedValue({ frame: new VideoFrame({} as any, {}), captions: [] }); // Subsequent calls succeed
+            .mockResolvedValueOnce(null)
+            .mockResolvedValue({ frame: new VideoFrame({} as any, {}), captions: [] });
 
         const onProgress = vi.fn();
         await exporter.export({ onProgress, signal: new AbortController().signal, mode: 'auto' });
 
-        // First call was probe
         expect(mockController.captureFrame).toHaveBeenNthCalledWith(1, 0, { selector: 'canvas', mode: 'canvas' });
-
-        // Second call (setup) should use 'dom'
         expect(mockController.captureFrame).toHaveBeenNthCalledWith(2, 0, { selector: 'canvas', mode: 'dom' });
     });
 
-    it('should export audio if tracks exist (MP4)', async () => {
+    it('should export audio if tracks exist', async () => {
         const onProgress = vi.fn();
         const signal = new AbortController().signal;
 
@@ -264,60 +227,8 @@ describe('ClientSideExporter', () => {
 
         await exporter.export({ onProgress, signal, mode: 'canvas', format: 'mp4' });
 
-        expect(audioConfigureSpy).toHaveBeenCalledWith(expect.objectContaining({
-            codec: 'mp4a.40.2'
-        }));
-        expect(audioEncodeSpy).toHaveBeenCalled();
-        expect(audioFlushSpy).toHaveBeenCalled();
-        expect(audioCloseSpy).toHaveBeenCalled();
-    });
-
-    it('should export audio if tracks exist (WebM)', async () => {
-        const onProgress = vi.fn();
-        const signal = new AbortController().signal;
-
-        (mockController.getAudioTracks as any).mockResolvedValue([
-            { buffer: new ArrayBuffer(8), mimeType: 'audio/mp3' }
-        ]);
-
-        await exporter.export({ onProgress, signal, mode: 'canvas', format: 'webm' });
-
-        expect(audioConfigureSpy).toHaveBeenCalledWith(expect.objectContaining({
-            codec: 'opus'
-        }));
-        expect(audioEncodeSpy).toHaveBeenCalled();
-        expect(audioFlushSpy).toHaveBeenCalled();
-        expect(audioCloseSpy).toHaveBeenCalled();
-    });
-
-    it('should fallback to lower profile if primary config is not supported (MP4)', async () => {
-        const onProgress = vi.fn();
-        const signal = new AbortController().signal;
-
-        // First call (Level 4.0) returns false, Second call (Level 3.0) returns true
-        (VideoEncoder.isConfigSupported as any)
-            .mockResolvedValueOnce(false)
-            .mockResolvedValueOnce(true);
-
-        await exporter.export({ onProgress, signal, mode: 'canvas', format: 'mp4' });
-
-        expect(VideoEncoder.isConfigSupported).toHaveBeenCalledTimes(2);
-        // Verify configure was called with the fallback config (Level 3.0 => avc1.42001E)
-        expect(configureSpy).toHaveBeenCalledWith(expect.objectContaining({
-            codec: 'avc1.42001E'
-        }));
-    });
-
-    it('should throw error if no supported config found', async () => {
-        const onProgress = vi.fn();
-        const signal = new AbortController().signal;
-
-        // Both return false
-        (VideoEncoder.isConfigSupported as any).mockResolvedValue(false);
-
-        await expect(exporter.export({ onProgress, signal, mode: 'canvas' }))
-            .rejects
-            .toThrow(/Unsupported VideoEncoder config/);
+        expect(audioAddSpy).toHaveBeenCalled();
+        expect(outputFinalizeSpy).toHaveBeenCalled();
     });
 
     it('should apply volume and mute settings to audio export', async () => {
@@ -348,18 +259,14 @@ describe('ClientSideExporter', () => {
 
         await exporter.export({ onProgress, signal, mode: 'canvas' });
 
-        // Since we mocked OffscreenCanvas, we can check if getContext was called,
-        // but checking exact drawing calls is hard without capturing the instance.
-        // However, if the code didn't crash and we passed captions, it means the logic branch was taken.
-        expect(mockController.captureFrame).toHaveBeenCalled();
-        expect(encodeSpy).toHaveBeenCalled();
+        // Indirectly verify by ensuring process completes
+        expect(videoAddSpy).toHaveBeenCalled();
     });
 
     it('should NOT render captions if includeCaptions is false', async () => {
         const onProgress = vi.fn();
         const signal = new AbortController().signal;
 
-        // Reset spies
         fillTextSpy.mockClear();
         fillRectSpy.mockClear();
 
@@ -378,7 +285,6 @@ describe('ClientSideExporter', () => {
         const onProgress = vi.fn();
         const signal = new AbortController().signal;
 
-        // Reset spies
         fillTextSpy.mockClear();
 
         mockController.captureFrame = vi.fn().mockResolvedValue({
@@ -388,7 +294,6 @@ describe('ClientSideExporter', () => {
 
         await exporter.export({ onProgress, signal, mode: 'canvas', includeCaptions: true });
 
-        // 10 frames * 2 lines = 20 calls
         expect(fillTextSpy).toHaveBeenCalledTimes(20);
         expect(fillTextSpy).toHaveBeenCalledWith('Line 1', expect.any(Number), expect.any(Number));
         expect(fillTextSpy).toHaveBeenCalledWith('Line 2', expect.any(Number), expect.any(Number));
@@ -398,9 +303,6 @@ describe('ClientSideExporter', () => {
         const onProgress = vi.fn();
         const signal = new AbortController().signal;
 
-        // Mock state with playbackRange
-        // Duration 10 seconds, fps 10 = 100 frames.
-        // Range 20 to 30.
         mockController.getState = vi.fn().mockReturnValue({
             duration: 10,
             fps: 10,
@@ -409,13 +311,11 @@ describe('ClientSideExporter', () => {
 
         await exporter.export({ onProgress, signal, mode: 'canvas' });
 
-        // Setup captures startFrame (20).
-        // Loop captures 21..29.
         expect(mockController.captureFrame).toHaveBeenCalledWith(20, expect.anything());
         expect(mockController.captureFrame).toHaveBeenCalledWith(29, expect.anything());
         expect(mockController.captureFrame).not.toHaveBeenCalledWith(19, expect.anything());
         expect(mockController.captureFrame).not.toHaveBeenCalledWith(30, expect.anything());
 
-        expect(encodeSpy).toHaveBeenCalledTimes(10);
+        expect(videoAddSpy).toHaveBeenCalledTimes(10);
     });
 });

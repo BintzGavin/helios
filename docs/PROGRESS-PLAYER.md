@@ -1,5 +1,11 @@
 # PLAYER Progress Log
 
+## PLAYER v0.46.1
+- ✅ Completed: Migrate Client-Side Export to Mediabunny - Replaced deprecated `mp4-muxer` and `webm-muxer` with `mediabunny`, modernizing the export pipeline.
+
+## PLAYER v0.46.0
+- ✅ Completed: Visualize Markers - Implemented visual rendering of timeline markers on the scrubber, including clickable interaction to seek to the marker's timestamp.
+
 ## PLAYER v0.45.0
 - ✅ Completed: Interactive Playback Range - Implemented `I` (In), `O` (Out), and `X` (Clear) keyboard shortcuts to set the playback loop range interactively.
 
