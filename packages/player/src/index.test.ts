@@ -58,12 +58,28 @@ describe('HeliosPlayer', () => {
   });
 
   it('should toggle fullscreen on button click', async () => {
-    const btn = player.shadowRoot!.querySelector('.fullscreen-btn') as HTMLButtonElement;
+    // Mock Controller
+    const mockController = {
+        getState: vi.fn().mockReturnValue({ currentFrame: 0, duration: 10, fps: 30, isPlaying: false }),
+        play: vi.fn(),
+        pause: vi.fn(),
+        seek: vi.fn(),
+        subscribe: vi.fn().mockReturnValue(() => {}),
+        onError: vi.fn().mockReturnValue(() => {}),
+        dispose: vi.fn(), setCaptions: vi.fn(),
+        setPlaybackRate: vi.fn(),
+        setAudioVolume: vi.fn(),
+        setAudioMuted: vi.fn(),
+        setInputProps: vi.fn(),
+        setLoop: vi.fn(),
+        setPlaybackRange: vi.fn(),
+        clearPlaybackRange: vi.fn()
+    };
 
-    // Enable controls (needs a controller usually, or hack disable state)
-    // Or just check if click handler is attached. Button is disabled by default.
-    // Let's force enable it for test
-    btn.disabled = false;
+    // Inject controller (using private access workaround)
+    (player as any).setController(mockController);
+
+    const btn = player.shadowRoot!.querySelector('.fullscreen-btn') as HTMLButtonElement;
 
     // Click to enter fullscreen
     btn.click();
