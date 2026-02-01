@@ -37,6 +37,7 @@
 - [x] Implement Studio UI (Timeline, Props).
 - [x] Implement CLI integration.
 - [x] Implement Asset Discovery (Backend & UI).
+- [x] Implement Persistent Render Jobs.
 
 ### 8. Maintenance
 - [x] Synchronize package versions (Fix CORE 2.7.1 dependency mismatch in PLAYER/RENDERER).

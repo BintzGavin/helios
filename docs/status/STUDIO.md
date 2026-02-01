@@ -1,4 +1,4 @@
-**Version**: 0.69.0
+**Version**: 0.70.0
 
 # Studio Domain Status
 
@@ -7,6 +7,7 @@
 **Focus**: UI Implementation & CLI
 
 ## Recent Updates
+- [v0.70.0] ✅ Completed: Persistent Render Jobs - Finalized verification and closed out the plan for persistent render jobs, ensuring job history survives restarts.
 - [v0.69.0] ✅ Verified: Maintenance - Synced package.json version and re-verified persistent render jobs functionality via tests.
 - [v0.69.0] ✅ Completed: Rename Composition - Implemented ability to rename compositions from the Settings modal, including backend directory moving and ID updates.
 - [v0.68.1] ✅ Verified: Persistent Render Jobs - Verified implementation and updated documentation to reflect persistence behavior.
