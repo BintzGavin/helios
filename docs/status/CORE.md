@@ -1,11 +1,12 @@
 # Status: CORE
 
-**Version**: 3.6.0
+**Version**: 3.7.0
 
 - **Status**: Active
 - **Current Focus**: Maintenance, Optimization, and Stability
-- **Last Updated**: 2026-06-08
+- **Last Updated**: 2026-06-09
 
+[v3.7.0] ✅ Completed: Implement DomDriver Audio Looping - Updated `DomDriver` to respect the `loop` attribute on media elements, wrapping time calculations to support infinite loops.
 [v3.6.0] ✅ Completed: Refactor Helios - Extracted Helios class to dedicated Helios.ts file and cleaned up index.ts exports.
 [v3.6.0] ✅ Completed: Implement Audio Fading - Added support for `data-helios-fade-in` and `data-helios-fade-out` in `DomDriver` to enable linear audio fading.
 [v3.5.1] ✅ Completed: Implement Reactive Virtual Time - Replaced polling with reactive setter for `__HELIOS_VIRTUAL_TIME__` in `bindToDocumentTimeline` to ensure reliable headless rendering sync.
@@ -90,7 +91,6 @@
 
 **Next Steps**:
 - Maintain version alignment with Player and Renderer.
-- Note: Added plan `/.sys/plans/2026-01-29-CORE-Bind-Virtual-Time.md` to ensure `bindToDocumentTimeline` prefers `__HELIOS_VIRTUAL_TIME__` when present (DOM render sync).
 - **⚠️ COORDINATION**: RENDERER agent investigating GSAP timeline sync issue - may need `bindToDocumentTimeline()` subscription timing adjustments if `helios.subscribe()` callbacks aren't firing synchronously during fast frame-by-frame rendering. See `docs/status/RENDERER.md` "Next Steps" for details.
 
 [v2.10.0] ✅ Completed: Implement RenderSession - Added RenderSession class for standardized frame iteration and stability orchestration.
