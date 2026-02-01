@@ -5,8 +5,13 @@ import * as domCapture from './features/dom-capture';
 
 // Mock Helios
 vi.mock('@helios-project/core', () => {
+    const MockHelios = vi.fn();
+    (MockHelios as any).diagnose = vi.fn().mockResolvedValue({
+        waapi: true,
+        webCodecs: true
+    });
     return {
-        Helios: vi.fn()
+        Helios: MockHelios
     };
 });
 
@@ -54,6 +59,7 @@ describe('DirectController', () => {
             }),
             getState: vi.fn().mockReturnValue({ fps: 30, duration: 10, currentFrame: 0 }),
             schema: { someProp: { type: 'string' } },
+            constructor: Helios
         };
 
         (Helios as unknown as any).mockImplementation(function() {
@@ -199,6 +205,12 @@ describe('DirectController', () => {
 
         cleanup();
         expect(iframeListeners['error']).toHaveLength(0);
+    });
+
+    it('should return diagnostic report', async () => {
+        const report = await controller.diagnose();
+        expect((Helios as any).diagnose).toHaveBeenCalled();
+        expect(report).toEqual({ waapi: true, webCodecs: true });
     });
 });
 
@@ -373,5 +385,17 @@ describe('BridgeController', () => {
 
          const result = await promise;
          expect(result).toBeNull();
+    });
+
+    it('should get diagnostics via bridge', async () => {
+        const promise = controller.diagnose();
+
+        expect(mockWindow.postMessage).toHaveBeenCalledWith({ type: 'HELIOS_DIAGNOSE' }, '*');
+
+        const mockReport = { waapi: true, webCodecs: true };
+        triggerMessage({ type: 'HELIOS_DIAGNOSE_RESULT', report: mockReport });
+
+        const result = await promise;
+        expect(result).toEqual(mockReport);
     });
 });
