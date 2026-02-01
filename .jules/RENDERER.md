@@ -214,3 +214,7 @@
 ## 2026-06-10 - Verification Correction
 **Learning:** Identified that `DomScanner` *does* implement declarative audio fades, contradicting the journal entry `[2026-06-08]`. The gap was actually in the *verification* suite (tests existed but weren't running).
 **Action:** Always verify "missing features" by reading the code before trusting the journal. Prioritize enabling existing tests in `run-all.ts` over reimplementing supposedly missing features.
+
+## [2026-06-12] - Incomplete DomStrategy Preloading
+**Learning:** In addition to the previously identified background image gap, `DomStrategy` also misses `<video poster>`, SVG `<image>`, and CSS `mask-image` properties, potentially causing FOUC in complex compositions.
+**Action:** Created plan `2026-06-12-RENDERER-Enhance-Dom-Preloading.md` to implement comprehensive asset discovery for these types.
