@@ -106,7 +106,7 @@ Properties and methods available on the `HeliosPlayer` element instance:
 
 **HeliosController Interface:**
 The controller returned by `getController()` provides advanced methods:
-- `getAudioTracks(): Promise<AudioAsset[]>`: Returns list of available audio tracks (including `id`, `volume`, `muted`).
+- `getAudioTracks(): Promise<AudioAsset[]>`: Returns list of available audio tracks (including `id`, `volume`, `muted`, `fadeInDuration`, `fadeOutDuration`).
 - `setAudioTrackVolume(trackId: string, volume: number): void`
 - `setAudioTrackMuted(trackId: string, muted: boolean): void`
 - `setInputProps(props: Record<string, any>): void`

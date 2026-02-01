@@ -1,4 +1,4 @@
-**Version**: v0.53.0
+**Version**: v0.54.0
 
 # Status: PLAYER
 
@@ -44,10 +44,12 @@
 - Implemented persistence for `volume`, `playbackRate`, and `muted` properties, ensuring values set before connection are applied upon initialization.
 - Implements Smart Controls: 'CC' button is hidden when no tracks are present, and 'Picture-in-Picture' button can be hidden via `disablepictureinpicture`.
 - Supports auto-enabling of captions if a track is marked as `default`.
+- Supports audio fade-in/out in client-side export via `data-helios-fade-in` and `data-helios-fade-out` attributes.
 
 ## Critical Task
 - **None**: All critical tasks completed.
 
+[v0.54.0] ✅ Completed: Audio Fades - Implemented audio fade-in and fade-out support in client-side exporter via `data-helios-fade-in` and `data-helios-fade-out` attributes.
 [v0.53.0] ✅ Completed: Smart Controls - Implemented 'disablepictureinpicture' attribute and auto-hiding CC button/auto-enabling default tracks.
 [v0.52.0] ✅ Completed: WebVTT Support - Implemented `caption-parser` to support standard WebVTT captions alongside SRT, enabling broader compatibility with caption file formats.
 [v0.51.0] ✅ Completed: Expose Audio Track IDs - Updated `getAudioAssets` to populate `id` from `data-helios-track-id`, standard `id`, or fallback index, enabling robust track identification.

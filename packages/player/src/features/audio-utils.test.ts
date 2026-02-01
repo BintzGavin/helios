@@ -71,6 +71,24 @@ describe('audio-utils', () => {
       expect(assets).toHaveLength(1);
       expect(assets[0].id).toBe('priority-id');
     });
+
+    it('should parse fade attributes', async () => {
+      document.body.innerHTML = `
+        <audio src="fades.mp3" data-helios-fade-in="0.5" data-helios-fade-out="1.5"></audio>
+        <audio src="nofades.mp3"></audio>
+        <audio src="invalid.mp3" data-helios-fade-in="abc"></audio>
+      `;
+      const assets = await getAudioAssets(document);
+      expect(assets).toHaveLength(3);
+
+      expect(assets[0].fadeInDuration).toBe(0.5);
+      expect(assets[0].fadeOutDuration).toBe(1.5);
+
+      expect(assets[1].fadeInDuration).toBe(0);
+      expect(assets[1].fadeOutDuration).toBe(0);
+
+      expect(assets[2].fadeInDuration).toBe(0);
+    });
   });
 
   describe('mixAudio', () => {
@@ -87,7 +105,11 @@ describe('audio-utils', () => {
       };
 
       mockGain = {
-        gain: { value: 1 },
+        gain: {
+          value: 1,
+          setValueAtTime: vi.fn(),
+          linearRampToValueAtTime: vi.fn()
+        },
         connect: vi.fn(),
       };
 
@@ -182,6 +204,39 @@ describe('audio-utils', () => {
       // playbackStart should be 0 (play immediately at start of range)
       // offset should be 2.0 (skip first 2 seconds of audio)
       expect(mockSource.start).toHaveBeenCalledWith(0, 2.0);
+    });
+
+    it('should schedule fade automation', async () => {
+      const assets = [{
+        buffer: new ArrayBuffer(8), // approx 0s duration but mocked duration is different usually?
+        mimeType: 'audio/mpeg',
+        startTime: 2.0,
+        volume: 0.8,
+        fadeInDuration: 1.0,
+        fadeOutDuration: 1.0
+      }];
+
+      // Mock duration of buffer
+      // OfflineAudioContext needs real decoding or mocks.
+      mockContext.decodeAudioData = vi.fn().mockResolvedValue({
+        duration: 10.0
+      });
+
+      // Export window starts at 0.0
+      await mixAudio(assets, 20, 44100, 0.0);
+
+      // Asset starts at 2.0.
+      // Fade In:
+      // Start at 2.0 with vol 0.
+      // Ramp to 0.8 at 3.0.
+      expect(mockGain.gain.setValueAtTime).toHaveBeenCalledWith(0, 2.0);
+      expect(mockGain.gain.linearRampToValueAtTime).toHaveBeenCalledWith(0.8, 3.0);
+
+      // Fade Out:
+      // Ends at 2.0 + 10.0 = 12.0.
+      // Fade out start: 12.0 - 1.0 = 11.0.
+      expect(mockGain.gain.setValueAtTime).toHaveBeenCalledWith(0.8, 11.0);
+      expect(mockGain.gain.linearRampToValueAtTime).toHaveBeenCalledWith(0, 12.0);
     });
   });
 });

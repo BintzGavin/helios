@@ -7,6 +7,8 @@ export interface AudioAsset {
   muted?: boolean;
   loop?: boolean;
   startTime?: number;
+  fadeInDuration?: number;
+  fadeOutDuration?: number;
 }
 
 export async function getAudioAssets(doc: Document): Promise<AudioAsset[]> {
@@ -30,7 +32,9 @@ export async function getAudioAssets(doc: Document): Promise<AudioAsset[]> {
             volume: volumeAttr !== null ? parseFloat(volumeAttr) : tag.volume,
             muted: tag.muted,
             loop: tag.loop,
-            startTime: parseFloat(tag.getAttribute('data-start-time') || '0') || 0
+            startTime: parseFloat(tag.getAttribute('data-start-time') || '0') || 0,
+            fadeInDuration: parseFloat(tag.getAttribute('data-helios-fade-in') || '0') || 0,
+            fadeOutDuration: parseFloat(tag.getAttribute('data-helios-fade-out') || '0') || 0
         };
     } catch (e) {
         console.warn("Failed to fetch audio asset:", tag.src, e);
@@ -62,8 +66,8 @@ export async function mixAudio(assets: AudioAsset[], duration: number, sampleRat
             source.loop = !!asset.loop;
 
             const gainNode = ctx.createGain();
-            const volume = asset.muted ? 0 : (typeof asset.volume === 'number' ? asset.volume : 1);
-            gainNode.gain.value = volume;
+            const targetVolume = asset.muted ? 0 : (typeof asset.volume === 'number' ? asset.volume : 1);
+            gainNode.gain.value = targetVolume;
 
             source.connect(gainNode);
             gainNode.connect(ctx.destination);
@@ -77,6 +81,55 @@ export async function mixAudio(assets: AudioAsset[], duration: number, sampleRat
                 // If the clip starts before the window, we need to skip the beginning
                 startOffset = -playbackStart;
                 playbackStart = 0;
+            }
+
+            // Apply Fades
+            if ((asset.fadeInDuration && asset.fadeInDuration > 0) || (asset.fadeOutDuration && asset.fadeOutDuration > 0)) {
+                let fadeInEndTime = playbackStart;
+
+                // Fade In
+                if (asset.fadeInDuration && asset.fadeInDuration > 0) {
+                    const durationRemaining = asset.fadeInDuration - startOffset;
+                    if (durationRemaining > 0) {
+                        const initialVol = targetVolume * (startOffset / asset.fadeInDuration);
+                        gainNode.gain.setValueAtTime(initialVol, playbackStart);
+                        fadeInEndTime = playbackStart + durationRemaining;
+                        gainNode.gain.linearRampToValueAtTime(targetVolume, fadeInEndTime);
+                    } else {
+                        gainNode.gain.setValueAtTime(targetVolume, playbackStart);
+                    }
+                } else {
+                    gainNode.gain.setValueAtTime(targetVolume, playbackStart);
+                }
+
+                // Fade Out
+                if (asset.fadeOutDuration && asset.fadeOutDuration > 0) {
+                    const clipDuration = audioBuffer.duration;
+                    const assetEnd = assetStart + clipDuration;
+                    const playbackEnd = assetEnd - rangeStart;
+                    const fadeOutStart = playbackEnd - asset.fadeOutDuration;
+
+                    if (fadeOutStart >= 0) {
+                        if (fadeOutStart >= fadeInEndTime) {
+                            gainNode.gain.setValueAtTime(targetVolume, fadeOutStart);
+                        } else {
+                            // Overlap: Anchor at current calculated volume or targetVolume?
+                            // Simpler to anchor at targetVolume if we assume users don't overlap fades aggressively
+                            gainNode.gain.setValueAtTime(targetVolume, fadeOutStart);
+                        }
+                        gainNode.gain.linearRampToValueAtTime(0, playbackEnd);
+                    } else {
+                        const timeIntoFade = -fadeOutStart;
+                        if (timeIntoFade < asset.fadeOutDuration) {
+                            const progress = timeIntoFade / asset.fadeOutDuration;
+                            const startVol = targetVolume * (1 - progress);
+                            gainNode.gain.setValueAtTime(startVol, 0);
+                            gainNode.gain.linearRampToValueAtTime(0, playbackEnd);
+                        } else {
+                            gainNode.gain.setValueAtTime(0, 0);
+                        }
+                    }
+                }
             }
 
             // source.start(when, offset)

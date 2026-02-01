@@ -1,3 +1,6 @@
+## PLAYER v0.54.0
+- ✅ Completed: Audio Fades - Implemented audio fade-in and fade-out support in client-side exporter via `data-helios-fade-in` and `data-helios-fade-out` attributes.
+
 ## PLAYER v0.53.0
 - ✅ Completed: Smart Controls - Implemented 'disablepictureinpicture' attribute and auto-hiding CC button/auto-enabling default tracks.
 
