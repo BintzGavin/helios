@@ -43,3 +43,7 @@
 ## [1.74.0] - Vanilla Parity Gap
 **Learning:** The "Vanilla JS" examples (`simple-animation`) use legacy inline scripts and relative imports, failing to demonstrate the "Professional" Vite+TS pipeline promised by the Vision.
 **Action:** Created `examples/vanilla-typescript` to serve as the canonical reference for non-framework usage.
+
+## [1.76.1] - Vue Animation Helpers Gap
+**Learning:** The "Animation Helpers" (interpolate, spring) are core features but were only demonstrated in React examples. Vue and Svelte examples lacked them, creating a parity gap.
+**Action:** When verifying framework support, explicitly check that "optional" but core features are demonstrated across ALL supported frameworks, not just the primary one.
