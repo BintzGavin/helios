@@ -20,6 +20,12 @@ async function main() {
       if (report.browser?.videoEncoder === undefined) {
         throw new Error('Canvas diagnostics missing browser.videoEncoder');
       }
+      if (!report.browser?.codecs) {
+        throw new Error('Canvas diagnostics missing browser.codecs');
+      }
+      if (report.browser.codecs.h264 === undefined) {
+        throw new Error('Canvas diagnostics missing h264 support flag');
+      }
     } catch (err) {
       console.error('Canvas diagnose failed:', err);
       process.exit(1);
