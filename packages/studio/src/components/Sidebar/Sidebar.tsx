@@ -6,7 +6,7 @@ import { RendersPanel } from '../RendersPanel/RendersPanel';
 import { CaptionsPanel } from '../CaptionsPanel/CaptionsPanel';
 
 export const Sidebar: React.FC = () => {
-  const { setHelpOpen, setDiagnosticsOpen, setPromptOpen } = useStudio();
+  const { setHelpOpen, setDiagnosticsOpen, setAssistantOpen } = useStudio();
   const [activeTab, setActiveTab] = useState<'assets' | 'renders' | 'captions'>('assets');
 
   return (
@@ -39,8 +39,8 @@ export const Sidebar: React.FC = () => {
       <div className="sidebar-footer">
         <button
           className="sidebar-help-button"
-          onClick={() => setPromptOpen(true)}
-          title="Generate AI System Prompt"
+          onClick={() => setAssistantOpen(true)}
+          title="Helios Assistant"
           style={{ marginRight: '8px' }}
         >
           ✨

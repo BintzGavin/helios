@@ -147,3 +147,6 @@ Each agent should update **their own dedicated progress file** instead of this f
   - Created documentation for 3 new examples and Audio Tracks guide
   - Updated Studio guide with new features
   - Updated navigation structure in `mint.json`
+
+## STUDIO v0.72.0
+- ✅ Completed: Helios Assistant - Implemented context-aware AI assistant with documentation search, replacing System Prompt Modal.

@@ -12,7 +12,7 @@ import { DuplicateCompositionModal } from './components/DuplicateCompositionModa
 import { CompositionSettingsModal } from './components/CompositionSettingsModal'
 import { KeyboardShortcutsModal } from './components/KeyboardShortcutsModal'
 import { DiagnosticsModal } from './components/DiagnosticsModal'
-import { SystemPromptModal } from './components/SystemPromptModal'
+import { AssistantModal } from './components/AssistantModal'
 import { RenderPreviewModal } from './components/RenderPreviewModal'
 import { GlobalShortcuts } from './components/GlobalShortcuts'
 import { Stage } from './components/Stage/Stage'
@@ -126,7 +126,7 @@ function AppContent() {
       <CompositionSettingsModal />
       <KeyboardShortcutsModal />
       <DiagnosticsModal />
-      <SystemPromptModal />
+      <AssistantModal />
       <RenderPreviewModal />
       <GlobalShortcuts />
     </>

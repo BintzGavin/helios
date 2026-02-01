@@ -85,8 +85,8 @@ interface StudioContextType {
   isDiagnosticsOpen: boolean;
   setDiagnosticsOpen: (isOpen: boolean) => void;
 
-  isPromptOpen: boolean;
-  setPromptOpen: (isOpen: boolean) => void;
+  isAssistantOpen: boolean;
+  setAssistantOpen: (isOpen: boolean) => void;
 
   isCreateOpen: boolean;
   setCreateOpen: (isOpen: boolean) => void;
@@ -158,7 +158,7 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [isSwitcherOpen, setSwitcherOpen] = useState(false);
   const [isHelpOpen, setHelpOpen] = useState(false);
   const [isDiagnosticsOpen, setDiagnosticsOpen] = useState(false);
-  const [isPromptOpen, setPromptOpen] = useState(false);
+  const [isAssistantOpen, setAssistantOpen] = useState(false);
   const [isCreateOpen, setCreateOpen] = useState(false);
   const [isDuplicateOpen, setDuplicateOpen] = useState(false);
   const [isSettingsOpen, setSettingsOpen] = useState(false);
@@ -583,8 +583,8 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         setHelpOpen,
         isDiagnosticsOpen,
         setDiagnosticsOpen,
-        isPromptOpen,
-        setPromptOpen,
+        isAssistantOpen,
+        setAssistantOpen,
         isCreateOpen,
         setCreateOpen,
         isDuplicateOpen,

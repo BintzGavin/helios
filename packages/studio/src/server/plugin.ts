@@ -5,6 +5,7 @@ import path from 'path';
 import { SSEServerTransport } from "@modelcontextprotocol/sdk/server/sse.js";
 import { createMcpServer } from './mcp';
 import { findCompositions, findAssets, getProjectRoot, createComposition, deleteComposition, updateCompositionMetadata, duplicateComposition, renameComposition, renameAsset } from './discovery';
+import { findDocumentation } from './documentation';
 import { startRender, getJob, getJobs, cancelJob, deleteJob, diagnoseServer } from './render-manager';
 
 export interface StudioPluginOptions {
@@ -313,6 +314,22 @@ function configureMiddlewares(server: ViteDevServer | PreviewServer, isPreview: 
             console.error(e);
             res.statusCode = 500;
             res.end(JSON.stringify({ error: e.message || 'Diagnostics failed' }));
+          }
+          return;
+        }
+        next();
+      });
+
+      server.middlewares.use('/api/documentation', async (req, res, next) => {
+        if (req.url === '/' || req.url === '') {
+          try {
+            const docs = findDocumentation(process.cwd());
+            res.setHeader('Content-Type', 'application/json');
+            res.end(JSON.stringify(docs));
+          } catch (e: any) {
+             console.error(e);
+             res.statusCode = 500;
+             res.end(JSON.stringify({ error: e.message || 'Documentation scan failed' }));
           }
           return;
         }
