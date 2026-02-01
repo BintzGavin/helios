@@ -69,6 +69,7 @@ Tests are located in `tests/e2e/`.
 - **verify-render.ts**: Verifies server-side rendering using the `Renderer` class.
     - Scans `output/example-build` for compositions.
     - Renders each example to MP4 using `Renderer`.
+    - STRICTLY verifies output content using FFmpeg: checks video duration and ensures non-black frames (YMAX > 0).
     - Supports filtering via command line arguments.
 - **verify-client-export.ts**: Verifies the client-side export pipeline.
     - Dynamically discovers all examples in `examples/`.

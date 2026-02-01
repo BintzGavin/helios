@@ -51,3 +51,7 @@
 ## [1.77.0] - SolidJS Animation Sync
 **Learning:** SolidJS examples using `createHeliosSignal` may not automatically sync with the document timeline if `autoSyncAnimations` is false. Explicitly calling `helios.bindToDocumentTimeline()` is required for automated playback verification (e.g., Playwright).
 **Action:** Always ensure `helios.bindToDocumentTimeline()` is called in framework examples to support consistent automated verification behavior.
+
+## [1.78.1] - Dependency Hoisting
+**Learning:** Scripts in the root directory (like `tests/e2e/verify-render.ts`) should explicitly declare their dependencies in the root `package.json`, even if those dependencies are present in workspaces and hoisted. Relying on hoisting works in some environments but fails in others (or linters/reviewers flag it).
+**Action:** Always add `devDependencies` to the root `package.json` for any tool used in root-level scripts.
