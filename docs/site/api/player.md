@@ -77,6 +77,7 @@ The `<helios-player>` element implements a subset of the HTMLMediaElement API, a
 - **`pause()`**: Pauses playback.
 - **`addTextTrack(kind, label, language)`**: Adds a new text track to the player.
 - **`seekToMarker(id)`**: Seeks to the marker with the specified ID.
+- **`requestPictureInPicture()`**: Requests Picture-in-Picture mode for the video. Returns a Promise resolving to the PiP Window.
 
 ### Visual Markers
 
@@ -142,5 +143,9 @@ const controller = player.getController();
 
 if (controller) {
   controller.setInputProps({ newProp: 'value' });
+
+  // Audio Track Control
+  controller.setAudioTrackVolume('my-music-track', 0.5);
+  controller.setAudioTrackMuted('my-sfx-track', true);
 }
 ```

@@ -24,6 +24,8 @@ The Studio will start a local server (typically at `http://localhost:3000`) and 
 The Studio automatically scans your project (based on `HELIOS_PROJECT_ROOT` or current directory) to find available compositions. It lists them in the sidebar or command palette for easy navigation.
 
 - **Create Composition**: You can create new compositions directly from the UI using templates for Vanilla JS, React, Vue, Svelte, and Three.js.
+- **Duplicate Composition**: You can duplicate an existing composition to use as a starting point.
+- **Rename Composition**: You can rename a composition (which updates the directory name and ID) from the Settings modal.
 - **Delete Composition**: You can delete existing compositions (requires confirmation).
 
 ### Diagnostics Panel
@@ -52,6 +54,7 @@ Accessible from the sidebar, this panel provides real-time information about you
 Manage your project's assets directly from the Studio.
 -   **Discovery**: Automatically lists files in your project's `assets/` directory.
 -   **Upload**: Drag and drop files to upload them.
+-   **Renaming**: You can rename assets directly in the panel. The Studio will attempt to update references, but be careful as this changes the asset's URL.
 -   **Preview**: Rich previews for Images, Video, Audio, Fonts, 3D Models (.glb/.gltf), JSON data, and Shaders.
 -   **Drag & Drop**: You can drag assets from the panel directly into the Props Editor to assign them to image/video/audio inputs.
 
@@ -61,7 +64,11 @@ If your composition defines an input schema or uses `inputProps`, the Studio gen
 
 -   **Groups**: Props can be organized into collapsible groups using the `group` property in the schema.
 -   **Nested Objects/Arrays**: Supports deep editing of complex objects and arrays.
--   **Validation**: Enforces constraints like `min`, `max`, `pattern`, and `accept` defined in your schema.
+-   **Validation**: The UI provides immediate feedback for constraints:
+    - `min` / `max`: Clamps numeric inputs and length.
+    - `pattern`: Validates text against Regex.
+    - `accept`: Filters file selection for assets (e.g., `image/*`).
+    - `minItems` / `maxItems`: Enforces array length limits.
 -   **Asset Drag & Drop**: You can drag files from the Assets Panel directly into image/video/audio inputs.
 
 ### Render Configuration

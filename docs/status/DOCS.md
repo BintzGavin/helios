@@ -1,8 +1,16 @@
-**Version**: 1.5.0
+**Version**: 1.6.0
 
 # DOCS Status
 
 ## Recent Updates
+[v1.6.0] ✅ Completed: Daily Documentation Review - Audio Tracks & Diagnostics
+- Updated all Changelogs (Core v3.9.0, Player v0.51.0, Renderer v1.54.0, Demo v1.79.0, Studio v0.71.0).
+- Updated API Docs: Core (Bind/Unbind, Audio Tracks), Player (Audio Controls, PiP), Renderer (Canvas Selector, Diagnostics).
+- Created Example Docs: Vue Captions, Diagnostics, Vanilla TypeScript.
+- Created Guide: Audio Tracks & Fading.
+- Updated Studio Guide: Renaming, Duplication, Schema Constraints.
+- Updated Navigation (`mint.json`).
+
 [v1.5.0] ✅ Completed: Daily Documentation Review - Major sync.
 - Updated all Changelogs with latest versions from PROGRESS files.
 - Updated API Docs: Core (System Prompt, Stagger/Shift, Schema), Player (TextTracks, Markers, Shortcuts), Renderer (FrameCount).

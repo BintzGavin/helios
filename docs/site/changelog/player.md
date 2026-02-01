@@ -5,6 +5,16 @@ description: "Changelog for the Player package"
 
 # Player Changelog
 
+## v0.51.0
+- **Expose Audio Track IDs**: Updated `getAudioAssets` to populate `id` from `data-helios-track-id`, standard `id`, or fallback index, enabling robust track identification.
+
+## v0.50.0
+- **Audio Track Control**: Added `setAudioTrackVolume` and `setAudioTrackMuted` to `HeliosController` and the Bridge protocol, enabling granular audio control.
+
+## v0.49.0
+- **Picture-in-Picture**: Implemented `requestPictureInPicture` API and UI toggle button for the player.
+- **Persist Media Properties**: Implemented persistence for `volume`, `playbackRate`, and `muted` properties so values set before the player loads are applied when the controller connects.
+
 ## v0.48.1
 - **Harden Bridge Security**: Implemented explicit source verification for all postMessage listeners in HeliosPlayer and BridgeController to prevent cross-talk and improve security.
 

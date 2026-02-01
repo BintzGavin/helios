@@ -5,6 +5,28 @@ description: "Changelog for the Core package"
 
 # Core Changelog
 
+## v3.9.0
+- **Fix Signal Glitches and Runtime Safety**: Optimized `EffectImpl` to avoid redundant executions and guarded `Helios.bindToDocumentTimeline` for Node.js compatibility.
+
+## v3.8.0
+- **Implement Audio Track Discovery**: Implemented `availableAudioTracks` signal in `Helios` and updated `DomDriver` to discover elements with `data-helios-track-id`.
+
+## v3.7.0
+- **Implement DomDriver Audio Looping**: Updated `DomDriver` to respect the `loop` attribute on media elements, wrapping time calculations to support infinite loops.
+
+## v3.6.0
+- **Refactor Helios**: Extracted Helios class to dedicated Helios.ts file.
+- **Implement Audio Fading**: Added support for `data-helios-fade-in` and `data-helios-fade-out` in `DomDriver` to enable linear audio fading.
+
+## v3.5.1
+- **Implement Reactive Virtual Time**: Replaced polling with reactive setter for `__HELIOS_VIRTUAL_TIME__` in `bindToDocumentTimeline`.
+
+## v3.5.0
+- **Implement Timeline Sync**: Added `Helios.bindTo(master)` and `Helios.unbind()` for synchronizing multiple Helios instances.
+
+## v3.4.0
+- **Implement Audio Tracks**: Added support for audio tracks allowing independent volume/mute control for groups of elements using `data-helios-track-id`.
+
 ## v3.2.0
 - **Implement AI System Prompt Generator**: Added `createSystemPrompt` and `HELIOS_BASE_PROMPT` to programmatically generate context-aware system prompts for AI agents.
 

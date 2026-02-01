@@ -1,5 +1,14 @@
 # DOCS Progress Log
 
+## DOCS v1.6.0
+- ✅ Completed: Daily Documentation Review
+  - Updated API documentation for Core (Audio Tracks), Player (PiP), Renderer (Canvas Selector)
+  - Synced changelog entries for all packages (v3.9.0 Core, v0.51.0 Player, v1.54.0 Renderer)
+  - Created documentation for 3 new examples (Vue Captions, Diagnostics, Vanilla TS)
+  - Created "Audio Tracks & Fading" guide
+  - Updated Studio guide with new features (Renaming, Duplication)
+  - Updated navigation structure in `mint.json`
+
 ## DOCS v1.5.0
 - ✅ Completed: Daily Documentation Review
   - Updated API documentation for Core, Player, and Renderer

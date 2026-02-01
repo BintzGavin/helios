@@ -43,6 +43,9 @@ const options: RendererOptions = {
   startFrame: 0,
   frameCount: 150, // Optional: Override duration to render exactly this many frames
 
+  // Canvas Targeting
+  canvasSelector: '#my-canvas', // Optional: Select a specific canvas element
+
   ffmpegPath: '/path/to/ffmpeg' // Optional
 };
 
@@ -81,11 +84,27 @@ The renderer uses different strategies based on `mode`:
 ### Diagnostics
 
 #### `Renderer.diagnose()`
-Runs diagnostic checks on the page context to verify WebCodecs support, WAAPI availability, and other environment capabilities using a headless browser.
+Runs diagnostic checks on the page context to verify WebCodecs support (H.264, VP8, VP9, AV1), WAAPI availability, and other environment capabilities using a headless browser. Returns a detailed report including browser capabilities and FFmpeg configuration.
 
 ```typescript
 const diagnostics = await renderer.diagnose();
 console.log(diagnostics);
+/*
+{
+  browser: {
+    webCodecs: {
+      h264: true,
+      vp8: true,
+      ...
+    },
+    waapi: true
+  },
+  ffmpeg: {
+    version: "...",
+    encoders: ["libx264", ...]
+  }
+}
+*/
 ```
 
 ## Utilities

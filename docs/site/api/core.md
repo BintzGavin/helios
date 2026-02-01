@@ -46,6 +46,7 @@ Helios uses signals for reactive state management. You can subscribe to these si
 - **`activeCaptions`** (`ReadonlySignal<CaptionCue[]>`): The list of captions active at the current time.
 - **`width`** (`ReadonlySignal<number>`): The composition width.
 - **`height`** (`ReadonlySignal<number>`): The composition height.
+- **`availableAudioTracks`** (`ReadonlySignal<string[]>`): List of detected audio track IDs.
 
 ### Methods
 
@@ -103,12 +104,18 @@ Updates the captions. Accepts an SRT string or an array of `CaptionCue` objects.
 #### `setSize(width, height)`
 Updates the composition resolution.
 
+#### `bindTo(master: Helios)`
+Binds this Helios instance to a master Helios instance. This instance will sync its state (time, playback, etc.) with the master.
+
+#### `unbind()`
+Unbinds this instance from any master (including `document.timeline` or another Helios instance).
+
 #### `bindToDocumentTimeline()`
 Binds the Helios instance to `document.timeline`. Useful when the timeline is driven externally (e.g., by the Renderer or Studio).
 Helios will poll `document.timeline.currentTime` and update its internal state.
 
 #### `unbindFromDocumentTimeline()`
-Stops syncing with `document.timeline`.
+*Deprecated*: Use `unbind()` instead.
 
 #### `dispose()`
 Cleans up resources (tickers, polling loops, subscribers, drivers) to prevent memory leaks.
@@ -117,6 +124,17 @@ Cleans up resources (tickers, polling loops, subscribers, drivers) to prevent me
 
 #### `Helios.diagnose()`
 Returns a `Promise<DiagnosticReport>` containing environment support information (WAAPI, WebCodecs, OffscreenCanvas, User Agent).
+
+## DomDriver Attributes
+
+When using `DomDriver` (default), you can control behavior using data attributes on DOM elements.
+
+### Audio & Video Control
+- **`data-helios-track-id="my-track"`**: Assigns an ID to an audio/video element. Used for grouping volume/mute controls.
+- **`data-helios-fade-in="duration"`**: Linearly fades in the audio volume over `duration` seconds at the start of the media.
+- **`data-helios-fade-out="duration"`**: Linearly fades out the audio volume over `duration` seconds before the end of the media.
+- **`data-helios-offset="seconds"`**: Delays the media playback by `seconds`.
+- **`data-helios-seek="seconds"`**: Starts playback from `seconds` into the media file (clips the beginning).
 
 ## Validation (Schema)
 
