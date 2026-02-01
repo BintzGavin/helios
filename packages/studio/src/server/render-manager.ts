@@ -1,5 +1,4 @@
-// @ts-ignore - Importing from sibling package source to avoid build issues
-import { Renderer } from '../../../renderer/src/index';
+import { Renderer } from '@helios-project/renderer';
 import path from 'path';
 import fs from 'fs';
 import { getProjectRoot } from './discovery';

@@ -1,3 +1,6 @@
+## STUDIO v0.70.2
+- ✅ Verified: Refactor Render Manager Imports - Updated tsconfig.json to alias @helios-project packages to source, and refactored render-manager.ts to use clean imports, ensuring robust type checking and verified persistence logic.
+
 ## STUDIO v0.70.1
 - ✅ Verified: Maintenance - Synced package.json version and added lint script.
 
