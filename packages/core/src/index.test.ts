@@ -364,6 +364,54 @@ describe('Helios Core', () => {
         delete (window as any).__HELIOS_VIRTUAL_TIME__;
         helios.unbindFromDocumentTimeline();
     });
+
+    it('should update synchronously when setting __HELIOS_VIRTUAL_TIME__', () => {
+        const helios = new Helios({ duration: 10, fps: 30 });
+        helios.bindToDocumentTimeline();
+
+        // 1000ms = 1 second = 30 frames
+        (window as any).__HELIOS_VIRTUAL_TIME__ = 1000;
+
+        // No wait needed!
+        expect(helios.getState().currentFrame).toBe(30);
+
+        // 2000ms = 2 seconds = 60 frames
+        (window as any).__HELIOS_VIRTUAL_TIME__ = 2000;
+        expect(helios.getState().currentFrame).toBe(60);
+
+        helios.unbindFromDocumentTimeline();
+        delete (window as any).__HELIOS_VIRTUAL_TIME__;
+    });
+
+    it('should restore original __HELIOS_VIRTUAL_TIME__ descriptor on unbind', () => {
+        // Define an original property
+        Object.defineProperty(window, '__HELIOS_VIRTUAL_TIME__', {
+            value: 999,
+            configurable: true,
+            writable: true,
+            enumerable: true
+        });
+
+        const helios = new Helios({ duration: 10, fps: 30 });
+        helios.bindToDocumentTimeline();
+
+        // Should be hijacked now (getter/setter)
+        (window as any).__HELIOS_VIRTUAL_TIME__ = 1000;
+        expect(helios.getState().currentFrame).toBe(30);
+
+        helios.unbindFromDocumentTimeline();
+
+        // Should be restored
+        const descriptor = Object.getOwnPropertyDescriptor(window, '__HELIOS_VIRTUAL_TIME__');
+        expect(descriptor?.value).toBe(999);
+        expect((window as any).__HELIOS_VIRTUAL_TIME__).toBe(999);
+
+        // Setting it now should NOT update helios
+        (window as any).__HELIOS_VIRTUAL_TIME__ = 2000;
+        expect(helios.getState().currentFrame).toBe(30); // Remains 30
+
+        delete (window as any).__HELIOS_VIRTUAL_TIME__;
+    });
   });
 
   describe('WAAPI Synchronization', () => {

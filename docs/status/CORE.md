@@ -1,11 +1,12 @@
 # Status: CORE
 
-**Version**: 3.5.0
+**Version**: 3.5.1
 
 - **Status**: Active
 - **Current Focus**: Maintenance, Optimization, and Stability
 - **Last Updated**: 2026-06-08
 
+[v3.5.1] ✅ Completed: Implement Reactive Virtual Time - Replaced polling with reactive setter for `__HELIOS_VIRTUAL_TIME__` in `bindToDocumentTimeline` to ensure reliable headless rendering sync.
 [v3.5.0] ✅ Completed: Implement Timeline Sync - Added `Helios.bindTo(master)` and `Helios.unbind()` for synchronizing multiple Helios instances.
 [v3.4.0] ✅ Completed: Implement Audio Tracks - Added track-based volume/mute control via data-helios-track-id and helios.setAudioTrackVolume/Muted.
 [v3.3.1] ✅ Completed: Update Skill Docs - Updated .agents/skills/helios/core/SKILL.md to match v3.3.0 API (DiagnosticReport, Sequencing Helpers).
