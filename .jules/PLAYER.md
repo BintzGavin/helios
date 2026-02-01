@@ -5,3 +5,7 @@
 ## [v0.46.1] - Planner Role Violation
 **Learning:** I mistakenly implemented the feature code instead of just creating the plan file, violating the Planner Protocol.
 **Action:** Always stop after creating the `.md` plan file. Do not write feature code, do not run build/test verification for the feature code (only for the plan feasibility if needed).
+
+## [v0.49.3] - Audio Track Control Gap
+**Learning:** Discovered that `HeliosController` interface blocked Studio from controlling individual audio tracks, despite Core support.
+**Action:** When defining cross-domain interfaces (Player <-> Studio), verify all necessary Core capabilities are exposed, not just the ones needed for the immediate UI.
