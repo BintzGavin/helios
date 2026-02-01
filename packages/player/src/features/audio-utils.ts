@@ -1,5 +1,6 @@
 
 export interface AudioAsset {
+  id: string;
   buffer: ArrayBuffer;
   mimeType: string | null;
   volume?: number;
@@ -10,12 +11,19 @@ export interface AudioAsset {
 
 export async function getAudioAssets(doc: Document): Promise<AudioAsset[]> {
   const audioTags = Array.from(doc.querySelectorAll('audio'));
-  return Promise.all(audioTags.map(async (tag) => {
-    if (!tag.src) return { buffer: new ArrayBuffer(0), mimeType: null };
+  return Promise.all(audioTags.map(async (tag, index) => {
+    // ID Extraction Priority:
+    // 1. data-helios-track-id (Used by DomDriver for control)
+    // 2. id attribute (Standard DOM)
+    // 3. Fallback: generated "track-${index}" (Stable fallback for listing)
+    const id = tag.getAttribute('data-helios-track-id') || tag.id || `track-${index}`;
+
+    if (!tag.src) return { id, buffer: new ArrayBuffer(0), mimeType: null };
     try {
         const res = await fetch(tag.src);
         const volumeAttr = tag.getAttribute('volume');
         return {
+            id,
             buffer: await res.arrayBuffer(),
             mimeType: res.headers.get('content-type'),
             // Support non-standard 'volume' attribute for declarative usage, fallback to DOM property
@@ -26,7 +34,7 @@ export async function getAudioAssets(doc: Document): Promise<AudioAsset[]> {
         };
     } catch (e) {
         console.warn("Failed to fetch audio asset:", tag.src, e);
-        return { buffer: new ArrayBuffer(0), mimeType: null };
+        return { id, buffer: new ArrayBuffer(0), mimeType: null };
     }
   }));
 }

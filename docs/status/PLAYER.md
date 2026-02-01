@@ -1,4 +1,4 @@
-**Version**: v0.50.0
+**Version**: v0.51.0
 
 # Status: PLAYER
 
@@ -46,6 +46,7 @@
 ## Critical Task
 - **None**: All critical tasks completed.
 
+[v0.51.0] ✅ Completed: Expose Audio Track IDs - Updated `getAudioAssets` to populate `id` from `data-helios-track-id`, standard `id`, or fallback index, enabling robust track identification.
 [v0.50.0] ✅ Completed: Audio Track Control - Added `setAudioTrackVolume` and `setAudioTrackMuted` to `HeliosController` and the Bridge protocol, enabling granular audio control.
 [v0.49.3] ✅ Completed: Verify and Harden Persist Media Properties - Added comprehensive unit tests for volume clamping and muted property precedence to verify robustness of persisted media properties.
 [v0.49.3] ✅ Verified: Synced package.json version with status file and verified all tests pass.
