@@ -1,6 +1,7 @@
 # CORE Progress Log
 
 ## CORE v3.6.0
+- ✅ Completed: Refactor Helios - Extracted Helios class to dedicated Helios.ts file and cleaned up index.ts exports.
 - ✅ Completed: Implement Audio Fading - Added support for `data-helios-fade-in` and `data-helios-fade-out` in `DomDriver` to enable linear audio fading.
 
 ## CORE v3.5.1

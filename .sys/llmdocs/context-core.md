@@ -19,6 +19,7 @@ The `DomDriver` acts as the bridge between the pure mathematical state of Helios
 
 ```
 packages/core/src/
+├── Helios.ts
 ├── ai.ts
 ├── animation.ts
 ├── captions.ts
@@ -45,7 +46,7 @@ packages/core/src/
 ## C. Type Definitions
 
 ```typescript
-// From index.ts
+// From Helios.ts
 
 export type HeliosState = {
   width: number;

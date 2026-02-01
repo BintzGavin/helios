@@ -6,6 +6,7 @@
 - **Current Focus**: Maintenance, Optimization, and Stability
 - **Last Updated**: 2026-06-08
 
+[v3.6.0] ✅ Completed: Refactor Helios - Extracted Helios class to dedicated Helios.ts file and cleaned up index.ts exports.
 [v3.6.0] ✅ Completed: Implement Audio Fading - Added support for `data-helios-fade-in` and `data-helios-fade-out` in `DomDriver` to enable linear audio fading.
 [v3.5.1] ✅ Completed: Implement Reactive Virtual Time - Replaced polling with reactive setter for `__HELIOS_VIRTUAL_TIME__` in `bindToDocumentTimeline` to ensure reliable headless rendering sync.
 [v3.5.0] ✅ Completed: Implement Timeline Sync - Added `Helios.bindTo(master)` and `Helios.unbind()` for synchronizing multiple Helios instances.
