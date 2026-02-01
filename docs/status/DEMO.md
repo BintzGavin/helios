@@ -9,7 +9,7 @@ The DEMO domain is responsible for:
 3.  **Build Config:** Maintaining the root `vite.config.js` and build scripts to support the examples.
 
 ## Blocked Items
-- None
+- Verification blocked by build failure in `packages/core`. `npm run build` fails with `error TS2741` in `src/index.test.ts` (missing `availableAudioTracks` in test state).
 
 ## Active Tasks
 - None
