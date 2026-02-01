@@ -1,8 +1,13 @@
-**Version**: 1.52.0
+**Version**: 1.54.0
 
 # Renderer Agent Status
 
 ## Progress Log
+- [1.54.0] ✅ Completed: Implement Canvas Selector - Added `canvasSelector` to `RendererOptions` and updated `CanvasStrategy` to target specific canvas elements (e.g., `#my-canvas`), enabling support for multi-canvas compositions and layered architectures.
+- [1.53.2] ✅ Completed: Sync Core Dependency - Updated `packages/renderer/package.json` to depend on `@helios-project/core` version `3.6.0` (matching the workspace), fixing dependency resolution issues and ensuring compatibility with the latest core features.
+- [1.53.1] ✅ Completed: Fix Workspace Version Mismatch - Updated `packages/renderer/package.json` to depend on `@helios-project/core` version `3.4.0` (matching the workspace), enabling strict version synchronization and preventing lockfile drift.
+- [1.53.0] ✅ Completed: Enhance Diagnostics - Updated `CanvasStrategy.diagnose()` to perform comprehensive checks of supported WebCodecs (H.264, VP8, VP9, AV1) in the browser environment, returning a detailed `codecs` report for better debuggability.
+- [1.52.1] ✅ Completed: Fix GSAP Timeline Synchronization - Updated `SeekTimeDriver` to wait for `window.__helios_gsap_timeline__` initialization (handling ES module async loading) and explicitly seek the GSAP timeline in `setTime`, resolving the black screen issue in the promo video example.
 - [1.52.0] ✅ Completed: Enable Audio Looping - Updated `DomScanner` and `FFmpegBuilder` to support the `loop` attribute on `<audio>` and `<video>` elements by injecting `-stream_loop -1` into FFmpeg input args.
 - [1.51.0] ✅ Completed: Enable Recursive Shadow DOM Image Preloading - Updated `DomStrategy` to recursively discover and preload `<img>` tags within Shadow DOMs using `TreeWalker`, ensuring images in Web Components are fully loaded before rendering.
 - [1.50.0] ✅ Completed: Enable Blob Audio - Implemented `blob-extractor` to bridge browser `blob:` URLs to FFmpeg by extracting content to temporary files, enabling support for dynamic client-side audio (e.g., text-to-speech).
@@ -205,3 +210,7 @@
 ## 2026-06-09 - Orphaned Plans
 **Learning:** Found an existing plan (`2026-02-18-RENDERER-Canvas-Selector.md`) that was never implemented (test file missing). This indicates a potential disconnect between Planning and Execution phases.
 **Action:** When identifying gaps, check `.sys/plans` for existing but unexecuted plans before creating new ones. If found, "revive" them by updating the date/content or referencing them.
+
+## 2026-06-10 - Verification Correction
+**Learning:** Identified that `DomScanner` *does* implement declarative audio fades, contradicting the journal entry `[2026-06-08]`. The gap was actually in the *verification* suite (tests existed but weren't running).
+**Action:** Always verify "missing features" by reading the code before trusting the journal. Prioritize enabling existing tests in `run-all.ts` over reimplementing supposedly missing features.
