@@ -1,6 +1,6 @@
 {
   "name": "@helios-project/player",
-  "version": "0.49.3",
+  "version": "0.50.0",
   "description": "Web Component player for Helios compositions.",
   "author": "Gavin Bintz <me@gavinbintz.com>",
   "license": "ELv2",
