@@ -6,9 +6,11 @@ import { Asset } from '../../context/StudioContext';
 
 // Mock useStudio
 const mockDeleteAsset = vi.fn();
+const mockRenameAsset = vi.fn(() => Promise.resolve());
 vi.mock('../../context/StudioContext', () => ({
   useStudio: () => ({
-    deleteAsset: mockDeleteAsset
+    deleteAsset: mockDeleteAsset,
+    renameAsset: mockRenameAsset
   })
 }));
 
@@ -99,7 +101,7 @@ describe('AssetItem', () => {
     expect(fontPreview).toHaveTextContent('Aa');
   });
 
-  it('shows delete button on hover and calls deleteAsset on click', () => {
+  it('shows delete button on hover and confirms delete via modal', () => {
     const asset: Asset = { id: '1', name: 'test.png', url: '/test.png', type: 'image', relativePath: 'test.png' };
     render(<AssetItem asset={asset} />);
 
@@ -109,11 +111,59 @@ describe('AssetItem', () => {
     const deleteBtn = document.querySelector('.delete-btn');
     expect(deleteBtn).toBeInTheDocument();
 
-    // Mock confirm
-    window.confirm = vi.fn(() => true);
+    // Ensure confirm is not used
+    const confirmSpy = vi.spyOn(window, 'confirm');
 
     fireEvent.click(deleteBtn!);
+
+    expect(confirmSpy).not.toHaveBeenCalled();
+    expect(mockDeleteAsset).not.toHaveBeenCalled();
+
+    // Check for Modal
+    expect(screen.getByText('Delete Asset')).toBeInTheDocument();
+
+    // Click Delete in Modal (find button by text 'Delete')
+    // We need to be specific because Title also says "Delete Asset"
+    // Use selector button
+    const confirmBtn = screen.getAllByText('Delete').find(el => el.tagName === 'BUTTON');
+    expect(confirmBtn).toBeInTheDocument();
+
+    fireEvent.click(confirmBtn!);
+
     expect(mockDeleteAsset).toHaveBeenCalledWith('1');
+
+    // Modal should close
+    expect(screen.queryByText('Are you sure you want to delete "test.png"? This action cannot be undone and may break compositions referencing this file.')).not.toBeInTheDocument();
+  });
+
+  it('shows rename warning modal when renaming', async () => {
+    const asset: Asset = { id: '1', name: 'test.png', url: '/test.png', type: 'image', relativePath: 'test.png' };
+    render(<AssetItem asset={asset} />);
+
+    const container = screen.getByText('test.png').closest('.asset-item')!;
+    fireEvent.mouseEnter(container);
+
+    // Click edit
+    const editBtn = document.querySelector('.rename-btn');
+    fireEvent.click(editBtn!);
+
+    // Change input
+    const input = screen.getByDisplayValue('test.png');
+    fireEvent.change(input, { target: { value: 'new.png' } });
+
+    // Submit (blur)
+    fireEvent.blur(input);
+
+    // Modal should appear
+    expect(screen.getByText('Rename Asset')).toBeInTheDocument();
+    expect(screen.getByText(/Renaming this asset will change its file path/)).toBeInTheDocument();
+    expect(mockRenameAsset).not.toHaveBeenCalled();
+
+    // Click Rename in Modal
+    const confirmBtn = screen.getAllByText('Rename').find(el => el.tagName === 'BUTTON');
+    fireEvent.click(confirmBtn!);
+
+    expect(mockRenameAsset).toHaveBeenCalledWith('1', 'new.png');
   });
 
   it('renders new asset types (model, json, shader) correctly', () => {
