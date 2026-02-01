@@ -61,6 +61,7 @@ export type HeliosState = {
   volume: number;
   muted: boolean;
   audioTracks: Record<string, AudioTrackState>;
+  availableAudioTracks: string[];
   captions: CaptionCue[];
   activeCaptions: CaptionCue[];
   markers: Marker[];
@@ -145,6 +146,7 @@ class Helios {
   get volume(): ReadonlySignal<number>;
   get muted(): ReadonlySignal<boolean>;
   get audioTracks(): ReadonlySignal<Record<string, AudioTrackState>>;
+  get availableAudioTracks(): ReadonlySignal<string[]>;
   get captions(): ReadonlySignal<CaptionCue[]>;
   get activeCaptions(): ReadonlySignal<CaptionCue[]>;
   get markers(): ReadonlySignal<Marker[]>;

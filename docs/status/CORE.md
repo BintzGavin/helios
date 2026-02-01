@@ -1,11 +1,12 @@
 # Status: CORE
 
-**Version**: 3.7.0
+**Version**: 3.8.0
 
 - **Status**: Active
 - **Current Focus**: Maintenance, Optimization, and Stability
-- **Last Updated**: 2026-06-09
+- **Last Updated**: 2026-06-10
 
+[v3.8.0] ✅ Completed: Implement Audio Track Discovery - Implemented `availableAudioTracks` signal in `Helios` and updated `DomDriver` to discover elements with `data-helios-track-id`.
 [v3.7.0] ✅ Completed: Implement DomDriver Audio Looping - Updated `DomDriver` to respect the `loop` attribute on media elements, wrapping time calculations to support infinite loops.
 [v3.6.0] ✅ Completed: Refactor Helios - Extracted Helios class to dedicated Helios.ts file and cleaned up index.ts exports.
 [v3.6.0] ✅ Completed: Implement Audio Fading - Added support for `data-helios-fade-in` and `data-helios-fade-out` in `DomDriver` to enable linear audio fading.
