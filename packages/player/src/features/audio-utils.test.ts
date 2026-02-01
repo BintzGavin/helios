@@ -49,6 +49,28 @@ describe('audio-utils', () => {
       expect(assets[1].startTime).toBe(0); // Default
       expect(assets[2].startTime).toBe(0); // Fallback on invalid
     });
+
+    it('should extract IDs with correct priority', async () => {
+      document.body.innerHTML = `
+        <audio src="track1.mp3" data-helios-track-id="custom-id"></audio>
+        <audio src="track2.mp3" id="dom-id"></audio>
+        <audio src="track3.mp3"></audio>
+      `;
+      const assets = await getAudioAssets(document);
+      expect(assets).toHaveLength(3);
+      expect(assets[0].id).toBe('custom-id');
+      expect(assets[1].id).toBe('dom-id');
+      expect(assets[2].id).toBe('track-2'); // index 2
+    });
+
+    it('should prioritize data-helios-track-id over id attribute', async () => {
+      document.body.innerHTML = `
+        <audio src="track1.mp3" data-helios-track-id="priority-id" id="ignored-id"></audio>
+      `;
+      const assets = await getAudioAssets(document);
+      expect(assets).toHaveLength(1);
+      expect(assets[0].id).toBe('priority-id');
+    });
   });
 
   describe('mixAudio', () => {
