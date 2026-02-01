@@ -1,8 +1,9 @@
-**Version**: 1.53.0
+**Version**: 1.53.1
 
 # Renderer Agent Status
 
 ## Progress Log
+- [1.53.1] ✅ Completed: Fix Workspace Version Mismatch - Updated `packages/renderer/package.json` to depend on `@helios-project/core` version `3.4.0` (matching the workspace), enabling strict version synchronization and preventing lockfile drift.
 - [1.53.0] ✅ Completed: Enhance Diagnostics - Updated `CanvasStrategy.diagnose()` to perform comprehensive checks of supported WebCodecs (H.264, VP8, VP9, AV1) in the browser environment, returning a detailed `codecs` report for better debuggability.
 - [1.52.1] ✅ Completed: Fix GSAP Timeline Synchronization - Updated `SeekTimeDriver` to wait for `window.__helios_gsap_timeline__` initialization (handling ES module async loading) and explicitly seek the GSAP timeline in `setTime`, resolving the black screen issue in the promo video example.
 - [1.52.0] ✅ Completed: Enable Audio Looping - Updated `DomScanner` and `FFmpegBuilder` to support the `loop` attribute on `<audio>` and `<video>` elements by injecting `-stream_loop -1` into FFmpeg input args.
