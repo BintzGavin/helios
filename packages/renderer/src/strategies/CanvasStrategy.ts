@@ -27,12 +27,40 @@ export class CanvasStrategy implements RenderStrategy {
   }
 
   async diagnose(page: Page): Promise<any> {
-    return await page.evaluate(function() {
+    return await page.evaluate(async function() {
       console.log('[Helios Diagnostics] Checking Canvas environment...');
+
+      const configs = [
+        { id: 'h264', config: { codec: 'avc1.4d002a', width: 1920, height: 1080, avc: { format: 'annexb' } } }, // H.264 High Profile
+        { id: 'vp8', config: { codec: 'vp8', width: 1920, height: 1080 } },
+        { id: 'vp9', config: { codec: 'vp9', width: 1920, height: 1080 } },
+        { id: 'av1', config: { codec: 'av01.0.08M.08', width: 1920, height: 1080 } }
+      ];
+
+      const codecs: Record<string, boolean> = {};
+      const videoEncoderSupported = typeof VideoEncoder !== 'undefined';
+
+      // Initialize with false
+      for (const c of configs) {
+        codecs[c.id] = false;
+      }
+
+      if (videoEncoderSupported) {
+        for (const c of configs) {
+          try {
+            const support = await VideoEncoder.isConfigSupported(c.config as any);
+            codecs[c.id] = support.supported || false;
+          } catch (e) {
+            codecs[c.id] = false;
+          }
+        }
+      }
+
       const report = {
-        videoEncoder: typeof VideoEncoder !== 'undefined',
+        videoEncoder: videoEncoderSupported,
         offscreenCanvas: typeof OffscreenCanvas !== 'undefined',
         userAgent: navigator.userAgent,
+        codecs
       };
       return report;
     });

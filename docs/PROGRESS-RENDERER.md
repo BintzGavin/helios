@@ -1,3 +1,6 @@
+## RENDERER v1.53.0
+- ✅ Completed: Enhance Diagnostics - Updated `CanvasStrategy.diagnose()` to perform comprehensive checks of supported WebCodecs (H.264, VP8, VP9, AV1) in the browser environment, returning a detailed `codecs` report for better debuggability.
+
 ## RENDERER v1.52.1
 - ✅ Completed: Fix GSAP Timeline Synchronization - Updated `SeekTimeDriver` to wait for `window.__helios_gsap_timeline__` initialization (handling ES module async loading) and explicitly seek the GSAP timeline in `setTime`, resolving the black screen issue in the promo video example.
 
