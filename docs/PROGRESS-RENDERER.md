@@ -1,3 +1,6 @@
+## RENDERER v1.56.2
+- ✅ Completed: Revive Verification Suite - Updated `run-all.ts` to include 5 orphaned verification scripts (`verify-blob-audio`, `verify-dom-audio-fades`, `verify-enhanced-dom-preload`, `verify-frame-count`, `verify-shadow-dom-images`), enabling full verification coverage. Also fixed `tests/verify-bitrate.ts` and updated workspace dependency versions.
+
 ## RENDERER v1.56.1
 - ✅ Completed: Sync Core Dependency - Updated `packages/renderer/package.json` to depend on `@helios-project/core` version `3.9.2` (matching the workspace), ensuring compatibility. Also fixed `tests/verify-canvas-strategy.ts` to correctly inject a canvas element.
 

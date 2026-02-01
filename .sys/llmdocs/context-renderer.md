@@ -44,6 +44,9 @@ packages/renderer/
     ├── verify-cdp-shadow-dom-sync.ts # Shadow DOM media sync test (Canvas Mode)
     ├── verify-shadow-dom-images.ts # Shadow DOM image discovery test
     ├── verify-enhanced-dom-preload.ts # Enhanced DOM preloading test
+    ├── verify-blob-audio.ts    # Blob audio extraction test
+    ├── verify-dom-audio-fades.ts # DOM audio fades test
+    ├── verify-frame-count.ts   # Precision frame count test
     ├── verify-cdp-hang.ts      # CDP initialization order/deadlock test
     ├── verify-cdp-driver.ts    # CdpDriver budget test
     ├── verify-cdp-driver-timeout.ts # CdpDriver stability timeout test
