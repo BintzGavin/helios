@@ -23,6 +23,7 @@ type Subscribable = {
   addSubscriber(sub: Subscriber): void;
   removeSubscriber(sub: Subscriber): void;
   version: number;
+  hasChanged?(): boolean;
 };
 
 // Global context
@@ -151,6 +152,10 @@ class ComputedImpl<T> implements ReadonlySignal<T>, Subscriber, Subscribable {
     return this._value!;
   }
 
+  hasChanged(): boolean {
+    return this._shouldUpdate();
+  }
+
   private _shouldUpdate(): boolean {
     if (this._dirty) return true;
     // If not dirty, check if any dependency has changed (version mismatch)
@@ -195,9 +200,11 @@ class ComputedImpl<T> implements ReadonlySignal<T>, Subscriber, Subscribable {
 
   notify() {
     if (!this._dirty) {
-      this._dirty = true;
-      for (const sub of [...this._subscribers]) {
-        sub.notify();
+      if (this._shouldUpdate()) {
+        this._dirty = true;
+        for (const sub of [...this._subscribers]) {
+          sub.notify();
+        }
       }
     }
   }
@@ -270,7 +277,7 @@ export function computed<T>(fn: () => T): ReadonlySignal<T> {
 
 class EffectImpl implements Subscriber {
   private _fn: () => void;
-  private _dependencies = new Set<Subscribable>();
+  private _dependencies = new Map<Subscribable, number>();
   private _disposed = false;
 
   constructor(fn: () => void) {
@@ -293,18 +300,30 @@ class EffectImpl implements Subscriber {
   }
 
   notify() {
-    this.run();
+    if (this._shouldRun()) {
+      this.run();
+    }
+  }
+
+  private _shouldRun(): boolean {
+    for (const [dep, version] of this._dependencies) {
+      if (dep.version !== version) return true;
+      if (dep.hasChanged && dep.hasChanged()) return true;
+    }
+    return false;
   }
 
   addDependency(dep: Subscribable) {
     if (!this._dependencies.has(dep)) {
       dep.addSubscriber(this);
-      this._dependencies.add(dep);
+      this._dependencies.set(dep, dep.version);
+    } else {
+      this._dependencies.set(dep, dep.version);
     }
   }
 
   private _cleanupDeps() {
-    for (const dep of this._dependencies) {
+    for (const [dep] of this._dependencies) {
       dep.removeSubscriber(this);
     }
     this._dependencies.clear();

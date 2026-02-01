@@ -26,7 +26,12 @@ packages/core/src/
 ├── color.ts
 ├── drivers/
 │   ├── DomDriver.ts
+│   ├── ManualTicker.ts
+│   ├── NoopDriver.ts
+│   ├── RafTicker.ts
+│   ├── Ticker.ts
 │   ├── TimeDriver.ts
+│   ├── TimeoutTicker.ts
 │   ├── WaapiDriver.ts
 │   └── index.ts
 ├── easing.ts

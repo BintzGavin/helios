@@ -1,5 +1,8 @@
 # CORE Progress Log
 
+## CORE v3.9.0
+- ✅ Completed: Fix Signal Glitches and Runtime Safety - Optimized `EffectImpl` to avoid redundant executions (diamond problem) and guarded `Helios.bindToDocumentTimeline` for Node.js compatibility.
+
 ## CORE v3.8.0
 - ✅ Completed: Implement Audio Track Discovery - Implemented `availableAudioTracks` signal in `Helios` and updated `DomDriver` to discover elements with `data-helios-track-id`.
 
