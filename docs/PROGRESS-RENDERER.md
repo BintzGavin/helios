@@ -1,3 +1,6 @@
+## RENDERER v1.56.3
+- ✅ Completed: Update Verification Suite - Refactored `verify-cancellation.ts` and `verify-trace.ts` to be self-contained and added them (along with `verify-ffmpeg-path.ts`) to `run-all.ts`, ensuring continuous regression testing for these features.
+
 ## RENDERER v1.56.2
 - ✅ Completed: Revive Verification Suite - Updated `run-all.ts` to include 5 orphaned verification scripts (`verify-blob-audio`, `verify-dom-audio-fades`, `verify-enhanced-dom-preload`, `verify-frame-count`, `verify-shadow-dom-images`), enabling full verification coverage. Also fixed `tests/verify-bitrate.ts` and updated workspace dependency versions.
 

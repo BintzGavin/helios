@@ -53,6 +53,8 @@ packages/renderer/
     ├── verify-diagnose.ts      # Codec diagnostics test
     ├── verify-transparency.ts  # Transparency support test
     ├── verify-canvas-strategy.ts # Canvas WebCodecs strategy test
+    ├── verify-cancellation.ts  # Render cancellation test
+    ├── verify-trace.ts         # Playwright trace generation test
     └── ...                     # Other verification scripts
 ```
 

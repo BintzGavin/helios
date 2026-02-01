@@ -53,6 +53,9 @@ const tests = [
   'scripts/verify-dom-preload.ts',
   'scripts/verify-error-handling.ts',
   'scripts/verify-transparency.ts',
+  'scripts/verify-cancellation.ts',
+  'scripts/verify-trace.ts',
+  'scripts/verify-ffmpeg-path.ts',
 ];
 
 console.log('Running Renderer Verification Suite...');
