@@ -1,3 +1,6 @@
+## STUDIO v0.71.0
+- ✅ Completed: Implement Asset Renaming - Added ability to rename assets from the Assets Panel, updating both UI and filesystem.
+
 ## STUDIO v0.70.2
 - ✅ Verified: Refactor Render Manager Imports - Updated tsconfig.json to alias @helios-project packages to source, and refactored render-manager.ts to use clean imports, ensuring robust type checking and verified persistence logic.
 

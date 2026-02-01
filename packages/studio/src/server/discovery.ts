@@ -384,6 +384,64 @@ export function findAssets(rootDir: string): AssetInfo[] {
   return assets;
 }
 
+export function renameAsset(
+  rootDir: string,
+  id: string,
+  newName: string
+): AssetInfo {
+  const projectRoot = getProjectRoot(rootDir);
+  const publicDir = path.join(projectRoot, 'public');
+  const hasPublic = fs.existsSync(publicDir);
+  const scanRoot = hasPublic ? publicDir : projectRoot;
+
+  // Resolve source path
+  // id is the full path in the current implementation of findAssets
+  const sourcePath = path.resolve(id);
+
+  // Security check
+  if (!sourcePath.startsWith(scanRoot)) {
+    throw new Error('Access denied: Cannot rename outside project/public root');
+  }
+
+  if (!fs.existsSync(sourcePath)) {
+    throw new Error(`Asset "${id}" not found`);
+  }
+
+  const dir = path.dirname(sourcePath);
+  const ext = path.extname(sourcePath);
+
+  // Ensure newName has an extension, if not, append original extension
+  let finalName = newName;
+  if (path.extname(newName) === '') {
+    finalName = newName + ext;
+  }
+
+  const targetPath = path.join(dir, finalName);
+
+  // Security check for target
+  if (!targetPath.startsWith(scanRoot)) {
+    throw new Error('Access denied: Cannot rename to outside project/public root');
+  }
+
+  if (fs.existsSync(targetPath)) {
+    throw new Error(`Asset "${finalName}" already exists`);
+  }
+
+  fs.renameSync(sourcePath, targetPath);
+
+  const relativePath = path.relative(scanRoot, targetPath).replace(/\\/g, '/');
+  const url = hasPublic ? `/${relativePath}` : `/@fs${targetPath}`;
+  const type = getAssetType(path.extname(targetPath).toLowerCase());
+
+  return {
+    id: targetPath,
+    name: finalName,
+    url,
+    type,
+    relativePath
+  };
+}
+
 export function updateCompositionMetadata(
   rootDir: string,
   id: string,

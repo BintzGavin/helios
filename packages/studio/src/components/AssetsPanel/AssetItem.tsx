@@ -7,9 +7,11 @@ interface AssetItemProps {
 }
 
 export const AssetItem: React.FC<AssetItemProps> = ({ asset }) => {
-  const { deleteAsset } = useStudio();
+  const { deleteAsset, renameAsset } = useStudio();
   const [isHovering, setIsHovering] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editName, setEditName] = useState(asset.name);
   const videoRef = useRef<HTMLVideoElement>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
@@ -49,6 +51,28 @@ export const AssetItem: React.FC<AssetItemProps> = ({ asset }) => {
     e.stopPropagation();
     if (confirm(`Are you sure you want to delete ${asset.name}?`)) {
       deleteAsset(asset.id);
+    }
+  };
+
+  const handleRenameClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsEditing(true);
+    setEditName(asset.name);
+  };
+
+  const handleRenameSubmit = async () => {
+    if (!editName || editName === asset.name) {
+      setIsEditing(false);
+      setEditName(asset.name);
+      return;
+    }
+    try {
+      await renameAsset(asset.id, editName);
+      setIsEditing(false);
+    } catch (e) {
+      alert('Failed to rename asset');
+      setEditName(asset.name);
+      setIsEditing(false);
     }
   };
 
@@ -141,21 +165,74 @@ export const AssetItem: React.FC<AssetItemProps> = ({ asset }) => {
       onMouseEnter={asset.type === 'video' ? handleVideoEnter : () => setIsHovering(true)}
       onMouseLeave={asset.type === 'video' ? handleVideoLeave : () => setIsHovering(false)}
     >
-      {isHovering && (
-        <div
+      {isHovering && !isEditing && (
+        <>
+          <div
             className="delete-btn"
             onClick={handleDelete}
             title="Delete Asset"
-        >
+          >
             ×
-        </div>
+          </div>
+          <div
+            className="rename-btn"
+            onClick={handleRenameClick}
+            title="Rename Asset"
+            style={{
+              position: 'absolute',
+              top: '4px',
+              right: '28px',
+              width: '20px',
+              height: '20px',
+              background: 'rgba(0, 0, 0, 0.7)',
+              borderRadius: '50%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: '#fff',
+              fontSize: '12px',
+              cursor: 'pointer',
+              zIndex: 10
+            }}
+          >
+            ✎
+          </div>
+        </>
       )}
       <div className="asset-preview">
         {renderPreview()}
       </div>
-      <span className="asset-name">
-        {asset.name}
-      </span>
+      {isEditing ? (
+        <input
+          value={editName}
+          onChange={(e) => setEditName(e.target.value)}
+          onBlur={handleRenameSubmit}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') handleRenameSubmit();
+            if (e.key === 'Escape') {
+              setIsEditing(false);
+              setEditName(asset.name);
+            }
+          }}
+          onClick={(e) => e.stopPropagation()}
+          autoFocus
+          style={{
+            width: '100%',
+            fontSize: '0.8em',
+            textAlign: 'center',
+            background: '#444',
+            border: 'none',
+            color: '#fff',
+            padding: '2px',
+            borderRadius: '2px',
+            outline: 'none'
+          }}
+        />
+      ) : (
+        <span className="asset-name">
+          {asset.name}
+        </span>
+      )}
     </div>
   );
 };
