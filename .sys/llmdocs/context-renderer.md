@@ -57,6 +57,7 @@ The `RendererOptions` interface controls the render pipeline:
 - `durationInSeconds`: Total length of the video (fallback if `frameCount` is not set).
 - `frameCount`: Exact number of frames to render (overrides `durationInSeconds`).
 - `mode`: `'dom'` or `'canvas'`.
+- `canvasSelector`: CSS selector to target the canvas element in `'canvas'` mode (default `'canvas'`).
 - `browserConfig`: Object to customize Playwright browser launch (`headless`, `args`, `executablePath`).
 - `videoCodec`: `'libx264'` (default), `'copy'`, or others.
 - `audioCodec`: `'aac'` (default), `'libvorbis'`, etc.

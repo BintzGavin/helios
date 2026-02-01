@@ -85,6 +85,12 @@ export interface RendererOptions {
   startFrame?: number;
 
   /**
+   * The CSS selector to use to find the canvas element in 'canvas' mode.
+   * Defaults to 'canvas' (the first canvas element in the document).
+   */
+  canvasSelector?: string;
+
+  /**
    * The exact number of frames to render.
    * If provided, this overrides `durationInSeconds` for calculating loop limits.
    * Useful for precise distributed rendering to avoid floating point errors.

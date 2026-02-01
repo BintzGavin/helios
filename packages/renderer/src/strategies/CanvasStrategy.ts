@@ -308,7 +308,9 @@ export class CanvasStrategy implements RenderStrategy {
   }
 
   private async captureWebCodecs(page: Page, frameTime: number): Promise<Buffer> {
-    const chunkData = await page.evaluate<string, number>(async function(time: number) {
+    const selector = this.options.canvasSelector || 'canvas';
+
+    const chunkData = await page.evaluate<string, { time: number; selector: string }>(async function(args) {
       const context = (window as any).heliosWebCodecs;
 
       if (context.error) {
@@ -316,13 +318,13 @@ export class CanvasStrategy implements RenderStrategy {
       }
 
       const encoder = context.encoder as VideoEncoder;
-      const canvas = document.querySelector('canvas');
+      const canvas = document.querySelector(args.selector);
 
-      if (!canvas) throw new Error('Canvas not found');
+      if (!canvas) throw new Error(`Canvas not found matching selector: ${args.selector}`);
 
       // Create Frame and Encode
-      const frame = new VideoFrame(canvas, { timestamp: time * 1000 }); // microseconds
-      encoder.encode(frame, { keyFrame: (time === 0) });
+      const frame = new VideoFrame(canvas, { timestamp: args.time * 1000 }); // microseconds
+      encoder.encode(frame, { keyFrame: (args.time === 0) });
       frame.close();
 
       // 3. Collect Chunks
@@ -351,7 +353,7 @@ export class CanvasStrategy implements RenderStrategy {
           reader.readAsDataURL(blob);
       });
 
-    }, frameTime);
+    }, { time: frameTime, selector });
 
     if (chunkData && chunkData.length > 0) {
         return Buffer.from(chunkData, 'base64');
@@ -362,9 +364,10 @@ export class CanvasStrategy implements RenderStrategy {
   private async captureCanvas(page: Page, frameTime: number): Promise<Buffer> {
     const format = this.options.intermediateImageFormat || 'png';
     const quality = this.options.intermediateImageQuality;
+    const selector = this.options.canvasSelector || 'canvas';
 
-    const dataUrl = await page.evaluate(function(args: { format: string, quality?: number }) {
-      const canvas = document.querySelector('canvas');
+    const dataUrl = await page.evaluate(function(args: { format: string, quality?: number, selector: string }) {
+      const canvas = document.querySelector(args.selector);
       if (!canvas) return 'error:canvas-not-found';
 
       const mimeType = args.format === 'jpeg' ? 'image/jpeg' : 'image/png';
@@ -375,10 +378,10 @@ export class CanvasStrategy implements RenderStrategy {
       }
 
       return canvas.toDataURL(mimeType);
-    }, { format, quality });
+    }, { format, quality, selector });
 
     if (typeof dataUrl !== 'string' || dataUrl === 'error:canvas-not-found') {
-      throw new Error('CanvasStrategy: Could not find canvas element or an error occurred during capture.');
+      throw new Error(`CanvasStrategy: Could not find canvas element matching selector '${selector}' or an error occurred during capture.`);
     }
 
     // Extract base64 data
