@@ -42,7 +42,7 @@
   ],
   "dependencies": {
     "@ffmpeg-installer/ffmpeg": "^1.1.0",
-    "@helios-project/core": "3.6.0",
+    "@helios-project/core": "3.9.0",
     "playwright": "^1.42.1"
   },
   "devDependencies": {
