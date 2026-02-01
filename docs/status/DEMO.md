@@ -1,6 +1,6 @@
 # Status: DEMO Domain
 
-**Version**: 1.78.1
+**Version**: 1.79.0
 
 ## Vision
 The DEMO domain is responsible for:
@@ -15,6 +15,7 @@ The DEMO domain is responsible for:
 - None
 
 ## Completed Tasks
+- [v1.79.0] ✅ Completed: Vue Captions Animation - Created `examples/vue-captions-animation` demonstrating how to use Helios captions with Vue 3 composition API.
 - [v1.78.1] ✅ Completed: Enhance Render Verification - Updated `tests/e2e/verify-render.ts` to verify output video content (duration and non-black frames) using FFmpeg, ensuring silent rendering failures are caught.
 - [v1.78.0] ✅ Completed: Verify Promo Video - Confirmed Promo Video example renders correctly, unblocking the demo.
 - [v1.77.0] ✅ Completed: Update Animation Helpers - Added `interpolate` and `spring` examples to Vue, Svelte, and Solid examples.

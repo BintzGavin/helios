@@ -52,6 +52,7 @@ The `examples/` directory contains reference implementations for various framewo
 - **variable-font-animation**: Animating variable fonts.
 - **vue-animation-helpers**: Vue components for sequencing and core utilities.
 - **vue-canvas-animation**: Vue + Canvas example.
+- **vue-captions-animation**: Vue integration with Helios SRT captions.
 - **vue-dom-animation**: Vue + DOM example.
 - **vue-transitions**: Vue CSS transitions.
 - **waapi-animation**: Web Animations API integration.
