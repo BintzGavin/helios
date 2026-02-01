@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect, MouseEvent, WheelEvent } from 'react';
 import type { HeliosController } from '@helios-project/player';
 import { useStudio } from '../../context/StudioContext';
+import { EmptyState } from './EmptyState';
 import { StageToolbar } from './StageToolbar';
 import { useKeyboardShortcut } from '../../hooks/useKeyboardShortcut';
 import './Stage.css';
@@ -140,7 +141,7 @@ export const Stage: React.FC<StageProps> = ({ src }) => {
                 transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})`
             }}
         >
-            {src ? (
+            {src && (
               <>
                 <helios-player
                   ref={playerRef}
@@ -168,10 +169,9 @@ export const Stage: React.FC<StageProps> = ({ src }) => {
                   </div>
                 )}
               </>
-            ) : (
-                <div style={{ color: '#888' }}>No composition selected</div>
             )}
         </div>
+        {!src && <EmptyState />}
         <StageToolbar
             zoom={zoom}
             onZoom={setZoom}

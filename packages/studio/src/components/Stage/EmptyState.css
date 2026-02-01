@@ -1,0 +1,60 @@
+.empty-state-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: #1e1e1e;
+  color: #e0e0e0;
+  z-index: 10;
+  text-align: center;
+}
+
+.empty-state-overlay h1 {
+  font-size: 24px;
+  margin-bottom: 16px;
+  color: #ffffff;
+}
+
+.empty-state-overlay h2 {
+  font-size: 20px;
+  margin-bottom: 12px;
+  color: #ffffff;
+}
+
+.empty-state-overlay p {
+  font-size: 14px;
+  color: #a0a0a0;
+  margin-bottom: 24px;
+}
+
+.empty-state-overlay button {
+  padding: 10px 20px;
+  border-radius: 4px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  border: none;
+}
+
+.empty-state-overlay .primary-button {
+  background-color: #3b82f6; /* Blue-500 */
+  color: white;
+}
+
+.empty-state-overlay .primary-button:hover {
+  background-color: #2563eb; /* Blue-600 */
+}
+
+.empty-state-overlay .secondary-button {
+  background-color: #4b5563; /* Gray-600 */
+  color: white;
+}
+
+.empty-state-overlay .secondary-button:hover {
+  background-color: #374151; /* Gray-700 */
+}

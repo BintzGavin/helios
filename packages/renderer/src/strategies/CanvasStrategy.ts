@@ -318,7 +318,7 @@ export class CanvasStrategy implements RenderStrategy {
       }
 
       const encoder = context.encoder as VideoEncoder;
-      const canvas = document.querySelector(args.selector);
+      const canvas = document.querySelector(args.selector) as HTMLCanvasElement;
 
       if (!canvas) throw new Error(`Canvas not found matching selector: ${args.selector}`);
 
@@ -367,7 +367,7 @@ export class CanvasStrategy implements RenderStrategy {
     const selector = this.options.canvasSelector || 'canvas';
 
     const dataUrl = await page.evaluate(function(args: { format: string, quality?: number, selector: string }) {
-      const canvas = document.querySelector(args.selector);
+      const canvas = document.querySelector(args.selector) as HTMLCanvasElement;
       if (!canvas) return 'error:canvas-not-found';
 
       const mimeType = args.format === 'jpeg' ? 'image/jpeg' : 'image/png';
