@@ -1,0 +1,11 @@
+{
+  "name": "@helios-examples/solid-threejs-canvas-animation",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "dependencies": {
+    "solid-js": "^1.8.0",
+    "three": "^0.160.0",
+    "@helios-project/core": "workspace:*"
+  }
+}
