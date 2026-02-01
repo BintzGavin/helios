@@ -47,3 +47,7 @@
 ## [1.76.1] - Vue Animation Helpers Gap
 **Learning:** The "Animation Helpers" (interpolate, spring) are core features but were only demonstrated in React examples. Vue and Svelte examples lacked them, creating a parity gap.
 **Action:** When verifying framework support, explicitly check that "optional" but core features are demonstrated across ALL supported frameworks, not just the primary one.
+
+## [1.77.0] - SolidJS Animation Sync
+**Learning:** SolidJS examples using `createHeliosSignal` may not automatically sync with the document timeline if `autoSyncAnimations` is false. Explicitly calling `helios.bindToDocumentTimeline()` is required for automated playback verification (e.g., Playwright).
+**Action:** Always ensure `helios.bindToDocumentTimeline()` is called in framework examples to support consistent automated verification behavior.
