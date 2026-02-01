@@ -1,3 +1,6 @@
+## DEMO v1.83.0
+- ✅ Completed: Solid Three.js Canvas Animation - Created `examples/solid-threejs-canvas-animation` demonstrating Three.js integration with SolidJS and Helios.
+
 ## DEMO v1.82.0
 - ✅ Completed: Svelte Three.js Canvas Animation - Created `examples/svelte-threejs-canvas-animation` demonstrating Three.js integration with Svelte and Helios.
 

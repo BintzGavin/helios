@@ -38,6 +38,7 @@ The `examples/` directory contains reference implementations for various framewo
 - **solid-animation-helpers**: SolidJS components for sequencing and core utilities.
 - **solid-canvas-animation**: SolidJS + Canvas integration.
 - **solid-dom-animation**: SolidJS + DOM integration.
+- **solid-threejs-canvas-animation**: SolidJS + Three.js integration using reactive frame updates.
 - **solid-transitions**: SolidJS CSS transitions.
 - **stress-test-animation**: High-element count stress test.
 - **svelte-animation-helpers**: Svelte components for sequencing and core utilities.

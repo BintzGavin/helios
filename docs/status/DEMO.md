@@ -1,6 +1,6 @@
 # Status: DEMO Domain
 
-**Version**: 1.82.0
+**Version**: 1.83.0
 
 ## Vision
 The DEMO domain is responsible for:
@@ -15,6 +15,7 @@ The DEMO domain is responsible for:
 - None
 
 ## Completed Tasks
+- [v1.83.0] ✅ Completed: Solid Three.js Canvas Animation - Created `examples/solid-threejs-canvas-animation` demonstrating Three.js integration with SolidJS and Helios.
 - [v1.82.0] ✅ Completed: Svelte Three.js Canvas Animation - Created `examples/svelte-threejs-canvas-animation` demonstrating Three.js integration with Svelte and Helios.
 - [v1.81.0] ✅ Completed: Vue Three.js Canvas Animation - Created `examples/vue-threejs-canvas-animation` demonstrating Three.js integration with Vue 3 and Helios.
 - [v1.80.0] ✅ Completed: Svelte Captions Animation - Created `examples/svelte-captions-animation` demonstrating Helios captions (SRT) support in Svelte.
