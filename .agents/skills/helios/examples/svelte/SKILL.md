@@ -94,6 +94,55 @@ export const createHeliosStore = (helios) => {
 </style>
 ```
 
+## Svelte 5 (Runes)
+
+For Svelte 5, use the `$state` rune to create a reactive state class.
+
+### 1. Create Helios State Class
+
+```javascript
+// lib/helios.svelte.ts
+import { Helios } from '@helios-project/core';
+
+export class HeliosState {
+    currentFrame = $state(0);
+    fps = $state(0);
+    duration = $state(0);
+    isPlaying = $state(false);
+
+    constructor(helios) {
+        this.fps = helios.fps;
+        this.duration = helios.duration;
+        this.isPlaying = helios.isPlaying;
+
+        helios.subscribe((state) => {
+            this.currentFrame = state.currentFrame;
+            this.isPlaying = state.isPlaying;
+        });
+    }
+}
+```
+
+### 2. Use in Component
+
+```svelte
+<!-- App.svelte -->
+<script>
+  import { Helios } from '@helios-project/core';
+  import { HeliosState } from './lib/helios.svelte.js';
+
+  const helios = new Helios({ duration: 10, fps: 30 });
+  const state = new HeliosState(helios);
+
+  // Reactivity works automatically with state properties
+  $effect(() => {
+    console.log(`Current Frame: ${state.currentFrame}`);
+  });
+</script>
+
+<div>Frame: {state.currentFrame}</div>
+```
+
 ## Key Concepts
 
 - **Store Pattern:** Svelte's `readable` store is the perfect primitive for wrapping the `helios.subscribe` callback.

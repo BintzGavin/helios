@@ -1,5 +1,20 @@
 # SKILLS Progress Log
 
+## SKILLS v1.8.0
+- ✅ Completed: Daily Skills Review
+  - Updated example skill for `solid` (Helios Signal pattern)
+  - Updated example skill for `svelte` (Svelte 5 Runes)
+  - Updated API skills for `core` (RenderSession)
+  - Updated API skills for `player` (Picture-in-Picture, Export Caption Mode)
+
+## SKILLS v1.7.0
+- ✅ Completed: Daily Skills Review
+  - Updated API skills for `core` (AI Context, Schema Groups)
+  - Updated API skills for `renderer` (frameCount, H.264 priority)
+  - Updated API skills for `player` (export-caption-mode, Text Tracks)
+  - Updated API skills for `studio` (MCP, Persistent Jobs)
+  - Updated workflow skills for `render-video`
+
 ## SKILLS v1.6.0
 - ✅ Completed: Daily Skills Review
   - Updated API skills for `core` (Signals, Spring, Series, Validation)

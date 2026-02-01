@@ -243,6 +243,26 @@ const prompt = createSystemPrompt(helios);
 // 3. Schema Definitions
 ```
 
+#### Advanced Utilities
+
+**RenderSession**
+Controlled frame iteration, typically used for custom rendering or processing loops.
+
+```typescript
+import { RenderSession } from '@helios-project/core';
+
+const session = new RenderSession(helios, {
+  startFrame: 0,
+  endFrame: 100,
+  abortSignal: controller.signal // Optional cancellation
+});
+
+for await (const frame of session) {
+  // Helios is now sought to 'frame' and is stable
+  console.log(`Processing frame ${frame}`);
+}
+```
+
 ## Signals
 
 The `Helios` class exposes reactive signals for granular state management. You can also create your own signals.
