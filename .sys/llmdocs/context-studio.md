@@ -24,7 +24,7 @@ packages/studio/
 ├── bin/                 # CLI bin script (helios-studio.js)
 │   └── helios-studio.js # Executable script serving dist via vite preview
 ├── src/
-│   ├── components/      # UI Components (Timeline, PropsEditor, etc.)
+│   ├── components/      # UI Components
 │   │   ├── AssetsPanel/
 │   │   ├── CaptionsPanel/
 │   │   ├── Controls/
@@ -33,8 +33,13 @@ packages/studio/
 │   │   ├── CompositionSettingsModal.tsx
 │   │   ├── CreateCompositionModal.tsx
 │   │   ├── DuplicateCompositionModal.tsx
+│   │   ├── GlobalShortcuts.tsx
+│   │   ├── KeyboardShortcutsModal.tsx
 │   │   ├── PropsEditor.tsx
-│   │   └── SchemaInputs.tsx
+│   │   ├── RenderPreviewModal.tsx
+│   │   ├── SchemaInputs.tsx
+│   │   ├── SystemPromptModal.tsx
+│   │   └── Timeline.tsx
 │   ├── context/         # React Context (StudioContext)
 │   ├── hooks/           # Custom Hooks
 │   ├── server/          # Backend Logic (Discovery, RenderManager)
