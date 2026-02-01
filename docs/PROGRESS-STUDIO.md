@@ -1,3 +1,6 @@
+## STUDIO v0.76.0
+- ✅ Completed: Audio Mixer Panel - Implemented "Audio" panel in Sidebar with volume and mute controls for individual audio tracks, backed by `HeliosController`.
+
 ## STUDIO v0.75.0
 - ✅ Completed: Compositions Panel - Implemented persistent "Compositions" panel in Sidebar with creation, duplication, and deletion workflows.
 

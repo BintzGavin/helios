@@ -5,10 +5,11 @@ import { AssetsPanel } from '../AssetsPanel/AssetsPanel';
 import { RendersPanel } from '../RendersPanel/RendersPanel';
 import { CaptionsPanel } from '../CaptionsPanel/CaptionsPanel';
 import { CompositionsPanel } from '../CompositionsPanel/CompositionsPanel';
+import { AudioMixerPanel } from '../AudioMixerPanel/AudioMixerPanel';
 
 export const Sidebar: React.FC = () => {
   const { setHelpOpen, setDiagnosticsOpen, setAssistantOpen } = useStudio();
-  const [activeTab, setActiveTab] = useState<'compositions' | 'assets' | 'renders' | 'captions'>('compositions');
+  const [activeTab, setActiveTab] = useState<'compositions' | 'assets' | 'renders' | 'captions' | 'audio'>('compositions');
 
   return (
     <div className="studio-sidebar">
@@ -32,6 +33,12 @@ export const Sidebar: React.FC = () => {
           Captions
         </button>
         <button
+          className={`sidebar-tab ${activeTab === 'audio' ? 'active' : ''}`}
+          onClick={() => setActiveTab('audio')}
+        >
+          Audio
+        </button>
+        <button
           className={`sidebar-tab ${activeTab === 'renders' ? 'active' : ''}`}
           onClick={() => setActiveTab('renders')}
         >
@@ -42,6 +49,7 @@ export const Sidebar: React.FC = () => {
         {activeTab === 'compositions' && <CompositionsPanel />}
         {activeTab === 'assets' && <AssetsPanel />}
         {activeTab === 'captions' && <CaptionsPanel />}
+        {activeTab === 'audio' && <AudioMixerPanel />}
         {activeTab === 'renders' && <RendersPanel />}
       </div>
       <div className="sidebar-footer">
