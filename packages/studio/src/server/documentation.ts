@@ -9,6 +9,71 @@ export interface DocSection {
   content: string;
 }
 
+export function resolveDocumentationPath(cwd: string, pkgName: string): string | null {
+  // Strategy 1: Monorepo Development
+  let monorepoRoot: string | null = null;
+  // If cwd is package root (e.g. packages/studio)
+  if (fs.existsSync(path.resolve(cwd, '../../packages/core'))) {
+      monorepoRoot = path.resolve(cwd, '../../');
+  }
+  // If cwd is repo root
+  else if (fs.existsSync(path.resolve(cwd, 'packages/core'))) {
+      monorepoRoot = cwd;
+  }
+
+  if (monorepoRoot) {
+      const paths: Record<string, string> = {
+        'core': 'packages/core',
+        'studio': 'packages/studio',
+        'renderer': 'packages/renderer',
+        'player': 'packages/player',
+        'root': '.'
+      };
+
+      if (paths[pkgName]) {
+          const readmePath = path.join(monorepoRoot, paths[pkgName], 'README.md');
+          if (fs.existsSync(readmePath)) {
+              return readmePath;
+          }
+      }
+      return null;
+  }
+
+  // Strategy 2: Installed via NPM (node_modules)
+  try {
+      if (pkgName === 'root') {
+          const readmePath = path.join(cwd, 'README.md');
+          return fs.existsSync(readmePath) ? readmePath : null;
+      }
+
+      // Use createRequire to resolve package paths from the Current Working Directory
+      const requireFunc = createRequire(path.join(cwd, 'index.js'));
+      const pkgMap: Record<string, string> = {
+          'core': '@helios-project/core',
+          'renderer': '@helios-project/renderer',
+          'player': '@helios-project/player',
+          'studio': '@helios-project/studio'
+      };
+
+      if (pkgMap[pkgName]) {
+           try {
+              const pkgJsonPath = requireFunc.resolve(`${pkgMap[pkgName]}/package.json`);
+              const pkgRoot = path.dirname(pkgJsonPath);
+              const readmePath = path.join(pkgRoot, 'README.md');
+              if (fs.existsSync(readmePath)) {
+                  return readmePath;
+              }
+           } catch (e) {
+               // Ignore missing packages
+           }
+      }
+  } catch (e) {
+      console.warn("Failed to resolve documentation from node_modules", e);
+  }
+
+  return null;
+}
+
 export function findDocumentation(cwd: string): DocSection[] {
   const sections: DocSection[] = [];
 
@@ -49,75 +114,18 @@ export function findDocumentation(cwd: string): DocSection[] {
     flush();
   };
 
-  // Strategy 1: Monorepo Development
-  // We assume we are in packages/studio or running from root
+  const packages = ['core', 'studio', 'renderer', 'player', 'root'];
 
-  let monorepoRoot: string | null = null;
-  // If cwd is package root (e.g. packages/studio)
-  if (fs.existsSync(path.resolve(cwd, '../../packages/core'))) {
-      monorepoRoot = path.resolve(cwd, '../../');
-  }
-  // If cwd is repo root
-  else if (fs.existsSync(path.resolve(cwd, 'packages/core'))) {
-      monorepoRoot = cwd;
-  }
-
-  if (monorepoRoot) {
-      const packages = [
-        { name: 'core', path: 'packages/core' },
-        { name: 'studio', path: 'packages/studio' },
-        { name: 'renderer', path: 'packages/renderer' },
-        { name: 'player', path: 'packages/player' },
-        { name: 'root', path: '.' }
-      ];
-
-      for (const p of packages) {
-          const readmePath = path.join(monorepoRoot, p.path, 'README.md');
-          if (fs.existsSync(readmePath)) {
-              try {
-                  const content = fs.readFileSync(readmePath, 'utf-8');
-                  parseMarkdown(p.name, content);
-              } catch (e) {
-                  console.error(`Failed to read README for ${p.name}`, e);
-              }
-          }
-      }
-
-      // If we found docs, return them.
-      // If not (e.g. strict peer dep issues in some monorepo tools), fall through.
-      if (sections.length > 0) return sections;
-  }
-
-  // Strategy 2: Installed via NPM (node_modules)
-  try {
-      // Use createRequire to resolve package paths from the Current Working Directory
-      // This ensures we find what the user has installed.
-      const requireFunc = createRequire(path.join(cwd, 'index.js'));
-
-      const pkgNames = {
-          'core': '@helios-project/core',
-          'renderer': '@helios-project/renderer',
-          'player': '@helios-project/player',
-          'studio': '@helios-project/studio'
-      };
-
-      for (const [shortName, pkgName] of Object.entries(pkgNames)) {
+  for (const pkg of packages) {
+      const readmePath = resolveDocumentationPath(cwd, pkg);
+      if (readmePath) {
           try {
-              const pkgJsonPath = requireFunc.resolve(`${pkgName}/package.json`);
-              const pkgRoot = path.dirname(pkgJsonPath);
-              const readmePath = path.join(pkgRoot, 'README.md');
-
-              if (fs.existsSync(readmePath)) {
-                  const content = fs.readFileSync(readmePath, 'utf-8');
-                  parseMarkdown(shortName, content);
-              }
+              const content = fs.readFileSync(readmePath, 'utf-8');
+              parseMarkdown(pkg, content);
           } catch (e) {
-              // Ignore missing packages
+              console.error(`Failed to read README for ${pkg}`, e);
           }
       }
-
-  } catch (e) {
-      console.warn("Failed to resolve documentation from node_modules", e);
   }
 
   return sections;

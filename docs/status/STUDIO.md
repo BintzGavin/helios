@@ -1,4 +1,4 @@
-**Version**: 0.73.0
+**Version**: 0.74.0
 
 # Studio Domain Status
 
@@ -7,6 +7,7 @@
 **Focus**: UI Implementation & CLI
 
 ## Recent Updates
+- [v0.74.0] ✅ Completed: Markdown URLs - Implemented `/docs/:pkg.md` endpoint to serve raw documentation for Core, Renderer, Player, and Studio packages.
 - [v0.73.0] ✅ Completed: Composition Thumbnails - Implemented ability to set and view thumbnails for compositions in the Switcher and Settings.
 - [v0.72.1] ✅ Verified: Robustness - Added output file verification to Render Manager and synced package versions.
 - [v0.72.0] ✅ Completed: Helios Assistant - Implemented context-aware AI assistant with documentation search, replacing System Prompt Modal.
