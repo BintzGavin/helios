@@ -1,4 +1,5 @@
 ## STUDIO v0.69.0
+- ✅ Verified: Maintenance - Synced package.json version and re-verified persistent render jobs functionality via tests.
 - ✅ Completed: Rename Composition - Implemented ability to rename compositions from the Settings modal, including backend directory moving and ID updates.
 
 ## STUDIO v0.68.1
