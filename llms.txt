@@ -6,7 +6,7 @@ Helios is a modern engine for creating videos programmatically using standard we
 
 ## Quick Facts
 - **License**: Elastic License 2.0 (free commercial use, no SaaS resale)
-- **Status**: Core: Stable, Studio: Alpha
+- **Status**: Core: Stable (v3.7+), Studio: Alpha (v0.70+)
 - **Frameworks**: React, Vue, Svelte, vanilla JS
 - **Animation**: Standard CSS, Web Animations API (WAAPI), any animation library
 
@@ -93,15 +93,19 @@ Skills for AI agents are in `.agents/skills/helios/`:
 ## Diagnostics
 ```typescript
 const report = await Helios.diagnose();
-// { waapi: boolean, webCodecs: boolean, offscreenCanvas: boolean, userAgent: string }
+// { waapi: boolean, webCodecs: boolean, videoCodecs: {...}, audioCodecs: {...}, ... }
 ```
 
 ## Roadmap
 ### V1.x (Active)
-- **Helios Studio**: Alpha v0.63+ (MCP Server, Recursive Discovery)
-- **Core**: Stable v3.0+ (Signals, Stability Registry)
-- **Player**: Feature Complete v0.48+ (SRT Export, Markers)
-- **AI**: Agent Skills (In Progress)
+- **Helios Studio**: Alpha v0.70+ (MCP Server, Persistent Jobs, Recursive Discovery)
+- **Core**: Stable v3.7+ (Audio Looping/Fading, Reactive Virtual Time)
+- **Player**: Feature Complete v0.50+ (Audio Tracks, Persistence, PiP)
+- **Renderer**: Stable v1.53+ (H.264 Default, Blob Audio, Recursive Shadow DOM)
+
+### AI Integration
+- **Studio MCP Server**: Inspect, create, and render compositions via LLM tools
+- **System Prompt**: Programmatic context generation for agents
 
 ### V2 (Next)
 - Distributed rendering (Lambda, Cloud Run)
