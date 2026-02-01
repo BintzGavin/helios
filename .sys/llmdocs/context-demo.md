@@ -55,6 +55,7 @@ The `examples/` directory contains reference implementations for various framewo
 - **vue-canvas-animation**: Vue + Canvas example.
 - **vue-captions-animation**: Vue integration with Helios SRT captions.
 - **vue-dom-animation**: Vue + DOM example.
+- **vue-threejs-canvas-animation**: Vue 3 + Three.js integration using reactive frame updates.
 - **vue-transitions**: Vue CSS transitions.
 - **waapi-animation**: Web Animations API integration.
 - **web-component-animation**: Shadow DOM and Web Component integration.
