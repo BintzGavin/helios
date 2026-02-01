@@ -1,3 +1,6 @@
+## RENDERER v1.56.0
+- ✅ Completed: Fix CDP Hang - Swapped initialization order in `Renderer` to call `strategy.prepare` before `timeDriver.prepare`, ensuring `DomScanner` can discover and load media assets before the CDP `TimeDriver` freezes the virtual clock.
+
 ## RENDERER v1.55.0
 - ✅ Completed: Enhance Dom Preloading - Updated `DomStrategy` to detect and preload `<video>` posters, SVG `<image>` elements, and CSS masks (`mask-image`), ensuring zero-artifact rendering for these asset types.
 

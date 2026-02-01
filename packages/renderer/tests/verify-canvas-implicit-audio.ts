@@ -40,6 +40,11 @@ async function runTests() {
             return true;
         }
 
+        // Handle Canvas existence check
+        if (typeof fnOrString === 'function' && fnOrString.toString().includes('HTMLCanvasElement')) {
+            return true;
+        }
+
         // Handle WebCodecs detection (CanvasStrategy.prepare)
         // Return not supported to fallback to standard behavior for simplicity
         if (typeof fnOrString === 'string' && fnOrString.includes('VideoEncoder')) {

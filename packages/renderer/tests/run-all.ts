@@ -15,6 +15,7 @@ const tests = [
   'tests/verify-cdp-driver.ts',
   'tests/verify-cdp-driver-stability.ts',
   'tests/verify-cdp-driver-timeout.ts',
+  'tests/verify-cdp-hang.ts',
   'tests/verify-cdp-media-offsets.ts',
   'tests/verify-cdp-media-sync-timing.ts',
   'tests/verify-cdp-shadow-dom-sync.ts',

@@ -122,8 +122,8 @@ export class Renderer {
       console.log('[Helios Diagnostics]', JSON.stringify(diagnostics, null, 2));
 
       console.log('Preparing render strategy...');
-      await this.timeDriver.prepare(page);
       await this.strategy.prepare(page);
+      await this.timeDriver.prepare(page);
       console.log('Strategy prepared.');
 
       const ffmpegPath = this.options.ffmpegPath || ffmpeg.path;
