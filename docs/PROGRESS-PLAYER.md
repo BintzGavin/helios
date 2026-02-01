@@ -1,4 +1,5 @@
-# PLAYER Progress Log
+## PLAYER v0.52.0
+- ✅ Completed: WebVTT Support - Implemented `caption-parser` to support standard WebVTT captions alongside SRT, enabling broader compatibility with caption file formats.
 
 ## PLAYER v0.51.0
 - ✅ Completed: Expose Audio Track IDs - Updated `getAudioAssets` to populate `id` from `data-helios-track-id`, standard `id`, or fallback index, enabling robust track identification.

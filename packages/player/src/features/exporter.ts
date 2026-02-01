@@ -1,6 +1,6 @@
 import { HeliosController } from "../controllers";
 import { CaptionCue } from "@helios-project/core";
-import { stringifySRT, SubtitleCue } from "./srt-parser";
+import { stringifySRT, SubtitleCue } from "./caption-parser";
 import {
   Output,
   BufferTarget,
