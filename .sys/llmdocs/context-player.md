@@ -76,6 +76,7 @@ The component exposes the following CSS variables for theming:
 ## F. Public API Members
 Properties and methods available on the `HeliosPlayer` element instance:
 
+- `getController()`: Returns the underlying `HeliosController` instance (if connected).
 - `textTracks`: Returns a `HeliosTextTrackList` object containing `HeliosTextTrack` instances.
 - `addTextTrack(kind, label, language)`: Creates and returns a new `HeliosTextTrack`.
 - `play()`: Starts playback.
@@ -100,6 +101,14 @@ Properties and methods available on the `HeliosPlayer` element instance:
 - `defaultPlaybackRate`: Get/Set default playback speed.
 - `canPlayType(type)`: Returns string indicating support (always empty for video MIME types).
 - `requestPictureInPicture()`: Request Picture-in-Picture mode (returns Promise<PictureInPictureWindow>).
+
+**HeliosController Interface:**
+The controller returned by `getController()` provides advanced methods:
+- `setAudioTrackVolume(trackId: string, volume: number): void`
+- `setAudioTrackMuted(trackId: string, muted: boolean): void`
+- `setInputProps(props: Record<string, any>): void`
+- `setPlaybackRange(startFrame: number, endFrame: number): void`
+- `clearPlaybackRange(): void`
 
 ## G. Interaction
 - **Keyboard Shortcuts**:

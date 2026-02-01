@@ -8,6 +8,8 @@ export interface HeliosController {
   seek(frame: number): void;
   setAudioVolume(volume: number): void;
   setAudioMuted(muted: boolean): void;
+  setAudioTrackVolume(trackId: string, volume: number): void;
+  setAudioTrackMuted(trackId: string, muted: boolean): void;
   setLoop(loop: boolean): void;
   setPlaybackRate(rate: number): void;
   setPlaybackRange(startFrame: number, endFrame: number): void;
@@ -30,6 +32,8 @@ export class DirectController implements HeliosController {
   seek(frame: number) { this.instance.seek(frame); }
   setAudioVolume(volume: number) { this.instance.setAudioVolume(volume); }
   setAudioMuted(muted: boolean) { this.instance.setAudioMuted(muted); }
+  setAudioTrackVolume(trackId: string, volume: number) { this.instance.setAudioTrackVolume(trackId, volume); }
+  setAudioTrackMuted(trackId: string, muted: boolean) { this.instance.setAudioTrackMuted(trackId, muted); }
   setLoop(loop: boolean) { this.instance.setLoop(loop); }
   setPlaybackRate(rate: number) { this.instance.setPlaybackRate(rate); }
   setPlaybackRange(start: number, end: number) { this.instance.setPlaybackRange(start, end); }
@@ -152,6 +156,8 @@ export class BridgeController implements HeliosController {
   seek(frame: number) { this.iframeWindow.postMessage({ type: 'HELIOS_SEEK', frame }, '*'); }
   setAudioVolume(volume: number) { this.iframeWindow.postMessage({ type: 'HELIOS_SET_VOLUME', volume }, '*'); }
   setAudioMuted(muted: boolean) { this.iframeWindow.postMessage({ type: 'HELIOS_SET_MUTED', muted }, '*'); }
+  setAudioTrackVolume(trackId: string, volume: number) { this.iframeWindow.postMessage({ type: 'HELIOS_SET_AUDIO_TRACK_VOLUME', trackId, volume }, '*'); }
+  setAudioTrackMuted(trackId: string, muted: boolean) { this.iframeWindow.postMessage({ type: 'HELIOS_SET_AUDIO_TRACK_MUTED', trackId, muted }, '*'); }
   setLoop(loop: boolean) { this.iframeWindow.postMessage({ type: 'HELIOS_SET_LOOP', loop }, '*'); }
   setPlaybackRate(rate: number) { this.iframeWindow.postMessage({ type: 'HELIOS_SET_PLAYBACK_RATE', rate }, '*'); }
   setPlaybackRange(start: number, end: number) { this.iframeWindow.postMessage({ type: 'HELIOS_SET_PLAYBACK_RANGE', start, end }, '*'); }

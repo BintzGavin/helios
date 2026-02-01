@@ -42,6 +42,8 @@ describe('DirectController', () => {
             seek: vi.fn(),
             setAudioVolume: vi.fn(),
             setAudioMuted: vi.fn(),
+            setAudioTrackVolume: vi.fn(),
+            setAudioTrackMuted: vi.fn(),
             setLoop: vi.fn(),
             setPlaybackRate: vi.fn(),
             setPlaybackRange: vi.fn(),
@@ -111,6 +113,14 @@ describe('DirectController', () => {
 
         controller.setAudioMuted(true);
         expect(mockHeliosInstance.setAudioMuted).toHaveBeenCalledWith(true);
+    });
+
+    it('should set audio track volume and muted', () => {
+        controller.setAudioTrackVolume('track-1', 0.8);
+        expect(mockHeliosInstance.setAudioTrackVolume).toHaveBeenCalledWith('track-1', 0.8);
+
+        controller.setAudioTrackMuted('track-1', true);
+        expect(mockHeliosInstance.setAudioTrackMuted).toHaveBeenCalledWith('track-1', true);
     });
 
     it('should set loop', () => {
@@ -245,6 +255,14 @@ describe('BridgeController', () => {
 
         controller.setAudioMuted(true);
         expect(mockWindow.postMessage).toHaveBeenCalledWith({ type: 'HELIOS_SET_MUTED', muted: true }, '*');
+    });
+
+    it('should post messages for audio track controls', () => {
+        controller.setAudioTrackVolume('track-1', 0.8);
+        expect(mockWindow.postMessage).toHaveBeenCalledWith({ type: 'HELIOS_SET_AUDIO_TRACK_VOLUME', trackId: 'track-1', volume: 0.8 }, '*');
+
+        controller.setAudioTrackMuted('track-1', true);
+        expect(mockWindow.postMessage).toHaveBeenCalledWith({ type: 'HELIOS_SET_AUDIO_TRACK_MUTED', trackId: 'track-1', muted: true }, '*');
     });
 
     it('should post messages for loop', () => {

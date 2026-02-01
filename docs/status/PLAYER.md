@@ -1,4 +1,4 @@
-**Version**: v0.49.3
+**Version**: v0.50.0
 
 # Status: PLAYER
 
@@ -21,6 +21,7 @@
 - Supports Interactive Playback Range via keyboard shortcuts (`I`, `O`, `X`).
 - Displays actionable error messages with "Dismiss" option for failed client-side exports.
 - Supports Volume and Mute controls via UI and Bridge.
+- Supports Audio Track Volume and Mute controls via Controller API and Bridge.
 - Supports caption rendering overlay with toggleable "CC" button.
 - Supports WebM (VP9/Opus) client-side export via `export-format` attribute.
 - Implements Standard Media API (play, pause, currentTime, events) for better interoperability.
@@ -45,6 +46,7 @@
 ## Critical Task
 - **None**: All critical tasks completed.
 
+[v0.50.0] ✅ Completed: Audio Track Control - Added `setAudioTrackVolume` and `setAudioTrackMuted` to `HeliosController` and the Bridge protocol, enabling granular audio control.
 [v0.49.3] ✅ Completed: Verify and Harden Persist Media Properties - Added comprehensive unit tests for volume clamping and muted property precedence to verify robustness of persisted media properties.
 [v0.49.3] ✅ Verified: Synced package.json version with status file and verified all tests pass.
 [v0.49.2] ✅ Completed: Fix API Parity Tests - Updated `api_parity.test.ts` mock controller to match the `HeliosController` interface, ensuring tests pass with the new media persistence logic.
