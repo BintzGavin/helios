@@ -9,3 +9,7 @@
 ## [v0.49.3] - Audio Track Control Gap
 **Learning:** Discovered that `HeliosController` interface blocked Studio from controlling individual audio tracks, despite Core support.
 **Action:** When defining cross-domain interfaces (Player <-> Studio), verify all necessary Core capabilities are exposed, not just the ones needed for the immediate UI.
+
+## [v0.51.0] - Audio Track ID Gap
+**Learning:** Discovered that `HeliosController.setAudioTrackVolume` requires an ID, but `getAudioAssets` (used for track discovery) does not return one, making the API unusable for generic players.
+**Action:** When designing controller APIs for resources (tracks, assets), always ensure the "List" method returns the unique identifiers required by the "Control" methods.
