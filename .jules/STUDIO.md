@@ -13,3 +13,7 @@
 ## [0.69.1] - CLI HMR Architecture
 **Learning:** The previous CLI implementation used `vite preview`, which serves a static production build and does not support Hot Module Replacement (HMR). This broke the "Hot Reloading" vision for end users. To support HMR in a distributed tool, the CLI must invoke a custom `vite.createServer` instance that treats the User's Project as the root (for HMR) while serving the pre-built Studio UI as a static overlay.
 **Action:** When building developer tools that require HMR, do not rely on `vite preview`. Use the Vite JavaScript API to construct a hybrid server.
+
+## [0.72.0] - Dependency Version Skew
+**Learning:** `packages/renderer` depended on strict `3.9.0` of Core, while Core was `3.9.1`, causing `npm install` to fail. Also, `examples/agent-promo-3d` has a broken import path `../../packages/core` instead of `../../../packages/core`.
+**Action:** Always verify workspace dependencies and example paths before starting implementation.
