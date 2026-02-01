@@ -1,4 +1,4 @@
-import { Helios, CaptionCue, HeliosSchema } from "@helios-project/core";
+import { Helios, CaptionCue, HeliosSchema, DiagnosticReport } from "@helios-project/core";
 import { captureDomToBitmap } from "./features/dom-capture";
 import { getAudioAssets, AudioAsset } from "./features/audio-utils";
 
@@ -23,6 +23,7 @@ export interface HeliosController {
   captureFrame(frame: number, options?: { selector?: string, mode?: 'canvas' | 'dom' }): Promise<{ frame: VideoFrame, captions: CaptionCue[] } | null>;
   getAudioTracks(): Promise<AudioAsset[]>;
   getSchema(): Promise<HeliosSchema | undefined>;
+  diagnose(): Promise<DiagnosticReport>;
 }
 
 export class DirectController implements HeliosController {
@@ -119,6 +120,10 @@ export class DirectController implements HeliosController {
           return { frame: videoFrame, captions };
       }
       return null;
+  }
+
+  async diagnose(): Promise<DiagnosticReport> {
+    return Helios.diagnose();
   }
 }
 
@@ -268,5 +273,29 @@ export class BridgeController implements HeliosController {
               resolve(undefined);
           }, 5000);
       });
+  }
+
+  async diagnose(): Promise<DiagnosticReport> {
+    return new Promise((resolve, reject) => {
+      let timeoutId: number;
+      const handler = (event: MessageEvent) => {
+        if (event.source !== this.iframeWindow) return;
+
+        if (event.data?.type === 'HELIOS_DIAGNOSE_RESULT') {
+          window.removeEventListener('message', handler);
+          clearTimeout(timeoutId);
+          resolve(event.data.report);
+        }
+      };
+
+      window.addEventListener('message', handler);
+      this.iframeWindow.postMessage({ type: 'HELIOS_DIAGNOSE' }, '*');
+
+      // Timeout
+      timeoutId = window.setTimeout(() => {
+        window.removeEventListener('message', handler);
+        reject(new Error('Timeout waiting for diagnostics'));
+      }, 5000);
+    });
   }
 }
