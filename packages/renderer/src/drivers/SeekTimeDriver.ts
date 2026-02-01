@@ -31,16 +31,17 @@ export class SeekTimeDriver implements TimeDriver {
   }
 
   async prepare(page: Page): Promise<void> {
-    // Wait for GSAP timeline to be available if it's a GSAP project
-    // This handles the race condition where main.js (ES module) hasn't finished executing when rendering starts
+    // Wait for app initialization (GSAP timeline OR Helios instance)
+    // This handles the race condition where main.js (ES module) hasn't finished executing when rendering starts.
+    // We check for either the GSAP timeline (for GSAP projects) or the Helios global (for any Helios project).
     try {
       await page.waitForFunction(
-        () => typeof (window as any).__helios_gsap_timeline__ !== 'undefined',
-        { timeout: 1000 }
+        () => typeof (window as any).__helios_gsap_timeline__ !== 'undefined' || typeof (window as any).helios !== 'undefined',
+        { timeout: 5000 }
       );
     } catch (e) {
-      // Ignore - likely not a GSAP project, or timeline didn't initialize in time
-      // We'll proceed and rely on Helios subscription/polling as fallback
+      // Ignore - likely a static page or initialization took too long.
+      // We'll proceed and rely on Helios subscription/polling as fallback.
     }
   }
 
