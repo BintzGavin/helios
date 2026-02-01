@@ -4,14 +4,21 @@ import './Sidebar.css';
 import { AssetsPanel } from '../AssetsPanel/AssetsPanel';
 import { RendersPanel } from '../RendersPanel/RendersPanel';
 import { CaptionsPanel } from '../CaptionsPanel/CaptionsPanel';
+import { CompositionsPanel } from '../CompositionsPanel/CompositionsPanel';
 
 export const Sidebar: React.FC = () => {
   const { setHelpOpen, setDiagnosticsOpen, setAssistantOpen } = useStudio();
-  const [activeTab, setActiveTab] = useState<'assets' | 'renders' | 'captions'>('assets');
+  const [activeTab, setActiveTab] = useState<'compositions' | 'assets' | 'renders' | 'captions'>('compositions');
 
   return (
     <div className="studio-sidebar">
       <div className="sidebar-tabs">
+        <button
+          className={`sidebar-tab ${activeTab === 'compositions' ? 'active' : ''}`}
+          onClick={() => setActiveTab('compositions')}
+        >
+          Compositions
+        </button>
         <button
           className={`sidebar-tab ${activeTab === 'assets' ? 'active' : ''}`}
           onClick={() => setActiveTab('assets')}
@@ -32,6 +39,7 @@ export const Sidebar: React.FC = () => {
         </button>
       </div>
       <div className="sidebar-content">
+        {activeTab === 'compositions' && <CompositionsPanel />}
         {activeTab === 'assets' && <AssetsPanel />}
         {activeTab === 'captions' && <CaptionsPanel />}
         {activeTab === 'renders' && <RendersPanel />}

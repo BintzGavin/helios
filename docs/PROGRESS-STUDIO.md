@@ -1,3 +1,6 @@
+## STUDIO v0.75.0
+- ✅ Completed: Compositions Panel - Implemented persistent "Compositions" panel in Sidebar with creation, duplication, and deletion workflows.
+
 ## STUDIO v0.74.0
 - ✅ Completed: Markdown URLs - Implemented `/docs/:pkg.md` endpoint to serve raw documentation for Core, Renderer, Player, and Studio packages.
 

@@ -33,6 +33,7 @@ packages/studio/
 │   │   ├── AssetsPanel/
 │   │   ├── AssistantModal/ # AI & Documentation Assistant
 │   │   ├── CaptionsPanel/
+│   │   ├── CompositionsPanel/
 │   │   ├── Controls/
 │   │   ├── RendersPanel/
 │   │   ├── Stage/
@@ -105,6 +106,7 @@ npx @helios-project/studio
     -   Supports assets (image, video, audio) with type and extension filtering.
     -   Supports complex types (object, array, typed arrays) with size constraints (minItems/maxItems).
     -   Supports collapsible groups via `group` property.
+-   **Compositions Panel**: Persistent sidebar panel for managing compositions (Browse, Create, Duplicate, Delete).
 -   **Assets Panel**: Discovers and allows drag-and-drop of assets from the project. Supports uploading, deleting, and renaming assets.
 -   **Renders Panel**: Manages render jobs (Start, Cancel, Download).
 -   **Captions Panel**: Edits SRT captions and syncs with Core.
