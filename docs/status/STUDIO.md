@@ -1,4 +1,4 @@
-**Version**: 0.72.0
+**Version**: 0.72.1
 
 # Studio Domain Status
 
@@ -7,6 +7,7 @@
 **Focus**: UI Implementation & CLI
 
 ## Recent Updates
+- [v0.72.1] ✅ Verified: Robustness - Added output file verification to Render Manager and synced package versions.
 - [v0.72.0] ✅ Completed: Helios Assistant - Implemented context-aware AI assistant with documentation search, replacing System Prompt Modal.
 - [v0.71.0] ✅ Completed: Implement Asset Renaming - Added ability to rename assets from the Assets Panel, updating both UI and filesystem.
 - [v0.70.2] ✅ Verified: Refactor Render Manager Imports - Updated tsconfig.json to alias @helios-project packages to source, and refactored render-manager.ts to use clean imports, ensuring robust type checking and verified persistence logic.

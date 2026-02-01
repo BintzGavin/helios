@@ -1,3 +1,10 @@
+## STUDIO v0.72.1
+- ✅ Verified: Robustness - Added output file verification to Render Manager to ensure failed renders (empty/missing files) are correctly reported as failures.
+- ✅ Verified: Maintenance - Synced package versions and updated tests.
+
+## STUDIO v0.72.0
+- ✅ Completed: Helios Assistant - Implemented context-aware AI assistant with documentation search, replacing System Prompt Modal.
+
 ## STUDIO v0.71.0
 - ✅ Completed: Implement Asset Renaming - Added ability to rename assets from the Assets Panel, updating both UI and filesystem.
 

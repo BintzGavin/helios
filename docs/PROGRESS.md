@@ -148,5 +148,8 @@ Each agent should update **their own dedicated progress file** instead of this f
   - Updated Studio guide with new features
   - Updated navigation structure in `mint.json`
 
+## STUDIO v0.72.1
+- ✅ Verified: Robustness - Added output file verification to Render Manager to ensure failed renders (empty/missing files) are correctly reported as failures.
+
 ## STUDIO v0.72.0
 - ✅ Completed: Helios Assistant - Implemented context-aware AI assistant with documentation search, replacing System Prompt Modal.

@@ -6,6 +6,7 @@ Helios Studio is a browser-based development environment for video composition. 
 1.  **Compose**: Edit composition properties (duration, FPS) and inputs (props) in real-time.
 2.  **Preview**: See instant feedback using `<helios-player>` with Hot Module Reloading (HMR).
 3.  **Render**: Queue and manage high-quality video renders via `@helios-project/renderer`.
+4.  **Connect**: Expose studio capabilities to AI agents via Model Context Protocol (MCP).
 
 **Core Components:**
 -   **CLI**: 
@@ -16,6 +17,7 @@ Helios Studio is a browser-based development environment for video composition. 
     -   Filesystem access (assets, compositions)
     -   Render management (`RenderManager`)
     -   Documentation discovery (`findDocumentation`)
+    -   MCP Server (`mcp.ts`)
 -   **UI**: A React application (`packages/studio/src`) that consumes the API and controls the Player.
 -   **Communication**: The UI communicates with the Player via the `HeliosController` bridge (postMessage) and with the Server via HTTP API.
 -   **Publishing**: Studio is a publishable npm package (`publishConfig.access: "public"`) with `bin` field for CLI installation.
@@ -46,7 +48,12 @@ packages/studio/
 │   ├── context/         # React Context (StudioContext)
 │   ├── data/            # Static Data (AI Context)
 │   ├── hooks/           # Custom Hooks
-│   ├── server/          # Backend Logic (Discovery, RenderManager, Documentation)
+│   ├── server/          # Backend Logic
+│   │   ├── discovery.ts      # Composition & Asset Discovery
+│   │   ├── documentation.ts  # Documentation Search
+│   │   ├── mcp.ts            # Model Context Protocol Server
+│   │   ├── plugin.ts         # Vite Plugin Entry
+│   │   └── render-manager.ts # Render Job Management
 │   ├── utils/           # Shared Utilities
 │   ├── App.tsx          # Main Layout
 │   └── main.tsx         # Entry Point
@@ -124,6 +131,13 @@ npx @helios-project/studio
 -   Studio triggers renders via POST `/api/render`.
 -   The backend spawns a Renderer process (using `RenderManager`) to generate MP4/WebM files.
 -   Render progress and history are managed via `/api/jobs` and persisted to disk.
+-   **Robustness**: RenderManager verifies output file existence and size before marking jobs as complete.
+
+**With AI Agents (MCP):**
+-   Studio exposes an MCP server allowing agents to:
+    -   List compositions (`compositions` resource)
+    -   Create compositions (`create_composition` tool)
+    -   Trigger renders (`render_composition` tool)
 
 ## F. Publishing
 

@@ -5,7 +5,11 @@ import fs from 'fs';
 // Mock dependencies
 vi.mock('@helios-project/renderer', () => ({
   Renderer: class MockRenderer {
-    render() { return Promise.resolve(); }
+    render(_url: string, outputPath: string) {
+      const fs = require('fs');
+      fs.writeFileSync(outputPath, 'dummy content');
+      return Promise.resolve();
+    }
     diagnose() { return Promise.resolve({}); }
   }
 }));
