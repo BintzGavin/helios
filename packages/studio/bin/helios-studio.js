@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 import { fileURLToPath } from 'url';
 import { dirname, resolve } from 'path';
-import { spawn } from 'child_process';
 import { existsSync } from 'fs';
+import { createServer } from 'vite';
+import { studioApiPlugin } from '../dist/cli/plugin.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -11,11 +12,10 @@ const __dirname = dirname(__filename);
 const studioRoot = resolve(__dirname, '..');
 const distPath = resolve(studioRoot, 'dist');
 
-// Check if dist folder exists
+// Check if dist folder exists (Studio UI)
 if (!existsSync(distPath)) {
-  console.error('❌ Error: Studio has not been built yet.');
+  console.error('❌ Error: Studio UI has not been built yet.');
   console.error('   Please run: npm run build');
-  console.error('   Or install the package which will build it automatically.');
   process.exit(1);
 }
 
@@ -26,35 +26,33 @@ console.log('🚀 Starting Helios Studio...');
 console.log(`📁 Project root: ${projectRoot}`);
 console.log(`🌐 Studio UI: ${distPath}`);
 
-// Spawn vite preview
-const viteProcess = spawn('npx', ['vite', 'preview', '--host', '--open'], {
-  cwd: studioRoot,
-  env: {
-    ...process.env,
-    HELIOS_PROJECT_ROOT: projectRoot,
-  },
-  stdio: 'inherit',
-  shell: true,
-});
+(async () => {
+  try {
+    const server = await createServer({
+      // Root at user project to enable HMR for their files
+      root: projectRoot,
+      server: {
+        port: 5173,
+        open: true,
+      },
+      // Use the built plugin which includes the static serving middleware
+      plugins: [
+        studioApiPlugin({ studioRoot: distPath })
+      ],
+      // Allow Vite to discover user config if it exists
+      configFile: undefined,
+    });
 
-viteProcess.on('error', (err) => {
-  console.error('❌ Failed to start studio:', err.message);
-  process.exit(1);
-});
+    await server.listen();
 
-viteProcess.on('close', (code) => {
-  if (code !== 0 && code !== null) {
-    console.log(`\n⚠️  Studio process exited with code ${code}`);
+    const address = server.httpServer.address();
+    const port = typeof address === 'object' && address ? address.port : 5173;
+
+    server.printUrls();
+    console.log(`\n  ➜  Studio: http://localhost:${port}/`);
+
+  } catch (e) {
+    console.error('❌ Failed to start studio server:', e);
+    process.exit(1);
   }
-  process.exit(code || 0);
-});
-
-// Handle graceful shutdown
-process.on('SIGINT', () => {
-  console.log('\n\n👋 Shutting down Helios Studio...');
-  viteProcess.kill('SIGINT');
-});
-
-process.on('SIGTERM', () => {
-  viteProcess.kill('SIGTERM');
-});
+})();
