@@ -544,6 +544,29 @@ describe('Helios Core', () => {
       const helios = new Helios({ duration: 10, fps: 30 });
       expect(helios.getState().inputProps).toEqual({});
     });
+
+    it('should support generic typed inputProps', () => {
+      interface MyProps {
+        title: string;
+        count: number;
+      }
+      const initial: MyProps = { title: 'Test', count: 1 };
+
+      // Instantiate with generic type
+      const helios = new Helios<MyProps>({
+        duration: 10,
+        fps: 30,
+        inputProps: initial
+      });
+
+      // Type inference should work (runtime verification)
+      expect(helios.getState().inputProps.title).toBe('Test');
+      expect(helios.inputProps.peek().count).toBe(1);
+
+      // Update with typed props
+      helios.setInputProps({ title: 'Updated', count: 2 });
+      expect(helios.getState().inputProps).toEqual({ title: 'Updated', count: 2 });
+    });
   });
 
   describe('Playback Rate', () => {

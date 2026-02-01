@@ -141,13 +141,13 @@ export function validateSchema(schema: HeliosSchema | undefined, parentKey = '')
   }
 }
 
-export function validateProps(props: Record<string, any>, schema?: HeliosSchema): Record<string, any> {
+export function validateProps<T = Record<string, any>>(props: T, schema?: HeliosSchema): T {
   if (!schema) return props;
 
   const validProps: Record<string, any> = {};
 
   for (const [key, def] of Object.entries(schema)) {
-    const val = props[key];
+    const val = (props as any)[key];
 
     // Check requirement
     if (val === undefined) {
@@ -166,13 +166,13 @@ export function validateProps(props: Record<string, any>, schema?: HeliosSchema)
   }
 
   // Preserve extra props that are not in schema
-  for (const key of Object.keys(props)) {
+  for (const key of Object.keys(props as any)) {
     if (!(key in schema)) {
-      validProps[key] = props[key];
+      validProps[key] = (props as any)[key];
     }
   }
 
-  return validProps;
+  return validProps as T;
 }
 
 function validateValue(val: any, def: PropDefinition, keyPath: string): any {
