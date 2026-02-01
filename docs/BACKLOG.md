@@ -41,7 +41,7 @@
 ### 8. Maintenance
 - [x] Synchronize package versions (Fix CORE 2.7.1 dependency mismatch in PLAYER/RENDERER).
 - [ ] Fix workspace version mismatch between packages/renderer and packages/core (Core 2.11.0 vs Renderer req 2.10.0).
-- [ ] **Fix GSAP Timeline Synchronization in SeekTimeDriver**
+- [x] **Fix GSAP Timeline Synchronization in SeekTimeDriver**
   - **Problem**: Promo video (`examples/promo-video/composition.html`) renders a black video with only the background visible. All scenes (Logo Reveal, Tagline, Code to Video, Frameworks, CTA, End Card) are missing because GSAP timeline animations aren't being seeked during rendering.
   - **Last Working State**: Commit `9558e19` (Jan 29, 2026) - "✨ PROMO: Add Promo Video Example and Render Script"
   - **Root Cause**: The composition uses GSAP timeline (`tl`) with `paused: true` and a Helios subscription that seeks the timeline:
