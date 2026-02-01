@@ -49,6 +49,7 @@ packages/renderer/
     ├── verify-cdp-driver-timeout.ts # CdpDriver stability timeout test
     ├── verify-diagnose.ts      # Codec diagnostics test
     ├── verify-transparency.ts  # Transparency support test
+    ├── verify-canvas-strategy.ts # Canvas WebCodecs strategy test
     └── ...                     # Other verification scripts
 ```
 
