@@ -24,6 +24,11 @@
   <script>
     // Define process.env for Excalidraw if needed
     window.process = { env: { NODE_ENV: 'development' } };
+    // Set asset path for local rendering (file protocol)
+    if (window.location.protocol === 'file:') {
+      // Excalidraw requires an absolute URL for the asset path
+      window.EXCALIDRAW_ASSET_PATH = new URL('../../excalidraw-assets/', window.location.href).href;
+    }
   </script>
   <script type="module" src="./src/main.jsx"></script>
 </body>

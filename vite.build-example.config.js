@@ -6,6 +6,22 @@ import vue from "@vitejs/plugin-vue";
 import { svelte } from "@sveltejs/vite-plugin-svelte";
 import solidPlugin from "vite-plugin-solid";
 
+const copyExcalidrawAssetsPlugin = () => {
+  return {
+    name: 'copy-excalidraw-assets',
+    closeBundle: async () => {
+      const src = resolve(__dirname, 'node_modules/@excalidraw/excalidraw/dist/prod/fonts');
+      const dest = resolve(__dirname, 'output/example-build/excalidraw-assets');
+      if (fs.existsSync(src)) {
+        await fs.promises.cp(src, dest, { recursive: true });
+        console.log('Copied Excalidraw fonts to output/example-build/excalidraw-assets');
+      } else {
+        console.warn('Excalidraw fonts source not found at:', src);
+      }
+    }
+  }
+}
+
 function discoverExamples() {
   const examplesDir = resolve(__dirname, "examples");
   const inputs = {};
@@ -56,7 +72,8 @@ export default defineConfig({
     svelte(),
     solidPlugin({
       include: /examples\/solid-(canvas|dom|threejs-canvas)-animation|examples\/solid-transitions|examples\/solid-animation-helpers/,
-    })
+    }),
+    copyExcalidrawAssetsPlugin()
   ],
   // Root of the project
   root: ".",
