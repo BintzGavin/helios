@@ -1,3 +1,6 @@
+## RENDERER v1.53.2
+- ✅ Completed: Sync Core Dependency - Updated `packages/renderer/package.json` to depend on `@helios-project/core` version `3.6.0` (matching the workspace), fixing dependency resolution issues and ensuring compatibility with the latest core features.
+
 ## RENDERER v1.53.1
 - ✅ Completed: Fix Workspace Version Mismatch - Updated `packages/renderer/package.json` to depend on `@helios-project/core` version `3.4.0` (matching the workspace), enabling strict version synchronization and preventing lockfile drift.
 
