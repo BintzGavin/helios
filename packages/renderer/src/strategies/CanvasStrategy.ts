@@ -70,6 +70,17 @@ export class CanvasStrategy implements RenderStrategy {
     // Ensure fonts are loaded before capture starts
     await page.evaluate(function() { return document.fonts.ready; });
 
+    // Validate that the canvas element exists
+    const selector = this.options.canvasSelector || 'canvas';
+    const canvasExists = await page.evaluate((sel) => {
+      const el = document.querySelector(sel);
+      return el instanceof HTMLCanvasElement;
+    }, selector);
+
+    if (!canvasExists) {
+      throw new Error(`Canvas not found matching selector: ${selector}`);
+    }
+
     // Scan for audio tracks using the shared utility
     const initialTracks = await scanForAudioTracks(page);
 
