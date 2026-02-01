@@ -413,6 +413,20 @@ describe('Helios Core', () => {
 
         delete (window as any).__HELIOS_VIRTUAL_TIME__;
     });
+
+    it('should sync with pre-existing __HELIOS_VIRTUAL_TIME__ on bind', async () => {
+        // Set virtual time BEFORE creating Helios or binding
+        (window as any).__HELIOS_VIRTUAL_TIME__ = 5000;
+
+        const helios = new Helios({ duration: 10, fps: 30 });
+        helios.bindToDocumentTimeline();
+
+        // Should sync immediately without waiting for poll
+        expect(helios.getState().currentFrame).toBe(150); // 5000ms * 30fps / 1000 = 150
+
+        delete (window as any).__HELIOS_VIRTUAL_TIME__;
+        helios.unbindFromDocumentTimeline();
+    });
   });
 
   describe('WAAPI Synchronization', () => {
