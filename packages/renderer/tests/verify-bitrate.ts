@@ -17,6 +17,9 @@ async function testBitrate(
   // Set viewport to match desired resolution so page.viewportSize() is correct
   await page.setViewportSize({ width, height });
 
+  // Inject canvas
+  await page.setContent(`<canvas id="canvas" width="${width}" height="${height}"></canvas>`);
+
   // Mock VideoEncoder
   await page.evaluate(() => {
     (window as any).heliosWebCodecs = {
