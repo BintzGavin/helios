@@ -14,7 +14,12 @@
     "strict": true,
     "noUnusedLocals": false,
     "noUnusedParameters": false,
-    "noFallthroughCasesInSwitch": true
+    "noFallthroughCasesInSwitch": true,
+    "paths": {
+      "@helios-project/core": ["../core/src/index.ts"],
+      "@helios-project/player": ["../player/src/index.ts"],
+      "@helios-project/renderer": ["../renderer/src/index.ts"]
+    }
   },
   "include": ["src"],
   "exclude": ["src/**/*.test.ts", "src/**/*.test.tsx"]

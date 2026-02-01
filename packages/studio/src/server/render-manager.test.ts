@@ -3,7 +3,7 @@ import path from 'path';
 import fs from 'fs';
 
 // Mock dependencies
-vi.mock('../../../renderer/src/index', () => ({
+vi.mock('@helios-project/renderer', () => ({
   Renderer: class MockRenderer {
     render() { return Promise.resolve(); }
     diagnose() { return Promise.resolve({}); }

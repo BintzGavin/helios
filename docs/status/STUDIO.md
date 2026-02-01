@@ -1,4 +1,4 @@
-**Version**: 0.70.1
+**Version**: 0.70.2
 
 # Studio Domain Status
 
@@ -7,6 +7,7 @@
 **Focus**: UI Implementation & CLI
 
 ## Recent Updates
+- [v0.70.2] ✅ Verified: Refactor Render Manager Imports - Updated tsconfig.json to alias @helios-project packages to source, and refactored render-manager.ts to use clean imports, ensuring robust type checking and verified persistence logic.
 - [v0.70.1] ✅ Verified: Maintenance - Synced package.json version and added lint script.
 - [v0.70.0] ✅ Completed: Persistent Render Jobs - Finalized verification and closed out the plan for persistent render jobs, ensuring job history survives restarts.
 - [v0.69.0] ✅ Verified: Maintenance - Synced package.json version and re-verified persistent render jobs functionality via tests.
