@@ -58,6 +58,7 @@ The component observes the following attributes:
 - `controlslist`: Space-separated tokens to customize UI (`nodownload`, `nofullscreen`).
 - `crossorigin`: CORS setting for the element (`anonymous`, `use-credentials`).
 - `sandbox`: Space-separated tokens for iframe security flags (default: `allow-scripts allow-same-origin`).
+- `disablepictureinpicture`: Boolean attribute to hide the Picture-in-Picture button.
 
 ## D. Child Elements
 - `<track>`: Standard HTMLTrackElement for importing captions (kind="captions"). Requires `src` (SRT or WebVTT file). Automatically populates the `textTracks` list.
@@ -101,6 +102,7 @@ Properties and methods available on the `HeliosPlayer` element instance:
 - `defaultPlaybackRate`: Get/Set default playback speed.
 - `canPlayType(type)`: Returns string indicating support (always empty for video MIME types).
 - `requestPictureInPicture()`: Request Picture-in-Picture mode (returns Promise<PictureInPictureWindow>).
+- `disablePictureInPicture`: Get/Set disable state for Picture-in-Picture button.
 
 **HeliosController Interface:**
 The controller returned by `getController()` provides advanced methods:

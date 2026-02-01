@@ -802,6 +802,18 @@ export class HeliosPlayer extends HTMLElement implements TrackHost {
     this.setAttribute("sandbox", val);
   }
 
+  public get disablePictureInPicture(): boolean {
+    return this.hasAttribute("disablepictureinpicture");
+  }
+
+  public set disablePictureInPicture(val: boolean) {
+    if (val) {
+      this.setAttribute("disablepictureinpicture", "");
+    } else {
+      this.removeAttribute("disablepictureinpicture");
+    }
+  }
+
   public async requestPictureInPicture(): Promise<PictureInPictureWindow> {
     if (!document.pictureInPictureEnabled) {
       throw new Error("Picture-in-Picture not supported");
@@ -879,7 +891,7 @@ export class HeliosPlayer extends HTMLElement implements TrackHost {
   }
 
   static get observedAttributes() {
-    return ["src", "width", "height", "autoplay", "loop", "controls", "export-format", "input-props", "poster", "muted", "interactive", "preload", "controlslist", "sandbox", "export-caption-mode"];
+    return ["src", "width", "height", "autoplay", "loop", "controls", "export-format", "input-props", "poster", "muted", "interactive", "preload", "controlslist", "sandbox", "export-caption-mode", "disablepictureinpicture"];
   }
 
   constructor() {
@@ -923,6 +935,8 @@ export class HeliosPlayer extends HTMLElement implements TrackHost {
     this.clickLayer.addEventListener("dblclick", () => this.toggleFullscreen());
 
     this._textTracks = new HeliosTextTrackList();
+    this._textTracks.addEventListener("addtrack", () => this.updateCCButtonVisibility());
+    this._textTracks.addEventListener("removetrack", () => this.updateCCButtonVisibility());
 
     this.resizeObserver = new ResizeObserver((entries) => {
       for (const entry of entries) {
@@ -1032,7 +1046,7 @@ export class HeliosPlayer extends HTMLElement implements TrackHost {
       }
     }
 
-    if (name === "controlslist") {
+    if (name === "controlslist" || name === "disablepictureinpicture") {
       this.updateControlsVisibility();
     }
 
@@ -1069,6 +1083,21 @@ export class HeliosPlayer extends HTMLElement implements TrackHost {
       this.fullscreenBtn.style.display = "none";
     } else {
       this.fullscreenBtn.style.removeProperty("display");
+    }
+
+    if (this.hasAttribute("disablepictureinpicture")) {
+      this.pipBtn.style.display = "none";
+    } else {
+      this.pipBtn.style.removeProperty("display");
+    }
+  }
+
+  private updateCCButtonVisibility() {
+    // Smart Controls: Hide CC button if no tracks are present
+    if (this._textTracks.length > 0) {
+        this.ccBtn.style.removeProperty("display");
+    } else {
+        this.ccBtn.style.display = "none";
     }
   }
 
@@ -1385,6 +1414,11 @@ export class HeliosPlayer extends HTMLElement implements TrackHost {
             const textTrack = this.addTextTrack(kind, label, lang);
             this._domTracks.set(t, textTrack);
 
+            if (isDefault) {
+                this.showCaptions = true;
+                this.ccBtn.classList.add("active");
+            }
+
             if (src) {
                 fetch(src)
                 .then((res) => {
@@ -1418,6 +1452,8 @@ export class HeliosPlayer extends HTMLElement implements TrackHost {
             this._domTracks.delete(el);
         }
     }
+
+    this.updateCCButtonVisibility();
   };
 
   private setController(controller: HeliosController) {

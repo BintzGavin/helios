@@ -122,6 +122,8 @@ export declare class HeliosPlayer extends HTMLElement implements TrackHost {
     set preload(val: string);
     get sandbox(): string;
     set sandbox(val: string);
+    get disablePictureInPicture(): boolean;
+    set disablePictureInPicture(val: boolean);
     requestPictureInPicture(): Promise<PictureInPictureWindow>;
     private togglePip;
     private onEnterPip;
