@@ -1,6 +1,6 @@
 # Status: DEMO Domain
 
-**Version**: 1.80.0
+**Version**: 1.81.0
 
 ## Vision
 The DEMO domain is responsible for:
@@ -15,6 +15,7 @@ The DEMO domain is responsible for:
 - None
 
 ## Completed Tasks
+- [v1.81.0] ✅ Completed: Vue Three.js Canvas Animation - Created `examples/vue-threejs-canvas-animation` demonstrating Three.js integration with Vue 3 and Helios.
 - [v1.80.0] ✅ Completed: Svelte Captions Animation - Created `examples/svelte-captions-animation` demonstrating Helios captions (SRT) support in Svelte.
 - [v1.79.1] ✅ Verified: Promo Video GSAP Sync - Confirmed that running the dev server from the project root resolves module resolution issues, allowing the Promo Video example to render correctly with full content.
 - [v1.79.0] ✅ Completed: Vue Captions Animation - Created `examples/vue-captions-animation` demonstrating how to use Helios captions with Vue 3 composition API.

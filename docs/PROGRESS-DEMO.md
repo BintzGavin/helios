@@ -1,3 +1,6 @@
+## DEMO v1.81.0
+- ✅ Completed: Vue Three.js Canvas Animation - Created `examples/vue-threejs-canvas-animation` demonstrating Three.js integration with Vue 3 and Helios.
+
 ## DEMO v1.80.0
 - ✅ Completed: Svelte Captions Animation - Created `examples/svelte-captions-animation` demonstrating Helios captions (SRT) support in Svelte.
 
