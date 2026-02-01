@@ -1,3 +1,6 @@
+## RENDERER v1.53.1
+- ✅ Completed: Fix Workspace Version Mismatch - Updated `packages/renderer/package.json` to depend on `@helios-project/core` version `3.4.0` (matching the workspace), enabling strict version synchronization and preventing lockfile drift.
+
 ## RENDERER v1.53.0
 - ✅ Completed: Enhance Diagnostics - Updated `CanvasStrategy.diagnose()` to perform comprehensive checks of supported WebCodecs (H.264, VP8, VP9, AV1) in the browser environment, returning a detailed `codecs` report for better debuggability.
 
