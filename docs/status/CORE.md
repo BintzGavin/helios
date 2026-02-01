@@ -1,11 +1,12 @@
 # Status: CORE
 
-**Version**: 3.8.0
+**Version**: 3.9.0
 
 - **Status**: Active
 - **Current Focus**: Maintenance, Optimization, and Stability
 - **Last Updated**: 2026-06-10
 
+[v3.9.0] ✅ Completed: Fix Signal Glitches and Runtime Safety - Optimized `EffectImpl` to avoid redundant executions (diamond problem) and guarded `Helios.bindToDocumentTimeline` for Node.js compatibility.
 [v3.8.0] ✅ Completed: Implement Audio Track Discovery - Implemented `availableAudioTracks` signal in `Helios` and updated `DomDriver` to discover elements with `data-helios-track-id`.
 [v3.7.0] ✅ Completed: Implement DomDriver Audio Looping - Updated `DomDriver` to respect the `loop` attribute on media elements, wrapping time calculations to support infinite loops.
 [v3.6.0] ✅ Completed: Refactor Helios - Extracted Helios class to dedicated Helios.ts file and cleaned up index.ts exports.

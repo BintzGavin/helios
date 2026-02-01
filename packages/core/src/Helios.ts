@@ -982,11 +982,13 @@ export class Helios {
 
       // Check if virtual time is active. If so, we skip polling document.timeline
       // because the setter handles it.
-      if (typeof window !== 'undefined' && typeof (window as any).__HELIOS_VIRTUAL_TIME__ === 'number') {
+      if (typeof window !== 'undefined') {
         const virtualTime = (window as any).__HELIOS_VIRTUAL_TIME__;
-        if (Number.isFinite(virtualTime)) {
+        if (typeof virtualTime === 'number' && Number.isFinite(virtualTime)) {
           // Virtual time is active, setter handles logic.
-          requestAnimationFrame(poll);
+          if (typeof requestAnimationFrame !== 'undefined') {
+            requestAnimationFrame(poll);
+          }
           return;
         }
       }
@@ -1011,10 +1013,14 @@ export class Helios {
           audioTracks: this._audioTracks.peek()
         });
       }
-      requestAnimationFrame(poll);
+      if (typeof requestAnimationFrame !== 'undefined') {
+        requestAnimationFrame(poll);
+      }
     };
 
-    requestAnimationFrame(poll);
+    if (typeof requestAnimationFrame !== 'undefined') {
+      requestAnimationFrame(poll);
+    }
   }
 
   public unbindFromDocumentTimeline() {
