@@ -1661,5 +1661,45 @@ describe('HeliosPlayer', () => {
         // Should have applied to controller
         expect(mockController.setAudioMuted).toHaveBeenCalledWith(true);
     });
+
+    it('should clamp invalid volume values', () => {
+        // Test negative value
+        player.volume = -0.5;
+        expect(player.volume).toBe(0);
+
+        // Test value > 1
+        player.volume = 1.5;
+        expect(player.volume).toBe(1);
+
+        // Connect
+        (player as any).setController(mockController);
+
+        // Should apply clamped value (last set was 1.5 -> 1)
+        expect(mockController.setAudioVolume).toHaveBeenCalledWith(1);
+    });
+
+    it('should prioritize explicit muted property over attribute', () => {
+        // Attribute says muted
+        player.setAttribute('muted', '');
+
+        // Property says unmuted (explicitly set)
+        player.muted = false;
+
+        // Connect
+        (player as any).setController(mockController);
+
+        // Should respect property (false) over attribute (true)
+        expect(mockController.setAudioMuted).toHaveBeenCalledWith(false);
+    });
+
+    it('should apply both volume and muted when set before connection', () => {
+        player.volume = 0.5;
+        player.muted = true;
+
+        (player as any).setController(mockController);
+
+        expect(mockController.setAudioVolume).toHaveBeenCalledWith(0.5);
+        expect(mockController.setAudioMuted).toHaveBeenCalledWith(true);
+    });
   });
 });

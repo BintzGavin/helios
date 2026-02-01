@@ -1,4 +1,4 @@
-**Version**: v0.49.2
+**Version**: v0.49.3
 
 # Status: PLAYER
 
@@ -45,6 +45,7 @@
 ## Critical Task
 - **None**: All critical tasks completed.
 
+[v0.49.3] ✅ Completed: Verify and Harden Persist Media Properties - Added comprehensive unit tests for volume clamping and muted property precedence to verify robustness of persisted media properties.
 [v0.49.2] ✅ Completed: Fix API Parity Tests - Updated `api_parity.test.ts` mock controller to match the `HeliosController` interface, ensuring tests pass with the new media persistence logic.
 [v0.49.1] ✅ Completed: Persist Media Properties - Implemented persistence for `volume`, `playbackRate`, and `muted` properties so values set before the player loads are applied when the controller connects.
 [v0.49.0] ✅ Completed: Picture-in-Picture - Implemented `requestPictureInPicture` API and UI toggle button for the player, supported in Direct/Same-Origin mode.
