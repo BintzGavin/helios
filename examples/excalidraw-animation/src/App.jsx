@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Excalidraw } from "@excalidraw/excalidraw";
+import "@excalidraw/excalidraw/index.css";
 import { Helios } from '../../../packages/core/src/index.ts';
 import { useVideoFrame } from './hooks/useVideoFrame';
 import { getArchitectureElements } from './diagram';
