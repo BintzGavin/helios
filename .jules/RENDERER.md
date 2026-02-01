@@ -201,3 +201,7 @@
 ## [2026-06-08] - Incomplete Declarative Audio Fades
 **Learning:** `DomScanner` misses `data-helios-fade-in` and `data-helios-fade-out` attributes, limiting the "Use What You Know" vision for audio elements. Users can specify fades in JSON config but not in HTML.
 **Action:** Created plan to parse these attributes in `scanForAudioTracks` and map them to the existing `AudioTrackConfig` fields.
+
+## 2026-06-09 - Orphaned Plans
+**Learning:** Found an existing plan (`2026-02-18-RENDERER-Canvas-Selector.md`) that was never implemented (test file missing). This indicates a potential disconnect between Planning and Execution phases.
+**Action:** When identifying gaps, check `.sys/plans` for existing but unexecuted plans before creating new ones. If found, "revive" them by updating the date/content or referencing them.
