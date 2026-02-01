@@ -59,3 +59,7 @@
 ## [1.81.1] - File List Accuracy
 **Learning:** Relying on `list_files` output without checking subdirectory contents can lead to incorrect assumptions about file existence (e.g. `main.ts` vs `index.ts`).
 **Action:** Always `list_files` in the specific subdirectory before attempting to read files, especially when "guessing" entry points.
+
+## [1.82.0] - SolidJS Build Config Constraint
+**Learning:** The `vite.build-example.config.js` file uses a strict regex to include/exclude specific SolidJS example directories (`examples/solid-*`). Adding a new SolidJS example requires manually updating this regex in the root build config, or it will be ignored/miscompiled.
+**Action:** When planning new SolidJS examples, always include a step to update `vite.build-example.config.js`.
