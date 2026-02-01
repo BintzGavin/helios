@@ -31,9 +31,17 @@ export class SeekTimeDriver implements TimeDriver {
   }
 
   async prepare(page: Page): Promise<void> {
-    // No-op for SeekTimeDriver, but required by interface
-    // The page should already be fully loaded (waitUntil: 'networkidle')
-    // If GSAP timeline isn't available yet, we'll rely on Helios subscription
+    // Wait for GSAP timeline to be available if it's a GSAP project
+    // This handles the race condition where main.js (ES module) hasn't finished executing when rendering starts
+    try {
+      await page.waitForFunction(
+        () => typeof (window as any).__helios_gsap_timeline__ !== 'undefined',
+        { timeout: 1000 }
+      );
+    } catch (e) {
+      // Ignore - likely not a GSAP project, or timeline didn't initialize in time
+      // We'll proceed and rely on Helios subscription/polling as fallback
+    }
   }
 
   async setTime(page: Page, timeInSeconds: number): Promise<void> {
@@ -41,6 +49,7 @@ export class SeekTimeDriver implements TimeDriver {
     // interfering with the client-side execution in Playwright.
     const script = `
       (async (t, timeoutMs) => {
+        let gsapTimelineSeeked = false;
         const timeInMs = t * 1000;
 
         // Update the global virtual time
