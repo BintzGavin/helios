@@ -13,3 +13,7 @@
 ## [v0.51.0] - Audio Track ID Gap
 **Learning:** Discovered that `HeliosController.setAudioTrackVolume` requires an ID, but `getAudioAssets` (used for track discovery) does not return one, making the API unusable for generic players.
 **Action:** When designing controller APIs for resources (tracks, assets), always ensure the "List" method returns the unique identifiers required by the "Control" methods.
+
+## [v0.52.0] - Standard Attributes UX
+**Learning:** Standard HTML5 video attributes like `disablePictureInPicture` and `default` (for tracks) are critical for expected UX but were missed in initial implementation.
+**Action:** When implementing standard elements (like `<video>`), systematically review the entire MDN attribute list to ensure behavioral parity, especially for UI controls visibility.
