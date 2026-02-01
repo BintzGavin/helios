@@ -63,3 +63,7 @@
 ## [1.82.0] - SolidJS Build Config Constraint
 **Learning:** The `vite.build-example.config.js` file uses a strict regex to include/exclude specific SolidJS example directories (`examples/solid-*`). Adding a new SolidJS example requires manually updating this regex in the root build config, or it will be ignored/miscompiled.
 **Action:** When planning new SolidJS examples, always include a step to update `vite.build-example.config.js`.
+
+## [1.83.0] - Plan Scope Discipline
+**Learning:** As a Planner, I initially drafted a plan to *implement* the code myself, violating the role boundary. The system rejected this.
+**Action:** When creating plans, explicitly verify that every step is about *creating the spec file* or *verifying the spec*, not touching the target code.
