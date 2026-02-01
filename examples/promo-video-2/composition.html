@@ -4,6 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Helios Promo Video 2</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <style>
     body, html {
       margin: 0;
@@ -11,7 +14,7 @@
       width: 1920px;
       height: 1080px;
       overflow: hidden;
-      background-color: #000;
+      background: linear-gradient(135deg, #0a0a0f 0%, #0f0f1a 50%, #0a0a0f 100%);
       color: #fff;
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     }
@@ -50,15 +53,38 @@
       font-weight: 400;
       margin-top: 20px;
       opacity: 0.8;
+      color: rgba(255, 255, 255, 0.7);
     }
     .code-overlay {
       font-family: 'Fira Code', monospace;
       font-size: 24px;
-      background: rgba(0,0,0,0.8);
-      padding: 20px;
-      border-radius: 8px;
+      background: #1a1a2e;
+      padding: 40px;
+      border-radius: 16px;
       text-align: left;
       opacity: 0;
+      border: 1px solid rgba(55, 112, 255, 0.3);
+      box-shadow: 0 0 60px rgba(55, 112, 255, 0.2);
+    }
+
+    .highlight-text {
+      background: linear-gradient(135deg, #3770FF 0%, #7B9FFF 50%, #3770FF 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .gold-text {
+      background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .sun-icon {
+      font-size: 100px;
+      margin-bottom: 20px;
+      filter: drop-shadow(0 0 60px rgba(255, 200, 50, 0.8));
     }
   </style>
 </head>
@@ -78,7 +104,7 @@
 
     <!-- Scene 4 -->
     <div id="text-scene-4" class="text-overlay">
-      Helios
+      <span class="highlight-text">Helios</span>
       <div class="text-small">Programmatic video. Reimagined.</div>
     </div>
 
@@ -94,7 +120,7 @@
     <div id="text-scene-6" class="text-overlay">
       <div class="code-overlay">
         const scene = new Scene();<br>
-        scene.light = <span style="color: #4fd1c5">Color.CYAN</span>;
+        scene.light = <span style="color: #3770FF">Color.BLUE</span>;
       </div>
       <div style="margin-top: 40px;">Change the rules. Everything follows.</div>
     </div>
@@ -108,7 +134,8 @@
 
     <!-- Scene 8 -->
     <div id="text-scene-8" class="text-overlay">
-      <div style="font-size: 140px; font-weight: 900;">HELIOS</div>
+      <div class="sun-icon">☀️</div>
+      <div style="font-size: 140px; font-weight: 900;" class="highlight-text">HELIOS</div>
       <div class="text-small">Build video like software.</div>
     </div>
   </div>

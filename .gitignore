@@ -35,4 +35,6 @@ Thumbs.db
 # Allow promo video output
 !examples/promo-video/output/
 !examples/promo-video/output/helios-promo.mp4
+!examples/promo-video-2/output/
+!examples/promo-video-2/output/*.mp4
 test-results/

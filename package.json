@@ -70,7 +70,7 @@
     "tailwindcss": "^3.4.19",
     "three": "^0.182.0",
     "ts-node": "^10.9.2",
-    "typescript": "^5.0.0",
+    "typescript": "^5.9.3",
     "vite": "^7.1.2",
     "vite-plugin-solid": "^2.11.10",
     "vitest": "^4.0.17",

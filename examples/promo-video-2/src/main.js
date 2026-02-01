@@ -19,7 +19,7 @@ const helios = new Helios({
 // ===== Initialize Three.js =====
 const canvasContainer = document.getElementById('canvas-container');
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x000000);
+// scene.background = new THREE.Color(0x000000); // Transparent for CSS gradient
 
 const camera = new THREE.PerspectiveCamera(60, WIDTH / HEIGHT, 0.1, 1000);
 camera.position.z = 20;
@@ -50,7 +50,7 @@ const rowCount = 10;
 const rows = [];
 for (let i = 0; i < rowCount; i++) {
   const rowGeo = new THREE.BoxGeometry(20, 0.5, 0.1);
-  const rowMat = new THREE.MeshBasicMaterial({ color: 0x555555 });
+  const rowMat = new THREE.MeshBasicMaterial({ color: 0x2a2a4e });
   const row = new THREE.Mesh(rowGeo, rowMat);
   row.position.y = (i - rowCount / 2) * 1.5;
   row.visible = false;
@@ -67,7 +67,7 @@ for (let i = 0; i < particleCount * 3; i++) {
   particlePositions[i] = (Math.random() - 0.5) * 40;
 }
 particlesGeo.setAttribute('position', new THREE.BufferAttribute(particlePositions, 3));
-const particlesMat = new THREE.PointsMaterial({ color: 0xffffff, size: 0.1 });
+const particlesMat = new THREE.PointsMaterial({ color: 0x3770FF, size: 0.1 });
 const particles = new THREE.Points(particlesGeo, particlesMat);
 particles.visible = false;
 scene.add(particles);
@@ -75,7 +75,7 @@ scene.add(particles);
 // Scene 5: Shapes
 const shapesGroup = new THREE.Group();
 const barGeo = new THREE.BoxGeometry(1, 1, 1);
-const barMat = new THREE.MeshStandardMaterial({ color: 0x4fd1c5 });
+const barMat = new THREE.MeshStandardMaterial({ color: 0x3770FF });
 const bars = [];
 for (let i = 0; i < 5; i++) {
   const bar = new THREE.Mesh(barGeo, barMat);
@@ -90,7 +90,7 @@ scene.add(shapesGroup);
 
 // Scene 6: Developer Power Sphere
 const devSphereGeo = new THREE.IcosahedronGeometry(2, 1);
-const devSphereMat = new THREE.MeshStandardMaterial({ color: 0x222222, wireframe: true });
+const devSphereMat = new THREE.MeshStandardMaterial({ color: 0x3770FF, wireframe: true });
 const devSphere = new THREE.Mesh(devSphereGeo, devSphereMat);
 devSphere.visible = false;
 scene.add(devSphere);
@@ -100,7 +100,7 @@ const orbitGroup = new THREE.Group();
 const orbitPlanes = [];
 for (let i = 0; i < 8; i++) {
   const planeGeo = new THREE.PlaneGeometry(3, 1.69); // 16:9 aspect
-  const planeMat = new THREE.MeshBasicMaterial({ color: new THREE.Color().setHSL(i / 8, 0.7, 0.5), side: THREE.DoubleSide });
+  const planeMat = new THREE.MeshBasicMaterial({ color: new THREE.Color(i % 2 === 0 ? 0x3770FF : 0x7B9FFF), side: THREE.DoubleSide });
   const plane = new THREE.Mesh(planeGeo, planeMat);
   // Position in a circle
   const angle = (i / 8) * Math.PI * 2;
@@ -205,7 +205,7 @@ tl.set(devSphere, { visible: true }, 18);
 tl.to('#text-scene-6', { opacity: 1, duration: 0.5 }, 18);
 
 // Code change effect
-tl.to(devSphere.material.color, { r: 0.3, g: 0.8, b: 0.7, duration: 0.1 }, 20); // Turn Teal
+tl.to(devSphere.material.color, { r: 1.0, g: 0.84, b: 0.0, duration: 0.1 }, 20); // Turn Gold
 tl.to(devSphere.scale, { x: 1.5, y: 1.5, z: 1.5, duration: 0.5, ease: "back.out" }, 20);
 
 tl.to('#text-scene-6', { opacity: 0, duration: 0.5 }, 21.5);
