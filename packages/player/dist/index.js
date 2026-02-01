@@ -480,6 +480,10 @@ export class HeliosPlayer extends HTMLElement {
     lastState = null;
     pendingProps = null;
     _error = null;
+    // Persistence for properties set before connection
+    _pendingVolume = 1;
+    _pendingPlaybackRate = 1;
+    _pendingMuted = null;
     // --- Standard Media API States ---
     static HAVE_NOTHING = 0;
     static HAVE_METADATA = 1;
@@ -626,17 +630,28 @@ export class HeliosPlayer extends HTMLElement {
         return s.currentFrame >= s.duration * s.fps - 1;
     }
     get volume() {
-        return this.controller ? this.controller.getState().volume ?? 1 : 1;
+        if (this.controller) {
+            return this.controller.getState().volume ?? this._pendingVolume;
+        }
+        return this._pendingVolume;
     }
     set volume(val) {
+        const clamped = Math.max(0, Math.min(1, val));
+        this._pendingVolume = clamped;
         if (this.controller) {
-            this.controller.setAudioVolume(Math.max(0, Math.min(1, val)));
+            this.controller.setAudioVolume(clamped);
         }
     }
     get muted() {
-        return this.controller ? !!this.controller.getState().muted : false;
+        if (this.controller) {
+            return !!this.controller.getState().muted;
+        }
+        // If pendingMuted is explicitly set, return it.
+        // Otherwise fallback to attribute presence (default behavior).
+        return this._pendingMuted !== null ? this._pendingMuted : this.hasAttribute("muted");
     }
     set muted(val) {
+        this._pendingMuted = val;
         if (this.controller) {
             this.controller.setAudioMuted(val);
         }
@@ -653,9 +668,13 @@ export class HeliosPlayer extends HTMLElement {
         }
     }
     get playbackRate() {
-        return this.controller ? this.controller.getState().playbackRate ?? 1 : 1;
+        if (this.controller) {
+            return this.controller.getState().playbackRate ?? this._pendingPlaybackRate;
+        }
+        return this._pendingPlaybackRate;
     }
     set playbackRate(val) {
+        this._pendingPlaybackRate = val;
         if (this.controller) {
             this.controller.setPlaybackRate(val);
         }
@@ -1303,9 +1322,12 @@ export class HeliosPlayer extends HTMLElement {
         if (this.pendingProps) {
             this.controller.setInputProps(this.pendingProps);
         }
-        if (this.hasAttribute("muted")) {
-            this.controller.setAudioMuted(true);
-        }
+        // Apply persisted media properties
+        this.controller.setAudioVolume(this._pendingVolume);
+        this.controller.setPlaybackRate(this._pendingPlaybackRate);
+        // Determine muted state: Explicit property set > Attribute
+        const shouldMute = this._pendingMuted !== null ? this._pendingMuted : this.hasAttribute("muted");
+        this.controller.setAudioMuted(shouldMute);
         if (this.hasAttribute("loop")) {
             this.controller.setLoop(true);
         }

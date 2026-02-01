@@ -55,6 +55,9 @@ export declare class HeliosPlayer extends HTMLElement implements TrackHost {
     private lastState;
     private pendingProps;
     private _error;
+    private _pendingVolume;
+    private _pendingPlaybackRate;
+    private _pendingMuted;
     static readonly HAVE_NOTHING = 0;
     static readonly HAVE_METADATA = 1;
     static readonly HAVE_CURRENT_DATA = 2;
