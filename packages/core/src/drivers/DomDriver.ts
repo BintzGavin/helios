@@ -315,8 +315,16 @@ export class DomDriver implements TimeDriver {
       const isBeforeStart = timeRelToStart < 0;
 
       // effectiveTime is where the media element should be.
-      // If before start, we hold at the in-point (seek).
-      const targetTime = Math.max(0, timeRelToStart + seek);
+      let targetTime: number;
+
+      if (el.loop && !isNaN(el.duration) && isFinite(el.duration) && el.duration > 0) {
+        // If looping, wrap around duration.
+        // We only rely on targetTime when !isBeforeStart (timeRelToStart >= 0),
+        // so (timeRelToStart + seek) is guaranteed positive.
+        targetTime = (timeRelToStart + seek) % el.duration;
+      } else {
+        targetTime = Math.max(0, timeRelToStart + seek);
+      }
 
       // Sync Playback Rate
       if (el.playbackRate !== playbackRate) {

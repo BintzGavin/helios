@@ -767,4 +767,75 @@ describe('DomDriver', () => {
       expect(mockAudio.volume).toBeCloseTo(0.6, 2);
     });
   });
+
+  describe('Looping Support', () => {
+    it('should loop media when loop attribute is present', async () => {
+      const mockVideo = document.createElement('video');
+      Object.defineProperty(mockVideo, 'loop', { value: true, writable: true });
+      Object.defineProperty(mockVideo, 'duration', { value: 10, writable: true });
+      Object.defineProperty(mockVideo, 'currentTime', { value: 0, writable: true });
+      mockVideo.play = vi.fn().mockResolvedValue(undefined);
+      mockVideo.pause = vi.fn();
+
+      scope.appendChild(mockVideo);
+      await new Promise(resolve => setTimeout(resolve, 20));
+
+      // 12s: Should be at 2s (12 % 10)
+      driver.update(12000, { isPlaying: true, playbackRate: 1 });
+
+      expect(mockVideo.play).toHaveBeenCalled();
+      expect(mockVideo.currentTime).toBe(2);
+    });
+
+    it('should respect seek with loop', async () => {
+      const mockVideo = document.createElement('video');
+      Object.defineProperty(mockVideo, 'loop', { value: true, writable: true });
+      Object.defineProperty(mockVideo, 'duration', { value: 10, writable: true });
+      mockVideo.setAttribute('data-helios-seek', '5');
+
+      Object.defineProperty(mockVideo, 'currentTime', { value: 0, writable: true });
+      mockVideo.play = vi.fn().mockResolvedValue(undefined);
+      mockVideo.pause = vi.fn();
+
+      scope.appendChild(mockVideo);
+      await new Promise(resolve => setTimeout(resolve, 20));
+
+      // 1s: Effective = 1 + 5 = 6s.
+      driver.update(1000, { isPlaying: true, playbackRate: 1 });
+      expect(mockVideo.currentTime).toBe(6);
+
+      // 6s: Effective = 6 + 5 = 11s. 11 % 10 = 1s.
+      driver.update(6000, { isPlaying: true, playbackRate: 1 });
+      expect(mockVideo.currentTime).toBe(1);
+    });
+
+    it('should fallback to clamp if duration is invalid', async () => {
+      const mockVideo = document.createElement('video');
+      Object.defineProperty(mockVideo, 'loop', { value: true, writable: true });
+      Object.defineProperty(mockVideo, 'duration', { value: Infinity, writable: true });
+      Object.defineProperty(mockVideo, 'currentTime', { value: 0, writable: true });
+      mockVideo.play = vi.fn().mockResolvedValue(undefined);
+
+      scope.appendChild(mockVideo);
+      await new Promise(resolve => setTimeout(resolve, 20));
+
+      // 100s: Should just be 100s (Infinity check fails, goes to else block)
+      driver.update(100000, { isPlaying: true, playbackRate: 1 });
+      expect(mockVideo.currentTime).toBe(100);
+    });
+
+    it('should handle zero duration gracefully', async () => {
+      const mockVideo = document.createElement('video');
+      Object.defineProperty(mockVideo, 'loop', { value: true, writable: true });
+      Object.defineProperty(mockVideo, 'duration', { value: 0, writable: true });
+      Object.defineProperty(mockVideo, 'currentTime', { value: 0, writable: true });
+      mockVideo.play = vi.fn().mockResolvedValue(undefined);
+
+      scope.appendChild(mockVideo);
+      await new Promise(resolve => setTimeout(resolve, 20));
+
+      driver.update(10000, { isPlaying: true, playbackRate: 1 });
+      expect(mockVideo.currentTime).toBe(10);
+    });
+  });
 });

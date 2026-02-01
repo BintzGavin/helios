@@ -13,7 +13,7 @@ The **CORE** domain implements the **Helios State Machine** pattern.
 The `DomDriver` acts as the bridge between the pure mathematical state of Helios and the browser's DOM, handling:
 *   WAAPI Animation synchronization.
 *   HTMLMediaElement (`<video>`, `<audio>`) synchronization.
-*   Audio volume, fading, and mute states.
+*   Audio volume, fading, looping, and mute states.
 
 ## B. File Tree
 

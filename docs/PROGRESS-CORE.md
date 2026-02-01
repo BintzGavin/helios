@@ -1,5 +1,8 @@
 # CORE Progress Log
 
+## CORE v3.7.0
+- ✅ Completed: Implement DomDriver Audio Looping - Updated `DomDriver` to respect the `loop` attribute on media elements, wrapping time calculations to support infinite loops.
+
 ## CORE v3.6.0
 - ✅ Completed: Refactor Helios - Extracted Helios class to dedicated Helios.ts file and cleaned up index.ts exports.
 - ✅ Completed: Implement Audio Fading - Added support for `data-helios-fade-in` and `data-helios-fade-out` in `DomDriver` to enable linear audio fading.
