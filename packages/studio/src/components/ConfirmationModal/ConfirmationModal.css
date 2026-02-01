@@ -1,0 +1,84 @@
+.confirmation-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1100;
+  backdrop-filter: blur(2px);
+}
+
+.confirmation-modal-content {
+  background: #1e1e1e;
+  border: 1px solid #333;
+  border-radius: 8px;
+  width: 400px;
+  max-width: 90vw;
+  padding: 24px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.confirmation-modal-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #fff;
+  margin: 0;
+}
+
+.confirmation-modal-message {
+  font-size: 14px;
+  color: #ccc;
+  line-height: 1.5;
+}
+
+.confirmation-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.confirmation-modal-button {
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  transition: background-color 0.2s;
+}
+
+.confirmation-modal-button.cancel {
+  background: transparent;
+  color: #aaa;
+  border: 1px solid #444;
+}
+
+.confirmation-modal-button.cancel:hover {
+  background: #333;
+  color: #fff;
+}
+
+.confirmation-modal-button.confirm {
+  background: #007bff;
+  color: #fff;
+}
+
+.confirmation-modal-button.confirm:hover {
+  background: #0069d9;
+}
+
+.confirmation-modal-button.confirm.destructive {
+  background: #d32f2f;
+}
+
+.confirmation-modal-button.confirm.destructive:hover {
+  background: #b71c1c;
+}

@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Asset, useStudio } from '../../context/StudioContext';
+import { ConfirmationModal } from '../ConfirmationModal/ConfirmationModal';
 import './AssetItem.css';
 
 interface AssetItemProps {
@@ -12,6 +13,8 @@ export const AssetItem: React.FC<AssetItemProps> = ({ asset }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editName, setEditName] = useState(asset.name);
+  const [showRenameWarning, setShowRenameWarning] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
@@ -49,9 +52,12 @@ export const AssetItem: React.FC<AssetItemProps> = ({ asset }) => {
 
   const handleDelete = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (confirm(`Are you sure you want to delete ${asset.name}?`)) {
-      deleteAsset(asset.id);
-    }
+    setShowDeleteConfirm(true);
+  };
+
+  const handleConfirmDelete = () => {
+    deleteAsset(asset.id);
+    setShowDeleteConfirm(false);
   };
 
   const handleRenameClick = (e: React.MouseEvent) => {
@@ -60,20 +66,30 @@ export const AssetItem: React.FC<AssetItemProps> = ({ asset }) => {
     setEditName(asset.name);
   };
 
-  const handleRenameSubmit = async () => {
+  const handleRenameSubmit = () => {
     if (!editName || editName === asset.name) {
       setIsEditing(false);
       setEditName(asset.name);
       return;
     }
+    setIsEditing(false);
+    setShowRenameWarning(true);
+  };
+
+  const handleConfirmRename = async () => {
     try {
       await renameAsset(asset.id, editName);
-      setIsEditing(false);
+      setShowRenameWarning(false);
     } catch (e) {
       alert('Failed to rename asset');
       setEditName(asset.name);
-      setIsEditing(false);
+      setShowRenameWarning(false);
     }
+  };
+
+  const handleCancelRename = () => {
+    setShowRenameWarning(false);
+    setEditName(asset.name);
   };
 
   const handleVideoEnter = () => {
@@ -157,8 +173,27 @@ export const AssetItem: React.FC<AssetItemProps> = ({ asset }) => {
   };
 
   return (
-    <div
-      className="asset-item"
+    <>
+      <ConfirmationModal
+        isOpen={showDeleteConfirm}
+        onClose={() => setShowDeleteConfirm(false)}
+        onConfirm={handleConfirmDelete}
+        title="Delete Asset"
+        message={`Are you sure you want to delete "${asset.name}"? This action cannot be undone and may break compositions referencing this file.`}
+        confirmLabel="Delete"
+        isDestructive
+      />
+      <ConfirmationModal
+        isOpen={showRenameWarning}
+        onClose={handleCancelRename}
+        onConfirm={handleConfirmRename}
+        title="Rename Asset"
+        message="Renaming this asset will change its file path. Any compositions referencing it will need to be updated manually. Are you sure you want to proceed?"
+        confirmLabel="Rename"
+        cancelLabel="Cancel"
+      />
+      <div
+        className="asset-item"
       title={asset.relativePath}
       draggable={true}
       onDragStart={handleDragStart}
@@ -233,6 +268,7 @@ export const AssetItem: React.FC<AssetItemProps> = ({ asset }) => {
           {asset.name}
         </span>
       )}
-    </div>
+      </div>
+    </>
   );
 };
