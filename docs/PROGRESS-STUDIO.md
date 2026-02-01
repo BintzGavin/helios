@@ -1,3 +1,6 @@
+## STUDIO v0.74.0
+- ✅ Completed: Markdown URLs - Implemented `/docs/:pkg.md` endpoint to serve raw documentation for Core, Renderer, Player, and Studio packages.
+
 ## STUDIO v0.73.0
 - ✅ Completed: Composition Thumbnails - Implemented ability to set and view thumbnails for compositions in the Switcher and Settings.
 

@@ -5,7 +5,7 @@ import path from 'path';
 import { SSEServerTransport } from "@modelcontextprotocol/sdk/server/sse.js";
 import { createMcpServer } from './mcp';
 import { findCompositions, findAssets, getProjectRoot, createComposition, deleteComposition, updateCompositionMetadata, duplicateComposition, renameComposition, renameAsset } from './discovery';
-import { findDocumentation } from './documentation';
+import { findDocumentation, resolveDocumentationPath } from './documentation';
 import { startRender, getJob, getJobs, cancelJob, deleteJob, diagnoseServer } from './render-manager';
 
 export interface StudioPluginOptions {
@@ -368,6 +368,30 @@ function configureMiddlewares(server: ViteDevServer | PreviewServer, isPreview: 
             res.end(JSON.stringify({ error: e.message || 'Diagnostics failed' }));
           }
           return;
+        }
+        next();
+      });
+
+      server.middlewares.use('/docs', async (req, res, next) => {
+        const match = req.url!.match(/^\/([^\/]+)\.md$/);
+        if (match) {
+            const pkgName = match[1];
+            try {
+                const readmePath = resolveDocumentationPath(process.cwd(), pkgName);
+                if (readmePath && fs.existsSync(readmePath)) {
+                    res.setHeader('Content-Type', 'text/markdown; charset=utf-8');
+                    const stream = fs.createReadStream(readmePath);
+                    stream.pipe(res);
+                } else {
+                    res.statusCode = 404;
+                    res.end('Documentation not found');
+                }
+            } catch (e: any) {
+                console.error(e);
+                res.statusCode = 500;
+                res.end(JSON.stringify({ error: e.message }));
+            }
+            return;
         }
         next();
       });

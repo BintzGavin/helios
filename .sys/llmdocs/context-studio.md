@@ -16,7 +16,7 @@ Helios Studio is a browser-based development environment for video composition. 
 -   **Server**: A Vite plugin (`vite-plugin-studio-api.ts`) provides API endpoints for:
     -   Filesystem access (assets, compositions, thumbnails)
     -   Render management (`RenderManager`)
-    -   Documentation discovery (`findDocumentation`)
+    -   Documentation discovery (`findDocumentation`) and raw markdown serving (`/docs/*.md`)
     -   MCP Server (`mcp.ts`)
 -   **UI**: A React application (`packages/studio/src`) that consumes the API and controls the Player.
 -   **Communication**: The UI communicates with the Player via the `HeliosController` bridge (postMessage) and with the Server via HTTP API.
@@ -50,7 +50,7 @@ packages/studio/
 │   ├── hooks/           # Custom Hooks
 │   ├── server/          # Backend Logic
 │   │   ├── discovery.ts      # Composition & Asset Discovery
-│   │   ├── documentation.ts  # Documentation Search
+│   │   ├── documentation.ts  # Documentation Search & Resolution
 │   │   ├── mcp.ts            # Model Context Protocol Server
 │   │   ├── plugin.ts         # Vite Plugin Entry
 │   │   └── render-manager.ts # Render Job Management
