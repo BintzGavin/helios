@@ -1,6 +1,6 @@
 # Status: DEMO Domain
 
-**Version**: 1.77.0
+**Version**: 1.78.0
 
 ## Vision
 The DEMO domain is responsible for:
@@ -9,12 +9,13 @@ The DEMO domain is responsible for:
 3.  **Build Config:** Maintaining the root `vite.config.js` and build scripts to support the examples.
 
 ## Blocked Items
-- **⚠️ COORDINATION**: Promo video example (`examples/promo-video/`) currently renders black due to RENDERER bug in `SeekTimeDriver.ts` (GSAP timeline synchronization issue). RENDERER agent is fixing this - DEMO agent should verify the example works correctly after RENDERER completes the fix. See `docs/status/RENDERER.md` "Next Steps" for details.
+- None
 
 ## Active Tasks
 - None
 
 ## Completed Tasks
+- [v1.78.0] ✅ Completed: Verify Promo Video - Confirmed Promo Video example renders correctly, unblocking the demo.
 - [v1.77.0] ✅ Completed: Update Animation Helpers - Added `interpolate` and `spring` examples to Vue, Svelte, and Solid examples.
 - [v1.76.1] ✅ Verified: Diagnostics Example - Verified build and structure of `examples/diagnostics`. Note: E2E verification blocked by systemic environment issue.
 - [v1.76.0] ✅ Completed: Diagnostics Example - Created `examples/diagnostics` to demonstrate `Helios.diagnose()` and provide a runnable environment check.
