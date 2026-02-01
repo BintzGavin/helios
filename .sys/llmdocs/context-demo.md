@@ -45,6 +45,7 @@ The `examples/` directory contains reference implementations for various framewo
 - **svelte-captions-animation**: Svelte integration with Helios SRT captions.
 - **svelte-dom-animation**: Svelte + DOM example.
 - **svelte-runes-animation**: Svelte 5 Runes example.
+- **svelte-threejs-canvas-animation**: Integration with Three.js using Svelte 5 and reactive updates.
 - **svelte-transitions**: Svelte CSS transitions.
 - **tailwind-animation**: Tailwind CSS integration.
 - **text-effects-animation**: Typewriter and reveal effects.

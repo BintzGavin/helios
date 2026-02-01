@@ -1,3 +1,6 @@
+## DEMO v1.82.0
+- ✅ Completed: Svelte Three.js Canvas Animation - Created `examples/svelte-threejs-canvas-animation` demonstrating Three.js integration with Svelte and Helios.
+
 ## DEMO v1.81.0
 - ✅ Completed: Vue Three.js Canvas Animation - Created `examples/vue-threejs-canvas-animation` demonstrating Three.js integration with Vue 3 and Helios.
 
