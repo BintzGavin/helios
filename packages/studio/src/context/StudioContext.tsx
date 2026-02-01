@@ -103,6 +103,7 @@ interface StudioContextType {
   assets: Asset[];
   uploadAsset: (file: File) => Promise<void>;
   deleteAsset: (id: string) => Promise<void>;
+  renameAsset: (id: string, newName: string) => Promise<void>;
 
   // Render Jobs
   renderJobs: RenderJob[];
@@ -221,6 +222,26 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       fetchAssets();
     } catch (e) {
       console.error('Failed to delete asset:', e);
+    }
+  };
+
+  const renameAsset = async (id: string, newName: string) => {
+    try {
+      const res = await fetch('/api/assets', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, newName })
+      });
+
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || 'Failed to rename asset');
+      }
+
+      fetchAssets();
+    } catch (e) {
+      console.error('Failed to rename asset:', e);
+      throw e;
     }
   };
 
@@ -553,6 +574,7 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         assets,
         uploadAsset,
         deleteAsset,
+        renameAsset,
         activeComposition,
         setActiveComposition,
         isSwitcherOpen,

@@ -4,7 +4,7 @@ import fs from 'fs';
 import path from 'path';
 import { SSEServerTransport } from "@modelcontextprotocol/sdk/server/sse.js";
 import { createMcpServer } from './mcp';
-import { findCompositions, findAssets, getProjectRoot, createComposition, deleteComposition, updateCompositionMetadata, duplicateComposition, renameComposition } from './discovery';
+import { findCompositions, findAssets, getProjectRoot, createComposition, deleteComposition, updateCompositionMetadata, duplicateComposition, renameComposition, renameAsset } from './discovery';
 import { startRender, getJob, getJobs, cancelJob, deleteJob, diagnoseServer } from './render-manager';
 
 export interface StudioPluginOptions {
@@ -334,6 +334,29 @@ function configureMiddlewares(server: ViteDevServer | PreviewServer, isPreview: 
               console.error(e);
               res.statusCode = 500;
               res.end(JSON.stringify({ error: 'Failed to scan assets' }));
+            }
+            return;
+          }
+
+          // PATCH: Rename asset
+          if (req.method === 'PATCH') {
+            try {
+              const body = await getBody(req);
+              const { id, newName } = body;
+
+              if (!id || !newName) {
+                res.statusCode = 400;
+                res.end(JSON.stringify({ error: 'ID and newName are required' }));
+                return;
+              }
+
+              const newAsset = renameAsset(process.cwd(), id, newName);
+              res.setHeader('Content-Type', 'application/json');
+              res.end(JSON.stringify(newAsset));
+            } catch (e: any) {
+              console.error(e);
+              res.statusCode = 500;
+              res.end(JSON.stringify({ error: e.message }));
             }
             return;
           }
