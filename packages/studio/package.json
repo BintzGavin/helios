@@ -26,7 +26,8 @@
   ],
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build:cli": "vite build -c vite.config.cli.ts",
+    "build": "tsc && vite build && npm run build:cli",
     "lint": "tsc --noEmit",
     "preview": "vite preview",
     "test": "vitest",

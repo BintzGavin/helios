@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react'
 import vue from '@vitejs/plugin-vue'
 import { svelte } from '@sveltejs/vite-plugin-svelte'
 import solidPlugin from 'vite-plugin-solid'
-import { studioApiPlugin } from './vite-plugin-studio-api'
+import { studioApiPlugin } from './src/server/plugin'
 import path from 'path'
 
 const projectRoot = process.env.HELIOS_PROJECT_ROOT

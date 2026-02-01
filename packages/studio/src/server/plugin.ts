@@ -3,9 +3,13 @@ import { AddressInfo } from 'net';
 import fs from 'fs';
 import path from 'path';
 import { SSEServerTransport } from "@modelcontextprotocol/sdk/server/sse.js";
-import { createMcpServer } from './src/server/mcp';
-import { findCompositions, findAssets, getProjectRoot, createComposition, deleteComposition, updateCompositionMetadata, duplicateComposition, renameComposition } from './src/server/discovery';
-import { startRender, getJob, getJobs, cancelJob, deleteJob, diagnoseServer } from './src/server/render-manager';
+import { createMcpServer } from './mcp';
+import { findCompositions, findAssets, getProjectRoot, createComposition, deleteComposition, updateCompositionMetadata, duplicateComposition, renameComposition } from './discovery';
+import { startRender, getJob, getJobs, cancelJob, deleteJob, diagnoseServer } from './render-manager';
+
+export interface StudioPluginOptions {
+  studioRoot?: string;
+}
 
 const getBody = async (req: any) => {
   return new Promise<any>((resolve, reject) => {
@@ -45,7 +49,38 @@ const MIME_TYPES: Record<string, string> = {
   '.woff2': 'font/woff2',
 };
 
-function configureMiddlewares(server: ViteDevServer | PreviewServer, isPreview: boolean) {
+function configureMiddlewares(server: ViteDevServer | PreviewServer, isPreview: boolean, options: StudioPluginOptions) {
+      // Static File Serving for Studio UI (Overlay)
+      if (options.studioRoot) {
+          server.middlewares.use((req, res, next) => {
+              if (!req.url) return next();
+
+              // Only handle GET/HEAD
+              if (req.method !== 'GET' && req.method !== 'HEAD') return next();
+
+              const url = req.url.split('?')[0];
+              const safeUrl = path.normalize(url).replace(/^(\.\.[\/\\])+/, '');
+
+              // 1. Try serving exact file from studioRoot
+              let filePath = path.join(options.studioRoot!, safeUrl);
+
+              // If root request, serve index.html
+              if (url === '/') {
+                  filePath = path.join(options.studioRoot!, 'index.html');
+              }
+
+              if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
+                  const ext = path.extname(filePath).toLowerCase();
+                  const contentType = MIME_TYPES[ext] || 'application/octet-stream';
+                  res.setHeader('Content-Type', contentType);
+                  fs.createReadStream(filePath).pipe(res);
+                  return;
+              }
+
+              next();
+          });
+      }
+
       // MCP Server Setup
       const mcpServer = createMcpServer(() => {
           const address = server.httpServer?.address();
@@ -494,10 +529,10 @@ function configureMiddlewares(server: ViteDevServer | PreviewServer, isPreview: 
       });
 }
 
-export function studioApiPlugin(): Plugin {
+export function studioApiPlugin(options: StudioPluginOptions = {}): Plugin {
   return {
     name: 'helios-studio-api',
-    configureServer: (server) => configureMiddlewares(server, false),
-    configurePreviewServer: (server) => configureMiddlewares(server, true)
+    configureServer: (server) => configureMiddlewares(server, false, options),
+    configurePreviewServer: (server) => configureMiddlewares(server, true, options)
   };
 }
