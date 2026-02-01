@@ -1,0 +1,183 @@
+.compositions-panel {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background-color: #1e1e1e;
+  color: #e0e0e0;
+}
+
+.compositions-header {
+  padding: 8px;
+  border-bottom: 1px solid #333;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.compositions-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.compositions-title {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: #fff;
+}
+
+.compositions-new-btn {
+  background: #3296ff;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.compositions-new-btn:hover {
+  background: #4dabff;
+}
+
+.compositions-search-row {
+  display: flex;
+}
+
+.compositions-search-input {
+  flex: 1;
+  background: #2a2a2a;
+  border: 1px solid #444;
+  color: #fff;
+  padding: 6px 8px;
+  border-radius: 4px;
+  font-size: 0.85rem;
+}
+
+.compositions-search-input:focus {
+  border-color: #3296ff;
+  outline: none;
+}
+
+.compositions-list {
+  flex: 1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 8px;
+  overflow-y: auto;
+  align-content: flex-start;
+}
+
+.compositions-empty {
+  color: #666;
+  font-size: 0.9em;
+  width: 100%;
+  text-align: center;
+  margin-top: 40px;
+  line-height: 1.5;
+}
+
+/* Item Styling */
+.composition-item {
+  width: 140px;
+  display: flex;
+  flex-direction: column;
+  background: #2a2a2a;
+  border-radius: 4px;
+  overflow: hidden;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: border-color 0.2s;
+}
+
+.composition-item:hover {
+  border-color: #444;
+}
+
+.composition-item.active {
+  border-color: #3296ff;
+  box-shadow: 0 0 0 1px #3296ff;
+}
+
+.composition-thumbnail {
+  width: 100%;
+  aspect-ratio: 16/9;
+  background: #000;
+  position: relative;
+  overflow: hidden;
+}
+
+.composition-thumbnail img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.composition-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #333;
+  color: #666;
+  font-size: 2rem;
+}
+
+/* Hover Actions */
+.composition-actions {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.composition-thumbnail:hover .composition-actions {
+  opacity: 1;
+}
+
+.composition-action-btn {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: #fff;
+  width: 28px;
+  height: 28px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.composition-action-btn:hover {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.composition-action-btn.delete:hover {
+  background: rgba(255, 50, 50, 0.6);
+}
+
+.composition-name {
+  padding: 6px;
+  font-size: 0.8rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #e0e0e0;
+}
+
+.composition-item.active .composition-name {
+  color: #fff;
+  font-weight: 500;
+}

@@ -93,6 +93,8 @@ interface StudioContextType {
   setCreateOpen: (isOpen: boolean) => void;
   isDuplicateOpen: boolean;
   setDuplicateOpen: (isOpen: boolean) => void;
+  duplicateTargetId: string | null;
+  setDuplicateTargetId: (id: string | null) => void;
   isSettingsOpen: boolean;
   setSettingsOpen: (isOpen: boolean) => void;
   createComposition: (name: string, template?: string, options?: CompositionMetadata) => Promise<void>;
@@ -163,6 +165,7 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [isAssistantOpen, setAssistantOpen] = useState(false);
   const [isCreateOpen, setCreateOpen] = useState(false);
   const [isDuplicateOpen, setDuplicateOpen] = useState(false);
+  const [duplicateTargetId, setDuplicateTargetId] = useState<string | null>(null);
   const [isSettingsOpen, setSettingsOpen] = useState(false);
   const [canvasSize, setCanvasSize] = useState({ width: 1920, height: 1080 });
   const [renderConfig, setRenderConfig] = useState<RenderConfig>({ mode: 'canvas' });
@@ -660,6 +663,8 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         setCreateOpen,
         isDuplicateOpen,
         setDuplicateOpen,
+        duplicateTargetId,
+        setDuplicateTargetId,
         isSettingsOpen,
         setSettingsOpen,
         createComposition,

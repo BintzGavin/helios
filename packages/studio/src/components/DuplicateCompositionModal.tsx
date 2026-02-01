@@ -3,36 +3,56 @@ import { useStudio } from '../context/StudioContext';
 import './DuplicateCompositionModal.css';
 
 export const DuplicateCompositionModal: React.FC = () => {
-  const { isDuplicateOpen, setDuplicateOpen, duplicateComposition, activeComposition } = useStudio();
+  const {
+    isDuplicateOpen,
+    setDuplicateOpen,
+    duplicateComposition,
+    activeComposition,
+    duplicateTargetId,
+    setDuplicateTargetId,
+    compositions
+  } = useStudio();
   const [name, setName] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    if (isDuplicateOpen && activeComposition) {
-      setName(`Copy of ${activeComposition.name}`);
-      setError(null);
-      setLoading(false);
-      setTimeout(() => {
-        if (inputRef.current) {
-          inputRef.current.focus();
-          inputRef.current.select();
-        }
-      }, 10);
+    if (isDuplicateOpen) {
+      const targetId = duplicateTargetId || activeComposition?.id;
+      const targetComp = compositions.find(c => c.id === targetId);
+
+      if (targetComp) {
+        setName(`Copy of ${targetComp.name}`);
+        setError(null);
+        setLoading(false);
+        setTimeout(() => {
+          if (inputRef.current) {
+            inputRef.current.focus();
+            inputRef.current.select();
+          }
+        }, 10);
+      }
     }
-  }, [isDuplicateOpen, activeComposition]);
+  }, [isDuplicateOpen, activeComposition, duplicateTargetId, compositions]);
+
+  const handleClose = () => {
+    setDuplicateOpen(false);
+    setDuplicateTargetId(null);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name.trim() || !activeComposition) return;
+    const targetId = duplicateTargetId || activeComposition?.id;
+    if (!name.trim() || !targetId) return;
 
     setLoading(true);
     setError(null);
 
     try {
-      await duplicateComposition(activeComposition.id, name);
-      // Modal closes automatically via context
+      await duplicateComposition(targetId, name);
+      setDuplicateTargetId(null);
+      // Modal closes automatically via context (duplicateComposition sets isDuplicateOpen false)
     } catch (err: any) {
       setError(err.message || 'Failed to duplicate composition');
       setLoading(false);
@@ -42,7 +62,7 @@ export const DuplicateCompositionModal: React.FC = () => {
   if (!isDuplicateOpen) return null;
 
   return (
-    <div className="duplicate-modal-overlay" onClick={() => setDuplicateOpen(false)}>
+    <div className="duplicate-modal-overlay" onClick={handleClose}>
       <div className="duplicate-modal-content" onClick={e => e.stopPropagation()}>
         <div className="duplicate-modal-header">Duplicate Composition</div>
 
@@ -65,7 +85,7 @@ export const DuplicateCompositionModal: React.FC = () => {
             <button
               type="button"
               className="duplicate-modal-button cancel"
-              onClick={() => setDuplicateOpen(false)}
+              onClick={handleClose}
               disabled={loading}
             >
               Cancel
