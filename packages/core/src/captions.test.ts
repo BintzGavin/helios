@@ -1,8 +1,123 @@
 import { describe, it, expect } from 'vitest';
-import { parseSrt, stringifySrt, findActiveCues, CaptionCue } from './captions.js';
+import { parseSrt, parseWebVTT, parseCaptions, stringifySrt, findActiveCues, CaptionCue } from './captions.js';
 import { HeliosError, HeliosErrorCode } from './errors.js';
 
 describe('captions', () => {
+  describe('parseWebVTT', () => {
+    it('should parse a standard WebVTT string', () => {
+      const vtt = `WEBVTT
+
+1
+00:00:01.000 --> 00:00:04.000
+First caption
+
+2
+00:00:05.000 --> 00:00:08.000
+Second caption
+with two lines`;
+
+      const cues = parseWebVTT(vtt);
+      expect(cues).toHaveLength(2);
+      expect(cues[0]).toEqual({
+        id: '1',
+        startTime: 1000,
+        endTime: 4000,
+        text: 'First caption'
+      });
+      expect(cues[1]).toEqual({
+        id: '2',
+        startTime: 5000,
+        endTime: 8000,
+        text: 'Second caption\nwith two lines'
+      });
+    });
+
+    it('should handle missing IDs in WebVTT', () => {
+      const vtt = `WEBVTT
+
+00:00:01.000 --> 00:00:04.000
+First caption
+
+00:00:05.000 --> 00:00:08.000
+Second caption`;
+
+      const cues = parseWebVTT(vtt);
+      expect(cues).toHaveLength(2);
+      expect(cues[0].id).toBe('1');
+      expect(cues[1].id).toBe('2');
+    });
+
+    it('should handle short timecode format MM:SS.mmm', () => {
+      const vtt = `WEBVTT
+
+00:01.000 --> 00:04.000
+First caption`;
+
+      const cues = parseWebVTT(vtt);
+      expect(cues[0].startTime).toBe(1000);
+      expect(cues[0].endTime).toBe(4000);
+    });
+
+    it('should ignore NOTE comments', () => {
+      const vtt = `WEBVTT
+
+NOTE This is a comment
+
+1
+00:00:01.000 --> 00:00:04.000
+First caption`;
+
+      const cues = parseWebVTT(vtt);
+      expect(cues).toHaveLength(1);
+      expect(cues[0].text).toBe('First caption');
+    });
+
+    it('should throw error if WEBVTT header is missing', () => {
+      const vtt = `1
+00:00:01.000 --> 00:00:04.000
+First caption`;
+
+      expect(() => parseWebVTT(vtt)).toThrow(HeliosError);
+      try {
+        parseWebVTT(vtt);
+      } catch (e) {
+        expect((e as HeliosError).code).toBe(HeliosErrorCode.INVALID_WEBVTT_FORMAT);
+      }
+    });
+
+    it('should skip blocks with invalid timecodes', () => {
+      const vtt = `WEBVTT
+
+INVALID
+00:00:01,000 --> 00:00:04,000
+Comma instead of dot`;
+
+      const cues = parseWebVTT(vtt);
+      expect(cues).toHaveLength(0);
+    });
+  });
+
+  describe('parseCaptions', () => {
+    it('should detect WebVTT', () => {
+      const vtt = `WEBVTT
+
+00:00:01.000 --> 00:00:04.000
+VTT Caption`;
+      const cues = parseCaptions(vtt);
+      expect(cues).toHaveLength(1);
+      expect(cues[0].text).toBe('VTT Caption');
+    });
+
+    it('should fallback to SRT', () => {
+      const srt = `1
+00:00:01,000 --> 00:00:04,000
+SRT Caption`;
+      const cues = parseCaptions(srt);
+      expect(cues).toHaveLength(1);
+      expect(cues[0].text).toBe('SRT Caption');
+    });
+  });
+
   describe('parseSrt', () => {
     it('should parse a standard SRT string', () => {
       const srt = `1
