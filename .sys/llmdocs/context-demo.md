@@ -22,7 +22,7 @@ The `examples/` directory contains reference implementations for various framewo
 - **pixi-canvas-animation**: Integration with PixiJS.
 - **podcast-visualizer**: Complex example with multi-track audio mixing.
 - **procedural-generation**: Deterministic randomness and procedural content.
-- **promo-video**: A marketing video example.
+- **promo-video**: A comprehensive marketing video example demonstrating multi-scene GSAP animations.
 - **react-animation-helpers**: React components for sequencing and timing.
 - **react-canvas-animation**: Basic React + Canvas example.
 - **react-captions-animation**: React integration with Helios SRT captions.

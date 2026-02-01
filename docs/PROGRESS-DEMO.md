@@ -1,3 +1,6 @@
+## DEMO v1.78.0
+- ✅ Completed: Verify Promo Video - Confirmed Promo Video example renders correctly, unblocking the demo.
+
 ## DEMO v1.77.0
 - ✅ Completed: Update Animation Helpers - Added `interpolate` and `spring` examples to Vue, Svelte, and Solid examples.
 
