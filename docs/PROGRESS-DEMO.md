@@ -1,3 +1,6 @@
+## DEMO v1.79.1
+- ✅ Verified: Promo Video GSAP Sync - Confirmed that running the dev server from the project root resolves module resolution issues, allowing the Promo Video example to render correctly with full content.
+
 ## DEMO v1.79.0
 - ✅ Completed: Vue Captions Animation - Created `examples/vue-captions-animation` demonstrating how to use Helios captions with Vue 3 composition API.
 
