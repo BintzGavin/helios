@@ -54,6 +54,16 @@ export function connectToParent(helios: Helios) {
             helios.setAudioMuted(event.data.muted);
         }
         break;
+      case 'HELIOS_SET_AUDIO_TRACK_VOLUME':
+        if (typeof event.data.trackId === 'string' && typeof event.data.volume === 'number') {
+            helios.setAudioTrackVolume(event.data.trackId, event.data.volume);
+        }
+        break;
+      case 'HELIOS_SET_AUDIO_TRACK_MUTED':
+        if (typeof event.data.trackId === 'string' && typeof event.data.muted === 'boolean') {
+            helios.setAudioTrackMuted(event.data.trackId, event.data.muted);
+        }
+        break;
       case 'HELIOS_SET_LOOP':
         if (typeof event.data.loop === 'boolean') {
             helios.setLoop(event.data.loop);
