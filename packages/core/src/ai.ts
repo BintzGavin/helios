@@ -18,7 +18,7 @@ Constraints:
 - Use relative paths for imports.
 `;
 
-export function createSystemPrompt(helios: Helios): string {
+export function createSystemPrompt(helios: Helios<any>): string {
   const state = helios.getState();
   const schema = helios.schema;
 

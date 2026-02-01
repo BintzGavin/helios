@@ -1,5 +1,4 @@
 export * from './TimeDriver.js';
-export * from './WaapiDriver.js';
 export * from './DomDriver.js';
 export * from './NoopDriver.js';
 export * from './Ticker.js';
