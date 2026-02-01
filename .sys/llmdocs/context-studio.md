@@ -12,7 +12,10 @@ Helios Studio is a browser-based development environment for video composition. 
     - `npx helios studio` - Via main CLI (starts Vite dev server)
     - `npx @helios-project/studio` or `helios-studio` - Standalone CLI (serves built dist via vite preview)
 -   **Bin Script**: `bin/helios-studio.js` - Executable script that serves the built Studio UI
--   **Server**: A Vite plugin (`vite-plugin-studio-api.ts`) provides API endpoints for filesystem access (assets, compositions) and render management. It uses `RenderManager` to handle render jobs, persisting job history to `renders/jobs.json`.
+-   **Server**: A Vite plugin (`vite-plugin-studio-api.ts`) provides API endpoints for:
+    -   Filesystem access (assets, compositions)
+    -   Render management (`RenderManager`)
+    -   Documentation discovery (`findDocumentation`)
 -   **UI**: A React application (`packages/studio/src`) that consumes the API and controls the Player.
 -   **Communication**: The UI communicates with the Player via the `HeliosController` bridge (postMessage) and with the Server via HTTP API.
 -   **Publishing**: Studio is a publishable npm package (`publishConfig.access: "public"`) with `bin` field for CLI installation.
@@ -26,6 +29,7 @@ packages/studio/
 ├── src/
 │   ├── components/      # UI Components
 │   │   ├── AssetsPanel/
+│   │   ├── AssistantModal/ # AI & Documentation Assistant
 │   │   ├── CaptionsPanel/
 │   │   ├── Controls/
 │   │   ├── RendersPanel/
@@ -38,11 +42,11 @@ packages/studio/
 │   │   ├── PropsEditor.tsx
 │   │   ├── RenderPreviewModal.tsx
 │   │   ├── SchemaInputs.tsx
-│   │   ├── SystemPromptModal.tsx
 │   │   └── Timeline.tsx
 │   ├── context/         # React Context (StudioContext)
+│   ├── data/            # Static Data (AI Context)
 │   ├── hooks/           # Custom Hooks
-│   ├── server/          # Backend Logic (Discovery, RenderManager)
+│   ├── server/          # Backend Logic (Discovery, RenderManager, Documentation)
 │   ├── utils/           # Shared Utilities
 │   ├── App.tsx          # Main Layout
 │   └── main.tsx         # Entry Point
@@ -97,6 +101,9 @@ npx @helios-project/studio
 -   **Assets Panel**: Discovers and allows drag-and-drop of assets from the project. Supports uploading, deleting, and renaming assets.
 -   **Renders Panel**: Manages render jobs (Start, Cancel, Download).
 -   **Captions Panel**: Edits SRT captions and syncs with Core.
+-   **Helios Assistant**: A modal providing:
+    -   **Ask AI**: Generates context-aware prompts (System Context + Schema + Relevant Docs) for LLMs.
+    -   **Documentation**: Searchable documentation browser scanning local READMEs.
 -   **Composition Management**:
     -   **Switcher**: Cmd+K to switch active composition.
     -   **Create**: Create new compositions from templates.
