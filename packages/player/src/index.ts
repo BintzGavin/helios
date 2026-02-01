@@ -3,7 +3,7 @@ import { DirectController, BridgeController } from "./controllers";
 import type { HeliosController } from "./controllers";
 import { ClientSideExporter } from "./features/exporter";
 import { HeliosTextTrack, HeliosTextTrackList, CueClass, TrackHost } from "./features/text-tracks";
-import { parseSRT } from "./features/srt-parser";
+import { parseCaptions } from "./features/caption-parser";
 
 export { ClientSideExporter };
 export type { HeliosController };
@@ -1391,8 +1391,8 @@ export class HeliosPlayer extends HTMLElement implements TrackHost {
                     if (!res.ok) throw new Error(`Status ${res.status}`);
                     return res.text();
                 })
-                .then((srt) => {
-                    const cues = parseSRT(srt);
+                .then((content) => {
+                    const cues = parseCaptions(content);
                     cues.forEach(c => {
                         textTrack.addCue(new CueClass(c.startTime, c.endTime, c.text));
                     });

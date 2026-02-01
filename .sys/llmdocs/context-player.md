@@ -60,7 +60,7 @@ The component observes the following attributes:
 - `sandbox`: Space-separated tokens for iframe security flags (default: `allow-scripts allow-same-origin`).
 
 ## D. Child Elements
-- `<track>`: Standard HTMLTrackElement for importing captions (kind="captions"). Requires `src` (SRT file). Automatically populates the `textTracks` list.
+- `<track>`: Standard HTMLTrackElement for importing captions (kind="captions"). Requires `src` (SRT or WebVTT file). Automatically populates the `textTracks` list.
 
 ## E. Styling
 The component exposes the following CSS variables for theming:
