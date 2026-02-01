@@ -1,6 +1,6 @@
 {
   "name": "@helios-project/studio",
-  "version": "0.69.0",
+  "version": "0.70.1",
   "description": "Browser-based development environment for Helios video compositions.",
   "author": "Gavin Bintz <me@gavinbintz.com>",
   "license": "ELv2",
@@ -27,6 +27,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
+    "lint": "tsc --noEmit",
     "preview": "vite preview",
     "test": "vitest",
     "verify": "npx tsx scripts/verify-ui.ts",

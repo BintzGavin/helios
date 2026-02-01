@@ -1,3 +1,6 @@
+## STUDIO v0.70.1
+- ✅ Verified: Maintenance - Synced package.json version and added lint script.
+
 ## STUDIO v0.70.0
 - ✅ Completed: Persistent Render Jobs - Finalized verification and closed out the plan for persistent render jobs, ensuring job history survives restarts.
 
