@@ -1,3 +1,7 @@
+export interface DriverMetadata {
+  audioTracks?: string[];
+}
+
 export interface TimeDriver {
   init(scope: HTMLElement | Document): void;
   update(timeInMs: number, options?: {
@@ -9,4 +13,5 @@ export interface TimeDriver {
   }): void;
   waitUntilStable(): Promise<void>;
   dispose?(): void;
+  subscribeToMetadata?(callback: (meta: DriverMetadata) => void): () => void;
 }

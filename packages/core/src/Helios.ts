@@ -18,6 +18,7 @@ export type HeliosState = {
   volume: number;
   muted: boolean;
   audioTracks: Record<string, AudioTrackState>;
+  availableAudioTracks: string[];
   captions: CaptionCue[];
   activeCaptions: CaptionCue[];
   markers: Marker[];
@@ -101,6 +102,7 @@ export class Helios {
   private _volume: Signal<number>;
   private _muted: Signal<boolean>;
   private _audioTracks: Signal<Record<string, AudioTrackState>>;
+  private _availableAudioTracks: Signal<string[]>;
   private _captions: Signal<CaptionCue[]>;
   private _activeCaptions: Signal<CaptionCue[]>;
   private _markers: Signal<Marker[]>;
@@ -113,6 +115,7 @@ export class Helios {
   private _disposeActiveCaptionsEffect: () => void;
   private _syncDispose: (() => void) | null = null;
   private _originalVirtualTimeDescriptor: PropertyDescriptor | undefined;
+  private _disposeDriverMetadataSubscription: (() => void) | null = null;
 
   // Public Readonly Signals
 
@@ -169,6 +172,12 @@ export class Helios {
    * Can be subscribed to for reactive updates.
    */
   public get audioTracks(): ReadonlySignal<Record<string, AudioTrackState>> { return this._audioTracks; }
+
+  /**
+   * Signal for the available (discovered) audio tracks.
+   * Can be subscribed to for reactive updates.
+   */
+  public get availableAudioTracks(): ReadonlySignal<string[]> { return this._availableAudioTracks; }
 
   /**
    * Signal for the full list of captions.
@@ -453,6 +462,7 @@ export class Helios {
     this._volume = signal(options.volume ?? 1);
     this._muted = signal(options.muted ?? false);
     this._audioTracks = signal({});
+    this._availableAudioTracks = signal([]);
     this._captions = signal(initialCaptions);
     this._markers = signal(initialMarkers);
     this._width = signal(width);
@@ -488,6 +498,14 @@ export class Helios {
 
     this.driver.init(this.animationScope);
 
+    if (this.driver.subscribeToMetadata) {
+      this._disposeDriverMetadataSubscription = this.driver.subscribeToMetadata((meta) => {
+        if (meta.audioTracks) {
+          this._availableAudioTracks.value = meta.audioTracks;
+        }
+      });
+    }
+
     // Sync driver with initial state
     this.driver.update((this._currentFrame.value / this._fps.value) * 1000, {
       isPlaying: this._isPlaying.value,
@@ -515,6 +533,7 @@ export class Helios {
       volume: this._volume.value,
       muted: this._muted.value,
       audioTracks: this._audioTracks.value,
+      availableAudioTracks: this._availableAudioTracks.value,
       captions: this._captions.value,
       activeCaptions: this.activeCaptions.value,
       markers: this._markers.value,
@@ -1018,6 +1037,7 @@ export class Helios {
     this.unbind();
     this.driver.dispose?.();
     this._disposeActiveCaptionsEffect?.();
+    this._disposeDriverMetadataSubscription?.();
 
     this.subscriberMap.forEach((dispose) => dispose());
     this.subscriberMap.clear();

@@ -1,5 +1,8 @@
 # CORE Progress Log
 
+## CORE v3.8.0
+- ✅ Completed: Implement Audio Track Discovery - Implemented `availableAudioTracks` signal in `Helios` and updated `DomDriver` to discover elements with `data-helios-track-id`.
+
 ## CORE v3.7.0
 - ✅ Completed: Implement DomDriver Audio Looping - Updated `DomDriver` to respect the `loop` attribute on media elements, wrapping time calculations to support infinite loops.
 

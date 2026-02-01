@@ -1,4 +1,4 @@
-import { TimeDriver } from './TimeDriver.js';
+import { TimeDriver, DriverMetadata } from './TimeDriver.js';
 
 interface TrackState {
   baseVolume: number;
@@ -13,15 +13,29 @@ export class DomDriver implements TimeDriver {
   private observers = new Map<Node, MutationObserver>();
   private trackStates = new WeakMap<HTMLMediaElement, TrackState>();
   private mediaElements = new Set<HTMLMediaElement>();
+  private discoveredTracks = new Set<string>();
+  private metadataSubscribers = new Set<(meta: DriverMetadata) => void>();
 
   init(scope: HTMLElement | Document) {
     this.scope = scope;
     this.mediaElements.clear();
     this.scopes.clear();
     this.observers.clear();
+    this.discoveredTracks.clear();
 
     this.addScope(scope);
     this.scanAndAdd(scope);
+  }
+
+  subscribeToMetadata(callback: (meta: DriverMetadata) => void): () => void {
+    this.metadataSubscribers.add(callback);
+    callback({ audioTracks: Array.from(this.discoveredTracks) });
+    return () => this.metadataSubscribers.delete(callback);
+  }
+
+  private emitMetadata() {
+    const tracks = Array.from(this.discoveredTracks);
+    this.metadataSubscribers.forEach((cb) => cb({ audioTracks: tracks }));
   }
 
   private addScope(scope: Node) {
@@ -31,15 +45,26 @@ export class DomDriver implements TimeDriver {
     if (typeof MutationObserver !== 'undefined') {
       const observer = new MutationObserver((mutations) => {
         mutations.forEach((m) => {
-          m.addedNodes.forEach((node) => {
-            this.scanAndAdd(node);
-          });
-          m.removedNodes.forEach((node) => {
-            this.scanAndRemove(node);
-          });
+          if (m.type === 'childList') {
+            m.addedNodes.forEach((node) => {
+              this.scanAndAdd(node);
+            });
+            m.removedNodes.forEach((node) => {
+              this.scanAndRemove(node);
+            });
+          } else if (m.type === 'attributes') {
+            if (m.target.nodeName === 'AUDIO' || m.target.nodeName === 'VIDEO') {
+              this.rebuildDiscoveredTracks();
+            }
+          }
         });
       });
-      observer.observe(scope, { childList: true, subtree: true });
+      observer.observe(scope, {
+        childList: true,
+        subtree: true,
+        attributes: true,
+        attributeFilter: ['data-helios-track-id']
+      });
       this.observers.set(scope, observer);
     }
   }
@@ -56,10 +81,17 @@ export class DomDriver implements TimeDriver {
   }
 
   private scanAndAdd(node: Node) {
+    let tracksChanged = false;
     const processElement = (el: Element) => {
       // Add media element
       if (el.nodeName === 'AUDIO' || el.nodeName === 'VIDEO') {
         this.mediaElements.add(el as HTMLMediaElement);
+
+        const trackId = el.getAttribute('data-helios-track-id');
+        if (trackId && !this.discoveredTracks.has(trackId)) {
+            this.discoveredTracks.add(trackId);
+            tracksChanged = true;
+        }
       }
 
       // Discover shadow root
@@ -86,12 +118,19 @@ export class DomDriver implements TimeDriver {
        const descendants = (node as Element | DocumentFragment).querySelectorAll('*');
        descendants.forEach(el => processElement(el));
     }
+
+    if (tracksChanged) {
+        this.emitMetadata();
+    }
   }
 
   private scanAndRemove(node: Node) {
+     let removedMedia = false;
      const processElement = (el: Element) => {
       if (el.nodeName === 'AUDIO' || el.nodeName === 'VIDEO') {
-        this.mediaElements.delete(el as HTMLMediaElement);
+        if (this.mediaElements.delete(el as HTMLMediaElement)) {
+            removedMedia = true;
+        }
       }
       if (el.shadowRoot) {
         if (this.scopes.has(el.shadowRoot)) {
@@ -109,6 +148,33 @@ export class DomDriver implements TimeDriver {
        const descendants = (node as Element | DocumentFragment).querySelectorAll('*');
        descendants.forEach(el => processElement(el));
     }
+
+    if (removedMedia) {
+        this.rebuildDiscoveredTracks();
+    }
+  }
+
+  private rebuildDiscoveredTracks() {
+      const oldTracks = new Set(this.discoveredTracks);
+      this.discoveredTracks.clear();
+
+      this.mediaElements.forEach(el => {
+          const id = el.getAttribute('data-helios-track-id');
+          if (id) this.discoveredTracks.add(id);
+      });
+
+      // Check for changes
+      if (oldTracks.size !== this.discoveredTracks.size) {
+          this.emitMetadata();
+          return;
+      }
+
+      for (const t of oldTracks) {
+          if (!this.discoveredTracks.has(t)) {
+              this.emitMetadata();
+              return;
+          }
+      }
   }
 
   dispose() {
@@ -116,6 +182,8 @@ export class DomDriver implements TimeDriver {
     this.observers.clear();
     this.mediaElements.clear();
     this.scopes.clear();
+    this.discoveredTracks.clear();
+    this.metadataSubscribers.clear();
   }
 
   update(timeInMs: number, options: {
