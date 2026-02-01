@@ -2,6 +2,12 @@ import { Renderer } from '../../packages/renderer/dist/index.js';
 import * as path from 'path';
 import * as fs from 'fs/promises';
 import { existsSync } from 'fs';
+import { execFile } from 'child_process';
+import { promisify } from 'util';
+import ffmpeg from '@ffmpeg-installer/ffmpeg';
+
+const execFileAsync = promisify(execFile);
+const ffmpegPath = ffmpeg.path;
 
 // Specific overrides for mode
 const CANVAS_OVERRIDES = new Set([
@@ -25,6 +31,71 @@ function formatName(dirName: string) {
     .split('-')
     .map(word => word.charAt(0).toUpperCase() + word.slice(1))
     .join(' ');
+}
+
+async function verifyVideoContent(filePath: string, expectedDuration: number) {
+  try {
+    // 1. Check Metadata using ffmpeg -i
+    // ffmpeg -i usually returns exit code 1 if no output file, but prints info to stderr
+    let stderr = '';
+    try {
+      await execFileAsync(ffmpegPath, ['-i', filePath]);
+    } catch (e: any) {
+      stderr = e.stderr || '';
+    }
+
+    // Parse Duration
+    const durationMatch = stderr.match(/Duration: (\d{2}):(\d{2}):(\d{2}\.\d{2})/);
+    if (!durationMatch) {
+      // If we can't find Duration in stderr, it might be a valid file but ffmpeg output format changed?
+      // Or the file is corrupted.
+      throw new Error('Could not parse duration from ffmpeg output. File might be invalid.');
+    }
+    const [_, h, m, s] = durationMatch;
+    const actualDuration = parseFloat(h) * 3600 + parseFloat(m) * 60 + parseFloat(s);
+
+    if (Math.abs(actualDuration - expectedDuration) > 1.0) {
+      throw new Error(`Duration mismatch: expected ${expectedDuration}s, got ${actualDuration}s`);
+    }
+
+    // Parse Video Stream
+    if (!stderr.includes('Video:')) {
+      throw new Error('No video stream found');
+    }
+
+    // 2. Check Content (Non-Black) using signalstats
+    const midPoint = expectedDuration / 2;
+    const { stdout, stderr: statsStderr } = await execFileAsync(ffmpegPath, [
+      '-ss', midPoint.toString(),
+      '-i', filePath,
+      '-vframes', '1',
+      '-vf', 'signalstats,metadata=mode=print:key=lavfi.signalstats.YMAX',
+      '-f', 'null',
+      '-'
+    ]);
+
+    // Metadata is printed to stderr by default
+    const output = stdout + statsStderr;
+    const ymaxMatch = output.match(/lavfi\.signalstats\.YMAX=([0-9.]+)/);
+
+    if (!ymaxMatch) {
+      console.log('--- FFmpeg STDOUT ---');
+      console.log(stdout);
+      console.log('--- FFmpeg STDERR ---');
+      console.log(statsStderr);
+      throw new Error('Could not retrieve signalstats YMAX');
+    }
+
+    const ymax = parseFloat(ymaxMatch[1]);
+    if (ymax <= 0) {
+      throw new Error(`Video frame at ${midPoint}s is pure black (YMAX=0)`);
+    }
+
+    console.log(`   Content verified: Duration=${actualDuration.toFixed(2)}s, YMAX=${ymax}`);
+
+  } catch (err: any) {
+    throw new Error(`Verification failed: ${err.message}`);
+  }
 }
 
 async function discoverCases() {
@@ -110,6 +181,10 @@ async function main() {
 
     try {
       await renderer.render(compositionUrl, outputPath);
+
+      // Verify content
+      await verifyVideoContent(outputPath, 5); // 5s is default duration in Renderer init above
+
       console.log(`✅ ${testCase.name} Passed! Video saved to: ${outputPath}`);
     } catch (error) {
       console.error(`❌ ${testCase.name} Failed:`, error);
