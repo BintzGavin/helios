@@ -1,40 +1,52 @@
-# Core Context
+# CORE Context
 
 ## A. Architecture
 
-The Core package (`@helios-project/core`) implements the **Helios State Machine**, a framework-agnostic engine for programmatic video creation. It manages the timeline, state, and synchronization of animation elements.
+The **CORE** domain implements the **Helios State Machine** pattern.
 
-**Key Principles:**
-- **Store**: State is held in reactive `Signal` primitives (via `signals.ts`).
-- **Actions**: Public methods (e.g., `seek()`, `play()`) modify signals.
-- **Subscribers**: The `subscribe()` method allows external systems (Renderer, Player) to react to state changes.
-- **Drivers**: A pluggable `TimeDriver` strategy handles the actual time progression (e.g., `DomDriver` for browsers, `WaapiDriver` for Web Animations).
+1.  **Store**: The `Helios` class maintains the single source of truth for the animation state (`currentFrame`, `isPlaying`, `inputProps`, etc.) using **Signals** (`packages/core/src/signals.ts`).
+2.  **Actions**: Public methods on the `Helios` class (e.g., `seek()`, `play()`, `setDuration()`) modify these signals.
+3.  **Subscribers**: The state changes propagate to:
+    *   **Drivers**: The active `TimeDriver` (e.g., `DomDriver`) receives updates via its `update()` method to synchronize the external environment (DOM, WAAPI, Audio).
+    *   **External Consumers**: UI components or renderers subscribe via `helios.subscribe()`.
+
+The `DomDriver` acts as the bridge between the pure mathematical state of Helios and the browser's DOM, handling:
+*   WAAPI Animation synchronization.
+*   HTMLMediaElement (`<video>`, `<audio>`) synchronization.
+*   Audio volume, fading, and mute states.
 
 ## B. File Tree
 
 ```
 packages/core/src/
-├── drivers/           # TimeDriver implementations (Dom, Waapi, Noop)
-├── ai.ts              # AI prompt generation utilities
-├── animation.ts       # Animation interpolation helpers
-├── captions.ts        # SRT parsing and caption logic
-├── color.ts           # Color manipulation and interpolation
-├── easing.ts          # Easing functions
-├── errors.ts          # Structured error handling
-├── index.ts           # Main entry point and Helios class
-├── markers.ts         # Timeline marker logic
-├── random.ts          # Deterministic PRNG
-├── render-session.ts  # Frame iteration logic
-├── schema.ts          # Input property schema validation
-├── sequencing.ts      # Stagger/sequence utilities
-├── signals.ts         # Reactivity system
-├── timecode.ts        # Timecode conversion utilities
-└── transitions.ts     # Transition primitives
+├── ai.ts
+├── animation.ts
+├── captions.ts
+├── color.ts
+├── drivers/
+│   ├── DomDriver.ts
+│   ├── TimeDriver.ts
+│   ├── WaapiDriver.ts
+│   └── index.ts
+├── easing.ts
+├── errors.ts
+├── index.ts
+├── markers.ts
+├── random.ts
+├── render-session.ts
+├── schema.ts
+├── sequencing.ts
+├── signals.ts
+├── time-control.ts
+├── timecode.ts
+└── transitions.ts
 ```
 
 ## C. Type Definitions
 
 ```typescript
+// From index.ts
+
 export type HeliosState = {
   width: number;
   height: number;
@@ -117,11 +129,12 @@ export interface DiagnosticReport {
 }
 ```
 
-## D. Public Methods (Helios)
+## D. Public Methods
 
 ```typescript
+// Helios Class
 class Helios {
-  // Signals
+  // Readonly Signals
   get currentFrame(): ReadonlySignal<number>;
   get currentTime(): ReadonlySignal<number>;
   get loop(): ReadonlySignal<boolean>;
@@ -147,10 +160,10 @@ class Helios {
   constructor(options: HeliosOptions);
   dispose(): void;
 
-  // State
+  // State Access
   getState(): Readonly<HeliosState>;
 
-  // Setters
+  // Configuration
   setSize(width: number, height: number): void;
   setLoop(shouldLoop: boolean): void;
   setDuration(seconds: number): void;
@@ -165,25 +178,23 @@ class Helios {
   setMarkers(markers: Marker[]): void;
   addMarker(marker: Marker): void;
   removeMarker(id: string): void;
-  seekToMarker(id: string): void;
-  seekToTime(seconds: number): void;
   setPlaybackRange(startFrame: number, endFrame: number): void;
   clearPlaybackRange(): void;
 
   // Subscription
   subscribe(callback: HeliosSubscriber): () => void;
   unsubscribe(callback: HeliosSubscriber): void;
-
-  // Stability
   registerStabilityCheck(check: StabilityCheck): () => void;
-  waitUntilStable(): Promise<void>;
 
-  // Playback
+  // Playback Control
   play(): void;
   pause(): void;
   seek(frame: number): void;
+  seekToTime(seconds: number): void;
+  seekToMarker(id: string): void;
+  waitUntilStable(): Promise<void>;
 
-  // Timeline Binding
+  // Synchronization
   bindTo(master: Helios): void;
   unbind(): void;
   bindToDocumentTimeline(): void;

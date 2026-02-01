@@ -9,3 +9,7 @@
 ## [3.5.1] - Preview/Render Parity
 **Learning:** `DomDriver` (Preview) logic can silently drift from `Renderer` (FFmpeg) logic if features like audio fades are implemented via different mechanisms (DOM vs FFmpeg filters) without shared logic.
 **Action:** When inspecting "Vision: Native Always Wins", verify that "Native" implementation (DOM) actually supports all features exposed by the Renderer to ensure WYSIWYG.
+
+## [3.6.0] - DomDriver State Persistence
+**Learning:** `DomDriver` uses a `trackStates` WeakMap to distinguish between programmatic volume updates and external user interactions (e.g. browser controls). This pattern prevents feedback loops when applying continuous transformations (like fades) on top of the DOM state.
+**Action:** When modifying driver synchronization logic, always check if the property being written to is also the source of truth for the next frame, and use the `trackStates` pattern to cache the "base" value if necessary.

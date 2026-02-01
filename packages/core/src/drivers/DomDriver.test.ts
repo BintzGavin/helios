@@ -641,4 +641,130 @@ describe('DomDriver', () => {
       expect(mockAudio.volume).toBe(1);
     });
   });
+
+  describe('Audio Fading', () => {
+    it('should fade in audio', async () => {
+      const mockAudio = document.createElement('audio');
+      Object.defineProperty(mockAudio, 'volume', { value: 1, writable: true });
+      mockAudio.setAttribute('data-helios-fade-in', '2'); // 2s fade in
+      scope.appendChild(mockAudio);
+      await new Promise(resolve => setTimeout(resolve, 20));
+
+      // 0s: Should be 0 volume
+      driver.update(0, { isPlaying: false, playbackRate: 1, volume: 1 });
+      expect(mockAudio.volume).toBe(0);
+
+      // 1s: Should be 0.5 volume
+      driver.update(1000, { isPlaying: false, playbackRate: 1, volume: 1 });
+      expect(mockAudio.volume).toBe(0.5);
+
+      // 2s: Should be 1 volume
+      driver.update(2000, { isPlaying: false, playbackRate: 1, volume: 1 });
+      expect(mockAudio.volume).toBe(1);
+
+      // 3s: Should be 1 volume
+      driver.update(3000, { isPlaying: false, playbackRate: 1, volume: 1 });
+      expect(mockAudio.volume).toBe(1);
+    });
+
+    it('should fade out audio', async () => {
+      const mockAudio = document.createElement('audio');
+      Object.defineProperty(mockAudio, 'volume', { value: 1, writable: true });
+      Object.defineProperty(mockAudio, 'duration', { value: 10, writable: true }); // 10s duration
+      mockAudio.setAttribute('data-helios-fade-out', '2'); // 2s fade out
+      scope.appendChild(mockAudio);
+      await new Promise(resolve => setTimeout(resolve, 20));
+
+      // 7s: Should be 1 volume (3s remaining)
+      driver.update(7000, { isPlaying: false, playbackRate: 1, volume: 1 });
+      expect(mockAudio.volume).toBe(1);
+
+      // 9s: Should be 0.5 volume (1s remaining)
+      driver.update(9000, { isPlaying: false, playbackRate: 1, volume: 1 });
+      expect(mockAudio.volume).toBe(0.5);
+
+      // 10s: Should be 0 volume (0s remaining)
+      driver.update(10000, { isPlaying: false, playbackRate: 1, volume: 1 });
+      expect(mockAudio.volume).toBe(0);
+    });
+
+    it('should handle overlapping fades', async () => {
+      const mockAudio = document.createElement('audio');
+      Object.defineProperty(mockAudio, 'volume', { value: 1, writable: true });
+      Object.defineProperty(mockAudio, 'duration', { value: 4, writable: true });
+      mockAudio.setAttribute('data-helios-fade-in', '3'); // Fade in over 3s
+      mockAudio.setAttribute('data-helios-fade-out', '3'); // Fade out last 3s
+      // Overlap from 1s to 3s
+      scope.appendChild(mockAudio);
+      await new Promise(resolve => setTimeout(resolve, 20));
+
+      // 2s (Midpoint):
+      // Fade in (2/3) = 0.66
+      // Fade out (2/3 remaining) = 0.66
+      // Total = 0.66 * 0.66 = 0.44
+      driver.update(2000, { isPlaying: false, playbackRate: 1, volume: 1 });
+      expect(mockAudio.volume).toBeCloseTo(0.444, 2);
+    });
+
+    it('should default to no fade if attributes are missing', async () => {
+      const mockAudio = document.createElement('audio');
+      Object.defineProperty(mockAudio, 'volume', { value: 1, writable: true });
+      scope.appendChild(mockAudio);
+      await new Promise(resolve => setTimeout(resolve, 20));
+
+      driver.update(0, { isPlaying: false, playbackRate: 1, volume: 1 });
+      expect(mockAudio.volume).toBe(1);
+    });
+
+    it('should respect offset when fading in', async () => {
+      const mockAudio = document.createElement('audio');
+      Object.defineProperty(mockAudio, 'volume', { value: 1, writable: true });
+      mockAudio.setAttribute('data-helios-fade-in', '2');
+      mockAudio.setAttribute('data-helios-offset', '1'); // Starts at 1s
+      scope.appendChild(mockAudio);
+      await new Promise(resolve => setTimeout(resolve, 20));
+
+      // 0.5s: Before start, volume should be 0 (clamped)
+      driver.update(500, { isPlaying: false, playbackRate: 1, volume: 1 });
+      expect(mockAudio.volume).toBe(0);
+
+      // 2s: 1s into playback. Fade in is 2s. So 0.5.
+      driver.update(2000, { isPlaying: false, playbackRate: 1, volume: 1 });
+      expect(mockAudio.volume).toBe(0.5);
+    });
+
+    it('should handle zero duration fades', async () => {
+      const mockAudio = document.createElement('audio');
+      Object.defineProperty(mockAudio, 'volume', { value: 1, writable: true });
+      mockAudio.setAttribute('data-helios-fade-in', '0');
+      scope.appendChild(mockAudio);
+      await new Promise(resolve => setTimeout(resolve, 20));
+
+      // 0s: Should be 1 volume (immediate)
+      driver.update(0, { isPlaying: false, playbackRate: 1, volume: 1 });
+      expect(mockAudio.volume).toBe(1);
+    });
+
+    it('should NOT suffer from volume feedback loop during continuous updates', async () => {
+      const mockAudio = document.createElement('audio');
+      Object.defineProperty(mockAudio, 'volume', { value: 1, writable: true });
+      mockAudio.setAttribute('data-helios-fade-in', '2'); // 2s fade in
+      scope.appendChild(mockAudio);
+      await new Promise(resolve => setTimeout(resolve, 20));
+
+      // 1s: Fade should be 0.5. Volume becomes 0.5.
+      driver.update(1000, { isPlaying: false, playbackRate: 1, volume: 1 });
+      expect(mockAudio.volume).toBe(0.5);
+
+      // 1.1s: Fade should be 0.55.
+      // If feedback loop existed, baseVol would be 0.5, so 0.5 * 0.55 = 0.275.
+      // If correct, baseVol is restored to 1, so 1 * 0.55 = 0.55.
+      driver.update(1100, { isPlaying: false, playbackRate: 1, volume: 1 });
+      expect(mockAudio.volume).toBeCloseTo(0.55, 2);
+
+      // 1.2s: Fade should be 0.6.
+      driver.update(1200, { isPlaying: false, playbackRate: 1, volume: 1 });
+      expect(mockAudio.volume).toBeCloseTo(0.6, 2);
+    });
+  });
 });

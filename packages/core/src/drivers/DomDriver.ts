@@ -236,6 +236,31 @@ export class DomDriver implements TimeDriver {
         trackMuted = audioTracks[trackId].muted;
       }
 
+      // --- Offset & Seek Logic ---
+      const offset = parseFloat(el.getAttribute('data-helios-offset') || '0');
+      const seek = parseFloat(el.getAttribute('data-helios-seek') || '0');
+      const timeRelToStart = timeInSeconds - offset;
+
+      // --- Fade Logic ---
+      const fadeInDuration = parseFloat(el.getAttribute('data-helios-fade-in') || '0');
+      const fadeOutDuration = parseFloat(el.getAttribute('data-helios-fade-out') || '0');
+
+      let fadeInMultiplier = 1;
+      if (fadeInDuration > 0) {
+        fadeInMultiplier = Math.max(0, Math.min(1, timeRelToStart / fadeInDuration));
+      }
+
+      let fadeOutMultiplier = 1;
+      // We need duration to calculate time remaining.
+      // effectiveTime (playback position) = timeRelToStart + seek
+      // But we only care about how close we are to the end of the clip.
+      // If we are scrubbing, we use the target time.
+      if (fadeOutDuration > 0 && !isNaN(el.duration) && isFinite(el.duration)) {
+        const targetTime = Math.max(0, timeRelToStart + seek);
+        const timeRemaining = el.duration - targetTime;
+        fadeOutMultiplier = Math.max(0, Math.min(1, timeRemaining / fadeOutDuration));
+      }
+
       // --- Volume Logic ---
       const currentVol = el.volume;
       let baseVol = currentVol;
@@ -251,7 +276,7 @@ export class DomDriver implements TimeDriver {
 
       // If master volume is provided, use it; otherwise assume 1 (no scaling)
       const masterVolume = volume ?? 1;
-      const effectiveVol = Math.max(0, Math.min(1, baseVol * masterVolume * trackVol));
+      const effectiveVol = Math.max(0, Math.min(1, baseVol * masterVolume * trackVol * fadeInMultiplier * fadeOutMultiplier));
 
       if (Math.abs(el.volume - effectiveVol) > 0.0001) {
         el.volume = effectiveVol;
@@ -286,12 +311,7 @@ export class DomDriver implements TimeDriver {
         lastSetMuted: effectiveMuted
       });
 
-      // --- Offset & Seek Logic ---
-      const offset = parseFloat(el.getAttribute('data-helios-offset') || '0');
-      const seek = parseFloat(el.getAttribute('data-helios-seek') || '0');
-
       // Check if we are before the start time
-      const timeRelToStart = timeInSeconds - offset;
       const isBeforeStart = timeRelToStart < 0;
 
       // effectiveTime is where the media element should be.
