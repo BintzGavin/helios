@@ -138,6 +138,7 @@ export declare class HeliosPlayer extends HTMLElement implements TrackHost {
     handleTrackModeChange(track: HeliosTextTrack): void;
     attributeChangedCallback(name: string, oldVal: string, newVal: string): void;
     private updateControlsVisibility;
+    private updateCCButtonVisibility;
     get inputProps(): Record<string, any> | null;
     set inputProps(val: Record<string, any> | null);
     connectedCallback(): void;

@@ -1,3 +1,4 @@
+import { Helios } from "@helios-project/core";
 import { captureDomToBitmap } from "./features/dom-capture";
 import { getAudioAssets } from "./features/audio-utils";
 export function connectToParent(helios) {
@@ -79,6 +80,10 @@ export function connectToParent(helios) {
                 break;
             case 'HELIOS_GET_SCHEMA':
                 window.parent.postMessage({ type: 'HELIOS_SCHEMA', schema: helios.schema }, '*');
+                break;
+            case 'HELIOS_DIAGNOSE':
+                const report = await Helios.diagnose();
+                window.parent.postMessage({ type: 'HELIOS_DIAGNOSE_RESULT', report }, '*');
                 break;
             case 'HELIOS_CAPTURE_FRAME':
                 handleCaptureFrame(helios, event.data);

@@ -858,6 +858,8 @@ export class HeliosPlayer extends HTMLElement {
         });
         this.clickLayer.addEventListener("dblclick", () => this.toggleFullscreen());
         this._textTracks = new HeliosTextTrackList();
+        this._textTracks.addEventListener("addtrack", () => this.updateCCButtonVisibility());
+        this._textTracks.addEventListener("removetrack", () => this.updateCCButtonVisibility());
         this.resizeObserver = new ResizeObserver((entries) => {
             for (const entry of entries) {
                 const width = entry.contentRect.width;
@@ -998,6 +1000,15 @@ export class HeliosPlayer extends HTMLElement {
         }
         else {
             this.pipBtn.style.removeProperty("display");
+        }
+    }
+    updateCCButtonVisibility() {
+        // Smart Controls: Hide CC button if no tracks are present
+        if (this._textTracks.length > 0) {
+            this.ccBtn.style.removeProperty("display");
+        }
+        else {
+            this.ccBtn.style.display = "none";
         }
     }
     get inputProps() {
@@ -1318,13 +1329,7 @@ export class HeliosPlayer extends HTMLElement {
                 this._domTracks.delete(el);
             }
         }
-        // Smart Controls: Hide CC button if no tracks are present
-        if (this._textTracks.length > 0) {
-            this.ccBtn.style.removeProperty("display");
-        }
-        else {
-            this.ccBtn.style.display = "none";
-        }
+        this.updateCCButtonVisibility();
     };
     setController(controller) {
         // Clean up old controller
