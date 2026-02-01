@@ -1,3 +1,6 @@
+## DEMO v1.77.0
+- ✅ Completed: Update Animation Helpers - Added `interpolate` and `spring` examples to Vue, Svelte, and Solid examples.
+
 ## DEMO v1.76.1
 - ✅ Verified: Diagnostics Example - Verified build and structure of `examples/diagnostics`. Note: E2E verification blocked by systemic environment issue.
 

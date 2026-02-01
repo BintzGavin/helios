@@ -1,6 +1,6 @@
 <script setup>
-import { ref, provide, onUnmounted } from 'vue';
-import { Helios } from '../../../packages/core/src/index.ts';
+import { ref, provide, onUnmounted, computed } from 'vue';
+import { Helios, interpolate, spring } from '../../../packages/core/src/index.ts';
 import Sequence from './components/Sequence.vue';
 import Series from './components/Series.vue';
 
@@ -20,6 +20,9 @@ const unsubscribe = helios.subscribe((state) => {
 onUnmounted(() => {
   unsubscribe();
 });
+
+const x = computed(() => interpolate(frame.value, [0, 60], [0, 200], { extrapolateRight: 'clamp' }));
+const scale = computed(() => spring({ frame: frame.value, fps: 30, from: 0, to: 1, config: { stiffness: 100 } }));
 
 provide('videoFrame', frame);
 </script>
@@ -51,6 +54,24 @@ provide('videoFrame', frame);
           </Sequence>
       </Sequence>
     </Series>
+
+    <div :style="{
+      position: 'absolute',
+      top: '250px',
+      left: '50px',
+      transform: `translateX(${x}px) scale(${scale})`,
+      width: '100px',
+      height: '100px',
+      background: 'hotpink',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      color: 'white',
+      fontWeight: 'bold',
+      border: '2px solid white'
+    }">
+      Helpers
+    </div>
   </div>
 </template>
 

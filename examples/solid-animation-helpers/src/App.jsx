@@ -1,7 +1,7 @@
 import { createHeliosSignal } from './lib/createHeliosSignal';
 import { Sequence } from './lib/Sequence';
 import { Series } from './lib/Series';
-import { Helios } from '@helios-project/core';
+import { Helios, interpolate, spring } from '@helios-project/core';
 
 // Initialize Helios
 if (!window.helios) {
@@ -12,10 +12,14 @@ if (!window.helios) {
     height: 1080,
     autoSyncAnimations: false, // We control timing manually via Signals
   });
+  window.helios.bindToDocumentTimeline();
 }
 
 function App() {
   const frame = createHeliosSignal(window.helios); // returns accessor
+
+  const x = () => interpolate(frame().currentFrame, [0, 60], [0, 200], { extrapolateRight: 'clamp' });
+  const scale = () => spring({ frame: frame().currentFrame, fps: 30, from: 0, to: 1, config: { stiffness: 100 } });
 
   return (
     <div style={{
@@ -91,6 +95,24 @@ function App() {
                 <div style={{ background: '#44ff44', inset: 0, position: 'absolute', display: 'flex', "justify-content": 'center', "align-items": 'center', color: 'black' }}>Item 3 (60-90)</div>
             </Sequence>
         </Series>
+      </div>
+
+      <div style={{
+        position: 'absolute',
+        top: '250px',
+        left: '50px',
+        transform: `translateX(${x()}px) scale(${scale()})`,
+        width: '100px',
+        height: '100px',
+        background: 'hotpink',
+        display: 'flex',
+        "justify-content": 'center',
+        "align-items": 'center',
+        color: 'white',
+        "font-weight": 'bold',
+        border: '2px solid white'
+      }}>
+        Helpers
       </div>
     </div>
   );

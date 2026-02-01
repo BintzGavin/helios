@@ -1,7 +1,7 @@
 <script>
   import { setContext } from 'svelte';
   import { derived } from 'svelte/store';
-  import { Helios } from '../../../packages/core/src/index.ts';
+  import { Helios, interpolate, spring } from '../../../packages/core/src/index.ts';
   import { createHeliosStore } from './lib/store';
   import { FRAME_CONTEXT_KEY } from './lib/context';
   import Sequence from './lib/Sequence.svelte';
@@ -26,6 +26,9 @@
   const currentFrame = derived(heliosStore, $s => $s.currentFrame);
 
   setContext(FRAME_CONTEXT_KEY, currentFrame);
+
+  $: x = interpolate($currentFrame, [0, 60], [0, 200], { extrapolateRight: 'clamp' });
+  $: scale = spring({ frame: $currentFrame, fps, from: 0, to: 1, config: { stiffness: 100 } });
 </script>
 
 <div class="container">
@@ -65,6 +68,22 @@
              </Series>
         </Sequence>
     </Series>
+
+    <div style:position="absolute"
+         style:top="250px"
+         style:left="50px"
+         style:transform="translateX({x}px) scale({scale})"
+         style:width="100px"
+         style:height="100px"
+         style:background="hotpink"
+         style:display="flex"
+         style:align-items="center"
+         style:justify-content="center"
+         style:color="white"
+         style:font-weight="bold"
+         style:border="2px solid white">
+        Helpers
+    </div>
 </div>
 
 <style>

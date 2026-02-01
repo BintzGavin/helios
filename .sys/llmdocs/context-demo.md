@@ -35,12 +35,12 @@ The `examples/` directory contains reference implementations for various framewo
 - **simple-animation**: Vanilla JS DOM animation.
 - **simple-canvas-animation**: Vanilla JS Canvas animation.
 - **social-media-story**: Social media story format example.
-- **solid-animation-helpers**: SolidJS components for sequencing.
+- **solid-animation-helpers**: SolidJS components for sequencing and core utilities.
 - **solid-canvas-animation**: SolidJS + Canvas integration.
 - **solid-dom-animation**: SolidJS + DOM integration.
 - **solid-transitions**: SolidJS CSS transitions.
 - **stress-test-animation**: High-element count stress test.
-- **svelte-animation-helpers**: Svelte components for sequencing.
+- **svelte-animation-helpers**: Svelte components for sequencing and core utilities.
 - **svelte-canvas-animation**: Svelte + Canvas example.
 - **svelte-dom-animation**: Svelte + DOM example.
 - **svelte-runes-animation**: Svelte 5 Runes example.
@@ -50,7 +50,7 @@ The `examples/` directory contains reference implementations for various framewo
 - **threejs-canvas-animation**: Integration with Three.js.
 - **vanilla-typescript**: Vanilla TypeScript example.
 - **variable-font-animation**: Animating variable fonts.
-- **vue-animation-helpers**: Vue components for sequencing.
+- **vue-animation-helpers**: Vue components for sequencing and core utilities.
 - **vue-canvas-animation**: Vue + Canvas example.
 - **vue-dom-animation**: Vue + DOM example.
 - **vue-transitions**: Vue CSS transitions.
