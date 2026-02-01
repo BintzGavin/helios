@@ -154,6 +154,16 @@ export async function startRender(options: StartRenderOptions, serverPort: numbe
         signal: controller.signal
       });
 
+      // Verify file exists and has size
+      if (fs.existsSync(outputPath)) {
+        const stats = fs.statSync(outputPath);
+        if (stats.size === 0) {
+          throw new Error("Render produced an empty file.");
+        }
+      } else {
+        throw new Error("Render output file not found.");
+      }
+
       job.status = 'completed';
       job.progress = 1;
       saveJobs();

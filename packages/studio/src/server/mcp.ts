@@ -7,7 +7,7 @@ import { startRender } from './render-manager';
 export function createMcpServer(getPort: () => number) {
   const server = new McpServer({
     name: "Helios Studio",
-    version: "0.59.0"
+    version: "0.72.1"
   });
 
   server.resource(
