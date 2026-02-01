@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body { margin: 0; background: white; }
+    canvas { position: absolute; top: 0; left: 0; }
+  </style>
+</head>
+<body>
+  <canvas id="canvas-a" width="100" height="100" style="z-index: 1;"></canvas>
+  <canvas id="canvas-b" width="100" height="100" style="z-index: 2;"></canvas>
+  <script>
+    // Canvas A: Red background
+    const canvasA = document.getElementById('canvas-a');
+    const ctxA = canvasA.getContext('2d');
+    ctxA.fillStyle = 'red';
+    ctxA.fillRect(0, 0, 100, 100);
+
+    // Canvas B: Blue background
+    const canvasB = document.getElementById('canvas-b');
+    const ctxB = canvasB.getContext('2d');
+    ctxB.fillStyle = 'blue';
+    ctxB.fillRect(0, 0, 100, 100);
+
+    // Add text to distinguish
+    ctxA.fillStyle = 'white';
+    ctxA.fillText('A', 10, 50);
+
+    ctxB.fillStyle = 'white';
+    ctxB.fillText('B', 10, 50);
+
+    // Helios hook
+    window.helios = {
+      subscribe: () => {},
+      status: 'ready'
+    };
+  </script>
+</body>
+</html>

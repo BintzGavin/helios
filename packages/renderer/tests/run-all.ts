@@ -8,6 +8,7 @@ const tests = [
   'tests/verify-bitrate.ts',
   'tests/verify-browser-config.ts',
   'tests/verify-canvas-implicit-audio.ts',
+  'tests/verify-canvas-selector.ts',
   'tests/verify-canvas-strategy.ts',
   'tests/verify-captions.ts',
   'tests/verify-cdp-determinism.ts',
