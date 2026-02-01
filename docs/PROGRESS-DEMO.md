@@ -1,3 +1,6 @@
+## DEMO v1.76.1
+- ✅ Verified: Diagnostics Example - Verified build and structure of `examples/diagnostics`. Note: E2E verification blocked by systemic environment issue.
+
 ## DEMO v1.76.0
 - ✅ Completed: Diagnostics Example - Created `examples/diagnostics` to demonstrate `Helios.diagnose()` and provide a runnable environment check.
 

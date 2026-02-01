@@ -1,6 +1,6 @@
 # Status: DEMO Domain
 
-**Version**: 1.76.0
+**Version**: 1.76.1
 
 ## Vision
 The DEMO domain is responsible for:
@@ -15,6 +15,7 @@ The DEMO domain is responsible for:
 - None
 
 ## Completed Tasks
+- [v1.76.1] ✅ Verified: Diagnostics Example - Verified build and structure of `examples/diagnostics`. Note: E2E verification blocked by systemic environment issue.
 - [v1.76.0] ✅ Completed: Diagnostics Example - Created `examples/diagnostics` to demonstrate `Helios.diagnose()` and provide a runnable environment check.
 - [v1.75.0] ✅ Completed: Vanilla TypeScript Example - Created `examples/vanilla-typescript` to demonstrate idiomatic TypeScript usage without frameworks.
 - [v1.74.1] ✅ Completed: Create Examples Documentation - Added `examples/README.md` to catalog and describe all available examples.
