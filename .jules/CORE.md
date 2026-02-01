@@ -5,3 +5,7 @@
 ## [3.3.0] - Documentation Drift
 **Learning:** Documentation for AI agents (`SKILL.md`) is a critical part of the "Agent Experience First" vision and can silently drift from the codebase, causing hallucinated usage.
 **Action:** Always verify `SKILL.md` examples against source code (`src/`) during the "Gap Identification" phase, treating documentation bugs as high-priority vision gaps.
+
+## [3.5.1] - Preview/Render Parity
+**Learning:** `DomDriver` (Preview) logic can silently drift from `Renderer` (FFmpeg) logic if features like audio fades are implemented via different mechanisms (DOM vs FFmpeg filters) without shared logic.
+**Action:** When inspecting "Vision: Native Always Wins", verify that "Native" implementation (DOM) actually supports all features exposed by the Renderer to ensure WYSIWYG.
