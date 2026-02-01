@@ -14,7 +14,7 @@ Helios Studio is a browser-based development environment for video composition. 
     - `npx @helios-project/studio` or `helios-studio` - Standalone CLI (serves built dist via vite preview)
 -   **Bin Script**: `bin/helios-studio.js` - Executable script that serves the built Studio UI
 -   **Server**: A Vite plugin (`vite-plugin-studio-api.ts`) provides API endpoints for:
-    -   Filesystem access (assets, compositions)
+    -   Filesystem access (assets, compositions, thumbnails)
     -   Render management (`RenderManager`)
     -   Documentation discovery (`findDocumentation`)
     -   MCP Server (`mcp.ts`)
@@ -112,10 +112,10 @@ npx @helios-project/studio
     -   **Ask AI**: Generates context-aware prompts (System Context + Schema + Relevant Docs) for LLMs.
     -   **Documentation**: Searchable documentation browser scanning local READMEs.
 -   **Composition Management**:
-    -   **Switcher**: Cmd+K to switch active composition.
+    -   **Switcher**: Cmd+K to switch active composition. Displays composition name and thumbnail.
     -   **Create**: Create new compositions from templates.
     -   **Duplicate**: Clone existing compositions.
-    -   **Settings**: Edit metadata (resolution, FPS, duration) and Rename composition.
+    -   **Settings**: Edit metadata (resolution, FPS, duration), Rename composition, and Update Thumbnail.
 
 ## E. Integration
 

@@ -186,6 +186,58 @@ function configureMiddlewares(server: ViteDevServer | PreviewServer, isPreview: 
       });
 
       server.middlewares.use('/api/compositions', async (req, res, next) => {
+        const match = req.url!.match(/^\/([^\/]+)\/thumbnail$/);
+        if (match && req.method === 'POST') {
+            const id = decodeURIComponent(match[1]);
+            try {
+                const projectRoot = getProjectRoot(process.cwd());
+                const compDir = path.resolve(projectRoot, id);
+
+                // Security check
+                if (!compDir.startsWith(projectRoot)) {
+                    res.statusCode = 403;
+                    res.end(JSON.stringify({ error: 'Access denied' }));
+                    return;
+                }
+
+                if (!fs.existsSync(compDir)) {
+                    res.statusCode = 404;
+                    res.end(JSON.stringify({ error: 'Composition not found' }));
+                    return;
+                }
+
+                const thumbPath = path.join(compDir, 'thumbnail.png');
+                const writeStream = fs.createWriteStream(thumbPath);
+
+                req.pipe(writeStream);
+
+                writeStream.on('finish', () => {
+                   res.setHeader('Content-Type', 'application/json');
+                   res.end(JSON.stringify({ success: true }));
+                });
+
+                writeStream.on('error', (err) => {
+                   console.error('Thumbnail write error:', err);
+                   res.statusCode = 500;
+                   res.end(JSON.stringify({ error: 'Write failed' }));
+                });
+
+                req.on('error', (err) => {
+                   console.error('Thumbnail upload error:', err);
+                   if (!res.headersSent) {
+                       res.statusCode = 500;
+                       res.end(JSON.stringify({ error: 'Upload failed' }));
+                   }
+                });
+
+            } catch (e: any) {
+                console.error(e);
+                res.statusCode = 500;
+                res.end(JSON.stringify({ error: e.message }));
+            }
+            return;
+        }
+
         if (req.url === '/' || req.url === '') {
           if (req.method === 'POST') {
              try {

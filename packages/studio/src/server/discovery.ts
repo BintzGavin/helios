@@ -7,6 +7,7 @@ export interface CompositionInfo {
   id: string;
   name: string;
   url: string;
+  thumbnailUrl?: string;
   description?: string;
   metadata?: CompositionOptions;
 }
@@ -63,12 +64,20 @@ export function findCompositions(rootDir: string): CompositionInfo[] {
         }
       }
 
+      // Check for thumbnail
+      let thumbnailUrl: string | undefined;
+      const thumbPath = path.join(dir, 'thumbnail.png');
+      if (fs.existsSync(thumbPath)) {
+        thumbnailUrl = `/@fs${thumbPath}`;
+      }
+
       compositions.push({
         id,
         name,
         // Use /@fs/ prefix with absolute path so Vite can serve files outside root
         // Ensure we don't double slash if path starts with /
         url: `/@fs${compPath}`,
+        thumbnailUrl,
         description: id,
         metadata
       });
@@ -183,10 +192,18 @@ export function renameComposition(
     }
   }
 
+  // Check for thumbnail
+  let thumbnailUrl: string | undefined;
+  const thumbPath = path.join(targetDir, 'thumbnail.png');
+  if (fs.existsSync(thumbPath)) {
+    thumbnailUrl = `/@fs${thumbPath}`;
+  }
+
   return {
     id: dirName,
     name: displayName,
     url: `/@fs${compPath}`,
+    thumbnailUrl,
     description: `Example: ${displayName}`,
     metadata
   };
@@ -241,10 +258,18 @@ export function duplicateComposition(
 
   const compPath = path.join(targetDir, 'composition.html');
 
+  // Check for thumbnail
+  let thumbnailUrl: string | undefined;
+  const thumbPath = path.join(targetDir, 'thumbnail.png');
+  if (fs.existsSync(thumbPath)) {
+    thumbnailUrl = `/@fs${thumbPath}`;
+  }
+
   return {
     id: dirName,
     name: displayName,
     url: `/@fs${compPath}`,
+    thumbnailUrl,
     description: `Example: ${displayName}`,
     metadata
   };
@@ -493,10 +518,18 @@ export function updateCompositionMetadata(
 
   const compPath = path.join(compDir, 'composition.html');
 
+  // Check for thumbnail
+  let thumbnailUrl: string | undefined;
+  const thumbPath = path.join(compDir, 'thumbnail.png');
+  if (fs.existsSync(thumbPath)) {
+    thumbnailUrl = `/@fs${thumbPath}`;
+  }
+
   return {
     id: id,
     name: name,
     url: `/@fs${compPath}`,
+    thumbnailUrl,
     description: `Example: ${name}`,
     metadata: newMetadata
   };

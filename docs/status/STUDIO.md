@@ -1,4 +1,4 @@
-**Version**: 0.72.1
+**Version**: 0.73.0
 
 # Studio Domain Status
 
@@ -7,6 +7,7 @@
 **Focus**: UI Implementation & CLI
 
 ## Recent Updates
+- [v0.73.0] ✅ Completed: Composition Thumbnails - Implemented ability to set and view thumbnails for compositions in the Switcher and Settings.
 - [v0.72.1] ✅ Verified: Robustness - Added output file verification to Render Manager and synced package versions.
 - [v0.72.0] ✅ Completed: Helios Assistant - Implemented context-aware AI assistant with documentation search, replacing System Prompt Modal.
 - [v0.71.0] ✅ Completed: Implement Asset Renaming - Added ability to rename assets from the Assets Panel, updating both UI and filesystem.
