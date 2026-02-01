@@ -3,7 +3,7 @@ import { CSS3DRenderer, CSS3DObject } from 'three/examples/jsm/renderers/CSS3DRe
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
-import { Helios } from '../../packages/core/src/index.ts';
+import { Helios } from '../../../packages/core/src/index.ts';
 
 // --- Configuration ---
 const DURATION = 30;
