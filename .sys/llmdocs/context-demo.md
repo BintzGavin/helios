@@ -42,6 +42,7 @@ The `examples/` directory contains reference implementations for various framewo
 - **stress-test-animation**: High-element count stress test.
 - **svelte-animation-helpers**: Svelte components for sequencing and core utilities.
 - **svelte-canvas-animation**: Svelte + Canvas example.
+- **svelte-captions-animation**: Svelte integration with Helios SRT captions.
 - **svelte-dom-animation**: Svelte + DOM example.
 - **svelte-runes-animation**: Svelte 5 Runes example.
 - **svelte-transitions**: Svelte CSS transitions.

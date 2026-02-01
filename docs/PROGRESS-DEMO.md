@@ -1,3 +1,6 @@
+## DEMO v1.80.0
+- ✅ Completed: Svelte Captions Animation - Created `examples/svelte-captions-animation` demonstrating Helios captions (SRT) support in Svelte.
+
 ## DEMO v1.79.1
 - ✅ Verified: Promo Video GSAP Sync - Confirmed that running the dev server from the project root resolves module resolution issues, allowing the Promo Video example to render correctly with full content.
 
