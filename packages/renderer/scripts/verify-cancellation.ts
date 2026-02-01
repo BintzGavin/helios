@@ -1,17 +1,37 @@
 import { Renderer } from '../src/index';
-import path from 'path';
-import fs from 'fs';
+import * as path from 'path';
+import * as fs from 'fs';
 
 async function main() {
-  const outputDir = path.resolve(__dirname, '../output');
+  const outputDir = path.resolve(__dirname, '../output/verify-cancellation');
   if (!fs.existsSync(outputDir)) {
     fs.mkdirSync(outputDir, { recursive: true });
   }
-  const outputPath = path.join(outputDir, 'cancellation-test.mp4');
 
-  // Use the built example from output/example-build
-  const compositionPath = path.resolve(__dirname, '../../../output/example-build/examples/simple-canvas-animation/composition.html');
+  // Create a temporary composition
+  const compositionPath = path.join(outputDir, 'composition.html');
+  const htmlContent = `
+    <!DOCTYPE html>
+    <html>
+    <body>
+      <canvas id="canvas" width="1280" height="720"></canvas>
+      <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        function render(time) {
+            ctx.fillStyle = 'red';
+            ctx.fillRect(0, 0, 1280, 720);
+            requestAnimationFrame(render);
+        }
+        requestAnimationFrame(render);
+      </script>
+    </body>
+    </html>
+  `;
+  fs.writeFileSync(compositionPath, htmlContent);
   const compositionUrl = `file://${compositionPath}`;
+
+  const outputPath = path.join(outputDir, 'cancellation-test.mp4');
 
   console.log(`Target composition: ${compositionUrl}`);
 
@@ -41,16 +61,30 @@ async function main() {
       }
     });
     console.error('Test Failed: Render completed despite cancellation.');
+    // Cleanup on failure too
+    cleanup(outputDir);
     process.exit(1);
   } catch (err: any) {
     if (err.message === 'Aborted') {
       console.log('Test Passed: Render was successfully aborted.');
+      cleanup(outputDir);
       process.exit(0);
     } else {
       console.error('Test Failed: Unexpected error:', err);
+      cleanup(outputDir);
       process.exit(1);
     }
   }
+}
+
+function cleanup(dir: string) {
+    try {
+        if (fs.existsSync(dir)) {
+            fs.rmSync(dir, { recursive: true, force: true });
+        }
+    } catch (e) {
+        console.warn('Cleanup failed:', e);
+    }
 }
 
 main().catch(err => {
