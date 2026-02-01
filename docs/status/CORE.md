@@ -1,11 +1,12 @@
 # Status: CORE
 
-**Version**: 3.9.1
+**Version**: 3.9.2
 
 - **Status**: Active
 - **Current Focus**: Maintenance, Optimization, and Stability
 - **Last Updated**: 2026-06-11
 
+[v3.9.2] ✅ Completed: Verify Subscription Timing - Added `packages/core/src/subscription-timing.test.ts` to verify that `helios.subscribe` fires synchronously after `seek()` and virtual time updates, confirming CORE behavior is correct for RENDERER synchronization.
 [v3.9.1] ✅ Completed: Expose Version and Verify Init Sync - Exported `VERSION` constant and verified robust `bindToDocumentTimeline` initialization with pre-existing virtual time.
 [v3.9.0] ✅ Completed: Fix Signal Glitches and Runtime Safety - Optimized `EffectImpl` to avoid redundant executions (diamond problem) and guarded `Helios.bindToDocumentTimeline` for Node.js compatibility.
 [v3.8.0] ✅ Completed: Implement Audio Track Discovery - Implemented `availableAudioTracks` signal in `Helios` and updated `DomDriver` to discover elements with `data-helios-track-id`.

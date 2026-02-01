@@ -1,5 +1,8 @@
 # CORE Progress Log
 
+## CORE v3.9.2
+- ✅ Completed: Verify Subscription Timing - Added `packages/core/src/subscription-timing.test.ts` to verify that `helios.subscribe` fires synchronously after `seek()` and virtual time updates, confirming CORE behavior is correct for RENDERER synchronization.
+
 ## CORE v3.9.1
 - ✅ Completed: Expose Version and Verify Init Sync - Exported `VERSION` constant and verified robust `bindToDocumentTimeline` initialization with pre-existing virtual time.
 
