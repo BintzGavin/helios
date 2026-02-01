@@ -10,6 +10,7 @@ async function testCodec(codecOption: string | undefined, expectedFourCC: string
 
   // Mock VideoEncoder to ensure tests run even if the environment doesn't strictly support the codec.
   // We are testing the logic of Header Generation and Config Passing, not the browser's implementation.
+  await page.setContent('<canvas id="canvas" width="1920" height="1080"></canvas>');
   await page.evaluate(() => {
     (window as any).VideoEncoder = class {
       static isConfigSupported(config: any) {
