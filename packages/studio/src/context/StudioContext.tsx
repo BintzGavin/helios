@@ -13,6 +13,7 @@ export interface Composition {
   id: string;
   name: string;
   url: string;
+  thumbnailUrl?: string;
   description?: string;
   metadata?: CompositionMetadata;
 }
@@ -97,6 +98,7 @@ interface StudioContextType {
   createComposition: (name: string, template?: string, options?: CompositionMetadata) => Promise<void>;
   duplicateComposition: (sourceId: string, newName: string) => Promise<void>;
   updateCompositionMetadata: (id: string, metadata: CompositionMetadata, name?: string) => Promise<void>;
+  updateThumbnail: (id: string) => Promise<void>;
   deleteComposition: (id: string) => Promise<void>;
 
   // Assets
@@ -342,6 +344,75 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     } catch (e) {
       console.error(e);
       throw e;
+    }
+  };
+
+  const updateThumbnail = async (id: string) => {
+    if (!controller) return;
+
+    const frameNumber = playerState.currentFrame;
+    const mode = renderConfig.mode;
+
+    try {
+      const result = await controller.captureFrame(frameNumber, { mode });
+      if (!result || !result.frame) return;
+
+      const { frame: videoFrame } = result;
+
+      // Create canvas for resizing
+      const canvas = document.createElement('canvas');
+      const MAX_WIDTH = 320;
+      const scale = Math.min(1, MAX_WIDTH / videoFrame.displayWidth);
+      canvas.width = videoFrame.displayWidth * scale;
+      canvas.height = videoFrame.displayHeight * scale;
+
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+         ctx.drawImage(videoFrame, 0, 0, canvas.width, canvas.height);
+
+         canvas.toBlob(async (blob) => {
+             if (!blob) return;
+
+             try {
+                 const res = await fetch(`/api/compositions/${encodeURIComponent(id)}/thumbnail`, {
+                     method: 'POST',
+                     body: blob
+                 });
+
+                 if (!res.ok) {
+                     console.error('Failed to upload thumbnail');
+                     return;
+                 }
+
+                 // Refresh compositions to get new thumbnail URL
+                 const listRes = await fetch('/api/compositions');
+                 const data = await listRes.json();
+
+                 // Append timestamp to bust cache if URL is same
+                 const dataWithCacheBust = data.map((c: Composition) => {
+                    if (c.id === id && c.thumbnailUrl) {
+                        return { ...c, thumbnailUrl: `${c.thumbnailUrl}?t=${Date.now()}` };
+                    }
+                    return c;
+                 });
+
+                 setCompositions(dataWithCacheBust);
+
+                 // Update active composition if needed
+                 if (activeComposition?.id === id) {
+                     const updated = dataWithCacheBust.find((c: Composition) => c.id === id);
+                     if (updated) setActiveComposition(updated);
+                 }
+
+             } catch (e) {
+                 console.error('Error updating thumbnail:', e);
+             }
+         }, 'image/png');
+      }
+
+      videoFrame.close();
+    } catch (e) {
+      console.error("Thumbnail capture failed", e);
     }
   };
 
@@ -594,6 +665,7 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         createComposition,
         duplicateComposition,
         updateCompositionMetadata,
+        updateThumbnail,
         deleteComposition,
         renderJobs,
         startRender,

@@ -97,6 +97,32 @@ describe('findCompositions', () => {
         // Verify description (should contain relative path)
         expect(comp2?.description).toContain('folder/comp2');
     });
+
+    it('should include thumbnailUrl if thumbnail.png exists', () => {
+        const root = path.resolve('/mock/project');
+
+        vi.mocked(fs.readdirSync).mockImplementation((dirPath: any) => {
+            const dir = path.resolve(dirPath);
+            if (dir === root) {
+                return [
+                    { name: 'comp-with-thumb', isDirectory: () => true }
+                ] as any;
+            }
+            return [] as any;
+        });
+
+        vi.mocked(fs.existsSync).mockImplementation((filePath: any) => {
+            const p = path.resolve(filePath);
+            if (p === root) return true;
+            if (p === path.resolve(root, 'comp-with-thumb/composition.html')) return true;
+            if (p === path.resolve(root, 'comp-with-thumb/thumbnail.png')) return true;
+            return false;
+        });
+
+        const compositions = findCompositions('.');
+        expect(compositions).toHaveLength(1);
+        expect(compositions[0].thumbnailUrl).toContain('comp-with-thumb/thumbnail.png');
+    });
 });
 
 describe('findAssets', () => {

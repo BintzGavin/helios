@@ -112,9 +112,20 @@ export const CompositionSwitcher: React.FC = () => {
                   alignItems: 'center'
                 }}
               >
-                <div>
-                  <div style={{ color: 'white' }}>{comp.name}</div>
-                  <div style={{ fontSize: '12px', color: '#888' }}>{comp.description || comp.id}</div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  {comp.thumbnailUrl ? (
+                    <img
+                      src={comp.thumbnailUrl}
+                      alt=""
+                      style={{ width: '48px', height: '27px', objectFit: 'cover', borderRadius: '2px', background: '#000' }}
+                    />
+                  ) : (
+                    <div style={{ width: '48px', height: '27px', borderRadius: '2px', background: '#222' }} />
+                  )}
+                  <div>
+                    <div style={{ color: 'white' }}>{comp.name}</div>
+                    <div style={{ fontSize: '12px', color: '#888' }}>{comp.description || comp.id}</div>
+                  </div>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                   {index === selectedIndex && <div style={{ fontSize: '12px', color: '#aaa' }}>Enter ↵</div>}

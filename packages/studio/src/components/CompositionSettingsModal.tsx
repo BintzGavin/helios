@@ -3,7 +3,7 @@ import { useStudio } from '../context/StudioContext';
 import './CompositionSettingsModal.css';
 
 export const CompositionSettingsModal: React.FC = () => {
-  const { isSettingsOpen, setSettingsOpen, updateCompositionMetadata, activeComposition, setDuplicateOpen } = useStudio();
+  const { isSettingsOpen, setSettingsOpen, updateCompositionMetadata, updateThumbnail, activeComposition, setDuplicateOpen } = useStudio();
   const [name, setName] = useState('');
   const [width, setWidth] = useState(1920);
   const [height, setHeight] = useState(1080);
@@ -12,6 +12,7 @@ export const CompositionSettingsModal: React.FC = () => {
 
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [updatingThumbnail, setUpdatingThumbnail] = useState(false);
 
   useEffect(() => {
     if (isSettingsOpen && activeComposition) {
@@ -43,6 +44,18 @@ export const CompositionSettingsModal: React.FC = () => {
     }
   };
 
+  const handleUpdateThumbnail = async () => {
+    if (!activeComposition) return;
+    setUpdatingThumbnail(true);
+    try {
+      await updateThumbnail(activeComposition.id);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setUpdatingThumbnail(false);
+    }
+  };
+
   if (!isSettingsOpen || !activeComposition) return null;
 
   return (
@@ -51,6 +64,34 @@ export const CompositionSettingsModal: React.FC = () => {
         <div className="settings-modal-header">Composition Settings</div>
 
         <form onSubmit={handleSubmit}>
+          <div className="settings-modal-row">
+            <div className="settings-modal-input-group" style={{ flex: 1 }}>
+              <label>Thumbnail</label>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginTop: '8px', marginBottom: '16px' }}>
+                {activeComposition.thumbnailUrl ? (
+                  <img
+                    src={activeComposition.thumbnailUrl}
+                    alt="Thumbnail"
+                    style={{ width: '120px', height: '67.5px', objectFit: 'cover', borderRadius: '4px', border: '1px solid #333' }}
+                  />
+                ) : (
+                  <div style={{ width: '120px', height: '67.5px', background: '#333', borderRadius: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#666', fontSize: '12px' }}>
+                    No Thumbnail
+                  </div>
+                )}
+                <button
+                  type="button"
+                  className="settings-modal-button"
+                  onClick={handleUpdateThumbnail}
+                  disabled={loading || updatingThumbnail}
+                  style={{ background: '#444', width: 'auto', padding: '0 12px' }}
+                >
+                  {updatingThumbnail ? 'Updating...' : 'Set from Current Frame'}
+                </button>
+              </div>
+            </div>
+          </div>
+
           <div className="settings-modal-row">
             <div className="settings-modal-input-group" style={{ flex: 1 }}>
               <label>Name</label>

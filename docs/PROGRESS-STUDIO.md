@@ -1,3 +1,6 @@
+## STUDIO v0.73.0
+- ✅ Completed: Composition Thumbnails - Implemented ability to set and view thumbnails for compositions in the Switcher and Settings.
+
 ## STUDIO v0.72.1
 - ✅ Verified: Robustness - Added output file verification to Render Manager to ensure failed renders (empty/missing files) are correctly reported as failures.
 - ✅ Verified: Maintenance - Synced package versions and updated tests.
