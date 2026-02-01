@@ -1,3 +1,6 @@
+## RENDERER v1.55.0
+- ✅ Completed: Enhance Dom Preloading - Updated `DomStrategy` to detect and preload `<video>` posters, SVG `<image>` elements, and CSS masks (`mask-image`), ensuring zero-artifact rendering for these asset types.
+
 ## RENDERER v1.54.0
 - ✅ Completed: Implement Canvas Selector - Added `canvasSelector` to `RendererOptions` and updated `CanvasStrategy` to target specific canvas elements (e.g., `#my-canvas`), enabling support for multi-canvas compositions and layered architectures.
 
