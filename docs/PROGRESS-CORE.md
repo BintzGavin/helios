@@ -1,5 +1,8 @@
 # CORE Progress Log
 
+## CORE v3.5.1
+- ✅ Completed: Implement Reactive Virtual Time - Replaced polling with reactive setter for `__HELIOS_VIRTUAL_TIME__` in `bindToDocumentTimeline` to ensure reliable headless rendering sync.
+
 ## CORE v3.5.0
 - ✅ Completed: Implement Timeline Sync - Added `Helios.bindTo(master)` and `Helios.unbind()` for synchronizing multiple Helios instances.
 

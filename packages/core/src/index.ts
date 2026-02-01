@@ -127,6 +127,7 @@ export class Helios {
 
   private _disposeActiveCaptionsEffect: () => void;
   private _syncDispose: (() => void) | null = null;
+  private _originalVirtualTimeDescriptor: PropertyDescriptor | undefined;
 
   // Public Readonly Signals
 
@@ -913,57 +914,117 @@ export class Helios {
    * Helios will poll document.timeline.currentTime and update its internal state.
    */
   public bindToDocumentTimeline() {
+    if (this.syncWithDocumentTimeline) return;
+
     if (typeof document === 'undefined' || !document.timeline) {
-        console.warn('document.timeline is not available.');
-        return;
+      console.warn('document.timeline is not available.');
+      return;
     }
 
     this.syncWithDocumentTimeline = true;
 
-    // Start a loop to poll the timeline
-    const poll = () => {
-        if (!this.syncWithDocumentTimeline) return;
+    // Reactive Virtual Time Binding
+    if (typeof window !== 'undefined') {
+      let virtualTimeValue: number | null = null;
 
-        let currentTime: number | null = null;
+      // Check if property already exists to preserve it
+      this._originalVirtualTimeDescriptor = Object.getOwnPropertyDescriptor(window, '__HELIOS_VIRTUAL_TIME__');
 
-        // Check for virtual time first (Renderer environment)
-        if (typeof window !== 'undefined' && typeof (window as any).__HELIOS_VIRTUAL_TIME__ === 'number') {
-            const virtualTime = (window as any).__HELIOS_VIRTUAL_TIME__;
-            if (Number.isFinite(virtualTime)) {
-                currentTime = virtualTime;
-            }
-        }
+      // If it has a value, capture it
+      if (typeof (window as any).__HELIOS_VIRTUAL_TIME__ === 'number') {
+        virtualTimeValue = (window as any).__HELIOS_VIRTUAL_TIME__;
+      }
 
-        // Fallback to document timeline
-        if (currentTime === null) {
-            const tlTime = document.timeline.currentTime;
-            if (tlTime !== null && typeof tlTime === 'number') {
-                currentTime = tlTime;
-            }
-        }
+      try {
+        Object.defineProperty(window, '__HELIOS_VIRTUAL_TIME__', {
+          configurable: true,
+          enumerable: true,
+          get: () => virtualTimeValue,
+          set: (value: number) => {
+            virtualTimeValue = value;
+            if (!this.syncWithDocumentTimeline) return;
 
-        if (currentTime !== null) {
-            const frame = (currentTime / 1000) * this._fps.value;
-            if (frame !== this._currentFrame.peek()) {
-                 this._currentFrame.value = frame;
-            }
+            if (Number.isFinite(value)) {
+              const frame = (value / 1000) * this._fps.value;
+              if (frame !== this._currentFrame.peek()) {
+                this._currentFrame.value = frame;
+              }
 
-            this.driver.update(currentTime, {
+              this.driver.update(value, {
                 isPlaying: false,
                 playbackRate: this._playbackRate.peek(),
                 volume: this._volume.peek(),
                 muted: this._muted.peek(),
                 audioTracks: this._audioTracks.peek()
-            });
+              });
+            }
+          }
+        });
+
+        // Trigger initial update if value exists
+        if (virtualTimeValue !== null) {
+          (window as any).__HELIOS_VIRTUAL_TIME__ = virtualTimeValue;
         }
-        requestAnimationFrame(poll);
+      } catch (e) {
+        console.warn('Failed to bind reactive virtual time:', e);
+      }
+    }
+
+    // Start a loop to poll the timeline (fallback)
+    const poll = () => {
+      if (!this.syncWithDocumentTimeline) return;
+
+      let currentTime: number | null = null;
+
+      // Check if virtual time is active. If so, we skip polling document.timeline
+      // because the setter handles it.
+      if (typeof window !== 'undefined' && typeof (window as any).__HELIOS_VIRTUAL_TIME__ === 'number') {
+        const virtualTime = (window as any).__HELIOS_VIRTUAL_TIME__;
+        if (Number.isFinite(virtualTime)) {
+          // Virtual time is active, setter handles logic.
+          requestAnimationFrame(poll);
+          return;
+        }
+      }
+
+      // Fallback to document timeline
+      const tlTime = document.timeline.currentTime;
+      if (tlTime !== null && typeof tlTime === 'number') {
+        currentTime = tlTime;
+      }
+
+      if (currentTime !== null) {
+        const frame = (currentTime / 1000) * this._fps.value;
+        if (frame !== this._currentFrame.peek()) {
+          this._currentFrame.value = frame;
+        }
+
+        this.driver.update(currentTime, {
+          isPlaying: false,
+          playbackRate: this._playbackRate.peek(),
+          volume: this._volume.peek(),
+          muted: this._muted.peek(),
+          audioTracks: this._audioTracks.peek()
+        });
+      }
+      requestAnimationFrame(poll);
     };
 
     requestAnimationFrame(poll);
   }
 
   public unbindFromDocumentTimeline() {
-      this.syncWithDocumentTimeline = false;
+    this.syncWithDocumentTimeline = false;
+
+    if (typeof window !== 'undefined') {
+      if (this._originalVirtualTimeDescriptor) {
+        Object.defineProperty(window, '__HELIOS_VIRTUAL_TIME__', this._originalVirtualTimeDescriptor);
+        this._originalVirtualTimeDescriptor = undefined;
+      } else {
+        // If we defined it, remove it
+        delete (window as any).__HELIOS_VIRTUAL_TIME__;
+      }
+    }
   }
 
   public dispose() {
