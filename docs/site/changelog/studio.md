@@ -5,6 +5,24 @@ description: "Changelog for the Studio package"
 
 # Studio Changelog
 
+## v0.71.0
+- **Implement Asset Renaming**: Added ability to rename assets from the Assets Panel, updating both UI and filesystem.
+
+## v0.70.0
+- **Persistent Render Jobs**: Finalized verification and closed out the plan for persistent render jobs, ensuring job history survives restarts.
+
+## v0.69.0
+- **Rename Composition**: Implemented ability to rename compositions from the Settings modal, including backend directory moving and ID updates.
+
+## v0.68.0
+- **Duplicate Composition**: Implemented "Duplicate Composition" feature with UI modal, API endpoint, and file copy logic.
+
+## v0.67.0
+- **Schema Constraints UI**: Implemented UI support for schema constraints (`minLength`, `maxLength`, `pattern`, `minItems`, `maxItems`, `accept`) in the Props Editor, enabling validation feedback and asset filtering.
+
+## v0.66.0
+- **TypedArray Support**: Implemented support for TypedArray props (e.g., `float32array`, `int8array`) in the Props Editor using JSON serialization and added missing tests.
+
 ## v0.65.0
 - **Persistent Render Jobs**: Implemented persistence of render jobs to `jobs.json` in the `renders` directory, ensuring history survives server restarts.
 

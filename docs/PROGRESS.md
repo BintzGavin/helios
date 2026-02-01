@@ -132,3 +132,11 @@ Each agent should update **their own dedicated progress file** instead of this f
   - Updated API skills for `player` (export-caption-mode, Text Tracks)
   - Updated API skills for `studio` (MCP, Persistent Jobs)
   - Updated workflow skills for `render-video`
+
+## DOCS v1.6.0
+- ✅ Completed: Daily Documentation Review
+  - Updated API documentation for Core (Audio Tracks), Player (PiP), Renderer (Canvas Selector)
+  - Synced changelog entries for all packages
+  - Created documentation for 3 new examples and Audio Tracks guide
+  - Updated Studio guide with new features
+  - Updated navigation structure in `mint.json`

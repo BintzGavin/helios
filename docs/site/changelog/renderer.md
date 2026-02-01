@@ -5,6 +5,24 @@ description: "Changelog for the Renderer package"
 
 # Renderer Changelog
 
+## v1.54.0
+- **Implement Canvas Selector**: Added `canvasSelector` to `RendererOptions` and updated `CanvasStrategy` to target specific canvas elements (e.g., `#my-canvas`), enabling support for multi-canvas compositions and layered architectures.
+
+## v1.53.0
+- **Enhance Diagnostics**: Updated `CanvasStrategy.diagnose()` to perform comprehensive checks of supported WebCodecs (H.264, VP8, VP9, AV1) in the browser environment, returning a detailed `codecs` report for better debuggability.
+
+## v1.52.1
+- **Fix GSAP Timeline Synchronization**: Updated `SeekTimeDriver` to wait for `window.__helios_gsap_timeline__` initialization and explicitly seek the GSAP timeline in `setTime`, resolving the black screen issue in the promo video example.
+
+## v1.52.0
+- **Enable Audio Looping**: Updated `DomScanner` and `FFmpegBuilder` to support the `loop` attribute on `<audio>` and `<video>` elements by injecting `-stream_loop -1` into FFmpeg input args.
+
+## v1.51.0
+- **Enable Recursive Shadow DOM Image Preloading**: Updated `DomStrategy` to recursively discover and preload `<img>` tags within Shadow DOMs using `TreeWalker`, ensuring images in Web Components are fully loaded before rendering.
+
+## v1.50.0
+- **Enable Blob Audio**: Implemented `blob-extractor` to bridge browser `blob:` URLs to FFmpeg by extracting content to temporary files, enabling support for dynamic client-side audio (e.g., text-to-speech).
+
 ## v1.49.0
 - **Precision Frame Control**: Added `frameCount` to `RendererOptions`, enabling exact frame-count rendering for distributed rendering workflows, overriding floating-point duration calculations.
 

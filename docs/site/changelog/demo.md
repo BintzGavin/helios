@@ -5,6 +5,28 @@ description: "Changelog for the Demo package and examples"
 
 # Demo Changelog
 
+## v1.79.0
+- **Vue Captions Animation**: Created `examples/vue-captions-animation` demonstrating how to use Helios captions with Vue 3 composition API.
+
+## v1.78.1
+- **Enhance Render Verification**: Updated `tests/e2e/verify-render.ts` to verify output video content (duration and non-black frames) using FFmpeg, ensuring silent rendering failures are caught.
+
+## v1.78.0
+- **Verify Promo Video**: Confirmed Promo Video example renders correctly, unblocking the demo.
+
+## v1.77.0
+- **Update Animation Helpers**: Added `interpolate` and `spring` examples to Vue, Svelte, and Solid examples.
+
+## v1.76.0
+- **Diagnostics Example**: Created `examples/diagnostics` to demonstrate `Helios.diagnose()` and provide a runnable environment check.
+
+## v1.75.0
+- **Vanilla TypeScript Example**: Created `examples/vanilla-typescript` to demonstrate idiomatic TypeScript usage without frameworks.
+
+## v1.74.0
+- **Dynamic Verification Pipeline**: Refactored `verify-client-export.ts` to dynamically discover and test all examples using a generic `dynamic-player.html` fixture.
+- **Create Examples Documentation**: Added `examples/README.md` to catalog and describe all available examples.
+
 ## v1.71.0
 - **Scaffold React Captions Animation**: Created `examples/react-captions-animation` demonstrating `useCaptions` hook for integrating Helios SRT parsing with React.
 
