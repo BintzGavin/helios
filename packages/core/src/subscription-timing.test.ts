@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, afterEach, beforeAll, afterAll } from 'vitest';
-import { Helios } from './Helios';
+import { Helios } from './Helios.js';
 
 describe('Helios Subscription Timing', () => {
   let originalWindow: any;

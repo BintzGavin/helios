@@ -699,6 +699,7 @@ describe('Helios Core', () => {
         volume: 1,
         muted: false,
         audioTracks: {},
+        availableAudioTracks: [],
         captions: [],
         activeCaptions: [],
         loop: false,

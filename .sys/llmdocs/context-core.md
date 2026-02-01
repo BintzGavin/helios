@@ -32,7 +32,6 @@ packages/core/src/
 │   ├── Ticker.ts
 │   ├── TimeDriver.ts
 │   ├── TimeoutTicker.ts
-│   ├── WaapiDriver.ts
 │   └── index.ts
 ├── easing.ts
 ├── errors.ts
@@ -54,7 +53,7 @@ packages/core/src/
 ```typescript
 // From Helios.ts
 
-export type HeliosState = {
+export type HeliosState<TInputProps = Record<string, any>> = {
   width: number;
   height: number;
   duration: number;
@@ -62,7 +61,7 @@ export type HeliosState = {
   currentFrame: number;
   loop: boolean;
   isPlaying: boolean;
-  inputProps: Record<string, any>;
+  inputProps: TInputProps;
   playbackRate: number;
   volume: number;
   muted: boolean;
@@ -80,11 +79,11 @@ export type AudioTrackState = {
   muted: boolean;
 };
 
-export type HeliosSubscriber = (state: HeliosState) => void;
+export type HeliosSubscriber<TInputProps = Record<string, any>> = (state: HeliosState<TInputProps>) => void;
 
 export type StabilityCheck = () => Promise<void>;
 
-export interface HeliosOptions {
+export interface HeliosOptions<TInputProps = Record<string, any>> {
   width?: number;
   height?: number;
   initialFrame?: number;
@@ -94,7 +93,7 @@ export interface HeliosOptions {
   playbackRange?: [number, number];
   autoSyncAnimations?: boolean;
   animationScope?: HTMLElement;
-  inputProps?: Record<string, any>;
+  inputProps?: TInputProps;
   schema?: HeliosSchema;
   playbackRate?: number;
   volume?: number;
@@ -141,13 +140,13 @@ export interface DiagnosticReport {
 
 ```typescript
 // Helios Class
-class Helios {
+class Helios<TInputProps = Record<string, any>> {
   // Readonly Signals
   get currentFrame(): ReadonlySignal<number>;
   get currentTime(): ReadonlySignal<number>;
   get loop(): ReadonlySignal<boolean>;
   get isPlaying(): ReadonlySignal<boolean>;
-  get inputProps(): ReadonlySignal<Record<string, any>>;
+  get inputProps(): ReadonlySignal<TInputProps>;
   get playbackRate(): ReadonlySignal<number>;
   get volume(): ReadonlySignal<number>;
   get muted(): ReadonlySignal<boolean>;
@@ -166,18 +165,18 @@ class Helios {
   static diagnose(): Promise<DiagnosticReport>;
 
   // Lifecycle
-  constructor(options: HeliosOptions);
+  constructor(options: HeliosOptions<TInputProps>);
   dispose(): void;
 
   // State Access
-  getState(): Readonly<HeliosState>;
+  getState(): Readonly<HeliosState<TInputProps>>;
 
   // Configuration
   setSize(width: number, height: number): void;
   setLoop(shouldLoop: boolean): void;
   setDuration(seconds: number): void;
   setFps(fps: number): void;
-  setInputProps(props: Record<string, any>): void;
+  setInputProps(props: TInputProps): void;
   setPlaybackRate(rate: number): void;
   setAudioVolume(volume: number): void;
   setAudioMuted(muted: boolean): void;
@@ -191,8 +190,8 @@ class Helios {
   clearPlaybackRange(): void;
 
   // Subscription
-  subscribe(callback: HeliosSubscriber): () => void;
-  unsubscribe(callback: HeliosSubscriber): void;
+  subscribe(callback: HeliosSubscriber<TInputProps>): () => void;
+  unsubscribe(callback: HeliosSubscriber<TInputProps>): void;
   registerStabilityCheck(check: StabilityCheck): () => void;
 
   // Playback Control
@@ -204,7 +203,7 @@ class Helios {
   waitUntilStable(): Promise<void>;
 
   // Synchronization
-  bindTo(master: Helios): void;
+  bindTo(master: Helios<any>): void;
   unbind(): void;
   bindToDocumentTimeline(): void;
   unbindFromDocumentTimeline(): void;
