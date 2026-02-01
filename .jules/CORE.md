@@ -13,3 +13,7 @@
 ## [3.6.0] - DomDriver State Persistence
 **Learning:** `DomDriver` uses a `trackStates` WeakMap to distinguish between programmatic volume updates and external user interactions (e.g. browser controls). This pattern prevents feedback loops when applying continuous transformations (like fades) on top of the DOM state.
 **Action:** When modifying driver synchronization logic, always check if the property being written to is also the source of truth for the next frame, and use the `trackStates` pattern to cache the "base" value if necessary.
+
+## [4.0.0] - External Library Parity
+**Learning:** While "Native Always Wins" (WAAPI/CSS) ensures parity between Preview and Render (CDP), external libraries relying on `requestAnimationFrame` (like GSAP) may desync in Preview when seeking, because `raf` is not virtualized in the browser tab.
+**Action:** When planning "Preview" features, identifying "Userland" gaps (like GSAP sync) is valid, but solutions must remain framework-agnostic (e.g. via `subscribe` hooks) rather than baked into `DomDriver`.
