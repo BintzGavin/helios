@@ -32,6 +32,7 @@ packages/studio/
 │   ├── components/      # UI Components
 │   │   ├── AssetsPanel/
 │   │   ├── AssistantModal/ # AI & Documentation Assistant
+│   │   ├── AudioMixerPanel/
 │   │   ├── CaptionsPanel/
 │   │   ├── CompositionsPanel/
 │   │   ├── Controls/
@@ -54,7 +55,8 @@ packages/studio/
 │   │   ├── documentation.ts  # Documentation Search & Resolution
 │   │   ├── mcp.ts            # Model Context Protocol Server
 │   │   ├── plugin.ts         # Vite Plugin Entry
-│   │   └── render-manager.ts # Render Job Management
+│   │   ├── render-manager.ts # Render Job Management
+│   │   └── server.ts         # Server Utilities
 │   ├── utils/           # Shared Utilities
 │   ├── App.tsx          # Main Layout
 │   └── main.tsx         # Entry Point
@@ -108,6 +110,7 @@ npx @helios-project/studio
     -   Supports collapsible groups via `group` property.
 -   **Compositions Panel**: Persistent sidebar panel for managing compositions (Browse, Create, Duplicate, Delete).
 -   **Assets Panel**: Discovers and allows drag-and-drop of assets from the project. Supports uploading, deleting, and renaming assets.
+-   **Audio Mixer**: Panel for controlling volume and mute state of individual audio tracks detected in the composition.
 -   **Renders Panel**: Manages render jobs (Start, Cancel, Download).
 -   **Captions Panel**: Edits SRT captions and syncs with Core.
 -   **Helios Assistant**: A modal providing:
