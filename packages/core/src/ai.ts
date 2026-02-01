@@ -1,4 +1,4 @@
-import type { Helios } from './index.js';
+import type { Helios } from './Helios.js';
 
 export const HELIOS_BASE_PROMPT = `You are an expert Helios video engineer.
 Helios is a programmatic video engine that drives the browser's native animation engine.

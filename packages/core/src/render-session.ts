@@ -1,4 +1,4 @@
-import type { Helios } from './index.js';
+import type { Helios } from './Helios.js';
 
 export interface RenderSessionOptions {
   startFrame: number;
