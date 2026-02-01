@@ -1,7 +1,7 @@
 export async function captureDomToBitmap(element) {
     const doc = element.ownerDocument || document;
     // 1. Clone & Inline Assets
-    let clone = element.cloneNode(true);
+    let clone = cloneWithShadow(element);
     await inlineImages(clone);
     clone = inlineCanvases(element, clone);
     clone = inlineVideos(element, clone);
@@ -111,34 +111,42 @@ async function processCss(css, baseUrl) {
 }
 async function inlineImages(root) {
     const promises = [];
-    // A. Handle <img> tags
-    const images = root.querySelectorAll('img');
-    images.forEach((img) => {
-        if (img.src && !img.src.startsWith('data:')) {
-            promises.push(fetchAsDataUri(img.src)
-                .then((dataUri) => {
-                img.src = dataUri;
-            })
-                .catch((e) => console.warn('Helios: Failed to inline image:', img.src, e)));
-        }
-    });
-    // B. Handle background-images (inline styles only)
-    const elementsWithStyle = root.querySelectorAll('[style*="background-image"]');
-    elementsWithStyle.forEach((el) => {
-        const element = el;
-        const bg = element.style.backgroundImage;
-        if (bg && bg.includes('url(')) {
-            const match = bg.match(/url\(['"]?(.*?)['"]?\)/);
-            if (match && match[1] && !match[1].startsWith('data:')) {
-                promises.push(fetchAsDataUri(match[1])
+    const processNode = (node) => {
+        // A. Handle <img> tags
+        const images = node.querySelectorAll('img');
+        images.forEach((img) => {
+            if (img.src && !img.src.startsWith('data:')) {
+                promises.push(fetchAsDataUri(img.src)
                     .then((dataUri) => {
-                    // Replace the specific URL instance to preserve other layers (gradients, etc.)
-                    element.style.backgroundImage = element.style.backgroundImage.replace(match[0], `url("${dataUri}")`);
+                    img.src = dataUri;
                 })
-                    .catch((e) => console.warn('Helios: Failed to inline background:', match[1], e)));
+                    .catch((e) => console.warn('Helios: Failed to inline image:', img.src, e)));
             }
-        }
-    });
+        });
+        // B. Handle background-images (inline styles only)
+        const elementsWithStyle = node.querySelectorAll('[style*="background-image"]');
+        elementsWithStyle.forEach((el) => {
+            const element = el;
+            const bg = element.style.backgroundImage;
+            if (bg && bg.includes('url(')) {
+                const match = bg.match(/url\(['"]?(.*?)['"]?\)/);
+                if (match && match[1] && !match[1].startsWith('data:')) {
+                    promises.push(fetchAsDataUri(match[1])
+                        .then((dataUri) => {
+                        // Replace the specific URL instance to preserve other layers (gradients, etc.)
+                        element.style.backgroundImage = element.style.backgroundImage.replace(match[0], `url("${dataUri}")`);
+                    })
+                        .catch((e) => console.warn('Helios: Failed to inline background:', match[1], e)));
+                }
+            }
+        });
+        // C. Recurse into templates (Shadow DOM)
+        const templates = node.querySelectorAll('template');
+        templates.forEach((t) => {
+            processNode(t.content);
+        });
+    };
+    processNode(root);
     await Promise.all(promises);
 }
 async function fetchAsDataUri(url) {
@@ -154,7 +162,10 @@ async function fetchAsDataUri(url) {
     });
 }
 function inlineCanvases(original, clone) {
-    // Handle root element being a canvas
+    return inlineCanvasesRecursive(original, clone);
+}
+function inlineCanvasesRecursive(original, clone) {
+    // 1. Check matching nodes
     if (original instanceof HTMLCanvasElement && clone instanceof HTMLCanvasElement) {
         try {
             const dataUri = original.toDataURL();
@@ -168,59 +179,64 @@ function inlineCanvases(original, clone) {
                 img.setAttribute('width', original.getAttribute('width'));
             if (original.hasAttribute('height'))
                 img.setAttribute('height', original.getAttribute('height'));
-            return img;
+            if (clone.parentNode) {
+                clone.parentNode.replaceChild(img, clone);
+            }
+            return img; // Stop processing this branch
         }
         catch (e) {
-            console.warn('Helios: Failed to inline root canvas:', e);
-            return clone;
+            console.warn('Helios: Failed to inline canvas:', e);
         }
     }
-    const originalCanvases = Array.from(original.querySelectorAll('canvas'));
-    const clonedCanvases = Array.from(clone.querySelectorAll('canvas'));
-    for (let i = 0; i < Math.min(originalCanvases.length, clonedCanvases.length); i++) {
-        const source = originalCanvases[i];
-        const target = clonedCanvases[i];
-        try {
-            const dataUri = source.toDataURL();
-            const img = document.createElement('img');
-            img.src = dataUri;
-            img.style.cssText = source.style.cssText;
-            img.className = source.className;
-            if (source.id)
-                img.id = source.id;
-            if (source.hasAttribute('width'))
-                img.setAttribute('width', source.getAttribute('width'));
-            if (source.hasAttribute('height'))
-                img.setAttribute('height', source.getAttribute('height'));
-            target.parentNode?.replaceChild(img, target);
+    // 2. Recurse Children
+    const originalChildren = Array.from(original.childNodes);
+    let cloneChildren = Array.from(clone.childNodes);
+    // Check for Shadow DOM / Template
+    if (original instanceof Element && original.shadowRoot) {
+        const template = cloneChildren.find((n) => n instanceof HTMLTemplateElement && n.hasAttribute('shadowrootmode'));
+        if (template) {
+            // Remove template from cloneChildren list to match originalChildren
+            cloneChildren = cloneChildren.filter((n) => n !== template);
+            // Recurse into shadow
+            inlineCanvasesRecursive(original.shadowRoot, template.content);
         }
-        catch (e) {
-            console.warn('Helios: Failed to inline nested canvas:', e);
-        }
+    }
+    for (let i = 0; i < Math.min(originalChildren.length, cloneChildren.length); i++) {
+        inlineCanvasesRecursive(originalChildren[i], cloneChildren[i]);
     }
     return clone;
 }
 function inlineVideos(original, clone) {
-    // Handle root element being a video
+    return inlineVideosRecursive(original, clone);
+}
+function inlineVideosRecursive(original, clone) {
+    // 1. Check matching nodes
     if (original instanceof HTMLVideoElement && clone instanceof HTMLVideoElement) {
         if (original.readyState >= 2) {
             const img = videoToImage(original);
-            if (img)
-                return img;
+            if (img) {
+                if (clone.parentNode) {
+                    clone.parentNode.replaceChild(img, clone);
+                }
+                return img; // Stop processing this branch
+            }
         }
-        return clone;
     }
-    const originals = Array.from(original.querySelectorAll('video'));
-    const clones = Array.from(clone.querySelectorAll('video'));
-    for (let i = 0; i < Math.min(originals.length, clones.length); i++) {
-        const video = originals[i];
-        const target = clones[i];
-        if (video.readyState < 2)
-            continue; // Skip if no data
-        const img = videoToImage(video);
-        if (img) {
-            target.parentNode?.replaceChild(img, target);
+    // 2. Recurse Children
+    const originalChildren = Array.from(original.childNodes);
+    let cloneChildren = Array.from(clone.childNodes);
+    // Check for Shadow DOM / Template
+    if (original instanceof Element && original.shadowRoot) {
+        const template = cloneChildren.find((n) => n instanceof HTMLTemplateElement && n.hasAttribute('shadowrootmode'));
+        if (template) {
+            // Remove template from cloneChildren list to match originalChildren
+            cloneChildren = cloneChildren.filter((n) => n !== template);
+            // Recurse into shadow
+            inlineVideosRecursive(original.shadowRoot, template.content);
         }
+    }
+    for (let i = 0; i < Math.min(originalChildren.length, cloneChildren.length); i++) {
+        inlineVideosRecursive(originalChildren[i], cloneChildren[i]);
     }
     return clone;
 }
@@ -250,4 +266,39 @@ function videoToImage(video) {
         console.warn('Helios: Failed to inline video:', e);
     }
     return null;
+}
+function cloneWithShadow(node) {
+    const clone = node.cloneNode(false);
+    // 1. Handle Shadow DOM
+    if (node instanceof Element && node.shadowRoot) {
+        const shadowRoot = node.shadowRoot;
+        const template = document.createElement('template');
+        template.setAttribute('shadowrootmode', shadowRoot.mode);
+        // Serialize adoptedStyleSheets
+        if (shadowRoot.adoptedStyleSheets && shadowRoot.adoptedStyleSheets.length > 0) {
+            shadowRoot.adoptedStyleSheets.forEach((sheet) => {
+                const style = document.createElement('style');
+                try {
+                    const rules = Array.from(sheet.cssRules)
+                        .map((r) => r.cssText)
+                        .join('\n');
+                    style.textContent = rules;
+                }
+                catch (e) {
+                    console.warn('Helios: Failed to read cssRules from adoptedStyleSheet', e);
+                }
+                template.content.appendChild(style);
+            });
+        }
+        // Clone shadow children into template content
+        shadowRoot.childNodes.forEach((child) => {
+            template.content.appendChild(cloneWithShadow(child));
+        });
+        clone.appendChild(template);
+    }
+    // 2. Handle Light DOM Children
+    node.childNodes.forEach((child) => {
+        clone.appendChild(cloneWithShadow(child));
+    });
+    return clone;
 }

@@ -328,4 +328,36 @@ describe('dom-capture', () => {
         // Should still contain video tag
         expect(text).toContain('<video');
     });
+
+    it('should capture open shadow DOM', async () => {
+        // Define a custom element to attach shadow DOM
+        class MyElement extends HTMLElement {
+            constructor() {
+                super();
+                this.attachShadow({ mode: 'open' });
+            }
+            connectedCallback() {
+                if (this.shadowRoot) {
+                    this.shadowRoot.innerHTML = '<div class="shadow-content">Inside Shadow</div><style>.shadow-content { color: red; }</style>';
+                }
+            }
+        }
+
+        if (!customElements.get('my-element')) {
+            customElements.define('my-element', MyElement);
+        }
+
+        const el = document.createElement('my-element');
+        container.appendChild(el);
+
+        await captureDomToBitmap(container);
+
+        const blob = (URL.createObjectURL as any).mock.calls[0][0] as Blob;
+        const text = await readBlob(blob);
+
+        // Should contain declarative shadow DOM
+        expect(text).toContain('<template shadowrootmode="open">');
+        expect(text).toContain('Inside Shadow');
+        expect(text).toContain('.shadow-content { color: red; }');
+    });
 });
