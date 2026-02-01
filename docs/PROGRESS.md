@@ -125,6 +125,13 @@ Each agent should update **their own dedicated progress file** instead of this f
 ## DEMO v1.71.0
 - ✅ Completed: Scaffold React Captions Animation - Created `examples/react-captions-animation` demonstrating `useCaptions` hook for integrating Helios SRT parsing with React.
 
+## SKILLS v1.8.0
+- ✅ Completed: Daily Skills Review
+  - Added SolidJS skill
+  - Added Svelte 5 Runes pattern
+  - Updated Core with RenderSession utility
+  - Updated Player with Picture-in-Picture and Export Caption Mode
+
 ## SKILLS v1.7.0
 - ✅ Completed: Daily Skills Review
   - Updated API skills for `core` (AI Context, Schema Groups)

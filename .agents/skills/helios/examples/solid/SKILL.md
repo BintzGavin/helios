@@ -1,105 +1,98 @@
 ---
 name: example-solid
-description: SolidJS integration patterns for Helios. Use when creating compositions with SolidJS, using signals to drive animations.
+description: Patterns for using Helios with SolidJS. Use when building compositions in a SolidJS environment, utilizing signals for fine-grained reactivity.
 ---
 
-# SolidJS + Helios
+# SolidJS Composition Patterns
 
-Integrate Helios with SolidJS by wrapping the Helios state in a reactive Signal. This allows you to drive your UI components purely from the timeline state.
+Integrate Helios into SolidJS components using Signals to manage frame state reactivity with high performance.
 
 ## Quick Start
 
-### 1. Create a Helper Hook
+### 1. Create Helios Signal
 
-Create `src/lib/createHeliosSignal.js` (or `.ts`):
+Wrap the Helios instance in a SolidJS signal to make state reactive.
 
-```typescript
-import { createSignal, onCleanup, onMount } from 'solid-js';
+```javascript
+// lib/createHeliosSignal.js
+import { createSignal, onCleanup } from 'solid-js';
 
 export function createHeliosSignal(helios) {
-  // Initialize signal with current state
-  const [state, setState] = createSignal(helios.getState());
+  const [frame, setFrame] = createSignal(helios.getState());
 
-  onMount(() => {
-    // Subscribe to Helios updates
-    const unsub = helios.subscribe(setState);
-
-    // Cleanup on unmount
-    onCleanup(() => {
-      unsub();
-    });
+  const unsubscribe = helios.subscribe((state) => {
+    setFrame(state);
   });
 
-  return state;
+  onCleanup(() => {
+    unsubscribe();
+  });
+
+  return frame;
 }
 ```
 
-### 2. Use in Component
+### 2. Create Composition Component
 
 ```jsx
+// App.jsx
 import { createEffect } from 'solid-js';
-import { createHeliosSignal } from './lib/createHeliosSignal';
 import { Helios } from '@helios-project/core';
+import { createHeliosSignal } from './lib/createHeliosSignal';
 
-// Initialize globally or in a context
-if (!window.helios) {
-  window.helios = new Helios({ fps: 30, duration: 10 });
-}
+// Initialize Helios (outside component or in a context)
+const helios = new Helios({
+  duration: 10,
+  fps: 30,
+  width: 1920,
+  height: 1080
+});
+
+// Bind for external control
+helios.bindToDocumentTimeline();
 
 function App() {
-  const frame = createHeliosSignal(window.helios);
-
-  return (
-    <div>
-      <h1>Frame: {frame().currentFrame}</h1>
-      <div
-        style={{
-          width: '100px',
-          height: '100px',
-          background: 'red',
-          transform: `translateX(${frame().currentFrame}px)`
-        }}
-      />
-    </div>
-  );
-}
-```
-
-## Key Patterns
-
-### Canvas Rendering with Effects
-
-Use `createEffect` to react to frame changes and draw to a canvas imperatively.
-
-```jsx
-function CanvasAnimation() {
   let canvasRef;
-  const frame = createHeliosSignal(window.helios);
+
+  // Create reactive accessor
+  const state = createHeliosSignal(helios);
 
   createEffect(() => {
     const canvas = canvasRef;
     if (!canvas) return;
-    const ctx = canvas.getContext('2d');
 
-    const { currentFrame, width, height } = frame();
+    const ctx = canvas.getContext('2d');
+    const { currentFrame, width, height } = state();
 
     // Clear
     ctx.clearRect(0, 0, width, height);
 
-    // Draw based on frame
-    ctx.fillStyle = 'blue';
-    ctx.fillRect(currentFrame, 50, 50, 50);
+    // Draw
+    ctx.fillStyle = '#446b9e';
+    const x = (currentFrame / (10 * 30)) * width;
+    ctx.fillRect(x, height / 2 - 50, 100, 100);
   });
 
-  return <canvas ref={canvasRef} width={1920} height={1080} />;
+  return (
+    <canvas
+      ref={canvasRef}
+      width={1920}
+      height={1080}
+      style={{ width: '100%', height: 'auto' }}
+    />
+  );
 }
+
+export default App;
 ```
 
-## Common Issues
+## Key Concepts
 
-- **Signal Granularity**: `createHeliosSignal` updates the entire state object on every frame. If performance is an issue with many components, consider creating derived signals (`createMemo`) for specific properties like `currentFrame` to avoid re-rendering unrelated parts of the tree (though SolidJS is generally fine with fine-grained updates).
-- **Context Initialization**: Ensure `window.helios` is initialized before the component mounts, or use a Context Provider pattern to pass the instance down.
+- **Fine-Grained Reactivity:** SolidJS signals update only what changes. However, since Helios updates on every frame (30-60 times/sec), wrapping the entire state in a signal is the standard approach for canvas rendering.
+- **`createEffect`:** Use `createEffect` to trigger imperative canvas drawing logic whenever the Helios signal updates.
+- **Cleanup:** Always use `onCleanup` to remove the Helios subscription when the component unmounts.
 
 ## Source Files
 
+- Helper: `examples/solid-animation-helpers/src/lib/createHeliosSignal.js`
 - Example: `examples/solid-canvas-animation/`

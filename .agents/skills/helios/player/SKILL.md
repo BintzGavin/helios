@@ -72,6 +72,7 @@ const player = document.querySelector('helios-player');
 player.play();
 player.pause();
 player.load();
+player.requestPictureInPicture(); // Enter PiP mode
 player.currentTime = 5.0; // Seek to 5 seconds
 player.currentFrame = 150; // Seek to frame 150
 
@@ -143,7 +144,7 @@ The player supports exporting videos directly in the browser (using `VideoEncode
 
 1. **Formats:** Supports `mp4` (H.264/AAC) and `webm` (VP9/Opus).
 2. **Audio:** Captures audio from `<audio>` elements (must be CORS-enabled).
-3. **Captions:** Supports "burning in" captions if they are active.
+3. **Captions:** Supports "burning in" captions (`export-caption-mode="burn-in"`) or saving as sidecar file (`export-caption-mode="file"`).
 4. **Usage:** User clicks "Export" in controls, or call `clientSideExporter` manually (internal API).
 
 ## UI Features
