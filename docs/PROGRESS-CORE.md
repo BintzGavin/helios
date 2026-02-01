@@ -1,5 +1,8 @@
 # CORE Progress Log
 
+## CORE v4.1.0
+- ✅ Completed: Implement Marker Metadata - Updated `Marker` interface to include optional `metadata` and make `label` optional.
+
 ## CORE v4.0.0
 - ✅ Completed: Remove WaapiDriver - Removed deprecated `WaapiDriver` and bumped version to 4.0.0 (Breaking Change). Also fixed TypeScript build errors in tests ensuring compatibility with `Helios<T>` generics.
 

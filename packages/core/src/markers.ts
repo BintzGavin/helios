@@ -3,8 +3,9 @@ import { HeliosError, HeliosErrorCode } from './errors.js';
 export interface Marker {
   id: string;
   time: number; // in seconds
-  label: string;
+  label?: string;
   color?: string; // hex code
+  metadata?: Record<string, any>;
 }
 
 export function validateMarker(marker: Marker): Marker {

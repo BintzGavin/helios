@@ -147,6 +147,7 @@ interface Marker {
   time: number; // Time in seconds
   label?: string;
   color?: string;
+  metadata?: Record<string, any>;
 }
 
 helios.setMarkers(markers: Marker[])

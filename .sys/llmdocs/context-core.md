@@ -104,6 +104,14 @@ export interface HeliosOptions<TInputProps = Record<string, any>> {
   ticker?: Ticker;
 }
 
+export interface Marker {
+  id: string;
+  time: number; // in seconds
+  label?: string;
+  color?: string; // hex code
+  metadata?: Record<string, any>;
+}
+
 export interface DiagnosticReport {
   waapi: boolean;
   webCodecs: boolean;

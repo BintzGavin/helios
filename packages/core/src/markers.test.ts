@@ -9,6 +9,20 @@ describe('markers', () => {
       expect(validateMarker(marker)).toEqual(marker);
     });
 
+    it('should pass for a marker without label', () => {
+      const marker: Marker = { id: 'm1', time: 10 };
+      expect(validateMarker(marker)).toEqual(marker);
+    });
+
+    it('should pass for a marker with metadata', () => {
+      const marker: Marker = {
+        id: 'm1',
+        time: 10,
+        metadata: { type: 'scene', tags: ['intro', 'dark'] }
+      };
+      expect(validateMarker(marker)).toEqual(marker);
+    });
+
     it('should throw if id is empty', () => {
       const marker: Marker = { id: '', time: 10, label: 'Intro' };
       expect(() => validateMarker(marker)).toThrow(/Marker ID cannot be empty/);
