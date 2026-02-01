@@ -43,6 +43,7 @@ packages/core/src/
 ├── schema.ts
 ├── sequencing.ts
 ├── signals.ts
+├── subscription-timing.test.ts
 ├── time-control.ts
 ├── timecode.ts
 └── transitions.ts
