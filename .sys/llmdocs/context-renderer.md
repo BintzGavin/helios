@@ -62,6 +62,8 @@ The `RendererOptions` interface controls the render pipeline:
 - `audioCodec`: `'aac'` (default), `'libvorbis'`, etc.
 - `audioFilePath`: Path to external audio file to mix in.
 - `audioTracks`: List of audio tracks (files or `AudioTrackConfig` objects with `path`, `loop`, `volume`, `offset`).
+- `intermediateImageFormat`: `'png'` (default) or `'jpeg'` for DOM mode capture.
+- `intermediateImageQuality`: JPEG quality (0-100) if format is jpeg.
 - `stabilityTimeout`: Timeout for frame stability (default 30000ms).
 - `inputProps`: Object injected into the page as `window.__HELIOS_PROPS__`.
 
