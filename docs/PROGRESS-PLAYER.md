@@ -1,3 +1,6 @@
+## PLAYER v0.53.0
+- ✅ Completed: Smart Controls - Implemented 'disablepictureinpicture' attribute and auto-hiding CC button/auto-enabling default tracks.
+
 ## PLAYER v0.52.0
 - ✅ Completed: WebVTT Support - Implemented `caption-parser` to support standard WebVTT captions alongside SRT, enabling broader compatibility with caption file formats.
 

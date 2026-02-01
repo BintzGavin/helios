@@ -1,7 +1,7 @@
 import { DirectController, BridgeController } from "./controllers";
 import { ClientSideExporter } from "./features/exporter";
 import { HeliosTextTrack, HeliosTextTrackList, CueClass } from "./features/text-tracks";
-import { parseSRT } from "./features/srt-parser";
+import { parseCaptions } from "./features/caption-parser";
 export { ClientSideExporter };
 class StaticTimeRange {
     startVal;
@@ -739,6 +739,17 @@ export class HeliosPlayer extends HTMLElement {
     set sandbox(val) {
         this.setAttribute("sandbox", val);
     }
+    get disablePictureInPicture() {
+        return this.hasAttribute("disablepictureinpicture");
+    }
+    set disablePictureInPicture(val) {
+        if (val) {
+            this.setAttribute("disablepictureinpicture", "");
+        }
+        else {
+            this.removeAttribute("disablepictureinpicture");
+        }
+    }
     async requestPictureInPicture() {
         if (!document.pictureInPictureEnabled) {
             throw new Error("Picture-in-Picture not supported");
@@ -810,7 +821,7 @@ export class HeliosPlayer extends HTMLElement {
         }
     }
     static get observedAttributes() {
-        return ["src", "width", "height", "autoplay", "loop", "controls", "export-format", "input-props", "poster", "muted", "interactive", "preload", "controlslist", "sandbox", "export-caption-mode"];
+        return ["src", "width", "height", "autoplay", "loop", "controls", "export-format", "input-props", "poster", "muted", "interactive", "preload", "controlslist", "sandbox", "export-caption-mode", "disablepictureinpicture"];
     }
     constructor() {
         super();
@@ -948,7 +959,7 @@ export class HeliosPlayer extends HTMLElement {
                 this.controller.setAudioMuted(this.hasAttribute("muted"));
             }
         }
-        if (name === "controlslist") {
+        if (name === "controlslist" || name === "disablepictureinpicture") {
             this.updateControlsVisibility();
         }
         if (name === "sandbox") {
@@ -981,6 +992,12 @@ export class HeliosPlayer extends HTMLElement {
         }
         else {
             this.fullscreenBtn.style.removeProperty("display");
+        }
+        if (this.hasAttribute("disablepictureinpicture")) {
+            this.pipBtn.style.display = "none";
+        }
+        else {
+            this.pipBtn.style.removeProperty("display");
         }
     }
     get inputProps() {
@@ -1264,6 +1281,10 @@ export class HeliosPlayer extends HTMLElement {
                 const isDefault = t.hasAttribute("default");
                 const textTrack = this.addTextTrack(kind, label, lang);
                 this._domTracks.set(t, textTrack);
+                if (isDefault) {
+                    this.showCaptions = true;
+                    this.ccBtn.classList.add("active");
+                }
                 if (src) {
                     fetch(src)
                         .then((res) => {
@@ -1271,8 +1292,8 @@ export class HeliosPlayer extends HTMLElement {
                             throw new Error(`Status ${res.status}`);
                         return res.text();
                     })
-                        .then((srt) => {
-                        const cues = parseSRT(srt);
+                        .then((content) => {
+                        const cues = parseCaptions(content);
                         cues.forEach(c => {
                             textTrack.addCue(new CueClass(c.startTime, c.endTime, c.text));
                         });
@@ -1296,6 +1317,13 @@ export class HeliosPlayer extends HTMLElement {
                 this._textTracks.removeTrack(track);
                 this._domTracks.delete(el);
             }
+        }
+        // Smart Controls: Hide CC button if no tracks are present
+        if (this._textTracks.length > 0) {
+            this.ccBtn.style.removeProperty("display");
+        }
+        else {
+            this.ccBtn.style.display = "none";
         }
     };
     setController(controller) {
