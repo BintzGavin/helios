@@ -5,7 +5,7 @@ import { HeliosSchema, validateProps, validateSchema } from './schema.js';
 import { CaptionCue, parseSrt, findActiveCues, areCuesEqual } from './captions.js';
 import { Marker, validateMarker, validateMarkers } from './markers.js';
 
-export type HeliosState = {
+export type HeliosState<TInputProps = Record<string, any>> = {
   width: number;
   height: number;
   duration: number;
@@ -13,7 +13,7 @@ export type HeliosState = {
   currentFrame: number;
   loop: boolean;
   isPlaying: boolean;
-  inputProps: Record<string, any>;
+  inputProps: TInputProps;
   playbackRate: number;
   volume: number;
   muted: boolean;
@@ -31,11 +31,11 @@ export type AudioTrackState = {
   muted: boolean;
 };
 
-export type HeliosSubscriber = (state: HeliosState) => void;
+export type HeliosSubscriber<TInputProps = Record<string, any>> = (state: HeliosState<TInputProps>) => void;
 
 export type StabilityCheck = () => Promise<void>;
 
-export interface HeliosOptions {
+export interface HeliosOptions<TInputProps = Record<string, any>> {
   width?: number;
   height?: number;
   initialFrame?: number;
@@ -45,7 +45,7 @@ export interface HeliosOptions {
   playbackRange?: [number, number];
   autoSyncAnimations?: boolean;
   animationScope?: HTMLElement;
-  inputProps?: Record<string, any>;
+  inputProps?: TInputProps;
   schema?: HeliosSchema;
   playbackRate?: number;
   volume?: number;
@@ -87,7 +87,7 @@ export interface DiagnosticReport {
   userAgent: string;
 }
 
-export class Helios {
+export class Helios<TInputProps = Record<string, any>> {
   // Constants
   public readonly schema?: HeliosSchema;
 
@@ -97,7 +97,7 @@ export class Helios {
   private _currentFrame: Signal<number>;
   private _loop: Signal<boolean>;
   private _isPlaying: Signal<boolean>;
-  private _inputProps: Signal<Record<string, any>>;
+  private _inputProps: Signal<TInputProps>;
   private _playbackRate: Signal<number>;
   private _volume: Signal<number>;
   private _muted: Signal<boolean>;
@@ -147,7 +147,7 @@ export class Helios {
    * Signal for the input properties.
    * Can be subscribed to for reactive updates.
    */
-  public get inputProps(): ReadonlySignal<Record<string, any>> { return this._inputProps; }
+  public get inputProps(): ReadonlySignal<TInputProps> { return this._inputProps; }
 
   /**
    * Signal for the playback rate (speed multiplier).
@@ -237,7 +237,7 @@ export class Helios {
   private animationScope: HTMLElement | Document = typeof document !== 'undefined' ? document : ({} as Document);
   private driver: TimeDriver;
   private ticker: Ticker;
-  private subscriberMap = new Map<HeliosSubscriber, () => void>();
+  private subscriberMap = new Map<HeliosSubscriber<TInputProps>, () => void>();
 
   static async diagnose(): Promise<DiagnosticReport> {
     const report: DiagnosticReport = {
@@ -396,7 +396,7 @@ export class Helios {
     return report;
   }
 
-  constructor(options: HeliosOptions) {
+  constructor(options: HeliosOptions<TInputProps>) {
     if (options.duration < 0) {
       throw new HeliosError(
         HeliosErrorCode.INVALID_DURATION,
@@ -428,7 +428,7 @@ export class Helios {
     // Validate the schema definition itself (check defaults)
     validateSchema(this.schema);
 
-    const initialProps = validateProps(options.inputProps || {}, this.schema);
+    const initialProps = validateProps(options.inputProps || {}, this.schema) as TInputProps;
     const initialCaptions = options.captions
       ? (typeof options.captions === 'string' ? parseSrt(options.captions) : options.captions)
       : [];
@@ -519,7 +519,7 @@ export class Helios {
     this.ticker = options.ticker || (typeof requestAnimationFrame !== 'undefined' ? new RafTicker() : new TimeoutTicker());
   }
 
-  public getState(): Readonly<HeliosState> {
+  public getState(): Readonly<HeliosState<TInputProps>> {
     return {
       width: this._width.value,
       height: this._height.value,
@@ -623,7 +623,7 @@ export class Helios {
    * This triggers a state update and notifies subscribers.
    * @param props A record of properties to pass to the composition.
    */
-  public setInputProps(props: Record<string, any>) {
+  public setInputProps(props: TInputProps) {
     this._inputProps.value = validateProps(props, this.schema);
   }
 
@@ -777,7 +777,7 @@ export class Helios {
   }
 
   // --- Subscription ---
-  public subscribe(callback: HeliosSubscriber): () => void {
+  public subscribe(callback: HeliosSubscriber<TInputProps>): () => void {
     const dispose = effect(() => {
       callback(this.getState());
     });
@@ -787,7 +787,7 @@ export class Helios {
     return () => this.unsubscribe(callback);
   }
 
-  public unsubscribe(callback: HeliosSubscriber) {
+  public unsubscribe(callback: HeliosSubscriber<TInputProps>) {
     const dispose = this.subscriberMap.get(callback);
     if (dispose) {
       dispose();
@@ -880,7 +880,7 @@ export class Helios {
     await Promise.all([driverPromise, ...checkPromises]);
   }
 
-  public bindTo(master: Helios) {
+  public bindTo(master: Helios<any>) {
     this.disposeSync();
     this.unbindFromDocumentTimeline();
     this.ticker.stop();
