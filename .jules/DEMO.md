@@ -55,3 +55,7 @@
 ## [1.78.1] - Dependency Hoisting
 **Learning:** Scripts in the root directory (like `tests/e2e/verify-render.ts`) should explicitly declare their dependencies in the root `package.json`, even if those dependencies are present in workspaces and hoisted. Relying on hoisting works in some environments but fails in others (or linters/reviewers flag it).
 **Action:** Always add `devDependencies` to the root `package.json` for any tool used in root-level scripts.
+
+## [1.81.1] - File List Accuracy
+**Learning:** Relying on `list_files` output without checking subdirectory contents can lead to incorrect assumptions about file existence (e.g. `main.ts` vs `index.ts`).
+**Action:** Always `list_files` in the specific subdirectory before attempting to read files, especially when "guessing" entry points.
