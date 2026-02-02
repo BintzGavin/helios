@@ -1,4 +1,4 @@
-**Version**: v0.57.0
+**Version**: v0.57.1
 
 # Status: PLAYER
 
@@ -52,6 +52,7 @@
 ## Critical Task
 - **None**: All critical tasks completed.
 
+[v0.57.1] ✅ Completed: Fix Test Environment & Sync Version - Updated package version to match status file, installed missing dependencies, and verified all tests pass (including Shadow DOM export).
 [v0.57.0] ✅ Completed: Configurable Export Resolution - Implemented `export-width` and `export-height` attributes to allow specifying target resolution for client-side exports, enabling high-quality DOM exports independent of player size.
 [v0.56.2] ✅ Completed: Fix Core Dependency - Updated `packages/player/package.json` to depend on `@helios-project/core@^5.0.1` to resolve version mismatch and fix the build.
 [v0.56.1] ✅ Verified: Synced package.json version with status file.

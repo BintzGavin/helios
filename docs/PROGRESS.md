@@ -168,3 +168,6 @@ Each agent should update **their own dedicated progress file** instead of this f
 
 ### PLAYER v0.57.0
 - ✅ Completed: Configurable Export Resolution - Implemented `export-width` and `export-height` attributes to allow specifying target resolution for client-side exports, enabling high-quality DOM exports independent of player size.
+
+### PLAYER v0.57.1
+- ✅ Completed: Fix Test Environment & Sync Version - Updated package version to match status file, installed missing dependencies, and verified all tests pass (including Shadow DOM export).
