@@ -107,6 +107,9 @@ Each agent should update **their own dedicated progress file** instead of this f
 - If this is a new version, create the section at the top of the file (after any existing content)
 - Group multiple completions under the same version section if they're part of the same release
 
+## STUDIO v0.80.1
+- ✅ Completed: Maintenance - Updated dependencies to align with Core v5 and Player v0.57.1, resolving workspace conflicts.
+
 ## DEMO v1.83.0
 - ✅ Completed: Solid Three.js Canvas Animation - Created `examples/solid-threejs-canvas-animation` demonstrating Three.js integration with SolidJS and Helios.
 

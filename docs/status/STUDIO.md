@@ -1,4 +1,4 @@
-**Version**: 0.80.0
+**Version**: 0.80.1
 
 # Studio Domain Status
 
@@ -7,6 +7,7 @@
 **Focus**: UI Implementation & CLI
 
 ## Recent Updates
+- [v0.80.1] ✅ Completed: Maintenance - Updated dependencies to align with Core v5 and Player v0.57.1, resolving workspace conflicts.
 - [v0.80.0] ✅ Completed: Toast Notifications - Implemented centralized toast notification system for success/error feedback.
 - [v0.79.0] ✅ Completed: Array Reordering - Implemented ability to reorder array items (up/down) in the Props Editor, improving list management.
 - [v0.78.0] ✅ Completed: Persistent Preferences - Implemented persistence for Sidebar tab, Stage settings (Zoom/Pan/Transparency/Guides), Timeline Zoom, and Active Composition using `localStorage`.

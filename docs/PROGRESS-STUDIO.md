@@ -1,3 +1,6 @@
+## STUDIO v0.80.1
+- ✅ Completed: Maintenance - Updated dependencies to align with Core v5 and Player v0.57.1, resolving workspace conflicts.
+
 ## STUDIO v0.80.0
 - ✅ Completed: Toast Notifications - Implemented centralized toast notification system for success/error feedback.
 
