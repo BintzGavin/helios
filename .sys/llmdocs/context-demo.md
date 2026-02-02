@@ -29,6 +29,7 @@ The `examples/` directory contains reference implementations for various framewo
 - **react-three-fiber**: 3D animation with React Three Fiber.
 - **react-transitions**: `react-transition-group` integration.
 - **react-animation-helpers**: Helper components for sequencing.
+- **react-audio-visualization**: Real-time audio frequency analysis visualization.
 
 ### Vue
 - **vue-dom-animation**: Basic Vue + DOM.

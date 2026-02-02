@@ -20,6 +20,7 @@ const CANVAS_OVERRIDES = new Set([
   'animation-helpers',
   'simple-canvas-animation',
   'react-canvas-animation',
+  'react-audio-visualization',
   'vue-canvas-animation',
   'svelte-canvas-animation',
   'solid-canvas-animation'

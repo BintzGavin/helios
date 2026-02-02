@@ -113,6 +113,9 @@ Each agent should update **their own dedicated progress file** instead of this f
 - If this is a new version, create the section at the top of the file (after any existing content)
 - Group multiple completions under the same version section if they're part of the same release
 
+## DEMO v1.87.0
+- ✅ Completed: React Audio Visualization - Created `examples/react-audio-visualization` demonstrating real-time audio analysis (RMS, waveforms) using synthesized `AudioBuffer` and React Hooks.
+
 ## DEMO v1.86.1
 - ✅ Verified: Vanilla Transitions - Verified build and E2E tests for the existing implementation.
 
