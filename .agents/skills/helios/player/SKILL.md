@@ -1,6 +1,6 @@
 ---
 name: helios-player
-description: Player API for embedding Helios compositions in web pages. Use when you need to display a composition with playback controls or enable client-side exporting.
+description: Player API for embedding Helios compositions in web pages. Use when you need to display a composition with playback controls, enable client-side exporting, or support Picture-in-Picture.
 ---
 
 # Helios Player API
@@ -43,6 +43,9 @@ The `<helios-player>` Web Component allows you to embed and control Helios compo
 | `export-mode` | 'auto' \| 'canvas' \| 'dom' | Strategy for client-side export (default: 'auto') |
 | `export-format` | 'mp4' \| 'webm' | Output format for client-side export (default: 'mp4') |
 | `export-caption-mode` | 'burn-in' \| 'file' | How to handle captions during export (default: 'burn-in') |
+| `export-width` | number | Width of the exported video (independent of display width) |
+| `export-height` | number | Height of the exported video |
+| `disablepictureinpicture` | boolean | Disable the Picture-in-Picture button |
 | `canvas-selector`| string | CSS selector for the canvas element (default: 'canvas') |
 | `sandbox` | string | Iframe sandbox flags (default: 'allow-scripts allow-same-origin') |
 
@@ -145,7 +148,8 @@ The player supports exporting videos directly in the browser (using `VideoEncode
 1. **Formats:** Supports `mp4` (H.264/AAC) and `webm` (VP9/Opus).
 2. **Audio:** Captures audio from `<audio>` elements (must be CORS-enabled).
 3. **Captions:** Supports "burning in" captions (`export-caption-mode="burn-in"`) or saving as sidecar file (`export-caption-mode="file"`).
-4. **Usage:** User clicks "Export" in controls, or call `clientSideExporter` manually (internal API).
+4. **Resolution:** Configure export resolution independently of player size using `export-width` and `export-height`.
+5. **Usage:** User clicks "Export" in controls, or call `clientSideExporter` manually (internal API).
 
 ## UI Features
 

@@ -177,3 +177,10 @@ Each agent should update **their own dedicated progress file** instead of this f
 
 ## CORE v5.1.2
 - ✅ Completed: Fix GSAP Synchronization - Forced subscriber notification in `bindToDocumentTimeline` when virtual time is present to ensure initial state synchronization with external libraries like GSAP, resolving black frames in render output.
+
+## SKILLS v1.9.0
+- ✅ Completed: Daily Skills Review
+  - Updated `player/SKILL.md` with new export attributes (`export-width`, `export-height`) and `disablepictureinpicture`
+  - Updated `examples/solid/SKILL.md` with Three.js integration patterns
+  - Created `examples/vanilla/SKILL.md` for framework-less integration
+  - Verified Svelte 5 patterns in `examples/svelte/SKILL.md`

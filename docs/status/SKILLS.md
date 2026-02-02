@@ -1,10 +1,11 @@
 # Status: SKILLS
 
-**Version**: 1.8.0
+**Version**: 1.9.0
 - **Status**: Active
 - **Current Focus**: Comprehensive Skills Coverage
-- **Last Updated**: 2026-05-30
+- **Last Updated**: 2026-06-01
 
+[v1.9.0] ✅ Completed: Daily Skills Review - Updated Player skill with new export attributes. Updated SolidJS skill with Three.js patterns. Added Vanilla JS skill.
 [v1.8.0] ✅ Completed: Daily Skills Review - Added SolidJS skill. Added Svelte 5 Runes pattern. Updated Core with RenderSession utility. Updated Player with Picture-in-Picture and Export Caption Mode details.
 [v1.7.0] ✅ Completed: Daily Skills Review - Updated Core with AI Context and Schema Groups. Updated Renderer with frameCount and H.264 priority. Updated Player with export-caption-mode and Text Tracks. Updated Studio with MCP and Persistent Jobs.
 [v1.6.0] ✅ Completed: Daily Skills Review - Updated API skills for Core (Signals, Animation), Renderer (Diagnostics, Options), Player (Standard Media API). Updated Studio skill with new features. Created Podcast Visualizer workflow skill.
