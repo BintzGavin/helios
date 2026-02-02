@@ -44,9 +44,9 @@
     "helios"
   ],
   "dependencies": {
-    "@helios-project/core": "^5.1.0",
-    "@helios-project/player": "^0.57.1",
-    "@helios-project/renderer": "^0.0.2",
+    "@helios-project/core": "^5.4.1",
+    "@helios-project/player": "^0.59.1",
+    "@helios-project/renderer": "^0.0.3",
     "@modelcontextprotocol/sdk": "^1.25.3",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",

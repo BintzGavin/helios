@@ -1006,26 +1006,7 @@ export class Helios<TInputProps = Record<string, any>> {
           set: (value: number) => {
             virtualTimeValue = value;
             if (!this.syncWithDocumentTimeline) return;
-
-            if (Number.isFinite(value)) {
-              const frame = (value / 1000) * this._fps.value;
-              if (frame !== this._currentFrame.peek()) {
-                this._currentFrame.value = frame;
-              } else {
-                // Force notification to ensure subscribers are synced even if frame matches.
-                // This is critical for external drivers (like SeekTimeDriver) that rely on
-                // the "set" event to synchronize other systems (like GSAP timelines).
-                this._syncVersion.value++;
-              }
-
-              this.driver.update(value, {
-                isPlaying: false,
-                playbackRate: this._playbackRate.peek(),
-                volume: this._volume.peek(),
-                muted: this._muted.peek(),
-                audioTracks: this._audioTracks.peek()
-              });
-            }
+            this._updateFromVirtualTime(value);
           }
         });
 
@@ -1033,7 +1014,8 @@ export class Helios<TInputProps = Record<string, any>> {
 
         // Trigger initial update if value exists
         if (virtualTimeValue !== null) {
-          (window as any).__HELIOS_VIRTUAL_TIME__ = virtualTimeValue;
+          // Explicitly update internal state first to ensure sync regardless of setter behavior
+          this._updateFromVirtualTime(virtualTimeValue);
         }
       } catch (e) {
         console.warn('Failed to bind reactive virtual time. Helios will fall back to polling, which may affect synchronization accuracy.', e);
@@ -1192,5 +1174,27 @@ export class Helios<TInputProps = Record<string, any>> {
       muted: this._muted.peek(),
       audioTracks: this._audioTracks.peek()
     });
+  }
+
+  private _updateFromVirtualTime(value: number) {
+    if (Number.isFinite(value)) {
+      const frame = (value / 1000) * this._fps.value;
+      if (frame !== this._currentFrame.peek()) {
+        this._currentFrame.value = frame;
+      } else {
+        // Force notification to ensure subscribers are synced even if frame matches.
+        // This is critical for external drivers (like SeekTimeDriver) that rely on
+        // the "set" event to synchronize other systems (like GSAP timelines).
+        this._syncVersion.value++;
+      }
+
+      this.driver.update(value, {
+        isPlaying: false,
+        playbackRate: this._playbackRate.peek(),
+        volume: this._volume.peek(),
+        muted: this._muted.peek(),
+        audioTracks: this._audioTracks.peek()
+      });
+    }
   }
 }

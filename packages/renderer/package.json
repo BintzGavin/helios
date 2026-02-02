@@ -1,6 +1,6 @@
 {
   "name": "@helios-project/renderer",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Renderer for Helios video engine.",
   "author": "Gavin Bintz <me@gavinbintz.com>",
   "license": "ELv2",
@@ -42,7 +42,7 @@
   ],
   "dependencies": {
     "@ffmpeg-installer/ffmpeg": "^1.1.0",
-    "@helios-project/core": "5.2.1",
+    "@helios-project/core": "5.4.1",
     "playwright": "^1.42.1"
   },
   "devDependencies": {

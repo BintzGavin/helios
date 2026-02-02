@@ -1,5 +1,8 @@
 # CORE Progress Log
 
+## CORE v5.4.1
+- ✅ Completed: Robustify Virtual Time Sync - Refactored `Helios` to explicitly synchronize with `__HELIOS_VIRTUAL_TIME__` during initialization, preventing race conditions in "Late Binding" scenarios (e.g. renderer).
+
 ## CORE v5.4.0
 - ✅ Completed: Headless Audio Tracks - Added `availableAudioTracks` option to `HeliosOptions` and `setAvailableAudioTracks` method, enabling manual injection of audio metadata for headless environments.
 

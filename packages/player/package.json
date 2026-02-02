@@ -1,6 +1,6 @@
 {
   "name": "@helios-project/player",
-  "version": "0.59.0",
+  "version": "0.59.1",
   "description": "Web Component player for Helios compositions.",
   "author": "Gavin Bintz <me@gavinbintz.com>",
   "license": "ELv2",
@@ -46,7 +46,7 @@
     "helios"
   ],
   "dependencies": {
-    "@helios-project/core": "5.2.1",
+    "@helios-project/core": "5.4.1",
     "mediabunny": "^1.31.0"
   },
   "devDependencies": {
