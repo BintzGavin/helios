@@ -5,6 +5,12 @@ export interface AudioTrackConfig {
   path: string;
 
   /**
+   * Optional buffer containing the audio data.
+   * If provided, this will be piped to FFmpeg instead of reading from disk.
+   */
+  buffer?: Buffer;
+
+  /**
    * Volume multiplier (0.0 to 1.0).
    * Defaults to 1.0.
    */
@@ -217,4 +223,9 @@ export interface RenderJobOptions {
    * If provided, Playwright tracing will be enabled for the session.
    */
   tracePath?: string;
+}
+
+export interface FFmpegConfig {
+  args: string[];
+  inputBuffers: { index: number; buffer: Buffer }[];
 }

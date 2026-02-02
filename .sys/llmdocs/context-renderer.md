@@ -11,7 +11,7 @@ The Renderer operates on a "Dual-Path" architecture to support different use cas
    - **Optimization**: Prioritizes H.264 (AVC) intermediate codec for hardware acceleration, falling back to VP8. Exposes `diagnose()` API to verify supported WebCodecs.
    - **Output**: Best for high-performance 2D/3D graphics.
 
-Both strategies pipe frame data directly to an FFmpeg process via stdin ("Zero Disk I/O"), ensuring high performance and low latency.
+Both strategies pipe frame data directly to an FFmpeg process via stdin ("Zero Disk I/O"), ensuring high performance and low latency. Audio tracks from Blob URLs are extracted to memory and also piped to FFmpeg via additional pipes, avoiding temporary files.
 
 ## B. File Tree
 ```
@@ -74,7 +74,7 @@ The `RendererOptions` interface controls the render pipeline:
 - `videoCodec`: `'libx264'` (default), `'copy'`, or others.
 - `audioCodec`: `'aac'` (default), `'libvorbis'`, etc.
 - `audioFilePath`: Path to external audio file to mix in.
-- `audioTracks`: List of audio tracks (files or `AudioTrackConfig` objects with `path`, `loop`, `volume`, `offset`).
+- `audioTracks`: List of audio tracks (files or `AudioTrackConfig` objects with `path`, `buffer`, `loop`, `volume`, `offset`).
 - `intermediateImageFormat`: `'png'` (default) or `'jpeg'` for DOM mode capture.
 - `intermediateImageQuality`: JPEG quality (0-100) if format is jpeg.
 - `stabilityTimeout`: Timeout for frame stability (default 30000ms).
@@ -83,6 +83,7 @@ The `RendererOptions` interface controls the render pipeline:
 ## D. FFmpeg Interface
 The renderer spawns an FFmpeg process with the following key flags:
 - `-f image2pipe`: Reads frames from stdin.
+- `pipe:N`: Additional inputs for audio buffers (mapped to file descriptors).
 - `-c:v`: Video codec (e.g., `libx264`).
 - `-pix_fmt`: Pixel format (e.g., `yuv420p`).
 - `-vf`: Video filters (scaling, padding, subtitles).

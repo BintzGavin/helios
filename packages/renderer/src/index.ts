@@ -133,10 +133,27 @@ export class Renderer {
       const fps = this.options.fps;
       const startFrame = this.options.startFrame || 0;
 
-      const args = this.strategy.getFFmpegArgs(this.options, outputPath);
+      const { args, inputBuffers } = this.strategy.getFFmpegArgs(this.options, outputPath);
 
-      const ffmpegProcess = spawn(ffmpegPath, args);
+      const stdio: any[] = ['pipe', 'pipe', 'pipe'];
+      const maxPipeIndex = Math.max(...inputBuffers.map(b => b.index), 2);
+      while (stdio.length <= maxPipeIndex) {
+        stdio.push('pipe');
+      }
+
+      const ffmpegProcess = spawn(ffmpegPath, args, { stdio });
       console.log(`Spawning FFmpeg: ${ffmpegPath} ${args.join(' ')}`);
+
+      inputBuffers.forEach(({ index, buffer }) => {
+        const pipe = ffmpegProcess.stdio[index] as any;
+        if (pipe) {
+          pipe.on('error', (err: any) => console.error(`Error writing to pipe ${index}:`, err));
+          pipe.write(buffer);
+          pipe.end();
+        } else {
+          console.error(`Failed to get pipe ${index} from FFmpeg process`);
+        }
+      });
 
       ffmpegProcess.stderr.on('data', (data: Buffer) => {
         console.error(`ffmpeg: ${data.toString()}`);
