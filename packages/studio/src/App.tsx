@@ -17,6 +17,8 @@ import { RenderPreviewModal } from './components/RenderPreviewModal'
 import { GlobalShortcuts } from './components/GlobalShortcuts'
 import { Stage } from './components/Stage/Stage'
 import { Sidebar } from './components/Sidebar/Sidebar'
+import { ToastProvider } from './context/ToastContext'
+import { ToastContainer } from './components/Toast/ToastContainer'
 
 function AppContent() {
   const {
@@ -135,9 +137,12 @@ function AppContent() {
 
 function App() {
   return (
-    <StudioProvider>
-      <AppContent />
-    </StudioProvider>
+    <ToastProvider>
+      <StudioProvider>
+        <AppContent />
+      </StudioProvider>
+      <ToastContainer />
+    </ToastProvider>
   )
 }
 

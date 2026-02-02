@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { type HeliosController, ClientSideExporter } from '@helios-project/player';
 import type { HeliosSchema, CaptionCue, Marker } from '@helios-project/core';
+import { useToast } from './ToastContext';
 
 export interface CompositionMetadata {
   width: number;
@@ -156,6 +157,7 @@ interface StudioContextType {
 export const StudioContext = createContext<StudioContextType | undefined>(undefined);
 
 export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { addToast } = useToast();
   const [compositions, setCompositions] = useState<Composition[]>([]);
   const [assets, setAssets] = useState<Asset[]>([]);
   const [activeComposition, setActiveComposition] = useState<Composition | null>(null);
@@ -214,8 +216,10 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         body: file
       });
       fetchAssets();
+      addToast('Asset uploaded successfully', 'success');
     } catch (e) {
       console.error('Failed to upload asset:', e);
+      addToast('Failed to upload asset', 'error');
     }
   };
 
@@ -225,8 +229,10 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         method: 'DELETE'
       });
       fetchAssets();
+      addToast('Asset deleted', 'success');
     } catch (e) {
       console.error('Failed to delete asset:', e);
+      addToast('Failed to delete asset', 'error');
     }
   };
 
@@ -280,8 +286,10 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       }
 
       setCreateOpen(false);
-    } catch (e) {
+      addToast('Composition created', 'success');
+    } catch (e: any) {
       console.error(e);
+      addToast(e.message || 'Failed to create composition', 'error');
       throw e;
     }
   };
@@ -315,8 +323,10 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       }
 
       setDuplicateOpen(false);
-    } catch (e) {
+      addToast('Composition duplicated', 'success');
+    } catch (e: any) {
       console.error(e);
+      addToast(e.message || 'Failed to duplicate composition', 'error');
       throw e;
     }
   };
@@ -344,8 +354,10 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       if (activeComposition?.id === id) {
         setActiveComposition(updatedComp);
       }
-    } catch (e) {
+      addToast('Composition updated', 'success');
+    } catch (e: any) {
       console.error(e);
+      addToast(e.message || 'Failed to update composition', 'error');
       throw e;
     }
   };
@@ -416,6 +428,7 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       videoFrame.close();
     } catch (e) {
       console.error("Thumbnail capture failed", e);
+      addToast('Failed to capture thumbnail', 'error');
     }
   };
 
@@ -437,8 +450,10 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         }
         return next;
       });
-    } catch (e) {
+      addToast('Composition deleted', 'success');
+    } catch (e: any) {
       console.error(e);
+      addToast(e.message || 'Failed to delete composition', 'error');
       throw e;
     }
   };
@@ -544,8 +559,10 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         })
       });
       fetchJobs();
+      addToast('Render started', 'success');
     } catch (err) {
       console.error('Failed to start render:', err);
+      addToast('Failed to start render', 'error');
     }
   };
 
@@ -553,8 +570,10 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     try {
       await fetch(`/api/jobs/${jobId}/cancel`, { method: 'POST' });
       fetchJobs();
+      addToast('Render cancelled', 'info');
     } catch (err) {
       console.error('Failed to cancel render:', err);
+      addToast('Failed to cancel render', 'error');
     }
   };
 
@@ -562,8 +581,10 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     try {
       await fetch(`/api/jobs/${jobId}`, { method: 'DELETE' });
       fetchJobs();
+      addToast('Render job deleted', 'success');
     } catch (err) {
       console.error('Failed to delete render:', err);
+      addToast('Failed to delete render', 'error');
     }
   };
 
@@ -617,11 +638,13 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         a.href = dataUrl;
         a.download = filename;
         a.click();
+        addToast('Snapshot saved', 'success');
       }
 
       videoFrame.close();
     } catch (e) {
       console.error("Snapshot failed", e);
+      addToast('Failed to take snapshot', 'error');
     }
   };
 
@@ -651,7 +674,7 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     } catch (e: any) {
       if (e.message !== "Export aborted") {
         console.error("Export failed:", e);
-        // We could expose an error state here if desired
+        addToast(e.message || 'Export failed', 'error');
       }
     } finally {
       setIsExporting(false);
