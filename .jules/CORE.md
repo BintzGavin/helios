@@ -17,3 +17,11 @@
 ## [4.0.0] - External Library Parity
 **Learning:** While "Native Always Wins" (WAAPI/CSS) ensures parity between Preview and Render (CDP), external libraries relying on `requestAnimationFrame` (like GSAP) may desync in Preview when seeking, because `raf` is not virtualized in the browser tab.
 **Action:** When planning "Preview" features, identifying "Userland" gaps (like GSAP sync) is valid, but solutions must remain framework-agnostic (e.g. via `subscribe` hooks) rather than baked into `DomDriver`.
+
+## [4.1.0] - Workspace Dependency Hell
+**Learning:** Bumping the core package version requires immediate synchronization of dependent workspace packages (player, renderer) to avoid `ETARGET` errors during `npm install`, which blocks verification.
+**Action:** When bumping Core version, assume responsibility for updating `package.json` in dependent packages immediately, or treat the repo as broken until fixed.
+
+## [4.1.0] - JSDOM Computed Styles
+**Learning:** In JSDOM (vitest), `window.getComputedStyle(el)` returns empty values unless the element is attached to the document body.
+**Action:** In tests involving computed styles, always use `document.body.appendChild(el)` in `beforeEach` and remove it in `afterEach`.
