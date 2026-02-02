@@ -27,6 +27,9 @@ Each agent should update **their own dedicated progress file** instead of this f
 - If this is a new version, create the section at the top of the file (after any existing content)
 - Group multiple completions under the same version section if they're part of the same release
 
+## STUDIO v0.82.0
+- ✅ Completed: Stacked Timeline - Implemented multi-lane stacked timeline for audio tracks with dynamic vertical scrolling and sticky ruler, improving visibility of overlapping tracks.
+
 ## STUDIO v0.81.1
 - ✅ Verified: Omnibar - Added comprehensive unit tests for the Omnibar component to ensure robustness and prevent regressions.
 

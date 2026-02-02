@@ -2,7 +2,7 @@
   display: flex;
   flex-direction: column;
   width: 100%;
-  height: 80px;
+  height: 100%; /* Changed from 80px */
   background: #1e1e1e;
   position: relative;
   user-select: none;
@@ -60,7 +60,7 @@
   cursor: pointer;
   background: #1e1e1e;
   overflow-x: auto;
-  overflow-y: hidden;
+  overflow-y: auto; /* Changed to auto */
 }
 
 .timeline-content {
@@ -70,13 +70,16 @@
 }
 
 .timeline-ruler {
-  position: absolute;
+  position: sticky; /* Changed from absolute */
   top: 0;
   left: 0;
   right: 0;
-  height: 20px;
+  height: 24px; /* Increased from 20px */
   pointer-events: none;
   overflow: hidden;
+  z-index: 50;
+  background: #1e1e1e;
+  border-bottom: 1px solid #333;
 }
 
 .timeline-tick {
@@ -89,7 +92,7 @@
 .timeline-tick-line {
   position: absolute;
   left: 0;
-  top: 0;
+  bottom: 0; /* Align to bottom of ruler */
   width: 1px;
   height: 6px;
   background: #555;
@@ -98,7 +101,7 @@
 .timeline-tick-label {
   position: absolute;
   left: 4px;
-  top: 0;
+  top: 2px;
   font-size: 9px;
   color: #666;
   white-space: nowrap;
@@ -107,32 +110,30 @@
 /* Adjust vertical alignment to account for ruler */
 .timeline-track {
   position: absolute;
-  top: 60%;
+  /* top removed, set via inline style */
   left: 0;
   right: 0;
-  height: 4px;
-  background: #333;
-  transform: translateY(-50%);
+  height: 24px; /* Match TRACK_HEIGHT */
+  background: #2a2a2a;
   border-radius: 2px;
 }
 
 .timeline-region {
   position: absolute;
-  top: 60%;
-  height: 4px;
-  transform: translateY(-50%);
+  /* top removed */
+  height: 24px; /* Match TRACK_HEIGHT */
   background: #007bff;
-  opacity: 0.3;
+  opacity: 0.1;
   pointer-events: none;
 }
 
 .timeline-marker {
   position: absolute;
-  top: 60%;
-  width: 4px;
-  height: 16px;
+  /* top removed */
+  width: 1px; /* Changed from 4px to look cleaner */
+  height: 24px;
   background: #007bff;
-  transform: translate(-50%, -50%);
+  /* transform removed, handled by positioning */
   cursor: ew-resize;
   z-index: 10;
 }
@@ -140,7 +141,7 @@
 .timeline-marker::before {
   content: '';
   position: absolute;
-  top: -4px;
+  top: 0;
   left: 50%;
   transform: translateX(-50%);
   border-left: 4px solid transparent;
@@ -164,13 +165,13 @@
   background: #ff4d4f;
   transform: translateX(-50%);
   pointer-events: none;
-  z-index: 5;
+  z-index: 60; /* Above ruler */
 }
 
 .timeline-playhead::after {
   content: '';
   position: absolute;
-  top: 20px; /* Below ruler */
+  top: 0;
   left: 50%;
   transform: translateX(-50%);
   border-left: 4px solid transparent;
@@ -180,29 +181,30 @@
 
 .timeline-caption-marker {
   position: absolute;
-  top: 60%;
-  height: 8px;
+  /* top removed */
+  height: 18px;
   background: #4caf50;
-  transform: translateY(-50%);
   opacity: 0.7;
   pointer-events: none;
   z-index: 2;
   border-radius: 2px;
+  margin-top: 3px; /* Center vertically in 24px track */
 }
 
 .timeline-marker-comp {
   position: absolute;
-  top: 60%;
+  /* top removed */
   width: 8px;
   height: 8px;
-  transform: translate(-50%, -50%) rotate(45deg);
+  /* transform removed */
+  transform: translate(-50%, 8px) rotate(45deg);
   cursor: pointer;
   z-index: 8;
   border: 1px solid rgba(0, 0, 0, 0.3);
 }
 
 .timeline-marker-comp:hover {
-  transform: translate(-50%, -50%) rotate(45deg) scale(1.2);
+  transform: translate(-50%, 8px) rotate(45deg) scale(1.2);
   z-index: 20;
   border-color: white;
 }
@@ -212,10 +214,10 @@
   top: 0;
   bottom: 0;
   width: 1px;
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.1);
   pointer-events: none;
-  z-index: 100;
-  border-left: 1px dashed rgba(255, 255, 255, 0.5);
+  z-index: 55; /* Above ruler */
+  border-left: 1px dashed rgba(255, 255, 255, 0.3);
 }
 
 .timeline-hover-tooltip {
@@ -237,12 +239,12 @@
 
 .timeline-audio-track {
   position: absolute;
-  top: 75%;
-  height: 4px;
+  /* top removed */
+  height: 24px; /* Match TRACK_HEIGHT */
   background: #e91e63;
-  transform: translateY(-50%);
   opacity: 0.7;
   pointer-events: none;
   z-index: 1;
   border-radius: 2px;
+  border: 1px solid rgba(0,0,0,0.2);
 }

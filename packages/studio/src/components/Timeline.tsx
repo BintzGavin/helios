@@ -11,6 +11,9 @@ interface Tick {
 }
 
 const SNAP_THRESHOLD_PX = 10;
+const RULER_HEIGHT = 24;
+const TRACK_HEIGHT = 24;
+const TRACK_GAP = 4;
 
 export const Timeline: React.FC = () => {
   const {
@@ -63,6 +66,13 @@ export const Timeline: React.FC = () => {
 
   const effectiveWidth = zoom === 0 ? '100%' : `${totalFrames * pixelsPerFrame}px`;
 
+  // Calculate Layout Heights
+  const audioTrackCount = audioTracks.length;
+  // Ruler + Gap + Video Track + Gap + Audio Tracks + Padding
+  const totalContentHeight = RULER_HEIGHT + TRACK_GAP + TRACK_HEIGHT + TRACK_GAP + (audioTrackCount * (TRACK_HEIGHT + TRACK_GAP)) + 20;
+  const videoTrackTop = RULER_HEIGHT + TRACK_GAP;
+  const getAudioTrackTop = (index: number) => videoTrackTop + TRACK_HEIGHT + TRACK_GAP + (index * (TRACK_HEIGHT + TRACK_GAP));
+
   // Calculate Ticks
   const ticks = useMemo(() => {
     if (!fps || totalFrames <= 0) return [];
@@ -97,7 +107,6 @@ export const Timeline: React.FC = () => {
 
     const res: Tick[] = [];
     for (let f = 0; f <= totalFrames; f += intervalFrames) {
-        // Avoid adding tick at exact end if it overlaps with others heavily? No, keep simple.
         res.push({
             frame: f,
             label: framesToTimecode(f, fps)
@@ -125,8 +134,6 @@ export const Timeline: React.FC = () => {
   };
 
   const getSnapFrame = (rawFrame: number) => {
-      // If pixelsPerFrame is very small (zoomed out), threshold covers many frames.
-      // If pixelsPerFrame is large (zoomed in), threshold covers few frames.
       const ppf = pixelsPerFrame || (contentWidth / totalFrames);
       if (ppf <= 0) return rawFrame;
 
@@ -165,7 +172,6 @@ export const Timeline: React.FC = () => {
     setIsDragging(type);
 
     if (type === 'playhead' && controller) {
-      // Initial click snaps too? Yes.
       const rawFrame = getFrameFromEvent(e);
       const frame = e.shiftKey ? rawFrame : getSnapFrame(rawFrame);
       controller.seek(frame);
@@ -174,7 +180,6 @@ export const Timeline: React.FC = () => {
 
   // Track mouse over track area for Hover Guide
   const handleTrackMouseMove = (e: React.MouseEvent) => {
-      // Only update hover if NOT dragging (dragging handled globally)
       if (!isDragging) {
           setHoverFrame(getFrameFromEvent(e));
       }
@@ -196,12 +201,9 @@ export const Timeline: React.FC = () => {
       if (isDragging === 'playhead') {
         if (controller) controller.seek(frame);
       } else if (isDragging === 'in') {
-        // Clamp inPoint: 0 <= inPoint < outPoint
-        // Also ensure snap doesn't violate clamp
         const newIn = Math.max(0, Math.min(frame, outPoint - 1));
         setInPoint(newIn);
       } else if (isDragging === 'out') {
-        // Clamp outPoint: inPoint < outPoint <= totalFrames
         const newOut = Math.max(inPoint + 1, Math.min(frame, totalFrames));
         setOutPoint(newOut);
       }
@@ -266,7 +268,7 @@ export const Timeline: React.FC = () => {
         <div
             className="timeline-content"
             ref={contentRef}
-            style={{ width: effectiveWidth }}
+            style={{ width: effectiveWidth, height: `${totalContentHeight}px` }}
             onMouseDown={(e) => handleMouseDown(e, 'playhead')}
             onMouseMove={handleTrackMouseMove}
             onMouseLeave={handleTrackMouseLeave}
@@ -285,12 +287,28 @@ export const Timeline: React.FC = () => {
                 ))}
             </div>
 
-            <div className="timeline-track" />
+            {/* Video Track (Lane 0) */}
+            <div
+                className="timeline-track"
+                style={{ top: `${videoTrackTop}px` }}
+                title="Composition Track"
+            />
 
-            {/* Audio Tracks */}
-            {audioTracks.map((track) => {
+            {/* Render Region (on Video Track) */}
+            <div
+                className="timeline-region"
+                style={{
+                    left: `${getPercent(inPoint)}%`,
+                    width: `${getPercent(outPoint - inPoint)}%`,
+                    top: `${videoTrackTop}px`
+                }}
+            />
+
+            {/* Audio Tracks (Lanes 1..N) */}
+            {audioTracks.map((track, i) => {
               const startFrame = track.startTime * fps;
               const durationFrame = track.duration * fps;
+              const top = getAudioTrackTop(i);
 
               return (
                 <div
@@ -298,14 +316,15 @@ export const Timeline: React.FC = () => {
                   className="timeline-audio-track"
                   style={{
                     left: `${getPercent(startFrame)}%`,
-                    width: `${getPercent(durationFrame)}%`
+                    width: `${getPercent(durationFrame)}%`,
+                    top: `${top}px`
                   }}
                   title={`Audio: ${track.id}`}
                 />
               );
             })}
 
-            {/* Caption Markers */}
+            {/* Caption Markers (on Video Track) */}
             {captions.map((cue, i) => {
                 const startFrame = (cue.startTime / 1000) * fps;
                 const endFrame = (cue.endTime / 1000) * fps;
@@ -317,67 +336,55 @@ export const Timeline: React.FC = () => {
                         className="timeline-caption-marker"
                         style={{
                             left: `${getPercent(startFrame)}%`,
-                            width: `${Math.max(0.5, (durationFrame / totalFrames) * 100)}%`
+                            width: `${Math.max(0.5, (durationFrame / totalFrames) * 100)}%`,
+                            top: `${videoTrackTop}px`
                         }}
                         title={cue.text}
                     />
                 );
             })}
 
-            {/* Composition Markers */}
+            {/* Composition Markers (on Video Track) */}
             {markers.map((marker) => (
               <div
                 key={marker.id}
                 className="timeline-marker-comp"
                 style={{
                   left: `${getPercent(marker.time * fps)}%`,
+                  top: `${videoTrackTop}px`,
                   backgroundColor: marker.color || '#ff9800'
                 }}
                 title={`${marker.label} (${marker.id})`}
                 onMouseDown={(e) => {
                   e.stopPropagation();
-                  // Snap handled by global logic?
-                  // If we click a marker, we usually want to seek to IT.
-                  // But the click propagates to track.
-                  // Existing code stopped propagation and sought.
-                  // We should keep that behavior.
                   if (controller) controller.seek(marker.time * fps);
                 }}
               />
             ))}
 
-            {/* Render Region */}
+            {/* In Marker (on Video Track) */}
             <div
-            className="timeline-region"
-            style={{
-                left: `${getPercent(inPoint)}%`,
-                width: `${getPercent(outPoint - inPoint)}%`
-            }}
+                className="timeline-marker in"
+                style={{ left: `${getPercent(inPoint)}%`, top: `${videoTrackTop}px` }}
+                onMouseDown={(e) => { e.stopPropagation(); handleMouseDown(e, 'in'); }}
+                title="In Point (I)"
             />
 
-            {/* In Marker */}
+            {/* Out Marker (on Video Track) */}
             <div
-            className="timeline-marker in"
-            style={{ left: `${getPercent(inPoint)}%` }}
-            onMouseDown={(e) => { e.stopPropagation(); handleMouseDown(e, 'in'); }}
-            title="In Point (I)"
+                className="timeline-marker out"
+                style={{ left: `${getPercent(outPoint)}%`, top: `${videoTrackTop}px` }}
+                onMouseDown={(e) => { e.stopPropagation(); handleMouseDown(e, 'out'); }}
+                title="Out Point (O)"
             />
 
-            {/* Out Marker */}
+            {/* Playhead (Spans entire height) */}
             <div
-            className="timeline-marker out"
-            style={{ left: `${getPercent(outPoint)}%` }}
-            onMouseDown={(e) => { e.stopPropagation(); handleMouseDown(e, 'out'); }}
-            title="Out Point (O)"
+                className="timeline-playhead"
+                style={{ left: `${getPercent(currentFrame)}%` }}
             />
 
-            {/* Playhead */}
-            <div
-            className="timeline-playhead"
-            style={{ left: `${getPercent(currentFrame)}%` }}
-            />
-
-            {/* Hover Guide */}
+            {/* Hover Guide (Spans entire height) */}
             {hoverFrame !== null && (
                 <div
                     className="timeline-hover-guide"
