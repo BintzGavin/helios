@@ -1,3 +1,6 @@
+## RENDERER v1.57.3
+- ✅ Completed: Enable Looping Media Verification - Updated `packages/renderer/package.json` to depend on `@helios-project/core` version `5.1.1` (matching local workspace), allowing `verify-video-loop.ts` to run and confirm correct looping media implementation in `SeekTimeDriver` and `CdpTimeDriver`.
+
 ## RENDERER v1.57.2
 - ✅ Completed: Sync Core Dependency - Updated `packages/renderer` dependency on `@helios-project/core` to `5.1.0` to match the local workspace, resolving build failures and enabling verification of GSAP timeline synchronization.
 
