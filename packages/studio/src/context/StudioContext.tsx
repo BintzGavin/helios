@@ -607,6 +607,9 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     const totalFrames = duration * fps;
     const loopEnd = outPoint > 0 ? outPoint : totalFrames;
 
+    // Fix: Prevent infinite loop if composition has 0 duration
+    if (loopEnd <= 0) return;
+
     if (currentFrame >= loopEnd - 1) {
       // Seek to inPoint and play to loop
       controller.seek(inPoint);
