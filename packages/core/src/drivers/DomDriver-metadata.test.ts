@@ -33,11 +33,57 @@ describe('DomDriver Metadata Discovery', () => {
     expect(discovered).toHaveLength(1);
     expect(discovered[0]).toEqual({
       id: 'track1',
+      src: '',
       startTime: 0,
       duration: 0,
       fadeInDuration: 0,
       fadeOutDuration: 0
     });
+  });
+
+  it('should discover src metadata', () => {
+    const audio = document.createElement('audio');
+    audio.setAttribute('data-helios-track-id', 'track-src');
+    audio.src = 'http://example.com/audio.mp3';
+    container.appendChild(audio);
+
+    const driver = new DomDriver();
+    let discovered: AudioTrackMetadata[] = [];
+
+    driver.subscribeToMetadata((meta) => {
+      if (meta.audioTracks) discovered = meta.audioTracks;
+    });
+
+    driver.init(container);
+
+    expect(discovered).toHaveLength(1);
+    expect(discovered[0].src).toBe('http://example.com/audio.mp3');
+  });
+
+  it('should update metadata when src changes', async () => {
+    const audio = document.createElement('audio');
+    audio.setAttribute('data-helios-track-id', 'track-src-mutate');
+    audio.src = 'http://example.com/audio1.mp3';
+    container.appendChild(audio);
+
+    const driver = new DomDriver();
+    let discovered: AudioTrackMetadata[] = [];
+
+    driver.subscribeToMetadata((meta) => {
+      if (meta.audioTracks) discovered = meta.audioTracks;
+    });
+
+    driver.init(container);
+
+    expect(discovered[0].src).toBe('http://example.com/audio1.mp3');
+
+    // Update attribute
+    audio.src = 'http://example.com/audio2.mp3';
+
+    // Wait for MutationObserver (src is an attribute in DOM)
+    await new Promise(resolve => setTimeout(resolve, 50));
+
+    expect(discovered[0].src).toBe('http://example.com/audio2.mp3');
   });
 
   it('should extract start time from data-helios-offset', () => {
@@ -188,8 +234,8 @@ describe('DomDriver Metadata Discovery', () => {
     const t1 = discovered.find(t => t.id === 't1');
     const t2 = discovered.find(t => t.id === 't2');
 
-    expect(t1).toEqual({ id: 't1', startTime: 1, duration: 10, fadeInDuration: 0, fadeOutDuration: 0 });
-    expect(t2).toEqual({ id: 't2', startTime: 2, duration: 20, fadeInDuration: 0, fadeOutDuration: 0 });
+    expect(t1).toEqual({ id: 't1', src: '', startTime: 1, duration: 10, fadeInDuration: 0, fadeOutDuration: 0 });
+    expect(t2).toEqual({ id: 't2', src: '', startTime: 2, duration: 20, fadeInDuration: 0, fadeOutDuration: 0 });
   });
 
   it('should stop listening when element is removed', async () => {
