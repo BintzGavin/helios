@@ -33,3 +33,7 @@
 ## [v0.58.0] - Export Bitrate Configuration
 **Learning:** `mediabunny` exposes `bitrate` in its `VideoEncodingConfig`, which maps directly to WebCodecs `VideoEncoder` configuration, allowing for precise quality control.
 **Action:** When adding export configuration, pass parameters directly through to the `VideoEncodingConfig` object in `ClientSideExporter`.
+
+## [v0.59.1] - Standard Media API Parity Gap
+**Learning:** README promises "Standard Media API" support, but `HeliosTextTrack` implementation is incomplete (missing `activeCues` and events), creating a false promise for developers expecting standard behavior.
+**Action:** When implementing "Standard" APIs, always check the MDN specification for key properties and events, and document any intentional deviations or "subset" limitations clearly.
