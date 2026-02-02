@@ -41,6 +41,7 @@
     "verify:e2e": "npx tsx tests/e2e/verify-all.ts"
   },
   "devDependencies": {
+    "@excalidraw/excalidraw": "^0.18.0",
     "@ffmpeg-installer/ffmpeg": "^1.1.0",
     "@playwright/test": "^1.58.0",
     "@react-three/drei": "^10.7.7",
@@ -75,8 +76,5 @@
     "vite-plugin-solid": "^2.11.10",
     "vitest": "^4.0.17",
     "vue": "^3.5.27"
-  },
-  "dependencies": {
-    "@excalidraw/excalidraw": "^0.18.0"
   }
 }
