@@ -32,6 +32,12 @@ packages/renderer/
 │   │   └── blob-extractor.ts   # Blob URL extraction
 │   ├── index.ts                # Main Renderer class
 │   └── types.ts                # Configuration interfaces
+├── scripts/                    # Self-contained verification scripts (integration tests)
+│   ├── verify-cancellation.ts  # Render cancellation test
+│   ├── verify-trace.ts         # Playwright trace generation test
+│   ├── verify-ffmpeg-path.ts   # FFmpeg binary path verification
+│   ├── verify-blob-audio.ts    # Blob audio extraction test
+│   └── ...                     # Other script-based tests
 └── tests/
     ├── run-all.ts              # Test runner (executes comprehensive suite)
     ├── verify-browser-config.ts # Browser launch config test
@@ -44,7 +50,6 @@ packages/renderer/
     ├── verify-cdp-shadow-dom-sync.ts # Shadow DOM media sync test (Canvas Mode)
     ├── verify-shadow-dom-images.ts # Shadow DOM image discovery test
     ├── verify-enhanced-dom-preload.ts # Enhanced DOM preloading test
-    ├── verify-blob-audio.ts    # Blob audio extraction test
     ├── verify-dom-audio-fades.ts # DOM audio fades test
     ├── verify-frame-count.ts   # Precision frame count test
     ├── verify-cdp-hang.ts      # CDP initialization order/deadlock test
@@ -53,8 +58,6 @@ packages/renderer/
     ├── verify-diagnose.ts      # Codec diagnostics test
     ├── verify-transparency.ts  # Transparency support test
     ├── verify-canvas-strategy.ts # Canvas WebCodecs strategy test
-    ├── verify-cancellation.ts  # Render cancellation test
-    ├── verify-trace.ts         # Playwright trace generation test
     └── ...                     # Other verification scripts
 ```
 
