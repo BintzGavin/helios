@@ -86,6 +86,69 @@ function App() {
 export default App;
 ```
 
+### 3. Three.js Integration
+
+Integrate `three` with Helios by synchronizing the render loop via `createEffect`.
+
+```jsx
+// App.jsx
+import { createEffect, onCleanup, onMount } from "solid-js";
+import * as THREE from "three";
+import { Helios } from "@helios-project/core";
+import { createHeliosSignal } from "./lib/createHeliosSignal";
+
+// Singleton initialization pattern
+if (!window.helios) {
+  window.helios = new Helios({
+    fps: 30,
+    duration: 10,
+    width: 1920,
+    height: 1080
+  });
+}
+
+export default function App() {
+  let canvasRef;
+  const state = createHeliosSignal(window.helios);
+
+  onMount(() => {
+    // 1. Setup Three.js Scene
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ canvas: canvasRef, antialias: true });
+
+    // 2. Create Objects
+    const geometry = new THREE.BoxGeometry();
+    const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+    const cube = new THREE.Mesh(geometry, material);
+    scene.add(cube);
+
+    camera.position.z = 5;
+
+    // 3. Sync Render Loop
+    createEffect(() => {
+      const s = state();
+      const t = s.currentTime;
+
+      // Update animation state based on time
+      cube.rotation.x = t * 0.5;
+      cube.rotation.y = t * 0.5;
+
+      renderer.render(scene, camera);
+    });
+
+    // 4. Cleanup
+    onCleanup(() => {
+      renderer.dispose();
+      geometry.dispose();
+      material.dispose();
+    });
+  });
+
+  return <canvas ref={canvasRef} style={{ width: '100%', height: '100%' }} />;
+}
+```
+
 ## Key Concepts
 
 - **Fine-Grained Reactivity:** SolidJS signals update only what changes. However, since Helios updates on every frame (30-60 times/sec), wrapping the entire state in a signal is the standard approach for canvas rendering.
@@ -96,3 +159,4 @@ export default App;
 
 - Helper: `examples/solid-animation-helpers/src/lib/createHeliosSignal.js`
 - Example: `examples/solid-canvas-animation/`
+- Example: `examples/solid-threejs-canvas-animation/`

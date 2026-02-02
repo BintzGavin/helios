@@ -152,3 +152,4 @@ export class HeliosState {
 ## Source Files
 
 - Example: `examples/svelte-canvas-animation/`
+- Example: `examples/svelte-runes-animation/`
