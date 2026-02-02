@@ -2,6 +2,7 @@ import { FFmpegBuilder } from '../src/utils/FFmpegBuilder';
 import { RendererOptions } from '../src/types';
 
 function runTests() {
+  // Verifies that audio playbackRate is correctly translated to FFmpeg atempo filters
   console.log('Running Audio Playback Rate Verification...');
   let hasError = false;
 
