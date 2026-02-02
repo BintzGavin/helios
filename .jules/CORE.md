@@ -29,3 +29,7 @@
 ## [5.0.1] - Mock Duck Typing
 **Learning:** Strict type checks (`instanceof HTMLElement`) in `DomDriver` broke existing tests that used mock objects.
 **Action:** When enforcing runtime type safety for DOM APIs, allow "duck typing" (checking for presence of methods like `querySelectorAll` or `getAnimations`) to support test mocks and alternative environments.
+
+## [5.1.0] - Build Configuration
+**Learning:** Including test files in the library build (`tsc`) causes failures when tests use environment-specific globals (like `global` in Node) that conflict with the library's target environment (isomorphic/browser).
+**Action:** Always exclude `**/*.test.ts` from the package's `tsconfig.json` (or use a separate `tsconfig.build.json`) to ensure a clean distribution and robust build.
