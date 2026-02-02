@@ -37,6 +37,7 @@ The `examples/` directory contains reference implementations for various framewo
 - **social-media-story**: Social media story format example.
 - **solid-animation-helpers**: SolidJS components for sequencing and core utilities.
 - **solid-canvas-animation**: SolidJS + Canvas integration.
+- **solid-captions-animation**: SolidJS integration with Helios SRT captions.
 - **solid-dom-animation**: SolidJS + DOM integration.
 - **solid-threejs-canvas-animation**: SolidJS + Three.js integration using reactive frame updates.
 - **solid-transitions**: SolidJS CSS transitions.
