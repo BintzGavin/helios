@@ -17,7 +17,7 @@ describe('GlobalShortcuts', () => {
   const mockSetOutPoint = vi.fn();
   const mockToggleLoop = vi.fn();
   const mockSetHelpOpen = vi.fn();
-  const mockSetSwitcherOpen = vi.fn();
+  const mockSetOmnibarOpen = vi.fn();
 
   const defaultPlayerState = {
     currentFrame: 30, // 1 second
@@ -39,7 +39,7 @@ describe('GlobalShortcuts', () => {
     setOutPoint: mockSetOutPoint,
     toggleLoop: mockToggleLoop,
     setHelpOpen: mockSetHelpOpen,
-    setSwitcherOpen: mockSetSwitcherOpen,
+    setOmnibarOpen: mockSetOmnibarOpen,
   };
 
   beforeEach(() => {
@@ -135,10 +135,10 @@ describe('GlobalShortcuts', () => {
     expect(mockSetHelpOpen).toHaveBeenCalledWith(true);
   });
 
-  it('opens switcher with Cmd+K', () => {
+  it('opens omnibar with Cmd+K', () => {
     render(<GlobalShortcuts />);
     fireEvent.keyDown(window, { key: 'k', metaKey: true });
-    expect(mockSetSwitcherOpen).toHaveBeenCalledWith(true);
+    expect(mockSetOmnibarOpen).toHaveBeenCalledWith(true);
   });
 
   it('ignores input elements', () => {

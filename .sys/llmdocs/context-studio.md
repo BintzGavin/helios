@@ -43,6 +43,8 @@ packages/studio/
 │   │   ├── DuplicateCompositionModal.tsx
 │   │   ├── GlobalShortcuts.tsx
 │   │   ├── KeyboardShortcutsModal.tsx
+│   │   ├── Omnibar.css
+│   │   ├── Omnibar.tsx
 │   │   ├── PropsEditor.tsx
 │   │   ├── RenderPreviewModal.tsx
 │   │   ├── SchemaInputs.tsx
@@ -117,7 +119,7 @@ npx @helios-project/studio
     -   **Ask AI**: Generates context-aware prompts (System Context + Schema + Relevant Docs) for LLMs.
     -   **Documentation**: Searchable documentation browser scanning local READMEs.
 -   **Composition Management**:
-    -   **Switcher**: Cmd+K to switch active composition. Displays composition name and thumbnail.
+    -   **Omnibar**: Unified Command Palette (Cmd+K) to search and switch compositions, execute commands (Toggle Loop, Snapshot, etc.), and find assets.
     -   **Create**: Create new compositions from templates.
     -   **Duplicate**: Clone existing compositions.
     -   **Settings**: Edit metadata (resolution, FPS, duration), Rename composition, and Update Thumbnail.
