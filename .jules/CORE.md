@@ -33,3 +33,7 @@
 ## [5.1.0] - Build Configuration
 **Learning:** Including test files in the library build (`tsc`) causes failures when tests use environment-specific globals (like `global` in Node) that conflict with the library's target environment (isomorphic/browser).
 **Action:** Always exclude `**/*.test.ts` from the package's `tsconfig.json` (or use a separate `tsconfig.build.json`) to ensure a clean distribution and robust build.
+
+## [5.2.0] - Utility vs Runtime Integration
+**Learning:** Utilities like `sequencing.ts` can exist in isolation without being integrated into the core runtime (`Helios` class), creating a "Vision Gap" where a feature is technically "possible" but not "supported" by the engine.
+**Action:** When auditing features like "Sequencing", check not just for the existence of helper functions, but for the integration points (e.g. `bindTo` options) that make them usable in the core loop.
