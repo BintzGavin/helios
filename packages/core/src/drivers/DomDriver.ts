@@ -71,7 +71,7 @@ export class DomDriver implements TimeDriver {
         childList: true,
         subtree: true,
         attributes: true,
-        attributeFilter: ['data-helios-track-id', 'data-helios-offset']
+        attributeFilter: ['data-helios-track-id', 'data-helios-offset', 'data-helios-fade-in', 'data-helios-fade-out']
       });
       this.observers.set(scope, observer);
     }
@@ -181,11 +181,15 @@ export class DomDriver implements TimeDriver {
           if (id) {
             const startTime = parseFloat(el.getAttribute('data-helios-offset') || '0');
             const duration = (!isNaN(el.duration) && isFinite(el.duration)) ? el.duration : 0;
+            const fadeInDuration = parseFloat(el.getAttribute('data-helios-fade-in') || '0');
+            const fadeOutDuration = parseFloat(el.getAttribute('data-helios-fade-out') || '0');
 
             this.discoveredTracks.set(id, {
                 id,
                 startTime,
-                duration
+                duration,
+                fadeInDuration,
+                fadeOutDuration
             });
           }
       });
@@ -202,7 +206,7 @@ export class DomDriver implements TimeDriver {
               this.emitMetadata();
               return;
           }
-          if (oldMeta.startTime !== meta.startTime || oldMeta.duration !== meta.duration) {
+          if (oldMeta.startTime !== meta.startTime || oldMeta.duration !== meta.duration || oldMeta.fadeInDuration !== meta.fadeInDuration || oldMeta.fadeOutDuration !== meta.fadeOutDuration) {
               this.emitMetadata();
               return;
           }

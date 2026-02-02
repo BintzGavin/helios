@@ -2,6 +2,8 @@ export interface AudioTrackMetadata {
   id: string;
   startTime: number;
   duration: number;
+  fadeInDuration?: number;
+  fadeOutDuration?: number;
 }
 
 export interface DriverMetadata {

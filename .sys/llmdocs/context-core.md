@@ -1,34 +1,20 @@
-# CORE Context
+# Core Context
 
-## A. Architecture
+## Section A: Architecture
 
-The **CORE** domain implements the **Helios State Machine** pattern.
+The Core package implements a "Helios State Machine" pattern.
 
-1.  **Store**: The `Helios` class maintains the single source of truth for the animation state (`currentFrame`, `isPlaying`, `inputProps`, etc.) using **Signals** (`packages/core/src/signals.ts`).
-2.  **Actions**: Public methods on the `Helios` class (e.g., `seek()`, `play()`, `setDuration()`) modify these signals.
-3.  **Subscribers**: The state changes propagate to:
-    *   **Drivers**: The active `TimeDriver` (e.g., `DomDriver`) receives updates via its `update()` method to synchronize the external environment (DOM, WAAPI, Audio).
-    *   **External Consumers**: UI components or renderers subscribe via `helios.subscribe()`.
+1.  **State Store**: The `Helios` class holds the reactive state (using signals) for time, dimensions, playback status, and metadata.
+2.  **Actions**: Public methods (e.g., `seek`, `play`, `setInputProps`) modify this internal state.
+3.  **Subscribers**: External consumers (Renderer, Player) subscribe to state changes.
+4.  **Drivers**: The `TimeDriver` interface abstracts the synchronization with the underlying environment (DOM, WAAPI, or no-op). The `DomDriver` specifically syncs HTMLMediaElements and Web Animations API with the Helios internal time.
 
-The `DomDriver` acts as the bridge between the pure mathematical state of Helios and the browser's DOM, handling:
-*   WAAPI Animation synchronization.
-*   HTMLMediaElement (`<video>`, `<audio>`) synchronization.
-*   Audio volume, fading, looping, and mute states.
-
-## B. File Tree
+## Section B: File Tree
 
 ```
 packages/core/src/
-├── Helios.ts
-├── ai.ts
-├── animation.ts
-├── captions.ts
-├── color.ts
 ├── drivers/
-│   ├── DomDriver-metadata.test.ts
-│   ├── DomDriver.test.ts
 │   ├── DomDriver.ts
-│   ├── DomDriverDiscovery.test.ts
 │   ├── ManualTicker.ts
 │   ├── NoopDriver.ts
 │   ├── RafTicker.ts
@@ -36,6 +22,11 @@ packages/core/src/
 │   ├── TimeDriver.ts
 │   ├── TimeoutTicker.ts
 │   └── index.ts
+├── Helios.ts
+├── ai.ts
+├── animation.ts
+├── captions.ts
+├── color.ts
 ├── easing.ts
 ├── errors.ts
 ├── index.ts
@@ -45,17 +36,24 @@ packages/core/src/
 ├── schema.ts
 ├── sequencing.ts
 ├── signals.ts
-├── subscription-timing.test.ts
-├── time-control.ts
-├── worker-runtime.test.ts
 ├── timecode.ts
 └── transitions.ts
 ```
 
-## C. Type Definitions
+## Section C: Type Definitions
 
 ```typescript
-// From Helios.ts
+export interface AudioTrackMetadata {
+  id: string;
+  startTime: number;
+  duration: number;
+  fadeInDuration?: number;
+  fadeOutDuration?: number;
+}
+
+export interface DriverMetadata {
+  audioTracks?: AudioTrackMetadata[];
+}
 
 export type HeliosState<TInputProps = Record<string, any>> = {
   width: number;
@@ -83,12 +81,6 @@ export type AudioTrackState = {
   muted: boolean;
 };
 
-export interface AudioTrackMetadata {
-  id: string;
-  startTime: number;
-  duration: number;
-}
-
 export type HeliosSubscriber<TInputProps = Record<string, any>> = (state: HeliosState<TInputProps>) => void;
 
 export type StabilityCheck = () => Promise<void>;
@@ -112,14 +104,6 @@ export interface HeliosOptions<TInputProps = Record<string, any>> {
   markers?: Marker[];
   driver?: TimeDriver;
   ticker?: Ticker;
-}
-
-export interface Marker {
-  id: string;
-  time: number; // in seconds
-  label?: string;
-  color?: string; // hex code
-  metadata?: Record<string, any>;
 }
 
 export interface DiagnosticReport {
@@ -154,76 +138,67 @@ export interface DiagnosticReport {
 }
 ```
 
-## D. Public Methods
+## Section D: Public Methods
 
 ```typescript
-// Helios Class
-class Helios<TInputProps = Record<string, any>> {
-  // Readonly Signals
-  get currentFrame(): ReadonlySignal<number>;
-  get currentTime(): ReadonlySignal<number>;
-  get loop(): ReadonlySignal<boolean>;
-  get isPlaying(): ReadonlySignal<boolean>;
-  get inputProps(): ReadonlySignal<TInputProps>;
-  get playbackRate(): ReadonlySignal<number>;
-  get volume(): ReadonlySignal<number>;
-  get muted(): ReadonlySignal<boolean>;
-  get audioTracks(): ReadonlySignal<Record<string, AudioTrackState>>;
-  get availableAudioTracks(): ReadonlySignal<AudioTrackMetadata[]>;
-  get captions(): ReadonlySignal<CaptionCue[]>;
-  get activeCaptions(): ReadonlySignal<CaptionCue[]>;
-  get markers(): ReadonlySignal<Marker[]>;
-  get playbackRange(): ReadonlySignal<[number, number] | null>;
-  get width(): ReadonlySignal<number>;
-  get height(): ReadonlySignal<number>;
-  get duration(): ReadonlySignal<number>;
-  get fps(): ReadonlySignal<number>;
+export class Helios<TInputProps = Record<string, any>> {
+  // Signals
+  public get currentFrame(): ReadonlySignal<number>;
+  public get currentTime(): ReadonlySignal<number>;
+  public get loop(): ReadonlySignal<boolean>;
+  public get isPlaying(): ReadonlySignal<boolean>;
+  public get inputProps(): ReadonlySignal<TInputProps>;
+  public get playbackRate(): ReadonlySignal<number>;
+  public get volume(): ReadonlySignal<number>;
+  public get muted(): ReadonlySignal<boolean>;
+  public get audioTracks(): ReadonlySignal<Record<string, AudioTrackState>>;
+  public get availableAudioTracks(): ReadonlySignal<AudioTrackMetadata[]>;
+  public get captions(): ReadonlySignal<CaptionCue[]>;
+  public get activeCaptions(): ReadonlySignal<CaptionCue[]>;
+  public get markers(): ReadonlySignal<Marker[]>;
+  public get playbackRange(): ReadonlySignal<[number, number] | null>;
+  public get width(): ReadonlySignal<number>;
+  public get height(): ReadonlySignal<number>;
+  public get duration(): ReadonlySignal<number>;
+  public get fps(): ReadonlySignal<number>;
 
   // Static
-  static diagnose(): Promise<DiagnosticReport>;
+  static async diagnose(): Promise<DiagnosticReport>;
 
-  // Lifecycle
+  // Constructor
   constructor(options: HeliosOptions<TInputProps>);
-  dispose(): void;
 
-  // State Access
-  getState(): Readonly<HeliosState<TInputProps>>;
-
-  // Configuration
-  setSize(width: number, height: number): void;
-  setLoop(shouldLoop: boolean): void;
-  setDuration(seconds: number): void;
-  setFps(fps: number): void;
-  setInputProps(props: TInputProps): void;
-  setPlaybackRate(rate: number): void;
-  setAudioVolume(volume: number): void;
-  setAudioMuted(muted: boolean): void;
-  setAudioTrackVolume(trackId: string, volume: number): void;
-  setAudioTrackMuted(trackId: string, muted: boolean): void;
-  setCaptions(captions: string | CaptionCue[]): void;
-  setMarkers(markers: Marker[]): void;
-  addMarker(marker: Marker): void;
-  removeMarker(id: string): void;
-  setPlaybackRange(startFrame: number, endFrame: number): void;
-  clearPlaybackRange(): void;
-
-  // Subscription
-  subscribe(callback: HeliosSubscriber<TInputProps>): () => void;
-  unsubscribe(callback: HeliosSubscriber<TInputProps>): void;
-  registerStabilityCheck(check: StabilityCheck): () => void;
-
-  // Playback Control
-  play(): void;
-  pause(): void;
-  seek(frame: number): void;
-  seekToTime(seconds: number): void;
-  seekToMarker(id: string): void;
-  waitUntilStable(): Promise<void>;
-
-  // Synchronization
-  bindTo(master: Helios<any>): void;
-  unbind(): void;
-  bindToDocumentTimeline(): void;
-  unbindFromDocumentTimeline(): void;
+  // Methods
+  public getState(): Readonly<HeliosState<TInputProps>>;
+  public setSize(width: number, height: number): void;
+  public setLoop(shouldLoop: boolean): void;
+  public setDuration(seconds: number): void;
+  public setFps(fps: number): void;
+  public setInputProps(props: TInputProps): void;
+  public setPlaybackRate(rate: number): void;
+  public setAudioVolume(volume: number): void;
+  public setAudioMuted(muted: boolean): void;
+  public setAudioTrackVolume(trackId: string, volume: number): void;
+  public setAudioTrackMuted(trackId: string, muted: boolean): void;
+  public setCaptions(captions: string | CaptionCue[]): void;
+  public setMarkers(markers: Marker[]): void;
+  public addMarker(marker: Marker): void;
+  public removeMarker(id: string): void;
+  public seekToMarker(id: string): void;
+  public seekToTime(seconds: number): void;
+  public setPlaybackRange(startFrame: number, endFrame: number): void;
+  public clearPlaybackRange(): void;
+  public subscribe(callback: HeliosSubscriber<TInputProps>): () => void;
+  public unsubscribe(callback: HeliosSubscriber<TInputProps>): void;
+  public registerStabilityCheck(check: StabilityCheck): () => void;
+  public play(): void;
+  public pause(): void;
+  public seek(frame: number): void;
+  public async waitUntilStable(): Promise<void>;
+  public bindTo(master: Helios<any>): void;
+  public unbind(): void;
+  public bindToDocumentTimeline(): void;
+  public unbindFromDocumentTimeline(): void;
+  public dispose(): void;
 }
 ```
