@@ -1,11 +1,12 @@
 # Status: CORE
 
-**Version**: 5.0.1
+**Version**: 5.1.0
 
 - **Status**: Active
 - **Current Focus**: Maintenance, Optimization, and Stability
-- **Last Updated**: 2026-07-27
+- **Last Updated**: 2026-07-28
 
+[v5.1.0] ✅ Completed: Implement WebVTT Support - Implemented `parseWebVTT` and auto-detecting `parseCaptions` in `captions.ts`, enabling native .vtt file support.
 [v5.0.1] ✅ Completed: Decouple TimeDriver from DOM - Updated `TimeDriver` and `Helios` to accept `unknown` scope, enabling Web Worker support, and synchronized version.
 [v5.0.0] ✅ Completed: Implement Audio Track Metadata - Updated `availableAudioTracks` signal to return `AudioTrackMetadata[]` instead of `string[]` (Breaking Change), including `startTime` and `duration` discovery.
 [v4.1.0] ✅ Completed: Implement Marker Metadata - Updated `Marker` interface to include optional `metadata` and make `label` optional.

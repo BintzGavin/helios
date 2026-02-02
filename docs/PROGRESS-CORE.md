@@ -1,5 +1,8 @@
 # CORE Progress Log
 
+## CORE v5.1.0
+- ✅ Completed: Implement WebVTT Support - Implemented `parseWebVTT` and auto-detecting `parseCaptions` in `captions.ts`, enabling native .vtt file support.
+
 ## CORE v5.0.1
 - ✅ Completed: Decouple TimeDriver from DOM - Updated `TimeDriver` and `Helios` to accept `unknown` scope, enabling Web Worker support, and synchronized version.
 
