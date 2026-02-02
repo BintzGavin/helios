@@ -7,6 +7,7 @@ const videoAddSpy = vi.fn().mockResolvedValue(undefined);
 const audioAddSpy = vi.fn().mockResolvedValue(undefined);
 const outputStartSpy = vi.fn().mockResolvedValue(undefined);
 const outputFinalizeSpy = vi.fn().mockResolvedValue(undefined);
+const videoSampleSources: any[] = [];
 
 // Mock Mediabunny
 vi.mock('mediabunny', () => {
@@ -24,7 +25,9 @@ vi.mock('mediabunny', () => {
         Mp4OutputFormat: class {},
         WebMOutputFormat: class {},
         VideoSampleSource: class {
-            constructor(public config: any) {}
+            constructor(public config: any) {
+                videoSampleSources.push(this);
+            }
             add = videoAddSpy;
         },
         AudioSampleSource: class {
@@ -125,6 +128,7 @@ describe('ClientSideExporter', () => {
     beforeEach(() => {
         vi.clearAllMocks();
         gainNodes.length = 0;
+        videoSampleSources.length = 0;
 
         mockController = {
             play: vi.fn(),
@@ -328,5 +332,25 @@ describe('ClientSideExporter', () => {
         expect(mockAnchor.download).toBe('test.srt');
         expect(mockAnchor.click).toHaveBeenCalled();
         expect(URL.revokeObjectURL).toHaveBeenCalled();
+    });
+
+    it('should respect custom bitrate configuration', async () => {
+        const onProgress = vi.fn();
+        const signal = new AbortController().signal;
+
+        await exporter.export({ onProgress, signal, mode: 'canvas', bitrate: 8_000_000 });
+
+        expect(videoSampleSources.length).toBeGreaterThan(0);
+        expect(videoSampleSources[0].config.bitrate).toBe(8_000_000);
+    });
+
+    it('should default bitrate to 5Mbps if not provided', async () => {
+        const onProgress = vi.fn();
+        const signal = new AbortController().signal;
+
+        await exporter.export({ onProgress, signal, mode: 'canvas' });
+
+        expect(videoSampleSources.length).toBeGreaterThan(0);
+        expect(videoSampleSources[0].config.bitrate).toBe(5_000_000);
     });
 });

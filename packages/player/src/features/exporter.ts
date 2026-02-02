@@ -30,8 +30,9 @@ export class ClientSideExporter {
     includeCaptions?: boolean;
     width?: number;
     height?: number;
+    bitrate?: number;
   }): Promise<void> {
-    const { onProgress, signal, mode = 'auto', canvasSelector = 'canvas', format = 'mp4', includeCaptions = true, width: targetWidth, height: targetHeight } = options;
+    const { onProgress, signal, mode = 'auto', canvasSelector = 'canvas', format = 'mp4', includeCaptions = true, width: targetWidth, height: targetHeight, bitrate } = options;
 
     console.log(`Client-side rendering started! Format: ${format}`);
     this.controller.pause();
@@ -95,9 +96,7 @@ export class ClientSideExporter {
       // 4. Setup Video Track
       const videoConfig: VideoEncodingConfig = {
           codec: format === 'webm' ? 'vp9' : 'avc',
-          bitrate: 5_000_000,
-          width,
-          height
+          bitrate: bitrate ?? 5_000_000
       };
 
       const videoSource = new VideoSampleSource(videoConfig);

@@ -56,6 +56,7 @@ The component observes the following attributes:
 - `export-caption-mode`: Mode for caption export (`burn-in` or `file`).
 - `export-width`: Target width for client-side export (overrides player size).
 - `export-height`: Target height for client-side export (overrides player size).
+- `export-bitrate`: Bitrate for client-side export in bits per second (default: 5Mbps).
 - `input-props`: JSON string of properties to pass to the composition.
 - `controlslist`: Space-separated tokens to customize UI (`nodownload`, `nofullscreen`).
 - `crossorigin`: CORS setting for the element (`anonymous`, `use-credentials`).
