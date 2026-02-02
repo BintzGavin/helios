@@ -17,3 +17,7 @@
 ## [0.72.0] - Dependency Version Skew
 **Learning:** `packages/renderer` depended on strict `3.9.0` of Core, while Core was `3.9.1`, causing `npm install` to fail. Also, `examples/agent-promo-3d` has a broken import path `../../packages/core` instead of `../../../packages/core`.
 **Action:** Always verify workspace dependencies and example paths before starting implementation.
+
+## [0.77.0] - Command Palette Pattern
+**Learning:** Expanding the "Composition Switcher" into a full "Command Palette" (Omnibar) is a high-value pattern for Developer Tools. It allows unified access to commands, navigation, and assets, reducing UI clutter and improving "Agent Experience" by making capabilities discoverable via text search.
+**Action:** When designing complex IDE-like interfaces, prioritize centralized command access over scattered buttons.
