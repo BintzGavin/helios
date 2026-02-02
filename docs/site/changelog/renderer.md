@@ -5,6 +5,39 @@ description: "Changelog for the Renderer package"
 
 # Renderer Changelog
 
+## v1.57.3
+- **Enable Looping Media Verification**: Updated `packages/renderer/package.json` to depend on `@helios-project/core` version `5.1.1` (matching local workspace), allowing `verify-video-loop.ts` to run and confirm correct looping media implementation in `SeekTimeDriver` and `CdpTimeDriver`.
+
+## v1.57.2
+- **Sync Core Dependency**: Updated `packages/renderer` dependency on `@helios-project/core` to `5.1.0` to match the local workspace, resolving build failures and enabling verification of GSAP timeline synchronization.
+
+## v1.57.1
+- **Verify Looping Media**: Enabled regression test `verify-video-loop.ts` in `run-all.ts` and updated dependencies to resolve environment issues, confirming correct looping behavior in both SeekTimeDriver and CdpTimeDriver.
+
+## v1.57.0
+- **Enable Looping Media**: Updated SeekTimeDriver and CdpTimeDriver to implement modulo arithmetic for `currentTime` when the `loop` attribute is present, ensuring correct looping behavior during rendering.
+
+## v1.56.5
+- **Update Verification Suite**: Updated `verify-ffmpeg-path.ts` to be self-contained and robust, and verified that `verify-cancellation.ts`, `verify-trace.ts`, and `verify-ffmpeg-path.ts` pass and are included in the main test runner.
+
+## v1.56.4
+- **Restore Environment**: Restored missing node_modules and verified full test suite passes.
+
+## v1.56.3
+- **Update Verification Suite**: Refactored `verify-cancellation.ts` and `verify-trace.ts` to be self-contained and added them (along with `verify-ffmpeg-path.ts`) to `run-all.ts`, ensuring continuous regression testing for these features.
+
+## v1.56.2
+- **Revive Verification Suite**: Updated `run-all.ts` to include 5 orphaned verification scripts (`verify-blob-audio`, `verify-dom-audio-fades`, `verify-enhanced-dom-preload`, `verify-frame-count`, `verify-shadow-dom-images`), enabling full verification coverage. Also fixed `tests/verify-bitrate.ts` and updated workspace dependency versions.
+
+## v1.56.1
+- **Sync Core Dependency**: Updated `packages/renderer/package.json` to depend on `@helios-project/core` version `3.9.2` (matching the workspace), ensuring compatibility. Also fixed `tests/verify-canvas-strategy.ts` to correctly inject a canvas element.
+
+## v1.56.0
+- **Fix CDP Hang**: Swapped initialization order in `Renderer` to call `strategy.prepare` before `timeDriver.prepare`, ensuring `DomScanner` can discover and load media assets before the CDP `TimeDriver` freezes the virtual clock.
+
+## v1.55.0
+- **Enhance Dom Preloading**: Updated `DomStrategy` to detect and preload `<video>` posters, SVG `<image>` elements, and CSS masks (`mask-image`), ensuring zero-artifact rendering for these asset types.
+
 ## v1.54.0
 - **Implement Canvas Selector**: Added `canvasSelector` to `RendererOptions` and updated `CanvasStrategy` to target specific canvas elements (e.g., `#my-canvas`), enabling support for multi-canvas compositions and layered architectures.
 

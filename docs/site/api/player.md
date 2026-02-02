@@ -39,13 +39,17 @@ A custom element that embeds a composition (via iframe) and provides a rich play
 - **`loop`** (boolean): If present, loops playback.
 - **`muted`** (boolean): If present, initializes the player in muted state.
 - **`poster`** (string): URL of an image to show before playback starts.
+- **`preload`** (string): `'auto'`, `'metadata'`, or `'none'`. Hints how much data to preload.
 - **`export-mode`** (string): `'auto'`, `'canvas'`, or `'dom'`. Determines how frames are captured for client-side export.
 - **`export-format`** (string): `'mp4'` (default) or `'webm'`. The output video format.
 - **`export-caption-mode`** (string): `'burn-in'` (default) or `'file'`. If `'file'`, exports a sidecar `.srt` file instead of burning captions into the video.
+- **`export-width`** (number): The width of the exported video (optional).
+- **`export-height`** (number): The height of the exported video (optional).
 - **`canvas-selector`** (string): CSS selector for the canvas element (required for `export-mode="canvas"`).
 - **`input-props`** (string): JSON string of input properties to pass to the composition.
 - **`sandbox`** (string): Sandbox flags for the iframe (default: `'allow-scripts allow-same-origin'`).
 - **`controlslist`** (string): Space-separated list of features to disable (e.g., `'nodownload nofullscreen'`).
+- **`disablepictureinpicture`** (boolean): If present, disables the Picture-in-Picture button.
 - **`interactive`** (boolean): If present, disables the click-layer to allow direct interaction with the iframe content.
 
 ### Standard Media API
@@ -66,18 +70,28 @@ The `<helios-player>` element implements a subset of the HTMLMediaElement API, a
 - **`videoHeight`** (number, readonly): The height of the video in pixels.
 - **`buffered`** (TimeRanges, readonly): The buffered time ranges.
 - **`seekable`** (TimeRanges, readonly): The seekable time ranges.
+- **`played`** (TimeRanges, readonly): The played time ranges.
 - **`seeking`** (boolean, readonly): Whether the player is currently seeking.
 - **`playing`** (boolean, readonly): Whether the media is playing.
 - **`readyState`** (number, readonly): The current readiness state of the media.
 - **`networkState`** (number, readonly): The current network state of the media.
 - **`textTracks`** (TextTrackList, readonly): List of text tracks (captions).
+- **`src`** (string): The URL of the composition.
+- **`currentSrc`** (string, readonly): The current URL of the composition.
+- **`error`** (MediaError, readonly): The current error state.
+- **`defaultMuted`** (boolean): The default muted state.
+- **`defaultPlaybackRate`** (number): The default playback rate.
+- **`preservesPitch`** (boolean): Whether to preserve pitch when adjusting playback rate.
+- **`crossOrigin`** (string): The CORS setting.
 
 #### Methods
 - **`play()`**: Starts playback. Returns a Promise.
 - **`pause()`**: Pauses playback.
+- **`load()`**: Reloads the media resource.
+- **`canPlayType(type)`**: Returns whether the user agent can play the specified media type.
 - **`addTextTrack(kind, label, language)`**: Adds a new text track to the player.
-- **`seekToMarker(id)`**: Seeks to the marker with the specified ID.
 - **`requestPictureInPicture()`**: Requests Picture-in-Picture mode for the video. Returns a Promise resolving to the PiP Window.
+- **`getSchema()`**: Returns the input schema of the composition (if connected).
 
 ### Visual Markers
 
@@ -109,7 +123,9 @@ if (controller) {
     format: 'mp4',
     mode: 'auto',
     onProgress: (p) => console.log(p),
-    includeCaptions: true
+    includeCaptions: true,
+    width: 1920, // Optional override
+    height: 1080 // Optional override
   });
 }
 ```
@@ -147,5 +163,9 @@ if (controller) {
   // Audio Track Control
   controller.setAudioTrackVolume('my-music-track', 0.5);
   controller.setAudioTrackMuted('my-sfx-track', true);
+
+  // Diagnostics
+  const report = await controller.diagnose();
+  console.log(report);
 }
 ```

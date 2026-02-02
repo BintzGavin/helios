@@ -1,5 +1,14 @@
 # DOCS Progress Log
 
+## DOCS v1.7.0
+- ✅ Completed: Daily Documentation Review
+  - Updated API documentation for Core (Captions, AudioTrackMetadata), Player (Standard Media API), Renderer (Browser Config)
+  - Synced changelog entries for all packages (v5.1.2 Core, v0.57.1 Player, v1.57.3 Renderer, v0.80.2 Studio, v1.85.0 Demo)
+  - Created "Working with Captions" guide
+  - Created aggregated example pages for Captions, SolidJS, and Svelte
+  - Updated Studio guide with Omnibar, Assistant, and Persistent Preferences
+  - Updated navigation structure in `mint.json`
+
 ## DOCS v1.6.0
 - ✅ Completed: Daily Documentation Review
   - Updated API documentation for Core (Audio Tracks), Player (PiP), Renderer (Canvas Selector)

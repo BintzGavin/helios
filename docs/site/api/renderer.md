@@ -28,7 +28,7 @@ const options: RendererOptions = {
   pixelFormat: 'yuv420p',
 
   // Audio
-  audioFilePath: './audio.mp3',
+  audioFilePath: './audio.mp3', // Supports local paths and blob: URLs
   audioCodec: 'aac', // 'aac', 'libvorbis', etc.
   audioBitrate: '192k',
   audioTracks: ['./voiceover.mp3', './music.mp3'], // For mixing multiple tracks
@@ -46,7 +46,13 @@ const options: RendererOptions = {
   // Canvas Targeting
   canvasSelector: '#my-canvas', // Optional: Select a specific canvas element
 
-  ffmpegPath: '/path/to/ffmpeg' // Optional
+  ffmpegPath: '/path/to/ffmpeg', // Optional
+
+  // Browser Configuration
+  browserConfig: {
+      headless: true,
+      args: ['--no-sandbox'] // Custom Playwright launch arguments
+  }
 };
 
 const renderer = new Renderer(options);
@@ -78,7 +84,9 @@ await renderer.render(
 
 The renderer uses different strategies based on `mode`:
 
-- **`canvas`**: Uses `CdpTimeDriver` (Chrome DevTools Protocol) and `CanvasStrategy`. Captures frames via WebCodecs (supports H.264 stream copy) or Screenshot. Best for Canvas/WebGL.
+- **`canvas`**: Uses `CdpTimeDriver` (Chrome DevTools Protocol) and `CanvasStrategy`. Captures frames via WebCodecs or Screenshot. Best for Canvas/WebGL.
+    - **H.264 Support**: By default, `CanvasStrategy` prioritizes H.264 (`avc1`) intermediate capture for performance.
+    - **Stream Copy**: If `videoCodec: 'copy'` is used, the renderer performs a lossless stream copy from the WebCodecs output to the container, bypassing re-encoding.
 - **`dom`**: Uses `SeekTimeDriver` and `DomStrategy`. Captures frames by taking screenshots of the DOM. Supports CSS animations, font loading, image preloading, and `startFrame`.
 
 ### Diagnostics

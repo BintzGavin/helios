@@ -1,22 +1,19 @@
 ---
-title: "Three.js Example"
-description: "Using Helios with Three.js"
+title: "Three.js Examples"
+description: "Using Helios with Three.js across different frameworks"
 ---
 
-# Three.js Example
+# Three.js Examples
 
-The `threejs-canvas-animation` example shows how to drive a 3D scene using Helios.
+Driving a 3D scene with Helios ensures deterministic rendering and frame-perfect synchronization. Instead of using Three.js's internal `Clock` or `requestAnimationFrame` loop directly, you let Helios drive the rendering.
 
-## Concept
+## Core Concept (Vanilla)
 
-Instead of using Three.js's internal `Clock` or `requestAnimationFrame` loop directly, you let Helios drive the rendering.
-
-### Implementation
+Location: `examples/threejs-canvas-animation`
 
 1.  **Scene Setup**: Create Scene, Camera, Renderer.
-2.  **Disable Auto-Clear**: (Optional, depending on usage).
-3.  **Render Loop**: Instead of a self-driving loop, create a function `render(time)` that updates object positions based on time and calls `renderer.render()`.
-4.  **Subscribe**: Call your `render` function inside the Helios subscription.
+2.  **Render Loop**: Instead of a self-driving loop, create a function `render(time)` that updates object positions based on time and calls `renderer.render()`.
+3.  **Subscribe**: Call your `render` function inside the Helios subscription.
 
 ```javascript
 import { Helios } from '@helios-project/core';
@@ -38,3 +35,44 @@ helios.subscribe((state) => {
   renderer.render(scene, camera);
 });
 ```
+
+## React Three Fiber
+
+Location: `examples/react-three-fiber`
+
+In R3F, you disable the internal loop using `frameloop="never"` and manually advance the state in the Helios subscription.
+
+```jsx
+<Canvas frameloop="never">
+  <MyScene />
+</Canvas>
+
+// In a component or hook
+useFrame((state) => {
+   // Manual update logic if needed
+});
+
+helios.subscribe((state) => {
+   const time = state.currentFrame / state.fps;
+   // Update R3F state or Three.js objects directly
+   threeState.advance(time); // Or similar manual advancement
+});
+```
+
+## Solid Three.js
+
+Location: `examples/solid-threejs-canvas-animation`
+
+Solid signals drive the updates efficiently. Since Solid doesn't have a heavy VDOM, you can often update Three.js properties directly inside `createEffect`.
+
+## Svelte Three.js
+
+Location: `examples/svelte-threejs-canvas-animation`
+
+Svelte's reactivity (`$effect` or `$:`) updates the scene.
+
+## Vue Three.js
+
+Location: `examples/vue-threejs-canvas-animation`
+
+Uses Vue's `watchEffect` or simple refs to drive the animation.

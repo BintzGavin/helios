@@ -5,6 +5,30 @@ description: "Changelog for the Player package"
 
 # Player Changelog
 
+## v0.57.1
+- **Fix Test Environment & Sync Version**: Updated package version to match status file, installed missing dependencies, and verified all tests pass (including Shadow DOM export).
+
+## v0.57.0
+- **Configurable Export Resolution**: Implemented `export-width` and `export-height` attributes to allow specifying target resolution for client-side exports, enabling high-quality DOM exports independent of player size.
+
+## v0.56.2
+- **Fix Core Dependency**: Updated `packages/player/package.json` to depend on `@helios-project/core@^5.0.1` to resolve version mismatch and fix the build.
+
+## v0.56.0
+- **Expose Diagnostics**: Implemented `diagnose()` method in `HeliosController` (Direct and Bridge) to expose environment capabilities (WebCodecs, etc.) to the host.
+
+## v0.55.0
+- **Shadow DOM Export**: Implemented `cloneWithShadow` and recursive asset inlining to support capturing content inside Shadow DOM (Web Components) during client-side export.
+
+## v0.54.0
+- **Audio Fades**: Implemented audio fade-in and fade-out support in client-side exporter via `data-helios-fade-in` and `data-helios-fade-out` attributes.
+
+## v0.53.0
+- **Smart Controls**: Implemented 'disablepictureinpicture' attribute and auto-hiding CC button/auto-enabling default tracks.
+
+## v0.52.0
+- **WebVTT Support**: Implemented `caption-parser` to support standard WebVTT captions alongside SRT, enabling broader compatibility with caption file formats.
+
 ## v0.51.0
 - **Expose Audio Track IDs**: Updated `getAudioAssets` to populate `id` from `data-helios-track-id`, standard `id`, or fallback index, enabling robust track identification.
 
