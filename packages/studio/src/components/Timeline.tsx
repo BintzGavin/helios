@@ -26,7 +26,7 @@ export const Timeline: React.FC = () => {
   const totalFrames = duration * fps || 100;
   const captions = playerState.captions || [];
   const markers = playerState.markers || [];
-  const audioTracks = playerState.audioTracks || [];
+  const audioTracks = playerState.availableAudioTracks || [];
 
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);

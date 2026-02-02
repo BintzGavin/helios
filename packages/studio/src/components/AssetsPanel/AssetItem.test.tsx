@@ -4,6 +4,11 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { AssetItem } from './AssetItem';
 import { Asset } from '../../context/StudioContext';
 
+// Mock useToast
+vi.mock('../../context/ToastContext', () => ({
+  useToast: () => ({ addToast: vi.fn() })
+}));
+
 // Mock useStudio
 const mockDeleteAsset = vi.fn();
 const mockRenameAsset = vi.fn(() => Promise.resolve());

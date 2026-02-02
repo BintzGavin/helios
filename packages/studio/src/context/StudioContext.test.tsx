@@ -3,6 +3,12 @@ import { render, act, waitFor } from '@testing-library/react';
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { StudioProvider, useStudio } from './StudioContext';
 
+// Mock ToastContext
+vi.mock('./ToastContext', () => ({
+  useToast: () => ({ addToast: vi.fn() }),
+  ToastProvider: ({ children }: any) => <div>{children}</div>
+}));
+
 // Mock Component to consume context and trigger snapshot
 const TestComponent = ({ onReady }: { onReady: (context: any) => void }) => {
   const context = useStudio();

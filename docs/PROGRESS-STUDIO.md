@@ -1,3 +1,6 @@
+## STUDIO v0.81.0
+- ✅ Completed: Timeline Audio Visualization - Implemented visualization of audio tracks on the timeline using `availableAudioTracks` metadata, separating it from runtime state.
+
 ## STUDIO v0.80.2
 - ✅ Completed: Test Coverage - Added unit tests for Toast notification system (ToastItem, ToastContext, ToastContainer) and verified with mocked environment.
 

@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { type HeliosController, ClientSideExporter } from '@helios-project/player';
-import type { HeliosSchema, CaptionCue, Marker } from '@helios-project/core';
+import type { HeliosSchema, CaptionCue, Marker, AudioTrackMetadata } from '@helios-project/core';
 import { useToast } from './ToastContext';
 
 export interface CompositionMetadata {
@@ -46,12 +46,6 @@ export interface RenderJob {
   outPoint?: number;
 }
 
-export interface AudioTrackMetadata {
-  id: string;
-  startTime: number;
-  duration: number;
-}
-
 export interface PlayerState {
   currentFrame: number;
   duration: number;
@@ -64,7 +58,8 @@ export interface PlayerState {
   schema?: HeliosSchema;
   captions: CaptionCue[];
   markers: Marker[];
-  audioTracks: AudioTrackMetadata[];
+  audioTracks: Record<string, { volume: number; muted: boolean }>;
+  availableAudioTracks: AudioTrackMetadata[];
 }
 
 const DEFAULT_PLAYER_STATE: PlayerState = {
@@ -79,7 +74,8 @@ const DEFAULT_PLAYER_STATE: PlayerState = {
   schema: undefined,
   captions: [],
   markers: [],
-  audioTracks: []
+  audioTracks: {},
+  availableAudioTracks: []
 };
 
 interface StudioContextType {

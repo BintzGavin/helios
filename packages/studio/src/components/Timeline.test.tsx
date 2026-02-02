@@ -21,6 +21,8 @@ describe('Timeline', () => {
     playbackRate: 1,
     isPlaying: false,
     inputProps: {},
+    availableAudioTracks: [],
+    audioTracks: {},
   };
 
   const defaultContext = {
@@ -153,5 +155,31 @@ describe('Timeline', () => {
 
     expect(event.stopPropagation).toHaveBeenCalled();
     expect(mockSeek).toHaveBeenCalledWith(150); // 5s * 30fps = 150
+  });
+
+  it('renders audio tracks from playerState.availableAudioTracks', () => {
+    const availableAudioTracks = [
+      { id: 'track1', startTime: 2, duration: 4 }, // Start 2s, End 6s
+      { id: 'track2', startTime: 8, duration: 1 }  // Start 8s, End 9s
+    ];
+
+    (StudioContext.useStudio as any).mockReturnValue({
+      ...defaultContext,
+      playerState: { ...defaultPlayerState, availableAudioTracks }
+    });
+
+    const { container } = render(<Timeline />);
+    const tracks = container.querySelectorAll('.timeline-audio-track');
+
+    expect(tracks).toHaveLength(2);
+    expect(tracks[0]).toHaveAttribute('title', 'Audio: track1');
+    expect(tracks[1]).toHaveAttribute('title', 'Audio: track2');
+
+    // Verify positioning (roughly)
+    // Total frames = 300 (10s)
+    // Track 1: Start 2s (60f) -> 20%. Duration 4s (120f) -> 40%.
+    const style1 = tracks[0].getAttribute('style');
+    expect(style1).toContain('left: 20%');
+    expect(style1).toContain('width: 40%');
   });
 });
