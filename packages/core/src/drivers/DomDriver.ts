@@ -16,15 +16,23 @@ export class DomDriver implements TimeDriver {
   private discoveredTracks = new Map<string, AudioTrackMetadata>();
   private metadataSubscribers = new Set<(meta: DriverMetadata) => void>();
 
-  init(scope: HTMLElement | Document) {
-    this.scope = scope;
-    this.mediaElements.clear();
-    this.scopes.clear();
-    this.observers.clear();
-    this.discoveredTracks.clear();
+  init(scope: unknown) {
+    // Allow HTMLElement/Document (Browser) or objects with getAnimations/querySelectorAll (Mocks/Tests)
+    const isDom = typeof HTMLElement !== 'undefined' && (scope instanceof HTMLElement || scope instanceof Document);
+    const isMock = scope && (typeof (scope as any).getAnimations === 'function' || typeof (scope as any).querySelectorAll === 'function');
 
-    this.addScope(scope);
-    this.scanAndAdd(scope);
+    if (isDom || isMock) {
+      this.scope = scope as HTMLElement | Document;
+      this.mediaElements.clear();
+      this.scopes.clear();
+      this.observers.clear();
+      this.discoveredTracks.clear();
+
+      this.addScope(this.scope);
+      this.scanAndAdd(this.scope);
+    } else if (scope) {
+      console.warn('DomDriver initialized with invalid scope', scope);
+    }
   }
 
   subscribeToMetadata(callback: (meta: DriverMetadata) => void): () => void {

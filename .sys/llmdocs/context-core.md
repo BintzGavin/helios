@@ -47,6 +47,7 @@ packages/core/src/
 ├── signals.ts
 ├── subscription-timing.test.ts
 ├── time-control.ts
+├── worker-runtime.test.ts
 ├── timecode.ts
 └── transitions.ts
 ```
@@ -101,7 +102,7 @@ export interface HeliosOptions<TInputProps = Record<string, any>> {
   loop?: boolean;
   playbackRange?: [number, number];
   autoSyncAnimations?: boolean;
-  animationScope?: HTMLElement;
+  animationScope?: unknown;
   inputProps?: TInputProps;
   schema?: HeliosSchema;
   playbackRate?: number;

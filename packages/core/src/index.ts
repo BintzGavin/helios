@@ -15,4 +15,4 @@ export * from './ai.js';
 export * from './Helios.js';
 export * from './render-session.js';
 
-export const VERSION = '4.1.0';
+export const VERSION = '5.0.1';
