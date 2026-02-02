@@ -27,6 +27,7 @@ The `examples/` directory contains reference implementations for various framewo
 - **react-captions-animation**: React integration with Helios SRT captions.
 - **react-css-animation**: React with CSS animations.
 - **react-dom-animation**: Basic React + DOM example.
+- **react-podcast-visualizer**: React audio visualization with `data-helios-offset` sync.
 - **react-styled-components**: React with Styled Components.
 - **react-three-fiber**: Integration with React Three Fiber (R3F).
 - **react-transitions**: React transition group integration.

@@ -162,3 +162,6 @@ Each agent should update **their own dedicated progress file** instead of this f
 
 ## CORE v5.0.0
 - ✅ Completed: Implement Audio Track Metadata - Updated `availableAudioTracks` signal to return `AudioTrackMetadata[]` instead of `string[]` (Breaking Change), including `startTime` and `duration` discovery.
+
+## DEMO v1.86.0
+- ✅ Completed: React Podcast Visualizer - Created `examples/react-podcast-visualizer` demonstrating audio offset synchronization in React.
