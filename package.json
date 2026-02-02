@@ -25,6 +25,7 @@
     "dev": "npx vite ./examples/simple-canvas-animation",
     "dev:react": "vite serve examples/react-canvas-animation",
     "dev:react-dom": "vite serve examples/react-dom-animation",
+    "dev:react-lottie": "vite serve examples/react-lottie-animation",
     "dev:vue": "vite serve examples/vue-canvas-animation",
     "dev:vue-dom": "vite serve examples/vue-dom-animation",
     "dev:vue-helpers": "vite serve examples/vue-animation-helpers",

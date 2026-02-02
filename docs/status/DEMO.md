@@ -1,6 +1,6 @@
 # Status: DEMO Domain
 
-**Version**: 1.87.0
+**Version**: 1.88.0
 
 ## Vision
 The DEMO domain is responsible for:
@@ -15,6 +15,7 @@ The DEMO domain is responsible for:
 - None
 
 ## Completed Tasks
+- [v1.88.0] ✅ Completed: React Lottie Animation - Created `examples/react-lottie-animation` demonstrating Lottie integration with React and Helios, using `lottie-web` and `useVideoFrame` hook for frame-precise control.
 - [v1.87.1] ✅ Completed: React Audio Visualization - Created `examples/react-audio-visualization` demonstrating real-time audio analysis (RMS, waveforms) using synthesized `AudioBuffer` and React Hooks.
 - [v1.87.0] ✅ Completed: Fix GSAP Sync - Fixed synchronization issue in `examples/promo-video` using `helios.registerStabilityCheck` and enhanced `tests/e2e/verify-render.ts` with custom duration/brightness checks. Confirmed E2E pass with YMAX=192.
 - [v1.86.1] ✅ Verified: Vanilla Transitions - Verified build and E2E tests for the existing implementation to ensure stability.
