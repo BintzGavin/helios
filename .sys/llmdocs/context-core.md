@@ -101,6 +101,7 @@ export interface HeliosOptions<TInputProps = Record<string, any>> {
   playbackRate?: number;
   volume?: number;
   muted?: boolean;
+  availableAudioTracks?: AudioTrackMetadata[];
   captions?: string | CaptionCue[];
   markers?: Marker[];
   driver?: TimeDriver;
@@ -181,6 +182,7 @@ export class Helios<TInputProps = Record<string, any>> {
   public setAudioMuted(muted: boolean): void;
   public setAudioTrackVolume(trackId: string, volume: number): void;
   public setAudioTrackMuted(trackId: string, muted: boolean): void;
+  public setAvailableAudioTracks(tracks: AudioTrackMetadata[]): void;
   public setCaptions(captions: string | CaptionCue[]): void;
   public setMarkers(markers: Marker[]): void;
   public addMarker(marker: Marker): void;

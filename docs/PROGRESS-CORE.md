@@ -1,5 +1,8 @@
 # CORE Progress Log
 
+## CORE v5.4.0
+- ✅ Completed: Headless Audio Tracks - Added `availableAudioTracks` option to `HeliosOptions` and `setAvailableAudioTracks` method, enabling manual injection of audio metadata for headless environments.
+
 ## CORE v5.3.0
 - ✅ Completed: Expose Audio Source - Updated `AudioTrackMetadata` to include `src` property, populated by `DomDriver` from `currentSrc` or `src` attribute, enabling access to audio source URLs in metadata.
 
