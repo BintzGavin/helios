@@ -21,3 +21,7 @@
 ## [0.77.0] - Command Palette Pattern
 **Learning:** Expanding the "Composition Switcher" into a full "Command Palette" (Omnibar) is a high-value pattern for Developer Tools. It allows unified access to commands, navigation, and assets, reducing UI clutter and improving "Agent Experience" by making capabilities discoverable via text search.
 **Action:** When designing complex IDE-like interfaces, prioritize centralized command access over scattered buttons.
+
+## [0.79.0] - Type Sharing Constraints
+**Learning:** `packages/player` does not export `AudioAsset`, forcing duplication or manual type definition in Studio. Since planners cannot modify other packages, we must accept this duplication in `packages/studio/src/types.ts` as a necessary compromise.
+**Action:** When integrating with internal packages that lack public exports, prefer creating a local `types.ts` to contain the duplicated types rather than using brittle import paths.
