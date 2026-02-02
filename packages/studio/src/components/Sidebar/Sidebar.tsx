@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useStudio } from '../../context/StudioContext';
+import { usePersistentState } from '../../hooks/usePersistentState';
 import './Sidebar.css';
 import { AssetsPanel } from '../AssetsPanel/AssetsPanel';
 import { RendersPanel } from '../RendersPanel/RendersPanel';
@@ -9,7 +10,7 @@ import { AudioMixerPanel } from '../AudioMixerPanel/AudioMixerPanel';
 
 export const Sidebar: React.FC = () => {
   const { setHelpOpen, setDiagnosticsOpen, setAssistantOpen } = useStudio();
-  const [activeTab, setActiveTab] = useState<'compositions' | 'assets' | 'renders' | 'captions' | 'audio'>('compositions');
+  const [activeTab, setActiveTab] = usePersistentState<'compositions' | 'assets' | 'renders' | 'captions' | 'audio'>('sidebar-active-tab', 'compositions');
 
   return (
     <div className="studio-sidebar">

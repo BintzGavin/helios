@@ -52,6 +52,7 @@ packages/studio/
 │   ├── context/         # React Context (StudioContext)
 │   ├── data/            # Static Data (AI Context)
 │   ├── hooks/           # Custom Hooks
+│   │   └── usePersistentState.ts # localStorage Persistence Hook
 │   ├── server/          # Backend Logic
 │   │   ├── discovery.ts      # Composition & Asset Discovery
 │   │   ├── documentation.ts  # Documentation Search & Resolution
@@ -103,8 +104,9 @@ npx @helios-project/studio
 
 ## D. UI Components
 
--   **Stage**: Wraps `<helios-player>` and provides canvas controls (Zoom, Pan, Safe Areas).
--   **Timeline**: Visualizes playback progress, markers, and captions. Supports seeking and scrubbing.
+-   **Persistence**: Uses `usePersistentState` to remember UI settings (Sidebar Tab, Stage Zoom/Pan, Timeline Zoom, Active Composition) across reloads.
+-   **Stage**: Wraps `<helios-player>` and provides canvas controls (Zoom, Pan, Safe Areas). Settings are persisted.
+-   **Timeline**: Visualizes playback progress, markers, and captions. Supports seeking and scrubbing. Zoom level is persisted.
 -   **Props Editor**: auto-generated form based on the composition's `HeliosSchema`.
     -   Supports primitives (string, number, boolean) with constraints (min/max/step, minLength/maxLength/pattern).
     -   Supports assets (image, video, audio) with type and extension filtering.

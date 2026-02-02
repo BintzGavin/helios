@@ -1,5 +1,6 @@
 import React, { useRef, useState, useEffect, useMemo } from 'react';
 import { useStudio } from '../context/StudioContext';
+import { usePersistentState } from '../hooks/usePersistentState';
 import { framesToTimecode } from '@helios-project/core';
 import { TimecodeDisplay } from './Controls/TimecodeDisplay';
 import './Timeline.css';
@@ -30,7 +31,7 @@ export const Timeline: React.FC = () => {
   const contentRef = useRef<HTMLDivElement>(null);
 
   const [isDragging, setIsDragging] = useState<'playhead' | 'in' | 'out' | null>(null);
-  const [zoom, setZoom] = useState(0);
+  const [zoom, setZoom] = usePersistentState('timeline-zoom', 0);
   const [hoverFrame, setHoverFrame] = useState<number | null>(null);
   const [contentWidth, setContentWidth] = useState(0);
 
