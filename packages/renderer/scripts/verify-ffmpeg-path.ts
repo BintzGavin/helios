@@ -1,12 +1,13 @@
 import { Renderer } from '../src/index';
 import * as path from 'path';
 import * as fs from 'fs/promises';
+import { existsSync, rmSync } from 'fs';
 import ffmpeg from '@ffmpeg-installer/ffmpeg';
 
 async function main() {
   console.log('Starting FFmpeg path verification script...');
 
-  const outputDir = path.resolve(process.cwd(), 'output/verify-ffmpeg');
+  const outputDir = path.resolve(__dirname, '../output/verify-ffmpeg');
   await fs.mkdir(outputDir, { recursive: true });
 
   const compositionPath = path.resolve(outputDir, 'composition.html');
@@ -56,10 +57,12 @@ async function main() {
         console.log('✅ Passed: Render failed as expected with invalid path.');
       } else {
         console.error('❌ Failed: Expected ENOENT/spawn error for invalid path, got:', capturedError);
+        cleanup(outputDir);
         process.exit(1);
       }
   } else {
       console.error('❌ Failed: No error was caught!');
+      cleanup(outputDir);
       process.exit(1);
   }
 
@@ -80,10 +83,25 @@ async function main() {
     console.log('✅ Passed: Render succeeded with valid explicit path.');
   } catch (error) {
     console.error('❌ Failed: Valid path render failed:', error);
+    cleanup(outputDir);
     process.exit(1);
   }
 
   console.log('\n🎉 Verification successful!');
+  cleanup(outputDir);
 }
 
-main().catch(err => console.error('Unhandled script error:', err));
+function cleanup(dir: string) {
+    try {
+        if (existsSync(dir)) {
+            rmSync(dir, { recursive: true, force: true });
+        }
+    } catch (e) {
+        console.warn('Cleanup failed:', e);
+    }
+}
+
+main().catch(err => {
+  console.error('Unhandled script error:', err);
+  process.exit(1);
+});
