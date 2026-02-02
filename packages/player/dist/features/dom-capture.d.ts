@@ -1,1 +1,4 @@
-export declare function captureDomToBitmap(element: HTMLElement): Promise<ImageBitmap>;
+export declare function captureDomToBitmap(element: HTMLElement, options?: {
+    targetWidth?: number;
+    targetHeight?: number;
+}): Promise<ImageBitmap>;

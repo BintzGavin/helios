@@ -121,7 +121,7 @@ export function connectToParent(helios) {
     });
 }
 async function handleCaptureFrame(helios, data) {
-    const { frame, selector, mode } = data;
+    const { frame, selector, mode, width, height } = data;
     // 1. Seek
     helios.seek(frame);
     // 2. Wait for render (double RAF to be safe and ensure paint)
@@ -131,7 +131,7 @@ async function handleCaptureFrame(helios, data) {
     // 3. DOM Mode
     if (mode === 'dom') {
         try {
-            const bitmap = await captureDomToBitmap(document.body);
+            const bitmap = await captureDomToBitmap(document.body, { targetWidth: width, targetHeight: height });
             window.parent.postMessage({
                 type: 'HELIOS_FRAME_DATA',
                 frame,

@@ -197,5 +197,8 @@ Each agent should update **their own dedicated progress file** instead of this f
   - Created `examples/vanilla/SKILL.md` for framework-less integration
   - Verified Svelte 5 patterns in `examples/svelte/SKILL.md`
 
+### PLAYER v0.59.0
+- ✅ Completed: Implement Diagnostics UI Overlay - Implemented a visible Diagnostics UI overlay in `<helios-player>` toggled via `Shift+D`, and exposed `diagnose()` as a public method.
+
 ### PLAYER v0.58.0
 - ✅ Completed: Configurable Export Bitrate - Implemented `export-bitrate` attribute to control client-side export quality.
