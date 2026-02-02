@@ -1,4 +1,4 @@
-**Version**: v0.59.0
+**Version**: v0.59.1
 
 # Status: PLAYER
 
@@ -52,6 +52,7 @@
 ## Critical Task
 - **None**: All critical tasks completed.
 
+[v0.59.1] ✅ Completed: Documentation Update - Added missing export attributes, audio fades, and diagnostics API to README.
 [v0.59.0] ✅ Completed: Implement Diagnostics UI Overlay - Implemented a visible Diagnostics UI overlay in `<helios-player>` toggled via `Shift+D`, and exposed `diagnose()` as a public method.
 [v0.58.0] ✅ Completed: Configurable Export Bitrate - Implemented `export-bitrate` attribute to control client-side export quality.
 [v0.57.1] ✅ Completed: Fix Test Environment & Sync Version - Updated package version to match status file, installed missing dependencies, and verified all tests pass (including Shadow DOM export).

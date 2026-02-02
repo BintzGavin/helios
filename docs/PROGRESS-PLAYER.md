@@ -1,3 +1,21 @@
+## PLAYER v0.59.1
+- ✅ Completed: Documentation Update - Added missing export attributes, audio fades, and diagnostics API to README.
+
+## PLAYER v0.59.0
+- ✅ Completed: Implement Diagnostics UI Overlay - Implemented a visible Diagnostics UI overlay in `<helios-player>` toggled via `Shift+D`, and exposed `diagnose()` as a public method.
+
+## PLAYER v0.58.0
+- ✅ Completed: Configurable Export Bitrate - Implemented `export-bitrate` attribute to control client-side export quality.
+
+## PLAYER v0.57.1
+- ✅ Completed: Fix Test Environment & Sync Version - Updated package version to match status file, installed missing dependencies, and verified all tests pass (including Shadow DOM export).
+
+## PLAYER v0.57.0
+- ✅ Completed: Configurable Export Resolution - Implemented `export-width` and `export-height` attributes to allow specifying target resolution for client-side exports, enabling high-quality DOM exports independent of player size.
+
+## PLAYER v0.56.2
+- ✅ Completed: Fix Core Dependency - Updated `packages/player/package.json` to depend on `@helios-project/core@^5.0.1` to resolve version mismatch and fix the build.
+
 ## PLAYER v0.56.1
 - ✅ Verified: Synced package.json version with status file.
 

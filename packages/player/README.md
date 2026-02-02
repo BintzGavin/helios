@@ -67,6 +67,11 @@ The player will automatically attempt to access `window.helios` on the iframe's 
 | `interactive` | Enable direct interaction with the composition (disables click-to-pause). | `false` |
 | `controlslist` | Space-separated list of features to disable: `nodownload`, `nofullscreen`. | - |
 | `sandbox` | Security flags for the iframe. | `allow-scripts allow-same-origin` |
+| `export-width` | Target width for client-side export. | - |
+| `export-height` | Target height for client-side export. | - |
+| `export-bitrate` | Target bitrate for client-side export (bps). | - |
+| `export-caption-mode` | Strategy for caption export: `burn-in` or `file`. | `burn-in` |
+| `disablepictureinpicture` | Hides the Picture-in-Picture button. | `false` |
 
 ## CSS Variables
 
@@ -90,6 +95,7 @@ The `<helios-player>` element implements a subset of the HTMLMediaElement interf
 - `pause(): void` - Pauses playback.
 - `load(): void` - Reloads the iframe (useful if `src` changed or to retry connection).
 - `addTextTrack(kind: string, label?: string, language?: string): TextTrack` - Adds a new text track to the media element.
+- `diagnose(): Promise<DiagnosticReport>` - Runs environment diagnostics (WebCodecs, WebGL) and returns a report.
 
 ### Properties
 
@@ -145,4 +151,12 @@ Configuration:
   export-mode="dom"
   export-format="webm"
 ></helios-player>
+```
+
+### Audio Fades
+
+To apply audio fades during client-side export, add `data-helios-fade-in` and/or `data-helios-fade-out` attributes to your audio elements within the composition. The value should be the duration in seconds.
+
+```html
+<audio src="music.mp3" data-helios-fade-in="2" data-helios-fade-out="3"></audio>
 ```
