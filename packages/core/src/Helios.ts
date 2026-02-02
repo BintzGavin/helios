@@ -110,6 +110,7 @@ export class Helios<TInputProps = Record<string, any>> {
   private _height: Signal<number>;
   private _playbackRange: Signal<[number, number] | null>;
   private _currentTime: ReadonlySignal<number>;
+  private _syncVersion: Signal<number>;
   private _stabilityChecks = new Set<StabilityCheck>();
 
   private _disposeActiveCaptionsEffect: () => void;
@@ -469,6 +470,7 @@ export class Helios<TInputProps = Record<string, any>> {
     this._width = signal(width);
     this._height = signal(height);
     this._playbackRange = signal(options.playbackRange || null);
+    this._syncVersion = signal(0);
 
     this._currentTime = computed(() => this._currentFrame.value / this._fps.value);
 
@@ -521,6 +523,9 @@ export class Helios<TInputProps = Record<string, any>> {
   }
 
   public getState(): Readonly<HeliosState<TInputProps>> {
+    // Read sync version to allow forced updates via dependency tracking
+    this._syncVersion.value;
+
     return {
       width: this._width.value,
       height: this._height.value,
@@ -1014,6 +1019,8 @@ export class Helios<TInputProps = Record<string, any>> {
         // Trigger initial update if value exists
         if (virtualTimeValue !== null) {
           (window as any).__HELIOS_VIRTUAL_TIME__ = virtualTimeValue;
+          // Force notification to ensure subscribers are synced even if frame matches
+          this._syncVersion.value++;
         }
       } catch (e) {
         console.warn('Failed to bind reactive virtual time. Helios will fall back to polling, which may affect synchronization accuracy.', e);

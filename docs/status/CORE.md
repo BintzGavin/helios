@@ -1,11 +1,12 @@
 # Status: CORE
 
-**Version**: 5.1.1
+**Version**: 5.1.2
 
 - **Status**: Active
 - **Current Focus**: Maintenance, Optimization, and Stability
-- **Last Updated**: 2026-07-29
+- **Last Updated**: 2026-07-30
 
+[v5.1.2] ✅ Completed: Fix GSAP Synchronization - Forced subscriber notification in `bindToDocumentTimeline` when virtual time is present to ensure initial state synchronization with external libraries like GSAP, resolving black frames in render output.
 [v5.1.1] ✅ Completed: Fix Virtual Time Synchronization - Enhanced `bindToDocumentTimeline` to robustly handle reactive binding failures (falling back to manual polling) and updated `waitUntilStable` to block until virtual time is fully synchronized, fixing race conditions in frame-by-frame rendering.
 [v5.1.0] ✅ Completed: Implement WebVTT Support - Implemented `parseWebVTT` and auto-detecting `parseCaptions` in `captions.ts`, enabling native .vtt file support.
 [v5.0.1] ✅ Completed: Decouple TimeDriver from DOM - Updated `TimeDriver` and `Helios` to accept `unknown` scope, enabling Web Worker support, and synchronized version.

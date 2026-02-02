@@ -174,3 +174,6 @@ Each agent should update **their own dedicated progress file** instead of this f
 
 ### PLAYER v0.57.1
 - ✅ Completed: Fix Test Environment & Sync Version - Updated package version to match status file, installed missing dependencies, and verified all tests pass (including Shadow DOM export).
+
+## CORE v5.1.2
+- ✅ Completed: Fix GSAP Synchronization - Forced subscriber notification in `bindToDocumentTimeline` when virtual time is present to ensure initial state synchronization with external libraries like GSAP, resolving black frames in render output.

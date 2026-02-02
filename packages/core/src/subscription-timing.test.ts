@@ -195,4 +195,21 @@ describe('Helios Subscription Timing', () => {
         delete (global as any).requestAnimationFrame;
     }
   });
+
+  it('should force subscription update on bind if virtual time is present', () => {
+    // Simulate SeekTimeDriver setting virtual time BEFORE bind
+    (window as any).__HELIOS_VIRTUAL_TIME__ = 0;
+
+    const helios = new Helios({ fps: 30, duration: 10 });
+    const frames: number[] = [];
+    helios.subscribe((state) => frames.push(state.currentFrame));
+
+    // Initial state
+    expect(frames).toEqual([0]);
+
+    helios.bindToDocumentTimeline();
+
+    // Expect forced update (duplicate 0), ensuring subscribers run and sync
+    expect(frames).toEqual([0, 0]);
+  });
 });
