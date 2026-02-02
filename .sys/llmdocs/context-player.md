@@ -54,6 +54,8 @@ The component observes the following attributes:
 - `preload`: Hint for preloading behavior (`auto`, `metadata`, `none`).
 - `export-format`: Format for client-side export (`mp4`, `webm`).
 - `export-caption-mode`: Mode for caption export (`burn-in` or `file`).
+- `export-width`: Target width for client-side export (overrides player size).
+- `export-height`: Target height for client-side export (overrides player size).
 - `input-props`: JSON string of properties to pass to the composition.
 - `controlslist`: Space-separated tokens to customize UI (`nodownload`, `nofullscreen`).
 - `crossorigin`: CORS setting for the element (`anonymous`, `use-credentials`).

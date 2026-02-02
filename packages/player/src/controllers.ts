@@ -20,7 +20,7 @@ export interface HeliosController {
   onError(callback: (err: any) => void): () => void;
   getState(): any;
   dispose(): void;
-  captureFrame(frame: number, options?: { selector?: string, mode?: 'canvas' | 'dom' }): Promise<{ frame: VideoFrame, captions: CaptionCue[] } | null>;
+  captureFrame(frame: number, options?: { selector?: string, mode?: 'canvas' | 'dom', width?: number, height?: number }): Promise<{ frame: VideoFrame, captions: CaptionCue[] } | null>;
   getAudioTracks(): Promise<AudioAsset[]>;
   getSchema(): Promise<HeliosSchema | undefined>;
   diagnose(): Promise<DiagnosticReport>;
@@ -83,7 +83,7 @@ export class DirectController implements HeliosController {
     return this.instance.schema;
   }
 
-  async captureFrame(frame: number, options?: { selector?: string, mode?: 'canvas' | 'dom' }): Promise<{ frame: VideoFrame, captions: CaptionCue[] } | null> {
+  async captureFrame(frame: number, options?: { selector?: string, mode?: 'canvas' | 'dom', width?: number, height?: number }): Promise<{ frame: VideoFrame, captions: CaptionCue[] } | null> {
       const state = this.instance.getState();
       const fps = state.fps;
       const captions = state.activeCaptions || [];
@@ -101,7 +101,7 @@ export class DirectController implements HeliosController {
       // Handle DOM mode
       if (options?.mode === 'dom') {
           try {
-             const bitmap = await captureDomToBitmap(doc.body);
+             const bitmap = await captureDomToBitmap(doc.body, { targetWidth: options?.width, targetHeight: options?.height });
              videoFrame = new VideoFrame(bitmap, { timestamp: (frame / fps) * 1_000_000 });
           } catch (e) {
              console.error("DOM capture failed:", e);
@@ -194,7 +194,7 @@ export class BridgeController implements HeliosController {
       this.errorListeners = [];
   }
 
-  async captureFrame(frame: number, options?: { selector?: string, mode?: 'canvas' | 'dom' }): Promise<{ frame: VideoFrame, captions: CaptionCue[] } | null> {
+  async captureFrame(frame: number, options?: { selector?: string, mode?: 'canvas' | 'dom', width?: number, height?: number }): Promise<{ frame: VideoFrame, captions: CaptionCue[] } | null> {
       return new Promise((resolve) => {
           const handler = (event: MessageEvent) => {
               if (event.source !== this.iframeWindow) return;
@@ -220,7 +220,9 @@ export class BridgeController implements HeliosController {
               type: 'HELIOS_CAPTURE_FRAME',
               frame,
               selector: options?.selector,
-              mode: options?.mode
+              mode: options?.mode,
+              width: options?.width,
+              height: options?.height
           }, '*');
 
           // Timeout

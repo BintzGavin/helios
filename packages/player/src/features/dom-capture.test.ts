@@ -360,4 +360,15 @@ describe('dom-capture', () => {
         expect(text).toContain('Inside Shadow');
         expect(text).toContain('.shadow-content { color: red; }');
     });
+
+    it('should respect target dimensions', async () => {
+        const options = { targetWidth: 1280, targetHeight: 720 };
+        await captureDomToBitmap(container, options);
+
+        const blob = (URL.createObjectURL as any).mock.calls[0][0] as Blob;
+        const text = await readBlob(blob);
+
+        expect(text).toContain('width="1280"');
+        expect(text).toContain('height="720"');
+    });
 });

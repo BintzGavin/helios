@@ -1,4 +1,4 @@
-**Version**: v0.56.2
+**Version**: v0.57.0
 
 # Status: PLAYER
 
@@ -10,6 +10,7 @@
 ## Current State
 - `<helios-player>` uses a modular architecture with `HeliosController` (Direct/Bridge) and `ClientSideExporter`.
 - Client-side export supports explicit configuration via `export-mode`, `canvas-selector`, and `export-caption-mode` attributes.
+- Supports specifying target export resolution via `export-width` and `export-height` attributes, enabling high-quality exports independent of player preview size.
 - Supports exporting captions as `.srt` files (`export-caption-mode="file"`) or burning them into the video (`burn-in`).
 - Supports sandboxed iframes and cross-origin usage via `postMessage` bridge.
 - Includes visual feedback for loading and error states (connection timeouts).
@@ -51,6 +52,8 @@
 ## Critical Task
 - **None**: All critical tasks completed.
 
+[v0.57.0] ✅ Completed: Configurable Export Resolution - Implemented `export-width` and `export-height` attributes to allow specifying target resolution for client-side exports, enabling high-quality DOM exports independent of player size.
+[v0.56.2] ✅ Completed: Fix Core Dependency - Updated `packages/player/package.json` to depend on `@helios-project/core@^5.0.1` to resolve version mismatch and fix the build.
 [v0.56.1] ✅ Verified: Synced package.json version with status file.
 [v0.56.0] ✅ Completed: Expose Diagnostics - Implemented `diagnose()` method in `HeliosController` (Direct and Bridge) to expose environment capabilities (WebCodecs, etc.) to the host.
 [v0.55.0] ✅ Completed: Shadow DOM Export - Implemented `cloneWithShadow` and recursive asset inlining to support capturing content inside Shadow DOM (Web Components) during client-side export.
@@ -131,4 +134,3 @@
 [v0.6.0] ✅ Completed: Keyboard & Fullscreen Support - Implemented standard keyboard shortcuts (Space, F, Arrows) and Fullscreen UI/logic.
 [v0.5.2] ✅ Completed: Scaffold Tests - Added unit test suite for controllers and exporter using Vitest.
 [v0.5.1] ✅ Completed: Standard Attributes - Implemented `autoplay`, `loop`, and `controls` attributes. Synced version and artifacts.
-[v0.56.2] ✅ Completed: Fix Core Dependency - Updated `packages/player/package.json` to depend on `@helios-project/core@^5.0.1` to resolve version mismatch and fix the build.

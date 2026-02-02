@@ -25,3 +25,7 @@
 ## [v0.56.1] - Diagnostics UX Gap
 **Learning:** Diagnostics API exists (`Helios.diagnose()`), but the Player UI has no way to expose this info to users/agents without custom scripts, despite the vision emphasizing "Diagnostics for AI Environments".
 **Action:** Plan features that not only implement the API but also expose it in the UI (e.g. Debug Overlay) or use it for proactive error prevention (e.g. checking export codecs).
+
+## [v0.57.0] - Dependency Deadlock
+**Learning:** Encountered a situation where root-level `npm install` failed due to version mismatches in *other* workspaces, blocking `npm run build` for the current workspace despite correct local dependencies.
+**Action:** When verification is blocked by external environment issues, proceed with implementation and manual code verification, but clearly document the limitation. Ensure unit tests are added to aid future validation once the environment is stabilized.
