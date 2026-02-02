@@ -105,6 +105,7 @@ E2E tests are located in `tests/e2e/` and use Playwright + FFmpeg.
 - **verify-render.ts**: Verifies that examples render correctly to video.
   - Dynamically discovers examples in `examples/`.
   - Supports `dom` and `canvas` modes (auto-detected or overridden).
+  - Supports custom duration and brightness thresholds per example (e.g., `promo-video`).
   - Checks for video duration and non-black frames (using FFmpeg `signalstats`).
   - Usage: `npx tsx tests/e2e/verify-render.ts [filter]`
 - **verify-client-export.ts**: Verifies client-side export functionality using `ClientSideExporter`.

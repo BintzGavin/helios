@@ -308,6 +308,18 @@ helios.subscribe((state) => {
 // ===== Bind to Document Timeline (Critical for Renderer) =====
 helios.bindToDocumentTimeline();
 
+// Ensure GSAP timeline is synced before every frame capture
+// This handles race conditions where the subscription callback might not have fired yet
+if (helios.registerStabilityCheck) {
+  helios.registerStabilityCheck(async () => {
+    const targetTime = helios.currentTime.value;
+    // If GSAP is out of sync (with some tolerance)
+    if (Math.abs(tl.time() - targetTime) > 0.001) {
+      tl.seek(targetTime);
+    }
+  });
+}
+
 // ===== Expose for Detection =====
 window.helios = helios;
 // Expose GSAP timeline for renderer to seek directly

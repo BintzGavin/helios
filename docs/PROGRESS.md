@@ -199,3 +199,6 @@ Each agent should update **their own dedicated progress file** instead of this f
 
 ### PLAYER v0.58.0
 - ✅ Completed: Configurable Export Bitrate - Implemented `export-bitrate` attribute to control client-side export quality.
+
+## DEMO v1.87.0
+- ✅ Completed: Fix GSAP Sync - Fixed synchronization issue in `examples/promo-video` using `helios.registerStabilityCheck` and enhanced `tests/e2e/verify-render.ts` with custom duration/brightness checks.

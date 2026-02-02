@@ -25,6 +25,14 @@ const CANVAS_OVERRIDES = new Set([
   'solid-canvas-animation'
 ]);
 
+const DURATION_OVERRIDES: Record<string, number> = {
+  'promo-video': 15
+};
+
+const YMAX_THRESHOLD_OVERRIDES: Record<string, number> = {
+  'promo-video': 150
+};
+
 // Helper to format name: "simple-animation" -> "Simple Animation"
 function formatName(dirName: string) {
   return dirName
@@ -33,7 +41,7 @@ function formatName(dirName: string) {
     .join(' ');
 }
 
-async function verifyVideoContent(filePath: string, expectedDuration: number) {
+async function verifyVideoContent(filePath: string, expectedDuration: number, minYmax: number = 0) {
   try {
     // 1. Check Metadata using ffmpeg -i
     // ffmpeg -i usually returns exit code 1 if no output file, but prints info to stderr
@@ -87,8 +95,8 @@ async function verifyVideoContent(filePath: string, expectedDuration: number) {
     }
 
     const ymax = parseFloat(ymaxMatch[1]);
-    if (ymax <= 0) {
-      throw new Error(`Video frame at ${midPoint}s is pure black (YMAX=0)`);
+    if (ymax <= minYmax) {
+      throw new Error(`Video frame at ${midPoint}s is too dark (YMAX=${ymax}, expected > ${minYmax})`);
     }
 
     console.log(`   Content verified: Duration=${actualDuration.toFixed(2)}s, YMAX=${ymax}`);
@@ -148,12 +156,17 @@ async function main() {
   for (const testCase of casesToRun) {
     console.log(`\nVerifying ${testCase.name} [${testCase.mode}]...`);
 
+    // Check for overrides
+    const dirName = testCase.relativePath.split('/')[1];
+    const duration = DURATION_OVERRIDES[dirName] || 5;
+    const minYmax = YMAX_THRESHOLD_OVERRIDES[dirName] || 0;
+
     // Create a new renderer for each case to ensure clean state
     const renderer = new Renderer({
       width: 600,
       height: 600,
       fps: 30,
-      durationInSeconds: 5,
+      durationInSeconds: duration,
       mode: testCase.mode,
     });
 
@@ -183,7 +196,7 @@ async function main() {
       await renderer.render(compositionUrl, outputPath);
 
       // Verify content
-      await verifyVideoContent(outputPath, 5); // 5s is default duration in Renderer init above
+      await verifyVideoContent(outputPath, duration, minYmax);
 
       console.log(`✅ ${testCase.name} Passed! Video saved to: ${outputPath}`);
     } catch (error) {
