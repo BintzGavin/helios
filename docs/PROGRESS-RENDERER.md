@@ -1,3 +1,6 @@
+## RENDERER v1.57.1
+- ✅ Completed: Verify Looping Media - Enabled regression test `verify-video-loop.ts` in `run-all.ts` and updated dependencies to resolve environment issues, confirming correct looping behavior in both SeekTimeDriver and CdpTimeDriver.
+
 ## RENDERER v1.57.0
 - ✅ Completed: Enable Looping Media - Updated SeekTimeDriver and CdpTimeDriver to implement modulo arithmetic for `currentTime` when the `loop` attribute is present, ensuring correct looping behavior during rendering.
 

@@ -45,6 +45,7 @@ const tests = [
   'tests/verify-shadow-dom-sync.ts',
   'tests/verify-smart-codec-selection.ts',
   'tests/verify-stream-copy.ts',
+  'tests/verify-video-loop.ts',
   'tests/verify-waapi-sync.ts',
   'scripts/verify-advanced-audio.ts',
   'scripts/verify-audio-args.ts',
