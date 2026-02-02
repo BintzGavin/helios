@@ -891,7 +891,7 @@ export class HeliosPlayer extends HTMLElement implements TrackHost {
   }
 
   static get observedAttributes() {
-    return ["src", "width", "height", "autoplay", "loop", "controls", "export-format", "input-props", "poster", "muted", "interactive", "preload", "controlslist", "sandbox", "export-caption-mode", "disablepictureinpicture"];
+    return ["src", "width", "height", "autoplay", "loop", "controls", "export-format", "input-props", "poster", "muted", "interactive", "preload", "controlslist", "sandbox", "export-caption-mode", "disablepictureinpicture", "export-width", "export-height"];
   }
 
   constructor() {
@@ -1950,6 +1950,12 @@ export class HeliosPlayer extends HTMLElement implements TrackHost {
     const exportFormat = (this.getAttribute("export-format") || "mp4") as "mp4" | "webm";
     const captionMode = (this.getAttribute("export-caption-mode") || "burn-in") as "burn-in" | "file";
 
+    const exportWidth = parseFloat(this.getAttribute("export-width") || "");
+    const exportHeight = parseFloat(this.getAttribute("export-height") || "");
+
+    const width = !isNaN(exportWidth) && exportWidth > 0 ? exportWidth : undefined;
+    const height = !isNaN(exportHeight) && exportHeight > 0 ? exportHeight : undefined;
+
     let includeCaptions = this.showCaptions;
 
     if (this.showCaptions && captionMode === 'file') {
@@ -1975,7 +1981,9 @@ export class HeliosPlayer extends HTMLElement implements TrackHost {
             mode: exportMode,
             canvasSelector: canvasSelector,
             format: exportFormat,
-            includeCaptions: includeCaptions
+            includeCaptions: includeCaptions,
+            width: width,
+            height: height
         });
     } catch (e: any) {
         if (e.message !== "Export aborted") {

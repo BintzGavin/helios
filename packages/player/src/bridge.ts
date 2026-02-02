@@ -127,7 +127,7 @@ export function connectToParent(helios: Helios) {
 }
 
 async function handleCaptureFrame(helios: Helios, data: any) {
-    const { frame, selector, mode } = data;
+    const { frame, selector, mode, width, height } = data;
 
     // 1. Seek
     helios.seek(frame);
@@ -141,7 +141,7 @@ async function handleCaptureFrame(helios: Helios, data: any) {
     // 3. DOM Mode
     if (mode === 'dom') {
         try {
-            const bitmap = await captureDomToBitmap(document.body);
+            const bitmap = await captureDomToBitmap(document.body, { targetWidth: width, targetHeight: height });
             window.parent.postMessage({
                 type: 'HELIOS_FRAME_DATA',
                 frame,

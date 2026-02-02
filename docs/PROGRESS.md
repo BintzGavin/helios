@@ -165,3 +165,6 @@ Each agent should update **their own dedicated progress file** instead of this f
 
 ## PLAYER v0.56.2
 - ✅ Completed: Fix Core Dependency - Updated `packages/player/package.json` to depend on `@helios-project/core@^5.0.1` to resolve version mismatch and fix the build.
+
+### PLAYER v0.57.0
+- ✅ Completed: Configurable Export Resolution - Implemented `export-width` and `export-height` attributes to allow specifying target resolution for client-side exports, enabling high-quality DOM exports independent of player size.

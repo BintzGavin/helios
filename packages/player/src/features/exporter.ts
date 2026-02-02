@@ -28,8 +28,10 @@ export class ClientSideExporter {
     canvasSelector?: string;
     format?: 'mp4' | 'webm';
     includeCaptions?: boolean;
+    width?: number;
+    height?: number;
   }): Promise<void> {
-    const { onProgress, signal, mode = 'auto', canvasSelector = 'canvas', format = 'mp4', includeCaptions = true } = options;
+    const { onProgress, signal, mode = 'auto', canvasSelector = 'canvas', format = 'mp4', includeCaptions = true, width: targetWidth, height: targetHeight } = options;
 
     console.log(`Client-side rendering started! Format: ${format}`);
     this.controller.pause();
@@ -52,7 +54,9 @@ export class ClientSideExporter {
       if (effectiveMode === 'auto') {
           const result = await this.controller.captureFrame(startFrame, {
               selector: canvasSelector,
-              mode: 'canvas'
+              mode: 'canvas',
+              width: targetWidth,
+              height: targetHeight
           });
 
           if (result && result.frame) {
@@ -67,7 +71,9 @@ export class ClientSideExporter {
       // 2. Capture first frame to determine dimensions
       const firstResult = await this.controller.captureFrame(startFrame, {
           selector: canvasSelector,
-          mode: effectiveMode as 'canvas' | 'dom'
+          mode: effectiveMode as 'canvas' | 'dom',
+          width: targetWidth,
+          height: targetHeight
       });
 
       if (!firstResult || !firstResult.frame) {
@@ -89,7 +95,9 @@ export class ClientSideExporter {
       // 4. Setup Video Track
       const videoConfig: VideoEncodingConfig = {
           codec: format === 'webm' ? 'vp9' : 'avc',
-          bitrate: 5_000_000
+          bitrate: 5_000_000,
+          width,
+          height
       };
 
       const videoSource = new VideoSampleSource(videoConfig);
@@ -136,7 +144,9 @@ export class ClientSideExporter {
         const frameIndex = startFrame + i;
         const result = await this.controller.captureFrame(frameIndex, {
             selector: canvasSelector,
-            mode: effectiveMode as 'canvas' | 'dom'
+            mode: effectiveMode as 'canvas' | 'dom',
+            width: targetWidth,
+            height: targetHeight
         });
 
         if (!result || !result.frame) {
