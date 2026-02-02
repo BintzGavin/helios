@@ -20,9 +20,17 @@ export default function App() {
     const frame = useVideoFrame(helios);
     const [excalidrawAPI, setExcalidrawAPI] = useState(null);
     const [centered, setCentered] = useState(false);
+    const [fontsLoaded, setFontsLoaded] = useState(false);
 
     useEffect(() => {
-        if (excalidrawAPI) {
+        // Preload Excalidraw font to ensure no unstyled text
+        document.fonts.load("20px Virgil").then(() => {
+            setFontsLoaded(true);
+        });
+    }, []);
+
+    useEffect(() => {
+        if (excalidrawAPI && fontsLoaded) {
             const elements = getArchitectureElements(frame);
             excalidrawAPI.updateScene({
                 elements
@@ -35,6 +43,10 @@ export default function App() {
             }
         }
     }, [frame, excalidrawAPI, centered]);
+
+    if (!fontsLoaded) {
+        return null;
+    }
 
     return (
         <div style={{ height: "100vh", width: "100vw" }}>
