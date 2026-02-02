@@ -38,15 +38,12 @@ export async function concatenateVideos(inputPaths: string[], outputPath: string
     return `file '${absolutePath}'`;
   }).join('\n');
 
-  const listPath = path.resolve(outputDir, `concat_list_${Date.now()}_${Math.random().toString(36).substring(7)}.txt`);
-
-  await fs.promises.writeFile(listPath, listContent);
-
   const ffmpegPath = options?.ffmpegPath || ffmpeg.path;
   const args = [
     '-f', 'concat',
     '-safe', '0',
-    '-i', listPath,
+    '-protocol_whitelist', 'file,pipe',
+    '-i', '-',
     '-c', 'copy',
     '-y', // Overwrite output file
     outputPath
@@ -55,23 +52,18 @@ export async function concatenateVideos(inputPaths: string[], outputPath: string
   console.log(`Spawning FFmpeg for concat: ${ffmpegPath} ${args.join(' ')}`);
 
   return new Promise((resolve, reject) => {
-    const process = spawn(ffmpegPath, args);
+    const process = spawn(ffmpegPath, args, { stdio: ['pipe', 'pipe', 'pipe'] });
     let stderr = '';
+
+    // Write file list to stdin
+    process.stdin.write(listContent);
+    process.stdin.end();
 
     process.stderr.on('data', (data) => {
       stderr += data.toString();
     });
 
     process.on('close', async (code) => {
-      // Cleanup temp file
-      try {
-        if (fs.existsSync(listPath)) {
-            await fs.promises.unlink(listPath);
-        }
-      } catch (e) {
-        console.warn(`Failed to delete temp file ${listPath}`, e);
-      }
-
       if (code === 0) {
         resolve();
       } else {
@@ -80,13 +72,6 @@ export async function concatenateVideos(inputPaths: string[], outputPath: string
     });
 
     process.on('error', async (err) => {
-       try {
-        if (fs.existsSync(listPath)) {
-            await fs.promises.unlink(listPath);
-        }
-      } catch (e) {
-        // ignore
-      }
       reject(err);
     });
   });

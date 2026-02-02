@@ -205,3 +205,5 @@ Each agent should update **their own dedicated progress file** instead of this f
 
 ### PLAYER v0.58.0
 - ✅ Completed: Configurable Export Bitrate - Implemented `export-bitrate` attribute to control client-side export quality.
+### RENDERER v1.60.1
+- ✅ Completed: Refactor Concat to Pipe - Refactored `concatenateVideos` to pipe file list to FFmpeg, achieving Zero Disk I/O.

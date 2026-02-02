@@ -1,8 +1,9 @@
-**Version**: 1.60.0
+**Version**: 1.60.1
 
 # Renderer Agent Status
 
 ## Progress Log
+- [1.60.1] ✅ Completed: Refactor Concat to Pipe - Refactored `concatenateVideos` to pipe the file list directly to FFmpeg via stdin (using `-protocol_whitelist file,pipe`), eliminating temporary file creation and achieving Zero Disk I/O for video concatenation.
 - [1.60.0] ✅ Completed: Enable Audio Playback Rate - Updated `AudioTrackConfig` to include `playbackRate`, and implemented `atempo` filter chaining in `FFmpegBuilder` to support speed adjustments (including values outside 0.5-2.0 range). Also updated `DomScanner` to extract `playbackRate` from media elements.
 - [1.59.0] ✅ Completed: Local Distributed Rendering - Implemented `RenderOrchestrator` to split render jobs into concurrent chunks and concatenate them, enabling faster local rendering. Also refactored `Renderer` to its own file to support this architecture.
 - [1.58.0] ✅ Completed: Zero Disk Audio - Refactored `blob-extractor.ts` and `FFmpegBuilder.ts` to pipe audio buffers directly to FFmpeg via stdio pipes (`pipe:N`), eliminating temporary file creation for Blob audio tracks and improving security and performance.
