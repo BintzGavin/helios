@@ -30,6 +30,7 @@ Examples using the React adapter (`useVideoFrame`, hooks).
 - **[react-three-fiber](./react-three-fiber/)**: 3D animation with React Three Fiber (R3F).
 - **[react-transitions](./react-transitions/)**: Using `react-transition-group` for enter/exit animations.
 - **[react-animation-helpers](./react-animation-helpers/)**: Helper components for sequencing and timing.
+- **[react-audio-visualization](./react-audio-visualization/)**: Real-time audio frequency analysis visualization.
 
 ## Vue
 Examples using the Vue adapter (Composition API).

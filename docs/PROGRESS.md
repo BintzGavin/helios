@@ -117,6 +117,7 @@ Each agent should update **their own dedicated progress file** instead of this f
 - Group multiple completions under the same version section if they're part of the same release
 
 ## DEMO v1.87.0
+- ✅ Completed: React Audio Visualization - Created `examples/react-audio-visualization` demonstrating real-time audio analysis (RMS, waveforms) using synthesized `AudioBuffer` and React Hooks.
 - ✅ Completed: Fix GSAP Sync - Fixed synchronization issue in `examples/promo-video` using `helios.registerStabilityCheck` and enhanced `tests/e2e/verify-render.ts` with custom duration/brightness checks.
 
 ## DEMO v1.86.1
