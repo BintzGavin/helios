@@ -15,7 +15,7 @@ The DEMO domain is responsible for:
 - None
 
 ## Completed Tasks
-- [v1.87.0] ✅ Completed: Fix GSAP Sync - Fixed synchronization issue in `examples/promo-video` using `helios.registerStabilityCheck` and enhanced `tests/e2e/verify-render.ts` with custom duration/brightness checks.
+- [v1.87.0] ✅ Completed: Fix GSAP Sync - Fixed synchronization issue in `examples/promo-video` using `helios.registerStabilityCheck` and enhanced `tests/e2e/verify-render.ts` with custom duration/brightness checks. Confirmed E2E pass with YMAX=192.
 - [v1.86.1] ✅ Verified: Vanilla Transitions - Verified build and E2E tests for the existing implementation to ensure stability.
 - [v1.86.0] ✅ Completed: Vanilla Transitions - Created `examples/vanilla-transitions` demonstrating sequenced scene transitions using Vanilla JS and the `sequence()` utility.
 - [v1.85.1] ✅ Completed: Update Documentation - Updated `examples/README.md` and `/.sys/llmdocs/context-demo.md` to reflect the current state of examples, including new Captions and Three.js integration examples.
