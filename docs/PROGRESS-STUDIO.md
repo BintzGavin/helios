@@ -1,3 +1,6 @@
+## STUDIO v0.80.2
+- ✅ Completed: Test Coverage - Added unit tests for Toast notification system (ToastItem, ToastContext, ToastContainer) and verified with mocked environment.
+
 ## STUDIO v0.80.1
 - ✅ Completed: Maintenance - Updated dependencies to align with Core v5 and Player v0.57.1, resolving workspace conflicts.
 
