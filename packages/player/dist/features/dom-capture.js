@@ -1,4 +1,4 @@
-export async function captureDomToBitmap(element) {
+export async function captureDomToBitmap(element, options) {
     const doc = element.ownerDocument || document;
     // 1. Clone & Inline Assets
     let clone = cloneWithShadow(element);
@@ -14,11 +14,6 @@ export async function captureDomToBitmap(element) {
     const inlineStylesPromises = styleElements.map(async (style) => {
         const css = style.textContent || '';
         const processed = await processCss(css, doc.baseURI);
-        // Create a new style tag to preserve the structure,
-        // but here we just wrap in <style> as we are concatenating strings anyway.
-        // If we want to preserve attributes (like id="my-style"), we should look at attributes.
-        // The previous implementation used style.outerHTML which preserved attributes.
-        // Let's try to preserve attributes by cloning.
         const styleClone = style.cloneNode(true);
         styleClone.textContent = processed;
         return styleClone.outerHTML;
@@ -28,9 +23,9 @@ export async function captureDomToBitmap(element) {
     const externalStyles = await getExternalStyles(doc);
     const styles = externalStyles + '\n' + inlineStyles;
     // 4. Determine dimensions
-    // Use scroll dimensions to capture full content, fallback to offset or defaults.
-    const width = element.scrollWidth || element.offsetWidth || 1920;
-    const height = element.scrollHeight || element.offsetHeight || 1080;
+    // Use target dimensions if provided, otherwise scroll dimensions or defaults.
+    const width = options?.targetWidth || element.scrollWidth || element.offsetWidth || 1920;
+    const height = options?.targetHeight || element.scrollHeight || element.offsetHeight || 1080;
     // 5. Construct SVG
     // We wrap the content in a div to ensure block formatting context.
     const svg = `
