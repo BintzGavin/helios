@@ -95,19 +95,14 @@ describe('Timeline', () => {
     // Change zoom
     fireEvent.change(slider, { target: { value: '50' } });
 
-    // Check style updated.
-    // It should effectively be pixel based now.
-    // Note: JS DOM might not compute the exact pixels without layout engine,
-    // but the inline style should reflect the calculation.
     expect(content).not.toHaveStyle('width: 100%');
 
-    // We can inspect the style attribute directly
     const style = content?.getAttribute('style');
     expect(style).toContain('width:');
     expect(style).toMatch(/px/);
   });
 
-  it('renders caption markers from playerState.captions', () => {
+  it('renders caption markers correctly positioned', () => {
       const captions = [
           { startTime: 0, endTime: 1000, text: 'Hello' },
           { startTime: 2000, endTime: 3000, text: 'World' }
@@ -124,9 +119,13 @@ describe('Timeline', () => {
       expect(markers).toHaveLength(2);
       expect(markers[0]).toHaveAttribute('title', 'Hello');
       expect(markers[1]).toHaveAttribute('title', 'World');
+
+      // Check vertical position (Lane 0 = 28px)
+      // videoTrackTop = RULER_HEIGHT(24) + TRACK_GAP(4) = 28px
+      expect(markers[0]).toHaveStyle('top: 28px');
   });
 
-  it('renders composition markers from playerState.markers', () => {
+  it('renders composition markers correctly positioned', () => {
     const markers = [
       { id: 'm1', time: 1, label: 'Start', color: '#ff0000' },
       { id: 'm2', time: 5, label: 'Mid', color: '#00ff00' }
@@ -142,10 +141,10 @@ describe('Timeline', () => {
 
     expect(renderedMarkers).toHaveLength(2);
     expect(renderedMarkers[0]).toHaveAttribute('title', 'Start (m1)');
-    // Note: styles are sometimes converted to rgb/rgba by jsdom
-    // expect(renderedMarkers[0]).toHaveStyle('background-color: #ff0000');
-
     expect(renderedMarkers[1]).toHaveAttribute('title', 'Mid (m2)');
+
+    // Check vertical position (Lane 0 = 28px)
+    expect(renderedMarkers[0]).toHaveStyle('top: 28px');
 
     // Test click
     const marker = renderedMarkers[1];
@@ -157,7 +156,7 @@ describe('Timeline', () => {
     expect(mockSeek).toHaveBeenCalledWith(150); // 5s * 30fps = 150
   });
 
-  it('renders audio tracks from playerState.availableAudioTracks', () => {
+  it('renders audio tracks stacked vertically', () => {
     const availableAudioTracks = [
       { id: 'track1', startTime: 2, duration: 4 }, // Start 2s, End 6s
       { id: 'track2', startTime: 8, duration: 1 }  // Start 8s, End 9s
@@ -175,11 +174,16 @@ describe('Timeline', () => {
     expect(tracks[0]).toHaveAttribute('title', 'Audio: track1');
     expect(tracks[1]).toHaveAttribute('title', 'Audio: track2');
 
-    // Verify positioning (roughly)
-    // Total frames = 300 (10s)
-    // Track 1: Start 2s (60f) -> 20%. Duration 4s (120f) -> 40%.
+    // Check Track 1 (Lane 1)
+    // Top = VideoTop(28) + TrackHeight(24) + Gap(4) = 56px
     const style1 = tracks[0].getAttribute('style');
     expect(style1).toContain('left: 20%');
     expect(style1).toContain('width: 40%');
+    expect(style1).toContain('top: 56px');
+
+    // Check Track 2 (Lane 2)
+    // Top = 56 + 24 + 4 = 84px
+    const style2 = tracks[1].getAttribute('style');
+    expect(style2).toContain('top: 84px');
   });
 });

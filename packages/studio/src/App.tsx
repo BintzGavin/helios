@@ -115,7 +115,7 @@ function AppContent() {
         }
         timeline={
           <Panel title="Timeline">
-            <div style={{ display: 'flex', alignItems: 'center', width: '100%', gap: '16px', paddingRight: '16px' }}>
+            <div style={{ display: 'flex', width: '100%', gap: '16px', paddingRight: '16px', height: '100%' }}>
                 <PlaybackControls />
                 <Timeline />
             </div>
