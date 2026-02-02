@@ -83,7 +83,12 @@ export class CdpTimeDriver implements TimeDriver {
 
           // Calculate target time
           // Formula: GlobalTime - Offset + InPoint
-          const targetTime = Math.max(0, t - offset + seek);
+          let targetTime = Math.max(0, t - offset + seek);
+
+          // Handle Looping
+          if (el.loop && el.duration > 0 && targetTime > el.duration) {
+            targetTime = targetTime % el.duration;
+          }
 
           el.currentTime = targetTime;
           // Note: We intentionally do NOT await 'seeked' here because CDP virtual time is paused.
