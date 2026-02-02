@@ -1,4 +1,4 @@
-**Version**: v0.55.0
+**Version**: v0.56.0
 
 # Status: PLAYER
 
@@ -45,11 +45,13 @@
 - Implements Smart Controls: 'CC' button is hidden when no tracks are present, and 'Picture-in-Picture' button can be hidden via `disablepictureinpicture`.
 - Supports auto-enabling of captions if a track is marked as `default`.
 - Supports audio fade-in/out in client-side export via `data-helios-fade-in` and `data-helios-fade-out` attributes.
-- **Supports Shadow DOM Export**: DOM-based client-side export now correctly captures Shadow DOM content (via Declarative Shadow DOM transformation), enabling support for Web Components in exports.
+- Supports Shadow DOM Export: DOM-based client-side export now correctly captures Shadow DOM content (via Declarative Shadow DOM transformation), enabling support for Web Components in exports.
+- **Supports Environment Diagnostics**: Implemented `diagnose()` method in `HeliosController` (Direct and Bridge) to expose environment capabilities (WebCodecs, WebGL, etc.) to the host.
 
 ## Critical Task
 - **None**: All critical tasks completed.
 
+[v0.56.0] ✅ Completed: Expose Diagnostics - Implemented `diagnose()` method in `HeliosController` (Direct and Bridge) to expose environment capabilities (WebCodecs, etc.) to the host.
 [v0.55.0] ✅ Completed: Shadow DOM Export - Implemented `cloneWithShadow` and recursive asset inlining to support capturing content inside Shadow DOM (Web Components) during client-side export.
 [v0.54.0] ✅ Completed: Audio Fades - Implemented audio fade-in and fade-out support in client-side exporter via `data-helios-fade-in` and `data-helios-fade-out` attributes.
 [v0.53.0] ✅ Completed: Smart Controls - Implemented 'disablepictureinpicture' attribute and auto-hiding CC button/auto-enabling default tracks.
