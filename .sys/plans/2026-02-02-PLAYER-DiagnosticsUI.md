@@ -75,5 +75,3 @@
 - **Edge Cases**:
   - Controller not connected (should show error or handle gracefully).
   - Diagnostics timeout (should show error).
-
-<!-- Retry trigger: Mon Feb  2 20:53:06 UTC 2026 -->
