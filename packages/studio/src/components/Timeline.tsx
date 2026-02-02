@@ -26,6 +26,7 @@ export const Timeline: React.FC = () => {
   const totalFrames = duration * fps || 100;
   const captions = playerState.captions || [];
   const markers = playerState.markers || [];
+  const audioTracks = playerState.audioTracks || [];
 
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
@@ -285,6 +286,24 @@ export const Timeline: React.FC = () => {
             </div>
 
             <div className="timeline-track" />
+
+            {/* Audio Tracks */}
+            {audioTracks.map((track) => {
+              const startFrame = track.startTime * fps;
+              const durationFrame = track.duration * fps;
+
+              return (
+                <div
+                  key={track.id}
+                  className="timeline-audio-track"
+                  style={{
+                    left: `${getPercent(startFrame)}%`,
+                    width: `${getPercent(durationFrame)}%`
+                  }}
+                  title={`Audio: ${track.id}`}
+                />
+              );
+            })}
 
             {/* Caption Markers */}
             {captions.map((cue, i) => {

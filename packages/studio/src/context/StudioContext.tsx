@@ -46,6 +46,12 @@ export interface RenderJob {
   outPoint?: number;
 }
 
+export interface AudioTrackMetadata {
+  id: string;
+  startTime: number;
+  duration: number;
+}
+
 export interface PlayerState {
   currentFrame: number;
   duration: number;
@@ -58,6 +64,7 @@ export interface PlayerState {
   schema?: HeliosSchema;
   captions: CaptionCue[];
   markers: Marker[];
+  audioTracks: AudioTrackMetadata[];
 }
 
 const DEFAULT_PLAYER_STATE: PlayerState = {
@@ -71,7 +78,8 @@ const DEFAULT_PLAYER_STATE: PlayerState = {
   inputProps: {},
   schema: undefined,
   captions: [],
-  markers: []
+  markers: [],
+  audioTracks: []
 };
 
 interface StudioContextType {
