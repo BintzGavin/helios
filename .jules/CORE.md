@@ -37,3 +37,7 @@
 ## [5.2.0] - Utility vs Runtime Integration
 **Learning:** Utilities like `sequencing.ts` can exist in isolation without being integrated into the core runtime (`Helios` class), creating a "Vision Gap" where a feature is technically "possible" but not "supported" by the engine.
 **Action:** When auditing features like "Sequencing", check not just for the existence of helper functions, but for the integration points (e.g. `bindTo` options) that make them usable in the core loop.
+
+## [5.2.1] - Audio Source Discovery
+**Learning:** Client-side export (WebCodecs) requires access to audio sources for muxing, but `AudioTrackMetadata` previously only exposed timing data, forcing consumers to scrape the DOM or re-fetch assets.
+**Action:** When designing "Headless" state, ensure it contains all data necessary for reconstruction (like `src`), not just simulation parameters.
