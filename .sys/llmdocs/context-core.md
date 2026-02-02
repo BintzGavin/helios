@@ -25,7 +25,10 @@ packages/core/src/
 ├── captions.ts
 ├── color.ts
 ├── drivers/
+│   ├── DomDriver-metadata.test.ts
+│   ├── DomDriver.test.ts
 │   ├── DomDriver.ts
+│   ├── DomDriverDiscovery.test.ts
 │   ├── ManualTicker.ts
 │   ├── NoopDriver.ts
 │   ├── RafTicker.ts
@@ -66,7 +69,7 @@ export type HeliosState<TInputProps = Record<string, any>> = {
   volume: number;
   muted: boolean;
   audioTracks: Record<string, AudioTrackState>;
-  availableAudioTracks: string[];
+  availableAudioTracks: AudioTrackMetadata[];
   captions: CaptionCue[];
   activeCaptions: CaptionCue[];
   markers: Marker[];
@@ -78,6 +81,12 @@ export type AudioTrackState = {
   volume: number;
   muted: boolean;
 };
+
+export interface AudioTrackMetadata {
+  id: string;
+  startTime: number;
+  duration: number;
+}
 
 export type HeliosSubscriber<TInputProps = Record<string, any>> = (state: HeliosState<TInputProps>) => void;
 
@@ -159,7 +168,7 @@ class Helios<TInputProps = Record<string, any>> {
   get volume(): ReadonlySignal<number>;
   get muted(): ReadonlySignal<boolean>;
   get audioTracks(): ReadonlySignal<Record<string, AudioTrackState>>;
-  get availableAudioTracks(): ReadonlySignal<string[]>;
+  get availableAudioTracks(): ReadonlySignal<AudioTrackMetadata[]>;
   get captions(): ReadonlySignal<CaptionCue[]>;
   get activeCaptions(): ReadonlySignal<CaptionCue[]>;
   get markers(): ReadonlySignal<Marker[]>;

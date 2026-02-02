@@ -26,7 +26,7 @@ describe('DomDriver Discovery', () => {
 
     // We expect subscribeToMetadata to exist
     (driver as any).subscribeToMetadata((meta: any) => {
-      if (meta.audioTracks) discovered = meta.audioTracks;
+      if (meta.audioTracks) discovered = meta.audioTracks.map((t: any) => t.id);
     });
 
     driver.init(container);
@@ -41,7 +41,7 @@ describe('DomDriver Discovery', () => {
     let discovered: string[] = [];
 
     (driver as any).subscribeToMetadata((meta: any) => {
-       if (meta.audioTracks) discovered = meta.audioTracks;
+       if (meta.audioTracks) discovered = meta.audioTracks.map((t: any) => t.id);
     });
 
     driver.init(container);
@@ -63,7 +63,7 @@ describe('DomDriver Discovery', () => {
      let discovered: string[] = [];
 
      (driver as any).subscribeToMetadata((meta: any) => {
-        if (meta.audioTracks) discovered = meta.audioTracks;
+        if (meta.audioTracks) discovered = meta.audioTracks.map((t: any) => t.id);
      });
 
      driver.init(container);
@@ -85,7 +85,7 @@ describe('DomDriver Discovery', () => {
     let discovered: string[] = [];
 
     (driver as any).subscribeToMetadata((meta: any) => {
-       if (meta.audioTracks) discovered = meta.audioTracks;
+       if (meta.audioTracks) discovered = meta.audioTracks.map((t: any) => t.id);
     });
 
     driver.init(container);
@@ -115,7 +115,7 @@ describe('DomDriver Discovery', () => {
     let discovered: string[] = [];
 
     (driver as any).subscribeToMetadata((meta: any) => {
-       if (meta.audioTracks) discovered = meta.audioTracks;
+       if (meta.audioTracks) discovered = meta.audioTracks.map((t: any) => t.id);
     });
 
     driver.init(container);
@@ -160,6 +160,6 @@ describe('Helios Audio Track Integration', () => {
 
      await new Promise(resolve => setTimeout(resolve, 50));
 
-     expect((helios as any).availableAudioTracks.value).toEqual(['helios-track']);
+     expect((helios as any).availableAudioTracks.value.map((t: any) => t.id)).toEqual(['helios-track']);
   });
 });

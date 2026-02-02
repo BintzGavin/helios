@@ -1,5 +1,11 @@
+export interface AudioTrackMetadata {
+  id: string;
+  startTime: number;
+  duration: number;
+}
+
 export interface DriverMetadata {
-  audioTracks?: string[];
+  audioTracks?: AudioTrackMetadata[];
 }
 
 export interface TimeDriver {

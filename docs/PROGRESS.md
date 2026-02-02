@@ -159,3 +159,6 @@ Each agent should update **their own dedicated progress file** instead of this f
 
 ## DEMO v1.85.0
 - ✅ Completed: Vanilla Captions Animation - Created `examples/vanilla-captions-animation` demonstrating Helios captions (SRT) support in Vanilla TypeScript, replacing the legacy `examples/captions-animation`.
+
+## CORE v5.0.0
+- ✅ Completed: Implement Audio Track Metadata - Updated `availableAudioTracks` signal to return `AudioTrackMetadata[]` instead of `string[]` (Breaking Change), including `startTime` and `duration` discovery.

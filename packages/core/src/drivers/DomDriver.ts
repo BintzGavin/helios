@@ -1,4 +1,4 @@
-import { TimeDriver, DriverMetadata } from './TimeDriver.js';
+import { TimeDriver, DriverMetadata, AudioTrackMetadata } from './TimeDriver.js';
 
 interface TrackState {
   baseVolume: number;
@@ -13,7 +13,7 @@ export class DomDriver implements TimeDriver {
   private observers = new Map<Node, MutationObserver>();
   private trackStates = new WeakMap<HTMLMediaElement, TrackState>();
   private mediaElements = new Set<HTMLMediaElement>();
-  private discoveredTracks = new Set<string>();
+  private discoveredTracks = new Map<string, AudioTrackMetadata>();
   private metadataSubscribers = new Set<(meta: DriverMetadata) => void>();
 
   init(scope: HTMLElement | Document) {
@@ -29,12 +29,12 @@ export class DomDriver implements TimeDriver {
 
   subscribeToMetadata(callback: (meta: DriverMetadata) => void): () => void {
     this.metadataSubscribers.add(callback);
-    callback({ audioTracks: Array.from(this.discoveredTracks) });
+    callback({ audioTracks: Array.from(this.discoveredTracks.values()) });
     return () => this.metadataSubscribers.delete(callback);
   }
 
   private emitMetadata() {
-    const tracks = Array.from(this.discoveredTracks);
+    const tracks = Array.from(this.discoveredTracks.values());
     this.metadataSubscribers.forEach((cb) => cb({ audioTracks: tracks }));
   }
 
@@ -63,7 +63,7 @@ export class DomDriver implements TimeDriver {
         childList: true,
         subtree: true,
         attributes: true,
-        attributeFilter: ['data-helios-track-id']
+        attributeFilter: ['data-helios-track-id', 'data-helios-offset']
       });
       this.observers.set(scope, observer);
     }
@@ -80,16 +80,27 @@ export class DomDriver implements TimeDriver {
     }
   }
 
+  private handleMetadataChange = () => {
+    this.rebuildDiscoveredTracks();
+  };
+
   private scanAndAdd(node: Node) {
     let tracksChanged = false;
     const processElement = (el: Element) => {
       // Add media element
       if (el.nodeName === 'AUDIO' || el.nodeName === 'VIDEO') {
-        this.mediaElements.add(el as HTMLMediaElement);
+        const mediaEl = el as HTMLMediaElement;
+        this.mediaElements.add(mediaEl);
+
+        // Add listeners for metadata updates
+        mediaEl.addEventListener('durationchange', this.handleMetadataChange);
+        mediaEl.addEventListener('loadedmetadata', this.handleMetadataChange);
 
         const trackId = el.getAttribute('data-helios-track-id');
-        if (trackId && !this.discoveredTracks.has(trackId)) {
-            this.discoveredTracks.add(trackId);
+        if (trackId) {
+            // Even if we already have it, we might need to update metadata
+            // But we'll let rebuildDiscoveredTracks handle the details to avoid duplication here
+            // We just flag that we found something relevant
             tracksChanged = true;
         }
       }
@@ -110,17 +121,13 @@ export class DomDriver implements TimeDriver {
     }
 
     // 2. Process descendants
-    // If node is Element or DocumentFragment (ShadowRoot), it supports querySelectorAll
     if ('querySelectorAll' in node) {
-       // We use querySelectorAll('*') to find all descendants in the current scope (Light DOM)
-       // This is efficient and handles nested structure within this scope.
-       // It will NOT pierce into Shadow Roots, which is why we check el.shadowRoot above.
        const descendants = (node as Element | DocumentFragment).querySelectorAll('*');
        descendants.forEach(el => processElement(el));
     }
 
     if (tracksChanged) {
-        this.emitMetadata();
+        this.rebuildDiscoveredTracks();
     }
   }
 
@@ -128,8 +135,11 @@ export class DomDriver implements TimeDriver {
      let removedMedia = false;
      const processElement = (el: Element) => {
       if (el.nodeName === 'AUDIO' || el.nodeName === 'VIDEO') {
-        if (this.mediaElements.delete(el as HTMLMediaElement)) {
+        const mediaEl = el as HTMLMediaElement;
+        if (this.mediaElements.delete(mediaEl)) {
             removedMedia = true;
+            mediaEl.removeEventListener('durationchange', this.handleMetadataChange);
+            mediaEl.removeEventListener('loadedmetadata', this.handleMetadataChange);
         }
       }
       if (el.shadowRoot) {
@@ -155,12 +165,21 @@ export class DomDriver implements TimeDriver {
   }
 
   private rebuildDiscoveredTracks() {
-      const oldTracks = new Set(this.discoveredTracks);
+      const oldTracks = new Map(this.discoveredTracks);
       this.discoveredTracks.clear();
 
       this.mediaElements.forEach(el => {
           const id = el.getAttribute('data-helios-track-id');
-          if (id) this.discoveredTracks.add(id);
+          if (id) {
+            const startTime = parseFloat(el.getAttribute('data-helios-offset') || '0');
+            const duration = (!isNaN(el.duration) && isFinite(el.duration)) ? el.duration : 0;
+
+            this.discoveredTracks.set(id, {
+                id,
+                startTime,
+                duration
+            });
+          }
       });
 
       // Check for changes
@@ -169,8 +188,13 @@ export class DomDriver implements TimeDriver {
           return;
       }
 
-      for (const t of oldTracks) {
-          if (!this.discoveredTracks.has(t)) {
+      for (const [id, meta] of this.discoveredTracks) {
+          const oldMeta = oldTracks.get(id);
+          if (!oldMeta) {
+              this.emitMetadata();
+              return;
+          }
+          if (oldMeta.startTime !== meta.startTime || oldMeta.duration !== meta.duration) {
               this.emitMetadata();
               return;
           }
@@ -180,7 +204,13 @@ export class DomDriver implements TimeDriver {
   dispose() {
     this.observers.forEach((obs) => obs.disconnect());
     this.observers.clear();
+
+    this.mediaElements.forEach(el => {
+        el.removeEventListener('durationchange', this.handleMetadataChange);
+        el.removeEventListener('loadedmetadata', this.handleMetadataChange);
+    });
     this.mediaElements.clear();
+
     this.scopes.clear();
     this.discoveredTracks.clear();
     this.metadataSubscribers.clear();
