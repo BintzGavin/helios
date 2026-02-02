@@ -112,6 +112,7 @@ The controller returned by `getController()` provides advanced methods:
 - `setInputProps(props: Record<string, any>): void`
 - `setPlaybackRange(startFrame: number, endFrame: number): void`
 - `clearPlaybackRange(): void`
+- `diagnose(): Promise<DiagnosticReport>`: Returns a diagnostic report of the environment capabilities (WebCodecs, WebGL, etc.).
 
 ## G. Interaction
 - **Keyboard Shortcuts**:
