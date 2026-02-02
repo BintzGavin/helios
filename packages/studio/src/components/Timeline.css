@@ -234,3 +234,15 @@
   box-shadow: 0 2px 4px rgba(0,0,0,0.5);
   border: 1px solid #444;
 }
+
+.timeline-audio-track {
+  position: absolute;
+  top: 75%;
+  height: 4px;
+  background: #e91e63;
+  transform: translateY(-50%);
+  opacity: 0.7;
+  pointer-events: none;
+  z-index: 1;
+  border-radius: 2px;
+}
