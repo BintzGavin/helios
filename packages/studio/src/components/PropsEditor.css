@@ -150,6 +150,35 @@
   flex: 1;
 }
 
+.prop-array-controls {
+  display: flex;
+  flex-direction: row;
+  gap: 4px;
+}
+
+.prop-array-control-btn {
+  padding: 4px 8px;
+  background-color: #f5f5f5;
+  color: #333;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.8em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+}
+
+.prop-array-control-btn:hover {
+  background-color: #e0e0e0;
+}
+
+.prop-array-control-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
 .prop-array-remove {
   padding: 4px 8px;
   background-color: #ffebee;
@@ -158,10 +187,16 @@
   border-radius: 4px;
   cursor: pointer;
   font-size: 0.8em;
+  white-space: nowrap;
 }
 
 .prop-array-remove:hover {
   background-color: #ffcdd2;
+}
+
+.prop-array-remove:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
 }
 
 .prop-array-add {

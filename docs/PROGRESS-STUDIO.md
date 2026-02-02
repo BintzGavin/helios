@@ -1,3 +1,6 @@
+## STUDIO v0.79.0
+- ✅ Completed: Array Reordering - Implemented ability to reorder array items (up/down) in the Props Editor.
+
 ## STUDIO v0.78.0
 - ✅ Completed: Persistent Preferences - Implemented persistence for Sidebar tab, Stage settings (Zoom/Pan/Transparency/Guides), Timeline Zoom, and Active Composition using `localStorage`.
 

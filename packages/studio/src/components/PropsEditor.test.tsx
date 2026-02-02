@@ -488,4 +488,55 @@ describe('PropsEditor', () => {
     expect(optionValues).toContain('/assets/image.png');
     expect(optionValues).not.toContain('/assets/image.jpg');
   });
+
+  it('reorders array items', () => {
+    const schema: HeliosSchema = {
+      listProp: {
+        type: 'array',
+        items: { type: 'string' }
+      }
+    };
+
+    (StudioContext.useStudio as any).mockReturnValue({
+      ...defaultContext,
+      playerState: {
+        inputProps: {
+          listProp: ['A', 'B', 'C']
+        },
+        schema
+      }
+    });
+
+    render(<PropsEditor />);
+
+    // Check initial order
+    const inputs = screen.getAllByRole('textbox');
+    expect(inputs[0]).toHaveValue('A');
+    expect(inputs[1]).toHaveValue('B');
+    expect(inputs[2]).toHaveValue('C');
+
+    // Find "Move Down" button for first item ('A')
+    const downButtons = screen.getAllByTitle('Move Down');
+    const upButtons = screen.getAllByTitle('Move Up');
+
+    // First item 'A' (index 0)
+    // Up should be disabled
+    expect(upButtons[0]).toBeDisabled();
+    // Down should be enabled
+    expect(downButtons[0]).not.toBeDisabled();
+
+    // Click Down on 'A' -> should become ['B', 'A', 'C']
+    fireEvent.click(downButtons[0]);
+    expect(mockSetInputProps).toHaveBeenCalledWith({ listProp: ['B', 'A', 'C'] });
+
+    // Last item 'C' (index 2)
+    // Down should be disabled
+    expect(downButtons[2]).toBeDisabled();
+    // Up should be enabled
+    expect(upButtons[2]).not.toBeDisabled();
+
+    // Click Up on 'C' -> should become ['A', 'C', 'B'] (assuming starting from original ['A', 'B', 'C'])
+    fireEvent.click(upButtons[2]);
+    expect(mockSetInputProps).toHaveBeenCalledWith({ listProp: ['A', 'C', 'B'] });
+  });
 });

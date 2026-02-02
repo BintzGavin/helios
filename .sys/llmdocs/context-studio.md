@@ -110,7 +110,7 @@ npx @helios-project/studio
 -   **Props Editor**: auto-generated form based on the composition's `HeliosSchema`.
     -   Supports primitives (string, number, boolean) with constraints (min/max/step, minLength/maxLength/pattern).
     -   Supports assets (image, video, audio) with type and extension filtering.
-    -   Supports complex types (object, array, typed arrays) with size constraints (minItems/maxItems).
+    -   Supports complex types (object, array, typed arrays) with size constraints (minItems/maxItems) and item reordering.
     -   Supports collapsible groups via `group` property.
 -   **Compositions Panel**: Persistent sidebar panel for managing compositions (Browse, Create, Duplicate, Delete).
 -   **Assets Panel**: Discovers and allows drag-and-drop of assets from the project. Supports uploading, deleting, and renaming assets.
