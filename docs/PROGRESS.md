@@ -162,3 +162,6 @@ Each agent should update **their own dedicated progress file** instead of this f
 
 ## CORE v5.0.0
 - ✅ Completed: Implement Audio Track Metadata - Updated `availableAudioTracks` signal to return `AudioTrackMetadata[]` instead of `string[]` (Breaking Change), including `startTime` and `duration` discovery.
+
+## PLAYER v0.56.2
+- ✅ Completed: Fix Core Dependency - Updated `packages/player/package.json` to depend on `@helios-project/core@^5.0.1` to resolve version mismatch and fix the build.
