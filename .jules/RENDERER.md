@@ -193,7 +193,7 @@
 **Action:** Future plan required to implement Blob audio extraction (fetch blob -> buffer -> pipe to FFmpeg) to support this "Native" web capability.
 
 ## [2026-05-30] - Architectural Gap: DomStrategy lacks CDP
-**Learning:** `DomStrategy` relies on `SeekTimeDriver` (WAAPI) instead of `CdpTimeDriver` because `page.screenshot` hangs when CDP virtual time is paused. This means `mode: 'dom'` is not using the promised "Production Rendering" architecture (CDP), creating a divergence in time control mechanisms.
+**Learning:** `DomStrategy` relies on `SeekTimeDriver` (WAAPI) instead of `CdpTimeDriver` (CDP) because `page.screenshot` hangs when CDP virtual time is paused. This means `mode: 'dom'` is not using the promised "Production Rendering" architecture (CDP), creating a divergence in time control mechanisms.
 **Action:** Investigate using `Emulation.setVirtualTimePolicy({ policy: 'advance', budget: ... })` combined with a non-hanging capture method, or accept this divergence as a permanent constraint of `page.screenshot`.
 
 ## [1.50.0] - Resource Cleanup Timing
@@ -223,3 +223,7 @@
 ## [2026-06-15] - CDP Deadlock on Resource Loading
 **Learning:** `CdpTimeDriver` pauses the virtual clock in `prepare()`, which freezes the browser's event loop (timers, media events). If `strategy.prepare()` (which scans for resources using `setTimeout` fallbacks or `canplaythrough` events) runs *after* `timeDriver.prepare()`, it causes a deadlock where resource discovery hangs indefinitely.
 **Action:** Always initialize strategies (resource discovery) *before* activating `TimeDriver` clock control (especially CDP pause policies). This ensures resources are loaded using the robust wall-clock environment before deterministic rendering begins.
+
+## [2026-08-02] - Renderer Class Location
+**Learning:** The `Renderer` class is not defined in `packages/renderer/src/Renderer.ts` but is exported directly from `packages/renderer/src/index.ts`. This structure can be confusing when searching for the class definition.
+**Action:** Always verify the file location of the `Renderer` class in `index.ts` before assuming standard file-per-class structure.
