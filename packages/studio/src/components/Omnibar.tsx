@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useStudio, Composition, Asset } from '../context/StudioContext';
 import { useKeyboardShortcut } from '../hooks/useKeyboardShortcut';
+import { useToast } from '../context/ToastContext';
 import './Omnibar.css';
 
 interface OmnibarItem {
@@ -15,6 +16,7 @@ interface OmnibarItem {
 }
 
 export const Omnibar: React.FC = () => {
+  const { addToast } = useToast();
   const {
     isOmnibarOpen,
     setOmnibarOpen,
@@ -146,7 +148,7 @@ export const Omnibar: React.FC = () => {
       icon: <span style={{ fontSize: '12px' }}>{getAssetIcon(a.type)}</span>,
       action: () => {
         navigator.clipboard.writeText(a.relativePath);
-        // Visual feedback could be added here
+        addToast('Path copied to clipboard', 'success');
       }
     }));
 

@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Asset, useStudio } from '../../context/StudioContext';
 import { ConfirmationModal } from '../ConfirmationModal/ConfirmationModal';
+import { useToast } from '../../context/ToastContext';
 import './AssetItem.css';
 
 interface AssetItemProps {
@@ -8,6 +9,7 @@ interface AssetItemProps {
 }
 
 export const AssetItem: React.FC<AssetItemProps> = ({ asset }) => {
+  const { addToast } = useToast();
   const { deleteAsset, renameAsset } = useStudio();
   const [isHovering, setIsHovering] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -81,7 +83,7 @@ export const AssetItem: React.FC<AssetItemProps> = ({ asset }) => {
       await renameAsset(asset.id, editName);
       setShowRenameWarning(false);
     } catch (e) {
-      alert('Failed to rename asset');
+      addToast('Failed to rename asset', 'error');
       setEditName(asset.name);
       setShowRenameWarning(false);
     }

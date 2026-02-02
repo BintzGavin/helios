@@ -1,4 +1,4 @@
-**Version**: 0.79.0
+**Version**: 0.80.0
 
 # Studio Domain Status
 
@@ -7,6 +7,7 @@
 **Focus**: UI Implementation & CLI
 
 ## Recent Updates
+- [v0.80.0] ✅ Completed: Toast Notifications - Implemented centralized toast notification system for success/error feedback.
 - [v0.79.0] ✅ Completed: Array Reordering - Implemented ability to reorder array items (up/down) in the Props Editor, improving list management.
 - [v0.78.0] ✅ Completed: Persistent Preferences - Implemented persistence for Sidebar tab, Stage settings (Zoom/Pan/Transparency/Guides), Timeline Zoom, and Active Composition using `localStorage`.
 - [v0.77.0] ✅ Completed: Omnibar Command Palette - Replaced Composition Switcher with a unified Omnibar (Cmd+K) for searching commands, compositions, and assets.
