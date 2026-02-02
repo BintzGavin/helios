@@ -7,7 +7,7 @@ export const GlobalShortcuts: React.FC = () => {
     controller,
     playerState,
     setHelpOpen,
-    setSwitcherOpen,
+    setOmnibarOpen,
     inPoint,
     setInPoint,
     outPoint,
@@ -54,10 +54,10 @@ export const GlobalShortcuts: React.FC = () => {
     setHelpOpen(true);
   }, { ignoreInput: true });
 
-  // Cmd+K: Switcher
+  // Cmd+K: Omnibar
   useKeyboardShortcut('k', (e) => {
     e.preventDefault();
-    setSwitcherOpen(true);
+    setOmnibarOpen(true);
   }, { ctrlOrCmd: true });
 
   // I: Set In Point

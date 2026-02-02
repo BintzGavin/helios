@@ -1,0 +1,138 @@
+.omnibar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding-top: 100px;
+  z-index: 1000;
+}
+
+.omnibar-container {
+  background-color: #1e1e1e;
+  border: 1px solid #333;
+  border-radius: 8px;
+  width: 600px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.omnibar-input {
+  padding: 16px;
+  font-size: 18px;
+  background-color: transparent;
+  border: none;
+  border-bottom: 1px solid #333;
+  color: white;
+  outline: none;
+  width: 100%;
+}
+
+.omnibar-list {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.omnibar-empty {
+  padding: 16px;
+  color: #666;
+  text-align: center;
+}
+
+.omnibar-group-header {
+  padding: 8px 16px;
+  font-size: 12px;
+  font-weight: bold;
+  color: #888;
+  text-transform: uppercase;
+  background-color: #252525;
+  border-top: 1px solid #333;
+  border-bottom: 1px solid #333;
+}
+
+.omnibar-group-header:first-child {
+  border-top: none;
+}
+
+.omnibar-item {
+  padding: 10px 16px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #ccc;
+}
+
+.omnibar-item:hover, .omnibar-item.selected {
+  background-color: #333;
+  color: white;
+}
+
+.omnibar-item-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.omnibar-item-icon {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #888;
+}
+
+.omnibar-item-details {
+  display: flex;
+  flex-direction: column;
+}
+
+.omnibar-item-label {
+  font-weight: 500;
+}
+
+.omnibar-item-description {
+  font-size: 12px;
+  color: #666;
+}
+
+.omnibar-item-shortcut {
+  font-size: 12px;
+  color: #666;
+  background: #2a2a2a;
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: 1px solid #333;
+}
+
+.omnibar-footer {
+  padding: 8px 16px;
+  border-top: 1px solid #333;
+  font-size: 11px;
+  color: #666;
+  display: flex;
+  justify-content: space-between;
+  background-color: #252525;
+}
+
+.omnibar-thumbnail {
+  width: 32px;
+  height: 18px;
+  object-fit: cover;
+  border-radius: 2px;
+  background-color: #000;
+}
+
+.omnibar-thumbnail-placeholder {
+  width: 32px;
+  height: 18px;
+  border-radius: 2px;
+  background-color: #333;
+}

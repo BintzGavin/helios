@@ -6,7 +6,7 @@ import { Timeline } from './components/Timeline'
 import { PropsEditor } from './components/PropsEditor'
 import { PlaybackControls } from './components/Controls/PlaybackControls'
 import { StudioProvider, useStudio } from './context/StudioContext'
-import { CompositionSwitcher } from './components/CompositionSwitcher'
+import { Omnibar } from './components/Omnibar'
 import { CreateCompositionModal } from './components/CreateCompositionModal'
 import { DuplicateCompositionModal } from './components/DuplicateCompositionModal'
 import { CompositionSettingsModal } from './components/CompositionSettingsModal'
@@ -21,7 +21,7 @@ import { Sidebar } from './components/Sidebar/Sidebar'
 function AppContent() {
   const {
     activeComposition,
-    setSwitcherOpen,
+    setOmnibarOpen,
     setCreateOpen,
     controller,
     playerState,
@@ -66,7 +66,7 @@ function AppContent() {
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '0 16px', height: '100%' }}>
             <div style={{ fontWeight: 'bold' }}>Helios Studio</div>
             <button
-              onClick={() => setSwitcherOpen(true)}
+              onClick={() => setOmnibarOpen(true)}
               style={{
                 background: '#333',
                 border: '1px solid #444',
@@ -120,7 +120,7 @@ function AppContent() {
           </Panel>
         }
       />
-      <CompositionSwitcher />
+      <Omnibar />
       <CreateCompositionModal />
       <DuplicateCompositionModal />
       <CompositionSettingsModal />

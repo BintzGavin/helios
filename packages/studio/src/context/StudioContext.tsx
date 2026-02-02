@@ -77,8 +77,8 @@ interface StudioContextType {
   compositions: Composition[];
   activeComposition: Composition | null;
   setActiveComposition: (comp: Composition) => void;
-  isSwitcherOpen: boolean;
-  setSwitcherOpen: (isOpen: boolean) => void;
+  isOmnibarOpen: boolean;
+  setOmnibarOpen: (isOpen: boolean) => void;
 
   isHelpOpen: boolean;
   setHelpOpen: (isOpen: boolean) => void;
@@ -159,7 +159,7 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [compositions, setCompositions] = useState<Composition[]>([]);
   const [assets, setAssets] = useState<Asset[]>([]);
   const [activeComposition, setActiveComposition] = useState<Composition | null>(null);
-  const [isSwitcherOpen, setSwitcherOpen] = useState(false);
+  const [isOmnibarOpen, setOmnibarOpen] = useState(false);
   const [isHelpOpen, setHelpOpen] = useState(false);
   const [isDiagnosticsOpen, setDiagnosticsOpen] = useState(false);
   const [isAssistantOpen, setAssistantOpen] = useState(false);
@@ -651,8 +651,8 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         renameAsset,
         activeComposition,
         setActiveComposition,
-        isSwitcherOpen,
-        setSwitcherOpen,
+        isOmnibarOpen,
+        setOmnibarOpen,
         isHelpOpen,
         setHelpOpen,
         isDiagnosticsOpen,

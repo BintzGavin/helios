@@ -3,7 +3,7 @@ import { useStudio } from '../../context/StudioContext';
 import './EmptyState.css';
 
 export const EmptyState: React.FC = () => {
-  const { compositions, setCreateOpen, setSwitcherOpen } = useStudio();
+  const { compositions, setCreateOpen, setOmnibarOpen } = useStudio();
 
   // Scenario A: Fresh Project (No compositions)
   if (compositions.length === 0) {
@@ -23,7 +23,7 @@ export const EmptyState: React.FC = () => {
     <div className="empty-state-overlay">
       <h2>No Composition Selected</h2>
       <p>Select a composition to start editing.</p>
-      <button className="secondary-button" onClick={() => setSwitcherOpen(true)}>
+      <button className="secondary-button" onClick={() => setOmnibarOpen(true)}>
         Select Composition (⌘K)
       </button>
     </div>
