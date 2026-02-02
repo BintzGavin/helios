@@ -1,6 +1,6 @@
 # Status: DEMO Domain
 
-**Version**: 1.85.0
+**Version**: 1.85.1
 
 ## Vision
 The DEMO domain is responsible for:
@@ -15,6 +15,7 @@ The DEMO domain is responsible for:
 - None
 
 ## Completed Tasks
+- [v1.85.1] ✅ Completed: Fix Promo Video Rendering - Updated workspace dependencies to resolve build failures and confirmed successful rendering of `examples/promo-video`.
 - [v1.85.0] ✅ Completed: Vanilla Captions Animation - Created `examples/vanilla-captions-animation` demonstrating Helios captions (SRT) support in Vanilla TypeScript, replacing the legacy `examples/captions-animation`.
 - [v1.84.0] ✅ Completed: Solid Captions Animation - Created `examples/solid-captions-animation` demonstrating Helios captions (SRT) support in SolidJS.
 - [v1.83.0] ✅ Completed: Solid Three.js Canvas Animation - Created `examples/solid-threejs-canvas-animation` demonstrating Three.js integration with SolidJS and Helios.

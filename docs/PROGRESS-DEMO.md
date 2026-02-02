@@ -1,3 +1,6 @@
+## DEMO v1.85.1
+- ✅ Completed: Fix Promo Video Rendering - Updated workspace dependencies to resolve build failures and confirmed successful rendering of `examples/promo-video`.
+
 ## DEMO v1.85.0
 - ✅ Completed: Vanilla Captions Animation - Created `examples/vanilla-captions-animation` demonstrating Helios captions (SRT) support in Vanilla TypeScript, replacing the legacy `examples/captions-animation`.
 
