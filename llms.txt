@@ -6,8 +6,8 @@ Helios is a modern engine for creating videos programmatically using standard we
 
 ## Quick Facts
 - **License**: Elastic License 2.0 (free commercial use, no SaaS resale)
-- **Status**: Core: Stable (v3.7+), Studio: Alpha (v0.70+)
-- **Frameworks**: React, Vue, Svelte, vanilla JS
+- **Status**: Core: Stable (v5.0+), Studio: Alpha (v0.79+)
+- **Frameworks**: React, Vue, Svelte, Solid, vanilla JS
 - **Animation**: Standard CSS, Web Animations API (WAAPI), any animation library
 
 ## Core API
@@ -18,16 +18,18 @@ import { Helios } from '@helios-project/core';
 const helios = new Helios({
   duration: 10,  // seconds
   fps: 30,
-  autoSyncAnimations: true,
+  autoSyncAnimations: true, // Auto-sync CSS/WAAPI
   inputProps: { title: "Hello World" }, // Dynamic data
   captions: [{ id: "1", startTime: 0, endTime: 1000, text: "Welcome" }] // SRT string or objects
 });
 
-helios.subscribe(({ currentFrame, inputProps }) => {
+// Reactively subscribe to state changes
+helios.subscribe(({ currentFrame, inputProps, availableAudioTracks }) => {
   // Drive animations with progress or props
+  // availableAudioTracks is now AudioTrackMetadata[] (id, startTime, duration)
 });
 
-// Ensure fonts, images, and media are ready before rendering
+// CRITICAL: Ensure fonts, images, and media are ready before rendering
 await helios.waitUntilStable();
 
 helios.play();
@@ -60,7 +62,7 @@ The engine controls `document.timeline.currentTime` to seek animations frame-acc
 
 ### Components
 - **Helios class**: Headless state machine (currentFrame, isPlaying, etc.)
-- **Framework adapters**: React hook, Vue composable, Svelte store
+- **Framework adapters**: React hook, Vue composable, Svelte store, Solid signal
 - **Web Component**: `<helios-player>` for browser preview
 - **Renderer**: FFmpeg with piped frames (no temp files)
 
@@ -83,7 +85,7 @@ Skills for AI agents are in `.agents/skills/helios/`:
 ## Key Files for Agents
 - `README.md` - Vision document
 - `docs/BACKLOG.md` - Feature backlog
-- `docs/PROGRESS.md` - Completed work
+- `docs/PROGRESS-*.md` - Completed work (per domain)
 - `docs/status/[ROLE].md` - Domain-specific status
 - `.sys/llmdocs/context-*.md` - Architecture summaries
 - `packages/core/src/index.ts` - Core public API
@@ -93,19 +95,27 @@ Skills for AI agents are in `.agents/skills/helios/`:
 ## Diagnostics
 ```typescript
 const report = await Helios.diagnose();
-// { waapi: boolean, webCodecs: boolean, videoCodecs: {...}, audioCodecs: {...}, ... }
+// {
+//   waapi: boolean,
+//   webCodecs: boolean,
+//   videoCodecs: { h264: boolean, ... },
+//   audioCodecs: { aac: boolean, ... },
+//   videoDecoders: { h264: boolean, ... },
+//   audioDecoders: { aac: boolean, ... }
+// }
 ```
 
 ## Roadmap
 ### V1.x (Active)
-- **Helios Studio**: Alpha v0.70+ (MCP Server, Persistent Jobs, Recursive Discovery)
-- **Core**: Stable v3.7+ (Audio Looping/Fading, Reactive Virtual Time)
-- **Player**: Feature Complete v0.50+ (Audio Tracks, Persistence, PiP)
-- **Renderer**: Stable v1.53+ (H.264 Default, Blob Audio, Recursive Shadow DOM)
+- **Helios Studio**: Alpha v0.79+ (Omnibar, Audio Mixer, Persistent Preferences)
+- **Core**: Stable v5.0+ (Audio Metadata, Decoupled TimeDriver)
+- **Player**: Feature Complete v0.56+ (Shadow DOM Export, Diagnostics)
+- **Renderer**: Stable v1.57+ (Looping Media, Recursive Shadow DOM)
 
 ### AI Integration
-- **Studio MCP Server**: Inspect, create, and render compositions via LLM tools
-- **System Prompt**: Programmatic context generation for agents
+- **Studio MCP Server**: Inspect, create, and render compositions via LLM tools (Done)
+- **System Prompt**: Programmatic context generation for agents (Done)
+- **Helios Assistant**: Context-aware documentation search (Done)
 
 ### V2 (Next)
 - Distributed rendering (Lambda, Cloud Run)

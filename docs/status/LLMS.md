@@ -1,11 +1,12 @@
 # Status: LLMS
 
-**Version**: 1.5.0
+**Version**: 1.6.0
 
 - **Status**: Active
 - **Current Focus**: Comprehensive Review and Maintenance
-- **Last Updated**: 2026-06-12
+- **Last Updated**: 2026-07-27
 
+[v1.6.0] ✅ Completed: Comprehensive Daily Review - Updated Status to reflect Core v5.0+ and Studio v0.79+, refined Core API example with critical stability checks, added Diagnostics detail, and synced Roadmap with completed features (Studio MCP, System Prompt).
 [v1.5.0] ✅ Completed: Comprehensive Daily Review - Updated Status to reflect Core v3.7+ and Studio v0.70+, added AI Integration section to Roadmap (MCP Server), and refined Diagnostics API example.
 [v1.4.0] ✅ Completed: Comprehensive Daily Review - Updated Status to reflect Core stability vs Studio Alpha, corrected Core API caption example, and updated roadmap with recent package versions (Studio v0.63+, Core v3.0+, Player v0.48+).
 [v1.3.0] ✅ Completed: Comprehensive Daily Review - Updated Studio roadmap details to v0.48+ (Timeline Polish, Safe Areas).
