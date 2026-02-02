@@ -113,6 +113,9 @@ Each agent should update **their own dedicated progress file** instead of this f
 - If this is a new version, create the section at the top of the file (after any existing content)
 - Group multiple completions under the same version section if they're part of the same release
 
+## DEMO v1.87.0
+- ✅ Completed: Fix GSAP Sync - Fixed synchronization issue in `examples/promo-video` using `helios.registerStabilityCheck` and enhanced `tests/e2e/verify-render.ts` with custom duration/brightness checks.
+
 ## DEMO v1.86.1
 - ✅ Verified: Vanilla Transitions - Verified build and E2E tests for the existing implementation.
 
@@ -199,6 +202,3 @@ Each agent should update **their own dedicated progress file** instead of this f
 
 ### PLAYER v0.58.0
 - ✅ Completed: Configurable Export Bitrate - Implemented `export-bitrate` attribute to control client-side export quality.
-
-## DEMO v1.87.0
-- ✅ Completed: Fix GSAP Sync - Fixed synchronization issue in `examples/promo-video` using `helios.registerStabilityCheck` and enhanced `tests/e2e/verify-render.ts` with custom duration/brightness checks.
