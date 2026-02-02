@@ -9,7 +9,7 @@ export interface DriverMetadata {
 }
 
 export interface TimeDriver {
-  init(scope: HTMLElement | Document): void;
+  init(scope: unknown): void;
   update(timeInMs: number, options?: {
     isPlaying: boolean;
     playbackRate: number;

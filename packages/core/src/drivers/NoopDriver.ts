@@ -1,7 +1,7 @@
 import { TimeDriver } from './TimeDriver.js';
 
 export class NoopDriver implements TimeDriver {
-  init(scope: HTMLElement | Document) {
+  init(scope: unknown) {
     // No-op
   }
 

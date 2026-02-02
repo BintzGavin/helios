@@ -1,5 +1,8 @@
 # CORE Progress Log
 
+## CORE v5.0.1
+- ✅ Completed: Decouple TimeDriver from DOM - Updated `TimeDriver` and `Helios` to accept `unknown` scope, enabling Web Worker support, and synchronized version.
+
 ## CORE v5.0.0
 - ✅ Completed: Implement Audio Track Metadata - Updated `availableAudioTracks` signal to return `AudioTrackMetadata[]` instead of `string[]` (Breaking Change), including `startTime` and `duration` discovery.
 

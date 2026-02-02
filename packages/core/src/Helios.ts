@@ -44,7 +44,7 @@ export interface HeliosOptions<TInputProps = Record<string, any>> {
   loop?: boolean;
   playbackRange?: [number, number];
   autoSyncAnimations?: boolean;
-  animationScope?: HTMLElement;
+  animationScope?: unknown;
   inputProps?: TInputProps;
   schema?: HeliosSchema;
   playbackRate?: number;
@@ -234,7 +234,7 @@ export class Helios<TInputProps = Record<string, any>> {
   // Other internals
   private syncWithDocumentTimeline = false;
   private autoSyncAnimations = false;
-  private animationScope: HTMLElement | Document = typeof document !== 'undefined' ? document : ({} as Document);
+  private animationScope?: unknown = typeof document !== 'undefined' ? document : undefined;
   private driver: TimeDriver;
   private ticker: Ticker;
   private subscriberMap = new Map<HeliosSubscriber<TInputProps>, () => void>();

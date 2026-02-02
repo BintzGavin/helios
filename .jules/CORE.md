@@ -25,3 +25,7 @@
 ## [4.1.0] - JSDOM Computed Styles
 **Learning:** In JSDOM (vitest), `window.getComputedStyle(el)` returns empty values unless the element is attached to the document body.
 **Action:** In tests involving computed styles, always use `document.body.appendChild(el)` in `beforeEach` and remove it in `afterEach`.
+
+## [5.0.1] - Mock Duck Typing
+**Learning:** Strict type checks (`instanceof HTMLElement`) in `DomDriver` broke existing tests that used mock objects.
+**Action:** When enforcing runtime type safety for DOM APIs, allow "duck typing" (checking for presence of methods like `querySelectorAll` or `getAnimations`) to support test mocks and alternative environments.
