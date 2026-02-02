@@ -31,6 +31,7 @@
 
 ### 6. Distributed Rendering Research
 - [x] Scaffolding for distributed rendering.
+- [x] Implement RenderOrchestrator for Local Distributed Rendering.
 
 ### 7. Helios Studio
 - [x] Scaffold `packages/studio` package.

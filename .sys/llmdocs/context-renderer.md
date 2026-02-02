@@ -13,6 +13,8 @@ The Renderer operates on a "Dual-Path" architecture to support different use cas
 
 Both strategies pipe frame data directly to an FFmpeg process via stdin ("Zero Disk I/O"), ensuring high performance and low latency. Audio tracks from Blob URLs are extracted to memory and also piped to FFmpeg via additional pipes, avoiding temporary files.
 
+The **Render Orchestrator** manages local distributed rendering by splitting the job into concurrent chunks and combining them, utilizing multi-core systems efficiently.
+
 ## B. File Tree
 ```
 packages/renderer/
@@ -30,7 +32,10 @@ packages/renderer/
 │   │   ├── FFmpegInspector.ts  # Environment diagnostics
 │   │   ├── dom-scanner.ts      # Asset discovery
 │   │   └── blob-extractor.ts   # Blob URL extraction
-│   ├── index.ts                # Main Renderer class
+│   ├── index.ts                # Main Entry point
+│   ├── Renderer.ts             # Renderer class
+│   ├── Orchestrator.ts         # Distributed rendering orchestrator
+│   ├── concat.ts               # Video concatenation utility
 │   └── types.ts                # Configuration interfaces
 ├── scripts/                    # Self-contained verification scripts (integration tests)
 │   ├── verify-cancellation.ts  # Render cancellation test
@@ -41,6 +46,7 @@ packages/renderer/
 └── tests/
     ├── run-all.ts              # Test runner (executes comprehensive suite)
     ├── verify-browser-config.ts # Browser launch config test
+    ├── verify-distributed.ts   # Distributed rendering verification
     ├── verify-waapi-sync.ts    # CSS animation sync test
     ├── verify-seek-driver-determinism.ts # SeekDriver determinism test
     ├── verify-cdp-media-sync-timing.ts # CdpDriver media sync timing test
@@ -68,6 +74,7 @@ The `RendererOptions` interface controls the render pipeline:
 - `fps`: Target frame rate.
 - `durationInSeconds`: Total length of the video (fallback if `frameCount` is not set).
 - `frameCount`: Exact number of frames to render (overrides `durationInSeconds`).
+- `startFrame`: Frame index to start rendering from (for partial renders).
 - `mode`: `'dom'` or `'canvas'`.
 - `canvasSelector`: CSS selector to target the canvas element in `'canvas'` mode (default `'canvas'`).
 - `browserConfig`: Object to customize Playwright browser launch (`headless`, `args`, `executablePath`).
@@ -79,6 +86,9 @@ The `RendererOptions` interface controls the render pipeline:
 - `intermediateImageQuality`: JPEG quality (0-100) if format is jpeg.
 - `stabilityTimeout`: Timeout for frame stability (default 30000ms).
 - `inputProps`: Object injected into the page as `window.__HELIOS_PROPS__`.
+
+The `DistributedRenderOptions` interface (extends `RendererOptions`) adds:
+- `concurrency`: Number of concurrent workers for distributed rendering.
 
 ## D. FFmpeg Interface
 The renderer spawns an FFmpeg process with the following key flags:

@@ -1,3 +1,6 @@
+## RENDERER v1.59.0
+- ✅ Completed: Local Distributed Rendering - Implemented `RenderOrchestrator` to split render jobs into concurrent chunks and concatenate the results, enabling faster rendering on multi-core systems.
+
 ## RENDERER v1.58.0
 - ✅ Completed: Zero Disk Audio - Refactored `blob-extractor.ts` and `FFmpegBuilder.ts` to pipe audio buffers directly to FFmpeg via stdio pipes (`pipe:N`), eliminating temporary file creation for Blob audio tracks and improving security and performance.
 
