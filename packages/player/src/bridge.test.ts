@@ -36,6 +36,10 @@ describe('connectToParent', () => {
             setAudioVolume: vi.fn(),
             setAudioMuted: vi.fn(),
             setLoop: vi.fn(),
+            setDuration: vi.fn(),
+            setFps: vi.fn(),
+            setSize: vi.fn(),
+            setMarkers: vi.fn(),
             setInputProps: vi.fn(),
             setCaptions: vi.fn(),
             getState: vi.fn().mockReturnValue({}),
@@ -84,5 +88,22 @@ describe('connectToParent', () => {
         triggerMessage({ type: 'HELIOS_PLAY' }, window);
 
         expect(mockHelios.play).not.toHaveBeenCalled();
+    });
+
+    it('should process composition setting messages', () => {
+        connectToParent(mockHelios);
+
+        triggerMessage({ type: 'HELIOS_SET_DURATION', duration: 10 }, window.parent);
+        expect(mockHelios.setDuration).toHaveBeenCalledWith(10);
+
+        triggerMessage({ type: 'HELIOS_SET_FPS', fps: 30 }, window.parent);
+        expect(mockHelios.setFps).toHaveBeenCalledWith(30);
+
+        triggerMessage({ type: 'HELIOS_SET_SIZE', width: 800, height: 600 }, window.parent);
+        expect(mockHelios.setSize).toHaveBeenCalledWith(800, 600);
+
+        const markers = [{ id: 'm1', time: 1 }];
+        triggerMessage({ type: 'HELIOS_SET_MARKERS', markers }, window.parent);
+        expect(mockHelios.setMarkers).toHaveBeenCalledWith(markers);
     });
 });

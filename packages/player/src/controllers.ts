@@ -1,4 +1,4 @@
-import { Helios, CaptionCue, HeliosSchema, DiagnosticReport } from "@helios-project/core";
+import { Helios, CaptionCue, HeliosSchema, DiagnosticReport, Marker } from "@helios-project/core";
 import { captureDomToBitmap } from "./features/dom-capture";
 import { getAudioAssets, AudioAsset } from "./features/audio-utils";
 
@@ -15,6 +15,10 @@ export interface HeliosController {
   setPlaybackRange(startFrame: number, endFrame: number): void;
   clearPlaybackRange(): void;
   setCaptions(captions: string | CaptionCue[]): void;
+  setDuration(seconds: number): void;
+  setFps(fps: number): void;
+  setSize(width: number, height: number): void;
+  setMarkers(markers: Marker[]): void;
   setInputProps(props: Record<string, any>): void;
   subscribe(callback: (state: any) => void): () => void;
   onError(callback: (err: any) => void): () => void;
@@ -40,6 +44,10 @@ export class DirectController implements HeliosController {
   setPlaybackRange(start: number, end: number) { this.instance.setPlaybackRange(start, end); }
   clearPlaybackRange() { this.instance.clearPlaybackRange(); }
   setCaptions(captions: string | CaptionCue[]) { this.instance.setCaptions(captions); }
+  setDuration(seconds: number) { this.instance.setDuration(seconds); }
+  setFps(fps: number) { this.instance.setFps(fps); }
+  setSize(width: number, height: number) { this.instance.setSize(width, height); }
+  setMarkers(markers: Marker[]) { this.instance.setMarkers(markers); }
   setInputProps(props: Record<string, any>) { this.instance.setInputProps(props); }
   subscribe(callback: (state: any) => void) { return this.instance.subscribe(callback); }
   getState() { return this.instance.getState(); }
@@ -168,6 +176,10 @@ export class BridgeController implements HeliosController {
   setPlaybackRange(start: number, end: number) { this.iframeWindow.postMessage({ type: 'HELIOS_SET_PLAYBACK_RANGE', start, end }, '*'); }
   clearPlaybackRange() { this.iframeWindow.postMessage({ type: 'HELIOS_CLEAR_PLAYBACK_RANGE' }, '*'); }
   setCaptions(captions: string | CaptionCue[]) { this.iframeWindow.postMessage({ type: 'HELIOS_SET_CAPTIONS', captions }, '*'); }
+  setDuration(duration: number) { this.iframeWindow.postMessage({ type: 'HELIOS_SET_DURATION', duration }, '*'); }
+  setFps(fps: number) { this.iframeWindow.postMessage({ type: 'HELIOS_SET_FPS', fps }, '*'); }
+  setSize(width: number, height: number) { this.iframeWindow.postMessage({ type: 'HELIOS_SET_SIZE', width, height }, '*'); }
+  setMarkers(markers: Marker[]) { this.iframeWindow.postMessage({ type: 'HELIOS_SET_MARKERS', markers }, '*'); }
   setInputProps(props: Record<string, any>) { this.iframeWindow.postMessage({ type: 'HELIOS_SET_PROPS', props }, '*'); }
 
   subscribe(callback: (state: any) => void) {

@@ -114,6 +114,10 @@ The controller returned by `getController()` provides advanced methods:
 - `setInputProps(props: Record<string, any>): void`
 - `setPlaybackRange(startFrame: number, endFrame: number): void`
 - `clearPlaybackRange(): void`
+- `setDuration(seconds: number): void`: Updates the composition duration.
+- `setFps(fps: number): void`: Updates the composition frame rate.
+- `setSize(width: number, height: number): void`: Updates the composition resolution.
+- `setMarkers(markers: Marker[]): void`: Updates the timeline markers.
 - `diagnose(): Promise<DiagnosticReport>`: Returns a diagnostic report of the environment capabilities (WebCodecs, WebGL, etc.).
 
 ## G. Interaction

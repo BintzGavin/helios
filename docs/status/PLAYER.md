@@ -1,4 +1,4 @@
-**Version**: v0.57.1
+**Version**: v0.58.0
 
 # Status: PLAYER
 
@@ -48,10 +48,12 @@
 - Supports audio fade-in/out in client-side export via `data-helios-fade-in` and `data-helios-fade-out` attributes.
 - Supports Shadow DOM Export: DOM-based client-side export now correctly captures Shadow DOM content (via Declarative Shadow DOM transformation), enabling support for Web Components in exports.
 - **Supports Environment Diagnostics**: Implemented `diagnose()` method in `HeliosController` (Direct and Bridge) to expose environment capabilities (WebCodecs, WebGL, etc.) to the host.
+- **Supports Composition Setters**: Exposed `setDuration`, `setFps`, `setSize`, and `setMarkers` in `HeliosController` and Bridge, enabling dynamic updates to composition structure.
 
 ## Critical Task
 - **None**: All critical tasks completed.
 
+[v0.58.0] ✅ Completed: Expose Composition Setters - Implemented `setDuration`, `setFps`, `setSize`, and `setMarkers` methods in `HeliosController` (Direct/Bridge) to allow dynamic composition updates.
 [v0.57.1] ✅ Completed: Fix Test Environment & Sync Version - Updated package version to match status file, installed missing dependencies, and verified all tests pass (including Shadow DOM export).
 [v0.57.0] ✅ Completed: Configurable Export Resolution - Implemented `export-width` and `export-height` attributes to allow specifying target resolution for client-side exports, enabling high-quality DOM exports independent of player size.
 [v0.56.2] ✅ Completed: Fix Core Dependency - Updated `packages/player/package.json` to depend on `@helios-project/core@^5.0.1` to resolve version mismatch and fix the build.

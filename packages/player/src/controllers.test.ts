@@ -53,6 +53,10 @@ describe('DirectController', () => {
             setPlaybackRate: vi.fn(),
             setPlaybackRange: vi.fn(),
             clearPlaybackRange: vi.fn(),
+            setDuration: vi.fn(),
+            setFps: vi.fn(),
+            setSize: vi.fn(),
+            setMarkers: vi.fn(),
             setInputProps: vi.fn(),
             subscribe: vi.fn((cb) => {
                  return vi.fn();
@@ -111,6 +115,21 @@ describe('DirectController', () => {
 
         controller.setInputProps({ foo: 'bar' });
         expect(mockHeliosInstance.setInputProps).toHaveBeenCalledWith({ foo: 'bar' });
+    });
+
+    it('should set composition settings', () => {
+        controller.setDuration(15);
+        expect(mockHeliosInstance.setDuration).toHaveBeenCalledWith(15);
+
+        controller.setFps(60);
+        expect(mockHeliosInstance.setFps).toHaveBeenCalledWith(60);
+
+        controller.setSize(1280, 720);
+        expect(mockHeliosInstance.setSize).toHaveBeenCalledWith(1280, 720);
+
+        const markers = [{ id: 'm1', time: 10, label: 'Marker 1' }];
+        controller.setMarkers(markers);
+        expect(mockHeliosInstance.setMarkers).toHaveBeenCalledWith(markers);
     });
 
     it('should set audio volume and muted', () => {
@@ -280,6 +299,21 @@ describe('BridgeController', () => {
     it('should post messages for loop', () => {
         controller.setLoop(true);
         expect(mockWindow.postMessage).toHaveBeenCalledWith({ type: 'HELIOS_SET_LOOP', loop: true }, '*');
+    });
+
+    it('should post messages for composition settings', () => {
+        controller.setDuration(20);
+        expect(mockWindow.postMessage).toHaveBeenCalledWith({ type: 'HELIOS_SET_DURATION', duration: 20 }, '*');
+
+        controller.setFps(60);
+        expect(mockWindow.postMessage).toHaveBeenCalledWith({ type: 'HELIOS_SET_FPS', fps: 60 }, '*');
+
+        controller.setSize(1920, 1080);
+        expect(mockWindow.postMessage).toHaveBeenCalledWith({ type: 'HELIOS_SET_SIZE', width: 1920, height: 1080 }, '*');
+
+        const markers = [{ id: 'm1', time: 5, label: 'Intro' }];
+        controller.setMarkers(markers);
+        expect(mockWindow.postMessage).toHaveBeenCalledWith({ type: 'HELIOS_SET_MARKERS', markers }, '*');
     });
 
     it('should post messages for playback range', () => {
