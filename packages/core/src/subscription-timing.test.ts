@@ -101,4 +101,98 @@ describe('Helios Subscription Timing', () => {
     expect(spy).toHaveBeenCalledTimes(2);
     expect(lastFrame).toBe(30); // 1000ms * 30fps / 1000 = 30 frames
   });
+
+  it('should fire subscribers synchronously for multiple rapid updates', () => {
+    const helios = new Helios({
+      fps: 30,
+      duration: 10
+    });
+
+    helios.bindToDocumentTimeline();
+
+    const frames: number[] = [];
+    helios.subscribe((state) => {
+      frames.push(state.currentFrame);
+    });
+
+    // Initial call
+    expect(frames).toEqual([0]);
+
+    // Update 1
+    (window as any).__HELIOS_VIRTUAL_TIME__ = 1000;
+    // Update 2
+    (window as any).__HELIOS_VIRTUAL_TIME__ = 2000;
+    // Update 3
+    (window as any).__HELIOS_VIRTUAL_TIME__ = 3000;
+
+    expect(frames).toEqual([0, 30, 60, 90]);
+  });
+
+  it('should block waitUntilStable until virtual time is synced (polling fallback)', async () => {
+    const helios = new Helios({
+      fps: 30,
+      duration: 10
+    });
+
+    // Mock defineProperty to fail, forcing polling fallback
+    const originalDefineProperty = Object.defineProperty;
+    Object.defineProperty = vi.fn(() => { throw new Error('Mock error'); });
+
+    // Mock rAF queue
+    const originalRaf = (global as any).requestAnimationFrame;
+    const rafQueue: (() => void)[] = [];
+    const mockRaf = (cb: any) => {
+      rafQueue.push(cb);
+      return 1;
+    };
+    (global as any).requestAnimationFrame = mockRaf;
+    if (typeof window !== 'undefined') {
+        (window as any).requestAnimationFrame = mockRaf;
+    }
+
+    const flushRaf = () => {
+        const queue = [...rafQueue];
+        rafQueue.length = 0;
+        queue.forEach(cb => cb());
+    };
+
+    helios.bindToDocumentTimeline();
+
+    // Restore defineProperty
+    Object.defineProperty = originalDefineProperty;
+
+    // Set virtual time
+    (window as any).__HELIOS_VIRTUAL_TIME__ = 1000;
+
+    // Verify currentFrame hasn't updated yet (because polling hasn't run)
+    expect(helios.currentFrame.peek()).toBe(0);
+
+    // Call waitUntilStable - should not resolve yet
+    let resolved = false;
+    const promise = helios.waitUntilStable().then(() => { resolved = true; });
+
+    // Wait a bit
+    await new Promise(r => setTimeout(r, 10));
+    expect(resolved).toBe(false);
+
+    // Flush rAF to run polling loop and start checkSync loop
+    flushRaf();
+
+    // Helios poll loop should update currentFrame
+    expect(helios.currentFrame.peek()).toBe(30);
+
+    // Flush again to allow checkSync to verify and resolve
+    flushRaf();
+
+    // We need to wait for promise to resolve
+    await promise;
+    expect(resolved).toBe(true);
+
+    // Cleanup
+    if (originalRaf) {
+        (global as any).requestAnimationFrame = originalRaf;
+    } else {
+        delete (global as any).requestAnimationFrame;
+    }
+  });
 });

@@ -116,6 +116,7 @@ export class Helios<TInputProps = Record<string, any>> {
   private _syncDispose: (() => void) | null = null;
   private _originalVirtualTimeDescriptor: PropertyDescriptor | undefined;
   private _disposeDriverMetadataSubscription: (() => void) | null = null;
+  private _reactiveVirtualTimeBound = false;
 
   // Public Readonly Signals
 
@@ -877,7 +878,50 @@ export class Helios<TInputProps = Record<string, any>> {
     // Execute all registered stability checks
     const checks = Array.from(this._stabilityChecks);
     const checkPromises = checks.map((check) => check());
-    await Promise.all([driverPromise, ...checkPromises]);
+
+    // Virtual Time Sync Check
+    // Ensures that if we are being driven by __HELIOS_VIRTUAL_TIME__, we wait until our internal state matches.
+    // This handles cases where reactive binding failed (fallback to polling) or there is a race condition.
+    const virtualTimePromise = new Promise<void>((resolve) => {
+      if (!this.syncWithDocumentTimeline || typeof window === 'undefined') {
+        resolve();
+        return;
+      }
+
+      const checkSync = () => {
+        // If we stopped syncing, abort check
+        if (!this.syncWithDocumentTimeline) {
+          resolve();
+          return;
+        }
+
+        const virtualTime = (window as any).__HELIOS_VIRTUAL_TIME__;
+        // If not defined or not finite, skip sync check
+        if (typeof virtualTime !== 'number' || !Number.isFinite(virtualTime)) {
+          resolve();
+          return;
+        }
+
+        const rawTargetFrame = (virtualTime / 1000) * this._fps.value;
+        const totalFrames = this._duration.value * this._fps.value;
+        // Clamp target frame to valid range, as Helios internally clamps currentFrame
+        const targetFrame = Math.max(0, Math.min(rawTargetFrame, totalFrames));
+
+        // Tolerance 0.01 frame
+        if (Math.abs(targetFrame - this._currentFrame.peek()) <= 0.01) {
+          resolve();
+        } else {
+          if (typeof requestAnimationFrame !== 'undefined') {
+            requestAnimationFrame(checkSync);
+          } else {
+            setTimeout(checkSync, 10);
+          }
+        }
+      };
+      checkSync();
+    });
+
+    await Promise.all([driverPromise, ...checkPromises, virtualTimePromise]);
   }
 
   public bindTo(master: Helios<any>) {
@@ -965,12 +1009,14 @@ export class Helios<TInputProps = Record<string, any>> {
           }
         });
 
+        this._reactiveVirtualTimeBound = true;
+
         // Trigger initial update if value exists
         if (virtualTimeValue !== null) {
           (window as any).__HELIOS_VIRTUAL_TIME__ = virtualTimeValue;
         }
       } catch (e) {
-        console.warn('Failed to bind reactive virtual time:', e);
+        console.warn('Failed to bind reactive virtual time. Helios will fall back to polling, which may affect synchronization accuracy.', e);
       }
     }
 
@@ -985,18 +1031,26 @@ export class Helios<TInputProps = Record<string, any>> {
       if (typeof window !== 'undefined') {
         const virtualTime = (window as any).__HELIOS_VIRTUAL_TIME__;
         if (typeof virtualTime === 'number' && Number.isFinite(virtualTime)) {
-          // Virtual time is active, setter handles logic.
-          if (typeof requestAnimationFrame !== 'undefined') {
-            requestAnimationFrame(poll);
+          if (this._reactiveVirtualTimeBound) {
+            // Virtual time is active and reactively bound, setter handles logic.
+            if (typeof requestAnimationFrame !== 'undefined') {
+              requestAnimationFrame(poll);
+            }
+            return;
+          } else {
+            // Virtual time is present but not bound reactively (e.g. defineProperty failed).
+            // We must poll it manually.
+            currentTime = virtualTime;
           }
-          return;
         }
       }
 
-      // Fallback to document timeline
-      const tlTime = document.timeline.currentTime;
-      if (tlTime !== null && typeof tlTime === 'number') {
-        currentTime = tlTime;
+      // Fallback to document timeline if no virtual time
+      if (currentTime === null) {
+        const tlTime = document.timeline.currentTime;
+        if (tlTime !== null && typeof tlTime === 'number') {
+          currentTime = tlTime;
+        }
       }
 
       if (currentTime !== null) {
