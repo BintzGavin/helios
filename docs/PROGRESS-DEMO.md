@@ -1,3 +1,6 @@
+## DEMO v1.84.0
+- ✅ Completed: Solid Captions Animation - Created `examples/solid-captions-animation` demonstrating Helios captions (SRT) support in SolidJS.
+
 ## DEMO v1.83.0
 - ✅ Completed: Solid Three.js Canvas Animation - Created `examples/solid-threejs-canvas-animation` demonstrating Three.js integration with SolidJS and Helios.
 
