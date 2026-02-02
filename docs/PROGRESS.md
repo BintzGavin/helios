@@ -107,6 +107,9 @@ Each agent should update **their own dedicated progress file** instead of this f
 - If this is a new version, create the section at the top of the file (after any existing content)
 - Group multiple completions under the same version section if they're part of the same release
 
+## DEMO v1.86.0
+- ✅ Completed: Vanilla Transitions - Created `examples/vanilla-transitions` demonstrating sequenced scene transitions using Vanilla JS and the `sequence()` utility.
+
 ## STUDIO v0.80.1
 - ✅ Completed: Maintenance - Updated dependencies to align with Core v5 and Player v0.57.1, resolving workspace conflicts.
 

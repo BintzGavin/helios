@@ -1,6 +1,6 @@
 # Status: DEMO Domain
 
-**Version**: 1.85.1
+**Version**: 1.86.0
 
 ## Vision
 The DEMO domain is responsible for:
@@ -15,6 +15,7 @@ The DEMO domain is responsible for:
 - None
 
 ## Completed Tasks
+- [v1.86.0] ✅ Completed: Vanilla Transitions - Created `examples/vanilla-transitions` demonstrating sequenced scene transitions using Vanilla JS and the `sequence()` utility.
 - [v1.85.1] ✅ Completed: Update Documentation - Updated `examples/README.md` and `/.sys/llmdocs/context-demo.md` to reflect the current state of examples, including new Captions and Three.js integration examples.
 - [v1.85.0] ✅ Completed: Vanilla Captions Animation - Created `examples/vanilla-captions-animation` demonstrating Helios captions (SRT) support in Vanilla TypeScript, replacing the legacy `examples/captions-animation`.
 - [v1.84.0] ✅ Completed: Solid Captions Animation - Created `examples/solid-captions-animation` demonstrating Helios captions (SRT) support in SolidJS.

@@ -1,0 +1,51 @@
+body {
+  margin: 0;
+  overflow: hidden;
+  background-color: #1a1a1a;
+  color: white;
+  font-family: sans-serif;
+}
+
+.scene {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 3rem;
+  /* Start hidden, toggled by JS */
+  display: none;
+}
+
+#scene-1 {
+  background-color: #e74c3c;
+  animation: slideIn 1s ease-out;
+}
+
+#scene-2 {
+  background-color: #3498db;
+  animation: zoomIn 1s ease-out;
+}
+
+#scene-3 {
+  background-color: #2ecc71;
+  animation: rotateIn 1s ease-out;
+}
+
+@keyframes slideIn {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes zoomIn {
+  from { transform: scale(0); }
+  to { transform: scale(1); }
+}
+
+@keyframes rotateIn {
+  from { transform: rotate(-180deg) scale(0); }
+  to { transform: rotate(0) scale(1); }
+}
