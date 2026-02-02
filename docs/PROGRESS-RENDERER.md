@@ -1,3 +1,6 @@
+## RENDERER v1.60.1
+- ✅ Completed: Refactor Concat to Pipe - Refactored `concatenateVideos` to pipe the file list to FFmpeg's stdin (`-i -`), removing temporary file creation and eliminating disk I/O for the concatenation process. Verified with `verify-concat.ts`.
+
 ## RENDERER v1.60.0
 - ✅ Completed: Enable Audio Playback Rate - Updated `AudioTrackConfig` to include `playbackRate`, and implemented `atempo` filter chaining in `FFmpegBuilder` to support speed adjustments (including values outside 0.5-2.0 range). Also updated `DomScanner` to extract `playbackRate` from media elements.
 

@@ -30,7 +30,7 @@ export async function concatenateVideos(inputPaths: string[], outputPath: string
     await fs.promises.mkdir(outputDir, { recursive: true });
   }
 
-  // Create a temporary file list for ffmpeg concat demuxer
+  // Create file list content for ffmpeg concat demuxer
   // FFmpeg requires paths to be escaped properly.
   // We use absolute paths and replace backslashes with forward slashes for cross-platform compatibility.
   const listContent = inputPaths.map(p => {
@@ -38,21 +38,18 @@ export async function concatenateVideos(inputPaths: string[], outputPath: string
     return `file '${absolutePath}'`;
   }).join('\n');
 
-  const listPath = path.resolve(outputDir, `concat_list_${Date.now()}_${Math.random().toString(36).substring(7)}.txt`);
-
-  await fs.promises.writeFile(listPath, listContent);
-
   const ffmpegPath = options?.ffmpegPath || ffmpeg.path;
   const args = [
     '-f', 'concat',
     '-safe', '0',
-    '-i', listPath,
+    '-protocol_whitelist', 'file,pipe', // Allow reading files from disk via pipe list
+    '-i', '-', // Read list from stdin
     '-c', 'copy',
     '-y', // Overwrite output file
     outputPath
   ];
 
-  console.log(`Spawning FFmpeg for concat: ${ffmpegPath} ${args.join(' ')}`);
+  console.log(`Spawning FFmpeg for concat (piping list to stdin): ${ffmpegPath} ${args.join(' ')}`);
 
   return new Promise((resolve, reject) => {
     const process = spawn(ffmpegPath, args);
@@ -62,16 +59,7 @@ export async function concatenateVideos(inputPaths: string[], outputPath: string
       stderr += data.toString();
     });
 
-    process.on('close', async (code) => {
-      // Cleanup temp file
-      try {
-        if (fs.existsSync(listPath)) {
-            await fs.promises.unlink(listPath);
-        }
-      } catch (e) {
-        console.warn(`Failed to delete temp file ${listPath}`, e);
-      }
-
+    process.on('close', (code) => {
       if (code === 0) {
         resolve();
       } else {
@@ -79,15 +67,12 @@ export async function concatenateVideos(inputPaths: string[], outputPath: string
       }
     });
 
-    process.on('error', async (err) => {
-       try {
-        if (fs.existsSync(listPath)) {
-            await fs.promises.unlink(listPath);
-        }
-      } catch (e) {
-        // ignore
-      }
+    process.on('error', (err) => {
       reject(err);
     });
+
+    // Write file list to stdin
+    process.stdin.write(listContent);
+    process.stdin.end();
   });
 }
