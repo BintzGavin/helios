@@ -45,6 +45,12 @@ export interface AudioTrackConfig {
    * Defaults to false.
    */
   loop?: boolean;
+
+  /**
+   * Playback rate multiplier (e.g., 0.5, 1.0, 2.0).
+   * Defaults to 1.0.
+   */
+  playbackRate?: number;
 }
 
 export interface BrowserConfig {
