@@ -1,8 +1,16 @@
-**Version**: 1.6.0
+**Version**: 1.7.0
 
 # DOCS Status
 
 ## Recent Updates
+[v1.7.0] ✅ Completed: Daily Documentation Review - Comprehensive Sync
+- Updated all Changelogs (Core v5.1.2, Player v0.57.1, Renderer v1.57.3, Demo v1.85.0, Studio v0.80.2).
+- Updated API Docs: Core (Captions, AudioTrackMetadata), Player (Standard Media API, New Attributes), Renderer (Browser Config).
+- Created Guides: Working with Captions.
+- Updated Studio Guide: Omnibar, Assistant, Toast Notifications.
+- Created Example Docs: Captions (Aggregated), SolidJS, Svelte.
+- Updated Navigation (`mint.json`).
+
 [v1.6.0] ✅ Completed: Daily Documentation Review - Audio Tracks & Diagnostics
 - Updated all Changelogs (Core v3.9.0, Player v0.51.0, Renderer v1.54.0, Demo v1.79.0, Studio v0.71.0).
 - Updated API Docs: Core (Bind/Unbind, Audio Tracks), Player (Audio Controls, PiP), Renderer (Canvas Selector, Diagnostics).

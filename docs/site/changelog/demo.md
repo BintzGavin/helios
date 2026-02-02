@@ -5,6 +5,24 @@ description: "Changelog for the Demo package and examples"
 
 # Demo Changelog
 
+## v1.85.0
+- **Vanilla Captions Animation**: Created `examples/vanilla-captions-animation` demonstrating Helios captions (SRT) support in Vanilla TypeScript, replacing the legacy `examples/captions-animation`.
+
+## v1.84.0
+- **Solid Captions Animation**: Created `examples/solid-captions-animation` demonstrating Helios captions (SRT) support in SolidJS.
+
+## v1.83.0
+- **Solid Three.js Canvas Animation**: Created `examples/solid-threejs-canvas-animation` demonstrating Three.js integration with SolidJS and Helios.
+
+## v1.82.0
+- **Svelte Three.js Canvas Animation**: Created `examples/svelte-threejs-canvas-animation` demonstrating Three.js integration with Svelte and Helios.
+
+## v1.81.0
+- **Vue Three.js Canvas Animation**: Created `examples/vue-threejs-canvas-animation` demonstrating Three.js integration with Vue 3 and Helios.
+
+## v1.80.0
+- **Svelte Captions Animation**: Created `examples/svelte-captions-animation` demonstrating Helios captions (SRT) support in Svelte.
+
 ## v1.79.0
 - **Vue Captions Animation**: Created `examples/vue-captions-animation` demonstrating how to use Helios captions with Vue 3 composition API.
 

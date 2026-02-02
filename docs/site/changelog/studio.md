@@ -5,6 +5,30 @@ description: "Changelog for the Studio package"
 
 # Studio Changelog
 
+## v0.80.2
+- **Test Coverage**: Added unit tests for Toast notification system (ToastItem, ToastContext, ToastContainer) and verified with mocked environment.
+
+## v0.80.1
+- **Maintenance**: Updated dependencies to align with Core v5 and Player v0.57.1, resolving workspace conflicts.
+
+## v0.80.0
+- **Toast Notifications**: Implemented centralized toast notification system for success/error feedback.
+
+## v0.79.0
+- **Array Reordering**: Implemented ability to reorder array items (up/down) in the Props Editor.
+
+## v0.78.0
+- **Persistent Preferences**: Implemented persistence for Sidebar tab, Stage settings (Zoom/Pan/Transparency/Guides), Timeline Zoom, and Active Composition using `localStorage`.
+
+## v0.77.0
+- **Omnibar Command Palette**: Replaced Composition Switcher with a unified Omnibar (Cmd+K) for searching commands, compositions, and assets.
+
+## v0.72.1
+- **Robustness**: Added output file verification to Render Manager to ensure failed renders (empty/missing files) are correctly reported as failures.
+
+## v0.72.0
+- **Helios Assistant**: Implemented context-aware AI assistant with documentation search, replacing System Prompt Modal.
+
 ## v0.71.0
 - **Implement Asset Renaming**: Added ability to rename assets from the Assets Panel, updating both UI and filesystem.
 

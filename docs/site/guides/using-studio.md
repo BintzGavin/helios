@@ -19,20 +19,29 @@ The Studio will start a local server (typically at `http://localhost:3000`) and 
 
 ## Features
 
+### Omnibar (Command Palette)
+
+Press `Cmd+K` (or `Ctrl+K`) to open the **Omnibar**. This unified command palette allows you to:
+- **Search Compositions**: Quickly switch between compositions.
+- **Find Assets**: Search for assets in your project.
+- **Execute Commands**: Trigger actions like "Render", "Take Snapshot", or "Toggle Fullscreen".
+- **Ask Assistant**: Query the Helios Assistant for help.
+
 ### Project Discovery
 
-The Studio automatically scans your project (based on `HELIOS_PROJECT_ROOT` or current directory) to find available compositions. It lists them in the sidebar or command palette for easy navigation.
+The Studio automatically scans your project (based on `HELIOS_PROJECT_ROOT` or current directory) to find available compositions. It lists them in the sidebar or Omnibar for easy navigation.
 
 - **Create Composition**: You can create new compositions directly from the UI using templates for Vanilla JS, React, Vue, Svelte, and Three.js.
 - **Duplicate Composition**: You can duplicate an existing composition to use as a starting point.
 - **Rename Composition**: You can rename a composition (which updates the directory name and ID) from the Settings modal.
 - **Delete Composition**: You can delete existing compositions (requires confirmation).
 
-### Diagnostics Panel
+### Helios Assistant
 
-Accessible from the sidebar, this panel provides real-time information about your system capabilities:
--   **Client (Preview)**: Checks for WebCodecs, WebGL, and WAAPI support in your browser.
--   **Server (Renderer)**: Verifies FFmpeg availability and server-side rendering capabilities.
+The **Helios Assistant** is a context-aware AI helper integrated directly into the Studio.
+- **Documentation Search**: Ask questions about the Helios API, and the assistant will search the documentation to provide answers.
+- **Context Aware**: It understands your current composition configuration (schema, duration, etc.).
+- **Access**: Trigger via the "Ask AI" button or through the Omnibar.
 
 ### Visual Timeline
 
@@ -48,6 +57,7 @@ Accessible from the sidebar, this panel provides real-time information about you
 -   **Safe Areas**: Toggle Title Safe and Action Safe guides to ensure your content is positioned correctly for broadcast or social media.
 -   **Snapshot**: Take a PNG snapshot of the current frame.
 -   **Background**: Toggle transparency grid or background color.
+-   **Preferences**: Your settings (Zoom, Pan, Guides) are automatically persisted across sessions.
 
 ### Assets Panel
 
@@ -64,6 +74,7 @@ If your composition defines an input schema or uses `inputProps`, the Studio gen
 
 -   **Groups**: Props can be organized into collapsible groups using the `group` property in the schema.
 -   **Nested Objects/Arrays**: Supports deep editing of complex objects and arrays.
+-   **Reordering**: You can reorder array items using Up/Down controls.
 -   **Validation**: The UI provides immediate feedback for constraints:
     - `min` / `max`: Clamps numeric inputs and length.
     - `pattern`: Validates text against Regex.
@@ -85,6 +96,7 @@ You can trigger a render job directly from the Studio UI. The progress is displa
 
 -   **Persistence**: Render jobs are saved to disk, so your history is preserved even if you restart the Studio.
 -   **Preview**: Once a render is complete, you can click the thumbnail to watch the video in a modal directly within the Studio.
+-   **Verification**: The Render Manager automatically verifies the output file (size, existence) to ensure the render was successful, flagging failures even if FFmpeg exits cleanly.
 -   **Error Reporting**: If a render fails, you can view the detailed error logs to diagnose the issue.
 
 #### Client-Side Export
@@ -93,6 +105,12 @@ For quick previews or sharing, you can also perform a **Client-Side Export** dir
 - Select **Client Export** in the Render Panel.
 - Supports MP4 and WebM formats.
 - Includes audio and burned-in captions.
+
+### Diagnostics Panel
+
+Accessible from the sidebar, this panel provides real-time information about your system capabilities:
+-   **Client (Preview)**: Checks for WebCodecs, WebGL, and WAAPI support in your browser.
+-   **Server (Renderer)**: Verifies FFmpeg availability and server-side rendering capabilities.
 
 ## Keyboard Shortcuts
 
@@ -105,4 +123,4 @@ For quick previews or sharing, you can also perform a **Client-Side Export** dir
 | **Home** | Jump to Start |
 | **I** | Set In Point (Loop Start) |
 | **O** | Set Out Point (Loop End) |
-| **Cmd+K** | Open Composition Switcher |
+| **Cmd+K** | Open Omnibar |

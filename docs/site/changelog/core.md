@@ -5,6 +5,33 @@ description: "Changelog for the Core package"
 
 # Core Changelog
 
+## v5.1.2
+- **Fix GSAP Synchronization**: Forced subscriber notification in `bindToDocumentTimeline` when virtual time is present to ensure initial state synchronization with external libraries like GSAP, resolving black frames in render output.
+
+## v5.1.1
+- **Fix Virtual Time Synchronization**: Enhanced `bindToDocumentTimeline` to robustly handle reactive binding failures (falling back to manual polling) and updated `waitUntilStable` to block until virtual time is fully synchronized, fixing race conditions in frame-by-frame rendering.
+
+## v5.1.0
+- **Implement WebVTT Support**: Implemented `parseWebVTT` and auto-detecting `parseCaptions` in `captions.ts`, enabling native .vtt file support.
+
+## v5.0.1
+- **Decouple TimeDriver from DOM**: Updated `TimeDriver` and `Helios` to accept `unknown` scope, enabling Web Worker support, and synchronized version.
+
+## v5.0.0
+- **Implement Audio Track Metadata**: Updated `availableAudioTracks` signal to return `AudioTrackMetadata[]` instead of `string[]` (Breaking Change), including `startTime` and `duration` discovery.
+
+## v4.1.0
+- **Implement Marker Metadata**: Updated `Marker` interface to include optional `metadata` and make `label` optional.
+
+## v4.0.0
+- **Remove WaapiDriver**: Removed deprecated `WaapiDriver` and bumped version to 4.0.0 (Breaking Change).
+
+## v3.9.2
+- **Verify Subscription Timing**: Verified that `helios.subscribe` fires synchronously after `seek()` and virtual time updates.
+
+## v3.9.1
+- **Expose Version and Verify Init Sync**: Exported `VERSION` constant and verified robust `bindToDocumentTimeline` initialization with pre-existing virtual time.
+
 ## v3.9.0
 - **Fix Signal Glitches and Runtime Safety**: Optimized `EffectImpl` to avoid redundant executions and guarded `Helios.bindToDocumentTimeline` for Node.js compatibility.
 

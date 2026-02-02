@@ -25,12 +25,12 @@ const helios = new Helios(options: HeliosOptions);
 - **`initialFrame`** (number, default: `0`): The frame to start at.
 - **`schema`** (`HeliosSchema`, optional): Schema for validating input properties.
 - **`inputProps`** (object, optional): Initial input properties.
-- **`captions`** (string | CaptionCue[], optional): Initial captions (SRT string or cue array).
+- **`captions`** (string | CaptionCue[], optional): Initial captions (SRT/WebVTT string or cue array).
 - **`autoSyncAnimations`** (boolean, default: `false`): If true, uses `DomDriver` to sync CSS/WAAPI animations.
 - **`playbackRate`** (number, default: `1`): Initial playback speed.
 - **`volume`** (number, default: `1`): Initial audio volume (0.0 - 1.0).
 - **`muted`** (boolean, default: `false`): Initial muted state.
-- **`animationScope`** (HTMLElement, optional): Scope for the driver to control.
+- **`animationScope`** (HTMLElement | unknown, optional): Scope for the driver to control. Defaults to `document`.
 
 ### Signals (State)
 
@@ -46,7 +46,7 @@ Helios uses signals for reactive state management. You can subscribe to these si
 - **`activeCaptions`** (`ReadonlySignal<CaptionCue[]>`): The list of captions active at the current time.
 - **`width`** (`ReadonlySignal<number>`): The composition width.
 - **`height`** (`ReadonlySignal<number>`): The composition height.
-- **`availableAudioTracks`** (`ReadonlySignal<string[]>`): List of detected audio track IDs.
+- **`availableAudioTracks`** (`ReadonlySignal<AudioTrackMetadata[]>`): List of detected audio tracks. Each object contains `id`, `startTime`, and `duration`.
 
 ### Methods
 
@@ -70,6 +70,8 @@ Jumps to a specific frame index.
 
 #### `waitUntilStable()`
 Waits for the composition to stabilize. This ensures that all asynchronous operations (like image loading, font loading, and media seeking) triggered by the last seek/update are complete. Returns a `Promise<void>`. Useful for deterministic rendering.
+
+**Note**: When using virtual time (e.g. during rendering), this method blocks until the virtual time has fully synchronized.
 
 ```typescript
 await helios.seek(100);
@@ -99,7 +101,7 @@ Sets the audio muted state and syncs with the driver.
 Updates the input properties, validating them against the schema if provided.
 
 #### `setCaptions(captions)`
-Updates the captions. Accepts an SRT string or an array of `CaptionCue` objects.
+Updates the captions. Accepts an SRT/WebVTT string or an array of `CaptionCue` objects.
 
 #### `setSize(width, height)`
 Updates the composition resolution.
@@ -135,6 +137,7 @@ When using `DomDriver` (default), you can control behavior using data attributes
 - **`data-helios-fade-out="duration"`**: Linearly fades out the audio volume over `duration` seconds before the end of the media.
 - **`data-helios-offset="seconds"`**: Delays the media playback by `seconds`.
 - **`data-helios-seek="seconds"`**: Starts playback from `seconds` into the media file (clips the beginning).
+- **`loop`**: The standard HTML `loop` attribute is fully supported and synchronized with the Helios timeline (wrapping time calculations).
 
 ## Validation (Schema)
 
@@ -212,9 +215,11 @@ const prompt = createSystemPrompt(helios);
 ### `HELIOS_BASE_PROMPT`
 The base system prompt text used by `createSystemPrompt`.
 
-## Captions (SRT)
+## Captions
 
-Utilities for parsing SRT files.
+Utilities for parsing caption files.
 
+- **`parseCaptions(content)`**: Auto-detects format (SRT or WebVTT) and parses it into structured data.
 - **`parseSrt(srtContent)`**: Parses SRT string into structured data.
+- **`parseWebVTT(vttContent)`**: Parses WebVTT string into structured data.
 - **`stringifySrt(captions)`**: Converts structured data back to SRT string.
