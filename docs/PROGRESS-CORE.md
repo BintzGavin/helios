@@ -1,5 +1,8 @@
 # CORE Progress Log
 
+## CORE v5.3.0
+- ✅ Completed: Expose Audio Source - Updated `AudioTrackMetadata` to include `src` property, populated by `DomDriver` from `currentSrc` or `src` attribute, enabling access to audio source URLs in metadata.
+
 ## CORE v5.2.1
 - ✅ Completed: Fix Subscription Timing - Forced notification in `bindToDocumentTimeline` when virtual time is set to the same frame, ensuring external drivers (e.g. GSAP) remain synchronized during precise seeking.
 

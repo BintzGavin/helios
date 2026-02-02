@@ -45,6 +45,7 @@ packages/core/src/
 ```typescript
 export interface AudioTrackMetadata {
   id: string;
+  src: string;
   startTime: number;
   duration: number;
   fadeInDuration?: number;
