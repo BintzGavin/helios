@@ -1,4 +1,4 @@
-**Version**: 0.80.1
+**Version**: 0.80.2
 
 # Studio Domain Status
 
@@ -7,6 +7,7 @@
 **Focus**: UI Implementation & CLI
 
 ## Recent Updates
+- [v0.80.2] ✅ Completed: Test Coverage - Added unit tests for Toast notification system (ToastItem, ToastContext, ToastContainer) and verified with mocked environment.
 - [v0.80.1] ✅ Completed: Maintenance - Updated dependencies to align with Core v5 and Player v0.57.1, resolving workspace conflicts.
 - [v0.80.0] ✅ Completed: Toast Notifications - Implemented centralized toast notification system for success/error feedback.
 - [v0.79.0] ✅ Completed: Array Reordering - Implemented ability to reorder array items (up/down) in the Props Editor, improving list management.
