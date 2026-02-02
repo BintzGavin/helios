@@ -1,11 +1,12 @@
 # Status: CORE
 
-**Version**: 5.1.2
+**Version**: 5.2.0
 
 - **Status**: Active
 - **Current Focus**: Maintenance, Optimization, and Stability
-- **Last Updated**: 2026-07-30
+- **Last Updated**: 2026-08-01
 
+[v5.2.0] ✅ Completed: Expose Audio Fades - Updated `AudioTrackMetadata` to include `fadeInDuration` and `fadeOutDuration`, and updated `DomDriver` to automatically discover these values from `data-helios-fade-in` and `data-helios-fade-out` attributes.
 [v5.1.2] ✅ Completed: Fix GSAP Synchronization - Forced subscriber notification in `bindToDocumentTimeline` when virtual time is present to ensure initial state synchronization with external libraries like GSAP, resolving black frames in render output.
 [v5.1.1] ✅ Completed: Fix Virtual Time Synchronization - Enhanced `bindToDocumentTimeline` to robustly handle reactive binding failures (falling back to manual polling) and updated `waitUntilStable` to block until virtual time is fully synchronized, fixing race conditions in frame-by-frame rendering.
 [v5.1.0] ✅ Completed: Implement WebVTT Support - Implemented `parseWebVTT` and auto-detecting `parseCaptions` in `captions.ts`, enabling native .vtt file support.

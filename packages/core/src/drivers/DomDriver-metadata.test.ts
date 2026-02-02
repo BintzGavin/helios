@@ -34,7 +34,9 @@ describe('DomDriver Metadata Discovery', () => {
     expect(discovered[0]).toEqual({
       id: 'track1',
       startTime: 0,
-      duration: 0
+      duration: 0,
+      fadeInDuration: 0,
+      fadeOutDuration: 0
     });
   });
 
@@ -55,6 +57,56 @@ describe('DomDriver Metadata Discovery', () => {
 
     expect(discovered).toHaveLength(1);
     expect(discovered[0].startTime).toBe(5.5);
+  });
+
+  it('should discover fade metadata', () => {
+    const audio = document.createElement('audio');
+    audio.setAttribute('data-helios-track-id', 'track-fade');
+    audio.setAttribute('data-helios-fade-in', '1.5');
+    audio.setAttribute('data-helios-fade-out', '2.0');
+    container.appendChild(audio);
+
+    const driver = new DomDriver();
+    let discovered: AudioTrackMetadata[] = [];
+
+    driver.subscribeToMetadata((meta) => {
+      if (meta.audioTracks) discovered = meta.audioTracks;
+    });
+
+    driver.init(container);
+
+    expect(discovered).toHaveLength(1);
+    expect(discovered[0]).toMatchObject({
+      id: 'track-fade',
+      fadeInDuration: 1.5,
+      fadeOutDuration: 2.0
+    });
+  });
+
+  it('should update metadata when fade attributes change', async () => {
+    const audio = document.createElement('audio');
+    audio.setAttribute('data-helios-track-id', 'track-fade-mutate');
+    audio.setAttribute('data-helios-fade-in', '0');
+    container.appendChild(audio);
+
+    const driver = new DomDriver();
+    let discovered: AudioTrackMetadata[] = [];
+
+    driver.subscribeToMetadata((meta) => {
+      if (meta.audioTracks) discovered = meta.audioTracks;
+    });
+
+    driver.init(container);
+
+    expect(discovered[0].fadeInDuration).toBe(0);
+
+    // Update attribute
+    audio.setAttribute('data-helios-fade-in', '3.0');
+
+    // Wait for MutationObserver
+    await new Promise(resolve => setTimeout(resolve, 50));
+
+    expect(discovered[0].fadeInDuration).toBe(3.0);
   });
 
   it('should update metadata when duration changes', async () => {
@@ -136,8 +188,8 @@ describe('DomDriver Metadata Discovery', () => {
     const t1 = discovered.find(t => t.id === 't1');
     const t2 = discovered.find(t => t.id === 't2');
 
-    expect(t1).toEqual({ id: 't1', startTime: 1, duration: 10 });
-    expect(t2).toEqual({ id: 't2', startTime: 2, duration: 20 });
+    expect(t1).toEqual({ id: 't1', startTime: 1, duration: 10, fadeInDuration: 0, fadeOutDuration: 0 });
+    expect(t2).toEqual({ id: 't2', startTime: 2, duration: 20, fadeInDuration: 0, fadeOutDuration: 0 });
   });
 
   it('should stop listening when element is removed', async () => {

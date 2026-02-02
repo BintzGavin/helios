@@ -1,5 +1,8 @@
 # CORE Progress Log
 
+## CORE v5.2.0
+- ✅ Completed: Expose Audio Fades - Updated `AudioTrackMetadata` to include `fadeInDuration` and `fadeOutDuration`, and updated `DomDriver` to automatically discover these values from `data-helios-fade-in` and `data-helios-fade-out` attributes.
+
 ## CORE v5.1.1
 - ✅ Completed: Fix Virtual Time Synchronization - Enhanced `bindToDocumentTimeline` to robustly handle reactive binding failures (falling back to manual polling) and updated `waitUntilStable` to block until virtual time is fully synchronized, fixing race conditions in frame-by-frame rendering.
 
