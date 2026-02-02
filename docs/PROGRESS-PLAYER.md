@@ -1,3 +1,6 @@
+## PLAYER v0.56.1
+- ✅ Verified: Synced package.json version with status file.
+
 ## PLAYER v0.56.0
 - ✅ Completed: Expose Diagnostics - Implemented `diagnose()` method in `HeliosController` (Direct and Bridge) to expose environment capabilities (WebCodecs, etc.) to the host.
 
