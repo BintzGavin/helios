@@ -1,5 +1,8 @@
 # CORE Progress Log
 
+## CORE v5.0.0
+- ✅ Completed: Implement Audio Track Metadata - Updated `availableAudioTracks` signal to return `AudioTrackMetadata[]` instead of `string[]` (Breaking Change), including `startTime` and `duration` discovery.
+
 ## CORE v4.1.0
 - ✅ Completed: Implement Marker Metadata - Updated `Marker` interface to include optional `metadata` and make `label` optional.
 
@@ -92,8 +95,6 @@
 ## CORE v2.10.0
 - ✅ Completed: Version Sync - Synced package.json version to 2.10.0 and updated context documentation.
 - ✅ Completed: Implement RenderSession - Added RenderSession class for standardized frame iteration and stability orchestration.
-# CORE Progress Log
-
 ## CORE v2.9.0
 - ✅ Completed: Synchronize Version - Updated `package.json` to 2.9.0 and fixed flaky stability test.
 - ✅ Completed: Implement Recursive Schema - Updated `PropDefinition` to support `items` and `properties` for nested array/object validation, and refactored `validateProps`.

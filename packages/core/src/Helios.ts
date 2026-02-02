@@ -1,4 +1,4 @@
-import { TimeDriver, DomDriver, NoopDriver, Ticker, RafTicker, TimeoutTicker } from './drivers/index.js';
+import { TimeDriver, DomDriver, NoopDriver, Ticker, RafTicker, TimeoutTicker, AudioTrackMetadata } from './drivers/index.js';
 import { signal, effect, computed, Signal, ReadonlySignal } from './signals.js';
 import { HeliosError, HeliosErrorCode } from './errors.js';
 import { HeliosSchema, validateProps, validateSchema } from './schema.js';
@@ -18,7 +18,7 @@ export type HeliosState<TInputProps = Record<string, any>> = {
   volume: number;
   muted: boolean;
   audioTracks: Record<string, AudioTrackState>;
-  availableAudioTracks: string[];
+  availableAudioTracks: AudioTrackMetadata[];
   captions: CaptionCue[];
   activeCaptions: CaptionCue[];
   markers: Marker[];
@@ -102,7 +102,7 @@ export class Helios<TInputProps = Record<string, any>> {
   private _volume: Signal<number>;
   private _muted: Signal<boolean>;
   private _audioTracks: Signal<Record<string, AudioTrackState>>;
-  private _availableAudioTracks: Signal<string[]>;
+  private _availableAudioTracks: Signal<AudioTrackMetadata[]>;
   private _captions: Signal<CaptionCue[]>;
   private _activeCaptions: Signal<CaptionCue[]>;
   private _markers: Signal<Marker[]>;
@@ -177,7 +177,7 @@ export class Helios<TInputProps = Record<string, any>> {
    * Signal for the available (discovered) audio tracks.
    * Can be subscribed to for reactive updates.
    */
-  public get availableAudioTracks(): ReadonlySignal<string[]> { return this._availableAudioTracks; }
+  public get availableAudioTracks(): ReadonlySignal<AudioTrackMetadata[]> { return this._availableAudioTracks; }
 
   /**
    * Signal for the full list of captions.
