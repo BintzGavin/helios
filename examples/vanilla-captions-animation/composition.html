@@ -61,48 +61,6 @@
     <div class="caption-box" id="captions"></div>
   </div>
 
-  <script type="module">
-    import { Helios } from '../../packages/core/src/index.ts';
-
-    const srt = `1
-00:00:00,500 --> 00:00:02,500
-Welcome to Helios.
-
-2
-00:00:02,800 --> 00:00:04,800
-This text is driven by an SRT string.
-
-3
-00:00:05,000 --> 00:00:07,000
-It works seamlessly with your animation.
-
-4
-00:00:07,500 --> 00:00:09,500
-Burned directly into the video.`;
-
-    const helios = new Helios({
-      duration: 10,
-      fps: 30,
-      captions: srt,
-      autoSyncAnimations: true
-    });
-
-    const captionBox = document.getElementById('captions');
-
-    helios.subscribe((state) => {
-      // Update Captions
-      if (state.activeCaptions.length > 0) {
-        // Join multiple cues with newlines if necessary
-        captionBox.innerText = state.activeCaptions.map(c => c.text).join('\n');
-        captionBox.style.opacity = 1;
-      } else {
-        captionBox.innerText = '';
-        captionBox.style.opacity = 0;
-      }
-    });
-
-    window.helios = helios;
-    helios.bindToDocumentTimeline();
-  </script>
+  <script type="module" src="./src/main.ts"></script>
 </body>
 </html>

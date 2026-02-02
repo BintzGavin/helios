@@ -1,6 +1,6 @@
 # Status: DEMO Domain
 
-**Version**: 1.84.0
+**Version**: 1.85.0
 
 ## Vision
 The DEMO domain is responsible for:
@@ -9,12 +9,13 @@ The DEMO domain is responsible for:
 3.  **Build Config:** Maintaining the root `vite.config.js` and build scripts to support the examples.
 
 ## Blocked Items
-- Verification blocked by build failure in `packages/core`. `npm run build` fails with `error TS2741` in `src/index.test.ts` (missing `availableAudioTracks` in test state).
+- None
 
 ## Active Tasks
 - None
 
 ## Completed Tasks
+- [v1.85.0] ✅ Completed: Vanilla Captions Animation - Created `examples/vanilla-captions-animation` demonstrating Helios captions (SRT) support in Vanilla TypeScript, replacing the legacy `examples/captions-animation`.
 - [v1.84.0] ✅ Completed: Solid Captions Animation - Created `examples/solid-captions-animation` demonstrating Helios captions (SRT) support in SolidJS.
 - [v1.83.0] ✅ Completed: Solid Three.js Canvas Animation - Created `examples/solid-threejs-canvas-animation` demonstrating Three.js integration with SolidJS and Helios.
 - [v1.82.0] ✅ Completed: Svelte Three.js Canvas Animation - Created `examples/svelte-threejs-canvas-animation` demonstrating Three.js integration with Svelte and Helios.

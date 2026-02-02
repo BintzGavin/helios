@@ -5,7 +5,6 @@ The `examples/` directory contains reference implementations for various framewo
 
 - **animation-helpers**: Demonstrates core animation utilities (`interpolate`, `spring`).
 - **audio-visualization**: Visualizes audio data using Canvas.
-- **captions-animation**: Renders SRT captions.
 - **chartjs-animation**: Integration with Chart.js.
 - **client-export-api**: Demonstrates programmtic client-side export using `ClientSideExporter` and `BridgeController` without the default player UI.
 - **code-walkthrough**: Demonstrates syntax highlighting and line focusing for developer content.
@@ -52,6 +51,7 @@ The `examples/` directory contains reference implementations for various framewo
 - **tailwind-animation**: Tailwind CSS integration.
 - **text-effects-animation**: Typewriter and reveal effects.
 - **threejs-canvas-animation**: Integration with Three.js.
+- **vanilla-captions-animation**: Vanilla TypeScript integration with Helios SRT captions.
 - **vanilla-typescript**: Vanilla TypeScript example.
 - **variable-font-animation**: Animating variable fonts.
 - **vue-animation-helpers**: Vue components for sequencing and core utilities.

@@ -156,3 +156,6 @@ Each agent should update **their own dedicated progress file** instead of this f
 
 ## STUDIO v0.72.0
 - ✅ Completed: Helios Assistant - Implemented context-aware AI assistant with documentation search, replacing System Prompt Modal.
+
+## DEMO v1.85.0
+- ✅ Completed: Vanilla Captions Animation - Created `examples/vanilla-captions-animation` demonstrating Helios captions (SRT) support in Vanilla TypeScript, replacing the legacy `examples/captions-animation`.

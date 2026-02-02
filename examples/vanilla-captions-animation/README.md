@@ -1,6 +1,6 @@
-# Captions Animation Example
+# Vanilla Captions Animation Example
 
-This example demonstrates how to use the built-in SRT caption support in Helios.
+This example demonstrates how to use the built-in SRT caption support in Helios using Vanilla TypeScript.
 
 ## Features
 - Passing an SRT string to the `Helios` constructor.
