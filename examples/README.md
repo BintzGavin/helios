@@ -9,6 +9,7 @@ These examples use plain JavaScript without any framework, demonstrating the cor
 - **[vanilla-typescript](./vanilla-typescript/)**: A basic TypeScript example with Vite integration.
 - **[simple-canvas-animation](./simple-canvas-animation/)**: A basic Canvas animation example.
 - **[waapi-animation](./waapi-animation/)**: Integration with the Web Animations API (WAAPI).
+- **[vanilla-animation-helpers](./vanilla-animation-helpers/)**: Helper utilities for sequencing in Vanilla JS.
 - **[web-component-animation](./web-component-animation/)**: Using Helios inside a Shadow DOM web component.
 - **[client-export-api](./client-export-api/)**: Programmatic client-side export using `ClientSideExporter` and `BridgeController` without the default player UI.
 - **[code-walkthrough](./code-walkthrough/)**: Syntax highlighting and line focusing for developer content.
@@ -35,6 +36,8 @@ Examples using the Vue adapter (Composition API).
 
 - **[vue-dom-animation](./vue-dom-animation/)**: Basic Vue + DOM example.
 - **[vue-canvas-animation](./vue-canvas-animation/)**: Basic Vue + Canvas example.
+- **[vue-captions-animation](./vue-captions-animation/)**: Integration with Helios SRT captions.
+- **[vue-threejs-canvas-animation](./vue-threejs-canvas-animation/)**: 3D animation with Three.js.
 - **[vue-transitions](./vue-transitions/)**: Using Vue's `<Transition>` component.
 - **[vue-animation-helpers](./vue-animation-helpers/)**: Helper components for sequencing.
 
@@ -43,6 +46,8 @@ Examples using the Svelte adapter (Stores, Runes).
 
 - **[svelte-dom-animation](./svelte-dom-animation/)**: Basic Svelte + DOM example.
 - **[svelte-canvas-animation](./svelte-canvas-animation/)**: Basic Svelte + Canvas example.
+- **[svelte-captions-animation](./svelte-captions-animation/)**: Integration with Helios SRT captions.
+- **[svelte-threejs-canvas-animation](./svelte-threejs-canvas-animation/)**: 3D animation with Three.js.
 - **[svelte-transitions](./svelte-transitions/)**: Using Svelte's native transition directives.
 - **[svelte-runes-animation](./svelte-runes-animation/)**: Example using Svelte 5 Runes syntax.
 - **[svelte-animation-helpers](./svelte-animation-helpers/)**: Helper components for sequencing.
@@ -52,6 +57,8 @@ Examples using the SolidJS adapter (Signals).
 
 - **[solid-dom-animation](./solid-dom-animation/)**: Basic SolidJS + DOM example.
 - **[solid-canvas-animation](./solid-canvas-animation/)**: Basic SolidJS + Canvas example.
+- **[solid-captions-animation](./solid-captions-animation/)**: Integration with Helios SRT captions.
+- **[solid-threejs-canvas-animation](./solid-threejs-canvas-animation/)**: 3D animation with Three.js.
 - **[solid-transitions](./solid-transitions/)**: Using Solid Transition Group.
 - **[solid-animation-helpers](./solid-animation-helpers/)**: Helper components for sequencing.
 

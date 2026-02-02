@@ -1,3 +1,6 @@
+## DEMO v1.85.1
+- ✅ Completed: Update Documentation - Updated `examples/README.md` and `/.sys/llmdocs/context-demo.md` to reflect the current state of examples, including new Captions and Three.js integration examples.
+
 ## DEMO v1.85.0
 - ✅ Completed: Vanilla Captions Animation - Created `examples/vanilla-captions-animation` demonstrating Helios captions (SRT) support in Vanilla TypeScript, replacing the legacy `examples/captions-animation`.
 
