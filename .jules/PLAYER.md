@@ -17,3 +17,11 @@
 ## [v0.52.0] - Standard Attributes UX
 **Learning:** Standard HTML5 video attributes like `disablePictureInPicture` and `default` (for tracks) are critical for expected UX but were missed in initial implementation.
 **Action:** When implementing standard elements (like `<video>`), systematically review the entire MDN attribute list to ensure behavioral parity, especially for UI controls visibility.
+
+## [v0.56.1] - Missing Framework Adapters
+**Learning:** README promises "Framework Adapters" packages (e.g. `@helios-project/react`), but they do not exist in the monorepo, only as examples.
+**Action:** Identify if these should be first-class packages or just examples. If packages, create a plan to scaffold them properly in `packages/`.
+
+## [v0.56.1] - Diagnostics UX Gap
+**Learning:** Diagnostics API exists (`Helios.diagnose()`), but the Player UI has no way to expose this info to users/agents without custom scripts, despite the vision emphasizing "Diagnostics for AI Environments".
+**Action:** Plan features that not only implement the API but also expose it in the UI (e.g. Debug Overlay) or use it for proactive error prevention (e.g. checking export codecs).
