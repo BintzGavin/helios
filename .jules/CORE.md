@@ -41,3 +41,7 @@
 ## [5.2.1] - Audio Source Discovery
 **Learning:** Client-side export (WebCodecs) requires access to audio sources for muxing, but `AudioTrackMetadata` previously only exposed timing data, forcing consumers to scrape the DOM or re-fetch assets.
 **Action:** When designing "Headless" state, ensure it contains all data necessary for reconstruction (like `src`), not just simulation parameters.
+
+## [5.3.0] - Headless Audio Tracks
+**Learning:** The "Headless Logic Engine" vision was compromised by `DomDriver` being the sole source of audio metadata, preventing strictly headless usage (e.g. Node.js composition) where no DOM exists.
+**Action:** Implemented `availableAudioTracks` injection in `HeliosOptions` to decouple metadata discovery from the environment driver.
