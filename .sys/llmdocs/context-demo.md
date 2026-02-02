@@ -1,90 +1,110 @@
-# DEMO Domain Context
+# Context: DEMO Domain
 
 ## A. Examples
-The `examples/` directory contains reference implementations for various frameworks and techniques. See `examples/README.md` for a categorized list.
+The `examples/` directory contains reference implementations for various frameworks and use cases.
 
-- **animation-helpers**: Demonstrates core animation utilities (`interpolate`, `spring`).
-- **audio-visualization**: Visualizes audio data using Canvas.
-- **chartjs-animation**: Integration with Chart.js.
-- **client-export-api**: Demonstrates programmtic client-side export using `ClientSideExporter` and `BridgeController` without the default player UI.
-- **code-walkthrough**: Demonstrates syntax highlighting and line focusing for developer content.
-- **d3-animation**: Integration with D3.js.
-- **diagnostics**: System capability and WebCodecs support checker.
-- **dynamic-props-animation**: Demonstrates `inputProps` and schema validation.
-- **framer-motion-animation**: Integration with Framer Motion.
-- **gsap-animation**: Integration with GSAP.
-- **lottie-animation**: Integration with Lottie.
-- **map-animation**: Integration with Leaflet maps.
-- **media-element-animation**: Synchronization of `<video>` and `<audio>` elements.
-- **motion-one-animation**: Integration with Motion One.
-- **p5-canvas-animation**: Integration with P5.js.
-- **pixi-canvas-animation**: Integration with PixiJS.
-- **podcast-visualizer**: Complex example with multi-track audio mixing.
-- **procedural-generation**: Deterministic randomness and procedural content.
-- **promo-video**: A comprehensive marketing video example demonstrating multi-scene GSAP animations.
-- **react-animation-helpers**: React components for sequencing and timing.
-- **react-canvas-animation**: Basic React + Canvas example.
-- **react-captions-animation**: React integration with Helios SRT captions.
-- **react-css-animation**: React with CSS animations.
-- **react-dom-animation**: Basic React + DOM example.
-- **react-styled-components**: React with Styled Components.
-- **react-three-fiber**: Integration with React Three Fiber (R3F).
-- **react-transitions**: React transition group integration.
-- **signals-animation**: Fine-grained reactivity using Helios signals.
-- **simple-animation**: Vanilla JS DOM animation.
-- **simple-canvas-animation**: Vanilla JS Canvas animation.
-- **social-media-story**: Social media story format example.
-- **solid-animation-helpers**: SolidJS components for sequencing and core utilities.
-- **solid-canvas-animation**: SolidJS + Canvas integration.
-- **solid-captions-animation**: SolidJS integration with Helios SRT captions.
-- **solid-dom-animation**: SolidJS + DOM integration.
-- **solid-threejs-canvas-animation**: SolidJS + Three.js integration using reactive frame updates.
-- **solid-transitions**: SolidJS CSS transitions.
-- **stress-test-animation**: High-element count stress test.
-- **svelte-animation-helpers**: Svelte components for sequencing and core utilities.
-- **svelte-canvas-animation**: Svelte + Canvas example.
-- **svelte-captions-animation**: Svelte integration with Helios SRT captions.
-- **svelte-dom-animation**: Svelte + DOM example.
-- **svelte-runes-animation**: Svelte 5 Runes example.
-- **svelte-threejs-canvas-animation**: Integration with Three.js using Svelte 5 and reactive updates.
-- **svelte-transitions**: Svelte CSS transitions.
-- **tailwind-animation**: Tailwind CSS integration.
-- **text-effects-animation**: Typewriter and reveal effects.
-- **threejs-canvas-animation**: Integration with Three.js.
-- **vanilla-captions-animation**: Vanilla TypeScript integration with Helios SRT captions.
-- **vanilla-typescript**: Vanilla TypeScript example.
-- **variable-font-animation**: Animating variable fonts.
-- **vue-animation-helpers**: Vue components for sequencing and core utilities.
-- **vue-canvas-animation**: Vue + Canvas example.
-- **vue-captions-animation**: Vue integration with Helios SRT captions.
-- **vue-dom-animation**: Vue + DOM example.
-- **vue-threejs-canvas-animation**: Vue 3 + Three.js integration using reactive frame updates.
-- **vue-transitions**: Vue CSS transitions.
+### Vanilla JS
+- **simple-animation**: Basic DOM animation using CSS.
+- **vanilla-typescript**: Basic TypeScript example with Vite.
+- **simple-canvas-animation**: Basic Canvas animation.
 - **waapi-animation**: Web Animations API integration.
-- **web-component-animation**: Shadow DOM and Web Component integration.
+- **vanilla-animation-helpers**: Sequencing utilities for Vanilla JS.
+- **vanilla-captions-animation**: Integration with Helios SRT captions in Vanilla JS.
+- **web-component-animation**: Helios inside a Shadow DOM web component.
+- **client-export-api**: Programmatic client-side export using `ClientSideExporter` and `BridgeController` without the default player UI.
+- **code-walkthrough**: Syntax highlighting and line focusing.
+- **media-element-animation**: Sync of `<video>` and `<audio>` elements.
+- **diagnostics**: System capability and WebCodecs support checker.
+- **stress-test-animation**: High-element count stress test (2500+ elements).
+- **text-effects-animation**: Typewriter and reveal effects.
+- **variable-font-animation**: Animating variable font axes.
+
+### React
+- **react-dom-animation**: Basic React + DOM.
+- **react-canvas-animation**: Basic React + Canvas.
+- **react-captions-animation**: React hooks for Helios SRT captions.
+- **react-css-animation**: Standard CSS animations in React.
+- **react-styled-components**: Styled Components integration.
+- **react-three-fiber**: 3D animation with React Three Fiber.
+- **react-transitions**: `react-transition-group` integration.
+- **react-animation-helpers**: Helper components for sequencing.
+
+### Vue
+- **vue-dom-animation**: Basic Vue + DOM.
+- **vue-canvas-animation**: Basic Vue + Canvas.
+- **vue-captions-animation**: Vue Composition API for Helios SRT captions.
+- **vue-threejs-canvas-animation**: 3D animation with Three.js and Vue.
+- **vue-transitions**: Vue `<Transition>` component.
+- **vue-animation-helpers**: Helper components for sequencing.
+
+### Svelte
+- **svelte-dom-animation**: Basic Svelte + DOM.
+- **svelte-canvas-animation**: Basic Svelte + Canvas.
+- **svelte-captions-animation**: Svelte stores for Helios SRT captions.
+- **svelte-threejs-canvas-animation**: 3D animation with Three.js and Svelte.
+- **svelte-transitions**: Svelte native transition directives.
+- **svelte-runes-animation**: Svelte 5 Runes syntax.
+- **svelte-animation-helpers**: Helper components for sequencing.
+
+### Solid
+- **solid-dom-animation**: Basic SolidJS + DOM.
+- **solid-canvas-animation**: Basic SolidJS + Canvas.
+- **solid-captions-animation**: SolidJS signals for Helios SRT captions.
+- **solid-threejs-canvas-animation**: 3D animation with Three.js and SolidJS.
+- **solid-transitions**: Solid Transition Group.
+- **solid-animation-helpers**: Helper components for sequencing.
+
+### Integrations
+- **threejs-canvas-animation**: 3D scenes with Three.js (Vanilla).
+- **pixi-canvas-animation**: 2D graphics with PixiJS.
+- **p5-canvas-animation**: Creative coding with P5.js.
+- **d3-animation**: Data visualization with D3.js.
+- **chartjs-animation**: Animated charts with Chart.js.
+- **lottie-animation**: Rendering Lottie JSON animations.
+- **framer-motion-animation**: React motion library integration.
+- **gsap-animation**: GreenSock Animation Platform integration.
+- **motion-one-animation**: Motion One library integration.
+- **tailwind-animation**: Styling and animation with Tailwind CSS.
+
+### Advanced
+- **podcast-visualizer**: Multi-track audio visualization.
+- **promo-video**: Marketing promo video template.
+- **social-media-story**: Vertical video format.
+- **audio-visualization**: Real-time frequency analysis.
+- **map-animation**: Animated maps with Leaflet.
+- **procedural-generation**: Deterministic random generation.
+
+### Core Concepts
+- **animation-helpers**: Core utilities (legacy/reference).
+- **dynamic-props-animation**: Input props and schema validation.
+- **signals-animation**: Signals architecture for performance.
 
 ## B. Build Config
-- **Root**: `vite.config.js` (for dev) and `vite.build-example.config.js` (for build).
-- **Aliases**: Configured to point `@helios-project/core`, `@helios-project/player`, etc., to their source files (`packages/*/src`) to allow developing examples against the latest source without rebuilding packages.
-- **Discovery**: `vite.build-example.config.js` dynamically discovers examples by looking for `composition.html` in subdirectories of `examples/`. It also includes `index.html` for specific examples like `client-export-api`.
+The build system uses Vite with a custom configuration `vite.build-example.config.js`.
+
+### Key Features
+- **Dynamic Discovery**: Scans `examples/` directory for `composition.html` files.
+- **Aliases**: Maps `@helios-project/*` packages to local source files for development.
+- **Framework Plugins**:
+  - `react()`: Excludes SolidJS examples to avoid conflicts.
+  - `vue()`: Supports Vue SFCs.
+  - `svelte()`: Supports Svelte components.
+  - `solidPlugin()`: Explicitly includes SolidJS examples.
+- **Assets**: Copies Excalidraw fonts to output directory.
+
+### Commands
+- `npm run build:examples`: Builds all examples to `output/example-build`.
+- `npm run dev`: Starts dev server for `simple-canvas-animation`.
+- `npm run dev:[name]`: Starts dev server for specific examples (e.g., `dev:react`, `dev:vue`).
 
 ## C. E2E Tests
-Tests are located in `tests/e2e/`.
+E2E tests are located in `tests/e2e/` and use Playwright + FFmpeg.
 
-- **verify-all.ts**: The master script (`npm run verify:e2e`). Builds Core/Renderer/Examples and runs all verifications.
-- **verify-render.ts**: Verifies server-side rendering using the `Renderer` class.
-    - Scans `output/example-build` for compositions.
-    - Renders each example to MP4 using `Renderer`.
-    - STRICTLY verifies output content using FFmpeg: checks video duration and ensures non-black frames (YMAX > 0).
-    - Supports filtering via command line arguments.
-- **verify-client-export.ts**: Verifies the client-side export pipeline.
-    - Dynamically discovers all examples in `examples/`.
-    - Spawns a local Node.js HTTP server.
-    - Launches Playwright (Chromium).
-    - Iterates through examples, loading each into a generic `<helios-player>` fixture (`tests/e2e/fixtures/dynamic-player.html`).
-    - Triggers export via the player UI and verifies the download event.
+- **verify-all.ts**: Orchestrator script that builds dependencies, builds examples, and runs all verification steps.
+- **verify-render.ts**: Verifies that examples render correctly to video.
+  - Dynamically discovers examples in `examples/`.
+  - Supports `dom` and `canvas` modes (auto-detected or overridden).
+  - Checks for video duration and non-black frames (using FFmpeg `signalstats`).
+  - Usage: `npx tsx tests/e2e/verify-render.ts [filter]`
+- **verify-client-export.ts**: Verifies client-side export functionality using `ClientSideExporter`.
 - **verify-player.ts**: Verifies the `<helios-player>` Web Component.
-    - Spawns a static file server.
-    - Launches Playwright.
-    - Navigates to a fixture page loading the player and a simple composition.
-    - Verifies playback controls and time advancement.
