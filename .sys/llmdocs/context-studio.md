@@ -6,7 +6,7 @@ Studio acts as a host environment for the Helios Player.
 
 - **Frontend**: React-based UI that wraps the `<helios-player>` component.
 - **Backend**: Vite plugin (`vite-plugin-studio-api`) that provides API endpoints for file discovery, asset management, and render job orchestration.
-- **Context**: `StudioContext` manages the global state (active composition, player state, assets).
+- **Context**: `StudioContext` manages the global state (active composition, player state including audio tracks metadata, assets).
 
 ## B. File Tree
 
@@ -42,7 +42,7 @@ packages/studio/
 
 ## D. UI Components
 
-- **Timeline**: Visual timeline with scrubbing, playhead, and markers.
+- **Timeline**: Visual timeline with scrubbing, playhead, markers, and audio track visualization.
 - **Props Editor**: Schema-aware input forms for composition properties.
 - **Assets Panel**: Drag-and-drop asset management.
 - **Renders Panel**: Render job tracking and history.
