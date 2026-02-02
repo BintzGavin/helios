@@ -19,7 +19,7 @@ function runTests() {
 
   // Test 1: Default (AAC)
   console.log('\nTest 1: Default Audio Codec');
-  const args1 = FFmpegBuilder.getArgs(baseOptions, outputPath, dummyInputArgs);
+  const args1 = FFmpegBuilder.getArgs(baseOptions, outputPath, dummyInputArgs).args;
   if (!args1.includes('aac')) {
      console.error('❌ Failed: Expected default audio codec to be aac');
      hasError = true;
@@ -30,7 +30,7 @@ function runTests() {
   // Test 2: Explicit Audio Codec
   console.log('\nTest 2: Explicit Audio Codec (libopus)');
   const options2 = { ...baseOptions, audioCodec: 'libopus' };
-  const args2 = FFmpegBuilder.getArgs(options2, outputPath, dummyInputArgs);
+  const args2 = FFmpegBuilder.getArgs(options2, outputPath, dummyInputArgs).args;
   if (!args2.includes('libopus')) {
      console.error('❌ Failed: Expected audio codec to be libopus');
      hasError = true;
@@ -41,7 +41,7 @@ function runTests() {
   // Test 3: WebM Default (libvorbis)
   console.log('\nTest 3: WebM Default (libvpx implies libvorbis)');
   const options3 = { ...baseOptions, videoCodec: 'libvpx-vp9' };
-  const args3 = FFmpegBuilder.getArgs(options3, 'output.webm', dummyInputArgs);
+  const args3 = FFmpegBuilder.getArgs(options3, 'output.webm', dummyInputArgs).args;
   if (!args3.includes('libvorbis')) {
      console.error('❌ Failed: Expected audio codec to be libvorbis when video is libvpx');
      hasError = true;
@@ -52,7 +52,7 @@ function runTests() {
   // Test 4: Audio Bitrate
   console.log('\nTest 4: Audio Bitrate');
   const options4 = { ...baseOptions, audioBitrate: '192k' };
-  const args4 = FFmpegBuilder.getArgs(options4, outputPath, dummyInputArgs);
+  const args4 = FFmpegBuilder.getArgs(options4, outputPath, dummyInputArgs).args;
   if (!args4.includes('-b:a') || !args4.includes('192k')) {
      console.error('❌ Failed: Expected -b:a 192k');
      hasError = true;

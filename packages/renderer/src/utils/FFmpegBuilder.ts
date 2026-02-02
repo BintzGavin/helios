@@ -26,6 +26,7 @@ export class FFmpegBuilder {
             fadeInDuration: track.fadeInDuration ?? 0,
             fadeOutDuration: track.fadeOutDuration ?? 0,
             loop: track.loop,
+            playbackRate: track.playbackRate ?? 1.0,
           });
         }
       });
@@ -82,6 +83,42 @@ export class FFmpegBuilder {
 
       // Always force stereo to ensure channel consistency for mixing and delay
       filters.push('aformat=channel_layouts=stereo');
+
+      // Apply Playback Rate (atempo)
+      // Must be applied BEFORE delay because delay is time-based,
+      // but if we speed up audio, the duration changes.
+      // Actually, delay is usually absolute composition time,
+      // so we apply it to the timeline.
+      // However, atempo changes the duration of the clip itself.
+      // Logic:
+      // 1. atempo (changes duration)
+      // 2. adelay (positions clip on timeline)
+      // 3. volume/fade (amplitude)
+
+      if (track.playbackRate && track.playbackRate !== 1.0 && track.playbackRate > 0) {
+        let rate = track.playbackRate;
+
+        // Safety check: Ensure rate is finite and reasonable
+        if (!Number.isFinite(rate) || rate <= 0) {
+          console.warn(`[FFmpegBuilder] Invalid playbackRate: ${rate}. Resetting to 1.0.`);
+          rate = 1.0;
+        } else {
+          // atempo filter is limited to [0.5, 2.0]
+          // We chain filters for values outside this range.
+          while (rate > 2.0) {
+            filters.push('atempo=2.0');
+            rate /= 2.0;
+          }
+          while (rate < 0.5) {
+            filters.push('atempo=0.5');
+            rate /= 0.5;
+          }
+          // Apply remaining factor
+          if (rate !== 1.0) {
+             filters.push(`atempo=${rate}`);
+          }
+        }
+      }
 
       if (delayMs > 0) {
         // Use adelay. We assume stereo (2 channels) due to aformat.

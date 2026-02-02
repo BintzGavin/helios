@@ -50,6 +50,7 @@ export interface HeliosOptions<TInputProps = Record<string, any>> {
   playbackRate?: number;
   volume?: number;
   muted?: boolean;
+  availableAudioTracks?: AudioTrackMetadata[];
   captions?: string | CaptionCue[];
   markers?: Marker[];
   driver?: TimeDriver;
@@ -464,7 +465,7 @@ export class Helios<TInputProps = Record<string, any>> {
     this._volume = signal(options.volume ?? 1);
     this._muted = signal(options.muted ?? false);
     this._audioTracks = signal({});
-    this._availableAudioTracks = signal([]);
+    this._availableAudioTracks = signal(options.availableAudioTracks || []);
     this._captions = signal(initialCaptions);
     this._markers = signal(initialMarkers);
     this._width = signal(width);
@@ -705,6 +706,15 @@ export class Helios<TInputProps = Record<string, any>> {
       muted: this._muted.peek(),
       audioTracks: this._audioTracks.value
     });
+  }
+
+  /**
+   * Updates the available audio tracks manually.
+   * Useful for headless environments where tracks cannot be discovered from the DOM.
+   * @param tracks The list of audio tracks to expose.
+   */
+  public setAvailableAudioTracks(tracks: AudioTrackMetadata[]) {
+    this._availableAudioTracks.value = tracks;
   }
 
   /**

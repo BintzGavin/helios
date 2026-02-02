@@ -1,11 +1,12 @@
 # Status: CORE
 
-**Version**: 5.3.0
+**Version**: 5.4.0
 
 - **Status**: Active
 - **Current Focus**: Maintenance, Optimization, and Stability
 - **Last Updated**: 2026-08-01
 
+[v5.4.0] ✅ Completed: Headless Audio Tracks - Added `availableAudioTracks` option to `HeliosOptions` and `setAvailableAudioTracks` method, enabling manual injection of audio metadata for headless environments.
 [v5.3.0] ✅ Completed: Expose Audio Source - Updated `AudioTrackMetadata` to include `src` property, populated by `DomDriver` from `currentSrc` or `src` attribute, enabling access to audio source URLs in metadata.
 [v5.2.1] ✅ Completed: Fix Subscription Timing - Forced notification in `bindToDocumentTimeline` when virtual time is set to the same frame, ensuring external drivers (e.g. GSAP) remain synchronized during precise seeking.
 [v5.2.0] ✅ Completed: Expose Audio Fades - Updated `AudioTrackMetadata` to include `fadeInDuration` and `fadeOutDuration`, and updated `DomDriver` to automatically discover these values from `data-helios-fade-in` and `data-helios-fade-out` attributes.

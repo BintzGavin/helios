@@ -27,6 +27,9 @@ Each agent should update **their own dedicated progress file** instead of this f
 - If this is a new version, create the section at the top of the file (after any existing content)
 - Group multiple completions under the same version section if they're part of the same release
 
+## PLAYER v0.59.1
+- ✅ Completed: Documentation Update - Added missing export attributes, audio fades, and diagnostics API to README.
+
 ## STUDIO v0.82.0
 - ✅ Completed: Stacked Timeline - Implemented multi-lane stacked timeline for audio tracks with dynamic vertical scrolling and sticky ruler, improving visibility of overlapping tracks.
 
@@ -115,6 +118,7 @@ Each agent should update **their own dedicated progress file** instead of this f
 
 ## DEMO v1.87.0
 - ✅ Completed: React Audio Visualization - Created `examples/react-audio-visualization` demonstrating real-time audio analysis (RMS, waveforms) using synthesized `AudioBuffer` and React Hooks.
+- ✅ Completed: Fix GSAP Sync - Fixed synchronization issue in `examples/promo-video` using `helios.registerStabilityCheck` and enhanced `tests/e2e/verify-render.ts` with custom duration/brightness checks.
 
 ## DEMO v1.86.1
 - ✅ Verified: Vanilla Transitions - Verified build and E2E tests for the existing implementation.
@@ -199,6 +203,9 @@ Each agent should update **their own dedicated progress file** instead of this f
   - Updated `examples/solid/SKILL.md` with Three.js integration patterns
   - Created `examples/vanilla/SKILL.md` for framework-less integration
   - Verified Svelte 5 patterns in `examples/svelte/SKILL.md`
+
+### PLAYER v0.59.0
+- ✅ Completed: Implement Diagnostics UI Overlay - Implemented a visible Diagnostics UI overlay in `<helios-player>` toggled via `Shift+D`, and exposed `diagnose()` as a public method.
 
 ### PLAYER v0.58.0
 - ✅ Completed: Configurable Export Bitrate - Implemented `export-bitrate` attribute to control client-side export quality.

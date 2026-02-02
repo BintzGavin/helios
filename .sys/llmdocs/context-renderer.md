@@ -4,7 +4,7 @@
 The Renderer operates on a "Dual-Path" architecture to support different use cases. The pipeline strictly enforces `strategy.prepare` (resource discovery/loading) before `timeDriver.prepare` (time freezing) to prevent deadlocks in CDP mode:
 1. **DOM Strategy (`DomStrategy`)**: Used for HTML/CSS-heavy compositions. It uses Playwright to capture screenshots of the page at each frame.
    - **Drivers**: Uses `SeekTimeDriver` to manipulate `document.timeline` and sync media/CSS animations (supports Shadow DOM, enforces deterministic Jan 1 2024 epoch, handles GSAP timeline sync, supports media looping).
-   - **Discovery**: Uses `dom-scanner` to recursively discover media elements (including Shadow DOM) and implements recursive preloading for `<img>` tags, `<video>` posters, SVG images, and CSS background/mask images. Supports automatic audio looping for `<audio loop>` elements via FFmpeg concat.
+   - **Discovery**: Uses `dom-scanner` to recursively discover media elements (including Shadow DOM) and implements recursive preloading for `<img>` tags, `<video>` posters, SVG images, and CSS background/mask images. Supports automatic audio looping and playback rate adjustment for `<audio>` elements.
    - **Output**: Best for sharp text and vector graphics.
 2. **Canvas Strategy (`CanvasStrategy`)**: Used for WebGL/Canvas-heavy compositions (e.g., Three.js, PixiJS). It captures the `<canvas>` context directly.
    - **Drivers**: Uses `CdpTimeDriver` (Chrome DevTools Protocol) for precise virtual time control (supports Shadow DOM media sync, enforces deterministic Jan 2024 epoch, ensures sync-before-render order, waits for budget expiration, enforces stability timeout via `Runtime.terminateExecution`, supports media looping).
@@ -56,6 +56,7 @@ packages/renderer/
     ├── verify-shadow-dom-images.ts # Shadow DOM image discovery test
     ├── verify-enhanced-dom-preload.ts # Enhanced DOM preloading test
     ├── verify-dom-audio-fades.ts # DOM audio fades test
+    ├── verify-audio-playback-rate.ts # Audio playback rate test
     ├── verify-frame-count.ts   # Precision frame count test
     ├── verify-cdp-hang.ts      # CDP initialization order/deadlock test
     ├── verify-cdp-driver.ts    # CdpDriver budget test
@@ -80,7 +81,7 @@ The `RendererOptions` interface controls the render pipeline:
 - `videoCodec`: `'libx264'` (default), `'copy'`, or others.
 - `audioCodec`: `'aac'` (default), `'libvorbis'`, etc.
 - `audioFilePath`: Path to external audio file to mix in.
-- `audioTracks`: List of audio tracks (files or `AudioTrackConfig` objects with `path`, `buffer`, `loop`, `volume`, `offset`).
+- `audioTracks`: List of audio tracks (files or `AudioTrackConfig` objects with `path`, `buffer`, `loop`, `volume`, `offset`, `playbackRate`).
 - `intermediateImageFormat`: `'png'` (default) or `'jpeg'` for DOM mode capture.
 - `intermediateImageQuality`: JPEG quality (0-100) if format is jpeg.
 - `stabilityTimeout`: Timeout for frame stability (default 30000ms).
@@ -96,6 +97,7 @@ The renderer spawns an FFmpeg process with the following key flags:
 - `-c:v`: Video codec (e.g., `libx264`).
 - `-pix_fmt`: Pixel format (e.g., `yuv420p`).
 - `-vf`: Video filters (scaling, padding, subtitles).
+- `-af`: Audio filters (atempo, adelay, volume, afade).
 - `-c:a`: Audio codec (if audio is present).
 - `-t`: Duration.
 - Output path (last argument).

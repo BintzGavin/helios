@@ -1,3 +1,6 @@
+## RENDERER v1.60.0
+- ✅ Completed: Enable Audio Playback Rate - Updated `AudioTrackConfig` to include `playbackRate`, and implemented `atempo` filter chaining in `FFmpegBuilder` to support speed adjustments (including values outside 0.5-2.0 range). Also updated `DomScanner` to extract `playbackRate` from media elements.
+
 ## RENDERER v1.59.0
 - ✅ Completed: Local Distributed Rendering - Implemented `RenderOrchestrator` to split render jobs into concurrent chunks and concatenate them, enabling faster local rendering. Also refactored `Renderer` to its own file to support this architecture.
 

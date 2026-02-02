@@ -398,8 +398,87 @@ template.innerHTML = `
     slot {
       display: none;
     }
+
+    /* Diagnostics UI */
+    .debug-overlay {
+      position: absolute;
+      inset: 20px;
+      background: rgba(0, 0, 0, 0.9);
+      border: 1px solid var(--helios-range-track-color);
+      border-radius: 8px;
+      color: var(--helios-text-color);
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      font-family: monospace;
+      font-size: 12px;
+      backdrop-filter: blur(4px);
+    }
+    .debug-overlay.hidden {
+      display: none;
+    }
+    .debug-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--helios-range-track-color);
+      background: rgba(255, 255, 255, 0.05);
+    }
+    .debug-title {
+      font-weight: bold;
+      font-size: 14px;
+    }
+    .close-debug-btn {
+      background: none;
+      border: none;
+      color: var(--helios-text-color);
+      font-size: 20px;
+      cursor: pointer;
+      line-height: 1;
+    }
+    .close-debug-btn:hover {
+      color: var(--helios-accent-color);
+    }
+    .debug-content {
+      flex: 1;
+      overflow: auto;
+      padding: 12px;
+      margin: 0;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+    .debug-actions {
+      padding: 8px 12px;
+      border-top: 1px solid var(--helios-range-track-color);
+      display: flex;
+      justify-content: flex-end;
+      background: rgba(255, 255, 255, 0.05);
+    }
+    .copy-debug-btn {
+      background: var(--helios-accent-color);
+      color: white;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 12px;
+    }
+    .copy-debug-btn:hover {
+      filter: brightness(0.9);
+    }
   </style>
   <slot></slot>
+  <div class="debug-overlay hidden" part="debug-overlay">
+    <div class="debug-header">
+      <span class="debug-title">Diagnostics</span>
+      <button class="close-debug-btn" aria-label="Close diagnostics">×</button>
+    </div>
+    <pre class="debug-content"></pre>
+    <div class="debug-actions">
+      <button class="copy-debug-btn">Copy to Clipboard</button>
+    </div>
+  </div>
   <div class="status-overlay hidden" part="overlay">
     <div class="status-text">Connecting...</div>
     <button class="retry-btn" style="display: none">Retry</button>
@@ -461,6 +540,11 @@ export class HeliosPlayer extends HTMLElement {
     ccBtn;
     showCaptions = false;
     lastCaptionsHash = "";
+    // Diagnostics UI
+    debugOverlay;
+    debugContent;
+    closeDebugBtn;
+    copyDebugBtn;
     clickLayer;
     posterContainer;
     posterImage;
@@ -821,7 +905,7 @@ export class HeliosPlayer extends HTMLElement {
         }
     }
     static get observedAttributes() {
-        return ["src", "width", "height", "autoplay", "loop", "controls", "export-format", "input-props", "poster", "muted", "interactive", "preload", "controlslist", "sandbox", "export-caption-mode", "disablepictureinpicture"];
+        return ["src", "width", "height", "autoplay", "loop", "controls", "export-format", "input-props", "poster", "muted", "interactive", "preload", "controlslist", "sandbox", "export-caption-mode", "disablepictureinpicture", "export-width", "export-height", "export-bitrate"];
     }
     constructor() {
         super();
@@ -845,6 +929,10 @@ export class HeliosPlayer extends HTMLElement {
         this.pipBtn = this.shadowRoot.querySelector(".pip-btn");
         this.captionsContainer = this.shadowRoot.querySelector(".captions-container");
         this.ccBtn = this.shadowRoot.querySelector(".cc-btn");
+        this.debugOverlay = this.shadowRoot.querySelector(".debug-overlay");
+        this.debugContent = this.shadowRoot.querySelector(".debug-content");
+        this.closeDebugBtn = this.shadowRoot.querySelector(".close-debug-btn");
+        this.copyDebugBtn = this.shadowRoot.querySelector(".copy-debug-btn");
         this.pipVideo = this.shadowRoot.querySelector(".pip-video");
         this.clickLayer = this.shadowRoot.querySelector(".click-layer");
         this.posterContainer = this.shadowRoot.querySelector(".poster-container");
@@ -1046,6 +1134,8 @@ export class HeliosPlayer extends HTMLElement {
         this.pipVideo.addEventListener("enterpictureinpicture", this.onEnterPip);
         this.pipVideo.addEventListener("leavepictureinpicture", this.onLeavePip);
         this.posterContainer.addEventListener("click", this.handleBigPlayClick);
+        this.closeDebugBtn.addEventListener("click", this.toggleDiagnostics);
+        this.copyDebugBtn.addEventListener("click", this.handleCopyDebug);
         const slot = this.shadowRoot.querySelector("slot");
         if (slot) {
             slot.addEventListener("slotchange", this.handleSlotChange);
@@ -1099,6 +1189,8 @@ export class HeliosPlayer extends HTMLElement {
         this.pipVideo.removeEventListener("enterpictureinpicture", this.onEnterPip);
         this.pipVideo.removeEventListener("leavepictureinpicture", this.onLeavePip);
         this.posterContainer.removeEventListener("click", this.handleBigPlayClick);
+        this.closeDebugBtn.removeEventListener("click", this.toggleDiagnostics);
+        this.copyDebugBtn.removeEventListener("click", this.handleCopyDebug);
         const slot = this.shadowRoot.querySelector("slot");
         if (slot) {
             slot.removeEventListener("slotchange", this.handleSlotChange);
@@ -1490,6 +1582,34 @@ export class HeliosPlayer extends HTMLElement {
             this.updateUI(this.controller.getState());
         }
     };
+    toggleDiagnostics = async () => {
+        if (this.debugOverlay.classList.contains('hidden')) {
+            this.debugOverlay.classList.remove('hidden');
+            this.debugContent.textContent = "Running diagnostics...";
+            try {
+                const report = await this.diagnose();
+                this.debugContent.textContent = JSON.stringify(report, null, 2);
+            }
+            catch (e) {
+                this.debugContent.textContent = "Error: " + (e.message || String(e));
+            }
+        }
+        else {
+            this.debugOverlay.classList.add('hidden');
+        }
+    };
+    handleCopyDebug = () => {
+        const text = this.debugContent.textContent || "";
+        navigator.clipboard.writeText(text).then(() => {
+            const originalText = this.copyDebugBtn.textContent;
+            this.copyDebugBtn.textContent = "Copied!";
+            setTimeout(() => {
+                this.copyDebugBtn.textContent = originalText;
+            }, 2000);
+        }).catch(err => {
+            console.error('Failed to copy diagnostics:', err);
+        });
+    };
     handleKeydown = (e) => {
         if (this.isExporting)
             return;
@@ -1517,6 +1637,12 @@ export class HeliosPlayer extends HTMLElement {
             case "f":
             case "F":
                 this.toggleFullscreen();
+                break;
+            case "d":
+            case "D":
+                if (e.shiftKey) {
+                    this.toggleDiagnostics();
+                }
                 break;
             case "ArrowRight":
             case "l":
@@ -1739,6 +1865,12 @@ export class HeliosPlayer extends HTMLElement {
         }
         return undefined;
     }
+    async diagnose() {
+        if (!this.controller) {
+            throw new Error("Cannot run diagnostics: Player is not connected.");
+        }
+        return this.controller.diagnose();
+    }
     retryConnection() {
         this.showStatus("Retrying...", false);
         // Reload iframe to force fresh start
@@ -1767,6 +1899,12 @@ export class HeliosPlayer extends HTMLElement {
         const canvasSelector = this.getAttribute("canvas-selector") || "canvas";
         const exportFormat = (this.getAttribute("export-format") || "mp4");
         const captionMode = (this.getAttribute("export-caption-mode") || "burn-in");
+        const exportWidth = parseFloat(this.getAttribute("export-width") || "");
+        const exportHeight = parseFloat(this.getAttribute("export-height") || "");
+        const exportBitrate = parseInt(this.getAttribute("export-bitrate") || "");
+        const width = !isNaN(exportWidth) && exportWidth > 0 ? exportWidth : undefined;
+        const height = !isNaN(exportHeight) && exportHeight > 0 ? exportHeight : undefined;
+        const bitrate = !isNaN(exportBitrate) && exportBitrate > 0 ? exportBitrate : undefined;
         let includeCaptions = this.showCaptions;
         if (this.showCaptions && captionMode === 'file') {
             const showingTrack = Array.from(this._textTracks).find(t => t.mode === 'showing' && t.kind === 'captions');
@@ -1790,7 +1928,10 @@ export class HeliosPlayer extends HTMLElement {
                 mode: exportMode,
                 canvasSelector: canvasSelector,
                 format: exportFormat,
-                includeCaptions: includeCaptions
+                includeCaptions: includeCaptions,
+                width: width,
+                height: height,
+                bitrate: bitrate
             });
         }
         catch (e) {

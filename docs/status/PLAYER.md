@@ -1,4 +1,4 @@
-**Version**: v0.58.0
+**Version**: v0.59.1
 
 # Status: PLAYER
 
@@ -47,11 +47,13 @@
 - Supports auto-enabling of captions if a track is marked as `default`.
 - Supports audio fade-in/out in client-side export via `data-helios-fade-in` and `data-helios-fade-out` attributes.
 - Supports Shadow DOM Export: DOM-based client-side export now correctly captures Shadow DOM content (via Declarative Shadow DOM transformation), enabling support for Web Components in exports.
-- **Supports Environment Diagnostics**: Implemented `diagnose()` method in `HeliosController` (Direct and Bridge) to expose environment capabilities (WebCodecs, WebGL, etc.) to the host.
+- **Supports Environment Diagnostics UI**: Implemented `diagnose()` method in `HeliosController` and a visible Diagnostics UI overlay in `<helios-player>` (toggled via `Shift+D`) to expose environment capabilities (WebCodecs, WebGL, etc.) to the user.
 
 ## Critical Task
 - **None**: All critical tasks completed.
 
+[v0.59.1] ✅ Completed: Documentation Update - Added missing export attributes, audio fades, and diagnostics API to README.
+[v0.59.0] ✅ Completed: Implement Diagnostics UI Overlay - Implemented a visible Diagnostics UI overlay in `<helios-player>` toggled via `Shift+D`, and exposed `diagnose()` as a public method.
 [v0.58.0] ✅ Completed: Configurable Export Bitrate - Implemented `export-bitrate` attribute to control client-side export quality.
 [v0.57.1] ✅ Completed: Fix Test Environment & Sync Version - Updated package version to match status file, installed missing dependencies, and verified all tests pass (including Shadow DOM export).
 [v0.57.0] ✅ Completed: Configurable Export Resolution - Implemented `export-width` and `export-height` attributes to allow specifying target resolution for client-side exports, enabling high-quality DOM exports independent of player size.

@@ -1,4 +1,4 @@
-import { HeliosSchema } from "@helios-project/core";
+import { HeliosSchema, DiagnosticReport } from "@helios-project/core";
 import type { HeliosController } from "./controllers";
 import { ClientSideExporter } from "./features/exporter";
 import { HeliosTextTrack, HeliosTextTrackList, TrackHost } from "./features/text-tracks";
@@ -37,6 +37,10 @@ export declare class HeliosPlayer extends HTMLElement implements TrackHost {
     private ccBtn;
     private showCaptions;
     private lastCaptionsHash;
+    private debugOverlay;
+    private debugContent;
+    private closeDebugBtn;
+    private copyDebugBtn;
     private clickLayer;
     private posterContainer;
     private posterImage;
@@ -165,6 +169,8 @@ export declare class HeliosPlayer extends HTMLElement implements TrackHost {
     private handleScrubberLeave;
     private handleSpeedChange;
     private toggleCaptions;
+    private toggleDiagnostics;
+    private handleCopyDebug;
     private handleKeydown;
     private seekRelative;
     private toggleFullscreen;
@@ -174,6 +180,7 @@ export declare class HeliosPlayer extends HTMLElement implements TrackHost {
     private hideStatus;
     getController(): HeliosController | null;
     getSchema(): Promise<HeliosSchema | undefined>;
+    diagnose(): Promise<DiagnosticReport>;
     private retryConnection;
     private renderClientSide;
 }
