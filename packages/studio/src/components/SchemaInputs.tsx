@@ -170,6 +170,24 @@ const ArrayInput: React.FC<{
         onChange(copy);
     };
 
+    const handleMoveUp = (index: number) => {
+        if (index <= 0) return;
+        const copy = [...safeValue];
+        const temp = copy[index];
+        copy[index] = copy[index - 1];
+        copy[index - 1] = temp;
+        onChange(copy);
+    };
+
+    const handleMoveDown = (index: number) => {
+        if (index >= safeValue.length - 1) return;
+        const copy = [...safeValue];
+        const temp = copy[index];
+        copy[index] = copy[index + 1];
+        copy[index + 1] = temp;
+        onChange(copy);
+    };
+
     return (
         <div className="prop-array-container">
             {safeValue.map((item: any, index: number) => (
@@ -183,14 +201,32 @@ const ArrayInput: React.FC<{
                             />
                         )}
                      </div>
-                     <button
-                        className="prop-array-remove"
-                        onClick={() => handleRemove(index)}
-                        title="Remove Item"
-                        disabled={minItems !== undefined && safeValue.length <= minItems}
-                     >
-                        Remove
-                     </button>
+                     <div className="prop-array-controls">
+                        <button
+                            className="prop-array-control-btn"
+                            onClick={() => handleMoveUp(index)}
+                            title="Move Up"
+                            disabled={index === 0}
+                        >
+                            ↑
+                        </button>
+                        <button
+                            className="prop-array-control-btn"
+                            onClick={() => handleMoveDown(index)}
+                            title="Move Down"
+                            disabled={index === safeValue.length - 1}
+                        >
+                            ↓
+                        </button>
+                        <button
+                            className="prop-array-remove"
+                            onClick={() => handleRemove(index)}
+                            title="Remove Item"
+                            disabled={minItems !== undefined && safeValue.length <= minItems}
+                        >
+                            Remove
+                        </button>
+                     </div>
                 </div>
             ))}
             {canAdd && (
