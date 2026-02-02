@@ -1,8 +1,20 @@
-**Version**: 1.55.0
+**Version**: 1.58.0
 
 # Renderer Agent Status
 
 ## Progress Log
+- [2026-08-03] ✅ Planned: Refactor Concat to Pipe - Created plan to refactor `concatenateVideos` to pipe file list to FFmpeg, completing the "Zero Disk I/O" vision.
+- [1.58.0] ✅ Completed: Zero Disk Audio - Refactored `blob-extractor.ts` and `FFmpegBuilder.ts` to pipe audio buffers directly to FFmpeg via stdio pipes (`pipe:N`), eliminating temporary file creation for Blob audio tracks and improving security and performance.
+- [1.57.3] ✅ Completed: Enable Looping Media Verification - Updated `packages/renderer/package.json` to depend on `@helios-project/core` version `5.1.1` (matching local workspace), allowing `verify-video-loop.ts` to run and confirm correct looping media implementation in `SeekTimeDriver` and `CdpTimeDriver`.
+- [1.57.2] ✅ Completed: Sync Core Dependency - Updated `packages/renderer` dependency on `@helios-project/core` to `5.1.0` to match the local workspace, resolving build failures and enabling verification of GSAP timeline synchronization.
+- [1.57.1] ✅ Completed: Verify Looping Media - Enabled regression test `verify-video-loop.ts` in `run-all.ts` and updated dependencies to resolve environment issues, confirming correct looping behavior in both SeekTimeDriver and CdpTimeDriver.
+- [1.57.0] ✅ Completed: Enable Looping Media - Updated SeekTimeDriver and CdpTimeDriver to implement modulo arithmetic for `currentTime` when the `loop` attribute is present, ensuring correct looping behavior during rendering.
+- [1.56.5] ✅ Completed: Update Verification Suite - Updated `verify-ffmpeg-path.ts` to be self-contained and robust, and verified that `verify-cancellation.ts`, `verify-trace.ts`, and `verify-ffmpeg-path.ts` pass and are included in the main test runner.
+- [1.56.4] ✅ Completed: Restore Environment - Restored missing node_modules and verified full test suite passes.
+- [1.56.3] ✅ Completed: Update Verification Suite - Refactored `verify-cancellation.ts` and `verify-trace.ts` to be self-contained and added them (along with `verify-ffmpeg-path.ts`) to `run-all.ts`, ensuring continuous regression testing for these features.
+- [1.56.2] ✅ Completed: Revive Verification Suite - Updated `run-all.ts` to include 5 orphaned verification scripts (`verify-blob-audio`, `verify-dom-audio-fades`, `verify-enhanced-dom-preload`, `verify-frame-count`, `verify-shadow-dom-images`), enabling full verification coverage. Also fixed `tests/verify-bitrate.ts` and updated workspace dependency versions.
+- [1.56.1] ✅ Completed: Sync Core Dependency - Updated `packages/renderer/package.json` to depend on `@helios-project/core` version `3.9.2` (matching the workspace), ensuring compatibility. Also fixed `tests/verify-canvas-strategy.ts` to correctly inject a canvas element.
+- [1.56.0] ✅ Completed: Fix CDP Hang - Swapped initialization order in `Renderer` to call `strategy.prepare` before `timeDriver.prepare`, ensuring `DomScanner` can discover and load media assets before the CDP `TimeDriver` freezes the virtual clock.
 - [1.55.0] ✅ Completed: Enhance Dom Preloading - Updated `DomStrategy` to detect and preload `<video>` posters, SVG `<image>` elements, and CSS masks (`mask-image`), ensuring zero-artifact rendering for these asset types.
 - [1.54.0] ✅ Completed: Implement Canvas Selector - Added `canvasSelector` to `RendererOptions` and updated `CanvasStrategy` to target specific canvas elements (e.g., `#my-canvas`), enabling support for multi-canvas compositions and layered architectures.
 - [1.53.2] ✅ Completed: Sync Core Dependency - Updated `packages/renderer/package.json` to depend on `@helios-project/core` version `3.6.0` (matching the workspace), fixing dependency resolution issues and ensuring compatibility with the latest core features.
@@ -227,3 +239,7 @@
 ## [2026-08-02] - Renderer Class Location
 **Learning:** The `Renderer` class is not defined in `packages/renderer/src/Renderer.ts` but is exported directly from `packages/renderer/src/index.ts`. This structure can be confusing when searching for the class definition.
 **Action:** Always verify the file location of the `Renderer` class in `index.ts` before assuming standard file-per-class structure.
+
+## [2026-08-03] - Zero Disk I/O: Concat Refactor
+**Learning:** `concatenateVideos` was the last holdout for disk-based operations. Refactoring it to use pipe input completes the "Zero Disk I/O" vision.
+**Action:** Created plan to refactor `concat.ts` to use pipe input.
