@@ -24,6 +24,7 @@ const tests = [
   'tests/verify-codecs.ts',
   'tests/verify-concat.ts',
   'tests/verify-deep-dom.ts',
+  'tests/verify-distributed.ts',
   'tests/verify-diagnose.ts',
   'tests/verify-diagnose-ffmpeg.ts',
   'tests/verify-dom-audio-fades.ts',
