@@ -1,5 +1,8 @@
 # CORE Progress Log
 
+## CORE v5.2.1
+- ✅ Completed: Fix Subscription Timing - Forced notification in `bindToDocumentTimeline` when virtual time is set to the same frame, ensuring external drivers (e.g. GSAP) remain synchronized during precise seeking.
+
 ## CORE v5.2.0
 - ✅ Completed: Expose Audio Fades - Updated `AudioTrackMetadata` to include `fadeInDuration` and `fadeOutDuration`, and updated `DomDriver` to automatically discover these values from `data-helios-fade-in` and `data-helios-fade-out` attributes.
 
