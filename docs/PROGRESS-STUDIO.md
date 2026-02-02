@@ -1,3 +1,9 @@
+## STUDIO v0.83.0
+- ✅ Completed: Smart Empty State - Implemented "Smart Empty State" for the Stage, providing clear calls-to-action for creating or selecting compositions when the stage is empty. Verified with unit tests.
+
+## STUDIO v0.82.0
+- ✅ Completed: Stacked Timeline - Implemented multi-lane stacked timeline for audio tracks with dynamic vertical scrolling and sticky ruler, improving visibility of overlapping tracks.
+
 ## STUDIO v0.81.0
 - ✅ Completed: Timeline Audio Visualization - Implemented visualization of audio tracks on the timeline using `availableAudioTracks` metadata, separating it from runtime state.
 

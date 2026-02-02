@@ -1,3 +1,7 @@
+/**
+ * Smart Empty State for the Stage.
+ * Displays call-to-action when no composition is loaded or selected.
+ */
 import React from 'react';
 import { useStudio } from '../../context/StudioContext';
 import './EmptyState.css';

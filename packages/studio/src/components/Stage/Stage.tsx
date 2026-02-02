@@ -7,6 +7,7 @@ import { useKeyboardShortcut } from '../../hooks/useKeyboardShortcut';
 import { usePersistentState } from '../../hooks/usePersistentState';
 import './Stage.css';
 
+// Main Stage component that hosts the Player and EmptyState
 interface StageProps {
   src: string;
 }
