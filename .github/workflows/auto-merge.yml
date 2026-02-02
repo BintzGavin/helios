@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   resolve-progress-conflicts:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-standard
     if: |
       github.event.pull_request.user.login == 'google-labs-jules' ||
       github.event.pull_request.user.login == 'google-labs-jules[bot]' ||
