@@ -45,3 +45,7 @@
 ## [5.3.0] - Headless Audio Tracks
 **Learning:** The "Headless Logic Engine" vision was compromised by `DomDriver` being the sole source of audio metadata, preventing strictly headless usage (e.g. Node.js composition) where no DOM exists.
 **Action:** Implemented `availableAudioTracks` injection in `HeliosOptions` to decouple metadata discovery from the environment driver.
+
+## [5.4.0] - Audio Visualization Hooks
+**Learning:** `DomDriver` controls the `HTMLMediaElement`s, making it impossible for consumers to attach `AudioContext` nodes for visualization without "stealing" the audio or duplicating the fetch.
+**Action:** Expose `getAudioContext` and `getAudioSourceNode` via `TimeDriver` (returning `unknown` for isomorphism) to allow "hooking" into the existing pipeline.
