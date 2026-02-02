@@ -1001,6 +1001,11 @@ export class Helios<TInputProps = Record<string, any>> {
               const frame = (value / 1000) * this._fps.value;
               if (frame !== this._currentFrame.peek()) {
                 this._currentFrame.value = frame;
+              } else {
+                // Force notification to ensure subscribers are synced even if frame matches.
+                // This is critical for external drivers (like SeekTimeDriver) that rely on
+                // the "set" event to synchronize other systems (like GSAP timelines).
+                this._syncVersion.value++;
               }
 
               this.driver.update(value, {
@@ -1019,8 +1024,6 @@ export class Helios<TInputProps = Record<string, any>> {
         // Trigger initial update if value exists
         if (virtualTimeValue !== null) {
           (window as any).__HELIOS_VIRTUAL_TIME__ = virtualTimeValue;
-          // Force notification to ensure subscribers are synced even if frame matches
-          this._syncVersion.value++;
         }
       } catch (e) {
         console.warn('Failed to bind reactive virtual time. Helios will fall back to polling, which may affect synchronization accuracy.', e);
