@@ -3,7 +3,7 @@
 <summary>DISCLAIMER: This repository is an active experiment in autonomous software engineering.</summary>
 
 
-> **Current Status:** 🚧 **Alpha / Self-Driving**
+> **Current Status:** 🚀 **Beta / Self-Driving**
 
 This codebase is primarily managed and developed by a fleet of AI agents running on **Google's Jules** platform. It is **not** currently intended for production use.
 
@@ -36,7 +36,7 @@ For transparency and educational purposes, the complete prompts used to orchestr
 ### Video is Light Over Time
 
 [![License](https://img.shields.io/badge/license-ELv2-blue.svg)](LICENSE)
-[![Status](https://img.shields.io/badge/status-alpha-orange.svg)](#project-status)
+[![Status](https://img.shields.io/badge/status-beta-yellow.svg)](#project-status)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue.svg)](https://www.typescriptlang.org/)
 [![Node](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen.svg)](https://nodejs.org/)
 [![npm](https://img.shields.io/badge/npm-workspace-red.svg)](https://www.npmjs.com/)
@@ -360,11 +360,11 @@ Both Helios and [Remotion](https://www.remotion.dev/) enable programmatic video 
 | **Framework** | Any (React, Vue, Svelte, vanilla) | React only |
 | **Animation** | CSS, WAAPI, any library | `interpolate()`, `spring()` hooks |
 | **Learning curve** | Use what you know | Learn Remotion APIs |
-| **Maturity** | 🟡 Alpha | 🟢 Production-ready |
+| **Maturity** | 🟡 Beta | 🟢 Production-ready |
 | **Pricing** | Free (ELv2) | Free ≤3 devs, then $100+/mo |
-| **Studio IDE** | 🟡 Planned | 🟢 Available |
+| **Studio IDE** | 🟢 Beta | 🟢 Available |
 | **Distributed rendering** | 🟡 Planned (V2) | 🟢 Lambda, Cloud Run |
-| **Captions/subtitles** | 🔴 Not yet | 🟢 Built-in |
+| **Captions/subtitles** | 🟡 Basic (SRT) | 🟢 Built-in |
 | **Audio mixing** | 🟡 Basic (FFmpeg) | 🟢 Advanced |
 | **MCP Server** | 🟡 Planned | 🟢 Available |
 | **Agent Skills** | 🟡 Local only | 🟢 `npx skills add` |
@@ -506,10 +506,14 @@ WYSIWYG preview using the same bundled composition code as the final render:
 
 ## Project Status
 
-**Alpha**: Architecture defined, Canvas MVP functional, API subject to change.
+**Beta**: Architecture stable, API maturing, suitable for early adopters.
 
 ### Current Capabilities
 - ✅ Core `Helios` class with timeline control
+- ✅ Helios Studio (Beta)
+- ✅ Animation Helpers (`interpolate`, `spring`)
+- ✅ Captions Support (SRT parsing/rendering)
+- ✅ AI Integration (System Prompts)
 - ✅ Canvas-to-Video rendering path
 - ✅ `<helios-player>` Web Component
 - ✅ React, Vue examples
@@ -526,39 +530,9 @@ See [`docs/BACKLOG.md`](./docs/BACKLOG.md) for the full task list.
 
 <!-- AGENT_ROADMAP_START: Planning agents use this to identify features to build -->
 
-### V1.x: Helios Studio
-**A browser-based development environment for video composition.**
-
-Framework-agnostic IDE supporting React, Vue, Svelte, and vanilla JS.
-
-**Planned Features:**
-- Playback controls (play/pause, frame-by-frame, variable speed, reverse)
-- Timeline scrubber with in/out markers
-- Composition switcher (Cmd/Ctrl+K)
-- Props editor with schema validation
-- Assets panel for project files
-- Renders panel for job tracking
-- Canvas controls (zoom, resize, transparency)
-- Hot reloading
-
-**Launch:** `npx helios studio`
-
-### V1.x: Animation Helpers (Optional)
-For developers who want Remotion-style helpers alongside standard CSS:
-
-**Planned:**
-- `interpolate(frame, inputRange, outputRange, options)` - Frame-based value interpolation
-- `spring({ frame, fps, config })` - Physics-based spring animations
-- `<Sequence from={} durationInFrames={}>` - Timeline sequencing component
-- `<Series>` - Sequential composition helper
-
-> These are optional conveniences. Standard CSS/WAAPI animations remain the primary approach.
-
 ### V1.x: Captions & Audio
 **Planned:**
-- Caption/subtitle import (SRT)
 - Caption generation via Whisper integration
-- Caption export (burned-in or SRT)
 - Advanced audio mixing
 - Text-to-speech integration
 
@@ -567,7 +541,6 @@ For developers who want Remotion-style helpers alongside standard CSS:
 - MCP Server (`@helios-engine/mcp`) for Cursor/VS Code
 - Publishable Agent Skills (`npx @helios-engine/skills add`)
 - AI chatbot for documentation help
-- System prompt for LLM code generation
 - `.md` URL suffix for documentation
 
 ### V1.x: Architecture Hardening
