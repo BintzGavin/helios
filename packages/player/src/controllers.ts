@@ -76,7 +76,8 @@ export class DirectController implements HeliosController {
 
   async getAudioTracks(): Promise<AudioAsset[]> {
      const doc = this.iframe?.contentDocument || document;
-     return getAudioAssets(doc);
+     const state = this.instance.getState();
+     return getAudioAssets(doc, state.availableAudioTracks, state.audioTracks);
   }
 
   async getSchema(): Promise<HeliosSchema | undefined> {

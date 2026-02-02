@@ -10,7 +10,8 @@ export function connectToParent(helios: Helios) {
     const { type, frame } = event.data;
     switch (type) {
       case 'HELIOS_GET_AUDIO_TRACKS':
-        const assets = await getAudioAssets(document);
+        const state = helios.getState();
+        const assets = await getAudioAssets(document, state.availableAudioTracks, state.audioTracks);
         const buffers = assets.map(a => a.buffer);
         window.parent.postMessage({ type: 'HELIOS_AUDIO_DATA', assets }, '*', buffers);
         break;
