@@ -18,11 +18,24 @@ packages/studio/
 │   ├── cli.ts
 │   ├── components/
 │   │   ├── AssetsPanel/
+│   │   ├── AssistantModal/
+│   │   ├── AudioMixerPanel/
+│   │   ├── CaptionsPanel/
+│   │   ├── CompositionsPanel/
 │   │   ├── Controls/
-│   │   ├── PropsEditor/
+│   │   ├── Layout/
 │   │   ├── Stage/
 │   │   ├── Timeline/
-│   │   └── Toast/
+│   │   ├── Toast/
+│   │   ├── CompositionSettingsModal.tsx
+│   │   ├── CreateCompositionModal.tsx
+│   │   ├── DiagnosticsModal.tsx
+│   │   ├── DuplicateCompositionModal.tsx
+│   │   ├── GlobalShortcuts.tsx
+│   │   ├── KeyboardShortcutsModal.tsx
+│   │   ├── Omnibar.tsx
+│   │   ├── PropsEditor.tsx
+│   │   └── RenderPreviewModal.tsx
 │   ├── context/
 │   │   ├── StudioContext.tsx
 │   │   └── ToastContext.tsx
@@ -47,7 +60,9 @@ packages/studio/
 - **Assets Panel**: Drag-and-drop asset management.
 - **Renders Panel**: Render job tracking and history.
 - **Toast**: Notification system for user feedback.
-- **Omnibar**: Command palette for quick actions and navigation.
+- **Omnibar**: Command palette for quick actions, navigation, and asset management (Cmd+K).
+- **Assistant**: AI-powered help and documentation search.
+- **Audio Mixer**: Volume and mute controls for individual audio tracks.
 
 ## E. Integration
 
