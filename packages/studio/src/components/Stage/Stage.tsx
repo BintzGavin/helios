@@ -4,6 +4,7 @@ import { useStudio } from '../../context/StudioContext';
 import { EmptyState } from './EmptyState';
 import { StageToolbar } from './StageToolbar';
 import { useKeyboardShortcut } from '../../hooks/useKeyboardShortcut';
+import { usePersistentState } from '../../hooks/usePersistentState';
 import './Stage.css';
 
 interface StageProps {
@@ -19,10 +20,10 @@ export const Stage: React.FC<StageProps> = ({ src }) => {
   const playerRef = useRef<HeliosPlayerElement>(null);
 
   // State
-  const [zoom, setZoom] = useState(1);
-  const [pan, setPan] = useState({ x: 0, y: 0 });
-  const [isTransparent, setIsTransparent] = useState(true);
-  const [showGuides, setShowGuides] = useState(false);
+  const [zoom, setZoom] = usePersistentState('stage-zoom', 1);
+  const [pan, setPan] = usePersistentState('stage-pan', { x: 0, y: 0 });
+  const [isTransparent, setIsTransparent] = usePersistentState('stage-transparent', true);
+  const [showGuides, setShowGuides] = usePersistentState('stage-guides', false);
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
 

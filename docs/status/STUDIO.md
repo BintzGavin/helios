@@ -1,4 +1,4 @@
-**Version**: 0.77.0
+**Version**: 0.78.0
 
 # Studio Domain Status
 
@@ -7,6 +7,7 @@
 **Focus**: UI Implementation & CLI
 
 ## Recent Updates
+- [v0.78.0] ✅ Completed: Persistent Preferences - Implemented persistence for Sidebar tab, Stage settings (Zoom/Pan/Transparency/Guides), Timeline Zoom, and Active Composition using `localStorage`.
 - [v0.77.0] ✅ Completed: Omnibar Command Palette - Replaced Composition Switcher with a unified Omnibar (Cmd+K) for searching commands, compositions, and assets.
 - [v0.76.0] ✅ Completed: Audio Mixer Panel - Implemented "Audio" panel in Sidebar with volume and mute controls for individual audio tracks, backed by `HeliosController`.
 - [v0.75.0] ✅ Completed: Compositions Panel - Implemented persistent "Compositions" panel in Sidebar with creation, duplication, and deletion workflows.

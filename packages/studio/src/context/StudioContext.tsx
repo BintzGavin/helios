@@ -449,8 +449,26 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       .then(res => res.json())
       .then((data: Composition[]) => {
         setCompositions(data);
-        if (data.length > 0 && !activeComposition) {
-          setActiveComposition(data[0]);
+
+        let targetComp = null;
+
+        // Try to restore from localStorage
+        try {
+           const savedId = localStorage.getItem('helios-studio:active-composition-id');
+           if (savedId) {
+             const parsedId = JSON.parse(savedId);
+             targetComp = data.find((c: Composition) => c.id === parsedId);
+           }
+        } catch (e) {}
+
+        // Fallback to first if not found
+        if (!targetComp && data.length > 0) {
+           targetComp = data[0];
+        }
+
+        // Only set if we found something and no active composition is set yet
+        if (targetComp && !activeComposition) {
+           setActiveComposition(targetComp);
         }
       })
       .catch(err => {
@@ -459,6 +477,13 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
     fetchAssets();
   }, []);
+
+  // Persist active composition ID
+  useEffect(() => {
+    if (activeComposition) {
+      localStorage.setItem('helios-studio:active-composition-id', JSON.stringify(activeComposition.id));
+    }
+  }, [activeComposition]);
 
   // Reset range when composition changes
   useEffect(() => {
