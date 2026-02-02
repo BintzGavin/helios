@@ -2,7 +2,7 @@ import { TimeDriver, DomDriver, NoopDriver, Ticker, RafTicker, TimeoutTicker, Au
 import { signal, effect, computed, Signal, ReadonlySignal } from './signals.js';
 import { HeliosError, HeliosErrorCode } from './errors.js';
 import { HeliosSchema, validateProps, validateSchema } from './schema.js';
-import { CaptionCue, parseSrt, findActiveCues, areCuesEqual } from './captions.js';
+import { CaptionCue, parseSrt, parseCaptions, findActiveCues, areCuesEqual } from './captions.js';
 import { Marker, validateMarker, validateMarkers } from './markers.js';
 
 export type HeliosState<TInputProps = Record<string, any>> = {
@@ -430,7 +430,7 @@ export class Helios<TInputProps = Record<string, any>> {
 
     const initialProps = validateProps(options.inputProps || {}, this.schema) as TInputProps;
     const initialCaptions = options.captions
-      ? (typeof options.captions === 'string' ? parseSrt(options.captions) : options.captions)
+      ? (typeof options.captions === 'string' ? parseCaptions(options.captions) : options.captions)
       : [];
 
     const initialMarkers = options.markers ? validateMarkers(options.markers) : [];
@@ -703,10 +703,10 @@ export class Helios<TInputProps = Record<string, any>> {
 
   /**
    * Updates the captions for the composition.
-   * @param captions SRT string or array of CaptionCue objects.
+   * @param captions SRT/WebVTT string or array of CaptionCue objects.
    */
   public setCaptions(captions: string | CaptionCue[]) {
-    const cues = typeof captions === 'string' ? parseSrt(captions) : captions;
+    const cues = typeof captions === 'string' ? parseCaptions(captions) : captions;
     this._captions.value = cues;
   }
 

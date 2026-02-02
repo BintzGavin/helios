@@ -25,6 +25,27 @@ function parseTimecode(timecode: string): number {
   );
 }
 
+function parseVttTimecode(timecode: string): number {
+  // Matches HH:MM:SS.mmm or MM:SS.mmm
+  const match = timecode.match(/^(?:(\d{2}):)?(\d{2}):(\d{2})\.(\d{3})$/);
+  if (!match) {
+     throw new HeliosError(
+      HeliosErrorCode.INVALID_WEBVTT_FORMAT,
+      `Invalid timecode format: ${timecode}`,
+      'Timecode must be in HH:MM:SS.mmm or MM:SS.mmm format'
+    );
+  }
+  const [, hoursStr, minutes, seconds, milliseconds] = match;
+  const hours = hoursStr ? parseInt(hoursStr, 10) : 0;
+
+  return (
+    hours * 3600000 +
+    parseInt(minutes, 10) * 60000 +
+    parseInt(seconds, 10) * 1000 +
+    parseInt(milliseconds, 10)
+  );
+}
+
 function formatTimecode(milliseconds: number): string {
   const rounded = Math.floor(milliseconds);
   const hours = Math.floor(rounded / 3600000);
@@ -87,6 +108,73 @@ export function parseSrt(content: string): CaptionCue[] {
       text,
     };
   });
+}
+
+export function parseWebVTT(content: string): CaptionCue[] {
+  const normalized = content.replace(/\r\n/g, '\n').trim();
+  if (!normalized.startsWith('WEBVTT')) {
+    throw new HeliosError(HeliosErrorCode.INVALID_WEBVTT_FORMAT, "Missing WEBVTT header");
+  }
+
+  const blocks = normalized.split(/\n\n+/).slice(1);
+  const cues: CaptionCue[] = [];
+
+  blocks.forEach((block) => {
+      const lines = block.split('\n');
+      if (lines.length === 0) return;
+
+      // Ignore NOTE blocks
+      if (lines[0].startsWith('NOTE')) return;
+
+      let id = '';
+      let timecodeLineIndex = 0;
+
+       // Try to parse ID
+      if (lines[0].includes('-->')) {
+           // No ID
+           timecodeLineIndex = 0;
+           id = (cues.length + 1).toString();
+      } else {
+          id = lines[0];
+          timecodeLineIndex = 1;
+      }
+
+      if (timecodeLineIndex >= lines.length) return; // Skip if malformed
+
+      const timecodeLine = lines[timecodeLineIndex];
+      // Match timestamps, ignoring settings
+      // Captures start and end, ignoring potential "align:start" etc at the end
+      const timecodeMatch = timecodeLine.match(/^((?:(?:\d{2}:)?\d{2}:\d{2}\.\d{3})) --> ((?:(?:\d{2}:)?\d{2}:\d{2}\.\d{3}))/);
+
+      if (!timecodeMatch) {
+           throw new HeliosError(
+              HeliosErrorCode.INVALID_WEBVTT_FORMAT,
+              `Invalid timecode line: ${timecodeLine}`,
+              'Timecode line must match "HH:MM:SS.mmm --> HH:MM:SS.mmm"'
+          );
+      }
+
+      const startTime = parseVttTimecode(timecodeMatch[1]);
+      const endTime = parseVttTimecode(timecodeMatch[2]);
+      const text = lines.slice(timecodeLineIndex + 1).join('\n');
+
+      cues.push({
+          id,
+          startTime,
+          endTime,
+          text
+      });
+  });
+
+  return cues;
+}
+
+export function parseCaptions(content: string): CaptionCue[] {
+  const trimmed = content.trim();
+  if (trimmed.startsWith('WEBVTT')) {
+    return parseWebVTT(trimmed);
+  }
+  return parseSrt(trimmed);
 }
 
 export function stringifySrt(cues: CaptionCue[]): string {
