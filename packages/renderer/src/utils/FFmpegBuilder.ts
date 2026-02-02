@@ -1,9 +1,16 @@
-import { RendererOptions, AudioTrackConfig } from '../types.js';
+import { RendererOptions, AudioTrackConfig, FFmpegConfig } from '../types.js';
 
 export class FFmpegBuilder {
-  static getArgs(options: RendererOptions, outputPath: string, videoInputArgs: string[]): string[] {
+  static getArgs(options: RendererOptions, outputPath: string, videoInputArgs: string[]): FFmpegConfig {
     // 1. Normalize inputs into AudioTrackConfig objects
     const tracks: AudioTrackConfig[] = [];
+    const inputBuffers: { index: number; buffer: Buffer }[] = [];
+    // Start pipe index at 3 (0=stdin, 1=stdout, 2=stderr).
+    // Note: If videoInputArgs uses a pipe (e.g. image2pipe from stdin), that's pipe 0.
+    // FFmpeg is spawned with `stdio: ['pipe', 'pipe', 'pipe', ...extraPipes]`.
+    // The standard inputs are mapped to file descriptors 0, 1, 2.
+    // The first extra pipe is fd 3.
+    let nextPipeIndex = 3;
 
     if (options.audioTracks && options.audioTracks.length > 0) {
       options.audioTracks.forEach(track => {
@@ -12,6 +19,7 @@ export class FFmpegBuilder {
         } else {
           tracks.push({
             path: track.path,
+            buffer: track.buffer,
             volume: track.volume ?? 1.0,
             offset: track.offset ?? 0,
             seek: track.seek ?? 0,
@@ -34,6 +42,14 @@ export class FFmpegBuilder {
 
     // 2. Process each track to generate inputs and filters
     tracks.forEach((track, index) => {
+      // Handle Buffer -> Pipe mapping
+      if (track.buffer) {
+         const pipeIndex = nextPipeIndex++;
+         // FFmpeg syntax for reading from a file descriptor: pipe:N
+         track.path = `pipe:${pipeIndex}`;
+         inputBuffers.push({ index: pipeIndex, buffer: track.buffer });
+      }
+
       // Calculate effective seek and delay relative to render start
       const globalStart = track.offset || 0;
       let delayMs = 0;
@@ -205,6 +221,6 @@ export class FFmpegBuilder {
 
     finalArgs.push(outputPath);
 
-    return finalArgs;
+    return { args: finalArgs, inputBuffers };
   }
 }

@@ -1,5 +1,5 @@
 import { Page } from 'playwright';
-import { RendererOptions } from '../types.js';
+import { RendererOptions, FFmpegConfig } from '../types.js';
 
 export interface RenderStrategy {
   /**
@@ -40,7 +40,7 @@ export interface RenderStrategy {
    * @param options Renderer options.
    * @param outputPath The path to the output file.
    */
-  getFFmpegArgs(options: RendererOptions, outputPath: string): string[];
+  getFFmpegArgs(options: RendererOptions, outputPath: string): FFmpegConfig;
 
   /**
    * Cleans up any temporary resources created by the strategy.

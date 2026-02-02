@@ -1,6 +1,6 @@
 import { Page } from 'playwright';
 import { RenderStrategy } from './RenderStrategy.js';
-import { RendererOptions, AudioTrackConfig } from '../types.js';
+import { RendererOptions, AudioTrackConfig, FFmpegConfig } from '../types.js';
 import { FFmpegBuilder } from '../utils/FFmpegBuilder.js';
 import { scanForAudioTracks } from '../utils/dom-scanner.js';
 import { extractBlobTracks } from '../utils/blob-extractor.js';
@@ -434,7 +434,7 @@ export class CanvasStrategy implements RenderStrategy {
     return Promise.resolve();
   }
 
-  getFFmpegArgs(options: RendererOptions, outputPath: string): string[] {
+  getFFmpegArgs(options: RendererOptions, outputPath: string): FFmpegConfig {
     let videoInputArgs: string[];
 
     if (this.useWebCodecs) {
