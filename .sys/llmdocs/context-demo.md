@@ -30,6 +30,7 @@ The `examples/` directory contains reference implementations for various framewo
 - **react-transitions**: `react-transition-group` integration.
 - **react-animation-helpers**: Helper components for sequencing.
 - **react-audio-visualization**: Real-time audio frequency analysis visualization.
+- **react-lottie-animation**: Rendering Lottie JSON animations.
 
 ### Vue
 - **vue-dom-animation**: Basic Vue + DOM.
