@@ -51,6 +51,7 @@ The `examples/` directory contains reference implementations for various framewo
 - **svelte-transitions**: Svelte native transition directives.
 - **svelte-runes-animation**: Svelte 5 Runes syntax.
 - **svelte-animation-helpers**: Helper components for sequencing.
+- **svelte-lottie-animation**: Rendering Lottie JSON animations.
 
 ### Solid
 - **solid-dom-animation**: Basic SolidJS + DOM.
