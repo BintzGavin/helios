@@ -49,3 +49,7 @@
 ## [5.4.0] - Audio Visualization Hooks
 **Learning:** `DomDriver` controls the `HTMLMediaElement`s, making it impossible for consumers to attach `AudioContext` nodes for visualization without "stealing" the audio or duplicating the fetch.
 **Action:** Expose `getAudioContext` and `getAudioSourceNode` via `TimeDriver` (returning `unknown` for isomorphism) to allow "hooking" into the existing pipeline.
+
+## [5.6.0] - Workspace Dependency Breakage
+**Learning:** `packages/studio` depends on `player@^0.59.0` but `packages/player` is at `0.62.0`. This causes `npm install` at root to fail with `ETARGET`, blocking all verification.
+**Action:** When working on Core, check `npm install` status early. If broken due to other packages, document it as a blocker in the Plan Dependencies.
