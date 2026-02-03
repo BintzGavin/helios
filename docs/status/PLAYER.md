@@ -1,4 +1,4 @@
-**Version**: v0.63.1
+**Version**: v0.64.0
 
 # Status: PLAYER
 
@@ -56,6 +56,7 @@
 ## Critical Task
 - **None**: All critical tasks completed.
 
+[v0.64.0] ✅ Completed: Implement AudioTracks API - Implemented audioTracks property and AudioTrackList API on <helios-player> to provide Standard Media API parity and enable granular programmatic control of audio tracks.
 [v0.63.1] ✅ Completed: Fix cuechange on Disable - Fixed bug where disabling a track cleared active cues without dispatching the cuechange event.
 [v0.63.0] ✅ Completed: Implement Active Cues - Added `activeCues` property and `cuechange` event to `HeliosTextTrack`, and updated `HeliosPlayer` to drive cue updates via the main UI loop.
 [v0.62.1] ✅ Completed: Fix SRT Export Filename - Updated SRT export to respect `export-filename` attribute instead of using hardcoded "captions.srt".

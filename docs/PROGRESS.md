@@ -1,6 +1,9 @@
 ### DOCS v1.8.0
 - ✅ Completed: Daily Documentation Review - Updated all Changelogs, API Docs (Core, Player, Renderer), created new Example Docs (Lottie, Svelte/Vue Audio Vis), updated Studio Guide, and verified navigation.
 
+### PLAYER v0.64.0
+- ✅ Completed: Implement AudioTracks API - Implemented audioTracks property and AudioTrackList API on <helios-player> to provide Standard Media API parity and enable granular programmatic control of audio tracks.
+
 ### PLAYER v0.63.1
 - ✅ Completed: Fix cuechange on Disable - Fixed bug where disabling a track cleared active cues without dispatching the cuechange event.
 

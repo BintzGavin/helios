@@ -75,6 +75,6 @@ The component observes the following attributes:
 ## D. Public API
 The `HeliosPlayer` class exposes properties and methods closely mirroring `HTMLMediaElement`:
 
-- **Properties**: `currentTime`, `duration`, `paused`, `ended`, `volume`, `muted`, `playbackRate`, `src`, `currentSrc`, `error`, `readyState`, `networkState`, `buffered`, `seekable`, `played`, `videoWidth`, `videoHeight`, `textTracks`, `activeCues`.
+- **Properties**: `currentTime`, `duration`, `paused`, `ended`, `volume`, `muted`, `playbackRate`, `src`, `currentSrc`, `error`, `readyState`, `networkState`, `buffered`, `seekable`, `played`, `videoWidth`, `videoHeight`, `textTracks`, `audioTracks`, `activeCues`.
 - **Methods**: `play()`, `pause()`, `load()`, `addTextTrack()`, `requestPictureInPicture()`, `diagnose()`.
 - **Getters**: `getController()` (Returns internal controller instance).
