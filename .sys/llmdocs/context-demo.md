@@ -31,6 +31,7 @@ The `examples/` directory contains reference implementations for various framewo
 - **react-animation-helpers**: Helper components for sequencing.
 - **react-audio-visualization**: Real-time audio frequency analysis visualization.
 - **react-lottie-animation**: Rendering Lottie JSON animations.
+- **react-pixi-animation**: 2D animation with PixiJS and React.
 
 ### Vue
 - **vue-dom-animation**: Basic Vue + DOM.
