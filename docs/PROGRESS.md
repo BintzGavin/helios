@@ -1,3 +1,6 @@
+### RENDERER v1.61.2
+- ✅ Completed: Update Verification Suite - Updated `run-all.ts` to include regression tests for playback rate and seeking (`verify-audio-playback-rate.ts`, etc), ensuring continuous coverage.
+
 ### RENDERER v1.61.1
 - ✅ Completed: Fix Audio Playback Seek - Updated `FFmpegBuilder` to correctly calculate input seek time (`-ss`) when using `playbackRate` with `startFrame > 0`.
 
