@@ -1,4 +1,4 @@
-**Version**: 0.86.0
+**Version**: 0.87.0
 
 **Posture**: ACTIVELY EXPANDING FOR V2
 
@@ -9,6 +9,7 @@
 **Focus**: UI Implementation & CLI
 
 ## Recent Updates
+- [v0.87.0] ✅ Completed: Distributed Rendering Config - Implemented concurrency control in the Studio Renders Panel and updated backend to use `RenderOrchestrator` for parallel rendering.
 - [v0.86.0] ✅ Completed: Audio Mixer Solo - Implemented "Solo" functionality in Audio Mixer Panel, allowing isolation of individual audio tracks with mute state restoration.
 - [v0.85.0] ✅ Completed: Timeline Audio Waveforms - Implemented visual audio waveforms on the Timeline using `AudioWaveform` component and `OfflineAudioContext` for decoding.
 - [v0.84.0] ✅ Completed: Timeline Persistence - Implemented persistence for Current Frame, In Point, Out Point, and Loop state across reloads and composition switches.

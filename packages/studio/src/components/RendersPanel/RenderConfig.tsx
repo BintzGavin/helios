@@ -4,6 +4,7 @@ export interface RenderConfigData {
   mode: 'canvas' | 'dom';
   videoBitrate?: string;
   videoCodec?: string;
+  concurrency?: number;
 }
 
 interface RenderConfigProps {
@@ -12,7 +13,7 @@ interface RenderConfigProps {
 }
 
 export const RenderConfig: React.FC<RenderConfigProps> = ({ config, onChange }) => {
-  const handleChange = (field: keyof RenderConfigData, value: string) => {
+  const handleChange = (field: keyof RenderConfigData, value: string | number) => {
     onChange({
       ...config,
       [field]: value
@@ -70,6 +71,18 @@ export const RenderConfig: React.FC<RenderConfigProps> = ({ config, onChange }) 
           placeholder="e.g. libx264"
           value={config.videoCodec || ''}
           onChange={(e) => handleChange('videoCodec', e.target.value)}
+          style={inputStyle}
+        />
+      </div>
+
+      <div style={{ marginBottom: '8px' }}>
+        <label style={labelStyle}>Concurrency (Workers)</label>
+        <input
+          type="number"
+          min="1"
+          max="32"
+          value={config.concurrency || 1}
+          onChange={(e) => handleChange('concurrency', parseInt(e.target.value) || 1)}
           style={inputStyle}
         />
       </div>

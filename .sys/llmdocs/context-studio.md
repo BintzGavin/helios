@@ -57,11 +57,11 @@ npx helios studio [options]
 - **Assets Panel**: A file browser for managing project assets (images, video, audio, fonts). Supports drag-and-drop to Props Editor.
 - **Audio Mixer Panel**: Controls volume, mute, and solo states for individual audio tracks.
 - **Compositions Panel**: Manages composition files (create, duplicate, delete).
-- **Renders Panel**: Manages server-side render jobs and client-side exports.
+- **Renders Panel**: Manages server-side render jobs (single or distributed) and client-side exports.
 - **Omnibar**: A command palette (Cmd+K) for quick navigation and actions.
 
 ## E. Integration
 
 - **Core**: Consumes `HeliosSchema` for generating the Props Editor UI.
 - **Player**: Embeds `<helios-player>` (via `@helios-project/player`) to render the composition and provide playback control (`HeliosController`).
-- **Renderer**: Communicates with `@helios-project/renderer` (via backend API) to dispatch render jobs for high-quality output.
+- **Renderer**: Communicates with `@helios-project/renderer` (via backend API using `RenderOrchestrator`) to dispatch render jobs for high-quality output.

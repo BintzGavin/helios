@@ -11,6 +11,13 @@ vi.mock('@helios-project/renderer', () => ({
       return Promise.resolve();
     }
     diagnose() { return Promise.resolve({}); }
+  },
+  RenderOrchestrator: {
+    render: vi.fn().mockImplementation((_url: string, outputPath: string) => {
+      const fs = require('fs');
+      fs.writeFileSync(outputPath, 'dummy content');
+      return Promise.resolve();
+    })
   }
 }));
 
@@ -32,6 +39,7 @@ describe('RenderManager Persistence', () => {
     }
     fs.mkdirSync(rendersDir, { recursive: true });
     vi.resetModules(); // Ensure clean import for each test
+    vi.clearAllMocks();
   });
 
   afterEach(() => {
@@ -98,5 +106,20 @@ describe('RenderManager Persistence', () => {
     // Ensure it's gone
     const content = JSON.parse(fs.readFileSync(jobsFile, 'utf-8'));
     expect(content.find((j: any) => j.id === jobId)).toBeUndefined();
+  });
+
+  it('should use RenderOrchestrator with concurrency', async () => {
+    const { startRender } = await import('./render-manager');
+    const { RenderOrchestrator } = await import('@helios-project/renderer');
+
+    await startRender({ compositionUrl: '/test', concurrency: 4 }, 3000);
+
+    // Wait for async execution
+    await new Promise(r => setTimeout(r, 100));
+
+    expect(RenderOrchestrator.render).toHaveBeenCalled();
+    const args = (RenderOrchestrator.render as any).mock.calls[0];
+    // arg 2 is options
+    expect(args[2].concurrency).toBe(4);
   });
 });
