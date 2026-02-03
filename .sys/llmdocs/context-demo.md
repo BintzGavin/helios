@@ -70,7 +70,7 @@ The `examples/` directory contains reference implementations for various framewo
 - **tailwind-animation**: Styling and animation with Tailwind CSS.
 
 ### Advanced
-- **podcast-visualizer**: Multi-track audio visualization.
+- **podcast-visualizer**: Multi-track audio visualization using `AudioContext` analysis.
 - **promo-video**: Marketing promo video template.
 - **social-media-story**: Vertical video format.
 - **audio-visualization**: Real-time frequency analysis.

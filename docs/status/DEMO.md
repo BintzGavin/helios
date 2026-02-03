@@ -1,6 +1,6 @@
 # Status: DEMO Domain
 
-**Version**: 1.88.0
+**Version**: 1.89.0
 
 ## Vision
 The DEMO domain is responsible for:
@@ -15,6 +15,7 @@ The DEMO domain is responsible for:
 - None
 
 ## Completed Tasks
+- [v1.89.0] ✅ Completed: Refactor Podcast Visualizer - Refactored `examples/podcast-visualizer` to use `AudioContext` for real-time analysis, replacing simulated animations.
 - [v1.88.0] ✅ Completed: Verify Excalidraw Example - Verified build and rendering of `examples/excalidraw-animation` and added to documentation.
 - [v1.87.1] ✅ Completed: React Audio Visualization - Created `examples/react-audio-visualization` demonstrating real-time audio analysis (RMS, waveforms) using synthesized `AudioBuffer` and React Hooks.
 - [v1.87.0] ✅ Completed: Fix GSAP Sync - Fixed synchronization issue in `examples/promo-video` using `helios.registerStabilityCheck` and enhanced `tests/e2e/verify-render.ts` with custom duration/brightness checks. Confirmed E2E pass with YMAX=192.

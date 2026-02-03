@@ -1,3 +1,6 @@
+## DEMO v1.89.0
+- ✅ Completed: Refactor Podcast Visualizer - Refactored `examples/podcast-visualizer` to use `AudioContext` for real-time analysis, replacing simulated animations.
+
 ## DEMO v1.88.0
 - ✅ Completed: Verify Excalidraw Example - Verified build and rendering of `examples/excalidraw-animation` and added to documentation.
 
