@@ -21,3 +21,6 @@
 
 ### DEMO v1.90.0
 - ✅ Completed: Vue Audio Visualization - Created `examples/vue-audio-visualization` demonstrating real-time audio analysis with Vue 3.
+
+## PLAYER v0.63.0
+- ✅ Completed: Implement Active Cues - Added `activeCues` property and `cuechange` event to `HeliosTextTrack`, and updated `HeliosPlayer` to drive cue updates via the main UI loop.
