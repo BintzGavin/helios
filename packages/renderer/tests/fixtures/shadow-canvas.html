@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Shadow DOM Canvas Test</title>
+</head>
+<body>
+  <h1>Shadow DOM Canvas</h1>
+  <shadow-box></shadow-box>
+  <script>
+    class ShadowBox extends HTMLElement {
+      constructor() {
+        super();
+        this.attachShadow({ mode: 'open' });
+      }
+
+      connectedCallback() {
+        this.shadowRoot.innerHTML = `
+          <style>
+            canvas { border: 1px solid red; }
+          </style>
+          <div class="container">
+            <canvas id="gl" width="200" height="200"></canvas>
+          </div>
+        `;
+
+        const canvas = this.shadowRoot.getElementById('gl');
+        const ctx = canvas.getContext('2d');
+        let frame = 0;
+
+        function draw() {
+          ctx.fillStyle = frame % 2 === 0 ? 'blue' : 'green';
+          ctx.fillRect(0, 0, 200, 200);
+          ctx.fillStyle = 'white';
+          ctx.font = '20px Arial';
+          ctx.fillText('Frame: ' + frame, 10, 50);
+          frame++;
+          requestAnimationFrame(draw);
+        }
+        draw();
+      }
+    }
+    customElements.define('shadow-box', ShadowBox);
+  </script>
+</body>
+</html>

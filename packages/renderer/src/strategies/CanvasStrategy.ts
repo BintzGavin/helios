@@ -70,14 +70,55 @@ export class CanvasStrategy implements RenderStrategy {
     // Ensure fonts are loaded before capture starts
     await page.evaluate(function() { return document.fonts.ready; });
 
-    // Validate that the canvas element exists
+    // Validate that the canvas element exists (supporting Shadow DOM)
+    // We use a string-based script to avoid transpiler artifacts (like esbuild's __name)
     const selector = this.options.canvasSelector || 'canvas';
-    const canvasExists = await page.evaluate((sel) => {
-      const el = document.querySelector(sel);
-      return el instanceof HTMLCanvasElement;
-    }, selector);
+    const findCanvasScript = `
+      ((selector) => {
+        function findCanvas(root, selector) {
+          // Fast path for Light DOM (if querySelector is available)
+          // Note: querySelector does NOT cross shadow boundaries
+          if (root.querySelector) {
+            try {
+              const light = root.querySelector(selector);
+              if (light && light instanceof HTMLCanvasElement) return light;
+            } catch (e) {
+              // Ignore invalid selector errors
+            }
+          }
 
-    if (!canvasExists) {
+          // Recursive traversal
+          // We use createTreeWalker to iterate descendants
+          const walker = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT);
+          while (walker.nextNode()) {
+            const node = walker.currentNode;
+
+            if (node instanceof HTMLCanvasElement) {
+              if (node.matches && node.matches(selector)) {
+                return node;
+              }
+            }
+
+            if (node.shadowRoot) {
+              const found = findCanvas(node.shadowRoot, selector);
+              if (found) return found;
+            }
+          }
+          return null;
+        }
+
+        const canvas = findCanvas(document, selector);
+        if (canvas) {
+          window.__HELIOS_TARGET_CANVAS__ = canvas;
+          return true;
+        }
+        return false;
+      })(${JSON.stringify(selector)})
+    `;
+
+    const canvasFound = await page.evaluate(findCanvasScript);
+
+    if (!canvasFound) {
       throw new Error(`Canvas not found matching selector: ${selector}`);
     }
 
@@ -329,9 +370,9 @@ export class CanvasStrategy implements RenderStrategy {
       }
 
       const encoder = context.encoder as VideoEncoder;
-      const canvas = document.querySelector(args.selector) as HTMLCanvasElement;
+      const canvas = (window as any).__HELIOS_TARGET_CANVAS__ as HTMLCanvasElement;
 
-      if (!canvas) throw new Error(`Canvas not found matching selector: ${args.selector}`);
+      if (!canvas) throw new Error(`Canvas not found (lost reference) matching selector: ${args.selector}`);
 
       // Create Frame and Encode
       const frame = new VideoFrame(canvas, { timestamp: args.time * 1000 }); // microseconds
@@ -378,7 +419,7 @@ export class CanvasStrategy implements RenderStrategy {
     const selector = this.options.canvasSelector || 'canvas';
 
     const dataUrl = await page.evaluate(function(args: { format: string, quality?: number, selector: string }) {
-      const canvas = document.querySelector(args.selector) as HTMLCanvasElement;
+      const canvas = (window as any).__HELIOS_TARGET_CANVAS__ as HTMLCanvasElement;
       if (!canvas) return 'error:canvas-not-found';
 
       const mimeType = args.format === 'jpeg' ? 'image/jpeg' : 'image/png';
