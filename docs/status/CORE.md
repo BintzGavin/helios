@@ -1,11 +1,12 @@
 # Status: CORE
 
-**Version**: 5.5.0
+**Version**: 5.6.0
 
 - **Status**: Active
 - **Current Focus**: Maintenance, Optimization, and Stability
 - **Last Updated**: 2026-08-08
 
+[v5.6.0] ✅ Completed: Audio Fade Easing - Implemented `data-helios-fade-easing` support in `DomDriver`, enabling non-linear audio fades (e.g., "quad.in") using the Easing library.
 [v5.5.0] ✅ Verified: Maintenance - Verified core package integrity by running full test suite (27 files, 428 tests passed).
 [v5.5.0] ✅ Completed: Audio Visualization Hooks - Added `getAudioContext()` and `getAudioSourceNode(trackId)` methods to `Helios` and `DomDriver`, allowing consumers to hook into the audio graph for visualization.
 [v5.4.0] ✅ Completed: Headless Audio Tracks - Added `availableAudioTracks` option to `HeliosOptions` and `setAvailableAudioTracks` method, enabling manual injection of audio metadata for headless environments.
