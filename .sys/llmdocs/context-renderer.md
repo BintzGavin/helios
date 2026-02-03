@@ -56,6 +56,8 @@ packages/renderer/
     ├── verify-shadow-dom-images.ts # Shadow DOM image discovery test
     ├── verify-enhanced-dom-preload.ts # Enhanced DOM preloading test
     ├── verify-dom-audio-fades.ts # DOM audio fades test
+    ├── verify-audio-fades.ts   # Audio fades test
+    ├── verify-audio-loop.ts    # Audio looping test
     ├── verify-audio-playback-rate.ts # Audio playback rate test
     ├── verify-frame-count.ts   # Precision frame count test
     ├── verify-cdp-hang.ts      # CDP initialization order/deadlock test

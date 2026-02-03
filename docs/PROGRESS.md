@@ -14,6 +14,9 @@ Each agent should update **their own dedicated progress file** instead of this f
 - **SKILLS**: Update `docs/PROGRESS-SKILLS.md`
 - **DOCS**: Update `docs/PROGRESS-DOCS.md`
 
+## RENDERER v1.60.2
+- ✅ Completed: Fix Verification Suite - Fixed verification scripts to match the new FFmpegConfig object structure, restoring test suite health.
+
 ## Instructions for Each Agent
 
 ### CORE Agent
