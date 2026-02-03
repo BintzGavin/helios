@@ -270,4 +270,47 @@ describe('DomDriver Metadata Discovery', () => {
     await new Promise(resolve => setTimeout(resolve, 10));
     expect(updates, 'Update count after duration change').toBe(3);
   });
+
+  it('should discover fade easing metadata', () => {
+    const audio = document.createElement('audio');
+    audio.setAttribute('data-helios-track-id', 'track-fade-easing');
+    audio.setAttribute('data-helios-fade-easing', 'quad.in');
+    container.appendChild(audio);
+
+    const driver = new DomDriver();
+    let discovered: AudioTrackMetadata[] = [];
+
+    driver.subscribeToMetadata((meta) => {
+      if (meta.audioTracks) discovered = meta.audioTracks;
+    });
+
+    driver.init(container);
+
+    expect(discovered).toHaveLength(1);
+    expect(discovered[0].fadeEasing).toBe('quad.in');
+  });
+
+  it('should update metadata when fade easing attribute changes', async () => {
+    const audio = document.createElement('audio');
+    audio.setAttribute('data-helios-track-id', 'track-fade-easing-mutate');
+    container.appendChild(audio);
+
+    const driver = new DomDriver();
+    let discovered: AudioTrackMetadata[] = [];
+
+    driver.subscribeToMetadata((meta) => {
+      if (meta.audioTracks) discovered = meta.audioTracks;
+    });
+
+    driver.init(container);
+    expect(discovered[0].fadeEasing).toBeUndefined();
+
+    // Update attribute
+    audio.setAttribute('data-helios-fade-easing', 'cubic.out');
+
+    // Wait for MutationObserver
+    await new Promise(resolve => setTimeout(resolve, 50));
+
+    expect(discovered[0].fadeEasing).toBe('cubic.out');
+  });
 });

@@ -1,11 +1,12 @@
 # Status: CORE
 
-**Version**: 5.7.0
+**Version**: 5.8.0
 
 - **Status**: Active
 - **Current Focus**: Maintenance, Optimization, and Stability
-- **Last Updated**: 2026-08-09
+- **Last Updated**: 2026-08-10
 
+[v5.8.0] ✅ Completed: Expose Fade Easing Metadata - Added `fadeEasing` to `AudioTrackMetadata` and updated `DomDriver` to parse `data-helios-fade-easing` attribute, exposing non-linear fade configurations to consumers.
 [v5.7.0] ✅ Completed: Enable Audio State Persistence - Added `audioTracks` to `HeliosOptions` and updated constructor to initialize mixer state (volume/muted per track) from configuration, enabling full session save/load.
 [v5.6.0] ✅ Completed: Audio Fade Easing - Implemented `data-helios-fade-easing` support in `DomDriver`, enabling non-linear audio fades (e.g., "quad.in") using the Easing library.
 [v5.5.0] ✅ Verified: Maintenance - Verified core package integrity by running full test suite (27 files, 428 tests passed).

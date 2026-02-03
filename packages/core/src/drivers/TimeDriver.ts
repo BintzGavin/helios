@@ -5,6 +5,7 @@ export interface AudioTrackMetadata {
   duration: number;
   fadeInDuration?: number;
   fadeOutDuration?: number;
+  fadeEasing?: string;
 }
 
 export interface DriverMetadata {
