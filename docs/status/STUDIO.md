@@ -1,4 +1,4 @@
-**Version**: 0.84.0
+**Version**: 0.85.0
 
 # Studio Domain Status
 
@@ -7,6 +7,7 @@
 **Focus**: UI Implementation & CLI
 
 ## Recent Updates
+- [v0.85.0] ✅ Completed: Timeline Audio Waveforms - Implemented visual audio waveforms on the Timeline using `AudioWaveform` component and `OfflineAudioContext` for decoding.
 - [v0.84.0] ✅ Completed: Timeline Persistence - Implemented persistence for Current Frame, In Point, Out Point, and Loop state across reloads and composition switches.
 - [v0.83.0] ✅ Completed: Loop Range - Implemented logic to loop playback within defined In/Out points (including handling of Out Point = 0 for full duration), ensuring smooth playback for specific sections.
 - [v0.82.0] ✅ Completed: Stacked Timeline - Implemented multi-lane stacked timeline for audio tracks with dynamic vertical scrolling and sticky ruler, improving visibility of overlapping tracks.

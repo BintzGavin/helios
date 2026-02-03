@@ -26,7 +26,10 @@ describe('Timeline', () => {
   };
 
   const defaultContext = {
-    controller: { seek: mockSeek },
+    controller: {
+      seek: mockSeek,
+      getAudioTracks: vi.fn().mockResolvedValue([])
+    },
     playerState: defaultPlayerState,
     inPoint: 0,
     setInPoint: mockSetInPoint,

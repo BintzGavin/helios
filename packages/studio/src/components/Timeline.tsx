@@ -3,6 +3,8 @@ import { useStudio } from '../context/StudioContext';
 import { usePersistentState } from '../hooks/usePersistentState';
 import { framesToTimecode } from '@helios-project/core';
 import { TimecodeDisplay } from './Controls/TimecodeDisplay';
+import { AudioAsset } from '../types';
+import { AudioWaveform } from './AudioWaveform';
 import './Timeline.css';
 
 interface Tick {
@@ -38,6 +40,17 @@ export const Timeline: React.FC = () => {
   const [zoom, setZoom] = usePersistentState('timeline-zoom', 0);
   const [hoverFrame, setHoverFrame] = useState<number | null>(null);
   const [contentWidth, setContentWidth] = useState(0);
+  const [audioAssets, setAudioAssets] = useState<Record<string, AudioAsset>>({});
+
+  useEffect(() => {
+    if (controller) {
+       controller.getAudioTracks().then(assets => {
+         const map: Record<string, AudioAsset> = {};
+         assets.forEach(a => map[a.id] = a);
+         setAudioAssets(map);
+       }).catch(err => console.error("Failed to fetch audio tracks for waveform", err));
+    }
+  }, [controller, playerState.availableAudioTracks]);
 
   // Measure content width for Fit mode
   useEffect(() => {
@@ -309,6 +322,8 @@ export const Timeline: React.FC = () => {
               const startFrame = track.startTime * fps;
               const durationFrame = track.duration * fps;
               const top = getAudioTrackTop(i);
+              const containerWidth = zoom === 0 ? contentWidth : totalFrames * pixelsPerFrame;
+              const itemWidthPx = (durationFrame / totalFrames) * containerWidth;
 
               return (
                 <div
@@ -320,7 +335,16 @@ export const Timeline: React.FC = () => {
                     top: `${top}px`
                   }}
                   title={`Audio: ${track.id}`}
-                />
+                >
+                   {audioAssets[track.id]?.buffer && itemWidthPx > 0 && (
+                     <AudioWaveform
+                        buffer={audioAssets[track.id].buffer}
+                        width={itemWidthPx}
+                        height={TRACK_HEIGHT}
+                        color="rgba(0, 0, 0, 0.4)"
+                     />
+                   )}
+                </div>
               );
             })}
 
