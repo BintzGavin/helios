@@ -264,3 +264,7 @@
 ## [1.61.1] - Vision Gap: Audio Offset and Playback Rate
 **Learning:** `FFmpegBuilder` calculates `inputSeek` based on timeline duration, ignoring `playbackRate`. This causes desync when rendering ranges (`startFrame > 0`) with variable speed audio.
 **Action:** Created plan `2026-08-07-RENDERER-Fix-Audio-Playback-Seek.md` to fix the math.
+
+## [2026-08-08] - Incomplete Verification Suite
+**Learning:** `run-all.ts` (the master test runner) is not automatically updated when new test files are added to `tests/`. This led to `verify-audio-playback-rate.ts` (and others) being orphaned and not running in CI.
+**Action:** Always verify `run-all.ts` content when adding new test files to ensure they are actually executed.
