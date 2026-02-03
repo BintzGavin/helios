@@ -8,8 +8,11 @@ export interface TrackHost {
 const GlobalVTTCue = (typeof window !== 'undefined' && (window as any).VTTCue) || null;
 
 export class HeliosCue {
+  id: string = "";
+  track: HeliosTextTrack | null = null;
   startTime: number;
   endTime: number;
+  pauseOnExit: boolean = false;
   text: string;
 
   constructor(startTime: number, endTime: number, text: string) {
@@ -21,16 +24,49 @@ export class HeliosCue {
 
 export const CueClass = GlobalVTTCue || HeliosCue;
 
+export class HeliosTextTrackCueList implements Iterable<HeliosCue> {
+    private _cues: HeliosCue[];
+
+    constructor(cues: HeliosCue[]) {
+        this._cues = cues;
+        return new Proxy(this, {
+            get: (target, prop) => {
+                if (typeof prop === 'string') {
+                    const index = Number(prop);
+                    if (Number.isInteger(index) && index >= 0) {
+                        return target._cues[index];
+                    }
+                }
+                return Reflect.get(target, prop);
+            }
+        });
+    }
+
+    get length() { return this._cues.length; }
+
+    getCueById(id: string): HeliosCue | null {
+        return this._cues.find(c => c.id === id) || null;
+    }
+
+    [Symbol.iterator]() {
+        return this._cues[Symbol.iterator]();
+    }
+}
+
 export class HeliosTextTrack extends EventTarget {
   private _mode: TextTrackMode = 'disabled';
-  private _cues: any[] = [];
-  private _activeCues: any[] = [];
+  private _cues: HeliosCue[] = [];
+  private _activeCues: HeliosCue[] = [];
   private _oncuechange: ((event: Event) => void) | null = null;
   private _kind: string;
   private _label: string;
   private _language: string;
   private _id: string;
   private _host: TrackHost;
+
+  // Cached lists to ensure stable references
+  private _cuesWrapper: HeliosTextTrackCueList | null = null;
+  private _activeCuesWrapper: HeliosTextTrackCueList | null = null;
 
   constructor(kind: string, label: string, language: string, host: TrackHost) {
     super();
@@ -45,8 +81,20 @@ export class HeliosTextTrack extends EventTarget {
   get label() { return this._label; }
   get language() { return this._language; }
   get id() { return this._id; }
-  get cues() { return this._cues; }
-  get activeCues() { return this._activeCues; }
+
+  get cues() {
+    if (!this._cuesWrapper) {
+      this._cuesWrapper = new HeliosTextTrackCueList(this._cues);
+    }
+    return this._cuesWrapper;
+  }
+
+  get activeCues() {
+    if (!this._activeCuesWrapper) {
+      this._activeCuesWrapper = new HeliosTextTrackCueList(this._activeCues);
+    }
+    return this._activeCuesWrapper;
+  }
 
   get oncuechange() { return this._oncuechange; }
 
@@ -75,6 +123,7 @@ export class HeliosTextTrack extends EventTarget {
     if (this._mode === 'disabled') {
       if (this._activeCues.length > 0) {
         this._activeCues = [];
+        this._activeCuesWrapper = null;
         this.dispatchEvent(new Event('cuechange'));
       }
       return;
@@ -98,11 +147,27 @@ export class HeliosTextTrack extends EventTarget {
 
     if (changed) {
       this._activeCues = newActiveCues;
+      this._activeCuesWrapper = null;
       this.dispatchEvent(new Event('cuechange'));
     }
   }
 
-  addCue(cue: any) {
+  addCue(cue: HeliosCue) {
+    try {
+      cue.track = this;
+    } catch (e) {
+      // Handle native VTTCue where track is read-only
+      try {
+        Object.defineProperty(cue, 'track', {
+          value: this,
+          writable: true,
+          configurable: true
+        });
+      } catch (e2) {
+        console.warn("HeliosTextTrack: Could not set track property on cue", e2);
+      }
+    }
+
     this._cues.push(cue);
     this._cues.sort((a, b) => a.startTime - b.startTime);
 
@@ -112,9 +177,18 @@ export class HeliosTextTrack extends EventTarget {
     }
   }
 
-  removeCue(cue: any) {
+  removeCue(cue: HeliosCue) {
       const idx = this._cues.indexOf(cue);
       if (idx !== -1) {
+          try {
+            cue.track = null;
+          } catch (e) {
+             try {
+               Object.defineProperty(cue, 'track', { value: null });
+             } catch (e2) {
+               // Ignore
+             }
+          }
           this._cues.splice(idx, 1);
           if (this._mode === 'showing') {
               this._host.handleTrackModeChange(this);

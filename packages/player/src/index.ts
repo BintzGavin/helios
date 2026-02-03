@@ -1082,7 +1082,7 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
         }
 
         // Extract cues into the format Helios expects
-        const captions = track.cues.map((cue: any, index: number) => ({
+        const captions = Array.from(track.cues).map((cue: any, index: number) => ({
             id: cue.id || String(index + 1),
             startTime: cue.startTime * 1000, // Convert seconds to milliseconds
             endTime: cue.endTime * 1000,     // Convert seconds to milliseconds
@@ -1093,7 +1093,7 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
         // If hiding/disabling, check if any other track is showing
         const showingTrack = Array.from(this._textTracks).find(t => t.mode === 'showing' && t.kind === 'captions');
         if (showingTrack) {
-             const captions = showingTrack.cues.map((cue: any, index: number) => ({
+             const captions = Array.from(showingTrack.cues).map((cue: any, index: number) => ({
                 id: cue.id || String(index + 1),
                 startTime: cue.startTime * 1000, // Convert seconds to milliseconds
                 endTime: cue.endTime * 1000,     // Convert seconds to milliseconds
