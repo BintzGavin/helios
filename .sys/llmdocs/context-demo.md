@@ -43,6 +43,7 @@ The `examples/` directory contains reference implementations for various framewo
 ### Svelte
 - **svelte-dom-animation**: Basic Svelte + DOM.
 - **svelte-canvas-animation**: Basic Svelte + Canvas.
+- **svelte-audio-visualization**: Real-time audio frequency analysis visualization.
 - **svelte-captions-animation**: Svelte stores for Helios SRT captions.
 - **svelte-threejs-canvas-animation**: 3D animation with Three.js and Svelte.
 - **svelte-transitions**: Svelte native transition directives.

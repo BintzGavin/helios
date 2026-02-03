@@ -1,3 +1,6 @@
+### DEMO v1.92.0
+- ✅ Completed: Svelte Audio Visualization - Created `examples/svelte-audio-visualization` demonstrating real-time audio analysis using Svelte derived stores.
+
 ### STUDIO v0.83.0
 - ✅ Completed: Loop Range - Implemented logic to loop playback within defined In/Out points (including handling of Out Point = 0 for full duration), ensuring smooth playback for specific sections.
 

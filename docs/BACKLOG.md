@@ -28,6 +28,7 @@
 ### 5. Documentation and Examples
 - [ ] Add Quickstart guide.
 - [ ] Add realistic examples (Canvas and DOM).
+- [x] Create Svelte Audio Visualization Example.
 
 ### 6. Distributed Rendering Research
 - [x] Scaffolding for distributed rendering.
