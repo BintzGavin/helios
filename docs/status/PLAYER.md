@@ -1,4 +1,4 @@
-**Version**: v0.62.1
+**Version**: v0.63.0
 
 # Status: PLAYER
 
@@ -51,10 +51,12 @@
 - **Supports Headless Audio Export**: Client-side export now includes audio tracks manually injected into Helios state (`availableAudioTracks`), enabling headless audio rendering without DOM elements.
 - **Supports Dynamic Composition Updates**: Exposes `setDuration`, `setFps`, `setSize`, and `setMarkers` via `HeliosController` (and Bridge), allowing host applications (like Studio) to update the composition structure dynamically.
 - **Supports Export Filename**: Implemented `export-filename` attribute to allow specifying the filename for client-side exports.
+- **Supports Active Cues**: Implemented `activeCues` property and `cuechange` event on `HeliosTextTrack` for Standard Media API parity.
 
 ## Critical Task
 - **None**: All critical tasks completed.
 
+[v0.63.0] ✅ Completed: Implement Active Cues - Added `activeCues` property and `cuechange` event to `HeliosTextTrack`, and updated `HeliosPlayer` to drive cue updates via the main UI loop.
 [v0.62.1] ✅ Completed: Fix SRT Export Filename - Updated SRT export to respect `export-filename` attribute instead of using hardcoded "captions.srt".
 [v0.62.0] ✅ Verified: Export Filename - Confirmed implementation and tests for `export-filename` attribute. Synced package.json version.
 [v0.62.0] ✅ Completed: Export Filename - Implemented `export-filename` attribute on `<helios-player>` to allow customizing the filename of client-side exported videos.

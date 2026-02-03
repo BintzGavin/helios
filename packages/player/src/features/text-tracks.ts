@@ -24,6 +24,8 @@ export const CueClass = GlobalVTTCue || HeliosCue;
 export class HeliosTextTrack extends EventTarget {
   private _mode: TextTrackMode = 'disabled';
   private _cues: any[] = [];
+  private _activeCues: any[] = [];
+  private _oncuechange: ((event: Event) => void) | null = null;
   private _kind: string;
   private _label: string;
   private _language: string;
@@ -44,6 +46,19 @@ export class HeliosTextTrack extends EventTarget {
   get language() { return this._language; }
   get id() { return this._id; }
   get cues() { return this._cues; }
+  get activeCues() { return this._activeCues; }
+
+  get oncuechange() { return this._oncuechange; }
+
+  set oncuechange(handler: ((event: Event) => void) | null) {
+    if (this._oncuechange) {
+      this.removeEventListener('cuechange', this._oncuechange);
+    }
+    this._oncuechange = handler;
+    if (handler) {
+      this.addEventListener('cuechange', handler);
+    }
+  }
 
   get mode(): TextTrackMode {
     return this._mode;
@@ -53,6 +68,36 @@ export class HeliosTextTrack extends EventTarget {
     if (this._mode !== value) {
       this._mode = value;
       this._host.handleTrackModeChange(this);
+    }
+  }
+
+  updateActiveCues(currentTime: number) {
+    if (this._mode === 'disabled') {
+      if (this._activeCues.length > 0) {
+        this._activeCues = [];
+      }
+      return;
+    }
+
+    const newActiveCues = this._cues.filter(cue =>
+      currentTime >= cue.startTime && currentTime < cue.endTime
+    );
+
+    let changed = false;
+    if (newActiveCues.length !== this._activeCues.length) {
+      changed = true;
+    } else {
+      for (let i = 0; i < newActiveCues.length; i++) {
+        if (newActiveCues[i] !== this._activeCues[i]) {
+          changed = true;
+          break;
+        }
+      }
+    }
+
+    if (changed) {
+      this._activeCues = newActiveCues;
+      this.dispatchEvent(new Event('cuechange'));
     }
   }
 

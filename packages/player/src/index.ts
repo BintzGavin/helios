@@ -1877,6 +1877,14 @@ export class HeliosPlayer extends HTMLElement implements TrackHost {
   };
 
   private updateUI(state: any) {
+      // Update text tracks active cues
+      if (state.fps) {
+          const currentTime = state.currentFrame / state.fps;
+          for (const track of this._textTracks) {
+              track.updateActiveCues(currentTime);
+          }
+      }
+
       // Hide poster if we are playing or have advanced
       if (state.isPlaying || state.currentFrame > 0) {
          this.posterContainer.classList.add("hidden");
