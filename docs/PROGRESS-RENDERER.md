@@ -1,3 +1,12 @@
+## RENDERER v1.62.0
+- ✅ Completed: Pseudo-Element Preload - Updated `DomStrategy` to recursively discover and preload background images and masks in `::before` and `::after` pseudo-elements, ensuring zero-artifact rendering for CSS-heavy compositions. Verified with `verify-pseudo-element-preload.ts`.
+
+## RENDERER v1.61.2
+- ✅ Completed: Update Verification Suite - Updated `run-all.ts` to include 3 orphaned verification scripts (`verify-audio-playback-rate.ts`, `verify-audio-playback-seek.ts`, `verify-visual-playback-rate.ts`), ensuring continuous regression testing for playback rate features.
+
+## RENDERER v1.61.1
+- ✅ Completed: Fix Audio Playback Seek - Updated `FFmpegBuilder` to correctly calculate the audio input seek time (`-ss`) when using `playbackRate` and a `startFrame` > 0. Verified with `verify-audio-playback-seek.ts`.
+
 ## RENDERER v1.61.0
 - ✅ Completed: Enable Visual Playback Rate - Updated `SeekTimeDriver` and `CdpTimeDriver` to respect the `playbackRate` property (and attribute) on media elements, ensuring visual synchronization with audio speed changes.
 
