@@ -243,3 +243,11 @@
 ## [2026-08-03] - Zero Disk I/O: Concat Refactor
 **Learning:** `concatenateVideos` was the last holdout for disk-based operations. Refactoring it to use pipe input completes the "Zero Disk I/O" vision.
 **Action:** Created plan to refactor `concat.ts` to use pipe input.
+
+## 2026-08-05 - Read File Truncation
+**Learning:** The `read_file` tool truncates output (around 1000 characters), which can lead to incomplete understanding of code logic. This is critical when verifying existing implementations before planning refactors.
+**Action:** Use `wc -l` to check file length and `tail` or `start_line` (if available/supported by bash tools) to read the full content of large files.
+
+## 2026-08-05 - Strict Plan Format
+**Learning:** `set_plan` requires a numbered list of executable steps for the *agent* (e.g. "Create spec file"), NOT the content of the spec file itself.
+**Action:** Ensure the plan body is a simple numbered list of actions, and put the spec content in the `write_file` call during execution.
