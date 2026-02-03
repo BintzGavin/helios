@@ -2,6 +2,8 @@
 
 ## CORE v5.10.0
 - ✅ Completed: Shared Virtual Time Binding - Implemented static registry in Helios to allow multiple instances to synchronize with `window.__HELIOS_VIRTUAL_TIME__` simultaneously.
+- ✅ Verified: GSAP Timeline Sync - Verified that the promo video example renders correctly, confirming that GSAP synchronization is working as expected.
+- ✅ Completed: Sync Version - Updated package.json and index.ts to match status version 5.10.0, and updated dependencies in Player and Renderer.
 
 ## CORE v5.9.0
 - ✅ Completed: Reactive Virtual Time Getter - Exposed `isVirtualTimeBound` getter in `Helios` to allow consumers to verify synchronous virtual time binding, facilitating better integration with external renderers.

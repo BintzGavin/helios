@@ -112,8 +112,7 @@
 [v1.17.0] ✅ Completed: Implement SRT Parser - Implemented `parseSrt` and `stringifySrt` utilities for caption support.
 [v1.18.0] ✅ Completed: Implement Input Schema Validation - Added `HeliosSchema` definition, `validateProps` logic, and integrated validation into `Helios` constructor and `setInputProps`.
 
-**Next Steps**:
-- Maintain version alignment with Player and Renderer.
-- **⚠️ COORDINATION**: RENDERER agent investigating GSAP timeline sync issue - may need `bindToDocumentTimeline()` subscription timing adjustments if `helios.subscribe()` callbacks aren't firing synchronously during fast frame-by-frame rendering. See `docs/status/RENDERER.md` "Next Steps" for details.
+[v5.10.0] ✅ Verified: GSAP Timeline Sync - Verified that the promo video example renders correctly (916KB output), confirming that GSAP synchronization is working as expected.
+[v5.10.0] ✅ Completed: Sync Version - Updated package.json and index.ts to match status version 5.10.0, and updated dependencies in Player and Renderer.
 
 [v2.10.0] ✅ Completed: Implement RenderSession - Added RenderSession class for standardized frame iteration and stability orchestration.
