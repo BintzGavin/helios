@@ -1,6 +1,6 @@
 # CLI Status
 
-**Version**: 0.1.0
+**Version**: 0.1.1
 
 ## Current State
 
@@ -27,3 +27,4 @@ Per AGENTS.md, the CLI is "ACTIVELY EXPANDING FOR V2" with focus on:
 ## History
 
 [v0.1.0] ✅ Initial CLI with `helios studio` command
+[v0.1.1] ✅ Pass Project Root to Studio - Injected HELIOS_PROJECT_ROOT env var in studio command
