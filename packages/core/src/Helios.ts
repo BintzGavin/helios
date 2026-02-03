@@ -148,6 +148,15 @@ export class Helios<TInputProps = Record<string, any>> {
   public get isPlaying(): ReadonlySignal<boolean> { return this._isPlaying; }
 
   /**
+   * Returns true if the instance has successfully established a reactive, synchronous binding
+   * to the environment's virtual time source. Returns false if falling back to polling
+   * or if not bound to document timeline.
+   */
+  public get isVirtualTimeBound(): boolean {
+    return this._reactiveVirtualTimeBound;
+  }
+
+  /**
    * Signal for the input properties.
    * Can be subscribed to for reactive updates.
    */
@@ -1117,6 +1126,7 @@ export class Helios<TInputProps = Record<string, any>> {
 
   public unbindFromDocumentTimeline() {
     this.syncWithDocumentTimeline = false;
+    this._reactiveVirtualTimeBound = false;
 
     if (typeof window !== 'undefined') {
       if (this._originalVirtualTimeDescriptor) {

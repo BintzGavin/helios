@@ -1,3 +1,6 @@
+### CORE v5.9.0
+- ✅ Completed: Reactive Virtual Time Getter - Exposed `isVirtualTimeBound` getter in `Helios` to allow consumers to verify synchronous virtual time binding.
+
 ### DEMO v1.93.0
 - ✅ Completed: React Lottie Animation - Created `examples/react-lottie-animation` demonstrating integration with `lottie-web` in React.
 

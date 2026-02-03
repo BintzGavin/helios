@@ -1,11 +1,12 @@
 # Status: CORE
 
-**Version**: 5.8.0
+**Version**: 5.9.0
 
 - **Status**: Active
 - **Current Focus**: Maintenance, Optimization, and Stability
-- **Last Updated**: 2026-08-10
+- **Last Updated**: 2026-08-13
 
+[v5.9.0] ✅ Completed: Reactive Virtual Time Getter - Exposed `isVirtualTimeBound` getter in `Helios` to allow consumers to verify synchronous virtual time binding, facilitating better integration with external renderers.
 [v5.8.0] ✅ Completed: Expose Fade Easing Metadata - Added `fadeEasing` to `AudioTrackMetadata` and updated `DomDriver` to parse `data-helios-fade-easing` attribute, exposing non-linear fade configurations to consumers.
 [v5.7.0] ✅ Completed: Enable Audio State Persistence - Added `audioTracks` to `HeliosOptions` and updated constructor to initialize mixer state (volume/muted per track) from configuration, enabling full session save/load.
 [v5.6.0] ✅ Completed: Audio Fade Easing - Implemented `data-helios-fade-easing` support in `DomDriver`, enabling non-linear audio fades (e.g., "quad.in") using the Easing library.
