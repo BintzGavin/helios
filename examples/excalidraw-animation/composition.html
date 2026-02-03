@@ -17,6 +17,33 @@
       width: 100%;
       height: 100%;
     }
+    /* Hide Excalidraw UI elements */
+    .excalidraw .ToolIcon,
+    .excalidraw .ToolButton,
+    .excalidraw .zoom-actions,
+    .excalidraw .zoom-actions__plus,
+    .excalidraw .zoom-actions__minus,
+    .excalidraw button[aria-label*="Zoom"],
+    .excalidraw [class*="Toolbar"],
+    .excalidraw [class*="menu-bar"],
+    .excalidraw [class*="MenuBar"],
+    .excalidraw [class*="Island"],
+    .excalidraw [class*="sidebar"],
+    .excalidraw [class*="Sidebar"],
+    .excalidraw [data-testid*="menu"],
+    .excalidraw [data-testid*="toolbar"],
+    .excalidraw [data-testid*="zoom"],
+    /* Hide zoom controls specifically */
+    .excalidraw button[title*="Zoom"],
+    .excalidraw button[aria-label*="zoom"],
+    /* Hide menu bar */
+    .excalidraw .menu-container,
+    .excalidraw .menu-container__inner {
+      display: none !important;
+      visibility: hidden !important;
+      opacity: 0 !important;
+      pointer-events: none !important;
+    }
   </style>
 </head>
 <body>
