@@ -260,3 +260,7 @@
 ## [1.61.0] - Dependency Sync
 **Learning:** Dependencies in a monorepo workspace must be strictly synchronized to avoid `npm install` failures that block testing. Mismatched versions between packages (e.g. `renderer` depending on `core@5.4.0` while `core` is `5.5.0`) cause npm to search the registry instead of local workspace.
 **Action:** Ensure `package.json` dependencies match the exact version of local workspace packages before running tests.
+
+## [1.61.1] - Vision Gap: Audio Offset and Playback Rate
+**Learning:** `FFmpegBuilder` calculates `inputSeek` based on timeline duration, ignoring `playbackRate`. This causes desync when rendering ranges (`startFrame > 0`) with variable speed audio.
+**Action:** Created plan `2026-08-07-RENDERER-Fix-Audio-Playback-Seek.md` to fix the math.
