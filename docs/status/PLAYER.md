@@ -1,4 +1,4 @@
-**Version**: v0.59.1
+**Version**: v0.60.0
 
 # Status: PLAYER
 
@@ -48,10 +48,12 @@
 - Supports audio fade-in/out in client-side export via `data-helios-fade-in` and `data-helios-fade-out` attributes.
 - Supports Shadow DOM Export: DOM-based client-side export now correctly captures Shadow DOM content (via Declarative Shadow DOM transformation), enabling support for Web Components in exports.
 - **Supports Environment Diagnostics UI**: Implemented `diagnose()` method in `HeliosController` and a visible Diagnostics UI overlay in `<helios-player>` (toggled via `Shift+D`) to expose environment capabilities (WebCodecs, WebGL, etc.) to the user.
+- **Supports Headless Audio Export**: Client-side export now includes audio tracks manually injected into Helios state (`availableAudioTracks`), enabling headless audio rendering without DOM elements.
 
 ## Critical Task
 - **None**: All critical tasks completed.
 
+[v0.60.0] ✅ Completed: Headless Audio Support - Updated `getAudioAssets` and controllers to include audio tracks from Helios state metadata in client-side exports, prioritizing them over DOM elements.
 [v0.59.1] ✅ Completed: Documentation Update - Added missing export attributes, audio fades, and diagnostics API to README.
 [v0.59.0] ✅ Completed: Implement Diagnostics UI Overlay - Implemented a visible Diagnostics UI overlay in `<helios-player>` toggled via `Shift+D`, and exposed `diagnose()` as a public method.
 [v0.58.0] ✅ Completed: Configurable Export Bitrate - Implemented `export-bitrate` attribute to control client-side export quality.

@@ -89,6 +89,50 @@ describe('audio-utils', () => {
 
       expect(assets[2].fadeInDuration).toBe(0);
     });
+
+    it('should include metadata tracks', async () => {
+      document.body.innerHTML = '';
+      const metadataTracks = [{
+          id: 'meta-1',
+          src: 'meta.mp3',
+          startTime: 1.0,
+          duration: 5.0,
+          fadeInDuration: 0.5,
+          fadeOutDuration: 0.5
+      }];
+      const audioTrackState = {
+          'meta-1': { volume: 0.7, muted: false }
+      };
+
+      const assets = await getAudioAssets(document, metadataTracks, audioTrackState);
+      expect(assets).toHaveLength(1);
+      expect(assets[0].id).toBe('meta-1');
+      expect(assets[0].startTime).toBe(1.0);
+      expect(assets[0].fadeInDuration).toBe(0.5);
+      expect(assets[0].volume).toBe(0.7);
+    });
+
+    it('should prioritize metadata tracks over DOM with same ID', async () => {
+      document.body.innerHTML = `
+        <audio src="dom.mp3" data-helios-track-id="conflict-id" volume="0.5"></audio>
+      `;
+      const metadataTracks = [{
+          id: 'conflict-id',
+          src: 'meta.mp3',
+          startTime: 0,
+          duration: 5.0
+      }];
+      // State override
+      const audioTrackState = {
+          'conflict-id': { volume: 0.9, muted: false }
+      };
+
+      const assets = await getAudioAssets(document, metadataTracks, audioTrackState);
+      expect(assets).toHaveLength(1);
+      expect(assets[0].id).toBe('conflict-id');
+      // Fetch mock returns array buffer, but we check properties
+      expect(assets[0].volume).toBe(0.9); // Metadata (via state) wins
+    });
   });
 
   describe('mixAudio', () => {
@@ -133,6 +177,7 @@ describe('audio-utils', () => {
 
     it('should apply loop property to buffer source', async () => {
       const assets = [{
+        id: '1',
         buffer: new ArrayBuffer(8),
         mimeType: 'audio/mpeg',
         loop: true
@@ -145,6 +190,7 @@ describe('audio-utils', () => {
 
     it('should apply default loop property (false)', async () => {
         const assets = [{
+          id: '1',
           buffer: new ArrayBuffer(8),
           mimeType: 'audio/mpeg'
         }];
@@ -156,6 +202,7 @@ describe('audio-utils', () => {
 
     it('should apply startTime to source.start()', async () => {
       const assets = [{
+        id: '1',
         buffer: new ArrayBuffer(8),
         mimeType: 'audio/mpeg',
         startTime: 2.5
@@ -168,6 +215,7 @@ describe('audio-utils', () => {
 
     it('should default startTime to 0', async () => {
         const assets = [{
+          id: '1',
           buffer: new ArrayBuffer(8),
           mimeType: 'audio/mpeg'
         }];
@@ -179,6 +227,7 @@ describe('audio-utils', () => {
 
     it('should offset playback by rangeStart when asset starts after range', async () => {
       const assets = [{
+        id: '1',
         buffer: new ArrayBuffer(8),
         mimeType: 'audio/mpeg',
         startTime: 5.0
@@ -192,6 +241,7 @@ describe('audio-utils', () => {
 
     it('should skip beginning of asset if it starts before range', async () => {
       const assets = [{
+        id: '1',
         buffer: new ArrayBuffer(8),
         mimeType: 'audio/mpeg',
         startTime: 1.0
@@ -208,6 +258,7 @@ describe('audio-utils', () => {
 
     it('should schedule fade automation', async () => {
       const assets = [{
+        id: '1',
         buffer: new ArrayBuffer(8), // approx 0s duration but mocked duration is different usually?
         mimeType: 'audio/mpeg',
         startTime: 2.0,

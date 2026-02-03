@@ -88,5 +88,5 @@ The `<helios-player>` uses a Shadow DOM for encapsulation:
 ## Architecture
 - **Direct Mode**: When same-origin, accesses `window.helios` directly.
 - **Bridge Mode**: When cross-origin, uses `postMessage` protocol.
-- **ClientSideExporter**: Handles in-browser rendering using `mediabunny`. Supports audio fades via `data-helios-fade-in` and `data-helios-fade-out` attributes on media elements.
+- **ClientSideExporter**: Handles in-browser rendering using `mediabunny`. Supports audio fades via `data-helios-fade-in` and `data-helios-fade-out` attributes on media elements. Now supports **Headless Audio**: includes audio tracks injected via `availableAudioTracks` metadata, enabling export without DOM elements.
 - **Controllers**: `DirectController` and `BridgeController` normalize API access.

@@ -1,3 +1,4 @@
+import { AudioTrackMetadata } from "@helios-project/core";
 
 export interface AudioAsset {
   id: string;
@@ -11,36 +12,71 @@ export interface AudioAsset {
   fadeOutDuration?: number;
 }
 
-export async function getAudioAssets(doc: Document): Promise<AudioAsset[]> {
-  const audioTags = Array.from(doc.querySelectorAll('audio'));
-  return Promise.all(audioTags.map(async (tag, index) => {
+async function fetchAudioAsset(id: string, src: string, options: Partial<AudioAsset>): Promise<AudioAsset> {
+  if (!src) return { id, buffer: new ArrayBuffer(0), mimeType: null };
+  try {
+      const res = await fetch(src);
+      return {
+          id,
+          buffer: await res.arrayBuffer(),
+          mimeType: res.headers.get('content-type'),
+          volume: options.volume ?? 1,
+          muted: options.muted ?? false,
+          loop: options.loop ?? false,
+          startTime: options.startTime ?? 0,
+          fadeInDuration: options.fadeInDuration ?? 0,
+          fadeOutDuration: options.fadeOutDuration ?? 0
+      };
+  } catch (e) {
+      console.warn("Failed to fetch audio asset:", src, e);
+      return { id, buffer: new ArrayBuffer(0), mimeType: null };
+  }
+}
+
+export async function getAudioAssets(
+  doc: Document,
+  metadataTracks: AudioTrackMetadata[] = [],
+  audioTrackState: Record<string, { volume: number; muted: boolean }> = {}
+): Promise<AudioAsset[]> {
+  const domAssetsPromises = Array.from(doc.querySelectorAll('audio')).map((tag, index) => {
     // ID Extraction Priority:
     // 1. data-helios-track-id (Used by DomDriver for control)
     // 2. id attribute (Standard DOM)
     // 3. Fallback: generated "track-${index}" (Stable fallback for listing)
     const id = tag.getAttribute('data-helios-track-id') || tag.id || `track-${index}`;
+    const volumeAttr = tag.getAttribute('volume');
 
-    if (!tag.src) return { id, buffer: new ArrayBuffer(0), mimeType: null };
-    try {
-        const res = await fetch(tag.src);
-        const volumeAttr = tag.getAttribute('volume');
-        return {
-            id,
-            buffer: await res.arrayBuffer(),
-            mimeType: res.headers.get('content-type'),
-            // Support non-standard 'volume' attribute for declarative usage, fallback to DOM property
-            volume: volumeAttr !== null ? parseFloat(volumeAttr) : tag.volume,
-            muted: tag.muted,
-            loop: tag.loop,
-            startTime: parseFloat(tag.getAttribute('data-start-time') || '0') || 0,
-            fadeInDuration: parseFloat(tag.getAttribute('data-helios-fade-in') || '0') || 0,
-            fadeOutDuration: parseFloat(tag.getAttribute('data-helios-fade-out') || '0') || 0
-        };
-    } catch (e) {
-        console.warn("Failed to fetch audio asset:", tag.src, e);
-        return { id, buffer: new ArrayBuffer(0), mimeType: null };
-    }
-  }));
+    return fetchAudioAsset(id, tag.src, {
+        volume: volumeAttr !== null ? parseFloat(volumeAttr) : tag.volume,
+        muted: tag.muted,
+        loop: tag.loop,
+        startTime: parseFloat(tag.getAttribute('data-start-time') || '0') || 0,
+        fadeInDuration: parseFloat(tag.getAttribute('data-helios-fade-in') || '0') || 0,
+        fadeOutDuration: parseFloat(tag.getAttribute('data-helios-fade-out') || '0') || 0
+    });
+  });
+
+  const metadataAssetsPromises = metadataTracks.map(track => {
+     const state = audioTrackState[track.id];
+     return fetchAudioAsset(track.id, track.src, {
+         volume: state?.volume ?? 1,
+         muted: state?.muted ?? false,
+         startTime: track.startTime,
+         fadeInDuration: track.fadeInDuration,
+         fadeOutDuration: track.fadeOutDuration,
+         loop: false // Metadata doesn't strictly support loop yet, defaults to false
+     });
+  });
+
+  const domAssets = await Promise.all(domAssetsPromises);
+  const metadataAssets = await Promise.all(metadataAssetsPromises);
+
+  // Merge: Prioritize metadata if IDs collide (Explicit state overrides DOM discovery)
+  const assetsMap = new Map<string, AudioAsset>();
+  domAssets.forEach(a => assetsMap.set(a.id, a));
+  metadataAssets.forEach(a => assetsMap.set(a.id, a));
+
+  return Array.from(assetsMap.values());
 }
 
 export async function mixAudio(assets: AudioAsset[], duration: number, sampleRate: number, rangeStart: number = 0): Promise<AudioBuffer> {
