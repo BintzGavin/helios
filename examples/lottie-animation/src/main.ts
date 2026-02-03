@@ -1,4 +1,4 @@
-import { Helios } from '../../../packages/core/src/index.ts';
+import { Helios } from '@helios-project/core';
 import lottie from 'lottie-web';
 import animationData from './animation.json';
 
