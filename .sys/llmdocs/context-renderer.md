@@ -59,6 +59,7 @@ packages/renderer/
     ├── verify-audio-fades.ts   # Audio fades test
     ├── verify-audio-loop.ts    # Audio looping test
     ├── verify-audio-playback-rate.ts # Audio playback rate test
+    ├── verify-audio-playback-seek.ts # Audio playback seek test (Rate + StartFrame)
     ├── verify-visual-playback-rate.ts # Visual playback rate test
     ├── verify-frame-count.ts   # Precision frame count test
     ├── verify-cdp-hang.ts      # CDP initialization order/deadlock test
@@ -95,6 +96,7 @@ The `DistributedRenderOptions` interface extends `RendererOptions` with:
 
 ## D. FFmpeg Interface
 The renderer spawns an FFmpeg process with the following key flags:
+- `-ss`: Input seek (for audio synchronization with range rendering).
 - `-f image2pipe`: Reads frames from stdin.
 - `-f concat -safe 0 -protocol_whitelist file,pipe -i -`: Reads concat list from stdin (for concatenation jobs).
 - `pipe:N`: Additional inputs for audio buffers (mapped to file descriptors).
