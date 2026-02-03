@@ -1,19 +1,7 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { useStudio } from '../../context/StudioContext';
+import { AudioAsset } from '../../types';
 import './AudioMixerPanel.css';
-
-// Duplicate of AudioAsset from @helios-project/player
-interface AudioAsset {
-  id: string;
-  buffer: ArrayBuffer;
-  mimeType: string | null;
-  volume?: number;
-  muted?: boolean;
-  loop?: boolean;
-  startTime?: number;
-  fadeInDuration?: number;
-  fadeOutDuration?: number;
-}
 
 export const AudioMixerPanel: React.FC = () => {
   const { controller } = useStudio();

@@ -17,6 +17,9 @@
 ### DEMO v1.92.0
 - ✅ Completed: Svelte Audio Visualization - Created `examples/svelte-audio-visualization` demonstrating real-time audio analysis using Svelte derived stores.
 
+## STUDIO v0.85.0
+- ✅ Completed: Timeline Audio Waveforms - Implemented visual audio waveforms on the Timeline using `AudioWaveform` component and `OfflineAudioContext` for decoding.
+
 ### STUDIO v0.84.0
 - ✅ Completed: Timeline Persistence - Implemented persistence for Current Frame, In Point, Out Point, and Loop state across reloads and composition switches.
 
