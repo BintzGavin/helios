@@ -90,6 +90,16 @@ export interface HeliosOptions<TInputProps = Record<string, any>> {
   ticker?: Ticker;
 }
 
+export interface AudioTrackMetadata {
+  id: string;
+  src: string;
+  startTime: number;
+  duration: number;
+  fadeInDuration?: number;
+  fadeOutDuration?: number;
+  fadeEasing?: string;
+}
+
 export interface DiagnosticReport {
   waapi: boolean;
   webCodecs: boolean;

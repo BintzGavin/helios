@@ -74,7 +74,7 @@ export class DomDriver implements TimeDriver {
         childList: true,
         subtree: true,
         attributes: true,
-        attributeFilter: ['data-helios-track-id', 'data-helios-offset', 'data-helios-fade-in', 'data-helios-fade-out', 'src']
+        attributeFilter: ['data-helios-track-id', 'data-helios-offset', 'data-helios-fade-in', 'data-helios-fade-out', 'data-helios-fade-easing', 'src']
       });
       this.observers.set(scope, observer);
     }
@@ -186,6 +186,7 @@ export class DomDriver implements TimeDriver {
             const duration = (!isNaN(el.duration) && isFinite(el.duration)) ? el.duration : 0;
             const fadeInDuration = parseFloat(el.getAttribute('data-helios-fade-in') || '0');
             const fadeOutDuration = parseFloat(el.getAttribute('data-helios-fade-out') || '0');
+            const fadeEasing = el.getAttribute('data-helios-fade-easing') || undefined;
             const src = el.currentSrc || el.src || '';
 
             this.discoveredTracks.set(id, {
@@ -194,7 +195,8 @@ export class DomDriver implements TimeDriver {
                 startTime,
                 duration,
                 fadeInDuration,
-                fadeOutDuration
+                fadeOutDuration,
+                fadeEasing
             });
           }
       });
@@ -211,7 +213,7 @@ export class DomDriver implements TimeDriver {
               this.emitMetadata();
               return;
           }
-          if (oldMeta.startTime !== meta.startTime || oldMeta.duration !== meta.duration || oldMeta.fadeInDuration !== meta.fadeInDuration || oldMeta.fadeOutDuration !== meta.fadeOutDuration || oldMeta.src !== meta.src) {
+          if (oldMeta.startTime !== meta.startTime || oldMeta.duration !== meta.duration || oldMeta.fadeInDuration !== meta.fadeInDuration || oldMeta.fadeOutDuration !== meta.fadeOutDuration || oldMeta.fadeEasing !== meta.fadeEasing || oldMeta.src !== meta.src) {
               this.emitMetadata();
               return;
           }
