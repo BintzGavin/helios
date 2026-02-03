@@ -5,6 +5,7 @@ import { ClientSideExporter } from "./features/exporter";
 import { HeliosTextTrack, HeliosTextTrackList, CueClass, TrackHost } from "./features/text-tracks";
 import { HeliosAudioTrack, HeliosAudioTrackList, AudioTrackHost } from "./features/audio-tracks";
 import { parseCaptions } from "./features/caption-parser";
+import { HeliosMediaSession } from "./features/media-session";
 
 export { ClientSideExporter };
 export type { HeliosController };
@@ -571,6 +572,7 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
 
   private resizeObserver: ResizeObserver;
   private controller: HeliosController | null = null;
+  private mediaSession: HeliosMediaSession | null = null;
   // Keep track if we have direct access (optional, mainly for debugging/logging)
   private directHelios: Helios | null = null;
   private unsubscribe: (() => void) | null = null;
@@ -978,7 +980,7 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
   }
 
   static get observedAttributes() {
-    return ["src", "width", "height", "autoplay", "loop", "controls", "export-format", "input-props", "poster", "muted", "interactive", "preload", "controlslist", "sandbox", "export-caption-mode", "disablepictureinpicture", "export-width", "export-height", "export-bitrate", "export-filename"];
+    return ["src", "width", "height", "autoplay", "loop", "controls", "export-format", "input-props", "poster", "muted", "interactive", "preload", "controlslist", "sandbox", "export-caption-mode", "disablepictureinpicture", "export-width", "export-height", "export-bitrate", "export-filename", "media-title", "media-artist", "media-album", "media-artwork"];
   }
 
   constructor() {
@@ -1148,6 +1150,10 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
       if (this.controller) {
         this.controller.setAudioMuted(this.hasAttribute("muted"));
       }
+    }
+
+    if (name.startsWith("media-")) {
+      this.mediaSession?.updateMetadata();
     }
 
     if (name === "controlslist" || name === "disablepictureinpicture") {
@@ -1321,6 +1327,11 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
     if (this.unsubscribe) {
         this.unsubscribe();
     }
+    if (this.mediaSession) {
+        this.mediaSession.destroy();
+        this.mediaSession = null;
+    }
+
     if (this.controller) {
         this.controller.pause();
         this.controller.dispose();
@@ -1568,6 +1579,10 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
 
   private setController(controller: HeliosController) {
       // Clean up old controller
+      if (this.mediaSession) {
+          this.mediaSession.destroy();
+          this.mediaSession = null;
+      }
       if (this.controller) {
           this.controller.dispose();
       }
@@ -1577,6 +1592,7 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
       }
 
       this.controller = controller;
+      this.mediaSession = new HeliosMediaSession(this, controller);
 
       // Check for pending captions
       this.handleSlotChange();

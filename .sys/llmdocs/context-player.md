@@ -1,7 +1,7 @@
 # Context: PLAYER
 
 ## Overview
-The **PLAYER** domain is responsible for the `<helios-player>` Web Component, which acts as the visual and interactive frontend for Helios compositions. It manages the `iframe` sandbox, handles user input (UI controls, keyboard shortcuts), and communicates with the composition via the Bridge or Direct Controller. It also handles client-side export functionality.
+The **PLAYER** domain is responsible for the `<helios-player>` Web Component, which acts as the visual and interactive frontend for Helios compositions. It manages the `iframe` sandbox, handles user input (UI controls, keyboard shortcuts), and communicates with the composition via the Bridge or Direct Controller. It also handles client-side export functionality and integrates with the Media Session API.
 
 ## A. Component Structure
 The `<helios-player>` component uses a Shadow DOM to encapsulate its styles and structure.
@@ -73,6 +73,10 @@ The component observes or reads the following attributes:
 - `export-height`: Target height for export.
 - `export-bitrate`: Target bitrate for export.
 - `export-filename`: Output filename for export.
+- `media-title`: Title for Media Session metadata.
+- `media-artist`: Artist for Media Session metadata.
+- `media-album`: Album for Media Session metadata.
+- `media-artwork`: Artwork URL for Media Session metadata.
 
 ## D. Public API
 The `HeliosPlayer` class exposes properties and methods closely mirroring `HTMLMediaElement`:
