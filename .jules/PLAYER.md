@@ -1,3 +1,7 @@
+## [v0.64.0] - Incomplete Track Events
+**Learning:** Discovered that `HeliosTextTrackList` and `HeliosAudioTrackList` had stubbed event handler properties (`onaddtrack`) that accumulated listeners instead of replacing them, and `TextTrackList` was missing `change` event dispatching entirely.
+**Action:** When implementing "Standard" APIs (like `EventTarget` subclasses), always verify the event handler property behavior (setter replacing listener) and ensure all spec-mandated events are actually dispatched.
+
 ## [v0.46.0] - Deprecation Confirmation
 **Learning:** Confirmed that `mp4-muxer` and `webm-muxer` are deprecated and `mediabunny` is the correct replacement with a unified API covering WebCodecs abstraction.
 **Action:** When migrating libraries, always verify the replacement package exists and scan its API (via `npm install` + inspection if docs are unavailable) to ensure architectural fit before implementation.
@@ -16,7 +20,7 @@
 
 ## [v0.52.0] - Standard Attributes UX
 **Learning:** Standard HTML5 video attributes like `disablePictureInPicture` and `default` (for tracks) are critical for expected UX but were missed in initial implementation.
-**Action:** When implementing standard elements (like `<video>`), systematically review the entire MDN attribute list to ensure behavioral parity, especially for UI controls visibility.
+**Action:** When implementing standard elements (like `<video>`), systematically review the entire MDN attribute list to ensure architectural fit before implementation.
 
 ## [v0.56.1] - Missing Framework Adapters
 **Learning:** README promises "Framework Adapters" packages (e.g. `@helios-project/react`), but they do not exist in the monorepo, only as examples.
