@@ -81,9 +81,28 @@ export class CdpTimeDriver implements TimeDriver {
           const offset = parseFloat(el.getAttribute('data-helios-offset') || '0');
           const seek = parseFloat(el.getAttribute('data-helios-seek') || '0');
 
+          // Parse playbackRate
+          // We check the property first. If it's the default (1.0), we also check the attribute
+          // to support declarative usage (e.g. <video playbackRate="0.5">).
+          // If the property is not 1.0, we assume it was set programmatically and respect it.
+          let rate = el.playbackRate;
+          if (rate === 1.0) {
+            const rateAttr = el.getAttribute('playbackRate');
+            if (rateAttr) {
+              const parsed = parseFloat(rateAttr);
+              if (!isNaN(parsed)) {
+                rate = parsed;
+              }
+            }
+          }
+
+          if (isNaN(rate) || rate <= 0) {
+            rate = 1.0;
+          }
+
           // Calculate target time
-          // Formula: GlobalTime - Offset + InPoint
-          let targetTime = Math.max(0, t - offset + seek);
+          // Formula: (GlobalTime - Offset) * Rate + Seek
+          let targetTime = Math.max(0, (t - offset) * rate + seek);
 
           // Handle Looping
           if (el.loop && el.duration > 0 && targetTime > el.duration) {

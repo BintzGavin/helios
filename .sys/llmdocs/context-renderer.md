@@ -3,11 +3,11 @@
 ## A. Strategy
 The Renderer operates on a "Dual-Path" architecture to support different use cases. The pipeline strictly enforces `strategy.prepare` (resource discovery/loading) before `timeDriver.prepare` (time freezing) to prevent deadlocks in CDP mode:
 1. **DOM Strategy (`DomStrategy`)**: Used for HTML/CSS-heavy compositions. It uses Playwright to capture screenshots of the page at each frame.
-   - **Drivers**: Uses `SeekTimeDriver` to manipulate `document.timeline` and sync media/CSS animations (supports Shadow DOM, enforces deterministic Jan 1 2024 epoch, handles GSAP timeline sync, supports media looping).
+   - **Drivers**: Uses `SeekTimeDriver` to manipulate `document.timeline` and sync media/CSS animations (supports Shadow DOM, enforces deterministic Jan 1 2024 epoch, handles GSAP timeline sync, supports media looping and visual playback rate).
    - **Discovery**: Uses `dom-scanner` to recursively discover media elements (including Shadow DOM) and implements recursive preloading for `<img>` tags, `<video>` posters, SVG images, and CSS background/mask images. Supports automatic audio looping and playback rate adjustment for `<audio>` elements.
    - **Output**: Best for sharp text and vector graphics.
 2. **Canvas Strategy (`CanvasStrategy`)**: Used for WebGL/Canvas-heavy compositions (e.g., Three.js, PixiJS). It captures the `<canvas>` context directly.
-   - **Drivers**: Uses `CdpTimeDriver` (Chrome DevTools Protocol) for precise virtual time control (supports Shadow DOM media sync, enforces deterministic Jan 2024 epoch, ensures sync-before-render order, waits for budget expiration, enforces stability timeout via `Runtime.terminateExecution`, supports media looping).
+   - **Drivers**: Uses `CdpTimeDriver` (Chrome DevTools Protocol) for precise virtual time control (supports Shadow DOM media sync, enforces deterministic Jan 2024 epoch, ensures sync-before-render order, waits for budget expiration, enforces stability timeout via `Runtime.terminateExecution`, supports media looping and visual playback rate).
    - **Optimization**: Prioritizes H.264 (AVC) intermediate codec for hardware acceleration, falling back to VP8. Exposes `diagnose()` API to verify supported WebCodecs.
    - **Output**: Best for high-performance 2D/3D graphics.
 
@@ -59,6 +59,7 @@ packages/renderer/
     ├── verify-audio-fades.ts   # Audio fades test
     ├── verify-audio-loop.ts    # Audio looping test
     ├── verify-audio-playback-rate.ts # Audio playback rate test
+    ├── verify-visual-playback-rate.ts # Visual playback rate test
     ├── verify-frame-count.ts   # Precision frame count test
     ├── verify-cdp-hang.ts      # CDP initialization order/deadlock test
     ├── verify-cdp-driver.ts    # CdpDriver budget test
