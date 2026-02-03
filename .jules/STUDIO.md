@@ -33,3 +33,7 @@
 ## [0.83.0] - Timeline Persistence
 **Learning:** The "Browser-based development environment" vision implies a persistent workspace. Users expect their cursor (playhead) and context (loop range) to survive page reloads. This was a missed requirement in initial scaffolding.
 **Action:** When designing editor tools, always include state persistence (localStorage) for view-specific data (zoom, scroll, selection) as a P0 feature.
+
+## [0.84.0] - Audio Visualization Strategy
+**Learning:** The previous plan to visualize audio using `controller.getAudioTracks()` (which returns full buffers) was too heavy and complex for the Studio-Player boundary. A better approach for the Studio is to fetch the audio `src` independently on the client side and use `OfflineAudioContext` to generate waveforms, decoupling the visualization from the runtime playback engine.
+**Action:** When visualizing heavy assets in a decoupled UI, prefer independent fetching/processing over transferring large data blobs across boundaries.
