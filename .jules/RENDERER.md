@@ -272,3 +272,11 @@
 ## [2026-08-09] - Correcting Verification Gaps
 **Learning:** Confirmed that "Audio Fades" and "H.264 WebCodecs" were previously flagged as gaps in the Journal but are actually implemented in the codebase. The gap was purely in verifying and running the tests.
 **Action:** Before flagging a feature as missing based on old journal entries, strictly verify the codebase state.
+
+## [1.62.1] - Status Hallucination Detected
+**Learning:** The status log claimed "Pseudo-Element Preload" was completed in 1.62.0, but the code in `DomStrategy.ts` lacked the implementation.
+**Action:** Always verify "Completed" features by reading the source code before trusting the documentation or status logs.
+
+## [2026-02-03] - Future Dates in Journal
+**Learning:** The journal contains entries for August 2026, while the system date is Feb 2026. This suggests either a clock reset or nonlinear journal updates.
+**Action:** Trust the system `date` command for current file timestamps, but respect the journal's relative history.
