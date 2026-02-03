@@ -4,6 +4,9 @@
 ### RENDERER v1.61.1
 - ✅ Completed: Fix Audio Playback Seek - Updated `FFmpegBuilder` to correctly calculate input seek time (`-ss`) when using `playbackRate` with `startFrame > 0`.
 
+## CORE v5.7.1
+- ✅ Completed: Verify and Harden Subscription Timing - Exposed `isVirtualTimeBound` getter and added robust error logging for virtual time binding failures. Verified synchronous subscription behavior with reproduction test `gsap-sync.test.ts`.
+
 ### CORE v5.7.0
 - ✅ Completed: Enable Audio State Persistence - Added `audioTracks` to `HeliosOptions` and updated constructor to initialize mixer state (volume/muted per track) from configuration, enabling full session save/load.
 

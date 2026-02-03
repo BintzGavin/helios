@@ -131,6 +131,8 @@ class Helios<TInputProps> {
   get duration(): ReadonlySignal<number>;
   get fps(): ReadonlySignal<number>;
 
+  get isVirtualTimeBound(): boolean;
+
   // Methods
   constructor(options: HeliosOptions<TInputProps>);
   getState(): Readonly<HeliosState<TInputProps>>;

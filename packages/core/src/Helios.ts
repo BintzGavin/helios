@@ -121,6 +121,14 @@ export class Helios<TInputProps = Record<string, any>> {
   private _disposeDriverMetadataSubscription: (() => void) | null = null;
   private _reactiveVirtualTimeBound = false;
 
+  /**
+   * Returns whether Helios is successfully bound to the virtual time environment
+   * via reactive setters (synchronous). If false, it may be falling back to polling (asynchronous).
+   */
+  public get isVirtualTimeBound(): boolean {
+    return this._reactiveVirtualTimeBound;
+  }
+
   // Public Readonly Signals
 
   /**
@@ -1054,7 +1062,11 @@ export class Helios<TInputProps = Record<string, any>> {
           (window as any).__HELIOS_VIRTUAL_TIME__ = virtualTimeValue;
         }
       } catch (e) {
-        console.warn('Failed to bind reactive virtual time. Helios will fall back to polling, which may affect synchronization accuracy.', e);
+        console.warn(
+          'Failed to bind reactive virtual time. Helios will fall back to polling, which may affect synchronization accuracy. ' +
+          'This usually happens if __HELIOS_VIRTUAL_TIME__ is already defined as non-configurable.',
+          e
+        );
       }
     }
 

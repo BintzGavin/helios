@@ -1,11 +1,12 @@
 # Status: CORE
 
-**Version**: 5.7.0
+**Version**: 5.7.1
 
 - **Status**: Active
 - **Current Focus**: Maintenance, Optimization, and Stability
 - **Last Updated**: 2026-08-09
 
+[v5.7.1] ✅ Completed: Verify and Harden Subscription Timing - Exposed `isVirtualTimeBound` getter and added robust error logging for virtual time binding failures. Verified synchronous subscription behavior with reproduction test `gsap-sync.test.ts`.
 [v5.7.0] ✅ Completed: Enable Audio State Persistence - Added `audioTracks` to `HeliosOptions` and updated constructor to initialize mixer state (volume/muted per track) from configuration, enabling full session save/load.
 [v5.6.0] ✅ Completed: Audio Fade Easing - Implemented `data-helios-fade-easing` support in `DomDriver`, enabling non-linear audio fades (e.g., "quad.in") using the Easing library.
 [v5.5.0] ✅ Verified: Maintenance - Verified core package integrity by running full test suite (27 files, 428 tests passed).
