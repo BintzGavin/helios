@@ -126,6 +126,7 @@ class Helios<TInputProps> {
   get currentTime(): ReadonlySignal<number>;
   get loop(): ReadonlySignal<boolean>;
   get isPlaying(): ReadonlySignal<boolean>;
+  get isVirtualTimeBound(): boolean;
   get inputProps(): ReadonlySignal<TInputProps>;
   get playbackRate(): ReadonlySignal<number>;
   get volume(): ReadonlySignal<number>;
