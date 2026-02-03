@@ -1,4 +1,5 @@
 export interface SubtitleCue {
+  id?: string;
   startTime: number; // in seconds
   endTime: number;   // in seconds
   text: string;
@@ -47,6 +48,10 @@ function parseWebVTT(content: string): SubtitleCue[] {
 
     const timeLine = lines[timeLineIndex];
     const textLines = lines.slice(timeLineIndex + 1);
+    let id: string | undefined;
+    if (timeLineIndex > 0) {
+      id = lines[timeLineIndex - 1];
+    }
 
     // WebVTT timestamp regex:
     // (HH:)MM:SS.mmm or (HH:)MM:SS,mmm
@@ -58,7 +63,7 @@ function parseWebVTT(content: string): SubtitleCue[] {
       const text = textLines.join("\n").trim();
 
       if (!isNaN(startTime) && !isNaN(endTime)) {
-        cues.push({ startTime, endTime, text });
+        cues.push({ id, startTime, endTime, text });
       }
     }
   }
@@ -96,6 +101,10 @@ export function parseSRT(srt: string): SubtitleCue[] {
 
     const timeLine = lines[timeLineIndex];
     const textLines = lines.slice(timeLineIndex + 1);
+    let id: string | undefined;
+    if (timeLineIndex > 0) {
+      id = lines[timeLineIndex - 1];
+    }
 
     // Format: 00:00:01,000 --> 00:00:04,000
     // We allow dot or comma for milliseconds
@@ -107,7 +116,7 @@ export function parseSRT(srt: string): SubtitleCue[] {
       const text = textLines.join("\n").trim();
 
       if (!isNaN(startTime) && !isNaN(endTime)) {
-        cues.push({ startTime, endTime, text });
+        cues.push({ id, startTime, endTime, text });
       }
     }
   }
@@ -139,7 +148,8 @@ export function stringifySRT(cues: SubtitleCue[]): string {
     .map((cue, index) => {
       const start = formatTime(cue.startTime);
       const end = formatTime(cue.endTime);
-      return `${index + 1}\n${start} --> ${end}\n${cue.text}\n\n`;
+      const id = cue.id || String(index + 1);
+      return `${id}\n${start} --> ${end}\n${cue.text}\n\n`;
     })
     .join("");
 }

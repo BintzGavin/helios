@@ -400,4 +400,34 @@ describe('HeliosPlayer API Parity', () => {
     player.load();
     expect(loadIframeSpy).toHaveBeenCalledWith('test.html');
   });
+
+  it('should support standard TextTrackCue and TextTrackCueList', () => {
+    const track = player.addTextTrack("captions", "English", "en");
+    expect(track.cues).toBeDefined();
+    // Check it's iterable
+    expect(typeof track.cues[Symbol.iterator]).toBe('function');
+
+    const cue = new CueClass(0, 1, "Hello");
+    cue.id = "cue1";
+    track.addCue(cue);
+
+    // Check list access
+    expect(track.cues.length).toBe(1);
+    expect(track.cues[0]).toBe(cue);
+
+    // Check getCueById
+    expect(track.cues.getCueById("cue1")).toBe(cue);
+    expect(track.cues.getCueById("missing")).toBeNull();
+
+    // Check cue properties
+    expect(cue.track).toBe(track);
+    expect(cue.pauseOnExit).toBe(false);
+    cue.pauseOnExit = true;
+    expect(cue.pauseOnExit).toBe(true);
+
+    // Check removing cue clears track
+    track.removeCue(cue);
+    expect(cue.track).toBeNull();
+    expect(track.cues.length).toBe(0);
+  });
 });
