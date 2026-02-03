@@ -1,5 +1,7 @@
 **Version**: 0.86.0
 
+**Posture**: ACTIVELY EXPANDING FOR V2
+
 # Studio Domain Status
 
 **Status**: 🚧 Alpha / Scaffolding

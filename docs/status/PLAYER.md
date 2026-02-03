@@ -1,5 +1,7 @@
 **Version**: v0.65.0
 
+**Posture**: STABLE AND FEATURE COMPLETE
+
 # Status: PLAYER
 
 ## Identity
