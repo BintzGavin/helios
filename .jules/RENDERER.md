@@ -268,3 +268,7 @@
 ## [2026-08-08] - Incomplete Verification Suite
 **Learning:** `run-all.ts` (the master test runner) is not automatically updated when new test files are added to `tests/`. This led to `verify-audio-playback-rate.ts` (and others) being orphaned and not running in CI.
 **Action:** Always verify `run-all.ts` content when adding new test files to ensure they are actually executed.
+
+## [2026-08-09] - Correcting Verification Gaps
+**Learning:** Confirmed that "Audio Fades" and "H.264 WebCodecs" were previously flagged as gaps in the Journal but are actually implemented in the codebase. The gap was purely in verifying and running the tests.
+**Action:** Before flagging a feature as missing based on old journal entries, strictly verify the codebase state.
