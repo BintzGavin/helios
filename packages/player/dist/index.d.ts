@@ -2,6 +2,7 @@ import { HeliosSchema, DiagnosticReport } from "@helios-project/core";
 import type { HeliosController } from "./controllers";
 import { ClientSideExporter } from "./features/exporter";
 import { HeliosTextTrack, HeliosTextTrackList, TrackHost } from "./features/text-tracks";
+import { HeliosAudioTrack, HeliosAudioTrackList, AudioTrackHost } from "./features/audio-tracks";
 export { ClientSideExporter };
 export type { HeliosController };
 interface MediaError {
@@ -12,10 +13,11 @@ interface MediaError {
     readonly MEDIA_ERR_DECODE: number;
     readonly MEDIA_ERR_SRC_NOT_SUPPORTED: number;
 }
-export declare class HeliosPlayer extends HTMLElement implements TrackHost {
+export declare class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHost {
     private iframe;
     private pipVideo;
     private _textTracks;
+    private _audioTracks;
     private _domTracks;
     private playPauseBtn;
     private volumeBtn;
@@ -49,6 +51,7 @@ export declare class HeliosPlayer extends HTMLElement implements TrackHost {
     private isLoaded;
     private resizeObserver;
     private controller;
+    private mediaSession;
     private directHelios;
     private unsubscribe;
     private connectionInterval;
@@ -138,7 +141,9 @@ export declare class HeliosPlayer extends HTMLElement implements TrackHost {
     static get observedAttributes(): string[];
     constructor();
     get textTracks(): HeliosTextTrackList;
+    get audioTracks(): HeliosAudioTrackList;
     addTextTrack(kind: string, label?: string, language?: string): HeliosTextTrack;
+    handleAudioTrackEnabledChange(track: HeliosAudioTrack): void;
     handleTrackModeChange(track: HeliosTextTrack): void;
     attributeChangedCallback(name: string, oldVal: string, newVal: string): void;
     private updateControlsVisibility;

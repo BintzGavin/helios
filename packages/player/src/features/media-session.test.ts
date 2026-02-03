@@ -26,7 +26,9 @@ describe('HeliosMediaSession', () => {
 
     // Mock MediaMetadata
     vi.stubGlobal('MediaMetadata', class {
-      constructor(public init: any) {}
+      constructor(init: any) {
+        Object.assign(this, init);
+      }
     });
 
     // Mock Player (HTMLElement)
