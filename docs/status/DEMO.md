@@ -1,6 +1,6 @@
 # Status: DEMO Domain
 
-**Version**: 1.93.0
+**Version**: 1.94.0
 
 ## Vision
 The DEMO domain is responsible for:
@@ -15,6 +15,7 @@ The DEMO domain is responsible for:
 - None
 
 ## Completed Tasks
+- [v1.94.0] ✅ Completed: Vue Lottie Animation - Created `examples/vue-lottie-animation` demonstrating integration with `lottie-web` in Vue 3 driven by Helios timeline.
 - [v1.93.0] ✅ Completed: React Lottie Animation - Created `examples/react-lottie-animation` demonstrating integration with `lottie-web` in React driven by Helios timeline.
 - [v1.92.0] ✅ Completed: Svelte Audio Visualization - Created `examples/svelte-audio-visualization` demonstrating real-time audio analysis (RMS, waveforms) using synthesized `AudioBuffer` and Svelte derived stores.
 - [v1.91.0] ✅ Completed: Lottie Animation - Created `examples/lottie-animation` demonstrating integration with `lottie-web` driven by Helios timeline.
