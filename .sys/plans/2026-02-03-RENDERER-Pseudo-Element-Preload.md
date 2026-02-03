@@ -1,36 +1,52 @@
-# 📋 Spec: Enable Pseudo-Element Preloading in DomStrategy
+# Context & Goal
+- **Objective**: Implement asset preloading for CSS pseudo-elements (`::before` and `::after`) in `DomStrategy` to resolve status hallucination and prevent visual artifacts.
+- **Trigger**: Journal entry `[1.62.1]` identified that this feature was claimed as "Completed" in 1.62.0 but missing from the codebase.
+- **Impact**: Ensures "Zero-Artifact Rendering" for advanced CSS compositions that use pseudo-elements for backgrounds or masks (e.g., stylized frames, overlays).
 
-#### 1. Context & Goal
-- **Objective**: Implement discovery and preloading of background images defined in `::before` and `::after` pseudo-elements within `DomStrategy`.
-- **Trigger**: Identified a gap where `DomStrategy` preloads standard element backgrounds but misses pseudo-elements, contradicting the documented status and potentially causing visual artifacts (FOUC) in detailed CSS compositions.
-- **Impact**: Ensures "Zero-artifact rendering" for advanced CSS techniques used in modern web design (e.g., stylized overlays, complex decorations).
-
-#### 2. File Inventory
-- **Modify**: `packages/renderer/src/strategies/DomStrategy.ts`
-  - Update `prepare` method to scan pseudo-elements.
+# File Inventory
 - **Create**: `packages/renderer/tests/verify-pseudo-element-preload.ts`
-  - New verification script to test this specific scenario.
-- **Modify**: `packages/renderer/tests/run-all.ts`
-  - Register the new test script.
+  - **Purpose**: A regression test that renders a page with a `::before` background image and asserts it is preloaded.
+- **Modify**: `packages/renderer/src/strategies/DomStrategy.ts`
+  - **Change**: Update the injected `prepare()` script to inspect pseudo-element styles.
+- **Read-Only**: `packages/renderer/src/utils/dom-scanner.ts`
 
-#### 3. Implementation Spec
-- **Architecture**: Extend the existing `DomStrategy.prepare` injection script to iterate over pseudo-elements.
+# Implementation Spec
+- **Architecture**: Expand the existing DOM traversal logic in `DomStrategy.prepare` to explicitly query `window.getComputedStyle(el, '::before')` and `window.getComputedStyle(el, '::after')`.
 - **Pseudo-Code**:
-  - In `DomStrategy.prepare()`:
-    - Define `pseudos = [null, '::before', '::after']`.
-    - Iterate over `allElements`.
-    - For each `element`:
-      - For each `pseudo` in `pseudos`:
-        - CALL `window.getComputedStyle(element, pseudo)`.
-        - EXTRACT `backgroundImage`, `maskImage`, `webkitMaskImage`.
-        - IF valid URL found, ADD to `backgroundUrls` Set.
-    - PROCEED to existing preloading logic (Promise.all over `backgroundUrls`).
+  ```text
+  FUNCTION prepare(page):
+    INJECT SCRIPT:
+      FUNCTION findAllElements(root):
+        RECURSIVELY gather all DOM elements (including Shadow DOM)
 
-#### 4. Test Plan
-- **Verification**: `npx tsx packages/renderer/tests/verify-pseudo-element-preload.ts`
+      SET backgroundUrls = NEW Set()
+
+      FOR EACH element IN allElements:
+        DEFINE targets = [null, '::before', '::after']
+
+        FOR EACH pseudo IN targets:
+          SET style = window.getComputedStyle(element, pseudo)
+
+          FOR EACH prop IN ['backgroundImage', 'maskImage', 'webkitMaskImage']:
+            SET value = style[prop]
+            IF value exists AND value != 'none':
+              EXTRACT urls using regex /url\((['"]?)(.*?)\1\)/
+              ADD urls TO backgroundUrls
+
+      IF backgroundUrls.size > 0:
+        LOG "Preloading X background images..."
+        WAIT for all images to load (new Image().src = url)
+  ```
+- **Public API Changes**: None.
+- **Dependencies**: None.
+
+# Test Plan
+- **Verification**: `npx ts-node packages/renderer/tests/verify-pseudo-element-preload.ts`
 - **Success Criteria**:
-  - The verification script creates an HTML page with:
-    - `div#test { content: ''; width: 100px; height: 100px; }`
-    - `div#test::before { background-image: url('data:image/png;base64,...'); }`
-  - The script intercepts network requests (or mocks the image load) and verifies that `DomStrategy` attempts to load the image URL.
-  - The renderer log output should confirm "[DomStrategy] Preloading X background images".
+  - The test script intercepts network requests.
+  - It confirms that `http://example.com/pseudo-bg.png` (defined in a `::before` style) is requested *during* the `prepare()` phase.
+  - The script outputs "✅ Verification Passed".
+- **Edge Cases**:
+  - Elements with no pseudo-elements (should not error).
+  - Pseudo-elements with no background images.
+  - Multiple URLs in one property (already handled by existing regex logic).
