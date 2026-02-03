@@ -1,3 +1,9 @@
+## STUDIO v0.82.0
+- ✅ Completed: Stacked Timeline - Implemented multi-lane stacked timeline for audio tracks with dynamic vertical scrolling and sticky ruler, improving visibility of overlapping tracks.
+
+## STUDIO v0.81.1
+- ✅ Verified: Omnibar - Added comprehensive unit tests for the Omnibar component to ensure robustness and prevent regressions.
+
 ## STUDIO v0.81.0
 - ✅ Completed: Timeline Audio Visualization - Implemented visualization of audio tracks on the timeline using `availableAudioTracks` metadata, separating it from runtime state.
 
