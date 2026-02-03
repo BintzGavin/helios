@@ -37,3 +37,7 @@
 ## [0.84.0] - Audio Visualization Strategy
 **Learning:** The previous plan to visualize audio using `controller.getAudioTracks()` (which returns full buffers) was too heavy and complex for the Studio-Player boundary. A better approach for the Studio is to fetch the audio `src` independently on the client side and use `OfflineAudioContext` to generate waveforms, decoupling the visualization from the runtime playback engine.
 **Action:** When visualizing heavy assets in a decoupled UI, prefer independent fetching/processing over transferring large data blobs across boundaries.
+
+## [0.86.0] - Distributed Rendering Progress
+**Learning:** `RenderOrchestrator` in Renderer supports distributed rendering but does not aggregate progress from workers. This causes erratic progress bars in the Studio UI (jumping 0-100%).
+**Action:** Future work on Renderer must implement progress aggregation (e.g., weighted by frame count) to support smooth UI feedback.
