@@ -56,7 +56,7 @@ packages/studio/
 
 ## D. UI Components
 
-- **Timeline**: Visual timeline with scrubbing, playhead, markers, and multi-lane stacked audio track visualization.
+- **Timeline**: Visual timeline with scrubbing, playhead, markers, loop range (In/Out) control, and multi-lane stacked audio track visualization.
 - **Props Editor**: Schema-aware input forms for composition properties.
 - **Assets Panel**: Drag-and-drop asset management.
 - **Renders Panel**: Render job tracking and history.

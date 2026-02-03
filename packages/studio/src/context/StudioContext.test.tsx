@@ -33,6 +33,8 @@ describe('StudioContext', () => {
     // Mock Controller
     mockController = {
       captureFrame: vi.fn(),
+      seek: vi.fn(),
+      play: vi.fn(),
     };
   });
 
@@ -117,5 +119,121 @@ describe('StudioContext', () => {
 
     // Restore createElement
     document.createElement = originalCreateElement;
+  });
+
+  describe('Loop Logic', () => {
+    it('loops playback when currentFrame exceeds outPoint', async () => {
+      let context: any;
+
+      render(
+        <StudioProvider>
+          <TestComponent onReady={(ctx) => { context = ctx; }} />
+        </StudioProvider>
+      );
+
+      await waitFor(() => expect(context).toBeDefined());
+
+      // Setup state
+      act(() => {
+        context.setController(mockController);
+        context.setPlayerState((prev: any) => ({
+          ...prev,
+          duration: 10,
+          fps: 30,
+          isPlaying: true,
+          currentFrame: 50
+        }));
+        context.setInPoint(30);
+        context.setOutPoint(60);
+        // Enable loop
+        if (!context.loop) context.toggleLoop();
+      });
+
+      // Verify loop is enabled
+      expect(context.loop).toBe(true);
+
+      // Trigger frame update beyond outPoint (60)
+
+      // Update frame to 60
+      act(() => {
+        context.setPlayerState((prev: any) => ({ ...prev, currentFrame: 60 }));
+      });
+
+      // Verify seek and play called
+      expect(mockController.seek).toHaveBeenCalledWith(30);
+      expect(mockController.play).toHaveBeenCalled();
+    });
+
+    it('loops playback when currentFrame exceeds totalFrames (outPoint=0)', async () => {
+      let context: any;
+
+      render(
+        <StudioProvider>
+          <TestComponent onReady={(ctx) => { context = ctx; }} />
+        </StudioProvider>
+      );
+
+      await waitFor(() => expect(context).toBeDefined());
+
+      // Setup state
+      act(() => {
+        context.setController(mockController);
+        context.setPlayerState((prev: any) => ({
+          ...prev,
+          duration: 2, // 60 frames
+          fps: 30,
+          isPlaying: true,
+          currentFrame: 10
+        }));
+        context.setInPoint(0);
+        context.setOutPoint(0); // Default loop at end
+        if (!context.loop) context.toggleLoop();
+      });
+
+      // totalFrames = 60. loopEnd = 60.
+
+      // Update frame to 60
+      act(() => {
+        context.setPlayerState((prev: any) => ({ ...prev, currentFrame: 60 }));
+      });
+
+      // Verify seek and play called (to 0)
+      expect(mockController.seek).toHaveBeenCalledWith(0);
+      expect(mockController.play).toHaveBeenCalled();
+    });
+
+    it('does not loop when loop is disabled', async () => {
+      let context: any;
+
+      render(
+        <StudioProvider>
+          <TestComponent onReady={(ctx) => { context = ctx; }} />
+        </StudioProvider>
+      );
+
+      await waitFor(() => expect(context).toBeDefined());
+
+      act(() => {
+        context.setController(mockController);
+        context.setPlayerState((prev: any) => ({
+          ...prev,
+          duration: 10,
+          fps: 30,
+          isPlaying: true,
+          currentFrame: 59
+        }));
+        context.setOutPoint(60);
+        // Ensure loop is disabled (default false)
+      });
+
+      expect(context.loop).toBe(false);
+
+      // Update frame
+      act(() => {
+        context.setPlayerState((prev: any) => ({ ...prev, currentFrame: 60 }));
+      });
+
+      expect(mockController.seek).not.toHaveBeenCalled();
+    });
   });
 });
