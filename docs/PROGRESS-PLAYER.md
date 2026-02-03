@@ -1,3 +1,6 @@
+## PLAYER v0.65.0
+- ✅ Completed: Media Session Integration - Implemented HeliosMediaSession to support OS-level media keys and metadata display, observing media-* attributes.
+
 ## PLAYER v0.59.1
 - ✅ Completed: Documentation Update - Added missing export attributes, audio fades, and diagnostics API to README.
 
