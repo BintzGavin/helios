@@ -5,6 +5,7 @@ import path from 'path';
 import { SSEServerTransport } from "@modelcontextprotocol/sdk/server/sse.js";
 import { createMcpServer } from './mcp';
 import { findCompositions, findAssets, getProjectRoot, createComposition, deleteComposition, updateCompositionMetadata, duplicateComposition, renameComposition, renameAsset } from './discovery';
+import { templates } from './templates';
 import { findDocumentation, resolveDocumentationPath } from './documentation';
 import { startRender, getJob, getJobs, cancelJob, deleteJob, diagnoseServer } from './render-manager';
 
@@ -181,6 +182,18 @@ function configureMiddlewares(server: ViteDevServer | PreviewServer, isPreview: 
                 res.end(JSON.stringify({ error: e.message }));
             }
             return;
+        }
+        next();
+      });
+
+      server.middlewares.use('/api/templates', (req, res, next) => {
+        if (req.url === '/' || req.url === '') {
+          if (req.method === 'GET') {
+            const list = Object.values(templates).map(t => ({ id: t.id, label: t.label }));
+            res.setHeader('Content-Type', 'application/json');
+            res.end(JSON.stringify(list));
+            return;
+          }
         }
         next();
       });

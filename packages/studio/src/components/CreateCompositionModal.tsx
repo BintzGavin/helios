@@ -3,7 +3,7 @@ import { useStudio } from '../context/StudioContext';
 import './CreateCompositionModal.css';
 
 export const CreateCompositionModal: React.FC = () => {
-  const { isCreateOpen, setCreateOpen, createComposition } = useStudio();
+  const { isCreateOpen, setCreateOpen, createComposition, templates } = useStudio();
   const [name, setName] = useState('');
   const [template, setTemplate] = useState('vanilla');
   const [width, setWidth] = useState(1920);
@@ -18,7 +18,10 @@ export const CreateCompositionModal: React.FC = () => {
   useEffect(() => {
     if (isCreateOpen) {
       setName('');
-      setTemplate('vanilla');
+      if (templates.length > 0) {
+        const hasVanilla = templates.some(t => t.id === 'vanilla');
+        setTemplate(hasVanilla ? 'vanilla' : templates[0].id);
+      }
       setWidth(1920);
       setHeight(1080);
       setFps(30);
@@ -73,11 +76,9 @@ export const CreateCompositionModal: React.FC = () => {
               onChange={e => setTemplate(e.target.value)}
               disabled={loading}
             >
-              <option value="vanilla">Vanilla JS</option>
-              <option value="react">React</option>
-              <option value="vue">Vue</option>
-              <option value="svelte">Svelte</option>
-              <option value="threejs">Three.js</option>
+              {templates.map(t => (
+                <option key={t.id} value={t.id}>{t.label}</option>
+              ))}
             </select>
           </div>
 
