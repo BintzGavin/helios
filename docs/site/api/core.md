@@ -46,7 +46,7 @@ Helios uses signals for reactive state management. You can subscribe to these si
 - **`activeCaptions`** (`ReadonlySignal<CaptionCue[]>`): The list of captions active at the current time.
 - **`width`** (`ReadonlySignal<number>`): The composition width.
 - **`height`** (`ReadonlySignal<number>`): The composition height.
-- **`availableAudioTracks`** (`ReadonlySignal<AudioTrackMetadata[]>`): List of detected audio tracks. Each object contains `id`, `startTime`, and `duration`.
+- **`availableAudioTracks`** (`ReadonlySignal<AudioTrackMetadata[]>`): List of detected audio tracks. Each object contains `id`, `startTime`, `duration`, and optional `fadeEasing`.
 
 ### Methods
 
@@ -135,6 +135,7 @@ When using `DomDriver` (default), you can control behavior using data attributes
 - **`data-helios-track-id="my-track"`**: Assigns an ID to an audio/video element. Used for grouping volume/mute controls.
 - **`data-helios-fade-in="duration"`**: Linearly fades in the audio volume over `duration` seconds at the start of the media.
 - **`data-helios-fade-out="duration"`**: Linearly fades out the audio volume over `duration` seconds before the end of the media.
+- **`data-helios-fade-easing="easing"`**: Sets the easing function for fades (e.g., "linear", "quad.in", "cubic.out").
 - **`data-helios-offset="seconds"`**: Delays the media playback by `seconds`.
 - **`data-helios-seek="seconds"`**: Starts playback from `seconds` into the media file (clips the beginning).
 - **`loop`**: The standard HTML `loop` attribute is fully supported and synchronized with the Helios timeline (wrapping time calculations).

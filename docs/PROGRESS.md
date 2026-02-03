@@ -1,3 +1,6 @@
+### DOCS v1.8.0
+- ✅ Completed: Daily Documentation Review - Updated all Changelogs, API Docs (Core, Player, Renderer), created new Example Docs (Lottie, Svelte/Vue Audio Vis), updated Studio Guide, and verified navigation.
+
 ### PLAYER v0.63.1
 - ✅ Completed: Fix cuechange on Disable - Fixed bug where disabling a track cleared active cues without dispatching the cuechange event.
 

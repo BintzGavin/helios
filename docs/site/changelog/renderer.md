@@ -5,6 +5,27 @@ description: "Changelog for the Renderer package"
 
 # Renderer Changelog
 
+## v1.61.1
+- **Fix Audio Playback Seek**: Updated `FFmpegBuilder` to correctly calculate input seek time (`-ss`) when using `playbackRate` with `startFrame > 0`.
+
+## v1.61.0
+- **Enable Visual Playback Rate**: Updated `SeekTimeDriver` and `CdpTimeDriver` to respect the `playbackRate` property (and attribute) on media elements, ensuring visual synchronization with audio speed changes.
+
+## v1.60.2
+- **Fix Verification Suite**: Updated `verify-audio-fades.ts` and `verify-audio-loop.ts` to handle the new `FFmpegConfig` return type from `getArgs`, resolving test failures and ensuring the verification suite passes.
+
+## v1.60.1
+- **Refactor Concat to Pipe**: Refactored `concatenateVideos` to pipe the file list to FFmpeg's stdin (`-i -`), removing temporary file creation and eliminating disk I/O for the concatenation process. Verified with `verify-concat.ts`.
+
+## v1.60.0
+- **Enable Audio Playback Rate**: Updated `AudioTrackConfig` to include `playbackRate`, and implemented `atempo` filter chaining in `FFmpegBuilder` to support speed adjustments (including values outside 0.5-2.0 range). Also updated `DomScanner` to extract `playbackRate` from media elements.
+
+## v1.59.0
+- **Local Distributed Rendering**: Implemented `RenderOrchestrator` to split render jobs into concurrent chunks and concatenate them, enabling faster local rendering. Also refactored `Renderer` to its own file to support this architecture.
+
+## v1.58.0
+- **Zero Disk Audio**: Refactored `blob-extractor.ts` and `FFmpegBuilder.ts` to pipe audio buffers directly to FFmpeg via stdio pipes (`pipe:N`), eliminating temporary file creation for Blob audio tracks and improving security and performance.
+
 ## v1.57.3
 - **Enable Looping Media Verification**: Updated `packages/renderer/package.json` to depend on `@helios-project/core` version `5.1.1` (matching local workspace), allowing `verify-video-loop.ts` to run and confirm correct looping media implementation in `SeekTimeDriver` and `CdpTimeDriver`.
 

@@ -1,8 +1,15 @@
-**Version**: 1.7.0
+**Version**: 1.8.0
 
 # DOCS Status
 
 ## Recent Updates
+[v1.8.0] ✅ Completed: Daily Documentation Review - Comprehensive Sync
+- Updated all Changelogs (Core v5.2-v5.8, Player v0.58-v0.63, Renderer v1.58-v1.61, Demo v1.90-v1.92, Studio v0.81-v0.84).
+- Updated API Docs: Core (Fade Easing), Player (Active Cues, Diagnose), Renderer (Visual Playback Rate).
+- Created Example Docs: Lottie Animation, Svelte Audio Visualization, Vue Audio Visualization.
+- Updated Studio Guide: Audio Visualization, Loop Range Persistence.
+- Updated Navigation (`mint.json`).
+
 [v1.7.0] ✅ Completed: Daily Documentation Review - Comprehensive Sync
 - Updated all Changelogs (Core v5.1.2, Player v0.57.1, Renderer v1.57.3, Demo v1.85.0, Studio v0.80.2).
 - Updated API Docs: Core (Captions, AudioTrackMetadata), Player (Standard Media API, New Attributes), Renderer (Browser Config).

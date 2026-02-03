@@ -5,6 +5,21 @@ description: "Changelog for the Studio package"
 
 # Studio Changelog
 
+## v0.84.0
+- **Timeline Persistence**: Implemented persistence for Current Frame, In Point, Out Point, and Loop state across reloads and composition switches.
+
+## v0.83.0
+- **Loop Range**: Implemented logic to loop playback within defined In/Out points (including handling of Out Point = 0 for full duration), ensuring smooth playback for specific sections.
+
+## v0.82.0
+- **Stacked Timeline**: Implemented multi-lane stacked timeline for audio tracks with dynamic vertical scrolling and sticky ruler, improving visibility of overlapping tracks.
+
+## v0.81.1
+- **Verified: Omnibar**: Added comprehensive unit tests for the Omnibar component to ensure robustness and prevent regressions.
+
+## v0.81.0
+- **Timeline Audio Visualization**: Implemented visualization of audio tracks on the timeline using `availableAudioTracks` metadata, separating it from runtime state.
+
 ## v0.80.2
 - **Test Coverage**: Added unit tests for Toast notification system (ToastItem, ToastContext, ToastContainer) and verified with mocked environment.
 

@@ -48,7 +48,8 @@ The **Helios Assistant** is a context-aware AI helper integrated directly into t
 -   **Scrubbing**: Drag the playhead to scrub through your animation.
 -   **Playback**: Use the Play/Pause controls or keyboard shortcuts.
 -   **Frame Stepping**: Move frame-by-frame to inspect exact details.
--   **Range Markers**: Set In (`I`) and Out (`O`) points to loop a specific section of your animation.
+-   **Range Markers**: Set In (`I`) and Out (`O`) points to loop a specific section of your animation. These points and the loop state are **persisted** across reloads.
+-   **Audio Visualization**: Audio tracks display a waveform visualization directly on the timeline, helping you synchronize animation cues with sound events.
 -   **Zooming**: Use the zoom slider to expand the timeline for precise frame-level editing. The track is scrollable when zoomed in.
 -   **Timecode**: Displays current time in SMPTE format (HH:MM:SS:FF) for professional timing reference.
 
@@ -57,7 +58,7 @@ The **Helios Assistant** is a context-aware AI helper integrated directly into t
 -   **Safe Areas**: Toggle Title Safe and Action Safe guides to ensure your content is positioned correctly for broadcast or social media.
 -   **Snapshot**: Take a PNG snapshot of the current frame.
 -   **Background**: Toggle transparency grid or background color.
--   **Preferences**: Your settings (Zoom, Pan, Guides) are automatically persisted across sessions.
+-   **Preferences**: Your settings (Zoom, Pan, Guides, Timeline Zoom, Current Frame, Active Composition) are automatically persisted to `localStorage`, so you can pick up exactly where you left off after a restart.
 
 ### Assets Panel
 

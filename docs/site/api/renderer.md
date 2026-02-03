@@ -87,7 +87,7 @@ The renderer uses different strategies based on `mode`:
 - **`canvas`**: Uses `CdpTimeDriver` (Chrome DevTools Protocol) and `CanvasStrategy`. Captures frames via WebCodecs or Screenshot. Best for Canvas/WebGL.
     - **H.264 Support**: By default, `CanvasStrategy` prioritizes H.264 (`avc1`) intermediate capture for performance.
     - **Stream Copy**: If `videoCodec: 'copy'` is used, the renderer performs a lossless stream copy from the WebCodecs output to the container, bypassing re-encoding.
-- **`dom`**: Uses `SeekTimeDriver` and `DomStrategy`. Captures frames by taking screenshots of the DOM. Supports CSS animations, font loading, image preloading, and `startFrame`.
+- **`dom`**: Uses `SeekTimeDriver` and `DomStrategy`. Captures frames by taking screenshots of the DOM. Supports CSS animations, font loading, image preloading, visual playback rate synchronization, and `startFrame`.
 
 ### Diagnostics
 

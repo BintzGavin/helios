@@ -54,7 +54,10 @@
         "examples/client-export",
         "examples/web-component",
         "examples/diagnostics",
-        "examples/vanilla-typescript"
+        "examples/vanilla-typescript",
+        "examples/lottie-animation",
+        "examples/svelte-audio-visualization",
+        "examples/vue-audio-visualization"
       ]
     },
     {
