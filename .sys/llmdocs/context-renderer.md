@@ -8,6 +8,7 @@ The Renderer operates on a "Dual-Path" architecture to support different use cas
    - **Output**: Best for sharp text and vector graphics.
 2. **Canvas Strategy (`CanvasStrategy`)**: Used for WebGL/Canvas-heavy compositions (e.g., Three.js, PixiJS). It captures the `<canvas>` context directly.
    - **Drivers**: Uses `CdpTimeDriver` (Chrome DevTools Protocol) for precise virtual time control (supports Shadow DOM media sync, enforces deterministic Jan 2024 epoch, ensures sync-before-render order, waits for budget expiration, enforces stability timeout via `Runtime.terminateExecution`, supports media looping and visual playback rate).
+   - **Discovery**: Uses `dom-scanner` to recursively discover media elements (including Shadow DOM) for implicit audio inclusion (including `blob:` URLs via extraction), unifying behavior with `DomStrategy`.
    - **Optimization**: Prioritizes H.264 (AVC) intermediate codec for hardware acceleration, falling back to VP8. Exposes `diagnose()` API to verify supported WebCodecs.
    - **Output**: Best for high-performance 2D/3D graphics.
 
@@ -69,6 +70,7 @@ packages/renderer/
     ├── verify-diagnose.ts      # Codec diagnostics test
     ├── verify-transparency.ts  # Transparency support test
     ├── verify-canvas-strategy.ts # Canvas WebCodecs strategy test
+    ├── verify-canvas-implicit-audio.ts # Canvas implicit audio verification
     ├── verify-video-loop.ts    # Video looping logic verification
     └── ...                     # Other verification scripts
 ```

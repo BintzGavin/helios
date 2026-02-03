@@ -41,7 +41,8 @@ async function runTests() {
         }
 
         // Handle Canvas existence check
-        if (typeof fnOrString === 'function' && fnOrString.toString().includes('HTMLCanvasElement')) {
+        if ((typeof fnOrString === 'function' && fnOrString.toString().includes('HTMLCanvasElement')) ||
+            (typeof fnOrString === 'string' && fnOrString.includes('HTMLCanvasElement'))) {
             return true;
         }
 
@@ -60,7 +61,8 @@ async function runTests() {
     await strategy.prepare(mockPage);
 
     console.log('Checking FFmpeg args...');
-    const args = strategy.getFFmpegArgs(options, 'output.mp4');
+    const config = strategy.getFFmpegArgs(options, 'output.mp4');
+    const args = config.args;
 
     // Check if audio file is in args
     const audioIndex = args.indexOf('audio.mp3');

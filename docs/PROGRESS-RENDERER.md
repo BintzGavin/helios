@@ -1,3 +1,6 @@
+## RENDERER v1.63.0
+- ✅ Completed: Canvas Implicit Audio - Verified and finalized the implementation of implicit audio discovery in `CanvasStrategy`. Updated `dom-scanner` and `blob-extractor` to robustly handle `blob:` URLs (gracefully ignoring failed extractions to prevent FFmpeg crashes) and fixed the `verify-canvas-implicit-audio` test suite.
+
 ## RENDERER v1.62.1
 - ✅ Completed: Fix Pseudo-Element Preloading - Updated `DomStrategy` to correctly iterate over `::before` and `::after` pseudo-elements when discovering background images, fixing a regression where these assets were missed. Verified with `verify-pseudo-element-preload.ts`.
 
