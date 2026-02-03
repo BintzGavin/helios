@@ -1,3 +1,6 @@
+## DEMO v1.97.0
+- ✅ Completed: Svelte Lottie Animation - Created `examples/svelte-lottie-animation` demonstrating integration with `lottie-web` in Svelte 5.
+
 ## DEMO v1.96.0
 - ✅ Completed: Solid Audio Visualization - Created `examples/solid-audio-visualization` demonstrating real-time audio analysis (RMS, waveforms) using synthesized `AudioBuffer` and SolidJS.
 
