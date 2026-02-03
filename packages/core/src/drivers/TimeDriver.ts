@@ -23,4 +23,6 @@ export interface TimeDriver {
   waitUntilStable(): Promise<void>;
   dispose?(): void;
   subscribeToMetadata?(callback: (meta: DriverMetadata) => void): () => void;
+  getAudioContext?(): Promise<unknown>;
+  getAudioSourceNode?(trackId: string): Promise<unknown>;
 }
