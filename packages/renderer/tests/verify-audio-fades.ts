@@ -24,7 +24,7 @@ async function main() {
         fadeInDuration: 2
       }]
     };
-    const args = FFmpegBuilder.getArgs(options, 'out.mp4', videoInputArgs);
+    const { args } = FFmpegBuilder.getArgs(options, 'out.mp4', videoInputArgs);
     const filterComplex = args[args.indexOf('-filter_complex') + 1];
 
     // Expect: afade=t=in:st=0:d=2
@@ -51,7 +51,7 @@ async function main() {
         fadeOutDuration: 3
       }]
     };
-    const args = FFmpegBuilder.getArgs(options, 'out.mp4', videoInputArgs);
+    const { args } = FFmpegBuilder.getArgs(options, 'out.mp4', videoInputArgs);
     const filterComplex = args[args.indexOf('-filter_complex') + 1];
 
     // Expect: afade=t=out:st=7:d=3  (10 - 3 = 7)
@@ -77,7 +77,7 @@ async function main() {
         fadeInDuration: 2
       }]
     };
-    const args = FFmpegBuilder.getArgs(options, 'out.mp4', videoInputArgs);
+    const { args } = FFmpegBuilder.getArgs(options, 'out.mp4', videoInputArgs);
     const filterComplex = args[args.indexOf('-filter_complex') + 1];
 
     // Offset 5s. Delay = 5000ms. startTime = 5.
@@ -106,7 +106,7 @@ async function main() {
         fadeOutDuration: 1
       }]
     };
-    const args = FFmpegBuilder.getArgs(options, 'out.mp4', videoInputArgs);
+    const { args } = FFmpegBuilder.getArgs(options, 'out.mp4', videoInputArgs);
     const filterComplex = args[args.indexOf('-filter_complex') + 1];
 
     // Composition Duration = 150/30 = 5s.
@@ -134,7 +134,7 @@ async function main() {
         { path: 't2.mp3', fadeOutDuration: 1 }
       ]
     };
-    const args = FFmpegBuilder.getArgs(options, 'out.mp4', videoInputArgs);
+    const { args } = FFmpegBuilder.getArgs(options, 'out.mp4', videoInputArgs);
     const filterComplex = args[args.indexOf('-filter_complex') + 1];
 
     // t1: afade=t=in:st=0:d=1
