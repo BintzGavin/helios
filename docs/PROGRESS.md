@@ -212,3 +212,6 @@ Each agent should update **their own dedicated progress file** instead of this f
 
 ### PLAYER v0.58.0
 - ✅ Completed: Configurable Export Bitrate - Implemented `export-bitrate` attribute to control client-side export quality.
+
+## CORE v5.5.0
+- ✅ Completed: Audio Visualization Hooks - Added `getAudioContext()` and `getAudioSourceNode(trackId)` methods to `Helios` and `DomDriver`, allowing consumers to hook into the audio graph for visualization.

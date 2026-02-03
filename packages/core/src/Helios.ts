@@ -183,6 +183,23 @@ export class Helios<TInputProps = Record<string, any>> {
   public get availableAudioTracks(): ReadonlySignal<AudioTrackMetadata[]> { return this._availableAudioTracks; }
 
   /**
+   * Returns the shared AudioContext used by the driver, if supported.
+   * Useful for connecting custom audio nodes for visualization.
+   */
+  public async getAudioContext(): Promise<unknown> {
+    return this.driver.getAudioContext?.() ?? null;
+  }
+
+  /**
+   * Returns a MediaElementAudioSourceNode for the specified track ID.
+   * Useful for visualizing audio from a specific track.
+   * @param trackId The ID of the audio track.
+   */
+  public async getAudioSourceNode(trackId: string): Promise<unknown> {
+    return this.driver.getAudioSourceNode?.(trackId) ?? null;
+  }
+
+  /**
    * Signal for the full list of captions.
    * Can be subscribed to for reactive updates.
    */

@@ -15,6 +15,8 @@ export class DomDriver implements TimeDriver {
   private mediaElements = new Set<HTMLMediaElement>();
   private discoveredTracks = new Map<string, AudioTrackMetadata>();
   private metadataSubscribers = new Set<(meta: DriverMetadata) => void>();
+  private audioContext: AudioContext | null = null;
+  private sourceNodes = new Map<string, MediaElementAudioSourceNode>();
 
   init(scope: unknown) {
     // Allow HTMLElement/Document (Browser) or objects with getAnimations/querySelectorAll (Mocks/Tests)
@@ -228,6 +230,53 @@ export class DomDriver implements TimeDriver {
     this.scopes.clear();
     this.discoveredTracks.clear();
     this.metadataSubscribers.clear();
+
+    if (this.audioContext) {
+      this.audioContext.close().catch(() => {});
+      this.audioContext = null;
+    }
+    this.sourceNodes.clear();
+  }
+
+  async getAudioContext(): Promise<unknown> {
+    if (this.audioContext) return this.audioContext;
+
+    if (typeof window !== 'undefined') {
+      const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+      if (AudioContextClass) {
+        this.audioContext = new AudioContextClass();
+      }
+    }
+    return this.audioContext;
+  }
+
+  async getAudioSourceNode(trackId: string): Promise<unknown> {
+    const ctx = await this.getAudioContext() as AudioContext | null;
+    if (!ctx) return null;
+
+    if (this.sourceNodes.has(trackId)) {
+      return this.sourceNodes.get(trackId);
+    }
+
+    let targetEl: HTMLMediaElement | null = null;
+    for (const el of this.mediaElements) {
+      if (el.getAttribute('data-helios-track-id') === trackId) {
+        targetEl = el;
+        break;
+      }
+    }
+
+    if (targetEl) {
+      // Use createMediaElementSource if available on context
+      if (typeof ctx.createMediaElementSource === 'function') {
+        const source = ctx.createMediaElementSource(targetEl);
+        source.connect(ctx.destination);
+        this.sourceNodes.set(trackId, source);
+        return source;
+      }
+    }
+
+    return null;
   }
 
   update(timeInMs: number, options: {

@@ -155,6 +155,8 @@ export class Helios<TInputProps = Record<string, any>> {
   public get muted(): ReadonlySignal<boolean>;
   public get audioTracks(): ReadonlySignal<Record<string, AudioTrackState>>;
   public get availableAudioTracks(): ReadonlySignal<AudioTrackMetadata[]>;
+  public async getAudioContext(): Promise<unknown>;
+  public async getAudioSourceNode(trackId: string): Promise<unknown>;
   public get captions(): ReadonlySignal<CaptionCue[]>;
   public get activeCaptions(): ReadonlySignal<CaptionCue[]>;
   public get markers(): ReadonlySignal<Marker[]>;
