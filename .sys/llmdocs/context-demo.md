@@ -34,6 +34,7 @@ The `examples/` directory contains reference implementations for various framewo
 ### Vue
 - **vue-dom-animation**: Basic Vue + DOM.
 - **vue-canvas-animation**: Basic Vue + Canvas.
+- **vue-audio-visualization**: Real-time audio frequency analysis visualization.
 - **vue-captions-animation**: Vue Composition API for Helios SRT captions.
 - **vue-threejs-canvas-animation**: 3D animation with Three.js and Vue.
 - **vue-transitions**: Vue `<Transition>` component.
