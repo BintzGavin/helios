@@ -53,3 +53,7 @@
 ## [5.6.0] - Workspace Dependency Breakage
 **Learning:** `packages/studio` depends on `player@^0.59.0` but `packages/player` is at `0.62.0`. This causes `npm install` at root to fail with `ETARGET`, blocking all verification.
 **Action:** When working on Core, check `npm install` status early. If broken due to other packages, document it as a blocker in the Plan Dependencies.
+
+## [5.7.0] - Driver State Visibility
+**Learning:** `DomDriver` implemented `fadeEasing` logic internally but failed to expose the configuration in `AudioTrackMetadata`, causing a gap where the Renderer could not replicate the behavior.
+**Action:** When adding features to Drivers (like `DomDriver`), always ensure the configuration data is reflected in the public state (e.g. `availableAudioTracks` signal) for external consumers.
