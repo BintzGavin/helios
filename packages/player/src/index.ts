@@ -3,6 +3,7 @@ import { DirectController, BridgeController } from "./controllers";
 import type { HeliosController } from "./controllers";
 import { ClientSideExporter } from "./features/exporter";
 import { HeliosTextTrack, HeliosTextTrackList, CueClass, TrackHost } from "./features/text-tracks";
+import { HeliosAudioTrack, HeliosAudioTrackList, AudioTrackHost } from "./features/audio-tracks";
 import { parseCaptions } from "./features/caption-parser";
 
 export { ClientSideExporter };
@@ -528,10 +529,11 @@ template.innerHTML = `
   </div>
 `;
 
-export class HeliosPlayer extends HTMLElement implements TrackHost {
+export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHost {
   private iframe: HTMLIFrameElement;
   private pipVideo: HTMLVideoElement;
   private _textTracks: HeliosTextTrackList;
+  private _audioTracks: HeliosAudioTrackList;
   private _domTracks = new Map<HTMLTrackElement, HeliosTextTrack>();
   private playPauseBtn: HTMLButtonElement;
   private volumeBtn: HTMLButtonElement;
@@ -1028,6 +1030,8 @@ export class HeliosPlayer extends HTMLElement implements TrackHost {
     this._textTracks.addEventListener("addtrack", () => this.updateCCButtonVisibility());
     this._textTracks.addEventListener("removetrack", () => this.updateCCButtonVisibility());
 
+    this._audioTracks = new HeliosAudioTrackList();
+
     this.resizeObserver = new ResizeObserver((entries) => {
       for (const entry of entries) {
         const width = entry.contentRect.width;
@@ -1044,10 +1048,20 @@ export class HeliosPlayer extends HTMLElement implements TrackHost {
     return this._textTracks;
   }
 
+  public get audioTracks(): HeliosAudioTrackList {
+    return this._audioTracks;
+  }
+
   public addTextTrack(kind: string, label: string = "", language: string = ""): HeliosTextTrack {
     const track = new HeliosTextTrack(kind, label, language, this);
     this._textTracks.addTrack(track);
     return track;
+  }
+
+  public handleAudioTrackEnabledChange(track: HeliosAudioTrack) {
+    if (!this.controller) return;
+    // Helios "muted" is the inverse of AudioTrack "enabled"
+    this.controller.setAudioTrackMuted(track.id, !track.enabled);
   }
 
   public handleTrackModeChange(track: HeliosTextTrack) {
@@ -1877,6 +1891,46 @@ export class HeliosPlayer extends HTMLElement implements TrackHost {
   };
 
   private updateUI(state: any) {
+      // Sync Audio Tracks
+      if (state.availableAudioTracks) {
+          const metadataTracks: any[] = state.availableAudioTracks;
+          const currentIds = new Set(metadataTracks.map(t => t.id));
+
+          // 1. Add new tracks
+          metadataTracks.forEach(meta => {
+              let track = this._audioTracks.getTrackById(meta.id);
+              if (!track) {
+                  // Default enabled=true unless explicitly muted in state
+                  const isMuted = state.audioTracks && state.audioTracks[meta.id] ? state.audioTracks[meta.id].muted : false;
+                  track = new HeliosAudioTrack(
+                      meta.id,
+                      "", // Kind
+                      meta.id, // Label (fallback to ID)
+                      "", // Language
+                      !isMuted, // Enabled
+                      this
+                  );
+                  this._audioTracks.addTrack(track);
+              } else {
+                  // Update enabled state if changed externally
+                  const isMuted = state.audioTracks && state.audioTracks[meta.id] ? state.audioTracks[meta.id].muted : false;
+                  if (track.enabled !== !isMuted) {
+                      track._setEnabledInternal(!isMuted);
+                      this._audioTracks.dispatchChangeEvent();
+                  }
+              }
+          });
+
+          // 2. Remove old tracks
+          const tracksToRemove: HeliosAudioTrack[] = [];
+          for (const track of this._audioTracks) {
+              if (!currentIds.has(track.id)) {
+                  tracksToRemove.push(track);
+              }
+          }
+          tracksToRemove.forEach(t => this._audioTracks.removeTrack(t));
+      }
+
       // Update text tracks active cues
       if (state.fps) {
           const currentTime = state.currentFrame / state.fps;
