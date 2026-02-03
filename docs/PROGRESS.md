@@ -1,3 +1,6 @@
+### RENDERER v1.61.2
+- ✅ Completed: Update Verification Suite - Added orphaned verification scripts (`verify-audio-playback-rate.ts`, `verify-audio-playback-seek.ts`, `verify-visual-playback-rate.ts`) to the master test runner (`run-all.ts`) and fixed legacy scripts.
+
 ### DEMO v1.92.0
 - ✅ Completed: Svelte Audio Visualization - Created `examples/svelte-audio-visualization` demonstrating real-time audio analysis using Svelte derived stores.
 
