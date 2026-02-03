@@ -65,3 +65,7 @@
 ## [5.10.0] - Test State Leakage
 **Learning:** Static registries in singletons (like `Helios._virtualTimeRegistry`) persist across tests in the same suite, causing "state leakage" if instances are not disposed. This leads to flaky tests where one test's cleanup (deleting a global) breaks another test's assumptions (that the global is hooked).
 **Action:** Always ensure test setups isolate state or explicitly dispose of instances in `afterEach` to clear static registries.
+
+## [5.10.0] - Schema-First Development
+**Learning:** "Prompt to Composition" features were blocked because `HeliosOptions` mixed runtime callbacks with configuration, lacking a pure JSON-serializable schema for the composition itself.
+**Action:** When planning "Generation" or "Serialization" features, first identify or define the data contract (JSON interfaces) in a dedicated types file before attempting to implement the logic.
