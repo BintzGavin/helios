@@ -65,7 +65,9 @@ export class FFmpegBuilder {
         // Track starts before or at the render window
         // We need to skip the part of the track that happened before renderStart
         delayMs = 0;
-        inputSeek = (track.seek || 0) + (renderStartTime - globalStart);
+        const timelineDiff = renderStartTime - globalStart;
+        const mediaDiff = timelineDiff * (track.playbackRate || 1.0);
+        inputSeek = (track.seek || 0) + mediaDiff;
       }
 
       // Add input arguments

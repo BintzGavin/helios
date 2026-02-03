@@ -17,7 +17,7 @@ const videoInputArgs = ['-i', 'pipe:0'];
 // Test Case 1: Standard Encoding (Default)
 {
   console.log('Test 1: Standard Encoding (Default)');
-  const args = FFmpegBuilder.getArgs(baseOptions, outputPath, videoInputArgs);
+  const args = FFmpegBuilder.getArgs(baseOptions, outputPath, videoInputArgs).args;
 
   assert.ok(args.includes('-c:v'), 'Should include video codec flag');
   assert.ok(args.includes('libx264'), 'Should default to libx264');
@@ -33,7 +33,7 @@ const videoInputArgs = ['-i', 'pipe:0'];
     ...baseOptions,
     videoCodec: 'copy'
   };
-  const args = FFmpegBuilder.getArgs(copyOptions, outputPath, videoInputArgs);
+  const args = FFmpegBuilder.getArgs(copyOptions, outputPath, videoInputArgs).args;
 
   // Assertions for presence
   const codecIndex = args.indexOf('-c:v');
@@ -62,7 +62,7 @@ const videoInputArgs = ['-i', 'pipe:0'];
     videoBitrate: '5M',
     pixelFormat: 'yuv444p'
   };
-  const args = FFmpegBuilder.getArgs(copyOptions, outputPath, videoInputArgs);
+  const args = FFmpegBuilder.getArgs(copyOptions, outputPath, videoInputArgs).args;
 
   assert.strictEqual(args.includes('-pix_fmt'), false, 'Should NOT include -pix_fmt even if specified');
   assert.strictEqual(args.includes('-crf'), false, 'Should NOT include -crf even if specified');

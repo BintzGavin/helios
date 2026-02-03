@@ -59,6 +59,7 @@ packages/renderer/
     ├── verify-audio-fades.ts   # Audio fades test
     ├── verify-audio-loop.ts    # Audio looping test
     ├── verify-audio-playback-rate.ts # Audio playback rate test
+    ├── verify-audio-playback-rate-seek.ts # Audio playback rate seek test
     ├── verify-visual-playback-rate.ts # Visual playback rate test
     ├── verify-frame-count.ts   # Precision frame count test
     ├── verify-cdp-hang.ts      # CDP initialization order/deadlock test
