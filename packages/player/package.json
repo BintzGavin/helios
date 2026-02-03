@@ -46,7 +46,7 @@
     "helios"
   ],
   "dependencies": {
-    "@helios-project/core": "5.4.0",
+    "@helios-project/core": "5.5.0",
     "mediabunny": "^1.31.0"
   },
   "devDependencies": {

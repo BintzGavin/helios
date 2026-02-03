@@ -353,4 +353,13 @@ describe('ClientSideExporter', () => {
         expect(videoSampleSources.length).toBeGreaterThan(0);
         expect(videoSampleSources[0].config.bitrate).toBe(5_000_000);
     });
+
+    it('should use custom filename', async () => {
+        const onProgress = vi.fn();
+        const signal = new AbortController().signal;
+
+        await exporter.export({ onProgress, signal, mode: 'canvas', filename: 'custom-export' });
+
+        expect(mockAnchor.download).toBe('custom-export.mp4');
+    });
 });
