@@ -6,7 +6,7 @@ Helios is a modern engine for creating videos programmatically using standard we
 
 ## Quick Facts
 - **License**: Elastic License 2.0 (free commercial use, no SaaS resale)
-- **Status**: Core: Stable (v5.0+), Studio: Alpha (v0.79+)
+- **Status**: Core: Stable (v5.6.0+), Studio: Alpha (v0.82.0+)
 - **Frameworks**: React, Vue, Svelte, Solid, vanilla JS
 - **Animation**: Standard CSS, Web Animations API (WAAPI), any animation library
 
@@ -19,14 +19,14 @@ const helios = new Helios({
   duration: 10,  // seconds
   fps: 30,
   autoSyncAnimations: true, // Auto-sync CSS/WAAPI
-  inputProps: { title: "Hello World" }, // Dynamic data
+  inputProps: { title: "Hello World" }, // Dynamic data via constructor
   captions: [{ id: "1", startTime: 0, endTime: 1000, text: "Welcome" }] // SRT string or objects
 });
 
 // Reactively subscribe to state changes
 helios.subscribe(({ currentFrame, inputProps, availableAudioTracks }) => {
   // Drive animations with progress or props
-  // availableAudioTracks is now AudioTrackMetadata[] (id, startTime, duration)
+  // availableAudioTracks is AudioTrackMetadata[] (id, startTime, duration, src)
 });
 
 // CRITICAL: Ensure fonts, images, and media are ready before rendering
@@ -107,10 +107,10 @@ const report = await Helios.diagnose();
 
 ## Roadmap
 ### V1.x (Active)
-- **Helios Studio**: Alpha v0.79+ (Omnibar, Audio Mixer, Persistent Preferences)
-- **Core**: Stable v5.0+ (Audio Metadata, Decoupled TimeDriver)
-- **Player**: Feature Complete v0.56+ (Shadow DOM Export, Diagnostics)
-- **Renderer**: Stable v1.57+ (Looping Media, Recursive Shadow DOM)
+- **Helios Studio**: Alpha v0.82+ (Stacked Timeline, Audio Mixer, Omnibar, Visualization)
+- **Core**: Stable v5.6+ (Audio Fade Easing, Headless Audio, WebVTT)
+- **Player**: Feature Complete v0.62+ (Diagnostics UI, Headless Audio Export)
+- **Renderer**: Stable v1.61+ (Local Distributed Rendering, Zero Disk Audio)
 
 ### AI Integration
 - **Studio MCP Server**: Inspect, create, and render compositions via LLM tools (Done)

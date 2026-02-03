@@ -1,5 +1,16 @@
 # LLMS Progress
 
+## LLMS v1.7.0
+- ✅ Completed: Daily llms.txt Review
+  - Updated Quick Facts: Core v5.6.0+, Studio v0.82.0+, Player v0.62.0+, Renderer v1.61.0+
+  - Updated Core API example: Clarified `inputProps` via constructor and `availableAudioTracks` metadata (including `src`)
+  - Updated Roadmap:
+    - Studio: Added Stacked Timeline, Audio Mixer, Omnibar, Visualization
+    - Core: Added Audio Fade Easing, Headless Audio, WebVTT
+    - Player: Added Diagnostics UI, Headless Audio Export
+    - Renderer: Added Local Distributed Rendering, Zero Disk Audio
+  - Verified all key file paths including `studio/SKILL.md`
+
 ## LLMS v1.6.0
 - ✅ Completed: Daily llms.txt Review
   - Updated Quick Facts: Core v5.0+, Studio v0.79+, Renderer v1.57+, Player v0.56+
