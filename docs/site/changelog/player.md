@@ -5,6 +5,33 @@ description: "Changelog for the Player package"
 
 # Player Changelog
 
+## v0.63.1
+- **Fix cuechange on Disable**: Fixed bug where disabling a track cleared active cues without dispatching the cuechange event.
+
+## v0.63.0
+- **Implement Active Cues**: Added `activeCues` property and `cuechange` event to `HeliosTextTrack`, and updated `HeliosPlayer` to drive cue updates via the main UI loop.
+
+## v0.62.1
+- **Fix SRT Export Filename**: Updated SRT export to respect `export-filename` attribute instead of using hardcoded "captions.srt".
+
+## v0.62.0
+- **Export Filename**: Implemented `export-filename` attribute on `<helios-player>` to allow customizing the filename of client-side exported videos.
+
+## v0.61.0
+- **Expose Composition Setters**: Implemented `setDuration`, `setFps`, `setSize`, and `setMarkers` in `HeliosController` and updated Bridge protocol to support dynamic composition updates from the host.
+
+## v0.60.0
+- **Headless Audio Support**: Updated `getAudioAssets` and controllers to include audio tracks from Helios state metadata in client-side exports, prioritizing them over DOM elements.
+
+## v0.59.1
+- **Documentation Update**: Added missing export attributes, audio fades, and diagnostics API to README.
+
+## v0.59.0
+- **Implement Diagnostics UI Overlay**: Implemented a visible Diagnostics UI overlay in `<helios-player>` toggled via `Shift+D`, and exposed `diagnose()` as a public method.
+
+## v0.58.0
+- **Configurable Export Bitrate**: Implemented `export-bitrate` attribute to control client-side export quality.
+
 ## v0.57.1
 - **Fix Test Environment & Sync Version**: Updated package version to match status file, installed missing dependencies, and verified all tests pass (including Shadow DOM export).
 

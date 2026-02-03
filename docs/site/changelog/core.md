@@ -5,6 +5,30 @@ description: "Changelog for the Core package"
 
 # Core Changelog
 
+## v5.8.0
+- **Expose Fade Easing Metadata**: Added `fadeEasing` to `AudioTrackMetadata` and updated `DomDriver` to parse `data-helios-fade-easing` attribute, exposing non-linear fade configurations to consumers.
+
+## v5.7.0
+- **Enable Audio State Persistence**: Added `audioTracks` to `HeliosOptions` and updated constructor to initialize mixer state (volume/muted per track) from configuration, enabling full session save/load.
+
+## v5.6.0
+- **Audio Fade Easing**: Implemented `data-helios-fade-easing` support in `DomDriver`, enabling non-linear audio fades (e.g., "quad.in") using the Easing library.
+
+## v5.5.0
+- **Audio Visualization Hooks**: Added `getAudioContext()` and `getAudioSourceNode(trackId)` methods to `Helios` and `DomDriver`, allowing consumers to hook into the audio graph for visualization.
+
+## v5.4.0
+- **Headless Audio Tracks**: Added `availableAudioTracks` option to `HeliosOptions` and `setAvailableAudioTracks` method, enabling manual injection of audio metadata for headless environments.
+
+## v5.3.0
+- **Expose Audio Source**: Updated `AudioTrackMetadata` to include `src` property, populated by `DomDriver` from `currentSrc` or `src` attribute, enabling access to audio source URLs in metadata.
+
+## v5.2.1
+- **Fix Subscription Timing**: Forced notification in `bindToDocumentTimeline` when virtual time is set to the same frame, ensuring external drivers (e.g. GSAP) remain synchronized during precise seeking.
+
+## v5.2.0
+- **Expose Audio Fades**: Updated `AudioTrackMetadata` to include `fadeInDuration` and `fadeOutDuration`, and updated `DomDriver` to automatically discover these values from `data-helios-fade-in` and `data-helios-fade-out` attributes.
+
 ## v5.1.2
 - **Fix GSAP Synchronization**: Forced subscriber notification in `bindToDocumentTimeline` when virtual time is present to ensure initial state synchronization with external libraries like GSAP, resolving black frames in render output.
 

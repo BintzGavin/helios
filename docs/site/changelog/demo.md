@@ -5,6 +5,15 @@ description: "Changelog for the Demo package and examples"
 
 # Demo Changelog
 
+## v1.92.0
+- **Svelte Audio Visualization**: Created `examples/svelte-audio-visualization` demonstrating real-time audio analysis using Svelte derived stores.
+
+## v1.91.0
+- **Lottie Animation**: Created `examples/lottie-animation` demonstrating integration with `lottie-web`.
+
+## v1.90.0
+- **Vue Audio Visualization**: Created `examples/vue-audio-visualization` demonstrating real-time audio analysis with Vue 3.
+
 ## v1.85.0
 - **Vanilla Captions Animation**: Created `examples/vanilla-captions-animation` demonstrating Helios captions (SRT) support in Vanilla TypeScript, replacing the legacy `examples/captions-animation`.
 

@@ -75,7 +75,7 @@ The `<helios-player>` element implements a subset of the HTMLMediaElement API, a
 - **`playing`** (boolean, readonly): Whether the media is playing.
 - **`readyState`** (number, readonly): The current readiness state of the media.
 - **`networkState`** (number, readonly): The current network state of the media.
-- **`textTracks`** (TextTrackList, readonly): List of text tracks (captions).
+- **`textTracks`** (TextTrackList, readonly): List of text tracks. Each track supports `activeCues` and the `cuechange` event.
 - **`src`** (string): The URL of the composition.
 - **`currentSrc`** (string, readonly): The current URL of the composition.
 - **`error`** (MediaError, readonly): The current error state.
@@ -152,6 +152,12 @@ The player implements ARIA attributes for accessibility:
 ### Programmatic Control (Controller)
 
 You can also access the internal controller for advanced usage (though the Standard Media API on the element itself is preferred for basic control).
+
+The controller exposes methods like:
+- **`setInputProps(props)`**: Updates input properties.
+- **`setAudioTrackVolume(id, volume)`**: Sets volume for a specific track.
+- **`setAudioTrackMuted(id, muted)`**: Mutes/unmutes a specific track.
+- **`diagnose()`**: Returns a diagnostic report of the environment (WebCodecs, etc.).
 
 ```typescript
 const player = document.querySelector('helios-player');
