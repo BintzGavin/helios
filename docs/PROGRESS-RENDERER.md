@@ -1,3 +1,6 @@
+## RENDERER v1.62.1
+- ✅ Completed: Fix Pseudo-Element Preloading - Updated `DomStrategy` to correctly iterate over `::before` and `::after` pseudo-elements when discovering background images, fixing a regression where these assets were missed. Verified with `verify-pseudo-element-preload.ts`.
+
 ## RENDERER v1.62.0
 - ✅ Completed: Pseudo-Element Preload - Updated `DomStrategy` to recursively discover and preload background images and masks in `::before` and `::after` pseudo-elements, ensuring zero-artifact rendering for CSS-heavy compositions. Verified with `verify-pseudo-element-preload.ts`.
 

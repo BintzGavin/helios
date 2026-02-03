@@ -1,10 +1,11 @@
-**Version**: 1.62.0
+**Version**: 1.62.1
 
 **Posture**: MAINTENANCE WITH V2 EXPANSION
 
 # Renderer Agent Status
 
 ## Progress Log
+- [1.62.1] ✅ Completed: Fix Pseudo-Element Preloading - Updated `DomStrategy` to correctly iterate over `::before` and `::after` pseudo-elements when discovering background images, fixing a regression where these assets were missed. Verified with `verify-pseudo-element-preload.ts`.
 - [1.62.0] ✅ Completed: Pseudo-Element Preload - Updated `DomStrategy` to recursively discover and preload background images and masks in `::before` and `::after` pseudo-elements, ensuring zero-artifact rendering for CSS-heavy compositions. Verified with `verify-pseudo-element-preload.ts`.
 - [1.61.2] ✅ Completed: Update Verification Suite - Updated `run-all.ts` to include 3 orphaned verification scripts (`verify-audio-playback-rate.ts`, `verify-audio-playback-seek.ts`, `verify-visual-playback-rate.ts`), ensuring continuous regression testing for playback rate features.
 - [1.61.1] ✅ Completed: Fix Audio Playback Seek - Updated `FFmpegBuilder` to correctly calculate the audio input seek time (`-ss`) when using `playbackRate` and a `startFrame` > 0. Verified with `verify-audio-playback-seek.ts`.
@@ -44,15 +45,14 @@
 - [1.47.0] ✅ Completed: SeekTimeDriver Determinism - Updated `SeekTimeDriver` to enforce deterministic `Date.now()` by setting a fixed epoch (Jan 1, 2024), aligning DOM-based rendering determinism with Canvas-based rendering.
 - [1.46.0] ✅ Completed: CdpTimeDriver Determinism - Updated `CdpTimeDriver` to enforce deterministic `Date.now()` by setting `initialVirtualTime` to Jan 1, 2024 (UTC), ensuring frame consistency across runs.
 - [1.45.0] ✅ Completed: CdpTimeDriver Shadow DOM Sync - Updated `CdpTimeDriver` to recursively traverse Shadow DOMs using `TreeWalker` to find and synchronize `<video>` and `<audio>` elements, ensuring media sync in Canvas mode.
-- [1.44.0] ✅ Completed: Recursive Animation Discovery - Updated `SeekTimeDriver` to recursively traverse Shadow DOMs using `TreeWalker` to find and synchronize CSS animations and WAAPI animations, ensuring parity with media element sync.
+- [1.44.0] ✅ Completed: Recursive Animation Discovery - Updated `SeekTimeDriver` to recursively traverse Shadow DOMs using `TreeWalker` to find and synchronize CSS animations and WAAPI animations.
 - [1.43.1] ✅ Verified: Full Test Coverage - Executed full verification suite including FFmpeg diagnostics and CdpTimeDriver media sync, confirming all systems operational.
-- [1.43.0] ✅ Completed: Enable Shadow DOM Media Sync - Updated `SeekTimeDriver` to recursively traverse Shadow DOMs using `TreeWalker` to find and synchronize `<video>` and `<audio>` elements, and added `verify-shadow-dom-sync.ts`.
-- [1.42.0] ✅ Completed: Enable Browser Launch Configuration - Added `browserConfig` to `RendererOptions` to allow customizing Playwright launch arguments (headless, executablePath, args), and fixed workspace dependency issues.
-- [1.41.1] ✅ Completed: Restore Environment and Verify - Restored missing `node_modules` by resolving workspace dependency conflicts (temporarily aligning versions), installed Playwright browsers, and verified full test suite passes.
-- [1.41.0] ✅ Completed: Support Shadow DOM Audio Discovery - Updated `scanForAudioTracks` utility to recursively traverse Shadow DOM for media elements using `TreeWalker`, ensuring audio in Web Components is detected.
+- [1.43.0] ✅ Completed: Enable Shadow DOM Media Sync - Updated `SeekTimeDriver` to recursively traverse Shadow DOMs using `TreeWalker` to find and synchronize `<video>` and `<audio>` elements.
+- [1.42.0] ✅ Completed: Enable Browser Launch Configuration - Added `browserConfig` to `RendererOptions` to allow customizing Playwright launch arguments.
+- [1.41.0] ✅ Completed: Support Shadow DOM Audio Discovery - Updated `scanForAudioTracks` utility to recursively traverse Shadow DOM for media elements using `TreeWalker`.
 - [1.40.1] ✅ Completed: Enable Full Verification Coverage - Updated `run-all.ts` to include 6 additional verification scripts, and fixed `verify-dom-media-preload.ts` and `verify-dom-preload.ts` to be robust and self-contained.
 - [1.40.0] ✅ Completed: Implement WAAPI Sync - Updated `SeekTimeDriver` to manually iterate over `document.getAnimations()` and set `currentTime`, ensuring correct synchronization of CSS animations and transitions for DOM-based rendering.
-- [1.39.0] ✅ Completed: CdpTimeDriver Media Sync - Implemented manual synchronization for `<video>` and `<audio>` elements in `CdpTimeDriver` to respect `data-helios-offset` and `data-helios-seek`, and fixed regression tests to handle initial timeline drift.
+- [1.39.0] ✅ Completed: CdpTimeDriver Media Sync - Implemented manual synchronization for `<video>` and `<audio>` elements in `CdpTimeDriver` to respect `data-helios-offset` and `data-helios-seek`, enabling correct playback in Canvas renders.
 - [1.38.1] ✅ Completed: Fix Build and Dependencies - Updated `@helios-project/core` dependency to `2.7.1` in `packages/renderer`, modernized render script to use `tsx`, and fixed `verify-smart-codec-selection` test mock to support frame scanning.
 - [1.38.0] ✅ Completed: Canvas Implicit Audio - Implemented `scanForAudioTracks` utility and updated `CanvasStrategy` to automatically discover and include DOM-based audio/video elements in the render, unifying behavior with `DomStrategy`.
 - [1.37.1] ✅ Completed: Fix Workspace Dependency - Updated `@helios-project/core` dependency to `2.7.0` in `packages/renderer/package.json` to match local workspace version, restoring verification environment.

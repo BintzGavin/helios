@@ -97,20 +97,24 @@ export class DomStrategy implements RenderStrategy {
         const backgroundUrls = new Set();
 
         allElements.forEach((el) => {
-          const style = window.getComputedStyle(el);
-          const props = ['backgroundImage', 'maskImage', 'webkitMaskImage'];
+          const targets = [null, '::before', '::after'];
 
-          props.forEach(prop => {
-            const val = style[prop];
-            if (val && val !== 'none') {
-              // Extract URLs from "url('...'), url("...")"
-              const matches = val.matchAll(/url\\((['"]?)(.*?)\\1\\)/g);
-              for (const match of matches) {
-                if (match[2]) {
-                  backgroundUrls.add(match[2]);
+          targets.forEach(pseudo => {
+            const style = window.getComputedStyle(el, pseudo);
+            const props = ['backgroundImage', 'maskImage', 'webkitMaskImage'];
+
+            props.forEach(prop => {
+              const val = style[prop];
+              if (val && val !== 'none') {
+                // Extract URLs from "url('...'), url("...")"
+                const matches = val.matchAll(/url\\((['"]?)(.*?)\\1\\)/g);
+                for (const match of matches) {
+                  if (match[2]) {
+                    backgroundUrls.add(match[2]);
+                  }
                 }
               }
-            }
+            });
           });
         });
 
