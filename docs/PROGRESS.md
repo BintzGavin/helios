@@ -1,3 +1,6 @@
+### RENDERER v1.61.2
+- ✅ Completed: Update Verification Suite - Updated `run-all.ts` to include 3 orphaned verification scripts (`verify-audio-playback-rate.ts`, `verify-audio-playback-seek.ts`, `verify-visual-playback-rate.ts`).
+
 ### CORE v5.9.0
 - ✅ Completed: Reactive Virtual Time Getter - Exposed `isVirtualTimeBound` getter in `Helios` to allow consumers to verify synchronous virtual time binding.
 
