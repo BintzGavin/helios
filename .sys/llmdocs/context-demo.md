@@ -55,6 +55,7 @@ The `examples/` directory contains reference implementations for various framewo
 ### Solid
 - **solid-dom-animation**: Basic SolidJS + DOM.
 - **solid-canvas-animation**: Basic SolidJS + Canvas.
+- **solid-audio-visualization**: Real-time audio frequency analysis visualization.
 - **solid-captions-animation**: SolidJS signals for Helios SRT captions.
 - **solid-threejs-canvas-animation**: 3D animation with Three.js and SolidJS.
 - **solid-transitions**: Solid Transition Group.

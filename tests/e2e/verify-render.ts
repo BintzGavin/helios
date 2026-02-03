@@ -22,6 +22,8 @@ const CANVAS_OVERRIDES = new Set([
   'react-canvas-animation',
   'react-audio-visualization',
   'vue-audio-visualization',
+  'svelte-audio-visualization',
+  'solid-audio-visualization',
   'vue-canvas-animation',
   'svelte-canvas-animation',
   'solid-canvas-animation'
