@@ -1,4 +1,4 @@
-import { Renderer } from '@helios-project/renderer';
+import { Renderer, RenderOrchestrator, DistributedRenderOptions } from '@helios-project/renderer';
 import path from 'path';
 import fs from 'fs';
 import { getProjectRoot } from './discovery';
@@ -83,6 +83,7 @@ export interface StartRenderOptions {
   videoCodec?: string;
   pixelFormat?: string;
   inputProps?: Record<string, any>;
+  concurrency?: number;
 }
 
 export async function startRender(options: StartRenderOptions, serverPort: number): Promise<string> {
@@ -122,7 +123,7 @@ export async function startRender(options: StartRenderOptions, serverPort: numbe
       saveJobs();
 
       const fullUrl = `http://localhost:${serverPort}${options.compositionUrl}`;
-      console.log(`[RenderManager] Starting render job ${jobId} for ${fullUrl}`);
+      console.log(`[RenderManager] Starting render job ${jobId} for ${fullUrl} (concurrency: ${options.concurrency || 1})`);
 
       const fps = options.fps || 30;
       let durationInSeconds = options.duration || 10;
@@ -134,7 +135,7 @@ export async function startRender(options: StartRenderOptions, serverPort: numbe
         durationInSeconds = durationFrames / fps;
       }
 
-      const renderer = new Renderer({
+      const renderOptions: DistributedRenderOptions = {
         width: options.width || 1920,
         height: options.height || 1080,
         fps: fps,
@@ -144,10 +145,11 @@ export async function startRender(options: StartRenderOptions, serverPort: numbe
         videoBitrate: options.videoBitrate,
         videoCodec: options.videoCodec,
         pixelFormat: options.pixelFormat,
-        inputProps: options.inputProps
-      });
+        inputProps: options.inputProps,
+        concurrency: options.concurrency
+      };
 
-      await renderer.render(fullUrl, outputPath, {
+      await RenderOrchestrator.render(fullUrl, outputPath, renderOptions, {
         onProgress: (p) => {
           job.progress = p;
         },

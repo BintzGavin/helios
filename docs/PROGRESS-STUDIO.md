@@ -1,3 +1,6 @@
+## STUDIO v0.87.0
+- ✅ Completed: Distributed Rendering Config - Implemented concurrency control in the Studio Renders Panel and updated backend to use `RenderOrchestrator` for parallel rendering.
+
 ## STUDIO v0.86.0
 - ✅ Completed: Audio Mixer Solo - Implemented "Solo" functionality in Audio Mixer Panel, allowing isolation of individual audio tracks with mute state restoration.
 
