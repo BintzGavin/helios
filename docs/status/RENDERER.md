@@ -1,8 +1,9 @@
-**Version**: 1.61.1
+**Version**: 1.61.2
 
 # Renderer Agent Status
 
 ## Progress Log
+- [1.61.2] ✅ Completed: Update Verification Suite - Added orphaned verification scripts (`verify-audio-playback-rate.ts`, `verify-audio-playback-seek.ts`, `verify-visual-playback-rate.ts`) to `run-all.ts`, ensuring continuous regression testing.
 - [1.61.1] ✅ Completed: Fix Audio Playback Seek - Updated `FFmpegBuilder` to correctly calculate the audio input seek time (`-ss`) when using `playbackRate` and a `startFrame` > 0. Verified with `verify-audio-playback-seek.ts`.
 - [1.61.0] ✅ Completed: Enable Visual Playback Rate - Updated `SeekTimeDriver` and `CdpTimeDriver` to respect the `playbackRate` property (and attribute) on media elements, ensuring visual synchronization with audio speed changes.
 - [1.60.2] ✅ Completed: Fix Verification Suite - Updated `verify-audio-fades.ts` and `verify-audio-loop.ts` to handle the new `FFmpegConfig` return type from `getArgs`, resolving test failures and ensuring the verification suite passes.

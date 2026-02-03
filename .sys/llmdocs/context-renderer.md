@@ -1,109 +1,87 @@
-# Renderer Agent Context
+# Renderer Context
 
-## A. Strategy
-The Renderer operates on a "Dual-Path" architecture to support different use cases. The pipeline strictly enforces `strategy.prepare` (resource discovery/loading) before `timeDriver.prepare` (time freezing) to prevent deadlocks in CDP mode:
-1. **DOM Strategy (`DomStrategy`)**: Used for HTML/CSS-heavy compositions. It uses Playwright to capture screenshots of the page at each frame.
-   - **Drivers**: Uses `SeekTimeDriver` to manipulate `document.timeline` and sync media/CSS animations (supports Shadow DOM, enforces deterministic Jan 1 2024 epoch, handles GSAP timeline sync, supports media looping and visual playback rate).
-   - **Discovery**: Uses `dom-scanner` to recursively discover media elements (including Shadow DOM) and implements recursive preloading for `<img>` tags, `<video>` posters, SVG images, and CSS background/mask images. Supports automatic audio looping and playback rate adjustment for `<audio>` elements.
-   - **Output**: Best for sharp text and vector graphics.
-2. **Canvas Strategy (`CanvasStrategy`)**: Used for WebGL/Canvas-heavy compositions (e.g., Three.js, PixiJS). It captures the `<canvas>` context directly.
-   - **Drivers**: Uses `CdpTimeDriver` (Chrome DevTools Protocol) for precise virtual time control (supports Shadow DOM media sync, enforces deterministic Jan 2024 epoch, ensures sync-before-render order, waits for budget expiration, enforces stability timeout via `Runtime.terminateExecution`, supports media looping and visual playback rate).
-   - **Optimization**: Prioritizes H.264 (AVC) intermediate codec for hardware acceleration, falling back to VP8. Exposes `diagnose()` API to verify supported WebCodecs.
-   - **Output**: Best for high-performance 2D/3D graphics.
+## A. Strategy: Dual-Path Architecture
+The Renderer employs a "Dual-Path" architecture to handle different rendering needs:
 
-Both strategies pipe frame data directly to an FFmpeg process via stdin ("Zero Disk I/O"), ensuring high performance and low latency. Audio tracks from Blob URLs are extracted to memory and also piped to FFmpeg via additional pipes, avoiding temporary files. Video concatenation also constructs file lists in memory and pipes them to FFmpeg stdin, eliminating all temporary file creation.
+1.  **Canvas Strategy (`mode: 'canvas'`)**:
+    *   **Best For**: High-performance, pixel-perfect rendering of `<canvas>` elements (WebGL, Three.js, PixiJS).
+    *   **Mechanism**: Uses `WebCodecs` (H.264/VP8/VP9/AV1) to capture frames directly from the browser context.
+    *   **Flow**: Browser -> `VideoEncoder` -> `EncodedVideoChunk` -> Node.js (via `page.exposeFunction`) -> FFmpeg (stdin).
+    *   **Pros**: Fast, hardware-accelerated, supports transparency.
+    *   **Cons**: Requires WebCodecs support.
 
-The **RenderOrchestrator** enables Local Distributed Rendering by splitting a job into concurrent chunks and merging the results, utilizing multiple cores for faster processing.
+2.  **DOM Strategy (`mode: 'dom'`)**:
+    *   **Best For**: Complex HTML/CSS animations, GSAP, SVG.
+    *   **Mechanism**: Uses Playwright's `page.screenshot` (PNG/JPEG) to capture the entire viewport.
+    *   **Flow**: Browser -> `page.screenshot` -> Buffer -> Node.js -> FFmpeg (stdin).
+    *   **Pros**: Capture anything visible (HTML, CSS).
+    *   **Cons**: Slower (screenshot overhead), larger temporary data.
 
 ## B. File Tree
 ```
-packages/renderer/
-├── src/
-│   ├── drivers/
-│   │   ├── TimeDriver.ts       # Interface for time control
-│   │   ├── CdpTimeDriver.ts    # CDP-based time driver
-│   │   └── SeekTimeDriver.ts   # DOM-based time driver (WAAPI sync)
-│   ├── strategies/
-│   │   ├── RenderStrategy.ts   # Interface for strategies
-│   │   ├── CanvasStrategy.ts   # WebGL/Canvas capture
-│   │   └── DomStrategy.ts      # Screenshot capture
-│   ├── utils/
-│   │   ├── FFmpegBuilder.ts    # Argument generator
-│   │   ├── FFmpegInspector.ts  # Environment diagnostics
-│   │   ├── dom-scanner.ts      # Asset discovery
-│   │   └── blob-extractor.ts   # Blob URL extraction
-│   ├── Orchestrator.ts         # Distributed rendering logic
-│   ├── Renderer.ts             # Main Renderer class
-│   ├── index.ts                # Public exports
-│   └── types.ts                # Configuration interfaces
-├── scripts/                    # Self-contained verification scripts (integration tests)
-│   ├── verify-cancellation.ts  # Render cancellation test
-│   ├── verify-trace.ts         # Playwright trace generation test
-│   ├── verify-ffmpeg-path.ts   # FFmpeg binary path verification
-│   ├── verify-blob-audio.ts    # Blob audio extraction test
-│   └── ...                     # Other script-based tests
-└── tests/
-    ├── run-all.ts              # Test runner (executes comprehensive suite)
-    ├── verify-distributed.ts   # Distributed rendering test
-    ├── verify-browser-config.ts # Browser launch config test
-    ├── verify-waapi-sync.ts    # CSS animation sync test
-    ├── verify-seek-driver-determinism.ts # SeekDriver determinism test
-    ├── verify-cdp-media-sync-timing.ts # CdpDriver media sync timing test
-    ├── verify-shadow-dom-animations.ts # Shadow DOM animation sync test
-    ├── verify-shadow-dom-audio.ts # Shadow DOM audio test
-    ├── verify-shadow-dom-sync.ts  # Shadow DOM sync test (DOM Mode)
-    ├── verify-cdp-shadow-dom-sync.ts # Shadow DOM media sync test (Canvas Mode)
-    ├── verify-shadow-dom-images.ts # Shadow DOM image discovery test
-    ├── verify-enhanced-dom-preload.ts # Enhanced DOM preloading test
-    ├── verify-dom-audio-fades.ts # DOM audio fades test
-    ├── verify-audio-fades.ts   # Audio fades test
-    ├── verify-audio-loop.ts    # Audio looping test
-    ├── verify-audio-playback-rate.ts # Audio playback rate test
-    ├── verify-audio-playback-seek.ts # Audio playback seek test (Rate + StartFrame)
-    ├── verify-visual-playback-rate.ts # Visual playback rate test
-    ├── verify-frame-count.ts   # Precision frame count test
-    ├── verify-cdp-hang.ts      # CDP initialization order/deadlock test
-    ├── verify-cdp-driver.ts    # CdpDriver budget test
-    ├── verify-cdp-driver-timeout.ts # CdpDriver stability timeout test
-    ├── verify-diagnose.ts      # Codec diagnostics test
-    ├── verify-transparency.ts  # Transparency support test
-    ├── verify-canvas-strategy.ts # Canvas WebCodecs strategy test
-    ├── verify-video-loop.ts    # Video looping logic verification
-    └── ...                     # Other verification scripts
+packages/renderer/src/
+├── drivers/
+│   ├── CdpTimeDriver.ts       # Chrome DevTools Protocol time control
+│   ├── SeekTimeDriver.ts      # WAAPI/requestAnimationFrame time control
+│   └── TimeDriver.ts          # Interface
+├── strategies/
+│   ├── CanvasStrategy.ts      # WebCodecs capture implementation
+│   ├── DomStrategy.ts         # Screenshot capture implementation
+│   └── RenderStrategy.ts      # Abstract base class
+├── utils/
+│   ├── FFmpegBuilder.ts       # FFmpeg argument generation
+│   ├── FFmpegInspector.ts     # FFmpeg capability detection
+│   ├── blob-extractor.ts      # Blob URL extraction utility
+│   └── dom-scanner.ts         # Media element discovery
+├── Orchestrator.ts            # Distributed rendering manager
+├── Renderer.ts                # Main entry point class
+├── concat.ts                  # Video concatenation utility
+├── index.ts                   # Public exports
+└── types.ts                   # Configuration interfaces
 ```
 
-## C. Configuration
-The `RendererOptions` interface controls the render pipeline:
-- `width`, `height`: Output resolution.
-- `fps`: Target frame rate.
-- `durationInSeconds`: Total length of the video (fallback if `frameCount` is not set).
-- `frameCount`: Exact number of frames to render (overrides `durationInSeconds`).
-- `startFrame`: Frame to start rendering from (for range/distributed rendering).
-- `mode`: `'dom'` or `'canvas'`.
-- `canvasSelector`: CSS selector to target the canvas element in `'canvas'` mode (default `'canvas'`).
-- `browserConfig`: Object to customize Playwright browser launch (`headless`, `args`, `executablePath`).
-- `videoCodec`: `'libx264'` (default), `'copy'`, or others.
-- `audioCodec`: `'aac'` (default), `'libvorbis'`, etc.
-- `audioFilePath`: Path to external audio file to mix in.
-- `audioTracks`: List of audio tracks (files or `AudioTrackConfig` objects with `path`, `buffer`, `loop`, `volume`, `offset`, `playbackRate`).
-- `intermediateImageFormat`: `'png'` (default) or `'jpeg'` for DOM mode capture.
-- `intermediateImageQuality`: JPEG quality (0-100) if format is jpeg.
-- `stabilityTimeout`: Timeout for frame stability (default 30000ms).
-- `inputProps`: Object injected into the page as `window.__HELIOS_PROPS__`.
+## C. Configuration: RendererOptions
+The `RendererOptions` interface controls the rendering process:
 
-The `DistributedRenderOptions` interface extends `RendererOptions` with:
-- `concurrency`: Number of parallel workers (defaults to CPU count - 1).
+```typescript
+interface RendererOptions {
+  width: number;
+  height: number;
+  fps: number;
+  duration?: number;             // Duration in seconds (optional if startFrame/frameCount used)
+  startFrame?: number;           // Start frame index (default: 0)
+  frameCount?: number;           // Total frames to render (overrides duration)
+  mode: 'canvas' | 'dom';
+  quality?: number;              // 0-100 (for JPEG/WebP)
+  videoBitrate?: number;         // Target bitrate in bits/sec
+  videoCodec?: 'libx264' | 'libvpx' | 'libvpx-vp9' | 'libaom-av1' | 'copy';
+  audioCodec?: string;           // e.g., 'libmp3lame', 'aac'
+  audioBitrate?: string;         // e.g., '128k'
+  pixelFormat?: string;          // e.g., 'yuv420p', 'yuva420p'
+  crf?: number;                  // Constant Rate Factor
+  preset?: string;               // e.g., 'fast', 'slow'
+  audioFilePath?: string;        // Path to audio file
+  audioTracks?: AudioTrackConfig[]; // Multiple audio tracks
+  inputProps?: Record<string, any>; // Injected into window.__HELIOS_PROPS__
+  canvasSelector?: string;       // Selector for target canvas (mode: 'canvas')
+  browserConfig?: BrowserConfig; // Custom Playwright launch args
+  subtitles?: string;            // Path to SRT file for burning
+  intermediateImageFormat?: 'png' | 'jpeg'; // (mode: 'dom')
+  intermediateImageQuality?: number;        // (mode: 'dom')
+  intermediateVideoCodec?: string;          // (mode: 'canvas') e.g., 'avc1.4d002a'
+}
+```
 
 ## D. FFmpeg Interface
-The renderer spawns an FFmpeg process with the following key flags:
-- `-ss`: Input seek (for audio synchronization with range rendering).
-- `-f image2pipe`: Reads frames from stdin.
-- `-f concat -safe 0 -protocol_whitelist file,pipe -i -`: Reads concat list from stdin (for concatenation jobs).
-- `pipe:N`: Additional inputs for audio buffers (mapped to file descriptors).
-- `-c:v`: Video codec (e.g., `libx264`).
-- `-pix_fmt`: Pixel format (e.g., `yuv420p`).
-- `-vf`: Video filters (scaling, padding, subtitles).
-- `-af`: Audio filters (atempo, adelay, volume, afade).
-- `-c:a`: Audio codec (if audio is present).
-- `-t`: Duration.
-- Output path (last argument).
+The renderer communicates with FFmpeg via standard input (`stdin`) pipes.
+
+*   **Video Input**: Piped as raw bytestream (Annex B H.264 or IVF) or image sequence (PNG/JPEG) via `pipe:3`.
+*   **Audio Input**: Piped as raw PCM or compressed chunks via `pipe:4`, `pipe:5`, etc.
+*   **Standard Flags**:
+    *   `-y` (Overwrite output)
+    *   `-f image2pipe` (for DOM) or `-f h264`/`-f ivf` (for Canvas)
+    *   `-r <fps>` (Frame rate)
+    *   `-i pipe:N` (Input streams)
+    *   `-map` (Stream mapping)
+    *   `-c:v <codec>` (Video encoder)
+    *   `-pix_fmt <format>` (Pixel format)

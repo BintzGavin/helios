@@ -1,3 +1,6 @@
+### RENDERER v1.61.2
+- ✅ Completed: Update Verification Suite - Added orphaned verification scripts (`verify-audio-playback-rate.ts`, `verify-audio-playback-seek.ts`, `verify-visual-playback-rate.ts`) to `run-all.ts`, ensuring continuous regression testing.
+
 ### SKILLS v1.9.1
 - ✅ Completed: Daily Skills Review
     - Updated **Core Skill**: Added Audio Visualization hooks, `availableAudioTracks`, and `currentTime` signal.
