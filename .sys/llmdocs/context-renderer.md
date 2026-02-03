@@ -11,7 +11,7 @@ The Renderer operates on a "Dual-Path" architecture to support different use cas
    - **Optimization**: Prioritizes H.264 (AVC) intermediate codec for hardware acceleration, falling back to VP8. Exposes `diagnose()` API to verify supported WebCodecs.
    - **Output**: Best for high-performance 2D/3D graphics.
 
-Both strategies pipe frame data directly to an FFmpeg process via stdin ("Zero Disk I/O"), ensuring high performance and low latency. Audio tracks from Blob URLs are extracted to memory and also piped to FFmpeg via additional pipes, avoiding temporary files.
+Both strategies pipe frame data directly to an FFmpeg process via stdin ("Zero Disk I/O"), ensuring high performance and low latency. Audio tracks from Blob URLs are extracted to memory and also piped to FFmpeg via additional pipes, avoiding temporary files. Video concatenation also constructs file lists in memory and pipes them to FFmpeg stdin, eliminating all temporary file creation.
 
 The **RenderOrchestrator** enables Local Distributed Rendering by splitting a job into concurrent chunks and merging the results, utilizing multiple cores for faster processing.
 
@@ -93,6 +93,7 @@ The `DistributedRenderOptions` interface extends `RendererOptions` with:
 ## D. FFmpeg Interface
 The renderer spawns an FFmpeg process with the following key flags:
 - `-f image2pipe`: Reads frames from stdin.
+- `-f concat -safe 0 -protocol_whitelist file,pipe -i -`: Reads concat list from stdin (for concatenation jobs).
 - `pipe:N`: Additional inputs for audio buffers (mapped to file descriptors).
 - `-c:v`: Video codec (e.g., `libx264`).
 - `-pix_fmt`: Pixel format (e.g., `yuv420p`).
