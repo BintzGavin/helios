@@ -36,7 +36,8 @@ export async function extractBlobTracks(page: Page, tracks: AudioTrackConfig[]):
 
       if ('error' in extraction) {
         console.warn(`[BlobExtractor] Failed to extract blob ${track.path}: ${extraction.error}`);
-        updatedTracks.push(track);
+        // Do not add the track to updatedTracks if extraction fails.
+        // Passing a raw 'blob:' URL to FFmpeg will cause it to crash.
         continue;
       }
 
