@@ -1,3 +1,6 @@
+### DEMO v1.93.0
+- ✅ Completed: Solid Audio Visualization - Created `examples/solid-audio-visualization` demonstrating real-time audio analysis using SolidJS signals.
+
 ### CORE v5.8.0
 - ✅ Completed: Expose Fade Easing Metadata - Added `fadeEasing` to `AudioTrackMetadata` and updated `DomDriver` to parse `data-helios-fade-easing` attribute, exposing non-linear fade configurations to consumers.
 
