@@ -4,6 +4,7 @@ import { Helios } from './Helios.js';
 describe('Helios Subscription Timing', () => {
   let originalWindow: any;
   let originalDocument: any;
+  let helios: Helios<any>;
 
   beforeAll(() => {
     // Save original globals
@@ -46,6 +47,9 @@ describe('Helios Subscription Timing', () => {
   });
 
   afterEach(() => {
+    // Dispose Helios to cleanup virtual time hooks
+    helios?.dispose();
+
     // Cleanup window properties
     if (typeof window !== 'undefined') {
       delete (window as any).__HELIOS_VIRTUAL_TIME__;
@@ -53,7 +57,7 @@ describe('Helios Subscription Timing', () => {
   });
 
   it('should fire subscribe callback synchronously after seek()', () => {
-    const helios = new Helios({
+    helios = new Helios({
       fps: 30,
       duration: 10
     });
@@ -75,7 +79,7 @@ describe('Helios Subscription Timing', () => {
   });
 
   it('should fire subscribe callback synchronously after virtual time update', () => {
-    const helios = new Helios({
+    helios = new Helios({
       fps: 30,
       duration: 10
     });
@@ -103,7 +107,7 @@ describe('Helios Subscription Timing', () => {
   });
 
   it('should fire subscribers synchronously for multiple rapid updates', () => {
-    const helios = new Helios({
+    helios = new Helios({
       fps: 30,
       duration: 10
     });
@@ -129,7 +133,7 @@ describe('Helios Subscription Timing', () => {
   });
 
   it('should block waitUntilStable until virtual time is synced (polling fallback)', async () => {
-    const helios = new Helios({
+    helios = new Helios({
       fps: 30,
       duration: 10
     });
@@ -200,7 +204,7 @@ describe('Helios Subscription Timing', () => {
     // Simulate SeekTimeDriver setting virtual time BEFORE bind
     (window as any).__HELIOS_VIRTUAL_TIME__ = 0;
 
-    const helios = new Helios({ fps: 30, duration: 10 });
+    helios = new Helios({ fps: 30, duration: 10 });
     const frames: number[] = [];
     helios.subscribe((state) => frames.push(state.currentFrame));
 
