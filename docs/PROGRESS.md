@@ -1,3 +1,6 @@
+### STUDIO v0.83.0
+- ✅ Completed: Smart Empty State - Implemented and verified the "Empty State" component which guides users to create a composition (for fresh projects) or select one (for loaded projects), improving onboarding UX.
+
 ### CORE v5.7.0
 - ✅ Completed: Enable Audio State Persistence - Added `audioTracks` to `HeliosOptions` and updated constructor to initialize mixer state (volume/muted per track) from configuration, enabling full session save/load.
 

@@ -1,4 +1,4 @@
-**Version**: 0.82.0
+**Version**: 0.83.0
 
 # Studio Domain Status
 
@@ -7,6 +7,7 @@
 **Focus**: UI Implementation & CLI
 
 ## Recent Updates
+- [v0.83.0] ✅ Completed: Smart Empty State - Implemented and verified the "Empty State" component which guides users to create a composition (for fresh projects) or select one (for loaded projects), improving onboarding UX.
 - [v0.82.0] ✅ Completed: Stacked Timeline - Implemented multi-lane stacked timeline for audio tracks with dynamic vertical scrolling and sticky ruler, improving visibility of overlapping tracks.
 - [v0.81.1] ✅ Verified: Omnibar - Added comprehensive unit tests for the Omnibar component to ensure robustness and prevent regressions.
 - [v0.81.0] ✅ Completed: Timeline Audio Visualization - Implemented visualization of audio tracks on the timeline using `availableAudioTracks` metadata, separating it from runtime state.

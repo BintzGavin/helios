@@ -56,6 +56,7 @@ packages/studio/
 
 ## D. UI Components
 
+- **Stage**: Main preview area with Smart Empty State for onboarding.
 - **Timeline**: Visual timeline with scrubbing, playhead, markers, and multi-lane stacked audio track visualization.
 - **Props Editor**: Schema-aware input forms for composition properties.
 - **Assets Panel**: Drag-and-drop asset management.
