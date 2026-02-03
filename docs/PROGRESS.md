@@ -1,3 +1,6 @@
+### CORE v5.8.1
+- ✅ Completed: Verify GSAP Sync Timing - Verified synchronous subscription timing and hardened polling loop fallback for robust external driver synchronization.
+
 ### DOCS v1.8.0
 - ✅ Completed: Daily Documentation Review - Updated all Changelogs, API Docs (Core, Player, Renderer), created new Example Docs (Lottie, Svelte/Vue Audio Vis), updated Studio Guide, and verified navigation.
 

@@ -1095,6 +1095,10 @@ export class Helios<TInputProps = Record<string, any>> {
         const frame = (currentTime / 1000) * this._fps.value;
         if (frame !== this._currentFrame.peek()) {
           this._currentFrame.value = frame;
+        } else {
+          // Ensure subscribers are notified even if frame hasn't changed
+          // (parity with reactive virtual time setter)
+          this._syncVersion.value++;
         }
 
         this.driver.update(currentTime, {

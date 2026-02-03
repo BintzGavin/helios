@@ -57,3 +57,7 @@
 ## [5.7.0] - Driver State Visibility
 **Learning:** `DomDriver` implemented `fadeEasing` logic internally but failed to expose the configuration in `AudioTrackMetadata`, causing a gap where the Renderer could not replicate the behavior.
 **Action:** When adding features to Drivers (like `DomDriver`), always ensure the configuration data is reflected in the public state (e.g. `availableAudioTracks` signal) for external consumers.
+
+## [5.8.1] - Sync Robustness & Race Conditions
+**Learning:** Verified that `helios.subscribe` fires synchronously when signals update. The "black video" issue in Renderer/Promo Video is likely a race condition where the Renderer attempts to drive the timeline before the Composition (main.js) has initialized and subscribed.
+**Action:** When debugging sync issues, assume Core signals are synchronous and look for lifecycle mismatches (e.g. binding late). Also, ensure fallback mechanisms (like polling loops) strictly mirror the logic of the primary mechanism (reactive setters) to avoid edge-case failures.
