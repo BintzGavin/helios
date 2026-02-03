@@ -3,6 +3,8 @@
 # Renderer Agent Status
 
 ## Progress Log
+- [2026-08-05] ✅ Planned: Visual Playback Rate - Created plan `2026-08-05-RENDERER-Visual-Playback-Rate.md` to fix A/V desync by enabling `playbackRate` support in `SeekTimeDriver` and `CdpTimeDriver`.
+- [2026-08-03] ✅ Planned: Refactor Concat to Pipe - Created plan to refactor `concatenateVideos` to pipe file list to FFmpeg, completing the "Zero Disk I/O" vision.
 - [1.60.0] ✅ Completed: Enable Audio Playback Rate - Updated `AudioTrackConfig` to include `playbackRate`, and implemented `atempo` filter chaining in `FFmpegBuilder` to support speed adjustments (including values outside 0.5-2.0 range). Also updated `DomScanner` to extract `playbackRate` from media elements.
 - [1.59.0] ✅ Completed: Local Distributed Rendering - Implemented `RenderOrchestrator` to split render jobs into concurrent chunks and concatenate them, enabling faster local rendering. Also refactored `Renderer` to its own file to support this architecture.
 - [1.58.0] ✅ Completed: Zero Disk Audio - Refactored `blob-extractor.ts` and `FFmpegBuilder.ts` to pipe audio buffers directly to FFmpeg via stdio pipes (`pipe:N`), eliminating temporary file creation for Blob audio tracks and improving security and performance.

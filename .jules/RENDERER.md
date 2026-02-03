@@ -3,6 +3,7 @@
 # Renderer Agent Status
 
 ## Progress Log
+- [2026-08-05] ✅ Planned: Visual Playback Rate - Created plan `2026-08-05-RENDERER-Visual-Playback-Rate.md` to fix A/V desync by enabling `playbackRate` support in `SeekTimeDriver` and `CdpTimeDriver`.
 - [2026-08-03] ✅ Planned: Refactor Concat to Pipe - Created plan to refactor `concatenateVideos` to pipe file list to FFmpeg, completing the "Zero Disk I/O" vision.
 - [1.58.0] ✅ Completed: Zero Disk Audio - Refactored `blob-extractor.ts` and `FFmpegBuilder.ts` to pipe audio buffers directly to FFmpeg via stdio pipes (`pipe:N`), eliminating temporary file creation for Blob audio tracks and improving security and performance.
 - [1.57.3] ✅ Completed: Enable Looping Media Verification - Updated `packages/renderer/package.json` to depend on `@helios-project/core` version `5.1.1` (matching local workspace), allowing `verify-video-loop.ts` to run and confirm correct looping media implementation in `SeekTimeDriver` and `CdpTimeDriver`.
@@ -243,3 +244,7 @@
 ## [2026-08-03] - Zero Disk I/O: Concat Refactor
 **Learning:** `concatenateVideos` was the last holdout for disk-based operations. Refactoring it to use pipe input completes the "Zero Disk I/O" vision.
 **Action:** Created plan to refactor `concat.ts` to use pipe input.
+
+## [2026-08-05] - Visual Playback Rate Gap
+**Learning:** Identified a critical synchronization gap where `DomScanner` extracts `playbackRate` and `FFmpegBuilder` respects it (audio), but `TimeDriver` (visual) ignores it. This causes A/V desync.
+**Action:** Future feature implementations must verify end-to-end support across both Audio (FFmpeg) and Video (TimeDriver) subsystems.
