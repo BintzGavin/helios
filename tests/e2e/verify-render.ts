@@ -26,7 +26,8 @@ const CANVAS_OVERRIDES = new Set([
   'solid-audio-visualization',
   'vue-canvas-animation',
   'svelte-canvas-animation',
-  'solid-canvas-animation'
+  'solid-canvas-animation',
+  'react-pixi-animation'
 ]);
 
 const DURATION_OVERRIDES: Record<string, number> = {

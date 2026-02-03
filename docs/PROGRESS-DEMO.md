@@ -1,3 +1,6 @@
+## DEMO v1.98.0
+- ✅ Completed: React Pixi Animation - Created `examples/react-pixi-animation` demonstrating integration with PixiJS v8 and React.
+
 ## DEMO v1.97.0
 - ✅ Completed: Svelte Lottie Animation - Created `examples/svelte-lottie-animation` demonstrating integration with `lottie-web` in Svelte 5.
 
