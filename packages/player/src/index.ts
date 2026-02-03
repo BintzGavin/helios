@@ -1064,9 +1064,11 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
     if (!this.controller) return;
     // Helios "muted" is the inverse of AudioTrack "enabled"
     this.controller.setAudioTrackMuted(track.id, !track.enabled);
+    this._audioTracks.dispatchChangeEvent();
   }
 
   public handleTrackModeChange(track: HeliosTextTrack) {
+    this._textTracks.dispatchChangeEvent();
     if (!this.controller) return;
 
     if (track.mode === 'showing') {
