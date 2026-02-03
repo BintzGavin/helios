@@ -236,4 +236,86 @@ describe('StudioContext', () => {
       expect(mockController.seek).not.toHaveBeenCalled();
     });
   });
+
+  describe('Timeline Persistence', () => {
+    let getItemSpy: any;
+    let setItemSpy: any;
+
+    beforeEach(() => {
+      getItemSpy = vi.spyOn(Storage.prototype, 'getItem');
+      setItemSpy = vi.spyOn(Storage.prototype, 'setItem');
+    });
+
+    afterEach(() => {
+      vi.restoreAllMocks();
+    });
+
+    it('saves timeline state when inPoint/outPoint/loop changes', async () => {
+      let context: any;
+
+      render(
+        <StudioProvider>
+          <TestComponent onReady={(ctx) => { context = ctx; }} />
+        </StudioProvider>
+      );
+
+      await waitFor(() => expect(context).toBeDefined());
+
+      // Simulate active composition
+      act(() => {
+        context.setActiveComposition({ id: 'comp-1', name: 'Test', url: '' });
+      });
+
+      // Change inPoint
+      act(() => {
+        context.setInPoint(10);
+      });
+
+      expect(setItemSpy).toHaveBeenCalledWith(
+        'helios-studio:timeline:comp-1',
+        expect.stringContaining('"inPoint":10')
+      );
+    });
+
+    it('restores timeline state when composition loads', async () => {
+      // Mock saved state
+      getItemSpy.mockReturnValue(JSON.stringify({
+        inPoint: 20,
+        outPoint: 100,
+        loop: true,
+        frame: 50
+      }));
+
+      let context: any;
+
+      render(
+        <StudioProvider>
+          <TestComponent onReady={(ctx) => { context = ctx; }} />
+        </StudioProvider>
+      );
+
+      await waitFor(() => expect(context).toBeDefined());
+
+      // Simulate setting active composition, which triggers loadTimelineState
+      act(() => {
+        context.setActiveComposition({ id: 'comp-2', name: 'Test 2', url: '' });
+      });
+
+      // Verify state restored
+      await waitFor(() => {
+        expect(context.inPoint).toBe(20);
+        expect(context.outPoint).toBe(100);
+        expect(context.loop).toBe(true);
+      });
+
+      // Verify pending seek handled when controller becomes available
+      act(() => {
+        context.setController(mockController);
+      });
+
+      await waitFor(() => {
+        expect(mockController.seek).toHaveBeenCalledWith(50);
+      });
+    });
+  });
 });
