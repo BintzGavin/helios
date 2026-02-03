@@ -1,6 +1,6 @@
 # Status: DEMO Domain
 
-**Version**: 1.90.0
+**Version**: 1.91.0
 
 ## Vision
 The DEMO domain is responsible for:
@@ -9,12 +9,13 @@ The DEMO domain is responsible for:
 3.  **Build Config:** Maintaining the root `vite.config.js` and build scripts to support the examples.
 
 ## Blocked Items
-- None
+- **Root Build Dependency Mismatch**: The `packages/studio`, `packages/player`, and `packages/renderer` have desynchronized dependencies on `@helios-project/core` (requiring `5.5.0` or `^5.4.0` while workspace is `5.7.0`), causing `npm install` to fail at the root. This blocks clean builds of examples without manual intervention.
 
 ## Active Tasks
 - None
 
 ## Completed Tasks
+- [v1.91.0] ✅ Completed: Lottie Animation - Created `examples/lottie-animation` demonstrating integration with `lottie-web` driven by Helios timeline.
 - [v1.90.0] ✅ Completed: Vue Audio Visualization - Created `examples/vue-audio-visualization` demonstrating real-time audio analysis (RMS, waveforms) using synthesized `AudioBuffer` and Vue 3.
 - [v1.89.0] ✅ Completed: Refactor Podcast Visualizer - Refactored `examples/podcast-visualizer` to use `AudioContext` for real-time analysis, replacing simulated animations.
 - [v1.88.0] ✅ Completed: Verify Excalidraw Example - Verified build and rendering of `examples/excalidraw-animation` and added to documentation.
