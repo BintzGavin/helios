@@ -46,7 +46,7 @@ For transparency and educational purposes, the complete prompts used to orchestr
 **A programmatic video engine that runs on web standards.**  
 Stop reinventing animation in JavaScript. Use the platform.
 
-[The Thesis](#the-thesis) • [Quick Start](#quick-start) • [Why Helios?](#why-helios) • [Documentation](#architecture) • [Roadmap](#roadmap-the-future-of-helios)
+[The Thesis](#the-thesis) • [Quick Start](#quick-start) • [Why Helios?](#why-helios) • [Documentation](#architecture) • [Roadmap](#roadmap--governance)
 
 </div>
 
@@ -530,97 +530,16 @@ See [`docs/BACKLOG.md`](./docs/BACKLOG.md) for the full task list.
 
 ---
 
-## Roadmap: The Future of Helios
+## Roadmap & Governance
 
-<!-- AGENT_ROADMAP_START: Planning agents use this to identify features to build -->
+The authoritative roadmap and project direction are defined in [`AGENTS.md`](./AGENTS.md).
 
-### V1.x: Captions & Audio
-**Planned:**
-- Caption generation via Whisper integration
-- Text-to-speech integration
+This document serves as the single source of truth for:
+- V2 Platform Direction
+- Domain Posture (Core, Renderer, Studio, etc.)
+- Governance Laws
 
-### V1.x: AI Integration Parity
-**Planned:**
-- MCP Server (`@helios-engine/mcp`) for Cursor/VS Code
-- Publishable Agent Skills (`npx @helios-engine/skills add`)
-- AI chatbot for documentation help
-- `.md` URL suffix for documentation
-
-### V1.x: Architecture Hardening
-
-Three structural improvements to move Helios from "clever hack" to "stable standard":
-
-#### 1. TimeDriver Abstraction
-
-Currently, Helios's time control relies on CDP hacks (production) and WAAPI seeking (preview). This works, but couples the library to implementation details that browsers could tighten.
-
-**The Fix:** Introduce a `TimeDriver` interface that abstracts the source of truth for time.
-
-```typescript
-// User code (clean API)
-director.seek(1500); // Seek to 1.5 seconds
-
-// Under the hood:
-// - Preview: TimeDriver updates CSS variables or WAAPI currentTime
-// - Production: TimeDriver calls CDP setVirtualTimePolicy
-```
-
-**Why:** This decoupling protects the library from breaking when browsers inevitably tighten security around read-only native properties. The public API stays stable even as the underlying mechanism evolves.
-
-#### 2. Signal-Based State
-
-Remotion ties frame numbers to React State. This is its biggest performance bottleneck—React is not designed to re-render a component tree 60 times per second. It creates massive garbage collection overhead and "jank."
-
-**The Fix:** Adopt a Signal-based architecture (similar to SolidJS or Preact Signals) for the animation loop.
-
-```typescript
-// Signals: fine-grained updates
-const opacity = signal(0);
-opacity.value = 1; // Only the bound DOM node updates—not the entire tree
-```
-
-**Why:** Signals allow fine-grained updates. Changing `opacity` from 0 to 1 updates only that DOM node's style attribute—not the entire component tree. This would allow Helios to render scenes with thousands of animated elements at 60 FPS in the previewer, whereas Remotion often drops to 5-10 FPS on complex timelines because it's thrashing the React Reconciler.
-
-#### 3. Client-Side WebCodecs as Primary Export
-
-Currently, Helios supports WebCodecs but server-side rendering (headless Chrome + FFmpeg) remains the primary path. Remotion has the same architecture—expensive servers, slow to scale.
-
-**The Fix:** Fully commit to **client-side WebCodecs as the primary export target**.
-
-```typescript
-// User's browser does all the work
-const encoder = new VideoEncoder({ ... });
-// → Render to OffscreenCanvas
-// → Encode with local GPU
-// → Download MP4 directly
-```
-
-**Why:** This creates a "Canva-like" experience where the user's own hardware does the compute, reducing infrastructure costs to near zero. Server-side rendering becomes a fallback for low-power devices or background batch jobs—not the default.
-
-| Export Path | Current | Planned |
-|-------------|---------|---------|
-| **Primary** | Server (Headless Chrome + FFmpeg) | Client (WebCodecs + local GPU) |
-| **Fallback** | Client (experimental) | Server (batch/low-power devices) |
-
-### V2: Distributed Rendering
-Scalable serverless rendering on AWS Lambda or Google Cloud Run.
-
-**Status:** 🟡 **Beta (Local Orchestrator Implemented)**
-
-**Architecture:**
-1. Orchestrator divides video into N frame-range chunks
-2. N parallel workers render chunks
-3. FFmpeg `concat` demuxer losslessly stitches MP4 chunks
-
-**Critical Detail:** Only the concat *demuxer* supports lossless MP4 stitching. The concat filter and protocol are unsuitable.
-
-### V2: Advanced Audio Engine
-Integration with Tone.js for generative audio and real-time effects.
-
-### V3: Native Node.js Encoding
-Replace spawned FFmpeg with `beamcoder` for in-process encoding via FFmpeg C bindings.
-
-<!-- AGENT_ROADMAP_END -->
+Please refer to `AGENTS.md` to understand where Helios is going and how to contribute.
 
 ---
 
@@ -734,103 +653,6 @@ This license allows us to build a SaaS platform around Helios while enabling a t
 If you need to offer Helios Engine as a managed service or have questions about commercial licensing, please [contact us](mailto:me@gavinbintz.com).
 
 See [LICENSE](LICENSE) for full text.
-
----
-
-## Services & Commercial Offerings
-
-Helios Engine is free and open source, allowing you to build video creation applications without restrictions. To support ongoing development and provide managed infrastructure, we plan to offer the following commercial services in the future:
-
-### Helios API (API as a Service) 🚀 *Primary Service*
-
-**Programmatic video rendering without managing infrastructure.**
-
-Render videos programmatically via REST API. Ideal for developers who want to integrate video creation into their applications without managing rendering infrastructure, GPU acceleration, or distributed rendering systems.
-
-**Planned Features:**
-- **REST API** - Simple HTTP endpoints for video rendering
-- **Webhook notifications** - Get notified when renders complete
-- **Queue management** - Priority queues, batch rendering, job status tracking
-- **Distributed rendering** - Leverage our infrastructure for fast, scalable rendering
-- **Multiple formats** - MP4, WebM, GIF, and more
-- **Custom resolutions** - Render at any resolution up to 4K
-- **SDKs** - Official SDKs for popular languages (JavaScript, Python, etc.)
-
-**Use Cases:**
-- Integrate video generation into your SaaS platform
-- Build automated video workflows
-- Generate personalized videos at scale
-- Create video content from templates and data
-- Add video creation capabilities to existing applications
-
-**Pricing Model (Planned):**
-- **Pay-as-you-go** - Per-minute rendering costs
-- **Render credits** - Bulk purchases with discounts
-- **Free tier** - Limited renders per month for testing and development
-- **Enterprise plans** - Custom pricing with SLA guarantees, dedicated infrastructure
-
-This service is designed for developers and teams who want the power of Helios Engine without the complexity of managing rendering infrastructure. Perfect for founders building video platforms who need reliable, scalable rendering infrastructure.
-
-### Helios Cloud (Managed Platform)
-
-**A hosted video creation platform powered by Helios Engine.**
-
-A full-featured SaaS platform for creating, editing, and managing videos. Built on Helios Engine, providing a user-friendly interface for non-technical users while leveraging the performance of the underlying engine.
-
-**Planned Features:**
-- Web-based video editor
-- Integrations with data sources (e.g. databases, APIs)
-- Template library with pre-built templates for common use cases
-- Collaboration tools for teams
-- Asset management (images, videos, audio, fonts)
-- Analytics and insights
-
-**Target Users:**
-- Content creators
-- Marketing teams
-- Agencies
-- Non-technical users who want video creation capabilities
-
-### Enterprise Services
-
-**For organizations with advanced requirements:**
-
-- **Enterprise Support** - SLA-backed support, dedicated account management, priority assistance
-- **Professional Services** - Custom implementations, integrations, architecture consulting
-- **On-Premise Deployments** - Self-hosted Helios Engine for organizations with security/compliance requirements
-- **Commercial Licensing** - For companies that want to offer Helios Engine as a managed service to their customers
-- **Training & Certification** - Developer training, best practices workshops, official certification programs
-
-### Marketplace & Ecosystem
-
-**A marketplace for Helios extensions and assets:**
-
-- **Template Marketplace** - Video templates created by the community
-- **Plugin System** - Extensions and integrations for Helios Engine
-- **Asset Marketplace** - Stock footage, music, graphics optimized for Helios
-- **Integration Marketplace** - Pre-built integrations with popular tools and platforms
-
-### Our Business Model
-
-**Free engine, paid infrastructure and services.**
-
-Similar to successful open-source companies like MongoDB (Atlas), Elastic (Elastic Cloud), and GitLab (GitLab.com), we believe in:
-
-- **Open source core** - Helios Engine remains free and open source forever
-- **Managed services** - Pay for convenience, scale, and support
-- **Ecosystem growth** - Marketplace and community-driven extensions
-
-This model ensures:
-- ✅ Unlimited adoption of Helios Engine (no licensing barriers)
-- ✅ Sustainable business to support long-term development
-- ✅ Thriving ecosystem of products built on Helios
-- ✅ Multiple options for users (self-hosted or managed services)
-
-**For developers:** Use Helios Engine for free. Build your applications, deploy your own infrastructure, and scale as needed.
-
-**For teams that want managed infrastructure:** Use Helios API or Helios Cloud to offload infrastructure management and focus on building your product.
-
-We're committed to keeping Helios Engine open source and free, while building sustainable commercial services that add value for teams that need managed infrastructure and support.
 
 ---
 

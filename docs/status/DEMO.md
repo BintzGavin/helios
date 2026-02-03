@@ -2,6 +2,8 @@
 
 **Version**: 1.96.0
 
+**Posture**: ACTIVELY EXPANDING FOR V2
+
 ## Vision
 The DEMO domain is responsible for:
 1.  **Examples:** Providing clear, idiomatic usage examples for all supported frameworks (React, Vue, Svelte, Vanilla).
