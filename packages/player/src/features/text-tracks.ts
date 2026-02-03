@@ -75,6 +75,7 @@ export class HeliosTextTrack extends EventTarget {
     if (this._mode === 'disabled') {
       if (this._activeCues.length > 0) {
         this._activeCues = [];
+        this.dispatchEvent(new Event('cuechange'));
       }
       return;
     }

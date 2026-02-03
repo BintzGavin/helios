@@ -112,4 +112,21 @@ describe('HeliosTextTrack', () => {
         track.dispatchEvent(new Event('cuechange'));
         expect(spy).toHaveBeenCalled();
     });
+
+    it('should dispatch cuechange event when activeCues are cleared due to disabling', () => {
+        const cue = new CueClass(0, 5, 'Hello');
+        track.addCue(cue);
+        track.mode = 'showing';
+        track.updateActiveCues(2);
+        expect(track.activeCues).toHaveLength(1);
+
+        const spy = vi.fn();
+        track.addEventListener('cuechange', spy);
+
+        track.mode = 'disabled';
+        track.updateActiveCues(2);
+
+        expect(track.activeCues).toHaveLength(0);
+        expect(spy).toHaveBeenCalledTimes(1);
+    });
 });

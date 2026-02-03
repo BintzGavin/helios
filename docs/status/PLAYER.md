@@ -1,4 +1,4 @@
-**Version**: v0.63.0
+**Version**: v0.63.1
 
 # Status: PLAYER
 
@@ -56,6 +56,7 @@
 ## Critical Task
 - **None**: All critical tasks completed.
 
+[v0.63.1] ✅ Completed: Fix cuechange on Disable - Fixed bug where disabling a track cleared active cues without dispatching the cuechange event.
 [v0.63.0] ✅ Completed: Implement Active Cues - Added `activeCues` property and `cuechange` event to `HeliosTextTrack`, and updated `HeliosPlayer` to drive cue updates via the main UI loop.
 [v0.62.1] ✅ Completed: Fix SRT Export Filename - Updated SRT export to respect `export-filename` attribute instead of using hardcoded "captions.srt".
 [v0.62.0] ✅ Verified: Export Filename - Confirmed implementation and tests for `export-filename` attribute. Synced package.json version.

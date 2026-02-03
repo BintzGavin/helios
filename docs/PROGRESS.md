@@ -1,3 +1,6 @@
+### PLAYER v0.63.1
+- ✅ Completed: Fix cuechange on Disable - Fixed bug where disabling a track cleared active cues without dispatching the cuechange event.
+
 ### CORE v5.8.0
 - ✅ Completed: Expose Fade Easing Metadata - Added `fadeEasing` to `AudioTrackMetadata` and updated `DomDriver` to parse `data-helios-fade-easing` attribute, exposing non-linear fade configurations to consumers.
 
