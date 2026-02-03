@@ -81,6 +81,8 @@ async function verifyStudio() {
     // But verify_studio.py used "Renders" text.
 
     // Let's verify Renders panel tab existence
+    // Disable pointer events on stage to prevent interception
+    await page.addStyleTag({ content: '.area-stage { pointer-events: none !important; }' });
     await page.getByText('Renders').click();
     console.log('✅ Clicked Renders tab');
     await page.waitForSelector('text=No render jobs');
