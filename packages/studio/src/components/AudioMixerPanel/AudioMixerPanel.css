@@ -85,6 +85,33 @@
   gap: 8px;
 }
 
+.track-solo-btn {
+  background: transparent;
+  border: 1px solid #444;
+  color: #aaa;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  width: 24px;
+  height: 24px;
+  font-size: 0.8rem;
+  font-weight: bold;
+}
+
+.track-solo-btn:hover {
+  border-color: #666;
+  color: #fff;
+}
+
+.track-solo-btn.active {
+  background: #ffb300;
+  border-color: #ffb300;
+  color: #121212;
+}
+
 .track-mute-btn {
   background: transparent;
   border: none;

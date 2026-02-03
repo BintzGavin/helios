@@ -7,6 +7,8 @@ export const AudioMixerPanel: React.FC = () => {
   const { controller } = useStudio();
   const [tracks, setTracks] = useState<AudioAsset[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [soloTrackId, setSoloTrackId] = useState<string | null>(null);
+  const [muteSnapshot, setMuteSnapshot] = useState<Record<string, boolean>>({});
 
   const fetchTracks = useCallback(async () => {
     if (!controller) return;
@@ -53,6 +55,55 @@ export const AudioMixerPanel: React.FC = () => {
     ));
   };
 
+  const handleSoloToggle = (id: string) => {
+    if (!controller) return;
+
+    if (soloTrackId === id) {
+      // Deactivate Solo
+      setSoloTrackId(null);
+
+      // Restore mutes from snapshot
+      const newTracks = tracks.map(t => {
+        const originalMuted = muteSnapshot[t.id] ?? t.muted;
+        if (t.muted !== originalMuted) {
+          controller.setAudioTrackMuted(t.id, originalMuted);
+        }
+        return { ...t, muted: originalMuted };
+      });
+
+      setTracks(newTracks);
+      setMuteSnapshot({});
+    } else {
+      // Activate Solo (or switch target)
+      let snapshot = muteSnapshot;
+
+      // If starting fresh solo session, capture snapshot
+      if (soloTrackId === null) {
+        snapshot = {};
+        tracks.forEach(t => {
+          snapshot[t.id] = !!t.muted;
+        });
+        setMuteSnapshot(snapshot);
+      }
+
+      setSoloTrackId(id);
+
+      // Mute all others, Unmute target
+      const newTracks = tracks.map(t => {
+        const shouldBeMuted = t.id !== id;
+
+        // Only call controller if state changes
+        if (!!t.muted !== shouldBeMuted) {
+          controller.setAudioTrackMuted(t.id, shouldBeMuted);
+        }
+
+        return { ...t, muted: shouldBeMuted };
+      });
+
+      setTracks(newTracks);
+    }
+  };
+
   return (
     <div className="audio-mixer-panel">
       <div className="mixer-header">
@@ -87,9 +138,19 @@ export const AudioMixerPanel: React.FC = () => {
 
                 <div className="track-controls">
                   <button
+                    className={`track-solo-btn ${soloTrackId === track.id ? 'active' : ''}`}
+                    onClick={() => handleSoloToggle(track.id)}
+                    title="Solo"
+                  >
+                    S
+                  </button>
+
+                  <button
                     className={`track-mute-btn ${isMuted ? 'active' : ''}`}
                     onClick={() => handleMuteToggle(track.id)}
                     title={isMuted ? "Unmute" : "Mute"}
+                    disabled={soloTrackId !== null && soloTrackId !== track.id}
+                    style={{ opacity: (soloTrackId !== null && soloTrackId !== track.id) ? 0.5 : 1 }}
                   >
                     {isMuted ? '🔇' : '🔊'}
                   </button>
