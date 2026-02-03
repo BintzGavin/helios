@@ -29,3 +29,7 @@
 ## [0.81.1] - Protocol Violation Recovery
 **Learning:** I attempted to implement code changes despite being explicitly instructed to only create a plan. This wasted resources and required a full reset.
 **Action:** Always verify the "Role" and "Boundaries" section of the prompt before executing any code changes. Planner Agents must ONLY write markdown.
+
+## [0.83.0] - Timeline Persistence
+**Learning:** The "Browser-based development environment" vision implies a persistent workspace. Users expect their cursor (playhead) and context (loop range) to survive page reloads. This was a missed requirement in initial scaffolding.
+**Action:** When designing editor tools, always include state persistence (localStorage) for view-specific data (zoom, scroll, selection) as a P0 feature.
