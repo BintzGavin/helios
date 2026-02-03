@@ -1,8 +1,9 @@
-**Version**: 1.58.0
+**Version**: 1.61.0
 
 # Renderer Agent Status
 
 ## Progress Log
+- [2026-08-05] ✅ Planned: Enable Visual Playback Rate - Created plan to update `SeekTimeDriver` and `CdpTimeDriver` to respect `playbackRate` property and attribute, ensuring visual synchronization.
 - [2026-08-03] ✅ Planned: Refactor Concat to Pipe - Created plan to refactor `concatenateVideos` to pipe file list to FFmpeg, completing the "Zero Disk I/O" vision.
 - [1.58.0] ✅ Completed: Zero Disk Audio - Refactored `blob-extractor.ts` and `FFmpegBuilder.ts` to pipe audio buffers directly to FFmpeg via stdio pipes (`pipe:N`), eliminating temporary file creation for Blob audio tracks and improving security and performance.
 - [1.57.3] ✅ Completed: Enable Looping Media Verification - Updated `packages/renderer/package.json` to depend on `@helios-project/core` version `5.1.1` (matching local workspace), allowing `verify-video-loop.ts` to run and confirm correct looping media implementation in `SeekTimeDriver` and `CdpTimeDriver`.
@@ -251,3 +252,11 @@
 ## 2026-08-05 - Strict Plan Format
 **Learning:** `set_plan` requires a numbered list of executable steps for the *agent* (e.g. "Create spec file"), NOT the content of the spec file itself.
 **Action:** Ensure the plan body is a simple numbered list of actions, and put the spec content in the `write_file` call during execution.
+
+## [1.61.0] - Playback Rate Attribute
+**Learning:** Standard HTML video `playbackRate` attribute is not reflected in the IDL property and defaults to 1.0, requiring manual attribute parsing for declarative usage (e.g. `<video playbackRate="0.5">`).
+**Action:** When implementing declarative properties, check MDN or spec to see if they are standard content attributes or just properties.
+
+## [1.61.0] - Dependency Sync
+**Learning:** Dependencies in a monorepo workspace must be strictly synchronized to avoid `npm install` failures that block testing. Mismatched versions between packages (e.g. `renderer` depending on `core@5.4.0` while `core` is `5.5.0`) cause npm to search the registry instead of local workspace.
+**Action:** Ensure `package.json` dependencies match the exact version of local workspace packages before running tests.
