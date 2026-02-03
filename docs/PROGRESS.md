@@ -1,3 +1,6 @@
+### DEMO v1.94.0
+- ✅ Completed: Vue Lottie Animation - Created `examples/vue-lottie-animation` demonstrating integration with `lottie-web` in Vue 3.
+
 ### CORE v5.9.0
 - ✅ Completed: Reactive Virtual Time Getter - Exposed `isVirtualTimeBound` getter in `Helios` to allow consumers to verify synchronous virtual time binding.
 

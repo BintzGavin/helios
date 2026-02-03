@@ -40,6 +40,7 @@ The `examples/` directory contains reference implementations for various framewo
 - **vue-threejs-canvas-animation**: 3D animation with Three.js and Vue.
 - **vue-transitions**: Vue `<Transition>` component.
 - **vue-animation-helpers**: Helper components for sequencing.
+- **vue-lottie-animation**: Rendering Lottie JSON animations.
 
 ### Svelte
 - **svelte-dom-animation**: Basic Svelte + DOM.
