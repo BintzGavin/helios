@@ -766,6 +766,34 @@ describe('DomDriver', () => {
       driver.update(1200, { isPlaying: false, playbackRate: 1, volume: 1 });
       expect(mockAudio.volume).toBeCloseTo(0.6, 2);
     });
+
+    it('should support eased fade in', async () => {
+      const mockAudio = document.createElement('audio');
+      Object.defineProperty(mockAudio, 'volume', { value: 1, writable: true });
+      mockAudio.setAttribute('data-helios-fade-in', '2'); // 2s fade in
+      mockAudio.setAttribute('data-helios-fade-easing', 'quad.in'); // t^2
+      scope.appendChild(mockAudio);
+      await new Promise(resolve => setTimeout(resolve, 20));
+
+      // 1s (50% progress):
+      // Linear: 0.5
+      // Quad.in: 0.5^2 = 0.25
+      driver.update(1000, { isPlaying: false, playbackRate: 1, volume: 1 });
+      expect(mockAudio.volume).toBeCloseTo(0.25, 2);
+    });
+
+    it('should fallback to linear for invalid easing', async () => {
+      const mockAudio = document.createElement('audio');
+      Object.defineProperty(mockAudio, 'volume', { value: 1, writable: true });
+      mockAudio.setAttribute('data-helios-fade-in', '2');
+      mockAudio.setAttribute('data-helios-fade-easing', 'invalid.method');
+      scope.appendChild(mockAudio);
+      await new Promise(resolve => setTimeout(resolve, 20));
+
+      // 1s (50% progress): Should be 0.5 (linear fallback)
+      driver.update(1000, { isPlaying: false, playbackRate: 1, volume: 1 });
+      expect(mockAudio.volume).toBe(0.5);
+    });
   });
 
   describe('Looping Support', () => {

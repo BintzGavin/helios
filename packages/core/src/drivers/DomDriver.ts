@@ -1,4 +1,5 @@
 import { TimeDriver, DriverMetadata, AudioTrackMetadata } from './TimeDriver.js';
+import { Easing, EasingFunction } from '../easing.js';
 
 interface TrackState {
   baseVolume: number;
@@ -293,6 +294,20 @@ export class DomDriver implements TimeDriver {
     this.syncMediaElements(timeInMs, options);
   }
 
+  private resolveEasing(name: string | null): EasingFunction {
+    if (!name || name === 'linear') return Easing.linear;
+    const parts = name.split('.');
+    if (parts.length === 2) {
+      const [group, type] = parts;
+      // @ts-ignore
+      const groupObj = Easing[group];
+      if (groupObj && typeof groupObj[type] === 'function') {
+        return groupObj[type];
+      }
+    }
+    return Easing.linear;
+  }
+
   async waitUntilStable(): Promise<void> {
     if (!this.scope) return;
     if (typeof document === 'undefined') return;
@@ -405,10 +420,13 @@ export class DomDriver implements TimeDriver {
       // --- Fade Logic ---
       const fadeInDuration = parseFloat(el.getAttribute('data-helios-fade-in') || '0');
       const fadeOutDuration = parseFloat(el.getAttribute('data-helios-fade-out') || '0');
+      const fadeEasingName = el.getAttribute('data-helios-fade-easing');
+      const easingFn = this.resolveEasing(fadeEasingName);
 
       let fadeInMultiplier = 1;
       if (fadeInDuration > 0) {
-        fadeInMultiplier = Math.max(0, Math.min(1, timeRelToStart / fadeInDuration));
+        const progress = Math.max(0, Math.min(1, timeRelToStart / fadeInDuration));
+        fadeInMultiplier = easingFn(progress);
       }
 
       let fadeOutMultiplier = 1;
@@ -419,7 +437,8 @@ export class DomDriver implements TimeDriver {
       if (fadeOutDuration > 0 && !isNaN(el.duration) && isFinite(el.duration)) {
         const targetTime = Math.max(0, timeRelToStart + seek);
         const timeRemaining = el.duration - targetTime;
-        fadeOutMultiplier = Math.max(0, Math.min(1, timeRemaining / fadeOutDuration));
+        const progress = Math.max(0, Math.min(1, timeRemaining / fadeOutDuration));
+        fadeOutMultiplier = easingFn(progress);
       }
 
       // --- Volume Logic ---
