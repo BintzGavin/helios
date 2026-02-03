@@ -1,63 +1,15 @@
-### PLAYER v0.64.1
-- ✅ Verified: SRT Export Implementation - Verified existing implementation of SRT export and caption parsing against plan requirements.
+# Helios Project Progress Log
 
-### CORE v5.9.0
-- ✅ Completed: Reactive Virtual Time Getter - Exposed `isVirtualTimeBound` getter in `Helios` to allow consumers to verify synchronous virtual time binding.
+This file serves as a central index. Each agent maintains their own progress file to avoid merge conflicts.
 
-### DEMO v1.93.0
-- ✅ Completed: React Lottie Animation - Created `examples/react-lottie-animation` demonstrating integration with `lottie-web` in React.
+## Agent Progress Files
 
-### SKILLS v1.9.1
-- ✅ Completed: Daily Skills Review
-    - Updated **Core Skill**: Added Audio Visualization hooks, `availableAudioTracks`, and `currentTime` signal.
-    - Updated **Renderer Skill**: Added Distributed Rendering (`RenderOrchestrator`) and audio playback rate.
-    - Updated **Player Skill**: Added Diagnostics UI, Text Track `cuechange`, and new export attributes.
-    - Updated **Svelte/Vue Skills**: Added Audio Visualization patterns.
+Each agent should update **their own dedicated progress file** instead of this file:
 
-### DOCS v1.8.0
-- ✅ Completed: Daily Documentation Review - Updated all Changelogs, API Docs (Core, Player, Renderer), created new Example Docs (Lottie, Svelte/Vue Audio Vis), updated Studio Guide, and verified navigation.
-
-### PLAYER v0.64.0
-- ✅ Completed: Implement AudioTracks API - Implemented audioTracks property and AudioTrackList API on <helios-player> to provide Standard Media API parity and enable granular programmatic control of audio tracks.
-
-### PLAYER v0.63.1
-- ✅ Completed: Fix cuechange on Disable - Fixed bug where disabling a track cleared active cues without dispatching the cuechange event.
-
-### CORE v5.8.0
-- ✅ Completed: Expose Fade Easing Metadata - Added `fadeEasing` to `AudioTrackMetadata` and updated `DomDriver` to parse `data-helios-fade-easing` attribute, exposing non-linear fade configurations to consumers.
-
-### DEMO v1.92.0
-- ✅ Completed: Svelte Audio Visualization - Created `examples/svelte-audio-visualization` demonstrating real-time audio analysis using Svelte derived stores.
-
-## STUDIO v0.85.0
-- ✅ Completed: Timeline Audio Waveforms - Implemented visual audio waveforms on the Timeline using `AudioWaveform` component and `OfflineAudioContext` for decoding.
-
-### STUDIO v0.84.0
-- ✅ Completed: Timeline Persistence - Implemented persistence for Current Frame, In Point, Out Point, and Loop state across reloads and composition switches.
-
-### STUDIO v0.83.0
-- ✅ Completed: Loop Range - Implemented logic to loop playback within defined In/Out points (including handling of Out Point = 0 for full duration), ensuring smooth playback for specific sections.
-
-### RENDERER v1.61.1
-- ✅ Completed: Fix Audio Playback Seek - Updated `FFmpegBuilder` to correctly calculate input seek time (`-ss`) when using `playbackRate` with `startFrame > 0`.
-
-### CORE v5.7.0
-- ✅ Completed: Enable Audio State Persistence - Added `audioTracks` to `HeliosOptions` and updated constructor to initialize mixer state (volume/muted per track) from configuration, enabling full session save/load.
-
-### CORE v5.6.0
-- ✅ Completed: Audio Fade Easing - Implemented `data-helios-fade-easing` support in `DomDriver`, allowing non-linear audio fades (e.g. "quad.in").
-
-### PLAYER v0.62.1
-- ✅ Completed: Fix SRT Export Filename - Updated SRT export to respect `export-filename` attribute instead of using hardcoded "captions.srt".
-
-### PLAYER v0.62.0
-- ✅ Completed: Export Filename - Implemented `export-filename` attribute on `<helios-player>` to allow customizing the filename of client-side exported videos.
-
-### DEMO v1.91.0
-- ✅ Completed: Lottie Animation - Created `examples/lottie-animation` demonstrating integration with `lottie-web`.
-
-### DEMO v1.90.0
-- ✅ Completed: Vue Audio Visualization - Created `examples/vue-audio-visualization` demonstrating real-time audio analysis with Vue 3.
-
-## PLAYER v0.63.0
-- ✅ Completed: Implement Active Cues - Added `activeCues` property and `cuechange` event to `HeliosTextTrack`, and updated `HeliosPlayer` to drive cue updates via the main UI loop.
+- **CORE**: Update `docs/PROGRESS-CORE.md`
+- **PLAYER**: Update `docs/PROGRESS-PLAYER.md`
+- **RENDERER**: Update `docs/PROGRESS-RENDERER.md`
+- **DEMO**: Update `docs/PROGRESS-DEMO.md`
+- **STUDIO**: Update `docs/PROGRESS-STUDIO.md`
+- **SKILLS**: Update `docs/PROGRESS-SKILLS.md`
+- **DOCS**: Update `docs/PROGRESS-DOCS.md`
