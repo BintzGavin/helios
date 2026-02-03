@@ -71,6 +71,7 @@ Integration with popular third-party animation and graphics libraries.
 - **[p5-canvas-animation](./p5-canvas-animation/)**: Creative coding with P5.js.
 - **[d3-animation](./d3-animation/)**: Data visualization with D3.js.
 - **[chartjs-animation](./chartjs-animation/)**: Animated charts with Chart.js.
+- **[excalidraw-animation](./excalidraw-animation/)**: Whiteboard animation with Excalidraw.
 - **[lottie-animation](./lottie-animation/)**: Rendering Lottie JSON animations.
 - **[framer-motion-animation](./framer-motion-animation/)**: React motion library integration.
 - **[gsap-animation](./gsap-animation/)**: GreenSock Animation Platform integration.

@@ -62,6 +62,7 @@ The `examples/` directory contains reference implementations for various framewo
 - **p5-canvas-animation**: Creative coding with P5.js.
 - **d3-animation**: Data visualization with D3.js.
 - **chartjs-animation**: Animated charts with Chart.js.
+- **excalidraw-animation**: Whiteboard animation with Excalidraw.
 - **lottie-animation**: Rendering Lottie JSON animations.
 - **framer-motion-animation**: React motion library integration.
 - **gsap-animation**: GreenSock Animation Platform integration.
