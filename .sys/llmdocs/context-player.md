@@ -90,3 +90,17 @@ The `<helios-player>` uses a Shadow DOM for encapsulation:
 - **Bridge Mode**: When cross-origin, uses `postMessage` protocol.
 - **ClientSideExporter**: Handles in-browser rendering using `mediabunny`. Supports audio fades via `data-helios-fade-in` and `data-helios-fade-out` attributes on media elements. Now supports **Headless Audio**: includes audio tracks injected via `availableAudioTracks` metadata, enabling export without DOM elements.
 - **Controllers**: `DirectController` and `BridgeController` normalize API access.
+
+### Controller Interface (HeliosController)
+The internal controller exposed via `getController()` provides programmatic access to the composition:
+- `play()`, `pause()`, `seek(frame)`
+- `setAudioVolume(vol)`, `setAudioMuted(bool)`
+- `setAudioTrackVolume(id, vol)`, `setAudioTrackMuted(id, bool)`
+- `setLoop(bool)`, `setPlaybackRate(rate)`
+- `setPlaybackRange(start, end)`, `clearPlaybackRange()`
+- `setCaptions(captions)`
+- `setInputProps(props)`
+- `setDuration(seconds)`, `setFps(fps)`
+- `setSize(width, height)`, `setMarkers(markers)`
+- `captureFrame(frame, options)`
+- `getAudioTracks()`, `getSchema()`, `diagnose()`

@@ -1,4 +1,4 @@
-**Version**: v0.60.0
+**Version**: v0.61.0
 
 # Status: PLAYER
 
@@ -49,10 +49,12 @@
 - Supports Shadow DOM Export: DOM-based client-side export now correctly captures Shadow DOM content (via Declarative Shadow DOM transformation), enabling support for Web Components in exports.
 - **Supports Environment Diagnostics UI**: Implemented `diagnose()` method in `HeliosController` and a visible Diagnostics UI overlay in `<helios-player>` (toggled via `Shift+D`) to expose environment capabilities (WebCodecs, WebGL, etc.) to the user.
 - **Supports Headless Audio Export**: Client-side export now includes audio tracks manually injected into Helios state (`availableAudioTracks`), enabling headless audio rendering without DOM elements.
+- **Supports Dynamic Composition Updates**: Exposes `setDuration`, `setFps`, `setSize`, and `setMarkers` via `HeliosController` (and Bridge), allowing host applications (like Studio) to update the composition structure dynamically.
 
 ## Critical Task
 - **None**: All critical tasks completed.
 
+[v0.61.0] ✅ Completed: Expose Composition Setters - Implemented `setDuration`, `setFps`, `setSize`, and `setMarkers` in `HeliosController` and updated Bridge protocol to support dynamic composition updates from the host.
 [v0.60.0] ✅ Completed: Headless Audio Support - Updated `getAudioAssets` and controllers to include audio tracks from Helios state metadata in client-side exports, prioritizing them over DOM elements.
 [v0.59.1] ✅ Completed: Documentation Update - Added missing export attributes, audio fades, and diagnostics API to README.
 [v0.59.0] ✅ Completed: Implement Diagnostics UI Overlay - Implemented a visible Diagnostics UI overlay in `<helios-player>` toggled via `Shift+D`, and exposed `diagnose()` as a public method.

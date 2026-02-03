@@ -80,6 +80,26 @@ export function connectToParent(helios: Helios) {
             helios.setCaptions(event.data.captions);
         }
         break;
+      case 'HELIOS_SET_DURATION':
+        if (typeof event.data.duration === 'number') {
+            helios.setDuration(event.data.duration);
+        }
+        break;
+      case 'HELIOS_SET_FPS':
+        if (typeof event.data.fps === 'number') {
+            helios.setFps(event.data.fps);
+        }
+        break;
+      case 'HELIOS_SET_SIZE':
+        if (typeof event.data.width === 'number' && typeof event.data.height === 'number') {
+            helios.setSize(event.data.width, event.data.height);
+        }
+        break;
+      case 'HELIOS_SET_MARKERS':
+        if (Array.isArray(event.data.markers)) {
+            helios.setMarkers(event.data.markers);
+        }
+        break;
       case 'HELIOS_GET_SCHEMA':
         window.parent.postMessage({ type: 'HELIOS_SCHEMA', schema: helios.schema }, '*');
         break;

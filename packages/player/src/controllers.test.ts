@@ -54,6 +54,10 @@ describe('DirectController', () => {
             setPlaybackRange: vi.fn(),
             clearPlaybackRange: vi.fn(),
             setInputProps: vi.fn(),
+            setDuration: vi.fn(),
+            setFps: vi.fn(),
+            setSize: vi.fn(),
+            setMarkers: vi.fn(),
             subscribe: vi.fn((cb) => {
                  return vi.fn();
             }),
@@ -111,6 +115,21 @@ describe('DirectController', () => {
 
         controller.setInputProps({ foo: 'bar' });
         expect(mockHeliosInstance.setInputProps).toHaveBeenCalledWith({ foo: 'bar' });
+    });
+
+    it('should set duration, fps, size, and markers', () => {
+        controller.setDuration(20);
+        expect(mockHeliosInstance.setDuration).toHaveBeenCalledWith(20);
+
+        controller.setFps(60);
+        expect(mockHeliosInstance.setFps).toHaveBeenCalledWith(60);
+
+        controller.setSize(1280, 720);
+        expect(mockHeliosInstance.setSize).toHaveBeenCalledWith(1280, 720);
+
+        const markers = [{ id: '1', time: 5, label: 'M1' }];
+        controller.setMarkers(markers);
+        expect(mockHeliosInstance.setMarkers).toHaveBeenCalledWith(markers);
     });
 
     it('should set audio volume and muted', () => {
@@ -288,6 +307,21 @@ describe('BridgeController', () => {
 
         controller.clearPlaybackRange();
         expect(mockWindow.postMessage).toHaveBeenCalledWith({ type: 'HELIOS_CLEAR_PLAYBACK_RANGE' }, '*');
+    });
+
+    it('should post messages for composition settings', () => {
+        controller.setDuration(20);
+        expect(mockWindow.postMessage).toHaveBeenCalledWith({ type: 'HELIOS_SET_DURATION', duration: 20 }, '*');
+
+        controller.setFps(60);
+        expect(mockWindow.postMessage).toHaveBeenCalledWith({ type: 'HELIOS_SET_FPS', fps: 60 }, '*');
+
+        controller.setSize(1280, 720);
+        expect(mockWindow.postMessage).toHaveBeenCalledWith({ type: 'HELIOS_SET_SIZE', width: 1280, height: 720 }, '*');
+
+        const markers = [{ id: '1', time: 5, label: 'M1' }];
+        controller.setMarkers(markers);
+        expect(mockWindow.postMessage).toHaveBeenCalledWith({ type: 'HELIOS_SET_MARKERS', markers }, '*');
     });
 
     it('should update state on HELIOS_STATE message', () => {

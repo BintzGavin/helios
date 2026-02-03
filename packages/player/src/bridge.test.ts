@@ -38,6 +38,10 @@ describe('connectToParent', () => {
             setLoop: vi.fn(),
             setInputProps: vi.fn(),
             setCaptions: vi.fn(),
+            setDuration: vi.fn(),
+            setFps: vi.fn(),
+            setSize: vi.fn(),
+            setMarkers: vi.fn(),
             getState: vi.fn().mockReturnValue({}),
             subscribe: vi.fn(),
             schema: {}
@@ -75,6 +79,23 @@ describe('connectToParent', () => {
         triggerMessage({ type: 'HELIOS_PLAY' }, window.parent);
 
         expect(mockHelios.play).toHaveBeenCalled();
+    });
+
+    it('should process composition setting messages', () => {
+        connectToParent(mockHelios);
+
+        triggerMessage({ type: 'HELIOS_SET_DURATION', duration: 30 }, window.parent);
+        expect(mockHelios.setDuration).toHaveBeenCalledWith(30);
+
+        triggerMessage({ type: 'HELIOS_SET_FPS', fps: 24 }, window.parent);
+        expect(mockHelios.setFps).toHaveBeenCalledWith(24);
+
+        triggerMessage({ type: 'HELIOS_SET_SIZE', width: 800, height: 600 }, window.parent);
+        expect(mockHelios.setSize).toHaveBeenCalledWith(800, 600);
+
+        const markers = [{ id: '1', time: 5, label: 'Test' }];
+        triggerMessage({ type: 'HELIOS_SET_MARKERS', markers }, window.parent);
+        expect(mockHelios.setMarkers).toHaveBeenCalledWith(markers);
     });
 
     it('should IGNORE messages from other sources', () => {
