@@ -51,6 +51,8 @@ interface HeliosOptions {
   playbackRate?: number;         // Initial playback rate (default: 1)
   volume?: number;               // Initial volume (0.0 to 1.0)
   muted?: boolean;               // Initial muted state
+  audioTracks?: Record<string, AudioTrackState>; // Initial track state
+  availableAudioTracks?: AudioTrackMetadata[];   // Headless track metadata
   captions?: string | CaptionCue[]; // SRT string or cue array
   markers?: Marker[];            // Initial timeline markers
   playbackRange?: [number, number]; // Restrict playback to [startFrame, endFrame]
@@ -69,6 +71,7 @@ interface HeliosState {
   duration: number;
   fps: number;
   currentFrame: number;
+  currentTime: number;
   loop: boolean;
   isPlaying: boolean;
   inputProps: Record<string, any>;
@@ -76,6 +79,7 @@ interface HeliosState {
   volume: number;
   muted: boolean;
   audioTracks: Record<string, AudioTrackState>;
+  availableAudioTracks: AudioTrackMetadata[];
   captions: CaptionCue[];
   activeCaptions: CaptionCue[];
   markers: Marker[];
@@ -123,6 +127,16 @@ helios.setAudioMuted(muted: boolean)  // Set muted state
 // Use data-helios-track-id="myTrack" on DOM elements to group them
 helios.setAudioTrackVolume(trackId: string, volume: number)
 helios.setAudioTrackMuted(trackId: string, muted: boolean)
+
+// Advanced: Audio Visualization Hooks
+// Get the shared AudioContext (if supported by driver)
+await helios.getAudioContext();
+// Get a MediaElementAudioSourceNode for a specific track
+await helios.getAudioSourceNode(trackId);
+
+// Audio Fades:
+// Use data-helios-fade-easing="quad.in" (or linear, cubic, sine, etc.)
+// on DOM elements to control fade curve.
 ```
 
 #### Data Input & Validation
@@ -297,9 +311,11 @@ helios.playbackRate: ReadonlySignal<number>
 helios.volume: ReadonlySignal<number>
 helios.muted: ReadonlySignal<boolean>
 helios.audioTracks: ReadonlySignal<Record<string, AudioTrackState>>
+helios.availableAudioTracks: ReadonlySignal<AudioTrackMetadata[]>
 helios.captions: ReadonlySignal<CaptionCue[]>
 helios.activeCaptions: ReadonlySignal<CaptionCue[]>
 helios.markers: ReadonlySignal<Marker[]>
+helios.currentTime: ReadonlySignal<number>
 helios.playbackRange: ReadonlySignal<[number, number] | null>
 helios.width: ReadonlySignal<number>
 helios.height: ReadonlySignal<number>

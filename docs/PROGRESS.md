@@ -1,3 +1,10 @@
+### SKILLS v1.9.1
+- ✅ Completed: Daily Skills Review
+    - Updated **Core Skill**: Added Audio Visualization hooks, `availableAudioTracks`, and `currentTime` signal.
+    - Updated **Renderer Skill**: Added Distributed Rendering (`RenderOrchestrator`) and audio playback rate.
+    - Updated **Player Skill**: Added Diagnostics UI, Text Track `cuechange`, and new export attributes.
+    - Updated **Svelte/Vue Skills**: Added Audio Visualization patterns.
+
 ### DOCS v1.8.0
 - ✅ Completed: Daily Documentation Review - Updated all Changelogs, API Docs (Core, Player, Renderer), created new Example Docs (Lottie, Svelte/Vue Audio Vis), updated Studio Guide, and verified navigation.
 

@@ -45,6 +45,8 @@ The `<helios-player>` Web Component allows you to embed and control Helios compo
 | `export-caption-mode` | 'burn-in' \| 'file' | How to handle captions during export (default: 'burn-in') |
 | `export-width` | number | Width of the exported video (independent of display width) |
 | `export-height` | number | Height of the exported video |
+| `export-bitrate` | number | Target bitrate for export (bits/s) |
+| `export-filename` | string | Filename for export (default: 'video') |
 | `disablepictureinpicture` | boolean | Disable the Picture-in-Picture button |
 | `canvas-selector`| string | CSS selector for the canvas element (default: 'canvas') |
 | `sandbox` | string | Iframe sandbox flags (default: 'allow-scripts allow-same-origin') |
@@ -107,7 +109,12 @@ player.inputProps = { title: "Updated Title" };
 
 // Text Tracks
 console.log(player.textTracks);
-player.addTextTrack("captions", "English", "en");
+const track = player.addTextTrack("captions", "English", "en");
+
+// Access active cues
+track.addEventListener("cuechange", () => {
+  console.log("Active Cues:", track.activeCues);
+});
 ```
 
 #### Events
@@ -127,8 +134,21 @@ const controller = player.getController();
 
 if (controller) {
   const state = controller.getState();
-  console.log("Active Captions:", state.activeCaptions);
+
+  // Dynamic Updates
+  controller.setDuration(30);       // Update duration to 30s
+  controller.setFps(60);            // Update FPS to 60
+  controller.setSize(1080, 1080);   // Update resolution
+  controller.setMarkers([{ id: "m1", time: 5, label: "Intro" }]);
 }
+```
+
+#### Diagnostics
+View environment capabilities (WebCodecs, WebGL) by pressing **Shift+D** to toggle the overlay, or calling `diagnose()` programmatically.
+
+```typescript
+const report = await player.diagnose();
+console.log("WebCodecs support:", report.webCodecs);
 ```
 
 #### Captions
