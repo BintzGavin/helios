@@ -1,3 +1,6 @@
+## DEMO v1.95.0
+- ✅ Completed: Vue Lottie Animation - Created `examples/vue-lottie-animation` demonstrating integration with `lottie-web` in Vue 3 driven by Helios timeline.
+
 ## DEMO v1.89.0
 - ✅ Completed: Refactor Podcast Visualizer - Refactored `examples/podcast-visualizer` to use `AudioContext` for real-time analysis, replacing simulated animations.
 

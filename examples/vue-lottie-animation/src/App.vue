@@ -1,23 +1,16 @@
 <script setup>
 import { onMounted, onUnmounted, ref } from 'vue';
-import { Helios } from '../../../packages/core/src/index.ts';
+import { Helios } from '@helios-project/core';
 import lottie from 'lottie-web';
 import animationData from './animation.json';
 
 const container = ref(null);
-const helios = new Helios({ fps: 30, duration: 2 }); // Duration 2s matches the square animation (60 frames / 30 fps)
-
-// Bind to document timeline for local preview
-helios.bindToDocumentTimeline();
-
-// Expose to window for debugging/player control
-if (typeof window !== 'undefined') {
-    window.helios = helios;
-}
+const helios = new Helios({ fps: 30, duration: 2 });
+let anim = null;
+let unsubscribe = null;
 
 onMounted(() => {
-  // 1. Load Animation
-  const anim = lottie.loadAnimation({
+  anim = lottie.loadAnimation({
     container: container.value,
     renderer: 'svg',
     loop: false,
@@ -25,38 +18,28 @@ onMounted(() => {
     animationData
   });
 
-  // 2. Subscribe to Helios
-  const unsubscribe = helios.subscribe((state) => {
-    // We access currentFrame from the state object passed to callback
-    const { currentFrame, fps } = state;
+  unsubscribe = helios.subscribe(({ currentFrame, fps }) => {
     const timeMs = (currentFrame / fps) * 1000;
-    anim.goToAndStop(timeMs, false); // false = milliseconds
+    anim.goToAndStop(timeMs, false);
   });
+});
 
-  onUnmounted(() => {
-      unsubscribe();
-      anim.destroy();
-  });
+onUnmounted(() => {
+  if (unsubscribe) unsubscribe();
+  if (anim) anim.destroy();
 });
 </script>
 
 <template>
-  <div class="container">
-      <div ref="container" class="lottie-container"></div>
-  </div>
+  <div ref="container" class="lottie-container"></div>
 </template>
 
-<style scoped>
-.container {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: #f0f0f0;
-}
+<style>
 .lottie-container {
-    width: 400px;
-    height: 400px;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 </style>
