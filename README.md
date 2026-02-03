@@ -363,9 +363,9 @@ Both Helios and [Remotion](https://www.remotion.dev/) enable programmatic video 
 | **Maturity** | 🟡 Beta | 🟢 Production-ready |
 | **Pricing** | Free (ELv2) | Free ≤3 devs, then $100+/mo |
 | **Studio IDE** | 🟢 Beta | 🟢 Available |
-| **Distributed rendering** | 🟡 Planned (V2) | 🟢 Lambda, Cloud Run |
-| **Captions/subtitles** | 🟡 Basic (SRT) | 🟢 Built-in |
-| **Audio mixing** | 🟡 Basic (FFmpeg) | 🟢 Advanced |
+| **Distributed rendering** | 🟡 Beta (Local Orchestrator) | 🟢 Lambda, Cloud Run |
+| **Captions/subtitles** | 🟡 Standard (SRT) | 🟢 Built-in |
+| **Audio mixing** | 🟢 Client-side (WebCodecs) | 🟢 Advanced |
 | **MCP Server** | 🟡 Planned | 🟢 Available |
 | **Agent Skills** | 🟡 Local only | 🟢 `npx skills add` |
 | **Transitions library** | 🟢 Available | 🟢 `@remotion/transitions` |
@@ -519,7 +519,11 @@ WYSIWYG preview using the same bundled composition code as the final render:
 - ✅ React, Vue examples
 - ✅ FFmpeg integration with piped frames
 - ✅ `helios.diagnose()` environment checks
-- ✅ Client-side export (WebCodecs)
+- ✅ Client-side export (WebCodecs) with Audio Mixing & Captions
+- ✅ Distributed Rendering (Local Orchestrator)
+- ✅ Lottie Integration (React, Vue)
+- ✅ Audio Visualization Examples
+- ✅ Audio Tracks API
 
 
 See [`docs/BACKLOG.md`](./docs/BACKLOG.md) for the full task list.
@@ -533,7 +537,6 @@ See [`docs/BACKLOG.md`](./docs/BACKLOG.md) for the full task list.
 ### V1.x: Captions & Audio
 **Planned:**
 - Caption generation via Whisper integration
-- Advanced audio mixing
 - Text-to-speech integration
 
 ### V1.x: AI Integration Parity
@@ -601,6 +604,8 @@ const encoder = new VideoEncoder({ ... });
 
 ### V2: Distributed Rendering
 Scalable serverless rendering on AWS Lambda or Google Cloud Run.
+
+**Status:** 🟡 **Beta (Local Orchestrator Implemented)**
 
 **Architecture:**
 1. Orchestrator divides video into N frame-range chunks
