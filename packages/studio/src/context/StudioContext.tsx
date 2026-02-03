@@ -10,6 +10,11 @@ export interface CompositionMetadata {
   duration: number;
 }
 
+export interface TemplateInfo {
+  id: string;
+  label: string;
+}
+
 export interface Composition {
   id: string;
   name: string;
@@ -108,6 +113,9 @@ interface StudioContextType {
   updateThumbnail: (id: string) => Promise<void>;
   deleteComposition: (id: string) => Promise<void>;
 
+  // Templates
+  templates: TemplateInfo[];
+
   // Assets
   assets: Asset[];
   uploadAsset: (file: File) => Promise<void>;
@@ -163,6 +171,7 @@ export const StudioContext = createContext<StudioContextType | undefined>(undefi
 export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { addToast } = useToast();
   const [compositions, setCompositions] = useState<Composition[]>([]);
+  const [templates, setTemplates] = useState<TemplateInfo[]>([]);
   const [assets, setAssets] = useState<Asset[]>([]);
   const [activeComposition, setActiveComposition] = useState<Composition | null>(null);
   const [isOmnibarOpen, setOmnibarOpen] = useState(false);
@@ -464,6 +473,15 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
   // Fetch compositions and assets from backend
   useEffect(() => {
+    fetch('/api/templates')
+      .then(res => res.json())
+      .then((data: TemplateInfo[]) => {
+        setTemplates(data);
+      })
+      .catch(err => {
+        console.error('Failed to fetch templates:', err);
+      });
+
     fetch('/api/compositions')
       .then(res => res.json())
       .then((data: Composition[]) => {
@@ -700,6 +718,7 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     <StudioContext.Provider
       value={{
         compositions,
+        templates,
         assets,
         uploadAsset,
         deleteAsset,
