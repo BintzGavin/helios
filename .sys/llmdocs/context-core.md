@@ -1,182 +1,182 @@
-# CORE Domain Context
+# Core Context
 
 ## A. Architecture
 
-The **Helios Core** follows a reactive, signal-based architecture pattern ("Helios State Machine"):
+**Helios State Machine**
+The Core package implements a "Headless State Machine" pattern.
+1.  **Store**: `Helios` class holds the state (frame, duration, playback status, inputs) in reactive `signals`.
+2.  **Drivers**: A `TimeDriver` (e.g., `DomDriver`) synchronizes external systems (AudioContext, DOM elements) with the internal state.
+3.  **Subscribers**: UI components or renderers subscribe to state changes to update their views.
 
-1.  **State (Signals)**: Internal state (current frame, playing status, volume, etc.) is managed using fine-grained reactive signals (`signal`, `computed`, `effect`). This ensures efficient updates and dependency tracking.
-2.  **Controller (Helios Class)**: The `Helios` class acts as the central controller. It exposes state via ReadonlySignals and provides imperative methods (Actions) to modify that state (e.g., `seek()`, `play()`).
-3.  **Drivers (TimeDriver)**: The abstract `TimeDriver` interface delegates environment-specific logic. The default `DomDriver` synchronizes the internal state with the DOM (HTMLMediaElements, WAAPI Animations), while the Renderer uses `SeekTimeDriver` or `CdpTimeDriver`.
-4.  **Subscribers**: External consumers (UI, Renderer) subscribe to state changes via `helios.subscribe()`.
-5.  **Virtual Time**: For frame-perfect rendering, `bindToDocumentTimeline` allows the internal clock to be driven by `window.__HELIOS_VIRTUAL_TIME__` or `document.timeline`, ensuring determinism.
+This architecture ensures that the "truth" of the composition is purely mathematical and decoupled from the display layer, enabling:
+-   Deterministic rendering (frame-by-frame)
+-   Headless execution (Node.js/Workers)
+-   Reactive UI updates
 
 ## B. File Tree
 
 ```
 packages/core/src/
-├── drivers/
-│   ├── DomDriver.ts        # Default browser driver (Media/WAAPI sync)
-│   ├── NoopDriver.ts       # Headless/Test driver
-│   └── TimeDriver.ts       # Interface definition
-├── ai.ts                   # System prompt generation
-├── animation.ts            # Animation primitives (interpolate)
-├── captions.ts             # VTT/SRT parsing logic
-├── color.ts                # Color parsing and interpolation
-├── easing.ts               # Easing functions (linear, quad, etc.)
-├── errors.ts               # Structured error definitions
-├── Helios.ts               # Main class (State Machine)
-├── index.ts                # Public exports
-├── markers.ts              # Timeline marker logic
-├── random.ts               # Deterministic PRNG
-├── render-session.ts       # Frame iteration orchestration
-├── schema.ts               # Prop validation and schema logic
-├── sequencing.ts           # Sequencing helpers (series, sequence)
-├── signals.ts              # Reactive signal implementation
-├── timecode.ts             # Timecode conversion utilities
-└── transitions.ts          # Transition helper functions
+├── drivers/           # TimeDriver implementations (DomDriver, NoopDriver)
+├── ai.ts              # AI helper utilities
+├── animation.ts       # Animation primitives (interpolate, spring)
+├── captions.ts        # Caption parsing and cue management
+├── color.ts           # Color utilities (hex/rgb/hsl parsing & interpolation)
+├── easing.ts          # Easing functions (linear, quad, cubic, etc.)
+├── errors.ts          # Error handling (HeliosError)
+├── Helios.ts          # Main Helios class and state machine
+├── index.ts           # Public API exports
+├── markers.ts         # Marker management
+├── random.ts          # Deterministic PRNG
+├── render-session.ts  # Render session orchestration
+├── schema.ts          # Input prop schema validation
+├── sequencing.ts      # Sequencing helpers (sequence, series)
+├── signals.ts         # Reactive signal primitives
+├── timecode.ts        # Timecode conversion utilities
+└── transitions.ts     # Transition helpers (crossfade)
 ```
 
 ## C. Type Definitions
 
 ```typescript
-// From index.ts & types.ts
-export interface HeliosState {
-  currentFrame: number;
-  isPlaying: boolean;
-  duration: number; // in seconds
-  fps: number;
-  playbackRate: number;
+export type HeliosState<TInputProps = Record<string, any>> = {
   width: number;
   height: number;
-  captions: Caption[];
-  activeCaptions: Caption[];
-  markers: Marker[];
-  activeMarkers: Marker[];
+  duration: number;
+  fps: number;
+  currentFrame: number;
+  loop: boolean;
+  isPlaying: boolean;
+  inputProps: TInputProps;
+  playbackRate: number;
   volume: number;
   muted: boolean;
+  audioTracks: Record<string, AudioTrackState>;
   availableAudioTracks: AudioTrackMetadata[];
-  inputProps: Record<string, any>;
+  captions: CaptionCue[];
+  activeCaptions: CaptionCue[];
+  markers: Marker[];
   playbackRange: [number, number] | null;
-  error: HeliosError | null;
-}
+  currentTime: number;
+};
 
-export interface HeliosOptions {
-  fps?: number;
-  duration?: number;
+export type AudioTrackState = {
+  volume: number;
+  muted: boolean;
+};
+
+export type HeliosSubscriber<TInputProps = Record<string, any>> = (state: HeliosState<TInputProps>) => void;
+
+export interface HeliosOptions<TInputProps = Record<string, any>> {
   width?: number;
   height?: number;
-  autoPlay?: boolean;
-  loop?: boolean;
-  driver?: TimeDriver;
-  captions?: Caption[] | string[];
-  markers?: Marker[];
-  inputProps?: Record<string, any>;
   initialFrame?: number;
+  duration: number; // in seconds
+  fps: number;
+  loop?: boolean;
+  playbackRange?: [number, number];
+  autoSyncAnimations?: boolean;
+  animationScope?: unknown;
+  inputProps?: TInputProps;
+  schema?: HeliosSchema;
+  playbackRate?: number;
+  volume?: number;
+  muted?: boolean;
+  audioTracks?: Record<string, AudioTrackState>;
   availableAudioTracks?: AudioTrackMetadata[];
+  captions?: string | CaptionCue[];
+  markers?: Marker[];
+  driver?: TimeDriver;
+  ticker?: Ticker;
 }
 
-export type HeliosSubscriber = (state: HeliosState) => void;
-
-export interface PropDefinition {
-  type: PropType;
-  default?: any;
-  label?: string;
-  min?: number;
-  max?: number;
-  step?: number;
-  options?: string[]; // for enum
-  accept?: string[]; // for file
-  format?: string; // e.g. 'color', 'date'
-  pattern?: string; // regex
-  group?: string;
-  items?: PropDefinition; // for array
-  properties?: Record<string, PropDefinition>; // for object
-  minLength?: number;
-  maxLength?: number;
-  minItems?: number;
-  maxItems?: number;
-}
-
-export type PropType = 'string' | 'number' | 'boolean' | 'color' | 'image' | 'video' | 'audio' | 'font' | 'json' | 'model' | 'shader' | 'array' | 'object';
-
-export interface HeliosSchema {
-  [key: string]: PropDefinition;
-}
-
-export interface AudioTrackMetadata {
-  id: string;
-  src: string;
-  startTime: number;
-  duration: number;
-  fadeInDuration: number;
-  fadeOutDuration: number;
-  // Note: fadeEasing is an attribute implementation detail in DomDriver, not currently in metadata interface exposed to Studio, though it could be added later.
+export interface DiagnosticReport {
+  waapi: boolean;
+  webCodecs: boolean;
+  offscreenCanvas: boolean;
+  webgl: boolean;
+  webgl2: boolean;
+  webAudio: boolean;
+  colorGamut: 'srgb' | 'p3' | 'rec2020' | null;
+  videoCodecs: { h264: boolean; vp8: boolean; vp9: boolean; av1: boolean };
+  audioCodecs: { aac: boolean; opus: boolean };
+  videoDecoders: { h264: boolean; vp8: boolean; vp9: boolean; av1: boolean };
+  audioDecoders: { aac: boolean; opus: boolean };
+  userAgent: string;
 }
 ```
 
 ## D. Public Methods
 
 ```typescript
-// Helios Class Public Signature
-class Helios<T = Record<string, any>> {
+// Helios Class
+class Helios<TInputProps> {
   // Signals
-  readonly currentFrame: ReadonlySignal<number>;
-  readonly isPlaying: ReadonlySignal<boolean>;
-  readonly duration: ReadonlySignal<number>;
-  readonly fps: ReadonlySignal<number>;
-  readonly playbackRate: ReadonlySignal<number>;
-  readonly width: ReadonlySignal<number>;
-  readonly height: ReadonlySignal<number>;
-  readonly captions: ReadonlySignal<Caption[]>;
-  readonly activeCaptions: ReadonlySignal<Caption[]>;
-  readonly markers: ReadonlySignal<Marker[]>;
-  readonly activeMarkers: ReadonlySignal<Marker[]>;
-  readonly volume: ReadonlySignal<number>;
-  readonly muted: ReadonlySignal<boolean>;
-  readonly availableAudioTracks: ReadonlySignal<AudioTrackMetadata[]>;
-  readonly inputProps: ReadonlySignal<T>;
-  readonly playbackRange: ReadonlySignal<[number, number] | null>;
-  readonly error: ReadonlySignal<HeliosError | null>;
+  get currentFrame(): ReadonlySignal<number>;
+  get currentTime(): ReadonlySignal<number>;
+  get loop(): ReadonlySignal<boolean>;
+  get isPlaying(): ReadonlySignal<boolean>;
+  get inputProps(): ReadonlySignal<TInputProps>;
+  get playbackRate(): ReadonlySignal<number>;
+  get volume(): ReadonlySignal<number>;
+  get muted(): ReadonlySignal<boolean>;
+  get audioTracks(): ReadonlySignal<Record<string, AudioTrackState>>;
+  get availableAudioTracks(): ReadonlySignal<AudioTrackMetadata[]>;
+  get captions(): ReadonlySignal<CaptionCue[]>;
+  get activeCaptions(): ReadonlySignal<CaptionCue[]>;
+  get markers(): ReadonlySignal<Marker[]>;
+  get playbackRange(): ReadonlySignal<[number, number] | null>;
+  get width(): ReadonlySignal<number>;
+  get height(): ReadonlySignal<number>;
+  get duration(): ReadonlySignal<number>;
+  get fps(): ReadonlySignal<number>;
 
-  constructor(options?: HeliosOptions);
-
-  // Control
-  start(): void;
-  stop(): void;
-  pause(): void;
-  seek(frame: number): void;
-  seekToTime(time: number): void;
-
-  // Configuration
+  // Methods
+  constructor(options: HeliosOptions<TInputProps>);
+  getState(): Readonly<HeliosState<TInputProps>>;
   setSize(width: number, height: number): void;
+  setLoop(shouldLoop: boolean): void;
   setDuration(seconds: number): void;
   setFps(fps: number): void;
-  setCaptions(captions: Caption[] | string[]): void;
-  setMarkers(markers: Marker[]): void;
-  setPlaybackRange(startFrame: number, endFrame: number): void;
-  clearPlaybackRange(): void;
-  setInputProps(props: Partial<T>, schema?: HeliosSchema): void;
-  setAvailableAudioTracks(tracks: AudioTrackMetadata[]): void;
-
-  // Audio
-  setVolume(volume: number): void;
-  setMuted(muted: boolean): void;
+  setInputProps(props: TInputProps): void;
+  setPlaybackRate(rate: number): void;
+  setAudioVolume(volume: number): void;
+  setAudioMuted(muted: boolean): void;
   setAudioTrackVolume(trackId: string, volume: number): void;
   setAudioTrackMuted(trackId: string, muted: boolean): void;
+  setAvailableAudioTracks(tracks: AudioTrackMetadata[]): void;
+  setCaptions(captions: string | CaptionCue[]): void;
+  setMarkers(markers: Marker[]): void;
+  addMarker(marker: Marker): void;
+  removeMarker(id: string): void;
+  seekToMarker(id: string): void;
+  seekToTime(seconds: number): void;
+  setPlaybackRange(startFrame: number, endFrame: number): void;
+  clearPlaybackRange(): void;
   getAudioContext(): Promise<unknown>;
   getAudioSourceNode(trackId: string): Promise<unknown>;
 
-  // Sync & Lifecycle
+  // Subscription
+  subscribe(callback: HeliosSubscriber<TInputProps>): () => void;
+  unsubscribe(callback: HeliosSubscriber<TInputProps>): void;
+
+  // Stability
+  registerStabilityCheck(check: StabilityCheck): () => void;
+  waitUntilStable(): Promise<void>;
+
+  // Playback
+  play(): void;
+  pause(): void;
+  seek(frame: number): void;
+
+  // Synchronization
   bindTo(master: Helios<any>): void;
   unbind(): void;
   bindToDocumentTimeline(): void;
   unbindFromDocumentTimeline(): void;
   dispose(): void;
-  subscribe(callback: HeliosSubscriber): () => void;
 
-  // Diagnostics
+  // Static
   static diagnose(): Promise<DiagnosticReport>;
-  waitUntilStable(): Promise<void>;
-  registerStabilityCheck(check: () => Promise<void>): void;
 }
 ```

@@ -50,6 +50,7 @@ export interface HeliosOptions<TInputProps = Record<string, any>> {
   playbackRate?: number;
   volume?: number;
   muted?: boolean;
+  audioTracks?: Record<string, AudioTrackState>;
   availableAudioTracks?: AudioTrackMetadata[];
   captions?: string | CaptionCue[];
   markers?: Marker[];
@@ -481,7 +482,7 @@ export class Helios<TInputProps = Record<string, any>> {
     this._playbackRate = signal(options.playbackRate ?? 1);
     this._volume = signal(options.volume ?? 1);
     this._muted = signal(options.muted ?? false);
-    this._audioTracks = signal({});
+    this._audioTracks = signal(options.audioTracks || {});
     this._availableAudioTracks = signal(options.availableAudioTracks || []);
     this._captions = signal(initialCaptions);
     this._markers = signal(initialMarkers);
