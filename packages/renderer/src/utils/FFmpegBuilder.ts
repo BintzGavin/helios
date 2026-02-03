@@ -65,7 +65,8 @@ export class FFmpegBuilder {
         // Track starts before or at the render window
         // We need to skip the part of the track that happened before renderStart
         delayMs = 0;
-        inputSeek = (track.seek || 0) + (renderStartTime - globalStart);
+        const playbackRate = track.playbackRate && Number.isFinite(track.playbackRate) && track.playbackRate > 0 ? track.playbackRate : 1.0;
+        inputSeek = (track.seek || 0) + (renderStartTime - globalStart) * playbackRate;
       }
 
       // Add input arguments
