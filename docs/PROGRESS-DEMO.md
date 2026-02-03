@@ -1,3 +1,12 @@
+## DEMO v1.88.0
+- ✅ Completed: Verify Excalidraw Example - Verified build and rendering of `examples/excalidraw-animation` and added to documentation.
+
+## DEMO v1.87.1
+- ✅ Completed: React Audio Visualization - Created `examples/react-audio-visualization` demonstrating real-time audio analysis (RMS, waveforms) using synthesized `AudioBuffer` and React Hooks.
+
+## DEMO v1.87.0
+- ✅ Completed: Fix GSAP Sync - Fixed synchronization issue in `examples/promo-video` using `helios.registerStabilityCheck` and enhanced `tests/e2e/verify-render.ts` with custom duration/brightness checks. Confirmed E2E pass with YMAX=192.
+
 ## DEMO v1.86.0
 - ✅ Completed: Vanilla Transitions - Created `examples/vanilla-transitions` demonstrating sequenced scene transitions using Vanilla JS and the `sequence()` utility.
 
