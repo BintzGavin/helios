@@ -1,49 +1,53 @@
-# Fix Audio Playback Seek Calculation
+# 1. Context & Goal
+- **Objective**: Fix `FFmpegBuilder` to correctly calculate the audio input seek time (`-ss`) when rendering a specific timeline range (`startFrame` > 0) with a non-default `playbackRate`.
+- **Trigger**: Identified a logic gap where the current implementation ignores `playbackRate` when calculating how much audio to skip, leading to desynchronization.
+- **Impact**: Ensures audio remains synchronized with video when rendering partial ranges of a composition, especially for clips with variable playback speeds.
 
-#### 1. Context & Goal
-- **Objective**: Fix the audio input seek calculation in `FFmpegBuilder` to correctly account for `playbackRate` when rendering a range that starts after the audio track's global offset.
-- **Trigger**: Analysis of `FFmpegBuilder.ts` revealed that `inputSeek` (used for `-ss`) simply adds the timeline time difference to the track seek, ignoring that 1 timeline second equals `rate` media seconds.
-- **Impact**: Ensures audio synchronization is maintained when rendering specific frame ranges (`startFrame > 0`) for compositions using variable speed audio tracks.
+# 2. File Inventory
+- **Create**: `packages/renderer/tests/verify-audio-playback-seek.ts` (Verification script to test seek logic with rates)
+- **Modify**: `packages/renderer/src/utils/FFmpegBuilder.ts` (Fix inputSeek calculation)
+- **Read-Only**: `packages/renderer/src/types.ts`
 
-#### 2. File Inventory
-- **Modify**: `packages/renderer/src/utils/FFmpegBuilder.ts` (Update seek calculation logic)
-- **Create**: `packages/renderer/tests/verify-audio-playback-rate-seek.ts` (New verification script)
-- **Read-Only**: `packages/renderer/tests/verify-audio-playback-rate.ts` (Reference for existing tests)
-
-#### 3. Implementation Spec
-- **Architecture**: No architectural changes. Logic fix within `FFmpegBuilder.getArgs` method.
+# 3. Implementation Spec
+- **Architecture**: Update `FFmpegBuilder.getArgs` to sanitize `playbackRate` early and use it in the `inputSeek` calculation for tracks starting before the render window.
 - **Pseudo-Code**:
   ```typescript
-  // inside getArgs, processing tracks loop
-  rate = track.playbackRate OR 1.0
+  // In FFmpegBuilder.getArgs loop over tracks:
+
+  // 1. Sanitize Rate
+  LET rate = track.playbackRate OR 1.0
+  IF rate <= 0 OR !isFinite(rate) THEN rate = 1.0
+
+  // 2. Calculate Seek
+  LET renderStartTime = startFrame / fps
+  LET globalStart = track.offset OR 0
+  LET inputSeek = track.seek OR 0
+  LET delayMs = 0
 
   IF globalStart > renderStartTime THEN
     // Track starts after render window
     delayMs = (globalStart - renderStartTime) * 1000
-    // inputSeek remains as configured
+    inputSeek = track.seek OR 0
   ELSE
     // Track starts before or at render window
-    // We need to skip the part of the track before renderStart
-    timelineDiff = renderStartTime - globalStart
-
-    // SCALE the difference by playbackRate
-    // If rate is 2.0, skipping 5s of timeline means skipping 10s of media
-    mediaDiff = timelineDiff * rate
-
     delayMs = 0
-    inputSeek = (track.seek OR 0) + mediaDiff
+    LET timelineTimeDiff = renderStartTime - globalStart
+    // Apply rate to timeline difference to get media time difference
+    inputSeek = (track.seek OR 0) + (timelineTimeDiff * rate)
   END IF
-  ```
 
-#### 4. Test Plan
-- **Verification**: Run the new verification script:
-  ```bash
-  npx ts-node packages/renderer/tests/verify-audio-playback-rate-seek.ts
+  // 3. Use inputSeek in -ss argument
+  ADD args: ['-ss', inputSeek.toString(), ...]
   ```
+- **Dependencies**: None.
+
+# 4. Test Plan
+- **Verification**: `npx ts-node packages/renderer/tests/verify-audio-playback-seek.ts`
 - **Success Criteria**:
-  - Test verifies that for `renderStartTime=5`, `offset=0`, `playbackRate=2.0`, the generated `-ss` argument is `10` (not `5`).
-  - Test verifies that for `renderStartTime=5`, `offset=0`, `playbackRate=0.5`, the generated `-ss` argument is `2.5` (not `5`).
-  - Test verifies `playbackRate=1.0` works as before.
+  - **Case 1**: Rate 1.0, StartFrame corresponds to 5s. Audio at T=0. Expect Seek = 5s.
+  - **Case 2**: Rate 2.0, StartFrame corresponds to 5s. Audio at T=0. Expect Seek = 10s.
+  - **Case 3**: Rate 0.5, StartFrame corresponds to 10s. Audio at T=0. Expect Seek = 5s.
+  - **Case 4**: Rate 1.5, StartFrame corresponds to 10s. Audio at T=2. Expect Seek = 0 (original seek) + (8s * 1.5) = 12s.
 - **Edge Cases**:
-  - `playbackRate` infinite or negative (should be handled by existing validation, defaulting to 1.0).
-  - `startFrame` causing `renderStartTime` to be exactly equal to `offset`.
+  - `playbackRate` = Infinity (fallback to 1.0).
+  - `track.seek` > 0 (should be added correctly).
