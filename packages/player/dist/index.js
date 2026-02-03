@@ -1,7 +1,9 @@
 import { DirectController, BridgeController } from "./controllers";
 import { ClientSideExporter } from "./features/exporter";
 import { HeliosTextTrack, HeliosTextTrackList, CueClass } from "./features/text-tracks";
+import { HeliosAudioTrack, HeliosAudioTrackList } from "./features/audio-tracks";
 import { parseCaptions } from "./features/caption-parser";
+import { HeliosMediaSession } from "./features/media-session";
 export { ClientSideExporter };
 class StaticTimeRange {
     startVal;
@@ -519,6 +521,7 @@ export class HeliosPlayer extends HTMLElement {
     iframe;
     pipVideo;
     _textTracks;
+    _audioTracks;
     _domTracks = new Map();
     playPauseBtn;
     volumeBtn;
@@ -553,6 +556,7 @@ export class HeliosPlayer extends HTMLElement {
     isLoaded = false;
     resizeObserver;
     controller = null;
+    mediaSession = null;
     // Keep track if we have direct access (optional, mainly for debugging/logging)
     directHelios = null;
     unsubscribe = null;
@@ -905,7 +909,7 @@ export class HeliosPlayer extends HTMLElement {
         }
     }
     static get observedAttributes() {
-        return ["src", "width", "height", "autoplay", "loop", "controls", "export-format", "input-props", "poster", "muted", "interactive", "preload", "controlslist", "sandbox", "export-caption-mode", "disablepictureinpicture", "export-width", "export-height", "export-bitrate", "export-filename"];
+        return ["src", "width", "height", "autoplay", "loop", "controls", "export-format", "input-props", "poster", "muted", "interactive", "preload", "controlslist", "sandbox", "export-caption-mode", "disablepictureinpicture", "export-width", "export-height", "export-bitrate", "export-filename", "media-title", "media-artist", "media-album", "media-artwork"];
     }
     constructor() {
         super();
@@ -948,6 +952,7 @@ export class HeliosPlayer extends HTMLElement {
         this._textTracks = new HeliosTextTrackList();
         this._textTracks.addEventListener("addtrack", () => this.updateCCButtonVisibility());
         this._textTracks.addEventListener("removetrack", () => this.updateCCButtonVisibility());
+        this._audioTracks = new HeliosAudioTrackList();
         this.resizeObserver = new ResizeObserver((entries) => {
             for (const entry of entries) {
                 const width = entry.contentRect.width;
@@ -962,10 +967,19 @@ export class HeliosPlayer extends HTMLElement {
     get textTracks() {
         return this._textTracks;
     }
+    get audioTracks() {
+        return this._audioTracks;
+    }
     addTextTrack(kind, label = "", language = "") {
         const track = new HeliosTextTrack(kind, label, language, this);
         this._textTracks.addTrack(track);
         return track;
+    }
+    handleAudioTrackEnabledChange(track) {
+        if (!this.controller)
+            return;
+        // Helios "muted" is the inverse of AudioTrack "enabled"
+        this.controller.setAudioTrackMuted(track.id, !track.enabled);
     }
     handleTrackModeChange(track) {
         if (!this.controller)
@@ -1048,6 +1062,9 @@ export class HeliosPlayer extends HTMLElement {
             if (this.controller) {
                 this.controller.setAudioMuted(this.hasAttribute("muted"));
             }
+        }
+        if (name.startsWith("media-")) {
+            this.mediaSession?.updateMetadata();
         }
         if (name === "controlslist" || name === "disablepictureinpicture") {
             this.updateControlsVisibility();
@@ -1198,6 +1215,10 @@ export class HeliosPlayer extends HTMLElement {
         this.stopConnectionAttempts();
         if (this.unsubscribe) {
             this.unsubscribe();
+        }
+        if (this.mediaSession) {
+            this.mediaSession.destroy();
+            this.mediaSession = null;
         }
         if (this.controller) {
             this.controller.pause();
@@ -1425,6 +1446,10 @@ export class HeliosPlayer extends HTMLElement {
     };
     setController(controller) {
         // Clean up old controller
+        if (this.mediaSession) {
+            this.mediaSession.destroy();
+            this.mediaSession = null;
+        }
         if (this.controller) {
             this.controller.dispose();
         }
@@ -1433,6 +1458,7 @@ export class HeliosPlayer extends HTMLElement {
             this.unsubscribe = null;
         }
         this.controller = controller;
+        this.mediaSession = new HeliosMediaSession(this, controller);
         // Check for pending captions
         this.handleSlotChange();
         // Update States
@@ -1721,6 +1747,48 @@ export class HeliosPlayer extends HTMLElement {
         }
     };
     updateUI(state) {
+        // Sync Audio Tracks
+        if (state.availableAudioTracks) {
+            const metadataTracks = state.availableAudioTracks;
+            const currentIds = new Set(metadataTracks.map(t => t.id));
+            // 1. Add new tracks
+            metadataTracks.forEach(meta => {
+                let track = this._audioTracks.getTrackById(meta.id);
+                if (!track) {
+                    // Default enabled=true unless explicitly muted in state
+                    const isMuted = state.audioTracks && state.audioTracks[meta.id] ? state.audioTracks[meta.id].muted : false;
+                    track = new HeliosAudioTrack(meta.id, "", // Kind
+                    meta.id, // Label (fallback to ID)
+                    "", // Language
+                    !isMuted, // Enabled
+                    this);
+                    this._audioTracks.addTrack(track);
+                }
+                else {
+                    // Update enabled state if changed externally
+                    const isMuted = state.audioTracks && state.audioTracks[meta.id] ? state.audioTracks[meta.id].muted : false;
+                    if (track.enabled !== !isMuted) {
+                        track._setEnabledInternal(!isMuted);
+                        this._audioTracks.dispatchChangeEvent();
+                    }
+                }
+            });
+            // 2. Remove old tracks
+            const tracksToRemove = [];
+            for (const track of this._audioTracks) {
+                if (!currentIds.has(track.id)) {
+                    tracksToRemove.push(track);
+                }
+            }
+            tracksToRemove.forEach(t => this._audioTracks.removeTrack(t));
+        }
+        // Update text tracks active cues
+        if (state.fps) {
+            const currentTime = state.currentFrame / state.fps;
+            for (const track of this._textTracks) {
+                track.updateActiveCues(currentTime);
+            }
+        }
         // Hide poster if we are playing or have advanced
         if (state.isPlaying || state.currentFrame > 0) {
             this.posterContainer.classList.add("hidden");
@@ -1916,7 +1984,7 @@ export class HeliosPlayer extends HTMLElement {
                     endTime: cue.endTime,
                     text: cue.text
                 }));
-                exporter.saveCaptionsAsSRT(cues, "captions.srt");
+                exporter.saveCaptionsAsSRT(cues, `${filename}.srt`);
             }
             includeCaptions = false;
         }
