@@ -74,6 +74,51 @@ onMounted(() => {
 </template>
 ```
 
+## Audio Visualization Pattern
+
+For audio visualization, use a **computed property** to analyze audio data based on the reactive `frame` or `currentTime`.
+
+### 1. Create Audio Analysis Composable
+
+```javascript
+// composables/useAudioData.js
+import { computed, unref } from 'vue';
+
+export function useAudioData(buffer, currentTime) {
+  return computed(() => {
+    const b = unref(buffer);
+    const t = unref(currentTime);
+    if (!b) return { rms: 0, waveform: [] };
+
+    const data = b.getChannelData(0);
+    const sampleRate = b.sampleRate;
+    const center = Math.floor(t * sampleRate);
+
+    // Analysis logic...
+    return { rms: 0.5, waveform: [] };
+  });
+}
+```
+
+### 2. Use in Component
+
+```vue
+<script setup>
+import { computed, watch } from 'vue';
+import { useVideoFrame } from './composables/useVideoFrame';
+import { useAudioData } from './composables/useAudioData';
+
+const frame = useVideoFrame(helios);
+const currentTime = computed(() => frame.value / helios.fps);
+const audioData = useAudioData(buffer, currentTime);
+
+watch(audioData, ({ rms, waveform }) => {
+    // Draw logic
+});
+</script>
+```
+
 ## Source Files
 
 - Example: `examples/vue-canvas-animation/`
+- Example: `examples/vue-audio-visualization/`

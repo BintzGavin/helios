@@ -82,6 +82,7 @@ interface AudioTrackConfig {
   volume?: number; // 0.0 to 1.0
   offset?: number; // Start time in composition (seconds)
   seek?: number;   // Start time in source file (seconds)
+  playbackRate?: number; // Speed multiplier (default: 1.0)
 }
 ```
 
@@ -149,6 +150,25 @@ const diagnostics = await renderer.diagnose();
 - **Stability:** Waits for `seeked` events on all media elements (Multi-Frame Seek) to ensure frames are perfectly aligned before capturing.
 
 ## Utilities
+
+### Distributed Rendering
+Split a render job into multiple chunks to run concurrently (e.g., on multiple cores).
+
+```typescript
+import { RenderOrchestrator, DistributedRenderOptions } from '@helios-project/renderer';
+
+const options: DistributedRenderOptions = {
+  // ...standard Renderer options...
+  concurrency: 4 // Number of parallel workers (default: CPU cores - 1)
+};
+
+await RenderOrchestrator.render(
+  'http://localhost:3000/composition.html',
+  'output.mp4',
+  options,
+  { onProgress: (p) => console.log(`Total Progress: ${p}`) }
+);
+```
 
 ### Concatenate Videos
 Combine multiple video files into one.

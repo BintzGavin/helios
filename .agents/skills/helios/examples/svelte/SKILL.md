@@ -149,7 +149,55 @@ export class HeliosState {
 - **Reactive Statements (`$:`):** Use reactive statements to trigger redraws whenever `$heliosStore` updates.
 - **Singleton Helios:** Initialize `Helios` outside the component script or in a separate module to ensure it persists if the component remounts (though for a root App component, inside `<script>` is fine).
 
+## Audio Visualization Pattern
+
+For audio visualization, use a **derived store** to compute analysis data (RMS, Waveform) reactively based on the current frame.
+
+### 1. Create Audio Store
+
+```javascript
+// lib/audio.js
+import { derived } from 'svelte/store';
+
+export function createAudioStore(bufferStore, heliosStore) {
+    return derived(
+        [bufferStore, heliosStore],
+        ([$buffer, $heliosState]) => {
+            if (!$buffer || !$heliosState) return { rms: 0, waveform: [] };
+
+            const data = $buffer.getChannelData(0);
+            const sampleRate = $buffer.sampleRate;
+            const time = $heliosState.currentFrame / $heliosState.fps;
+
+            // Analyze window around current time
+            const center = Math.floor(time * sampleRate);
+            const windowSize = 1024;
+            // ... (FFT logic or simple time-domain analysis) ...
+
+            return { rms: 0.5, waveform: [] }; // Mock result
+        }
+    );
+}
+```
+
+### 2. Use in Component
+
+```svelte
+<script>
+    import { createAudioStore } from './lib/audio';
+    // ... setup heliosStore and bufferStore ...
+
+    const audioStore = createAudioStore(bufferStore, heliosStore);
+
+    $: if (ctx && $audioStore) {
+        const { rms, waveform } = $audioStore;
+        // Draw using rms/waveform
+    }
+</script>
+```
+
 ## Source Files
 
 - Example: `examples/svelte-canvas-animation/`
 - Example: `examples/svelte-runes-animation/`
+- Example: `examples/svelte-audio-visualization/`
