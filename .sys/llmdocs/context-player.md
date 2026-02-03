@@ -72,7 +72,7 @@ The `<helios-player>` uses a Shadow DOM for encapsulation:
 - `export-width`: Target width for client-side export.
 - `export-height`: Target height for client-side export.
 - `export-bitrate`: Target bitrate for client-side export (bps).
-- `export-filename`: Filename for client-side export (without extension).
+- `export-filename`: Filename for client-side export (video and SRT).
 - `canvas-selector`: CSS selector for canvas in "canvas" mode.
 - `input-props`: JSON string for initial props.
 

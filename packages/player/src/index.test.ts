@@ -7,7 +7,8 @@ vi.mock('./features/exporter', () => {
   return {
     ClientSideExporter: vi.fn().mockImplementation(() => {
       return {
-        export: vi.fn()
+        export: vi.fn(),
+        saveCaptionsAsSRT: vi.fn()
       };
     })
   };
@@ -1272,6 +1273,88 @@ describe('HeliosPlayer', () => {
 
     it('should observe muted attribute', () => {
         expect(HeliosPlayer.observedAttributes).toContain('muted');
+    });
+  });
+
+  describe('SRT Export', () => {
+    let mockController: any;
+
+    beforeEach(() => {
+        mockController = {
+            getState: vi.fn().mockReturnValue({ currentFrame: 0, duration: 10, fps: 30, isPlaying: false }),
+            play: vi.fn(),
+            pause: vi.fn(),
+            seek: vi.fn(),
+            subscribe: vi.fn().mockReturnValue(() => {}),
+            onError: vi.fn().mockReturnValue(() => {}),
+            dispose: vi.fn(), setCaptions: vi.fn(),
+            setPlaybackRate: vi.fn(),
+            setAudioVolume: vi.fn(),
+            setAudioMuted: vi.fn(),
+            setInputProps: vi.fn(),
+            setLoop: vi.fn(),
+            setPlaybackRange: vi.fn(),
+            clearPlaybackRange: vi.fn(),
+            captureFrame: vi.fn(),
+            getAudioTracks: vi.fn()
+        };
+        (player as any).setController(mockController);
+    });
+
+    it('should save captions as SRT with correct filename', async () => {
+        // Add a text track and show it
+        const track = player.addTextTrack('captions', 'English', 'en');
+        track.addCue({ startTime: 0, endTime: 5, text: 'Hello' });
+        track.mode = 'showing';
+        // Need to enable global captions flag (usually done via UI toggle or track change logic)
+        (player as any).showCaptions = true;
+
+        // Set attributes
+        player.setAttribute('export-caption-mode', 'file');
+        player.setAttribute('export-filename', 'my-movie');
+
+        // Access the mocked exporter constructor to setup spies
+        const { ClientSideExporter } = await import('./features/exporter');
+        const saveCaptionsSpy = vi.fn();
+        const exportSpy = vi.fn().mockResolvedValue(undefined);
+
+        // Update mock implementation for this test
+        (ClientSideExporter as any).mockImplementation(function() {
+          return {
+            export: exportSpy,
+            saveCaptionsAsSRT: saveCaptionsSpy
+          };
+        });
+
+        // Trigger export
+        await (player as any).renderClientSide();
+
+        // Expect saveCaptionsAsSRT to be called with "my-movie.srt"
+        expect(saveCaptionsSpy).toHaveBeenCalledWith(expect.anything(), 'my-movie.srt');
+    });
+
+    it('should use default filename for SRT if not provided', async () => {
+        const track = player.addTextTrack('captions', 'English', 'en');
+        track.addCue({ startTime: 0, endTime: 5, text: 'Hello' });
+        track.mode = 'showing';
+        (player as any).showCaptions = true;
+
+        player.setAttribute('export-caption-mode', 'file');
+        // No export-filename (defaults to "video")
+
+        const { ClientSideExporter } = await import('./features/exporter');
+        const saveCaptionsSpy = vi.fn();
+        const exportSpy = vi.fn().mockResolvedValue(undefined);
+        (ClientSideExporter as any).mockImplementation(function() {
+          return {
+            export: exportSpy,
+            saveCaptionsAsSRT: saveCaptionsSpy
+          };
+        });
+
+        await (player as any).renderClientSide();
+
+        expect(saveCaptionsSpy).toHaveBeenCalledWith(expect.anything(), 'video.srt');
     });
   });
 
