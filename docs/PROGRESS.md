@@ -1,3 +1,6 @@
+### STUDIO v0.83.0
+- ✅ Completed: Loop Range - Implemented logic to loop playback within defined In/Out points (including handling of Out Point = 0 for full duration), ensuring smooth playback for specific sections.
+
 ### RENDERER v1.61.1
 - ✅ Completed: Fix Audio Playback Seek - Updated `FFmpegBuilder` to correctly calculate input seek time (`-ss`) when using `playbackRate` with `startFrame > 0`.
 

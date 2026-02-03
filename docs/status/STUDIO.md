@@ -1,4 +1,4 @@
-**Version**: 0.82.0
+**Version**: 0.83.0
 
 # Studio Domain Status
 
@@ -7,6 +7,7 @@
 **Focus**: UI Implementation & CLI
 
 ## Recent Updates
+- [v0.83.0] ✅ Completed: Loop Range - Implemented logic to loop playback within defined In/Out points (including handling of Out Point = 0 for full duration), ensuring smooth playback for specific sections.
 - [v0.82.0] ✅ Completed: Stacked Timeline - Implemented multi-lane stacked timeline for audio tracks with dynamic vertical scrolling and sticky ruler, improving visibility of overlapping tracks.
 - [v0.81.1] ✅ Verified: Omnibar - Added comprehensive unit tests for the Omnibar component to ensure robustness and prevent regressions.
 - [v0.81.0] ✅ Completed: Timeline Audio Visualization - Implemented visualization of audio tracks on the timeline using `availableAudioTracks` metadata, separating it from runtime state.
