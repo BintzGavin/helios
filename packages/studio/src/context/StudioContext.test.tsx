@@ -33,6 +33,7 @@ describe('StudioContext', () => {
     // Mock Controller
     mockController = {
       captureFrame: vi.fn(),
+      getAudioTracks: vi.fn().mockResolvedValue([]),
     };
   });
 

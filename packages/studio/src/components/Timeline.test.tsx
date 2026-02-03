@@ -32,6 +32,7 @@ describe('Timeline', () => {
     setInPoint: mockSetInPoint,
     outPoint: 300, // 10s * 30fps
     setOutPoint: mockSetOutPoint,
+    audioAssets: []
   };
 
   beforeEach(() => {

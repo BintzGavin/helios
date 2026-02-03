@@ -2,67 +2,32 @@ import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { useStudio } from '../../context/StudioContext';
 import './AudioMixerPanel.css';
 
-// Duplicate of AudioAsset from @helios-project/player
-interface AudioAsset {
-  id: string;
-  buffer: ArrayBuffer;
-  mimeType: string | null;
-  volume?: number;
-  muted?: boolean;
-  loop?: boolean;
-  startTime?: number;
-  fadeInDuration?: number;
-  fadeOutDuration?: number;
-}
-
 export const AudioMixerPanel: React.FC = () => {
-  const { controller } = useStudio();
-  const [tracks, setTracks] = useState<AudioAsset[]>([]);
+  const { controller, audioAssets, refreshAudioTracks } = useStudio();
   const [isLoading, setIsLoading] = useState(false);
 
-  const fetchTracks = useCallback(async () => {
-    if (!controller) return;
+  const handleRefresh = async () => {
     setIsLoading(true);
-    try {
-      const assets = await controller.getAudioTracks();
-      setTracks(assets);
-    } catch (e) {
-      console.error("Failed to fetch audio tracks", e);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [controller]);
-
-  useEffect(() => {
-    if (controller) {
-      fetchTracks();
-    }
-  }, [controller, fetchTracks]);
-
-  const handleVolumeChange = (id: string, newVolume: number) => {
-    if (!controller) return;
-    controller.setAudioTrackVolume(id, newVolume);
-
-    // Optimistic update
-    setTracks(prev => prev.map(t =>
-      t.id === id ? { ...t, volume: newVolume } : t
-    ));
+    await refreshAudioTracks();
+    setIsLoading(false);
   };
 
-  const handleMuteToggle = (id: string) => {
+  const handleVolumeChange = async (id: string, newVolume: number) => {
+    if (!controller) return;
+    controller.setAudioTrackVolume(id, newVolume);
+    await refreshAudioTracks();
+  };
+
+  const handleMuteToggle = async (id: string) => {
     if (!controller) return;
 
     // Find current track to toggle
-    const track = tracks.find(t => t.id === id);
+    const track = audioAssets.find(t => t.id === id);
     if (!track) return;
 
     const newMuted = !track.muted;
     controller.setAudioTrackMuted(id, newMuted);
-
-    // Optimistic update
-    setTracks(prev => prev.map(t =>
-      t.id === id ? { ...t, muted: newMuted } : t
-    ));
+    await refreshAudioTracks();
   };
 
   return (
@@ -71,7 +36,7 @@ export const AudioMixerPanel: React.FC = () => {
         <h3>Audio Mixer</h3>
         <button
           className="mixer-refresh-btn"
-          onClick={fetchTracks}
+          onClick={handleRefresh}
           title="Refresh Tracks"
           disabled={isLoading}
         >
@@ -80,12 +45,12 @@ export const AudioMixerPanel: React.FC = () => {
       </div>
 
       <div className="mixer-track-list">
-        {tracks.length === 0 ? (
+        {audioAssets.length === 0 ? (
           <div className="mixer-empty-state">
             {controller ? "No audio tracks found." : "Connect to player..."}
           </div>
         ) : (
-          tracks.map(track => {
+          audioAssets.map(track => {
             // Default volume to 1 if undefined, muted to false
             const volume = track.volume ?? 1;
             const isMuted = !!track.muted;

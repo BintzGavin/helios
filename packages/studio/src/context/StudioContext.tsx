@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect, useRef } from 'r
 import { type HeliosController, ClientSideExporter } from '@helios-project/player';
 import type { HeliosSchema, CaptionCue, Marker, AudioTrackMetadata } from '@helios-project/core';
 import { useToast } from './ToastContext';
+import { AudioAsset } from '../types';
 
 export interface CompositionMetadata {
   width: number;
@@ -122,6 +123,10 @@ interface StudioContextType {
   deleteAsset: (id: string) => Promise<void>;
   renameAsset: (id: string, newName: string) => Promise<void>;
 
+  // Audio Assets
+  audioAssets: AudioAsset[];
+  refreshAudioTracks: () => Promise<void>;
+
   // Render Jobs
   renderJobs: RenderJob[];
   startRender: (compositionId: string, options?: { inPoint: number; outPoint: number }) => void;
@@ -173,6 +178,7 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [compositions, setCompositions] = useState<Composition[]>([]);
   const [templates, setTemplates] = useState<TemplateInfo[]>([]);
   const [assets, setAssets] = useState<Asset[]>([]);
+  const [audioAssets, setAudioAssets] = useState<AudioAsset[]>([]);
   const [activeComposition, setActiveComposition] = useState<Composition | null>(null);
   const [isOmnibarOpen, setOmnibarOpen] = useState(false);
   const [isHelpOpen, setHelpOpen] = useState(false);
@@ -613,6 +619,22 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [controller, setController] = useState<HeliosController | null>(null);
   const [loop, setLoop] = useState(false);
 
+  const refreshAudioTracks = async () => {
+    if (!controller) return;
+    try {
+      const tracks = await controller.getAudioTracks();
+      setAudioAssets(tracks as AudioAsset[]);
+    } catch (e) {
+      console.error("Failed to refresh audio tracks", e);
+    }
+  };
+
+  useEffect(() => {
+    if (controller) {
+      refreshAudioTracks();
+    }
+  }, [controller]);
+
   const toggleLoop = () => setLoop(prev => !prev);
 
   // Loop logic: Enforce loop range when enabled
@@ -723,6 +745,8 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         uploadAsset,
         deleteAsset,
         renameAsset,
+        audioAssets,
+        refreshAudioTracks,
         activeComposition,
         setActiveComposition,
         isOmnibarOpen,
