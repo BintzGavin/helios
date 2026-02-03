@@ -70,6 +70,7 @@ The player will automatically attempt to access `window.helios` on the iframe's 
 | `export-width` | Target width for client-side export. | - |
 | `export-height` | Target height for client-side export. | - |
 | `export-bitrate` | Target bitrate for client-side export (bps). | - |
+| `export-filename` | Filename for client-side export (without extension). | `video` |
 | `export-caption-mode` | Strategy for caption export: `burn-in` or `file`. | `burn-in` |
 | `disablepictureinpicture` | Hides the Picture-in-Picture button. | `false` |
 

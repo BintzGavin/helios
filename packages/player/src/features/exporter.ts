@@ -31,8 +31,9 @@ export class ClientSideExporter {
     width?: number;
     height?: number;
     bitrate?: number;
+    filename?: string;
   }): Promise<void> {
-    const { onProgress, signal, mode = 'auto', canvasSelector = 'canvas', format = 'mp4', includeCaptions = true, width: targetWidth, height: targetHeight, bitrate } = options;
+    const { onProgress, signal, mode = 'auto', canvasSelector = 'canvas', format = 'mp4', includeCaptions = true, width: targetWidth, height: targetHeight, bitrate, filename = 'video' } = options;
 
     console.log(`Client-side rendering started! Format: ${format}`);
     this.controller.pause();
@@ -194,7 +195,7 @@ export class ClientSideExporter {
       await output.finalize();
 
       if (target.buffer) {
-        this.download(target.buffer, format);
+        this.download(target.buffer, format, filename);
         console.log("Client-side rendering and download finished!");
       } else {
         throw new Error("Export failed: Output buffer is empty");
@@ -278,13 +279,13 @@ export class ClientSideExporter {
       return new VideoFrame(canvas, { timestamp: frame.timestamp });
   }
 
-  private download(buffer: ArrayBuffer, format: 'mp4' | 'webm') {
+  private download(buffer: ArrayBuffer, format: 'mp4' | 'webm', filename: string) {
       const type = format === 'webm' ? "video/webm" : "video/mp4";
       const blob = new Blob([buffer], { type });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `video.${format}`;
+      a.download = `${filename}.${format}`;
       a.click();
       URL.revokeObjectURL(url);
   }

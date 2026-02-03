@@ -976,7 +976,7 @@ export class HeliosPlayer extends HTMLElement implements TrackHost {
   }
 
   static get observedAttributes() {
-    return ["src", "width", "height", "autoplay", "loop", "controls", "export-format", "input-props", "poster", "muted", "interactive", "preload", "controlslist", "sandbox", "export-caption-mode", "disablepictureinpicture", "export-width", "export-height", "export-bitrate"];
+    return ["src", "width", "height", "autoplay", "loop", "controls", "export-format", "input-props", "poster", "muted", "interactive", "preload", "controlslist", "sandbox", "export-caption-mode", "disablepictureinpicture", "export-width", "export-height", "export-bitrate", "export-filename"];
   }
 
   constructor() {
@@ -2090,6 +2090,7 @@ export class HeliosPlayer extends HTMLElement implements TrackHost {
     const exportWidth = parseFloat(this.getAttribute("export-width") || "");
     const exportHeight = parseFloat(this.getAttribute("export-height") || "");
     const exportBitrate = parseInt(this.getAttribute("export-bitrate") || "");
+    const filename = this.getAttribute("export-filename") || "video";
 
     const width = !isNaN(exportWidth) && exportWidth > 0 ? exportWidth : undefined;
     const height = !isNaN(exportHeight) && exportHeight > 0 ? exportHeight : undefined;
@@ -2123,7 +2124,8 @@ export class HeliosPlayer extends HTMLElement implements TrackHost {
             includeCaptions: includeCaptions,
             width: width,
             height: height,
-            bitrate: bitrate
+            bitrate: bitrate,
+            filename: filename
         });
     } catch (e: any) {
         if (e.message !== "Export aborted") {
