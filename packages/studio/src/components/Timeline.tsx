@@ -3,6 +3,7 @@ import { useStudio } from '../context/StudioContext';
 import { usePersistentState } from '../hooks/usePersistentState';
 import { framesToTimecode } from '@helios-project/core';
 import { TimecodeDisplay } from './Controls/TimecodeDisplay';
+import { AudioWaveform } from './AudioWaveform';
 import './Timeline.css';
 
 interface Tick {
@@ -22,7 +23,8 @@ export const Timeline: React.FC = () => {
     inPoint,
     setInPoint,
     outPoint,
-    setOutPoint
+    setOutPoint,
+    audioAssets
   } = useStudio();
 
   const { currentFrame, duration, fps } = playerState;
@@ -309,6 +311,7 @@ export const Timeline: React.FC = () => {
               const startFrame = track.startTime * fps;
               const durationFrame = track.duration * fps;
               const top = getAudioTrackTop(i);
+              const asset = audioAssets.find(a => a.id === track.id);
 
               return (
                 <div
@@ -317,10 +320,19 @@ export const Timeline: React.FC = () => {
                   style={{
                     left: `${getPercent(startFrame)}%`,
                     width: `${getPercent(durationFrame)}%`,
-                    top: `${top}px`
+                    top: `${top}px`,
+                    overflow: 'hidden'
                   }}
                   title={`Audio: ${track.id}`}
-                />
+                >
+                    {asset && asset.buffer && (
+                        <AudioWaveform
+                            buffer={asset.buffer}
+                            color="rgba(255, 255, 255, 0.8)"
+                        />
+                    )}
+                    {!asset && <span style={{fontSize: '10px', paddingLeft: '4px', color: '#fff'}}>{track.id}</span>}
+                </div>
               );
             })}
 

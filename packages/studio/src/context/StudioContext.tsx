@@ -1,71 +1,16 @@
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { type HeliosController, ClientSideExporter } from '@helios-project/player';
-import type { HeliosSchema, CaptionCue, Marker, AudioTrackMetadata } from '@helios-project/core';
 import { useToast } from './ToastContext';
-
-export interface CompositionMetadata {
-  width: number;
-  height: number;
-  fps: number;
-  duration: number;
-}
-
-export interface TemplateInfo {
-  id: string;
-  label: string;
-}
-
-export interface Composition {
-  id: string;
-  name: string;
-  url: string;
-  thumbnailUrl?: string;
-  description?: string;
-  metadata?: CompositionMetadata;
-}
-
-export interface Asset {
-  id: string;
-  name: string;
-  url: string;
-  type: 'image' | 'video' | 'audio' | 'font' | 'model' | 'json' | 'shader' | 'other';
-  relativePath: string;
-}
-
-export interface RenderConfig {
-  mode: 'canvas' | 'dom';
-  videoBitrate?: string;
-  videoCodec?: string;
-}
-
-export interface RenderJob {
-  id: string;
-  status: 'queued' | 'rendering' | 'completed' | 'failed' | 'cancelled';
-  progress: number; // 0-1
-  compositionId: string;
-  outputPath?: string;
-  outputUrl?: string;
-  error?: string;
-  createdAt: number;
-  inPoint?: number;
-  outPoint?: number;
-}
-
-export interface PlayerState {
-  currentFrame: number;
-  duration: number;
-  fps: number;
-  playbackRate: number;
-  isPlaying: boolean;
-  volume: number;
-  muted: boolean;
-  inputProps: Record<string, any>;
-  schema?: HeliosSchema;
-  captions: CaptionCue[];
-  markers: Marker[];
-  audioTracks: Record<string, { volume: number; muted: boolean }>;
-  availableAudioTracks: AudioTrackMetadata[];
-}
+import {
+  type CompositionMetadata,
+  type TemplateInfo,
+  type Composition,
+  type Asset,
+  type RenderConfig,
+  type RenderJob,
+  type PlayerState,
+  type AudioAsset
+} from '../types';
 
 const DEFAULT_PLAYER_STATE: PlayerState = {
   currentFrame: 0,
@@ -122,6 +67,10 @@ interface StudioContextType {
   deleteAsset: (id: string) => Promise<void>;
   renameAsset: (id: string, newName: string) => Promise<void>;
 
+  // Audio Assets
+  audioAssets: AudioAsset[];
+  refreshAudioAssets: () => Promise<void>;
+
   // Render Jobs
   renderJobs: RenderJob[];
   startRender: (compositionId: string, options?: { inPoint: number; outPoint: number }) => void;
@@ -173,6 +122,7 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [compositions, setCompositions] = useState<Composition[]>([]);
   const [templates, setTemplates] = useState<TemplateInfo[]>([]);
   const [assets, setAssets] = useState<Asset[]>([]);
+  const [audioAssets, setAudioAssets] = useState<AudioAsset[]>([]);
   const [activeComposition, setActiveComposition] = useState<Composition | null>(null);
   const [isOmnibarOpen, setOmnibarOpen] = useState(false);
   const [isHelpOpen, setHelpOpen] = useState(false);
@@ -197,6 +147,8 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [outPoint, setOutPoint] = useState(0);
   const [playerState, _setPlayerState] = useState<PlayerState>(DEFAULT_PLAYER_STATE);
 
+  const [controller, setController] = useState<HeliosController | null>(null);
+
   const setPlayerState = (newState: Partial<PlayerState> | ((prev: PlayerState) => PlayerState)) => {
     _setPlayerState(prev => {
       const state = typeof newState === 'function' ? newState(prev) : newState;
@@ -207,6 +159,22 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       };
     });
   };
+
+  const refreshAudioAssets = async () => {
+    if (!controller) return;
+    try {
+      const tracks = await controller.getAudioTracks();
+      setAudioAssets(tracks as unknown as AudioAsset[]);
+    } catch (e) {
+      console.error("Failed to refresh audio assets:", e);
+    }
+  };
+
+  useEffect(() => {
+    if (controller) {
+      refreshAudioAssets();
+    }
+  }, [controller]);
 
   const fetchAssets = () => {
     fetch('/api/assets')
@@ -610,7 +578,6 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     }
   };
 
-  const [controller, setController] = useState<HeliosController | null>(null);
   const [loop, setLoop] = useState(false);
 
   const toggleLoop = () => setLoop(prev => !prev);
@@ -770,7 +737,9 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         isExporting,
         exportProgress,
         exportVideo,
-        cancelExport
+        cancelExport,
+        audioAssets,
+        refreshAudioAssets
       }}
     >
       {children}

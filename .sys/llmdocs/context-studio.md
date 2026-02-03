@@ -16,6 +16,7 @@ packages/studio/
 │   └── helios-studio.js
 ├── src/
 │   ├── cli.ts
+│   ├── types.ts
 │   ├── components/
 │   │   ├── AssetsPanel/
 │   │   ├── AssistantModal/
@@ -26,6 +27,7 @@ packages/studio/
 │   │   ├── Layout/
 │   │   ├── Stage/
 │   │   ├── Toast/
+│   │   ├── AudioWaveform.tsx
 │   │   ├── Timeline.tsx
 │   │   ├── Timeline.css
 │   │   ├── CompositionSettingsModal.tsx
@@ -56,7 +58,7 @@ packages/studio/
 
 ## D. UI Components
 
-- **Timeline**: Visual timeline with scrubbing, playhead, markers, and multi-lane stacked audio track visualization.
+- **Timeline**: Visual timeline with scrubbing, playhead, markers, multi-lane stacked audio track visualization, and audio waveforms.
 - **Props Editor**: Schema-aware input forms for composition properties.
 - **Assets Panel**: Drag-and-drop asset management.
 - **Renders Panel**: Render job tracking and history.

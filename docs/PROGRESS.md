@@ -39,6 +39,9 @@ Each agent should update **their own dedicated progress file** instead of this f
 ## PLAYER v0.59.1
 - ✅ Completed: Documentation Update - Added missing export attributes, audio fades, and diagnostics API to README.
 
+## STUDIO v0.83.0
+- ✅ Completed: Audio Waveforms - Implemented visual audio waveforms on the timeline using OfflineAudioContext.
+
 ## STUDIO v0.82.0
 - ✅ Completed: Stacked Timeline - Implemented multi-lane stacked timeline for audio tracks with dynamic vertical scrolling and sticky ruler, improving visibility of overlapping tracks.
 
