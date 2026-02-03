@@ -2107,7 +2107,7 @@ export class HeliosPlayer extends HTMLElement implements TrackHost {
           endTime: cue.endTime,
           text: cue.text
         }));
-        exporter.saveCaptionsAsSRT(cues, "captions.srt");
+        exporter.saveCaptionsAsSRT(cues, `${filename}.srt`);
       }
       includeCaptions = false;
     }
