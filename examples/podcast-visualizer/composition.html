@@ -42,15 +42,11 @@
       height: 100%;
       background: #4CAF50;
       width: 0%;
-      transition: width 0.1s linear;
+      /* Removed transition for frame-perfect updates */
     }
     .music-bar {
-      animation: pulse 1s infinite alternate;
-      width: 100%;
-    }
-    @keyframes pulse {
-      from { opacity: 0.5; }
-      to { opacity: 1; }
+      /* Removed CSS animation */
+      width: 0%;
     }
     .voice-indicator {
       width: 20px;
@@ -58,7 +54,7 @@
       border-radius: 50%;
       background: #FF5722;
       opacity: 0;
-      transition: opacity 0.1s;
+      /* Removed transition for frame-perfect updates */
     }
     .muted-indicator {
       width: 20px;
@@ -81,7 +77,7 @@
   <div class="track-container">
     <div class="track-label">Music</div>
     <div class="visualizer">
-      <div class="bar music-bar"></div>
+      <div id="music-bar" class="bar music-bar"></div>
     </div>
     <!-- Track 1: Music (Looping, Offset 0) -->
     <audio id="music-track" loop data-helios-offset="0"></audio>
@@ -106,8 +102,7 @@
   </div>
 
   <div class="warning">
-    Note: In browser preview, 'Voice' track will play immediately or be out of sync due to DomDriver limitations with offset.
-    Use 'npm run verify' to check correct audio timing in Renderer.
+    Real-time audio analysis driven by AudioContext and synchronized with Helios.
   </div>
 
   <script type="module">
@@ -120,9 +115,10 @@
     const voiceTrack = document.getElementById('voice-track');
     const mutedTrack = document.getElementById('muted-track');
 
+    const musicBar = document.getElementById('music-bar');
     const voiceVisual = document.getElementById('voice-visual');
 
-    // Set Sources
+    // Set Sources for Playback
     musicTrack.src = AUDIO_SRC;
     voiceTrack.src = AUDIO_SRC;
     mutedTrack.src = AUDIO_SRC;
@@ -130,7 +126,56 @@
     // Set Volume
     musicTrack.volume = 0.5;
     voiceTrack.volume = 1.0;
-    // mutedTrack is muted via attribute
+
+    let audioBuffer = null;
+
+    async function loadAudio() {
+        try {
+            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            const response = await fetch(AUDIO_SRC);
+            const arrayBuffer = await response.arrayBuffer();
+            audioBuffer = await ctx.decodeAudioData(arrayBuffer);
+            console.log("Audio loaded for analysis");
+        } catch (e) {
+            console.error("Failed to load audio for analysis", e);
+        }
+    }
+
+    loadAudio();
+
+    // Helper to get RMS
+    function getRMS(buffer, time, windowSize = 512) {
+        if (!buffer) return 0;
+
+        const data = buffer.getChannelData(0); // Mono or Left
+        const sampleRate = buffer.sampleRate;
+        const centerSample = Math.floor(time * sampleRate);
+
+        // Loop support for music track (assuming 1s duration)
+        // Since the track is "looping", we mod the sample index by length
+        // But for safety, let's just use modulo on time if needed.
+        // The implementation below clamps, but if we want looping we handle it outside or here.
+        // For simplicity: this function just returns data at specific time.
+
+        const startSample = centerSample - windowSize / 2;
+        const endSample = centerSample + windowSize / 2;
+
+        let sumSquares = 0;
+        let count = 0;
+
+        for (let i = startSample; i < endSample; i++) {
+            // Handle looping index
+            let idx = i;
+            if (idx < 0) idx = data.length + idx;
+            if (idx >= data.length) idx = idx % data.length;
+
+            const sample = data[idx];
+            sumSquares += sample * sample;
+            count++;
+        }
+
+        return Math.sqrt(sumSquares / count);
+    }
 
     const helios = new Helios({
       duration: 5,
@@ -142,13 +187,27 @@
 
     // Subscribe to update visual indicators
     helios.subscribe((state) => {
-      // Voice Indicator Logic: Visible after 2 seconds
       const currentTime = state.currentFrame / state.fps;
-      if (currentTime >= 2) {
-        voiceVisual.style.opacity = 1;
-      } else {
-        voiceVisual.style.opacity = 0;
+
+      if (!audioBuffer) return;
+
+      // 1. Music Track (Offset 0, Looping)
+      // Since it loops every 1s (approx duration of wav), we can just sample.
+      // But getRMS with looping logic above handles it.
+      const musicRMS = getRMS(audioBuffer, currentTime);
+      // Amplify for visual effect
+      const musicWidth = Math.min(100, musicRMS * 200);
+      musicBar.style.width = `${musicWidth}%`;
+
+      // 2. Voice Track (Offset 2s, One-shot)
+      const voiceTime = currentTime - 2;
+      let voiceOpacity = 0;
+
+      if (voiceTime >= 0 && voiceTime < audioBuffer.duration) {
+          const voiceRMS = getRMS(audioBuffer, voiceTime);
+          voiceOpacity = Math.min(1, voiceRMS * 5); // Amplify
       }
+      voiceVisual.style.opacity = voiceOpacity;
     });
 
     helios.bindToDocumentTimeline();
