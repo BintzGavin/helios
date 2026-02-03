@@ -46,9 +46,10 @@ The `<helios-player>` component dispatches standard HTMLMediaElement events and 
 - `error`: An error occurred (details in `error` property).
 - `enterpictureinpicture`: Entered PiP mode.
 - `leavepictureinpicture`: Left PiP mode.
+- `cuechange`: Active cues changed (dispatched by TextTrack, but bubbles or handled).
 
 ## C. Attributes
-The component observes the following attributes:
+The component observes or reads the following attributes:
 
 - `src`: URL of the Helios composition.
 - `width`: Player width (for aspect ratio).
@@ -65,6 +66,7 @@ The component observes the following attributes:
 - `disablepictureinpicture`: Hide PiP button.
 - `input-props`: JSON string for dynamic props.
 - `export-mode`: Export strategy (`auto`, `canvas`, `dom`).
+- `canvas-selector`: CSS selector for the canvas element during export (default: `canvas`).
 - `export-format`: Export format (`mp4`, `webm`).
 - `export-caption-mode`: Caption export mode (`burn-in`, `file`).
 - `export-width`: Target width for export.
@@ -75,6 +77,6 @@ The component observes the following attributes:
 ## D. Public API
 The `HeliosPlayer` class exposes properties and methods closely mirroring `HTMLMediaElement`:
 
-- **Properties**: `currentTime`, `duration`, `paused`, `ended`, `volume`, `muted`, `playbackRate`, `src`, `currentSrc`, `error`, `readyState`, `networkState`, `buffered`, `seekable`, `played`, `videoWidth`, `videoHeight`, `textTracks`, `audioTracks`, `activeCues`.
+- **Properties**: `currentTime`, `duration`, `paused`, `ended`, `volume`, `muted`, `playbackRate`, `src`, `currentSrc`, `error`, `readyState`, `networkState`, `buffered`, `seekable`, `played`, `videoWidth`, `videoHeight`, `textTracks`, `audioTracks`.
 - **Methods**: `play()`, `pause()`, `load()`, `addTextTrack()`, `requestPictureInPicture()`, `diagnose()`.
 - **Getters**: `getController()` (Returns internal controller instance).

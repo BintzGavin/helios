@@ -1,3 +1,6 @@
+### PLAYER v0.64.1
+- ✅ Verified: SRT Export Implementation - Verified existing implementation of SRT export and caption parsing against plan requirements.
+
 ### CORE v5.9.0
 - ✅ Completed: Reactive Virtual Time Getter - Exposed `isVirtualTimeBound` getter in `Helios` to allow consumers to verify synchronous virtual time binding.
 
