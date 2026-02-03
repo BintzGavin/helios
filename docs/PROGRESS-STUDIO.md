@@ -1,3 +1,6 @@
+## STUDIO v0.86.0
+- ✅ Completed: Audio Mixer Solo - Implemented "Solo" functionality in Audio Mixer Panel, allowing isolation of individual audio tracks with mute state restoration.
+
 ## STUDIO v0.82.0
 - ✅ Completed: Stacked Timeline - Implemented multi-lane stacked timeline for audio tracks with dynamic vertical scrolling and sticky ruler, improving visibility of overlapping tracks.
 
