@@ -46,6 +46,7 @@ The system uses individual prompts for each agent role:
 - **[PLAYER Planning](./planning-player.md)** - Planning agent for Web Component player
 - **[DEMO Planning](./planning-demo.md)** - Planning agent for examples and build tooling
 - **[STUDIO Planning](./planning-studio.md)** - Planning agent for Helios Studio dev environment
+- **[CLI Planning](./planning-cli.md)** - Planning agent for CLI (registry, workflows, deployment)
 
 **Execution Prompts:**
 - **[CORE Execution](./execution-core.md)** - Execution agent for core logic engine
@@ -53,6 +54,7 @@ The system uses individual prompts for each agent role:
 - **[PLAYER Execution](./execution-player.md)** - Execution agent for Web Component player
 - **[DEMO Execution](./execution-demo.md)** - Execution agent for examples and build tooling
 - **[STUDIO Execution](./execution-studio.md)** - Execution agent for Helios Studio dev environment
+- **[CLI Execution](./execution-cli.md)** - Execution agent for CLI (registry, workflows, deployment)
 
 **Other Prompts:**
 - **[Documentation Prompt](./docs.md)** - Unified prompt for user-facing documentation agent (no planning/execution separation)

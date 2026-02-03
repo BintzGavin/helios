@@ -1,38 +1,61 @@
-# 2026-02-01-PLAYER-audio-tracks.md
+# 2026-02-01-PLAYER-Audio-Tracks
 
 #### 1. Context & Goal
-- **Objective**: Implement `setAudioTrackVolume` and `setAudioTrackMuted` in the `HeliosController` interface and bridge protocol.
-- **Trigger**: The Studio domain requires granular control over individual audio tracks, but the current Player API only supports global volume/mute.
-- **Impact**: Unlocks track-level audio mixing in Helios Studio.
+- **Objective**: Implement the `audioTracks` property and `AudioTrackList` interface on `<helios-player>` to expose discovered audio tracks and enable granular control (mute/unmute) via a standard API.
+- **Trigger**: "Standard Media API Parity" vision gap and "Advanced Audio Mixing" roadmap requirement. Currently, tracks can only be controlled if IDs are known, but there is no mechanism to discover them.
+- **Impact**: Enables custom UIs (like Studio mixers) to list and control individual audio tracks. Improves generic player capabilities.
 
 #### 2. File Inventory
-- **Create**: None
-- **Modify**:
-  - `packages/player/src/controllers.ts`: Update `HeliosController` interface and `DirectController`/`BridgeController` implementations.
-  - `packages/player/src/bridge.ts`: Handle `HELIOS_SET_TRACK_VOLUME` and `HELIOS_SET_TRACK_MUTED` messages.
-  - `packages/player/src/controllers.test.ts`: Add unit tests for new methods.
-- **Read-Only**: `packages/core/src/index.ts`
+- **Create**: `packages/player/src/features/audio-tracks.ts` (Implement `HeliosAudioTrack` and `HeliosAudioTrackList` classes).
+- **Modify**: `packages/player/src/features/audio-utils.ts` (Add `AudioTrackMetadata` interface and `scanAudioTracks` function).
+- **Modify**: `packages/player/src/controllers.ts` (Add `getAudioTrackList` to `HeliosController` interface and implementations).
+- **Modify**: `packages/player/src/bridge.ts` (Handle `HELIOS_GET_AUDIO_TRACK_LIST` message).
+- **Modify**: `packages/player/src/index.ts` (Add `audioTracks` property to `HeliosPlayer` and sync logic).
+- **Read-Only**: `packages/core/src/index.ts` (Implicit dependency on Core behavior).
 
 #### 3. Implementation Spec
-- **Architecture**: Extend the existing Bridge/Controller pattern. `DirectController` calls core methods directly; `BridgeController` uses `postMessage` to trigger core methods inside the iframe.
+- **Architecture**:
+  - `HeliosAudioTrack` wraps track metadata (`id`, `kind`, `label`, `language`, `enabled`) and calls `player.controller.setAudioTrackMuted(id, !enabled)` on change.
+  - `HeliosAudioTrackList` maintains the list of tracks and emits `change`, `addtrack`, `removetrack` events (Standard `EventTarget`).
+  - `AudioTrackMetadata` is a lightweight structure (no buffers) for passing track info across the bridge.
+
 - **Pseudo-Code**:
-  - **Interface Update**: Add methods for setting track volume and mute status to `HeliosController` interface.
-  - **DirectController**: Implement new methods to proxy calls directly to the underlying `Helios` instance.
-  - **BridgeController**: Implement new methods to serialize arguments into `HELIOS_SET_TRACK_VOLUME` and `HELIOS_SET_TRACK_MUTED` messages and post them to the iframe.
-  - **Bridge Handler**:
-    - Listen for `HELIOS_SET_TRACK_VOLUME`. Validate `trackId` (string) and `volume` (number). Call `helios.setAudioTrackVolume`.
-    - Listen for `HELIOS_SET_TRACK_MUTED`. Validate `trackId` (string) and `muted` (boolean). Call `helios.setAudioTrackMuted`.
+  - **audio-utils.ts**:
+    - Update `AudioAsset` to include `id`.
+    - Update `getAudioAssets` to populate `id` (from element ID).
+    - Create `scanAudioTracks(doc)` that returns `AudioTrackMetadata[]` (id, kind, label, language, enabled).
+  - **controllers.ts**:
+    - `HeliosController` interface adds `getAudioTrackList()`.
+    - `DirectController`: calls `scanAudioTracks(document)`.
+    - `BridgeController`: sends `HELIOS_GET_AUDIO_TRACK_LIST` and waits for response.
+  - **bridge.ts**:
+    - On `HELIOS_GET_AUDIO_TRACK_LIST`: call `scanAudioTracks`, send back result.
+  - **audio-tracks.ts**:
+    - `HeliosAudioTrack`:
+      - Properties: `id`, `kind`, `label`, `language`, `enabled`.
+      - Setter for `enabled`: calls `controller.setAudioTrackMuted`.
+    - `HeliosAudioTrackList`:
+      - Properties: `length`, index accessors (via Proxy or array).
+      - Methods: `getTrackById`.
+      - Events: `onaddtrack`, `onremovetrack`, `onchange`.
+  - **index.ts**:
+    - Add `audioTracks: HeliosAudioTrackList`.
+    - On connection (`setController`), call `controller.getAudioTrackList()`.
+    - Populate `audioTracks`.
+    - Listen for changes.
+
 - **Public API Changes**:
-  - `HeliosController` interface gains:
-    - `setAudioTrackVolume(trackId: string, volume: number): void`
-    - `setAudioTrackMuted(trackId: string, muted: boolean): void`
+  - `<helios-player>`: adds `.audioTracks` (Read-only `HeliosAudioTrackList`).
+  - `HeliosController`: adds `getAudioTrackList()`.
+
 - **Dependencies**: None.
 
 #### 4. Test Plan
 - **Verification**: `npm test -w packages/player`
 - **Success Criteria**:
-  - Unit tests pass for `DirectController` delegating to `Helios` instance.
-  - Unit tests pass for `BridgeController` sending correct `postMessage` payloads.
+  - `audio-tracks.test.ts` passes, verifying list management and event emission.
+  - Integration: When `enabled` is toggled on a track in the list, `setAudioTrackMuted` is called on the controller.
 - **Edge Cases**:
-  - Invalid types in bridge messages (should be ignored).
-  - Missing track IDs (handled by Core, but Player should pass them through).
+  - No audio tracks found (list empty).
+  - Tracks with duplicate IDs (should handle gracefully or dedupe).
+  - Tracks with no IDs (should generate one or skip?). *Decision: Return empty ID, but warn.*
