@@ -55,6 +55,7 @@
 ## Critical Task
 - **None**: All critical tasks completed.
 
+[v0.62.0] ✅ Verified: Export Filename - Confirmed implementation and tests for `export-filename` attribute. Synced package.json version.
 [v0.62.0] ✅ Completed: Export Filename - Implemented `export-filename` attribute on `<helios-player>` to allow customizing the filename of client-side exported videos.
 [v0.61.0] ✅ Completed: Expose Composition Setters - Implemented `setDuration`, `setFps`, `setSize`, and `setMarkers` in `HeliosController` and updated Bridge protocol to support dynamic composition updates from the host.
 [v0.60.0] ✅ Completed: Headless Audio Support - Updated `getAudioAssets` and controllers to include audio tracks from Helios state metadata in client-side exports, prioritizing them over DOM elements.
