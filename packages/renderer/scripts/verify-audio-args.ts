@@ -32,7 +32,8 @@ const runTest = () => {
   const domStrategy = new DomStrategy({ width: 1920, height: 1080, fps: 30, durationInSeconds: 1 });
 
   // Case 1: DomStrategy with Audio
-  const argsDomWithAudio = domStrategy.getFFmpegArgs(optionsWithAudio, outputPath);
+  const configDomWithAudio = domStrategy.getFFmpegArgs(optionsWithAudio, outputPath);
+  const argsDomWithAudio = configDomWithAudio.args;
   console.log('Testing DomStrategy with Audio...');
   assert(argsDomWithAudio.includes('-i'), 'DomStrategy should include -i');
   assert(argsDomWithAudio.includes('/path/to/audio.mp3'), 'DomStrategy should include audio path');
@@ -45,7 +46,8 @@ const runTest = () => {
   assert(!argsDomWithAudio.includes('-shortest'), 'DomStrategy should NOT include -shortest');
 
   // Case 2: DomStrategy without Audio
-  const argsDomNoAudio = domStrategy.getFFmpegArgs(optionsWithoutAudio, outputPath);
+  const configDomNoAudio = domStrategy.getFFmpegArgs(optionsWithoutAudio, outputPath);
+  const argsDomNoAudio = configDomNoAudio.args;
   console.log('Testing DomStrategy without Audio...');
   assert(!argsDomNoAudio.includes('/path/to/audio.mp3'), 'DomStrategy should NOT include audio path');
   assert(!argsDomNoAudio.includes('-c:a'), 'DomStrategy should NOT include -c:a');
@@ -56,7 +58,8 @@ const runTest = () => {
   const canvasStrategy = new CanvasStrategy(optionsWithAudio);
 
   // Case 3: CanvasStrategy with Audio
-  const argsCanvasWithAudio = canvasStrategy.getFFmpegArgs(optionsWithAudio, outputPath);
+  const configCanvasWithAudio = canvasStrategy.getFFmpegArgs(optionsWithAudio, outputPath);
+  const argsCanvasWithAudio = configCanvasWithAudio.args;
   console.log('Testing CanvasStrategy with Audio...');
   assert(argsCanvasWithAudio.includes('-i'), 'CanvasStrategy should include -i');
   assert(argsCanvasWithAudio.includes('/path/to/audio.mp3'), 'CanvasStrategy should include audio path');
@@ -69,7 +72,8 @@ const runTest = () => {
   assert(!argsCanvasWithAudio.includes('-shortest'), 'CanvasStrategy should NOT include -shortest');
 
   // Case 4: CanvasStrategy without Audio
-  const argsCanvasNoAudio = canvasStrategy.getFFmpegArgs(optionsWithoutAudio, outputPath);
+  const configCanvasNoAudio = canvasStrategy.getFFmpegArgs(optionsWithoutAudio, outputPath);
+  const argsCanvasNoAudio = configCanvasNoAudio.args;
   console.log('Testing CanvasStrategy without Audio...');
   assert(!argsCanvasNoAudio.includes('/path/to/audio.mp3'), 'CanvasStrategy should NOT include audio path');
   assert(!argsCanvasNoAudio.includes('-c:a'), 'CanvasStrategy should NOT include -c:a');

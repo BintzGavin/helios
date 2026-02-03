@@ -1,3 +1,6 @@
+## RENDERER v1.63.0
+- ✅ Completed: Sync Core Dependency - Reverted `@helios-project/core` dependency to `5.9.0` (matching workspace) and fixed verification scripts (`verify-advanced-audio.ts`, `verify-audio-args.ts`) to handle `FFmpegConfig` return type, ensuring full test suite passes.
+
 ## RENDERER v1.62.0
 - ✅ Completed: Pseudo-Element Preload - Updated `DomStrategy` to recursively discover and preload background images and masks in `::before` and `::after` pseudo-elements, ensuring zero-artifact rendering for CSS-heavy compositions. Verified with `verify-pseudo-element-preload.ts`.
 
