@@ -83,6 +83,13 @@ const DEFAULT_PLAYER_STATE: PlayerState = {
   availableAudioTracks: []
 };
 
+interface TimelineState {
+  inPoint: number;
+  outPoint: number;
+  loop: boolean;
+  frame: number;
+}
+
 interface StudioContextType {
   compositions: Composition[];
   activeComposition: Composition | null;
@@ -193,6 +200,7 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [exportProgress, setExportProgress] = useState(0);
   const exportAbortControllerRef = useRef<AbortController | null>(null);
 
+  const [pendingSeekFrame, setPendingSeekFrame] = useState<number | null>(null);
   const [inPoint, setInPoint] = useState(0);
   const [outPoint, setOutPoint] = useState(0);
   const [playerState, _setPlayerState] = useState<PlayerState>(DEFAULT_PLAYER_STATE);
@@ -522,11 +530,84 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     }
   }, [activeComposition]);
 
-  // Reset range when composition changes
+  const [controller, setController] = useState<HeliosController | null>(null);
+  const [loop, setLoop] = useState(false);
+  const toggleLoop = () => setLoop(prev => !prev);
+
+  const loadTimelineState = (compId: string) => {
+    try {
+      const saved = localStorage.getItem(`helios-studio:timeline:${compId}`);
+      if (saved) {
+        const state: TimelineState = JSON.parse(saved);
+        setInPoint(state.inPoint ?? 0);
+        setOutPoint(state.outPoint ?? 0);
+        setLoop(state.loop ?? false);
+        if (typeof state.frame === 'number') {
+          setPendingSeekFrame(state.frame);
+        }
+      } else {
+        setInPoint(0);
+        setOutPoint(0);
+        setLoop(false);
+      }
+    } catch (e) {
+      console.warn('Failed to load timeline state', e);
+    }
+  };
+
+  const saveTimelineState = (compId: string) => {
+    try {
+      const state: TimelineState = {
+        inPoint,
+        outPoint,
+        loop,
+        frame: playerState.currentFrame
+      };
+      localStorage.setItem(`helios-studio:timeline:${compId}`, JSON.stringify(state));
+    } catch (e) {
+      console.warn('Failed to save timeline state', e);
+    }
+  };
+
+  // Load timeline state when composition changes
   useEffect(() => {
-    setInPoint(0);
-    setOutPoint(0);
+    if (activeComposition) {
+      loadTimelineState(activeComposition.id);
+    }
   }, [activeComposition?.id]);
+
+  // Save timeline state on change
+  useEffect(() => {
+    if (activeComposition) {
+      saveTimelineState(activeComposition.id);
+    }
+  }, [inPoint, outPoint, loop, activeComposition?.id]);
+
+  // Save timeline state on pause
+  useEffect(() => {
+    if (activeComposition && !playerState.isPlaying) {
+      saveTimelineState(activeComposition.id);
+    }
+  }, [playerState.isPlaying, activeComposition?.id]);
+
+  // Save timeline state on unload
+  useEffect(() => {
+    const handleUnload = () => {
+      if (activeComposition) {
+        saveTimelineState(activeComposition.id);
+      }
+    };
+    window.addEventListener('beforeunload', handleUnload);
+    return () => window.removeEventListener('beforeunload', handleUnload);
+  }, [activeComposition, inPoint, outPoint, loop, playerState.currentFrame]);
+
+  // Handle pending seek
+  useEffect(() => {
+    if (controller && pendingSeekFrame !== null) {
+      controller.seek(pendingSeekFrame);
+      setPendingSeekFrame(null);
+    }
+  }, [controller, pendingSeekFrame]);
 
   // Update canvas size when composition metadata is available
   useEffect(() => {
@@ -609,11 +690,6 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       addToast('Failed to delete render', 'error');
     }
   };
-
-  const [controller, setController] = useState<HeliosController | null>(null);
-  const [loop, setLoop] = useState(false);
-
-  const toggleLoop = () => setLoop(prev => !prev);
 
   // Loop logic: Enforce loop range when enabled
   useEffect(() => {
