@@ -57,3 +57,7 @@
 ## [5.7.0] - Driver State Visibility
 **Learning:** `DomDriver` implemented `fadeEasing` logic internally but failed to expose the configuration in `AudioTrackMetadata`, causing a gap where the Renderer could not replicate the behavior.
 **Action:** When adding features to Drivers (like `DomDriver`), always ensure the configuration data is reflected in the public state (e.g. `availableAudioTracks` signal) for external consumers.
+
+## [5.9.0] - Timeline Synchronization
+**Learning:** `bindToDocumentTimeline` assumes a single instance, overwriting the global `window.__HELIOS_VIRTUAL_TIME__` setter. This breaks multi-composition rendering in headless environments.
+**Action:** Implemented a shared registry for virtual time bindings to allow multiple instances to receive updates from a single CDP hook.
