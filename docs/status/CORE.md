@@ -1,11 +1,12 @@
 # Status: CORE
 
-**Version**: 5.9.0
+**Version**: 5.10.0
 
 - **Status**: Active
 - **Current Focus**: Maintenance, Optimization, and Stability
-- **Last Updated**: 2026-08-13
+- **Last Updated**: 2026-08-14
 
+[v5.10.0] ✅ Completed: Shared Virtual Time Binding - Implemented static registry in Helios to allow multiple instances to synchronize with `window.__HELIOS_VIRTUAL_TIME__` simultaneously.
 [v5.9.0] ✅ Completed: Reactive Virtual Time Getter - Exposed `isVirtualTimeBound` getter in `Helios` to allow consumers to verify synchronous virtual time binding, facilitating better integration with external renderers.
 [v5.8.0] ✅ Completed: Expose Fade Easing Metadata - Added `fadeEasing` to `AudioTrackMetadata` and updated `DomDriver` to parse `data-helios-fade-easing` attribute, exposing non-linear fade configurations to consumers.
 [v5.7.0] ✅ Completed: Enable Audio State Persistence - Added `audioTracks` to `HeliosOptions` and updated constructor to initialize mixer state (volume/muted per track) from configuration, enabling full session save/load.

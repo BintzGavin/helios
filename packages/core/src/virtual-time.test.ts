@@ -89,4 +89,49 @@ describe('Helios Virtual Time Binding', () => {
       Object.defineProperty = originalDefineProperty;
     }
   });
+
+  it('should synchronize multiple instances with virtual time', () => {
+    const helios1 = new Helios({ fps: 30, duration: 10 });
+    const helios2 = new Helios({ fps: 60, duration: 10 });
+
+    helios1.bindToDocumentTimeline();
+    helios2.bindToDocumentTimeline();
+
+    expect(helios1.isVirtualTimeBound).toBe(true);
+    expect(helios2.isVirtualTimeBound).toBe(true);
+
+    // Update virtual time (1 second)
+    (window as any).__HELIOS_VIRTUAL_TIME__ = 1000;
+
+    expect(helios1.currentTime.value).toBe(1);
+    expect(helios2.currentTime.value).toBe(1);
+    expect(helios1.currentFrame.value).toBe(30);
+    expect(helios2.currentFrame.value).toBe(60);
+
+    // Unbind one
+    helios1.unbindFromDocumentTimeline();
+    expect(helios1.isVirtualTimeBound).toBe(false);
+    expect(helios2.isVirtualTimeBound).toBe(true);
+
+    // Update virtual time again (2 seconds)
+    (window as any).__HELIOS_VIRTUAL_TIME__ = 2000;
+
+    // Helios1 should not update (unbound)
+    expect(helios1.currentTime.value).toBe(1);
+    // Helios2 should update
+    expect(helios2.currentTime.value).toBe(2);
+
+    // Unbind second
+    helios2.unbindFromDocumentTimeline();
+    expect(helios2.isVirtualTimeBound).toBe(false);
+
+    // Check cleanup
+    // We expect the property to be deleted or restored.
+    // In our test setup, it might be undefined or the original descriptor if present.
+    // Since we delete it in afterEach, we just check that setting it doesn't trigger anything.
+    // But conceptually, the descriptor should be gone or restored.
+
+    // In our implementation, unbindFromDocumentTimeline checks if registry is empty then tears down.
+    // So the property should be gone or reset.
+  });
 });

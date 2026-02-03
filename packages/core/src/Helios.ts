@@ -117,9 +117,13 @@ export class Helios<TInputProps = Record<string, any>> {
 
   private _disposeActiveCaptionsEffect: () => void;
   private _syncDispose: (() => void) | null = null;
-  private _originalVirtualTimeDescriptor: PropertyDescriptor | undefined;
   private _disposeDriverMetadataSubscription: (() => void) | null = null;
   private _reactiveVirtualTimeBound = false;
+
+  // Shared Virtual Time Registry
+  private static _virtualTimeRegistry = new Set<Helios<any>>();
+  private static _virtualTimeHooked = false;
+  private static _originalVirtualTimeDescriptor: PropertyDescriptor | undefined;
 
   // Public Readonly Signals
 
@@ -1003,6 +1007,60 @@ export class Helios<TInputProps = Record<string, any>> {
    * This is useful when the timeline is being driven externally (e.g. by the Renderer).
    * Helios will poll document.timeline.currentTime and update its internal state.
    */
+  private static _ensureVirtualTimeHook() {
+    if (this._virtualTimeHooked) return;
+    if (typeof window === 'undefined') return;
+
+    let virtualTimeValue: number | null = null;
+
+    // Check if property already exists to preserve it
+    this._originalVirtualTimeDescriptor = Object.getOwnPropertyDescriptor(window, '__HELIOS_VIRTUAL_TIME__');
+
+    // If it has a value, capture it
+    if (typeof (window as any).__HELIOS_VIRTUAL_TIME__ === 'number') {
+      virtualTimeValue = (window as any).__HELIOS_VIRTUAL_TIME__;
+    }
+
+    try {
+      Object.defineProperty(window, '__HELIOS_VIRTUAL_TIME__', {
+        configurable: true,
+        enumerable: true,
+        get: () => virtualTimeValue,
+        set: (value: number) => {
+          virtualTimeValue = value;
+          // Broadcast to all registered instances
+          this._virtualTimeRegistry.forEach((instance) => {
+            instance._onVirtualTimeChange(value);
+          });
+        }
+      });
+
+      this._virtualTimeHooked = true;
+
+      // Trigger initial update if value exists
+      if (virtualTimeValue !== null) {
+        (window as any).__HELIOS_VIRTUAL_TIME__ = virtualTimeValue;
+      }
+    } catch (e) {
+      console.warn('Failed to bind reactive virtual time. Helios will fall back to polling, which may affect synchronization accuracy.', e);
+    }
+  }
+
+  private static _teardownVirtualTimeHook() {
+    if (this._virtualTimeRegistry.size > 0) return;
+    if (!this._virtualTimeHooked) return;
+
+    if (typeof window !== 'undefined') {
+      if (this._originalVirtualTimeDescriptor) {
+        Object.defineProperty(window, '__HELIOS_VIRTUAL_TIME__', this._originalVirtualTimeDescriptor);
+        this._originalVirtualTimeDescriptor = undefined;
+      } else {
+        delete (window as any).__HELIOS_VIRTUAL_TIME__;
+      }
+    }
+    this._virtualTimeHooked = false;
+  }
+
   public bindToDocumentTimeline() {
     if (this.syncWithDocumentTimeline) return;
 
@@ -1013,58 +1071,12 @@ export class Helios<TInputProps = Record<string, any>> {
 
     this.syncWithDocumentTimeline = true;
 
-    // Reactive Virtual Time Binding
-    if (typeof window !== 'undefined') {
-      let virtualTimeValue: number | null = null;
+    // Register with shared virtual time hook
+    Helios._virtualTimeRegistry.add(this);
+    Helios._ensureVirtualTimeHook();
 
-      // Check if property already exists to preserve it
-      this._originalVirtualTimeDescriptor = Object.getOwnPropertyDescriptor(window, '__HELIOS_VIRTUAL_TIME__');
-
-      // If it has a value, capture it
-      if (typeof (window as any).__HELIOS_VIRTUAL_TIME__ === 'number') {
-        virtualTimeValue = (window as any).__HELIOS_VIRTUAL_TIME__;
-      }
-
-      try {
-        Object.defineProperty(window, '__HELIOS_VIRTUAL_TIME__', {
-          configurable: true,
-          enumerable: true,
-          get: () => virtualTimeValue,
-          set: (value: number) => {
-            virtualTimeValue = value;
-            if (!this.syncWithDocumentTimeline) return;
-
-            if (Number.isFinite(value)) {
-              const frame = (value / 1000) * this._fps.value;
-              if (frame !== this._currentFrame.peek()) {
-                this._currentFrame.value = frame;
-              } else {
-                // Force notification to ensure subscribers are synced even if frame matches.
-                // This is critical for external drivers (like SeekTimeDriver) that rely on
-                // the "set" event to synchronize other systems (like GSAP timelines).
-                this._syncVersion.value++;
-              }
-
-              this.driver.update(value, {
-                isPlaying: false,
-                playbackRate: this._playbackRate.peek(),
-                volume: this._volume.peek(),
-                muted: this._muted.peek(),
-                audioTracks: this._audioTracks.peek()
-              });
-            }
-          }
-        });
-
-        this._reactiveVirtualTimeBound = true;
-
-        // Trigger initial update if value exists
-        if (virtualTimeValue !== null) {
-          (window as any).__HELIOS_VIRTUAL_TIME__ = virtualTimeValue;
-        }
-      } catch (e) {
-        console.warn('Failed to bind reactive virtual time. Helios will fall back to polling, which may affect synchronization accuracy.', e);
-      }
+    if (Helios._virtualTimeHooked) {
+      this._reactiveVirtualTimeBound = true;
     }
 
     // Start a loop to poll the timeline (fallback)
@@ -1128,14 +1140,29 @@ export class Helios<TInputProps = Record<string, any>> {
     this.syncWithDocumentTimeline = false;
     this._reactiveVirtualTimeBound = false;
 
-    if (typeof window !== 'undefined') {
-      if (this._originalVirtualTimeDescriptor) {
-        Object.defineProperty(window, '__HELIOS_VIRTUAL_TIME__', this._originalVirtualTimeDescriptor);
-        this._originalVirtualTimeDescriptor = undefined;
+    Helios._virtualTimeRegistry.delete(this);
+    Helios._teardownVirtualTimeHook();
+  }
+
+  private _onVirtualTimeChange(value: number) {
+    if (!this.syncWithDocumentTimeline) return;
+
+    if (Number.isFinite(value)) {
+      const frame = (value / 1000) * this._fps.value;
+      if (frame !== this._currentFrame.peek()) {
+        this._currentFrame.value = frame;
       } else {
-        // If we defined it, remove it
-        delete (window as any).__HELIOS_VIRTUAL_TIME__;
+        // Force notification to ensure subscribers are synced even if frame matches.
+        this._syncVersion.value++;
       }
+
+      this.driver.update(value, {
+        isPlaying: false,
+        playbackRate: this._playbackRate.peek(),
+        volume: this._volume.peek(),
+        muted: this._muted.peek(),
+        audioTracks: this._audioTracks.peek()
+      });
     }
   }
 
