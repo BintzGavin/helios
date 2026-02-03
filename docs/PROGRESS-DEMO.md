@@ -1,3 +1,6 @@
+## DEMO v1.96.0
+- ✅ Completed: Solid Audio Visualization - Created `examples/solid-audio-visualization` demonstrating real-time audio analysis (RMS, waveforms) using synthesized `AudioBuffer` and SolidJS.
+
 ## DEMO v1.95.0
 - ✅ Completed: Vue Lottie Animation - Created `examples/vue-lottie-animation` demonstrating integration with `lottie-web` in Vue 3 driven by Helios timeline.
 
