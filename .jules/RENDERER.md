@@ -280,3 +280,7 @@
 ## [2026-02-03] - Future Dates in Journal
 **Learning:** The journal contains entries for August 2026, while the system date is Feb 2026. This suggests either a clock reset or nonlinear journal updates.
 **Action:** Trust the system `date` command for current file timestamps, but respect the journal's relative history.
+
+## 2026-02-19 - Distributed Rendering Audio Gap
+**Learning:** Distributed rendering concatenates video chunks that each have mixed audio. This causes audio glitches at boundaries due to codec priming/padding (e.g. AAC 1024-sample frames).
+**Action:** Planned to refactor `RenderOrchestrator` to separate audio mixing into a final global pass (`2026-02-19-RENDERER-Distributed-Audio-Mixing.md`).
