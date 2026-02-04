@@ -1,3 +1,6 @@
+## DEMO v1.105.0
+- ✅ Completed: Vue D3 Animation - Created `examples/vue-d3-animation` demonstrating D3.js integration with Vue 3.
+
 ## DEMO v1.104.1
 - ✅ Verified: Fix Root Build - Verified that root `npm install` and `npm run build:examples` work correctly, confirming that dependency mismatches are resolved.
 
