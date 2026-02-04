@@ -14,7 +14,7 @@ The DEMO domain is responsible for:
 - **Root Build Dependency Mismatch**: The `packages/studio`, `packages/player`, and `packages/renderer` have desynchronized dependencies on `@helios-project/core` (requiring `5.5.0` or `^5.4.0` while workspace is `5.7.0`), causing `npm install` to fail at the root. This blocks clean builds of examples without manual intervention.
 
 ## Active Tasks
-- None
+- [ ] Create `examples/svelte-pixi-animation` - Plan created at `.sys/plans/2026-01-30-DEMO-svelte-pixi-animation.md`
 
 ## Completed Tasks
 - [v1.100.0] ✅ Completed: Vue Pixi Animation - Created `examples/vue-pixi-animation` demonstrating integration with PixiJS v8 and Vue 3.
