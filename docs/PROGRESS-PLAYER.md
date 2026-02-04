@@ -1,3 +1,6 @@
+## PLAYER v0.65.1
+- ✅ Completed: Maintenance and Documentation - Removed unnecessary TS suppressions and updated documentation with missing API members (media-* attributes, PiP control).
+
 ## PLAYER v0.65.0
 - ✅ Completed: Media Session Integration - Implemented HeliosMediaSession to support OS-level media keys and metadata display, observing media-* attributes.
 
