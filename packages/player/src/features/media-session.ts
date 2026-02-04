@@ -30,7 +30,6 @@ export class HeliosMediaSession {
 
     const artwork = artworkSrc ? [{ src: artworkSrc }] : [];
 
-    // @ts-ignore - MediaMetadata might not be in all TS envs yet
     navigator.mediaSession.metadata = new MediaMetadata({
       title,
       artist,

@@ -73,6 +73,10 @@ The player will automatically attempt to access `window.helios` on the iframe's 
 | `export-filename` | Filename for client-side export (without extension). | `video` |
 | `export-caption-mode` | Strategy for caption export: `burn-in` or `file`. | `burn-in` |
 | `disablepictureinpicture` | Hides the Picture-in-Picture button. | `false` |
+| `media-title` | Title of the composition for OS Media Session. | - |
+| `media-artist` | Artist name for OS Media Session. | - |
+| `media-album` | Album name for OS Media Session. | - |
+| `media-artwork` | URL of artwork for OS Media Session (defaults to poster). | - |
 
 ## CSS Variables
 
@@ -97,6 +101,7 @@ The `<helios-player>` element implements a subset of the HTMLMediaElement interf
 - `load(): void` - Reloads the iframe (useful if `src` changed or to retry connection).
 - `addTextTrack(kind: string, label?: string, language?: string): TextTrack` - Adds a new text track to the media element.
 - `diagnose(): Promise<DiagnosticReport>` - Runs environment diagnostics (WebCodecs, WebGL) and returns a report.
+- `requestPictureInPicture(): Promise<PictureInPictureWindow>` - Requests Picture-in-Picture mode for the player.
 
 ### Properties
 
@@ -118,6 +123,7 @@ The `<helios-player>` element implements a subset of the HTMLMediaElement interf
 - `fps` (number, read-only): Frames per second of the composition.
 - `currentFrame` (number): Current frame index.
 - `inputProps` (object): Get or set the input properties passed to the composition.
+- `disablePictureInPicture` (boolean): Hides the Picture-in-Picture button.
 
 ## Events
 

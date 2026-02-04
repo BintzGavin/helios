@@ -1,4 +1,4 @@
-**Version**: v0.65.0
+**Version**: v0.65.1
 
 **Posture**: STABLE AND FEATURE COMPLETE
 
@@ -58,6 +58,7 @@
 ## Critical Task
 - **None**: All critical tasks completed.
 
+[v0.65.1] ✅ Completed: Maintenance and Documentation - Removed unnecessary TS suppressions and updated documentation with missing API members (media-* attributes, PiP control).
 [v0.65.0] ✅ Completed: Media Session Integration - Implemented HeliosMediaSession to support OS-level media keys and metadata display, observing media-* attributes.
 [v0.64.1] ✅ Verified: SRT Export Implementation - Verified existing implementation of SRT export and caption parsing against plan requirements.
 [v0.64.0] ✅ Completed: Implement AudioTracks API - Implemented audioTracks property and AudioTrackList API on <helios-player> to provide Standard Media API parity and enable granular programmatic control of audio tracks.
