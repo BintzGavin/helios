@@ -5,3 +5,7 @@
 ## 0.66.3 - Audio Track UI
 **Learning:** While the `AudioTracks` API was implemented, the lack of UI controls made it inaccessible for previewing multi-track compositions without custom code.
 **Action:** When implementing new APIs that affect user-perceivable state (like tracks), always include a corresponding UI control update in the plan.
+
+## 0.66.3 - Keyboard Shortcuts Standard
+**Learning:** The existing keyboard shortcuts implementation (Arrows = 1 frame) deviated from standard video player conventions (usually 5s), leading to a frustrating UX for playback navigation.
+**Action:** Always verify "Standard" features against industry leaders (YouTube, VLC) rather than just implementing technical parity (frame steps).
