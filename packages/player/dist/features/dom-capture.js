@@ -2,7 +2,7 @@ export async function captureDomToBitmap(element, options) {
     const doc = element.ownerDocument || document;
     // 1. Clone & Inline Assets
     let clone = cloneWithShadow(element);
-    await inlineImages(clone);
+    await inlineImages(element, clone);
     clone = inlineCanvases(element, clone);
     clone = inlineVideos(element, clone);
     // 2. Serialize DOM
@@ -104,45 +104,62 @@ async function processCss(css, baseUrl) {
     }
     return processedCss;
 }
-async function inlineImages(root) {
+async function inlineImages(original, clone) {
     const promises = [];
-    const processNode = (node) => {
-        // A. Handle <img> tags
-        const images = node.querySelectorAll('img');
-        images.forEach((img) => {
-            if (img.src && !img.src.startsWith('data:')) {
-                promises.push(fetchAsDataUri(img.src)
-                    .then((dataUri) => {
-                    img.src = dataUri;
-                })
-                    .catch((e) => console.warn('Helios: Failed to inline image:', img.src, e)));
-            }
-        });
-        // B. Handle background-images (inline styles only)
-        const elementsWithStyle = node.querySelectorAll('[style*="background-image"]');
-        elementsWithStyle.forEach((el) => {
-            const element = el;
-            const bg = element.style.backgroundImage;
-            if (bg && bg.includes('url(')) {
-                const match = bg.match(/url\(['"]?(.*?)['"]?\)/);
-                if (match && match[1] && !match[1].startsWith('data:')) {
-                    promises.push(fetchAsDataUri(match[1])
-                        .then((dataUri) => {
-                        // Replace the specific URL instance to preserve other layers (gradients, etc.)
-                        element.style.backgroundImage = element.style.backgroundImage.replace(match[0], `url("${dataUri}")`);
-                    })
-                        .catch((e) => console.warn('Helios: Failed to inline background:', match[1], e)));
-                }
-            }
-        });
-        // C. Recurse into templates (Shadow DOM)
-        const templates = node.querySelectorAll('template');
-        templates.forEach((t) => {
-            processNode(t.content);
-        });
-    };
-    processNode(root);
+    inlineImagesRecursive(original, clone, promises);
     await Promise.all(promises);
+}
+function inlineImagesRecursive(original, clone, promises) {
+    // 1. Process Current Node
+    if (original instanceof HTMLImageElement && clone instanceof HTMLImageElement) {
+        const src = original.currentSrc || original.src;
+        if (src && !src.startsWith('data:')) {
+            promises.push(fetchAsDataUri(src)
+                .then((dataUri) => {
+                clone.src = dataUri;
+                clone.removeAttribute('srcset');
+                clone.removeAttribute('sizes');
+            })
+                .catch((e) => console.warn('Helios: Failed to inline image:', src, e)));
+        }
+    }
+    else if (original instanceof HTMLElement && clone instanceof HTMLElement) {
+        // Handle background-images (inline styles only)
+        const bg = clone.style.backgroundImage;
+        if (bg && bg.includes('url(')) {
+            const match = bg.match(/url\(['"]?(.*?)['"]?\)/);
+            if (match && match[1] && !match[1].startsWith('data:')) {
+                promises.push(fetchAsDataUri(match[1])
+                    .then((dataUri) => {
+                    // Replace the specific URL instance to preserve other layers (gradients, etc.)
+                    clone.style.backgroundImage = clone.style.backgroundImage.replace(match[0], `url("${dataUri}")`);
+                })
+                    .catch((e) => console.warn('Helios: Failed to inline background:', match[1], e)));
+            }
+        }
+    }
+    // 2. Recurse Children
+    const originalChildren = Array.from(original.childNodes);
+    let cloneChildren = Array.from(clone.childNodes);
+    // Check for Shadow DOM / Template
+    if (original instanceof Element && original.shadowRoot) {
+        const template = cloneChildren.find((n) => n instanceof HTMLTemplateElement && n.hasAttribute('shadowrootmode'));
+        if (template) {
+            // Remove template from cloneChildren list to match originalChildren
+            cloneChildren = cloneChildren.filter((n) => n !== template);
+            // Recurse into shadow
+            inlineImagesRecursive(original.shadowRoot, template.content, promises);
+        }
+    }
+    // Check for explicit template elements
+    if (original instanceof HTMLTemplateElement && clone instanceof HTMLTemplateElement) {
+        // Note: Standard cloneNode(false) on template doesn't clone content, so clone.content might be empty.
+        // If cloneWithShadow didn't handle it, we can't do much here unless we manually clone content.
+        // But inlineCanvases doesn't handle this either, so preserving parity.
+    }
+    for (let i = 0; i < Math.min(originalChildren.length, cloneChildren.length); i++) {
+        inlineImagesRecursive(originalChildren[i], cloneChildren[i], promises);
+    }
 }
 async function fetchAsDataUri(url) {
     const response = await fetch(url);

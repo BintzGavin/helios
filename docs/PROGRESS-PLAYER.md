@@ -1,3 +1,6 @@
+## PLAYER v0.67.0
+- ✅ Completed: Audio Track UI - Implemented audio menu in player controls to mute/unmute and adjust volume of individual audio tracks.
+
 ## PLAYER v0.66.2
 - ✅ Completed: Handle Connection Timeouts - Implemented error state and event dispatching on connection timeout.
 
