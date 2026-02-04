@@ -6,7 +6,7 @@ Helios is a modern engine for creating videos programmatically using standard we
 
 ## Quick Facts
 - **License**: Elastic License 2.0 (free commercial use, no SaaS resale)
-- **Status**: Core: Stable (v5.6.0+), Studio: Alpha (v0.82.0+)
+- **Status**: Core: Stable (v5.11+), Studio: Alpha (v0.90+)
 - **Frameworks**: React, Vue, Svelte, Solid, vanilla JS
 - **Animation**: Standard CSS, Web Animations API (WAAPI), any animation library
 
@@ -39,8 +39,8 @@ helios.play();
 - `@helios-project/core` - Headless video engine (state, timeline, subscriptions)
 - `@helios-project/player` - Web Component player (`<helios-player>`)
 - `@helios-project/renderer` - Server-side rendering (Playwright, FFmpeg)
-- `@helios-project/studio` - Visual editor and asset manager (Alpha)
-- `@helios-project/cli` - Command-line interface
+- `@helios-project/studio` - Browser-based development environment (Alpha)
+- `@helios-project/cli` - Command-line interface (scaffolding, registry, studio)
 
 ## Animation Approach
 Helios uses native browser APIs, not proprietary hooks:
@@ -73,7 +73,7 @@ The engine controls `document.timeline.currentTime` to seek animations frame-acc
 | Animation | CSS, WAAPI | `interpolate()`, `spring()` |
 | Pricing | Free | $100+/mo for 4+ devs |
 | Maturity | Alpha | Production-ready |
-| Distributed rendering | Planned | Available |
+| Distributed rendering | Local (Beta) / Cloud (Planned) | Available |
 
 ## Agent Skills
 Skills for AI agents are in `.agents/skills/helios/`:
@@ -107,9 +107,10 @@ const report = await Helios.diagnose();
 
 ## Roadmap
 ### V1.x (Active)
-- **Helios Studio**: Alpha v0.82+ (Stacked Timeline, Audio Mixer, Omnibar, Visualization)
-- **Core**: Stable v5.6+ (Audio Fade Easing, Headless Audio, WebVTT)
-- **Player**: Feature Complete v0.62+ (Diagnostics UI, Headless Audio Export)
+- **Helios Studio**: Alpha v0.90+ (Stacked Timeline, Audio Mixer, Omnibar, Visualization)
+- **CLI**: Beta v0.3+ (Component Registry, Project Scaffolding)
+- **Core**: Stable v5.11+ (Audio Fade Easing, Headless Audio, WebVTT)
+- **Player**: Feature Complete v0.65+ (Diagnostics UI, Headless Audio Export)
 - **Renderer**: Stable v1.61+ (Local Distributed Rendering, Zero Disk Audio)
 
 ### AI Integration
