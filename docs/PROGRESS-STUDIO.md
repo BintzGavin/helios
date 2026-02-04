@@ -1,3 +1,6 @@
+## STUDIO v0.92.0
+- ✅ Completed: Components Registry UI - Implemented "Components" panel in Studio UI, enabling users to browse and install components from the registry via the CLI backend.
+
 ## STUDIO v0.91.0
 - ✅ Completed: CLI Production Server - Replaced development-only spawn process with robust Vite server integration using `studioApiPlugin`, enabling correct HMR and path resolution for end-users.
 

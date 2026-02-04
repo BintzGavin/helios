@@ -9,8 +9,17 @@ import { templates } from './templates';
 import { findDocumentation, resolveDocumentationPath } from './documentation';
 import { startRender, getJob, getJobs, cancelJob, deleteJob, diagnoseServer } from './render-manager';
 
+export interface StudioComponentDefinition {
+  name: string;
+  type: string;
+  files: { name: string; content: string }[];
+  dependencies?: Record<string, string>;
+}
+
 export interface StudioPluginOptions {
   studioRoot?: string;
+  components?: StudioComponentDefinition[];
+  onInstallComponent?: (name: string) => Promise<void>;
 }
 
 const getBody = async (req: any) => {
@@ -127,6 +136,42 @@ function configureMiddlewares(server: ViteDevServer | PreviewServer, isPreview: 
           }
 
           await transport.handlePostMessage(req, res);
+      });
+
+      server.middlewares.use('/api/components', async (req, res, next) => {
+        if (req.url === '/' || req.url === '') {
+            if (req.method === 'GET') {
+                const components = options.components || [];
+                res.setHeader('Content-Type', 'application/json');
+                res.end(JSON.stringify(components));
+                return;
+            }
+            if (req.method === 'POST') {
+                try {
+                    const body = await getBody(req);
+                    const { name } = body;
+                    if (!name) {
+                        res.statusCode = 400;
+                        res.end(JSON.stringify({ error: 'Name is required' }));
+                        return;
+                    }
+                    if (options.onInstallComponent) {
+                        await options.onInstallComponent(name);
+                        res.setHeader('Content-Type', 'application/json');
+                        res.end(JSON.stringify({ success: true }));
+                    } else {
+                        res.statusCode = 501;
+                        res.end(JSON.stringify({ error: 'Component installation not supported' }));
+                    }
+                } catch (e: any) {
+                    console.error(e);
+                    res.statusCode = 500;
+                    res.end(JSON.stringify({ error: e.message }));
+                }
+                return;
+            }
+        }
+        next();
       });
 
       // NEW: Middleware for /@fs/ (Project File Serving)

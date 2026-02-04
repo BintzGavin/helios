@@ -20,6 +20,7 @@ packages/studio/
 │   │   ├── AssetsPanel/
 │   │   ├── AudioMixerPanel/
 │   │   ├── CaptionsPanel/
+│   │   ├── ComponentsPanel/
 │   │   ├── CompositionsPanel/
 │   │   ├── Controls/
 │   │   ├── PropsEditor/
@@ -72,6 +73,7 @@ npx helios <command> [options]
 - **Timeline**: A multi-track timeline for scrubbing, playback control, loop range setting, and audio visualization.
 - **Props Editor**: A schema-aware inspector for editing composition properties (`inputProps`). Supports primitives, arrays, objects, colors, and assets.
 - **Assets Panel**: A file browser for managing project assets (images, video, audio, fonts). Supports drag-and-drop to Props Editor.
+- **Components Panel**: Allows browsing and installing components (e.g. Timer) from the registry.
 - **Audio Mixer Panel**: Controls volume, mute, and solo states for individual audio tracks.
 - **Compositions Panel**: Manages composition files (create, duplicate, delete).
 - **Renders Panel**: Manages server-side render jobs (single or distributed with concurrency control) and client-side exports.
