@@ -6,3 +6,7 @@
 ## [2026-03-06] - Distributed Audio Priming Gap
 **Learning:** Distributed rendering concatenates chunks rendered with lossy codecs (AAC), causing audio priming artifacts (clicks) at chunk boundaries. This affects Implicit Audio (DOM) which is rendered per-chunk.
 **Action:** Created plan `2026-03-06-RENDERER-Robust-Distributed-Audio-Pipeline.md` to standardize on uncompressed PCM (`.mov`) intermediate chunks and force a final transcode pass.
+
+## [1.66.0] - Missing VP9/AV1 in Smart Codec Selection
+**Learning:** `CanvasStrategy` defaults to checking only H.264 and VP8. This forces users needing transparency (which H.264 often lacks) to fall back to the older VP8 codec, bypassing the superior VP9 (which supports alpha).
+**Action:** Created plan `2026-08-28-RENDERER-Smart-Codec-Selection-Update.md` to add VP9 and AV1 to the default candidates list.
