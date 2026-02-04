@@ -22,7 +22,7 @@ const runTest = () => {
     ]
   };
 
-  const argsVolume = domStrategy.getFFmpegArgs(optionsVolume, outputPath);
+  const argsVolume = domStrategy.getFFmpegArgs(optionsVolume, outputPath).args;
   console.log('Testing Volume Control...');
   // Expect: [1:a]aformat=channel_layouts=stereo,volume=0.5[a0]
   const filterGraphIdx = argsVolume.indexOf('-filter_complex');
@@ -40,7 +40,7 @@ const runTest = () => {
     ]
   };
 
-  const argsDelay = domStrategy.getFFmpegArgs(optionsDelay, outputPath);
+  const argsDelay = domStrategy.getFFmpegArgs(optionsDelay, outputPath).args;
   console.log('Testing Audio Delay...');
   const filterGraphIdxDelay = argsDelay.indexOf('-filter_complex');
   assert(filterGraphIdxDelay !== -1, 'Should include -filter_complex');
@@ -58,7 +58,7 @@ const runTest = () => {
     ]
   };
 
-  const argsSFDelay = domStrategy.getFFmpegArgs(optionsStartFrameDelay, outputPath);
+  const argsSFDelay = domStrategy.getFFmpegArgs(optionsStartFrameDelay, outputPath).args;
   console.log('Testing StartFrame + Delay...');
   const filterGraphSFDelay = argsSFDelay[argsSFDelay.indexOf('-filter_complex') + 1];
   assert(filterGraphSFDelay.includes('adelay=1000|1000'), `Should calculate correct relative delay (expected 1000, got graph: ${filterGraphSFDelay})`);
@@ -74,7 +74,7 @@ const runTest = () => {
     ]
   };
 
-  const argsSFSeek = domStrategy.getFFmpegArgs(optionsSFSeek, outputPath);
+  const argsSFSeek = domStrategy.getFFmpegArgs(optionsSFSeek, outputPath).args;
   console.log('Testing StartFrame + Seek...');
   // Check for -ss 1 before -i audio.mp3
   const inputIdx = argsSFSeek.indexOf('audio.mp3');
@@ -91,7 +91,7 @@ const runTest = () => {
     ]
   };
 
-  const argsMix = domStrategy.getFFmpegArgs(optionsMix, outputPath);
+  const argsMix = domStrategy.getFFmpegArgs(optionsMix, outputPath).args;
   console.log('Testing Mixing...');
   const filterGraphMix = argsMix[argsMix.indexOf('-filter_complex') + 1];
   assert(filterGraphMix.includes('volume=0.5'), 'Should include volume');

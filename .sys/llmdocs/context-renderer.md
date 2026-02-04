@@ -42,6 +42,8 @@ packages/renderer/
 │   ├── verify-trace.ts         # Playwright trace generation test
 │   ├── verify-ffmpeg-path.ts   # FFmpeg binary path verification
 │   ├── verify-blob-audio.ts    # Blob audio extraction test
+│   ├── verify-advanced-audio.ts # Advanced audio config test
+│   ├── verify-audio-args.ts    # Audio arguments test
 │   └── ...                     # Other script-based tests
 └── tests/
     ├── run-all.ts              # Test runner (executes comprehensive suite)
@@ -57,6 +59,7 @@ packages/renderer/
     ├── verify-shadow-dom-images.ts # Shadow DOM image discovery test
     ├── verify-enhanced-dom-preload.ts # Enhanced DOM preloading test
     ├── verify-pseudo-element-preload.ts # Pseudo-element preloading test
+    ├── verify-canvas-shadow-dom.ts # Canvas inside Shadow DOM test
     ├── verify-dom-audio-fades.ts # DOM audio fades test
     ├── verify-audio-fades.ts   # Audio fades test
     ├── verify-audio-loop.ts    # Audio looping test
