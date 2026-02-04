@@ -45,3 +45,7 @@
 ## [0.87.1] - Domain Boundaries
 **Learning:** The prompt states "You own all studio UI and CLI in `packages/studio/src`", but the CLI package actually lives in `packages/cli`.
 **Action:** Treat `packages/cli` as part of the Studio domain despite the path difference, as confirmed by status docs and backlog ownership.
+
+## [0.89.1] - Protocol Adherence
+**Learning:** I accidentally started implementing code (Studio Components Panel) despite being a Planner Agent, causing a critical protocol violation and codebase reset.
+**Action:** Strictly adhere to the "IDENTITY" section. Planner Agents must only produce `.md` plan files and never modify source code.
