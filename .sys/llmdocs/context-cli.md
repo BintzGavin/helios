@@ -22,6 +22,7 @@ packages/cli/
 │   │   ├── add.ts          # helios add command
 │   │   ├── components.ts   # helios components command
 │   │   ├── init.ts         # helios init command
+│   │   ├── render.ts       # helios render command
 │   │   └── studio.ts       # helios studio command
 │   ├── utils/
 │   │   └── config.ts       # Config loading and types
@@ -54,16 +55,7 @@ helios init
 Options:
 - `-y, --yes`: Skip prompts and use defaults
 
-Generates a `helios.config.json` file in the current directory with the following structure:
-```json
-{
-  "version": "1.0.0",
-  "directories": {
-    "components": "src/components/helios",
-    "lib": "src/lib"
-  }
-}
-```
+Generates a `helios.config.json` file in the current directory.
 
 ### `helios add`
 
@@ -75,7 +67,6 @@ helios add <component>
 
 - Installs component source code and dependencies into the configured `components` directory.
 - Requires `helios.config.json` to exist.
-- Current registry includes: `timer`.
 
 ### `helios components`
 
@@ -87,9 +78,23 @@ helios components
 
 - Lists component names and types (e.g., `timer (react)`).
 
-### Planned Commands (V2)
+### `helios render`
 
-- `helios render` - Trigger local or distributed rendering
+Renders a composition to video using the underlying `@helios-project/renderer`.
+
+```bash
+helios render [options] <input>
+```
+
+Options:
+- `-o, --output <path>`: Output file path (default: "output.mp4")
+- `--width <number>`: Viewport width (default: 1920)
+- `--height <number>`: Viewport height (default: 1080)
+- `--fps <number>`: Frames per second (default: 30)
+- `--duration <number>`: Duration in seconds (default: 1)
+- `--quality <number>`: CRF quality (0-51)
+- `--mode <mode>`: Render mode (canvas or dom) (default: "canvas")
+- `--no-headless`: Run in visible browser window (default: headless)
 
 ## D. Configuration
 
@@ -102,7 +107,7 @@ The CLI uses `helios.config.json` for project configuration. Configuration logic
 
 - **Studio**: The `studio` command launches `@helios-project/studio` via npm
 - **Registry**: Integrates with embedded component registry for `add` and `components` commands
-- **Renderer**: Will integrate with `@helios-project/renderer` for render commands
+- **Renderer**: Integrates with `@helios-project/renderer` for `render` command
 
 ## F. Command Pattern
 

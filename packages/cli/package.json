@@ -1,6 +1,6 @@
 {
   "name": "@helios-project/cli",
-  "version": "0.3.0",
+  "version": "0.4.1",
   "description": "CLI for Helios video engine.",
   "author": "Gavin Bintz <me@gavinbintz.com>",
   "license": "ELv2",
@@ -38,7 +38,8 @@
   ],
   "dependencies": {
     "commander": "^13.1.0",
-    "chalk": "^5.4.1"
+    "chalk": "^5.4.1",
+    "@helios-project/renderer": "^0.0.2"
   },
   "devDependencies": {
     "typescript": "^5.0.0"

@@ -1,6 +1,6 @@
 # CLI Status
 
-**Version**: 0.4.0
+**Version**: 0.4.1
 
 ## Current State
 
@@ -17,6 +17,7 @@ The Helios CLI (`packages/cli`) provides the command-line interface for the Heli
 - `helios init` - Initializes a new Helios project configuration
 - `helios add` - Adds a component to the project
 - `helios components` - Lists available components in the registry
+- `helios render` - Renders a composition to video
 
 ## V2 Roadmap
 
@@ -34,3 +35,4 @@ Per AGENTS.md, the CLI is "ACTIVELY EXPANDING FOR V2" with focus on:
 [v0.2.0] ✅ Scaffold Init Command - Implemented `helios init` to generate `helios.config.json`
 [v0.3.0] ✅ Scaffold Add Command - Implemented `helios add` command scaffold and centralized configuration logic
 [v0.4.0] ✅ Implement Components Command - Implemented `helios components` to list registry items
+[v0.4.1] ✅ Implement Render Command - Implemented `helios render` command using `@helios-project/renderer`
