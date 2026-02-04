@@ -41,3 +41,7 @@
 ## [0.86.0] - Distributed Rendering Progress
 **Learning:** `RenderOrchestrator` in Renderer supports distributed rendering but does not aggregate progress from workers. This causes erratic progress bars in the Studio UI (jumping 0-100%).
 **Action:** Future work on Renderer must implement progress aggregation (e.g., weighted by frame count) to support smooth UI feedback.
+
+## [0.87.1] - Domain Boundaries
+**Learning:** The prompt states "You own all studio UI and CLI in `packages/studio/src`", but the CLI package actually lives in `packages/cli`.
+**Action:** Treat `packages/cli` as part of the Studio domain despite the path difference, as confirmed by status docs and backlog ownership.
