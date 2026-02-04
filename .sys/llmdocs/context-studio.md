@@ -1,86 +1,62 @@
-# STUDIO Domain Context
+# Studio Context
 
-## A. Architecture
+## Section A: Architecture
 
-Helios Studio is a browser-based development environment for creating video compositions. It is built as a framework-agnostic tool that runs locally, serving the user's project files and providing a visual interface for editing and previewing.
+The Studio is a browser-based development environment for Helios. It consists of:
+1.  **CLI**: Entry point (`helios studio`) that launches the dev server.
+2.  **Server**: A Vite-based dev server (`packages/studio/src/server`) that serves the UI and provides API endpoints for filesystem operations (compositions, assets, renders).
+3.  **UI**: A React-based Single Page Application (`packages/studio/src/ui` or root `src`) that provides the IDE interface.
+4.  **Integration**:
+    -   **Core**: Consumed via `Helios` class for composition logic.
+    -   **Player**: Consumed via `<helios-player>` for preview and playback.
+    -   **Renderer**: Used by the backend to execute FFmpeg render jobs.
 
-- **CLI**: The entry point (`packages/cli/bin/helios.js`) provides commands to initialize projects (`init`), add components (`add`), render videos (`render`), and launch the Studio (`studio`).
-- **Dev Server**: The `studio` command launches a Vite server (as a library) configured with `studioApiPlugin` (`packages/studio/src/server/`), which serves the Studio UI (overlay) and provides API endpoints for filesystem operations and HMR.
-- **UI**: A React-based Single Page Application (SPA) that acts as the frontend. It communicates with the backend via REST API and connects to the `<helios-player>` component for preview.
-- **State Management**: `StudioContext` manages global state (compositions, assets, player controller, timeline).
-
-## B. File Tree
+## Section B: File Tree
 
 ```
 packages/studio/
-├── bin/
-│   └── helios-studio.js      # Legacy server entry point
+├── bin/                # CLI entry point
 ├── src/
-│   ├── components/           # UI Components
-│   │   ├── AssetsPanel/
-│   │   ├── AudioMixerPanel/
-│   │   ├── CaptionsPanel/
-│   │   ├── ComponentsPanel/
-│   │   ├── CompositionsPanel/
-│   │   ├── Controls/
-│   │   ├── PropsEditor/
-│   │   ├── RendersPanel/
-│   │   ├── Stage/
-│   │   ├── Timeline/
-│   │   └── ...
-│   ├── context/
-│   │   └── StudioContext.tsx # Global state
-│   ├── server/               # Backend logic (Vite plugins)
-│   │   ├── plugin.ts         # Main studioApiPlugin export
-│   │   ├── render-manager.ts # Render orchestration
-│   │   └── ...
-│   ├── App.tsx               # Main UI layout
-│   └── main.tsx              # Entry point
-├── index.html                # HTML entry
+│   ├── cli/            # CLI plugin integration
+│   ├── components/     # UI Components (Sidebar, Stage, Timeline, etc.)
+│   ├── context/        # React Context (StudioContext, ToastContext)
+│   ├── hooks/          # Custom hooks (usePersistentState)
+│   ├── server/         # Backend logic (discovery, render-manager)
+│   ├── utils/          # Utilities
+│   ├── App.tsx         # Main UI entry
+│   ├── main.tsx        # React root
+│   └── types.ts        # Type definitions
+├── index.html          # Vite entry HTML
 ├── package.json
-├── vite.config.ts            # Studio UI build config
-├── vite.config.cli.ts        # CLI plugin build config
-├── tsconfig.cli.json         # CLI types build config
-└── vitest.config.ts          # Test config
+├── tsconfig.json
+└── vite.config.ts
 ```
 
-## C. CLI Interface
+## Section C: CLI Interface
 
-The Helios CLI (`@helios-project/cli`) provides commands for project management and Studio access.
+Command: `npx helios studio`
 
-```bash
-npx helios <command> [options]
-```
+Options:
+-   `--port <number>`: Port to run the server on (default: 5173).
+-   `--open`: Open browser on start.
 
-### Commands
+## Section D: UI Components
 
-- **`studio`**: Starts the Studio development server and opens the browser.
-  - Usage: `npx helios studio [options]`
-  - Options: `-p, --port <number>` (default: 5173)
-  - Uses current working directory to discover compositions.
-- **`render <input>`**: Renders a composition to video.
-  - Usage: `npx helios render <input> [options]`
-  - Options: `-o, --output <path>`, `--width`, `--height`, `--fps`, `--duration`, `--quality`, `--mode`.
-- **`init`**: Initializes a new Helios project configuration (`helios.config.json`).
-  - Scaffolds directory structure references.
-- **`add <component>`**: Adds a component to the project (Shadcn-style).
-  - Fetches component code from the registry (`packages/cli/src/registry/manifest.ts`).
-  - Installs component files (e.g. `Timer.tsx`, `ProgressBar.tsx`) and dependencies into the configured `components` directory.
+-   **Sidebar**: Navigation tabs (Compositions, Assets, Components, Captions, Audio, Renders).
+-   **Stage**: Main preview area containing `<helios-player>`.
+-   **Timeline**: Track-based timeline for scrubbing and editing.
+-   **PropsEditor**: Form for editing composition input props (`HeliosSchema`).
+-   **RendersPanel**: Configures and manages render jobs.
+    -   **RenderConfig**: Settings for Mode, Bitrate, Codec, Concurrency (with Presets).
+-   **AssetsPanel**: Drag-and-drop asset management.
+-   **Omnibar**: Command palette (Cmd+K).
 
-## D. UI Components
+## Section E: Integration
 
-- **Stage**: The central preview area containing the `<helios-player>`. Supports pan, zoom, and transparency toggles.
-- **Timeline**: A multi-track timeline for scrubbing, playback control, loop range setting, audio visualization, and visualization of time-based props.
-- **Props Editor**: A schema-aware inspector for editing composition properties (`inputProps`). Supports primitives, arrays, objects, colors, and assets. Includes Timecode input for time-based props.
-- **Assets Panel**: A file browser for managing project assets (images, video, audio, fonts). Supports drag-and-drop to Props Editor.
-- **Components Panel**: Allows browsing and installing components (e.g. Timer) from the registry.
-- **Audio Mixer Panel**: Controls volume, mute, and solo states for individual audio tracks.
-- **Compositions Panel**: Manages composition files (create, duplicate, delete).
-- **Renders Panel**: Manages server-side render jobs (single or distributed with concurrency control) and client-side exports.
-- **Omnibar**: A command palette (Cmd+K) for quick navigation and actions.
-
-## E. Integration
-
-- **Core**: Consumes `HeliosSchema` for generating the Props Editor UI.
-- **Player**: Embeds `<helios-player>` (via `@helios-project/player`) to render the composition and provide playback control (`HeliosController`).
-- **Renderer**: Communicates with `@helios-project/renderer` (via backend API using `RenderOrchestrator`) to dispatch render jobs for high-quality output.
+-   **StudioContext**: Central store for Studio state (compositions, assets, render jobs, player state).
+-   **HeliosPlayer**: The web component used for playback. Studio controls it via `HeliosController`.
+-   **Backend API**:
+    -   `GET /api/compositions`: List available compositions.
+    -   `POST /api/render`: Submit a render job.
+    -   `GET /api/jobs`: List render jobs.
+    -   `GET /api/assets`: List assets.

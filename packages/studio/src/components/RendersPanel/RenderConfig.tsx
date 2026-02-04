@@ -12,12 +12,41 @@ interface RenderConfigProps {
   onChange: (config: RenderConfigData) => void;
 }
 
+const RENDER_PRESETS: Record<string, Partial<RenderConfigData>> = {
+  'Custom': {},
+  'Draft': { mode: 'canvas', concurrency: 4 },
+  'HD (1080p)': { mode: 'canvas', videoBitrate: '5000k', videoCodec: 'libx264' },
+  '4K (High Quality)': { mode: 'canvas', videoBitrate: '20000k', videoCodec: 'libx264' },
+  'Transparent (WebM)': { mode: 'dom', videoCodec: 'libvpx-vp9' }
+};
+
 export const RenderConfig: React.FC<RenderConfigProps> = ({ config, onChange }) => {
   const handleChange = (field: keyof RenderConfigData, value: string | number) => {
     onChange({
       ...config,
       [field]: value
     });
+  };
+
+  const applyPreset = (presetName: string) => {
+    const preset = RENDER_PRESETS[presetName];
+    if (preset) {
+      onChange({
+        ...config,
+        ...preset
+      });
+    }
+  };
+
+  const getActivePreset = () => {
+    for (const [name, preset] of Object.entries(RENDER_PRESETS)) {
+      if (name === 'Custom') continue;
+      const isMatch = Object.entries(preset).every(([key, value]) => {
+        return config[key as keyof RenderConfigData] === value;
+      });
+      if (isMatch) return name;
+    }
+    return 'Custom';
   };
 
   const inputStyle = {
@@ -41,6 +70,19 @@ export const RenderConfig: React.FC<RenderConfigProps> = ({ config, onChange }) 
 
   return (
     <div className="render-config" style={{ padding: '8px', background: '#252526', borderRadius: '4px', marginBottom: '8px', border: '1px solid #333' }}>
+      <div style={{ marginBottom: '8px' }}>
+        <label style={labelStyle}>Preset</label>
+        <select
+          value={getActivePreset()}
+          onChange={(e) => applyPreset(e.target.value)}
+          style={inputStyle}
+        >
+          {Object.keys(RENDER_PRESETS).map(preset => (
+            <option key={preset} value={preset}>{preset}</option>
+          ))}
+        </select>
+      </div>
+
       <div style={{ marginBottom: '8px' }}>
         <label style={labelStyle}>Mode</label>
         <select

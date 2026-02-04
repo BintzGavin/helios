@@ -36,6 +36,7 @@ export interface RenderConfig {
   mode: 'canvas' | 'dom';
   videoBitrate?: string;
   videoCodec?: string;
+  concurrency?: number;
 }
 
 export interface RenderJob {
@@ -190,8 +191,21 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [duplicateTargetId, setDuplicateTargetId] = useState<string | null>(null);
   const [isSettingsOpen, setSettingsOpen] = useState(false);
   const [canvasSize, setCanvasSize] = useState({ width: 1920, height: 1080 });
-  const [renderConfig, setRenderConfig] = useState<RenderConfig>({ mode: 'canvas' });
+  const [renderConfig, setRenderConfig] = useState<RenderConfig>(() => {
+    try {
+      const saved = localStorage.getItem('helios-studio:render-config');
+      return saved ? JSON.parse(saved) : { mode: 'canvas' };
+    } catch (e) {
+      console.warn('Failed to parse render config', e);
+      return { mode: 'canvas' };
+    }
+  });
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
+  // Persist Render Config
+  useEffect(() => {
+    localStorage.setItem('helios-studio:render-config', JSON.stringify(renderConfig));
+  }, [renderConfig]);
 
   const [renderJobs, setRenderJobs] = useState<RenderJob[]>([]);
 
