@@ -1,3 +1,6 @@
+## DEMO v1.103.0
+- ✅ Completed: Solid Pixi Animation - Created `examples/solid-pixi-animation` demonstrating integration with PixiJS v8 and SolidJS.
+
 ## DEMO v1.101.0
 - ✅ Completed: Svelte Pixi Animation - Created `examples/svelte-pixi-animation` demonstrating integration with PixiJS v8 and Svelte 5.
 
@@ -18,6 +21,21 @@
 
 ## DEMO v1.95.0
 - ✅ Completed: Vue Lottie Animation - Created `examples/vue-lottie-animation` demonstrating integration with `lottie-web` in Vue 3 driven by Helios timeline.
+
+## DEMO v1.94.0
+- ✅ Completed: Vue Lottie Animation - Created `examples/vue-lottie-animation` demonstrating integration with `lottie-web` in Vue 3 driven by Helios timeline.
+
+## DEMO v1.93.0
+- ✅ Completed: React Lottie Animation - Created `examples/react-lottie-animation` demonstrating integration with `lottie-web` in React driven by Helios timeline.
+
+## DEMO v1.92.0
+- ✅ Completed: Svelte Audio Visualization - Created `examples/svelte-audio-visualization` demonstrating real-time audio analysis (RMS, waveforms) using synthesized `AudioBuffer` and Svelte derived stores.
+
+## DEMO v1.91.0
+- ✅ Completed: Lottie Animation - Created `examples/lottie-animation` demonstrating integration with `lottie-web` driven by Helios timeline.
+
+## DEMO v1.90.0
+- ✅ Completed: Vue Audio Visualization - Created `examples/vue-audio-visualization` demonstrating real-time audio analysis (RMS, waveforms) using synthesized `AudioBuffer` and Vue 3.
 
 ## DEMO v1.89.0
 - ✅ Completed: Refactor Podcast Visualizer - Refactored `examples/podcast-visualizer` to use `AudioContext` for real-time analysis, replacing simulated animations.
