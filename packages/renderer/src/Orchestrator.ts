@@ -1,9 +1,12 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
+import { spawn } from 'child_process';
+import ffmpeg from '@ffmpeg-installer/ffmpeg';
 import { Renderer } from './Renderer.js';
 import { RendererOptions, RenderJobOptions } from './types.js';
 import { concatenateVideos } from './concat.js';
+import { FFmpegBuilder } from './utils/FFmpegBuilder.js';
 
 export interface DistributedRenderOptions extends RendererOptions {
   concurrency?: number;
@@ -37,6 +40,21 @@ export class RenderOrchestrator {
       await fs.promises.mkdir(outputDir, { recursive: true });
     }
 
+    // Determine if we need a final audio mixing pass
+    // If audio is present, we render silent video chunks, concatenate them,
+    // and then mix the audio in a final pass to avoid glitches.
+    const hasAudio = (options.audioTracks && options.audioTracks.length > 0) || !!options.audioFilePath;
+    const finalStepNeeded = hasAudio;
+
+    const concatTarget = finalStepNeeded
+      ? path.join(outputDir, `temp_concat_${Date.now()}.mp4`)
+      : outputPath;
+
+    // If mixing is needed, strip audio from the chunks
+    const chunkBaseOptions: RendererOptions = finalStepNeeded
+      ? { ...options, audioTracks: [], audioFilePath: undefined }
+      : options;
+
     const tempPrefix = `temp_${Date.now()}_${Math.random().toString(36).substring(7)}`;
 
     for (let i = 0; i < concurrency; i++) {
@@ -52,7 +70,7 @@ export class RenderOrchestrator {
       // Create options for this chunk
       // We must preserve the original options but override startFrame and frameCount
       const chunkOptions: RendererOptions = {
-        ...options,
+        ...chunkBaseOptions,
         startFrame: (options.startFrame || 0) + start,
         frameCount: count,
         // Calculate duration based on frame count to be consistent, though Renderer prioritizes frameCount
@@ -69,7 +87,53 @@ export class RenderOrchestrator {
     try {
       await Promise.all(promises);
       console.log('All chunks rendered. Concatenating...');
-      await concatenateVideos(tempFiles, outputPath, { ffmpegPath: options.ffmpegPath });
+      await concatenateVideos(tempFiles, concatTarget, { ffmpegPath: options.ffmpegPath });
+
+      if (finalStepNeeded) {
+        console.log('Mixing audio into concatenated video...');
+
+        // Use FFmpegBuilder to generate args for the mixing pass
+        // We force 'copy' for video to avoid re-encoding
+        const mixOptions: RendererOptions = { ...options, videoCodec: 'copy' };
+        const videoInputArgs = ['-i', concatTarget];
+
+        // FFmpegBuilder handles audio offsets/seeking based on options
+        const { args } = FFmpegBuilder.getArgs(mixOptions, outputPath, videoInputArgs);
+
+        const ffmpegPath = options.ffmpegPath || ffmpeg.path;
+        console.log(`Spawning FFmpeg for audio mixing: ${ffmpegPath} ${args.join(' ')}`);
+
+        await new Promise<void>((resolve, reject) => {
+          const process = spawn(ffmpegPath, args);
+          let stderr = '';
+
+          process.stderr.on('data', (data) => {
+            stderr += data.toString();
+          });
+
+          process.on('close', (code) => {
+            if (code === 0) {
+              resolve();
+            } else {
+              reject(new Error(`FFmpeg audio mix failed with code ${code}: ${stderr}`));
+            }
+          });
+
+          process.on('error', (err) => {
+            reject(err);
+          });
+        });
+
+        // Cleanup intermediate silent video
+        try {
+          if (fs.existsSync(concatTarget)) {
+            await fs.promises.unlink(concatTarget);
+          }
+        } catch (e) {
+          console.warn(`Failed to delete temp concat file ${concatTarget}`, e);
+        }
+      }
+
     } finally {
       console.log('Cleaning up temporary files...');
       for (const file of tempFiles) {

@@ -1,9 +1,24 @@
 import { RenderOrchestrator } from '../src/index.js';
 import * as path from 'path';
 import * as fs from 'fs/promises';
+import { spawnSync } from 'child_process';
+import ffmpeg from '@ffmpeg-installer/ffmpeg';
 
 async function main() {
   console.log('Starting distributed render verification...');
+
+  const outputDir = path.resolve(process.cwd(), 'output');
+  await fs.mkdir(outputDir, { recursive: true });
+
+  const audioPath = path.join(outputDir, 'test_audio.mp3');
+  console.log('Generating dummy audio file...');
+  spawnSync(ffmpeg.path, [
+    '-f', 'lavfi',
+    '-i', 'sine=frequency=1000:duration=4',
+    '-c:a', 'libmp3lame',
+    '-y',
+    audioPath
+  ]);
 
   const options = {
     width: 600,
@@ -11,6 +26,7 @@ async function main() {
     fps: 30,
     durationInSeconds: 4, // 120 frames
     concurrency: 2, // Should spawn 2 workers, 60 frames each
+    audioFilePath: audioPath,
   };
 
   const compositionPath = path.resolve(
@@ -22,10 +38,8 @@ async function main() {
   const outputPath = path.resolve(process.cwd(), 'output/distributed-render.mp4');
 
   try {
-      await fs.rm(outputPath);
+      await fs.rm(outputPath, { force: true });
   } catch(e) {}
-
-  await fs.mkdir(path.dirname(outputPath), { recursive: true });
 
   try {
     const start = Date.now();
@@ -40,6 +54,9 @@ async function main() {
     } else {
         throw new Error('Output file is empty');
     }
+
+    // Clean up audio file
+    await fs.rm(audioPath, { force: true });
 
   } catch (error) {
     console.error('Distributed render failed:', error);

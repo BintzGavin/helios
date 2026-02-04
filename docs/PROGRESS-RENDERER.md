@@ -1,3 +1,6 @@
+## RENDERER v1.64.0
+- ✅ Completed: Distributed Audio Mixing - Updated `RenderOrchestrator` to decouple audio mixing from distributed video rendering chunks. Chunks are now rendered silently and concatenated, with audio mixed in a final pass to prevent glitches. Verified with `verify-distributed.ts`.
+
 ## RENDERER v1.63.1
 - ✅ Completed: Update Verification Suite - Added orphaned verification scripts (`verify-canvas-shadow-dom.ts` and `verify-pseudo-element-preload.ts`) to the main test runner `run-all.ts` and fixed type errors in `verify-advanced-audio.ts` and `verify-audio-args.ts` caused by `getFFmpegArgs` return type change.
 
