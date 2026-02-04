@@ -1,3 +1,9 @@
+## RENDERER v1.66.0
+- ✅ Completed: CdpTimeDriver Iframe Sync - Updated `CdpTimeDriver` to synchronize media elements across all frames (including iframes) by iterating `page.frames()` and executing sync logic in each context. Verified with `verify-cdp-iframe-media-sync.ts`.
+
+## RENDERER v1.65.0
+- ✅ Completed: Smart Audio Fades - Updated `AudioTrackConfig` and `FFmpegBuilder` to calculate fade-out times relative to the clip's duration (if known and not looping) rather than the composition duration. Verified with `verify-smart-audio-fades.ts`.
+
 ## RENDERER v1.64.1
 - ✅ Completed: Verify and Sync - Verified v1.64.0 distributed rendering and synced documentation. Verified with `verify-distributed.ts` and `npm run test`.
 
