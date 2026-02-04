@@ -14,6 +14,9 @@ Each agent should update **their own dedicated progress file** instead of this f
 - **SKILLS**: Update `docs/PROGRESS-SKILLS.md`
 - **DOCS**: Update `docs/PROGRESS-DOCS.md`
 
+### CLI v0.4.1
+- ✅ Completed: Implement `helios render` command - Implemented and verified the `render` command using `@helios-project/renderer`.
+
 ### DOCS v1.9.0
 - ✅ Completed: Daily Documentation Review - CLI & Studio Sync. Created CLI Docs, updated all changelogs and API docs.
 
