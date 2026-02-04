@@ -1,3 +1,6 @@
+## RENDERER v1.67.1
+- ✅ Completed: Robust Distributed Audio Pipeline - Updated `Orchestrator` to use `.mov` containers with `pcm_s16le` audio for intermediate chunks, preventing concatenation artifacts (clicks) at chunk boundaries.
+
 ## RENDERER v1.67.0
 - ✅ Completed: Smart Codec Selection Update - Updated `CanvasStrategy` to prioritize H.264 -> VP9 -> AV1 -> VP8, enabling hardware-accelerated transparency and better quality. Verified with `verify-smart-codec-priority.ts`.
 
