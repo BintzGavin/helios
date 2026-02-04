@@ -55,6 +55,18 @@ npx helios <command> [options]
 - **`add <component>`**: Adds a component to the project (Shadcn-style).
   - Fetches component code from the registry (`packages/cli/src/registry/manifest.ts`).
   - Installs component files (e.g. `Timer.tsx`, `ProgressBar.tsx`) and dependencies into the configured `components` directory.
+- **`render <input>`**: Renders a composition to video.
+  - Arguments:
+    - `<input>`: Path or URL to the composition.
+  - Options:
+    - `-o, --output <path>`: Output file path.
+    - `--width <number>`: Viewport width.
+    - `--height <number>`: Viewport height.
+    - `--fps <number>`: Frames per second.
+    - `--duration <number>`: Duration in seconds.
+    - `--quality <number>`: CRF quality.
+    - `--mode <mode>`: Render mode (`canvas` or `dom`).
+    - `--no-headless`: Run in visible browser window.
 
 ## D. UI Components
 

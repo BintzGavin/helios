@@ -1,4 +1,4 @@
-**Version**: 0.90.0
+**Version**: 0.90.1
 
 **Posture**: ACTIVELY EXPANDING FOR V2
 
@@ -9,6 +9,7 @@
 **Focus**: UI Implementation & CLI
 
 ## Recent Updates
+- [v0.90.1] ✅ Verified: Render Command - Verified `helios render` command functionality and synced package version.
 - [v0.90.0] ✅ Completed: Core Components - Expanded CLI Component Registry with `ProgressBar` and `Watermark` components.
 - [v0.89.0] ✅ Completed: Component Registry - Implemented `helios add` command in CLI to install components (Timer) from a local registry.
 - [v0.88.0] ✅ Completed: CLI Scaffold - Implemented `helios init` and `helios add` commands to scaffold project configuration and component structure.
