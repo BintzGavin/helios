@@ -1,4 +1,4 @@
-**Version**: 0.92.0
+**Version**: 0.93.0
 
 **Posture**: ACTIVELY EXPANDING FOR V2
 
@@ -9,6 +9,7 @@
 **Focus**: UI Implementation & CLI
 
 ## Recent Updates
+- [v0.93.0] ✅ Completed: Visualize Time-based Props - Implemented `TimecodeInput` in Props Editor and visual markers on the Timeline for number props with `format: 'time'`, enabling WYSIWYG timing adjustments.
 - [v0.92.0] ✅ Completed: Components Registry UI - Implemented "Components" panel in Studio UI, enabling users to browse and install components from the registry via the CLI backend.
 - [v0.91.0] ✅ Completed: CLI Production Server - Replaced development-only spawn process with robust Vite server integration using `studioApiPlugin`, enabling correct HMR and path resolution for end-users.
 - [v0.90.0] ✅ Completed: Core Components - Expanded CLI Component Registry with `ProgressBar` and `Watermark` components.

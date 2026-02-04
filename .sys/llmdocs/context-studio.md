@@ -70,8 +70,8 @@ npx helios <command> [options]
 ## D. UI Components
 
 - **Stage**: The central preview area containing the `<helios-player>`. Supports pan, zoom, and transparency toggles.
-- **Timeline**: A multi-track timeline for scrubbing, playback control, loop range setting, and audio visualization.
-- **Props Editor**: A schema-aware inspector for editing composition properties (`inputProps`). Supports primitives, arrays, objects, colors, and assets.
+- **Timeline**: A multi-track timeline for scrubbing, playback control, loop range setting, audio visualization, and visualization of time-based props.
+- **Props Editor**: A schema-aware inspector for editing composition properties (`inputProps`). Supports primitives, arrays, objects, colors, and assets. Includes Timecode input for time-based props.
 - **Assets Panel**: A file browser for managing project assets (images, video, audio, fonts). Supports drag-and-drop to Props Editor.
 - **Components Panel**: Allows browsing and installing components (e.g. Timer) from the registry.
 - **Audio Mixer Panel**: Controls volume, mute, and solo states for individual audio tracks.

@@ -209,6 +209,23 @@
   border-color: white;
 }
 
+.timeline-marker-prop {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  transform: translate(-50%, 8px) rotate(45deg);
+  background-color: #00bcd4;
+  cursor: pointer;
+  z-index: 9;
+  border: 1px solid rgba(0, 0, 0, 0.3);
+}
+
+.timeline-marker-prop:hover {
+  transform: translate(-50%, 8px) rotate(45deg) scale(1.2);
+  z-index: 20;
+  border-color: white;
+}
+
 .timeline-hover-guide {
   position: absolute;
   top: 0;
