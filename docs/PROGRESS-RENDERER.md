@@ -1,3 +1,6 @@
+## RENDERER v1.67.0
+- ✅ Completed: Smart Codec Selection Update - Updated `CanvasStrategy` to prioritize H.264 -> VP9 -> AV1 -> VP8, enabling hardware-accelerated transparency and better quality. Verified with `verify-smart-codec-priority.ts`.
+
 ## RENDERER v1.66.0
 - ✅ Completed: CdpTimeDriver Iframe Sync - Updated `CdpTimeDriver` to synchronize media elements across all frames (including iframes) by iterating `page.frames()` and executing sync logic in each context. Verified with `verify-cdp-iframe-media-sync.ts`.
 
