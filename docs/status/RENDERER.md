@@ -1,10 +1,11 @@
-**Version**: 1.66.0
+**Version**: 1.67.0
 
 **Posture**: MAINTENANCE WITH V2 EXPANSION
 
 # Renderer Agent Status
 
 ## Progress Log
+- [1.67.0] ✅ Completed: Smart Codec Selection Update - Updated `CanvasStrategy` to prioritize H.264 -> VP9 -> AV1 -> VP8, enabling hardware-accelerated transparency and better quality. Verified with `verify-smart-codec-priority.ts`.
 - [1.66.0] ✅ Completed: CdpTimeDriver Iframe Sync - Updated `CdpTimeDriver` to synchronize media elements across all frames (including iframes) by iterating `page.frames()` and executing sync logic in each context. Verified with `verify-cdp-iframe-media-sync.ts`.
 - [1.65.0] ✅ Completed: Smart Audio Fades - Updated `AudioTrackConfig` and `FFmpegBuilder` to calculate fade-out times relative to the clip's duration (if known and not looping) rather than the composition duration. Verified with `verify-smart-audio-fades.ts`.
 - [1.64.1] ✅ Completed: Verify and Sync - Verified v1.64.0 distributed rendering and synced documentation. Verified with `verify-distributed.ts` and `npm run test`.

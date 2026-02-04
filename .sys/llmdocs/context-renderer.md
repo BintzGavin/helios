@@ -9,7 +9,7 @@ The Renderer operates on a "Dual-Path" architecture to support different use cas
 2. **Canvas Strategy (`CanvasStrategy`)**: Used for WebGL/Canvas-heavy compositions (e.g., Three.js, PixiJS). It captures the `<canvas>` context directly.
    - **Drivers**: Uses `CdpTimeDriver` (Chrome DevTools Protocol) for precise virtual time control (supports Shadow DOM media sync, syncs media in iframes, enforces deterministic Jan 2024 epoch, ensures sync-before-render order, waits for budget expiration, enforces stability timeout via `Runtime.terminateExecution`, supports media looping and visual playback rate).
    - **Discovery**: Uses `dom-scanner` to recursively discover media elements (including Shadow DOM) for implicit audio inclusion (including `blob:` URLs via extraction), unifying behavior with `DomStrategy`.
-   - **Optimization**: Prioritizes H.264 (AVC) intermediate codec for hardware acceleration, falling back to VP8. Exposes `diagnose()` API to verify supported WebCodecs.
+   - **Optimization**: Prioritizes H.264 (AVC) -> VP9 -> AV1 -> VP8 intermediate codec for hardware acceleration and transparency support. Exposes `diagnose()` API to verify supported WebCodecs.
    - **Output**: Best for high-performance 2D/3D graphics.
 
 Both strategies pipe frame data directly to an FFmpeg process via stdin ("Zero Disk I/O"), ensuring high performance and low latency. Audio tracks from Blob URLs are extracted to memory and also piped to FFmpeg via additional pipes, avoiding temporary files. Video concatenation also constructs file lists in memory and pipes them to FFmpeg stdin, eliminating all temporary file creation.
@@ -63,6 +63,7 @@ packages/renderer/
     ├── verify-dom-audio-fades.ts # DOM audio fades test
     ├── verify-audio-fades.ts   # Audio fades test
     ├── verify-smart-audio-fades.ts # Smart Audio Fades verification
+    ├── verify-smart-codec-priority.ts # Smart Codec Priority verification
     ├── verify-audio-loop.ts    # Audio looping test
     ├── verify-audio-playback-rate.ts # Audio playback rate test
     ├── verify-audio-playback-seek.ts # Audio playback seek test (Rate + StartFrame)

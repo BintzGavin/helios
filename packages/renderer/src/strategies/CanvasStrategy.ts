@@ -191,13 +191,17 @@ export class CanvasStrategy implements RenderStrategy {
         addCandidate(this.options.intermediateVideoCodec);
     } else if (this.options.videoCodec === 'copy') {
         // Smart Selection for Copy Mode
-        // Prioritize H.264 (AVC) -> VP8
+        // Prioritize H.264 (AVC) -> VP9 -> AV1 -> VP8
         addCandidate('avc1.4d002a'); // H.264 High Profile
+        addCandidate('vp9');
+        addCandidate('av01.0.05M.08'); // AV1
         addCandidate('vp8');
     } else {
         // Default behavior
-        // Prioritize H.264 (Hardware) -> VP8 (Software Fallback)
+        // Prioritize H.264 (Hardware) -> VP9 -> AV1 -> VP8
         addCandidate('avc1.4d002a');
+        addCandidate('vp9');
+        addCandidate('av01.0.05M.08');
         addCandidate('vp8');
     }
 

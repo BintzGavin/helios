@@ -48,6 +48,8 @@ const tests = [
   'tests/verify-shadow-dom-background.ts',
   'tests/verify-shadow-dom-images.ts',
   'tests/verify-shadow-dom-sync.ts',
+  'tests/verify-smart-audio-fades.ts',
+  'tests/verify-smart-codec-priority.ts',
   'tests/verify-smart-codec-selection.ts',
   'tests/verify-stream-copy.ts',
   'tests/verify-video-loop.ts',
