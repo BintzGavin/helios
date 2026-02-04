@@ -4,8 +4,8 @@
 
 Helios Studio is a browser-based development environment for creating video compositions. It is built as a framework-agnostic tool that runs locally, serving the user's project files and providing a visual interface for editing and previewing.
 
-- **CLI**: The entry point (`packages/cli/bin/helios.js`) provides commands to initialize projects (`init`), add components (`add`), and launch the Studio (`studio`).
-- **Dev Server**: A customized Vite server (`packages/studio/src/server/`) that serves the Studio UI and provides API endpoints for filesystem operations (creating compositions, uploading assets, managing render jobs).
+- **CLI**: The entry point (`packages/cli/bin/helios.js`) provides commands to initialize projects (`init`), add components (`add`), render videos (`render`), and launch the Studio (`studio`).
+- **Dev Server**: The `studio` command launches a Vite server (as a library) configured with `studioApiPlugin` (`packages/studio/src/server/`), which serves the Studio UI (overlay) and provides API endpoints for filesystem operations and HMR.
 - **UI**: A React-based Single Page Application (SPA) that acts as the frontend. It communicates with the backend via REST API and connects to the `<helios-player>` component for preview.
 - **State Management**: `StudioContext` manages global state (compositions, assets, player controller, timeline).
 
@@ -14,7 +14,7 @@ Helios Studio is a browser-based development environment for creating video comp
 ```
 packages/studio/
 ├── bin/
-│   └── helios-studio.js      # Studio server entry point
+│   └── helios-studio.js      # Legacy server entry point
 ├── src/
 │   ├── components/           # UI Components
 │   │   ├── AssetsPanel/
@@ -30,11 +30,16 @@ packages/studio/
 │   ├── context/
 │   │   └── StudioContext.tsx # Global state
 │   ├── server/               # Backend logic (Vite plugins)
+│   │   ├── plugin.ts         # Main studioApiPlugin export
+│   │   ├── render-manager.ts # Render orchestration
+│   │   └── ...
 │   ├── App.tsx               # Main UI layout
 │   └── main.tsx              # Entry point
 ├── index.html                # HTML entry
 ├── package.json
-├── vite.config.ts            # Studio build config
+├── vite.config.ts            # Studio UI build config
+├── vite.config.cli.ts        # CLI plugin build config
+├── tsconfig.cli.json         # CLI types build config
 └── vitest.config.ts          # Test config
 ```
 
@@ -49,7 +54,12 @@ npx helios <command> [options]
 ### Commands
 
 - **`studio`**: Starts the Studio development server and opens the browser.
+  - Usage: `npx helios studio [options]`
+  - Options: `-p, --port <number>` (default: 5173)
   - Uses current working directory to discover compositions.
+- **`render <input>`**: Renders a composition to video.
+  - Usage: `npx helios render <input> [options]`
+  - Options: `-o, --output <path>`, `--width`, `--height`, `--fps`, `--duration`, `--quality`, `--mode`.
 - **`init`**: Initializes a new Helios project configuration (`helios.config.json`).
   - Scaffolds directory structure references.
 - **`add <component>`**: Adds a component to the project (Shadcn-style).

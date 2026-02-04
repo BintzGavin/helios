@@ -1,40 +1,53 @@
 import { Command } from 'commander';
-import { spawn } from 'child_process';
+import { createServer } from 'vite';
+import { studioApiPlugin } from '@helios-project/studio/cli';
+import { createRequire } from 'module';
 import path from 'path';
-import { fileURLToPath } from 'url';
 
 export function registerStudioCommand(program: Command) {
   program
     .command('studio')
     .description('Launch the Helios Studio')
-    .action(async () => {
+    .option('-p, --port <number>', 'Port to listen on', '5173')
+    .action(async (options) => {
       console.log('Starting Studio...');
 
-      // Resolve path to packages/studio
-      // This file is in .../packages/cli/dist/commands/studio.js
-      const __dirname = path.dirname(fileURLToPath(import.meta.url));
-      const studioPath = path.resolve(__dirname, '../../../studio');
+      try {
+        const require = createRequire(import.meta.url);
 
-      console.log(`Resolved Studio path: ${studioPath}`);
+        // Resolve the path to the studio package
+        // We resolve the CLI entry point and go up to find the package root
+        const studioCliPath = require.resolve('@helios-project/studio/cli');
+        const studioRoot = path.resolve(path.dirname(studioCliPath), '../../');
+        const studioDist = path.join(studioRoot, 'dist');
 
-      const child = spawn('npm', ['run', 'dev'], {
-        cwd: studioPath,
-        env: {
-          ...process.env,
-          HELIOS_PROJECT_ROOT: process.env.HELIOS_PROJECT_ROOT || process.cwd(),
-        },
-        stdio: 'inherit',
-        shell: true,
-      });
+        console.log(`Studio Root: ${studioRoot}`);
 
-      child.on('error', (err) => {
-        console.error('Failed to start studio:', err);
-      });
+        const server = await createServer({
+          configFile: false, // Ensure we don't pick up a random vite.config.js unless intended?
+                             // Actually user might want their own config for aliases etc.
+                             // But for Studio we act as the host.
+                             // Usually we want to respect user's vite config if they have one for their project?
+                             // But the plan said "The CLI will act as the 'Server Host'".
+                             // If we pass `root: process.cwd()`, Vite will look for config there.
+                             // This is probably good so user can configure aliases.
+          root: process.cwd(),
+          server: {
+            port: parseInt(options.port, 10),
+            strictPort: false
+          },
+          plugins: [
+            studioApiPlugin({
+              studioRoot: studioDist
+            })
+          ]
+        });
 
-      child.on('close', (code) => {
-        if (code !== 0) {
-           console.log(`Studio process exited with code ${code}`);
-        }
-      });
+        await server.listen();
+        server.printUrls();
+      } catch (e: any) {
+        console.error('Failed to start Studio:', e);
+        process.exit(1);
+      }
     });
 }

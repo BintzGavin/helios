@@ -1,3 +1,6 @@
+## STUDIO v0.91.0
+- ✅ Completed: CLI Production Server - Replaced development-only spawn process with robust Vite server integration using `studioApiPlugin`, enabling correct HMR and path resolution for end-users.
+
 ## STUDIO v0.90.0
 - ✅ Completed: Core Components - Expanded CLI Component Registry with `ProgressBar` and `Watermark` components.
 
