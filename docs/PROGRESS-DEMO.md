@@ -1,3 +1,6 @@
+## DEMO v1.108.0
+- ✅ Completed: Svelte D3 Animation - Created `examples/svelte-d3-animation` demonstrating D3.js integration with Svelte 5 and Helios.
+
 ## DEMO v1.107.0
 - ✅ Completed: React D3 Animation - Created `examples/react-d3-animation` demonstrating D3.js integration with React.
 
