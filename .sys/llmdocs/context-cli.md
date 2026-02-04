@@ -94,6 +94,8 @@ Options:
 - `--duration <number>`: Duration in seconds (default: 1)
 - `--quality <number>`: CRF quality (0-51)
 - `--mode <mode>`: Render mode (canvas or dom) (default: "canvas")
+- `--start-frame <number>`: Frame to start rendering from
+- `--frame-count <number>`: Number of frames to render
 - `--no-headless`: Run in visible browser window (default: headless)
 
 ## D. Configuration

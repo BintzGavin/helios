@@ -14,6 +14,8 @@ export function registerRenderCommand(program: Command) {
     .option('--duration <number>', 'Duration in seconds', '1')
     .option('--quality <number>', 'CRF quality (0-51)')
     .option('--mode <mode>', 'Render mode (canvas or dom)', 'canvas')
+    .option('--start-frame <number>', 'Frame to start rendering from')
+    .option('--frame-count <number>', 'Number of frames to render')
     .option('--no-headless', 'Run in visible browser window (default: headless)')
     .action(async (input, options) => {
       try {
@@ -26,6 +28,16 @@ export function registerRenderCommand(program: Command) {
         console.log(`Input: ${url}`);
         console.log(`Output: ${outputPath}`);
 
+        const startFrame = options.startFrame ? parseInt(options.startFrame, 10) : undefined;
+        if (startFrame !== undefined && isNaN(startFrame)) {
+          throw new Error('start-frame must be a valid number');
+        }
+
+        const frameCount = options.frameCount ? parseInt(options.frameCount, 10) : undefined;
+        if (frameCount !== undefined && isNaN(frameCount)) {
+          throw new Error('frame-count must be a valid number');
+        }
+
         const renderer = new Renderer({
           width: parseInt(options.width, 10),
           height: parseInt(options.height, 10),
@@ -33,6 +45,8 @@ export function registerRenderCommand(program: Command) {
           durationInSeconds: parseInt(options.duration, 10),
           crf: options.quality ? parseInt(options.quality, 10) : undefined,
           mode: options.mode as 'canvas' | 'dom',
+          startFrame,
+          frameCount,
           browserConfig: {
             headless: options.headless, // 'no-headless' sets this to false
           },
