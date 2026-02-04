@@ -13,3 +13,7 @@ Critical learnings only. This is not a log—only add entries for insights that 
 ## [0.4.1] - Distributed Rendering Gap
 **Learning:** `helios render` lacked flags for frame ranges (`--start-frame`, `--frame-count`) required for distributed rendering, even though `@helios-project/renderer` supports them.
 **Action:** Always check the underlying package capabilities (like `Renderer`) when implementing CLI commands to ensure full feature parity.
+
+## [0.4.1] - Init Scope Gap
+**Learning:** `helios init` was documented as "implemented" but only generated a config file, lacking the project scaffolding required by the Vision ("scaffold new Helios projects"). "Implemented" status can obscure scope gaps.
+**Action:** Verify "implemented" commands against the Vision (`AGENTS.md`) to distinguish between "MVP exists" and "Vision Complete".
