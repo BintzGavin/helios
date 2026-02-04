@@ -56,6 +56,14 @@ export class SeekTimeDriver implements TimeDriver {
         // Update the global virtual time
         window.__HELIOS_VIRTUAL_TIME__ = timeInMs;
 
+        // Check for reactive binding (if supported)
+        if (typeof window.helios !== 'undefined' && typeof window.helios.isVirtualTimeBound !== 'undefined') {
+          if (!window.helios.isVirtualTimeBound && !window.__HELIOS_WARNED_VIRTUAL_TIME__) {
+            console.warn('[SeekTimeDriver] Warning: Helios is not reactively bound to virtual time. Fallback polling usage detected.');
+            window.__HELIOS_WARNED_VIRTUAL_TIME__ = true;
+          }
+        }
+
         // Helper to find all scopes (Document + ShadowRoots)
         function findAllScopes(rootNode) {
           const scopes = [rootNode];
