@@ -7,7 +7,7 @@ The Renderer operates on a "Dual-Path" architecture to support different use cas
    - **Discovery**: Uses `dom-scanner` to recursively discover media elements (including Shadow DOM) and implements recursive preloading for `<img>` tags, `<video>` posters, SVG images, and CSS background/mask images (including those in `::before` and `::after` pseudo-elements). Supports automatic audio looping, playback rate adjustment, and smart fades based on clip duration for `<audio>` elements.
    - **Output**: Best for sharp text and vector graphics.
 2. **Canvas Strategy (`CanvasStrategy`)**: Used for WebGL/Canvas-heavy compositions (e.g., Three.js, PixiJS). It captures the `<canvas>` context directly.
-   - **Drivers**: Uses `CdpTimeDriver` (Chrome DevTools Protocol) for precise virtual time control (supports Shadow DOM media sync, enforces deterministic Jan 2024 epoch, ensures sync-before-render order, waits for budget expiration, enforces stability timeout via `Runtime.terminateExecution`, supports media looping and visual playback rate).
+   - **Drivers**: Uses `CdpTimeDriver` (Chrome DevTools Protocol) for precise virtual time control (supports Shadow DOM media sync, syncs media in iframes, enforces deterministic Jan 2024 epoch, ensures sync-before-render order, waits for budget expiration, enforces stability timeout via `Runtime.terminateExecution`, supports media looping and visual playback rate).
    - **Discovery**: Uses `dom-scanner` to recursively discover media elements (including Shadow DOM) for implicit audio inclusion (including `blob:` URLs via extraction), unifying behavior with `DomStrategy`.
    - **Optimization**: Prioritizes H.264 (AVC) intermediate codec for hardware acceleration, falling back to VP8. Exposes `diagnose()` API to verify supported WebCodecs.
    - **Output**: Best for high-performance 2D/3D graphics.
@@ -69,6 +69,7 @@ packages/renderer/
     ├── verify-visual-playback-rate.ts # Visual playback rate test
     ├── verify-virtual-time-binding.ts # Virtual Time Binding verification test
     ├── verify-frame-count.ts   # Precision frame count test
+    ├── verify-cdp-iframe-media-sync.ts # CDP Iframe Media Sync test
     ├── verify-cdp-hang.ts      # CDP initialization order/deadlock test
     ├── verify-cdp-driver.ts    # CdpDriver budget test
     ├── verify-cdp-driver-timeout.ts # CdpDriver stability timeout test
