@@ -17,7 +17,7 @@ export const Timer: React.FC<TimerProps> = ({ helios: propHelios, style }) => {
      return <div style={style}>Helios instance not found</div>;
   }
 
-  const fps = heliosInstance.config.fps || 30;
+  const fps = heliosInstance.fps.value || 30;
   const time = frame / fps;
 
   // Format time as MM:SS:FF
@@ -85,8 +85,8 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({
 
   if (!heliosInstance) return null;
 
-  const duration = heliosInstance.config.duration || 1;
-  const fps = heliosInstance.config.fps || 30;
+  const duration = heliosInstance.duration.value || 1;
+  const fps = heliosInstance.fps.value || 30;
   const totalFrames = duration * fps;
 
   const progress = Math.min(Math.max(frame / totalFrames, 0), 1);
