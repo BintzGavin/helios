@@ -1,4 +1,4 @@
-**Version**: v0.66.1
+**Version**: v0.66.2
 
 **Posture**: STABLE AND FEATURE COMPLETE
 
@@ -58,6 +58,7 @@
 ## Critical Task
 - **None**: All critical tasks completed.
 
+[v0.66.2] ✅ Completed: Handle Connection Timeouts - Implemented error state and event dispatching on connection timeout.
 [v0.66.1] ✅ Completed: Responsive Images - Implemented support for capturing currentSrc of responsive images during client-side export, ensuring high-fidelity output.
 [v0.66.0] ✅ Completed: Implement VideoTracks API - Implemented videoTracks property and VideoTrackList API on <helios-player> to complete Standard Media API parity.
 [v0.65.2] ✅ Completed: Client-Side Audio Volume Support - Updated `getAudioAssets` to prioritize `audioTrackState` (volume/mute) over DOM attributes for robust client-side export parity.

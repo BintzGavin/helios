@@ -1,3 +1,6 @@
+## PLAYER v0.66.2
+- ✅ Completed: Handle Connection Timeouts - Implemented error state and event dispatching on connection timeout.
+
 ## PLAYER v0.66.1
 - ✅ Completed: Responsive Images - Implemented support for capturing currentSrc of responsive images during client-side export, ensuring high-fidelity output.
 

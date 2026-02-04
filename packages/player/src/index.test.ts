@@ -1811,7 +1811,8 @@ describe('HeliosPlayer', () => {
       vi.useRealTimers();
     });
 
-    it('should set error state and dispatch event on connection timeout', () => {
+    it('should correctly set error state and dispatch event on connection timeout', () => {
+      // Verify timeout error handling
       const errorSpy = vi.fn();
       player.addEventListener('error', errorSpy);
 
