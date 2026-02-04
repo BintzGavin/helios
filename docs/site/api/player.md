@@ -45,6 +45,8 @@ A custom element that embeds a composition (via iframe) and provides a rich play
 - **`export-caption-mode`** (string): `'burn-in'` (default) or `'file'`. If `'file'`, exports a sidecar `.srt` file instead of burning captions into the video.
 - **`export-width`** (number): The width of the exported video (optional).
 - **`export-height`** (number): The height of the exported video (optional).
+- **`export-bitrate`** (number): The target bitrate for export (optional).
+- **`export-filename`** (string): The filename for the exported video (default: "video").
 - **`canvas-selector`** (string): CSS selector for the canvas element (required for `export-mode="canvas"`).
 - **`input-props`** (string): JSON string of input properties to pass to the composition.
 - **`sandbox`** (string): Sandbox flags for the iframe (default: `'allow-scripts allow-same-origin'`).
@@ -76,6 +78,7 @@ The `<helios-player>` element implements a subset of the HTMLMediaElement API, a
 - **`readyState`** (number, readonly): The current readiness state of the media.
 - **`networkState`** (number, readonly): The current network state of the media.
 - **`textTracks`** (TextTrackList, readonly): List of text tracks. Each track supports `activeCues` and the `cuechange` event.
+- **`videoTracks`** (VideoTrackList, readonly): List of video tracks. Supports selection of tracks.
 - **`src`** (string): The URL of the composition.
 - **`currentSrc`** (string, readonly): The current URL of the composition.
 - **`error`** (MediaError, readonly): The current error state.

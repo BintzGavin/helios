@@ -5,6 +5,15 @@ description: "Changelog for the Core package"
 
 # Core Changelog
 
+## v5.11.0
+- **Implement Composition Schema**: Implemented HeliosConfig, HeliosComposition, and related interfaces to support serializable composition definitions.
+
+## v5.10.0
+- **Shared Virtual Time Binding**: Implemented static registry in Helios to allow multiple instances to synchronize with `window.__HELIOS_VIRTUAL_TIME__` simultaneously.
+
+## v5.9.0
+- **Reactive Virtual Time Getter**: Exposed `isVirtualTimeBound` getter in `Helios` to allow consumers to verify synchronous virtual time binding, facilitating better integration with external renderers.
+
 ## v5.8.0
 - **Expose Fade Easing Metadata**: Added `fadeEasing` to `AudioTrackMetadata` and updated `DomDriver` to parse `data-helios-fade-easing` attribute, exposing non-linear fade configurations to consumers.
 

@@ -38,6 +38,7 @@ Helios uses signals for reactive state management. You can subscribe to these si
 
 - **`currentFrame`** (`ReadonlySignal<number>`): The current frame number.
 - **`isPlaying`** (`ReadonlySignal<boolean>`): Whether the animation is playing.
+- **`isVirtualTimeBound`** (`boolean`): (Getter) Returns `true` if the instance is synchronously bound to `window.__HELIOS_VIRTUAL_TIME__`.
 - **`playbackRate`** (`ReadonlySignal<number>`): Current playback speed multiplier.
 - **`volume`** (`ReadonlySignal<number>`): Current audio volume.
 - **`muted`** (`ReadonlySignal<boolean>`): Current muted state.
@@ -113,11 +114,7 @@ Binds this Helios instance to a master Helios instance. This instance will sync 
 Unbinds this instance from any master (including `document.timeline` or another Helios instance).
 
 #### `bindToDocumentTimeline()`
-Binds the Helios instance to `document.timeline`. Useful when the timeline is driven externally (e.g., by the Renderer or Studio).
-Helios will poll `document.timeline.currentTime` and update its internal state.
-
-#### `unbindFromDocumentTimeline()`
-*Deprecated*: Use `unbind()` instead.
+Binds the Helios instance to `document.timeline`. Useful for syncing with external drivers (Renderer, Studio).
 
 #### `dispose()`
 Cleans up resources (tickers, polling loops, subscribers, drivers) to prevent memory leaks.
@@ -126,6 +123,44 @@ Cleans up resources (tickers, polling loops, subscribers, drivers) to prevent me
 
 #### `Helios.diagnose()`
 Returns a `Promise<DiagnosticReport>` containing environment support information (WAAPI, WebCodecs, OffscreenCanvas, User Agent).
+
+## Composition Schema
+
+These interfaces are used for serializable composition definitions.
+
+### `HeliosConfig`
+Base configuration for a Helios session.
+
+```typescript
+interface HeliosConfig<TInputProps = Record<string, any>> {
+  width?: number;
+  height?: number;
+  initialFrame?: number;
+  duration: number; // in seconds
+  fps: number;
+  loop?: boolean;
+  playbackRange?: [number, number];
+  autoSyncAnimations?: boolean;
+  inputProps?: TInputProps;
+  schema?: HeliosSchema;
+  playbackRate?: number;
+  volume?: number;
+  muted?: boolean;
+  audioTracks?: Record<string, AudioTrackState>;
+  availableAudioTracks?: AudioTrackMetadata[];
+  captions?: string | CaptionCue[];
+  markers?: Marker[];
+}
+```
+
+### `HeliosComposition`
+Extends `HeliosConfig` to include timeline definitions.
+
+```typescript
+interface HeliosComposition<TInputProps = Record<string, any>> extends HeliosConfig<TInputProps> {
+  timeline?: HeliosTimeline;
+}
+```
 
 ## DomDriver Attributes
 
