@@ -10,12 +10,6 @@ This backlog tracks concrete deliverables derived from [`AGENTS.md`](../AGENTS.m
 - [x] Implement output stitching without re-encoding (verify `concat` demuxer workflow).
 - [ ] Cloud execution adapter (AWS Lambda / Google Cloud Run).
 
-## Prompt to Composition
-*Helios must support workflows where a structured prompt produces a valid composition.*
-
-- [ ] Define structured prompt schema.
-- [ ] Implement composition generation logic.
-- [ ] Validate generated compositions without manual assembly.
 
 ## Component Registry
 *Helios will support a Shadcn-style component registry.*
