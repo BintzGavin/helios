@@ -2,6 +2,10 @@
 
 This file tracks progress for the CLI domain (`packages/cli`).
 
+## CLI v0.5.1
+
+- ✅ Fix Registry Components - Updated component registry to use V2 Helios Signals (`fps.value`, `duration.value`)
+
 ## CLI v0.5.0
 
 - ✅ Distributed Rendering Support - Added `--start-frame` and `--frame-count` to `helios render`

@@ -24,6 +24,9 @@ packages/cli/
 │   │   ├── init.ts         # helios init command
 │   │   ├── render.ts       # helios render command
 │   │   └── studio.ts       # helios studio command
+│   ├── registry/
+│   │   ├── manifest.ts     # Component registry definitions
+│   │   └── types.ts        # Registry types
 │   ├── utils/
 │   │   └── config.ts       # Config loading and types
 │   └── index.ts            # Main CLI setup
