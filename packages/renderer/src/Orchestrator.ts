@@ -12,6 +12,10 @@ export interface DistributedRenderOptions extends RendererOptions {
   concurrency?: number;
 }
 
+// Define constants for robust audio pipeline
+const CHUNK_AUDIO_CODEC = 'pcm_s16le';
+const CHUNK_EXTENSION = '.mov';
+
 export class RenderOrchestrator {
   static async render(compositionUrl: string, outputPath: string, options: DistributedRenderOptions, jobOptions?: RenderJobOptions): Promise<void> {
     const concurrency = options.concurrency || Math.max(1, os.cpus().length - 1);
@@ -40,20 +44,27 @@ export class RenderOrchestrator {
       await fs.promises.mkdir(outputDir, { recursive: true });
     }
 
-    // Determine if we need a final audio mixing pass
-    // If audio is present, we render silent video chunks, concatenate them,
-    // and then mix the audio in a final pass to avoid glitches.
-    const hasAudio = (options.audioTracks && options.audioTracks.length > 0) || !!options.audioFilePath;
-    const finalStepNeeded = hasAudio;
+    // Pipeline Strategy:
+    // 1. Render chunks with PCM audio (capturing implicit DOM audio) into .mov container
+    // 2. Concatenate chunks into a master PCM .mov file
+    // 3. Transcode/Mix to final output (adding explicit audio)
 
-    const concatTarget = finalStepNeeded
-      ? path.join(outputDir, `temp_concat_${Date.now()}.mp4`)
-      : outputPath;
+    // We always perform the final step to ensure consistent transcoding and mixing
+    const finalStepNeeded = true;
 
-    // If mixing is needed, strip audio from the chunks
-    const chunkBaseOptions: RendererOptions = finalStepNeeded
-      ? { ...options, audioTracks: [], audioFilePath: undefined }
-      : options;
+    // The intermediate concatenation target is always a PCM .mov file
+    const concatTarget = path.join(outputDir, `temp_concat_${Date.now()}${CHUNK_EXTENSION}`);
+
+    // Chunk Options:
+    // - Remove explicit audio tracks (they are mixed in the final step)
+    // - Force PCM audio codec (to capture implicit audio without artifacts)
+    // - Inherit video codec (or defaults from strategy)
+    const chunkBaseOptions: RendererOptions = {
+      ...options,
+      audioTracks: [],
+      audioFilePath: undefined,
+      audioCodec: CHUNK_AUDIO_CODEC
+    };
 
     const tempPrefix = `temp_${Date.now()}_${Math.random().toString(36).substring(7)}`;
 
@@ -64,7 +75,8 @@ export class RenderOrchestrator {
 
       if (count <= 0) break;
 
-      const tempFile = path.join(outputDir, `${tempPrefix}_part_${i}.mp4`);
+      // Use CHUNK_EXTENSION for temporary chunk files
+      const tempFile = path.join(outputDir, `${tempPrefix}_part_${i}${CHUNK_EXTENSION}`);
       tempFiles.push(tempFile);
 
       // Create options for this chunk

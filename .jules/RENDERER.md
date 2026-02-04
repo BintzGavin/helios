@@ -10,3 +10,7 @@
 ## [1.66.0] - Missing VP9/AV1 in Smart Codec Selection
 **Learning:** `CanvasStrategy` defaults to checking only H.264 and VP8. This forces users needing transparency (which H.264 often lacks) to fall back to the older VP8 codec, bypassing the superior VP9 (which supports alpha).
 **Action:** Created plan `2026-08-28-RENDERER-Smart-Codec-Selection-Update.md` to add VP9 and AV1 to the default candidates list.
+
+## [1.67.1] - Distributed Rendering PCM Pipeline
+**Learning:** Concatenating MP4/AAC chunks causes audio clicks. The solution is to use `.mov` container with `pcm_s16le` audio for intermediate chunks, then concatenate and transcode to final format. This robustly handles both implicit and explicit audio.
+**Action:** Implemented in `Orchestrator.ts`.
