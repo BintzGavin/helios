@@ -2,6 +2,7 @@ import { DirectController, BridgeController } from "./controllers";
 import { ClientSideExporter } from "./features/exporter";
 import { HeliosTextTrack, HeliosTextTrackList, CueClass } from "./features/text-tracks";
 import { HeliosAudioTrack, HeliosAudioTrackList } from "./features/audio-tracks";
+import { HeliosVideoTrack, HeliosVideoTrackList } from "./features/video-tracks";
 import { parseCaptions } from "./features/caption-parser";
 import { HeliosMediaSession } from "./features/media-session";
 export { ClientSideExporter };
@@ -469,8 +470,84 @@ template.innerHTML = `
     .copy-debug-btn:hover {
       filter: brightness(0.9);
     }
+    .audio-menu {
+      position: absolute;
+      bottom: 60px;
+      left: 10px;
+      background: rgba(0, 0, 0, 0.9);
+      border: 1px solid var(--helios-range-track-color);
+      border-radius: 8px;
+      padding: 8px;
+      z-index: 20;
+      min-width: 200px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      backdrop-filter: blur(4px);
+    }
+    .audio-menu.hidden {
+      display: none;
+    }
+    .track-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: white;
+      font-size: 12px;
+    }
+    .track-name {
+      flex: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 120px;
+    }
+    .track-volume {
+      width: 60px;
+      height: 4px;
+      -webkit-appearance: none;
+      background: var(--helios-range-track-color);
+      border-radius: 2px;
+      outline: none;
+    }
+    .track-volume::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 10px;
+      height: 10px;
+      background: var(--helios-text-color);
+      cursor: pointer;
+      border-radius: 50%;
+    }
+    .track-mute-btn {
+      background: none;
+      border: none;
+      color: var(--helios-text-color);
+      cursor: pointer;
+      padding: 0;
+      font-size: 14px;
+      width: 20px;
+      text-align: center;
+    }
+    .audio-btn {
+      background: none;
+      border: none;
+      color: var(--helios-text-color);
+      font-size: 20px;
+      cursor: pointer;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-left: 4px;
+    }
+    .audio-btn:hover {
+      color: var(--helios-accent-color);
+    }
   </style>
   <slot></slot>
+  <div class="audio-menu hidden" part="audio-menu"></div>
   <div class="debug-overlay hidden" part="debug-overlay">
     <div class="debug-header">
       <span class="debug-title">Diagnostics</span>
@@ -499,6 +576,7 @@ template.innerHTML = `
       <button class="volume-btn" part="volume-button" aria-label="Mute">🔊</button>
       <input type="range" class="volume-slider" min="0" max="1" step="0.05" value="1" part="volume-slider" aria-label="Volume">
     </div>
+    <button class="audio-btn" part="audio-button" aria-label="Audio Tracks" style="display: none;">🎵</button>
     <button class="cc-btn" part="cc-button" aria-label="Toggle Captions">CC</button>
     <button class="export-btn" part="export-button" aria-label="Export video">Export</button>
     <select class="speed-selector" part="speed-selector" aria-label="Playback speed">
@@ -522,10 +600,13 @@ export class HeliosPlayer extends HTMLElement {
     pipVideo;
     _textTracks;
     _audioTracks;
+    _videoTracks;
     _domTracks = new Map();
     playPauseBtn;
     volumeBtn;
     volumeSlider;
+    audioBtn;
+    audioMenu;
     scrubber;
     scrubberWrapper;
     scrubberTooltip;
@@ -919,6 +1000,8 @@ export class HeliosPlayer extends HTMLElement {
         this.playPauseBtn = this.shadowRoot.querySelector(".play-pause-btn");
         this.volumeBtn = this.shadowRoot.querySelector(".volume-btn");
         this.volumeSlider = this.shadowRoot.querySelector(".volume-slider");
+        this.audioBtn = this.shadowRoot.querySelector(".audio-btn");
+        this.audioMenu = this.shadowRoot.querySelector(".audio-menu");
         this.scrubber = this.shadowRoot.querySelector(".scrubber");
         this.scrubberWrapper = this.shadowRoot.querySelector(".scrubber-wrapper");
         this.scrubberTooltip = this.shadowRoot.querySelector(".scrubber-tooltip");
@@ -953,6 +1036,15 @@ export class HeliosPlayer extends HTMLElement {
         this._textTracks.addEventListener("addtrack", () => this.updateCCButtonVisibility());
         this._textTracks.addEventListener("removetrack", () => this.updateCCButtonVisibility());
         this._audioTracks = new HeliosAudioTrackList();
+        this._audioTracks.addEventListener("addtrack", () => this.updateAudioBtnVisibility());
+        this._audioTracks.addEventListener("removetrack", () => this.updateAudioBtnVisibility());
+        this._audioTracks.addEventListener("change", () => {
+            if (!this.audioMenu.classList.contains("hidden")) {
+                this.renderAudioMenu();
+            }
+        });
+        this._videoTracks = new HeliosVideoTrackList();
+        this._videoTracks.addTrack(new HeliosVideoTrack("main", "main", "Main Video", "en", true, this));
         this.resizeObserver = new ResizeObserver((entries) => {
             for (const entry of entries) {
                 const width = entry.contentRect.width;
@@ -970,6 +1062,9 @@ export class HeliosPlayer extends HTMLElement {
     get audioTracks() {
         return this._audioTracks;
     }
+    get videoTracks() {
+        return this._videoTracks;
+    }
     addTextTrack(kind, label = "", language = "") {
         const track = new HeliosTextTrack(kind, label, language, this);
         this._textTracks.addTrack(track);
@@ -981,6 +1076,16 @@ export class HeliosPlayer extends HTMLElement {
         // Helios "muted" is the inverse of AudioTrack "enabled"
         this.controller.setAudioTrackMuted(track.id, !track.enabled);
         this._audioTracks.dispatchChangeEvent();
+    }
+    handleVideoTrackSelectedChange(track) {
+        if (track.selected) {
+            for (const t of this._videoTracks) {
+                if (t !== track && t.selected) {
+                    t._setSelectedInternal(false);
+                }
+            }
+        }
+        this._videoTracks.dispatchChangeEvent();
     }
     handleTrackModeChange(track) {
         this._textTracks.dispatchChangeEvent();
@@ -1118,6 +1223,88 @@ export class HeliosPlayer extends HTMLElement {
             this.ccBtn.style.display = "none";
         }
     }
+    updateAudioBtnVisibility() {
+        if (this._audioTracks.length > 0) {
+            this.audioBtn.style.removeProperty("display");
+        }
+        else {
+            this.audioBtn.style.display = "none";
+        }
+    }
+    toggleAudioMenu = (e) => {
+        e.stopPropagation();
+        if (this.audioMenu.classList.contains("hidden")) {
+            this.renderAudioMenu();
+            this.audioMenu.classList.remove("hidden");
+        }
+        else {
+            this.audioMenu.classList.add("hidden");
+        }
+    };
+    closeAudioMenu = () => {
+        this.audioMenu.classList.add("hidden");
+    };
+    closeAudioMenuIfOutside = (e) => {
+        // If menu is hidden, do nothing
+        if (this.audioMenu.classList.contains("hidden"))
+            return;
+        const target = e.composedPath()[0];
+        // Check if click is inside the menu or on the button
+        if (this.audioMenu.contains(target) || this.audioBtn.contains(target)) {
+            return;
+        }
+        this.closeAudioMenu();
+    };
+    renderAudioMenu() {
+        this.audioMenu.innerHTML = "";
+        const tracks = Array.from(this._audioTracks);
+        tracks.forEach(track => {
+            const item = document.createElement("div");
+            item.className = "track-item";
+            const name = document.createElement("span");
+            name.className = "track-name";
+            name.textContent = track.label || track.id;
+            name.title = name.textContent;
+            let currentVolume = 1;
+            if (this.controller) {
+                const state = this.controller.getState();
+                if (state.audioTracks && state.audioTracks[track.id]) {
+                    currentVolume = state.audioTracks[track.id].volume ?? 1;
+                }
+            }
+            const volumeSlider = document.createElement("input");
+            volumeSlider.type = "range";
+            volumeSlider.className = "track-volume";
+            volumeSlider.min = "0";
+            volumeSlider.max = "1";
+            volumeSlider.step = "0.05";
+            volumeSlider.value = String(currentVolume);
+            volumeSlider.ariaLabel = `Volume for ${name.textContent}`;
+            volumeSlider.addEventListener("input", (e) => {
+                e.stopPropagation();
+                const vol = parseFloat(volumeSlider.value);
+                if (this.controller) {
+                    this.controller.setAudioTrackVolume(track.id, vol);
+                }
+            });
+            volumeSlider.addEventListener("click", e => e.stopPropagation());
+            const muteBtn = document.createElement("button");
+            muteBtn.className = "track-mute-btn";
+            muteBtn.textContent = track.enabled ? "🔊" : "🔇";
+            muteBtn.title = track.enabled ? "Mute" : "Unmute";
+            muteBtn.ariaLabel = muteBtn.title;
+            muteBtn.addEventListener("click", (e) => {
+                e.stopPropagation();
+                track.enabled = !track.enabled;
+                // UI update is handled by the 'change' event listener on _audioTracks calling renderAudioMenu
+                // but for immediate feedback we can update button here too, though renderAudioMenu will overwrite it.
+            });
+            item.appendChild(name);
+            item.appendChild(volumeSlider);
+            item.appendChild(muteBtn);
+            this.audioMenu.appendChild(item);
+        });
+    }
     get inputProps() {
         return this.pendingProps;
     }
@@ -1136,6 +1323,8 @@ export class HeliosPlayer extends HTMLElement {
         this.playPauseBtn.addEventListener("click", this.togglePlayPause);
         this.volumeBtn.addEventListener("click", this.toggleMute);
         this.volumeSlider.addEventListener("input", this.handleVolumeInput);
+        this.audioBtn.addEventListener("click", this.toggleAudioMenu);
+        document.addEventListener("click", this.closeAudioMenuIfOutside);
         this.scrubber.addEventListener("input", this.handleScrubberInput);
         this.scrubber.addEventListener("mousedown", this.handleScrubStart);
         this.scrubber.addEventListener("change", this.handleScrubEnd);
@@ -1192,6 +1381,8 @@ export class HeliosPlayer extends HTMLElement {
         this.playPauseBtn.removeEventListener("click", this.togglePlayPause);
         this.volumeBtn.removeEventListener("click", this.toggleMute);
         this.volumeSlider.removeEventListener("input", this.handleVolumeInput);
+        this.audioBtn.removeEventListener("click", this.toggleAudioMenu);
+        document.removeEventListener("click", this.closeAudioMenuIfOutside);
         this.scrubber.removeEventListener("input", this.handleScrubberInput);
         this.scrubber.removeEventListener("mousedown", this.handleScrubStart);
         this.scrubber.removeEventListener("change", this.handleScrubEnd);
@@ -1348,10 +1539,22 @@ export class HeliosPlayer extends HTMLElement {
             }
             if (checkDirect())
                 return;
-            // Timeout check (5 seconds)
+            // Connection Timeout Check (5000ms)
             if (Date.now() - startTime > 5000) {
                 this.stopConnectionAttempts();
                 if (!this.controller) {
+                    const message = "Connection Timed Out";
+                    const err = {
+                        code: 4, // MEDIA_ERR_SRC_NOT_SUPPORTED
+                        message: message,
+                        MEDIA_ERR_ABORTED: 1,
+                        MEDIA_ERR_NETWORK: 2,
+                        MEDIA_ERR_DECODE: 3,
+                        MEDIA_ERR_SRC_NOT_SUPPORTED: 4
+                    };
+                    this._error = err;
+                    this._networkState = HeliosPlayer.NETWORK_NO_SOURCE;
+                    this.dispatchEvent(new CustomEvent('error', { detail: err }));
                     this.showStatus("Connection Failed. Ensure window.helios is set or connectToParent() is called.", true);
                 }
             }
@@ -1759,9 +1962,9 @@ export class HeliosPlayer extends HTMLElement {
                 if (!track) {
                     // Default enabled=true unless explicitly muted in state
                     const isMuted = state.audioTracks && state.audioTracks[meta.id] ? state.audioTracks[meta.id].muted : false;
-                    track = new HeliosAudioTrack(meta.id, "", // Kind
-                    meta.id, // Label (fallback to ID)
-                    "", // Language
+                    track = new HeliosAudioTrack(meta.id, meta.kind || "", // Kind
+                    meta.label || meta.id, // Label
+                    meta.language || "", // Language
                     !isMuted, // Enabled
                     this);
                     this._audioTracks.addTrack(track);

@@ -1,4 +1,4 @@
-**Version**: v0.66.2
+**Version**: v0.67.0
 
 **Posture**: STABLE AND FEATURE COMPLETE
 
@@ -25,6 +25,7 @@
 - Displays actionable error messages with "Dismiss" option for failed client-side exports.
 - Supports Volume and Mute controls via UI and Bridge.
 - Supports Audio Track Volume and Mute controls via Controller API and Bridge.
+- **Audio Track UI**: Implements a dedicated Audio Menu in the player controls (toggled by '🎵' button) to mute/unmute and adjust volume for individual audio tracks.
 - Supports caption rendering overlay with toggleable "CC" button.
 - Supports WebM (VP9/Opus) client-side export via `export-format` attribute.
 - Implements Standard Media API (play, pause, currentTime, events) for better interoperability.
@@ -49,15 +50,16 @@
 - Supports auto-enabling of captions if a track is marked as `default`.
 - Supports audio fade-in/out in client-side export via `data-helios-fade-in` and `data-helios-fade-out` attributes.
 - Supports Shadow DOM Export: DOM-based client-side export now correctly captures Shadow DOM content (via Declarative Shadow DOM transformation), enabling support for Web Components in exports.
-- **Supports Environment Diagnostics UI**: Implemented `diagnose()` method in `HeliosController` and a visible Diagnostics UI overlay in `<helios-player>` (toggled via `Shift+D`) to expose environment capabilities (WebCodecs, WebGL, etc.) to the user.
-- **Supports Headless Audio Export**: Client-side export now includes audio tracks manually injected into Helios state (`availableAudioTracks`), enabling headless audio rendering without DOM elements.
-- **Supports Dynamic Composition Updates**: Exposes `setDuration`, `setFps`, `setSize`, and `setMarkers` via `HeliosController` (and Bridge), allowing host applications (like Studio) to update the composition structure dynamically.
-- **Supports Export Filename**: Implemented `export-filename` attribute to allow specifying the filename for client-side exports.
-- **Supports Active Cues**: Implemented `activeCues` property and `cuechange` event on `HeliosTextTrack` for Standard Media API parity.
+- Supports Environment Diagnostics UI: Implemented `diagnose()` method in `HeliosController` and a visible Diagnostics UI overlay in `<helios-player>` (toggled via `Shift+D`) to expose environment capabilities (WebCodecs, WebGL, etc.) to the user.
+- Supports Headless Audio Export: Client-side export now includes audio tracks manually injected into Helios state (`availableAudioTracks`), enabling headless audio rendering without DOM elements.
+- Supports Dynamic Composition Updates: Exposes `setDuration`, `setFps`, `setSize`, and `setMarkers` via `HeliosController` (and Bridge), allowing host applications (like Studio) to update the composition structure dynamically.
+- Supports Export Filename: Implemented `export-filename` attribute to allow specifying the filename for client-side exports.
+- Supports Active Cues: Implemented `activeCues` property and `cuechange` event on `HeliosTextTrack` for Standard Media API parity.
 
 ## Critical Task
 - **None**: All critical tasks completed.
 
+[v0.67.0] ✅ Completed: Audio Track UI - Implemented audio menu in player controls to mute/unmute and adjust volume of individual audio tracks.
 [v0.66.2] ✅ Completed: Handle Connection Timeouts - Implemented error state and event dispatching on connection timeout.
 [v0.66.1] ✅ Completed: Responsive Images - Implemented support for capturing currentSrc of responsive images during client-side export, ensuring high-fidelity output.
 [v0.66.0] ✅ Completed: Implement VideoTracks API - Implemented videoTracks property and VideoTrackList API on <helios-player> to complete Standard Media API parity.

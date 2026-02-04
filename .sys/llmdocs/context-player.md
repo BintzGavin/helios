@@ -14,10 +14,12 @@ The `<helios-player>` component uses a Shadow DOM to encapsulate its styles and 
     - `.poster-container` (Poster image and Big Play Button)
     - `.captions-container` (Caption rendering overlay)
     - `.debug-overlay` (Diagnostics UI)
+    - `.audio-menu` (Audio Tracks UI - Popover for per-track volume/mute)
     - `.click-layer` (Captures clicks for play/pause when controls are hidden)
   - **Controls**: `.controls` (Flexbox container)
     - Play/Pause Button
     - Volume Control (Mute button + Slider)
+    - Audio Button (Toggles Audio Menu, hidden if no tracks)
     - CC Button (Captions toggle)
     - Export Button
     - Speed Selector

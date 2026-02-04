@@ -3,6 +3,7 @@ import type { HeliosController } from "./controllers";
 import { ClientSideExporter } from "./features/exporter";
 import { HeliosTextTrack, HeliosTextTrackList, TrackHost } from "./features/text-tracks";
 import { HeliosAudioTrack, HeliosAudioTrackList, AudioTrackHost } from "./features/audio-tracks";
+import { HeliosVideoTrack, HeliosVideoTrackList, VideoTrackHost } from "./features/video-tracks";
 export { ClientSideExporter };
 export type { HeliosController };
 interface MediaError {
@@ -13,15 +14,18 @@ interface MediaError {
     readonly MEDIA_ERR_DECODE: number;
     readonly MEDIA_ERR_SRC_NOT_SUPPORTED: number;
 }
-export declare class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHost {
+export declare class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHost, VideoTrackHost {
     private iframe;
     private pipVideo;
     private _textTracks;
     private _audioTracks;
+    private _videoTracks;
     private _domTracks;
     private playPauseBtn;
     private volumeBtn;
     private volumeSlider;
+    private audioBtn;
+    private audioMenu;
     private scrubber;
     private scrubberWrapper;
     private scrubberTooltip;
@@ -142,12 +146,19 @@ export declare class HeliosPlayer extends HTMLElement implements TrackHost, Audi
     constructor();
     get textTracks(): HeliosTextTrackList;
     get audioTracks(): HeliosAudioTrackList;
+    get videoTracks(): HeliosVideoTrackList;
     addTextTrack(kind: string, label?: string, language?: string): HeliosTextTrack;
     handleAudioTrackEnabledChange(track: HeliosAudioTrack): void;
+    handleVideoTrackSelectedChange(track: HeliosVideoTrack): void;
     handleTrackModeChange(track: HeliosTextTrack): void;
     attributeChangedCallback(name: string, oldVal: string, newVal: string): void;
     private updateControlsVisibility;
     private updateCCButtonVisibility;
+    private updateAudioBtnVisibility;
+    private toggleAudioMenu;
+    private closeAudioMenu;
+    private closeAudioMenuIfOutside;
+    private renderAudioMenu;
     get inputProps(): Record<string, any> | null;
     set inputProps(val: Record<string, any> | null);
     connectedCallback(): void;
