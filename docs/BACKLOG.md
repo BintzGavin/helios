@@ -24,6 +24,7 @@ This backlog tracks concrete deliverables derived from [`AGENTS.md`](../AGENTS.m
 - [x] **Studio**: Expand features to support distributed rendering configuration.
 - [x] **CLI**: Implement init command.
 - [x] **CLI**: Implement registry commands.
+- [x] **CLI**: Implement render command.
 - [ ] **Examples**: Create examples demonstrating distributed rendering workflows.
 - [ ] **Examples**: Create examples demonstrating component usage.
 
