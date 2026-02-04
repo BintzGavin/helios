@@ -1495,6 +1495,19 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
         if (Date.now() - startTime > 5000) {
              this.stopConnectionAttempts();
              if (!this.controller) {
+                 const message = "Connection Timed Out";
+                 const err = {
+                     code: 4, // MEDIA_ERR_SRC_NOT_SUPPORTED
+                     message: message,
+                     MEDIA_ERR_ABORTED: 1,
+                     MEDIA_ERR_NETWORK: 2,
+                     MEDIA_ERR_DECODE: 3,
+                     MEDIA_ERR_SRC_NOT_SUPPORTED: 4
+                 };
+                 this._error = err;
+                 this._networkState = HeliosPlayer.NETWORK_NO_SOURCE;
+                 this.dispatchEvent(new CustomEvent('error', { detail: err }));
+
                  this.showStatus("Connection Failed. Ensure window.helios is set or connectToParent() is called.", true);
              }
         }

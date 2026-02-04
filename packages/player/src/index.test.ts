@@ -1801,4 +1801,50 @@ describe('HeliosPlayer', () => {
         expect(mockController.setAudioMuted).toHaveBeenCalledWith(true);
     });
   });
+
+  describe('Connection Timeout', () => {
+    beforeEach(() => {
+      vi.useFakeTimers();
+    });
+
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    it('should set error state and dispatch event on connection timeout', () => {
+      const errorSpy = vi.fn();
+      player.addEventListener('error', errorSpy);
+
+      // Trigger load which starts connection attempts
+      player.setAttribute('src', 'test.html');
+
+      // Simulate iframe load event which triggers startConnectionAttempts
+      const iframe = player.shadowRoot!.querySelector('iframe')!;
+
+      // Mock contentWindow to ensure startConnectionAttempts proceeds
+      Object.defineProperty(iframe, 'contentWindow', {
+          value: {
+              postMessage: vi.fn(),
+          },
+          writable: true
+      });
+
+      iframe.dispatchEvent(new Event('load'));
+
+      // Fast-forward time past 5000ms
+      vi.advanceTimersByTime(5100);
+
+      expect(player.error).not.toBeNull();
+      expect(player.error?.code).toBe(4);
+      expect(player.error?.message).toBe("Connection Timed Out");
+      expect(player.networkState).toBe(HeliosPlayer.NETWORK_NO_SOURCE);
+      expect(errorSpy).toHaveBeenCalled();
+
+      // Check that status overlay shows failure
+      const overlay = player.shadowRoot!.querySelector('.status-overlay');
+      const statusText = player.shadowRoot!.querySelector('.status-text');
+      expect(overlay?.classList.contains('hidden')).toBe(false);
+      expect(statusText?.textContent).toContain("Connection Failed");
+    });
+  });
 });
