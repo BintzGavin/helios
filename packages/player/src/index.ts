@@ -965,7 +965,8 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
   }
 
   public get sandbox(): string {
-    return this.getAttribute("sandbox") || "allow-scripts allow-same-origin";
+    const val = this.getAttribute("sandbox");
+    return val === null ? "allow-scripts allow-same-origin" : val;
   }
 
   public set sandbox(val: string) {
@@ -2058,6 +2059,10 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
         e.preventDefault(); // Prevent scrolling
         this.togglePlayPause();
         break;
+      case "c":
+      case "C":
+        this.toggleCaptions();
+        break;
       case "f":
       case "F":
         this.toggleFullscreen();
@@ -2077,6 +2082,18 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
       case "j":
       case "J":
         this.seekRelative(e.shiftKey ? -10 : -1);
+        break;
+      case "Home":
+        e.preventDefault();
+        this.controller.seek(0);
+        break;
+      case "End":
+        e.preventDefault();
+        {
+          const s = this.controller.getState();
+          const totalFrames = s.duration * s.fps;
+          this.controller.seek(Math.floor(totalFrames));
+        }
         break;
       case "m":
       case "M":
@@ -2116,6 +2133,17 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
       case "x":
       case "X":
         this.controller.clearPlaybackRange();
+        break;
+      default:
+        // Handle 0-9 seeking
+        if (e.key >= "0" && e.key <= "9") {
+          e.preventDefault();
+          const digit = parseInt(e.key, 10);
+          const s = this.controller.getState();
+          const totalFrames = s.duration * s.fps;
+          // Seek to percentage: digit * 10%
+          this.controller.seek(Math.floor(totalFrames * (digit / 10)));
+        }
         break;
     }
   };

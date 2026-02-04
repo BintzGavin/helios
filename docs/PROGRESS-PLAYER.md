@@ -1,3 +1,6 @@
+## PLAYER v0.66.4
+- ✅ Completed: Enhance Keyboard Shortcuts & Fix Sandbox - Implemented standard shortcuts (Captions, Seek Home/End, 0-9) and fixed sandbox attribute behavior to support strict mode.
+
 ## PLAYER v0.66.3
 - ✅ Verified: Synced package.json version with status file and verified all tests pass.
 - ✅ Completed: Audio Track UI - Implemented audio menu in player controls to mute/unmute and adjust volume of individual audio tracks.
