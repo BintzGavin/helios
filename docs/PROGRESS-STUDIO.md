@@ -1,3 +1,6 @@
+## STUDIO v0.90.0
+- ✅ Completed: Core Components - Expanded CLI Component Registry with `ProgressBar` and `Watermark` components.
+
 ## STUDIO v0.89.0
 - ✅ Completed: Component Registry - Implemented `helios add` command in CLI to install components (Timer) from a local registry.
 
