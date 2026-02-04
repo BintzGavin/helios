@@ -19,8 +19,11 @@ packages/cli/
 │   └── helios.js           # Shebang entry point
 ├── src/
 │   ├── commands/
+│   │   ├── add.ts          # helios add command
 │   │   ├── init.ts         # helios init command
 │   │   └── studio.ts       # helios studio command
+│   ├── utils/
+│   │   └── config.ts       # Config loading and types
 │   └── index.ts            # Main CLI setup
 ├── package.json
 └── tsconfig.json
@@ -61,15 +64,25 @@ Generates a `helios.config.json` file in the current directory with the followin
 }
 ```
 
+### `helios add`
+
+Scaffold for adding a component to the project.
+
+```bash
+helios add <component>
+```
+
+- **Note**: Currently a placeholder/scaffold. Logs a warning that registry lookup is not implemented.
+- Requires `helios.config.json` to exist.
+
 ### Planned Commands (V2)
 
-- `helios add [component]` - Fetch and copy components from registry
 - `helios render` - Trigger local or distributed rendering
 - `helios components` - Browse available registry components
 
 ## D. Configuration
 
-The CLI uses `helios.config.json` for project configuration:
+The CLI uses `helios.config.json` for project configuration. Configuration logic is centralized in `src/utils/config.ts`.
 
 - **directories.components**: Target directory for installed components
 - **directories.lib**: Location of the library directory
