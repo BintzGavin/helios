@@ -4,7 +4,7 @@
 
 Helios Studio is a browser-based development environment for creating video compositions. It is built as a framework-agnostic tool that runs locally, serving the user's project files and providing a visual interface for editing and previewing.
 
-- **CLI**: The entry point (`packages/studio/bin/helios-studio.js`) launches a Vite dev server.
+- **CLI**: The entry point (`packages/cli/bin/helios.js`) provides commands to initialize projects (`init`), add components (`add`), and launch the Studio (`studio`).
 - **Dev Server**: A customized Vite server (`packages/studio/src/server/`) that serves the Studio UI and provides API endpoints for filesystem operations (creating compositions, uploading assets, managing render jobs).
 - **UI**: A React-based Single Page Application (SPA) that acts as the frontend. It communicates with the backend via REST API and connects to the `<helios-player>` component for preview.
 - **State Management**: `StudioContext` manages global state (compositions, assets, player controller, timeline).
@@ -40,14 +40,20 @@ packages/studio/
 
 ## C. CLI Interface
 
-The Studio is launched via the `helios` CLI (from `@helios-project/cli` which calls `@helios-project/studio`).
+The Helios CLI (`@helios-project/cli`) provides commands for project management and Studio access.
 
 ```bash
-npx helios studio [options]
+npx helios <command> [options]
 ```
 
-- **Function**: Starts the Studio development server and opens the browser.
-- **Project Root**: Uses the current working directory as the project root to discover `examples/` or compositions.
+### Commands
+
+- **`studio`**: Starts the Studio development server and opens the browser.
+  - Uses current working directory to discover compositions.
+- **`init`**: Initializes a new Helios project configuration (`helios.config.json`).
+  - Scaffolds directory structure references.
+- **`add <component>`**: Adds a component to the project (Shadcn-style).
+  - Reads `helios.config.json` to determine installation path.
 
 ## D. UI Components
 
