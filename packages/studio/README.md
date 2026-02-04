@@ -49,6 +49,8 @@ npx @helios-project/studio
 
 The standalone CLI serves the built Studio UI using `vite preview`, automatically detecting your project root.
 
+For a comprehensive guide on getting started, see the [Quickstart Guide](../../docs/site/getting-started/quickstart.md).
+
 ### Keyboard Shortcuts
 
 | Key | Action |

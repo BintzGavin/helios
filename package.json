@@ -17,7 +17,7 @@
     "packages/*"
   ],
   "scripts": {
-    "build": "npm run build -w packages/core && npm run build -w packages/player && npm run build -w packages/cli && npm run build -w packages/renderer",
+    "build": "npm run build -w packages/core && npm run build -w packages/player && npm run build -w packages/renderer && npm run build -w packages/studio && npm run build -w packages/cli",
     "test": "npm run test -w packages/core & npm run test -w packages/player & npm run test -w packages/renderer & wait",
     "test:core": "npm run test -w packages/core",
     "test:player": "npm run test -w packages/player",

@@ -9,7 +9,7 @@ Helios Engine is a library for creating video-ready animations using web technol
 
 ## The Fastest Way to Start
 
-The quickest way to get started is by using our scaffold tool (Coming Soon) or by cloning one of our examples.
+The quickest way to get started is by cloning one of our examples.
 
 ### Using an Example
 
