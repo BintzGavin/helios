@@ -2,6 +2,10 @@
 
 This file tracks progress for the CLI domain (`packages/cli`).
 
+## CLI v0.5.0
+
+- ✅ Distributed Rendering Support - Added `--start-frame` and `--frame-count` to `helios render`
+
 ## CLI v0.4.1
 
 - ✅ Implement `helios render` command to allow rendering compositions from the CLI

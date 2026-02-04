@@ -1,6 +1,6 @@
 # CLI Status
 
-**Version**: 0.4.1
+**Version**: 0.5.0
 
 ## Current State
 
@@ -36,3 +36,4 @@ Per AGENTS.md, the CLI is "ACTIVELY EXPANDING FOR V2" with focus on:
 [v0.3.0] ✅ Scaffold Add Command - Implemented `helios add` command scaffold and centralized configuration logic
 [v0.4.0] ✅ Implement Components Command - Implemented `helios components` to list registry items
 [v0.4.1] ✅ Implement Render Command - Implemented `helios render` command using `@helios-project/renderer`
+[v0.5.0] ✅ Distributed Rendering Support - Added `--start-frame` and `--frame-count` to `helios render`
