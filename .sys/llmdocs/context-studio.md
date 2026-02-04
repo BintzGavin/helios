@@ -54,7 +54,7 @@ npx helios <command> [options]
   - Scaffolds directory structure references.
 - **`add <component>`**: Adds a component to the project (Shadcn-style).
   - Fetches component code from the registry (`packages/cli/src/registry/manifest.ts`).
-  - Installs component files (e.g. `Timer.tsx`) and dependencies into the configured `components` directory.
+  - Installs component files (e.g. `Timer.tsx`, `ProgressBar.tsx`) and dependencies into the configured `components` directory.
 
 ## D. UI Components
 

@@ -22,7 +22,7 @@ This backlog tracks concrete deliverables derived from [`AGENTS.md`](../AGENTS.m
 
 - [x] Design registry manifest format.
 - [x] Implement CLI command to fetch and copy components.
-- [ ] Create initial set of core components.
+- [x] Create initial set of core components.
 
 ## Product Surface (Studio, CLI, Examples)
 *Studio, CLI, and examples are first class product surfaces in V2.*
