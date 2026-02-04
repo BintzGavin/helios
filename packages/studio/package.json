@@ -20,6 +20,13 @@
     "helios-studio": "./bin/helios-studio.js"
   },
   "main": "dist/index.html",
+  "exports": {
+    "./cli": {
+      "types": "./dist/types/server/plugin.d.ts",
+      "default": "./dist/cli/plugin.js"
+    },
+    ".": "./dist/index.html"
+  },
   "files": [
     "bin",
     "dist"
@@ -27,7 +34,8 @@
   "scripts": {
     "dev": "vite",
     "build:cli": "vite build -c vite.config.cli.ts",
-    "build": "tsc && vite build && npm run build:cli",
+    "build:types": "tsc -p tsconfig.cli.json",
+    "build": "tsc && vite build && npm run build:cli && npm run build:types",
     "lint": "tsc --noEmit",
     "preview": "vite preview",
     "test": "vitest",
