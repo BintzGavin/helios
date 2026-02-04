@@ -133,6 +133,20 @@ describe('audio-utils', () => {
       // Fetch mock returns array buffer, but we check properties
       expect(assets[0].volume).toBe(0.9); // Metadata (via state) wins
     });
+
+    it('should prioritize audioTrackState for DOM assets if ID matches', async () => {
+      document.body.innerHTML = `
+        <audio src="dom.mp3" data-helios-track-id="track-1" volume="0.5"></audio>
+      `;
+      const audioTrackState = {
+          'track-1': { volume: 0.8, muted: false }
+      };
+
+      const assets = await getAudioAssets(document, [], audioTrackState);
+      expect(assets).toHaveLength(1);
+      expect(assets[0].id).toBe('track-1');
+      expect(assets[0].volume).toBe(0.8);
+    });
   });
 
   describe('mixAudio', () => {

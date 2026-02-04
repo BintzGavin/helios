@@ -45,10 +45,22 @@ export async function getAudioAssets(
     // 3. Fallback: generated "track-${index}" (Stable fallback for listing)
     const id = tag.getAttribute('data-helios-track-id') || tag.id || `track-${index}`;
     const volumeAttr = tag.getAttribute('volume');
+    const state = audioTrackState[id];
+
+    let volume = 1;
+    let muted = false;
+
+    if (state) {
+        volume = state.volume;
+        muted = state.muted;
+    } else {
+        volume = volumeAttr !== null ? parseFloat(volumeAttr) : tag.volume;
+        muted = tag.muted;
+    }
 
     return fetchAudioAsset(id, tag.src, {
-        volume: volumeAttr !== null ? parseFloat(volumeAttr) : tag.volume,
-        muted: tag.muted,
+        volume,
+        muted,
         loop: tag.loop,
         startTime: parseFloat(tag.getAttribute('data-start-time') || '0') || 0,
         fadeInDuration: parseFloat(tag.getAttribute('data-helios-fade-in') || '0') || 0,
