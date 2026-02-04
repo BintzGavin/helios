@@ -318,4 +318,74 @@ describe('StudioContext', () => {
       });
     });
   });
+
+  describe('Render Config Persistence', () => {
+    let getItemSpy: any;
+    let setItemSpy: any;
+
+    beforeEach(() => {
+      getItemSpy = vi.spyOn(Storage.prototype, 'getItem');
+      setItemSpy = vi.spyOn(Storage.prototype, 'setItem');
+    });
+
+    afterEach(() => {
+      vi.restoreAllMocks();
+    });
+
+    it('loads config from localStorage on init', async () => {
+      getItemSpy.mockReturnValue(JSON.stringify({ mode: 'dom', videoBitrate: '2000k' }));
+
+      let context: any;
+
+      render(
+        <StudioProvider>
+          <TestComponent onReady={(ctx) => { context = ctx; }} />
+        </StudioProvider>
+      );
+
+      await waitFor(() => expect(context).toBeDefined());
+
+      expect(context.renderConfig).toEqual(expect.objectContaining({
+        mode: 'dom',
+        videoBitrate: '2000k'
+      }));
+    });
+
+    it('saves config to localStorage on change', async () => {
+      let context: any;
+
+      render(
+        <StudioProvider>
+          <TestComponent onReady={(ctx) => { context = ctx; }} />
+        </StudioProvider>
+      );
+
+      await waitFor(() => expect(context).toBeDefined());
+
+      act(() => {
+        context.setRenderConfig({ mode: 'canvas', videoCodec: 'vp9' });
+      });
+
+      expect(setItemSpy).toHaveBeenCalledWith(
+        'helios-studio:render-config',
+        JSON.stringify({ mode: 'canvas', videoCodec: 'vp9' })
+      );
+    });
+
+    it('uses default config if localStorage is empty', async () => {
+      getItemSpy.mockReturnValue(null);
+
+      let context: any;
+
+      render(
+        <StudioProvider>
+          <TestComponent onReady={(ctx) => { context = ctx; }} />
+        </StudioProvider>
+      );
+
+      await waitFor(() => expect(context).toBeDefined());
+
+      expect(context.renderConfig).toEqual({ mode: 'canvas' });
+    });
+  });
 });

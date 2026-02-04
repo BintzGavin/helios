@@ -71,8 +71,9 @@ export const RenderConfig: React.FC<RenderConfigProps> = ({ config, onChange }) 
   return (
     <div className="render-config" style={{ padding: '8px', background: '#252526', borderRadius: '4px', marginBottom: '8px', border: '1px solid #333' }}>
       <div style={{ marginBottom: '8px' }}>
-        <label style={labelStyle}>Preset</label>
+        <label htmlFor="render-preset" style={labelStyle}>Preset</label>
         <select
+          id="render-preset"
           value={getActivePreset()}
           onChange={(e) => applyPreset(e.target.value)}
           style={inputStyle}
@@ -84,8 +85,9 @@ export const RenderConfig: React.FC<RenderConfigProps> = ({ config, onChange }) 
       </div>
 
       <div style={{ marginBottom: '8px' }}>
-        <label style={labelStyle}>Mode</label>
+        <label htmlFor="render-mode" style={labelStyle}>Mode</label>
         <select
+          id="render-mode"
           value={config.mode}
           onChange={(e) => handleChange('mode', e.target.value as 'canvas' | 'dom')}
           style={inputStyle}
@@ -96,8 +98,9 @@ export const RenderConfig: React.FC<RenderConfigProps> = ({ config, onChange }) 
       </div>
 
       <div style={{ marginBottom: '8px' }}>
-        <label style={labelStyle}>Video Bitrate</label>
+        <label htmlFor="render-bitrate" style={labelStyle}>Video Bitrate</label>
         <input
+          id="render-bitrate"
           type="text"
           placeholder="e.g. 5M, 1000k"
           value={config.videoBitrate || ''}
@@ -107,8 +110,9 @@ export const RenderConfig: React.FC<RenderConfigProps> = ({ config, onChange }) 
       </div>
 
       <div style={{ marginBottom: '8px' }}>
-        <label style={labelStyle}>Video Codec</label>
+        <label htmlFor="render-codec" style={labelStyle}>Video Codec</label>
         <input
+          id="render-codec"
           type="text"
           placeholder="e.g. libx264"
           value={config.videoCodec || ''}
@@ -118,8 +122,9 @@ export const RenderConfig: React.FC<RenderConfigProps> = ({ config, onChange }) 
       </div>
 
       <div style={{ marginBottom: '8px' }}>
-        <label style={labelStyle}>Concurrency (Workers)</label>
+        <label htmlFor="render-concurrency" style={labelStyle}>Concurrency (Workers)</label>
         <input
+          id="render-concurrency"
           type="number"
           min="1"
           max="32"
