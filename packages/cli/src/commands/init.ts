@@ -3,6 +3,7 @@ import fs from 'fs';
 import path from 'path';
 import readline from 'readline';
 import chalk from 'chalk';
+import { DEFAULT_CONFIG } from '../utils/config.js';
 
 export function registerInitCommand(program: Command) {
   program
@@ -17,15 +18,8 @@ export function registerInitCommand(program: Command) {
         process.exit(1);
       }
 
-      const defaultConfig = {
-        version: '1.0.0',
-        directories: {
-          components: 'src/components/helios',
-          lib: 'src/lib',
-        },
-      };
-
-      let config = { ...defaultConfig };
+      // Deep copy to avoid mutating the exported constant
+      let config = JSON.parse(JSON.stringify(DEFAULT_CONFIG));
 
       if (!options.yes) {
         const rl = readline.createInterface({
@@ -45,11 +39,11 @@ export function registerInitCommand(program: Command) {
 
         const componentsDir = await ask(
           'Where would you like to install components?',
-          defaultConfig.directories.components
+          DEFAULT_CONFIG.directories.components
         );
         const libDir = await ask(
           'Where is your lib directory?',
-          defaultConfig.directories.lib
+          DEFAULT_CONFIG.directories.lib
         );
 
         config.directories.components = componentsDir;

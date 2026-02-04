@@ -2,6 +2,10 @@
 
 This file tracks progress for the CLI domain (`packages/cli`).
 
+## CLI v0.3.0
+
+- ✅ Scaffold `helios add` command and centralized configuration logic
+
 ## CLI v0.2.0
 
 - ✅ Implement `helios init` command to scaffold `helios.config.json`
