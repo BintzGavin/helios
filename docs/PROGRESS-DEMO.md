@@ -1,3 +1,6 @@
+## DEMO v1.100.0
+- ✅ Completed: Vue Pixi Animation - Created `examples/vue-pixi-animation` demonstrating integration with PixiJS v8 and Vue 3.
+
 ## DEMO v1.99.0
 - ✅ Completed: Solid Lottie Animation - Created `examples/solid-lottie-animation` demonstrating integration with `lottie-web` in SolidJS.
 
