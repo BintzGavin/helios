@@ -31,6 +31,22 @@ export const Timeline: React.FC = () => {
   const captions = playerState.captions || [];
   const markers = playerState.markers || [];
   const audioTracks = playerState.availableAudioTracks || [];
+  const schema = playerState.schema || {};
+  const inputProps = playerState.inputProps || {};
+
+  // Extract time props for visualization
+  const timeProps = useMemo(() => {
+    const props: { key: string; label: string; time: number }[] = [];
+    for (const [key, def] of Object.entries(schema)) {
+      if (def.type === 'number' && def.format === 'time') {
+        const val = inputProps[key];
+        if (typeof val === 'number') {
+          props.push({ key, label: def.label || key, time: val });
+        }
+      }
+    }
+    return props;
+  }, [schema, inputProps]);
 
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
@@ -147,7 +163,8 @@ export const Timeline: React.FC = () => {
           outPoint,
           ...markers.map(m => m.time * fps),
           ...captions.map(c => (c.startTime / 1000) * fps),
-          ...captions.map(c => (c.endTime / 1000) * fps)
+          ...captions.map(c => (c.endTime / 1000) * fps),
+          ...timeProps.map(p => p.time * fps)
       ];
 
       let closest = rawFrame;
@@ -358,6 +375,23 @@ export const Timeline: React.FC = () => {
                 onMouseDown={(e) => {
                   e.stopPropagation();
                   if (controller) controller.seek(marker.time * fps);
+                }}
+              />
+            ))}
+
+            {/* Time Prop Markers (on Video Track) */}
+            {timeProps.map((prop) => (
+              <div
+                key={`prop-${prop.key}`}
+                className="timeline-marker-prop"
+                style={{
+                  left: `${getPercent(prop.time * fps)}%`,
+                  top: `${videoTrackTop}px`
+                }}
+                title={`${prop.label} (${formatTime(prop.time * fps, fps)})`}
+                onMouseDown={(e) => {
+                  e.stopPropagation();
+                  if (controller) controller.seek(prop.time * fps);
                 }}
               />
             ))}

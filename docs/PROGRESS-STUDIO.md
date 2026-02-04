@@ -1,3 +1,6 @@
+## STUDIO v0.93.0
+- ✅ Completed: Visualize Time-based Props - Implemented `TimecodeInput` in Props Editor and visual markers on the Timeline for number props with `format: 'time'`, enabling WYSIWYG timing adjustments.
+
 ## STUDIO v0.92.0
 - ✅ Completed: Components Registry UI - Implemented "Components" panel in Studio UI, enabling users to browse and install components from the registry via the CLI backend.
 

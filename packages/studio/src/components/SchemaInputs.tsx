@@ -1,6 +1,7 @@
 import React from 'react';
 import type { PropDefinition, PropType } from '@helios-project/core';
 import { useStudio } from '../context/StudioContext';
+import { TimecodeInput } from './Controls/TimecodeInput';
 import './PropsEditor.css'; // Re-use styles
 
 // Extended PropType to support future types not yet in Core
@@ -13,6 +14,9 @@ interface SchemaInputProps {
 }
 
 export const SchemaInput: React.FC<SchemaInputProps> = ({ definition, value, onChange }) => {
+  const { playerState } = useStudio();
+  const fps = playerState.fps || 30;
+
   if (definition.enum) {
     return <EnumInput options={definition.enum} value={value} onChange={onChange} />;
   }
@@ -33,6 +37,9 @@ export const SchemaInput: React.FC<SchemaInputProps> = ({ definition, value, onC
         />
       );
     case 'number':
+      if (definition.format === 'time') {
+        return <TimecodeInput value={value} fps={fps} onChange={onChange} />;
+      }
       return <NumberRangeInput min={definition.minimum} max={definition.maximum} step={definition.step} value={value} onChange={onChange} />;
     case 'boolean':
       return <BooleanInput value={value} onChange={onChange} />;
