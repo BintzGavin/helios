@@ -1,5 +1,15 @@
 # LLMS Progress
 
+## LLMS v1.8.0
+- ✅ Completed: Daily llms.txt Review
+  - Updated Quick Facts: Core v5.11+, Studio v0.90+, Player v0.65+
+  - Updated Package Descriptions: Clarified CLI role (Registry, Scaffolding) and Studio role
+  - Updated Roadmap:
+    - Added CLI Beta v0.3+ (Component Registry, Project Scaffolding)
+    - Updated versions for Core, Studio, Player, Renderer
+  - Updated Comparison Table: Distributed Rendering -> "Local (Beta) / Cloud (Planned)"
+  - Verified Core API example against v5.11 codebase
+
 ## LLMS v1.7.0
 - ✅ Completed: Daily llms.txt Review
   - Updated Quick Facts: Core v5.6.0+, Studio v0.82.0+, Player v0.62.0+, Renderer v1.61.0+
