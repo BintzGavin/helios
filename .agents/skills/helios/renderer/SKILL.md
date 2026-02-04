@@ -169,6 +169,7 @@ await RenderOrchestrator.render(
   { onProgress: (p) => console.log(`Total Progress: ${p}`) }
 );
 ```
+**Audio Handling:** Distributed rendering generates silent video chunks first. Audio is mixed in a final global pass after concatenation to ensure seamless playback without glitches.
 
 ### Concatenate Videos
 Combine multiple video files into one.
@@ -228,6 +229,12 @@ const renderer = new Renderer({
   ]
 });
 ```
+
+## Common Issues
+
+### Virtual Time Binding Warning
+If you see a warning about "Helios not bound to virtual time", it means the `SeekTimeDriver` cannot precisely control the animation loop.
+**Fix:** Ensure your composition calls `helios.bindToDocumentTimeline()` (typically in your entry file).
 
 ## Source Files
 
