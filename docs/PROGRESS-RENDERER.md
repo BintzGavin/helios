@@ -1,3 +1,6 @@
+## RENDERER v1.67.2
+- ✅ Completed: CdpTimeDriver Determinism - Updated `CdpTimeDriver` to override `performance.now()` to match the virtual time epoch, ensuring deterministic behavior for time-based animations (e.g. Three.js) regardless of page load time. Verified with `verify-cdp-determinism.ts`.
+
 ## RENDERER v1.67.1
 - ✅ Completed: Robust Distributed Audio Pipeline - Updated `Orchestrator` to use `.mov` containers with `pcm_s16le` audio for intermediate chunks, preventing concatenation artifacts (clicks) at chunk boundaries.
 
