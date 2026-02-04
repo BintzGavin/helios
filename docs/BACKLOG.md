@@ -7,7 +7,7 @@ This backlog tracks concrete deliverables derived from [`AGENTS.md`](../AGENTS.m
 
 - [ ] Implement stateless worker architecture.
 - [ ] Ensure deterministic frame seeking across all drivers.
-- [ ] Implement output stitching without re-encoding (verify `concat` demuxer workflow).
+- [x] Implement output stitching without re-encoding (verify `concat` demuxer workflow).
 - [ ] Cloud execution adapter (AWS Lambda / Google Cloud Run).
 
 ## Prompt to Composition
