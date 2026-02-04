@@ -50,6 +50,7 @@ The `examples/` directory contains reference implementations for various framewo
 - **svelte-audio-visualization**: Real-time audio frequency analysis visualization.
 - **svelte-captions-animation**: Svelte stores for Helios SRT captions.
 - **svelte-threejs-canvas-animation**: 3D animation with Three.js and Svelte.
+- **svelte-pixi-animation**: 2D animation with PixiJS and Svelte.
 - **svelte-transitions**: Svelte native transition directives.
 - **svelte-runes-animation**: Svelte 5 Runes syntax.
 - **svelte-animation-helpers**: Helper components for sequencing.

@@ -1,6 +1,6 @@
 # Status: DEMO Domain
 
-**Version**: 1.100.0
+**Version**: 1.101.0
 
 **Posture**: ACTIVELY EXPANDING FOR V2
 
@@ -14,9 +14,10 @@ The DEMO domain is responsible for:
 - **Root Build Dependency Mismatch**: The `packages/studio`, `packages/player`, and `packages/renderer` have desynchronized dependencies on `@helios-project/core` (requiring `5.5.0` or `^5.4.0` while workspace is `5.7.0`), causing `npm install` to fail at the root. This blocks clean builds of examples without manual intervention.
 
 ## Active Tasks
-- [ ] Create `examples/svelte-pixi-animation` - Plan created at `.sys/plans/2026-01-30-DEMO-svelte-pixi-animation.md`
+
 
 ## Completed Tasks
+- [v1.101.0] ✅ Completed: Svelte Pixi Animation - Created `examples/svelte-pixi-animation` demonstrating integration with PixiJS v8 and Svelte 5.
 - [v1.100.0] ✅ Completed: Vue Pixi Animation - Created `examples/vue-pixi-animation` demonstrating integration with PixiJS v8 and Vue 3.
 - [v1.99.0] ✅ Completed: Solid Lottie Animation - Created `examples/solid-lottie-animation` demonstrating integration with `lottie-web` in SolidJS.
 - [v1.98.0] ✅ Completed: React Pixi Animation - Created `examples/react-pixi-animation` demonstrating integration with PixiJS v8 and React.
