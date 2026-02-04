@@ -66,14 +66,15 @@ Generates a `helios.config.json` file in the current directory with the followin
 
 ### `helios add`
 
-Scaffold for adding a component to the project.
+Adds a component to the project from the embedded registry.
 
 ```bash
 helios add <component>
 ```
 
-- **Note**: Currently a placeholder/scaffold. Logs a warning that registry lookup is not implemented.
+- Installs component source code and dependencies into the configured `components` directory.
 - Requires `helios.config.json` to exist.
+- Current registry includes: `timer`.
 
 ### Planned Commands (V2)
 
