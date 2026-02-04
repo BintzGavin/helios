@@ -1491,7 +1491,7 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
 
         if (checkDirect()) return;
 
-        // Timeout check (5 seconds)
+        // Connection Timeout Check (5000ms)
         if (Date.now() - startTime > 5000) {
              this.stopConnectionAttempts();
              if (!this.controller) {

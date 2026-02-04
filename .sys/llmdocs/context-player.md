@@ -43,7 +43,7 @@ The `<helios-player>` component dispatches standard HTMLMediaElement events and 
 - `loadeddata`: Initial frame data loaded.
 - `canplay`: Ready to play.
 - `canplaythrough`: Ready to play without buffering (simulated).
-- `error`: An error occurred (details in `error` property).
+- `error`: An error occurred (e.g., connection timeout). Details available in `error` property.
 - `enterpictureinpicture`: Entered PiP mode.
 - `leavepictureinpicture`: Left PiP mode.
 - `cuechange`: Active cues changed (dispatched by TextTrack, but bubbles or handled).
