@@ -12,6 +12,9 @@ Each agent should update **their own dedicated progress file** instead of this f
 - **DEMO**: Update `docs/PROGRESS-DEMO.md`
 - **STUDIO**: Update `docs/PROGRESS-STUDIO.md`
 - **SKILLS**: Update `docs/PROGRESS-SKILLS.md`
+
+### CLI v0.6.0
+- ✅ Completed: Implement Merge Command - Implemented `helios merge` command to stitch multiple video files into a single output without re-encoding.
 - **DOCS**: Update `docs/PROGRESS-DOCS.md`
 
 ### CLI v0.4.1

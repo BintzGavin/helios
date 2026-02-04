@@ -2,6 +2,10 @@
 
 This file tracks progress for the CLI domain (`packages/cli`).
 
+## CLI v0.6.0
+
+- ✅ Implement Merge Command - Implemented `helios merge` command to stitch multiple video files into a single output without re-encoding
+
 ## CLI v0.5.2
 
 - ✅ Project Scaffolding - Updated `helios init` to scaffold a full React+Vite project structure when `package.json` is missing
