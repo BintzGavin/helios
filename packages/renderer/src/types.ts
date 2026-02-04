@@ -51,6 +51,13 @@ export interface AudioTrackConfig {
    * Defaults to 1.0.
    */
   playbackRate?: number;
+
+  /**
+   * Duration of the source audio in seconds, if known.
+   * This allows for smart calculation of fade-out relative to the clip end
+   * rather than the composition end.
+   */
+  duration?: number;
 }
 
 export interface BrowserConfig {

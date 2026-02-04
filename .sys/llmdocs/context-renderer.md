@@ -4,7 +4,7 @@
 The Renderer operates on a "Dual-Path" architecture to support different use cases. The pipeline strictly enforces `strategy.prepare` (resource discovery/loading) before `timeDriver.prepare` (time freezing) to prevent deadlocks in CDP mode:
 1. **DOM Strategy (`DomStrategy`)**: Used for HTML/CSS-heavy compositions. It uses Playwright to capture screenshots of the page at each frame.
    - **Drivers**: Uses `SeekTimeDriver` to manipulate `document.timeline` and sync media/CSS animations (supports Shadow DOM, enforces deterministic Jan 1 2024 epoch, handles GSAP timeline sync, supports media looping and visual playback rate, verifies reactive virtual time binding).
-   - **Discovery**: Uses `dom-scanner` to recursively discover media elements (including Shadow DOM) and implements recursive preloading for `<img>` tags, `<video>` posters, SVG images, and CSS background/mask images (including those in `::before` and `::after` pseudo-elements). Supports automatic audio looping and playback rate adjustment for `<audio>` elements.
+   - **Discovery**: Uses `dom-scanner` to recursively discover media elements (including Shadow DOM) and implements recursive preloading for `<img>` tags, `<video>` posters, SVG images, and CSS background/mask images (including those in `::before` and `::after` pseudo-elements). Supports automatic audio looping, playback rate adjustment, and smart fades based on clip duration for `<audio>` elements.
    - **Output**: Best for sharp text and vector graphics.
 2. **Canvas Strategy (`CanvasStrategy`)**: Used for WebGL/Canvas-heavy compositions (e.g., Three.js, PixiJS). It captures the `<canvas>` context directly.
    - **Drivers**: Uses `CdpTimeDriver` (Chrome DevTools Protocol) for precise virtual time control (supports Shadow DOM media sync, enforces deterministic Jan 2024 epoch, ensures sync-before-render order, waits for budget expiration, enforces stability timeout via `Runtime.terminateExecution`, supports media looping and visual playback rate).
@@ -62,6 +62,7 @@ packages/renderer/
     ├── verify-canvas-shadow-dom.ts # Canvas inside Shadow DOM test
     ├── verify-dom-audio-fades.ts # DOM audio fades test
     ├── verify-audio-fades.ts   # Audio fades test
+    ├── verify-smart-audio-fades.ts # Smart Audio Fades verification
     ├── verify-audio-loop.ts    # Audio looping test
     ├── verify-audio-playback-rate.ts # Audio playback rate test
     ├── verify-audio-playback-seek.ts # Audio playback seek test (Rate + StartFrame)
@@ -92,7 +93,7 @@ The `RendererOptions` interface controls the render pipeline:
 - `videoCodec`: `'libx264'` (default), `'copy'`, or others.
 - `audioCodec`: `'aac'` (default), `'libvorbis'`, etc.
 - `audioFilePath`: Path to external audio file to mix in.
-- `audioTracks`: List of audio tracks (files or `AudioTrackConfig` objects with `path`, `buffer`, `loop`, `volume`, `offset`, `playbackRate`).
+- `audioTracks`: List of audio tracks (files or `AudioTrackConfig` objects with `path`, `buffer`, `loop`, `volume`, `offset`, `playbackRate`, `duration`).
 - `intermediateImageFormat`: `'png'` (default) or `'jpeg'` for DOM mode capture.
 - `intermediateImageQuality`: JPEG quality (0-100) if format is jpeg.
 - `stabilityTimeout`: Timeout for frame stability (default 30000ms).

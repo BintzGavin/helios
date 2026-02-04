@@ -28,3 +28,6 @@ Each agent should update **their own dedicated progress file** instead of this f
 
 ### RENDERER v1.63.2
 - ✅ Completed: Verify Virtual Time Binding - Updated `SeekTimeDriver` to warn (once per session) if the Helios player is not reactively bound to virtual time, ensuring developers are aware of potential polling fallbacks. Verified with `verify-virtual-time-binding.ts`.
+
+## RENDERER v1.65.0
+- ✅ Completed: Smart Audio Fades - Updated audio fading logic to respect clip duration for accurate fade-out timing.
