@@ -430,4 +430,17 @@ describe('HeliosPlayer API Parity', () => {
     expect(cue.track).toBeNull();
     expect(track.cues.length).toBe(0);
   });
+
+  it('should support videoTracks API', () => {
+    expect(player.videoTracks).toBeDefined();
+    expect(player.videoTracks.length).toBeGreaterThanOrEqual(1);
+
+    const track = player.videoTracks[0];
+    expect(track.kind).toBe("main");
+    expect(track.selected).toBe(true);
+
+    track.selected = false;
+    expect(track.selected).toBe(false);
+    expect(player.videoTracks.selectedIndex).toBe(-1);
+  });
 });

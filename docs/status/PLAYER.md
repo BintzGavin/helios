@@ -1,4 +1,4 @@
-**Version**: v0.65.2
+**Version**: v0.66.0
 
 **Posture**: STABLE AND FEATURE COMPLETE
 
@@ -58,6 +58,7 @@
 ## Critical Task
 - **None**: All critical tasks completed.
 
+[v0.66.0] ✅ Completed: Implement VideoTracks API - Implemented videoTracks property and VideoTrackList API on <helios-player> to complete Standard Media API parity.
 [v0.65.2] ✅ Completed: Client-Side Audio Volume Support - Updated `getAudioAssets` to prioritize `audioTrackState` (volume/mute) over DOM attributes for robust client-side export parity.
 [v0.65.1] ✅ Completed: Maintenance and Documentation - Removed unnecessary TS suppressions and updated documentation with missing API members (media-* attributes, PiP control).
 [v0.65.0] ✅ Completed: Media Session Integration - Implemented HeliosMediaSession to support OS-level media keys and metadata display, observing media-* attributes.

@@ -1,3 +1,6 @@
+## PLAYER v0.66.0
+- ✅ Completed: Implement VideoTracks API - Implemented videoTracks property and VideoTrackList API on <helios-player> to complete Standard Media API parity.
+
 ## PLAYER v0.65.2
 - ✅ Completed: Client-Side Audio Volume Support - Updated `getAudioAssets` to prioritize `audioTrackState` (volume/mute) over DOM attributes for robust client-side export parity.
 
