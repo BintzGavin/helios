@@ -36,7 +36,7 @@ This backlog tracks concrete deliverables derived from [`AGENTS.md`](../AGENTS.m
 ## Maintenance & Stability
 *Core and renderer stability are prerequisites.*
 
-- [ ] **Fix GSAP Timeline Synchronization in SeekTimeDriver**
+- [x] **Fix GSAP Timeline Synchronization in SeekTimeDriver**
   - **Problem**: Promo video (`examples/promo-video/composition.html`) renders a black video with only the background visible. GSAP timeline animations aren't being seeked during rendering.
   - **Root Cause**: `window.__helios_gsap_timeline__` is not available when `setTime()` first runs, and subscription timing may be off.
   - **Goal**: Ensure GSAP timelines are correctly synchronized during frame capture.
