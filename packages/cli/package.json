@@ -40,7 +40,7 @@
     "commander": "^13.1.0",
     "chalk": "^5.4.1",
     "@helios-project/renderer": "^0.0.2",
-    "@helios-project/studio": "^0.82.0",
+    "@helios-project/studio": "^0.93.1",
     "vite": "^7.1.2"
   },
   "devDependencies": {
