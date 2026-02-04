@@ -1,3 +1,6 @@
+## DEMO v1.101.0
+- ✅ Completed: Svelte Pixi Animation - Created `examples/svelte-pixi-animation` demonstrating integration with PixiJS v8 and Svelte 5.
+
 ## DEMO v1.100.0
 - ✅ Completed: Vue Pixi Animation - Created `examples/vue-pixi-animation` demonstrating integration with PixiJS v8 and Vue 3.
 

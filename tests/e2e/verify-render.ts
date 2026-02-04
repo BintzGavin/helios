@@ -28,7 +28,8 @@ const CANVAS_OVERRIDES = new Set([
   'svelte-canvas-animation',
   'solid-canvas-animation',
   'react-pixi-animation',
-  'vue-pixi-animation'
+  'vue-pixi-animation',
+  'svelte-pixi-animation'
 ]);
 
 const DURATION_OVERRIDES: Record<string, number> = {
