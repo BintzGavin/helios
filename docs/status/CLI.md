@@ -1,6 +1,6 @@
 # CLI Status
 
-**Version**: 0.1.1
+**Version**: 0.2.0
 
 ## Current State
 
@@ -14,6 +14,7 @@ The Helios CLI (`packages/cli`) provides the command-line interface for the Heli
 ## Existing Commands
 
 - `helios studio` - Launches the Helios Studio dev server
+- `helios init` - Initializes a new Helios project configuration
 
 ## V2 Roadmap
 
@@ -28,3 +29,4 @@ Per AGENTS.md, the CLI is "ACTIVELY EXPANDING FOR V2" with focus on:
 
 [v0.1.0] ✅ Initial CLI with `helios studio` command
 [v0.1.1] ✅ Pass Project Root to Studio - Injected HELIOS_PROJECT_ROOT env var in studio command
+[v0.2.0] ✅ Scaffold Init Command - Implemented `helios init` to generate `helios.config.json`

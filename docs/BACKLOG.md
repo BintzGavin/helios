@@ -28,6 +28,7 @@ This backlog tracks concrete deliverables derived from [`AGENTS.md`](../AGENTS.m
 *Studio, CLI, and examples are first class product surfaces in V2.*
 
 - [x] **Studio**: Expand features to support distributed rendering configuration.
+- [x] **CLI**: Implement init command.
 - [ ] **CLI**: Implement registry commands.
 - [ ] **Examples**: Create examples demonstrating distributed rendering workflows.
 - [ ] **Examples**: Create examples demonstrating component usage.

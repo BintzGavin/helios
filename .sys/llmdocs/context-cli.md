@@ -19,6 +19,7 @@ packages/cli/
 │   └── helios.js           # Shebang entry point
 ├── src/
 │   ├── commands/
+│   │   ├── init.ts         # helios init command
 │   │   └── studio.ts       # helios studio command
 │   └── index.ts            # Main CLI setup
 ├── package.json
@@ -38,19 +39,40 @@ helios studio
 - Spawns `npm run dev` in the `packages/studio` directory
 - Sets `HELIOS_PROJECT_ROOT` environment variable to the current working directory
 
+### `helios init`
+
+Initializes a new Helios project configuration.
+
+```bash
+helios init
+```
+
+Options:
+- `-y, --yes`: Skip prompts and use defaults
+
+Generates a `helios.config.json` file in the current directory with the following structure:
+```json
+{
+  "version": "1.0.0",
+  "directories": {
+    "components": "src/components/helios",
+    "lib": "src/lib"
+  }
+}
+```
+
 ### Planned Commands (V2)
 
 - `helios add [component]` - Fetch and copy components from registry
-- `helios init` - Scaffold a new Helios project
 - `helios render` - Trigger local or distributed rendering
 - `helios components` - Browse available registry components
 
 ## D. Configuration
 
-No configuration files are currently used. Future plans may include:
+The CLI uses `helios.config.json` for project configuration:
 
-- `.heliosrc` or `helios.config.js` for project configuration
-- Registry configuration for custom component sources
+- **directories.components**: Target directory for installed components
+- **directories.lib**: Location of the library directory
 
 ## E. Integration
 
