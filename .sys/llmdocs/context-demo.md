@@ -39,6 +39,7 @@ The `examples/` directory contains reference implementations for various framewo
 - **vue-audio-visualization**: Real-time audio frequency analysis visualization.
 - **vue-captions-animation**: Vue Composition API for Helios SRT captions.
 - **vue-threejs-canvas-animation**: 3D animation with Three.js and Vue.
+- **vue-pixi-animation**: 2D animation with PixiJS and Vue.
 - **vue-transitions**: Vue `<Transition>` component.
 - **vue-animation-helpers**: Helper components for sequencing.
 - **vue-lottie-animation**: Rendering Lottie JSON animations.
