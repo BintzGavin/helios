@@ -4,6 +4,7 @@ import type { HeliosController } from "./controllers";
 import { ClientSideExporter } from "./features/exporter";
 import { HeliosTextTrack, HeliosTextTrackList, CueClass, TrackHost } from "./features/text-tracks";
 import { HeliosAudioTrack, HeliosAudioTrackList, AudioTrackHost } from "./features/audio-tracks";
+import { HeliosVideoTrack, HeliosVideoTrackList, VideoTrackHost } from "./features/video-tracks";
 import { parseCaptions } from "./features/caption-parser";
 import { HeliosMediaSession } from "./features/media-session";
 
@@ -530,11 +531,12 @@ template.innerHTML = `
   </div>
 `;
 
-export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHost {
+export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHost, VideoTrackHost {
   private iframe: HTMLIFrameElement;
   private pipVideo: HTMLVideoElement;
   private _textTracks: HeliosTextTrackList;
   private _audioTracks: HeliosAudioTrackList;
+  private _videoTracks: HeliosVideoTrackList;
   private _domTracks = new Map<HTMLTrackElement, HeliosTextTrack>();
   private playPauseBtn: HTMLButtonElement;
   private volumeBtn: HTMLButtonElement;
@@ -1034,6 +1036,9 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
 
     this._audioTracks = new HeliosAudioTrackList();
 
+    this._videoTracks = new HeliosVideoTrackList();
+    this._videoTracks.addTrack(new HeliosVideoTrack("main", "main", "Main Video", "en", true, this));
+
     this.resizeObserver = new ResizeObserver((entries) => {
       for (const entry of entries) {
         const width = entry.contentRect.width;
@@ -1054,6 +1059,10 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
     return this._audioTracks;
   }
 
+  public get videoTracks(): HeliosVideoTrackList {
+    return this._videoTracks;
+  }
+
   public addTextTrack(kind: string, label: string = "", language: string = ""): HeliosTextTrack {
     const track = new HeliosTextTrack(kind, label, language, this);
     this._textTracks.addTrack(track);
@@ -1065,6 +1074,18 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
     // Helios "muted" is the inverse of AudioTrack "enabled"
     this.controller.setAudioTrackMuted(track.id, !track.enabled);
     this._audioTracks.dispatchChangeEvent();
+  }
+
+  public handleVideoTrackSelectedChange(track: HeliosVideoTrack) {
+    if (track.selected) {
+      for (const t of this._videoTracks) {
+        if (t !== track && t.selected) {
+           t._setSelectedInternal(false);
+        }
+      }
+    }
+
+    this._videoTracks.dispatchChangeEvent();
   }
 
   public handleTrackModeChange(track: HeliosTextTrack) {
