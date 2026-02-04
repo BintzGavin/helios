@@ -1,3 +1,6 @@
+## PLAYER v0.66.1
+- ✅ Completed: Responsive Images - Implemented support for capturing currentSrc of responsive images during client-side export, ensuring high-fidelity output.
+
 ## PLAYER v0.66.0
 - ✅ Completed: Implement VideoTracks API - Implemented videoTracks property and VideoTrackList API on <helios-player> to complete Standard Media API parity.
 

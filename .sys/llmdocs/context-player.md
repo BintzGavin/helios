@@ -1,7 +1,7 @@
 # Context: PLAYER
 
 ## Overview
-The **PLAYER** domain is responsible for the `<helios-player>` Web Component, which acts as the visual and interactive frontend for Helios compositions. It manages the `iframe` sandbox, handles user input (UI controls, keyboard shortcuts), and communicates with the composition via the Bridge or Direct Controller. It also handles client-side export functionality and integrates with the Media Session API.
+The **PLAYER** domain is responsible for the `<helios-player>` Web Component, which acts as the visual and interactive frontend for Helios compositions. It manages the `iframe` sandbox, handles user input (UI controls, keyboard shortcuts), and communicates with the composition via the Bridge or Direct Controller. It also handles client-side export functionality (including high-fidelity DOM capture) and integrates with the Media Session API.
 
 ## A. Component Structure
 The `<helios-player>` component uses a Shadow DOM to encapsulate its styles and structure.
