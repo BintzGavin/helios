@@ -27,6 +27,8 @@ packages/cli/
 │   ├── registry/
 │   │   ├── manifest.ts     # Component registry definitions
 │   │   └── types.ts        # Registry types
+│   ├── templates/
+│   │   └── basic.ts        # Project scaffolding templates
 │   ├── utils/
 │   │   └── config.ts       # Config loading and types
 │   └── index.ts            # Main CLI setup
@@ -49,7 +51,7 @@ helios studio
 
 ### `helios init`
 
-Initializes a new Helios project configuration.
+Initializes a new Helios project.
 
 ```bash
 helios init
@@ -58,7 +60,9 @@ helios init
 Options:
 - `-y, --yes`: Skip prompts and use defaults
 
-Generates a `helios.config.json` file in the current directory.
+Behavior:
+1. Checks for `package.json`. If missing, prompts to scaffold a new React+Vite+Helios project structure.
+2. Checks for `helios.config.json`. If missing, prompts for configuration (component directory, etc.) or uses defaults if scaffolded.
 
 ### `helios add`
 
