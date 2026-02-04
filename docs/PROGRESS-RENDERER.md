@@ -1,3 +1,6 @@
+## RENDERER v1.63.1
+- ✅ Completed: Update Verification Suite - Added orphaned verification scripts (`verify-canvas-shadow-dom.ts` and `verify-pseudo-element-preload.ts`) to the main test runner `run-all.ts` and fixed type errors in `verify-advanced-audio.ts` and `verify-audio-args.ts` caused by `getFFmpegArgs` return type change.
+
 ## RENDERER v1.63.0
 - ✅ Completed: Canvas Implicit Audio - Verified and finalized the implementation of implicit audio discovery in `CanvasStrategy`. Updated `dom-scanner` and `blob-extractor` to robustly handle `blob:` URLs (gracefully ignoring failed extractions to prevent FFmpeg crashes) and fixed the `verify-canvas-implicit-audio` test suite.
 
