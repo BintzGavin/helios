@@ -62,6 +62,7 @@ The `examples/` directory contains reference implementations for various framewo
 - **solid-threejs-canvas-animation**: 3D animation with Three.js and SolidJS.
 - **solid-transitions**: Solid Transition Group.
 - **solid-animation-helpers**: Helper components for sequencing.
+- **solid-lottie-animation**: Rendering Lottie JSON animations.
 
 ### Integrations
 - **threejs-canvas-animation**: 3D scenes with Three.js (Vanilla).
