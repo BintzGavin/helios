@@ -1,3 +1,7 @@
+## [v0.65.0] - PiP Gap in DOM Mode
+**Learning:** Identified that the Picture-in-Picture button remains active but non-functional when using `export-mode="dom"` (or any mode without a canvas).
+**Action:** In a future polish task, auto-detect canvas availability or expose a capability check in `HeliosController` to hide the PiP button when unavailable.
+
 ## [v0.64.0] - Incomplete Track Events
 **Learning:** Discovered that `HeliosTextTrackList` and `HeliosAudioTrackList` had stubbed event handler properties (`onaddtrack`) that accumulated listeners instead of replacing them, and `TextTrackList` was missing `change` event dispatching entirely.
 **Action:** When implementing "Standard" APIs (like `EventTarget` subclasses), always verify the event handler property behavior (setter replacing listener) and ensure all spec-mandated events are actually dispatched.
