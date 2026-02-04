@@ -39,7 +39,7 @@ The `<helios-player>` Web Component allows you to embed and control Helios compo
 | `poster` | string | URL of an image to show before playback |
 | `preload` | 'auto' \| 'none' | Preload behavior (default: 'auto') |
 | `interactive`| boolean | Allow direct interaction with the iframe content (disables overlay) |
-| `input-props` | JSON string | Pass initial properties to the composition |
+| `input-props` | JSON string | Pass initial properties to the composition (e.g., `'{"title": "My Video"}'`) |
 | `export-mode` | 'auto' \| 'canvas' \| 'dom' | Strategy for client-side export (default: 'auto') |
 | `export-format` | 'mp4' \| 'webm' | Output format for client-side export (default: 'mp4') |
 | `export-caption-mode` | 'burn-in' \| 'file' | How to handle captions during export (default: 'burn-in') |
@@ -167,7 +167,9 @@ The player supports exporting videos directly in the browser (using `VideoEncode
 
 1. **Formats:** Supports `mp4` (H.264/AAC) and `webm` (VP9/Opus).
 2. **Audio:** Captures audio from `<audio>` elements (must be CORS-enabled).
-3. **Captions:** Supports "burning in" captions (`export-caption-mode="burn-in"`) or saving as sidecar file (`export-caption-mode="file"`).
+3. **Captions:** Configure how captions are handled:
+   - `export-caption-mode="burn-in"`: Renders text directly onto the video frames (hardsub).
+   - `export-caption-mode="file"`: Downloads a separate `.srt` file alongside the video (softsub).
 4. **Resolution:** Configure export resolution independently of player size using `export-width` and `export-height`.
 5. **Usage:** User clicks "Export" in controls, or call `clientSideExporter` manually (internal API).
 
