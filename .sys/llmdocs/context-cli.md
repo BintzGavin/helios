@@ -20,6 +20,7 @@ packages/cli/
 ├── src/
 │   ├── commands/
 │   │   ├── add.ts          # helios add command
+│   │   ├── components.ts   # helios components command
 │   │   ├── init.ts         # helios init command
 │   │   └── studio.ts       # helios studio command
 │   ├── utils/
@@ -76,10 +77,19 @@ helios add <component>
 - Requires `helios.config.json` to exist.
 - Current registry includes: `timer`.
 
+### `helios components`
+
+Lists available components in the registry.
+
+```bash
+helios components
+```
+
+- Lists component names and types (e.g., `timer (react)`).
+
 ### Planned Commands (V2)
 
 - `helios render` - Trigger local or distributed rendering
-- `helios components` - Browse available registry components
 
 ## D. Configuration
 
@@ -91,7 +101,7 @@ The CLI uses `helios.config.json` for project configuration. Configuration logic
 ## E. Integration
 
 - **Studio**: The `studio` command launches `@helios-project/studio` via npm
-- **Registry**: Will integrate with component registry for `add` and `components` commands
+- **Registry**: Integrates with embedded component registry for `add` and `components` commands
 - **Renderer**: Will integrate with `@helios-project/renderer` for render commands
 
 ## F. Command Pattern

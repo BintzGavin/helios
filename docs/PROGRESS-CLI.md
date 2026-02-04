@@ -2,6 +2,10 @@
 
 This file tracks progress for the CLI domain (`packages/cli`).
 
+## CLI v0.4.0
+
+- ✅ Implement `helios components` command to list registry items
+
 ## CLI v0.3.0
 
 - ✅ Scaffold `helios add` command and centralized configuration logic
