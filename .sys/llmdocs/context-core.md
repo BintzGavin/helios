@@ -63,6 +63,8 @@ packages/core/src/
 ├── timecode.test.ts
 ├── transitions.ts
 ├── transitions.test.ts
+├── types.ts
+├── types.test.ts
 ├── virtual-time.test.ts
 └── worker-runtime.test.ts
 ```
@@ -70,6 +72,55 @@ packages/core/src/
 ## C. Type Definitions
 
 ```typescript
+// From types.ts
+export type AudioTrackState = {
+  volume: number;
+  muted: boolean;
+};
+
+export interface HeliosConfig<TInputProps = Record<string, any>> {
+  width?: number;
+  height?: number;
+  initialFrame?: number;
+  duration: number; // in seconds
+  fps: number;
+  loop?: boolean;
+  playbackRange?: [number, number];
+  autoSyncAnimations?: boolean;
+  inputProps?: TInputProps;
+  schema?: HeliosSchema;
+  playbackRate?: number;
+  volume?: number;
+  muted?: boolean;
+  audioTracks?: Record<string, AudioTrackState>;
+  availableAudioTracks?: AudioTrackMetadata[];
+  captions?: string | CaptionCue[];
+  markers?: Marker[];
+}
+
+export interface HeliosClip {
+  id: string;
+  source: string;
+  start: number;
+  duration: number;
+  track?: number;
+  props?: Record<string, any>;
+}
+
+export interface HeliosTrack {
+  id: string;
+  name?: string;
+  clips: HeliosClip[];
+}
+
+export interface HeliosTimeline {
+  tracks: HeliosTrack[];
+}
+
+export interface HeliosComposition<TInputProps = Record<string, any>> extends HeliosConfig<TInputProps> {
+  timeline?: HeliosTimeline;
+}
+
 // From drivers/TimeDriver.ts
 export interface AudioTrackMetadata {
   id: string;
@@ -123,34 +174,12 @@ export type HeliosState<TInputProps = Record<string, any>> = {
   currentTime: number;
 };
 
-export type AudioTrackState = {
-  volume: number;
-  muted: boolean;
-};
-
 export type HeliosSubscriber<TInputProps = Record<string, any>> = (state: HeliosState<TInputProps>) => void;
 
 export type StabilityCheck = () => Promise<void>;
 
-export interface HeliosOptions<TInputProps = Record<string, any>> {
-  width?: number;
-  height?: number;
-  initialFrame?: number;
-  duration: number; // in seconds
-  fps: number;
-  loop?: boolean;
-  playbackRange?: [number, number];
-  autoSyncAnimations?: boolean;
+export interface HeliosOptions<TInputProps = Record<string, any>> extends HeliosConfig<TInputProps> {
   animationScope?: unknown;
-  inputProps?: TInputProps;
-  schema?: HeliosSchema;
-  playbackRate?: number;
-  volume?: number;
-  muted?: boolean;
-  audioTracks?: Record<string, AudioTrackState>;
-  availableAudioTracks?: AudioTrackMetadata[];
-  captions?: string | CaptionCue[];
-  markers?: Marker[];
   driver?: TimeDriver;
   ticker?: Ticker;
 }
