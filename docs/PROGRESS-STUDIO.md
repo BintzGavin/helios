@@ -1,3 +1,6 @@
+## STUDIO v0.94.0
+- ✅ Completed: Render Presets - Implemented render configuration presets (Draft, HD, 4K) and persistence for render settings.
+
 ## STUDIO v0.93.1
 - ✅ Completed: Smart Empty State - Implemented "Smart Empty State" for the Stage, providing "Create Composition" (fresh project) and "Select Composition" (unselected) empty states.
 
