@@ -1,4 +1,4 @@
-**Version**: v0.66.3
+**Version**: v0.66.4
 
 **Posture**: STABLE AND FEATURE COMPLETE
 
@@ -59,6 +59,7 @@
 ## Critical Task
 - **None**: All critical tasks completed.
 
+[v0.66.4] ✅ Completed: Enhance Keyboard Shortcuts & Fix Sandbox - Implemented standard shortcuts (Captions, Seek Home/End, 0-9) and fixed sandbox attribute behavior to support strict mode.
 [v0.66.3] ✅ Verified: Synced package.json version with status file and verified all tests pass.
 [v0.66.3] ✅ Completed: Audio Track UI - Implemented audio menu in player controls to mute/unmute and adjust volume of individual audio tracks.
 [v0.66.2] ✅ Completed: Handle Connection Timeouts - Implemented error state and event dispatching on connection timeout.

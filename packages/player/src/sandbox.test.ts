@@ -52,6 +52,8 @@ describe('HeliosPlayer Sandbox', () => {
     const iframe = player.shadowRoot!.querySelector('iframe');
     // Attribute exists but is empty
     expect(iframe?.getAttribute('sandbox')).toBe('');
+    // Getter should return empty string, not default
+    expect(player.sandbox).toBe('');
   });
 
   it('should reload iframe when sandbox attribute changes if src is present', () => {
