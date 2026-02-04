@@ -14,3 +14,7 @@
 ## [1.67.1] - Distributed Rendering PCM Pipeline
 **Learning:** Concatenating MP4/AAC chunks causes audio clicks. The solution is to use `.mov` container with `pcm_s16le` audio for intermediate chunks, then concatenate and transcode to final format. This robustly handles both implicit and explicit audio.
 **Action:** Implemented in `Orchestrator.ts`.
+
+## [1.67.2] - Implicit Audio Loss in Distributed Mix
+**Learning:** Distributed rendering drops implicit audio (DOM `<audio>`) during the final mix step because `FFmpegBuilder` defaults to ignoring the input video's audio stream (`0:a`). This happens even though the intermediate chunks correctly contain the audio.
+**Action:** Created plan `2026-03-07-RENDERER-Distributed-Implicit-Audio.md` to add `mixInputAudio` option to explicitly preserve input audio.
