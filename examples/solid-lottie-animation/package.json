@@ -1,0 +1,19 @@
+{
+  "name": "@helios-examples/solid-lottie-animation",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build"
+  },
+  "dependencies": {
+    "solid-js": "^1.8.1",
+    "lottie-web": "^5.12.2",
+    "@helios-project/core": "workspace:*"
+  },
+  "devDependencies": {
+    "vite": "^5.0.0",
+    "vite-plugin-solid": "^2.8.0"
+  }
+}

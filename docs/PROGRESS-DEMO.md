@@ -1,3 +1,6 @@
+## DEMO v1.99.0
+- ✅ Completed: Solid Lottie Animation - Created `examples/solid-lottie-animation` demonstrating integration with `lottie-web` in SolidJS.
+
 ## DEMO v1.98.0
 - ✅ Completed: React Pixi Animation - Created `examples/react-pixi-animation` demonstrating integration with PixiJS v8 and React.
 
