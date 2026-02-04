@@ -121,4 +121,7 @@ E2E tests are located in `tests/e2e/` and use Playwright + FFmpeg.
   - Checks for video duration and non-black frames (using FFmpeg `signalstats`).
   - Usage: `npx tsx tests/e2e/verify-render.ts [filter]`
 - **verify-client-export.ts**: Verifies client-side export functionality using `ClientSideExporter`.
+  - Dynamically discovers examples in `examples/`.
+  - Serves examples via a local server and uses a generic `dynamic-player.html` fixture.
+  - Verifies export triggers a download.
 - **verify-player.ts**: Verifies the `<helios-player>` Web Component.

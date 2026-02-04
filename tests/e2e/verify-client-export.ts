@@ -23,6 +23,13 @@ const CANVAS_OVERRIDES = new Set([
   'vue-canvas-animation',
   'svelte-canvas-animation',
   'solid-canvas-animation',
+  'react-audio-visualization',
+  'vue-audio-visualization',
+  'svelte-audio-visualization',
+  'solid-audio-visualization',
+  'react-pixi-animation',
+  'vue-pixi-animation',
+  'svelte-pixi-animation',
   'vanilla-typescript'
 ]);
 
