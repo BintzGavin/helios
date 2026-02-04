@@ -5,6 +5,24 @@ description: "Changelog for the Renderer package"
 
 # Renderer Changelog
 
+## v1.64.1
+- **Verify and Sync**: Verified v1.64.0 distributed rendering and synced documentation.
+
+## v1.64.0
+- **Distributed Audio Mixing**: Updated `RenderOrchestrator` to decouple audio mixing from distributed video rendering chunks. Chunks are now rendered silently and concatenated, with audio mixed in a final pass to prevent glitches.
+
+## v1.63.1
+- **Update Verification Suite**: Added orphaned verification scripts (`verify-canvas-shadow-dom.ts` and `verify-pseudo-element-preload.ts`) to the main test runner `run-all.ts`.
+
+## v1.63.0
+- **Canvas Implicit Audio**: Verified and finalized the implementation of implicit audio discovery in `CanvasStrategy`. Updated `dom-scanner` and `blob-extractor` to robustly handle `blob:` URLs.
+
+## v1.62.1
+- **Fix Pseudo-Element Preloading**: Updated `DomStrategy` to correctly iterate over `::before` and `::after` pseudo-elements when discovering background images.
+
+## v1.62.0
+- **Pseudo-Element Preload**: Updated `DomStrategy` to recursively discover and preload background images and masks in `::before` and `::after` pseudo-elements.
+
 ## v1.61.1
 - **Fix Audio Playback Seek**: Updated `FFmpegBuilder` to correctly calculate input seek time (`-ss`) when using `playbackRate` with `startFrame > 0`.
 

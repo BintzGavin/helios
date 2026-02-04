@@ -5,6 +5,24 @@ description: "Changelog for the Studio package"
 
 # Studio Changelog
 
+## v0.90.0
+- **Core Components**: Expanded CLI Component Registry with `ProgressBar` and `Watermark` components.
+
+## v0.89.0
+- **Component Registry**: Implemented `helios add` command in CLI to install components (Timer) from a local registry.
+
+## v0.88.0
+- **CLI Scaffold**: Implemented `helios init` and `helios add` commands to scaffold project configuration and component structure.
+
+## v0.87.1
+- **Verified: Distributed Rendering Config**: Verified implementation of concurrency control in Renders Panel and RenderManager.
+
+## v0.87.0
+- **Distributed Rendering Config**: Implemented concurrency control in the Studio Renders Panel and updated backend to use `RenderOrchestrator` for parallel rendering.
+
+## v0.86.0
+- **Audio Mixer Solo**: Implemented "Solo" functionality in Audio Mixer Panel, allowing isolation of individual audio tracks with mute state restoration.
+
 ## v0.84.0
 - **Timeline Persistence**: Implemented persistence for Current Frame, In Point, Out Point, and Loop state across reloads and composition switches.
 

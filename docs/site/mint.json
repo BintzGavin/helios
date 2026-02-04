@@ -57,7 +57,10 @@
         "examples/vanilla-typescript",
         "examples/lottie-animation",
         "examples/svelte-audio-visualization",
-        "examples/vue-audio-visualization"
+        "examples/vue-audio-visualization",
+        "examples/pixi-animation",
+        "examples/solid-audio-visualization",
+        "examples/react-components"
       ]
     },
     {
@@ -65,7 +68,8 @@
       "pages": [
         "api/core",
         "api/player",
-        "api/renderer"
+        "api/renderer",
+        "api/cli"
       ]
     },
     {
@@ -81,7 +85,8 @@
         "changelog/renderer",
         "changelog/player",
         "changelog/demo",
-        "changelog/studio"
+        "changelog/studio",
+        "changelog/cli"
       ]
     }
   ]

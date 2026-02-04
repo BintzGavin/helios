@@ -5,6 +5,36 @@ description: "Changelog for the Demo package and examples"
 
 # Demo Changelog
 
+## v1.104.0
+- **React Components Demo**: Created `examples/react-components-demo` to verify and demonstrate registry components (`Timer`, `ProgressBar`, `Watermark`).
+
+## v1.103.0
+- **Solid Pixi Animation**: Created `examples/solid-pixi-animation` demonstrating integration with PixiJS v8 and SolidJS.
+
+## v1.101.0
+- **Svelte Pixi Animation**: Created `examples/svelte-pixi-animation` demonstrating integration with PixiJS v8 and Svelte 5.
+
+## v1.100.0
+- **Vue Pixi Animation**: Created `examples/vue-pixi-animation` demonstrating integration with PixiJS v8 and Vue 3.
+
+## v1.99.0
+- **Solid Lottie Animation**: Created `examples/solid-lottie-animation` demonstrating integration with `lottie-web` in SolidJS.
+
+## v1.98.0
+- **React Pixi Animation**: Created `examples/react-pixi-animation` demonstrating integration with PixiJS v8 and React.
+
+## v1.97.0
+- **Svelte Lottie Animation**: Created `examples/svelte-lottie-animation` demonstrating integration with `lottie-web` in Svelte 5.
+
+## v1.96.0
+- **Solid Audio Visualization**: Created `examples/solid-audio-visualization` demonstrating real-time audio analysis (RMS, waveforms) using synthesized `AudioBuffer` and SolidJS.
+
+## v1.95.0
+- **Vue Lottie Animation**: Created `examples/vue-lottie-animation` demonstrating integration with `lottie-web` in Vue 3 driven by Helios timeline.
+
+## v1.93.0
+- **React Lottie Animation**: Created `examples/react-lottie-animation` demonstrating integration with `lottie-web` in React driven by Helios timeline.
+
 ## v1.92.0
 - **Svelte Audio Visualization**: Created `examples/svelte-audio-visualization` demonstrating real-time audio analysis using Svelte derived stores.
 

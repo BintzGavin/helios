@@ -5,6 +5,21 @@ description: "Changelog for the Player package"
 
 # Player Changelog
 
+## v0.66.1
+- **Responsive Images**: Implemented support for capturing currentSrc of responsive images during client-side export, ensuring high-fidelity output.
+
+## v0.66.0
+- **Implement VideoTracks API**: Implemented videoTracks property and VideoTrackList API on `<helios-player>` to complete Standard Media API parity.
+
+## v0.65.2
+- **Client-Side Audio Volume Support**: Updated `getAudioAssets` to prioritize `audioTrackState` (volume/mute) over DOM attributes for robust client-side export parity.
+
+## v0.65.1
+- **Maintenance**: Removed unnecessary TS suppressions and updated documentation with missing API members.
+
+## v0.65.0
+- **Media Session Integration**: Implemented HeliosMediaSession to support OS-level media keys and metadata display, observing media-* attributes.
+
 ## v0.63.1
 - **Fix cuechange on Disable**: Fixed bug where disabling a track cleared active cues without dispatching the cuechange event.
 
