@@ -75,6 +75,7 @@ export async function scanForAudioTracks(page: Page): Promise<AudioTrackConfig[]
             const fadeIn = el.dataset.heliosFadeIn ? parseFloat(el.dataset.heliosFadeIn) : 0;
             const fadeOut = el.dataset.heliosFadeOut ? parseFloat(el.dataset.heliosFadeOut) : 0;
             const volume = el.muted ? 0 : el.volume;
+            const duration = el.duration;
             // Get playbackRate from property or attribute
             let rate = el.playbackRate;
             if (rate === 1.0) {
@@ -98,7 +99,8 @@ export async function scanForAudioTracks(page: Page): Promise<AudioTrackConfig[]
               fadeInDuration: isNaN(fadeIn) ? 0 : fadeIn,
               fadeOutDuration: isNaN(fadeOut) ? 0 : fadeOut,
               loop: el.loop,
-              playbackRate: isNaN(rate) ? 1.0 : rate
+              playbackRate: isNaN(rate) ? 1.0 : rate,
+              duration: (Number.isFinite(duration) && duration > 0) ? duration : undefined
             });
           }
         });
@@ -126,7 +128,8 @@ export async function scanForAudioTracks(page: Page): Promise<AudioTrackConfig[]
       fadeInDuration: track.fadeInDuration,
       fadeOutDuration: track.fadeOutDuration,
       loop: track.loop,
-      playbackRate: track.playbackRate
+      playbackRate: track.playbackRate,
+      duration: track.duration
     }));
 
   if (validTracks.length > 0) {

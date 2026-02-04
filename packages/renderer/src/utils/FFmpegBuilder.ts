@@ -27,6 +27,7 @@ export class FFmpegBuilder {
             fadeOutDuration: track.fadeOutDuration ?? 0,
             loop: track.loop,
             playbackRate: track.playbackRate ?? 1.0,
+            duration: track.duration,
           });
         }
       });
@@ -137,9 +138,24 @@ export class FFmpegBuilder {
       }
 
       if (track.fadeOutDuration && track.fadeOutDuration > 0) {
-        let startTime = compositionDuration - track.fadeOutDuration;
-        if (startTime < 0) startTime = 0;
-        filters.push(`afade=t=out:st=${startTime}:d=${track.fadeOutDuration}`);
+        let fadeOutStartTime = compositionDuration - track.fadeOutDuration;
+
+        // Smart Fades: If track is not looping and has a known duration,
+        // calculate fade-out relative to the clip's end.
+        if (!track.loop && track.duration) {
+          const playbackRate = track.playbackRate && Number.isFinite(track.playbackRate) && track.playbackRate > 0 ? track.playbackRate : 1.0;
+
+          // inputSeek is the start position in the source file
+          // We must clamp remaining duration to be at least 0
+          const remainingSourceDuration = Math.max(0, track.duration - inputSeek);
+          const durationInStream = remainingSourceDuration / playbackRate;
+          const clipEndTime = (delayMs / 1000) + durationInStream;
+
+          fadeOutStartTime = clipEndTime - track.fadeOutDuration;
+        }
+
+        if (fadeOutStartTime < 0) fadeOutStartTime = 0;
+        filters.push(`afade=t=out:st=${fadeOutStartTime}:d=${track.fadeOutDuration}`);
       }
 
       // Construct the chain: [in]filter,filter[out]
