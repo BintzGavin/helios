@@ -39,6 +39,7 @@ Examples using the Vue adapter (Composition API).
 - **[vue-canvas-animation](./vue-canvas-animation/)**: Basic Vue + Canvas example.
 - **[vue-captions-animation](./vue-captions-animation/)**: Integration with Helios SRT captions.
 - **[vue-threejs-canvas-animation](./vue-threejs-canvas-animation/)**: 3D animation with Three.js.
+- **[vue-d3-animation](./vue-d3-animation/)**: Data visualization with D3.js and Vue 3.
 - **[vue-transitions](./vue-transitions/)**: Using Vue's `<Transition>` component.
 - **[vue-animation-helpers](./vue-animation-helpers/)**: Helper components for sequencing.
 
