@@ -1,3 +1,6 @@
+## STUDIO v0.89.0
+- ✅ Completed: Component Registry - Implemented `helios add` command in CLI to install components (Timer) from a local registry.
+
 ## STUDIO v0.88.0
 - ✅ Completed: CLI Scaffold - Implemented `helios init` and `helios add` commands to scaffold project configuration and component structure.
 

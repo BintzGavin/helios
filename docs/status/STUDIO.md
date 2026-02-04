@@ -1,4 +1,4 @@
-**Version**: 0.88.0
+**Version**: 0.89.0
 
 **Posture**: ACTIVELY EXPANDING FOR V2
 
@@ -9,6 +9,7 @@
 **Focus**: UI Implementation & CLI
 
 ## Recent Updates
+- [v0.89.0] ✅ Completed: Component Registry - Implemented `helios add` command in CLI to install components (Timer) from a local registry.
 - [v0.88.0] ✅ Completed: CLI Scaffold - Implemented `helios init` and `helios add` commands to scaffold project configuration and component structure.
 - [v0.87.1] ✅ Verified: Distributed Rendering Config - Verified implementation of concurrency control in Renders Panel and RenderManager, ensuring correct usage of RenderOrchestrator.
 - [v0.87.0] ✅ Completed: Distributed Rendering Config - Implemented concurrency control in the Studio Renders Panel and updated backend to use `RenderOrchestrator` for parallel rendering.

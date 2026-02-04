@@ -14,7 +14,7 @@ Helios Studio is a browser-based development environment for creating video comp
 ```
 packages/studio/
 ├── bin/
-│   └── helios-studio.js      # CLI entry point
+│   └── helios-studio.js      # Studio server entry point
 ├── src/
 │   ├── components/           # UI Components
 │   │   ├── AssetsPanel/
@@ -53,7 +53,8 @@ npx helios <command> [options]
 - **`init`**: Initializes a new Helios project configuration (`helios.config.json`).
   - Scaffolds directory structure references.
 - **`add <component>`**: Adds a component to the project (Shadcn-style).
-  - Reads `helios.config.json` to determine installation path.
+  - Fetches component code from the registry (`packages/cli/src/registry/manifest.ts`).
+  - Installs component files (e.g. `Timer.tsx`) and dependencies into the configured `components` directory.
 
 ## D. UI Components
 
