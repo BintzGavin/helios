@@ -1,3 +1,6 @@
+## DEMO v1.106.0
+- ✅ Completed: React CSS Animation - Created/Verified `examples/react-css-animation` demonstrating CSS animation sync with `autoSyncAnimations: true`.
+
 ## DEMO v1.105.0
 - ✅ Completed: Vue D3 Animation - Created `examples/vue-d3-animation` demonstrating D3.js integration with Vue 3.
 
@@ -9,6 +12,9 @@
 
 ## DEMO v1.103.0
 - ✅ Completed: Solid Pixi Animation - Created `examples/solid-pixi-animation` demonstrating integration with PixiJS v8 and SolidJS.
+
+## DEMO v1.102.0
+- ✅ Completed: Update Client Export Verification - Updated `tests/e2e/verify-client-export.ts` to include recent audio visualization and PixiJS examples in canvas overrides.
 
 ## DEMO v1.101.0
 - ✅ Completed: Svelte Pixi Animation - Created `examples/svelte-pixi-animation` demonstrating integration with PixiJS v8 and Svelte 5.
