@@ -22,6 +22,7 @@ packages/cli/
 │   │   ├── add.ts          # helios add command
 │   │   ├── components.ts   # helios components command
 │   │   ├── init.ts         # helios init command
+│   │   ├── merge.ts        # helios merge command
 │   │   ├── render.ts       # helios render command
 │   │   └── studio.ts       # helios studio command
 │   ├── registry/
@@ -104,6 +105,16 @@ Options:
 - `--start-frame <number>`: Frame to start rendering from
 - `--frame-count <number>`: Number of frames to render
 - `--no-headless`: Run in visible browser window (default: headless)
+
+### `helios merge`
+
+Merges multiple video files into one without re-encoding.
+
+```bash
+helios merge <output> [inputs...]
+```
+
+- Uses `@helios-project/renderer`'s `concatenateVideos` function (FFmpeg concat demuxer).
 
 ## D. Configuration
 

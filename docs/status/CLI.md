@@ -1,6 +1,6 @@
 # CLI Status
 
-**Version**: 0.5.2
+**Version**: 0.6.0
 
 ## Current State
 
@@ -18,6 +18,7 @@ The Helios CLI (`packages/cli`) provides the command-line interface for the Heli
 - `helios add` - Adds a component to the project
 - `helios components` - Lists available components in the registry
 - `helios render` - Renders a composition to video
+- `helios merge` - Merges multiple video files into one without re-encoding
 
 ## V2 Roadmap
 
@@ -27,6 +28,7 @@ Per AGENTS.md, the CLI is "ACTIVELY EXPANDING FOR V2" with focus on:
 2. **Render Commands** - `helios render` for local/distributed rendering
 3. **Init Command** - `helios init` for project scaffolding
 4. **Components Command** - `helios components` for browsing registry
+5. **Merge Command** - `helios merge` for stitching distributed render chunks
 
 ## History
 
@@ -39,3 +41,4 @@ Per AGENTS.md, the CLI is "ACTIVELY EXPANDING FOR V2" with focus on:
 [v0.5.0] ✅ Distributed Rendering Support - Added `--start-frame` and `--frame-count` to `helios render`
 [v0.5.1] ✅ Fix Registry Components - Updated component registry to use V2 Helios Signals (`fps.value`, `duration.value`)
 [v0.5.2] ✅ Project Scaffolding - Updated `helios init` to scaffold a full React+Vite project structure when `package.json` is missing
+[v0.6.0] ✅ Implement Merge Command - Implemented `helios merge` for stitching video clips

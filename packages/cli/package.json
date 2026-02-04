@@ -1,6 +1,6 @@
 {
   "name": "@helios-project/cli",
-  "version": "0.4.1",
+  "version": "0.6.0",
   "description": "CLI for Helios video engine.",
   "author": "Gavin Bintz <me@gavinbintz.com>",
   "license": "ELv2",
