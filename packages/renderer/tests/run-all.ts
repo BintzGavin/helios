@@ -51,6 +51,7 @@ const tests = [
   'tests/verify-smart-codec-selection.ts',
   'tests/verify-stream-copy.ts',
   'tests/verify-video-loop.ts',
+  'tests/verify-virtual-time-binding.ts',
   'tests/verify-visual-playback-rate.ts',
   'tests/verify-waapi-sync.ts',
   'scripts/verify-advanced-audio.ts',
