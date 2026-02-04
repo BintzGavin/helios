@@ -4,6 +4,7 @@ import { HeliosError, HeliosErrorCode } from './errors.js';
 import { HeliosSchema, validateProps, validateSchema } from './schema.js';
 import { CaptionCue, parseSrt, parseCaptions, findActiveCues, areCuesEqual } from './captions.js';
 import { Marker, validateMarker, validateMarkers } from './markers.js';
+import { HeliosConfig, AudioTrackState } from './types.js';
 
 export type HeliosState<TInputProps = Record<string, any>> = {
   width: number;
@@ -26,34 +27,12 @@ export type HeliosState<TInputProps = Record<string, any>> = {
   currentTime: number;
 };
 
-export type AudioTrackState = {
-  volume: number;
-  muted: boolean;
-};
-
 export type HeliosSubscriber<TInputProps = Record<string, any>> = (state: HeliosState<TInputProps>) => void;
 
 export type StabilityCheck = () => Promise<void>;
 
-export interface HeliosOptions<TInputProps = Record<string, any>> {
-  width?: number;
-  height?: number;
-  initialFrame?: number;
-  duration: number; // in seconds
-  fps: number;
-  loop?: boolean;
-  playbackRange?: [number, number];
-  autoSyncAnimations?: boolean;
+export interface HeliosOptions<TInputProps = Record<string, any>> extends HeliosConfig<TInputProps> {
   animationScope?: unknown;
-  inputProps?: TInputProps;
-  schema?: HeliosSchema;
-  playbackRate?: number;
-  volume?: number;
-  muted?: boolean;
-  audioTracks?: Record<string, AudioTrackState>;
-  availableAudioTracks?: AudioTrackMetadata[];
-  captions?: string | CaptionCue[];
-  markers?: Marker[];
   driver?: TimeDriver;
   ticker?: Ticker;
 }

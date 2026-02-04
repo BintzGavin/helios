@@ -14,5 +14,6 @@ export * from './transitions.js';
 export * from './ai.js';
 export * from './Helios.js';
 export * from './render-session.js';
+export * from './types.js';
 
 export const VERSION = '5.10.0';

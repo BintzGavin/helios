@@ -1,5 +1,8 @@
 # CORE Progress Log
 
+## CORE v5.11.0
+- ✅ Completed: Implement Composition Schema - Implemented HeliosConfig, HeliosComposition, and related interfaces to support serializable composition definitions.
+
 ## CORE v5.10.0
 - ✅ Completed: Shared Virtual Time Binding - Implemented static registry in Helios to allow multiple instances to synchronize with `window.__HELIOS_VIRTUAL_TIME__` simultaneously.
 
@@ -259,7 +262,7 @@
 - ✅ Completed: Add Documentation - Created comprehensive `README.md` for `packages/core`.
 
 ## CORE v1.11.2
-- ✅ Completed: Verify Signals and Cleanup Plans - Verified signal integration and cleaned up completed plan files.
+- ✅ Completed: Verify Signals and Cleanup Plans - Verified signal integration and cleaned up plan files.
 
 ## CORE v1.11.1
 - ✅ Completed: Refactor Helios Signals - Added JSDoc documentation to public signal properties and verified signal implementation.
