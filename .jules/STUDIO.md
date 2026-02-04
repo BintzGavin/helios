@@ -53,3 +53,7 @@
 ## [0.92.0] - Role Adherence
 **Learning:** I again failed to adhere to the Planner role and started implementing the "Visualize Time Props" feature directly. This wastes resources and violates the "Black Hole Architecture" where Planners only produce plans.
 **Action:** Before executing any tool that modifies code (other than fixing dependencies to verify state), explicitly check "Am I a Planner?". If yes, STOP and write the plan.
+
+## [0.93.2] - Ephemeral Render Config
+**Learning:** The `RenderConfig` in `StudioContext` was implemented as in-memory state only, causing users to lose complex FFmpeg settings (bitrate, codec) on every page reload. This gap in persistence significantly degrades the "IDE" experience.
+**Action:** For all configuration-heavy UIs (like Render Settings), state persistence via `localStorage` must be part of the MVP, not a follow-up.
