@@ -7,7 +7,7 @@ The Renderer employs a Strategy pattern to support two distinct rendering modes,
 1.  **Canvas Strategy (Canvas Mode)**:
     -   **Target**: High-performance, frame-accurate rendering of HTML5 Canvas elements (WebGL/2D).
     -   **Mechanism**: Uses `playwright` to inject scripts that capture frames directly from the `<canvas>` element using `VideoEncoder` (WebCodecs) or `toDataURL` (fallback).
-    -   **Time Driver**: `CdpTimeDriver`. Uses Chrome DevTools Protocol (`HeadlessExperimental`) to deterministically control virtual time, ensuring perfect synchronization for `requestAnimationFrame`.
+    -   **Time Driver**: `CdpTimeDriver`. Uses Chrome DevTools Protocol (`HeadlessExperimental`) to deterministically control virtual time, ensuring perfect synchronization for `requestAnimationFrame` and overriding `performance.now()` to eliminate drift.
     -   **Output**: Pipes raw image buffers or encoded chunks (H.264/VP9/AV1) to FFmpeg stdin.
 
 2.  **Dom Strategy (DOM Mode)**:

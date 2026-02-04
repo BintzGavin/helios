@@ -1,10 +1,11 @@
-**Version**: 1.67.1
+**Version**: 1.67.2
 
 **Posture**: MAINTENANCE WITH V2 EXPANSION
 
 # Renderer Agent Status
 
 ## Progress Log
+- [1.67.2] ✅ Completed: CdpTimeDriver Determinism - Updated `CdpTimeDriver` to override `performance.now()` to match the virtual time epoch, ensuring deterministic behavior for time-based animations (e.g. Three.js) regardless of page load time. Verified with `verify-cdp-determinism.ts`.
 - [1.67.1] ✅ Completed: Robust Distributed Audio Pipeline - Updated `Orchestrator` to use `.mov` containers with `pcm_s16le` audio for intermediate chunks, preventing concatenation artifacts (clicks) at chunk boundaries.
 - [1.67.0] ✅ Completed: Smart Codec Selection Update - Updated `CanvasStrategy` to prioritize H.264 -> VP9 -> AV1 -> VP8, enabling hardware-accelerated transparency and better quality. Verified with `verify-smart-codec-priority.ts`.
 - [1.66.0] ✅ Completed: CdpTimeDriver Iframe Sync - Updated `CdpTimeDriver` to synchronize media elements across all frames (including iframes) by iterating `page.frames()` and executing sync logic in each context. Verified with `verify-cdp-iframe-media-sync.ts`.

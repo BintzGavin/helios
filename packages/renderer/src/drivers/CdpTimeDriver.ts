@@ -23,6 +23,14 @@ export class CdpTimeDriver implements TimeDriver {
       policy: 'pause',
       initialVirtualTime: INITIAL_VIRTUAL_TIME
     });
+
+    // Inject performance.now() override to match virtual time
+    // This ensures performance.now() is deterministic and starts at 0, regardless of page load time.
+    await page.evaluate((epoch) => {
+      // @ts-ignore
+      window.performance.now = () => Date.now() - epoch;
+    }, INITIAL_VIRTUAL_TIME * 1000);
+
     this.currentTime = 0;
   }
 

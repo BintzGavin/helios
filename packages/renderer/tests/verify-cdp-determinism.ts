@@ -1,7 +1,7 @@
 import { chromium, Browser, Page } from 'playwright';
 import { CdpTimeDriver } from '../src/drivers/CdpTimeDriver.js';
 
-async function runSession(): Promise<number[]> {
+async function runSession(): Promise<{now: number, perf: number}[]> {
   const browser = await chromium.launch();
   const page = await browser.newPage();
   const driver = new CdpTimeDriver();
@@ -11,13 +11,14 @@ async function runSession(): Promise<number[]> {
 
   await driver.prepare(page);
 
-  const timestamps: number[] = [];
+  const timestamps: {now: number, perf: number}[] = [];
   const timesToCheck = [0, 1, 2, 5]; // Seconds
 
   for (const t of timesToCheck) {
     await driver.setTime(page, t);
     const now = await page.evaluate(() => Date.now());
-    timestamps.push(now);
+    const perf = await page.evaluate(() => performance.now());
+    timestamps.push({ now, perf });
   }
 
   await browser.close();
@@ -45,25 +46,38 @@ async function verify() {
     failures++;
   } else {
     for (let i = 0; i < run1.length; i++) {
-      if (run1[i] !== run2[i]) {
-        console.error(`❌ Mismatch at step ${i}: ${run1[i]} !== ${run2[i]}`);
+      // Check Date.now()
+      if (run1[i].now !== run2[i].now) {
+        console.error(`❌ Date.now() mismatch at step ${i}: ${run1[i].now} !== ${run2[i].now}`);
         failures++;
+      }
+      // Check performance.now()
+      // Allow extremely small epsilon for floating point, but essentially it should be exact
+      if (Math.abs(run1[i].perf - run2[i].perf) > 0.001) {
+         console.error(`❌ performance.now() mismatch at step ${i}: ${run1[i].perf} !== ${run2[i].perf}`);
+         failures++;
       }
     }
   }
 
   // 2. Check anchor to epoch (Jan 1, 2024 = 1704067200000 ms)
-  // Note: Before the fix, this will likely fail (it will be current date)
-  // After the fix, it should be exactly 1704067200000 + offset
   const EXPECTED_EPOCH = 1704067200000;
-  const tolerance = 1000; // Allow slight drift if any, but virtual time should be precise
+  const tolerance = 1000;
 
-  if (Math.abs(run1[0] - EXPECTED_EPOCH) > tolerance) {
-    console.warn(`⚠️  Initial timestamp ${run1[0]} is far from target epoch ${EXPECTED_EPOCH} (Diff: ${run1[0] - EXPECTED_EPOCH}ms).`);
-    console.warn(`    This is expected BEFORE the fix. After the fix, this should be close to 0.`);
-    // We don't fail yet because we haven't applied the fix, but this is a good indicator.
+  if (Math.abs(run1[0].now - EXPECTED_EPOCH) > tolerance) {
+    console.error(`❌ Initial timestamp ${run1[0].now} is far from target epoch ${EXPECTED_EPOCH}.`);
+    failures++;
   } else {
-    console.log(`✅ Initial timestamp is correctly anchored to Jan 1, 2024.`);
+    console.log(`✅ Date.now() is correctly anchored to Jan 1, 2024.`);
+  }
+
+  // 3. Check performance.now() anchor (Should be ~0 at start)
+  // We expect it to be 0 because we subtracted the epoch.
+  if (Math.abs(run1[0].perf) > 100) {
+    console.error(`❌ Initial performance.now() ${run1[0].perf} is far from 0.`);
+    failures++;
+  } else {
+    console.log(`✅ performance.now() is correctly anchored to 0.`);
   }
 
   if (failures > 0) {
