@@ -2,6 +2,10 @@
 
 This file tracks progress for the CLI domain (`packages/cli`).
 
+## CLI v0.4.1
+
+- ✅ Implement `helios render` command to allow rendering compositions from the CLI
+
 ## CLI v0.4.0
 
 - ✅ Implement `helios components` command to list registry items
