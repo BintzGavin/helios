@@ -1,6 +1,6 @@
 # Status: DEMO Domain
 
-**Version**: 1.105.0
+**Version**: 1.106.0
 
 **Posture**: ACTIVELY EXPANDING FOR V2
 
@@ -17,6 +17,7 @@ The DEMO domain is responsible for:
 
 
 ## Completed Tasks
+- [v1.106.0] ✅ Completed: React CSS Animation - Created/Verified `examples/react-css-animation` demonstrating CSS animation sync with `autoSyncAnimations: true`.
 - [v1.105.0] ✅ Completed: Vue D3 Animation - Created `examples/vue-d3-animation` demonstrating D3.js integration with Vue 3.
 - [v1.104.1] ✅ Verified: Fix Root Build - Verified that root `npm install` and `npm run build:examples` work correctly, confirming that dependency mismatches are resolved.
 - [v1.104.0] ✅ Completed: React Components Demo - Created `examples/react-components-demo` to verify and demonstrate registry components (`Timer`, `ProgressBar`, `Watermark`). Note: Discovered and patched broken API usage in the registry components locally.
