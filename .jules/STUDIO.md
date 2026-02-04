@@ -57,3 +57,7 @@
 ## [0.93.2] - Ephemeral Render Config
 **Learning:** The `RenderConfig` in `StudioContext` was implemented as in-memory state only, causing users to lose complex FFmpeg settings (bitrate, codec) on every page reload. This gap in persistence significantly degrades the "IDE" experience.
 **Action:** For all configuration-heavy UIs (like Render Settings), state persistence via `localStorage` must be part of the MVP, not a follow-up.
+
+## [0.94.1] - Input Props Persistence
+**Learning:** While `composition.json` existed for metadata (fps, size), it did not store the most critical user configuration: input props. Users lost their work on reload. This was a vision gap in "WYSIWYG" editing.
+**Action:** Ensure all user-configurable state in the Studio (including props) is persisted to the project filesystem (`composition.json`) to serve as the single source of truth.
