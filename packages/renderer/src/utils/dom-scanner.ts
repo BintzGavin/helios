@@ -76,8 +76,19 @@ export async function scanForAudioTracks(page: Page): Promise<AudioTrackConfig[]
             const fadeOut = el.dataset.heliosFadeOut ? parseFloat(el.dataset.heliosFadeOut) : 0;
             const volume = el.muted ? 0 : el.volume;
             // Get playbackRate from property or attribute
-            const rateAttr = el.getAttribute('playbackRate');
-            const rate = el.playbackRate !== undefined ? el.playbackRate : (rateAttr ? parseFloat(rateAttr) : 1.0);
+            let rate = el.playbackRate;
+            if (rate === 1.0) {
+              const rateAttr = el.getAttribute('playbackRate');
+              if (rateAttr) {
+                const parsed = parseFloat(rateAttr);
+                if (!isNaN(parsed)) {
+                  rate = parsed;
+                }
+              }
+            }
+            if (isNaN(rate) || rate <= 0) {
+              rate = 1.0;
+            }
 
             tracks.push({
               path: src,
