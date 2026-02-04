@@ -547,7 +547,7 @@ template.innerHTML = `
     }
   </style>
   <slot></slot>
-  <div class="audio-menu hidden" part="audio-menu"></div>
+  <div class="audio-menu hidden" part="audio-menu" id="audio-menu-container" role="dialog" aria-label="Audio Tracks"></div>
   <div class="debug-overlay hidden" part="debug-overlay">
     <div class="debug-header">
       <span class="debug-title">Diagnostics</span>
@@ -576,7 +576,7 @@ template.innerHTML = `
       <button class="volume-btn" part="volume-button" aria-label="Mute">🔊</button>
       <input type="range" class="volume-slider" min="0" max="1" step="0.05" value="1" part="volume-slider" aria-label="Volume">
     </div>
-    <button class="audio-btn" part="audio-button" aria-label="Audio Tracks" style="display: none;">🎵</button>
+    <button class="audio-btn" part="audio-button" aria-label="Audio Tracks" style="display: none;" aria-haspopup="true" aria-controls="audio-menu-container" aria-expanded="false">🎵</button>
     <button class="cc-btn" part="cc-button" aria-label="Toggle Captions">CC</button>
     <button class="export-btn" part="export-button" aria-label="Export video">Export</button>
     <select class="speed-selector" part="speed-selector" aria-label="Playback speed">
@@ -1236,13 +1236,19 @@ export class HeliosPlayer extends HTMLElement {
         if (this.audioMenu.classList.contains("hidden")) {
             this.renderAudioMenu();
             this.audioMenu.classList.remove("hidden");
+            this.audioBtn.setAttribute("aria-expanded", "true");
+            const firstFocusable = this.audioMenu.querySelector("input, button");
+            if (firstFocusable) {
+                firstFocusable.focus();
+            }
         }
         else {
-            this.audioMenu.classList.add("hidden");
+            this.closeAudioMenu();
         }
     };
     closeAudioMenu = () => {
         this.audioMenu.classList.add("hidden");
+        this.audioBtn.setAttribute("aria-expanded", "false");
     };
     closeAudioMenuIfOutside = (e) => {
         // If menu is hidden, do nothing
@@ -1844,6 +1850,14 @@ export class HeliosPlayer extends HTMLElement {
     handleKeydown = (e) => {
         if (this.isExporting)
             return;
+        if (e.key === "Escape") {
+            if (!this.audioMenu.classList.contains("hidden")) {
+                e.stopPropagation();
+                this.closeAudioMenu();
+                this.audioBtn.focus();
+            }
+            return;
+        }
         // Allow bubbling from children (like buttons), but ignore inputs
         const target = e.composedPath()[0];
         if (target && target.tagName) {
