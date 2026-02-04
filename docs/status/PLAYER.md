@@ -1,4 +1,4 @@
-**Version**: v0.67.0
+**Version**: v0.66.3
 
 **Posture**: STABLE AND FEATURE COMPLETE
 
@@ -59,7 +59,8 @@
 ## Critical Task
 - **None**: All critical tasks completed.
 
-[v0.67.0] ✅ Completed: Audio Track UI - Implemented audio menu in player controls to mute/unmute and adjust volume of individual audio tracks.
+[v0.66.3] ✅ Verified: Synced package.json version with status file and verified all tests pass.
+[v0.66.3] ✅ Completed: Audio Track UI - Implemented audio menu in player controls to mute/unmute and adjust volume of individual audio tracks.
 [v0.66.2] ✅ Completed: Handle Connection Timeouts - Implemented error state and event dispatching on connection timeout.
 [v0.66.1] ✅ Completed: Responsive Images - Implemented support for capturing currentSrc of responsive images during client-side export, ensuring high-fidelity output.
 [v0.66.0] ✅ Completed: Implement VideoTracks API - Implemented videoTracks property and VideoTrackList API on <helios-player> to complete Standard Media API parity.
