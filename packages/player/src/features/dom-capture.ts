@@ -3,7 +3,7 @@ export async function captureDomToBitmap(element: HTMLElement, options?: { targe
 
   // 1. Clone & Inline Assets
   let clone = cloneWithShadow(element) as HTMLElement;
-  await inlineImages(clone);
+  await inlineImages(element, clone);
   clone = inlineCanvases(element, clone);
   clone = inlineVideos(element, clone);
 
@@ -124,57 +124,75 @@ async function processCss(css: string, baseUrl: string): Promise<string> {
   return processedCss;
 }
 
-async function inlineImages(root: HTMLElement | DocumentFragment): Promise<void> {
+async function inlineImages(original: HTMLElement, clone: HTMLElement): Promise<void> {
   const promises: Promise<void>[] = [];
+  inlineImagesRecursive(original, clone, promises);
+  await Promise.all(promises);
+}
 
-  const processNode = (node: Element | DocumentFragment) => {
-    // A. Handle <img> tags
-    const images = node.querySelectorAll('img');
-    images.forEach((img) => {
-      if (img.src && !img.src.startsWith('data:')) {
+function inlineImagesRecursive(original: Node, clone: Node, promises: Promise<void>[]) {
+  // 1. Process Current Node
+  if (original instanceof HTMLImageElement && clone instanceof HTMLImageElement) {
+    const src = original.currentSrc || original.src;
+    if (src && !src.startsWith('data:')) {
+      promises.push(
+        fetchAsDataUri(src)
+          .then((dataUri) => {
+            (clone as HTMLImageElement).src = dataUri;
+            (clone as HTMLImageElement).removeAttribute('srcset');
+            (clone as HTMLImageElement).removeAttribute('sizes');
+          })
+          .catch((e) => console.warn('Helios: Failed to inline image:', src, e))
+      );
+    }
+  } else if (original instanceof HTMLElement && clone instanceof HTMLElement) {
+    // Handle background-images (inline styles only)
+    const bg = clone.style.backgroundImage;
+    if (bg && bg.includes('url(')) {
+      const match = bg.match(/url\(['"]?(.*?)['"]?\)/);
+      if (match && match[1] && !match[1].startsWith('data:')) {
         promises.push(
-          fetchAsDataUri(img.src)
+          fetchAsDataUri(match[1])
             .then((dataUri) => {
-              img.src = dataUri;
+              // Replace the specific URL instance to preserve other layers (gradients, etc.)
+              clone.style.backgroundImage = clone.style.backgroundImage.replace(
+                match[0],
+                `url("${dataUri}")`
+              );
             })
-            .catch((e) => console.warn('Helios: Failed to inline image:', img.src, e))
+            .catch((e) => console.warn('Helios: Failed to inline background:', match[1], e))
         );
       }
-    });
+    }
+  }
 
-    // B. Handle background-images (inline styles only)
-    const elementsWithStyle = node.querySelectorAll('[style*="background-image"]');
-    elementsWithStyle.forEach((el) => {
-      const element = el as HTMLElement;
-      const bg = element.style.backgroundImage;
-      if (bg && bg.includes('url(')) {
-        const match = bg.match(/url\(['"]?(.*?)['"]?\)/);
-        if (match && match[1] && !match[1].startsWith('data:')) {
-          promises.push(
-            fetchAsDataUri(match[1])
-              .then((dataUri) => {
-                // Replace the specific URL instance to preserve other layers (gradients, etc.)
-                element.style.backgroundImage = element.style.backgroundImage.replace(
-                  match[0],
-                  `url("${dataUri}")`
-                );
-              })
-              .catch((e) => console.warn('Helios: Failed to inline background:', match[1], e))
-          );
-        }
-      }
-    });
+  // 2. Recurse Children
+  const originalChildren = Array.from(original.childNodes);
+  let cloneChildren = Array.from(clone.childNodes);
 
-    // C. Recurse into templates (Shadow DOM)
-    const templates = node.querySelectorAll('template');
-    templates.forEach((t) => {
-      processNode(t.content);
-    });
-  };
+  // Check for Shadow DOM / Template
+  if (original instanceof Element && original.shadowRoot) {
+    const template = cloneChildren.find(
+      (n) => n instanceof HTMLTemplateElement && n.hasAttribute('shadowrootmode')
+    ) as HTMLTemplateElement | undefined;
+    if (template) {
+      // Remove template from cloneChildren list to match originalChildren
+      cloneChildren = cloneChildren.filter((n) => n !== template);
+      // Recurse into shadow
+      inlineImagesRecursive(original.shadowRoot, template.content, promises);
+    }
+  }
 
-  processNode(root);
+  // Check for explicit template elements
+  if (original instanceof HTMLTemplateElement && clone instanceof HTMLTemplateElement) {
+     // Note: Standard cloneNode(false) on template doesn't clone content, so clone.content might be empty.
+     // If cloneWithShadow didn't handle it, we can't do much here unless we manually clone content.
+     // But inlineCanvases doesn't handle this either, so preserving parity.
+  }
 
-  await Promise.all(promises);
+  for (let i = 0; i < Math.min(originalChildren.length, cloneChildren.length); i++) {
+    inlineImagesRecursive(originalChildren[i], cloneChildren[i], promises);
+  }
 }
 
 async function fetchAsDataUri(url: string): Promise<string> {

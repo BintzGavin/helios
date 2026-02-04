@@ -371,4 +371,37 @@ describe('dom-capture', () => {
         expect(text).toContain('width="1280"');
         expect(text).toContain('height="720"');
     });
+
+    it('should use currentSrc for responsive images', async () => {
+        const img = document.createElement('img');
+        img.srcset = 'small.png 500w, large.png 1000w';
+        img.src = 'fallback.png';
+
+        // Mock currentSrc behavior
+        Object.defineProperty(img, 'currentSrc', {
+            value: 'https://example.com/large.png',
+            writable: true
+        });
+
+        container.appendChild(img);
+
+        const mockBlob = new Blob(['mock-large-data'], { type: 'image/png' });
+        fetchSpy.mockResolvedValue({
+            ok: true,
+            blob: () => Promise.resolve(mockBlob)
+        });
+
+        await captureDomToBitmap(container);
+
+        // Should fetch the currentSrc, not the fallback src
+        expect(fetchSpy).toHaveBeenCalledWith('https://example.com/large.png');
+
+        const blob = (URL.createObjectURL as any).mock.calls[0][0] as Blob;
+        const text = await readBlob(blob);
+
+        // The src should be replaced with a data URI
+        expect(text).toContain('data:image/png;base64,');
+        // srcset and sizes should be removed
+        expect(text).not.toContain('srcset');
+    });
 });
