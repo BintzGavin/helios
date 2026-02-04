@@ -17,3 +17,7 @@ Critical learnings only. This is not a log—only add entries for insights that 
 ## [0.4.1] - Init Scope Gap
 **Learning:** `helios init` was documented as "implemented" but only generated a config file, lacking the project scaffolding required by the Vision ("scaffold new Helios projects"). "Implemented" status can obscure scope gaps.
 **Action:** Verify "implemented" commands against the Vision (`AGENTS.md`) to distinguish between "MVP exists" and "Vision Complete".
+
+## [0.6.0] - Registry Architecture
+**Learning:** The existing component registry was hardcoded in `manifest.ts` (V1 MVP), conflicting with the V2 "Shadcn-style" vision which requires dynamic/remote fetching.
+**Action:** Created plan `2026-03-01-CLI-Remote-Registry.md` to decouple the registry. Future implementations must prioritize externalizing data sources over embedding them in the binary.
