@@ -1,3 +1,6 @@
+## DEMO v1.104.1
+- ✅ Verified: Fix Root Build - Verified that root `npm install` and `npm run build:examples` work correctly, confirming that dependency mismatches are resolved.
+
 ## DEMO v1.104.0
 - ✅ Completed: React Components Demo - Created `examples/react-components-demo` to verify and demonstrate registry components (`Timer`, `ProgressBar`, `Watermark`). Note: Discovered and patched broken API usage in the registry components locally.
 
