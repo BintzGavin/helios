@@ -1,3 +1,6 @@
+## RENDERER v1.63.3
+- ✅ Completed: Restore Verification Suite - Fixed dependency version mismatch for `@helios-project/core` (syncing to 5.10.0) and restored Playwright environment (resolved missing binaries), ensuring 50+ verification scripts pass.
+
 ## RENDERER v1.63.1
 - ✅ Completed: Update Verification Suite - Added orphaned verification scripts (`verify-canvas-shadow-dom.ts` and `verify-pseudo-element-preload.ts`) to the main test runner `run-all.ts` and fixed type errors in `verify-advanced-audio.ts` and `verify-audio-args.ts` caused by `getFFmpegArgs` return type change.
 
