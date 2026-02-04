@@ -1,3 +1,6 @@
+## STUDIO v0.94.1
+- ✅ Verified: Render Presets - Added unit tests for RenderConfig and StudioContext persistence, ensuring robustness.
+
 ## STUDIO v0.94.0
 - ✅ Completed: Render Presets - Implemented render configuration presets (Draft, HD, 4K) and persistence for render settings.
 

@@ -1,4 +1,4 @@
-**Version**: 0.94.0
+**Version**: 0.94.1
 
 **Posture**: ACTIVELY EXPANDING FOR V2
 
@@ -126,3 +126,4 @@
 - [v0.2.0] ✅ Completed: Scaffold CLI Package - Created @helios-project/cli and studio command.
 - [v0.1.0] ✅ Completed: Scaffold Studio Package - Created package structure, config, and basic UI.
 - [2026-02-18] Initialized domain status and created scaffold plan.
+- [v0.94.1] ✅ Verified: Render Presets - Added unit tests for RenderConfig and StudioContext persistence, ensuring robustness.
