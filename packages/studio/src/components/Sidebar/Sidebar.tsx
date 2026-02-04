@@ -7,10 +7,11 @@ import { RendersPanel } from '../RendersPanel/RendersPanel';
 import { CaptionsPanel } from '../CaptionsPanel/CaptionsPanel';
 import { CompositionsPanel } from '../CompositionsPanel/CompositionsPanel';
 import { AudioMixerPanel } from '../AudioMixerPanel/AudioMixerPanel';
+import { ComponentsPanel } from '../ComponentsPanel/ComponentsPanel';
 
 export const Sidebar: React.FC = () => {
   const { setHelpOpen, setDiagnosticsOpen, setAssistantOpen } = useStudio();
-  const [activeTab, setActiveTab] = usePersistentState<'compositions' | 'assets' | 'renders' | 'captions' | 'audio'>('sidebar-active-tab', 'compositions');
+  const [activeTab, setActiveTab] = usePersistentState<'compositions' | 'assets' | 'renders' | 'captions' | 'audio' | 'components'>('sidebar-active-tab', 'compositions');
 
   return (
     <div className="studio-sidebar">
@@ -26,6 +27,12 @@ export const Sidebar: React.FC = () => {
           onClick={() => setActiveTab('assets')}
         >
           Assets
+        </button>
+        <button
+          className={`sidebar-tab ${activeTab === 'components' ? 'active' : ''}`}
+          onClick={() => setActiveTab('components')}
+        >
+          Components
         </button>
         <button
           className={`sidebar-tab ${activeTab === 'captions' ? 'active' : ''}`}
@@ -49,6 +56,7 @@ export const Sidebar: React.FC = () => {
       <div className="sidebar-content">
         {activeTab === 'compositions' && <CompositionsPanel />}
         {activeTab === 'assets' && <AssetsPanel />}
+        {activeTab === 'components' && <ComponentsPanel />}
         {activeTab === 'captions' && <CaptionsPanel />}
         {activeTab === 'audio' && <AudioMixerPanel />}
         {activeTab === 'renders' && <RendersPanel />}

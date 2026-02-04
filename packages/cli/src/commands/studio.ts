@@ -3,6 +3,8 @@ import { createServer } from 'vite';
 import { studioApiPlugin } from '@helios-project/studio/cli';
 import { createRequire } from 'module';
 import path from 'path';
+import { registry } from '../registry/manifest.js';
+import { installComponent } from '../utils/install.js';
 
 export function registerStudioCommand(program: Command) {
   program
@@ -38,7 +40,11 @@ export function registerStudioCommand(program: Command) {
           },
           plugins: [
             studioApiPlugin({
-              studioRoot: studioDist
+              studioRoot: studioDist,
+              components: registry,
+              onInstallComponent: async (name) => {
+                await installComponent(process.cwd(), name);
+              }
             })
           ]
         });
