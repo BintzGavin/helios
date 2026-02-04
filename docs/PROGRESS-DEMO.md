@@ -1,3 +1,6 @@
+## DEMO v1.104.0
+- ✅ Completed: React Components Demo - Created `examples/react-components-demo` to verify and demonstrate registry components (`Timer`, `ProgressBar`, `Watermark`). Note: Discovered and patched broken API usage in the registry components locally.
+
 ## DEMO v1.103.0
 - ✅ Completed: Solid Pixi Animation - Created `examples/solid-pixi-animation` demonstrating integration with PixiJS v8 and SolidJS.
 

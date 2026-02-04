@@ -1,6 +1,6 @@
 # Status: DEMO Domain
 
-**Version**: 1.103.0
+**Version**: 1.104.0
 
 **Posture**: ACTIVELY EXPANDING FOR V2
 
@@ -12,11 +12,13 @@ The DEMO domain is responsible for:
 
 ## Blocked Items
 - **Root Build Dependency Mismatch**: The `packages/studio`, `packages/player`, and `packages/renderer` have desynchronized dependencies on `@helios-project/core` (requiring `5.5.0` or `^5.4.0` while workspace is `5.7.0`), causing `npm install` to fail at the root. This blocks clean builds of examples without manual intervention.
+- **CLI Registry Components Broken**: The components defined in `packages/cli/src/registry/manifest.ts` use outdated APIs (accessing `helios.config`) which causes runtime errors. The `examples/react-components-demo` has manually fixed versions.
 
 ## Active Tasks
 
 
 ## Completed Tasks
+- [v1.104.0] ✅ Completed: React Components Demo - Created `examples/react-components-demo` to verify and demonstrate registry components (`Timer`, `ProgressBar`, `Watermark`). Note: Discovered and patched broken API usage in the registry components locally.
 - [v1.103.0] ✅ Completed: Solid Pixi Animation - Created `examples/solid-pixi-animation` demonstrating integration with PixiJS v8 and SolidJS.
 - [v1.102.0] ✅ Completed: Update Client Export Verification - Updated `tests/e2e/verify-client-export.ts` to include recent audio visualization and PixiJS examples in canvas overrides.
 - [v1.101.0] ✅ Completed: Svelte Pixi Animation - Created `examples/svelte-pixi-animation` demonstrating integration with PixiJS v8 and Svelte 5.
