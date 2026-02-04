@@ -30,6 +30,7 @@
     "dev:vue-helpers": "vite serve examples/vue-animation-helpers",
     "dev:react-helpers": "vite serve examples/react-animation-helpers",
     "dev:svelte": "vite serve examples/svelte-canvas-animation",
+    "dev:solid-dom": "vite serve examples/solid-dom-animation",
     "dev:threejs": "vite serve examples/threejs-canvas-animation",
     "dev:pixi": "vite serve examples/pixi-canvas-animation",
     "dev:p5": "vite serve examples/p5-canvas-animation",
