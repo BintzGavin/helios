@@ -1,4 +1,4 @@
-**Version**: 0.87.1
+**Version**: 0.88.0
 
 **Posture**: ACTIVELY EXPANDING FOR V2
 
@@ -9,6 +9,7 @@
 **Focus**: UI Implementation & CLI
 
 ## Recent Updates
+- [v0.88.0] ✅ Completed: CLI Scaffold - Implemented `helios init` and `helios add` commands to scaffold project configuration and component structure.
 - [v0.87.1] ✅ Verified: Distributed Rendering Config - Verified implementation of concurrency control in Renders Panel and RenderManager, ensuring correct usage of RenderOrchestrator.
 - [v0.87.0] ✅ Completed: Distributed Rendering Config - Implemented concurrency control in the Studio Renders Panel and updated backend to use `RenderOrchestrator` for parallel rendering.
 - [v0.86.0] ✅ Completed: Audio Mixer Solo - Implemented "Solo" functionality in Audio Mixer Panel, allowing isolation of individual audio tracks with mute state restoration.

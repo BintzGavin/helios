@@ -1,3 +1,6 @@
+## STUDIO v0.88.0
+- ✅ Completed: CLI Scaffold - Implemented `helios init` and `helios add` commands to scaffold project configuration and component structure.
+
 ## STUDIO v0.87.1
 - ✅ Verified: Distributed Rendering Config - Verified implementation of concurrency control in Renders Panel and RenderManager, ensuring correct usage of RenderOrchestrator.
 
