@@ -1,6 +1,6 @@
 # CLI Status
 
-**Version**: 0.5.1
+**Version**: 0.5.2
 
 ## Current State
 
@@ -14,7 +14,7 @@ The Helios CLI (`packages/cli`) provides the command-line interface for the Heli
 ## Existing Commands
 
 - `helios studio` - Launches the Helios Studio dev server
-- `helios init` - Initializes a new Helios project configuration
+- `helios init` - Initializes a new Helios project configuration and scaffolds project structure
 - `helios add` - Adds a component to the project
 - `helios components` - Lists available components in the registry
 - `helios render` - Renders a composition to video
@@ -38,3 +38,4 @@ Per AGENTS.md, the CLI is "ACTIVELY EXPANDING FOR V2" with focus on:
 [v0.4.1] ✅ Implement Render Command - Implemented `helios render` command using `@helios-project/renderer`
 [v0.5.0] ✅ Distributed Rendering Support - Added `--start-frame` and `--frame-count` to `helios render`
 [v0.5.1] ✅ Fix Registry Components - Updated component registry to use V2 Helios Signals (`fps.value`, `duration.value`)
+[v0.5.2] ✅ Project Scaffolding - Updated `helios init` to scaffold a full React+Vite project structure when `package.json` is missing
