@@ -980,8 +980,10 @@ export class HeliosPlayer extends HTMLElement {
             return;
         // Helios "muted" is the inverse of AudioTrack "enabled"
         this.controller.setAudioTrackMuted(track.id, !track.enabled);
+        this._audioTracks.dispatchChangeEvent();
     }
     handleTrackModeChange(track) {
+        this._textTracks.dispatchChangeEvent();
         if (!this.controller)
             return;
         if (track.mode === 'showing') {
@@ -994,7 +996,7 @@ export class HeliosPlayer extends HTMLElement {
                 }
             }
             // Extract cues into the format Helios expects
-            const captions = track.cues.map((cue, index) => ({
+            const captions = Array.from(track.cues).map((cue, index) => ({
                 id: cue.id || String(index + 1),
                 startTime: cue.startTime * 1000, // Convert seconds to milliseconds
                 endTime: cue.endTime * 1000, // Convert seconds to milliseconds
@@ -1006,7 +1008,7 @@ export class HeliosPlayer extends HTMLElement {
             // If hiding/disabling, check if any other track is showing
             const showingTrack = Array.from(this._textTracks).find(t => t.mode === 'showing' && t.kind === 'captions');
             if (showingTrack) {
-                const captions = showingTrack.cues.map((cue, index) => ({
+                const captions = Array.from(showingTrack.cues).map((cue, index) => ({
                     id: cue.id || String(index + 1),
                     startTime: cue.startTime * 1000, // Convert seconds to milliseconds
                     endTime: cue.endTime * 1000, // Convert seconds to milliseconds
