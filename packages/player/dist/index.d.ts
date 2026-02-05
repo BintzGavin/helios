@@ -197,6 +197,8 @@ export declare class HeliosPlayer extends HTMLElement implements TrackHost, Audi
     getController(): HeliosController | null;
     getSchema(): Promise<HeliosSchema | undefined>;
     diagnose(): Promise<DiagnosticReport>;
+    startAudioMetering(): void;
+    stopAudioMetering(): void;
     private retryConnection;
     private renderClientSide;
 }

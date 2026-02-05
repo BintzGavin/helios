@@ -1,8 +1,12 @@
 import { Helios } from "@helios-project/core";
 import { captureDomToBitmap } from "./features/dom-capture";
 import { getAudioAssets } from "./features/audio-utils";
+import { AudioMeter } from "./features/audio-metering";
 
 export function connectToParent(helios: Helios) {
+  let audioMeter: AudioMeter | null = null;
+  let audioMeterRaf: number | null = null;
+
   // 1. Listen for messages from parent
   window.addEventListener('message', async (event) => {
     if (event.source !== window.parent) return;
@@ -103,6 +107,31 @@ export function connectToParent(helios: Helios) {
       case 'HELIOS_GET_SCHEMA':
         window.parent.postMessage({ type: 'HELIOS_SCHEMA', schema: helios.schema }, '*');
         break;
+      case 'HELIOS_START_METERING':
+        if (!audioMeter) {
+          audioMeter = new AudioMeter();
+          audioMeter.connect(document);
+
+          const loop = () => {
+            if (audioMeter) {
+              const levels = audioMeter.getLevels();
+              window.parent.postMessage({ type: 'HELIOS_AUDIO_LEVELS', levels }, '*');
+            }
+            audioMeterRaf = requestAnimationFrame(loop);
+          };
+          audioMeterRaf = requestAnimationFrame(loop);
+        }
+        break;
+      case 'HELIOS_STOP_METERING':
+        if (audioMeterRaf) {
+          cancelAnimationFrame(audioMeterRaf);
+          audioMeterRaf = null;
+        }
+        if (audioMeter) {
+          audioMeter.dispose();
+          audioMeter = null;
+        }
+        break;
       case 'HELIOS_DIAGNOSE':
         const report = await Helios.diagnose();
         window.parent.postMessage({ type: 'HELIOS_DIAGNOSE_RESULT', report }, '*');
@@ -118,7 +147,7 @@ export function connectToParent(helios: Helios) {
   window.parent.postMessage({ type: 'HELIOS_READY', state: helios.getState() }, '*');
 
   // 3. Subscribe to Helios state changes and broadcast
-  helios.subscribe((state) => {
+  helios.subscribe((state: any) => {
     window.parent.postMessage({ type: 'HELIOS_STATE', state }, '*');
   });
 

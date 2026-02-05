@@ -1,6 +1,7 @@
 import { Helios, CaptionCue, HeliosSchema, DiagnosticReport, Marker } from "@helios-project/core";
 import { captureDomToBitmap } from "./features/dom-capture";
 import { getAudioAssets, AudioAsset } from "./features/audio-utils";
+import { AudioMeter, AudioLevels } from "./features/audio-metering";
 
 export interface HeliosController {
   play(): void;
@@ -28,9 +29,16 @@ export interface HeliosController {
   getAudioTracks(): Promise<AudioAsset[]>;
   getSchema(): Promise<HeliosSchema | undefined>;
   diagnose(): Promise<DiagnosticReport>;
+  startAudioMetering(): void;
+  stopAudioMetering(): void;
+  onAudioMetering(callback: (levels: AudioLevels) => void): () => void;
 }
 
 export class DirectController implements HeliosController {
+  private audioMeter: AudioMeter | null = null;
+  private audioMeteringCallback: ((levels: AudioLevels) => void) | null = null;
+  private audioMeteringRaf: number | null = null;
+
   constructor(public instance: Helios, private iframe?: HTMLIFrameElement) {}
   play() { this.instance.play(); }
   pause() { this.instance.pause(); }
@@ -51,7 +59,43 @@ export class DirectController implements HeliosController {
   setMarkers(markers: Marker[]) { this.instance.setMarkers(markers); }
   subscribe(callback: (state: any) => void) { return this.instance.subscribe(callback); }
   getState() { return this.instance.getState(); }
-  dispose() { /* No-op for direct */ }
+  dispose() {
+    this.stopAudioMetering();
+  }
+
+  startAudioMetering() {
+    if (this.audioMeter) return;
+    this.audioMeter = new AudioMeter();
+    const doc = this.iframe?.contentDocument || document;
+    this.audioMeter.connect(doc);
+
+    const loop = () => {
+      if (this.audioMeter && this.audioMeteringCallback) {
+        const levels = this.audioMeter.getLevels();
+        this.audioMeteringCallback(levels);
+      }
+      this.audioMeteringRaf = requestAnimationFrame(loop);
+    };
+    this.audioMeteringRaf = requestAnimationFrame(loop);
+  }
+
+  stopAudioMetering() {
+    if (this.audioMeteringRaf) {
+      cancelAnimationFrame(this.audioMeteringRaf);
+      this.audioMeteringRaf = null;
+    }
+    if (this.audioMeter) {
+      this.audioMeter.dispose();
+      this.audioMeter = null;
+    }
+  }
+
+  onAudioMetering(callback: (levels: AudioLevels) => void): () => void {
+    this.audioMeteringCallback = callback;
+    return () => {
+      this.audioMeteringCallback = null;
+    };
+  }
 
   onError(callback: (err: any) => void): () => void {
     const target = this.iframe?.contentWindow || window;
@@ -139,6 +183,7 @@ export class DirectController implements HeliosController {
 export class BridgeController implements HeliosController {
   private listeners: ((state: any) => void)[] = [];
   private errorListeners: ((err: any) => void)[] = [];
+  private audioMeteringListeners: ((levels: AudioLevels) => void)[] = [];
   private lastState: any;
 
   constructor(private iframeWindow: Window, initialState?: any) {
@@ -154,6 +199,8 @@ export class BridgeController implements HeliosController {
       this.notifyListeners();
     } else if (event.data?.type === 'HELIOS_ERROR') {
       this.notifyErrorListeners(event.data.error);
+    } else if (event.data?.type === 'HELIOS_AUDIO_LEVELS') {
+      this.notifyAudioMeteringListeners(event.data.levels);
     }
   }
 
@@ -163,6 +210,10 @@ export class BridgeController implements HeliosController {
 
   private notifyErrorListeners(err: any) {
     this.errorListeners.forEach(cb => cb(err));
+  }
+
+  private notifyAudioMeteringListeners(levels: AudioLevels) {
+    this.audioMeteringListeners.forEach(cb => cb(levels));
   }
 
   play() { this.iframeWindow.postMessage({ type: 'HELIOS_PLAY' }, '*'); }
@@ -183,6 +234,9 @@ export class BridgeController implements HeliosController {
   setSize(width: number, height: number) { this.iframeWindow.postMessage({ type: 'HELIOS_SET_SIZE', width, height }, '*'); }
   setMarkers(markers: Marker[]) { this.iframeWindow.postMessage({ type: 'HELIOS_SET_MARKERS', markers }, '*'); }
 
+  startAudioMetering() { this.iframeWindow.postMessage({ type: 'HELIOS_START_METERING' }, '*'); }
+  stopAudioMetering() { this.iframeWindow.postMessage({ type: 'HELIOS_STOP_METERING' }, '*'); }
+
   subscribe(callback: (state: any) => void) {
     this.listeners.push(callback);
     // Call immediately with current state
@@ -199,12 +253,21 @@ export class BridgeController implements HeliosController {
     };
   }
 
+  onAudioMetering(callback: (levels: AudioLevels) => void) {
+    this.audioMeteringListeners.push(callback);
+    return () => {
+      this.audioMeteringListeners = this.audioMeteringListeners.filter(l => l !== callback);
+    };
+  }
+
   getState() { return this.lastState; }
 
   dispose() {
+      this.stopAudioMetering();
       window.removeEventListener('message', this.handleMessage);
       this.listeners = [];
       this.errorListeners = [];
+      this.audioMeteringListeners = [];
   }
 
   async captureFrame(frame: number, options?: { selector?: string, mode?: 'canvas' | 'dom', width?: number, height?: number }): Promise<{ frame: VideoFrame, captions: CaptionCue[] } | null> {

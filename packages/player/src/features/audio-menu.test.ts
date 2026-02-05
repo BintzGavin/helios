@@ -57,7 +57,7 @@ describe('Audio Menu Accessibility', () => {
         setPlaybackRange: vi.fn(),
         clearPlaybackRange: vi.fn(),
         captureFrame: vi.fn(),
-        getAudioTracks: vi.fn()
+        getAudioTracks: vi.fn(), startAudioMetering: vi.fn(), stopAudioMetering: vi.fn(), onAudioMetering: vi.fn().mockReturnValue(() => {}), diagnose: vi.fn()
     };
     (player as any).setController(mockController);
   });

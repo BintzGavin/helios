@@ -49,6 +49,7 @@ The `<helios-player>` component dispatches standard HTMLMediaElement events and 
 - `enterpictureinpicture`: Entered PiP mode.
 - `leavepictureinpicture`: Left PiP mode.
 - `cuechange`: Active cues changed (dispatched by TextTrack, but bubbles or handled).
+- `audiometering`: Audio metering data available (custom event with `detail: AudioLevels`).
 
 ## C. Attributes
 The component observes or reads the following attributes:
@@ -84,5 +85,5 @@ The component observes or reads the following attributes:
 The `HeliosPlayer` class exposes properties and methods closely mirroring `HTMLMediaElement`:
 
 - **Properties**: `currentTime`, `duration`, `paused`, `ended`, `volume`, `muted`, `playbackRate`, `src`, `currentSrc`, `error`, `readyState`, `networkState`, `buffered`, `seekable`, `played`, `videoWidth`, `videoHeight`, `textTracks`, `audioTracks`, `videoTracks`, `disablePictureInPicture`, `inputProps`.
-- **Methods**: `play()`, `pause()`, `load()`, `addTextTrack()`, `requestPictureInPicture()`, `diagnose()`.
+- **Methods**: `play()`, `pause()`, `load()`, `addTextTrack()`, `requestPictureInPicture()`, `diagnose()`, `startAudioMetering()`, `stopAudioMetering()`.
 - **Getters**: `getController()` (Returns internal controller instance).

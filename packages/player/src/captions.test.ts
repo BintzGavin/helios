@@ -39,7 +39,11 @@ describe('HeliosPlayer Captions', () => {
       dispose: vi.fn(),
       captureFrame: vi.fn(),
       getAudioTracks: vi.fn(),
-      getSchema: vi.fn()
+      getSchema: vi.fn(),
+      startAudioMetering: vi.fn(),
+      stopAudioMetering: vi.fn(),
+      onAudioMetering: vi.fn().mockReturnValue(() => {}),
+      diagnose: vi.fn()
     };
 
     // Create Player
