@@ -1,4 +1,4 @@
-**Version**: 0.97.1
+**Version**: 0.98.0
 
 **Posture**: ACTIVELY EXPANDING FOR V2
 
@@ -9,6 +9,7 @@
 **Focus**: UI Implementation & CLI
 
 ## Recent Updates
+- [v0.98.0] ✅ Completed: CLI Solid Init - Added SolidJS template support to `helios init` command.
 - [v0.97.1] ✅ Verified: Build & Tests - Verified studio build process and unit tests after ensuring dependencies (core, renderer, player) are built, confirming system integrity.
 - [v0.97.0] ✅ Completed: Draggable Time Markers - Implemented dragging for time-based input prop markers on the Timeline, allowing direct manipulation of prop values.
 - [v0.96.0] ✅ Completed: Sync Playback Range - Delegated loop and playback range enforcement to HeliosController, ensuring consistent behavior across Preview and Export.

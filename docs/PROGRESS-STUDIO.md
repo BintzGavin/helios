@@ -1,3 +1,6 @@
+## STUDIO v0.98.0
+- ✅ Completed: CLI Solid Init - Added SolidJS template support to `helios init` command.
+
 ## STUDIO v0.97.1
 - ✅ Verified: Build & Tests - Verified studio build process and unit tests after ensuring dependencies (core, renderer, player) are built, confirming system integrity.
 
