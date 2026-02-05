@@ -1,3 +1,6 @@
+## PLAYER v0.70.3
+- ✅ Completed: Refactor Granular Playback - Refactored renderSettingsMenu to use dynamic generation for playback speed options.
+
 ## PLAYER v0.70.0
 - ✅ Completed: Settings Menu - Consolidated secondary controls (Speed, Loop, Range) into a Shadow DOM Settings Menu and removed the standalone speed selector.
 
