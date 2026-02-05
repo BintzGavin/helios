@@ -35,6 +35,9 @@ describe('StudioContext', () => {
       captureFrame: vi.fn(),
       seek: vi.fn(),
       play: vi.fn(),
+      setLoop: vi.fn(),
+      setPlaybackRange: vi.fn(),
+      clearPlaybackRange: vi.fn(),
     };
   });
 
@@ -122,7 +125,7 @@ describe('StudioContext', () => {
   });
 
   describe('Loop Logic', () => {
-    it('loops playback when currentFrame exceeds outPoint', async () => {
+    it('syncs loop state to controller', async () => {
       let context: any;
 
       render(
@@ -133,107 +136,60 @@ describe('StudioContext', () => {
 
       await waitFor(() => expect(context).toBeDefined());
 
-      // Setup state
+      act(() => {
+        context.setController(mockController);
+      });
+
+      // Enable loop
+      act(() => {
+        if (!context.loop) context.toggleLoop();
+      });
+
+      expect(mockController.setLoop).toHaveBeenCalledWith(true);
+
+      // Disable loop
+      act(() => {
+        if (context.loop) context.toggleLoop();
+      });
+
+      expect(mockController.setLoop).toHaveBeenCalledWith(false);
+    });
+
+    it('syncs playback range to controller', async () => {
+      let context: any;
+
+      render(
+        <StudioProvider>
+          <TestComponent onReady={(ctx) => { context = ctx; }} />
+        </StudioProvider>
+      );
+
+      await waitFor(() => expect(context).toBeDefined());
+
       act(() => {
         context.setController(mockController);
         context.setPlayerState((prev: any) => ({
           ...prev,
           duration: 10,
-          fps: 30,
-          isPlaying: true,
-          currentFrame: 50
+          fps: 30
         }));
-        context.setInPoint(30);
-        context.setOutPoint(60);
-        // Enable loop
-        if (!context.loop) context.toggleLoop();
       });
 
-      // Verify loop is enabled
-      expect(context.loop).toBe(true);
-
-      // Trigger frame update beyond outPoint (60)
-
-      // Update frame to 60
+      // Set range
       act(() => {
-        context.setPlayerState((prev: any) => ({ ...prev, currentFrame: 60 }));
+        context.setInPoint(10);
+        context.setOutPoint(50);
       });
 
-      // Verify seek and play called
-      expect(mockController.seek).toHaveBeenCalledWith(30);
-      expect(mockController.play).toHaveBeenCalled();
-    });
+      expect(mockController.setPlaybackRange).toHaveBeenCalledWith(10, 50);
 
-    it('loops playback when currentFrame exceeds totalFrames (outPoint=0)', async () => {
-      let context: any;
-
-      render(
-        <StudioProvider>
-          <TestComponent onReady={(ctx) => { context = ctx; }} />
-        </StudioProvider>
-      );
-
-      await waitFor(() => expect(context).toBeDefined());
-
-      // Setup state
+      // Clear range (full duration)
       act(() => {
-        context.setController(mockController);
-        context.setPlayerState((prev: any) => ({
-          ...prev,
-          duration: 2, // 60 frames
-          fps: 30,
-          isPlaying: true,
-          currentFrame: 10
-        }));
         context.setInPoint(0);
-        context.setOutPoint(0); // Default loop at end
-        if (!context.loop) context.toggleLoop();
+        context.setOutPoint(0);
       });
 
-      // totalFrames = 60. loopEnd = 60.
-
-      // Update frame to 60
-      act(() => {
-        context.setPlayerState((prev: any) => ({ ...prev, currentFrame: 60 }));
-      });
-
-      // Verify seek and play called (to 0)
-      expect(mockController.seek).toHaveBeenCalledWith(0);
-      expect(mockController.play).toHaveBeenCalled();
-    });
-
-    it('does not loop when loop is disabled', async () => {
-      let context: any;
-
-      render(
-        <StudioProvider>
-          <TestComponent onReady={(ctx) => { context = ctx; }} />
-        </StudioProvider>
-      );
-
-      await waitFor(() => expect(context).toBeDefined());
-
-      act(() => {
-        context.setController(mockController);
-        context.setPlayerState((prev: any) => ({
-          ...prev,
-          duration: 10,
-          fps: 30,
-          isPlaying: true,
-          currentFrame: 59
-        }));
-        context.setOutPoint(60);
-        // Ensure loop is disabled (default false)
-      });
-
-      expect(context.loop).toBe(false);
-
-      // Update frame
-      act(() => {
-        context.setPlayerState((prev: any) => ({ ...prev, currentFrame: 60 }));
-      });
-
-      expect(mockController.seek).not.toHaveBeenCalled();
+      expect(mockController.clearPlaybackRange).toHaveBeenCalled();
     });
   });
 

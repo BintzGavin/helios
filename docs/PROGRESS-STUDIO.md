@@ -1,3 +1,6 @@
+## STUDIO v0.96.0
+- ✅ Completed: Sync Playback Range - Delegated loop and playback range enforcement to HeliosController, ensuring consistent behavior across Preview and Export.
+
 ## STUDIO v0.95.2
 - ✅ Completed: Audio Metering - Implemented Master Audio Meter in the Mixer Panel header using `AudioMeter` component and real-time controller events.
 
