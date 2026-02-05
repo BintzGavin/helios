@@ -34,6 +34,7 @@ The `examples/` directory contains reference implementations for various framewo
 - **react-pixi-animation**: 2D animation with PixiJS and React.
 - **react-components-demo**: Demonstration of CLI Registry components (Timer, ProgressBar, Watermark).
 - **react-d3-animation**: Data visualization with D3.js and React.
+- **react-chartjs-animation**: Animated charts with Chart.js.
 
 ### Vue
 - **vue-dom-animation**: Basic Vue + DOM.

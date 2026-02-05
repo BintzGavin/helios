@@ -67,3 +67,7 @@
 ## [1.83.0] - Plan Scope Discipline
 **Learning:** As a Planner, I initially drafted a plan to *implement* the code myself, violating the role boundary. The system rejected this.
 **Action:** When creating plans, explicitly verify that every step is about *creating the spec file* or *verifying the spec*, not touching the target code.
+
+## [1.110.0] - React Helios Instantiation
+**Learning:** Newer examples or setups might not export a singleton `helios` instance from core. React examples should instantiate `Helios` manually and expose it/use it via context or direct import to ensure proper configuration (like `autoSyncAnimations: false`).
+**Action:** Always verify how `Helios` is initialized and accessed in the specific framework context when creating new examples.

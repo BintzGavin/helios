@@ -1,3 +1,6 @@
+## DEMO v1.110.0
+- ✅ Completed: React Chart.js Animation - Created `examples/react-chartjs-animation` demonstrating integration with Chart.js using synchronous updates in React.
+
 ## DEMO v1.109.0
 - ✅ Completed: Solid DOM Animation - Created `examples/solid-dom-animation` demonstrating SolidJS integration for DOM-based animations using `createHeliosSignal` and `autoSyncAnimations`.
 
