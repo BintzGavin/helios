@@ -1,3 +1,6 @@
+## PLAYER v0.68.1
+- ✅ Completed: Robust Audio Metering - Refactored `AudioMeter` to support non-destructive toggling, preventing audio playback from stopping when metering is disabled.
+
 ## PLAYER v0.66.5
 - ✅ Completed: Smart PiP Visibility - Implemented auto-hiding of Picture-in-Picture button when environment lacks support or `export-mode="dom"` is active.
 

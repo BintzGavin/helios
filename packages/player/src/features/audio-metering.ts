@@ -14,6 +14,7 @@ export class AudioMeter {
   private dataArrayRight: Float32Array;
   private sources: Map<HTMLMediaElement, MediaElementAudioSourceNode> = new Map();
   private elementListeners: Map<HTMLMediaElement, { listener: () => void, gainNode: GainNode }> = new Map();
+  private isEnabled: boolean = false;
 
   constructor() {
     const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
@@ -64,12 +65,15 @@ export class AudioMeter {
         // Store for cleanup
         this.elementListeners.set(el, { listener, gainNode });
 
-        // Metering path (Pre-fader to visualize activity even if muted)
-        source.connect(this.splitter);
-
         // Playback path (Post-fader to respect volume controls)
         source.connect(gainNode);
         gainNode.connect(this.ctx.destination);
+
+        // Metering path (Pre-fader to visualize activity even if muted)
+        // Only connect if enabled
+        if (this.isEnabled) {
+            source.connect(this.splitter);
+        }
 
         this.sources.set(el, source);
       } catch (e) {
@@ -80,7 +84,41 @@ export class AudioMeter {
     });
   }
 
+  enable() {
+    if (this.isEnabled) return;
+    this.isEnabled = true;
+
+    if (this.ctx.state === 'suspended') {
+        this.ctx.resume().catch(e => console.warn("AudioMeter: Failed to resume context", e));
+    }
+
+    this.sources.forEach(source => {
+        try {
+            source.connect(this.splitter);
+        } catch (e) {
+            // Already connected or error
+        }
+    });
+  }
+
+  disable() {
+    if (!this.isEnabled) return;
+    this.isEnabled = false;
+
+    this.sources.forEach(source => {
+        try {
+            source.disconnect(this.splitter);
+        } catch (e) {
+            // ignore
+        }
+    });
+  }
+
   getLevels(): AudioLevels {
+    if (!this.isEnabled) {
+        return { left: 0, right: 0, peakLeft: 0, peakRight: 0 };
+    }
+
     this.analyserLeft.getFloatTimeDomainData(this.dataArrayLeft as any);
     this.analyserRight.getFloatTimeDomainData(this.dataArrayRight as any);
 

@@ -41,5 +41,8 @@ Each agent should update **their own dedicated progress file** instead of this f
 ## RENDERER v1.65.0
 - ✅ Completed: Smart Audio Fades - Updated audio fading logic to respect clip duration for accurate fade-out timing.
 
+## PLAYER v0.68.1
+- ✅ Completed: Robust Audio Metering - Refactored `AudioMeter` to support non-destructive toggling, preventing audio playback from stopping when metering is disabled.
+
 ## PLAYER v0.68.0
 - ✅ Completed: Expose Export API - Implemented public `export()` method on `<helios-player>` to allow programmatic triggering of client-side exports with configurable options (format, resolution, bitrate, etc.).

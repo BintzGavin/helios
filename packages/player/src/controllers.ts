@@ -61,22 +61,30 @@ export class DirectController implements HeliosController {
   getState() { return this.instance.getState(); }
   dispose() {
     this.stopAudioMetering();
+    if (this.audioMeter) {
+      this.audioMeter.dispose();
+      this.audioMeter = null;
+    }
   }
 
   startAudioMetering() {
-    if (this.audioMeter) return;
-    this.audioMeter = new AudioMeter();
+    if (!this.audioMeter) {
+      this.audioMeter = new AudioMeter();
+    }
     const doc = this.iframe?.contentDocument || document;
     this.audioMeter.connect(doc);
+    this.audioMeter.enable();
 
-    const loop = () => {
-      if (this.audioMeter && this.audioMeteringCallback) {
-        const levels = this.audioMeter.getLevels();
-        this.audioMeteringCallback(levels);
-      }
+    if (!this.audioMeteringRaf) {
+      const loop = () => {
+        if (this.audioMeter && this.audioMeteringCallback) {
+          const levels = this.audioMeter.getLevels();
+          this.audioMeteringCallback(levels);
+        }
+        this.audioMeteringRaf = requestAnimationFrame(loop);
+      };
       this.audioMeteringRaf = requestAnimationFrame(loop);
-    };
-    this.audioMeteringRaf = requestAnimationFrame(loop);
+    }
   }
 
   stopAudioMetering() {
@@ -85,8 +93,7 @@ export class DirectController implements HeliosController {
       this.audioMeteringRaf = null;
     }
     if (this.audioMeter) {
-      this.audioMeter.dispose();
-      this.audioMeter = null;
+      this.audioMeter.disable();
     }
   }
 
