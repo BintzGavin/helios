@@ -774,10 +774,8 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     // Create new abort controller
     exportAbortControllerRef.current = new AbortController();
 
-    // Instantiate exporter with dummy iframe (unused in export method)
-    // Note: We cast to unknown then HTMLIFrameElement to satisfy type requirements
-    const dummyIframe = document.createElement('iframe');
-    const exporter = new ClientSideExporter(controller, dummyIframe);
+    // Instantiate exporter
+    const exporter = new ClientSideExporter(controller);
 
     try {
       await exporter.export({

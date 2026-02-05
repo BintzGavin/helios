@@ -44,3 +44,4 @@ Per AGENTS.md, the CLI is "ACTIVELY EXPANDING FOR V2" with focus on:
 [v0.6.0] ✅ Implement Merge Command - Implemented `helios merge` for stitching video clips
 [v0.7.0] ✅ Remote Registry Support - Implemented `RegistryClient` to fetch components from a remote URL with local fallback
 [v0.8.0] ✅ Auto-Install Dependencies - Implemented automatic dependency installation for `helios add` with `--no-install` flag
+[v0.9.0] ✅ Multi-Framework Support - Enabled `helios init` for Vue, Svelte, and Vanilla, and updated `helios studio` to load user config.
