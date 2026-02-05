@@ -2,6 +2,10 @@
 
 This file tracks progress for the CLI domain (`packages/cli`).
 
+## CLI v0.10.0
+
+- ✅ Track Installed Components - Updated `helios add` to automatically record installed components in `helios.config.json` and persist config changes.
+
 ## CLI v0.9.2
 
 - ✅ SolidJS Support Verified - Verified SolidJS template functionality and added `--framework` CLI flag for automation.

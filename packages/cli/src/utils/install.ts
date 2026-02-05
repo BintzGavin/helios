@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import chalk from 'chalk';
-import { loadConfig } from './config.js';
+import { loadConfig, saveConfig } from './config.js';
 import { defaultClient } from '../registry/client.js';
 import { installPackage } from './package-manager.js';
 
@@ -86,5 +86,16 @@ export async function installComponent(
     } else if (depsToInstall.length > 0) {
       console.log(chalk.gray(`\nSkipping installation (--no-install)`));
     }
+  }
+
+  // Update config
+  if (!config.components) {
+    config.components = [];
+  }
+
+  if (!config.components.includes(componentName)) {
+    config.components.push(componentName);
+    saveConfig(config, rootDir);
+    console.log(chalk.green(`✓ Added ${componentName} to helios.config.json`));
   }
 }
