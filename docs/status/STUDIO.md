@@ -1,4 +1,4 @@
-**Version**: 0.95.0
+**Version**: 0.95.1
 
 **Posture**: ACTIVELY EXPANDING FOR V2
 
@@ -9,6 +9,7 @@
 **Focus**: UI Implementation & CLI
 
 ## Recent Updates
+- [v0.95.1] ✅ Verified: Stage Tests - Implemented unit tests for `Stage` component, covering rendering, interactions (Zoom/Pan), and HMR state preservation.
 - [v0.95.0] ✅ Completed: Persist Input Props - Implemented auto-saving of user-configured input props to `composition.json`, ensuring persistence across reloads.
 - [v0.94.3] ✅ Fixed: Concurrency Input - Fixed concurrency input validation in Render Config, ensuring values are clamped between 1 and 32.
 - [v0.94.2] ✅ Verified: Stacked Timeline - Verified implementation of multi-lane stacked timeline with existing unit tests `Timeline.test.tsx`.

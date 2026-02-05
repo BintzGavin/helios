@@ -5,7 +5,7 @@
 The Studio is a browser-based development environment for Helios. It consists of:
 1.  **CLI**: Entry point (`helios studio`) that launches the dev server.
 2.  **Server**: A Vite-based dev server (`packages/studio/src/server`) that serves the UI and provides API endpoints for filesystem operations (compositions, assets, renders).
-3.  **UI**: A React-based Single Page Application (`packages/studio/src/ui` or root `src`) that provides the IDE interface.
+3.  **UI**: A React-based Single Page Application (`packages/studio/src`) that provides the IDE interface.
 4.  **Integration**:
     -   **Core**: Consumed via `Helios` class for composition logic.
     -   **Player**: Consumed via `<helios-player>` for preview and playback.
@@ -17,11 +17,10 @@ The Studio is a browser-based development environment for Helios. It consists of
 packages/studio/
 ├── bin/                # CLI entry point
 ├── src/
-│   ├── cli/            # CLI plugin integration
 │   ├── components/     # UI Components (Sidebar, Stage, Timeline, etc.)
 │   ├── context/        # React Context (StudioContext, ToastContext)
 │   ├── hooks/          # Custom hooks (usePersistentState)
-│   ├── server/         # Backend logic (discovery, render-manager)
+│   ├── server/         # Backend logic (discovery, render-manager, plugin)
 │   ├── utils/          # Utilities
 │   ├── App.tsx         # Main UI entry
 │   ├── main.tsx        # React root
