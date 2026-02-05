@@ -65,6 +65,38 @@ export class CanvasStrategy implements RenderStrategy {
                  codecs[c.id].hardware = (support.type === 'hardware');
                }
 
+               // Check MediaCapabilities for powerEfficient (Hardware)
+               if (navigator.mediaCapabilities && navigator.mediaCapabilities.encodingInfo) {
+                  try {
+                    let contentType = `video/webm; codecs="${c.config.codec}"`;
+                    if (c.id === 'h264') {
+                        contentType = `video/mp4; codecs="${c.config.codec}"`;
+                    } else if (c.id === 'av1') {
+                         contentType = `video/mp4; codecs="${c.config.codec}"`;
+                    }
+
+                    const mcConfig = {
+                        type: 'record',
+                        video: {
+                            contentType,
+                            width: c.config.width,
+                            height: c.config.height,
+                            bitrate: 2500000,
+                            framerate: 60
+                        }
+                    };
+
+                    // @ts-ignore
+                    const mcInfo = await navigator.mediaCapabilities.encodingInfo(mcConfig);
+                    if (mcInfo.powerEfficient) {
+                        codecs[c.id].hardware = true;
+                        codecs[c.id].powerEfficient = true;
+                    }
+                  } catch (e) {
+                      // ignore
+                  }
+               }
+
                // Check Alpha
                try {
                  const alphaConfig = { ...c.config, alpha: 'keep' };
@@ -151,9 +183,11 @@ export class CanvasStrategy implements RenderStrategy {
         codecString: string;
         fourCC: string;
         isH264: boolean;
+        index: number;
     }
 
     const candidates: Candidate[] = [];
+    let candidateIndex = 0;
 
     const addCandidate = (inputCodec: string) => {
         let codecString = inputCodec;
@@ -180,7 +214,7 @@ export class CanvasStrategy implements RenderStrategy {
              else codecString = inputCodec; // Pass through unknown
         }
 
-        candidates.push({ codecString, fourCC, isH264 });
+        candidates.push({ codecString, fourCC, isH264, index: candidateIndex++ });
     };
 
     if (this.options.intermediateVideoCodec) {
@@ -224,7 +258,8 @@ export class CanvasStrategy implements RenderStrategy {
           return { supported: false, reason: 'VideoEncoder not found' };
         }
 
-        let selected = null;
+        const supportedCandidates = [];
+
         for (const candidate of config.candidates) {
             const encoderConfig = {
               codec: candidate.codecString,
@@ -239,20 +274,73 @@ export class CanvasStrategy implements RenderStrategy {
             }
 
             try {
+              // 1. Check VideoEncoder support
               const support = await VideoEncoder.isConfigSupported(encoderConfig);
               if (support.supported) {
-                  selected = { supported: true, config: encoderConfig, candidate };
-                  break;
+                  let isHardware = false;
+
+                  // Check standard 'type' property (Chrome 106+)
+                  if (support.type === 'hardware') isHardware = true;
+
+                  // 2. Check MediaCapabilities for powerEfficient (Hardware)
+                  if (navigator.mediaCapabilities && navigator.mediaCapabilities.encodingInfo) {
+                      try {
+                        let contentType = \`video/webm; codecs="\${candidate.codecString}"\`;
+                        if (candidate.isH264) {
+                            contentType = \`video/mp4; codecs="\${candidate.codecString}"\`;
+                        } else if (candidate.fourCC === 'AV01') {
+                            contentType = \`video/mp4; codecs="\${candidate.codecString}"\`;
+                        }
+
+                        const mcConfig = {
+                            type: 'record',
+                            video: {
+                                contentType,
+                                width: config.width,
+                                height: config.height,
+                                bitrate: config.bitrate,
+                                framerate: 60 // Assume 60fps for check
+                            }
+                        };
+
+                        const mcInfo = await navigator.mediaCapabilities.encodingInfo(mcConfig);
+                        if (mcInfo.powerEfficient) {
+                            isHardware = true;
+                        }
+                      } catch (e) {}
+                  }
+
+                  supportedCandidates.push({
+                      candidate,
+                      config: encoderConfig,
+                      isHardware
+                  });
               }
             } catch (e) {
                // Ignore error
             }
         }
 
-        if (!selected) {
+        if (supportedCandidates.length === 0) {
             return { supported: false, reason: 'No supported codec found among candidates' };
         }
 
+        // Sort candidates:
+        // 1. Hardware First (isHardware=true > isHardware=false)
+        // 2. Codec Preference: H.264 (isH264=true > isH264=false) - if strictly tied on hardware
+        // 3. Original Index (candidate.index ASC)
+
+        supportedCandidates.sort((a, b) => {
+            if (a.isHardware !== b.isHardware) {
+                return b.isHardware ? 1 : -1; // True comes first
+            }
+            if (a.candidate.isH264 !== b.candidate.isH264) {
+                return a.candidate.isH264 ? -1 : 1; // H.264 first
+            }
+            return a.candidate.index - b.candidate.index;
+        });
+
+        const selected = supportedCandidates[0];
         const { config: encoderConfig, candidate: selectedCandidate } = selected;
 
         // Initialize global state for accumulation

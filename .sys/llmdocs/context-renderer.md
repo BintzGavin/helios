@@ -7,7 +7,7 @@ The Renderer employs a "Dual-Path" architecture to handle different rendering ne
 1.  **Canvas Strategy (`mode: 'canvas'`)**:
     -   **Target**: High-performance WebGL/Canvas animations (Three.js, PixiJS).
     -   **Mechanism**: Captures frames directly from the HTML `<canvas>` element (found via `canvasSelector`).
-    -   **Optimization**: Uses `WebCodecs` (VideoEncoder) for hardware-accelerated encoding (H.264, VP9, AV1) where available, falling back to `toDataURL()` (PNG/JPEG) if necessary.
+    -   **Optimization**: Prioritizes hardware-accelerated `WebCodecs` (checked via `navigator.mediaCapabilities`) and prefers H.264 over VP9 when hardware support is equivalent. Falls back to software WebCodecs or `toDataURL()` (PNG/JPEG) if necessary.
     -   **Audio**: Explicitly extracts audio from `<audio>`/`<video>` elements via `DomScanner`.
 
 2.  **DOM Strategy (`mode: 'dom'`)**:

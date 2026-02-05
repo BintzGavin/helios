@@ -13,6 +13,9 @@ Each agent should update **their own dedicated progress file** instead of this f
 - **STUDIO**: Update `docs/PROGRESS-STUDIO.md`
 - **SKILLS**: Update `docs/PROGRESS-SKILLS.md`
 
+### RENDERER v1.71.0
+- ✅ Completed: Hardware Accelerated Codec Priority - Updated `CanvasStrategy` to prioritize hardware-accelerated codecs (checking `navigator.mediaCapabilities.encodingInfo` for `powerEfficient: true`) and prefer H.264 over VP9 when hardware support is equivalent. Verified with `verify-hardware-codec-selection.ts`.
+
 ### CLI v0.8.0
 - ✅ Completed: Auto-Install Dependencies - Implemented automatic dependency installation for `helios add` with `--no-install` flag.
 

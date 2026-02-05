@@ -1,3 +1,6 @@
+## RENDERER v1.71.0
+- ✅ Completed: Hardware Accelerated Codec Priority - Updated `CanvasStrategy` to prioritize hardware-accelerated codecs (checking `navigator.mediaCapabilities.encodingInfo` for `powerEfficient: true`) and prefer H.264 over VP9 when hardware support is equivalent. Verified with `verify-hardware-codec-selection.ts`.
+
 ## RENDERER v1.70.0
 - ✅ Completed: DOM Target Selector - Implemented `targetSelector` in `DomStrategy` to allow rendering specific elements (including those in Shadow DOM) instead of the full viewport, and refactored deep element finding logic into a shared utility `dom-finder.ts`. Verified with `verify-dom-selector.ts`.
 
