@@ -1,3 +1,6 @@
+## DEMO v1.115.0
+- ✅ Completed: Standardize Three.js Canvas Example - Modernized `examples/threejs-canvas-animation` with TypeScript, `package.json`, and proper build config.
+
 ## DEMO v1.114.0
 - ✅ Completed: Solid Chart.js Animation - Created `examples/solid-chartjs-animation` demonstrating Chart.js integration with SolidJS and Helios.
 

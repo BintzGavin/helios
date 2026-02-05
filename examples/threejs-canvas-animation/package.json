@@ -1,0 +1,18 @@
+{
+  "name": "threejs-canvas-animation",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build"
+  },
+  "dependencies": {
+    "three": "^0.182.0",
+    "@helios-project/core": "file:../../packages/core"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0",
+    "vite": "^7.1.2"
+  }
+}

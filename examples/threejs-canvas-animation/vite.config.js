@@ -12,7 +12,8 @@ export default defineConfig({
   },
   resolve: {
     alias: [
-        { find: /^\/packages\/(.*)/, replacement: path.resolve(process.cwd(), 'packages') + '/$1' }
+      { find: '@helios-project/core', replacement: path.resolve(process.cwd(), 'packages/core/src/index.ts') },
+      { find: /^\/packages\/(.*)/, replacement: path.resolve(process.cwd(), 'packages') + '/$1' }
     ]
   }
 });
