@@ -15,6 +15,7 @@ packages/cli/
 │   │   ├── add.ts
 │   │   ├── components.ts
 │   │   ├── init.ts
+│   │   ├── list.ts
 │   │   ├── merge.ts
 │   │   ├── render.ts
 │   │   └── studio.ts
@@ -50,6 +51,9 @@ Launch the Studio development server.
 ### `add <component>`
 Add a component to the project.
 - `--no-install`: Skip dependency installation
+
+### `list`
+List installed components in the project.
 
 ### `components`
 List available components in the registry.

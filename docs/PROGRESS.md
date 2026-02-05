@@ -13,6 +13,9 @@ Each agent should update **their own dedicated progress file** instead of this f
 - **STUDIO**: Update `docs/PROGRESS-STUDIO.md`
 - **SKILLS**: Update `docs/PROGRESS-SKILLS.md`
 
+### CLI v0.11.0
+- ✅ Completed: Implement List Command - Implemented `helios list` to display installed components.
+
 ### RENDERER v1.71.1
 - ✅ Completed: Deterministic Randomness - Enforced deterministic Math.random() in `CdpTimeDriver` and `SeekTimeDriver` by injecting a seeded Mulberry32 PRNG via `page.addInitScript`, ensuring consistent generative rendering. Verified with `verify-random-determinism.ts`.
 
