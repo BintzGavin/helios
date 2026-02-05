@@ -1,54 +1,79 @@
-# CLI: Implement Remote Registry Fetching
+# Plan: CLI Remote Registry Support
 
 #### 1. Context & Goal
-- **Objective**: Decouple the component registry from the CLI binary by implementing remote registry fetching.
-- **Trigger**: The current registry is hardcoded in `manifest.ts`, which prevents dynamic updates and community contributions ("Shadcn-style" registry requirement).
-- **Impact**: Enables the CLI to fetch components from a remote source, allowing the ecosystem to grow independently of CLI releases.
+- **Objective**: Decouple the component registry from the CLI binary by enabling remote fetching of component definitions.
+- **Trigger**: The V2 vision mandates a "Shadcn-style" registry where components are distributed as source. The current implementation uses a hardcoded `manifest.ts` file, which prevents dynamic updates.
+- **Impact**: Allows the registry to grow independently of the CLI release cycle and supports custom/private registries via URL configuration.
 
 #### 2. File Inventory
-- **Create**:
-  - `packages/cli/src/registry/api.ts` (Registry fetching and caching logic)
-- **Modify**:
-  - `packages/cli/src/registry/types.ts` (Export registry types for API use)
-  - `packages/cli/src/utils/config.ts` (Add `registryUrl` to `HeliosConfig`)
-  - `packages/cli/src/utils/install.ts` (Accept `ComponentDefinition` instead of looking it up)
-  - `packages/cli/src/commands/add.ts` (Use `fetchRegistry` and pass definition to install)
-  - `packages/cli/src/commands/components.ts` (Use `fetchRegistry` to list items)
-- **Read-Only**: `packages/cli/src/registry/manifest.ts` (Used as fallback/default)
+- **Create**: `packages/cli/src/registry/client.ts`
+  - Purpose: Implements `RegistryClient` class to handle fetching and fallback logic.
+- **Modify**: `packages/cli/src/utils/install.ts`
+  - Change: Replace direct `manifest.ts` imports with `RegistryClient` usage.
+- **Modify**: `packages/cli/src/commands/components.ts`
+  - Change: Replace direct `manifest.ts` imports with `RegistryClient` usage.
+- **Read-Only**: `packages/cli/src/registry/manifest.ts`
+  - Purpose: Retained as a fallback for offline use or network failures.
 
 #### 3. Implementation Spec
-- **Architecture**:
-  - Introduce a `fetchRegistry(url?: string)` function in `api.ts`.
-  - It checks for a `--registry` flag, then `helios.config.json`, then env var, then falls back to `manifest.ts`.
-  - Uses `fetch` (Node 18+) to retrieve the JSON.
-  - Validates the schema.
-- **Pseudo-Code**:
-  ```typescript
-  // registry/api.ts
-  async function fetchRegistry(urlOverride?: string): Promise<ComponentDefinition[]> {
-    const url = urlOverride || config.registryUrl || DEFAULT_REGISTRY_URL;
-    try {
-      if (url) {
-        const res = await fetch(url);
-        if (!res.ok) throw new Error('Failed to fetch');
-        return await res.json();
+
+**Architecture**
+- **RegistryClient**: A class responsible for resolving component definitions.
+  - **Inputs**: Optional `registryUrl` (defaults to environment variable `HELIOS_REGISTRY_URL` or internal default).
+  - **Mechanism**:
+    1. Attempts to fetch `index.json` from the registry URL.
+    2. On success, maps the JSON to `ComponentDefinition[]`.
+    3. On failure (or if URL unset), falls back to the local `registry/manifest.ts`.
+- **Caching**: Simple in-memory caching for the duration of the command execution.
+
+**Pseudo-Code**
+
+```typescript
+// packages/cli/src/registry/client.ts
+
+import { registry as localRegistry } from './manifest.js';
+import { ComponentDefinition } from './types.js';
+
+export class RegistryClient {
+  private url: string | undefined;
+
+  constructor(url?: string) {
+    this.url = url || process.env.HELIOS_REGISTRY_URL;
+  }
+
+  async getComponents(): Promise<ComponentDefinition[]> {
+    if (this.url) {
+      try {
+        const res = await fetch(this.url);
+        if (res.ok) {
+           return await res.json();
+        }
+      } catch (e) {
+        console.warn('Failed to fetch remote registry, falling back to local.');
       }
-    } catch (e) {
-      // warn and fallback
     }
     return localRegistry;
   }
-  ```
-- **Public API Changes**:
-  - `helios add` and `helios components` accept new `--registry <url>` flag.
-  - `helios.config.json` supports `registryUrl` field.
-- **Dependencies**: None (uses native `fetch`).
+
+  async findComponent(name: string): Promise<ComponentDefinition | undefined> {
+    const components = await this.getComponents();
+    return components.find(c => c.name === name);
+  }
+}
+
+export const defaultClient = new RegistryClient();
+```
+
+**Public API Changes**
+- `helios add` and `helios components` will now be async in their data retrieval phase (internal implementation detail, but affects flow).
+- New Environment Variable: `HELIOS_REGISTRY_URL` supported.
+
+**Dependencies**
+- None.
 
 #### 4. Test Plan
 - **Verification**:
-  - Run `helios components` (verifies fallback to local works).
-  - Run `helios add timer` (verifies fallback install works).
-  - (Manual) Run `helios components --registry <invalid-url>` (verify fallback/error handling).
-- **Success Criteria**:
-  - Existing commands continue to work using the local manifest (fallback).
-  - Code structure supports remote fetching for future V2 platform expansion.
+  1. Run `helios components` - Verify it lists default components (fallback path).
+  2. Run `HELIOS_REGISTRY_URL=http://localhost:9999/bad-url helios components` - Verify it warns but falls back to local.
+- **Success Criteria**: CLI continues to work identical to before, but `manifest.ts` is no longer the *only* source of truth.
+- **Edge Cases**: Network timeouts, invalid JSON response.
