@@ -16,7 +16,7 @@ interface HeliosPlayerElement extends HTMLElement {
 }
 
 export const Stage: React.FC<StageProps> = ({ src }) => {
-  const { setController, canvasSize, setCanvasSize, playerState, controller, takeSnapshot, setSettingsOpen } = useStudio();
+  const { setController, canvasSize, setCanvasSize, playerState, controller, takeSnapshot, setSettingsOpen, activeComposition } = useStudio();
   const playerRef = useRef<HeliosPlayerElement>(null);
 
   // State
@@ -79,12 +79,21 @@ export const Stage: React.FC<StageProps> = ({ src }) => {
           } catch (e) {
             console.warn('Failed to restore state after HMR', e);
           }
+        } else {
+          // Fresh load or new composition - apply default props if available
+          if (activeComposition?.metadata?.defaultProps) {
+            try {
+              freshCtrl.setInputProps(activeComposition.metadata.defaultProps);
+            } catch (e) {
+              console.warn('Failed to apply default props', e);
+            }
+          }
         }
       }
     }, 200);
 
     return () => clearInterval(interval);
-  }, [src, controller, setController]);
+  }, [src, controller, setController, activeComposition]);
 
   // Event Handlers
   const handleWheel = (e: WheelEvent) => {

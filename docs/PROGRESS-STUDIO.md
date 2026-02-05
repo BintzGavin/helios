@@ -1,3 +1,6 @@
+## STUDIO v0.95.0
+- ✅ Completed: Persist Input Props - Implemented auto-saving of user-configured input props to `composition.json`, ensuring persistence across reloads.
+
 ## STUDIO v0.94.3
 - ✅ Fixed: Concurrency Input - Fixed concurrency input validation in Render Config, ensuring values are clamped between 1 and 32.
 

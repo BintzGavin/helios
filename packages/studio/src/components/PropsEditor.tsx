@@ -41,8 +41,34 @@ const PropsToolbar: React.FC<{
 };
 
 export const PropsEditor: React.FC = () => {
-  const { controller, playerState } = useStudio();
+  const { controller, playerState, activeComposition, updateCompositionMetadata } = useStudio();
   const { inputProps, schema } = playerState;
+
+  // Auto-save input props to composition metadata
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (activeComposition && inputProps && Object.keys(inputProps).length > 0) {
+        const currentDefaults = activeComposition.metadata?.defaultProps;
+        // Only save if changed to avoid infinite loops/unnecessary writes
+        if (JSON.stringify(currentDefaults) !== JSON.stringify(inputProps)) {
+          // Ensure we preserve existing metadata
+          const metadata = activeComposition.metadata || {
+            width: 1920,
+            height: 1080,
+            fps: 30,
+            duration: 10
+          };
+
+          updateCompositionMetadata(activeComposition.id, {
+            ...metadata,
+            defaultProps: inputProps
+          });
+        }
+      }
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, [inputProps, activeComposition, updateCompositionMetadata]);
 
   const groupedProps = useMemo(() => {
     const groups: Record<string, string[]> = {};

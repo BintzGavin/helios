@@ -8,6 +8,7 @@ export interface CompositionOptions {
   height: number;
   fps: number;
   duration: number;
+  defaultProps?: Record<string, any>;
 }
 
 export interface Template {
