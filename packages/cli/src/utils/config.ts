@@ -7,6 +7,7 @@ export interface HeliosConfig {
     components: string;
     lib: string;
   };
+  framework?: 'react' | 'vue' | 'svelte' | 'vanilla';
 }
 
 export const DEFAULT_CONFIG: HeliosConfig = {

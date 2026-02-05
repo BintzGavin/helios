@@ -26,13 +26,7 @@ export function registerStudioCommand(program: Command) {
         console.log(`Studio Root: ${studioRoot}`);
 
         const server = await createServer({
-          configFile: false, // Ensure we don't pick up a random vite.config.js unless intended?
-                             // Actually user might want their own config for aliases etc.
-                             // But for Studio we act as the host.
-                             // Usually we want to respect user's vite config if they have one for their project?
-                             // But the plan said "The CLI will act as the 'Server Host'".
-                             // If we pass `root: process.cwd()`, Vite will look for config there.
-                             // This is probably good so user can configure aliases.
+          // configFile: false, // Removed to allow loading user config (crucial for framework plugins)
           root: process.cwd(),
           server: {
             port: parseInt(options.port, 10),
@@ -42,7 +36,7 @@ export function registerStudioCommand(program: Command) {
             studioApiPlugin({
               studioRoot: studioDist,
               components: registry,
-              onInstallComponent: async (name) => {
+              onInstallComponent: async (name: string) => {
                 await installComponent(process.cwd(), name);
               }
             })

@@ -9,6 +9,7 @@ The Helios CLI is the primary interface for managing Helios projects, rendering 
 - **Command Registration**: `src/index.ts` initializes the program and registers commands from `src/commands/`.
 - **Registry Client**: `src/registry/client.ts` handles component fetching (remote with local fallback).
 - **Utilities**: `src/utils/` contains helpers for config loading (`config.ts`), installation logic (`install.ts`), and package management (`package-manager.ts`).
+- **Templates**: `src/templates/` contains project scaffolds for React, Vue, Svelte, and Vanilla.
 
 ## B. File Tree
 
@@ -29,6 +30,11 @@ packages/cli/
 │   │   ├── client.ts       # RegistryClient implementation
 │   │   ├── manifest.ts     # Local fallback registry data
 │   │   └── types.ts        # Registry type definitions
+│   ├── templates/
+│   │   ├── react.ts        # React scaffold
+│   │   ├── vue.ts          # Vue scaffold
+│   │   ├── svelte.ts       # Svelte scaffold
+│   │   └── vanilla.ts      # Vanilla scaffold
 │   └── utils/
 │       ├── config.ts       # Config file loader
 │       ├── install.ts      # Component installation logic
@@ -39,9 +45,9 @@ packages/cli/
 ## C. Commands
 
 ### `helios init [options]`
-Initializes a new Helios project configuration and scaffolds structure if missing.
+Initializes a new Helios project configuration and scaffolds structure if missing. Supports React, Vue, Svelte, and Vanilla templates.
 - **Options**:
-  - `-y, --yes`: Skip prompts and use defaults.
+  - `-y, --yes`: Skip prompts and use defaults (React).
 
 ### `helios add <component> [options]`
 Adds a component (and its dependencies) to the project.
@@ -54,7 +60,7 @@ Adds a component (and its dependencies) to the project.
 Lists available components in the registry.
 
 ### `helios studio [options]`
-Launches the Helios Studio development server.
+Launches the Helios Studio development server. Respects user's `vite.config.ts`.
 - **Options**:
   - `-p, --port <number>`: Port to run on (default: 3000).
 
@@ -79,10 +85,12 @@ The CLI reads `helios.config.json` in the project root.
 **Example `helios.config.json`:**
 ```json
 {
+  "version": "1.0.0",
   "directories": {
-    "components": "src/components",
-    "output": "output"
-  }
+    "components": "src/components/helios",
+    "lib": "src/lib"
+  },
+  "framework": "react"
 }
 ```
 
