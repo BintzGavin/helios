@@ -17,3 +17,7 @@
 ## 0.68.0 - Destructive Audio Metering
 **Learning:** The `AudioMeter` implementation uses `createMediaElementSource` which "hijacks" the audio output. Destroying the meter's `AudioContext` permanently silences the media element, making it impossible to toggle metering without reloading.
 **Action:** Always maintain a persistent audio graph for pass-through audio when using Web Audio API with media elements. Use `disconnect()` on the analyzer path instead of closing the context.
+
+## v0.70.0 - Planner Protocol Violation
+**Learning:** The "Planner" role must strictly produce a `.sys/plans/` file and NOT execute `set_plan` or write implementation code, even if standard system prompts suggest otherwise.
+**Action:** When acting as Planner, verify the output is ONLY a markdown file in `.sys/plans/` and use `write_file` instead of `set_plan`.
