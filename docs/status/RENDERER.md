@@ -1,10 +1,11 @@
-**Version**: 1.71.1
+**Version**: 1.71.2
 
 **Posture**: MAINTENANCE WITH V2 EXPANSION
 
 # Renderer Agent Status
 
 ## Progress Log
+- [1.71.2] ✅ Completed: Verify Background Image Preloading - Enhanced `verify-dom-preload.ts` to strictly verify that `DomStrategy` detects and preloads CSS background images by intercepting and validating log output.
 - [1.71.1] ✅ Completed: Deterministic Randomness - Enforced deterministic Math.random() in `CdpTimeDriver` and `SeekTimeDriver` by injecting a seeded Mulberry32 PRNG via `page.addInitScript`, ensuring consistent generative rendering. Verified with `verify-random-determinism.ts`.
 - [1.71.0] ✅ Completed: Hardware Accelerated Codec Priority - Updated `CanvasStrategy` to prioritize hardware-accelerated codecs (checking `navigator.mediaCapabilities.encodingInfo` for `powerEfficient: true`) and prefer H.264 over VP9 when hardware support is equivalent. Verified with `verify-hardware-codec-selection.ts`.
 - [1.70.0] ✅ Completed: DOM Target Selector - Implemented `targetSelector` in `DomStrategy` to allow rendering specific elements (including those in Shadow DOM) instead of the full viewport, and refactored deep element finding logic into a shared utility `dom-finder.ts`. Verified with `verify-dom-selector.ts`.

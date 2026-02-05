@@ -13,7 +13,7 @@ The Renderer employs a "Dual-Path" architecture to handle different rendering ne
 2.  **DOM Strategy (`mode: 'dom'`)**:
     -   **Target**: CSS animations, HTML/DOM-based motion graphics.
     -   **Mechanism**: Captures the viewport or a specific element (via `targetSelector`) using Playwright's `page.screenshot()` or `elementHandle.screenshot()`.
-    -   **Optimization**: Supports `omittedBackground` for transparency.
+    -   **Optimization**: Supports `omittedBackground` for transparency. Preloads fonts, images, and CSS background images (including those in Shadow DOM) to prevent rendering artifacts.
     -   **Audio**: Scans for and includes implicit audio tracks.
 
 Both strategies rely on **Time Drivers** (`CdpTimeDriver` or `SeekTimeDriver`) to enforce frame-perfect synchronization and deterministic behavior. This includes:
