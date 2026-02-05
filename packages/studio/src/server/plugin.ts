@@ -328,7 +328,7 @@ function configureMiddlewares(server: ViteDevServer | PreviewServer, isPreview: 
           if (req.method === 'PATCH') {
             try {
               const body = await getBody(req);
-              const { id, name, width, height, fps, duration } = body;
+              const { id, name, width, height, fps, duration, defaultProps } = body;
 
               if (!id) {
                 res.statusCode = 400;
@@ -356,6 +356,7 @@ function configureMiddlewares(server: ViteDevServer | PreviewServer, isPreview: 
               if (height !== undefined) options.height = Number(height);
               if (fps !== undefined) options.fps = Number(fps);
               if (duration !== undefined) options.duration = Number(duration);
+              if (defaultProps !== undefined) options.defaultProps = defaultProps;
 
               const updatedComp = updateCompositionMetadata(process.cwd(), currentId, options);
               res.setHeader('Content-Type', 'application/json');
