@@ -1,6 +1,7 @@
 # CORE Progress Log
 
 ## CORE v5.11.0
+- ✅ Completed: Synchronize Version - Synced package.json version to 5.11.0 and added Input Schema documentation.
 - ✅ Completed: Implement Composition Schema - Implemented HeliosConfig, HeliosComposition, and related interfaces to support serializable composition definitions.
 
 ## CORE v5.10.0
