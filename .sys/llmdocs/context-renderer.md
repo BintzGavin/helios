@@ -71,6 +71,7 @@ interface RendererOptions {
   canvasSelector?: string;      // Selector for target canvas (default: 'canvas')
   subtitles?: string;           // Path to SRT file for burning
   concurrency?: number;         // Workers for distributed rendering
+  mixInputAudio?: boolean;      // Mix audio from input video (stream 0:a)
 }
 ```
 

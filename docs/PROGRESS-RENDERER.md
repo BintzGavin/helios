@@ -1,3 +1,6 @@
+## RENDERER v1.68.0
+- ✅ Completed: Distributed Implicit Audio - Added `mixInputAudio` option to `RendererOptions` and updated `Orchestrator` to preserve implicit audio (DOM `<audio>`) during the final mix of distributed rendering. Verified with `verify-distributed-audio.ts`.
+
 ## RENDERER v1.67.2
 - ✅ Completed: CdpTimeDriver Determinism - Updated `CdpTimeDriver` to override `performance.now()` to match the virtual time epoch, ensuring deterministic behavior for time-based animations (e.g. Three.js) regardless of page load time. Verified with `verify-cdp-determinism.ts`.
 

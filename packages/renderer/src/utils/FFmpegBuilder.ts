@@ -189,17 +189,34 @@ export class FFmpegBuilder {
     let audioFilterGraph = '';
     let audioMap = '';
 
-    if (tracks.length > 0) {
-      if (tracks.length === 1) {
+    const shouldMixInput = options.mixInputAudio === true;
+
+    if (tracks.length > 0 || shouldMixInput) {
+      if (tracks.length === 0 && shouldMixInput) {
+        // No extra tracks, just pass through input audio
+        // We assume input 0 is the video file which contains the audio stream
+        audioMap = '0:a';
+      } else if (tracks.length === 1 && !shouldMixInput) {
         audioFilterGraph = audioFilterChains[0];
         audioMap = '[a0]';
       } else {
-        // Multiple tracks: Mix them using amix
+        // Multiple tracks (or single track + input): Mix them using amix
         let graph = audioFilterChains.join(';');
-        // Mix step: combine all [aX] outputs
-        const mixInputs = tracks.map((_, i) => `[a${i}]`).join('');
+
+        let mixInputs = tracks.map((_, i) => `[a${i}]`).join('');
+        let inputCount = tracks.length;
+
+        if (shouldMixInput) {
+          // Prepend 0:a to the mix inputs
+          mixInputs = `[0:a]${mixInputs}`;
+          inputCount++;
+        }
+
+        // Mix step: combine all [aX] outputs (and [0:a] if needed)
         // inputs=N:duration=longest
-        graph += `;${mixInputs}amix=inputs=${tracks.length}:duration=longest[aout]`;
+        // Note: If filter chains existed, we append the amix
+        const separator = graph ? ';' : '';
+        graph += `${separator}${mixInputs}amix=inputs=${inputCount}:duration=longest[aout]`;
 
         audioFilterGraph = graph;
         audioMap = '[aout]';
