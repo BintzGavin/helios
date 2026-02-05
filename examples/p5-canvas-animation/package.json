@@ -1,0 +1,20 @@
+{
+  "name": "p5-canvas-animation",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build"
+  },
+  "dependencies": {
+    "p5": "^1.9.0",
+    "@helios-project/core": "file:../../packages/core"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/p5": "^1.7.6",
+    "typescript": "^5.0.0",
+    "vite": "^5.0.0"
+  }
+}
