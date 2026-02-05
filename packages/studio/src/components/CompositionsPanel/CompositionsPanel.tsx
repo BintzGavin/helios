@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useStudio, Composition } from '../../context/StudioContext';
 import { ConfirmationModal } from '../ConfirmationModal/ConfirmationModal';
+import { buildCompositionTree } from '../../utils/tree';
+import { CompositionTree } from './CompositionTree';
 import './CompositionsPanel.css';
 
 export const CompositionsPanel: React.FC = () => {
@@ -17,9 +19,10 @@ export const CompositionsPanel: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [deleteTarget, setDeleteTarget] = useState<Composition | null>(null);
 
-  const filteredCompositions = compositions.filter(comp =>
-    comp.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  // Build tree structure
+  const treeNodes = useMemo(() => {
+    return buildCompositionTree(compositions, searchQuery);
+  }, [compositions, searchQuery]);
 
   const handleDuplicate = (e: React.MouseEvent, comp: Composition) => {
     e.stopPropagation();
@@ -37,6 +40,10 @@ export const CompositionsPanel: React.FC = () => {
       await deleteComposition(deleteTarget.id);
       setDeleteTarget(null);
     }
+  };
+
+  const handleSelect = (comp: Composition) => {
+    setActiveComposition(comp);
   };
 
   return (
@@ -74,47 +81,18 @@ export const CompositionsPanel: React.FC = () => {
       </div>
 
       <div className="compositions-list">
-        {filteredCompositions.length === 0 ? (
+        {treeNodes.length === 0 ? (
           <div className="compositions-empty">
             {compositions.length === 0 ? 'No compositions yet.' : 'No matches found.'}
           </div>
         ) : (
-          filteredCompositions.map(comp => (
-            <div
-              key={comp.id}
-              className={`composition-item ${activeComposition?.id === comp.id ? 'active' : ''}`}
-              onClick={() => setActiveComposition(comp)}
-            >
-              <div className="composition-thumbnail">
-                {comp.thumbnailUrl ? (
-                  <img src={comp.thumbnailUrl} alt={comp.name} />
-                ) : (
-                  <div className="composition-placeholder">
-                    <span>🎬</span>
-                  </div>
-                )}
-                <div className="composition-actions">
-                  <button
-                    className="composition-action-btn duplicate"
-                    onClick={(e) => handleDuplicate(e, comp)}
-                    title="Duplicate"
-                  >
-                    📑
-                  </button>
-                  <button
-                    className="composition-action-btn delete"
-                    onClick={(e) => handleDeleteClick(e, comp)}
-                    title="Delete"
-                  >
-                    ×
-                  </button>
-                </div>
-              </div>
-              <div className="composition-name" title={comp.name}>
-                {comp.name}
-              </div>
-            </div>
-          ))
+          <CompositionTree
+            nodes={treeNodes}
+            activeCompositionId={activeComposition?.id}
+            onSelect={handleSelect}
+            onDuplicate={handleDuplicate}
+            onDelete={handleDeleteClick}
+          />
         )}
       </div>
     </div>
