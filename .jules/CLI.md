@@ -25,3 +25,7 @@ Critical learnings only. This is not a log—only add entries for insights that 
 ## [0.7.0] - Remote Data Validation
 **Learning:** Fetching data from a remote registry introduced risks of runtime crashes (e.g., trying to iterate over an error object). Simple `res.json()` is insufficient.
 **Action:** Always validate the structure of remote data (e.g., `Array.isArray()`) before consuming it, and handle timeouts to prevent CLI hangs.
+
+## [0.7.0] - Registry Install Gap
+**Learning:** `helios add` was marked as implemented but only copied files, failing to install dependencies. This created friction and violated the "Shadcn-style" vision of seamless adoption.
+**Action:** When implementing "add" commands, always include dependency management (check/install) to ensure the added component is immediately usable.
