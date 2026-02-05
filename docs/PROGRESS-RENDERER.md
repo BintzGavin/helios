@@ -1,3 +1,6 @@
+## RENDERER v1.68.1
+- ✅ Verified: Robust Distributed Audio Pipeline - Updated `Orchestrator` to detect audio streams in concatenated chunks and conditionally enable `mixInputAudio`, preventing failures when rendering compositions with no implicit audio. Verified with `verify-distributed.ts` and `verify-smart-codec-priority.ts`.
+
 ## RENDERER v1.68.0
 - ✅ Completed: Distributed Implicit Audio - Added `mixInputAudio` option to `RendererOptions` and updated `Orchestrator` to preserve implicit audio (DOM `<audio>`) during the final mix of distributed rendering. Verified with `verify-distributed-audio.ts`.
 

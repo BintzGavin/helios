@@ -17,6 +17,19 @@ const CHUNK_AUDIO_CODEC = 'pcm_s16le';
 const CHUNK_EXTENSION = '.mov';
 
 export class RenderOrchestrator {
+  private static async hasAudioStream(filePath: string, ffmpegPath: string): Promise<boolean> {
+    return new Promise((resolve) => {
+      const process = spawn(ffmpegPath, ['-i', filePath]);
+      let stderr = '';
+      process.stderr.on('data', (d) => stderr += d.toString());
+      process.on('close', () => {
+        // FFmpeg outputs stream info to stderr. Look for "Stream #x:x...: Audio:"
+        resolve(stderr.includes(': Audio:'));
+      });
+      process.on('error', () => resolve(false));
+    });
+  }
+
   static async render(compositionUrl: string, outputPath: string, options: DistributedRenderOptions, jobOptions?: RenderJobOptions): Promise<void> {
     const concurrency = options.concurrency || Math.max(1, os.cpus().length - 1);
 
@@ -104,16 +117,18 @@ export class RenderOrchestrator {
       if (finalStepNeeded) {
         console.log('Mixing audio into concatenated video...');
 
+        // Check if the concatenated file has an audio stream (implicit audio)
+        const ffmpegPath = options.ffmpegPath || ffmpeg.path;
+        const hasAudio = await RenderOrchestrator.hasAudioStream(concatTarget, ffmpegPath);
+
         // Use FFmpegBuilder to generate args for the mixing pass
         // We force 'copy' for video to avoid re-encoding
-        // We enable mixInputAudio to preserve the audio from the concatenated chunks (implicit audio)
-        const mixOptions: RendererOptions = { ...options, videoCodec: 'copy', mixInputAudio: true };
+        // We enable mixInputAudio only if there is audio to preserve
+        const mixOptions: RendererOptions = { ...options, videoCodec: 'copy', mixInputAudio: hasAudio };
         const videoInputArgs = ['-i', concatTarget];
 
         // FFmpegBuilder handles audio offsets/seeking based on options
         const { args } = FFmpegBuilder.getArgs(mixOptions, outputPath, videoInputArgs);
-
-        const ffmpegPath = options.ffmpegPath || ffmpeg.path;
         console.log(`Spawning FFmpeg for audio mixing: ${ffmpegPath} ${args.join(' ')}`);
 
         await new Promise<void>((resolve, reject) => {
