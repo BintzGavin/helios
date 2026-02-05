@@ -25,7 +25,7 @@ export class ClientSideExporter {
     signal?: AbortSignal;
     mode?: 'auto' | 'canvas' | 'dom';
     canvasSelector?: string;
-    format?: 'mp4' | 'webm';
+    format?: 'mp4' | 'webm' | 'png' | 'jpeg';
     includeCaptions?: boolean;
     width?: number;
     height?: number;
@@ -39,6 +39,94 @@ export class ClientSideExporter {
 
     try {
       const state = this.controller.getState();
+
+      // Image Export Logic
+      if (format === 'png' || format === 'jpeg') {
+        // For snapshot, use current frame
+        const frameToCapture = state.currentFrame;
+        let effectiveMode = mode;
+
+        if (effectiveMode === 'auto') {
+            const result = await this.controller.captureFrame(frameToCapture, {
+                selector: canvasSelector,
+                mode: 'canvas',
+                width: targetWidth,
+                height: targetHeight
+            });
+
+            if (result && result.frame) {
+                effectiveMode = 'canvas';
+                result.frame.close();
+            } else {
+                effectiveMode = 'dom';
+                console.log("Canvas not found for snapshot, falling back to DOM mode.");
+            }
+        }
+
+        const result = await this.controller.captureFrame(frameToCapture, {
+            selector: canvasSelector,
+            mode: effectiveMode as 'canvas' | 'dom',
+            width: targetWidth,
+            height: targetHeight
+        });
+
+        if (!result || !result.frame) {
+            throw new Error(`Failed to capture snapshot frame in mode: ${effectiveMode}`);
+        }
+
+        const { frame, captions } = result;
+
+        let finalFrame = frame;
+        if (includeCaptions && captions && captions.length > 0) {
+            finalFrame = await this.drawCaptions(frame, captions);
+            frame.close();
+        }
+
+        // Convert to Blob
+        const width = finalFrame.displayWidth;
+        const height = finalFrame.displayHeight;
+
+        let canvas: OffscreenCanvas | HTMLCanvasElement;
+        let ctx: OffscreenCanvasRenderingContext2D | CanvasRenderingContext2D | null;
+
+        if (typeof OffscreenCanvas !== 'undefined') {
+            canvas = new OffscreenCanvas(width, height);
+            ctx = canvas.getContext('2d');
+        } else {
+            canvas = document.createElement('canvas');
+            canvas.width = width;
+            canvas.height = height;
+            ctx = canvas.getContext('2d');
+        }
+
+        if (!ctx) throw new Error("Failed to create canvas context for snapshot");
+        ctx.drawImage(finalFrame, 0, 0);
+        finalFrame.close();
+
+        let blob: Blob | null = null;
+        const mimeType = format === 'png' ? 'image/png' : 'image/jpeg';
+
+        if (canvas instanceof OffscreenCanvas) {
+            blob = await canvas.convertToBlob({ type: mimeType });
+        } else {
+            blob = await new Promise<Blob | null>(resolve => (canvas as HTMLCanvasElement).toBlob(resolve, mimeType));
+        }
+
+        if (blob) {
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `${filename}.${format}`;
+            a.click();
+            URL.revokeObjectURL(url);
+            console.log("Snapshot download finished!");
+        } else {
+            throw new Error("Failed to create image blob");
+        }
+
+        onProgress(1);
+        return;
+      }
 
       let startFrame = 0;
       let totalFrames = state.duration * state.fps;

@@ -13,7 +13,7 @@ export { ClientSideExporter };
 export type { HeliosController };
 
 export interface HeliosExportOptions {
-  format?: 'mp4' | 'webm';
+  format?: 'mp4' | 'webm' | 'png' | 'jpeg';
   filename?: string;
   mode?: 'auto' | 'canvas' | 'dom';
   width?: number;
