@@ -1,3 +1,6 @@
+## DEMO v1.112.0
+- ✅ Completed: Vue Chart.js Animation - Created `examples/vue-chartjs-animation` demonstrating Chart.js integration with Vue 3 and Helios.
+
 ## DEMO v1.111.0
 - ✅ Completed: Solid D3 Animation - Created `examples/solid-d3-animation` demonstrating D3.js integration with SolidJS driven by Helios frame clock.
 
