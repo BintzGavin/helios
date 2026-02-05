@@ -45,3 +45,7 @@ Critical learnings only. This is not a log—only add entries for insights that 
 ## [0.9.1] - Registry Tracking Gap
 **Learning:** `helios add` installs components but does not record them in `helios.config.json` or any lockfile. This prevents inventory management (`list --installed`) and future updates (`helios update`).
 **Action:** When designing package managers or registries, always include a mechanism to track installed assets (like `components.json` or `package.json` deps) to enable lifecycle management.
+
+## [0.10.0] - Studio Registry Disconnect
+**Learning:** `helios studio` was passing a static local registry to the UI, ignoring the remote registry logic implemented in `helios add` (via `RegistryClient`). This caused the Studio UI to show outdated component lists even if the CLI could fetch new ones.
+**Action:** When a shared resource (like Registry) is accessed by multiple commands (`add`, `studio`), ensure they all use the same client/abstraction (`RegistryClient`) to maintain consistency.
