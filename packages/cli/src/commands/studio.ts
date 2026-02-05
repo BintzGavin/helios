@@ -3,8 +3,10 @@ import { createServer } from 'vite';
 import { studioApiPlugin } from '@helios-project/studio/cli';
 import { createRequire } from 'module';
 import path from 'path';
+import fs from 'fs';
 import { registry } from '../registry/manifest.js';
 import { installComponent } from '../utils/install.js';
+import { loadConfig } from '../utils/config.js';
 
 export function registerStudioCommand(program: Command) {
   program
@@ -38,6 +40,15 @@ export function registerStudioCommand(program: Command) {
               components: registry,
               onInstallComponent: async (name: string) => {
                 await installComponent(process.cwd(), name);
+              },
+              onCheckInstalled: async (name: string) => {
+                const config = loadConfig(process.cwd());
+                const componentsDir = config?.directories.components || 'src/components/helios';
+                const comp = registry.find(c => c.name === name);
+                if (!comp) return false;
+
+                const targetDir = path.resolve(process.cwd(), componentsDir);
+                return comp.files.every(f => fs.existsSync(path.join(targetDir, f.name)));
               }
             })
           ]

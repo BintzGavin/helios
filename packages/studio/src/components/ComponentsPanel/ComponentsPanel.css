@@ -76,3 +76,13 @@
 .install-button.success {
   background-color: var(--success-color, #4caf50);
 }
+
+.component-badge.installed {
+  background-color: var(--success-color, #4caf50);
+  color: white;
+  font-size: 0.7em;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-left: 0; /* Handled by flex gap */
+  font-weight: 600;
+}

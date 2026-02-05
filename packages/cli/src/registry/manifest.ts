@@ -162,6 +162,7 @@ export const Watermark: React.FC<WatermarkProps> = ({
 export const registry: ComponentDefinition[] = [
   {
     name: 'timer',
+    description: 'Displays a countdown or stopwatch synchronized with the video frame.',
     type: 'react',
     files: [
       {
@@ -180,6 +181,7 @@ export const registry: ComponentDefinition[] = [
   },
   {
     name: 'progress-bar',
+    description: 'Visualizes playback progress.',
     type: 'react',
     files: [
       {
@@ -198,6 +200,7 @@ export const registry: ComponentDefinition[] = [
   },
   {
     name: 'watermark',
+    description: 'Overlay text or image logo.',
     type: 'react',
     files: [
       {

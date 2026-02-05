@@ -11,6 +11,7 @@ import { startRender, getJob, getJobs, cancelJob, deleteJob, diagnoseServer } fr
 
 export interface StudioComponentDefinition {
   name: string;
+  description?: string;
   type: string;
   files: { name: string; content: string }[];
   dependencies?: Record<string, string>;
@@ -20,6 +21,7 @@ export interface StudioPluginOptions {
   studioRoot?: string;
   components?: StudioComponentDefinition[];
   onInstallComponent?: (name: string) => Promise<void>;
+  onCheckInstalled?: (name: string) => Promise<boolean>;
 }
 
 const getBody = async (req: any) => {
@@ -142,8 +144,12 @@ function configureMiddlewares(server: ViteDevServer | PreviewServer, isPreview: 
         if (req.url === '/' || req.url === '') {
             if (req.method === 'GET') {
                 const components = options.components || [];
+                const enriched = await Promise.all(components.map(async (c) => ({
+                    ...c,
+                    installed: options.onCheckInstalled ? await options.onCheckInstalled(c.name) : false
+                })));
                 res.setHeader('Content-Type', 'application/json');
-                res.end(JSON.stringify(components));
+                res.end(JSON.stringify(enriched));
                 return;
             }
             if (req.method === 'POST') {
