@@ -189,4 +189,55 @@ describe('Timeline', () => {
     const style2 = tracks[1].getAttribute('style');
     expect(style2).toContain('top: 84px');
   });
+
+  it('allows dragging time prop markers', () => {
+    const setInputPropsMock = vi.fn();
+    (StudioContext.useStudio as any).mockReturnValue({
+      ...defaultContext,
+      playerState: {
+        ...defaultPlayerState,
+        schema: {
+          myTime: { type: 'number', format: 'time', label: 'My Time' }
+        },
+        inputProps: {
+          myTime: 2.0 // Frame 60
+        }
+      },
+      controller: {
+        ...defaultContext.controller,
+        setInputProps: setInputPropsMock
+      }
+    });
+
+    const { container } = render(<Timeline />);
+    const propMarker = container.querySelector('.timeline-marker-prop');
+    expect(propMarker).toBeInTheDocument();
+    expect(propMarker).toHaveAttribute('title', 'My Time (00:00:02:00)');
+    expect(propMarker).toHaveStyle('left: 20%'); // 2s / 10s = 20%
+
+    // Mock content rect for drag calculation
+    const content = container.querySelector('.timeline-content');
+    if (content) {
+      content.getBoundingClientRect = vi.fn(() => ({
+        left: 0, top: 0, width: 1000, height: 100, bottom: 100, right: 1000, x: 0, y: 0, toJSON: () => {}
+      }));
+    }
+
+    // Mouse down on marker
+    fireEvent.mouseDown(propMarker!, { bubbles: true });
+
+    // Mouse move on document (dragging to 50% -> 5s)
+    act(() => {
+      const moveEvent = new MouseEvent('mousemove', {
+        bubbles: true,
+        cancelable: true,
+        clientX: 500 // 50% of 1000px
+      });
+      document.dispatchEvent(moveEvent);
+    });
+
+    // Should call setInputProps with new time
+    // 50% of 10s = 5s
+    expect(setInputPropsMock).toHaveBeenCalledWith({ myTime: 5 });
+  });
 });

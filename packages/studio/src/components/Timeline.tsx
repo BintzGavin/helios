@@ -51,7 +51,8 @@ export const Timeline: React.FC = () => {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
 
-  const [isDragging, setIsDragging] = useState<'playhead' | 'in' | 'out' | null>(null);
+  const [isDragging, setIsDragging] = useState<'playhead' | 'in' | 'out' | 'prop' | null>(null);
+  const [draggingPropKey, setDraggingPropKey] = useState<string | null>(null);
   const [zoom, setZoom] = usePersistentState('timeline-zoom', 0);
   const [hoverFrame, setHoverFrame] = useState<number | null>(null);
   const [contentWidth, setContentWidth] = useState(0);
@@ -185,9 +186,13 @@ export const Timeline: React.FC = () => {
       return rawFrame;
   };
 
-  const handleMouseDown = (e: React.MouseEvent, type: 'playhead' | 'in' | 'out') => {
+  const handleMouseDown = (e: React.MouseEvent, type: 'playhead' | 'in' | 'out' | 'prop', key?: string) => {
     e.preventDefault();
     setIsDragging(type);
+
+    if (type === 'prop' && key) {
+      setDraggingPropKey(key);
+    }
 
     if (type === 'playhead' && controller) {
       const rawFrame = getFrameFromEvent(e);
@@ -224,6 +229,9 @@ export const Timeline: React.FC = () => {
       } else if (isDragging === 'out') {
         const newOut = Math.max(inPoint + 1, Math.min(frame, totalFrames));
         setOutPoint(newOut);
+      } else if (isDragging === 'prop' && draggingPropKey && controller) {
+        const time = frame / fps;
+        controller.setInputProps({ [draggingPropKey]: time });
       }
     };
 
@@ -238,7 +246,7 @@ export const Timeline: React.FC = () => {
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
     };
-  }, [isDragging, controller, totalFrames, inPoint, outPoint, setInPoint, setOutPoint, pixelsPerFrame, contentWidth, markers, captions]);
+  }, [isDragging, controller, totalFrames, inPoint, outPoint, setInPoint, setOutPoint, pixelsPerFrame, contentWidth, markers, captions, draggingPropKey, fps]);
 
   const getPercent = (frame: number) => {
     const p = (frame / totalFrames) * 100;
@@ -386,12 +394,13 @@ export const Timeline: React.FC = () => {
                 className="timeline-marker-prop"
                 style={{
                   left: `${getPercent(prop.time * fps)}%`,
-                  top: `${videoTrackTop}px`
+                  top: `${videoTrackTop}px`,
+                  cursor: 'ew-resize'
                 }}
                 title={`${prop.label} (${formatTime(prop.time * fps, fps)})`}
                 onMouseDown={(e) => {
                   e.stopPropagation();
-                  if (controller) controller.seek(prop.time * fps);
+                  handleMouseDown(e, 'prop', prop.key);
                 }}
               />
             ))}

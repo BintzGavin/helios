@@ -1,3 +1,6 @@
+## STUDIO v0.97.0
+- ✅ Completed: Draggable Time Markers - Implemented dragging for time-based input prop markers on the Timeline, allowing direct manipulation of prop values.
+
 ## STUDIO v0.96.0
 - ✅ Completed: Sync Playback Range - Delegated loop and playback range enforcement to HeliosController, ensuring consistent behavior across Preview and Export.
 
