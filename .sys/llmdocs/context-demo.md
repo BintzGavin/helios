@@ -44,6 +44,7 @@ The `examples/` directory contains reference implementations for various framewo
 - **vue-threejs-canvas-animation**: 3D animation with Three.js and Vue.
 - **vue-pixi-animation**: 2D animation with PixiJS and Vue.
 - **vue-d3-animation**: Data visualization with D3.js and Vue 3.
+- **vue-chartjs-animation**: Animated charts with Chart.js.
 - **vue-transitions**: Vue `<Transition>` component.
 - **vue-animation-helpers**: Helper components for sequencing.
 - **vue-lottie-animation**: Rendering Lottie JSON animations.
