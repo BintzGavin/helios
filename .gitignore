@@ -36,3 +36,5 @@ Thumbs.db
 !examples/promo-video/output/
 !examples/promo-video/output/helios-promo.mp4
 test-results/
+!examples/excalidraw-animation/output/
+!examples/excalidraw-animation/output/excalidraw-animation.mp4
