@@ -21,3 +21,7 @@ Critical learnings only. This is not a log—only add entries for insights that 
 ## [0.6.0] - Registry Architecture
 **Learning:** The existing component registry was hardcoded in `manifest.ts` (V1 MVP), conflicting with the V2 "Shadcn-style" vision which requires dynamic/remote fetching.
 **Action:** Created plan `2026-03-01-CLI-Remote-Registry.md` to decouple the registry. Future implementations must prioritize externalizing data sources over embedding them in the binary.
+
+## [0.7.0] - Remote Data Validation
+**Learning:** Fetching data from a remote registry introduced risks of runtime crashes (e.g., trying to iterate over an error object). Simple `res.json()` is insufficient.
+**Action:** Always validate the structure of remote data (e.g., `Array.isArray()`) before consuming it, and handle timeouts to prevent CLI hangs.

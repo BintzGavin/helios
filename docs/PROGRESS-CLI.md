@@ -2,6 +2,10 @@
 
 This file tracks progress for the CLI domain (`packages/cli`).
 
+## CLI v0.7.0
+
+- ✅ Remote Registry Support - Implemented `RegistryClient` to fetch components from a remote URL with local fallback
+
 ## CLI v0.6.0
 
 - ✅ Implement Merge Command - Implemented `helios merge` command to stitch multiple video files into a single output without re-encoding
