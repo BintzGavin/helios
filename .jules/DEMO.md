@@ -71,3 +71,7 @@
 ## [1.110.0] - React Helios Instantiation
 **Learning:** Newer examples or setups might not export a singleton `helios` instance from core. React examples should instantiate `Helios` manually and expose it/use it via context or direct import to ensure proper configuration (like `autoSyncAnimations: false`).
 **Action:** Always verify how `Helios` is initialized and accessed in the specific framework context when creating new examples.
+
+## [1.115.0] - Legacy Example Portability
+**Learning:** Legacy examples (e.g., `threejs-canvas-animation`) rely on implicit hoisting and root build configs. They lack `package.json` and `tsconfig.json`, making them poor references for users who want to "eject" or copy-paste.
+**Action:** Standardize legacy examples by adding `package.json` and TypeScript configuration to ensure they are self-contained and "Professional".
