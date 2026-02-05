@@ -7,7 +7,7 @@ import { HeliosVideoTrack, HeliosVideoTrackList, VideoTrackHost } from "./featur
 export { ClientSideExporter };
 export type { HeliosController };
 export interface HeliosExportOptions {
-    format?: 'mp4' | 'webm';
+    format?: 'mp4' | 'webm' | 'png' | 'jpeg';
     filename?: string;
     mode?: 'auto' | 'canvas' | 'dom';
     width?: number;
@@ -38,6 +38,8 @@ export declare class HeliosPlayer extends HTMLElement implements TrackHost, Audi
     private volumeSlider;
     private audioBtn;
     private audioMenu;
+    private settingsBtn;
+    private settingsMenu;
     private scrubber;
     private scrubberWrapper;
     private scrubberTooltip;
@@ -48,7 +50,6 @@ export declare class HeliosPlayer extends HTMLElement implements TrackHost, Audi
     private statusText;
     private retryBtn;
     private retryAction;
-    private speedSelector;
     private fullscreenBtn;
     private pipBtn;
     private captionsContainer;
@@ -59,6 +60,9 @@ export declare class HeliosPlayer extends HTMLElement implements TrackHost, Audi
     private debugContent;
     private closeDebugBtn;
     private copyDebugBtn;
+    private shortcutsOverlay;
+    private shortcutsGrid;
+    private closeShortcutsBtn;
     private clickLayer;
     private posterContainer;
     private posterImage;
@@ -169,7 +173,12 @@ export declare class HeliosPlayer extends HTMLElement implements TrackHost, Audi
     private updateAudioBtnVisibility;
     private toggleAudioMenu;
     private closeAudioMenu;
+    private toggleSettingsMenu;
+    private closeSettingsMenu;
+    private closeMenusIfOutside;
     private closeAudioMenuIfOutside;
+    private renderSettingsMenu;
+    private createDivider;
     private renderAudioMenu;
     get inputProps(): Record<string, any> | null;
     set inputProps(val: Record<string, any> | null);
@@ -198,6 +207,8 @@ export declare class HeliosPlayer extends HTMLElement implements TrackHost, Audi
     private handleSpeedChange;
     private toggleCaptions;
     private toggleDiagnostics;
+    private toggleShortcutsOverlay;
+    private renderShortcuts;
     private handleCopyDebug;
     private handleKeydown;
     private seekRelative;

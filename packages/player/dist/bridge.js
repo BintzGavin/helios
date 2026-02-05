@@ -108,7 +108,10 @@ export function connectToParent(helios) {
             case 'HELIOS_START_METERING':
                 if (!audioMeter) {
                     audioMeter = new AudioMeter();
-                    audioMeter.connect(document);
+                }
+                audioMeter.connect(document);
+                audioMeter.enable();
+                if (!audioMeterRaf) {
                     const loop = () => {
                         if (audioMeter) {
                             const levels = audioMeter.getLevels();
@@ -125,8 +128,7 @@ export function connectToParent(helios) {
                     audioMeterRaf = null;
                 }
                 if (audioMeter) {
-                    audioMeter.dispose();
-                    audioMeter = null;
+                    audioMeter.disable();
                 }
                 break;
             case 'HELIOS_DIAGNOSE':

@@ -239,23 +239,6 @@ template.innerHTML = `
     .retry-btn:hover {
       background-color: #ff5252;
     }
-    .speed-selector {
-      background: rgba(0, 0, 0, 0.4);
-      color: var(--helios-text-color);
-      border: 1px solid var(--helios-range-track-color);
-      border-radius: 4px;
-      padding: 4px 8px;
-      margin-left: 8px;
-      font-size: 12px;
-      cursor: pointer;
-    }
-    .speed-selector:hover {
-      background: rgba(0, 0, 0, 0.6);
-    }
-    .speed-selector:focus {
-      outline: none;
-      border-color: var(--helios-accent-color);
-    }
     .fullscreen-btn {
       background: none;
       border: none;
@@ -395,9 +378,6 @@ template.innerHTML = `
     .controls.layout-tiny .volume-slider {
       display: none;
     }
-    .controls.layout-tiny .speed-selector {
-      display: none;
-    }
     slot {
       display: none;
     }
@@ -470,30 +450,38 @@ template.innerHTML = `
     .copy-debug-btn:hover {
       filter: brightness(0.9);
     }
-    .audio-menu {
+    .audio-menu, .settings-menu {
       position: absolute;
       bottom: 60px;
-      left: 10px;
       background: rgba(0, 0, 0, 0.9);
       border: 1px solid var(--helios-range-track-color);
       border-radius: 8px;
       padding: 8px;
       z-index: 20;
-      min-width: 200px;
+      min-width: 220px;
       display: flex;
       flex-direction: column;
       gap: 8px;
       backdrop-filter: blur(4px);
     }
-    .audio-menu.hidden {
+    .audio-menu {
+       left: 10px;
+    }
+    .settings-menu {
+       right: 10px;
+    }
+    .audio-menu.hidden, .settings-menu.hidden {
       display: none;
     }
-    .track-item {
+    .track-item, .settings-item {
       display: flex;
       align-items: center;
       gap: 8px;
       color: white;
       font-size: 12px;
+    }
+    .settings-item {
+      justify-content: space-between;
     }
     .track-name {
       flex: 1;
@@ -529,7 +517,7 @@ template.innerHTML = `
       width: 20px;
       text-align: center;
     }
-    .audio-btn {
+    .audio-btn, .settings-btn {
       background: none;
       border: none;
       color: var(--helios-text-color);
@@ -542,12 +530,131 @@ template.innerHTML = `
       justify-content: center;
       margin-left: 4px;
     }
-    .audio-btn:hover {
+    .audio-btn:hover, .settings-btn:hover {
+      color: var(--helios-accent-color);
+    }
+    /* Settings UI */
+    .settings-label {
+      font-weight: bold;
+    }
+    .settings-select {
+       background: rgba(255, 255, 255, 0.1);
+       color: white;
+       border: 1px solid var(--helios-range-track-color);
+       border-radius: 4px;
+       padding: 2px 4px;
+    }
+    .settings-action-btn {
+       background: rgba(255, 255, 255, 0.1);
+       border: 1px solid var(--helios-range-track-color);
+       color: white;
+       border-radius: 4px;
+       padding: 4px 8px;
+       cursor: pointer;
+       font-size: 11px;
+       flex: 1;
+    }
+    .settings-action-btn:hover {
+       background: rgba(255, 255, 255, 0.2);
+    }
+    .settings-divider {
+       height: 1px;
+       background: var(--helios-range-track-color);
+       margin: 4px 0;
+    }
+    /* Toggle Switch */
+    .toggle-switch {
+      position: relative;
+      display: inline-block;
+      width: 32px;
+      height: 18px;
+    }
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .toggle-slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: var(--helios-range-track-color);
+      transition: .2s;
+      border-radius: 18px;
+    }
+    .toggle-slider:before {
+      position: absolute;
+      content: "";
+      height: 14px;
+      width: 14px;
+      left: 2px;
+      bottom: 2px;
+      background-color: white;
+      transition: .2s;
+      border-radius: 50%;
+    }
+    input:checked + .toggle-slider {
+      background-color: var(--helios-accent-color);
+    }
+    input:checked + .toggle-slider:before {
+      transform: translateX(14px);
+    }
+    /* Shortcuts Overlay */
+    .shortcuts-overlay {
+      position: absolute;
+      inset: 20px;
+      background: rgba(0, 0, 0, 0.95);
+      border: 1px solid var(--helios-range-track-color);
+      border-radius: 8px;
+      z-index: 110;
+      display: flex;
+      flex-direction: column;
+      color: white;
+      padding: 16px;
+      font-size: 13px;
+      backdrop-filter: blur(4px);
+    }
+    .shortcuts-overlay.hidden {
+      display: none;
+    }
+    .shortcuts-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px 24px;
+      overflow-y: auto;
+      flex: 1;
+    }
+    .shortcut-row {
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 4px 0;
+    }
+    .shortcut-key {
+      font-family: monospace;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 2px 6px;
+      border-radius: 4px;
       color: var(--helios-accent-color);
     }
   </style>
   <slot></slot>
   <div class="audio-menu hidden" part="audio-menu" id="audio-menu-container" role="dialog" aria-label="Audio Tracks"></div>
+  <div class="settings-menu hidden" part="settings-menu" id="settings-menu-container" role="dialog" aria-label="Settings"></div>
+
+  <div class="shortcuts-overlay hidden" part="shortcuts-overlay">
+    <div class="debug-header">
+      <span class="debug-title">Keyboard Shortcuts</span>
+      <button class="close-shortcuts-btn close-debug-btn" aria-label="Close">×</button>
+    </div>
+    <div class="shortcuts-grid">
+       <!-- Populated via JS -->
+    </div>
+  </div>
+
   <div class="debug-overlay hidden" part="debug-overlay">
     <div class="debug-header">
       <span class="debug-title">Diagnostics</span>
@@ -579,12 +686,6 @@ template.innerHTML = `
     <button class="audio-btn" part="audio-button" aria-label="Audio Tracks" style="display: none;" aria-haspopup="true" aria-controls="audio-menu-container" aria-expanded="false">🎵</button>
     <button class="cc-btn" part="cc-button" aria-label="Toggle Captions">CC</button>
     <button class="export-btn" part="export-button" aria-label="Export video">Export</button>
-    <select class="speed-selector" part="speed-selector" aria-label="Playback speed">
-      <option value="0.25">0.25x</option>
-      <option value="0.5">0.5x</option>
-      <option value="1" selected>1x</option>
-      <option value="2">2x</option>
-    </select>
     <div class="scrubber-wrapper">
       <div class="scrubber-tooltip hidden" part="tooltip"></div>
       <div class="markers-container" part="markers"></div>
@@ -593,6 +694,7 @@ template.innerHTML = `
     <div class="time-display" part="time-display">0.00 / 0.00</div>
     <button class="fullscreen-btn" part="fullscreen-button" aria-label="Toggle fullscreen">⛶</button>
     <button class="pip-btn" part="pip-button" aria-label="Picture-in-Picture">⏏</button>
+    <button class="settings-btn" part="settings-button" aria-label="Settings" aria-haspopup="true" aria-controls="settings-menu-container" aria-expanded="false">⚙</button>
   </div>
 `;
 export class HeliosPlayer extends HTMLElement {
@@ -607,6 +709,8 @@ export class HeliosPlayer extends HTMLElement {
     volumeSlider;
     audioBtn;
     audioMenu;
+    settingsBtn;
+    settingsMenu;
     scrubber;
     scrubberWrapper;
     scrubberTooltip;
@@ -617,7 +721,6 @@ export class HeliosPlayer extends HTMLElement {
     statusText;
     retryBtn;
     retryAction;
-    speedSelector;
     fullscreenBtn;
     pipBtn;
     captionsContainer;
@@ -629,6 +732,10 @@ export class HeliosPlayer extends HTMLElement {
     debugContent;
     closeDebugBtn;
     copyDebugBtn;
+    // Shortcuts UI
+    shortcutsOverlay;
+    shortcutsGrid;
+    closeShortcutsBtn;
     clickLayer;
     posterContainer;
     posterImage;
@@ -1003,6 +1110,8 @@ export class HeliosPlayer extends HTMLElement {
         this.volumeSlider = this.shadowRoot.querySelector(".volume-slider");
         this.audioBtn = this.shadowRoot.querySelector(".audio-btn");
         this.audioMenu = this.shadowRoot.querySelector(".audio-menu");
+        this.settingsBtn = this.shadowRoot.querySelector(".settings-btn");
+        this.settingsMenu = this.shadowRoot.querySelector(".settings-menu");
         this.scrubber = this.shadowRoot.querySelector(".scrubber");
         this.scrubberWrapper = this.shadowRoot.querySelector(".scrubber-wrapper");
         this.scrubberTooltip = this.shadowRoot.querySelector(".scrubber-tooltip");
@@ -1012,7 +1121,6 @@ export class HeliosPlayer extends HTMLElement {
         this.overlay = this.shadowRoot.querySelector(".status-overlay");
         this.statusText = this.shadowRoot.querySelector(".status-text");
         this.retryBtn = this.shadowRoot.querySelector(".retry-btn");
-        this.speedSelector = this.shadowRoot.querySelector(".speed-selector");
         this.fullscreenBtn = this.shadowRoot.querySelector(".fullscreen-btn");
         this.pipBtn = this.shadowRoot.querySelector(".pip-btn");
         this.captionsContainer = this.shadowRoot.querySelector(".captions-container");
@@ -1021,6 +1129,9 @@ export class HeliosPlayer extends HTMLElement {
         this.debugContent = this.shadowRoot.querySelector(".debug-content");
         this.closeDebugBtn = this.shadowRoot.querySelector(".close-debug-btn");
         this.copyDebugBtn = this.shadowRoot.querySelector(".copy-debug-btn");
+        this.shortcutsOverlay = this.shadowRoot.querySelector(".shortcuts-overlay");
+        this.shortcutsGrid = this.shadowRoot.querySelector(".shortcuts-grid");
+        this.closeShortcutsBtn = this.shadowRoot.querySelector(".close-shortcuts-btn");
         this.pipVideo = this.shadowRoot.querySelector(".pip-video");
         this.clickLayer = this.shadowRoot.querySelector(".click-layer");
         this.posterContainer = this.shadowRoot.querySelector(".poster-container");
@@ -1242,6 +1353,7 @@ export class HeliosPlayer extends HTMLElement {
     toggleAudioMenu = (e) => {
         e.stopPropagation();
         if (this.audioMenu.classList.contains("hidden")) {
+            this.closeSettingsMenu(); // Close other menu
             this.renderAudioMenu();
             this.audioMenu.classList.remove("hidden");
             this.audioBtn.setAttribute("aria-expanded", "true");
@@ -1258,6 +1370,31 @@ export class HeliosPlayer extends HTMLElement {
         this.audioMenu.classList.add("hidden");
         this.audioBtn.setAttribute("aria-expanded", "false");
     };
+    toggleSettingsMenu = (e) => {
+        e.stopPropagation();
+        if (this.settingsMenu.classList.contains("hidden")) {
+            this.closeAudioMenu(); // Close other menu
+            this.renderSettingsMenu();
+            this.settingsMenu.classList.remove("hidden");
+            this.settingsBtn.setAttribute("aria-expanded", "true");
+        }
+        else {
+            this.closeSettingsMenu();
+        }
+    };
+    closeSettingsMenu = () => {
+        this.settingsMenu.classList.add("hidden");
+        this.settingsBtn.setAttribute("aria-expanded", "false");
+    };
+    closeMenusIfOutside = (e) => {
+        this.closeAudioMenuIfOutside(e);
+        if (!this.settingsMenu.classList.contains("hidden")) {
+            const target = e.composedPath()[0];
+            if (!this.settingsMenu.contains(target) && !this.settingsBtn.contains(target)) {
+                this.closeSettingsMenu();
+            }
+        }
+    };
     closeAudioMenuIfOutside = (e) => {
         // If menu is hidden, do nothing
         if (this.audioMenu.classList.contains("hidden"))
@@ -1269,6 +1406,125 @@ export class HeliosPlayer extends HTMLElement {
         }
         this.closeAudioMenu();
     };
+    renderSettingsMenu() {
+        this.settingsMenu.innerHTML = "";
+        if (!this.controller)
+            return;
+        const state = this.controller.getState();
+        // 1. Playback Speed
+        const speedItem = document.createElement("div");
+        speedItem.className = "settings-item";
+        speedItem.innerHTML = `<span class="settings-label">Speed</span>`;
+        const speedSelect = document.createElement("select");
+        speedSelect.className = "settings-select";
+        speedSelect.innerHTML = `
+      <option value="0.25">0.25x</option>
+      <option value="0.5">0.5x</option>
+      <option value="1">1x</option>
+      <option value="2">2x</option>
+    `;
+        speedSelect.value = String(state.playbackRate || 1);
+        speedSelect.addEventListener("change", (e) => {
+            if (this.controller) {
+                this.controller.setPlaybackRate(parseFloat(speedSelect.value));
+            }
+        });
+        speedItem.appendChild(speedSelect);
+        this.settingsMenu.appendChild(speedItem);
+        this.settingsMenu.appendChild(this.createDivider());
+        // 2. Loop
+        const loopItem = document.createElement("div");
+        loopItem.className = "settings-item";
+        loopItem.innerHTML = `<span class="settings-label">Loop</span>`;
+        const loopSwitch = document.createElement("label");
+        loopSwitch.className = "toggle-switch";
+        const loopInput = document.createElement("input");
+        loopInput.type = "checkbox";
+        loopInput.checked = this.hasAttribute("loop"); // We sync attribute with state, but check attrib for initial state
+        // Actually better to check state if available, but native loop state in controller mirrors attribute usually
+        // Let's assume controller state matches attribute or manual set
+        // But controller.setLoop() updates internal state.
+        // We don't have isLooping in state exposed directly?
+        // Wait, HeliosState doesn't expose 'loop' boolean?
+        // Let's check state. Actually HeliosState does not strictly expose loop boolean,
+        // it's handled by logic. But we can use attribute as source of truth for UI toggle
+        // if we keep them synced.
+        // However, setLoop updates the attribute usually? No, the attribute updater calls setLoop.
+        loopInput.addEventListener("change", () => {
+            this.loop = loopInput.checked; // This triggers attributeChangedCallback -> controller.setLoop
+        });
+        const loopSlider = document.createElement("span");
+        loopSlider.className = "toggle-slider";
+        loopSwitch.appendChild(loopInput);
+        loopSwitch.appendChild(loopSlider);
+        loopItem.appendChild(loopSwitch);
+        this.settingsMenu.appendChild(loopItem);
+        // 3. Loop Range Controls
+        const rangeItem = document.createElement("div");
+        rangeItem.className = "settings-item";
+        rangeItem.style.flexDirection = "column";
+        rangeItem.style.alignItems = "stretch";
+        rangeItem.style.gap = "4px";
+        rangeItem.innerHTML = `<span class="settings-label">Playback Range</span>`;
+        const btnRow = document.createElement("div");
+        btnRow.style.display = "flex";
+        btnRow.style.gap = "4px";
+        const setInBtn = document.createElement("button");
+        setInBtn.className = "settings-action-btn";
+        setInBtn.textContent = "Set In";
+        setInBtn.onclick = () => {
+            const s = this.controller.getState();
+            const start = Math.floor(s.currentFrame);
+            const end = s.playbackRange ? s.playbackRange[1] : (s.duration * s.fps);
+            this.controller.setPlaybackRange(start, Math.max(start + 1, end));
+        };
+        const setOutBtn = document.createElement("button");
+        setOutBtn.className = "settings-action-btn";
+        setOutBtn.textContent = "Set Out";
+        setOutBtn.onclick = () => {
+            const s = this.controller.getState();
+            const end = Math.floor(s.currentFrame);
+            const start = s.playbackRange ? s.playbackRange[0] : 0;
+            this.controller.setPlaybackRange(Math.min(start, end - 1), end);
+        };
+        const clearBtn = document.createElement("button");
+        clearBtn.className = "settings-action-btn";
+        clearBtn.textContent = "Clear";
+        clearBtn.onclick = () => {
+            this.controller.clearPlaybackRange();
+        };
+        btnRow.appendChild(setInBtn);
+        btnRow.appendChild(setOutBtn);
+        btnRow.appendChild(clearBtn);
+        rangeItem.appendChild(btnRow);
+        this.settingsMenu.appendChild(rangeItem);
+        this.settingsMenu.appendChild(this.createDivider());
+        // 4. Shortcuts
+        const shortcutsBtn = document.createElement("button");
+        shortcutsBtn.className = "settings-action-btn";
+        shortcutsBtn.style.textAlign = "center";
+        shortcutsBtn.textContent = "Keyboard Shortcuts";
+        shortcutsBtn.onclick = () => {
+            this.closeSettingsMenu();
+            this.toggleShortcutsOverlay();
+        };
+        this.settingsMenu.appendChild(shortcutsBtn);
+        // 5. Diagnostics
+        const diagBtn = document.createElement("button");
+        diagBtn.className = "settings-action-btn";
+        diagBtn.style.textAlign = "center";
+        diagBtn.textContent = "Diagnostics";
+        diagBtn.onclick = () => {
+            this.closeSettingsMenu();
+            this.toggleDiagnostics();
+        };
+        this.settingsMenu.appendChild(diagBtn);
+    }
+    createDivider() {
+        const div = document.createElement("div");
+        div.className = "settings-divider";
+        return div;
+    }
     renderAudioMenu() {
         this.audioMenu.innerHTML = "";
         const tracks = Array.from(this._audioTracks);
@@ -1338,7 +1594,8 @@ export class HeliosPlayer extends HTMLElement {
         this.volumeBtn.addEventListener("click", this.toggleMute);
         this.volumeSlider.addEventListener("input", this.handleVolumeInput);
         this.audioBtn.addEventListener("click", this.toggleAudioMenu);
-        document.addEventListener("click", this.closeAudioMenuIfOutside);
+        this.settingsBtn.addEventListener("click", this.toggleSettingsMenu);
+        document.addEventListener("click", this.closeMenusIfOutside);
         this.scrubber.addEventListener("input", this.handleScrubberInput);
         this.scrubber.addEventListener("mousedown", this.handleScrubStart);
         this.scrubber.addEventListener("change", this.handleScrubEnd);
@@ -1348,7 +1605,6 @@ export class HeliosPlayer extends HTMLElement {
         this.scrubberWrapper.addEventListener("mousemove", this.handleScrubberHover);
         this.scrubberWrapper.addEventListener("mouseleave", this.handleScrubberLeave);
         this.exportBtn.addEventListener("click", this.renderClientSide);
-        this.speedSelector.addEventListener("change", this.handleSpeedChange);
         this.fullscreenBtn.addEventListener("click", this.toggleFullscreen);
         this.pipBtn.addEventListener("click", () => this.togglePip());
         this.ccBtn.addEventListener("click", this.toggleCaptions);
@@ -1358,6 +1614,7 @@ export class HeliosPlayer extends HTMLElement {
         this.posterContainer.addEventListener("click", this.handleBigPlayClick);
         this.closeDebugBtn.addEventListener("click", this.toggleDiagnostics);
         this.copyDebugBtn.addEventListener("click", this.handleCopyDebug);
+        this.closeShortcutsBtn.addEventListener("click", this.toggleShortcutsOverlay);
         const slot = this.shadowRoot.querySelector("slot");
         if (slot) {
             slot.addEventListener("slotchange", this.handleSlotChange);
@@ -1396,7 +1653,8 @@ export class HeliosPlayer extends HTMLElement {
         this.volumeBtn.removeEventListener("click", this.toggleMute);
         this.volumeSlider.removeEventListener("input", this.handleVolumeInput);
         this.audioBtn.removeEventListener("click", this.toggleAudioMenu);
-        document.removeEventListener("click", this.closeAudioMenuIfOutside);
+        this.settingsBtn.removeEventListener("click", this.toggleSettingsMenu);
+        document.removeEventListener("click", this.closeMenusIfOutside);
         this.scrubber.removeEventListener("input", this.handleScrubberInput);
         this.scrubber.removeEventListener("mousedown", this.handleScrubStart);
         this.scrubber.removeEventListener("change", this.handleScrubEnd);
@@ -1406,7 +1664,6 @@ export class HeliosPlayer extends HTMLElement {
         this.scrubberWrapper.removeEventListener("mousemove", this.handleScrubberHover);
         this.scrubberWrapper.removeEventListener("mouseleave", this.handleScrubberLeave);
         this.exportBtn.removeEventListener("click", this.renderClientSide);
-        this.speedSelector.removeEventListener("change", this.handleSpeedChange);
         this.fullscreenBtn.removeEventListener("click", this.toggleFullscreen);
         this.ccBtn.removeEventListener("click", this.toggleCaptions);
         this.bigPlayBtn.removeEventListener("click", this.handleBigPlayClick);
@@ -1415,6 +1672,7 @@ export class HeliosPlayer extends HTMLElement {
         this.posterContainer.removeEventListener("click", this.handleBigPlayClick);
         this.closeDebugBtn.removeEventListener("click", this.toggleDiagnostics);
         this.copyDebugBtn.removeEventListener("click", this.handleCopyDebug);
+        this.closeShortcutsBtn.removeEventListener("click", this.toggleShortcutsOverlay);
         const slot = this.shadowRoot.querySelector("slot");
         if (slot) {
             slot.removeEventListener("slotchange", this.handleSlotChange);
@@ -1491,7 +1749,7 @@ export class HeliosPlayer extends HTMLElement {
         this.volumeBtn.disabled = disabled;
         this.volumeSlider.disabled = disabled;
         this.scrubber.disabled = disabled;
-        this.speedSelector.disabled = disabled;
+        this.settingsBtn.disabled = disabled;
         this.fullscreenBtn.disabled = disabled;
         this.pipBtn.disabled = disabled;
         this.ccBtn.disabled = disabled;
@@ -1505,7 +1763,7 @@ export class HeliosPlayer extends HTMLElement {
         this.volumeBtn.disabled = locked;
         this.volumeSlider.disabled = locked;
         this.scrubber.disabled = locked;
-        this.speedSelector.disabled = locked;
+        this.settingsBtn.disabled = locked;
         this.fullscreenBtn.disabled = locked;
         this.pipBtn.disabled = locked;
         this.ccBtn.disabled = locked;
@@ -1820,9 +2078,7 @@ export class HeliosPlayer extends HTMLElement {
         this.scrubberTooltip.classList.add("hidden");
     };
     handleSpeedChange = () => {
-        if (this.controller) {
-            this.controller.setPlaybackRate(parseFloat(this.speedSelector.value));
-        }
+        // Managed by Settings Menu now
     };
     toggleCaptions = () => {
         this.showCaptions = !this.showCaptions;
@@ -1847,6 +2103,38 @@ export class HeliosPlayer extends HTMLElement {
             this.debugOverlay.classList.add('hidden');
         }
     };
+    toggleShortcutsOverlay = () => {
+        if (this.shortcutsOverlay.classList.contains('hidden')) {
+            this.renderShortcuts();
+            this.shortcutsOverlay.classList.remove('hidden');
+        }
+        else {
+            this.shortcutsOverlay.classList.add('hidden');
+        }
+    };
+    renderShortcuts() {
+        const shortcuts = [
+            { key: "Space / K", desc: "Play / Pause" },
+            { key: "← / →", desc: "Seek 1 frame" },
+            { key: "Shift + ← / →", desc: "Seek 10 frames" },
+            { key: "Home", desc: "Go to start" },
+            { key: "End", desc: "Go to end" },
+            { key: "F", desc: "Toggle Fullscreen" },
+            { key: "M", desc: "Mute" },
+            { key: "C", desc: "Toggle Captions" },
+            { key: "Shift + D", desc: "Toggle Diagnostics" },
+            { key: "I", desc: "Set In Point" },
+            { key: "O", desc: "Set Out Point" },
+            { key: "X", desc: "Clear Range" },
+            { key: "0-9", desc: "Seek to 0-90%" }
+        ];
+        this.shortcutsGrid.innerHTML = shortcuts.map(s => `
+         <div class="shortcut-row">
+            <span class="shortcut-desc">${s.desc}</span>
+            <span class="shortcut-key">${s.key}</span>
+         </div>
+     `).join("");
+    }
     handleCopyDebug = () => {
         const text = this.debugContent.textContent || "";
         navigator.clipboard.writeText(text).then(() => {
@@ -1867,6 +2155,15 @@ export class HeliosPlayer extends HTMLElement {
                 e.stopPropagation();
                 this.closeAudioMenu();
                 this.audioBtn.focus();
+            }
+            if (!this.settingsMenu.classList.contains("hidden")) {
+                e.stopPropagation();
+                this.closeSettingsMenu();
+                this.settingsBtn.focus();
+            }
+            if (!this.shortcutsOverlay.classList.contains("hidden")) {
+                e.stopPropagation();
+                this.toggleShortcutsOverlay();
             }
             return;
         }
@@ -1904,6 +2201,9 @@ export class HeliosPlayer extends HTMLElement {
                 if (e.shiftKey) {
                     this.toggleDiagnostics();
                 }
+                break;
+            case "?":
+                this.toggleShortcutsOverlay();
                 break;
             case "ArrowRight":
             case "l":
@@ -2097,8 +2397,13 @@ export class HeliosPlayer extends HTMLElement {
         this.scrubber.setAttribute("aria-valuemin", "0");
         this.scrubber.setAttribute("aria-valuemax", String(state.duration * state.fps));
         this.scrubber.setAttribute("aria-valuetext", `${currentTime} of ${totalTime} seconds`);
-        if (state.playbackRate !== undefined) {
-            this.speedSelector.value = String(state.playbackRate);
+        // Update speed in settings menu (if open)
+        // Since it's a select element, we can find it and update
+        if (!this.settingsMenu.classList.contains("hidden")) {
+            const select = this.settingsMenu.querySelector("select");
+            if (select && state.playbackRate !== undefined && document.activeElement !== select) {
+                select.value = String(state.playbackRate);
+            }
         }
         // Update Markers
         const markersChanged = !this.lastState || state.markers !== this.lastState.markers;
@@ -2199,14 +2504,18 @@ export class HeliosPlayer extends HTMLElement {
         this.isExporting = true;
         this.lockPlaybackControls(true);
         try {
+            const parseNum = (attr) => {
+                const val = parseFloat(this.getAttribute(attr) || '');
+                return !isNaN(val) && val > 0 ? val : undefined;
+            };
             // Merge options with attributes (options take precedence)
             const finalOptions = {
                 mode: options.mode || this.getAttribute('export-mode') || 'auto',
                 format: options.format || this.getAttribute('export-format') || 'mp4',
                 filename: options.filename || this.getAttribute('export-filename') || 'video',
-                width: options.width || parseFloat(this.getAttribute('export-width') || ''),
-                height: options.height || parseFloat(this.getAttribute('export-height') || ''),
-                bitrate: options.bitrate || parseInt(this.getAttribute('export-bitrate') || ''),
+                width: options.width ?? parseNum('export-width'),
+                height: options.height ?? parseNum('export-height'),
+                bitrate: options.bitrate ?? parseNum('export-bitrate'),
                 canvasSelector: options.canvasSelector || this.getAttribute('canvas-selector') || 'canvas',
                 includeCaptions: options.includeCaptions ?? this.showCaptions,
                 onProgress: options.onProgress || (() => { }),
