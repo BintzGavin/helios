@@ -1,32 +1,12 @@
 import { Page } from 'playwright';
 import { AudioTrackConfig } from '../types.js';
+import { FIND_ALL_MEDIA_FUNCTION } from './dom-scripts.js';
 
 export async function scanForAudioTracks(page: Page): Promise<AudioTrackConfig[]> {
   const script = `
     (async () => {
       // Helper to find all media elements, including in Shadow DOM
-      function findAllMedia(rootNode) {
-        const media = [];
-        // Check rootNode (if it is an Element)
-        if (rootNode.nodeType === Node.ELEMENT_NODE) {
-          const tagName = rootNode.tagName;
-          if (tagName === 'AUDIO' || tagName === 'VIDEO') {
-            media.push(rootNode);
-          }
-        }
-
-        const walker = document.createTreeWalker(rootNode, NodeFilter.SHOW_ELEMENT);
-        while (walker.nextNode()) {
-          const node = walker.currentNode;
-          if (node.tagName === 'AUDIO' || node.tagName === 'VIDEO') {
-            media.push(node);
-          }
-          if (node.shadowRoot) {
-            media.push(...findAllMedia(node.shadowRoot));
-          }
-        }
-        return media;
-      }
+      ${FIND_ALL_MEDIA_FUNCTION}
 
       // Wait for media elements (video/audio)
       const mediaElements = findAllMedia(document);
