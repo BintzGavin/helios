@@ -1,3 +1,5 @@
+import { SharedAudioContextManager, SharedAudioSource } from './audio-context-manager';
+
 export interface AudioLevels {
   left: number;
   right: number;
@@ -12,13 +14,14 @@ export class AudioMeter {
   private analyserRight: AnalyserNode;
   private dataArrayLeft: Float32Array;
   private dataArrayRight: Float32Array;
-  private sources: Map<HTMLMediaElement, MediaElementAudioSourceNode> = new Map();
-  private elementListeners: Map<HTMLMediaElement, { listener: () => void, gainNode: GainNode }> = new Map();
+  private sources: Map<HTMLMediaElement, SharedAudioSource> = new Map();
   private isEnabled: boolean = false;
+  private manager: SharedAudioContextManager;
 
   constructor() {
-    const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
-    this.ctx = new AudioContextClass();
+    this.manager = SharedAudioContextManager.getInstance();
+    this.ctx = this.manager.context;
+
     this.splitter = this.ctx.createChannelSplitter(2);
     this.analyserLeft = this.ctx.createAnalyser();
     this.analyserRight = this.ctx.createAnalyser();
@@ -45,40 +48,16 @@ export class AudioMeter {
       if (this.sources.has(el)) return;
 
       try {
-        // Create source
-        const source = this.ctx.createMediaElementSource(el);
-        const gainNode = this.ctx.createGain();
-
-        // Sync initial state
-        gainNode.gain.value = el.muted ? 0 : el.volume;
-
-        // Create listener
-        const listener = () => {
-            try {
-                gainNode.gain.value = el.muted ? 0 : el.volume;
-            } catch (e) {
-                // Ignore if disconnected
-            }
-        };
-        el.addEventListener('volumechange', listener);
-
-        // Store for cleanup
-        this.elementListeners.set(el, { listener, gainNode });
-
-        // Playback path (Post-fader to respect volume controls)
-        source.connect(gainNode);
-        gainNode.connect(this.ctx.destination);
+        const sharedSource = this.manager.getSharedSource(el);
 
         // Metering path (Pre-fader to visualize activity even if muted)
         // Only connect if enabled
         if (this.isEnabled) {
-            source.connect(this.splitter);
+            sharedSource.connect(this.splitter);
         }
 
-        this.sources.set(el, source);
+        this.sources.set(el, sharedSource);
       } catch (e) {
-        // This often happens if the element is already connected to another context
-        // or if there's a CORS issue (though CORS usually just gives silence)
         console.warn('AudioMeter: Failed to connect element', e);
       }
     });
@@ -93,11 +72,7 @@ export class AudioMeter {
     }
 
     this.sources.forEach(source => {
-        try {
-            source.connect(this.splitter);
-        } catch (e) {
-            // Already connected or error
-        }
+        source.connect(this.splitter);
     });
   }
 
@@ -106,11 +81,7 @@ export class AudioMeter {
     this.isEnabled = false;
 
     this.sources.forEach(source => {
-        try {
-            source.disconnect(this.splitter);
-        } catch (e) {
-            // ignore
-        }
+        source.disconnect(this.splitter);
     });
   }
 
@@ -148,22 +119,8 @@ export class AudioMeter {
   }
 
   dispose() {
-    this.elementListeners.forEach(({ listener, gainNode }, el) => {
-        el.removeEventListener('volumechange', listener);
-        try {
-            gainNode.disconnect();
-        } catch (e) {
-            // ignore
-        }
-    });
-    this.elementListeners.clear();
-
     this.sources.forEach(source => {
-        try {
-            source.disconnect();
-        } catch (e) {
-            // ignore
-        }
+        source.disconnect(this.splitter);
     });
     this.sources.clear();
 
@@ -171,7 +128,6 @@ export class AudioMeter {
         this.splitter.disconnect();
         this.analyserLeft.disconnect();
         this.analyserRight.disconnect();
-        this.ctx.close();
     } catch (e) {
         console.warn("AudioMeter: Error during dispose", e);
     }
