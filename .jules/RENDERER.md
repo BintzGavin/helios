@@ -30,3 +30,7 @@
 ## [2026-09-09] - Hardware Codec Detection Gap
 **Learning:** `CanvasStrategy` relied on a non-standard `type` property on `VideoEncoderSupport` to detect hardware acceleration, potentially falling back to software codecs unnecessarily. The standard way is `navigator.mediaCapabilities.encodingInfo()`.
 **Action:** Created plan `2026-09-09-RENDERER-Hardware-Accelerated-Codec-Priority.md` to implement robust hardware detection and prioritization.
+
+## [2026-03-12] - Duplicate Media Discovery Logic
+**Learning:** The Shadow DOM traversal logic for discovering and syncing media elements (`findAllMedia`) is duplicated across `DomScanner`, `CdpTimeDriver`, and `SeekTimeDriver`. This increases maintenance risk and potential for divergence between Canvas and DOM modes.
+**Action:** Created plan `2026-03-12-RENDERER-Refactor-Media-Discovery.md` to consolidate this logic into a shared `dom-scripts.ts` utility.
