@@ -26,7 +26,7 @@ The `examples/` directory contains reference implementations for various framewo
 - **react-captions-animation**: React hooks for Helios SRT captions.
 - **react-css-animation**: Standard CSS animations in React.
 - **react-styled-components**: Styled Components integration.
-- **react-three-fiber**: 3D animation with React Three Fiber.
+- **react-three-fiber**: 3D animation with React Three Fiber (TypeScript).
 - **react-transitions**: `react-transition-group` integration.
 - **react-animation-helpers**: Helper components for sequencing.
 - **react-audio-visualization**: Real-time audio frequency analysis visualization.
