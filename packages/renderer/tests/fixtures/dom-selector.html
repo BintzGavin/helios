@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body { margin: 0; background: white; }
+    #target { width: 500px; height: 500px; background: red; }
+    #wrapper { width: 800px; height: 800px; background: blue; padding: 50px; }
+  </style>
+</head>
+<body>
+  <div id="wrapper">
+    <div id="target"></div>
+  </div>
+
+  <div id="host"></div>
+
+  <script>
+    const host = document.getElementById('host');
+    const shadow = host.attachShadow({ mode: 'open' });
+    shadow.innerHTML = `
+      <style>
+        #shadow-target { width: 300px; height: 300px; background: green; }
+      </style>
+      <div id="shadow-target"></div>
+    `;
+  </script>
+</body>
+</html>

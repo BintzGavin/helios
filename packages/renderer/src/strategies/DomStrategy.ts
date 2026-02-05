@@ -4,6 +4,7 @@ import { RendererOptions, AudioTrackConfig, FFmpegConfig } from '../types.js';
 import { FFmpegBuilder } from '../utils/FFmpegBuilder.js';
 import { scanForAudioTracks } from '../utils/dom-scanner.js';
 import { extractBlobTracks } from '../utils/blob-extractor.js';
+import { FIND_DEEP_ELEMENT_SCRIPT } from '../utils/dom-finder.js';
 
 export class DomStrategy implements RenderStrategy {
   private discoveredAudioTracks: AudioTrackConfig[] = [];
@@ -171,8 +172,12 @@ export class DomStrategy implements RenderStrategy {
     const quality = this.options.intermediateImageQuality;
     const pixelFormat = this.options.pixelFormat || 'yuv420p';
 
+    const screenshotOptions: any = {
+      type: format,
+    };
+
     if (format === 'jpeg') {
-      return await page.screenshot({ type: 'jpeg', quality: quality });
+      screenshotOptions.quality = quality;
     } else {
       // Check if the requested pixel format supports alpha
       const hasAlpha = pixelFormat.includes('yuva') ||
@@ -180,12 +185,26 @@ export class DomStrategy implements RenderStrategy {
                        pixelFormat.includes('bgra') ||
                        pixelFormat.includes('argb') ||
                        pixelFormat.includes('abgr');
-
-      return await page.screenshot({
-        type: 'png',
-        omitBackground: hasAlpha
-      });
+      screenshotOptions.omitBackground = hasAlpha;
     }
+
+    if (this.options.targetSelector) {
+      const handle = await page.evaluateHandle((args) => {
+        // @ts-ignore
+        const finder = eval(args.script);
+        const element = finder(document, args.selector);
+        if (!element) throw new Error(`Target element not found: ${args.selector}`);
+        return element;
+      }, { script: FIND_DEEP_ELEMENT_SCRIPT, selector: this.options.targetSelector });
+
+      const element = handle.asElement();
+      if (!element) {
+        throw new Error(`Target element found but is not an element: ${this.options.targetSelector}`);
+      }
+      return await element.screenshot(screenshotOptions);
+    }
+
+    return await page.screenshot(screenshotOptions);
   }
 
   async finish(page: Page): Promise<void> {

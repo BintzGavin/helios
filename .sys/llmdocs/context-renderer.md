@@ -6,13 +6,13 @@ The Renderer employs a "Dual-Path" architecture to handle different rendering ne
 
 1.  **Canvas Strategy (`mode: 'canvas'`)**:
     -   **Target**: High-performance WebGL/Canvas animations (Three.js, PixiJS).
-    -   **Mechanism**: Captures frames directly from the HTML `<canvas>` element.
+    -   **Mechanism**: Captures frames directly from the HTML `<canvas>` element (found via `canvasSelector`).
     -   **Optimization**: Uses `WebCodecs` (VideoEncoder) for hardware-accelerated encoding (H.264, VP9, AV1) where available, falling back to `toDataURL()` (PNG/JPEG) if necessary.
     -   **Audio**: Explicitly extracts audio from `<audio>`/`<video>` elements via `DomScanner`.
 
 2.  **DOM Strategy (`mode: 'dom'`)**:
     -   **Target**: CSS animations, HTML/DOM-based motion graphics.
-    -   **Mechanism**: Captures the entire viewport using Playwright's `page.screenshot()`.
+    -   **Mechanism**: Captures the viewport or a specific element (via `targetSelector`) using Playwright's `page.screenshot()` or `elementHandle.screenshot()`.
     -   **Optimization**: Supports `omittedBackground` for transparency.
     -   **Audio**: Scans for and includes implicit audio tracks.
 
@@ -30,6 +30,7 @@ packages/renderer/
 │   ├── utils/
 │   │   ├── FFmpegBuilder.ts   # FFmpeg argument construction
 │   │   ├── blob-extractor.ts  # Blob URL handling
+│   │   ├── dom-finder.ts      # Shared deep element finding (Shadow DOM)
 │   │   └── dom-scanner.ts     # Media element discovery
 │   ├── index.ts               # Entry point
 │   ├── Renderer.ts            # Main class
@@ -48,7 +49,8 @@ interface RendererOptions {
   fps: number;
   durationInSeconds: number;
   mode?: 'canvas' | 'dom';
-  canvasSelector?: string; // CSS selector for target canvas
+  canvasSelector?: string; // CSS selector for target canvas ('canvas' mode)
+  targetSelector?: string; // CSS selector for target element ('dom' mode)
   audioFilePath?: string;
   audioTracks?: (string | AudioTrackConfig)[];
   videoCodec?: 'libx264' | 'libvpx' | 'libvpx-vp9' | 'copy';

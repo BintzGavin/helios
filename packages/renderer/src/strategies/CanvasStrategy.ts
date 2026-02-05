@@ -4,6 +4,7 @@ import { RendererOptions, AudioTrackConfig, FFmpegConfig } from '../types.js';
 import { FFmpegBuilder } from '../utils/FFmpegBuilder.js';
 import { scanForAudioTracks } from '../utils/dom-scanner.js';
 import { extractBlobTracks } from '../utils/blob-extractor.js';
+import { FIND_DEEP_ELEMENT_SCRIPT } from '../utils/dom-finder.js';
 
 export class CanvasStrategy implements RenderStrategy {
   private useWebCodecs = false;
@@ -99,50 +100,19 @@ export class CanvasStrategy implements RenderStrategy {
     // Validate that the canvas element exists (supporting Shadow DOM)
     // We use a string-based script to avoid transpiler artifacts (like esbuild's __name)
     const selector = this.options.canvasSelector || 'canvas';
-    const findCanvasScript = `
-      ((selector) => {
-        function findCanvas(root, selector) {
-          // Fast path for Light DOM (if querySelector is available)
-          // Note: querySelector does NOT cross shadow boundaries
-          if (root.querySelector) {
-            try {
-              const light = root.querySelector(selector);
-              if (light && light instanceof HTMLCanvasElement) return light;
-            } catch (e) {
-              // Ignore invalid selector errors
-            }
-          }
 
-          // Recursive traversal
-          // We use createTreeWalker to iterate descendants
-          const walker = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT);
-          while (walker.nextNode()) {
-            const node = walker.currentNode;
+    const canvasFound = await page.evaluate((args) => {
+      // @ts-ignore
+      const finder = eval(args.script);
+      const element = finder(document, args.selector);
 
-            if (node instanceof HTMLCanvasElement) {
-              if (node.matches && node.matches(selector)) {
-                return node;
-              }
-            }
-
-            if (node.shadowRoot) {
-              const found = findCanvas(node.shadowRoot, selector);
-              if (found) return found;
-            }
-          }
-          return null;
-        }
-
-        const canvas = findCanvas(document, selector);
-        if (canvas) {
-          window.__HELIOS_TARGET_CANVAS__ = canvas;
-          return true;
-        }
-        return false;
-      })(${JSON.stringify(selector)})
-    `;
-
-    const canvasFound = await page.evaluate(findCanvasScript);
+      if (element && element instanceof HTMLCanvasElement) {
+        // @ts-ignore
+        window.__HELIOS_TARGET_CANVAS__ = element;
+        return true;
+      }
+      return false;
+    }, { script: FIND_DEEP_ELEMENT_SCRIPT, selector });
 
     if (!canvasFound) {
       throw new Error(`Canvas not found matching selector: ${selector}`);

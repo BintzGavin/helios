@@ -1,3 +1,6 @@
+## RENDERER v1.70.0
+- ✅ Completed: DOM Target Selector - Implemented `targetSelector` in `DomStrategy` to allow rendering specific elements (including those in Shadow DOM) instead of the full viewport, and refactored deep element finding logic into a shared utility `dom-finder.ts`. Verified with `verify-dom-selector.ts`.
+
 ## RENDERER v1.69.0
 - ✅ Completed: Enhanced Diagnostics - Updated `CanvasStrategy.diagnose()` to perform deep codec capability checks (Hardware/Software, Alpha support) via `VideoEncoder.isConfigSupported()`, and updated `DomStrategy.diagnose()` to include viewport dimensions, DPR, and WebGL support. Verified with `verify-diagnose.ts`.
 
