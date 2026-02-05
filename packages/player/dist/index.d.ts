@@ -212,6 +212,7 @@ export declare class HeliosPlayer extends HTMLElement implements TrackHost, Audi
     private handleCopyDebug;
     private handleKeydown;
     private seekRelative;
+    private seekRelativeSeconds;
     private toggleFullscreen;
     private updateFullscreenUI;
     private updateUI;
