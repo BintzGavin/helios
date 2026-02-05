@@ -8,6 +8,7 @@
 - **Current Focus**: Maintenance, Optimization, and Stability
 - **Last Updated**: 2026-08-14
 
+[v5.11.0] ✅ Completed: Synchronize Version - Synced package.json version to 5.11.0 and added Input Schema documentation.
 [v5.11.0] ✅ Completed: Implement Composition Schema - Implemented HeliosConfig, HeliosComposition, and related interfaces to support serializable composition definitions.
 [v5.10.0] ✅ Completed: Shared Virtual Time Binding - Implemented static registry in Helios to allow multiple instances to synchronize with `window.__HELIOS_VIRTUAL_TIME__` simultaneously.
 [v5.9.0] ✅ Completed: Reactive Virtual Time Getter - Exposed `isVirtualTimeBound` getter in `Helios` to allow consumers to verify synchronous virtual time binding, facilitating better integration with external renderers.

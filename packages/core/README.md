@@ -57,6 +57,52 @@ const unsubscribe = helios.isPlaying.subscribe((playing) => {
 helios.setInputProps({ text: 'Hello World' });
 ```
 
+### Input Schema
+
+Define a schema to validate input properties and generate UI controls in Helios Studio.
+
+```typescript
+import { Helios, HeliosSchema } from '@helios-project/core';
+
+// Define the schema
+const schema: HeliosSchema = {
+  text: {
+    type: 'string',
+    default: 'Hello World',
+    minLength: 1,
+    maxLength: 50
+  },
+  color: {
+    type: 'color',
+    default: '#ff0000'
+  },
+  scale: {
+    type: 'number',
+    default: 1,
+    minimum: 0.1,
+    maximum: 5,
+    step: 0.1
+  }
+};
+
+// Pass schema to constructor
+const helios = new Helios({
+  fps: 30,
+  duration: 10,
+  schema: schema,
+  inputProps: {
+    text: 'Welcome' // Validates against schema
+  }
+});
+
+// Update props with validation
+try {
+  helios.setInputProps({ scale: 10 }); // Throws Error: Prop 'scale' must be <= 5
+} catch (e) {
+  console.error(e.message);
+}
+```
+
 ### Sequencing
 
 Coordinate animations relative to a parent time or in a sequence.
