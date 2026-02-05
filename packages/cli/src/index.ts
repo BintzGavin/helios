@@ -11,7 +11,7 @@ const program = new Command();
 program
   .name('helios')
   .description('Helios CLI')
-  .version('0.9.0');
+  .version('0.9.2');
 
 registerStudioCommand(program);
 registerInitCommand(program);

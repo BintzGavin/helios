@@ -49,6 +49,7 @@ packages/cli/
 Initializes a new Helios project configuration and scaffolds structure if missing. Supports React, Vue, Svelte, Solid, and Vanilla templates.
 - **Options**:
   - `-y, --yes`: Skip prompts and use defaults (React).
+  - `-f, --framework <framework>`: Specify framework (react, vue, svelte, solid, vanilla).
 
 ### `helios add <component> [options]`
 Adds a component (and its dependencies) to the project.
