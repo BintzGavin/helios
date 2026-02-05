@@ -1,3 +1,6 @@
+## RENDERER v1.69.0
+- ✅ Completed: Enhanced Diagnostics - Updated `CanvasStrategy.diagnose()` to perform deep codec capability checks (Hardware/Software, Alpha support) via `VideoEncoder.isConfigSupported()`, and updated `DomStrategy.diagnose()` to include viewport dimensions, DPR, and WebGL support. Verified with `verify-diagnose.ts`.
+
 ## RENDERER v1.68.0
 - ✅ Completed: Distributed Implicit Audio - Added `mixInputAudio` option to `RendererOptions` and updated `Orchestrator` to preserve implicit audio (DOM `<audio>`) during the final mix of distributed rendering. Verified with `verify-distributed-audio.ts`.
 

@@ -1,55 +1,45 @@
-# Context: Renderer
+# Renderer Domain Context
 
 ## A. Strategy: Dual-Path Architecture
 
-The Renderer employs a Strategy pattern to support two distinct rendering modes, ensuring both visual fidelity and performance.
+The Renderer employs a "Dual-Path" architecture to handle different rendering needs:
 
-1.  **Canvas Strategy (Canvas Mode)**:
-    -   **Target**: High-performance, frame-accurate rendering of HTML5 Canvas elements (WebGL/2D).
-    -   **Mechanism**: Uses `playwright` to inject scripts that capture frames directly from the `<canvas>` element using `VideoEncoder` (WebCodecs) or `toDataURL` (fallback).
-    -   **Time Driver**: `CdpTimeDriver`. Uses Chrome DevTools Protocol (`HeadlessExperimental`) to deterministically control virtual time, ensuring perfect synchronization for `requestAnimationFrame` and overriding `performance.now()` to eliminate drift.
-    -   **Output**: Pipes raw image buffers or encoded chunks (H.264/VP9/AV1) to FFmpeg stdin.
+1.  **Canvas Strategy (`mode: 'canvas'`)**:
+    -   **Target**: High-performance WebGL/Canvas animations (Three.js, PixiJS).
+    -   **Mechanism**: Captures frames directly from the HTML `<canvas>` element.
+    -   **Optimization**: Uses `WebCodecs` (VideoEncoder) for hardware-accelerated encoding (H.264, VP9, AV1) where available, falling back to `toDataURL()` (PNG/JPEG) if necessary.
+    -   **Audio**: Explicitly extracts audio from `<audio>`/`<video>` elements via `DomScanner`.
 
-2.  **Dom Strategy (DOM Mode)**:
-    -   **Target**: Rendering of standard DOM elements (HTML/CSS animations).
-    -   **Mechanism**: Uses `page.screenshot()` to capture the viewport at each frame.
-    -   **Time Driver**: `SeekTimeDriver`. Polyfills `Date.now`, `performance.now`, and `requestAnimationFrame`, and manually advances time. It aggressively preloads assets (images, fonts, media) and waits for `seeked` events on `<video>`/`<audio>` elements to ensure zero artifacts.
-    -   **Output**: Pipes PNG/JPEG buffers to FFmpeg stdin.
+2.  **DOM Strategy (`mode: 'dom'`)**:
+    -   **Target**: CSS animations, HTML/DOM-based motion graphics.
+    -   **Mechanism**: Captures the entire viewport using Playwright's `page.screenshot()`.
+    -   **Optimization**: Supports `omittedBackground` for transparency.
+    -   **Audio**: Scans for and includes implicit audio tracks.
 
-**Orchestration (Distributed Rendering)**:
--   The `RenderOrchestrator` splits large render jobs into concurrent chunks.
--   **Phase 1**: Renders silent video chunks (`.mov`) using uncompressed PCM audio (`pcm_s16le`) to capture implicit audio (DOM) without compression artifacts.
--   **Phase 2**: Concatenates chunks into a master PCM intermediate file.
--   **Phase 3**: Transcodes the master file to the final output format (e.g., MP4/AAC) and mixes in explicit audio tracks.
+Both strategies normalize the output into a stream of buffers (video frames) that are piped into FFmpeg.
 
 ## B. File Tree
 
 ```
 packages/renderer/
 ├── src/
-│   ├── index.ts                # Entry point
-│   ├── Renderer.ts             # Main class, handles lifecycle
-│   ├── Orchestrator.ts         # Distributed rendering logic
-│   ├── concat.ts               # Video concatenation utility
-│   ├── types.ts                # Interfaces (RendererOptions, etc.)
-│   ├── drivers/
-│   │   ├── TimeDriver.ts       # Interface
-│   │   ├── CdpTimeDriver.ts    # CDP-based time control
-│   │   └── SeekTimeDriver.ts   # Polyfill-based time control
 │   ├── strategies/
-│   │   ├── RenderStrategy.ts   # Interface
-│   │   ├── CanvasStrategy.ts   # WebCodecs/Canvas capture
-│   │   └── DomStrategy.ts      # Screenshot-based capture
-│   └── utils/
-│       ├── FFmpegBuilder.ts    # Argument generation
-│       ├── FFmpegInspector.ts  # Diagnostics
-│       ├── blob-extractor.ts   # Blob URL handling
-│       └── dom-scanner.ts      # DOM media discovery
+│   │   ├── CanvasStrategy.ts  # WebCodecs/Canvas capture
+│   │   ├── DomStrategy.ts     # Screenshot capture
+│   │   └── RenderStrategy.ts  # Interface
+│   ├── utils/
+│   │   ├── FFmpegBuilder.ts   # FFmpeg argument construction
+│   │   ├── blob-extractor.ts  # Blob URL handling
+│   │   └── dom-scanner.ts     # Media element discovery
+│   ├── index.ts               # Entry point
+│   ├── Renderer.ts            # Main class
+│   └── types.ts               # Configuration interfaces
+└── tests/                     # Verification scripts
 ```
 
 ## C. Configuration
 
-The `RendererOptions` interface controls the rendering process:
+The `RendererOptions` interface controls the pipeline:
 
 ```typescript
 interface RendererOptions {
@@ -57,40 +47,41 @@ interface RendererOptions {
   height: number;
   fps: number;
   durationInSeconds: number;
-  frameCount?: number;          // Override duration with exact frame count
-  startFrame?: number;          // Start rendering from this frame
-  mode?: 'canvas' | 'dom';      // Strategy selection
-  videoCodec?: string;          // e.g., 'libx264', 'libvpx-vp9', 'copy'
-  audioCodec?: string;          // e.g., 'aac', 'libvorbis', 'pcm_s16le'
-  pixelFormat?: string;         // e.g., 'yuv420p', 'yuva420p'
-  quality?: number;             // 1-100 (JPEG quality)
-  videoBitrate?: string;        // e.g., '2500k', '5M'
-  audioBitrate?: string;        // e.g., '128k'
-  audioTracks?: AudioTrackConfig[]; // Explicit audio mixing
+  mode?: 'canvas' | 'dom';
+  canvasSelector?: string; // CSS selector for target canvas
+  audioFilePath?: string;
+  audioTracks?: (string | AudioTrackConfig)[];
+  videoCodec?: 'libx264' | 'libvpx' | 'libvpx-vp9' | 'copy';
+  videoBitrate?: string;
+  audioCodec?: string;
+  pixelFormat?: string; // e.g. 'yuv420p', 'yuva420p'
+  intermediateVideoCodec?: string; // For Canvas WebCodecs (e.g. 'avc1', 'vp9')
+  intermediateImageFormat?: 'png' | 'jpeg'; // For DOM/Fallback
   inputProps?: Record<string, any>; // Injected into window.__HELIOS_PROPS__
-  canvasSelector?: string;      // Selector for target canvas (default: 'canvas')
-  subtitles?: string;           // Path to SRT file for burning
-  concurrency?: number;         // Workers for distributed rendering
-  mixInputAudio?: boolean;      // Mix audio from input video (stream 0:a)
+  mixInputAudio?: boolean; // Mix implicit audio from input
+  subtitles?: string; // Path to SRT file to burn in
 }
 ```
 
 ## D. FFmpeg Interface
 
-The Renderer spawns an FFmpeg process and pipes frame data to its `stdin`.
+The Renderer spawns an FFmpeg process and communicates via stdio:
 
-**Common Flags**:
--   `-y`: Overwrite output.
--   `-f image2pipe`: For DOM rendering (reading images from pipe).
--   `-c:v libx264`: Default video encoder.
--   `-pix_fmt yuv420p`: Standard pixel format.
--   `-preset fast`: Encoding speed.
--   `-crf 23`: Constant Rate Factor (quality).
--   `-movflags +faststart`: Web-optimized metadata.
--   `-filter_complex`: Used for mixing multiple audio tracks (`amix`) or burning subtitles (`subtitles`).
+-   **Input**:
+    -   Video frames piped to `stdin` (`-f image2pipe` or `-f ivf` or `-f h264`).
+    -   Audio tracks mapped as external inputs (`-i audio.mp3`).
+-   **Filters**:
+    -   `amix`: Mixes multiple audio tracks.
+    -   `atempo`: Adjusts audio playback rate.
+    -   `subtitles`: Burns subtitles if requested.
+-   **Output**:
+    -   Writes final video file to disk.
+    -   Defaults to `libx264` (H.264) + `aac` (Audio) in an MP4 container.
 
-**Audio Pipeline**:
--   Inputs are normalized (mono -> stereo) using `aformat`.
--   Timeline positioning uses `adelay`.
--   Playback rate uses `atempo`.
--   Fading uses `afade`.
+## E. Diagnostics
+
+The `renderer.diagnose()` method returns a comprehensive report on the environment:
+
+-   **Canvas**: Detailed WebCodecs support matrix (Hardware/Software, Alpha).
+-   **DOM**: Viewport dimensions, Device Pixel Ratio (DPR), and WebGL support.
+-   **FFmpeg**: Installed version and supported encoders/filters.
