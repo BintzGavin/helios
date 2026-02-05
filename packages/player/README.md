@@ -203,3 +203,13 @@ To apply audio fades during client-side export, add `data-helios-fade-in` and/or
 ```html
 <audio src="music.mp3" data-helios-fade-in="2" data-helios-fade-out="3"></audio>
 ```
+
+## Verification
+
+To run the End-to-End (E2E) verification suite:
+
+```bash
+npx tsx tests/e2e/verify-player.ts
+```
+
+This script starts a local server and uses Playwright to verify the player's core functionality (playback, scrubber, menus, volume) using a dependency-free mock composition.

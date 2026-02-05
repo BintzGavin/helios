@@ -1,4 +1,4 @@
-**Version**: v0.70.0
+**Version**: v0.70.1
 
 **Posture**: STABLE AND FEATURE COMPLETE
 
@@ -58,9 +58,7 @@
 - **Audio Metering**: Supports real-time audio metering via `startAudioMetering()` API and `audiometering` event, enabling visualization of audio levels (stereo/peak) in host applications.
 - **Export API**: Exposes public `export()` method for programmatic control over client-side exports, supporting Video (MP4/WebM) and Snapshot (PNG/JPEG) formats.
 
-## Critical Task
-- **Robust Audio Metering**: Refactor AudioMeter to support non-destructive toggling.
-
+[v0.70.1] ✅ Verified: Robust E2E Verification - Expanded E2E test coverage (Playback, Scrubber, Menus) and created a dependency-free mock fixture to ensure stability.
 [v0.70.0] ✅ Completed: Settings Menu - Consolidated secondary controls (Speed, Loop, Range) into a Shadow DOM Settings Menu and removed the standalone speed selector.
 [v0.69.0] ✅ Completed: Snapshot Export - Implemented support for exporting the current frame as PNG or JPEG image via the export API, enabling high-quality snapshot capture.
 [v0.68.2] ✅ Completed: Shared Audio Context - Implemented `SharedAudioContextManager` to prevent audio hijacking when `AudioMeter` is disposed, ensuring audio playback persists.

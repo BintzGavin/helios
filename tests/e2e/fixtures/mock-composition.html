@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mock Composition</title>
+    <style>
+        body { margin: 0; background: #222; color: #fff; font-family: monospace; display: flex; align-items: center; justify-content: center; height: 100vh; }
+        .info { text-align: center; }
+    </style>
+</head>
+<body>
+    <div class="info">
+        <h1>Mock Composition</h1>
+        <p>Frame: <span id="frame">0</span></p>
+    </div>
+
+    <script>
+        const state = {
+            isPlaying: false,
+            currentFrame: 0,
+            duration: 10, // seconds
+            fps: 30,
+            width: 1920,
+            height: 1080,
+            volume: 1,
+            muted: false,
+            playbackRate: 1,
+            availableAudioTracks: [],
+            audioTracks: {},
+            markers: []
+        };
+
+        const listeners = [];
+        const frameEl = document.getElementById('frame');
+
+        function notify() {
+            listeners.forEach(cb => cb({ ...state }));
+            frameEl.textContent = Math.floor(state.currentFrame);
+        }
+
+        window.helios = {
+            play: () => {
+                state.isPlaying = true;
+                notify();
+            },
+            pause: () => {
+                state.isPlaying = false;
+                notify();
+            },
+            seek: (frame) => {
+                state.currentFrame = frame;
+                notify();
+            },
+            setAudioVolume: (vol) => { state.volume = vol; notify(); },
+            setAudioMuted: (muted) => { state.muted = muted; notify(); },
+            setPlaybackRate: (rate) => { state.playbackRate = rate; notify(); },
+            setLoop: () => {},
+            getState: () => ({ ...state }),
+            subscribe: (cb) => {
+                listeners.push(cb);
+                cb({ ...state });
+                return () => {
+                    const idx = listeners.indexOf(cb);
+                    if (idx > -1) listeners.splice(idx, 1);
+                };
+            },
+            // Mock other methods as no-ops for this test
+            setAudioTrackVolume: () => {},
+            setAudioTrackMuted: () => {},
+            setPlaybackRange: () => {},
+            clearPlaybackRange: () => {},
+            setCaptions: () => {},
+            setInputProps: () => {},
+            setDuration: () => {},
+            setFps: () => {},
+            setSize: () => {},
+            setMarkers: () => {},
+            startAudioMetering: () => {},
+            stopAudioMetering: () => {},
+            onAudioMetering: () => () => {},
+            onError: () => () => {},
+            getAudioTracks: async () => [],
+            getSchema: async () => undefined,
+            dispose: () => {}
+        };
+
+        // Simulation Loop
+        setInterval(() => {
+            if (state.isPlaying) {
+                state.currentFrame += (state.playbackRate || 1);
+                if (state.currentFrame >= state.duration * state.fps) {
+                    state.currentFrame = 0; // Simple loop
+                }
+                notify();
+            }
+        }, 1000 / 30);
+
+        // Signal readiness for Bridge mode (if used)
+        window.parent.postMessage({ type: 'HELIOS_READY' }, '*');
+    </script>
+</body>
+</html>
