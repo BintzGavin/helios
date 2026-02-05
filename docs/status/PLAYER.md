@@ -1,4 +1,4 @@
-**Version**: v0.69.0
+**Version**: v0.70.0
 
 **Posture**: STABLE AND FEATURE COMPLETE
 
@@ -61,6 +61,7 @@
 ## Critical Task
 - **Robust Audio Metering**: Refactor AudioMeter to support non-destructive toggling.
 
+[v0.70.0] ✅ Completed: Settings Menu - Consolidated secondary controls (Speed, Loop, Range) into a Shadow DOM Settings Menu and removed the standalone speed selector.
 [v0.69.0] ✅ Completed: Snapshot Export - Implemented support for exporting the current frame as PNG or JPEG image via the export API, enabling high-quality snapshot capture.
 [v0.68.2] ✅ Completed: Shared Audio Context - Implemented `SharedAudioContextManager` to prevent audio hijacking when `AudioMeter` is disposed, ensuring audio playback persists.
 [v0.68.1] ✅ Completed: Robust Audio Metering - Refactored `AudioMeter` to support non-destructive toggling, preventing audio playback from stopping when metering is disabled.
