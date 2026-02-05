@@ -65,3 +65,7 @@
 ## [0.94.3] - Test Environment Fragility
 **Learning:** `vitest` execution in workspace packages relies on the root `node_modules/.bin` being populated. If the environment is not fresh, tests may fail with "command not found". Also, `setupTests.ts` mechanism can be fragile if `vitest` globals are not configured, requiring explicit `expect.extend` in test files.
 **Action:** Always verify `npm install` state before running tests in a new session, and prefer explicit imports over implicit global setup for robust tests.
+
+## [0.96.0] - Core API Parity
+**Learning:** The Studio was implementing manual loop enforcement logic in `StudioContext`, duplicating logic that already existed in `packages/core` (`setPlaybackRange`). This led to inconsistencies where Client-Side Export (which relies on Core) ignored the Studio's range selection.
+**Action:** Before implementing logic in the Studio that duplicates engine behavior (looping, playback, timing), always verify if the `HeliosController` or Core API already provides a native solution.
