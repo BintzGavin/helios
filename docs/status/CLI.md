@@ -1,6 +1,6 @@
 # CLI Status
 
-**Version**: 0.6.0
+**Version**: 0.7.0
 
 ## Current State
 
@@ -42,3 +42,4 @@ Per AGENTS.md, the CLI is "ACTIVELY EXPANDING FOR V2" with focus on:
 [v0.5.1] ✅ Fix Registry Components - Updated component registry to use V2 Helios Signals (`fps.value`, `duration.value`)
 [v0.5.2] ✅ Project Scaffolding - Updated `helios init` to scaffold a full React+Vite project structure when `package.json` is missing
 [v0.6.0] ✅ Implement Merge Command - Implemented `helios merge` for stitching video clips
+[v0.7.0] ✅ Remote Registry Support - Implemented `RegistryClient` to fetch components from a remote URL with local fallback

@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import chalk from 'chalk';
 import { loadConfig } from './config.js';
-import { findComponent } from '../registry/manifest.js';
+import { defaultClient } from '../registry/client.js';
 
 export async function installComponent(rootDir: string, componentName: string) {
   const config = loadConfig(rootDir);
@@ -11,7 +11,7 @@ export async function installComponent(rootDir: string, componentName: string) {
     throw new Error('Configuration file not found. Run "helios init" first.');
   }
 
-  const component = findComponent(componentName);
+  const component = await defaultClient.findComponent(componentName);
   if (!component) {
     throw new Error(`Component "${componentName}" not found in registry.`);
   }
