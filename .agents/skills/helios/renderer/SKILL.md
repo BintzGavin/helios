@@ -46,12 +46,18 @@ interface RendererOptions {
   startFrame?: number;     // Frame to start rendering from (default: 0)
   mode?: 'dom' | 'canvas'; // Rendering strategy (default: 'canvas')
   inputProps?: Record<string, any>; // Inject props into window.__HELIOS_PROPS__
+  stabilityTimeout?: number; // Max time to wait for frame stability (ms, default: 30000)
+
+  // Selector Configuration
+  canvasSelector?: string; // CSS selector for canvas mode (default: 'canvas')
+  targetSelector?: string; // CSS selector for DOM mode (captures specific element)
 
   // Audio Configuration
   audioFilePath?: string;        // Path to single audio file
   audioTracks?: (string | AudioTrackConfig)[]; // List of audio tracks
   audioCodec?: string;           // e.g., 'aac', 'libvorbis'
   audioBitrate?: string;         // e.g., '128k', '192k'
+  mixInputAudio?: boolean;       // Mix audio from input video (default: false)
 
   // Video Encoding
   videoCodec?: string;           // e.g., 'libx264' (default, prioritized), 'libvpx'

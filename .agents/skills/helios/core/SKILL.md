@@ -45,7 +45,8 @@ interface HeliosOptions {
   initialFrame?: number;         // Start frame (default: 0)
   loop?: boolean;                // Loop playback (default: false)
   autoSyncAnimations?: boolean;  // Auto-sync DOM animations (WAAPI) to timeline
-  animationScope?: HTMLElement;  // Scope for animation syncing
+  animationScope?: HTMLElement;  // Scope for animation syncing (default: document)
+  ticker?: Ticker;               // Custom ticker implementation
   inputProps?: Record<string, any>; // Initial input properties
   schema?: HeliosSchema;         // JSON schema for inputProps validation
   playbackRate?: number;         // Initial playback rate (default: 1)
@@ -99,6 +100,7 @@ type AudioTrackState = {
 helios.play()                 // Start playback
 helios.pause()                // Pause playback
 helios.seek(frame: number)    // Jump to specific frame
+helios.seekToTime(seconds: number) // Jump to specific time in seconds
 helios.setPlaybackRate(rate: number) // Change playback speed (e.g., 0.5, 2.0)
 
 // Set Playback Range (Loop/Play only within these frames)
@@ -127,6 +129,9 @@ helios.setAudioMuted(muted: boolean)  // Set muted state
 // Use data-helios-track-id="myTrack" on DOM elements to group them
 helios.setAudioTrackVolume(trackId: string, volume: number)
 helios.setAudioTrackMuted(trackId: string, muted: boolean)
+
+// Manually set available tracks (for headless environments)
+helios.setAvailableAudioTracks(tracks: AudioTrackMetadata[])
 
 // Advanced: Audio Visualization Hooks
 // Get the shared AudioContext (if supported by driver)
