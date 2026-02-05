@@ -81,3 +81,4 @@ The Shadow DOM contains:
 - `diagnose(): Promise<DiagnosticReport>`: Run environment diagnostics.
 - `startAudioMetering()`: Enable audio level events.
 - `stopAudioMetering()`: Disable audio level events.
+- `export(options?: HeliosExportOptions): Promise<void>`: Trigger client-side export programmatically.

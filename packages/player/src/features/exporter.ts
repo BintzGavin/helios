@@ -17,13 +17,12 @@ import { mixAudio } from "./audio-utils";
 
 export class ClientSideExporter {
   constructor(
-    private controller: HeliosController,
-    private iframe: HTMLIFrameElement // Kept for compatibility
+    private controller: HeliosController
   ) {}
 
   public async export(options: {
     onProgress: (progress: number) => void;
-    signal: AbortSignal;
+    signal?: AbortSignal;
     mode?: 'auto' | 'canvas' | 'dom';
     canvasSelector?: string;
     format?: 'mp4' | 'webm';
@@ -137,7 +136,7 @@ export class ClientSideExporter {
       onProgress(1 / totalFrames);
 
       for (let i = 1; i < totalFrames; i++) {
-        if (signal.aborted) {
+        if (signal?.aborted) {
             throw new Error("Export aborted");
         }
 
