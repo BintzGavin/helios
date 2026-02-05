@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PiP Verification</title>
+    <script src="../packages/player/dist/helios-player.global.js"></script>
+    <style>
+        body { font-family: sans-serif; padding: 20px; }
+        .case { margin-bottom: 30px; border: 1px solid #ccc; padding: 10px; }
+        h3 { margin-top: 0; }
+        helios-player {
+            width: 400px;
+            height: 225px;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <h1>Smart PiP Verification</h1>
+
+    <div class="case">
+        <h3>Case 1: Default (PiP Supported, No Attributes)</h3>
+        <p>Expect: PiP button visible (⏏ icon)</p>
+        <helios-player id="player-default" controls></helios-player>
+    </div>
+
+    <div class="case">
+        <h3>Case 2: export-mode="dom"</h3>
+        <p>Expect: PiP button HIDDEN</p>
+        <helios-player id="player-dom" controls export-mode="dom"></helios-player>
+    </div>
+
+    <div class="case">
+        <h3>Case 3: disablepictureinpicture</h3>
+        <p>Expect: PiP button HIDDEN</p>
+        <helios-player id="player-disabled" controls disablepictureinpicture></helios-player>
+    </div>
+
+</body>
+</html>

@@ -1062,7 +1062,7 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
   }
 
   static get observedAttributes() {
-    return ["src", "width", "height", "autoplay", "loop", "controls", "export-format", "input-props", "poster", "muted", "interactive", "preload", "controlslist", "sandbox", "export-caption-mode", "disablepictureinpicture", "export-width", "export-height", "export-bitrate", "export-filename", "media-title", "media-artist", "media-album", "media-artwork"];
+    return ["src", "width", "height", "autoplay", "loop", "controls", "export-format", "input-props", "poster", "muted", "interactive", "preload", "controlslist", "sandbox", "export-caption-mode", "disablepictureinpicture", "export-width", "export-height", "export-bitrate", "export-filename", "media-title", "media-artist", "media-album", "media-artwork", "export-mode"];
   }
 
   constructor() {
@@ -1268,7 +1268,7 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
       this.mediaSession?.updateMetadata();
     }
 
-    if (name === "controlslist" || name === "disablepictureinpicture") {
+    if (name === "controlslist" || name === "disablepictureinpicture" || name === "export-mode") {
       this.updateControlsVisibility();
     }
 
@@ -1307,10 +1307,20 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
       this.fullscreenBtn.style.removeProperty("display");
     }
 
-    if (this.hasAttribute("disablepictureinpicture")) {
-      this.pipBtn.style.display = "none";
-    } else {
+    let showPiP = !this.hasAttribute("disablepictureinpicture");
+
+    if (!document.pictureInPictureEnabled) {
+      showPiP = false;
+    }
+
+    if (this.getAttribute("export-mode") === "dom") {
+      showPiP = false;
+    }
+
+    if (showPiP) {
       this.pipBtn.style.removeProperty("display");
+    } else {
+      this.pipBtn.style.display = "none";
     }
   }
 
