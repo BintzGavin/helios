@@ -25,6 +25,22 @@ async function main() {
 
   console.log(`Rendering ${compositionUrl} to ${outputPath} using DOM strategy...`);
 
+  // Hook into console logs to verify preloading messages
+  const originalLog = console.log;
+  let preloadDetected = false;
+
+  console.log = (...args: any[]) => {
+    // Preserve original logging behavior including object inspection
+    originalLog(...args);
+
+    // Check message content for verification
+    const msg = args.map(a => String(a)).join(' ');
+    // Looking for "[DomStrategy] Preloading X background images..."
+    if (msg.includes('[DomStrategy]') && msg.includes('Preloading') && msg.includes('background images')) {
+      preloadDetected = true;
+    }
+  };
+
   try {
     await renderer.render(compositionUrl, outputPath);
     console.log(`Render finished successfully! Video saved to: ${outputPath}`);
@@ -32,14 +48,22 @@ async function main() {
     // Check if file exists and has size > 0
     const stats = await fs.stat(outputPath);
     if (stats.size > 0) {
-        console.log(`Verification Passed: Output file created (${stats.size} bytes).`);
+        console.log(`Output file created (${stats.size} bytes).`);
     } else {
         throw new Error('Output file is empty.');
+    }
+
+    if (preloadDetected) {
+      console.log('✅ Verification Passed: Background image preloading detected.');
+    } else {
+      throw new Error('Background image preloading NOT detected in logs.');
     }
 
   } catch (error) {
     console.error('Verification script failed:', error);
     process.exit(1);
+  } finally {
+    console.log = originalLog;
   }
 }
 
