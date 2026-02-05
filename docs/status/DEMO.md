@@ -1,6 +1,6 @@
 # Status: DEMO Domain
 
-**Version**: 1.116.0
+**Version**: 1.117.0
 
 **Posture**: ACTIVELY EXPANDING FOR V2
 
@@ -17,6 +17,7 @@ The DEMO domain is responsible for:
 
 
 ## Completed Tasks
+- [v1.117.0] ✅ Completed: Standardize P5 Canvas Example - Modernized `examples/p5-canvas-animation` with TypeScript, `package.json`, and proper build config.
 - [v1.116.0] ✅ Completed: Standardize React Three Fiber Example - Modernized `examples/react-three-fiber` with TypeScript, `package.json`, and proper build config.
 - [v1.115.0] ✅ Completed: Standardize Three.js Canvas Example - Modernized `examples/threejs-canvas-animation` with TypeScript, `package.json`, and proper build config.
 - [v1.114.0] ✅ Completed: Solid Chart.js Animation - Created `examples/solid-chartjs-animation` demonstrating Chart.js integration with SolidJS and Helios.

@@ -1,3 +1,6 @@
+## DEMO v1.117.0
+- ✅ Completed: Standardize P5 Canvas Example - Modernized `examples/p5-canvas-animation` with TypeScript, `package.json`, and proper build config.
+
 ## DEMO v1.116.0
 - ✅ Completed: Standardize React Three Fiber Example - Modernized `examples/react-three-fiber` with TypeScript, `package.json`, and proper build config.
 

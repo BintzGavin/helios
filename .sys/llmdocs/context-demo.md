@@ -79,7 +79,7 @@ The `examples/` directory contains reference implementations for various framewo
 ### Integrations
 - **threejs-canvas-animation**: 3D scenes with Three.js (TypeScript + Vite).
 - **pixi-canvas-animation**: 2D graphics with PixiJS.
-- **p5-canvas-animation**: Creative coding with P5.js.
+- **p5-canvas-animation**: Creative coding with P5.js (TypeScript + Vite).
 - **d3-animation**: Data visualization with D3.js.
 - **chartjs-animation**: Animated charts with Chart.js.
 - **excalidraw-animation**: Whiteboard animation with Excalidraw.
