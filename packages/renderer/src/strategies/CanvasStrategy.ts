@@ -37,21 +37,47 @@ export class CanvasStrategy implements RenderStrategy {
         { id: 'av1', config: { codec: 'av01.0.08M.08', width: 1920, height: 1080 } }
       ];
 
-      const codecs: Record<string, boolean> = {};
+      const codecs: Record<string, any> = {};
       const videoEncoderSupported = typeof VideoEncoder !== 'undefined';
 
-      // Initialize with false
+      // Initialize with default values
       for (const c of configs) {
-        codecs[c.id] = false;
+        codecs[c.id] = { supported: false, hardware: false, alpha: false, type: 'unknown' };
       }
 
       if (videoEncoderSupported) {
         for (const c of configs) {
           try {
-            const support = await VideoEncoder.isConfigSupported(c.config as any);
-            codecs[c.id] = support.supported || false;
+            // Check base support (no alpha)
+            const baseConfig = { ...c.config, alpha: 'discard' };
+            // @ts-ignore
+            const support = await VideoEncoder.isConfigSupported(baseConfig);
+
+            if (support.supported) {
+               codecs[c.id].supported = true;
+               // Check for 'type' (hardware/software) support (Chrome 106+)
+               // @ts-ignore
+               if (support.type) {
+                 // @ts-ignore
+                 codecs[c.id].type = support.type;
+                 // @ts-ignore
+                 codecs[c.id].hardware = (support.type === 'hardware');
+               }
+
+               // Check Alpha
+               try {
+                 const alphaConfig = { ...c.config, alpha: 'keep' };
+                 // @ts-ignore
+                 const alphaSupport = await VideoEncoder.isConfigSupported(alphaConfig);
+                 if (alphaSupport.supported) {
+                   codecs[c.id].alpha = true;
+                 }
+               } catch (e) {
+                 // Alpha check failed
+               }
+            }
           } catch (e) {
-            codecs[c.id] = false;
+            // Codec check failed
           }
         }
       }

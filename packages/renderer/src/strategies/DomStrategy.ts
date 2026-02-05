@@ -18,10 +18,25 @@ export class DomStrategy implements RenderStrategy {
   async diagnose(page: Page): Promise<any> {
     return await page.evaluate(() => {
       console.log('[Helios Diagnostics] Checking DOM environment...');
+
+      let webgl = false;
+      try {
+          const canvas = document.createElement('canvas');
+          webgl = !!(canvas.getContext('webgl') || canvas.getContext('experimental-webgl'));
+      } catch (e) {
+          // ignore
+      }
+
       const report = {
         waapi: typeof document !== 'undefined' && 'timeline' in document,
         animations: typeof document.getAnimations === 'function' ? 'supported' : 'unsupported',
         userAgent: navigator.userAgent,
+        viewport: {
+            width: window.innerWidth,
+            height: window.innerHeight,
+            dpr: window.devicePixelRatio || 1
+        },
+        webgl
       };
       return report;
     });

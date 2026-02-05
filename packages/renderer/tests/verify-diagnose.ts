@@ -26,6 +26,20 @@ async function main() {
       if (report.browser.codecs.h264 === undefined) {
         throw new Error('Canvas diagnostics missing h264 support flag');
       }
+      // New checks for object structure
+      const h264 = report.browser.codecs.h264;
+      if (typeof h264 !== 'object') {
+        throw new Error('Canvas diagnostics h264 should be an object');
+      }
+      if (h264.supported === undefined) {
+         throw new Error('Canvas diagnostics missing h264.supported');
+      }
+      if (h264.hardware === undefined) {
+         throw new Error('Canvas diagnostics missing h264.hardware');
+      }
+      if (h264.alpha === undefined) {
+         throw new Error('Canvas diagnostics missing h264.alpha');
+      }
     } catch (err) {
       console.error('Canvas diagnose failed:', err);
       process.exit(1);
@@ -48,6 +62,12 @@ async function main() {
       console.log('DOM Diagnostics:', report);
       if (report.browser?.waapi === undefined) {
         throw new Error('DOM diagnostics missing browser.waapi');
+      }
+      if (!report.browser?.viewport) {
+         throw new Error('DOM diagnostics missing browser.viewport');
+      }
+      if (report.browser.webgl === undefined) {
+         throw new Error('DOM diagnostics missing browser.webgl');
       }
     } catch (err) {
       console.error('DOM diagnose failed:', err);
