@@ -47,7 +47,7 @@ async function verify() {
   await strategy.prepare(page);
 
   console.log('Getting FFmpeg args...');
-  const args = strategy.getFFmpegArgs(options, 'output.mp4');
+  const { args } = strategy.getFFmpegArgs(options, 'output.mp4');
 
   console.log('FFmpeg Args:', args);
 
