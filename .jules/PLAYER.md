@@ -13,3 +13,7 @@
 ## 0.66.4 - Playback Speed Granularity
 **Learning:** The previous implementation of playback speed options (0.25, 0.5, 1, 2) was too coarse for effective review. Standard players offer intermediate steps (0.75, 1.25, etc.).
 **Action:** When implementing range-based controls, check industry standards (YouTube, VLC) for common step values.
+
+## 0.68.0 - Destructive Audio Metering
+**Learning:** The `AudioMeter` implementation uses `createMediaElementSource` which "hijacks" the audio output. Destroying the meter's `AudioContext` permanently silences the media element, making it impossible to toggle metering without reloading.
+**Action:** Always maintain a persistent audio graph for pass-through audio when using Web Audio API with media elements. Use `disconnect()` on the analyzer path instead of closing the context.
