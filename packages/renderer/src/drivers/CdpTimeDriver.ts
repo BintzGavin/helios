@@ -1,6 +1,7 @@
 import { Page, CDPSession } from 'playwright';
 import { TimeDriver } from './TimeDriver.js';
 import { RANDOM_SEED_SCRIPT } from '../utils/random-seed.js';
+import { FIND_ALL_MEDIA_FUNCTION } from '../utils/dom-scripts.js';
 
 export class CdpTimeDriver implements TimeDriver {
   private client: CDPSession | null = null;
@@ -57,28 +58,7 @@ export class CdpTimeDriver implements TimeDriver {
     const mediaSyncScript = `
       (async (t) => {
         // Helper to find all media elements, including in Shadow DOM
-        function findAllMedia(rootNode) {
-          const media = [];
-          // Check rootNode (if it is an Element)
-          if (rootNode.nodeType === Node.ELEMENT_NODE) {
-            const tagName = rootNode.tagName;
-            if (tagName === 'AUDIO' || tagName === 'VIDEO') {
-              media.push(rootNode);
-            }
-          }
-
-          const walker = document.createTreeWalker(rootNode, NodeFilter.SHOW_ELEMENT);
-          while (walker.nextNode()) {
-            const node = walker.currentNode;
-            if (node.tagName === 'AUDIO' || node.tagName === 'VIDEO') {
-              media.push(node);
-            }
-            if (node.shadowRoot) {
-              media.push(...findAllMedia(node.shadowRoot));
-            }
-          }
-          return media;
-        }
+        ${FIND_ALL_MEDIA_FUNCTION}
 
         const mediaElements = findAllMedia(document);
         console.log('[CdpTimeDriver] Syncing ' + mediaElements.length + ' media elements to ' + t);

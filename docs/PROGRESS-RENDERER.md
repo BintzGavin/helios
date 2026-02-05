@@ -1,3 +1,6 @@
+## RENDERER v1.71.3
+- ✅ Completed: Refactor Media Discovery - Consolidated duplicated `findAllMedia` logic from `CdpTimeDriver`, `SeekTimeDriver`, and `dom-scanner` into a shared `dom-scripts.ts` utility, improving maintainability. Verified with `npm run test` (logic equivalence).
+
 ## RENDERER v1.71.2
 - ✅ Completed: Verify Background Image Preloading - Enhanced `verify-dom-preload.ts` to strictly verify that `DomStrategy` detects and preloads CSS background images by intercepting and validating log output.
 

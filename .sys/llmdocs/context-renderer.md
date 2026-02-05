@@ -39,6 +39,7 @@ packages/renderer/
 │   │   ├── blob-extractor.ts  # Blob URL handling
 │   │   ├── dom-finder.ts      # Shared deep element finding (Shadow DOM)
 │   │   ├── dom-scanner.ts     # Media element discovery
+│   │   ├── dom-scripts.ts     # Shared browser-side scripts (media discovery)
 │   │   └── random-seed.ts     # Deterministic PRNG injection
 │   ├── index.ts               # Entry point
 │   ├── Renderer.ts            # Main class
