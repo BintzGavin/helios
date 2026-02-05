@@ -1,3 +1,6 @@
+## STUDIO v0.98.0
+- ✅ Completed: CLI Solid Support - Verified SolidJS template integration in `helios init` and synced package dependencies (Studio -> Player ^0.70.0).
+
 ## STUDIO v0.97.0
 - ✅ Completed: Draggable Time Markers - Implemented dragging for time-based input prop markers on the Timeline, allowing direct manipulation of prop values.
 

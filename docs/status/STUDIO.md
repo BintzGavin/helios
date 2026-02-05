@@ -1,4 +1,4 @@
-**Version**: 0.97.0
+**Version**: 0.98.0
 
 **Posture**: ACTIVELY EXPANDING FOR V2
 
@@ -9,6 +9,7 @@
 **Focus**: UI Implementation & CLI
 
 ## Recent Updates
+- [v0.98.0] ✅ Completed: CLI Solid Support - Verified SolidJS template integration in `helios init` and synced package dependencies.
 - [v0.97.0] ✅ Completed: Draggable Time Markers - Implemented dragging for time-based input prop markers on the Timeline, allowing direct manipulation of prop values.
 - [v0.96.0] ✅ Completed: Sync Playback Range - Delegated loop and playback range enforcement to HeliosController, ensuring consistent behavior across Preview and Export.
 - [v0.95.2] ✅ Completed: Audio Metering - Implemented Master Audio Meter in the Mixer Panel header using `AudioMeter` component and real-time controller events.
