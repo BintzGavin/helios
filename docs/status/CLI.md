@@ -1,6 +1,6 @@
 # CLI Status
 
-**Version**: 0.10.1
+**Version**: 0.11.0
 
 ## Current State
 
@@ -16,6 +16,7 @@ The Helios CLI (`packages/cli`) provides the command-line interface for the Heli
 - `helios studio` - Launches the Helios Studio dev server
 - `helios init` - Initializes a new Helios project configuration and scaffolds project structure
 - `helios add` - Adds a component to the project
+- `helios list` - Lists installed components in the project
 - `helios components` - Lists available components in the registry
 - `helios render` - Renders a composition to video
 - `helios merge` - Merges multiple video files into one without re-encoding
@@ -47,3 +48,4 @@ Per AGENTS.md, the CLI is "ACTIVELY EXPANDING FOR V2" with focus on:
 [v0.9.0] ✅ Multi-Framework Support - Enabled `helios init` for Vue, Svelte, and Vanilla, and updated `helios studio` to load user config.
 [v0.9.2] ✅ SolidJS Support - Added SolidJS template to `helios init` and added `--framework` flag for automated scaffolding.
 [v0.10.0] ✅ Track Installed Components - Updated `helios add` to record installed components in `helios.config.json`.
+[v0.11.0] ✅ Implement List Command - Implemented `helios list` to display installed components.
