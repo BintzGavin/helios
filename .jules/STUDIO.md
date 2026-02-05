@@ -61,3 +61,7 @@
 ## [0.94.1] - Input Props Persistence
 **Learning:** While `composition.json` existed for metadata (fps, size), it did not store the most critical user configuration: input props. Users lost their work on reload. This was a vision gap in "WYSIWYG" editing.
 **Action:** Ensure all user-configurable state in the Studio (including props) is persisted to the project filesystem (`composition.json`) to serve as the single source of truth.
+
+## [0.94.3] - Test Environment Fragility
+**Learning:** `vitest` execution in workspace packages relies on the root `node_modules/.bin` being populated. If the environment is not fresh, tests may fail with "command not found". Also, `setupTests.ts` mechanism can be fragile if `vitest` globals are not configured, requiring explicit `expect.extend` in test files.
+**Action:** Always verify `npm install` state before running tests in a new session, and prefer explicit imports over implicit global setup for robust tests.

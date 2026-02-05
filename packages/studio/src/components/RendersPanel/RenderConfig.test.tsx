@@ -1,7 +1,15 @@
+// @vitest-environment jsdom
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
-import { describe, it, expect, vi } from 'vitest';
+import { render, screen, fireEvent, cleanup } from '@testing-library/react';
+import { describe, it, expect, vi, afterEach } from 'vitest';
+import * as matchers from '@testing-library/jest-dom/matchers';
 import { RenderConfig, type RenderConfigData } from './RenderConfig';
+
+expect.extend(matchers);
+
+afterEach(() => {
+  cleanup();
+});
 
 describe('RenderConfig', () => {
   const defaultConfig: RenderConfigData = {
@@ -75,6 +83,26 @@ describe('RenderConfig', () => {
     expect(mockOnChange).toHaveBeenCalledWith({
       ...defaultConfig,
       videoBitrate: '8000k'
+    });
+  });
+
+  it('clamps concurrency values between 1 and 32', () => {
+    render(<RenderConfig config={defaultConfig} onChange={mockOnChange} />);
+
+    const concurrencyInput = screen.getByLabelText('Concurrency (Workers)');
+
+    // Test negative value -> should be clamped to 1
+    fireEvent.change(concurrencyInput, { target: { value: '-5' } });
+    expect(mockOnChange).toHaveBeenCalledWith({
+      ...defaultConfig,
+      concurrency: 1
+    });
+
+    // Test excessive value -> should be clamped to 32
+    fireEvent.change(concurrencyInput, { target: { value: '100' } });
+    expect(mockOnChange).toHaveBeenCalledWith({
+      ...defaultConfig,
+      concurrency: 32
     });
   });
 });
