@@ -25,11 +25,22 @@ export function registerInitCommand(program: Command) {
     .command('init')
     .description('Initialize a new Helios project configuration')
     .option('-y, --yes', 'Skip prompts and use defaults (React)')
+    .option('-f, --framework <framework>', 'Specify framework (react, vue, svelte, solid, vanilla)')
     .action(async (options) => {
       const configPath = path.resolve(process.cwd(), 'helios.config.json');
       const packageJsonPath = path.resolve(process.cwd(), 'package.json');
       let isScaffolded = false;
       let selectedFramework: Framework = 'react';
+
+      if (options.framework) {
+        const normalized = options.framework.toLowerCase();
+        if (['react', 'vue', 'svelte', 'solid', 'vanilla'].includes(normalized)) {
+          selectedFramework = normalized as Framework;
+        } else {
+          console.error(chalk.red(`Invalid framework: ${options.framework}`));
+          process.exit(1);
+        }
+      }
 
       const ask = (question: string, defaultValue?: string): Promise<string> => {
         const rl = readline.createInterface({
@@ -56,7 +67,7 @@ export function registerInitCommand(program: Command) {
         }
 
         if (shouldScaffold) {
-          if (!options.yes) {
+          if (!options.yes && !options.framework) {
             const frameworkInput = await ask(`Select framework (${chalk.cyan('react')}, vue, svelte, solid, vanilla)`, 'react');
             const normalized = frameworkInput.toLowerCase();
             if (['react', 'vue', 'svelte', 'solid', 'vanilla'].includes(normalized)) {
@@ -101,12 +112,16 @@ export function registerInitCommand(program: Command) {
       if (!options.yes && !isScaffolded) {
         console.log(chalk.cyan('Initializing Helios configuration...'));
 
-        const framework = await ask(
-          'Which framework are you using? (react, vue, svelte, solid, vanilla)',
-          'react'
-        );
-        if (['react', 'vue', 'svelte', 'solid', 'vanilla'].includes(framework.toLowerCase())) {
-           config.framework = framework.toLowerCase();
+        if (options.framework) {
+          config.framework = options.framework.toLowerCase();
+        } else {
+          const framework = await ask(
+            'Which framework are you using? (react, vue, svelte, solid, vanilla)',
+            'react'
+          );
+          if (['react', 'vue', 'svelte', 'solid', 'vanilla'].includes(framework.toLowerCase())) {
+            config.framework = framework.toLowerCase();
+          }
         }
 
         const componentsDir = await ask(

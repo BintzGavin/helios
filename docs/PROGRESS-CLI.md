@@ -2,6 +2,10 @@
 
 This file tracks progress for the CLI domain (`packages/cli`).
 
+## CLI v0.9.2
+
+- ✅ SolidJS Support Verified - Verified SolidJS template functionality and added `--framework` CLI flag for automation.
+
 ## CLI v0.9.1
 
 - ✅ SolidJS Support - Added SolidJS template to `helios init`
