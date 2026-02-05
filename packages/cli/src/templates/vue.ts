@@ -1,5 +1,5 @@
 
-export const BASIC_TEMPLATE: Record<string, string> = {
+export const VUE_TEMPLATE: Record<string, string> = {
   'package.json': JSON.stringify({
     name: "helios-project",
     private: true,
@@ -7,30 +7,28 @@ export const BASIC_TEMPLATE: Record<string, string> = {
     type: "module",
     scripts: {
       "dev": "helios studio",
-      "build": "tsc && vite build",
+      "build": "vue-tsc && vite build",
       "render": "helios render"
     },
     dependencies: {
-      "react": "^18.2.0",
-      "react-dom": "^18.2.0",
-      "@helios-project/core": "^5.10.0"
+      "vue": "^3.5.27",
+      "@helios-project/core": "^5.11.0"
     },
     devDependencies: {
-      "@types/react": "^18.2.66",
-      "@types/react-dom": "^18.2.22",
-      "@vitejs/plugin-react": "^4.2.1",
+      "@vitejs/plugin-vue": "^6.0.3",
       "typescript": "^5.2.2",
-      "vite": "^5.2.0",
+      "vite": "^7.1.2",
+      "vue-tsc": "^2.0.0",
       "@helios-project/cli": "latest"
     }
   }, null, 2),
 
   'vite.config.ts': `import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
+import vue from '@vitejs/plugin-vue'
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react()],
+  plugins: [vue()],
 })
 `,
 
@@ -38,21 +36,25 @@ export default defineConfig({
     "compilerOptions": {
       "target": "ES2020",
       "useDefineForClassFields": true,
-      "lib": ["ES2020", "DOM", "DOM.Iterable"],
       "module": "ESNext",
+      "lib": ["ES2020", "DOM", "DOM.Iterable"],
       "skipLibCheck": true,
+
+      /* Bundler mode */
       "moduleResolution": "bundler",
       "allowImportingTsExtensions": true,
       "resolveJsonModule": true,
       "isolatedModules": true,
       "noEmit": true,
-      "jsx": "react-jsx",
+      "jsx": "preserve",
+
+      /* Linting */
       "strict": true,
       "noUnusedLocals": true,
       "noUnusedParameters": true,
       "noFallthroughCasesInSwitch": true
     },
-    "include": ["src"]
+    "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue"]
   }, null, 2),
 
   'index.html': `<!doctype html>
@@ -63,8 +65,8 @@ export default defineConfig({
     <title>Helios Project</title>
   </head>
   <body>
-    <div id="root"></div>
-    <script type="module" src="/src/index.tsx"></script>
+    <div id="app"></div>
+    <script type="module" src="/src/main.ts"></script>
   </body>
 </html>
 `,
@@ -205,52 +207,49 @@ export const helios = new Helios({
 helios.bindToDocumentTimeline();
 `,
 
-  'src/index.tsx': `import React from 'react'
-import ReactDOM from 'react-dom/client'
+  'src/main.ts': `import { createApp } from 'vue'
 import './helios' // Initialize Helios
-import HelloWorld from './components/HelloWorld'
+import App from './App.vue'
 
-ReactDOM.createRoot(document.getElementById('root')!).render(
-  <React.StrictMode>
-    <HelloWorld />
-  </React.StrictMode>,
-)
+createApp(App).mount('#app')
 `,
 
-  'src/components/HelloWorld.tsx': `import React, { useEffect, useRef } from 'react';
-import { helios } from '../helios';
+  'src/App.vue': `<script setup lang="ts">
+import { ref, onMounted, onUnmounted } from 'vue';
+import { helios } from './helios';
 
-export default function HelloWorld() {
-  const ref = useRef<HTMLHeadingElement>(null);
+const opacity = ref(0);
+const translation = ref(0);
 
-  useEffect(() => {
-    // Subscribe to Helios frame updates
-    const unsubscribe = helios.subscribe((state) => {
-      if (ref.current) {
-        // Example: Animate opacity based on time
-        // state.currentTime is the current time in seconds
-        const opacity = Math.min(state.currentTime, 1);
-        ref.current.style.opacity = opacity.toString();
-        ref.current.style.transform = \`translateY(\${(1 - opacity) * 20}px)\`;
-      }
-    });
+// Subscribe to Helios updates
+const unsubscribe = helios.subscribe((state) => {
+  opacity.value = Math.min(state.currentTime, 1);
+  translation.value = (1 - opacity.value) * 20;
+});
 
-    return unsubscribe;
-  }, []);
+onUnmounted(() => {
+  unsubscribe();
+});
+</script>
 
-  return (
-    <div style={{
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-      height: '100vh',
-      fontFamily: 'sans-serif',
-      backgroundColor: '#1a1a1a',
-      color: '#fff'
-    }}>
-      <h1 ref={ref}>Hello Helios!</h1>
-    </div>
-  );
+<template>
+  <div class="container">
+    <h1 :style="{ opacity: opacity, transform: \`translateY(\${translation}px)\` }">
+      Hello Helios!
+    </h1>
+  </div>
+</template>
+
+<style scoped>
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  font-family: sans-serif;
+  background-color: #1a1a1a;
+  color: #fff;
 }
+</style>
 `
 };

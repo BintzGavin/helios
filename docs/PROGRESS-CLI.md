@@ -2,6 +2,10 @@
 
 This file tracks progress for the CLI domain (`packages/cli`).
 
+## CLI v0.9.0
+
+- ✅ Multi-Framework Support - Implemented `helios init` support for React, Vue, Svelte, and Vanilla templates
+
 ## CLI v0.8.0
 
 - ✅ Auto-Install Dependencies - Implemented automatic dependency installation for `helios add` with `--no-install` flag

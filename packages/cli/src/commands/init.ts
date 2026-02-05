@@ -4,42 +4,68 @@ import path from 'path';
 import readline from 'readline';
 import chalk from 'chalk';
 import { DEFAULT_CONFIG } from '../utils/config.js';
-import { BASIC_TEMPLATE } from '../templates/basic.js';
+import { REACT_TEMPLATE } from '../templates/react.js';
+import { VUE_TEMPLATE } from '../templates/vue.js';
+import { SVELTE_TEMPLATE } from '../templates/svelte.js';
+import { VANILLA_TEMPLATE } from '../templates/vanilla.js';
+
+type Framework = 'react' | 'vue' | 'svelte' | 'vanilla';
+
+const TEMPLATES: Record<Framework, Record<string, string>> = {
+  react: REACT_TEMPLATE,
+  vue: VUE_TEMPLATE,
+  svelte: SVELTE_TEMPLATE,
+  vanilla: VANILLA_TEMPLATE
+};
 
 export function registerInitCommand(program: Command) {
   program
     .command('init')
     .description('Initialize a new Helios project configuration')
-    .option('-y, --yes', 'Skip prompts and use defaults')
+    .option('-y, --yes', 'Skip prompts and use defaults (React)')
     .action(async (options) => {
       const configPath = path.resolve(process.cwd(), 'helios.config.json');
       const packageJsonPath = path.resolve(process.cwd(), 'package.json');
       let isScaffolded = false;
+      let selectedFramework: Framework = 'react';
+
+      const ask = (question: string, defaultValue?: string): Promise<string> => {
+        const rl = readline.createInterface({
+          input: process.stdin,
+          output: process.stdout,
+        });
+
+        return new Promise((resolve) => {
+          const suffix = defaultValue ? ` ${chalk.gray(`[${defaultValue}]`)}` : '';
+          rl.question(`${question}${suffix}: `, (answer) => {
+            rl.close();
+            resolve(answer.trim() || defaultValue || '');
+          });
+        });
+      };
 
       if (!fs.existsSync(packageJsonPath)) {
         let shouldScaffold = options.yes; // Default to yes if -y is passed
 
         if (!options.yes) {
-          const rl = readline.createInterface({
-            input: process.stdin,
-            output: process.stdout,
-          });
-
-          const answer = await new Promise<string>((resolve) => {
-            rl.question(`No package.json found. Do you want to scaffold a new project? ${chalk.gray('(Y/n)')}: `, (ans) => {
-              resolve(ans);
-            });
-          });
-
-          rl.close();
-          const normalized = answer.trim().toLowerCase();
-          shouldScaffold = normalized === '' || normalized === 'y' || normalized === 'yes';
+          const answer = await ask(`No package.json found. Do you want to scaffold a new project? ${chalk.gray('(Y/n)')}`, 'y');
+          const normalized = answer.toLowerCase();
+          shouldScaffold = normalized === 'y' || normalized === 'yes';
         }
 
         if (shouldScaffold) {
-          console.log(chalk.cyan('Scaffolding new Helios project...'));
+          if (!options.yes) {
+            const frameworkInput = await ask(`Select framework (${chalk.cyan('react')}, vue, svelte, vanilla)`, 'react');
+            const normalized = frameworkInput.toLowerCase();
+            if (['react', 'vue', 'svelte', 'vanilla'].includes(normalized)) {
+              selectedFramework = normalized as Framework;
+            }
+          }
+
+          console.log(chalk.cyan(`Scaffolding new Helios project (${selectedFramework})...`));
           try {
-            for (const [filepath, content] of Object.entries(BASIC_TEMPLATE)) {
+            const template = TEMPLATES[selectedFramework];
+            for (const [filepath, content] of Object.entries(template)) {
               const fullPath = path.resolve(process.cwd(), filepath);
               const dir = path.dirname(fullPath);
               if (!fs.existsSync(dir)) {
@@ -65,22 +91,21 @@ export function registerInitCommand(program: Command) {
       // Deep copy to avoid mutating the exported constant
       let config = JSON.parse(JSON.stringify(DEFAULT_CONFIG));
 
+      if (isScaffolded) {
+        config.framework = selectedFramework;
+      }
+
       // Skip prompts if we just scaffolded (use defaults matching template) OR if -y passed
       if (!options.yes && !isScaffolded) {
-        const rl = readline.createInterface({
-          input: process.stdin,
-          output: process.stdout,
-        });
-
-        const ask = (question: string, defaultValue: string): Promise<string> => {
-          return new Promise((resolve) => {
-            rl.question(`${question} ${chalk.gray(`(${defaultValue})`)}: `, (answer) => {
-              resolve(answer.trim() || defaultValue);
-            });
-          });
-        };
-
         console.log(chalk.cyan('Initializing Helios configuration...'));
+
+        const framework = await ask(
+          'Which framework are you using? (react, vue, svelte, vanilla)',
+          'react'
+        );
+        if (['react', 'vue', 'svelte', 'vanilla'].includes(framework.toLowerCase())) {
+           config.framework = framework.toLowerCase();
+        }
 
         const componentsDir = await ask(
           'Where would you like to install components?',
@@ -93,8 +118,6 @@ export function registerInitCommand(program: Command) {
 
         config.directories.components = componentsDir;
         config.directories.lib = libDir;
-
-        rl.close();
       }
 
       try {
