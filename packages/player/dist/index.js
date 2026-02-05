@@ -1707,6 +1707,9 @@ export class HeliosPlayer extends HTMLElement {
             this.updateUI(state);
         }
         const unsubState = this.controller.subscribe((s) => this.updateUI(s));
+        const unsubMetering = this.controller.onAudioMetering((levels) => {
+            this.dispatchEvent(new CustomEvent('audiometering', { detail: levels }));
+        });
         const unsubError = this.controller.onError((err) => {
             const message = err.message || String(err);
             this._error = {
@@ -1726,6 +1729,7 @@ export class HeliosPlayer extends HTMLElement {
         this.unsubscribe = () => {
             unsubState();
             unsubError();
+            unsubMetering();
         };
         if (this.hasAttribute("autoplay")) {
             this.controller.play();
@@ -2192,6 +2196,16 @@ export class HeliosPlayer extends HTMLElement {
             throw new Error("Cannot run diagnostics: Player is not connected.");
         }
         return this.controller.diagnose();
+    }
+    startAudioMetering() {
+        if (this.controller) {
+            this.controller.startAudioMetering();
+        }
+    }
+    stopAudioMetering() {
+        if (this.controller) {
+            this.controller.stopAudioMetering();
+        }
     }
     retryConnection() {
         this.showStatus("Retrying...", false);

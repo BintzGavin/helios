@@ -1,4 +1,4 @@
-**Version**: v0.66.5
+**Version**: v0.67.0
 
 **Posture**: STABLE AND FEATURE COMPLETE
 
@@ -50,15 +50,17 @@
 - Supports auto-enabling of captions if a track is marked as `default`.
 - Supports audio fade-in/out in client-side export via `data-helios-fade-in` and `data-helios-fade-out` attributes.
 - Supports Shadow DOM Export: DOM-based client-side export now correctly captures Shadow DOM content (via Declarative Shadow DOM transformation), enabling support for Web Components in exports.
-- Supports Environment Diagnostics UI: Implemented `diagnose()` method in `HeliosController` and a visible Diagnostics UI overlay in `<helios-player>` (toggled via `Shift+D`) to expose environment capabilities (WebCodecs, WebGL, etc.) to the user.
+- Supports Environment Diagnostics UI: Implemented `diagnose()` method in `HeliosController` and a visible Diagnostics UI overlay in `<helios-player>` (toggled via `Shift+D`) to expose environment capabilities (WebCodecs, etc.) to the user.
 - Supports Headless Audio Export: Client-side export now includes audio tracks manually injected into Helios state (`availableAudioTracks`), enabling headless audio rendering without DOM elements.
 - Supports Dynamic Composition Updates: Exposes `setDuration`, `setFps`, `setSize`, and `setMarkers` via `HeliosController` (and Bridge), allowing host applications (like Studio) to update the composition structure dynamically.
 - Supports Export Filename: Implemented `export-filename` attribute to allow specifying the filename for client-side exports.
 - Supports Active Cues: Implemented `activeCues` property and `cuechange` event on `HeliosTextTrack` for Standard Media API parity.
+- **Audio Metering**: Supports real-time audio metering via `startAudioMetering()` API and `audiometering` event, enabling visualization of audio levels (stereo/peak) in host applications.
 
 ## Critical Task
 - **None**: All critical tasks completed.
 
+[v0.67.0] ✅ Completed: Audio Metering Bridge - Implemented real-time audio metering system exposing stereo RMS and Peak levels via `audiometering` event and Bridge protocol.
 [v0.66.5] ✅ Completed: Smart PiP Visibility - Implemented auto-hiding of Picture-in-Picture button when environment lacks support or `export-mode="dom"` is active.
 [v0.66.4] ✅ Completed: Enhance Keyboard Shortcuts & Fix Sandbox - Implemented standard shortcuts (Captions, Seek Home/End, 0-9) and fixed sandbox attribute behavior to support strict mode.
 [v0.66.3] ✅ Verified: Synced package.json version with status file and verified all tests pass.

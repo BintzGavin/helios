@@ -1,7 +1,10 @@
 import { Helios } from "@helios-project/core";
 import { captureDomToBitmap } from "./features/dom-capture";
 import { getAudioAssets } from "./features/audio-utils";
+import { AudioMeter } from "./features/audio-metering";
 export function connectToParent(helios) {
+    let audioMeter = null;
+    let audioMeterRaf = null;
     // 1. Listen for messages from parent
     window.addEventListener('message', async (event) => {
         if (event.source !== window.parent)
@@ -101,6 +104,30 @@ export function connectToParent(helios) {
                 break;
             case 'HELIOS_GET_SCHEMA':
                 window.parent.postMessage({ type: 'HELIOS_SCHEMA', schema: helios.schema }, '*');
+                break;
+            case 'HELIOS_START_METERING':
+                if (!audioMeter) {
+                    audioMeter = new AudioMeter();
+                    audioMeter.connect(document);
+                    const loop = () => {
+                        if (audioMeter) {
+                            const levels = audioMeter.getLevels();
+                            window.parent.postMessage({ type: 'HELIOS_AUDIO_LEVELS', levels }, '*');
+                        }
+                        audioMeterRaf = requestAnimationFrame(loop);
+                    };
+                    audioMeterRaf = requestAnimationFrame(loop);
+                }
+                break;
+            case 'HELIOS_STOP_METERING':
+                if (audioMeterRaf) {
+                    cancelAnimationFrame(audioMeterRaf);
+                    audioMeterRaf = null;
+                }
+                if (audioMeter) {
+                    audioMeter.dispose();
+                    audioMeter = null;
+                }
                 break;
             case 'HELIOS_DIAGNOSE':
                 const report = await Helios.diagnose();

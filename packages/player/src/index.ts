@@ -1,6 +1,7 @@
 import { Helios, HeliosSchema, DiagnosticReport } from "@helios-project/core";
 import { DirectController, BridgeController } from "./controllers";
 import type { HeliosController } from "./controllers";
+import { AudioLevels } from "./features/audio-metering";
 import { ClientSideExporter } from "./features/exporter";
 import { HeliosTextTrack, HeliosTextTrackList, CueClass, TrackHost } from "./features/text-tracks";
 import { HeliosAudioTrack, HeliosAudioTrackList, AudioTrackHost } from "./features/audio-tracks";
@@ -1876,6 +1877,10 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
 
       const unsubState = this.controller.subscribe((s) => this.updateUI(s));
 
+      const unsubMetering = this.controller.onAudioMetering((levels: AudioLevels) => {
+        this.dispatchEvent(new CustomEvent('audiometering', { detail: levels }));
+      });
+
       const unsubError = this.controller.onError((err) => {
         const message = err.message || String(err);
         this._error = {
@@ -1896,6 +1901,7 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
       this.unsubscribe = () => {
         unsubState();
         unsubError();
+        unsubMetering();
       };
 
       if (this.hasAttribute("autoplay")) {
@@ -2407,6 +2413,18 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
         throw new Error("Cannot run diagnostics: Player is not connected.");
     }
     return this.controller.diagnose();
+  }
+
+  public startAudioMetering() {
+    if (this.controller) {
+      this.controller.startAudioMetering();
+    }
+  }
+
+  public stopAudioMetering() {
+    if (this.controller) {
+      this.controller.stopAudioMetering();
+    }
   }
 
   private retryConnection() {
