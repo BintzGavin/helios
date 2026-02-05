@@ -6,12 +6,14 @@
 ## A. Component Structure
 The Shadow DOM contains:
 - `iframe`: Sandboxed environment for the composition.
-- `.controls`: UI overlay (Play/Pause, Volume, Scrubber, Audio Menu, CC, Speed, Export, Fullscreen, PiP).
+- `.controls`: UI overlay (Play/Pause, Volume, Scrubber, Audio Menu, CC, Settings, Export, Fullscreen, PiP).
 - `.status-overlay`: Visual feedback for connection/loading states.
 - `.poster-container`: Poster image overlay.
 - `.audio-menu`: Popup menu for individual audio track control.
+- `.settings-menu`: Popup menu for Speed, Loop, Playback Range, Shortcuts, and Diagnostics.
+- `.shortcuts-overlay`: Overlay displaying keyboard shortcuts.
 - `.captions-container`: Overlay for rendering captions.
-- `.debug-overlay`: Diagnostics UI (toggled via Shift+D).
+- `.debug-overlay`: Diagnostics UI (toggled via Settings or Shift+D).
 
 ## B. Events
 - `play`: Playback started.
