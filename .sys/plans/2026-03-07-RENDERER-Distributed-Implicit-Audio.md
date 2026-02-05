@@ -1,63 +1,67 @@
-# 2026-03-07-RENDERER-Distributed-Implicit-Audio.md
+# Plan: Distributed Implicit Audio
 
 ## 1. Context & Goal
-- **Objective**: Ensure implicit audio (DOM `<audio>`/`<video>`) preserved in distributed rendering chunks is included in the final output mix.
-- **Trigger**: Distributed rendering drops implicit audio during the final mix step because `FFmpegBuilder` ignores the input video's audio stream (`0:a`) when explicit audio tracks are present.
-- **Impact**: Enables fully correct distributed rendering for compositions that use both implicit DOM audio and explicit background tracks.
+- **Objective**: Ensure implicit audio (DOM `<audio>` elements) is preserved during the final mix step of distributed rendering.
+- **Trigger**: The current `FFmpegBuilder` implementation defaults to ignoring the input video's audio stream (`0:a`) when performing audio mixing, causing distributed renders (which rely on concatenating chunks with implicit audio) to be silent unless explicit audio tracks are provided.
+- **Impact**: Enables correct distributed rendering for compositions using DOM-based audio (e.g., `<audio>` tags), aligning with the "Use What You Know" principle.
+- **Dependencies**: None.
 
 ## 2. File Inventory
-- **Modify**: `packages/renderer/src/types.ts` (Add `mixInputAudio` option)
-- **Modify**: `packages/renderer/src/utils/FFmpegBuilder.ts` (Implement `mixInputAudio` logic)
-- **Modify**: `packages/renderer/src/Orchestrator.ts` (Enable `mixInputAudio` in final mix step)
-- **Create**: `tests/verify-ffmpeg-builder.ts` (Unit test for FFmpegBuilder argument generation)
+- **Modify**: `packages/renderer/src/types.ts` (add `mixInputAudio` to `RendererOptions`)
+- **Modify**: `packages/renderer/src/utils/FFmpegBuilder.ts` (implement logic to map `0:a` when `mixInputAudio` is true)
+- **Modify**: `packages/renderer/src/Orchestrator.ts` (enable `mixInputAudio: true` for the final mixing pass)
 
 ## 3. Implementation Spec
+- **Architecture**:
+  - Update `RendererOptions` to include `mixInputAudio?: boolean`.
+  - In `FFmpegBuilder.getArgs`:
+    - Check if `mixInputAudio` is true.
+    - If true, treat `0:a` as an audio input source.
+    - If `tracks.length > 0`, include `[0:a]` in the `amix` filter graph (increasing inputs count by 1).
+    - If `tracks.length === 0`, ensure `0:a` is mapped directly to the output (`-map 0:a`).
+  - In `Orchestrator.render`:
+    - Set `mixInputAudio: true` in the `mixOptions` used for the final ffmpeg pass.
 
-### Architecture
-- **Strategy Pattern**: Enhance `FFmpegBuilder` to optionally treat the input video (stream `0:a`) as a mixable audio source.
-- **Configuration**: Expose `mixInputAudio` in `RendererOptions` to allow explicit control over this behavior.
+- **Pseudo-Code (FFmpegBuilder)**:
+  ```typescript
+  // Inside getArgs...
+  let audioFilterGraph = '';
+  let audioMap = '';
+  // Check if we should mix input audio (only if input video exists, which is standard)
+  const shouldMixInput = options.mixInputAudio === true;
 
-### Pseudo-Code
+  if (tracks.length > 0 || shouldMixInput) {
+    if (tracks.length === 0 && shouldMixInput) {
+      // No extra tracks, just pass through input audio
+      // We assume input 0 is the video file which contains the audio stream
+      audioMap = '0:a';
+    } else {
+      // Mixing required
+      let graph = audioFilterChains.join(';');
+      let mixInputs = tracks.map((_, i) => `[a${i}]`).join('');
+      let inputCount = tracks.length;
 
-**types.ts**:
-```typescript
-interface RendererOptions {
-  // ... existing options
-  /**
-   * Whether to include the input video's audio stream (0:a) in the final mix.
-   * Useful when post-processing a video that already contains audio.
-   */
-  mixInputAudio?: boolean;
-}
-```
+      if (shouldMixInput) {
+        // Prepend 0:a to the mix inputs
+        mixInputs = `[0:a]${mixInputs}`;
+        inputCount++;
+      }
 
-**FFmpegBuilder.ts**:
-- In `getArgs`:
-  - Check `options.mixInputAudio`.
-  - If `true`:
-    - Identify input 0 audio as `[0:a]`.
-    - If `tracks` exist:
-      - Add `[0:a]` to the inputs of the `amix` filter.
-      - Increment `inputs` count for `amix`.
-      - Prepend `[0:a]` to the filter chain string: `[0:a][a0][a1]...amix...`.
-    - If `tracks` do NOT exist:
-      - Set `audioMap` to `'0:a'` (ensure input audio is passed through).
+      graph += `;${mixInputs}amix=inputs=${inputCount}:duration=longest[aout]`;
+      audioFilterGraph = graph;
+      audioMap = '[aout]';
+    }
+  }
+  ```
 
-**Orchestrator.ts**:
-- In the final mixing step (after concatenation):
-  - Set `mixInputAudio: true` in `mixOptions`.
-
-### Public API Changes
-- `RendererOptions` gains optional `mixInputAudio` property.
-
-### Dependencies
-- None.
+- **Public API Changes**:
+  - `RendererOptions` interface gains `mixInputAudio?: boolean`.
 
 ## 4. Test Plan
-- **Verification**: Run `npx ts-node tests/verify-ffmpeg-builder.ts`
-- **Success Criteria**:
-  - The script asserts that generated FFmpeg arguments contain `[0:a]` in the `filter_complex` string when `mixInputAudio` is true.
-  - Verifies correct behavior for both "tracks + input audio" (mixing) and "no tracks + input audio" (passthrough) cases.
-- **Edge Cases**:
-  - `mixInputAudio: true` with no audio tracks -> Should map `0:a`.
-  - `mixInputAudio: false` (default) -> Should behave as before (ignore `0:a` if tracks exist).
+- **Verification**:
+  - Create a new test script `tests/verify-distributed-audio.ts` that:
+    - Uses a simple DOM composition with an `<audio>` element (using a data URI or local file).
+    - Runs a distributed render (concurrency > 1).
+    - Uses `ffprobe` (via `FFmpegInspector` or `spawn`) to verify the output file has an audio stream.
+  - Run `npm run test` to ensure no regressions.
+- **Success Criteria**: The output video from distributed rendering contains an audio stream with non-zero duration.
