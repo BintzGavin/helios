@@ -26,3 +26,7 @@
 ## [2026-03-11] - DomStrategy Parity Gap
 **Learning:** `DomStrategy` lacks `targetSelector` support, forcing full-viewport capture even when users only need to render a specific component. This is a parity gap with `CanvasStrategy` which supports `canvasSelector`.
 **Action:** Created plan `2026-03-11-RENDERER-Dom-Selector.md` to implement `targetSelector` in `DomStrategy` and unify the deep element finder logic across both strategies.
+
+## [2026-09-09] - Hardware Codec Detection Gap
+**Learning:** `CanvasStrategy` relied on a non-standard `type` property on `VideoEncoderSupport` to detect hardware acceleration, potentially falling back to software codecs unnecessarily. The standard way is `navigator.mediaCapabilities.encodingInfo()`.
+**Action:** Created plan `2026-09-09-RENDERER-Hardware-Accelerated-Codec-Priority.md` to implement robust hardware detection and prioritization.
