@@ -1,5 +1,15 @@
 # LLMS Progress
 
+## LLMS v1.9.0
+- ✅ Completed: Daily llms.txt Review
+  - Updated Quick Facts: Studio v0.95+
+  - Updated Core API example: Clarified `availableAudioTracks` metadata
+  - Updated Roadmap:
+    - Updated versions: Studio v0.95+, CLI v0.8+, Player v0.67+, Renderer v1.69+
+    - Added features: Component Registry UI, Audio Metering, Enhanced Diagnostics, Auto-install
+  - Updated Agent Skills: Added `cli/SKILL.md`
+  - Verified content against codebase
+
 ## LLMS v1.8.0
 - ✅ Completed: Daily llms.txt Review
   - Updated Quick Facts: Core v5.11+, Studio v0.90+, Player v0.65+

@@ -6,7 +6,7 @@ Helios is a modern engine for creating videos programmatically using standard we
 
 ## Quick Facts
 - **License**: Elastic License 2.0 (free commercial use, no SaaS resale)
-- **Status**: Core: Stable (v5.11+), Studio: Alpha (v0.90+)
+- **Status**: Core: Stable (v5.11+), Studio: Alpha (v0.95+)
 - **Frameworks**: React, Vue, Svelte, Solid, vanilla JS
 - **Animation**: Standard CSS, Web Animations API (WAAPI), any animation library
 
@@ -26,7 +26,7 @@ const helios = new Helios({
 // Reactively subscribe to state changes
 helios.subscribe(({ currentFrame, inputProps, availableAudioTracks }) => {
   // Drive animations with progress or props
-  // availableAudioTracks is AudioTrackMetadata[] (id, startTime, duration, src)
+  // availableAudioTracks is AudioTrackMetadata[] (id, kind, label, startTime, duration, src)
 });
 
 // CRITICAL: Ensure fonts, images, and media are ready before rendering
@@ -81,6 +81,7 @@ Skills for AI agents are in `.agents/skills/helios/`:
 - `renderer/SKILL.md` - Rendering pipeline usage
 - `player/SKILL.md` - Player component usage
 - `studio/SKILL.md` - Studio usage and extensions
+- `cli/SKILL.md` - CLI usage and scaffolding
 
 ## Key Files for Agents
 - `README.md` - Vision document
@@ -107,11 +108,11 @@ const report = await Helios.diagnose();
 
 ## Roadmap
 ### V1.x (Active)
-- **Helios Studio**: Alpha v0.90+ (Stacked Timeline, Audio Mixer, Omnibar, Visualization)
-- **CLI**: Beta v0.3+ (Component Registry, Project Scaffolding)
-- **Core**: Stable v5.11+ (Audio Fade Easing, Headless Audio, WebVTT)
-- **Player**: Feature Complete v0.65+ (Diagnostics UI, Headless Audio Export)
-- **Renderer**: Stable v1.61+ (Local Distributed Rendering, Zero Disk Audio)
+- **Helios Studio**: Alpha v0.95+ (Stacked Timeline, Audio Mixer, Component Registry UI, Render Presets)
+- **CLI**: Beta v0.8+ (Component Registry, Project Scaffolding, Auto-install, Merge Command)
+- **Core**: Stable v5.11+ (Input Schema, Audio Fade Easing, Headless Audio, WebVTT)
+- **Player**: Feature Complete v0.67+ (Audio Metering, Diagnostics UI, Responsive Images)
+- **Renderer**: Stable v1.69+ (Local Distributed Rendering, Enhanced Diagnostics, Smart Codec Selection)
 
 ### AI Integration
 - **Studio MCP Server**: Inspect, create, and render compositions via LLM tools (Done)
