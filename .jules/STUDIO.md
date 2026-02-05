@@ -69,3 +69,7 @@
 ## [0.96.0] - Core API Parity
 **Learning:** The Studio was implementing manual loop enforcement logic in `StudioContext`, duplicating logic that already existed in `packages/core` (`setPlaybackRange`). This led to inconsistencies where Client-Side Export (which relies on Core) ignored the Studio's range selection.
 **Action:** Before implementing logic in the Studio that duplicates engine behavior (looping, playback, timing), always verify if the `HeliosController` or Core API already provides a native solution.
+
+## [0.98.0] - Planner Role Boundaries
+**Learning:** The "Vision-Driven Planner" role requires strict adherence to producing *only* the plan file and not executing it, even if the general system instructions suggest "working on changes". The Planner's output is the blueprint, not the building.
+**Action:** Explicitly check the role description ("DO NOT lay the bricks") before interpreting general tool instructions.
