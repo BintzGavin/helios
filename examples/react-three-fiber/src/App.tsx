@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Canvas } from '@react-three/fiber';
-import { Helios } from '../../../packages/core/src/index.ts';
+import { Canvas, RootState } from '@react-three/fiber';
+import { Helios } from '@helios-project/core';
 import Scene from './Scene';
 
 // Singleton Helios instance
@@ -13,11 +13,11 @@ const helios = new Helios({
 helios.bindToDocumentTimeline();
 
 if (typeof window !== 'undefined') {
-    window.helios = helios;
+    (window as any).helios = helios;
 }
 
 export default function App() {
-    const [r3fState, setR3fState] = useState(null);
+    const [r3fState, setR3fState] = useState<RootState | null>(null);
 
     useEffect(() => {
         if (!r3fState) return;

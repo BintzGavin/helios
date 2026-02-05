@@ -1,8 +1,9 @@
 import React, { useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
+import { Mesh } from 'three';
 
 export default function Scene() {
-  const meshRef = useRef();
+  const meshRef = useRef<Mesh>(null);
 
   useFrame((state) => {
     // state.clock.elapsedTime should match what we passed to advance()

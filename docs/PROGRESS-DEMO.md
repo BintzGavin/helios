@@ -1,3 +1,6 @@
+## DEMO v1.116.0
+- ✅ Completed: Standardize React Three Fiber Example - Modernized `examples/react-three-fiber` with TypeScript, `package.json`, and proper build config.
+
 ## DEMO v1.115.0
 - ✅ Completed: Standardize Three.js Canvas Example - Modernized `examples/threejs-canvas-animation` with TypeScript, `package.json`, and proper build config.
 

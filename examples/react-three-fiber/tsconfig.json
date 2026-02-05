@@ -1,0 +1,12 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@helios-project/core": ["../../packages/core/src/index.ts"]
+    },
+    "noEmit": true,
+    "jsx": "react-jsx"
+  },
+  "include": ["src", "vite.config.ts"]
+}
