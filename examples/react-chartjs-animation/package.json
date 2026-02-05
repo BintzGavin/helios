@@ -1,0 +1,14 @@
+{
+  "name": "react-chartjs-animation",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite"
+  },
+  "dependencies": {
+    "chart.js": "^4.5.1",
+    "react": "^19.2.3",
+    "react-dom": "^19.2.3"
+  }
+}
