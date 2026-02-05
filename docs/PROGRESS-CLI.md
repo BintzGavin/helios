@@ -5,6 +5,7 @@ This file tracks progress for the CLI domain (`packages/cli`).
 ## CLI v0.11.0
 
 - ✅ Implement List Command - Implemented `helios list` to display installed components.
+- ✅ Verified List Command - Verified `helios list` correctly lists installed components, handles empty lists, and missing config.
 
 ## CLI v0.10.1
 
