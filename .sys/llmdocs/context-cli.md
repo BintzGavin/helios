@@ -9,7 +9,7 @@ The Helios CLI is the primary interface for managing Helios projects, rendering 
 - **Command Registration**: `src/index.ts` initializes the program and registers commands from `src/commands/`.
 - **Registry Client**: `src/registry/client.ts` handles component fetching (remote with local fallback).
 - **Utilities**: `src/utils/` contains helpers for config loading (`config.ts`), installation logic (`install.ts`), and package management (`package-manager.ts`).
-- **Templates**: `src/templates/` contains project scaffolds for React, Vue, Svelte, and Vanilla.
+- **Templates**: `src/templates/` contains project scaffolds for React, Vue, Svelte, Solid, and Vanilla.
 
 ## B. File Tree
 
@@ -25,16 +25,17 @@ packages/cli/
 │   │   ├── init.ts         # 'helios init' command
 │   │   ├── merge.ts        # 'helios merge' command
 │   │   ├── render.ts       # 'helios render' command
-│   │   └── studio.ts       # 'helios studio' command
-│   ├── registry/
-│   │   ├── client.ts       # RegistryClient implementation
-│   │   ├── manifest.ts     # Local fallback registry data
-│   │   └── types.ts        # Registry type definitions
-│   ├── templates/
-│   │   ├── react.ts        # React scaffold
-│   │   ├── vue.ts          # Vue scaffold
-│   │   ├── svelte.ts       # Svelte scaffold
-│   │   └── vanilla.ts      # Vanilla scaffold
+│   │   ├── studio.ts       # 'helios studio' command
+│   └── registry/
+│       ├── client.ts       # RegistryClient implementation
+│       ├── manifest.ts     # Local fallback registry data
+│       └── types.ts        # Registry type definitions
+│   └── templates/
+│       ├── react.ts        # React scaffold
+│       ├── solid.ts        # SolidJS scaffold
+│       ├── svelte.ts       # Svelte scaffold
+│       ├── vanilla.ts      # Vanilla scaffold
+│       └── vue.ts          # Vue scaffold
 │   └── utils/
 │       ├── config.ts       # Config file loader
 │       ├── install.ts      # Component installation logic
@@ -45,7 +46,7 @@ packages/cli/
 ## C. Commands
 
 ### `helios init [options]`
-Initializes a new Helios project configuration and scaffolds structure if missing. Supports React, Vue, Svelte, and Vanilla templates.
+Initializes a new Helios project configuration and scaffolds structure if missing. Supports React, Vue, Svelte, Solid, and Vanilla templates.
 - **Options**:
   - `-y, --yes`: Skip prompts and use defaults (React).
 
