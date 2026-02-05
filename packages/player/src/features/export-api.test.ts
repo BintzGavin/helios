@@ -171,4 +171,18 @@ describe('HeliosPlayer Export API', () => {
             bitrate: undefined
         }));
     });
+
+    it('should support png format in export options', async () => {
+        const mockExporterInstance = {
+            export: vi.fn().mockResolvedValue(undefined),
+            saveCaptionsAsSRT: vi.fn()
+        };
+        (ClientSideExporter as any).mockImplementation(function() { return mockExporterInstance; });
+
+        await player.export({ format: 'png' });
+
+        expect(mockExporterInstance.export).toHaveBeenCalledWith(expect.objectContaining({
+            format: 'png'
+        }));
+    });
 });

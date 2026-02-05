@@ -96,6 +96,7 @@ class MockOffscreenCanvas {
         save: vi.fn(),
         restore: vi.fn(),
     });
+    convertToBlob = vi.fn().mockResolvedValue(new Blob(['mock'], { type: 'image/png' }));
 }
 vi.stubGlobal('OffscreenCanvas', MockOffscreenCanvas);
 
@@ -358,5 +359,33 @@ describe('ClientSideExporter', () => {
         await exporter.export({ onProgress, signal, mode: 'canvas', filename: 'custom-export' });
 
         expect(mockAnchor.download).toBe('custom-export.mp4');
+    });
+
+    it('should export PNG snapshot of current frame', async () => {
+        const onProgress = vi.fn();
+        const signal = new AbortController().signal;
+
+        // Mock current frame
+        (mockController.getState as any).mockReturnValue({ duration: 10, fps: 30, currentFrame: 15 });
+
+        await exporter.export({ onProgress, signal, mode: 'canvas', format: 'png', filename: 'snapshot' });
+
+        // Should capture current frame (15)
+        expect(mockController.captureFrame).toHaveBeenCalledWith(15, expect.anything());
+
+        // Should download as png
+        expect(mockAnchor.download).toBe('snapshot.png');
+        expect(mockAnchor.click).toHaveBeenCalled();
+        expect(outputStartSpy).not.toHaveBeenCalled(); // Should skip mediabunny
+    });
+
+    it('should export JPEG snapshot', async () => {
+        const onProgress = vi.fn();
+        const signal = new AbortController().signal;
+
+        await exporter.export({ onProgress, signal, mode: 'canvas', format: 'jpeg', filename: 'snapshot' });
+
+        expect(mockAnchor.download).toBe('snapshot.jpeg');
+        expect(outputStartSpy).not.toHaveBeenCalled();
     });
 });

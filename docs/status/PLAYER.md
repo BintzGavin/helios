@@ -1,4 +1,4 @@
-**Version**: v0.68.2
+**Version**: v0.69.0
 
 **Posture**: STABLE AND FEATURE COMPLETE
 
@@ -56,11 +56,12 @@
 - Supports Export Filename: Implemented `export-filename` attribute to allow specifying the filename for client-side exports.
 - Supports Active Cues: Implemented `activeCues` property and `cuechange` event on `HeliosTextTrack` for Standard Media API parity.
 - **Audio Metering**: Supports real-time audio metering via `startAudioMetering()` API and `audiometering` event, enabling visualization of audio levels (stereo/peak) in host applications.
-- **Export API**: Exposes public `export()` method for programmatic control over client-side exports.
+- **Export API**: Exposes public `export()` method for programmatic control over client-side exports, supporting Video (MP4/WebM) and Snapshot (PNG/JPEG) formats.
 
 ## Critical Task
 - **Robust Audio Metering**: Refactor AudioMeter to support non-destructive toggling.
 
+[v0.69.0] ✅ Completed: Snapshot Export - Implemented support for exporting the current frame as PNG or JPEG image via the export API, enabling high-quality snapshot capture.
 [v0.68.2] ✅ Completed: Shared Audio Context - Implemented `SharedAudioContextManager` to prevent audio hijacking when `AudioMeter` is disposed, ensuring audio playback persists.
 [v0.68.1] ✅ Completed: Robust Audio Metering - Refactored `AudioMeter` to support non-destructive toggling, preventing audio playback from stopping when metering is disabled.
 [v0.68.0] ✅ Completed: Expose Export API - Implemented public `export()` method on `<helios-player>` to allow programmatic triggering of client-side exports with configurable options (format, resolution, bitrate, etc.).
