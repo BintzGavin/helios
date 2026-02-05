@@ -59,6 +59,69 @@ https://github.com/user-attachments/assets/89ee2a20-77c5-4440-ad68-9f9180d969bd
 
 ---
 
+## Quick Start
+
+### Installation
+
+```bash
+npm install @helios-project/core @helios-project/player
+```
+
+### Create a Composition
+
+```typescript
+import { Helios } from '@helios-engine/core';
+
+// Create a 10-second video at 30fps
+const helios = new Helios({
+  duration: 10,
+  fps: 30,
+  autoSyncAnimations: true
+});
+
+// Subscribe to frame updates
+helios.subscribe(({ currentFrame, duration, fps }) => {
+  const progress = currentFrame / (duration * fps);
+  // Use progress (0-1) to drive your animations
+  document.querySelector('.my-element').style.opacity = progress;
+});
+
+// Control playback
+helios.play();
+helios.pause();
+helios.seek(150); // Jump to frame 150
+```
+
+### Use Standard CSS Animations
+
+```css
+/* Your existing CSS animations just work */
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.my-element {
+  animation: fadeIn 1s ease-out;
+}
+```
+
+### Preview with the Player
+
+```html
+<!-- Drop-in Web Component works anywhere -->
+<helios-player src="./composition.html" width="1920" height="1080"></helios-player>
+<script type="module" src="@helios-project/player"></script>
+```
+
+### Render to Video
+
+```bash
+npx helios render ./composition.html -o output.mp4
+```
+
+---
+
 ## The Thesis
 
 ### Native Always Wins
@@ -148,69 +211,6 @@ This is a **native-aligned architecture**, but it's not without constraints:
 But if history is any guide—native mobile vs PhoneGap, CSS Grid vs JavaScript layouts, `fetch()` vs jQuery—native-aligned architectures eventually win.
 
 We named this engine after the sun because video is, fundamentally, *light over time*.
-
----
-
-## Quick Start
-
-### Installation
-
-```bash
-npm install @helios-project/core @helios-project/player
-```
-
-### Create a Composition
-
-```typescript
-import { Helios } from '@helios-engine/core';
-
-// Create a 10-second video at 30fps
-const helios = new Helios({
-  duration: 10,
-  fps: 30,
-  autoSyncAnimations: true
-});
-
-// Subscribe to frame updates
-helios.subscribe(({ currentFrame, duration, fps }) => {
-  const progress = currentFrame / (duration * fps);
-  // Use progress (0-1) to drive your animations
-  document.querySelector('.my-element').style.opacity = progress;
-});
-
-// Control playback
-helios.play();
-helios.pause();
-helios.seek(150); // Jump to frame 150
-```
-
-### Use Standard CSS Animations
-
-```css
-/* Your existing CSS animations just work */
-@keyframes fadeIn {
-  from { opacity: 0; transform: scale(0.9); }
-  to { opacity: 1; transform: scale(1); }
-}
-
-.my-element {
-  animation: fadeIn 1s ease-out;
-}
-```
-
-### Preview with the Player
-
-```html
-<!-- Drop-in Web Component works anywhere -->
-<helios-player src="./composition.html" width="1920" height="1080"></helios-player>
-<script type="module" src="@helios-project/player"></script>
-```
-
-### Render to Video
-
-```bash
-npx helios render ./composition.html -o output.mp4
-```
 
 ---
 
