@@ -36,6 +36,19 @@ describe('HeliosPlayer Smart Controls', () => {
   });
 
   describe('disablePictureInPicture', () => {
+    let originalPipEnabled: boolean;
+
+    beforeEach(() => {
+        originalPipEnabled = (document as any).pictureInPictureEnabled;
+        Object.defineProperty(document, 'pictureInPictureEnabled', { value: true, configurable: true });
+        // Update UI to reflect the change
+        (player as any).updateControlsVisibility();
+    });
+
+    afterEach(() => {
+        Object.defineProperty(document, 'pictureInPictureEnabled', { value: originalPipEnabled, configurable: true });
+    });
+
     it('should default to enabled (visible)', () => {
         expect(player.disablePictureInPicture).toBe(false);
         const pipBtn = player.shadowRoot!.querySelector('.pip-btn') as HTMLButtonElement;

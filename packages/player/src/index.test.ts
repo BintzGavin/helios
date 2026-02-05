@@ -1848,4 +1848,61 @@ describe('HeliosPlayer', () => {
       expect(statusText?.textContent).toContain("Connection Failed");
     });
   });
+
+  describe('Smart PiP Visibility', () => {
+    let originalPipEnabled: boolean;
+
+    beforeEach(() => {
+        // Save original value (JSDOM defaults to undefined/false usually)
+        originalPipEnabled = (document as any).pictureInPictureEnabled;
+    });
+
+    afterEach(() => {
+        // Restore
+        Object.defineProperty(document, 'pictureInPictureEnabled', { value: originalPipEnabled, configurable: true });
+    });
+
+    it('should hide PiP button when document.pictureInPictureEnabled is false', () => {
+       Object.defineProperty(document, 'pictureInPictureEnabled', { value: false, configurable: true });
+       // Force update as connectedCallback runs before this test might set the prop
+       (player as any).updateControlsVisibility();
+
+       const pipBtn = player.shadowRoot!.querySelector('.pip-btn') as HTMLButtonElement;
+       expect(pipBtn.style.display).toBe('none');
+    });
+
+    it('should hide PiP button when export-mode="dom"', () => {
+       Object.defineProperty(document, 'pictureInPictureEnabled', { value: true, configurable: true });
+       // Ensure visible initially
+       (player as any).updateControlsVisibility();
+       const pipBtn = player.shadowRoot!.querySelector('.pip-btn') as HTMLButtonElement;
+       expect(pipBtn.style.display).toBe('');
+
+       // Set attribute
+       player.setAttribute('export-mode', 'dom');
+       expect(pipBtn.style.display).toBe('none');
+    });
+
+    it('should show PiP button when supported and not in dom mode', () => {
+       Object.defineProperty(document, 'pictureInPictureEnabled', { value: true, configurable: true });
+       player.removeAttribute('export-mode');
+       player.removeAttribute('disablepictureinpicture');
+
+       // Force update
+       (player as any).updateControlsVisibility();
+
+       const pipBtn = player.shadowRoot!.querySelector('.pip-btn') as HTMLButtonElement;
+       expect(pipBtn.style.display).toBe('');
+    });
+
+    it('should hide PiP button when disablepictureinpicture is present', () => {
+       Object.defineProperty(document, 'pictureInPictureEnabled', { value: true, configurable: true });
+       player.removeAttribute('export-mode');
+
+       player.setAttribute('disablepictureinpicture', '');
+
+       const pipBtn = player.shadowRoot!.querySelector('.pip-btn') as HTMLButtonElement;
+       expect(pipBtn.style.display).toBe('none');
+    });
+  });
 });
