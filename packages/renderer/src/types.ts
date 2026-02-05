@@ -110,6 +110,13 @@ export interface RendererOptions {
   canvasSelector?: string;
 
   /**
+   * The CSS selector to use to find the target element in 'dom' mode.
+   * If provided, the screenshot will be limited to this element.
+   * Supports deep selection across Shadow DOM boundaries.
+   */
+  targetSelector?: string;
+
+  /**
    * The exact number of frames to render.
    * If provided, this overrides `durationInSeconds` for calculating loop limits.
    * Useful for precise distributed rendering to avoid floating point errors.
