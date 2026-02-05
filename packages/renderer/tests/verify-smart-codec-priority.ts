@@ -16,7 +16,7 @@ class MockPage {
     }
 
     // If it's the canvas finder
-    if (fnOrScript.toString().includes('findCanvas')) {
+    if (fnOrScript.toString().includes('findCanvas') || fnOrScript.toString().includes('eval(args.script)')) {
       return true; // Found
     }
 
@@ -49,7 +49,7 @@ class MockPage {
     }
 
     // If it's scanForAudioTracks (which uses evaluate)
-    if (fnOrScript.includes('scanForAudioTracks') || (args && args.toString().includes('scanForAudioTracks'))) {
+    if (fnOrScript.toString().includes('scanForAudioTracks') || (args && args.toString().includes('scanForAudioTracks'))) {
         return [];
     }
 

@@ -1,10 +1,11 @@
-**Version**: 1.70.0
+**Version**: 1.71.0
 
 **Posture**: MAINTENANCE WITH V2 EXPANSION
 
 # Renderer Agent Status
 
 ## Progress Log
+- [1.71.0] ✅ Completed: Hardware Accelerated Codec Priority - Updated `CanvasStrategy` to prioritize hardware-accelerated codecs (checking `navigator.mediaCapabilities.encodingInfo` for `powerEfficient: true`) and prefer H.264 over VP9 when hardware support is equivalent. Verified with `verify-hardware-codec-selection.ts`.
 - [1.70.0] ✅ Completed: DOM Target Selector - Implemented `targetSelector` in `DomStrategy` to allow rendering specific elements (including those in Shadow DOM) instead of the full viewport, and refactored deep element finding logic into a shared utility `dom-finder.ts`. Verified with `verify-dom-selector.ts`.
 - [1.69.0] ✅ Completed: Enhanced Diagnostics - Updated `CanvasStrategy.diagnose()` to perform deep codec capability checks (Hardware/Software, Alpha support) via `VideoEncoder.isConfigSupported()`, and updated `DomStrategy.diagnose()` to include viewport dimensions, DPR, and WebGL support. Verified with `verify-diagnose.ts`.
 - [1.68.0] ✅ Completed: Distributed Implicit Audio - Added `mixInputAudio` option to `RendererOptions` and updated `Orchestrator` to preserve implicit audio (DOM `<audio>`) during the final mix of distributed rendering. Verified with `verify-distributed-audio.ts`.
