@@ -7,14 +7,16 @@ import { DEFAULT_CONFIG } from '../utils/config.js';
 import { REACT_TEMPLATE } from '../templates/react.js';
 import { VUE_TEMPLATE } from '../templates/vue.js';
 import { SVELTE_TEMPLATE } from '../templates/svelte.js';
+import { SOLID_TEMPLATE } from '../templates/solid.js';
 import { VANILLA_TEMPLATE } from '../templates/vanilla.js';
 
-type Framework = 'react' | 'vue' | 'svelte' | 'vanilla';
+type Framework = 'react' | 'vue' | 'svelte' | 'solid' | 'vanilla';
 
 const TEMPLATES: Record<Framework, Record<string, string>> = {
   react: REACT_TEMPLATE,
   vue: VUE_TEMPLATE,
   svelte: SVELTE_TEMPLATE,
+  solid: SOLID_TEMPLATE,
   vanilla: VANILLA_TEMPLATE
 };
 
@@ -55,9 +57,9 @@ export function registerInitCommand(program: Command) {
 
         if (shouldScaffold) {
           if (!options.yes) {
-            const frameworkInput = await ask(`Select framework (${chalk.cyan('react')}, vue, svelte, vanilla)`, 'react');
+            const frameworkInput = await ask(`Select framework (${chalk.cyan('react')}, vue, svelte, solid, vanilla)`, 'react');
             const normalized = frameworkInput.toLowerCase();
-            if (['react', 'vue', 'svelte', 'vanilla'].includes(normalized)) {
+            if (['react', 'vue', 'svelte', 'solid', 'vanilla'].includes(normalized)) {
               selectedFramework = normalized as Framework;
             }
           }
@@ -100,10 +102,10 @@ export function registerInitCommand(program: Command) {
         console.log(chalk.cyan('Initializing Helios configuration...'));
 
         const framework = await ask(
-          'Which framework are you using? (react, vue, svelte, vanilla)',
+          'Which framework are you using? (react, vue, svelte, solid, vanilla)',
           'react'
         );
-        if (['react', 'vue', 'svelte', 'vanilla'].includes(framework.toLowerCase())) {
+        if (['react', 'vue', 'svelte', 'solid', 'vanilla'].includes(framework.toLowerCase())) {
            config.framework = framework.toLowerCase();
         }
 
