@@ -1,4 +1,4 @@
-**Version**: 0.94.1
+**Version**: 0.94.2
 
 **Posture**: ACTIVELY EXPANDING FOR V2
 
@@ -9,6 +9,8 @@
 **Focus**: UI Implementation & CLI
 
 ## Recent Updates
+- [v0.94.2] ✅ Verified: Stacked Timeline - Verified implementation of multi-lane stacked timeline with existing unit tests `Timeline.test.tsx`.
+- [v0.94.1] ✅ Verified: Render Presets - Added unit tests for RenderConfig and StudioContext persistence, ensuring robustness.
 - [v0.94.0] ✅ Completed: Render Presets - Implemented render configuration presets (Draft, HD, 4K) and persistence for render settings.
 - [v0.93.1] ✅ Completed: Smart Empty State - Implemented "Smart Empty State" for the Stage, providing "Create Composition" (fresh project) and "Select Composition" (unselected) empty states.
 - [v0.93.0] ✅ Completed: Visualize Time-based Props - Implemented `TimecodeInput` in Props Editor and visual markers on the Timeline for number props with `format: 'time'`, enabling WYSIWYG timing adjustments.
@@ -126,4 +128,3 @@
 - [v0.2.0] ✅ Completed: Scaffold CLI Package - Created @helios-project/cli and studio command.
 - [v0.1.0] ✅ Completed: Scaffold Studio Package - Created package structure, config, and basic UI.
 - [2026-02-18] Initialized domain status and created scaffold plan.
-- [v0.94.1] ✅ Verified: Render Presets - Added unit tests for RenderConfig and StudioContext persistence, ensuring robustness.
