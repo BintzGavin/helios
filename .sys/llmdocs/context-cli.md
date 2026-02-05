@@ -20,6 +20,7 @@ packages/cli/
 │   │   └── studio.ts
 │   ├── registry/
 │   │   ├── client.ts
+│   │   ├── manifest.ts
 │   │   └── types.ts
 │   ├── templates/
 │   │   ├── react.ts
@@ -44,8 +45,7 @@ Initialize a new Helios project.
 
 ### `studio`
 Launch the Studio development server.
-- `--port <number>`: Port (default: 3000)
-- `--open`: Open browser
+- `-p, --port <number>`: Port to listen on (default: 5173)
 
 ### `add <component>`
 Add a component to the project.
@@ -56,14 +56,17 @@ List available components in the registry.
 
 ### `render <input>`
 Render a composition to video.
-- `-o, --output <path>`: Output path
-- `--width <number>`
-- `--height <number>`
-- `--fps <number>`
-- `--duration <number>`
-- `--quality <number>`
-- `--mode <canvas|dom>`
-- `--concurrency <number>`: Number of concurrent render jobs
+- `-o, --output <path>`: Output path (default: "output.mp4")
+- `--width <number>`: Viewport width (default: "1920")
+- `--height <number>`: Viewport height (default: "1080")
+- `--fps <number>`: Frames per second (default: "30")
+- `--duration <number>`: Duration in seconds (default: "1")
+- `--quality <number>`: CRF quality (0-51)
+- `--mode <mode>`: Render mode (canvas or dom) (default: "canvas")
+- `--start-frame <number>`: Frame to start rendering from
+- `--frame-count <number>`: Number of frames to render
+- `--concurrency <number>`: Number of concurrent render jobs (default: "1")
+- `--no-headless`: Run in visible browser window (default: headless)
 
 ### `merge`
 Merge multiple video files.
@@ -85,5 +88,5 @@ interface HeliosConfig {
 
 ## E. Integration
 - **Registry**: Fetches components via `registry/client.ts`.
-- **Renderer**: Delegates to `@helios-project/renderer` for `render` and `merge`.
-- **Studio**: Delegates to `@helios-project/studio` for `studio` command.
+- **Renderer**: Delegates to `@helios-project/renderer` via `RenderOrchestrator` for `render` and `merge`.
+- **Studio**: Delegates to `@helios-project/studio/cli` for `studio` command, running a custom Vite server.
