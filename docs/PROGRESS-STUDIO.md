@@ -1,3 +1,6 @@
+## STUDIO v0.95.1
+- ✅ Verified: Stage Tests - Implemented unit tests for `Stage` component, covering rendering, interactions (Zoom/Pan), and HMR state preservation.
+
 ## STUDIO v0.95.0
 - ✅ Completed: Persist Input Props - Implemented auto-saving of user-configured input props to `composition.json`, ensuring persistence across reloads.
 
