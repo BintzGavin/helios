@@ -12,6 +12,19 @@ import { HeliosMediaSession } from "./features/media-session";
 export { ClientSideExporter };
 export type { HeliosController };
 
+export interface HeliosExportOptions {
+  format?: 'mp4' | 'webm';
+  filename?: string;
+  mode?: 'auto' | 'canvas' | 'dom';
+  width?: number;
+  height?: number;
+  bitrate?: number;
+  includeCaptions?: boolean;
+  onProgress?: (progress: number) => void;
+  signal?: AbortSignal;
+  canvasSelector?: string;
+}
+
 // Helper to match MediaError interface if not globally available in all envs
 interface MediaError {
   readonly code: number;
@@ -2408,6 +2421,67 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
     return undefined;
   }
 
+  public async export(options: HeliosExportOptions = {}): Promise<void> {
+     if (this.isExporting) throw new Error("Already exporting");
+     if (!this.controller) throw new Error("Not connected");
+
+     this.isExporting = true;
+     this.lockPlaybackControls(true);
+
+     try {
+         const parseNum = (attr: string): number | undefined => {
+             const val = parseFloat(this.getAttribute(attr) || '');
+             return !isNaN(val) && val > 0 ? val : undefined;
+         };
+
+         // Merge options with attributes (options take precedence)
+         const finalOptions = {
+             mode: options.mode || (this.getAttribute('export-mode') as any) || 'auto',
+             format: options.format || (this.getAttribute('export-format') as any) || 'mp4',
+             filename: options.filename || this.getAttribute('export-filename') || 'video',
+             width: options.width ?? parseNum('export-width'),
+             height: options.height ?? parseNum('export-height'),
+             bitrate: options.bitrate ?? parseNum('export-bitrate'),
+             canvasSelector: options.canvasSelector || this.getAttribute('canvas-selector') || 'canvas',
+             includeCaptions: options.includeCaptions ?? this.showCaptions,
+             onProgress: options.onProgress || (() => {}),
+             signal: options.signal
+         };
+
+         // Handle export-caption-mode='file' logic if not explicitly overridden by options
+         // If options.includeCaptions is undefined, we use this.showCaptions.
+         // If attribute logic applies, we might want to disable includeCaptions for burning.
+         // The original logic was: if captionMode === 'file' && showCaptions, save file and don't burn.
+         // We should respect that if options didn't explicit set includeCaptions.
+
+         const captionMode = (this.getAttribute("export-caption-mode") || "burn-in") as "burn-in" | "file";
+
+         // If options.includeCaptions IS set, we respect it strictly for burning.
+         // If it is NOT set, we check the caption mode.
+
+         const exporter = new ClientSideExporter(this.controller);
+
+         if (options.includeCaptions === undefined && this.showCaptions && captionMode === 'file') {
+             // Side effect: save captions file
+             const showingTrack = Array.from(this._textTracks).find(t => t.mode === 'showing' && t.kind === 'captions');
+             if (showingTrack) {
+                const cues = Array.from(showingTrack.cues).map((cue: any) => ({
+                  startTime: cue.startTime,
+                  endTime: cue.endTime,
+                  text: cue.text
+                }));
+                exporter.saveCaptionsAsSRT(cues, `${finalOptions.filename}.srt`);
+             }
+             finalOptions.includeCaptions = false;
+         }
+
+         await exporter.export(finalOptions);
+     } finally {
+         this.isExporting = false;
+         this.lockPlaybackControls(false);
+     }
+  }
+
   public async diagnose(): Promise<DiagnosticReport> {
     if (!this.controller) {
         throw new Error("Cannot run diagnostics: Player is not connected.");
@@ -2452,55 +2526,12 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
     this.abortController = new AbortController();
     this.exportBtn.textContent = "Cancel";
 
-    this.isExporting = true;
-    this.lockPlaybackControls(true);
-
-    const exporter = new ClientSideExporter(this.controller, this.iframe);
-
-    const exportMode = (this.getAttribute("export-mode") || "auto") as "auto" | "canvas" | "dom";
-    const canvasSelector = this.getAttribute("canvas-selector") || "canvas";
-    const exportFormat = (this.getAttribute("export-format") || "mp4") as "mp4" | "webm";
-    const captionMode = (this.getAttribute("export-caption-mode") || "burn-in") as "burn-in" | "file";
-
-    const exportWidth = parseFloat(this.getAttribute("export-width") || "");
-    const exportHeight = parseFloat(this.getAttribute("export-height") || "");
-    const exportBitrate = parseInt(this.getAttribute("export-bitrate") || "");
-    const filename = this.getAttribute("export-filename") || "video";
-
-    const width = !isNaN(exportWidth) && exportWidth > 0 ? exportWidth : undefined;
-    const height = !isNaN(exportHeight) && exportHeight > 0 ? exportHeight : undefined;
-    const bitrate = !isNaN(exportBitrate) && exportBitrate > 0 ? exportBitrate : undefined;
-
-    let includeCaptions = this.showCaptions;
-
-    if (this.showCaptions && captionMode === 'file') {
-      const showingTrack = Array.from(this._textTracks).find(t => t.mode === 'showing' && t.kind === 'captions');
-      if (showingTrack) {
-        // Convert TextTrackCueList to Array before mapping
-        const cues = Array.from(showingTrack.cues).map((cue: any) => ({
-          startTime: cue.startTime,
-          endTime: cue.endTime,
-          text: cue.text
-        }));
-        exporter.saveCaptionsAsSRT(cues, `${filename}.srt`);
-      }
-      includeCaptions = false;
-    }
-
     try {
-        await exporter.export({
+        await this.export({
+            signal: this.abortController.signal,
             onProgress: (p) => {
                 this.exportBtn.textContent = `Cancel (${Math.round(p * 100)}%)`;
-            },
-            signal: this.abortController.signal,
-            mode: exportMode,
-            canvasSelector: canvasSelector,
-            format: exportFormat,
-            includeCaptions: includeCaptions,
-            width: width,
-            height: height,
-            bitrate: bitrate,
-            filename: filename
+            }
         });
     } catch (e: any) {
         if (e.message !== "Export aborted") {
@@ -2511,8 +2542,6 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
         }
         console.error("Export failed or aborted", e);
     } finally {
-        this.isExporting = false;
-        this.lockPlaybackControls(false);
         this.exportBtn.textContent = "Export";
         this.exportBtn.disabled = false;
         this.abortController = null;

@@ -122,7 +122,6 @@ if (typeof URL.createObjectURL === 'undefined') {
 describe('ClientSideExporter', () => {
     let mockController: HeliosController;
     let exporter: ClientSideExporter;
-    let mockIframe: HTMLIFrameElement;
     let mockAnchor: any;
 
     beforeEach(() => {
@@ -143,9 +142,7 @@ describe('ClientSideExporter', () => {
             getAudioTracks: vi.fn().mockResolvedValue([])
         } as unknown as HeliosController;
 
-        mockIframe = {} as HTMLIFrameElement;
-
-        exporter = new ClientSideExporter(mockController, mockIframe);
+        exporter = new ClientSideExporter(mockController);
 
         // Mock document.createElement('a')
         mockAnchor = {

@@ -6,6 +6,18 @@ import { HeliosAudioTrack, HeliosAudioTrackList, AudioTrackHost } from "./featur
 import { HeliosVideoTrack, HeliosVideoTrackList, VideoTrackHost } from "./features/video-tracks";
 export { ClientSideExporter };
 export type { HeliosController };
+export interface HeliosExportOptions {
+    format?: 'mp4' | 'webm';
+    filename?: string;
+    mode?: 'auto' | 'canvas' | 'dom';
+    width?: number;
+    height?: number;
+    bitrate?: number;
+    includeCaptions?: boolean;
+    onProgress?: (progress: number) => void;
+    signal?: AbortSignal;
+    canvasSelector?: string;
+}
 interface MediaError {
     readonly code: number;
     readonly message: string;
@@ -196,6 +208,7 @@ export declare class HeliosPlayer extends HTMLElement implements TrackHost, Audi
     private hideStatus;
     getController(): HeliosController | null;
     getSchema(): Promise<HeliosSchema | undefined>;
+    export(options?: HeliosExportOptions): Promise<void>;
     diagnose(): Promise<DiagnosticReport>;
     startAudioMetering(): void;
     stopAudioMetering(): void;

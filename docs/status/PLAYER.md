@@ -1,4 +1,4 @@
-**Version**: v0.67.0
+**Version**: v0.68.0
 
 **Posture**: STABLE AND FEATURE COMPLETE
 
@@ -56,10 +56,12 @@
 - Supports Export Filename: Implemented `export-filename` attribute to allow specifying the filename for client-side exports.
 - Supports Active Cues: Implemented `activeCues` property and `cuechange` event on `HeliosTextTrack` for Standard Media API parity.
 - **Audio Metering**: Supports real-time audio metering via `startAudioMetering()` API and `audiometering` event, enabling visualization of audio levels (stereo/peak) in host applications.
+- **Export API**: Exposes public `export()` method for programmatic control over client-side exports.
 
 ## Critical Task
 - **None**: All critical tasks completed.
 
+[v0.68.0] ✅ Completed: Expose Export API - Implemented public `export()` method on `<helios-player>` to allow programmatic triggering of client-side exports with configurable options (format, resolution, bitrate, etc.).
 [v0.67.0] ✅ Verified: Integrity - Ran full unit test suite (276 tests) and E2E verification script (verify-player.ts).
 [v0.67.0] ✅ Completed: Audio Metering Bridge - Implemented real-time audio metering system exposing stereo RMS and Peak levels via `audiometering` event and Bridge protocol.
 [v0.66.5] ✅ Completed: Smart PiP Visibility - Implemented auto-hiding of Picture-in-Picture button when environment lacks support or `export-mode="dom"` is active.
