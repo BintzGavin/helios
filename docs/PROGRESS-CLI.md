@@ -2,6 +2,10 @@
 
 This file tracks progress for the CLI domain (`packages/cli`).
 
+## CLI v0.8.0
+
+- ✅ Auto-Install Dependencies - Implemented automatic dependency installation for `helios add` with `--no-install` flag
+
 ## CLI v0.7.0
 
 - ✅ Remote Registry Support - Implemented `RegistryClient` to fetch components from a remote URL with local fallback

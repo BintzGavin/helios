@@ -3,8 +3,13 @@ import path from 'path';
 import chalk from 'chalk';
 import { loadConfig } from './config.js';
 import { defaultClient } from '../registry/client.js';
+import { installPackage } from './package-manager.js';
 
-export async function installComponent(rootDir: string, componentName: string) {
+export async function installComponent(
+  rootDir: string,
+  componentName: string,
+  options: { install: boolean } = { install: true }
+) {
   const config = loadConfig(rootDir);
 
   if (!config) {
@@ -44,9 +49,42 @@ export async function installComponent(rootDir: string, componentName: string) {
   }
 
   if (component.dependencies) {
+    const depsToInstall: string[] = [];
+    let packageJson: any = {};
+
+    try {
+      const packageJsonPath = path.resolve(rootDir, 'package.json');
+      if (fs.existsSync(packageJsonPath)) {
+        packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
+      }
+    } catch (e) {
+      // Ignore error reading package.json
+    }
+
+    const allDeps = {
+      ...packageJson.dependencies,
+      ...packageJson.devDependencies,
+    };
+
     console.log('\n' + chalk.yellow('Required dependencies:'));
     for (const [dep, version] of Object.entries(component.dependencies)) {
       console.log(`  - ${dep}@${version}`);
+
+      if (!allDeps[dep]) {
+        depsToInstall.push(`${dep}@${version}`);
+      }
+    }
+
+    if (options.install && depsToInstall.length > 0) {
+      console.log(chalk.cyan(`\nInstalling dependencies...`));
+      try {
+        await installPackage(rootDir, depsToInstall);
+        console.log(chalk.green(`✓ Dependencies installed`));
+      } catch (e) {
+        console.error(chalk.red(`Failed to install dependencies: ${e instanceof Error ? e.message : e}`));
+      }
+    } else if (depsToInstall.length > 0) {
+      console.log(chalk.gray(`\nSkipping installation (--no-install)`));
     }
   }
 }
