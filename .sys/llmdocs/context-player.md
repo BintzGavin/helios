@@ -79,6 +79,6 @@ The Shadow DOM contains:
 - `requestPictureInPicture(): Promise<PictureInPictureWindow>`: Enter PiP mode.
 - `addTextTrack(kind, label, language): HeliosTextTrack`: Create a new text track.
 - `diagnose(): Promise<DiagnosticReport>`: Run environment diagnostics.
-- `startAudioMetering()`: Enable audio level events.
-- `stopAudioMetering()`: Disable audio level events.
+- `startAudioMetering()`: Enable audio level events (non-destructive).
+- `stopAudioMetering()`: Disable audio level events (maintains playback).
 - `export(options?: HeliosExportOptions): Promise<void>`: Trigger client-side export programmatically.

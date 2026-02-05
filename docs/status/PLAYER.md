@@ -1,4 +1,4 @@
-**Version**: v0.68.0
+**Version**: v0.68.1
 
 **Posture**: STABLE AND FEATURE COMPLETE
 
@@ -61,6 +61,7 @@
 ## Critical Task
 - **Robust Audio Metering**: Refactor AudioMeter to support non-destructive toggling.
 
+[v0.68.1] ✅ Completed: Robust Audio Metering - Refactored `AudioMeter` to support non-destructive toggling, preventing audio playback from stopping when metering is disabled.
 [v0.68.0] ✅ Completed: Expose Export API - Implemented public `export()` method on `<helios-player>` to allow programmatic triggering of client-side exports with configurable options (format, resolution, bitrate, etc.).
 [v0.67.0] ✅ Verified: Integrity - Ran full unit test suite (276 tests) and E2E verification script (verify-player.ts).
 [v0.67.0] ✅ Completed: Audio Metering Bridge - Implemented real-time audio metering system exposing stereo RMS and Peak levels via `audiometering` event and Bridge protocol.
