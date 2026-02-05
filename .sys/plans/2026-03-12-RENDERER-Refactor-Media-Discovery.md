@@ -1,66 +1,64 @@
-# Refactor Media Discovery Logic
+# 📋 RENDERER: Refactor Media Discovery Logic
 
-#### 1. Context & Goal
-- **Objective**: Deduplicate the Shadow DOM media discovery logic (`findAllMedia`) which is currently copy-pasted across `DomScanner`, `CdpTimeDriver`, and `SeekTimeDriver`.
-- **Trigger**: Codebase exploration revealed identical complex tree-walking logic in three separate files, violating DRY and increasing maintenance risk.
-- **Impact**: Improves code maintainability and ensures consistent media synchronization behavior (including Shadow DOM support) across both Canvas and DOM rendering strategies.
+## 1. Context & Goal
+- **Objective**: Consolidate duplicated Shadow DOM media discovery logic from `DomScanner`, `CdpTimeDriver`, and `SeekTimeDriver` into a shared utility.
+- **Trigger**: Identified in `2026-03-12` journal entry; code scans confirmed identical `findAllMedia` implementations triplicated across the codebase.
+- **Impact**: Reduces maintenance risk, ensures consistent behavior between Canvas and DOM modes (and diagnostics), and simplifies future updates to Shadow DOM traversal logic.
 
-#### 2. File Inventory
-- **Create**: `packages/renderer/src/utils/dom-scripts.ts` (To house shared DOM script snippets)
+## 2. File Inventory
+- **Create**:
+  - `packages/renderer/src/utils/dom-scripts.ts`: Will host the shared `FIND_ALL_MEDIA_FUNCTION` script string.
 - **Modify**:
-  - `packages/renderer/src/utils/dom-scanner.ts`
-  - `packages/renderer/src/drivers/CdpTimeDriver.ts`
-  - `packages/renderer/src/drivers/SeekTimeDriver.ts`
-- **Read-Only**: `packages/renderer/src/utils/dom-finder.ts` (Reference for script pattern)
+  - `packages/renderer/src/utils/dom-scanner.ts`: Import and use `FIND_ALL_MEDIA_FUNCTION`.
+  - `packages/renderer/src/drivers/CdpTimeDriver.ts`: Import and use `FIND_ALL_MEDIA_FUNCTION`.
+  - `packages/renderer/src/drivers/SeekTimeDriver.ts`: Import and use `FIND_ALL_MEDIA_FUNCTION`.
+- **Read-Only**:
+  - `packages/renderer/src/utils/dom-finder.ts`: Reference for script string pattern.
 
-#### 3. Implementation Spec
-- **Architecture**: Extract the `findAllMedia` function source code into a constant `FIND_ALL_MEDIA_SCRIPT` in the new utils file. Import and inject this string into the `page.evaluate` scripts in the consumers.
-- **Pseudo-Code**:
+## 3. Implementation Spec
+- **Architecture**:
+  - Use the "Script String" pattern (as seen in `dom-finder.ts`) to export the function source code as a string constant (`FIND_ALL_MEDIA_FUNCTION`).
+  - This is necessary because the code is executed via `page.evaluate()` in the browser context, not the Node.js context.
+  - The shared function `findAllMedia(rootNode)` will recursively traverse Shadow DOMs using `TreeWalker` to find `<audio>` and `<video>` elements.
+
+- **Pseudo-Code (dom-scripts.ts)**:
   ```typescript
-  // packages/renderer/src/utils/dom-scripts.ts
-  export const FIND_ALL_MEDIA_SCRIPT = `
-    function findAllMedia(rootNode) {
-      const media = [];
-      // Check rootNode (if it is an Element)
-      if (rootNode.nodeType === Node.ELEMENT_NODE) {
-        const tagName = rootNode.tagName;
-        if (tagName === 'AUDIO' || tagName === 'VIDEO') {
-          media.push(rootNode);
-        }
-      }
-
-      const walker = document.createTreeWalker(rootNode, NodeFilter.SHOW_ELEMENT);
-      while (walker.nextNode()) {
-        const node = walker.currentNode;
-        if (node.tagName === 'AUDIO' || node.tagName === 'VIDEO') {
-          media.push(node);
-        }
-        if (node.shadowRoot) {
-          media.push(...findAllMedia(node.shadowRoot));
-        }
-      }
-      return media;
+  export const FIND_ALL_MEDIA_FUNCTION = `
+  function findAllMedia(rootNode) {
+    const media = [];
+    // Check rootNode itself
+    if (rootNode.nodeType === Node.ELEMENT_NODE && (rootNode.tagName === 'AUDIO' || rootNode.tagName === 'VIDEO')) {
+      media.push(rootNode);
     }
-  `;
 
-  // packages/renderer/src/utils/dom-scanner.ts
-  import { FIND_ALL_MEDIA_SCRIPT } from './dom-scripts.js';
-  // ...
-  const script = `
-    (async () => {
-      ${FIND_ALL_MEDIA_SCRIPT}
-      const mediaElements = findAllMedia(document);
-      // ... rest of logic
-    })()
+    // Walk tree
+    const walker = document.createTreeWalker(rootNode, NodeFilter.SHOW_ELEMENT);
+    while (walker.nextNode()) {
+      const node = walker.currentNode;
+      if (node.tagName === 'AUDIO' || node.tagName === 'VIDEO') {
+        media.push(node);
+      }
+      if (node.shadowRoot) {
+        media.push(...findAllMedia(node.shadowRoot));
+      }
+    }
+    return media;
+  }
   `;
   ```
-- **Public API Changes**: None. Internal refactor.
+
+- **Integration**:
+  - In `dom-scanner.ts`: Inject `${FIND_ALL_MEDIA_FUNCTION}` into the evaluation string.
+  - In `CdpTimeDriver.ts`: Inject `${FIND_ALL_MEDIA_FUNCTION}` into `mediaSyncScript`.
+  - In `SeekTimeDriver.ts`: Inject `${FIND_ALL_MEDIA_FUNCTION}` into `script`.
+
 - **Dependencies**: None.
 
-#### 4. Test Plan
-- **Verification**: Run the renderer test suite, specifically focusing on Shadow DOM and Media Sync tests.
-  - `npm run test -- packages/renderer/tests/verify-shadow-dom-audio.ts`
-  - `npm run test -- packages/renderer/tests/verify-cdp-shadow-dom-sync.ts`
-  - `npm run test -- packages/renderer/tests/verify-media-sync.ts`
-- **Success Criteria**: All tests pass, confirming that media elements are still correctly discovered and synchronized in both DOM and Canvas modes.
-- **Edge Cases**: Nested Shadow DOMs (covered by existing tests).
+## 4. Test Plan
+- **Verification**: Run the full verification suite to ensure no regressions in media discovery or synchronization.
+  - Command: `npx tsx tests/run-all.ts`
+- **Specific Checks**:
+  - `tests/verify-cdp-iframe-media-sync.ts`: Verifies `CdpTimeDriver` sync (Canvas mode).
+  - `tests/verify-media-sync.ts`: Verifies `SeekTimeDriver` sync (DOM mode).
+  - `tests/verify-canvas-implicit-audio.ts`: Verifies `DomScanner` discovery.
+- **Success Criteria**: All tests pass.
