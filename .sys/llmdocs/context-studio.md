@@ -33,11 +33,20 @@ packages/studio/
 
 ## Section C: CLI Interface
 
-Command: `npx helios studio`
+The CLI is available via `npx helios <command>`.
 
-Options:
--   `--port <number>`: Port to run the server on (default: 5173).
--   `--open`: Open browser on start.
+Commands:
+-   `studio`: Launches the Studio development environment.
+    -   Options: `--port <number>`, `--open`
+-   `init`: Scaffolds a new Helios project.
+    -   Options: `-y` (yes), `--framework <name>`
+-   `add <component>`: Adds a component to the project.
+    -   Options: `--no-install`
+-   `list`: Lists installed components.
+-   `components`: Lists available components in the registry.
+-   `render <composition>`: Renders a composition from the CLI.
+    -   Options: `--concurrency`, `--start-frame`, `--frame-count`
+-   `merge <files...>`: Merges video files.
 
 ## Section D: UI Components
 
