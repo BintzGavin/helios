@@ -30,7 +30,7 @@ function runTests() {
       durationInSeconds: 1,
       mode: 'canvas',
     };
-    const defaultArgs = instance.getFFmpegArgs(defaultOptions, 'out.mp4');
+    const { args: defaultArgs } = instance.getFFmpegArgs(defaultOptions, 'out.mp4');
 
     if (!defaultArgs.includes('libx264')) {
       console.error(`❌ ${name} failed default codec: Expected libx264`);
@@ -52,7 +52,7 @@ function runTests() {
         videoCodec: 'prores_ks',
         pixelFormat: 'yuva444p10le',
     };
-    const customArgs = instance.getFFmpegArgs(customOptions, 'out.mov');
+    const { args: customArgs } = instance.getFFmpegArgs(customOptions, 'out.mov');
 
     if (!customArgs.includes('prores_ks')) {
       console.error(`❌ ${name} failed custom codec: Expected prores_ks`);
@@ -74,7 +74,7 @@ function runTests() {
         crf: 18,
         preset: 'veryslow',
     };
-    const qualityArgs = instance.getFFmpegArgs(qualityOptions, 'out.mp4');
+    const { args: qualityArgs } = instance.getFFmpegArgs(qualityOptions, 'out.mp4');
 
     if (!qualityArgs.includes('-crf') || !qualityArgs.includes('18')) {
         console.error(`❌ ${name} failed CRF: Expected -crf 18`);
@@ -95,7 +95,7 @@ function runTests() {
         ...defaultOptions,
         videoBitrate: '5M',
     };
-    const bitrateArgs = instance.getFFmpegArgs(bitrateOptions, 'out.mp4');
+    const { args: bitrateArgs } = instance.getFFmpegArgs(bitrateOptions, 'out.mp4');
 
     if (!bitrateArgs.includes('-b:v') || !bitrateArgs.includes('5M')) {
         console.error(`❌ ${name} failed bitrate: Expected -b:v 5M`);

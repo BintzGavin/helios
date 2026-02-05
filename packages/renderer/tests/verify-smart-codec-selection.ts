@@ -59,7 +59,7 @@ async function runTest() {
         assert.ok(codecs.includes('avc1.4d002a'), 'Candidates should include H.264');
         assert.strictEqual(codecs[0], 'avc1.4d002a', 'H.264 should be first candidate');
 
-        const ffmpegArgs = strategy.getFFmpegArgs(options, 'out.mp4');
+        const { args: ffmpegArgs } = strategy.getFFmpegArgs(options, 'out.mp4');
         assert.ok(ffmpegArgs.includes('-f'), 'Should have format flag');
         const fIndex = ffmpegArgs.indexOf('-f');
         assert.strictEqual(ffmpegArgs[fIndex + 1], 'h264', 'Should use h264 format');
@@ -94,9 +94,9 @@ async function runTest() {
         console.log('Candidates:', codecs);
 
         assert.strictEqual(codecs[0], 'avc1.4d002a', 'H.264 should be first candidate');
-        assert.strictEqual(codecs[1], 'vp8', 'VP8 should be second candidate');
+        assert.strictEqual(codecs[1], 'vp9', 'VP9 should be second candidate');
 
-        const ffmpegArgs = strategy.getFFmpegArgs(options, 'out.mp4');
+        const { args: ffmpegArgs } = strategy.getFFmpegArgs(options, 'out.mp4');
         const fIndex = ffmpegArgs.indexOf('-f');
         assert.strictEqual(ffmpegArgs[fIndex + 1], 'h264', 'Should use h264 format');
 
