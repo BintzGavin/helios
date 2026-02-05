@@ -60,7 +60,7 @@ The player will automatically attempt to access `window.helios` on the iframe's 
 | `controls` | Show the UI controls overlay. | `false` |
 | `export-mode` | Strategy for client-side export: `auto`, `canvas`, or `dom`. | `auto` |
 | `canvas-selector` | CSS selector for the canvas element (used in `canvas` export mode). | `canvas` |
-| `export-format` | Output video format: `mp4` (H.264/AAC) or `webm` (VP9/Opus). | `mp4` |
+| `export-format` | Output format: `mp4`, `webm`, `png`, or `jpeg`. | `mp4` |
 | `poster` | URL of an image to display before playback starts. | - |
 | `preload` | `auto` or `none`. If `none`, defers loading the iframe until interaction. | `auto` |
 | `input-props` | JSON string of properties to pass to the composition. | - |
@@ -77,6 +77,39 @@ The player will automatically attempt to access `window.helios` on the iframe's 
 | `media-artist` | Artist name for OS Media Session. | - |
 | `media-album` | Album name for OS Media Session. | - |
 | `media-artwork` | URL of artwork for OS Media Session (defaults to poster). | - |
+
+## User Interface
+
+The player includes a comprehensive set of controls:
+
+- **Playback**: Play/Pause, Scrubber, Time Display.
+- **Audio**: Volume, Mute, and a Track Menu for individual track control.
+- **Settings Menu** (Gear Icon):
+  - **Speed**: Adjust playback rate (0.25x - 2x).
+  - **Loop**: Toggle playback looping.
+  - **Playback Range**: Set In/Out points to loop a specific section.
+  - **Diagnostics**: View environment capabilities (WebCodecs support).
+  - **Shortcuts**: View keyboard shortcuts.
+- **Tools**: Fullscreen, Picture-in-Picture, Captions (CC), Export.
+
+### Keyboard Shortcuts
+
+| Key | Action |
+|-----|--------|
+| `Space` / `K` | Play / Pause |
+| `F` | Toggle Fullscreen |
+| `M` | Mute / Unmute |
+| `C` | Toggle Captions |
+| `?` | Show Shortcuts Help |
+| `←` / `→` | Seek 1 frame |
+| `Shift` + `←` / `→` | Seek 10 frames |
+| `Home` | Go to Start |
+| `End` | Go to End |
+| `I` | Set In Point |
+| `O` | Set Out Point |
+| `X` | Clear Playback Range |
+| `Shift` + `D` | Toggle Diagnostics |
+| `0-9` | Seek to 0-90% |
 
 ## CSS Variables
 
@@ -102,6 +135,7 @@ The `<helios-player>` element implements a subset of the HTMLMediaElement interf
 - `addTextTrack(kind: string, label?: string, language?: string): TextTrack` - Adds a new text track to the media element.
 - `diagnose(): Promise<DiagnosticReport>` - Runs environment diagnostics (WebCodecs, WebGL) and returns a report.
 - `requestPictureInPicture(): Promise<PictureInPictureWindow>` - Requests Picture-in-Picture mode for the player.
+- `export(options?: HeliosExportOptions): Promise<void>` - Programmatically trigger client-side export.
 
 ### Properties
 
@@ -144,7 +178,7 @@ The element dispatches the following custom events:
 
 ## Client-Side Export
 
-The player supports exporting the composition to video (MP4/WebM) directly in the browser using WebCodecs.
+The player supports exporting the composition to video (MP4/WebM) or image snapshots (PNG/JPEG) directly in the browser using WebCodecs.
 
 - **`export-mode="canvas"`**: captures frames from a `<canvas>` element. Fast and efficient.
 - **`export-mode="dom"`**: captures the entire DOM using `foreignObject` SVG serialization. Useful for compositions using DOM elements (divs, text, css).
@@ -159,6 +193,8 @@ Configuration:
   export-format="webm"
 ></helios-player>
 ```
+
+To take a snapshot (PNG) instead of a video, set `export-format="png"`.
 
 ### Audio Fades
 

@@ -330,19 +330,19 @@ describe('HeliosPlayer', () => {
 
     const playBtn = player.shadowRoot!.querySelector('.play-pause-btn') as HTMLButtonElement;
     const scrubber = player.shadowRoot!.querySelector('.scrubber') as HTMLInputElement;
-    const speedSelector = player.shadowRoot!.querySelector('.speed-selector') as HTMLSelectElement;
+    const settingsBtn = player.shadowRoot!.querySelector('.settings-btn') as HTMLButtonElement;
     const fullscreenBtn = player.shadowRoot!.querySelector('.fullscreen-btn') as HTMLButtonElement;
 
     expect(playBtn.disabled).toBe(true);
     expect(scrubber.disabled).toBe(true);
-    expect(speedSelector.disabled).toBe(true);
+    expect(settingsBtn.disabled).toBe(true);
     expect(fullscreenBtn.disabled).toBe(true);
 
     (player as any).lockPlaybackControls(false);
 
     expect(playBtn.disabled).toBe(false);
     expect(scrubber.disabled).toBe(false);
-    expect(speedSelector.disabled).toBe(false);
+    expect(settingsBtn.disabled).toBe(false);
     expect(fullscreenBtn.disabled).toBe(false);
   });
 
