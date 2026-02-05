@@ -1,6 +1,6 @@
 # Status: DEMO Domain
 
-**Version**: 1.113.0
+**Version**: 1.114.0
 
 **Posture**: ACTIVELY EXPANDING FOR V2
 
@@ -17,6 +17,7 @@ The DEMO domain is responsible for:
 
 
 ## Completed Tasks
+- [v1.114.0] ✅ Completed: Solid Chart.js Animation - Created `examples/solid-chartjs-animation` demonstrating Chart.js integration with SolidJS and Helios.
 - [v1.113.0] ✅ Completed: Svelte Chart.js Animation - Created `examples/svelte-chartjs-animation` demonstrating Chart.js integration with Svelte 5 and Helios.
 - [v1.112.0] ✅ Completed: Vue Chart.js Animation - Created `examples/vue-chartjs-animation` demonstrating Chart.js integration with Vue 3 and Helios.
 - [v1.111.0] ✅ Completed: Solid D3 Animation - Created `examples/solid-d3-animation` demonstrating D3.js integration with SolidJS driven by Helios frame clock.

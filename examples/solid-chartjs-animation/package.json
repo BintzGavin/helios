@@ -1,0 +1,20 @@
+{
+  "name": "solid-chartjs-animation",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@helios-project/core": "workspace:*",
+    "chart.js": "^4.5.1",
+    "solid-js": "^1.8.11"
+  },
+  "devDependencies": {
+    "vite": "^7.1.2",
+    "vite-plugin-solid": "^2.8.2"
+  }
+}
