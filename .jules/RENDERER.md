@@ -22,3 +22,7 @@
 ## [2026-03-08] - Incomplete Diagnostics
 **Learning:** The "Diagnostics" feature was implemented but lacked depth (Alpha/Hardware checks), creating a false sense of security about environment verification.
 **Action:** Created plan `2026-03-08-RENDERER-Enhanced-Diagnostics.md` to expose `VideoEncoderSupport.type` and alpha capability.
+
+## [2026-03-11] - DomStrategy Parity Gap
+**Learning:** `DomStrategy` lacks `targetSelector` support, forcing full-viewport capture even when users only need to render a specific component. This is a parity gap with `CanvasStrategy` which supports `canvasSelector`.
+**Action:** Created plan `2026-03-11-RENDERER-Dom-Selector.md` to implement `targetSelector` in `DomStrategy` and unify the deep element finder logic across both strategies.
