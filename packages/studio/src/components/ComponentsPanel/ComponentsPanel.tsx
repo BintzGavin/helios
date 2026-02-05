@@ -4,6 +4,8 @@ import './ComponentsPanel.css';
 
 interface ComponentDefinition {
   name: string;
+  description?: string;
+  installed?: boolean;
   type: string;
   files: { name: string; content: string }[];
   dependencies?: Record<string, string>;
@@ -15,7 +17,7 @@ export const ComponentsPanel: React.FC = () => {
   const [installing, setInstalling] = useState<string | null>(null);
   const { addToast } = useToast();
 
-  useEffect(() => {
+  const fetchComponents = () => {
     fetch('/api/components')
       .then(res => {
           if (!res.ok) throw new Error('Failed to fetch components');
@@ -30,7 +32,11 @@ export const ComponentsPanel: React.FC = () => {
         addToast('Failed to load components', 'error');
         setLoading(false);
       });
-  }, [addToast]);
+  };
+
+  useEffect(() => {
+    fetchComponents();
+  }, []);
 
   const handleInstall = async (name: string) => {
     setInstalling(name);
@@ -47,6 +53,7 @@ export const ComponentsPanel: React.FC = () => {
       }
 
       addToast(`Component "${name}" installed`, 'success');
+      fetchComponents();
     } catch (e: any) {
       console.error(e);
       addToast(e.message || 'Installation failed', 'error');
@@ -66,9 +73,15 @@ export const ComponentsPanel: React.FC = () => {
         {components.map(comp => (
           <div key={comp.name} className="component-card">
             <div className="component-header">
-              <span className="component-name">{comp.name}</span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span className="component-name">{comp.name}</span>
+                {comp.installed && <span className="component-badge installed">Installed</span>}
+              </div>
               <span className="component-type">{comp.type}</span>
             </div>
+            {comp.description && (
+              <div className="component-description">{comp.description}</div>
+            )}
             <div className="component-dependencies">
               {comp.dependencies ? (
                 <span>Deps: {Object.keys(comp.dependencies).join(', ')}</span>
@@ -77,11 +90,11 @@ export const ComponentsPanel: React.FC = () => {
               )}
             </div>
             <button
-              className="install-button"
+              className={`install-button ${comp.installed ? 'success' : ''}`}
               onClick={() => handleInstall(comp.name)}
-              disabled={!!installing}
+              disabled={!!installing || comp.installed}
             >
-              {installing === comp.name ? 'Installing...' : 'Install'}
+              {installing === comp.name ? 'Installing...' : (comp.installed ? 'Installed' : 'Install')}
             </button>
           </div>
         ))}
