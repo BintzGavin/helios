@@ -706,25 +706,30 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     }
   };
 
-  // Loop logic: Enforce loop range when enabled
+  // Sync Loop State
   useEffect(() => {
-    if (!loop || !controller) return;
-
-    const { isPlaying, currentFrame, duration, fps } = playerState;
-    if (!isPlaying) return;
-
-    const totalFrames = duration * fps;
-    const loopEnd = outPoint > 0 ? outPoint : totalFrames;
-
-    // Fix: Prevent infinite loop if composition has 0 duration
-    if (loopEnd <= 0) return;
-
-    if (currentFrame >= loopEnd) {
-      // Seek to inPoint and play to loop
-      controller.seek(inPoint);
-      controller.play();
+    if (controller) {
+      controller.setLoop(loop);
     }
-  }, [playerState, loop, controller, inPoint, outPoint]);
+  }, [controller, loop]);
+
+  // Sync Playback Range
+  useEffect(() => {
+    if (!controller) return;
+
+    const { duration, fps } = playerState;
+    // Default handling: if outPoint is 0, treat as full duration
+    const maxFrame = Math.floor(duration * fps);
+    const effectiveOut = outPoint === 0 ? maxFrame : outPoint;
+
+    // If range is full video (or invalid), clear it
+    if (inPoint === 0 && (outPoint === 0 || effectiveOut >= maxFrame)) {
+      controller.clearPlaybackRange();
+    } else {
+      // Otherwise set strict range
+      controller.setPlaybackRange(inPoint, effectiveOut);
+    }
+  }, [controller, inPoint, outPoint, playerState.duration, playerState.fps]);
 
   const takeSnapshot = async () => {
     if (!controller) return;

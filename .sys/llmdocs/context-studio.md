@@ -53,7 +53,7 @@ Options:
 
 ## Section E: Integration
 
--   **StudioContext**: Central store for Studio state (compositions, assets, render jobs, player state).
+-   **StudioContext**: Central store for Studio state (compositions, assets, render jobs, player state). Syncs loop and playback range to `HeliosController`.
 -   **HeliosPlayer**: The web component used for playback. Studio controls it via `HeliosController`.
 -   **Backend API**:
     -   `GET /api/compositions`: List available compositions.
