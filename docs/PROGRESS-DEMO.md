@@ -1,3 +1,6 @@
+## DEMO v1.113.0
+- ✅ Completed: Svelte Chart.js Animation - Created `examples/svelte-chartjs-animation` demonstrating Chart.js integration with Svelte 5 and Helios.
+
 ## DEMO v1.112.0
 - ✅ Completed: Vue Chart.js Animation - Created `examples/vue-chartjs-animation` demonstrating Chart.js integration with Vue 3 and Helios.
 
