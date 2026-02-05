@@ -66,12 +66,12 @@ export default defineConfig({
   },
   plugins: [
     react({
-      exclude: /examples\/solid-(canvas|dom|threejs-canvas|captions|lottie|pixi|d3)-animation|examples\/solid-transitions|examples\/solid-animation-helpers|examples\/solid-audio-visualization/,
+      exclude: /examples\/solid-(canvas|dom|threejs-canvas|captions|lottie|pixi|d3|chartjs)-animation|examples\/solid-transitions|examples\/solid-animation-helpers|examples\/solid-audio-visualization/,
     }),
     vue(),
     svelte(),
     solidPlugin({
-      include: /examples\/solid-(canvas|dom|threejs-canvas|captions|lottie|pixi|d3)-animation|examples\/solid-transitions|examples\/solid-animation-helpers|examples\/solid-audio-visualization/,
+      include: /examples\/solid-(canvas|dom|threejs-canvas|captions|lottie|pixi|d3|chartjs)-animation|examples\/solid-transitions|examples\/solid-animation-helpers|examples\/solid-audio-visualization/,
     }),
     copyExcalidrawAssetsPlugin()
   ],

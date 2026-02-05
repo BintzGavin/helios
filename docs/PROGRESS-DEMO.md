@@ -1,3 +1,6 @@
+## DEMO v1.114.0
+- ✅ Completed: Solid Chart.js Animation - Created `examples/solid-chartjs-animation` demonstrating Chart.js integration with SolidJS and Helios.
+
 ## DEMO v1.113.0
 - ✅ Completed: Svelte Chart.js Animation - Created `examples/svelte-chartjs-animation` demonstrating Chart.js integration with Svelte 5 and Helios.
 
