@@ -5,6 +5,12 @@ description: "Changelog for the Player package"
 
 # Player Changelog
 
+## v0.68.1
+- **Robust Audio Metering**: Refactored `AudioMeter` to support non-destructive toggling, preventing audio playback from stopping when metering is disabled.
+
+## v0.68.0
+- **Expose Export API**: Implemented public `export()` method on `<helios-player>` to allow programmatic triggering of client-side exports with configurable options (format, resolution, bitrate, etc.).
+
 ## v0.66.1
 - **Responsive Images**: Implemented support for capturing currentSrc of responsive images during client-side export, ensuring high-fidelity output.
 

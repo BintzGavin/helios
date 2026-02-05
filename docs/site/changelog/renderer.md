@@ -5,11 +5,20 @@ description: "Changelog for the Renderer package"
 
 # Renderer Changelog
 
+## v1.71.0
+- **Hardware Accelerated Codec Priority**: Updated `CanvasStrategy` to prioritize hardware-accelerated codecs (checking `navigator.mediaCapabilities.encodingInfo` for `powerEfficient: true`) and prefer H.264 over VP9 when hardware support is equivalent.
+
+## v1.65.0
+- **Smart Audio Fades**: Updated audio fading logic to respect clip duration for accurate fade-out timing.
+
 ## v1.64.1
 - **Verify and Sync**: Verified v1.64.0 distributed rendering and synced documentation.
 
 ## v1.64.0
 - **Distributed Audio Mixing**: Updated `RenderOrchestrator` to decouple audio mixing from distributed video rendering chunks. Chunks are now rendered silently and concatenated, with audio mixed in a final pass to prevent glitches.
+
+## v1.63.2
+- **Verify Virtual Time Binding**: Updated `SeekTimeDriver` to warn (once per session) if the Helios player is not reactively bound to virtual time, ensuring developers are aware of potential polling fallbacks.
 
 ## v1.63.1
 - **Update Verification Suite**: Added orphaned verification scripts (`verify-canvas-shadow-dom.ts` and `verify-pseudo-element-preload.ts`) to the main test runner `run-all.ts`.

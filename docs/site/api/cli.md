@@ -32,16 +32,19 @@ Generates `helios.config.json` in the current working directory.
 Adds a component from the Helios registry to your project.
 
 ```bash
-helios add <component>
+helios add <component> [options]
 ```
 
 **Arguments**:
 - `<component>`: The name of the component to install (e.g., `Timer`, `ProgressBar`).
 
+**Options**:
+- `--no-install`: Skip automatic dependency installation.
+
 **Behavior**:
 1. Looks up the component in the built-in registry.
 2. Downloads/Copies the component source code to your configured `components` directory.
-3. Installs any necessary dependencies (prints a list of required packages).
+3. Installs any necessary dependencies (unless `--no-install` is used).
 
 ### `helios components`
 
@@ -74,6 +77,18 @@ helios render <input> [options]
 - `--quality <number>`: CRF quality (0-51). Lower is better quality.
 - `--mode <mode>`: Render mode (`canvas` or `dom`) (default: `canvas`).
 - `--no-headless`: Run in a visible browser window (useful for debugging).
+
+### `helios merge`
+
+Merges multiple video files into a single output file without re-encoding.
+
+```bash
+helios merge <output> [inputs...]
+```
+
+**Arguments**:
+- `<output>`: Path to the output video file (e.g., `final.mp4`).
+- `[inputs...]`: List of input video files to merge (e.g., `part1.mp4 part2.mp4`).
 
 ### `helios studio`
 

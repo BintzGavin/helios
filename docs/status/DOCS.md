@@ -1,8 +1,15 @@
-**Version**: 1.9.0
+**Version**: 1.10.0
 
 # DOCS Status
 
 ## Recent Updates
+[v1.10.0] ✅ Completed: Daily Documentation Review - Player Export API & CLI Sync
+- Updated all Changelogs (Renderer v1.63.2-v1.71.0, CLI v0.6.0-v0.8.0, Player v0.68.0-v0.68.1).
+- Updated Player API Docs: Added `export()` method.
+- Updated CLI API Docs: Added `helios merge`, updated `helios add` (--no-install).
+- Updated Renderer API Docs: Added Hardware Acceleration note.
+- Updated Example Docs: Referenced `player.export()` in Client Export example.
+
 [v1.9.0] ✅ Completed: Daily Documentation Review - CLI & Studio Sync
 - Created CLI Changelog (v0.1.0-v0.4.1) and CLI API Docs (`init`, `add`, `render`, `components`).
 - Updated all Changelogs (Core v5.9-v5.11, Player v0.64-v0.66, Renderer v1.62-v1.64, Demo v1.93-v1.104, Studio v0.86-v0.90).

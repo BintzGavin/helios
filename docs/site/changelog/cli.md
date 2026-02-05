@@ -5,6 +5,15 @@ description: "Changelog for the CLI package"
 
 # CLI Changelog
 
+## v0.8.0
+- **Auto-Install Dependencies**: Implemented automatic dependency installation for `helios add` with `--no-install` flag.
+
+## v0.7.0
+- **Remote Registry Support**: Implemented `RegistryClient` to fetch components from a remote URL with local fallback.
+
+## v0.6.0
+- **Implement Merge Command**: Implemented `helios merge` command to stitch multiple video files into a single output without re-encoding.
+
 ## v0.4.1
 - **Render Command**: Implemented `helios render` command to allow rendering compositions from the CLI using `@helios-project/renderer`.
 

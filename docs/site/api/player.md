@@ -109,9 +109,28 @@ The player supports client-side video export (rendering to WebM/MP4 in the brows
 - Supports audio export via OfflineAudioContext.
 - Supports "Burn-In" captions during export.
 
+#### Programmatic Export
+
+You can trigger an export programmatically using the `export()` method directly on the player element. This is the preferred way to trigger exports as it handles controller access automatically.
+
+```typescript
+const player = document.querySelector('helios-player');
+
+await player.export({
+  format: 'mp4', // 'mp4' or 'webm'
+  filename: 'my-video',
+  mode: 'auto', // 'auto', 'canvas', or 'dom'
+  width: 1920,
+  height: 1080,
+  bitrate: 5000000, // 5 Mbps
+  includeCaptions: true,
+  onProgress: (p) => console.log(`Progress: ${p * 100}%`)
+});
+```
+
 #### `ClientSideExporter`
 
-You can also access the exporter programmatically.
+For advanced use cases (e.g. custom UI outside the player), you can use the `ClientSideExporter` class directly.
 
 ```typescript
 import { ClientSideExporter } from '@helios-project/player';
@@ -120,15 +139,15 @@ const player = document.querySelector('helios-player');
 const controller = player.getController();
 
 if (controller) {
-  const exporter = new ClientSideExporter(controller, player.shadowRoot.querySelector('iframe'));
+  const exporter = new ClientSideExporter(controller); // No need to pass iframe in newer versions
 
   await exporter.export({
     format: 'mp4',
     mode: 'auto',
     onProgress: (p) => console.log(p),
     includeCaptions: true,
-    width: 1920, // Optional override
-    height: 1080 // Optional override
+    width: 1920,
+    height: 1080
   });
 }
 ```
