@@ -1420,7 +1420,11 @@ export class HeliosPlayer extends HTMLElement {
         speedSelect.innerHTML = `
       <option value="0.25">0.25x</option>
       <option value="0.5">0.5x</option>
+      <option value="0.75">0.75x</option>
       <option value="1">1x</option>
+      <option value="1.25">1.25x</option>
+      <option value="1.5">1.5x</option>
+      <option value="1.75">1.75x</option>
       <option value="2">2x</option>
     `;
         speedSelect.value = String(state.playbackRate || 1);
@@ -2206,14 +2210,18 @@ export class HeliosPlayer extends HTMLElement {
                 this.toggleShortcutsOverlay();
                 break;
             case "ArrowRight":
+                this.seekRelativeSeconds(e.shiftKey ? 10 : 5);
+                break;
             case "l":
             case "L":
-                this.seekRelative(e.shiftKey ? 10 : 1);
+                this.seekRelativeSeconds(10);
                 break;
             case "ArrowLeft":
+                this.seekRelativeSeconds(e.shiftKey ? -10 : -5);
+                break;
             case "j":
             case "J":
-                this.seekRelative(e.shiftKey ? -10 : -1);
+                this.seekRelativeSeconds(-10);
                 break;
             case "Home":
                 e.preventDefault();
@@ -2283,6 +2291,14 @@ export class HeliosPlayer extends HTMLElement {
         const state = this.controller.getState();
         const newFrame = Math.max(0, Math.min(Math.floor(state.duration * state.fps), state.currentFrame + frames));
         this.controller.seek(newFrame);
+    }
+    seekRelativeSeconds(seconds) {
+        if (!this.controller)
+            return;
+        const state = this.controller.getState();
+        if (state.fps) {
+            this.seekRelative(Math.round(seconds * state.fps));
+        }
     }
     toggleFullscreen = () => {
         if (!document.fullscreenElement) {
