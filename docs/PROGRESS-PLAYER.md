@@ -1,3 +1,6 @@
+## PLAYER v0.68.2
+- ✅ Completed: Shared Audio Context - Implemented `SharedAudioContextManager` to prevent audio hijacking when `AudioMeter` is disposed, ensuring audio playback persists.
+
 ## PLAYER v0.68.1
 - ✅ Completed: Robust Audio Metering - Refactored `AudioMeter` to support non-destructive toggling, preventing audio playback from stopping when metering is disabled.
 
