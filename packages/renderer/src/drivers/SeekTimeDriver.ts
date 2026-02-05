@@ -39,7 +39,7 @@ export class SeekTimeDriver implements TimeDriver {
     try {
       await page.waitForFunction(
         () => typeof (window as any).__helios_gsap_timeline__ !== 'undefined' || typeof (window as any).helios !== 'undefined',
-        { timeout: 5000 }
+        { timeout: this.timeout }
       );
     } catch (e) {
       // Ignore - likely a static page or initialization took too long.

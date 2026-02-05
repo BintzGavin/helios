@@ -4,15 +4,19 @@
  * Run with: npx ts-node render.ts
  * 
  * Make sure the dev server is running first:
- * npm run dev (from the project root)
+ * npm run dev:promo (from the project root)
  */
 
 import { Renderer } from '../../packages/renderer/src/index.ts';
 import path from 'path';
+import fs from 'fs';
 
 async function main() {
-  const compositionUrl = 'http://localhost:3002/examples/promo-video/composition.html';
+  const compositionUrl = 'http://localhost:3001/composition.html';
   const outputPath = path.resolve(__dirname, 'output/helios-promo.mp4');
+
+  // Ensure output directory exists
+  fs.mkdirSync(path.dirname(outputPath), { recursive: true });
 
   console.log('🎬 Starting Helios Promo Video Render...');
   console.log(`   Source: ${compositionUrl}`);
