@@ -7,7 +7,8 @@ export interface HeliosConfig {
     components: string;
     lib: string;
   };
-  framework?: 'react' | 'vue' | 'svelte' | 'vanilla';
+  framework?: 'react' | 'vue' | 'svelte' | 'solid' | 'vanilla';
+  components: string[];
 }
 
 export const DEFAULT_CONFIG: HeliosConfig = {
@@ -16,6 +17,7 @@ export const DEFAULT_CONFIG: HeliosConfig = {
     components: 'src/components/helios',
     lib: 'src/lib',
   },
+  components: [],
 };
 
 export function loadConfig(cwd: string = process.cwd()): HeliosConfig | null {
@@ -32,5 +34,14 @@ export function loadConfig(cwd: string = process.cwd()): HeliosConfig | null {
     return config as HeliosConfig;
   } catch (error) {
     throw new Error(`Failed to parse helios.config.json: ${(error as Error).message}`);
+  }
+}
+
+export function saveConfig(config: HeliosConfig, cwd: string = process.cwd()): void {
+  const configPath = path.resolve(cwd, 'helios.config.json');
+  try {
+    fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
+  } catch (error) {
+    throw new Error(`Failed to save helios.config.json: ${(error as Error).message}`);
   }
 }

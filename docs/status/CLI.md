@@ -1,6 +1,6 @@
 # CLI Status
 
-**Version**: 0.9.2
+**Version**: 0.10.0
 
 ## Current State
 
@@ -46,3 +46,4 @@ Per AGENTS.md, the CLI is "ACTIVELY EXPANDING FOR V2" with focus on:
 [v0.8.0] ✅ Auto-Install Dependencies - Implemented automatic dependency installation for `helios add` with `--no-install` flag
 [v0.9.0] ✅ Multi-Framework Support - Enabled `helios init` for Vue, Svelte, and Vanilla, and updated `helios studio` to load user config.
 [v0.9.2] ✅ SolidJS Support - Added SolidJS template to `helios init` and added `--framework` flag for automated scaffolding.
+[v0.10.0] ✅ Track Installed Components - Updated `helios add` to record installed components in `helios.config.json`.
