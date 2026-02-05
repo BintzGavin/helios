@@ -29,3 +29,7 @@ Critical learnings only. This is not a log—only add entries for insights that 
 ## [0.7.0] - Registry Install Gap
 **Learning:** `helios add` was marked as implemented but only copied files, failing to install dependencies. This created friction and violated the "Shadcn-style" vision of seamless adoption.
 **Action:** When implementing "add" commands, always include dependency management (check/install) to ensure the added component is immediately usable.
+
+## [0.8.0] - Studio Config Blocking
+**Learning:** `helios studio` was configured with `configFile: false`, preventing it from loading user-defined `vite.config.ts`. This implicitly blocked support for frameworks requiring plugins (Vue, Svelte) despite the CLI being intended as framework-agnostic.
+**Action:** Ensure `helios studio` (and similar host commands) explicitly allows user configuration to support the diverse ecosystem of V2.
