@@ -1,0 +1,11 @@
+{
+  "name": "@helios-examples/solid-d3-animation",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "dependencies": {
+    "@helios-project/core": "workspace:*",
+    "d3": "^7.9.0",
+    "solid-js": "^1.9.11"
+  }
+}

@@ -1,3 +1,6 @@
+## DEMO v1.110.0
+- ✅ Completed: Solid D3 Animation - Created `examples/solid-d3-animation` demonstrating D3.js integration with SolidJS and Helios.
+
 ## DEMO v1.109.0
 - ✅ Completed: Solid DOM Animation - Created `examples/solid-dom-animation` demonstrating SolidJS integration for DOM-based animations using `createHeliosSignal` and `autoSyncAnimations`.
 
