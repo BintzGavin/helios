@@ -1,3 +1,6 @@
+## RENDERER v1.71.4
+- ✅ Completed: Restore Verification Environment - Restored missing Playwright browsers and ensured verification scripts pass by creating necessary directories. Verified with verify-dom-preload.ts, verify-transparency.ts, and verify-cancellation.ts.
+
 ## RENDERER v1.71.3
 - ✅ Completed: Refactor Media Discovery - Consolidated duplicated `findAllMedia` logic from `CdpTimeDriver`, `SeekTimeDriver`, and `dom-scanner` into a shared `dom-scripts.ts` utility, improving maintainability. Verified with `npm run test` (logic equivalence).
 

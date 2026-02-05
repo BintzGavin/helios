@@ -43,6 +43,8 @@ packages/renderer/
 │   │   └── random-seed.ts     # Deterministic PRNG injection
 │   ├── index.ts               # Entry point
 │   ├── Renderer.ts            # Main class
+│   ├── Orchestrator.ts        # Distributed rendering orchestrator
+│   ├── concat.ts              # Video concatenation utility
 │   └── types.ts               # Configuration interfaces
 └── tests/                     # Verification scripts
 ```
