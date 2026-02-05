@@ -16,6 +16,10 @@ The Renderer employs a "Dual-Path" architecture to handle different rendering ne
     -   **Optimization**: Supports `omittedBackground` for transparency.
     -   **Audio**: Scans for and includes implicit audio tracks.
 
+Both strategies rely on **Time Drivers** (`CdpTimeDriver` or `SeekTimeDriver`) to enforce frame-perfect synchronization and deterministic behavior. This includes:
+-   **Virtual Time**: Overriding `Date.now()`, `performance.now()`, and `requestAnimationFrame`.
+-   **Seeded Randomness**: Injecting a deterministic Mulberry32 PRNG to replace `Math.random()`.
+
 Both strategies normalize the output into a stream of buffers (video frames) that are piped into FFmpeg.
 
 ## B. File Tree
@@ -23,6 +27,9 @@ Both strategies normalize the output into a stream of buffers (video frames) tha
 ```
 packages/renderer/
 ├── src/
+│   ├── drivers/
+│   │   ├── CdpTimeDriver.ts   # Deterministic virtual time (CDP)
+│   │   └── SeekTimeDriver.ts  # Deterministic Seek-based time
 │   ├── strategies/
 │   │   ├── CanvasStrategy.ts  # WebCodecs/Canvas capture
 │   │   ├── DomStrategy.ts     # Screenshot capture
@@ -31,7 +38,8 @@ packages/renderer/
 │   │   ├── FFmpegBuilder.ts   # FFmpeg argument construction
 │   │   ├── blob-extractor.ts  # Blob URL handling
 │   │   ├── dom-finder.ts      # Shared deep element finding (Shadow DOM)
-│   │   └── dom-scanner.ts     # Media element discovery
+│   │   ├── dom-scanner.ts     # Media element discovery
+│   │   └── random-seed.ts     # Deterministic PRNG injection
 │   ├── index.ts               # Entry point
 │   ├── Renderer.ts            # Main class
 │   └── types.ts               # Configuration interfaces

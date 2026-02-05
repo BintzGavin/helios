@@ -1,10 +1,12 @@
 import { Page } from 'playwright';
 import { TimeDriver } from './TimeDriver.js';
+import { RANDOM_SEED_SCRIPT } from '../utils/random-seed.js';
 
 export class SeekTimeDriver implements TimeDriver {
   constructor(private timeout: number = 30000) {}
 
   async init(page: Page): Promise<void> {
+    await page.addInitScript(RANDOM_SEED_SCRIPT);
     await page.addInitScript(() => {
       // Initialize virtual time
       (window as any).__HELIOS_VIRTUAL_TIME__ = 0;

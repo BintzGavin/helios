@@ -1,5 +1,6 @@
 import { Page, CDPSession } from 'playwright';
 import { TimeDriver } from './TimeDriver.js';
+import { RANDOM_SEED_SCRIPT } from '../utils/random-seed.js';
 
 export class CdpTimeDriver implements TimeDriver {
   private client: CDPSession | null = null;
@@ -11,7 +12,7 @@ export class CdpTimeDriver implements TimeDriver {
   }
 
   async init(page: Page): Promise<void> {
-    // No-op for CdpTimeDriver
+    await page.addInitScript(RANDOM_SEED_SCRIPT);
   }
 
   async prepare(page: Page): Promise<void> {
