@@ -13,6 +13,9 @@ Each agent should update **their own dedicated progress file** instead of this f
 - **STUDIO**: Update `docs/PROGRESS-STUDIO.md`
 - **SKILLS**: Update `docs/PROGRESS-SKILLS.md`
 
+### DEMO v1.118.0
+- ✅ Completed: Standardize Simple Canvas Example - Modernized `examples/simple-canvas-animation` with TypeScript, `package.json`, and proper build config.
+
 ### CLI v0.11.0
 - ✅ Completed: Implement List Command - Implemented `helios list` to display installed components.
 

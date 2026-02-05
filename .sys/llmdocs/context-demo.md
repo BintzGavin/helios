@@ -7,7 +7,7 @@ The `examples/` directory contains reference implementations for various framewo
 - **simple-animation**: Basic DOM animation using CSS.
 - **vanilla-typescript**: Basic TypeScript example with Vite.
 - **vanilla-transitions**: Sequenced scene transitions using core utilities.
-- **simple-canvas-animation**: Basic Canvas animation.
+- **simple-canvas-animation**: Basic Canvas animation (TypeScript + Vite).
 - **waapi-animation**: Web Animations API integration.
 - **vanilla-animation-helpers**: Sequencing utilities for Vanilla JS.
 - **vanilla-captions-animation**: Integration with Helios SRT captions in Vanilla JS.

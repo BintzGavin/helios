@@ -1,3 +1,6 @@
+## DEMO v1.118.0
+- ✅ Completed: Standardize Simple Canvas Example - Modernized `examples/simple-canvas-animation` with TypeScript, `package.json`, and proper build config.
+
 ## DEMO v1.117.0
 - ✅ Completed: Standardize P5 Canvas Example - Modernized `examples/p5-canvas-animation` with TypeScript, `package.json`, and proper build config.
 
