@@ -1,3 +1,6 @@
+## DEMO v1.111.0
+- ✅ Completed: Solid D3 Animation - Created `examples/solid-d3-animation` demonstrating D3.js integration with SolidJS driven by Helios frame clock.
+
 ## DEMO v1.110.0
 - ✅ Completed: React Chart.js Animation - Created `examples/react-chartjs-animation` demonstrating integration with Chart.js using synchronous updates in React.
 
