@@ -166,23 +166,23 @@ describe('HeliosPlayer', () => {
     // Reset mocks
     mockController.seek.mockClear();
 
-    // ArrowRight: Seek +1 (Default)
+    // ArrowRight: Seek +5s (Default) -> 150 frames
     mockController.getState.mockReturnValue({ currentFrame: 0, duration: 10, fps: 30, isPlaying: false });
     dispatchKey('ArrowRight');
-    expect(mockController.seek).toHaveBeenCalledWith(1);
+    expect(mockController.seek).toHaveBeenCalledWith(150);
 
-    // ArrowRight + Shift: Seek +10
+    // ArrowRight + Shift: Seek +10s -> 300 frames
     dispatchKey('ArrowRight', { shiftKey: true });
-    expect(mockController.seek).toHaveBeenCalledWith(10);
+    expect(mockController.seek).toHaveBeenCalledWith(300);
 
-    // ArrowLeft: Seek -1 (Default)
-    mockController.getState.mockReturnValue({ currentFrame: 20, duration: 10, fps: 30, isPlaying: false });
+    // ArrowLeft: Seek -5s (Default) -> 150 frames
+    mockController.getState.mockReturnValue({ currentFrame: 200, duration: 10, fps: 30, isPlaying: false });
     dispatchKey('ArrowLeft');
-    expect(mockController.seek).toHaveBeenCalledWith(19); // 20 - 1
+    expect(mockController.seek).toHaveBeenCalledWith(50); // 200 - 150
 
-    // ArrowLeft + Shift: Seek -10
+    // ArrowLeft + Shift: Seek -10s -> 300 frames
     dispatchKey('ArrowLeft', { shiftKey: true });
-    expect(mockController.seek).toHaveBeenCalledWith(10); // 20 - 10
+    expect(mockController.seek).toHaveBeenCalledWith(0); // 200 - 300 -> 0
 
     // .: Seek +1
     mockController.getState.mockReturnValue({ currentFrame: 10, duration: 10, fps: 30, isPlaying: false });
@@ -1903,6 +1903,70 @@ describe('HeliosPlayer', () => {
 
        const pipBtn = player.shadowRoot!.querySelector('.pip-btn') as HTMLButtonElement;
        expect(pipBtn.style.display).toBe('none');
+    });
+  });
+
+  describe('Settings Menu', () => {
+    it('should render granular playback speed options', () => {
+        const mockController = {
+            getState: vi.fn().mockReturnValue({ currentFrame: 0, duration: 10, fps: 30, isPlaying: false, playbackRate: 1 }),
+            play: vi.fn(),
+            pause: vi.fn(),
+            seek: vi.fn(),
+            setPlaybackRate: vi.fn(),
+            subscribe: vi.fn().mockReturnValue(() => {}),
+            onError: vi.fn().mockReturnValue(() => {}),
+            dispose: vi.fn(), setCaptions: vi.fn(),
+            setInputProps: vi.fn(),
+            setAudioMuted: vi.fn(),
+            setAudioVolume: vi.fn(), startAudioMetering: vi.fn(), stopAudioMetering: vi.fn(), onAudioMetering: vi.fn().mockReturnValue(() => {}), diagnose: vi.fn(),
+            setLoop: vi.fn(),
+            setPlaybackRange: vi.fn(),
+            clearPlaybackRange: vi.fn(), startAudioMetering: vi.fn(), stopAudioMetering: vi.fn(), onAudioMetering: vi.fn().mockReturnValue(() => {}), diagnose: vi.fn()
+        };
+        (player as any).setController(mockController);
+
+        // Trigger settings menu render
+        const settingsBtn = player.shadowRoot!.querySelector('.settings-btn') as HTMLButtonElement;
+        settingsBtn.click();
+
+        const settingsMenu = player.shadowRoot!.querySelector('.settings-menu') as HTMLDivElement;
+        const speedSelect = settingsMenu.querySelector('select.settings-select') as HTMLSelectElement;
+
+        expect(speedSelect).toBeTruthy();
+        const options = Array.from(speedSelect.options).map(opt => opt.value);
+        expect(options).toEqual(['0.25', '0.5', '0.75', '1', '1.25', '1.5', '1.75', '2']);
+    });
+
+    it('should set playback rate when option is selected', () => {
+        const mockController = {
+            getState: vi.fn().mockReturnValue({ currentFrame: 0, duration: 10, fps: 30, isPlaying: false, playbackRate: 1 }),
+            play: vi.fn(),
+            pause: vi.fn(),
+            seek: vi.fn(),
+            setPlaybackRate: vi.fn(),
+            subscribe: vi.fn().mockReturnValue(() => {}),
+            onError: vi.fn().mockReturnValue(() => {}),
+            dispose: vi.fn(), setCaptions: vi.fn(),
+            setInputProps: vi.fn(),
+            setAudioMuted: vi.fn(),
+            setAudioVolume: vi.fn(), startAudioMetering: vi.fn(), stopAudioMetering: vi.fn(), onAudioMetering: vi.fn().mockReturnValue(() => {}), diagnose: vi.fn(),
+            setLoop: vi.fn(),
+            setPlaybackRange: vi.fn(),
+            clearPlaybackRange: vi.fn(), startAudioMetering: vi.fn(), stopAudioMetering: vi.fn(), onAudioMetering: vi.fn().mockReturnValue(() => {}), diagnose: vi.fn()
+        };
+        (player as any).setController(mockController);
+
+        const settingsBtn = player.shadowRoot!.querySelector('.settings-btn') as HTMLButtonElement;
+        settingsBtn.click();
+
+        const settingsMenu = player.shadowRoot!.querySelector('.settings-menu') as HTMLDivElement;
+        const speedSelect = settingsMenu.querySelector('select.settings-select') as HTMLSelectElement;
+
+        speedSelect.value = '1.5';
+        speedSelect.dispatchEvent(new Event('change'));
+
+        expect(mockController.setPlaybackRate).toHaveBeenCalledWith(1.5);
     });
   });
 });
