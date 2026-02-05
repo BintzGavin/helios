@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { useStudio } from '../../context/StudioContext';
 import { AudioAsset } from '../../types';
 import './AudioMixerPanel.css';
+import { AudioMeter, AudioMeterRef, AudioLevels } from './AudioMeter';
 
 export const AudioMixerPanel: React.FC = () => {
   const { controller } = useStudio();
@@ -9,6 +10,8 @@ export const AudioMixerPanel: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [soloTrackId, setSoloTrackId] = useState<string | null>(null);
   const [muteSnapshot, setMuteSnapshot] = useState<Record<string, boolean>>({});
+
+  const meterRef = useRef<AudioMeterRef>(null);
 
   const fetchTracks = useCallback(async () => {
     if (!controller) return;
@@ -28,6 +31,26 @@ export const AudioMixerPanel: React.FC = () => {
       fetchTracks();
     }
   }, [controller, fetchTracks]);
+
+  // Audio Metering Lifecycle
+  useEffect(() => {
+    if (!controller) return;
+
+    // Start metering
+    controller.startAudioMetering();
+
+    // Subscribe to updates
+    const unsubscribe = controller.onAudioMetering((levels: any) => {
+        if (meterRef.current) {
+            meterRef.current.update(levels as AudioLevels);
+        }
+    });
+
+    return () => {
+        controller.stopAudioMetering();
+        unsubscribe();
+    };
+  }, [controller]);
 
   const handleVolumeChange = (id: string, newVolume: number) => {
     if (!controller) return;
@@ -107,7 +130,10 @@ export const AudioMixerPanel: React.FC = () => {
   return (
     <div className="audio-mixer-panel">
       <div className="mixer-header">
-        <h3>Audio Mixer</h3>
+        <h3>
+          Audio Mixer
+          <AudioMeter ref={meterRef} />
+        </h3>
         <button
           className="mixer-refresh-btn"
           onClick={fetchTracks}

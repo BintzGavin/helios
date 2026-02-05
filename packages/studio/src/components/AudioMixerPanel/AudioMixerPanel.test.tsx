@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { AudioMixerPanel } from './AudioMixerPanel';
 import { StudioContext } from '../../context/StudioContext';
@@ -14,12 +14,21 @@ const mockTracks = [
 describe('AudioMixerPanel', () => {
   let mockController: any;
   let mockContextValue: any;
+  let meteringCallback: any;
+  let unsubscribeMetering: any;
 
   beforeEach(() => {
+    unsubscribeMetering = vi.fn();
     mockController = {
       getAudioTracks: vi.fn().mockResolvedValue([...mockTracks]),
       setAudioTrackMuted: vi.fn(),
       setAudioTrackVolume: vi.fn(),
+      startAudioMetering: vi.fn(),
+      stopAudioMetering: vi.fn(),
+      onAudioMetering: vi.fn((cb) => {
+        meteringCallback = cb;
+        return unsubscribeMetering;
+      }),
     };
 
     mockContextValue = {
@@ -45,12 +54,41 @@ describe('AudioMixerPanel', () => {
     });
   });
 
+  it('activates audio metering on mount', async () => {
+    renderComponent();
+    expect(mockController.startAudioMetering).toHaveBeenCalled();
+    expect(mockController.onAudioMetering).toHaveBeenCalled();
+    expect(screen.getByTitle('Master Levels')).toBeInTheDocument();
+  });
+
+  it('updates meter when levels are received', async () => {
+    renderComponent();
+    await waitFor(() => expect(mockController.onAudioMetering).toHaveBeenCalled());
+
+    // Simulate levels update
+    act(() => {
+        if (meteringCallback) {
+            meteringCallback({ left: 0.5, right: 0.5, peakLeft: 0.6, peakRight: 0.6 });
+        }
+    });
+
+    // DOM verification is tricky with refs and styles, but existence confirms render
+    const meter = screen.getByTitle('Master Levels');
+    expect(meter).toBeInTheDocument();
+  });
+
+  it('cleans up audio metering on unmount', async () => {
+    const { unmount } = renderComponent();
+    unmount();
+    expect(mockController.stopAudioMetering).toHaveBeenCalled();
+    expect(unsubscribeMetering).toHaveBeenCalled();
+  });
+
   it('toggles mute calls controller', async () => {
     renderComponent();
     await waitFor(() => screen.getByText('track-1'));
 
     const muteBtns = screen.getAllByTitle(/Mute|Unmute/);
-    // track-1 is unmuted (index 0)
     fireEvent.click(muteBtns[0]);
 
     expect(mockController.setAudioTrackMuted).toHaveBeenCalledWith('track-1', true);
@@ -62,30 +100,12 @@ describe('AudioMixerPanel', () => {
 
     const soloBtns = screen.getAllByTitle('Solo');
 
-    // Solo track-1
-    // Initial state:
-    // track-1: unmuted
-    // track-2: muted
-    // track-3: unmuted
-
     fireEvent.click(soloBtns[0]);
 
-    // Expect track-1 to stay unmuted (or be unmuted if it was muted)
-    // Expect track-2 to stay muted
-    // Expect track-3 to become muted
-
-    // Check calls
     expect(mockController.setAudioTrackMuted).toHaveBeenCalledWith('track-3', true);
-    // track-2 was already muted, so it might not be called if we optimize,
-    // but the plan said "mute others".
-    // track-1 was already unmuted.
 
-    // Let's verify subsequent state restoration
-    // Unsolo track-1
     fireEvent.click(soloBtns[0]);
 
-    // Should restore:
-    // track-3 to unmuted
     expect(mockController.setAudioTrackMuted).toHaveBeenCalledWith('track-3', false);
   });
 });

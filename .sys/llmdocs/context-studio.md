@@ -48,6 +48,7 @@ Options:
 -   **RendersPanel**: Configures and manages render jobs.
     -   **RenderConfig**: Settings for Mode, Bitrate, Codec, Concurrency (with Presets).
 -   **AssetsPanel**: Drag-and-drop asset management.
+-   **AudioPanel**: Audio track mixer with Volume, Mute, Solo controls, and Master Audio Meter.
 -   **Omnibar**: Command palette (Cmd+K).
 
 ## Section E: Integration
