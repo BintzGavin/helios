@@ -217,6 +217,13 @@ export interface RendererOptions {
    * These will be available as `window.__HELIOS_PROPS__`.
    */
   inputProps?: Record<string, any>;
+
+  /**
+   * Whether to mix the audio from the input video (stream 0:a) into the output.
+   * Defaults to false.
+   * Useful for multi-pass rendering or when the input video already contains audio that should be preserved.
+   */
+  mixInputAudio?: boolean;
 }
 
 export interface RenderJobOptions {

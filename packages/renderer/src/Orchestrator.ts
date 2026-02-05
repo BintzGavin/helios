@@ -106,7 +106,8 @@ export class RenderOrchestrator {
 
         // Use FFmpegBuilder to generate args for the mixing pass
         // We force 'copy' for video to avoid re-encoding
-        const mixOptions: RendererOptions = { ...options, videoCodec: 'copy' };
+        // We enable mixInputAudio to preserve the audio from the concatenated chunks (implicit audio)
+        const mixOptions: RendererOptions = { ...options, videoCodec: 'copy', mixInputAudio: true };
         const videoInputArgs = ['-i', concatTarget];
 
         // FFmpegBuilder handles audio offsets/seeking based on options
