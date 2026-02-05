@@ -13,6 +13,9 @@ Each agent should update **their own dedicated progress file** instead of this f
 - **STUDIO**: Update `docs/PROGRESS-STUDIO.md`
 - **SKILLS**: Update `docs/PROGRESS-SKILLS.md`
 
+### CLI v0.8.0
+- ✅ Completed: Auto-Install Dependencies - Implemented automatic dependency installation for `helios add` with `--no-install` flag.
+
 ### CLI v0.7.0
 - ✅ Completed: Remote Registry Support - Implemented `RegistryClient` to fetch components from a remote URL with local fallback.
 

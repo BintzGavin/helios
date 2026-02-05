@@ -6,9 +6,10 @@ export function registerAddCommand(program: Command) {
   program
     .command('add <component>')
     .description('Add a component to your project')
-    .action(async (componentName) => {
+    .option('--no-install', 'Skip dependency installation')
+    .action(async (componentName, options) => {
       try {
-        await installComponent(process.cwd(), componentName);
+        await installComponent(process.cwd(), componentName, { install: options.install });
       } catch (e: any) {
         console.error(chalk.red(e.message));
         process.exit(1);

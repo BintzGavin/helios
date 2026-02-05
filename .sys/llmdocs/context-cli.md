@@ -8,7 +8,7 @@ The Helios CLI is the primary interface for managing Helios projects, rendering 
 - **Entry Point**: `bin/helios.js` (shebang) calls `dist/index.js`.
 - **Command Registration**: `src/index.ts` initializes the program and registers commands from `src/commands/`.
 - **Registry Client**: `src/registry/client.ts` handles component fetching (remote with local fallback).
-- **Utilities**: `src/utils/` contains helpers for config loading (`config.ts`) and installation logic (`install.ts`).
+- **Utilities**: `src/utils/` contains helpers for config loading (`config.ts`), installation logic (`install.ts`), and package management (`package-manager.ts`).
 
 ## B. File Tree
 
@@ -31,7 +31,8 @@ packages/cli/
 │   │   └── types.ts        # Registry type definitions
 │   └── utils/
 │       ├── config.ts       # Config file loader
-│       └── install.ts      # Component installation logic
+│       ├── install.ts      # Component installation logic
+│       └── package-manager.ts # Package manager detection & installation
 └── package.json
 ```
 
@@ -42,10 +43,12 @@ Initializes a new Helios project configuration and scaffolds structure if missin
 - **Options**:
   - `-y, --yes`: Skip prompts and use defaults.
 
-### `helios add <component>`
+### `helios add <component> [options]`
 Adds a component (and its dependencies) to the project.
 - **Arguments**:
   - `component`: Name of the component to install.
+- **Options**:
+  - `--no-install`: Skip dependency installation.
 
 ### `helios components`
 Lists available components in the registry.
