@@ -4,7 +4,7 @@
 The `examples/` directory contains reference implementations for various frameworks and use cases.
 
 ### Vanilla JS
-- **simple-animation**: Basic DOM animation using CSS.
+- **simple-animation**: Basic DOM animation using CSS (TypeScript + Vite).
 - **vanilla-typescript**: Basic TypeScript example with Vite.
 - **vanilla-transitions**: Sequenced scene transitions using core utilities.
 - **simple-canvas-animation**: Basic Canvas animation.

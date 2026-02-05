@@ -1,0 +1,36 @@
+body {
+  margin: 0;
+  overflow: hidden;
+  background-color: #eee;
+}
+
+.animated-box {
+  width: 150px;
+  height: 150px;
+  background-color: #007bff;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  /* Initial state */
+  transform: translate(-50%, -50%) scale(0.5);
+  opacity: 0;
+
+  /* Use standard CSS animation */
+  animation: moveAndScale 5s linear forwards;
+}
+
+@keyframes moveAndScale {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.5);
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+    /* Match original logic: calc(-50% + (1 * (50vw - 100%))) */
+    /* -50% + 50vw - 100% */
+    transform: translate(calc(-50% + 50vw - 100%), -50%) scale(1);
+  }
+}
