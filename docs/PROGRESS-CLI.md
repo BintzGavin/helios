@@ -2,6 +2,10 @@
 
 This file tracks progress for the CLI domain (`packages/cli`).
 
+## CLI v0.10.1
+
+- ✅ Sync & Verify - Synced CLI version, updated context documentation, and verified distributed rendering concurrency flags.
+
 ## CLI v0.10.0
 
 - ✅ Track Installed Components - Updated `helios add` to automatically record installed components in `helios.config.json` and persist config changes.

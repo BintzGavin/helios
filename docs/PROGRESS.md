@@ -16,6 +16,9 @@ Each agent should update **their own dedicated progress file** instead of this f
 ### RENDERER v1.71.1
 - ✅ Completed: Deterministic Randomness - Enforced deterministic Math.random() in `CdpTimeDriver` and `SeekTimeDriver` by injecting a seeded Mulberry32 PRNG via `page.addInitScript`, ensuring consistent generative rendering. Verified with `verify-random-determinism.ts`.
 
+### CLI v0.10.1
+- ✅ Completed: Sync & Verify - Synced CLI version, updated context documentation, and verified distributed rendering concurrency flags.
+
 ### RENDERER v1.71.0
 - ✅ Completed: Hardware Accelerated Codec Priority - Updated `CanvasStrategy` to prioritize hardware-accelerated codecs (checking `navigator.mediaCapabilities.encodingInfo` for `powerEfficient: true`) and prefer H.264 over VP9 when hardware support is equivalent. Verified with `verify-hardware-codec-selection.ts`.
 
