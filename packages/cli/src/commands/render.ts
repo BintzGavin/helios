@@ -1,7 +1,7 @@
 import { Command } from 'commander';
 import path from 'path';
 import { pathToFileURL } from 'url';
-import { Renderer } from '@helios-project/renderer';
+import { RenderOrchestrator, DistributedRenderOptions } from '@helios-project/renderer';
 
 export function registerRenderCommand(program: Command) {
   program
@@ -16,6 +16,7 @@ export function registerRenderCommand(program: Command) {
     .option('--mode <mode>', 'Render mode (canvas or dom)', 'canvas')
     .option('--start-frame <number>', 'Frame to start rendering from')
     .option('--frame-count <number>', 'Number of frames to render')
+    .option('--concurrency <number>', 'Number of concurrent render jobs', '1')
     .option('--no-headless', 'Run in visible browser window (default: headless)')
     .action(async (input, options) => {
       try {
@@ -38,7 +39,12 @@ export function registerRenderCommand(program: Command) {
           throw new Error('frame-count must be a valid number');
         }
 
-        const renderer = new Renderer({
+        const concurrency = options.concurrency ? parseInt(options.concurrency, 10) : 1;
+        if (isNaN(concurrency)) {
+          throw new Error('concurrency must be a valid number');
+        }
+
+        const renderOptions: DistributedRenderOptions = {
           width: parseInt(options.width, 10),
           height: parseInt(options.height, 10),
           fps: parseInt(options.fps, 10),
@@ -47,12 +53,13 @@ export function registerRenderCommand(program: Command) {
           mode: options.mode as 'canvas' | 'dom',
           startFrame,
           frameCount,
+          concurrency,
           browserConfig: {
             headless: options.headless, // 'no-headless' sets this to false
           },
-        });
+        };
 
-        await renderer.render(url, outputPath);
+        await RenderOrchestrator.render(url, outputPath, renderOptions);
         console.log('Render complete.');
       } catch (err: any) {
         console.error('Render failed:', err.message);
