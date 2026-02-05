@@ -9,3 +9,7 @@
 ## 0.66.3 - Keyboard Shortcuts Standard
 **Learning:** The existing keyboard shortcuts implementation (Arrows = 1 frame) deviated from standard video player conventions (usually 5s), leading to a frustrating UX for playback navigation.
 **Action:** Always verify "Standard" features against industry leaders (YouTube, VLC) rather than just implementing technical parity (frame steps).
+
+## 0.66.4 - Playback Speed Granularity
+**Learning:** The previous implementation of playback speed options (0.25, 0.5, 1, 2) was too coarse for effective review. Standard players offer intermediate steps (0.75, 1.25, etc.).
+**Action:** When implementing range-based controls, check industry standards (YouTube, VLC) for common step values.
