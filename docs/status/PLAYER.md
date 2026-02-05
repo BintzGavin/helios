@@ -59,7 +59,7 @@
 - **Export API**: Exposes public `export()` method for programmatic control over client-side exports.
 
 ## Critical Task
-- **None**: All critical tasks completed.
+- **Robust Audio Metering**: Refactor AudioMeter to support non-destructive toggling.
 
 [v0.68.0] ✅ Completed: Expose Export API - Implemented public `export()` method on `<helios-player>` to allow programmatic triggering of client-side exports with configurable options (format, resolution, bitrate, etc.).
 [v0.67.0] ✅ Verified: Integrity - Ran full unit test suite (276 tests) and E2E verification script (verify-player.ts).
