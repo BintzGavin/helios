@@ -77,7 +77,7 @@ The `examples/` directory contains reference implementations for various framewo
 - **solid-lottie-animation**: Rendering Lottie JSON animations.
 
 ### Integrations
-- **threejs-canvas-animation**: 3D scenes with Three.js (Vanilla).
+- **threejs-canvas-animation**: 3D scenes with Three.js (TypeScript + Vite).
 - **pixi-canvas-animation**: 2D graphics with PixiJS.
 - **p5-canvas-animation**: Creative coding with P5.js.
 - **d3-animation**: Data visualization with D3.js.
