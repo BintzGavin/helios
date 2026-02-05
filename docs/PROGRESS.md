@@ -18,6 +18,7 @@ Each agent should update **their own dedicated progress file** instead of this f
 
 ### CLI v0.11.0
 - ✅ Completed: Implement List Command - Implemented `helios list` to display installed components.
+- ✅ Verified: List Command - Verified `helios list` correctly lists installed components, handles empty lists, and missing config.
 
 ### RENDERER v1.71.1
 - ✅ Completed: Deterministic Randomness - Enforced deterministic Math.random() in `CdpTimeDriver` and `SeekTimeDriver` by injecting a seeded Mulberry32 PRNG via `page.addInitScript`, ensuring consistent generative rendering. Verified with `verify-random-determinism.ts`.
