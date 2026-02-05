@@ -69,6 +69,21 @@ npx helios render <input-file> <output-file> [options]
 - `-q, --quality <number>`: Quality (CRF/Bitrate depending on codec).
 - `--headless`: Run in headless mode (default: true).
 
+### `merge`
+Merge multiple video files into one without re-encoding (concatenation).
+
+```bash
+npx helios merge <output> [inputs...]
+```
+**Arguments:**
+- `<output>`: Path for the output merged video file (e.g., `full-movie.mp4`).
+- `[inputs...]`: List of input video files to merge (e.g., `part1.mp4 part2.mp4`).
+
+**Example:**
+```bash
+npx helios merge final.mp4 section1.mp4 section2.mp4 section3.mp4
+```
+
 ### `add`
 Add a pre-built component to your project from the Helios Registry.
 

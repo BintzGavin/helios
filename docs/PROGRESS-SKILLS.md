@@ -1,5 +1,13 @@
 # SKILLS Progress Log
 
+## SKILLS v1.11.0
+- ✅ Completed: Daily Skills Review
+  - Created workflow skill for `audio-visualization` (Deterministic Buffer & Player Metering)
+  - Updated API skills for `core` (seekToTime, setAvailableAudioTracks, Options)
+  - Updated API skills for `renderer` (Audio Mixing, Selectors, Stability Timeout)
+  - Updated API skills for `player` (Media Metadata, Schema, PiP, Audio Metering)
+  - Updated skill for `cli` (Merge Command)
+
 ## SKILLS v1.10.0
 - ✅ Completed: Daily Skills Review
   - Created skill for `cli` (Commands, Usage)
@@ -26,7 +34,7 @@
 
 ## SKILLS v1.6.0
 - ✅ Completed: Daily Skills Review
-  - Updated API skills for `core` (Signals, Spring, Series, Validation)
+  - Updated API skills for `core` (Signals, Animation), Spring, Series, Validation)
   - Updated API skills for `renderer` (Diagnostics, Options, Recursive Sync)
   - Updated API skills for `player` (Standard Media API, Captions via Track, Attributes)
   - Updated `studio` skill (Props Editor, Assets, CLI)

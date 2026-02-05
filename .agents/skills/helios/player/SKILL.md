@@ -50,6 +50,10 @@ The `<helios-player>` Web Component allows you to embed and control Helios compo
 | `disablepictureinpicture` | boolean | Disable the Picture-in-Picture button |
 | `canvas-selector`| string | CSS selector for the canvas element (default: 'canvas') |
 | `sandbox` | string | Iframe sandbox flags (default: 'allow-scripts allow-same-origin') |
+| `media-title` | string | Media Metadata: Title |
+| `media-artist` | string | Media Metadata: Artist |
+| `media-album` | string | Media Metadata: Album |
+| `media-artwork` | string | Media Metadata: Artwork URL |
 
 ### CSS Variables (Theming)
 
@@ -77,13 +81,15 @@ const player = document.querySelector('helios-player');
 player.play();
 player.pause();
 player.load();
-player.requestPictureInPicture(); // Enter PiP mode
+player.requestPictureInPicture().then(pipWindow => { ... }); // Returns Promise<PictureInPictureWindow>
 player.currentTime = 5.0; // Seek to 5 seconds
 player.currentFrame = 150; // Seek to frame 150
 
 // Audio Control
 player.volume = 0.5; // 0.0 to 1.0
 player.muted = true;
+player.startAudioMetering(); // Start emitting 'audiometering' events
+player.stopAudioMetering();
 
 // Writable Properties
 console.log(player.duration);     // Total duration in seconds
@@ -115,6 +121,9 @@ const track = player.addTextTrack("captions", "English", "en");
 track.addEventListener("cuechange", () => {
   console.log("Active Cues:", track.activeCues);
 });
+
+// Schema
+const schema = await player.getSchema(); // Get the JSON schema defined in composition
 ```
 
 #### Events
@@ -125,6 +134,8 @@ The player dispatches standard media events:
 - `volumechange`
 - `durationchange`, `ratechange`
 - `error`
+- `enterpictureinpicture`, `leavepictureinpicture`
+- `audiometering` (custom event containing AudioLevels)
 
 #### Advanced Control
 For low-level access to the Helios state, use `getController()`.
