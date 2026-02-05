@@ -5,6 +5,8 @@ description: "Programmatic video export in the browser."
 
 # Client-Side Export API
 
+**Note**: For most use cases using `<helios-player>`, you can use the built-in `player.export()` method. See [Player API](/api/player#programmatic-export). This guide describes using the underlying `ClientSideExporter` class for advanced custom integrations.
+
 This example demonstrates how to build a custom export workflow using the `ClientSideExporter` class, bypassing the default `<helios-player>` UI. This is ideal for building custom creative tools or "Studio-like" interfaces.
 
 ## Architecture
