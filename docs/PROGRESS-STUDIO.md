@@ -1,3 +1,6 @@
+## STUDIO v0.97.1
+- ✅ Verified: Build & Tests - Verified studio build process and unit tests after ensuring dependencies (core, renderer, player) are built, confirming system integrity.
+
 ## STUDIO v0.97.0
 - ✅ Completed: Draggable Time Markers - Implemented dragging for time-based input prop markers on the Timeline, allowing direct manipulation of prop values.
 
