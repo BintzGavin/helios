@@ -1,3 +1,6 @@
+## STUDIO v0.94.2
+- ✅ Verified: Stacked Timeline - Verified implementation of multi-lane stacked timeline with existing unit tests `Timeline.test.tsx`.
+
 ## STUDIO v0.94.1
 - ✅ Verified: Render Presets - Added unit tests for RenderConfig and StudioContext persistence, ensuring robustness.
 

@@ -44,7 +44,7 @@ Options:
 
 -   **Sidebar**: Navigation tabs (Compositions, Assets, Components, Captions, Audio, Renders).
 -   **Stage**: Main preview area containing `<helios-player>`.
--   **Timeline**: Track-based timeline for scrubbing and editing.
+-   **Timeline**: Track-based timeline for scrubbing and editing (Stacked Audio Tracks).
 -   **PropsEditor**: Form for editing composition input props (`HeliosSchema`).
 -   **RendersPanel**: Configures and manages render jobs.
     -   **RenderConfig**: Settings for Mode, Bitrate, Codec, Concurrency (with Presets).
