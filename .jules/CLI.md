@@ -37,3 +37,11 @@ Critical learnings only. This is not a log—only add entries for insights that 
 ## [0.9.0] - Phantom Implementation
 **Learning:** System memory stated that `helios render` supported `--concurrency` via `RenderOrchestrator`, but the code (`render.ts`) showed it only used the basic `Renderer` class. Documentation and Memory can drift from Code Reality.
 **Action:** Trust Code over Memory. Always verify the existence of a feature in `src/` before assuming it is implemented, even if status files claim it exists.
+
+## [0.9.1] - Render Concurrency Reality
+**Learning:** Contrary to the [0.9.0] entry, `helios render` DOES support `--concurrency` and uses `RenderOrchestrator`. The previous observation was incorrect or outdated.
+**Action:** Double-check imports when verifying code. `render.ts` correctly delegates to `RenderOrchestrator`.
+
+## [0.9.1] - Registry Tracking Gap
+**Learning:** `helios add` installs components but does not record them in `helios.config.json` or any lockfile. This prevents inventory management (`list --installed`) and future updates (`helios update`).
+**Action:** When designing package managers or registries, always include a mechanism to track installed assets (like `components.json` or `package.json` deps) to enable lifecycle management.
