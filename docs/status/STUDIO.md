@@ -1,4 +1,4 @@
-**Version**: 0.94.2
+**Version**: 0.94.3
 
 **Posture**: ACTIVELY EXPANDING FOR V2
 
@@ -9,6 +9,7 @@
 **Focus**: UI Implementation & CLI
 
 ## Recent Updates
+- [v0.94.3] ✅ Fixed: Concurrency Input - Fixed concurrency input validation in Render Config, ensuring values are clamped between 1 and 32.
 - [v0.94.2] ✅ Verified: Stacked Timeline - Verified implementation of multi-lane stacked timeline with existing unit tests `Timeline.test.tsx`.
 - [v0.94.1] ✅ Verified: Render Presets - Added unit tests for RenderConfig and StudioContext persistence, ensuring robustness.
 - [v0.94.0] ✅ Completed: Render Presets - Implemented render configuration presets (Draft, HD, 4K) and persistence for render settings.

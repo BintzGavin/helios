@@ -1,3 +1,6 @@
+## STUDIO v0.94.3
+- ✅ Fixed: Concurrency Input - Fixed concurrency input validation in Render Config, ensuring values are clamped between 1 and 32.
+
 ## STUDIO v0.94.2
 - ✅ Verified: Stacked Timeline - Verified implementation of multi-lane stacked timeline with existing unit tests `Timeline.test.tsx`.
 

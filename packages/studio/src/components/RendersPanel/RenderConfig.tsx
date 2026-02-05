@@ -129,7 +129,11 @@ export const RenderConfig: React.FC<RenderConfigProps> = ({ config, onChange }) 
           min="1"
           max="32"
           value={config.concurrency || 1}
-          onChange={(e) => handleChange('concurrency', parseInt(e.target.value) || 1)}
+          onChange={(e) => {
+            let val = parseInt(e.target.value) || 1;
+            val = Math.max(1, Math.min(32, val));
+            handleChange('concurrency', val);
+          }}
           style={inputStyle}
         />
       </div>
