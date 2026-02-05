@@ -1,3 +1,6 @@
+## STUDIO v0.95.2
+- ✅ Completed: Audio Metering - Implemented Master Audio Meter in the Mixer Panel header using `AudioMeter` component and real-time controller events.
+
 ## STUDIO v0.95.1
 - ✅ Verified: Stage Tests - Implemented unit tests for `Stage` component, covering rendering, interactions (Zoom/Pan), and HMR state preservation.
 

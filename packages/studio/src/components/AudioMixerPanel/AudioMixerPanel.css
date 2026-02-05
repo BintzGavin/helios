@@ -18,6 +18,9 @@
   margin: 0;
   font-size: 1rem;
   font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .mixer-refresh-btn {
@@ -166,4 +169,33 @@
   width: 28px;
   text-align: right;
   font-variant-numeric: tabular-nums;
+}
+
+/* Audio Meter Styles */
+.audio-meter-container {
+  display: flex;
+  gap: 2px;
+  height: 16px;
+  width: 12px;
+  margin-left: 8px;
+  background: #000;
+  padding: 1px;
+  border-radius: 2px;
+}
+
+.meter-channel {
+  flex: 1;
+  background: #111;
+  position: relative;
+  display: flex;
+  flex-direction: column-reverse; /* Grow from bottom */
+  border-radius: 1px;
+  overflow: hidden;
+}
+
+.meter-bar {
+  width: 100%;
+  background: #4caf50;
+  transition: height 0.05s linear, background-color 0.1s;
+  height: 0%;
 }
