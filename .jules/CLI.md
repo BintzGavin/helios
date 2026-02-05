@@ -33,3 +33,7 @@ Critical learnings only. This is not a log—only add entries for insights that 
 ## [0.8.0] - Studio Config Blocking
 **Learning:** `helios studio` was configured with `configFile: false`, preventing it from loading user-defined `vite.config.ts`. This implicitly blocked support for frameworks requiring plugins (Vue, Svelte) despite the CLI being intended as framework-agnostic.
 **Action:** Ensure `helios studio` (and similar host commands) explicitly allows user configuration to support the diverse ecosystem of V2.
+
+## [0.9.0] - Phantom Implementation
+**Learning:** System memory stated that `helios render` supported `--concurrency` via `RenderOrchestrator`, but the code (`render.ts`) showed it only used the basic `Renderer` class. Documentation and Memory can drift from Code Reality.
+**Action:** Trust Code over Memory. Always verify the existence of a feature in `src/` before assuming it is implemented, even if status files claim it exists.
