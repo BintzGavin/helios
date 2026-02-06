@@ -67,14 +67,19 @@ describe('HeliosPlayer', () => {
         seek: vi.fn(),
         subscribe: vi.fn().mockReturnValue(() => {}),
         onError: vi.fn().mockReturnValue(() => {}),
-        dispose: vi.fn(), setCaptions: vi.fn(),
+        dispose: vi.fn(),
+        setCaptions: vi.fn(),
         setPlaybackRate: vi.fn(),
-        setAudioVolume: vi.fn(), startAudioMetering: vi.fn(), stopAudioMetering: vi.fn(), onAudioMetering: vi.fn().mockReturnValue(() => {}), diagnose: vi.fn(),
+        setAudioVolume: vi.fn(),
+        startAudioMetering: vi.fn(),
+        stopAudioMetering: vi.fn(),
+        onAudioMetering: vi.fn().mockReturnValue(() => {}),
+        diagnose: vi.fn(),
         setAudioMuted: vi.fn(),
         setInputProps: vi.fn(),
         setLoop: vi.fn(),
         setPlaybackRange: vi.fn(),
-        clearPlaybackRange: vi.fn(), startAudioMetering: vi.fn(), stopAudioMetering: vi.fn(), onAudioMetering: vi.fn().mockReturnValue(() => {}), diagnose: vi.fn()
+        clearPlaybackRange: vi.fn()
     };
 
     // Inject controller (using private access workaround)
@@ -113,14 +118,19 @@ describe('HeliosPlayer', () => {
         seek: vi.fn(),
         subscribe: vi.fn().mockReturnValue(() => {}),
         onError: vi.fn().mockReturnValue(() => {}),
-        dispose: vi.fn(), setCaptions: vi.fn(),
+        dispose: vi.fn(),
+        setCaptions: vi.fn(),
         setPlaybackRate: vi.fn(),
-        setAudioVolume: vi.fn(), startAudioMetering: vi.fn(), stopAudioMetering: vi.fn(), onAudioMetering: vi.fn().mockReturnValue(() => {}), diagnose: vi.fn(),
+        setAudioVolume: vi.fn(),
+        startAudioMetering: vi.fn(),
+        stopAudioMetering: vi.fn(),
+        onAudioMetering: vi.fn().mockReturnValue(() => {}),
+        diagnose: vi.fn(),
         setAudioMuted: vi.fn(),
         setInputProps: vi.fn(),
         setLoop: vi.fn(),
         setPlaybackRange: vi.fn(),
-        clearPlaybackRange: vi.fn(), startAudioMetering: vi.fn(), stopAudioMetering: vi.fn(), onAudioMetering: vi.fn().mockReturnValue(() => {}), diagnose: vi.fn()
+        clearPlaybackRange: vi.fn()
     };
 
     // Inject controller (using private access workaround)
@@ -203,11 +213,16 @@ describe('HeliosPlayer', () => {
         seek: vi.fn(),
         subscribe: vi.fn().mockReturnValue(() => {}),
         onError: vi.fn().mockReturnValue(() => {}),
-        dispose: vi.fn(), setCaptions: vi.fn(),
+        dispose: vi.fn(),
+        setCaptions: vi.fn(),
         setPlaybackRate: vi.fn(),
         setPlaybackRange: vi.fn(),
-        clearPlaybackRange: vi.fn(), startAudioMetering: vi.fn(), stopAudioMetering: vi.fn(), onAudioMetering: vi.fn().mockReturnValue(() => {}), diagnose: vi.fn(),
-        setAudioVolume: vi.fn(), startAudioMetering: vi.fn(), stopAudioMetering: vi.fn(), onAudioMetering: vi.fn().mockReturnValue(() => {}), diagnose: vi.fn(),
+        clearPlaybackRange: vi.fn(),
+        startAudioMetering: vi.fn(),
+        stopAudioMetering: vi.fn(),
+        onAudioMetering: vi.fn().mockReturnValue(() => {}),
+        diagnose: vi.fn(),
+        setAudioVolume: vi.fn(),
         setAudioMuted: vi.fn(),
         setInputProps: vi.fn(),
         setLoop: vi.fn()
@@ -275,14 +290,19 @@ describe('HeliosPlayer', () => {
         seek: vi.fn(),
         subscribe: vi.fn().mockReturnValue(() => {}),
         onError: vi.fn().mockReturnValue(() => {}),
-        dispose: vi.fn(), setCaptions: vi.fn(),
+        dispose: vi.fn(),
+        setCaptions: vi.fn(),
         setPlaybackRate: vi.fn(),
-        setAudioVolume: vi.fn(), startAudioMetering: vi.fn(), stopAudioMetering: vi.fn(), onAudioMetering: vi.fn().mockReturnValue(() => {}), diagnose: vi.fn(),
+        setAudioVolume: vi.fn(),
+        startAudioMetering: vi.fn(),
+        stopAudioMetering: vi.fn(),
+        onAudioMetering: vi.fn().mockReturnValue(() => {}),
+        diagnose: vi.fn(),
         setAudioMuted: vi.fn(),
         setInputProps: vi.fn(),
         setLoop: vi.fn(),
         setPlaybackRange: vi.fn(),
-        clearPlaybackRange: vi.fn(), startAudioMetering: vi.fn(), stopAudioMetering: vi.fn(), onAudioMetering: vi.fn().mockReturnValue(() => {}), diagnose: vi.fn()
+        clearPlaybackRange: vi.fn()
     };
     (player as any).setController(mockController);
 
@@ -354,14 +374,19 @@ describe('HeliosPlayer', () => {
       seek: vi.fn(),
       subscribe: vi.fn().mockReturnValue(() => {}),
       onError: vi.fn().mockReturnValue(() => {}),
-      dispose: vi.fn(), setCaptions: vi.fn(),
+      dispose: vi.fn(),
+      setCaptions: vi.fn(),
       setPlaybackRate: vi.fn(),
-      setAudioVolume: vi.fn(), startAudioMetering: vi.fn(), stopAudioMetering: vi.fn(), onAudioMetering: vi.fn().mockReturnValue(() => {}), diagnose: vi.fn(),
+      setAudioVolume: vi.fn(),
+      startAudioMetering: vi.fn(),
+      stopAudioMetering: vi.fn(),
+      onAudioMetering: vi.fn().mockReturnValue(() => {}),
+      diagnose: vi.fn(),
       setAudioMuted: vi.fn(),
       setInputProps: vi.fn(),
       setLoop: vi.fn(),
       setPlaybackRange: vi.fn(),
-      clearPlaybackRange: vi.fn(), startAudioMetering: vi.fn(), stopAudioMetering: vi.fn(), onAudioMetering: vi.fn().mockReturnValue(() => {}), diagnose: vi.fn()
+      clearPlaybackRange: vi.fn()
     };
     (player as any).setController(mockController);
 
@@ -407,14 +432,19 @@ describe('HeliosPlayer', () => {
             seek: vi.fn(),
             subscribe: vi.fn().mockReturnValue(() => {}),
             onError: vi.fn().mockReturnValue(() => {}),
-            dispose: vi.fn(), setCaptions: vi.fn(),
+            dispose: vi.fn(),
+            setCaptions: vi.fn(),
             setPlaybackRate: vi.fn(),
-            setAudioVolume: vi.fn(), startAudioMetering: vi.fn(), stopAudioMetering: vi.fn(), onAudioMetering: vi.fn().mockReturnValue(() => {}), diagnose: vi.fn(),
+            setAudioVolume: vi.fn(),
+            startAudioMetering: vi.fn(),
+            stopAudioMetering: vi.fn(),
+            onAudioMetering: vi.fn().mockReturnValue(() => {}),
+            diagnose: vi.fn(),
             setAudioMuted: vi.fn(),
             setInputProps: vi.fn(),
             setLoop: vi.fn(),
             setPlaybackRange: vi.fn(),
-            clearPlaybackRange: vi.fn(), startAudioMetering: vi.fn(), stopAudioMetering: vi.fn(), onAudioMetering: vi.fn().mockReturnValue(() => {}), diagnose: vi.fn()
+            clearPlaybackRange: vi.fn()
         };
         (player as any).setController(mockController);
     });
@@ -530,14 +560,19 @@ describe('HeliosPlayer', () => {
             seek: vi.fn(),
             subscribe: vi.fn().mockReturnValue(() => {}),
             onError: vi.fn().mockReturnValue(() => {}),
-            dispose: vi.fn(), setCaptions: vi.fn(),
+            dispose: vi.fn(),
+            setCaptions: vi.fn(),
             setPlaybackRate: vi.fn(),
             setInputProps: vi.fn(),
-        setAudioMuted: vi.fn(),
-        setAudioVolume: vi.fn(), startAudioMetering: vi.fn(), stopAudioMetering: vi.fn(), onAudioMetering: vi.fn().mockReturnValue(() => {}), diagnose: vi.fn(),
-        setLoop: vi.fn(),
-        setPlaybackRange: vi.fn(),
-        clearPlaybackRange: vi.fn(), startAudioMetering: vi.fn(), stopAudioMetering: vi.fn(), onAudioMetering: vi.fn().mockReturnValue(() => {}), diagnose: vi.fn()
+            setAudioMuted: vi.fn(),
+            setAudioVolume: vi.fn(),
+            startAudioMetering: vi.fn(),
+            stopAudioMetering: vi.fn(),
+            onAudioMetering: vi.fn().mockReturnValue(() => {}),
+            diagnose: vi.fn(),
+            setLoop: vi.fn(),
+            setPlaybackRange: vi.fn(),
+            clearPlaybackRange: vi.fn()
         };
         (player as any).setController(mockController);
     });
@@ -622,14 +657,19 @@ describe('HeliosPlayer', () => {
         seek: vi.fn(),
         subscribe: vi.fn().mockReturnValue(() => {}),
         onError: vi.fn().mockReturnValue(() => {}),
-        dispose: vi.fn(), setCaptions: vi.fn(),
+        dispose: vi.fn(),
+        setCaptions: vi.fn(),
         setPlaybackRate: vi.fn(),
-        setAudioVolume: vi.fn(), startAudioMetering: vi.fn(), stopAudioMetering: vi.fn(), onAudioMetering: vi.fn().mockReturnValue(() => {}), diagnose: vi.fn(),
+        setAudioVolume: vi.fn(),
+        startAudioMetering: vi.fn(),
+        stopAudioMetering: vi.fn(),
+        onAudioMetering: vi.fn().mockReturnValue(() => {}),
+        diagnose: vi.fn(),
         setAudioMuted: vi.fn(),
         setInputProps: vi.fn(),
         setLoop: vi.fn(),
         setPlaybackRange: vi.fn(),
-        clearPlaybackRange: vi.fn(), startAudioMetering: vi.fn(), stopAudioMetering: vi.fn(), onAudioMetering: vi.fn().mockReturnValue(() => {}), diagnose: vi.fn()
+        clearPlaybackRange: vi.fn()
       };
       (player as any).setController(mockController);
 
@@ -656,14 +696,19 @@ describe('HeliosPlayer', () => {
         seek: vi.fn(),
         subscribe: vi.fn().mockReturnValue(() => {}),
         onError: vi.fn().mockReturnValue(() => {}),
-        dispose: vi.fn(), setCaptions: vi.fn(),
+        dispose: vi.fn(),
+        setCaptions: vi.fn(),
         setPlaybackRate: vi.fn(),
-        setAudioVolume: vi.fn(), startAudioMetering: vi.fn(), stopAudioMetering: vi.fn(), onAudioMetering: vi.fn().mockReturnValue(() => {}), diagnose: vi.fn(),
+        setAudioVolume: vi.fn(),
+        startAudioMetering: vi.fn(),
+        stopAudioMetering: vi.fn(),
+        onAudioMetering: vi.fn().mockReturnValue(() => {}),
+        diagnose: vi.fn(),
         setAudioMuted: vi.fn(),
         setInputProps: vi.fn(),
         setLoop: vi.fn(),
         setPlaybackRange: vi.fn(),
-        clearPlaybackRange: vi.fn(), startAudioMetering: vi.fn(), stopAudioMetering: vi.fn(), onAudioMetering: vi.fn().mockReturnValue(() => {}), diagnose: vi.fn()
+        clearPlaybackRange: vi.fn()
       };
       (player as any).setController(mockController);
 
@@ -691,14 +736,19 @@ describe('HeliosPlayer', () => {
             seek: vi.fn(),
             subscribe: vi.fn().mockReturnValue(() => {}),
             onError: vi.fn().mockReturnValue(() => {}),
-            dispose: vi.fn(), setCaptions: vi.fn(),
+            dispose: vi.fn(),
+            setCaptions: vi.fn(),
             setPlaybackRate: vi.fn(),
-            setAudioVolume: vi.fn(), startAudioMetering: vi.fn(), stopAudioMetering: vi.fn(), onAudioMetering: vi.fn().mockReturnValue(() => {}), diagnose: vi.fn(),
+            setAudioVolume: vi.fn(),
+            startAudioMetering: vi.fn(),
+            stopAudioMetering: vi.fn(),
+            onAudioMetering: vi.fn().mockReturnValue(() => {}),
+            diagnose: vi.fn(),
             setAudioMuted: vi.fn(),
             setInputProps: vi.fn(),
             setLoop: vi.fn(),
             setPlaybackRange: vi.fn(),
-            clearPlaybackRange: vi.fn(), startAudioMetering: vi.fn(), stopAudioMetering: vi.fn(), onAudioMetering: vi.fn().mockReturnValue(() => {}), diagnose: vi.fn()
+            clearPlaybackRange: vi.fn()
         };
         (player as any).setController(mockController);
 
@@ -709,8 +759,16 @@ describe('HeliosPlayer', () => {
           return { export: mockExport };
         });
 
-        // Trigger export via private method to await it
-        await (player as any).renderClientSide();
+        // Trigger export via UI
+        const exportBtn = player.shadowRoot!.querySelector('.export-btn') as HTMLButtonElement;
+        exportBtn.disabled = false; // Enable button as we bypassed connection logic
+        exportBtn.click(); // Opens menu
+
+        const actionBtn = player.shadowRoot!.querySelector('.export-action-btn') as HTMLButtonElement;
+        actionBtn.click(); // Triggers export
+
+        // Wait for async operations
+        await new Promise(resolve => setTimeout(resolve, 0));
 
         // Verify Status Overlay
         const overlay = player.shadowRoot!.querySelector('.status-overlay') as HTMLElement;
@@ -735,14 +793,19 @@ describe('HeliosPlayer', () => {
             seek: vi.fn(),
             subscribe: vi.fn().mockReturnValue(() => {}),
             onError: vi.fn().mockReturnValue(() => {}),
-            dispose: vi.fn(), setCaptions: vi.fn(),
+            dispose: vi.fn(),
+            setCaptions: vi.fn(),
             setPlaybackRate: vi.fn(),
-            setAudioVolume: vi.fn(), startAudioMetering: vi.fn(), stopAudioMetering: vi.fn(), onAudioMetering: vi.fn().mockReturnValue(() => {}), diagnose: vi.fn(),
+            setAudioVolume: vi.fn(),
+            startAudioMetering: vi.fn(),
+            stopAudioMetering: vi.fn(),
+            onAudioMetering: vi.fn().mockReturnValue(() => {}),
+            diagnose: vi.fn(),
             setAudioMuted: vi.fn(),
             setInputProps: vi.fn(),
             setLoop: vi.fn(),
             setPlaybackRange: vi.fn(),
-            clearPlaybackRange: vi.fn(), startAudioMetering: vi.fn(), stopAudioMetering: vi.fn(), onAudioMetering: vi.fn().mockReturnValue(() => {}), diagnose: vi.fn()
+            clearPlaybackRange: vi.fn()
         };
         (player as any).setController(mockController);
 
@@ -757,8 +820,16 @@ describe('HeliosPlayer', () => {
         const overlay = player.shadowRoot!.querySelector('.status-overlay') as HTMLElement;
         overlay.classList.add('hidden');
 
-        // Trigger export
-        await (player as any).renderClientSide();
+        // Trigger export via UI
+        const exportBtn = player.shadowRoot!.querySelector('.export-btn') as HTMLButtonElement;
+        exportBtn.disabled = false; // Enable button as we bypassed connection logic
+        exportBtn.click(); // Opens menu
+
+        const actionBtn = player.shadowRoot!.querySelector('.export-action-btn') as HTMLButtonElement;
+        actionBtn.click(); // Triggers export
+
+        // Wait for async operations
+        await new Promise(resolve => setTimeout(resolve, 0));
 
         // Should still be hidden (or at least not showing failure)
         expect(overlay.classList.contains('hidden')).toBe(true);
@@ -776,13 +847,18 @@ describe('HeliosPlayer', () => {
             seek: vi.fn(),
             subscribe: vi.fn().mockReturnValue(() => {}),
             onError: vi.fn().mockReturnValue(() => {}),
-            dispose: vi.fn(), setCaptions: vi.fn(),
+            dispose: vi.fn(),
+            setCaptions: vi.fn(),
             setPlaybackRate: vi.fn(),
-            setAudioVolume: vi.fn(), startAudioMetering: vi.fn(), stopAudioMetering: vi.fn(), onAudioMetering: vi.fn().mockReturnValue(() => {}), diagnose: vi.fn(),
+            setAudioVolume: vi.fn(),
+            startAudioMetering: vi.fn(),
+            stopAudioMetering: vi.fn(),
+            onAudioMetering: vi.fn().mockReturnValue(() => {}),
+            diagnose: vi.fn(),
             setAudioMuted: vi.fn(),
             setInputProps: vi.fn(),
             captureFrame: vi.fn(),
-            getAudioTracks: vi.fn(), startAudioMetering: vi.fn(), stopAudioMetering: vi.fn(), onAudioMetering: vi.fn().mockReturnValue(() => {}), diagnose: vi.fn(), startAudioMetering: vi.fn(), stopAudioMetering: vi.fn(), onAudioMetering: vi.fn().mockReturnValue(() => {}), diagnose: vi.fn()
+            getAudioTracks: vi.fn()
         };
         (player as any).setController(mockController);
     });
@@ -868,15 +944,20 @@ describe('HeliosPlayer', () => {
             play: vi.fn(),
             pause: vi.fn(),
             seek: vi.fn(),
-            setAudioVolume: vi.fn(), startAudioMetering: vi.fn(), stopAudioMetering: vi.fn(), onAudioMetering: vi.fn().mockReturnValue(() => {}), diagnose: vi.fn(),
+            setAudioVolume: vi.fn(),
+            startAudioMetering: vi.fn(),
+            stopAudioMetering: vi.fn(),
+            onAudioMetering: vi.fn().mockReturnValue(() => {}),
+            diagnose: vi.fn(),
             setAudioMuted: vi.fn(),
             setPlaybackRate: vi.fn(),
             subscribe: vi.fn().mockReturnValue(() => {}),
             onError: vi.fn().mockReturnValue(() => {}),
-            dispose: vi.fn(), setCaptions: vi.fn(),
+            dispose: vi.fn(),
+            setCaptions: vi.fn(),
             setInputProps: vi.fn(),
             captureFrame: vi.fn(),
-            getAudioTracks: vi.fn(), startAudioMetering: vi.fn(), stopAudioMetering: vi.fn(), onAudioMetering: vi.fn().mockReturnValue(() => {}), diagnose: vi.fn(), startAudioMetering: vi.fn(), stopAudioMetering: vi.fn(), onAudioMetering: vi.fn().mockReturnValue(() => {}), diagnose: vi.fn()
+            getAudioTracks: vi.fn()
         };
         (player as any).setController(mockController);
         (player as any).isLoaded = true;
@@ -1050,15 +1131,20 @@ describe('HeliosPlayer', () => {
             play: vi.fn(),
             pause: vi.fn(),
             seek: vi.fn(),
-            setAudioVolume: vi.fn(), startAudioMetering: vi.fn(), stopAudioMetering: vi.fn(), onAudioMetering: vi.fn().mockReturnValue(() => {}), diagnose: vi.fn(),
+            setAudioVolume: vi.fn(),
+            startAudioMetering: vi.fn(),
+            stopAudioMetering: vi.fn(),
+            onAudioMetering: vi.fn().mockReturnValue(() => {}),
+            diagnose: vi.fn(),
             setAudioMuted: vi.fn(),
             setPlaybackRate: vi.fn(),
             subscribe: vi.fn().mockReturnValue(() => {}),
             onError: vi.fn().mockReturnValue(() => {}),
-            dispose: vi.fn(), setCaptions: vi.fn(),
+            dispose: vi.fn(),
+            setCaptions: vi.fn(),
             setInputProps: vi.fn(),
             captureFrame: vi.fn(),
-            getAudioTracks: vi.fn(), startAudioMetering: vi.fn(), stopAudioMetering: vi.fn(), onAudioMetering: vi.fn().mockReturnValue(() => {}), diagnose: vi.fn(), startAudioMetering: vi.fn(), stopAudioMetering: vi.fn(), onAudioMetering: vi.fn().mockReturnValue(() => {}), diagnose: vi.fn()
+            getAudioTracks: vi.fn()
         };
         // Reset player pending props
         player.inputProps = null;
@@ -1120,14 +1206,19 @@ describe('HeliosPlayer', () => {
             seek: vi.fn(),
             subscribe: vi.fn().mockReturnValue(() => {}),
             onError: vi.fn().mockReturnValue(() => {}),
-            dispose: vi.fn(), setCaptions: vi.fn(),
+            dispose: vi.fn(),
+            setCaptions: vi.fn(),
             setPlaybackRate: vi.fn(),
         setInputProps: vi.fn(),
-        setAudioVolume: vi.fn(), startAudioMetering: vi.fn(), stopAudioMetering: vi.fn(), onAudioMetering: vi.fn().mockReturnValue(() => {}), diagnose: vi.fn(),
+        setAudioVolume: vi.fn(),
+        startAudioMetering: vi.fn(),
+        stopAudioMetering: vi.fn(),
+        onAudioMetering: vi.fn().mockReturnValue(() => {}),
+        diagnose: vi.fn(),
         setAudioMuted: vi.fn(),
         setLoop: vi.fn(),
         setPlaybackRange: vi.fn(),
-        clearPlaybackRange: vi.fn(), startAudioMetering: vi.fn(), stopAudioMetering: vi.fn(), onAudioMetering: vi.fn().mockReturnValue(() => {}), diagnose: vi.fn()
+        clearPlaybackRange: vi.fn()
         };
     });
 
@@ -1260,15 +1351,20 @@ describe('HeliosPlayer', () => {
             play: vi.fn(),
             pause: vi.fn(),
             seek: vi.fn(),
-            setAudioVolume: vi.fn(), startAudioMetering: vi.fn(), stopAudioMetering: vi.fn(), onAudioMetering: vi.fn().mockReturnValue(() => {}), diagnose: vi.fn(),
+            setAudioVolume: vi.fn(),
+            startAudioMetering: vi.fn(),
+            stopAudioMetering: vi.fn(),
+            onAudioMetering: vi.fn().mockReturnValue(() => {}),
+            diagnose: vi.fn(),
             setAudioMuted: vi.fn(),
             setPlaybackRate: vi.fn(),
             subscribe: vi.fn().mockReturnValue(() => {}),
             onError: vi.fn().mockReturnValue(() => {}),
-            dispose: vi.fn(), setCaptions: vi.fn(),
+            dispose: vi.fn(),
+            setCaptions: vi.fn(),
             setInputProps: vi.fn(),
             captureFrame: vi.fn(),
-            getAudioTracks: vi.fn(), startAudioMetering: vi.fn(), stopAudioMetering: vi.fn(), onAudioMetering: vi.fn().mockReturnValue(() => {}), diagnose: vi.fn(), startAudioMetering: vi.fn(), stopAudioMetering: vi.fn(), onAudioMetering: vi.fn().mockReturnValue(() => {}), diagnose: vi.fn()
+            getAudioTracks: vi.fn()
         };
     });
 
@@ -1309,16 +1405,21 @@ describe('HeliosPlayer', () => {
             seek: vi.fn(),
             subscribe: vi.fn().mockReturnValue(() => {}),
             onError: vi.fn().mockReturnValue(() => {}),
-            dispose: vi.fn(), setCaptions: vi.fn(),
+            dispose: vi.fn(),
+            setCaptions: vi.fn(),
             setPlaybackRate: vi.fn(),
-            setAudioVolume: vi.fn(), startAudioMetering: vi.fn(), stopAudioMetering: vi.fn(), onAudioMetering: vi.fn().mockReturnValue(() => {}), diagnose: vi.fn(),
+            setAudioVolume: vi.fn(),
+            startAudioMetering: vi.fn(),
+            stopAudioMetering: vi.fn(),
+            onAudioMetering: vi.fn().mockReturnValue(() => {}),
+            diagnose: vi.fn(),
             setAudioMuted: vi.fn(),
             setInputProps: vi.fn(),
             setLoop: vi.fn(),
             setPlaybackRange: vi.fn(),
-            clearPlaybackRange: vi.fn(), startAudioMetering: vi.fn(), stopAudioMetering: vi.fn(), onAudioMetering: vi.fn().mockReturnValue(() => {}), diagnose: vi.fn(),
+            clearPlaybackRange: vi.fn(),
             captureFrame: vi.fn(),
-            getAudioTracks: vi.fn(), startAudioMetering: vi.fn(), stopAudioMetering: vi.fn(), onAudioMetering: vi.fn().mockReturnValue(() => {}), diagnose: vi.fn(), startAudioMetering: vi.fn(), stopAudioMetering: vi.fn(), onAudioMetering: vi.fn().mockReturnValue(() => {}), diagnose: vi.fn()
+            getAudioTracks: vi.fn()
         };
         (player as any).setController(mockController);
     });
@@ -1349,7 +1450,7 @@ describe('HeliosPlayer', () => {
         });
 
         // Trigger export
-        await (player as any).renderClientSide();
+        await (player as any).export();
 
         // Expect saveCaptionsAsSRT to be called with "my-movie.srt"
         expect(saveCaptionsSpy).toHaveBeenCalledWith(expect.anything(), 'my-movie.srt');
@@ -1374,7 +1475,7 @@ describe('HeliosPlayer', () => {
           };
         });
 
-        await (player as any).renderClientSide();
+        await (player as any).export();
 
         expect(saveCaptionsSpy).toHaveBeenCalledWith(expect.anything(), 'video.srt');
     });
@@ -1391,14 +1492,19 @@ describe('HeliosPlayer', () => {
             seek: vi.fn(),
             subscribe: vi.fn().mockReturnValue(() => {}),
             onError: vi.fn().mockReturnValue(() => {}),
-            dispose: vi.fn(), setCaptions: vi.fn(),
+            dispose: vi.fn(),
+            setCaptions: vi.fn(),
             setPlaybackRate: vi.fn(),
             setInputProps: vi.fn(),
             setAudioMuted: vi.fn(),
-            setAudioVolume: vi.fn(), startAudioMetering: vi.fn(), stopAudioMetering: vi.fn(), onAudioMetering: vi.fn().mockReturnValue(() => {}), diagnose: vi.fn(),
+            setAudioVolume: vi.fn(),
+            startAudioMetering: vi.fn(),
+            stopAudioMetering: vi.fn(),
+            onAudioMetering: vi.fn().mockReturnValue(() => {}),
+            diagnose: vi.fn(),
             setLoop: vi.fn(),
             setPlaybackRange: vi.fn(),
-            clearPlaybackRange: vi.fn(), startAudioMetering: vi.fn(), stopAudioMetering: vi.fn(), onAudioMetering: vi.fn().mockReturnValue(() => {}), diagnose: vi.fn()
+            clearPlaybackRange: vi.fn()
         };
     });
 
@@ -1537,14 +1643,19 @@ describe('HeliosPlayer', () => {
             seek: vi.fn(),
             subscribe: vi.fn().mockReturnValue(() => {}),
             onError: vi.fn().mockReturnValue(() => {}),
-            dispose: vi.fn(), setCaptions: vi.fn(),
+            dispose: vi.fn(),
+            setCaptions: vi.fn(),
             setPlaybackRate: vi.fn(),
             setInputProps: vi.fn(),
             setAudioMuted: vi.fn(),
-            setAudioVolume: vi.fn(), startAudioMetering: vi.fn(), stopAudioMetering: vi.fn(), onAudioMetering: vi.fn().mockReturnValue(() => {}), diagnose: vi.fn(),
+            setAudioVolume: vi.fn(),
+            startAudioMetering: vi.fn(),
+            stopAudioMetering: vi.fn(),
+            onAudioMetering: vi.fn().mockReturnValue(() => {}),
+            diagnose: vi.fn(),
             setLoop: vi.fn(),
             setPlaybackRange: vi.fn(),
-            clearPlaybackRange: vi.fn(), startAudioMetering: vi.fn(), stopAudioMetering: vi.fn(), onAudioMetering: vi.fn().mockReturnValue(() => {}), diagnose: vi.fn()
+            clearPlaybackRange: vi.fn()
         };
         (player as any).setController(mockController);
     });
@@ -1615,14 +1726,19 @@ describe('HeliosPlayer', () => {
             seek: vi.fn(),
             subscribe: vi.fn().mockReturnValue(() => {}),
             onError: vi.fn().mockReturnValue(() => {}),
-            dispose: vi.fn(), setCaptions: vi.fn(),
+            dispose: vi.fn(),
+            setCaptions: vi.fn(),
             setPlaybackRate: vi.fn(),
             setInputProps: vi.fn(),
             setAudioMuted: vi.fn(),
-            setAudioVolume: vi.fn(), startAudioMetering: vi.fn(), stopAudioMetering: vi.fn(), onAudioMetering: vi.fn().mockReturnValue(() => {}), diagnose: vi.fn(),
+            setAudioVolume: vi.fn(),
+            startAudioMetering: vi.fn(),
+            stopAudioMetering: vi.fn(),
+            onAudioMetering: vi.fn().mockReturnValue(() => {}),
+            diagnose: vi.fn(),
             setLoop: vi.fn(),
             setPlaybackRange: vi.fn(),
-            clearPlaybackRange: vi.fn(), startAudioMetering: vi.fn(), stopAudioMetering: vi.fn(), onAudioMetering: vi.fn().mockReturnValue(() => {}), diagnose: vi.fn()
+            clearPlaybackRange: vi.fn()
         };
         (player as any).setController(mockController);
     });
@@ -1739,11 +1855,16 @@ describe('HeliosPlayer', () => {
             seek: vi.fn(),
             subscribe: vi.fn().mockReturnValue(() => {}),
             onError: vi.fn().mockReturnValue(() => {}),
-            dispose: vi.fn(), setCaptions: vi.fn(),
+            dispose: vi.fn(),
+            setCaptions: vi.fn(),
             setPlaybackRate: vi.fn(),
             setInputProps: vi.fn(),
             setAudioMuted: vi.fn(),
-            setAudioVolume: vi.fn(), startAudioMetering: vi.fn(), stopAudioMetering: vi.fn(), onAudioMetering: vi.fn().mockReturnValue(() => {}), diagnose: vi.fn()
+            setAudioVolume: vi.fn(),
+            startAudioMetering: vi.fn(),
+            stopAudioMetering: vi.fn(),
+            onAudioMetering: vi.fn().mockReturnValue(() => {}),
+            diagnose: vi.fn()
         };
     });
 
@@ -1938,13 +2059,18 @@ describe('HeliosPlayer', () => {
             setPlaybackRate: vi.fn(),
             subscribe: vi.fn().mockReturnValue(() => {}),
             onError: vi.fn().mockReturnValue(() => {}),
-            dispose: vi.fn(), setCaptions: vi.fn(),
+            dispose: vi.fn(),
+            setCaptions: vi.fn(),
             setInputProps: vi.fn(),
             setAudioMuted: vi.fn(),
-            setAudioVolume: vi.fn(), startAudioMetering: vi.fn(), stopAudioMetering: vi.fn(), onAudioMetering: vi.fn().mockReturnValue(() => {}), diagnose: vi.fn(),
+            setAudioVolume: vi.fn(),
+            startAudioMetering: vi.fn(),
+            stopAudioMetering: vi.fn(),
+            onAudioMetering: vi.fn().mockReturnValue(() => {}),
+            diagnose: vi.fn(),
             setLoop: vi.fn(),
             setPlaybackRange: vi.fn(),
-            clearPlaybackRange: vi.fn(), startAudioMetering: vi.fn(), stopAudioMetering: vi.fn(), onAudioMetering: vi.fn().mockReturnValue(() => {}), diagnose: vi.fn()
+            clearPlaybackRange: vi.fn()
         };
         (player as any).setController(mockController);
 
@@ -1969,13 +2095,18 @@ describe('HeliosPlayer', () => {
             setPlaybackRate: vi.fn(),
             subscribe: vi.fn().mockReturnValue(() => {}),
             onError: vi.fn().mockReturnValue(() => {}),
-            dispose: vi.fn(), setCaptions: vi.fn(),
+            dispose: vi.fn(),
+            setCaptions: vi.fn(),
             setInputProps: vi.fn(),
             setAudioMuted: vi.fn(),
-            setAudioVolume: vi.fn(), startAudioMetering: vi.fn(), stopAudioMetering: vi.fn(), onAudioMetering: vi.fn().mockReturnValue(() => {}), diagnose: vi.fn(),
+            setAudioVolume: vi.fn(),
+            startAudioMetering: vi.fn(),
+            stopAudioMetering: vi.fn(),
+            onAudioMetering: vi.fn().mockReturnValue(() => {}),
+            diagnose: vi.fn(),
             setLoop: vi.fn(),
             setPlaybackRange: vi.fn(),
-            clearPlaybackRange: vi.fn(), startAudioMetering: vi.fn(), stopAudioMetering: vi.fn(), onAudioMetering: vi.fn().mockReturnValue(() => {}), diagnose: vi.fn()
+            clearPlaybackRange: vi.fn()
         };
         (player as any).setController(mockController);
 
@@ -2003,14 +2134,19 @@ describe('HeliosPlayer', () => {
             seek: vi.fn(),
             subscribe: vi.fn().mockReturnValue(() => {}),
             onError: vi.fn().mockReturnValue(() => {}),
-            dispose: vi.fn(), setCaptions: vi.fn(),
+            dispose: vi.fn(),
+            setCaptions: vi.fn(),
             setPlaybackRate: vi.fn(),
-            setAudioVolume: vi.fn(), startAudioMetering: vi.fn(), stopAudioMetering: vi.fn(), onAudioMetering: vi.fn().mockReturnValue(() => {}), diagnose: vi.fn(),
+            setAudioVolume: vi.fn(),
+            startAudioMetering: vi.fn(),
+            stopAudioMetering: vi.fn(),
+            onAudioMetering: vi.fn().mockReturnValue(() => {}),
+            diagnose: vi.fn(),
             setAudioMuted: vi.fn(),
             setInputProps: vi.fn(),
             setLoop: vi.fn(),
             setPlaybackRange: vi.fn(),
-            clearPlaybackRange: vi.fn(), startAudioMetering: vi.fn(), stopAudioMetering: vi.fn(), onAudioMetering: vi.fn().mockReturnValue(() => {}), diagnose: vi.fn(),
+            clearPlaybackRange: vi.fn(),
             captureFrame: vi.fn(),
             getAudioTracks: vi.fn()
         };
@@ -2044,7 +2180,7 @@ describe('HeliosPlayer', () => {
           return { export: exportSpy };
         });
 
-        await (player as any).renderClientSide();
+        await (player as any).export();
 
         expect(exportSpy).toHaveBeenCalledWith(expect.objectContaining({
             captionStyle: {
@@ -2068,7 +2204,7 @@ describe('HeliosPlayer', () => {
           return { export: exportSpy };
         });
 
-        await (player as any).renderClientSide();
+        await (player as any).export();
 
         expect(exportSpy).toHaveBeenCalledWith(expect.objectContaining({
             captionStyle: {
