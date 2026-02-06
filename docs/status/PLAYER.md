@@ -1,4 +1,4 @@
-**Version**: v0.71.0
+**Version**: v0.72.0
 
 **Posture**: STABLE AND FEATURE COMPLETE
 
@@ -58,7 +58,9 @@
 - Supports Active Cues: Implemented `activeCues` property and `cuechange` event on `HeliosTextTrack` for Standard Media API parity.
 - **Audio Metering**: Supports real-time audio metering via `startAudioMetering()` API and `audiometering` event, enabling visualization of audio levels (stereo/peak) in host applications.
 - **Export API**: Exposes public `export()` method for programmatic control over client-side exports, supporting Video (MP4/WebM) and Snapshot (PNG/JPEG) formats.
+- **Export Menu**: Implements a dedicated Export Menu in the player UI (replacing the direct export button action) to allow configuring format, resolution, filename, and captions before exporting or taking a snapshot.
 
+[v0.72.0] ✅ Completed: Export Menu - Implemented a dedicated Export Menu UI to allow users to configure export options (format, resolution, filename, captions) and take snapshots directly from the player.
 [v0.71.0] ✅ Completed: Synchronize Caption Styling - Implemented responsive caption sizing and configurable styling via CSS variables, ensuring visual parity between player preview and client-side export.
 [v0.70.5] ✅ Completed: Decouple Core - Decoupled `@helios-project/player` from `@helios-project/core` runtime dependency to fix UMD builds and enable drop-in usage.
 [v0.70.4] ✅ Completed: Fix Poster Visibility - Implemented persistent `_hasPlayed` state to ensure poster remains hidden when seeking back to frame 0 after playback.
