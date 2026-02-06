@@ -1,4 +1,4 @@
-import { Helios } from '../../../packages/core/src/index.ts';
+import { Helios } from '@helios-project/core';
 import { Application, Graphics } from 'pixi.js';
 
 async function init() {
