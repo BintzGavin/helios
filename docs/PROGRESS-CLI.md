@@ -2,6 +2,10 @@
 
 This file tracks progress for the CLI domain (`packages/cli`).
 
+## CLI v0.11.2
+
+- ✅ Unify Studio Registry - Updated `helios studio` to use the unified `RegistryClient`, enabling remote registry fetching and consistency with `helios add`.
+
 ## CLI v0.11.1
 
 - ✅ Update Context & Verify - Updated context documentation for list command and re-verified functionality.

@@ -20,10 +20,14 @@ packages/cli/
 │   │   ├── components.ts   # helios components
 │   │   ├── render.ts       # helios render
 │   │   └── merge.ts        # helios merge
+│   ├── registry/
+│   │   ├── client.ts       # Registry client
+│   │   ├── manifest.ts     # Local registry manifest
+│   │   └── types.ts        # Registry types
 │   ├── utils/
 │   │   ├── config.ts       # Configuration management
 │   │   ├── logger.ts       # Logging utilities
-│   │   └── registry.ts     # Registry client
+│   │   └── install.ts      # Component installation logic
 │   └── types/
 │       └── index.ts        # Shared types
 ```
@@ -59,6 +63,6 @@ interface HeliosConfig {
 ```
 
 ## E. Integration
-- **Registry**: `src/utils/registry.ts` fetches components from the remote registry.
-- **Studio**: `helios studio` wraps the Studio dev server.
+- **Registry**: `src/registry/client.ts` fetches components from the remote registry (with local fallback).
+- **Studio**: `helios studio` wraps the Studio dev server and injects the registry via `studioApiPlugin`.
 - **Renderer**: `helios render` invokes `@helios-project/renderer`.
