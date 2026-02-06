@@ -16,6 +16,7 @@ packages/cli/
 │   │   ├── studio.ts       # helios studio
 │   │   ├── init.ts         # helios init
 │   │   ├── add.ts          # helios add
+│   │   ├── update.ts       # helios update
 │   │   ├── remove.ts       # helios remove
 │   │   ├── list.ts         # helios list
 │   │   ├── components.ts   # helios components
@@ -41,6 +42,8 @@ packages/cli/
   - Options: `-y`, `--framework <name>`
 - `helios add [component]`: Adds a component to the project.
   - Options: `--no-install`
+- `helios update [component]`: Updates a component to the latest version.
+  - Options: `-y, --yes` (skip confirmation), `--no-install`
 - `helios remove [component]`: Removes a component from the project configuration and warns about associated files.
 - `helios list`: Lists installed components in the project as defined in `helios.config.json`.
 - `helios components`: Lists available components in the registry.

@@ -2,6 +2,10 @@
 
 This file tracks progress for the CLI domain (`packages/cli`).
 
+## CLI v0.14.0
+
+- ✅ Implement Update Command - Implemented `helios update <component>` to restore or update components from the registry.
+
 ## CLI v0.13.0
 
 - ✅ Implement Remove Command - Implemented `helios remove <component>` to unregister components and warn about associated files.
