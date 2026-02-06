@@ -998,6 +998,24 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
     return new StaticTimeRange(0, this.duration);
   }
 
+  public get width(): number {
+    const val = this.getAttribute("width");
+    return val ? parseInt(val, 10) : 0;
+  }
+
+  public set width(val: number) {
+    this.setAttribute("width", String(val));
+  }
+
+  public get height(): number {
+    const val = this.getAttribute("height");
+    return val ? parseInt(val, 10) : 0;
+  }
+
+  public set height(val: number) {
+    this.setAttribute("height", String(val));
+  }
+
   public get videoWidth(): number {
     if (this.controller) {
       const state = this.controller.getState();
@@ -1012,6 +1030,22 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
       if (state.height) return state.height;
     }
     return parseFloat(this.getAttribute("height") || "0");
+  }
+
+  public get playsInline(): boolean {
+    return this.hasAttribute("playsinline");
+  }
+
+  public set playsInline(val: boolean) {
+    if (val) {
+      this.setAttribute("playsinline", "");
+    } else {
+      this.removeAttribute("playsinline");
+    }
+  }
+
+  public fastSeek(time: number): void {
+    this.currentTime = time;
   }
 
   public get currentTime(): number {

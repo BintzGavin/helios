@@ -1,3 +1,6 @@
+## PLAYER v0.72.1
+- ✅ Completed: Api Parity - Implemented `width`, `height`, `playsInline` properties and `fastSeek` method on `HeliosPlayer` to improve compatibility with standard `HTMLVideoElement` API.
+
 ## PLAYER v0.72.0
 - ✅ Completed: Export Menu - Implemented a dedicated Export Menu UI to allow users to configure export options (format, resolution, filename, captions) and take snapshots directly from the player.
 
