@@ -39,3 +39,4 @@ This backlog tracks concrete deliverables derived from [`AGENTS.md`](../AGENTS.m
   - **Verification**: `examples/promo-video` must render correctly with all scenes visible.
 
 - [ ] **Documentation**: Add Quickstart guide.
+- [ ] ⛔ Renderer Verification Blocked: packages/studio dependency mismatch
