@@ -1,3 +1,6 @@
+## STUDIO v0.103.2
+- ✅ Fixed: Dependency Mismatch - Updated `packages/studio/package.json` to align `core` dependency with workspace version (`^5.11.0`) and fixed verification pipeline.
+
 ## STUDIO v0.103.1
 - ✅ Completed: Refine Agent Skills - Prepend "Agent Skill: " to skill titles in documentation to distinguish them from standard package docs.
 
