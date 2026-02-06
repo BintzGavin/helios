@@ -7,7 +7,7 @@ The Renderer employs a "Dual-Path" architecture to handle different rendering ne
 1.  **Canvas Strategy (`mode: 'canvas'`)**:
     -   **Target**: High-performance WebGL/Canvas animations (Three.js, PixiJS).
     -   **Mechanism**: Captures frames directly from the HTML `<canvas>` element (found via `canvasSelector`).
-    -   **Optimization**: Prioritizes hardware-accelerated `WebCodecs` (checked via `navigator.mediaCapabilities`) and prefers H.264 over VP9 when hardware support is equivalent. Falls back to software WebCodecs or `toDataURL()` (PNG/JPEG) if necessary.
+    -   **Optimization**: Prioritizes hardware-accelerated `WebCodecs` (checked via `navigator.mediaCapabilities`) and prefers H.264 over VP9 when hardware support is equivalent. Falls back to software WebCodecs or `toDataURL()` (PNG/JPEG) if necessary. Preloads fonts, images, and backgrounds (shared logic with DOM strategy).
     -   **Audio**: Explicitly extracts audio from `<audio>`/`<video>` elements via `DomScanner`.
 
 2.  **DOM Strategy (`mode: 'dom'`)**:
@@ -40,6 +40,7 @@ packages/renderer/
 │   │   ├── FFmpegBuilder.ts   # FFmpeg argument construction
 │   │   ├── blob-extractor.ts  # Blob URL handling
 │   │   ├── dom-finder.ts      # Shared deep element finding (Shadow DOM)
+│   │   ├── dom-preload.ts     # Shared asset preloading logic
 │   │   ├── dom-scanner.ts     # Media element discovery
 │   │   ├── dom-scripts.ts     # Shared browser-side scripts (media discovery)
 │   │   └── random-seed.ts     # Deterministic PRNG injection
