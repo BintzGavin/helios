@@ -68,12 +68,28 @@ export class RenderOrchestrator {
 
     const tempPrefix = `temp_${Date.now()}_${Math.random().toString(36).substring(7)}`;
 
+    // Progress Aggregation State
+    const workerProgress = new Array(concurrency).fill(0);
+    const chunkFrameCounts = new Array(concurrency).fill(0);
+
+    const updateGlobalProgress = () => {
+      if (!jobOptions?.onProgress) return;
+
+      let completedFrames = 0;
+      for (let j = 0; j < concurrency; j++) {
+        completedFrames += workerProgress[j] * chunkFrameCounts[j];
+      }
+      const globalProgress = Math.min(1.0, completedFrames / totalFrames);
+      jobOptions.onProgress(globalProgress);
+    };
+
     for (let i = 0; i < concurrency; i++) {
       const start = i * chunkSize;
       // Ensure we don't exceed totalFrames
       const count = Math.min(chunkSize, totalFrames - start);
 
       if (count <= 0) break;
+      chunkFrameCounts[i] = count;
 
       // Use CHUNK_EXTENSION for temporary chunk files
       const tempFile = path.join(outputDir, `${tempPrefix}_part_${i}${CHUNK_EXTENSION}`);
@@ -93,7 +109,16 @@ export class RenderOrchestrator {
 
       console.log(`[Worker ${i}] Rendering frames ${chunkOptions.startFrame} to ${chunkOptions.startFrame! + count} (${count} frames) to ${tempFile}`);
 
-      promises.push(renderer.render(compositionUrl, tempFile, jobOptions));
+      // Wrap onProgress to aggregate
+      const workerJobOptions: RenderJobOptions = {
+        ...jobOptions,
+        onProgress: (p) => {
+          workerProgress[i] = p;
+          updateGlobalProgress();
+        }
+      };
+
+      promises.push(renderer.render(compositionUrl, tempFile, workerJobOptions));
     }
 
     try {

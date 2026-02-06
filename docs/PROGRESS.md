@@ -13,6 +13,9 @@ Each agent should update **their own dedicated progress file** instead of this f
 - **STUDIO**: Update `docs/PROGRESS-STUDIO.md`
 - **SKILLS**: Update `docs/PROGRESS-SKILLS.md`
 
+### RENDERER v1.72.0
+- ✅ Completed: Distributed Progress Aggregation - Implemented progress aggregation in `RenderOrchestrator` to provide smooth, monotonic `onProgress` updates during distributed rendering by calculating a weighted global average of worker progress. Verified with `verify-distributed-progress.ts`.
+
 ### DEMO v1.118.0
 - ✅ Completed: Standardize Simple Animation Example - Modernized `examples/simple-animation` with TypeScript, `package.json`, and proper build config.
 

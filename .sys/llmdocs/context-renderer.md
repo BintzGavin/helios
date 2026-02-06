@@ -16,6 +16,11 @@ The Renderer employs a "Dual-Path" architecture to handle different rendering ne
     -   **Optimization**: Supports `omittedBackground` for transparency. Preloads fonts, images, and CSS background images (including those in Shadow DOM) to prevent rendering artifacts.
     -   **Audio**: Scans for and includes implicit audio tracks.
 
+**Distributed Rendering**:
+The `RenderOrchestrator` handles splitting a render job into concurrent chunks, each processed by a `Renderer` instance. It ensures:
+-   **Monotonic Progress**: Aggregates progress updates from all workers into a smooth, weighted global average.
+-   **Seamless Stitching**: Concatenates intermediate chunks (preserving PCM audio) and performs a final mix pass to ensure glitch-free output.
+
 Both strategies rely on **Time Drivers** (`CdpTimeDriver` or `SeekTimeDriver`) to enforce frame-perfect synchronization and deterministic behavior. This includes:
 -   **Virtual Time**: Overriding `Date.now()`, `performance.now()`, and `requestAnimationFrame`.
 -   **Seeded Randomness**: Injecting a deterministic Mulberry32 PRNG to replace `Math.random()`.
@@ -42,7 +47,9 @@ packages/renderer/
 │   │   ├── dom-scripts.ts     # Shared browser-side scripts (media discovery)
 │   │   └── random-seed.ts     # Deterministic PRNG injection
 │   ├── index.ts               # Entry point
+│   ├── Orchestrator.ts        # Distributed rendering logic
 │   ├── Renderer.ts            # Main class
+│   ├── concat.ts              # Concatenation utility
 │   └── types.ts               # Configuration interfaces
 └── tests/                     # Verification scripts
 ```
