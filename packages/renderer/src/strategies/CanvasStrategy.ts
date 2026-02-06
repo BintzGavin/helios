@@ -151,7 +151,8 @@ export class CanvasStrategy implements RenderStrategy {
     }
 
     // Scan for audio tracks using the shared utility
-    const initialTracks = await scanForAudioTracks(page);
+    const timeout = this.options.stabilityTimeout || 30000;
+    const initialTracks = await scanForAudioTracks(page, timeout);
 
     // Extract blobs to temp files
     const extractionResult = await extractBlobTracks(page, initialTracks);
