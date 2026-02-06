@@ -13,6 +13,9 @@ Each agent should update **their own dedicated progress file** instead of this f
 - **STUDIO**: Update `docs/PROGRESS-STUDIO.md`
 - **SKILLS**: Update `docs/PROGRESS-SKILLS.md`
 
+### CLI v0.15.0
+- ✅ Completed: Implement Build Command - Implemented `helios build` wrapping Vite for production builds.
+
 ### RENDERER v1.75.0
 - ✅ Completed: Distributed Progress Aggregation - Implemented weighted progress aggregation in RenderOrchestrator to ensure monotonic progress reporting during distributed rendering. Verified with `verify-distributed-progress.ts`.
 
