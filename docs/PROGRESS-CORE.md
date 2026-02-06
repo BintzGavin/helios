@@ -1,5 +1,8 @@
 # CORE Progress Log
 
+## CORE v5.12.0
+- ✅ Completed: Implement Active Clips - Added `timeline` to `HeliosOptions` and `activeClips` signal to `Helios` state, enabling declarative timeline management. Fixed critical bug in chained cold computed signals.
+
 ## CORE v5.11.0
 - ✅ Completed: Synchronize Version - Synced package.json version to 5.11.0 and added Input Schema documentation.
 - ✅ Completed: Implement Composition Schema - Implemented HeliosConfig, HeliosComposition, and related interfaces to support serializable composition definitions.

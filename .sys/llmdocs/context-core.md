@@ -61,6 +61,7 @@ packages/core/src/
 ├── time-control.test.ts
 ├── timecode.ts
 ├── timecode.test.ts
+├── timeline.test.ts
 ├── transitions.ts
 ├── transitions.test.ts
 ├── types.ts
@@ -169,6 +170,7 @@ export type HeliosState<TInputProps = Record<string, any>> = {
   availableAudioTracks: AudioTrackMetadata[];
   captions: CaptionCue[];
   activeCaptions: CaptionCue[];
+  activeClips: HeliosClip[];
   markers: Marker[];
   playbackRange: [number, number] | null;
   currentTime: number;
@@ -182,6 +184,7 @@ export interface HeliosOptions<TInputProps = Record<string, any>> extends Helios
   animationScope?: unknown;
   driver?: TimeDriver;
   ticker?: Ticker;
+  timeline?: HeliosTimeline;
 }
 
 export interface DiagnosticReport {
@@ -299,6 +302,7 @@ class Helios<TInputProps> {
   get availableAudioTracks(): ReadonlySignal<AudioTrackMetadata[]>;
   get captions(): ReadonlySignal<CaptionCue[]>;
   get activeCaptions(): ReadonlySignal<CaptionCue[]>;
+  get activeClips(): ReadonlySignal<HeliosClip[]>;
   get markers(): ReadonlySignal<Marker[]>;
   get playbackRange(): ReadonlySignal<[number, number] | null>;
   get width(): ReadonlySignal<number>;
@@ -324,6 +328,7 @@ class Helios<TInputProps> {
   setAudioTrackMuted(trackId: string, muted: boolean): void;
   setAvailableAudioTracks(tracks: AudioTrackMetadata[]): void;
   setCaptions(captions: string | CaptionCue[]): void;
+  setTimeline(timeline: HeliosTimeline): void;
   setMarkers(markers: Marker[]): void;
   addMarker(marker: Marker): void;
   removeMarker(id: string): void;

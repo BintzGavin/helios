@@ -4,7 +4,7 @@ import { HeliosError, HeliosErrorCode } from './errors.js';
 import { HeliosSchema, validateProps, validateSchema } from './schema.js';
 import { CaptionCue, parseSrt, parseCaptions, findActiveCues, areCuesEqual } from './captions.js';
 import { Marker, validateMarker, validateMarkers } from './markers.js';
-import { HeliosConfig, AudioTrackState } from './types.js';
+import { HeliosConfig, AudioTrackState, HeliosTimeline, HeliosClip } from './types.js';
 
 export type HeliosState<TInputProps = Record<string, any>> = {
   width: number;
@@ -22,6 +22,7 @@ export type HeliosState<TInputProps = Record<string, any>> = {
   availableAudioTracks: AudioTrackMetadata[];
   captions: CaptionCue[];
   activeCaptions: CaptionCue[];
+  activeClips: HeliosClip[];
   markers: Marker[];
   playbackRange: [number, number] | null;
   currentTime: number;
@@ -35,6 +36,7 @@ export interface HeliosOptions<TInputProps = Record<string, any>> extends Helios
   animationScope?: unknown;
   driver?: TimeDriver;
   ticker?: Ticker;
+  timeline?: HeliosTimeline;
 }
 
 export interface DiagnosticReport {
@@ -86,6 +88,8 @@ export class Helios<TInputProps = Record<string, any>> {
   private _availableAudioTracks: Signal<AudioTrackMetadata[]>;
   private _captions: Signal<CaptionCue[]>;
   private _activeCaptions: Signal<CaptionCue[]>;
+  private _timeline: Signal<HeliosTimeline | undefined>;
+  private _activeClips: ReadonlySignal<HeliosClip[]>;
   private _markers: Signal<Marker[]>;
   private _width: Signal<number>;
   private _height: Signal<number>;
@@ -204,6 +208,14 @@ export class Helios<TInputProps = Record<string, any>> {
    */
   public get activeCaptions(): ReadonlySignal<CaptionCue[]> {
     return this._activeCaptions;
+  }
+
+  /**
+   * Signal for the currently active clips based on the timeline.
+   * Can be subscribed to for reactive updates.
+   */
+  public get activeClips(): ReadonlySignal<HeliosClip[]> {
+    return this._activeClips;
   }
 
   /**
@@ -485,6 +497,25 @@ export class Helios<TInputProps = Record<string, any>> {
 
     this._currentTime = computed(() => this._currentFrame.value / this._fps.value);
 
+    this._timeline = signal(options.timeline);
+
+    this._activeClips = computed(() => {
+      const time = this._currentTime.value;
+      const timeline = this._timeline.value;
+      if (!timeline || !timeline.tracks) return [];
+
+      const active: HeliosClip[] = [];
+      for (const track of timeline.tracks) {
+        for (const clip of track.clips) {
+           const end = clip.start + clip.duration;
+           if (time >= clip.start && time < end) {
+             active.push(clip);
+           }
+        }
+      }
+      return active;
+    });
+
     this._activeCaptions = signal(findActiveCues(initialCaptions, 0));
 
     this._disposeActiveCaptionsEffect = effect(() => {
@@ -553,6 +584,7 @@ export class Helios<TInputProps = Record<string, any>> {
       availableAudioTracks: this._availableAudioTracks.value,
       captions: this._captions.value,
       activeCaptions: this.activeCaptions.value,
+      activeClips: this.activeClips.value,
       markers: this._markers.value,
       playbackRange: this._playbackRange.value,
       currentTime: this._currentTime.value,
@@ -734,6 +766,10 @@ export class Helios<TInputProps = Record<string, any>> {
   public setCaptions(captions: string | CaptionCue[]) {
     const cues = typeof captions === 'string' ? parseCaptions(captions) : captions;
     this._captions.value = cues;
+  }
+
+  public setTimeline(timeline: HeliosTimeline) {
+    this._timeline.value = timeline;
   }
 
   public setMarkers(markers: Marker[]) {
