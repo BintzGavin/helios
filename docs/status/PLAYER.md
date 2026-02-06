@@ -1,4 +1,4 @@
-**Version**: v0.70.5
+**Version**: v0.71.0
 
 **Posture**: STABLE AND FEATURE COMPLETE
 
@@ -14,6 +14,7 @@
 - Client-side export supports explicit configuration via `export-mode`, `canvas-selector`, and `export-caption-mode` attributes.
 - Supports specifying target export resolution via `export-width` and `export-height` attributes, enabling high-quality exports independent of player preview size.
 - Supports exporting captions as `.srt` files (`export-caption-mode="file"`) or burning them into the video (`burn-in`).
+- Supports **Synchronized Caption Styling**: Captions in the player match the export output (WYSIWYG), with configurable styling via CSS variables (`--helios-caption-scale`, `--helios-caption-bg`, etc.) and responsive font sizing.
 - Supports sandboxed iframes and cross-origin usage via `postMessage` bridge.
 - Includes visual feedback for loading and error states (connection timeouts).
 - Supports variable playback speed via UI and Controller API.
@@ -58,6 +59,7 @@
 - **Audio Metering**: Supports real-time audio metering via `startAudioMetering()` API and `audiometering` event, enabling visualization of audio levels (stereo/peak) in host applications.
 - **Export API**: Exposes public `export()` method for programmatic control over client-side exports, supporting Video (MP4/WebM) and Snapshot (PNG/JPEG) formats.
 
+[v0.71.0] ✅ Completed: Synchronize Caption Styling - Implemented responsive caption sizing and configurable styling via CSS variables, ensuring visual parity between player preview and client-side export.
 [v0.70.5] ✅ Completed: Decouple Core - Decoupled `@helios-project/player` from `@helios-project/core` runtime dependency to fix UMD builds and enable drop-in usage.
 [v0.70.4] ✅ Completed: Fix Poster Visibility - Implemented persistent `_hasPlayed` state to ensure poster remains hidden when seeking back to frame 0 after playback.
 [v0.70.3] ✅ Completed: Refactor Granular Playback - Refactored renderSettingsMenu to use dynamic generation for playback speed options.

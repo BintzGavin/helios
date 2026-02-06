@@ -27,12 +27,18 @@ export class ClientSideExporter {
     canvasSelector?: string;
     format?: 'mp4' | 'webm' | 'png' | 'jpeg';
     includeCaptions?: boolean;
+    captionStyle?: {
+      color?: string;
+      backgroundColor?: string;
+      fontFamily?: string;
+      scale?: number;
+    };
     width?: number;
     height?: number;
     bitrate?: number;
     filename?: string;
   }): Promise<void> {
-    const { onProgress, signal, mode = 'auto', canvasSelector = 'canvas', format = 'mp4', includeCaptions = true, width: targetWidth, height: targetHeight, bitrate, filename = 'video' } = options;
+    const { onProgress, signal, mode = 'auto', canvasSelector = 'canvas', format = 'mp4', includeCaptions = true, captionStyle, width: targetWidth, height: targetHeight, bitrate, filename = 'video' } = options;
 
     console.log(`Client-side rendering started! Format: ${format}`);
     this.controller.pause();
@@ -78,7 +84,7 @@ export class ClientSideExporter {
 
         let finalFrame = frame;
         if (includeCaptions && captions && captions.length > 0) {
-            finalFrame = await this.drawCaptions(frame, captions);
+            finalFrame = await this.drawCaptions(frame, captions, captionStyle);
             frame.close();
         }
 
@@ -214,7 +220,7 @@ export class ClientSideExporter {
       // Encode first frame
       let frameToEncode = firstFrame;
       if (includeCaptions && firstCaptions && firstCaptions.length > 0) {
-          frameToEncode = await this.drawCaptions(firstFrame, firstCaptions);
+          frameToEncode = await this.drawCaptions(firstFrame, firstCaptions, captionStyle);
           firstFrame.close();
       }
 
@@ -245,7 +251,7 @@ export class ClientSideExporter {
 
         let finalFrame = videoFrame;
         if (includeCaptions && captions && captions.length > 0) {
-             finalFrame = await this.drawCaptions(videoFrame, captions);
+             finalFrame = await this.drawCaptions(videoFrame, captions, captionStyle);
              videoFrame.close();
         }
 
@@ -298,7 +304,12 @@ export class ClientSideExporter {
     }
   }
 
-  private async drawCaptions(frame: VideoFrame, captions: CaptionCue[]): Promise<VideoFrame> {
+  private async drawCaptions(frame: VideoFrame, captions: CaptionCue[], style?: {
+      color?: string;
+      backgroundColor?: string;
+      fontFamily?: string;
+      scale?: number;
+  }): Promise<VideoFrame> {
       const width = frame.displayWidth;
       const height = frame.displayHeight;
       let canvas: OffscreenCanvas | HTMLCanvasElement;
@@ -320,12 +331,13 @@ export class ClientSideExporter {
 
       ctx.save();
 
-      const fontSize = Math.max(16, Math.round(height * 0.05));
+      const scale = style?.scale ?? 0.05;
+      const fontSize = Math.max(16, Math.round(height * scale));
       const padding = fontSize * 0.5;
       const lineHeight = fontSize * 1.2;
       const bottomMargin = height * 0.05;
 
-      ctx.font = `${fontSize}px sans-serif`;
+      ctx.font = `${fontSize}px ${style?.fontFamily || 'sans-serif'}`;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'top';
 
@@ -346,13 +358,13 @@ export class ClientSideExporter {
           const bgTopY = currentBottomY - cueHeight;
 
           ctx!.shadowColor = 'transparent';
-          ctx!.fillStyle = 'rgba(0, 0, 0, 0.7)';
+          ctx!.fillStyle = style?.backgroundColor || 'rgba(0, 0, 0, 0.7)';
           ctx!.fillRect((width / 2) - (bgWidth / 2), bgTopY, bgWidth, cueHeight);
 
           ctx!.shadowColor = 'black';
           ctx!.shadowBlur = 2;
           ctx!.shadowOffsetY = 1;
-          ctx!.fillStyle = 'white';
+          ctx!.fillStyle = style?.color || 'white';
           lines.forEach((line: any, i: any) => {
               const y = bgTopY + padding + (i * lineHeight);
               ctx!.fillText(line, width / 2, y);

@@ -84,3 +84,13 @@ The Shadow DOM contains:
 - `startAudioMetering()`: Enable audio level events (non-destructive).
 - `stopAudioMetering()`: Disable audio level events (maintains playback).
 - `export(options?: HeliosExportOptions): Promise<void>`: Trigger client-side export programmatically.
+
+## F. CSS Variables
+- `--helios-controls-bg`: Background color for controls.
+- `--helios-text-color`: Text color.
+- `--helios-accent-color`: Accent color (buttons, sliders).
+- `--helios-range-track-color`: Scrubber track color.
+- `--helios-caption-scale`: Caption font size scale relative to player height (default: 0.05).
+- `--helios-caption-bg`: Caption background color.
+- `--helios-caption-color`: Caption text color.
+- `--helios-caption-font-family`: Caption font family.
