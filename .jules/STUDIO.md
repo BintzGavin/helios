@@ -81,3 +81,7 @@
 ## [0.103.0] - CLI Build Gap
 **Learning:** The "Preview with the Player" vision relies on the player being available in the built artifact. Currently, `npm run build` only builds the headless composition, leaving users without a playable artifact to deploy. A dedicated `helios build` command is required to wrap the output.
 **Action:** When planning CLI features, consider the entire deployment lifecycle (Init -> Dev -> Build -> Deploy).
+
+## [0.104.0] - Player Bundle Integration
+**Learning:** The `@helios-project/player` package exports a `./bundle` entry point (pointing to `dist/helios-player.bundle.mjs`), which is ideal for embedding the player in standalone pages without a bundler. This simplifies the creation of "Player Harness" pages in CLI tools.
+**Action:** When integrating web components into static tools or CLI outputs, prefer using pre-bundled ESM exports to avoid complex runtime bundling logic.
