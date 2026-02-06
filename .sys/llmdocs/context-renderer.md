@@ -48,6 +48,7 @@ packages/renderer/
 │   ├── index.ts               # Entry point
 │   ├── Renderer.ts            # Main class
 │   └── types.ts               # Configuration interfaces
+├── scripts/                   # Additional verification scripts
 └── tests/                     # Verification scripts
 ```
 
