@@ -8,6 +8,7 @@ import { registerMergeCommand } from './commands/merge.js';
 import { registerListCommand } from './commands/list.js';
 import { registerRemoveCommand } from './commands/remove.js';
 import { registerUpdateCommand } from './commands/update.js';
+import { registerBuildCommand } from './commands/build.js';
 
 const program = new Command();
 
@@ -25,5 +26,6 @@ registerMergeCommand(program);
 registerListCommand(program);
 registerRemoveCommand(program);
 registerUpdateCommand(program);
+registerBuildCommand(program);
 
 program.parse(process.argv);

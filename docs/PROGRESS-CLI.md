@@ -2,6 +2,10 @@
 
 This file tracks progress for the CLI domain (`packages/cli`).
 
+## CLI v0.15.0
+
+- ✅ Implement Build Command - Implemented `helios build` wrapping Vite for production builds.
+
 ## CLI v0.14.0
 
 - ✅ Implement Update Command - Implemented `helios update <component>` to restore or update components from the registry.

@@ -1,6 +1,6 @@
 # CLI Status
 
-**Version**: 0.14.0
+**Version**: 0.15.0
 
 ## Current State
 
@@ -22,6 +22,7 @@ The Helios CLI (`packages/cli`) provides the command-line interface for the Heli
 - `helios merge` - Merges multiple video files into one without re-encoding
 - `helios remove` - Removes a component from the project configuration
 - `helios update` - Updates a component to the latest version
+- `helios build` - Builds the project for production
 
 ## V2 Roadmap
 
@@ -57,3 +58,4 @@ Per AGENTS.md, the CLI is "ACTIVELY EXPANDING FOR V2" with focus on:
 [v0.12.0] ✅ Framework-Aware Registry - Implemented framework filtering in `RegistryClient` and updated `helios studio` and `helios add` to respect project framework. Added SolidJS support to registry types.
 [v0.13.0] ✅ Implement Remove Command - Implemented `helios remove <component>` to unregister components and warn about associated files.
 [v0.14.0] ✅ Implement Update Command - Implemented `helios update <component>` to restore or update components from the registry.
+[v0.15.0] ✅ Implement Build Command - Implemented `helios build` wrapping Vite for production builds.
