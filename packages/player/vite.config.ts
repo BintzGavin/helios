@@ -10,15 +10,8 @@ export default defineConfig({
       formats: ['es', 'umd']
     },
     rollupOptions: {
-      // Externalize @helios-project/core as it is primarily a type dependency
-      // or provided by the environment/iframe.
-      // We bundle mediabunny so it works drop-in.
-      external: ['@helios-project/core'],
-      output: {
-        globals: {
-          '@helios-project/core': 'HeliosCore'
-        }
-      }
+      // We bundle everything so it works drop-in.
+      // @helios-project/core is type-only so it won't add weight.
     },
     emptyOutDir: false, // Preserve tsc output
     outDir: 'dist'

@@ -1,4 +1,4 @@
-import { AudioTrackMetadata } from "@helios-project/core";
+import type { AudioTrackMetadata } from "@helios-project/core";
 
 export interface AudioAsset {
   id: string;

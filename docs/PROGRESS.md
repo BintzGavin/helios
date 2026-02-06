@@ -28,6 +28,9 @@ Each agent should update **their own dedicated progress file** instead of this f
 ### DEMO v1.118.0
 - ✅ Completed: Standardize Simple Animation Example - Modernized `examples/simple-animation` with TypeScript, `package.json`, and proper build config.
 
+### PLAYER v0.70.5
+- ✅ Completed: Decouple Core - Decoupled `@helios-project/player` from `@helios-project/core` runtime dependency to fix UMD builds and enable drop-in usage.
+
 ### PLAYER v0.70.4
 - ✅ Completed: Fix Poster Visibility - Implemented persistent `_hasPlayed` state to ensure poster remains hidden when seeking back to frame 0 after playback.
 

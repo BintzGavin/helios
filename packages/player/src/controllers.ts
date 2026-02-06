@@ -1,4 +1,4 @@
-import { Helios, CaptionCue, HeliosSchema, DiagnosticReport, Marker } from "@helios-project/core";
+import type { Helios, CaptionCue, HeliosSchema, DiagnosticReport, Marker } from "@helios-project/core";
 import { captureDomToBitmap } from "./features/dom-capture";
 import { getAudioAssets, AudioAsset } from "./features/audio-utils";
 import { AudioMeter, AudioLevels } from "./features/audio-metering";
@@ -183,7 +183,7 @@ export class DirectController implements HeliosController {
   }
 
   async diagnose(): Promise<DiagnosticReport> {
-    return Helios.diagnose();
+    return (this.instance.constructor as any).diagnose();
   }
 }
 
