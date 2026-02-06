@@ -34,3 +34,7 @@
 ## [2026-03-12] - Duplicate Media Discovery Logic
 **Learning:** The Shadow DOM traversal logic for discovering and syncing media elements (`findAllMedia`) is duplicated across `DomScanner`, `CdpTimeDriver`, and `SeekTimeDriver`. This increases maintenance risk and potential for divergence between Canvas and DOM modes.
 **Action:** Created plan `2026-03-12-RENDERER-Refactor-Media-Discovery.md` to consolidate this logic into a shared `dom-scripts.ts` utility.
+
+## [2026-09-12] - Distributed Progress Reporting Gap
+**Learning:** Distributed rendering instances (`Renderer`) report progress independently (0-100% for their chunk), causing the `onProgress` callback to fire erratically with non-monotonic values when called from the Orchestrator. This degrades the user experience in Studio/CLI.
+**Action:** Created plan `2026-09-12-RENDERER-Distributed-Progress-Aggregation.md` to implement an aggregator pattern in `Orchestrator` that normalizes progress across concurrent workers.
