@@ -1,5 +1,5 @@
 import React from 'react';
-import { Composition } from '../../context/StudioContext';
+import { Composition, useStudio } from '../../context/StudioContext';
 
 interface CompositionItemProps {
   composition: Composition;
@@ -16,6 +16,8 @@ export const CompositionItem: React.FC<CompositionItemProps> = ({
   onDuplicate,
   onDelete
 }) => {
+  const { openInEditor } = useStudio();
+
   return (
     <div
       className={`composition-item ${isActive ? 'active' : ''}`}
@@ -30,6 +32,16 @@ export const CompositionItem: React.FC<CompositionItemProps> = ({
           </div>
         )}
         <div className="composition-actions">
+          <button
+            className="composition-action-btn open-editor"
+            onClick={(e) => {
+              e.stopPropagation();
+              openInEditor(composition.id);
+            }}
+            title="Open in Editor"
+          >
+            📝
+          </button>
           <button
             className="composition-action-btn duplicate"
             onClick={(e) => onDuplicate(e, composition)}

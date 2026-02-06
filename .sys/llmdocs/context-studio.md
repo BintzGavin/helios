@@ -67,7 +67,7 @@ Commands:
 
 ## Section E: Integration
 
--   **StudioContext**: Central store for Studio state (compositions, assets, render jobs, player state). Syncs loop and playback range to `HeliosController`.
+-   **StudioContext**: Central store for Studio state (compositions, assets, render jobs, player state). Syncs loop and playback range to `HeliosController`. Provides `openInEditor(path)` to open files in default editor.
 -   **HeliosPlayer**: The web component used for playback. Studio controls it via `HeliosController`.
 -   **Backend API**:
     -   `GET /api/compositions`: List available compositions.

@@ -10,7 +10,7 @@ interface AssetItemProps {
 
 export const AssetItem: React.FC<AssetItemProps> = ({ asset }) => {
   const { addToast } = useToast();
-  const { deleteAsset, renameAsset } = useStudio();
+  const { deleteAsset, renameAsset, openInEditor } = useStudio();
   const [isHovering, setIsHovering] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -55,6 +55,11 @@ export const AssetItem: React.FC<AssetItemProps> = ({ asset }) => {
   const handleDelete = (e: React.MouseEvent) => {
     e.stopPropagation();
     setShowDeleteConfirm(true);
+  };
+
+  const handleOpenInEditor = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    openInEditor(asset.id);
   };
 
   const handleConfirmDelete = () => {
@@ -215,24 +220,15 @@ export const AssetItem: React.FC<AssetItemProps> = ({ asset }) => {
             className="rename-btn"
             onClick={handleRenameClick}
             title="Rename Asset"
-            style={{
-              position: 'absolute',
-              top: '4px',
-              right: '28px',
-              width: '20px',
-              height: '20px',
-              background: 'rgba(0, 0, 0, 0.7)',
-              borderRadius: '50%',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: '#fff',
-              fontSize: '12px',
-              cursor: 'pointer',
-              zIndex: 10
-            }}
           >
             ✎
+          </div>
+          <div
+            className="open-btn"
+            onClick={handleOpenInEditor}
+            title="Open in Editor"
+          >
+            📝
           </div>
         </>
       )}

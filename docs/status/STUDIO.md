@@ -1,4 +1,4 @@
-**Version**: 0.100.0
+**Version**: 0.101.0
 
 **Posture**: ACTIVELY EXPANDING FOR V2
 
@@ -9,6 +9,7 @@
 **Focus**: UI Implementation & CLI
 
 ## Recent Updates
+- [v0.101.0] ✅ Completed: Open in Editor - Implemented "Open in Editor" buttons for assets and compositions, allowing users to open source files directly in their default editor.
 - [v0.100.0] ✅ Completed: Resizable Layout - Implemented resizable Sidebar, Inspector, and Timeline panels with persistence using `localStorage` and CSS variables.
 - [v0.99.0] ✅ Completed: CLI List Command - Verified implementation of `helios list` command to display installed components from `helios.config.json`.
 - [v0.98.0] ✅ Completed: CLI Solid Init - Added SolidJS template support to `helios init` command.
