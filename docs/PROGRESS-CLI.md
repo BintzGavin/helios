@@ -2,6 +2,10 @@
 
 This file tracks progress for the CLI domain (`packages/cli`).
 
+## CLI v0.16.0
+
+- ✅ Distributed Job Export - Implemented `--emit-job`, `--audio-codec`, and `--video-codec` options in `helios render` to generate distributed rendering job specifications.
+
 ## CLI v0.15.0
 
 - ✅ Implement Build Command - Implemented `helios build` wrapping Vite for production builds.

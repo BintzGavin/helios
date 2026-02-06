@@ -1,5 +1,6 @@
 import { Command } from 'commander';
 import path from 'path';
+import fs from 'fs';
 import { pathToFileURL } from 'url';
 import { RenderOrchestrator, DistributedRenderOptions } from '@helios-project/renderer';
 
@@ -18,6 +19,9 @@ export function registerRenderCommand(program: Command) {
     .option('--frame-count <number>', 'Number of frames to render')
     .option('--concurrency <number>', 'Number of concurrent render jobs', '1')
     .option('--no-headless', 'Run in visible browser window (default: headless)')
+    .option('--emit-job <path>', 'Generate a distributed render job spec (JSON) instead of rendering')
+    .option('--audio-codec <codec>', 'Audio codec (e.g., aac, pcm_s16le)')
+    .option('--video-codec <codec>', 'Video codec (e.g., libx264, libvpx)')
     .action(async (input, options) => {
       try {
         const url = input.startsWith('http')
@@ -44,6 +48,84 @@ export function registerRenderCommand(program: Command) {
           throw new Error('concurrency must be a valid number');
         }
 
+        if (options.emitJob) {
+          const fps = parseInt(options.fps, 10);
+          const duration = parseInt(options.duration, 10);
+          const width = parseInt(options.width, 10);
+          const height = parseInt(options.height, 10);
+
+          let totalFrames = frameCount;
+          if (totalFrames === undefined) {
+            totalFrames = Math.ceil(duration * fps);
+          }
+
+          const chunks = [];
+          const chunkSize = Math.ceil(totalFrames / concurrency);
+          const outputDir = path.dirname(outputPath);
+          const outputExt = path.extname(outputPath);
+          const outputName = path.basename(outputPath, outputExt);
+
+          // Construct base command parts
+          const baseArgs = ['helios', 'render', input];
+          if (options.width) baseArgs.push('--width', options.width);
+          if (options.height) baseArgs.push('--height', options.height);
+          if (options.fps) baseArgs.push('--fps', options.fps);
+          // duration is derived from chunk frame count, but passing original duration doesn't hurt if frame-count overrides it
+          // actually, for clarity, we should omit duration if we pass frame-count
+          if (options.quality) baseArgs.push('--quality', options.quality);
+          if (options.mode) baseArgs.push('--mode', options.mode);
+          if (options.headless === false) baseArgs.push('--no-headless');
+          if (options.audioCodec) baseArgs.push('--audio-codec', options.audioCodec);
+          if (options.videoCodec) baseArgs.push('--video-codec', options.videoCodec);
+
+          const mergeInputs = [];
+
+          for (let i = 0; i < concurrency; i++) {
+            const chunkStart = (startFrame || 0) + i * chunkSize;
+            // Calculate remaining frames based on current chunk index, not absolute frame
+            const framesProcessed = i * chunkSize;
+            const chunkCount = Math.min(chunkSize, totalFrames - framesProcessed);
+
+            if (chunkCount <= 0) break;
+
+            const chunkFilename = `${outputName}_part_${i}${outputExt}`;
+            const chunkPath = path.join(outputDir, chunkFilename);
+            mergeInputs.push(chunkPath);
+
+            const chunkArgs = [...baseArgs];
+            chunkArgs.push('-o', chunkPath);
+            chunkArgs.push('--start-frame', chunkStart.toString());
+            chunkArgs.push('--frame-count', chunkCount.toString());
+
+            chunks.push({
+              id: i,
+              startFrame: chunkStart,
+              frameCount: chunkCount,
+              outputFile: chunkPath,
+              command: chunkArgs.join(' ')
+            });
+          }
+
+          const mergeCommand = `helios merge ${outputPath} ${mergeInputs.join(' ')}`;
+
+          const jobSpec = {
+            metadata: {
+              totalFrames,
+              fps,
+              width,
+              height,
+              duration: totalFrames / fps
+            },
+            chunks,
+            mergeCommand
+          };
+
+          const jobPath = path.resolve(process.cwd(), options.emitJob);
+          fs.writeFileSync(jobPath, JSON.stringify(jobSpec, null, 2));
+          console.log(`Job spec written to ${jobPath}`);
+          return;
+        }
+
         const renderOptions: DistributedRenderOptions = {
           width: parseInt(options.width, 10),
           height: parseInt(options.height, 10),
@@ -54,6 +136,8 @@ export function registerRenderCommand(program: Command) {
           startFrame,
           frameCount,
           concurrency,
+          audioCodec: options.audioCodec,
+          videoCodec: options.videoCodec,
           browserConfig: {
             headless: options.headless, // 'no-headless' sets this to false
           },
