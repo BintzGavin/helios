@@ -237,6 +237,15 @@ export interface RendererOptions {
    * Defaults to 0x12345678.
    */
   randomSeed?: number;
+
+  /**
+   * The number of frames between keyframes (GOP size) when using WebCodecs in 'canvas' mode.
+   * If not provided, defaults to 2 seconds worth of frames (fps * 2).
+   *
+   * Example: For 30fps, a value of 60 means a keyframe every 2 seconds.
+   * Only applicable when `intermediateVideoCodec` is used or inferred.
+   */
+  keyFrameInterval?: number;
 }
 
 export interface RenderJobOptions {

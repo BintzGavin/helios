@@ -451,7 +451,14 @@ export class CanvasStrategy implements RenderStrategy {
   private async captureWebCodecs(page: Page, frameTime: number): Promise<Buffer> {
     const selector = this.options.canvasSelector || 'canvas';
 
-    const chunkData = await page.evaluate<string, { time: number; selector: string }>(async function(args) {
+    // Calculate if this frame should be a keyframe
+    const fps = this.options.fps;
+    const keyFrameInterval = this.options.keyFrameInterval || (fps * 2);
+    // frameTime is in ms, so convert to seconds then frames
+    const frameIndex = Math.round((frameTime / 1000) * fps);
+    const isKeyFrame = (frameIndex % keyFrameInterval === 0);
+
+    const chunkData = await page.evaluate<string, { time: number; selector: string; isKeyFrame: boolean }>(async function(args) {
       const context = (window as any).heliosWebCodecs;
 
       if (context.error) {
@@ -465,7 +472,7 @@ export class CanvasStrategy implements RenderStrategy {
 
       // Create Frame and Encode
       const frame = new VideoFrame(canvas, { timestamp: args.time * 1000 }); // microseconds
-      encoder.encode(frame, { keyFrame: (args.time === 0) });
+      encoder.encode(frame, { keyFrame: args.isKeyFrame });
       frame.close();
 
       // 3. Collect Chunks
@@ -494,7 +501,7 @@ export class CanvasStrategy implements RenderStrategy {
           reader.readAsDataURL(blob);
       });
 
-    }, { time: frameTime, selector });
+    }, { time: frameTime, selector, isKeyFrame });
 
     if (chunkData && chunkData.length > 0) {
         return Buffer.from(chunkData, 'base64');
