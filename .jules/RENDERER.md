@@ -1,4 +1,3 @@
-
 ## [2026-03-05] - Smart Audio Fades Gap
 **Learning:** Declarative audio fades (`data-helios-fade-out`) are calculated relative to the video duration, causing short, non-looping clips to fade out incorrectly (or not at all). This violates the "Use What You Know" principle as users expect fades to be relative to the clip itself.
 **Action:** Created plan `2026-03-05-RENDERER-Smart-Audio-Fades.md` to implement smart fade logic by resolving source duration in `DomScanner` and updating `FFmpegBuilder`.
@@ -38,3 +37,7 @@
 ## [2026-09-12] - Distributed Progress Reporting Gap
 **Learning:** Distributed rendering instances (`Renderer`) report progress independently (0-100% for their chunk), causing the `onProgress` callback to fire erratically with non-monotonic values when called from the Orchestrator. This degrades the user experience in Studio/CLI.
 **Action:** Created plan `2026-09-12-RENDERER-Distributed-Progress-Aggregation.md` to implement an aggregator pattern in `Orchestrator` that normalizes progress across concurrent workers.
+
+## [1.76.0] - Role Adherence Failure
+**Learning:** I mistakenly acted as an Executor, implementing code (`dom-preload.ts`) instead of creating a Spec File. This violated the "Vision-Driven Planner" protocol and the "Never modify packages" rule.
+**Action:** Strictly adhere to the "Spec File Only" output. Verify role definition before starting.
