@@ -1,3 +1,6 @@
+## STUDIO v0.104.0
+- ✅ Completed: CLI Build Command - Implemented `helios build` command to generate a deployable player harness.
+
 ## STUDIO v0.103.2
 - ✅ Fixed: Dependency Mismatch - Updated `packages/studio/package.json` to align `core` dependency with workspace version (`^5.11.0`) and fixed verification pipeline.
 
