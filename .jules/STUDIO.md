@@ -73,3 +73,7 @@
 ## [0.98.0] - Planner Role Boundaries
 **Learning:** The "Vision-Driven Planner" role requires strict adherence to producing *only* the plan file and not executing it, even if the general system instructions suggest "working on changes". The Planner's output is the blueprint, not the building.
 **Action:** Explicitly check the role description ("DO NOT lay the bricks") before interpreting general tool instructions.
+
+## [0.102.0] - Documentation Verification
+**Learning:** Verification of backend-only logic like documentation discovery in Studio requires custom scripts (`npx tsx`) because the sandbox environment lacks `node_modules` within package directories, preventing standard test runners like `vitest` from working out of the box without potentially disruptive installs.
+**Action:** When implementing backend features, prioritize creating standalone verification scripts that import the source directly to verify logic without relying on the test runner environment.

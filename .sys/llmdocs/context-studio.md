@@ -4,7 +4,7 @@
 
 The Studio is a browser-based development environment for Helios. It consists of:
 1.  **CLI**: Entry point (`helios studio`) that launches the dev server.
-2.  **Server**: A Vite-based dev server (`packages/studio/src/server`) that serves the UI and provides API endpoints for filesystem operations (compositions, assets, renders).
+2.  **Server**: A Vite-based dev server (`packages/studio/src/server`) that serves the UI and provides API endpoints for filesystem operations (compositions, assets, renders) and documentation discovery (READMEs, Agent Skills).
 3.  **UI**: A React-based Single Page Application (`packages/studio/src`) that provides the IDE interface.
 4.  **Integration**:
     -   **Core**: Consumed via `Helios` class for composition logic.
@@ -24,7 +24,7 @@ packages/studio/
 │   │   └── Timeline/   # Timeline area
 │   ├── context/        # React Context (StudioContext, ToastContext)
 │   ├── hooks/          # Custom hooks (usePersistentState)
-│   ├── server/         # Backend logic (discovery, render-manager, plugin)
+│   ├── server/         # Backend logic (discovery, render-manager, plugin, documentation)
 │   ├── utils/          # Utilities
 │   ├── App.tsx         # Main UI entry
 │   ├── main.tsx        # React root
@@ -74,3 +74,4 @@ Commands:
     -   `POST /api/render`: Submit a render job.
     -   `GET /api/jobs`: List render jobs.
     -   `GET /api/assets`: List assets.
+    -   `GET /api/documentation`: Returns documentation sections (READMEs and SKILLs).
