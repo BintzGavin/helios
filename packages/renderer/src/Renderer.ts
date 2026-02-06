@@ -109,7 +109,7 @@ export class Renderer {
       }
 
       console.log('Initializing time driver...');
-      await this.timeDriver.init(page);
+      await this.timeDriver.init(page, this.options.randomSeed);
 
       await page.goto(compositionUrl, { waitUntil: 'networkidle' });
       console.log('Page loaded.');

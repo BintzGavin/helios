@@ -1,6 +1,6 @@
 import { Page, CDPSession } from 'playwright';
 import { TimeDriver } from './TimeDriver.js';
-import { RANDOM_SEED_SCRIPT } from '../utils/random-seed.js';
+import { getSeedScript } from '../utils/random-seed.js';
 import { FIND_ALL_MEDIA_FUNCTION } from '../utils/dom-scripts.js';
 
 export class CdpTimeDriver implements TimeDriver {
@@ -12,8 +12,8 @@ export class CdpTimeDriver implements TimeDriver {
     this.timeout = timeout;
   }
 
-  async init(page: Page): Promise<void> {
-    await page.addInitScript(RANDOM_SEED_SCRIPT);
+  async init(page: Page, seed?: number): Promise<void> {
+    await page.addInitScript(getSeedScript(seed));
   }
 
   async prepare(page: Page): Promise<void> {
