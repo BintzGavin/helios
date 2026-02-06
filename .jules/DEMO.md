@@ -75,3 +75,7 @@
 ## [1.115.0] - Legacy Example Portability
 **Learning:** Legacy examples (e.g., `threejs-canvas-animation`) rely on implicit hoisting and root build configs. They lack `package.json` and `tsconfig.json`, making them poor references for users who want to "eject" or copy-paste.
 **Action:** Standardize legacy examples by adding `package.json` and TypeScript configuration to ensure they are self-contained and "Professional".
+
+## [1.127.0] - Scaffolding vs Standardization
+**Learning:** Examples may be marked as "Completed" (Scaffolded) but lack the standardization (TypeScript, package.json) required by the vision. Scaffolding is just step one.
+**Action:** When auditing "Completed" examples, verify they meet the *current* standard (TS, private package), not just that they exist.

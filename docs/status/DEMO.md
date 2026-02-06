@@ -1,6 +1,6 @@
 # Status: DEMO Domain
 
-**Version**: 1.126.0
+**Version**: 1.127.0
 
 **Posture**: ACTIVELY EXPANDING FOR V2
 
@@ -14,7 +14,7 @@ The DEMO domain is responsible for:
 - **CLI Registry Components Broken**: The components defined in `packages/cli/src/registry/manifest.ts` use outdated APIs (accessing `helios.config`) which causes runtime errors. The `examples/react-components-demo` has manually fixed versions.
 
 ## Active Tasks
-
+- [v1.127.0] 📝 Planning: Standardize React DOM Example - Upgrade `examples/react-dom-animation` to a fully standardized, strictly-typed TypeScript example.
 
 ## Completed Tasks
 - [v1.126.0] ✅ Completed: Standardize Procedural Generation Example - Modernized `examples/procedural-generation` with TypeScript, `package.json`, and proper build config.
