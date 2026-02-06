@@ -6,6 +6,7 @@ export async function captureDomToBitmap(element: HTMLElement, options?: { targe
   await inlineImages(element, clone);
   clone = inlineCanvases(element, clone);
   clone = inlineVideos(element, clone);
+  inlineFormValues(element, clone);
 
   // 2. Serialize DOM
   const serializer = new XMLSerializer();
@@ -255,6 +256,56 @@ function inlineCanvasesRecursive(original: Node, clone: Node): Node {
   }
 
   return clone;
+}
+
+function inlineFormValues(original: HTMLElement, clone: HTMLElement): void {
+  inlineFormValuesRecursive(original, clone);
+}
+
+function inlineFormValuesRecursive(original: Node, clone: Node): void {
+  // 1. Process Current Node
+  if (original instanceof HTMLInputElement && clone instanceof HTMLInputElement) {
+    clone.setAttribute('value', original.value);
+    if (original.type === 'checkbox' || original.type === 'radio') {
+      if (original.checked) {
+        clone.setAttribute('checked', '');
+      } else {
+        clone.removeAttribute('checked');
+      }
+    }
+  } else if (original instanceof HTMLTextAreaElement && clone instanceof HTMLTextAreaElement) {
+    clone.textContent = original.value;
+  } else if (original instanceof HTMLSelectElement && clone instanceof HTMLSelectElement) {
+    const options = Array.from(clone.options);
+    for (let i = 0; i < options.length; i++) {
+      if (i === original.selectedIndex) {
+        options[i].setAttribute('selected', '');
+      } else {
+        options[i].removeAttribute('selected');
+      }
+    }
+  }
+
+  // 2. Recurse Children
+  const originalChildren = Array.from(original.childNodes);
+  let cloneChildren = Array.from(clone.childNodes);
+
+  // Check for Shadow DOM / Template
+  if (original instanceof Element && original.shadowRoot) {
+    const template = cloneChildren.find(
+      (n) => n instanceof HTMLTemplateElement && n.hasAttribute('shadowrootmode')
+    ) as HTMLTemplateElement | undefined;
+    if (template) {
+      // Remove template from cloneChildren list to match originalChildren
+      cloneChildren = cloneChildren.filter((n) => n !== template);
+      // Recurse into shadow
+      inlineFormValuesRecursive(original.shadowRoot, template.content);
+    }
+  }
+
+  for (let i = 0; i < Math.min(originalChildren.length, cloneChildren.length); i++) {
+    inlineFormValuesRecursive(originalChildren[i], cloneChildren[i]);
+  }
 }
 
 function inlineVideos(original: HTMLElement, clone: HTMLElement): HTMLElement {
