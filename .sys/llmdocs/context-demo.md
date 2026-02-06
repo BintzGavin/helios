@@ -83,7 +83,7 @@ The `examples/` directory contains reference implementations for various framewo
 - **d3-animation**: Data visualization with D3.js.
 - **chartjs-animation**: Animated charts with Chart.js.
 - **excalidraw-animation**: Whiteboard animation with Excalidraw.
-- **lottie-animation**: Rendering Lottie JSON animations.
+- **lottie-animation**: Rendering Lottie JSON animations (TypeScript + Vite).
 - **framer-motion-animation**: React motion library integration.
 - **gsap-animation**: GreenSock Animation Platform integration (TypeScript + Vite).
 - **motion-one-animation**: Motion One library integration (TypeScript + Vite).
