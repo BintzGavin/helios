@@ -1,7 +1,14 @@
 import React from 'react';
-import { interpolate } from '/packages/core/src/index.ts';
+import { interpolate } from '@helios-project/core';
 
-export function Typewriter({ text, frame, start, end }) {
+interface TypewriterProps {
+    text: string;
+    frame: number;
+    start: number;
+    end: number;
+}
+
+export function Typewriter({ text, frame, start, end }: TypewriterProps) {
     // Calculate how many characters to show
     // We map [start, end] frames to [0, text.length] characters
     const visibleCount = Math.floor(interpolate(frame, [start, end], [0, text.length]));

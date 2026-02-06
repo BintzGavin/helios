@@ -13,8 +13,15 @@ export default defineConfig({
     },
   },
   resolve: {
-    alias: [
-        { find: /^\/packages\/(.*)/, replacement: path.resolve(__dirname, '../../packages') + '/$1' }
-    ]
+    alias: {
+      '@helios-project/core': path.resolve(__dirname, '../../packages/core/src/index.ts')
+    }
+  },
+  build: {
+    rollupOptions: {
+      input: {
+        main: path.resolve(__dirname, 'composition.html')
+      }
+    }
   }
 });

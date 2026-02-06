@@ -125,8 +125,15 @@ export declare class HeliosPlayer extends HTMLElement implements TrackHost, Audi
     get buffered(): TimeRanges;
     get seekable(): TimeRanges;
     get played(): TimeRanges;
+    get width(): number;
+    set width(val: number);
+    get height(): number;
+    set height(val: number);
     get videoWidth(): number;
     get videoHeight(): number;
+    get playsInline(): boolean;
+    set playsInline(val: boolean);
+    fastSeek(time: number): void;
     get currentTime(): number;
     set currentTime(val: number);
     get currentFrame(): number;

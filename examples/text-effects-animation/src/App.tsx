@@ -1,5 +1,5 @@
 import React from 'react';
-import { Helios } from '/packages/core/src/index.ts';
+import { Helios } from '@helios-project/core';
 import { useVideoFrame } from './hooks/useVideoFrame';
 import { Typewriter } from './components/Typewriter';
 import { TextReveal } from './components/TextReveal';
@@ -9,7 +9,8 @@ import './styles.css';
 const helios = new Helios({
     width: 1920,
     height: 1080,
-    fps: 30
+    fps: 30,
+    duration: 10 // Enough for the animation
 });
 
 export default function App() {

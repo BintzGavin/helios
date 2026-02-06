@@ -17,7 +17,6 @@ The `examples/` directory contains reference implementations for various framewo
 - **media-element-animation**: Sync of `<video>` and `<audio>` elements.
 - **diagnostics**: System capability and WebCodecs support checker.
 - **stress-test-animation**: High-element count stress test (2500+ elements).
-- **text-effects-animation**: Typewriter and reveal effects.
 - **variable-font-animation**: Animating variable font axes (TypeScript + Vite).
 
 ### React
@@ -35,6 +34,7 @@ The `examples/` directory contains reference implementations for various framewo
 - **react-components-demo**: Demonstration of CLI Registry components (Timer, ProgressBar, Watermark).
 - **react-d3-animation**: Data visualization with D3.js and React.
 - **react-chartjs-animation**: Animated charts with Chart.js.
+- **text-effects-animation**: Typewriter and reveal effects (TypeScript + Vite).
 
 ### Vue
 - **vue-dom-animation**: Basic Vue + DOM.

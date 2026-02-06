@@ -1,7 +1,15 @@
 import React from 'react';
-import { interpolate } from '/packages/core/src/index.ts';
+import { interpolate } from '@helios-project/core';
 
-export function TextReveal({ text, frame, start, stagger = 5, duration = 20 }) {
+interface TextRevealProps {
+    text: string;
+    frame: number;
+    start: number;
+    stagger?: number;
+    duration?: number;
+}
+
+export function TextReveal({ text, frame, start, stagger = 5, duration = 20 }: TextRevealProps) {
     return (
         <div className="text text-reveal">
             {text.split('').map((char, i) => {
