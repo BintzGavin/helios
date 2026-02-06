@@ -14,6 +14,12 @@ export interface HeliosExportOptions {
     height?: number;
     bitrate?: number;
     includeCaptions?: boolean;
+    captionStyle?: {
+        color?: string;
+        backgroundColor?: string;
+        fontFamily?: string;
+        scale?: number;
+    };
     onProgress?: (progress: number) => void;
     signal?: AbortSignal;
     canvasSelector?: string;

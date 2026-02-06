@@ -1991,4 +1991,93 @@ describe('HeliosPlayer', () => {
         expect(mockController.setPlaybackRate).toHaveBeenCalledWith(1.5);
     });
   });
+
+  describe('Caption Styling', () => {
+    let mockController: any;
+
+    beforeEach(() => {
+        mockController = {
+            getState: vi.fn().mockReturnValue({ currentFrame: 0, duration: 10, fps: 30, isPlaying: false }),
+            play: vi.fn(),
+            pause: vi.fn(),
+            seek: vi.fn(),
+            subscribe: vi.fn().mockReturnValue(() => {}),
+            onError: vi.fn().mockReturnValue(() => {}),
+            dispose: vi.fn(), setCaptions: vi.fn(),
+            setPlaybackRate: vi.fn(),
+            setAudioVolume: vi.fn(), startAudioMetering: vi.fn(), stopAudioMetering: vi.fn(), onAudioMetering: vi.fn().mockReturnValue(() => {}), diagnose: vi.fn(),
+            setAudioMuted: vi.fn(),
+            setInputProps: vi.fn(),
+            setLoop: vi.fn(),
+            setPlaybackRange: vi.fn(),
+            clearPlaybackRange: vi.fn(), startAudioMetering: vi.fn(), stopAudioMetering: vi.fn(), onAudioMetering: vi.fn().mockReturnValue(() => {}), diagnose: vi.fn(),
+            captureFrame: vi.fn(),
+            getAudioTracks: vi.fn()
+        };
+        (player as any).setController(mockController);
+    });
+
+    it('should extract computed caption styles and pass to exporter', async () => {
+        // Enable captions
+        (player as any).showCaptions = true;
+
+        // Mock getComputedStyle to return custom values
+        const originalGetComputedStyle = window.getComputedStyle;
+        vi.spyOn(window, 'getComputedStyle').mockImplementation((elt) => {
+            const style = originalGetComputedStyle(elt);
+            return {
+                ...style,
+                getPropertyValue: (prop: string) => {
+                    if (prop === '--helios-caption-color') return 'red';
+                    if (prop === '--helios-caption-bg') return 'blue';
+                    if (prop === '--helios-caption-font-family') return 'Courier';
+                    if (prop === '--helios-caption-scale') return '0.1';
+                    return style.getPropertyValue(prop);
+                }
+            } as CSSStyleDeclaration;
+        });
+
+        // Setup Exporter Mock
+        const { ClientSideExporter } = await import('./features/exporter');
+        const exportSpy = vi.fn().mockResolvedValue(undefined);
+        (ClientSideExporter as any).mockImplementation(function() {
+          return { export: exportSpy };
+        });
+
+        await (player as any).renderClientSide();
+
+        expect(exportSpy).toHaveBeenCalledWith(expect.objectContaining({
+            captionStyle: {
+                color: 'red',
+                backgroundColor: 'blue',
+                fontFamily: 'Courier',
+                scale: 0.1
+            }
+        }));
+
+        vi.restoreAllMocks();
+    });
+
+    it('should use default caption styles if variables missing', async () => {
+        (player as any).showCaptions = true;
+
+        // Setup Exporter Mock
+        const { ClientSideExporter } = await import('./features/exporter');
+        const exportSpy = vi.fn().mockResolvedValue(undefined);
+        (ClientSideExporter as any).mockImplementation(function() {
+          return { export: exportSpy };
+        });
+
+        await (player as any).renderClientSide();
+
+        expect(exportSpy).toHaveBeenCalledWith(expect.objectContaining({
+            captionStyle: {
+                color: 'white',
+                backgroundColor: 'rgba(0, 0, 0, 0.7)',
+                fontFamily: 'sans-serif',
+                scale: 0.05
+            }
+        }));
+    });
+  });
 });

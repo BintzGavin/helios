@@ -20,6 +20,12 @@ export interface HeliosExportOptions {
   height?: number;
   bitrate?: number;
   includeCaptions?: boolean;
+  captionStyle?: {
+    color?: string;
+    backgroundColor?: string;
+    fontFamily?: string;
+    scale?: number;
+  };
   onProgress?: (progress: number) => void;
   signal?: AbortSignal;
   canvasSelector?: string;
@@ -72,6 +78,12 @@ template.innerHTML = `
       --helios-range-selected-color: rgba(255, 255, 255, 0.2);
       --helios-range-unselected-color: var(--helios-range-track-color);
       --helios-font-family: sans-serif;
+
+      /* Caption Styling */
+      --helios-caption-scale: 0.05;
+      --helios-caption-bg: rgba(0, 0, 0, 0.7);
+      --helios-caption-color: white;
+      --helios-caption-font-family: sans-serif;
     }
     iframe {
       width: 100%;
@@ -313,11 +325,12 @@ template.innerHTML = `
       z-index: 5;
     }
     .caption-cue {
-      background: rgba(0, 0, 0, 0.7);
-      color: white;
+      background: var(--helios-caption-bg);
+      color: var(--helios-caption-color);
+      font-family: var(--helios-caption-font-family);
+      font-size: var(--helios-internal-caption-font-size, 16px);
       padding: 4px 8px;
       border-radius: 4px;
-      font-size: 16px;
       text-shadow: 0 1px 2px black;
       white-space: pre-wrap;
     }
@@ -1259,11 +1272,18 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
     this.resizeObserver = new ResizeObserver((entries) => {
       for (const entry of entries) {
         const width = entry.contentRect.width;
+        const height = entry.contentRect.height;
         const controls = this.shadowRoot!.querySelector(".controls");
         if (controls) {
           controls.classList.toggle("layout-compact", width < 500);
           controls.classList.toggle("layout-tiny", width < 350);
         }
+
+        // Responsive Caption Sizing
+        const computedStyle = getComputedStyle(this);
+        const scale = parseFloat(computedStyle.getPropertyValue('--helios-caption-scale').trim()) || 0.05;
+        const fontSize = Math.max(16, height * scale);
+        this.style.setProperty('--helios-internal-caption-font-size', `${fontSize}px`);
       }
     });
   }
@@ -2783,7 +2803,8 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
              canvasSelector: options.canvasSelector || this.getAttribute('canvas-selector') || 'canvas',
              includeCaptions: options.includeCaptions ?? this.showCaptions,
              onProgress: options.onProgress || (() => {}),
-             signal: options.signal
+             signal: options.signal,
+             captionStyle: options.captionStyle
          };
 
          // Handle export-caption-mode='file' logic if not explicitly overridden by options
@@ -2811,6 +2832,17 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
                 exporter.saveCaptionsAsSRT(cues, `${finalOptions.filename}.srt`);
              }
              finalOptions.includeCaptions = false;
+         }
+
+         // Extract computed styles for captions
+         if (finalOptions.includeCaptions) {
+             const computedStyle = getComputedStyle(this);
+             finalOptions.captionStyle = {
+                 color: computedStyle.getPropertyValue('--helios-caption-color').trim() || 'white',
+                 backgroundColor: computedStyle.getPropertyValue('--helios-caption-bg').trim() || 'rgba(0, 0, 0, 0.7)',
+                 fontFamily: computedStyle.getPropertyValue('--helios-caption-font-family').trim() || 'sans-serif',
+                 scale: parseFloat(computedStyle.getPropertyValue('--helios-caption-scale').trim()) || 0.05
+             };
          }
 
          await exporter.export(finalOptions);
