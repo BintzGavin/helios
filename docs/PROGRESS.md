@@ -104,3 +104,6 @@ Each agent should update **their own dedicated progress file** instead of this f
 
 ## PLAYER v0.68.0
 - ✅ Completed: Expose Export API - Implemented public `export()` method on `<helios-player>` to allow programmatic triggering of client-side exports with configurable options (format, resolution, bitrate, etc.).
+
+## DEMO v1.123.0
+- ✅ Completed: Standardize Lottie Animation Example - Modernized `examples/lottie-animation` with TypeScript, `package.json`, and proper build config.
