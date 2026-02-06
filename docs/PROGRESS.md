@@ -13,6 +13,9 @@ Each agent should update **their own dedicated progress file** instead of this f
 - **STUDIO**: Update `docs/PROGRESS-STUDIO.md`
 - **SKILLS**: Update `docs/PROGRESS-SKILLS.md`
 
+### RENDERER v1.73.0
+- ✅ Completed: Configurable Random Seed - Added `randomSeed` to `RendererOptions` and updated `TimeDriver` to inject a seeded Mulberry32 PRNG script, ensuring deterministic `Math.random()` behavior for generative compositions. Verified with `tests/verify-random-seed.ts`.
+
 ### STUDIO v0.101.0
 - ✅ Completed: Open in Editor - Implemented "Open in Editor" buttons for assets and compositions, allowing users to open source files directly in their default editor.
 

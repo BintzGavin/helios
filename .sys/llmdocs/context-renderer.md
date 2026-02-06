@@ -18,7 +18,7 @@ The Renderer employs a "Dual-Path" architecture to handle different rendering ne
 
 Both strategies rely on **Time Drivers** (`CdpTimeDriver` or `SeekTimeDriver`) to enforce frame-perfect synchronization and deterministic behavior. This includes:
 -   **Virtual Time**: Overriding `Date.now()`, `performance.now()`, and `requestAnimationFrame`.
--   **Seeded Randomness**: Injecting a deterministic Mulberry32 PRNG to replace `Math.random()`.
+-   **Seeded Randomness**: Injecting a deterministic Mulberry32 PRNG to replace `Math.random()`, configurable via `randomSeed`.
 
 Both strategies normalize the output into a stream of buffers (video frames) that are piped into FFmpeg.
 
@@ -74,6 +74,7 @@ interface RendererOptions {
   inputProps?: Record<string, any>; // Injected into window.__HELIOS_PROPS__
   mixInputAudio?: boolean; // Mix implicit audio from input
   subtitles?: string; // Path to SRT file to burn in
+  randomSeed?: number; // Seed for deterministic PRNG (default: 0x12345678)
 }
 ```
 

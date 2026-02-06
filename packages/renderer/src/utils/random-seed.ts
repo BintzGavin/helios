@@ -1,8 +1,9 @@
-export const RANDOM_SEED_SCRIPT = `
+export function getSeedScript(seed: number = 0x12345678): string {
+  return `
   (function() {
     // Mulberry32 seeded random number generator
-    // Seed: 0x12345678 (Fixed constant)
-    let seed = 0x12345678;
+    // Seed: ${seed} (Configurable)
+    let seed = ${seed};
 
     Math.random = function() {
       let t = seed += 0x6D2B79F5;
@@ -11,6 +12,7 @@ export const RANDOM_SEED_SCRIPT = `
       return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
     };
 
-    console.log('[Helios] Math.random() has been seeded for deterministic rendering.');
+    console.log('[Helios] Math.random() has been seeded for deterministic rendering. Seed: ${seed}');
   })();
 `;
+}

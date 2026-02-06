@@ -4,8 +4,9 @@ export interface TimeDriver {
   /**
    * Initialize the driver before navigation (e.g., injecting scripts).
    * @param page The Playwright page instance.
+   * @param seed Optional random seed for deterministic rendering.
    */
-  init(page: Page): Promise<void>;
+  init(page: Page, seed?: number): Promise<void>;
 
   /**
    * Prepares the driver after navigation (e.g., setting up CDP session or initial overrides).

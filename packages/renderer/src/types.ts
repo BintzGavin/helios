@@ -231,6 +231,12 @@ export interface RendererOptions {
    * Useful for multi-pass rendering or when the input video already contains audio that should be preserved.
    */
   mixInputAudio?: boolean;
+
+  /**
+   * Seed for the deterministic random number generator.
+   * Defaults to 0x12345678.
+   */
+  randomSeed?: number;
 }
 
 export interface RenderJobOptions {

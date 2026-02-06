@@ -1,10 +1,11 @@
-**Version**: 1.72.0
+**Version**: 1.73.0
 
 **Posture**: MAINTENANCE WITH V2 EXPANSION
 
 # Renderer Agent Status
 
 ## Progress Log
+- [1.73.0] ✅ Completed: Configurable Random Seed - Added `randomSeed` to `RendererOptions` and updated `TimeDriver` to inject a seeded Mulberry32 PRNG script, ensuring deterministic `Math.random()` behavior for generative compositions. Verified with `tests/verify-random-seed.ts`.
 - [1.72.0] ✅ Completed: Orchestrator Cancellation - Implemented robust cancellation in `RenderOrchestrator`. Now, if a single distributed worker fails, all concurrent workers are immediately aborted via `AbortController` to prevent resource waste. Verified with `verify-distributed-cancellation.ts`.
 - [1.71.3] ✅ Completed: Refactor Media Discovery - Consolidated duplicated `findAllMedia` logic from `CdpTimeDriver`, `SeekTimeDriver`, and `dom-scanner` into a shared `dom-scripts.ts` utility, improving maintainability. Verified with `npm run test` (logic equivalence).
 - [1.71.2] ✅ Completed: Verify Background Image Preloading - Enhanced `verify-dom-preload.ts` to strictly verify that `DomStrategy` detects and preloads CSS background images by intercepting and validating log output.
@@ -109,7 +110,7 @@
 - [1.11.0] ✅ Completed: Implement Media Preloading - Updated `DomStrategy` to detect and preload `<video>` and `<audio>` elements, ensuring they are buffered (`HAVE_ENOUGH_DATA`) before rendering starts.
 - [1.10.0] ✅ Completed: Implement Background Image Preloading - Updated `DomStrategy` to detect and preload CSS background images, ensuring they are loaded before rendering starts.
 - [1.9.0] ✅ Completed: Integrate Diagnostics - Added `diagnose(page)` to `RenderStrategy` interface and implemented environment checks (VideoEncoder, WAAPI) in strategies to improve observability.
-- [1.8.0] ✅ Completed: Configurable WebCodecs Bitrate - Updated `CanvasStrategy` to respect `videoBitrate` in `RendererOptions`, enabling high-quality intermediate capture (defaulting to 25 Mbps floor).
+- [1.8.0] ✅ Completed: Configurable Codecs Bitrate - Updated `CanvasStrategy` to respect `videoBitrate` in `RendererOptions`, enabling high-quality intermediate capture (defaulting to 25 Mbps floor).
 - [1.7.0] ✅ Completed: Implement Video Concatenation - Added `concatenateVideos` utility using FFmpeg concat demuxer to support distributed rendering workflows.
 - [1.6.0] ✅ Completed: Configurable Codecs - Added `videoCodec`, `pixelFormat`, `crf`, `preset`, and `videoBitrate` options to `RendererOptions` and updated strategies to use them.
 - [2024-05-21] ✅ Completed: Refactor FFmpeg Arguments to Strategy - Moved FFmpeg input argument generation to RenderStrategy interface, allowing custom input formats (like WebCodecs streams) in the future.

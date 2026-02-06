@@ -1,5 +1,8 @@
 # Renderer Progress Log
 
+## RENDERER v1.73.0
+- ✅ Completed: Configurable Random Seed - Added `randomSeed` to `RendererOptions` and updated `TimeDriver` to inject a seeded Mulberry32 PRNG script, ensuring deterministic `Math.random()` behavior for generative compositions. Verified with `tests/verify-random-seed.ts`.
+
 ## RENDERER v1.72.0
 - ✅ Completed: Orchestrator Cancellation - Implemented robust cancellation in `RenderOrchestrator`. Now, if a single distributed worker fails, all concurrent workers are immediately aborted via `AbortController` to prevent resource waste. Verified with `verify-distributed-cancellation.ts`.
 

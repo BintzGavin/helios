@@ -1,13 +1,13 @@
 import { Page } from 'playwright';
 import { TimeDriver } from './TimeDriver.js';
-import { RANDOM_SEED_SCRIPT } from '../utils/random-seed.js';
+import { getSeedScript } from '../utils/random-seed.js';
 import { FIND_ALL_MEDIA_FUNCTION } from '../utils/dom-scripts.js';
 
 export class SeekTimeDriver implements TimeDriver {
   constructor(private timeout: number = 30000) {}
 
-  async init(page: Page): Promise<void> {
-    await page.addInitScript(RANDOM_SEED_SCRIPT);
+  async init(page: Page, seed?: number): Promise<void> {
+    await page.addInitScript(getSeedScript(seed));
     await page.addInitScript(() => {
       // Initialize virtual time
       (window as any).__HELIOS_VIRTUAL_TIME__ = 0;
