@@ -19,6 +19,20 @@ export interface DistributedRenderOptions extends RendererOptions {
 const CHUNK_AUDIO_CODEC = 'pcm_s16le';
 const CHUNK_EXTENSION = '.mov';
 
+// Helper to detect if a video file has an audio stream
+function hasAudioStream(filePath: string, ffmpegPath: string): Promise<boolean> {
+  return new Promise((resolve) => {
+    const process = spawn(ffmpegPath, ['-i', filePath]);
+    let stderr = '';
+    process.stderr.on('data', (d) => stderr += d.toString());
+    process.on('close', () => {
+      // Look for "Audio:" stream in the output
+      resolve(/Stream #.*:.*Audio:/.test(stderr));
+    });
+    process.on('error', () => resolve(false));
+  });
+}
+
 export class RenderOrchestrator {
   static async render(compositionUrl: string, outputPath: string, options: DistributedRenderOptions, jobOptions?: RenderJobOptions): Promise<void> {
     const concurrency = options.concurrency || Math.max(1, os.cpus().length - 1);
@@ -156,16 +170,30 @@ export class RenderOrchestrator {
       if (finalStepNeeded) {
         console.log('Mixing audio into concatenated video...');
 
+        const ffmpegPath = options.ffmpegPath || ffmpeg.path;
+
+        // Detect if the concatenated video has an audio stream (implicit audio)
+        const hasImplicitAudio = await hasAudioStream(concatTarget, ffmpegPath);
+        if (!hasImplicitAudio) {
+          console.log('No implicit audio stream detected in concatenated video.');
+        }
+
         // Use FFmpegBuilder to generate args for the mixing pass
         // We force 'copy' for video to avoid re-encoding
         // We enable mixInputAudio to preserve the audio from the concatenated chunks (implicit audio)
-        const mixOptions: RendererOptions = { ...options, videoCodec: 'copy', mixInputAudio: true };
+        // We explicitly disable subtitles because they are already burned into the chunks (if requested)
+        // and enabling them here with 'copy' codec would cause FFmpegBuilder to throw an error.
+        const mixOptions: RendererOptions = {
+          ...options,
+          videoCodec: 'copy',
+          mixInputAudio: hasImplicitAudio,
+          subtitles: undefined
+        };
         const videoInputArgs = ['-i', concatTarget];
 
         // FFmpegBuilder handles audio offsets/seeking based on options
         const { args } = FFmpegBuilder.getArgs(mixOptions, outputPath, videoInputArgs);
 
-        const ffmpegPath = options.ffmpegPath || ffmpeg.path;
         console.log(`Spawning FFmpeg for audio mixing: ${ffmpegPath} ${args.join(' ')}`);
 
         await new Promise<void>((resolve, reject) => {
@@ -188,15 +216,6 @@ export class RenderOrchestrator {
             reject(err);
           });
         });
-
-        // Cleanup intermediate silent video
-        try {
-          if (fs.existsSync(concatTarget)) {
-            await fs.promises.unlink(concatTarget);
-          }
-        } catch (e) {
-          console.warn(`Failed to delete temp concat file ${concatTarget}`, e);
-        }
       }
 
     } finally {
@@ -206,6 +225,12 @@ export class RenderOrchestrator {
       }
 
       console.log('Cleaning up temporary files...');
+
+      // Ensure the concatenated intermediate file is also cleaned up
+      if (concatTarget) {
+        tempFiles.push(concatTarget);
+      }
+
       for (const file of tempFiles) {
         try {
           if (fs.existsSync(file)) {
