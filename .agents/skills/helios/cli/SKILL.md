@@ -84,6 +84,22 @@ npx helios merge <output> [inputs...]
 npx helios merge final.mp4 section1.mp4 section2.mp4 section3.mp4
 ```
 
+### `list`
+List all installed components in the current project.
+
+```bash
+npx helios list
+```
+- Reads `helios.config.json` to identify tracked components.
+
+### `update`
+Update or reinstall a specific component from the registry.
+
+```bash
+npx helios update <component-name>
+```
+- **Force:** Use `--force` to overwrite local changes if necessary.
+
 ### `add`
 Add a pre-built component to your project from the Helios Registry.
 
