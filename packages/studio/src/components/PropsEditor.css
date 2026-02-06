@@ -32,6 +32,16 @@
   box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.1);
 }
 
+.prop-input.error {
+  border-color: #dc3545;
+  background-color: #fff5f5;
+}
+
+.prop-input.error:focus {
+  border-color: #dc3545;
+  box-shadow: 0 0 0 2px rgba(220, 53, 69, 0.1);
+}
+
 .prop-checkbox-label {
   display: flex;
   align-items: center;

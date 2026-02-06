@@ -344,9 +344,24 @@ const EnumInput: React.FC<{ options: (string | number)[], value: any, onChange: 
 };
 
 const NumberRangeInput: React.FC<{ min?: number, max?: number, step?: number, value: number, onChange: (val: number) => void }> = ({ min, max, step, value, onChange }) => {
+  const [localValue, setLocalValue] = React.useState(value);
+
+  React.useEffect(() => {
+    setLocalValue(value);
+  }, [value]);
+
+  const handleChange = (val: number) => {
+    setLocalValue(val);
+    onChange(val);
+  };
+
   const hasRange = min !== undefined && max !== undefined;
   // If step is not provided, default to 1% of range, or default browser behavior if no range
   const rangeStep = step !== undefined ? step : (hasRange ? (max! - min!) / 100 : undefined);
+
+  let validation = { valid: true, message: undefined as string | undefined };
+  if (min !== undefined && localValue < min) validation = { valid: false, message: 'Value too low' };
+  else if (max !== undefined && localValue > max) validation = { valid: false, message: 'Value too high' };
 
   return (
     <div className={`prop-number-container ${hasRange ? 'has-range' : ''}`}>
@@ -357,18 +372,19 @@ const NumberRangeInput: React.FC<{ min?: number, max?: number, step?: number, va
           min={min}
           max={max}
           step={rangeStep}
-          value={value}
-          onChange={(e) => onChange(parseFloat(e.target.value))}
+          value={localValue}
+          onChange={(e) => handleChange(parseFloat(e.target.value))}
         />
       )}
       <input
         type="number"
-        className="prop-input prop-number"
+        className={`prop-input prop-number ${!validation.valid ? 'error' : ''}`}
         min={min}
         max={max}
         step={step}
-        value={value}
-        onChange={(e) => onChange(parseFloat(e.target.value))}
+        value={localValue}
+        onChange={(e) => handleChange(parseFloat(e.target.value))}
+        title={validation.message}
       />
     </div>
   );
@@ -414,6 +430,17 @@ const StringInput: React.FC<{
   maxLength?: number;
   pattern?: string;
 }> = ({ value, onChange, format, minLength, maxLength, pattern }) => {
+  const [localValue, setLocalValue] = React.useState(value);
+
+  React.useEffect(() => {
+    setLocalValue(value);
+  }, [value]);
+
+  const handleChange = (val: string) => {
+    setLocalValue(val);
+    onChange(val);
+  };
+
   const [isDragOver, setIsDragOver] = React.useState(false);
 
   const handleDragOver = (e: React.DragEvent) => {
@@ -429,7 +456,7 @@ const StringInput: React.FC<{
     e.preventDefault();
     setIsDragOver(false);
     const text = e.dataTransfer.getData('text/plain');
-    if (text) onChange(text);
+    if (text) handleChange(text);
   };
 
   let inputType = 'text';
@@ -442,19 +469,35 @@ const StringInput: React.FC<{
       else if (format === 'color') inputType = 'color';
   }
 
+  const validate = () => {
+    if (minLength !== undefined && localValue.length < minLength) return { valid: false, message: 'Too short' };
+    if (maxLength !== undefined && localValue.length > maxLength) return { valid: false, message: 'Too long' };
+    if (pattern) {
+      try {
+        if (!new RegExp(pattern).test(localValue)) return { valid: false, message: 'Pattern mismatch' };
+      } catch (e) {
+        // ignore invalid regex
+      }
+    }
+    return { valid: true, message: undefined as string | undefined };
+  };
+
+  const validation = validate();
+  const title = validation.message || (pattern ? `Must match pattern: ${pattern}` : undefined);
+
   return (
     <input
       type={inputType}
-      className={`prop-input ${isDragOver ? 'drag-over' : ''}`}
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
+      className={`prop-input ${isDragOver ? 'drag-over' : ''} ${!validation.valid ? 'error' : ''}`}
+      value={localValue}
+      onChange={(e) => handleChange(e.target.value)}
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
       minLength={minLength}
       maxLength={maxLength}
       pattern={pattern}
-      title={pattern ? `Must match pattern: ${pattern}` : undefined}
+      title={title}
     />
   );
 };
