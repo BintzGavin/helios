@@ -16,6 +16,9 @@ Each agent should update **their own dedicated progress file** instead of this f
 ### STUDIO v0.104.2
 - ✅ Completed: CompositionsPanel Tests - Implemented unit tests for CompositionsPanel covering CRUD and filtering.
 
+### CLI v0.17.0
+- ✅ Completed: Implement Job Command - Implemented `helios job run` to execute distributed rendering jobs from JSON specifications.
+
 ### SKILLS v1.12.0
 - ✅ Completed: Daily Skills Review
   - Created workflow skill for `declarative-timeline` (Timeline & Active Clips)

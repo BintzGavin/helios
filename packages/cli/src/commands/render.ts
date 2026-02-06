@@ -3,6 +3,7 @@ import path from 'path';
 import fs from 'fs';
 import { pathToFileURL } from 'url';
 import { RenderOrchestrator, DistributedRenderOptions } from '@helios-project/renderer';
+import { JobSpec, RenderJobChunk } from '../types/job.js';
 
 export function registerRenderCommand(program: Command) {
   program
@@ -59,7 +60,7 @@ export function registerRenderCommand(program: Command) {
             totalFrames = Math.ceil(duration * fps);
           }
 
-          const chunks = [];
+          const chunks: RenderJobChunk[] = [];
           const chunkSize = Math.ceil(totalFrames / concurrency);
           const outputDir = path.dirname(outputPath);
           // Force intermediate chunks to be .mov for PCM support
@@ -137,7 +138,7 @@ export function registerRenderCommand(program: Command) {
           // However, we should only add defaults if the user didn't specify.
           // For now, only explicit user options are passed.
 
-          const jobSpec = {
+          const jobSpec: JobSpec = {
             metadata: {
               totalFrames,
               fps,

@@ -22,12 +22,15 @@ packages/cli/
 │   │   ├── build.ts
 │   │   ├── components.ts
 │   │   ├── init.ts
+│   │   ├── job.ts
 │   │   ├── list.ts
 │   │   ├── merge.ts
 │   │   ├── remove.ts
 │   │   ├── render.ts
 │   │   ├── studio.ts
 │   │   └── update.ts
+│   ├── types/
+│   │   └── job.ts
 │   └── utils/
 ├── package.json
 └── tsconfig.json
@@ -45,6 +48,7 @@ packages/cli/
 - `helios remove <component>`: Removes a component from the project configuration.
 - `helios update <component>`: Updates a component to the latest version.
 - `helios build`: Builds the project for production using Vite.
+- `helios job run <file>`: Execute a distributed render job from a JSON spec.
 
 ## D. Configuration
 
