@@ -1,3 +1,15 @@
+## PLAYER v0.72.0
+- ✅ Completed: Export Menu - Implemented a dedicated Export Menu UI to allow users to configure export options (format, resolution, filename, captions) and take snapshots directly from the player.
+
+## PLAYER v0.71.0
+- ✅ Completed: Synchronize Caption Styling - Implemented responsive caption sizing and configurable styling via CSS variables, ensuring visual parity between player preview and client-side export.
+
+## PLAYER v0.70.5
+- ✅ Completed: Decouple Core - Decoupled `@helios-project/player` from `@helios-project/core` runtime dependency to fix UMD builds and enable drop-in usage.
+
+## PLAYER v0.70.4
+- ✅ Completed: Fix Poster Visibility - Implemented persistent `_hasPlayed` state to ensure poster remains hidden when seeking back to frame 0 after playback.
+
 ## PLAYER v0.70.3
 - ✅ Completed: Refactor Granular Playback - Refactored renderSettingsMenu to use dynamic generation for playback speed options.
 

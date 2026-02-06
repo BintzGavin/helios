@@ -11,6 +11,7 @@ The Shadow DOM contains:
 - `.poster-container`: Poster image overlay.
 - `.audio-menu`: Popup menu for individual audio track control.
 - `.settings-menu`: Popup menu for Playback Speed (0.25x - 2x), Loop, Playback Range, Shortcuts, and Diagnostics.
+- `.export-menu`: Popup menu for Export and Snapshot configuration.
 - `.shortcuts-overlay`: Overlay displaying keyboard shortcuts.
 - `.captions-container`: Overlay for rendering captions.
 - `.debug-overlay`: Diagnostics UI (toggled via Settings or Shift+D).
