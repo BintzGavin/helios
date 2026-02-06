@@ -937,6 +937,20 @@ export class HeliosPlayer extends HTMLElement {
         // Standard Media API: played range matches duration
         return new StaticTimeRange(0, this.duration);
     }
+    get width() {
+        const val = this.getAttribute("width");
+        return val ? parseInt(val, 10) : 0;
+    }
+    set width(val) {
+        this.setAttribute("width", String(val));
+    }
+    get height() {
+        const val = this.getAttribute("height");
+        return val ? parseInt(val, 10) : 0;
+    }
+    set height(val) {
+        this.setAttribute("height", String(val));
+    }
     get videoWidth() {
         if (this.controller) {
             const state = this.controller.getState();
@@ -953,6 +967,20 @@ export class HeliosPlayer extends HTMLElement {
         }
         return parseFloat(this.getAttribute("height") || "0");
     }
+    get playsInline() {
+        return this.hasAttribute("playsinline");
+    }
+    set playsInline(val) {
+        if (val) {
+            this.setAttribute("playsinline", "");
+        }
+        else {
+            this.removeAttribute("playsinline");
+        }
+    }
+    fastSeek(time) {
+        this.currentTime = time;
+    }
     get currentTime() {
         if (!this.controller)
             return 0;
@@ -965,8 +993,9 @@ export class HeliosPlayer extends HTMLElement {
             if (s.fps) {
                 // Dispatch events to satisfy Standard Media API expectations
                 this.dispatchEvent(new Event("seeking"));
-                this.controller.seek(Math.floor(val * s.fps));
-                this.dispatchEvent(new Event("seeked"));
+                this.controller.seek(Math.floor(val * s.fps)).then(() => {
+                    this.dispatchEvent(new Event("seeked"));
+                });
             }
         }
     }
@@ -977,8 +1006,9 @@ export class HeliosPlayer extends HTMLElement {
         if (this.controller) {
             // Dispatch events to satisfy Standard Media API expectations
             this.dispatchEvent(new Event("seeking"));
-            this.controller.seek(Math.floor(val));
-            this.dispatchEvent(new Event("seeked"));
+            this.controller.seek(Math.floor(val)).then(() => {
+                this.dispatchEvent(new Event("seeked"));
+            });
         }
     }
     get duration() {

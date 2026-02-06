@@ -31,6 +31,11 @@ export function connectToParent(helios) {
             case 'HELIOS_SEEK':
                 if (typeof frame === 'number') {
                     helios.seek(frame);
+                    requestAnimationFrame(() => {
+                        requestAnimationFrame(() => {
+                            window.parent.postMessage({ type: 'HELIOS_SEEK_DONE', frame }, '*');
+                        });
+                    });
                 }
                 break;
             case 'HELIOS_SET_PLAYBACK_RATE':
