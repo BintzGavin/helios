@@ -2,6 +2,10 @@
 
 This file tracks progress for the CLI domain (`packages/cli`).
 
+## CLI v0.11.1
+
+- ✅ Update Context & Verify - Updated context documentation for list command and re-verified functionality.
+
 ## CLI v0.11.0
 
 - ✅ Implement List Command - Implemented `helios list` to display installed components.

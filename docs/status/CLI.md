@@ -1,6 +1,6 @@
 # CLI Status
 
-**Version**: 0.11.0
+**Version**: 0.11.1
 
 ## Current State
 
@@ -50,3 +50,4 @@ Per AGENTS.md, the CLI is "ACTIVELY EXPANDING FOR V2" with focus on:
 [v0.10.0] ✅ Track Installed Components - Updated `helios add` to record installed components in `helios.config.json`.
 [v0.11.0] ✅ Implement List Command - Implemented `helios list` to display installed components.
 [v0.11.0] ✅ Verified List Command - Verified `helios list` correctly lists installed components, handles empty lists, and missing config.
+[v0.11.1] ✅ Update Context & Verify - Updated context documentation for list command and re-verified functionality.

@@ -35,7 +35,7 @@ packages/cli/
   - Options: `-y`, `--framework <name>`
 - `helios add [component]`: Adds a component to the project.
   - Options: `--no-install`
-- `helios list`: Lists installed components in the project.
+- `helios list`: Lists installed components in the project as defined in `helios.config.json`.
 - `helios components`: Lists available components in the registry.
 - `helios render [file]`: Renders a composition to video.
   - Options: `--concurrency`, `--start-frame`, `--frame-count`
