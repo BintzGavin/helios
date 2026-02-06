@@ -404,4 +404,56 @@ describe('dom-capture', () => {
         // srcset and sizes should be removed
         expect(text).not.toContain('srcset');
     });
+
+    it('should preserve form input values', async () => {
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.value = 'user text';
+        container.appendChild(input);
+
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.checked = true;
+        container.appendChild(checkbox);
+
+        const radio = document.createElement('input');
+        radio.type = 'radio';
+        radio.checked = true;
+        container.appendChild(radio);
+
+        const textarea = document.createElement('textarea');
+        textarea.value = 'multiline text';
+        container.appendChild(textarea);
+
+        const select = document.createElement('select');
+        const opt1 = document.createElement('option');
+        opt1.value = '1';
+        opt1.text = 'One';
+        const opt2 = document.createElement('option');
+        opt2.value = '2';
+        opt2.text = 'Two';
+        select.appendChild(opt1);
+        select.appendChild(opt2);
+        select.selectedIndex = 1; // Select 'Two'
+        container.appendChild(select);
+
+        await captureDomToBitmap(container);
+
+        const blob = (URL.createObjectURL as any).mock.calls[0][0] as Blob;
+        const text = await readBlob(blob);
+
+        // Input value should be synced to attribute
+        expect(text).toContain('value="user text"');
+
+        // Checkbox/Radio checked state should be synced to attribute
+        // XMLSerializer might serialize as checked="" or checked
+        expect(text).toMatch(/checked=""|checked(?!=")/);
+
+        // Textarea value should be text content
+        expect(text).toContain('multiline text');
+
+        // Select option should have selected attribute
+        // We look for the option with value="2" having selected
+        expect(text).toMatch(/<option value="2"[^>]*selected/);
+    });
 });
