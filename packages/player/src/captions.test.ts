@@ -24,7 +24,7 @@ describe('HeliosPlayer Captions', () => {
     mockController = {
       play: vi.fn(),
       pause: vi.fn(),
-      seek: vi.fn(),
+      seek: vi.fn().mockResolvedValue(undefined),
       setAudioVolume: vi.fn(),
       setAudioMuted: vi.fn(),
       setLoop: vi.fn(),

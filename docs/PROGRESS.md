@@ -47,6 +47,16 @@ Each agent should update **their own dedicated progress file** instead of this f
 ### DEMO v1.118.0
 - ✅ Completed: Standardize Simple Animation Example - Modernized `examples/simple-animation` with TypeScript, `package.json`, and proper build config.
 
+## PLAYER v0.73.0
+- ✅ Completed: Async Seek - Updated `HeliosController.seek` to return a Promise and implemented `HELIOS_SEEK_DONE` handshake in Bridge mode to ensure `seeked` event fires only after frame rendering.
+
+## PLAYER v0.72.1
+- ✅ Verified: Test Suite Fixes - Updated tests to use `export()` instead of removed `renderClientSide()` and cleaned up duplicate keys in mock controllers. All 300 tests passed.
+- ✅ Completed: Api Parity - Implemented `width`, `height`, `playsInline` properties and `fastSeek` method on `HeliosPlayer` to improve compatibility with standard `HTMLVideoElement` API.
+
+## PLAYER v0.72.0
+- ✅ Completed: Export Menu - Implemented a dedicated Export Menu UI to allow users to configure export options (format, resolution, filename, captions) and take snapshots directly from the player.
+
 ## PLAYER v0.71.0
 - ✅ Completed: Synchronize Caption Styling - Implemented responsive caption sizing and configurable styling via CSS variables, ensuring visual parity between player preview and client-side export.
 

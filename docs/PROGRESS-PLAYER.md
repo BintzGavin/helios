@@ -1,3 +1,6 @@
+## PLAYER v0.73.0
+- ✅ Completed: Async Seek - Updated `HeliosController.seek` to return a Promise and implemented `HELIOS_SEEK_DONE` handshake in Bridge mode to ensure `seeked` event fires only after frame rendering.
+
 ## PLAYER v0.72.1
 - ✅ Completed: Api Parity - Implemented `width`, `height`, `playsInline` properties and `fastSeek` method on `HeliosPlayer` to improve compatibility with standard `HTMLVideoElement` API.
 

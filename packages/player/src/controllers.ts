@@ -6,7 +6,7 @@ import { AudioMeter, AudioLevels } from "./features/audio-metering";
 export interface HeliosController {
   play(): void;
   pause(): void;
-  seek(frame: number): void;
+  seek(frame: number): Promise<void>;
   setAudioVolume(volume: number): void;
   setAudioMuted(muted: boolean): void;
   setAudioTrackVolume(trackId: string, volume: number): void;
@@ -42,7 +42,10 @@ export class DirectController implements HeliosController {
   constructor(public instance: Helios, private iframe?: HTMLIFrameElement) {}
   play() { this.instance.play(); }
   pause() { this.instance.pause(); }
-  seek(frame: number) { this.instance.seek(frame); }
+  seek(frame: number) {
+    this.instance.seek(frame);
+    return Promise.resolve();
+  }
   setAudioVolume(volume: number) { this.instance.setAudioVolume(volume); }
   setAudioMuted(muted: boolean) { this.instance.setAudioMuted(muted); }
   setAudioTrackVolume(trackId: string, volume: number) { this.instance.setAudioTrackVolume(trackId, volume); }
@@ -225,7 +228,29 @@ export class BridgeController implements HeliosController {
 
   play() { this.iframeWindow.postMessage({ type: 'HELIOS_PLAY' }, '*'); }
   pause() { this.iframeWindow.postMessage({ type: 'HELIOS_PAUSE' }, '*'); }
-  seek(frame: number) { this.iframeWindow.postMessage({ type: 'HELIOS_SEEK', frame }, '*'); }
+  async seek(frame: number): Promise<void> {
+    return new Promise((resolve) => {
+      let timeoutId: number;
+      const handler = (event: MessageEvent) => {
+        if (event.source !== this.iframeWindow) return;
+
+        if (event.data?.type === 'HELIOS_SEEK_DONE' && event.data.frame === frame) {
+          window.removeEventListener('message', handler);
+          clearTimeout(timeoutId);
+          resolve();
+        }
+      };
+
+      window.addEventListener('message', handler);
+      this.iframeWindow.postMessage({ type: 'HELIOS_SEEK', frame }, '*');
+
+      timeoutId = window.setTimeout(() => {
+        window.removeEventListener('message', handler);
+        console.warn(`HeliosPlayer: Seek to frame ${frame} timed out`);
+        resolve();
+      }, 5000);
+    });
+  }
   setAudioVolume(volume: number) { this.iframeWindow.postMessage({ type: 'HELIOS_SET_VOLUME', volume }, '*'); }
   setAudioMuted(muted: boolean) { this.iframeWindow.postMessage({ type: 'HELIOS_SET_MUTED', muted }, '*'); }
   setAudioTrackVolume(trackId: string, volume: number) { this.iframeWindow.postMessage({ type: 'HELIOS_SET_AUDIO_TRACK_VOLUME', trackId, volume }, '*'); }

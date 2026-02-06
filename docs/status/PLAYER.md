@@ -1,4 +1,4 @@
-**Version**: v0.72.1
+**Version**: v0.73.0
 
 **Posture**: STABLE AND FEATURE COMPLETE
 
@@ -60,6 +60,7 @@
 - **Export API**: Exposes public `export()` method for programmatic control over client-side exports, supporting Video (MP4/WebM) and Snapshot (PNG/JPEG) formats.
 - **Export Menu**: Implements a dedicated Export Menu in the player UI (replacing the direct export button action) to allow configuring format, resolution, filename, and captions before exporting or taking a snapshot.
 
+[v0.73.0] ✅ Completed: Async Seek - Updated `HeliosController.seek` to return a Promise and implemented `HELIOS_SEEK_DONE` handshake in Bridge mode to ensure `seeked` event fires only after frame rendering.
 [v0.72.1] ✅ Verified: Test Suite Fixes - Updated tests to use `export()` instead of removed `renderClientSide()` and cleaned up duplicate keys in mock controllers. All 300 tests passed.
 [v0.72.1] ✅ Completed: Api Parity - Implemented `width`, `height`, `playsInline` properties and `fastSeek` method on `HeliosPlayer` to improve compatibility with standard `HTMLVideoElement` API.
 [v0.72.0] ✅ Completed: Export Menu - Implemented a dedicated Export Menu UI to allow users to configure export options (format, resolution, filename, captions) and take snapshots directly from the player.

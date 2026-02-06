@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Verify Async Seek</title>
+    <script src="../dist/helios-player.global.js"></script>
+    <style>
+        body { font-family: sans-serif; padding: 20px; }
+        #logs { margin-top: 20px; background: #f0f0f0; padding: 10px; border: 1px solid #ccc; height: 200px; overflow-y: auto; }
+    </style>
+</head>
+<body>
+    <h1>Async Seek Verification</h1>
+    <p>This test mocks a slow bridge response (500ms) to verify 'seeked' event waits for it.</p>
+    <helios-player id="player" width="800" height="450" controls></helios-player>
+    <div id="logs"></div>
+
+    <script>
+        const player = document.getElementById('player');
+        const logs = document.getElementById('logs');
+
+        function log(msg) {
+            const div = document.createElement('div');
+            div.textContent = `[${new Date().toISOString()}] ${msg}`;
+            logs.appendChild(div);
+            console.log(msg);
+        }
+
+        player.addEventListener('seeking', () => log('Event: seeking'));
+        player.addEventListener('seeked', () => log('Event: seeked'));
+
+        // Mock composition via src
+        const mockSrc = `
+            <!DOCTYPE html>
+            <html>
+            <body>
+                <h1>Mock Composition</h1>
+                <script>
+                    window.addEventListener('message', (e) => {
+                        if (e.data.type === 'HELIOS_CONNECT') {
+                            window.parent.postMessage({
+                                type: 'HELIOS_READY',
+                                state: { duration: 10, fps: 30, currentFrame: 0, isPlaying: false }
+                            }, '*');
+                        }
+                        if (e.data.type === 'HELIOS_SEEK') {
+                            console.log('Iframe received seek:', e.data.frame);
+                            // Simulate delay
+                            setTimeout(() => {
+                                console.log('Iframe sending SEEK_DONE');
+                                window.parent.postMessage({
+                                    type: 'HELIOS_SEEK_DONE',
+                                    frame: e.data.frame
+                                }, '*');
+                            }, 500); // 500ms delay to be noticeable
+                        }
+                    });
+                </script>
+            </body>
+            </html>
+        `;
+        const blob = new Blob([mockSrc], { type: 'text/html' });
+        player.src = URL.createObjectURL(blob);
+
+        setTimeout(() => {
+            log('Starting seek to 5s...');
+            player.currentTime = 5;
+            log('Set currentTime = 5. Waiting for seeked...');
+        }, 1000);
+    </script>
+</body>
+</html>
