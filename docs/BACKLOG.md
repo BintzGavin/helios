@@ -10,6 +10,7 @@ This backlog tracks concrete deliverables derived from [`AGENTS.md`](../AGENTS.m
 - [x] Ensure deterministic frame seeking across all drivers.
 - [x] Support frame range rendering in CLI.
 - [x] Implement output stitching without re-encoding (verify `concat` demuxer workflow).
+- [x] Implement RenderExecutor abstraction for pluggable execution.
 - [ ] Cloud execution adapter (AWS Lambda / Google Cloud Run).
 
 
