@@ -19,6 +19,7 @@ helios init [options]
 
 **Options**:
 - `-y, --yes`: Skip prompts and use default configuration.
+- `--framework <framework>`: Specify the framework (react, vue, svelte, vanilla, solid).
 
 **Behavior**:
 Prompts the user for:
@@ -45,6 +46,30 @@ helios add <component> [options]
 1. Looks up the component in the built-in registry.
 2. Downloads/Copies the component source code to your configured `components` directory.
 3. Installs any necessary dependencies (unless `--no-install` is used).
+
+### `helios update`
+
+Updates a component to the latest version from the registry.
+
+```bash
+helios update <component>
+```
+
+### `helios remove`
+
+Removes a component from the project configuration.
+
+```bash
+helios remove <component>
+```
+
+### `helios list`
+
+Lists installed components in the project.
+
+```bash
+helios list
+```
 
 ### `helios components`
 

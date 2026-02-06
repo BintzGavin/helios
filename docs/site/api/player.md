@@ -117,7 +117,7 @@ You can trigger an export programmatically using the `export()` method directly 
 const player = document.querySelector('helios-player');
 
 await player.export({
-  format: 'mp4', // 'mp4' or 'webm'
+  format: 'mp4', // 'mp4', 'webm', 'png', or 'jpeg'
   filename: 'my-video',
   mode: 'auto', // 'auto', 'canvas', or 'dom'
   width: 1920,
@@ -177,6 +177,10 @@ You can also access the internal controller for advanced usage (though the Stand
 
 The controller exposes methods like:
 - **`setInputProps(props)`**: Updates input properties.
+- **`setDuration(duration)`**: Sets the composition duration.
+- **`setFps(fps)`**: Sets the composition FPS.
+- **`setSize(width, height)`**: Sets the composition resolution.
+- **`setMarkers(markers)`**: Sets the timeline markers.
 - **`setAudioTrackVolume(id, volume)`**: Sets volume for a specific track.
 - **`setAudioTrackMuted(id, muted)`**: Mutes/unmutes a specific track.
 - **`diagnose()`**: Returns a diagnostic report of the environment (WebCodecs, etc.).

@@ -5,6 +5,9 @@ description: "Changelog for the Core package"
 
 # Core Changelog
 
+## v5.12.0
+- **Implement Active Clips**: Added `timeline` to `HeliosOptions` and `activeClips` signal to `Helios` state, enabling declarative timeline management. Fixed critical bug in chained cold computed signals.
+
 ## v5.11.0
 - **Implement Composition Schema**: Implemented HeliosConfig, HeliosComposition, and related interfaces to support serializable composition definitions.
 

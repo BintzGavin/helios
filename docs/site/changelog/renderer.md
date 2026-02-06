@@ -5,6 +5,27 @@ description: "Changelog for the Renderer package"
 
 # Renderer Changelog
 
+## v1.75.0
+- **Distributed Progress Aggregation**: Implemented weighted progress aggregation in RenderOrchestrator to ensure monotonic progress reporting during distributed rendering.
+
+## v1.74.0
+- **Configurable Asset Timeout**: Implemented `stabilityTimeout` support in `DomStrategy` and `CanvasStrategy` to prevent indefinite hangs during asset preloading (fonts, images) and audio track scanning.
+
+## v1.73.0
+- **Configurable Random Seed**: Added `randomSeed` to `RendererOptions` and updated `TimeDriver` to inject a seeded Mulberry32 PRNG script, ensuring deterministic `Math.random()` behavior for generative compositions.
+
+## v1.72.0
+- **Orchestrator Cancellation**: Implemented robust cancellation in `RenderOrchestrator`. Now, if a single distributed worker fails, all concurrent workers are immediately aborted via `AbortController` to prevent resource waste.
+
+## v1.71.3
+- **Refactor Media Discovery**: Consolidated duplicated `findAllMedia` logic from `CdpTimeDriver`, `SeekTimeDriver`, and `dom-scanner` into a shared `dom-scripts.ts` utility.
+
+## v1.71.2
+- **Verify Background Image Preloading**: Enhanced `verify-dom-preload.ts` to strictly verify that `DomStrategy` detects and preloads CSS background images by intercepting and validating log output.
+
+## v1.71.1
+- **Deterministic Randomness**: Enforced deterministic Math.random() in `CdpTimeDriver` and `SeekTimeDriver` by injecting a seeded Mulberry32 PRNG via `page.addInitScript`, ensuring consistent generative rendering.
+
 ## v1.71.0
 - **Hardware Accelerated Codec Priority**: Updated `CanvasStrategy` to prioritize hardware-accelerated codecs (checking `navigator.mediaCapabilities.encodingInfo` for `powerEfficient: true`) and prefer H.264 over VP9 when hardware support is equivalent.
 

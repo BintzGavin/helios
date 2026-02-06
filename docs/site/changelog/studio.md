@@ -5,6 +5,51 @@ description: "Changelog for the Studio package"
 
 # Studio Changelog
 
+## v0.103.0
+- **CLI Update Command**: Implemented `helios update` command in CLI to update/reinstall components with overwrite support.
+
+## v0.102.0
+- **Agent Skills Documentation**: Updated Studio Assistant backend to index `SKILL.md` files from `.agents/skills/helios`.
+
+## v0.101.0
+- **Open in Editor**: Implemented "Open in Editor" buttons for assets and compositions, allowing users to open source files directly in their default editor.
+
+## v0.100.0
+- **Resizable Layout**: Implemented resizable Sidebar, Inspector, and Timeline panels with persistence using `localStorage` and CSS variables.
+
+## v0.99.0
+- **CLI List Command**: Verified implementation of `helios list` command to display installed components from `helios.config.json`.
+
+## v0.98.0
+- **CLI Solid Init**: Added SolidJS template support to `helios init` command.
+
+## v0.97.0
+- **Draggable Time Markers**: Implemented dragging for time-based input prop markers on the Timeline, allowing direct manipulation of prop values.
+
+## v0.96.0
+- **Sync Playback Range**: Delegated loop and playback range enforcement to HeliosController, ensuring consistent behavior across Preview and Export.
+
+## v0.95.2
+- **Audio Metering**: Implemented Master Audio Meter in the Mixer Panel header using `AudioMeter` component and real-time controller events.
+
+## v0.95.0
+- **Persist Input Props**: Implemented auto-saving of user-configured input props to `composition.json`, ensuring persistence across reloads.
+
+## v0.94.0
+- **Render Presets**: Implemented render configuration presets (Draft, HD, 4K) and persistence for render settings.
+
+## v0.93.1
+- **Smart Empty State**: Implemented "Smart Empty State" for the Stage, providing "Create Composition" (fresh project) and "Select Composition" (unselected) empty states.
+
+## v0.93.0
+- **Visualize Time-based Props**: Implemented `TimecodeInput` in Props Editor and visual markers on the Timeline for number props with `format: 'time'`, enabling WYSIWYG timing adjustments.
+
+## v0.92.0
+- **Components Registry UI**: Implemented "Components" panel in Studio UI, enabling users to browse and install components from the registry via the CLI backend.
+
+## v0.91.0
+- **CLI Production Server**: Replaced development-only spawn process with robust Vite server integration using `studioApiPlugin`.
+
 ## v0.90.0
 - **Core Components**: Expanded CLI Component Registry with `ProgressBar` and `Watermark` components.
 
