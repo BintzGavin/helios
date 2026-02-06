@@ -2,6 +2,10 @@
 
 This file tracks progress for the CLI domain (`packages/cli`).
 
+## CLI v0.13.0
+
+- ✅ Implement Remove Command - Implemented `helios remove <component>` to unregister components and warn about associated files.
+
 ## CLI v0.12.0
 
 - ✅ Framework-Aware Registry - Implemented framework filtering in `RegistryClient` and updated `helios studio` and `helios add` to respect project framework. Added SolidJS support to registry types.
