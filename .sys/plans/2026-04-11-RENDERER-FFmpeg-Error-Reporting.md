@@ -1,6 +1,6 @@
 #### 1. Context & Goal
 - **Objective**: Enhance FFmpeg error reporting by capturing and including the last 20 lines of stderr in the Error message.
-- **Trigger**: Vision gap "Agent Experience First" -> "Clear error messages". Currently, FFmpeg errors just say "exited with code X", hiding the actual cause (logged to console but not in the error object).
+- **Trigger**: Vision gap "Agent Experience First" -> "Clear error messages". Currently, FFmpeg errors just say "exited with code X", hiding the actual cause (logged to console but not in the error object). (Plan verified 2026-04-11).
 - **Impact**: Improves debuggability for agents and developers by surfacing the root cause (e.g., "Unknown encoder", "Invalid argument") directly in the exception.
 
 #### 2. File Inventory
