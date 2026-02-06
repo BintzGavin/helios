@@ -74,45 +74,76 @@ export function resolveDocumentationPath(cwd: string, pkgName: string): string |
   return null;
 }
 
-export function findDocumentation(cwd: string): DocSection[] {
-  const sections: DocSection[] = [];
+// Helper to parse markdown
+function parseMarkdown(pkg: string, content: string, sections: DocSection[]) {
+  const lines = content.split('\n');
+  let currentTitle = 'Introduction';
+  let currentContent: string[] = [];
+  // Calculate starting index to ensure unique IDs if appending to existing package sections
+  let sectionCount = sections.filter(s => s.package === pkg).length;
 
-  // Helper to parse markdown
-  const parseMarkdown = (pkg: string, content: string) => {
-    const lines = content.split('\n');
-    let currentTitle = 'Introduction';
-    let currentContent: string[] = [];
-    let sectionCount = 0;
-
-    const flush = () => {
-      if (currentContent.length > 0) {
-        // Skip empty sections
-        const text = currentContent.join('\n').trim();
-        if (text) {
-            sections.push({
-              id: `${pkg}-${sectionCount++}`,
-              package: pkg,
-              title: currentTitle,
-              content: text
-            });
-        }
-      }
-      currentContent = [];
-    };
-
-    for (const line of lines) {
-      if (line.startsWith('# ')) {
-        flush();
-        currentTitle = line.substring(2).trim();
-      } else if (line.startsWith('## ')) {
-        flush();
-        currentTitle = line.substring(3).trim();
-      } else {
-        currentContent.push(line);
+  const flush = () => {
+    if (currentContent.length > 0) {
+      // Skip empty sections
+      const text = currentContent.join('\n').trim();
+      if (text) {
+          sections.push({
+            id: `${pkg}-${sectionCount++}`,
+            package: pkg,
+            title: currentTitle,
+            content: text
+          });
       }
     }
-    flush();
+    currentContent = [];
   };
+
+  for (const line of lines) {
+    if (line.startsWith('# ')) {
+      flush();
+      currentTitle = line.substring(2).trim();
+    } else if (line.startsWith('## ')) {
+      flush();
+      currentTitle = line.substring(3).trim();
+    } else {
+      currentContent.push(line);
+    }
+  }
+  flush();
+}
+
+function findSkills(cwd: string, sections: DocSection[]) {
+  let skillsRoot: string | null = null;
+  const possiblePaths = [
+      path.resolve(cwd, '../../.agents/skills/helios'), // From packages/studio
+      path.resolve(cwd, '.agents/skills/helios')        // From root
+  ];
+
+  for (const p of possiblePaths) {
+      if (fs.existsSync(p)) {
+          skillsRoot = p;
+          break;
+      }
+  }
+
+  if (!skillsRoot) return;
+
+  const packages = ['core', 'studio', 'renderer', 'player', 'cli'];
+  for (const pkg of packages) {
+      const skillPath = path.join(skillsRoot, pkg, 'SKILL.md');
+      if (fs.existsSync(skillPath)) {
+          try {
+              const content = fs.readFileSync(skillPath, 'utf-8');
+              parseMarkdown(pkg, content, sections);
+          } catch (e) {
+              console.error(`Failed to read SKILL.md for ${pkg}`, e);
+          }
+      }
+  }
+}
+
+export function findDocumentation(cwd: string): DocSection[] {
+  const sections: DocSection[] = [];
 
   const packages = ['core', 'studio', 'renderer', 'player', 'root'];
 
@@ -121,12 +152,14 @@ export function findDocumentation(cwd: string): DocSection[] {
       if (readmePath) {
           try {
               const content = fs.readFileSync(readmePath, 'utf-8');
-              parseMarkdown(pkg, content);
+              parseMarkdown(pkg, content, sections);
           } catch (e) {
               console.error(`Failed to read README for ${pkg}`, e);
           }
       }
   }
+
+  findSkills(cwd, sections);
 
   return sections;
 }

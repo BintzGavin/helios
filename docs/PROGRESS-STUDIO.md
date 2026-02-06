@@ -1,3 +1,6 @@
+## STUDIO v0.102.0
+- ✅ Completed: Agent Skills Documentation - Updated Studio Assistant backend to index `SKILL.md` files from `.agents/skills/helios`, making agent-specific knowledge available in the documentation search.
+
 ## STUDIO v0.101.0
 - ✅ Completed: Open in Editor - Implemented "Open in Editor" buttons for assets and compositions, allowing users to open source files directly in their default editor.
 
