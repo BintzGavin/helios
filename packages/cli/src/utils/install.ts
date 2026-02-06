@@ -8,7 +8,7 @@ import { installPackage } from './package-manager.js';
 export async function installComponent(
   rootDir: string,
   componentName: string,
-  options: { install: boolean } = { install: true }
+  options: { install: boolean; overwrite?: boolean } = { install: true }
 ) {
   const config = loadConfig(rootDir);
 
@@ -39,13 +39,13 @@ export async function installComponent(
       fs.mkdirSync(fileDir, { recursive: true });
     }
 
-    if (fs.existsSync(filePath)) {
+    if (fs.existsSync(filePath) && !options.overwrite) {
       console.warn(chalk.yellow(`File already exists: ${file.name}. Skipping.`));
       continue;
     }
 
     fs.writeFileSync(filePath, file.content);
-    console.log(chalk.green(`✓ Created ${file.name}`));
+    console.log(chalk.green(`✓ ${options.overwrite && fs.existsSync(filePath) ? 'Updated' : 'Created'} ${file.name}`));
   }
 
   if (component.dependencies) {
