@@ -7,6 +7,7 @@ import { registerRenderCommand } from './commands/render.js';
 import { registerMergeCommand } from './commands/merge.js';
 import { registerListCommand } from './commands/list.js';
 import { registerRemoveCommand } from './commands/remove.js';
+import { registerUpdateCommand } from './commands/update.js';
 
 const program = new Command();
 
@@ -23,5 +24,6 @@ registerRenderCommand(program);
 registerMergeCommand(program);
 registerListCommand(program);
 registerRemoveCommand(program);
+registerUpdateCommand(program);
 
 program.parse(process.argv);

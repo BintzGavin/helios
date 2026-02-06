@@ -1,3 +1,6 @@
+## STUDIO v0.103.0
+- ✅ Completed: CLI Update Command - Implemented `helios update` command in CLI to update/reinstall components with overwrite support, ensuring users can refresh component code.
+
 ## STUDIO v0.102.0
 - ✅ Completed: Agent Skills Documentation - Updated Studio Assistant backend to index `SKILL.md` files from `.agents/skills/helios`, making agent-specific knowledge available in the documentation search.
 

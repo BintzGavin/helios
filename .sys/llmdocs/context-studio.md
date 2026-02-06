@@ -46,6 +46,8 @@ Commands:
     -   Options: `-y` (yes), `--framework <name>`
 -   `add <component>`: Adds a component to the project.
     -   Options: `--no-install`
+-   `update <component>`: Updates or force-reinstalls a component.
+    -   Options: `-y` (yes), `--no-install`
 -   `list`: Lists installed components.
 -   `components`: Lists available components in the registry.
 -   `render <composition>`: Renders a composition from the CLI.
