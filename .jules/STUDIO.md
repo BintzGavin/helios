@@ -1,3 +1,7 @@
+## [0.93.2] - Version Mismatch Awareness
+**Learning:** `docs/status/STUDIO.md` claimed version `0.104.0` but `package.json` was `0.93.2`. This suggests the Status file may be hallucinating or ahead of the actual codebase state.
+**Action:** Always verify `package.json` versions directly before trusting the Status file for version-specific logic.
+
 ## [0.68.0] - Composition Renaming Strategy
 **Learning:** Renaming a composition changes its ID (derived from the file path). The API must return the new ID, and the frontend Context must be robust enough to handle the ID change during the update cycle, specifically updating `activeComposition` to point to the new object to prevent stale state.
 **Action:** When designing CRUD operations for file-based entities, always account for identity instability (ID changing on rename/move).
