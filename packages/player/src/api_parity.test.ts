@@ -213,7 +213,7 @@ describe('HeliosPlayer API Parity', () => {
     expect(player.seeking).toBe(false);
   });
 
-  it('should dispatch seeking and seeked events during programmatic seek', () => {
+  it('should dispatch seeking and seeked events during programmatic seek', async () => {
     const seekingSpy = vi.fn();
     const seekedSpy = vi.fn();
     player.addEventListener('seeking', seekingSpy);
@@ -230,18 +230,22 @@ describe('HeliosPlayer API Parity', () => {
     player.currentTime = 5;
     expect(seekingSpy).toHaveBeenCalledTimes(1);
     expect(mockController.seek).toHaveBeenCalledWith(150); // 5 * 30
+
+    await new Promise(resolve => setTimeout(resolve, 0));
     expect(seekedSpy).toHaveBeenCalledTimes(1);
 
     player.currentFrame = 10;
     expect(seekingSpy).toHaveBeenCalledTimes(2);
     expect(mockController.seek).toHaveBeenCalledWith(10);
+
+    await new Promise(resolve => setTimeout(resolve, 0));
     expect(seekedSpy).toHaveBeenCalledTimes(2);
   });
 
   it('should support fastSeek method', () => {
     const mockController = {
       getState: () => ({ fps: 30, duration: 10 }),
-      seek: vi.fn(),
+      seek: vi.fn().mockResolvedValue(undefined),
       pause: vi.fn(),
       dispose: vi.fn(),
     };
