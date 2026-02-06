@@ -1,3 +1,6 @@
+## DEMO v1.121.0
+- ✅ Completed: Standardize Motion One Example - Modernized `examples/motion-one-animation` with TypeScript, `package.json`, and proper build config.
+
 ## DEMO v1.120.0
 - ✅ Completed: Standardize GSAP Animation Example - Modernized `examples/gsap-animation` with TypeScript, `package.json`, and proper build config.
 
