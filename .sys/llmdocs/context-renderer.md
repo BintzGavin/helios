@@ -19,6 +19,7 @@ The Renderer employs a "Dual-Path" architecture to handle different rendering ne
 Both strategies rely on **Time Drivers** (`CdpTimeDriver` or `SeekTimeDriver`) to enforce frame-perfect synchronization and deterministic behavior. This includes:
 -   **Virtual Time**: Overriding `Date.now()`, `performance.now()`, and `requestAnimationFrame`.
 -   **Seeded Randomness**: Injecting a deterministic Mulberry32 PRNG to replace `Math.random()`, configurable via `randomSeed`.
+-   **DOM Traversal**: Using consolidated scripts in `dom-scripts.ts` to recursively find media, images, and Shadow DOM scopes.
 
 Both strategies normalize the output into a stream of buffers (video frames) that are piped into FFmpeg.
 
@@ -45,7 +46,7 @@ packages/renderer/
 │   │   ├── dom-finder.ts      # Shared deep element finding (Shadow DOM)
 │   │   ├── dom-preload.ts     # Shared asset preloading logic
 │   │   ├── dom-scanner.ts     # Media element discovery
-│   │   ├── dom-scripts.ts     # Shared browser-side scripts (media discovery)
+│   │   ├── dom-scripts.ts     # Shared browser-side scripts (media, scopes, images)
 │   │   └── random-seed.ts     # Deterministic PRNG injection
 │   ├── Orchestrator.ts        # Distributed rendering coordination
 │   ├── index.ts               # Entry point
