@@ -23,7 +23,7 @@
    - Imports `core` for types and logic reuse.
    - **MUST** handle Headless Chrome interactions.
 3. **Player (`packages/player`)**:
-   - Imports `core` for types.
+   - Imports `core` for types (Type-Only dependency).
    - **MUST** work as a standalone Web Component.
 4. **Studio (`packages/studio`)**:
    - Imports `player` for preview.

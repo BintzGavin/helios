@@ -1,4 +1,4 @@
-import { Helios, HeliosSchema, DiagnosticReport } from "@helios-project/core";
+import type { Helios, HeliosSchema, DiagnosticReport } from "@helios-project/core";
 import { DirectController, BridgeController } from "./controllers";
 import type { HeliosController } from "./controllers";
 import { AudioLevels } from "./features/audio-metering";

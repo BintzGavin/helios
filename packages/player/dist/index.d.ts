@@ -1,4 +1,4 @@
-import { HeliosSchema, DiagnosticReport } from "@helios-project/core";
+import type { HeliosSchema, DiagnosticReport } from "@helios-project/core";
 import type { HeliosController } from "./controllers";
 import { ClientSideExporter } from "./features/exporter";
 import { HeliosTextTrack, HeliosTextTrackList, TrackHost } from "./features/text-tracks";
