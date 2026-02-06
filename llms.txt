@@ -6,7 +6,7 @@ Helios is a modern engine for creating videos programmatically using standard we
 
 ## Quick Facts
 - **License**: Elastic License 2.0 (free commercial use, no SaaS resale)
-- **Status**: Core: Stable (v5.11+), Studio: Alpha (v0.95+)
+- **Status**: Beta / Self-Driving (Core: Stable v5.12+, Studio: Alpha v0.101+)
 - **Frameworks**: React, Vue, Svelte, Solid, vanilla JS
 - **Animation**: Standard CSS, Web Animations API (WAAPI), any animation library
 
@@ -40,7 +40,7 @@ helios.play();
 - `@helios-project/player` - Web Component player (`<helios-player>`)
 - `@helios-project/renderer` - Server-side rendering (Playwright, FFmpeg)
 - `@helios-project/studio` - Browser-based development environment (Alpha)
-- `@helios-project/cli` - Command-line interface (scaffolding, registry, studio)
+- `@helios-project/cli` - Command-line interface (scaffolding, registry, studio, merge)
 
 ## Animation Approach
 Helios uses native browser APIs, not proprietary hooks:
@@ -72,7 +72,7 @@ The engine controls `document.timeline.currentTime` to seek animations frame-acc
 | Framework | Any | React only |
 | Animation | CSS, WAAPI | `interpolate()`, `spring()` |
 | Pricing | Free | $100+/mo for 4+ devs |
-| Maturity | Alpha | Production-ready |
+| Maturity | Beta | Production-ready |
 | Distributed rendering | Local (Beta) / Cloud (Planned) | Available |
 
 ## Agent Skills
@@ -108,11 +108,11 @@ const report = await Helios.diagnose();
 
 ## Roadmap
 ### V1.x (Active)
-- **Helios Studio**: Alpha v0.95+ (Stacked Timeline, Audio Mixer, Component Registry UI, Render Presets)
-- **CLI**: Beta v0.8+ (Component Registry, Project Scaffolding, Auto-install, Merge Command)
-- **Core**: Stable v5.11+ (Input Schema, Audio Fade Easing, Headless Audio, WebVTT)
-- **Player**: Feature Complete v0.67+ (Audio Metering, Diagnostics UI, Responsive Images)
-- **Renderer**: Stable v1.69+ (Local Distributed Rendering, Enhanced Diagnostics, Smart Codec Selection)
+- **Helios Studio**: Alpha v0.101+ (Stacked Timeline, Audio Mixer, Component Registry UI, Render Presets, Open in Editor)
+- **CLI**: Beta v0.12+ (Component Registry, Project Scaffolding, Auto-install, Merge Command)
+- **Core**: Stable v5.12+ (Active Clips, Input Schema, Audio Fade Easing, Headless Audio, WebVTT)
+- **Player**: Feature Complete v0.70+ (Audio Metering, Snapshot Export, Diagnostics UI, Responsive Images)
+- **Renderer**: Stable v1.74+ (Local Distributed Rendering, Enhanced Diagnostics, Smart Codec Selection)
 
 ### AI Integration
 - **Studio MCP Server**: Inspect, create, and render compositions via LLM tools (Done)
@@ -120,7 +120,8 @@ const report = await Helios.diagnose();
 - **Helios Assistant**: Context-aware documentation search (Done)
 
 ### V2 (Next)
-- Distributed rendering (Lambda, Cloud Run)
+- Distributed rendering (Cloud Adapters)
+- Registry Commands (CLI expansion)
 - Advanced audio engine (Tone.js integration)
 
 ### V3 (Future)
