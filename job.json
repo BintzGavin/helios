@@ -1,0 +1,26 @@
+{
+  "metadata": {
+    "totalFrames": 60,
+    "fps": 30,
+    "width": 1920,
+    "height": 1080,
+    "duration": 2
+  },
+  "chunks": [
+    {
+      "id": 0,
+      "startFrame": 0,
+      "frameCount": 30,
+      "outputFile": "/app/final_part_0.mp4",
+      "command": "helios render test_render_input.js --width 1920 --height 1080 --fps 30 --mode canvas -o /app/final_part_0.mp4 --start-frame 0 --frame-count 30"
+    },
+    {
+      "id": 1,
+      "startFrame": 30,
+      "frameCount": 30,
+      "outputFile": "/app/final_part_1.mp4",
+      "command": "helios render test_render_input.js --width 1920 --height 1080 --fps 30 --mode canvas -o /app/final_part_1.mp4 --start-frame 30 --frame-count 30"
+    }
+  ],
+  "mergeCommand": "helios merge /app/final.mp4 /app/final_part_0.mp4 /app/final_part_1.mp4"
+}
