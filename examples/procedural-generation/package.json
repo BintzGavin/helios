@@ -1,0 +1,16 @@
+{
+  "name": "procedural-generation",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build"
+  },
+  "dependencies": {
+    "@helios-project/core": "file:../../packages/core"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0",
+    "vite": "^7.1.2"
+  }
+}

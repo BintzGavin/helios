@@ -1,4 +1,4 @@
-import { Helios, random, interpolateColors } from '../../../packages/core/src/index';
+import { Helios, random, interpolateColors } from '@helios-project/core';
 
 // Init Helios
 const helios = new Helios({ fps: 30, duration: 10 });

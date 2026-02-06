@@ -95,7 +95,7 @@ The `examples/` directory contains reference implementations for various framewo
 - **social-media-story**: Vertical video format.
 - **audio-visualization**: Real-time frequency analysis.
 - **map-animation**: Animated maps with Leaflet.
-- **procedural-generation**: Deterministic random generation.
+- **procedural-generation**: Deterministic random generation (TypeScript + Vite).
 
 ### Core Concepts
 - **animation-helpers**: Core utilities (legacy/reference).
