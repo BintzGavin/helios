@@ -1,6 +1,6 @@
 {
   "name": "@helios-project/studio",
-  "version": "0.93.1",
+  "version": "0.93.2",
   "description": "Browser-based development environment for Helios video compositions.",
   "author": "Gavin Bintz <me@gavinbintz.com>",
   "license": "ELv2",
@@ -52,7 +52,7 @@
     "helios"
   ],
   "dependencies": {
-    "@helios-project/core": "^5.4.0",
+    "@helios-project/core": "^5.11.0",
     "@helios-project/player": "^0.71.0",
     "@helios-project/renderer": "^0.0.2",
     "@modelcontextprotocol/sdk": "^1.25.3",
