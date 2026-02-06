@@ -1,4 +1,4 @@
-**Version**: 0.104.0
+**Version**: 0.104.1
 
 **Posture**: ACTIVELY EXPANDING FOR V2
 
@@ -9,6 +9,7 @@
 **Focus**: UI Implementation & CLI
 
 ## Recent Updates
+- [v0.104.1] ✅ Verified: Agent Skills Tests - Added unit tests for agent skills documentation logic and synced package version.
 - [v0.104.0] ✅ Completed: CLI Build Command - Implemented `helios build` command to generate a deployable player harness.
 - [v0.103.2] ✅ Fixed: Dependency Mismatch - Updated `packages/studio/package.json` to align `core` dependency with workspace version (`^5.11.0`) and fixed verification pipeline.
 - [v0.103.1] ✅ Completed: Refine Agent Skills - Prepend "Agent Skill: " to skill titles in documentation to distinguish them from standard package docs.

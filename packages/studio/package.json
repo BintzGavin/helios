@@ -1,6 +1,6 @@
 {
   "name": "@helios-project/studio",
-  "version": "0.93.2",
+  "version": "0.104.1",
   "description": "Browser-based development environment for Helios video compositions.",
   "author": "Gavin Bintz <me@gavinbintz.com>",
   "license": "ELv2",
