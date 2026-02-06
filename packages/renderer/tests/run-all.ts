@@ -38,6 +38,7 @@ const tests = [
   'tests/verify-frame-count.ts',
   'tests/verify-iframe-sync.ts',
   'tests/verify-implicit-audio.ts',
+  'tests/verify-keyframes.ts',
   'tests/verify-media-sync.ts',
   'tests/verify-pseudo-element-preload.ts',
   'tests/verify-range-render.ts',
