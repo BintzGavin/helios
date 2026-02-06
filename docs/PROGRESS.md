@@ -21,6 +21,9 @@ Each agent should update **their own dedicated progress file** instead of this f
 ### CLI v0.15.0
 - ✅ Completed: Implement Build Command - Implemented `helios build` wrapping Vite for production builds.
 
+### PLAYER v0.74.0
+- ✅ Completed: CSS Parts - Implemented CSS Shadow Parts (`part` attribute) for key UI elements (`controls`, `volume-control`, `scrubber-wrapper`, `poster-image`, `big-play-button`, etc.), enabling full styling customization.
+
 ### PLAYER v0.73.1
 - ✅ Completed: DOM Export Form Values - Implemented `inlineFormValues` utility to preserve user input (value, checked, selected) in form elements during client-side DOM export.
 

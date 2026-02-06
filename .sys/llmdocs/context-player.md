@@ -98,3 +98,16 @@ The Shadow DOM contains:
 - `--helios-caption-bg`: Caption background color.
 - `--helios-caption-color`: Caption text color.
 - `--helios-caption-font-family`: Caption font family.
+
+## G. CSS Parts
+- `controls`: Main controls container.
+- `volume-control`: Volume button and slider container.
+- `scrubber-wrapper`: Scrubber and markers container.
+- `poster-image`: The poster `<img>` element.
+- `big-play-button`: The large play button overlay.
+- `status-text`: Text element in the status overlay.
+- `retry-button`: Retry button in the status overlay.
+- `shortcuts-header`: Header of the shortcuts overlay.
+- `shortcuts-grid`: Grid container for shortcuts list.
+- `debug-header`: Header of the diagnostics overlay.
+- `debug-content`: Preformatted text content of diagnostics.

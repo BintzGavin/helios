@@ -764,47 +764,47 @@ template.innerHTML = `
   <div class="export-menu hidden" part="export-menu" id="export-menu-container" role="dialog" aria-label="Export Options"></div>
 
   <div class="shortcuts-overlay hidden" part="shortcuts-overlay">
-    <div class="debug-header">
+    <div class="debug-header" part="shortcuts-header">
       <span class="debug-title">Keyboard Shortcuts</span>
       <button class="close-shortcuts-btn close-debug-btn" aria-label="Close">×</button>
     </div>
-    <div class="shortcuts-grid">
+    <div class="shortcuts-grid" part="shortcuts-grid">
        <!-- Populated via JS -->
     </div>
   </div>
 
   <div class="debug-overlay hidden" part="debug-overlay">
-    <div class="debug-header">
+    <div class="debug-header" part="debug-header">
       <span class="debug-title">Diagnostics</span>
       <button class="close-debug-btn" aria-label="Close diagnostics">×</button>
     </div>
-    <pre class="debug-content"></pre>
+    <pre class="debug-content" part="debug-content"></pre>
     <div class="debug-actions">
       <button class="copy-debug-btn">Copy to Clipboard</button>
     </div>
   </div>
   <div class="status-overlay hidden" part="overlay">
-    <div class="status-text">Connecting...</div>
-    <button class="retry-btn" style="display: none">Retry</button>
+    <div class="status-text" part="status-text">Connecting...</div>
+    <button class="retry-btn" part="retry-button" style="display: none">Retry</button>
   </div>
   <div class="poster-container hidden" part="poster">
-    <img class="poster-image" alt="Video poster" />
-    <div class="big-play-btn" aria-label="Play video">▶</div>
+    <img class="poster-image" part="poster-image" alt="Video poster" />
+    <div class="big-play-btn" part="big-play-button" aria-label="Play video">▶</div>
   </div>
   <video class="pip-video" playsinline muted autoplay></video>
   <iframe part="iframe" sandbox="allow-scripts allow-same-origin" title="Helios Composition Preview"></iframe>
   <div class="click-layer" part="click-layer"></div>
   <div class="captions-container" part="captions"></div>
-  <div class="controls" role="toolbar" aria-label="Playback Controls">
+  <div class="controls" part="controls" role="toolbar" aria-label="Playback Controls">
     <button class="play-pause-btn" part="play-pause-button" aria-label="Play">▶</button>
-    <div class="volume-control">
+    <div class="volume-control" part="volume-control">
       <button class="volume-btn" part="volume-button" aria-label="Mute">🔊</button>
       <input type="range" class="volume-slider" min="0" max="1" step="0.05" value="1" part="volume-slider" aria-label="Volume">
     </div>
     <button class="audio-btn" part="audio-button" aria-label="Audio Tracks" style="display: none;" aria-haspopup="true" aria-controls="audio-menu-container" aria-expanded="false">🎵</button>
     <button class="cc-btn" part="cc-button" aria-label="Toggle Captions">CC</button>
     <button class="export-btn" part="export-button" aria-label="Export options" aria-haspopup="true" aria-controls="export-menu-container" aria-expanded="false">Export</button>
-    <div class="scrubber-wrapper">
+    <div class="scrubber-wrapper" part="scrubber-wrapper">
       <div class="scrubber-tooltip hidden" part="tooltip"></div>
       <div class="markers-container" part="markers"></div>
       <input type="range" class="scrubber" min="0" value="0" step="1" part="scrubber" aria-label="Seek time">
