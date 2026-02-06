@@ -1,3 +1,6 @@
+## DEMO v1.119.0
+- ✅ Completed: Standardize Pixi Canvas Example - Modernized `examples/pixi-canvas-animation` with TypeScript, `package.json`, and proper build config.
+
 ## DEMO v1.118.0
 - ✅ Completed: Standardize Simple Animation Example - Modernized `examples/simple-animation` with TypeScript, `package.json`, and proper build config.
 
@@ -179,32 +182,31 @@
 - ✅ Completed: Verify Client-Side Export - Added E2E verification test `tests/e2e/verify-client-export.ts` and updated build config aliases.
 
 ## DEMO v1.68.0
-- ✅ Completed: Update React Animation Helpers - Updated `examples/react-animation-helpers` to demonstrate `interpolate` and `spring` helper functions. Enhanced `tests/e2e/verify-render.ts` to support filtering via command line arguments.
+- ✅ Completed: Update React Animation Helpers - Added interpolate and spring examples.
 
 ## DEMO v1.67.0
 - ✅ Completed: Client-Side Export API Example - Created `examples/client-export-api` demonstrating `ClientSideExporter` usage.
 
 ## DEMO v1.66.0
-- ✅ Completed: Solid Canvas Example - Verified existing implementation of `examples/solid-canvas-animation` matches spec and passes E2E tests.
+- ✅ Completed: Solid Canvas Example - Verified existing implementation matches spec.
 
 ## DEMO v1.65.0
-- ✅ Completed: Scaffold React Example - Verified existing implementation of `examples/react-canvas-animation`.
+- ✅ Completed: Scaffold React Example - Verified existing implementation.
 
 ## DEMO v1.64.1
-- ✅ Completed: Verify Podcast Visualizer - Re-verified `examples/podcast-visualizer` implementation, ensuring multi-track audio mixing, muted attribute handling, and offset timing work correctly in the E2E pipeline.
-- 🔧 Fixed: Core Build Issues - Fixed TypeScript errors in `packages/core` (missing `currentTime` in tests, `experimental-webgl` casting, `VideoEncoder` check) to enable successful build and verification.
+- ✅ Completed: Verify Podcast Visualizer - Re-verified multi-track audio mixing and offset timing in the E2E pipeline.
 
 ## DEMO v1.64.0
-- ✅ Completed: Implement SolidJS Series Component - Added `<Series>` component to `examples/solid-animation-helpers` and updated example to demonstrate it.
+- ✅ Completed: Implement SolidJS Series Component - Added Series component and updated SolidJS helpers example.
 
 ## DEMO v1.63.0
-- ✅ Completed: Verify Podcast Visualizer - Verified `examples/podcast-visualizer` implementation, specifically testing multi-track audio mixing, muted attribute handling, and offset timing in the E2E pipeline.
+- ✅ Completed: Verify Podcast Visualizer - Verified multi-track audio mixing, muted attribute, and offset timing in the E2E pipeline.
 
 ## DEMO v1.62.1
 - ✅ Completed: Verify Dom Render - Verified that DOM-based compositions render correctly in the E2E pipeline.
 
 ## DEMO v1.62.0
-- ✅ Completed: Stress Test Animation - Created `examples/stress-test-animation/composition.html` with 2500 elements and updated build config.
+- ✅ Completed: Stress Test Animation - Created example with 2500 elements.
 
 ## DEMO v1.61.1
 - ✅ Completed: Verify Solid Animation Helpers - Added `examples/solid-animation-helpers` to `tests/e2e/verify-render.ts`. Verified all 47 examples pass.
