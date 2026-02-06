@@ -48,6 +48,10 @@ const options: RendererOptions = {
 
   ffmpegPath: '/path/to/ffmpeg', // Optional
 
+  // Stability & Determinism
+  randomSeed: 'my-seed', // Optional: Seed for deterministic randomness
+  stabilityTimeout: 30000, // Optional: Timeout for waitUntilStable (ms)
+
   // Browser Configuration
   browserConfig: {
       headless: true,

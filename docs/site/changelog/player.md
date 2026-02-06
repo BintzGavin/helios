@@ -5,6 +5,36 @@ description: "Changelog for the Player package"
 
 # Player Changelog
 
+## v0.72.0
+- **Export Menu**: Implemented a dedicated Export Menu UI to allow users to configure export options (format, resolution, filename, captions) and take snapshots directly from the player.
+
+## v0.71.0
+- **Synchronize Caption Styling**: Implemented responsive caption sizing and configurable styling via CSS variables, ensuring visual parity between player preview and client-side export.
+
+## v0.70.5
+- **Decouple Core**: Decoupled `@helios-project/player` from `@helios-project/core` runtime dependency to fix UMD builds and enable drop-in usage.
+
+## v0.70.4
+- **Fix Poster Visibility**: Implemented persistent `_hasPlayed` state to ensure poster remains hidden when seeking back to frame 0 after playback.
+
+## v0.70.3
+- **Refactor Granular Playback**: Refactored renderSettingsMenu to use dynamic generation for playback speed options.
+
+## v0.70.2
+- **Granular Playback**: Verified expanded playback speed options (0.25x - 2x) via unit tests.
+
+## v0.70.1
+- **Robust E2E Verification**: Expanded E2E test coverage (Playback, Scrubber, Menus) and created a dependency-free mock fixture to ensure stability.
+
+## v0.70.0
+- **Settings Menu**: Consolidated secondary controls (Speed, Loop, Range) into a Shadow DOM Settings Menu and removed the standalone speed selector.
+
+## v0.69.0
+- **Snapshot Export**: Implemented support for exporting the current frame as PNG or JPEG image via the export API, enabling high-quality snapshot capture.
+
+## v0.68.2
+- **Shared Audio Context**: Implemented `SharedAudioContextManager` to prevent audio hijacking when `AudioMeter` is disposed.
+
 ## v0.68.1
 - **Robust Audio Metering**: Refactored `AudioMeter` to support non-destructive toggling, preventing audio playback from stopping when metering is disabled.
 

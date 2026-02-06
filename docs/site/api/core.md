@@ -45,6 +45,7 @@ Helios uses signals for reactive state management. You can subscribe to these si
 - **`inputProps`** (`ReadonlySignal<Record<string, any>>`): Current input properties.
 - **`captions`** (`ReadonlySignal<CaptionCue[]>`): The full list of parsed captions.
 - **`activeCaptions`** (`ReadonlySignal<CaptionCue[]>`): The list of captions active at the current time.
+- **`activeClips`** (`ReadonlySignal<HeliosClip[]>`): The list of timeline clips active at the current time.
 - **`width`** (`ReadonlySignal<number>`): The composition width.
 - **`height`** (`ReadonlySignal<number>`): The composition height.
 - **`availableAudioTracks`** (`ReadonlySignal<AudioTrackMetadata[]>`): List of detected audio tracks. Each object contains `id`, `startTime`, `duration`, and optional `fadeEasing`.
@@ -150,6 +151,7 @@ interface HeliosConfig<TInputProps = Record<string, any>> {
   availableAudioTracks?: AudioTrackMetadata[];
   captions?: string | CaptionCue[];
   markers?: Marker[];
+  timeline?: HeliosTimeline;
 }
 ```
 

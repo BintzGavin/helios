@@ -1,8 +1,15 @@
-**Version**: 1.10.0
+**Version**: 1.11.0
 
 # DOCS Status
 
 ## Recent Updates
+[v1.11.0] ✅ Completed: Daily Documentation Review - Comprehensive Sync
+- Updated all Changelogs (Core v5.12.0, Renderer v1.72.0-v1.75.0, Player v0.69.0-v0.72.0, CLI v0.9.0-v0.14.0, Studio v0.91.0-v0.103.0, Demo v1.105.0-v1.123.0).
+- Updated Core API Docs: Active Clips, Timeline.
+- Updated Renderer API Docs: Random Seed, Stability Timeout.
+- Updated Player API Docs: Export Menu, Snapshot Export, Composition Setters.
+- Updated CLI API Docs: Update, Remove, List commands, Framework Init.
+
 [v1.10.0] ✅ Completed: Daily Documentation Review - Player Export API & CLI Sync
 - Updated all Changelogs (Renderer v1.63.2-v1.71.0, CLI v0.6.0-v0.8.0, Player v0.68.0-v0.68.1).
 - Updated Player API Docs: Added `export()` method.

@@ -5,6 +5,63 @@ description: "Changelog for the Demo package and examples"
 
 # Demo Changelog
 
+## v1.123.0
+- **Standardize Lottie Animation**: Modernized `examples/lottie-animation` with TypeScript, `package.json`, and proper build config.
+
+## v1.122.0
+- **Standardize WAAPI Animation**: Modernized `examples/waapi-animation` with TypeScript, `package.json`, and proper build config.
+
+## v1.121.0
+- **Standardize Motion One**: Modernized `examples/motion-one-animation` with TypeScript, `package.json`, and proper build config.
+
+## v1.120.0
+- **Standardize GSAP Animation**: Modernized `examples/gsap-animation` with TypeScript, `package.json`, and proper build config.
+
+## v1.119.0
+- **Standardize Pixi Canvas**: Modernized `examples/pixi-canvas-animation` with TypeScript, `package.json`, and proper build config.
+
+## v1.118.0
+- **Standardize Simple Animation**: Modernized `examples/simple-animation` with TypeScript, `package.json`, and proper build config.
+
+## v1.117.0
+- **Standardize P5 Canvas**: Modernized `examples/p5-canvas-animation` with TypeScript, `package.json`, and proper build config.
+
+## v1.116.0
+- **Standardize React Three Fiber**: Modernized `examples/react-three-fiber` with TypeScript, `package.json`, and proper build config.
+
+## v1.115.0
+- **Standardize Three.js Canvas**: Modernized `examples/threejs-canvas-animation` with TypeScript, `package.json`, and proper build config.
+
+## v1.114.0
+- **Solid Chart.js Animation**: Created `examples/solid-chartjs-animation` demonstrating Chart.js integration with SolidJS and Helios.
+
+## v1.113.0
+- **Svelte Chart.js Animation**: Created `examples/svelte-chartjs-animation` demonstrating Chart.js integration with Svelte 5 and Helios.
+
+## v1.112.0
+- **Vue Chart.js Animation**: Created `examples/vue-chartjs-animation` demonstrating Chart.js integration with Vue 3 and Helios.
+
+## v1.111.0
+- **Solid D3 Animation**: Created `examples/solid-d3-animation` demonstrating D3.js integration with SolidJS driven by Helios frame clock.
+
+## v1.110.0
+- **React Chart.js Animation**: Created `examples/react-chartjs-animation` demonstrating integration with Chart.js using synchronous updates in React.
+
+## v1.109.0
+- **Solid DOM Animation**: Created `examples/solid-dom-animation` demonstrating SolidJS integration for DOM-based animations using `createHeliosSignal` and `autoSyncAnimations`.
+
+## v1.108.0
+- **Svelte D3 Animation**: Created `examples/svelte-d3-animation` demonstrating D3.js integration with Svelte 5 and Helios.
+
+## v1.107.0
+- **React D3 Animation**: Created `examples/react-d3-animation` demonstrating D3.js integration with React.
+
+## v1.106.0
+- **React CSS Animation**: Created/Verified `examples/react-css-animation` demonstrating CSS animation sync with `autoSyncAnimations: true`.
+
+## v1.105.0
+- **Vue D3 Animation**: Created `examples/vue-d3-animation` demonstrating D3.js integration with Vue 3.
+
 ## v1.104.0
 - **React Components Demo**: Created `examples/react-components-demo` to verify and demonstrate registry components (`Timer`, `ProgressBar`, `Watermark`).
 
