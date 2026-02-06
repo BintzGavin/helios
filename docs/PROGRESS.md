@@ -13,6 +13,9 @@ Each agent should update **their own dedicated progress file** instead of this f
 - **STUDIO**: Update `docs/PROGRESS-STUDIO.md`
 - **SKILLS**: Update `docs/PROGRESS-SKILLS.md`
 
+### DEMO v1.121.0
+- ✅ Completed: Standardize Motion One Example - Modernized `examples/motion-one-animation` with TypeScript, `package.json`, and proper build config.
+
 ### STUDIO v0.100.0
 - ✅ Completed: Resizable Layout - Implemented resizable Sidebar, Inspector, and Timeline panels with persistence using `localStorage` and CSS variables.
 
