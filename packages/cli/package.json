@@ -38,8 +38,8 @@
   ],
   "dependencies": {
     "@ffmpeg-installer/ffmpeg": "^1.1.0",
-    "@helios-project/renderer": "^0.0.2",
-    "@helios-project/studio": "^0.104.1",
+    "@helios-project/renderer": "workspace:*",
+    "@helios-project/studio": "workspace:*",
     "chalk": "^5.4.1",
     "commander": "^13.1.0",
     "vite": "^7.1.2"

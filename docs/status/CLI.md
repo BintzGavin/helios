@@ -1,6 +1,6 @@
 # CLI Status
 
-**Version**: 0.16.0
+**Version**: 0.17.0
 
 ## Current State
 
@@ -61,3 +61,4 @@ Per AGENTS.md, the CLI is "ACTIVELY EXPANDING FOR V2" with focus on:
 [v0.15.0] ✅ Implement Build Command - Implemented `helios build` wrapping Vite for production builds.
 [v0.15.0] ✅ Synced Version - Updated package.json and index.ts to match status file and verified functionality.
 [v0.16.0] ✅ Distributed Job Export - Implemented `--emit-job`, `--audio-codec`, and `--video-codec` options in `helios render` to generate distributed rendering job specifications.
+[v0.17.0] ✅ Local Distributed Rendering - Verified and enabled `--concurrency` flag in `helios render` to support parallel rendering using `RenderOrchestrator`.

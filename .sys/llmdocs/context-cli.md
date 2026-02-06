@@ -2,16 +2,12 @@
 
 ## A. Architecture
 
-The Helios CLI is built using `commander.js`. The entry point is `bin/helios.js`, which invokes the main logic in `dist/index.js`.
-Commands are organized as separate modules in `src/commands/` and registered in `src/index.ts`.
+The CLI is built with `commander` and uses a plugin-style architecture where each command is registered in `src/index.ts` from the `src/commands/` directory.
 
-Entry Points:
-- `packages/cli/bin/helios.js`: Executable entry point.
-- `packages/cli/src/index.ts`: Main application setup.
+Entry point: `bin/helios.js` -> `dist/index.js`.
 
 ## B. File Tree
 
-```
 packages/cli/
 ├── bin/
 │   └── helios.js
@@ -28,31 +24,60 @@ packages/cli/
 │   │   ├── render.ts
 │   │   ├── studio.ts
 │   │   └── update.ts
-│   └── utils/
+│   ├── utils/
+│   └── types/
 ├── package.json
 └── tsconfig.json
-```
 
 ## C. Commands
 
-- `helios studio`: Launches the Helios Studio dev server.
-- `helios init`: Initializes a new Helios project configuration and scaffolds project structure.
-- `helios add [component]`: Adds a component to the project.
-- `helios list`: Lists installed components in the project.
-- `helios components`: Lists available components in the registry.
-- `helios render <input>`: Renders a composition to video.
-- `helios merge <output> [inputs...]`: Merges multiple video files into one without re-encoding.
-- `helios remove <component>`: Removes a component from the project configuration.
-- `helios update <component>`: Updates a component to the latest version.
-- `helios build`: Builds the project for production using Vite.
+### `helios studio`
+Launches the Helios Studio development server.
+
+### `helios init`
+Initializes a new Helios project.
+
+### `helios add <component>`
+Adds a component from the registry to the project.
+
+### `helios list`
+Lists installed components.
+
+### `helios components`
+Lists available components in the registry.
+
+### `helios render <input>`
+Renders a composition to video.
+Options:
+- `-o, --output <path>`: Output file path
+- `--width <number>`: Viewport width
+- `--height <number>`: Viewport height
+- `--fps <number>`: Frames per second
+- `--duration <number>`: Duration in seconds
+- `--quality <number>`: CRF quality
+- `--mode <mode>`: Render mode (canvas or dom)
+- `--start-frame <number>`: Start frame
+- `--frame-count <number>`: Number of frames
+- `--concurrency <number>`: Number of concurrent render workers (Distributed Rendering)
+- `--no-headless`: Run in visible browser
+- `--emit-job <path>`: Generate distributed render job spec
+
+### `helios merge <output> <inputs...>`
+Merges multiple video files.
+
+### `helios remove <component>`
+Removes a component.
+
+### `helios update <component>`
+Updates a component.
+
+### `helios build`
+Builds the project for production.
 
 ## D. Configuration
-
-The CLI reads configuration from `helios.config.json` in the project root.
-This file tracks installed components and project settings.
+Reads `helios.config.json` in the project root.
 
 ## E. Integration
-
-- **Registry**: `RegistryClient` fetches components from `HELIOS_REGISTRY_URL` or falls back to local registry.
-- **Renderer**: `helios render` uses `@helios-project/renderer` to execute rendering strategies (Canvas/DOM).
-- **Studio**: `helios studio` wraps the Studio dev server.
+- **Registry**: Uses `RegistryClient` to fetch components.
+- **Renderer**: Uses `@helios-project/renderer` (`RenderOrchestrator`, `Renderer`) for rendering.
+- **Studio**: Launches `@helios-project/studio` dev server.

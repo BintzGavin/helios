@@ -2,6 +2,10 @@
 
 This file tracks progress for the CLI domain (`packages/cli`).
 
+## CLI v0.17.0
+
+- ✅ Local Distributed Rendering - Verified and enabled `--concurrency` flag in `helios render` to support parallel rendering using `RenderOrchestrator`.
+
 ## CLI v0.16.0
 
 - ✅ Distributed Job Export - Implemented `--emit-job`, `--audio-codec`, and `--video-codec` options in `helios render` to generate distributed rendering job specifications.

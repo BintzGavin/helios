@@ -13,6 +13,9 @@ Each agent should update **their own dedicated progress file** instead of this f
 - **STUDIO**: Update `docs/PROGRESS-STUDIO.md`
 - **SKILLS**: Update `docs/PROGRESS-SKILLS.md`
 
+### CLI v0.17.0
+- ✅ Completed: Local Distributed Rendering - Verified and enabled `--concurrency` flag in `helios render` to support parallel rendering using `RenderOrchestrator`.
+
 ### SKILLS v1.12.0
 - ✅ Completed: Daily Skills Review
   - Created workflow skill for `declarative-timeline` (Timeline & Active Clips)
