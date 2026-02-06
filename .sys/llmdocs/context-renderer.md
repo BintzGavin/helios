@@ -22,6 +22,8 @@ Both strategies rely on **Time Drivers** (`CdpTimeDriver` or `SeekTimeDriver`) t
 
 Both strategies normalize the output into a stream of buffers (video frames) that are piped into FFmpeg.
 
+**Orchestrator**: Manages distributed rendering by splitting the job into concurrent chunks (workers) and concatenating the results. It implements robust cancellation: if any worker fails, all others are immediately aborted via `AbortController` to save resources.
+
 ## B. File Tree
 
 ```
@@ -41,6 +43,7 @@ packages/renderer/
 │   │   ├── dom-scanner.ts     # Media element discovery
 │   │   ├── dom-scripts.ts     # Shared browser-side scripts (media discovery)
 │   │   └── random-seed.ts     # Deterministic PRNG injection
+│   ├── Orchestrator.ts        # Distributed rendering coordination
 │   ├── index.ts               # Entry point
 │   ├── Renderer.ts            # Main class
 │   └── types.ts               # Configuration interfaces

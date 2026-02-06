@@ -28,6 +28,7 @@ const tests = [
   'tests/verify-concat.ts',
   'tests/verify-deep-dom.ts',
   'tests/verify-distributed.ts',
+  'tests/verify-distributed-cancellation.ts',
   'tests/verify-diagnose.ts',
   'tests/verify-diagnose-ffmpeg.ts',
   'tests/verify-dom-audio-fades.ts',

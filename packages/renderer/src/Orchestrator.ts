@@ -68,6 +68,25 @@ export class RenderOrchestrator {
 
     const tempPrefix = `temp_${Date.now()}_${Math.random().toString(36).substring(7)}`;
 
+    // Create an internal AbortController to manage worker cancellation
+    const internalController = new AbortController();
+
+    // Link user-provided signal (if any) to the internal controller
+    const userSignalHandler = () => internalController.abort();
+    if (jobOptions?.signal) {
+      if (jobOptions.signal.aborted) {
+        internalController.abort();
+      } else {
+        jobOptions.signal.addEventListener('abort', userSignalHandler);
+      }
+    }
+
+    // Create job options for workers that use the internal signal
+    const workerJobOptions: RenderJobOptions = {
+      ...jobOptions,
+      signal: internalController.signal,
+    };
+
     for (let i = 0; i < concurrency; i++) {
       const start = i * chunkSize;
       // Ensure we don't exceed totalFrames
@@ -93,7 +112,18 @@ export class RenderOrchestrator {
 
       console.log(`[Worker ${i}] Rendering frames ${chunkOptions.startFrame} to ${chunkOptions.startFrame! + count} (${count} frames) to ${tempFile}`);
 
-      promises.push(renderer.render(compositionUrl, tempFile, jobOptions));
+      // Wrap the promise to abort other workers on failure
+      const promise = renderer.render(compositionUrl, tempFile, workerJobOptions)
+        .catch(err => {
+          // If one worker fails, abort the others immediately
+          if (!internalController.signal.aborted) {
+            console.warn(`[Worker ${i}] failed. Aborting other workers...`);
+            internalController.abort();
+          }
+          throw err;
+        });
+
+      promises.push(promise);
     }
 
     try {
@@ -148,6 +178,11 @@ export class RenderOrchestrator {
       }
 
     } finally {
+      // Clean up event listener
+      if (jobOptions?.signal) {
+        jobOptions.signal.removeEventListener('abort', userSignalHandler);
+      }
+
       console.log('Cleaning up temporary files...');
       for (const file of tempFiles) {
         try {
