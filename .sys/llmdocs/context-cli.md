@@ -63,6 +63,6 @@ interface HeliosConfig {
 ```
 
 ## E. Integration
-- **Registry**: `src/registry/client.ts` fetches components from the remote registry (with local fallback).
-- **Studio**: `helios studio` wraps the Studio dev server and injects the registry via `studioApiPlugin`.
+- **Registry**: `src/registry/client.ts` fetches components from the remote registry (with local fallback). Supports framework-based filtering.
+- **Studio**: `helios studio` wraps the Studio dev server and injects the registry via `studioApiPlugin`. Filters registry based on `helios.config.json` framework.
 - **Renderer**: `helios render` invokes `@helios-project/renderer`.

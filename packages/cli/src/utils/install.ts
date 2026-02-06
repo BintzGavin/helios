@@ -16,7 +16,7 @@ export async function installComponent(
     throw new Error('Configuration file not found. Run "helios init" first.');
   }
 
-  const component = await defaultClient.findComponent(componentName);
+  const component = await defaultClient.findComponent(componentName, config.framework);
   if (!component) {
     throw new Error(`Component "${componentName}" not found in registry.`);
   }
