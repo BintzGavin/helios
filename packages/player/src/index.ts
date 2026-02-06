@@ -1060,8 +1060,9 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
       if (s.fps) {
         // Dispatch events to satisfy Standard Media API expectations
         this.dispatchEvent(new Event("seeking"));
-        this.controller.seek(Math.floor(val * s.fps));
-        this.dispatchEvent(new Event("seeked"));
+        this.controller.seek(Math.floor(val * s.fps)).then(() => {
+          this.dispatchEvent(new Event("seeked"));
+        });
       }
     }
   }
@@ -1074,8 +1075,9 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
     if (this.controller) {
       // Dispatch events to satisfy Standard Media API expectations
       this.dispatchEvent(new Event("seeking"));
-      this.controller.seek(Math.floor(val));
-      this.dispatchEvent(new Event("seeked"));
+      this.controller.seek(Math.floor(val)).then(() => {
+        this.dispatchEvent(new Event("seeked"));
+      });
     }
   }
 

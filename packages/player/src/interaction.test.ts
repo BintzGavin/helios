@@ -65,7 +65,7 @@ describe('HeliosPlayer Interaction Fixes', () => {
   });
 
   it('should seek to start when Home is pressed', () => {
-    const mockSeek = vi.fn();
+    const mockSeek = vi.fn().mockResolvedValue(undefined);
     const mockController = {
         getState: vi.fn(() => ({ fps: 30, duration: 10, currentFrame: 100 })),
         seek: mockSeek,
@@ -81,7 +81,7 @@ describe('HeliosPlayer Interaction Fixes', () => {
   });
 
   it('should seek to end when End is pressed', () => {
-    const mockSeek = vi.fn();
+    const mockSeek = vi.fn().mockResolvedValue(undefined);
     const mockController = {
         getState: vi.fn(() => ({ fps: 30, duration: 10, currentFrame: 0 })), // 300 frames total
         seek: mockSeek,
@@ -97,7 +97,7 @@ describe('HeliosPlayer Interaction Fixes', () => {
   });
 
   it('should seek to percentage when number keys are pressed', () => {
-    const mockSeek = vi.fn();
+    const mockSeek = vi.fn().mockResolvedValue(undefined);
     const mockController = {
         getState: vi.fn(() => ({ fps: 30, duration: 10, currentFrame: 0 })), // 300 frames total
         seek: mockSeek,

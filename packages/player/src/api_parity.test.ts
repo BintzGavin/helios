@@ -126,6 +126,7 @@ describe('HeliosPlayer API Parity', () => {
       getState: () => ({ width: 1280, height: 720 }),
       pause: vi.fn(),
       dispose: vi.fn(),
+      seek: vi.fn().mockResolvedValue(undefined),
     };
     (player as any).controller = mockController;
     expect(player.videoWidth).toBe(1280);
@@ -147,6 +148,7 @@ describe('HeliosPlayer API Parity', () => {
       getState: () => ({ duration: 10, width: 0, height: 0 }),
       pause: vi.fn(),
       dispose: vi.fn(),
+      seek: vi.fn().mockResolvedValue(undefined),
     };
     (player as any).controller = mockController;
 
@@ -196,6 +198,7 @@ describe('HeliosPlayer API Parity', () => {
       pause: vi.fn(),
       play: vi.fn(),
       dispose: vi.fn(),
+      seek: vi.fn().mockResolvedValue(undefined),
     };
     (player as any).controller = mockController;
 
@@ -218,7 +221,7 @@ describe('HeliosPlayer API Parity', () => {
 
     const mockController = {
       getState: () => ({ fps: 30, duration: 10 }),
-      seek: vi.fn(),
+      seek: vi.fn().mockResolvedValue(undefined),
       pause: vi.fn(),
       dispose: vi.fn(),
     };

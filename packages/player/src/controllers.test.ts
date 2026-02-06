@@ -275,9 +275,14 @@ describe('BridgeController', () => {
 
         controller.pause();
         expect(mockWindow.postMessage).toHaveBeenCalledWith({ type: 'HELIOS_PAUSE' }, '*');
+    });
 
-        controller.seek(10);
+    it('should post seek message and wait for confirmation', async () => {
+        const promise = controller.seek(10);
         expect(mockWindow.postMessage).toHaveBeenCalledWith({ type: 'HELIOS_SEEK', frame: 10 }, '*');
+
+        triggerMessage({ type: 'HELIOS_SEEK_DONE', frame: 10 });
+        await promise;
     });
 
     it('should post messages for audio controls', () => {
