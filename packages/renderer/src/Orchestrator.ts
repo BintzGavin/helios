@@ -7,9 +7,12 @@ import { Renderer } from './Renderer.js';
 import { RendererOptions, RenderJobOptions } from './types.js';
 import { concatenateVideos } from './concat.js';
 import { FFmpegBuilder } from './utils/FFmpegBuilder.js';
+import { RenderExecutor } from './executors/RenderExecutor.js';
+import { LocalExecutor } from './executors/LocalExecutor.js';
 
 export interface DistributedRenderOptions extends RendererOptions {
   concurrency?: number;
+  executor?: RenderExecutor;
 }
 
 // Define constants for robust audio pipeline
@@ -26,10 +29,11 @@ export class RenderOrchestrator {
         totalFrames = Math.ceil(options.durationInSeconds * options.fps);
     }
 
+    const executor = options.executor || new LocalExecutor();
+
     // If concurrency is 1, just use standard Renderer
     if (concurrency === 1) {
-      const renderer = new Renderer(options);
-      return renderer.render(compositionUrl, outputPath, jobOptions);
+      return executor.render(compositionUrl, outputPath, options, jobOptions);
     }
 
     console.log(`Starting distributed render with concurrency: ${concurrency}`);
@@ -128,12 +132,10 @@ export class RenderOrchestrator {
         }
       };
 
-      const renderer = new Renderer(chunkOptions);
-
       console.log(`[Worker ${i}] Rendering frames ${chunkOptions.startFrame} to ${chunkOptions.startFrame! + count} (${count} frames) to ${tempFile}`);
 
       // Wrap the promise to abort other workers on failure
-      const promise = renderer.render(compositionUrl, tempFile, workerJobOptions)
+      const promise = executor.render(compositionUrl, tempFile, chunkOptions, workerJobOptions)
         .catch(err => {
           // If one worker fails, abort the others immediately
           if (!internalController.signal.aborted) {

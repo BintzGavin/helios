@@ -22,7 +22,7 @@ Both strategies rely on **Time Drivers** (`CdpTimeDriver` or `SeekTimeDriver`) t
 
 Both strategies normalize the output into a stream of buffers (video frames) that are piped into FFmpeg.
 
-**Orchestrator**: Manages distributed rendering by splitting the job into concurrent chunks (workers) and concatenating the results. It implements robust cancellation (aborting all workers if one fails) and aggregates progress from all workers into a smooth, monotonic global progress value.
+**Orchestrator**: Manages distributed rendering by splitting the job into concurrent chunks (workers) and concatenating the results. It utilizes the **Strategy Pattern** via the `RenderExecutor` interface (defaulting to `LocalExecutor`) to decouple the orchestration logic from the concrete rendering implementation, enabling pluggable execution contexts. It also implements robust cancellation (aborting all workers if one fails) and aggregates progress from all workers into a smooth, monotonic global progress value.
 
 ## B. File Tree
 
@@ -32,6 +32,9 @@ packages/renderer/
 │   ├── drivers/
 │   │   ├── CdpTimeDriver.ts   # Deterministic virtual time (CDP)
 │   │   └── SeekTimeDriver.ts  # Deterministic Seek-based time
+│   ├── executors/
+│   │   ├── LocalExecutor.ts   # Default local rendering wrapper
+│   │   └── RenderExecutor.ts  # Interface for execution strategies
 │   ├── strategies/
 │   │   ├── CanvasStrategy.ts  # WebCodecs/Canvas capture
 │   │   ├── DomStrategy.ts     # Screenshot capture
