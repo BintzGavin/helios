@@ -742,6 +742,7 @@ export class HeliosPlayer extends HTMLElement {
     bigPlayBtn;
     pendingSrc = null;
     isLoaded = false;
+    _hasPlayed = false;
     resizeObserver;
     controller = null;
     mediaSession = null;
@@ -1690,6 +1691,7 @@ export class HeliosPlayer extends HTMLElement {
         this._error = null;
         this._networkState = HeliosPlayer.NETWORK_LOADING;
         this._readyState = HeliosPlayer.HAVE_NOTHING;
+        this._hasPlayed = false;
         this.dispatchEvent(new Event('loadstart'));
         this.iframe.src = src;
         this.isLoaded = true;
@@ -1722,14 +1724,7 @@ export class HeliosPlayer extends HTMLElement {
             return;
         }
         if (this.hasAttribute("poster")) {
-            let shouldHide = false;
-            if (this.controller) {
-                const state = this.controller.getState();
-                if (state.isPlaying || state.currentFrame > 0) {
-                    shouldHide = true;
-                }
-            }
-            if (shouldHide) {
+            if (this._hasPlayed) {
                 this.posterContainer.classList.add("hidden");
             }
             else {
@@ -2355,10 +2350,12 @@ export class HeliosPlayer extends HTMLElement {
                 track.updateActiveCues(currentTime);
             }
         }
-        // Hide poster if we are playing or have advanced
+        // Update hasPlayed state
         if (state.isPlaying || state.currentFrame > 0) {
-            this.posterContainer.classList.add("hidden");
+            this._hasPlayed = true;
         }
+        // Consolidate poster visibility
+        this.updatePosterVisibility();
         // Event Dispatching
         if (this.lastState) {
             if (state.isPlaying !== this.lastState.isPlaying) {
