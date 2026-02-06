@@ -35,8 +35,8 @@ async function main() {
 
     // Check message content for verification
     const msg = args.map(a => String(a)).join(' ');
-    // Looking for "[DomStrategy] Preloading X background images..."
-    if (msg.includes('[DomStrategy]') && msg.includes('Preloading') && msg.includes('background images')) {
+    // Looking for "[Helios Preload] Preloading X background images..."
+    if (msg.includes('[Helios Preload]') && msg.includes('Preloading') && msg.includes('background images')) {
       preloadDetected = true;
     }
   };

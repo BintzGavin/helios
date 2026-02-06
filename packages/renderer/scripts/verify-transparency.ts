@@ -1,10 +1,16 @@
 
 import path from 'path';
+import fs from 'fs';
 import { spawnSync } from 'child_process';
 import ffmpeg from '@ffmpeg-installer/ffmpeg';
 import { Renderer } from '../src/index';
 
 const OUTPUT_PATH = path.join(__dirname, '../../../test-results/transparent-output.webm');
+
+// Ensure output directory exists
+if (!fs.existsSync(path.dirname(OUTPUT_PATH))) {
+  fs.mkdirSync(path.dirname(OUTPUT_PATH), { recursive: true });
+}
 
 // Simple transparent HTML page
 const HTML_CONTENT = `
