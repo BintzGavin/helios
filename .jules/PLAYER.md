@@ -9,3 +9,7 @@
 ## [v0.72.0] - Async Seek Gap
 **Learning:** The `currentTime` setter in `HeliosPlayer` assumed synchronous seeking, which caused `seeked` to fire prematurely in Bridge mode. Standard Media API compliance requires `seeking` to remain true until the frame is actually updated.
 **Action:** When implementing bridge-based media controls, always ensure a request/response pattern for state-changing operations like `seek` to maintain state consistency.
+
+## [v0.72.1] - Canvas Resolution Mismatch
+**Learning:** `captureFrame` (and `VideoFrame` from Canvas) captures the backing store resolution, which might differ from the requested export resolution. The `ClientSideExporter` assumed the source frame matched the target size.
+**Action:** Always verify target dimensions in export logic and explicitly resize (via intermediate canvas) if the source frame doesn't match the target.

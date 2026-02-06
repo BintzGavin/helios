@@ -64,7 +64,9 @@ The Shadow DOM contains:
 - `muted` (get/set): Master mute state.
 - `playbackRate` (get/set): Playback speed multiplier.
 - `src` (get/set): Source URL.
+- `width`, `height` (get/set): Reflects width/height attributes.
 - `videoWidth`, `videoHeight` (get): Intrinsic dimensions.
+- `playsInline` (get/set): Reflects playsinline attribute.
 - `buffered`, `seekable`, `played` (get): `TimeRanges`.
 - `readyState`, `networkState` (get): Loading states.
 - `error` (get): Current error.
@@ -79,6 +81,7 @@ The Shadow DOM contains:
 - `play(): Promise<void>`: Start playback.
 - `pause(): void`: Pause playback.
 - `load(): void`: Reload the source.
+- `fastSeek(time: number): void`: Seek to time.
 - `requestPictureInPicture(): Promise<PictureInPictureWindow>`: Enter PiP mode.
 - `addTextTrack(kind, label, language): HeliosTextTrack`: Create a new text track.
 - `diagnose(): Promise<DiagnosticReport>`: Run environment diagnostics.
