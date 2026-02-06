@@ -53,3 +53,7 @@ Critical learnings only. This is not a log—only add entries for insights that 
 ## [0.12.0] - Registry Lifecycle Gap
 **Learning:** While `helios add` and `helios list` existed, the CLI lacked a `helios remove` command, leading to potential state drift between `helios.config.json` and the file system. Users had to manually edit config files to unregister components.
 **Action:** When implementing CRUD workflows (like Registry management), always ensure the full lifecycle (Create, Read, Update, Delete) is supported to prevent orphaned state.
+
+## [0.15.0] - Distributed Orchestration Decoupling
+**Learning:** The "Distributed Rendering" vision requires a separation of "Planning" (job splitting) and "Execution" (rendering). The `RenderOrchestrator` in `packages/renderer` tightly couples them (calculating chunks and immediately spawning workers). This blocks external/cloud orchestration.
+**Action:** When bridging a "Cloud" gap without cloud infrastructure, implement the "Planning" phase as a standalone artifact (e.g., Job Spec JSON) in the CLI. This allows users to bring their own execution environment (CI/Batch) and fulfills the vision's "Stateless" requirement incrementally.
