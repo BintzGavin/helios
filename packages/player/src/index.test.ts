@@ -1218,6 +1218,28 @@ describe('HeliosPlayer', () => {
         expect(posterContainer!.classList.contains('hidden')).toBe(true);
     });
 
+    it('should keep poster hidden when seeking back to start after playing', () => {
+        player.setAttribute('poster', 'poster.jpg');
+        player.setAttribute('src', 'test.html');
+
+        // Load and connect controller
+        (player as any).setController(mockController);
+
+        const posterContainer = player.shadowRoot!.querySelector('.poster-container');
+
+        // 1. Play
+        mockController.getState.mockReturnValue({ currentFrame: 10, duration: 10, fps: 30, isPlaying: true });
+        (player as any).updateUI(mockController.getState());
+        expect(posterContainer!.classList.contains('hidden')).toBe(true);
+
+        // 2. Pause and Seek back to 0
+        mockController.getState.mockReturnValue({ currentFrame: 0, duration: 10, fps: 30, isPlaying: false });
+        (player as any).updateUI(mockController.getState());
+
+        // Should remain hidden
+        expect(posterContainer!.classList.contains('hidden')).toBe(true);
+    });
+
     it('should hide status overlay when poster is present (initial load)', () => {
         const p = new HeliosPlayer();
         p.setAttribute('poster', 'poster.jpg');

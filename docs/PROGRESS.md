@@ -16,6 +16,9 @@ Each agent should update **their own dedicated progress file** instead of this f
 ### DEMO v1.118.0
 - ✅ Completed: Standardize Simple Animation Example - Modernized `examples/simple-animation` with TypeScript, `package.json`, and proper build config.
 
+### PLAYER v0.70.4
+- ✅ Completed: Fix Poster Visibility - Implemented persistent `_hasPlayed` state to ensure poster remains hidden when seeking back to frame 0 after playback.
+
 ### PLAYER v0.70.3
 - ✅ Completed: Refactor Granular Playback - Refactored renderSettingsMenu to use dynamic generation for playback speed options.
 

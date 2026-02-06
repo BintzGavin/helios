@@ -1,4 +1,4 @@
-**Version**: v0.70.3
+**Version**: v0.70.4
 
 **Posture**: STABLE AND FEATURE COMPLETE
 
@@ -58,6 +58,7 @@
 - **Audio Metering**: Supports real-time audio metering via `startAudioMetering()` API and `audiometering` event, enabling visualization of audio levels (stereo/peak) in host applications.
 - **Export API**: Exposes public `export()` method for programmatic control over client-side exports, supporting Video (MP4/WebM) and Snapshot (PNG/JPEG) formats.
 
+[v0.70.4] ✅ Completed: Fix Poster Visibility - Implemented persistent `_hasPlayed` state to ensure poster remains hidden when seeking back to frame 0 after playback.
 [v0.70.3] ✅ Completed: Refactor Granular Playback - Refactored renderSettingsMenu to use dynamic generation for playback speed options.
 [v0.70.2] ✅ Verified: Granular Playback - Verified expanded playback speed options (0.25x - 2x) via unit tests.
 [v0.70.1] ✅ Verified: Robust E2E Verification - Expanded E2E test coverage (Playback, Scrubber, Menus) and created a dependency-free mock fixture to ensure stability.

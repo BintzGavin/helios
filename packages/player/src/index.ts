@@ -772,6 +772,7 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
   private bigPlayBtn: HTMLDivElement;
   private pendingSrc: string | null = null;
   private isLoaded: boolean = false;
+  private _hasPlayed: boolean = false;
 
   private resizeObserver: ResizeObserver;
   private controller: HeliosController | null = null;
@@ -1866,6 +1867,7 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
     this._error = null;
     this._networkState = HeliosPlayer.NETWORK_LOADING;
     this._readyState = HeliosPlayer.HAVE_NOTHING;
+    this._hasPlayed = false;
     this.dispatchEvent(new Event('loadstart'));
 
     this.iframe.src = src;
@@ -1901,15 +1903,7 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
     }
 
     if (this.hasAttribute("poster")) {
-      let shouldHide = false;
-      if (this.controller) {
-        const state = this.controller.getState();
-        if (state.isPlaying || state.currentFrame > 0) {
-          shouldHide = true;
-        }
-      }
-
-      if (shouldHide) {
+      if (this._hasPlayed) {
         this.posterContainer.classList.add("hidden");
       } else {
         this.posterContainer.classList.remove("hidden");
@@ -2589,10 +2583,13 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
           }
       }
 
-      // Hide poster if we are playing or have advanced
+      // Update hasPlayed state
       if (state.isPlaying || state.currentFrame > 0) {
-         this.posterContainer.classList.add("hidden");
+        this._hasPlayed = true;
       }
+
+      // Consolidate poster visibility
+      this.updatePosterVisibility();
 
       // Event Dispatching
       if (this.lastState) {
