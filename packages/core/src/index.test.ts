@@ -23,6 +23,7 @@ describe('Helios Core', () => {
       availableAudioTracks: [],
       captions: [],
       activeCaptions: [],
+      activeClips: [],
       markers: [],
       playbackRange: null,
     });

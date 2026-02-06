@@ -163,6 +163,9 @@ class ComputedImpl<T> implements ReadonlySignal<T>, Subscriber, Subscribable {
       if (dep.version !== version) {
         return true;
       }
+      if (dep.hasChanged && dep.hasChanged()) {
+        return true;
+      }
     }
     return false;
   }

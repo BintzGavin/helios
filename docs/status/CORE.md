@@ -1,13 +1,14 @@
 # Status: CORE
 
-**Version**: 5.11.0
+**Version**: 5.12.0
 
 **Posture**: STABLE AND FEATURE COMPLETE
 
 - **Status**: Active
 - **Current Focus**: Maintenance, Optimization, and Stability
-- **Last Updated**: 2026-08-14
+- **Last Updated**: 2026-08-15
 
+[v5.12.0] ✅ Completed: Implement Active Clips - Added `timeline` to `HeliosOptions` and `activeClips` signal to `Helios` state, enabling declarative timeline management. Fixed critical bug in chained cold computed signals.
 [v5.11.0] ✅ Completed: Synchronize Version - Synced package.json version to 5.11.0 and added Input Schema documentation.
 [v5.11.0] ✅ Completed: Implement Composition Schema - Implemented HeliosConfig, HeliosComposition, and related interfaces to support serializable composition definitions.
 [v5.10.0] ✅ Completed: Shared Virtual Time Binding - Implemented static registry in Helios to allow multiple instances to synchronize with `window.__HELIOS_VIRTUAL_TIME__` simultaneously.
