@@ -3,6 +3,7 @@
 ## A. Architecture
 
 Helios Studio is a browser-based development environment for creating and editing video compositions. It is built as a Vite application that can be run via the CLI.
+The Studio Domain also encompasses the Helios CLI (`packages/cli`), which provides project scaffolding, component management, and rendering commands.
 
 - **Dev Server**: Uses Vite with a custom plugin (`studioApiPlugin`) to serve the Studio UI and handle API requests (e.g., file operations, asset discovery, rendering, documentation serving).
 - **Frontend**: A React-based Single Page Application (SPA) that communicates with the dev server.
@@ -36,6 +37,14 @@ packages/studio/
 ├── vite.config.ts       # Vite configuration
 └── vitest.config.ts     # Test configuration
 
+packages/cli/            # (Managed by Studio Domain)
+├── bin/                 # Executable entry point
+├── src/
+│   ├── commands/        # CLI commands (studio, init, add, render, etc.)
+│   ├── registry/        # Component registry logic
+│   └── utils/           # Shared utilities
+└── package.json
+
 ## C. CLI Interface
 
 The Studio is launched via the Helios CLI:
@@ -47,6 +56,15 @@ npx helios studio [options]
 Options:
 - `--port <number>`: Specify the port to run the Studio server (default: 5173).
 - `--open`: Open the Studio in the default browser on start.
+
+Other CLI commands managed by Studio domain:
+- `helios init`: Initialize a new project.
+- `helios add`: Install components.
+- `helios render`: Render a composition.
+- `helios build`: Build for production.
+- `helios skills`: Manage AI agent skills.
+
+See `context-cli.md` for full CLI documentation.
 
 ## D. UI Components
 

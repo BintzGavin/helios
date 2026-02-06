@@ -9,6 +9,7 @@ import { registerListCommand } from './commands/list.js';
 import { registerRemoveCommand } from './commands/remove.js';
 import { registerUpdateCommand } from './commands/update.js';
 import { registerBuildCommand } from './commands/build.js';
+import { registerSkillsCommand } from './commands/skills.js';
 
 const program = new Command();
 
@@ -27,5 +28,6 @@ registerListCommand(program);
 registerRemoveCommand(program);
 registerUpdateCommand(program);
 registerBuildCommand(program);
+registerSkillsCommand(program);
 
 program.parse(process.argv);

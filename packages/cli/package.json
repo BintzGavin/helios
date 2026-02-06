@@ -24,7 +24,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && cp -r ../../.agents/skills/helios dist/skills",
     "dev": "tsc -w",
     "prepublishOnly": "npm run build"
   },

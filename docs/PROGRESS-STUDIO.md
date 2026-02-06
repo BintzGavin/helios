@@ -1,3 +1,6 @@
+## STUDIO v0.105.0
+- ✅ Completed: CLI Skills Command - Implemented `helios skills install` command to distribute AI agent skills.
+
 ## STUDIO v0.104.1
 - ✅ Verified: Agent Skills Tests - Added unit tests for agent skills documentation logic and synced package version.
 

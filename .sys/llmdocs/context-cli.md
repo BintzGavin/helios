@@ -26,6 +26,7 @@ packages/cli/
 │   │   ├── merge.ts
 │   │   ├── remove.ts
 │   │   ├── render.ts
+│   │   ├── skills.ts
 │   │   ├── studio.ts
 │   │   └── update.ts
 │   └── utils/
@@ -45,6 +46,7 @@ packages/cli/
 - `helios remove <component>`: Removes a component from the project configuration.
 - `helios update <component>`: Updates a component to the latest version.
 - `helios build`: Builds the project for production using Vite.
+- `helios skills install`: Installs AI agent skills into the project.
 
 ## D. Configuration
 
