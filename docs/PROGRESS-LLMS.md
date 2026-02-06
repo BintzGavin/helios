@@ -1,5 +1,16 @@
 # LLMS Progress
 
+## LLMS v1.10.0
+- ✅ Completed: Daily llms.txt Review
+  - Updated Quick Facts: Status "Beta / Self-Driving"
+  - Updated Packages: Added "Merging" to CLI, "Open in Editor" to Studio
+  - Updated Roadmap:
+    - Updated versions: Core v5.12+, Studio v0.101+, Renderer v1.74+, Player v0.70+, CLI v0.12+
+    - Added features: Active Clips, Orchestrator Cancellation, Open in Editor, Merging
+    - Moved AI Integration items to Completed
+  - Verified Agent Skills (cli/SKILL.md present)
+  - Verified content against status files
+
 ## LLMS v1.9.0
 - ✅ Completed: Daily llms.txt Review
   - Updated Quick Facts: Studio v0.95+
