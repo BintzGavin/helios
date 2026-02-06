@@ -20,7 +20,7 @@ The `examples/` directory contains reference implementations for various framewo
 - **variable-font-animation**: Animating variable font axes (TypeScript + Vite).
 
 ### React
-- **react-dom-animation**: Basic React + DOM.
+- **react-dom-animation**: Basic React + DOM (TypeScript + Vite).
 - **react-canvas-animation**: Basic React + Canvas.
 - **react-captions-animation**: React hooks for Helios SRT captions.
 - **react-css-animation**: Standard CSS animations in React.
