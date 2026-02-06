@@ -13,6 +13,30 @@ interface SchemaInputProps {
   onChange: (value: any) => void;
 }
 
+export const validateValue = (value: any, def: PropDefinition): { valid: boolean; message?: string } => {
+  if (def.type === 'string') {
+    if (def.minLength !== undefined && typeof value === 'string' && value.length < def.minLength) {
+      return { valid: false, message: `Too short (min ${def.minLength})` };
+    }
+    if (def.maxLength !== undefined && typeof value === 'string' && value.length > def.maxLength) {
+      return { valid: false, message: `Too long (max ${def.maxLength})` };
+    }
+    if (def.pattern && typeof value === 'string' && !new RegExp(def.pattern).test(value)) {
+      return { valid: false, message: `Pattern mismatch` };
+    }
+  }
+  if (def.type === 'number') {
+    const num = Number(value);
+    if (def.minimum !== undefined && num < def.minimum) {
+      return { valid: false, message: `Value too low (min ${def.minimum})` };
+    }
+    if (def.maximum !== undefined && num > def.maximum) {
+      return { valid: false, message: `Value too high (max ${def.maximum})` };
+    }
+  }
+  return { valid: true };
+};
+
 export const SchemaInput: React.FC<SchemaInputProps> = ({ definition, value, onChange }) => {
   const { playerState } = useStudio();
   const fps = playerState.fps || 30;
@@ -348,6 +372,8 @@ const NumberRangeInput: React.FC<{ min?: number, max?: number, step?: number, va
   // If step is not provided, default to 1% of range, or default browser behavior if no range
   const rangeStep = step !== undefined ? step : (hasRange ? (max! - min!) / 100 : undefined);
 
+  const { valid, message } = validateValue(value, { type: 'number', minimum: min, maximum: max });
+
   return (
     <div className={`prop-number-container ${hasRange ? 'has-range' : ''}`}>
       {hasRange && (
@@ -363,12 +389,13 @@ const NumberRangeInput: React.FC<{ min?: number, max?: number, step?: number, va
       )}
       <input
         type="number"
-        className="prop-input prop-number"
+        className={`prop-input prop-number ${!valid ? 'error' : ''}`}
         min={min}
         max={max}
         step={step}
         value={value}
         onChange={(e) => onChange(parseFloat(e.target.value))}
+        title={message}
       />
     </div>
   );
@@ -442,10 +469,13 @@ const StringInput: React.FC<{
       else if (format === 'color') inputType = 'color';
   }
 
+  const { valid, message } = validateValue(value, { type: 'string', minLength, maxLength, pattern });
+  const title = !valid ? message : (pattern ? `Must match pattern: ${pattern}` : undefined);
+
   return (
     <input
       type={inputType}
-      className={`prop-input ${isDragOver ? 'drag-over' : ''}`}
+      className={`prop-input ${isDragOver ? 'drag-over' : ''} ${!valid ? 'error' : ''}`}
       value={value}
       onChange={(e) => onChange(e.target.value)}
       onDragOver={handleDragOver}
@@ -454,7 +484,7 @@ const StringInput: React.FC<{
       minLength={minLength}
       maxLength={maxLength}
       pattern={pattern}
-      title={pattern ? `Must match pattern: ${pattern}` : undefined}
+      title={title}
     />
   );
 };

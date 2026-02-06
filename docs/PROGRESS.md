@@ -13,6 +13,9 @@ Each agent should update **their own dedicated progress file** instead of this f
 - **STUDIO**: Update `docs/PROGRESS-STUDIO.md`
 - **SKILLS**: Update `docs/PROGRESS-SKILLS.md`
 
+### STUDIO v0.100.0
+- ✅ Completed: Schema Validation - Implemented visual validation feedback (CSS error class and tooltips) in Props Editor for schema constraints (minLength, maxLength, pattern, min, max).
+
 ### DEMO v1.118.0
 - ✅ Completed: Standardize Simple Animation Example - Modernized `examples/simple-animation` with TypeScript, `package.json`, and proper build config.
 
