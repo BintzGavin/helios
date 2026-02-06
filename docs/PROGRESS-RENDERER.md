@@ -1,5 +1,8 @@
 # Renderer Progress Log
 
+## RENDERER v1.75.0
+- ✅ Completed: Distributed Progress Aggregation - Implemented weighted progress aggregation in RenderOrchestrator to ensure monotonic progress reporting during distributed rendering. Verified with `verify-distributed-progress.ts`.
+
 ## RENDERER v1.74.0
 - ✅ Completed: Configurable Asset Timeout - Implemented `stabilityTimeout` support in `DomStrategy` and `CanvasStrategy` to prevent indefinite hangs during asset preloading (fonts, images) and audio track scanning. Verified with `verify-asset-timeout.ts`.
 

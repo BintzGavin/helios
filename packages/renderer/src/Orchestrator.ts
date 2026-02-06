@@ -81,11 +81,9 @@ export class RenderOrchestrator {
       }
     }
 
-    // Create job options for workers that use the internal signal
-    const workerJobOptions: RenderJobOptions = {
-      ...jobOptions,
-      signal: internalController.signal,
-    };
+    // Progress tracking
+    const workerProgress = new Array(concurrency).fill(0);
+    const workerWeights = new Array(concurrency).fill(0);
 
     for (let i = 0; i < concurrency; i++) {
       const start = i * chunkSize;
@@ -93,6 +91,9 @@ export class RenderOrchestrator {
       const count = Math.min(chunkSize, totalFrames - start);
 
       if (count <= 0) break;
+
+      // Calculate weight for this worker
+      workerWeights[i] = count / totalFrames;
 
       // Use CHUNK_EXTENSION for temporary chunk files
       const tempFile = path.join(outputDir, `${tempPrefix}_part_${i}${CHUNK_EXTENSION}`);
@@ -106,6 +107,25 @@ export class RenderOrchestrator {
         frameCount: count,
         // Calculate duration based on frame count to be consistent, though Renderer prioritizes frameCount
         durationInSeconds: count / options.fps
+      };
+
+      // Create job options for this worker with progress aggregation
+      const workerJobOptions: RenderJobOptions = {
+        ...jobOptions,
+        signal: internalController.signal,
+        onProgress: (p: number) => {
+          workerProgress[i] = p;
+
+          // Calculate global progress
+          let globalProgress = 0;
+          for (let j = 0; j < concurrency; j++) {
+            globalProgress += workerProgress[j] * workerWeights[j];
+          }
+
+          if (jobOptions?.onProgress) {
+            jobOptions.onProgress(globalProgress);
+          }
+        }
       };
 
       const renderer = new Renderer(chunkOptions);

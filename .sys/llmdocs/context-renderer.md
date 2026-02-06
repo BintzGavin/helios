@@ -22,7 +22,7 @@ Both strategies rely on **Time Drivers** (`CdpTimeDriver` or `SeekTimeDriver`) t
 
 Both strategies normalize the output into a stream of buffers (video frames) that are piped into FFmpeg.
 
-**Orchestrator**: Manages distributed rendering by splitting the job into concurrent chunks (workers) and concatenating the results. It implements robust cancellation: if any worker fails, all others are immediately aborted via `AbortController` to save resources.
+**Orchestrator**: Manages distributed rendering by splitting the job into concurrent chunks (workers) and concatenating the results. It implements robust cancellation (aborting all workers if one fails) and aggregates progress from all workers into a smooth, monotonic global progress value.
 
 ## B. File Tree
 

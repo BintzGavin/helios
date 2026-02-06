@@ -1,10 +1,11 @@
-**Version**: 1.74.0
+**Version**: 1.75.0
 
 **Posture**: MAINTENANCE WITH V2 EXPANSION
 
 # Renderer Agent Status
 
 ## Progress Log
+- [1.75.0] ✅ Completed: Distributed Progress Aggregation - Implemented weighted progress aggregation in RenderOrchestrator to ensure monotonic progress reporting during distributed rendering. Verified with `verify-distributed-progress.ts`.
 - [1.74.0] ✅ Completed: Configurable Asset Timeout - Implemented `stabilityTimeout` support in `DomStrategy` and `CanvasStrategy` to prevent indefinite hangs during asset preloading (fonts, images) and audio track scanning. Verified with `verify-asset-timeout.ts`.
 - [1.73.0] ✅ Completed: Configurable Random Seed - Added `randomSeed` to `RendererOptions` and updated `TimeDriver` to inject a seeded Mulberry32 PRNG script, ensuring deterministic `Math.random()` behavior for generative compositions. Verified with `tests/verify-random-seed.ts`.
 - [1.72.0] ✅ Completed: Orchestrator Cancellation - Implemented robust cancellation in `RenderOrchestrator`. Now, if a single distributed worker fails, all concurrent workers are immediately aborted via `AbortController` to prevent resource waste. Verified with `verify-distributed-cancellation.ts`.
