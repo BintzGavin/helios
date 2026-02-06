@@ -17,8 +17,11 @@ export function registerStudioCommand(program: Command) {
     .action(async (options) => {
       try {
         console.log(chalk.blue('Starting Studio...'));
-        console.log(chalk.dim('Fetching component registry...'));
-        const components = await defaultClient.getComponents();
+
+        const config = loadConfig(process.cwd());
+        console.log(chalk.dim(`Fetching component registry${config?.framework ? ` (${config.framework})` : ''}...`));
+
+        const components = await defaultClient.getComponents(config?.framework);
 
         const require = createRequire(import.meta.url);
 

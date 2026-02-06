@@ -8,7 +8,9 @@ export class RegistryClient {
     this.url = url || process.env.HELIOS_REGISTRY_URL;
   }
 
-  async getComponents(): Promise<ComponentDefinition[]> {
+  async getComponents(framework?: string): Promise<ComponentDefinition[]> {
+    let components = localRegistry;
+
     if (this.url) {
       try {
         const controller = new AbortController();
@@ -19,7 +21,7 @@ export class RegistryClient {
           if (res.ok) {
             const data = await res.json();
             if (Array.isArray(data)) {
-               return data as ComponentDefinition[];
+               components = data as ComponentDefinition[];
             } else {
                console.warn('Remote registry response is not an array, falling back to local.');
             }
@@ -31,11 +33,15 @@ export class RegistryClient {
         console.warn('Failed to fetch remote registry (or timed out), falling back to local.');
       }
     }
-    return localRegistry;
+
+    if (framework) {
+      return components.filter(c => c.type === framework);
+    }
+    return components;
   }
 
-  async findComponent(name: string): Promise<ComponentDefinition | undefined> {
-    const components = await this.getComponents();
+  async findComponent(name: string, framework?: string): Promise<ComponentDefinition | undefined> {
+    const components = await this.getComponents(framework);
     return components.find(c => c.name === name);
   }
 }
