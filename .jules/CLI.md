@@ -49,3 +49,7 @@ Critical learnings only. This is not a log—only add entries for insights that 
 ## [0.10.0] - Studio Registry Disconnect
 **Learning:** `helios studio` was passing a static local registry to the UI, ignoring the remote registry logic implemented in `helios add` (via `RegistryClient`). This caused the Studio UI to show outdated component lists even if the CLI could fetch new ones.
 **Action:** When a shared resource (like Registry) is accessed by multiple commands (`add`, `studio`), ensure they all use the same client/abstraction (`RegistryClient`) to maintain consistency.
+
+## [0.12.0] - Registry Lifecycle Gap
+**Learning:** While `helios add` and `helios list` existed, the CLI lacked a `helios remove` command, leading to potential state drift between `helios.config.json` and the file system. Users had to manually edit config files to unregister components.
+**Action:** When implementing CRUD workflows (like Registry management), always ensure the full lifecycle (Create, Read, Update, Delete) is supported to prevent orphaned state.
