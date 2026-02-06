@@ -16,6 +16,7 @@ packages/cli/
 │   │   ├── studio.ts       # helios studio
 │   │   ├── init.ts         # helios init
 │   │   ├── add.ts          # helios add
+│   │   ├── remove.ts       # helios remove
 │   │   ├── list.ts         # helios list
 │   │   ├── components.ts   # helios components
 │   │   ├── render.ts       # helios render
@@ -27,7 +28,8 @@ packages/cli/
 │   ├── utils/
 │   │   ├── config.ts       # Configuration management
 │   │   ├── logger.ts       # Logging utilities
-│   │   └── install.ts      # Component installation logic
+│   │   ├── install.ts      # Component installation logic
+│   │   └── uninstall.ts    # Component uninstallation logic
 │   └── types/
 │       └── index.ts        # Shared types
 ```
@@ -39,6 +41,7 @@ packages/cli/
   - Options: `-y`, `--framework <name>`
 - `helios add [component]`: Adds a component to the project.
   - Options: `--no-install`
+- `helios remove [component]`: Removes a component from the project configuration and warns about associated files.
 - `helios list`: Lists installed components in the project as defined in `helios.config.json`.
 - `helios components`: Lists available components in the registry.
 - `helios render [file]`: Renders a composition to video.
