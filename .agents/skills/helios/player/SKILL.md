@@ -67,6 +67,12 @@ helios-player {
   --helios-range-track-color: #555555;
   --helios-range-selected-color: rgba(255, 255, 255, 0.5);
   --helios-font-family: 'Helvetica', sans-serif;
+
+  /* Caption Styling */
+  --helios-caption-scale: 0.05;           /* Scale relative to player height */
+  --helios-caption-bg: rgba(0, 0, 0, 0.7);
+  --helios-caption-color: white;
+  --helios-caption-font-family: sans-serif;
 }
 ```
 
@@ -88,7 +94,10 @@ player.currentFrame = 150; // Seek to frame 150
 // Audio Control
 player.volume = 0.5; // 0.0 to 1.0
 player.muted = true;
-player.startAudioMetering(); // Start emitting 'audiometering' events
+
+// Audio Metering
+// Dispatches 'audiometering' event with { stereo: [L, R], peak: [L, R] }
+player.startAudioMetering();
 player.stopAudioMetering();
 
 // Writable Properties
@@ -180,9 +189,9 @@ The player supports exporting videos directly in the browser (using `VideoEncode
 2. **Audio:** Captures audio from `<audio>` elements (must be CORS-enabled).
 3. **Captions:** Configure how captions are handled:
    - `export-caption-mode="burn-in"`: Renders text directly onto the video frames (hardsub).
-   - `export-caption-mode="file"`: Downloads a separate `.srt` file alongside the video (softsub).
+   - `export-caption-mode="file"`: Downloads a separate `.srt` file alongside the video (softsub) and does NOT burn them in.
 4. **Resolution:** Configure export resolution independently of player size using `export-width` and `export-height`.
-5. **Usage:** User clicks "Export" in controls, or call `clientSideExporter` manually (internal API).
+5. **Usage:** User clicks "Export" in controls (opens Export Menu), or call `player.export()` programmatically.
 
 ## UI Features
 

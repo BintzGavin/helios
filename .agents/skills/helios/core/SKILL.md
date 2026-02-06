@@ -58,6 +58,7 @@ interface HeliosOptions {
   markers?: Marker[];            // Initial timeline markers
   playbackRange?: [number, number]; // Restrict playback to [startFrame, endFrame]
   driver?: TimeDriver;           // Custom time driver (mostly internal use)
+  timeline?: HeliosTimeline;     // Declarative timeline definition
 }
 ```
 
@@ -83,8 +84,41 @@ interface HeliosState {
   availableAudioTracks: AudioTrackMetadata[];
   captions: CaptionCue[];
   activeCaptions: CaptionCue[];
+  activeClips: HeliosClip[];
   markers: Marker[];
   playbackRange: [number, number] | null;
+}
+
+interface HeliosConfig<TInputProps = Record<string, any>> {
+  width?: number;
+  height?: number;
+  duration: number;
+  fps: number;
+  inputProps?: TInputProps;
+  schema?: HeliosSchema;
+  // ... other HeliosOptions properties
+}
+
+interface HeliosComposition<TInputProps = Record<string, any>> extends HeliosConfig<TInputProps> {
+  timeline?: HeliosTimeline;
+}
+
+interface HeliosTimeline {
+  tracks: HeliosTrack[];
+}
+
+interface HeliosTrack {
+  id: string;
+  name?: string;
+  clips: HeliosClip[];
+}
+
+interface HeliosClip {
+  id: string;
+  source: string;
+  start: number;   // Start time in seconds
+  duration: number; // Duration in seconds
+  props?: Record<string, any>;
 }
 
 type AudioTrackState = {
@@ -131,6 +165,7 @@ helios.setAudioTrackVolume(trackId: string, volume: number)
 helios.setAudioTrackMuted(trackId: string, muted: boolean)
 
 // Manually set available tracks (for headless environments)
+// Metadata now supports 'fadeEasing' (e.g. "quad.in", "sine.out")
 helios.setAvailableAudioTracks(tracks: AudioTrackMetadata[])
 
 // Advanced: Audio Visualization Hooks
@@ -195,6 +230,11 @@ Bind Helios to `document.timeline` when the timeline is driven externally (e.g.,
 // Start polling document.timeline (or __HELIOS_VIRTUAL_TIME__ in Renderer)
 helios.bindToDocumentTimeline()
 helios.unbindFromDocumentTimeline() // Stop polling
+
+// Check if reactively bound to virtual time (Synchronous)
+if (helios.isVirtualTimeBound) {
+  // Sync is exact
+}
 ```
 
 #### Stability Registry
@@ -325,6 +365,7 @@ helios.playbackRange: ReadonlySignal<[number, number] | null>
 helios.width: ReadonlySignal<number>
 helios.height: ReadonlySignal<number>
 helios.loop: ReadonlySignal<boolean>
+helios.activeClips: ReadonlySignal<HeliosClip[]>
 ```
 
 ## Animation Helpers

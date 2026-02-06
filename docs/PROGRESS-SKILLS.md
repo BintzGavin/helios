@@ -1,5 +1,13 @@
 # SKILLS Progress Log
 
+## SKILLS v1.12.0
+- ✅ Completed: Daily Skills Review
+  - Created workflow skill for `declarative-timeline` (Timeline & Active Clips)
+  - Updated API skills for `core` (Timeline, activeClips, isVirtualTimeBound)
+  - Updated API skills for `renderer` (stabilityTimeout, randomSeed, keyFrameInterval)
+  - Updated API skills for `player` (CSS Vars, Audio Metering, Export Caption Mode)
+  - Updated skill for `cli` (update, list commands)
+
 ## SKILLS v1.11.0
 - ✅ Completed: Daily Skills Review
   - Created workflow skill for `audio-visualization` (Deterministic Buffer & Player Metering)
