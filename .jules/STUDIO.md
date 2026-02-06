@@ -77,3 +77,7 @@
 ## [0.102.0] - Documentation Verification
 **Learning:** Verification of backend-only logic like documentation discovery in Studio requires custom scripts (`npx tsx`) because the sandbox environment lacks `node_modules` within package directories, preventing standard test runners like `vitest` from working out of the box without potentially disruptive installs.
 **Action:** When implementing backend features, prioritize creating standalone verification scripts that import the source directly to verify logic without relying on the test runner environment.
+
+## [0.103.0] - CLI Build Gap
+**Learning:** The "Preview with the Player" vision relies on the player being available in the built artifact. Currently, `npm run build` only builds the headless composition, leaving users without a playable artifact to deploy. A dedicated `helios build` command is required to wrap the output.
+**Action:** When planning CLI features, consider the entire deployment lifecycle (Init -> Dev -> Build -> Deploy).
