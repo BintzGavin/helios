@@ -21,3 +21,7 @@
 ## v0.70.0 - Planner Protocol Violation
 **Learning:** The "Planner" role must strictly produce a `.sys/plans/` file and NOT execute `set_plan` or write implementation code, even if standard system prompts suggest otherwise.
 **Action:** When acting as Planner, verify the output is ONLY a markdown file in `.sys/plans/` and use `write_file` instead of `set_plan`.
+
+## v0.71.0 - UMD Build Decoupling
+**Learning:** `vite` configuration externalizing `@helios-project/core` causes the UMD build to require a global `HeliosCore` variable, breaking standalone CDN usage. Using `import type` and `instance.constructor` avoids hard runtime dependencies.
+**Action:** When designing "drop-in" components that depend on a core library, avoid value imports from the core to ensure the UMD build remains self-contained.
