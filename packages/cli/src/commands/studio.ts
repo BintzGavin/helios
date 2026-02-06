@@ -4,9 +4,10 @@ import { studioApiPlugin } from '@helios-project/studio/cli';
 import { createRequire } from 'module';
 import path from 'path';
 import fs from 'fs';
-import { registry } from '../registry/manifest.js';
+import { defaultClient } from '../registry/client.js';
 import { installComponent } from '../utils/install.js';
 import { loadConfig } from '../utils/config.js';
+import chalk from 'chalk';
 
 export function registerStudioCommand(program: Command) {
   program
@@ -14,9 +15,11 @@ export function registerStudioCommand(program: Command) {
     .description('Launch the Helios Studio')
     .option('-p, --port <number>', 'Port to listen on', '5173')
     .action(async (options) => {
-      console.log('Starting Studio...');
-
       try {
+        console.log(chalk.blue('Starting Studio...'));
+        console.log(chalk.dim('Fetching component registry...'));
+        const components = await defaultClient.getComponents();
+
         const require = createRequire(import.meta.url);
 
         // Resolve the path to the studio package
@@ -37,14 +40,14 @@ export function registerStudioCommand(program: Command) {
           plugins: [
             studioApiPlugin({
               studioRoot: studioDist,
-              components: registry,
+              components: components,
               onInstallComponent: async (name: string) => {
                 await installComponent(process.cwd(), name);
               },
               onCheckInstalled: async (name: string) => {
                 const config = loadConfig(process.cwd());
                 const componentsDir = config?.directories.components || 'src/components/helios';
-                const comp = registry.find(c => c.name === name);
+                const comp = components.find(c => c.name === name);
                 if (!comp) return false;
 
                 const targetDir = path.resolve(process.cwd(), componentsDir);
