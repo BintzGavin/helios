@@ -57,3 +57,7 @@ Critical learnings only. This is not a log—only add entries for insights that 
 ## [0.15.0] - Distributed Orchestration Decoupling
 **Learning:** The "Distributed Rendering" vision requires a separation of "Planning" (job splitting) and "Execution" (rendering). The `RenderOrchestrator` in `packages/renderer` tightly couples them (calculating chunks and immediately spawning workers). This blocks external/cloud orchestration.
 **Action:** When bridging a "Cloud" gap without cloud infrastructure, implement the "Planning" phase as a standalone artifact (e.g., Job Spec JSON) in the CLI. This allows users to bring their own execution environment (CI/Batch) and fulfills the vision's "Stateless" requirement incrementally.
+
+## [0.16.1] - Module System Mismatch
+**Learning:** `packages/cli` is ESM (`type: module`) but imported `packages/renderer` which lacked `type: module` in its `package.json` despite targeting ESM in `tsconfig`. This caused `SyntaxError` when using named exports like `RenderOrchestrator` in `tsx` environments.
+**Action:** When developing in a monorepo with mixed CJS/ESM history, explicit `package.json` configuration (`type: module`) is critical for ensuring interoperability, even if compilation targets seem correct.
