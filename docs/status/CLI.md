@@ -59,3 +59,4 @@ Per AGENTS.md, the CLI is "ACTIVELY EXPANDING FOR V2" with focus on:
 [v0.13.0] ✅ Implement Remove Command - Implemented `helios remove <component>` to unregister components and warn about associated files.
 [v0.14.0] ✅ Implement Update Command - Implemented `helios update <component>` to restore or update components from the registry.
 [v0.15.0] ✅ Implement Build Command - Implemented `helios build` wrapping Vite for production builds.
+[v0.15.0] ✅ Synced Version - Updated package.json and index.ts to match status file and verified functionality.

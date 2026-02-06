@@ -5,6 +5,7 @@ This file tracks progress for the CLI domain (`packages/cli`).
 ## CLI v0.15.0
 
 - ✅ Implement Build Command - Implemented `helios build` wrapping Vite for production builds.
+- ✅ Synced Version - Updated `package.json` and `index.ts` to match status file and verified functionality.
 
 ## CLI v0.14.0
 
