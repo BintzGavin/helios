@@ -33,6 +33,9 @@ export function connectToParent(helios: Helios) {
       case 'HELIOS_SEEK':
         if (typeof frame === 'number') {
           helios.seek(frame);
+          // Wait for render (double RAF) to ensure the frame is painted
+          await new Promise<void>(r => requestAnimationFrame(() => requestAnimationFrame(() => r())));
+          window.parent.postMessage({ type: 'HELIOS_SEEK_DONE', frame }, '*');
         }
         break;
       case 'HELIOS_SET_PLAYBACK_RATE':

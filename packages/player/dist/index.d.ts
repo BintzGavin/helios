@@ -46,6 +46,7 @@ export declare class HeliosPlayer extends HTMLElement implements TrackHost, Audi
     private audioMenu;
     private settingsBtn;
     private settingsMenu;
+    private exportMenu;
     private scrubber;
     private scrubberWrapper;
     private scrubberTooltip;
@@ -85,6 +86,7 @@ export declare class HeliosPlayer extends HTMLElement implements TrackHost, Audi
     private abortController;
     private isExporting;
     private isScrubbing;
+    private _isSeeking;
     private wasPlayingBeforeScrub;
     private lastState;
     private pendingProps;
@@ -184,6 +186,10 @@ export declare class HeliosPlayer extends HTMLElement implements TrackHost, Audi
     private closeSettingsMenu;
     private closeMenusIfOutside;
     private closeAudioMenuIfOutside;
+    private toggleExportMenu;
+    private closeExportMenu;
+    private renderExportMenu;
+    private startExportFromMenu;
     private renderSettingsMenu;
     private createDivider;
     private renderAudioMenu;
@@ -232,5 +238,5 @@ export declare class HeliosPlayer extends HTMLElement implements TrackHost, Audi
     startAudioMetering(): void;
     stopAudioMetering(): void;
     private retryConnection;
-    private renderClientSide;
+    private handleExportClick;
 }

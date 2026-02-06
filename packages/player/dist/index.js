@@ -647,10 +647,89 @@ template.innerHTML = `
       border-radius: 4px;
       color: var(--helios-accent-color);
     }
+    /* Export Menu */
+    .export-menu {
+      position: absolute;
+      bottom: 60px;
+      right: 10px;
+      background: rgba(0, 0, 0, 0.9);
+      border: 1px solid var(--helios-range-track-color);
+      border-radius: 8px;
+      padding: 12px;
+      z-index: 20;
+      min-width: 240px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      backdrop-filter: blur(4px);
+    }
+    .export-menu.hidden {
+      display: none;
+    }
+    .export-item {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      color: white;
+      font-size: 12px;
+    }
+    .export-label {
+      font-weight: bold;
+      color: var(--helios-text-color);
+      font-size: 11px;
+      text-transform: uppercase;
+      opacity: 0.8;
+    }
+    .export-input, .export-select {
+       background: rgba(255, 255, 255, 0.1);
+       color: white;
+       border: 1px solid var(--helios-range-track-color);
+       border-radius: 4px;
+       padding: 6px 8px;
+       font-size: 13px;
+       width: 100%;
+       box-sizing: border-box;
+       font-family: inherit;
+    }
+    .export-input:focus, .export-select:focus {
+        outline: 1px solid var(--helios-accent-color);
+        border-color: var(--helios-accent-color);
+    }
+    .export-checkbox-label {
+       display: flex;
+       align-items: center;
+       gap: 8px;
+       cursor: pointer;
+       font-size: 13px;
+       user-select: none;
+    }
+    .export-checkbox-label input {
+        accent-color: var(--helios-accent-color);
+        width: 16px;
+        height: 16px;
+        margin: 0;
+    }
+    .export-action-btn {
+       background: var(--helios-accent-color);
+       border: none;
+       color: white;
+       border-radius: 4px;
+       padding: 10px;
+       cursor: pointer;
+       font-size: 14px;
+       font-weight: bold;
+       margin-top: 4px;
+       width: 100%;
+       transition: filter 0.2s;
+    }
+    .export-action-btn:hover {
+       filter: brightness(1.1);
+    }
   </style>
   <slot></slot>
   <div class="audio-menu hidden" part="audio-menu" id="audio-menu-container" role="dialog" aria-label="Audio Tracks"></div>
   <div class="settings-menu hidden" part="settings-menu" id="settings-menu-container" role="dialog" aria-label="Settings"></div>
+  <div class="export-menu hidden" part="export-menu" id="export-menu-container" role="dialog" aria-label="Export Options"></div>
 
   <div class="shortcuts-overlay hidden" part="shortcuts-overlay">
     <div class="debug-header">
@@ -692,7 +771,7 @@ template.innerHTML = `
     </div>
     <button class="audio-btn" part="audio-button" aria-label="Audio Tracks" style="display: none;" aria-haspopup="true" aria-controls="audio-menu-container" aria-expanded="false">🎵</button>
     <button class="cc-btn" part="cc-button" aria-label="Toggle Captions">CC</button>
-    <button class="export-btn" part="export-button" aria-label="Export video">Export</button>
+    <button class="export-btn" part="export-button" aria-label="Export options" aria-haspopup="true" aria-controls="export-menu-container" aria-expanded="false">Export</button>
     <div class="scrubber-wrapper">
       <div class="scrubber-tooltip hidden" part="tooltip"></div>
       <div class="markers-container" part="markers"></div>
@@ -718,6 +797,7 @@ export class HeliosPlayer extends HTMLElement {
     audioMenu;
     settingsBtn;
     settingsMenu;
+    exportMenu;
     scrubber;
     scrubberWrapper;
     scrubberTooltip;
@@ -760,6 +840,7 @@ export class HeliosPlayer extends HTMLElement {
     abortController = null;
     isExporting = false;
     isScrubbing = false;
+    _isSeeking = false;
     wasPlayingBeforeScrub = false;
     lastState = null;
     pendingProps = null;
@@ -844,8 +925,8 @@ export class HeliosPlayer extends HTMLElement {
         }
     }
     get seeking() {
-        // Return internal scrubbing state as seeking
-        return this.isScrubbing;
+        // Return internal scrubbing state or async seek state as seeking
+        return this.isScrubbing || this._isSeeking;
     }
     get buffered() {
         return new StaticTimeRange(0, this.duration);
@@ -884,9 +965,12 @@ export class HeliosPlayer extends HTMLElement {
             const s = this.controller.getState();
             if (s.fps) {
                 // Dispatch events to satisfy Standard Media API expectations
+                this._isSeeking = true;
                 this.dispatchEvent(new Event("seeking"));
-                this.controller.seek(Math.floor(val * s.fps));
-                this.dispatchEvent(new Event("seeked"));
+                this.controller.seek(Math.floor(val * s.fps)).then(() => {
+                    this._isSeeking = false;
+                    this.dispatchEvent(new Event("seeked"));
+                });
             }
         }
     }
@@ -896,9 +980,12 @@ export class HeliosPlayer extends HTMLElement {
     set currentFrame(val) {
         if (this.controller) {
             // Dispatch events to satisfy Standard Media API expectations
+            this._isSeeking = true;
             this.dispatchEvent(new Event("seeking"));
-            this.controller.seek(Math.floor(val));
-            this.dispatchEvent(new Event("seeked"));
+            this.controller.seek(Math.floor(val)).then(() => {
+                this._isSeeking = false;
+                this.dispatchEvent(new Event("seeked"));
+            });
         }
     }
     get duration() {
@@ -1120,6 +1207,7 @@ export class HeliosPlayer extends HTMLElement {
         this.audioMenu = this.shadowRoot.querySelector(".audio-menu");
         this.settingsBtn = this.shadowRoot.querySelector(".settings-btn");
         this.settingsMenu = this.shadowRoot.querySelector(".settings-menu");
+        this.exportMenu = this.shadowRoot.querySelector(".export-menu");
         this.scrubber = this.shadowRoot.querySelector(".scrubber");
         this.scrubberWrapper = this.shadowRoot.querySelector(".scrubber-wrapper");
         this.scrubberTooltip = this.shadowRoot.querySelector(".scrubber-tooltip");
@@ -1368,6 +1456,7 @@ export class HeliosPlayer extends HTMLElement {
         e.stopPropagation();
         if (this.audioMenu.classList.contains("hidden")) {
             this.closeSettingsMenu(); // Close other menu
+            this.closeExportMenu();
             this.renderAudioMenu();
             this.audioMenu.classList.remove("hidden");
             this.audioBtn.setAttribute("aria-expanded", "true");
@@ -1388,6 +1477,7 @@ export class HeliosPlayer extends HTMLElement {
         e.stopPropagation();
         if (this.settingsMenu.classList.contains("hidden")) {
             this.closeAudioMenu(); // Close other menu
+            this.closeExportMenu();
             this.renderSettingsMenu();
             this.settingsMenu.classList.remove("hidden");
             this.settingsBtn.setAttribute("aria-expanded", "true");
@@ -1408,6 +1498,12 @@ export class HeliosPlayer extends HTMLElement {
                 this.closeSettingsMenu();
             }
         }
+        if (!this.exportMenu.classList.contains("hidden")) {
+            const target = e.composedPath()[0];
+            if (!this.exportMenu.contains(target) && !this.exportBtn.contains(target)) {
+                this.closeExportMenu();
+            }
+        }
     };
     closeAudioMenuIfOutside = (e) => {
         // If menu is hidden, do nothing
@@ -1420,6 +1516,146 @@ export class HeliosPlayer extends HTMLElement {
         }
         this.closeAudioMenu();
     };
+    toggleExportMenu = (e) => {
+        e.stopPropagation();
+        if (this.exportMenu.classList.contains("hidden")) {
+            this.closeAudioMenu();
+            this.closeSettingsMenu();
+            this.renderExportMenu();
+            this.exportMenu.classList.remove("hidden");
+            this.exportBtn.setAttribute("aria-expanded", "true");
+            const firstFocusable = this.exportMenu.querySelector("input, select, button");
+            if (firstFocusable)
+                firstFocusable.focus();
+        }
+        else {
+            this.closeExportMenu();
+        }
+    };
+    closeExportMenu = () => {
+        this.exportMenu.classList.add("hidden");
+        this.exportBtn.setAttribute("aria-expanded", "false");
+    };
+    renderExportMenu() {
+        this.exportMenu.innerHTML = "";
+        // 1. Filename
+        const filenameItem = document.createElement("div");
+        filenameItem.className = "export-item";
+        filenameItem.innerHTML = `<span class="export-label">Filename</span>`;
+        const filenameInput = document.createElement("input");
+        filenameInput.className = "export-input";
+        filenameInput.type = "text";
+        filenameInput.value = this.getAttribute("export-filename") || "video";
+        filenameItem.appendChild(filenameInput);
+        this.exportMenu.appendChild(filenameItem);
+        // 2. Format
+        const formatItem = document.createElement("div");
+        formatItem.className = "export-item";
+        formatItem.innerHTML = `<span class="export-label">Format</span>`;
+        const formatSelect = document.createElement("select");
+        formatSelect.className = "export-select";
+        ["mp4", "webm", "png", "jpeg"].forEach(fmt => {
+            const opt = document.createElement("option");
+            opt.value = fmt;
+            opt.textContent = fmt.toUpperCase();
+            formatSelect.appendChild(opt);
+        });
+        formatSelect.value = this.getAttribute("export-format") || "mp4";
+        formatItem.appendChild(formatSelect);
+        this.exportMenu.appendChild(formatItem);
+        // 3. Resolution (Scale)
+        const scaleItem = document.createElement("div");
+        scaleItem.className = "export-item";
+        scaleItem.innerHTML = `<span class="export-label">Resolution</span>`;
+        const scaleSelect = document.createElement("select");
+        scaleSelect.className = "export-select";
+        const w = this.videoWidth || 1920;
+        const h = this.videoHeight || 1080;
+        [1, 0.5].forEach(scale => {
+            const opt = document.createElement("option");
+            opt.value = String(scale);
+            const label = scale === 1 ? "Original" : "Half";
+            opt.textContent = `${label} (${Math.round(w * scale)}x${Math.round(h * scale)})`;
+            scaleSelect.appendChild(opt);
+        });
+        scaleSelect.value = "1";
+        scaleItem.appendChild(scaleSelect);
+        this.exportMenu.appendChild(scaleItem);
+        // 4. Captions
+        const captionsItem = document.createElement("div");
+        captionsItem.className = "export-item";
+        const captionsLabel = document.createElement("label");
+        captionsLabel.className = "export-checkbox-label";
+        const captionsCheckbox = document.createElement("input");
+        captionsCheckbox.type = "checkbox";
+        captionsCheckbox.checked = this.showCaptions;
+        captionsLabel.appendChild(captionsCheckbox);
+        captionsLabel.appendChild(document.createTextNode("Burn-in Captions"));
+        captionsItem.appendChild(captionsLabel);
+        this.exportMenu.appendChild(captionsItem);
+        // 5. Action Button
+        const actionBtn = document.createElement("button");
+        actionBtn.className = "export-action-btn";
+        const updateButtonText = () => {
+            const isImage = ["png", "jpeg"].includes(formatSelect.value);
+            actionBtn.textContent = isImage ? "Save Snapshot" : "Export Video";
+        };
+        formatSelect.addEventListener("change", updateButtonText);
+        updateButtonText();
+        actionBtn.onclick = () => {
+            this.startExportFromMenu({
+                filename: filenameInput.value || "video",
+                format: formatSelect.value,
+                scale: parseFloat(scaleSelect.value),
+                includeCaptions: captionsCheckbox.checked
+            });
+        };
+        this.exportMenu.appendChild(actionBtn);
+    }
+    async startExportFromMenu(options) {
+        this.closeExportMenu();
+        // Calculate dimensions
+        const w = this.videoWidth || 1920;
+        const h = this.videoHeight || 1080;
+        const width = Math.round(w * options.scale);
+        const height = Math.round(h * options.scale);
+        // Setup AbortController
+        this.abortController = new AbortController();
+        this.exportBtn.textContent = "Cancel"; // Should show cancel immediately
+        try {
+            await this.export({
+                filename: options.filename,
+                format: options.format,
+                width,
+                height,
+                includeCaptions: options.includeCaptions,
+                signal: this.abortController.signal,
+                onProgress: (p) => {
+                    const percent = Math.round(p * 100);
+                    if (options.format === 'png' || options.format === 'jpeg') {
+                        this.exportBtn.textContent = "Saving...";
+                    }
+                    else {
+                        this.exportBtn.textContent = `Cancel (${percent}%)`;
+                    }
+                }
+            });
+        }
+        catch (e) {
+            if (e.message !== "Export aborted") {
+                this.showStatus("Export Failed: " + e.message, true, {
+                    label: "Dismiss",
+                    handler: () => this.hideStatus()
+                });
+            }
+            console.error("Export failed or aborted", e);
+        }
+        finally {
+            this.exportBtn.textContent = "Export";
+            this.exportBtn.disabled = false;
+            this.abortController = null;
+        }
+    }
     renderSettingsMenu() {
         this.settingsMenu.innerHTML = "";
         if (!this.controller)
@@ -1614,7 +1850,7 @@ export class HeliosPlayer extends HTMLElement {
         this.scrubber.addEventListener("touchcancel", this.handleScrubEnd);
         this.scrubberWrapper.addEventListener("mousemove", this.handleScrubberHover);
         this.scrubberWrapper.addEventListener("mouseleave", this.handleScrubberLeave);
-        this.exportBtn.addEventListener("click", this.renderClientSide);
+        this.exportBtn.addEventListener("click", this.handleExportClick);
         this.fullscreenBtn.addEventListener("click", this.toggleFullscreen);
         this.pipBtn.addEventListener("click", () => this.togglePip());
         this.ccBtn.addEventListener("click", this.toggleCaptions);
@@ -1673,7 +1909,7 @@ export class HeliosPlayer extends HTMLElement {
         this.scrubber.removeEventListener("touchcancel", this.handleScrubEnd);
         this.scrubberWrapper.removeEventListener("mousemove", this.handleScrubberHover);
         this.scrubberWrapper.removeEventListener("mouseleave", this.handleScrubberLeave);
-        this.exportBtn.removeEventListener("click", this.renderClientSide);
+        this.exportBtn.removeEventListener("click", this.handleExportClick);
         this.fullscreenBtn.removeEventListener("click", this.toggleFullscreen);
         this.ccBtn.removeEventListener("click", this.toggleCaptions);
         this.bigPlayBtn.removeEventListener("click", this.handleBigPlayClick);
@@ -2165,6 +2401,11 @@ export class HeliosPlayer extends HTMLElement {
                 this.closeSettingsMenu();
                 this.settingsBtn.focus();
             }
+            if (!this.exportMenu.classList.contains("hidden")) {
+                e.stopPropagation();
+                this.closeExportMenu();
+                this.exportBtn.focus();
+            }
             if (!this.shortcutsOverlay.classList.contains("hidden")) {
                 e.stopPropagation();
                 this.toggleShortcutsOverlay();
@@ -2600,13 +2841,11 @@ export class HeliosPlayer extends HTMLElement {
         // Reload iframe to force fresh start
         this.load();
     }
-    renderClientSide = async () => {
+    handleExportClick = (e) => {
         // If we are already exporting, this is a cancel request
         if (this.abortController) {
             this.abortController.abort();
-            this.abortController = null;
-            this.exportBtn.textContent = "Export";
-            this.exportBtn.disabled = false;
+            // Cleanup is handled in startExportFromMenu finally block
             return;
         }
         // Export requires Controller (Direct or Bridge)
@@ -2614,30 +2853,7 @@ export class HeliosPlayer extends HTMLElement {
             console.error("Export not available: Not connected.");
             return;
         }
-        this.abortController = new AbortController();
-        this.exportBtn.textContent = "Cancel";
-        try {
-            await this.export({
-                signal: this.abortController.signal,
-                onProgress: (p) => {
-                    this.exportBtn.textContent = `Cancel (${Math.round(p * 100)}%)`;
-                }
-            });
-        }
-        catch (e) {
-            if (e.message !== "Export aborted") {
-                this.showStatus("Export Failed: " + e.message, true, {
-                    label: "Dismiss",
-                    handler: () => this.hideStatus()
-                });
-            }
-            console.error("Export failed or aborted", e);
-        }
-        finally {
-            this.exportBtn.textContent = "Export";
-            this.exportBtn.disabled = false;
-            this.abortController = null;
-        }
+        this.toggleExportMenu(e);
     };
 }
 if (!customElements.get("helios-player")) {

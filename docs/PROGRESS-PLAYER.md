@@ -1,3 +1,6 @@
+## PLAYER v0.73.0
+- ✅ Completed: Async Seek - Implemented asynchronous seek operation in `HeliosController` (returning `Promise<void>`) and ensures `HeliosPlayer` waits for the frame update before dispatching the `seeked` event, improving Standard Media API compliance and export reliability.
+
 ## PLAYER v0.72.0
 - ✅ Completed: Export Menu - Implemented a dedicated Export Menu UI to allow users to configure export options (format, resolution, filename, captions) and take snapshots directly from the player.
 

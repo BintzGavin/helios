@@ -24,7 +24,7 @@ The Shadow DOM contains:
 - `volumechange`: Volume or mute state changed.
 - `ratechange`: Playback rate changed.
 - `durationchange`: Duration changed.
-- `seeking`: Seek operation started.
+- `seeking`: Seek operation started (scrubbing or programmatic).
 - `seeked`: Seek operation completed.
 - `loadstart`: Loading process started.
 - `loadedmetadata`: Metadata (duration, dimensions) loaded.
@@ -57,9 +57,10 @@ The Shadow DOM contains:
 - `media-*`: Metadata attributes (title, artist, album, artwork).
 
 ## D. Properties (API)
-- `currentTime` (get/set): Current playback time in seconds.
+- `currentTime` (get/set): Current playback time in seconds. Setter triggers async seek.
 - `duration` (get): Duration in seconds.
 - `paused`, `ended` (get): Playback state.
+- `seeking` (get): Whether a seek operation is in progress.
 - `volume` (get/set): Master volume (0-1).
 - `muted` (get/set): Master mute state.
 - `playbackRate` (get/set): Playback speed multiplier.

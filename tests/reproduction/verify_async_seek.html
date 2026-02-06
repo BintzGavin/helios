@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Verify Async Seek</title>
+</head>
+<body>
+    <helios-player id="player" src="./mock_composition.html" width="800" height="450" controls></helios-player>
+    <div id="log"></div>
+
+    <script type="module">
+        import '../../packages/player/dist/helios-player.bundle.mjs';
+
+        const player = document.getElementById('player');
+        const log = document.getElementById('log');
+
+        function appendLog(msg) {
+            log.innerHTML += `<div>${msg}</div>`;
+            console.log(msg);
+        }
+
+        player.addEventListener('loadedmetadata', async () => {
+            appendLog('Player ready');
+
+            player.addEventListener('seeking', () => {
+                appendLog(`Event: seeking (seeking=${player.seeking})`);
+            });
+
+            player.addEventListener('seeked', () => {
+                appendLog(`Event: seeked (seeking=${player.seeking})`);
+            });
+
+            // Perform async seek
+            appendLog('Setting currentTime = 5.0...');
+            player.currentTime = 5.0;
+
+            // Immediately check seeking status
+            if (player.seeking) {
+                appendLog('SUCCESS: player.seeking is true immediately after set.');
+            } else {
+                appendLog('FAILURE: player.seeking is false immediately after set.');
+            }
+        });
+    </script>
+</body>
+</html>

@@ -64,7 +64,7 @@ describe('HeliosPlayer', () => {
         getState: vi.fn().mockReturnValue({ currentFrame: 0, duration: 10, fps: 30, isPlaying: false }),
         play: vi.fn(),
         pause: vi.fn(),
-        seek: vi.fn(),
+        seek: vi.fn().mockResolvedValue(undefined),
         subscribe: vi.fn().mockReturnValue(() => {}),
         onError: vi.fn().mockReturnValue(() => {}),
         dispose: vi.fn(), setCaptions: vi.fn(),
@@ -110,7 +110,7 @@ describe('HeliosPlayer', () => {
         getState: vi.fn().mockReturnValue({ currentFrame: 0, duration: 10, fps: 30, isPlaying: false }),
         play: vi.fn(),
         pause: vi.fn(),
-        seek: vi.fn(),
+        seek: vi.fn().mockResolvedValue(undefined),
         subscribe: vi.fn().mockReturnValue(() => {}),
         onError: vi.fn().mockReturnValue(() => {}),
         dispose: vi.fn(), setCaptions: vi.fn(),
@@ -200,7 +200,7 @@ describe('HeliosPlayer', () => {
         getState: vi.fn().mockReturnValue({ currentFrame: 0, duration: 10, fps: 30, isPlaying: false }),
         play: vi.fn(),
         pause: vi.fn(),
-        seek: vi.fn(),
+        seek: vi.fn().mockResolvedValue(undefined),
         subscribe: vi.fn().mockReturnValue(() => {}),
         onError: vi.fn().mockReturnValue(() => {}),
         dispose: vi.fn(), setCaptions: vi.fn(),
@@ -272,7 +272,7 @@ describe('HeliosPlayer', () => {
         getState: vi.fn().mockReturnValue({ currentFrame: 0, duration: 10, fps: 30, isPlaying: false }),
         play: vi.fn(),
         pause: vi.fn(),
-        seek: vi.fn(),
+        seek: vi.fn().mockResolvedValue(undefined),
         subscribe: vi.fn().mockReturnValue(() => {}),
         onError: vi.fn().mockReturnValue(() => {}),
         dispose: vi.fn(), setCaptions: vi.fn(),
@@ -351,7 +351,7 @@ describe('HeliosPlayer', () => {
       getState: vi.fn().mockReturnValue({ currentFrame: 0, duration: 10, fps: 30, isPlaying: false }),
       play: vi.fn(),
       pause: vi.fn(),
-      seek: vi.fn(),
+      seek: vi.fn().mockResolvedValue(undefined),
       subscribe: vi.fn().mockReturnValue(() => {}),
       onError: vi.fn().mockReturnValue(() => {}),
       dispose: vi.fn(), setCaptions: vi.fn(),
@@ -404,7 +404,7 @@ describe('HeliosPlayer', () => {
             getState: vi.fn().mockReturnValue({ currentFrame: 0, duration: 10, fps: 30, isPlaying: false }),
             play: vi.fn(),
             pause: vi.fn(),
-            seek: vi.fn(),
+            seek: vi.fn().mockResolvedValue(undefined),
             subscribe: vi.fn().mockReturnValue(() => {}),
             onError: vi.fn().mockReturnValue(() => {}),
             dispose: vi.fn(), setCaptions: vi.fn(),
@@ -527,7 +527,7 @@ describe('HeliosPlayer', () => {
             getState: vi.fn().mockReturnValue({ currentFrame: 0, duration: 10, fps: 30, isPlaying: false }),
             play: vi.fn(),
             pause: vi.fn(),
-            seek: vi.fn(),
+            seek: vi.fn().mockResolvedValue(undefined),
             subscribe: vi.fn().mockReturnValue(() => {}),
             onError: vi.fn().mockReturnValue(() => {}),
             dispose: vi.fn(), setCaptions: vi.fn(),
@@ -619,7 +619,7 @@ describe('HeliosPlayer', () => {
         getState: vi.fn().mockReturnValue({ currentFrame: 0, duration: 10, fps: 30, isPlaying: false }),
         play: vi.fn(),
         pause: vi.fn(),
-        seek: vi.fn(),
+        seek: vi.fn().mockResolvedValue(undefined),
         subscribe: vi.fn().mockReturnValue(() => {}),
         onError: vi.fn().mockReturnValue(() => {}),
         dispose: vi.fn(), setCaptions: vi.fn(),
@@ -653,7 +653,7 @@ describe('HeliosPlayer', () => {
         getState: vi.fn().mockReturnValue({ currentFrame: 0, duration: 10, fps: 30, isPlaying: false }),
         play: vi.fn(),
         pause: vi.fn(),
-        seek: vi.fn(),
+        seek: vi.fn().mockResolvedValue(undefined),
         subscribe: vi.fn().mockReturnValue(() => {}),
         onError: vi.fn().mockReturnValue(() => {}),
         dispose: vi.fn(), setCaptions: vi.fn(),
@@ -688,7 +688,7 @@ describe('HeliosPlayer', () => {
             getState: vi.fn().mockReturnValue({ currentFrame: 0, duration: 10, fps: 30, isPlaying: false }),
             play: vi.fn(),
             pause: vi.fn(),
-            seek: vi.fn(),
+            seek: vi.fn().mockResolvedValue(undefined),
             subscribe: vi.fn().mockReturnValue(() => {}),
             onError: vi.fn().mockReturnValue(() => {}),
             dispose: vi.fn(), setCaptions: vi.fn(),
@@ -710,7 +710,7 @@ describe('HeliosPlayer', () => {
         });
 
         // Trigger export via private method to await it
-        await (player as any).renderClientSide();
+        await (player as any).startExportFromMenu({ filename: 'video', format: 'mp4', scale: 1, includeCaptions: false });
 
         // Verify Status Overlay
         const overlay = player.shadowRoot!.querySelector('.status-overlay') as HTMLElement;
@@ -732,7 +732,7 @@ describe('HeliosPlayer', () => {
             getState: vi.fn().mockReturnValue({ currentFrame: 0, duration: 10, fps: 30, isPlaying: false }),
             play: vi.fn(),
             pause: vi.fn(),
-            seek: vi.fn(),
+            seek: vi.fn().mockResolvedValue(undefined),
             subscribe: vi.fn().mockReturnValue(() => {}),
             onError: vi.fn().mockReturnValue(() => {}),
             dispose: vi.fn(), setCaptions: vi.fn(),
@@ -758,7 +758,7 @@ describe('HeliosPlayer', () => {
         overlay.classList.add('hidden');
 
         // Trigger export
-        await (player as any).renderClientSide();
+        await (player as any).startExportFromMenu({ filename: 'video', format: 'mp4', scale: 1, includeCaptions: false });
 
         // Should still be hidden (or at least not showing failure)
         expect(overlay.classList.contains('hidden')).toBe(true);
@@ -773,7 +773,7 @@ describe('HeliosPlayer', () => {
             getState: vi.fn().mockReturnValue({ currentFrame: 0, duration: 10, fps: 30, isPlaying: false }),
             play: vi.fn(),
             pause: vi.fn(),
-            seek: vi.fn(),
+            seek: vi.fn().mockResolvedValue(undefined),
             subscribe: vi.fn().mockReturnValue(() => {}),
             onError: vi.fn().mockReturnValue(() => {}),
             dispose: vi.fn(), setCaptions: vi.fn(),
@@ -867,7 +867,7 @@ describe('HeliosPlayer', () => {
             getState: vi.fn().mockReturnValue({ currentFrame: 0, duration: 10, fps: 30, isPlaying: false, volume: 1, muted: false, playbackRate: 1 }),
             play: vi.fn(),
             pause: vi.fn(),
-            seek: vi.fn(),
+            seek: vi.fn().mockResolvedValue(undefined),
             setAudioVolume: vi.fn(), startAudioMetering: vi.fn(), stopAudioMetering: vi.fn(), onAudioMetering: vi.fn().mockReturnValue(() => {}), diagnose: vi.fn(),
             setAudioMuted: vi.fn(),
             setPlaybackRate: vi.fn(),
@@ -1049,7 +1049,7 @@ describe('HeliosPlayer', () => {
             getState: vi.fn().mockReturnValue({ currentFrame: 0, duration: 10, fps: 30, isPlaying: false }),
             play: vi.fn(),
             pause: vi.fn(),
-            seek: vi.fn(),
+            seek: vi.fn().mockResolvedValue(undefined),
             setAudioVolume: vi.fn(), startAudioMetering: vi.fn(), stopAudioMetering: vi.fn(), onAudioMetering: vi.fn().mockReturnValue(() => {}), diagnose: vi.fn(),
             setAudioMuted: vi.fn(),
             setPlaybackRate: vi.fn(),
@@ -1117,7 +1117,7 @@ describe('HeliosPlayer', () => {
             getState: vi.fn().mockReturnValue({ currentFrame: 0, duration: 10, fps: 30, isPlaying: false }),
             play: vi.fn(),
             pause: vi.fn(),
-            seek: vi.fn(),
+            seek: vi.fn().mockResolvedValue(undefined),
             subscribe: vi.fn().mockReturnValue(() => {}),
             onError: vi.fn().mockReturnValue(() => {}),
             dispose: vi.fn(), setCaptions: vi.fn(),
@@ -1259,7 +1259,7 @@ describe('HeliosPlayer', () => {
             getState: vi.fn().mockReturnValue({ currentFrame: 0, duration: 10, fps: 30, isPlaying: false, muted: false }),
             play: vi.fn(),
             pause: vi.fn(),
-            seek: vi.fn(),
+            seek: vi.fn().mockResolvedValue(undefined),
             setAudioVolume: vi.fn(), startAudioMetering: vi.fn(), stopAudioMetering: vi.fn(), onAudioMetering: vi.fn().mockReturnValue(() => {}), diagnose: vi.fn(),
             setAudioMuted: vi.fn(),
             setPlaybackRate: vi.fn(),
@@ -1306,7 +1306,7 @@ describe('HeliosPlayer', () => {
             getState: vi.fn().mockReturnValue({ currentFrame: 0, duration: 10, fps: 30, isPlaying: false }),
             play: vi.fn(),
             pause: vi.fn(),
-            seek: vi.fn(),
+            seek: vi.fn().mockResolvedValue(undefined),
             subscribe: vi.fn().mockReturnValue(() => {}),
             onError: vi.fn().mockReturnValue(() => {}),
             dispose: vi.fn(), setCaptions: vi.fn(),
@@ -1349,7 +1349,7 @@ describe('HeliosPlayer', () => {
         });
 
         // Trigger export
-        await (player as any).renderClientSide();
+        await player.export();
 
         // Expect saveCaptionsAsSRT to be called with "my-movie.srt"
         expect(saveCaptionsSpy).toHaveBeenCalledWith(expect.anything(), 'my-movie.srt');
@@ -1374,7 +1374,7 @@ describe('HeliosPlayer', () => {
           };
         });
 
-        await (player as any).renderClientSide();
+        await player.export();
 
         expect(saveCaptionsSpy).toHaveBeenCalledWith(expect.anything(), 'video.srt');
     });
@@ -1388,7 +1388,7 @@ describe('HeliosPlayer', () => {
             getState: vi.fn().mockReturnValue({ currentFrame: 0, duration: 10, fps: 30, isPlaying: false }),
             play: vi.fn(),
             pause: vi.fn(),
-            seek: vi.fn(),
+            seek: vi.fn().mockResolvedValue(undefined),
             subscribe: vi.fn().mockReturnValue(() => {}),
             onError: vi.fn().mockReturnValue(() => {}),
             dispose: vi.fn(), setCaptions: vi.fn(),
@@ -1534,7 +1534,7 @@ describe('HeliosPlayer', () => {
             getState: vi.fn().mockReturnValue({ currentFrame: 0, duration: 10, fps: 30, isPlaying: false }),
             play: vi.fn(),
             pause: vi.fn(),
-            seek: vi.fn(),
+            seek: vi.fn().mockResolvedValue(undefined),
             subscribe: vi.fn().mockReturnValue(() => {}),
             onError: vi.fn().mockReturnValue(() => {}),
             dispose: vi.fn(), setCaptions: vi.fn(),
@@ -1612,7 +1612,7 @@ describe('HeliosPlayer', () => {
             getState: vi.fn().mockReturnValue({ currentFrame: 0, duration: 10, fps: 30, isPlaying: false }),
             play: vi.fn(),
             pause: vi.fn(),
-            seek: vi.fn(),
+            seek: vi.fn().mockResolvedValue(undefined),
             subscribe: vi.fn().mockReturnValue(() => {}),
             onError: vi.fn().mockReturnValue(() => {}),
             dispose: vi.fn(), setCaptions: vi.fn(),
@@ -1736,7 +1736,7 @@ describe('HeliosPlayer', () => {
             getState: vi.fn().mockReturnValue({ currentFrame: 0, duration: 10, fps: 30, isPlaying: false }),
             play: vi.fn(),
             pause: vi.fn(),
-            seek: vi.fn(),
+            seek: vi.fn().mockResolvedValue(undefined),
             subscribe: vi.fn().mockReturnValue(() => {}),
             onError: vi.fn().mockReturnValue(() => {}),
             dispose: vi.fn(), setCaptions: vi.fn(),
@@ -1934,7 +1934,7 @@ describe('HeliosPlayer', () => {
             getState: vi.fn().mockReturnValue({ currentFrame: 0, duration: 10, fps: 30, isPlaying: false, playbackRate: 1 }),
             play: vi.fn(),
             pause: vi.fn(),
-            seek: vi.fn(),
+            seek: vi.fn().mockResolvedValue(undefined),
             setPlaybackRate: vi.fn(),
             subscribe: vi.fn().mockReturnValue(() => {}),
             onError: vi.fn().mockReturnValue(() => {}),
@@ -1965,7 +1965,7 @@ describe('HeliosPlayer', () => {
             getState: vi.fn().mockReturnValue({ currentFrame: 0, duration: 10, fps: 30, isPlaying: false, playbackRate: 1 }),
             play: vi.fn(),
             pause: vi.fn(),
-            seek: vi.fn(),
+            seek: vi.fn().mockResolvedValue(undefined),
             setPlaybackRate: vi.fn(),
             subscribe: vi.fn().mockReturnValue(() => {}),
             onError: vi.fn().mockReturnValue(() => {}),
@@ -2000,7 +2000,7 @@ describe('HeliosPlayer', () => {
             getState: vi.fn().mockReturnValue({ currentFrame: 0, duration: 10, fps: 30, isPlaying: false }),
             play: vi.fn(),
             pause: vi.fn(),
-            seek: vi.fn(),
+            seek: vi.fn().mockResolvedValue(undefined),
             subscribe: vi.fn().mockReturnValue(() => {}),
             onError: vi.fn().mockReturnValue(() => {}),
             dispose: vi.fn(), setCaptions: vi.fn(),
@@ -2044,7 +2044,7 @@ describe('HeliosPlayer', () => {
           return { export: exportSpy };
         });
 
-        await (player as any).renderClientSide();
+        await player.export();
 
         expect(exportSpy).toHaveBeenCalledWith(expect.objectContaining({
             captionStyle: {
@@ -2068,7 +2068,7 @@ describe('HeliosPlayer', () => {
           return { export: exportSpy };
         });
 
-        await (player as any).renderClientSide();
+        await player.export();
 
         expect(exportSpy).toHaveBeenCalledWith(expect.objectContaining({
             captionStyle: {

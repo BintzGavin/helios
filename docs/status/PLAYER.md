@@ -1,4 +1,4 @@
-**Version**: v0.72.0
+**Version**: v0.73.0
 
 **Posture**: STABLE AND FEATURE COMPLETE
 
@@ -59,7 +59,9 @@
 - **Audio Metering**: Supports real-time audio metering via `startAudioMetering()` API and `audiometering` event, enabling visualization of audio levels (stereo/peak) in host applications.
 - **Export API**: Exposes public `export()` method for programmatic control over client-side exports, supporting Video (MP4/WebM) and Snapshot (PNG/JPEG) formats.
 - **Export Menu**: Implements a dedicated Export Menu in the player UI (replacing the direct export button action) to allow configuring format, resolution, filename, and captions before exporting or taking a snapshot.
+- **Async Seek**: Implements asynchronous seek operation in `HeliosController` (returning `Promise<void>`) and ensures `HeliosPlayer` waits for the frame update before dispatching the `seeked` event, improving Standard Media API compliance and export reliability.
 
+[v0.73.0] ✅ Completed: Async Seek - Implemented async seek in `HeliosController` and `BridgeController`, ensuring `seeked` event waits for frame update in the iframe.
 [v0.72.0] ✅ Completed: Export Menu - Implemented a dedicated Export Menu UI to allow users to configure export options (format, resolution, filename, captions) and take snapshots directly from the player.
 [v0.71.0] ✅ Completed: Synchronize Caption Styling - Implemented responsive caption sizing and configurable styling via CSS variables, ensuring visual parity between player preview and client-side export.
 [v0.70.5] ✅ Completed: Decouple Core - Decoupled `@helios-project/player` from `@helios-project/core` runtime dependency to fix UMD builds and enable drop-in usage.

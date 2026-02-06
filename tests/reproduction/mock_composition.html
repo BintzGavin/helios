@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<body>
+    <h1>Mock Composition</h1>
+    <canvas width="800" height="450" style="background: red;"></canvas>
+    <script type="module">
+        import { connectToParent } from '../../packages/player/dist/bridge.js';
+
+        let currentState = {
+            fps: 30,
+            duration: 10,
+            currentFrame: 0,
+            isPlaying: false,
+            width: 800,
+            height: 450
+        };
+
+        const helios = {
+            getState: () => currentState,
+            subscribe: (cb) => {
+                // Mock subscription
+                return () => {};
+            },
+            seek: (frame) => {
+                console.log('Helios seek called:', frame);
+                currentState.currentFrame = frame;
+            },
+            play: () => {},
+            pause: () => {},
+            setAudioVolume: () => {},
+            setAudioMuted: () => {},
+            setPlaybackRate: () => {},
+            setLoop: () => {},
+            setDuration: () => {},
+            setFps: () => {},
+            setSize: () => {},
+            setMarkers: () => {},
+            setInputProps: () => {},
+            setCaptions: () => {},
+            setPlaybackRange: () => {},
+            clearPlaybackRange: () => {},
+            setAudioTrackVolume: () => {},
+            setAudioTrackMuted: () => {},
+            schema: {}
+        };
+
+        connectToParent(helios);
+    </script>
+</body>
+</html>

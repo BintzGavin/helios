@@ -877,6 +877,7 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
   private abortController: AbortController | null = null;
   private isExporting: boolean = false;
   private isScrubbing: boolean = false;
+  private _pendingSeeks: number = 0;
   private wasPlayingBeforeScrub: boolean = false;
   private lastState: any = null;
   private pendingProps: Record<string, any> | null = null;
@@ -981,8 +982,8 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
   }
 
   public get seeking(): boolean {
-    // Return internal scrubbing state as seeking
-    return this.isScrubbing;
+    // Return internal scrubbing state or async seek state as seeking
+    return this.isScrubbing || this._pendingSeeks > 0;
   }
 
   public get buffered(): TimeRanges {
@@ -1025,9 +1026,18 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
       const s = this.controller.getState();
       if (s.fps) {
         // Dispatch events to satisfy Standard Media API expectations
+        this._pendingSeeks++;
         this.dispatchEvent(new Event("seeking"));
-        this.controller.seek(Math.floor(val * s.fps));
-        this.dispatchEvent(new Event("seeked"));
+        this.controller.seek(Math.floor(val * s.fps))
+          .catch((e) => {
+             console.error("HeliosPlayer: Seek failed", e);
+          })
+          .finally(() => {
+             this._pendingSeeks = Math.max(0, this._pendingSeeks - 1);
+             if (this._pendingSeeks === 0) {
+                 this.dispatchEvent(new Event("seeked"));
+             }
+          });
       }
     }
   }
@@ -1039,9 +1049,18 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
   public set currentFrame(val: number) {
     if (this.controller) {
       // Dispatch events to satisfy Standard Media API expectations
+      this._pendingSeeks++;
       this.dispatchEvent(new Event("seeking"));
-      this.controller.seek(Math.floor(val));
-      this.dispatchEvent(new Event("seeked"));
+      this.controller.seek(Math.floor(val))
+        .catch((e) => {
+             console.error("HeliosPlayer: Seek failed", e);
+        })
+        .finally(() => {
+             this._pendingSeeks = Math.max(0, this._pendingSeeks - 1);
+             if (this._pendingSeeks === 0) {
+                 this.dispatchEvent(new Event("seeked"));
+             }
+        });
     }
   }
 
