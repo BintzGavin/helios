@@ -5,6 +5,7 @@ import { FFmpegBuilder } from '../utils/FFmpegBuilder.js';
 import { scanForAudioTracks } from '../utils/dom-scanner.js';
 import { extractBlobTracks } from '../utils/blob-extractor.js';
 import { FIND_DEEP_ELEMENT_SCRIPT } from '../utils/dom-finder.js';
+import { PRELOAD_SCRIPT } from '../utils/dom-preload.js';
 
 export class CanvasStrategy implements RenderStrategy {
   private useWebCodecs = false;
@@ -126,10 +127,13 @@ export class CanvasStrategy implements RenderStrategy {
   }
 
   async prepare(page: Page): Promise<void> {
-    // Ensure fonts are loaded before capture starts
-    await page.evaluate(function() { return document.fonts.ready; });
+    // 1. Preload assets (fonts, images, backgrounds) using shared logic
+    // We execute this in all frames to ensure consistency with DomStrategy and handle cross-frame assets if needed.
+    const timeout = this.options.stabilityTimeout || 30000;
+    const preloadScript = `${PRELOAD_SCRIPT}(${timeout})`;
+    await Promise.all(page.frames().map(frame => frame.evaluate(preloadScript)));
 
-    // Validate that the canvas element exists (supporting Shadow DOM)
+    // 2. Validate that the canvas element exists (supporting Shadow DOM)
     // We use a string-based script to avoid transpiler artifacts (like esbuild's __name)
     const selector = this.options.canvasSelector || 'canvas';
 
@@ -151,7 +155,6 @@ export class CanvasStrategy implements RenderStrategy {
     }
 
     // Scan for audio tracks using the shared utility
-    const timeout = this.options.stabilityTimeout || 30000;
     const initialTracks = await scanForAudioTracks(page, timeout);
 
     // Extract blobs to temp files

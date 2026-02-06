@@ -92,8 +92,8 @@ async function verify() {
   // 1 SVG Image -> Should be counted as Image?
   // 1 CSS Mask -> Should be counted as Background/Style Image?
 
-  const preloadImagesLog = consoleLogs.find(l => l.includes('[DomStrategy] Preloading') && l.includes('images...'));
-  const preloadBgLog = consoleLogs.find(l => l.includes('[DomStrategy] Preloading') && l.includes('background images...'));
+  const preloadImagesLog = consoleLogs.find(l => l.includes('[Helios Preload] Preloading') && l.includes('images...'));
+  const preloadBgLog = consoleLogs.find(l => l.includes('[Helios Preload] Preloading') && l.includes('background images...'));
 
   console.log('Logs:', consoleLogs);
 

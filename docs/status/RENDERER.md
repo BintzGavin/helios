@@ -1,10 +1,11 @@
-**Version**: 1.75.2
+**Version**: 1.76.0
 
 **Posture**: MAINTENANCE WITH V2 EXPANSION
 
 # Renderer Agent Status
 
 ## Progress Log
+- [1.76.0] ✅ Completed: Canvas Image Preload - Implemented comprehensive asset preloading for `CanvasStrategy` (images, fonts, backgrounds) using a shared utility extracted from `DomStrategy`. Verified with `verify-canvas-preload.ts`.
 - [1.75.2] ✅ Completed: Restore Development Environment - Restored dependencies and installed Playwright browsers, enabling successful execution of the verification suite and resolving the environment blockage.
 - [1.75.1] ✅ Completed: Verify Configurable Asset Timeout - Enabled `verify-asset-timeout.ts` in the main test suite to ensure `stabilityTimeout` logic in `DomStrategy` remains robust and prevents hangs.
 - [1.75.0] ✅ Completed: Distributed Progress Aggregation - Implemented weighted progress aggregation in RenderOrchestrator to ensure monotonic progress reporting during distributed rendering. Verified with `verify-distributed-progress.ts`.
