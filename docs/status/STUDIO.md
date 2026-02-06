@@ -1,4 +1,4 @@
-**Version**: 0.104.1
+**Version**: 0.104.2
 
 **Posture**: ACTIVELY EXPANDING FOR V2
 
@@ -9,6 +9,7 @@
 **Focus**: UI Implementation & CLI
 
 ## Recent Updates
+- [v0.104.2] ✅ Completed: CompositionsPanel Tests - Implemented unit tests for CompositionsPanel covering CRUD and filtering.
 - [v0.104.1] ✅ Verified: Agent Skills Tests - Added unit tests for agent skills documentation logic and synced package version.
 - [v0.104.0] ✅ Completed: CLI Build Command - Implemented `helios build` command to generate a deployable player harness.
 - [v0.103.2] ✅ Fixed: Dependency Mismatch - Updated `packages/studio/package.json` to align `core` dependency with workspace version (`^5.11.0`) and fixed verification pipeline.
