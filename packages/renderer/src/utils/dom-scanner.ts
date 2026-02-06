@@ -2,9 +2,9 @@ import { Page } from 'playwright';
 import { AudioTrackConfig } from '../types.js';
 import { FIND_ALL_MEDIA_FUNCTION } from './dom-scripts.js';
 
-export async function scanForAudioTracks(page: Page): Promise<AudioTrackConfig[]> {
+export async function scanForAudioTracks(page: Page, timeout: number = 30000): Promise<AudioTrackConfig[]> {
   const script = `
-    (async () => {
+    (async (timeoutMs) => {
       // Helper to find all media elements, including in Shadow DOM
       ${FIND_ALL_MEDIA_FUNCTION}
 
@@ -34,13 +34,13 @@ export async function scanForAudioTracks(page: Page): Promise<AudioTrackConfig[]
               el.preload = 'auto';
             }
 
-            // Timeout fallback (e.g., 10 seconds)
+            // Timeout fallback
             setTimeout(() => {
               if (!resolved) {
                 console.warn('[DomScanner] Timeout waiting for media element: ' + (el.currentSrc || el.src));
                 finish();
               }
-            }, 10000);
+            }, timeoutMs);
           });
         }));
         console.log('[DomScanner] Media elements ready.');
@@ -86,7 +86,7 @@ export async function scanForAudioTracks(page: Page): Promise<AudioTrackConfig[]
         });
       }
       return tracks;
-    })()
+    })(${timeout})
   `;
 
   // Execute in all frames

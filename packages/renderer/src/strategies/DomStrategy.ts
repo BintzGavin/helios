@@ -44,10 +44,26 @@ export class DomStrategy implements RenderStrategy {
   }
 
   async prepare(page: Page): Promise<void> {
+    const timeout = this.options.stabilityTimeout || 30000;
     const script = `
-      (async () => {
+      (async (timeoutMs) => {
+        // Helper: withTimeout
+        const withTimeout = (promise, msg) => {
+           let timeoutId;
+           const timeoutPromise = new Promise(r => {
+             timeoutId = setTimeout(() => {
+               console.warn(msg);
+               r();
+             }, timeoutMs);
+           });
+           return Promise.race([
+              promise.finally(() => clearTimeout(timeoutId)),
+              timeoutPromise
+           ]);
+        };
+
         // 1. Wait for fonts
-        await document.fonts.ready;
+        await withTimeout(document.fonts.ready, '[DomStrategy] Timeout waiting for fonts');
 
         // 2. Wait for images (IMG tags, Video posters, SVG images)
         function findAllImages(root) {
@@ -83,13 +99,14 @@ export class DomStrategy implements RenderStrategy {
         const images = findAllImages(document);
         if (images.length > 0) {
           console.log('[DomStrategy] Preloading ' + images.length + ' images...');
-          await Promise.all(images.map((img) => {
+          const loadPromise = Promise.all(images.map((img) => {
             if (img.complete) return;
             return new Promise((resolve) => {
               img.onload = resolve;
               img.onerror = resolve; // Don't block on broken images
             });
           }));
+          await withTimeout(loadPromise, '[DomStrategy] Timeout waiting for images');
         }
 
         // 3. Wait for CSS background images and masks
@@ -136,7 +153,7 @@ export class DomStrategy implements RenderStrategy {
 
         if (backgroundUrls.size > 0) {
           console.log('[DomStrategy] Preloading ' + backgroundUrls.size + ' background images...');
-          await Promise.all(Array.from(backgroundUrls).map((url) => {
+          const loadPromise = Promise.all(Array.from(backgroundUrls).map((url) => {
             return new Promise((resolve) => {
               const img = new Image();
               img.onload = () => resolve(undefined);
@@ -148,9 +165,10 @@ export class DomStrategy implements RenderStrategy {
               if (img.complete) resolve(undefined);
             });
           }));
+          await withTimeout(loadPromise, '[DomStrategy] Timeout waiting for background images');
         }
 
-      })()
+      })(${timeout})
     `;
 
     // Execute preloading script in all frames
@@ -159,7 +177,7 @@ export class DomStrategy implements RenderStrategy {
     ));
 
     // Scan for audio tracks using the shared utility
-    const initialTracks = await scanForAudioTracks(page);
+    const initialTracks = await scanForAudioTracks(page, timeout);
 
     // Extract blobs to temp files
     const extractionResult = await extractBlobTracks(page, initialTracks);

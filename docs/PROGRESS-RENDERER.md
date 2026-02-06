@@ -1,5 +1,8 @@
 # Renderer Progress Log
 
+## RENDERER v1.74.0
+- ✅ Completed: Configurable Asset Timeout - Implemented `stabilityTimeout` support in `DomStrategy` and `CanvasStrategy` to prevent indefinite hangs during asset preloading (fonts, images) and audio track scanning. Verified with `verify-asset-timeout.ts`.
+
 ## RENDERER v1.73.0
 - ✅ Completed: Configurable Random Seed - Added `randomSeed` to `RendererOptions` and updated `TimeDriver` to inject a seeded Mulberry32 PRNG script, ensuring deterministic `Math.random()` behavior for generative compositions. Verified with `tests/verify-random-seed.ts`.
 
@@ -46,4 +49,4 @@
 - ✅ Completed: Verify and Sync - Verified v1.64.0 distributed rendering and synced documentation. Verified with `verify-distributed.ts` and `npm run test`.
 
 ## RENDERER v1.64.0
-- ✅ Completed: Distributed Audio Mixing - Updated `RenderOrchestrator` to decouple audio mixing from distributed video rendering chunks. Chunks are now rendered silently and concatenated, with audio mixed in a final pass to prevent glitches. Verified with `verify-distributed.ts`.
+- ✅ Completed: Distributed Audio Mixing - Updated `RenderOrchestrator` to decouple audio mixing from distributed video rendering chunks. Chunks are now rendered silently and concatenated, with audio mixed in a final pass to prevent audible glitches. Verified with `verify-distributed.ts`.
