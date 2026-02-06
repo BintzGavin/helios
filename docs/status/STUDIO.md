@@ -1,4 +1,4 @@
-**Version**: 0.103.0
+**Version**: 0.103.1
 
 **Posture**: ACTIVELY EXPANDING FOR V2
 
@@ -9,6 +9,7 @@
 **Focus**: UI Implementation & CLI
 
 ## Recent Updates
+- [v0.103.1] ✅ Completed: Refine Agent Skills - Prepend "Agent Skill: " to skill titles in documentation to distinguish them from standard package docs.
 - [v0.103.0] ✅ Completed: CLI Update Command - Implemented `helios update` command in CLI to update/reinstall components with overwrite support, ensuring users can refresh component code.
 - [v0.102.0] ✅ Completed: Agent Skills Documentation - Updated Studio Assistant backend to index `SKILL.md` files from `.agents/skills/helios`, making agent-specific knowledge available in the documentation search.
 - [v0.101.0] ✅ Completed: Open in Editor - Implemented "Open in Editor" buttons for assets and compositions, allowing users to open source files directly in their default editor.

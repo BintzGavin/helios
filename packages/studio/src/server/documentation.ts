@@ -75,9 +75,9 @@ export function resolveDocumentationPath(cwd: string, pkgName: string): string |
 }
 
 // Helper to parse markdown
-function parseMarkdown(pkg: string, content: string, sections: DocSection[]) {
+function parseMarkdown(pkg: string, content: string, sections: DocSection[], titlePrefix: string = '') {
   const lines = content.split('\n');
-  let currentTitle = 'Introduction';
+  let currentTitle = titlePrefix ? `${titlePrefix}Introduction` : 'Introduction';
   let currentContent: string[] = [];
   // Calculate starting index to ensure unique IDs if appending to existing package sections
   let sectionCount = sections.filter(s => s.package === pkg).length;
@@ -101,10 +101,10 @@ function parseMarkdown(pkg: string, content: string, sections: DocSection[]) {
   for (const line of lines) {
     if (line.startsWith('# ')) {
       flush();
-      currentTitle = line.substring(2).trim();
+      currentTitle = (titlePrefix || '') + line.substring(2).trim();
     } else if (line.startsWith('## ')) {
       flush();
-      currentTitle = line.substring(3).trim();
+      currentTitle = (titlePrefix || '') + line.substring(3).trim();
     } else {
       currentContent.push(line);
     }
@@ -134,7 +134,7 @@ function findSkills(cwd: string, sections: DocSection[]) {
       if (fs.existsSync(skillPath)) {
           try {
               const content = fs.readFileSync(skillPath, 'utf-8');
-              parseMarkdown(pkg, content, sections);
+              parseMarkdown(pkg, content, sections, 'Agent Skill: ');
           } catch (e) {
               console.error(`Failed to read SKILL.md for ${pkg}`, e);
           }
