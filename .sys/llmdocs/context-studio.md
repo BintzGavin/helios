@@ -17,7 +17,11 @@ The Studio is a browser-based development environment for Helios. It consists of
 packages/studio/
 ├── bin/                # CLI entry point
 ├── src/
-│   ├── components/     # UI Components (Sidebar, Stage, Timeline, etc.)
+│   ├── components/     # UI Components
+│   │   ├── Layout/     # Layout system (StudioLayout, Resizer)
+│   │   ├── Sidebar/    # Sidebar panels
+│   │   ├── Stage/      # Preview area
+│   │   └── Timeline/   # Timeline area
 │   ├── context/        # React Context (StudioContext, ToastContext)
 │   ├── hooks/          # Custom hooks (usePersistentState)
 │   ├── server/         # Backend logic (discovery, render-manager, plugin)
@@ -50,6 +54,7 @@ Commands:
 
 ## Section D: UI Components
 
+-   **StudioLayout**: Main layout with resizable Sidebar, Inspector, and Timeline panels.
 -   **Sidebar**: Navigation tabs (Compositions, Assets, Components, Captions, Audio, Renders).
 -   **Stage**: Main preview area containing `<helios-player>`.
 -   **Timeline**: Track-based timeline for scrubbing, editing, and adjusting time-based prop markers (Stacked Audio Tracks).

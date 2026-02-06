@@ -1,3 +1,6 @@
+## STUDIO v0.100.0
+- ✅ Completed: Resizable Layout - Implemented resizable Sidebar, Inspector, and Timeline panels with persistence using `localStorage` and CSS variables.
+
 ## STUDIO v0.98.0
 - ✅ Completed: CLI Solid Init - Added SolidJS template support to `helios init` command.
 

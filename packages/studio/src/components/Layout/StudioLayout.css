@@ -16,8 +16,8 @@ html, body, #root {
     "header header header"
     "sidebar stage inspector"
     "sidebar timeline inspector";
-  grid-template-columns: 250px 1fr 300px;
-  grid-template-rows: 40px 1fr 300px;
+  grid-template-columns: var(--sidebar-width, 250px) 1fr var(--inspector-width, 300px);
+  grid-template-rows: 40px 1fr var(--timeline-height, 300px);
   gap: 1px;
   background-color: #000;
 }
@@ -56,4 +56,31 @@ html, body, #root {
   grid-area: timeline;
   background-color: #1e1e1e;
   border-top: 1px solid #333;
+}
+
+.resizer-sidebar {
+  grid-column: 1;
+  grid-row: 2 / -1;
+  justify-self: end;
+  transform: translateX(50%);
+  z-index: 10;
+  height: 100%;
+}
+
+.resizer-inspector {
+  grid-column: 3;
+  grid-row: 2 / -1;
+  justify-self: start;
+  transform: translateX(-50%);
+  z-index: 10;
+  height: 100%;
+}
+
+.resizer-timeline {
+  grid-column: 2;
+  grid-row: 3;
+  align-self: start;
+  transform: translateY(-50%);
+  z-index: 10;
+  width: 100%;
 }
