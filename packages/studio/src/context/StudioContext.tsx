@@ -173,6 +173,9 @@ interface StudioContextType {
   exportProgress: number;
   exportVideo: (format: 'mp4' | 'webm') => Promise<void>;
   cancelExport: () => void;
+
+  // Editor Integration
+  openInEditor: (path: string) => void;
 }
 
 export const StudioContext = createContext<StudioContextType | undefined>(undefined);
@@ -808,6 +811,12 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     }
   };
 
+  const openInEditor = (path: string) => {
+    const safePath = path.replace(/^\/@fs/, '');
+    fetch('/__open-in-editor?file=' + encodeURIComponent(safePath))
+      .catch(err => console.error('Failed to open in editor', err));
+  };
+
   return (
     <StudioContext.Provider
       value={{
@@ -864,7 +873,8 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         isExporting,
         exportProgress,
         exportVideo,
-        cancelExport
+        cancelExport,
+        openInEditor
       }}
     >
       {children}

@@ -1,3 +1,6 @@
+## STUDIO v0.101.0
+- ✅ Completed: Open in Editor - Implemented "Open in Editor" buttons for assets and compositions, allowing users to open source files directly in their default editor.
+
 ## STUDIO v0.100.0
 - ✅ Completed: Resizable Layout - Implemented resizable Sidebar, Inspector, and Timeline panels with persistence using `localStorage` and CSS variables.
 
