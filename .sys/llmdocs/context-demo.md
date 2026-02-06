@@ -18,7 +18,7 @@ The `examples/` directory contains reference implementations for various framewo
 - **diagnostics**: System capability and WebCodecs support checker.
 - **stress-test-animation**: High-element count stress test (2500+ elements).
 - **text-effects-animation**: Typewriter and reveal effects.
-- **variable-font-animation**: Animating variable font axes.
+- **variable-font-animation**: Animating variable font axes (TypeScript + Vite).
 
 ### React
 - **react-dom-animation**: Basic React + DOM.

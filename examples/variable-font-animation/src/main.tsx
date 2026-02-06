@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
 import './style.css';
-import { Helios } from '../../../packages/core/src/index.ts';
+import { Helios } from '@helios-project/core';
 
 const helios = new Helios({
   fps: 30,
@@ -11,9 +11,9 @@ const helios = new Helios({
 });
 
 helios.bindToDocumentTimeline();
-window.helios = helios;
+(window as any).helios = helios;
 
-ReactDOM.createRoot(document.getElementById('root')).render(
+ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
     <App />
   </React.StrictMode>
