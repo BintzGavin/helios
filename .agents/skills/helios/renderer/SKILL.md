@@ -47,6 +47,7 @@ interface RendererOptions {
   mode?: 'dom' | 'canvas'; // Rendering strategy (default: 'canvas')
   inputProps?: Record<string, any>; // Inject props into window.__HELIOS_PROPS__
   stabilityTimeout?: number; // Max time to wait for frame stability (ms, default: 30000)
+  randomSeed?: number;       // Seed for deterministic random numbers (default: 0x12345678)
 
   // Selector Configuration
   canvasSelector?: string; // CSS selector for canvas mode (default: 'canvas')
@@ -69,6 +70,7 @@ interface RendererOptions {
 
   // Intermediate Capture (Canvas Mode)
   intermediateVideoCodec?: string; // 'vp8' (default), 'vp9', 'av1'
+  keyFrameInterval?: number;       // Keyframe interval in frames (default: fps * 2)
 
   // Intermediate Capture (DOM Mode)
   intermediateImageFormat?: 'png' | 'jpeg'; // Default: 'png'
