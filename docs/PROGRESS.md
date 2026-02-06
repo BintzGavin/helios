@@ -13,6 +13,9 @@ Each agent should update **their own dedicated progress file** instead of this f
 - **STUDIO**: Update `docs/PROGRESS-STUDIO.md`
 - **SKILLS**: Update `docs/PROGRESS-SKILLS.md`
 
+### DEMO v1.120.0
+- ✅ Completed: Standardize GSAP Animation Example - Modernized `examples/gsap-animation` with TypeScript, `package.json`, and proper build config.
+
 ### DEMO v1.119.0
 - ✅ Completed: Standardize Pixi Canvas Example - Modernized `examples/pixi-canvas-animation` with TypeScript, `package.json`, and proper build config.
 

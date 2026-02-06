@@ -85,7 +85,7 @@ The `examples/` directory contains reference implementations for various framewo
 - **excalidraw-animation**: Whiteboard animation with Excalidraw.
 - **lottie-animation**: Rendering Lottie JSON animations.
 - **framer-motion-animation**: React motion library integration.
-- **gsap-animation**: GreenSock Animation Platform integration.
+- **gsap-animation**: GreenSock Animation Platform integration (TypeScript + Vite).
 - **motion-one-animation**: Motion One library integration.
 - **tailwind-animation**: Styling and animation with Tailwind CSS.
 
