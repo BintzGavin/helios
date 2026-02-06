@@ -92,6 +92,24 @@ describe('HeliosPlayer API Parity', () => {
     expect(player.getAttribute('preload')).toBe('auto');
   });
 
+  it('should support width and height properties', () => {
+    expect(player.width).toBe(0);
+    expect(player.height).toBe(0);
+
+    player.width = 640;
+    player.height = 480;
+
+    expect(player.getAttribute('width')).toBe('640');
+    expect(player.getAttribute('height')).toBe('480');
+    expect(player.width).toBe(640);
+    expect(player.height).toBe(480);
+
+    player.setAttribute('width', '1920');
+    player.setAttribute('height', '1080');
+    expect(player.width).toBe(1920);
+    expect(player.height).toBe(1080);
+  });
+
   it('should support videoWidth and videoHeight', () => {
     // Default 0
     expect(player.videoWidth).toBe(0);
@@ -215,6 +233,31 @@ describe('HeliosPlayer API Parity', () => {
     expect(seekingSpy).toHaveBeenCalledTimes(2);
     expect(mockController.seek).toHaveBeenCalledWith(10);
     expect(seekedSpy).toHaveBeenCalledTimes(2);
+  });
+
+  it('should support fastSeek method', () => {
+    const mockController = {
+      getState: () => ({ fps: 30, duration: 10 }),
+      seek: vi.fn(),
+      pause: vi.fn(),
+      dispose: vi.fn(),
+    };
+    (player as any).controller = mockController;
+
+    player.fastSeek(5);
+    expect(mockController.seek).toHaveBeenCalledWith(150); // 5 * 30
+  });
+
+  it('should support playsInline property', () => {
+    expect(player.playsInline).toBe(false);
+
+    player.playsInline = true;
+    expect(player.hasAttribute('playsinline')).toBe(true);
+    expect(player.playsInline).toBe(true);
+
+    player.playsInline = false;
+    expect(player.hasAttribute('playsinline')).toBe(false);
+    expect(player.playsInline).toBe(false);
   });
 
   it('should support currentSrc property', () => {
