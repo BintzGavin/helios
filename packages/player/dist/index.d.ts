@@ -69,6 +69,7 @@ export declare class HeliosPlayer extends HTMLElement implements TrackHost, Audi
     private bigPlayBtn;
     private pendingSrc;
     private isLoaded;
+    private _hasPlayed;
     private resizeObserver;
     private controller;
     private mediaSession;
