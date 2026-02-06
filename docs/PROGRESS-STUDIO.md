@@ -1,3 +1,6 @@
+## STUDIO v0.104.1
+- ✅ Verified: Agent Skills Tests - Added unit tests for agent skills documentation logic and synced package version.
+
 ## STUDIO v0.104.0
 - ✅ Completed: CLI Build Command - Implemented `helios build` command to generate a deployable player harness.
 

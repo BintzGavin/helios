@@ -4,7 +4,7 @@
 
 Helios Studio is a browser-based development environment for creating and editing video compositions. It is built as a Vite application that can be run via the CLI.
 
-- **Dev Server**: Uses Vite with a custom plugin (`studioApiPlugin`) to serve the Studio UI and handle API requests (e.g., file operations, asset discovery, rendering).
+- **Dev Server**: Uses Vite with a custom plugin (`studioApiPlugin`) to serve the Studio UI and handle API requests (e.g., file operations, asset discovery, rendering, documentation serving).
 - **Frontend**: A React-based Single Page Application (SPA) that communicates with the dev server.
 - **State Management**: Uses React Context (`StudioContext`) to manage application state (active composition, timeline, playback).
 - **Integration**: Embeds `<helios-player>` to preview compositions and synchronizes state with the Helios Core instance.
@@ -56,6 +56,7 @@ Options:
 - **Assets Panel**: Allows browsing and dragging assets (images, video, audio) into the composition.
 - **Renders Panel**: Manages render jobs (start, cancel, delete) and displays progress/results.
 - **Omnibar**: A command palette (Cmd+K) for quick navigation and actions.
+- **Helios Assistant**: An AI-powered assistant for documentation and help, accessible via the toolbar.
 
 ## E. Integration
 
