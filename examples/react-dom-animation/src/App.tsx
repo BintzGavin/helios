@@ -1,5 +1,4 @@
-import React from 'react';
-import { Helios } from '../../../packages/core/src/index.ts';
+import { Helios } from '@helios-project/core';
 import { useVideoFrame } from './hooks/useVideoFrame';
 
 const duration = 5;
@@ -11,7 +10,7 @@ helios.bindToDocumentTimeline();
 
 // Expose to window for debugging/player control
 if (typeof window !== 'undefined') {
-    window.helios = helios;
+    (window as any).helios = helios;
 }
 
 export default function App() {

@@ -48,6 +48,9 @@ Each agent should update **their own dedicated progress file** instead of this f
 ### RENDERER v1.72.0
 - ✅ Completed: Orchestrator Cancellation - Implemented robust cancellation in `RenderOrchestrator`. Now, if a single distributed worker fails, all concurrent workers are immediately aborted via `AbortController` to prevent resource waste. Verified with `verify-distributed-cancellation.ts`.
 
+### DEMO v1.127.0
+- ✅ Completed: Standardize React DOM Example - Upgraded examples/react-dom-animation to a fully standardized, strictly-typed TypeScript example.
+
 ### DEMO v1.126.0
 - ✅ Completed: Standardize Procedural Generation Example - Modernized `examples/procedural-generation` with TypeScript, `package.json`, and proper build config.
 
