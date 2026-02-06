@@ -1,7 +1,7 @@
 import { Page } from 'playwright';
 import { TimeDriver } from './TimeDriver.js';
 import { getSeedScript } from '../utils/random-seed.js';
-import { FIND_ALL_MEDIA_FUNCTION } from '../utils/dom-scripts.js';
+import { FIND_ALL_MEDIA_FUNCTION, FIND_ALL_SCOPES_FUNCTION } from '../utils/dom-scripts.js';
 
 export class SeekTimeDriver implements TimeDriver {
   constructor(private timeout: number = 30000) {}
@@ -68,17 +68,7 @@ export class SeekTimeDriver implements TimeDriver {
         }
 
         // Helper to find all scopes (Document + ShadowRoots)
-        function findAllScopes(rootNode) {
-          const scopes = [rootNode];
-          const walker = document.createTreeWalker(rootNode, NodeFilter.SHOW_ELEMENT);
-          while (walker.nextNode()) {
-            const node = walker.currentNode;
-            if (node.shadowRoot) {
-              scopes.push.apply(scopes, findAllScopes(node.shadowRoot));
-            }
-          }
-          return scopes;
-        }
+        ${FIND_ALL_SCOPES_FUNCTION}
 
         // Synchronize document timeline (WAAPI) across all scopes
         // document.timeline.currentTime is read-only in many contexts or doesn't control CSS animations reliably.

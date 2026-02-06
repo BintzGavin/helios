@@ -1,3 +1,5 @@
+import { FIND_ALL_IMAGES_FUNCTION, FIND_ALL_ELEMENTS_WITH_PSEUDO_FUNCTION } from './dom-scripts.js';
+
 export const PRELOAD_SCRIPT = `
 (async (timeoutMs) => {
   // Helper: withTimeout
@@ -19,35 +21,7 @@ export const PRELOAD_SCRIPT = `
   await withTimeout(document.fonts.ready, '[Helios Preload] Timeout waiting for fonts');
 
   // 2. Wait for images (IMG tags, Video posters, SVG images)
-  function findAllImages(root) {
-    const images = [];
-    const walker = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT);
-    while (walker.nextNode()) {
-      const node = walker.currentNode;
-      if (node.tagName === 'IMG') {
-        images.push(node);
-      }
-      // Check for VIDEO poster
-      if (node.tagName === 'VIDEO' && node.poster) {
-        const img = new Image();
-        img.src = node.poster;
-        images.push(img);
-      }
-      // Check for SVG IMAGE
-      if (node.tagName === 'image' || node.tagName === 'IMAGE') {
-        const href = node.getAttribute('href') || node.getAttribute('xlink:href');
-        if (href) {
-          const img = new Image();
-          img.src = href;
-          images.push(img);
-        }
-      }
-      if (node.shadowRoot) {
-        images.push(...findAllImages(node.shadowRoot));
-      }
-    }
-    return images;
-  }
+  ${FIND_ALL_IMAGES_FUNCTION}
 
   const images = findAllImages(document);
   if (images.length > 0) {
@@ -63,21 +37,7 @@ export const PRELOAD_SCRIPT = `
   }
 
   // 3. Wait for CSS background images and masks
-  function findAllElements(root, elements) {
-    elements = elements || [];
-    if (root.nodeType === Node.ELEMENT_NODE) {
-      elements.push(root);
-    }
-    const walker = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT);
-    while (walker.nextNode()) {
-      const node = walker.currentNode;
-      elements.push(node);
-      if (node.shadowRoot) {
-        findAllElements(node.shadowRoot, elements);
-      }
-    }
-    return elements;
-  }
+  ${FIND_ALL_ELEMENTS_WITH_PSEUDO_FUNCTION}
 
   const allElements = findAllElements(document);
   const backgroundUrls = new Set();
