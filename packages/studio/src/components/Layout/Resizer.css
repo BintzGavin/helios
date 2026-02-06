@@ -1,0 +1,22 @@
+.resizer {
+  background-color: transparent;
+  z-index: 100;
+  transition: background-color 0.2s;
+  user-select: none;
+  touch-action: none;
+}
+
+.resizer:hover, .resizer.active {
+  background-color: #007fd4;
+}
+
+.resizer.horizontal {
+  width: 10px;
+  cursor: col-resize;
+  /* Visual adjustments handled by parent placement or transforms */
+}
+
+.resizer.vertical {
+  height: 10px;
+  cursor: row-resize;
+}
