@@ -13,6 +13,9 @@ Each agent should update **their own dedicated progress file** instead of this f
 - **STUDIO**: Update `docs/PROGRESS-STUDIO.md`
 - **SKILLS**: Update `docs/PROGRESS-SKILLS.md`
 
+### CLI v0.20.1
+- ✅ Completed: Performance Optimization - Optimized `helios init` file creation using `Promise.all` and `fs.promises` to improve concurrency and scalability.
+
 ### STUDIO v0.106.0
 - ✅ Completed: Configurable Example Registry (CLI) - Implemented `--repo` flag for `helios init` command, enabling scaffolding from custom GitHub repositories.
 
