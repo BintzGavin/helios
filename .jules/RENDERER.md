@@ -1,6 +1,6 @@
-## [2026-09-15] - WebCodecs Determinism Gap
-**Learning:** `CanvasStrategy` strictly prioritizes hardware encoding (if available) via `VideoEncoder`. This introduces potential non-determinism across different GPUs, violating the project's goal of bit-exact rendering for regression testing.
-**Action:** Created plan `2026-09-15-RENDERER-WebCodecs-Preference.md` to introduce `webCodecsPreference` option, allowing users to force software encoding or disable WebCodecs entirely.
+## [2026-10-18] - WebCodecs Determinism Gap (Retry)
+**Learning:** Re-identified the WebCodecs determinism gap. The original plan from 2026-09-15 was not executed. `CanvasStrategy` still strictly prioritizes hardware encoding.
+**Action:** Created fresh plan `2026-10-18-RENDERER-WebCodecs-Preference.md` to introduce `webCodecsPreference` option. This is critical for reliable regression testing.
 
 ## [1.79.1] - Missing Web Audio Support
 **Learning:** `CanvasStrategy` lacks `AudioEncoder` integration, preventing capture of procedural audio generated via Web Audio API.
