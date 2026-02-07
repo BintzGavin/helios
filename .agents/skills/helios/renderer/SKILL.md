@@ -98,6 +98,29 @@ interface AudioTrackConfig {
   playbackRate?: number; // Speed multiplier (default: 1.0)
   duration?: number; // Source duration in seconds
 }
+
+interface DistributedRenderOptions extends RendererOptions {
+  concurrency?: number; // Number of parallel workers (default: CPU cores - 1)
+  executor?: RenderExecutor; // Custom executor (default: LocalExecutor)
+}
+
+interface RenderPlan {
+  totalFrames: number;
+  chunks: RenderChunk[];
+  concatManifest: string[]; // List of chunk files to concatenate
+  concatOutputFile: string; // The intermediate PCM .mov file
+  finalOutputFile: string; // The final user-requested output
+  mixOptions: RendererOptions; // Options for the final audio mix/transcode pass
+  cleanupFiles: string[]; // List of temporary files to delete after success
+}
+
+interface RenderChunk {
+  id: number;
+  startFrame: number;
+  frameCount: number;
+  outputFile: string;
+  options: RendererOptions;
+}
 ```
 
 ### Methods
@@ -168,6 +191,8 @@ const diagnostics = await renderer.diagnose();
 ### Distributed Rendering
 Split a render job into multiple chunks to run concurrently (e.g., on multiple cores).
 
+#### Execution
+
 ```typescript
 import { RenderOrchestrator, DistributedRenderOptions } from '@helios-project/renderer';
 
@@ -183,6 +208,26 @@ await RenderOrchestrator.render(
   { onProgress: (p) => console.log(`Total Progress: ${p}`) }
 );
 ```
+
+#### Planning
+Plan a distributed render job without executing it. Returns a `RenderPlan` object describing the chunks and concatenation steps.
+
+```typescript
+const plan = RenderOrchestrator.plan(
+  'http://localhost:3000/composition.html',
+  'output.mp4',
+  {
+    width: 1920,
+    height: 1080,
+    fps: 30,
+    durationInSeconds: 10,
+    concurrency: 4
+  }
+);
+
+console.log(`Plan creates ${plan.chunks.length} chunks.`);
+```
+
 **Audio Handling:**
 - Distributed rendering generates silent video chunks first to maximize performance.
 - Audio is mixed in a final global pass after concatenation.

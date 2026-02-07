@@ -40,7 +40,7 @@ packages/renderer/
 ```
 
 ## C. Configuration
-The `Renderer` is configured via `RendererOptions`:
+The `Renderer` is configured via `RendererOptions` and `DistributedRenderOptions`:
 
 ```typescript
 interface RendererOptions {
@@ -51,10 +51,9 @@ interface RendererOptions {
   mode?: 'canvas' | 'dom';
   videoCodec?: 'libx264' | 'libvpx-vp9' | 'copy';
   audioFilePath?: string;
-  audioTracks?: (string | AudioTrackConfig)[]; // Path or config object (supports buffer)
+  audioTracks?: (string | AudioTrackConfig)[]; // Path or config object
   subtitles?: string; // Path to SRT file
   inputProps?: Record<string, any>;
-  concurrency?: number; // For distributed rendering
   frameCount?: number; // Exact frame count override
   startFrame?: number; // Start frame for partial renders
   canvasSelector?: string; // CSS selector for canvas
@@ -65,6 +64,11 @@ interface RendererOptions {
   randomSeed?: number; // Deterministic PRNG seed
   mixInputAudio?: boolean; // Preserve implicit audio from input
   hwAccel?: string; // Hardware acceleration method ('cuda', 'vaapi', 'auto')
+}
+
+interface DistributedRenderOptions extends RendererOptions {
+  concurrency?: number; // Number of parallel workers
+  executor?: RenderExecutor; // Custom executor (default: LocalExecutor)
 }
 ```
 
@@ -89,8 +93,18 @@ The Renderer pipes raw frames (or encoded chunks) to FFmpeg's `stdin`.
 ## E. Orchestration
 The `RenderOrchestrator` manages distributed rendering jobs.
 
-*   **Planning**: `RenderOrchestrator.plan(url, output, options)` generates a `RenderPlan` containing chunks, file paths, and execution options.
-*   **Execution**: `RenderOrchestrator.render(url, output, options)` executes the plan (or generates one if not provided), rendering chunks in parallel and concatenating/mixing them.
+*   **Planning**: `RenderOrchestrator.plan(url, output, options)` generates a `RenderPlan`.
+    ```typescript
+    interface RenderPlan {
+      chunks: RenderChunk[];
+      concatManifest: string[];
+      concatOutputFile: string;
+      finalOutputFile: string;
+      mixOptions: RendererOptions;
+      cleanupFiles: string[];
+    }
+    ```
+*   **Execution**: `RenderOrchestrator.render(url, output, options)` executes the plan (or generates one), rendering chunks in parallel and concatenating/mixing them.
 *   **Pipeline**:
     1.  **Render Chunks**: Splits the job into `N` concurrent workers. Each worker renders a segment to a temporary `.mov` file with PCM audio (`pcm_s16le`).
     2.  **Concatenate**: Merges chunks into a single intermediate PCM master file using FFmpeg `concat` demuxer.
