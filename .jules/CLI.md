@@ -69,3 +69,7 @@ Critical learnings only. This is not a log—only add entries for insights that 
 ## [0.20.0] - Distributed Plan Consistency
 **Learning:** `helios render --emit-job` implemented manual chunking logic that diverged from `RenderOrchestrator.plan()`. This created a risk where distributed jobs would behave differently from local runs (e.g., audio mixing, frame ranges).
 **Action:** Always delegate logic to the core domain (Renderer) rather than reimplementing it in the interface (CLI). If the API is missing, expose it, but don't duplicate the math.
+
+## [0.20.2] - Registry Dependencies
+**Learning:** The current `installComponent` implementation is flat and does not support recursive installation of registry components. This limits the ability to create composable component libraries (e.g. `Hero` -> `Button`).
+**Action:** Created plan `2025-02-19-CLI-Registry-Dependencies.md` to implement recursive installation using a `registryDependencies` property in `ComponentDefinition`.
