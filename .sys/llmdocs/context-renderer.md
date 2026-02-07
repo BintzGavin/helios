@@ -82,6 +82,19 @@ interface RendererOptions {
   mixInputAudio?: boolean; // Mix implicit audio from input
   subtitles?: string; // Path to SRT file to burn in
   randomSeed?: number; // Seed for deterministic PRNG (default: 0x12345678)
+  keyFrameInterval?: number; // WebCodecs keyframe interval (frames)
+}
+
+interface AudioTrackConfig {
+  path: string;
+  volume?: number;
+  offset?: number;
+  seek?: number;
+  fadeInDuration?: number;
+  fadeOutDuration?: number;
+  loop?: boolean;
+  playbackRate?: number;
+  duration?: number;
 }
 ```
 
