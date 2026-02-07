@@ -66,7 +66,11 @@ async function verify() {
 
   // Verify warning log
   console.log('All Logs:', consoleLogs);
-  const timeoutLog = consoleLogs.find(l => l.includes('[DomStrategy] Timeout waiting for'));
+  const timeoutLog = consoleLogs.find(l =>
+    l.includes('[DomStrategy] Timeout waiting for') ||
+    l.includes('[Helios Preload] Timeout waiting for') ||
+    l.includes('[DomScanner] Timeout waiting for')
+  );
   if (!timeoutLog) {
     console.error('❌ Failed: Expected timeout warning log not found.');
     success = false;
