@@ -13,6 +13,9 @@ Each agent should update **their own dedicated progress file** instead of this f
 - **STUDIO**: Update `docs/PROGRESS-STUDIO.md`
 - **SKILLS**: Update `docs/PROGRESS-SKILLS.md`
 
+### CLI v0.20.0
+- ✅ Completed: Implement Example Init - Implemented `helios init --example` to fetch, download, and transform examples from GitHub, and improved interactivity with `prompts`.
+
 ### RENDERER v1.77.3
 - ✅ Completed: Update Skill Documentation - Updated `.agents/skills/helios/renderer/SKILL.md` to match the actual `RendererOptions` and `AudioTrackConfig` interfaces in `packages/renderer/src/types.ts` (adding `subtitles` as string, `fadeInDuration`, `fadeOutDuration`, etc.), ensuring agents generate correct code. Verified by manual inspection.
 
