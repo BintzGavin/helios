@@ -70,6 +70,12 @@ export interface DiagnosticReport {
   userAgent: string;
 }
 
+/**
+ * The core Helios engine class.
+ * Manages the animation state, timeline, and synchronization with drivers.
+ *
+ * @template TInputProps The type of the input properties for the composition.
+ */
 export class Helios<TInputProps = Record<string, any>> {
   // Constants
   public readonly schema?: HeliosSchema;

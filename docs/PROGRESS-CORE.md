@@ -1,5 +1,8 @@
 # CORE Progress Log
 
+## CORE v5.13.0
+- ✅ Completed: Generic Input Props - Refactored Helios class to accept generic TInputProps for strict property typing.
+
 ## CORE v5.12.0
 - ✅ Completed: Implement Active Clips - Added `timeline` to `HeliosOptions` and `activeClips` signal to `Helios` state, enabling declarative timeline management. Fixed critical bug in chained cold computed signals.
 

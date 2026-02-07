@@ -285,7 +285,7 @@ export interface ReadonlySignal<T> {
 
 ```typescript
 // Helios Class
-class Helios<TInputProps> {
+class Helios<TInputProps = Record<string, any>> {
   constructor(options: HeliosOptions<TInputProps>);
 
   // Readonly Signals
