@@ -2,6 +2,10 @@
 
 This file tracks progress for the CLI domain (`packages/cli`).
 
+## CLI v0.22.0
+
+- ✅ Registry Dependencies - Implemented recursive component installation to support shared registry dependencies (e.g. `use-video-frame`).
+
 ## CLI v0.21.0
 
 - ✅ Portable Job Paths - Implemented relative path generation in `helios render --emit-job` and relative execution in `helios job run` to support distributed rendering across machines.

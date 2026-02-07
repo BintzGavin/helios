@@ -161,14 +161,10 @@ export const Watermark: React.FC<WatermarkProps> = ({
 
 export const registry: ComponentDefinition[] = [
   {
-    name: 'timer',
-    description: 'Displays a countdown or stopwatch synchronized with the video frame.',
+    name: 'use-video-frame',
+    description: 'React hook for synchronizing with the video frame.',
     type: 'react',
     files: [
-      {
-        name: 'Timer.tsx',
-        content: TIMER_CODE,
-      },
       {
         name: 'useVideoFrame.ts',
         content: USE_VIDEO_FRAME_CODE,
@@ -180,6 +176,22 @@ export const registry: ComponentDefinition[] = [
     }
   },
   {
+    name: 'timer',
+    description: 'Displays a countdown or stopwatch synchronized with the video frame.',
+    type: 'react',
+    files: [
+      {
+        name: 'Timer.tsx',
+        content: TIMER_CODE,
+      },
+    ],
+    dependencies: {
+      'react': '^18.0.0',
+      '@helios-project/core': 'latest'
+    },
+    registryDependencies: ['use-video-frame']
+  },
+  {
     name: 'progress-bar',
     description: 'Visualizes playback progress.',
     type: 'react',
@@ -188,15 +200,12 @@ export const registry: ComponentDefinition[] = [
         name: 'ProgressBar.tsx',
         content: PROGRESS_BAR_CODE,
       },
-      {
-        name: 'useVideoFrame.ts',
-        content: USE_VIDEO_FRAME_CODE,
-      },
     ],
     dependencies: {
       'react': '^18.0.0',
       '@helios-project/core': 'latest'
-    }
+    },
+    registryDependencies: ['use-video-frame']
   },
   {
     name: 'watermark',
