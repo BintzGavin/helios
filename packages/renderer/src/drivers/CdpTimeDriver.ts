@@ -1,7 +1,7 @@
 import { Page, CDPSession } from 'playwright';
 import { TimeDriver } from './TimeDriver.js';
 import { getSeedScript } from '../utils/random-seed.js';
-import { FIND_ALL_MEDIA_FUNCTION } from '../utils/dom-scripts.js';
+import { FIND_ALL_MEDIA_FUNCTION, SYNC_MEDIA_FUNCTION, PARSE_MEDIA_ATTRIBUTES_FUNCTION } from '../utils/dom-scripts.js';
 
 export class CdpTimeDriver implements TimeDriver {
   private client: CDPSession | null = null;
@@ -59,46 +59,15 @@ export class CdpTimeDriver implements TimeDriver {
       (async (t) => {
         // Helper to find all media elements, including in Shadow DOM
         ${FIND_ALL_MEDIA_FUNCTION}
+        // Helper to sync media
+        ${PARSE_MEDIA_ATTRIBUTES_FUNCTION}
+        ${SYNC_MEDIA_FUNCTION}
 
         const mediaElements = findAllMedia(document);
         console.log('[CdpTimeDriver] Syncing ' + mediaElements.length + ' media elements to ' + t);
 
         mediaElements.forEach((el) => {
-          el.pause(); // Ensure we are in control
-
-          // Parse attributes (default to 0)
-          const offset = parseFloat(el.getAttribute('data-helios-offset') || '0');
-          const seek = parseFloat(el.getAttribute('data-helios-seek') || '0');
-
-          // Parse playbackRate
-          // We check the property first. If it's the default (1.0), we also check the attribute
-          // to support declarative usage (e.g. <video playbackRate="0.5">).
-          // If the property is not 1.0, we assume it was set programmatically and respect it.
-          let rate = el.playbackRate;
-          if (rate === 1.0) {
-            const rateAttr = el.getAttribute('playbackRate');
-            if (rateAttr) {
-              const parsed = parseFloat(rateAttr);
-              if (!isNaN(parsed)) {
-                rate = parsed;
-              }
-            }
-          }
-
-          if (isNaN(rate) || rate <= 0) {
-            rate = 1.0;
-          }
-
-          // Calculate target time
-          // Formula: (GlobalTime - Offset) * Rate + Seek
-          let targetTime = Math.max(0, (t - offset) * rate + seek);
-
-          // Handle Looping
-          if (el.loop && el.duration > 0 && targetTime > el.duration) {
-            targetTime = targetTime % el.duration;
-          }
-
-          el.currentTime = targetTime;
+          syncMedia(el, t);
           // Note: We intentionally do NOT await 'seeked' here because CDP virtual time is paused.
           // Awaiting async events would cause a deadlock in the frozen task runner.
           // We rely on the browser to update the frame synchronously enough for the snapshot.
