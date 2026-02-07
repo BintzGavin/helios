@@ -17,3 +17,7 @@
 ## [v0.74.1] - Reactive DOM Features
 **Learning:** Features that interact with composition DOM elements (like `AudioFader`) must use `MutationObserver` to handle dynamic content (e.g. React rendering), as a single scan on `connect` misses elements added later.
 **Action:** Always implement `MutationObserver` when building features that need to track DOM elements inside the composition iframe.
+
+## [v0.76.0] - Preview/Export Parity Gap
+**Learning:** `AudioFader` (preview) supported `<video>` elements but `ClientSideExporter` (export) did not, because they used different asset discovery logic.
+**Action:** Always ensure asset discovery logic is shared or identical between runtime preview features and export logic to prevent feature gaps.
