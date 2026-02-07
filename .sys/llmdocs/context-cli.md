@@ -15,6 +15,8 @@ Entry Points:
 packages/cli/
 ├── bin/
 │   └── helios.js
+├── scripts/
+│   └── bundle-skills.js
 ├── src/
 │   ├── index.ts
 │   ├── commands/
@@ -27,6 +29,7 @@ packages/cli/
 │   │   ├── merge.ts
 │   │   ├── remove.ts
 │   │   ├── render.ts
+│   │   ├── skills.ts
 │   │   ├── studio.ts
 │   │   └── update.ts
 │   ├── types/
@@ -49,6 +52,7 @@ packages/cli/
 - `helios update <component>`: Updates a component to the latest version.
 - `helios build`: Builds the project for production using Vite.
 - `helios job run <file>`: Execute a distributed render job from a JSON spec.
+- `helios skills install`: Installs AI agent skills into the project.
 
 ## D. Configuration
 

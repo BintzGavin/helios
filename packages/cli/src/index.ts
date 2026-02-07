@@ -10,13 +10,14 @@ import { registerRemoveCommand } from './commands/remove.js';
 import { registerUpdateCommand } from './commands/update.js';
 import { registerBuildCommand } from './commands/build.js';
 import { registerJobCommand } from './commands/job.js';
+import { registerSkillsCommand } from './commands/skills.js';
 
 const program = new Command();
 
 program
   .name('helios')
   .description('Helios CLI')
-  .version('0.15.0');
+  .version('0.18.0');
 
 registerStudioCommand(program);
 registerInitCommand(program);
@@ -29,5 +30,6 @@ registerRemoveCommand(program);
 registerUpdateCommand(program);
 registerBuildCommand(program);
 registerJobCommand(program);
+registerSkillsCommand(program);
 
 program.parse(process.argv);

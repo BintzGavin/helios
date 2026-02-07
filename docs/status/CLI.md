@@ -1,6 +1,6 @@
 # CLI Status
 
-**Version**: 0.17.0
+**Version**: 0.18.0
 
 ## Current State
 
@@ -24,6 +24,7 @@ The Helios CLI (`packages/cli`) provides the command-line interface for the Heli
 - `helios update` - Updates a component to the latest version
 - `helios build` - Builds the project for production
 - `helios job` - Manages distributed rendering jobs
+- `helios skills` - Manages AI agent skills installation
 
 ## V2 Roadmap
 
@@ -63,3 +64,4 @@ Per AGENTS.md, the CLI is "ACTIVELY EXPANDING FOR V2" with focus on:
 [v0.15.0] ✅ Synced Version - Updated package.json and index.ts to match status file and verified functionality.
 [v0.16.0] ✅ Distributed Job Export - Implemented `--emit-job`, `--audio-codec`, and `--video-codec` options in `helios render` to generate distributed rendering job specifications.
 [v0.17.0] ✅ Implement Job Command - Implemented `helios job run` to execute distributed rendering jobs from JSON specifications, supporting concurrency and selective chunk execution.
+[v0.18.0] ✅ Implement Skills Command - Implemented `helios skills install` to distribute AI agent skills to user projects.
