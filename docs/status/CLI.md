@@ -1,6 +1,6 @@
 # CLI Status
 
-**Version**: 0.20.0
+**Version**: 0.21.0
 
 ## Current State
 
@@ -68,3 +68,4 @@ Per AGENTS.md, the CLI is "ACTIVELY EXPANDING FOR V2" with focus on:
 [v0.18.0] ✅ Implement Skills Command - Implemented `helios skills install` to distribute AI agent skills to user projects.
 [v0.19.0] ✅ Implement Preview Command - Implemented `helios preview` to serve the production build locally using Vite.
 [v0.20.0] ✅ Implement Example Init - Implemented `helios init --example` to fetch, download, and transform examples from GitHub, and improved interactivity with `prompts`.
+[v0.21.0] ✅ Configurable Example Registry - Implemented `--repo` option for `helios init` to use custom GitHub repositories for example templates, supporting subdirectories and branches.

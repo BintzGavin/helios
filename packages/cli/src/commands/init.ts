@@ -28,6 +28,7 @@ export function registerInitCommand(program: Command) {
     .option('-y, --yes', 'Skip prompts and use defaults (React)')
     .option('-f, --framework <framework>', 'Specify framework (react, vue, svelte, solid, vanilla)')
     .option('--example <name>', 'Initialize from an example')
+    .option('--repo <repo>', 'Example repository (user/repo or user/repo/path)', 'BintzGavin/helios/examples')
     .action(async (target, options) => {
       const targetDir = target ? path.resolve(process.cwd(), target) : process.cwd();
       const configPath = path.resolve(targetDir, 'helios.config.json');
@@ -60,7 +61,7 @@ export function registerInitCommand(program: Command) {
         mode = 'example';
         console.log(chalk.cyan(`Downloading example '${options.example}'...`));
         try {
-          await downloadExample(options.example, targetDir);
+          await downloadExample(options.example, targetDir, options.repo);
           console.log(chalk.green('Downloaded example. Transforming files...'));
           transformProject(targetDir);
           console.log(chalk.green('Project initialized from example.'));
@@ -93,7 +94,7 @@ export function registerInitCommand(program: Command) {
 
         if (mode === 'example') {
             console.log(chalk.gray('Fetching examples...'));
-            const examples = await fetchExamples();
+            const examples = await fetchExamples(options.repo);
 
             if (examples.length === 0) {
               console.log(chalk.yellow('No examples found or failed to fetch. Falling back to templates.'));
@@ -110,7 +111,7 @@ export function registerInitCommand(program: Command) {
 
               console.log(chalk.cyan(`Downloading example '${response.example}'...`));
               try {
-                await downloadExample(response.example, targetDir);
+                await downloadExample(response.example, targetDir, options.repo);
                 transformProject(targetDir);
                 isScaffolded = true;
               } catch (error) {

@@ -193,3 +193,6 @@ Each agent should update **their own dedicated progress file** instead of this f
 
 ## STUDIO v0.105.0
 - ✅ Completed: Component Management - Implemented ability to remove and update components from the Studio UI, adding corresponding CLI hooks and backend API endpoints.
+
+### CLI v0.21.0
+- ✅ Completed: Configurable Example Registry - Implemented --repo option for helios init to use custom GitHub repositories for example templates, supporting subdirectories and branches.

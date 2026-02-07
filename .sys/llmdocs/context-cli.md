@@ -44,7 +44,7 @@ packages/cli/
 ## C. Commands
 
 - `helios studio`: Launches the Helios Studio dev server.
-- `helios init [target]`: Initializes a new Helios project configuration and scaffolds project structure. Supports `--example <name>` to scaffold from GitHub examples.
+- `helios init [target]`: Initializes a new Helios project configuration and scaffolds project structure. Supports `--example <name>` to scaffold from GitHub examples, and `--repo <repo>` to specify a custom repository.
 - `helios add [component]`: Adds a component to the project.
 - `helios list`: Lists installed components in the project.
 - `helios components`: Lists available components in the registry.
@@ -67,4 +67,4 @@ This file tracks installed components and project settings.
 - **Registry**: `RegistryClient` fetches components from `HELIOS_REGISTRY_URL` or falls back to local registry.
 - **Renderer**: `helios render` uses `@helios-project/renderer` to execute rendering strategies (Canvas/DOM).
 - **Studio**: `helios studio` wraps the Studio dev server.
-- **Examples**: `helios init` fetches examples from the GitHub repository (`BintzGavin/helios/examples`).
+- **Examples**: `helios init` fetches examples from the GitHub repository (default: `BintzGavin/helios/examples`, configurable via `--repo`).

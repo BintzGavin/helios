@@ -3,13 +3,37 @@ import path from 'path';
 import degit from 'degit';
 import chalk from 'chalk';
 
-export async function fetchExamples(): Promise<string[]> {
+export async function fetchExamples(repoPath: string = 'BintzGavin/helios/examples'): Promise<string[]> {
   try {
-    const response = await fetch('https://api.github.com/repos/BintzGavin/helios/contents/examples');
+    let branch = '';
+    const [base, branchPart] = repoPath.split('#');
+    if (branchPart) branch = branchPart;
+
+    const parts = base.split('/').filter(Boolean);
+    if (parts.length < 2) {
+      console.warn(chalk.yellow(`Invalid repository path: ${repoPath}`));
+      return [];
+    }
+
+    const owner = parts[0];
+    const repo = parts[1];
+    const dirPath = parts.slice(2).join('/');
+
+    let url = `https://api.github.com/repos/${owner}/${repo}/contents/${dirPath}`;
+    if (branch) {
+      url += `?ref=${branch}`;
+    }
+
+    const response = await fetch(url);
     if (!response.ok) {
       throw new Error(`Failed to fetch examples: ${response.statusText}`);
     }
     const data = await response.json() as any[];
+
+    if (!Array.isArray(data)) {
+      return [];
+    }
+
     return data
       .filter((item: any) => item.type === 'dir')
       .map((item: any) => item.name);
@@ -19,8 +43,17 @@ export async function fetchExamples(): Promise<string[]> {
   }
 }
 
-export async function downloadExample(name: string, targetDir: string): Promise<void> {
-  const emitter = degit(`BintzGavin/helios/examples/${name}`, {
+export async function downloadExample(name: string, targetDir: string, repoBase: string = 'BintzGavin/helios/examples'): Promise<void> {
+  let src = repoBase;
+  const [base, branchPart] = repoBase.split('#');
+
+  if (branchPart) {
+     src = `${base}/${name}#${branchPart}`;
+  } else {
+     src = `${base}/${name}`;
+  }
+
+  const emitter = degit(src, {
     cache: false,
     force: true,
     verbose: false,
