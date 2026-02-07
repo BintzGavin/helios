@@ -30,7 +30,7 @@ The `examples/` directory contains various examples demonstrating Helios usage w
 - `examples/solid-dom-animation`: Demonstrates SolidJS DOM animation.
 - `examples/svelte-d3-animation`: Demonstrates Svelte and D3.
 - `examples/react-d3-animation`: Demonstrates React and D3.
-- `examples/react-css-animation`: Demonstrates React and CSS animation.
+- `examples/react-css-animation`: Standardized React and CSS animation example.
 - `examples/vue-d3-animation`: Demonstrates Vue and D3.
 - `examples/react-components-demo`: Demonstrates registry components.
 - `examples/solid-pixi-animation`: Demonstrates SolidJS and PixiJS.

@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
 import './style.css';
-import { Helios } from '../../../packages/core/src/index.ts';
+import { Helios } from '@helios-project/core';
 
 // Initialize Helios with autoSyncAnimations: true
 // This tells Helios to hijack all CSS animations on the page
@@ -13,10 +13,13 @@ const helios = new Helios({
 });
 
 helios.bindToDocumentTimeline();
-window.helios = helios;
+(window as any).helios = helios;
 
-ReactDOM.createRoot(document.getElementById('root')).render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
-);
+const rootElement = document.getElementById('root');
+if (rootElement) {
+  ReactDOM.createRoot(rootElement).render(
+    <React.StrictMode>
+      <App />
+    </React.StrictMode>
+  );
+}
