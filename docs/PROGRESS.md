@@ -48,6 +48,9 @@ Each agent should update **their own dedicated progress file** instead of this f
 ### CLI v0.15.0
 - ✅ Completed: Implement Build Command - Implemented `helios build` wrapping Vite for production builds.
 
+### PLAYER v0.74.2
+- ✅ Completed: Api Parity Improvements - Fixed logic for `width`/`height` getters to handle invalid input gracefully, added missing test coverage, and updated documentation for Standard Media API parity.
+
 ### PLAYER v0.74.1
 - ✅ Completed: Implement SVG Icons - Replaced text-based control icons with inline SVGs for consistent visual styling.
 

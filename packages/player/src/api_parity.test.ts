@@ -110,6 +110,13 @@ describe('HeliosPlayer API Parity', () => {
     expect(player.height).toBe(1080);
   });
 
+  it('should return 0 for invalid width/height attributes', () => {
+    player.setAttribute('width', 'invalid');
+    player.setAttribute('height', 'abc');
+    expect(player.width).toBe(0);
+    expect(player.height).toBe(0);
+  });
+
   it('should support videoWidth and videoHeight', () => {
     // Default 0
     expect(player.videoWidth).toBe(0);
@@ -243,6 +250,7 @@ describe('HeliosPlayer API Parity', () => {
   });
 
   it('should support fastSeek method', () => {
+    // fastSeek delegates to standard seek
     const mockController = {
       getState: () => ({ fps: 30, duration: 10 }),
       seek: vi.fn().mockResolvedValue(undefined),

@@ -136,6 +136,7 @@ The `<helios-player>` element implements a subset of the HTMLMediaElement interf
 - `diagnose(): Promise<DiagnosticReport>` - Runs environment diagnostics (WebCodecs, WebGL) and returns a report.
 - `requestPictureInPicture(): Promise<PictureInPictureWindow>` - Requests Picture-in-Picture mode for the player.
 - `export(options?: HeliosExportOptions): Promise<void>` - Programmatically trigger client-side export.
+- `fastSeek(time: number): void` - Seeks to the specified time as fast as possible (currently equivalent to setting `currentTime`).
 
 ### Properties
 
@@ -147,6 +148,8 @@ The `<helios-player>` element implements a subset of the HTMLMediaElement interf
 - `volume` (number): Audio volume (0.0 to 1.0).
 - `muted` (boolean): Audio mute state.
 - `playbackRate` (number): Playback speed (default 1.0).
+- `width` (number): Reflected width attribute.
+- `height` (number): Reflected height attribute.
 - `videoWidth` (number, read-only): The intrinsic width of the video (from controller state or attributes).
 - `videoHeight` (number, read-only): The intrinsic height of the video (from controller state or attributes).
 - `buffered` (TimeRanges, read-only): Returns a TimeRanges object representing buffered content (always 0-duration).
@@ -157,6 +160,7 @@ The `<helios-player>` element implements a subset of the HTMLMediaElement interf
 - `fps` (number, read-only): Frames per second of the composition.
 - `currentFrame` (number): Current frame index.
 - `inputProps` (object): Get or set the input properties passed to the composition.
+- `playsInline` (boolean): Reflected playsinline attribute.
 - `disablePictureInPicture` (boolean): Hides the Picture-in-Picture button.
 
 ## Events
