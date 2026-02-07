@@ -13,6 +13,7 @@ interface ComponentDefinition {
 
 export const ComponentsPanel: React.FC = () => {
   const [components, setComponents] = useState<ComponentDefinition[]>([]);
+  const [activeTab, setActiveTab] = useState<'components' | 'skills'>('components');
   const [loading, setLoading] = useState(true);
   const [installing, setInstalling] = useState<string | null>(null);
   const { addToast } = useToast();
@@ -62,15 +63,36 @@ export const ComponentsPanel: React.FC = () => {
     }
   };
 
+  const filteredComponents = components.filter(c => {
+    if (activeTab === 'skills') return c.type === 'skill';
+    return c.type !== 'skill';
+  });
+
   if (loading) {
     return <div className="components-panel">Loading registry...</div>;
   }
 
   return (
     <div className="components-panel">
-      <h2>Component Registry</h2>
+      <h2>Registry</h2>
+
+      <div className="components-tabs">
+        <button
+           className={activeTab === 'components' ? 'active' : ''}
+           onClick={() => setActiveTab('components')}
+        >
+           UI Components
+        </button>
+        <button
+           className={activeTab === 'skills' ? 'active' : ''}
+           onClick={() => setActiveTab('skills')}
+        >
+           Agent Skills
+        </button>
+      </div>
+
       <div className="components-grid">
-        {components.map(comp => (
+        {filteredComponents.map(comp => (
           <div key={comp.name} className="component-card">
             <div className="component-header">
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -92,14 +114,14 @@ export const ComponentsPanel: React.FC = () => {
             <button
               className={`install-button ${comp.installed ? 'success' : ''}`}
               onClick={() => handleInstall(comp.name)}
-              disabled={!!installing || comp.installed}
+              disabled={!!installing || (!!comp.installed)}
             >
               {installing === comp.name ? 'Installing...' : (comp.installed ? 'Installed' : 'Install')}
             </button>
           </div>
         ))}
-        {components.length === 0 && (
-            <div>No components found in registry.</div>
+        {filteredComponents.length === 0 && (
+            <div>No {activeTab} found in registry.</div>
         )}
       </div>
     </div>

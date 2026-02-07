@@ -13,6 +13,9 @@ Each agent should update **their own dedicated progress file** instead of this f
 - **STUDIO**: Update `docs/PROGRESS-STUDIO.md`
 - **SKILLS**: Update `docs/PROGRESS-SKILLS.md`
 
+### STUDIO v0.105.0
+- ✅ Completed: Agent Skills - Implemented `helios skills` CLI command and Studio UI integration to discover and install AI Agent Skills via the Component Registry.
+
 ### STUDIO v0.104.3
 - ✅ Completed: Preview Command - Implemented `helios preview` command to serve production builds locally for verification.
 

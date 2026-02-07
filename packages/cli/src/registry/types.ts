@@ -6,7 +6,7 @@ export interface ComponentFile {
 export interface ComponentDefinition {
   name: string;
   description?: string;
-  type: 'react' | 'vue' | 'svelte' | 'solid' | 'vanilla';
+  type: 'react' | 'vue' | 'svelte' | 'solid' | 'vanilla' | 'skill';
   files: ComponentFile[];
   dependencies?: Record<string, string>;
 }

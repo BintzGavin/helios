@@ -1,4 +1,5 @@
 import { ComponentDefinition } from './types.js';
+import { skills } from './skills.js';
 
 const TIMER_CODE = `import React from 'react';
 import { useVideoFrame } from './useVideoFrame';
@@ -160,6 +161,7 @@ export const Watermark: React.FC<WatermarkProps> = ({
 `;
 
 export const registry: ComponentDefinition[] = [
+  ...skills,
   {
     name: 'timer',
     description: 'Displays a countdown or stopwatch synchronized with the video frame.',

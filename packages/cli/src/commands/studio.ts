@@ -55,15 +55,23 @@ export function registerStudioCommand(program: Command) {
               skillsRoot: skillsRoot,
               components: components,
               onInstallComponent: async (name: string) => {
-                await installComponent(process.cwd(), name);
+                const comp = components.find(c => c.name === name);
+                const type = comp?.type === 'skill' ? 'skill' : undefined;
+                await installComponent(process.cwd(), name, { install: true, type });
               },
               onCheckInstalled: async (name: string) => {
                 const config = loadConfig(process.cwd());
-                const componentsDir = config?.directories.components || 'src/components/helios';
                 const comp = components.find(c => c.name === name);
                 if (!comp) return false;
 
-                const targetDir = path.resolve(process.cwd(), componentsDir);
+                let targetDir;
+                if (comp.type === 'skill') {
+                   targetDir = path.resolve(process.cwd(), '.agents/skills/helios', name);
+                } else {
+                   const componentsDir = config?.directories.components || 'src/components/helios';
+                   targetDir = path.resolve(process.cwd(), componentsDir);
+                }
+
                 return comp.files.every(f => fs.existsSync(path.join(targetDir, f.name)));
               }
             })

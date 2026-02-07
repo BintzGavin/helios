@@ -8,7 +8,7 @@ import { installPackage } from './package-manager.js';
 export async function installComponent(
   rootDir: string,
   componentName: string,
-  options: { install: boolean; overwrite?: boolean } = { install: true }
+  options: { install: boolean; overwrite?: boolean; type?: string } = { install: true }
 ) {
   const config = loadConfig(rootDir);
 
@@ -16,12 +16,18 @@ export async function installComponent(
     throw new Error('Configuration file not found. Run "helios init" first.');
   }
 
-  const component = await defaultClient.findComponent(componentName, config.framework);
+  const lookupType = options.type || config.framework;
+  const component = await defaultClient.findComponent(componentName, lookupType);
+
   if (!component) {
     throw new Error(`Component "${componentName}" not found in registry.`);
   }
 
-  const targetBaseDir = path.resolve(rootDir, config.directories.components);
+  let targetBaseDir = path.resolve(rootDir, config.directories.components);
+
+  if (component.type === 'skill') {
+    targetBaseDir = path.resolve(rootDir, '.agents/skills/helios', componentName);
+  }
 
   // Ensure base directory exists
   if (!fs.existsSync(targetBaseDir)) {

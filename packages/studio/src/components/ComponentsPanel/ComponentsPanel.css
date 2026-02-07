@@ -86,3 +86,33 @@
   margin-left: 0; /* Handled by flex gap */
   font-weight: 600;
 }
+
+.components-tabs {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 8px;
+}
+
+.components-tabs button {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 1em;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 8px 16px;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.components-tabs button:hover {
+  background-color: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.components-tabs button.active {
+  background-color: var(--accent-color);
+  color: white;
+}

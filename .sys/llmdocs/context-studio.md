@@ -18,6 +18,7 @@ packages/studio/
 │   ├── cli/             # CLI plugin logic
 │   ├── components/      # React UI components
 │   │   ├── CompositionsPanel/ # Compositions panel
+│   │   ├── ComponentsPanel/   # Components & Skills registry
 │   │   ├── assets/      # Assets panel
 │   │   ├── layout/      # Application layout
 │   │   ├── props/       # Props editor
@@ -57,6 +58,14 @@ Options:
 - `--out-dir <dir>`: Output directory to serve (default: `dist`).
 - `--port <number>`: Port to listen on (default: 4173).
 
+```bash
+npx helios skills [command] [options]
+```
+
+Commands:
+- `list`: List available skills.
+- `install [name]`: Install a skill (or all bundled skills if no name provided).
+
 ## D. UI Components
 
 - **Sidebar**: Navigation between different panels (Assets, Renders, Settings).
@@ -64,6 +73,7 @@ Options:
 - **Timeline**: A multi-track timeline for visualization and scrubbing. Supports audio waveforms and markers.
 - **Props Editor**: A schema-aware editor for modifying composition input props in real-time.
 - **Assets Panel**: Allows browsing and dragging assets (images, video, audio) into the composition.
+- **Components Panel**: Browse and install UI components and Agent Skills from the registry.
 - **Renders Panel**: Manages render jobs (start, cancel, delete) and displays progress/results.
 - **Omnibar**: A command palette (Cmd+K) for quick navigation and actions.
 - **Helios Assistant**: An AI-powered assistant for documentation and help, accessible via the toolbar.
