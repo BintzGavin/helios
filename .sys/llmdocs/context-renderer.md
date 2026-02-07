@@ -67,6 +67,8 @@ interface RendererOptions {
   fps: number;
   durationInSeconds: number;
   mode?: 'canvas' | 'dom';
+  startFrame?: number; // Start frame (default: 0)
+  frameCount?: number; // Override duration with exact frame count
   canvasSelector?: string; // CSS selector for target canvas ('canvas' mode)
   targetSelector?: string; // CSS selector for target element ('dom' mode)
   audioFilePath?: string;
@@ -76,12 +78,14 @@ interface RendererOptions {
   audioCodec?: string;
   pixelFormat?: string; // e.g. 'yuv420p', 'yuva420p'
   intermediateVideoCodec?: string; // For Canvas WebCodecs (e.g. 'avc1', 'vp9')
+  keyFrameInterval?: number; // Keyframe interval for WebCodecs
   intermediateImageFormat?: 'png' | 'jpeg'; // For DOM/Fallback
   stabilityTimeout?: number; // Timeout for asset loading (default: 30000ms)
   inputProps?: Record<string, any>; // Injected into window.__HELIOS_PROPS__
   mixInputAudio?: boolean; // Mix implicit audio from input
   subtitles?: string; // Path to SRT file to burn in
   randomSeed?: number; // Seed for deterministic PRNG (default: 0x12345678)
+  browserConfig?: BrowserConfig; // Playwright launch options
 }
 ```
 

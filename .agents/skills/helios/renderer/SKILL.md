@@ -66,7 +66,7 @@ interface RendererOptions {
   crf?: number;                  // Constant Rate Factor (quality control)
   preset?: string;               // Encoding preset (e.g., 'fast')
   videoBitrate?: string;         // e.g., '5M', '1000k'
-  subtitles?: boolean;           // Burn subtitles into video (requires libx264)
+  subtitles?: string;            // Path to SRT file to burn into video (requires libx264)
 
   // Intermediate Capture (Canvas Mode)
   intermediateVideoCodec?: string; // 'vp8' (default), 'vp9', 'av1'
@@ -91,6 +91,10 @@ interface AudioTrackConfig {
   offset?: number; // Start time in composition (seconds)
   seek?: number;   // Start time in source file (seconds)
   playbackRate?: number; // Speed multiplier (default: 1.0)
+  fadeInDuration?: number; // Fade in duration (seconds)
+  fadeOutDuration?: number; // Fade out duration (seconds)
+  loop?: boolean;          // Loop indefinitely
+  duration?: number;       // Source duration (seconds, optional)
 }
 ```
 
@@ -197,7 +201,7 @@ Burn subtitles (e.g. from the player) into the video output. Requires `videoCode
 const renderer = new Renderer({
   // ...
   videoCodec: 'libx264',
-  subtitles: true
+  subtitles: './captions.srt'
 });
 ```
 

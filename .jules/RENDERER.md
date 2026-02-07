@@ -45,3 +45,15 @@
 ## [2026-09-13] - FFmpeg Hardware Acceleration Visibility Gap
 **Learning:** `FFmpegInspector` reports codec support but misses hardware acceleration capabilities (`-hwaccels`), leaving users blind to GPU availability in distributed environments. This violates the "GPU Acceleration" vision pillar for diagnostics.
 **Action:** Created plan `2026-09-13-RENDERER-FFmpeg-Hardware-Acceleration.md` to implement `-hwaccels` detection.
+
+## [1.77.3] - Missing Web Audio Support
+**Learning:** `CanvasStrategy` lacks `AudioEncoder` integration, preventing capture of procedural audio (e.g. from Web Audio API). It only supports explicit `<audio>`/`<video>` elements via `DomScanner`.
+**Action:** Documented this limitation in `SKILL.md`. Future work should investigate `AudioEncoder` support.
+
+## [1.77.3] - Codec/PixelFormat Mismatch
+**Learning:** No validation exists for incompatible combinations like `libx264` + `yuva420p` (alpha). Users might try to render transparency with H.264 and fail silently or get unexpected results (black background).
+**Action:** Documented in journal. Future work should add validation in `Renderer`.
+
+## [1.77.3] - GSAP Fragility
+**Learning:** `SeekTimeDriver` relies on `window.__helios_gsap_timeline__` global to control GSAP animations. If the user doesn't expose this, GSAP animations may not sync correctly in DOM mode.
+**Action:** Documented the need for `bindToDocumentTimeline()` in `SKILL.md`.
