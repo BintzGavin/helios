@@ -1,8 +1,15 @@
-import React from 'react';
-import { Helios } from '../../../packages/core/src/index.ts';
-import { useHelios } from './hooks/useHelios';
+import { Helios } from '@helios-project/core';
+import { useVideoFrame } from './hooks/useVideoFrame';
 
-// 1. Define Schema
+interface InputProps {
+  title: string;
+  subtitle: string;
+  backgroundColor: string;
+  textColor: string;
+  scale: number;
+  showSubtitle: boolean;
+}
+
 const schema = {
     title: { type: 'string', default: 'Dynamic Title' },
     subtitle: { type: 'string', default: 'Change me via props' },
@@ -10,41 +17,43 @@ const schema = {
     textColor: { type: 'color', default: '#000000' },
     scale: { type: 'number', minimum: 0.5, maximum: 2.0, default: 1.0 },
     showSubtitle: { type: 'boolean', default: true }
-};
+} as const;
 
-// 2. Initialize Helios
-const helios = new Helios({
+const helios = new Helios<InputProps>({
     duration: 5,
     fps: 30,
-    schema,
+    schema: schema as any,
     inputProps: {
         title: 'Dynamic Title',
-        scale: 1.0
+        subtitle: 'Change me via props',
+        backgroundColor: '#ffffff',
+        textColor: '#000000',
+        scale: 1.0,
+        showSubtitle: true
     }
 });
 
 helios.bindToDocumentTimeline();
 
 if (typeof window !== 'undefined') {
-    window.helios = helios;
+    (window as any).helios = helios;
 }
 
 export default function App() {
-    const state = useHelios(helios);
+    const state = useVideoFrame(helios);
     const { inputProps, currentFrame, fps } = state;
+    const typedInputProps = inputProps as InputProps;
 
     const time = currentFrame / fps;
-
-    // Demonstrate using props in animation
     const pulse = Math.sin(time * 2) * 0.1;
-    const currentScale = (inputProps.scale || 1) + pulse;
+    const currentScale = (typedInputProps.scale || 1) + pulse;
 
     return (
         <div style={{
             width: '100vw',
             height: '100vh',
-            backgroundColor: inputProps.backgroundColor,
-            color: inputProps.textColor,
+            backgroundColor: typedInputProps.backgroundColor,
+            color: typedInputProps.textColor,
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
@@ -53,9 +62,9 @@ export default function App() {
             overflow: 'hidden'
         }}>
             <div style={{ transform: `scale(${currentScale})`, textAlign: 'center' }}>
-                <h1 style={{ margin: 0 }}>{inputProps.title}</h1>
-                {inputProps.showSubtitle && (
-                    <p style={{ marginTop: '0.5em', opacity: 0.8 }}>{inputProps.subtitle}</p>
+                <h1 style={{ margin: 0 }}>{typedInputProps.title}</h1>
+                {typedInputProps.showSubtitle && (
+                    <p style={{ marginTop: '0.5em', opacity: 0.8 }}>{typedInputProps.subtitle}</p>
                 )}
             </div>
             <div style={{ position: 'absolute', bottom: 20, fontSize: '12px', opacity: 0.5 }}>
