@@ -262,9 +262,7 @@ export class CanvasStrategy implements RenderStrategy {
           return { supported: false, reason: 'VideoEncoder not found' };
         }
 
-        const supportedCandidates = [];
-
-        for (const candidate of config.candidates) {
+        const checks = config.candidates.map(async (candidate) => {
             const encoderConfig = {
               codec: candidate.codecString,
               width: config.width,
@@ -314,16 +312,20 @@ export class CanvasStrategy implements RenderStrategy {
                       } catch (e) {}
                   }
 
-                  supportedCandidates.push({
+                  return {
                       candidate,
                       config: encoderConfig,
                       isHardware
-                  });
+                  };
               }
             } catch (e) {
                // Ignore error
             }
-        }
+            return null;
+        });
+
+        const results = await Promise.all(checks);
+        const supportedCandidates = results.filter(r => r !== null);
 
         if (supportedCandidates.length === 0) {
             return { supported: false, reason: 'No supported codec found among candidates' };
