@@ -1,137 +1,70 @@
-# Context: DEMO Domain
+# DEMO Domain Context
 
 ## A. Examples
-The `examples/` directory contains reference implementations for various frameworks and use cases.
+The `examples/` directory contains various examples demonstrating Helios usage with different frameworks and libraries.
 
-### Vanilla JS
-- **simple-animation**: Basic DOM animation using CSS (TypeScript + Vite).
-- **vanilla-typescript**: Basic TypeScript example with Vite.
-- **vanilla-transitions**: Sequenced scene transitions using core utilities.
-- **simple-canvas-animation**: Basic Canvas animation.
-- **waapi-animation**: Web Animations API integration (TypeScript + Vite).
-- **vanilla-animation-helpers**: Sequencing utilities for Vanilla JS.
-- **vanilla-captions-animation**: Integration with Helios SRT captions in Vanilla JS.
-- **web-component-animation**: Helios inside a Shadow DOM web component.
-- **client-export-api**: Programmatic client-side export using `ClientSideExporter` and `BridgeController` without the default player UI.
-- **code-walkthrough**: Syntax highlighting and line focusing.
-- **media-element-animation**: Sync of `<video>` and `<audio>` elements.
-- **diagnostics**: System capability and WebCodecs support checker.
-- **stress-test-animation**: High-element count stress test (2500+ elements).
-- **variable-font-animation**: Animating variable font axes (TypeScript + Vite).
-
-### React
-- **react-dom-animation**: Basic React + DOM (TypeScript + Vite).
-- **react-canvas-animation**: Basic React + Canvas.
-- **react-captions-animation**: React hooks for Helios SRT captions.
-- **react-css-animation**: Standard CSS animations in React.
-- **react-styled-components**: Styled Components integration.
-- **react-three-fiber**: 3D animation with React Three Fiber (TypeScript).
-- **react-transitions**: `react-transition-group` integration.
-- **react-animation-helpers**: Helper components for sequencing.
-- **react-audio-visualization**: Real-time audio frequency analysis visualization.
-- **react-lottie-animation**: Rendering Lottie JSON animations.
-- **react-pixi-animation**: 2D animation with PixiJS and React.
-- **react-components-demo**: Demonstration of CLI Registry components (Timer, ProgressBar, Watermark).
-- **react-d3-animation**: Data visualization with D3.js and React.
-- **react-chartjs-animation**: Animated charts with Chart.js.
-- **text-effects-animation**: Typewriter and reveal effects (TypeScript + Vite).
-
-### Vue
-- **vue-dom-animation**: Basic Vue + DOM.
-- **vue-canvas-animation**: Basic Vue + Canvas.
-- **vue-audio-visualization**: Real-time audio frequency analysis visualization.
-- **vue-captions-animation**: Vue Composition API for Helios SRT captions.
-- **vue-threejs-canvas-animation**: 3D animation with Three.js and Vue.
-- **vue-pixi-animation**: 2D animation with PixiJS and Vue.
-- **vue-d3-animation**: Data visualization with D3.js and Vue 3.
-- **vue-chartjs-animation**: Animated charts with Chart.js.
-- **vue-transitions**: Vue `<Transition>` component.
-- **vue-animation-helpers**: Helper components for sequencing.
-- **vue-lottie-animation**: Rendering Lottie JSON animations.
-
-### Svelte
-- **svelte-dom-animation**: Basic Svelte + DOM.
-- **svelte-canvas-animation**: Basic Svelte + Canvas.
-- **svelte-audio-visualization**: Real-time audio frequency analysis visualization.
-- **svelte-captions-animation**: Svelte stores for Helios SRT captions.
-- **svelte-threejs-canvas-animation**: 3D animation with Three.js and Svelte.
-- **svelte-pixi-animation**: 2D animation with PixiJS and Svelte.
-- **svelte-d3-animation**: Data visualization with D3.js and Svelte.
-- **svelte-chartjs-animation**: Animated charts with Chart.js.
-- **svelte-transitions**: Svelte native transition directives.
-- **svelte-runes-animation**: Svelte 5 Runes syntax.
-- **svelte-animation-helpers**: Helper components for sequencing.
-- **svelte-lottie-animation**: Rendering Lottie JSON animations.
-
-### Solid
-- **solid-dom-animation**: Basic SolidJS + DOM.
-- **solid-canvas-animation**: Basic SolidJS + Canvas.
-- **solid-audio-visualization**: Real-time audio frequency analysis visualization.
-- **solid-captions-animation**: SolidJS signals for Helios SRT captions.
-- **solid-threejs-canvas-animation**: 3D animation with Three.js and SolidJS.
-- **solid-pixi-animation**: 2D animation with PixiJS and SolidJS.
-- **solid-d3-animation**: Data visualization with D3.js and SolidJS.
-- **solid-chartjs-animation**: Animated charts with Chart.js.
-- **solid-transitions**: Solid Transition Group.
-- **solid-animation-helpers**: Helper components for sequencing.
-- **solid-lottie-animation**: Rendering Lottie JSON animations.
-
-### Integrations
-- **threejs-canvas-animation**: 3D scenes with Three.js (TypeScript + Vite).
-- **pixi-canvas-animation**: 2D graphics with PixiJS (TypeScript + Vite).
-- **p5-canvas-animation**: Creative coding with P5.js (TypeScript + Vite).
-- **d3-animation**: Data visualization with D3.js.
-- **chartjs-animation**: Animated charts with Chart.js.
-- **excalidraw-animation**: Whiteboard animation with Excalidraw.
-- **lottie-animation**: Rendering Lottie JSON animations (TypeScript + Vite).
-- **framer-motion-animation**: React motion library integration.
-- **gsap-animation**: GreenSock Animation Platform integration (TypeScript + Vite).
-- **motion-one-animation**: Motion One library integration (TypeScript + Vite).
-- **tailwind-animation**: Styling and animation with Tailwind CSS.
-
-### Advanced
-- **podcast-visualizer**: Multi-track audio visualization using `AudioContext` analysis.
-- **promo-video**: Marketing promo video template.
-- **social-media-story**: Vertical video format.
-- **audio-visualization**: Real-time frequency analysis.
-- **map-animation**: Animated maps with Leaflet.
-- **procedural-generation**: Deterministic random generation (TypeScript + Vite).
-
-### Core Concepts
-- **animation-helpers**: Core utilities (legacy/reference).
-- **dynamic-props-animation**: Input props and schema validation (TypeScript + Vite).
-- **signals-animation**: Signals architecture for performance.
+- `examples/react-canvas-animation`: Demonstrates React integration with Canvas and Helios.
+- `examples/dynamic-props-animation`: Demonstrates dynamic properties.
+- `examples/react-dom-animation`: Demonstrates React integration with DOM elements.
+- `examples/procedural-generation`: Demonstrates procedural generation.
+- `examples/text-effects-animation`: Demonstrates text effects.
+- `examples/variable-font-animation`: Demonstrates variable fonts.
+- `examples/lottie-animation`: Demonstrates Lottie integration.
+- `examples/waapi-animation`: Demonstrates Web Animations API integration.
+- `examples/motion-one-animation`: Demonstrates Motion One integration.
+- `examples/gsap-animation`: Demonstrates GSAP integration.
+- `examples/pixi-canvas-animation`: Demonstrates PixiJS integration.
+- `examples/simple-animation`: Simple vanilla JS animation.
+- `examples/p5-canvas-animation`: Demonstrates p5.js integration.
+- `examples/react-three-fiber`: Demonstrates React Three Fiber integration.
+- `examples/threejs-canvas-animation`: Demonstrates Three.js integration.
+- `examples/solid-chartjs-animation`: Demonstrates SolidJS and Chart.js.
+- `examples/svelte-chartjs-animation`: Demonstrates Svelte and Chart.js.
+- `examples/vue-chartjs-animation`: Demonstrates Vue and Chart.js.
+- `examples/solid-d3-animation`: Demonstrates SolidJS and D3.
+- `examples/react-chartjs-animation`: Demonstrates React and Chart.js.
+- `examples/solid-dom-animation`: Demonstrates SolidJS DOM animation.
+- `examples/svelte-d3-animation`: Demonstrates Svelte and D3.
+- `examples/react-d3-animation`: Demonstrates React and D3.
+- `examples/react-css-animation`: Demonstrates React and CSS animation.
+- `examples/vue-d3-animation`: Demonstrates Vue and D3.
+- `examples/react-components-demo`: Demonstrates registry components.
+- `examples/solid-pixi-animation`: Demonstrates SolidJS and PixiJS.
+- `examples/svelte-pixi-animation`: Demonstrates Svelte and PixiJS.
+- `examples/vue-pixi-animation`: Demonstrates Vue and PixiJS.
+- `examples/solid-lottie-animation`: Demonstrates SolidJS and Lottie.
+- `examples/react-pixi-animation`: Demonstrates React and PixiJS.
+- `examples/svelte-lottie-animation`: Demonstrates Svelte and Lottie.
+- `examples/solid-audio-visualization`: Demonstrates SolidJS audio visualization.
+- `examples/vue-lottie-animation`: Demonstrates Vue and Lottie.
+- `examples/react-lottie-animation`: Demonstrates React and Lottie.
+- `examples/svelte-audio-visualization`: Demonstrates Svelte audio visualization.
+- `examples/vue-audio-visualization`: Demonstrates Vue audio visualization.
+- `examples/podcast-visualizer`: Podcast visualizer example.
+- `examples/excalidraw-animation`: Excalidraw animation example.
+- `examples/react-audio-visualization`: React audio visualization.
+- `examples/promo-video`: Promo video example.
+- `examples/vanilla-transitions`: Vanilla JS transitions.
+- `examples/vanilla-captions-animation`: Vanilla JS captions.
+- `examples/solid-captions-animation`: SolidJS captions.
+- `examples/solid-threejs-canvas-animation`: SolidJS and Three.js.
+- `examples/svelte-threejs-canvas-animation`: Svelte and Three.js.
+- `examples/vue-threejs-canvas-animation`: Vue and Three.js.
+- `examples/svelte-captions-animation`: Svelte captions.
+- `examples/vue-captions-animation`: Vue captions.
+- `examples/diagnostics`: Diagnostics example.
+- `examples/vanilla-typescript`: Vanilla TypeScript example.
+- `examples/code-walkthrough`: Code walkthrough example.
+- `examples/react-captions-animation`: React captions.
+- `examples/client-export-api`: Client-side export API example.
 
 ## B. Build Config
-The build system uses Vite with a custom configuration `vite.build-example.config.js`.
-
-### Key Features
-- **Dynamic Discovery**: Scans `examples/` directory for `composition.html` files.
-- **Aliases**: Maps `@helios-project/*` packages to local source files for development.
-- **Framework Plugins**:
-  - `react()`: Excludes SolidJS examples to avoid conflicts.
-  - `vue()`: Supports Vue SFCs.
-  - `svelte()`: Supports Svelte components.
-  - `solidPlugin()`: Explicitly includes SolidJS examples.
-- **Assets**: Copies Excalidraw fonts to output directory.
-
-### Commands
-- `npm run build:examples`: Builds all examples to `output/example-build`.
-- `npm run dev`: Starts dev server for `simple-canvas-animation`.
-- `npm run dev:[name]`: Starts dev server for specific examples (e.g., `dev:react`, `dev:vue`).
+- Root `vite.config.js`: Shared configuration.
+- `vite.build-example.config.js`: Configuration for building all examples.
+- Individual examples have their own `package.json`, `tsconfig.json`, and `vite.config.ts` for standalone development.
 
 ## C. E2E Tests
-E2E tests are located in `tests/e2e/` and use Playwright + FFmpeg.
-
-- **verify-all.ts**: Orchestrator script that builds dependencies, builds examples, and runs all verification steps.
-- **verify-render.ts**: Verifies that examples render correctly to video.
-  - Dynamically discovers examples in `examples/`.
-  - Supports `dom` and `canvas` modes (auto-detected or overridden).
-  - Supports custom duration and brightness thresholds per example (e.g., `promo-video`).
-  - Checks for video duration and non-black frames (using FFmpeg `signalstats`).
-  - Usage: `npx tsx tests/e2e/verify-render.ts [filter]`
-- **verify-client-export.ts**: Verifies client-side export functionality using `ClientSideExporter`.
-  - Dynamically discovers examples in `examples/`.
-  - Serves examples via a local server and uses a generic `dynamic-player.html` fixture.
-  - Verifies export triggers a download.
-- **verify-player.ts**: Verifies the `<helios-player>` Web Component.
+- `tests/e2e/verify-all.ts`: Orchestrates full verification pipeline.
+- `tests/e2e/verify-render.ts`: Verifies server-side rendering.
+- `tests/e2e/verify-client-export.ts`: Verifies client-side export.
+- `tests/e2e/verify-player.ts`: Verifies player web component.

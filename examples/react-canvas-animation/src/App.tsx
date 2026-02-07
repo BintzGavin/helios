@@ -1,5 +1,5 @@
 import React, { useRef, useEffect } from 'react';
-import { Helios } from '../../../packages/core/src/index.ts';
+import { Helios } from '@helios-project/core';
 import { useVideoFrame } from './hooks/useVideoFrame';
 
 // Initialize Helios outside the component to keep a stable instance
@@ -14,11 +14,11 @@ helios.bindToDocumentTimeline();
 
 // Expose to window for debugging/player control
 if (typeof window !== 'undefined') {
-    window.helios = helios;
+    (window as any).helios = helios;
 }
 
 export default function App() {
-    const canvasRef = useRef(null);
+    const canvasRef = useRef<HTMLCanvasElement>(null);
     const frame = useVideoFrame(helios);
 
     useEffect(() => {
@@ -26,6 +26,8 @@ export default function App() {
         if (!canvas) return;
 
         const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+
         const { width, height } = canvas;
 
         // Clear

@@ -1,3 +1,6 @@
+## DEMO v1.129.0
+- ✅ Completed: Standardize React Canvas Animation Example - Modernized `examples/react-canvas-animation` with TypeScript, `package.json`, and proper build config.
+
 ## DEMO v1.128.0
 - ✅ Completed: Standardize Dynamic Props Animation Example - Modernized `examples/dynamic-props-animation` with TypeScript, `package.json`, and proper build config.
 
