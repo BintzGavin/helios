@@ -55,7 +55,7 @@ describe('HeliosPlayer', () => {
     expect(player.shadowRoot).toBeTruthy();
     const btn = player.shadowRoot!.querySelector('.fullscreen-btn');
     expect(btn).toBeTruthy();
-    expect(btn!.textContent).toContain('⛶');
+    expect(btn!.innerHTML).toContain('<svg');
   });
 
   it('should toggle fullscreen on button click', async () => {
@@ -95,7 +95,7 @@ describe('HeliosPlayer', () => {
     Object.defineProperty(document, 'fullscreenElement', { value: player });
     document.dispatchEvent(new Event('fullscreenchange'));
 
-    expect(btn.textContent).toContain('↙'); // Exit icon
+    expect(btn.innerHTML).toContain('<svg'); // Exit icon
     expect(btn.title).toBe('Exit Fullscreen');
 
     // Click to exit fullscreen
@@ -106,7 +106,7 @@ describe('HeliosPlayer', () => {
     Object.defineProperty(document, 'fullscreenElement', { value: null });
     document.dispatchEvent(new Event('fullscreenchange'));
 
-    expect(btn.textContent).toContain('⛶'); // Enter icon
+    expect(btn.innerHTML).toContain('<svg'); // Enter icon
   });
 
   it('should handle keyboard shortcuts', () => {
@@ -866,7 +866,7 @@ describe('HeliosPlayer', () => {
     it('should initialize with CC button', () => {
         const ccBtn = player.shadowRoot!.querySelector('.cc-btn');
         expect(ccBtn).toBeTruthy();
-        expect(ccBtn!.textContent).toBe('CC');
+        expect(ccBtn!.innerHTML).toContain('<svg');
         expect(ccBtn!.classList.contains('active')).toBe(false);
     });
 

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verification</title>
+    <script src="../packages/player/dist/helios-player.global.js"></script>
+    <style>
+        body { margin: 0; background: #333; display: flex; justify-content: center; align-items: center; height: 100vh; }
+        helios-player { width: 800px; }
+    </style>
+</head>
+<body>
+    <helios-player src="" controls></helios-player>
+    <script>
+        // Mock helios controller to enable controls
+        const player = document.querySelector("helios-player");
+        // We need to wait for component upgrade
+        customElements.whenDefined("helios-player").then(() => {
+            // Mock controller injection if possible, or just rely on default state
+            // The player needs a controller to show state.
+            // We can manually call updateUI if we can access the instance.
+            // But updateUI is private.
+            // However, we can mock the controller via setController (private) if we can cast to any.
+
+            // Let isLoaded = true to allow play button to toggle state (mock)
+            player.isLoaded = true;
+
+            // We can trigger attribute changes to see some things.
+            // But to see Play vs Pause icon, we need state.
+
+            // Hack to inject a mock controller
+            const mockController = {
+                getState: () => ({
+                    currentFrame: 0, duration: 10, fps: 30, isPlaying: false,
+                    volume: 1, muted: false
+                }),
+                subscribe: (cb) => { cb({ currentFrame: 0, duration: 10, fps: 30, isPlaying: false }); return () => {}; },
+                onError: () => () => {},
+                onAudioMetering: () => () => {},
+                setAudioVolume: () => {},
+                setAudioMuted: () => {},
+                dispose: () => {}
+            };
+            player.setController(mockController);
+        });
+    </script>
+</body>
+</html>

@@ -59,6 +59,22 @@ class StaticTimeRange implements TimeRanges {
   }
 }
 
+const ICONS = {
+  play: '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>',
+  pause: '<svg viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>',
+  replay: '<svg viewBox="0 0 24 24"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>',
+  volumeHigh: '<svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>',
+  volumeLow: '<svg viewBox="0 0 24 24"><path d="M7 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>',
+  volumeMuted: '<svg viewBox="0 0 24 24"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73 4.27 3zM12 4L9.91 6.09 12 8.18V4z"/></svg>',
+  settings: '<svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.58 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>',
+  fullscreen: '<svg viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>',
+  exitFullscreen: '<svg viewBox="0 0 24 24"><path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/></svg>',
+  pip: '<svg viewBox="0 0 24 24"><path d="M19 11h-8v6h8v-6zm4 8V4.98C23 3.88 22.1 3 21 3H3c-1.1 0-2 .88-2 1.98V19c0 1.1.9 2 2 2h20c1.1 0 2-.9 2-2zm-2 .02H3V4.97h18v14.05z"/><path d="M0 0h24v24H0z" fill="none"/></svg>',
+  cc: '<svg viewBox="0 0 24 24"><path d="M19 4H5c-1.11 0-2 .9-2 2v12c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm-8 7h-3v1.5h-1.5v-3H8V11h3V9.5zM12.5 9.5h1.5v3h-1.5v-3zm5.5 1.5h-3v1.5h-1.5v-3H15V11h3V9.5z"/></svg>',
+  audioTracks: '<svg viewBox="0 0 24 24"><path d="M12 3v9.28c-.47-.17-.97-.28-1.5-.28C8.01 12 6 14.01 6 16.5S8.01 21 10.5 21c2.31 0 4.2-1.75 4.45-4H15V6h4V3h-7z"/></svg>',
+  export: '<svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>'
+};
+
 const template = document.createElement("template");
 template.innerHTML = `
   <style>
@@ -84,6 +100,12 @@ template.innerHTML = `
       --helios-caption-bg: rgba(0, 0, 0, 0.7);
       --helios-caption-color: white;
       --helios-caption-font-family: sans-serif;
+    }
+    button svg {
+      fill: currentColor;
+      width: 24px;
+      height: 24px;
+      vertical-align: middle;
     }
     iframe {
       width: 100%;
@@ -398,6 +420,11 @@ template.innerHTML = `
     }
     .big-play-btn:hover {
         transform: scale(1.1);
+    }
+    .big-play-btn svg {
+        width: 40px;
+        height: 40px;
+        fill: currentColor;
     }
 
     .click-layer {
@@ -789,30 +816,30 @@ template.innerHTML = `
   </div>
   <div class="poster-container hidden" part="poster">
     <img class="poster-image" part="poster-image" alt="Video poster" />
-    <div class="big-play-btn" part="big-play-button" aria-label="Play video">▶</div>
+    <div class="big-play-btn" part="big-play-button" aria-label="Play video">${ICONS.play}</div>
   </div>
   <video class="pip-video" playsinline muted autoplay></video>
   <iframe part="iframe" sandbox="allow-scripts allow-same-origin" title="Helios Composition Preview"></iframe>
   <div class="click-layer" part="click-layer"></div>
   <div class="captions-container" part="captions"></div>
   <div class="controls" part="controls" role="toolbar" aria-label="Playback Controls">
-    <button class="play-pause-btn" part="play-pause-button" aria-label="Play">▶</button>
+    <button class="play-pause-btn" part="play-pause-button" aria-label="Play">${ICONS.play}</button>
     <div class="volume-control" part="volume-control">
-      <button class="volume-btn" part="volume-button" aria-label="Mute">🔊</button>
+      <button class="volume-btn" part="volume-button" aria-label="Mute">${ICONS.volumeHigh}</button>
       <input type="range" class="volume-slider" min="0" max="1" step="0.05" value="1" part="volume-slider" aria-label="Volume">
     </div>
-    <button class="audio-btn" part="audio-button" aria-label="Audio Tracks" style="display: none;" aria-haspopup="true" aria-controls="audio-menu-container" aria-expanded="false">🎵</button>
-    <button class="cc-btn" part="cc-button" aria-label="Toggle Captions">CC</button>
-    <button class="export-btn" part="export-button" aria-label="Export options" aria-haspopup="true" aria-controls="export-menu-container" aria-expanded="false">Export</button>
+    <button class="audio-btn" part="audio-button" aria-label="Audio Tracks" style="display: none;" aria-haspopup="true" aria-controls="audio-menu-container" aria-expanded="false">${ICONS.audioTracks}</button>
+    <button class="cc-btn" part="cc-button" aria-label="Toggle Captions">${ICONS.cc}</button>
+    <button class="export-btn" part="export-button" aria-label="Export options" aria-haspopup="true" aria-controls="export-menu-container" aria-expanded="false">${ICONS.export} <span style="vertical-align: middle; margin-left: 4px;">Export</span></button>
     <div class="scrubber-wrapper" part="scrubber-wrapper">
       <div class="scrubber-tooltip hidden" part="tooltip"></div>
       <div class="markers-container" part="markers"></div>
       <input type="range" class="scrubber" min="0" value="0" step="1" part="scrubber" aria-label="Seek time">
     </div>
     <div class="time-display" part="time-display">0.00 / 0.00</div>
-    <button class="fullscreen-btn" part="fullscreen-button" aria-label="Toggle fullscreen">⛶</button>
-    <button class="pip-btn" part="pip-button" aria-label="Picture-in-Picture">⏏</button>
-    <button class="settings-btn" part="settings-button" aria-label="Settings" aria-haspopup="true" aria-controls="settings-menu-container" aria-expanded="false">⚙</button>
+    <button class="fullscreen-btn" part="fullscreen-button" aria-label="Toggle fullscreen">${ICONS.fullscreen}</button>
+    <button class="pip-btn" part="pip-button" aria-label="Picture-in-Picture">${ICONS.pip}</button>
+    <button class="settings-btn" part="settings-button" aria-label="Settings" aria-haspopup="true" aria-controls="settings-menu-container" aria-expanded="false">${ICONS.settings}</button>
   </div>
 `;
 
@@ -2011,7 +2038,7 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
 
       const muteBtn = document.createElement("button");
       muteBtn.className = "track-mute-btn";
-      muteBtn.textContent = track.enabled ? "🔊" : "🔇";
+      muteBtn.innerHTML = track.enabled ? ICONS.volumeHigh : ICONS.volumeMuted;
       muteBtn.title = track.enabled ? "Mute" : "Unmute";
       muteBtn.ariaLabel = muteBtn.title;
 
@@ -2831,10 +2858,10 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
 
   private updateFullscreenUI = () => {
     if (document.fullscreenElement === this) {
-       this.fullscreenBtn.textContent = "↙";
+       this.fullscreenBtn.innerHTML = ICONS.exitFullscreen;
        this.fullscreenBtn.title = "Exit Fullscreen";
     } else {
-       this.fullscreenBtn.textContent = "⛶";
+       this.fullscreenBtn.innerHTML = ICONS.fullscreen;
        this.fullscreenBtn.title = "Fullscreen";
     }
   };
@@ -2934,15 +2961,21 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
       const isFinished = state.currentFrame >= state.duration * state.fps - 1;
 
       if (isFinished) {
-        this.playPauseBtn.textContent = "🔄"; // Restart button
+        this.playPauseBtn.innerHTML = ICONS.replay; // Restart button
         this.playPauseBtn.setAttribute("aria-label", "Restart");
       } else {
-        this.playPauseBtn.textContent = state.isPlaying ? "❚❚" : "▶";
+        this.playPauseBtn.innerHTML = state.isPlaying ? ICONS.pause : ICONS.play;
         this.playPauseBtn.setAttribute("aria-label", state.isPlaying ? "Pause" : "Play");
       }
 
       const isMuted = state.muted || state.volume === 0;
-      this.volumeBtn.textContent = isMuted ? "🔇" : "🔊";
+      let volIcon = ICONS.volumeHigh;
+      if (isMuted) {
+          volIcon = ICONS.volumeMuted;
+      } else if (state.volume < 0.5) {
+          volIcon = ICONS.volumeLow;
+      }
+      this.volumeBtn.innerHTML = volIcon;
       this.volumeBtn.setAttribute("aria-label", isMuted ? "Unmute" : "Mute");
       this.volumeSlider.value = String(state.volume !== undefined ? state.volume : 1);
 
