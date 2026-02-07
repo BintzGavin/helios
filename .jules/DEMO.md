@@ -83,3 +83,7 @@
 ## [1.130.1] - Vanilla TypeScript Ambiguity
 **Learning:** `examples/vanilla-typescript` lacks `package.json` and `vite.config.ts`, making it a poor reference for "Standardization" despite its name. `examples/simple-canvas-animation` is the correct reference.
 **Action:** When standardizing, verify the reference example actually has the files you intend to replicate.
+
+## [1.136.0] - Legacy Example Discovery
+**Learning:** Some examples (like `social-media-story`) appear functional but lack the standardized "Professional" structure (package.json, tsconfig), making them poor references.
+**Action:** Systematically check for `package.json` in all example directories to identify hidden legacy code.
