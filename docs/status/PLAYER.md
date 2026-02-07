@@ -1,4 +1,4 @@
-**Version**: v0.74.3
+**Version**: v0.74.4
 
 **Posture**: STABLE AND FEATURE COMPLETE
 
@@ -60,6 +60,7 @@
 - **Export API**: Exposes public `export()` method for programmatic control over client-side exports, supporting Video (MP4/WebM) and Snapshot (PNG/JPEG) formats.
 - **Export Menu**: Implements a dedicated Export Menu in the player UI (replacing the direct export button action) to allow configuring format, resolution, filename, and captions before exporting or taking a snapshot.
 
+[v0.74.4] ✅ Completed: Sync Version - Synced package.json version with status file and verified all tests pass.
 [v0.74.3] ✅ Completed: Fix Async Seek State - Fixed `seeking` property implementation to correctly return `true` during programmatic asynchronous seeks (e.g. via `currentTime` setter), ensuring Standard Media API compliance.
 [v0.74.2] ✅ Completed: Api Parity Improvements - Fixed logic for `width`/`height` getters to handle invalid input gracefully, added missing test coverage, and updated documentation for Standard Media API parity.
 [v0.74.1] ✅ Completed: Implement SVG Icons - Replaced text-based control icons with inline SVGs for consistent visual styling.
