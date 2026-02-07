@@ -26,6 +26,7 @@ import * as assert from 'assert';
     assert.ok(diagnostics.ffmpeg.version, 'Version should be present');
     assert.ok(Array.isArray(diagnostics.ffmpeg.encoders), 'Encoders should be an array');
     assert.ok(Array.isArray(diagnostics.ffmpeg.filters), 'Filters should be an array');
+    assert.ok(Array.isArray(diagnostics.ffmpeg.hwaccels), 'Hardware accelerators should be an array');
 
     // Check for common encoder (libx264)
     const hasH264 = diagnostics.ffmpeg.encoders.includes('libx264');
