@@ -38,6 +38,9 @@ Each agent should update **their own dedicated progress file** instead of this f
 ### CORE v5.13.0
 - ✅ Completed: Generic Input Props - Refactored Helios class to accept generic TInputProps for strict property typing.
 
+## DEMO v1.135.0
+- ✅ Completed: Expand E2E Tests - Verified `react-canvas-animation` and `simple-canvas-animation` are correctly covered by the E2E rendering test suite.
+
 ## DEMO v1.134.0
 - ✅ Completed: Standardize React CSS Animation Example - Modernized `examples/react-css-animation` with TypeScript, `package.json`, and proper build config.
 

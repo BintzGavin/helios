@@ -69,6 +69,6 @@ The `examples/` directory contains various examples demonstrating Helios usage w
 
 ## C. E2E Tests
 - `tests/e2e/verify-all.ts`: Orchestrates full verification pipeline.
-- `tests/e2e/verify-render.ts`: Verifies server-side rendering.
+- `tests/e2e/verify-render.ts`: Verifies server-side rendering for all examples, including `simple-canvas-animation`, `react-canvas-animation`, and `vue-canvas-animation`.
 - `tests/e2e/verify-client-export.ts`: Verifies client-side export.
 - `tests/e2e/verify-player.ts`: Verifies player web component.

@@ -1,6 +1,6 @@
 # Status: DEMO Domain
 
-**Version**: 1.134.0
+**Version**: 1.135.0
 
 **Posture**: ACTIVELY EXPANDING FOR V2
 
@@ -16,6 +16,7 @@ The DEMO domain is responsible for:
 ## Active Tasks
 
 ## Completed Tasks
+- [v1.135.0] ✅ Completed: Expand E2E Tests - Verified correct rendering of React and Simple Canvas animations via `tests/e2e/verify-render.ts`.
 - [v1.134.0] ✅ Completed: Standardize React CSS Animation Example - Modernized `examples/react-css-animation` with TypeScript, `package.json`, and proper build config.
 - [v1.133.0] ✅ Completed: Standardize Media Element Animation Example - Modernized `examples/media-element-animation` with TypeScript, `package.json`, and proper build config.
 - [v1.132.0] ✅ Completed: Standardize Chart.js Animation Example - Modernized `examples/chartjs-animation` with TypeScript, `package.json`, and proper build config.
