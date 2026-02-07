@@ -4,7 +4,26 @@ import { findAssets, deleteComposition, createComposition, findCompositions, ren
 import fs from 'fs';
 import path from 'path';
 
-vi.mock('fs');
+vi.mock('fs', async (importOriginal) => {
+    const actual = await importOriginal<typeof import('fs')>();
+    return {
+        ...actual,
+        default: {
+            ...actual,
+            existsSync: vi.fn(),
+            readdirSync: vi.fn(),
+            readFileSync: vi.fn(),
+            mkdirSync: vi.fn(),
+            writeFileSync: vi.fn(),
+            rmSync: vi.fn(),
+            renameSync: vi.fn(),
+            cpSync: vi.fn(),
+            promises: {
+                readdir: vi.fn(),
+            }
+        }
+    };
+});
 
 describe('findCompositions', () => {
     const originalEnv = process.env;
@@ -139,7 +158,7 @@ describe('findAssets', () => {
     process.env = originalEnv;
   });
 
-  it('should discover supported asset types including new extensions', () => {
+  it('should discover supported asset types including new extensions', async () => {
     const mockFiles = [
       { name: 'image.png', isDirectory: () => false },
       { name: 'model.glb', isDirectory: () => false },
@@ -148,14 +167,12 @@ describe('findAssets', () => {
       { name: 'notes.txt', isDirectory: () => false },
     ];
 
-    // Mock readdirSync
-    // We use mockImplementation to handle the path resolution correctly
-    vi.mocked(fs.readdirSync).mockImplementation((dir) => {
-        // We accept any call because getProjectRoot does some path resolution
+    // Mock fs.promises.readdir
+    vi.mocked(fs.promises.readdir).mockImplementation(async (dir) => {
         return mockFiles as any;
     });
 
-    const assets = findAssets('.');
+    const assets = await findAssets('.');
 
     // Verify we found the expected assets with correct types
     const assetNames = assets.map(a => a.name).sort();
@@ -166,14 +183,12 @@ describe('findAssets', () => {
 
     const assetMap = new Map(assets.map(a => [a.name, a.type]));
     expect(assetMap.get('image.png')).toBe('image');
-
-    // These assertions will fail until we implement the changes
     expect(assetMap.get('model.glb')).toBe('model');
     expect(assetMap.get('data.json')).toBe('json');
     expect(assetMap.get('shader.frag')).toBe('shader');
   });
 
-  it('should prioritize public directory if it exists and use relative URLs', () => {
+  it('should prioritize public directory if it exists and use relative URLs', async () => {
     const root = path.resolve('/mock/project');
     const publicDir = path.resolve(root, 'public');
 
@@ -183,7 +198,7 @@ describe('findAssets', () => {
         return false;
     });
 
-    vi.mocked(fs.readdirSync).mockImplementation((dir) => {
+    vi.mocked(fs.promises.readdir).mockImplementation(async (dir) => {
         if (dir === publicDir) {
             return [
                 { name: 'logo.png', isDirectory: () => false }
@@ -192,17 +207,15 @@ describe('findAssets', () => {
         return [] as any;
     });
 
-    const assets = findAssets('.');
+    const assets = await findAssets('.');
 
     expect(assets).toHaveLength(1);
     expect(assets[0].name).toBe('logo.png');
-    // For public assets, URL should be relative (no /@fs)
     expect(assets[0].url).toBe('/logo.png');
-    // Relative path should be correct
     expect(assets[0].relativePath).toBe('logo.png');
   });
 
-  it('should fall back to project root if public directory does not exist', () => {
+  it('should fall back to project root if public directory does not exist', async () => {
     const root = path.resolve('/mock/project');
     const publicDir = path.resolve(root, 'public');
 
@@ -212,7 +225,7 @@ describe('findAssets', () => {
         return false;
     });
 
-    vi.mocked(fs.readdirSync).mockImplementation((dir) => {
+    vi.mocked(fs.promises.readdir).mockImplementation(async (dir) => {
         if (dir === root) {
             return [
                 { name: 'root-image.png', isDirectory: () => false }
@@ -221,11 +234,10 @@ describe('findAssets', () => {
         return [] as any;
     });
 
-    const assets = findAssets('.');
+    const assets = await findAssets('.');
 
     expect(assets).toHaveLength(1);
     expect(assets[0].name).toBe('root-image.png');
-    // For root assets, URL should use /@fs
     expect(assets[0].url).toContain('/@fs');
     expect(assets[0].url).toContain('root-image.png');
     expect(assets[0].relativePath).toBe('root-image.png');

@@ -485,7 +485,7 @@ function configureMiddlewares(server: ViteDevServer | PreviewServer, isPreview: 
           // GET: List assets
           if (req.method === 'GET') {
             try {
-              const assets = findAssets(process.cwd());
+              const assets = await findAssets(process.cwd());
               res.setHeader('Content-Type', 'application/json');
               res.end(JSON.stringify(assets));
             } catch (e) {

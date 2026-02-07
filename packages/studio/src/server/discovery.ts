@@ -362,7 +362,7 @@ function getAssetType(ext: string): AssetInfo['type'] {
   return 'other';
 }
 
-export function findAssets(rootDir: string): AssetInfo[] {
+export async function findAssets(rootDir: string): Promise<AssetInfo[]> {
   const projectRoot = getProjectRoot(rootDir);
 
   if (!fs.existsSync(projectRoot)) {
@@ -376,36 +376,42 @@ export function findAssets(rootDir: string): AssetInfo[] {
 
   const assets: AssetInfo[] = [];
 
-  function scan(dir: string) {
-    const entries = fs.readdirSync(dir, { withFileTypes: true });
+  async function scan(dir: string) {
+    try {
+      const entries = await fs.promises.readdir(dir, { withFileTypes: true });
+      const promises: Promise<void>[] = [];
 
-    for (const entry of entries) {
-      const fullPath = path.join(dir, entry.name);
+      for (const entry of entries) {
+        const fullPath = path.join(dir, entry.name);
 
-      if (entry.isDirectory()) {
-        if (['node_modules', '.git', 'dist', 'build'].includes(entry.name)) continue;
-        scan(fullPath);
-      } else {
-        const ext = path.extname(entry.name).toLowerCase();
-        const type = getAssetType(ext);
+        if (entry.isDirectory()) {
+          if (['node_modules', '.git', 'dist', 'build'].includes(entry.name)) continue;
+          promises.push(scan(fullPath));
+        } else {
+          const ext = path.extname(entry.name).toLowerCase();
+          const type = getAssetType(ext);
 
-        if (type !== 'other') {
-           const relativePath = path.relative(scanRoot, fullPath).replace(/\\/g, '/');
-           const url = hasPublic ? `/${relativePath}` : `/@fs${fullPath}`;
+          if (type !== 'other') {
+             const relativePath = path.relative(scanRoot, fullPath).replace(/\\/g, '/');
+             const url = hasPublic ? `/${relativePath}` : `/@fs${fullPath}`;
 
-           assets.push({
-             id: fullPath,
-             name: entry.name,
-             url,
-             type,
-             relativePath
-           });
+             assets.push({
+               id: fullPath,
+               name: entry.name,
+               url,
+               type,
+               relativePath
+             });
+          }
         }
       }
+      await Promise.all(promises);
+    } catch (e) {
+      console.warn(`Failed to scan directory: ${dir}`, e);
     }
   }
 
-  scan(scanRoot);
+  await scan(scanRoot);
   return assets;
 }
 
