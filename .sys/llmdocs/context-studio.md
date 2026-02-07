@@ -77,7 +77,7 @@ Options:
 - **Props Editor**: A schema-aware editor for modifying composition input props in real-time.
 - **Assets Panel**: Allows browsing and dragging assets (images, video, audio) into the composition.
 - **Components Panel**: Allows browsing, installing, updating, and removing components from the registry.
-- **Renders Panel**: Manages render jobs (start, cancel, delete) and displays progress/results.
+- **Renders Panel**: Manages server-side render jobs (start, cancel, delete) and displays progress/results. Includes "Export Job Spec" for generating distributed render configurations.
 - **Omnibar**: A command palette (Cmd+K) for quick navigation and actions.
 - **Helios Assistant**: An AI-powered assistant for documentation and help, accessible via the toolbar.
 

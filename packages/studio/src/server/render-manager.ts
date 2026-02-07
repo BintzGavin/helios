@@ -1,6 +1,7 @@
-import { Renderer, RenderOrchestrator, DistributedRenderOptions } from '@helios-project/renderer';
+import { Renderer, RenderOrchestrator, DistributedRenderOptions, RendererOptions } from '@helios-project/renderer';
 import path from 'path';
 import fs from 'fs';
+import { pathToFileURL } from 'url';
 import { getProjectRoot } from './discovery';
 
 export interface RenderJob {
@@ -14,6 +15,28 @@ export interface RenderJob {
   createdAt: number;
   inPoint?: number;
   outPoint?: number;
+}
+
+export interface RenderJobChunk {
+  id: number;
+  startFrame: number;
+  frameCount: number;
+  outputFile: string;
+  command: string;
+}
+
+export interface RenderJobMetadata {
+  totalFrames: number;
+  fps: number;
+  width: number;
+  height: number;
+  duration: number;
+}
+
+export interface JobSpec {
+  metadata: RenderJobMetadata;
+  chunks: RenderJobChunk[];
+  mergeCommand: string;
 }
 
 const jobs = new Map<string, RenderJob>();
@@ -104,6 +127,98 @@ export interface StartRenderOptions {
   pixelFormat?: string;
   inputProps?: Record<string, any>;
   concurrency?: number;
+}
+
+function rendererOptionsToFlags(options: RendererOptions): string {
+  const flags: string[] = [];
+  if (options.width) flags.push(`--width ${options.width}`);
+  if (options.height) flags.push(`--height ${options.height}`);
+  if (options.fps) flags.push(`--fps ${options.fps}`);
+  if (options.crf !== undefined) flags.push(`--quality ${options.crf}`);
+  if (options.mode) flags.push(`--mode ${options.mode}`);
+  if (options.audioCodec) flags.push(`--audio-codec ${options.audioCodec}`);
+  if (options.videoCodec) flags.push(`--video-codec ${options.videoCodec}`);
+  if (options.browserConfig?.headless === false) flags.push('--no-headless');
+  return flags.join(' ');
+}
+
+export function getRenderJobSpec(options: StartRenderOptions): JobSpec {
+  const projectRoot = getProjectRoot(process.cwd());
+  let compositionPath: string;
+
+  if (options.compositionUrl.startsWith('/@fs/')) {
+      compositionPath = options.compositionUrl.slice(4); // Remove /@fs
+  } else {
+      // Remove leading slash if present to avoid absolute path confusion
+      const relativePath = options.compositionUrl.startsWith('/') ? options.compositionUrl.slice(1) : options.compositionUrl;
+      compositionPath = path.resolve(projectRoot, relativePath);
+  }
+
+  const compositionUrl = pathToFileURL(compositionPath).href;
+  const outputDir = path.resolve(projectRoot, 'renders'); // Default output dir
+  const jobId = Date.now().toString();
+  const outputPath = path.resolve(outputDir, `render-${jobId}.mp4`);
+
+  const fps = options.fps || 30;
+  let durationInSeconds = options.duration || 10;
+  let startFrame = 0;
+
+  if (options.inPoint !== undefined && options.outPoint !== undefined) {
+    startFrame = options.inPoint;
+    const durationFrames = options.outPoint - options.inPoint;
+    durationInSeconds = durationFrames / fps;
+  }
+
+  const renderOptions: DistributedRenderOptions = {
+    width: options.width || 1920,
+    height: options.height || 1080,
+    fps: fps,
+    durationInSeconds: durationInSeconds,
+    startFrame: startFrame,
+    frameCount: options.outPoint !== undefined ? (options.outPoint - options.inPoint!) : undefined,
+    mode: options.mode || 'canvas',
+    videoBitrate: options.videoBitrate,
+    videoCodec: options.videoCodec,
+    pixelFormat: options.pixelFormat,
+    inputProps: options.inputProps,
+    concurrency: options.concurrency || 1
+  };
+
+  const plan = RenderOrchestrator.plan(compositionUrl, outputPath, renderOptions);
+
+  const chunks: RenderJobChunk[] = plan.chunks.map(chunk => {
+    const flags = rendererOptionsToFlags(chunk.options);
+    return {
+      id: chunk.id,
+      startFrame: chunk.startFrame!,
+      frameCount: chunk.frameCount!,
+      outputFile: chunk.outputFile,
+      command: `helios render ${compositionUrl} -o ${chunk.outputFile} --start-frame ${chunk.startFrame} --frame-count ${chunk.frameCount} ${flags}`
+    };
+  });
+
+  let mergeCommand = `helios merge ${outputPath} ${plan.concatManifest.join(' ')}`;
+  if (plan.mixOptions.videoCodec && plan.mixOptions.videoCodec !== 'copy') {
+    mergeCommand += ` --video-codec ${plan.mixOptions.videoCodec}`;
+  }
+  if (plan.mixOptions.audioCodec) {
+    mergeCommand += ` --audio-codec ${plan.mixOptions.audioCodec}`;
+  }
+  if (plan.mixOptions.crf !== undefined) {
+    mergeCommand += ` --quality ${plan.mixOptions.crf}`;
+  }
+
+  return {
+    metadata: {
+      totalFrames: plan.totalFrames,
+      fps,
+      width: renderOptions.width!,
+      height: renderOptions.height!,
+      duration: plan.totalFrames / fps
+    },
+    chunks,
+    mergeCommand
+  };
 }
 
 export async function startRender(options: StartRenderOptions, serverPort: number): Promise<string> {

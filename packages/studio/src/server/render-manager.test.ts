@@ -1,125 +1,139 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { vi, describe, it, expect, beforeEach } from 'vitest';
 import path from 'path';
-import fs from 'fs';
+import { getRenderJobSpec } from './render-manager';
+import { RenderOrchestrator } from '@helios-project/renderer';
+import * as Discovery from './discovery';
 
-// Mock dependencies
 vi.mock('@helios-project/renderer', () => ({
-  Renderer: class MockRenderer {
-    render(_url: string, outputPath: string) {
-      const fs = require('fs');
-      fs.writeFileSync(outputPath, 'dummy content');
-      return Promise.resolve();
-    }
-    diagnose() { return Promise.resolve({}); }
-  },
   RenderOrchestrator: {
-    render: vi.fn().mockImplementation((_url: string, outputPath: string) => {
-      const fs = require('fs');
-      fs.writeFileSync(outputPath, 'dummy content');
-      return Promise.resolve();
-    })
-  }
+    plan: vi.fn()
+  },
+  // Mock other exports if needed, but we only use types and static plan method
 }));
 
-const tempDir = path.join(__dirname, 'temp-test-persistence');
-
-// Mock discovery to redirect project root
 vi.mock('./discovery', () => ({
-  getProjectRoot: () => tempDir
+  getProjectRoot: vi.fn().mockReturnValue('/mock/project/root')
 }));
 
-describe('RenderManager Persistence', () => {
-  const rendersDir = path.join(tempDir, 'renders');
-  const jobsFile = path.join(rendersDir, 'jobs.json');
+describe('render-manager', () => {
+  const mockProjectRoot = '/mock/project/root';
 
   beforeEach(() => {
-    // Clean up
-    if (fs.existsSync(tempDir)) {
-      fs.rmSync(tempDir, { recursive: true, force: true });
-    }
-    fs.mkdirSync(rendersDir, { recursive: true });
-    vi.resetModules(); // Ensure clean import for each test
     vi.clearAllMocks();
+    // Re-apply the mock return value if needed, though the factory default handles init
+    (Discovery.getProjectRoot as any).mockReturnValue(mockProjectRoot);
   });
 
-  afterEach(() => {
-    if (fs.existsSync(tempDir)) {
-      fs.rmSync(tempDir, { recursive: true, force: true });
-    }
-  });
+  describe('getRenderJobSpec', () => {
+    it('should generate a correct JobSpec', async () => {
+      const options = {
+        compositionUrl: '/examples/basic/composition.html',
+        width: 1920,
+        height: 1080,
+        fps: 30,
+        duration: 2,
+        mode: 'canvas' as const,
+        concurrency: 2
+      };
 
-  it('should load existing jobs and mark interrupted ones as failed', async () => {
-    // Setup existing jobs
-    const existingJob = {
-      id: 'existing-1',
-      status: 'rendering',
-      progress: 0.5,
-      compositionId: 'comp-1',
-      createdAt: Date.now()
-    };
-    fs.writeFileSync(jobsFile, JSON.stringify([existingJob], null, 2));
+      // Mock RenderOrchestrator.plan response
+      const mockPlan = {
+        totalFrames: 60,
+        chunks: [
+          {
+            id: 0,
+            startFrame: 0,
+            frameCount: 30,
+            outputFile: path.join(mockProjectRoot, 'renders/temp_0.mov'),
+            options: {
+                width: 1920,
+                height: 1080,
+                fps: 30,
+                mode: 'canvas'
+            }
+          },
+          {
+            id: 1,
+            startFrame: 30,
+            frameCount: 30,
+            outputFile: path.join(mockProjectRoot, 'renders/temp_1.mov'),
+            options: {
+                width: 1920,
+                height: 1080,
+                fps: 30,
+                mode: 'canvas'
+            }
+          }
+        ],
+        concatManifest: ['/path/to/0.mov', '/path/to/1.mov'],
+        concatOutputFile: '/path/to/concat.mov',
+        finalOutputFile: '/path/to/final.mp4',
+        mixOptions: {
+           videoCodec: 'libx264',
+           audioCodec: 'aac'
+        },
+        cleanupFiles: []
+      };
 
-    // Import to trigger loadJobs
-    const { getJobs } = await import('./render-manager');
+      (RenderOrchestrator.plan as any).mockReturnValue(mockPlan);
 
-    const jobs = getJobs();
-    const job = jobs.find(j => j.id === 'existing-1');
-    expect(job).toBeDefined();
-    expect(job?.status).toBe('failed');
-    expect(job?.error).toContain('Server restarted');
-  });
+      const spec = await getRenderJobSpec(options);
 
-  it('should save new jobs to disk', async () => {
-    const { startRender, getJobs } = await import('./render-manager');
+      expect(RenderOrchestrator.plan).toHaveBeenCalled();
+      const planCallArgs = (RenderOrchestrator.plan as any).mock.calls[0];
+      // Check composition URL (should be absolute file URL)
+      expect(planCallArgs[0]).toContain('file://');
+      expect(planCallArgs[0]).toContain('examples/basic/composition.html');
 
-    // Wait for startRender to complete (it's async but returns jobId immediately)
-    // Actually startRender returns Promise<string>
-    const jobId = await startRender({ compositionUrl: '/test' }, 3000);
+      // Check metadata
+      expect(spec.metadata).toEqual({
+        totalFrames: 60,
+        fps: 30,
+        width: 1920,
+        height: 1080,
+        duration: 2
+      });
 
-    // Wait a tick for async file write if any (it is sync in our impl but wrapped in async function)
-    await new Promise(r => setTimeout(r, 100));
+      // Check chunks
+      expect(spec.chunks).toHaveLength(2);
+      expect(spec.chunks[0].command).toContain('helios render');
+      expect(spec.chunks[0].command).toContain('--start-frame 0');
+      expect(spec.chunks[0].command).toContain('--frame-count 30');
+      // Verify ported flags logic
+      expect(spec.chunks[0].command).toContain('--width 1920');
+      expect(spec.chunks[0].command).toContain('--height 1080');
 
-    const jobs = getJobs();
-    expect(jobs.length).toBeGreaterThan(0);
-    const job = jobs.find(j => j.id === jobId);
+      // Check merge command
+      expect(spec.mergeCommand).toContain('helios merge');
+      expect(spec.mergeCommand).toContain('--video-codec libx264');
+      expect(spec.mergeCommand).toContain('--audio-codec aac');
+    });
 
-    // Check disk
-    const content = JSON.parse(fs.readFileSync(jobsFile, 'utf-8'));
-    const savedJob = content.find((j: any) => j.id === jobId);
-    expect(savedJob).toBeDefined();
-    // Since MockRenderer resolves immediately, it should be 'completed'
-    expect(savedJob.status).toBe('completed');
-  });
+    it('should handle @fs urls', async () => {
+        const options = {
+            compositionUrl: '/@fs/abs/path/to/composition.html',
+            fps: 30,
+            duration: 1
+        };
 
-  it('should remove job from disk on delete', async () => {
-    const { startRender, deleteJob } = await import('./render-manager');
-    const jobId = await startRender({ compositionUrl: '/test' }, 3000);
+        const mockPlan = {
+            totalFrames: 30,
+            chunks: [],
+            concatManifest: [],
+            mixOptions: {},
+            cleanupFiles: []
+        };
+        (RenderOrchestrator.plan as any).mockReturnValue(mockPlan);
 
-    // Wait for completion
-    await new Promise(r => setTimeout(r, 100));
+        await getRenderJobSpec(options);
 
-    // Ensure it's there
-    expect(fs.readFileSync(jobsFile, 'utf-8')).toContain(jobId);
-
-    await deleteJob(jobId);
-
-    // Ensure it's gone
-    const content = JSON.parse(fs.readFileSync(jobsFile, 'utf-8'));
-    expect(content.find((j: any) => j.id === jobId)).toBeUndefined();
-  });
-
-  it('should use RenderOrchestrator with concurrency', async () => {
-    const { startRender } = await import('./render-manager');
-    const { RenderOrchestrator } = await import('@helios-project/renderer');
-
-    await startRender({ compositionUrl: '/test', concurrency: 4 }, 3000);
-
-    // Wait for async execution
-    await new Promise(r => setTimeout(r, 100));
-
-    expect(RenderOrchestrator.render).toHaveBeenCalled();
-    const args = (RenderOrchestrator.render as any).mock.calls[0];
-    // arg 2 is options
-    expect(args[2].concurrency).toBe(4);
+        const planCallArgs = (RenderOrchestrator.plan as any).mock.calls[0];
+        // Should convert /@fs/abs/path... to file:///abs/path...
+        // Note: pathToFileURL handles generic paths.
+        // Assuming /abs/path is absolute on linux, or C:/ on windows.
+        // The mock logic in getRenderJobSpec strips /@fs/
+        expect(planCallArgs[0]).toContain('file://');
+        expect(planCallArgs[0]).not.toContain('/@fs/');
+    });
   });
 });

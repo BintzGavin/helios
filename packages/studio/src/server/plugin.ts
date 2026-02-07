@@ -7,7 +7,7 @@ import { createMcpServer } from './mcp';
 import { findCompositions, findAssets, getProjectRoot, createComposition, deleteComposition, updateCompositionMetadata, duplicateComposition, renameComposition, renameAsset } from './discovery';
 import { templates } from './templates';
 import { findDocumentation, resolveDocumentationPath } from './documentation';
-import { startRender, getJob, getJobs, cancelJob, deleteJob, diagnoseServer } from './render-manager';
+import { startRender, getRenderJobSpec, getJob, getJobs, cancelJob, deleteJob, diagnoseServer } from './render-manager';
 
 export interface StudioComponentDefinition {
   name: string;
@@ -675,6 +675,23 @@ function configureMiddlewares(server: ViteDevServer | PreviewServer, isPreview: 
           }
         }
 
+        next();
+      });
+
+      server.middlewares.use('/api/render/job-spec', async (req, res, next) => {
+        if (req.method === 'POST') {
+            try {
+                const body = await getBody(req);
+                const spec = await getRenderJobSpec(body);
+                res.setHeader('Content-Type', 'application/json');
+                res.end(JSON.stringify(spec));
+            } catch (e: any) {
+                console.error(e);
+                res.statusCode = 500;
+                res.end(JSON.stringify({ error: e.message }));
+            }
+            return;
+        }
         next();
       });
 

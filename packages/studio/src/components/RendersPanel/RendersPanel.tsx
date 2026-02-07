@@ -18,7 +18,8 @@ export const RendersPanel: React.FC = () => {
     exportProgress,
     exportVideo,
     cancelExport,
-    setPreviewUrl
+    setPreviewUrl,
+    exportJobSpec
   } = useStudio();
 
   const [exportFormat, setExportFormat] = useState<'mp4' | 'webm'>('mp4');
@@ -74,9 +75,32 @@ export const RendersPanel: React.FC = () => {
       <div style={{ borderTop: '1px solid #333', paddingTop: '10px', marginTop: '10px' }}>
           <h3 style={{ margin: '0 0 8px 0', fontSize: '12px', color: '#ccc', fontWeight: 'bold' }}>Server-Side Render</h3>
           <RenderConfig config={renderConfig} onChange={setRenderConfig} />
-          <button className="start-render-btn" onClick={handleTestRender} disabled={!activeComposition}>
-            Start Render Job
-          </button>
+
+          <div style={{ display: 'flex', gap: '8px', marginBottom: '8px' }}>
+            <button
+                className="start-render-btn"
+                onClick={handleTestRender}
+                disabled={!activeComposition}
+                style={{ flex: 1 }}
+            >
+                Start Render Job
+            </button>
+            <button
+                onClick={exportJobSpec}
+                disabled={!activeComposition}
+                style={{
+                    flex: 1,
+                    background: '#444',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '4px',
+                    cursor: 'pointer',
+                    opacity: !activeComposition ? 0.5 : 1
+                }}
+            >
+                Export Spec
+            </button>
+          </div>
 
           <div style={{ fontSize: '10px', color: '#888', marginBottom: '8px', textAlign: 'center' }}>
             Range: {inPoint} - {outPoint}

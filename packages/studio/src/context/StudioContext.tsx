@@ -176,6 +176,9 @@ interface StudioContextType {
 
   // Editor Integration
   openInEditor: (path: string) => void;
+
+  // Export Job Spec
+  exportJobSpec: () => Promise<void>;
 }
 
 export const StudioContext = createContext<StudioContextType | undefined>(undefined);
@@ -811,6 +814,49 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     }
   };
 
+  const exportJobSpec = async () => {
+    if (!activeComposition) return;
+    const { fps, duration } = playerState;
+
+    try {
+      const res = await fetch('/api/render/job-spec', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          compositionUrl: activeComposition.url,
+          fps,
+          duration,
+          width: canvasSize.width,
+          height: canvasSize.height,
+          inPoint,
+          outPoint,
+          inputProps: playerState.inputProps,
+          ...renderConfig
+        })
+      });
+
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || 'Failed to generate job spec');
+      }
+
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `job-${Date.now()}.json`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+
+      addToast('Job spec exported', 'success');
+    } catch (e: any) {
+      console.error('Failed to export job spec:', e);
+      addToast(e.message || 'Failed to export job spec', 'error');
+    }
+  };
+
   const openInEditor = (path: string) => {
     const safePath = path.replace(/^\/@fs/, '');
     fetch('/__open-in-editor?file=' + encodeURIComponent(safePath))
@@ -874,7 +920,8 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         exportProgress,
         exportVideo,
         cancelExport,
-        openInEditor
+        openInEditor,
+        exportJobSpec
       }}
     >
       {children}
