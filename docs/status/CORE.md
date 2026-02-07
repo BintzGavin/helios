@@ -1,6 +1,6 @@
 # Status: CORE
 
-**Version**: 5.12.0
+**Version**: 5.13.0
 
 **Posture**: STABLE AND FEATURE COMPLETE
 
@@ -8,6 +8,7 @@
 - **Current Focus**: Maintenance, Optimization, and Stability
 - **Last Updated**: 2026-08-15
 
+[v5.13.0] ✅ Completed: Generic Input Props - Refactored Helios class to accept generic TInputProps for strict property typing.
 [v5.12.0] ✅ Completed: Implement Active Clips - Added `timeline` to `HeliosOptions` and `activeClips` signal to `Helios` state, enabling declarative timeline management. Fixed critical bug in chained cold computed signals.
 [v5.11.0] ✅ Completed: Synchronize Version - Synced package.json version to 5.11.0 and added Input Schema documentation.
 [v5.11.0] ✅ Completed: Implement Composition Schema - Implemented HeliosConfig, HeliosComposition, and related interfaces to support serializable composition definitions.
