@@ -236,17 +236,21 @@ describe('HeliosPlayer API Parity', () => {
 
     player.currentTime = 5;
     expect(seekingSpy).toHaveBeenCalledTimes(1);
+    expect(player.seeking).toBe(true);
     expect(mockController.seek).toHaveBeenCalledWith(150); // 5 * 30
 
     await new Promise(resolve => setTimeout(resolve, 0));
     expect(seekedSpy).toHaveBeenCalledTimes(1);
+    expect(player.seeking).toBe(false);
 
     player.currentFrame = 10;
     expect(seekingSpy).toHaveBeenCalledTimes(2);
+    expect(player.seeking).toBe(true);
     expect(mockController.seek).toHaveBeenCalledWith(10);
 
     await new Promise(resolve => setTimeout(resolve, 0));
     expect(seekedSpy).toHaveBeenCalledTimes(2);
+    expect(player.seeking).toBe(false);
   });
 
   it('should support fastSeek method', () => {

@@ -86,6 +86,7 @@ export declare class HeliosPlayer extends HTMLElement implements TrackHost, Audi
     private abortController;
     private isExporting;
     private isScrubbing;
+    private _isSeeking;
     private wasPlayingBeforeScrub;
     private lastState;
     private pendingProps;
@@ -128,21 +129,25 @@ export declare class HeliosPlayer extends HTMLElement implements TrackHost, Audi
     /**
      * Gets the width attribute of the player.
      * Part of the Standard Media API parity.
+     * @returns {number} The width.
      */
     get width(): number;
     /**
      * Sets the width attribute of the player.
      * Part of the Standard Media API parity.
+     * @param {number} val The new width.
      */
     set width(val: number);
     /**
      * Gets the height attribute of the player.
      * Part of the Standard Media API parity.
+     * @returns {number} The height.
      */
     get height(): number;
     /**
      * Sets the height attribute of the player.
      * Part of the Standard Media API parity.
+     * @param {number} val The new height.
      */
     set height(val: number);
     get videoWidth(): number;
@@ -150,17 +155,20 @@ export declare class HeliosPlayer extends HTMLElement implements TrackHost, Audi
     /**
      * Gets whether the playsinline attribute is present.
      * Part of the Standard Media API parity.
+     * @returns {boolean} True if playsinline is present.
      */
     get playsInline(): boolean;
     /**
      * Sets the playsinline attribute.
      * Part of the Standard Media API parity.
+     * @param {boolean} val Whether playsinline should be present.
      */
     set playsInline(val: boolean);
     /**
      * Seeks to the specified time.
      * Part of the Standard Media API parity.
      * Note: In HeliosPlayer, this currently delegates to standard seek (currentTime setter).
+     * @param time The time to seek to.
      */
     fastSeek(time: number): void;
     get currentTime(): number;

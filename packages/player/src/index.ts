@@ -904,6 +904,7 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
   private abortController: AbortController | null = null;
   private isExporting: boolean = false;
   private isScrubbing: boolean = false;
+  private _isSeeking: boolean = false;
   private wasPlayingBeforeScrub: boolean = false;
   private lastState: any = null;
   private pendingProps: Record<string, any> | null = null;
@@ -1009,7 +1010,7 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
 
   public get seeking(): boolean {
     // Return internal scrubbing state as seeking
-    return this.isScrubbing;
+    return this.isScrubbing || this._isSeeking;
   }
 
   public get buffered(): TimeRanges {
@@ -1122,8 +1123,10 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
       const s = this.controller.getState();
       if (s.fps) {
         // Dispatch events to satisfy Standard Media API expectations
+        this._isSeeking = true;
         this.dispatchEvent(new Event("seeking"));
         this.controller.seek(Math.floor(val * s.fps)).then(() => {
+          this._isSeeking = false;
           this.dispatchEvent(new Event("seeked"));
         });
       }
@@ -1137,8 +1140,10 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
   public set currentFrame(val: number) {
     if (this.controller) {
       // Dispatch events to satisfy Standard Media API expectations
+      this._isSeeking = true;
       this.dispatchEvent(new Event("seeking"));
       this.controller.seek(Math.floor(val)).then(() => {
+        this._isSeeking = false;
         this.dispatchEvent(new Event("seeked"));
       });
     }

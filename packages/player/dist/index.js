@@ -866,6 +866,7 @@ export class HeliosPlayer extends HTMLElement {
     abortController = null;
     isExporting = false;
     isScrubbing = false;
+    _isSeeking = false;
     wasPlayingBeforeScrub = false;
     lastState = null;
     pendingProps = null;
@@ -951,7 +952,7 @@ export class HeliosPlayer extends HTMLElement {
     }
     get seeking() {
         // Return internal scrubbing state as seeking
-        return this.isScrubbing;
+        return this.isScrubbing || this._isSeeking;
     }
     get buffered() {
         return new StaticTimeRange(0, this.duration);
@@ -966,14 +967,16 @@ export class HeliosPlayer extends HTMLElement {
     /**
      * Gets the width attribute of the player.
      * Part of the Standard Media API parity.
+     * @returns {number} The width.
      */
     get width() {
         const val = this.getAttribute("width");
-        return val ? parseInt(val, 10) : 0;
+        return val ? (parseInt(val, 10) || 0) : 0;
     }
     /**
      * Sets the width attribute of the player.
      * Part of the Standard Media API parity.
+     * @param {number} val The new width.
      */
     set width(val) {
         this.setAttribute("width", String(val));
@@ -981,14 +984,16 @@ export class HeliosPlayer extends HTMLElement {
     /**
      * Gets the height attribute of the player.
      * Part of the Standard Media API parity.
+     * @returns {number} The height.
      */
     get height() {
         const val = this.getAttribute("height");
-        return val ? parseInt(val, 10) : 0;
+        return val ? (parseInt(val, 10) || 0) : 0;
     }
     /**
      * Sets the height attribute of the player.
      * Part of the Standard Media API parity.
+     * @param {number} val The new height.
      */
     set height(val) {
         this.setAttribute("height", String(val));
@@ -1012,6 +1017,7 @@ export class HeliosPlayer extends HTMLElement {
     /**
      * Gets whether the playsinline attribute is present.
      * Part of the Standard Media API parity.
+     * @returns {boolean} True if playsinline is present.
      */
     get playsInline() {
         return this.hasAttribute("playsinline");
@@ -1019,6 +1025,7 @@ export class HeliosPlayer extends HTMLElement {
     /**
      * Sets the playsinline attribute.
      * Part of the Standard Media API parity.
+     * @param {boolean} val Whether playsinline should be present.
      */
     set playsInline(val) {
         if (val) {
@@ -1032,6 +1039,7 @@ export class HeliosPlayer extends HTMLElement {
      * Seeks to the specified time.
      * Part of the Standard Media API parity.
      * Note: In HeliosPlayer, this currently delegates to standard seek (currentTime setter).
+     * @param time The time to seek to.
      */
     fastSeek(time) {
         this.currentTime = time;
@@ -1047,8 +1055,10 @@ export class HeliosPlayer extends HTMLElement {
             const s = this.controller.getState();
             if (s.fps) {
                 // Dispatch events to satisfy Standard Media API expectations
+                this._isSeeking = true;
                 this.dispatchEvent(new Event("seeking"));
                 this.controller.seek(Math.floor(val * s.fps)).then(() => {
+                    this._isSeeking = false;
                     this.dispatchEvent(new Event("seeked"));
                 });
             }
@@ -1060,8 +1070,10 @@ export class HeliosPlayer extends HTMLElement {
     set currentFrame(val) {
         if (this.controller) {
             // Dispatch events to satisfy Standard Media API expectations
+            this._isSeeking = true;
             this.dispatchEvent(new Event("seeking"));
             this.controller.seek(Math.floor(val)).then(() => {
+                this._isSeeking = false;
                 this.dispatchEvent(new Event("seeked"));
             });
         }

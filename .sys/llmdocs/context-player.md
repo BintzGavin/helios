@@ -76,6 +76,7 @@ The Shadow DOM contains:
 - `inputProps` (get/set): Object for composition properties.
 - `sandbox` (get/set): Security flags.
 - `disablePictureInPicture` (get/set): PiP availability.
+- `seeking` (get): Whether the player is currently seeking (scrubbing or waiting for async seek).
 
 ## E. Public Methods
 - `play(): Promise<void>`: Start playback.

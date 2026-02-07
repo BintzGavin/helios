@@ -48,6 +48,9 @@ Each agent should update **their own dedicated progress file** instead of this f
   - Created workflow skill for `declarative-timeline` (Timeline & Active Clips)
   - Updated API skills for `core`, `renderer`, `player`, and `cli`.
 
+### PLAYER v0.74.3
+- ✅ Completed: Fix Async Seek State - Fixed `seeking` property implementation to correctly return `true` during programmatic asynchronous seeks (e.g. via `currentTime` setter), ensuring Standard Media API compliance.
+
 ### CLI v0.15.0
 - ✅ Completed: Implement Build Command - Implemented `helios build` wrapping Vite for production builds.
 
