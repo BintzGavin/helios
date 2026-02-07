@@ -1,10 +1,11 @@
-**Version**: 1.79.0
+**Version**: 1.79.1
 
 **Posture**: MAINTENANCE WITH V2 EXPANSION
 
 # Renderer Agent Status
 
 ## Progress Log
+- [1.79.1] ✅ Completed: Update Skill Documentation - Updated `.agents/skills/helios/renderer/SKILL.md` to match current `types.ts` (including `hwAccel`) and identified critical learnings.
 - [1.79.0] ✅ Completed: Validate HW Accel - Implemented validation in `Renderer.render()` to check requested `hwAccel` against available FFmpeg hardware accelerations and log warnings for mismatches. Verified with `verify-hwaccel-validation.ts`.
 - [1.78.0] ✅ Completed: Orchestrator Plan - Implemented `RenderOrchestrator.plan()` static method to decouple job planning from execution, returning a serializable `RenderPlan`. Refactored `render()` to use this plan. Verified with `verify-orchestrator-plan.ts`.
 - [1.77.4] ✅ Completed: Refactor Media Sync Logic - Consolidated duplicated media attribute parsing and synchronization logic from `SeekTimeDriver`, `CdpTimeDriver`, and `dom-scanner` into shared utilities in `dom-scripts.ts`, ensuring consistency and maintainability. Verified with `verify-media-sync.ts`.

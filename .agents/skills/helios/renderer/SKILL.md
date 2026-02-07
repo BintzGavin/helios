@@ -67,6 +67,7 @@ interface RendererOptions {
   preset?: string;               // Encoding preset (e.g., 'fast')
   videoBitrate?: string;         // e.g., '5M', '1000k'
   subtitles?: string;            // Path to SRT file (requires libx264)
+  hwAccel?: string;              // e.g., 'cuda', 'vaapi', 'auto'
 
   // Intermediate Capture (Canvas Mode)
   intermediateVideoCodec?: string; // 'vp8' (default), 'vp9', 'av1'

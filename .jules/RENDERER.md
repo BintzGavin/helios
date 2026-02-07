@@ -49,3 +49,10 @@
 ## [2026-09-14] - FFmpeg Hardware Acceleration Implementation Gap
 **Learning:** The plan `2026-09-13-RENDERER-FFmpeg-Hardware-Acceleration.md` existed but the implementation was missing. Additionally, `FFmpegBuilder` lacked support for using the detected acceleration.
 **Action:** Created expanded plan `2026-09-14-RENDERER-FFmpeg-Hardware-Acceleration.md` to cover both detection and usage.
+
+## [1.79.1] - Skill Documentation Update
+**Learning:** Identified several critical gaps while updating `SKILL.md`:
+1. **Missing Web Audio Support**: `CanvasStrategy` lacks `AudioEncoder` integration.
+2. **Codec/PixelFormat Mismatch**: No validation for incompatible combinations like `libx264` + `yuva420p`.
+3. **GSAP Fragility**: `SeekTimeDriver` relies on global `window.__helios_gsap_timeline__`.
+**Action:** Updated `SKILL.md` to reflect current `types.ts` and noted these gaps for future planning.
