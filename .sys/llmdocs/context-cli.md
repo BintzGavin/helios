@@ -48,7 +48,7 @@ packages/cli/
 - `helios add [component]`: Adds a component to the project.
 - `helios list`: Lists installed components in the project.
 - `helios components`: Lists available components in the registry.
-- `helios render <input>`: Renders a composition to video.
+- `helios render <input>`: Renders a composition to video. Supports `--emit-job <path>` to generate a distributed render job spec using RenderOrchestrator.
 - `helios merge <output> [inputs...]`: Merges multiple video files into one without re-encoding.
 - `helios remove <component>`: Removes a component from the project configuration.
 - `helios update <component>`: Updates a component to the latest version.

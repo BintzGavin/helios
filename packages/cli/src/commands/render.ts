@@ -2,8 +2,21 @@ import { Command } from 'commander';
 import path from 'path';
 import fs from 'fs';
 import { pathToFileURL } from 'url';
-import { RenderOrchestrator, DistributedRenderOptions } from '@helios-project/renderer';
+import { RenderOrchestrator, DistributedRenderOptions, RendererOptions } from '@helios-project/renderer';
 import { JobSpec, RenderJobChunk } from '../types/job.js';
+
+function rendererOptionsToFlags(options: RendererOptions): string {
+  const flags: string[] = [];
+  if (options.width) flags.push(`--width ${options.width}`);
+  if (options.height) flags.push(`--height ${options.height}`);
+  if (options.fps) flags.push(`--fps ${options.fps}`);
+  if (options.crf !== undefined) flags.push(`--quality ${options.crf}`);
+  if (options.mode) flags.push(`--mode ${options.mode}`);
+  if (options.audioCodec) flags.push(`--audio-codec ${options.audioCodec}`);
+  if (options.videoCodec) flags.push(`--video-codec ${options.videoCodec}`);
+  if (options.browserConfig?.headless === false) flags.push('--no-headless');
+  return flags.join(' ');
+}
 
 export function registerRenderCommand(program: Command) {
   program
@@ -54,97 +67,58 @@ export function registerRenderCommand(program: Command) {
           const duration = parseInt(options.duration, 10);
           const width = parseInt(options.width, 10);
           const height = parseInt(options.height, 10);
+          const crf = options.quality ? parseInt(options.quality, 10) : undefined;
 
-          let totalFrames = frameCount;
-          if (totalFrames === undefined) {
-            totalFrames = Math.ceil(duration * fps);
+          const renderOptions: DistributedRenderOptions = {
+            width,
+            height,
+            fps,
+            durationInSeconds: duration,
+            crf,
+            mode: options.mode as 'canvas' | 'dom',
+            startFrame,
+            frameCount,
+            concurrency,
+            audioCodec: options.audioCodec,
+            videoCodec: options.videoCodec,
+            browserConfig: {
+              headless: options.headless,
+            },
+          };
+
+          const plan = RenderOrchestrator.plan(url, outputPath, renderOptions);
+
+          const chunks: RenderJobChunk[] = plan.chunks.map(chunk => {
+            const flags = rendererOptionsToFlags(chunk.options);
+            return {
+              id: chunk.id,
+              startFrame: chunk.startFrame,
+              frameCount: chunk.frameCount,
+              outputFile: chunk.outputFile,
+              // Use resolved URL for reliability in distributed environments
+              command: `helios render ${url} -o ${chunk.outputFile} --start-frame ${chunk.startFrame} --frame-count ${chunk.frameCount} ${flags}`
+            };
+          });
+
+          let mergeCommand = `helios merge ${outputPath} ${plan.concatManifest.join(' ')}`;
+
+          if (plan.mixOptions.videoCodec && plan.mixOptions.videoCodec !== 'copy') {
+            mergeCommand += ` --video-codec ${plan.mixOptions.videoCodec}`;
           }
-
-          const chunks: RenderJobChunk[] = [];
-          const chunkSize = Math.ceil(totalFrames / concurrency);
-          const outputDir = path.dirname(outputPath);
-          // Force intermediate chunks to be .mov for PCM support
-          const chunkExt = '.mov';
-          const outputExt = path.extname(outputPath); // Keep original for final output name calc if needed
-          const outputName = path.basename(outputPath, outputExt);
-
-          // Construct base command parts
-          const baseArgs = ['helios', 'render', input];
-          if (options.width) baseArgs.push('--width', options.width);
-          if (options.height) baseArgs.push('--height', options.height);
-          if (options.fps) baseArgs.push('--fps', options.fps);
-          // duration is derived from chunk frame count, but passing original duration doesn't hurt if frame-count overrides it
-          // actually, for clarity, we should omit duration if we pass frame-count
-          if (options.quality) baseArgs.push('--quality', options.quality);
-          if (options.mode) baseArgs.push('--mode', options.mode);
-          if (options.headless === false) baseArgs.push('--no-headless');
-
-          // Force robust intermediate codecs for chunks
-          // RenderOrchestrator uses pcm_s16le for audio to avoid sync issues.
-          // We don't force video codec (let it default or inherit), but user options are for FINAL output.
-          // Ideally, we should use a high-quality intermediate video codec if the user asks for h264 final.
-          // But for now, we just force audio to PCM and let video be default (likely h264 or what user passed? No, we shouldn't pass user's final codec to chunks if it's lossy/bad for stitching).
-          // Actually, we SHOULD ignore user's --audio-codec for chunks and force pcm_s16le.
-          baseArgs.push('--audio-codec', 'pcm_s16le');
-
-          // If user specified video codec, we might want to respect it for chunks IF it's safe?
-          // But concatenating h264 is risky.
-          // For now, we will NOT pass user's video-codec to chunks, letting Renderer default (which might be libx264).
-          // Wait, if we don't pass it, Renderer defaults to libx264.
-          // If we want "smart" distributed rendering, maybe we should use 'prores' or 'qtrle'?
-          // But that might result in huge files.
-          // Let's stick to explicitly setting PCM audio, and if the user provided a video codec, we assume they know what they are doing?
-          // No, the goal is "Robust". Robust means ignoring user errors.
-          // We will NOT pass user's video/audio codec options to chunks.
-          // We already skipped adding them above.
-
-          const mergeInputs = [];
-
-          for (let i = 0; i < concurrency; i++) {
-            const chunkStart = (startFrame || 0) + i * chunkSize;
-            // Calculate remaining frames based on current chunk index, not absolute frame
-            const framesProcessed = i * chunkSize;
-            const chunkCount = Math.min(chunkSize, totalFrames - framesProcessed);
-
-            if (chunkCount <= 0) break;
-
-            const chunkFilename = `${outputName}_part_${i}${chunkExt}`;
-            const chunkPath = path.join(outputDir, chunkFilename);
-            mergeInputs.push(chunkPath);
-
-            const chunkArgs = [...baseArgs];
-            chunkArgs.push('-o', chunkPath);
-            chunkArgs.push('--start-frame', chunkStart.toString());
-            chunkArgs.push('--frame-count', chunkCount.toString());
-
-            chunks.push({
-              id: i,
-              startFrame: chunkStart,
-              frameCount: chunkCount,
-              outputFile: chunkPath,
-              command: chunkArgs.join(' ')
-            });
+          if (plan.mixOptions.audioCodec) {
+            mergeCommand += ` --audio-codec ${plan.mixOptions.audioCodec}`;
           }
-
-          let mergeCommand = `helios merge ${outputPath} ${mergeInputs.join(' ')}`;
-
-          // Pass final output options to merge command for transcoding
-          if (options.videoCodec) mergeCommand += ` --video-codec ${options.videoCodec}`;
-          if (options.audioCodec) mergeCommand += ` --audio-codec ${options.audioCodec}`;
-          if (options.quality) mergeCommand += ` --quality ${options.quality}`;
-
-          // Use default robust video codec (libx264) for final merge if not specified,
-          // because we are transcoding from intermediate chunks.
-          // However, we should only add defaults if the user didn't specify.
-          // For now, only explicit user options are passed.
+          if (plan.mixOptions.crf !== undefined) {
+            mergeCommand += ` --quality ${plan.mixOptions.crf}`;
+          }
 
           const jobSpec: JobSpec = {
             metadata: {
-              totalFrames,
+              totalFrames: plan.totalFrames,
               fps,
               width,
               height,
-              duration: totalFrames / fps
+              duration: plan.totalFrames / fps
             },
             chunks,
             mergeCommand

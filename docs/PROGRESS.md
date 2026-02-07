@@ -13,6 +13,9 @@ Each agent should update **their own dedicated progress file** instead of this f
 - **STUDIO**: Update `docs/PROGRESS-STUDIO.md`
 - **SKILLS**: Update `docs/PROGRESS-SKILLS.md`
 
+### CLI v0.20.2
+- ✅ Completed: Use RenderOrchestrator Planning - Refactored `helios render --emit-job` to use `RenderOrchestrator.plan()` for consistent chunking and command generation.
+
 ### CLI v0.20.1
 - ✅ Completed: Performance Optimization - Optimized `helios init` file creation using `Promise.all` and `fs.promises` to improve concurrency and scalability.
 
