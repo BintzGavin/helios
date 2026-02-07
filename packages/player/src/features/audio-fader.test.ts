@@ -138,4 +138,49 @@ describe('AudioFader', () => {
 
     expect(mockSharedSource.setFadeGain).toHaveBeenCalledWith(1);
   });
+
+  it('should track dynamically added audio elements', async () => {
+    const doc = document.implementation.createHTMLDocument();
+    fader.connect(doc);
+
+    const audio = doc.createElement('audio');
+    audio.setAttribute('data-helios-fade-in', '2');
+    doc.body.appendChild(audio);
+
+    // Wait for MutationObserver callback
+    await new Promise(resolve => setTimeout(resolve, 10));
+
+    expect(mockManager.getSharedSource).toHaveBeenCalledWith(audio);
+  });
+
+  it('should stop tracking removed audio elements', async () => {
+    const doc = document.implementation.createHTMLDocument();
+    const audio = doc.createElement('audio');
+    audio.setAttribute('data-helios-fade-in', '2');
+    doc.body.appendChild(audio);
+
+    fader.connect(doc);
+    fader.enable();
+
+    // Verify it's being tracked (check if setFadeGain is called in loop)
+    // We need to set mock properties to trigger a gain calculation
+    Object.defineProperty(audio, 'duration', { value: 10, writable: true });
+    Object.defineProperty(audio, 'currentTime', { value: 1, writable: true }); // 0.5 gain
+
+    await new Promise(r => setTimeout(r, 10)); // Run loop
+    expect(mockSharedSource.setFadeGain).toHaveBeenCalled();
+    mockSharedSource.setFadeGain.mockClear();
+
+    // Remove element
+    doc.body.removeChild(audio);
+
+    // Wait for MutationObserver callback
+    await new Promise(resolve => setTimeout(resolve, 10));
+
+    // Run loop again
+    await new Promise(r => setTimeout(r, 10));
+
+    // Should not be called anymore because it was removed from sources
+    expect(mockSharedSource.setFadeGain).not.toHaveBeenCalled();
+  });
 });
