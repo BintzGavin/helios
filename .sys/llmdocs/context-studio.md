@@ -17,19 +17,20 @@ packages/studio/
 ├── src/
 │   ├── cli/             # CLI plugin logic
 │   ├── components/      # React UI components
+│   │   ├── AssetsPanel/       # Assets panel (Folder-based Tree View)
 │   │   ├── CompositionsPanel/ # Compositions panel (tested)
 │   │   ├── ComponentsPanel/   # Components registry panel (tested)
-│   │   ├── assets/      # Assets panel
-│   │   ├── layout/      # Application layout
-│   │   ├── props/       # Props editor
-│   │   ├── renders/     # Renders panel
-│   │   ├── stage/       # Preview stage
-│   │   └── timeline/    # Timeline editor
+│   │   ├── Layout/            # Application layout
+│   │   ├── RendersPanel/      # Renders panel
+│   │   ├── Stage/             # Preview stage
+│   │   ├── AudioMixerPanel/   # Audio mixer
+│   │   ├── CaptionsPanel/     # Captions editor
+│   │   └── ...
 │   ├── contexts/        # React contexts (StudioContext, ToastContext)
 │   ├── hooks/           # Custom hooks
 │   ├── server/          # Backend logic (API handlers, RenderManager)
 │   ├── types/           # TypeScript type definitions
-│   ├── utils/           # Utility functions
+│   ├── utils/           # Utility functions (tree.ts, etc)
 │   ├── App.tsx          # Main application component
 │   └── main.tsx         # Entry point
 ├── index.html           # HTML entry point
@@ -75,7 +76,7 @@ Options:
 - **Stage**: The main preview area displaying the `<helios-player>` component. Includes controls for zoom, pan, and safe areas.
 - **Timeline**: A multi-track timeline for visualization and scrubbing. Supports audio waveforms and markers.
 - **Props Editor**: A schema-aware editor for modifying composition input props in real-time.
-- **Assets Panel**: Allows browsing and dragging assets (images, video, audio) into the composition.
+- **Assets Panel**: Allows browsing and dragging assets (images, video, audio) into the composition. Supports folder-based organization, searching, filtering, and drag-and-drop uploads to specific folders.
 - **Components Panel**: Allows browsing, installing, updating, and removing components from the registry.
 - **Renders Panel**: Manages server-side render jobs (start, cancel, delete) and displays progress/results. Includes "Export Job Spec" for generating distributed render configurations.
 - **Omnibar**: A command palette (Cmd+K) for quick navigation and actions.

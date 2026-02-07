@@ -648,8 +648,17 @@ function configureMiddlewares(server: ViteDevServer | PreviewServer, isPreview: 
             const projectRoot = getProjectRoot(process.cwd());
             const publicDir = path.join(projectRoot, 'public');
 
+            const folderHeader = req.headers['x-folder'] as string || '';
+            const safeFolder = path.normalize(folderHeader).replace(/^(\.\.[\/\\])+/, '');
+
             // Use public directory if it exists, otherwise use project root
-            const targetDir = fs.existsSync(publicDir) ? publicDir : projectRoot;
+            const baseDir = fs.existsSync(publicDir) ? publicDir : projectRoot;
+            const targetDir = path.join(baseDir, safeFolder);
+
+            if (!fs.existsSync(targetDir)) {
+                fs.mkdirSync(targetDir, { recursive: true });
+            }
+
             const targetPath = path.join(targetDir, safeFilename);
 
             const writeStream = fs.createWriteStream(targetPath);

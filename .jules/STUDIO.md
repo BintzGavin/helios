@@ -109,3 +109,7 @@
 ## [0.104.1] - Protocol Adherence
 **Learning:** I violated the Planner role by implementing code.
 **Action:** Strictly adhere to producing only `.md` plan files.
+
+## [0.108.0] - Plan vs. State Sync
+**Learning:** I encountered a plan `2026-10-11-STUDIO-Implement-Preview-Command.md` which was already marked as completed in `docs/status/STUDIO.md` ([v0.104.3]). This created confusion about whether to re-implement or skip.
+**Action:** Always check `docs/status/STUDIO.md` and `docs/PROGRESS.md` *first* to verify if a plan in `/.sys/plans/` has already been executed, especially if the plan date is futuristic or ambiguous.

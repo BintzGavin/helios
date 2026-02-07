@@ -5,7 +5,7 @@ import { CompositionItem } from './CompositionItem';
 import './CompositionTree.css';
 
 interface CompositionTreeProps {
-  nodes: TreeNode[];
+  nodes: TreeNode<Composition>[];
   activeCompositionId: string | undefined;
   onSelect: (comp: Composition) => void;
   onDuplicate: (e: React.MouseEvent, comp: Composition) => void;
@@ -57,7 +57,7 @@ export const CompositionTree: React.FC<CompositionTreeProps> = ({
 };
 
 interface CompositionFolderProps {
-  node: TreeNode;
+  node: TreeNode<Composition>;
   activeCompositionId: string | undefined;
   onSelect: (comp: Composition) => void;
   onDuplicate: (e: React.MouseEvent, comp: Composition) => void;

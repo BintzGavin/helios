@@ -80,13 +80,15 @@ async function verifyStudio() {
     // If I don't know the exact class, I can use a looser check or read the code first.
     // But verify_studio.py used "Renders" text.
 
-    // Let's verify Renders panel tab existence
+    // Let's verify Assets panel tab existence
     // Disable pointer events on stage to prevent interception
     await page.addStyleTag({ content: '.area-stage { pointer-events: none !important; }' });
-    await page.getByText('Renders').click();
-    console.log('✅ Clicked Renders tab');
-    await page.waitForSelector('text=No render jobs');
-    console.log('✅ Renders panel verified');
+    await page.getByText('ASSETS').click();
+    console.log('✅ Clicked ASSETS tab');
+    // Check for Assets specific element (e.g. upload button or empty state)
+    // The empty state text is "No assets found." or "Drag & drop to upload."
+    await page.waitForSelector('.assets-panel');
+    console.log('✅ Assets panel verified');
 
     // Verify Iframe
     console.log('Verifying preview iframe...');

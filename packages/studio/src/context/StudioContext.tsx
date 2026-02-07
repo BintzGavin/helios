@@ -127,7 +127,7 @@ interface StudioContextType {
 
   // Assets
   assets: Asset[];
-  uploadAsset: (file: File) => Promise<void>;
+  uploadAsset: (file: File, folder?: string) => Promise<void>;
   deleteAsset: (id: string) => Promise<void>;
   renameAsset: (id: string, newName: string) => Promise<void>;
 
@@ -248,12 +248,13 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       });
   };
 
-  const uploadAsset = async (file: File) => {
+  const uploadAsset = async (file: File, folder?: string) => {
     try {
       await fetch('/api/assets/upload', {
         method: 'POST',
         headers: {
-          'x-filename': file.name
+          'x-filename': file.name,
+          'x-folder': folder || ''
         },
         body: file
       });

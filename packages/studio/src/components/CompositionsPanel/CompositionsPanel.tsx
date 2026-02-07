@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { useStudio, Composition } from '../../context/StudioContext';
 import { ConfirmationModal } from '../ConfirmationModal/ConfirmationModal';
-import { buildCompositionTree } from '../../utils/tree';
+import { buildTree } from '../../utils/tree';
 import { CompositionTree } from './CompositionTree';
 import './CompositionsPanel.css';
 
@@ -21,7 +21,7 @@ export const CompositionsPanel: React.FC = () => {
 
   // Build tree structure
   const treeNodes = useMemo(() => {
-    return buildCompositionTree(compositions, searchQuery);
+    return buildTree<Composition>(compositions, (c) => c.id, searchQuery, 'composition');
   }, [compositions, searchQuery]);
 
   const handleDuplicate = (e: React.MouseEvent, comp: Composition) => {

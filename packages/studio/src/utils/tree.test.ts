@@ -1,8 +1,8 @@
 import { describe, it, expect } from 'vitest';
-import { buildCompositionTree } from './tree';
+import { buildCompositionTree, buildTree } from './tree';
 import { Composition } from '../context/StudioContext';
 
-describe('buildCompositionTree', () => {
+describe('buildCompositionTree (Backward Compatibility)', () => {
   const mockCompositions: Composition[] = [
     { id: 'root-comp', name: 'Root Comp', url: '' },
     { id: 'folder/comp-a', name: 'Comp A', url: '' },
@@ -48,38 +48,41 @@ describe('buildCompositionTree', () => {
 
     expect(sub.children![0].label).toBe('Comp B');
   });
+});
 
-  it('filters folders by name', () => {
-    const tree = buildCompositionTree(mockCompositions, 'Sub');
-    // Should show Folder -> Sub -> Comp B
-    // Because Sub matches, we show it.
-    expect(tree).toHaveLength(1);
+describe('buildTree (Generic)', () => {
+  interface MockItem {
+    id: string;
+    name: string;
+    path: string;
+  }
+
+  const mockItems: MockItem[] = [
+    { id: '1', name: 'Item 1', path: 'folder/item1.txt' },
+    { id: '2', name: 'Item 2', path: 'item2.txt' },
+    { id: '3', name: 'Item 3', path: 'folder/sub/item3.txt' }
+  ];
+
+  it('builds tree using custom path getter', () => {
+    const tree = buildTree(mockItems, (item) => item.path, '', 'file');
+
+    // Expect Folder and Item 2 at root
+    expect(tree).toHaveLength(2);
     expect(tree[0].label).toBe('Folder');
+    expect(tree[0].type).toBe('folder');
 
-    const sub = tree[0].children![0];
+    expect(tree[1].label).toBe('Item 2');
+    expect(tree[1].type).toBe('file');
+
+    // Check nested
+    const folder = tree[0];
+    expect(folder.children).toHaveLength(2); // sub, item1.txt
+
+    const sub = folder.children![0];
     expect(sub.label).toBe('Sub');
-    // Children of matching folder are included?
-    // My logic: if matchesSelf, return true.
-    // Logic for children filtering is:
-    // const matchingChildren = node.children.filter...
-    // if matchingChildren > 0, keep children.
-    // if not, but matchesSelf, return true.
-    // So 'Sub' matches. 'Comp B' does not match 'Sub'.
-    // So 'Sub' has 0 matching children.
-    // But 'Sub' matches self. So 'Sub' is returned.
-    // 'Sub' children list will be empty?
-    // Let's check logic:
-    // `const matchingChildren = node.children.filter(...)`
-    // If length 0, `node.children` is NOT updated (stays original full list? No).
-    // Wait, I didn't update `node.children` if length 0.
-    // `if (matchingChildren.length > 0) { node.children = matchingChildren; ... }`
-    // So if 0 matches, node.children remains UNTOUCHED (all children).
-    // And matchesSelf is true.
-    // So we return true.
-    // So we see Sub and ALL its children.
-    // This is correct behavior for folder match.
 
-    expect(sub.children).toHaveLength(1);
-    expect(sub.children![0].label).toBe('Comp B');
+    const item3Node = sub.children![0];
+    expect(item3Node.label).toBe('Item 3');
+    expect(item3Node.data).toEqual(mockItems[2]);
   });
 });

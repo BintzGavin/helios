@@ -1,4 +1,4 @@
-**Version**: 0.107.0
+**Version**: 0.108.0
 
 **Posture**: ACTIVELY EXPANDING FOR V2
 
@@ -9,6 +9,7 @@
 **Focus**: UI Implementation & CLI
 
 ## Recent Updates
+- [v0.108.0] ✅ Completed: Asset Folders - Implemented folder-based Tree View for the Assets Panel with drag-and-drop organization and nested uploads.
 - [v0.107.0] ✅ Completed: Export Job Spec - Implemented "Export Job Spec" functionality in Renders Panel to generate distributed render job JSON files for cloud execution.
 - [v0.106.0] ✅ Completed: Configurable Example Registry (CLI) - Implemented `--repo` flag for `helios init` command, enabling scaffolding from custom GitHub repositories.
 - [v0.105.1] ✅ Verified: Components Panel Tests - Implemented comprehensive unit tests for ComponentsPanel covering loading, listing, install, update, and remove flows.

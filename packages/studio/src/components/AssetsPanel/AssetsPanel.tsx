@@ -1,6 +1,7 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useMemo } from 'react';
 import { useStudio, Asset } from '../../context/StudioContext';
-import { AssetItem } from './AssetItem';
+import { buildTree } from '../../utils/tree';
+import { AssetTree } from './AssetTree';
 import './AssetsPanel.css';
 
 export const AssetsPanel: React.FC = () => {
@@ -44,11 +45,21 @@ export const AssetsPanel: React.FC = () => {
       if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
-  const filteredAssets = assets.filter(asset => {
-    const matchesSearch = asset.name.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesType = filterType === 'all' || asset.type === filterType;
-    return matchesSearch && matchesType;
-  });
+  const handleTreeUpload = async (files: FileList, folder: string) => {
+      for (let i = 0; i < files.length; i++) {
+          await uploadAsset(files[i], folder);
+      }
+  };
+
+  const filteredAssets = useMemo(() => {
+    return assets.filter(asset => {
+        return filterType === 'all' || asset.type === filterType;
+    });
+  }, [assets, filterType]);
+
+  const treeNodes = useMemo(() => {
+    return buildTree<Asset>(filteredAssets, a => a.relativePath || a.name, searchQuery, 'file');
+  }, [filteredAssets, searchQuery]);
 
   return (
     <div
@@ -105,7 +116,7 @@ export const AssetsPanel: React.FC = () => {
       </div>
 
       <div className="assets-list">
-        {filteredAssets.length === 0 ? (
+        {treeNodes.length === 0 ? (
              <div className="assets-empty">
                 {assets.length === 0 ? (
                     <>No assets found.<br/>Drag & drop to upload.</>
@@ -114,9 +125,7 @@ export const AssetsPanel: React.FC = () => {
                 )}
              </div>
         ) : (
-            filteredAssets.map((asset) => (
-                <AssetItem key={asset.id} asset={asset} />
-            ))
+            <AssetTree nodes={treeNodes} onUpload={handleTreeUpload} />
         )}
       </div>
     </div>

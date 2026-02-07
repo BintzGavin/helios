@@ -1,21 +1,25 @@
-import { Composition } from '../context/StudioContext';
 
-export interface TreeNode {
+export interface TreeNode<T> {
   id: string;
   label: string;
-  type: 'folder' | 'composition';
-  children?: TreeNode[];
-  data?: Composition;
+  type: 'folder' | 'item' | string;
+  children?: TreeNode<T>[];
+  data?: T;
   isExpanded?: boolean; // Hint for initial render (e.g. search match)
 }
 
-export function buildCompositionTree(compositions: Composition[], filterText: string = ''): TreeNode[] {
-  const root: TreeNode[] = [];
-  const map: Record<string, TreeNode> = {};
+export function buildTree<T extends { name: string }>(
+  items: T[],
+  getPath: (item: T) => string,
+  filterText: string = '',
+  itemType: string = 'item'
+): TreeNode<T>[] {
+  const root: TreeNode<T>[] = [];
+  const map: Record<string, TreeNode<T>> = {};
   const query = filterText.toLowerCase().trim();
 
   // Helper to get or create folder node
-  const getOrCreateFolder = (pathSegments: string[], fullPath: string): TreeNode => {
+  const getOrCreateFolder = (pathSegments: string[], fullPath: string): TreeNode<T> => {
     if (map[fullPath]) return map[fullPath];
 
     const label = pathSegments[pathSegments.length - 1]
@@ -23,7 +27,7 @@ export function buildCompositionTree(compositions: Composition[], filterText: st
       .map(w => w.charAt(0).toUpperCase() + w.slice(1))
       .join(' ');
 
-    const node: TreeNode = {
+    const node: TreeNode<T> = {
       id: fullPath,
       label,
       type: 'folder',
@@ -47,16 +51,19 @@ export function buildCompositionTree(compositions: Composition[], filterText: st
   };
 
   // 1. Build full tree first
-  compositions.forEach(comp => {
-    const parts = comp.id.split('/');
+  items.forEach(item => {
+    const pathVal = getPath(item);
+    // Normalize path separators
+    const normalizedPath = pathVal.replace(/\\/g, '/');
+    const parts = normalizedPath.split('/');
 
     // If it's at root (no slashes), just add to root
     if (parts.length === 1) {
       root.push({
-        id: comp.id,
-        label: comp.name,
-        type: 'composition',
-        data: comp
+        id: pathVal, // Use path as ID for tree node
+        label: item.name,
+        type: itemType,
+        data: item
       });
       return;
     }
@@ -67,15 +74,15 @@ export function buildCompositionTree(compositions: Composition[], filterText: st
     const folder = getOrCreateFolder(folderParts, folderPath);
 
     folder.children!.push({
-      id: comp.id,
-      label: comp.name,
-      type: 'composition',
-      data: comp
+      id: pathVal,
+      label: item.name,
+      type: itemType,
+      data: item
     });
   });
 
   // 2. Sort function
-  const sortNodes = (nodes: TreeNode[]) => {
+  const sortNodes = (nodes: TreeNode<T>[]) => {
     nodes.sort((a, b) => {
       if (a.type === b.type) return a.label.localeCompare(b.label);
       return a.type === 'folder' ? -1 : 1; // Folders first
@@ -93,10 +100,10 @@ export function buildCompositionTree(compositions: Composition[], filterText: st
 
   // Recursive filter function
   // Returns true if node or any child matches
-  const filterNode = (node: TreeNode): boolean => {
+  const filterNode = (node: TreeNode<T>): boolean => {
     const matchesSelf = node.label.toLowerCase().includes(query);
 
-    if (node.type === 'composition') {
+    if (node.type === itemType) {
       return matchesSelf;
     }
 
@@ -112,13 +119,6 @@ export function buildCompositionTree(compositions: Composition[], filterText: st
       return true;
     }
 
-    // If folder itself matches, keep it (and maybe show empty? or all children?)
-    // Standard behavior: if folder matches, show all children.
-    // But here we filtered children recursively.
-    // Let's say if folder matches, we keep matching children.
-    // If folder matches but no children match, do we show it? Yes.
-    // If folder matches, should we show ALL children?
-    // Often yes. But let's stick to strict filtering for now to avoid clutter.
     return matchesSelf;
   };
 
@@ -127,4 +127,11 @@ export function buildCompositionTree(compositions: Composition[], filterText: st
   sortNodes(filteredRoot);
 
   return filteredRoot;
+}
+
+// Backward compatibility for existing tests if needed, or update tests
+// I will update tests, so I don't strictly need this, but it might help if I missed any import.
+import { Composition } from '../context/StudioContext';
+export function buildCompositionTree(compositions: Composition[], filterText: string = ''): TreeNode<Composition>[] {
+  return buildTree(compositions, c => c.id, filterText, 'composition');
 }

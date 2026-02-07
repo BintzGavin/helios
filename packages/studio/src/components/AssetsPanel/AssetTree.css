@@ -1,0 +1,60 @@
+.asset-tree {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.asset-folder {
+  display: flex;
+  flex-direction: column;
+}
+
+.asset-folder-header {
+  display: flex;
+  align-items: center;
+  padding: 6px 4px;
+  cursor: pointer;
+  color: #aaa;
+  font-weight: 500;
+  font-size: 0.85rem;
+  border-radius: 4px;
+  user-select: none;
+  transition: color 0.2s, background-color 0.2s;
+}
+
+.asset-folder-header:hover {
+  background-color: #2a2a2a;
+  color: #fff;
+}
+
+.asset-folder-header.drag-over {
+  background-color: rgba(50, 150, 255, 0.2);
+  border: 1px dashed #3296ff;
+  color: #fff;
+}
+
+.folder-icon {
+  margin-right: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+}
+
+.asset-folder-body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-left: 12px;
+  margin-top: 4px;
+  border-left: 1px solid #333;
+  margin-left: 8px;
+}
+
+.assets-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 4px 0;
+}
