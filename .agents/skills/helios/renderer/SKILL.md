@@ -71,6 +71,7 @@ interface RendererOptions {
   // Intermediate Capture (Canvas Mode)
   intermediateVideoCodec?: string; // 'vp8' (default), 'vp9', 'av1'
   keyFrameInterval?: number;       // Keyframe interval in frames (default: fps * 2)
+  hwAccel?: string;                // Hardware acceleration (e.g., 'cuda', 'vaapi', 'auto')
 
   // Intermediate Capture (DOM Mode)
   intermediateImageFormat?: 'png' | 'jpeg'; // Default: 'png'
@@ -87,6 +88,7 @@ interface RendererOptions {
 
 interface AudioTrackConfig {
   path: string;
+  buffer?: Buffer; // Buffer containing audio data (alternative to path)
   volume?: number; // 0.0 to 1.0
   offset?: number; // Start time in composition (seconds)
   seek?: number;   // Start time in source file (seconds)

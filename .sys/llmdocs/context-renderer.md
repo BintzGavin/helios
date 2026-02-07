@@ -51,7 +51,7 @@ interface RendererOptions {
   mode?: 'canvas' | 'dom';
   videoCodec?: 'libx264' | 'libvpx-vp9' | 'copy';
   audioFilePath?: string;
-  audioTracks?: AudioTrackConfig[];
+  audioTracks?: (string | AudioTrackConfig)[]; // Path or config object (supports buffer)
   subtitles?: string; // Path to SRT file
   inputProps?: Record<string, any>;
   concurrency?: number; // For distributed rendering
