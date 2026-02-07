@@ -112,12 +112,16 @@ function parseMarkdown(pkg: string, content: string, sections: DocSection[], tit
   flush();
 }
 
-function findSkills(cwd: string, sections: DocSection[]) {
+function findSkills(cwd: string, sections: DocSection[], skillsRootOverride?: string) {
   let skillsRoot: string | null = null;
   const possiblePaths = [
       path.resolve(cwd, '../../.agents/skills/helios'), // From packages/studio
       path.resolve(cwd, '.agents/skills/helios')        // From root
   ];
+
+  if (skillsRootOverride) {
+      possiblePaths.push(skillsRootOverride);
+  }
 
   for (const p of possiblePaths) {
       if (fs.existsSync(p)) {
@@ -142,7 +146,7 @@ function findSkills(cwd: string, sections: DocSection[]) {
   }
 }
 
-export function findDocumentation(cwd: string): DocSection[] {
+export function findDocumentation(cwd: string, skillsRoot?: string): DocSection[] {
   const sections: DocSection[] = [];
 
   const packages = ['core', 'studio', 'renderer', 'player', 'root'];
@@ -159,7 +163,7 @@ export function findDocumentation(cwd: string): DocSection[] {
       }
   }
 
-  findSkills(cwd, sections);
+  findSkills(cwd, sections, skillsRoot);
 
   return sections;
 }

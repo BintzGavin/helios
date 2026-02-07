@@ -4,6 +4,7 @@ import { studioApiPlugin } from '@helios-project/studio/cli';
 import { createRequire } from 'module';
 import path from 'path';
 import fs from 'fs';
+import { fileURLToPath } from 'url';
 import { defaultClient } from '../registry/client.js';
 import { installComponent } from '../utils/install.js';
 import { loadConfig } from '../utils/config.js';
@@ -31,7 +32,15 @@ export function registerStudioCommand(program: Command) {
         const studioRoot = path.resolve(path.dirname(studioCliPath), '../../');
         const studioDist = path.join(studioRoot, 'dist');
 
+        // Resolve bundled skills path relative to this CLI file
+        const __filename = fileURLToPath(import.meta.url);
+        const __dirname = path.dirname(__filename);
+        const skillsRoot = path.resolve(__dirname, '../skills');
+
         console.log(`Studio Root: ${studioRoot}`);
+        if (fs.existsSync(skillsRoot)) {
+            console.log(`Skills Root: ${skillsRoot}`);
+        }
 
         const server = await createServer({
           // configFile: false, // Removed to allow loading user config (crucial for framework plugins)
@@ -43,6 +52,7 @@ export function registerStudioCommand(program: Command) {
           plugins: [
             studioApiPlugin({
               studioRoot: studioDist,
+              skillsRoot: skillsRoot,
               components: components,
               onInstallComponent: async (name: string) => {
                 await installComponent(process.cwd(), name);

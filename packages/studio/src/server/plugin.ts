@@ -19,6 +19,7 @@ export interface StudioComponentDefinition {
 
 export interface StudioPluginOptions {
   studioRoot?: string;
+  skillsRoot?: string;
   components?: StudioComponentDefinition[];
   onInstallComponent?: (name: string) => Promise<void>;
   onCheckInstalled?: (name: string) => Promise<boolean>;
@@ -464,7 +465,7 @@ function configureMiddlewares(server: ViteDevServer | PreviewServer, isPreview: 
       server.middlewares.use('/api/documentation', async (req, res, next) => {
         if (req.url === '/' || req.url === '') {
           try {
-            const docs = findDocumentation(process.cwd());
+            const docs = findDocumentation(process.cwd(), options.skillsRoot);
             res.setHeader('Content-Type', 'application/json');
             res.end(JSON.stringify(docs));
           } catch (e: any) {
