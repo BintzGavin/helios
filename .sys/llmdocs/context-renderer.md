@@ -76,6 +76,7 @@ interface RendererOptions {
   audioCodec?: string;
   pixelFormat?: string; // e.g. 'yuv420p', 'yuva420p'
   intermediateVideoCodec?: string; // For Canvas WebCodecs (e.g. 'avc1', 'vp9')
+  keyFrameInterval?: number; // GOP size for WebCodecs
   intermediateImageFormat?: 'png' | 'jpeg'; // For DOM/Fallback
   stabilityTimeout?: number; // Timeout for asset loading (default: 30000ms)
   inputProps?: Record<string, any>; // Injected into window.__HELIOS_PROPS__

@@ -41,3 +41,15 @@
 ## [1.76.0] - Role Adherence Failure
 **Learning:** I mistakenly acted as an Executor, implementing code (`dom-preload.ts`) instead of creating a Spec File. This violated the "Vision-Driven Planner" protocol and the "Never modify packages" rule.
 **Action:** Strictly adhere to the "Spec File Only" output. Verify role definition before starting.
+
+## [1.77.2] - Missing Web Audio Support
+**Learning:** `CanvasStrategy` currently lacks integration with `AudioEncoder` or Web Audio API capture, meaning procedural audio (e.g., from Tone.js or oscillators) is not captured. Only DOM `<audio>/<video>` elements are supported via `mixInputAudio` or explicit tracks.
+**Action:** Documented limitation in internal knowledge; needs a proper implementation plan.
+
+## [1.77.2] - Codec/PixelFormat Validation Gap
+**Learning:** The Renderer does not validate incompatible combinations of codecs and pixel formats (e.g., `libx264` with `yuva420p` for transparency). This leads to FFmpeg errors or silent loss of transparency without clear feedback to the user.
+**Action:** Documented limitation; future work should implement a validation layer in `Renderer.ts` to reject or warn about known incompatible configurations.
+
+## [1.77.2] - GSAP Timeline Fragility
+**Learning:** `SeekTimeDriver` relies on the global `window.__helios_gsap_timeline__` to synchronize GSAP animations. If this global is missing or not set correctly by the user's code, GSAP animations may not scrub correctly during rendering.
+**Action:** Documented in `SKILL.md` under Common Issues.
