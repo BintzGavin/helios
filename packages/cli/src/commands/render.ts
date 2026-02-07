@@ -60,16 +60,31 @@ export function registerRenderCommand(program: Command) {
             totalFrames = Math.ceil(duration * fps);
           }
 
+          // Resolve job path and directory
+          const jobPath = path.resolve(process.cwd(), options.emitJob);
+          const jobDir = path.dirname(jobPath);
+
           const chunks: RenderJobChunk[] = [];
           const chunkSize = Math.ceil(totalFrames / concurrency);
           const outputDir = path.dirname(outputPath);
+
+          // Calculate paths relative to the job file
+          let relInput = input;
+          if (!input.startsWith('http')) {
+             const absInputPath = path.resolve(process.cwd(), input);
+             relInput = path.relative(jobDir, absInputPath);
+          }
+
+          const relOutput = path.relative(jobDir, outputPath);
+          const relOutputDir = path.relative(jobDir, outputDir);
+
           // Force intermediate chunks to be .mov for PCM support
           const chunkExt = '.mov';
           const outputExt = path.extname(outputPath); // Keep original for final output name calc if needed
           const outputName = path.basename(outputPath, outputExt);
 
-          // Construct base command parts
-          const baseArgs = ['helios', 'render', input];
+          // Construct base command parts using RELATIVE input
+          const baseArgs = ['helios', 'render', relInput];
           if (options.width) baseArgs.push('--width', options.width);
           if (options.height) baseArgs.push('--height', options.height);
           if (options.fps) baseArgs.push('--fps', options.fps);
@@ -81,22 +96,7 @@ export function registerRenderCommand(program: Command) {
 
           // Force robust intermediate codecs for chunks
           // RenderOrchestrator uses pcm_s16le for audio to avoid sync issues.
-          // We don't force video codec (let it default or inherit), but user options are for FINAL output.
-          // Ideally, we should use a high-quality intermediate video codec if the user asks for h264 final.
-          // But for now, we just force audio to PCM and let video be default (likely h264 or what user passed? No, we shouldn't pass user's final codec to chunks if it's lossy/bad for stitching).
-          // Actually, we SHOULD ignore user's --audio-codec for chunks and force pcm_s16le.
           baseArgs.push('--audio-codec', 'pcm_s16le');
-
-          // If user specified video codec, we might want to respect it for chunks IF it's safe?
-          // But concatenating h264 is risky.
-          // For now, we will NOT pass user's video-codec to chunks, letting Renderer default (which might be libx264).
-          // Wait, if we don't pass it, Renderer defaults to libx264.
-          // If we want "smart" distributed rendering, maybe we should use 'prores' or 'qtrle'?
-          // But that might result in huge files.
-          // Let's stick to explicitly setting PCM audio, and if the user provided a video codec, we assume they know what they are doing?
-          // No, the goal is "Robust". Robust means ignoring user errors.
-          // We will NOT pass user's video/audio codec options to chunks.
-          // We already skipped adding them above.
 
           const mergeInputs = [];
 
@@ -109,11 +109,14 @@ export function registerRenderCommand(program: Command) {
             if (chunkCount <= 0) break;
 
             const chunkFilename = `${outputName}_part_${i}${chunkExt}`;
-            const chunkPath = path.join(outputDir, chunkFilename);
-            mergeInputs.push(chunkPath);
+
+            // chunkPath for COMMAND (relative to jobDir)
+            const relChunkPath = path.join(relOutputDir, chunkFilename);
+
+            mergeInputs.push(relChunkPath);
 
             const chunkArgs = [...baseArgs];
-            chunkArgs.push('-o', chunkPath);
+            chunkArgs.push('-o', relChunkPath);
             chunkArgs.push('--start-frame', chunkStart.toString());
             chunkArgs.push('--frame-count', chunkCount.toString());
 
@@ -121,22 +124,17 @@ export function registerRenderCommand(program: Command) {
               id: i,
               startFrame: chunkStart,
               frameCount: chunkCount,
-              outputFile: chunkPath,
+              outputFile: relChunkPath, // Store relative path
               command: chunkArgs.join(' ')
             });
           }
 
-          let mergeCommand = `helios merge ${outputPath} ${mergeInputs.join(' ')}`;
+          let mergeCommand = `helios merge ${relOutput} ${mergeInputs.join(' ')}`;
 
           // Pass final output options to merge command for transcoding
           if (options.videoCodec) mergeCommand += ` --video-codec ${options.videoCodec}`;
           if (options.audioCodec) mergeCommand += ` --audio-codec ${options.audioCodec}`;
           if (options.quality) mergeCommand += ` --quality ${options.quality}`;
-
-          // Use default robust video codec (libx264) for final merge if not specified,
-          // because we are transcoding from intermediate chunks.
-          // However, we should only add defaults if the user didn't specify.
-          // For now, only explicit user options are passed.
 
           const jobSpec: JobSpec = {
             metadata: {
@@ -150,7 +148,6 @@ export function registerRenderCommand(program: Command) {
             mergeCommand
           };
 
-          const jobPath = path.resolve(process.cwd(), options.emitJob);
           fs.writeFileSync(jobPath, JSON.stringify(jobSpec, null, 2));
           console.log(`Job spec written to ${jobPath}`);
           return;

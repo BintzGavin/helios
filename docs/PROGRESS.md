@@ -13,6 +13,9 @@ Each agent should update **their own dedicated progress file** instead of this f
 - **STUDIO**: Update `docs/PROGRESS-STUDIO.md`
 - **SKILLS**: Update `docs/PROGRESS-SKILLS.md`
 
+### CLI v0.20.0
+- ✅ Completed: Portable Job Paths - Implemented relative path calculation for `--emit-job` and set `cwd` during execution in `helios job run`, enabling portable distributed rendering jobs.
+
 ### CORE v5.13.0
 - ✅ Completed: Generic Input Props - Refactored Helios class to accept generic TInputProps for strict property typing.
 

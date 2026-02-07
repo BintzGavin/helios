@@ -2,6 +2,10 @@
 
 This file tracks progress for the CLI domain (`packages/cli`).
 
+## CLI v0.20.0
+
+- ✅ Portable Job Paths - Implemented relative path calculation for `--emit-job` and set `cwd` during execution in `helios job run`, enabling portable distributed rendering jobs.
+
 ## CLI v0.19.0
 
 - ✅ Implement Preview Command - Implemented `helios preview` to serve the production build locally using Vite.

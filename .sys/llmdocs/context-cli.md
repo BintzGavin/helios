@@ -47,13 +47,13 @@ packages/cli/
 - `helios add [component]`: Adds a component to the project.
 - `helios list`: Lists installed components in the project.
 - `helios components`: Lists available components in the registry.
-- `helios render <input>`: Renders a composition to video.
+- `helios render <input>`: Renders a composition to video. Supports `--emit-job` for creating distributed render specs.
 - `helios merge <output> [inputs...]`: Merges multiple video files into one without re-encoding.
 - `helios remove <component>`: Removes a component from the project configuration.
 - `helios update <component>`: Updates a component to the latest version.
 - `helios build`: Builds the project for production using Vite.
 - `helios preview [dir]`: Previews the production build locally using Vite.
-- `helios job run <file>`: Execute a distributed render job from a JSON spec.
+- `helios job run <file>`: Execute a distributed render job from a JSON spec. Supports portable/relative paths.
 - `helios skills install`: Installs AI agent skills into the project.
 
 ## D. Configuration

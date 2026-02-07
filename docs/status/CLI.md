@@ -1,6 +1,6 @@
 # CLI Status
 
-**Version**: 0.19.0
+**Version**: 0.20.0
 
 ## Current State
 
@@ -67,3 +67,4 @@ Per AGENTS.md, the CLI is "ACTIVELY EXPANDING FOR V2" with focus on:
 [v0.17.0] ✅ Implement Job Command - Implemented `helios job run` to execute distributed rendering jobs from JSON specifications, supporting concurrency and selective chunk execution.
 [v0.18.0] ✅ Implement Skills Command - Implemented `helios skills install` to distribute AI agent skills to user projects.
 [v0.19.0] ✅ Implement Preview Command - Implemented `helios preview` to serve the production build locally using Vite.
+[v0.20.0] ✅ Portable Job Paths - Implemented relative path calculation for `--emit-job` and set `cwd` during execution in `helios job run`, enabling portable distributed rendering jobs.
