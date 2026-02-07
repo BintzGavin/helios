@@ -29,19 +29,19 @@ function getJobsFilePath() {
 let savePromise: Promise<void> | null = null;
 let nextSavePromise: Promise<void> | null = null;
 
-async function performSave() {
+async function performSave(): Promise<void> {
   const file = getJobsFilePath();
   const rendersDir = path.dirname(file);
   try {
     await fs.promises.mkdir(rendersDir, { recursive: true });
     const jobList = Array.from(jobs.values());
     await fs.promises.writeFile(file, JSON.stringify(jobList, null, 2));
-  } catch (e) {
+  } catch (e: any) {
     console.error('[RenderManager] Failed to save jobs history:', e);
   }
 }
 
-async function saveJobs() {
+async function saveJobs(): Promise<void> {
   if (savePromise) {
     if (!nextSavePromise) {
       nextSavePromise = savePromise.then(() => {
@@ -78,10 +78,10 @@ function loadJobs() {
            jobs.set(job.id, job);
         }
         if (changed) {
-          saveJobs().catch(e => console.error('[RenderManager] Failed to save cleaned jobs:', e));
+          saveJobs().catch((e: any) => console.error('[RenderManager] Failed to save cleaned jobs:', e));
         }
       }
-    } catch (e) {
+    } catch (e: any) {
       console.warn('[RenderManager] Failed to load jobs history:', e);
     }
   }
@@ -244,7 +244,7 @@ export async function deleteJob(id: string): Promise<boolean> {
     try {
       fs.unlinkSync(job.outputPath);
       console.log(`[RenderManager] Deleted output file for job ${id}`);
-    } catch (e) {
+    } catch (e: any) {
       console.error(`[RenderManager] Failed to delete file ${job.outputPath}`, e);
     }
   }
