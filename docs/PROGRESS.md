@@ -16,6 +16,9 @@ Each agent should update **their own dedicated progress file** instead of this f
 ### CLI v0.18.0
 - ✅ Completed: Implement Skills Command - Implemented `helios skills install` to distribute AI agent skills to user projects.
 
+### RENDERER v1.77.2
+- ✅ Completed: Fix Verification Script Regression - Updated `verify-asset-timeout.ts` to check for the correct log prefixes (`[Helios Preload]`, `[DomScanner]`) instead of `[DomStrategy]`, fixing a regression caused by the v1.77.1 DOM traversal refactor. Verified with `verify-asset-timeout.ts`.
+
 ### RENDERER v1.77.1
 - ✅ Completed: Refactor DOM Traversal - Consolidated duplicated DOM traversal logic (`findAllImages`, `findAllScopes`, `findAllElements`) into `dom-scripts.ts` and updated `DomStrategy` (preload) and `SeekTimeDriver` to use shared constants. Verified with `verify-enhanced-dom-preload.ts`.
 
