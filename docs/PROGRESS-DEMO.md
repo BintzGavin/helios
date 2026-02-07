@@ -1,3 +1,6 @@
+## DEMO v1.130.0
+- ✅ Completed: Standardize Simple Canvas Animation Example - Modernized `examples/simple-canvas-animation` with TypeScript, `package.json`, and proper build config.
+
 ## DEMO v1.129.0
 - ✅ Completed: Standardize React Canvas Animation Example - Modernized `examples/react-canvas-animation` with TypeScript, `package.json`, and proper build config.
 
