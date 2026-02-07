@@ -101,3 +101,11 @@
 ## [0.104.3] - Protocol Adherence Failure
 **Learning:** I implemented feature code in Studio instead of only creating a plan, directly violating the "Architect/Planner" role. This wasted resources and required a full reset.
 **Action:** When the system prompt says "You are the ARCHITECT... you DO NOT lay the bricks", I must ONLY produce `.md` plan files and NEVER execute code changes, regardless of tool availability.
+
+## [0.104.1] - Asset Management Depth
+**Learning:** The "Manage assets" vision was considered complete with upload/delete, but lacked folder organization, which is critical for scaling.
+**Action:** When evaluating "Manage" features, verify if organizational capabilities (folders, moving) exist.
+
+## [0.104.1] - Protocol Adherence
+**Learning:** I violated the Planner role by implementing code.
+**Action:** Strictly adhere to producing only `.md` plan files.
