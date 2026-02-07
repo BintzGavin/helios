@@ -17,6 +17,7 @@ export class AudioMeter {
   private sources: Map<HTMLMediaElement, SharedAudioSource> = new Map();
   private isEnabled: boolean = false;
   private manager: SharedAudioContextManager;
+  private observer: MutationObserver | null = null;
 
   constructor() {
     this.manager = SharedAudioContextManager.getInstance();
@@ -37,14 +38,57 @@ export class AudioMeter {
     this.splitter.connect(this.analyserRight, 1);
   }
 
-  connect(doc: Document) {
+  connect(doc: Document | ShadowRoot) {
     if (this.ctx.state === 'suspended') {
       this.ctx.resume().catch(e => console.warn("AudioMeter: Failed to resume context", e));
     }
 
-    const mediaElements = Array.from(doc.querySelectorAll('audio, video')) as HTMLMediaElement[];
+    const scanElement = (el: Element) => {
+      if (el.tagName !== 'AUDIO' && el.tagName !== 'VIDEO') return;
+      const mediaEl = el as HTMLMediaElement;
+      this.connectElement(mediaEl);
+    };
 
-    mediaElements.forEach(el => {
+    // Initial scan
+    const mediaElements = Array.from(doc.querySelectorAll('audio, video')) as HTMLMediaElement[];
+    mediaElements.forEach(el => this.connectElement(el));
+
+    // Observer for dynamic elements
+    this.observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        mutation.addedNodes.forEach((node) => {
+          if (node.nodeType === Node.ELEMENT_NODE) {
+            const el = node as Element;
+            // Check the element itself
+            scanElement(el);
+            // Check children if a container was added
+            const children = el.querySelectorAll('audio, video');
+            children.forEach(child => scanElement(child));
+          }
+        });
+
+        mutation.removedNodes.forEach((node) => {
+          if (node.nodeType === Node.ELEMENT_NODE) {
+            const el = node as Element;
+            if (el.tagName === 'AUDIO' || el.tagName === 'VIDEO') {
+                this.disconnectElement(el as HTMLMediaElement);
+            }
+
+            // Also check children if a container was removed
+            const descendants = el.querySelectorAll('audio, video');
+            descendants.forEach(d => {
+                this.disconnectElement(d as HTMLMediaElement);
+            });
+          }
+        });
+      });
+    });
+
+    const target = (doc as Document).body || doc;
+    this.observer.observe(target, { childList: true, subtree: true });
+  }
+
+  private connectElement(el: HTMLMediaElement) {
       if (this.sources.has(el)) return;
 
       try {
@@ -60,7 +104,14 @@ export class AudioMeter {
       } catch (e) {
         console.warn('AudioMeter: Failed to connect element', e);
       }
-    });
+  }
+
+  private disconnectElement(el: HTMLMediaElement) {
+      const source = this.sources.get(el);
+      if (source) {
+          source.disconnect(this.splitter);
+          this.sources.delete(el);
+      }
   }
 
   enable() {
@@ -119,6 +170,11 @@ export class AudioMeter {
   }
 
   dispose() {
+    if (this.observer) {
+        this.observer.disconnect();
+        this.observer = null;
+    }
+
     this.sources.forEach(source => {
         source.disconnect(this.splitter);
     });

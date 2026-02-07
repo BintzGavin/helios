@@ -222,5 +222,5 @@ Each agent should update **their own dedicated progress file** instead of this f
 ## PLAYER v0.75.0
 - ✅ Completed: Implement Standard Event Handlers - Implemented standard HTMLMediaElement event handler properties (onplay, onpause, etc.) on HeliosPlayer for improved API parity.
 
-## PLAYER v0.75.0
-- ✅ Completed: Implement Standard Event Handlers - Implemented standard HTMLMediaElement event handler properties (onplay, onpause, etc.) on HeliosPlayer for improved API parity.
+## PLAYER v0.76.0
+- ✅ Completed: Dynamic Audio Metering - Implemented MutationObserver in AudioMeter to detect and meter dynamically added media elements.

@@ -1,4 +1,4 @@
-**Version**: v0.75.0
+**Version**: v0.76.0
 
 **Posture**: STABLE AND FEATURE COMPLETE
 
@@ -60,6 +60,8 @@
 - **Export API**: Exposes public `export()` method for programmatic control over client-side exports, supporting Video (MP4/WebM) and Snapshot (PNG/JPEG) formats.
 - **Export Menu**: Implements a dedicated Export Menu in the player UI (replacing the direct export button action) to allow configuring format, resolution, filename, and captions before exporting or taking a snapshot.
 
+[v0.76.0] ✅ Completed: Dynamic Audio Metering - Implemented MutationObserver in AudioMeter to detect and meter dynamically added media elements.
+[v0.75.0] ✅ Completed: Implement Standard Event Handlers - Implemented standard HTMLMediaElement event handler properties (onplay, onpause, etc.) on HeliosPlayer for improved API parity.
 [v0.74.4] ✅ Completed: Sync Version - Synced package.json version with status file and verified all tests pass.
 [v0.74.3] ✅ Completed: Fix Async Seek State - Fixed `seeking` property implementation to correctly return `true` during programmatic asynchronous seeks (e.g. via `currentTime` setter), ensuring Standard Media API compliance.
 [v0.74.2] ✅ Completed: Api Parity Improvements - Fixed logic for `width`/`height` getters to handle invalid input gracefully, added missing test coverage, and updated documentation for Standard Media API parity.
@@ -188,5 +190,3 @@
 [v0.6.0] ✅ Completed: Keyboard & Fullscreen Support - Implemented standard keyboard shortcuts (Space, F, Arrows) and Fullscreen UI/logic.
 [v0.5.2] ✅ Completed: Scaffold Tests - Added unit test suite for controllers and exporter using Vitest.
 [v0.5.1] ✅ Completed: Standard Attributes - Implemented `autoplay`, `loop`, and `controls` attributes. Synced version and artifacts.
-[v0.75.0] ✅ Completed: Implement Standard Event Handlers - Implemented standard HTMLMediaElement event handler properties (onplay, onpause, etc.) on HeliosPlayer for improved API parity.
-[v0.75.0] ✅ Completed: Implement Standard Event Handlers - Implemented standard HTMLMediaElement event handler properties (onplay, onpause, etc.) on HeliosPlayer for improved API parity.
