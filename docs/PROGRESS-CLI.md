@@ -2,6 +2,14 @@
 
 This file tracks progress for the CLI domain (`packages/cli`).
 
+## CLI v0.20.1
+
+- ✅ Performance Optimization - Optimized `helios init` file creation using `Promise.all` and `fs.promises` to improve concurrency and scalability.
+
+## CLI v0.20.0
+
+- ✅ Implement Example Init - Implemented `helios init --example` to fetch, download, and transform examples from GitHub.
+
 ## CLI v0.19.0
 
 - ✅ Implement Preview Command - Implemented `helios preview` to serve the production build locally using Vite.

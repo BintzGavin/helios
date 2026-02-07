@@ -147,15 +147,18 @@ export function registerInitCommand(program: Command) {
           console.log(chalk.cyan(`Scaffolding new Helios project (${selectedFramework})...`));
           try {
             const template = TEMPLATES[selectedFramework];
-            for (const [filepath, content] of Object.entries(template)) {
+            const entries = Object.entries(template);
+
+            // Create directories first
+            const dirs = new Set(entries.map(([filepath]) => path.dirname(path.resolve(targetDir, filepath))));
+            await Promise.all(Array.from(dirs).map(dir => fs.promises.mkdir(dir, { recursive: true })));
+
+            // Write files in parallel
+            await Promise.all(entries.map(async ([filepath, content]) => {
               const fullPath = path.resolve(targetDir, filepath);
-              const dir = path.dirname(fullPath);
-              if (!fs.existsSync(dir)) {
-                fs.mkdirSync(dir, { recursive: true });
-              }
-              fs.writeFileSync(fullPath, content);
+              await fs.promises.writeFile(fullPath, content);
               console.log(chalk.green(`Created ${filepath}`));
-            }
+            }));
             isScaffolded = true;
             console.log(chalk.green('Project structure created.'));
           } catch (error) {
