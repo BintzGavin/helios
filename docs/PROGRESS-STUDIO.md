@@ -1,3 +1,18 @@
+## STUDIO v0.106.0
+- ✅ Completed: Configurable Example Registry (CLI) - Implemented `--repo` flag for `helios init` command, enabling scaffolding from custom GitHub repositories.
+
+## STUDIO v0.105.1
+- ✅ Verified: Components Panel Tests - Implemented comprehensive unit tests for ComponentsPanel covering loading, listing, install, update, and remove flows.
+
+## STUDIO v0.105.0
+- ✅ Completed: Component Management - Implemented ability to remove and update components from the Studio UI, adding corresponding CLI hooks and backend API endpoints.
+
+## STUDIO v0.104.3
+- ✅ Completed: Preview Command - Implemented `helios preview` command to serve production builds locally for verification.
+
+## STUDIO v0.104.2
+- ✅ Completed: CompositionsPanel Tests - Implemented unit tests for CompositionsPanel covering CRUD and filtering.
+
 ## STUDIO v0.104.1
 - ✅ Verified: Agent Skills Tests - Added unit tests for agent skills documentation logic and synced package version.
 

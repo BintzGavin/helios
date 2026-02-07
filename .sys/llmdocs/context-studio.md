@@ -58,6 +58,17 @@ Options:
 - `--out-dir <dir>`: Output directory to serve (default: `dist`).
 - `--port <number>`: Port to listen on (default: 4173).
 
+```bash
+npx helios init [target] [options]
+```
+
+Options:
+- `[target]`: Target directory (default: current working directory).
+- `--repo <repo>`: Example repository (user/repo or user/repo/path).
+- `--example <name>`: Initialize from an example.
+- `--yes`: Skip prompts and use defaults.
+- `--framework <framework>`: Specify framework (react, vue, svelte, solid, vanilla).
+
 ## D. UI Components
 
 - **Sidebar**: Navigation between different panels (Assets, Renders, Settings).
