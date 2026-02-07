@@ -65,3 +65,7 @@ Critical learnings only. This is not a log—only add entries for insights that 
 ## [0.19.0] - Example Distributability
 **Learning:** The examples in the repository rely on local monorepo paths (`../../../packages/*`), making them impossible to distribute directly to users via `helios init`. The "Examples" product surface is blocked by this coupling.
 **Action:** Implement transformation logic in the CLI to rewrite imports and dependencies when scaffolding from an example, ensuring the user gets a standalone project.
+
+## [0.20.0] - Distributed Plan Consistency
+**Learning:** `helios render --emit-job` implemented manual chunking logic that diverged from `RenderOrchestrator.plan()`. This created a risk where distributed jobs would behave differently from local runs (e.g., audio mixing, frame ranges).
+**Action:** Always delegate logic to the core domain (Renderer) rather than reimplementing it in the interface (CLI). If the API is missing, expose it, but don't duplicate the math.
