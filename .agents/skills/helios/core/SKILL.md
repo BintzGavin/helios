@@ -454,6 +454,67 @@ const opacity = interpolate(frame, [0, 30], [0, 1], {
 });
 ```
 
+### Sequence
+Calculate the local time and progress of a single sequence.
+
+```typescript
+import { sequence } from '@helios-project/core';
+
+const { progress, isActive } = sequence({
+  frame: currentFrame,
+  from: 0,
+  durationInFrames: 60
+});
+// progress: 0 to 1
+// isActive: true if currentFrame is within [from, from + durationInFrames)
+```
+
+### Transition
+Calculate a linear or eased transition value (0 to 1).
+
+```typescript
+import { transition } from '@helios-project/core';
+
+const t = transition(frame, startFrame, duration, {
+  easing: (t) => t * t // Optional easing function
+});
+```
+
+### Crossfade
+Calculate overlapping transition values for crossfading two scenes.
+
+```typescript
+import { crossfade } from '@helios-project/core';
+
+const { in: fadeIn, out: fadeOut } = crossfade(frame, startFrame, duration);
+// fadeIn goes 0 -> 1
+// fadeOut goes 1 -> 0
+```
+
+## Utilities
+
+### Random
+Generate a deterministic pseudo-random number based on a seed.
+
+```typescript
+import { random } from '@helios-project/core';
+
+const val = random("seed-123"); // Always returns the same number (0 to 1)
+```
+
+### Color Handling
+Parse and interpolate colors.
+
+```typescript
+import { parseColor, interpolateColors } from '@helios-project/core';
+
+// Parse
+const color = parseColor("#ff0000"); // { r: 255, g: 0, b: 0, a: 1 }
+
+// Interpolate
+const bg = interpolateColors(frame, [0, 100], ["#000000", "#ffffff"]);
+```
+
 ## Schema Validation
 
 Define input types for validation and UI generation in Studio. Supported types now include `model`, `json`, and `shader`.

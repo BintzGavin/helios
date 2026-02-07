@@ -100,6 +100,13 @@ player.muted = true;
 player.startAudioMetering();
 player.stopAudioMetering();
 
+// Export Video
+await player.export({
+  filename: 'my-video',
+  format: 'mp4',
+  onProgress: (p) => console.log(`Exporting: ${Math.round(p * 100)}%`)
+});
+
 // Writable Properties
 console.log(player.duration);     // Total duration in seconds
 console.log(player.paused);       // Boolean
@@ -144,7 +151,14 @@ The player dispatches standard media events:
 - `durationchange`, `ratechange`
 - `error`
 - `enterpictureinpicture`, `leavepictureinpicture`
-- `audiometering` (custom event containing AudioLevels)
+- `audiometering` (custom event)
+  ```typescript
+  interface AudioLevels {
+    stereo: [number, number]; // Left/Right RMS levels (0-1)
+    peak: [number, number];   // Left/Right Peak levels (0-1)
+  }
+  // event.detail contains AudioLevels
+  ```
 
 #### Advanced Control
 For low-level access to the Helios state, use `getController()`.
@@ -183,14 +197,32 @@ The player will fetch the SRT file and pass it to the Helios controller.
 
 ## Client-Side Export
 
-The player supports exporting videos directly in the browser (using `VideoEncoder`).
+The player supports exporting videos directly in the browser using `VideoEncoder`.
 
-1. **Formats:** Supports `mp4` (H.264/AAC) and `webm` (VP9/Opus).
+### Programmatic Usage
+
+```typescript
+await player.export({
+  filename: 'my-export',
+  format: 'mp4', // 'mp4' | 'webm' | 'png' | 'jpeg'
+  width: 1920,   // Optional: Override resolution
+  height: 1080,
+  bitrate: 5_000_000,
+  includeCaptions: true, // Force burn-in
+  onProgress: (progress) => {
+    console.log(`Progress: ${progress}`);
+  }
+});
+```
+
+### Configuration
+1. **Formats:** `mp4` (H.264/AAC), `webm` (VP9/Opus), `png` (Snapshot), `jpeg` (Snapshot).
 2. **Audio:** Captures audio from `<audio>` elements (must be CORS-enabled).
-3. **Captions:** Configure how captions are handled:
-   - `export-caption-mode="burn-in"`: Renders text directly onto the video frames (hardsub).
-   - `export-caption-mode="file"`: Downloads a separate `.srt` file alongside the video (softsub) and does NOT burn them in.
-4. **Resolution:** Configure export resolution independently of player size using `export-width` and `export-height`.
+3. **Captions (`export-caption-mode`):**
+   - `burn-in`: Renders text directly onto video frames (hardsub).
+   - `file`: Downloads a separate `.srt` file (softsub) and keeps video clean.
+   - *Note:* Programmatic `includeCaptions: true` overrides this to force burn-in.
+4. **Resolution:** Configure export resolution using `export-width` / `export-height` attributes or options object.
 5. **Usage:** User clicks "Export" in controls (opens Export Menu), or call `player.export()` programmatically.
 
 ## UI Features

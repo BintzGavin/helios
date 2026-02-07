@@ -1,10 +1,11 @@
 # Status: SKILLS
 
-**Version**: 1.12.0
+**Version**: 1.13.0
 - **Status**: Active
 - **Current Focus**: Comprehensive Skills Coverage
-- **Last Updated**: 2026-06-04
+- **Last Updated**: 2026-06-05
 
+[v1.13.0] ✅ Completed: Daily Skills Review - Added Client-Side Export example skill. Updated Core with Animation Helpers (sequence, transition, crossfade) and Utilities (random, color). Updated Renderer with Distributed Rendering details. Updated Player with Export API and Audio Metering types.
 [v1.12.0] ✅ Completed: Daily Skills Review - Created Declarative Timeline workflow skill. Updated Core with Timeline and Active Clips. Updated Renderer with Stability Timeout and Random Seed. Updated Player with CSS Variables and Audio Metering. Updated CLI with update and list commands.
 [v1.11.0] ✅ Completed: Daily Skills Review - Created Audio Visualization workflow skill (Deterministic Buffer & Player Metering). Updated Core with seekToTime and audio track APIs. Updated Renderer with audio mixing and selector options. Updated Player with media metadata and schema APIs. Added CLI merge command.
 [v1.10.0] ✅ Completed: Daily Skills Review - Created CLI, Preview Composition, Debug Render, and React Audio Viz skills. Updated Renderer (Audio Mixing) and Player (Captions) skills.
