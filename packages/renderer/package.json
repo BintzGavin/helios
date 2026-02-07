@@ -1,6 +1,6 @@
 {
   "name": "@helios-project/renderer",
-  "version": "0.0.2",
+  "version": "1.77.4",
   "description": "Renderer for Helios video engine.",
   "author": "Gavin Bintz <me@gavinbintz.com>",
   "license": "ELv2",

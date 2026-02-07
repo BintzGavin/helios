@@ -1,10 +1,11 @@
-**Version**: 1.77.3
+**Version**: 1.77.4
 
 **Posture**: MAINTENANCE WITH V2 EXPANSION
 
 # Renderer Agent Status
 
 ## Progress Log
+- [1.77.4] ✅ Completed: Refactor Media Sync Logic - Consolidated duplicated media attribute parsing and synchronization logic from `SeekTimeDriver`, `CdpTimeDriver`, and `dom-scanner` into shared utilities in `dom-scripts.ts`, ensuring consistency and maintainability. Verified with `verify-media-sync.ts`.
 - [1.77.3] ✅ Completed: Update Skill Documentation - Updated `.agents/skills/helios/renderer/SKILL.md` to match the actual `RendererOptions` and `AudioTrackConfig` interfaces in `packages/renderer/src/types.ts` (adding `subtitles` as string, `fadeInDuration`, `fadeOutDuration`, etc.), ensuring agents generate correct code. Verified by manual inspection.
 - [1.77.2] ✅ Completed: Fix Verification Script Regression - Updated `verify-asset-timeout.ts` to check for the correct log prefixes (`[Helios Preload]`, `[DomScanner]`) instead of `[DomStrategy]`, fixing a regression caused by the v1.77.1 DOM traversal refactor. Verified with `verify-asset-timeout.ts`.
 - [1.77.1] ✅ Completed: Refactor DOM Traversal - Consolidated duplicated DOM traversal logic (`findAllImages`, `findAllScopes`, `findAllElements`) into `dom-scripts.ts` and updated `DomStrategy` (preload) and `SeekTimeDriver` to use shared constants. Verified with `verify-enhanced-dom-preload.ts`.

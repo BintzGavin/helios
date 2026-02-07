@@ -1,12 +1,15 @@
 import { Page } from 'playwright';
 import { AudioTrackConfig } from '../types.js';
-import { FIND_ALL_MEDIA_FUNCTION } from './dom-scripts.js';
+import { FIND_ALL_MEDIA_FUNCTION, PARSE_MEDIA_ATTRIBUTES_FUNCTION } from './dom-scripts.js';
 
 export async function scanForAudioTracks(page: Page, timeout: number = 30000): Promise<AudioTrackConfig[]> {
   const script = `
     (async (timeoutMs) => {
       // Helper to find all media elements, including in Shadow DOM
       ${FIND_ALL_MEDIA_FUNCTION}
+
+      // Helper to parse media attributes
+      ${PARSE_MEDIA_ATTRIBUTES_FUNCTION}
 
       // Wait for media elements (video/audio)
       const mediaElements = findAllMedia(document);
@@ -49,38 +52,18 @@ export async function scanForAudioTracks(page: Page, timeout: number = 30000): P
         mediaElements.forEach(el => {
           const src = el.currentSrc || el.src;
           if (src) {
-            // Parse attributes
-            const offset = el.dataset.heliosOffset ? parseFloat(el.dataset.heliosOffset) : 0;
-            const seek = el.dataset.heliosSeek ? parseFloat(el.dataset.heliosSeek) : 0;
-            const fadeIn = el.dataset.heliosFadeIn ? parseFloat(el.dataset.heliosFadeIn) : 0;
-            const fadeOut = el.dataset.heliosFadeOut ? parseFloat(el.dataset.heliosFadeOut) : 0;
-            const volume = el.muted ? 0 : el.volume;
-            const duration = el.duration;
-            // Get playbackRate from property or attribute
-            let rate = el.playbackRate;
-            if (rate === 1.0) {
-              const rateAttr = el.getAttribute('playbackRate');
-              if (rateAttr) {
-                const parsed = parseFloat(rateAttr);
-                if (!isNaN(parsed)) {
-                  rate = parsed;
-                }
-              }
-            }
-            if (isNaN(rate) || rate <= 0) {
-              rate = 1.0;
-            }
+            const attrs = parseMediaAttributes(el);
 
             tracks.push({
               path: src,
-              volume: volume,
-              offset: isNaN(offset) ? 0 : offset,
-              seek: isNaN(seek) ? 0 : seek,
-              fadeInDuration: isNaN(fadeIn) ? 0 : fadeIn,
-              fadeOutDuration: isNaN(fadeOut) ? 0 : fadeOut,
-              loop: el.loop,
-              playbackRate: isNaN(rate) ? 1.0 : rate,
-              duration: (Number.isFinite(duration) && duration > 0) ? duration : undefined
+              volume: attrs.volume,
+              offset: attrs.offset,
+              seek: attrs.seek,
+              fadeInDuration: attrs.fadeIn,
+              fadeOutDuration: attrs.fadeOut,
+              loop: attrs.loop,
+              playbackRate: attrs.playbackRate,
+              duration: attrs.duration
             });
           }
         });

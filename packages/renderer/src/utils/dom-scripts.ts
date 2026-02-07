@@ -86,3 +86,58 @@ export const FIND_ALL_SCOPES_FUNCTION = `
     return scopes;
   }
 `;
+
+export const PARSE_MEDIA_ATTRIBUTES_FUNCTION = `
+  function parseMediaAttributes(el) {
+    const offset = el.dataset.heliosOffset ? parseFloat(el.dataset.heliosOffset) : 0;
+    const seek = el.dataset.heliosSeek ? parseFloat(el.dataset.heliosSeek) : 0;
+    const fadeIn = el.dataset.heliosFadeIn ? parseFloat(el.dataset.heliosFadeIn) : 0;
+    const fadeOut = el.dataset.heliosFadeOut ? parseFloat(el.dataset.heliosFadeOut) : 0;
+    const volume = el.muted ? 0 : el.volume;
+    const loop = el.loop;
+    const duration = el.duration;
+
+    let rate = el.playbackRate;
+    if (rate === 1.0) {
+      const rateAttr = el.getAttribute('playbackRate');
+      if (rateAttr) {
+        const parsed = parseFloat(rateAttr);
+        if (!isNaN(parsed)) {
+          rate = parsed;
+        }
+      }
+    }
+    if (isNaN(rate) || rate <= 0) {
+      rate = 1.0;
+    }
+
+    return {
+      offset: isNaN(offset) ? 0 : offset,
+      seek: isNaN(seek) ? 0 : seek,
+      fadeIn: isNaN(fadeIn) ? 0 : fadeIn,
+      fadeOut: isNaN(fadeOut) ? 0 : fadeOut,
+      volume,
+      loop,
+      playbackRate: rate,
+      duration: (Number.isFinite(duration) && duration > 0) ? duration : undefined
+    };
+  }
+`;
+
+export const SYNC_MEDIA_FUNCTION = `
+  function syncMedia(el, globalTime) {
+    const attrs = parseMediaAttributes(el);
+
+    // Calculate target time
+    // Formula: (GlobalTime - Offset) * Rate + Seek
+    let targetTime = Math.max(0, (globalTime - attrs.offset) * attrs.playbackRate + attrs.seek);
+
+    // Handle Looping
+    if (attrs.loop && attrs.duration && targetTime > attrs.duration) {
+      targetTime = targetTime % attrs.duration;
+    }
+
+    el.pause();
+    el.currentTime = targetTime;
+  }
+`;

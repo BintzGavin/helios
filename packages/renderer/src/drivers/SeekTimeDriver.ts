@@ -1,7 +1,7 @@
 import { Page } from 'playwright';
 import { TimeDriver } from './TimeDriver.js';
 import { getSeedScript } from '../utils/random-seed.js';
-import { FIND_ALL_MEDIA_FUNCTION, FIND_ALL_SCOPES_FUNCTION } from '../utils/dom-scripts.js';
+import { FIND_ALL_MEDIA_FUNCTION, FIND_ALL_SCOPES_FUNCTION, SYNC_MEDIA_FUNCTION, PARSE_MEDIA_ATTRIBUTES_FUNCTION } from '../utils/dom-scripts.js';
 
 export class SeekTimeDriver implements TimeDriver {
   constructor(private timeout: number = 30000) {}
@@ -124,45 +124,14 @@ export class SeekTimeDriver implements TimeDriver {
 
         // Helper to find all media elements, including in Shadow DOM
         ${FIND_ALL_MEDIA_FUNCTION}
+        // Helper to sync media
+        ${PARSE_MEDIA_ATTRIBUTES_FUNCTION}
+        ${SYNC_MEDIA_FUNCTION}
 
         // 2. Synchronize media elements (video, audio)
         const mediaElements = findAllMedia(document);
         mediaElements.forEach((el) => {
-          el.pause();
-
-          // Parse attributes (default to 0)
-          const offset = parseFloat(el.getAttribute('data-helios-offset') || '0');
-          const seek = parseFloat(el.getAttribute('data-helios-seek') || '0');
-
-          // Parse playbackRate
-          // We check the property first. If it's the default (1.0), we also check the attribute
-          // to support declarative usage (e.g. <video playbackRate="0.5">).
-          // If the property is not 1.0, we assume it was set programmatically and respect it.
-          let rate = el.playbackRate;
-          if (rate === 1.0) {
-            const rateAttr = el.getAttribute('playbackRate');
-            if (rateAttr) {
-              const parsed = parseFloat(rateAttr);
-              if (!isNaN(parsed)) {
-                rate = parsed;
-              }
-            }
-          }
-
-          if (isNaN(rate) || rate <= 0) {
-            rate = 1.0;
-          }
-
-          // Calculate target time
-          // Formula: (GlobalTime - Offset) * Rate + Seek
-          let targetTime = Math.max(0, (t - offset) * rate + seek);
-
-          // Handle Looping
-          if (el.loop && el.duration > 0 && targetTime > el.duration) {
-            targetTime = targetTime % el.duration;
-          }
-
-          el.currentTime = targetTime;
+          syncMedia(el, t);
 
           // Check if we need to wait for seeking to complete
           // readyState < 2 (HAVE_CURRENT_DATA) means we don't have the frame yet
