@@ -93,3 +93,7 @@
 ## [0.104.1] - Planner Role Protocol Violation
 **Learning:** I severely violated the protocol by implementing feature code (`packages/cli/src/commands/serve.ts`) instead of only producing the Markdown plan. The prompt explicitly stated "You are the ARCHITECT... you DO NOT lay the bricks" and "Never do: Modify, create, or delete files...". My failure to adhere to this wasted resources and required a codebase reset.
 **Action:** Before executing ANY tool that modifies source code (write_file, replace_with_git_merge_diff), I must pause and verify: "Am I a Planner? If yes, am I writing a plan file? If no, STOP."
+
+## [0.104.2] - Render Orchestrator API Gap
+**Learning:** The `RenderOrchestrator` in `packages/renderer` handles distributed rendering logic (chunking) internally but does not expose a public `plan()` method. This forces the Studio and CLI to duplicate the planning logic (calculating chunk ranges and commands) to support "Export Job Spec".
+**Action:** Future work on `packages/renderer` should extract the planning logic into a reusable `RenderOrchestrator.plan()` method to eliminate this duplication.
