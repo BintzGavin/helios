@@ -472,7 +472,7 @@ function configureMiddlewares(server: ViteDevServer | PreviewServer, isPreview: 
           }
 
           try {
-            const comps = findCompositions(process.cwd());
+            const comps = await findCompositions(process.cwd());
             res.setHeader('Content-Type', 'application/json');
             res.end(JSON.stringify(comps));
           } catch (e) {

@@ -20,6 +20,8 @@ export interface AssetInfo {
   relativePath: string;
 }
 
+const IGNORED_DIRS = new Set(['node_modules', '.git', 'dist', 'build']);
+
 export function getProjectRoot(cwd: string): string {
   if (process.env.HELIOS_PROJECT_ROOT) {
     return path.resolve(process.env.HELIOS_PROJECT_ROOT);
@@ -27,7 +29,7 @@ export function getProjectRoot(cwd: string): string {
   return path.resolve(cwd, '../../examples');
 }
 
-export function findCompositions(rootDir: string): CompositionInfo[] {
+export async function findCompositions(rootDir: string): Promise<CompositionInfo[]> {
   // rootDir is expected to be packages/studio (or wherever the vite server is running from)
   const projectRoot = getProjectRoot(rootDir);
 
@@ -36,70 +38,89 @@ export function findCompositions(rootDir: string): CompositionInfo[] {
     return [];
   }
 
-  const compositions: CompositionInfo[] = [];
-
-  function scan(dir: string) {
-    const compPath = path.join(dir, 'composition.html');
-
-    if (fs.existsSync(compPath)) {
-      // It is a composition
-      const relativePath = path.relative(projectRoot, dir);
-      // Ensure forward slashes for ID consistency across platforms
-      const id = relativePath.split(path.sep).join('/');
-
-      // Format name: "simple-canvas-animation" -> "Simple Canvas Animation"
-      const name = path.basename(dir)
-        .split('-')
-        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-        .join(' ');
-
-      // Read metadata if exists
-      let metadata: CompositionOptions | undefined;
-      const metaPath = path.join(dir, 'composition.json');
-      if (fs.existsSync(metaPath)) {
-        try {
-          metadata = JSON.parse(fs.readFileSync(metaPath, 'utf-8'));
-        } catch (e) {
-          console.warn(`Failed to parse metadata for ${id}`, e);
-        }
-      }
-
-      // Check for thumbnail
-      let thumbnailUrl: string | undefined;
-      const thumbPath = path.join(dir, 'thumbnail.png');
-      if (fs.existsSync(thumbPath)) {
-        thumbnailUrl = `/@fs${thumbPath}`;
-      }
-
-      compositions.push({
-        id,
-        name,
-        // Use /@fs/ prefix with absolute path so Vite can serve files outside root
-        // Ensure we don't double slash if path starts with /
-        url: `/@fs${compPath}`,
-        thumbnailUrl,
-        description: id,
-        metadata
-      });
-      return;
-    }
-
-    // Recurse into subdirectories
+  // Helper to check existence asynchronously
+  async function exists(filePath: string): Promise<boolean> {
     try {
-      const entries = fs.readdirSync(dir, { withFileTypes: true });
-      for (const entry of entries) {
-        if (entry.isDirectory()) {
-          if (['node_modules', '.git', 'dist', 'build'].includes(entry.name)) continue;
-          scan(path.join(dir, entry.name));
-        }
-      }
-    } catch (e) {
-      console.warn(`Failed to scan directory: ${dir}`, e);
+      await fs.promises.access(filePath);
+      return true;
+    } catch {
+      return false;
     }
   }
 
-  scan(projectRoot);
-  return compositions;
+  async function scan(dir: string): Promise<CompositionInfo[]> {
+    const compPath = path.join(dir, 'composition.html');
+
+    // Check if it is a composition first (avoid readdir if so)
+    if (await exists(compPath)) {
+        // It is a composition
+        const relativePath = path.relative(projectRoot, dir);
+        // Ensure forward slashes for ID consistency across platforms
+        const id = relativePath.split(path.sep).join('/');
+
+        // Format name: "simple-canvas-animation" -> "Simple Canvas Animation"
+        const name = path.basename(dir)
+          .split('-')
+          .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+          .join(' ');
+
+        // Read metadata if exists
+        let metadata: CompositionOptions | undefined;
+        const metaPath = path.join(dir, 'composition.json');
+        if (await exists(metaPath)) {
+          try {
+            const content = await fs.promises.readFile(metaPath, 'utf-8');
+            metadata = JSON.parse(content);
+          } catch (e) {
+            console.warn(`Failed to parse metadata for ${id}`, e);
+          }
+        }
+
+        // Check for thumbnail
+        let thumbnailUrl: string | undefined;
+        const thumbPath = path.join(dir, 'thumbnail.png');
+        if (await exists(thumbPath)) {
+          thumbnailUrl = `/@fs${thumbPath}`;
+        }
+
+        return [{
+          id,
+          name,
+          // Use /@fs/ prefix with absolute path so Vite can serve files outside root
+          // Ensure we don't double slash if path starts with /
+          url: `/@fs${compPath}`,
+          thumbnailUrl,
+          description: id,
+          metadata
+        }];
+    }
+
+    try {
+      const entries = await fs.promises.readdir(dir, { withFileTypes: true });
+
+      // Recurse into subdirectories
+      const subdirs = entries.filter(e => e.isDirectory() && !IGNORED_DIRS.has(e.name));
+      const results: CompositionInfo[] = [];
+
+      // Limit concurrency to avoid thread pool exhaustion
+      const CONCURRENCY_LIMIT = 20;
+
+      for (let i = 0; i < subdirs.length; i += CONCURRENCY_LIMIT) {
+        const chunk = subdirs.slice(i, i + CONCURRENCY_LIMIT);
+        const chunkPromises = chunk.map(subdir => scan(path.join(dir, subdir.name)));
+        const chunkResults = await Promise.all(chunkPromises);
+        results.push(...chunkResults.flat());
+      }
+
+      return results;
+
+    } catch (e) {
+      console.warn(`Failed to scan directory: ${dir}`, e);
+      return [];
+    }
+  }
+
+  return scan(projectRoot);
 }
 
 export function deleteComposition(rootDir: string, id: string): void {

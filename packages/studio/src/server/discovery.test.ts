@@ -20,6 +20,8 @@ vi.mock('fs', async (importOriginal) => {
             cpSync: vi.fn(),
             promises: {
                 readdir: vi.fn(),
+                readFile: vi.fn(),
+                access: vi.fn(),
             }
         }
     };
@@ -32,13 +34,14 @@ describe('findCompositions', () => {
         vi.resetAllMocks();
         process.env = { ...originalEnv, HELIOS_PROJECT_ROOT: path.resolve('/mock/project') };
         vi.mocked(fs.existsSync).mockReturnValue(false);
+        vi.mocked(fs.promises.access).mockRejectedValue(new Error('ENOENT'));
     });
 
     afterEach(() => {
         process.env = originalEnv;
     });
 
-    it('should find nested compositions', () => {
+    it('should find nested compositions', async () => {
         // Mock directory structure:
         // /mock/project/
         //   comp1/ (composition)
@@ -48,33 +51,49 @@ describe('findCompositions', () => {
         //       comp3/ (composition)
         //   node_modules/ (ignored)
 
-        vi.mocked(fs.readdirSync).mockImplementation((dirPath: any) => {
+        vi.mocked(fs.promises.readdir).mockImplementation(async (dirPath: any) => {
             const dir = path.resolve(dirPath);
             const root = path.resolve('/mock/project');
 
             if (dir === root) {
                 return [
-                    { name: 'comp1', isDirectory: () => true },
-                    { name: 'folder', isDirectory: () => true },
-                    { name: 'node_modules', isDirectory: () => true }, // Should be ignored
-                    { name: 'random.txt', isDirectory: () => false }
+                    { name: 'comp1', isDirectory: () => true, isFile: () => false },
+                    { name: 'folder', isDirectory: () => true, isFile: () => false },
+                    { name: 'node_modules', isDirectory: () => true, isFile: () => false }, // Should be ignored
+                    { name: 'random.txt', isDirectory: () => false, isFile: () => true }
+                ] as any;
+            }
+            if (dir === path.resolve(root, 'comp1')) {
+                return [
+                     { name: 'composition.html', isDirectory: () => false, isFile: () => true }
                 ] as any;
             }
             if (dir === path.resolve(root, 'folder')) {
                 return [
-                    { name: 'comp2', isDirectory: () => true },
-                    { name: 'subfolder', isDirectory: () => true }
+                    { name: 'comp2', isDirectory: () => true, isFile: () => false },
+                    { name: 'subfolder', isDirectory: () => true, isFile: () => false }
+                ] as any;
+            }
+            if (dir === path.resolve(root, 'folder/comp2')) {
+                return [
+                     { name: 'composition.html', isDirectory: () => false, isFile: () => true }
                 ] as any;
             }
             if (dir === path.resolve(root, 'folder/subfolder')) {
                 return [
-                    { name: 'comp3', isDirectory: () => true }
+                    { name: 'comp3', isDirectory: () => true, isFile: () => false }
+                ] as any;
+            }
+            if (dir === path.resolve(root, 'folder/subfolder/comp3')) {
+                return [
+                     { name: 'composition.html', isDirectory: () => false, isFile: () => true }
                 ] as any;
             }
             return [] as any;
         });
 
-        vi.mocked(fs.existsSync).mockImplementation((filePath: any) => {
+        // Implementation for both existsSync and promises.access
+        const checkExists = (filePath: any) => {
             const p = path.resolve(filePath);
             const root = path.resolve('/mock/project');
 
@@ -85,13 +104,18 @@ describe('findCompositions', () => {
 
             // Project root exists
             if (p === root) return true;
-
             return false;
+        };
+
+        vi.mocked(fs.existsSync).mockImplementation(checkExists);
+        vi.mocked(fs.promises.access).mockImplementation(async (filePath: any) => {
+            if (checkExists(filePath)) return undefined; // Resolve (void)
+            throw new Error('ENOENT');
         });
 
-        vi.mocked(fs.readFileSync).mockImplementation(() => '{}'); // Mock metadata read
+        vi.mocked(fs.promises.readFile).mockResolvedValue('{}'); // Mock metadata read
 
-        const compositions = findCompositions('.');
+        const compositions = await findCompositions('.');
 
         const ids = compositions.map(c => c.id).sort();
 
@@ -104,10 +128,6 @@ describe('findCompositions', () => {
         const comp2 = compositions.find(c => c.id === 'folder/comp2');
         expect(comp2).toBeDefined();
         // The URL logic uses /@fs prefix
-        // On Windows, paths might differ, but our test environment is likely Posix or we used path.join
-        // However, findCompositions implementation uses `/@fs${compPath}`.
-        // compPath is constructed with path.join.
-        // For the test expectation, we can check if it contains the path.
         expect(comp2?.url).toContain('folder/comp2/composition.html');
 
         // Verify names
@@ -117,28 +137,40 @@ describe('findCompositions', () => {
         expect(comp2?.description).toContain('folder/comp2');
     });
 
-    it('should include thumbnailUrl if thumbnail.png exists', () => {
+    it('should include thumbnailUrl if thumbnail.png exists', async () => {
         const root = path.resolve('/mock/project');
 
-        vi.mocked(fs.readdirSync).mockImplementation((dirPath: any) => {
+        vi.mocked(fs.promises.readdir).mockImplementation(async (dirPath: any) => {
             const dir = path.resolve(dirPath);
             if (dir === root) {
                 return [
-                    { name: 'comp-with-thumb', isDirectory: () => true }
+                    { name: 'comp-with-thumb', isDirectory: () => true, isFile: () => false }
+                ] as any;
+            }
+            if (dir === path.resolve(root, 'comp-with-thumb')) {
+                return [
+                    { name: 'composition.html', isDirectory: () => false, isFile: () => true },
+                    { name: 'thumbnail.png', isDirectory: () => false, isFile: () => true }
                 ] as any;
             }
             return [] as any;
         });
 
-        vi.mocked(fs.existsSync).mockImplementation((filePath: any) => {
+        const checkExists = (filePath: any) => {
             const p = path.resolve(filePath);
             if (p === root) return true;
             if (p === path.resolve(root, 'comp-with-thumb/composition.html')) return true;
             if (p === path.resolve(root, 'comp-with-thumb/thumbnail.png')) return true;
             return false;
+        };
+
+        vi.mocked(fs.existsSync).mockImplementation(checkExists);
+        vi.mocked(fs.promises.access).mockImplementation(async (filePath: any) => {
+            if (checkExists(filePath)) return undefined;
+            throw new Error('ENOENT');
         });
 
-        const compositions = findCompositions('.');
+        const compositions = await findCompositions('.');
         expect(compositions).toHaveLength(1);
         expect(compositions[0].thumbnailUrl).toContain('comp-with-thumb/thumbnail.png');
     });

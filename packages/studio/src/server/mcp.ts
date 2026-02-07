@@ -14,7 +14,7 @@ export function createMcpServer(getPort: () => number) {
     "compositions",
     "helios://compositions",
     async (uri) => {
-      const comps = findCompositions(process.cwd());
+      const comps = await findCompositions(process.cwd());
       return {
         contents: [{
           uri: uri.href,
@@ -75,7 +75,7 @@ export function createMcpServer(getPort: () => number) {
     },
     async (args) => {
        try {
-           const comps = findCompositions(process.cwd());
+           const comps = await findCompositions(process.cwd());
            const comp = comps.find(c => c.id === args.compositionId);
 
            if (!comp) {
