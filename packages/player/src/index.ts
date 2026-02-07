@@ -1028,15 +1028,17 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
   /**
    * Gets the width attribute of the player.
    * Part of the Standard Media API parity.
+   * @returns {number} The width.
    */
   public get width(): number {
     const val = this.getAttribute("width");
-    return val ? parseInt(val, 10) : 0;
+    return val ? (parseInt(val, 10) || 0) : 0;
   }
 
   /**
    * Sets the width attribute of the player.
    * Part of the Standard Media API parity.
+   * @param {number} val The new width.
    */
   public set width(val: number) {
     this.setAttribute("width", String(val));
@@ -1045,15 +1047,17 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
   /**
    * Gets the height attribute of the player.
    * Part of the Standard Media API parity.
+   * @returns {number} The height.
    */
   public get height(): number {
     const val = this.getAttribute("height");
-    return val ? parseInt(val, 10) : 0;
+    return val ? (parseInt(val, 10) || 0) : 0;
   }
 
   /**
    * Sets the height attribute of the player.
    * Part of the Standard Media API parity.
+   * @param {number} val The new height.
    */
   public set height(val: number) {
     this.setAttribute("height", String(val));
@@ -1078,6 +1082,7 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
   /**
    * Gets whether the playsinline attribute is present.
    * Part of the Standard Media API parity.
+   * @returns {boolean} True if playsinline is present.
    */
   public get playsInline(): boolean {
     return this.hasAttribute("playsinline");
@@ -1086,6 +1091,7 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
   /**
    * Sets the playsinline attribute.
    * Part of the Standard Media API parity.
+   * @param {boolean} val Whether playsinline should be present.
    */
   public set playsInline(val: boolean) {
     if (val) {
@@ -1099,6 +1105,7 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
    * Seeks to the specified time.
    * Part of the Standard Media API parity.
    * Note: In HeliosPlayer, this currently delegates to standard seek (currentTime setter).
+   * @param time The time to seek to.
    */
   public fastSeek(time: number): void {
     this.currentTime = time;

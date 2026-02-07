@@ -1,4 +1,4 @@
-**Version**: v0.74.1
+**Version**: v0.74.2
 
 **Posture**: STABLE AND FEATURE COMPLETE
 
@@ -60,6 +60,7 @@
 - **Export API**: Exposes public `export()` method for programmatic control over client-side exports, supporting Video (MP4/WebM) and Snapshot (PNG/JPEG) formats.
 - **Export Menu**: Implements a dedicated Export Menu in the player UI (replacing the direct export button action) to allow configuring format, resolution, filename, and captions before exporting or taking a snapshot.
 
+[v0.74.2] ✅ Completed: Api Parity Improvements - Fixed logic for `width`/`height` getters to handle invalid input gracefully, added missing test coverage, and updated documentation for Standard Media API parity.
 [v0.74.1] ✅ Completed: Implement SVG Icons - Replaced text-based control icons with inline SVGs for consistent visual styling.
 [v0.74.0] ✅ Completed: CSS Parts - Implemented CSS Shadow Parts (`part` attribute) for key UI elements (`controls`, `volume-control`, `scrubber-wrapper`, `poster-image`, `big-play-button`, etc.), enabling full styling customization.
 [v0.73.1] ✅ Completed: DOM Export Form Values - Implemented `inlineFormValues` utility to preserve user input (value, checked, selected) in form elements during client-side DOM export.
