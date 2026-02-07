@@ -1,64 +1,45 @@
-# Renderer Domain Context
+# RENDERER Context
 
 ## A. Strategy: Dual-Path Architecture
+The Renderer uses a **Strategy Pattern** to handle different content types, optimizing for performance and accuracy.
 
-The Renderer employs a "Dual-Path" architecture to handle different rendering needs:
+1.  **Canvas Strategy** (`mode: 'canvas'`)
+    *   **Target**: WebGL, Three.js, PixiJS, P5.js, Canvas 2D.
+    *   **Mechanism**: Injects scripts to capture frames from `<canvas>` elements.
+    *   **Capture**: Uses `VideoEncoder` (WebCodecs) for hardware-accelerated encoding in the browser.
+    *   **Fallback**: Uses `canvas.toDataURL()` or `createImageBitmap()` if WebCodecs is unavailable.
+    *   **Time Driver**: `CdpTimeDriver` (Chrome DevTools Protocol) for precise, deterministic time control.
 
-1.  **Canvas Strategy (`mode: 'canvas'`)**:
-    -   **Target**: High-performance WebGL/Canvas animations (Three.js, PixiJS).
-    -   **Mechanism**: Captures frames directly from the HTML `<canvas>` element (found via `canvasSelector`).
-    -   **Optimization**: Prioritizes hardware-accelerated `WebCodecs` (checked via `navigator.mediaCapabilities`) and prefers H.264 over VP9 when hardware support is equivalent. Falls back to software WebCodecs or `toDataURL()` (PNG/JPEG) if necessary. Preloads fonts, images, and backgrounds (shared logic with DOM strategy).
-    -   **Audio**: Explicitly extracts audio from `<audio>`/`<video>` elements via `DomScanner`.
-
-2.  **DOM Strategy (`mode: 'dom'`)**:
-    -   **Target**: CSS animations, HTML/DOM-based motion graphics.
-    -   **Mechanism**: Captures the viewport or a specific element (via `targetSelector`) using Playwright's `page.screenshot()` or `elementHandle.screenshot()`.
-    -   **Optimization**: Supports `omittedBackground` for transparency. Preloads fonts, images, and CSS background images (including those in Shadow DOM) to prevent rendering artifacts.
-    -   **Audio**: Scans for and includes implicit audio tracks.
-
-Both strategies rely on **Time Drivers** (`CdpTimeDriver` or `SeekTimeDriver`) to enforce frame-perfect synchronization and deterministic behavior. This includes:
--   **Virtual Time**: Overriding `Date.now()`, `performance.now()`, and `requestAnimationFrame`.
--   **Seeded Randomness**: Injecting a deterministic Mulberry32 PRNG to replace `Math.random()`, configurable via `randomSeed`.
--   **DOM Traversal**: Using consolidated scripts in `dom-scripts.ts` to recursively find media, images, and Shadow DOM scopes.
-
-Both strategies normalize the output into a stream of buffers (video frames) that are piped into FFmpeg.
-
-**Orchestrator**: Manages distributed rendering by splitting the job into concurrent chunks (workers) and concatenating the results. It utilizes the **Strategy Pattern** via the `RenderExecutor` interface (defaulting to `LocalExecutor`) to decouple the orchestration logic from the concrete rendering implementation, enabling pluggable execution contexts. It also implements robust cancellation (aborting all workers if one fails) and aggregates progress from all workers into a smooth, monotonic global progress value.
+2.  **DOM Strategy** (`mode: 'dom'`)
+    *   **Target**: HTML/CSS animations, GSAP, Framer Motion, standard DOM elements.
+    *   **Mechanism**: Takes full-page screenshots via Playwright.
+    *   **Capture**: `page.screenshot()` (PNG/JPEG).
+    *   **Time Driver**: `SeekTimeDriver` (overrides `requestAnimationFrame`, `Date.now`, `performance.now`) to ensure deterministic rendering.
 
 ## B. File Tree
-
 ```
 packages/renderer/
 ├── src/
-│   ├── drivers/
-│   │   ├── CdpTimeDriver.ts   # Deterministic virtual time (CDP)
-│   │   └── SeekTimeDriver.ts  # Deterministic Seek-based time
-│   ├── executors/
-│   │   ├── LocalExecutor.ts   # Default local rendering wrapper
-│   │   └── RenderExecutor.ts  # Interface for execution strategies
+│   ├── index.ts              # Entry point
+│   ├── Renderer.ts           # Main class (facade)
+│   ├── Orchestrator.ts       # Distributed rendering & orchestration
+│   ├── types.ts              # Interfaces (RendererOptions, AudioTrackConfig)
+│   ├── concat.ts             # Video concatenation utility
 │   ├── strategies/
-│   │   ├── CanvasStrategy.ts  # WebCodecs/Canvas capture
-│   │   ├── DomStrategy.ts     # Screenshot capture
-│   │   └── RenderStrategy.ts  # Interface
-│   ├── utils/
-│   │   ├── FFmpegBuilder.ts   # FFmpeg argument construction
-│   │   ├── blob-extractor.ts  # Blob URL handling
-│   │   ├── dom-finder.ts      # Shared deep element finding (Shadow DOM)
-│   │   ├── dom-preload.ts     # Shared asset preloading logic
-│   │   ├── dom-scanner.ts     # Media element discovery
-│   │   ├── dom-scripts.ts     # Shared browser-side scripts (media, scopes, images)
-│   │   └── random-seed.ts     # Deterministic PRNG injection
-│   ├── Orchestrator.ts        # Distributed rendering coordination
-│   ├── index.ts               # Entry point
-│   ├── Renderer.ts            # Main class
-│   └── types.ts               # Configuration interfaces
-├── scripts/                   # Additional verification scripts
-└── tests/                     # Verification scripts
+│   │   ├── CanvasStrategy.ts # WebCodecs/Canvas capture logic
+│   │   └── DomStrategy.ts    # Playwright screenshot logic
+│   ├── drivers/
+│   │   ├── CdpTimeDriver.ts  # Virtual time via CDP
+│   │   └── SeekTimeDriver.ts # Virtual time via polyfills
+│   └── utils/
+│       ├── FFmpegBuilder.ts  # FFmpeg argument generator
+│       ├── dom-scanner.ts    # Audio/Video element discovery
+│       ├── dom-scripts.ts    # Shared DOM injection scripts
+│       └── blob-extractor.ts # Blob URL extraction
 ```
 
 ## C. Configuration
-
-The `RendererOptions` interface controls the pipeline:
+The `Renderer` is configured via `RendererOptions`:
 
 ```typescript
 interface RendererOptions {
@@ -67,56 +48,44 @@ interface RendererOptions {
   fps: number;
   durationInSeconds: number;
   mode?: 'canvas' | 'dom';
-  canvasSelector?: string; // CSS selector for target canvas ('canvas' mode)
-  targetSelector?: string; // CSS selector for target element ('dom' mode)
+  videoCodec?: 'libx264' | 'libvpx-vp9' | 'copy';
   audioFilePath?: string;
-  audioTracks?: (string | AudioTrackConfig)[];
-  videoCodec?: 'libx264' | 'libvpx' | 'libvpx-vp9' | 'copy';
-  videoBitrate?: string;
-  audioCodec?: string;
-  pixelFormat?: string; // e.g. 'yuv420p', 'yuva420p'
-  intermediateVideoCodec?: string; // For Canvas WebCodecs (e.g. 'avc1', 'vp9')
-  intermediateImageFormat?: 'png' | 'jpeg'; // For DOM/Fallback
-  stabilityTimeout?: number; // Timeout for asset loading (default: 30000ms)
-  inputProps?: Record<string, any>; // Injected into window.__HELIOS_PROPS__
-  mixInputAudio?: boolean; // Mix implicit audio from input
-  subtitles?: string; // Path to SRT file to burn in
-  randomSeed?: number; // Seed for deterministic PRNG (default: 0x12345678)
-  keyFrameInterval?: number; // WebCodecs keyframe interval (frames)
-}
-
-interface AudioTrackConfig {
-  path: string;
-  volume?: number;
-  offset?: number;
-  seek?: number;
-  fadeInDuration?: number;
-  fadeOutDuration?: number;
-  loop?: boolean;
-  playbackRate?: number;
-  duration?: number;
+  audioTracks?: AudioTrackConfig[];
+  subtitles?: string; // Path to SRT file
+  inputProps?: Record<string, any>;
+  concurrency?: number; // For distributed rendering
+  frameCount?: number; // Exact frame count override
+  startFrame?: number; // Start frame for partial renders
+  canvasSelector?: string; // CSS selector for canvas
+  targetSelector?: string; // CSS selector for DOM screenshot target
+  intermediateVideoCodec?: string; // 'vp8', 'vp9', 'av1', 'h264'
+  intermediateImageFormat?: 'png' | 'jpeg';
+  stabilityTimeout?: number; // Wait timeout for assets
+  randomSeed?: number; // Deterministic PRNG seed
+  mixInputAudio?: boolean; // Preserve implicit audio from input
 }
 ```
 
 ## D. FFmpeg Interface
+The Renderer pipes raw frames (or encoded chunks) to FFmpeg's `stdin`.
 
-The Renderer spawns an FFmpeg process and communicates via stdio:
+*   **Canvas Mode**:
+    *   Input: `h264` (Annex B) or `ivf` (VP8/VP9/AV1) stream via pipe.
+    *   Flags: `-f h264 -i pipe:0` (or similar).
+*   **DOM Mode**:
+    *   Input: Image sequence via pipe.
+    *   Flags: `-f image2pipe -vcodec png -i pipe:0`.
+*   **Output**:
+    *   Controlled by `FFmpegBuilder`.
+    *   Supports `libx264` (MP4), `libvpx-vp9` (WebM), `prores`, etc.
+    *   Audio is mixed using `amix` filter or `-filter_complex`.
 
--   **Input**:
-    -   Video frames piped to `stdin` (`-f image2pipe` or `-f ivf` or `-f h264`).
-    -   Audio tracks mapped as external inputs (`-i audio.mp3`).
--   **Filters**:
-    -   `amix`: Mixes multiple audio tracks.
-    -   `atempo`: Adjusts audio playback rate.
-    -   `subtitles`: Burns subtitles if requested.
--   **Output**:
-    -   Writes final video file to disk.
-    -   Defaults to `libx264` (H.264) + `aac` (Audio) in an MP4 container.
+## E. Orchestration
+The `RenderOrchestrator` manages distributed rendering jobs.
 
-## E. Diagnostics
-
-The `renderer.diagnose()` method returns a comprehensive report on the environment:
-
--   **Canvas**: Detailed WebCodecs support matrix (Hardware/Software, Alpha).
--   **DOM**: Viewport dimensions, Device Pixel Ratio (DPR), and WebGL support.
--   **FFmpeg**: Installed version and supported encoders/filters.
+*   **Planning**: `RenderOrchestrator.plan(url, output, options)` generates a `RenderPlan` containing chunks, file paths, and execution options.
+*   **Execution**: `RenderOrchestrator.render(url, output, options)` executes the plan (or generates one if not provided), rendering chunks in parallel and concatenating/mixing them.
+*   **Pipeline**:
+    1.  **Render Chunks**: Splits the job into `N` concurrent workers. Each worker renders a segment to a temporary `.mov` file with PCM audio (`pcm_s16le`).
+    2.  **Concatenate**: Merges chunks into a single intermediate PCM master file using FFmpeg `concat` demuxer.
+    3.  **Mix/Transcode**: Transcodes the master file to the final output format (e.g., MP4/AAC) and mixes any explicit audio tracks.
