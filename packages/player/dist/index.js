@@ -899,6 +899,169 @@ export class HeliosPlayer extends HTMLElement {
     get currentSrc() {
         return this.src;
     }
+    // --- Standard Event Handlers ---
+    _onplay = null;
+    get onplay() { return this._onplay; }
+    set onplay(handler) {
+        if (this._onplay)
+            this.removeEventListener('play', this._onplay);
+        this._onplay = handler;
+        if (handler)
+            this.addEventListener('play', handler);
+    }
+    _onpause = null;
+    get onpause() { return this._onpause; }
+    set onpause(handler) {
+        if (this._onpause)
+            this.removeEventListener('pause', this._onpause);
+        this._onpause = handler;
+        if (handler)
+            this.addEventListener('pause', handler);
+    }
+    _onended = null;
+    get onended() { return this._onended; }
+    set onended(handler) {
+        if (this._onended)
+            this.removeEventListener('ended', this._onended);
+        this._onended = handler;
+        if (handler)
+            this.addEventListener('ended', handler);
+    }
+    _ontimeupdate = null;
+    get ontimeupdate() { return this._ontimeupdate; }
+    set ontimeupdate(handler) {
+        if (this._ontimeupdate)
+            this.removeEventListener('timeupdate', this._ontimeupdate);
+        this._ontimeupdate = handler;
+        if (handler)
+            this.addEventListener('timeupdate', handler);
+    }
+    _onvolumechange = null;
+    get onvolumechange() { return this._onvolumechange; }
+    set onvolumechange(handler) {
+        if (this._onvolumechange)
+            this.removeEventListener('volumechange', this._onvolumechange);
+        this._onvolumechange = handler;
+        if (handler)
+            this.addEventListener('volumechange', handler);
+    }
+    _onratechange = null;
+    get onratechange() { return this._onratechange; }
+    set onratechange(handler) {
+        if (this._onratechange)
+            this.removeEventListener('ratechange', this._onratechange);
+        this._onratechange = handler;
+        if (handler)
+            this.addEventListener('ratechange', handler);
+    }
+    _ondurationchange = null;
+    get ondurationchange() { return this._ondurationchange; }
+    set ondurationchange(handler) {
+        if (this._ondurationchange)
+            this.removeEventListener('durationchange', this._ondurationchange);
+        this._ondurationchange = handler;
+        if (handler)
+            this.addEventListener('durationchange', handler);
+    }
+    _onseeking = null;
+    get onseeking() { return this._onseeking; }
+    set onseeking(handler) {
+        if (this._onseeking)
+            this.removeEventListener('seeking', this._onseeking);
+        this._onseeking = handler;
+        if (handler)
+            this.addEventListener('seeking', handler);
+    }
+    _onseeked = null;
+    get onseeked() { return this._onseeked; }
+    set onseeked(handler) {
+        if (this._onseeked)
+            this.removeEventListener('seeked', this._onseeked);
+        this._onseeked = handler;
+        if (handler)
+            this.addEventListener('seeked', handler);
+    }
+    _onresize = null;
+    get onresize() { return this._onresize; }
+    set onresize(handler) {
+        if (this._onresize)
+            this.removeEventListener('resize', this._onresize);
+        this._onresize = handler;
+        if (handler)
+            this.addEventListener('resize', handler);
+    }
+    _onloadstart = null;
+    get onloadstart() { return this._onloadstart; }
+    set onloadstart(handler) {
+        if (this._onloadstart)
+            this.removeEventListener('loadstart', this._onloadstart);
+        this._onloadstart = handler;
+        if (handler)
+            this.addEventListener('loadstart', handler);
+    }
+    _onloadedmetadata = null;
+    get onloadedmetadata() { return this._onloadedmetadata; }
+    set onloadedmetadata(handler) {
+        if (this._onloadedmetadata)
+            this.removeEventListener('loadedmetadata', this._onloadedmetadata);
+        this._onloadedmetadata = handler;
+        if (handler)
+            this.addEventListener('loadedmetadata', handler);
+    }
+    _onloadeddata = null;
+    get onloadeddata() { return this._onloadeddata; }
+    set onloadeddata(handler) {
+        if (this._onloadeddata)
+            this.removeEventListener('loadeddata', this._onloadeddata);
+        this._onloadeddata = handler;
+        if (handler)
+            this.addEventListener('loadeddata', handler);
+    }
+    _oncanplay = null;
+    get oncanplay() { return this._oncanplay; }
+    set oncanplay(handler) {
+        if (this._oncanplay)
+            this.removeEventListener('canplay', this._oncanplay);
+        this._oncanplay = handler;
+        if (handler)
+            this.addEventListener('canplay', handler);
+    }
+    _oncanplaythrough = null;
+    get oncanplaythrough() { return this._oncanplaythrough; }
+    set oncanplaythrough(handler) {
+        if (this._oncanplaythrough)
+            this.removeEventListener('canplaythrough', this._oncanplaythrough);
+        this._oncanplaythrough = handler;
+        if (handler)
+            this.addEventListener('canplaythrough', handler);
+    }
+    _onerror = null;
+    get onerror() { return this._onerror; }
+    set onerror(handler) {
+        if (this._onerror)
+            this.removeEventListener('error', this._onerror);
+        this._onerror = handler;
+        if (handler)
+            this.addEventListener('error', handler);
+    }
+    _onenterpictureinpicture = null;
+    get onenterpictureinpicture() { return this._onenterpictureinpicture; }
+    set onenterpictureinpicture(handler) {
+        if (this._onenterpictureinpicture)
+            this.removeEventListener('enterpictureinpicture', this._onenterpictureinpicture);
+        this._onenterpictureinpicture = handler;
+        if (handler)
+            this.addEventListener('enterpictureinpicture', handler);
+    }
+    _onleavepictureinpicture = null;
+    get onleavepictureinpicture() { return this._onleavepictureinpicture; }
+    set onleavepictureinpicture(handler) {
+        if (this._onleavepictureinpicture)
+            this.removeEventListener('leavepictureinpicture', this._onleavepictureinpicture);
+        this._onleavepictureinpicture = handler;
+        if (handler)
+            this.addEventListener('leavepictureinpicture', handler);
+    }
     // --- Standard Media API ---
     canPlayType(type) {
         // We strictly play Helios compositions, not standard video MIME types.
