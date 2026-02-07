@@ -28,6 +28,8 @@ This backlog tracks concrete deliverables derived from [`AGENTS.md`](../AGENTS.m
 - [x] **CLI**: Implement init command.
 - [x] **CLI**: Implement registry commands.
 - [x] **CLI**: Implement render command.
+- [x] **CLI**: Implement example init (`helios init --example`).
+- [ ] **CLI**: Make example registry configurable (remove hardcoded URL).
 - [ ] **Examples**: Create examples demonstrating distributed rendering workflows.
 - [ ] **Examples**: Create examples demonstrating component usage.
 
