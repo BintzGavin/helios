@@ -1,0 +1,22 @@
+body {
+  margin: 0;
+  overflow: hidden;
+  background-color: #222;
+  color: white;
+  font-family: sans-serif;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+video {
+  width: 320px;
+  height: 240px;
+  border: 2px solid #444;
+  background: black;
+  margin-bottom: 20px;
+}
+.info {
+  text-align: center;
+}
