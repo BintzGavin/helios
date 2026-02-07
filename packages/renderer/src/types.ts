@@ -271,3 +271,21 @@ export interface FFmpegConfig {
   args: string[];
   inputBuffers: { index: number; buffer: Buffer }[];
 }
+
+export interface RenderChunk {
+  id: number;
+  startFrame: number;
+  frameCount: number;
+  outputFile: string;
+  options: RendererOptions;
+}
+
+export interface RenderPlan {
+  totalFrames: number;
+  chunks: RenderChunk[];
+  concatManifest: string[]; // List of chunk files to concatenate
+  concatOutputFile: string; // The intermediate PCM .mov file
+  finalOutputFile: string; // The final user-requested output
+  mixOptions: RendererOptions; // Options for the final audio mix/transcode pass
+  cleanupFiles: string[]; // List of temporary files to delete after success
+}

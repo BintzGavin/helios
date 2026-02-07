@@ -42,6 +42,7 @@ const tests = [
   'tests/verify-implicit-audio.ts',
   'tests/verify-keyframes.ts',
   'tests/verify-media-sync.ts',
+  'tests/verify-orchestrator-plan.ts',
   'tests/verify-pseudo-element-preload.ts',
   'tests/verify-range-render.ts',
   'tests/verify-seek-driver-determinism.ts',
