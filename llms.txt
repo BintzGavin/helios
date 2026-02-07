@@ -6,7 +6,7 @@ Helios is a modern engine for creating videos programmatically using standard we
 
 ## Quick Facts
 - **License**: Elastic License 2.0 (free commercial use, no SaaS resale)
-- **Status**: Beta / Self-Driving (Core: Stable v5.12+, Studio: Alpha v0.101+)
+- **Status**: Beta / Self-Driving (Core: Stable v5.13+, Studio: Alpha v0.104+)
 - **Frameworks**: React, Vue, Svelte, Solid, vanilla JS
 - **Animation**: Standard CSS, Web Animations API (WAAPI), any animation library
 
@@ -40,7 +40,7 @@ helios.play();
 - `@helios-project/player` - Web Component player (`<helios-player>`)
 - `@helios-project/renderer` - Server-side rendering (Playwright, FFmpeg)
 - `@helios-project/studio` - Browser-based development environment (Alpha)
-- `@helios-project/cli` - Command-line interface (scaffolding, registry, studio, merge)
+- `@helios-project/cli` - Command-line interface (scaffolding, registry, studio, render, job, skills, preview)
 
 ## Animation Approach
 Helios uses native browser APIs, not proprietary hooks:
@@ -92,6 +92,8 @@ Skills for AI agents are in `.agents/skills/helios/`:
 - `packages/core/src/index.ts` - Core public API
 - `packages/player/src/index.ts` - Player public API
 - `packages/renderer/src/index.ts` - Renderer public API
+- `packages/studio/src/server/mcp.ts` - Studio MCP Server
+- `packages/studio/src/server/plugin.ts` - Studio Vite Plugin
 
 ## Diagnostics
 ```typescript
@@ -108,11 +110,11 @@ const report = await Helios.diagnose();
 
 ## Roadmap
 ### V1.x (Active)
-- **Helios Studio**: Alpha v0.101+ (Stacked Timeline, Audio Mixer, Component Registry UI, Render Presets, Open in Editor)
-- **CLI**: Beta v0.12+ (Component Registry, Project Scaffolding, Auto-install, Merge Command)
-- **Core**: Stable v5.12+ (Active Clips, Input Schema, Audio Fade Easing, Headless Audio, WebVTT)
-- **Player**: Feature Complete v0.70+ (Audio Metering, Snapshot Export, Diagnostics UI, Responsive Images)
-- **Renderer**: Stable v1.74+ (Local Distributed Rendering, Enhanced Diagnostics, Smart Codec Selection)
+- **Helios Studio**: Alpha v0.104+ (Preview Command, Open in Editor, Resizable Layout, Component Registry UI)
+- **CLI**: Beta v0.19+ (Preview Command, Skills Command, Job Command, Build Command)
+- **Core**: Stable v5.13+ (Generic Input Props, Active Clips, Input Schema, Headless Audio)
+- **Player**: Feature Complete v0.74+ (SVG Icons, CSS Parts, Export Menu, Audio Metering)
+- **Renderer**: Stable v1.77+ (Distributed Progress, Configurable Random Seed, Orchestrator Cancellation)
 
 ### AI Integration
 - **Studio MCP Server**: Inspect, create, and render compositions via LLM tools (Done)
