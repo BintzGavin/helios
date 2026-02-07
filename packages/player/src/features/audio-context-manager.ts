@@ -1,5 +1,6 @@
 export class SharedAudioSource {
   private source: MediaElementAudioSourceNode;
+  private fadeGainNode: GainNode;
   private gainNode: GainNode;
   private listener: () => void;
   private element: HTMLMediaElement;
@@ -7,7 +8,8 @@ export class SharedAudioSource {
   constructor(element: HTMLMediaElement, context: AudioContext) {
     this.element = element;
     this.source = context.createMediaElementSource(element);
-    this.gainNode = context.createGain();
+    this.fadeGainNode = context.createGain(); // For fades (composition)
+    this.gainNode = context.createGain();     // For volume (user control)
 
     // Initial sync
     this.syncVolume();
@@ -16,9 +18,20 @@ export class SharedAudioSource {
     this.listener = () => this.syncVolume();
     element.addEventListener('volumechange', this.listener);
 
-    // Playback path (Post-fader to respect volume controls)
-    this.source.connect(this.gainNode);
+    // Playback path: Source -> Fade -> Volume -> Destination
+    this.source.connect(this.fadeGainNode);
+    this.fadeGainNode.connect(this.gainNode);
     this.gainNode.connect(context.destination);
+  }
+
+  public setFadeGain(value: number) {
+    try {
+      // Use setTargetAtTime for smooth transition to avoid clicks
+      // time constant 0.01 provides fast but smooth updates
+      this.fadeGainNode.gain.setTargetAtTime(value, this.fadeGainNode.context.currentTime, 0.01);
+    } catch (e) {
+      // Ignore
+    }
   }
 
   private syncVolume() {
@@ -30,9 +43,10 @@ export class SharedAudioSource {
   }
 
   connect(node: AudioNode) {
-    // Connect source (pre-fader) to the metering node
+    // Connect post-fade (but pre-volume) to the metering node
+    // This ensures meter reflects composition fades but not user volume
     try {
-      this.source.connect(node);
+      this.fadeGainNode.connect(node);
     } catch (e) {
       // Already connected or error
     }
@@ -40,7 +54,7 @@ export class SharedAudioSource {
 
   disconnect(node: AudioNode) {
     try {
-      this.source.disconnect(node);
+      this.fadeGainNode.disconnect(node);
     } catch (e) {
       // Ignore if not connected
     }

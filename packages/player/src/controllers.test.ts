@@ -3,6 +3,16 @@ import { DirectController, BridgeController } from './controllers';
 import { Helios } from '@helios-project/core';
 import * as domCapture from './features/dom-capture';
 
+// Mock AudioFader
+vi.mock('./features/audio-fader', () => ({
+    AudioFader: class {
+        connect = vi.fn();
+        enable = vi.fn();
+        disable = vi.fn();
+        dispose = vi.fn();
+    }
+}));
+
 // Mock Helios
 vi.mock('@helios-project/core', () => {
     const MockHelios = vi.fn();

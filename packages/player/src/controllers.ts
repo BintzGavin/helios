@@ -2,6 +2,7 @@ import type { Helios, CaptionCue, HeliosSchema, DiagnosticReport, Marker } from 
 import { captureDomToBitmap } from "./features/dom-capture";
 import { getAudioAssets, AudioAsset } from "./features/audio-utils";
 import { AudioMeter, AudioLevels } from "./features/audio-metering";
+import { AudioFader } from "./features/audio-fader";
 
 export interface HeliosController {
   play(): void;
@@ -36,10 +37,15 @@ export interface HeliosController {
 
 export class DirectController implements HeliosController {
   private audioMeter: AudioMeter | null = null;
+  private audioFader: AudioFader | null = null;
   private audioMeteringCallback: ((levels: AudioLevels) => void) | null = null;
   private audioMeteringRaf: number | null = null;
 
-  constructor(public instance: Helios, private iframe?: HTMLIFrameElement) {}
+  constructor(public instance: Helios, private iframe?: HTMLIFrameElement) {
+    this.audioFader = new AudioFader();
+    const doc = this.iframe?.contentDocument || document;
+    this.audioFader.connect(doc);
+  }
   play() { this.instance.play(); }
   pause() { this.instance.pause(); }
   seek(frame: number) {
@@ -60,13 +66,28 @@ export class DirectController implements HeliosController {
   setFps(fps: number) { this.instance.setFps(fps); }
   setSize(width: number, height: number) { this.instance.setSize(width, height); }
   setMarkers(markers: Marker[]) { this.instance.setMarkers(markers); }
-  subscribe(callback: (state: any) => void) { return this.instance.subscribe(callback); }
+  subscribe(callback: (state: any) => void) {
+    return this.instance.subscribe((state: any) => {
+       if (this.audioFader) {
+         if (state.isPlaying) {
+           this.audioFader.enable();
+         } else {
+           this.audioFader.disable();
+         }
+       }
+       callback(state);
+    });
+  }
   getState() { return this.instance.getState(); }
   dispose() {
     this.stopAudioMetering();
     if (this.audioMeter) {
       this.audioMeter.dispose();
       this.audioMeter = null;
+    }
+    if (this.audioFader) {
+      this.audioFader.dispose();
+      this.audioFader = null;
     }
   }
 
