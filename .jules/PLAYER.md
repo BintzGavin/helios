@@ -13,3 +13,7 @@
 ## [v0.72.1] - Canvas Resolution Mismatch
 **Learning:** `captureFrame` (and `VideoFrame` from Canvas) captures the backing store resolution, which might differ from the requested export resolution. The `ClientSideExporter` assumed the source frame matched the target size.
 **Action:** Always verify target dimensions in export logic and explicitly resize (via intermediate canvas) if the source frame doesn't match the target.
+
+## [v0.74.1] - Reactive DOM Features
+**Learning:** Features that interact with composition DOM elements (like `AudioFader`) must use `MutationObserver` to handle dynamic content (e.g. React rendering), as a single scan on `connect` misses elements added later.
+**Action:** Always implement `MutationObserver` when building features that need to track DOM elements inside the composition iframe.
