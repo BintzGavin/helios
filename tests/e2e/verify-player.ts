@@ -86,12 +86,20 @@ async function main() {
     await playButton.waitFor();
     await timeDisplay.waitFor();
 
+    // Initial state: paused (so button label is "Play")
+    let playLabel = await playButton.getAttribute('aria-label');
+    if (playLabel !== 'Play') throw new Error(`Expected 'Play' label, got ${playLabel}`);
+
     const initialTime = await timeDisplay.textContent();
     console.log(`Initial time: ${initialTime}`);
 
     console.log('Clicking play...');
     await playButton.click();
     await page.waitForTimeout(1000);
+
+    // Playing state: button label should be "Pause"
+    playLabel = await playButton.getAttribute('aria-label');
+    if (playLabel !== 'Pause') throw new Error(`Expected 'Pause' label, got ${playLabel}`);
 
     const afterTimeText = await timeDisplay.textContent();
     console.log(`Time after 1s: ${afterTimeText}`);
@@ -105,6 +113,10 @@ async function main() {
     const pauseTimeText = await timeDisplay.textContent();
     await page.waitForTimeout(500);
     const pauseTimeText2 = await timeDisplay.textContent();
+
+    // Paused state: button label should be "Play"
+    playLabel = await playButton.getAttribute('aria-label');
+    if (playLabel !== 'Play') throw new Error(`Expected 'Play' label, got ${playLabel}`);
 
     if (pauseTimeText !== pauseTimeText2) {
          throw new Error('Time advanced while paused!');
@@ -162,19 +174,19 @@ async function main() {
     // ---------------------------------------------------------
     console.log('Running Volume Tests...');
     const volumeBtn = player.locator('.volume-btn');
-    // Initial state: unmuted
-    let volText = await volumeBtn.textContent();
-    if (volText !== '🔊') throw new Error(`Expected unmuted icon, got ${volText}`);
+    // Initial state: unmuted (so button label is "Mute")
+    let volLabel = await volumeBtn.getAttribute('aria-label');
+    if (volLabel !== 'Mute') throw new Error(`Expected 'Mute' label, got ${volLabel}`);
 
     console.log('Muting...');
     await volumeBtn.click();
-    volText = await volumeBtn.textContent();
-    if (volText !== '🔇') throw new Error(`Expected muted icon, got ${volText}`);
+    volLabel = await volumeBtn.getAttribute('aria-label');
+    if (volLabel !== 'Unmute') throw new Error(`Expected 'Unmute' label, got ${volLabel}`);
 
     console.log('Unmuting...');
     await volumeBtn.click();
-    volText = await volumeBtn.textContent();
-    if (volText !== '🔊') throw new Error(`Expected unmuted icon, got ${volText}`);
+    volLabel = await volumeBtn.getAttribute('aria-label');
+    if (volLabel !== 'Mute') throw new Error(`Expected 'Mute' label, got ${volLabel}`);
 
     console.log('Volume Verified ✅');
 
