@@ -100,14 +100,37 @@ The Shadow DOM contains:
 - `--helios-caption-font-family`: Caption font family.
 
 ## G. CSS Parts
+- `iframe`: The composition iframe.
 - `controls`: Main controls container.
+- `play-pause-button`: Play/Pause button.
 - `volume-control`: Volume button and slider container.
+- `volume-button`: Mute/Unmute button.
+- `volume-slider`: Volume range input.
+- `audio-button`: Audio tracks menu toggle button.
+- `cc-button`: Captions toggle button.
+- `export-button`: Export menu toggle button.
 - `scrubber-wrapper`: Scrubber and markers container.
-- `poster-image`: The poster `<img>` element.
-- `big-play-button`: The large play button overlay.
-- `status-text`: Text element in the status overlay.
-- `retry-button`: Retry button in the status overlay.
+- `scrubber`: Time seek range input.
+- `tooltip`: Scrubber hover tooltip.
+- `markers`: Container for timeline markers.
+- `time-display`: Current time / Duration text.
+- `fullscreen-button`: Fullscreen toggle button.
+- `pip-button`: Picture-in-Picture toggle button.
+- `settings-button`: Settings menu toggle button.
+- `audio-menu`: Audio tracks popup menu.
+- `settings-menu`: Settings popup menu.
+- `export-menu`: Export options popup menu.
+- `shortcuts-overlay`: Keyboard shortcuts overlay container.
 - `shortcuts-header`: Header of the shortcuts overlay.
 - `shortcuts-grid`: Grid container for shortcuts list.
+- `debug-overlay`: Diagnostics overlay container.
 - `debug-header`: Header of the diagnostics overlay.
 - `debug-content`: Preformatted text content of diagnostics.
+- `overlay`: Status overlay (Connecting/Error).
+- `status-text`: Text element in the status overlay.
+- `retry-button`: Retry button in the status overlay.
+- `poster`: Poster container.
+- `poster-image`: The poster `<img>` element.
+- `big-play-button`: The large play button overlay.
+- `click-layer`: Transparent layer capturing clicks for play/pause.
+- `captions`: Captions overlay container.

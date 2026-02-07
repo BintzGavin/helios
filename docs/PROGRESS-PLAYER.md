@@ -1,3 +1,12 @@
+## PLAYER v0.74.1
+- ✅ Completed: Implement SVG Icons - Replaced text-based control icons with inline SVGs for consistent visual styling.
+
+## PLAYER v0.74.0
+- ✅ Completed: CSS Parts - Implemented CSS Shadow Parts (`part` attribute) for key UI elements (`controls`, `volume-control`, `scrubber-wrapper`, `poster-image`, `big-play-button`, etc.), enabling full styling customization.
+
+## PLAYER v0.73.1
+- ✅ Completed: DOM Export Form Values - Implemented `inlineFormValues` utility to preserve user input (value, checked, selected) in form elements during client-side DOM export.
+
 ## PLAYER v0.73.0
 - ✅ Completed: Async Seek - Updated `HeliosController.seek` to return a Promise and implemented `HELIOS_SEEK_DONE` handshake in Bridge mode to ensure `seeked` event fires only after frame rendering.
 
