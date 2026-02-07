@@ -17,6 +17,7 @@ The `examples/` directory contains various examples demonstrating Helios usage w
 - `examples/pixi-canvas-animation`: Demonstrates PixiJS integration.
 - `examples/simple-animation`: Simple vanilla JS animation.
 - `examples/simple-canvas-animation`: Standardized simple canvas animation.
+- `examples/chartjs-animation`: Standardized Chart.js animation example.
 - `examples/p5-canvas-animation`: Demonstrates p5.js integration.
 - `examples/react-three-fiber`: Demonstrates React Three Fiber integration.
 - `examples/threejs-canvas-animation`: Demonstrates Three.js integration.
