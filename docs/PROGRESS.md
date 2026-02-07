@@ -19,6 +19,9 @@ Each agent should update **their own dedicated progress file** instead of this f
 ### CORE v5.13.0
 - ✅ Completed: Generic Input Props - Refactored Helios class to accept generic TInputProps for strict property typing.
 
+### DEMO v1.131.0
+- ✅ Completed: Standardize Audio Visualization Example - Modernized `examples/audio-visualization` with TypeScript, `package.json`, and proper build config.
+
 ### DEMO v1.130.0
 - ✅ Completed: Standardize Simple Canvas Animation Example - Modernized `examples/simple-canvas-animation` with TypeScript, `package.json`, and proper build config.
 

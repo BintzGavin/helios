@@ -6,6 +6,7 @@ The `examples/` directory contains various examples demonstrating Helios usage w
 - `examples/react-canvas-animation`: Demonstrates React integration with Canvas and Helios.
 - `examples/dynamic-props-animation`: Demonstrates dynamic properties.
 - `examples/react-dom-animation`: Demonstrates React integration with DOM elements.
+- `examples/audio-visualization`: Demonstrates audio visualization with vanilla TypeScript.
 - `examples/procedural-generation`: Demonstrates procedural generation.
 - `examples/text-effects-animation`: Demonstrates text effects.
 - `examples/variable-font-animation`: Demonstrates variable fonts.
