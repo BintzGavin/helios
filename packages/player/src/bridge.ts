@@ -2,10 +2,15 @@ import { Helios } from "@helios-project/core";
 import { captureDomToBitmap } from "./features/dom-capture";
 import { getAudioAssets } from "./features/audio-utils";
 import { AudioMeter } from "./features/audio-metering";
+import { AudioFader } from "./features/audio-fader";
 
 export function connectToParent(helios: Helios) {
   let audioMeter: AudioMeter | null = null;
   let audioMeterRaf: number | null = null;
+  const audioFader = new AudioFader();
+
+  // Connect fader immediately (scans document for audio elements)
+  audioFader.connect(document);
 
   // 1. Listen for messages from parent
   window.addEventListener('message', async (event) => {
@@ -155,6 +160,11 @@ export function connectToParent(helios: Helios) {
 
   // 3. Subscribe to Helios state changes and broadcast
   helios.subscribe((state: any) => {
+    if (state.isPlaying) {
+      audioFader.enable();
+    } else {
+      audioFader.disable();
+    }
     window.parent.postMessage({ type: 'HELIOS_STATE', state }, '*');
   });
 

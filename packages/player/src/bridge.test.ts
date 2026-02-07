@@ -2,6 +2,16 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { connectToParent } from './bridge';
 
+// Mock AudioFader
+vi.mock('./features/audio-fader', () => ({
+    AudioFader: class {
+        connect = vi.fn();
+        enable = vi.fn();
+        disable = vi.fn();
+        dispose = vi.fn();
+    }
+}));
+
 // Mock Helios
 vi.mock('@helios-project/core', () => {
     return {
