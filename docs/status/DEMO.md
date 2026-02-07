@@ -1,6 +1,6 @@
 # Status: DEMO Domain
 
-**Version**: 1.129.0
+**Version**: 1.130.0
 
 **Posture**: ACTIVELY EXPANDING FOR V2
 
@@ -16,6 +16,7 @@ The DEMO domain is responsible for:
 ## Active Tasks
 
 ## Completed Tasks
+- [v1.130.0] ✅ Completed: Standardize Simple Canvas Animation Example - Modernized `examples/simple-canvas-animation` with TypeScript, `package.json`, and proper build config.
 - [v1.129.0] ✅ Completed: Standardize React Canvas Animation Example - Modernized `examples/react-canvas-animation` with TypeScript, `package.json`, and proper build config.
 - [v1.128.0] ✅ Completed: Standardize Dynamic Props Animation Example - Modernized `examples/dynamic-props-animation` with TypeScript, `package.json`, and proper build config.
 - [v1.127.0] ✅ Completed: Standardize React DOM Example - Upgraded `examples/react-dom-animation` to a fully standardized, strictly-typed TypeScript example.
