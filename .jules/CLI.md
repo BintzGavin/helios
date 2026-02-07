@@ -61,3 +61,7 @@ Critical learnings only. This is not a log—only add entries for insights that 
 ## [0.16.1] - Module System Mismatch
 **Learning:** `packages/cli` is ESM (`type: module`) but imported `packages/renderer` which lacked `type: module` in its `package.json` despite targeting ESM in `tsconfig`. This caused `SyntaxError` when using named exports like `RenderOrchestrator` in `tsx` environments.
 **Action:** When developing in a monorepo with mixed CJS/ESM history, explicit `package.json` configuration (`type: module`) is critical for ensuring interoperability, even if compilation targets seem correct.
+
+## [0.19.0] - Example Distributability
+**Learning:** The examples in the repository rely on local monorepo paths (`../../../packages/*`), making them impossible to distribute directly to users via `helios init`. The "Examples" product surface is blocked by this coupling.
+**Action:** Implement transformation logic in the CLI to rewrite imports and dependencies when scaffolding from an example, ensuring the user gets a standalone project.
