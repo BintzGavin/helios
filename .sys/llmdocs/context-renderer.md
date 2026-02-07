@@ -33,6 +33,7 @@ packages/renderer/
 │   │   └── SeekTimeDriver.ts # Virtual time via polyfills
 │   └── utils/
 │       ├── FFmpegBuilder.ts  # FFmpeg argument generator
+│       ├── FFmpegInspector.ts # Hardware acceleration detection
 │       ├── dom-scanner.ts    # Audio/Video element discovery
 │       ├── dom-scripts.ts    # Shared DOM injection scripts
 │       └── blob-extractor.ts # Blob URL extraction
@@ -63,6 +64,7 @@ interface RendererOptions {
   stabilityTimeout?: number; // Wait timeout for assets
   randomSeed?: number; // Deterministic PRNG seed
   mixInputAudio?: boolean; // Preserve implicit audio from input
+  hwAccel?: string; // Hardware acceleration method ('cuda', 'vaapi', 'auto')
 }
 ```
 
@@ -75,6 +77,10 @@ The Renderer pipes raw frames (or encoded chunks) to FFmpeg's `stdin`.
 *   **DOM Mode**:
     *   Input: Image sequence via pipe.
     *   Flags: `-f image2pipe -vcodec png -i pipe:0`.
+*   **Hardware Acceleration**:
+    *   Configured via `hwAccel` option.
+    *   Validated against available methods via `ffmpeg -hwaccels`.
+    *   Injected via `-hwaccel [method]` flag.
 *   **Output**:
     *   Controlled by `FFmpegBuilder`.
     *   Supports `libx264` (MP4), `libvpx-vp9` (WebM), `prores`, etc.

@@ -38,6 +38,7 @@ const tests = [
   'tests/verify-dom-transparency.ts',
   'tests/verify-enhanced-dom-preload.ts',
   'tests/verify-frame-count.ts',
+  'tests/verify-hwaccel-validation.ts',
   'tests/verify-iframe-sync.ts',
   'tests/verify-implicit-audio.ts',
   'tests/verify-keyframes.ts',

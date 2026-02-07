@@ -70,6 +70,18 @@ export class Renderer {
   public async render(compositionUrl: string, outputPath: string, jobOptions?: RenderJobOptions): Promise<void> {
     console.log(`Starting render for composition: ${compositionUrl} (Mode: ${this.options.mode || 'canvas'})`);
 
+    // Validate Hardware Acceleration
+    const ffmpegPath = this.options.ffmpegPath || ffmpeg.path;
+    const ffmpegInfo = FFmpegInspector.inspect(ffmpegPath);
+    console.log(`[Helios Diagnostics] FFmpeg Version: ${ffmpegInfo.version}`);
+    console.log(`[Helios Diagnostics] FFmpeg HW Accel: ${ffmpegInfo.hwaccels.join(', ') || 'none'}`);
+
+    if (this.options.hwAccel && this.options.hwAccel !== 'auto') {
+      if (!ffmpegInfo.hwaccels.includes(this.options.hwAccel)) {
+        console.warn(`[Helios Warning] Hardware acceleration '${this.options.hwAccel}' was requested but is not listed in 'ffmpeg -hwaccels' output. Available: ${ffmpegInfo.hwaccels.join(', ') || 'none'}`);
+      }
+    }
+
     const browser = await chromium.launch(this.getLaunchOptions());
 
     const context = await browser.newContext({
@@ -123,7 +135,6 @@ export class Renderer {
       await this.timeDriver.prepare(page);
       console.log('Strategy prepared.');
 
-      const ffmpegPath = this.options.ffmpegPath || ffmpeg.path;
       const totalFrames = this.options.frameCount
         ? this.options.frameCount
         : this.options.durationInSeconds * this.options.fps;
