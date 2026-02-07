@@ -60,7 +60,11 @@
         "examples/vue-audio-visualization",
         "examples/pixi-animation",
         "examples/solid-audio-visualization",
-        "examples/react-components"
+        "examples/react-components",
+        "examples/media-element",
+        "examples/chartjs",
+        "examples/audio-visualization",
+        "examples/simple-canvas"
       ]
     },
     {
@@ -75,7 +79,8 @@
     {
       "group": "Architecture",
       "pages": [
-        "architecture/overview"
+        "architecture/overview",
+        "architecture/rendering-pipeline"
       ]
     },
     {

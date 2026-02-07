@@ -69,3 +69,44 @@ Best for HTML/CSS animations. Uses `XMLSerializer` to serialize the DOM into an 
   export-mode="dom"
 ></helios-player>
 ```
+
+## Styling & Icons
+
+The player uses Shadow DOM, but exposes parts for styling. You can customize the look and feel using standard CSS.
+
+### Customizing Colors
+
+Use CSS variables to change the theme:
+
+```css
+helios-player {
+  --helios-accent-color: #ff0055;
+  --helios-controls-bg: rgba(20, 20, 20, 0.9);
+  --helios-text-color: #ffffff;
+  --helios-font-family: 'Helvetica Neue', sans-serif;
+}
+```
+
+### Advanced Styling with Parts
+
+Target specific internal elements using `::part()`:
+
+```css
+/* Style the play button */
+helios-player::part(play-pause-button) {
+  color: var(--helios-accent-color);
+}
+
+/* Style the scrubber track */
+helios-player::part(scrubber) {
+  height: 10px;
+  border-radius: 5px;
+}
+
+/* Hide the volume control */
+helios-player::part(volume-control) {
+  display: none;
+}
+```
+
+See the [Player API Reference](/api/player#styling-css-parts) for a full list of available parts.

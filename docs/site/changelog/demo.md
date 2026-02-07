@@ -5,6 +5,24 @@ description: "Changelog for the Demo package and examples"
 
 # Demo Changelog
 
+## v1.133.0
+- **Standardize Media Element Animation Example**: Modernized `examples/media-element-animation` with TypeScript, `package.json`, and proper build config.
+
+## v1.132.0
+- **Standardize Chart.js Animation Example**: Modernized `examples/chartjs-animation` with TypeScript, `package.json`, and proper build config.
+
+## v1.131.0
+- **Standardize Audio Visualization Example**: Modernized `examples/audio-visualization` with TypeScript, `package.json`, and proper build config.
+
+## v1.130.0
+- **Standardize Simple Canvas Animation Example**: Modernized `examples/simple-canvas-animation` with TypeScript, `package.json`, and proper build config.
+
+## v1.127.0
+- **Standardize React DOM Example**: Upgraded `examples/react-dom-animation` to a fully standardized, strictly-typed TypeScript example.
+
+## v1.126.0
+- **Standardize Procedural Generation Example**: Modernized `examples/procedural-generation` with TypeScript, `package.json`, and proper build config.
+
 ## v1.123.0
 - **Standardize Lottie Animation**: Modernized `examples/lottie-animation` with TypeScript, `package.json`, and proper build config.
 

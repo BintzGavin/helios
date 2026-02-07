@@ -5,28 +5,44 @@ description: "API Reference for @helios-project/cli"
 
 # CLI API
 
-The `@helios-project/cli` package provides the command-line interface for managing Helios projects, installing components, and rendering compositions.
+The `@helios-project/cli` package provides the command-line interface for managing Helios projects, installing components, running distributed jobs, and building for production.
+
+## Installation
+
+```bash
+npm install -g @helios-project/cli
+```
 
 ## Commands
 
 ### `helios init`
 
-Initializes a new Helios project by creating a `helios.config.json` file.
+Initializes a new Helios project or scaffolds from an example.
 
 ```bash
-helios init [options]
+helios init [target] [options]
 ```
 
+**Arguments**:
+- `[target]`: The directory to initialize the project in (defaults to current directory).
+
 **Options**:
-- `-y, --yes`: Skip prompts and use default configuration.
-- `--framework <framework>`: Specify the framework (react, vue, svelte, vanilla, solid).
+- `-y, --yes`: Skip prompts and use default configuration (React).
+- `-f, --framework <framework>`: Specify the framework (`react`, `vue`, `svelte`, `solid`, `vanilla`).
+- `--example <name>`: Initialize from a specific example in the repository.
+- `--repo <repo>`: Specify the repository to fetch examples from (default: `BintzGavin/helios/examples`). Supports `user/repo` or `user/repo/path`.
 
-**Behavior**:
-Prompts the user for:
-1. Components directory (default: `src/components`)
-2. Library directory (default: `src/lib`)
+**Examples**:
+```bash
+# Interactive mode
+helios init
 
-Generates `helios.config.json` in the current working directory.
+# Scaffold a React project in 'my-video' folder
+helios init my-video --framework react
+
+# Scaffold from an example
+helios init --example chartjs-animation
+```
 
 ### `helios add`
 
@@ -57,7 +73,7 @@ helios update <component>
 
 ### `helios remove`
 
-Removes a component from the project configuration.
+Removes a component from the project configuration and warns about associated files.
 
 ```bash
 helios remove <component>
@@ -65,7 +81,7 @@ helios remove <component>
 
 ### `helios list`
 
-Lists installed components in the project.
+Lists installed components in the project as tracked in `helios.config.json`.
 
 ```bash
 helios list
@@ -73,14 +89,81 @@ helios list
 
 ### `helios components`
 
-Lists all available components in the registry.
+Lists all available components in the registry that can be installed via `helios add`.
 
 ```bash
 helios components
 ```
 
-**Output**:
-Displays a list of component names and types available for installation via `helios add`.
+### `helios skills install`
+
+Installs Helios AI agent skills into the current project.
+
+```bash
+helios skills install
+```
+
+**Behavior**:
+Copies bundled skill definitions to `.agents/skills/helios` in your project, enabling AI agents to understand and generate Helios code.
+
+### `helios job run`
+
+Executes a distributed rendering job from a JSON specification.
+
+```bash
+helios job run <file> [options]
+```
+
+**Arguments**:
+- `<file>`: Path to the job specification JSON file.
+
+**Options**:
+- `--chunk <id>`: Execute only a specific chunk ID (useful for distributed workers).
+- `--concurrency <number>`: Number of concurrent chunks to run locally (default: `1`).
+- `--no-merge`: Skip the final video merge step.
+
+**Example Job Spec**:
+```json
+{
+  "chunks": [
+    { "id": 0, "command": "helios render ...", "outputFile": "chunk-0.mp4" },
+    { "id": 1, "command": "helios render ...", "outputFile": "chunk-1.mp4" }
+  ],
+  "mergeCommand": "helios merge final.mp4 chunk-0.mp4 chunk-1.mp4"
+}
+```
+
+### `helios build`
+
+Builds the project for production deployment.
+
+```bash
+helios build [dir] [options]
+```
+
+**Arguments**:
+- `[dir]`: The project root directory (default: `.`).
+
+**Options**:
+- `-o, --out-dir <dir>`: Output directory (default: `dist`).
+
+**Behavior**:
+Generates a production-ready static site in `dist/` containing your composition and a lightweight player wrapper.
+
+### `helios preview`
+
+Previews the production build locally.
+
+```bash
+helios preview [dir] [options]
+```
+
+**Arguments**:
+- `[dir]`: The project root directory (default: `.`).
+
+**Options**:
+- `-o, --out-dir <dir>`: Directory to serve (default: `dist`).
+- `-p, --port <number>`: Port to listen on (default: `4173`).
 
 ### `helios render`
 
@@ -124,4 +207,4 @@ helios studio [options]
 ```
 
 **Behavior**:
-Starts a local development server for visual editing of your compositions.
+Starts a local development server for visual editing of your compositions. It respects `helios.config.json` configuration.

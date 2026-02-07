@@ -5,6 +5,15 @@ description: "Changelog for the Renderer package"
 
 # Renderer Changelog
 
+## v1.77.3
+- **Update Skill Documentation**: Updated `.agents/skills/helios/renderer/SKILL.md` to match the actual `RendererOptions` and `AudioTrackConfig` interfaces, ensuring agents generate correct code.
+
+## v1.77.2
+- **Fix Verification Script Regression**: Updated `verify-asset-timeout.ts` to check for the correct log prefixes (`[Helios Preload]`, `[DomScanner]`), fixing a regression caused by the v1.77.1 DOM traversal refactor.
+
+## v1.77.1
+- **Refactor DOM Traversal**: Consolidated duplicated DOM traversal logic (`findAllImages`, `findAllScopes`, `findAllElements`) into `dom-scripts.ts` and updated `DomStrategy` (preload) and `SeekTimeDriver` to use shared constants.
+
 ## v1.75.0
 - **Distributed Progress Aggregation**: Implemented weighted progress aggregation in RenderOrchestrator to ensure monotonic progress reporting during distributed rendering.
 

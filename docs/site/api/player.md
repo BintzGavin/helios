@@ -86,15 +86,52 @@ The `<helios-player>` element implements a subset of the HTMLMediaElement API, a
 - **`defaultPlaybackRate`** (number): The default playback rate.
 - **`preservesPitch`** (boolean): Whether to preserve pitch when adjusting playback rate.
 - **`crossOrigin`** (string): The CORS setting.
+- **`width`** (number): The width of the player element (reflects attribute).
+- **`height`** (number): The height of the player element (reflects attribute).
+- **`playsInline`** (boolean): Whether the player should play inline on mobile (reflects attribute).
 
 #### Methods
 - **`play()`**: Starts playback. Returns a Promise.
 - **`pause()`**: Pauses playback.
 - **`load()`**: Reloads the media resource.
 - **`canPlayType(type)`**: Returns whether the user agent can play the specified media type.
+- **`fastSeek(time)`**: Quickly seeks to the given time.
 - **`addTextTrack(kind, label, language)`**: Adds a new text track to the player.
 - **`requestPictureInPicture()`**: Requests Picture-in-Picture mode for the video. Returns a Promise resolving to the PiP Window.
 - **`getSchema()`**: Returns the input schema of the composition (if connected).
+
+### Styling (CSS Parts)
+
+You can style the internal components of the player using CSS Shadow Parts.
+
+```css
+helios-player::part(controls) {
+  background-color: rgba(0, 0, 0, 0.8);
+}
+
+helios-player::part(play-pause-button) {
+  color: #ff0000;
+}
+```
+
+**Available Parts**:
+- `controls`: The main control bar container.
+- `play-pause-button`: The play/pause toggle button.
+- `volume-control`: The volume control container.
+- `volume-button`: The mute/unmute button.
+- `volume-slider`: The volume slider input.
+- `scrubber-wrapper`: The timeline scrubber container.
+- `scrubber`: The timeline range input.
+- `time-display`: The current time / duration text.
+- `fullscreen-button`: The fullscreen toggle button.
+- `pip-button`: The picture-in-picture toggle button.
+- `settings-button`: The settings menu button.
+- `cc-button`: The closed captions toggle button.
+- `export-button`: The export menu button.
+- `poster`: The poster image container.
+- `poster-image`: The poster image element.
+- `big-play-button`: The large center play button overlay.
+- `overlay`: The status overlay (e.g., "Connecting...", errors).
 
 ### Visual Markers
 
@@ -151,6 +188,20 @@ if (controller) {
   });
 }
 ```
+
+### Diagnostics
+
+You can run diagnostics to check for environment support (WebCodecs, WebGL, etc.).
+
+#### `diagnose()`
+Returns a promise that resolves to a `DiagnosticReport`.
+
+```typescript
+const report = await player.diagnose();
+console.log(report.videoCodecs);
+```
+
+**UI**: You can toggle a visible diagnostics overlay by pressing `Shift + D`.
 
 ### Keyboard Shortcuts
 

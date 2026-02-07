@@ -31,7 +31,18 @@ const options: RendererOptions = {
   audioFilePath: './audio.mp3', // Supports local paths and blob: URLs
   audioCodec: 'aac', // 'aac', 'libvorbis', etc.
   audioBitrate: '192k',
-  audioTracks: ['./voiceover.mp3', './music.mp3'], // For mixing multiple tracks
+  // Supports mixing multiple tracks with configuration
+  audioTracks: [
+    './voiceover.mp3',
+    {
+      path: './music.mp3',
+      volume: 0.5,
+      loop: true,
+      fadeInDuration: 2,
+      fadeOutDuration: 2
+    }
+  ],
+  mixInputAudio: false, // Mix audio from the input video (default: false)
 
   // Captions
   subtitles: './captions.srt', // Path to SRT file for burn-in subtitles
@@ -47,9 +58,10 @@ const options: RendererOptions = {
   canvasSelector: '#my-canvas', // Optional: Select a specific canvas element
 
   ffmpegPath: '/path/to/ffmpeg', // Optional
+  hwAccel: 'auto', // Hardware acceleration ('cuda', 'vaapi', 'videotoolbox', 'auto')
 
   // Stability & Determinism
-  randomSeed: 'my-seed', // Optional: Seed for deterministic randomness
+  randomSeed: 12345, // Optional: Seed for deterministic randomness (number)
   stabilityTimeout: 30000, // Optional: Timeout for waitUntilStable (ms)
 
   // Browser Configuration

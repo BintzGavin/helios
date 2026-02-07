@@ -1,8 +1,18 @@
-**Version**: 1.11.0
+**Version**: 1.12.0
 
 # DOCS Status
 
 ## Recent Updates
+[v1.12.0] ✅ Completed: Daily Documentation Review - Comprehensive Sync
+- Updated all Changelogs (Core v5.13.0, Renderer v1.77.3, Player v0.74.4, CLI v0.20.1, Studio v0.106.0, Demo v1.133.0).
+- Updated CLI API Docs: Added `init` (--repo/--example), `skills`, `job`, `build`, `preview`.
+- Updated Core API Docs: Generic `TInputProps`.
+- Updated Player API Docs: `export()`, CSS Parts, `fastSeek`, Diagnostics.
+- Updated Renderer API Docs: `RendererOptions` (`mixInputAudio`, `audioTracks` config, `hwAccel`).
+- Created Architecture Doc: `rendering-pipeline.md`.
+- Created Example Docs: Media Element, Chart.js, Audio Viz, Simple Canvas.
+- Updated Guides: Quickstart (CLI init), Rendering (Distributed), Player (Styling).
+
 [v1.11.0] ✅ Completed: Daily Documentation Review - Comprehensive Sync
 - Updated all Changelogs (Core v5.12.0, Renderer v1.72.0-v1.75.0, Player v0.69.0-v0.72.0, CLI v0.9.0-v0.14.0, Studio v0.91.0-v0.103.0, Demo v1.105.0-v1.123.0).
 - Updated Core API Docs: Active Clips, Timeline.

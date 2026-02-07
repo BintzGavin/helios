@@ -16,10 +16,16 @@ The main class that manages the animation state, timing, and synchronization.
 ```typescript
 import { Helios } from '@helios-project/core';
 
-const helios = new Helios(options: HeliosOptions);
+// TInputProps allows you to strictly type your input properties
+interface MyProps {
+  title: string;
+  color: string;
+}
+
+const helios = new Helios<MyProps>(options: HeliosOptions<MyProps>);
 ```
 
-**`HeliosOptions`**:
+**`HeliosOptions<TInputProps>`**:
 - **`duration`** (number): Duration of the composition in seconds (Required).
 - **`fps`** (number): Frames per second (Required).
 - **`initialFrame`** (number, default: `0`): The frame to start at.

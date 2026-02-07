@@ -5,6 +5,21 @@ description: "Changelog for the CLI package"
 
 # CLI Changelog
 
+## v0.20.1
+- **Performance Optimization**: Optimized `helios init` file creation using `Promise.all` and `fs.promises` to improve concurrency and scalability.
+
+## v0.20.0
+- **Implement Example Init**: Implemented `helios init --example` to fetch, download, and transform examples from GitHub, and improved interactivity with `prompts`.
+
+## v0.18.0
+- **Implement Skills Command**: Implemented `helios skills install` to distribute AI agent skills to user projects.
+
+## v0.17.0
+- **Implement Job Command**: Implemented `helios job run` to execute distributed rendering jobs from JSON specifications.
+
+## v0.15.0
+- **Implement Build Command**: Implemented `helios build` wrapping Vite for production builds.
+
 ## v0.14.0
 - **Update Command**: Implemented `helios update <component>` to restore or update components from the registry.
 

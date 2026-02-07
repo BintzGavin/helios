@@ -66,3 +66,35 @@ await renderer.render({
   duration: 2 // Render only first 2 seconds
 });
 ```
+
+## Distributed Rendering
+
+For long or complex compositions, you can split the rendering workload across multiple processes or machines using `helios job run`.
+
+1.  **Define a Job Spec**: Create a JSON file (e.g. `render-job.json`) defining the chunks.
+
+    ```json
+    {
+      "chunks": [
+        {
+          "id": 0,
+          "command": "helios render composition.html -o chunk-0.mp4 --start-frame 0 --frame-count 150",
+          "outputFile": "chunk-0.mp4"
+        },
+        {
+          "id": 1,
+          "command": "helios render composition.html -o chunk-1.mp4 --start-frame 150 --frame-count 150",
+          "outputFile": "chunk-1.mp4"
+        }
+      ],
+      "mergeCommand": "helios merge final.mp4 chunk-0.mp4 chunk-1.mp4"
+    }
+    ```
+
+2.  **Run the Job**:
+
+    ```bash
+    helios job run render-job.json --concurrency 4
+    ```
+
+This will run up to 4 render commands in parallel and then merge the results into `final.mp4`.

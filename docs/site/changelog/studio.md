@@ -5,6 +5,15 @@ description: "Changelog for the Studio package"
 
 # Studio Changelog
 
+## v0.106.0
+- **Configurable Example Registry**: Implemented `--repo` flag for `helios init` command (via CLI), enabling scaffolding from custom GitHub repositories.
+
+## v0.104.3
+- **Preview Command**: Implemented `helios preview` command (via CLI) to serve production builds locally for verification.
+
+## v0.104.2
+- **CompositionsPanel Tests**: Implemented unit tests for CompositionsPanel covering CRUD and filtering.
+
 ## v0.103.0
 - **CLI Update Command**: Implemented `helios update` command in CLI to update/reinstall components with overwrite support.
 

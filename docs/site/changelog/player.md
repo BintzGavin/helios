@@ -5,6 +5,30 @@ description: "Changelog for the Player package"
 
 # Player Changelog
 
+## v0.74.4
+- **Sync Version**: Synced package.json version with status file and verified all tests pass.
+
+## v0.74.3
+- **Fix Async Seek State**: Fixed `seeking` property implementation to correctly return `true` during programmatic asynchronous seeks (e.g. via `currentTime` setter), ensuring Standard Media API compliance.
+
+## v0.74.2
+- **Api Parity Improvements**: Fixed logic for `width`/`height` getters to handle invalid input gracefully, added missing test coverage, and updated documentation for Standard Media API parity.
+
+## v0.74.1
+- **Implement SVG Icons**: Replaced text-based control icons with inline SVGs for consistent visual styling.
+
+## v0.74.0
+- **CSS Parts**: Implemented CSS Shadow Parts (`part` attribute) for key UI elements (`controls`, `volume-control`, `scrubber-wrapper`, `poster-image`, `big-play-button`, etc.), enabling full styling customization.
+
+## v0.73.1
+- **DOM Export Form Values**: Implemented `inlineFormValues` utility to preserve user input (value, checked, selected) in form elements during client-side DOM export.
+
+## v0.73.0
+- **Async Seek**: Updated `HeliosController.seek` to return a Promise and implemented `HELIOS_SEEK_DONE` handshake in Bridge mode to ensure `seeked` event fires only after frame rendering.
+
+## v0.72.1
+- **Api Parity**: Implemented `width`, `height`, `playsInline` properties and `fastSeek` method on `HeliosPlayer` to improve compatibility with standard `HTMLVideoElement` API.
+
 ## v0.72.0
 - **Export Menu**: Implemented a dedicated Export Menu UI to allow users to configure export options (format, resolution, filename, captions) and take snapshots directly from the player.
 

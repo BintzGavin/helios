@@ -9,24 +9,29 @@ Helios Engine is a library for creating video-ready animations using web technol
 
 ## The Fastest Way to Start
 
-The quickest way to get started is by cloning one of our examples.
+The quickest way to get started is using the CLI to scaffold a project from an example.
 
-### Using an Example
+### Using the CLI
 
-1.  Clone the repository (if you haven't already):
+1.  Install the CLI globally (optional, or use npx):
     ```bash
-    git clone https://github.com/helios-project/helios.git
-    cd helios
+    npm install -g @helios-project/cli
     ```
 
-2.  Install dependencies:
+2.  Initialize a new project:
     ```bash
+    # Interactive mode
+    helios init my-video
+
+    # Or, scaffold from a specific example
+    helios init my-video --example chartjs-animation
+    ```
+
+3.  Start the development server:
+    ```bash
+    cd my-video
     npm install
-    ```
-
-3.  Run the React example:
-    ```bash
-    npm run dev:react-dom
+    npm run dev
     ```
     Open your browser to the URL shown (usually `http://localhost:5173/composition.html`).
 
