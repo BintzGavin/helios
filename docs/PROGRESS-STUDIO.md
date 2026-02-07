@@ -1,3 +1,6 @@
+## STUDIO v0.107.0
+- ✅ Completed: Export Job Spec - Implemented "Export Job Spec" functionality in Renders Panel to generate distributed render job JSON files for cloud execution.
+
 ## STUDIO v0.106.0
 - ✅ Completed: Configurable Example Registry (CLI) - Implemented `--repo` flag for `helios init` command, enabling scaffolding from custom GitHub repositories.
 
