@@ -493,4 +493,46 @@ describe('HeliosPlayer API Parity', () => {
     expect(track.selected).toBe(false);
     expect(player.videoTracks.selectedIndex).toBe(-1);
   });
+
+  it('should dispatch resize event when dimensions change', () => {
+    const resizeSpy = vi.fn();
+    player.addEventListener('resize', resizeSpy);
+
+    const baseState = { width: 1920, height: 1080, duration: 10, fps: 30, currentFrame: 0, isPlaying: false };
+
+    const mockController = {
+      getState: () => baseState,
+      pause: vi.fn(),
+      dispose: vi.fn(),
+      subscribe: vi.fn((cb) => {
+        // Mock sending initial state then update
+        cb(baseState); // Initial state
+        return vi.fn();
+      }),
+      onError: vi.fn().mockReturnValue(() => {}),
+      onAudioMetering: vi.fn().mockReturnValue(() => {}),
+      setAudioVolume: vi.fn(),
+      setPlaybackRate: vi.fn(),
+      setAudioMuted: vi.fn(),
+      setInputProps: vi.fn(),
+      setLoop: vi.fn(),
+      play: vi.fn(),
+    };
+    (player as any).setController(mockController);
+
+    // Initial state set should not trigger resize as lastState was null
+    expect(resizeSpy).toHaveBeenCalledTimes(0);
+
+    // Update with new dimensions
+    (player as any).updateUI({ ...baseState, width: 1280, height: 720 });
+    expect(resizeSpy).toHaveBeenCalledTimes(1);
+
+    // Update with same dimensions
+    (player as any).updateUI({ ...baseState, width: 1280, height: 720 });
+    expect(resizeSpy).toHaveBeenCalledTimes(1);
+
+    // Update with new height
+    (player as any).updateUI({ ...baseState, width: 1280, height: 721 });
+    expect(resizeSpy).toHaveBeenCalledTimes(2);
+  });
 });

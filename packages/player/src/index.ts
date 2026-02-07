@@ -2923,6 +2923,12 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
         if (state.duration !== this.lastState.duration) {
             this.dispatchEvent(new Event("durationchange"));
         }
+
+        const widthChanged = state.width !== this.lastState.width;
+        const heightChanged = state.height !== this.lastState.height;
+        if (widthChanged || heightChanged) {
+            this.dispatchEvent(new Event("resize"));
+        }
       }
 
       const isFinished = state.currentFrame >= state.duration * state.fps - 1;
