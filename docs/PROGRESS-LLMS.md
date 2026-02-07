@@ -1,5 +1,18 @@
 # LLMS Progress
 
+## LLMS v1.11.0
+- ✅ Completed: Daily llms.txt Review
+  - Updated Quick Facts: Core v5.13+, Studio v0.104+, Player v0.74+, Renderer v1.77+, CLI v0.19+
+  - Updated Packages: Added CLI commands (render, job, skills, preview)
+  - Updated Roadmap:
+    - Added "Preview Command", "Skills Command", "Job Command" to CLI
+    - Added "Preview Command", "Open in Editor" to Studio
+    - Added "Generic Input Props" to Core
+    - Added "SVG Icons", "CSS Parts" to Player
+    - Added "Distributed Progress" to Renderer
+  - Updated Key Files: Replaced Studio index with MCP Server and Vite Plugin
+  - Verified content against codebase
+
 ## LLMS v1.10.0
 - ✅ Completed: Daily llms.txt Review
   - Updated Quick Facts: Status "Beta / Self-Driving"
