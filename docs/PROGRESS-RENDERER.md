@@ -1,4 +1,11 @@
-# Renderer Progress Log
+## RENDERER v1.77.3
+- ✅ Completed: Update Skill Documentation - Updated `.agents/skills/helios/renderer/SKILL.md` to match the actual `RendererOptions` and `AudioTrackConfig` interfaces in `packages/renderer/src/types.ts` (adding `subtitles` as string, `fadeInDuration`, `fadeOutDuration`, etc.), ensuring agents generate correct code. Verified by manual inspection.
+
+## RENDERER v1.77.2
+- ✅ Completed: Fix Verification Script Regression - Updated `verify-asset-timeout.ts` to check for the correct log prefixes (`[Helios Preload]`, `[DomScanner]`) instead of `[DomStrategy]`, fixing a regression caused by the v1.77.1 DOM traversal refactor. Verified with `verify-asset-timeout.ts`.
+
+## RENDERER v1.77.1
+- ✅ Completed: Refactor DOM Traversal - Consolidated duplicated DOM traversal logic (`findAllImages`, `findAllScopes`, `findAllElements`) into `dom-scripts.ts` and updated `DomStrategy` (preload) and `SeekTimeDriver` to use shared constants. Verified with `verify-enhanced-dom-preload.ts`.
 
 ## RENDERER v1.77.0
 - ✅ Completed: Abstraction for Pluggable Execution - Decoupled `RenderOrchestrator` from concrete `Renderer` implementation by introducing `RenderExecutor` interface and `LocalExecutor` strategy. Verified with `verify-orchestrator-executor.ts`.

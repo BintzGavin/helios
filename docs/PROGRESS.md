@@ -13,6 +13,9 @@ Each agent should update **their own dedicated progress file** instead of this f
 - **STUDIO**: Update `docs/PROGRESS-STUDIO.md`
 - **SKILLS**: Update `docs/PROGRESS-SKILLS.md`
 
+### RENDERER v1.77.3
+- ✅ Completed: Update Skill Documentation - Updated `.agents/skills/helios/renderer/SKILL.md` to match the actual `RendererOptions` and `AudioTrackConfig` interfaces in `packages/renderer/src/types.ts` (adding `subtitles` as string, `fadeInDuration`, `fadeOutDuration`, etc.), ensuring agents generate correct code. Verified by manual inspection.
+
 ### CORE v5.13.0
 - ✅ Completed: Generic Input Props - Refactored Helios class to accept generic TInputProps for strict property typing.
 
