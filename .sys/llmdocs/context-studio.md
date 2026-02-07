@@ -4,7 +4,7 @@
 
 Helios Studio is a browser-based development environment for creating and editing video compositions. It is built as a Vite application that can be run via the CLI.
 
-- **Dev Server**: Uses Vite with a custom plugin (`studioApiPlugin`) to serve the Studio UI and handle API requests (e.g., file operations, asset discovery, rendering, documentation serving).
+- **Dev Server**: Uses Vite with a custom plugin (`studioApiPlugin`) to serve the Studio UI and handle API requests (e.g., file operations, asset discovery, rendering, documentation serving, component management).
 - **Frontend**: A React-based Single Page Application (SPA) that communicates with the dev server.
 - **State Management**: Uses React Context (`StudioContext`) to manage application state (active composition, timeline, playback).
 - **Integration**: Embeds `<helios-player>` to preview compositions and synchronizes state with the Helios Core instance.
@@ -18,6 +18,7 @@ packages/studio/
 │   ├── cli/             # CLI plugin logic
 │   ├── components/      # React UI components
 │   │   ├── CompositionsPanel/ # Compositions panel
+│   │   ├── ComponentsPanel/   # Components registry panel
 │   │   ├── assets/      # Assets panel
 │   │   ├── layout/      # Application layout
 │   │   ├── props/       # Props editor
@@ -64,6 +65,7 @@ Options:
 - **Timeline**: A multi-track timeline for visualization and scrubbing. Supports audio waveforms and markers.
 - **Props Editor**: A schema-aware editor for modifying composition input props in real-time.
 - **Assets Panel**: Allows browsing and dragging assets (images, video, audio) into the composition.
+- **Components Panel**: Allows browsing, installing, updating, and removing components from the registry.
 - **Renders Panel**: Manages render jobs (start, cancel, delete) and displays progress/results.
 - **Omnibar**: A command palette (Cmd+K) for quick navigation and actions.
 - **Helios Assistant**: An AI-powered assistant for documentation and help, accessible via the toolbar.

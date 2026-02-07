@@ -7,6 +7,7 @@ import fs from 'fs';
 import { fileURLToPath } from 'url';
 import { defaultClient } from '../registry/client.js';
 import { installComponent } from '../utils/install.js';
+import { uninstallComponent } from '../utils/uninstall.js';
 import { loadConfig } from '../utils/config.js';
 import chalk from 'chalk';
 
@@ -56,6 +57,12 @@ export function registerStudioCommand(program: Command) {
               components: components,
               onInstallComponent: async (name: string) => {
                 await installComponent(process.cwd(), name);
+              },
+              onRemoveComponent: async (name: string) => {
+                await uninstallComponent(process.cwd(), name, { removeFiles: true });
+              },
+              onUpdateComponent: async (name: string) => {
+                await installComponent(process.cwd(), name, { install: true, overwrite: true });
               },
               onCheckInstalled: async (name: string) => {
                 const config = loadConfig(process.cwd());

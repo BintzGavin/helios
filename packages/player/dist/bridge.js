@@ -2,9 +2,13 @@ import { Helios } from "@helios-project/core";
 import { captureDomToBitmap } from "./features/dom-capture";
 import { getAudioAssets } from "./features/audio-utils";
 import { AudioMeter } from "./features/audio-metering";
+import { AudioFader } from "./features/audio-fader";
 export function connectToParent(helios) {
     let audioMeter = null;
     let audioMeterRaf = null;
+    const audioFader = new AudioFader();
+    // Connect fader immediately (scans document for audio elements)
+    audioFader.connect(document);
     // 1. Listen for messages from parent
     window.addEventListener('message', async (event) => {
         if (event.source !== window.parent)
@@ -150,6 +154,12 @@ export function connectToParent(helios) {
     window.parent.postMessage({ type: 'HELIOS_READY', state: helios.getState() }, '*');
     // 3. Subscribe to Helios state changes and broadcast
     helios.subscribe((state) => {
+        if (state.isPlaying) {
+            audioFader.enable();
+        }
+        else {
+            audioFader.disable();
+        }
         window.parent.postMessage({ type: 'HELIOS_STATE', state }, '*');
     });
     // 4. Capture Global Errors
