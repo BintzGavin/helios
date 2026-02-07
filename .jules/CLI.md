@@ -73,3 +73,7 @@ Critical learnings only. This is not a log—only add entries for insights that 
 ## [0.20.2] - Registry Dependencies
 **Learning:** The current `installComponent` implementation is flat and does not support recursive installation of registry components. This limits the ability to create composable component libraries (e.g. `Hero` -> `Button`).
 **Action:** Created plan `2025-02-19-CLI-Registry-Dependencies.md` to implement recursive installation using a `registryDependencies` property in `ComponentDefinition`.
+
+## [0.22.0] - Registry Recursion
+**Learning:** Implementing recursive component installation requires careful handling of circular dependencies and file overwrite logic. The `visited` set pattern is essential to prevent infinite loops, and file existence checks prevent accidental data loss.
+**Action:** When implementing graph traversal in CLI commands (like dependencies), always implement cycle detection and idempotent operations (skip if exists) to ensure robustness.

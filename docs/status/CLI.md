@@ -1,6 +1,6 @@
 # CLI Status
 
-**Version**: 0.21.0
+**Version**: 0.22.0
 
 ## Current State
 
@@ -70,3 +70,4 @@ Per AGENTS.md, the CLI is "ACTIVELY EXPANDING FOR V2" with focus on:
 [v0.20.0] ✅ Implement Example Init - Implemented `helios init --example` to fetch, download, and transform examples from GitHub, and improved interactivity with `prompts`.
 [v0.20.2] ✅ Use RenderOrchestrator Planning - Refactored `helios render --emit-job` to use `RenderOrchestrator.plan()` for consistent chunking and command generation.
 [v0.21.0] ✅ Portable Job Paths - Implemented relative path generation in `helios render --emit-job` and relative execution in `helios job run`.
+[v0.22.0] ✅ Registry Dependencies - Implemented recursive component installation to support shared registry dependencies (e.g. `use-video-frame`).

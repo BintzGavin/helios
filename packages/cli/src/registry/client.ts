@@ -3,12 +3,20 @@ import { ComponentDefinition } from './types.js';
 
 export class RegistryClient {
   private url: string | undefined;
+  private cache: ComponentDefinition[] | null = null;
 
   constructor(url?: string) {
     this.url = url || process.env.HELIOS_REGISTRY_URL;
   }
 
   async getComponents(framework?: string): Promise<ComponentDefinition[]> {
+    if (this.cache) {
+      if (framework) {
+        return this.cache.filter(c => c.type === framework);
+      }
+      return this.cache;
+    }
+
     let components = localRegistry;
 
     if (this.url) {
@@ -33,6 +41,8 @@ export class RegistryClient {
         console.warn('Failed to fetch remote registry (or timed out), falling back to local.');
       }
     }
+
+    this.cache = components;
 
     if (framework) {
       return components.filter(c => c.type === framework);

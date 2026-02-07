@@ -9,4 +9,5 @@ export interface ComponentDefinition {
   type: 'react' | 'vue' | 'svelte' | 'solid' | 'vanilla';
   files: ComponentFile[];
   dependencies?: Record<string, string>;
+  registryDependencies?: string[];
 }

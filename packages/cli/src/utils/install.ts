@@ -4,6 +4,37 @@ import chalk from 'chalk';
 import { loadConfig, saveConfig } from './config.js';
 import { defaultClient } from '../registry/client.js';
 import { installPackage } from './package-manager.js';
+import { ComponentDefinition } from '../registry/types.js';
+
+async function resolveComponentTree(
+  componentName: string,
+  framework: string | undefined,
+  visited: Set<string> = new Set()
+): Promise<ComponentDefinition[]> {
+  if (visited.has(componentName)) {
+    return [];
+  }
+
+  visited.add(componentName);
+
+  const component = await defaultClient.findComponent(componentName, framework);
+  if (!component) {
+    throw new Error(`Component "${componentName}" not found in registry.`);
+  }
+
+  const components: ComponentDefinition[] = [];
+
+  // Recursively resolve registry dependencies first
+  if (component.registryDependencies) {
+    for (const depName of component.registryDependencies) {
+      const depComponents = await resolveComponentTree(depName, framework, visited);
+      components.push(...depComponents);
+    }
+  }
+
+  components.push(component);
+  return components;
+}
 
 export async function installComponent(
   rootDir: string,
@@ -16,10 +47,7 @@ export async function installComponent(
     throw new Error('Configuration file not found. Run "helios init" first.');
   }
 
-  const component = await defaultClient.findComponent(componentName, config.framework);
-  if (!component) {
-    throw new Error(`Component "${componentName}" not found in registry.`);
-  }
+  const componentsToInstall = await resolveComponentTree(componentName, config.framework);
 
   const targetBaseDir = path.resolve(rootDir, config.directories.components);
 
@@ -28,27 +56,42 @@ export async function installComponent(
     fs.mkdirSync(targetBaseDir, { recursive: true });
   }
 
-  console.log(chalk.cyan(`Installing ${component.name}...`));
+  const uniqueNpmDeps = new Map<string, string>();
+  const installedComponents: string[] = [];
 
-  for (const file of component.files) {
-    const filePath = path.join(targetBaseDir, file.name);
-    const fileDir = path.dirname(filePath);
+  for (const component of componentsToInstall) {
+    console.log(chalk.cyan(`Installing ${component.name}...`));
 
-    // Ensure subdirectories exist
-    if (!fs.existsSync(fileDir)) {
-      fs.mkdirSync(fileDir, { recursive: true });
+    for (const file of component.files) {
+      const filePath = path.join(targetBaseDir, file.name);
+      const fileDir = path.dirname(filePath);
+
+      // Ensure subdirectories exist
+      if (!fs.existsSync(fileDir)) {
+        fs.mkdirSync(fileDir, { recursive: true });
+      }
+
+      if (fs.existsSync(filePath) && !options.overwrite) {
+        console.warn(chalk.yellow(`File already exists: ${file.name}. Skipping.`));
+        continue;
+      }
+
+      fs.writeFileSync(filePath, file.content);
+      console.log(chalk.green(`✓ ${options.overwrite && fs.existsSync(filePath) ? 'Updated' : 'Created'} ${file.name}`));
     }
 
-    if (fs.existsSync(filePath) && !options.overwrite) {
-      console.warn(chalk.yellow(`File already exists: ${file.name}. Skipping.`));
-      continue;
+    if (component.dependencies) {
+      for (const [dep, version] of Object.entries(component.dependencies)) {
+        // Simple version resolution: last one wins for now
+        uniqueNpmDeps.set(dep, version);
+      }
     }
 
-    fs.writeFileSync(filePath, file.content);
-    console.log(chalk.green(`✓ ${options.overwrite && fs.existsSync(filePath) ? 'Updated' : 'Created'} ${file.name}`));
+    installedComponents.push(component.name);
   }
 
-  if (component.dependencies) {
+  // Handle NPM dependencies
+  if (uniqueNpmDeps.size > 0) {
     const depsToInstall: string[] = [];
     let packageJson: any = {};
 
@@ -67,7 +110,7 @@ export async function installComponent(
     };
 
     console.log('\n' + chalk.yellow('Required dependencies:'));
-    for (const [dep, version] of Object.entries(component.dependencies)) {
+    for (const [dep, version] of uniqueNpmDeps.entries()) {
       console.log(`  - ${dep}@${version}`);
 
       if (!allDeps[dep]) {
@@ -93,9 +136,16 @@ export async function installComponent(
     config.components = [];
   }
 
-  if (!config.components.includes(componentName)) {
-    config.components.push(componentName);
+  let configChanged = false;
+  for (const installedName of installedComponents) {
+    if (!config.components.includes(installedName)) {
+      config.components.push(installedName);
+      configChanged = true;
+    }
+  }
+
+  if (configChanged) {
     saveConfig(config, rootDir);
-    console.log(chalk.green(`✓ Added ${componentName} to helios.config.json`));
+    console.log(chalk.green(`✓ Updated helios.config.json`));
   }
 }
