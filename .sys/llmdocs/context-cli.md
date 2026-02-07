@@ -27,6 +27,7 @@ packages/cli/
 │   │   ├── job.ts
 │   │   ├── list.ts
 │   │   ├── merge.ts
+│   │   ├── preview.ts
 │   │   ├── remove.ts
 │   │   ├── render.ts
 │   │   ├── skills.ts
@@ -51,6 +52,7 @@ packages/cli/
 - `helios remove <component>`: Removes a component from the project configuration.
 - `helios update <component>`: Updates a component to the latest version.
 - `helios build`: Builds the project for production using Vite.
+- `helios preview [dir]`: Previews the production build locally using Vite.
 - `helios job run <file>`: Execute a distributed render job from a JSON spec.
 - `helios skills install`: Installs AI agent skills into the project.
 

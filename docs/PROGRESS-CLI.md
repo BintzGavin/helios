@@ -2,6 +2,18 @@
 
 This file tracks progress for the CLI domain (`packages/cli`).
 
+## CLI v0.19.0
+
+- ✅ Implement Preview Command - Implemented `helios preview` to serve the production build locally using Vite.
+
+## CLI v0.18.0
+
+- ✅ Implement Skills Command - Implemented `helios skills install` to distribute AI agent skills to user projects.
+
+## CLI v0.17.0
+
+- ✅ Implement Job Command - Implemented `helios job run` to execute distributed rendering jobs from JSON specifications, supporting concurrency and selective chunk execution.
+
 ## CLI v0.16.0
 
 - ✅ Distributed Job Export - Implemented `--emit-job`, `--audio-codec`, and `--video-codec` options in `helios render` to generate distributed rendering job specifications.
