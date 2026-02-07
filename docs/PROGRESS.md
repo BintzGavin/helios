@@ -208,3 +208,9 @@ Each agent should update **their own dedicated progress file** instead of this f
 
 ## STUDIO v0.105.0
 - ✅ Completed: Component Management - Implemented ability to remove and update components from the Studio UI, adding corresponding CLI hooks and backend API endpoints.
+
+## PLAYER v0.75.0
+- ✅ Completed: Implement Standard Event Handlers - Implemented standard HTMLMediaElement event handler properties (onplay, onpause, etc.) on HeliosPlayer for improved API parity.
+
+## PLAYER v0.75.0
+- ✅ Completed: Implement Standard Event Handlers - Implemented standard HTMLMediaElement event handler properties (onplay, onpause, etc.) on HeliosPlayer for improved API parity.

@@ -947,6 +947,152 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
     return this.src;
   }
 
+  // --- Standard Event Handlers ---
+
+  private _onplay: ((event: Event) => void) | null = null;
+  public get onplay() { return this._onplay; }
+  public set onplay(handler: ((event: Event) => void) | null) {
+    if (this._onplay) this.removeEventListener('play', this._onplay);
+    this._onplay = handler;
+    if (handler) this.addEventListener('play', handler);
+  }
+
+  private _onpause: ((event: Event) => void) | null = null;
+  public get onpause() { return this._onpause; }
+  public set onpause(handler: ((event: Event) => void) | null) {
+    if (this._onpause) this.removeEventListener('pause', this._onpause);
+    this._onpause = handler;
+    if (handler) this.addEventListener('pause', handler);
+  }
+
+  private _onended: ((event: Event) => void) | null = null;
+  public get onended() { return this._onended; }
+  public set onended(handler: ((event: Event) => void) | null) {
+    if (this._onended) this.removeEventListener('ended', this._onended);
+    this._onended = handler;
+    if (handler) this.addEventListener('ended', handler);
+  }
+
+  private _ontimeupdate: ((event: Event) => void) | null = null;
+  public get ontimeupdate() { return this._ontimeupdate; }
+  public set ontimeupdate(handler: ((event: Event) => void) | null) {
+    if (this._ontimeupdate) this.removeEventListener('timeupdate', this._ontimeupdate);
+    this._ontimeupdate = handler;
+    if (handler) this.addEventListener('timeupdate', handler);
+  }
+
+  private _onvolumechange: ((event: Event) => void) | null = null;
+  public get onvolumechange() { return this._onvolumechange; }
+  public set onvolumechange(handler: ((event: Event) => void) | null) {
+    if (this._onvolumechange) this.removeEventListener('volumechange', this._onvolumechange);
+    this._onvolumechange = handler;
+    if (handler) this.addEventListener('volumechange', handler);
+  }
+
+  private _onratechange: ((event: Event) => void) | null = null;
+  public get onratechange() { return this._onratechange; }
+  public set onratechange(handler: ((event: Event) => void) | null) {
+    if (this._onratechange) this.removeEventListener('ratechange', this._onratechange);
+    this._onratechange = handler;
+    if (handler) this.addEventListener('ratechange', handler);
+  }
+
+  private _ondurationchange: ((event: Event) => void) | null = null;
+  public get ondurationchange() { return this._ondurationchange; }
+  public set ondurationchange(handler: ((event: Event) => void) | null) {
+    if (this._ondurationchange) this.removeEventListener('durationchange', this._ondurationchange);
+    this._ondurationchange = handler;
+    if (handler) this.addEventListener('durationchange', handler);
+  }
+
+  private _onseeking: ((event: Event) => void) | null = null;
+  public get onseeking() { return this._onseeking; }
+  public set onseeking(handler: ((event: Event) => void) | null) {
+    if (this._onseeking) this.removeEventListener('seeking', this._onseeking);
+    this._onseeking = handler;
+    if (handler) this.addEventListener('seeking', handler);
+  }
+
+  private _onseeked: ((event: Event) => void) | null = null;
+  public get onseeked() { return this._onseeked; }
+  public set onseeked(handler: ((event: Event) => void) | null) {
+    if (this._onseeked) this.removeEventListener('seeked', this._onseeked);
+    this._onseeked = handler;
+    if (handler) this.addEventListener('seeked', handler);
+  }
+
+  private _onresize: ((event: Event) => void) | null = null;
+  public get onresize() { return this._onresize; }
+  public set onresize(handler: ((event: Event) => void) | null) {
+    if (this._onresize) this.removeEventListener('resize', this._onresize);
+    this._onresize = handler;
+    if (handler) this.addEventListener('resize', handler);
+  }
+
+  private _onloadstart: ((event: Event) => void) | null = null;
+  public get onloadstart() { return this._onloadstart; }
+  public set onloadstart(handler: ((event: Event) => void) | null) {
+    if (this._onloadstart) this.removeEventListener('loadstart', this._onloadstart);
+    this._onloadstart = handler;
+    if (handler) this.addEventListener('loadstart', handler);
+  }
+
+  private _onloadedmetadata: ((event: Event) => void) | null = null;
+  public get onloadedmetadata() { return this._onloadedmetadata; }
+  public set onloadedmetadata(handler: ((event: Event) => void) | null) {
+    if (this._onloadedmetadata) this.removeEventListener('loadedmetadata', this._onloadedmetadata);
+    this._onloadedmetadata = handler;
+    if (handler) this.addEventListener('loadedmetadata', handler);
+  }
+
+  private _onloadeddata: ((event: Event) => void) | null = null;
+  public get onloadeddata() { return this._onloadeddata; }
+  public set onloadeddata(handler: ((event: Event) => void) | null) {
+    if (this._onloadeddata) this.removeEventListener('loadeddata', this._onloadeddata);
+    this._onloadeddata = handler;
+    if (handler) this.addEventListener('loadeddata', handler);
+  }
+
+  private _oncanplay: ((event: Event) => void) | null = null;
+  public get oncanplay() { return this._oncanplay; }
+  public set oncanplay(handler: ((event: Event) => void) | null) {
+    if (this._oncanplay) this.removeEventListener('canplay', this._oncanplay);
+    this._oncanplay = handler;
+    if (handler) this.addEventListener('canplay', handler);
+  }
+
+  private _oncanplaythrough: ((event: Event) => void) | null = null;
+  public get oncanplaythrough() { return this._oncanplaythrough; }
+  public set oncanplaythrough(handler: ((event: Event) => void) | null) {
+    if (this._oncanplaythrough) this.removeEventListener('canplaythrough', this._oncanplaythrough);
+    this._oncanplaythrough = handler;
+    if (handler) this.addEventListener('canplaythrough', handler);
+  }
+
+  private _onerror: ((event: Event) => void) | null = null;
+  public get onerror() { return this._onerror; }
+  public set onerror(handler: ((event: Event) => void) | null) {
+    if (this._onerror) this.removeEventListener('error', this._onerror);
+    this._onerror = handler;
+    if (handler) this.addEventListener('error', handler);
+  }
+
+  private _onenterpictureinpicture: ((event: Event) => void) | null = null;
+  public get onenterpictureinpicture() { return this._onenterpictureinpicture; }
+  public set onenterpictureinpicture(handler: ((event: Event) => void) | null) {
+    if (this._onenterpictureinpicture) this.removeEventListener('enterpictureinpicture', this._onenterpictureinpicture);
+    this._onenterpictureinpicture = handler;
+    if (handler) this.addEventListener('enterpictureinpicture', handler);
+  }
+
+  private _onleavepictureinpicture: ((event: Event) => void) | null = null;
+  public get onleavepictureinpicture() { return this._onleavepictureinpicture; }
+  public set onleavepictureinpicture(handler: ((event: Event) => void) | null) {
+    if (this._onleavepictureinpicture) this.removeEventListener('leavepictureinpicture', this._onleavepictureinpicture);
+    this._onleavepictureinpicture = handler;
+    if (handler) this.addEventListener('leavepictureinpicture', handler);
+  }
+
   // --- Standard Media API ---
 
   public canPlayType(type: string): CanPlayTypeResult {

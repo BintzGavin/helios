@@ -34,6 +34,7 @@ The Shadow DOM contains:
 - `audiometering`: Fired with `AudioLevels` data (stereo RMS/Peak).
 - `enterpictureinpicture`: Entered PiP mode.
 - `leavepictureinpicture`: Left PiP mode.
+- `resize`: Player dimensions changed.
 
 ## C. Observed Attributes
 - `src`: URL of the composition.
@@ -76,7 +77,8 @@ The Shadow DOM contains:
 - `inputProps` (get/set): Object for composition properties.
 - `sandbox` (get/set): Security flags.
 - `disablePictureInPicture` (get/set): PiP availability.
-- `seeking` (get): Whether the player is currently seeking (scrubbing or waiting for async seek).
+- `seeking` (get): Whether the player is currently seeking.
+- **Event Handlers**: `onplay`, `onpause`, `onended`, `ontimeupdate`, `onvolumechange`, `onratechange`, `ondurationchange`, `onseeking`, `onseeked`, `onresize`, `onloadstart`, `onloadedmetadata`, `onloadeddata`, `oncanplay`, `oncanplaythrough`, `onerror`, `onenterpictureinpicture`, `onleavepictureinpicture`.
 
 ## E. Public Methods
 - `play(): Promise<void>`: Start playback.
