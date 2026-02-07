@@ -77,3 +77,7 @@ Critical learnings only. This is not a log—only add entries for insights that 
 ## [0.22.0] - Registry Recursion
 **Learning:** Implementing recursive component installation requires careful handling of circular dependencies and file overwrite logic. The `visited` set pattern is essential to prevent infinite loops, and file existence checks prevent accidental data loss.
 **Action:** When implementing graph traversal in CLI commands (like dependencies), always implement cycle detection and idempotent operations (skip if exists) to ensure robustness.
+
+## [0.23.0] - Singleton Registry Pattern
+**Learning:** `RegistryClient` was implemented as a global singleton, which prevented per-project configuration (e.g., custom registry URLs) required for the "Monetization Ready" vision.
+**Action:** Created plan `2026-02-07-CLI-Configurable-Registry.md` to refactor `RegistryClient` and enable project-level registry configuration. Future services must avoid singletons when state depends on user config.
