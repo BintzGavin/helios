@@ -1,6 +1,6 @@
 {
   "name": "@helios-project/cli",
-  "version": "0.15.0",
+  "version": "0.18.0",
   "description": "CLI for Helios video engine.",
   "author": "Gavin Bintz <me@gavinbintz.com>",
   "license": "ELv2",
@@ -24,7 +24,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && node scripts/bundle-skills.js",
     "dev": "tsc -w",
     "prepublishOnly": "npm run build"
   },
