@@ -22,6 +22,9 @@ export function registerJobCommand(program: Command) {
           throw new Error(`Job file not found: ${jobPath}`);
         }
 
+        // Run all commands relative to the job file directory
+        const jobDir = path.dirname(jobPath);
+
         const jobSpec: JobSpec = JSON.parse(fs.readFileSync(jobPath, 'utf-8'));
         const chunkId = options.chunk ? parseInt(options.chunk, 10) : undefined;
 
@@ -50,7 +53,8 @@ export function registerJobCommand(program: Command) {
           return new Promise<void>((resolve, reject) => {
             const child = spawn(chunk.command, {
               stdio: 'inherit',
-              shell: true
+              shell: true,
+              cwd: jobDir
             });
 
             child.on('close', (code) => {
@@ -91,7 +95,8 @@ export function registerJobCommand(program: Command) {
           await new Promise<void>((resolve, reject) => {
             const child = spawn(jobSpec.mergeCommand, {
               stdio: 'inherit',
-              shell: true
+              shell: true,
+              cwd: jobDir
             });
 
             child.on('close', (code) => {

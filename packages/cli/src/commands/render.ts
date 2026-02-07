@@ -1,7 +1,7 @@
 import { Command } from 'commander';
 import path from 'path';
 import fs from 'fs';
-import { pathToFileURL } from 'url';
+import { pathToFileURL, fileURLToPath } from 'url';
 import { RenderOrchestrator, DistributedRenderOptions, RendererOptions } from '@helios-project/renderer';
 import { JobSpec, RenderJobChunk } from '../types/job.js';
 
@@ -88,19 +88,35 @@ export function registerRenderCommand(program: Command) {
 
           const plan = RenderOrchestrator.plan(url, outputPath, renderOptions);
 
+          const jobPath = path.resolve(process.cwd(), options.emitJob);
+          const jobDir = path.dirname(jobPath);
+
+          // Calculate relative paths for portability
+          let relativeInput = url;
+          if (url.startsWith('file://')) {
+            const inputPath = fileURLToPath(url);
+            relativeInput = path.relative(jobDir, inputPath);
+          }
+
+          const relativeOutputPath = path.relative(jobDir, outputPath);
+
           const chunks: RenderJobChunk[] = plan.chunks.map(chunk => {
             const flags = rendererOptionsToFlags(chunk.options);
+            const relativeChunkOutput = path.relative(jobDir, chunk.outputFile);
             return {
               id: chunk.id,
               startFrame: chunk.startFrame,
               frameCount: chunk.frameCount,
-              outputFile: chunk.outputFile,
-              // Use resolved URL for reliability in distributed environments
-              command: `helios render ${url} -o ${chunk.outputFile} --start-frame ${chunk.startFrame} --frame-count ${chunk.frameCount} ${flags}`
+              outputFile: relativeChunkOutput,
+              // Use relative paths for portability
+              command: `helios render ${relativeInput} -o ${relativeChunkOutput} --start-frame ${chunk.startFrame} --frame-count ${chunk.frameCount} ${flags}`
             };
           });
 
-          let mergeCommand = `helios merge ${outputPath} ${plan.concatManifest.join(' ')}`;
+          // Convert manifest paths to relative
+          const relativeManifest = plan.concatManifest.map(f => path.relative(jobDir, f));
+
+          let mergeCommand = `helios merge ${relativeOutputPath} ${relativeManifest.join(' ')}`;
 
           if (plan.mixOptions.videoCodec && plan.mixOptions.videoCodec !== 'copy') {
             mergeCommand += ` --video-codec ${plan.mixOptions.videoCodec}`;
@@ -124,7 +140,6 @@ export function registerRenderCommand(program: Command) {
             mergeCommand
           };
 
-          const jobPath = path.resolve(process.cwd(), options.emitJob);
           fs.writeFileSync(jobPath, JSON.stringify(jobSpec, null, 2));
           console.log(`Job spec written to ${jobPath}`);
           return;

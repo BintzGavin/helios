@@ -1069,12 +1069,12 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
     if (handler) this.addEventListener('canplaythrough', handler);
   }
 
-  private _onerror: ((event: Event) => void) | null = null;
-  public get onerror() { return this._onerror; }
-  public set onerror(handler: ((event: Event) => void) | null) {
-    if (this._onerror) this.removeEventListener('error', this._onerror);
+  private _onerror: OnErrorEventHandler = null;
+  public get onerror(): OnErrorEventHandler { return this._onerror; }
+  public set onerror(handler: OnErrorEventHandler) {
+    if (this._onerror) this.removeEventListener('error', this._onerror as EventListener);
     this._onerror = handler;
-    if (handler) this.addEventListener('error', handler);
+    if (handler) this.addEventListener('error', handler as EventListener);
   }
 
   private _onenterpictureinpicture: ((event: Event) => void) | null = null;
