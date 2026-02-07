@@ -13,6 +13,9 @@ Each agent should update **their own dedicated progress file** instead of this f
 - **STUDIO**: Update `docs/PROGRESS-STUDIO.md`
 - **SKILLS**: Update `docs/PROGRESS-SKILLS.md`
 
+### DEMO v1.136.0
+- ✅ Completed: Fix Motion One Example Standardization - Updated `examples/motion-one-animation` to use `file:` protocol for dependencies (matching other examples) and standardized package name.
+
 ### RENDERER v1.79.1
 - ✅ Completed: Fix Skill Documentation - Added missing `hwAccel` and `buffer` properties to `SKILL.md` and updated journal with architectural learnings.
 
