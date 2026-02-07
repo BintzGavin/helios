@@ -1,4 +1,4 @@
-**Version**: 0.105.0
+**Version**: 0.105.1
 
 **Posture**: ACTIVELY EXPANDING FOR V2
 
@@ -9,6 +9,7 @@
 **Focus**: UI Implementation & CLI
 
 ## Recent Updates
+- [v0.105.1] ✅ Verified: Components Panel Tests - Implemented comprehensive unit tests for ComponentsPanel covering loading, listing, install, update, and remove flows.
 - [v0.105.0] ✅ Completed: Component Management - Implemented ability to remove and update components from the Studio UI, adding corresponding CLI hooks and backend API endpoints.
 - [v0.104.3] ✅ Completed: Preview Command - Implemented `helios preview` command to serve production builds locally for verification.
 - [v0.104.2] ✅ Completed: CompositionsPanel Tests - Implemented unit tests for CompositionsPanel covering CRUD and filtering.

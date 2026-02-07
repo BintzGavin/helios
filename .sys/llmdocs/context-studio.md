@@ -17,8 +17,8 @@ packages/studio/
 ├── src/
 │   ├── cli/             # CLI plugin logic
 │   ├── components/      # React UI components
-│   │   ├── CompositionsPanel/ # Compositions panel
-│   │   ├── ComponentsPanel/   # Components registry panel
+│   │   ├── CompositionsPanel/ # Compositions panel (tested)
+│   │   ├── ComponentsPanel/   # Components registry panel (tested)
 │   │   ├── assets/      # Assets panel
 │   │   ├── layout/      # Application layout
 │   │   ├── props/       # Props editor
