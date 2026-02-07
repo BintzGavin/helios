@@ -45,3 +45,7 @@
 ## [2026-09-13] - FFmpeg Hardware Acceleration Visibility Gap
 **Learning:** `FFmpegInspector` reports codec support but misses hardware acceleration capabilities (`-hwaccels`), leaving users blind to GPU availability in distributed environments. This violates the "GPU Acceleration" vision pillar for diagnostics.
 **Action:** Created plan `2026-09-13-RENDERER-FFmpeg-Hardware-Acceleration.md` to implement `-hwaccels` detection.
+
+## [2026-09-14] - FFmpeg Hardware Acceleration Implementation Gap
+**Learning:** The plan `2026-09-13-RENDERER-FFmpeg-Hardware-Acceleration.md` existed but the implementation was missing. Additionally, `FFmpegBuilder` lacked support for using the detected acceleration.
+**Action:** Created expanded plan `2026-09-14-RENDERER-FFmpeg-Hardware-Acceleration.md` to cover both detection and usage.
