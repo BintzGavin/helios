@@ -99,7 +99,7 @@ The `examples/` directory contains reference implementations for various framewo
 
 ### Core Concepts
 - **animation-helpers**: Core utilities (legacy/reference).
-- **dynamic-props-animation**: Input props and schema validation.
+- **dynamic-props-animation**: Input props and schema validation (TypeScript + Vite).
 - **signals-animation**: Signals architecture for performance.
 
 ## B. Build Config
