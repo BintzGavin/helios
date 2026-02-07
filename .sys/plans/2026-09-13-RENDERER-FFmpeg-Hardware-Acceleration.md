@@ -1,36 +1,50 @@
-# Spec: FFmpeg Hardware Acceleration Discovery
+# 2026-09-13-RENDERER-FFmpeg-Hardware-Acceleration.md
 
-## 1. Context & Goal
-- **Objective:** Enable `FFmpegInspector` to detect and report supported hardware acceleration methods (e.g., `cuda`, `videotoolbox`, `vaapi`) by parsing `ffmpeg -hwaccels` output.
-- **Trigger:** Vision Gap "GPU Acceleration" visibility. The current diagnostics miss critical information for performance tuning on GPU infrastructure.
-- **Impact:** Allows users and the engine to verify GPU availability, facilitating the use of high-performance codecs like `h264_nvenc`.
+#### 1. Context & Goal
+- **Objective**: Enhance `FFmpegInspector` to detect supported hardware acceleration methods (e.g., `cuda`, `videotoolbox`, `vaapi`) available in the FFmpeg build.
+- **Trigger**: Vision gap identified in `docs/status/RENDERER.md`. The "Diagnostics" feature currently misses hardware acceleration capabilities, leaving users blind to GPU availability.
+- **Impact**: Provides critical visibility into the rendering environment, enabling better debugging of performance issues and validation of GPU-accelerated workflows in distributed systems.
 
-## 2. File Inventory
-- **Modify:** `packages/renderer/src/utils/FFmpegInspector.ts` (Implement `-hwaccels` check)
-- **Modify:** `packages/renderer/tests/verify-diagnose-ffmpeg.ts` (Add verification assertions)
-- **Read-Only:** `packages/renderer/src/types.ts`
+#### 2. File Inventory
+- **Create**: None.
+- **Modify**:
+  - `packages/renderer/src/utils/FFmpegInspector.ts`: Add `hwaccels` detection logic.
+  - `packages/renderer/tests/verify-diagnose-ffmpeg.ts`: Update test to verify `hwaccels` presence.
+- **Read-Only**:
+  - `packages/renderer/src/Renderer.ts` (Reference for usage)
 
-## 3. Implementation Spec
-- **Architecture:** Extend `FFmpegInspector.inspect` to spawn a synchronous `ffmpeg` process with the `-hwaccels` flag. Parse the output line-by-line to extract acceleration method names.
-- **Pseudo-Code:**
-  ```typescript
-  // In FFmpegInspector.inspect:
-  // 1. Spawn `ffmpeg -hwaccels`
-  // 2. Parse stdout:
-  //    - Skip header "Hardware acceleration methods:"
-  //    - Collect non-empty lines as methods
-  // 3. Add `hwaccels: string[]` to result object
-  ```
-- **Public API Changes:**
-  - Update `FFmpegDiagnostics` interface in `FFmpegInspector.ts` to include `hwaccels: string[]`.
-- **Dependencies:** None.
+#### 3. Implementation Spec
+- **Architecture**: Extend the existing `FFmpegInspector` static class to spawn `ffmpeg -hwaccels` and parse the output.
+- **Public API Changes**:
+  - Update `FFmpegDiagnostics` interface:
+    ```typescript
+    export interface FFmpegDiagnostics {
+      // ... existing fields
+      hwaccels: string[];
+    }
+    ```
+- **Logic Flow**:
+  1. In `FFmpegInspector.inspect(ffmpegPath)`:
+  2. Spawn `ffmpeg -hwaccels`.
+  3. Capture stdout.
+  4. Parse output: The output typically lists one accelerator per line after a header.
+     - Example output:
+       ```
+       Hardware acceleration methods:
+       cuda
+       dxva2
+       qsv
+       d3d11va
+       ```
+  5. Extract the list of accelerators (skipping the header).
+  6. Add to the `result` object.
 
-## 4. Test Plan
-- **Verification:** Run `npx tsx packages/renderer/tests/verify-diagnose-ffmpeg.ts`.
-- **Success Criteria:**
-  - The script outputs the diagnostics JSON containing a `hwaccels` array.
-  - The array contains strings (even if empty, it should be an array).
-  - If running on a machine with GPU (e.g., Mac), it might show `videotoolbox`.
-- **Edge Cases:**
-  - FFmpeg version doesn't support `-hwaccels` (older versions). Handle error/empty output gracefully.
-  - Output format changes.
+#### 4. Test Plan
+- **Verification**: `npx tsx packages/renderer/tests/verify-diagnose-ffmpeg.ts`
+- **Success Criteria**:
+  - The script outputs the diagnostics JSON including `"hwaccels": [...]`.
+  - The script asserts that `diagnostics.ffmpeg.hwaccels` is an array.
+  - The script passes without error.
+- **Edge Cases**:
+  - FFmpeg version without `-hwaccels` support (unlikely in modern builds, but should handle gracefully/empty array).
+  - Empty output from command.
