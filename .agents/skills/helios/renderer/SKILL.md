@@ -181,7 +181,11 @@ await RenderOrchestrator.render(
   { onProgress: (p) => console.log(`Total Progress: ${p}`) }
 );
 ```
-**Audio Handling:** Distributed rendering generates silent video chunks first. Audio is mixed in a final global pass after concatenation to ensure seamless playback without glitches.
+**Audio Handling:**
+- Distributed rendering generates silent video chunks first to maximize performance.
+- Audio is mixed in a final global pass after concatenation.
+- The Orchestrator automatically detects if the concatenated video contains implicit audio (from DOM elements) and mixes it if present.
+- Explicit `audioTracks` are also mixed in this final pass.
 
 ### Concatenate Videos
 Combine multiple video files into one.

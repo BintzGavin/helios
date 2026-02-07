@@ -13,6 +13,13 @@ Each agent should update **their own dedicated progress file** instead of this f
 - **STUDIO**: Update `docs/PROGRESS-STUDIO.md`
 - **SKILLS**: Update `docs/PROGRESS-SKILLS.md`
 
+### SKILLS v1.13.0
+- ✅ Completed: Daily Skills Review
+  - Added Client-Side Export example skill.
+  - Updated Core with Animation Helpers (sequence, transition, crossfade) and Utilities (random, color).
+  - Updated Renderer with Distributed Rendering details.
+  - Updated Player with Export API and Audio Metering types.
+
 ### CLI v0.20.2
 - ✅ Completed: Use RenderOrchestrator Planning - Refactored `helios render --emit-job` to use `RenderOrchestrator.plan()` for consistent chunking and command generation.
 
