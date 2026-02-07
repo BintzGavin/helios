@@ -41,7 +41,7 @@ async function performSave() {
   }
 }
 
-async function saveJobs() {
+async function saveJobs(): Promise<void> {
   if (savePromise) {
     if (!nextSavePromise) {
       nextSavePromise = savePromise.then(() => {
@@ -78,7 +78,7 @@ function loadJobs() {
            jobs.set(job.id, job);
         }
         if (changed) {
-          saveJobs().catch(e => console.error('[RenderManager] Failed to save cleaned jobs:', e));
+          saveJobs().catch((e: any) => console.error('[RenderManager] Failed to save cleaned jobs:', e));
         }
       }
     } catch (e) {

@@ -13,6 +13,9 @@ Each agent should update **their own dedicated progress file** instead of this f
 - **STUDIO**: Update `docs/PROGRESS-STUDIO.md`
 - **SKILLS**: Update `docs/PROGRESS-SKILLS.md`
 
+### STUDIO v0.105.0
+- ✅ Completed: CLI Preview Command - Implemented `helios preview` command to serve production builds locally using `vite.preview`.
+
 ### RENDERER v1.77.1
 - ✅ Completed: Refactor DOM Traversal - Consolidated duplicated DOM traversal logic (`findAllImages`, `findAllScopes`, `findAllElements`) into `dom-scripts.ts` and updated `DomStrategy` (preload) and `SeekTimeDriver` to use shared constants. Verified with `verify-enhanced-dom-preload.ts`.
 

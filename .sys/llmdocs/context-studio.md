@@ -38,7 +38,7 @@ packages/studio/
 
 ## C. CLI Interface
 
-The Studio is launched via the Helios CLI:
+The Studio and related tools are launched via the Helios CLI:
 
 ```bash
 npx helios studio [options]
@@ -47,6 +47,17 @@ npx helios studio [options]
 Options:
 - `--port <number>`: Specify the port to run the Studio server (default: 5173).
 - `--open`: Open the Studio in the default browser on start.
+
+To preview a production build:
+
+```bash
+npx helios preview [dir] [options]
+```
+
+Options:
+- `[dir]`: Project root directory (default: current working directory).
+- `-o, --out-dir <dir>`: Output directory to serve (default: `dist`).
+- `-p, --port <number>`: Port to listen on (default: `4173`).
 
 ## D. UI Components
 
