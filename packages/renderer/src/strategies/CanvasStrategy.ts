@@ -48,7 +48,7 @@ export class CanvasStrategy implements RenderStrategy {
       }
 
       if (videoEncoderSupported) {
-        for (const c of configs) {
+        await Promise.all(configs.map(async (c) => {
           try {
             // Check base support (no alpha)
             const baseConfig = { ...c.config, alpha: 'discard' };
@@ -113,7 +113,7 @@ export class CanvasStrategy implements RenderStrategy {
           } catch (e) {
             // Codec check failed
           }
-        }
+        }));
       }
 
       const report = {
