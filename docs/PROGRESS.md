@@ -13,6 +13,9 @@ Each agent should update **their own dedicated progress file** instead of this f
 - **STUDIO**: Update `docs/PROGRESS-STUDIO.md`
 - **SKILLS**: Update `docs/PROGRESS-SKILLS.md`
 
+### STUDIO v0.106.0
+- ✅ Completed: Configurable Example Registry (CLI) - Implemented `--repo` flag for `helios init` command, enabling scaffolding from custom GitHub repositories.
+
 ### CLI v0.20.0
 - ✅ Completed: Implement Example Init - Implemented `helios init --example` to fetch, download, and transform examples from GitHub, and improved interactivity with `prompts`.
 
