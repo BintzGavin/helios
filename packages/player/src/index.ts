@@ -1025,20 +1025,36 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
     return new StaticTimeRange(0, this.duration);
   }
 
+  /**
+   * Gets the width attribute of the player.
+   * Part of the Standard Media API parity.
+   */
   public get width(): number {
     const val = this.getAttribute("width");
     return val ? parseInt(val, 10) : 0;
   }
 
+  /**
+   * Sets the width attribute of the player.
+   * Part of the Standard Media API parity.
+   */
   public set width(val: number) {
     this.setAttribute("width", String(val));
   }
 
+  /**
+   * Gets the height attribute of the player.
+   * Part of the Standard Media API parity.
+   */
   public get height(): number {
     const val = this.getAttribute("height");
     return val ? parseInt(val, 10) : 0;
   }
 
+  /**
+   * Sets the height attribute of the player.
+   * Part of the Standard Media API parity.
+   */
   public set height(val: number) {
     this.setAttribute("height", String(val));
   }
@@ -1059,10 +1075,18 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
     return parseFloat(this.getAttribute("height") || "0");
   }
 
+  /**
+   * Gets whether the playsinline attribute is present.
+   * Part of the Standard Media API parity.
+   */
   public get playsInline(): boolean {
     return this.hasAttribute("playsinline");
   }
 
+  /**
+   * Sets the playsinline attribute.
+   * Part of the Standard Media API parity.
+   */
   public set playsInline(val: boolean) {
     if (val) {
       this.setAttribute("playsinline", "");
@@ -1071,6 +1095,11 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
     }
   }
 
+  /**
+   * Seeks to the specified time.
+   * Part of the Standard Media API parity.
+   * Note: In HeliosPlayer, this currently delegates to standard seek (currentTime setter).
+   */
   public fastSeek(time: number): void {
     this.currentTime = time;
   }
