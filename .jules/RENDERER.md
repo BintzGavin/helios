@@ -41,3 +41,7 @@
 ## [1.76.0] - Role Adherence Failure
 **Learning:** I mistakenly acted as an Executor, implementing code (`dom-preload.ts`) instead of creating a Spec File. This violated the "Vision-Driven Planner" protocol and the "Never modify packages" rule.
 **Action:** Strictly adhere to the "Spec File Only" output. Verify role definition before starting.
+
+## [2026-09-13] - FFmpeg Hardware Acceleration Visibility Gap
+**Learning:** `FFmpegInspector` reports codec support but misses hardware acceleration capabilities (`-hwaccels`), leaving users blind to GPU availability in distributed environments. This violates the "GPU Acceleration" vision pillar for diagnostics.
+**Action:** Created plan `2026-09-13-RENDERER-FFmpeg-Hardware-Acceleration.md` to implement `-hwaccels` detection.
