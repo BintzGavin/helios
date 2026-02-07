@@ -101,7 +101,7 @@ describe('RenderManager Persistence', () => {
     // Ensure it's there
     expect(fs.readFileSync(jobsFile, 'utf-8')).toContain(jobId);
 
-    deleteJob(jobId);
+    await deleteJob(jobId);
 
     // Ensure it's gone
     const content = JSON.parse(fs.readFileSync(jobsFile, 'utf-8'));

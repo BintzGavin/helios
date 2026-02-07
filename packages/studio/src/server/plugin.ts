@@ -676,10 +676,15 @@ function configureMiddlewares(server: ViteDevServer | PreviewServer, isPreview: 
         const cancelMatch = req.url!.match(/^\/([^\/]+)\/cancel$/);
         if (cancelMatch) {
             if (req.method === 'POST') {
-                const jobId = cancelMatch[1];
-                const success = cancelJob(jobId);
-                res.setHeader('Content-Type', 'application/json');
-                res.end(JSON.stringify({ success }));
+                try {
+                    const jobId = cancelMatch[1];
+                    const success = await cancelJob(jobId);
+                    res.setHeader('Content-Type', 'application/json');
+                    res.end(JSON.stringify({ success }));
+                } catch (e: any) {
+                    res.statusCode = 500;
+                    res.end(JSON.stringify({ error: e.message }));
+                }
                 return;
             }
         }
@@ -690,9 +695,14 @@ function configureMiddlewares(server: ViteDevServer | PreviewServer, isPreview: 
           const jobId = match[1];
 
           if (req.method === 'DELETE') {
-              const success = deleteJob(jobId);
-              res.setHeader('Content-Type', 'application/json');
-              res.end(JSON.stringify({ success }));
+              try {
+                  const success = await deleteJob(jobId);
+                  res.setHeader('Content-Type', 'application/json');
+                  res.end(JSON.stringify({ success }));
+              } catch (e: any) {
+                  res.statusCode = 500;
+                  res.end(JSON.stringify({ error: e.message }));
+              }
               return;
           }
 

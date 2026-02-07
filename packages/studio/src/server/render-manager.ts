@@ -26,19 +26,39 @@ function getJobsFilePath() {
   return path.resolve(projectRoot, 'renders', JOBS_FILE);
 }
 
-function saveJobs() {
+let savePromise: Promise<void> | null = null;
+let nextSavePromise: Promise<void> | null = null;
+
+async function performSave() {
   const file = getJobsFilePath();
   const rendersDir = path.dirname(file);
-  if (!fs.existsSync(rendersDir)) {
-    fs.mkdirSync(rendersDir, { recursive: true });
-  }
-
   try {
+    await fs.promises.mkdir(rendersDir, { recursive: true });
     const jobList = Array.from(jobs.values());
-    fs.writeFileSync(file, JSON.stringify(jobList, null, 2));
+    await fs.promises.writeFile(file, JSON.stringify(jobList, null, 2));
   } catch (e) {
     console.error('[RenderManager] Failed to save jobs history:', e);
   }
+}
+
+async function saveJobs() {
+  if (savePromise) {
+    if (!nextSavePromise) {
+      nextSavePromise = savePromise.then(() => {
+        nextSavePromise = null;
+        return saveJobs();
+      });
+    }
+    return nextSavePromise;
+  }
+
+  const promise = performSave().finally(() => {
+    if (savePromise === promise) {
+      savePromise = null;
+    }
+  });
+  savePromise = promise;
+  return promise;
 }
 
 function loadJobs() {
@@ -58,7 +78,7 @@ function loadJobs() {
            jobs.set(job.id, job);
         }
         if (changed) {
-          saveJobs();
+          saveJobs().catch(e => console.error('[RenderManager] Failed to save cleaned jobs:', e));
         }
       }
     } catch (e) {
@@ -111,7 +131,7 @@ export async function startRender(options: StartRenderOptions, serverPort: numbe
   };
 
   jobs.set(jobId, job);
-  saveJobs();
+  await saveJobs();
 
   const controller = new AbortController();
   jobControllers.set(jobId, controller);
@@ -120,7 +140,7 @@ export async function startRender(options: StartRenderOptions, serverPort: numbe
   (async () => {
     try {
       job.status = 'rendering';
-      saveJobs();
+      await saveJobs();
 
       const fullUrl = `http://localhost:${serverPort}${options.compositionUrl}`;
       console.log(`[RenderManager] Starting render job ${jobId} for ${fullUrl} (concurrency: ${options.concurrency || 1})`);
@@ -168,7 +188,7 @@ export async function startRender(options: StartRenderOptions, serverPort: numbe
 
       job.status = 'completed';
       job.progress = 1;
-      saveJobs();
+      await saveJobs();
       console.log(`[RenderManager] Job ${jobId} completed: ${outputPath}`);
     } catch (e: any) {
       if (e.message === 'Aborted') {
@@ -179,7 +199,7 @@ export async function startRender(options: StartRenderOptions, serverPort: numbe
         job.status = 'failed';
         job.error = e.message;
       }
-      saveJobs();
+      await saveJobs();
     } finally {
       jobControllers.delete(jobId);
     }
@@ -196,7 +216,7 @@ export function getJobs(): RenderJob[] {
     return Array.from(jobs.values()).sort((a, b) => b.createdAt - a.createdAt);
 }
 
-export function cancelJob(id: string): boolean {
+export async function cancelJob(id: string): Promise<boolean> {
   const job = jobs.get(id);
   const controller = jobControllers.get(id);
 
@@ -204,13 +224,13 @@ export function cancelJob(id: string): boolean {
     console.log(`[RenderManager] Cancelling job ${id}...`);
     controller.abort();
     job.status = 'cancelled';
-    saveJobs();
+    await saveJobs();
     return true;
   }
   return false;
 }
 
-export function deleteJob(id: string): boolean {
+export async function deleteJob(id: string): Promise<boolean> {
   const job = jobs.get(id);
   if (!job) return false;
 
@@ -218,7 +238,7 @@ export function deleteJob(id: string): boolean {
   if (job.status === 'rendering') return false;
 
   jobs.delete(id);
-  saveJobs();
+  await saveJobs();
 
   if (job.outputPath && fs.existsSync(job.outputPath)) {
     try {
