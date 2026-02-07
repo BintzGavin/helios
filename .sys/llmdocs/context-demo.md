@@ -13,6 +13,7 @@ The `examples/` directory contains various examples demonstrating Helios usage w
 - `examples/lottie-animation`: Demonstrates Lottie integration.
 - `examples/waapi-animation`: Demonstrates Web Animations API integration.
 - `examples/motion-one-animation`: Demonstrates Motion One integration.
+- `examples/media-element-animation`: Demonstrates synchronization of native video/audio elements.
 - `examples/gsap-animation`: Demonstrates GSAP integration.
 - `examples/pixi-canvas-animation`: Demonstrates PixiJS integration.
 - `examples/simple-animation`: Simple vanilla JS animation.
