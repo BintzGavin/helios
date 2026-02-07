@@ -97,3 +97,7 @@
 ## [0.104.2] - Render Orchestrator API Gap
 **Learning:** The `RenderOrchestrator` in `packages/renderer` handles distributed rendering logic (chunking) internally but does not expose a public `plan()` method. This forces the Studio and CLI to duplicate the planning logic (calculating chunk ranges and commands) to support "Export Job Spec".
 **Action:** Future work on `packages/renderer` should extract the planning logic into a reusable `RenderOrchestrator.plan()` method to eliminate this duplication.
+
+## [0.104.3] - Protocol Adherence Failure
+**Learning:** I implemented feature code in Studio instead of only creating a plan, directly violating the "Architect/Planner" role. This wasted resources and required a full reset.
+**Action:** When the system prompt says "You are the ARCHITECT... you DO NOT lay the bricks", I must ONLY produce `.md` plan files and NEVER execute code changes, regardless of tool availability.
