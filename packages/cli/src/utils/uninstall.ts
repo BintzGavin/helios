@@ -1,9 +1,14 @@
 import path from 'path';
+import fs from 'fs';
 import chalk from 'chalk';
 import { loadConfig, saveConfig } from './config.js';
 import { defaultClient } from '../registry/client.js';
 
-export async function uninstallComponent(rootDir: string, componentName: string): Promise<void> {
+export interface UninstallOptions {
+  removeFiles?: boolean;
+}
+
+export async function uninstallComponent(rootDir: string, componentName: string, options: UninstallOptions = {}): Promise<void> {
   const config = loadConfig(rootDir);
 
   if (!config) {
@@ -21,19 +26,47 @@ export async function uninstallComponent(rootDir: string, componentName: string)
   console.log(chalk.green(`✓ Removed "${componentName}" from configuration.`));
 
   try {
-    // Attempt to find files to warn user
+    // Attempt to find files to warn user or delete them
     const component = await defaultClient.findComponent(componentName, config.framework);
 
     if (component) {
       const componentsDir = path.resolve(rootDir, config.directories.components);
-      console.log(chalk.yellow('\nThe following files are no longer tracked and can be safely deleted:'));
 
-      for (const file of component.files) {
-        // Just show relative path to be cleaner for user
-        const relPath = path.join(config.directories.components, file.name);
-        console.log(chalk.dim(`- ${relPath}`));
+      if (options.removeFiles) {
+        console.log(chalk.cyan(`\nDeleting component files...`));
+        for (const file of component.files) {
+          const filePath = path.join(componentsDir, file.name);
+          if (fs.existsSync(filePath)) {
+            try {
+              fs.unlinkSync(filePath);
+              console.log(chalk.dim(`✓ Deleted ${path.join(config.directories.components, file.name)}`));
+
+              // Try to remove empty parent directories
+              let dir = path.dirname(filePath);
+              while (dir !== componentsDir && dir.startsWith(componentsDir)) {
+                if (fs.existsSync(dir) && fs.readdirSync(dir).length === 0) {
+                  fs.rmdirSync(dir);
+                  dir = path.dirname(dir);
+                } else {
+                  break;
+                }
+              }
+            } catch (e) {
+              console.warn(chalk.yellow(`⚠ Failed to delete ${file.name}: ${(e as Error).message}`));
+            }
+          }
+        }
+        console.log(chalk.green(`✓ Component files removed.`));
+      } else {
+        console.log(chalk.yellow('\nThe following files are no longer tracked and can be safely deleted:'));
+
+        for (const file of component.files) {
+          // Just show relative path to be cleaner for user
+          const relPath = path.join(config.directories.components, file.name);
+          console.log(chalk.dim(`- ${relPath}`));
+        }
+        console.log('');
       }
-      console.log('');
     } else {
        console.log(chalk.yellow(`\nCould not find component "${componentName}" in registry to verify files.`));
     }

@@ -125,14 +125,43 @@ export declare class HeliosPlayer extends HTMLElement implements TrackHost, Audi
     get buffered(): TimeRanges;
     get seekable(): TimeRanges;
     get played(): TimeRanges;
+    /**
+     * Gets the width attribute of the player.
+     * Part of the Standard Media API parity.
+     */
     get width(): number;
+    /**
+     * Sets the width attribute of the player.
+     * Part of the Standard Media API parity.
+     */
     set width(val: number);
+    /**
+     * Gets the height attribute of the player.
+     * Part of the Standard Media API parity.
+     */
     get height(): number;
+    /**
+     * Sets the height attribute of the player.
+     * Part of the Standard Media API parity.
+     */
     set height(val: number);
     get videoWidth(): number;
     get videoHeight(): number;
+    /**
+     * Gets whether the playsinline attribute is present.
+     * Part of the Standard Media API parity.
+     */
     get playsInline(): boolean;
+    /**
+     * Sets the playsinline attribute.
+     * Part of the Standard Media API parity.
+     */
     set playsInline(val: boolean);
+    /**
+     * Seeks to the specified time.
+     * Part of the Standard Media API parity.
+     * Note: In HeliosPlayer, this currently delegates to standard seek (currentTime setter).
+     */
     fastSeek(time: number): void;
     get currentTime(): number;
     set currentTime(val: number);

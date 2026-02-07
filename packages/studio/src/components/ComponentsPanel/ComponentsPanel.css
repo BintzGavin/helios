@@ -86,3 +86,45 @@
   margin-left: 0; /* Handled by flex gap */
   font-weight: 600;
 }
+
+.component-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.update-button {
+  background-color: var(--secondary-button-bg, #444);
+  color: white;
+  border: 1px solid var(--border-color);
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  flex: 1;
+  transition: background-color 0.2s;
+}
+
+.update-button:hover:not(:disabled) {
+  background-color: var(--secondary-button-hover, #555);
+}
+
+.remove-button {
+  background-color: transparent;
+  color: var(--error-color, #ff4d4f);
+  border: 1px solid var(--error-color, #ff4d4f);
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  flex: 1;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.remove-button:hover:not(:disabled) {
+  background-color: var(--error-color, #ff4d4f);
+  color: white;
+}
+
+.update-button:disabled, .remove-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

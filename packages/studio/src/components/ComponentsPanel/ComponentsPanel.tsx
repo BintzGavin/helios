@@ -14,7 +14,7 @@ interface ComponentDefinition {
 export const ComponentsPanel: React.FC = () => {
   const [components, setComponents] = useState<ComponentDefinition[]>([]);
   const [loading, setLoading] = useState(true);
-  const [installing, setInstalling] = useState<string | null>(null);
+  const [processing, setProcessing] = useState<string | null>(null);
   const { addToast } = useToast();
 
   const fetchComponents = () => {
@@ -39,7 +39,7 @@ export const ComponentsPanel: React.FC = () => {
   }, []);
 
   const handleInstall = async (name: string) => {
-    setInstalling(name);
+    setProcessing(name);
     try {
       const res = await fetch('/api/components', {
         method: 'POST',
@@ -58,7 +58,55 @@ export const ComponentsPanel: React.FC = () => {
       console.error(e);
       addToast(e.message || 'Installation failed', 'error');
     } finally {
-      setInstalling(null);
+      setProcessing(null);
+    }
+  };
+
+  const handleUpdate = async (name: string) => {
+    setProcessing(name);
+    try {
+      const res = await fetch('/api/components', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name })
+      });
+
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || 'Update failed');
+      }
+
+      addToast(`Component "${name}" updated`, 'success');
+      fetchComponents();
+    } catch (e: any) {
+      console.error(e);
+      addToast(e.message || 'Update failed', 'error');
+    } finally {
+      setProcessing(null);
+    }
+  };
+
+  const handleRemove = async (name: string) => {
+    if (!confirm(`Are you sure you want to remove "${name}"? This will delete component files.`)) return;
+
+    setProcessing(name);
+    try {
+      const res = await fetch(`/api/components?name=${encodeURIComponent(name)}`, {
+        method: 'DELETE'
+      });
+
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || 'Removal failed');
+      }
+
+      addToast(`Component "${name}" removed`, 'success');
+      fetchComponents();
+    } catch (e: any) {
+      console.error(e);
+      addToast(e.message || 'Removal failed', 'error');
+    } finally {
+      setProcessing(null);
     }
   };
 
@@ -89,13 +137,34 @@ export const ComponentsPanel: React.FC = () => {
                 <span>No dependencies</span>
               )}
             </div>
-            <button
-              className={`install-button ${comp.installed ? 'success' : ''}`}
-              onClick={() => handleInstall(comp.name)}
-              disabled={!!installing || comp.installed}
-            >
-              {installing === comp.name ? 'Installing...' : (comp.installed ? 'Installed' : 'Install')}
-            </button>
+            <div className="component-actions">
+              {!comp.installed ? (
+                <button
+                  className="install-button"
+                  onClick={() => handleInstall(comp.name)}
+                  disabled={!!processing}
+                >
+                  {processing === comp.name ? 'Installing...' : 'Install'}
+                </button>
+              ) : (
+                <>
+                  <button
+                    className="update-button"
+                    onClick={() => handleUpdate(comp.name)}
+                    disabled={!!processing}
+                  >
+                    {processing === comp.name ? 'Updating...' : 'Update'}
+                  </button>
+                  <button
+                    className="remove-button"
+                    onClick={() => handleRemove(comp.name)}
+                    disabled={!!processing}
+                  >
+                    {processing === comp.name ? 'Removing...' : 'Remove'}
+                  </button>
+                </>
+              )}
+            </div>
           </div>
         ))}
         {components.length === 0 && (

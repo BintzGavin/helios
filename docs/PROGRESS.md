@@ -169,3 +169,6 @@ Each agent should update **their own dedicated progress file** instead of this f
 
 ## DEMO v1.123.0
 - ✅ Completed: Standardize Lottie Animation Example - Modernized `examples/lottie-animation` with TypeScript, `package.json`, and proper build config.
+
+## STUDIO v0.105.0
+- ✅ Completed: Component Management - Implemented ability to remove and update components from the Studio UI, adding corresponding CLI hooks and backend API endpoints.

@@ -22,6 +22,8 @@ export interface StudioPluginOptions {
   skillsRoot?: string;
   components?: StudioComponentDefinition[];
   onInstallComponent?: (name: string) => Promise<void>;
+  onRemoveComponent?: (name: string) => Promise<void>;
+  onUpdateComponent?: (name: string) => Promise<void>;
   onCheckInstalled?: (name: string) => Promise<boolean>;
 }
 
@@ -169,6 +171,67 @@ function configureMiddlewares(server: ViteDevServer | PreviewServer, isPreview: 
                     } else {
                         res.statusCode = 501;
                         res.end(JSON.stringify({ error: 'Component installation not supported' }));
+                    }
+                } catch (e: any) {
+                    console.error(e);
+                    res.statusCode = 500;
+                    res.end(JSON.stringify({ error: e.message }));
+                }
+                return;
+            }
+
+            if (req.method === 'PUT') {
+                try {
+                    const body = await getBody(req);
+                    const { name } = body;
+                    if (!name) {
+                        res.statusCode = 400;
+                        res.end(JSON.stringify({ error: 'Name is required' }));
+                        return;
+                    }
+                    if (options.onUpdateComponent) {
+                        await options.onUpdateComponent(name);
+                        res.setHeader('Content-Type', 'application/json');
+                        res.end(JSON.stringify({ success: true }));
+                    } else {
+                        res.statusCode = 501;
+                        res.end(JSON.stringify({ error: 'Component update not supported' }));
+                    }
+                } catch (e: any) {
+                    console.error(e);
+                    res.statusCode = 500;
+                    res.end(JSON.stringify({ error: e.message }));
+                }
+                return;
+            }
+
+            if (req.method === 'DELETE') {
+                try {
+                    let name: string | null = null;
+                    const qIndex = req.url?.indexOf('?');
+                    if (qIndex !== undefined && qIndex !== -1) {
+                        const params = new URLSearchParams(req.url?.substring(qIndex));
+                        name = params.get('name');
+                    }
+
+                    if (!name) {
+                        const body = await getBody(req);
+                        name = body?.name;
+                    }
+
+                    if (!name) {
+                        res.statusCode = 400;
+                        res.end(JSON.stringify({ error: 'Name is required' }));
+                        return;
+                    }
+
+                    if (options.onRemoveComponent) {
+                        await options.onRemoveComponent(name);
+                        res.setHeader('Content-Type', 'application/json');
+                        res.end(JSON.stringify({ success: true }));
+                    } else {
+                        res.statusCode = 501;
+                        res.end(JSON.stringify({ error: 'Component removal not supported' }));
                     }
                 } catch (e: any) {
                     console.error(e);

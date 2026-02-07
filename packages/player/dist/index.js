@@ -963,17 +963,33 @@ export class HeliosPlayer extends HTMLElement {
         // Standard Media API: played range matches duration
         return new StaticTimeRange(0, this.duration);
     }
+    /**
+     * Gets the width attribute of the player.
+     * Part of the Standard Media API parity.
+     */
     get width() {
         const val = this.getAttribute("width");
         return val ? parseInt(val, 10) : 0;
     }
+    /**
+     * Sets the width attribute of the player.
+     * Part of the Standard Media API parity.
+     */
     set width(val) {
         this.setAttribute("width", String(val));
     }
+    /**
+     * Gets the height attribute of the player.
+     * Part of the Standard Media API parity.
+     */
     get height() {
         const val = this.getAttribute("height");
         return val ? parseInt(val, 10) : 0;
     }
+    /**
+     * Sets the height attribute of the player.
+     * Part of the Standard Media API parity.
+     */
     set height(val) {
         this.setAttribute("height", String(val));
     }
@@ -993,9 +1009,17 @@ export class HeliosPlayer extends HTMLElement {
         }
         return parseFloat(this.getAttribute("height") || "0");
     }
+    /**
+     * Gets whether the playsinline attribute is present.
+     * Part of the Standard Media API parity.
+     */
     get playsInline() {
         return this.hasAttribute("playsinline");
     }
+    /**
+     * Sets the playsinline attribute.
+     * Part of the Standard Media API parity.
+     */
     set playsInline(val) {
         if (val) {
             this.setAttribute("playsinline", "");
@@ -1004,6 +1028,11 @@ export class HeliosPlayer extends HTMLElement {
             this.removeAttribute("playsinline");
         }
     }
+    /**
+     * Seeks to the specified time.
+     * Part of the Standard Media API parity.
+     * Note: In HeliosPlayer, this currently delegates to standard seek (currentTime setter).
+     */
     fastSeek(time) {
         this.currentTime = time;
     }
