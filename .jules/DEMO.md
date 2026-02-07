@@ -79,3 +79,7 @@
 ## [1.127.0] - Scaffolding vs Standardization
 **Learning:** Examples may be marked as "Completed" (Scaffolded) but lack the standardization (TypeScript, package.json) required by the vision. Scaffolding is just step one.
 **Action:** When auditing "Completed" examples, verify they meet the *current* standard (TS, private package), not just that they exist.
+
+## [1.130.1] - Vanilla TypeScript Ambiguity
+**Learning:** `examples/vanilla-typescript` lacks `package.json` and `vite.config.ts`, making it a poor reference for "Standardization" despite its name. `examples/simple-canvas-animation` is the correct reference.
+**Action:** When standardizing, verify the reference example actually has the files you intend to replicate.
