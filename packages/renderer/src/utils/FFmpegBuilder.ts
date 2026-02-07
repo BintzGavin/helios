@@ -224,7 +224,13 @@ export class FFmpegBuilder {
     }
 
     // 5. Construct Final Arguments
-    const finalArgs: string[] = ['-y', ...videoInputArgs, ...audioInputArgs];
+    const finalArgs: string[] = ['-y'];
+
+    if (options.hwAccel) {
+      finalArgs.push('-hwaccel', options.hwAccel);
+    }
+
+    finalArgs.push(...videoInputArgs, ...audioInputArgs);
 
     // Combine filters
     const complexFilters: string[] = [];

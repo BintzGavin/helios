@@ -246,6 +246,13 @@ export interface RendererOptions {
    * Only applicable when `intermediateVideoCodec` is used or inferred.
    */
   keyFrameInterval?: number;
+
+  /**
+   * Hardware acceleration method to use for FFmpeg.
+   * Examples: 'cuda', 'vaapi', 'qsv', 'videotoolbox', 'auto'.
+   * If provided, adds the `-hwaccel` flag to the FFmpeg command.
+   */
+  hwAccel?: string;
 }
 
 export interface RenderJobOptions {

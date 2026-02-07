@@ -6,6 +6,7 @@ export interface FFmpegDiagnostics {
   version?: string;
   encoders: string[];
   filters: string[];
+  hwaccels: string[];
   error?: string;
 }
 
@@ -16,6 +17,7 @@ export class FFmpegInspector {
       present: false,
       encoders: [],
       filters: [],
+      hwaccels: [],
     };
 
     try {
@@ -70,6 +72,23 @@ export class FFmpegInspector {
             if (match) {
                 result.filters.push(match[1]);
             }
+        }
+      }
+
+      // Check Hardware Accelerations
+      const hwaccelsProc = spawnSync(ffmpegPath, ['-hwaccels'], { encoding: 'utf-8' });
+      if (!hwaccelsProc.error && hwaccelsProc.status === 0) {
+        const lines = hwaccelsProc.stdout.split('\n');
+        // Output format:
+        // Hardware acceleration methods:
+        // vdpau
+        // vaapi
+        // ...
+        for (let i = 0; i < lines.length; i++) {
+          const line = lines[i].trim();
+          if (line && line !== 'Hardware acceleration methods:') {
+            result.hwaccels.push(line);
+          }
         }
       }
 
