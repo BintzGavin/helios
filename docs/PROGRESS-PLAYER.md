@@ -1,3 +1,15 @@
+## PLAYER v0.76.1
+- ✅ Completed: Fix Verification Script - Updated E2E script to use aria-label assertions for SVG icons.
+
+## PLAYER v0.76.0
+- ✅ Completed: Dynamic Audio Metering - Implemented MutationObserver in AudioMeter to detect and meter dynamically added media elements.
+
+## PLAYER v0.75.0
+- ✅ Completed: Implement Standard Event Handlers - Implemented standard HTMLMediaElement event handler properties (onplay, onpause, etc.) on HeliosPlayer for improved API parity.
+
+## PLAYER v0.74.4
+- ✅ Completed: Sync Version - Synced package.json version with status file and verified all tests pass.
+
 ## PLAYER v0.74.1
 - ✅ Completed: Implement SVG Icons - Replaced text-based control icons with inline SVGs for consistent visual styling.
 
