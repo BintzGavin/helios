@@ -1,0 +1,22 @@
+{
+  "name": "@helios-examples/vue-dom-animation",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@helios-project/core": "file:../../packages/core",
+    "vue": "^3.4.21"
+  },
+  "devDependencies": {
+    "@types/node": "^25.2.2",
+    "@vitejs/plugin-vue": "^5.0.4",
+    "typescript": "^5.4.5",
+    "vite": "^5.2.10",
+    "vue-tsc": "^2.0.13"
+  }
+}

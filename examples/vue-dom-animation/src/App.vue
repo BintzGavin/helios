@@ -1,5 +1,5 @@
-<script setup>
-import { Helios } from '../../../packages/core/src/index.ts';
+<script setup lang="ts">
+import { Helios } from '@helios-project/core';
 import { useVideoFrame } from './composables/useVideoFrame';
 
 // Initialize Helios singleton
@@ -10,7 +10,7 @@ helios.bindToDocumentTimeline();
 
 // Expose to window for debugging/player control
 if (typeof window !== 'undefined') {
-    window.helios = helios;
+    (window as any).helios = helios;
 }
 
 const frame = useVideoFrame(helios);
