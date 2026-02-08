@@ -1,9 +1,10 @@
-import { ref, onUnmounted } from 'vue';
+import { ref, onUnmounted, type Ref } from 'vue';
+import type { Helios } from '@helios-project/core';
 
-export function useVideoFrame(helios) {
+export function useVideoFrame(helios: Helios): Ref<number> {
     const frame = ref(helios.getState().currentFrame);
 
-    const update = (state) => {
+    const update = (state: { currentFrame: number }) => {
         frame.value = state.currentFrame;
     };
 

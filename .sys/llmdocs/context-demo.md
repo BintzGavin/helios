@@ -56,6 +56,7 @@ The `examples/` directory contains various examples demonstrating Helios usage w
 - `examples/vue-threejs-canvas-animation`: Vue and Three.js.
 - `examples/svelte-captions-animation`: Svelte captions.
 - `examples/vue-captions-animation`: Vue captions.
+- `examples/vue-dom-animation`: Standardized Vue DOM animation example.
 - `examples/diagnostics`: Diagnostics example.
 - `examples/vanilla-typescript`: Vanilla TypeScript example.
 - `examples/code-walkthrough`: Code walkthrough example.
