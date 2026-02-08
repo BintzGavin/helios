@@ -54,5 +54,6 @@ The Studio is launched via the `helios` CLI (from `@helios-project/cli`).
 - **Renderer**: Uses `RenderOrchestrator` for planning and executing renders.
 - **CLI**: The Studio backend exposes endpoints that the CLI can leverage (e.g., for `helios render` with HMR support, though currently CLI uses Renderer directly).
 
-## F. Recent Changes (v0.107.1)
+## F. Recent Changes (v0.107.2)
+- **Renders Panel Verification**: Implemented comprehensive unit tests for `RendersPanel` to ensure stability of the rendering UI.
 - **Portable Job Specs**: The "Export Job Spec" feature now generates relative paths for input, output, and chunks, enabling portability across different environments (e.g. local vs cloud).
