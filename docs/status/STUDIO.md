@@ -1,4 +1,4 @@
-**Version**: 0.107.1
+**Version**: 0.107.2
 
 **Posture**: ACTIVELY EXPANDING FOR V2
 
@@ -9,6 +9,7 @@
 **Focus**: UI Implementation & CLI
 
 ## Recent Updates
+- [v0.107.2] ✅ Verified: Renders Panel Tests - Implemented comprehensive unit tests for `RendersPanel`, covering interactions, states, and context integration.
 - [v0.107.1] ✅ Completed: Portable Job Paths - Updated `getRenderJobSpec` to generate relative paths for input, output, and chunks, ensuring distributed render jobs are portable across environments.
 - [v0.107.0] ✅ Completed: Export Job Spec - Implemented "Export Job Spec" functionality in Renders Panel to generate distributed render job JSON files for cloud execution.
 - [v0.106.0] ✅ Completed: Configurable Example Registry (CLI) - Implemented `--repo` flag for `helios init` command, enabling scaffolding from custom GitHub repositories.
