@@ -1,3 +1,6 @@
+## STUDIO v0.107.1
+- ✅ Completed: Portable Job Paths - Updated `getRenderJobSpec` to generate relative paths for input, output, and chunks, ensuring distributed render jobs are portable across environments.
+
 ## STUDIO v0.107.0
 - ✅ Completed: Export Job Spec - Implemented "Export Job Spec" functionality in Renders Panel to generate distributed render job JSON files for cloud execution.
 

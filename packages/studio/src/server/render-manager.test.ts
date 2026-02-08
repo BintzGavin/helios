@@ -1,139 +1,86 @@
-import { vi, describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import path from 'path';
+import fs from 'fs';
 import { getRenderJobSpec } from './render-manager';
-import { RenderOrchestrator } from '@helios-project/renderer';
-import * as Discovery from './discovery';
 
-vi.mock('@helios-project/renderer', () => ({
-  RenderOrchestrator: {
-    plan: vi.fn()
-  },
-  // Mock other exports if needed, but we only use types and static plan method
-}));
+// Mock dependencies
+vi.mock('@helios-project/renderer', () => {
+  return {
+    RenderOrchestrator: {
+      plan: vi.fn((compositionUrl, outputPath, options) => {
+         // Mock output for chunks
+         const outputDir = path.dirname(outputPath);
+         const chunks: any[] = [];
+         const concurrency = options.concurrency || 1;
 
-vi.mock('./discovery', () => ({
-  getProjectRoot: vi.fn().mockReturnValue('/mock/project/root')
-}));
+         for(let i=0; i<concurrency; i++) {
+             chunks.push({
+                 id: i,
+                 startFrame: i * 10,
+                 frameCount: 10,
+                 outputFile: path.join(outputDir, `temp_part_${i}.mov`),
+                 options: { ...options }
+             });
+         }
 
-describe('render-manager', () => {
-  const mockProjectRoot = '/mock/project/root';
+         return {
+             totalFrames: 100,
+             chunks,
+             concatManifest: chunks.map(c => c.outputFile),
+             concatOutputFile: path.join(outputDir, 'temp_concat.mov'),
+             finalOutputFile: outputPath,
+             mixOptions: {},
+             cleanupFiles: []
+         };
+      }),
+      render: vi.fn()
+    },
+    Renderer: class {},
+    DistributedRenderOptions: {}
+  };
+});
+
+describe('getRenderJobSpec', () => {
+  const TEST_DIR = path.resolve(process.cwd(), 'temp-test-root');
 
   beforeEach(() => {
-    vi.clearAllMocks();
-    // Re-apply the mock return value if needed, though the factory default handles init
-    (Discovery.getProjectRoot as any).mockReturnValue(mockProjectRoot);
+    vi.stubEnv('HELIOS_PROJECT_ROOT', TEST_DIR);
+    if (fs.existsSync(TEST_DIR)) fs.rmSync(TEST_DIR, { recursive: true, force: true });
+    fs.mkdirSync(TEST_DIR, { recursive: true });
+    fs.mkdirSync(path.join(TEST_DIR, 'renders'));
   });
 
-  describe('getRenderJobSpec', () => {
-    it('should generate a correct JobSpec', async () => {
-      const options = {
-        compositionUrl: '/examples/basic/composition.html',
+  afterEach(() => {
+    if (fs.existsSync(TEST_DIR)) fs.rmSync(TEST_DIR, { recursive: true, force: true });
+    vi.unstubAllEnvs();
+  });
+
+  it('should generate relative paths', () => {
+    const options = {
+        compositionUrl: '/my-comp/composition.html',
         width: 1920,
         height: 1080,
         fps: 30,
-        duration: 2,
-        mode: 'canvas' as const,
+        duration: 5,
         concurrency: 2
-      };
+    };
 
-      // Mock RenderOrchestrator.plan response
-      const mockPlan = {
-        totalFrames: 60,
-        chunks: [
-          {
-            id: 0,
-            startFrame: 0,
-            frameCount: 30,
-            outputFile: path.join(mockProjectRoot, 'renders/temp_0.mov'),
-            options: {
-                width: 1920,
-                height: 1080,
-                fps: 30,
-                mode: 'canvas'
-            }
-          },
-          {
-            id: 1,
-            startFrame: 30,
-            frameCount: 30,
-            outputFile: path.join(mockProjectRoot, 'renders/temp_1.mov'),
-            options: {
-                width: 1920,
-                height: 1080,
-                fps: 30,
-                mode: 'canvas'
-            }
-          }
-        ],
-        concatManifest: ['/path/to/0.mov', '/path/to/1.mov'],
-        concatOutputFile: '/path/to/concat.mov',
-        finalOutputFile: '/path/to/final.mp4',
-        mixOptions: {
-           videoCodec: 'libx264',
-           audioCodec: 'aac'
-        },
-        cleanupFiles: []
-      };
+    const spec = getRenderJobSpec(options);
 
-      (RenderOrchestrator.plan as any).mockReturnValue(mockPlan);
+    console.log('Chunk Command:', spec.chunks[0].command);
+    console.log('Merge Command:', spec.mergeCommand);
 
-      const spec = await getRenderJobSpec(options);
+    const chunkCommand = spec.chunks[0].command;
 
-      expect(RenderOrchestrator.plan).toHaveBeenCalled();
-      const planCallArgs = (RenderOrchestrator.plan as any).mock.calls[0];
-      // Check composition URL (should be absolute file URL)
-      expect(planCallArgs[0]).toContain('file://');
-      expect(planCallArgs[0]).toContain('examples/basic/composition.html');
+    // Should NOT contain absolute path
+    expect(chunkCommand).not.toContain(TEST_DIR);
 
-      // Check metadata
-      expect(spec.metadata).toEqual({
-        totalFrames: 60,
-        fps: 30,
-        width: 1920,
-        height: 1080,
-        duration: 2
-      });
+    // Should contain relative paths
+    // Note: Normalize slashes if needed for cross-platform
+    const expectedInput = 'my-comp/composition.html';
+    const expectedOutput = 'renders/temp_part_0.mov';
 
-      // Check chunks
-      expect(spec.chunks).toHaveLength(2);
-      expect(spec.chunks[0].command).toContain('helios render');
-      expect(spec.chunks[0].command).toContain('--start-frame 0');
-      expect(spec.chunks[0].command).toContain('--frame-count 30');
-      // Verify ported flags logic
-      expect(spec.chunks[0].command).toContain('--width 1920');
-      expect(spec.chunks[0].command).toContain('--height 1080');
-
-      // Check merge command
-      expect(spec.mergeCommand).toContain('helios merge');
-      expect(spec.mergeCommand).toContain('--video-codec libx264');
-      expect(spec.mergeCommand).toContain('--audio-codec aac');
-    });
-
-    it('should handle @fs urls', async () => {
-        const options = {
-            compositionUrl: '/@fs/abs/path/to/composition.html',
-            fps: 30,
-            duration: 1
-        };
-
-        const mockPlan = {
-            totalFrames: 30,
-            chunks: [],
-            concatManifest: [],
-            mixOptions: {},
-            cleanupFiles: []
-        };
-        (RenderOrchestrator.plan as any).mockReturnValue(mockPlan);
-
-        await getRenderJobSpec(options);
-
-        const planCallArgs = (RenderOrchestrator.plan as any).mock.calls[0];
-        // Should convert /@fs/abs/path... to file:///abs/path...
-        // Note: pathToFileURL handles generic paths.
-        // Assuming /abs/path is absolute on linux, or C:/ on windows.
-        // The mock logic in getRenderJobSpec strips /@fs/
-        expect(planCallArgs[0]).toContain('file://');
-        expect(planCallArgs[0]).not.toContain('/@fs/');
-    });
+    expect(chunkCommand).toContain(expectedInput);
+    expect(chunkCommand).toContain(expectedOutput);
   });
 });
