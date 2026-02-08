@@ -127,6 +127,7 @@ export interface StartRenderOptions {
   pixelFormat?: string;
   inputProps?: Record<string, any>;
   concurrency?: number;
+  hwAccel?: string;
 }
 
 function rendererOptionsToFlags(options: RendererOptions): string {
@@ -293,7 +294,8 @@ export async function startRender(options: StartRenderOptions, serverPort: numbe
         videoCodec: options.videoCodec,
         pixelFormat: options.pixelFormat,
         inputProps: options.inputProps,
-        concurrency: options.concurrency
+        concurrency: options.concurrency,
+        hwAccel: options.hwAccel
       };
 
       await RenderOrchestrator.render(fullUrl, outputPath, renderOptions, {

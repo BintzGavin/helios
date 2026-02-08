@@ -38,6 +38,8 @@ export interface RenderConfig {
   videoBitrate?: string;
   videoCodec?: string;
   concurrency?: number;
+  hwAccel?: string;
+  scale?: number;
 }
 
 export interface RenderJob {
@@ -665,6 +667,10 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     if (!comp) return;
 
     const { fps, duration } = playerState;
+    const scale = renderConfig.scale || 1;
+    // Ensure even dimensions for FFmpeg compatibility
+    const width = Math.floor((canvasSize.width * scale) / 2) * 2;
+    const height = Math.floor((canvasSize.height * scale) / 2) * 2;
 
     try {
       await fetch('/api/render', {
@@ -674,8 +680,8 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           compositionUrl: comp.url,
           fps,
           duration,
-          width: canvasSize.width,
-          height: canvasSize.height,
+          width,
+          height,
           inPoint: options?.inPoint,
           outPoint: options?.outPoint,
           inputProps: playerState.inputProps,
@@ -817,6 +823,10 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const exportJobSpec = async () => {
     if (!activeComposition) return;
     const { fps, duration } = playerState;
+    const scale = renderConfig.scale || 1;
+    // Ensure even dimensions for FFmpeg compatibility
+    const width = Math.floor((canvasSize.width * scale) / 2) * 2;
+    const height = Math.floor((canvasSize.height * scale) / 2) * 2;
 
     try {
       const res = await fetch('/api/render/job-spec', {
@@ -826,8 +836,8 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           compositionUrl: activeComposition.url,
           fps,
           duration,
-          width: canvasSize.width,
-          height: canvasSize.height,
+          width,
+          height,
           inPoint,
           outPoint,
           inputProps: playerState.inputProps,
