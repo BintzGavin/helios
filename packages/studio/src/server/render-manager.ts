@@ -186,18 +186,30 @@ export function getRenderJobSpec(options: StartRenderOptions): JobSpec {
 
   const plan = RenderOrchestrator.plan(compositionUrl, outputPath, renderOptions);
 
+  // Helper to normalize paths for cross-platform portability (forward slashes)
+  const normalizePath = (p: string) => p.split(path.sep).join('/');
+
+  // Convert absolute paths to relative to projectRoot for portability
+  const relativeInput = normalizePath(path.relative(projectRoot, compositionPath));
+  const relativeOutput = normalizePath(path.relative(projectRoot, outputPath));
+
   const chunks: RenderJobChunk[] = plan.chunks.map(chunk => {
     const flags = rendererOptionsToFlags(chunk.options);
+    const relativeChunkOutput = normalizePath(path.relative(projectRoot, chunk.outputFile));
+
     return {
       id: chunk.id,
       startFrame: chunk.startFrame!,
       frameCount: chunk.frameCount!,
-      outputFile: chunk.outputFile,
-      command: `helios render ${compositionUrl} -o ${chunk.outputFile} --start-frame ${chunk.startFrame} --frame-count ${chunk.frameCount} ${flags}`
+      outputFile: relativeChunkOutput,
+      command: `helios render ${relativeInput} -o ${relativeChunkOutput} --start-frame ${chunk.startFrame} --frame-count ${chunk.frameCount} ${flags}`
     };
   });
 
-  let mergeCommand = `helios merge ${outputPath} ${plan.concatManifest.join(' ')}`;
+  // Convert manifest paths to relative
+  const relativeManifest = plan.concatManifest.map(f => normalizePath(path.relative(projectRoot, f)));
+
+  let mergeCommand = `helios merge ${relativeOutput} ${relativeManifest.join(' ')}`;
   if (plan.mixOptions.videoCodec && plan.mixOptions.videoCodec !== 'copy') {
     mergeCommand += ` --video-codec ${plan.mixOptions.videoCodec}`;
   }
