@@ -27,6 +27,8 @@ describe('RenderConfig', () => {
     expect(screen.getByText('Video Bitrate')).toBeInTheDocument();
     expect(screen.getByText('Video Codec')).toBeInTheDocument();
     expect(screen.getByText('Concurrency (Workers)')).toBeInTheDocument();
+    expect(screen.getByText('Hardware Acceleration')).toBeInTheDocument();
+    expect(screen.getByText('Resolution Scale')).toBeInTheDocument();
   });
 
   it('applies preset values when selected', () => {
@@ -103,6 +105,24 @@ describe('RenderConfig', () => {
     expect(mockOnChange).toHaveBeenCalledWith({
       ...defaultConfig,
       concurrency: 32
+    });
+  });
+
+  it('updates hwAccel and scale', () => {
+    render(<RenderConfig config={defaultConfig} onChange={mockOnChange} />);
+
+    const hwAccelSelect = screen.getByLabelText('Hardware Acceleration');
+    fireEvent.change(hwAccelSelect, { target: { value: 'cuda' } });
+    expect(mockOnChange).toHaveBeenCalledWith({
+      ...defaultConfig,
+      hwAccel: 'cuda'
+    });
+
+    const scaleSelect = screen.getByLabelText('Resolution Scale');
+    fireEvent.change(scaleSelect, { target: { value: '0.5' } });
+    expect(mockOnChange).toHaveBeenCalledWith({
+      ...defaultConfig,
+      scale: 0.5
     });
   });
 });

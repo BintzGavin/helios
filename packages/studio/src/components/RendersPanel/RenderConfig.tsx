@@ -5,6 +5,8 @@ export interface RenderConfigData {
   videoBitrate?: string;
   videoCodec?: string;
   concurrency?: number;
+  hwAccel?: string;
+  scale?: number;
 }
 
 interface RenderConfigProps {
@@ -136,6 +138,38 @@ export const RenderConfig: React.FC<RenderConfigProps> = ({ config, onChange }) 
           }}
           style={inputStyle}
         />
+      </div>
+
+      <div style={{ marginBottom: '8px' }}>
+        <label htmlFor="render-hwaccel" style={labelStyle}>Hardware Acceleration</label>
+        <select
+          id="render-hwaccel"
+          value={config.hwAccel || 'auto'}
+          onChange={(e) => handleChange('hwAccel', e.target.value)}
+          style={inputStyle}
+        >
+          <option value="auto">Auto</option>
+          <option value="cuda">NVIDIA CUDA</option>
+          <option value="vaapi">VAAPI (Linux/Intel)</option>
+          <option value="qsv">Intel QSV</option>
+          <option value="videotoolbox">Apple VideoToolbox</option>
+          <option value="none">None (CPU)</option>
+        </select>
+      </div>
+
+      <div style={{ marginBottom: '8px' }}>
+        <label htmlFor="render-scale" style={labelStyle}>Resolution Scale</label>
+        <select
+          id="render-scale"
+          value={config.scale || 1}
+          onChange={(e) => handleChange('scale', parseFloat(e.target.value))}
+          style={inputStyle}
+        >
+          <option value={1}>100% (Original)</option>
+          <option value={0.75}>75%</option>
+          <option value={0.5}>50%</option>
+          <option value={0.25}>25%</option>
+        </select>
       </div>
     </div>
   );
