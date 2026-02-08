@@ -1,10 +1,11 @@
-**Version**: 1.79.2
+**Version**: 1.79.3
 
 **Posture**: MAINTENANCE WITH V2 EXPANSION
 
 # Renderer Agent Status
 
 ## Progress Log
+- [1.79.3] ✅ Completed: Validate Codec Pixel Format - Implemented validation in `FFmpegBuilder` to fail fast when incompatible codec and pixel format combinations (e.g., `libx264` + `yuva420p`) are requested. Verified with `verify-codec-pixel-format-mismatch.ts`.
 - [1.79.2] ✅ Completed: Update Skill Documentation - Added documentation for RenderOrchestrator.plan() and related interfaces (DistributedRenderOptions, RenderPlan) to SKILL.md.
 - [1.79.1] ✅ Completed: Fix Skill Documentation - Added missing `hwAccel` and `buffer` properties to `SKILL.md` and updated journal with architectural learnings.
 - [1.79.0] ✅ Completed: Validate HW Accel - Implemented validation in `Renderer.render()` to check requested `hwAccel` against available FFmpeg hardware accelerations and log warnings for mismatches. Verified with `verify-hwaccel-validation.ts`.

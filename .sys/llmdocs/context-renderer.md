@@ -89,6 +89,8 @@ The Renderer pipes raw frames (or encoded chunks) to FFmpeg's `stdin`.
     *   Controlled by `FFmpegBuilder`.
     *   Supports `libx264` (MP4), `libvpx-vp9` (WebM), `prores`, etc.
     *   Audio is mixed using `amix` filter or `-filter_complex`.
+*   **Validation**:
+    *   Checks for incompatible codec/pixel format combinations (e.g., `libx264` + `yuva420p`) and throws descriptive errors.
 
 ## E. Orchestration
 The `RenderOrchestrator` manages distributed rendering jobs.

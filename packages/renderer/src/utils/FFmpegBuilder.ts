@@ -2,6 +2,18 @@ import { RendererOptions, AudioTrackConfig, FFmpegConfig } from '../types.js';
 
 export class FFmpegBuilder {
   static getArgs(options: RendererOptions, outputPath: string, videoInputArgs: string[]): FFmpegConfig {
+    // 0. Validate codec and pixel format compatibility
+    const videoCodec = options.videoCodec || 'libx264';
+    const pixelFormat = options.pixelFormat || 'yuv420p';
+
+    const isH264 = videoCodec === 'libx264' || videoCodec === 'h264';
+    const isH265 = videoCodec === 'libx265' || videoCodec === 'hevc';
+    const hasAlpha = pixelFormat.startsWith('yuva') || pixelFormat.startsWith('argb') || pixelFormat.startsWith('rgba') || pixelFormat.startsWith('abgr') || pixelFormat.startsWith('bgra');
+
+    if ((isH264 || isH265) && hasAlpha) {
+      throw new Error(`The codec '${videoCodec}' does not support alpha channel pixel format '${pixelFormat}'. Please use a codec that supports transparency (e.g., 'libvpx-vp9', 'prores_ks', 'qtrle') or use a non-alpha pixel format (e.g., 'yuv420p').`);
+    }
+
     // 1. Normalize inputs into AudioTrackConfig objects
     const tracks: AudioTrackConfig[] = [];
     const inputBuffers: { index: number; buffer: Buffer }[] = [];
@@ -165,7 +177,7 @@ export class FFmpegBuilder {
     // 3. Prepare Video Filters (Subtitles)
     let videoFilterGraph = '';
     let videoMap = '0:v';
-    const videoCodec = options.videoCodec || 'libx264';
+    // videoCodec is already defined at the start of the function
 
     if (options.subtitles) {
       if (videoCodec === 'copy') {
