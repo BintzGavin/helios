@@ -1,5 +1,16 @@
 # LLMS Progress
 
+## LLMS v1.12.0
+- ✅ Completed: Daily llms.txt Review
+  - Updated Quick Facts: Core v5.13+, Studio v0.107+, Player v0.76+, Renderer v1.79+
+  - Corrected Quick Facts: CLI v0.18+ (previously misreported as v0.19+)
+  - Updated Core API example: Added generic input props example (`Helios<{ title: string }>`)
+  - Updated Roadmap:
+    - Added "Export Job Spec", "Component Management", "Configurable Example Registry", "Preview Command" to Studio
+    - Added "Repo Scaffolding", "Update Command", "Build Command" to CLI
+    - Moved "Registry Commands" from V2 to V1.x (completed)
+  - Verified Distributed Rendering status in Comparison Table ("Local (Beta) / Cloud (Planned)")
+
 ## LLMS v1.11.0
 - ✅ Completed: Daily llms.txt Review
   - Updated Quick Facts: Core v5.13+, Studio v0.104+, Player v0.74+, Renderer v1.77+, CLI v0.19+

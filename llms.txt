@@ -6,7 +6,7 @@ Helios is a modern engine for creating videos programmatically using standard we
 
 ## Quick Facts
 - **License**: Elastic License 2.0 (free commercial use, no SaaS resale)
-- **Status**: Beta / Self-Driving (Core: Stable v5.13+, Studio: Alpha v0.104+)
+- **Status**: Beta / Self-Driving (Core: Stable v5.13+, Studio: Alpha v0.107+)
 - **Frameworks**: React, Vue, Svelte, Solid, vanilla JS
 - **Animation**: Standard CSS, Web Animations API (WAAPI), any animation library
 
@@ -15,7 +15,8 @@ Helios is a modern engine for creating videos programmatically using standard we
 ```typescript
 import { Helios } from '@helios-project/core';
 
-const helios = new Helios({
+// Define strict types for input props
+const helios = new Helios<{ title: string }>({
   duration: 10,  // seconds
   fps: 30,
   autoSyncAnimations: true, // Auto-sync CSS/WAAPI
@@ -110,11 +111,11 @@ const report = await Helios.diagnose();
 
 ## Roadmap
 ### V1.x (Active)
-- **Helios Studio**: Alpha v0.104+ (Preview Command, Open in Editor, Resizable Layout, Component Registry UI)
-- **CLI**: Beta v0.19+ (Preview Command, Skills Command, Job Command, Build Command)
+- **Helios Studio**: Alpha v0.107+ (Export Job Spec, Component Management, Preview Command, Configurable Registry)
+- **CLI**: Beta v0.18+ (Repo Scaffolding, Update Command, Build Command, Preview Command, Job Command)
 - **Core**: Stable v5.13+ (Generic Input Props, Active Clips, Input Schema, Headless Audio)
-- **Player**: Feature Complete v0.74+ (SVG Icons, CSS Parts, Export Menu, Audio Metering)
-- **Renderer**: Stable v1.77+ (Distributed Progress, Configurable Random Seed, Orchestrator Cancellation)
+- **Player**: Feature Complete v0.76+ (Dynamic Audio Metering, Standard Event Handlers, SVG Icons, CSS Parts)
+- **Renderer**: Stable v1.79+ (Orchestrator Plan, HW Accel Validation, Distributed Progress)
 
 ### AI Integration
 - **Studio MCP Server**: Inspect, create, and render compositions via LLM tools (Done)
@@ -122,8 +123,7 @@ const report = await Helios.diagnose();
 - **Helios Assistant**: Context-aware documentation search (Done)
 
 ### V2 (Next)
-- Distributed rendering (Cloud Adapters)
-- Registry Commands (CLI expansion)
+- Distributed rendering (Cloud Adapters - Lambda/Cloud Run)
 - Advanced audio engine (Tone.js integration)
 
 ### V3 (Future)
