@@ -1,3 +1,7 @@
+## [0.109.0] - Implicit Folder Structure
+**Learning:** The `findAssets` backend function scans for files recursively but does not return directory entities. This means the Studio backend has no concept of "empty folders"—folders only exist if they contain files. This complicates features like "Create New Folder" as they must be implemented as "Create Placeholder File".
+**Action:** When designing file-system based management UIs, determine if the backend supports directory entities or only file entities, and adjust the UI paradigm accordingly (e.g., "New Folder" vs "Upload to New Path").
+
 ## [0.108.0] - Asset Folder Organization
 **Learning:** Implemented folder-based navigation in the Assets Panel to address the scalability gap. The backend `findAssets` already supported recursive scanning, so the frontend just needed to reconstruct the tree from `relativePath`.
 **Action:** When adding "Management" features to file-based resources, leverage the file system's natural hierarchy rather than creating abstract grouping layers.
