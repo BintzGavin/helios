@@ -253,11 +253,16 @@ export class CanvasStrategy implements RenderStrategy {
         height,
         bitrate: intermediateBitrate,
         candidates,
-        alphaMode
+        alphaMode,
+        webCodecsPreference: this.options.webCodecsPreference
     };
 
     const result = await page.evaluate<{ supported: boolean; codec?: string; isH264: boolean; reason?: string }>(`
       (async (config) => {
+        if (config.webCodecsPreference === 'disabled') {
+          return { supported: false, reason: 'Disabled by user preference' };
+        }
+
         if (typeof VideoEncoder === 'undefined') {
           return { supported: false, reason: 'VideoEncoder not found' };
         }
@@ -332,13 +337,19 @@ export class CanvasStrategy implements RenderStrategy {
         }
 
         // Sort candidates:
-        // 1. Hardware First (isHardware=true > isHardware=false)
+        // 1. Hardware/Software Preference
         // 2. Codec Preference: H.264 (isH264=true > isH264=false) - if strictly tied on hardware
         // 3. Original Index (candidate.index ASC)
 
+        const preferSoftware = config.webCodecsPreference === 'software';
+
         supportedCandidates.sort((a, b) => {
             if (a.isHardware !== b.isHardware) {
-                return b.isHardware ? 1 : -1; // True comes first
+                if (preferSoftware) {
+                    return a.isHardware ? 1 : -1; // Hardware comes last (Software first)
+                } else {
+                    return b.isHardware ? 1 : -1; // Hardware comes first (Default)
+                }
             }
             if (a.candidate.isH264 !== b.candidate.isH264) {
                 return a.candidate.isH264 ? -1 : 1; // H.264 first
