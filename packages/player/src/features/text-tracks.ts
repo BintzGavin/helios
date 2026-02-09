@@ -25,6 +25,7 @@ export class HeliosCue {
 export const CueClass = GlobalVTTCue || HeliosCue;
 
 export class HeliosTextTrackCueList implements Iterable<HeliosCue> {
+    [index: number]: HeliosCue;
     private _cues: HeliosCue[];
 
     constructor(cues: HeliosCue[]) {
