@@ -117,3 +117,7 @@
 ## [0.104.1] - Protocol Adherence
 **Learning:** I violated the Planner role by implementing code.
 **Action:** Strictly adhere to producing only `.md` plan files.
+
+## [0.107.3] - WebCodecs Preference Gap
+**Learning:** The Renderer (`v1.80.0`) added `webCodecsPreference` to control hardware acceleration, but the Studio (`v0.107.3`) did not expose it. This created a gap where users couldn't leverage deterministic rendering for debugging.
+**Action:** When Renderer adds new configuration options, always check if they need to be exposed in Studio's `RenderConfig`.
