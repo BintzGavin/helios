@@ -28,12 +28,16 @@ Studio acts as a host environment for the Helios Player.
 
 Studio can be installed and run in two ways:
 
-**Option 1: Via Main CLI** (Development Mode)
+**Option 1: Via Main CLI** (Recommended)
 ```bash
+# Start development server
 npx helios studio
+
+# Preview production build
+npx helios preview
 ```
 
-**Option 2: Direct Installation** (Production Mode)
+**Option 2: Direct Installation** (Standalone)
 ```bash
 # Install globally
 npm install -g @helios-project/studio
@@ -47,7 +51,7 @@ Or use with npx:
 npx @helios-project/studio
 ```
 
-The standalone CLI serves the built Studio UI using `vite preview`, automatically detecting your project root.
+The `helios preview` command serves the static build output using `vite preview`, providing a production-like environment for verifying your composition before deployment.
 
 For a comprehensive guide on getting started, see the [Quickstart Guide](../../docs/site/getting-started/quickstart.md).
 
