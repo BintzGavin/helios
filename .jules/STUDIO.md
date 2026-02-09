@@ -1,3 +1,7 @@
+## [0.108.0] - Asset Folder Organization
+**Learning:** Implemented folder-based navigation in the Assets Panel to address the scalability gap. The backend `findAssets` already supported recursive scanning, so the frontend just needed to reconstruct the tree from `relativePath`.
+**Action:** When adding "Management" features to file-based resources, leverage the file system's natural hierarchy rather than creating abstract grouping layers.
+
 ## [0.93.2] - Version Mismatch Awareness
 **Learning:** `docs/status/STUDIO.md` claimed version `0.104.0` but `package.json` was `0.93.2`. This suggests the Status file may be hallucinating or ahead of the actual codebase state.
 **Action:** Always verify `package.json` versions directly before trusting the Status file for version-specific logic.
@@ -55,7 +59,7 @@
 **Action:** Strictly adhere to the "IDENTITY" section. Planner Agents must only produce `.md` plan files and never modify source code.
 
 ## [0.92.0] - Role Adherence
-**Learning:** I again failed to adhere to the Planner role and started implementing the "Visualize Time Props" feature directly. This wastes resources and violates the "Black Hole Architecture" where Planners only produce plans.
+**Learning:** I again failed to adhere to the Planner role and started implementing the "Visualize Time Props" feature directly. This wastes resources and required a full reset.
 **Action:** Before executing any tool that modifies code (other than fixing dependencies to verify state), explicitly check "Am I a Planner?". If yes, STOP and write the plan.
 
 ## [0.93.2] - Ephemeral Render Config

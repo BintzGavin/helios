@@ -637,6 +637,8 @@ function configureMiddlewares(server: ViteDevServer | PreviewServer, isPreview: 
         // POST: Upload asset
         if (req.url === '/upload' && req.method === 'POST') {
           const filename = req.headers['x-filename'] as string;
+          const directory = req.headers['x-directory'] as string || '';
+
           if (!filename) {
             res.statusCode = 400;
             res.end(JSON.stringify({ error: 'Missing x-filename header' }));
@@ -645,12 +647,27 @@ function configureMiddlewares(server: ViteDevServer | PreviewServer, isPreview: 
 
           try {
             const safeFilename = path.basename(filename);
+            const safeDirectory = path.normalize(directory).replace(/^(\.\.[\/\\])+/, ''); // Prevent traversal
+
             const projectRoot = getProjectRoot(process.cwd());
             const publicDir = path.join(projectRoot, 'public');
 
             // Use public directory if it exists, otherwise use project root
-            const targetDir = fs.existsSync(publicDir) ? publicDir : projectRoot;
+            const baseDir = fs.existsSync(publicDir) ? publicDir : projectRoot;
+            const targetDir = path.join(baseDir, safeDirectory);
+
+            if (!fs.existsSync(targetDir)) {
+                fs.mkdirSync(targetDir, { recursive: true });
+            }
+
             const targetPath = path.join(targetDir, safeFilename);
+
+            // Security check: ensure target path is still within project root
+            if (!targetPath.startsWith(baseDir)) {
+                 res.statusCode = 403;
+                 res.end(JSON.stringify({ error: 'Access denied: Path traversal detected' }));
+                 return;
+            }
 
             const writeStream = fs.createWriteStream(targetPath);
             req.pipe(writeStream);

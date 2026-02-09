@@ -1,6 +1,7 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useMemo } from 'react';
 import { useStudio, Asset } from '../../context/StudioContext';
 import { AssetItem } from './AssetItem';
+import { FolderItem } from './FolderItem';
 import './AssetsPanel.css';
 
 export const AssetsPanel: React.FC = () => {
@@ -8,6 +9,7 @@ export const AssetsPanel: React.FC = () => {
   const [isDragging, setIsDragging] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterType, setFilterType] = useState<Asset['type'] | 'all'>('all');
+  const [currentPath, setCurrentPath] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleDragOver = (e: React.DragEvent) => {
@@ -19,13 +21,19 @@ export const AssetsPanel: React.FC = () => {
     setIsDragging(false);
   };
 
-  const handleDrop = async (e: React.DragEvent) => {
+  const handleDrop = async (e: React.DragEvent, targetFolder?: string) => {
     e.preventDefault();
+    e.stopPropagation();
     setIsDragging(false);
+
+    // If dropped on a specific folder item, use that. Otherwise use current path.
+    const uploadDir = targetFolder !== undefined ?
+        (currentPath ? `${currentPath}/${targetFolder}` : targetFolder) :
+        currentPath;
 
     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
        for (let i = 0; i < e.dataTransfer.files.length; i++) {
-           await uploadAsset(e.dataTransfer.files[i]);
+           await uploadAsset(e.dataTransfer.files[i], uploadDir);
        }
     }
   };
@@ -37,46 +45,95 @@ export const AssetsPanel: React.FC = () => {
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
       if (e.target.files && e.target.files.length > 0) {
           for (let i = 0; i < e.target.files.length; i++) {
-              await uploadAsset(e.target.files[i]);
+              await uploadAsset(e.target.files[i], currentPath);
           }
       }
       // Reset input
       if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
-  const filteredAssets = assets.filter(asset => {
-    const matchesSearch = asset.name.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesType = filterType === 'all' || asset.type === filterType;
-    return matchesSearch && matchesType;
-  });
+  const content = useMemo(() => {
+    // Flat View for Search
+    if (searchQuery) {
+        const files = assets.filter(asset => {
+            const matchesSearch = asset.name.toLowerCase().includes(searchQuery.toLowerCase());
+            const matchesType = filterType === 'all' || asset.type === filterType;
+            return matchesSearch && matchesType;
+        });
+        return { files, folders: [] };
+    }
+
+    // Tree View
+    const folders = new Set<string>();
+    const files: Asset[] = [];
+
+    // Ensure prefix has trailing slash if not empty
+    const prefix = currentPath ? `${currentPath}/` : '';
+
+    assets.forEach(asset => {
+        // Only consider assets starting with currentPath
+        if (!asset.relativePath.startsWith(prefix)) return;
+
+        // Remove prefix to get path relative to current folder
+        const relative = asset.relativePath.slice(prefix.length);
+        const parts = relative.split('/');
+
+        if (parts.length > 1) {
+            // It's in a subfolder
+            folders.add(parts[0]);
+        } else {
+            // It's a file in this folder
+            if (filterType === 'all' || asset.type === filterType) {
+                files.push(asset);
+            }
+        }
+    });
+
+    return {
+        files,
+        folders: Array.from(folders).sort()
+    };
+  }, [assets, currentPath, searchQuery, filterType]);
+
+  const navigateTo = (path: string) => {
+      setCurrentPath(path);
+      setSearchQuery(''); // Clear search on nav
+  };
+
+  const enterFolder = (folderName: string) => {
+      const newPath = currentPath ? `${currentPath}/${folderName}` : folderName;
+      navigateTo(newPath);
+  };
 
   return (
     <div
         className="assets-panel"
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
-        onDrop={handleDrop}
+        onDrop={(e) => handleDrop(e)}
     >
         {isDragging && (
             <div className="assets-drop-overlay">
-                Drop files to upload
+                Drop files to upload to {currentPath || 'Root'}
             </div>
         )}
 
       <div className="assets-header">
-         <input
-            type="file"
-            ref={fileInputRef}
-            style={{ display: 'none' }}
-            onChange={handleFileChange}
-            multiple
-         />
-         <button
-            className="assets-upload-btn"
-            onClick={handleUploadClick}
-         >
-            Upload Asset
-         </button>
+         <div className="assets-header-top">
+             <input
+                type="file"
+                ref={fileInputRef}
+                style={{ display: 'none' }}
+                onChange={handleFileChange}
+                multiple
+             />
+             <button
+                className="assets-upload-btn"
+                onClick={handleUploadClick}
+             >
+                Upload to {currentPath ? currentPath : 'Root'}
+             </button>
+         </div>
 
          <div className="assets-toolbar">
             <input
@@ -102,21 +159,56 @@ export const AssetsPanel: React.FC = () => {
                 <option value="other">Other</option>
             </select>
          </div>
+
+         {!searchQuery && (
+             <div className="assets-breadcrumbs">
+                 <span
+                    className={`breadcrumb-item ${!currentPath ? 'active' : ''}`}
+                    onClick={() => navigateTo('')}
+                 >
+                    Home
+                 </span>
+                 {currentPath.split('/').map((part, i, arr) => {
+                     const path = arr.slice(0, i + 1).join('/');
+                     return (
+                         <React.Fragment key={path}>
+                             <span className="breadcrumb-separator">/</span>
+                             <span
+                                className={`breadcrumb-item ${i === arr.length - 1 ? 'active' : ''}`}
+                                onClick={() => navigateTo(path)}
+                             >
+                                {part}
+                             </span>
+                         </React.Fragment>
+                     );
+                 })}
+             </div>
+         )}
       </div>
 
       <div className="assets-list">
-        {filteredAssets.length === 0 ? (
+        {!searchQuery && content.folders.map(folder => (
+            <FolderItem
+                key={folder}
+                name={folder}
+                onClick={() => enterFolder(folder)}
+                onDrop={(e) => handleDrop(e, folder)}
+            />
+        ))}
+
+        {content.files.map((asset) => (
+            <AssetItem key={asset.id} asset={asset} />
+        ))}
+
+        {content.files.length === 0 && content.folders.length === 0 && (
              <div className="assets-empty">
-                {assets.length === 0 ? (
-                    <>No assets found.<br/>Drag & drop to upload.</>
-                ) : (
-                    <>No matching assets found.</>
+                {searchQuery ? 'No matching assets found.' : (
+                    <>
+                        Folder is empty.<br/>
+                        Drag & drop to upload.
+                    </>
                 )}
              </div>
-        ) : (
-            filteredAssets.map((asset) => (
-                <AssetItem key={asset.id} asset={asset} />
-            ))
         )}
       </div>
     </div>
