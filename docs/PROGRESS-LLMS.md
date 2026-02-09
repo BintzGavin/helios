@@ -1,5 +1,12 @@
 # LLMS Progress
 
+## LLMS v1.13.0
+- ✅ Completed: Daily llms.txt Review
+  - Updated Quick Facts: Core v5.13.0+, Studio v0.107.2+, Player v0.76.1+, Renderer v1.79.2+, CLI v0.18.0+
+  - Updated CLI Description: Added `merge`, `build`, `update` commands
+  - Updated Agent Skills: Added note about `workflows/` and `examples/` directories
+  - Updated Roadmap: Added "Portable Job Paths" to Studio
+
 ## LLMS v1.12.0
 - ✅ Completed: Daily llms.txt Review
   - Updated Quick Facts: Core v5.13+, Studio v0.107+, Player v0.76+, Renderer v1.79+

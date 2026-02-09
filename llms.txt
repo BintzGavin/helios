@@ -6,7 +6,7 @@ Helios is a modern engine for creating videos programmatically using standard we
 
 ## Quick Facts
 - **License**: Elastic License 2.0 (free commercial use, no SaaS resale)
-- **Status**: Beta / Self-Driving (Core: Stable v5.13+, Studio: Alpha v0.107+)
+- **Status**: Beta / Self-Driving (Core: Stable v5.13.0+, Studio: Alpha v0.107.2+, Player: v0.76.1+, Renderer: v1.79.2+, CLI: Beta v0.18.0+)
 - **Frameworks**: React, Vue, Svelte, Solid, vanilla JS
 - **Animation**: Standard CSS, Web Animations API (WAAPI), any animation library
 
@@ -41,7 +41,7 @@ helios.play();
 - `@helios-project/player` - Web Component player (`<helios-player>`)
 - `@helios-project/renderer` - Server-side rendering (Playwright, FFmpeg)
 - `@helios-project/studio` - Browser-based development environment (Alpha)
-- `@helios-project/cli` - Command-line interface (scaffolding, registry, studio, render, job, skills, preview)
+- `@helios-project/cli` - Command-line interface (scaffolding, registry, studio, render, job, skills, preview, build, update, merge)
 
 ## Animation Approach
 Helios uses native browser APIs, not proprietary hooks:
@@ -83,6 +83,7 @@ Skills for AI agents are in `.agents/skills/helios/`:
 - `player/SKILL.md` - Player component usage
 - `studio/SKILL.md` - Studio usage and extensions
 - `cli/SKILL.md` - CLI usage and scaffolding
+- `workflows/*.md` & `examples/*.md` - Task-specific workflows and example skills
 
 ## Key Files for Agents
 - `README.md` - Vision document
@@ -111,11 +112,11 @@ const report = await Helios.diagnose();
 
 ## Roadmap
 ### V1.x (Active)
-- **Helios Studio**: Alpha v0.107+ (Export Job Spec, Component Management, Preview Command, Configurable Registry)
-- **CLI**: Beta v0.18+ (Repo Scaffolding, Update Command, Build Command, Preview Command, Job Command)
-- **Core**: Stable v5.13+ (Generic Input Props, Active Clips, Input Schema, Headless Audio)
-- **Player**: Feature Complete v0.76+ (Dynamic Audio Metering, Standard Event Handlers, SVG Icons, CSS Parts)
-- **Renderer**: Stable v1.79+ (Orchestrator Plan, HW Accel Validation, Distributed Progress)
+- **Helios Studio**: Alpha v0.107.2+ (Export Job Spec, Portable Job Paths, Component Management, Preview Command, Configurable Registry)
+- **CLI**: Beta v0.18.0+ (Repo Scaffolding, Update Command, Build Command, Preview Command, Job Command)
+- **Core**: Stable v5.13.0+ (Generic Input Props, Active Clips, Input Schema, Headless Audio)
+- **Player**: Feature Complete v0.76.1+ (Dynamic Audio Metering, Standard Event Handlers, SVG Icons, CSS Parts)
+- **Renderer**: Stable v1.79.2+ (Orchestrator Plan, HW Accel Validation, Distributed Progress)
 
 ### AI Integration
 - **Studio MCP Server**: Inspect, create, and render compositions via LLM tools (Done)
