@@ -80,4 +80,16 @@ jobs:
           PR_URL: ${{ github.event.pull_request.html_url }}
         run: |
           gh pr ready "$PR_URL" || true
-          gh pr merge --auto --squash "$PR_URL"
+
+          # Retry loop for gh pr merge to handle rate limits
+          for i in {1..5}; do
+            if gh pr merge --auto --squash "$PR_URL"; then
+              echo "Auto-merge enabled successfully"
+              exit 0
+            fi
+            echo "Auto-merge failed, retrying in $((i * 5)) seconds..."
+            sleep $((i * 5))
+          done
+
+          echo "Failed to enable auto-merge after 5 attempts"
+          exit 1
