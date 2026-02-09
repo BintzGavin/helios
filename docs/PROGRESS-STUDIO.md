@@ -1,3 +1,9 @@
+## STUDIO v0.107.3
+- ✅ Completed: Documentation Maintenance - Updated Studio documentation to document `helios preview` command usage.
+
+## STUDIO v0.107.2
+- ✅ Verified: Renders Panel Tests - Implemented comprehensive unit tests for `RendersPanel`, covering interactions, states, and context integration.
+
 ## STUDIO v0.107.1
 - ✅ Completed: Portable Job Paths - Updated `getRenderJobSpec` to generate relative paths for input, output, and chunks, ensuring distributed render jobs are portable across environments.
 
