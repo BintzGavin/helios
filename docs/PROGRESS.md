@@ -13,6 +13,9 @@ Each agent should update **their own dedicated progress file** instead of this f
 - **STUDIO**: Update `docs/PROGRESS-STUDIO.md`
 - **SKILLS**: Update `docs/PROGRESS-SKILLS.md`
 
+### RENDERER v1.80.0
+- ✅ Completed: WebCodecs Preference - Added `webCodecsPreference` option to `RendererOptions` ('hardware' | 'software' | 'disabled') to allow controlling hardware acceleration usage in `CanvasStrategy`, enabling deterministic regression testing. Verified with `verify-webcodecs-preference.ts`.
+
 ### DEMO v1.137.0
 - ✅ Completed: Standardize Vue DOM Example - Modernized `examples/vue-dom-animation` with TypeScript, `package.json`, and proper build config.
 

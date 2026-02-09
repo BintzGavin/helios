@@ -253,6 +253,14 @@ export interface RendererOptions {
    * If provided, adds the `-hwaccel` flag to the FFmpeg command.
    */
   hwAccel?: string;
+
+  /**
+   * Preference for using WebCodecs hardware acceleration in 'canvas' mode.
+   * - 'hardware' (default): Prioritize hardware-accelerated codecs.
+   * - 'software': Prioritize software-based codecs (useful for deterministic testing).
+   * - 'disabled': Disable WebCodecs entirely and fall back to image capture.
+   */
+  webCodecsPreference?: 'hardware' | 'software' | 'disabled';
 }
 
 export interface RenderJobOptions {

@@ -1,111 +1,116 @@
-# RENDERER Context
+# Renderer Agent Context
 
 ## A. Strategy: Dual-Path Architecture
-The Renderer uses a **Strategy Pattern** to handle different content types, optimizing for performance and accuracy.
+The Renderer employs a "Dual-Path" architecture to support both Canvas-based and DOM-based animations:
 
-1.  **Canvas Strategy** (`mode: 'canvas'`)
-    *   **Target**: WebGL, Three.js, PixiJS, P5.js, Canvas 2D.
-    *   **Mechanism**: Injects scripts to capture frames from `<canvas>` elements.
-    *   **Capture**: Uses `VideoEncoder` (WebCodecs) for hardware-accelerated encoding in the browser.
-    *   **Fallback**: Uses `canvas.toDataURL()` or `createImageBitmap()` if WebCodecs is unavailable.
-    *   **Time Driver**: `CdpTimeDriver` (Chrome DevTools Protocol) for precise, deterministic time control.
+1. **Canvas Strategy (`CanvasStrategy.ts`)**:
+   - Best for high-performance animations (WebGL, Three.js, PixiJS).
+   - Captures frames by converting the `<canvas>` element to a blob/buffer.
+   - Uses `VideoEncoder` (WebCodecs) for hardware-accelerated intermediate encoding (H.264/VP9/AV1) when available.
+   - Falls back to `toDataURL()` if WebCodecs is unavailable or disabled.
+   - Supports `webCodecsPreference` to control hardware acceleration usage.
 
-2.  **DOM Strategy** (`mode: 'dom'`)
-    *   **Target**: HTML/CSS animations, GSAP, Framer Motion, standard DOM elements.
-    *   **Mechanism**: Takes full-page screenshots via Playwright.
-    *   **Capture**: `page.screenshot()` (PNG/JPEG).
-    *   **Time Driver**: `SeekTimeDriver` (overrides `requestAnimationFrame`, `Date.now`, `performance.now`) to ensure deterministic rendering.
+2. **DOM Strategy (`DomStrategy.ts`)**:
+   - Best for CSS animations, HTML content, and complex layouts.
+   - Captures frames by taking a full viewport screenshot via Playwright (`page.screenshot`).
+   - Supports transparent backgrounds (`omitBackground: true`).
+   - Slower than Canvas strategy but pixel-perfect for DOM elements.
+
+Both strategies implement the `RenderStrategy` interface and share common utilities for:
+- Asset preloading (fonts, images, media).
+- Time synchronization (TimeDrivers).
+- Audio track discovery.
 
 ## B. File Tree
-```
+
 packages/renderer/
 ├── src/
-│   ├── index.ts              # Entry point
-│   ├── Renderer.ts           # Main class (facade)
-│   ├── Orchestrator.ts       # Distributed rendering & orchestration
-│   ├── types.ts              # Interfaces (RendererOptions, AudioTrackConfig)
-│   ├── concat.ts             # Video concatenation utility
 │   ├── strategies/
-│   │   ├── CanvasStrategy.ts # WebCodecs/Canvas capture logic
-│   │   └── DomStrategy.ts    # Playwright screenshot logic
-│   ├── drivers/
-│   │   ├── CdpTimeDriver.ts  # Virtual time via CDP
-│   │   └── SeekTimeDriver.ts # Virtual time via polyfills
-│   └── utils/
-│       ├── FFmpegBuilder.ts  # FFmpeg argument generator
-│       ├── FFmpegInspector.ts # Hardware acceleration detection
-│       ├── dom-scanner.ts    # Audio/Video element discovery
-│       ├── dom-scripts.ts    # Shared DOM injection scripts
-│       └── blob-extractor.ts # Blob URL extraction
-```
+│   │   ├── CanvasStrategy.ts       # Canvas capture implementation
+│   │   ├── DomStrategy.ts          # DOM screenshot implementation
+│   │   └── RenderStrategy.ts       # Strategy interface
+│   ├── utils/
+│   │   ├── FFmpegBuilder.ts        # FFmpeg command construction
+│   │   ├── FFmpegInspector.ts      # FFmpeg capability detection
+│   │   ├── blob-extractor.ts       # Blob URL handling
+│   │   ├── dom-finder.ts           # Deep element selection
+│   │   ├── dom-preload.ts          # Asset preloading scripts
+│   │   ├── dom-scanner.ts          # Media element discovery
+│   │   ├── dom-scripts.ts          # Shared browser scripts
+│   │   └── random-seed.ts          # Deterministic PRNG
+│   ├── drivers/                    # Time synchronization drivers
+│   ├── executors/                  # Execution strategies (Local vs Distributed)
+│   ├── Orchestrator.ts             # Distributed rendering orchestrator
+│   ├── Renderer.ts                 # Main entry point
+│   ├── concat.ts                   # Video concatenation utility
+│   ├── index.ts                    # Public API export
+│   └── types.ts                    # Shared interfaces
+└── tests/                          # Verification scripts
 
-## C. Configuration
-The `Renderer` is configured via `RendererOptions` and `DistributedRenderOptions`:
+## C. Configuration: RendererOptions
 
 ```typescript
-interface RendererOptions {
+export interface RendererOptions {
   width: number;
   height: number;
   fps: number;
   durationInSeconds: number;
-  mode?: 'canvas' | 'dom';
-  videoCodec?: 'libx264' | 'libvpx-vp9' | 'copy';
+  mode?: 'canvas' | 'dom'; // Defaults to 'canvas'
+
+  // Frame Control
+  startFrame?: number;
+  frameCount?: number;
+  keyFrameInterval?: number;
+
+  // Codecs & Quality
+  videoCodec?: string; // e.g. 'libx264', 'libvpx', 'copy'
+  audioCodec?: string;
+  pixelFormat?: string; // e.g. 'yuv420p', 'yuva420p'
+  crf?: number;
+  preset?: string;
+  videoBitrate?: string;
+  audioBitrate?: string;
+
+  // Intermediate Capture
+  intermediateVideoCodec?: string; // 'vp8', 'vp9', 'av1'
+  intermediateImageFormat?: 'png' | 'jpeg';
+  intermediateImageQuality?: number;
+  webCodecsPreference?: 'hardware' | 'software' | 'disabled';
+
+  // Inputs
   audioFilePath?: string;
-  audioTracks?: (string | AudioTrackConfig)[]; // Path or config object
+  audioTracks?: (string | AudioTrackConfig)[];
   subtitles?: string; // Path to SRT file
   inputProps?: Record<string, any>;
-  frameCount?: number; // Exact frame count override
-  startFrame?: number; // Start frame for partial renders
-  canvasSelector?: string; // CSS selector for canvas
-  targetSelector?: string; // CSS selector for DOM screenshot target
-  intermediateVideoCodec?: string; // 'vp8', 'vp9', 'av1', 'h264'
-  intermediateImageFormat?: 'png' | 'jpeg';
-  stabilityTimeout?: number; // Wait timeout for assets
-  randomSeed?: number; // Deterministic PRNG seed
-  mixInputAudio?: boolean; // Preserve implicit audio from input
-  hwAccel?: string; // Hardware acceleration method ('cuda', 'vaapi', 'auto')
-}
+  mixInputAudio?: boolean;
+  randomSeed?: number;
 
-interface DistributedRenderOptions extends RendererOptions {
-  concurrency?: number; // Number of parallel workers
-  executor?: RenderExecutor; // Custom executor (default: LocalExecutor)
+  // Environment
+  browserConfig?: BrowserConfig;
+  ffmpegPath?: string;
+  stabilityTimeout?: number;
+  hwAccel?: string; // FFmpeg hardware acceleration
+
+  // Selectors
+  canvasSelector?: string;
+  targetSelector?: string;
 }
 ```
 
 ## D. FFmpeg Interface
-The Renderer pipes raw frames (or encoded chunks) to FFmpeg's `stdin`.
 
-*   **Canvas Mode**:
-    *   Input: `h264` (Annex B) or `ivf` (VP8/VP9/AV1) stream via pipe.
-    *   Flags: `-f h264 -i pipe:0` (or similar).
-*   **DOM Mode**:
-    *   Input: Image sequence via pipe.
-    *   Flags: `-f image2pipe -vcodec png -i pipe:0`.
-*   **Hardware Acceleration**:
-    *   Configured via `hwAccel` option.
-    *   Validated against available methods via `ffmpeg -hwaccels`.
-    *   Injected via `-hwaccel [method]` flag.
-*   **Output**:
-    *   Controlled by `FFmpegBuilder`.
-    *   Supports `libx264` (MP4), `libvpx-vp9` (WebM), `prores`, etc.
-    *   Audio is mixed using `amix` filter or `-filter_complex`.
+The Renderer constructs FFmpeg commands dynamically using `FFmpegBuilder`.
 
-## E. Orchestration
-The `RenderOrchestrator` manages distributed rendering jobs.
+**Common Flags:**
+- **Input**: `-f image2pipe` (DOM/Canvas fallback) or `-f h264`/`-f ivf` (WebCodecs).
+- **Framerate**: `-framerate <fps>`.
+- **Codecs**: `-c:v <videoCodec>` (default: libx264), `-c:a <audioCodec>`.
+- **Filters**:
+  - `atempo`: For audio playback rate adjustment.
+  - `amix`: For mixing multiple audio tracks.
+  - `subtitles`: For burning SRT captions.
+  - `-vf "scale=..."`: For resizing (if needed).
 
-*   **Planning**: `RenderOrchestrator.plan(url, output, options)` generates a `RenderPlan`.
-    ```typescript
-    interface RenderPlan {
-      chunks: RenderChunk[];
-      concatManifest: string[];
-      concatOutputFile: string;
-      finalOutputFile: string;
-      mixOptions: RendererOptions;
-      cleanupFiles: string[];
-    }
-    ```
-*   **Execution**: `RenderOrchestrator.render(url, output, options)` executes the plan (or generates one), rendering chunks in parallel and concatenating/mixing them.
-*   **Pipeline**:
-    1.  **Render Chunks**: Splits the job into `N` concurrent workers. Each worker renders a segment to a temporary `.mov` file with PCM audio (`pcm_s16le`).
-    2.  **Concatenate**: Merges chunks into a single intermediate PCM master file using FFmpeg `concat` demuxer.
-    3.  **Mix/Transcode**: Transcodes the master file to the final output format (e.g., MP4/AAC) and mixes any explicit audio tracks.
+**Hardware Acceleration:**
+- Controlled via `hwAccel` option (e.g., `-hwaccel cuda`).
+- Checked via `FFmpegInspector` to ensure availability.
