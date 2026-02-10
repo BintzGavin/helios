@@ -13,6 +13,9 @@ Each agent should update **their own dedicated progress file** instead of this f
 - **STUDIO**: Update `docs/PROGRESS-STUDIO.md`
 - **SKILLS**: Update `docs/PROGRESS-SKILLS.md`
 
+### PLAYER v0.76.2
+- ✅ Completed: Sync Dependencies - Updated @helios-project/core and mediabunny dependencies to match workspace versions.
+
 ### RENDERER v1.80.0
 - ✅ Completed: WebCodecs Preference - Added `webCodecsPreference` option to `RendererOptions` ('hardware' | 'software' | 'disabled') to allow controlling hardware acceleration usage in `CanvasStrategy`, enabling deterministic regression testing. Verified with `verify-webcodecs-preference.ts`.
 
