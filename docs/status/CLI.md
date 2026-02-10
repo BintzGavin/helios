@@ -1,6 +1,6 @@
 # CLI Status
 
-**Version**: 0.22.0
+**Version**: 0.23.0
 
 ## Current State
 
@@ -20,7 +20,7 @@ The Helios CLI (`packages/cli`) provides the command-line interface for the Heli
 - `helios components` - Lists available components in the registry
 - `helios render` - Renders a composition to video
 - `helios merge` - Merges multiple video files into one without re-encoding
-- `helios remove` - Removes a component from the project configuration
+- `helios remove` - Removes a component from the project configuration and deletes associated files (with confirmation)
 - `helios update` - Updates a component to the latest version
 - `helios build` - Builds the project for production
 - `helios job` - Manages distributed rendering jobs
@@ -71,3 +71,4 @@ Per AGENTS.md, the CLI is "ACTIVELY EXPANDING FOR V2" with focus on:
 [v0.20.2] ✅ Use RenderOrchestrator Planning - Refactored `helios render --emit-job` to use `RenderOrchestrator.plan()` for consistent chunking and command generation.
 [v0.21.0] ✅ Portable Job Paths - Implemented relative path generation in `helios render --emit-job` and relative execution in `helios job run`.
 [v0.22.0] ✅ Registry Dependencies - Implemented recursive component installation to support shared registry dependencies (e.g. `use-video-frame`).
+[v0.23.0] ✅ Refine Component Removal - Enhanced `helios remove` to support interactive file deletion, `--yes` flag for automation, and `--keep-files` to preserve files.

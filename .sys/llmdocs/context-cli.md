@@ -56,7 +56,9 @@ packages/cli/
 - `helios add <component>` - Add a component to the project.
   - `--no-install` - Skip npm dependency installation.
   - Installs recursively (e.g., `timer` installs `use-video-frame`).
-- `helios remove <component>` - Remove a component from config (files remain).
+- `helios remove <component>` - Remove a component.
+  - `--yes` - Skip confirmation.
+  - `--keep-files` - Keep component files on disk.
 - `helios update <component>` - Update a component from registry.
 - `helios list` - List installed components.
 - `helios components` - List available registry components.
