@@ -1,5 +1,14 @@
 # LLMS Progress
 
+## LLMS v1.14.0
+- ✅ Completed: Daily llms.txt Review
+  - Updated Quick Facts: Core v5.13.0+, Studio v0.107.3+, Player v0.76.1+, Renderer v1.80.0+, CLI v0.22.0+
+  - Updated Roadmap:
+    - Studio: v0.107.3+
+    - CLI: v0.22.0+ (Added "Registry Dependencies, Portable Job Paths, Example Init, Skills Command")
+    - Renderer: v1.80.0+ (Added "WebCodecs Preference")
+  - Verified Core API example and file paths
+
 ## LLMS v1.13.0
 - ✅ Completed: Daily llms.txt Review
   - Updated Quick Facts: Core v5.13.0+, Studio v0.107.2+, Player v0.76.1+, Renderer v1.79.2+, CLI v0.18.0+
