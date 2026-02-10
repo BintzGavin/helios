@@ -1,14 +1,62 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { SSEServerTransport } from "@modelcontextprotocol/sdk/server/sse.js";
 import { z } from "zod";
-import { findCompositions, createComposition } from './discovery';
+import { findCompositions, createComposition, findAssets } from './discovery';
 import { startRender } from './render-manager';
+import { StudioPluginOptions } from './types';
+import { findDocumentation } from './documentation';
 
-export function createMcpServer(getPort: () => number) {
+export function createMcpServer(getPort: () => number, options: StudioPluginOptions = {}) {
   const server = new McpServer({
     name: "Helios Studio",
     version: "0.72.1"
   });
+
+  server.resource(
+    "documentation",
+    "helios://documentation",
+    async (uri) => {
+      const docs = findDocumentation(process.cwd(), options.skillsRoot);
+      return {
+        contents: [{
+          uri: uri.href,
+          text: JSON.stringify(docs, null, 2)
+        }]
+      };
+    }
+  );
+
+  server.resource(
+    "assets",
+    "helios://assets",
+    async (uri) => {
+      const assets = await findAssets(process.cwd());
+      return {
+        contents: [{
+          uri: uri.href,
+          text: JSON.stringify(assets, null, 2)
+        }]
+      };
+    }
+  );
+
+  server.resource(
+    "components",
+    "helios://components",
+    async (uri) => {
+      const components = options.components || [];
+      const enriched = await Promise.all(components.map(async (c) => ({
+          ...c,
+          installed: options.onCheckInstalled ? await options.onCheckInstalled(c.name) : false
+      })));
+      return {
+        contents: [{
+          uri: uri.href,
+          text: JSON.stringify(enriched, null, 2)
+        }]
+      };
+    }
+  );
 
   server.resource(
     "compositions",
@@ -103,6 +151,48 @@ export function createMcpServer(getPort: () => number) {
                isError: true
            };
        }
+    }
+  );
+
+  server.tool(
+    "install_component",
+    { name: z.string() },
+    async (args) => {
+      if (!options.onInstallComponent) return { content: [{ type: "text", text: "Feature not available" }], isError: true };
+      try {
+        await options.onInstallComponent(args.name);
+        return { content: [{ type: "text", text: `Installed ${args.name}` }] };
+      } catch (e: any) {
+        return { content: [{ type: "text", text: `Error: ${e.message}` }], isError: true };
+      }
+    }
+  );
+
+  server.tool(
+    "uninstall_component",
+    { name: z.string() },
+    async (args) => {
+      if (!options.onRemoveComponent) return { content: [{ type: "text", text: "Feature not available" }], isError: true };
+      try {
+        await options.onRemoveComponent(args.name);
+        return { content: [{ type: "text", text: `Uninstalled ${args.name}` }] };
+      } catch (e: any) {
+        return { content: [{ type: "text", text: `Error: ${e.message}` }], isError: true };
+      }
+    }
+  );
+
+  server.tool(
+    "update_component",
+    { name: z.string() },
+    async (args) => {
+      if (!options.onUpdateComponent) return { content: [{ type: "text", text: "Feature not available" }], isError: true };
+      try {
+        await options.onUpdateComponent(args.name);
+        return { content: [{ type: "text", text: `Updated ${args.name}` }] };
+      } catch (e: any) {
+        return { content: [{ type: "text", text: `Error: ${e.message}` }], isError: true };
+      }
     }
   );
 

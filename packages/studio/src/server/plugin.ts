@@ -8,24 +8,9 @@ import { findCompositions, findAssets, getProjectRoot, createComposition, delete
 import { templates } from './templates';
 import { findDocumentation, resolveDocumentationPath } from './documentation';
 import { startRender, getRenderJobSpec, getJob, getJobs, cancelJob, deleteJob, diagnoseServer } from './render-manager';
+import { StudioPluginOptions } from './types';
 
-export interface StudioComponentDefinition {
-  name: string;
-  description?: string;
-  type: string;
-  files: { name: string; content: string }[];
-  dependencies?: Record<string, string>;
-}
-
-export interface StudioPluginOptions {
-  studioRoot?: string;
-  skillsRoot?: string;
-  components?: StudioComponentDefinition[];
-  onInstallComponent?: (name: string) => Promise<void>;
-  onRemoveComponent?: (name: string) => Promise<void>;
-  onUpdateComponent?: (name: string) => Promise<void>;
-  onCheckInstalled?: (name: string) => Promise<boolean>;
-}
+export type { StudioPluginOptions, StudioComponentDefinition } from './types';
 
 const getBody = async (req: any) => {
   return new Promise<any>((resolve, reject) => {
@@ -101,7 +86,7 @@ function configureMiddlewares(server: ViteDevServer | PreviewServer, isPreview: 
       const mcpServer = createMcpServer(() => {
           const address = server.httpServer?.address();
           return (typeof address === 'object' && address !== null) ? address.port : 5173;
-      });
+      }, options);
       const mcpTransports = new Map<string, SSEServerTransport>();
 
       server.middlewares.use('/mcp/sse', async (req, res, next) => {
