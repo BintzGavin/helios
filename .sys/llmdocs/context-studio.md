@@ -6,6 +6,7 @@ The Helios Studio (`packages/studio`) is a browser-based IDE for developing and 
 
 - **Frontend**: A Single Page Application (SPA) built with React and Vite. It communicates with the backend via REST API and JSON-RPC over WebSockets (MCP).
 - **Backend**: A Node.js server (integrated into Vite dev server via `studioApiPlugin`) that handles file system operations, project discovery, and rendering orchestration.
+- **Agent Integration**: Exposes an MCP (Model Context Protocol) server with resources (`documentation`, `assets`, `components`) and tools (`install_component`, etc.) to enable AI agents to interact with the project.
 - **Project Structure**: The Studio expects a project root containing `composition.html` files or directories.
 - **Rendering**: The Studio integrates with `@helios-project/renderer` to execute render jobs. It supports both local rendering and generating job specs for distributed rendering.
 
@@ -21,9 +22,11 @@ packages/studio/
 │   ├── context/            # React Context (StudioContext)
 │   ├── server/             # Backend logic
 │   │   ├── discovery.ts    # Project & Asset discovery
+│   │   ├── documentation.ts # Documentation discovery
+│   │   ├── mcp.ts          # MCP Server implementation
+│   │   ├── plugin.ts       # Vite plugin API routes
 │   │   ├── render-manager.ts # Render job management & Orchestration
-│   │   └── plugin.ts       # Vite plugin API routes
-│   ├── types.ts            # Shared types
+│   │   └── types.ts        # Shared server types
 │   ├── App.tsx             # Main UI entry
 │   └── main.tsx
 ├── index.html
@@ -54,6 +57,6 @@ The Studio is launched via the `helios` CLI (from `@helios-project/cli`).
 - **Renderer**: Uses `RenderOrchestrator` for planning and executing renders.
 - **CLI**: The Studio backend exposes endpoints that the CLI can leverage (e.g., for `helios render` with HMR support, though currently CLI uses Renderer directly).
 
-## F. Recent Changes (v0.107.2)
-- **Renders Panel Verification**: Implemented comprehensive unit tests for `RendersPanel` to ensure stability of the rendering UI.
-- **Portable Job Specs**: The "Export Job Spec" feature now generates relative paths for input, output, and chunks, enabling portability across different environments (e.g. local vs cloud).
+## F. Recent Changes (v0.108.0)
+- **MCP Server Enhancement**: Implemented MCP resources (documentation, assets, components) and tools (install/update/uninstall components) for agent integration.
+- **Documentation Maintenance**: Updated Studio documentation to document `helios preview` command usage.

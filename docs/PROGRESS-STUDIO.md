@@ -1,3 +1,6 @@
+## STUDIO v0.108.0
+- ✅ Completed: Enhance MCP Server - Implemented MCP resources (documentation, assets, components) and tools (install/update/uninstall components) for agent integration.
+
 ## STUDIO v0.107.3
 - ✅ Completed: Documentation Maintenance - Updated Studio documentation to document `helios preview` command usage.
 
