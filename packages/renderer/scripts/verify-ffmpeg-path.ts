@@ -3,7 +3,10 @@ import * as path from 'path';
 import * as fs from 'fs/promises';
 import { existsSync, rmSync } from 'fs';
 import ffmpeg from '@ffmpeg-installer/ffmpeg';
+import { fileURLToPath } from 'url';
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 async function main() {
   console.log('Starting FFmpeg path verification script...');
 

@@ -76,7 +76,7 @@ async function verify() {
   let preloadCount = 0;
   page.on('console', msg => {
     const text = msg.text();
-    if (text.includes('[DomStrategy] Preloading')) {
+    if (text.includes('[Helios Preload] Preloading')) {
        console.log(`[Page Console] ${text}`);
        const match = text.match(/Preloading (\d+) background images/);
        if (match) {

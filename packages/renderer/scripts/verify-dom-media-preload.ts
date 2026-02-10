@@ -4,7 +4,10 @@ import fs from 'fs';
 import path from 'path';
 import { spawnSync } from 'child_process';
 import ffmpeg from '@ffmpeg-installer/ffmpeg';
+import { fileURLToPath } from 'url';
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 async function run() {
   const tempDir = path.join(__dirname, '../temp');
   if (!fs.existsSync(tempDir)) {

@@ -3,9 +3,12 @@ import { spawn } from 'child_process';
 import * as path from 'path';
 import * as fs from 'fs';
 import * as url from 'url';
+import ffmpeg from '@ffmpeg-installer/ffmpeg';
+import { fileURLToPath } from 'url';
 
-const ffmpegInstaller = require('@ffmpeg-installer/ffmpeg');
-const ffmpegPath = ffmpegInstaller.path;
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const ffmpegPath = ffmpeg.path;
 
 const outputDir = path.join(__dirname, '..', 'output-verify-audio');
 if (!fs.existsSync(outputDir)) {

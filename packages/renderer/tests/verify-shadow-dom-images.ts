@@ -86,7 +86,7 @@ async function verify() {
   let preloadCount = 0;
   page.on('console', msg => {
     const text = msg.text();
-    if (text.includes('[DomStrategy] Preloading')) {
+    if (text.includes('[Helios Preload] Preloading')) {
       // Look for "Preloading X images..." (not background images)
       const match = text.match(/Preloading (\d+) images/);
       // Ensure it's NOT background images

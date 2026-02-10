@@ -25,7 +25,9 @@ async function verifyFrameCount() {
     frameCount: 100,       // This should take precedence
     mode: 'canvas',
     videoCodec: 'libx264',
-    headless: true,
+    browserConfig: {
+      headless: true
+    },
     // Use 'cat' as ffmpeg so it just consumes stdin and exits when closed
     // actually, we will use a custom node script to ensure it behaves nicely
     ffmpegPath: process.execPath
@@ -61,14 +63,18 @@ async function verifyFrameCount() {
   // Mock getFFmpegArgs to return args for our dummy script
   strategy.getFFmpegArgs = (opts, outPath) => {
     // Generate real args to verify them later
-    generatedArgs = FFmpegBuilder.getArgs(opts, outPath, []);
+    const config = FFmpegBuilder.getArgs(opts, outPath, []);
+    generatedArgs = config.args;
 
     // Return args for "node -e 'process.stdin.resume(); process.stdin.on(`end`, ()=>process.exit(0));'"
     // We can use -e for inline script
-    return [
-        '-e',
-        'process.stdin.resume(); process.stdin.on("end", () => process.exit(0));'
-    ];
+    return {
+        args: [
+            '-e',
+            'process.stdin.resume(); process.stdin.on("end", () => process.exit(0));'
+        ],
+        inputBuffers: [] 
+    };
   };
 
   try {
@@ -118,7 +124,7 @@ async function verifyAudioDuration() {
         audioFilePath: 'dummy.mp3'
     };
 
-    const args = FFmpegBuilder.getArgs(options, 'out.mp4', []);
+    const args = FFmpegBuilder.getArgs(options, 'out.mp4', []).args;
     const tIndex = args.indexOf('-t');
 
     if (tIndex === -1) {

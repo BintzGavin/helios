@@ -2,7 +2,10 @@ import { Renderer } from '../src/index.js';
 import { RendererOptions } from '../src/types.js';
 import path from 'path';
 import fs from 'fs';
+import { fileURLToPath } from 'url';
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 async function verifyErrorHandling() {
   const outputPath = path.join(__dirname, 'error-test.mp4');
   const options: RendererOptions = {

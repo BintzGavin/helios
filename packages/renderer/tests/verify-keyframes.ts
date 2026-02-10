@@ -1,8 +1,12 @@
 
 import { Renderer } from '../src/index.js';
-import path from 'path';
-import fs from 'fs';
+import * as path from 'path';
+import * as fs from 'fs';
 import ffmpeg from '@ffmpeg-installer/ffmpeg';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 async function main() {
   const outputPath = path.resolve(__dirname, 'test-keyframes.mp4');

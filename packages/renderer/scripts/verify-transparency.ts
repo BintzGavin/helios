@@ -4,7 +4,10 @@ import fs from 'fs';
 import { spawnSync } from 'child_process';
 import ffmpeg from '@ffmpeg-installer/ffmpeg';
 import { Renderer } from '../src/index';
+import { fileURLToPath } from 'url';
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 const OUTPUT_PATH = path.join(__dirname, '../../../test-results/transparent-output.webm');
 
 // Ensure output directory exists

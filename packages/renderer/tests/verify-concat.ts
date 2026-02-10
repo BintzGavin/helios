@@ -1,6 +1,10 @@
 import { Renderer, concatenateVideos } from '../src/index';
+import { fileURLToPath } from 'url';
 import * as path from 'path';
 import * as fs from 'fs';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 async function main() {
   console.log('Starting Concatenation Verification...');
