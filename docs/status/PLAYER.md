@@ -1,4 +1,4 @@
-**Version**: v0.76.2
+**Version**: v0.76.3
 
 **Posture**: STABLE AND FEATURE COMPLETE
 
@@ -60,6 +60,7 @@
 - **Export API**: Exposes public `export()` method for programmatic control over client-side exports, supporting Video (MP4/WebM) and Snapshot (PNG/JPEG) formats.
 - **Export Menu**: Implements a dedicated Export Menu in the player UI (replacing the direct export button action) to allow configuring format, resolution, filename, and captions before exporting or taking a snapshot.
 
+[v0.76.3] ✅ Verified: Enhanced Verification Script - Added E2E tests for `controlslist` and `disablepictureinpicture` attributes, confirming feature availability and stability.
 [v0.76.2] ✅ Completed: Sync Dependencies - Updated @helios-project/core and mediabunny dependencies to match workspace versions.
 [v0.76.1] ✅ Completed: Fix Verification Script - Updated E2E script to use aria-label assertions for SVG icons.
 [v0.76.0] ✅ Completed: Dynamic Audio Metering - Implemented MutationObserver in AudioMeter to detect and meter dynamically added media elements.
