@@ -25,3 +25,7 @@
 ## [v0.76.2] - Workspace Dependency Mismatch
 **Learning:** `npm install` failed because `packages/studio` depended on `@helios-project/player@^0.74.0` while the workspace had `0.76.1`, and npm tried to fetch from registry. Explicitly updating the consumer's dependency version to match the workspace fixed it.
 **Action:** When working in a monorepo, ensure internal dependencies in `package.json` match the current workspace versions to prevent registry fallback errors.
+
+## [v0.76.3] - DirectController Consistency
+**Learning:** `DirectController` resolved `seek` promises immediately, while `BridgeController` waited for frame rendering. This inconsistency caused premature `seeked` events in Direct Mode, violating Standard Media API expectations (seeking state must persist until frame update) and potentially breaking tests.
+**Action:** When implementing controllers for different connection modes (Direct vs Bridge), ensure consistent async behavior for state-changing operations. Specifically, ensure `seek` waits for `requestAnimationFrame` (visual update) before resolving, regardless of the transport mechanism.
