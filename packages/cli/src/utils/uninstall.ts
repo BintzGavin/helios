@@ -2,10 +2,11 @@ import path from 'path';
 import fs from 'fs';
 import chalk from 'chalk';
 import { loadConfig, saveConfig } from './config.js';
-import { defaultClient } from '../registry/client.js';
+import { RegistryClient } from '../registry/client.js';
 
 export interface UninstallOptions {
   removeFiles?: boolean;
+  client?: RegistryClient;
 }
 
 export async function uninstallComponent(rootDir: string, componentName: string, options: UninstallOptions = {}): Promise<void> {
@@ -26,8 +27,10 @@ export async function uninstallComponent(rootDir: string, componentName: string,
   console.log(chalk.green(`✓ Removed "${componentName}" from configuration.`));
 
   try {
+    const client = options.client || new RegistryClient(config.registry);
+
     // Attempt to find files to warn user or delete them
-    const component = await defaultClient.findComponent(componentName, config.framework);
+    const component = await client.findComponent(componentName, config.framework);
 
     if (component) {
       const componentsDir = path.resolve(rootDir, config.directories.components);

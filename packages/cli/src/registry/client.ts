@@ -56,4 +56,3 @@ export class RegistryClient {
   }
 }
 
-export const defaultClient = new RegistryClient();

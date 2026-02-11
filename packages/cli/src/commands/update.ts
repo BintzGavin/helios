@@ -2,6 +2,7 @@ import { Command } from 'commander';
 import chalk from 'chalk';
 import readline from 'readline';
 import { loadConfig } from '../utils/config.js';
+import { RegistryClient } from '../registry/client.js';
 import { installComponent } from '../utils/install.js';
 
 export function registerUpdateCommand(program: Command) {
@@ -12,6 +13,7 @@ export function registerUpdateCommand(program: Command) {
     .option('--no-install', 'Skip dependency installation')
     .action(async (component, options) => {
       const config = loadConfig();
+      const client = new RegistryClient(config?.registry);
 
       if (!config) {
         console.error(chalk.red('Configuration file not found. Run "helios init" first.'));
@@ -50,6 +52,7 @@ export function registerUpdateCommand(program: Command) {
         await installComponent(process.cwd(), component, {
           install: options.install,
           overwrite: true,
+          client,
         });
         console.log(chalk.green(`\nSuccessfully updated ${component}!`));
       } catch (error) {

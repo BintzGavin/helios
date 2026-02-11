@@ -1,97 +1,92 @@
 # CLI Context
 
-## Section A: Architecture
-The Helios CLI (`packages/cli`) is the primary interface for users. It is built using `commander.js`.
-- **Entry Point**: `bin/helios.js` (shebang) -> `dist/index.js` (compiled).
-- **Command Registration**: Commands are defined in `src/commands/` and registered in `src/index.ts` using `register[Command]Command(program)`.
-- **Registry**: Uses `RegistryClient` (`src/registry/client.ts`) to fetch components from a remote URL or fallback to a local manifest (`src/registry/manifest.ts`). Supports recursive installation via `registryDependencies`.
-- **Configuration**: Reads/writes `helios.config.json` in the project root.
+## A. Architecture
 
-## Section B: File Tree
+The Helios CLI is built using `commander` and serves as the primary interface for managing Helios projects. It handles:
+- Project initialization and scaffolding (`init`)
+- Component management (`add`, `remove`, `update`, `components`)
+- Development server (`studio`)
+- Rendering (`render`, `job`, `merge`)
+- Deployment (`build`, `preview`)
+
+Commands are registered in `src/index.ts` and implemented in individual files within `src/commands/`.
+
+## B. File Tree
+
 ```
 packages/cli/
 ├── bin/
-│   └── helios.js
+│   └── helios.js           # Entry point
 ├── src/
 │   ├── commands/
-│   │   ├── add.ts
-│   │   ├── build.ts
-│   │   ├── components.ts
-│   │   ├── init.ts
-│   │   ├── job.ts
-│   │   ├── list.ts
-│   │   ├── merge.ts
-│   │   ├── preview.ts
-│   │   ├── remove.ts
-│   │   ├── render.ts
-│   │   ├── skills.ts
-│   │   ├── studio.ts
-│   │   └── update.ts
+│   │   ├── add.ts          # Adds components
+│   │   ├── build.ts        # Builds for production
+│   │   ├── components.ts   # Lists registry components
+│   │   ├── init.ts         # Initializes project
+│   │   ├── job.ts          # Manages render jobs
+│   │   ├── list.ts         # Lists installed components
+│   │   ├── merge.ts        # Merges video files
+│   │   ├── preview.ts      # Previews build
+│   │   ├── remove.ts       # Removes components
+│   │   ├── render.ts       # Renders composition
+│   │   ├── skills.ts       # Installs agent skills
+│   │   ├── studio.ts       # Starts Studio server
+│   │   └── update.ts       # Updates components
 │   ├── registry/
-│   │   ├── client.ts
-│   │   ├── manifest.ts
-│   │   └── types.ts
-│   ├── templates/
-│   ├── utils/
-│   │   ├── config.ts
-│   │   ├── examples.ts
-│   │   ├── ffmpeg.ts
-│   │   ├── install.ts
-│   │   ├── logger.ts
-│   │   ├── package-manager.ts
-│   │   └── uninstall.ts
-│   └── index.ts
-├── package.json
-└── tsconfig.json
+│   │   ├── client.ts       # Registry API client
+│   │   └── types.ts        # Registry types
+│   ├── templates/          # Project templates
+│   ├── types/              # Shared types
+│   └── utils/
+│       ├── config.ts       # Config management
+│       ├── examples.ts     # Example fetching
+│       ├── install.ts      # Installation logic
+│       └── uninstall.ts    # Uninstallation logic
+└── package.json
 ```
 
-## Section C: Commands
-- `helios init [name]` - Initialize a new project.
-  - `--example <name>` - Scaffold from an example.
-  - `--repo <url>` - Scaffold from a git repo.
-  - `--yes` - Skip prompts.
-- `helios studio` - Start the Studio dev server.
-  - `--port <number>` - Specify port.
-  - `--open` - Open browser.
-- `helios add <component>` - Add a component to the project.
-  - `--no-install` - Skip npm dependency installation.
-  - Installs recursively (e.g., `timer` installs `use-video-frame`).
-- `helios remove <component>` - Remove a component.
-  - `--yes` - Skip confirmation.
-  - `--keep-files` - Keep component files on disk.
-- `helios update <component>` - Update a component from registry.
-- `helios list` - List installed components.
-- `helios components` - List available registry components.
-- `helios render <composition>` - Render a composition to video.
-  - `--out <file>` - Output file.
-  - `--concurrency <n>` - Number of parallel workers.
-  - `--start-frame <n>` - Start frame.
-  - `--frame-count <n>` - Number of frames.
-  - `--emit-job <file>` - Generate a distributed job JSON.
-- `helios merge <files...>` - Merge video files.
-  - `--out <file>` - Output file.
-- `helios build` - Build the project for production.
-- `helios preview` - Preview the production build.
-- `helios job run <file>` - Execute a distributed job.
-  - `--concurrency <n>` - Parallel workers.
-  - `--chunk <index>` - Run specific chunk.
-- `helios skills install <skill>` - Install AI agent skills.
+## C. Commands
 
-## Section D: Configuration
-**`helios.config.json`**:
-```json
-{
-  "version": "1.0.0",
-  "directories": {
-    "components": "src/components/helios",
-    "lib": "src/lib"
-  },
-  "components": ["timer", "use-video-frame"],
-  "framework": "react" | "vue" | "svelte" | "solid" | "vanilla"
+- `helios init [target]`: Initialize a new project.
+  - Options: `--yes`, `--framework <name>`, `--example <name>`, `--repo <url>`
+- `helios studio`: Start the Studio development server.
+  - Options: `--port <number>`
+- `helios add <component>`: Add a component from the registry.
+  - Options: `--no-install`
+- `helios remove <component>`: Remove a component.
+  - Options: `--yes`, `--keep-files`
+- `helios update <component>`: Update a component.
+  - Options: `--yes`, `--no-install`
+- `helios components`: List available components in the registry.
+- `helios list`: List installed components.
+- `helios render <input>`: Render a composition.
+  - Options: `--output`, `--width`, `--height`, `--fps`, `--duration`, `--quality`, `--mode`, `--emit-job`
+- `helios job run <spec>`: Run a distributed render job.
+  - Options: `--concurrency`, `--chunks`
+- `helios merge <output> <inputs...>`: Merge video files.
+- `helios build`: Build the project for production.
+- `helios preview`: Preview the production build.
+- `helios skills install`: Install agent skills.
+
+## D. Configuration
+
+The CLI reads `helios.config.json` in the project root.
+
+```typescript
+interface HeliosConfig {
+  version: string;
+  registry?: string; // Custom registry URL
+  directories: {
+    components: string;
+    lib: string;
+  };
+  framework?: 'react' | 'vue' | 'svelte' | 'solid' | 'vanilla';
+  components: string[];
 }
 ```
 
-## Section E: Integration
-- **Registry**: `RegistryClient` caches results and handles fallback. `installComponent` resolves dependency trees recursively.
-- **Renderer**: `helios render` uses `RenderOrchestrator` from `@helios-project/renderer` for local and distributed rendering.
-- **Studio**: `helios studio` uses `@helios-project/studio` to serve the UI, injecting project root context.
+## E. Integration
+
+- **Registry**: The CLI uses `RegistryClient` to fetch components. It supports a custom registry URL via `helios.config.json` or `HELIOS_REGISTRY_URL` env var.
+- **Studio**: The `studio` command launches a Vite server with `studioApiPlugin`, allowing the Studio UI to trigger CLI actions (install/remove components) via the server.
+- **Renderer**: The `render` command orchestrates rendering using `@helios-project/renderer`.
