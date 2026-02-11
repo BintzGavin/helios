@@ -1,5 +1,13 @@
 # LLMS Progress
 
+## LLMS v1.15.0
+- ✅ Completed: Daily llms.txt Review
+  - Updated Quick Facts: Studio v0.108.0+, CLI v0.23.0+, Player v0.76.2+, Renderer v1.80.0+
+  - Updated Roadmap:
+    - Studio: v0.108.0+ (Added "MCP Resources & Tools")
+    - CLI: v0.23.0+ (Added "Registry Dependencies, Interactive Remove")
+  - Verified content against latest codebase and status files
+
 ## LLMS v1.14.0
 - ✅ Completed: Daily llms.txt Review
   - Updated Quick Facts: Core v5.13.0+, Studio v0.107.3+, Player v0.76.1+, Renderer v1.80.0+, CLI v0.22.0+
