@@ -1,3 +1,6 @@
+## PLAYER v0.76.3
+- ✅ Verified: Enhanced Verification Script - Added E2E tests for `controlslist` and `disablepictureinpicture` attributes, confirming feature availability and stability.
+
 ## PLAYER v0.76.1
 - ✅ Completed: Fix Verification Script - Updated E2E script to use aria-label assertions for SVG icons.
 

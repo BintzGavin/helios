@@ -132,8 +132,6 @@ async function main() {
     await scrubber.waitFor();
 
     // Set scrubber to 50% (approx)
-    // We can't easily drag in playwright without precise coords, but we can set value
-    // Since it's an input[type=range], we can use fill or eval
     await scrubber.evaluate((el: HTMLInputElement) => {
         el.value = '150'; // 5 seconds * 30 fps
         el.dispatchEvent(new Event('input'));
@@ -190,6 +188,72 @@ async function main() {
 
     console.log('Volume Verified ✅');
 
+    // ---------------------------------------------------------
+    // 5. ControlsList Tests
+    // ---------------------------------------------------------
+    console.log('Running ControlsList Tests...');
+    const exportBtn = player.locator('.export-btn');
+    const fullscreenBtn = player.locator('.fullscreen-btn');
+
+    // Verify initially visible (default fixture has no controlslist)
+    await expectVisible(exportBtn, 'Export Button');
+    await expectVisible(fullscreenBtn, 'Fullscreen Button');
+
+    console.log('Setting controlslist="nodownload nofullscreen"...');
+    await player.evaluate((el: any) => {
+        el.setAttribute('controlslist', 'nodownload nofullscreen');
+    });
+
+    // Verify hidden (waits automatically)
+    await exportBtn.waitFor({ state: 'hidden' });
+    await fullscreenBtn.waitFor({ state: 'hidden' });
+
+    console.log('Clearing controlslist...');
+    await player.evaluate((el: any) => {
+        el.removeAttribute('controlslist');
+    });
+
+    // Verify visible again (waits automatically)
+    await exportBtn.waitFor({ state: 'visible' });
+    await fullscreenBtn.waitFor({ state: 'visible' });
+
+    console.log('ControlsList Verified ✅');
+
+    // ---------------------------------------------------------
+    // 6. Picture-in-Picture Tests
+    // ---------------------------------------------------------
+    console.log('Running PiP Disable Tests...');
+    const pipBtn = player.locator('.pip-btn');
+
+    // Assuming environment supports PiP (headless chrome usually does or mocks it)
+    // If PiP is not supported by browser, the button is hidden by default logic.
+    // We check if it's visible first.
+    const isPipSupported = await player.evaluate(() => document.pictureInPictureEnabled);
+    if (isPipSupported) {
+        console.log('PiP is supported in this environment.');
+        // Ensure visible initially
+        await pipBtn.waitFor({ state: 'visible' });
+
+        console.log('Setting disablepictureinpicture...');
+        await player.evaluate((el: any) => {
+            el.setAttribute('disablepictureinpicture', '');
+        });
+
+        await pipBtn.waitFor({ state: 'hidden' });
+
+        console.log('Clearing disablepictureinpicture...');
+        await player.evaluate((el: any) => {
+            el.removeAttribute('disablepictureinpicture');
+        });
+
+        await pipBtn.waitFor({ state: 'visible' });
+        console.log('PiP Disable Verified ✅');
+    } else {
+        console.log('PiP not supported in this environment, skipping visibility toggling test, but verifying it is hidden.');
+        await pipBtn.waitFor({ state: 'hidden' });
+        console.log('PiP Hidden (Unsupported) Verified ✅');
+    }
+
 
     console.log('🎉 All Player Verification Tests Passed!');
 
@@ -203,21 +267,37 @@ async function main() {
 }
 
 async function expectVisible(locator: any, name: string) {
-    // Check if class list does not contain 'hidden'
     await locator.waitFor({ state: 'visible' });
     const classes = await locator.getAttribute('class');
     if (classes && classes.includes('hidden')) {
         throw new Error(`${name} should be visible but has hidden class`);
     }
+    const style = await locator.getAttribute('style');
+    if (style && style.includes('display: none')) {
+        throw new Error(`${name} should be visible but has display: none`);
+    }
 }
 
 async function expectHidden(locator: any, name: string) {
-    // Check if class list contains 'hidden'
-    // Playwright might consider it visible if display:block but opacity:0, etc.
-    // Our 'hidden' class sets display:none.
     const classes = await locator.getAttribute('class');
     if (classes && !classes.includes('hidden')) {
         throw new Error(`${name} should be hidden but missing hidden class`);
+    }
+}
+
+async function expectHiddenStyle(locator: any, name: string) {
+    // Check for display: none
+    const style = await locator.getAttribute('style');
+    if (!style || !style.includes('display: none')) {
+        // Also check if it's hidden via class
+        const classes = await locator.getAttribute('class');
+        if (classes && classes.includes('hidden')) return;
+
+        // Check computed style
+        const display = await locator.evaluate((el: HTMLElement) => getComputedStyle(el).display);
+        if (display !== 'none') {
+             throw new Error(`${name} should be hidden (display: none) but style is "${style}" and computed is "${display}"`);
+        }
     }
 }
 
