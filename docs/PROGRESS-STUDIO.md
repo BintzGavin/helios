@@ -1,3 +1,6 @@
+## STUDIO v0.108.1
+- ✅ Verified: Refine CLI Component Removal - Verified `helios remove` command supports interactive file deletion, `--yes` flag, and `--keep-files` flag.
+
 ## STUDIO v0.108.0
 - ✅ Completed: Enhance MCP Server - Implemented MCP resources (documentation, assets, components) and tools (install/update/uninstall components) for agent integration.
 

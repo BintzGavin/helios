@@ -41,6 +41,7 @@ The Studio is launched via the `helios` CLI (from `@helios-project/cli`).
 - `helios studio [dir]`: Opens the Studio UI for the specified directory (defaults to CWD).
 - `helios build`: Builds a production-ready player harness.
 - `helios preview`: Serves the production build locally.
+- `helios remove`: Removes a component from the project configuration and deletes associated files (interactive).
 
 ## D. UI Components
 
@@ -57,6 +58,7 @@ The Studio is launched via the `helios` CLI (from `@helios-project/cli`).
 - **Renderer**: Uses `RenderOrchestrator` for planning and executing renders.
 - **CLI**: The Studio backend exposes endpoints that the CLI can leverage (e.g., for `helios render` with HMR support, though currently CLI uses Renderer directly).
 
-## F. Recent Changes (v0.108.0)
+## F. Recent Changes (v0.108.1)
+- **Verified: CLI Component Removal**: Verified `helios remove` command supports interactive file deletion, `--yes` flag, and `--keep-files` flag.
 - **MCP Server Enhancement**: Implemented MCP resources (documentation, assets, components) and tools (install/update/uninstall components) for agent integration.
 - **Documentation Maintenance**: Updated Studio documentation to document `helios preview` command usage.
