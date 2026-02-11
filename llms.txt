@@ -6,7 +6,7 @@ Helios is a modern engine for creating videos programmatically using standard we
 
 ## Quick Facts
 - **License**: Elastic License 2.0 (free commercial use, no SaaS resale)
-- **Status**: Beta / Self-Driving (Core: Stable v5.13.0+, Studio: Alpha v0.107.3+, Player: v0.76.1+, Renderer: v1.80.0+, CLI: Beta v0.22.0+)
+- **Status**: Beta / Self-Driving (Core: Stable v5.13.0+, Studio: Alpha v0.108.0+, Player: v0.76.2+, Renderer: v1.80.0+, CLI: Beta v0.23.0+)
 - **Frameworks**: React, Vue, Svelte, Solid, vanilla JS
 - **Animation**: Standard CSS, Web Animations API (WAAPI), any animation library
 
@@ -112,10 +112,10 @@ const report = await Helios.diagnose();
 
 ## Roadmap
 ### V1.x (Active)
-- **Helios Studio**: Alpha v0.107.3+ (Export Job Spec, Portable Job Paths, Component Management, Preview Command, Configurable Registry)
-- **CLI**: Beta v0.22.0+ (Registry Dependencies, Portable Job Paths, Example Init, Skills Command, Job Command)
+- **Helios Studio**: Alpha v0.108.0+ (MCP Resources & Tools, Export Job Spec, Portable Job Paths, Component Management)
+- **CLI**: Beta v0.23.0+ (Registry Dependencies, Interactive Remove, Portable Job Paths, Example Init, Skills Command)
 - **Core**: Stable v5.13.0+ (Generic Input Props, Active Clips, Input Schema, Headless Audio)
-- **Player**: Feature Complete v0.76.1+ (Dynamic Audio Metering, Standard Event Handlers, SVG Icons, CSS Parts)
+- **Player**: Feature Complete v0.76.2+ (Dynamic Audio Metering, Standard Event Handlers, SVG Icons, CSS Parts)
 - **Renderer**: Stable v1.80.0+ (WebCodecs Preference, Orchestrator Plan, HW Accel Validation, Distributed Progress)
 
 ### AI Integration

@@ -1,11 +1,12 @@
 # Status: LLMS
 
-**Version**: 1.14.0
+**Version**: 1.15.0
 
 - **Status**: Active
 - **Current Focus**: Comprehensive Review and Maintenance
-- **Last Updated**: 2026-02-18
+- **Last Updated**: 2026-02-19
 
+[v1.15.0] ✅ Completed: Comprehensive Daily Review - Updated Quick Facts versions (Studio v0.108.0+, CLI v0.23.0+, Player v0.76.2+). Updated Roadmap for Studio (MCP Resources & Tools), CLI (Registry Dependencies, Interactive Remove), and verified all other versions.
 [v1.14.0] ✅ Completed: Comprehensive Daily Review - Updated Quick Facts versions (Core v5.13.0+, Studio v0.107.3+, Player v0.76.1+, Renderer v1.80.0+, CLI v0.22.0+). Updated Roadmap for Studio (v0.107.3+), CLI (v0.22.0+ with Registry Dependencies, Example Init, Skills Command), and Renderer (v1.80.0+ with WebCodecs Preference).
 [v1.13.0] ✅ Completed: Comprehensive Daily Review - Updated Quick Facts with precise versions (Core v5.13.0+, Studio v0.107.2+, Player v0.76.1+, Renderer v1.79.2+, CLI v0.18.0+). Expanded CLI description to include `merge`, `build`, `update` commands. Added note about `workflows/` and `examples/` agent skills. Added "Portable Job Paths" to Studio roadmap.
 [v1.12.0] ✅ Completed: Comprehensive Daily Review - Updated Status to reflect Core v5.13+, Studio v0.107+, Player v0.76+, Renderer v1.79+. Corrected CLI version to v0.18+. Updated Core API example with generic input props. Updated Roadmap with "Export Job Spec", "Component Management", "Configurable Example Registry", "Preview Command". Moved "Registry Commands" to V1.x. Verified Distributed Rendering status.
