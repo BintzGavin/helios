@@ -5,7 +5,7 @@ import { createRequire } from 'module';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
-import { defaultClient } from '../registry/client.js';
+import { RegistryClient } from '../registry/client.js';
 import { installComponent } from '../utils/install.js';
 import { uninstallComponent } from '../utils/uninstall.js';
 import { loadConfig } from '../utils/config.js';
@@ -23,7 +23,8 @@ export function registerStudioCommand(program: Command) {
         const config = loadConfig(process.cwd());
         console.log(chalk.dim(`Fetching component registry${config?.framework ? ` (${config.framework})` : ''}...`));
 
-        const components = await defaultClient.getComponents(config?.framework);
+        const client = new RegistryClient(config?.registry);
+        const components = await client.getComponents(config?.framework);
 
         const require = createRequire(import.meta.url);
 
@@ -56,13 +57,13 @@ export function registerStudioCommand(program: Command) {
               skillsRoot: skillsRoot,
               components: components,
               onInstallComponent: async (name: string) => {
-                await installComponent(process.cwd(), name);
+                await installComponent(process.cwd(), name, { install: true, client });
               },
               onRemoveComponent: async (name: string) => {
-                await uninstallComponent(process.cwd(), name, { removeFiles: true });
+                await uninstallComponent(process.cwd(), name, { removeFiles: true, client });
               },
               onUpdateComponent: async (name: string) => {
-                await installComponent(process.cwd(), name, { install: true, overwrite: true });
+                await installComponent(process.cwd(), name, { install: true, overwrite: true, client });
               },
               onCheckInstalled: async (name: string) => {
                 const config = loadConfig(process.cwd());

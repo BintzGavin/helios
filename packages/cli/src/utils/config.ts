@@ -3,6 +3,7 @@ import path from 'path';
 
 export interface HeliosConfig {
   version: string;
+  registry?: string;
   directories: {
     components: string;
     lib: string;

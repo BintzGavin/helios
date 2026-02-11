@@ -5,7 +5,7 @@ import path from 'path';
 import fs from 'fs';
 import { uninstallComponent } from '../utils/uninstall.js';
 import { loadConfig } from '../utils/config.js';
-import { defaultClient } from '../registry/client.js';
+import { RegistryClient } from '../registry/client.js';
 
 export function registerRemoveCommand(program: Command) {
   program
@@ -15,16 +15,17 @@ export function registerRemoveCommand(program: Command) {
     .option('--keep-files', 'Keep component files on disk')
     .action(async (component, options) => {
       try {
+        const config = loadConfig(process.cwd());
+        const client = new RegistryClient(config?.registry);
+
         if (options.keepFiles) {
-          await uninstallComponent(process.cwd(), component, { removeFiles: false });
+          await uninstallComponent(process.cwd(), component, { removeFiles: false, client });
           return;
         }
 
-        const config = loadConfig(process.cwd());
-
         // If config exists and component is installed, check for files to delete
         if (config && config.components.includes(component)) {
-          const def = await defaultClient.findComponent(component, config.framework);
+          const def = await client.findComponent(component, config.framework);
 
           if (def) {
             const componentsDir = path.resolve(process.cwd(), config.directories.components);
@@ -52,7 +53,7 @@ export function registerRemoveCommand(program: Command) {
           }
         }
 
-        await uninstallComponent(process.cwd(), component, { removeFiles: true });
+        await uninstallComponent(process.cwd(), component, { removeFiles: true, client });
       } catch (error) {
         console.error(chalk.red((error as Error).message));
         process.exit(1);

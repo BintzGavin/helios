@@ -2,11 +2,12 @@ import fs from 'fs';
 import path from 'path';
 import chalk from 'chalk';
 import { loadConfig, saveConfig } from './config.js';
-import { defaultClient } from '../registry/client.js';
+import { RegistryClient } from '../registry/client.js';
 import { installPackage } from './package-manager.js';
 import { ComponentDefinition } from '../registry/types.js';
 
 async function resolveComponentTree(
+  client: RegistryClient,
   componentName: string,
   framework: string | undefined,
   visited: Set<string> = new Set()
@@ -17,7 +18,7 @@ async function resolveComponentTree(
 
   visited.add(componentName);
 
-  const component = await defaultClient.findComponent(componentName, framework);
+  const component = await client.findComponent(componentName, framework);
   if (!component) {
     throw new Error(`Component "${componentName}" not found in registry.`);
   }
@@ -27,7 +28,7 @@ async function resolveComponentTree(
   // Recursively resolve registry dependencies first
   if (component.registryDependencies) {
     for (const depName of component.registryDependencies) {
-      const depComponents = await resolveComponentTree(depName, framework, visited);
+      const depComponents = await resolveComponentTree(client, depName, framework, visited);
       components.push(...depComponents);
     }
   }
@@ -39,7 +40,7 @@ async function resolveComponentTree(
 export async function installComponent(
   rootDir: string,
   componentName: string,
-  options: { install: boolean; overwrite?: boolean } = { install: true }
+  options: { install: boolean; overwrite?: boolean; client?: RegistryClient } = { install: true }
 ) {
   const config = loadConfig(rootDir);
 
@@ -47,7 +48,11 @@ export async function installComponent(
     throw new Error('Configuration file not found. Run "helios init" first.');
   }
 
-  const componentsToInstall = await resolveComponentTree(componentName, config.framework);
+  // Fallback to a default client if none provided (mainly for backward compatibility during refactor)
+  // But strictly speaking, the caller should provide it.
+  const client = options.client || new RegistryClient(config.registry);
+
+  const componentsToInstall = await resolveComponentTree(client, componentName, config.framework);
 
   const targetBaseDir = path.resolve(rootDir, config.directories.components);
 
