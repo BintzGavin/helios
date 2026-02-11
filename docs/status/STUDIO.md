@@ -1,4 +1,4 @@
-**Version**: 0.108.0
+**Version**: 0.108.1
 
 **Posture**: ACTIVELY EXPANDING FOR V2
 
@@ -9,6 +9,7 @@
 **Focus**: UI Implementation & CLI
 
 ## Recent Updates
+- [v0.108.1] ✅ Verified: CLI Component Removal - Verified `helios remove` command supports interactive file deletion, `--yes` flag, and `--keep-files` flag.
 - [v0.108.0] ✅ Completed: Enhance MCP Server - Implemented MCP resources (documentation, assets, components) and tools (install/update/uninstall components) for agent integration.
 - [v0.107.3] ✅ Completed: Documentation Maintenance - Updated Studio documentation to document `helios preview` command usage.
 - [v0.107.1] ✅ Completed: Portable Job Paths - Updated `getRenderJobSpec` to generate relative paths for input, output, and chunks, ensuring distributed render jobs are portable across environments.
