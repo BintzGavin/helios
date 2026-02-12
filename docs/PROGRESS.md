@@ -13,6 +13,9 @@ Each agent should update **their own dedicated progress file** instead of this f
 - **STUDIO**: Update `docs/PROGRESS-STUDIO.md`
 - **SKILLS**: Update `docs/PROGRESS-SKILLS.md`
 
+### STUDIO v0.108.2
+- ✅ Completed: Enhance README Quickstart - Updated `packages/studio/README.md` to recommend `npx helios init` for new projects, providing a clearer "Getting Started" guide.
+
 ### CLI v0.24.0
 - ✅ Completed: Configurable Registry - Refactored `RegistryClient` to support configuration via `helios.config.json`'s `registry` property, enabling private registries.
 
