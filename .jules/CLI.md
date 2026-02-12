@@ -81,3 +81,7 @@ Critical learnings only. This is not a log—only add entries for insights that 
 ## [0.23.0] - Singleton Registry Pattern
 **Learning:** `RegistryClient` was implemented as a global singleton, which prevented per-project configuration (e.g., custom registry URLs) required for the "Monetization Ready" vision.
 **Action:** Created plan `2026-02-07-CLI-Configurable-Registry.md` to refactor `RegistryClient` and enable project-level registry configuration. Future services must avoid singletons when state depends on user config.
+
+## [0.24.0] - Prompt vs Reality Discrepancy
+**Learning:** The prompt description ("Current State: Basic CLI... Single command: studio") was severely outdated compared to the actual codebase (v0.24.0 with full Init/Add/Registry commands). Relying on the prompt led to incorrect gap analysis.
+**Action:** Always prioritize `list_files` and `read_file` exploration over provided text descriptions. Trust the file system as the single source of truth.
