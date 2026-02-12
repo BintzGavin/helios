@@ -4,7 +4,7 @@
 
 The Helios CLI is built using `commander` and serves as the primary interface for managing Helios projects. It handles:
 - Project initialization and scaffolding (`init`)
-- Component management (`add`, `remove`, `update`, `components`)
+- Component management (`add`, `remove`, `update`, `components`, `diff`)
 - Development server (`studio`)
 - Rendering (`render`, `job`, `merge`)
 - Deployment (`build`, `preview`)
@@ -22,6 +22,7 @@ packages/cli/
 │   │   ├── add.ts          # Adds components
 │   │   ├── build.ts        # Builds for production
 │   │   ├── components.ts   # Lists registry components
+│   │   ├── diff.ts         # Diffs components
 │   │   ├── init.ts         # Initializes project
 │   │   ├── job.ts          # Manages render jobs
 │   │   ├── list.ts         # Lists installed components
@@ -59,6 +60,7 @@ packages/cli/
   - Options: `--yes`, `--no-install`
 - `helios components`: List available components in the registry.
 - `helios list`: List installed components.
+- `helios diff <component>`: Compare local component with registry version.
 - `helios render <input>`: Render a composition.
   - Options: `--output`, `--width`, `--height`, `--fps`, `--duration`, `--quality`, `--mode`, `--emit-job`
 - `helios job run <spec>`: Run a distributed render job.

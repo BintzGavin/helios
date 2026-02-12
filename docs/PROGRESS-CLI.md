@@ -2,6 +2,14 @@
 
 This file tracks progress for the CLI domain (`packages/cli`).
 
+## CLI v0.25.0
+
+- ✅ Diff Command - Implemented `helios diff <component>` to compare local component files with the registry version, showing colorized diffs.
+
+## CLI v0.24.0
+
+- ✅ Configurable Registry - Refactored `RegistryClient` to support configuration via `helios.config.json`'s `registry` property, enabling private registries.
+
 ## CLI v0.23.0
 
 - ✅ Refine Component Removal - Enhanced `helios remove` to support interactive file deletion, `--yes` flag for automation, and `--keep-files` to preserve files.

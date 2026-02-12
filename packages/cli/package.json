@@ -43,11 +43,13 @@
     "chalk": "^5.4.1",
     "commander": "^13.1.0",
     "degit": "^2.8.4",
+    "diff": "^8.0.3",
     "prompts": "^2.4.2",
     "vite": "^7.1.2"
   },
   "devDependencies": {
     "@types/degit": "^2.8.6",
+    "@types/diff": "^7.0.2",
     "@types/prompts": "^2.4.9",
     "typescript": "^5.0.0"
   }
