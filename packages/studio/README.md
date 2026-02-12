@@ -14,6 +14,37 @@ Helios Studio is a visual interface for composing, previewing, and debugging Hel
 - **Diagnostics**: Inspect environment capabilities and system status.
 - **Client-Side Export**: Export MP4/WebM directly from the browser using WebCodecs.
 
+## Getting Started
+
+The recommended way to use Helios Studio is by initializing a new project with the Helios CLI.
+
+### 1. Create a New Project
+
+Use the `init` command to scaffold a project with your preferred framework (React, Vue, Svelte, Solid, or Vanilla):
+
+```bash
+npx helios init my-project
+```
+
+### 2. Install Dependencies
+
+Navigate to your project directory and install the necessary packages:
+
+```bash
+cd my-project
+npm install
+```
+
+### 3. Start the Studio
+
+Run the development server, which launches Helios Studio:
+
+```bash
+npm run dev
+```
+
+This will typically open the Studio at `http://localhost:5173`.
+
 ## Architecture
 
 Studio acts as a host environment for the Helios Player.
@@ -24,20 +55,24 @@ Studio acts as a host environment for the Helios Player.
 
 ## Usage
 
-### Installation
+### Commands
 
-Studio can be installed and run in two ways:
-
-**Option 1: Via Main CLI** (Recommended)
+**Start Development Server**
 ```bash
-# Start development server
 npx helios studio
+```
+Launches the Studio UI for the current directory. This is what `npm run dev` typically executes.
 
-# Preview production build
+**Preview Production Build**
+```bash
 npx helios preview
 ```
+Serves the static build output using `vite preview`, providing a production-like environment for verifying your composition before deployment.
 
-**Option 2: Direct Installation** (Standalone)
+### Standalone Usage
+
+You can also install the Studio package directly:
+
 ```bash
 # Install globally
 npm install -g @helios-project/studio
@@ -45,13 +80,6 @@ npm install -g @helios-project/studio
 # Run from any directory
 helios-studio
 ```
-
-Or use with npx:
-```bash
-npx @helios-project/studio
-```
-
-The `helios preview` command serves the static build output using `vite preview`, providing a production-like environment for verifying your composition before deployment.
 
 For a comprehensive guide on getting started, see the [Quickstart Guide](../../docs/site/getting-started/quickstart.md).
 
@@ -71,7 +99,7 @@ For a comprehensive guide on getting started, see the [Quickstart Guide](../../d
 
 ## Development
 
-To run the Studio package locally for development:
+To run the Studio package locally for development (contributing):
 
 1. Install dependencies:
    ```bash
