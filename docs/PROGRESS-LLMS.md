@@ -1,5 +1,15 @@
 # LLMS Progress
 
+## LLMS v1.17.0
+- ✅ Completed: Daily llms.txt Review
+  - Updated Studio version to v0.108.2+
+  - Updated Player version to v0.76.4+
+  - Updated CLI version to v0.25.0+
+  - Added "Diff Command" to CLI description and Roadmap
+  - Updated Studio Roadmap with "Enhance README Quickstart"
+  - Updated Player Roadmap with "Dynamic Audio Metering"
+  - Verified Core API examples and package structure
+
 ## LLMS v1.16.0
 - ✅ Completed: Daily llms.txt Review
   - Updated Quick Facts versions (Studio, Player, CLI)
