@@ -69,6 +69,12 @@ npx helios preview
 ```
 Serves the static build output using `vite preview`, providing a production-like environment for verifying your composition before deployment.
 
+**Compare Component**
+```bash
+npx helios diff <component-name>
+```
+Compares your local component implementation against the official registry version, highlighting any modifications you've made.
+
 ### Standalone Usage
 
 You can also install the Studio package directly:

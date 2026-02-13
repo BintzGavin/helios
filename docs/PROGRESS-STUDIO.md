@@ -1,3 +1,6 @@
+## STUDIO v0.109.0
+- ✅ Verified: CLI Diff Command - Verified implementation of `helios diff` command and updated documentation in Studio README.
+
 ## STUDIO v0.108.1
 - ✅ Verified: Refine CLI Component Removal - Verified `helios remove` command supports interactive file deletion, `--yes` flag, and `--keep-files` flag.
 
