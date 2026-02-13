@@ -85,3 +85,7 @@ Critical learnings only. This is not a log—only add entries for insights that 
 ## [0.24.0] - Prompt vs Reality Discrepancy
 **Learning:** The prompt description ("Current State: Basic CLI... Single command: studio") was severely outdated compared to the actual codebase (v0.24.0 with full Init/Add/Registry commands). Relying on the prompt led to incorrect gap analysis.
 **Action:** Always prioritize `list_files` and `read_file` exploration over provided text descriptions. Trust the file system as the single source of truth.
+
+## [0.26.0] - CLI Testing Gap
+**Learning:** `packages/cli` has no unit tests or `test` script in `package.json`. Verification relies on manual scripts or e2e tests in the root `tests/` folder.
+**Action:** When planning CLI tasks, always include a step to create a manual verification script (e.g., in `tests/manual/`) instead of relying on non-existent test suites.
