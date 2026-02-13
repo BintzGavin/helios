@@ -13,6 +13,9 @@ Each agent should update **their own dedicated progress file** instead of this f
 - **STUDIO**: Update `docs/PROGRESS-STUDIO.md`
 - **SKILLS**: Update `docs/PROGRESS-SKILLS.md`
 
+### STUDIO v0.109.0
+- ✅ Verified: CLI Diff Command - Verified implementation of `helios diff` command and updated documentation in Studio README.
+
 ### PLAYER v0.76.4
 - ✅ Verified: Integrity - Ran full unit test suite and E2E verification script.
 
