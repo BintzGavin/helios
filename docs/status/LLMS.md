@@ -1,11 +1,12 @@
 # Status: LLMS
 
-**Version**: 1.16.0
+**Version**: 1.17.0
 
 - **Status**: Active
 - **Current Focus**: Comprehensive Review and Maintenance
-- **Last Updated**: 2026-02-20
+- **Last Updated**: 2026-02-21
 
+[v1.17.0] ✅ Completed: Comprehensive Daily Review - Updated Studio (v0.108.2+), Player (v0.76.4+), CLI (v0.25.0+). Added "Diff Command" to CLI roadmap. Updated Roadmap with "Enhance README Quickstart" (Studio) and "Dynamic Audio Metering" (Player).
 [v1.16.0] ✅ Completed: Comprehensive Daily Review - Updated Quick Facts versions (Studio v0.108.1+, CLI v0.24.0+, Player v0.76.3+). Updated Roadmap for Studio (Portable Job Paths) and CLI (Configurable Registry, Recursive Dependencies, Interactive Remove).
 [v1.15.0] ✅ Completed: Comprehensive Daily Review - Updated Quick Facts versions (Studio v0.108.0+, CLI v0.23.0+, Player v0.76.2+). Updated Roadmap for Studio (MCP Resources & Tools), CLI (Registry Dependencies, Interactive Remove), and verified all other versions.
 [v1.14.0] ✅ Completed: Comprehensive Daily Review - Updated Quick Facts versions (Core v5.13.0+, Studio v0.107.3+, Player v0.76.1+, Renderer v1.80.0+, CLI v0.22.0+). Updated Roadmap for Studio (v0.107.3+), CLI (v0.22.0+ with Registry Dependencies, Example Init, Skills Command), and Renderer (v1.80.0+ with WebCodecs Preference).
