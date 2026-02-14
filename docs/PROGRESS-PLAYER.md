@@ -1,3 +1,6 @@
+## PLAYER v0.76.5
+- ✅ Completed: Fix CaptureFrame Resizing - Updated DirectController and BridgeController to correctly resize canvas captures when width/height options are provided.
+
 ## PLAYER v0.76.3
 - ✅ Verified: Enhanced Verification Script - Added E2E tests for `controlslist` and `disablepictureinpicture` attributes, confirming feature availability and stability.
 

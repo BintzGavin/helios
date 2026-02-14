@@ -203,6 +203,40 @@ describe('DirectController', () => {
         expect(result!.captions).toEqual([]);
     });
 
+    it('should capture and resize Canvas frame using fallback when OffscreenCanvas is missing', async () => {
+        const originalOffscreenCanvas = global.OffscreenCanvas;
+        vi.stubGlobal('OffscreenCanvas', undefined);
+
+        const mockCanvas = document.createElement('canvas');
+        mockCanvas.width = 1920;
+        mockCanvas.height = 1080;
+        (mockIframe.contentDocument!.querySelector as any).mockReturnValue(mockCanvas);
+
+        const tempCanvas = document.createElement('canvas');
+        const mockContext = {
+            drawImage: vi.fn()
+        };
+        (tempCanvas as any).getContext = vi.fn().mockReturnValue(mockContext);
+
+        // Mock createElement
+        mockIframe.contentDocument!.createElement = vi.fn().mockReturnValue(tempCanvas) as any;
+
+        const result = await controller.captureFrame(5, { mode: 'canvas', width: 1280, height: 720 });
+
+        expect(mockHeliosInstance.seek).toHaveBeenCalledWith(5);
+        expect(mockIframe.contentDocument!.createElement).toHaveBeenCalledWith('canvas');
+        expect(tempCanvas.width).toBe(1280);
+        expect(tempCanvas.height).toBe(720);
+        expect(mockContext.drawImage).toHaveBeenCalledWith(mockCanvas, 0, 0, 1280, 720);
+        expect(result).not.toBeNull();
+        expect(result!.frame).toBeInstanceOf(VideoFrame);
+        expect((result!.frame as any).source).toBe(tempCanvas);
+
+        if (originalOffscreenCanvas) {
+            vi.stubGlobal('OffscreenCanvas', originalOffscreenCanvas);
+        }
+    });
+
     it('should return null if canvas not found', async () => {
         (mockIframe.contentDocument!.querySelector as any).mockReturnValue(null);
 
