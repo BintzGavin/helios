@@ -1,3 +1,6 @@
+## STUDIO v0.110.0
+- ✅ Completed: Distributed Rendering Example - Created `examples/distributed-rendering` demonstrating the workflow for generating and executing distributed render jobs.
+
 ## STUDIO v0.109.0
 - ✅ Verified: CLI Diff Command - Verified implementation of `helios diff` command and updated documentation in Studio README.
 
