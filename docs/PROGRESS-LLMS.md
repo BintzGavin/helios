@@ -1,5 +1,12 @@
 # LLMS Progress
 
+## LLMS v1.18.0
+- ✅ Completed: Daily llms.txt Review
+  - Updated Studio version to v0.109.0+
+  - Added "Diff Command Support" to Studio Roadmap
+  - Verified CLI version v0.25.0+ and features
+  - Verified Core v5.13.0+, Player v0.76.4+, Renderer v1.80.0+
+
 ## LLMS v1.17.0
 - ✅ Completed: Daily llms.txt Review
   - Updated Studio version to v0.108.2+
