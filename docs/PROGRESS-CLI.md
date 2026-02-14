@@ -2,6 +2,10 @@
 
 This file tracks progress for the CLI domain (`packages/cli`).
 
+## CLI v0.26.0
+
+- ✅ Registry Auth & Tests - Implemented authentication support for private registries using Bearer tokens and established Vitest-based testing infrastructure for the CLI package.
+
 ## CLI v0.25.0
 
 - ✅ Diff Command - Implemented `helios diff <component>` to compare local component files with the registry version, showing colorized diffs.
