@@ -26,6 +26,7 @@
   "scripts": {
     "build": "tsc && node scripts/bundle-skills.js",
     "dev": "tsc -w",
+    "test": "vitest",
     "prepublishOnly": "npm run build"
   },
   "keywords": [
@@ -51,6 +52,7 @@
     "@types/degit": "^2.8.6",
     "@types/diff": "^7.0.2",
     "@types/prompts": "^2.4.9",
-    "typescript": "^5.0.0"
+    "typescript": "^5.0.0",
+    "vitest": "^4.0.18"
   }
 }

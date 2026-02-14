@@ -3,10 +3,12 @@ import { ComponentDefinition } from './types.js';
 
 export class RegistryClient {
   private url: string | undefined;
+  private token: string | undefined;
   private cache: ComponentDefinition[] | null = null;
 
-  constructor(url?: string) {
+  constructor(url?: string, token?: string) {
     this.url = url || process.env.HELIOS_REGISTRY_URL;
+    this.token = token || process.env.HELIOS_REGISTRY_TOKEN;
   }
 
   async getComponents(framework?: string): Promise<ComponentDefinition[]> {
@@ -25,7 +27,15 @@ export class RegistryClient {
         const timeoutId = setTimeout(() => controller.abort(), 5000);
 
         try {
-          const res = await fetch(this.url, { signal: controller.signal });
+          const headers: HeadersInit = {};
+          if (this.token) {
+            headers['Authorization'] = `Bearer ${this.token}`;
+          }
+
+          const res = await fetch(this.url, {
+            signal: controller.signal,
+            headers,
+          });
           if (res.ok) {
             const data = await res.json();
             if (Array.isArray(data)) {
