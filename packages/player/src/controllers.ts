@@ -196,7 +196,29 @@ export class DirectController implements HeliosController {
         const canvas = doc.querySelector(selector);
 
         if (canvas instanceof HTMLCanvasElement) {
-             videoFrame = new VideoFrame(canvas, { timestamp: (frame / fps) * 1_000_000 });
+             let source: CanvasImageSource = canvas;
+
+             if (options?.width && options?.height && (canvas.width !== options.width || canvas.height !== options.height)) {
+                 if (typeof OffscreenCanvas !== 'undefined') {
+                     const offscreen = new OffscreenCanvas(options.width, options.height);
+                     const ctx = offscreen.getContext('2d');
+                     if (ctx) {
+                         ctx.drawImage(canvas, 0, 0, options.width, options.height);
+                         source = offscreen;
+                     }
+                 } else {
+                     const tempCanvas = doc.createElement('canvas');
+                     tempCanvas.width = options.width;
+                     tempCanvas.height = options.height;
+                     const ctx = tempCanvas.getContext('2d');
+                     if (ctx) {
+                         ctx.drawImage(canvas, 0, 0, options.width, options.height);
+                         source = tempCanvas;
+                     }
+                 }
+             }
+
+             videoFrame = new VideoFrame(source, { timestamp: (frame / fps) * 1_000_000 });
         }
       }
 
