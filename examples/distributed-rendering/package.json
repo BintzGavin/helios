@@ -1,0 +1,22 @@
+{
+  "name": "@helios-examples/distributed-rendering",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "generate-job": "helios render dist/index.html --emit-job job.json --width 1280 --height 720 --fps 30 --duration 2",
+    "run-job": "helios job run job.json"
+  },
+  "dependencies": {
+    "@helios-project/core": "file:../../packages/core"
+  },
+  "devDependencies": {
+    "@helios-project/cli": "file:../../packages/cli",
+    "@types/node": "^20.12.7",
+    "typescript": "^5.4.5",
+    "vite": "^5.2.10"
+  }
+}

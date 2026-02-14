@@ -1,4 +1,4 @@
-**Version**: 0.109.0
+**Version**: 0.110.0
 
 **Posture**: ACTIVELY EXPANDING FOR V2
 
@@ -9,6 +9,7 @@
 **Focus**: UI Implementation & CLI
 
 ## Recent Updates
+- [v0.110.0] ✅ Completed: Distributed Rendering Example - Created `examples/distributed-rendering` demonstrating the workflow for generating and executing distributed render jobs.
 - [v0.109.0] ✅ Verified: CLI Diff Command - Verified implementation of `helios diff` command and updated documentation in Studio README.
 - [v0.108.2] ✅ Completed: Enhance README Quickstart - Updated `packages/studio/README.md` to recommend `npx helios init` for new projects, providing a clearer "Getting Started" guide.
 - [v0.108.1] ✅ Verified: CLI Component Removal - Verified `helios remove` command supports interactive file deletion, `--yes` flag, and `--keep-files` flag.
