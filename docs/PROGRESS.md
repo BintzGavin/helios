@@ -13,6 +13,9 @@ Each agent should update **their own dedicated progress file** instead of this f
 - **STUDIO**: Update `docs/PROGRESS-STUDIO.md`
 - **SKILLS**: Update `docs/PROGRESS-SKILLS.md`
 
+### STUDIO v0.111.0
+- ✅ Completed: CLI Registry Auth - Enabled authentication for private component registries via environment variable `HELIOS_REGISTRY_TOKEN`.
+
 ### CLI v0.26.0
 - ✅ Completed: Registry Auth & Tests - Implemented authentication support for private registries using Bearer tokens and established Vitest-based testing infrastructure for the CLI package.
 

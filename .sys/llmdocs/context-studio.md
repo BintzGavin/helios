@@ -44,6 +44,9 @@ The Studio is launched via the `helios` CLI (from `@helios-project/cli`).
 - `helios remove`: Removes a component from the project configuration and deletes associated files (interactive).
 - `helios diff`: Compares local component code with the registry version.
 
+**Configuration**:
+- Authentication for private registries is supported via `HELIOS_REGISTRY_TOKEN` environment variable.
+
 ## D. UI Components
 
 - **Sidebar**: Navigation tabs (Project, Assets, Renders, Settings).
@@ -59,8 +62,8 @@ The Studio is launched via the `helios` CLI (from `@helios-project/cli`).
 - **Renderer**: Uses `RenderOrchestrator` for planning and executing renders.
 - **CLI**: The Studio backend exposes endpoints that the CLI can leverage (e.g., for `helios render` with HMR support, though currently CLI uses Renderer directly).
 
-## F. Recent Changes (v0.109.0)
+## F. Recent Changes (v0.111.0)
+- **Completed: CLI Registry Auth**: Enabled authentication for private component registries via environment variable `HELIOS_REGISTRY_TOKEN`.
+- **Completed: Distributed Rendering Example**: Created `examples/distributed-rendering` demonstrating the workflow for generating and executing distributed render jobs.
 - **Verified: CLI Diff Command**: Verified implementation of `helios diff` command and updated documentation in Studio README.
 - **Completed: Enhance README Quickstart**: Updated `packages/studio/README.md` to recommend `npx helios init` for new projects, providing a clearer "Getting Started" guide.
-- **Verified: CLI Component Removal**: Verified `helios remove` command supports interactive file deletion, `--yes` flag, and `--keep-files` flag.
-- **MCP Server Enhancement**: Implemented MCP resources (documentation, assets, components) and tools (install/update/uninstall components) for agent integration.

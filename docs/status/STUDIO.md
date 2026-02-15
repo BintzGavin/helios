@@ -1,4 +1,4 @@
-**Version**: 0.110.0
+**Version**: 0.111.0
 
 **Posture**: ACTIVELY EXPANDING FOR V2
 
@@ -9,6 +9,7 @@
 **Focus**: UI Implementation & CLI
 
 ## Recent Updates
+- [v0.111.0] ✅ Completed: CLI Registry Auth - Enabled authentication for private component registries via environment variable `HELIOS_REGISTRY_TOKEN`.
 - [v0.110.0] ✅ Completed: Distributed Rendering Example - Created `examples/distributed-rendering` demonstrating the workflow for generating and executing distributed render jobs.
 - [v0.109.0] ✅ Verified: CLI Diff Command - Verified implementation of `helios diff` command and updated documentation in Studio README.
 - [v0.108.2] ✅ Completed: Enhance README Quickstart - Updated `packages/studio/README.md` to recommend `npx helios init` for new projects, providing a clearer "Getting Started" guide.
