@@ -35,11 +35,14 @@ packages/cli/
 │   │   └── update.ts       # Updates components
 │   ├── registry/
 │   │   ├── __tests__/      # Registry tests
+│   │   │   └── client.test.ts
 │   │   ├── client.ts       # Registry API client
 │   │   └── types.ts        # Registry types
 │   ├── templates/          # Project templates
 │   ├── types/              # Shared types
 │   └── utils/
+│       ├── __tests__/      # Utility tests
+│       │   └── install.test.ts
 │       ├── config.ts       # Config management
 │       ├── examples.ts     # Example fetching
 │       ├── install.ts      # Installation logic

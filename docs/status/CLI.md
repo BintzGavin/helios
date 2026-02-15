@@ -1,6 +1,6 @@
 # CLI Status
 
-**Version**: 0.26.0
+**Version**: 0.26.1
 
 ## Current State
 
@@ -76,3 +76,4 @@ Per AGENTS.md, the CLI is "ACTIVELY EXPANDING FOR V2" with focus on:
 [v0.24.0] ✅ Configurable Registry - Refactored `RegistryClient` to support configuration via `helios.config.json`'s `registry` property, enabling private registries.
 [v0.25.0] ✅ Diff Command - Implemented `helios diff <component>` to compare local component files with the registry version, showing colorized diffs.
 [v0.26.0] ✅ Registry Auth & Tests - Implemented authentication support for private registries using Bearer tokens and established Vitest-based testing infrastructure for the CLI package.
+[v0.26.1] ✅ Add Install Tests - Added comprehensive unit tests for `installComponent` to verify dependency resolution, file operations, and config updates.
