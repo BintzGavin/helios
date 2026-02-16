@@ -3,7 +3,7 @@ import fs from 'fs';
 import path from 'path';
 import chalk from 'chalk';
 import prompts from 'prompts';
-import { DEFAULT_CONFIG } from '../utils/config.js';
+import { DEFAULT_CONFIG, saveConfig } from '../utils/config.js';
 import { REACT_TEMPLATE } from '../templates/react.js';
 import { VUE_TEMPLATE } from '../templates/vue.js';
 import { SVELTE_TEMPLATE } from '../templates/svelte.js';
@@ -235,7 +235,7 @@ export function registerInitCommand(program: Command) {
           }
 
           try {
-            fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
+            saveConfig(config, targetDir);
             console.log(chalk.green('Initialized helios.config.json'));
           } catch (error) {
              console.error(chalk.red('Failed to write configuration file:'), error);

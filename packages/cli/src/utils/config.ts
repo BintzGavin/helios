@@ -38,6 +38,14 @@ export function loadConfig(cwd: string = process.cwd()): HeliosConfig | null {
   }
 }
 
+export function getConfigOrThrow(cwd: string = process.cwd()): HeliosConfig {
+  const config = loadConfig(cwd);
+  if (!config) {
+    throw new Error('Configuration file not found. Run "helios init" first.');
+  }
+  return config;
+}
+
 export function saveConfig(config: HeliosConfig, cwd: string = process.cwd()): void {
   const configPath = path.resolve(cwd, 'helios.config.json');
   try {

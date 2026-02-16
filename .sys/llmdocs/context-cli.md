@@ -34,16 +34,16 @@ packages/cli/
 │   │   ├── studio.ts       # Starts Studio server
 │   │   └── update.ts       # Updates components
 │   ├── registry/
-│   │   ├── __tests__/      # Registry tests
-│   │   │   └── client.test.ts
+│   │   ├── client.test.ts  # Registry client tests
 │   │   ├── client.ts       # Registry API client
+│   │   ├── manifest.ts     # Local registry manifest
 │   │   └── types.ts        # Registry types
 │   ├── templates/          # Project templates
 │   ├── types/              # Shared types
 │   └── utils/
-│       ├── __tests__/      # Utility tests
-│       │   └── install.test.ts
+│       ├── config.test.ts  # Config tests
 │       ├── config.ts       # Config management
+│       ├── install.test.ts # Installation tests
 │       ├── examples.ts     # Example fetching
 │       ├── install.ts      # Installation logic
 │       └── uninstall.ts    # Uninstallation logic
@@ -96,6 +96,7 @@ interface HeliosConfig {
 
 - **Registry**: The CLI uses `RegistryClient` to fetch components. It supports:
   - Custom registry URL via `helios.config.json` or `HELIOS_REGISTRY_URL` env var.
+  - **Hydration**: Fetches lightweight `index.json` first, then hydrates file contents on-demand.
   - Authentication via `HELIOS_REGISTRY_TOKEN` env var or constructor injection (Bearer token).
 - **Studio**: The `studio` command launches a Vite server with `studioApiPlugin`, allowing the Studio UI to trigger CLI actions (install/remove components) via the server.
 - **Renderer**: The `render` command orchestrates rendering using `@helios-project/renderer`.
