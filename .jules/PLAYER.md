@@ -33,3 +33,7 @@
 ## [v0.76.4] - Strict Role Adherence
 **Learning:** Attempting to implement code as a Planner is a violation of protocol and leads to rejection. The Planner must strictly produce spec files (`.md`) and never modify source code (`.ts`).
 **Action:** Always verify the "Identity" and "Protocol" section of the prompt before starting any file modifications. If the goal is a "Plan", the output must be a Markdown file in `/.sys/plans/`.
+
+## [v0.76.6] - Comprehensive Asset Discovery
+**Learning:** `getAudioAssets` only scanned for `<audio>` elements, causing `<video>` audio to be missing from client-side export and audio controls. This gap persisted despite previous partial fixes.
+**Action:** When implementing asset discovery for media features, always include both `audio` and `video` tags unless explicitly restricted.
