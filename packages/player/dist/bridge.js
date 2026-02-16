@@ -228,7 +228,28 @@ async function handleCaptureFrame(helios, data) {
     }
     // 4. Create Bitmap
     try {
-        const bitmap = await createImageBitmap(canvas);
+        let source = canvas;
+        if (width && height && (canvas.width !== width || canvas.height !== height)) {
+            if (typeof OffscreenCanvas !== 'undefined') {
+                const offscreen = new OffscreenCanvas(width, height);
+                const ctx = offscreen.getContext('2d');
+                if (ctx) {
+                    ctx.drawImage(canvas, 0, 0, width, height);
+                    source = offscreen;
+                }
+            }
+            else {
+                const tempCanvas = document.createElement('canvas');
+                tempCanvas.width = width;
+                tempCanvas.height = height;
+                const ctx = tempCanvas.getContext('2d');
+                if (ctx) {
+                    ctx.drawImage(canvas, 0, 0, width, height);
+                    source = tempCanvas;
+                }
+            }
+        }
+        const bitmap = await createImageBitmap(source);
         // 5. Send back
         window.parent.postMessage({
             type: 'HELIOS_FRAME_DATA',

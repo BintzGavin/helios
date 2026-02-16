@@ -13,6 +13,9 @@ Each agent should update **their own dedicated progress file** instead of this f
 - **STUDIO**: Update `docs/PROGRESS-STUDIO.md`
 - **SKILLS**: Update `docs/PROGRESS-SKILLS.md`
 
+### PLAYER v0.76.6
+- ✅ Verified: Fix CaptureFrame Resizing - Added comprehensive unit tests for OffscreenCanvas resizing logic in DirectController, verifying correct behavior when width/height options are provided.
+
 ### STUDIO v0.111.0
 - ✅ Completed: CLI Registry Auth - Enabled authentication for private component registries via environment variable `HELIOS_REGISTRY_TOKEN`.
 
