@@ -1,5 +1,14 @@
 # LLMS Progress
 
+## LLMS v1.20.0
+- ✅ Completed: Daily llms.txt Review
+  - Updated Quick Facts: Studio v0.111.0+, CLI v0.26.0+
+  - Verified Packages: Confirmed `diff` command is present in CLI description
+  - Updated Roadmap:
+    - Updated Studio version to v0.111.0+
+    - Updated CLI version to v0.26.0+
+  - Verified content against status files and codebase
+
 ## LLMS v1.19.0
 - ✅ Completed: Daily llms.txt Review
   - Updated Quick Facts versions: Studio v0.110.0+, Player v0.76.5+, CLI v0.26.0+
@@ -65,7 +74,7 @@
     - Added "Export Job Spec", "Component Management", "Configurable Example Registry", "Preview Command" to Studio
     - Added "Repo Scaffolding", "Update Command", "Build Command" to CLI
     - Moved "Registry Commands" from V2 to V1.x (completed)
-  - Verified Distributed Rendering status in Comparison Table ("Local (Beta) / Cloud (Planned)")
+    - Verified Distributed Rendering status in Comparison Table ("Local (Beta) / Cloud (Planned)")
 
 ## LLMS v1.11.0
 - ✅ Completed: Daily llms.txt Review
