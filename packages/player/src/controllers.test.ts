@@ -203,6 +203,40 @@ describe('DirectController', () => {
         expect(result!.captions).toEqual([]);
     });
 
+    it('should capture and resize Canvas frame using OffscreenCanvas', async () => {
+        const originalOffscreenCanvas = global.OffscreenCanvas;
+        const mockOffscreenCanvas = {
+            getContext: vi.fn().mockReturnValue({
+                drawImage: vi.fn()
+            })
+        };
+        vi.stubGlobal('OffscreenCanvas', vi.fn(function() {
+            return mockOffscreenCanvas;
+        }));
+
+        const mockCanvas = document.createElement('canvas');
+        mockCanvas.width = 1920;
+        mockCanvas.height = 1080;
+        (mockIframe.contentDocument!.querySelector as any).mockReturnValue(mockCanvas);
+
+        const result = await controller.captureFrame(5, { mode: 'canvas', width: 1280, height: 720 });
+
+        expect(mockHeliosInstance.seek).toHaveBeenCalledWith(5);
+        expect(OffscreenCanvas).toHaveBeenCalledWith(1280, 720);
+        expect(mockOffscreenCanvas.getContext).toHaveBeenCalledWith('2d');
+        expect(mockOffscreenCanvas.getContext('2d').drawImage).toHaveBeenCalledWith(mockCanvas, 0, 0, 1280, 720);
+        expect(result).not.toBeNull();
+        expect(result!.frame).toBeInstanceOf(VideoFrame);
+        // source of VideoFrame should be the offscreen canvas
+        expect((result!.frame as any).source).toBe(mockOffscreenCanvas);
+
+        if (originalOffscreenCanvas) {
+            vi.stubGlobal('OffscreenCanvas', originalOffscreenCanvas);
+        } else {
+            vi.stubGlobal('OffscreenCanvas', undefined);
+        }
+    });
+
     it('should capture and resize Canvas frame using fallback when OffscreenCanvas is missing', async () => {
         const originalOffscreenCanvas = global.OffscreenCanvas;
         vi.stubGlobal('OffscreenCanvas', undefined);
