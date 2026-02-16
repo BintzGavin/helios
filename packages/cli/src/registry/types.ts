@@ -11,3 +11,17 @@ export interface ComponentDefinition {
   dependencies?: Record<string, string>;
   registryDependencies?: string[];
 }
+
+export interface RemoteRegistryIndex {
+  version: string;
+  components: RemoteComponent[];
+}
+
+export interface RemoteComponent {
+  name: string;
+  description: string;
+  type: 'react' | 'vue' | 'svelte' | 'solid' | 'vanilla';
+  files: string[];
+  dependencies?: Record<string, string>;
+  registryDependencies?: string[];
+}
