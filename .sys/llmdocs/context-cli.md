@@ -63,7 +63,8 @@ packages/cli/
   - Options: `--yes`, `--keep-files`
 - `helios update <component>`: Update a component.
   - Options: `--yes`, `--no-install`
-- `helios components`: List available components in the registry.
+- `helios components [query]`: List available components in the registry.
+  - Options: `--framework <name>`, `--all`
 - `helios list`: List installed components.
 - `helios diff <component>`: Compare local component with registry version.
 - `helios render <input>`: Render a composition.
