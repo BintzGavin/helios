@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { loadConfig, getConfigOrThrow, saveConfig, DEFAULT_CONFIG } from './config.js';
+import { loadConfig, getConfigOrThrow, saveConfig, DEFAULT_CONFIG } from '../config.js';
 import fs from 'fs';
 import path from 'path';
 

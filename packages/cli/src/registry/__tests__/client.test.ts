@@ -24,7 +24,7 @@ describe('RegistryClient', () => {
     const client = new RegistryClient('http://test.registry', 'test-token');
     await client.getComponents();
 
-    expect(fetchMock).toHaveBeenCalledWith('http://test.registry', expect.objectContaining({
+    expect(fetchMock).toHaveBeenCalledWith('http://test.registry/index.json', expect.objectContaining({
       headers: expect.objectContaining({
         'Authorization': 'Bearer test-token',
       }),
@@ -42,7 +42,7 @@ describe('RegistryClient', () => {
     const client = new RegistryClient('http://test.registry');
     await client.getComponents();
 
-    expect(fetchMock).toHaveBeenCalledWith('http://test.registry', expect.objectContaining({
+    expect(fetchMock).toHaveBeenCalledWith('http://test.registry/index.json', expect.objectContaining({
       headers: expect.objectContaining({
         'Authorization': 'Bearer env-token',
       }),

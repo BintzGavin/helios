@@ -6,7 +6,7 @@ import { RegistryClient } from '../registry/client.js';
 import { installPackage } from './package-manager.js';
 import { ComponentDefinition } from '../registry/types.js';
 
-async function resolveComponentTree(
+export async function resolveComponentTree(
   client: RegistryClient,
   componentName: string,
   framework: string | undefined,

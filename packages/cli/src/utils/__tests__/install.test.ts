@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import path from 'path';
 import fs from 'fs';
-import { installComponent } from '../install';
+import { installComponent, resolveComponentTree } from '../install';
 import { loadConfig, saveConfig } from '../config';
 import { installPackage } from '../package-manager';
 
@@ -12,6 +12,71 @@ vi.mock('../package-manager');
 // We don't need to mock RegistryClient completely if we inject a mock object,
 // but installComponent imports it. However, the function accepts an optional client.
 // We will test by injecting a mock client.
+
+describe('resolveComponentTree', () => {
+  const mockClient = {
+    findComponent: vi.fn(),
+  } as any;
+
+  beforeEach(() => {
+    vi.resetAllMocks();
+  });
+
+  it('should resolve a single component', async () => {
+    const component = { name: 'comp', dependencies: {}, files: [] };
+    mockClient.findComponent.mockResolvedValue(component);
+
+    const result = await resolveComponentTree(mockClient, 'comp', 'react');
+    expect(result).toEqual([component]);
+    expect(mockClient.findComponent).toHaveBeenCalledWith('comp', 'react');
+  });
+
+  it('should recursively resolve registry dependencies', async () => {
+    const parent = { name: 'parent', registryDependencies: ['child'], files: [] };
+    const child = { name: 'child', registryDependencies: [], files: [] };
+
+    mockClient.findComponent
+      .mockResolvedValueOnce(parent)
+      .mockResolvedValueOnce(child);
+
+    const result = await resolveComponentTree(mockClient, 'parent', 'react');
+    // Order: child first (depth-first resolution pushes to array)
+    // Wait, let's check implementation order.
+    // implementation:
+    // 1. push child components
+    // 2. push self
+    expect(result).toEqual([child, parent]);
+  });
+
+  it('should handle cycles gracefully', async () => {
+    // A -> B -> A
+    const compA = { name: 'A', registryDependencies: ['B'], files: [] };
+    const compB = { name: 'B', registryDependencies: ['A'], files: [] };
+
+    mockClient.findComponent.mockImplementation(async (name: string) => {
+      if (name === 'A') return compA;
+      if (name === 'B') return compB;
+      return null;
+    });
+
+    const result = await resolveComponentTree(mockClient, 'A', 'react');
+
+    // Result should contain B then A.
+    // Trace:
+    // resolve(A): visited={A}
+    //   resolve(B): visited={A, B}
+    //     resolve(A): visited={A, B} -> returns []
+    //   push B
+    // push A
+    expect(result).toEqual([compB, compA]);
+  });
+
+  it('should throw if component not found', async () => {
+    mockClient.findComponent.mockResolvedValue(null);
+    await expect(resolveComponentTree(mockClient, 'missing', 'react'))
+      .rejects.toThrow('Component "missing" not found');
+  });
+});
 
 describe('installComponent', () => {
   const mockRootDir = '/mock/root';
