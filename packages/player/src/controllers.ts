@@ -195,15 +195,17 @@ export class DirectController implements HeliosController {
         const selector = options?.selector || 'canvas';
         const canvas = doc.querySelector(selector);
 
-        if (canvas instanceof HTMLCanvasElement) {
-             let source: CanvasImageSource = canvas;
+        // Use tagName check for cross-frame compatibility
+        if (canvas && canvas.tagName === 'CANVAS') {
+             const canvasEl = canvas as HTMLCanvasElement;
+             let source: CanvasImageSource = canvasEl;
 
-             if (options?.width && options?.height && (canvas.width !== options.width || canvas.height !== options.height)) {
+             if (options?.width && options?.height && (canvasEl.width !== options.width || canvasEl.height !== options.height)) {
                  if (typeof OffscreenCanvas !== 'undefined') {
                      const offscreen = new OffscreenCanvas(options.width, options.height);
                      const ctx = offscreen.getContext('2d');
                      if (ctx) {
-                         ctx.drawImage(canvas, 0, 0, options.width, options.height);
+                         ctx.drawImage(canvasEl, 0, 0, options.width, options.height);
                          source = offscreen;
                      }
                  } else {
@@ -212,7 +214,7 @@ export class DirectController implements HeliosController {
                      tempCanvas.height = options.height;
                      const ctx = tempCanvas.getContext('2d');
                      if (ctx) {
-                         ctx.drawImage(canvas, 0, 0, options.width, options.height);
+                         ctx.drawImage(canvasEl, 0, 0, options.width, options.height);
                          source = tempCanvas;
                      }
                  }

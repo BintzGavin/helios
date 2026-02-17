@@ -254,6 +254,41 @@ async function main() {
         console.log('PiP Hidden (Unsupported) Verified ✅');
     }
 
+    // ---------------------------------------------------------
+    // 7. Export Resizing Tests
+    // ---------------------------------------------------------
+    console.log('Running Export Resizing Tests...');
+    async function triggerExport(width: number, height: number): Promise<number> {
+        console.log(`Triggering export for ${width}x${height}...`);
+        const downloadPromise = page.waitForEvent('download');
+        await player.evaluate((el: any, {w, h}) => {
+             // We return the promise from export to ensure it started
+             return el.export({ format: 'png', width: w, height: h });
+        }, { w: width, h: height });
+        const download = await downloadPromise;
+        const path = await download.path();
+        if (!path) throw new Error('Download path is null');
+        const stats = fs.statSync(path);
+        return stats.size;
+    }
+
+    // Export small
+    const sizeSmall = await triggerExport(10, 10);
+    console.log(`Size for 10x10: ${sizeSmall} bytes`);
+
+    // Export large
+    const sizeLarge = await triggerExport(100, 100);
+    console.log(`Size for 100x100: ${sizeLarge} bytes`);
+
+    // Basic heuristic: 100x100 should be significantly larger than 10x10
+    // A 10x10 PNG is tiny. A 100x100 PNG is roughly 100x more pixels.
+    // Compressed size won't scale perfectly linearly but should be much larger.
+    // Let's expect at least 5x difference to be safe against header overhead.
+    if (sizeLarge <= sizeSmall * 5) {
+         throw new Error(`Export resizing failed. 100x100 size (${sizeLarge}) is not significantly larger than 10x10 size (${sizeSmall})`);
+    }
+    console.log('Export Resizing Verified ✅');
+
 
     console.log('🎉 All Player Verification Tests Passed!');
 

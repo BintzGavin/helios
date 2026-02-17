@@ -7,12 +7,14 @@
     <style>
         body { margin: 0; background: #222; color: #fff; font-family: monospace; display: flex; align-items: center; justify-content: center; height: 100vh; }
         .info { text-align: center; }
+        canvas { border: 1px solid #444; }
     </style>
 </head>
 <body>
     <div class="info">
         <h1>Mock Composition</h1>
         <p>Frame: <span id="frame">0</span></p>
+        <canvas id="canvas" width="1920" height="1080" style="width: 480px; height: 270px;"></canvas>
     </div>
 
     <script>
@@ -33,10 +35,25 @@
 
         const listeners = [];
         const frameEl = document.getElementById('frame');
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+
+        function draw() {
+            ctx.fillStyle = '#000';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#fff';
+            ctx.font = '100px sans-serif';
+            ctx.fillText('Frame: ' + Math.floor(state.currentFrame), 100, 200);
+
+            // Draw something measurable
+            ctx.fillStyle = 'red';
+            ctx.fillRect(0, 0, 100, 100);
+        }
 
         function notify() {
             listeners.forEach(cb => cb({ ...state }));
             frameEl.textContent = Math.floor(state.currentFrame);
+            draw();
         }
 
         window.helios = {
@@ -84,6 +101,9 @@
             getSchema: async () => undefined,
             dispose: () => {}
         };
+
+        // Initial draw
+        draw();
 
         // Simulation Loop
         setInterval(() => {
