@@ -1,5 +1,13 @@
 # LLMS Progress
 
+## LLMS v1.21.0
+- ✅ Completed: Daily llms.txt Review
+  - Updated Quick Facts versions: Core v5.13.0+, Studio v0.111.0+, Player v0.76.6+, Renderer v1.80.0+, CLI v0.27.0+.
+  - Updated CLI description with new commands (`diff`, `preview`, `skills`).
+  - Updated Roadmap: Moved recent completions to Active (Registry Auth, Portable Job Paths, Distributed Rendering Example, Generic Input Props, etc.).
+  - Updated Core API example with generic input props comment.
+  - Verified all file paths and API examples.
+
 ## LLMS v1.20.0
 - ✅ Completed: Daily llms.txt Review
   - Updated Quick Facts: Studio v0.111.0+, CLI v0.26.0+
