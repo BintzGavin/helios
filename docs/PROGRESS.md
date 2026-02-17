@@ -13,6 +13,9 @@ Each agent should update **their own dedicated progress file** instead of this f
 - **STUDIO**: Update `docs/PROGRESS-STUDIO.md`
 - **SKILLS**: Update `docs/PROGRESS-SKILLS.md`
 
+### CLI v0.28.0
+- ✅ Completed: Enhance Components Command - Updated `helios components` to support search queries and framework/all filtering, displaying component descriptions in the output.
+
 ### CLI v0.27.0
 - ✅ Completed: Remote Registry Hydration - Updated `RegistryClient` to support fetching lightweight `index.json` and hydrating file contents on demand, improving performance and enabling Shadcn-style registries.
 
