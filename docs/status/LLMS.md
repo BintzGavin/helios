@@ -1,11 +1,12 @@
 # Status: LLMS
 
-**Version**: 1.20.0
+**Version**: 1.21.0
 
 - **Status**: Active
 - **Current Focus**: Comprehensive Review and Maintenance
-- **Last Updated**: 2026-02-21
+- **Last Updated**: 2026-02-23
 
+[v1.21.0] ✅ Completed: Comprehensive Daily Review - Updated Quick Facts versions (Core v5.13.0+, Studio v0.111.0+, Player v0.76.6+, Renderer v1.80.0+, CLI v0.27.0+). Updated CLI description with new commands (diff, preview, skills). Moved recent feature completions to V1.x Roadmap (Registry Auth, Portable Job Paths, Distributed Rendering Example, Generic Input Props, etc.).
 [v1.20.0] ✅ Completed: Comprehensive Daily Review - Updated Studio version to v0.111.0+ and CLI version to v0.26.0+. Verified Roadmap and Package descriptions against codebase.
 [v1.19.0] ✅ Completed: Comprehensive Daily Review - Updated Quick Facts versions (Studio v0.110.0+, Player v0.76.5+, CLI v0.26.0+). Updated Roadmap for Studio (Distributed Rendering Example), CLI (Registry Auth, Configurable Registry), Player (Export API, Export Menu, Dynamic Audio Metering), and Renderer (WebCodecs Preference, Orchestrator Plan). Verified all other versions.
 [v1.18.0] ✅ Completed: Comprehensive Daily Review - Updated Studio (v0.109.0+), added Diff Command Support to Studio roadmap, verified all other versions.
