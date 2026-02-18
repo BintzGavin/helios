@@ -29,7 +29,7 @@ export class RegistryClient {
   async getComponents(framework?: string): Promise<ComponentDefinition[]> {
     // Return cached full definitions if available
     if (this.cache) {
-      return framework ? this.cache.filter(c => c.type === framework) : this.cache;
+      return framework ? this.cache.filter(c => c.type === framework || c.type === 'vanilla') : this.cache;
     }
 
     if (this.url) {
@@ -49,12 +49,12 @@ export class RegistryClient {
               files: [] // Content missing, to be hydrated on install
             } as ComponentDefinition));
 
-            return framework ? partials.filter(c => c.type === framework) : partials;
+            return framework ? partials.filter(c => c.type === framework || c.type === 'vanilla') : partials;
           }
           // Old format: ComponentDefinition[]
           else if (Array.isArray(data)) {
             this.cache = data as ComponentDefinition[];
-            return framework ? this.cache.filter(c => c.type === framework) : this.cache;
+            return framework ? this.cache.filter(c => c.type === framework || c.type === 'vanilla') : this.cache;
           }
         }
       } catch (e) {
@@ -64,20 +64,37 @@ export class RegistryClient {
 
     // Fallback to local registry
     this.cache = localRegistry;
-    return framework ? this.cache.filter(c => c.type === framework) : this.cache;
+    return framework ? this.cache.filter(c => c.type === framework || c.type === 'vanilla') : this.cache;
   }
 
   async findComponent(name: string, framework?: string): Promise<ComponentDefinition | undefined> {
+    const findInList = (list: { name: string, type: string }[]) => {
+      const matches = list.filter(c => c.name === name);
+      if (matches.length === 0) return undefined;
+
+      if (framework) {
+        const exact = matches.find(c => c.type === framework);
+        if (exact) return exact;
+
+        const vanilla = matches.find(c => c.type === 'vanilla');
+        if (vanilla) return vanilla;
+
+        return undefined;
+      }
+
+      return matches[0];
+    };
+
     // 1. Check full cache
     if (this.cache) {
-      const found = this.cache.find(c => c.name === name && (!framework || c.type === framework));
-      if (found) return found;
+      const found = findInList(this.cache);
+      if (found) return found as ComponentDefinition;
     }
 
     // 2. Check remote cache (and hydrate)
     if (this.remoteCache) {
-      const found = this.remoteCache.find(c => c.name === name && (!framework || c.type === framework));
-      if (found) return await this.hydrateComponent(found);
+      const found = findInList(this.remoteCache);
+      if (found) return await this.hydrateComponent(found as RemoteComponent);
     }
 
     // 3. Force fetch if caches empty
@@ -85,15 +102,14 @@ export class RegistryClient {
       await this.getComponents(framework);
 
       // Re-check caches after fetch
-      const newCache = this.cache as ComponentDefinition[] | null;
-      if (newCache) {
-        return newCache.find(c => c.name === name && (!framework || c.type === framework));
+      if (this.cache) {
+        const found = findInList(this.cache);
+        if (found) return found as ComponentDefinition;
       }
 
-      const newRemoteCache = this.remoteCache as RemoteComponent[] | null;
-      if (newRemoteCache) {
-        const found = newRemoteCache.find((c: RemoteComponent) => c.name === name && (!framework || c.type === framework));
-        if (found) return await this.hydrateComponent(found);
+      if (this.remoteCache) {
+        const found = findInList(this.remoteCache);
+        if (found) return await this.hydrateComponent(found as RemoteComponent);
       }
     }
 
