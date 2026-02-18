@@ -46,6 +46,7 @@ The Studio is launched via the `helios` CLI (from `@helios-project/cli`).
 
 **Configuration**:
 - Authentication for private registries is supported via `HELIOS_REGISTRY_TOKEN` environment variable.
+- Component filtering supports `vanilla` (framework-agnostic) components as fallbacks when a specific framework is requested.
 
 ## D. UI Components
 
@@ -62,8 +63,8 @@ The Studio is launched via the `helios` CLI (from `@helios-project/cli`).
 - **Renderer**: Uses `RenderOrchestrator` for planning and executing renders.
 - **CLI**: The Studio backend exposes endpoints that the CLI can leverage (e.g., for `helios render` with HMR support, though currently CLI uses Renderer directly).
 
-## F. Recent Changes (v0.111.0)
+## F. Recent Changes (v0.112.0)
+- **Completed: CLI Registry Filtering**: Updated `RegistryClient` to support cross-framework component sharing by allowing `vanilla` components to be discovered and installed in framework-specific projects.
 - **Completed: CLI Registry Auth**: Enabled authentication for private component registries via environment variable `HELIOS_REGISTRY_TOKEN`.
 - **Completed: Distributed Rendering Example**: Created `examples/distributed-rendering` demonstrating the workflow for generating and executing distributed render jobs.
 - **Verified: CLI Diff Command**: Verified implementation of `helios diff` command and updated documentation in Studio README.
-- **Completed: Enhance README Quickstart**: Updated `packages/studio/README.md` to recommend `npx helios init` for new projects, providing a clearer "Getting Started" guide.
