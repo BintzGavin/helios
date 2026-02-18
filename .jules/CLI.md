@@ -89,3 +89,7 @@ Critical learnings only. This is not a log—only add entries for insights that 
 ## [0.26.0] - CLI Testing Gap
 **Learning:** `packages/cli` has no unit tests or `test` script in `package.json`. Verification relies on manual scripts or e2e tests in the root `tests/` folder.
 **Action:** When planning CLI tasks, always include a step to create a manual verification script (e.g., in `tests/manual/`) instead of relying on non-existent test suites.
+
+## [0.28.0] - Status Drift
+**Learning:** `docs/status/CLI.md` claimed v0.28.0 features ("Enhance Components Command") were implemented, but the code was missing and `package.json` was v0.27.0.
+**Action:** When status files claim features, verify the code (`src/` and `package.json`) before assuming they exist. Status files are not truth; code is truth.
