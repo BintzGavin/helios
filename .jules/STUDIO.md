@@ -121,3 +121,11 @@
 ## [0.107.3] - WebCodecs Preference Gap
 **Learning:** The Renderer (`v1.80.0`) added `webCodecsPreference` to control hardware acceleration, but the Studio (`v0.107.3`) did not expose it. This created a gap where users couldn't leverage deterministic rendering for debugging.
 **Action:** When Renderer adds new configuration options, always check if they need to be exposed in Studio's `RenderConfig`.
+
+## [0.112.0] - Asset Rename Limitation
+**Learning:** The `renameAsset` function in the discovery backend (`src/server/discovery.ts`) only supports renaming within the same directory, preventing "Move" operations via rename.
+**Action:** When implementing file system operations, explicitly check if the backend supports cross-directory moves or if a dedicated `move` function is required.
+
+## [0.112.0] - Asset Discovery Whitelist
+**Learning:** The `findAssets` backend function strictly filters files by extension (ignoring `other` types), which means placeholder files like `.helioskeep` are ignored by default. This complicates "empty folder" detection.
+**Action:** When implementing folder persistence strategies, ensure the discovery logic is updated to include the marker files, or implement a dedicated directory scanning pass.
