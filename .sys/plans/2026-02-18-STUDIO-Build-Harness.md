@@ -1,107 +1,121 @@
-# 1. Context & Goal
-- **Objective**: Enhance the `helios build` command to generate a deployment-ready "Player Harness" (index.html) that wraps the composition in the `<helios-player>` Web Component.
-- **Trigger**: Currently, `helios build` simply runs `vite build`, which typically outputs a headless composition (e.g., `index.html` that renders the animation but has no controls). This leaves users without a playable artifact to deploy.
-- **Impact**: Users can deploy the `dist/` folder to any static host (Vercel, Netlify, GitHub Pages) and get a full player experience with Play/Pause, Scrubbing, and Settings, fulfilling the "Build and sell products" vision.
+# 📋 STUDIO: Build Command - Player Harness
 
-# 2. File Inventory
-- **Modify**: `packages/cli/src/commands/build.ts` (Implement post-build logic)
-- **Read-Only**: `packages/cli/package.json` (Dependencies check)
-- **Read-Only**: `packages/player/package.json` (To verify bundle exports)
+#### 1. Context & Goal
+- **Objective**: Enhance the `helios build` command to automatically wrap the built composition in a "Player Harness" HTML file, ensuring the output is a deployable, playable video experience with controls.
+- **Trigger**: The current `helios build` simply wraps `vite build`, producing a "headless" composition (`index.html` executing the animation) without any playback controls. This leaves users with a non-interactive deployment.
+- **Impact**: Unlocks the "Preview with the Player" vision for production builds. Users can deploy the `dist/` folder to any static host (Netlify, Vercel, S3) and get a full player experience by default.
 
-# 3. Implementation Spec
+#### 2. File Inventory
+- **Modify**: `packages/cli/src/commands/build.ts` - Update the action handler to post-process the build output.
+- **Create**: `tests/verify-build-harness.ts` - A standalone verification script to ensure the harness is generated correctly by mocking a project environment.
+- **Read-Only**: `packages/player/package.json` - Reference for resolving the player bundle path.
+
+#### 3. Implementation Spec
 - **Architecture**:
-  - The CLI will wrap `vite.build`.
-  - Post-build, it will inspect the output directory (default `dist`).
-  - It will perform a "File Swap": `index.html` (Composition) -> `composition.html`.
-  - It will generate a new `index.html` (Harness) containing `<helios-player>`.
-  - It will resolve the `@helios-project/player` bundle from the user's `node_modules` and copy it to the output directory to ensure the player works without external CDNs.
+  - The build process will run in a two-stage pipeline:
+    1.  **Vite Build**: Execute the standard `vite build` (via existing logic) which compiles the user's composition to `[outDir]/index.html`.
+    2.  **Harness Generation (Post-Build)**:
+        -   Detect if `index.html` exists in the output directory.
+        -   Rename `[outDir]/index.html` to `[outDir]/composition.html`.
+        -   Resolve the `@helios-project/player` bundle from the project's `node_modules` (specifically looking for `dist/helios-player.bundle.mjs` or falling back to `dist/helios-player.global.js`).
+        -   Copy the player bundle to `[outDir]/assets/helios-player.js`.
+        -   Generate a new `[outDir]/index.html` that embeds `<helios-player>` pointing to `composition.html`.
 
-- **Pseudo-Code**:
+- **Pseudo-Code (`packages/cli/src/commands/build.ts`)**:
   ```typescript
-  // packages/cli/src/commands/build.ts
-  import fs from 'fs';
-  import path from 'path';
-  import { createRequire } from 'module';
-
-  const require = createRequire(import.meta.url);
+  import { rename, copyFile, writeFile, readFile, mkdir } from 'fs/promises';
+  import { existsSync } from 'fs';
+  import { join, resolve, dirname } from 'path';
 
   action(async (options) => {
     // 1. Run Vite Build
     await vite.build({ ... });
 
-    // 2. Check for Harness Flag (default true)
-    if (options.harness === false) return;
+    // 2. Post-processing
+    const outDir = resolve(process.cwd(), options.outDir || 'dist');
+    const indexHtml = join(outDir, 'index.html');
+    const compositionHtml = join(outDir, 'composition.html');
+    const playerAssetPath = join(outDir, 'assets/helios-player.js');
 
-    // 3. Locate Output
-    const dist = path.resolve(process.cwd(), options.outDir || 'dist');
-    const indexHtml = path.join(dist, 'index.html');
+    // Only proceed if index.html exists (standard build output)
+    if (existsSync(indexHtml)) {
+      console.log('Generating Player Harness...');
 
-    if (!fs.existsSync(indexHtml)) {
-       console.warn("No index.html found. Skipping player harness generation.");
-       return;
+      // Rename composition
+      await rename(indexHtml, compositionHtml);
+
+      // Resolve Player Bundle
+      // Attempt to find the bundle in node_modules
+      let playerBundleSource: string | null = null;
+      try {
+        // Heuristic: Check common paths
+        const playerPkg = resolve(process.cwd(), 'node_modules/@helios-project/player');
+        const bundlePath = join(playerPkg, 'dist/helios-player.bundle.mjs');
+        if (existsSync(bundlePath)) {
+          playerBundleSource = bundlePath;
+        } else {
+           // Fallback to global if bundle missing
+           const globalPath = join(playerPkg, 'dist/helios-player.global.js');
+           if (existsSync(globalPath)) playerBundleSource = globalPath;
+        }
+      } catch (e) {
+        // Ignore resolution errors
+      }
+
+      if (playerBundleSource) {
+        // Copy Player
+        // Ensure assets dir exists (Vite might have created it, but verify)
+        await mkdir(dirname(playerAssetPath), { recursive: true });
+        await copyFile(playerBundleSource, playerAssetPath);
+
+        // Write Harness
+        const harnessHtml = `
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Helios Player</title>
+            <style>
+              body { margin: 0; background: #000; height: 100vh; width: 100vw; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+              helios-player { width: 100%; height: 100%; }
+            </style>
+          </head>
+          <body>
+            <helios-player src="composition.html" controls autoplay></helios-player>
+            <script type="module" src="./assets/helios-player.js"></script>
+          </body>
+          </html>
+        `;
+        await writeFile(indexHtml, harnessHtml);
+        console.log(chalk.green('✓ Player Harness generated at index.html'));
+      } else {
+        console.warn(chalk.yellow('! Player bundle not found. Skipping harness generation.'));
+        // Revert rename if player not found to leave a working (headless) build
+        await rename(compositionHtml, indexHtml);
+      }
     }
-
-    // 4. Rename Composition
-    const compHtml = path.join(dist, 'composition.html');
-    fs.renameSync(indexHtml, compHtml);
-
-    // 5. Resolve Player Bundle
-    // We try to find the package.json of the player installed in the user's project
-    let bundlePath;
-    try {
-        const playerPkgPath = require.resolve('@helios-project/player/package.json', { paths: [process.cwd()] });
-        const playerPkg = JSON.parse(fs.readFileSync(playerPkgPath, 'utf-8'));
-        const bundleRelative = playerPkg.exports?.['./bundle'] || 'dist/helios-player.bundle.mjs';
-        bundlePath = path.resolve(path.dirname(playerPkgPath), bundleRelative);
-    } catch (e) {
-        console.warn("Could not resolve @helios-project/player. Skipping harness.");
-        // Revert rename? Or just leave it as composition.html?
-        // Better to revert if we fail.
-        fs.renameSync(compHtml, indexHtml);
-        return;
-    }
-
-    // 6. Copy Player Bundle
-    const destBundle = path.join(dist, 'helios-player.js');
-    fs.copyFileSync(bundlePath, destBundle);
-
-    // 7. Write Harness index.html
-    const harnessHtml = `
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <meta charset="utf-8">
-        <title>Helios Player</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <style>body { margin: 0; background: #000; height: 100vh; display: flex; align-items: center; justify-content: center; overflow: hidden; }</style>
-        <script type="module" src="./helios-player.js"></script>
-      </head>
-      <body>
-        <helios-player src="./composition.html" style="width: 100%; height: 100%; max-width: 100%;"></helios-player>
-      </body>
-      </html>
-    `;
-    fs.writeFileSync(indexHtml, harnessHtml);
-    console.log("Generated Player Harness at index.html");
   })
   ```
 
-- **Public API Changes**:
-  - `helios build` command now accepts `--no-harness` to disable this behavior.
-  - Default behavior changes: `dist/index.html` is now the Player, `dist/composition.html` is the composition.
-
 - **Dependencies**:
-  - Requires `@helios-project/player` to be installed in the target project (standard for Helios projects).
+  - The feature relies on `@helios-project/player` being installed and built in the user's project (standard for Helios templates).
+  - Uses standard Node.js `fs` and `path` modules.
 
-# 4. Test Plan
+#### 4. Test Plan
 - **Verification**:
-  1. Create a temporary test project (or use an existing example).
-  2. Run `npx helios build`.
-  3. Verify `dist/index.html` contains `<helios-player>`.
-  4. Verify `dist/composition.html` exists.
-  5. Verify `dist/helios-player.js` exists.
-  6. Serve `dist` and check if Player loads.
-- **Success Criteria**: `dist/` is self-contained and playable.
+  - Run `npx tsx tests/verify-build-harness.ts`
+  - The script will:
+    1.  Create a temporary test directory `temp-build-test`.
+    2.  Write a minimal `vite.config.ts` and `index.html` (mocking a project).
+    3.  Create a mock `node_modules/@helios-project/player/dist/helios-player.bundle.mjs` file to simulate the installed dependency.
+    4.  Execute `node packages/cli/bin/helios.js build --out-dir dist` within the temp directory.
+    5.  Assert that `dist/composition.html` exists.
+    6.  Assert that `dist/index.html` exists and contains the `<helios-player` tag.
+    7.  Assert that `dist/assets/helios-player.js` exists and matches the mock content.
+    8.  Cleanup the temp directory.
+- **Success Criteria**:
+  - The verification script passes, confirming the file renaming and generation logic works correctly.
 - **Edge Cases**:
-  - `dist` does not contain `index.html` (e.g. library build) -> Should skip gracefully.
-  - `@helios-project/player` not found -> Should warn and skip.
+  - **Missing Player**: Verify that if the player bundle is missing, the build completes but leaves `index.html` as the composition (reverts rename).
+  - **Custom OutDir**: Verify it respects the `--out-dir` flag.

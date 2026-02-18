@@ -15,15 +15,20 @@
   "publishConfig": {
     "access": "public"
   },
-  "main": "dist/index.js",
-  "module": "dist/index.js",
+  "main": "dist/helios-player.bundle.mjs",
+  "module": "dist/helios-player.bundle.mjs",
   "unpkg": "dist/helios-player.global.js",
   "types": "dist/index.d.ts",
   "files": [
     "dist"
   ],
   "exports": {
-    ".": "./dist/index.js",
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/helios-player.bundle.mjs",
+      "require": "./dist/helios-player.global.js",
+      "default": "./dist/helios-player.bundle.mjs"
+    },
     "./bridge": "./dist/bridge.js",
     "./controllers": "./dist/controllers.js",
     "./features/exporter": "./dist/features/exporter.js",

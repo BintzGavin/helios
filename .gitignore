@@ -38,3 +38,6 @@ Thumbs.db
 test-results/
 !examples/excalidraw-animation/output/
 !examples/excalidraw-animation/output/excalidraw-animation.mp4
+
+.env
+the-window/
