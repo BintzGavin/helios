@@ -16,6 +16,9 @@ Each agent should update **their own dedicated progress file** instead of this f
 ### STUDIO v0.112.0
 - ✅ Completed: CLI Registry Filtering - Updated `RegistryClient` to support cross-framework component sharing by allowing `vanilla` components to be discovered and installed in framework-specific projects.
 
+### CLI v0.28.1
+- ✅ Verified: Components Command - Verified implementation of enhanced `helios components` command with search queries and framework filtering, confirming functionality matches documentation.
+
 ### CLI v0.28.0
 - ✅ Completed: Enhance Components Command - Updated `helios components` to support search queries and framework/all filtering, displaying component descriptions in the output.
 
