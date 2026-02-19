@@ -1,5 +1,14 @@
 # LLMS Progress
 
+## LLMS v1.22.0
+- ✅ Completed: Daily llms.txt Review
+  - Updated Quick Facts: Studio v0.112.0+, Player v0.76.6+, Renderer v1.80.0+, CLI v0.28.1+.
+  - Corrected Core API example: `availableAudioTracks` metadata now includes `fadeInDuration`, `fadeOutDuration`, `fadeEasing`.
+  - Updated Roadmap:
+    - Added "Registry Filtering", "Components Search", "Dynamic Audio Metering", "WebCodecs Preference".
+    - Updated versions to match Quick Facts.
+  - Verified content against codebase.
+
 ## LLMS v1.21.1
 - ✅ Completed: Daily llms.txt Review
   - Updated Quick Facts versions: Studio v0.107.1+, Player v0.76.4+, Renderer v1.78.0+ (aligned with package.json).

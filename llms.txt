@@ -6,7 +6,7 @@ Helios is a modern engine for creating videos programmatically using standard we
 
 ## Quick Facts
 - **License**: Elastic License 2.0 (free commercial use, no SaaS resale)
-- **Status**: Beta / Self-Driving (Core: Stable v5.13.0+, Studio: Alpha v0.107.1+, Player: v0.76.4+, Renderer: v1.78.0+, CLI: Beta v0.27.0+)
+- **Status**: Beta / Self-Driving (Core: Stable v5.13.0+, Studio: Alpha v0.112.0+, Player: v0.76.6+, Renderer: v1.80.0+, CLI: Beta v0.28.1+)
 - **Frameworks**: React, Vue, Svelte, Solid, vanilla JS
 - **Animation**: Standard CSS, Web Animations API (WAAPI), any animation library
 
@@ -27,7 +27,7 @@ const helios = new Helios<{ title: string }>({
 // Reactively subscribe to state changes
 helios.subscribe(({ currentFrame, inputProps, availableAudioTracks }) => {
   // Drive animations with progress or props
-  // availableAudioTracks is AudioTrackMetadata[] (id, kind, label, startTime, duration, src)
+  // availableAudioTracks is AudioTrackMetadata[] (id, src, startTime, duration, fadeInDuration, fadeOutDuration, fadeEasing)
 });
 
 // CRITICAL: Ensure fonts, images, and media are ready before rendering
@@ -112,11 +112,11 @@ const report = await Helios.diagnose();
 
 ## Roadmap
 ### V1.x (Active)
-- **Studio**: v0.107.1+ (Distributed Rendering Example, Diff Command Support, Portable Job Paths, MCP Resources & Tools, Export Job Spec)
-- **CLI**: v0.27.0+ (Registry Auth, Configurable Registry, Interactive Remove, Recursive Dependencies, Portable Job Paths, Skills Command, Diff Command, Remote Registry Hydration)
+- **Studio**: v0.112.0+ (Registry Filtering, Registry Auth, Distributed Rendering Example, Diff Command Support, Portable Job Paths, MCP Resources & Tools)
+- **CLI**: v0.28.1+ (Components Search, Registry Auth, Remote Registry Hydration, Diff Command, Interactive Remove, Recursive Dependencies)
 - **Core**: v5.13.0+ (Generic Input Props, Active Clips, Input Schema, Headless Audio)
-- **Player**: v0.76.4+ (Export API, Export Menu, Dynamic Audio Metering, Standard Event Handlers, SVG Icons)
-- **Renderer**: v1.78.0+ (WebCodecs Preference, Orchestrator Plan, HW Accel Validation, Distributed Progress)
+- **Player**: v0.76.6+ (Standard Event Handlers, Dynamic Audio Metering, Export API, Export Menu, SVG Icons)
+- **Renderer**: v1.80.0+ (WebCodecs Preference, Orchestrator Plan, HW Accel Validation, Distributed Progress)
 
 ### AI Integration
 - **Studio MCP Server**: Inspect, create, and render compositions via LLM tools (Done)
