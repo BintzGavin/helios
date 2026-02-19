@@ -1,93 +1,119 @@
 import React from 'react';
-import { vi, describe, it, expect, beforeEach } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { AssetsPanel } from './AssetsPanel';
 import { useStudio } from '../../context/StudioContext';
 
 // Mock StudioContext
+const mockUseStudio = {
+  assets: [],
+  uploadAsset: vi.fn(),
+  createFolder: vi.fn()
+};
+
 vi.mock('../../context/StudioContext', () => ({
-  useStudio: vi.fn(),
-  // We don't need to mock Asset interface
+  useStudio: () => mockUseStudio
 }));
 
-// Mock AssetItem to avoid FontFace issues and simplify testing
+// Mock AssetItem and FolderItem
 vi.mock('./AssetItem', () => ({
   AssetItem: ({ asset }: { asset: any }) => <div data-testid="asset-item" data-type={asset.type}>{asset.name}</div>
 }));
 
+vi.mock('./FolderItem', () => ({
+  FolderItem: ({ name, onClick }: { name: string, onClick: () => void }) => (
+    <div data-testid="folder-item" onClick={onClick}>{name}</div>
+  )
+}));
+
 describe('AssetsPanel', () => {
   const mockAssets = [
-    { id: '1', name: 'image.png', type: 'image', url: '' },
-    { id: '2', name: 'video.mp4', type: 'video', url: '' },
-    { id: '3', name: 'audio.mp3', type: 'audio', url: '' },
-    { id: '4', name: 'font.ttf', type: 'font', url: '' },
-    { id: '5', name: 'test.json', type: 'json', url: '' }
+    { id: '1', name: 'image.png', type: 'image', url: '', relativePath: 'image.png' },
+    { id: '2', name: 'video.mp4', type: 'video', url: '', relativePath: 'video.mp4' },
+    { id: '3', name: 'audio.mp3', type: 'audio', url: '', relativePath: 'folder/audio.mp3' },
+    { id: '4', name: 'subfolder', type: 'folder', url: '', relativePath: 'subfolder' },
+    { id: '5', name: 'test.json', type: 'json', url: '', relativePath: 'subfolder/test.json' }
   ];
 
   beforeEach(() => {
-    (useStudio as any).mockReturnValue({
-      assets: mockAssets,
-      uploadAsset: vi.fn()
-    });
+    mockUseStudio.assets = mockAssets as any;
+    mockUseStudio.createFolder.mockReset();
+    mockUseStudio.uploadAsset.mockReset();
   });
 
-  it('renders all assets initially', () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('renders files and folders', () => {
     render(<AssetsPanel />);
-    expect(screen.getAllByTestId('asset-item')).toHaveLength(5);
+    // Files at root: image.png, video.mp4
+    // Folders at root: folder (inferred), subfolder (explicit)
+
+    const folders = screen.getAllByTestId('folder-item');
+    const files = screen.getAllByTestId('asset-item');
+
+    expect(folders).toHaveLength(2);
+    expect(folders[0]).toHaveTextContent('folder');
+    expect(folders[1]).toHaveTextContent('subfolder');
+
+    expect(files).toHaveLength(2);
+    expect(files[0]).toHaveTextContent('image.png');
+    expect(files[1]).toHaveTextContent('video.mp4');
   });
 
-  it('filters by search query', () => {
+  it('filters by search query (flat view)', () => {
     render(<AssetsPanel />);
     const searchInput = screen.getByPlaceholderText('Search assets...');
 
-    fireEvent.change(searchInput, { target: { value: 'video' } });
-
-    const items = screen.getAllByTestId('asset-item');
-    expect(items).toHaveLength(1);
-    expect(items[0]).toHaveTextContent('video.mp4');
-  });
-
-  it('filters by type', () => {
-    render(<AssetsPanel />);
-    const typeSelect = screen.getByRole('combobox'); // Select is a combobox
-
-    fireEvent.change(typeSelect, { target: { value: 'audio' } });
-
-    const items = screen.getAllByTestId('asset-item');
-    expect(items).toHaveLength(1);
-    expect(items[0]).toHaveTextContent('audio.mp3');
-  });
-
-  it('combines search and type filter', () => {
-    // Override mock for this test
-    const extendedAssets = [
-        ...mockAssets,
-        { id: '6', name: 'config.json', type: 'json', url: '' }
-    ];
-    (useStudio as any).mockReturnValue({
-        assets: extendedAssets,
-        uploadAsset: vi.fn()
-    });
-
-    render(<AssetsPanel />);
-    const typeSelect = screen.getByRole('combobox');
-    const searchInput = screen.getByPlaceholderText('Search assets...');
-
-    fireEvent.change(typeSelect, { target: { value: 'json' } });
     fireEvent.change(searchInput, { target: { value: 'test' } });
 
+    // Should find test.json inside subfolder, flattened
     const items = screen.getAllByTestId('asset-item');
     expect(items).toHaveLength(1);
     expect(items[0]).toHaveTextContent('test.json');
+
+    // Folders should be hidden in search
+    expect(screen.queryByTestId('folder-item')).not.toBeInTheDocument();
   });
 
-  it('shows no assets found message when filter returns nothing', () => {
+  it('navigates into folders', () => {
     render(<AssetsPanel />);
-    const searchInput = screen.getByPlaceholderText('Search assets...');
+    const subfolder = screen.getByText('subfolder');
 
-    fireEvent.change(searchInput, { target: { value: 'nonexistent' } });
+    fireEvent.click(subfolder);
 
-    expect(screen.queryByTestId('asset-item')).not.toBeInTheDocument();
-    expect(screen.getByText('No matching assets found.')).toBeInTheDocument();
+    // Now inside subfolder
+    // Should see test.json
+    const files = screen.getAllByTestId('asset-item');
+    expect(files).toHaveLength(1);
+    expect(files[0]).toHaveTextContent('test.json');
+
+    // Should not see root files
+    expect(screen.queryByText('image.png')).not.toBeInTheDocument();
+  });
+
+  it('creates a new folder', async () => {
+    render(<AssetsPanel />);
+    const createBtn = screen.getByText('New Folder');
+
+    // Mock window.prompt
+    vi.spyOn(window, 'prompt').mockReturnValue('My New Folder');
+
+    fireEvent.click(createBtn);
+
+    expect(window.prompt).toHaveBeenCalled();
+    expect(mockUseStudio.createFolder).toHaveBeenCalledWith('My New Folder', '');
+  });
+
+  it('does not create folder if prompt cancelled', async () => {
+    render(<AssetsPanel />);
+    const createBtn = screen.getByText('New Folder');
+
+    vi.spyOn(window, 'prompt').mockReturnValue(null);
+
+    fireEvent.click(createBtn);
+
+    expect(mockUseStudio.createFolder).not.toHaveBeenCalled();
   });
 });

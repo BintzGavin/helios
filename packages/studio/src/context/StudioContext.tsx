@@ -29,7 +29,7 @@ export interface Asset {
   id: string;
   name: string;
   url: string;
-  type: 'image' | 'video' | 'audio' | 'font' | 'model' | 'json' | 'shader' | 'other';
+  type: 'image' | 'video' | 'audio' | 'font' | 'model' | 'json' | 'shader' | 'folder' | 'other';
   relativePath: string;
 }
 
@@ -132,6 +132,7 @@ interface StudioContextType {
   uploadAsset: (file: File, directory?: string) => Promise<void>;
   deleteAsset: (id: string) => Promise<void>;
   renameAsset: (id: string, newName: string) => Promise<void>;
+  createFolder: (name: string, parentPath?: string) => Promise<void>;
 
   // Render Jobs
   renderJobs: RenderJob[];
@@ -301,6 +302,29 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       fetchAssets();
     } catch (e) {
       console.error('Failed to rename asset:', e);
+      throw e;
+    }
+  };
+
+  const createFolder = async (name: string, parentPath?: string) => {
+    try {
+      const dirPath = parentPath ? `${parentPath}/${name}` : name;
+      const res = await fetch('/api/assets/mkdir', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ path: dirPath })
+      });
+
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || 'Failed to create folder');
+      }
+
+      fetchAssets();
+      addToast('Folder created', 'success');
+    } catch (e: any) {
+      console.error(e);
+      addToast(e.message || 'Failed to create folder', 'error');
       throw e;
     }
   };
@@ -887,6 +911,7 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         uploadAsset,
         deleteAsset,
         renameAsset,
+        createFolder,
         activeComposition,
         setActiveComposition,
         isOmnibarOpen,

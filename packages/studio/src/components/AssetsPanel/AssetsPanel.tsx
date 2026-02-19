@@ -5,7 +5,7 @@ import { FolderItem } from './FolderItem';
 import './AssetsPanel.css';
 
 export const AssetsPanel: React.FC = () => {
-  const { assets, uploadAsset } = useStudio();
+  const { assets, uploadAsset, createFolder } = useStudio();
   const [isDragging, setIsDragging] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterType, setFilterType] = useState<Asset['type'] | 'all'>('all');
@@ -40,6 +40,13 @@ export const AssetsPanel: React.FC = () => {
 
   const handleUploadClick = () => {
       fileInputRef.current?.click();
+  };
+
+  const handleCreateFolder = async () => {
+      const name = window.prompt('Enter folder name:');
+      if (name) {
+          await createFolder(name, currentPath);
+      }
   };
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -81,10 +88,14 @@ export const AssetsPanel: React.FC = () => {
         if (parts.length > 1) {
             // It's in a subfolder
             folders.add(parts[0]);
-        } else {
-            // It's a file in this folder
-            if (filterType === 'all' || asset.type === filterType) {
-                files.push(asset);
+        } else if (parts.length === 1 && parts[0] !== '') {
+            if (asset.type === 'folder') {
+                folders.add(parts[0]);
+            } else {
+                // It's a file in this folder
+                if (filterType === 'all' || asset.type === filterType) {
+                    files.push(asset);
+                }
             }
         }
     });
@@ -131,7 +142,14 @@ export const AssetsPanel: React.FC = () => {
                 className="assets-upload-btn"
                 onClick={handleUploadClick}
              >
-                Upload to {currentPath ? currentPath : 'Root'}
+                Upload
+             </button>
+             <button
+                className="assets-upload-btn"
+                onClick={handleCreateFolder}
+                style={{ marginLeft: '8px' }}
+             >
+                New Folder
              </button>
          </div>
 
