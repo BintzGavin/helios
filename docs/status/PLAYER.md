@@ -1,4 +1,4 @@
-**Version**: v0.76.6
+**Version**: v0.76.7
 
 **Posture**: STABLE AND FEATURE COMPLETE
 
@@ -60,6 +60,7 @@
 - **Export API**: Exposes public `export()` method for programmatic control over client-side exports, supporting Video (MP4/WebM) and Snapshot (PNG/JPEG) formats.
 - **Export Menu**: Implements a dedicated Export Menu in the player UI (replacing the direct export button action) to allow configuring format, resolution, filename, and captions before exporting or taking a snapshot.
 
+[v0.76.7] ✅ Verified: Integrity Check - Ran full test suite (321 tests passed) and manually confirmed CaptureFrame resizing implementation in controllers.ts and bridge.ts matches the plan.
 [v0.76.6] ✅ Verified: Fix CaptureFrame Resizing - Added comprehensive unit tests for OffscreenCanvas resizing logic in DirectController, verifying correct behavior when width/height options are provided.
 [v0.76.5] ✅ Completed: Fix CaptureFrame Resizing - Updated DirectController and BridgeController to correctly resize canvas captures when width/height options are provided.
 [v0.76.4] ✅ Verified: Integrity - Ran full unit test suite and E2E verification script.
