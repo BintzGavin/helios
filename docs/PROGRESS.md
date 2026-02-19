@@ -13,6 +13,9 @@ Each agent should update **their own dedicated progress file** instead of this f
 - **STUDIO**: Update `docs/PROGRESS-STUDIO.md`
 - **SKILLS**: Update `docs/PROGRESS-SKILLS.md`
 
+### STUDIO v0.113.0
+- ✅ Completed: CLI Components Command Enhanced - Verified implementation of `helios components` command with comprehensive unit tests and updated Studio documentation.
+
 ### STUDIO v0.112.0
 - ✅ Completed: CLI Registry Filtering - Updated `RegistryClient` to support cross-framework component sharing by allowing `vanilla` components to be discovered and installed in framework-specific projects.
 

@@ -75,6 +75,12 @@ npx helios diff <component-name>
 ```
 Compares your local component implementation against the official registry version, highlighting any modifications you've made.
 
+**List Components**
+```bash
+npx helios components [query] [--all] [--framework <name>]
+```
+Lists available components in the registry. You can filter by name/description, framework, or show all components.
+
 ### Standalone Usage
 
 You can also install the Studio package directly:

@@ -1,4 +1,4 @@
-**Version**: 0.112.0
+**Version**: 0.113.0
 
 **Posture**: ACTIVELY EXPANDING FOR V2
 
@@ -9,6 +9,7 @@
 **Focus**: UI Implementation & CLI
 
 ## Recent Updates
+- [v0.113.0] ✅ Completed: CLI Components Command Enhanced - Verified implementation of `helios components` command with comprehensive unit tests and updated Studio documentation.
 - [v0.112.0] ✅ Completed: CLI Registry Filtering - Updated `RegistryClient` to support cross-framework component sharing by allowing `vanilla` components to be discovered and installed in framework-specific projects.
 - [v0.111.0] ✅ Completed: CLI Registry Auth - Enabled authentication for private component registries via environment variable `HELIOS_REGISTRY_TOKEN`.
 - [v0.110.0] ✅ Completed: Distributed Rendering Example - Created `examples/distributed-rendering` demonstrating the workflow for generating and executing distributed render jobs.
