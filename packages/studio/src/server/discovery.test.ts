@@ -1,6 +1,6 @@
 // @vitest-environment node
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { findAssets, deleteComposition, createComposition, findCompositions, renameComposition } from './discovery';
+import { findAssets, deleteComposition, createComposition, findCompositions, renameComposition, createDirectory } from './discovery';
 import fs from 'fs';
 import path from 'path';
 
@@ -183,25 +183,30 @@ describe('findAssets', () => {
     vi.resetAllMocks();
     // Set explicit project root to control the path
     process.env = { ...originalEnv, HELIOS_PROJECT_ROOT: path.resolve('/mock/project') };
-    vi.mocked(fs.existsSync).mockReturnValue(true);
+    vi.mocked(fs.existsSync).mockImplementation((p) => p === path.resolve('/mock/project'));
   });
 
   afterEach(() => {
     process.env = originalEnv;
   });
 
-  it('should discover supported asset types including new extensions', async () => {
+  it('should discover supported asset types including new extensions and folders', async () => {
     const mockFiles = [
       { name: 'image.png', isDirectory: () => false },
       { name: 'model.glb', isDirectory: () => false },
       { name: 'data.json', isDirectory: () => false },
       { name: 'shader.frag', isDirectory: () => false },
       { name: 'notes.txt', isDirectory: () => false },
+      { name: 'subfolder', isDirectory: () => true }, // Directory
     ];
 
     // Mock fs.promises.readdir
     vi.mocked(fs.promises.readdir).mockImplementation(async (dir) => {
-        return mockFiles as any;
+        // Prevent infinite recursion by only returning files for root
+        if (dir === path.resolve('/mock/project')) {
+            return mockFiles as any;
+        }
+        return [] as any;
     });
 
     const assets = await findAssets('.');
@@ -210,7 +215,7 @@ describe('findAssets', () => {
     const assetNames = assets.map(a => a.name).sort();
 
     // This expectation defines our goal: finding these new types
-    expect(assetNames).toEqual(expect.arrayContaining(['data.json', 'image.png', 'model.glb', 'shader.frag']));
+    expect(assetNames).toEqual(expect.arrayContaining(['data.json', 'image.png', 'model.glb', 'shader.frag', 'subfolder']));
     expect(assetNames).not.toContain('notes.txt');
 
     const assetMap = new Map(assets.map(a => [a.name, a.type]));
@@ -218,6 +223,7 @@ describe('findAssets', () => {
     expect(assetMap.get('model.glb')).toBe('model');
     expect(assetMap.get('data.json')).toBe('json');
     expect(assetMap.get('shader.frag')).toBe('shader');
+    expect(assetMap.get('subfolder')).toBe('folder');
   });
 
   it('should prioritize public directory if it exists and use relative URLs', async () => {
@@ -439,5 +445,77 @@ describe('renameComposition', () => {
         });
 
         expect(() => renameComposition('.', id, newName)).toThrow(/not found/);
+    });
+});
+
+describe('createDirectory', () => {
+    const originalEnv = process.env;
+
+    beforeEach(() => {
+        vi.resetAllMocks();
+        process.env = { ...originalEnv, HELIOS_PROJECT_ROOT: path.resolve('/mock/project') };
+        vi.mocked(fs.existsSync).mockReturnValue(false); // Default: doesn't exist
+        vi.mocked(fs.mkdirSync).mockReturnValue(undefined);
+    });
+
+    afterEach(() => {
+        process.env = originalEnv;
+    });
+
+    it('should create a directory inside public folder if it exists', () => {
+        const projectRoot = path.resolve('/mock/project');
+        const publicDir = path.join(projectRoot, 'public');
+
+        vi.mocked(fs.existsSync).mockImplementation((p) => {
+            if (p === publicDir) return true;
+            return false;
+        });
+
+        const result = createDirectory('.', 'new-folder');
+
+        const expectedPath = path.join(publicDir, 'new-folder');
+        expect(fs.mkdirSync).toHaveBeenCalledWith(expectedPath, { recursive: true });
+        expect(result.type).toBe('folder');
+        expect(result.name).toBe('new-folder');
+        expect(result.url).toBe('/new-folder');
+    });
+
+    it('should create a directory inside project root if public folder missing', () => {
+        const projectRoot = path.resolve('/mock/project');
+
+        vi.mocked(fs.existsSync).mockReturnValue(false);
+
+        const result = createDirectory('.', 'new-folder');
+
+        const expectedPath = path.join(projectRoot, 'new-folder');
+        expect(fs.mkdirSync).toHaveBeenCalledWith(expectedPath, { recursive: true });
+        expect(result.url).toBe(`/@fs${expectedPath}`);
+    });
+
+    it('should throw if directory already exists', () => {
+        vi.mocked(fs.existsSync).mockReturnValue(true);
+        expect(() => createDirectory('.', 'existing')).toThrow(/already exists/);
+    });
+
+    it('should prevent path traversal', () => {
+        const projectRoot = path.resolve('/mock/project');
+        // createDirectory sanitizes path, so ../outside becomes just 'outside' inside the root
+        // Wait, path.normalize('..') is '..'.
+        // createDirectory logic: path.normalize(dirPath).replace(/^(\.\.[\/\\])+/, '');
+
+        // If we pass '../outside', normalize gives '../outside'. Regex removes leading ../
+        // So it becomes 'outside'.
+
+        // If we want to test that it throws when trying to write outside, we'd need to bypass that regex or assume regex fails?
+        // Actually, the security check is: if (!fullPath.startsWith(scanRoot)).
+        // Since we sanitize, fullPath will always be inside scanRoot unless scanRoot itself is weird.
+
+        // Let's test that it creates 'outside' inside root instead of actually going outside
+
+        vi.mocked(fs.existsSync).mockReturnValue(false);
+        const result = createDirectory('.', '../outside');
+
+        const expectedPath = path.join(projectRoot, 'outside');
+        expect(fs.mkdirSync).toHaveBeenCalledWith(expectedPath, { recursive: true });
     });
 });

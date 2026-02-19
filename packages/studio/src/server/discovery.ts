@@ -16,11 +16,11 @@ export interface AssetInfo {
   id: string;
   name: string;
   url: string;
-  type: 'image' | 'video' | 'audio' | 'font' | 'model' | 'json' | 'shader' | 'other';
+  type: 'image' | 'video' | 'audio' | 'font' | 'model' | 'json' | 'shader' | 'folder' | 'other';
   relativePath: string;
 }
 
-const IGNORED_DIRS = new Set(['node_modules', '.git', 'dist', 'build']);
+const IGNORED_DIRS = new Set(['node_modules', '.git', 'dist', 'build', '.helios']);
 
 export function getProjectRoot(cwd: string): string {
   if (process.env.HELIOS_PROJECT_ROOT) {
@@ -406,7 +406,21 @@ export async function findAssets(rootDir: string): Promise<AssetInfo[]> {
         const fullPath = path.join(dir, entry.name);
 
         if (entry.isDirectory()) {
-          if (['node_modules', '.git', 'dist', 'build'].includes(entry.name)) continue;
+          if (IGNORED_DIRS.has(entry.name)) continue;
+
+          // Add directory as an asset
+          const relativePath = path.relative(scanRoot, fullPath).replace(/\\/g, '/');
+          // For folders, URL is not really applicable but we provide one consistent with files
+          const url = hasPublic ? `/${relativePath}` : `/@fs${fullPath}`;
+
+          assets.push({
+            id: fullPath,
+            name: entry.name,
+            url,
+            type: 'folder',
+            relativePath
+          });
+
           promises.push(scan(fullPath));
         } else {
           const ext = path.extname(entry.name).toLowerCase();
@@ -490,6 +504,42 @@ export function renameAsset(
     name: finalName,
     url,
     type,
+    relativePath
+  };
+}
+
+export function createDirectory(
+  rootDir: string,
+  dirPath: string
+): AssetInfo {
+  const projectRoot = getProjectRoot(rootDir);
+  const publicDir = path.join(projectRoot, 'public');
+  const hasPublic = fs.existsSync(publicDir);
+  const scanRoot = hasPublic ? publicDir : projectRoot;
+
+  // Sanitize input path to prevent traversal
+  const safePath = path.normalize(dirPath).replace(/^(\.\.[\/\\])+/, '');
+  const fullPath = path.join(scanRoot, safePath);
+
+  // Security check
+  if (!fullPath.startsWith(scanRoot)) {
+    throw new Error('Access denied: Cannot create directory outside project/public root');
+  }
+
+  if (fs.existsSync(fullPath)) {
+    throw new Error(`Directory "${dirPath}" already exists`);
+  }
+
+  fs.mkdirSync(fullPath, { recursive: true });
+
+  const relativePath = path.relative(scanRoot, fullPath).replace(/\\/g, '/');
+  const url = hasPublic ? `/${relativePath}` : `/@fs${fullPath}`;
+
+  return {
+    id: fullPath,
+    name: path.basename(fullPath),
+    url,
+    type: 'folder',
     relativePath
   };
 }
