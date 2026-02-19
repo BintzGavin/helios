@@ -22,6 +22,16 @@ export interface AssetInfo {
 
 const IGNORED_DIRS = new Set(['node_modules', '.git', 'dist', 'build', '.helios']);
 
+// Helper to check existence asynchronously
+async function exists(filePath: string): Promise<boolean> {
+  try {
+    await fs.promises.access(filePath);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 export function getProjectRoot(cwd: string): string {
   if (process.env.HELIOS_PROJECT_ROOT) {
     return path.resolve(process.env.HELIOS_PROJECT_ROOT);
@@ -36,16 +46,6 @@ export async function findCompositions(rootDir: string): Promise<CompositionInfo
   if (!fs.existsSync(projectRoot)) {
     console.warn(`Project root directory not found at: ${projectRoot}`);
     return [];
-  }
-
-  // Helper to check existence asynchronously
-  async function exists(filePath: string): Promise<boolean> {
-    try {
-      await fs.promises.access(filePath);
-      return true;
-    } catch {
-      return false;
-    }
   }
 
   async function scan(dir: string): Promise<CompositionInfo[]> {
@@ -144,11 +144,11 @@ export function deleteComposition(rootDir: string, id: string): void {
   fs.rmSync(compDir, { recursive: true, force: true });
 }
 
-export function renameComposition(
+export async function renameComposition(
   rootDir: string,
   id: string,
   newName: string
-): CompositionInfo {
+): Promise<CompositionInfo> {
   const projectRoot = getProjectRoot(rootDir);
   const sourceDir = path.resolve(projectRoot, id);
 
@@ -157,7 +157,7 @@ export function renameComposition(
     throw new Error('Access denied: Cannot rename outside project root');
   }
 
-  if (!fs.existsSync(sourceDir)) {
+  if (!(await exists(sourceDir))) {
     throw new Error(`Composition "${id}" not found`);
   }
 
@@ -188,11 +188,11 @@ export function renameComposition(
      };
   }
 
-  if (fs.existsSync(targetDir)) {
+  if (await exists(targetDir)) {
     throw new Error(`Composition "${newName}" (directory: ${dirName}) already exists`);
   }
 
-  fs.renameSync(sourceDir, targetDir);
+  await fs.promises.rename(sourceDir, targetDir);
 
   // Return new info
   const displayName = dirName
@@ -205,9 +205,9 @@ export function renameComposition(
   // Try to preserve metadata
   let metadata: CompositionOptions | undefined;
   const metaPath = path.join(targetDir, 'composition.json');
-  if (fs.existsSync(metaPath)) {
+  if (await exists(metaPath)) {
     try {
-      metadata = JSON.parse(fs.readFileSync(metaPath, 'utf-8'));
+      metadata = JSON.parse(await fs.promises.readFile(metaPath, 'utf-8'));
     } catch (e) {
       console.warn(`Failed to parse metadata for ${dirName}`, e);
     }
@@ -216,7 +216,7 @@ export function renameComposition(
   // Check for thumbnail
   let thumbnailUrl: string | undefined;
   const thumbPath = path.join(targetDir, 'thumbnail.png');
-  if (fs.existsSync(thumbPath)) {
+  if (await exists(thumbPath)) {
     thumbnailUrl = `/@fs${thumbPath}`;
   }
 

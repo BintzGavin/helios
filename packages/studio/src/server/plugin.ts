@@ -395,7 +395,7 @@ function configureMiddlewares(server: ViteDevServer | PreviewServer, isPreview: 
 
               // Handle Rename
               if (name) {
-                  const newComp = renameComposition(process.cwd(), id, name);
+                  const newComp = await renameComposition(process.cwd(), id, name);
                   currentId = newComp.id;
 
                   // If no other metadata provided, just return the result of rename
