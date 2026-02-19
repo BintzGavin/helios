@@ -1,3 +1,6 @@
+## PLAYER v0.76.7
+- ✅ Verified: Integrity Check - Ran full test suite (321 tests passed) and manually confirmed CaptureFrame resizing implementation in controllers.ts and bridge.ts matches the plan.
+
 ## PLAYER v0.76.5
 - ✅ Completed: Fix CaptureFrame Resizing - Updated DirectController and BridgeController to correctly resize canvas captures when width/height options are provided.
 
