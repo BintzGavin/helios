@@ -22,6 +22,7 @@ vi.mock('fs', async (importOriginal) => {
                 readdir: vi.fn(),
                 readFile: vi.fn(),
                 access: vi.fn(),
+                rename: vi.fn(),
             }
         }
     };
@@ -391,60 +392,74 @@ describe('renameComposition', () => {
         process.env = originalEnv;
     });
 
-    it('should rename a composition directory', () => {
+    it('should rename a composition directory', async () => {
         const id = 'old-name';
         const newName = 'New Name';
         const projectRoot = path.resolve('/mock/project');
         const sourceDir = path.join(projectRoot, id);
         const targetDir = path.join(projectRoot, 'new-name');
 
-        // Mock source exists, target does not
-        vi.mocked(fs.existsSync).mockImplementation((p) => {
+        const checkExists = (p: any) => {
             if (p === projectRoot) return true;
             if (p === sourceDir) return true;
             if (p === targetDir) return false;
             return false;
+        };
+
+        // Mock access for async check
+        vi.mocked(fs.promises.access).mockImplementation(async (filePath: any) => {
+            if (checkExists(filePath)) return undefined;
+            throw new Error('ENOENT');
         });
 
         // Mock rename
-        vi.mocked(fs.renameSync).mockReturnValue(undefined);
+        vi.mocked(fs.promises.rename).mockResolvedValue(undefined);
 
-        const result = renameComposition('.', id, newName);
+        const result = await renameComposition('.', id, newName);
 
-        expect(fs.renameSync).toHaveBeenCalledWith(sourceDir, targetDir);
+        expect(fs.promises.rename).toHaveBeenCalledWith(sourceDir, targetDir);
         expect(result.id).toBe('new-name');
         expect(result.name).toBe('New Name');
     });
 
-    it('should fail if target already exists', () => {
+    it('should fail if target already exists', async () => {
         const id = 'old-name';
         const newName = 'Existing Name';
         const projectRoot = path.resolve('/mock/project');
         const sourceDir = path.join(projectRoot, id);
         const targetDir = path.join(projectRoot, 'existing-name');
 
-        vi.mocked(fs.existsSync).mockImplementation((p) => {
+        const checkExists = (p: any) => {
              if (p === projectRoot) return true;
              if (p === sourceDir) return true;
              if (p === targetDir) return true; // Target exists
              return false;
+        };
+
+        vi.mocked(fs.promises.access).mockImplementation(async (filePath: any) => {
+            if (checkExists(filePath)) return undefined;
+            throw new Error('ENOENT');
         });
 
-        expect(() => renameComposition('.', id, newName)).toThrow(/already exists/);
+        await expect(renameComposition('.', id, newName)).rejects.toThrow(/already exists/);
     });
 
-    it('should fail if source does not exist', () => {
+    it('should fail if source does not exist', async () => {
         const id = 'missing-comp';
         const newName = 'New Name';
         const projectRoot = path.resolve('/mock/project');
 
-        vi.mocked(fs.existsSync).mockImplementation((p) => {
+        const checkExists = (p: any) => {
             if (p === projectRoot) return true;
-            // Source not found
             return false;
+        };
+
+        vi.mocked(fs.promises.access).mockImplementation(async (filePath: any) => {
+            if (checkExists(filePath)) return undefined;
+            throw new Error('ENOENT');
         });
 
-        expect(() => renameComposition('.', id, newName)).toThrow(/not found/);
+        await expect(renameComposition('.', id, newName)).rejects.toThrow(/not found/);
     });
 });
 
