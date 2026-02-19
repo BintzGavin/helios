@@ -137,4 +137,77 @@ describe('RegistryClient', () => {
 
     expect(result).toBeUndefined();
   });
+
+  it('should fetch remote registry index', async () => {
+    const mockIndex = {
+      version: '1.0.0',
+      components: [
+        {
+          name: 'test-comp',
+          description: 'Test Component',
+          type: 'react',
+          files: ['test-comp.tsx'],
+          dependencies: { react: '18' }
+        }
+      ]
+    };
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => mockIndex,
+    });
+    vi.stubGlobal('fetch', fetchMock);
+
+    const client = new RegistryClient('https://example.com/registry/index.json');
+    const components = await client.getComponents('react');
+
+    expect(fetchMock).toHaveBeenCalledWith('https://example.com/registry/index.json', expect.anything());
+    expect(components).toHaveLength(1);
+    expect(components[0].name).toBe('test-comp');
+    expect(components[0].files).toHaveLength(0); // Should be empty/partial
+  });
+
+  it('should hydrate component on findComponent', async () => {
+    const mockIndex = {
+      version: '1.0.0',
+      components: [
+        {
+          name: 'test-comp',
+          description: 'Test Component',
+          type: 'react',
+          files: ['test-comp.tsx'],
+          dependencies: { react: '18' }
+        }
+      ]
+    };
+    const fetchMock = vi.fn()
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockIndex,
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        text: async () => 'export const Test = () => <div>Test</div>;',
+      });
+    vi.stubGlobal('fetch', fetchMock);
+
+    const client = new RegistryClient('https://example.com/registry/index.json');
+    const component = await client.findComponent('test-comp', 'react');
+
+    expect(component).toBeDefined();
+    expect(component!.name).toBe('test-comp');
+    expect(component!.files).toHaveLength(1);
+    expect(component!.files[0].content).toContain('<div>Test</div>');
+    expect(fetchMock).toHaveBeenCalledWith('https://example.com/registry/test-comp.tsx', expect.anything());
+  });
+
+  it('should fallback to local registry if fetch fails', async () => {
+    const fetchMock = vi.fn().mockRejectedValue(new Error('Network error'));
+    vi.stubGlobal('fetch', fetchMock);
+
+    const client = new RegistryClient('https://example.com/registry/index.json');
+    const components = await client.getComponents('react');
+
+    expect(components.length).toBeGreaterThan(0);
+    expect(components.find(c => c.name === 'use-video-frame')).toBeDefined();
+  });
 });

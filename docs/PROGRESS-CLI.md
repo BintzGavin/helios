@@ -2,6 +2,18 @@
 
 This file tracks progress for the CLI domain (`packages/cli`).
 
+## CLI v0.28.2
+
+- ✅ Registry Filtering - Verified `RegistryClient` cross-framework component sharing logic and consolidated test files.
+
+## CLI v0.28.1
+
+- ✅ Verify Components Command - Verified implementation of enhanced `helios components` command with search queries and framework filtering, confirming functionality matches documentation.
+
+## CLI v0.28.0
+
+- ✅ Enhance Components Command - Updated `helios components` to support search queries and framework/all filtering, displaying component descriptions in the output.
+
 ## CLI v0.27.0
 
 - ✅ Remote Registry Hydration - Updated `RegistryClient` to support fetching lightweight `index.json` and hydrating file contents on demand, improving performance and enabling Shadcn-style registries.
