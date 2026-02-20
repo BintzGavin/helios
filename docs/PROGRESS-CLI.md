@@ -2,6 +2,10 @@
 
 This file tracks progress for the CLI domain (`packages/cli`).
 
+## CLI v0.29.0
+
+- ✅ Deploy Command - Implemented `helios deploy setup` to scaffold Docker files and updated `helios render` to support environment variables for browser args.
+
 ## CLI v0.28.2
 
 - ✅ Registry Filtering - Verified `RegistryClient` cross-framework component sharing logic and consolidated test files.

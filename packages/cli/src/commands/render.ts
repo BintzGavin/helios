@@ -62,6 +62,15 @@ export function registerRenderCommand(program: Command) {
           throw new Error('concurrency must be a valid number');
         }
 
+        // Parse browser args from environment variable
+        const browserArgs = process.env.HELIOS_BROWSER_ARGS
+          ? process.env.HELIOS_BROWSER_ARGS.split(' ')
+          : undefined;
+
+        if (browserArgs) {
+          console.log(`Using custom browser arguments: ${browserArgs.join(' ')}`);
+        }
+
         if (options.emitJob) {
           const fps = parseInt(options.fps, 10);
           const duration = parseInt(options.duration, 10);
@@ -83,6 +92,7 @@ export function registerRenderCommand(program: Command) {
             videoCodec: options.videoCodec,
             browserConfig: {
               headless: options.headless,
+              args: browserArgs,
             },
           };
 
@@ -159,6 +169,7 @@ export function registerRenderCommand(program: Command) {
           videoCodec: options.videoCodec,
           browserConfig: {
             headless: options.headless, // 'no-headless' sets this to false
+            args: browserArgs,
           },
         };
 

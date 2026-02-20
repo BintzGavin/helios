@@ -7,7 +7,7 @@ The Helios CLI is built using `commander` and serves as the primary interface fo
 - Component management (`add`, `remove`, `update`, `components`, `diff`)
 - Development server (`studio`)
 - Rendering (`render`, `job`, `merge`)
-- Deployment (`build`, `preview`)
+- Deployment (`build`, `preview`, `deploy`)
 
 Commands are registered in `src/index.ts` and implemented in individual files within `src/commands/`.
 
@@ -19,9 +19,12 @@ packages/cli/
 │   └── helios.js           # Entry point
 ├── src/
 │   ├── commands/
+│   │   ├── __tests__/
+│   │   │   └── deploy.test.ts # Deploy command tests
 │   │   ├── add.ts          # Adds components
 │   │   ├── build.ts        # Builds for production
 │   │   ├── components.ts   # Lists registry components
+│   │   ├── deploy.ts       # Deployment scaffolding
 │   │   ├── diff.ts         # Diffs components
 │   │   ├── init.ts         # Initializes project
 │   │   ├── job.ts          # Manages render jobs
@@ -40,6 +43,7 @@ packages/cli/
 │   │   ├── manifest.ts     # Local registry manifest
 │   │   └── types.ts        # Registry types
 │   ├── templates/          # Project templates
+│   │   └── docker.ts       # Docker templates
 │   ├── types/              # Shared types
 │   └── utils/
 │       ├── config.test.ts  # Config tests
@@ -76,6 +80,7 @@ packages/cli/
 - `helios build`: Build the project for production.
 - `helios preview`: Preview the production build.
 - `helios skills install`: Install agent skills.
+- `helios deploy setup`: Scaffold deployment configurations (Docker).
 
 ## D. Configuration
 

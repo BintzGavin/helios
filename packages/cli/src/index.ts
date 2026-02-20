@@ -13,6 +13,7 @@ import { registerPreviewCommand } from './commands/preview.js';
 import { registerJobCommand } from './commands/job.js';
 import { registerSkillsCommand } from './commands/skills.js';
 import { registerDiffCommand } from './commands/diff.js';
+import { registerDeployCommand } from './commands/deploy.js';
 
 const program = new Command();
 
@@ -35,5 +36,6 @@ registerPreviewCommand(program);
 registerJobCommand(program);
 registerSkillsCommand(program);
 registerDiffCommand(program);
+registerDeployCommand(program);
 
 program.parse(process.argv);
