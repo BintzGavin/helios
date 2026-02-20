@@ -52,7 +52,7 @@ Critical learnings only. This is not a log—only add entries for insights that 
 
 ## [0.12.0] - Registry Lifecycle Gap
 **Learning:** While `helios add` and `helios list` existed, the CLI lacked a `helios remove` command, leading to potential state drift between `helios.config.json` and the file system. Users had to manually edit config files to unregister components.
-**Action:** When implementing CRUD workflows (like Registry management), always ensure the full lifecycle (Create, Read, Update, Delete) is supported to prevent orphaned state.
+**Action:** When implementing CRUD workflows (like Registry management), always implement the full lifecycle (Create, Read, Update, Delete) to prevent orphaned state.
 
 ## [0.15.0] - Distributed Orchestration Decoupling
 **Learning:** The "Distributed Rendering" vision requires a separation of "Planning" (job splitting) and "Execution" (rendering). The `RenderOrchestrator` in `packages/renderer` tightly couples them (calculating chunks and immediately spawning workers). This blocks external/cloud orchestration.
@@ -93,3 +93,7 @@ Critical learnings only. This is not a log—only add entries for insights that 
 ## [0.28.0] - Status Drift
 **Learning:** `docs/status/CLI.md` claimed v0.28.0 features ("Enhance Components Command") were implemented, but the code was missing and `package.json` was v0.27.0.
 **Action:** When status files claim features, verify the code (`src/` and `package.json`) before assuming they exist. Status files are not truth; code is truth.
+
+## [0.28.3] - Role Constraints
+**Learning:** The Planner role is strictly limited to creating Markdown specifications in `/.sys/plans/` and must never modify source code. Attempting to implement the plan directly violates the role's constraints and leads to task failure.
+**Action:** Always verify the "IDENTITY" and "Boundaries" sections of the prompt before starting work. If assigned as a Planner, produce only the plan file.
