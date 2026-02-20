@@ -1,4 +1,4 @@
-**Version**: 0.113.0
+**Version**: 0.113.1
 
 **Posture**: ACTIVELY EXPANDING FOR V2
 
@@ -9,8 +9,8 @@
 **Focus**: UI Implementation & CLI
 
 ## Recent Updates
+- [v0.113.1] ✅ Completed: CLI Init Examples Fix - Replaced `degit` with `giget` in `helios init --example` to ensure reliable template downloading and added comprehensive tests.
 - [v0.113.0] ✅ Completed: CLI Components Command Enhanced - Verified implementation of `helios components` command with comprehensive unit tests and updated Studio documentation.
-- [v0.112.0] ✅ Completed: CLI Registry Filtering - Updated `RegistryClient` to support cross-framework component sharing by allowing `vanilla` components to be discovered and installed in framework-specific projects.
 - [v0.111.0] ✅ Completed: CLI Registry Auth - Enabled authentication for private component registries via environment variable `HELIOS_REGISTRY_TOKEN`.
 - [v0.110.0] ✅ Completed: Distributed Rendering Example - Created `examples/distributed-rendering` demonstrating the workflow for generating and executing distributed render jobs.
 - [v0.109.0] ✅ Verified: CLI Diff Command - Verified implementation of `helios diff` command and updated documentation in Studio README.

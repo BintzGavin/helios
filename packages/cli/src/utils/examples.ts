@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import degit from 'degit';
+import { downloadTemplate } from 'giget';
 import chalk from 'chalk';
 
 export async function fetchExamples(repoPath: string = 'BintzGavin/helios/examples'): Promise<string[]> {
@@ -41,15 +41,22 @@ export async function fetchExamples(repoPath: string = 'BintzGavin/helios/exampl
 export async function downloadExample(name: string, targetDir: string, repoBase: string = 'BintzGavin/helios/examples'): Promise<void> {
   // Ensure no double slashes if repoBase ends with /
   const base = repoBase.endsWith('/') ? repoBase.slice(0, -1) : repoBase;
-  const src = `${base}/${name}`;
 
-  const emitter = degit(src, {
-    cache: false,
-    force: true,
-    verbose: false,
-  });
+  // Construct giget source string
+  // giget expects input like "github:owner/repo/subdir" or "owner/repo/subdir" (defaults to github)
+  let source = `${base}/${name}`;
+  if (!source.includes(':')) {
+    source = `github:${source}`;
+  }
 
-  await emitter.clone(targetDir);
+  try {
+    await downloadTemplate(source, {
+      dir: targetDir,
+      force: true,
+    });
+  } catch (error) {
+    throw new Error(`Failed to download example '${name}' from '${source}': ${(error as Error).message}`);
+  }
 }
 
 export function transformProject(targetDir: string) {

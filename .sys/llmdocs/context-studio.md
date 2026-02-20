@@ -39,6 +39,7 @@ packages/studio/
 The Studio is launched via the `helios` CLI (from `@helios-project/cli`).
 
 - `helios studio [dir]`: Opens the Studio UI for the specified directory (defaults to CWD).
+- `helios init --example [name]`: Scaffolds a project from an example repository using `giget` (replacing `degit`).
 - `helios build`: Builds a production-ready player harness.
 - `helios preview`: Serves the production build locally.
 - `helios remove`: Removes a component from the project configuration and deletes associated files (interactive).
@@ -63,8 +64,9 @@ The Studio is launched via the `helios` CLI (from `@helios-project/cli`).
 - **Renderer**: Uses `RenderOrchestrator` for planning and executing renders.
 - **CLI**: The Studio backend exposes endpoints that the CLI can leverage (e.g., for `helios render` with HMR support, though currently CLI uses Renderer directly).
 
-## F. Recent Changes (v0.112.0)
+## F. Recent Changes (v0.113.1)
+- **Completed: CLI Init Examples Fix**: Replaced `degit` with `giget` in `helios init --example` to ensure reliable template downloading and added comprehensive tests.
+- **Completed: CLI Components Command Enhanced**: Verified implementation of `helios components` command with comprehensive unit tests and updated Studio documentation.
 - **Completed: CLI Registry Filtering**: Updated `RegistryClient` to support cross-framework component sharing by allowing `vanilla` components to be discovered and installed in framework-specific projects.
 - **Completed: CLI Registry Auth**: Enabled authentication for private component registries via environment variable `HELIOS_REGISTRY_TOKEN`.
 - **Completed: Distributed Rendering Example**: Created `examples/distributed-rendering` demonstrating the workflow for generating and executing distributed render jobs.
-- **Verified: CLI Diff Command**: Verified implementation of `helios diff` command and updated documentation in Studio README.
