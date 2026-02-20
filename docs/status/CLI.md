@@ -1,6 +1,6 @@
 # CLI Status
 
-**Version**: 0.28.3
+**Version**: 0.29.0
 
 ## Current State
 
@@ -27,6 +27,7 @@ The Helios CLI (`packages/cli`) provides the command-line interface for the Heli
 - `helios skills` - Manages AI agent skills installation
 - `helios preview` - Previews the production build locally
 - `helios diff` - Compares local component code with the registry version
+- `helios deploy` - Scaffolds deployment configurations (e.g., Docker)
 
 ## V2 Roadmap
 
@@ -82,3 +83,4 @@ Per AGENTS.md, the CLI is "ACTIVELY EXPANDING FOR V2" with focus on:
 [v0.28.1] ✅ Verify Components Command - Verified implementation of enhanced `helios components` command with search queries and framework filtering, confirming functionality matches documentation.
 [v0.28.2] ✅ Registry Filtering - Verified `RegistryClient` cross-framework component sharing logic and consolidated test files.
 [v0.28.3] ✅ Init Examples Fix - Replaced `degit` with `giget` in `helios init --example` to ensure reliable template downloading.
+[v0.29.0] ✅ Deploy Command - Implemented `helios deploy setup` to scaffold Docker files and updated `helios render` to support environment variables for browser args.
