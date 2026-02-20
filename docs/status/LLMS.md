@@ -1,11 +1,12 @@
 # Status: LLMS
 
-**Version**: 1.22.0
+**Version**: 1.22.1
 
 - **Status**: Active
 - **Current Focus**: Comprehensive Review and Maintenance
 - **Last Updated**: 2026-02-23
 
+[v1.22.1] ✅ Completed: Comprehensive Daily Review - Aligned llms.txt versions with actual package.json files (Studio v0.107.1, Renderer v1.78.0, CLI v0.28.2). Verified features (Registry Filtering, WebCodecs Preference) are present despite version lag.
 [v1.22.0] ✅ Completed: Comprehensive Daily Review - Updated Quick Facts versions (Studio v0.112.0+, Player v0.76.6+, Renderer v1.80.0+, CLI v0.28.1+). Corrected Core API example audio track metadata. Updated Roadmap with recent features (Registry Filtering, Components Search, Dynamic Audio Metering, WebCodecs Preference).
 [v1.21.1] ✅ Completed: Comprehensive Daily Review - Aligned llms.txt versions with package.json artifacts (Studio v0.107.1+, Player v0.76.4+, Renderer v1.78.0+). Expanded CLI command list.
 [v1.21.0] ✅ Completed: Comprehensive Daily Review - Updated Quick Facts versions (Core v5.13.0+, Studio v0.111.0+, Player v0.76.6+, Renderer v1.80.0+, CLI v0.27.0+). Updated CLI description with new commands (diff, preview, skills). Moved recent feature completions to V1.x Roadmap (Registry Auth, Portable Job Paths, Distributed Rendering Example, Generic Input Props, etc.).

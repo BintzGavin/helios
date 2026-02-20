@@ -1,5 +1,12 @@
 # LLMS Progress
 
+## LLMS v1.22.1
+- ✅ Completed: Daily llms.txt Review
+  - Updated Quick Facts: Studio v0.107.1+, Renderer v1.78.0+, CLI v0.28.2+.
+  - Aligned versions with actual `package.json` artifacts to ensure accuracy.
+  - Verified features (Registry Filtering, WebCodecs Preference) are present in the codebase despite version lag.
+  - Updated Roadmap version headers to match Quick Facts.
+
 ## LLMS v1.22.0
 - ✅ Completed: Daily llms.txt Review
   - Updated Quick Facts: Studio v0.112.0+, Player v0.76.6+, Renderer v1.80.0+, CLI v0.28.1+.
