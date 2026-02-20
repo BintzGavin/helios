@@ -1,3 +1,15 @@
+## STUDIO v0.113.1
+- ✅ Completed: CLI Init Examples Fix - Replaced `degit` with `giget` in `helios init --example` to ensure reliable template downloading and added comprehensive tests.
+
+## STUDIO v0.113.0
+- ✅ Completed: CLI Components Command Enhanced - Verified implementation of `helios components` command with comprehensive unit tests and updated Studio documentation.
+
+## STUDIO v0.112.0
+- ✅ Completed: CLI Registry Filtering - Updated `RegistryClient` to support cross-framework component sharing by allowing `vanilla` components to be discovered and installed in framework-specific projects.
+
+## STUDIO v0.111.0
+- ✅ Completed: CLI Registry Auth - Enabled authentication for private component registries via environment variable `HELIOS_REGISTRY_TOKEN`.
+
 ## STUDIO v0.110.0
 - ✅ Completed: Distributed Rendering Example - Created `examples/distributed-rendering` demonstrating the workflow for generating and executing distributed render jobs.
 

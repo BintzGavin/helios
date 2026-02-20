@@ -1,6 +1,6 @@
 # CLI Status
 
-**Version**: 0.28.2
+**Version**: 0.28.3
 
 ## Current State
 
@@ -81,3 +81,4 @@ Per AGENTS.md, the CLI is "ACTIVELY EXPANDING FOR V2" with focus on:
 [v0.28.0] ✅ Enhance Components Command - Updated `helios components` to support search queries and framework/all filtering, displaying component descriptions in the output.
 [v0.28.1] ✅ Verify Components Command - Verified implementation of enhanced `helios components` command with search queries and framework filtering, confirming functionality matches documentation.
 [v0.28.2] ✅ Registry Filtering - Verified `RegistryClient` cross-framework component sharing logic and consolidated test files.
+[v0.28.3] ✅ Init Examples Fix - Replaced `degit` with `giget` in `helios init --example` to ensure reliable template downloading.
