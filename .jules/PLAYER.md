@@ -37,3 +37,7 @@
 ## [v0.76.6] - Comprehensive Asset Discovery
 **Learning:** `getAudioAssets` only scanned for `<audio>` elements, causing `<video>` audio to be missing from client-side export and audio controls. This gap persisted despite previous partial fixes.
 **Action:** When implementing asset discovery for media features, always include both `audio` and `video` tags unless explicitly restricted.
+
+## [v0.76.7] - Accessibility Gap
+**Learning:** Custom UI components (Overlays, Modals) often miss basic accessibility features like focus management (trap/restore) and ARIA live regions, making them unusable for keyboard/screen-reader users despite having semantic HTML.
+**Action:** When implementing or reviewing custom UI components, always verify focus flow (Tab key) and screen reader announcements (ARIA) as part of the "UI controls" vision.
