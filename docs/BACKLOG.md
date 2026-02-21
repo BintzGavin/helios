@@ -11,7 +11,8 @@ This backlog tracks concrete deliverables derived from [`AGENTS.md`](../AGENTS.m
 - [x] Support frame range rendering in CLI.
 - [x] Implement output stitching without re-encoding (verify `concat` demuxer workflow).
 - [x] Implement RenderExecutor abstraction for pluggable execution.
-- [ ] Cloud execution adapter (AWS Lambda / Google Cloud Run).
+- [x] Cloud execution adapter (Google Cloud Run).
+- [ ] Cloud execution adapter (AWS Lambda).
 
 
 ## Component Registry

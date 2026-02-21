@@ -5,6 +5,7 @@ import fs from 'fs';
 import path from 'path';
 import prompts from 'prompts';
 import { DOCKERFILE_TEMPLATE, DOCKER_COMPOSE_TEMPLATE } from '../../templates/docker.js';
+import { CLOUD_RUN_JOB_TEMPLATE, README_GCP_TEMPLATE } from '../../templates/gcp.js';
 
 // Mock fs and prompts
 vi.mock('fs');
@@ -30,88 +31,160 @@ describe('deploy command', () => {
     exitSpy.mockRestore();
   });
 
-  it('should create files when they do not exist', async () => {
-    // Mock fs.existsSync to return false (files don't exist)
-    vi.mocked(fs.existsSync).mockReturnValue(false);
+  describe('setup subcommand', () => {
+    it('should create files when they do not exist', async () => {
+      // Mock fs.existsSync to return false (files don't exist)
+      vi.mocked(fs.existsSync).mockReturnValue(false);
 
-    // Mock fs.writeFileSync
-    vi.mocked(fs.writeFileSync).mockImplementation(() => {});
+      // Mock fs.writeFileSync
+      vi.mocked(fs.writeFileSync).mockImplementation(() => {});
 
-    // Run command
-    await program.parseAsync(['node', 'test', 'deploy', 'setup']);
+      // Run command
+      await program.parseAsync(['node', 'test', 'deploy', 'setup']);
 
-    // Check if files were created
-    expect(fs.writeFileSync).toHaveBeenCalledWith(
-      expect.stringContaining('Dockerfile'),
-      DOCKERFILE_TEMPLATE
-    );
-    expect(fs.writeFileSync).toHaveBeenCalledWith(
-      expect.stringContaining('docker-compose.yml'),
-      DOCKER_COMPOSE_TEMPLATE
-    );
+      // Check if files were created
+      expect(fs.writeFileSync).toHaveBeenCalledWith(
+        expect.stringContaining('Dockerfile'),
+        DOCKERFILE_TEMPLATE
+      );
+      expect(fs.writeFileSync).toHaveBeenCalledWith(
+        expect.stringContaining('docker-compose.yml'),
+        DOCKER_COMPOSE_TEMPLATE
+      );
+    });
+
+    it('should prompt if files exist and overwrite if confirmed', async () => {
+      // Mock fs.existsSync to return true
+      vi.mocked(fs.existsSync).mockReturnValue(true);
+
+      // Mock prompts to return true
+      vi.mocked(prompts).mockResolvedValue({ value: true });
+
+      // Mock fs.writeFileSync
+      vi.mocked(fs.writeFileSync).mockImplementation(() => {});
+
+      // Run command
+      await program.parseAsync(['node', 'test', 'deploy', 'setup']);
+
+      // Check prompts
+      expect(prompts).toHaveBeenCalledTimes(2);
+
+      // Check if files were overwritten
+      expect(fs.writeFileSync).toHaveBeenCalledWith(
+        expect.stringContaining('Dockerfile'),
+        DOCKERFILE_TEMPLATE
+      );
+      expect(fs.writeFileSync).toHaveBeenCalledWith(
+        expect.stringContaining('docker-compose.yml'),
+        DOCKER_COMPOSE_TEMPLATE
+      );
+    });
+
+    it('should prompt if files exist and NOT overwrite if declined', async () => {
+      // Mock fs.existsSync to return true
+      vi.mocked(fs.existsSync).mockReturnValue(true);
+
+      // Mock prompts to return false
+      vi.mocked(prompts).mockResolvedValue({ value: false });
+
+      // Mock fs.writeFileSync
+      vi.mocked(fs.writeFileSync).mockImplementation(() => {});
+
+      // Run command
+      await program.parseAsync(['node', 'test', 'deploy', 'setup']);
+
+      // Check prompts
+      expect(prompts).toHaveBeenCalledTimes(2);
+
+      // Check if files were NOT overwritten
+      expect(fs.writeFileSync).not.toHaveBeenCalled();
+    });
+
+    it('should handle cancellation (undefined value)', async () => {
+       // Mock fs.existsSync to return true
+      vi.mocked(fs.existsSync).mockReturnValue(true);
+
+      // Mock prompts to return undefined value (cancelled)
+      vi.mocked(prompts).mockResolvedValue({});
+
+      // Run command
+      await program.parseAsync(['node', 'test', 'deploy', 'setup']);
+
+      // Check if process.exit was called
+      expect(exitSpy).toHaveBeenCalledWith(0);
+
+      // Ensure no files written
+      expect(fs.writeFileSync).not.toHaveBeenCalled();
+    });
   });
 
-  it('should prompt if files exist and overwrite if confirmed', async () => {
-    // Mock fs.existsSync to return true
-    vi.mocked(fs.existsSync).mockReturnValue(true);
+  describe('gcp subcommand', () => {
+    it('should create GCP files when they do not exist', async () => {
+      // Mock fs.existsSync to return false
+      vi.mocked(fs.existsSync).mockReturnValue(false);
 
-    // Mock prompts to return true
-    vi.mocked(prompts).mockResolvedValue({ value: true });
+      // Mock fs.writeFileSync
+      vi.mocked(fs.writeFileSync).mockImplementation(() => {});
 
-    // Mock fs.writeFileSync
-    vi.mocked(fs.writeFileSync).mockImplementation(() => {});
+      // Run command
+      await program.parseAsync(['node', 'test', 'deploy', 'gcp']);
 
-    // Run command
-    await program.parseAsync(['node', 'test', 'deploy', 'setup']);
+      // Check if files were created
+      expect(fs.writeFileSync).toHaveBeenCalledWith(
+        expect.stringContaining('cloud-run-job.yaml'),
+        CLOUD_RUN_JOB_TEMPLATE
+      );
+      expect(fs.writeFileSync).toHaveBeenCalledWith(
+        expect.stringContaining('README-GCP.md'),
+        README_GCP_TEMPLATE
+      );
+    });
 
-    // Check prompts
-    expect(prompts).toHaveBeenCalledTimes(2);
+    it('should prompt if files exist and overwrite if confirmed', async () => {
+      // Mock fs.existsSync to return true
+      vi.mocked(fs.existsSync).mockReturnValue(true);
 
-    // Check if files were overwritten
-    expect(fs.writeFileSync).toHaveBeenCalledWith(
-      expect.stringContaining('Dockerfile'),
-      DOCKERFILE_TEMPLATE
-    );
-    expect(fs.writeFileSync).toHaveBeenCalledWith(
-      expect.stringContaining('docker-compose.yml'),
-      DOCKER_COMPOSE_TEMPLATE
-    );
-  });
+      // Mock prompts to return true
+      vi.mocked(prompts).mockResolvedValue({ value: true });
 
-  it('should prompt if files exist and NOT overwrite if declined', async () => {
-    // Mock fs.existsSync to return true
-    vi.mocked(fs.existsSync).mockReturnValue(true);
+      // Mock fs.writeFileSync
+      vi.mocked(fs.writeFileSync).mockImplementation(() => {});
 
-    // Mock prompts to return false
-    vi.mocked(prompts).mockResolvedValue({ value: false });
+      // Run command
+      await program.parseAsync(['node', 'test', 'deploy', 'gcp']);
 
-    // Mock fs.writeFileSync
-    vi.mocked(fs.writeFileSync).mockImplementation(() => {});
+      // Check prompts
+      expect(prompts).toHaveBeenCalledTimes(2);
 
-    // Run command
-    await program.parseAsync(['node', 'test', 'deploy', 'setup']);
+      // Check if files were overwritten
+      expect(fs.writeFileSync).toHaveBeenCalledWith(
+        expect.stringContaining('cloud-run-job.yaml'),
+        CLOUD_RUN_JOB_TEMPLATE
+      );
+      expect(fs.writeFileSync).toHaveBeenCalledWith(
+        expect.stringContaining('README-GCP.md'),
+        README_GCP_TEMPLATE
+      );
+    });
 
-    // Check prompts
-    expect(prompts).toHaveBeenCalledTimes(2);
+    it('should prompt if files exist and NOT overwrite if declined', async () => {
+      // Mock fs.existsSync to return true
+      vi.mocked(fs.existsSync).mockReturnValue(true);
 
-    // Check if files were NOT overwritten
-    expect(fs.writeFileSync).not.toHaveBeenCalled();
-  });
+      // Mock prompts to return false
+      vi.mocked(prompts).mockResolvedValue({ value: false });
 
-  it('should handle cancellation (undefined value)', async () => {
-     // Mock fs.existsSync to return true
-    vi.mocked(fs.existsSync).mockReturnValue(true);
+      // Mock fs.writeFileSync
+      vi.mocked(fs.writeFileSync).mockImplementation(() => {});
 
-    // Mock prompts to return undefined value (cancelled)
-    vi.mocked(prompts).mockResolvedValue({});
+      // Run command
+      await program.parseAsync(['node', 'test', 'deploy', 'gcp']);
 
-    // Run command
-    await program.parseAsync(['node', 'test', 'deploy', 'setup']);
+      // Check prompts
+      expect(prompts).toHaveBeenCalledTimes(2);
 
-    // Check if process.exit was called
-    expect(exitSpy).toHaveBeenCalledWith(0);
-
-    // Ensure no files written
-    expect(fs.writeFileSync).not.toHaveBeenCalled();
+      // Check if files were NOT overwritten
+      expect(fs.writeFileSync).not.toHaveBeenCalled();
+    });
   });
 });

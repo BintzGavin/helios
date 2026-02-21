@@ -2,6 +2,10 @@
 
 This file tracks progress for the CLI domain (`packages/cli`).
 
+## CLI v0.30.0
+
+- ✅ Deploy GCP Command - Implemented `helios deploy gcp` to scaffold Google Cloud Run Job configuration and documentation.
+
 ## CLI v0.29.0
 
 - ✅ Deploy Command - Implemented `helios deploy setup` to scaffold Docker files and updated `helios render` to support environment variables for browser args.
