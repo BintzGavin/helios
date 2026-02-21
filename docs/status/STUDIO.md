@@ -1,4 +1,4 @@
-**Version**: 0.113.1
+**Version**: 0.114.0
 
 **Posture**: ACTIVELY EXPANDING FOR V2
 
@@ -9,6 +9,7 @@
 **Focus**: UI Implementation & CLI
 
 ## Recent Updates
+- [v0.114.0] ✅ Verified: Registry Filtering Support - Confirmed that Studio supports cross-framework component discovery (e.g., vanilla components in React projects) via updated CLI logic.
 - [v0.113.1] ✅ Completed: CLI Init Examples Fix - Replaced `degit` with `giget` in `helios init --example` to ensure reliable template downloading and added comprehensive tests.
 - [v0.113.0] ✅ Completed: CLI Components Command Enhanced - Verified implementation of `helios components` command with comprehensive unit tests and updated Studio documentation.
 - [v0.111.0] ✅ Completed: CLI Registry Auth - Enabled authentication for private component registries via environment variable `HELIOS_REGISTRY_TOKEN`.

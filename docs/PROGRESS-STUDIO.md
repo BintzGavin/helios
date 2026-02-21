@@ -1,3 +1,6 @@
+## STUDIO v0.114.0
+- ✅ Verified: Registry Filtering Support - Confirmed that Studio supports cross-framework component discovery (e.g., vanilla components in React projects) via updated CLI logic.
+
 ## STUDIO v0.113.1
 - ✅ Completed: CLI Init Examples Fix - Replaced `degit` with `giget` in `helios init --example` to ensure reliable template downloading and added comprehensive tests.
 
