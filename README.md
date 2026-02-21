@@ -76,8 +76,7 @@ Paste this into an existing repo (preferably your marketing site):
 ```bash
 npx skills add BintzGavin/helios-skills
 ```
-
-Then follow the skills instructions and generate one video of each guided type.
+Then tell your agent to "follow the skills instructions and generate one video of each guided type."
 
 ---
 
