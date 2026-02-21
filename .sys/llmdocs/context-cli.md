@@ -43,7 +43,8 @@ packages/cli/
 │   │   ├── manifest.ts     # Local registry manifest
 │   │   └── types.ts        # Registry types
 │   ├── templates/          # Project templates
-│   │   └── docker.ts       # Docker templates
+│   │   ├── docker.ts       # Docker templates
+│   │   └── gcp.ts          # GCP templates
 │   ├── types/              # Shared types
 │   └── utils/
 │       ├── config.test.ts  # Config tests
@@ -81,6 +82,7 @@ packages/cli/
 - `helios preview`: Preview the production build.
 - `helios skills install`: Install agent skills.
 - `helios deploy setup`: Scaffold deployment configurations (Docker).
+- `helios deploy gcp`: Scaffold Google Cloud Run Job configuration.
 
 ## D. Configuration
 
