@@ -59,6 +59,28 @@ https://github.com/user-attachments/assets/89ee2a20-77c5-4440-ad68-9f9180d969bd
 
 ---
 
+## ⚡️ Recommended Quickstart: Helios Skills
+
+**The fastest way to get started.** With one prompt into OpenCode, Cursor, Antigravity, or Claude, you can generate 6 professional video types:
+
+**1 prompt →**
+• Launch announcement
+• Promo
+• Explainer
+• Product demo
+• Testimonial
+• Social cut
+
+Paste this into an existing repo (preferably your marketing site):
+
+```bash
+npx skills add BintzGavin/helios-skills
+```
+
+Then follow the skills instructions and generate one video of each guided type.
+
+---
+
 ## Quick Start
 
 ### Installation
