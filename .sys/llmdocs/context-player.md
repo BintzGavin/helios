@@ -70,7 +70,14 @@ The `<helios-player>` observes the following attributes:
 - `sandbox`: Configures iframe sandbox flags (default: `allow-scripts allow-same-origin`).
 - `controlslist`: Allows hiding specific controls (`nodownload`, `nofullscreen`).
 - `disablepictureinpicture`: Boolean attribute to disable the PiP button.
+- `interactive`: Boolean attribute to enable interactive mode (prevents click-to-pause).
 - `input-props`: JSON string of properties to pass to the composition.
+
+### Media Session Attributes
+- `media-title`: Title of the media for OS integration.
+- `media-artist`: Artist of the media for OS integration.
+- `media-album`: Album of the media for OS integration.
+- `media-artwork`: URL of the artwork for OS integration.
 
 ### Export Attributes
 - `export-mode`: Controls export behavior (`auto`, `canvas`, `dom`).

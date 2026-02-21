@@ -13,6 +13,9 @@ Each agent should update **their own dedicated progress file** instead of this f
 - **STUDIO**: Update `docs/PROGRESS-STUDIO.md`
 - **SKILLS**: Update `docs/PROGRESS-SKILLS.md`
 
+### PLAYER v0.76.8
+- ✅ Verified: Bridge Capture Resizing - Added specific unit tests for handleCaptureFrame in bridge.ts to verify resizing logic and error handling, complementing existing DirectController tests.
+
 ### PLAYER v0.76.7
 - ✅ Verified: Integrity Check - Ran full test suite (321 tests passed) and manually confirmed CaptureFrame resizing implementation in controllers.ts and bridge.ts matches the plan.
 
