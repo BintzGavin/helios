@@ -1,5 +1,14 @@
 # LLMS Progress
 
+## LLMS v1.22.2
+- ✅ Completed: Daily llms.txt Review
+  - Updated Quick Facts: CLI v0.28.3+, Player v0.76.7+.
+  - Updated Packages: Added `deploy` command to `@helios-project/cli` description.
+  - Updated Roadmap:
+    - CLI: Added "Deploy Command", "Verify Components".
+    - Player: Added "Integrity Check", "Fix CaptureFrame Resizing".
+  - Verified features against codebase (deploy command presence confirmed).
+
 ## LLMS v1.22.1
 - ✅ Completed: Daily llms.txt Review
   - Updated Quick Facts: Studio v0.107.1+, Renderer v1.78.0+, CLI v0.28.2+.

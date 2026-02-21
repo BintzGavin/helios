@@ -6,7 +6,7 @@ Helios is a modern engine for creating videos programmatically using standard we
 
 ## Quick Facts
 - **License**: Elastic License 2.0 (free commercial use, no SaaS resale)
-- **Status**: Beta / Self-Driving (Core: Stable v5.13.0+, Studio: Alpha v0.107.1+, Player: v0.76.6+, Renderer: v1.78.0+, CLI: Beta v0.28.2+)
+- **Status**: Beta / Self-Driving (Core: Stable v5.13.0+, Studio: Alpha v0.107.1+, Player: v0.76.7+, Renderer: v1.78.0+, CLI: Beta v0.28.3+)
 - **Frameworks**: React, Vue, Svelte, Solid, vanilla JS
 - **Animation**: Standard CSS, Web Animations API (WAAPI), any animation library
 
@@ -41,7 +41,7 @@ helios.play();
 - `@helios-project/player` - Web Component player (`<helios-player>`)
 - `@helios-project/renderer` - Server-side rendering (Playwright, FFmpeg)
 - `@helios-project/studio` - Browser-based development environment (Alpha)
-- `@helios-project/cli` - Command-line interface (init, add, components, list, remove, update, build, preview, job, skills, merge, diff, studio, render)
+- `@helios-project/cli` - Command-line interface (init, add, components, list, remove, update, build, preview, job, skills, merge, diff, deploy, studio, render)
 
 ## Animation Approach
 Helios uses native browser APIs, not proprietary hooks:
@@ -113,9 +113,9 @@ const report = await Helios.diagnose();
 ## Roadmap
 ### V1.x (Active)
 - **Studio**: v0.107.1+ (Registry Filtering, Registry Auth, Distributed Rendering Example, Diff Command Support, Portable Job Paths, MCP Resources & Tools)
-- **CLI**: v0.28.2+ (Components Search, Registry Auth, Remote Registry Hydration, Diff Command, Interactive Remove, Recursive Dependencies)
+- **CLI**: v0.28.3+ (Deploy Command, Verify Components, Components Search, Registry Auth, Remote Registry Hydration, Diff Command)
 - **Core**: v5.13.0+ (Generic Input Props, Active Clips, Input Schema, Headless Audio)
-- **Player**: v0.76.6+ (Standard Event Handlers, Dynamic Audio Metering, Export API, Export Menu, SVG Icons)
+- **Player**: v0.76.7+ (Integrity Check, Fix CaptureFrame Resizing, Standard Event Handlers, Dynamic Audio Metering, Export API)
 - **Renderer**: v1.78.0+ (WebCodecs Preference, Orchestrator Plan, HW Accel Validation, Distributed Progress)
 
 ### AI Integration
