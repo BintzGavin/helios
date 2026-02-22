@@ -12,7 +12,7 @@ This backlog tracks concrete deliverables derived from [`AGENTS.md`](../AGENTS.m
 - [x] Implement output stitching without re-encoding (verify `concat` demuxer workflow).
 - [x] Implement RenderExecutor abstraction for pluggable execution.
 - [x] Cloud execution adapter (Google Cloud Run).
-- [ ] Cloud execution adapter (AWS Lambda).
+- [x] Cloud execution adapter (AWS Lambda).
 
 
 ## Component Registry

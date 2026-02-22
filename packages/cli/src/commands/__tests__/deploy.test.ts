@@ -6,6 +6,7 @@ import path from 'path';
 import prompts from 'prompts';
 import { DOCKERFILE_TEMPLATE, DOCKER_COMPOSE_TEMPLATE } from '../../templates/docker.js';
 import { CLOUD_RUN_JOB_TEMPLATE, README_GCP_TEMPLATE } from '../../templates/gcp.js';
+import { AWS_DOCKERFILE_TEMPLATE, AWS_LAMBDA_HANDLER_TEMPLATE, AWS_SAM_TEMPLATE, README_AWS_TEMPLATE } from '../../templates/aws.js';
 
 // Mock fs and prompts
 vi.mock('fs');
@@ -95,6 +96,92 @@ describe('deploy command', () => {
 
       // Check prompts
       expect(prompts).toHaveBeenCalledTimes(2);
+
+      // Check if files were NOT overwritten
+      expect(fs.writeFileSync).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('aws subcommand', () => {
+    it('should create AWS files when they do not exist', async () => {
+      // Mock fs.existsSync to return false
+      vi.mocked(fs.existsSync).mockReturnValue(false);
+
+      // Mock fs.writeFileSync
+      vi.mocked(fs.writeFileSync).mockImplementation(() => {});
+
+      // Run command
+      await program.parseAsync(['node', 'test', 'deploy', 'aws']);
+
+      // Check if files were created
+      expect(fs.writeFileSync).toHaveBeenCalledWith(
+        expect.stringContaining('Dockerfile'),
+        AWS_DOCKERFILE_TEMPLATE
+      );
+      expect(fs.writeFileSync).toHaveBeenCalledWith(
+        expect.stringContaining('template.yaml'),
+        AWS_SAM_TEMPLATE
+      );
+      expect(fs.writeFileSync).toHaveBeenCalledWith(
+        expect.stringContaining('lambda.js'),
+        AWS_LAMBDA_HANDLER_TEMPLATE
+      );
+      expect(fs.writeFileSync).toHaveBeenCalledWith(
+        expect.stringContaining('README-AWS.md'),
+        README_AWS_TEMPLATE
+      );
+    });
+
+    it('should prompt if files exist and overwrite if confirmed', async () => {
+      // Mock fs.existsSync to return true
+      vi.mocked(fs.existsSync).mockReturnValue(true);
+
+      // Mock prompts to return true
+      vi.mocked(prompts).mockResolvedValue({ value: true });
+
+      // Mock fs.writeFileSync
+      vi.mocked(fs.writeFileSync).mockImplementation(() => {});
+
+      // Run command
+      await program.parseAsync(['node', 'test', 'deploy', 'aws']);
+
+      // Check prompts (4 files)
+      expect(prompts).toHaveBeenCalledTimes(4);
+
+      // Check if files were overwritten
+      expect(fs.writeFileSync).toHaveBeenCalledWith(
+        expect.stringContaining('Dockerfile'),
+        AWS_DOCKERFILE_TEMPLATE
+      );
+      expect(fs.writeFileSync).toHaveBeenCalledWith(
+        expect.stringContaining('template.yaml'),
+        AWS_SAM_TEMPLATE
+      );
+      expect(fs.writeFileSync).toHaveBeenCalledWith(
+        expect.stringContaining('lambda.js'),
+        AWS_LAMBDA_HANDLER_TEMPLATE
+      );
+      expect(fs.writeFileSync).toHaveBeenCalledWith(
+        expect.stringContaining('README-AWS.md'),
+        README_AWS_TEMPLATE
+      );
+    });
+
+    it('should prompt if files exist and NOT overwrite if declined', async () => {
+      // Mock fs.existsSync to return true
+      vi.mocked(fs.existsSync).mockReturnValue(true);
+
+      // Mock prompts to return false
+      vi.mocked(prompts).mockResolvedValue({ value: false });
+
+      // Mock fs.writeFileSync
+      vi.mocked(fs.writeFileSync).mockImplementation(() => {});
+
+      // Run command
+      await program.parseAsync(['node', 'test', 'deploy', 'aws']);
+
+      // Check prompts
+      expect(prompts).toHaveBeenCalledTimes(4);
 
       // Check if files were NOT overwritten
       expect(fs.writeFileSync).not.toHaveBeenCalled();
