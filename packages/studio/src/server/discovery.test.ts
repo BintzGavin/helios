@@ -1,6 +1,6 @@
 // @vitest-environment node
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { findAssets, deleteComposition, createComposition, findCompositions, renameComposition, createDirectory } from './discovery';
+import { findAssets, deleteComposition, createComposition, findCompositions, renameComposition, createDirectory, deleteAsset } from './discovery';
 import fs from 'fs';
 import path from 'path';
 
@@ -460,6 +460,65 @@ describe('renameComposition', () => {
         });
 
         await expect(renameComposition('.', id, newName)).rejects.toThrow(/not found/);
+    });
+});
+
+describe('deleteAsset', () => {
+    const originalEnv = process.env;
+
+    beforeEach(() => {
+        vi.resetAllMocks();
+        process.env = { ...originalEnv, HELIOS_PROJECT_ROOT: path.resolve('/mock/project') };
+    });
+
+    afterEach(() => {
+        process.env = originalEnv;
+    });
+
+    it('should delete a valid asset', () => {
+        const root = path.resolve('/mock/project');
+        const assetPath = path.join(root, 'image.png');
+
+        vi.mocked(fs.existsSync).mockImplementation((p) => {
+            if (p === root) return true;
+            if (p === assetPath) return true;
+            return false;
+        });
+
+        vi.mocked(fs.rmSync).mockReturnValue(undefined);
+
+        deleteAsset('.', assetPath);
+
+        expect(fs.rmSync).toHaveBeenCalledWith(assetPath, { recursive: true, force: true });
+    });
+
+    it('should delete a directory (recursive)', () => {
+        const root = path.resolve('/mock/project');
+        const dirPath = path.join(root, 'my-folder');
+
+        vi.mocked(fs.existsSync).mockImplementation((p) => {
+            if (p === root) return true;
+            if (p === dirPath) return true;
+            return false;
+        });
+
+        deleteAsset('.', dirPath);
+
+        expect(fs.rmSync).toHaveBeenCalledWith(dirPath, { recursive: true, force: true });
+    });
+
+    it('should throw if asset not found', () => {
+        const root = path.resolve('/mock/project');
+        vi.mocked(fs.existsSync).mockImplementation((p) => p === root);
+
+        expect(() => deleteAsset('.', path.join(root, 'missing.png'))).toThrow(/not found/);
+    });
+
+    it('should throw if trying to delete outside project root', () => {
+        const root = path.resolve('/mock/project');
+        vi.mocked(fs.existsSync).mockImplementation((p) => p === root);
+
+        expect(() => deleteAsset('.', path.resolve(root, '../outside.png'))).toThrow(/Access denied/);
     });
 });
 
