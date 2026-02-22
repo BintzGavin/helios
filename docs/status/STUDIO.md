@@ -1,4 +1,4 @@
-**Version**: 0.114.0
+**Version**: 0.114.1
 
 **Posture**: ACTIVELY EXPANDING FOR V2
 
@@ -8,7 +8,10 @@
 
 **Focus**: UI Implementation & CLI
 
+> **Note**: Status versions in this file may precede package release versions (`package.json`). Always verify `package.json` for the currently installed version.
+
 ## Recent Updates
+- [v0.114.1] ✅ Verified: Regression Test - Validated Studio UI functionality via Playwright script (`scripts/verify-ui.ts`), confirming critical UI elements (Timeline, Renders Panel) load correctly.
 - [v0.114.0] ✅ Verified: Registry Filtering Support - Confirmed that Studio supports cross-framework component discovery (e.g., vanilla components in React projects) via updated CLI logic.
 - [v0.113.1] ✅ Completed: CLI Init Examples Fix - Replaced `degit` with `giget` in `helios init --example` to ensure reliable template downloading and added comprehensive tests.
 - [v0.113.0] ✅ Completed: CLI Components Command Enhanced - Verified implementation of `helios components` command with comprehensive unit tests and updated Studio documentation.

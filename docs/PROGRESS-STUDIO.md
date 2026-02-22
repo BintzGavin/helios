@@ -1,3 +1,6 @@
+## STUDIO v0.114.1
+- ✅ Verified: Regression Test - Validated Studio UI functionality via Playwright script (`scripts/verify-ui.ts`), confirming critical UI elements (Timeline, Renders Panel) load correctly.
+
 ## STUDIO v0.114.0
 - ✅ Verified: Registry Filtering Support - Confirmed that Studio supports cross-framework component discovery (e.g., vanilla components in React projects) via updated CLI logic.
 
