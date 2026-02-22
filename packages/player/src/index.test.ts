@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { HeliosPlayer } from './index';
+import { DirectController } from './controllers';
 
 // Mock ClientSideExporter
 vi.mock('./features/exporter', () => {
@@ -910,8 +911,7 @@ describe('HeliosPlayer', () => {
         mockController.getState.mockReturnValue({
             currentFrame: 0,
             duration: 10,
-            fps: 30,
-            isPlaying: false,
+            fps: 30, isPlaying: false,
             activeCaptions
         });
 
@@ -2214,6 +2214,107 @@ describe('HeliosPlayer', () => {
                 scale: 0.05
             }
         }));
+    });
+  });
+
+  describe('captureStream', () => {
+    it('should throw error if not in Direct Mode', async () => {
+        // Mock BridgeController
+        const bridgeController = {
+             instance: {}, // Not really existing on bridge controller but just in case
+             pause: vi.fn(),
+             dispose: vi.fn()
+        } as any;
+        // setController checks instanceof DirectController or BridgeController?
+        // Actually setController accepts HeliosController interface.
+        // My code checks `instanceof DirectController`.
+        // So I can just pass an object that is NOT DirectController.
+        (player as any).controller = bridgeController;
+
+        await expect(player.captureStream()).rejects.toThrow("captureStream() is only available in Direct Mode (same-origin).");
+    });
+
+    it('should return stream with video track from canvas', async () => {
+        // Mock DirectController
+        const helios = {
+            fps: { peek: () => 30 },
+            getAudioContext: vi.fn().mockResolvedValue(null),
+            availableAudioTracks: { peek: () => [] },
+            pause: vi.fn(),
+            dispose: vi.fn()
+        };
+        const directController = Object.create(DirectController.prototype);
+        directController.instance = helios;
+        (player as any).controller = directController;
+
+        // Mock Iframe Content
+        const canvas = document.createElement('canvas');
+        canvas.captureStream = vi.fn().mockReturnValue({
+            getAudioTracks: () => [],
+            getVideoTracks: () => [{ kind: 'video' }],
+            addTrack: vi.fn()
+        });
+
+        // Mock iframe access
+        const iframe = player.shadowRoot!.querySelector('iframe')!;
+        Object.defineProperty(iframe, 'contentDocument', {
+            value: {
+                querySelector: vi.fn().mockReturnValue(canvas)
+            },
+            writable: true
+        });
+
+        const stream = await player.captureStream();
+
+        expect(canvas.captureStream).toHaveBeenCalledWith(30);
+        expect(stream).toBeDefined();
+        // Since I mocked return value of captureStream, check it
+        expect(stream.getVideoTracks().length).toBe(1);
+    });
+
+    it('should connect audio tracks if available', async () => {
+        // Mock AudioContext and Nodes
+        const destNode = { stream: { getAudioTracks: () => [{ kind: 'audio' }] } };
+        const ctx = {
+            createMediaStreamDestination: vi.fn().mockReturnValue(destNode)
+        };
+        const sourceNode = { connect: vi.fn() };
+
+        const helios = {
+            fps: { peek: () => 30 },
+            getAudioContext: vi.fn().mockResolvedValue(ctx),
+            availableAudioTracks: { peek: () => [{ id: 'track1' }] },
+            getAudioSourceNode: vi.fn().mockResolvedValue(sourceNode),
+            pause: vi.fn(),
+            dispose: vi.fn()
+        };
+
+        const directController = Object.create(DirectController.prototype);
+        directController.instance = helios;
+        (player as any).controller = directController;
+
+        // Mock Canvas
+        const canvas = document.createElement('canvas');
+        const streamMock = {
+            getAudioTracks: () => [],
+            getVideoTracks: () => [{ kind: 'video' }],
+            addTrack: vi.fn()
+        };
+        canvas.captureStream = vi.fn().mockReturnValue(streamMock);
+
+        const iframe = player.shadowRoot!.querySelector('iframe')!;
+        Object.defineProperty(iframe, 'contentDocument', {
+            value: { querySelector: vi.fn().mockReturnValue(canvas) },
+            writable: true
+        });
+
+        await player.captureStream();
+
+        expect(helios.getAudioContext).toHaveBeenCalled();
+        expect(ctx.createMediaStreamDestination).toHaveBeenCalled();
+        expect(helios.getAudioSourceNode).toHaveBeenCalledWith('track1');
+        expect(sourceNode.connect).toHaveBeenCalledWith(destNode);
+        expect(streamMock.addTrack).toHaveBeenCalled();
     });
   });
 });
