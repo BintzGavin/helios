@@ -3370,6 +3370,52 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
     return this.controller.diagnose();
   }
 
+  public async captureStream(): Promise<MediaStream> {
+    if (!this.controller || !(this.controller instanceof DirectController)) {
+      throw new Error("captureStream() is only available in Direct Mode (same-origin).");
+    }
+
+    const helios = this.controller.instance;
+    const fps = helios.fps.peek();
+
+    // 1. Video Stream from Canvas
+    let canvas: HTMLCanvasElement | null = null;
+    try {
+        const doc = this.iframe.contentDocument || (this.iframe.contentWindow as any)?.document;
+        if (doc) {
+            const selector = this.getAttribute("canvas-selector") || "canvas";
+            canvas = doc.querySelector(selector);
+        }
+    } catch (e) {
+        // Access denied
+    }
+
+    if (!canvas) {
+        throw new Error("Canvas not found for captureStream().");
+    }
+
+    const stream = canvas.captureStream(fps);
+
+    // 2. Audio Stream from AudioContext
+    const ctx = await helios.getAudioContext() as AudioContext | null;
+    if (ctx) {
+        const dest = ctx.createMediaStreamDestination();
+        const tracks = helios.availableAudioTracks.peek();
+
+        for (const track of tracks) {
+             const source = await helios.getAudioSourceNode(track.id) as AudioNode | null;
+             if (source) {
+                 source.connect(dest);
+             }
+        }
+
+        const audioTracks = dest.stream.getAudioTracks();
+        audioTracks.forEach(t => stream.addTrack(t));
+    }
+
+    return stream;
+  }
+
   public startAudioMetering() {
     if (this.controller) {
       this.controller.startAudioMetering();
