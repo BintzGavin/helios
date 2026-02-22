@@ -76,7 +76,11 @@ Paste this into an existing repo (preferably your marketing site):
 ```bash
 npx skills add BintzGavin/helios-skills
 ```
-Then tell your agent to "follow the skills instructions and generate one video of each guided type."
+
+Then tell your agent this prompt:
+
+> **follow the skills instructions and generate one video of each guided type.**
+
 This tends to get the best results using Opus 4.6. I've gotten mixed results with Gemini 3.1 so far.
 
 ---
