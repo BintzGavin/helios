@@ -1,5 +1,14 @@
 # LLMS Progress
 
+## LLMS v1.23.0
+- ✅ Completed: Daily llms.txt Review
+  - Updated Roadmap:
+    - CLI: Explicitly added "Deploy Command [GCP]".
+    - Distributed Rendering: Moved Cloud Run to completed (V1.x), kept AWS Lambda in V2.
+  - Updated Comparison Table: Changed "Distributed rendering" to "Local (Beta) / Cloud (GCP)".
+  - Verified Quick Facts: Confirmed versions against package.json (Studio v0.107.1+, Player v0.76.7+, Renderer v1.78.0+, CLI v0.28.3+).
+  - Verified Core API example and file paths.
+
 ## LLMS v1.22.2
 - ✅ Completed: Daily llms.txt Review
   - Updated Quick Facts: CLI v0.28.3+, Player v0.76.7+.
