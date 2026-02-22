@@ -1,3 +1,7 @@
+## PLAYER v0.76.8
+- ✅ Completed: Sync Version - Updated package.json to match status file (0.76.8) and verified implementation with full test suite (326 tests passed).
+- ✅ Verified: Bridge Capture Resizing - Added specific unit tests for handleCaptureFrame in bridge.ts to verify resizing logic and error handling, complementing existing DirectController tests.
+
 ## PLAYER v0.76.7
 - ✅ Verified: Integrity Check - Ran full test suite (321 tests passed) and manually confirmed CaptureFrame resizing implementation in controllers.ts and bridge.ts matches the plan.
 
