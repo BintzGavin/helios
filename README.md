@@ -71,7 +71,7 @@ https://github.com/user-attachments/assets/89ee2a20-77c5-4440-ad68-9f9180d969bd
 • Testimonial
 • Social cut
 
-Paste this into an existing repo (preferably your marketing site):
+Run this in an existing repo (preferably your marketing site):
 
 ```bash
 npx skills add BintzGavin/helios-skills
