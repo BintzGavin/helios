@@ -1,6 +1,6 @@
 # CLI Status
 
-**Version**: 0.30.0
+**Version**: 0.31.0
 
 ## Current State
 
@@ -85,3 +85,4 @@ Per AGENTS.md, the CLI is "ACTIVELY EXPANDING FOR V2" with focus on:
 [v0.28.3] ✅ Init Examples Fix - Replaced `degit` with `giget` in `helios init --example` to ensure reliable template downloading.
 [v0.29.0] ✅ Deploy Command - Implemented `helios deploy setup` to scaffold Docker files and updated `helios render` to support environment variables for browser args.
 [v0.30.0] ✅ Deploy GCP Command - Implemented `helios deploy gcp` to scaffold Google Cloud Run Job configuration and documentation.
+[v0.31.0] ✅ AWS Deployment - Implemented `helios deploy aws` to scaffold Lambda deployment and updated `helios render` to support custom browser executable.

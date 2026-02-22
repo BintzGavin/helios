@@ -2,6 +2,10 @@
 
 This file tracks progress for the CLI domain (`packages/cli`).
 
+## CLI v0.31.0
+
+- ✅ AWS Deployment - Implemented `helios deploy aws` to scaffold AWS Lambda deployment and updated `helios render` to support custom browser executable.
+
 ## CLI v0.30.0
 
 - ✅ Deploy GCP Command - Implemented `helios deploy gcp` to scaffold Google Cloud Run Job configuration and documentation.

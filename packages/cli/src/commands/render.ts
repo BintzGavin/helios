@@ -67,8 +67,14 @@ export function registerRenderCommand(program: Command) {
           ? process.env.HELIOS_BROWSER_ARGS.split(' ')
           : undefined;
 
+        const executablePath = process.env.PUPPETEER_EXECUTABLE_PATH;
+
         if (browserArgs) {
           console.log(`Using custom browser arguments: ${browserArgs.join(' ')}`);
+        }
+
+        if (executablePath) {
+          console.log(`Using custom browser executable: ${executablePath}`);
         }
 
         if (options.emitJob) {
@@ -93,6 +99,7 @@ export function registerRenderCommand(program: Command) {
             browserConfig: {
               headless: options.headless,
               args: browserArgs,
+              executablePath,
             },
           };
 
@@ -170,6 +177,7 @@ export function registerRenderCommand(program: Command) {
           browserConfig: {
             headless: options.headless, // 'no-headless' sets this to false
             args: browserArgs,
+            executablePath,
           },
         };
 

@@ -5,6 +5,7 @@ import prompts from 'prompts';
 import chalk from 'chalk';
 import { DOCKERFILE_TEMPLATE, DOCKER_COMPOSE_TEMPLATE } from '../templates/docker.js';
 import { CLOUD_RUN_JOB_TEMPLATE, README_GCP_TEMPLATE } from '../templates/gcp.js';
+import { AWS_DOCKERFILE_TEMPLATE, AWS_LAMBDA_HANDLER_TEMPLATE, AWS_SAM_TEMPLATE, README_AWS_TEMPLATE } from '../templates/aws.js';
 
 export function registerDeployCommand(program: Command) {
   const deploy = program.command('deploy')
@@ -139,5 +140,121 @@ export function registerDeployCommand(program: Command) {
 
       console.log(chalk.blue('\nGCP setup complete!'));
       console.log('See README-GCP.md for deployment instructions.');
+    });
+
+  deploy
+    .command('aws')
+    .description('Scaffold AWS Lambda deployment configuration')
+    .action(async () => {
+      const cwd = process.cwd();
+      const dockerfilePath = path.join(cwd, 'Dockerfile');
+      const samTemplatePath = path.join(cwd, 'template.yaml');
+      const lambdaHandlerPath = path.join(cwd, 'lambda.js');
+      const readmePath = path.join(cwd, 'README-AWS.md');
+
+      console.log(chalk.blue('Scaffolding AWS Lambda deployment files...'));
+
+      // Dockerfile
+      let writeDockerfile = true;
+      if (fs.existsSync(dockerfilePath)) {
+        const response = await prompts({
+          type: 'confirm',
+          name: 'value',
+          message: 'Dockerfile already exists. Overwrite?',
+          initial: false
+        });
+
+        if (typeof response.value === 'undefined') {
+          console.log(chalk.yellow('\nOperation cancelled.'));
+          process.exit(0);
+        }
+
+        writeDockerfile = response.value;
+      }
+
+      if (writeDockerfile) {
+        fs.writeFileSync(dockerfilePath, AWS_DOCKERFILE_TEMPLATE);
+        console.log(chalk.green('✔ Created Dockerfile'));
+      } else {
+        console.log(chalk.gray('Skipped Dockerfile'));
+      }
+
+      // template.yaml
+      let writeSamTemplate = true;
+      if (fs.existsSync(samTemplatePath)) {
+        const response = await prompts({
+          type: 'confirm',
+          name: 'value',
+          message: 'template.yaml already exists. Overwrite?',
+          initial: false
+        });
+
+        if (typeof response.value === 'undefined') {
+          console.log(chalk.yellow('\nOperation cancelled.'));
+          process.exit(0);
+        }
+
+        writeSamTemplate = response.value;
+      }
+
+      if (writeSamTemplate) {
+        fs.writeFileSync(samTemplatePath, AWS_SAM_TEMPLATE);
+        console.log(chalk.green('✔ Created template.yaml'));
+      } else {
+        console.log(chalk.gray('Skipped template.yaml'));
+      }
+
+      // lambda.js
+      let writeLambdaHandler = true;
+      if (fs.existsSync(lambdaHandlerPath)) {
+        const response = await prompts({
+          type: 'confirm',
+          name: 'value',
+          message: 'lambda.js already exists. Overwrite?',
+          initial: false
+        });
+
+        if (typeof response.value === 'undefined') {
+          console.log(chalk.yellow('\nOperation cancelled.'));
+          process.exit(0);
+        }
+
+        writeLambdaHandler = response.value;
+      }
+
+      if (writeLambdaHandler) {
+        fs.writeFileSync(lambdaHandlerPath, AWS_LAMBDA_HANDLER_TEMPLATE);
+        console.log(chalk.green('✔ Created lambda.js'));
+      } else {
+        console.log(chalk.gray('Skipped lambda.js'));
+      }
+
+      // README-AWS.md
+      let writeReadme = true;
+      if (fs.existsSync(readmePath)) {
+        const response = await prompts({
+          type: 'confirm',
+          name: 'value',
+          message: 'README-AWS.md already exists. Overwrite?',
+          initial: false
+        });
+
+        if (typeof response.value === 'undefined') {
+          console.log(chalk.yellow('\nOperation cancelled.'));
+          process.exit(0);
+        }
+
+        writeReadme = response.value;
+      }
+
+      if (writeReadme) {
+        fs.writeFileSync(readmePath, README_AWS_TEMPLATE);
+        console.log(chalk.green('✔ Created README-AWS.md'));
+      } else {
+        console.log(chalk.gray('Skipped README-AWS.md'));
+      }
+
+      console.log(chalk.blue('\nAWS Lambda setup complete!'));
+      console.log('See README-AWS.md for deployment instructions.');
     });
 }

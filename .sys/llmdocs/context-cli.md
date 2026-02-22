@@ -20,7 +20,8 @@ packages/cli/
 ├── src/
 │   ├── commands/
 │   │   ├── __tests__/
-│   │   │   └── deploy.test.ts # Deploy command tests
+│   │   │   ├── deploy.test.ts # Deploy command tests
+│   │   │   └── render.test.ts # Render command tests
 │   │   ├── add.ts          # Adds components
 │   │   ├── build.ts        # Builds for production
 │   │   ├── components.ts   # Lists registry components
@@ -43,6 +44,7 @@ packages/cli/
 │   │   ├── manifest.ts     # Local registry manifest
 │   │   └── types.ts        # Registry types
 │   ├── templates/          # Project templates
+│   │   ├── aws.ts          # AWS templates
 │   │   ├── docker.ts       # Docker templates
 │   │   └── gcp.ts          # GCP templates
 │   ├── types/              # Shared types
@@ -83,6 +85,7 @@ packages/cli/
 - `helios skills install`: Install agent skills.
 - `helios deploy setup`: Scaffold deployment configurations (Docker).
 - `helios deploy gcp`: Scaffold Google Cloud Run Job configuration.
+- `helios deploy aws`: Scaffold AWS Lambda deployment configuration.
 
 ## D. Configuration
 
@@ -109,4 +112,4 @@ interface HeliosConfig {
   - Authentication via `HELIOS_REGISTRY_TOKEN` env var or constructor injection (Bearer token).
   - **Cross-Framework Support**: Allows installing `vanilla` components in framework-specific projects.
 - **Studio**: The `studio` command launches a Vite server with `studioApiPlugin`, allowing the Studio UI to trigger CLI actions (install/remove components) via the server.
-- **Renderer**: The `render` command orchestrates rendering using `@helios-project/renderer`.
+- **Renderer**: The `render` command orchestrates rendering using `@helios-project/renderer`. It supports custom browser executable paths via `PUPPETEER_EXECUTABLE_PATH` env var.
