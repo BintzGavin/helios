@@ -205,14 +205,20 @@ export const AssetsPanel: React.FC = () => {
       </div>
 
       <div className="assets-list">
-        {!searchQuery && content.folders.map(folder => (
-            <FolderItem
-                key={folder}
-                name={folder}
-                onClick={() => enterFolder(folder)}
-                onDrop={(e) => handleDrop(e, folder)}
-            />
-        ))}
+        {!searchQuery && content.folders.map(folderName => {
+            const folderPath = currentPath ? `${currentPath}/${folderName}` : folderName;
+            const folderAsset = assets.find(a => a.type === 'folder' && a.relativePath === folderPath);
+
+            return (
+                <FolderItem
+                    key={folderName}
+                    name={folderName}
+                    asset={folderAsset}
+                    onClick={() => enterFolder(folderName)}
+                    onDrop={(e) => handleDrop(e, folderName)}
+                />
+            );
+        })}
 
         {content.files.map((asset) => (
             <AssetItem key={asset.id} asset={asset} />

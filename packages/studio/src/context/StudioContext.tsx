@@ -229,7 +229,7 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [outPoint, setOutPoint] = useState(0);
   const [playerState, _setPlayerState] = useState<PlayerState>(DEFAULT_PLAYER_STATE);
 
-  const setPlayerState = (newState: Partial<PlayerState> | ((prev: PlayerState) => PlayerState)) => {
+  const setPlayerState = React.useCallback((newState: Partial<PlayerState> | ((prev: PlayerState) => PlayerState)) => {
     _setPlayerState(prev => {
       const state = typeof newState === 'function' ? newState(prev) : newState;
       return {
@@ -238,7 +238,7 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         playbackRate: state.playbackRate ?? prev.playbackRate ?? 1
       };
     });
-  };
+  }, []);
 
   const fetchAssets = () => {
     fetch('/api/assets')

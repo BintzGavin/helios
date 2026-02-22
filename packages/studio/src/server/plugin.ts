@@ -4,7 +4,7 @@ import fs from 'fs';
 import path from 'path';
 import { SSEServerTransport } from "@modelcontextprotocol/sdk/server/sse.js";
 import { createMcpServer } from './mcp';
-import { findCompositions, findAssets, getProjectRoot, createComposition, deleteComposition, updateCompositionMetadata, duplicateComposition, renameComposition, renameAsset, createDirectory } from './discovery';
+import { findCompositions, findAssets, getProjectRoot, createComposition, deleteComposition, updateCompositionMetadata, duplicateComposition, renameComposition, renameAsset, deleteAsset, createDirectory } from './discovery';
 import { templates } from './templates';
 import { findDocumentation, resolveDocumentationPath } from './documentation';
 import { startRender, getRenderJobSpec, getJob, getJobs, cancelJob, deleteJob, diagnoseServer } from './render-manager';
@@ -592,24 +592,9 @@ function configureMiddlewares(server: ViteDevServer | PreviewServer, isPreview: 
                 return;
               }
 
-              // Security check: ensure file is within project root
-              const projectRoot = getProjectRoot(process.cwd());
-              const resolvedPath = path.resolve(id);
-
-              if (!resolvedPath.startsWith(projectRoot)) {
-                 res.statusCode = 403;
-                 res.end(JSON.stringify({ error: 'Access denied: File outside project root' }));
-                 return;
-              }
-
-              if (fs.existsSync(resolvedPath)) {
-                fs.unlinkSync(resolvedPath);
-                res.setHeader('Content-Type', 'application/json');
-                res.end(JSON.stringify({ success: true }));
-              } else {
-                res.statusCode = 404;
-                res.end(JSON.stringify({ error: 'File not found' }));
-              }
+              deleteAsset(process.cwd(), id);
+              res.setHeader('Content-Type', 'application/json');
+              res.end(JSON.stringify({ success: true }));
             } catch (e: any) {
               console.error(e);
               res.statusCode = 500;

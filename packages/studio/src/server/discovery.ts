@@ -508,6 +508,29 @@ export function renameAsset(
   };
 }
 
+export function deleteAsset(rootDir: string, id: string): void {
+  const projectRoot = getProjectRoot(rootDir);
+  const publicDir = path.join(projectRoot, 'public');
+  const hasPublic = fs.existsSync(publicDir);
+  const scanRoot = hasPublic ? publicDir : projectRoot;
+
+  // Resolve source path
+  // id is the full path in the current implementation of findAssets
+  const resolvedPath = path.resolve(id);
+
+  // Security check: ensure path is within project/public root
+  if (!resolvedPath.startsWith(scanRoot)) {
+    throw new Error('Access denied: Cannot delete outside project/public root');
+  }
+
+  if (fs.existsSync(resolvedPath)) {
+    // Use recursive delete to handle directories
+    fs.rmSync(resolvedPath, { recursive: true, force: true });
+  } else {
+    throw new Error(`Asset "${id}" not found`);
+  }
+}
+
 export function createDirectory(
   rootDir: string,
   dirPath: string
