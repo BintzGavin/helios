@@ -13,6 +13,9 @@ Each agent should update **their own dedicated progress file** instead of this f
 - **STUDIO**: Update `docs/PROGRESS-STUDIO.md`
 - **SKILLS**: Update `docs/PROGRESS-SKILLS.md`
 
+### CLI v0.32.0
+- ✅ Completed: Remote Job Spec - Implemented support for executing distributed render jobs from remote HTTP/HTTPS URLs in `helios job run`.
+
 ### CLI v0.31.0
 - ✅ Completed: AWS Deployment - Implemented AWS Lambda deployment scaffolding and custom browser path support.
 

@@ -4,6 +4,24 @@ import path from 'path';
 import { spawn } from 'child_process';
 import { JobSpec } from '../types/job.js';
 
+export async function loadJobSpec(file: string): Promise<{ jobSpec: JobSpec, jobDir: string }> {
+  if (file.startsWith('http://') || file.startsWith('https://')) {
+    const res = await fetch(file);
+    if (!res.ok) {
+      throw new Error(`Failed to fetch job: ${res.statusText} (${res.status})`);
+    }
+    const jobSpec = (await res.json()) as JobSpec;
+    return { jobSpec, jobDir: process.cwd() };
+  } else {
+    const jobPath = path.resolve(process.cwd(), file);
+    if (!fs.existsSync(jobPath)) {
+      throw new Error(`Job file not found: ${jobPath}`);
+    }
+    const jobSpec = JSON.parse(fs.readFileSync(jobPath, 'utf-8')) as JobSpec;
+    return { jobSpec, jobDir: path.dirname(jobPath) };
+  }
+}
+
 export function registerJobCommand(program: Command) {
   const jobCommand = program
     .command('job')
@@ -17,15 +35,7 @@ export function registerJobCommand(program: Command) {
     .option('--no-merge', 'Skip the final merge step')
     .action(async (file, options) => {
       try {
-        const jobPath = path.resolve(process.cwd(), file);
-        if (!fs.existsSync(jobPath)) {
-          throw new Error(`Job file not found: ${jobPath}`);
-        }
-
-        // Run all commands relative to the job file directory
-        const jobDir = path.dirname(jobPath);
-
-        const jobSpec: JobSpec = JSON.parse(fs.readFileSync(jobPath, 'utf-8'));
+        const { jobSpec, jobDir } = await loadJobSpec(file);
         const chunkId = options.chunk ? parseInt(options.chunk, 10) : undefined;
 
         if (chunkId !== undefined && isNaN(chunkId)) {
