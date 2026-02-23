@@ -1,3 +1,6 @@
+## STUDIO v0.114.2
+- ✅ Completed: React Components Example - Added documentation and verified `react-components-demo` example.
+
 ## STUDIO v0.114.1
 - ✅ Verified: Regression Test - Validated Studio UI functionality via Playwright script (`scripts/verify-ui.ts`), confirming critical UI elements (Timeline, Renders Panel) load correctly.
 
