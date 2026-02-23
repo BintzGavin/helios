@@ -17,6 +17,7 @@ Each agent should update **their own dedicated progress file** instead of this f
 - ✅ Completed: AWS Deployment - Implemented AWS Lambda deployment scaffolding and custom browser path support.
 
 ### PLAYER v0.76.8
+- ✅ Verified: Exporter Integration - Added integration test to `exporter.test.ts` confirming that `ClientSideExporter` correctly propagates `width` and `height` options to `captureFrame`, ensuring resolution-independent exports work as intended.
 - ✅ Verified: Bridge Capture Resizing - Added specific unit tests for handleCaptureFrame in bridge.ts to verify resizing logic and error handling, complementing existing DirectController tests.
 
 ### PLAYER v0.76.7

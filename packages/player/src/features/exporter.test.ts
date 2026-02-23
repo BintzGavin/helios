@@ -388,4 +388,26 @@ describe('ClientSideExporter', () => {
         expect(mockAnchor.download).toBe('snapshot.jpeg');
         expect(outputStartSpy).not.toHaveBeenCalled();
     });
+
+    it('should request resized frames when export dimensions are provided', async () => {
+        const onProgress = vi.fn();
+        const signal = new AbortController().signal;
+
+        await exporter.export({
+            onProgress,
+            signal,
+            mode: 'canvas',
+            width: 3840,
+            height: 2160
+        });
+
+        // Verify captureFrame was called with resizing options
+        expect(mockController.captureFrame).toHaveBeenCalledWith(
+            expect.any(Number),
+            expect.objectContaining({
+                width: 3840,
+                height: 2160
+            })
+        );
+    });
 });
