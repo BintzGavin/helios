@@ -129,3 +129,7 @@
 ## [0.112.0] - Asset Discovery Whitelist
 **Learning:** The `findAssets` backend function strictly filters files by extension (ignoring `other` types), which means placeholder files like `.helioskeep` are ignored by default. This complicates "empty folder" detection.
 **Action:** When implementing folder persistence strategies, ensure the discovery logic is updated to include the marker files, or implement a dedicated directory scanning pass.
+
+## [0.114.2] - Asset Drag-and-Drop Gap
+**Learning:** The `AssetsPanel` implementation supported uploading files via drag-and-drop but lacked the logic to handle internal `Asset` drag-and-drop for moving files, despite `AssetItem` being draggable. This highlights a gap where "drag and drop" features need to be explicitly specified for both external (OS) and internal (app) sources.
+**Action:** When specifying drag-and-drop features, explicitly distinguish between "Import" (external files) and "Move/Organize" (internal items) to ensure both are covered.
