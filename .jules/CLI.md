@@ -101,3 +101,7 @@ Critical learnings only. This is not a log—only add entries for insights that 
 ## [0.30.0] - Coder Violation
 **Learning:** I violated the "Planner" protocol by implementing the `helios deploy aws` feature directly, modifying source files instead of creating a spec file. The prompt strictly forbade code modification for this role.
 **Action:** When assigned the "Planner" role, I must ONLY produce a Markdown plan in `/.sys/plans/`. I must actively check "Boundaries" before touching any source file. If I catch myself editing code, I must stop and revert immediately.
+
+## [0.31.0] - Stateless Worker Strategy
+**Learning:** The "Stateless Worker Architecture" required by AGENTS.md was blocked by the need to rebuild containers for every job. Identifying that `helios job run` could accept remote URLs allows for a single generic worker deployment.
+**Action:** When designing distributed systems, prioritize runtime configuration (URL inputs) over build-time configuration (baked-in files) to enable statelessness.
