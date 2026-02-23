@@ -64,9 +64,9 @@ The Studio is launched via the `helios` CLI (from `@helios-project/cli`).
 - **Renderer**: Uses `RenderOrchestrator` for planning and executing renders.
 - **CLI**: The Studio backend exposes endpoints that the CLI can leverage (e.g., for `helios render` with HMR support, though currently CLI uses Renderer directly).
 
-## F. Recent Changes (v0.113.1)
-- **Completed: CLI Init Examples Fix**: Replaced `degit` with `giget` in `helios init --example` to ensure reliable template downloading and added comprehensive tests.
-- **Completed: CLI Components Command Enhanced**: Verified implementation of `helios components` command with comprehensive unit tests and updated Studio documentation.
-- **Completed: CLI Registry Filtering**: Updated `RegistryClient` to support cross-framework component sharing by allowing `vanilla` components to be discovered and installed in framework-specific projects.
-- **Completed: CLI Registry Auth**: Enabled authentication for private component registries via environment variable `HELIOS_REGISTRY_TOKEN`.
-- **Completed: Distributed Rendering Example**: Created `examples/distributed-rendering` demonstrating the workflow for generating and executing distributed render jobs.
+## F. Recent Changes (v0.114.2)
+- **Completed: React Components Example**: Added documentation and verified `react-components-demo` example.
+- **Verified: Regression Test**: Validated Studio UI functionality via Playwright script (`scripts/verify-ui.ts`).
+- **Verified: Registry Filtering Support**: Confirmed that Studio supports cross-framework component discovery.
+- **Completed: CLI Init Examples Fix**: Replaced `degit` with `giget` in `helios init --example`.
+- **Completed: CLI Components Command Enhanced**: Verified implementation of `helios components` command.
