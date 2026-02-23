@@ -21,6 +21,7 @@ packages/cli/
 │   ├── commands/
 │   │   ├── __tests__/
 │   │   │   ├── deploy.test.ts # Deploy command tests
+│   │   │   ├── job.test.ts    # Job command tests
 │   │   │   └── render.test.ts # Render command tests
 │   │   ├── add.ts          # Adds components
 │   │   ├── build.ts        # Builds for production
@@ -77,7 +78,7 @@ packages/cli/
 - `helios diff <component>`: Compare local component with registry version.
 - `helios render <input>`: Render a composition.
   - Options: `--output`, `--width`, `--height`, `--fps`, `--duration`, `--quality`, `--mode`, `--emit-job`
-- `helios job run <spec>`: Run a distributed render job.
+- `helios job run <spec>`: Run a distributed render job from a local file or remote URL.
   - Options: `--concurrency`, `--chunks`
 - `helios merge <output> <inputs...>`: Merge video files.
 - `helios build`: Build the project for production.
@@ -113,3 +114,4 @@ interface HeliosConfig {
   - **Cross-Framework Support**: Allows installing `vanilla` components in framework-specific projects.
 - **Studio**: The `studio` command launches a Vite server with `studioApiPlugin`, allowing the Studio UI to trigger CLI actions (install/remove components) via the server.
 - **Renderer**: The `render` command orchestrates rendering using `@helios-project/renderer`. It supports custom browser executable paths via `PUPPETEER_EXECUTABLE_PATH` env var.
+- **Job**: The `job` command supports loading job specifications from local paths or remote HTTP/HTTPS URLs using the native `fetch` API.

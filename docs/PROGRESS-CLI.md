@@ -2,6 +2,10 @@
 
 This file tracks progress for the CLI domain (`packages/cli`).
 
+## CLI v0.32.0
+
+- ✅ Remote Job Spec - Implemented support for executing distributed render jobs from remote HTTP/HTTPS URLs in `helios job run`.
+
 ## CLI v0.31.0
 
 - ✅ AWS Deployment - Implemented `helios deploy aws` to scaffold AWS Lambda deployment and updated `helios render` to support custom browser executable.
