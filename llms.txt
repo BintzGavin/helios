@@ -74,7 +74,7 @@ The engine controls `document.timeline.currentTime` to seek animations frame-acc
 | Animation | CSS, WAAPI | `interpolate()`, `spring()` |
 | Pricing | Free | $100+/mo for 4+ devs |
 | Maturity | Beta | Production-ready |
-| Distributed rendering | Local (Beta) / Cloud (GCP) | Available |
+| Distributed rendering | Local (Beta) / Cloud (GCP/AWS) | Available |
 
 ## Agent Skills
 Skills for AI agents are in `.agents/skills/helios/`:
@@ -113,7 +113,7 @@ const report = await Helios.diagnose();
 ## Roadmap
 ### V1.x (Active)
 - **Studio**: v0.107.1+ (Registry Filtering, Registry Auth, Distributed Rendering Example, Diff Command Support, Portable Job Paths, MCP Resources & Tools)
-- **CLI**: v0.28.3+ (Deploy Command [GCP], Verify Components, Components Search, Registry Auth, Remote Registry Hydration, Diff Command)
+- **CLI**: v0.28.3+ (Deploy Command [GCP/AWS], Verify Components, Components Search, Registry Auth, Remote Registry Hydration, Diff Command)
 - **Core**: v5.13.0+ (Generic Input Props, Active Clips, Input Schema, Headless Audio)
 - **Player**: v0.76.7+ (Integrity Check, Fix CaptureFrame Resizing, Standard Event Handlers, Dynamic Audio Metering, Export API)
 - **Renderer**: v1.78.0+ (WebCodecs Preference, Orchestrator Plan, HW Accel Validation, Distributed Progress)
@@ -124,7 +124,6 @@ const report = await Helios.diagnose();
 - **Helios Assistant**: Context-aware documentation search (Done)
 
 ### V2 (Next)
-- Distributed rendering (Cloud Adapters - AWS Lambda)
 - Advanced audio engine (Tone.js integration)
 
 ### V3 (Future)

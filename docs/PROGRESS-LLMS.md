@@ -1,5 +1,13 @@
 # LLMS Progress
 
+## LLMS v1.23.1
+- ✅ Completed: Daily llms.txt Review
+  - Updated Roadmap:
+    - Moved "Distributed rendering (Cloud Adapters - AWS Lambda)" to V1.x (Active).
+    - Updated CLI description to include "Deploy Command [GCP/AWS]".
+  - Updated Comparison Table: Changed "Distributed rendering" to "Local (Beta) / Cloud (GCP/AWS)".
+  - Verified Quick Facts: Confirmed versions against package.json.
+
 ## LLMS v1.23.0
 - ✅ Completed: Daily llms.txt Review
   - Updated Roadmap:
