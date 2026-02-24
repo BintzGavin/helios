@@ -41,3 +41,7 @@
 ## [v0.76.7] - Accessibility Gap
 **Learning:** Custom UI components (Overlays, Modals) often miss basic accessibility features like focus management (trap/restore) and ARIA live regions, making them unusable for keyboard/screen-reader users despite having semantic HTML.
 **Action:** When implementing or reviewing custom UI components, always verify focus flow (Tab key) and screen reader announcements (ARIA) as part of the "UI controls" vision.
+
+## [v0.76.9] - Execution Gap
+**Learning:** Found a discrepancy where a previous journal entry (v0.76.3) claimed an action item was needed (fix async seek in DirectController), but the code implementation remained synchronous.
+**Action:** Always verify "Completed" or "Action" items in the journal against the actual codebase state before assuming they are done. When planning, explicitly check for regressions on known issues.
