@@ -1,5 +1,13 @@
 # LLMS Progress
 
+## LLMS v1.24.0
+- ✅ Completed: Daily llms.txt Review
+  - Updated Quick Facts: CLI v0.32.0+, Player v0.76.8+.
+  - Updated Roadmap:
+    - CLI: Added "Remote Job Spec", "Deploy Command [GCP/AWS]".
+    - Player: Added "Exporter Integration".
+  - Verified features against codebase (CLI job command, Player exporter).
+
 ## LLMS v1.23.1
 - ✅ Completed: Daily llms.txt Review
   - Updated Roadmap:
