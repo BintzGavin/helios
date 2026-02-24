@@ -128,6 +128,7 @@ export interface StartRenderOptions {
   inputProps?: Record<string, any>;
   concurrency?: number;
   hwAccel?: string;
+  webCodecsPreference?: 'hardware' | 'software' | 'disabled';
 }
 
 function rendererOptionsToFlags(options: RendererOptions): string {
@@ -140,6 +141,7 @@ function rendererOptionsToFlags(options: RendererOptions): string {
   if (options.audioCodec) flags.push(`--audio-codec ${options.audioCodec}`);
   if (options.videoCodec) flags.push(`--video-codec ${options.videoCodec}`);
   if (options.browserConfig?.headless === false) flags.push('--no-headless');
+  if (options.webCodecsPreference) flags.push(`--webcodecs-preference ${options.webCodecsPreference}`);
   return flags.join(' ');
 }
 
@@ -182,7 +184,8 @@ export function getRenderJobSpec(options: StartRenderOptions): JobSpec {
     videoCodec: options.videoCodec,
     pixelFormat: options.pixelFormat,
     inputProps: options.inputProps,
-    concurrency: options.concurrency || 1
+    concurrency: options.concurrency || 1,
+    webCodecsPreference: options.webCodecsPreference
   };
 
   const plan = RenderOrchestrator.plan(compositionUrl, outputPath, renderOptions);
@@ -295,7 +298,8 @@ export async function startRender(options: StartRenderOptions, serverPort: numbe
         pixelFormat: options.pixelFormat,
         inputProps: options.inputProps,
         concurrency: options.concurrency,
-        hwAccel: options.hwAccel
+        hwAccel: options.hwAccel,
+        webCodecsPreference: options.webCodecsPreference
       };
 
       await RenderOrchestrator.render(fullUrl, outputPath, renderOptions, {

@@ -1,4 +1,4 @@
-**Version**: 0.114.2
+**Version**: 0.115.0
 
 **Posture**: ACTIVELY EXPANDING FOR V2
 
@@ -11,6 +11,7 @@
 > **Note**: Status versions in this file may precede package release versions (`package.json`). Always verify `package.json` for the currently installed version.
 
 ## Recent Updates
+- [v0.115.0] ✅ Completed: WebCodecs Preference - Added `webCodecsPreference` configuration to Studio Renders Panel, allowing users to select Hardware, Software, or Disabled modes for rendering.
 - [v0.114.2] ✅ Completed: React Components Example - Added documentation and verified `react-components-demo` example.
 - [v0.114.1] ✅ Verified: Regression Test - Validated Studio UI functionality via Playwright script (`scripts/verify-ui.ts`), confirming critical UI elements (Timeline, Renders Panel) load correctly.
 - [v0.114.0] ✅ Verified: Registry Filtering Support - Confirmed that Studio supports cross-framework component discovery (e.g., vanilla components in React projects) via updated CLI logic.

@@ -7,6 +7,7 @@ export interface RenderConfigData {
   concurrency?: number;
   hwAccel?: string;
   scale?: number;
+  webCodecsPreference?: 'hardware' | 'software' | 'disabled';
 }
 
 interface RenderConfigProps {
@@ -154,6 +155,20 @@ export const RenderConfig: React.FC<RenderConfigProps> = ({ config, onChange }) 
           <option value="qsv">Intel QSV</option>
           <option value="videotoolbox">Apple VideoToolbox</option>
           <option value="none">None (CPU)</option>
+        </select>
+      </div>
+
+      <div style={{ marginBottom: '8px' }}>
+        <label htmlFor="render-webcodecs" style={labelStyle}>WebCodecs Preference</label>
+        <select
+          id="render-webcodecs"
+          value={config.webCodecsPreference || 'hardware'}
+          onChange={(e) => handleChange('webCodecsPreference', e.target.value)}
+          style={inputStyle}
+        >
+          <option value="hardware">Hardware (Default)</option>
+          <option value="software">Software Only</option>
+          <option value="disabled">Disabled</option>
         </select>
       </div>
 
