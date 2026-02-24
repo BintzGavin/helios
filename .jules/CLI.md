@@ -105,3 +105,7 @@ Critical learnings only. This is not a log—only add entries for insights that 
 ## [0.31.0] - Stateless Worker Strategy
 **Learning:** The "Stateless Worker Architecture" required by AGENTS.md was blocked by the need to rebuild containers for every job. Identifying that `helios job run` could accept remote URLs allows for a single generic worker deployment.
 **Action:** When designing distributed systems, prioritize runtime configuration (URL inputs) over build-time configuration (baked-in files) to enable statelessness.
+
+## [0.32.0] - Template Rigidity
+**Learning:** Deployment templates (GCP) were hardcoded to local files (`job.json`), which defeated the purpose of the stateless worker strategy even though the CLI command supported it.
+**Action:** When designing deployment templates, always use environment variables for inputs (like job specs) to allow runtime configuration without container rebuilds.
