@@ -5,7 +5,7 @@ This backlog tracks concrete deliverables derived from [`AGENTS.md`](../AGENTS.m
 ## Distributed Rendering
 *Helios must support distributed rendering suitable for cloud execution.*
 
-- [ ] Implement stateless worker architecture.
+- [x] Implement stateless worker architecture.
 - [x] Implement CLI job generation (`--emit-job`).
 - [x] Ensure deterministic frame seeking across all drivers.
 - [x] Support frame range rendering in CLI.

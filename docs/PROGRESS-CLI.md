@@ -2,6 +2,10 @@
 
 This file tracks progress for the CLI domain (`packages/cli`).
 
+## CLI v0.33.0
+
+- ✅ Stateless Worker - Implemented support for stateless job execution via HELIOS_JOB_SPEC environment variable in GCP templates.
+
 ## CLI v0.32.0
 
 - ✅ Remote Job Spec - Implemented support for executing distributed render jobs from remote HTTP/HTTPS URLs in `helios job run`.

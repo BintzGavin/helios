@@ -115,3 +115,4 @@ interface HeliosConfig {
 - **Studio**: The `studio` command launches a Vite server with `studioApiPlugin`, allowing the Studio UI to trigger CLI actions (install/remove components) via the server.
 - **Renderer**: The `render` command orchestrates rendering using `@helios-project/renderer`. It supports custom browser executable paths via `PUPPETEER_EXECUTABLE_PATH` env var.
 - **Job**: The `job` command supports loading job specifications from local paths or remote HTTP/HTTPS URLs using the native `fetch` API.
+- **GCP Deployment**: The `deploy gcp` command scaffolds a Cloud Run Job that supports stateless execution via `HELIOS_JOB_SPEC` environment variable.
