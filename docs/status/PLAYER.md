@@ -1,4 +1,4 @@
-**Version**: v0.76.8
+**Version**: v0.76.9
 
 **Posture**: STABLE AND FEATURE COMPLETE
 
@@ -60,6 +60,7 @@
 - **Export API**: Exposes public `export()` method for programmatic control over client-side exports, supporting Video (MP4/WebM) and Snapshot (PNG/JPEG) formats.
 - **Export Menu**: Implements a dedicated Export Menu in the player UI (replacing the direct export button action) to allow configuring format, resolution, filename, and captions before exporting or taking a snapshot.
 
+[v0.76.9] ✅ Completed: Update Context Documentation - Regenerated context-player.md to reflect the latest API and features.
 [v0.76.8] ✅ Verified: Exporter Integration - Added integration test to `exporter.test.ts` confirming that `ClientSideExporter` correctly propagates `width` and `height` options to `captureFrame`, ensuring resolution-independent exports work as intended.
 [v0.76.8] ✅ Completed: Sync Version - Updated package.json to match status file (0.76.8) and verified implementation with full test suite (326 tests passed).
 [v0.76.8] ✅ Verified: Bridge Capture Resizing - Added specific unit tests for handleCaptureFrame in bridge.ts to verify resizing logic and error handling, complementing existing DirectController tests.
