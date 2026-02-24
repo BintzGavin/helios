@@ -12,7 +12,10 @@ spec:
           - image: gcr.io/PROJECT_ID/IMAGE_NAME:TAG # Replace with your image
             command: ["/bin/sh", "-c"]
             args:
-            - "npm exec -- helios job run job.json --chunk \${CLOUD_RUN_TASK_INDEX}"
+            - "npm exec -- helios job run \${HELIOS_JOB_SPEC} --chunk \${CLOUD_RUN_TASK_INDEX}"
+            env:
+            - name: HELIOS_JOB_SPEC
+              value: "job.json"
             resources:
               limits:
                 memory: "2Gi"
@@ -92,4 +95,19 @@ The output files will be stored in the container. To retrieve them, you should c
 2.  Configure the volume to use a GCS bucket.
 
 For more details, see [Cloud Run documentation on GCS integration](https://cloud.google.com/run/docs/configuring/services/cloud-storage-volume-mounts).
+
+### 7. (Optional) Stateless / Remote Job Execution
+
+To avoid rebuilding the Docker image for every new render job, you can use the stateless worker architecture.
+
+1.  **Upload your \`job.json\` to a remote URL** (e.g., Google Cloud Storage, S3, or any HTTP server).
+    Ensure the worker container has access to this URL.
+
+2.  **Execute the job with the \`HELIOS_JOB_SPEC\` environment variable**:
+
+    \`\`\`bash
+    gcloud run jobs execute helios-render-job --update-env-vars HELIOS_JOB_SPEC=https://storage.googleapis.com/my-bucket/job.json
+    \`\`\`
+
+    The worker will fetch the job specification from the URL and execute the assigned chunk.
 `;
