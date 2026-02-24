@@ -1,122 +1,191 @@
-# context-player.md
+# Context: Player
+
+The `packages/player` domain implements the `<helios-player>` Web Component, which provides a rich UI wrapper around the Helios Core engine. It handles iframe sandboxing, bridge communication, UI controls, and client-side export.
 
 ## A. Component Structure
 
-The `<helios-player>` Web Component utilizes a Shadow DOM to encapsulate its styles and structure.
+The `<helios-player>` component uses Shadow DOM to encapsulate its internal structure.
 
-- **Shadow Root**
-  - **Wrapper** (`div.helios-player`): Main container handling layout and sizing.
-    - **Iframe** (`iframe`): The sandboxed environment where the Helios composition runs.
-    - **Poster** (`div.helios-poster`): Displays the poster image before playback begins.
-    - **Big Play Button** (`button.helios-big-play-button`): Prominent play button for initial interaction.
-    - **Loading Overlay** (`div.helios-loading`): Visual indicator during resource loading or buffering.
-    - **Error Overlay** (`div.helios-error`): Displays error messages (e.g., connection timeout, export failure).
-    - **Controls Overlay** (`div.helios-controls`): The user interface for interacting with the player.
-      - **Scrubber** (`input[type="range"]`): Timeline slider for seeking and visualizing progress/buffer/markers.
-      - **Control Bar**: Contains playback controls.
-        - **Play/Pause Toggle**
-        - **Volume Control** (Mute toggle + Slider)
-        - **Time Display** (Current Time / Duration)
-        - **Audio Track Menu Toggle** (if multiple tracks exist)
-        - **Captions Toggle** (CC)
-        - **Picture-in-Picture Toggle**
-        - **Settings Toggle** (Speed, Loop, Range)
-        - **Export Menu Toggle** (Video, Snapshot)
-        - **Fullscreen Toggle**
-      - **Menus**:
-        - **Export Menu**: Options for Format, Resolution, Filename, Captions.
-        - **Settings Menu**: Playback Speed, Loop, Playback Range.
-        - **Audio Track Menu**: Individual track volume/mute controls.
-    - **Diagnostics UI** (`div.helios-diagnostics`): Overlay showing environment capabilities (WebCodecs, etc.), toggled via `Shift+D`.
+```html
+<helios-player>
+  #shadow-root
+    <!-- Style definitions (omitted) -->
+
+    <!-- Audio Menu Overlay -->
+    <div class="audio-menu hidden" part="audio-menu" role="dialog"></div>
+
+    <!-- Settings Menu Overlay -->
+    <div class="settings-menu hidden" part="settings-menu" role="dialog"></div>
+
+    <!-- Export Menu Overlay -->
+    <div class="export-menu hidden" part="export-menu" role="dialog"></div>
+
+    <!-- Shortcuts Overlay -->
+    <div class="shortcuts-overlay hidden" part="shortcuts-overlay"></div>
+
+    <!-- Diagnostics Overlay -->
+    <div class="debug-overlay hidden" part="debug-overlay"></div>
+
+    <!-- Status Overlay (Loading/Error) -->
+    <div class="status-overlay hidden" part="overlay">
+       <div class="status-text" part="status-text"></div>
+       <button class="retry-btn" part="retry-button">Retry</button>
+    </div>
+
+    <!-- Poster & Big Play Button -->
+    <div class="poster-container hidden" part="poster">
+       <img class="poster-image" part="poster-image" />
+       <div class="big-play-btn" part="big-play-button"></div>
+    </div>
+
+    <!-- Picture-in-Picture Video Element (Hidden) -->
+    <video class="pip-video"></video>
+
+    <!-- Sandboxed Iframe -->
+    <iframe part="iframe" sandbox="..."></iframe>
+
+    <!-- Click Layer (for play/pause interaction) -->
+    <div class="click-layer" part="click-layer"></div>
+
+    <!-- Captions Overlay -->
+    <div class="captions-container" part="captions"></div>
+
+    <!-- UI Controls -->
+    <div class="controls" part="controls">
+       <button class="play-pause-btn" part="play-pause-button"></button>
+
+       <div class="volume-control" part="volume-control">
+          <button class="volume-btn" part="volume-button"></button>
+          <input type="range" class="volume-slider" part="volume-slider" />
+       </div>
+
+       <button class="audio-btn" part="audio-button"></button>
+       <button class="cc-btn" part="cc-button"></button>
+       <button class="export-btn" part="export-button"></button>
+
+       <div class="scrubber-wrapper" part="scrubber-wrapper">
+          <div class="scrubber-tooltip hidden" part="tooltip"></div>
+          <div class="markers-container" part="markers"></div>
+          <input type="range" class="scrubber" part="scrubber" />
+       </div>
+
+       <div class="time-display" part="time-display"></div>
+
+       <button class="fullscreen-btn" part="fullscreen-button"></button>
+       <button class="pip-btn" part="pip-button"></button>
+       <button class="settings-btn" part="settings-button"></button>
+    </div>
+</helios-player>
+```
 
 ## B. Events
 
-The `<helios-player>` dispatches standard `HTMLMediaElement` events and custom events:
+The component dispatches the following Standard Media API events and custom events:
 
-### Standard Media Events
-- `play`: Fired when playback begins.
-- `pause`: Fired when playback is paused.
-- `ended`: Fired when playback completes.
-- `timeupdate`: Fired periodically as the current time changes.
-- `volumechange`: Fired when volume or muted state changes.
-- `ratechange`: Fired when playback rate changes.
-- `seeking`: Fired when a seek operation begins.
-- `seeked`: Fired when a seek operation completes.
-- `loadstart`: Fired when the user agent begins looking for media data.
-- `loadedmetadata`: Fired when media metadata has been loaded.
-- `canplay`: Fired when the user agent can play the media.
-- `canplaythrough`: Fired when the user agent estimates it can play through without buffering.
-- `waiting`: Fired when playback stops because of temporary lack of data.
-
-### Custom Events
-- `audiometering`: Fired with audio level data (stereo RMS/Peak) when metering is enabled.
+| Event Name | Type | Description |
+| :--- | :--- | :--- |
+| `play` | `Event` | Fired when playback begins. |
+| `pause` | `Event` | Fired when playback is paused. |
+| `ended` | `Event` | Fired when playback reaches the end of the duration. |
+| `timeupdate` | `Event` | Fired when the current playback position changes. |
+| `volumechange` | `Event` | Fired when volume or muted state changes. |
+| `ratechange` | `Event` | Fired when the playback rate changes. |
+| `durationchange` | `Event` | Fired when the duration attribute/state changes. |
+| `seeking` | `Event` | Fired when a seek operation begins. |
+| `seeked` | `Event` | Fired when a seek operation completes. |
+| `resize` | `Event` | Fired when the player dimensions change. |
+| `loadstart` | `Event` | Fired when the browser starts looking for the media. |
+| `loadedmetadata` | `Event` | Fired when the duration and dimensions of the media have been loaded. |
+| `loadeddata` | `Event` | Fired when the first frame of the media has finished loading. |
+| `canplay` | `Event` | Fired when the browser can start playing the media. |
+| `canplaythrough` | `Event` | Fired when the browser estimates it can play through the media without buffering. |
+| `error` | `CustomEvent` | Fired when an error occurs (network, decode, timeout). `detail` contains error info. |
+| `enterpictureinpicture` | `Event` | Fired when the player enters Picture-in-Picture mode. |
+| `leavepictureinpicture` | `Event` | Fired when the player leaves Picture-in-Picture mode. |
+| `audiometering` | `CustomEvent` | Fired with audio level data when metering is active. `detail` contains `AudioLevels`. |
 
 ## C. Attributes
 
-The `<helios-player>` observes the following attributes:
+The component observes the following attributes:
 
-### Standard Attributes
-- `src`: The URL of the Helios composition to load.
-- `width`: The width of the player.
-- `height`: The height of the player.
-- `autoplay`: Boolean attribute to auto-start playback.
-- `loop`: Boolean attribute to loop playback.
-- `controls`: Boolean attribute to show/hide default controls.
-- `poster`: URL of an image to show before playback.
-- `preload`: Hint for how much to preload (`none`, `metadata`, `auto`).
-- `muted`: Boolean attribute to default to muted state.
-
-### Configuration Attributes
-- `sandbox`: Configures iframe sandbox flags (default: `allow-scripts allow-same-origin`).
-- `controlslist`: Allows hiding specific controls (`nodownload`, `nofullscreen`).
-- `disablepictureinpicture`: Boolean attribute to disable the PiP button.
-- `interactive`: Boolean attribute to enable interactive mode (prevents click-to-pause).
-- `input-props`: JSON string of properties to pass to the composition.
-
-### Media Session Attributes
-- `media-title`: Title of the media for OS integration.
-- `media-artist`: Artist of the media for OS integration.
-- `media-album`: Album of the media for OS integration.
-- `media-artwork`: URL of the artwork for OS integration.
-
-### Export Attributes
-- `export-mode`: Controls export behavior (`auto`, `canvas`, `dom`).
-- `canvas-selector`: CSS selector for the canvas to capture in `canvas` mode.
-- `export-caption-mode`: Controls caption export (`burn-in`, `file`, `none`).
-- `export-width`: Target width for client-side export.
-- `export-height`: Target height for client-side export.
-- `export-bitrate`: Target bitrate for video export.
-- `export-filename`: Filename for the exported file.
-- `export-format`: Output format (`mp4`, `webm`).
+| Attribute | Type | Description |
+| :--- | :--- | :--- |
+| `src` | `string` | URL of the Helios composition to load. |
+| `width` | `number` | Width of the player in pixels. |
+| `height` | `number` | Height of the player in pixels. |
+| `autoplay` | `boolean` | If present, playback starts automatically when ready. |
+| `loop` | `boolean` | If present, the composition loops upon reaching the end. |
+| `controls` | `boolean` | If present, standard UI controls are displayed. |
+| `muted` | `boolean` | If present, audio is initially muted. |
+| `poster` | `string` | URL of an image to show while loading or before playback. |
+| `preload` | `string` | Hints how much media to preload (`auto`, `none`). |
+| `interactive` | `boolean` | If present, allows direct interaction with the iframe content (disables click-to-play layer). |
+| `controlslist` | `string` | Space-separated tokens to hide UI features: `nodownload`, `nofullscreen`. |
+| `disablepictureinpicture` | `boolean` | If present, hides the Picture-in-Picture button. |
+| `sandbox` | `string` | Sandbox flags for the iframe (default: `allow-scripts allow-same-origin`). |
+| `input-props` | `json` | JSON string of properties to pass to the Helios controller. |
+| `export-mode` | `string` | Export strategy: `auto`, `canvas` (requires same-origin), or `dom`. |
+| `canvas-selector` | `string` | CSS selector for the canvas element inside the composition (default: `canvas`). |
+| `export-format` | `string` | Default format for client-side export: `mp4`, `webm`, `png`, `jpeg`. |
+| `export-filename` | `string` | Default filename for exported files. |
+| `export-width` | `number` | Target width for client-side exports (independent of player display size). |
+| `export-height` | `number` | Target height for client-side exports. |
+| `export-bitrate` | `number` | Target bitrate for video exports (in bps). |
+| `export-caption-mode` | `string` | Caption handling during export: `burn-in` (default) or `file` (saves .srt). |
+| `media-title` | `string` | Media Session metadata: Title. |
+| `media-artist` | `string` | Media Session metadata: Artist. |
+| `media-album` | `string` | Media Session metadata: Album. |
+| `media-artwork` | `string` | Media Session metadata: Artwork URL. |
 
 ## D. Public API (HeliosPlayer)
 
-- `play()`: Promise<void>
-- `pause()`: void
-- `fastSeek(time: number)`: void
-- `export(options)`: Promise<void>
-- `diagnose()`: Promise<DiagnosticReport>
-- `addTextTrack(kind, label, language)`: TextTrack
-- `startAudioMetering()`: void
-- `stopAudioMetering()`: void
-- `requestPictureInPicture()`: Promise<PictureInPictureWindow>
+```typescript
+interface HeliosPlayer extends HTMLElement {
+  // Standard Media API
+  play(): Promise<void>;
+  pause(): void;
+  load(): void;
+  canPlayType(type: string): CanPlayTypeResult;
+  fastSeek(time: number): void;
+  requestPictureInPicture(): Promise<PictureInPictureWindow>;
 
-### Properties
-- `currentTime`: number (get/set)
-- `duration`: number (get)
-- `paused`: boolean (get)
-- `volume`: number (get/set)
-- `muted`: boolean (get/set)
-- `playbackRate`: number (get/set)
-- `videoWidth`: number (get)
-- `videoHeight`: number (get)
-- `readyState`: number (get)
-- `networkState`: number (get)
-- `currentSrc`: string (get)
-- `error`: MediaError | null (get)
-- `buffered`: TimeRanges (get)
-- `seekable`: TimeRanges (get)
-- `seeking`: boolean (get)
-- `audioTracks`: AudioTrackList (get)
-- `videoTracks`: VideoTrackList (get)
-- `textTracks`: TextTrackList (get)
+  // Properties
+  currentTime: number;
+  duration: number;
+  paused: boolean;
+  ended: boolean;
+  volume: number;
+  muted: boolean;
+  playbackRate: number;
+  currentSrc: string;
+  src: string;
+  error: MediaError | null;
+  readyState: number;
+  networkState: number;
+  width: number;
+  height: number;
+  videoWidth: number;
+  videoHeight: number;
+  playsInline: boolean;
+
+  // Tracks
+  readonly textTracks: HeliosTextTrackList;
+  readonly audioTracks: HeliosAudioTrackList;
+  readonly videoTracks: HeliosVideoTrackList;
+  addTextTrack(kind: string, label?: string, language?: string): HeliosTextTrack;
+
+  // Helios Specific
+  fps: number;
+  currentFrame: number;
+  inputProps: Record<string, any> | null;
+
+  // Methods
+  getController(): HeliosController | null;
+  getSchema(): Promise<HeliosSchema | undefined>;
+  diagnose(): Promise<DiagnosticReport>;
+  export(options?: HeliosExportOptions): Promise<void>;
+  captureStream(): Promise<MediaStream>;
+  startAudioMetering(): void;
+  stopAudioMetering(): void;
+}
+```

@@ -1,3 +1,6 @@
+## PLAYER v0.76.9
+- ✅ Completed: Update Context Documentation - Regenerated context-player.md to reflect the latest API and features.
+
 ## PLAYER v0.76.8
 - ✅ Verified: Exporter Integration - Added integration test to `exporter.test.ts` confirming that `ClientSideExporter` correctly propagates `width` and `height` options to `captureFrame`, ensuring resolution-independent exports work as intended.
 - ✅ Completed: Sync Version - Updated package.json to match status file (0.76.8) and verified implementation with full test suite (326 tests passed).
