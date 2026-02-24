@@ -1,3 +1,6 @@
+## STUDIO v0.115.0
+- ✅ Completed: WebCodecs Preference - Added `webCodecsPreference` configuration to Studio Renders Panel, allowing users to select Hardware, Software, or Disabled modes for rendering.
+
 ## STUDIO v0.114.2
 - ✅ Completed: React Components Example - Added documentation and verified `react-components-demo` example.
 

@@ -40,6 +40,7 @@ export interface RenderConfig {
   concurrency?: number;
   hwAccel?: string;
   scale?: number;
+  webCodecsPreference?: 'hardware' | 'software' | 'disabled';
 }
 
 export interface RenderJob {
