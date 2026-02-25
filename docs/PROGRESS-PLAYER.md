@@ -1,3 +1,6 @@
+## PLAYER v0.76.10
+- ✅ Completed: Async Seek - Updated `DirectController.seek` to wait for two `requestAnimationFrame` cycles before resolving, ensuring visual frame rendering is complete.
+
 ## PLAYER v0.76.9
 - ✅ Completed: Update Context Documentation - Regenerated context-player.md to reflect the latest API and features.
 

@@ -108,15 +108,17 @@ describe('DirectController', () => {
         controller = new DirectController(helios, mockIframe);
     });
 
-    it('should delegate play/pause/seek to instance', () => {
+    it('should delegate play/pause/seek to instance', async () => {
         controller.play();
         expect(mockHeliosInstance.play).toHaveBeenCalled();
 
         controller.pause();
         expect(mockHeliosInstance.pause).toHaveBeenCalled();
 
-        controller.seek(10);
+        const rafSpy = vi.spyOn(mockIframe.contentWindow as any, 'requestAnimationFrame');
+        await controller.seek(10);
         expect(mockHeliosInstance.seek).toHaveBeenCalledWith(10);
+        expect(rafSpy).toHaveBeenCalledTimes(2);
     });
 
     it('should set playback rate and input props', () => {

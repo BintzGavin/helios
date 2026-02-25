@@ -48,9 +48,16 @@ export class DirectController implements HeliosController {
   }
   play() { this.instance.play(); }
   pause() { this.instance.pause(); }
-  seek(frame: number) {
+  seek(frame: number): Promise<void> {
     this.instance.seek(frame);
-    return Promise.resolve();
+    return new Promise((resolve) => {
+      const win = this.iframe?.contentWindow || window;
+      win.requestAnimationFrame(() => {
+        win.requestAnimationFrame(() => {
+          resolve();
+        });
+      });
+    });
   }
   setAudioVolume(volume: number) { this.instance.setAudioVolume(volume); }
   setAudioMuted(muted: boolean) { this.instance.setAudioMuted(muted); }
