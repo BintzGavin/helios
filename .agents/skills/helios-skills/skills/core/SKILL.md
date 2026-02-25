@@ -45,8 +45,7 @@ interface HeliosOptions {
   initialFrame?: number;         // Start frame (default: 0)
   loop?: boolean;                // Loop playback (default: false)
   autoSyncAnimations?: boolean;  // Auto-sync DOM animations (WAAPI) to timeline
-  animationScope?: HTMLElement;  // Scope for animation syncing (default: document)
-  ticker?: Ticker;               // Custom ticker implementation
+  animationScope?: HTMLElement;  // Scope for animation syncing
   inputProps?: Record<string, any>; // Initial input properties
   schema?: HeliosSchema;         // JSON schema for inputProps validation
   playbackRate?: number;         // Initial playback rate (default: 1)
@@ -58,7 +57,6 @@ interface HeliosOptions {
   markers?: Marker[];            // Initial timeline markers
   playbackRange?: [number, number]; // Restrict playback to [startFrame, endFrame]
   driver?: TimeDriver;           // Custom time driver (mostly internal use)
-  timeline?: HeliosTimeline;     // Declarative timeline definition
 }
 ```
 
@@ -84,41 +82,8 @@ interface HeliosState {
   availableAudioTracks: AudioTrackMetadata[];
   captions: CaptionCue[];
   activeCaptions: CaptionCue[];
-  activeClips: HeliosClip[];
   markers: Marker[];
   playbackRange: [number, number] | null;
-}
-
-interface HeliosConfig<TInputProps = Record<string, any>> {
-  width?: number;
-  height?: number;
-  duration: number;
-  fps: number;
-  inputProps?: TInputProps;
-  schema?: HeliosSchema;
-  // ... other HeliosOptions properties
-}
-
-interface HeliosComposition<TInputProps = Record<string, any>> extends HeliosConfig<TInputProps> {
-  timeline?: HeliosTimeline;
-}
-
-interface HeliosTimeline {
-  tracks: HeliosTrack[];
-}
-
-interface HeliosTrack {
-  id: string;
-  name?: string;
-  clips: HeliosClip[];
-}
-
-interface HeliosClip {
-  id: string;
-  source: string;
-  start: number;   // Start time in seconds
-  duration: number; // Duration in seconds
-  props?: Record<string, any>;
 }
 
 type AudioTrackState = {
@@ -134,7 +99,6 @@ type AudioTrackState = {
 helios.play()                 // Start playback
 helios.pause()                // Pause playback
 helios.seek(frame: number)    // Jump to specific frame
-helios.seekToTime(seconds: number) // Jump to specific time in seconds
 helios.setPlaybackRate(rate: number) // Change playback speed (e.g., 0.5, 2.0)
 
 // Set Playback Range (Loop/Play only within these frames)
@@ -163,10 +127,6 @@ helios.setAudioMuted(muted: boolean)  // Set muted state
 // Use data-helios-track-id="myTrack" on DOM elements to group them
 helios.setAudioTrackVolume(trackId: string, volume: number)
 helios.setAudioTrackMuted(trackId: string, muted: boolean)
-
-// Manually set available tracks (for headless environments)
-// Metadata now supports 'fadeEasing' (e.g. "quad.in", "sine.out")
-helios.setAvailableAudioTracks(tracks: AudioTrackMetadata[])
 
 // Advanced: Audio Visualization Hooks
 // Get the shared AudioContext (if supported by driver)
@@ -230,11 +190,6 @@ Bind Helios to `document.timeline` when the timeline is driven externally (e.g.,
 // Start polling document.timeline (or __HELIOS_VIRTUAL_TIME__ in Renderer)
 helios.bindToDocumentTimeline()
 helios.unbindFromDocumentTimeline() // Stop polling
-
-// Check if reactively bound to virtual time (Synchronous)
-if (helios.isVirtualTimeBound) {
-  // Sync is exact
-}
 ```
 
 #### Stability Registry
@@ -365,7 +320,6 @@ helios.playbackRange: ReadonlySignal<[number, number] | null>
 helios.width: ReadonlySignal<number>
 helios.height: ReadonlySignal<number>
 helios.loop: ReadonlySignal<boolean>
-helios.activeClips: ReadonlySignal<HeliosClip[]>
 ```
 
 ## Animation Helpers
@@ -452,67 +406,6 @@ import { interpolate } from '@helios-project/core';
 const opacity = interpolate(frame, [0, 30], [0, 1], {
   extrapolateRight: 'clamp'
 });
-```
-
-### Sequence
-Calculate the local time and progress of a single sequence.
-
-```typescript
-import { sequence } from '@helios-project/core';
-
-const { progress, isActive } = sequence({
-  frame: currentFrame,
-  from: 0,
-  durationInFrames: 60
-});
-// progress: 0 to 1
-// isActive: true if currentFrame is within [from, from + durationInFrames)
-```
-
-### Transition
-Calculate a linear or eased transition value (0 to 1).
-
-```typescript
-import { transition } from '@helios-project/core';
-
-const t = transition(frame, startFrame, duration, {
-  easing: (t) => t * t // Optional easing function
-});
-```
-
-### Crossfade
-Calculate overlapping transition values for crossfading two scenes.
-
-```typescript
-import { crossfade } from '@helios-project/core';
-
-const { in: fadeIn, out: fadeOut } = crossfade(frame, startFrame, duration);
-// fadeIn goes 0 -> 1
-// fadeOut goes 1 -> 0
-```
-
-## Utilities
-
-### Random
-Generate a deterministic pseudo-random number based on a seed.
-
-```typescript
-import { random } from '@helios-project/core';
-
-const val = random("seed-123"); // Always returns the same number (0 to 1)
-```
-
-### Color Handling
-Parse and interpolate colors.
-
-```typescript
-import { parseColor, interpolateColors } from '@helios-project/core';
-
-// Parse
-const color = parseColor("#ff0000"); // { r: 255, g: 0, b: 0, a: 1 }
-
-// Interpolate
-const bg = interpolateColors(frame, [0, 100], ["#000000", "#ffffff"]);
 ```
 
 ## Schema Validation

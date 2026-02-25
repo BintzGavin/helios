@@ -39,7 +39,7 @@ The `<helios-player>` Web Component allows you to embed and control Helios compo
 | `poster` | string | URL of an image to show before playback |
 | `preload` | 'auto' \| 'none' | Preload behavior (default: 'auto') |
 | `interactive`| boolean | Allow direct interaction with the iframe content (disables overlay) |
-| `input-props` | JSON string | Pass initial properties to the composition (e.g., `'{"title": "My Video"}'`) |
+| `input-props` | JSON string | Pass initial properties to the composition |
 | `export-mode` | 'auto' \| 'canvas' \| 'dom' | Strategy for client-side export (default: 'auto') |
 | `export-format` | 'mp4' \| 'webm' | Output format for client-side export (default: 'mp4') |
 | `export-caption-mode` | 'burn-in' \| 'file' | How to handle captions during export (default: 'burn-in') |
@@ -50,10 +50,6 @@ The `<helios-player>` Web Component allows you to embed and control Helios compo
 | `disablepictureinpicture` | boolean | Disable the Picture-in-Picture button |
 | `canvas-selector`| string | CSS selector for the canvas element (default: 'canvas') |
 | `sandbox` | string | Iframe sandbox flags (default: 'allow-scripts allow-same-origin') |
-| `media-title` | string | Media Metadata: Title |
-| `media-artist` | string | Media Metadata: Artist |
-| `media-album` | string | Media Metadata: Album |
-| `media-artwork` | string | Media Metadata: Artwork URL |
 
 ### CSS Variables (Theming)
 
@@ -67,12 +63,6 @@ helios-player {
   --helios-range-track-color: #555555;
   --helios-range-selected-color: rgba(255, 255, 255, 0.5);
   --helios-font-family: 'Helvetica', sans-serif;
-
-  /* Caption Styling */
-  --helios-caption-scale: 0.05;           /* Scale relative to player height */
-  --helios-caption-bg: rgba(0, 0, 0, 0.7);
-  --helios-caption-color: white;
-  --helios-caption-font-family: sans-serif;
 }
 ```
 
@@ -87,25 +77,13 @@ const player = document.querySelector('helios-player');
 player.play();
 player.pause();
 player.load();
-player.requestPictureInPicture().then(pipWindow => { ... }); // Returns Promise<PictureInPictureWindow>
+player.requestPictureInPicture(); // Enter PiP mode
 player.currentTime = 5.0; // Seek to 5 seconds
 player.currentFrame = 150; // Seek to frame 150
 
 // Audio Control
 player.volume = 0.5; // 0.0 to 1.0
 player.muted = true;
-
-// Audio Metering
-// Dispatches 'audiometering' event with { stereo: [L, R], peak: [L, R] }
-player.startAudioMetering();
-player.stopAudioMetering();
-
-// Export Video
-await player.export({
-  filename: 'my-video',
-  format: 'mp4',
-  onProgress: (p) => console.log(`Exporting: ${Math.round(p * 100)}%`)
-});
 
 // Writable Properties
 console.log(player.duration);     // Total duration in seconds
@@ -137,9 +115,6 @@ const track = player.addTextTrack("captions", "English", "en");
 track.addEventListener("cuechange", () => {
   console.log("Active Cues:", track.activeCues);
 });
-
-// Schema
-const schema = await player.getSchema(); // Get the JSON schema defined in composition
 ```
 
 #### Events
@@ -150,15 +125,6 @@ The player dispatches standard media events:
 - `volumechange`
 - `durationchange`, `ratechange`
 - `error`
-- `enterpictureinpicture`, `leavepictureinpicture`
-- `audiometering` (custom event)
-  ```typescript
-  interface AudioLevels {
-    stereo: [number, number]; // Left/Right RMS levels (0-1)
-    peak: [number, number];   // Left/Right Peak levels (0-1)
-  }
-  // event.detail contains AudioLevels
-  ```
 
 #### Advanced Control
 For low-level access to the Helios state, use `getController()`.
@@ -197,33 +163,13 @@ The player will fetch the SRT file and pass it to the Helios controller.
 
 ## Client-Side Export
 
-The player supports exporting videos directly in the browser using `VideoEncoder`.
+The player supports exporting videos directly in the browser (using `VideoEncoder`).
 
-### Programmatic Usage
-
-```typescript
-await player.export({
-  filename: 'my-export',
-  format: 'mp4', // 'mp4' | 'webm' | 'png' | 'jpeg'
-  width: 1920,   // Optional: Override resolution
-  height: 1080,
-  bitrate: 5_000_000,
-  includeCaptions: true, // Force burn-in
-  onProgress: (progress) => {
-    console.log(`Progress: ${progress}`);
-  }
-});
-```
-
-### Configuration
-1. **Formats:** `mp4` (H.264/AAC), `webm` (VP9/Opus), `png` (Snapshot), `jpeg` (Snapshot).
+1. **Formats:** Supports `mp4` (H.264/AAC) and `webm` (VP9/Opus).
 2. **Audio:** Captures audio from `<audio>` elements (must be CORS-enabled).
-3. **Captions (`export-caption-mode`):**
-   - `burn-in`: Renders text directly onto video frames (hardsub).
-   - `file`: Downloads a separate `.srt` file (softsub) and keeps video clean.
-   - *Note:* Programmatic `includeCaptions: true` overrides this to force burn-in.
-4. **Resolution:** Configure export resolution using `export-width` / `export-height` attributes or options object.
-5. **Usage:** User clicks "Export" in controls (opens Export Menu), or call `player.export()` programmatically.
+3. **Captions:** Supports "burning in" captions (`export-caption-mode="burn-in"`) or saving as sidecar file (`export-caption-mode="file"`).
+4. **Resolution:** Configure export resolution independently of player size using `export-width` and `export-height`.
+5. **Usage:** User clicks "Export" in controls, or call `clientSideExporter` manually (internal API).
 
 ## UI Features
 

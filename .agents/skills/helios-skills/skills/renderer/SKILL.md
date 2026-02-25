@@ -46,19 +46,12 @@ interface RendererOptions {
   startFrame?: number;     // Frame to start rendering from (default: 0)
   mode?: 'dom' | 'canvas'; // Rendering strategy (default: 'canvas')
   inputProps?: Record<string, any>; // Inject props into window.__HELIOS_PROPS__
-  stabilityTimeout?: number; // Max time to wait for frame stability (ms, default: 30000)
-  randomSeed?: number;       // Seed for deterministic random numbers (default: 0x12345678)
-
-  // Selector Configuration
-  canvasSelector?: string; // CSS selector for canvas mode (default: 'canvas')
-  targetSelector?: string; // CSS selector for DOM mode (captures specific element)
 
   // Audio Configuration
   audioFilePath?: string;        // Path to single audio file
   audioTracks?: (string | AudioTrackConfig)[]; // List of audio tracks
   audioCodec?: string;           // e.g., 'aac', 'libvorbis'
   audioBitrate?: string;         // e.g., '128k', '192k'
-  mixInputAudio?: boolean;       // Mix audio from input video (default: false)
 
   // Video Encoding
   videoCodec?: string;           // e.g., 'libx264' (default, prioritized), 'libvpx'
@@ -66,12 +59,10 @@ interface RendererOptions {
   crf?: number;                  // Constant Rate Factor (quality control)
   preset?: string;               // Encoding preset (e.g., 'fast')
   videoBitrate?: string;         // e.g., '5M', '1000k'
-  subtitles?: string;            // Path to SRT file (requires libx264)
+  subtitles?: boolean;           // Burn subtitles into video (requires libx264)
 
   // Intermediate Capture (Canvas Mode)
   intermediateVideoCodec?: string; // 'vp8' (default), 'vp9', 'av1'
-  keyFrameInterval?: number;       // Keyframe interval in frames (default: fps * 2)
-  hwAccel?: string;                // Hardware acceleration (e.g., 'cuda', 'vaapi', 'auto')
 
   // Intermediate Capture (DOM Mode)
   intermediateImageFormat?: 'png' | 'jpeg'; // Default: 'png'
@@ -88,38 +79,10 @@ interface RendererOptions {
 
 interface AudioTrackConfig {
   path: string;
-  buffer?: Buffer; // Buffer containing audio data (alternative to path)
   volume?: number; // 0.0 to 1.0
   offset?: number; // Start time in composition (seconds)
   seek?: number;   // Start time in source file (seconds)
-  fadeInDuration?: number; // Duration in seconds
-  fadeOutDuration?: number; // Duration in seconds
-  loop?: boolean; // Loop indefinitely
   playbackRate?: number; // Speed multiplier (default: 1.0)
-  duration?: number; // Source duration in seconds
-}
-
-interface DistributedRenderOptions extends RendererOptions {
-  concurrency?: number; // Number of parallel workers (default: CPU cores - 1)
-  executor?: RenderExecutor; // Custom executor (default: LocalExecutor)
-}
-
-interface RenderPlan {
-  totalFrames: number;
-  chunks: RenderChunk[];
-  concatManifest: string[]; // List of chunk files to concatenate
-  concatOutputFile: string; // The intermediate PCM .mov file
-  finalOutputFile: string; // The final user-requested output
-  mixOptions: RendererOptions; // Options for the final audio mix/transcode pass
-  cleanupFiles: string[]; // List of temporary files to delete after success
-}
-
-interface RenderChunk {
-  id: number;
-  startFrame: number;
-  frameCount: number;
-  outputFile: string;
-  options: RendererOptions;
 }
 ```
 
@@ -191,8 +154,6 @@ const diagnostics = await renderer.diagnose();
 ### Distributed Rendering
 Split a render job into multiple chunks to run concurrently (e.g., on multiple cores).
 
-#### Execution
-
 ```typescript
 import { RenderOrchestrator, DistributedRenderOptions } from '@helios-project/renderer';
 
@@ -208,31 +169,6 @@ await RenderOrchestrator.render(
   { onProgress: (p) => console.log(`Total Progress: ${p}`) }
 );
 ```
-
-#### Planning
-Plan a distributed render job without executing it. Returns a `RenderPlan` object describing the chunks and concatenation steps.
-
-```typescript
-const plan = RenderOrchestrator.plan(
-  'http://localhost:3000/composition.html',
-  'output.mp4',
-  {
-    width: 1920,
-    height: 1080,
-    fps: 30,
-    durationInSeconds: 10,
-    concurrency: 4
-  }
-);
-
-console.log(`Plan creates ${plan.chunks.length} chunks.`);
-```
-
-**Audio Handling:**
-- Distributed rendering generates silent video chunks first to maximize performance.
-- Audio is mixed in a final global pass after concatenation.
-- The Orchestrator automatically detects if the concatenated video contains implicit audio (from DOM elements) and mixes it if present.
-- Explicit `audioTracks` are also mixed in this final pass.
 
 ### Concatenate Videos
 Combine multiple video files into one.
@@ -252,7 +188,7 @@ Burn subtitles (e.g. from the player) into the video output. Requires `videoCode
 const renderer = new Renderer({
   // ...
   videoCodec: 'libx264',
-  subtitles: './captions.srt'
+  subtitles: true
 });
 ```
 
@@ -292,12 +228,6 @@ const renderer = new Renderer({
   ]
 });
 ```
-
-## Common Issues
-
-### Virtual Time Binding Warning
-If you see a warning about "Helios not bound to virtual time", it means the `SeekTimeDriver` cannot precisely control the animation loop.
-**Fix:** Ensure your composition calls `helios.bindToDocumentTimeline()` (typically in your entry file).
 
 ## Source Files
 

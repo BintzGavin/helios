@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "skills": {
+    "helios-skills": {
+      "source": "BintzGavin/helios-skills",
+      "sourceType": "github",
+      "computedHash": "7e1dd53fd3b2801985acb1a30597f09b1438511794c528a231f52c9054de4319"
+    }
+  }
+}
