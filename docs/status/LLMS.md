@@ -1,11 +1,12 @@
 # Status: LLMS
 
-**Version**: 1.24.0
+**Version**: 1.25.0
 
 - **Status**: Active
 - **Current Focus**: Comprehensive Review and Maintenance
-- **Last Updated**: 2026-02-24
+- **Last Updated**: 2026-02-25
 
+[v1.25.0] ✅ Completed: Comprehensive Daily Review - Updated Studio to v0.115.0+ (WebCodecs Preference, React Components Example), Player to v0.76.9+ (Context Docs), Renderer to v1.80.0+ (WebCodecs Preference), and CLI to v0.33.0+ (Stateless Worker). Updated Quick Facts and Roadmap with recent features.
 [v1.24.0] ✅ Completed: Comprehensive Daily Review - Updated CLI to v0.32.0+ (Remote Job Spec, Deploy Command [GCP/AWS]) and Player to v0.76.8+ (Exporter Integration). Updated Quick Facts and Roadmap to reflect these changes.
 [v1.23.1] ✅ Completed: Comprehensive Daily Review - Updated Roadmap to reflect AWS Lambda Deploy Command support and moved it to V1.x (Active). Updated Comparison Table for Distributed Rendering (Cloud GCP/AWS). Verified all package versions.
 [v1.23.0] ✅ Completed: Comprehensive Daily Review - Updated Roadmap to reflect GCP Deploy Command support and moved Cloud Run to completed. Updated Comparison Table for Distributed Rendering (Cloud GCP). Verified all package versions against package.json.
