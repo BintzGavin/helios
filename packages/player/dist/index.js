@@ -3091,6 +3091,44 @@ export class HeliosPlayer extends HTMLElement {
         }
         return this.controller.diagnose();
     }
+    async captureStream() {
+        if (!this.controller || !(this.controller instanceof DirectController)) {
+            throw new Error("captureStream() is only available in Direct Mode (same-origin).");
+        }
+        const helios = this.controller.instance;
+        const fps = helios.fps.peek();
+        // 1. Video Stream from Canvas
+        let canvas = null;
+        try {
+            const doc = this.iframe.contentDocument || this.iframe.contentWindow?.document;
+            if (doc) {
+                const selector = this.getAttribute("canvas-selector") || "canvas";
+                canvas = doc.querySelector(selector);
+            }
+        }
+        catch (e) {
+            // Access denied
+        }
+        if (!canvas) {
+            throw new Error("Canvas not found for captureStream().");
+        }
+        const stream = canvas.captureStream(fps);
+        // 2. Audio Stream from AudioContext
+        const ctx = await helios.getAudioContext();
+        if (ctx) {
+            const dest = ctx.createMediaStreamDestination();
+            const tracks = helios.availableAudioTracks.peek();
+            for (const track of tracks) {
+                const source = await helios.getAudioSourceNode(track.id);
+                if (source) {
+                    source.connect(dest);
+                }
+            }
+            const audioTracks = dest.stream.getAudioTracks();
+            audioTracks.forEach(t => stream.addTrack(t));
+        }
+        return stream;
+    }
     startAudioMetering() {
         if (this.controller) {
             this.controller.startAudioMetering();

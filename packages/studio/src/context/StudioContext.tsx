@@ -133,6 +133,7 @@ interface StudioContextType {
   uploadAsset: (file: File, directory?: string) => Promise<void>;
   deleteAsset: (id: string) => Promise<void>;
   renameAsset: (id: string, newName: string) => Promise<void>;
+  moveAsset: (sourceId: string, targetFolderId: string) => Promise<void>;
   createFolder: (name: string, parentPath?: string) => Promise<void>;
 
   // Render Jobs
@@ -303,6 +304,28 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       fetchAssets();
     } catch (e) {
       console.error('Failed to rename asset:', e);
+      throw e;
+    }
+  };
+
+  const moveAsset = async (sourceId: string, targetFolderId: string) => {
+    try {
+      const res = await fetch('/api/assets/move', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sourceId, targetFolderId })
+      });
+
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || 'Failed to move asset');
+      }
+
+      fetchAssets();
+      addToast('Asset moved', 'success');
+    } catch (e: any) {
+      console.error(e);
+      addToast(e.message || 'Failed to move asset', 'error');
       throw e;
     }
   };
@@ -912,6 +935,7 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         uploadAsset,
         deleteAsset,
         renameAsset,
+        moveAsset,
         createFolder,
         activeComposition,
         setActiveComposition,

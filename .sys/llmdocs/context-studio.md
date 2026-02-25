@@ -64,10 +64,10 @@ The Studio is launched via the `helios` CLI (from `@helios-project/cli`).
 - **Renderer**: Uses `RenderOrchestrator` for planning and executing renders.
 - **CLI**: The Studio backend exposes endpoints that the CLI can leverage (e.g., for `helios render` with HMR support, though currently CLI uses Renderer directly).
 
-## F. Recent Changes (v0.115.0)
+## F. Recent Changes (v0.116.0)
+- **Completed: Asset Move**: Implemented drag-and-drop support for moving assets and folders within the Assets Panel, backed by a new `moveAsset` API.
 - **Completed: WebCodecs Preference**: Added `webCodecsPreference` configuration to Studio Renders Panel.
 - **Completed: React Components Example**: Added documentation and verified `react-components-demo` example.
 - **Verified: Regression Test**: Validated Studio UI functionality via Playwright script (`scripts/verify-ui.ts`).
 - **Verified: Registry Filtering Support**: Confirmed that Studio supports cross-framework component discovery.
 - **Completed: CLI Init Examples Fix**: Replaced `degit` with `giget` in `helios init --example`.
-- **Completed: CLI Components Command Enhanced**: Verified implementation of `helios components` command.

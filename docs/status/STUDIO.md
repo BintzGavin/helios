@@ -1,4 +1,4 @@
-**Version**: 0.115.0
+**Version**: 0.116.0
 
 **Posture**: ACTIVELY EXPANDING FOR V2
 
@@ -11,6 +11,7 @@
 > **Note**: Status versions in this file may precede package release versions (`package.json`). Always verify `package.json` for the currently installed version.
 
 ## Recent Updates
+- [v0.116.0] ✅ Completed: Asset Move - Implemented drag-and-drop support for moving assets and folders within the Assets Panel, backed by a new `moveAsset` API.
 - [v0.115.0] ✅ Completed: WebCodecs Preference - Added `webCodecsPreference` configuration to Studio Renders Panel, allowing users to select Hardware, Software, or Disabled modes for rendering.
 - [v0.114.2] ✅ Completed: React Components Example - Added documentation and verified `react-components-demo` example.
 - [v0.114.1] ✅ Verified: Regression Test - Validated Studio UI functionality via Playwright script (`scripts/verify-ui.ts`), confirming critical UI elements (Timeline, Renders Panel) load correctly.
@@ -52,7 +53,7 @@
 - [v0.94.1] ✅ Verified: Render Presets - Added unit tests for RenderConfig and StudioContext persistence, ensuring robustness.
 - [v0.94.0] ✅ Completed: Render Presets - Implemented render configuration presets (Draft, HD, 4K) and persistence for render settings.
 - [v0.93.1] ✅ Completed: Smart Empty State - Implemented "Smart Empty State" for the Stage, providing "Create Composition" (fresh project) and "Select Composition" (unselected) empty states.
-- [v0.93.0] ✅ Completed: Visualize Time-based Props - Implemented `TimecodeInput` in Props Editor and visual markers on the Timeline for number props with `format: 'time'`, enabling WYSIWYG timing adjustments.
+- [v0.93.0] ✅ Completed: Visualize Time-based Props - Implemented `TimecodeInput` in Props Editor and visual markers in Timeline for number props with `format: 'time'`, enabling WYSIWYG timing adjustments.
 - [v0.92.0] ✅ Completed: Components Registry UI - Implemented "Components" panel in Studio UI, enabling users to browse and install components from the registry via the CLI backend.
 - [v0.91.0] ✅ Completed: CLI Production Server - Replaced development-only spawn process with robust Vite server integration using `studioApiPlugin`, enabling correct HMR and path resolution for end-users.
 - [v0.90.0] ✅ Completed: Core Components - Expanded CLI Component Registry with `ProgressBar` and `Watermark` components.
@@ -121,6 +122,7 @@
 - [v0.40.1] ✅ Completed: Documentation & Verification - Added package README, updated version, and implemented Playwright-based verification script.
 - [v0.40.0] ✅ Completed: Global Shortcuts Refactor - Centralized all keyboard shortcuts into `GlobalShortcuts.tsx` and added Loop Toggle ('L').
 - [v0.39.0] ✅ Completed: Marker Visualization - Implemented visual markers in Timeline with click-to-seek functionality.
+- [v0.38.0] ✅ Completed: Marker Visualization - Implemented visual markers in Timeline with click-to-seek functionality.
 - [v0.38.0] ✅ Completed: AI System Prompt - Implemented a modal generator for LLM system prompts, combining static Helios context with dynamic composition schema.
 - [v0.37.0] ✅ Completed: Timeline Zoom - Implemented zoom slider and scrollable timeline track for precise editing.
 - [v0.36.0] ✅ Completed: Client-Side Export - Implemented in-browser MP4/WebM export functionality in Renders Panel using WebCodecs.

@@ -13,7 +13,7 @@ interface FolderItemProps {
 
 export const FolderItem: React.FC<FolderItemProps> = ({ name, asset, onClick, onDrop }) => {
   const { addToast } = useToast();
-  const { deleteAsset, renameAsset } = useStudio();
+  const { deleteAsset, renameAsset, moveAsset } = useStudio();
   const [isDragOver, setIsDragOver] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -33,11 +33,21 @@ export const FolderItem: React.FC<FolderItemProps> = ({ name, asset, onClick, on
     setIsDragOver(false);
   };
 
-  const handleDrop = (e: React.DragEvent) => {
+  const handleDrop = async (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
     setIsDragOver(false);
-    onDrop(e);
+
+    const assetId = e.dataTransfer.getData('application/helios-asset-id');
+    if (assetId && asset) {
+       try {
+         await moveAsset(assetId, asset.id);
+       } catch (err) {
+         // handled by toast in moveAsset
+       }
+    } else {
+       onDrop(e);
+    }
   };
 
   const handleDelete = (e: React.MouseEvent) => {

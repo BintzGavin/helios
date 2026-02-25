@@ -450,6 +450,68 @@ export async function findAssets(rootDir: string): Promise<AssetInfo[]> {
   return assets;
 }
 
+export function moveAsset(
+  rootDir: string,
+  sourceId: string,
+  targetFolderId: string
+): AssetInfo {
+  const projectRoot = getProjectRoot(rootDir);
+  const publicDir = path.join(projectRoot, 'public');
+  const hasPublic = fs.existsSync(publicDir);
+  const scanRoot = hasPublic ? publicDir : projectRoot;
+
+  const sourcePath = path.resolve(sourceId);
+  const targetDirPath = path.resolve(targetFolderId);
+
+  // Security check: ensure both paths are within project/public root
+  if (!sourcePath.startsWith(scanRoot)) {
+    throw new Error('Access denied: Cannot move asset from outside project/public root');
+  }
+  if (!targetDirPath.startsWith(scanRoot)) {
+    throw new Error('Access denied: Cannot move asset to outside project/public root');
+  }
+
+  if (!fs.existsSync(sourcePath)) {
+    throw new Error(`Source asset "${sourceId}" not found`);
+  }
+  if (!fs.existsSync(targetDirPath)) {
+    throw new Error(`Target folder "${targetFolderId}" not found`);
+  }
+  if (!fs.statSync(targetDirPath).isDirectory()) {
+    throw new Error(`Target "${targetFolderId}" is not a directory`);
+  }
+
+  // Prevent moving folder into itself
+  if (targetDirPath.startsWith(sourcePath)) {
+      throw new Error(`Cannot move folder "${sourcePath}" into itself "${targetDirPath}"`);
+  }
+
+  const fileName = path.basename(sourcePath);
+  const destPath = path.join(targetDirPath, fileName);
+
+  if (fs.existsSync(destPath)) {
+    throw new Error(`Asset "${fileName}" already exists in target folder`);
+  }
+
+  fs.renameSync(sourcePath, destPath);
+
+  const relativePath = path.relative(scanRoot, destPath).replace(/\\/g, '/');
+  const url = hasPublic ? `/${relativePath}` : `/@fs${destPath}`;
+  const ext = path.extname(destPath).toLowerCase();
+
+  // If it was a folder, the type should be folder
+  const isDir = fs.statSync(destPath).isDirectory();
+  const type = isDir ? 'folder' : getAssetType(ext);
+
+  return {
+    id: destPath,
+    name: fileName,
+    url,
+    type,
+    relativePath
+  };
+}
+
 export function renameAsset(
   rootDir: string,
   id: string,
