@@ -10,6 +10,7 @@ export interface HeliosConfig {
   };
   framework?: 'react' | 'vue' | 'svelte' | 'solid' | 'vanilla';
   components: string[];
+  dependencies?: Record<string, string>;
 }
 
 export const DEFAULT_CONFIG: HeliosConfig = {
@@ -19,6 +20,7 @@ export const DEFAULT_CONFIG: HeliosConfig = {
     lib: 'src/lib',
   },
   components: [],
+  dependencies: {},
 };
 
 export function loadConfig(cwd: string = process.cwd()): HeliosConfig | null {

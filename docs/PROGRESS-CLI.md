@@ -2,6 +2,10 @@
 
 This file tracks progress for the CLI domain (`packages/cli`).
 
+## CLI v0.34.0
+
+- ✅ Component Tracking - Implemented dependencies tracking in `helios.config.json` to mirror `package.json` dependencies.
+
 ## CLI v0.33.0
 
 - ✅ Stateless Worker - Implemented support for stateless job execution via HELIOS_JOB_SPEC environment variable in GCP templates.

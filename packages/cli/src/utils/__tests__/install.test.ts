@@ -160,6 +160,20 @@ describe('installComponent', () => {
     }), mockRootDir);
   });
 
+  it('should update dependencies in config', async () => {
+    const mockClient = {
+      findComponent: vi.fn().mockResolvedValue(mockComponent),
+    } as any;
+
+    await installComponent(mockRootDir, 'test-component', { install: true, client: mockClient });
+
+    expect(saveConfig).toHaveBeenCalledWith(expect.objectContaining({
+      dependencies: expect.objectContaining({
+        'test-component': 'latest',
+      }),
+    }), mockRootDir);
+  });
+
   it('should recursively install dependencies', async () => {
     const mockClient = {
       findComponent: vi.fn().mockImplementation((name) => {

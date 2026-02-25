@@ -20,6 +20,7 @@ This backlog tracks concrete deliverables derived from [`AGENTS.md`](../AGENTS.m
 
 - [x] Design registry manifest format.
 - [x] Implement CLI command to fetch and copy components.
+- [x] Implement component tracking in `helios.config.json`.
 - [x] Create initial set of core components.
 
 ## Product Surface (Studio, CLI, Examples)
