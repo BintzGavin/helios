@@ -109,3 +109,7 @@ Critical learnings only. This is not a log—only add entries for insights that 
 ## [0.32.0] - Template Rigidity
 **Learning:** Deployment templates (GCP) were hardcoded to local files (`job.json`), which defeated the purpose of the stateless worker strategy even though the CLI command supported it.
 **Action:** When designing deployment templates, always use environment variables for inputs (like job specs) to allow runtime configuration without container rebuilds.
+
+## [0.33.0] - Job Spec Asset Gap
+**Learning:** While `helios job run` supported remote specs, the generated specs (`--emit-job`) still used local paths, breaking the "Stateless Worker" vision. Generic workers cannot resolve local paths.
+**Action:** When designing distributed systems, ensure that ALL inputs (specs AND assets) are resolvable via network URLs. Local paths are only valid for local execution or mounted volumes.
