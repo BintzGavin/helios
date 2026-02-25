@@ -1,5 +1,15 @@
 # LLMS Progress
 
+## LLMS v1.25.0
+- ✅ Completed: Daily llms.txt Review
+  - Updated Quick Facts: Studio v0.115.0+, Player v0.76.9+, Renderer v1.80.0+, CLI v0.33.0+.
+  - Updated Roadmap:
+    - Studio: Added "WebCodecs Preference", "React Components Example", "Registry Filtering Support".
+    - CLI: Added "Stateless Worker (remote job spec)", "Remote Job Spec".
+    - Player: Added "Update Context Documentation".
+    - Renderer: Added "WebCodecs Preference".
+  - Verified features against codebase.
+
 ## LLMS v1.24.0
 - ✅ Completed: Daily llms.txt Review
   - Updated Quick Facts: CLI v0.32.0+, Player v0.76.8+.
