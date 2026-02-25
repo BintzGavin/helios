@@ -140,11 +140,21 @@ export async function installComponent(
   if (!config.components) {
     config.components = [];
   }
+  if (!config.dependencies) {
+    config.dependencies = {};
+  }
 
   let configChanged = false;
   for (const installedName of installedComponents) {
+    // Update components list (legacy)
     if (!config.components.includes(installedName)) {
       config.components.push(installedName);
+      configChanged = true;
+    }
+
+    // Update dependencies map
+    if (!config.dependencies[installedName]) {
+      config.dependencies[installedName] = 'latest';
       configChanged = true;
     }
   }

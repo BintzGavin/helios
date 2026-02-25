@@ -102,6 +102,7 @@ interface HeliosConfig {
   };
   framework?: 'react' | 'vue' | 'svelte' | 'solid' | 'vanilla';
   components: string[];
+  dependencies?: Record<string, string>;
 }
 ```
 
