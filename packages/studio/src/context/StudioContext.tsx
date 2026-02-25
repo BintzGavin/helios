@@ -847,13 +847,33 @@ export const StudioProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     // Instantiate exporter
     const exporter = new ClientSideExporter(controller);
 
+    const scale = renderConfig.scale || 1;
+    // Ensure even dimensions for FFmpeg compatibility
+    const width = Math.floor((canvasSize.width * scale) / 2) * 2;
+    const height = Math.floor((canvasSize.height * scale) / 2) * 2;
+
+    let bitrate: number | undefined;
+    if (renderConfig.videoBitrate) {
+      const match = renderConfig.videoBitrate.match(/^(\d+)([km])?$/i);
+      if (match) {
+        const val = parseInt(match[1], 10);
+        const unit = (match[2] || '').toLowerCase();
+        if (unit === 'k') bitrate = val * 1000;
+        else if (unit === 'm') bitrate = val * 1000000;
+        else bitrate = val;
+      }
+    }
+
     try {
       await exporter.export({
         format,
         mode: renderConfig.mode === 'dom' ? 'dom' : 'canvas',
         onProgress: (p: number) => setExportProgress(p),
         signal: exportAbortControllerRef.current.signal,
-        includeCaptions: true // Or expose as option if needed
+        includeCaptions: true, // Or expose as option if needed
+        width,
+        height,
+        bitrate
       });
     } catch (e: any) {
       if (e.message !== "Export aborted") {
