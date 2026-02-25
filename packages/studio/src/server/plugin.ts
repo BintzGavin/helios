@@ -4,7 +4,7 @@ import fs from 'fs';
 import path from 'path';
 import { SSEServerTransport } from "@modelcontextprotocol/sdk/server/sse.js";
 import { createMcpServer } from './mcp';
-import { findCompositions, findAssets, getProjectRoot, createComposition, deleteComposition, updateCompositionMetadata, duplicateComposition, renameComposition, renameAsset, deleteAsset, createDirectory } from './discovery';
+import { findCompositions, findAssets, getProjectRoot, createComposition, deleteComposition, updateCompositionMetadata, duplicateComposition, renameComposition, renameAsset, deleteAsset, createDirectory, moveAsset } from './discovery';
 import { templates } from './templates';
 import { findDocumentation, resolveDocumentationPath } from './documentation';
 import { startRender, getRenderJobSpec, getJob, getJobs, cancelJob, deleteJob, diagnoseServer } from './render-manager';
@@ -619,6 +619,29 @@ function configureMiddlewares(server: ViteDevServer | PreviewServer, isPreview: 
              const newDir = createDirectory(process.cwd(), dirPath);
              res.setHeader('Content-Type', 'application/json');
              res.end(JSON.stringify(newDir));
+           } catch (e: any) {
+             console.error(e);
+             res.statusCode = 500;
+             res.end(JSON.stringify({ error: e.message }));
+           }
+           return;
+        }
+
+        // POST: Move asset
+        if (req.url === '/move' && req.method === 'POST') {
+           try {
+             const body = await getBody(req);
+             const { sourceId, targetFolderId } = body;
+
+             if (!sourceId || !targetFolderId) {
+               res.statusCode = 400;
+               res.end(JSON.stringify({ error: 'sourceId and targetFolderId are required' }));
+               return;
+             }
+
+             const newAsset = moveAsset(process.cwd(), sourceId, targetFolderId);
+             res.setHeader('Content-Type', 'application/json');
+             res.end(JSON.stringify(newAsset));
            } catch (e: any) {
              console.error(e);
              res.statusCode = 500;

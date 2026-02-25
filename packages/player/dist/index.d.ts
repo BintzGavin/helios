@@ -332,6 +332,7 @@ export declare class HeliosPlayer extends HTMLElement implements TrackHost, Audi
     getSchema(): Promise<HeliosSchema | undefined>;
     export(options?: HeliosExportOptions): Promise<void>;
     diagnose(): Promise<DiagnosticReport>;
+    captureStream(): Promise<MediaStream>;
     startAudioMetering(): void;
     stopAudioMetering(): void;
     private retryConnection;

@@ -13,6 +13,9 @@ Each agent should update **their own dedicated progress file** instead of this f
 - **STUDIO**: Update `docs/PROGRESS-STUDIO.md`
 - **SKILLS**: Update `docs/PROGRESS-SKILLS.md`
 
+### STUDIO v0.116.0
+- ✅ Completed: Asset Move - Implemented drag-and-drop support for moving assets and folders within the Assets Panel, backed by a new `moveAsset` API.
+
 ### STUDIO v0.115.0
 - ✅ Completed: WebCodecs Preference - Added `webCodecsPreference` configuration to Studio Renders Panel, allowing users to select Hardware, Software, or Disabled modes for rendering.
 
