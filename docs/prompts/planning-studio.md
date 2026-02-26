@@ -76,6 +76,7 @@ Compare README promises to `packages/studio/src`:
 - **Renders Panel** - Track rendering progress and manage render jobs
 - **Canvas Controls** - Zoom, resize, and toggle transparent backgrounds
 - **Hot Reloading** - Instant preview updates as you edit your composition code
+- **Timeline Drag & Drop** - Drag and drop media support (auto-detecting audio vs video) for the timeline, ensuring functionality within iframe environments.
 
 **CLI Command**: `npx helios studio` - Should run the studio dev server
 
