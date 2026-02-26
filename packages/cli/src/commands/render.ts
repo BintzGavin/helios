@@ -1,7 +1,7 @@
 import { Command } from 'commander';
 import path from 'path';
 import fs from 'fs';
-import { pathToFileURL, fileURLToPath } from 'url';
+import { pathToFileURL, fileURLToPath, URL } from 'url';
 import { RenderOrchestrator, DistributedRenderOptions, RendererOptions } from '@helios-project/renderer';
 import { JobSpec, RenderJobChunk } from '../types/job.js';
 
@@ -34,6 +34,7 @@ export function registerRenderCommand(program: Command) {
     .option('--concurrency <number>', 'Number of concurrent render jobs', '1')
     .option('--no-headless', 'Run in visible browser window (default: headless)')
     .option('--emit-job <path>', 'Generate a distributed render job spec (JSON) instead of rendering')
+    .option('--job-base-url <url>', 'Base URL for remote asset resolution (for distributed jobs)')
     .option('--audio-codec <codec>', 'Audio codec (e.g., aac, pcm_s16le)')
     .option('--video-codec <codec>', 'Video codec (e.g., libx264, libvpx)')
     .action(async (input, options) => {
@@ -120,13 +121,32 @@ export function registerRenderCommand(program: Command) {
           const chunks: RenderJobChunk[] = plan.chunks.map(chunk => {
             const flags = rendererOptionsToFlags(chunk.options);
             const relativeChunkOutput = path.relative(jobDir, chunk.outputFile);
+
+            let commandInput = relativeInput;
+            if (options.jobBaseUrl && !relativeInput.startsWith('http')) {
+              // Normalize separators for URL compatibility
+              const normalizedPath = relativeInput.split(path.sep).join('/');
+
+              // Ensure base URL ends with slash
+              const baseUrl = options.jobBaseUrl.endsWith('/')
+                ? options.jobBaseUrl
+                : `${options.jobBaseUrl}/`;
+
+              // Remove leading ./ if present to avoid http://site/./path
+              const cleanPath = normalizedPath.startsWith('./')
+                ? normalizedPath.slice(2)
+                : normalizedPath;
+
+              commandInput = new URL(cleanPath, baseUrl).href;
+            }
+
             return {
               id: chunk.id,
               startFrame: chunk.startFrame,
               frameCount: chunk.frameCount,
               outputFile: relativeChunkOutput,
               // Use relative paths for portability
-              command: `helios render ${relativeInput} -o ${relativeChunkOutput} --start-frame ${chunk.startFrame} --frame-count ${chunk.frameCount} ${flags}`
+              command: `helios render ${commandInput} -o ${relativeChunkOutput} --start-frame ${chunk.startFrame} --frame-count ${chunk.frameCount} ${flags}`
             };
           });
 
