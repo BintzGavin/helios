@@ -10,6 +10,8 @@ describe('audio-utils', () => {
         arrayBuffer: () => Promise.resolve(new ArrayBuffer(8)),
         headers: { get: () => 'audio/mpeg' }
       });
+      // Clear document body before each test to prevent leakage
+      document.body.innerHTML = '';
     });
 
     afterEach(() => {
@@ -24,6 +26,35 @@ describe('audio-utils', () => {
       expect(assets).toHaveLength(1);
       expect(assets[0].volume).toBe(0.5);
       expect(assets[0].muted).toBe(false);
+    });
+
+    it('should parse basic video attributes', async () => {
+      // Create element explicitly to ensure properties are set correctly in JSDOM
+      const video = document.createElement('video');
+      video.src = "test.mp4";
+      video.volume = 0.7;
+      video.muted = true;
+      document.body.appendChild(video);
+
+      const assets = await getAudioAssets(document);
+      expect(assets).toHaveLength(1);
+      expect(assets[0].volume).toBe(0.7);
+      expect(assets[0].muted).toBe(true);
+
+      document.body.removeChild(video);
+    });
+
+    it('should handle mixed audio and video elements with correct ordering', async () => {
+      document.body.innerHTML = `
+        <audio src="track1.mp3"></audio>
+        <video src="video1.mp4"></video>
+        <audio src="track2.mp3"></audio>
+      `;
+      const assets = await getAudioAssets(document);
+      expect(assets).toHaveLength(3);
+      expect(assets[0].id).toBe('track-0');
+      expect(assets[1].id).toBe('track-1');
+      expect(assets[2].id).toBe('track-2');
     });
 
     it('should parse loop attribute', async () => {
