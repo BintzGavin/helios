@@ -65,7 +65,7 @@ async function main() {
   });
 
   // Suppress output unless error
-  // studio.stdout.on('data', d => process.stdout.write(`[Studio Out] ${d}`));
+  studio.stdout.on('data', d => process.stdout.write(`[Studio Out] ${d}`));
   studio.stderr.on('data', d => process.stderr.write(`[Studio Err] ${d}`));
 
   // Wait for server to start
