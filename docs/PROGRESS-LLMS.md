@@ -1,5 +1,14 @@
 # LLMS Progress
 
+## LLMS v1.26.0
+- ✅ Completed: Daily llms.txt Review
+  - Updated Quick Facts: Studio v0.116.0+, Player v0.76.10+, CLI v0.34.0+.
+  - Updated Roadmap:
+    - Studio: Added "Asset Move", "WebCodecs Preference".
+    - Player: Added "Async Seek", "Exporter Integration", "Integrity Check".
+    - CLI: Added "Component Tracking", "Remote Job Spec", "Stateless Worker".
+  - Verified Core API example and file paths.
+
 ## LLMS v1.25.0
 - ✅ Completed: Daily llms.txt Review
   - Updated Quick Facts: Studio v0.115.0+, Player v0.76.9+, Renderer v1.80.0+, CLI v0.33.0+.
