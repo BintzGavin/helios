@@ -1,6 +1,6 @@
 # CLI Status
 
-**Version**: 0.34.0
+**Version**: 0.34.1
 
 ## Current State
 
@@ -88,3 +88,4 @@ Per AGENTS.md, the CLI is "ACTIVELY EXPANDING FOR V2" with focus on:
 [v0.31.0] ✅ AWS Deployment - Implemented `helios deploy aws` to scaffold Lambda deployment and updated `helios render` to support custom browser executable.
 [v0.32.0] ✅ Remote Job Spec - Implemented support for executing distributed render jobs from remote HTTP/HTTPS URLs in `helios job run`.
 [v0.34.0] ✅ Component Tracking - Implemented dependencies tracking in `helios.config.json` to mirror `package.json` dependencies.
+[v0.34.1] ✅ Remote Job Assets - Implemented `--base-url` alias and fixed remote asset resolution in distributed jobs.

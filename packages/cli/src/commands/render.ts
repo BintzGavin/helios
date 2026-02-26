@@ -34,6 +34,7 @@ export function registerRenderCommand(program: Command) {
     .option('--concurrency <number>', 'Number of concurrent render jobs', '1')
     .option('--no-headless', 'Run in visible browser window (default: headless)')
     .option('--emit-job <path>', 'Generate a distributed render job spec (JSON) instead of rendering')
+    .option('--base-url <url>', 'Base URL for remote asset resolution (alias for --job-base-url)')
     .option('--job-base-url <url>', 'Base URL for remote asset resolution (for distributed jobs)')
     .option('--audio-codec <codec>', 'Audio codec (e.g., aac, pcm_s16le)')
     .option('--video-codec <codec>', 'Video codec (e.g., libx264, libvpx)')
@@ -123,14 +124,26 @@ export function registerRenderCommand(program: Command) {
             const relativeChunkOutput = path.relative(jobDir, chunk.outputFile);
 
             let commandInput = relativeInput;
-            if (options.jobBaseUrl && !relativeInput.startsWith('http')) {
+            const jobBaseUrl = options.baseUrl || options.jobBaseUrl;
+
+            if (jobBaseUrl && !relativeInput.startsWith('http')) {
+              // If we have a base URL, we want to resolve the input file relative to the project root
+              // (process.cwd()) and append it to the base URL.
+              // This allows workers to fetch assets from a remote server using the same folder structure.
+              let projectRelativeInput = relativeInput;
+
+              if (url.startsWith('file://')) {
+                 const inputPath = fileURLToPath(url);
+                 projectRelativeInput = path.relative(process.cwd(), inputPath);
+              }
+
               // Normalize separators for URL compatibility
-              const normalizedPath = relativeInput.split(path.sep).join('/');
+              const normalizedPath = projectRelativeInput.split(path.sep).join('/');
 
               // Ensure base URL ends with slash
-              const baseUrl = options.jobBaseUrl.endsWith('/')
-                ? options.jobBaseUrl
-                : `${options.jobBaseUrl}/`;
+              const baseUrl = jobBaseUrl.endsWith('/')
+                ? jobBaseUrl
+                : `${jobBaseUrl}/`;
 
               // Remove leading ./ if present to avoid http://site/./path
               const cleanPath = normalizedPath.startsWith('./')
