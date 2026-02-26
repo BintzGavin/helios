@@ -16,6 +16,9 @@ The Helios Studio (`packages/studio`) is a browser-based IDE for developing and 
 packages/studio/
 ├── bin/
 │   └── helios-studio.js    # CLI entry point
+├── scripts/
+│   ├── verify-asset-move.ts # Verification script for Asset Move
+│   └── verify-ui.ts        # UI regression test script
 ├── src/
 │   ├── cli/                # CLI integration logic
 │   ├── components/         # UI Components (RendersPanel, Timeline, etc.)
@@ -64,10 +67,9 @@ The Studio is launched via the `helios` CLI (from `@helios-project/cli`).
 - **Renderer**: Uses `RenderOrchestrator` for planning and executing renders.
 - **CLI**: The Studio backend exposes endpoints that the CLI can leverage (e.g., for `helios render` with HMR support, though currently CLI uses Renderer directly).
 
-## F. Recent Changes (v0.116.0)
+## F. Recent Changes (v0.116.1)
+- **Verified: Regression Test**: Confirmed Asset Move backend API and Studio UI stability via verification scripts (`verify-asset-move.ts`, `verify-ui.ts`).
 - **Completed: Asset Move**: Implemented drag-and-drop support for moving assets and folders within the Assets Panel, backed by a new `moveAsset` API.
 - **Completed: WebCodecs Preference**: Added `webCodecsPreference` configuration to Studio Renders Panel.
 - **Completed: React Components Example**: Added documentation and verified `react-components-demo` example.
-- **Verified: Regression Test**: Validated Studio UI functionality via Playwright script (`scripts/verify-ui.ts`).
 - **Verified: Registry Filtering Support**: Confirmed that Studio supports cross-framework component discovery.
-- **Completed: CLI Init Examples Fix**: Replaced `degit` with `giget` in `helios init --example`.

@@ -1,3 +1,9 @@
+## STUDIO v0.116.1
+- ✅ Verified: Regression Test - Confirmed Asset Move backend API and Studio UI stability via verification scripts (`verify-asset-move.ts`, `verify-ui.ts`).
+
+## STUDIO v0.116.0
+- ✅ Completed: Asset Move - Implemented drag-and-drop support for moving assets and folders within the Assets Panel, backed by a new `moveAsset` API.
+
 ## STUDIO v0.115.0
 - ✅ Completed: WebCodecs Preference - Added `webCodecsPreference` configuration to Studio Renders Panel, allowing users to select Hardware, Software, or Disabled modes for rendering.
 
