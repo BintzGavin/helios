@@ -1,66 +1,44 @@
-# Infrastructure Domain Context
+# CONTEXT: INFRASTRUCTURE
+
+**Version**: 0.1.0
 
 ## A. Architecture
+The `packages/infrastructure` domain provides the foundation for distributed rendering in Helios. It is responsible for:
+- **Cloud Adapters**: Executing rendering jobs on various cloud providers (AWS, GCP).
+- **Worker Orchestration**: Managing stateless workers and job distribution.
+- **Job Management**: Creating, tracking, and completing rendering jobs.
+- **Stitching**: Concatenating rendered video segments into a final output.
 
-The Helios Infrastructure domain (`packages/infrastructure`) is planned but does not yet exist. It will provide distributed rendering capabilities for cloud execution.
-
-**Planned Architecture:**
-- **Stateless Workers**: Frame rendering workers with no state between invocations
-- **Cloud Adapters**: Pluggable adapters for AWS Lambda, Google Cloud Run, local execution
-- **Job Orchestrator**: Work distribution and lifecycle management
-- **Output Stitcher**: Segment combination using FFmpeg concat demuxer
+The architecture follows a stateless worker model where workers fetch job specifications from remote URLs and render frames independently, enabling scalable parallel processing.
 
 ## B. File Tree
-
 ```
-packages/infrastructure/   (PLANNED - does not exist yet)
+packages/infrastructure/
 ├── src/
 │   ├── index.ts                    # Public exports
-│   ├── types/                      # Shared types and interfaces
-│   ├── worker/                     # Stateless worker implementations
-│   ├── orchestrator/               # Job management and scheduling
-│   ├── stitcher/                   # Output segment combination
+│   ├── types/                      # Shared types
+│   │   └── index.ts
+│   ├── worker/                     # Worker implementations
+│   │   └── index.ts
+│   ├── orchestrator/               # Job orchestration
+│   │   └── index.ts
+│   ├── stitcher/                   # Video stitching
+│   │   └── index.ts
 │   ├── adapters/                   # Cloud provider adapters
-│   └── utils/                      # Retry logic, validation
+│   │   └── index.ts
+│   └── utils/                      # Utility functions
+│       └── index.ts
+├── tests/                          # Unit tests
 ├── package.json
 ├── tsconfig.json
 └── vitest.config.ts
 ```
 
 ## C. Interfaces
-
-**Planned interfaces (not yet implemented):**
-
-```typescript
-// Worker interface
-interface FrameWorker {
-  renderFrame(job: FrameJob): Promise<FrameResult>;
-}
-
-// Cloud adapter interface
-interface CloudAdapter {
-  invoke(worker: FrameWorker, job: FrameJob): Promise<FrameResult>;
-  getStatus(): AdapterStatus;
-}
-
-// Job interface
-interface RenderJob {
-  id: string;
-  composition: CompositionSpec;
-  frameRange: [number, number];
-  outputPath: string;
-}
-```
+*Documentation of interfaces will be added as they are implemented.*
 
 ## D. Cloud Adapters
-
-**Planned adapters:**
-- `LocalAdapter` - Local execution for development and testing
-- `LambdaAdapter` - AWS Lambda for serverless frame rendering
-- `CloudRunAdapter` - Google Cloud Run for containerized rendering
+*Documentation of cloud adapters will be added as they are implemented.*
 
 ## E. Integration
-
-- **Renderer**: Infrastructure consumes renderer capabilities for frame generation
-- **CLI**: CLI will expose commands to trigger distributed renders
-- **Core**: Core provides deterministic animation state for stateless seeking
+*Documentation of integration points with Renderer and CLI will be added as they are implemented.*
