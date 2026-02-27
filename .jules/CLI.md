@@ -113,3 +113,7 @@ Critical learnings only. This is not a log—only add entries for insights that 
 ## [0.33.0] - Job Spec Asset Gap
 **Learning:** While `helios job run` supported remote specs, the generated specs (`--emit-job`) still used local paths, breaking the "Stateless Worker" vision. Generic workers cannot resolve local paths.
 **Action:** When designing distributed systems, ensure that ALL inputs (specs AND assets) are resolvable via network URLs. Local paths are only valid for local execution or mounted volumes.
+
+## [0.35.0] - Pluggable Execution Disconnect
+**Learning:** `packages/infrastructure` implemented stateless worker adapters (AWS, GCP, Local) and a `JobExecutor`, but `packages/cli`'s `helios job run` was still using a hardcoded local `spawn` loop. The CLI must be actively integrated with new platform capabilities to realize the "Primary interface for ... workflows" vision.
+**Action:** Always check if core/infrastructure abstractions exist before maintaining custom implementations in the CLI. The CLI should act as the orchestrator/interface for lower-level domain logic.
