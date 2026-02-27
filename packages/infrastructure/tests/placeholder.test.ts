@@ -3,7 +3,7 @@ import { INFRASTRUCTURE_VERSION, initInfrastructure } from '../src/index.js';
 
 describe('Infrastructure Package', () => {
   it('should export version', () => {
-    expect(INFRASTRUCTURE_VERSION).toBe('0.1.0');
+    expect(INFRASTRUCTURE_VERSION).toBe('0.2.0');
   });
 
   it('should initialize without error', () => {
