@@ -1,11 +1,12 @@
 # Status: LLMS
 
-**Version**: 1.26.0
+**Version**: 1.27.0
 
 - **Status**: Active
 - **Current Focus**: Comprehensive Review and Maintenance
 - **Last Updated**: 2026-02-26
 
+[v1.27.0] ✅ Completed: Comprehensive Daily Review - Updated Studio to v0.116.1+ (Regression Test) and CLI to v0.34.1+ (Remote Job Assets). Updated Roadmap with recent CLI features.
 [v1.26.0] ✅ Completed: Comprehensive Daily Review - Updated Studio to v0.116.0+ (Asset Move), Player to v0.76.10+ (Async Seek), and CLI to v0.34.0+ (Component Tracking). Verified Core API example.
 [v1.25.0] ✅ Completed: Comprehensive Daily Review - Updated Studio to v0.115.0+ (WebCodecs Preference, React Components Example), Player to v0.76.9+ (Context Docs), Renderer to v1.80.0+ (WebCodecs Preference), and CLI to v0.33.0+ (Stateless Worker). Updated Quick Facts and Roadmap with recent features.
 [v1.24.0] ✅ Completed: Comprehensive Daily Review - Updated CLI to v0.32.0+ (Remote Job Spec, Deploy Command [GCP/AWS]) and Player to v0.76.8+ (Exporter Integration). Updated Quick Facts and Roadmap to reflect these changes.
