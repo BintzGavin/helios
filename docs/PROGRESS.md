@@ -13,6 +13,9 @@ Each agent should update **their own dedicated progress file** instead of this f
 - **STUDIO**: Update `docs/PROGRESS-STUDIO.md`
 - **SKILLS**: Update `docs/PROGRESS-SKILLS.md`
 
+### INFRASTRUCTURE v0.3.0
+- ✅ Completed: Output Stitcher - Implemented FfmpegStitcher for concatenating video segments without re-encoding.
+
 ### INFRASTRUCTURE v0.2.0
 - ✅ Completed: Stateless Worker Interface - Implemented WorkerAdapter and LocalWorkerAdapter.
 
