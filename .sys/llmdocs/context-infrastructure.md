@@ -5,7 +5,8 @@
 The `packages/infrastructure` package provides the foundation for distributed rendering in Helios. It orchestrates rendering jobs across various compute environments (Local, AWS Lambda, Google Cloud Run) using a stateless worker model.
 
 **Key Components:**
-- **JobExecutor**: The central orchestrator that manages the lifecycle of a render job. It splits jobs into chunks, distributes them to workers via adapters, handles retries, and invokes the stitcher for final assembly.
+- **JobManager**: The higher-level component that orchestrates job lifecycle state tracking, persistence via `JobRepository`, and delegates execution.
+- **JobExecutor**: The central orchestrator that manages the lifecycle of a render job execution. It splits jobs into chunks, distributes them to workers via adapters, handles retries, and invokes the stitcher for final assembly.
 - **WorkerAdapter**: An abstraction layer that allows the orchestrator to interact with different compute providers uniformly.
 - **WorkerRuntime**: The entry point for the worker process running in the cloud. It receives a job specification, renders the assigned frames using the `RenderExecutor`, and reports status.
 - **RenderExecutor**: Executes the actual rendering commands (e.g., launching a browser or ffmpeg process).
@@ -21,6 +22,7 @@ packages/infrastructure/
 │   │   ├── index.ts                # Shared types
 │   │   ├── worker.ts               # Worker interfaces (WorkerJob, WorkerResult)
 │   │   ├── job-spec.ts             # Job specification interfaces
+│   │   ├── job-status.ts           # Job status tracking interfaces
 │   │   └── adapter.ts              # WorkerAdapter interface
 │   ├── worker/
 │   │   ├── index.ts
@@ -28,7 +30,8 @@ packages/infrastructure/
 │   │   └── render-executor.ts      # Frame rendering execution
 │   ├── orchestrator/
 │   │   ├── index.ts
-│   │   └── job-executor.ts         # Job orchestration and retry logic
+│   │   ├── job-executor.ts         # Job orchestration and retry logic
+│   │   └── job-manager.ts          # Job lifecycle and state manager
 │   ├── stitcher/
 │   │   ├── index.ts
 │   │   └── ffmpeg-stitcher.ts      # FFmpeg concatenation
@@ -43,6 +46,15 @@ packages/infrastructure/
 ```
 
 ## C. Interfaces
+
+### JobManager
+```typescript
+class JobManager {
+  constructor(repository: JobRepository, executor: JobExecutor);
+  submitJob(jobSpec: JobSpec, options?: JobExecutionOptions): Promise<string>;
+  getJob(id: string): Promise<JobStatus | undefined>;
+}
+```
 
 ### JobExecutor
 ```typescript

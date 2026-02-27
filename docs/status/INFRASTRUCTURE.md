@@ -1,7 +1,8 @@
 # INFRASTRUCTURE STATUS
-**Version**: 0.4.0
+**Version**: 0.5.0
 
 ## Status Log
+- [v0.5.0] ✅ Completed: JobManager Tests & Export Orchestrator - Exported `orchestrator` module and implemented unit tests for `JobManager`.
 - [v0.4.0] ✅ Completed: Retry Logic - Implemented configurable retry logic in JobExecutor for transient failures.
 - [v0.3.0] ✅ Completed: Output Stitcher - Implemented FfmpegStitcher for concatenating video segments without re-encoding.
 - [v0.2.0] ✅ Completed: Stateless Worker Interface - Implemented WorkerAdapter and LocalWorkerAdapter.

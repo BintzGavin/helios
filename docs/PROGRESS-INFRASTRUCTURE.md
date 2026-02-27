@@ -1,5 +1,8 @@
 # INFRASTRUCTURE PROGRESS
 
+## INFRASTRUCTURE v0.5.0
+- ✅ Completed: JobManager Tests & Export Orchestrator - Exported `orchestrator` module and implemented unit tests for `JobManager`.
+
 ## INFRASTRUCTURE v0.4.0
 - ✅ Completed: Retry Logic - Implemented configurable retry logic in JobExecutor for transient failures.
 
