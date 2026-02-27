@@ -34,11 +34,30 @@ packages/infrastructure/
 └── vitest.config.ts
 ```
 
-## C. Interfaces
-*Documentation of interfaces will be added as they are implemented.*
+## C. Planned Interfaces
+*These interfaces are planned for implementation:*
+
+```typescript
+// Worker Interface
+export interface Worker {
+  initialize(): Promise<void>;
+  process(job: Job): Promise<Result>;
+}
+
+// Cloud Adapter Interface
+export interface CloudAdapter {
+  deploy(config: Config): Promise<Deployment>;
+  invoke(payload: any): Promise<Response>;
+}
+```
 
 ## D. Cloud Adapters
-*Documentation of cloud adapters will be added as they are implemented.*
+*Planned Adapters:*
+- **AWS Lambda**: Serverless execution of frame rendering.
+- **Google Cloud Run**: Containerized execution for rendering and stitching.
+- **Local Adapter**: Simulates cloud environment for development and testing.
 
 ## E. Integration
-*Documentation of integration points with Renderer and CLI will be added as they are implemented.*
+*Integration Points:*
+- **Renderer**: Provides the core rendering engine (`@helios-project/renderer`).
+- **CLI**: Triggers jobs and manages deployments via infrastructure commands.
