@@ -6,3 +6,4 @@ export function initInfrastructure() {
 
 export * from './types/index.js';
 export * from './adapters/index.js';
+export * from './stitcher/index.js';
