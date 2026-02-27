@@ -80,17 +80,19 @@ export function createMcpServer(getPort: () => number, options: StudioPluginOpti
       width: z.number().optional(),
       height: z.number().optional(),
       fps: z.number().optional(),
-      duration: z.number().optional()
+      duration: z.number().optional(),
+      defaultProps: z.record(z.any()).optional()
     },
     async (args) => {
       try {
         // Only pass options if at least one is provided, otherwise let createComposition use defaults
-        const options = (args.width !== undefined || args.height !== undefined || args.fps !== undefined || args.duration !== undefined)
+        const options = (args.width !== undefined || args.height !== undefined || args.fps !== undefined || args.duration !== undefined || args.defaultProps !== undefined)
           ? {
               width: args.width ?? 1920,
               height: args.height ?? 1080,
               fps: args.fps ?? 30,
-              duration: args.duration ?? 5
+              duration: args.duration ?? 5,
+              defaultProps: args.defaultProps
             }
           : undefined;
         
@@ -119,7 +121,8 @@ export function createMcpServer(getPort: () => number, options: StudioPluginOpti
       width: z.number().optional(),
       height: z.number().optional(),
       fps: z.number().optional(),
-      duration: z.number().optional()
+      duration: z.number().optional(),
+      inputProps: z.record(z.any()).optional()
     },
     async (args) => {
        try {
@@ -140,6 +143,7 @@ export function createMcpServer(getPort: () => number, options: StudioPluginOpti
                height: args.height,
                fps: args.fps,
                duration: args.duration,
+               inputProps: args.inputProps
            }, port);
 
            return {

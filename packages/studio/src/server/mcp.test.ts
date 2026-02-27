@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { createMcpServer } from './mcp';
 import { StudioPluginOptions } from './types';
 
@@ -32,7 +32,8 @@ vi.mock('./documentation', () => ({
 }));
 
 import { findDocumentation } from './documentation';
-import { findAssets } from './discovery';
+import { findAssets, createComposition, findCompositions } from './discovery';
+import { startRender } from './render-manager';
 
 describe('createMcpServer', () => {
   const getPort = () => 1234;
@@ -72,6 +73,48 @@ describe('createMcpServer', () => {
 
     expect(findAssets).toHaveBeenCalled();
     expect(JSON.parse(result.contents[0].text)).toEqual([{ id: 'asset1' }]);
+  });
+
+  it('should handle create_composition tool with defaultProps', async () => {
+    const server = createMcpServer(getPort) as any;
+    (createComposition as any).mockReturnValue({ id: 'test', name: 'Test' });
+
+    const handler = server.tools['create_composition'].handler;
+    const result = await handler({
+      name: 'test-comp',
+      defaultProps: { text: 'Hello' }
+    });
+
+    expect(createComposition).toHaveBeenCalledWith(
+      expect.any(String),
+      'test-comp',
+      'vanilla',
+      expect.objectContaining({
+        defaultProps: { text: 'Hello' }
+      })
+    );
+    expect(JSON.parse(result.content[0].text)).toEqual({ id: 'test', name: 'Test' });
+  });
+
+  it('should handle render_composition tool with inputProps', async () => {
+    const server = createMcpServer(getPort) as any;
+    (findCompositions as any).mockResolvedValue([{ id: 'comp-1', url: '/@fs/path/to/comp' }]);
+    (startRender as any).mockResolvedValue('job-123');
+
+    const handler = server.tools['render_composition'].handler;
+    const result = await handler({
+      compositionId: 'comp-1',
+      inputProps: { text: 'Hello' }
+    });
+
+    expect(startRender).toHaveBeenCalledWith(
+      expect.objectContaining({
+        compositionUrl: '/@fs/path/to/comp',
+        inputProps: { text: 'Hello' }
+      }),
+      1234
+    );
+    expect(JSON.parse(result.content[0].text)).toEqual({ jobId: 'job-123', status: 'queued' });
   });
 
   it('should handle components resource', async () => {
