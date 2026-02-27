@@ -1,5 +1,12 @@
 # LLMS Progress
 
+## LLMS v1.27.0
+- ✅ Completed: Daily llms.txt Review
+  - Updated Quick Facts: Studio v0.116.1+, CLI v0.34.1+.
+  - Updated Roadmap:
+    - CLI: Added "Remote Job Assets".
+  - Verified features against codebase (CLI remote job assets).
+
 ## LLMS v1.26.0
 - ✅ Completed: Daily llms.txt Review
   - Updated Quick Facts: Studio v0.116.0+, Player v0.76.10+, CLI v0.34.0+.
