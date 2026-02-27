@@ -1,67 +1,42 @@
-# INFRASTRUCTURE CONTEXT
-**Domain**: `packages/infrastructure`
-**Version**: 0.2.0
+# CONTEXT: INFRASTRUCTURE
+**Owner**: `@helios-project/infrastructure`
+**Purpose**: Handles distributed rendering, cloud execution, and worker orchestration.
 
 ## A. Architecture
 
-The Infrastructure domain handles the execution of rendering jobs across different environments (Local, AWS Lambda, Google Cloud Run). It uses an **Adapter Pattern** to abstract the execution details from the orchestration logic.
+The infrastructure package uses a **Stateless Worker** architecture to enable scalable distributed rendering across different cloud providers (AWS Lambda, Google Cloud Run) and local environments.
 
 ### Core Concepts
 
-*   **Worker Adapter**: A unified interface (`WorkerAdapter`) for executing jobs.
-*   **Stateless Worker**: Workers are designed to be stateless, receiving all necessary context in the job specification.
+1.  **Orchestrator**: Manages the job lifecycle, splits work into chunks, and aggregates results.
+2.  **Worker**: A stateless unit that executes a specific task (e.g., rendering a frame range).
+3.  **Adapter**: Abstraction layer for different execution environments (Local, AWS, GCP).
+4.  **Stitcher**: Combines partial outputs (video segments) into a final artifact.
 
 ## B. File Tree
 
 ```
-packages/infrastructure/src/
-├── adapters/
-│   ├── index.ts                # Adapter exports
-│   └── local-adapter.ts        # Local process execution adapter
-├── orchestrator/               # (Planned) Job lifecycle management
-├── stitcher/                   # (Planned) FFmpeg concatenation
-├── types/
-│   ├── index.ts                # Shared type exports
-│   ├── adapter.ts              # WorkerAdapter & WorkerResult interfaces
-│   └── job.ts                  # WorkerJob interface
-├── utils/                      # (Planned) Shared utilities
-├── worker/
-│   └── index.ts                # Re-exports types (legacy/compatibility)
-└── index.ts                    # Public API
+packages/infrastructure/
+├── src/
+│   ├── index.ts                    # Public exports
+│   ├── types/
+│   │   ├── index.ts
+│   │   ├── worker.ts               # WorkerJob, WorkerResult
+│   │   └── adapter.ts              # WorkerAdapter interface
+│   ├── adapters/
+│   │   ├── index.ts
+│   │   └── local-adapter.ts        # Local process execution
+│   └── stitcher/
+│       ├── index.ts
+│       └── ffmpeg-stitcher.ts      # Concat demuxer implementation
+└── tests/
+    └── stitcher.test.ts
 ```
 
 ## C. Interfaces
 
-### WorkerJob
-
-Defines the unit of work to be executed.
-
-```typescript
-interface WorkerJob {
-  command: string;
-  args?: string[];
-  env?: Record<string, string>;
-  cwd?: string;
-  timeout?: number;
-}
-```
-
-### WorkerResult
-
-The outcome of a job execution.
-
-```typescript
-interface WorkerResult {
-  exitCode: number;
-  stdout: string;
-  stderr: string;
-  durationMs: number;
-}
-```
-
 ### WorkerAdapter
-
-The contract for execution environments.
+Defines how to execute a job in a specific environment.
 
 ```typescript
 interface WorkerAdapter {
@@ -69,17 +44,36 @@ interface WorkerAdapter {
 }
 ```
 
+### VideoStitcher
+Defines how to combine video segments.
+
+```typescript
+interface VideoStitcher {
+  stitch(inputs: string[], output: string): Promise<void>;
+}
+```
+
+### WorkerJob
+The payload sent to a worker.
+
+```typescript
+interface WorkerJob {
+  command: string;
+  args: string[];
+  env?: Record<string, string>;
+}
+```
+
 ## D. Cloud Adapters
 
-### LocalWorkerAdapter
-
-Executes jobs as local child processes using Node.js `spawn`.
-
-*   **Usage**: primarily for local development and testing.
-*   **Security**: Forces `shell: false` to prevent injection.
-*   **Features**: Supports timeouts, environment variable injection, and output capturing.
+| Adapter | Status | Description |
+| :--- | :--- | :--- |
+| `LocalWorkerAdapter` | ✅ Ready | Executes jobs as child processes locally. |
+| `AwsLambdaAdapter` | 🚧 Planned | Invokes AWS Lambda functions. |
+| `CloudRunAdapter` | 🚧 Planned | Invokes Google Cloud Run services. |
 
 ## E. Integration
 
-*   **Renderer**: Will consume `WorkerAdapter` to offload rendering tasks.
-*   **CLI**: Will use `LocalWorkerAdapter` for `helios render` and cloud adapters for `helios deploy`.
+- **Renderer**: The `RenderOrchestrator` uses `WorkerAdapter` to dispatch rendering tasks.
+- **CLI**: The `helios job` command configures the appropriate adapter based on user flags.
+- **Stitcher**: The `FfmpegStitcher` uses a `WorkerAdapter` (typically local) to run the `ffmpeg` concat command.
