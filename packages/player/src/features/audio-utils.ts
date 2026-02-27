@@ -54,7 +54,9 @@ export async function getAudioAssets(
         volume = state.volume;
         muted = state.muted;
     } else {
-        volume = volumeAttr !== null ? parseFloat(volumeAttr) : tag.volume;
+        // Prioritize runtime property for WYSIWYG accuracy.
+        // The 'volume' attribute is non-standard on HTMLMediaElement and may be ignored by the browser.
+        volume = tag.volume;
         muted = tag.muted;
     }
 
