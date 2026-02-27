@@ -20,6 +20,18 @@ export interface JobExecutionOptions {
    * Defaults to true.
    */
   merge?: boolean;
+
+  /**
+   * Number of retries for failed chunks.
+   * Defaults to 0.
+   */
+  retries?: number;
+
+  /**
+   * Delay in milliseconds between retries.
+   * Defaults to 1000.
+   */
+  retryDelay?: number;
 }
 
 export class JobExecutor {
@@ -36,6 +48,8 @@ export class JobExecutor {
     const concurrency = Math.max(1, options.concurrency || 1);
     const jobDir = options.jobDir || process.cwd();
     const shouldMerge = options.merge !== false;
+    const maxRetries = options.retries || 0;
+    const retryDelay = options.retryDelay || 1000;
 
     console.log(`Starting job execution with concurrency ${concurrency}...`);
     console.log(`Job Directory: ${jobDir}`);
@@ -60,34 +74,46 @@ export class JobExecutor {
         const chunk = queue.shift();
         if (!chunk) break;
 
-        try {
-          console.log(`[Worker ${workerId}] Starting chunk ${chunk.id}...`);
+        let attempt = 0;
+        while (true) {
+          try {
+            console.log(`[Worker ${workerId}] Starting chunk ${chunk.id} (Attempt ${attempt + 1}/${maxRetries + 1})...`);
 
-          const { command, args } = parseCommand(chunk.command);
+            const { command, args } = parseCommand(chunk.command);
 
-          const result = await this.adapter.execute({
-            command,
-            args,
-            cwd: jobDir,
-            env: process.env as Record<string, string>,
-            meta: {
-              chunkId: chunk.id,
-              ...chunk
+            const result = await this.adapter.execute({
+              command,
+              args,
+              cwd: jobDir,
+              env: process.env as Record<string, string>,
+              meta: {
+                chunkId: chunk.id,
+                ...chunk
+              }
+            });
+
+            if (result.exitCode !== 0) {
+              throw new Error(`Chunk ${chunk.id} failed with exit code ${result.exitCode}: ${result.stderr}`);
             }
-          });
 
-          if (result.exitCode !== 0) {
-             throw new Error(`Chunk ${chunk.id} failed with exit code ${result.exitCode}: ${result.stderr}`);
+            completedChunks++;
+            console.log(`[Worker ${workerId}] Chunk ${chunk.id} completed (${completedChunks}/${totalChunks})`);
+            break; // Success, break retry loop
+          } catch (error: any) {
+            if (attempt < maxRetries) {
+              attempt++;
+              console.warn(`[Worker ${workerId}] Chunk ${chunk.id} failed (Attempt ${attempt}/${maxRetries + 1}). Retrying in ${retryDelay}ms... Error: ${error.message}`);
+              await new Promise(resolve => setTimeout(resolve, retryDelay));
+              continue;
+            }
+
+            console.error(`[Worker ${workerId}] Chunk ${chunk.id} failed after ${attempt + 1} attempts:`, error.message);
+            const wrappedError = new Error(`Chunk ${chunk.id} failed after ${attempt + 1} attempts: ${error.message}`);
+            failures.push({ chunkId: chunk.id, error: wrappedError });
+            hasFailed = true; // Signal other workers to stop
+            queue.length = 0; // Clear the queue immediately
+            throw wrappedError;
           }
-
-          completedChunks++;
-          console.log(`[Worker ${workerId}] Chunk ${chunk.id} completed (${completedChunks}/${totalChunks})`);
-        } catch (error: any) {
-          console.error(`[Worker ${workerId}] Chunk ${chunk.id} failed:`, error.message);
-          failures.push({ chunkId: chunk.id, error });
-          hasFailed = true; // Signal other workers to stop
-          queue.length = 0; // Clear the queue immediately
-          throw error;
         }
       }
     };

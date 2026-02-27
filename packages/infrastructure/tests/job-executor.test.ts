@@ -110,4 +110,37 @@ describe('JobExecutor', () => {
     await jobExecutor.execute(jobSpec);
     expect(mockAdapter.execute).toHaveBeenCalledTimes(3);
   });
+
+  it('should retry a failed chunk and succeed eventually', async () => {
+    let attempt = 0;
+    mockAdapter.execute = vi.fn().mockImplementation(async (job: WorkerJob) => {
+      // Chunk 1 fails once then succeeds
+      if (job.args && job.args.includes('1')) {
+        attempt++;
+        if (attempt === 1) {
+          return { exitCode: 1, stdout: '', stderr: 'Transient failure', durationMs: 0 };
+        }
+      }
+      return { exitCode: 0, stdout: '', stderr: '', durationMs: 0 };
+    });
+
+    await jobExecutor.execute(jobSpec, { retries: 1, retryDelay: 10 });
+
+    expect(mockAdapter.execute).toHaveBeenCalledTimes(4); // Chunk 1 (fail) + Chunk 1 (retry) + Chunk 2 + Merge
+    expect(attempt).toBe(2); // 1st failure + 2nd success
+  });
+
+  it('should fail after exhausting all retries', async () => {
+    let attempts = 0;
+    mockAdapter.execute = vi.fn().mockImplementation(async (job: WorkerJob) => {
+      if (job.args && job.args.includes('1')) {
+        attempts++;
+        return { exitCode: 1, stdout: '', stderr: 'Persistent failure', durationMs: 0 };
+      }
+      return { exitCode: 0, stdout: '', stderr: '', durationMs: 0 };
+    });
+
+    await expect(jobExecutor.execute(jobSpec, { retries: 2, retryDelay: 10 })).rejects.toThrow(/Chunk 1 failed after 3 attempts/);
+    expect(attempts).toBe(3); // 1 initial + 2 retries
+  });
 });
