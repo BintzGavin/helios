@@ -23,7 +23,11 @@
     "test": "vitest"
   },
   "devDependencies": {
+    "aws-sdk-client-mock": "^4.1.0",
     "typescript": "^5.0.0",
     "vitest": "^4.0.18"
+  },
+  "dependencies": {
+    "@aws-sdk/client-lambda": "^3.999.0"
   }
 }

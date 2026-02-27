@@ -69,7 +69,11 @@ export class JobExecutor {
             command,
             args,
             cwd: jobDir,
-            env: process.env as Record<string, string>
+            env: process.env as Record<string, string>,
+            meta: {
+              chunkId: chunk.id,
+              ...chunk
+            }
           });
 
           if (result.exitCode !== 0) {

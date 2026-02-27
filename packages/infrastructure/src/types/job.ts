@@ -9,4 +9,6 @@ export interface WorkerJob {
   cwd?: string;
   /** Timeout in milliseconds after which the process will be killed */
   timeout?: number;
+  /** Additional metadata for adapters (e.g., chunk ID) */
+  meta?: Record<string, any>;
 }
