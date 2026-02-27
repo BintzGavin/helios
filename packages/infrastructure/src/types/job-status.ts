@@ -1,0 +1,36 @@
+export type JobState = 'pending' | 'running' | 'completed' | 'failed' | 'cancelled';
+
+export interface JobStatus {
+  id: string;
+  state: JobState;
+  progress: number; // 0-100
+  totalChunks: number;
+  completedChunks: number;
+  error?: string;
+  createdAt: number;
+  updatedAt: number;
+  result?: any;
+}
+
+export interface JobRepository {
+  save(job: JobStatus): Promise<void>;
+  get(id: string): Promise<JobStatus | undefined>;
+  list(): Promise<JobStatus[]>;
+}
+
+export class InMemoryJobRepository implements JobRepository {
+  private jobs = new Map<string, JobStatus>();
+
+  async save(job: JobStatus): Promise<void> {
+    this.jobs.set(job.id, { ...job });
+  }
+
+  async get(id: string): Promise<JobStatus | undefined> {
+    const job = this.jobs.get(id);
+    return job ? { ...job } : undefined;
+  }
+
+  async list(): Promise<JobStatus[]> {
+    return Array.from(this.jobs.values()).map(job => ({ ...job }));
+  }
+}
