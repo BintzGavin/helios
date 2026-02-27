@@ -28,6 +28,7 @@
     "vitest": "^4.0.18"
   },
   "dependencies": {
-    "@aws-sdk/client-lambda": "^3.999.0"
+    "@aws-sdk/client-lambda": "^3.999.0",
+    "google-auth-library": "^10.6.1"
   }
 }
