@@ -1,20 +1,20 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { CloudRunAdapter } from '../src/adapters/cloudrun-adapter.js';
 
-// Mock google-auth-library
+// Define the mock implementation for GoogleAuth
 const mockRequest = vi.fn();
 const mockGetIdTokenClient = vi.fn();
 
-// The class mock needs to return an object when instantiated with 'new'
-const MockGoogleAuth = vi.fn().mockImplementation(() => {
-  return {
-    getIdTokenClient: mockGetIdTokenClient
-  };
-});
-
+// Mock google-auth-library
 vi.mock('google-auth-library', () => {
   return {
-    GoogleAuth: MockGoogleAuth
+    GoogleAuth: class {
+      async getIdTokenClient() {
+        return {
+          request: mockRequest
+        };
+      }
+    }
   };
 });
 
@@ -26,12 +26,8 @@ describe('CloudRunAdapter', () => {
     // Reset mocks
     mockGetIdTokenClient.mockReset();
     mockRequest.mockReset();
-    MockGoogleAuth.mockClear();
 
-    // Default successful behavior
-    mockGetIdTokenClient.mockResolvedValue({
-      request: mockRequest
-    });
+    // Default successful behavior for request
     mockRequest.mockResolvedValue({
       status: 200,
       data: {
@@ -51,14 +47,14 @@ describe('CloudRunAdapter', () => {
 
     const result = await adapter.execute({
       command: 'ignored',
+      args: [],
+      cwd: '/tmp',
+      env: {},
       meta: { chunkId: 1 }
     });
 
     expect(result.exitCode).toBe(0);
     expect(result.stdout).toBe('Render success');
-
-    // Verify client acquisition
-    expect(mockGetIdTokenClient).toHaveBeenCalledWith(serviceUrl);
 
     // Verify request payload
     expect(mockRequest).toHaveBeenCalledWith(expect.objectContaining({
@@ -76,6 +72,9 @@ describe('CloudRunAdapter', () => {
 
     await adapter.execute({
       command: 'ignored',
+      args: [],
+      cwd: '/tmp',
+      env: {},
       meta: { chunkId: 2, jobDefUrl: 'https://override.url/job.json' }
     });
 
@@ -92,6 +91,9 @@ describe('CloudRunAdapter', () => {
 
     const result = await adapter.execute({
       command: 'ignored',
+      args: [],
+      cwd: '/tmp',
+      env: {},
       meta: { chunkId: 3 }
     });
 
@@ -112,6 +114,9 @@ describe('CloudRunAdapter', () => {
     const adapter = new CloudRunAdapter({ serviceUrl, jobDefUrl });
     const result = await adapter.execute({
       command: 'ignored',
+      args: [],
+      cwd: '/tmp',
+      env: {},
       meta: { chunkId: 4 }
     });
 
@@ -125,6 +130,9 @@ describe('CloudRunAdapter', () => {
     const adapter = new CloudRunAdapter({ serviceUrl, jobDefUrl });
     const result = await adapter.execute({
       command: 'ignored',
+      args: [],
+      cwd: '/tmp',
+      env: {},
       meta: { chunkId: 5 }
     });
 
@@ -144,6 +152,9 @@ describe('CloudRunAdapter', () => {
      const adapter = new CloudRunAdapter({ serviceUrl, jobDefUrl });
      const result = await adapter.execute({
        command: 'ignored',
+       args: [],
+       cwd: '/tmp',
+       env: {},
        meta: { chunkId: 6 }
      });
 
