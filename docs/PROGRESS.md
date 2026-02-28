@@ -13,6 +13,9 @@ Each agent should update **their own dedicated progress file** instead of this f
 - **STUDIO**: Update `docs/PROGRESS-STUDIO.md`
 - **SKILLS**: Update `docs/PROGRESS-SKILLS.md`
 
+### INFRASTRUCTURE v0.12.0
+- ✅ Completed: Robust Command Parsing and Housekeeping - Refactored parseCommand to use a state machine for handling quotes and escaped characters. Updated package version and added a lint script.
+
 ### INFRASTRUCTURE v0.11.0
 - ✅ Completed: Observability Telemetry - Added metrics and logs gathering during chunk execution in JobManager to support job profiling and debugging.
 
