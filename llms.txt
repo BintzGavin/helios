@@ -6,7 +6,7 @@ Helios is a modern engine for creating videos programmatically using standard we
 
 ## Quick Facts
 - **License**: Elastic License 2.0 (free commercial use, no SaaS resale)
-- **Status**: Beta / Self-Driving (Core: Stable v5.13.0+, Studio: Alpha v0.116.1+, Player: v0.76.10+, Renderer: v1.80.0+, CLI: Beta v0.34.1+)
+- **Status**: Beta / Self-Driving (Core: Stable v5.13.0+, Studio: Alpha v0.116.1+, Player: v0.76.11+, Renderer: v1.80.0+, CLI: Beta v0.32.0+)
 - **Frameworks**: React, Vue, Svelte, Solid, vanilla JS
 - **Animation**: Standard CSS, Web Animations API (WAAPI), any animation library
 
@@ -77,12 +77,12 @@ The engine controls `document.timeline.currentTime` to seek animations frame-acc
 | Distributed rendering | Local (Beta) / Cloud (GCP/AWS) | Available |
 
 ## Agent Skills
-Skills for AI agents are in `.agents/skills/helios/`:
+Skills for AI agents are in `.agents/skills/helios-skills/skills/`:
 - `core/SKILL.md` - Core API patterns, state management, subscriptions
 - `renderer/SKILL.md` - Rendering pipeline usage
 - `player/SKILL.md` - Player component usage
 - `studio/SKILL.md` - Studio usage and extensions
-- `cli/SKILL.md` - CLI usage and scaffolding
+- `getting-started/SKILL.md` - Initial scaffolding and basic tasks
 - `workflows/*.md` & `examples/*.md` - Task-specific workflows and example skills
 
 ## Key Files for Agents
@@ -112,10 +112,10 @@ const report = await Helios.diagnose();
 
 ## Roadmap
 ### V1.x (Active)
-- **Studio**: v0.116.0+ (Asset Move, WebCodecs Preference, React Components Example, Registry Filtering Support, Registry Auth, Distributed Rendering Example, Diff Command)
-- **CLI**: v0.34.1+ (Remote Job Assets, Component Tracking, Remote Job Spec, Stateless Worker, Deploy Command [GCP/AWS], Verify Components, Components Search, Registry Auth, Remote Registry Hydration)
+- **Studio**: v0.116.1+ (Asset Move, WebCodecs Preference, React Components Example, Registry Filtering Support, Registry Auth, Distributed Rendering Example, Diff Command)
+- **CLI**: v0.32.0+ (Remote Job Assets, Component Tracking, Remote Job Spec, Stateless Worker, Deploy Command [GCP/AWS], Verify Components, Components Search, Registry Auth, Remote Registry Hydration)
 - **Core**: v5.13.0+ (Generic Input Props, Active Clips, Input Schema, Headless Audio)
-- **Player**: v0.76.10+ (Async Seek, Update Context Documentation, Exporter Integration, Integrity Check, Fix CaptureFrame Resizing, Standard Event Handlers, Dynamic Audio Metering)
+- **Player**: v0.76.11+ (Synchronized Caption Styling, Robust DOM Export, Async Seek, Exporter Integration, Integrity Check, Fix CaptureFrame Resizing)
 - **Renderer**: v1.80.0+ (WebCodecs Preference, Orchestrator Plan, HW Accel Validation, Distributed Progress)
 
 ### AI Integration
