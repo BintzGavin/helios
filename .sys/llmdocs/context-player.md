@@ -116,7 +116,7 @@ The component observes the following attributes:
 | `autoplay` | `boolean` | If present, playback starts automatically when ready. |
 | `loop` | `boolean` | If present, the composition loops upon reaching the end. |
 | `controls` | `boolean` | If present, standard UI controls are displayed. |
-| `muted` | `boolean` | If present, audio is initially muted. |
+| `muted` | `boolean` | If present, audio is initially muted. *Note: Client-side export prioritizes runtime `volume`/`muted` properties over attributes.* |
 | `poster` | `string` | URL of an image to show while loading or before playback. |
 | `preload` | `string` | Hints how much media to preload (`auto`, `none`). |
 | `interactive` | `boolean` | If present, allows direct interaction with the iframe content (disables click-to-play layer). |
