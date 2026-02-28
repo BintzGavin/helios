@@ -19,13 +19,17 @@ describe('audio-utils', () => {
     });
 
     it('should parse basic audio attributes', async () => {
-      document.body.innerHTML = `
-        <audio src="test.mp3" volume="0.5"></audio>
-      `;
+      const audio = document.createElement('audio');
+      audio.src = "test.mp3";
+      audio.volume = 0.5;
+      document.body.appendChild(audio);
+
       const assets = await getAudioAssets(document);
       expect(assets).toHaveLength(1);
       expect(assets[0].volume).toBe(0.5);
       expect(assets[0].muted).toBe(false);
+
+      document.body.removeChild(audio);
     });
 
     it('should parse basic video attributes', async () => {

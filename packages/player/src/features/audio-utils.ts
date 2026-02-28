@@ -38,7 +38,8 @@ export async function getAudioAssets(
   metadataTracks: AudioTrackMetadata[] = [],
   audioTrackState: Record<string, { volume: number; muted: boolean }> = {}
 ): Promise<AudioAsset[]> {
-  const domAssetsPromises = Array.from(doc.querySelectorAll('audio, video')).map((tag, index) => {
+  const domAssetsPromises = Array.from(doc.querySelectorAll('audio, video')).map((tagElement, index) => {
+    const tag = tagElement as HTMLMediaElement;
     // ID Extraction Priority:
     // 1. data-helios-track-id (Used by DomDriver for control)
     // 2. id attribute (Standard DOM)
