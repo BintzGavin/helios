@@ -1,5 +1,11 @@
 # INFRASTRUCTURE PROGRESS
 
+## INFRASTRUCTURE v0.10.0
+- ✅ Completed: Cloud Worker Entrypoints - Implemented AWS Lambda and Google Cloud Run stateless entrypoints to execute jobs.
+
+## INFRASTRUCTURE v0.9.0
+- ✅ Completed: Decouple Merge Execution - Expanded JobExecutionOptions to support dedicated mergeAdapter, stitcher, and outputFile for distributed execution.
+
 ## INFRASTRUCTURE v0.8.0
 - ✅ Completed: FileJobRepository Spec - Implemented a persistent, file-based JobRepository for packages/infrastructure.
 

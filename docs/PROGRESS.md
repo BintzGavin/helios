@@ -13,6 +13,9 @@ Each agent should update **their own dedicated progress file** instead of this f
 - **STUDIO**: Update `docs/PROGRESS-STUDIO.md`
 - **SKILLS**: Update `docs/PROGRESS-SKILLS.md`
 
+### INFRASTRUCTURE v0.10.0
+- ✅ Completed: Cloud Worker Entrypoints - Implemented AWS Lambda and Google Cloud Run stateless entrypoints to execute jobs.
+
 ### INFRASTRUCTURE v0.9.0
 - ✅ Completed: Decouple Merge Execution - Expanded JobExecutionOptions to support dedicated mergeAdapter, stitcher, and outputFile for distributed execution.
 
