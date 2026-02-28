@@ -9,3 +9,7 @@ Critical learnings only. This is not a log—only add entries for insights that 
 ## [0.5.1] - Granular Progress Tracking Gap
 **Learning:** The `JobExecutor` lacks granular progress reporting (it doesn't emit events when chunks complete). This prevents `JobManager` from updating the `JobStatus.progress` and `JobStatus.completedChunks` correctly during execution.
 **Action:** Plan to add an `onProgress` callback to `JobExecutionOptions` and integrate it with `JobManager`.
+
+## [0.9.1] - Cloud Deployment Tooling Gap
+**Learning:** The `packages/infrastructure` implements cloud adapters (`AwsLambdaAdapter`, `CloudRunAdapter`) to invoke jobs, and a `WorkerRuntime` to execute them, but lacks the actual server/handler templates that run inside AWS Lambda or Cloud Run to bridge these two components. This forces users to write boilerplate to connect the adapter payload to `WorkerRuntime`.
+**Action:** Plan to add `createAwsHandler` and `createCloudRunServer` entrypoint generators to satisfy the V2 requirement for "deployment tooling".
