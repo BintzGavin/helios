@@ -86,6 +86,27 @@ describe('JobManager', () => {
     expect(job?.completedChunks).toBe(2);
   });
 
+  it('should aggregate metrics and logs via onChunkComplete', async () => {
+    mockExecutorExecute = vi.spyOn(executor, 'execute').mockImplementation(async (spec, options) => {
+      if (options?.onChunkComplete) {
+        await options.onChunkComplete(1, { exitCode: 0, stdout: 'chunk 1 out', stderr: '', durationMs: 150 });
+        await options.onChunkComplete(2, { exitCode: 0, stdout: 'chunk 2 out', stderr: '', durationMs: 200 });
+      }
+    });
+
+    const id = await jobManager.submitJob(sampleJobSpec);
+
+    await new Promise(resolve => setTimeout(resolve, 50));
+
+    const job = await jobManager.getJob(id);
+    expect(job?.metrics).toBeDefined();
+    expect(job?.metrics?.totalDurationMs).toBe(350);
+    expect(job?.logs).toBeDefined();
+    expect(job?.logs?.length).toBe(2);
+    expect(job?.logs?.[0]).toMatchObject({ chunkId: 1, durationMs: 150, stdout: 'chunk 1 out' });
+    expect(job?.logs?.[1]).toMatchObject({ chunkId: 2, durationMs: 200, stdout: 'chunk 2 out' });
+  });
+
   it('should transition to failed on execution error', async () => {
     mockExecutorExecute.mockRejectedValue(new Error('Execution failed'));
 

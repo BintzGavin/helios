@@ -1,4 +1,4 @@
-import { WorkerAdapter } from '../types/adapter.js';
+import { WorkerAdapter, WorkerResult } from '../types/adapter.js';
 import { JobSpec, RenderJobChunk } from '../types/job-spec.js';
 import { VideoStitcher } from '../stitcher/ffmpeg-stitcher.js';
 import { parseCommand } from '../utils/command.js';
@@ -39,6 +39,11 @@ export interface JobExecutionOptions {
    * Callback invoked when a chunk successfully completes.
    */
   onProgress?: (completedChunks: number, totalChunks: number) => void;
+
+  /**
+   * Callback invoked when a chunk successfully completes with its result.
+   */
+  onChunkComplete?: (chunkId: number, result: WorkerResult) => void | Promise<void>;
 
   /**
    * Signal to abort the job execution.
@@ -143,6 +148,9 @@ export class JobExecutor {
             completedChunks++;
             if (options.onProgress) {
               options.onProgress(completedChunks, totalChunks);
+            }
+            if (options.onChunkComplete) {
+              await options.onChunkComplete(chunk.id, result);
             }
             console.log(`[Worker ${workerId}] Chunk ${chunk.id} completed (${completedChunks}/${totalChunks})`);
             break; // Success, break retry loop

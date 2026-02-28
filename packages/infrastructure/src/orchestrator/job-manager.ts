@@ -24,7 +24,11 @@ export class JobManager {
       totalChunks: jobSpec.chunks.length,
       completedChunks: 0,
       createdAt: Date.now(),
-      updatedAt: Date.now()
+      updatedAt: Date.now(),
+      metrics: {
+        totalDurationMs: 0
+      },
+      logs: []
     };
 
     await this.repository.save(job);
@@ -98,6 +102,26 @@ export class JobManager {
           if (currentJob) {
             currentJob.completedChunks = completedChunks;
             currentJob.progress = Math.round((completedChunks / totalChunks) * 100);
+            currentJob.updatedAt = Date.now();
+            await this.repository.save(currentJob);
+          }
+        },
+        onChunkComplete: async (chunkId: number, result) => {
+          const currentJob = await this.repository.get(id);
+          if (currentJob) {
+            if (!currentJob.metrics) {
+              currentJob.metrics = { totalDurationMs: 0 };
+            }
+            if (!currentJob.logs) {
+              currentJob.logs = [];
+            }
+            currentJob.metrics.totalDurationMs += result.durationMs;
+            currentJob.logs.push({
+              chunkId,
+              durationMs: result.durationMs,
+              stdout: result.stdout,
+              stderr: result.stderr
+            });
             currentJob.updatedAt = Date.now();
             await this.repository.save(currentJob);
           }
