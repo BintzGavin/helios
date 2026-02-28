@@ -2,6 +2,7 @@
 **Version**: 0.12.0
 
 ## Status Log
+- [v0.12.0] ✅ Completed: Robust Command Parsing and Housekeeping - Refactored parseCommand to use a state machine for handling quotes and escaped characters. Updated package version and added a lint script.
 - [v0.12.0] ✅ Completed: Observability Telemetry - Added test verifying `onChunkComplete` metrics and logs gathering during chunk execution in JobManager.
 - [v0.11.0] ✅ Completed: Observability Telemetry - Added metrics and logs gathering during chunk execution in JobManager to support job profiling and debugging.
 - [v0.10.0] ✅ Completed: Cloud Worker Entrypoints - Implemented AWS Lambda and Google Cloud Run stateless entrypoints to execute jobs.
