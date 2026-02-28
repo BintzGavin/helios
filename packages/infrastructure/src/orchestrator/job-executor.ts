@@ -244,7 +244,8 @@ export class JobExecutor {
             command,
             args,
             cwd: jobDir,
-            env: process.env as Record<string, string>
+            env: process.env as Record<string, string>,
+            signal: options.signal
           });
 
           if (result.exitCode !== 0) {

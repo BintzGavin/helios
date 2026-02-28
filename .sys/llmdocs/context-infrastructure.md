@@ -74,32 +74,28 @@ export interface WorkerJob {
 }
 
 export interface WorkerResult {
-  jobId: string;
-  chunkIndex: number;
-  status: 'completed' | 'failed';
-  outputUrl?: string;
-  error?: string;
-  totalDurationMs?: number;
-  stdout?: string;
-  stderr?: string;
+  exitCode: number;
+  stdout: string;
+  stderr: string;
+  durationMs: number;
 }
 
 export interface WorkerAdapter {
-  executeChunk(job: WorkerJob): Promise<WorkerResult>;
+  execute(job: WorkerJob): Promise<WorkerResult>;
 }
 
 export interface JobExecutionOptions {
-  jobId: string;
-  spec: JobSpec;
   concurrency?: number;
+  jobDir?: string;
+  merge?: boolean;
   retries?: number;
   retryDelay?: number;
+  onProgress?: (completedChunks: number, totalChunks: number) => void;
+  onChunkComplete?: (chunkId: number, result: WorkerResult) => void | Promise<void>;
+  signal?: AbortSignal;
   mergeAdapter?: WorkerAdapter;
   stitcher?: VideoStitcher;
   outputFile?: string;
-  signal?: AbortSignal;
-  onProgress?: (completed: number, total: number) => void;
-  onChunkComplete?: (result: WorkerResult) => void;
 }
 ```
 

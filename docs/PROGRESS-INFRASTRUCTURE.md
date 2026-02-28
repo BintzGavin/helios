@@ -1,5 +1,11 @@
 # INFRASTRUCTURE PROGRESS
 
+## INFRASTRUCTURE v0.13.1
+- ✅ Completed: Enhance Worker Job Cancellation - Passed signal to mergeAdapter in JobExecutor
+
+## INFRASTRUCTURE v0.13.0
+- ✅ Completed: Enhance Worker Job Cancellation - Propagated `AbortSignal` from `JobExecutor` to `WorkerAdapter` implementations to enable true graceful cancellation of running chunks.
+
 ## INFRASTRUCTURE v0.12.0
 - ✅ Completed: Robust Command Parsing and Housekeeping - Refactored parseCommand to use a state machine for handling quotes and escaped characters. Updated package version and added a lint script.
 - ✅ Completed: Observability Telemetry - Added test verifying `onChunkComplete` metrics and logs gathering during chunk execution in JobManager.
