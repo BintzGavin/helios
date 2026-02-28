@@ -143,4 +143,14 @@ describe('JobExecutor', () => {
     await expect(jobExecutor.execute(jobSpec, { retries: 2, retryDelay: 10 })).rejects.toThrow(/Chunk 1 failed after 3 attempts/);
     expect(attempts).toBe(3); // 1 initial + 2 retries
   });
+
+  it('should call onProgress callback when a chunk completes', async () => {
+    const onProgress = vi.fn();
+
+    await jobExecutor.execute(jobSpec, { onProgress });
+
+    expect(onProgress).toHaveBeenCalledTimes(2);
+    expect(onProgress).toHaveBeenNthCalledWith(1, 1, 2);
+    expect(onProgress).toHaveBeenNthCalledWith(2, 2, 2);
+  });
 });

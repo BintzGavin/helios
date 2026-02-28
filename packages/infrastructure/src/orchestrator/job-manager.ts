@@ -57,12 +57,20 @@ export class JobManager {
 
     try {
       // Execute the job
-      // Note: JobExecutor doesn't currently emit progress events, so we can't update
-      // progress granularly unless we modify JobExecutor or wrap the adapter.
-      // For now, we'll just update completion status.
-      // TODO: Enhance JobExecutor to report progress.
+      const executeOptions: JobExecutionOptions = {
+        ...options,
+        onProgress: async (completedChunks: number, totalChunks: number) => {
+          const currentJob = await this.repository.get(id);
+          if (currentJob) {
+            currentJob.completedChunks = completedChunks;
+            currentJob.progress = Math.round((completedChunks / totalChunks) * 100);
+            currentJob.updatedAt = Date.now();
+            await this.repository.save(currentJob);
+          }
+        }
+      };
 
-      await this.executor.execute(jobSpec, options);
+      await this.executor.execute(jobSpec, executeOptions);
 
       // Update state to completed
       job = await this.repository.get(id);

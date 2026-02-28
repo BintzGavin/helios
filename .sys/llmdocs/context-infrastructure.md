@@ -1,103 +1,55 @@
-# Infrastructure Context
+# Context: @helios-project/infrastructure (v0.6.0)
 
-## A. Architecture
+## Section A: Architecture
+The `packages/infrastructure` package is responsible for the distributed rendering execution of Helios jobs. It abstracts away the execution environment (e.g., local, AWS Lambda, Google Cloud Run) behind a common `WorkerAdapter` interface.
+- **Workers**: Execute individual chunk rendering tasks in an isolated, stateless manner.
+- **Orchestrators**: Specifically `JobExecutor`, coordinates the execution of chunks using a worker adapter. It handles concurrency, failing fast, retries, and merging. `JobManager` manages the overall lifecycle of a job, tracking its state in a repository.
+- **Adapters**: Concrete implementations of `WorkerAdapter`, such as `LocalWorkerAdapter`, translate generic execution commands into environment-specific API calls.
 
-The `packages/infrastructure` package provides the foundation for distributed rendering in Helios. It orchestrates rendering jobs across various compute environments (Local, AWS Lambda, Google Cloud Run) using a stateless worker model.
-
-**Key Components:**
-- **JobManager**: The higher-level component that orchestrates job lifecycle state tracking, persistence via `JobRepository`, and delegates execution.
-- **JobExecutor**: The central orchestrator that manages the lifecycle of a render job execution. It splits jobs into chunks, distributes them to workers via adapters, handles retries, and invokes the stitcher for final assembly.
-- **WorkerAdapter**: An abstraction layer that allows the orchestrator to interact with different compute providers uniformly.
-- **WorkerRuntime**: The entry point for the worker process running in the cloud. It receives a job specification, renders the assigned frames using the `RenderExecutor`, and reports status.
-- **RenderExecutor**: Executes the actual rendering commands (e.g., launching a browser or ffmpeg process).
-- **FfmpegStitcher**: Concatenates individual video segments produced by workers into a final output file.
-
-## B. File Tree
-
+## Section B: File Tree
 ```
 packages/infrastructure/
 ├── src/
-│   ├── index.ts                    # Public exports
+│   ├── index.ts
 │   ├── types/
-│   │   ├── index.ts                # Shared types
-│   │   ├── worker.ts               # Worker interfaces (WorkerJob, WorkerResult)
-│   │   ├── job-spec.ts             # Job specification interfaces
-│   │   ├── job-status.ts           # Job status tracking interfaces
-│   │   └── adapter.ts              # WorkerAdapter interface
-│   ├── worker/
-│   │   ├── index.ts
-│   │   ├── runtime.ts              # Worker runtime logic
-│   │   └── render-executor.ts      # Frame rendering execution
-│   ├── orchestrator/
-│   │   ├── index.ts
-│   │   ├── job-executor.ts         # Job orchestration and retry logic
-│   │   └── job-manager.ts          # Job lifecycle and state manager
-│   ├── stitcher/
-│   │   ├── index.ts
-│   │   └── ffmpeg-stitcher.ts      # FFmpeg concatenation
+│   │   ├── adapter.ts
+│   │   ├── job-spec.ts
+│   │   └── job-status.ts
 │   ├── adapters/
-│   │   ├── index.ts
-│   │   ├── local-adapter.ts        # Local execution (for testing/dev)
-│   │   ├── aws-adapter.ts          # AWS Lambda execution
-│   │   └── cloudrun-adapter.ts     # Google Cloud Run execution
-│   └── utils/
-│       └── command.ts              # Command parsing utilities
-└── tests/                          # Unit and integration tests
+│   │   └── local-adapter.ts
+│   ├── orchestrator/
+│   │   ├── job-executor.ts
+│   │   └── job-manager.ts
+│   ├── stitcher/
+│   │   └── ffmpeg-stitcher.ts
+│   ├── utils/
+│   │   └── command.ts
+│   └── worker/
+│       ├── render-executor.ts
+│       └── runtime.ts
+├── tests/
+│   ├── adapters/
+│   ├── orchestrator/
+│   ├── worker-runtime.test.ts
+│   ├── render-executor.test.ts
+│   ├── job-manager.test.ts
+│   ├── job-executor.test.ts
+│   └── ...
+├── package.json
+└── tsconfig.json
 ```
 
-## C. Interfaces
+## Section C: Interfaces
+- **WorkerAdapter**: `execute(job: WorkerJob): Promise<WorkerResult>`
+- **JobExecutor**: `execute(job: JobSpec, options?: JobExecutionOptions): Promise<void>`
+- **JobManager**: `submitJob(jobSpec: JobSpec, options?: JobExecutionOptions): Promise<string>`, `getJob(id: string): Promise<JobStatus | undefined>`
+- **JobExecutionOptions**: `concurrency?: number`, `merge?: boolean`, `retries?: number`, `retryDelay?: number`, `onProgress?: (completedChunks: number, totalChunks: number) => void`
 
-### JobManager
-```typescript
-class JobManager {
-  constructor(repository: JobRepository, executor: JobExecutor);
-  submitJob(jobSpec: JobSpec, options?: JobExecutionOptions): Promise<string>;
-  getJob(id: string): Promise<JobStatus | undefined>;
-}
-```
+## Section D: Cloud Adapters
+- **LocalWorkerAdapter**: Uses `child_process.spawn` to run commands locally. Ideal for testing and single-machine renders.
+- **AWS Lambda**: Submits synchronous executions to AWS Lambda (implemented).
+- **Google Cloud Run**: Submits HTTP requests to Google Cloud Run Jobs (implemented).
 
-### JobExecutor
-```typescript
-interface JobExecutionOptions {
-  concurrency?: number;
-  jobDir?: string;
-  merge?: boolean;
-  retries?: number;      // Number of retries for failed chunks
-  retryDelay?: number;   // Delay in ms between retries
-}
-
-class JobExecutor {
-  constructor(adapter: WorkerAdapter);
-  execute(job: JobSpec, options?: JobExecutionOptions): Promise<void>;
-}
-```
-
-### WorkerAdapter
-```typescript
-interface WorkerAdapter {
-  execute(job: WorkerJob): Promise<WorkerResult>;
-}
-```
-
-### VideoStitcher
-```typescript
-interface VideoStitcher {
-  stitch(segments: string[], outputFile: string): Promise<void>;
-}
-```
-
-## D. Cloud Adapters
-
-### LocalAdapter
-Executes workers as child processes on the local machine. Useful for development and debugging.
-
-### AwsLambdaAdapter
-Invokes AWS Lambda functions to process chunks. Requires `aws-sdk`.
-
-### CloudRunAdapter
-Invokes Google Cloud Run services via HTTP. Uses `google-auth-library` for authentication.
-
-## E. Integration
-
-- **CLI**: The CLI uses `JobExecutor` to run render commands, selecting the appropriate adapter based on user configuration.
-- **Renderer**: The infrastructure package relies on the renderer (conceptually) to produce the actual frames, though it treats the render command as a black box execution.
+## Section E: Integration
+- The CLI depends on the `JobExecutor` to execute rendering tasks either locally or via a cloud adapter.
+- The RenderExecutor module communicates with the core renderer framework to generate frames via a subprocess.
