@@ -11,4 +11,6 @@ export interface WorkerJob {
   timeout?: number;
   /** Additional metadata for adapters (e.g., chunk ID) */
   meta?: Record<string, any>;
+  /** Optional AbortSignal to gracefully cancel the job execution */
+  signal?: AbortSignal;
 }

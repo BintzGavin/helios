@@ -1,6 +1,6 @@
 {
   "name": "@helios-project/infrastructure",
-  "version": "0.12.0",
+  "version": "0.13.0",
   "type": "module",
   "description": "Distributed rendering orchestration and cloud execution adapters.",
   "author": "Gavin Bintz <me@gavinbintz.com>",

@@ -138,7 +138,8 @@ export class JobExecutor {
               meta: {
                 chunkId: chunk.id,
                 ...chunk
-              }
+              },
+              signal: options.signal
             });
 
             if (result.exitCode !== 0) {

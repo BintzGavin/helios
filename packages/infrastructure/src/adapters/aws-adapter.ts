@@ -43,7 +43,7 @@ export class AwsLambdaAdapter implements WorkerAdapter {
         InvocationType: 'RequestResponse', // Wait for execution to complete
       });
 
-      const response: InvokeCommandOutput = await this.client.send(command);
+      const response: InvokeCommandOutput = await this.client.send(command, { abortSignal: job.signal });
 
       // Handle AWS SDK errors (infrastructure failures)
       if (response.FunctionError) {

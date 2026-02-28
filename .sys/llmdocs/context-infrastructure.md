@@ -64,11 +64,13 @@ packages/infrastructure/
 
 ```typescript
 export interface WorkerJob {
-  jobId: string;
-  chunkId?: string;
-  specUrl: string;
-  chunkIndex: number;
+  command: string;
+  args?: string[];
+  env?: Record<string, string>;
+  cwd?: string;
+  timeout?: number;
   meta?: Record<string, any>;
+  signal?: AbortSignal;
 }
 
 export interface WorkerResult {

@@ -71,7 +71,8 @@ export class CloudRunAdapter implements WorkerAdapter {
         },
         // Set a reasonable timeout (e.g., 60 minutes for rendering)
         // or rely on the Cloud Run service timeout
-        timeout: 3600000
+        timeout: 3600000,
+        signal: job.signal as any // Cast to any to bypass Gaxios types if needed, but it works natively in node fetch/axios
       });
 
       // We expect the worker to return a JSON object with:
