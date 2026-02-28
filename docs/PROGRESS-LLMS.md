@@ -1,5 +1,12 @@
 # LLMS Progress
 
+## LLMS v1.28.0
+- ✅ Completed: Daily llms.txt Review
+  - Updated Quick Facts: Core v5.13.0+, Studio v0.116.1+, Player v0.76.11+, Renderer v1.80.0+, CLI v0.32.0+ (aligned with package.json)
+  - Updated Roadmap: Added recent additions to Player (Synchronized Caption Styling, Robust DOM Export) and aligned CLI versions.
+  - Updated Agent Skills: Corrected path from `.agents/skills/helios/` to `.agents/skills/helios-skills/skills/`. Added `getting-started/SKILL.md`.
+  - Verified content against codebase and package versions.
+
 ## LLMS v1.27.0
 - ✅ Completed: Daily llms.txt Review
   - Updated Quick Facts: Studio v0.116.1+, CLI v0.34.1+.
