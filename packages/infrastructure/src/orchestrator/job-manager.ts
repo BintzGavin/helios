@@ -4,6 +4,8 @@ import { JobStatus, JobRepository, JobState } from '../types/job-status.js';
 import { randomUUID } from 'crypto';
 
 export class JobManager {
+  private controllers = new Map<string, AbortController>();
+
   constructor(
     private repository: JobRepository,
     private executor: JobExecutor
@@ -44,6 +46,34 @@ export class JobManager {
   }
 
   /**
+   * Retrieves a list of all jobs.
+   */
+  async listJobs(): Promise<JobStatus[]> {
+    return this.repository.list();
+  }
+
+  /**
+   * Cancels a pending or running job.
+   */
+  async cancelJob(id: string): Promise<void> {
+    const job = await this.repository.get(id);
+    if (!job || (job.state !== 'pending' && job.state !== 'running')) {
+      return;
+    }
+
+    const controller = this.controllers.get(id);
+    if (controller) {
+      controller.abort();
+    } else {
+      // If there's no controller but the job is pending/running,
+      // just set it to cancelled anyway (maybe it's queued).
+      job.state = 'cancelled';
+      job.updatedAt = Date.now();
+      await this.repository.save(job);
+    }
+  }
+
+  /**
    * Internal method to run the job and update status.
    */
   private async runJob(id: string, jobSpec: JobSpec, options?: JobExecutionOptions) {
@@ -55,10 +85,14 @@ export class JobManager {
     job.updatedAt = Date.now();
     await this.repository.save(job);
 
+    const controller = new AbortController();
+    this.controllers.set(id, controller);
+
     try {
       // Execute the job
       const executeOptions: JobExecutionOptions = {
         ...options,
+        signal: controller.signal,
         onProgress: async (completedChunks: number, totalChunks: number) => {
           const currentJob = await this.repository.get(id);
           if (currentJob) {
@@ -82,16 +116,22 @@ export class JobManager {
         await this.repository.save(job);
       }
     } catch (error: any) {
-      console.error(`Job ${id} failed:`, error);
-
-      // Update state to failed
       job = await this.repository.get(id);
       if (job) {
-        job.state = 'failed';
-        job.error = error.message;
-        job.updatedAt = Date.now();
+        if (error.name === 'AbortError' || controller.signal.aborted) {
+          console.log(`Job ${id} cancelled`);
+          job.state = 'cancelled';
+          job.updatedAt = Date.now();
+        } else {
+          console.error(`Job ${id} failed:`, error);
+          job.state = 'failed';
+          job.error = error.message;
+          job.updatedAt = Date.now();
+        }
         await this.repository.save(job);
       }
+    } finally {
+      this.controllers.delete(id);
     }
   }
 }
