@@ -6,7 +6,7 @@ The `@helios-project/infrastructure` package handles distributed execution of re
 
 - **Stateless Design**: Cloud functions are completely stateless.
 - **Worker Adapters**: Abstractions for local and cloud execution.
-- **Orchestration**: `JobManager` handles lifecycles; `JobExecutor` processes chunk queues with configurable retry logic, progress reporting, and cancellation via `AbortSignal`.
+- **Orchestration**: `JobManager` handles lifecycles; `JobExecutor` processes chunk queues with configurable retry logic, progress reporting, and cancellation via `AbortSignal`. Persistence is supported via `FileJobRepository`.
 - **Stitching**: `FfmpegStitcher` safely concatenates chunked videos without re-encoding.
 
 ## B. File Tree
@@ -21,6 +21,7 @@ packages/infrastructure/
 │   │   ├── cloudrun-adapter.ts
 │   │   └── local-adapter.ts
 │   ├── orchestrator/
+│   │   ├── file-job-repository.ts
 │   │   ├── job-executor.ts
 │   │   └── job-manager.ts
 │   ├── stitcher/
@@ -71,6 +72,13 @@ export class JobManager {
 
 export class JobExecutor {
   execute(job: JobSpec, options?: JobExecutionOptions): Promise<void>;
+}
+
+export class FileJobRepository implements JobRepository {
+  constructor(storageDir: string);
+  save(job: JobStatus): Promise<void>;
+  get(id: string): Promise<JobStatus | undefined>;
+  list(): Promise<JobStatus[]>;
 }
 ```
 
