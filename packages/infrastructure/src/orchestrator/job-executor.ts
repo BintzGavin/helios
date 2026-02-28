@@ -1,6 +1,8 @@
 import { WorkerAdapter } from '../types/adapter.js';
 import { JobSpec, RenderJobChunk } from '../types/job-spec.js';
+import { VideoStitcher } from '../stitcher/ffmpeg-stitcher.js';
 import { parseCommand } from '../utils/command.js';
+import path from 'node:path';
 
 export interface JobExecutionOptions {
   /**
@@ -42,6 +44,22 @@ export interface JobExecutionOptions {
    * Signal to abort the job execution.
    */
   signal?: AbortSignal;
+
+  /**
+   * Dedicated adapter for the merge step.
+   * Useful when cloud adapters execute chunks but merging requires local access.
+   */
+  mergeAdapter?: WorkerAdapter;
+
+  /**
+   * Video stitcher to use for merging chunks instead of the merge command.
+   */
+  stitcher?: VideoStitcher;
+
+  /**
+   * Output file path relative to jobDir for the stitcher.
+   */
+  outputFile?: string;
 }
 
 export class JobExecutor {
@@ -186,32 +204,54 @@ export class JobExecutor {
     }
 
     // Merge step
-    if (shouldMerge && job.mergeCommand) {
-      console.log('All chunks completed. Starting merge step...');
+    if (shouldMerge) {
+      if (options.stitcher && options.outputFile) {
+        console.log('All chunks completed. Starting merge step using dedicated VideoStitcher...');
 
-      try {
-        const { command, args } = parseCommand(job.mergeCommand);
+        try {
+          // Sort chunks by ID to ensure correct order
+          const sortedChunks = [...job.chunks].sort((a, b) => a.id - b.id);
+          const inputs = sortedChunks.map(c => path.resolve(jobDir, c.outputFile));
+          const output = path.resolve(jobDir, options.outputFile);
 
-        const result = await this.adapter.execute({
-          command,
-          args,
-          cwd: jobDir,
-          env: process.env as Record<string, string>
-        });
+          await options.stitcher.stitch(inputs, output);
+          console.log('Merge completed successfully via VideoStitcher.');
+        } catch (error: any) {
+          console.error('Merge step failed:', error.message);
+          throw error;
+        }
+      } else if (job.mergeCommand) {
+        console.log('All chunks completed. Starting merge step via mergeCommand...');
 
-        if (result.exitCode !== 0) {
-          throw new Error(`Merge failed with exit code ${result.exitCode}: ${result.stderr}`);
+        if (options.stitcher && !options.outputFile) {
+          console.warn('Warning: stitcher provided but outputFile is missing. Falling back to mergeCommand.');
         }
 
-        console.log('Merge completed successfully.');
-      } catch (error: any) {
-        console.error('Merge step failed:', error.message);
-        throw error;
+        try {
+          const { command, args } = parseCommand(job.mergeCommand);
+          const mergeAdapter = options.mergeAdapter || this.adapter;
+
+          const result = await mergeAdapter.execute({
+            command,
+            args,
+            cwd: jobDir,
+            env: process.env as Record<string, string>
+          });
+
+          if (result.exitCode !== 0) {
+            throw new Error(`Merge failed with exit code ${result.exitCode}: ${result.stderr}`);
+          }
+
+          console.log('Merge completed successfully.');
+        } catch (error: any) {
+          console.error('Merge step failed:', error.message);
+          throw error;
+        }
+      } else {
+        console.log('Skipping merge step (no merge mechanism provided).');
       }
-    } else if (!shouldMerge) {
-      console.log('Skipping merge step (disabled in options).');
     } else {
-      console.log('Skipping merge step (no merge command provided).');
+      console.log('Skipping merge step (disabled in options).');
     }
   }
 }

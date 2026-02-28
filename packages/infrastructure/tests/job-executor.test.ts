@@ -2,6 +2,8 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { JobExecutor } from '../src/orchestrator/job-executor.js';
 import { WorkerAdapter, WorkerJob } from '../src/types/adapter.js';
 import { JobSpec } from '../src/types/job-spec.js';
+import { VideoStitcher } from '../src/stitcher/ffmpeg-stitcher.js';
+import path from 'node:path';
 
 describe('JobExecutor', () => {
   let mockAdapter: WorkerAdapter;
@@ -178,5 +180,91 @@ describe('JobExecutor', () => {
     // It might execute chunk 1 depending on the exact timing in the event loop,
     // but definitely shouldn't process everything
     expect(mockAdapter.execute).toHaveBeenCalledTimes(1);
+  });
+
+  describe('merge logic decoupling', () => {
+    it('should use mergeAdapter when provided', async () => {
+      const mockMergeAdapter: WorkerAdapter = {
+        execute: vi.fn().mockResolvedValue({
+          exitCode: 0,
+          stdout: '',
+          stderr: '',
+          durationMs: 100
+        })
+      };
+
+      await jobExecutor.execute(jobSpec, { mergeAdapter: mockMergeAdapter });
+
+      expect(mockAdapter.execute).toHaveBeenCalledTimes(2); // Only chunks
+      expect(mockMergeAdapter.execute).toHaveBeenCalledTimes(1); // Merge
+      expect(mockMergeAdapter.execute).toHaveBeenCalledWith(expect.objectContaining({
+        command: 'merge',
+        args: ['chunks']
+      }));
+    });
+
+    it('should use stitcher when stitcher and outputFile are provided', async () => {
+      const mockStitcher: VideoStitcher = {
+        stitch: vi.fn().mockResolvedValue(undefined)
+      };
+
+      const jobDir = process.cwd();
+
+      await jobExecutor.execute(jobSpec, { stitcher: mockStitcher, outputFile: 'final.mp4' });
+
+      expect(mockAdapter.execute).toHaveBeenCalledTimes(2); // Only chunks
+      expect(mockStitcher.stitch).toHaveBeenCalledTimes(1); // Stitcher
+
+      const expectedInputs = [
+        path.resolve(jobDir, 'chunk1.mp4'),
+        path.resolve(jobDir, 'chunk2.mp4')
+      ];
+      const expectedOutput = path.resolve(jobDir, 'final.mp4');
+
+      expect(mockStitcher.stitch).toHaveBeenCalledWith(expectedInputs, expectedOutput);
+    });
+
+    it('should fall back to mergeCommand if stitcher is provided without outputFile', async () => {
+      const mockStitcher: VideoStitcher = {
+        stitch: vi.fn().mockResolvedValue(undefined)
+      };
+
+      // Mock console.warn to verify the warning
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+      await jobExecutor.execute(jobSpec, { stitcher: mockStitcher });
+
+      expect(mockAdapter.execute).toHaveBeenCalledTimes(3); // 2 chunks + 1 merge command
+      expect(mockStitcher.stitch).not.toHaveBeenCalled();
+      expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('stitcher provided but outputFile is missing'));
+
+      warnSpy.mockRestore();
+    });
+
+    it('should fall back to mergeCommand if stitcher is provided without outputFile and mergeAdapter is used', async () => {
+      const mockStitcher: VideoStitcher = {
+        stitch: vi.fn().mockResolvedValue(undefined)
+      };
+
+      const mockMergeAdapter: WorkerAdapter = {
+        execute: vi.fn().mockResolvedValue({
+          exitCode: 0,
+          stdout: '',
+          stderr: '',
+          durationMs: 100
+        })
+      };
+
+      // Mock console.warn to verify the warning
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+      await jobExecutor.execute(jobSpec, { stitcher: mockStitcher, mergeAdapter: mockMergeAdapter });
+
+      expect(mockAdapter.execute).toHaveBeenCalledTimes(2); // Only chunks
+      expect(mockMergeAdapter.execute).toHaveBeenCalledTimes(1); // Merge command
+      expect(mockStitcher.stitch).not.toHaveBeenCalled();
+
+      warnSpy.mockRestore();
+    });
   });
 });
