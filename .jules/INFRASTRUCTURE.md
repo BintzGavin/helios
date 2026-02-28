@@ -13,3 +13,7 @@ Critical learnings only. This is not a log—only add entries for insights that 
 ## [0.9.1] - Cloud Deployment Tooling Gap
 **Learning:** The `packages/infrastructure` implements cloud adapters (`AwsLambdaAdapter`, `CloudRunAdapter`) to invoke jobs, and a `WorkerRuntime` to execute them, but lacks the actual server/handler templates that run inside AWS Lambda or Cloud Run to bridge these two components. This forces users to write boilerplate to connect the adapter payload to `WorkerRuntime`.
 **Action:** Plan to add `createAwsHandler` and `createCloudRunServer` entrypoint generators to satisfy the V2 requirement for "deployment tooling".
+
+## [0.10.0] - Observability Gap
+**Learning:** V2 Monetization Readiness for hosted rendering requires Job observability. Currently, `JobExecutor` discards worker telemetry (`durationMs`) and logs (`stdout`), which prevents platforms from calculating billing or showing user logs.
+**Action:** Plan to implement telemetry capture via `onChunkComplete` and persist it in `JobStatus` to enable hosted platforms.
