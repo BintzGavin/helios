@@ -17,3 +17,7 @@ Critical learnings only. This is not a log—only add entries for insights that 
 ## [0.10.0] - Observability Gap
 **Learning:** V2 Monetization Readiness for hosted rendering requires Job observability. Currently, `JobExecutor` discards worker telemetry (`durationMs`) and logs (`stdout`), which prevents platforms from calculating billing or showing user logs.
 **Action:** Plan to implement telemetry capture via `onChunkComplete` and persist it in `JobStatus` to enable hosted platforms.
+
+## [0.11.0] - Robust Command Parsing & Housekeeping Gap
+**Learning:** The `parseCommand` utility in `packages/infrastructure/src/utils/command.ts` currently splits strings purely by whitespace. This will break when `JobSpec` commands contain quoted arguments with spaces (e.g., `-metadata title="My Render"` or paths with spaces). Additionally, `package.json` is missing a `lint` script, which breaks CI/CD consistency, and its version (`0.1.0`) is out of sync with actual release status.
+**Action:** Plan to implement a robust command parser (handling quotes) and perform package housekeeping (sync version, add lint script) to ensure distributed render commands execute correctly on workers.
