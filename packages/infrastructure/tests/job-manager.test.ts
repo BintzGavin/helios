@@ -137,4 +137,34 @@ describe('JobManager', () => {
     const job = await jobManager.getJob('non-existent-id');
     expect(job).toBeUndefined();
   });
+
+  it('should update job status progressively via onProgress callback', async () => {
+    // Mock the executor to call the onProgress callback incrementally
+    mockExecutor.execute = vi.fn().mockImplementation(async (spec, options) => {
+      if (options?.onProgress) {
+        await options.onProgress(1, 2);
+        // Add a small delay so we can inspect the state midway
+        await new Promise(resolve => setTimeout(resolve, 20));
+        await options.onProgress(2, 2);
+      }
+    });
+
+    const jobId = await jobManager.submitJob(jobSpec);
+
+    // Give it a tiny moment to transition to running and process first progress
+    await new Promise(resolve => setTimeout(resolve, 10));
+
+    let job = await jobManager.getJob(jobId);
+    expect(job?.state).toBe('running' as JobState);
+    expect(job?.completedChunks).toBe(1);
+    expect(job?.progress).toBe(50);
+
+    // Wait for the full execution to complete
+    await new Promise(resolve => setTimeout(resolve, 30));
+
+    job = await jobManager.getJob(jobId);
+    expect(job?.state).toBe('completed' as JobState);
+    expect(job?.completedChunks).toBe(2);
+    expect(job?.progress).toBe(100);
+  });
 });

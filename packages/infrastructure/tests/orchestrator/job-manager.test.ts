@@ -78,7 +78,7 @@ describe('JobManager', () => {
     // Allow the microtask queue to process the async runJob
     await new Promise(resolve => setTimeout(resolve, 50));
 
-    expect(mockExecutorExecute).toHaveBeenCalledWith(sampleJobSpec, undefined);
+    expect(mockExecutorExecute).toHaveBeenCalledWith(sampleJobSpec, expect.objectContaining({ onProgress: expect.any(Function) }));
 
     const job = await jobManager.getJob(id);
     expect(job?.state).toBe('completed');

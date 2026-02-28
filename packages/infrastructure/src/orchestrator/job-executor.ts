@@ -32,6 +32,11 @@ export interface JobExecutionOptions {
    * Defaults to 1000.
    */
   retryDelay?: number;
+
+  /**
+   * Callback invoked when a chunk successfully completes.
+   */
+  onProgress?: (completedChunks: number, totalChunks: number) => void;
 }
 
 export class JobExecutor {
@@ -97,6 +102,9 @@ export class JobExecutor {
             }
 
             completedChunks++;
+            if (options.onProgress) {
+              options.onProgress(completedChunks, totalChunks);
+            }
             console.log(`[Worker ${workerId}] Chunk ${chunk.id} completed (${completedChunks}/${totalChunks})`);
             break; // Success, break retry loop
           } catch (error: any) {
