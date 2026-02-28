@@ -176,6 +176,40 @@ describe('JobManager', () => {
     expect(jobs).toHaveLength(2);
   });
 
+  it('should aggregate metrics and logs via onChunkComplete', async () => {
+    mockExecutor.execute = vi.fn().mockImplementation(async (spec, options) => {
+      if (options?.onChunkComplete) {
+        await options.onChunkComplete(1, { exitCode: 0, stdout: 'chunk 1 out', stderr: '', durationMs: 150 });
+        // Add a small delay
+        await new Promise(resolve => setTimeout(resolve, 20));
+        await options.onChunkComplete(2, { exitCode: 0, stdout: 'chunk 2 out', stderr: '', durationMs: 200 });
+      }
+    });
+
+    const jobId = await jobManager.submitJob(jobSpec);
+
+    // Wait for the full execution to complete
+    await new Promise(resolve => setTimeout(resolve, 50));
+
+    const job = await jobManager.getJob(jobId);
+    expect(job?.state).toBe('completed' as JobState);
+    expect(job?.metrics?.totalDurationMs).toBe(350);
+    expect(job?.logs).toBeDefined();
+    expect(job?.logs).toHaveLength(2);
+    expect(job?.logs![0]).toEqual({
+      chunkId: 1,
+      durationMs: 150,
+      stdout: 'chunk 1 out',
+      stderr: ''
+    });
+    expect(job?.logs![1]).toEqual({
+      chunkId: 2,
+      durationMs: 200,
+      stdout: 'chunk 2 out',
+      stderr: ''
+    });
+  });
+
   it('cancelJob should abort the executor and set state to cancelled', async () => {
     let executeResolve: () => void;
 
