@@ -1,58 +1,86 @@
-# Infrastructure Context
+# INFRASTRUCTURE CONTEXT
 
-## A. Architecture
+## Section A: Architecture
+The `@helios-project/infrastructure` package manages distributed rendering execution and orchestration. It is built around pluggable worker adapters that abstract execution environments (Local, AWS Lambda, Google Cloud Run) from the core job execution logic.
+The `JobManager` orchestrates high-level job lifecycles and persistence (via `FileJobRepository`), delegating actual execution to `JobExecutor`. `JobExecutor` runs chunks concurrently, handles transient failures with retries, and can utilize an optional `VideoStitcher` (e.g. `FfmpegStitcher`) or a dedicated `mergeAdapter` for output assembly.
 
-The `@helios-project/infrastructure` package handles distributed execution of render jobs across various environments (Local, AWS Lambda, Google Cloud Run).
-
-- **Stateless Design**: Cloud functions are completely stateless.
-- **Worker Adapters**: Abstractions for local and cloud execution.
-- **Orchestration**: `JobManager` handles lifecycles; `JobExecutor` processes chunk queues with configurable retry logic, progress reporting, and cancellation via `AbortSignal`. Persistence is supported via `FileJobRepository`.
-- **Stitching**: `FfmpegStitcher` safely concatenates chunked videos without re-encoding.
-
-## B. File Tree
-
+## Section B: File Tree
 ```
 packages/infrastructure/
 ├── package.json
+├── tsconfig.json
+├── vitest.config.ts
 ├── src/
 │   ├── index.ts
-│   ├── adapters/
-│   │   ├── aws-adapter.ts
-│   │   ├── cloudrun-adapter.ts
-│   │   └── local-adapter.ts
-│   ├── orchestrator/
-│   │   ├── file-job-repository.ts
-│   │   ├── job-executor.ts
-│   │   └── job-manager.ts
-│   ├── stitcher/
-│   │   └── ffmpeg-stitcher.ts
 │   ├── types/
 │   │   ├── adapter.ts
+│   │   ├── index.ts
 │   │   ├── job-spec.ts
-│   │   └── job-status.ts
+│   │   ├── job-status.ts
+│   │   └── job.ts
+│   ├── worker/
+│   │   ├── index.ts
+│   │   ├── render-executor.ts
+│   │   └── runtime.ts
+│   ├── stitcher/
+│   │   ├── ffmpeg-stitcher.ts
+│   │   └── index.ts
 │   ├── utils/
 │   │   └── command.ts
-│   └── worker/
-│       ├── render-executor.ts
-│       └── runtime.ts
-└── tsconfig.json
+│   ├── orchestrator/
+│   │   ├── file-job-repository.ts
+│   │   ├── index.ts
+│   │   ├── job-executor.ts
+│   │   └── job-manager.ts
+│   └── adapters/
+│       ├── aws-adapter.ts
+│       ├── cloudrun-adapter.ts
+│       ├── index.ts
+│       └── local-adapter.ts
 ```
 
-## C. Interfaces
+## Section C: Interfaces
 
 ```typescript
-export interface WorkerAdapter {
-  execute(job: WorkerJob): Promise<WorkerResult>;
-}
-
+// src/types/adapter.ts
 export interface WorkerJob {
   command: string;
-  args?: string[];
+  args: string[];
   cwd?: string;
   env?: Record<string, string>;
   meta?: Record<string, any>;
 }
+export interface WorkerResult {
+  exitCode: number;
+  stdout: string;
+  stderr: string;
+  durationMs: number;
+}
+export interface WorkerAdapter {
+  execute(job: WorkerJob): Promise<WorkerResult>;
+}
 
+// src/types/job-spec.ts
+export interface RenderJobChunk {
+  id: number;
+  startFrame: number;
+  frameCount: number;
+  outputFile: string;
+  command: string;
+}
+export interface JobSpec {
+  metadata: {
+    totalFrames: number;
+    fps: number;
+    width: number;
+    height: number;
+    duration: number;
+  };
+  chunks: RenderJobChunk[];
+  mergeCommand: string;
+}
+
+// src/orchestrator/job-executor.ts
 export interface JobExecutionOptions {
   concurrency?: number;
   jobDir?: string;
@@ -61,34 +89,21 @@ export interface JobExecutionOptions {
   retryDelay?: number;
   onProgress?: (completedChunks: number, totalChunks: number) => void;
   signal?: AbortSignal;
+  mergeAdapter?: WorkerAdapter;
+  stitcher?: VideoStitcher;
+  outputFile?: string;
 }
 
-export class JobManager {
-  submitJob(jobSpec: JobSpec, options?: JobExecutionOptions): Promise<string>;
-  getJob(id: string): Promise<JobStatus | undefined>;
-  listJobs(): Promise<JobStatus[]>;
-  cancelJob(id: string): Promise<void>;
-}
-
-export class JobExecutor {
-  execute(job: JobSpec, options?: JobExecutionOptions): Promise<void>;
-}
-
-export class FileJobRepository implements JobRepository {
-  constructor(storageDir: string);
-  save(job: JobStatus): Promise<void>;
-  get(id: string): Promise<JobStatus | undefined>;
-  list(): Promise<JobStatus[]>;
+// src/stitcher/ffmpeg-stitcher.ts
+export interface VideoStitcher {
+  stitch(inputs: string[], output: string): Promise<void>;
 }
 ```
 
-## D. Cloud Adapters
+## Section D: Cloud Adapters
+*   **LocalWorkerAdapter**: Executes commands locally using `child_process.spawn`. Used for testing and local rendering.
+*   **AwsLambdaAdapter**: Translates jobs to synchronous `@aws-sdk/client-lambda` payloads.
+*   **CloudRunAdapter**: Submits jobs via HTTP POST to a Google Cloud Run service, authenticating with `google-auth-library`.
 
-- **LocalWorkerAdapter**: Executes processes locally via `child_process`.
-- **AwsLambdaAdapter**: Invokes AWS Lambda functions.
-- **CloudRunAdapter**: Invokes Google Cloud Run services via HTTP with OIDC authentication.
-
-## E. Integration
-
-- **Renderer**: Infrastructure uses render output to build chunks.
-- **CLI**: The CLI utilizes the job manager and orchestrator to execute distributed jobs locally or in the cloud.
+## Section E: Integration
+The infrastructure package is designed to be consumed by `packages/cli` for the `job run` command, enabling CLI users to execute jobs generated by `@helios-project/renderer`. The `WorkerRuntime` orchestrates pulling down the job specification and handing it off to `RenderExecutor`.

@@ -1,7 +1,8 @@
 # INFRASTRUCTURE STATUS
-**Version**: 0.8.0
+**Version**: 0.9.0
 
 ## Status Log
+- [v0.9.0] ✅ Completed: Decouple Merge Execution - Expanded JobExecutionOptions to support dedicated mergeAdapter, stitcher, and outputFile for distributed execution.
 - [v0.8.0] ✅ Completed: FileJobRepository Spec - Implemented a persistent, file-based JobRepository for packages/infrastructure.
 - [v0.7.0] ✅ Completed: Cancel Job - Implemented job cancellation via AbortSignal in JobExecutor and exposed cancelJob and listJobs in JobManager.
 - [v0.6.0] ✅ Completed: Enhance JobExecutor Progress - Implemented granular progress reporting in JobExecutor and JobManager via an onProgress callback.

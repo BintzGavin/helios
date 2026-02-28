@@ -13,6 +13,27 @@ Each agent should update **their own dedicated progress file** instead of this f
 - **STUDIO**: Update `docs/PROGRESS-STUDIO.md`
 - **SKILLS**: Update `docs/PROGRESS-SKILLS.md`
 
+### INFRASTRUCTURE v0.9.0
+- ✅ Completed: Decouple Merge Execution - Expanded JobExecutionOptions to support dedicated mergeAdapter, stitcher, and outputFile for distributed execution.
+
+### INFRASTRUCTURE v0.8.0
+- ✅ Completed: FileJobRepository Spec - Implemented a persistent, file-based JobRepository for packages/infrastructure.
+
+### INFRASTRUCTURE v0.7.0
+- ✅ Completed: Cancel Job - Implemented job cancellation via AbortSignal in JobExecutor and exposed cancelJob and listJobs in JobManager.
+
+### INFRASTRUCTURE v0.6.0
+- ✅ Completed: Enhance JobExecutor Progress - Implemented granular progress reporting in JobExecutor and JobManager via an onProgress callback.
+
+### INFRASTRUCTURE v0.5.1
+- ✅ Completed: Retry Logic Verification - Verified robust retry logic in JobExecutor with tests to handle transient failures in distributed rendering jobs.
+
+### INFRASTRUCTURE v0.5.0
+- ✅ Completed: JobManager Tests & Export Orchestrator - Exported `orchestrator` module and implemented unit tests for `JobManager`.
+
+### INFRASTRUCTURE v0.4.0
+- ✅ Completed: Retry Logic - Implemented configurable retry logic in JobExecutor for transient failures.
+
 ### INFRASTRUCTURE v0.3.0
 - ✅ Completed: Output Stitcher - Implemented FfmpegStitcher for concatenating video segments without re-encoding.
 
