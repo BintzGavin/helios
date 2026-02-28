@@ -10,6 +10,15 @@ export interface JobStatus {
   createdAt: number;
   updatedAt: number;
   result?: any;
+  metrics?: {
+    totalDurationMs: number;
+  };
+  logs?: Array<{
+    chunkId: number;
+    durationMs: number;
+    stdout: string;
+    stderr: string;
+  }>;
 }
 
 export interface JobRepository {

@@ -80,13 +80,35 @@ export interface JobExecutionOptions {
   retries?: number;
   retryDelay?: number;
   onProgress?: (progress: { chunkId: number; totalChunks: number; percent: number }) => void;
+  onChunkComplete?: (chunkId: number, result: WorkerResult) => void | Promise<void>;
   signal?: AbortSignal;
 }
 
+export interface JobStatus {
+  id: string;
+  state: JobState;
+  progress: number;
+  totalChunks: number;
+  completedChunks: number;
+  error?: string;
+  createdAt: number;
+  updatedAt: number;
+  result?: any;
+  metrics?: {
+    totalDurationMs: number;
+  };
+  logs?: Array<{
+    chunkId: number;
+    durationMs: number;
+    stdout: string;
+    stderr: string;
+  }>;
+}
+
 export interface JobRepository {
-  save(job: JobState): Promise<void>;
-  get(jobId: string): Promise<JobState | null>;
-  list(): Promise<JobState[]>;
+  save(job: JobStatus): Promise<void>;
+  get(jobId: string): Promise<JobStatus | null>;
+  list(): Promise<JobStatus[]>;
   delete(jobId: string): Promise<void>;
 }
 

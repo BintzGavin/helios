@@ -156,6 +156,26 @@ describe('JobExecutor', () => {
     expect(onProgress).toHaveBeenNthCalledWith(2, 2, 2);
   });
 
+  it('should call onChunkComplete callback when a chunk completes', async () => {
+    const onChunkComplete = vi.fn();
+
+    await jobExecutor.execute(jobSpec, { onChunkComplete });
+
+    expect(onChunkComplete).toHaveBeenCalledTimes(2);
+    expect(onChunkComplete).toHaveBeenNthCalledWith(1, 1, {
+      exitCode: 0,
+      stdout: '',
+      stderr: '',
+      durationMs: 100
+    });
+    expect(onChunkComplete).toHaveBeenNthCalledWith(2, 2, {
+      exitCode: 0,
+      stdout: '',
+      stderr: '',
+      durationMs: 100
+    });
+  });
+
   it('should throw AbortError if signal is already aborted', async () => {
     const controller = new AbortController();
     controller.abort();
