@@ -1,8 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { createAwsHandler } from '../src/worker/aws-handler.js';
-import { WorkerRuntime } from '../src/worker/runtime.js';
+import { createAwsHandler } from '../../src/worker/aws-handler.js';
+import { WorkerRuntime } from '../../src/worker/runtime.js';
 
-vi.mock('../src/worker/runtime.js', () => {
+vi.mock('../../src/worker/runtime.js', () => {
   return {
     WorkerRuntime: vi.fn()
   };

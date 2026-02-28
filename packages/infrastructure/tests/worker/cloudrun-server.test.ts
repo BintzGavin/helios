@@ -1,9 +1,9 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { createCloudRunServer } from '../src/worker/cloudrun-server.js';
-import { WorkerRuntime } from '../src/worker/runtime.js';
+import { createCloudRunServer } from '../../src/worker/cloudrun-server.js';
+import { WorkerRuntime } from '../../src/worker/runtime.js';
 import http from 'node:http';
 
-vi.mock('../src/worker/runtime.js', () => {
+vi.mock('../../src/worker/runtime.js', () => {
   return {
     WorkerRuntime: vi.fn()
   };
