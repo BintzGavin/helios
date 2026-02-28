@@ -271,6 +271,27 @@ describe('JobExecutor', () => {
       warnSpy.mockRestore();
     });
 
+    it('should pass signal to mergeAdapter', async () => {
+      const controller = new AbortController();
+      const mockMergeAdapter: WorkerAdapter = {
+        execute: vi.fn().mockResolvedValue({
+          exitCode: 0,
+          stdout: '',
+          stderr: '',
+          durationMs: 100
+        })
+      };
+
+      await jobExecutor.execute(jobSpec, {
+        mergeAdapter: mockMergeAdapter,
+        signal: controller.signal
+      });
+
+      expect(mockMergeAdapter.execute).toHaveBeenCalledWith(expect.objectContaining({
+        signal: controller.signal
+      }));
+    });
+
     it('should fall back to mergeCommand if stitcher is provided without outputFile and mergeAdapter is used', async () => {
       const mockStitcher: VideoStitcher = {
         stitch: vi.fn().mockResolvedValue(undefined)
