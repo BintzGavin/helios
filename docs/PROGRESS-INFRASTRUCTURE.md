@@ -1,5 +1,8 @@
 # INFRASTRUCTURE PROGRESS
 
+## INFRASTRUCTURE v0.8.0
+- ✅ Completed: FileJobRepository Spec - Implemented a persistent, file-based JobRepository for packages/infrastructure.
+
 ## INFRASTRUCTURE v0.7.0
 - ✅ Completed: Cancel Job - Implemented job cancellation via AbortSignal in JobExecutor and exposed cancelJob and listJobs in JobManager.
 
