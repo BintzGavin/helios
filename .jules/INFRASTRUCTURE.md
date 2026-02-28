@@ -5,3 +5,7 @@ Critical learnings only. This is not a log—only add entries for insights that 
 ## [0.0.0] - Initial State
 **Learning:** The Infrastructure package does not yet exist. First task should scaffold `packages/infrastructure/` with proper package.json, tsconfig.json, and directory structure before implementing features.
 **Action:** Ensure package scaffolding is the first plan before any feature work.
+
+## [0.5.1] - Granular Progress Tracking Gap
+**Learning:** The `JobExecutor` lacks granular progress reporting (it doesn't emit events when chunks complete). This prevents `JobManager` from updating the `JobStatus.progress` and `JobStatus.completedChunks` correctly during execution.
+**Action:** Plan to add an `onProgress` callback to `JobExecutionOptions` and integrate it with `JobManager`.
