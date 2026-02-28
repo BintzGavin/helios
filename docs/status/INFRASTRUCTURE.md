@@ -1,7 +1,8 @@
 # INFRASTRUCTURE STATUS
-**Version**: 0.11.0
+**Version**: 0.12.0
 
 ## Status Log
+- [v0.12.0] ✅ Completed: Observability Telemetry - Added test verifying `onChunkComplete` metrics and logs gathering during chunk execution in JobManager.
 - [v0.11.0] ✅ Completed: Observability Telemetry - Added metrics and logs gathering during chunk execution in JobManager to support job profiling and debugging.
 - [v0.10.0] ✅ Completed: Cloud Worker Entrypoints - Implemented AWS Lambda and Google Cloud Run stateless entrypoints to execute jobs.
 - [v0.9.0] ✅ Completed: Decouple Merge Execution - Expanded JobExecutionOptions to support dedicated mergeAdapter, stitcher, and outputFile for distributed execution.
