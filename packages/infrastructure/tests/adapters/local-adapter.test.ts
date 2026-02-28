@@ -61,4 +61,35 @@ describe('LocalWorkerAdapter', () => {
 
     await expect(adapter.execute(job)).rejects.toThrow(/timed out/);
   });
+
+  it('should handle explicit cancellation via AbortSignal', async () => {
+    const controller = new AbortController();
+    const job: WorkerJob = {
+      command: nodePath,
+      args: ['-e', 'setTimeout(() => {}, 5000)'], // Sleep for 5 seconds
+      signal: controller.signal,
+    };
+
+    const promise = adapter.execute(job);
+
+    // Give process a bit of time to start, then abort
+    setTimeout(() => {
+      controller.abort();
+    }, 50);
+
+    await expect(promise).rejects.toThrow('Job was aborted');
+  });
+
+  it('should fail fast if signal is already aborted', async () => {
+    const controller = new AbortController();
+    controller.abort();
+
+    const job: WorkerJob = {
+      command: nodePath,
+      args: ['-e', 'setTimeout(() => {}, 2000)'],
+      signal: controller.signal,
+    };
+
+    await expect(adapter.execute(job)).rejects.toThrow('Job was aborted');
+  });
 });

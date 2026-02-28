@@ -7,9 +7,13 @@ import { WorkerAdapter, WorkerJob, WorkerResult } from '../types/index.js';
 export class LocalWorkerAdapter implements WorkerAdapter {
   async execute(job: WorkerJob): Promise<WorkerResult> {
     const startTime = Date.now();
-    const { command, args = [], env, cwd, timeout } = job;
+    const { command, args = [], env, cwd, timeout, signal } = job;
 
     return new Promise((resolve, reject) => {
+      if (signal?.aborted) {
+        return reject(new Error('Job was aborted'));
+      }
+
       // Merge current process environment with provided env
       const childEnv = { ...process.env, ...(env || {}) };
 
@@ -44,13 +48,31 @@ export class LocalWorkerAdapter implements WorkerAdapter {
         }, timeout);
       }
 
-      child.on('error', (err) => {
+      let abortListener: (() => void) | undefined;
+
+      if (signal) {
+        abortListener = () => {
+          if (timeoutId) clearTimeout(timeoutId);
+          child.kill();
+          reject(new Error('Job was aborted'));
+        };
+        signal.addEventListener('abort', abortListener, { once: true });
+      }
+
+      const cleanup = () => {
         if (timeoutId) clearTimeout(timeoutId);
+        if (signal && abortListener) {
+          signal.removeEventListener('abort', abortListener);
+        }
+      };
+
+      child.on('error', (err) => {
+        cleanup();
         reject(err);
       });
 
       child.on('close', (code) => {
-        if (timeoutId) clearTimeout(timeoutId);
+        cleanup();
         const durationMs = Date.now() - startTime;
 
         resolve({

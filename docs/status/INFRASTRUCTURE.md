@@ -1,7 +1,8 @@
 # INFRASTRUCTURE STATUS
-**Version**: 0.12.0
+**Version**: 0.13.0
 
 ## Status Log
+- [v0.13.0] ✅ Completed: Enhance Worker Job Cancellation - Propagated `AbortSignal` from `JobExecutor` to `WorkerAdapter` implementations to enable true graceful cancellation of running chunks.
 - [v0.12.0] ✅ Completed: Robust Command Parsing and Housekeeping - Refactored parseCommand to use a state machine for handling quotes and escaped characters. Updated package version and added a lint script.
 - [v0.12.0] ✅ Completed: Observability Telemetry - Added test verifying `onChunkComplete` metrics and logs gathering during chunk execution in JobManager.
 - [v0.11.0] ✅ Completed: Observability Telemetry - Added metrics and logs gathering during chunk execution in JobManager to support job profiling and debugging.

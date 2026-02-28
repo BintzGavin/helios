@@ -176,6 +176,16 @@ describe('JobExecutor', () => {
     });
   });
 
+  it('should pass signal to the adapter', async () => {
+    const controller = new AbortController();
+
+    await jobExecutor.execute(jobSpec, { signal: controller.signal });
+
+    expect(mockAdapter.execute).toHaveBeenCalledWith(expect.objectContaining({
+      signal: controller.signal
+    }));
+  });
+
   it('should throw AbortError if signal is already aborted', async () => {
     const controller = new AbortController();
     controller.abort();

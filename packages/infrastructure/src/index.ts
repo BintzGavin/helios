@@ -1,4 +1,4 @@
-export const INFRASTRUCTURE_VERSION = '0.2.0';
+export const INFRASTRUCTURE_VERSION = '0.13.0';
 
 export function initInfrastructure() {
   console.log('Infrastructure initialized');
