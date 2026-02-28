@@ -37,6 +37,11 @@ export interface JobExecutionOptions {
    * Callback invoked when a chunk successfully completes.
    */
   onProgress?: (completedChunks: number, totalChunks: number) => void;
+
+  /**
+   * Signal to abort the job execution.
+   */
+  signal?: AbortSignal;
 }
 
 export class JobExecutor {
@@ -73,6 +78,14 @@ export class JobExecutor {
     // Worker function to process chunks from the queue
     const worker = async (workerId: number) => {
       while (true) {
+        if (options.signal?.aborted) {
+          const abortError = new Error('Job aborted');
+          abortError.name = 'AbortError';
+          hasFailed = true;
+          queue.length = 0;
+          throw abortError;
+        }
+
         // Atomic check and pop
         if (hasFailed || queue.length === 0) break;
 
@@ -81,6 +94,14 @@ export class JobExecutor {
 
         let attempt = 0;
         while (true) {
+          if (options.signal?.aborted) {
+            const abortError = new Error('Job aborted');
+            abortError.name = 'AbortError';
+            hasFailed = true;
+            queue.length = 0;
+            throw abortError;
+          }
+
           try {
             console.log(`[Worker ${workerId}] Starting chunk ${chunk.id} (Attempt ${attempt + 1}/${maxRetries + 1})...`);
 
@@ -111,7 +132,22 @@ export class JobExecutor {
             if (attempt < maxRetries) {
               attempt++;
               console.warn(`[Worker ${workerId}] Chunk ${chunk.id} failed (Attempt ${attempt}/${maxRetries + 1}). Retrying in ${retryDelay}ms... Error: ${error.message}`);
-              await new Promise(resolve => setTimeout(resolve, retryDelay));
+              await new Promise(resolve => {
+                const timeout = setTimeout(resolve, retryDelay);
+                if (options.signal) {
+                  options.signal.addEventListener('abort', () => {
+                    clearTimeout(timeout);
+                    resolve(undefined);
+                  }, { once: true });
+                }
+              });
+              if (options.signal?.aborted) {
+                const abortError = new Error('Job aborted');
+                abortError.name = 'AbortError';
+                hasFailed = true;
+                queue.length = 0;
+                throw abortError;
+              }
               continue;
             }
 

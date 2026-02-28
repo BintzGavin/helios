@@ -153,4 +153,30 @@ describe('JobExecutor', () => {
     expect(onProgress).toHaveBeenNthCalledWith(1, 1, 2);
     expect(onProgress).toHaveBeenNthCalledWith(2, 2, 2);
   });
+
+  it('should throw AbortError if signal is already aborted', async () => {
+    const controller = new AbortController();
+    controller.abort();
+
+    await expect(jobExecutor.execute(jobSpec, { signal: controller.signal })).rejects.toThrow(/Job aborted/);
+    expect(mockAdapter.execute).not.toHaveBeenCalled();
+  });
+
+  it('should throw AbortError if signal is aborted mid-execution', async () => {
+    const controller = new AbortController();
+
+    mockAdapter.execute = vi.fn().mockImplementation(async (job: WorkerJob) => {
+      // Abort during the first chunk
+      if (job.args && job.args.includes('1')) {
+         controller.abort();
+      }
+      return { exitCode: 0, stdout: '', stderr: '', durationMs: 0 };
+    });
+
+    await expect(jobExecutor.execute(jobSpec, { signal: controller.signal })).rejects.toThrow(/Job aborted/);
+
+    // It might execute chunk 1 depending on the exact timing in the event loop,
+    // but definitely shouldn't process everything
+    expect(mockAdapter.execute).toHaveBeenCalledTimes(1);
+  });
 });

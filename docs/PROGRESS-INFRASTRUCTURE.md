@@ -1,5 +1,8 @@
 # INFRASTRUCTURE PROGRESS
 
+## INFRASTRUCTURE v0.7.0
+- ✅ Completed: Cancel Job - Implemented job cancellation via AbortSignal in JobExecutor and exposed cancelJob and listJobs in JobManager.
+
 ## INFRASTRUCTURE v0.5.1
 - ✅ Completed: Retry Logic Verification - Verified robust retry logic in JobExecutor with tests to handle transient failures in distributed rendering jobs.
 

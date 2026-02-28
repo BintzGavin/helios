@@ -167,4 +167,50 @@ describe('JobManager', () => {
     expect(job?.completedChunks).toBe(2);
     expect(job?.progress).toBe(100);
   });
+
+  it('listJobs should return all jobs from the repository', async () => {
+    await jobManager.submitJob(jobSpec);
+    await jobManager.submitJob(jobSpec);
+
+    const jobs = await jobManager.listJobs();
+    expect(jobs).toHaveLength(2);
+  });
+
+  it('cancelJob should abort the executor and set state to cancelled', async () => {
+    let executeResolve: () => void;
+
+    // Simulate long running executor that can be aborted
+    mockExecutor.execute = vi.fn().mockImplementation((spec, options) => {
+      return new Promise<void>((resolve, reject) => {
+        executeResolve = resolve;
+        if (options?.signal) {
+          options.signal.addEventListener('abort', () => {
+            const error = new Error('Job aborted');
+            error.name = 'AbortError';
+            reject(error);
+          });
+        }
+      });
+    });
+
+    const jobId = await jobManager.submitJob(jobSpec);
+
+    // Give it a tiny moment to transition to running
+    await new Promise(resolve => setTimeout(resolve, 10));
+
+    let job = await jobManager.getJob(jobId);
+    expect(job?.state).toBe('running' as JobState);
+
+    // Cancel the job
+    await jobManager.cancelJob(jobId);
+
+    // Give it time to catch the AbortError and update state
+    await new Promise(resolve => setTimeout(resolve, 20));
+
+    job = await jobManager.getJob(jobId);
+    expect(job?.state).toBe('cancelled' as JobState);
+
+    // Ensure we don't leave lingering promises
+    executeResolve!();
+  });
 });
