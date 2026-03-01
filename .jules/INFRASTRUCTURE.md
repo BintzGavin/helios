@@ -29,3 +29,7 @@ Critical learnings only. This is not a log—only add entries for insights that 
 ## [0.18.0] - Dynamic Cloud Executions
 **Learning:** `AwsLambdaAdapter` statically requires `jobDefUrl` at initialization, whereas `CloudRunAdapter` correctly supports reading it from `job.meta.jobDefUrl`. This discrepancy prevents `AwsLambdaAdapter` from being used generically in multi-tenant environments where the job definition URL changes per execution. Also, `JobManager` lacks a deletion mechanism, causing job artifacts to accumulate.
 **Action:** Plan to refactor `AwsLambdaAdapter` for dynamic `jobDefUrl` support and add `deleteJob` to orchestration components to maintain a clean environment.
+
+## [0.20.0] - Artifact Storage Gap for Distributed Executions
+**Learning:** V2 Infrastructure requires distributed rendering for cloud execution. The current cloud adapters (`AwsLambdaAdapter` and `CloudRunAdapter`) pass job payloads, but lack a mechanism to securely upload local rendering assets to a shared location before the job begins, and subsequently allow workers to securely fetch those assets prior to rendering chunks. This forces local and remote environments to be tightly coupled.
+**Action:** Plan to implement an `ArtifactStorage` interface and concrete implementations (like `LocalStorageAdapter`) to cleanly handle asset uploading/downloading to decouple local jobs from remote worker execution.
