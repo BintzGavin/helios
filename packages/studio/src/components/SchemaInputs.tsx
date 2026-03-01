@@ -7,6 +7,25 @@ import './PropsEditor.css'; // Re-use styles
 // Extended PropType to support future types not yet in Core
 type ExtendedPropType = PropType | 'model' | 'json' | 'shader';
 
+export const validateValue = (value: any, def: PropDefinition): { valid: boolean; message?: string } => {
+  if (def.type === 'string') {
+    if (def.minLength !== undefined && value.length < def.minLength) return { valid: false, message: 'Too short' };
+    if (def.maxLength !== undefined && value.length > def.maxLength) return { valid: false, message: 'Too long' };
+    if (def.pattern) {
+      try {
+        if (!new RegExp(def.pattern).test(value)) return { valid: false, message: 'Pattern mismatch' };
+      } catch (e) {
+        // ignore invalid regex
+      }
+    }
+  }
+  if (def.type === 'number') {
+    if (def.minimum !== undefined && value < def.minimum) return { valid: false, message: 'Value too low' };
+    if (def.maximum !== undefined && value > def.maximum) return { valid: false, message: 'Value too high' };
+  }
+  return { valid: true };
+};
+
 interface SchemaInputProps {
   definition: PropDefinition;
   value: any;
@@ -359,9 +378,8 @@ const NumberRangeInput: React.FC<{ min?: number, max?: number, step?: number, va
   // If step is not provided, default to 1% of range, or default browser behavior if no range
   const rangeStep = step !== undefined ? step : (hasRange ? (max! - min!) / 100 : undefined);
 
-  let validation = { valid: true, message: undefined as string | undefined };
-  if (min !== undefined && localValue < min) validation = { valid: false, message: 'Value too low' };
-  else if (max !== undefined && localValue > max) validation = { valid: false, message: 'Value too high' };
+  const definition: PropDefinition = { type: 'number', minimum: min, maximum: max };
+  const validation = validateValue(localValue, definition);
 
   return (
     <div className={`prop-number-container ${hasRange ? 'has-range' : ''}`}>
@@ -469,20 +487,8 @@ const StringInput: React.FC<{
       else if (format === 'color') inputType = 'color';
   }
 
-  const validate = () => {
-    if (minLength !== undefined && localValue.length < minLength) return { valid: false, message: 'Too short' };
-    if (maxLength !== undefined && localValue.length > maxLength) return { valid: false, message: 'Too long' };
-    if (pattern) {
-      try {
-        if (!new RegExp(pattern).test(localValue)) return { valid: false, message: 'Pattern mismatch' };
-      } catch (e) {
-        // ignore invalid regex
-      }
-    }
-    return { valid: true, message: undefined as string | undefined };
-  };
-
-  const validation = validate();
+  const definition: PropDefinition = { type: 'string', minLength, maxLength, pattern };
+  const validation = validateValue(localValue, definition);
   const title = validation.message || (pattern ? `Must match pattern: ${pattern}` : undefined);
 
   return (
