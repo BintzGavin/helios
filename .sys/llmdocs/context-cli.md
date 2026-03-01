@@ -6,7 +6,7 @@ The Helios CLI is built using `commander` and serves as the primary interface fo
 - Project initialization and scaffolding (`init`)
 - Component management (`add`, `remove`, `update`, `components`, `diff`)
 - Development server (`studio`)
-- Rendering (`render`, `job`, `merge`)
+- Rendering (`render`, `job`, `merge`) - The `job` command utilizes `JobExecutor` from `@helios-project/infrastructure`
 - Deployment (`build`, `preview`, `deploy`)
 
 Commands are registered in `src/index.ts` and implemented in individual files within `src/commands/`.
@@ -115,5 +115,5 @@ interface HeliosConfig {
   - **Cross-Framework Support**: Allows installing `vanilla` components in framework-specific projects.
 - **Studio**: The `studio` command launches a Vite server with `studioApiPlugin`, allowing the Studio UI to trigger CLI actions (install/remove components) via the server.
 - **Renderer**: The `render` command orchestrates rendering using `@helios-project/renderer`. It supports custom browser executable paths via `PUPPETEER_EXECUTABLE_PATH` env var.
-- **Job**: The `job` command supports loading job specifications from local paths or remote HTTP/HTTPS URLs using the native `fetch` API.
+- **Job**: The `job` command supports loading job specifications from local paths or remote HTTP/HTTPS URLs using the native `fetch` API. It integrates with `@helios-project/infrastructure` using `JobExecutor` and worker adapters for robust distributed job processing.
 - **GCP Deployment**: The `deploy gcp` command scaffolds a Cloud Run Job that supports stateless execution via `HELIOS_JOB_SPEC` environment variable.
