@@ -73,6 +73,8 @@ export interface WorkerJob {
   timeout?: number;
   meta?: Record<string, any>;
   signal?: AbortSignal;
+  onStdout?: (data: string) => void;
+  onStderr?: (data: string) => void;
 }
 
 export interface WorkerResult {

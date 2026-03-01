@@ -46,6 +46,16 @@ export interface JobExecutionOptions {
   onChunkComplete?: (chunkId: number, result: WorkerResult) => void | Promise<void>;
 
   /**
+   * Callback invoked when a chunk emits stdout data.
+   */
+  onChunkStdout?: (chunkId: number, data: string) => void;
+
+  /**
+   * Callback invoked when a chunk emits stderr data.
+   */
+  onChunkStderr?: (chunkId: number, data: string) => void;
+
+  /**
    * Signal to abort the job execution.
    */
   signal?: AbortSignal;
@@ -139,7 +149,9 @@ export class JobExecutor {
                 chunkId: chunk.id,
                 ...chunk
               },
-              signal: options.signal
+              signal: options.signal,
+              onStdout: options.onChunkStdout ? (data) => options.onChunkStdout!(chunk.id, data) : undefined,
+              onStderr: options.onChunkStderr ? (data) => options.onChunkStderr!(chunk.id, data) : undefined
             });
 
             if (result.exitCode !== 0) {

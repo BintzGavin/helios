@@ -7,7 +7,7 @@ import { WorkerAdapter, WorkerJob, WorkerResult } from '../types/index.js';
 export class LocalWorkerAdapter implements WorkerAdapter {
   async execute(job: WorkerJob): Promise<WorkerResult> {
     const startTime = Date.now();
-    const { command, args = [], env, cwd, timeout, signal } = job;
+    const { command, args = [], env, cwd, timeout, signal, onStdout, onStderr } = job;
 
     return new Promise((resolve, reject) => {
       if (signal?.aborted) {
@@ -28,13 +28,17 @@ export class LocalWorkerAdapter implements WorkerAdapter {
 
       if (child.stdout) {
         child.stdout.on('data', (data) => {
-          stdout += data.toString();
+          const str = data.toString();
+          stdout += str;
+          onStdout?.(str);
         });
       }
 
       if (child.stderr) {
         child.stderr.on('data', (data) => {
-          stderr += data.toString();
+          const str = data.toString();
+          stderr += str;
+          onStderr?.(str);
         });
       }
 
