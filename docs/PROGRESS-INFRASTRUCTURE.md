@@ -1,5 +1,8 @@
 # INFRASTRUCTURE PROGRESS
 
+## INFRASTRUCTURE v0.22.0
+- ✅ Completed: Integrate Artifact Storage - Updated WorkerRuntime to support downloading remote job assets before rendering via ArtifactStorage interface and configured cloud entrypoints (AWS, Cloud Run) to accept storage adapters.
+
 ## INFRASTRUCTURE v0.21.0
 - ✅ Completed: Cloud Artifact Storage Implementation - Implemented ArtifactStorage interface and LocalStorageAdapter to manage job assets during distributed cloud executions.
 

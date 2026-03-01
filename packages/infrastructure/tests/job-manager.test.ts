@@ -38,6 +38,7 @@ describe('JobManager', () => {
     };
     jobManager = new JobManager(repository, mockExecutor as JobExecutor);
     jobSpec = {
+      id: 'test-job',
       metadata: {
         totalFrames: 100,
         fps: 30,

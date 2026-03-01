@@ -34,6 +34,7 @@ describe('WorkerRuntime', () => {
   let runtime: WorkerRuntime;
   const mockWorkspaceDir = '/tmp/workspace';
   const mockJobSpec: JobSpec = {
+    id: 'job-123',
     metadata: {
       totalFrames: 10,
       fps: 30,
@@ -87,6 +88,30 @@ describe('WorkerRuntime', () => {
     expect(readFileMock).toHaveBeenCalledWith(jobPath, 'utf-8');
     expect(executeChunkMock).toHaveBeenCalledWith(mockJobSpec, chunkId);
     expect(result.exitCode).toBe(0);
+  });
+
+  it('should download asset bundle if assetsUrl and storage are provided', async () => {
+    const jobUrl = 'http://example.com/job.json';
+    const chunkId = 0;
+
+    const mockStorage = {
+      downloadAssetBundle: vi.fn().mockResolvedValue(undefined),
+      uploadAssetBundle: vi.fn(),
+    };
+
+    const runtimeWithStorage = new WorkerRuntime({ workspaceDir: mockWorkspaceDir, storage: mockStorage });
+
+    const jobSpecWithAssets = { ...mockJobSpec, assetsUrl: 's3://some/url' };
+
+    (global.fetch as any).mockResolvedValue({
+      ok: true,
+      json: async () => jobSpecWithAssets,
+    });
+
+    await runtimeWithStorage.run(jobUrl, chunkId);
+
+    expect(mockStorage.downloadAssetBundle).toHaveBeenCalledWith('job-123', 's3://some/url', mockWorkspaceDir);
+    expect(executeChunkMock).toHaveBeenCalledWith(jobSpecWithAssets, chunkId);
   });
 
   it('should throw error if fetch fails', async () => {

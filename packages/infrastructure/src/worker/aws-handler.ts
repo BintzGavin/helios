@@ -1,8 +1,11 @@
 import { WorkerRuntime } from './runtime.js';
+import { ArtifactStorage } from '../types/index.js';
 
 export interface AwsHandlerConfig {
   /** The directory to use for the ephemeral workspace. Defaults to '/tmp'. */
   workspaceDir?: string;
+  /** Storage adapter for fetching remote job assets. */
+  storage?: ArtifactStorage;
 }
 
 /**
@@ -25,7 +28,7 @@ export function createAwsHandler(config: AwsHandlerConfig = {}) {
          };
       }
 
-      const runtime = new WorkerRuntime({ workspaceDir });
+      const runtime = new WorkerRuntime({ workspaceDir, storage: config.storage });
       const result = await runtime.run(jobPath, chunkIndex);
 
       return {

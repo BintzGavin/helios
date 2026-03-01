@@ -1,11 +1,14 @@
 import { createServer, IncomingMessage, ServerResponse } from 'node:http';
 import { WorkerRuntime } from './runtime.js';
+import { ArtifactStorage } from '../types/index.js';
 
 export interface CloudRunServerConfig {
   /** The directory to use for the ephemeral workspace. Defaults to '/tmp'. */
   workspaceDir?: string;
   /** The port for the server to listen on. Defaults to process.env.PORT or 8080. */
   port?: number | string;
+  /** Storage adapter for fetching remote job assets. */
+  storage?: ArtifactStorage;
 }
 
 /**
@@ -49,7 +52,7 @@ export function createCloudRunServer(config: CloudRunServerConfig = {}) {
           return;
         }
 
-        const runtime = new WorkerRuntime({ workspaceDir });
+        const runtime = new WorkerRuntime({ workspaceDir, storage: config.storage });
         const result = await runtime.run(jobPath, chunkIndex);
 
         // Map status code 200 for success (0) and 500 for non-zero exits (to indicate failure)

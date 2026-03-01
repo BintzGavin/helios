@@ -119,6 +119,7 @@ export interface RenderJobChunk {
 
 export interface JobSpec {
   id: string;
+  assetsUrl?: string;
   chunks: RenderJobChunk[];
   mergeCommand?: string;
 }
@@ -158,6 +159,18 @@ export interface ArtifactStorage {
 // Video Stitching (stitcher/index.ts)
 export interface VideoStitcher {
   stitch(inputFiles: string[], outputFile: string): Promise<void>;
+}
+
+// Worker Interfaces (worker/index.ts)
+export interface AwsHandlerConfig {
+  workspaceDir?: string;
+  storage?: ArtifactStorage;
+}
+
+export interface CloudRunServerConfig {
+  workspaceDir?: string;
+  port?: number | string;
+  storage?: ArtifactStorage;
 }
 ```
 

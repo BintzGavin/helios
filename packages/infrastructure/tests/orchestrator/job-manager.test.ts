@@ -17,6 +17,7 @@ describe('JobManager', () => {
   let mockExecutorExecute: any;
 
   const sampleJobSpec: JobSpec = {
+    id: 'test-job',
     metadata: {
       totalFrames: 100,
       fps: 30,

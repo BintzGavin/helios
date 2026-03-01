@@ -8,6 +8,7 @@ describe('RenderExecutor', () => {
   const executor = new RenderExecutor('/tmp');
 
   const jobSpec: JobSpec = {
+    id: 'test-job',
     metadata: {
       totalFrames: 10,
       fps: 30,
