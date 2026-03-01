@@ -1,7 +1,8 @@
 # INFRASTRUCTURE STATUS
-**Version**: 0.22.0
+**Version**: 0.23.0
 
 ## Status Log
+- [v0.23.0] ✅ Completed: Orchestrator Asset Upload - Integrated ArtifactStorage into JobManager to automatically upload local job assets before distributed cloud executions begin.
 - [v0.22.0] ✅ Completed: Integrate Artifact Storage - Updated WorkerRuntime to support downloading remote job assets before rendering via ArtifactStorage interface and configured cloud entrypoints (AWS, Cloud Run) to accept storage adapters.
 - [v0.21.0] ✅ Completed: Cloud Artifact Storage Implementation - Implemented ArtifactStorage interface and LocalStorageAdapter to manage job assets during distributed cloud executions.
 - [v0.20.0] ✅ Completed: Cloud Artifact Storage Spec - Created spec for artifact storage interface and LocalStorageAdapter to manage job assets during distributed cloud executions.

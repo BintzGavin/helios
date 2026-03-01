@@ -1,6 +1,7 @@
 import { JobExecutor, JobExecutionOptions } from './job-executor.js';
 import { JobSpec } from '../types/job-spec.js';
 import { JobStatus, JobRepository, JobState } from '../types/job-status.js';
+import { ArtifactStorage } from '../types/storage.js';
 import { randomUUID } from 'crypto';
 
 export class JobManager {
@@ -8,7 +9,8 @@ export class JobManager {
 
   constructor(
     private repository: JobRepository,
-    private executor: JobExecutor
+    private executor: JobExecutor,
+    private storage?: ArtifactStorage
   ) {}
 
   /**
@@ -142,6 +144,22 @@ export class JobManager {
   private async runJob(id: string, jobSpec: JobSpec, options?: JobExecutionOptions) {
     let job = await this.repository.get(id);
     if (!job) return;
+
+    // Upload job assets if storage and jobDir are configured
+    if (this.storage && options?.jobDir) {
+      try {
+        const assetsUrl = await this.storage.uploadAssetBundle(id, options.jobDir);
+        jobSpec.assetsUrl = assetsUrl;
+        job.spec.assetsUrl = assetsUrl;
+      } catch (error: any) {
+        console.error(`Job ${id} failed to upload assets:`, error);
+        job.state = 'failed';
+        job.error = `Asset upload failed: ${error.message}`;
+        job.updatedAt = Date.now();
+        await this.repository.save(job);
+        return;
+      }
+    }
 
     // Update state to running
     job.state = 'running';

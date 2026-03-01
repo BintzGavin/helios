@@ -4,7 +4,7 @@
 The `@helios-project/infrastructure` package orchestrates distributed rendering across various compute environments (e.g., local child processes, Google Cloud Run, AWS Lambda). It embraces a stateless worker design, where frames can be independently rendered via a consistent command interface.
 
 The orchestration lifecycle involves:
-1. `JobManager`: Manages active rendering jobs. Employs `JobRepository` for state persistence and delegates execution to `JobExecutor`. Supports pausing, resuming, and deleting jobs.
+1. `JobManager`: Manages active rendering jobs. Employs `JobRepository` for state persistence and delegates execution to `JobExecutor`. Supports pausing, resuming, and deleting jobs. Integrates `ArtifactStorage` to automatically upload local job assets before distributed cloud executions begin.
 2. `JobExecutor`: Takes a `JobSpec` and executes discrete rendering chunks via a `WorkerAdapter`. It gathers metrics, logs, limits concurrency, and provides `AbortSignal` implementation for graceful cancellation.
 3. `WorkerAdapter`: Adapters implementing `execute(job: WorkerJob): Promise<WorkerResult>`. Current implementations include Local (child process execution), AWS Lambda, and Cloud Run.
 4. `VideoStitcher`: A specialized entity (`FfmpegStitcher`) designed to securely concatenate rendered chunk artifacts seamlessly without re-encoding to assemble the final output video.
