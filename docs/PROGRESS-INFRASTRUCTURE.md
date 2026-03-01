@@ -1,5 +1,8 @@
 # INFRASTRUCTURE PROGRESS
 
+## INFRASTRUCTURE v0.16.0
+- ✅ Completed: Realtime Log Streaming - Verified and mapped onChunkStdout and onChunkStderr in JobExecutor and triggered onStdout/onStderr callbacks in LocalWorkerAdapter.
+
 ## INFRASTRUCTURE v0.15.0
 - ✅ Completed: Realtime Log Streaming - Added onStdout and onStderr streaming to WorkerJob and JobExecutor to support live progress tracking for chunk execution.
 

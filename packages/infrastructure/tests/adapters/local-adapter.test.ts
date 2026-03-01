@@ -92,4 +92,29 @@ describe('LocalWorkerAdapter', () => {
 
     await expect(adapter.execute(job)).rejects.toThrow('Job was aborted');
   });
+
+  it('should trigger onStdout and onStderr callbacks during execution', async () => {
+    let stdoutData = '';
+    let stderrData = '';
+
+    const job: WorkerJob = {
+      command: nodePath,
+      args: ['-e', 'console.log("stdout message"); console.error("stderr message");'],
+      onStdout: (data) => {
+        stdoutData += data;
+      },
+      onStderr: (data) => {
+        stderrData += data;
+      },
+    };
+
+    const result = await adapter.execute(job);
+
+    expect(result.exitCode).toBe(0);
+    expect(stdoutData).toContain('stdout message');
+    expect(stderrData).toContain('stderr message');
+    // Ensure buffered output is also correct
+    expect(result.stdout).toContain('stdout message');
+    expect(result.stderr).toContain('stderr message');
+  });
 });

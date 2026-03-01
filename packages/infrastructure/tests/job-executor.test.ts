@@ -176,6 +176,30 @@ describe('JobExecutor', () => {
     });
   });
 
+  it('should map onChunkStdout and onChunkStderr to adapter onStdout and onStderr', async () => {
+    const onChunkStdout = vi.fn();
+    const onChunkStderr = vi.fn();
+
+    mockAdapter.execute = vi.fn().mockImplementation(async (job: WorkerJob) => {
+      // Trigger the callbacks if they exist
+      if (job.onStdout) job.onStdout('test stdout');
+      if (job.onStderr) job.onStderr('test stderr');
+      return { exitCode: 0, stdout: '', stderr: '', durationMs: 100 };
+    });
+
+    await jobExecutor.execute(jobSpec, { onChunkStdout, onChunkStderr });
+
+    // Since there are 2 chunks, the adapter should be called twice with chunk jobs
+    // and both callbacks should be triggered twice (once per chunk)
+    expect(onChunkStdout).toHaveBeenCalledTimes(2);
+    expect(onChunkStdout).toHaveBeenNthCalledWith(1, 1, 'test stdout');
+    expect(onChunkStdout).toHaveBeenNthCalledWith(2, 2, 'test stdout');
+
+    expect(onChunkStderr).toHaveBeenCalledTimes(2);
+    expect(onChunkStderr).toHaveBeenNthCalledWith(1, 1, 'test stderr');
+    expect(onChunkStderr).toHaveBeenNthCalledWith(2, 2, 'test stderr');
+  });
+
   it('should pass signal to the adapter', async () => {
     const controller = new AbortController();
 

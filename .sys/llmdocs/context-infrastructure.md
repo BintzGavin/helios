@@ -64,7 +64,7 @@ packages/infrastructure/
 ## Section C: Interfaces
 
 ```typescript
-// Shared Types (types/adapter.ts)
+// Shared Types (types/job.ts)
 export interface WorkerJob {
   command: string;
   args?: string[];
@@ -75,6 +75,23 @@ export interface WorkerJob {
   signal?: AbortSignal;
   onStdout?: (data: string) => void;
   onStderr?: (data: string) => void;
+}
+
+// Orchestrator Execution Options (orchestrator/job-executor.ts)
+export interface JobExecutionOptions {
+  concurrency?: number;
+  jobDir?: string;
+  merge?: boolean;
+  retries?: number;
+  retryDelay?: number;
+  onProgress?: (completedChunks: number, totalChunks: number) => void;
+  onChunkComplete?: (chunkId: number, result: WorkerResult) => void | Promise<void>;
+  onChunkStdout?: (chunkId: number, data: string) => void;
+  onChunkStderr?: (chunkId: number, data: string) => void;
+  signal?: AbortSignal;
+  mergeAdapter?: WorkerAdapter;
+  stitcher?: VideoStitcher;
+  outputFile?: string;
 }
 
 export interface WorkerResult {
