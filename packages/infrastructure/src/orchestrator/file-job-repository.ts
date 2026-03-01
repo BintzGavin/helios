@@ -70,4 +70,19 @@ export class FileJobRepository implements JobRepository {
       throw error;
     }
   }
+
+  /**
+   * Deletes a job from the repository.
+   * @param id The job ID.
+   */
+  async delete(id: string): Promise<void> {
+    const filePath = path.join(this.storageDir, `${id}.json`);
+    try {
+      await fs.unlink(filePath);
+    } catch (error: any) {
+      if (error.code !== 'ENOENT') {
+        throw error;
+      }
+    }
+  }
 }

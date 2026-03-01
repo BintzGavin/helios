@@ -19,6 +19,10 @@ class InMemoryJobRepository implements JobRepository {
   async list(): Promise<JobStatus[]> {
     return Array.from(this.jobs.values());
   }
+
+  async delete(id: string): Promise<void> {
+    this.jobs.delete(id);
+  }
 }
 
 describe('JobManager', () => {
@@ -245,6 +249,44 @@ describe('JobManager', () => {
     expect(job?.state).toBe('cancelled' as JobState);
 
     // Ensure we don't leave lingering promises
+    executeResolve!();
+  });
+
+  it('should delete a job and cancel it if it is running', async () => {
+    let executeResolve: () => void;
+    mockExecutor.execute = vi.fn().mockImplementation((spec, options) => {
+      return new Promise<void>((resolve, reject) => {
+        executeResolve = resolve;
+        if (options?.signal) {
+          options.signal.addEventListener('abort', () => {
+            const error = new Error('Job aborted');
+            error.name = 'AbortError';
+            reject(error);
+          });
+        }
+      });
+    });
+
+    const jobId = await jobManager.submitJob(jobSpec);
+
+    // Give it a tiny moment to transition to running
+    await new Promise(resolve => setTimeout(resolve, 10));
+
+    let job = await jobManager.getJob(jobId);
+    expect(job?.state).toBe('running' as JobState);
+
+    // Delete the job
+    await jobManager.deleteJob(jobId);
+
+    // Give it time to catch the AbortError
+    await new Promise(resolve => setTimeout(resolve, 20));
+
+    job = await jobManager.getJob(jobId);
+    expect(job).toBeUndefined();
+
+    const jobs = await jobManager.listJobs();
+    expect(jobs).toHaveLength(0);
+
     executeResolve!();
   });
 });

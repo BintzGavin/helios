@@ -1,7 +1,8 @@
 # INFRASTRUCTURE STATUS
-**Version**: 0.18.0
+**Version**: 0.19.0
 
 ## Status Log
+- [v0.19.0] ✅ Completed: Dynamic Cloud Executions Implementation - Implemented dynamic jobDefUrl in AWS Lambda adapter and deleteJob in JobManager and JobRepository.
 - [v0.18.0] ✅ Completed: Dynamic Cloud Executions Spec - Created plan to add dynamic jobDefUrl to AWS adapter and deleteJob to JobManager.
 - [v0.17.0] ✅ Completed: Orchestration and Job Management - Implemented pauseJob and resumeJob in JobManager
 - [v0.16.0] ✅ Completed: Realtime Log Streaming - Verified and mapped onChunkStdout and onChunkStderr in JobExecutor and triggered onStdout/onStderr callbacks in LocalWorkerAdapter.

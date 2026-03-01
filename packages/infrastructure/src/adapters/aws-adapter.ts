@@ -7,7 +7,7 @@ export interface AwsLambdaAdapterConfig {
   /** Name or ARN of the Lambda function */
   functionName: string;
   /** URL where the job definition is hosted */
-  jobDefUrl: string;
+  jobDefUrl?: string;
 }
 
 /**
@@ -32,8 +32,13 @@ export class AwsLambdaAdapter implements WorkerAdapter {
     }
 
     try {
+      const jobDefUrl = job.meta?.jobDefUrl || this.config.jobDefUrl;
+      if (!jobDefUrl) {
+        throw new Error('AwsLambdaAdapter requires job.meta.jobDefUrl or config.jobDefUrl to be set');
+      }
+
       const payload = JSON.stringify({
-        jobPath: this.config.jobDefUrl,
+        jobPath: jobDefUrl,
         chunkIndex: chunkId
       });
 

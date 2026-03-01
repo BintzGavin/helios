@@ -4,7 +4,7 @@
 The `@helios-project/infrastructure` package orchestrates distributed rendering across various compute environments (e.g., local child processes, Google Cloud Run, AWS Lambda). It embraces a stateless worker design, where frames can be independently rendered via a consistent command interface.
 
 The orchestration lifecycle involves:
-1. `JobManager`: Manages active rendering jobs. Employs `JobRepository` for state persistence and delegates execution to `JobExecutor`.
+1. `JobManager`: Manages active rendering jobs. Employs `JobRepository` for state persistence and delegates execution to `JobExecutor`. Supports pausing, resuming, and deleting jobs.
 2. `JobExecutor`: Takes a `JobSpec` and executes discrete rendering chunks via a `WorkerAdapter`. It gathers metrics, logs, limits concurrency, and provides `AbortSignal` implementation for graceful cancellation.
 3. `WorkerAdapter`: Adapters implementing `execute(job: WorkerJob): Promise<WorkerResult>`. Current implementations include Local (child process execution), AWS Lambda, and Cloud Run.
 4. `VideoStitcher`: A specialized entity (`FfmpegStitcher`) designed to securely concatenate rendered chunk artifacts seamlessly without re-encoding to assemble the final output video.
@@ -153,8 +153,8 @@ export interface VideoStitcher {
 
 ## Section D: Cloud Adapters
 - `LocalWorkerAdapter`: Invokes chunk commands via native `node:child_process.spawn`. Highly used for local rendering or integration/E2E testing (e.g., deterministic frame verifications).
-- `AwsLambdaAdapter`: Translates `WorkerJob` requests to stateless chunk requests passed to AWS Lambda functions utilizing the payload structure via `@aws-sdk/client-lambda`. Wait state natively blocks until job execution completes.
-- `CloudRunAdapter`: Proxies HTTP POST requests using `google-auth-library` to an OIDC-secured Google Cloud Run endpoint, delegating discrete execution of rendering chunk pipelines on demand.
+- `AwsLambdaAdapter`: Translates `WorkerJob` requests to stateless chunk requests passed to AWS Lambda functions utilizing the payload structure via `@aws-sdk/client-lambda`. Wait state natively blocks until job execution completes. Supports dynamic `jobDefUrl` per execution when provided via `job.meta.jobDefUrl`.
+- `CloudRunAdapter`: Proxies HTTP POST requests using `google-auth-library` to an OIDC-secured Google Cloud Run endpoint, delegating discrete execution of rendering chunk pipelines on demand. Supports dynamic `jobDefUrl` per execution.
 
 ## Section E: Integration
 The infrastructure package acts as an orchestration intermediary. It expects deterministic render targets formatted by the `CLI` or `Studio` to build a `JobSpec`. Specifically:

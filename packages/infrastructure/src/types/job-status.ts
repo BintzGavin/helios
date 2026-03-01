@@ -28,6 +28,7 @@ export interface JobRepository {
   save(job: JobStatus): Promise<void>;
   get(id: string): Promise<JobStatus | undefined>;
   list(): Promise<JobStatus[]>;
+  delete(id: string): Promise<void>;
 }
 
 export class InMemoryJobRepository implements JobRepository {
@@ -44,5 +45,9 @@ export class InMemoryJobRepository implements JobRepository {
 
   async list(): Promise<JobStatus[]> {
     return Array.from(this.jobs.values()).map(job => ({ ...job }));
+  }
+
+  async delete(id: string): Promise<void> {
+    this.jobs.delete(id);
   }
 }
