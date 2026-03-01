@@ -25,3 +25,7 @@ Critical learnings only. This is not a log—only add entries for insights that 
 ## [0.14.0] - CLI Adoption Blocker for JobExecutor
 **Learning:** The `packages/cli` is blocked from adopting the infrastructure `JobExecutor` because `WorkerAdapter` implementations (like `LocalWorkerAdapter`) currently buffer output and return it only upon completion. The CLI requires real-time streaming of `stdout` and `stderr` to display progress during local chunk rendering.
 **Action:** Plan to implement real-time log streaming via `onStdout` and `onStderr` callbacks in the `WorkerJob` interface, and propagate them via `JobExecutionOptions` to unblock CLI adoption.
+
+## [0.18.0] - Dynamic Cloud Executions
+**Learning:** `AwsLambdaAdapter` statically requires `jobDefUrl` at initialization, whereas `CloudRunAdapter` correctly supports reading it from `job.meta.jobDefUrl`. This discrepancy prevents `AwsLambdaAdapter` from being used generically in multi-tenant environments where the job definition URL changes per execution. Also, `JobManager` lacks a deletion mechanism, causing job artifacts to accumulate.
+**Action:** Plan to refactor `AwsLambdaAdapter` for dynamic `jobDefUrl` support and add `deleteJob` to orchestration components to maintain a clean environment.
