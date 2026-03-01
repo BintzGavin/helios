@@ -1,5 +1,12 @@
 # LLMS Progress
 
+## LLMS v1.29.0
+- ✅ Completed: Daily llms.txt Review
+  - Updated Quick Facts: Core v5.13.0+, Studio v0.116.1+, Player v0.76.12+, Renderer v1.78.0+, CLI v0.34.0+, Infrastructure v0.13.0+ (aligned with package.json)
+  - Updated Packages: Added @helios-project/infrastructure package description.
+  - Updated Roadmap: Included Infrastructure updates and synced versions.
+  - Verified content against codebase and package versions.
+
 ## LLMS v1.28.0
 - ✅ Completed: Daily llms.txt Review
   - Updated Quick Facts: Core v5.13.0+, Studio v0.116.1+, Player v0.76.11+, Renderer v1.80.0+, CLI v0.32.0+ (aligned with package.json)
