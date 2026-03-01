@@ -21,6 +21,7 @@ describe('JobExecutor', () => {
     };
     jobExecutor = new JobExecutor(mockAdapter);
     jobSpec = {
+      id: 'test-job',
       metadata: {
         totalFrames: 100,
         fps: 30,

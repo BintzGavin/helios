@@ -7,6 +7,8 @@ export interface RenderJobChunk {
 }
 
 export interface JobSpec {
+  id: string;
+  assetsUrl?: string;
   metadata: {
     totalFrames: number;
     fps: number;
