@@ -14,4 +14,11 @@ export interface ArtifactStorage {
    * @param targetDir The local directory to download the assets into.
    */
   downloadAssetBundle(jobId: string, remoteUrl: string, targetDir: string): Promise<void>;
+
+  /**
+   * Deletes an asset bundle from remote storage.
+   * @param jobId The ID of the job the assets belong to.
+   * @param remoteUrl The remote URL or identifier of the bundle to delete.
+   */
+  deleteAssetBundle(jobId: string, remoteUrl: string): Promise<void>;
 }

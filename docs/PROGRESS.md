@@ -13,6 +13,9 @@ Each agent should update **their own dedicated progress file** instead of this f
 - **STUDIO**: Update `docs/PROGRESS-STUDIO.md`
 - **SKILLS**: Update `docs/PROGRESS-SKILLS.md`
 
+### INFRASTRUCTURE v0.24.0
+- ✅ Completed: Artifact Storage Cleanup - Integrated ArtifactStorage.deleteAssetBundle into JobManager to properly delete remote assets when a job is removed.
+
 ### INFRASTRUCTURE v0.13.0
 - ✅ Completed: Enhance Worker Job Cancellation - Propagated `AbortSignal` from `JobExecutor` to `WorkerAdapter` implementations to enable true graceful cancellation of running chunks.
 

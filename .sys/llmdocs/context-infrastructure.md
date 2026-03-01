@@ -154,6 +154,7 @@ export interface JobRepository {
 export interface ArtifactStorage {
   uploadAssetBundle(jobId: string, localDir: string): Promise<string>;
   downloadAssetBundle(jobId: string, remoteUrl: string, targetDir: string): Promise<void>;
+  deleteAssetBundle(jobId: string, remoteUrl: string): Promise<void>;
 }
 
 // Video Stitching (stitcher/index.ts)
