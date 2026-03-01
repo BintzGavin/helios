@@ -54,3 +54,6 @@
 
 ## INFRASTRUCTURE v0.1.0
 - ✅ Completed: Infrastructure Scaffold - Created initial package structure and configuration.
+
+## INFRASTRUCTURE v0.18.0
+- ✅ Completed: Dynamic Cloud Executions Spec - Created plan to add dynamic jobDefUrl to AWS adapter and deleteJob to JobManager.
