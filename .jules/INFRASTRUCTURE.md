@@ -33,3 +33,7 @@ Critical learnings only. This is not a log—only add entries for insights that 
 ## [0.20.0] - Artifact Storage Gap for Distributed Executions
 **Learning:** V2 Infrastructure requires distributed rendering for cloud execution. The current cloud adapters (`AwsLambdaAdapter` and `CloudRunAdapter`) pass job payloads, but lack a mechanism to securely upload local rendering assets to a shared location before the job begins, and subsequently allow workers to securely fetch those assets prior to rendering chunks. This forces local and remote environments to be tightly coupled.
 **Action:** Plan to implement an `ArtifactStorage` interface and concrete implementations (like `LocalStorageAdapter`) to cleanly handle asset uploading/downloading to decouple local jobs from remote worker execution.
+
+## [0.22.0] - Remote Job Assets Fetching Gap
+**Learning:** We implemented `ArtifactStorage` and `LocalStorageAdapter` in v0.21.0 to support uploading assets. However, the `WorkerRuntime` and cloud entrypoints (`aws-handler.ts`, `cloudrun-server.ts`) still lack the mechanism to use `ArtifactStorage` to fetch those assets. `JobSpec` also needs fields to carry the `assetsUrl` and job `id` so the worker knows where to download them from before executing rendering chunks.
+**Action:** Plan to integrate `ArtifactStorage` into `WorkerRuntime` and update `JobSpec` to support remote asset fetching to close the distributed rendering vision gap.
