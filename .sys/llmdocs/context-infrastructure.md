@@ -27,11 +27,15 @@ packages/infrastructure/
 │   ├── stitcher/
 │   │   ├── ffmpeg-stitcher.ts
 │   │   └── index.ts
+│   ├── storage/
+│   │   ├── index.ts
+│   │   └── local-storage.ts
 │   ├── types/
 │   │   ├── adapter.ts
 │   │   ├── index.ts
 │   │   ├── job-spec.ts
-│   │   └── orchestrator.ts
+│   │   ├── orchestrator.ts
+│   │   └── storage.ts
 │   ├── utils/
 │   │   └── command.ts
 │   └── worker/
@@ -143,6 +147,12 @@ export interface JobRepository {
   get(id: string): Promise<JobState | null>;
   list(): Promise<JobState[]>;
   delete(id: string): Promise<void>;
+}
+
+// Storage Abstraction (types/storage.ts)
+export interface ArtifactStorage {
+  uploadAssetBundle(jobId: string, localDir: string): Promise<string>;
+  downloadAssetBundle(jobId: string, remoteUrl: string, targetDir: string): Promise<void>;
 }
 
 // Video Stitching (stitcher/index.ts)

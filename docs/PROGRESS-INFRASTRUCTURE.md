@@ -1,5 +1,8 @@
 # INFRASTRUCTURE PROGRESS
 
+## INFRASTRUCTURE v0.21.0
+- ✅ Completed: Cloud Artifact Storage Implementation - Implemented ArtifactStorage interface and LocalStorageAdapter to manage job assets during distributed cloud executions.
+
 ## INFRASTRUCTURE v0.17.0
 - ✅ Completed: Orchestration and Job Management - Implemented pauseJob and resumeJob in JobManager
 
