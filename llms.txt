@@ -6,7 +6,7 @@ Helios is a modern engine for creating videos programmatically using standard we
 
 ## Quick Facts
 - **License**: Elastic License 2.0 (free commercial use, no SaaS resale)
-- **Status**: Beta / Self-Driving (Core: Stable v5.13.0+, Studio: Alpha v0.116.1+, Player: v0.76.11+, Renderer: v1.80.0+, CLI: Beta v0.32.0+)
+- **Status**: Beta / Self-Driving (Core: Stable v5.13.0+, Studio: Alpha v0.116.1+, Player: v0.76.12+, Renderer: v1.78.0+, CLI: Beta v0.34.0+, Infrastructure: v0.13.0+)
 - **Frameworks**: React, Vue, Svelte, Solid, vanilla JS
 - **Animation**: Standard CSS, Web Animations API (WAAPI), any animation library
 
@@ -42,6 +42,7 @@ helios.play();
 - `@helios-project/renderer` - Server-side rendering (Playwright, FFmpeg)
 - `@helios-project/studio` - Browser-based development environment (Alpha)
 - `@helios-project/cli` - Command-line interface (init, add, components, list, remove, update, build, preview, job, skills, merge, diff, deploy, studio, render)
+- `@helios-project/infrastructure` - Distributed rendering orchestration and cloud execution adapters
 
 ## Animation Approach
 Helios uses native browser APIs, not proprietary hooks:
@@ -113,10 +114,11 @@ const report = await Helios.diagnose();
 ## Roadmap
 ### V1.x (Active)
 - **Studio**: v0.116.1+ (Asset Move, WebCodecs Preference, React Components Example, Registry Filtering Support, Registry Auth, Distributed Rendering Example, Diff Command)
-- **CLI**: v0.32.0+ (Remote Job Assets, Component Tracking, Remote Job Spec, Stateless Worker, Deploy Command [GCP/AWS], Verify Components, Components Search, Registry Auth, Remote Registry Hydration)
+- **CLI**: v0.34.0+ (Component Tracking, Stateless Worker, Remote Job Assets, Remote Job Spec, Deploy Command [GCP/AWS], Verify Components, Components Search, Registry Auth, Remote Registry Hydration)
 - **Core**: v5.13.0+ (Generic Input Props, Active Clips, Input Schema, Headless Audio)
-- **Player**: v0.76.11+ (Synchronized Caption Styling, Robust DOM Export, Async Seek, Exporter Integration, Integrity Check, Fix CaptureFrame Resizing)
-- **Renderer**: v1.80.0+ (WebCodecs Preference, Orchestrator Plan, HW Accel Validation, Distributed Progress)
+- **Player**: v0.76.12+ (Synchronized Caption Styling, Robust DOM Export, Async Seek, Exporter Integration, Integrity Check, Fix CaptureFrame Resizing)
+- **Renderer**: v1.78.0+ (WebCodecs Preference, Orchestrator Plan, HW Accel Validation, Distributed Progress)
+- **Infrastructure**: v0.13.0+ (Realtime Log Streaming, Cloud Adapter Deterministic Verification, Graceful Worker Job Cancellation, Observability Telemetry, Cloud Worker Entrypoints)
 
 ### AI Integration
 - **Studio MCP Server**: Inspect, create, and render compositions via LLM tools (Done)
