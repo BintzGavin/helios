@@ -13,4 +13,8 @@ export interface WorkerJob {
   meta?: Record<string, any>;
   /** Optional AbortSignal to gracefully cancel the job execution */
   signal?: AbortSignal;
+  /** Optional callback for real-time stdout streaming */
+  onStdout?: (data: string) => void;
+  /** Optional callback for real-time stderr streaming */
+  onStderr?: (data: string) => void;
 }

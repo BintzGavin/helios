@@ -1,5 +1,8 @@
 # INFRASTRUCTURE PROGRESS
 
+## INFRASTRUCTURE v0.15.0
+- ✅ Completed: Realtime Log Streaming - Added onStdout and onStderr streaming to WorkerJob and JobExecutor to support live progress tracking for chunk execution.
+
 ## INFRASTRUCTURE v0.14.0
 - ✅ Completed: Cloud Adapter Deterministic Verification - Implemented E2E integration test validating deterministic seeking across stateless rendering chunks to ensure identical frame outputs across worker adapters.
 
