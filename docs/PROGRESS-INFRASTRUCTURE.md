@@ -1,5 +1,8 @@
 # INFRASTRUCTURE PROGRESS
 
+## INFRASTRUCTURE v0.24.0
+- ✅ Completed: Artifact Storage Cleanup - Integrated ArtifactStorage.deleteAssetBundle into JobManager to properly delete remote assets when a job is removed.
+
 ## INFRASTRUCTURE v0.23.0
 - ✅ Completed: Orchestrator Asset Upload - Integrated ArtifactStorage into JobManager to automatically upload local job assets before distributed cloud executions begin.
 

@@ -290,4 +290,43 @@ describe('JobManager', () => {
 
     executeResolve!();
   });
+
+  it('should delete job assets if storage and assetsUrl are present', async () => {
+    // Setup mock storage
+    const mockStorage = {
+      uploadAssetBundle: vi.fn(),
+      downloadAssetBundle: vi.fn(),
+      deleteAssetBundle: vi.fn().mockResolvedValue(undefined)
+    };
+
+    const jobManagerWithStorage = new JobManager(repository, mockExecutor as JobExecutor, mockStorage);
+
+    // Create a job with assetsUrl directly
+    const specWithAssets = { ...jobSpec, assetsUrl: 'local://some/dir' };
+
+    // We mock execute so runJob completes immediately
+    mockExecutor.execute = vi.fn().mockResolvedValue(undefined);
+
+    const jobId = await jobManagerWithStorage.submitJob(specWithAssets);
+
+    // Wait for internal updates to finish
+    await new Promise(resolve => setTimeout(resolve, 20));
+
+    // Ensure job is saved and complete
+    const job = await jobManagerWithStorage.getJob(jobId);
+    expect(job).toBeDefined();
+
+    // Delete the job
+    await jobManagerWithStorage.deleteJob(jobId);
+
+    // Wait for deletion and potential storage call
+    await new Promise(resolve => setTimeout(resolve, 20));
+
+    // Verify it was deleted from repo
+    const deletedJob = await jobManagerWithStorage.getJob(jobId);
+    expect(deletedJob).toBeUndefined();
+
+    // Verify storage cleanup was called
+    expect(mockStorage.deleteAssetBundle).toHaveBeenCalledWith(jobId, 'local://some/dir');
+  });
 });

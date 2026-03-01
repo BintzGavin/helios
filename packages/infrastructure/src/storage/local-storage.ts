@@ -48,4 +48,25 @@ export class LocalStorageAdapter implements ArtifactStorage {
     await fs.mkdir(targetDir, { recursive: true });
     await fs.cp(remoteDir, targetDir, { recursive: true });
   }
+
+  async deleteAssetBundle(jobId: string, remoteUrl: string): Promise<void> {
+    if (!remoteUrl.startsWith('local://')) {
+      throw new Error(`Unsupported remote URL scheme: ${remoteUrl}`);
+    }
+
+    const remoteDir = remoteUrl.slice('local://'.length);
+
+    // Security: Prevent directory traversal
+    const resolvedRemoteDir = path.resolve(remoteDir);
+    const resolvedStorageDir = path.resolve(this.storageDir);
+
+    if (
+      resolvedRemoteDir !== resolvedStorageDir &&
+      !resolvedRemoteDir.startsWith(resolvedStorageDir + path.sep)
+    ) {
+      throw new Error(`Invalid remote URL: Path traversal detected in ${remoteUrl}`);
+    }
+
+    await fs.rm(resolvedRemoteDir, { recursive: true, force: true });
+  }
 }

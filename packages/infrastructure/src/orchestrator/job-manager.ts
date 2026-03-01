@@ -135,6 +135,15 @@ export class JobManager {
       await this.cancelJob(id);
     }
 
+    // Cleanup remote artifacts if storage and assetsUrl exist
+    if (this.storage && job.spec.assetsUrl) {
+      try {
+        await this.storage.deleteAssetBundle(id, job.spec.assetsUrl);
+      } catch (error: any) {
+        console.error(`Failed to delete assets for job ${id}:`, error);
+      }
+    }
+
     await this.repository.delete(id);
   }
 
