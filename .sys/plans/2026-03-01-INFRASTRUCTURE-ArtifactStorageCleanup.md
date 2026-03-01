@@ -1,32 +1,31 @@
 #### 1. Context & Goal
-- **Objective**: Add `deleteAssetBundle` to the `ArtifactStorage` interface and implement it in `LocalStorageAdapter`, then integrate it into `JobManager.deleteJob` to ensure remote job assets are cleaned up.
-- **Trigger**: Vision gap identified: distributed cloud executions currently leak job assets in remote storage when jobs are deleted via `JobManager.deleteJob`.
-- **Impact**: Ensures proper resource cleanup for distributed rendering infrastructure and prevents storage bloat, paving the way for clean, production-ready cloud execution orchestration.
+- **Objective**: Implement `deleteAssetBundle` in `ArtifactStorage` and integrate it into `JobManager.deleteJob` to ensure remote job assets are cleaned up.
+- **Trigger**: The recent addition of artifact upload via `ArtifactStorage` missed the corresponding cleanup step. When jobs are deleted via `JobManager.deleteJob`, their remote assets are leaked in storage, violating the architectural goal of maintaining a clean distributed execution environment.
+- **Impact**: This prevents storage leaks in cloud environments by ensuring the full lifecycle of a job (creation, execution, deletion) properly cleans up its associated assets.
 
 #### 2. File Inventory
-- **Create**: None
+- **Create**:
+  - None
 - **Modify**:
-  - `packages/infrastructure/src/types/storage.ts` (Add `deleteAssetBundle` interface)
-  - `packages/infrastructure/src/storage/local-storage.ts` (Implement `deleteAssetBundle` method)
-  - `packages/infrastructure/src/orchestrator/job-manager.ts` (Call `deleteAssetBundle` in `deleteJob`)
-  - `packages/infrastructure/tests/orchestrator/job-manager.test.ts` (Add tests for cleanup)
-  - `packages/infrastructure/tests/storage/local-storage.test.ts` (Add tests for cleanup)
-- **Read-Only**: None
+  - `packages/infrastructure/src/types/storage.ts`: Add `deleteAssetBundle` to the interface.
+  - `packages/infrastructure/src/storage/local-storage.ts`: Implement `deleteAssetBundle` in `LocalStorageAdapter`.
+  - `packages/infrastructure/src/orchestrator/job-manager.ts`: Update `deleteJob` to call `storage.deleteAssetBundle` if `storage` and `job.spec.assetsUrl` exist.
+  - `packages/infrastructure/tests/job-manager.test.ts`: Add a test verifying `deleteJob` cleans up storage.
+- **Read-Only**:
+  - `packages/infrastructure/src/types/job-spec.ts`
 
 #### 3. Implementation Spec
-- **Architecture**: Extend `ArtifactStorage` to support resource teardown (`deleteAssetBundle`). Update `LocalStorageAdapter` to remove the remote directory (`rm -rf`). Update `JobManager` to delete the job assets via `ArtifactStorage` before deleting the job metadata from the repository.
+- **Architecture**: Expand the `ArtifactStorage` interface to include deletion capabilities (`deleteAssetBundle`). Implement this method in `LocalStorageAdapter` using `node:fs/promises` (`rm` with `recursive: true`). Modify `JobManager.deleteJob(id: string)` to retrieve the job, cancel it if pending/running, then if `this.storage` and `job.spec.assetsUrl` exist, attempt to delete the assets via the storage adapter. Finally, delete the job from the repository.
 - **Pseudo-Code**:
-  - Update `ArtifactStorage`: `deleteAssetBundle(jobId: string, remoteUrl: string): Promise<void>`
-  - Update `LocalStorageAdapter`: Use `fs.rm(remoteDir, { recursive: true, force: true })`
-  - Update `JobManager.deleteJob`: `if (this.storage && job.spec.assetsUrl) { await this.storage.deleteAssetBundle(job.id, job.spec.assetsUrl); }`
-- **Public API Changes**: Adds `deleteAssetBundle` to `ArtifactStorage` exported type.
+  - In `ArtifactStorage`, add `deleteAssetBundle(jobId: string, remoteUrl: string): Promise<void>;`
+  - In `LocalStorageAdapter.deleteAssetBundle`, check if `remoteUrl` starts with `local://`, extract the directory, and call `fs.rm(dir, { recursive: true, force: true })`.
+  - In `JobManager.deleteJob`, add logic before repository deletion: `if (this.storage && job.spec.assetsUrl) { try { await this.storage.deleteAssetBundle(id, job.spec.assetsUrl); } catch (e) { console.error(e); } }`
+- **Public API Changes**: `ArtifactStorage` requires `deleteAssetBundle`.
 - **Dependencies**: None.
-- **Cloud Considerations**: Enables future S3/GCS storage adapters to properly delete bucket prefixes/folders upon job deletion.
+- **Cloud Considerations**: The deletion interface is cloud-agnostic. Implementers for S3 or GCS will follow the same pattern to clean up objects.
 
 #### 4. Test Plan
-- **Verification**: Run `npm run test` in `packages/infrastructure`.
-- **Success Criteria**:
-  - A new unit test in `storage/local-storage.test.ts` should verify that `deleteAssetBundle` removes the directory correctly.
-  - A new unit test in `orchestrator/job-manager.test.ts` should verify that `JobManager.deleteJob` invokes the deletion method on the storage adapter and does not throw errors if storage is missing.
-- **Edge Cases**: Handles gracefully if `remoteUrl` doesn't exist or is invalid. Handles gracefully if `storage` is undefined in `JobManager`.
-- **Integration Verification**: Ensure existing E2E and unit tests for `JobManager` still pass.
+- **Verification**: Run `npm test` and `npm run lint` in the `packages/infrastructure` directory.
+- **Success Criteria**: All tests pass. `job-manager.test.ts` includes a test where `JobManager.deleteJob` is called on a job with an `assetsUrl`, and it verifies `storage.deleteAssetBundle` was called correctly.
+- **Edge Cases**: Verify that if `deleteAssetBundle` throws an error, it is caught and logged, allowing the job to still be deleted from the repository. Ensure it works seamlessly when no `storage` is provided or when the job has no `assetsUrl`.
+- **Integration Verification**: Verify that a job deleted using a standard local storage setup actually removes the physical folder.
