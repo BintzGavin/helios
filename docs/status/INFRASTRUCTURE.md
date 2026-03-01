@@ -1,7 +1,8 @@
 # INFRASTRUCTURE STATUS
-**Version**: 0.13.1
+**Version**: 0.14.0
 
 ## Status Log
+- [v0.14.0] ✅ Completed: Cloud Adapter Deterministic Verification - Implemented E2E integration test validating deterministic seeking across stateless rendering chunks to ensure identical frame outputs across worker adapters.
 - [v0.13.1] ✅ Completed: Enhance Worker Job Cancellation - Passed signal to mergeAdapter in JobExecutor
 - [v0.13.0] ✅ Completed: Enhance Worker Job Cancellation - Propagated `AbortSignal` from `JobExecutor` to `WorkerAdapter` implementations to enable true graceful cancellation of running chunks.
 - [v0.12.0] ✅ Completed: Robust Command Parsing and Housekeeping - Refactored parseCommand to use a state machine for handling quotes and escaped characters. Updated package version and added a lint script.
