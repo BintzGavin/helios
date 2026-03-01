@@ -41,3 +41,7 @@ Critical learnings only. This is not a log—only add entries for insights that 
 ## [0.23.0] - Orchestrator Asset Upload Integration
 **Learning:** While `ArtifactStorage` was integrated into `WorkerRuntime` to download remote assets, we missed the orchestrator side of the equation. Neither `JobManager` nor `JobExecutor` currently use `ArtifactStorage` to upload the local project assets before remote cloud execution begins. Furthermore, if this upload modifies `JobSpec.assetsUrl`, it must be done in `JobManager` before `JobExecutor` runs to ensure the updated spec is saved to `JobRepository`.
 **Action:** Plan to integrate `ArtifactStorage` upload into `JobManager.runJob` to ensure remote workers have assets available, closing the loop on distributed cloud rendering.
+
+## [0.24.0] - Artifact Storage Cleanup Gap
+**Learning:** While `ArtifactStorage` supports uploading and downloading job assets, it lacks a mechanism to delete them. Consequently, when `JobManager.deleteJob` is called to clean up job state, the remote job assets are leaked in storage, which violates the architectural goal of maintaining a clean distributed execution environment.
+**Action:** Plan to add `deleteAssetBundle` to the `ArtifactStorage` interface and integrate it into `JobManager.deleteJob` to ensure proper resource cleanup.
