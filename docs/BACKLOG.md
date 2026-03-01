@@ -47,3 +47,6 @@ This backlog tracks concrete deliverables derived from [`AGENTS.md`](../AGENTS.m
 
 - [ ] **Documentation**: Add Quickstart guide.
 - [x] ⛔ Renderer Verification Blocked: packages/studio dependency mismatch
+
+## PLAYER Agent Status
+- [ ] 🚫 Blocked: No new plan found in `/.sys/plans/` for `PLAYER`. Waiting for Planner to create the next implementation spec.
