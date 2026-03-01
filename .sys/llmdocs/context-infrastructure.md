@@ -1,28 +1,24 @@
-# Infrastructure Context
+# Infrastructure Domain Context
 
-## A. Architecture
+## Section A: Architecture
+The `@helios-project/infrastructure` package orchestrates distributed rendering across various compute environments (e.g., local child processes, Google Cloud Run, AWS Lambda). It embraces a stateless worker design, where frames can be independently rendered via a consistent command interface.
 
-The `@helios-project/infrastructure` package provides distributed rendering orchestration and cloud execution adapters for Helios. The architecture is composed of:
+The orchestration lifecycle involves:
+1. `JobManager`: Manages active rendering jobs. Employs `JobRepository` for state persistence and delegates execution to `JobExecutor`.
+2. `JobExecutor`: Takes a `JobSpec` and executes discrete rendering chunks via a `WorkerAdapter`. It gathers metrics, logs, limits concurrency, and provides `AbortSignal` implementation for graceful cancellation.
+3. `WorkerAdapter`: Adapters implementing `execute(job: WorkerJob): Promise<WorkerResult>`. Current implementations include Local (child process execution), AWS Lambda, and Cloud Run.
+4. `VideoStitcher`: A specialized entity (`FfmpegStitcher`) designed to securely concatenate rendered chunk artifacts seamlessly without re-encoding to assemble the final output video.
 
-- **Worker Adapters**: Cloud-agnostic interfaces (`WorkerAdapter`) with provider-specific implementations (`LocalWorkerAdapter`, `AwsLambdaAdapter`, `CloudRunAdapter`) to execute stateless rendering chunks.
-- **Worker Runtime**: A standardized runtime (`WorkerRuntime`) that orchestrates fetching `JobSpec` assets, delegating chunk execution to `RenderExecutor`, and managing error boundaries for cloud workers.
-- **Render Executor**: A local command runner (`RenderExecutor`) that spawns child processes to execute the rendering logic (e.g., calling `@helios-project/cli` or `@helios-project/renderer`).
-- **Orchestration**: The `JobManager` manages the overall job lifecycle, tracking active jobs via `AbortController`s and persisting state via a `JobRepository`. The `JobExecutor` handles concurrent execution of `JobSpec` chunks across workers, offering robust retry logic, chunk failure isolation, and detailed progress tracking (`onProgress`, `onChunkComplete`).
-- **Stitcher**: `VideoStitcher` interfaces (like `FfmpegStitcher`) for concatenating individual rendered video segments into a final output file without re-encoding.
-- **Utilities**: Shared utilities like `parseCommand` for tokenizing shell commands properly (respecting quotes).
-
-## B. File Tree
-
+## Section B: File Tree
 ```
 packages/infrastructure/
-├── package.json
 ├── src/
 │   ├── index.ts
 │   ├── adapters/
-│   │   ├── aws-lambda-adapter.ts
+│   │   ├── aws-adapter.ts
 │   │   ├── cloudrun-adapter.ts
 │   │   ├── index.ts
-│   │   └── local-worker-adapter.ts
+│   │   └── local-adapter.ts
 │   ├── orchestrator/
 │   │   ├── file-job-repository.ts
 │   │   ├── index.ts
@@ -32,42 +28,48 @@ packages/infrastructure/
 │   │   ├── ffmpeg-stitcher.ts
 │   │   └── index.ts
 │   ├── types/
-│   │   └── index.ts
+│   │   ├── adapter.ts
+│   │   ├── index.ts
+│   │   ├── job-spec.ts
+│   │   └── orchestrator.ts
 │   ├── utils/
-│   │   ├── command.ts
-│   │   └── retry.ts
+│   │   └── command.ts
 │   └── worker/
+│       ├── aws-handler.ts
+│       ├── cloudrun-server.ts
 │       ├── index.ts
 │       ├── render-executor.ts
 │       └── runtime.ts
 └── tests/
+    ├── e2e/
+    │   └── deterministic-seeking.test.ts
     ├── adapters/
     │   └── local-adapter.test.ts
+    ├── orchestrator/
+    │   ├── file-job-repository.test.ts
+    │   └── job-manager.test.ts
+    ├── worker/
+    │   ├── aws-handler.test.ts
+    │   └── cloudrun-server.test.ts
     ├── aws-adapter.test.ts
     ├── cloudrun-adapter.test.ts
     ├── command.test.ts
     ├── job-executor.test.ts
-    ├── job-manager.test.ts
-    ├── orchestrator/
-    │   ├── file-job-repository.test.ts
-    │   └── job-manager.test.ts
     ├── placeholder.test.ts
     ├── render-executor.test.ts
     ├── stitcher.test.ts
-    ├── worker-runtime.test.ts
-    └── worker/
-        ├── aws-handler.test.ts
-        └── cloudrun-server.test.ts
+    └── worker-runtime.test.ts
 ```
 
-## C. Interfaces
+## Section C: Interfaces
 
 ```typescript
+// Shared Types (types/adapter.ts)
 export interface WorkerJob {
   command: string;
   args?: string[];
-  env?: Record<string, string>;
   cwd?: string;
+  env?: Record<string, string>;
   timeout?: number;
   meta?: Record<string, any>;
   signal?: AbortSignal;
@@ -84,28 +86,57 @@ export interface WorkerAdapter {
   execute(job: WorkerJob): Promise<WorkerResult>;
 }
 
-export interface JobExecutionOptions {
-  concurrency?: number;
-  jobDir?: string;
-  merge?: boolean;
-  retries?: number;
-  retryDelay?: number;
-  onProgress?: (completedChunks: number, totalChunks: number) => void;
-  onChunkComplete?: (chunkId: number, result: WorkerResult) => void | Promise<void>;
-  signal?: AbortSignal;
-  mergeAdapter?: WorkerAdapter;
-  stitcher?: VideoStitcher;
-  outputFile?: string;
+// Job Orchestration (types/job-spec.ts)
+export interface RenderJobChunk {
+  id: number;
+  command: string;
+  outputFile: string;
+}
+
+export interface JobSpec {
+  id: string;
+  chunks: RenderJobChunk[];
+  mergeCommand?: string;
+}
+
+// Orchestrator State Persistence (types/orchestrator.ts)
+export type JobStatus = 'pending' | 'running' | 'completed' | 'failed' | 'cancelled';
+
+export interface JobState {
+  id: string;
+  spec: JobSpec;
+  status: JobStatus;
+  createdAt: number;
+  updatedAt: number;
+  completedChunks: number;
+  totalChunks: number;
+  error?: string;
+  result?: string;
+  metrics?: {
+    totalDurationMs: number;
+  };
+  chunkLogs?: Record<number, { stdout: string; stderr: string; durationMs: number }>;
+}
+
+export interface JobRepository {
+  save(state: JobState): Promise<void>;
+  get(id: string): Promise<JobState | null>;
+  list(): Promise<JobState[]>;
+  delete(id: string): Promise<void>;
+}
+
+// Video Stitching (stitcher/index.ts)
+export interface VideoStitcher {
+  stitch(inputFiles: string[], outputFile: string): Promise<void>;
 }
 ```
 
-## D. Cloud Adapters
+## Section D: Cloud Adapters
+- `LocalWorkerAdapter`: Invokes chunk commands via native `node:child_process.spawn`. Highly used for local rendering or integration/E2E testing (e.g., deterministic frame verifications).
+- `AwsLambdaAdapter`: Translates `WorkerJob` requests to stateless chunk requests passed to AWS Lambda functions utilizing the payload structure via `@aws-sdk/client-lambda`. Wait state natively blocks until job execution completes.
+- `CloudRunAdapter`: Proxies HTTP POST requests using `google-auth-library` to an OIDC-secured Google Cloud Run endpoint, delegating discrete execution of rendering chunk pipelines on demand.
 
-- **LocalWorkerAdapter**: Executes jobs locally using `WorkerRuntime`, intended for testing and local distributed rendering.
-- **AwsLambdaAdapter**: Invokes AWS Lambda functions to execute chunks, translating `WorkerJob` to Lambda payloads.
-- **CloudRunAdapter**: Invokes Google Cloud Run services to execute chunks via HTTP POST requests, handling OIDC authentication.
-
-## E. Integration
-
-- **Renderer**: Infrastructure leverages rendering interfaces and commands, eventually executing tasks spawned via `@helios-project/renderer` or CLI.
-- **CLI**: The CLI utilizes Infrastructure's orchestration tools to manage and run distributed rendering jobs (`JobManager`, `JobExecutor`).
+## Section E: Integration
+The infrastructure package acts as an orchestration intermediary. It expects deterministic render targets formatted by the `CLI` or `Studio` to build a `JobSpec`. Specifically:
+1. It does not parse the actual React rendering directly; it spawns CLI executions (`npx helios render ...`).
+2. Cloud adapters serve to "bridge" local orchestrator logic to ephemeral functions, requiring worker-side deployment entrypoints (`WorkerRuntime` + `CloudRun/AWS Lambda Server Handlers`) to download job contexts and process rendering autonomously using the system's `RenderExecutor`.
