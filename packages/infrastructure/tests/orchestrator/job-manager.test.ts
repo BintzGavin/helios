@@ -154,6 +154,34 @@ describe('JobManager', () => {
     expect(job?.state).toBe('paused');
   });
 
+  it('should upload assets if storage and jobDir are provided', async () => {
+    const mockStorage = {
+      uploadAssetBundle: vi.fn().mockResolvedValue('s3://test-bucket/assets'),
+      downloadAssetBundle: vi.fn()
+    };
+
+    // Create a new JobManager with storage configured
+    const jobManagerWithStorage = new JobManager(repository, executor, mockStorage);
+
+    // Deep clone the job spec to avoid mutating the sample
+    const localSpec = JSON.parse(JSON.stringify(sampleJobSpec));
+
+    const id = await jobManagerWithStorage.submitJob(localSpec, { jobDir: '/local/job/dir' });
+
+    await new Promise(resolve => setTimeout(resolve, 50));
+
+    expect(mockStorage.uploadAssetBundle).toHaveBeenCalledWith(id, '/local/job/dir');
+
+    const job = await jobManagerWithStorage.getJob(id);
+    expect(job?.spec.assetsUrl).toBe('s3://test-bucket/assets');
+
+    // Verify the modified spec with assetsUrl was passed to executor
+    expect(mockExecutorExecute).toHaveBeenCalledWith(
+      expect.objectContaining({ assetsUrl: 's3://test-bucket/assets' }),
+      expect.any(Object)
+    );
+  });
+
   it('should successfully resume a paused job and skip completed chunks', async () => {
     mockExecutorExecute.mockResolvedValue(undefined);
 
