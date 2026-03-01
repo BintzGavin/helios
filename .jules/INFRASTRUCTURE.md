@@ -21,3 +21,7 @@ Critical learnings only. This is not a log—only add entries for insights that 
 ## [0.11.0] - Robust Command Parsing & Housekeeping Gap
 **Learning:** The `parseCommand` utility in `packages/infrastructure/src/utils/command.ts` currently splits strings purely by whitespace. This will break when `JobSpec` commands contain quoted arguments with spaces (e.g., `-metadata title="My Render"` or paths with spaces). Additionally, `package.json` is missing a `lint` script, which breaks CI/CD consistency, and its version (`0.1.0`) is out of sync with actual release status.
 **Action:** Plan to implement a robust command parser (handling quotes) and perform package housekeeping (sync version, add lint script) to ensure distributed render commands execute correctly on workers.
+
+## [0.14.0] - CLI Adoption Blocker for JobExecutor
+**Learning:** The `packages/cli` is blocked from adopting the infrastructure `JobExecutor` because `WorkerAdapter` implementations (like `LocalWorkerAdapter`) currently buffer output and return it only upon completion. The CLI requires real-time streaming of `stdout` and `stderr` to display progress during local chunk rendering.
+**Action:** Plan to implement real-time log streaming via `onStdout` and `onStderr` callbacks in the `WorkerJob` interface, and propagate them via `JobExecutionOptions` to unblock CLI adoption.
