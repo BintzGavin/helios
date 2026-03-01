@@ -1,8 +1,8 @@
 import { Command } from 'commander';
 import fs from 'fs';
 import path from 'path';
-import { spawn } from 'child_process';
 import { JobSpec } from '../types/job.js';
+import { JobExecutor, LocalWorkerAdapter } from '@helios-project/infrastructure';
 
 export async function loadJobSpec(file: string): Promise<{ jobSpec: JobSpec, jobDir: string }> {
   if (file.startsWith('http://') || file.startsWith('https://')) {
@@ -47,86 +47,37 @@ export function registerJobCommand(program: Command) {
           throw new Error('Concurrency must be a positive number');
         }
 
-        const chunksToRun = chunkId !== undefined
-          ? jobSpec.chunks.filter(c => c.id === chunkId)
-          : jobSpec.chunks;
+        let completedChunkIds: number[] | undefined;
 
-        if (chunkId !== undefined && chunksToRun.length === 0) {
-          throw new Error(`Chunk ${chunkId} not found in job spec`);
-        }
-
-        console.log(`Found ${chunksToRun.length} chunks to execute.`);
-
-        // Execution function
-        const executeChunk = async (chunk: typeof jobSpec.chunks[0]) => {
-          console.log(`Starting chunk ${chunk.id}...`);
-          return new Promise<void>((resolve, reject) => {
-            const child = spawn(chunk.command, {
-              stdio: 'inherit',
-              shell: true,
-              cwd: jobDir
-            });
-
-            child.on('close', (code) => {
-              if (code === 0) {
-                console.log(`Chunk ${chunk.id} completed successfully.`);
-                resolve();
-              } else {
-                reject(new Error(`Chunk ${chunk.id} failed with exit code ${code}`));
-              }
-            });
-
-            child.on('error', (err) => {
-              reject(new Error(`Chunk ${chunk.id} failed to start: ${err.message}`));
-            });
-          });
-        };
-
-        // Worker Queue Pattern for Concurrency
-        const queue = [...chunksToRun];
-        const worker = async () => {
-          while (queue.length > 0) {
-            const chunk = queue.shift();
-            if (chunk) {
-              await executeChunk(chunk);
-            }
+        if (chunkId !== undefined) {
+          const chunkExists = jobSpec.chunks.some(c => c.id === chunkId);
+          if (!chunkExists) {
+            throw new Error(`Chunk ${chunkId} not found in job spec`);
           }
+          completedChunkIds = jobSpec.chunks
+            .map(c => c.id)
+            .filter(id => id !== chunkId);
+        }
+
+        const shouldMerge = options.merge && chunkId === undefined;
+
+        const adapter = new LocalWorkerAdapter();
+        const executor = new JobExecutor(adapter);
+
+        // Ensure jobSpec has an id to satisfy infrastructure JobSpec interface
+        const infrastructureJobSpec = {
+          ...jobSpec,
+          id: (jobSpec as any).id || `job-${Date.now()}`
         };
 
-        const workers = Array(Math.min(concurrency, chunksToRun.length))
-          .fill(null)
-          .map(() => worker());
-
-        await Promise.all(workers);
-
-        // Run merge command if appropriate
-        if (options.merge && chunkId === undefined) {
-          console.log('Starting merge step...');
-          await new Promise<void>((resolve, reject) => {
-            const child = spawn(jobSpec.mergeCommand, {
-              stdio: 'inherit',
-              shell: true,
-              cwd: jobDir
-            });
-
-            child.on('close', (code) => {
-              if (code === 0) {
-                console.log('Merge completed successfully.');
-                resolve();
-              } else {
-                reject(new Error(`Merge failed with exit code ${code}`));
-              }
-            });
-
-            child.on('error', (err) => {
-              reject(new Error(`Merge failed to start: ${err.message}`));
-            });
-          });
-        } else if (!options.merge) {
-          console.log('Skipping merge step (--no-merge provided).');
-        } else {
-          console.log('Skipping merge step (single chunk execution).');
-        }
+        await executor.execute(infrastructureJobSpec as any, {
+          concurrency,
+          jobDir,
+          merge: shouldMerge,
+          completedChunkIds,
+          onChunkStdout: (id: number, data: string) => process.stdout.write(data),
+          onChunkStderr: (id: number, data: string) => process.stderr.write(data)
+        });
 
       } catch (err: any) {
         console.error('Job execution failed:', err.message);
