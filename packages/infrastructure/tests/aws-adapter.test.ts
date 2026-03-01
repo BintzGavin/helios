@@ -52,6 +52,45 @@ describe('AwsLambdaAdapter', () => {
     });
   });
 
+  it('should use job.meta.jobDefUrl when provided instead of config', async () => {
+    const adapter = new AwsLambdaAdapter({
+      region: 'us-east-1',
+      functionName: 'test-function',
+      jobDefUrl: 'https://default.com/job.json' // Should be overridden
+    });
+
+    lambdaMock.on(InvokeCommand).resolves({
+      StatusCode: 200,
+      Payload: new TextEncoder().encode(JSON.stringify({ statusCode: 200, body: JSON.stringify({ output: 'Success' }) }))
+    });
+
+    await adapter.execute({
+      command: 'ignored',
+      meta: { chunkId: 1, jobDefUrl: 'https://dynamic.com/job.json' }
+    });
+
+    const calls = lambdaMock.commandCalls(InvokeCommand);
+    expect(calls.length).toBe(1);
+
+    const payload = JSON.parse(new TextDecoder().decode(calls[0].args[0].input.Payload));
+    expect(payload.jobPath).toBe('https://dynamic.com/job.json');
+  });
+
+  it('should throw if neither job.meta.jobDefUrl nor config.jobDefUrl is set', async () => {
+    const adapter = new AwsLambdaAdapter({
+      region: 'us-east-1',
+      functionName: 'test-function',
+    });
+
+    const result = await adapter.execute({
+      command: 'ignored',
+      meta: { chunkId: 1 }
+    });
+
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toContain('AwsLambdaAdapter requires job.meta.jobDefUrl or config.jobDefUrl to be set');
+  });
+
   it('should handle lambda application error (non-200 status code)', async () => {
     const adapter = new AwsLambdaAdapter({
       functionName: 'test-function',

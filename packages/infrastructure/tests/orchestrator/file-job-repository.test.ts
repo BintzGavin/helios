@@ -87,4 +87,27 @@ describe('FileJobRepository', () => {
     expect(retrievedJob?.state).toBe('running');
     expect(retrievedJob?.progress).toBe(50);
   });
+
+  it('should delete a job file', async () => {
+    await repository.save(mockJob);
+
+    // Check if the file was actually created
+    const filePath = path.join(tmpDir, `${mockJob.id}.json`);
+    let fileExists = await fs.access(filePath).then(() => true).catch(() => false);
+    expect(fileExists).toBe(true);
+
+    await repository.delete(mockJob.id);
+
+    // Check if the file was deleted
+    fileExists = await fs.access(filePath).then(() => true).catch(() => false);
+    expect(fileExists).toBe(false);
+
+    // Get should return undefined
+    const retrievedJob = await repository.get(mockJob.id);
+    expect(retrievedJob).toBeUndefined();
+  });
+
+  it('should not throw when deleting a non-existent job file', async () => {
+    await expect(repository.delete('non-existent-id')).resolves.toBeUndefined();
+  });
 });

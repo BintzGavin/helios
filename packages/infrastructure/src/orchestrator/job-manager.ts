@@ -121,6 +121,22 @@ export class JobManager {
   }
 
   /**
+   * Deletes a job from the repository, cancelling it first if it's pending or running.
+   */
+  async deleteJob(id: string): Promise<void> {
+    const job = await this.repository.get(id);
+    if (!job) {
+      return;
+    }
+
+    if (job.state === 'pending' || job.state === 'running') {
+      await this.cancelJob(id);
+    }
+
+    await this.repository.delete(id);
+  }
+
+  /**
    * Internal method to run the job and update status.
    */
   private async runJob(id: string, jobSpec: JobSpec, options?: JobExecutionOptions) {
@@ -189,8 +205,16 @@ export class JobManager {
           console.log(`Job ${id} paused`);
         } else if (error.name === 'AbortError' || controller.signal.aborted) {
           console.log(`Job ${id} cancelled`);
-          job.state = 'cancelled';
-          job.updatedAt = Date.now();
+          // Note: If the job was deleted, it might not be in the repository anymore.
+          // In that case, saving it here will re-create it, which we don't want.
+          // Let's check if it still exists before saving.
+          const exists = await this.repository.get(id);
+          if (exists) {
+            job.state = 'cancelled';
+            job.updatedAt = Date.now();
+          } else {
+            return; // Job was deleted
+          }
         } else {
           console.error(`Job ${id} failed:`, error);
           job.state = 'failed';
