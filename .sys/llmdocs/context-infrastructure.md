@@ -79,6 +79,7 @@ export interface WorkerJob {
 
 // Orchestrator Execution Options (orchestrator/job-executor.ts)
 export interface JobExecutionOptions {
+  completedChunkIds?: number[];
   concurrency?: number;
   jobDir?: string;
   merge?: boolean;
@@ -119,9 +120,9 @@ export interface JobSpec {
 }
 
 // Orchestrator State Persistence (types/orchestrator.ts)
-export type JobStatus = 'pending' | 'running' | 'completed' | 'failed' | 'cancelled';
+export type JobState = 'pending' | 'running' | 'completed' | 'failed' | 'cancelled' | 'paused';
 
-export interface JobState {
+export interface JobStatus {
   id: string;
   spec: JobSpec;
   status: JobStatus;

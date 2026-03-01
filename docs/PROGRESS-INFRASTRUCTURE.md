@@ -1,5 +1,8 @@
 # INFRASTRUCTURE PROGRESS
 
+## INFRASTRUCTURE v0.17.0
+- ✅ Completed: Orchestration and Job Management - Implemented pauseJob and resumeJob in JobManager
+
 ## INFRASTRUCTURE v0.16.0
 - ✅ Completed: Realtime Log Streaming - Verified and mapped onChunkStdout and onChunkStderr in JobExecutor and triggered onStdout/onStderr callbacks in LocalWorkerAdapter.
 

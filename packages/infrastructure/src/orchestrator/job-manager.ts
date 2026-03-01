@@ -19,6 +19,7 @@ export class JobManager {
     const id = randomUUID();
     const job: JobStatus = {
       id,
+      spec: jobSpec,
       state: 'pending',
       progress: 0,
       totalChunks: jobSpec.chunks.length,
@@ -75,6 +76,48 @@ export class JobManager {
       job.updatedAt = Date.now();
       await this.repository.save(job);
     }
+  }
+
+  /**
+   * Pauses a running job.
+   */
+  async pauseJob(id: string): Promise<void> {
+    const job = await this.repository.get(id);
+    if (!job || job.state !== 'running') {
+      return;
+    }
+
+    // IMPORTANT: Save the state as 'paused' BEFORE aborting the controller.
+    // Otherwise, the catch block in runJob() might fetch the old 'running' state
+    // and incorrectly mark the job as 'cancelled'.
+    job.state = 'paused';
+    job.updatedAt = Date.now();
+    await this.repository.save(job);
+
+    const controller = this.controllers.get(id);
+    if (controller) {
+      controller.abort();
+    }
+  }
+
+  /**
+   * Resumes a paused job.
+   */
+  async resumeJob(id: string, options?: JobExecutionOptions): Promise<void> {
+    const job = await this.repository.get(id);
+    if (!job || job.state !== 'paused') {
+      return;
+    }
+
+    const completedChunkIds = job.logs?.map(log => log.chunkId) || [];
+    const resumeOptions: JobExecutionOptions = {
+      ...options,
+      completedChunkIds
+    };
+
+    this.runJob(id, job.spec, resumeOptions).catch(err => {
+      console.error(`Unhandled error resuming job ${id}:`, err);
+    });
   }
 
   /**
@@ -142,7 +185,9 @@ export class JobManager {
     } catch (error: any) {
       job = await this.repository.get(id);
       if (job) {
-        if (error.name === 'AbortError' || controller.signal.aborted) {
+        if (job.state === 'paused') {
+          console.log(`Job ${id} paused`);
+        } else if (error.name === 'AbortError' || controller.signal.aborted) {
           console.log(`Job ${id} cancelled`);
           job.state = 'cancelled';
           job.updatedAt = Date.now();
