@@ -75,6 +75,12 @@ export interface JobExecutionOptions {
    * Output file path relative to jobDir for the stitcher.
    */
   outputFile?: string;
+
+  /**
+   * Array of chunk IDs that have already been completed.
+   * These chunks will be skipped during execution.
+   */
+  completedChunkIds?: number[];
 }
 
 export class JobExecutor {
@@ -100,9 +106,11 @@ export class JobExecutor {
 
     // Create a queue of chunks
     // We clone the chunks array so we don't modify the original job spec
-    const queue = [...job.chunks];
+    const queue = options.completedChunkIds
+      ? [...job.chunks].filter(chunk => !options.completedChunkIds!.includes(chunk.id))
+      : [...job.chunks];
     const totalChunks = job.chunks.length;
-    let completedChunks = 0;
+    let completedChunks = options.completedChunkIds?.length || 0;
 
     // We need to track failures
     const failures: { chunkId: number, error: any }[] = [];

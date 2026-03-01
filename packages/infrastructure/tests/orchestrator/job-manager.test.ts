@@ -127,4 +127,58 @@ describe('JobManager', () => {
     const jobs = await repository.list();
     expect(jobs.length).toBe(2);
   });
+
+  it('should successfully pause a running job', async () => {
+    mockExecutorExecute.mockImplementation(async (spec: any, options: any) => {
+      // simulate long running job
+      return new Promise((resolve, reject) => {
+        options.signal?.addEventListener('abort', () => {
+          const err = new Error('aborted');
+          err.name = 'AbortError';
+          reject(err);
+        });
+      });
+    });
+
+    const id = await jobManager.submitJob(sampleJobSpec);
+    await new Promise(resolve => setTimeout(resolve, 50));
+
+    let job = await jobManager.getJob(id);
+    expect(job?.state).toBe('running');
+
+    await jobManager.pauseJob(id);
+    await new Promise(resolve => setTimeout(resolve, 50));
+
+    job = await jobManager.getJob(id);
+    expect(job?.state).toBe('paused');
+  });
+
+  it('should successfully resume a paused job and skip completed chunks', async () => {
+    mockExecutorExecute.mockResolvedValue(undefined);
+
+    const id = await jobManager.submitJob(sampleJobSpec);
+    await new Promise(resolve => setTimeout(resolve, 50));
+
+    // Manually set to paused and add completed chunks to logs
+    let job = await jobManager.getJob(id);
+    if (job) {
+      job.state = 'paused';
+      job.logs = [
+        { chunkId: 1, durationMs: 150, stdout: '', stderr: '' }
+      ];
+      await repository.save(job);
+    }
+
+    await jobManager.resumeJob(id, { concurrency: 2 });
+    await new Promise(resolve => setTimeout(resolve, 50));
+
+    job = await jobManager.getJob(id);
+    expect(job?.state).toBe('completed');
+
+    // We expect execute to have been called again with the updated options
+    expect(mockExecutorExecute).toHaveBeenCalledWith(sampleJobSpec, expect.objectContaining({
+      concurrency: 2,
+      completedChunkIds: [1]
+    }));
+  });
 });

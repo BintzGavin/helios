@@ -1,7 +1,10 @@
-export type JobState = 'pending' | 'running' | 'completed' | 'failed' | 'cancelled';
+import { JobSpec } from './job-spec.js';
+
+export type JobState = 'pending' | 'running' | 'completed' | 'failed' | 'cancelled' | 'paused';
 
 export interface JobStatus {
   id: string;
+  spec: JobSpec;
   state: JobState;
   progress: number; // 0-100
   totalChunks: number;
