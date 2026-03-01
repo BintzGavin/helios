@@ -1,4 +1,4 @@
-**Version**: 0.116.1
+**Version**: 0.116.2
 
 **Posture**: ACTIVELY EXPANDING FOR V2
 
@@ -11,6 +11,7 @@
 > **Note**: Status versions in this file may precede package release versions (`package.json`). Always verify `package.json` for the currently installed version.
 
 ## Recent Updates
+- [v0.116.2] ✅ Completed: Schema Validation - Implemented visual validation feedback in the Studio Props Editor to enforce schema constraints (pattern, min/max) and guide users using a unified `validateValue` helper.
 - [v0.116.1] ✅ Verified: Regression Test - Confirmed Asset Move backend API and Studio UI stability via verification scripts (`verify-asset-move.ts`, `verify-ui.ts`).
 - [v0.116.0] ✅ Completed: Asset Move - Implemented drag-and-drop support for moving assets and folders within the Assets Panel, backed by a new `moveAsset` API.
 - [v0.115.0] ✅ Completed: WebCodecs Preference - Added `webCodecsPreference` configuration to Studio Renders Panel, allowing users to select Hardware, Software, or Disabled modes for rendering.

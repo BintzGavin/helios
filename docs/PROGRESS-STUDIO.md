@@ -1,3 +1,6 @@
+## STUDIO v0.116.2
+- ✅ Completed: Schema Validation - Implemented visual validation feedback in the Studio Props Editor to enforce schema constraints (pattern, min/max) and guide users using a unified `validateValue` helper.
+
 ## STUDIO v0.116.1
 - ✅ Verified: Regression Test - Confirmed Asset Move backend API and Studio UI stability via verification scripts (`verify-asset-move.ts`, `verify-ui.ts`).
 
