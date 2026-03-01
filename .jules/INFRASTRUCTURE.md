@@ -37,3 +37,7 @@ Critical learnings only. This is not a log—only add entries for insights that 
 ## [0.22.0] - Remote Job Assets Fetching Gap
 **Learning:** We implemented `ArtifactStorage` and `LocalStorageAdapter` in v0.21.0 to support uploading assets. However, the `WorkerRuntime` and cloud entrypoints (`aws-handler.ts`, `cloudrun-server.ts`) still lack the mechanism to use `ArtifactStorage` to fetch those assets. `JobSpec` also needs fields to carry the `assetsUrl` and job `id` so the worker knows where to download them from before executing rendering chunks.
 **Action:** Plan to integrate `ArtifactStorage` into `WorkerRuntime` and update `JobSpec` to support remote asset fetching to close the distributed rendering vision gap.
+
+## [0.23.0] - Orchestrator Asset Upload Integration
+**Learning:** While `ArtifactStorage` was integrated into `WorkerRuntime` to download remote assets, we missed the orchestrator side of the equation. Neither `JobManager` nor `JobExecutor` currently use `ArtifactStorage` to upload the local project assets before remote cloud execution begins. Furthermore, if this upload modifies `JobSpec.assetsUrl`, it must be done in `JobManager` before `JobExecutor` runs to ensure the updated spec is saved to `JobRepository`.
+**Action:** Plan to integrate `ArtifactStorage` upload into `JobManager.runJob` to ensure remote workers have assets available, closing the loop on distributed cloud rendering.
