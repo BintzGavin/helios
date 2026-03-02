@@ -53,3 +53,4 @@ This backlog tracks concrete deliverables derived from [`AGENTS.md`](../AGENTS.m
 
 ## INFRASTRUCTURE Agent Status
 - [ ] 🚫 Blocked: The only available plans (`2026-03-02-INFRASTRUCTURE-SyncDependency.md` and `2026-03-02-INFRASTRUCTURE-Workspace-Dependency-Synchronizer.md`) require modifying files outside of my domain (`packages/cli/package.json` and the root workspace package definitions), which strictly violates my boundaries. I must stop working.
+- [ ] 🚫 Blocked: The available plan (`2026-11-13-CLI-Cloud-Worker-Execution.md`) asks me to modify files outside of my domain (`packages/cli/src/commands/job.ts`), which strictly violates my boundaries. I cannot implement CLI execution commands.
