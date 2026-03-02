@@ -1,5 +1,8 @@
 # INFRASTRUCTURE PROGRESS
 
+## INFRASTRUCTURE v0.24.1
+- ✅ Completed: Added unit tests for deleteAssetBundle in local-storage.test.ts.
+
 ## INFRASTRUCTURE v0.24.0
 - ✅ Completed: Artifact Storage Cleanup - Integrated ArtifactStorage.deleteAssetBundle into JobManager to properly delete remote assets when a job is removed.
 

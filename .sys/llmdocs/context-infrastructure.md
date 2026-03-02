@@ -52,6 +52,8 @@ packages/infrastructure/
     ├── orchestrator/
     │   ├── file-job-repository.test.ts
     │   └── job-manager.test.ts
+    ├── storage/
+    │   └── local-storage.test.ts
     ├── worker/
     │   ├── aws-handler.test.ts
     │   └── cloudrun-server.test.ts
