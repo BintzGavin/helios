@@ -36,3 +36,4 @@
 - [v0.24.0] ✅ Completed: Artifact Storage Cleanup Spec - Created spec for artifact storage cleanup gap to ensure remote job assets are cleaned up.
 - [v0.24.1] 🚫 Blocked: The only available plans (`2026-03-02-INFRASTRUCTURE-SyncDependency.md` and `2026-03-02-INFRASTRUCTURE-Workspace-Dependency-Synchronizer.md`) require modifying files outside of my domain (`packages/cli/package.json` and the root workspace package definitions), which strictly violates my boundaries. I must stop working.
 - [v0.25.0] 🚫 Blocked: The available plan (`2026-11-13-CLI-Cloud-Worker-Execution.md`) asks me to modify files outside of my domain (`packages/cli/src/commands/job.ts`), which strictly violates my boundaries. I cannot implement CLI execution commands.
+- [v0.26.1] ✅ Completed: S3 Storage Adapter Spec - Created spec for `S3StorageAdapter` to handle artifact uploads and downloads using AWS S3.
