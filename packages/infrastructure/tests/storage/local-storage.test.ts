@@ -111,4 +111,35 @@ describe('LocalStorageAdapter', () => {
 
     await expect(adapter.downloadAssetBundle(jobId, remoteUrl, targetDir)).rejects.toThrow(/does not exist/);
   });
+
+  it('should delete an asset bundle', async () => {
+    const jobId = 'job-123';
+    await fs.writeFile(path.join(localDir, 'test.txt'), 'hello world');
+
+    const remoteUrl = await adapter.uploadAssetBundle(jobId, localDir);
+    const remoteDir = remoteUrl.slice('local://'.length);
+
+    // Ensure it exists
+    await fs.access(remoteDir);
+
+    await adapter.deleteAssetBundle(jobId, remoteUrl);
+
+    // Verify it is deleted
+    await expect(fs.access(remoteDir)).rejects.toThrow(/ENOENT/);
+  });
+
+  it('should throw an error for unsupported remote URLs on delete', async () => {
+    const jobId = 'job-123';
+    const remoteUrl = 's3://my-bucket/job-123';
+
+    await expect(adapter.deleteAssetBundle(jobId, remoteUrl)).rejects.toThrow(/Unsupported remote URL scheme/);
+  });
+
+  it('should prevent directory traversal attacks on delete', async () => {
+    const jobId = 'job-123';
+    const traversalPath = path.join(storageDir, '../../some-dir');
+    const remoteUrl = `local://${traversalPath}`;
+
+    await expect(adapter.deleteAssetBundle(jobId, remoteUrl)).rejects.toThrow(/Path traversal detected/);
+  });
 });
