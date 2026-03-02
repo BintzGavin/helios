@@ -1,0 +1,91 @@
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { syncWorkspaceDependencies } from '../../src/governance/sync-workspace.js';
+import fs from 'node:fs/promises';
+import path from 'node:path';
+
+// Mock fs/promises
+vi.mock('node:fs/promises', () => {
+  return {
+    default: {
+      readdir: vi.fn(),
+      readFile: vi.fn(),
+      writeFile: vi.fn(),
+    },
+  };
+});
+
+describe('syncWorkspaceDependencies', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('should synchronize versions correctly based on package.json files found in rootDir/packages', async () => {
+    const rootDir = '/virtual/repo';
+
+    const mockEntries = [
+      { name: 'pkg-a', isDirectory: () => true },
+      { name: 'pkg-b', isDirectory: () => true },
+      { name: 'not-a-dir', isDirectory: () => false },
+    ];
+
+    const mockPkgA = {
+      name: '@helios-project/pkg-a',
+      version: '1.2.3',
+      dependencies: {
+        '@helios-project/pkg-b': '^1.0.0', // Needs updating
+        'external-pkg': '^2.0.0',
+      },
+    };
+
+    const mockPkgB = {
+      name: '@helios-project/pkg-b',
+      version: '2.5.0',
+      devDependencies: {
+        '@helios-project/pkg-a': 'workspace:*', // Needs updating
+      },
+    };
+
+    // Setup mocks
+    (fs.readdir as any).mockResolvedValue(mockEntries);
+
+    (fs.readFile as any).mockImplementation((filepath: string) => {
+      if (filepath.includes('pkg-a')) {
+        return Promise.resolve(JSON.stringify(mockPkgA));
+      }
+      if (filepath.includes('pkg-b')) {
+        return Promise.resolve(JSON.stringify(mockPkgB));
+      }
+      return Promise.reject(Object.assign(new Error('ENOENT'), { code: 'ENOENT' }));
+    });
+
+    await syncWorkspaceDependencies({ rootDir });
+
+    expect(fs.readdir).toHaveBeenCalledWith(path.join(rootDir, 'packages'), { withFileTypes: true });
+
+    expect(fs.writeFile).toHaveBeenCalledTimes(2);
+
+    // Verify pkg-a write
+    const writeA = (fs.writeFile as any).mock.calls.find((call: any[]) => call[0].includes('pkg-a'));
+    expect(writeA).toBeDefined();
+    const updatedPkgA = JSON.parse(writeA[1]);
+    expect(updatedPkgA.dependencies['@helios-project/pkg-b']).toBe('^2.5.0');
+    expect(updatedPkgA.dependencies['external-pkg']).toBe('^2.0.0');
+
+    // Verify pkg-b write
+    const writeB = (fs.writeFile as any).mock.calls.find((call: any[]) => call[0].includes('pkg-b'));
+    expect(writeB).toBeDefined();
+    const updatedPkgB = JSON.parse(writeB[1]);
+    expect(updatedPkgB.devDependencies['@helios-project/pkg-a']).toBe('^1.2.3');
+  });
+
+  it('should do nothing if packages directory does not exist', async () => {
+    const rootDir = '/empty/repo';
+
+    (fs.readdir as any).mockRejectedValue(Object.assign(new Error('ENOENT'), { code: 'ENOENT' }));
+
+    await syncWorkspaceDependencies({ rootDir });
+
+    expect(fs.readdir).toHaveBeenCalled();
+    expect(fs.writeFile).not.toHaveBeenCalled();
+  });
+});

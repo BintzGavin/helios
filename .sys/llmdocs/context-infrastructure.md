@@ -19,6 +19,9 @@ packages/infrastructure/
 │   │   ├── cloudrun-adapter.ts
 │   │   ├── index.ts
 │   │   └── local-adapter.ts
+│   ├── governance/
+│   │   ├── index.ts
+│   │   └── sync-workspace.ts
 │   ├── orchestrator/
 │   │   ├── file-job-repository.ts
 │   │   ├── index.ts
@@ -49,6 +52,8 @@ packages/infrastructure/
     │   └── deterministic-seeking.test.ts
     ├── adapters/
     │   └── local-adapter.test.ts
+    ├── governance/
+    │   └── sync-workspace.test.ts
     ├── orchestrator/
     │   ├── file-job-repository.test.ts
     │   └── job-manager.test.ts
@@ -158,6 +163,13 @@ export interface ArtifactStorage {
   downloadAssetBundle(jobId: string, remoteUrl: string, targetDir: string): Promise<void>;
   deleteAssetBundle(jobId: string, remoteUrl: string): Promise<void>;
 }
+
+// Governance (governance/sync-workspace.ts)
+export interface SyncOptions {
+  rootDir: string;
+}
+
+export function syncWorkspaceDependencies(options: SyncOptions): Promise<void>;
 
 // Video Stitching (stitcher/index.ts)
 export interface VideoStitcher {
