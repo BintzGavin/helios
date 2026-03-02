@@ -45,3 +45,7 @@ Critical learnings only. This is not a log—only add entries for insights that 
 ## [0.24.0] - Artifact Storage Cleanup Gap
 **Learning:** While `ArtifactStorage` supports uploading and downloading job assets, it lacks a mechanism to delete them. Consequently, when `JobManager.deleteJob` is called to clean up job state, the remote job assets are leaked in storage, which violates the architectural goal of maintaining a clean distributed execution environment.
 **Action:** Plan to add `deleteAssetBundle` to the `ArtifactStorage` interface and integrate it into `JobManager.deleteJob` to ensure proper resource cleanup.
+
+## [0.24.1] - Governance Tooling Gap
+**Learning:** The INFRASTRUCTURE domain cannot manually edit cross-package `package.json` files to resolve dependency mismatches (like CLI needing the latest infrastructure package) because it violates strict domain boundaries. However, `AGENTS.md` explicitly designates "governance tooling" and "release tooling" for internal version propagation as part of the infrastructure domain's responsibility. Without this tooling, agents are blocked by dependency mismatches they are forbidden to fix manually.
+**Action:** Plan the implementation of a workspace dependency synchronizer tool within `packages/infrastructure/src/governance/` to automate internal version propagation across the monorepo.
