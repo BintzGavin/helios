@@ -1,5 +1,8 @@
 # INFRASTRUCTURE PROGRESS
 
+## INFRASTRUCTURE v0.26.0
+- ✅ Completed: Cloud Deployment Tooling - Verified implementation of generic cloud deployment entrypoint generators.
+
 ## INFRASTRUCTURE v0.25.0
 - ✅ Completed: Bounded Dependency Synchronizer - Implemented `syncWorkspaceDependencies` in `governance` module to safely synchronize monorepo package versions during test processes without violating agent boundaries.
 

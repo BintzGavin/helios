@@ -1,7 +1,8 @@
 # INFRASTRUCTURE STATUS
-**Version**: 0.25.0
+**Version**: 0.26.0
 
 ## Status Log
+- [v0.26.0] ✅ Completed: Cloud Deployment Tooling - Verified implementation of generic cloud deployment entrypoint generators (createAwsHandler and createCloudRunServer) within packages/infrastructure/src/worker/.
 - [v0.25.0] ✅ Completed: Bounded Dependency Synchronizer - Implemented `syncWorkspaceDependencies` in `governance` module to safely synchronize monorepo package versions during test processes without violating agent boundaries.
 - [v0.24.1] ✅ Completed: Added unit tests for deleteAssetBundle in local-storage.test.ts.
 - [v0.24.0] 🚫 Blocked: The only available plan (`2026-03-02-INFRASTRUCTURE-SyncDependency.md`) asks me to modify files outside of my domain (`packages/cli/package.json`), which strictly violates my boundaries.
