@@ -53,3 +53,7 @@ Critical learnings only. This is not a log—only add entries for insights that 
 ## 0.24.1 - Domain Boundary Enforcement
 **Learning:** Planners may generate spec files (e.g. `2026-03-02-INFRASTRUCTURE-Workspace-Dependency-Synchronizer.md`) that attempt to instruct me to implement "governance tooling" or scripts that automatically update `package.json` dependencies across the entire monorepo. Executing these scripts modifies files strictly outside of my `packages/infrastructure/` domain.
 **Action:** The instruction to never modify files outside of my domain boundary strictly overrides any explicit plan instructions or justifications about "governance tooling." If a plan requires me to write a script that updates files in other domains (like `packages/cli/`), I must reject the plan, document the blocked state, and immediately stop working.
+
+## 0.26.1 - Real Cloud Storage Adapter
+**Learning:** We implemented `ArtifactStorage` and `LocalStorageAdapter` for local simulated distributed rendering, but cloud execution needs real cloud-based storage (like S3) to truly work with the `AwsLambdaAdapter`.
+**Action:** Plan an `S3StorageAdapter` to handle real AWS storage for the worker execution.
