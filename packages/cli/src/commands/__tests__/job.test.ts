@@ -1,7 +1,20 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { loadJobSpec } from '../job';
+import { loadJobSpec, registerJobCommand } from '../job';
 import path from 'path';
 import fs from 'fs';
+import { Command } from 'commander';
+import { JobExecutor, LocalWorkerAdapter, AwsLambdaAdapter, CloudRunAdapter } from '@helios-project/infrastructure';
+
+vi.mock('@helios-project/infrastructure', () => {
+  return {
+    JobExecutor: vi.fn().mockImplementation(() => ({
+      execute: vi.fn().mockResolvedValue(undefined)
+    })),
+    LocalWorkerAdapter: vi.fn(),
+    AwsLambdaAdapter: vi.fn(),
+    CloudRunAdapter: vi.fn(),
+  };
+});
 
 // Mock fs module
 vi.mock('fs', () => {
@@ -58,6 +71,60 @@ describe('loadJobSpec', () => {
 
       const url = 'http://example.com/job.json';
       await expect(loadJobSpec(url)).rejects.toThrow('Failed to fetch job: Not Found (404)');
+    });
+  });
+
+  describe('Command Registration', () => {
+    let program: Command;
+    let mockExit: any;
+    let mockConsoleError: any;
+
+    beforeEach(() => {
+      program = new Command();
+      registerJobCommand(program);
+      mockExit = vi.spyOn(process, 'exit').mockImplementation((() => {}) as any);
+      mockConsoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+      const mockJobSpec = { chunks: [] };
+      vi.mocked(fs.existsSync).mockReturnValue(true);
+      vi.mocked(fs.readFileSync).mockReturnValue(JSON.stringify(mockJobSpec));
+    });
+
+    afterEach(() => {
+      mockExit.mockRestore();
+      mockConsoleError.mockRestore();
+    });
+
+    it('should default to LocalWorkerAdapter', async () => {
+      await program.parseAsync(['node', 'test', 'job', 'run', 'job.json']);
+      expect(LocalWorkerAdapter).toHaveBeenCalled();
+      expect(JobExecutor).toHaveBeenCalled();
+    });
+
+    it('should instantiate AwsLambdaAdapter when --adapter aws is used', async () => {
+      await program.parseAsync(['node', 'test', 'job', 'run', 'job.json', '--adapter', 'aws', '--aws-function-name', 'my-func']);
+      expect(AwsLambdaAdapter).toHaveBeenCalledWith(expect.objectContaining({
+        functionName: 'my-func'
+      }));
+    });
+
+    it('should error if aws adapter is used without function name', async () => {
+      await program.parseAsync(['node', 'test', 'job', 'run', 'job.json', '--adapter', 'aws']);
+      expect(mockConsoleError).toHaveBeenCalledWith('Job execution failed:', 'AWS adapter requires --aws-function-name');
+      expect(mockExit).toHaveBeenCalledWith(1);
+    });
+
+    it('should instantiate CloudRunAdapter when --adapter gcp is used', async () => {
+      await program.parseAsync(['node', 'test', 'job', 'run', 'job.json', '--adapter', 'gcp', '--gcp-service-url', 'http://gcp.com']);
+      expect(CloudRunAdapter).toHaveBeenCalledWith(expect.objectContaining({
+        serviceUrl: 'http://gcp.com'
+      }));
+    });
+
+    it('should error if gcp adapter is used without service url', async () => {
+      await program.parseAsync(['node', 'test', 'job', 'run', 'job.json', '--adapter', 'gcp']);
+      expect(mockConsoleError).toHaveBeenCalledWith('Job execution failed:', 'GCP adapter requires --gcp-service-url');
+      expect(mockExit).toHaveBeenCalledWith(1);
     });
   });
 

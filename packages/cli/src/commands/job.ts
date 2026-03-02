@@ -2,7 +2,7 @@ import { Command } from 'commander';
 import fs from 'fs';
 import path from 'path';
 import { JobSpec } from '../types/job.js';
-import { JobExecutor, LocalWorkerAdapter } from '@helios-project/infrastructure';
+import { JobExecutor, LocalWorkerAdapter, AwsLambdaAdapter, CloudRunAdapter, WorkerAdapter } from '@helios-project/infrastructure';
 
 export async function loadJobSpec(file: string): Promise<{ jobSpec: JobSpec, jobDir: string }> {
   if (file.startsWith('http://') || file.startsWith('https://')) {
@@ -33,6 +33,12 @@ export function registerJobCommand(program: Command) {
     .option('--chunk <id>', 'Execute only the chunk with the specified ID')
     .option('--concurrency <number>', 'Number of concurrent chunks to run locally', '1')
     .option('--no-merge', 'Skip the final merge step')
+    .option('--adapter <type>', 'Adapter to use (local, aws, gcp)', 'local')
+    .option('--aws-region <region>', 'AWS Region for Lambda adapter')
+    .option('--aws-function-name <name>', 'AWS Lambda function name')
+    .option('--aws-job-def-url <url>', 'URL of the job definition for AWS Lambda')
+    .option('--gcp-service-url <url>', 'GCP Cloud Run service URL')
+    .option('--gcp-job-def-url <url>', 'URL of the job definition for GCP Cloud Run')
     .action(async (file, options) => {
       try {
         const { jobSpec, jobDir } = await loadJobSpec(file);
@@ -61,7 +67,29 @@ export function registerJobCommand(program: Command) {
 
         const shouldMerge = options.merge && chunkId === undefined;
 
-        const adapter = new LocalWorkerAdapter();
+        let adapter: WorkerAdapter;
+
+        if (options.adapter === 'aws') {
+          if (!options.awsFunctionName) {
+            throw new Error('AWS adapter requires --aws-function-name');
+          }
+          adapter = new AwsLambdaAdapter({
+            region: options.awsRegion,
+            functionName: options.awsFunctionName,
+            jobDefUrl: options.awsJobDefUrl || file
+          });
+        } else if (options.adapter === 'gcp') {
+          if (!options.gcpServiceUrl) {
+            throw new Error('GCP adapter requires --gcp-service-url');
+          }
+          adapter = new CloudRunAdapter({
+            serviceUrl: options.gcpServiceUrl,
+            jobDefUrl: options.gcpJobDefUrl || file
+          });
+        } else {
+          adapter = new LocalWorkerAdapter();
+        }
+
         const executor = new JobExecutor(adapter);
 
         // Ensure jobSpec has an id to satisfy infrastructure JobSpec interface
