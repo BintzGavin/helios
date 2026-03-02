@@ -32,7 +32,8 @@ packages/infrastructure/
 │   │   └── index.ts
 │   ├── storage/
 │   │   ├── index.ts
-│   │   └── local-storage.ts
+│   │   ├── local-storage.ts
+│   │   └── s3-storage.ts
 │   ├── types/
 │   │   ├── adapter.ts
 │   │   ├── index.ts
@@ -58,7 +59,8 @@ packages/infrastructure/
     │   ├── file-job-repository.test.ts
     │   └── job-manager.test.ts
     ├── storage/
-    │   └── local-storage.test.ts
+    │   ├── local-storage.test.ts
+    │   └── s3-storage.test.ts
     ├── worker/
     │   ├── aws-handler.test.ts
     │   └── cloudrun-server.test.ts
@@ -164,6 +166,10 @@ export interface ArtifactStorage {
   deleteAssetBundle(jobId: string, remoteUrl: string): Promise<void>;
 }
 
+export interface S3StorageAdapterOptions extends S3ClientConfig {
+  bucket: string;
+}
+
 // Governance (governance/sync-workspace.ts)
 export interface SyncOptions {
   rootDir: string;
@@ -190,6 +196,8 @@ export interface CloudRunServerConfig {
 ```
 
 ## Section D: Cloud Adapters
+- `LocalStorageAdapter`: Local implementation of `ArtifactStorage` for managing job assets during tests and local executions.
+- `S3StorageAdapter`: AWS S3 implementation of `ArtifactStorage` for uploading and downloading job assets during distributed cloud executions.
 - `LocalWorkerAdapter`: Invokes chunk commands via native `node:child_process.spawn`. Highly used for local rendering or integration/E2E testing (e.g., deterministic frame verifications).
 - `AwsLambdaAdapter`: Translates `WorkerJob` requests to stateless chunk requests passed to AWS Lambda functions utilizing the payload structure via `@aws-sdk/client-lambda`. Wait state natively blocks until job execution completes. Supports dynamic `jobDefUrl` per execution when provided via `job.meta.jobDefUrl`.
 - `CloudRunAdapter`: Proxies HTTP POST requests using `google-auth-library` to an OIDC-secured Google Cloud Run endpoint, delegating discrete execution of rendering chunk pipelines on demand. Supports dynamic `jobDefUrl` per execution.

@@ -13,6 +13,15 @@ Each agent should update **their own dedicated progress file** instead of this f
 - **STUDIO**: Update `docs/PROGRESS-STUDIO.md`
 - **SKILLS**: Update `docs/PROGRESS-SKILLS.md`
 
+### INFRASTRUCTURE v0.27.0
+- ✅ Completed: S3 Storage Adapter - Implemented an `S3StorageAdapter` to handle artifact uploads and downloads using AWS S3.
+
+### INFRASTRUCTURE v0.26.0
+- ✅ Completed: Cloud Deployment Tooling - Verified implementation of generic cloud deployment entrypoint generators (createAwsHandler and createCloudRunServer) within packages/infrastructure/src/worker/.
+
+### INFRASTRUCTURE v0.25.0
+- ✅ Completed: Bounded Dependency Synchronizer - Implemented `syncWorkspaceDependencies` in `governance` module to safely synchronize monorepo package versions during test processes without violating agent boundaries.
+
 ### INFRASTRUCTURE v0.24.0
 - ✅ Completed: Artifact Storage Cleanup - Integrated ArtifactStorage.deleteAssetBundle into JobManager to properly delete remote assets when a job is removed.
 
