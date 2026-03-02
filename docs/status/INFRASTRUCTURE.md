@@ -32,3 +32,4 @@
 - [v0.2.0] ✅ Completed: Stateless Worker Interface - Implemented WorkerAdapter and LocalWorkerAdapter.
 - [v0.1.0] ✅ Completed: Infrastructure Scaffold - Created initial package structure and configuration.
 - [v0.24.0] ✅ Completed: Artifact Storage Cleanup Spec - Created spec for artifact storage cleanup gap to ensure remote job assets are cleaned up.
+- [v0.24.1] 🚫 Blocked: The only available plans (`2026-03-02-INFRASTRUCTURE-SyncDependency.md` and `2026-03-02-INFRASTRUCTURE-Workspace-Dependency-Synchronizer.md`) require modifying files outside of my domain (`packages/cli/package.json` and the root workspace package definitions), which strictly violates my boundaries. I must stop working.

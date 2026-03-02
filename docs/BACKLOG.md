@@ -52,4 +52,4 @@ This backlog tracks concrete deliverables derived from [`AGENTS.md`](../AGENTS.m
 - [ ] 🚫 Blocked: No new plan found in `/.sys/plans/` for `PLAYER`. Waiting for Planner to create the next implementation spec.
 
 ## INFRASTRUCTURE Agent Status
-- [ ] 🚫 Blocked: The only available plan (`2026-03-02-INFRASTRUCTURE-SyncDependency.md`) asks me to modify files outside of my domain (`packages/cli/package.json`), which strictly violates my boundaries.
+- [ ] 🚫 Blocked: The only available plans (`2026-03-02-INFRASTRUCTURE-SyncDependency.md` and `2026-03-02-INFRASTRUCTURE-Workspace-Dependency-Synchronizer.md`) require modifying files outside of my domain (`packages/cli/package.json` and the root workspace package definitions), which strictly violates my boundaries. I must stop working.
