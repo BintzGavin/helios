@@ -117,3 +117,7 @@ Critical learnings only. This is not a log—only add entries for insights that 
 ## [0.35.0] - Pluggable Execution Disconnect
 **Learning:** `packages/infrastructure` implemented stateless worker adapters (AWS, GCP, Local) and a `JobExecutor`, but `packages/cli`'s `helios job run` was still using a hardcoded local `spawn` loop. The CLI must be actively integrated with new platform capabilities to realize the "Primary interface for ... workflows" vision.
 **Action:** Always check if core/infrastructure abstractions exist before maintaining custom implementations in the CLI. The CLI should act as the orchestrator/interface for lower-level domain logic.
+
+## [0.36.0] - Hardcoded Infrastructure Adapters
+**Learning:** `helios job run` was refactored to use `JobExecutor`, but it still hardcodes `LocalWorkerAdapter`, failing to expose the cloud capabilities (`AwsLambdaAdapter`, `CloudRunAdapter`) provided by the `infrastructure` package.
+**Action:** When integrating new infrastructure abstractions into the CLI, ensure that all relevant capabilities (like execution adapters) are exposed via CLI options, rather than hardcoding local defaults.
