@@ -49,6 +49,33 @@ packages/infrastructure/
 │       ├── index.ts
 │       ├── render-executor.ts
 │       └── runtime.ts
+├── tests
+│   ├── adapters
+│   │   └── local-adapter.test.ts
+│   ├── e2e
+│   │   ├── deterministic-seeking.test.ts
+│   │   └── resiliency.test.ts
+│   ├── governance
+│   │   └── sync-workspace.test.ts
+│   ├── orchestrator
+│   │   ├── file-job-repository.test.ts
+│   │   └── job-manager.test.ts
+│   ├── storage
+│   │   ├── gcs-storage.test.ts
+│   │   ├── local-storage.test.ts
+│   │   └── s3-storage.test.ts
+│   ├── worker
+│   │   ├── aws-handler.test.ts
+│   │   └── cloudrun-server.test.ts
+│   ├── aws-adapter.test.ts
+│   ├── cloudrun-adapter.test.ts
+│   ├── command.test.ts
+│   ├── job-executor.test.ts
+│   ├── job-manager.test.ts
+│   ├── placeholder.test.ts
+│   ├── render-executor.test.ts
+│   ├── stitcher.test.ts
+│   └── worker-runtime.test.ts
 ```
 
 ## Section C: Interfaces

@@ -1,5 +1,8 @@
 # INFRASTRUCTURE PROGRESS
 
+### INFRASTRUCTURE v0.29.1
+- ✅ Completed: Regression Tests - Implemented comprehensive regression and resiliency tests for distributed execution components (`JobExecutor` and `WorkerRuntime`).
+
 ### INFRASTRUCTURE v0.29.0
 - ✅ Completed: Dynamic JobSpec Storage - Extended the infrastructure orchestrator to upload job specifications to remote storage, pass the resulting URL to executors via metadata, and reliably clean up the uploaded specifications when jobs are finalized.
 

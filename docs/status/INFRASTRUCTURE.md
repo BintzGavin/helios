@@ -1,7 +1,8 @@
 # INFRASTRUCTURE STATUS
-**Version**: 0.29.0
+**Version**: 0.29.1
 
 ## Status Log
+- [v0.29.1] ✅ Completed: Regression Tests - Implemented comprehensive regression and resiliency tests for distributed execution components (`JobExecutor` and `WorkerRuntime`).
 - [v0.29.0] ✅ Completed: Dynamic JobSpec Storage - Extended the infrastructure orchestrator to upload job specifications to remote storage, pass the resulting URL to executors via metadata, and reliably clean up the uploaded specifications when jobs are finalized.
 - [v0.28.3] ✅ Completed: Documentation Orchestration - Updated README.md to document Orchestration, Job Management, Cloud Execution Adapters, and Worker Runtime abstractions.
 - [v0.28.2] 🚫 Blocked: No uncompleted implementation plans found for my domain in `/.sys/plans/`. I must stop working.
