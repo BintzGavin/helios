@@ -366,3 +366,6 @@ Each agent should update **their own dedicated progress file** instead of this f
 
 ### STUDIO v0.110.0
 - ✅ Completed: Distributed Rendering Example - Created `examples/distributed-rendering` demonstrating the workflow for generating and executing distributed render jobs.
+
+### INFRASTRUCTURE v0.28.1
+- ✅ Completed: Documentation Update - Updated README.md with sections for Artifact Storage and Governance tooling.
