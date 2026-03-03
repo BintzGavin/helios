@@ -96,6 +96,12 @@ describe('GcsStorageAdapter', () => {
         .toThrow('Unsupported remote URL scheme: s3://bucket/prefix');
     });
 
+    it('throws error if URL is invalid', async () => {
+      await expect(adapter.downloadAssetBundle(jobId, 'gcs://', targetDir))
+        .rejects
+        .toThrow('Invalid GCS URL format: gcs://');
+    });
+
     it('throws error if bucket name does not match adapter configuration', async () => {
       await expect(adapter.downloadAssetBundle(jobId, 'gcs://other-bucket/prefix', targetDir))
         .rejects
