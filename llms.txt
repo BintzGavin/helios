@@ -6,7 +6,7 @@ Helios is a modern engine for creating videos programmatically using standard we
 
 ## Quick Facts
 - **License**: Elastic License 2.0 (free commercial use, no SaaS resale)
-- **Status**: Beta / Self-Driving (Core: Stable v5.13.0+, Studio: Alpha v0.116.1+, Player: v0.76.12+, Renderer: v1.78.0+, CLI: Beta v0.34.0+, Infrastructure: v0.13.0+)
+- **Status**: Beta / Self-Driving (Core: Stable v5.13.0+, Studio: Alpha v0.116.2+, Player: v0.76.13+, Renderer: v1.79.0+, CLI: Beta v0.36.0+, Infrastructure: v0.28.0+)
 - **Frameworks**: React, Vue, Svelte, Solid, vanilla JS
 - **Animation**: Standard CSS, Web Animations API (WAAPI), any animation library
 
@@ -113,12 +113,12 @@ const report = await Helios.diagnose();
 
 ## Roadmap
 ### V1.x (Active)
-- **Studio**: v0.116.1+ (Asset Move, WebCodecs Preference, React Components Example, Registry Filtering Support, Registry Auth, Distributed Rendering Example, Diff Command)
-- **CLI**: v0.34.0+ (Component Tracking, Stateless Worker, Remote Job Assets, Remote Job Spec, Deploy Command [GCP/AWS], Verify Components, Components Search, Registry Auth, Remote Registry Hydration)
+- **Studio**: v0.116.2+ (Schema Validation, Asset Move, WebCodecs Preference, React Components Example, Registry Filtering Support, Registry Auth, Distributed Rendering Example, Diff Command)
+- **CLI**: v0.36.0+ (Cloud Worker Execution, JobExecutor Integration, Component Tracking, Stateless Worker, Remote Job Assets, Remote Job Spec, Deploy Command [GCP/AWS], Verify Components, Components Search, Registry Auth, Remote Registry Hydration)
 - **Core**: v5.13.0+ (Generic Input Props, Active Clips, Input Schema, Headless Audio)
-- **Player**: v0.76.12+ (Synchronized Caption Styling, Robust DOM Export, Async Seek, Exporter Integration, Integrity Check, Fix CaptureFrame Resizing)
-- **Renderer**: v1.78.0+ (WebCodecs Preference, Orchestrator Plan, HW Accel Validation, Distributed Progress)
-- **Infrastructure**: v0.13.0+ (Realtime Log Streaming, Cloud Adapter Deterministic Verification, Graceful Worker Job Cancellation, Observability Telemetry, Cloud Worker Entrypoints)
+- **Player**: v0.76.13+ (Synchronized Caption Styling, Robust DOM Export, Async Seek, Exporter Integration, Integrity Check, Fix CaptureFrame Resizing)
+- **Renderer**: v1.79.0+ (WebCodecs Preference, Orchestrator Plan, HW Accel Validation, Distributed Progress)
+- **Infrastructure**: v0.28.0+ (GCS Storage Adapter, Cloud Deployment Tooling, Bounded Dependency Synchronizer, Artifact Storage Cleanup, Orchestrator Asset Upload, Integrate Artifact Storage, Dynamic Cloud Executions Implementation, Realtime Log Streaming, Cloud Adapter Deterministic Verification, Graceful Worker Job Cancellation, Observability Telemetry, Cloud Worker Entrypoints)
 
 ### AI Integration
 - **Studio MCP Server**: Inspect, create, and render compositions via LLM tools (Done)
