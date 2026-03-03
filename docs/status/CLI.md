@@ -1,6 +1,6 @@
 # CLI Status
 
-**Version**: 0.36.0
+**Version**: 0.36.1
 
 ## Current State
 
@@ -91,3 +91,4 @@ Per AGENTS.md, the CLI is "ACTIVELY EXPANDING FOR V2" with focus on:
 [v0.34.1] ✅ Remote Job Assets - Implemented `--base-url` alias and fixed remote asset resolution in distributed jobs.
 [v0.35.0] ✅ JobExecutor Integration - Refactored `helios job run` to use `@helios-project/infrastructure`'s `JobExecutor` and `LocalWorkerAdapter`.
 [v0.36.0] ✅ Cloud Worker Execution - Integrated AwsLambdaAdapter and CloudRunAdapter into helios job run.
+[v0.36.1] ✅ Add Command Scaffold - Verified the existing `helios add` command fulfills the scaffolding requirements outlined in the plan.
