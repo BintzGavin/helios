@@ -81,6 +81,11 @@ export interface JobExecutionOptions {
    * These chunks will be skipped during execution.
    */
   completedChunkIds?: number[];
+
+  /**
+   * Optional metadata to pass to the adapter's execute method.
+   */
+  meta?: Record<string, any>;
 }
 
 export class JobExecutor {

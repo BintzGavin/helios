@@ -16,6 +16,7 @@ export interface JobStatus {
   metrics?: {
     totalDurationMs: number;
   };
+  meta?: Record<string, any>;
   logs?: Array<{
     chunkId: number;
     durationMs: number;

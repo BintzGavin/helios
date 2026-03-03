@@ -157,7 +157,10 @@ describe('JobManager', () => {
   it('should upload assets if storage and jobDir are provided', async () => {
     const mockStorage = {
       uploadAssetBundle: vi.fn().mockResolvedValue('s3://test-bucket/assets'),
-      downloadAssetBundle: vi.fn()
+      downloadAssetBundle: vi.fn(),
+      deleteAssetBundle: vi.fn(),
+      uploadJobSpec: vi.fn().mockResolvedValue('s3://test-bucket/job.json'),
+      deleteJobSpec: vi.fn()
     };
 
     // Create a new JobManager with storage configured
@@ -174,6 +177,7 @@ describe('JobManager', () => {
 
     const job = await jobManagerWithStorage.getJob(id);
     expect(job?.spec.assetsUrl).toBe('s3://test-bucket/assets');
+    expect(mockStorage.uploadJobSpec).toHaveBeenCalledWith(id, expect.objectContaining({ assetsUrl: 's3://test-bucket/assets' }));
 
     // Verify the modified spec with assetsUrl was passed to executor
     expect(mockExecutorExecute).toHaveBeenCalledWith(

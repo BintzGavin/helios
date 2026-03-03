@@ -83,6 +83,8 @@ interface ArtifactStorage {
   uploadAssetBundle(jobId: string, localDir: string): Promise<string>;
   downloadAssetBundle(jobId: string, remoteUrl: string, localDir: string): Promise<void>;
   deleteAssetBundle(jobId: string, remoteUrl: string): Promise<void>;
+  uploadJobSpec(jobId: string, spec: JobSpec): Promise<string>;
+  deleteJobSpec(jobId: string, remoteUrl: string): Promise<void>;
 }
 ```
 
