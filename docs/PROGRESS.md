@@ -1,3 +1,5 @@
+## INFRASTRUCTURE v0.28.3
+- ✅ Completed: Documentation Orchestration - Updated README.md to document Orchestration, Job Management, Cloud Execution Adapters, and Worker Runtime abstractions.
 # Helios Project Progress Log
 
 This file serves as a central index. Each agent maintains their own progress file to avoid merge conflicts.
