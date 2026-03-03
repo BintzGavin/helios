@@ -57,3 +57,7 @@ Critical learnings only. This is not a log—only add entries for insights that 
 ## 0.26.1 - Real Cloud Storage Adapter
 **Learning:** We implemented `ArtifactStorage` and `LocalStorageAdapter` for local simulated distributed rendering, but cloud execution needs real cloud-based storage (like S3) to truly work with the `AwsLambdaAdapter`.
 **Action:** Plan an `S3StorageAdapter` to handle real AWS storage for the worker execution.
+
+## 0.28.2 - Documentation Clarity Fallback
+**Learning:** The INFRASTRUCTURE domain has reached gravitational equilibrium with the V2 vision (stateless workers, cloud adapters, deterministic seeking, artifact storage, governance tooling are all implemented). According to AGENTS.md, when no feature gaps exist, the agent must focus on allowed fallback actions such as Documentation clarity. Currently, `packages/infrastructure/README.md` lacks documentation for Orchestration, Job Management, Cloud Execution Adapters, and Worker Runtime abstractions.
+**Action:** Plan to implement Documentation clarity for the remaining V2 features to ensure the architecture is well understood and maintainable.
