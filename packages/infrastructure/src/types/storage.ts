@@ -21,4 +21,19 @@ export interface ArtifactStorage {
    * @param remoteUrl The remote URL or identifier of the bundle to delete.
    */
   deleteAssetBundle(jobId: string, remoteUrl: string): Promise<void>;
+
+  /**
+   * Uploads a job specification as a JSON file to remote storage.
+   * @param jobId The ID of the job.
+   * @param spec The JobSpec object to upload.
+   * @returns A promise that resolves to the remote URL of the uploaded spec.
+   */
+  uploadJobSpec(jobId: string, spec: import('./job-spec.js').JobSpec): Promise<string>;
+
+  /**
+   * Deletes a job specification JSON file from remote storage.
+   * @param jobId The ID of the job.
+   * @param remoteUrl The remote URL of the spec to delete.
+   */
+  deleteJobSpec(jobId: string, remoteUrl: string): Promise<void>;
 }

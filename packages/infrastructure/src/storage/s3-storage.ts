@@ -5,6 +5,7 @@ import {
   S3Client,
   PutObjectCommand,
   GetObjectCommand,
+  DeleteObjectCommand,
   DeleteObjectsCommand,
   ListObjectsV2Command,
   type S3ClientConfig,
@@ -121,6 +122,37 @@ export class S3StorageAdapter implements ArtifactStorage {
     if (fileCount === 0) {
         throw new Error(`Remote directory ${remoteUrl} does not exist or is empty`);
     }
+  }
+
+  async uploadJobSpec(jobId: string, spec: import('../types/job-spec.js').JobSpec): Promise<string> {
+    const s3Key = `${jobId}/job.json`;
+    const body = JSON.stringify(spec, null, 2);
+
+    const command = new PutObjectCommand({
+      Bucket: this.bucket,
+      Key: s3Key,
+      Body: body,
+      ContentType: 'application/json',
+    });
+
+    await this.client.send(command);
+
+    return `s3://${this.bucket}/${s3Key}`;
+  }
+
+  async deleteJobSpec(jobId: string, remoteUrl: string): Promise<void> {
+    const { bucket, prefix } = this.parseRemoteUrl(remoteUrl);
+
+    if (bucket !== this.bucket) {
+      throw new Error(`Remote URL bucket ${bucket} does not match adapter bucket ${this.bucket}`);
+    }
+
+    const deleteCommand = new DeleteObjectCommand({
+      Bucket: this.bucket,
+      Key: prefix, // the prefix here is the file key: jobId/job.json
+    });
+
+    await this.client.send(deleteCommand);
   }
 
   async deleteAssetBundle(jobId: string, remoteUrl: string): Promise<void> {

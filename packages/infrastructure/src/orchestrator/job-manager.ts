@@ -135,12 +135,23 @@ export class JobManager {
       await this.cancelJob(id);
     }
 
-    // Cleanup remote artifacts if storage and assetsUrl exist
-    if (this.storage && job.spec.assetsUrl) {
-      try {
-        await this.storage.deleteAssetBundle(id, job.spec.assetsUrl);
-      } catch (error: any) {
-        console.error(`Failed to delete assets for job ${id}:`, error);
+    if (this.storage) {
+      // Cleanup remote artifacts if storage and assetsUrl exist
+      if (job.spec.assetsUrl) {
+        try {
+          await this.storage.deleteAssetBundle(id, job.spec.assetsUrl);
+        } catch (error: any) {
+          console.error(`Failed to delete assets for job ${id}:`, error);
+        }
+      }
+
+      // Cleanup remote job spec
+      if (job.meta?.jobDefUrl) {
+        try {
+          await this.storage.deleteJobSpec(id, job.meta.jobDefUrl);
+        } catch (error: any) {
+          console.error(`Failed to delete job spec for job ${id}:`, error);
+        }
       }
     }
 
@@ -154,16 +165,31 @@ export class JobManager {
     let job = await this.repository.get(id);
     if (!job) return;
 
-    // Upload job assets if storage and jobDir are configured
+    // Upload job assets and spec if storage and jobDir are configured
     if (this.storage && options?.jobDir) {
       try {
         const assetsUrl = await this.storage.uploadAssetBundle(id, options.jobDir);
         jobSpec.assetsUrl = assetsUrl;
         job.spec.assetsUrl = assetsUrl;
+
+        // Upload the updated job spec
+        const jobDefUrl = await this.storage.uploadJobSpec(id, jobSpec);
+
+        // We need to pass jobDefUrl down to the executors via meta
+        if (!options.meta) {
+           options.meta = {};
+        }
+        options.meta.jobDefUrl = jobDefUrl;
+
+        // Also save it to the job status so it can be cleaned up later
+        if (!job.meta) {
+           job.meta = {};
+        }
+        job.meta.jobDefUrl = jobDefUrl;
       } catch (error: any) {
-        console.error(`Job ${id} failed to upload assets:`, error);
+        console.error(`Job ${id} failed to upload assets/spec:`, error);
         job.state = 'failed';
-        job.error = `Asset upload failed: ${error.message}`;
+        job.error = `Asset/Spec upload failed: ${error.message}`;
         job.updatedAt = Date.now();
         await this.repository.save(job);
         return;

@@ -72,6 +72,37 @@ export class GcsStorageAdapter implements ArtifactStorage {
     }
   }
 
+  async uploadJobSpec(jobId: string, spec: import('../types/job-spec.js').JobSpec): Promise<string> {
+    const bucket = this.client.bucket(this.bucketName);
+    const gcsKey = `${jobId}/job.json`;
+    const file = bucket.file(gcsKey);
+
+    const body = JSON.stringify(spec, null, 2);
+
+    await file.save(body, {
+      contentType: 'application/json',
+    });
+
+    return `gcs://${this.bucketName}/${gcsKey}`;
+  }
+
+  async deleteJobSpec(jobId: string, remoteUrl: string): Promise<void> {
+    const { bucket: remoteBucketName, prefix } = this.parseRemoteUrl(remoteUrl);
+
+    if (remoteBucketName !== this.bucketName) {
+      throw new Error(`Remote URL bucket ${remoteBucketName} does not match adapter bucket ${this.bucketName}`);
+    }
+
+    const bucket = this.client.bucket(this.bucketName);
+    const file = bucket.file(prefix);
+
+    try {
+      await file.delete();
+    } catch (e: any) {
+      if (e.code !== 404) throw e;
+    }
+  }
+
   async deleteAssetBundle(jobId: string, remoteUrl: string): Promise<void> {
     const { bucket: remoteBucketName, prefix } = this.parseRemoteUrl(remoteUrl);
 

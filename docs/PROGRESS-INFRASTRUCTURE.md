@@ -1,5 +1,11 @@
 # INFRASTRUCTURE PROGRESS
 
+### INFRASTRUCTURE v0.29.0
+- ✅ Completed: Dynamic JobSpec Storage - Extended the infrastructure orchestrator to upload job specifications to remote storage, pass the resulting URL to executors via metadata, and reliably clean up the uploaded specifications when jobs are finalized.
+
+### INFRASTRUCTURE v0.28.3
+- ✅ Completed: Documentation Orchestration - Updated README.md to document Orchestration, Job Management, Cloud Execution Adapters, and Worker Runtime abstractions.
+
 ### INFRASTRUCTURE v0.28.2
 - ✅ Completed: GCS Storage Tests - Added test coverage for `GcsStorageAdapter` handling artifact uploads and downloads using Google Cloud Storage.
 
