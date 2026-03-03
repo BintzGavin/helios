@@ -1,7 +1,9 @@
 # INFRASTRUCTURE STATUS
-**Version**: 0.28.0
+**Version**: 0.28.1
 
 ## Status Log
+- [v0.28.0] 🚫 Blocked: No uncompleted implementation plans found for my domain in `/.sys/plans/`. I must stop working.
+- [v0.28.1] ✅ Completed: Documentation Update - Updated README.md with sections for Artifact Storage and Governance tooling.
 - [v0.28.0] 🚫 Blocked: No uncompleted implementation plans found for my domain in `/.sys/plans/`. I must stop working.
 - [v0.28.0] ✅ Completed: GCS Storage Adapter - Implemented an `GcsStorageAdapter` to handle artifact uploads and downloads using Google Cloud Storage.
 - [v0.27.0] ✅ Completed: S3 Storage Adapter - Implemented an `S3StorageAdapter` to handle artifact uploads and downloads using AWS S3.
