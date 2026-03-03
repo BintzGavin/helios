@@ -61,3 +61,7 @@ Critical learnings only. This is not a log—only add entries for insights that 
 ## 0.28.2 - Documentation Clarity Fallback
 **Learning:** The INFRASTRUCTURE domain has reached gravitational equilibrium with the V2 vision (stateless workers, cloud adapters, deterministic seeking, artifact storage, governance tooling are all implemented). According to AGENTS.md, when no feature gaps exist, the agent must focus on allowed fallback actions such as Documentation clarity. Currently, `packages/infrastructure/README.md` lacks documentation for Orchestration, Job Management, Cloud Execution Adapters, and Worker Runtime abstractions.
 **Action:** Plan to implement Documentation clarity for the remaining V2 features to ensure the architecture is well understood and maintainable.
+
+## 0.28.3 - Dynamic JobSpec Storage Gap
+**Learning:** Remote cloud workers fail to fetch dynamically updated `JobSpec` configurations because `JobManager` does not persist the updated spec (containing the new `assetsUrl`) to a shared `ArtifactStorage` URL before dispatching the execution. While local assets were being uploaded, the actual JSON `JobSpec` instruction file was not, leaving the cloud execution adapter stranded with a stale or unresolvable local path.
+**Action:** Plan to add `uploadJobSpec` to `ArtifactStorage` and integrate it into `JobManager.runJob` to ensure stateless workers receive accurate, dynamic job definitions.
