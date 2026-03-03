@@ -1,5 +1,8 @@
 # INFRASTRUCTURE PROGRESS
 
+### INFRASTRUCTURE v0.28.0
+- ✅ Completed: GCS Storage Adapter - Implemented an `GcsStorageAdapter` to handle artifact uploads and downloads using Google Cloud Storage.
+
 ## INFRASTRUCTURE v0.26.0
 - ✅ Completed: Cloud Deployment Tooling - Verified implementation of generic cloud deployment entrypoint generators.
 
@@ -20,6 +23,15 @@
 
 ## INFRASTRUCTURE v0.21.0
 - ✅ Completed: Cloud Artifact Storage Implementation - Implemented ArtifactStorage interface and LocalStorageAdapter to manage job assets during distributed cloud executions.
+
+## INFRASTRUCTURE v0.20.0
+- ✅ Completed: Cloud Artifact Storage Spec - Created spec for artifact storage interface and LocalStorageAdapter to manage job assets during distributed cloud executions.
+
+## INFRASTRUCTURE v0.19.0
+- ✅ Completed: Dynamic Cloud Executions Implementation - Implemented dynamic jobDefUrl in AWS Lambda adapter and deleteJob in JobManager and JobRepository.
+
+## INFRASTRUCTURE v0.18.0
+- ✅ Completed: Dynamic Cloud Executions Spec - Created plan to add dynamic jobDefUrl to AWS adapter and deleteJob to JobManager.
 
 ## INFRASTRUCTURE v0.17.0
 - ✅ Completed: Orchestration and Job Management - Implemented pauseJob and resumeJob in JobManager
@@ -58,6 +70,9 @@
 ## INFRASTRUCTURE v0.7.0
 - ✅ Completed: Cancel Job - Implemented job cancellation via AbortSignal in JobExecutor and exposed cancelJob and listJobs in JobManager.
 
+## INFRASTRUCTURE v0.6.0
+- ✅ Completed: Enhance JobExecutor Progress - Implemented granular progress reporting in JobExecutor and JobManager via an onProgress callback.
+
 ## INFRASTRUCTURE v0.5.1
 - ✅ Completed: Retry Logic Verification - Verified robust retry logic in JobExecutor with tests to handle transient failures in distributed rendering jobs.
 
@@ -75,9 +90,3 @@
 
 ## INFRASTRUCTURE v0.1.0
 - ✅ Completed: Infrastructure Scaffold - Created initial package structure and configuration.
-
-## INFRASTRUCTURE v0.19.0
-- ✅ Completed: Dynamic Cloud Executions Implementation - Implemented dynamic jobDefUrl in AWS Lambda adapter and deleteJob in JobManager and JobRepository.
-
-## INFRASTRUCTURE v0.18.0
-- ✅ Completed: Dynamic Cloud Executions Spec - Created plan to add dynamic jobDefUrl to AWS adapter and deleteJob to JobManager.

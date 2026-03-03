@@ -1,13 +1,15 @@
-# Infrastructure Domain Context
+# Infrastructure Context
 
 ## Section A: Architecture
-The `@helios-project/infrastructure` package orchestrates distributed rendering across various compute environments (e.g., local child processes, Google Cloud Run, AWS Lambda). It embraces a stateless worker design, where frames can be independently rendered via a consistent command interface.
+The `@helios-project/infrastructure` package handles distributed rendering orchestration and cloud execution for Helios. It defines the core abstractions for running rendering jobs across multiple workers, handling the lifecycle, scheduling, state management, output stitching, and robust transient failure retries.
 
-The orchestration lifecycle involves:
-1. `JobManager`: Manages active rendering jobs. Employs `JobRepository` for state persistence and delegates execution to `JobExecutor`. Supports pausing, resuming, and deleting jobs. Integrates `ArtifactStorage` to automatically upload local job assets before distributed cloud executions begin.
-2. `JobExecutor`: Takes a `JobSpec` and executes discrete rendering chunks via a `WorkerAdapter`. It gathers metrics, logs, limits concurrency, and provides `AbortSignal` implementation for graceful cancellation.
-3. `WorkerAdapter`: Adapters implementing `execute(job: WorkerJob): Promise<WorkerResult>`. Current implementations include Local (child process execution), AWS Lambda, and Cloud Run.
-4. `VideoStitcher`: A specialized entity (`FfmpegStitcher`) designed to securely concatenate rendered chunk artifacts seamlessly without re-encoding to assemble the final output video.
+### Core Components
+1. **Adapters**: Concrete implementations of the `WorkerAdapter` interface. Adapters bridge the `JobExecutor` to physical execution environments. Cloud adapters (`AwsLambdaAdapter`, `CloudRunAdapter`) support dynamic scaling, deterministic remote execution, and dynamically routing executions to different deployment targets via properties like `jobDefUrl`. Local adapter (`LocalWorkerAdapter`) allows simulated multi-worker concurrency on a single machine.
+2. **Orchestrator**: High-level job lifecycle management components, including `JobManager` (handles pause, resume, cancel, and complete transitions) and `JobRepository` (abstracts persistence of `JobState`).
+3. **Storage**: Implementations of the `ArtifactStorage` interface (e.g., `LocalStorageAdapter`, `S3StorageAdapter`, `GcsStorageAdapter`) that securely handle the uploading, downloading, and cleanup of job asset bundles required for remote cloud executions.
+4. **Worker**: Runtime execution components (`WorkerRuntime`, `createAwsHandler`, `createCloudRunServer`) for processing rendering chunks dynamically. It securely accesses distributed files via injected `ArtifactStorage`.
+5. **Stitcher**: Output merging strategies (e.g., `FfmpegStitcher`) for concatenating distributed video chunks.
+6. **Governance**: Workspace administration and safety enforcement tools (e.g., `syncWorkspaceDependencies`).
 
 ## Section B: File Tree
 ```
@@ -15,194 +17,163 @@ packages/infrastructure/
 ├── src/
 │   ├── index.ts
 │   ├── adapters/
-│   │   ├── aws-adapter.ts
-│   │   ├── cloudrun-adapter.ts
 │   │   ├── index.ts
-│   │   └── local-adapter.ts
+│   │   ├── local-adapter.ts
+│   │   ├── aws-adapter.ts
+│   │   └── cloudrun-adapter.ts
 │   ├── governance/
 │   │   ├── index.ts
 │   │   └── sync-workspace.ts
 │   ├── orchestrator/
-│   │   ├── file-job-repository.ts
 │   │   ├── index.ts
+│   │   ├── file-job-repository.ts
 │   │   ├── job-executor.ts
-│   │   └── job-manager.ts
+│   │   ├── job-manager.ts
+│   │   └── scheduler.ts
 │   ├── stitcher/
-│   │   ├── ffmpeg-stitcher.ts
-│   │   └── index.ts
+│   │   ├── index.ts
+│   │   └── ffmpeg-stitcher.ts
 │   ├── storage/
 │   │   ├── index.ts
 │   │   ├── local-storage.ts
-│   │   └── s3-storage.ts
+│   │   ├── s3-storage.ts
+│   │   └── gcs-storage.ts
 │   ├── types/
 │   │   ├── adapter.ts
 │   │   ├── index.ts
 │   │   ├── job-spec.ts
+│   │   ├── job.ts
 │   │   ├── orchestrator.ts
-│   │   └── storage.ts
-│   ├── utils/
-│   │   └── command.ts
+│   │   ├── storage.ts
+│   │   └── worker.ts
 │   └── worker/
 │       ├── aws-handler.ts
 │       ├── cloudrun-server.ts
 │       ├── index.ts
-│       ├── render-executor.ts
 │       └── runtime.ts
-└── tests/
-    ├── e2e/
-    │   └── deterministic-seeking.test.ts
-    ├── adapters/
-    │   └── local-adapter.test.ts
-    ├── governance/
-    │   └── sync-workspace.test.ts
-    ├── orchestrator/
-    │   ├── file-job-repository.test.ts
-    │   └── job-manager.test.ts
-    ├── storage/
-    │   ├── local-storage.test.ts
-    │   └── s3-storage.test.ts
-    ├── worker/
-    │   ├── aws-handler.test.ts
-    │   └── cloudrun-server.test.ts
-    ├── aws-adapter.test.ts
-    ├── cloudrun-adapter.test.ts
-    ├── command.test.ts
-    ├── job-executor.test.ts
-    ├── placeholder.test.ts
-    ├── render-executor.test.ts
-    ├── stitcher.test.ts
-    └── worker-runtime.test.ts
+├── tests/
+│   ├── adapters/
+│   │   └── local-adapter.test.ts
+│   ├── e2e/
+│   │   └── deterministic-seeking.test.ts
+│   ├── governance/
+│   │   └── sync-workspace.test.ts
+│   ├── orchestrator/
+│   │   ├── file-job-repository.test.ts
+│   │   └── job-manager.test.ts
+│   ├── storage/
+│   │   ├── local-storage.test.ts
+│   │   ├── s3-storage.test.ts
+│   │   └── gcs-storage.test.ts
+│   ├── worker/
+│   │   ├── aws-handler.test.ts
+│   │   └── cloudrun-server.test.ts
+│   ├── aws-adapter.test.ts
+│   ├── cloudrun-adapter.test.ts
+│   ├── command.test.ts
+│   ├── job-executor.test.ts
+│   ├── job-manager.test.ts
+│   ├── placeholder.test.ts
+│   ├── render-executor.test.ts
+│   ├── stitcher.test.ts
+│   └── worker-runtime.test.ts
 ```
 
 ## Section C: Interfaces
 
+### Orchestrator Interfaces
 ```typescript
-// Shared Types (types/job.ts)
-export interface WorkerJob {
-  command: string;
-  args?: string[];
-  cwd?: string;
-  env?: Record<string, string>;
-  timeout?: number;
-  meta?: Record<string, any>;
-  signal?: AbortSignal;
-  onStdout?: (data: string) => void;
-  onStderr?: (data: string) => void;
+interface JobManager {
+  createJob(spec: JobSpec): Promise<JobState>;
+  getJob(id: string): Promise<JobState | null>;
+  listJobs(): Promise<JobState[]>;
+  pauseJob(id: string): Promise<void>;
+  resumeJob(id: string): Promise<void>;
+  cancelJob(id: string): Promise<void>;
+  deleteJob(id: string): Promise<void>;
+  runJob(id: string, options?: JobExecutionOptions): Promise<void>;
 }
 
-// Orchestrator Execution Options (orchestrator/job-executor.ts)
-export interface JobExecutionOptions {
-  completedChunkIds?: number[];
-  concurrency?: number;
-  jobDir?: string;
-  merge?: boolean;
-  retries?: number;
-  retryDelay?: number;
-  onProgress?: (completedChunks: number, totalChunks: number) => void;
-  onChunkComplete?: (chunkId: number, result: WorkerResult) => void | Promise<void>;
-  onChunkStdout?: (chunkId: number, data: string) => void;
-  onChunkStderr?: (chunkId: number, data: string) => void;
-  signal?: AbortSignal;
-  mergeAdapter?: WorkerAdapter;
-  stitcher?: VideoStitcher;
-  outputFile?: string;
-}
-
-export interface WorkerResult {
-  exitCode: number;
-  stdout: string;
-  stderr: string;
-  durationMs: number;
-}
-
-export interface WorkerAdapter {
-  execute(job: WorkerJob): Promise<WorkerResult>;
-}
-
-// Job Orchestration (types/job-spec.ts)
-export interface RenderJobChunk {
-  id: number;
-  command: string;
-  outputFile: string;
-}
-
-export interface JobSpec {
-  id: string;
-  assetsUrl?: string;
-  chunks: RenderJobChunk[];
-  mergeCommand?: string;
-}
-
-// Orchestrator State Persistence (types/orchestrator.ts)
-export type JobState = 'pending' | 'running' | 'completed' | 'failed' | 'cancelled' | 'paused';
-
-export interface JobStatus {
-  id: string;
-  spec: JobSpec;
-  status: JobStatus;
-  createdAt: number;
-  updatedAt: number;
-  completedChunks: number;
-  totalChunks: number;
-  error?: string;
-  result?: string;
-  metrics?: {
-    totalDurationMs: number;
-  };
-  chunkLogs?: Record<number, { stdout: string; stderr: string; durationMs: number }>;
-}
-
-export interface JobRepository {
-  save(state: JobState): Promise<void>;
+interface JobRepository {
   get(id: string): Promise<JobState | null>;
   list(): Promise<JobState[]>;
+  save(state: JobState): Promise<void>;
   delete(id: string): Promise<void>;
 }
 
-// Storage Abstraction (types/storage.ts)
-export interface ArtifactStorage {
+interface JobExecutor {
+  execute(spec: JobSpec, adapter: WorkerAdapter, options: JobExecutionOptions): Promise<WorkerResult>;
+}
+
+interface JobExecutionOptions {
+  concurrency?: number;
+  maxRetries?: number;
+  completedChunkIds?: number[];
+  stitcher?: OutputStitcher;
+  outputFile?: string;
+  mergeCommand?: string;
+  mergeAdapter?: WorkerAdapter;
+  onProgress?: (progress: number) => void;
+  onChunkComplete?: (chunkIndex: number, result: WorkerResult) => void;
+  onChunkStdout?: (chunkIndex: number, chunk: Buffer | string) => void;
+  onChunkStderr?: (chunkIndex: number, chunk: Buffer | string) => void;
+}
+```
+
+### Storage Interfaces
+```typescript
+interface ArtifactStorage {
   uploadAssetBundle(jobId: string, localDir: string): Promise<string>;
   downloadAssetBundle(jobId: string, remoteUrl: string, targetDir: string): Promise<void>;
   deleteAssetBundle(jobId: string, remoteUrl: string): Promise<void>;
 }
+```
 
-export interface S3StorageAdapterOptions extends S3ClientConfig {
-  bucket: string;
+### Adapter and Worker Interfaces
+```typescript
+interface WorkerAdapter {
+  executeChunk(job: WorkerJob, signal?: AbortSignal): Promise<WorkerResult>;
 }
 
-// Governance (governance/sync-workspace.ts)
-export interface SyncOptions {
-  rootDir: string;
+interface WorkerJob {
+  id: string;
+  jobPath: string;
+  chunkIndex: number;
+  totalChunks: number;
+  meta?: Record<string, string>;
+  onStdout?: (chunk: Buffer | string) => void;
+  onStderr?: (chunk: Buffer | string) => void;
 }
 
-export function syncWorkspaceDependencies(options: SyncOptions): Promise<void>;
-
-// Video Stitching (stitcher/index.ts)
-export interface VideoStitcher {
-  stitch(inputFiles: string[], outputFile: string): Promise<void>;
+interface WorkerResult {
+  success: boolean;
+  outputPath?: string;
+  error?: string;
+  exitCode?: number;
 }
+```
 
-// Worker Interfaces (worker/index.ts)
-export interface AwsHandlerConfig {
-  workspaceDir?: string;
+### Worker Runtime Interfaces
+```typescript
+interface WorkerRuntimeOptions {
+  jobPath: string;
+  chunkIndex: number;
+  assetsUrl?: string;
   storage?: ArtifactStorage;
 }
 
-export interface CloudRunServerConfig {
-  workspaceDir?: string;
-  port?: number | string;
-  storage?: ArtifactStorage;
+interface WorkerRuntime {
+  executeChunk(options: WorkerRuntimeOptions): Promise<WorkerResult>;
 }
 ```
 
 ## Section D: Cloud Adapters
-- `LocalStorageAdapter`: Local implementation of `ArtifactStorage` for managing job assets during tests and local executions.
-- `S3StorageAdapter`: AWS S3 implementation of `ArtifactStorage` for uploading and downloading job assets during distributed cloud executions.
-- `LocalWorkerAdapter`: Invokes chunk commands via native `node:child_process.spawn`. Highly used for local rendering or integration/E2E testing (e.g., deterministic frame verifications).
-- `AwsLambdaAdapter`: Translates `WorkerJob` requests to stateless chunk requests passed to AWS Lambda functions utilizing the payload structure via `@aws-sdk/client-lambda`. Wait state natively blocks until job execution completes. Supports dynamic `jobDefUrl` per execution when provided via `job.meta.jobDefUrl`.
-- `CloudRunAdapter`: Proxies HTTP POST requests using `google-auth-library` to an OIDC-secured Google Cloud Run endpoint, delegating discrete execution of rendering chunk pipelines on demand. Supports dynamic `jobDefUrl` per execution.
+- **AwsLambdaAdapter**: Executes rendering chunks dynamically on AWS Lambda. Supports reading `job.meta.jobDefUrl` or constructor configuration (`functionName`).
+- **CloudRunAdapter**: Executes rendering chunks via an HTTP POST request to a Google Cloud Run service (`serviceUrl`). Supports identity-token based authentication via `google-auth-library`.
+- **LocalStorageAdapter**: Simulates remote upload/download/delete logic securely mapped to a local bounded directory to verify distributed state behavior offline.
+- **S3StorageAdapter**: Validates remote URL schemes, handles reliable chunked uploading, listing, and bulk-deleting of assets purely through the standard AWS S3 REST APIs (`@aws-sdk/client-s3`).
+- **GcsStorageAdapter**: Validates remote URL schemes, handles reliable chunked uploading, listing, and bulk-deleting of assets via the official Google Cloud Storage SDK (`@google-cloud/storage`).
 
 ## Section E: Integration
-The infrastructure package acts as an orchestration intermediary. It expects deterministic render targets formatted by the `CLI` or `Studio` to build a `JobSpec`. Specifically:
-1. It does not parse the actual React rendering directly; it spawns CLI executions (`npx helios render ...`).
-2. Cloud adapters serve to "bridge" local orchestrator logic to ephemeral functions, requiring worker-side deployment entrypoints (`WorkerRuntime` + `CloudRun/AWS Lambda Server Handlers`) to download job contexts and process rendering autonomously using the system's `RenderExecutor`.
+- The CLI (`packages/cli`) requires explicit installation of `@helios-project/infrastructure` to utilize advanced remote rendering commands (e.g. `--adapter="lambda"` or `--storage="s3"`).
+- Cloud adapters provide stateless environments. Execution relies on `ArtifactStorage` to map a remote `assetsUrl` locally before `WorkerRuntime` delegates exact frame production to `packages/renderer`.
