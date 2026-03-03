@@ -10,44 +10,45 @@ Key components include:
 
 ## Section B: File Tree
 ```
-packages/infrastructure/
-├── README.md
-├── src/
+packages/infrastructure/src
+├── adapters
+│   ├── aws-adapter.ts
+│   ├── cloudrun-adapter.ts
 │   ├── index.ts
-│   ├── types/
-│   │   ├── worker.ts
-│   │   ├── job.ts
-│   │   └── adapter.ts
-│   ├── worker/
-│   │   ├── index.ts
-│   │   ├── stateless-worker.ts
-│   │   └── frame-worker.ts
-│   ├── orchestrator/
-│   │   ├── index.ts
-│   │   ├── job-manager.ts
-│   │   └── scheduler.ts
-│   ├── stitcher/
-│   │   ├── index.ts
-│   │   └── concat-stitcher.ts
-│   ├── adapters/
-│   │   ├── index.ts
-│   │   ├── local-adapter.ts
-│   │   ├── lambda-adapter.ts
-│   │   └── cloudrun-adapter.ts
-│   ├── storage/
-│   │   ├── index.ts
-│   │   ├── local-storage.ts
-│   │   ├── s3-storage.ts
-│   │   └── gcs-storage.ts
-│   ├── governance/
-│   │   ├── index.ts
-│   │   └── sync-workspace.ts
-│   └── utils/
-│       ├── retry.ts
-│       └── validation.ts
-├── package.json
-├── tsconfig.json
-└── vitest.config.ts
+│   └── local-adapter.ts
+├── governance
+│   ├── index.ts
+│   └── sync-workspace.ts
+├── index.ts
+├── orchestrator
+│   ├── file-job-repository.ts
+│   ├── index.ts
+│   ├── job-executor.ts
+│   └── job-manager.ts
+├── stitcher
+│   ├── ffmpeg-stitcher.ts
+│   └── index.ts
+├── storage
+│   ├── gcs-storage.ts
+│   ├── index.ts
+│   ├── local-storage.ts
+│   └── s3-storage.ts
+├── types
+│   ├── adapter.ts
+│   ├── index.ts
+│   ├── job-spec.ts
+│   ├── job-status.ts
+│   ├── job.ts
+│   └── storage.ts
+├── utils
+│   ├── command.ts
+│   └── index.ts
+└── worker
+    ├── aws-handler.ts
+    ├── cloudrun-server.ts
+    ├── index.ts
+    ├── render-executor.ts
+    └── runtime.ts
 ```
 
 ## Section C: Interfaces

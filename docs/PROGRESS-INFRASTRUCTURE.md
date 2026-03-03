@@ -1,5 +1,8 @@
 # INFRASTRUCTURE PROGRESS
 
+### INFRASTRUCTURE v0.28.2
+- ✅ Completed: GCS Storage Tests - Added test coverage for `GcsStorageAdapter` handling artifact uploads and downloads using Google Cloud Storage.
+
 ### INFRASTRUCTURE v0.28.0
 - ✅ Completed: GCS Storage Adapter - Implemented an `GcsStorageAdapter` to handle artifact uploads and downloads using Google Cloud Storage.
 
