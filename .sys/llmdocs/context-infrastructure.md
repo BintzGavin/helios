@@ -11,6 +11,10 @@ The infrastructure architecture manages distributed rendering through three main
 packages/infrastructure/
 ├── README.md
 ├── package.json
+├── examples
+│   ├── gcs-storage.ts
+│   ├── local-storage.ts
+│   └── s3-storage.ts
 ├── src
 │   ├── adapters
 │   │   ├── aws-adapter.ts
