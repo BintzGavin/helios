@@ -13,6 +13,7 @@ packages/infrastructure/
 ├── package.json
 ├── examples
 │   ├── aws-lambda.ts
+│   ├── cloudrun.ts
 │   ├── gcs-storage.ts
 │   ├── local-storage.ts
 │   └── s3-storage.ts
