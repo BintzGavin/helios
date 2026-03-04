@@ -1,5 +1,8 @@
 # INFRASTRUCTURE PROGRESS
 
+## INFRASTRUCTURE v0.36.2
+- ✅ Completed: Benchmarks - Added performance benchmarks for `JobManager` and `LocalStorageAdapter` using `vitest bench`.
+
 ## INFRASTRUCTURE v0.36.1
 - ✅ Completed: Governance Docs - Updated README.md to document the governance module and `syncWorkspaceDependencies`.
 
