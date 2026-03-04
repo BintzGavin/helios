@@ -1,7 +1,8 @@
 # INFRASTRUCTURE STATUS
-**Version**: 0.36.1
+**Version**: 0.36.2
 
 ## Status Log
+- [v0.36.2] ✅ Completed: Benchmarks - Added performance benchmarks for `JobManager` and `LocalStorageAdapter` using `vitest bench`.
 - [v0.36.1] ✅ Completed: Governance Docs - Updated README.md to document the governance module and `syncWorkspaceDependencies`.
 - [v0.36.0] ✅ Completed: Governance Docs Spec - Created spec for documenting the governance module.
 - [v0.35.0] ✅ Completed: JobExecutor Example - Created an example script demonstrating the standalone use of `JobExecutor` for custom orchestration logic.

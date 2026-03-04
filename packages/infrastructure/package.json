@@ -21,6 +21,7 @@
     "build": "tsc",
     "dev": "tsc -w",
     "test": "vitest",
+    "bench": "vitest bench",
     "lint": "tsc --noEmit"
   },
   "devDependencies": {

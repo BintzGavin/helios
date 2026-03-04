@@ -50,6 +50,10 @@ packages/infrastructure/
 │   │   └── sync-workspace.ts
 │   └── utils/
 │       └── command.ts
+├── tests/
+│   ├── benchmarks/
+│   │   ├── job-manager.bench.ts
+│   │   └── local-storage.bench.ts
 ```
 
 ## Section C: Interfaces
