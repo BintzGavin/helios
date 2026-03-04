@@ -1,5 +1,8 @@
 # INFRASTRUCTURE PROGRESS
 
+## INFRASTRUCTURE v0.32.0
+- ✅ Completed: Cloud Run Example - Created an example script demonstrating the use of `CloudRunAdapter` with `JobManager` for simulated distributed rendering.
+
 ## INFRASTRUCTURE v0.31.0
 - ✅ Completed: AWS Lambda Example - Created an example script demonstrating the use of `AwsLambdaAdapter` with `JobManager` for simulated distributed rendering.
 
