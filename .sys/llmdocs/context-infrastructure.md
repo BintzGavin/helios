@@ -137,4 +137,5 @@ The Infrastructure layer integrates with:
 - **Renderer**: Orchestrates rendering via CLI execution.
 - **CLI**: Consumes the Orchestrator (`JobManager`, `JobExecutor`) and Governance Tooling to launch distributed rendering jobs and enforce monorepo checks.
 ## Section F: Recent Updates
+- **V0.33.1**: AWS Lambda Example - Verified and improved the example script demonstrating the use of AwsLambdaAdapter with JobManager for distributed rendering.
 - **V0.33.0**: Dynamic JobSpec Storage Spec - Created spec for dynamic JobSpec storage gap to ensure remote job configurations are cleaned up.

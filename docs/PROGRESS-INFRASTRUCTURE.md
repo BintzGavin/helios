@@ -1,5 +1,8 @@
 # INFRASTRUCTURE PROGRESS
 
+## INFRASTRUCTURE v0.33.1
+- ✅ Completed: AWS Lambda Example - Verified and improved the example script demonstrating the use of AwsLambdaAdapter with JobManager for distributed rendering.
+
 ## INFRASTRUCTURE v0.33.0
 - ✅ Completed: Dynamic JobSpec Storage Spec - Created spec for dynamic JobSpec storage gap to ensure remote job configurations are cleaned up.
 
