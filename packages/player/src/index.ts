@@ -1844,7 +1844,7 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
   }
 
   private toggleSettingsMenu = (e: MouseEvent) => {
-    e.stopPropagation();
+    if (e && e.stopPropagation) e.stopPropagation();
     if (this.settingsMenu.classList.contains("hidden")) {
       this.closeAudioMenu(); // Close other menu
       this.closeExportMenu();
@@ -1892,7 +1892,7 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
   }
 
   private toggleExportMenu = (e: MouseEvent) => {
-    e.stopPropagation();
+    if (e && e.stopPropagation) e.stopPropagation();
     if (this.exportMenu.classList.contains("hidden")) {
       this.closeAudioMenu();
       this.closeSettingsMenu();
