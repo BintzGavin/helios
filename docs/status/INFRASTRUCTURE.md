@@ -1,7 +1,8 @@
 # INFRASTRUCTURE STATUS
-**Version**: 0.30.2
+**Version**: 0.31.0
 
 ## Status Log
+- [v0.31.0] ✅ Completed: AWS Lambda Example - Created an example script demonstrating the use of `AwsLambdaAdapter` with `JobManager` for simulated distributed rendering.
 - [v0.30.2] ✅ Completed: Local Storage Example - Created an example script demonstrating the use of `LocalStorageAdapter` with `JobManager` for simulated local distributed rendering.
 - [v0.30.1] ✅ Completed: GCS Artifact Storage Example - Created an example script demonstrating the use of `GcsStorageAdapter` with `JobManager` for cloud-based distributed rendering.
 - [v0.30.0] ✅ Completed: S3 Artifact Storage Example - Created an example script demonstrating the use of `S3StorageAdapter` with `JobManager` for cloud-based distributed rendering.

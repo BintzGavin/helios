@@ -1,5 +1,8 @@
 # INFRASTRUCTURE PROGRESS
 
+## INFRASTRUCTURE v0.31.0
+- ✅ Completed: AWS Lambda Example - Created an example script demonstrating the use of `AwsLambdaAdapter` with `JobManager` for simulated distributed rendering.
+
 ## INFRASTRUCTURE v0.30.2
 - ✅ Completed: Local Storage Example - Created an example script demonstrating the use of `LocalStorageAdapter` with `JobManager` for simulated local distributed rendering.
 
