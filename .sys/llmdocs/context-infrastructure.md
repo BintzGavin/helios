@@ -12,6 +12,7 @@ packages/infrastructure/
 ├── README.md
 ├── package.json
 ├── examples
+│   ├── aws-lambda.ts
 │   ├── gcs-storage.ts
 │   ├── local-storage.ts
 │   └── s3-storage.ts
