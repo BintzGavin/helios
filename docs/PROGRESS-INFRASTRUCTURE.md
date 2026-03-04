@@ -1,5 +1,8 @@
 # INFRASTRUCTURE PROGRESS
 
+## INFRASTRUCTURE v0.37.0
+- ✅ Completed: WorkerRuntime Example - Created an example script demonstrating the standalone use of `WorkerRuntime` for custom cloud environments.
+
 ## INFRASTRUCTURE v0.36.2
 - ✅ Completed: Benchmarks - Added performance benchmarks for `JobManager` and `LocalStorageAdapter` using `vitest bench`.
 

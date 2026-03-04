@@ -12,6 +12,14 @@ The infrastructure package provides orchestration and execution logic for distri
 ## Section B: File Tree
 ```
 packages/infrastructure/
+├── examples/
+│   ├── aws-lambda.ts
+│   ├── cloudrun.ts
+│   ├── gcs-storage.ts
+│   ├── job-executor-standalone.ts
+│   ├── local-storage.ts
+│   ├── s3-storage.ts
+│   └── worker-runtime.ts
 ├── src/
 │   ├── index.ts
 │   ├── types/
