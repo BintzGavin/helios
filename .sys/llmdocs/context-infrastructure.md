@@ -49,6 +49,8 @@ packages/infrastructure/
 │       ├── index.ts
 │       ├── render-executor.ts
 │       └── runtime.ts
+├── examples
+│   └── s3-storage.ts
 ├── tests
 │   ├── adapters
 │   │   └── local-adapter.test.ts
