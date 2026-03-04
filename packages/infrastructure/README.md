@@ -44,5 +44,6 @@ The following adapters are provided:
 
 ### Governance Tooling
 
-Governance tooling provides utilities to enforce rules and maintain project integrity.
-- **Workspace Dependency Synchronizer**: Utilities to synchronize monorepo workspace dependencies, ensuring consistent versions are used during test processes and operations without breaking package boundaries.
+Governance tooling provides utilities to enforce rules and maintain project integrity, adhering strictly to the "DEPENDENCY GOVERNANCE" law defined in the project's architectural guidelines. The guidelines state that agents are prohibited from manually synchronizing internal package versions, and that internal version propagation is handled by deterministic release tooling.
+
+- **Workspace Dependency Synchronizer (`syncWorkspaceDependencies`)**: A bounded utility to automatically synchronize monorepo workspace package versions (e.g., dependencies on `@helios-project/*`) within constrained directories (like test fixtures or temporary build paths). This ensures consistent versions are used during test processes and operations without requiring manual agent intervention or breaking strict cross-package domain boundaries.

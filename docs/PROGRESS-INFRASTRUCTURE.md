@@ -1,5 +1,8 @@
 # INFRASTRUCTURE PROGRESS
 
+## INFRASTRUCTURE v0.36.1
+- ✅ Completed: Governance Docs - Updated README.md to document the governance module and `syncWorkspaceDependencies`.
+
 ## INFRASTRUCTURE v0.36.0
 - ✅ Completed: Governance Docs Spec - Created spec for documenting the governance module.
 
