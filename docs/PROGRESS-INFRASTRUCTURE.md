@@ -1,5 +1,8 @@
 # INFRASTRUCTURE PROGRESS
 
+## INFRASTRUCTURE v0.30.1
+- ✅ Completed: GCS Artifact Storage Example - Created an example script demonstrating the use of `GcsStorageAdapter` with `JobManager` for cloud-based distributed rendering.
+
 ## INFRASTRUCTURE v0.30.0
 - ✅ Completed: S3 Artifact Storage Example - Created an example script demonstrating the use of `S3StorageAdapter` with `JobManager` for cloud-based distributed rendering.
 

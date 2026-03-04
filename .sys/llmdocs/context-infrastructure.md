@@ -50,6 +50,7 @@ packages/infrastructure/
 │       ├── render-executor.ts
 │       └── runtime.ts
 ├── examples
+│   ├── gcs-storage.ts
 │   └── s3-storage.ts
 ├── tests
 │   ├── adapters
