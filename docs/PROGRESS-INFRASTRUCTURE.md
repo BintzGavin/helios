@@ -1,5 +1,8 @@
 # INFRASTRUCTURE PROGRESS
 
+## INFRASTRUCTURE v0.30.2
+- ✅ Completed: Local Storage Example - Created an example script demonstrating the use of `LocalStorageAdapter` with `JobManager` for simulated local distributed rendering.
+
 ## INFRASTRUCTURE v0.30.1
 - ✅ Completed: GCS Artifact Storage Example - Created an example script demonstrating the use of `GcsStorageAdapter` with `JobManager` for cloud-based distributed rendering.
 
