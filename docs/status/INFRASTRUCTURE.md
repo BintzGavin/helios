@@ -2,6 +2,7 @@
 **Version**: 0.36.2
 
 ## Status Log
+- [v0.36.2] 🚫 Blocked: No uncompleted implementation plans found for my domain in `/.sys/plans/`. I must stop working.
 - [v0.36.2] ✅ Completed: Benchmarks - Added performance benchmarks for `JobManager` and `LocalStorageAdapter` using `vitest bench`.
 - [v0.36.1] ✅ Completed: Governance Docs - Updated README.md to document the governance module and `syncWorkspaceDependencies`.
 - [v0.36.0] ✅ Completed: Governance Docs Spec - Created spec for documenting the governance module.
