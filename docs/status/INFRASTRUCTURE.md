@@ -1,7 +1,8 @@
 # INFRASTRUCTURE STATUS
-**Version**: 0.32.0
+**Version**: 0.33.0
 
 ## Status Log
+- [v0.33.0] ✅ Completed: Dynamic JobSpec Storage Spec - Created spec for dynamic JobSpec storage gap to ensure remote job configurations are cleaned up.
 - [v0.32.0] ✅ Completed: Cloud Run Example - Created an example script demonstrating the use of `CloudRunAdapter` with `JobManager` for simulated distributed rendering.
 - [v0.31.0] ✅ Completed: AWS Lambda Example - Created an example script demonstrating the use of `AwsLambdaAdapter` with `JobManager` for simulated distributed rendering.
 - [v0.30.2] ✅ Completed: Local Storage Example - Created an example script demonstrating the use of `LocalStorageAdapter` with `JobManager` for simulated local distributed rendering.
