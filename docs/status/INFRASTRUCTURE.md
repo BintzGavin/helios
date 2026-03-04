@@ -1,7 +1,8 @@
 # INFRASTRUCTURE STATUS
-**Version**: 0.35.0
+**Version**: 0.36.0
 
 ## Status Log
+- [v0.36.0] ✅ Completed: Governance Docs Spec - Created spec for documenting the governance module.
 - [v0.35.0] ✅ Completed: JobExecutor Example - Created an example script demonstrating the standalone use of `JobExecutor` for custom orchestration logic.
 - [v0.34.1] 🚫 Blocked: No uncompleted implementation plans found for my domain in `/.sys/plans/`. I must stop working.
 - [v0.34.0] ✅ Completed: Benchmarks Spec - Created spec for adding performance benchmarks to the infrastructure package.

@@ -1,5 +1,8 @@
 # INFRASTRUCTURE PROGRESS
 
+## INFRASTRUCTURE v0.36.0
+- ✅ Completed: Governance Docs Spec - Created spec for documenting the governance module.
+
 ## INFRASTRUCTURE v0.35.0
 - ✅ Completed: JobExecutor Example - Created an example script demonstrating the standalone use of `JobExecutor` for custom orchestration logic.
 
