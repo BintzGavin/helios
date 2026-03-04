@@ -1,5 +1,8 @@
 # INFRASTRUCTURE PROGRESS
 
+## INFRASTRUCTURE v0.35.0
+- ✅ Completed: JobExecutor Example - Created an example script demonstrating the standalone use of `JobExecutor` for custom orchestration logic.
+
 ## INFRASTRUCTURE v0.34.0
 - ✅ Completed: Benchmarks Spec - Created spec for adding performance benchmarks to the infrastructure package.
 
