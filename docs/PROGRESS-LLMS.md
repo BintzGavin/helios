@@ -1,5 +1,12 @@
 # LLMS Progress
 
+## LLMS v1.31.0
+- ✅ Completed: Daily llms.txt Review
+  - Fixed version drift in Quick Facts section (Studio to v0.107.1+, Renderer to v1.78.0+, CLI to v0.32.0+, Infrastructure to v0.24.0+).
+  - Cleaned up V1.x Roadmap to list only actual features from `package.json` current versions.
+  - Aligned features in Roadmap precisely with `docs/status` logs corresponding to current versions.
+  - Verified no missing package files or incorrect versions.
+
 ## LLMS v1.30.0
 - ✅ Completed: Daily llms.txt Review
   - Updated Quick Facts:
