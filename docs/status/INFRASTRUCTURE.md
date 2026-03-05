@@ -1,7 +1,8 @@
 # INFRASTRUCTURE STATUS
-**Version**: 0.37.5
+**Version**: 0.37.6
 
 ## Status Log
+- [v0.37.6] ✅ Completed: Fix Storage Adapter Bench - Fixed missing directory errors during vitest bench execution for S3StorageAdapter and GcsStorageAdapter by moving setup/teardown logic to standard beforeAll/afterAll hooks.
 - [v0.37.5] ✅ Completed: GCS Storage Benchmark - Implemented performance benchmarks for GcsStorageAdapter.
 - [v0.37.4] ✅ Completed: GCS Storage Benchmark Spec - Created spec for adding performance benchmarks to the GcsStorageAdapter.
 - [v0.37.3] ✅ Completed: S3 Storage Benchmark - Implemented performance benchmarks for S3StorageAdapter.

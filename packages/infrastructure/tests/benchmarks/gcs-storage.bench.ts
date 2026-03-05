@@ -1,4 +1,4 @@
-import { bench, describe } from 'vitest';
+import { bench, describe, beforeAll, afterAll } from 'vitest';
 import { GcsStorageAdapter } from '../../src/storage/gcs-storage.js';
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -46,20 +46,18 @@ describe('GcsStorageAdapter IO Benchmark', () => {
       } catch {}
     };
 
-    const uploadAssetBundle = async () => {
-      try {
-        await adapter1MB.uploadAssetBundle(jobId1MB, localDir1MB);
-      } catch (e) {
-        // ignore if it doesn't exist during the final tear down iteration
-      }
-    };
+    beforeAll(async () => {
+      await setup1MB();
+    });
+
+    afterAll(async () => {
+      await teardown1MB();
+    });
 
     bench('GcsStorageAdapter.uploadAssetBundle - 1MB', async () => {
-      await uploadAssetBundle();
+      await adapter1MB.uploadAssetBundle(jobId1MB, localDir1MB);
     }, {
-      time: 500,
-      setup: setup1MB,
-      teardown: teardown1MB
+      time: 500
     });
   });
 
@@ -95,20 +93,18 @@ describe('GcsStorageAdapter IO Benchmark', () => {
       } catch {}
     };
 
-    const uploadAssetBundle = async () => {
-      try {
-        await adapter10MB.uploadAssetBundle(jobId10MB, localDir10MB);
-      } catch (e) {
-        // ignore if it doesn't exist during the final tear down iteration
-      }
-    };
+    beforeAll(async () => {
+      await setup10MB();
+    });
+
+    afterAll(async () => {
+      await teardown10MB();
+    });
 
     bench('GcsStorageAdapter.uploadAssetBundle - 10MB', async () => {
-      await uploadAssetBundle();
+      await adapter10MB.uploadAssetBundle(jobId10MB, localDir10MB);
     }, {
-      time: 500,
-      setup: setup10MB,
-      teardown: teardown10MB
+      time: 500
     });
   });
 
