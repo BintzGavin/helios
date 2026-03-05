@@ -2,6 +2,10 @@
 
 This file tracks progress for the CLI domain (`packages/cli`).
 
+## CLI v0.36.3
+
+- ✅ Remove Command Regression Tests - Implemented comprehensive unit tests for `helios remove`.
+
 ## CLI v0.36.2
 
 - ✅ Init Command Tests Spec - Created specification plan for implementing regression tests for the `helios init` command to ensure scaffolding stability.
