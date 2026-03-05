@@ -1,4 +1,4 @@
-import { bench, describe } from 'vitest';
+import { bench, describe, beforeAll, afterAll } from 'vitest';
 import { S3StorageAdapter } from '../../src/storage/s3-storage.js';
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -48,12 +48,18 @@ describe('S3StorageAdapter IO Benchmark', () => {
       } catch {}
     };
 
+    beforeAll(async () => {
+      await setup1MB();
+    });
+
+    afterAll(async () => {
+      await teardown1MB();
+    });
+
     bench('S3StorageAdapter.uploadAssetBundle - 1MB', async () => {
       await adapter1MB.uploadAssetBundle(jobId1MB, localDir1MB);
     }, {
-      time: 500,
-      setup: setup1MB,
-      teardown: teardown1MB
+      time: 500
     });
   });
 
@@ -91,12 +97,18 @@ describe('S3StorageAdapter IO Benchmark', () => {
       } catch {}
     };
 
+    beforeAll(async () => {
+      await setup10MB();
+    });
+
+    afterAll(async () => {
+      await teardown10MB();
+    });
+
     bench('S3StorageAdapter.uploadAssetBundle - 10MB', async () => {
       await adapter10MB.uploadAssetBundle(jobId10MB, localDir10MB);
     }, {
-      time: 500,
-      setup: setup10MB,
-      teardown: teardown10MB
+      time: 500
     });
   });
 
