@@ -1706,7 +1706,8 @@ export class HeliosPlayer extends HTMLElement {
         }
     }
     toggleAudioMenu = (e) => {
-        e.stopPropagation();
+        if (e && e.stopPropagation)
+            e.stopPropagation();
         if (this.audioMenu.classList.contains("hidden")) {
             this.closeSettingsMenu(); // Close other menu
             this.closeExportMenu();
@@ -1727,7 +1728,8 @@ export class HeliosPlayer extends HTMLElement {
         this.audioBtn.setAttribute("aria-expanded", "false");
     };
     toggleSettingsMenu = (e) => {
-        e.stopPropagation();
+        if (e && e.stopPropagation)
+            e.stopPropagation();
         if (this.settingsMenu.classList.contains("hidden")) {
             this.closeAudioMenu(); // Close other menu
             this.closeExportMenu();
@@ -1770,7 +1772,8 @@ export class HeliosPlayer extends HTMLElement {
         this.closeAudioMenu();
     };
     toggleExportMenu = (e) => {
-        e.stopPropagation();
+        if (e && e.stopPropagation)
+            e.stopPropagation();
         if (this.exportMenu.classList.contains("hidden")) {
             this.closeAudioMenu();
             this.closeSettingsMenu();
@@ -2050,20 +2053,23 @@ export class HeliosPlayer extends HTMLElement {
             volumeSlider.value = String(currentVolume);
             volumeSlider.ariaLabel = `Volume for ${name.textContent}`;
             volumeSlider.addEventListener("input", (e) => {
-                e.stopPropagation();
+                if (e && e.stopPropagation)
+                    e.stopPropagation();
                 const vol = parseFloat(volumeSlider.value);
                 if (this.controller) {
                     this.controller.setAudioTrackVolume(track.id, vol);
                 }
             });
-            volumeSlider.addEventListener("click", e => e.stopPropagation());
+            volumeSlider.addEventListener("click", e => { if (e && e.stopPropagation)
+                e.stopPropagation(); });
             const muteBtn = document.createElement("button");
             muteBtn.className = "track-mute-btn";
             muteBtn.innerHTML = track.enabled ? ICONS.volumeHigh : ICONS.volumeMuted;
             muteBtn.title = track.enabled ? "Mute" : "Unmute";
             muteBtn.ariaLabel = muteBtn.title;
             muteBtn.addEventListener("click", (e) => {
-                e.stopPropagation();
+                if (e && e.stopPropagation)
+                    e.stopPropagation();
                 track.enabled = !track.enabled;
                 // UI update is handled by the 'change' event listener on _audioTracks calling renderAudioMenu
                 // but for immediate feedback we can update button here too, though renderAudioMenu will overwrite it.
@@ -2645,22 +2651,26 @@ export class HeliosPlayer extends HTMLElement {
             return;
         if (e.key === "Escape") {
             if (!this.audioMenu.classList.contains("hidden")) {
-                e.stopPropagation();
+                if (e && e.stopPropagation)
+                    e.stopPropagation();
                 this.closeAudioMenu();
                 this.audioBtn.focus();
             }
             if (!this.settingsMenu.classList.contains("hidden")) {
-                e.stopPropagation();
+                if (e && e.stopPropagation)
+                    e.stopPropagation();
                 this.closeSettingsMenu();
                 this.settingsBtn.focus();
             }
             if (!this.exportMenu.classList.contains("hidden")) {
-                e.stopPropagation();
+                if (e && e.stopPropagation)
+                    e.stopPropagation();
                 this.closeExportMenu();
                 this.exportBtn.focus();
             }
             if (!this.shortcutsOverlay.classList.contains("hidden")) {
-                e.stopPropagation();
+                if (e && e.stopPropagation)
+                    e.stopPropagation();
                 this.toggleShortcutsOverlay();
             }
             return;
@@ -2944,7 +2954,8 @@ export class HeliosPlayer extends HTMLElement {
                             el.style.backgroundColor = marker.color;
                         el.title = marker.label || "";
                         el.addEventListener("click", (e) => {
-                            e.stopPropagation();
+                            if (e && e.stopPropagation)
+                                e.stopPropagation();
                             if (this.controller) {
                                 this.controller.seek(Math.floor(marker.time * state.fps));
                             }

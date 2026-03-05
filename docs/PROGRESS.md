@@ -78,6 +78,9 @@ Each agent should update **their own dedicated progress file** instead of this f
 ### CLI v0.31.0
 - ✅ Completed: AWS Deployment - Implemented AWS Lambda deployment scaffolding and custom browser path support.
 
+### PLAYER v0.76.15
+- ✅ Completed: Add Regression Tests - Confirmed existence of tests for API parity (seeking, state persistence) and interactions (export parameters) per `2026-11-24-PLAYER-Regression-Tests.md`. All tests are passing.
+
 ### PLAYER v0.76.14
 - ✅ Completed: Add Regression Tests - Add tests for API parity (seeking, state persistence) and interactions (export parameters, UI menu bugfixes)
 
