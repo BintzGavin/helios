@@ -65,3 +65,7 @@ Critical learnings only. This is not a log—only add entries for insights that 
 ## 0.28.3 - Dynamic JobSpec Storage Gap
 **Learning:** Remote cloud workers fail to fetch dynamically updated `JobSpec` configurations because `JobManager` does not persist the updated spec (containing the new `assetsUrl`) to a shared `ArtifactStorage` URL before dispatching the execution. While local assets were being uploaded, the actual JSON `JobSpec` instruction file was not, leaving the cloud execution adapter stranded with a stale or unresolvable local path.
 **Action:** Plan to add `uploadJobSpec` to `ArtifactStorage` and integrate it into `JobManager.runJob` to ensure stateless workers receive accurate, dynamic job definitions.
+
+## 0.24.0 - Vitest Bench Options Side-Effects
+**Learning:** In Vitest benchmarks (`vitest bench`), using `setup` and `teardown` options within the `bench()` configuration executes multiple times in the hot loop. This causes race conditions, missing directories, or disk bloat when setting up heavy file systems or directories.
+**Action:** Place heavy setup operations in standard `beforeAll` and `afterAll` hooks outside the benchmark block instead to avoid side-effects and crashes.
