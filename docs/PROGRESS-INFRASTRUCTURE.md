@@ -1,5 +1,8 @@
 # INFRASTRUCTURE PROGRESS
 
+## INFRASTRUCTURE v0.37.3
+- ✅ Completed: S3 Storage Benchmark - Implemented performance benchmarks for S3StorageAdapter.
+
 ## INFRASTRUCTURE v0.37.2
 - ✅ Completed: S3 Storage Benchmark Spec - Created spec for adding performance benchmarks to the S3StorageAdapter.
 

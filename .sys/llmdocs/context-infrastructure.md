@@ -80,3 +80,6 @@ packages/infrastructure/
 - Consumed by `CLI` for executing remote jobs via `JobManager`.
 - Exposes generated runtime entrypoints (`createAwsHandler`, `createCloudRunServer`) for platform deployment.
 - Uses `ArtifactStorage` interfaces to transparently load remote job assets from platforms like S3 and GCS prior to render execution.
+
+## Benchmark Support
+The package includes automated IO benchmarks that can be run with `vitest bench` to evaluate the performance of core adapters and orchestrators like `LocalStorageAdapter` and `S3StorageAdapter`.
