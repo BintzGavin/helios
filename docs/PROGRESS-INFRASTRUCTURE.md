@@ -1,5 +1,8 @@
 # INFRASTRUCTURE PROGRESS
 
+## INFRASTRUCTURE v0.37.8
+- ✅ Completed: Fix Local Storage Bench - Fixed missing directory errors during vitest bench execution for LocalStorageAdapter by moving setup/teardown logic to standard beforeAll/afterAll hooks.
+
 ## INFRASTRUCTURE v0.37.7
 - ✅ Completed: Fix Local Storage Bench Spec - Created spec for fixing missing directory errors in the LocalStorageAdapter benchmark.
 
