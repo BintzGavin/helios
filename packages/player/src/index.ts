@@ -1821,7 +1821,7 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
   }
 
   private toggleAudioMenu = (e: MouseEvent) => {
-    e.stopPropagation();
+    if (e && e.stopPropagation) e.stopPropagation();
     if (this.audioMenu.classList.contains("hidden")) {
       this.closeSettingsMenu(); // Close other menu
       this.closeExportMenu();
@@ -2214,14 +2214,14 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
       volumeSlider.ariaLabel = `Volume for ${name.textContent}`;
 
       volumeSlider.addEventListener("input", (e) => {
-          e.stopPropagation();
+          if (e && e.stopPropagation) e.stopPropagation();
           const vol = parseFloat(volumeSlider.value);
           if (this.controller) {
               this.controller.setAudioTrackVolume(track.id, vol);
           }
       });
 
-      volumeSlider.addEventListener("click", e => e.stopPropagation());
+      volumeSlider.addEventListener("click", e => { if (e && e.stopPropagation) e.stopPropagation(); });
 
       const muteBtn = document.createElement("button");
       muteBtn.className = "track-mute-btn";
@@ -2230,7 +2230,7 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
       muteBtn.ariaLabel = muteBtn.title;
 
       muteBtn.addEventListener("click", (e) => {
-          e.stopPropagation();
+          if (e && e.stopPropagation) e.stopPropagation();
           track.enabled = !track.enabled;
           // UI update is handled by the 'change' event listener on _audioTracks calling renderAudioMenu
           // but for immediate feedback we can update button here too, though renderAudioMenu will overwrite it.
@@ -2879,22 +2879,22 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
 
     if (e.key === "Escape") {
       if (!this.audioMenu.classList.contains("hidden")) {
-        e.stopPropagation();
+        if (e && e.stopPropagation) e.stopPropagation();
         this.closeAudioMenu();
         this.audioBtn.focus();
       }
       if (!this.settingsMenu.classList.contains("hidden")) {
-          e.stopPropagation();
+          if (e && e.stopPropagation) e.stopPropagation();
           this.closeSettingsMenu();
           this.settingsBtn.focus();
       }
       if (!this.exportMenu.classList.contains("hidden")) {
-          e.stopPropagation();
+          if (e && e.stopPropagation) e.stopPropagation();
           this.closeExportMenu();
           this.exportBtn.focus();
       }
       if (!this.shortcutsOverlay.classList.contains("hidden")) {
-          e.stopPropagation();
+          if (e && e.stopPropagation) e.stopPropagation();
           this.toggleShortcutsOverlay();
       }
       return;
@@ -3203,7 +3203,7 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
               el.title = marker.label || "";
 
               el.addEventListener("click", (e) => {
-                e.stopPropagation();
+                if (e && e.stopPropagation) e.stopPropagation();
                 if (this.controller) {
                   this.controller.seek(Math.floor(marker.time * state.fps));
                 }
