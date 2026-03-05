@@ -1,5 +1,8 @@
 # INFRASTRUCTURE PROGRESS
 
+## INFRASTRUCTURE v0.37.12
+- ✅ Completed: JobExecutor Benchmark - Implemented performance benchmarks for JobExecutor.
+
 ## INFRASTRUCTURE v0.37.11
 - ✅ Completed: FileJobRepository Benchmark - Implemented performance benchmarks for FileJobRepository.
 
