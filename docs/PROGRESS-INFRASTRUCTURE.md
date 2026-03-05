@@ -1,5 +1,8 @@
 # INFRASTRUCTURE PROGRESS
 
+## INFRASTRUCTURE v0.37.9
+- ✅ Completed: FileJobRepository Benchmark Spec - Created spec for adding performance benchmarks to the FileJobRepository.
+
 ## INFRASTRUCTURE v0.37.8
 - ✅ Completed: Fix Local Storage Bench - Fixed missing directory errors during vitest bench execution for LocalStorageAdapter by moving setup/teardown logic to standard beforeAll/afterAll hooks.
 
