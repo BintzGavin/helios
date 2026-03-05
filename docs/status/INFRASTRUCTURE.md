@@ -1,7 +1,8 @@
 # INFRASTRUCTURE STATUS
-**Version**: 0.37.2
+**Version**: 0.37.3
 
 ## Status Log
+- [v0.37.3] ✅ Completed: S3 Storage Benchmark - Implemented performance benchmarks for S3StorageAdapter.
 - [v0.37.2] ✅ Completed: S3 Storage Benchmark Spec - Created spec for adding performance benchmarks to the S3StorageAdapter.
 - [v0.37.1] ✅ Completed: Output Stitcher Docs Example - Created an example script demonstrating the standalone use of `FfmpegStitcher` and documented the Video Stitching abstractions.
 - [v0.37.0] ✅ Completed: WorkerRuntime Example - Created an example script demonstrating the standalone use of `WorkerRuntime` for custom cloud environments.
