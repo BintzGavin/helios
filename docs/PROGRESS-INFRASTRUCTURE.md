@@ -1,5 +1,8 @@
 # INFRASTRUCTURE PROGRESS
 
+## INFRASTRUCTURE v0.37.5
+- ✅ Completed: GCS Storage Benchmark - Implemented performance benchmarks for GcsStorageAdapter.
+
 ## INFRASTRUCTURE v0.37.4
 - ✅ Completed: GCS Storage Benchmark Spec - Created spec for adding performance benchmarks to the GcsStorageAdapter.
 

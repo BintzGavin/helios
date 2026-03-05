@@ -1,7 +1,8 @@
 # INFRASTRUCTURE STATUS
-**Version**: 0.37.4
+**Version**: 0.37.5
 
 ## Status Log
+- [v0.37.5] ✅ Completed: GCS Storage Benchmark - Implemented performance benchmarks for GcsStorageAdapter.
 - [v0.37.4] ✅ Completed: GCS Storage Benchmark Spec - Created spec for adding performance benchmarks to the GcsStorageAdapter.
 - [v0.37.3] ✅ Completed: S3 Storage Benchmark - Implemented performance benchmarks for S3StorageAdapter.
 - [v0.37.2] ✅ Completed: S3 Storage Benchmark Spec - Created spec for adding performance benchmarks to the S3StorageAdapter.

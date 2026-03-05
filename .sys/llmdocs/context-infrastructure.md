@@ -82,4 +82,4 @@ packages/infrastructure/
 - Uses `ArtifactStorage` interfaces to transparently load remote job assets from platforms like S3 and GCS prior to render execution.
 
 ## Benchmark Support
-The package includes automated IO benchmarks that can be run with `vitest bench` to evaluate the performance of core adapters and orchestrators like `LocalStorageAdapter` and `S3StorageAdapter`.
+The package includes automated IO benchmarks that can be run with `vitest bench` to evaluate the performance of core adapters and orchestrators like `LocalStorageAdapter`, `S3StorageAdapter`, and `GcsStorageAdapter`.
