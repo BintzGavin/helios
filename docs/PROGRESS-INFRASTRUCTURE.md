@@ -1,5 +1,8 @@
 # INFRASTRUCTURE PROGRESS
 
+## INFRASTRUCTURE v0.37.1
+- ✅ Completed: Output Stitcher Docs Example - Created an example script demonstrating the standalone use of `FfmpegStitcher` and documented the Video Stitching abstractions.
+
 ## INFRASTRUCTURE v0.37.0
 - ✅ Completed: WorkerRuntime Example - Created an example script demonstrating the standalone use of `WorkerRuntime` for custom cloud environments.
 
