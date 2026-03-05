@@ -41,6 +41,19 @@ Helios must support distributed rendering suitable for cloud execution.
 - Output stitching without re-encoding where possible
 *Local-only rendering is insufficient for V2 goals.*
 
+**Vision: Cloudflare Sandbox Distributed Rendering**
+While AWS Lambda and Google Cloud Run provide robust remote rendering capabilities, an emerging vision for the `infrastructure` package is **Cloudflare Sandbox Distributed Rendering**.
+*Cloudflare Constraints:*
+- Maximum of 5 sandboxes running in parallel on largest compute tier.
+- Each sandbox can reliably render a 3-4 second video clip.
+
+*Orchestration Architecture:*
+1. **Micro-Chunking**: Compositions are split into strict 3-4 second sequences.
+2. **Queue-Based Orchestration**: Sequences exceeding 5 chunks use **Cloudflare Queues** to enqueue tasks.
+3. **Rolling Execution**: Emit up to 5 parallel rendering tasks to available sandboxes, pulling from the queue continuously as sandboxes free up.
+4. **Edge Stitching**: A final execution handles rapid `-c copy` concatenations of the completed assets.
+This queuing architecture allows Helios to bypass the strict 5-sandbox concurrency limit.
+
 #### COMPONENT REGISTRY
 Helios will support a Shadcn-style component registry.
 *Constraints:*
