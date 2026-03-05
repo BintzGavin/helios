@@ -25,17 +25,17 @@ describe('GcsStorageAdapter IO Benchmark', () => {
 
       adapter1MB = new GcsStorageAdapter({
         bucket: 'test-bucket',
+        projectId: 'test-project',
+        credentials: { client_email: 'test@example.com', private_key: 'test' }
       });
 
-      // Override the client with a dummy that skips actual upload
-      const dummyBucket = {
-        upload: async () => {
-          return [{}]; // simulate response
-        }
-      };
-
+      // Override the client with a dummy to avoid real network calls and fd leaks
       const dummyClient = {
-        bucket: () => dummyBucket
+        bucket: () => ({
+          upload: async (file: string, options: any) => {
+            return [{}];
+          }
+        })
       };
       (adapter1MB as any).client = dummyClient;
     };
@@ -72,17 +72,17 @@ describe('GcsStorageAdapter IO Benchmark', () => {
 
       adapter10MB = new GcsStorageAdapter({
         bucket: 'test-bucket',
+        projectId: 'test-project',
+        credentials: { client_email: 'test@example.com', private_key: 'test' }
       });
 
-      // Override the client with a dummy that skips actual upload
-      const dummyBucket = {
-        upload: async () => {
-          return [{}]; // simulate response
-        }
-      };
-
+      // Override the client with a dummy to avoid real network calls and fd leaks
       const dummyClient = {
-        bucket: () => dummyBucket
+        bucket: () => ({
+          upload: async (file: string, options: any) => {
+            return [{}];
+          }
+        })
       };
       (adapter10MB as any).client = dummyClient;
     };
@@ -107,5 +107,4 @@ describe('GcsStorageAdapter IO Benchmark', () => {
       time: 500
     });
   });
-
 });
