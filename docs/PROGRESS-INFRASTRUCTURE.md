@@ -1,5 +1,8 @@
 # INFRASTRUCTURE PROGRESS
 
+## INFRASTRUCTURE v0.37.2
+- ✅ Completed: S3 Storage Benchmark Spec - Created spec for adding performance benchmarks to the S3StorageAdapter.
+
 ## INFRASTRUCTURE v0.37.1
 - ✅ Completed: Output Stitcher Docs Example - Created an example script demonstrating the standalone use of `FfmpegStitcher` and documented the Video Stitching abstractions.
 
