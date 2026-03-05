@@ -11,6 +11,13 @@ This package provides the infrastructure for distributed rendering, including:
 
 ## Features
 
+### Video Stitching
+
+Video stitching abstractions handle concatenating rendered segments into a single final video without re-encoding. This is crucial for performance after a distributed render.
+
+- **VideoStitcher**: The primary interface for video stitching operations. It takes an array of video chunk paths and an output path, combining them seamlessly.
+- **FfmpegStitcher**: An implementation of `VideoStitcher` that leverages `ffmpeg` and the `concat` demuxer. By skipping the re-encoding step and directly copying streams (`-c copy`), it achieves extremely fast merge times, perfectly suited for the final stage of distributed rendering workflows.
+
 ### Orchestration & Job Management
 
 The orchestrator module is responsible for managing the lifecycle of distributed rendering jobs, tracking progress, and executing tasks efficiently.

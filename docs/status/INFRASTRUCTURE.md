@@ -1,7 +1,8 @@
 # INFRASTRUCTURE STATUS
-**Version**: 0.37.0
+**Version**: 0.37.1
 
 ## Status Log
+- [v0.37.1] ✅ Completed: Output Stitcher Docs Example - Created an example script demonstrating the standalone use of `FfmpegStitcher` and documented the Video Stitching abstractions.
 - [v0.37.0] ✅ Completed: WorkerRuntime Example - Created an example script demonstrating the standalone use of `WorkerRuntime` for custom cloud environments.
 - [v0.36.2] 🚫 Blocked: No uncompleted implementation plans found for my domain in `/.sys/plans/`. I must stop working.
 - [v0.36.2] ✅ Completed: Benchmarks - Added performance benchmarks for `JobManager` and `LocalStorageAdapter` using `vitest bench`.
