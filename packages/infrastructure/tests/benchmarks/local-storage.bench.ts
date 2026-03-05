@@ -1,4 +1,4 @@
-import { bench, describe } from 'vitest';
+import { bench, describe, beforeAll, afterAll } from 'vitest';
 import { LocalStorageAdapter } from '../../src/storage/local-storage.js';
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -25,31 +25,46 @@ describe('LocalStorageAdapter IO Benchmark', () => {
     await fs.writeFile(filePath, buffer);
   };
 
-  bench('LocalStorageAdapter.uploadAssetBundle - 1MB', async () => {
-    // We recreate it per iteration to avoid conflicts or measuring cleanup in bench
+  describe('1MB Payload', () => {
     const jobId = randomUUID();
     const localDir = path.join(baseDir, `local-1mb-${jobId}`);
-    await createDummyFile(localDir, 'asset.bin', 1024 * 1024); // 1MB
+    let adapter: LocalStorageAdapter;
 
-    const adapter = new LocalStorageAdapter({ storageDir });
-    await adapter.uploadAssetBundle(jobId, localDir);
-  }, {
-    time: 500,
-    setup: setupDirs,
-    teardown: teardownDirs
+    beforeAll(async () => {
+      await setupDirs();
+      await createDummyFile(localDir, 'asset.bin', 1024 * 1024); // 1MB
+      adapter = new LocalStorageAdapter({ storageDir });
+    });
+
+    afterAll(async () => {
+      await teardownDirs();
+    });
+
+    bench('LocalStorageAdapter.uploadAssetBundle - 1MB', async () => {
+      // Hot loop focuses purely on the upload execution
+      await adapter.uploadAssetBundle(jobId, localDir);
+    }, { time: 500 });
   });
 
-  bench('LocalStorageAdapter.uploadAssetBundle - 10MB', async () => {
+  describe('10MB Payload', () => {
     const jobId = randomUUID();
     const localDir = path.join(baseDir, `local-10mb-${jobId}`);
-    await createDummyFile(localDir, 'asset.bin', 10 * 1024 * 1024); // 10MB
+    let adapter: LocalStorageAdapter;
 
-    const adapter = new LocalStorageAdapter({ storageDir });
-    await adapter.uploadAssetBundle(jobId, localDir);
-  }, {
-    time: 500,
-    setup: setupDirs,
-    teardown: teardownDirs
+    beforeAll(async () => {
+      await setupDirs();
+      await createDummyFile(localDir, 'asset.bin', 10 * 1024 * 1024); // 10MB
+      adapter = new LocalStorageAdapter({ storageDir });
+    });
+
+    afterAll(async () => {
+      await teardownDirs();
+    });
+
+    bench('LocalStorageAdapter.uploadAssetBundle - 10MB', async () => {
+      // Hot loop focuses purely on the upload execution
+      await adapter.uploadAssetBundle(jobId, localDir);
+    }, { time: 500 });
   });
 
 });
