@@ -10,6 +10,16 @@ The `infrastructure` package manages the distributed cloud rendering execution o
 
 ## Section B: File Tree
 ```
+packages/infrastructure/examples
+├── aws-lambda.ts
+├── cloudrun.ts
+├── ffmpeg-stitcher.ts
+├── gcs-storage.ts
+├── job-executor-standalone.ts
+├── local-storage.ts
+├── s3-storage.ts
+└── worker-runtime.ts
+
 packages/infrastructure/tests
 ├── adapters
 │   └── local-adapter.test.ts

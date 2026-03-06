@@ -95,6 +95,7 @@ async function main() {
     });
 
     console.log('Execution completed successfully!');
+    console.log('Final output is ready.');
 
     // Clean up
     console.log('Cleaning up execution directory...');
