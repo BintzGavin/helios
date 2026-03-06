@@ -1,3 +1,6 @@
+## STUDIO v0.117.0
+- ✅ Completed: Components Panel - Implemented a visual Components Panel in Helios Studio to browse and install components from the registry.
+
 ## STUDIO v0.116.2
 - ✅ Completed: Schema Validation - Implemented visual validation feedback in the Studio Props Editor to enforce schema constraints (pattern, min/max) and guide users using a unified `validateValue` helper.
 

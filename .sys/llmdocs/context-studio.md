@@ -33,8 +33,10 @@ The `npx helios studio` command launches the dev server, which uses `vite-plugin
 - **Assets Panel**: For managing local media files with drag-and-drop.
 - **Renders Panel**: For configuring and launching server-side or distributed render jobs.
 - **Compositions Panel**: For switching between multiple compositions.
+- **Components Panel**: For browsing and installing components from the registry.
 
 ## Section E: Integration
 - Integrates with `@helios-project/core` for state management and schemas.
 - Integrates with `@helios-project/player` for rendering the preview frame.
 - Integrates with `@helios-project/renderer` for launching backend render processes.
+- Integrates with `@helios-project/cli` for injecting the registry manifest into the Studio API backend.

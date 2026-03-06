@@ -81,7 +81,7 @@ export function createMcpServer(getPort: () => number, options: StudioPluginOpti
       height: z.number().optional(),
       fps: z.number().optional(),
       duration: z.number().optional(),
-      defaultProps: z.record(z.any()).optional()
+      defaultProps: z.record(z.string(), z.any()).optional()
     },
     async (args) => {
       try {
@@ -96,7 +96,7 @@ export function createMcpServer(getPort: () => number, options: StudioPluginOpti
             }
           : undefined;
         
-        const result = createComposition(
+        const result = await createComposition(
             process.cwd(),
             args.name,
             args.template || 'vanilla',
@@ -122,7 +122,7 @@ export function createMcpServer(getPort: () => number, options: StudioPluginOpti
       height: z.number().optional(),
       fps: z.number().optional(),
       duration: z.number().optional(),
-      inputProps: z.record(z.any()).optional()
+      inputProps: z.record(z.string(), z.any()).optional()
     },
     async (args) => {
        try {
