@@ -6,7 +6,7 @@ Helios is a modern engine for creating videos programmatically using standard we
 
 ## Quick Facts
 - **License**: Elastic License 2.0 (free commercial use, no SaaS resale)
-- **Status**: Beta / Self-Driving (Core: Stable v5.13.0+, Studio: Alpha v0.116.2+, Player: v0.76.14+, Renderer: v1.80.0+, CLI: Beta v0.36.2+, Infrastructure: v0.37.4+)
+- **Status**: Beta / Self-Driving (Core: Stable v5.13.0+, Studio: Alpha v0.107.1+, Player: v0.76.13+, Renderer: v1.78.0+, CLI: Beta v0.32.0+, Infrastructure: v0.24.0+)
 - **Frameworks**: React, Vue, Svelte, Solid, vanilla JS
 - **Animation**: Standard CSS, Web Animations API (WAAPI), any animation library
 
@@ -113,12 +113,12 @@ const report = await Helios.diagnose();
 
 ## Roadmap
 ### V1.x (Active)
-- **Studio**: v0.116.2+ (Schema Validation, Asset Move, WebCodecs Preference, Registry Filtering Support)
-- **CLI**: v0.36.2+ (Cloud Worker Execution, JobExecutor Integration, Component Tracking, Stateless Worker)
+- **Studio**: v0.107.1+ (Portable Job Paths, Export Job Spec, Configurable Example Registry, Component Management)
+- **CLI**: v0.32.0+ (Remote Job Spec, AWS Deployment, Deploy GCP Command, Component Tracking)
 - **Core**: v5.13.0+ (Generic Input Props, Active Clips, Input Schema, Headless Audio)
-- **Player**: v0.76.14+ (Synchronized Caption Styling, Robust DOM Export, Async Seek, Exporter Integration, Integrity Check, Fix CaptureFrame Resizing)
-- **Renderer**: v1.80.0+ (WebCodecs Preference, Orchestrator Plan, Validate HW Accel, Pluggable Execution)
-- **Infrastructure**: v0.37.4+ (GCS/S3 Storage Benchmarks, JobExecutor Example, Output Stitcher Docs Example)
+- **Player**: v0.76.13+ (Async Seek, Exporter Integration, Integrity Check, Fix CaptureFrame Resizing)
+- **Renderer**: v1.78.0+ (Orchestrator Plan, Refactor Media Sync Logic, Refactor DOM Traversal, Pluggable Execution)
+- **Infrastructure**: v0.24.0+ (Artifact Storage Cleanup, Orchestrator Asset Upload, Integrate Artifact Storage)
 
 ### AI Integration
 - **Studio MCP Server**: Inspect, create, and render compositions via LLM tools (Done)
