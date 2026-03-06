@@ -1,5 +1,8 @@
 # INFRASTRUCTURE PROGRESS
 
+## INFRASTRUCTURE v0.37.15
+- ✅ Completed: AWS Lambda Adapter Benchmark Spec - Created spec for adding performance benchmarks to the AwsLambdaAdapter.
+
 ## INFRASTRUCTURE v0.37.14
 - ✅ Completed: FfmpegStitcher Benchmark - Implemented performance benchmarks for FfmpegStitcher.
 
