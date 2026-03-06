@@ -1,5 +1,8 @@
 # INFRASTRUCTURE PROGRESS
 
+## INFRASTRUCTURE v0.38.2
+- ✅ Completed: LocalWorkerAdapter Benchmark Spec - Created spec for adding performance benchmarks to the LocalWorkerAdapter.
+
 ## INFRASTRUCTURE v0.38.0
 - ✅ Completed: JobExecutor Example - Created an example script demonstrating the standalone use of JobExecutor for custom orchestration logic.
 
