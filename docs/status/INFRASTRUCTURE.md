@@ -1,7 +1,8 @@
 # INFRASTRUCTURE STATUS
-**Version**: 0.38.9
+**Version**: 0.38.10
 
 ## Status Log
+- [v0.38.10] ✅ Completed: GCS Storage Benchmark - Implemented performance benchmarks for GcsStorageAdapter.
 - [v0.38.9] ✅ Completed: FileJobRepository Example - Created an example script demonstrating the standalone use of `FileJobRepository` with `JobManager` for persistent job state storage.
 - [v0.38.8] ✅ Completed: WorkerRuntime Benchmark - Implemented performance benchmarks for WorkerRuntime.
 - [v0.38.7] ✅ Completed: AwsLambdaAdapter Benchmark - Implemented performance benchmarks for the AwsLambdaAdapter.
