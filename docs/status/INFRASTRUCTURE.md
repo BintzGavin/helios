@@ -1,7 +1,8 @@
 # INFRASTRUCTURE STATUS
-**Version**: 0.38.6
+**Version**: 0.38.7
 
 ## Status Log
+- [v0.38.7] ✅ Completed: AwsLambdaAdapter Benchmark - Implemented performance benchmarks for the AwsLambdaAdapter.
 - [v0.38.6] ✅ Completed: JobExecutor Example - Created an example script demonstrating the standalone use of JobExecutor for custom orchestration logic.
 - [v0.38.5] ✅ Completed: CloudRunAdapter Benchmark - Implemented performance benchmarks for the CloudRunAdapter.
 - [v0.38.4] ✅ Completed: AWS Lambda Adapter Benchmark Spec - Created spec for adding performance benchmarks to the AwsLambdaAdapter.
