@@ -53,6 +53,7 @@ packages/infrastructure/
 │       └── runtime.ts
 ├── tests
 │   └── benchmarks
+│       ├── ffmpeg-stitcher.bench.ts
 │       ├── gcs-storage.bench.ts
 │       ├── job-executor.bench.ts
 │       ├── job-manager.bench.ts
