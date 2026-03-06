@@ -25,6 +25,7 @@ packages/infrastructure/tests
 │   └── local-adapter.test.ts
 ├── aws-adapter.test.ts
 ├── benchmarks
+│   ├── aws-adapter.bench.ts
 │   ├── cloudrun-adapter.bench.ts
 │   ├── ffmpeg-stitcher.bench.ts
 │   ├── file-job-repository.bench.ts

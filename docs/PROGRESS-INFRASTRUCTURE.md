@@ -1,6 +1,9 @@
 # INFRASTRUCTURE PROGRESS
 
 
+## INFRASTRUCTURE v0.38.7
+- ✅ Completed: AwsLambdaAdapter Benchmark - Implemented performance benchmarks for the AwsLambdaAdapter.
+
 ## INFRASTRUCTURE v0.38.6
 - ✅ Completed: JobExecutor Example - Created an example script demonstrating the standalone use of JobExecutor for custom orchestration logic.
 
