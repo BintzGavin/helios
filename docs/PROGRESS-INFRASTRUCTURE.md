@@ -1,5 +1,9 @@
 # INFRASTRUCTURE PROGRESS
 
+
+## INFRASTRUCTURE v0.38.5
+- ✅ Completed: CloudRunAdapter Benchmark - Implemented performance benchmarks for the CloudRunAdapter.
+
 ## INFRASTRUCTURE v0.38.3
 - ✅ Completed: LocalWorkerAdapter Benchmark - Implemented performance benchmarks for the LocalWorkerAdapter.
 
