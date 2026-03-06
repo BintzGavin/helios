@@ -1,5 +1,8 @@
 # INFRASTRUCTURE PROGRESS
 
+## INFRASTRUCTURE v0.38.9
+- ✅ Completed: FileJobRepository Example - Created an example script demonstrating the standalone use of `FileJobRepository` with `JobManager` for persistent job state storage.
+
 ## INFRASTRUCTURE v0.38.8
 - ✅ Completed: WorkerRuntime Benchmark - Implemented performance benchmarks for WorkerRuntime.
 
