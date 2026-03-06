@@ -1,6 +1,9 @@
 # INFRASTRUCTURE PROGRESS
 
 
+## INFRASTRUCTURE v0.38.6
+- ✅ Completed: JobExecutor Example - Created an example script demonstrating the standalone use of JobExecutor for custom orchestration logic.
+
 ## INFRASTRUCTURE v0.38.5
 - ✅ Completed: CloudRunAdapter Benchmark - Implemented performance benchmarks for the CloudRunAdapter.
 
