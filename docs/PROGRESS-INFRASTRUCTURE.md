@@ -1,5 +1,7 @@
 # INFRASTRUCTURE PROGRESS
 
+## INFRASTRUCTURE v0.38.8
+- ✅ Completed: WorkerRuntime Benchmark - Implemented performance benchmarks for WorkerRuntime.
 
 ## INFRASTRUCTURE v0.38.7
 - ✅ Completed: AwsLambdaAdapter Benchmark - Implemented performance benchmarks for the AwsLambdaAdapter.

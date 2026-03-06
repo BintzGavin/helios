@@ -35,7 +35,8 @@ packages/infrastructure/tests
 │   ├── local-adapter.bench.ts
 │   ├── local-storage.bench.ts
 │   ├── render-executor.bench.ts
-│   └── s3-storage.bench.ts
+│   ├── s3-storage.bench.ts
+│   └── worker-runtime.bench.ts
 ├── cloudrun-adapter.test.ts
 ├── command.test.ts
 ├── e2e
