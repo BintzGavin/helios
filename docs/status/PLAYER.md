@@ -60,6 +60,7 @@
 - **Export API**: Exposes public `export()` method for programmatic control over client-side exports, supporting Video (MP4/WebM) and Snapshot (PNG/JPEG) formats.
 - **Export Menu**: Implements a dedicated Export Menu in the player UI (replacing the direct export button action) to allow configuring format, resolution, filename, and captions before exporting or taking a snapshot.
 
+[v0.76.15] 🚫 Blocked: No new plan found in /.sys/plans/ for PLAYER. Waiting for Planner to create the next implementation spec.
 [v0.76.13] ✅ Completed: Video Volume Export Verification - Verified ClientSideExporter correctly prioritizes runtime `volume` and `muted` properties on `<video>` elements to ensure WYSIWYG export parity.
 [v0.76.12] ✅ Completed: Video Volume Export Verification - Confirmed ClientSideExporter prioritizes runtime volume and muted properties via test coverage.
 [v0.76.11] ✅ Completed: Video Volume Export - Ensured WYSIWYG video volume in client-side exports by prioritizing runtime `volume` and `muted` properties over HTML attributes.
