@@ -1,7 +1,8 @@
 # INFRASTRUCTURE STATUS
-**Version**: 0.38.3
+**Version**: 0.38.4
 
 ## Status Log
+- [v0.38.4] ✅ Completed: AWS Lambda Adapter Benchmark Spec - Created spec for adding performance benchmarks to the AwsLambdaAdapter.
 - [v0.38.3] ✅ Completed: LocalWorkerAdapter Benchmark - Implemented performance benchmarks for the LocalWorkerAdapter.
 - [v0.38.2] ✅ Completed: LocalWorkerAdapter Benchmark Spec - Created spec for adding performance benchmarks to the LocalWorkerAdapter.
 - [v0.38.1] 🚫 Blocked: No uncompleted implementation plans found for my domain in `/.sys/plans/`. I must stop working.
