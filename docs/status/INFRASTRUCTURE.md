@@ -1,7 +1,8 @@
 # INFRASTRUCTURE STATUS
-**Version**: 0.37.14
+**Version**: 0.37.15
 
 ## Status Log
+- [v0.37.15] ✅ Completed: AWS Lambda Adapter Benchmark Spec - Created spec for adding performance benchmarks to the AwsLambdaAdapter.
 - [v0.37.14] ✅ Completed: FfmpegStitcher Benchmark - Implemented performance benchmarks for FfmpegStitcher.
 - [v0.37.13] ✅ Completed: RenderExecutor Benchmark - Implemented performance benchmarks for RenderExecutor.
 - [v0.37.12] ✅ Completed: JobExecutor Benchmark - Implemented performance benchmarks for JobExecutor.
