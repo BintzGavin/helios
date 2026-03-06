@@ -14,6 +14,7 @@ packages/infrastructure/examples
 ├── aws-lambda.ts
 ├── cloudrun.ts
 ├── ffmpeg-stitcher.ts
+├── file-job-repository.ts
 ├── gcs-storage.ts
 ├── job-executor-standalone.ts
 ├── local-storage.ts
