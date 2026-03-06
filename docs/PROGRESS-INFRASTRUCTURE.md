@@ -1,5 +1,8 @@
 # INFRASTRUCTURE PROGRESS
 
+## INFRASTRUCTURE v0.37.14
+- ✅ Completed: FfmpegStitcher Benchmark - Implemented performance benchmarks for FfmpegStitcher.
+
 ## INFRASTRUCTURE v0.37.13
 - ✅ Completed: RenderExecutor Benchmark - Implemented performance benchmarks for RenderExecutor.
 
