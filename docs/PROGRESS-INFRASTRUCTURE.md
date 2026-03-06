@@ -1,5 +1,8 @@
 # INFRASTRUCTURE PROGRESS
 
+## INFRASTRUCTURE v0.38.3
+- ✅ Completed: LocalWorkerAdapter Benchmark - Implemented performance benchmarks for the LocalWorkerAdapter.
+
 ## INFRASTRUCTURE v0.38.2
 - ✅ Completed: LocalWorkerAdapter Benchmark Spec - Created spec for adding performance benchmarks to the LocalWorkerAdapter.
 

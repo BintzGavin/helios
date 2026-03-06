@@ -57,6 +57,7 @@ packages/infrastructure/
 │       ├── gcs-storage.bench.ts
 │       ├── job-executor.bench.ts
 │       ├── job-manager.bench.ts
+│       ├── local-adapter.bench.ts
 │       ├── local-storage.bench.ts
 │       └── s3-storage.bench.ts
 └── tsconfig.json
