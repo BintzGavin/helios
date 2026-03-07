@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { JobExecutor } from '../../src/orchestrator/job-executor.js';
 import { LocalWorkerAdapter } from '../../src/adapters/local-adapter.js';
 import { WorkerRuntime } from '../../src/worker/runtime.js';
+import { RenderExecutor } from '../../src/worker/render-executor.js';
 import { JobSpec } from '../../src/types/job-spec.js';
 import { WorkerJob } from '../../src/types/adapter.js';
 import { ArtifactStorage } from '../../src/types/index.js';
@@ -102,6 +103,55 @@ describe('Infrastructure Resiliency and Regression Tests', () => {
       try {
         await expect(runtime.run('http://example.com/job.json', 1)).rejects.toThrow('Simulated storage fetch error');
         expect(failingStorage.downloadAssetBundle).toHaveBeenCalledWith('job-123', 's3://some/path', '/tmp/test-workspace');
+      } finally {
+        global.fetch = originalFetch;
+      }
+    });
+
+    it('WorkerRuntime should correctly propagate chunk execution errors', async () => {
+      const runtime = new WorkerRuntime({
+        workspaceDir: '/tmp/test-workspace',
+      });
+
+      const mockJobSpec: JobSpec = {
+        id: 'job-123',
+        chunks: [
+          { id: 1, command: 'render', outputFile: 'out.mp4' }
+        ]
+      };
+
+      // Mock fetch to return the spec
+      const originalFetch = global.fetch;
+      global.fetch = vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => mockJobSpec
+      });
+
+      // Use vi.spyOn on the prototype of RenderExecutor to mock the class method
+      const executeChunkSpy = vi.spyOn(RenderExecutor.prototype, 'executeChunk').mockRejectedValue(new Error('Simulated chunk execution error'));
+
+      try {
+        await expect(runtime.run('http://example.com/job.json', 1)).rejects.toThrow('Simulated chunk execution error');
+      } finally {
+        global.fetch = originalFetch;
+        executeChunkSpy.mockRestore();
+      }
+    });
+
+    it('WorkerRuntime should gracefully handle remote JobSpec fetch failures', async () => {
+      const runtime = new WorkerRuntime({
+        workspaceDir: '/tmp/test-workspace',
+      });
+
+      // Mock fetch to return a non-ok response
+      const originalFetch = global.fetch;
+      global.fetch = vi.fn().mockResolvedValue({
+        ok: false,
+        statusText: 'Not Found'
+      });
+
+      try {
+        await expect(runtime.run('http://example.com/job.json', 1)).rejects.toThrow('Failed to fetch job spec: Not Found');
       } finally {
         global.fetch = originalFetch;
       }
