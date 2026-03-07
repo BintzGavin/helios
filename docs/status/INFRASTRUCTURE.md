@@ -2,6 +2,7 @@
 **Version**: 0.40.8
 
 ## Status Log
+- [v0.40.9] ✅ Completed: FileJobRepository Resiliency Tests Spec - Created spec for expanding FileJobRepository resiliency and regression tests.
 - [v0.40.8] ✅ Completed: JobManager Resiliency Tests - Implemented comprehensive resiliency and regression tests for JobManager.
 - [v0.40.7] ✅ Completed: WorkerRuntime Resiliency Tests - Expanded resiliency testing for WorkerRuntime
 - [v0.40.6] ✅ Completed: GCS Storage Benchmark - Implemented performance benchmarks for the GcsStorageAdapter.
