@@ -1,6 +1,6 @@
 # CLI Status
 
-**Version**: 0.36.4
+**Version**: 0.36.5
 
 ## Current State
 
@@ -41,6 +41,7 @@ Per AGENTS.md, the CLI is "ACTIVELY EXPANDING FOR V2" with focus on:
 
 ## History
 
+[v0.36.5] ✅ Update Command Tests Spec - Created specification plan for implementing regression tests for the `helios update` command.
 [v0.36.4] ✅ Init Command Regression Tests - Implemented comprehensive regression tests for `helios init`.
 [v0.36.3] ✅ Remove Command Regression Tests - Implemented comprehensive unit tests for `helios remove`.
 [v0.1.0] ✅ Initial CLI with `helios studio` command
