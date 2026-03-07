@@ -1,5 +1,8 @@
 # INFRASTRUCTURE PROGRESS
 
+## INFRASTRUCTURE v0.40.4
+- ✅ Completed: WorkerRuntime Resiliency Tests Spec - Created spec for expanding WorkerRuntime resiliency and regression tests.
+
 ## INFRASTRUCTURE v0.40.3
 - ✅ Completed: FileJobRepository Benchmark - Implemented performance benchmarks for FileJobRepository.
 
