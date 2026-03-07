@@ -2,6 +2,14 @@
 
 This file tracks progress for the CLI domain (`packages/cli`).
 
+## CLI v0.36.6
+
+- ✅ Update Command Regression Tests - Implemented comprehensive unit tests for `helios update`.
+
+## CLI v0.36.5
+
+- ✅ Update Command Tests Spec - Created specification plan for implementing regression tests for the `helios update` command.
+
 ## CLI v0.36.4
 
 - ✅ Init Command Regression Tests - Implemented comprehensive regression tests for `helios init`.
