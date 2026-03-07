@@ -1,5 +1,8 @@
 # INFRASTRUCTURE PROGRESS
 
+## INFRASTRUCTURE v0.40.0
+- ✅ Completed: RenderExecutor Example - Created an example script demonstrating the standalone use of RenderExecutor for processing job chunks locally within a stateless worker.
+
 ## INFRASTRUCTURE v0.39.0
 - ✅ Completed: JobManager Example - Created an example script demonstrating the standalone use of JobManager to manage rendering jobs, state, and orchestration.
 

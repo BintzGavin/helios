@@ -19,6 +19,7 @@ packages/infrastructure/examples
 ├── job-executor-standalone.ts
 ├── job-manager-standalone.ts
 ├── local-storage.ts
+├── render-executor.ts
 ├── s3-storage.ts
 └── worker-runtime.ts
 
