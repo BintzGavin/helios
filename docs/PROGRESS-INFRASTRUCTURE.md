@@ -1,5 +1,8 @@
 # INFRASTRUCTURE PROGRESS
 
+## INFRASTRUCTURE v0.40.3
+- ✅ Completed: FileJobRepository Benchmark - Implemented performance benchmarks for FileJobRepository.
+
 ## INFRASTRUCTURE v0.40.2
 - ✅ Completed: LocalWorkerAdapter Example - Created an example script demonstrating the standalone use of LocalWorkerAdapter to execute a local process and stream output.
 
