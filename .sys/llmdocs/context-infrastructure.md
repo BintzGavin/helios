@@ -18,6 +18,7 @@ packages/infrastructure/examples
 ├── gcs-storage.ts
 ├── job-executor-standalone.ts
 ├── job-manager-standalone.ts
+├── local-adapter.ts
 ├── local-storage.ts
 ├── render-executor.ts
 ├── s3-storage.ts

@@ -1,5 +1,8 @@
 # INFRASTRUCTURE PROGRESS
 
+## INFRASTRUCTURE v0.40.2
+- ✅ Completed: LocalWorkerAdapter Example - Created an example script demonstrating the standalone use of LocalWorkerAdapter to execute a local process and stream output.
+
 ## INFRASTRUCTURE v0.40.1
 - ✅ Completed: LocalWorkerAdapter Benchmark - Implemented performance benchmarks for LocalWorkerAdapter to measure invocation overhead.
 
