@@ -1,23 +1,38 @@
-import { describe, bench } from 'vitest';
+import { bench, describe, beforeAll } from 'vitest';
 import { LocalWorkerAdapter } from '../../src/adapters/local-adapter.js';
+import type { WorkerJob } from '../../src/types/index.js';
 
 describe('LocalWorkerAdapter Performance', () => {
-  const adapter = new LocalWorkerAdapter();
+  let adapter: LocalWorkerAdapter;
+  let fastJob: WorkerJob;
+  let timeoutJob: WorkerJob;
 
-  // Command that executes quickly to measure adapter overhead
-  const fastJobCommand = {
-    command: 'node',
-    args: ['-e', 'console.log("done")'],
-  };
+  beforeAll(() => {
+    adapter = new LocalWorkerAdapter();
+    fastJob = {
+      id: 'fast-job',
+      command: process.execPath,
+      args: ['-e', '0'],
+      metadata: {},
+    };
+    timeoutJob = {
+      id: 'timeout-job',
+      command: process.execPath,
+      args: ['-e', 'setTimeout(() => {}, 10000)'],
+      timeout: 10,
+      metadata: {},
+    };
+  });
 
   bench('execute (fast process)', async () => {
-    await adapter.execute(fastJobCommand);
+    await adapter.execute(fastJob);
   });
 
   bench('execute (with timeout)', async () => {
-    await adapter.execute({
-      ...fastJobCommand,
-      timeout: 5000,
-    });
+    try {
+      await adapter.execute(timeoutJob);
+    } catch (e) {
+      // Ignore timeout error
+    }
   });
 });

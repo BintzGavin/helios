@@ -1,5 +1,8 @@
 # INFRASTRUCTURE PROGRESS
 
+## INFRASTRUCTURE v0.40.1
+- ✅ Completed: LocalWorkerAdapter Benchmark - Implemented performance benchmarks for LocalWorkerAdapter to measure invocation overhead.
+
 ## INFRASTRUCTURE v0.40.0
 - ✅ Completed: RenderExecutor Example - Created an example script demonstrating the standalone use of RenderExecutor for processing job chunks locally within a stateless worker.
 
