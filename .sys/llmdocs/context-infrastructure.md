@@ -46,6 +46,7 @@ packages/infrastructure/tests
 ├── command.test.ts
 ├── e2e
 │   ├── deterministic-seeking.test.ts
+│   ├── job-manager-resiliency.test.ts
 │   └── resiliency.test.ts
 ├── governance
 │   └── sync-workspace.test.ts

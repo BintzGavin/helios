@@ -1,7 +1,8 @@
 # INFRASTRUCTURE STATUS
-**Version**: 0.40.7
+**Version**: 0.40.8
 
 ## Status Log
+- [v0.40.8] ✅ Completed: JobManager Resiliency Tests - Implemented comprehensive resiliency and regression tests for JobManager.
 - [v0.40.7] ✅ Completed: WorkerRuntime Resiliency Tests - Expanded resiliency testing for WorkerRuntime
 - [v0.40.6] ✅ Completed: GCS Storage Benchmark - Implemented performance benchmarks for the GcsStorageAdapter.
 - [v0.40.5] ✅ Completed: Workspace Dependency Synchronizer Example - Created an example script demonstrating the standalone use of the syncWorkspaceDependencies governance tool.
