@@ -53,6 +53,7 @@ packages/infrastructure/tests
 ├── job-executor.test.ts
 ├── job-manager.test.ts
 ├── orchestrator
+│   ├── file-job-repository-resiliency.test.ts
 │   ├── file-job-repository.test.ts
 │   └── job-manager.test.ts
 ├── placeholder.test.ts
