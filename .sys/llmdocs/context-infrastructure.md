@@ -17,6 +17,7 @@ packages/infrastructure/examples
 ├── file-job-repository.ts
 ├── gcs-storage.ts
 ├── job-executor-standalone.ts
+├── job-manager-standalone.ts
 ├── local-storage.ts
 ├── s3-storage.ts
 └── worker-runtime.ts
