@@ -1,3 +1,6 @@
+### STUDIO v0.118.0
+- ✅ Completed: Enhance MCP Server - Added support for inputProps, videoBitrate, and videoCodec to MCP server tools.
+
 ## STUDIO v0.117.0
 - ✅ Completed: Components Panel - Implemented a visual Components Panel in Helios Studio to browse and install components from the registry.
 

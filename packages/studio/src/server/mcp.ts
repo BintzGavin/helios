@@ -122,7 +122,9 @@ export function createMcpServer(getPort: () => number, options: StudioPluginOpti
       height: z.number().optional(),
       fps: z.number().optional(),
       duration: z.number().optional(),
-      inputProps: z.record(z.string(), z.any()).optional()
+      inputProps: z.record(z.string(), z.any()).optional(),
+      videoBitrate: z.string().optional(),
+      videoCodec: z.string().optional()
     },
     async (args) => {
        try {
@@ -143,7 +145,9 @@ export function createMcpServer(getPort: () => number, options: StudioPluginOpti
                height: args.height,
                fps: args.fps,
                duration: args.duration,
-               inputProps: args.inputProps
+               inputProps: args.inputProps,
+               videoBitrate: args.videoBitrate,
+               videoCodec: args.videoCodec
            }, port);
 
            return {

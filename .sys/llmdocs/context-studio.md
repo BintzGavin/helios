@@ -4,6 +4,7 @@
 Studio is a framework-agnostic browser-based development environment for video composition.
 It consists of a CLI, a dev server built on top of Vite, and a browser-based UI.
 The architecture uses a unified state model via `HeliosState` and interacts with a local API backend for file system operations.
+It also includes an MCP (Model Context Protocol) server to expose tools to AI agents.
 
 ## Section B: File Tree
 ```
@@ -40,3 +41,4 @@ The `npx helios studio` command launches the dev server, which uses `vite-plugin
 - Integrates with `@helios-project/player` for rendering the preview frame.
 - Integrates with `@helios-project/renderer` for launching backend render processes.
 - Integrates with `@helios-project/cli` for injecting the registry manifest into the Studio API backend.
+- Exposes MCP tools (`create_composition`, `render_composition`, etc.) enabling intelligent AI agents to interact with the workspace programmatically.

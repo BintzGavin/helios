@@ -96,7 +96,7 @@ describe('createMcpServer', () => {
     expect(JSON.parse(result.content[0].text)).toEqual({ id: 'test', name: 'Test' });
   });
 
-  it('should handle render_composition tool with inputProps', async () => {
+  it('should handle render_composition tool with inputProps, videoBitrate, and videoCodec', async () => {
     const server = createMcpServer(getPort) as any;
     (findCompositions as any).mockResolvedValue([{ id: 'comp-1', url: '/@fs/path/to/comp' }]);
     (startRender as any).mockResolvedValue('job-123');
@@ -104,13 +104,17 @@ describe('createMcpServer', () => {
     const handler = server.tools['render_composition'].handler;
     const result = await handler({
       compositionId: 'comp-1',
-      inputProps: { text: 'Hello' }
+      inputProps: { text: 'Hello' },
+      videoBitrate: '5M',
+      videoCodec: 'libx264'
     });
 
     expect(startRender).toHaveBeenCalledWith(
       expect.objectContaining({
         compositionUrl: '/@fs/path/to/comp',
-        inputProps: { text: 'Hello' }
+        inputProps: { text: 'Hello' },
+        videoBitrate: '5M',
+        videoCodec: 'libx264'
       }),
       1234
     );
