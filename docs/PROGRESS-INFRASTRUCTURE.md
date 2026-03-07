@@ -1,5 +1,8 @@
 # INFRASTRUCTURE PROGRESS
 
+## INFRASTRUCTURE v0.40.6
+- ✅ Completed: GCS Storage Benchmark - Implemented performance benchmarks for the GcsStorageAdapter.
+
 ## INFRASTRUCTURE v0.40.5
 - ✅ Completed: Workspace Dependency Synchronizer Example - Created an example script demonstrating the standalone use of the syncWorkspaceDependencies governance tool.
 
