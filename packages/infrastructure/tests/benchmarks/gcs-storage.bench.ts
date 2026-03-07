@@ -25,14 +25,14 @@ describe('GcsStorageAdapter IO Benchmark', () => {
 
       adapter1MB = new GcsStorageAdapter({
         bucket: 'test-bucket',
-        projectId: 'test-project',
-        credentials: { client_email: 'test@example.com', private_key: 'test' }
+        projectId: 'test-project'
       });
 
-      // Override the client with a dummy to avoid real network calls and fd leaks
+      // Override the client with a dummy to avoid actual network requests
       const dummyClient = {
         bucket: () => ({
           upload: async (file: string, options: any) => {
+            // Mock upload response
             return [{}];
           }
         })
@@ -72,14 +72,14 @@ describe('GcsStorageAdapter IO Benchmark', () => {
 
       adapter10MB = new GcsStorageAdapter({
         bucket: 'test-bucket',
-        projectId: 'test-project',
-        credentials: { client_email: 'test@example.com', private_key: 'test' }
+        projectId: 'test-project'
       });
 
-      // Override the client with a dummy to avoid real network calls and fd leaks
+      // Override the client with a dummy to avoid actual network requests
       const dummyClient = {
         bucket: () => ({
           upload: async (file: string, options: any) => {
+            // Mock upload response
             return [{}];
           }
         })
@@ -107,4 +107,5 @@ describe('GcsStorageAdapter IO Benchmark', () => {
       time: 500
     });
   });
+
 });
