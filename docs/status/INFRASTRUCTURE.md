@@ -2,6 +2,7 @@
 **Version**: 0.40.3
 
 ## Status Log
+- [v0.40.4] ✅ Completed: WorkerRuntime Resiliency Tests Spec - Created spec for expanding WorkerRuntime resiliency and regression tests.
 - [v0.40.3] ✅ Completed: FileJobRepository Benchmark - Implemented performance benchmarks for FileJobRepository.
 - [v0.40.2] ✅ Completed: LocalWorkerAdapter Example - Created an example script demonstrating the standalone use of LocalWorkerAdapter to execute a local process and stream output.
 - [v0.40.1] ✅ Completed: LocalWorkerAdapter Benchmark - Implemented performance benchmarks for LocalWorkerAdapter to measure invocation overhead.
