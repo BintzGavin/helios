@@ -1,5 +1,8 @@
 # INFRASTRUCTURE PROGRESS
 
+## INFRASTRUCTURE v0.40.7
+- ✅ Completed: WorkerRuntime Resiliency Tests - Expanded resiliency testing for WorkerRuntime
+
 ## INFRASTRUCTURE v0.40.6
 - ✅ Completed: GCS Storage Benchmark - Implemented performance benchmarks for the GcsStorageAdapter.
 
