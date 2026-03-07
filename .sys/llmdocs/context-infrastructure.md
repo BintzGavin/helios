@@ -64,7 +64,7 @@ packages/infrastructure/tests
 │   └── cloudrun-server.test.ts
 └── worker-runtime.test.ts
 
-8 directories, 30 files
+8 directories, 32 files
 ```
 
 ## Section C: Interfaces
