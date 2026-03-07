@@ -22,6 +22,7 @@ packages/infrastructure/examples
 ├── local-storage.ts
 ├── render-executor.ts
 ├── s3-storage.ts
+├── sync-workspace.ts
 └── worker-runtime.ts
 
 packages/infrastructure/tests

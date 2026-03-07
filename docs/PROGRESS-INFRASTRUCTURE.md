@@ -1,5 +1,8 @@
 # INFRASTRUCTURE PROGRESS
 
+## INFRASTRUCTURE v0.40.5
+- ✅ Completed: Workspace Dependency Synchronizer Example - Created an example script demonstrating the standalone use of the syncWorkspaceDependencies governance tool.
+
 ## INFRASTRUCTURE v0.40.4
 - ✅ Completed: WorkerRuntime Resiliency Tests Spec - Created spec for expanding WorkerRuntime resiliency and regression tests.
 
