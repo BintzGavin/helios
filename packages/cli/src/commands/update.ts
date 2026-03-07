@@ -13,17 +13,20 @@ export function registerUpdateCommand(program: Command) {
     .option('--no-install', 'Skip dependency installation')
     .action(async (component, options) => {
       const config = loadConfig();
-      const client = new RegistryClient(config?.registry);
 
       if (!config) {
         console.error(chalk.red('Configuration file not found. Run "helios init" first.'));
         process.exit(1);
+        return;
       }
+
+      const client = new RegistryClient(config.registry);
 
       if (!config.components || !config.components.includes(component)) {
         console.error(chalk.red(`Component "${component}" is not installed.`));
         console.log(chalk.gray(`Run "helios add ${component}" to install it.`));
         process.exit(1);
+        return;
       }
 
       if (!options.yes) {

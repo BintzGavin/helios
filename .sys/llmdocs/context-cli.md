@@ -21,8 +21,11 @@ packages/cli/
 │   ├── commands/
 │   │   ├── __tests__/
 │   │   │   ├── deploy.test.ts # Deploy command tests
+│   │   │   ├── init.test.ts   # Init command tests
 │   │   │   ├── job.test.ts    # Job command tests
-│   │   │   └── render.test.ts # Render command tests
+│   │   │   ├── remove.test.ts # Remove command tests
+│   │   │   ├── render.test.ts # Render command tests
+│   │   │   └── update.test.ts # Update command tests
 │   │   ├── add.ts          # Adds components
 │   │   ├── build.ts        # Builds for production
 │   │   ├── components.ts   # Lists registry components
