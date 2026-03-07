@@ -1,5 +1,8 @@
 # INFRASTRUCTURE PROGRESS
 
+## INFRASTRUCTURE v0.40.8
+- ✅ Completed: JobManager Resiliency Tests - Implemented comprehensive resiliency and regression tests for JobManager.
+
 ## INFRASTRUCTURE v0.40.7
 - ✅ Completed: WorkerRuntime Resiliency Tests - Expanded resiliency testing for WorkerRuntime
 
