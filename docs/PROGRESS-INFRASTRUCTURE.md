@@ -1,5 +1,8 @@
 # INFRASTRUCTURE PROGRESS
 
+## INFRASTRUCTURE v0.40.10
+- ✅ Completed: FileJobRepository Resiliency Tests - Implemented comprehensive resiliency and regression tests for FileJobRepository.
+
 ## INFRASTRUCTURE v0.40.8
 - ✅ Completed: JobManager Resiliency Tests - Implemented comprehensive resiliency and regression tests for JobManager.
 
