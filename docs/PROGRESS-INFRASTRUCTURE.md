@@ -1,5 +1,8 @@
 # INFRASTRUCTURE PROGRESS
 
+## INFRASTRUCTURE v0.40.16
+- ✅ Completed: Documentation Clarity - Updated README.md to improve clarity for Orchestration, Cloud Execution Adapters, and Worker Runtime abstractions.
+
 ## INFRASTRUCTURE v0.40.15
 - ✅ Completed: Cloud Adapter Resiliency Tests - Implemented comprehensive resiliency and regression tests for AwsLambdaAdapter and CloudRunAdapter.
 
