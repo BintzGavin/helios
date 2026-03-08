@@ -1,5 +1,11 @@
 # LLMS Progress
 
+## LLMS v1.35.0
+- ✅ Completed: Daily llms.txt Review
+  - Fixed version drift by realigning Quick Facts and Roadmap to actual package.json versions (Infrastructure to v0.25.0+).
+  - Updated Roadmap items for Infrastructure to reflect current codebase reality based on PROGRESS logs.
+  - Verified API examples, packages, and file paths.
+
 ## LLMS v1.34.0
 - ✅ Completed: Daily llms.txt Review
   - Synced Roadmap section with latest progress across all domain packages (e.g. Components Panel in Studio, JobManager examples in Infrastructure) while ensuring alignment with `package.json` version numbers.
