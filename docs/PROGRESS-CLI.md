@@ -2,6 +2,10 @@
 
 This file tracks progress for the CLI domain (`packages/cli`).
 
+## CLI v0.36.7
+
+- ✅ Add Command Regression Tests - Implemented comprehensive unit tests for `helios add`.
+
 ## CLI v0.36.6
 
 - ✅ Update Command Regression Tests - Implemented comprehensive unit tests for `helios update`.

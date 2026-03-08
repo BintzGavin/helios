@@ -17,6 +17,7 @@ export function registerAddCommand(program: Command) {
       } catch (e: any) {
         console.error(chalk.red(e.message));
         process.exit(1);
+        return;
       }
     });
 }
