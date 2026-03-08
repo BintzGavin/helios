@@ -20,26 +20,26 @@ Video stitching abstractions handle concatenating rendered segments into a singl
 
 ### Orchestration & Job Management
 
-The orchestrator module is responsible for managing the lifecycle of distributed rendering jobs, tracking progress, and executing tasks efficiently.
+The orchestrator module provides robust, fault-tolerant execution of distributed rendering jobs. It manages state transitions, concurrency, and error recovery to ensure consistent results across parallel tasks.
 
-- **JobManager**: The primary entry point for managing rendering jobs. It allows you to submit new jobs, pause, resume, cancel, or delete existing ones. It handles automatically uploading local job assets before distributed cloud executions begin (when provided an `ArtifactStorage` instance) and stores metrics such as total duration and logs per chunk.
-- **JobExecutor**: Coordinates the execution of individual job chunks using a specified `WorkerAdapter`. It supports concurrency limits, automated retries for transient failures, and handles merging the completed chunks either via a provided command or a `VideoStitcher`.
-- **JobExecutionOptions**: Configuration options passed to `JobManager` and `JobExecutor` to control concurrency, chunk execution logic, retry behavior, and merging strategies.
+- **JobManager**: The central orchestrator for job lifecycles. It provides APIs to submit, pause, resume, cancel, or delete rendering jobs. It integrates transparently with `ArtifactStorage` to handle automatic asset upload/download, aggregates execution metrics (durations, chunk logs), and manages persistence via pluggable `JobRepository` implementations.
+- **JobExecutor**: The execution engine that distributes rendering chunks across worker nodes. It interfaces with abstract `WorkerAdapter` instances to support hybrid deployments, enforces strict concurrency limits to prevent rate-limiting, handles automated backoff and retry for transient network/cloud failures, and delegates final output composition to an injected `VideoStitcher` or custom merge command.
+- **JobExecutionOptions**: The configuration schema governing job execution behavior, including fine-grained retry policies, chunking strategies, worker allocation parameters, and output artifact requirements.
 
 ### Cloud Execution Adapters
 
-Cloud adapters translate worker jobs into provider-specific invocations for scalable remote rendering.
+Cloud adapters provide the critical abstraction layer translating standardized worker jobs into provider-specific API invocations, enabling truly agnostic distributed rendering.
 
-- **AwsLambdaAdapter**: Executes rendering jobs on AWS Lambda. It invokes the Lambda function with the necessary job details (e.g., job definition URL, chunk index) and parses the response.
-- **CloudRunAdapter**: Executes rendering jobs on Google Cloud Run. It authenticates using OIDC ID Tokens via `google-auth-library` and sends a POST request to the service with the job payload.
+- **AwsLambdaAdapter**: Provisions and invokes rendering tasks on AWS Lambda infrastructure. It serializes job definitions, manages invocation payloads (job URL, chunk index), parses Lambda responses for execution status, and maps native AWS errors into the orchestrator's retry framework.
+- **CloudRunAdapter**: Provisions and invokes rendering tasks on Google Cloud Run containerized services. It handles secure invocation via OIDC ID Tokens using the `google-auth-library`, constructs HTTP POST payloads matching the container's expected schema, and maps standard HTTP status codes to framework execution states.
 
 ### Worker Runtime
 
-The worker runtime abstractions facilitate processing rendering tasks across diverse cloud environments in a stateless manner.
+The worker runtime abstractions provide the localized execution environment necessary for processing individual rendering tasks statelessly within diverse, ephemeral cloud compute nodes.
 
-- **WorkerRuntime**: The core engine for executing job chunks. It downloads remote job assets via an `ArtifactStorage` adapter, instantiates a `RenderExecutor`, and processes the specified chunk, ensuring a stateless execution environment.
-- **createAwsHandler**: A helper function to create an AWS Lambda handler (`aws-handler.ts`). It wraps the `WorkerRuntime` into an async function compatible with the AWS Lambda Node.js runtime signature, allowing seamless deployment to AWS.
-- **createCloudRunServer**: A helper function to create a Google Cloud Run HTTP server (`cloudrun-server.ts`). It spins up an HTTP server that listens for POST requests containing job payloads and processes them using the `WorkerRuntime`, suitable for containerized deployment on GCP.
+- **WorkerRuntime**: The foundational engine deployed inside cloud workers. It provides the required stateless environment by automatically downloading necessary remote assets via an injected `ArtifactStorage` adapter, instantiating the core `RenderExecutor` for localized frame rendering, and managing local temporary filesystem state to prevent cross-invocation pollution.
+- **createAwsHandler**: A factory function that constructs a production-ready AWS Lambda handler (`aws-handler.ts`). It wraps the generic `WorkerRuntime` inside an asynchronous execution shell that maps perfectly to the AWS Lambda Node.js signature, translating API Gateway or direct invocation events into standard job chunks.
+- **createCloudRunServer**: A factory function that constructs a production-ready Google Cloud Run HTTP server (`cloudrun-server.ts`). It initializes an Express or Node.js native server designed to receive incoming POST requests containing job payloads, routing them to the internal `WorkerRuntime` for execution within containerized environments.
 
 ### Artifact Storage
 
