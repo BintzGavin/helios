@@ -1,5 +1,8 @@
 # INFRASTRUCTURE PROGRESS
 
+## INFRASTRUCTURE v0.40.12
+- ✅ Completed: Cloud Storage Resiliency Tests - Implemented comprehensive regression and resiliency tests for S3StorageAdapter and GcsStorageAdapter handling JobSpec storage operations.
+
 ## INFRASTRUCTURE v0.40.11
 - ✅ Completed: LocalStorageAdapter Resiliency Tests - Implemented comprehensive resiliency and regression tests for LocalStorageAdapter's uploadJobSpec and deleteJobSpec methods.
 

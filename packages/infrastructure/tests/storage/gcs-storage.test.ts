@@ -6,6 +6,7 @@ const mockBucket = {
   upload: vi.fn(),
   getFiles: vi.fn(),
   deleteFiles: vi.fn(),
+  file: vi.fn().mockReturnValue({ save: vi.fn(), delete: vi.fn() }),
 };
 
 vi.mock('@google-cloud/storage', () => {
@@ -151,6 +152,50 @@ describe('GcsStorageAdapter', () => {
       await adapter.deleteAssetBundle(jobId, `gcs://${bucketName}/test-prefix`);
 
       expect(mockBucket.deleteFiles).toHaveBeenCalledWith({ prefix: 'test-prefix/' });
+    });
+  });
+
+  describe('uploadJobSpec', () => {
+    it('should upload a job spec and return a gcs:// URL', async () => {
+      const spec: any = { id: jobId, chunks: [] };
+      const mockFile = {
+        save: vi.fn().mockResolvedValue(undefined),
+      };
+      mockBucket.file.mockReturnValue(mockFile);
+
+      const remoteUrl = await adapter.uploadJobSpec(jobId, spec);
+
+      expect(remoteUrl).toBe(`gcs://${bucketName}/${jobId}/job.json`);
+      expect(mockBucket.file).toHaveBeenCalledWith(`${jobId}/job.json`);
+      expect(mockFile.save).toHaveBeenCalledWith(JSON.stringify(spec, null, 2), {
+        contentType: 'application/json',
+      });
+    });
+  });
+
+  describe('deleteJobSpec', () => {
+    it('should delete a job spec', async () => {
+      const mockFile = {
+        delete: vi.fn().mockResolvedValue(undefined),
+      };
+      mockBucket.file.mockReturnValue(mockFile);
+
+      await adapter.deleteJobSpec(jobId, `gcs://${bucketName}/${jobId}/job.json`);
+
+      expect(mockBucket.file).toHaveBeenCalledWith(`${jobId}/job.json`);
+      expect(mockFile.delete).toHaveBeenCalled();
+    });
+
+    it('should throw an error for unsupported remote URLs on deleteJobSpec', async () => {
+      await expect(adapter.deleteJobSpec(jobId, `local:///path/to/job.json`))
+        .rejects
+        .toThrow(/Unsupported remote URL scheme/);
+    });
+
+    it('should throw an error if mismatched bucket on deleteJobSpec', async () => {
+      await expect(adapter.deleteJobSpec(jobId, `gcs://other-bucket/${jobId}/job.json`))
+        .rejects
+        .toThrow(/does not match adapter bucket/);
     });
   });
 });
