@@ -1,5 +1,8 @@
 # INFRASTRUCTURE PROGRESS
 
+## INFRASTRUCTURE v0.40.11
+- ✅ Completed: LocalStorageAdapter Resiliency Tests - Implemented comprehensive resiliency and regression tests for LocalStorageAdapter's uploadJobSpec and deleteJobSpec methods.
+
 ## INFRASTRUCTURE v0.40.10
 - ✅ Completed: FileJobRepository Resiliency Tests - Implemented comprehensive resiliency and regression tests for FileJobRepository.
 
