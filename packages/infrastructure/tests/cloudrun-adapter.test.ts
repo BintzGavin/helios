@@ -10,6 +10,9 @@ vi.mock('google-auth-library', () => {
   return {
     GoogleAuth: class {
       async getIdTokenClient() {
+        if (mockGetIdTokenClient.mock.calls.length > 0) {
+          return mockGetIdTokenClient();
+        }
         return {
           request: mockRequest
         };
@@ -160,5 +163,43 @@ describe('CloudRunAdapter', () => {
 
      expect(result.exitCode).toBe(1);
      expect(result.stderr).toContain('HTTP 403');
+  });
+
+  it('should handle getIdTokenClient initialization failure', async () => {
+     mockGetIdTokenClient.mockRejectedValue(new Error('Auth failed'));
+     // Pre-populate mock.calls length so condition is hit and catch to avoid UnhandledPromiseRejection
+     mockGetIdTokenClient().catch(() => {});
+
+     const adapter = new CloudRunAdapter({ serviceUrl, jobDefUrl });
+     const result = await adapter.execute({
+       command: 'ignored',
+       args: [],
+       cwd: '/tmp',
+       env: {},
+       meta: { chunkId: 7 }
+     });
+
+     expect(result.exitCode).toBe(1);
+     expect(result.stderr).toContain('Auth failed');
+  });
+
+  it('should handle missing data fields gracefully', async () => {
+    mockRequest.mockResolvedValue({
+      status: 200,
+      data: {} // Missing stdout, exitCode, stderr
+    });
+
+    const adapter = new CloudRunAdapter({ serviceUrl, jobDefUrl });
+    const result = await adapter.execute({
+      command: 'ignored',
+      args: [],
+      cwd: '/tmp',
+      env: {},
+      meta: { chunkId: 8 }
+    });
+
+    expect(result.exitCode).toBe(0);
+    expect(result.stdout).toBe('');
+    expect(result.stderr).toBe('');
   });
 });

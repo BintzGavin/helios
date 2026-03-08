@@ -1,5 +1,8 @@
 # INFRASTRUCTURE PROGRESS
 
+## INFRASTRUCTURE v0.40.15
+- ✅ Completed: Cloud Adapter Resiliency Tests - Implemented comprehensive resiliency and regression tests for AwsLambdaAdapter and CloudRunAdapter.
+
 ## INFRASTRUCTURE v0.40.13
 - ✅ Completed: Documentation Clarity - Enhanced documentation for Orchestration, Job Management, Cloud Adapters, and Worker Runtime abstractions in the README.
 
