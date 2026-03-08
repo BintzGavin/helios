@@ -1,7 +1,8 @@
 # INFRASTRUCTURE STATUS
-**Version**: 0.40.17
+**Version**: 0.40.18
 
 ## Status Log
+- [v0.40.18] ✅ Completed: Robust Command Parsing - Refactored parseCommand to correctly process arguments with nested quotes and spaces.
 - [v0.40.17] ✅ Completed: Documentation Clarity - Enhanced Orchestration, Job Management, Cloud Adapters, and Worker Runtime abstractions descriptions in README.md.
 - [v0.40.16] ✅ Completed: Documentation Clarity - Updated README.md to improve clarity for Orchestration, Cloud Execution Adapters, and Worker Runtime abstractions.
 - [v0.40.15] 🚫 Blocked: No uncompleted implementation plans found for my domain in `/.sys/plans/`. I must stop working.

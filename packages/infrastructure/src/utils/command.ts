@@ -36,12 +36,14 @@ export function parseCommand(commandString: string): { command: string, args: st
     if (char === "'" && !inDoubleQuote) {
       inSingleQuote = !inSingleQuote;
       hasExplicitQuotes = true;
+      // DO NOT append quote to current token so it gets dropped.
       continue;
     }
 
     if (char === '"' && !inSingleQuote) {
       inDoubleQuote = !inDoubleQuote;
       hasExplicitQuotes = true;
+      // DO NOT append quote to current token so it gets dropped.
       continue;
     }
 

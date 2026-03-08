@@ -1,5 +1,8 @@
 # INFRASTRUCTURE PROGRESS
 
+## INFRASTRUCTURE v0.40.18
+- ✅ Completed: Robust Command Parsing - Refactored parseCommand to correctly process arguments with nested quotes and spaces.
+
 ## INFRASTRUCTURE v0.40.17
 - ✅ Completed: Documentation Clarity - Enhanced Orchestration, Job Management, Cloud Adapters, and Worker Runtime abstractions descriptions in README.md.
 
