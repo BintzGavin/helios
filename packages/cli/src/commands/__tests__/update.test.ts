@@ -29,6 +29,7 @@ describe('update command', () => {
     exitSpy = vi.spyOn(process, 'exit').mockImplementation((() => {}) as any);
 
     vi.mocked(configUtil.loadConfig).mockReturnValue({
+      version: '1.0.0',
       framework: 'react',
       directories: { components: 'src/components', lib: 'src/lib' },
       components: ['test-component'],
@@ -52,6 +53,7 @@ describe('update command', () => {
 
   it('should exit if component is not installed', async () => {
     vi.mocked(configUtil.loadConfig).mockReturnValue({
+      version: '1.0.0',
       framework: 'react',
       directories: { components: 'src/components', lib: 'src/lib' },
       components: ['other-component'],
