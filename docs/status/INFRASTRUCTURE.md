@@ -1,7 +1,8 @@
 # INFRASTRUCTURE STATUS
-**Version**: 0.40.12
+**Version**: 0.40.13
 
 ## Status Log
+- [v0.40.13] ✅ Completed: Documentation Clarity - Enhanced documentation for Orchestration, Job Management, Cloud Adapters, and Worker Runtime abstractions in the README.
 - [v0.40.12] ✅ Completed: Cloud Storage Resiliency Tests - Implemented comprehensive regression and resiliency tests for S3StorageAdapter and GcsStorageAdapter handling JobSpec storage operations.
 - [v0.40.11] ✅ Completed: LocalStorageAdapter Resiliency Tests - Implemented comprehensive resiliency and regression tests for LocalStorageAdapter's uploadJobSpec and deleteJobSpec methods.
 - [v0.40.10] ✅ Completed: FileJobRepository Resiliency Tests - Implemented comprehensive resiliency and regression tests for FileJobRepository.

@@ -1,5 +1,8 @@
 # INFRASTRUCTURE PROGRESS
 
+## INFRASTRUCTURE v0.40.13
+- ✅ Completed: Documentation Clarity - Enhanced documentation for Orchestration, Job Management, Cloud Adapters, and Worker Runtime abstractions in the README.
+
 ## INFRASTRUCTURE v0.40.12
 - ✅ Completed: Cloud Storage Resiliency Tests - Implemented comprehensive regression and resiliency tests for S3StorageAdapter and GcsStorageAdapter handling JobSpec storage operations.
 
