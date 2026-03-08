@@ -1,3 +1,6 @@
+## PLAYER v0.76.16
+- ✅ Completed: Audio Context Manager Tests - Added comprehensive unit test coverage for SharedAudioContextManager and SharedAudioSource logic to prevent regressions.
+
 ## PLAYER v0.76.10
 - ✅ Completed: Async Seek - Updated `DirectController.seek` to wait for two `requestAnimationFrame` cycles before resolving, ensuring visual frame rendering is complete.
 
