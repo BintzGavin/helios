@@ -1,4 +1,4 @@
-**Version**: v0.76.15
+**Version**: v0.76.16
 
 **Posture**: STABLE AND FEATURE COMPLETE
 
@@ -10,6 +10,7 @@
 - **Responsibility**: `<helios-player>` Web Component, UI controls, iframe bridge.
 
 ## Current State
+[v0.76.16] ✅ Completed: Audio Context Manager Tests - Added comprehensive unit test coverage for SharedAudioContextManager and SharedAudioSource logic to prevent regressions.
 [v0.76.15] 🚫 Blocked: No new plan found in /.sys/plans/ for PLAYER. Waiting for Planner to create the next implementation spec.
 - `<helios-player>` uses a modular architecture with `HeliosController` (Direct/Bridge) and `ClientSideExporter`.
 - Client-side export supports explicit configuration via `export-mode`, `canvas-selector`, and `export-caption-mode` attributes.
