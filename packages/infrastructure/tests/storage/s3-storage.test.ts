@@ -8,6 +8,7 @@ import {
   S3Client,
   PutObjectCommand,
   GetObjectCommand,
+  DeleteObjectCommand,
   DeleteObjectsCommand,
   ListObjectsV2Command,
 } from '@aws-sdk/client-s3';
@@ -230,5 +231,61 @@ describe('S3StorageAdapter', () => {
     const remoteUrl = `local:///path/to/job`;
 
     await expect(adapter.deleteAssetBundle(jobId, remoteUrl)).rejects.toThrow(/Unsupported remote URL scheme/);
+  });
+
+  describe('uploadJobSpec', () => {
+    it('should upload a job spec and return an s3:// URL', async () => {
+      const jobId = 'job-123';
+      const spec: any = { id: jobId, chunks: [] };
+
+      s3Mock.on(PutObjectCommand).resolves({});
+
+      const remoteUrl = await adapter.uploadJobSpec(jobId, spec);
+
+      expect(remoteUrl).toBe(`s3://${bucket}/${jobId}/job.json`);
+
+      const putCalls = s3Mock.calls().filter(c => c.args[0].constructor.name === 'PutObjectCommand');
+      expect(putCalls.length).toBe(1);
+
+      const putCall = putCalls[0];
+      expect(putCall.args[0].input).toMatchObject({
+        Bucket: bucket,
+        Key: `${jobId}/job.json`,
+        ContentType: 'application/json',
+      });
+      expect(putCall.args[0].input.Body).toBe(JSON.stringify(spec, null, 2));
+    });
+  });
+
+  describe('deleteJobSpec', () => {
+    it('should delete a job spec', async () => {
+      const jobId = 'job-123';
+      const remoteUrl = `s3://${bucket}/${jobId}/job.json`;
+
+      s3Mock.on(DeleteObjectCommand).resolves({});
+
+      await adapter.deleteJobSpec(jobId, remoteUrl);
+
+      const deleteCalls = s3Mock.calls().filter(c => c.args[0].constructor.name === 'DeleteObjectCommand');
+      expect(deleteCalls.length).toBe(1);
+
+      const deleteParams = deleteCalls[0].args[0].input;
+      expect(deleteParams.Bucket).toBe(bucket);
+      expect(deleteParams.Key).toBe(`${jobId}/job.json`);
+    });
+
+    it('should throw an error for unsupported remote URLs on deleteJobSpec', async () => {
+      const jobId = 'job-123';
+      const remoteUrl = `local:///path/to/job.json`;
+
+      await expect(adapter.deleteJobSpec(jobId, remoteUrl)).rejects.toThrow(/Unsupported remote URL scheme/);
+    });
+
+    it('should throw an error if mismatched bucket on deleteJobSpec', async () => {
+      const jobId = 'job-123';
+      const remoteUrl = `s3://other-bucket/${jobId}/job.json`;
+
+      await expect(adapter.deleteJobSpec(jobId, remoteUrl)).rejects.toThrow(/does not match adapter bucket/);
+    });
   });
 });

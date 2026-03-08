@@ -1,7 +1,8 @@
 # INFRASTRUCTURE STATUS
-**Version**: 0.40.11
+**Version**: 0.40.12
 
 ## Status Log
+- [v0.40.12] ✅ Completed: Cloud Storage Resiliency Tests - Implemented comprehensive regression and resiliency tests for S3StorageAdapter and GcsStorageAdapter handling JobSpec storage operations.
 - [v0.40.11] ✅ Completed: LocalStorageAdapter Resiliency Tests - Implemented comprehensive resiliency and regression tests for LocalStorageAdapter's uploadJobSpec and deleteJobSpec methods.
 - [v0.40.10] ✅ Completed: FileJobRepository Resiliency Tests - Implemented comprehensive resiliency and regression tests for FileJobRepository.
 - [v0.40.9] ✅ Completed: FileJobRepository Resiliency Tests Spec - Created spec for expanding FileJobRepository resiliency and regression tests.
