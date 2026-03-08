@@ -142,4 +142,74 @@ describe('LocalStorageAdapter', () => {
 
     await expect(adapter.deleteAssetBundle(jobId, remoteUrl)).rejects.toThrow(/Path traversal detected/);
   });
+
+  describe('uploadJobSpec', () => {
+    it('should upload a job spec and return a local:// URL', async () => {
+      const jobId = 'job-123';
+      const mockSpec = {
+        id: jobId,
+        priority: 1,
+        frames: 100,
+        fps: 30,
+        tasks: [],
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        status: 'pending',
+        state: { status: 'pending', completedChunks: 0, totalChunks: 1, activeWorkers: 0 }
+      } as any;
+
+      const remoteUrl = await adapter.uploadJobSpec(jobId, mockSpec);
+
+      expect(remoteUrl).toMatch(/^local:\/\//);
+      const remoteFile = remoteUrl.slice('local://'.length);
+      expect(remoteFile).toBe(path.join(storageDir, jobId, 'job.json'));
+
+      const content = await fs.readFile(remoteFile, 'utf-8');
+      const parsed = JSON.parse(content);
+      expect(parsed.id).toBe(jobId);
+    });
+  });
+
+  describe('deleteJobSpec', () => {
+    it('should delete a job spec', async () => {
+      const jobId = 'job-123';
+      const mockSpec = {
+        id: jobId,
+        priority: 1,
+        frames: 100,
+        fps: 30,
+        tasks: [],
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        status: 'pending',
+        state: { status: 'pending', completedChunks: 0, totalChunks: 1, activeWorkers: 0 }
+      } as any;
+
+      const remoteUrl = await adapter.uploadJobSpec(jobId, mockSpec);
+      const remoteFile = remoteUrl.slice('local://'.length);
+
+      // Ensure it exists
+      await fs.access(remoteFile);
+
+      await adapter.deleteJobSpec(jobId, remoteUrl);
+
+      // Verify it is deleted
+      await expect(fs.access(remoteFile)).rejects.toThrow(/ENOENT/);
+    });
+
+    it('should throw an error for unsupported remote URLs on deleteJobSpec', async () => {
+      const jobId = 'job-123';
+      const remoteUrl = 's3://my-bucket/job-123/job.json';
+
+      await expect(adapter.deleteJobSpec(jobId, remoteUrl)).rejects.toThrow(/Unsupported remote URL scheme/);
+    });
+
+    it('should prevent directory traversal attacks on deleteJobSpec', async () => {
+      const jobId = 'job-123';
+      const traversalPath = path.join(storageDir, '../../some-dir/job.json');
+      const remoteUrl = `local://${traversalPath}`;
+
+      await expect(adapter.deleteJobSpec(jobId, remoteUrl)).rejects.toThrow(/Path traversal detected/);
+    });
+  });
 });
