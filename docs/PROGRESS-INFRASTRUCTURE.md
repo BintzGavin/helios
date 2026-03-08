@@ -1,5 +1,8 @@
 # INFRASTRUCTURE PROGRESS
 
+## INFRASTRUCTURE v0.40.17
+- ✅ Completed: Documentation Clarity - Enhanced Orchestration, Job Management, Cloud Adapters, and Worker Runtime abstractions descriptions in README.md.
+
 ## INFRASTRUCTURE v0.40.16
 - ✅ Completed: Documentation Clarity - Updated README.md to improve clarity for Orchestration, Cloud Execution Adapters, and Worker Runtime abstractions.
 
