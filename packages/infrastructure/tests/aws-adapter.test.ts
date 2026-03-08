@@ -156,4 +156,62 @@ describe('AwsLambdaAdapter', () => {
       meta: {} // Missing chunkId
     })).rejects.toThrow('chunkId');
   });
+
+  it('should gracefully handle client.send throwing an error', async () => {
+    const adapter = new AwsLambdaAdapter({
+      functionName: 'test-function',
+      jobDefUrl: 'job.json'
+    });
+
+    lambdaMock.on(InvokeCommand).rejects(new Error('Network failure'));
+
+    const result = await adapter.execute({
+      command: 'ignored',
+      meta: { chunkId: 1 }
+    });
+
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toContain('Network failure');
+  });
+
+  it('should handle empty Payload in success response', async () => {
+    const adapter = new AwsLambdaAdapter({
+      functionName: 'test-function',
+      jobDefUrl: 'job.json'
+    });
+
+    lambdaMock.on(InvokeCommand).resolves({
+      StatusCode: 200,
+      // Missing Payload entirely
+    });
+
+    const result = await adapter.execute({
+      command: 'ignored',
+      meta: { chunkId: 1 }
+    });
+
+    expect(result.exitCode).toBe(0);
+    expect(result.stdout).toBe('');
+  });
+
+  it('should handle malformed JSON in Payload', async () => {
+    const adapter = new AwsLambdaAdapter({
+      functionName: 'test-function',
+      jobDefUrl: 'job.json'
+    });
+
+    lambdaMock.on(InvokeCommand).resolves({
+      StatusCode: 200,
+      Payload: new TextEncoder().encode('Invalid JSON')
+    });
+
+    const result = await adapter.execute({
+      command: 'ignored',
+      meta: { chunkId: 1 }
+    });
+
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toContain('Failed to parse Lambda response');
+    expect(result.stdout).toBe('Invalid JSON');
+  });
 });
