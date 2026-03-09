@@ -1,5 +1,8 @@
 # INFRASTRUCTURE PROGRESS
 
+## INFRASTRUCTURE v0.40.26
+- ✅ Completed: LocalWorkerAdapter Benchmark - Implemented performance benchmarks for the LocalWorkerAdapter using vitest bench.
+
 ## INFRASTRUCTURE v0.40.25
 - ✅ Completed: AwsHandler Resiliency Tests - Added tests to verify handler behavior under malformed payloads and runtime errors
 
