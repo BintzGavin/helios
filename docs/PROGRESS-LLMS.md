@@ -1,5 +1,12 @@
 # LLMS Progress
 
+## LLMS v1.36.0
+- ✅ Completed: Daily llms.txt Review
+  - Synced Roadmap with recent actual completions from PROGRESS files across all domain packages (Studio, CLI, Core, Player, Renderer, Infrastructure).
+  - Retained existing package.json versions in Quick Facts.
+  - Verified all API examples and file paths remain correct.
+  - Updated Roadmap items for Studio (MCP Server Enhancement, Components Panel), CLI (Command Regression Tests), Player (Audio Context Manager Tests), and Infrastructure (Resiliency Tests, Benchmarks).
+
 ## LLMS v1.35.0
 - ✅ Completed: Daily llms.txt Review
   - Fixed version drift by realigning Quick Facts and Roadmap to actual package.json versions (Infrastructure to v0.25.0+).
