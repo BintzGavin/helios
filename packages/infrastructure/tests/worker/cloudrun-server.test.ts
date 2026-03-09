@@ -180,4 +180,42 @@ describe('Cloud Run Server', () => {
     expect(response.statusCode).toBe(500);
     expect(response.body).toEqual({ exitCode: 1, stdout: '', stderr: 'Render error' });
   });
+
+  it('should return 400 for empty payload', async () => {
+    const cloudServer = createCloudRunServer({ port: 9008 });
+    serverInstance = cloudServer.listen();
+
+    const response = await new Promise<any>((resolve, reject) => {
+      const options = {
+        hostname: 'localhost',
+        port: 9008,
+        path: '/',
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      };
+
+      const req = http.request(options, (res) => {
+        let data = '';
+        res.on('data', (chunk) => {
+          data += chunk;
+        });
+        res.on('end', () => {
+          try {
+            resolve({ statusCode: res.statusCode, body: JSON.parse(data) });
+          } catch (e) {
+            resolve({ statusCode: res.statusCode, body: data });
+          }
+        });
+      });
+
+      req.on('error', (e) => reject(e));
+      req.end();
+    });
+
+    expect(response.statusCode).toBe(400);
+    expect(response.body.message).toBe('Empty payload');
+    expect(WorkerRuntime).not.toHaveBeenCalled();
+  });
 });
