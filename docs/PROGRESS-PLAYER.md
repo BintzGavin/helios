@@ -1,3 +1,6 @@
+## PLAYER v0.76.17
+- ✅ Completed: Regression Tests for MediaProperties - Added comprehensive tests for cross-origin security checks and media property parity (videoWidth/Height).
+
 ## PLAYER v0.76.16
 - ✅ Completed: Audio Context Manager Tests - Added comprehensive unit test coverage for SharedAudioContextManager and SharedAudioSource logic to prevent regressions.
 

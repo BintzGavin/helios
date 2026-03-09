@@ -116,4 +116,14 @@ describe('connectToParent', () => {
 
         expect(mockHelios.play).not.toHaveBeenCalled();
     });
+
+    it('should IGNORE messages from nested iframes', () => {
+        connectToParent(mockHelios);
+
+        // Send message from an untrusted source (e.g. nested iframe)
+        const nestedIframe = {};
+        triggerMessage({ type: 'HELIOS_PLAY' }, nestedIframe);
+
+        expect(mockHelios.play).not.toHaveBeenCalled();
+    });
 });
