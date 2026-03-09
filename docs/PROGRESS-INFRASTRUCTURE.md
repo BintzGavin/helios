@@ -1,5 +1,8 @@
 # INFRASTRUCTURE PROGRESS
 
+## INFRASTRUCTURE v0.41.2
+- ✅ Completed: SyncWorkspace Dependencies Benchmark - Implemented performance benchmarks for the syncWorkspaceDependencies utility.
+
 ## INFRASTRUCTURE v0.41.1
 - ✅ Completed: AwsHandler Benchmark - Implemented performance benchmarks for createAwsHandler using vitest bench.
 

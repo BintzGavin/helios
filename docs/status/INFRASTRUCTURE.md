@@ -1,7 +1,8 @@
 # INFRASTRUCTURE STATUS
-**Version**: 0.41.1
+**Version**: 0.41.2
 
 ## Status Log
+- [v0.41.2] ✅ Completed: SyncWorkspace Dependencies Benchmark - Implemented performance benchmarks for the syncWorkspaceDependencies utility.
 - [v0.41.1] ✅ Completed: AwsHandler Benchmark - Implemented performance benchmarks for createAwsHandler using vitest bench.
 - [v0.41.0] ✅ Completed: AwsLambdaAdapter Benchmark - Implemented performance benchmarks for the AwsLambdaAdapter using vitest bench.
 - [v0.40.27] ✅ Completed: CloudRunServer Benchmark - Implemented performance benchmarks for the CloudRunServer using vitest bench.
