@@ -39,6 +39,7 @@ Helios must support distributed rendering suitable for cloud execution.
 - Deterministic frame seeking
 - No reliance on replaying prior frames
 - Output stitching without re-encoding where possible
+- Cloud execution adapters: AWS Lambda, Google Cloud Run, Cloudflare Workers, Azure Functions, Fly.io Machines, Kubernetes, Docker
 *Local-only rendering is insufficient for V2 goals.*
 
 #### COMPONENT REGISTRY
