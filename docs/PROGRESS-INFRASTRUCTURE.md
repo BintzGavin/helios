@@ -1,5 +1,8 @@
 # INFRASTRUCTURE PROGRESS
 
+## INFRASTRUCTURE v0.40.25
+- ✅ Completed: AwsHandler Resiliency Tests - Added tests to verify handler behavior under malformed payloads and runtime errors
+
 ## INFRASTRUCTURE v0.40.24
 - ✅ Completed: CloudRunServer Resiliency Tests - Implemented comprehensive resiliency and regression tests for createCloudRunServer error handling.
 
