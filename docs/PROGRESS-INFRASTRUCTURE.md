@@ -1,5 +1,8 @@
 # INFRASTRUCTURE PROGRESS
 
+## INFRASTRUCTURE v0.40.27
+- ✅ Completed: CloudRunServer Benchmark - Implemented performance benchmarks for the CloudRunServer using vitest bench.
+
 ## INFRASTRUCTURE v0.40.26
 - ✅ Completed: LocalWorkerAdapter Benchmark - Implemented performance benchmarks for the LocalWorkerAdapter using vitest bench.
 

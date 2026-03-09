@@ -32,6 +32,7 @@ packages/infrastructure/tests
 ├── benchmarks
 │   ├── aws-adapter.bench.ts
 │   ├── cloudrun-adapter.bench.ts
+│   ├── cloudrun-server.bench.ts
 │   ├── ffmpeg-stitcher.bench.ts
 │   ├── file-job-repository.bench.ts
 │   ├── gcs-storage.bench.ts

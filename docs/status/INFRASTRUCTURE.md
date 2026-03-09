@@ -1,7 +1,8 @@
 # INFRASTRUCTURE STATUS
-**Version**: 0.40.26
+**Version**: 0.40.27
 
 ## Status Log
+- [v0.40.27] ✅ Completed: CloudRunServer Benchmark - Implemented performance benchmarks for the CloudRunServer using vitest bench.
 - [v0.40.26] ✅ Completed: LocalWorkerAdapter Benchmark - Implemented performance benchmarks for the LocalWorkerAdapter using vitest bench.
 [v0.40.25] ✅ Completed: AwsHandler Resiliency Tests - Added tests to verify handler behavior under malformed payloads and runtime errors
 - [v0.40.24] ✅ Completed: CloudRunServer Resiliency Tests - Implemented comprehensive resiliency and regression tests for createCloudRunServer error handling.
