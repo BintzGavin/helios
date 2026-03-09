@@ -1,4 +1,4 @@
-**Version**: 0.118.0
+**Version**: 0.118.1
 
 **Posture**: ACTIVELY EXPANDING FOR V2
 
@@ -11,6 +11,7 @@
 > **Note**: Status versions in this file may precede package release versions (`package.json`). Always verify `package.json` for the currently installed version.
 
 ## Recent Updates
+- [v0.118.1] ✅ Completed: Regression Tests - Implemented unit and regression tests for `TimelineAudioTrack` component and `useAudioWaveform` hook.
 - [v0.118.0] ✅ Completed: Enhance MCP Server - Added support for inputProps, videoBitrate, and videoCodec to MCP server tools.
 - [v0.117.0] ✅ Completed: Components Panel - Implemented a visual Components Panel in Helios Studio to browse and install components from the registry.
 - [v0.116.2] ✅ Completed: Schema Validation - Implemented visual validation feedback in the Studio Props Editor to enforce schema constraints (pattern, min/max) and guide users using a unified `validateValue` helper.
