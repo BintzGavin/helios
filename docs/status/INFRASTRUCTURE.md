@@ -1,7 +1,8 @@
 # INFRASTRUCTURE STATUS
-**Version**: 0.40.22
+**Version**: 0.40.23
 
 ## Status Log
+- [v0.40.23] ✅ Completed: Fix CloudRunServer Error Handling - Modified `createCloudRunServer` to use optional chaining for `error?.message` and wrapped `JSON.parse` in a try/catch block to prevent internal crashes on invalid JSON payloads.
 - [v0.40.22] ✅ Completed: AwsHandler Resiliency Tests - Implemented comprehensive resiliency and regression tests for createAwsHandler error handling.
 - [v0.40.22] ✅ Completed: AwsHandler Resiliency Tests Spec - Created spec for expanding AwsHandler resiliency and regression tests.
 - [v0.40.21] 🚫 Blocked: No uncompleted implementation plans found for my domain in `/.sys/plans/`. I must stop working.
