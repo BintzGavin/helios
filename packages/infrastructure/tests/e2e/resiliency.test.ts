@@ -3,11 +3,77 @@ import { JobExecutor } from '../../src/orchestrator/job-executor.js';
 import { LocalWorkerAdapter } from '../../src/adapters/local-adapter.js';
 import { WorkerRuntime } from '../../src/worker/runtime.js';
 import { RenderExecutor } from '../../src/worker/render-executor.js';
+import { FfmpegStitcher } from '../../src/stitcher/ffmpeg-stitcher.js';
 import { JobSpec } from '../../src/types/job-spec.js';
 import { WorkerJob } from '../../src/types/adapter.js';
 import { ArtifactStorage } from '../../src/types/index.js';
+import * as fs from 'node:fs';
 
 describe('Infrastructure Resiliency and Regression Tests', () => {
+  describe('FfmpegStitcher Resiliency', () => {
+    it('should fail gracefully when no input files are provided', async () => {
+      const adapter = new LocalWorkerAdapter();
+      const stitcher = new FfmpegStitcher(adapter);
+
+      await expect(stitcher.stitch([], 'output.mp4')).rejects.toThrow('No input files provided for stitching');
+    });
+
+    it('should handle ffmpeg command execution failure and throw error with stderr', async () => {
+      const adapter = new LocalWorkerAdapter();
+      vi.spyOn(adapter, 'execute').mockResolvedValue({
+        exitCode: 1,
+        stdout: '',
+        stderr: 'Simulated ffmpeg error output',
+        durationMs: 15
+      });
+
+      const stitcher = new FfmpegStitcher(adapter);
+
+      await expect(stitcher.stitch(['input1.mp4', 'input2.mp4'], 'output.mp4'))
+        .rejects.toThrow('FFmpeg stitching failed with exit code 1: Simulated ffmpeg error output');
+    });
+
+    it('should clean up the temporary list file even if ffmpeg command fails', async () => {
+      const adapter = new LocalWorkerAdapter();
+      vi.spyOn(adapter, 'execute').mockResolvedValue({
+        exitCode: 1,
+        stdout: '',
+        stderr: 'Simulated ffmpeg error output',
+        durationMs: 15
+      });
+
+      // To avoid global ESM mock issues with fs/promises, we allow the temporary
+      // file to be written to the real OS temp directory.
+      // We then intercept the execution call to capture the generated path,
+      // simulate an ffmpeg failure, and verify the file is successfully unlinked
+      // in the finally block.
+
+      let capturedListPath = '';
+      vi.spyOn(adapter, 'execute').mockImplementation(async (job) => {
+        const iIndex = job.args?.indexOf('-i');
+        if (iIndex !== undefined && iIndex !== -1 && job.args) {
+            capturedListPath = job.args[iIndex + 1];
+        }
+        return {
+          exitCode: 1,
+          stdout: '',
+          stderr: 'Simulated ffmpeg error output',
+          durationMs: 15
+        };
+      });
+
+      const stitcher = new FfmpegStitcher(adapter);
+
+      await expect(stitcher.stitch(['input1.mp4', 'input2.mp4'], 'output.mp4')).rejects.toThrow();
+
+      expect(capturedListPath).toBeTruthy();
+
+      // Check if the file still exists
+      const fileExists = fs.existsSync(capturedListPath);
+      expect(fileExists).toBe(false);
+    });
+  });
+
   describe('JobExecutor Resiliency', () => {
     let jobSpec: JobSpec;
 
