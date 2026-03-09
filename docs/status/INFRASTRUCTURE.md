@@ -1,7 +1,8 @@
 # INFRASTRUCTURE STATUS
-**Version**: 0.41.0
+**Version**: 0.41.1
 
 ## Status Log
+- [v0.41.1] ✅ Completed: AwsHandler Benchmark - Implemented performance benchmarks for createAwsHandler using vitest bench.
 - [v0.41.0] ✅ Completed: AwsLambdaAdapter Benchmark - Implemented performance benchmarks for the AwsLambdaAdapter using vitest bench.
 - [v0.40.27] ✅ Completed: CloudRunServer Benchmark - Implemented performance benchmarks for the CloudRunServer using vitest bench.
 - [v0.40.26] ✅ Completed: LocalWorkerAdapter Benchmark - Implemented performance benchmarks for the LocalWorkerAdapter using vitest bench.
