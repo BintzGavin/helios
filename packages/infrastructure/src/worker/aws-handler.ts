@@ -42,7 +42,7 @@ export function createAwsHandler(config: AwsHandlerConfig = {}) {
     } catch (error: any) {
       return {
         statusCode: 500,
-        body: JSON.stringify({ message: error.message || 'Unknown error in AWS Lambda handler' })
+        body: JSON.stringify({ message: (error && error.message) || 'Unknown error in AWS Lambda handler' })
       };
     }
   };

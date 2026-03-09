@@ -1,5 +1,8 @@
 # INFRASTRUCTURE PROGRESS
 
+## INFRASTRUCTURE v0.40.22
+- ✅ Completed: AwsHandler Resiliency Tests - Implemented comprehensive resiliency and regression tests for createAwsHandler error handling.
+
 ## INFRASTRUCTURE v0.40.21
 - ✅ Completed: FfmpegStitcher Resiliency Tests - Implemented comprehensive resiliency and regression tests for FfmpegStitcher error handling.
 
