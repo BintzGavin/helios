@@ -43,7 +43,15 @@ export function createCloudRunServer(config: CloudRunServerConfig = {}) {
            return;
         }
 
-        const payload = JSON.parse(body);
+        let payload;
+        try {
+          payload = JSON.parse(body);
+        } catch (parseError: any) {
+          res.writeHead(400, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ message: 'Invalid JSON payload' }));
+          return;
+        }
+
         const { jobPath, chunkIndex } = payload;
 
         if (!jobPath || chunkIndex === undefined) {
@@ -65,7 +73,7 @@ export function createCloudRunServer(config: CloudRunServerConfig = {}) {
 
       } catch (error: any) {
         res.writeHead(500, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ message: error.message || 'Unknown error in Cloud Run server' }));
+        res.end(JSON.stringify({ message: error?.message || 'Unknown error in Cloud Run server' }));
       }
     });
   });

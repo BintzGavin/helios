@@ -106,6 +106,45 @@ describe('Cloud Run Server', () => {
     expect(WorkerRuntime).not.toHaveBeenCalled();
   });
 
+  it('should return 400 for invalid JSON payload', async () => {
+    const cloudServer = createCloudRunServer({ port: 9006 });
+    serverInstance = cloudServer.listen();
+
+    const response = await new Promise<any>((resolve, reject) => {
+      const options = {
+        hostname: 'localhost',
+        port: 9006,
+        path: '/',
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      };
+
+      const req = http.request(options, (res) => {
+        let data = '';
+        res.on('data', (chunk) => {
+          data += chunk;
+        });
+        res.on('end', () => {
+          try {
+            resolve({ statusCode: res.statusCode, body: JSON.parse(data) });
+          } catch (e) {
+            resolve({ statusCode: res.statusCode, body: data });
+          }
+        });
+      });
+
+      req.on('error', (e) => reject(e));
+      req.write('{ "bad": json '); // Invalid JSON
+      req.end();
+    });
+
+    expect(response.statusCode).toBe(400);
+    expect(response.body.message).toBe('Invalid JSON payload');
+    expect(WorkerRuntime).not.toHaveBeenCalled();
+  });
+
   it('should return 500 when WorkerRuntime throws an error', async () => {
     mockRun.mockRejectedValue(new Error('Fetch failed'));
 
@@ -116,6 +155,18 @@ describe('Cloud Run Server', () => {
 
     expect(response.statusCode).toBe(500);
     expect(response.body.message).toBe('Fetch failed');
+  });
+
+  it('should return 500 when WorkerRuntime throws null', async () => {
+    mockRun.mockRejectedValue(null);
+
+    const cloudServer = createCloudRunServer({ port: 9007 });
+    serverInstance = cloudServer.listen();
+
+    const response = await sendPostRequest(9007, { jobPath: 'job.json', chunkIndex: 0 });
+
+    expect(response.statusCode).toBe(500);
+    expect(response.body.message).toBe('Unknown error in Cloud Run server');
   });
 
   it('should return 500 when exitCode is non-zero', async () => {
