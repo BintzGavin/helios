@@ -1,4 +1,7 @@
-### STUDIO v0.118.0
+### STUDIO v0.118.1
+- ✅ Completed: Regression Tests - Implemented unit and regression tests for `TimelineAudioTrack` component and `useAudioWaveform` hook.
+
+## STUDIO v0.118.0
 - ✅ Completed: Enhance MCP Server - Added support for inputProps, videoBitrate, and videoCodec to MCP server tools.
 
 ## STUDIO v0.117.0
