@@ -69,3 +69,7 @@ Critical learnings only. This is not a log—only add entries for insights that 
 ## 0.24.0 - Vitest Bench Options Side-Effects
 **Learning:** In Vitest benchmarks (`vitest bench`), using `setup` and `teardown` options within the `bench()` configuration executes multiple times in the hot loop. This causes race conditions, missing directories, or disk bloat when setting up heavy file systems or directories.
 **Action:** Place heavy setup operations in standard `beforeAll` and `afterAll` hooks outside the benchmark block instead to avoid side-effects and crashes.
+
+## 0.40.23 - WorkerRuntime CloudRun Resiliency
+**Learning:** CloudRun server uses `JSON.parse(body)` to process incoming requests. If a request sends invalid JSON, it throws an exception. `WorkerRuntime` exceptions are caught properly if they are in the `try { } catch` block, but the HTTP parsing is outside the runtime.
+**Action:** When implementing HTTP servers, ensure `JSON.parse` is wrapped in a try/catch, or that the outer exception handler gracefully returns a 500 error instead of failing internally.
