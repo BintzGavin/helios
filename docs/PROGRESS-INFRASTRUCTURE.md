@@ -1,5 +1,8 @@
 # INFRASTRUCTURE PROGRESS
 
+## INFRASTRUCTURE v0.41.0
+- ✅ Completed: AwsLambdaAdapter Benchmark - Implemented performance benchmarks for the AwsLambdaAdapter using vitest bench.
+
 ## INFRASTRUCTURE v0.40.27
 - ✅ Completed: CloudRunServer Benchmark - Implemented performance benchmarks for the CloudRunServer using vitest bench.
 
