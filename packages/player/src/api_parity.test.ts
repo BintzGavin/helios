@@ -284,6 +284,26 @@ describe('HeliosPlayer API Parity', () => {
     expect(player.currentSrc).toBe('test.html');
   });
 
+  it('should support videoWidth and videoHeight properties', () => {
+    // Should fallback to attributes when controller has no state
+    player.setAttribute('width', '800');
+    player.setAttribute('height', '600');
+    expect(player.videoWidth).toBe(800);
+    expect(player.videoHeight).toBe(600);
+
+    // Mock controller state with dimensions
+    const mockController = {
+      getState: () => ({ width: 1920, height: 1080 }),
+      pause: vi.fn(),
+      dispose: vi.fn(),
+    };
+    (player as any).controller = mockController;
+
+    // Should prioritize controller state over attributes
+    expect(player.videoWidth).toBe(1920);
+    expect(player.videoHeight).toBe(1080);
+  });
+
   it('should support error property', () => {
     expect(player.error).toBeNull();
 
