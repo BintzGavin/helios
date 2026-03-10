@@ -1,63 +1,56 @@
-# 2026-03-10-INFRASTRUCTURE-Fly-Machines-Adapter
+# INFRASTRUCTURE: Fly Machines Adapter
 
 ## 1. Context & Goal
-- **Objective**: Implement a `WorkerAdapter` for Fly.io Machines.
-- **Trigger**: Expanding distributed rendering to Fly.io as per `docs/BACKLOG.md` (Tier 1).
-- **Impact**: Enables true pay-per-frame distributed rendering by provisioning and executing jobs on Fly.io Machines, with the potential for GPU access for WebGL-heavy compositions.
+- **Objective**: Implement a `FlyMachinesAdapter` that conforms to the `WorkerAdapter` interface for executing rendering chunks on Fly.io Machines.
+- **Trigger**: Vision gap - `AGENTS.md` mandates Cloud execution adapters. `docs/BACKLOG.md` specifically lists `Fly.io Machines` as a Tier 1 high-impact adapter for true pay-per-frame execution.
+- **Impact**: Enables `packages/infrastructure` to orchestrate rendering jobs directly on Fly.io infrastructure using the Machines API. This is critical for users needing on-demand, cost-effective GPU/CPU scaling.
 
 ## 2. File Inventory
 - **Create**:
-  - `packages/infrastructure/src/adapters/fly-machines-adapter.ts` (Fly.io adapter implementation)
-  - `packages/infrastructure/tests/adapters/fly-machines-adapter.test.ts` (Unit tests)
-  - `packages/infrastructure/tests/benchmarks/fly-machines-adapter.bench.ts` (Performance benchmarks)
-  - `examples/fly-machines-execution/index.ts` (Example usage)
-  - `examples/fly-machines-execution/package.json` (Example usage)
+  - `packages/infrastructure/src/adapters/fly-machines-adapter.ts`: Implementation of the adapter.
+  - `packages/infrastructure/tests/adapters/fly-machines-adapter.test.ts`: Unit tests verifying API calls and lifecycle management.
+  - `packages/infrastructure/tests/benchmarks/fly-machines-adapter.bench.ts`: Performance benchmarks for the adapter.
+  - `packages/infrastructure/examples/fly-machines-adapter.ts`: Standalone example script demonstrating usage.
 - **Modify**:
-  - `packages/infrastructure/src/adapters/index.ts` (Export the new adapter)
+  - `packages/infrastructure/src/adapters/index.ts`: Export the new adapter.
 - **Read-Only**:
-  - `packages/infrastructure/src/types/index.ts`
-  - `packages/infrastructure/src/types/adapter.ts`
-  - `packages/infrastructure/src/types/job.ts`
-  - `docs/BACKLOG.md`
+  - `packages/infrastructure/src/types/index.ts`: Read the main type index.
+  - `packages/infrastructure/src/types/adapter.ts`: Read `WorkerAdapter` and `WorkerResult` interfaces.
+  - `packages/infrastructure/src/types/job.ts`: Read `WorkerJob` interface.
 
 ## 3. Implementation Spec
-- **Architecture**: Implement the `WorkerAdapter` interface (`execute(job: WorkerJob): Promise<WorkerResult>`). The adapter will interact with the Fly.io Machines REST API to:
-  1. Create a Machine with the specified job payload and container image.
-  2. Wait for the Machine to exit (polling or webhook).
-  3. Collect the output/logs.
-  4. Destroy the Machine.
+- **Architecture**:
+  - The `FlyMachinesAdapter` implements `WorkerAdapter`.
+  - It uses the standard native `fetch` API to interact with the Fly Machines REST API.
+  - Unlike simple function invocations (Lambda/CloudRun), this adapter must manage the full Machine lifecycle:
+    1. Send a `POST` request to create and start a temporary Machine configured with the job payload (`jobDefUrl` and `chunkId`).
+    2. Poll the Machine state via `GET` requests until it transitions to a stopped/exited state.
+    3. Retrieve the execution output (stdout/stderr/exitCode).
+    4. Ensure cleanup by sending a `DELETE` request to remove the Machine.
+  - The payload must follow the established pattern (e.g., passing `jobPath` and `chunkIndex`).
 - **Pseudo-Code**:
-  ```typescript
-  import { WorkerAdapter, WorkerJob, WorkerResult } from '../types/index.js';
-
-  export interface FlyMachinesAdapterConfig {
-    apiToken: string;
-    appName: string;
-    image: string;
-    region?: string;
-  }
-
-  export class FlyMachinesAdapter implements WorkerAdapter {
-    constructor(private config: FlyMachinesAdapterConfig) {}
-    async execute(job: WorkerJob): Promise<WorkerResult> {
-      // 1. Call Fly API to create a Machine with the job payload as env vars or args.
-      // 2. Wait for the Machine state to become 'stopped' or 'destroyed'.
-      // 3. Fetch logs for stdout/stderr or output file if applicable.
-      // 4. Cleanup the Machine if not auto-destroyed.
-      // 5. Return WorkerResult.
-    }
-  }
-  ```
+  - Define `FlyMachinesAdapterConfig` interface with `apiToken`, `appName`, `imageRef`, `jobDefUrl`, etc.
+  - In `execute(job)`:
+    - Validate `chunkId` and `jobDefUrl`.
+    - Create Machine: `fetch('https://api.machines.dev/v1/apps/.../machines', { method: 'POST', body: config })`
+    - Start polling loop: `fetch('https://api.machines.dev/v1/apps/.../machines/{id}')` until state is `stopped`.
+    - Handle `AbortSignal` to trigger premature cleanup if cancelled.
+    - Cleanup Machine: `fetch('https://api.machines.dev/v1/apps/.../machines/{id}', { method: 'DELETE' })`
+    - Parse output and return `WorkerResult` (with `exitCode`, `stdout`, `stderr`, and `durationMs`).
 - **Public API Changes**:
-  - Export `FlyMachinesAdapter` and `FlyMachinesAdapterConfig` from `packages/infrastructure/src/adapters/index.ts`.
-- **Dependencies**: None. Uses native `fetch`.
-- **Cloud Considerations**: Fly Machines take longer to spin up compared to Lambda/Cloudflare Workers. Polling logic must handle transient errors and timeouts gracefully. Machine lifecycle management (create, wait, destroy) is critical to avoid leaking resources.
+  - Export `FlyMachinesAdapter` and `FlyMachinesAdapterConfig`.
+- **Dependencies**: None. Relies on standard `fetch`.
+- **Cloud Considerations**: Fly Machines are full VMs with specific lifecycle states (`created`, `started`, `stopped`, `destroyed`). The adapter must robustly handle polling and ensure destroyed state even if execution fails or is aborted.
 
 ## 4. Test Plan
-- **Verification**: Run `cd packages/infrastructure && npm run test -- tests/adapters/fly-machines-adapter.test.ts`
-- **Success Criteria**: Tests pass, verifying that the adapter correctly formats Fly API requests, handles polling for machine state, processes logs, and manages cleanup.
+- **Verification**: `cd packages/infrastructure && npm install --no-save --workspaces=false && npm run test && npm run lint`
+- **Success Criteria**:
+  - Adapter correctly sends the sequence of API requests (Create, Poll, Delete) when `execute()` is called.
+  - Returns `exitCode`, `stdout`, `stderr`, and `durationMs` conforming to `WorkerResult`.
+  - Gracefully handles API errors and cancels polling/cleans up if `job.signal` is aborted.
 - **Edge Cases**:
-  - Machine fails to start.
-  - Machine times out.
-  - API rate limits or network errors during polling.
-- **Integration Verification**: Can be manually tested with a valid Fly.io API token if needed, but unit tests will mock `fetch`.
+  - Machine fails to start or gets stuck.
+  - Polling timeout.
+  - Clean up is attempted even if execution throws an internal error.
+  - `AbortSignal` is triggered mid-execution.
+- **Integration Verification**: Ensure it can be plugged into `JobExecutor` seamlessly.
