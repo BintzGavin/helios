@@ -1,5 +1,8 @@
 # INFRASTRUCTURE PROGRESS
 
+## INFRASTRUCTURE v0.41.4
+- ✅ Completed: SyncWorkspace Dependencies Benchmark - Implemented performance benchmarks for the syncWorkspaceDependencies utility.
+
 ## INFRASTRUCTURE v0.41.3
 - ✅ Completed: SyncWorkspace Dependencies Benchmark - Implemented performance benchmarks for the syncWorkspaceDependencies utility.
 
