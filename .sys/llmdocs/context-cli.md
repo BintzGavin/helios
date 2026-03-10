@@ -82,7 +82,7 @@ packages/cli/
 - `helios render <input>`: Render a composition.
   - Options: `--output`, `--width`, `--height`, `--fps`, `--duration`, `--quality`, `--mode`, `--emit-job`
 - `helios job run <spec>`: Run a distributed render job from a local file or remote URL.
-  - Options: `--concurrency`, `--chunks`, `--adapter`, `--aws-region`, `--aws-function-name`, `--aws-job-def-url`, `--gcp-service-url`, `--gcp-job-def-url`
+  - Options: `--concurrency`, `--chunks`, `--adapter`, `--aws-region`, `--aws-function-name`, `--aws-job-def-url`, `--gcp-service-url`, `--gcp-job-def-url`, `--cloudflare-service-url`, `--cloudflare-auth-token`, `--cloudflare-job-def-url`, `--azure-service-url`, `--azure-function-key`, `--azure-job-def-url`
 - `helios merge <output> <inputs...>`: Merge video files.
 - `helios build`: Build the project for production.
 - `helios preview`: Preview the production build.
