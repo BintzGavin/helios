@@ -2,7 +2,7 @@ import { Command } from 'commander';
 import fs from 'fs';
 import path from 'path';
 import { JobSpec } from '../types/job.js';
-import { JobExecutor, LocalWorkerAdapter, AwsLambdaAdapter, CloudRunAdapter, WorkerAdapter } from '@helios-project/infrastructure';
+import { JobExecutor, LocalWorkerAdapter, AwsLambdaAdapter, CloudRunAdapter, CloudflareWorkersAdapter, AzureFunctionsAdapter, WorkerAdapter } from '@helios-project/infrastructure';
 
 export async function loadJobSpec(file: string): Promise<{ jobSpec: JobSpec, jobDir: string }> {
   if (file.startsWith('http://') || file.startsWith('https://')) {
@@ -33,12 +33,18 @@ export function registerJobCommand(program: Command) {
     .option('--chunk <id>', 'Execute only the chunk with the specified ID')
     .option('--concurrency <number>', 'Number of concurrent chunks to run locally', '1')
     .option('--no-merge', 'Skip the final merge step')
-    .option('--adapter <type>', 'Adapter to use (local, aws, gcp)', 'local')
+    .option('--adapter <type>', 'Adapter to use (local, aws, gcp, cloudflare, azure)', 'local')
     .option('--aws-region <region>', 'AWS Region for Lambda adapter')
     .option('--aws-function-name <name>', 'AWS Lambda function name')
     .option('--aws-job-def-url <url>', 'URL of the job definition for AWS Lambda')
     .option('--gcp-service-url <url>', 'GCP Cloud Run service URL')
     .option('--gcp-job-def-url <url>', 'URL of the job definition for GCP Cloud Run')
+    .option('--cloudflare-service-url <url>', 'Cloudflare Workers service URL')
+    .option('--cloudflare-auth-token <token>', 'Cloudflare Workers bearer token')
+    .option('--cloudflare-job-def-url <url>', 'URL of the job definition for Cloudflare Workers')
+    .option('--azure-service-url <url>', 'Azure Functions service URL')
+    .option('--azure-function-key <key>', 'Azure Functions function key')
+    .option('--azure-job-def-url <url>', 'URL of the job definition for Azure Functions')
     .action(async (file, options) => {
       try {
         const { jobSpec, jobDir } = await loadJobSpec(file);
@@ -85,6 +91,24 @@ export function registerJobCommand(program: Command) {
           adapter = new CloudRunAdapter({
             serviceUrl: options.gcpServiceUrl,
             jobDefUrl: options.gcpJobDefUrl || file
+          });
+        } else if (options.adapter === 'cloudflare') {
+          if (!options.cloudflareServiceUrl) {
+            throw new Error('Cloudflare adapter requires --cloudflare-service-url');
+          }
+          adapter = new CloudflareWorkersAdapter({
+            serviceUrl: options.cloudflareServiceUrl,
+            authToken: options.cloudflareAuthToken,
+            jobDefUrl: options.cloudflareJobDefUrl || file
+          });
+        } else if (options.adapter === 'azure') {
+          if (!options.azureServiceUrl) {
+            throw new Error('Azure adapter requires --azure-service-url');
+          }
+          adapter = new AzureFunctionsAdapter({
+            serviceUrl: options.azureServiceUrl,
+            functionKey: options.azureFunctionKey,
+            jobDefUrl: options.azureJobDefUrl || file
           });
         } else {
           adapter = new LocalWorkerAdapter();
