@@ -48,13 +48,10 @@ describe('syncWorkspaceDependencies Benchmark', () => {
   });
 
   bench('synchronize dependencies', async () => {
-    await syncWorkspaceDependencies({ rootDir });
-  }, {
-    setup: () => {
-      // Reset writeFile mock to prevent memory leak during bench hot loop
-      if (vi.isMockFunction(fs.writeFile)) {
-        vi.mocked(fs.writeFile).mockClear();
-      }
+    // Reset writeFile mock to prevent memory leak during bench hot loop
+    if (vi.isMockFunction(fs.writeFile)) {
+      vi.mocked(fs.writeFile).mockClear();
     }
+    await syncWorkspaceDependencies({ rootDir });
   });
 });
