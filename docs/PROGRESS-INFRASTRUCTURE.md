@@ -1,5 +1,8 @@
 # INFRASTRUCTURE PROGRESS
 
+## INFRASTRUCTURE v0.43.0
+- ✅ Completed: Azure Functions Adapter - Implemented an Azure Functions cloud adapter for distributed rendering.
+
 ## INFRASTRUCTURE v0.42.0
 - ✅ Completed: Cloudflare Workers Adapter - Implemented a `WorkerAdapter` for Cloudflare Workers using the native `fetch` API.
 
