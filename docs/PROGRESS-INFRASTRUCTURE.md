@@ -1,5 +1,8 @@
 # INFRASTRUCTURE PROGRESS
 
+## INFRASTRUCTURE v0.44.0
+- ✅ Completed: Docker Adapter - Implemented a `WorkerAdapter` using Docker containers for local distributed rendering execution.
+
 ## INFRASTRUCTURE v0.43.2
 - ✅ Completed: SyncWorkspace Benchmark - Implemented vitest bench performance testing for the syncWorkspaceDependencies utility.
 
