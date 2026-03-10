@@ -1190,6 +1190,37 @@ describe('HeliosPlayer', () => {
         warnSpy.mockRestore();
     });
 
+    it('should handle "null" string gracefully', () => {
+        const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+        // Setting attribute to "null" should be parsed as null
+        player.setAttribute('input-props', 'null');
+
+        // It shouldn't trigger a warning since "null" is valid JSON
+        expect(warnSpy).not.toHaveBeenCalled();
+
+        // The property should be null
+        expect(player.inputProps).toBeNull();
+
+        warnSpy.mockRestore();
+    });
+
+    it('should handle empty string gracefully', () => {
+        const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+        // Set an initial value
+        player.setAttribute('input-props', '{"valid": true}');
+        expect(player.inputProps).toEqual({ valid: true });
+
+        // Setting to empty string should throw a warning in the JSON.parse try/catch
+        player.setAttribute('input-props', '');
+
+        // The catch block in attributeChangedCallback should catch the JSON error
+        expect(warnSpy).toHaveBeenCalled();
+
+        warnSpy.mockRestore();
+    });
+
     it('should observe input-props', () => {
         expect(HeliosPlayer.observedAttributes).toContain('input-props');
     });
