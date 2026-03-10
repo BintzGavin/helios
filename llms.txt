@@ -6,7 +6,7 @@ Helios is a modern engine for creating videos programmatically using standard we
 
 ## Quick Facts
 - **License**: Elastic License 2.0 (free commercial use, no SaaS resale)
-- **Status**: Beta / Self-Driving (Core: Stable v5.13.0+, Studio: Alpha v0.107.1+, Player: v0.76.13+, Renderer: v1.78.0+, CLI: Beta v0.32.0+, Infrastructure: v0.25.0+)
+- **Status**: Beta / Self-Driving (Core: Stable v5.13.0+, Studio: Alpha v0.118.1+, Player: v0.76.17+, Renderer: v1.80.0+, CLI: Beta v0.36.8+, Infrastructure: v0.41.5+)
 - **Frameworks**: React, Vue, Svelte, Solid, vanilla JS
 - **Animation**: Standard CSS, Web Animations API (WAAPI), any animation library
 
@@ -113,12 +113,12 @@ const report = await Helios.diagnose();
 
 ## Roadmap
 ### V1.x (Active)
-- **Studio**: v0.107.1+ (MCP Server Enhancement, Components Panel, Schema Validation, Asset Move)
-- **CLI**: v0.32.0+ (Command Regression Tests, Init Command Regression Tests, Cloud Worker Execution)
+- **Studio**: v0.118.1+ (TimelineAudioTrack Tests, MCP Server Enhance, Components Panel, Schema Validation)
+- **CLI**: v0.36.8+ (Add Command Regression Tests, Update Command Regression Tests, Init Command Regression Tests, Remove Command Regression Tests)
 - **Core**: v5.13.0+ (Generic Input Props, Active Clips, Input Schema, Shared Virtual Time Binding)
-- **Player**: v0.76.13+ (Audio Context Manager Tests, Async Seek, Context Documentation, Exporter Integration)
-- **Renderer**: v1.78.0+ (Validate HW Accel, Orchestrator Plan, Refactor Media Sync Logic, Pluggable Execution)
-- **Infrastructure**: v0.25.0+ (AwsHandler Resiliency Tests, FfmpegStitcher Resiliency Tests, CommandParser Benchmark, Robust Command Parsing)
+- **Player**: v0.76.17+ (MediaProperties Regression Tests, AudioContextManager Tests, Async Seek, Context Documentation)
+- **Renderer**: v1.80.0+ (WebCodecs Preference, Validate HW Accel, Orchestrator Plan, Refactor Media Sync Logic)
+- **Infrastructure**: v0.41.5+ (SyncWorkspaceDependencies Benchmark, AwsHandler Benchmark, AwsLambdaAdapter Benchmark, CloudRunServer Benchmark)
 
 ### AI Integration
 - **Studio MCP Server**: Inspect, create, and render compositions via LLM tools (Done)

@@ -1,5 +1,11 @@
 # LLMS Progress
 
+## LLMS v1.37.0
+- ✅ Completed: Daily llms.txt Review
+  - Fixed version drift by realigning Quick Facts and Roadmap to actual package.json versions (Studio v0.118.1+, CLI v0.36.8+, Player v0.76.17+, Renderer v1.80.0+, Infrastructure v0.41.5+).
+  - Updated Roadmap items for packages to reflect current codebase reality based on PROGRESS logs.
+  - Verified API examples, packages, and file paths.
+
 ## LLMS v1.36.0
 - ✅ Completed: Daily llms.txt Review
   - Synced Roadmap with recent actual completions from PROGRESS files across all domain packages (Studio, CLI, Core, Player, Renderer, Infrastructure).
