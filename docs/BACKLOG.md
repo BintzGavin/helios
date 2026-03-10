@@ -27,7 +27,7 @@ This backlog tracks concrete deliverables derived from [`AGENTS.md`](../AGENTS.m
   - **Dependencies**: None (uses `fetch`).
   - **Files**: `packages/infrastructure/src/adapters/cloudflare-workers-adapter.ts`, test, example, benchmark.
 
-- [ ] **Cloud execution adapter (Azure Functions).**
+- [x] **Cloud execution adapter (Azure Functions).**
   - Second-largest serverless market. Consumption plan pricing is competitive with Lambda.
   - **Adapter pattern**: HTTP trigger with JSON payload, nearly identical to Lambda invocation model.
   - **Auth**: Function key in query param or `x-functions-key` header.
