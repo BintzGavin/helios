@@ -1,5 +1,8 @@
 # INFRASTRUCTURE PROGRESS
 
+## INFRASTRUCTURE v0.42.0
+- ✅ Completed: Cloudflare Workers Adapter - Implemented a `WorkerAdapter` for Cloudflare Workers using the native `fetch` API.
+
 ## INFRASTRUCTURE v0.41.5
 - ✅ Completed: SyncWorkspace Dependencies Benchmark - Implemented performance benchmarks for the syncWorkspaceDependencies utility.
 

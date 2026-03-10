@@ -1,0 +1,75 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { CloudflareWorkersAdapter } from '../../src/adapters/cloudflare-workers-adapter.js';
+
+describe('CloudflareWorkersAdapter', () => {
+  const serviceUrl = 'https://render.example.workers.dev';
+  const jobDefUrl = 's3://bucket/job.json';
+
+  beforeEach(() => {
+    global.fetch = vi.fn();
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('should throw if chunkId is missing', async () => {
+    const adapter = new CloudflareWorkersAdapter({ serviceUrl });
+    await expect(adapter.execute({ command: 'render', meta: {} })).rejects.toThrow('CloudflareWorkersAdapter requires job.meta.chunkId to be set');
+  });
+
+  it('should return error if jobDefUrl is missing', async () => {
+    const adapter = new CloudflareWorkersAdapter({ serviceUrl });
+    const result = await adapter.execute({ command: 'render', meta: { chunkId: 0 } });
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toContain('requires jobDefUrl');
+  });
+
+  it('should execute successfully with 200 OK', async () => {
+    vi.mocked(global.fetch).mockResolvedValueOnce(new Response(JSON.stringify({ exitCode: 0, stdout: 'Rendered chunk 0', stderr: '' }), { status: 200, headers: { 'Content-Type': 'application/json' } }));
+    const adapter = new CloudflareWorkersAdapter({ serviceUrl, jobDefUrl });
+    const result = await adapter.execute({ command: 'render', meta: { chunkId: 0 } });
+    expect(result.exitCode).toBe(0);
+    expect(result.stdout).toBe('Rendered chunk 0');
+    expect(global.fetch).toHaveBeenCalledWith(serviceUrl, expect.objectContaining({
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ jobPath: jobDefUrl, chunkIndex: 0 })
+    }));
+  });
+
+  it('should handle authentication token', async () => {
+    vi.mocked(global.fetch).mockResolvedValueOnce(new Response(JSON.stringify({ exitCode: 0 }), { status: 200, headers: { 'Content-Type': 'application/json' } }));
+    const adapter = new CloudflareWorkersAdapter({ serviceUrl, authToken: 'secret-token', jobDefUrl });
+    await adapter.execute({ command: 'render', meta: { chunkId: 1 } });
+    expect(global.fetch).toHaveBeenCalledWith(serviceUrl, expect.objectContaining({
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer secret-token' }
+    }));
+  });
+
+  it('should return error result on non-200 HTTP status', async () => {
+    vi.mocked(global.fetch).mockResolvedValueOnce(new Response('Internal Server Error', { status: 500 }));
+    const adapter = new CloudflareWorkersAdapter({ serviceUrl, jobDefUrl });
+    const result = await adapter.execute({ command: 'render', meta: { chunkId: 0 } });
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toContain('HTTP Error 500');
+  });
+
+  it('should handle network errors gracefully', async () => {
+    vi.mocked(global.fetch).mockRejectedValueOnce(new Error('Network offline'));
+    const adapter = new CloudflareWorkersAdapter({ serviceUrl, jobDefUrl });
+    const result = await adapter.execute({ command: 'render', meta: { chunkId: 0 } });
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toContain('Network offline');
+  });
+
+  it('should handle AbortError gracefully', async () => {
+    const error = new Error('The operation was aborted');
+    error.name = 'AbortError';
+    vi.mocked(global.fetch).mockRejectedValueOnce(error);
+    const adapter = new CloudflareWorkersAdapter({ serviceUrl, jobDefUrl });
+    const result = await adapter.execute({ command: 'render', meta: { chunkId: 0 } });
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toContain('Job was cancelled');
+  });
+});
