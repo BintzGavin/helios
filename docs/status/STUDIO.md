@@ -1,4 +1,4 @@
-**Version**: 0.118.1
+**Version**: 0.118.3
 
 **Posture**: ACTIVELY EXPANDING FOR V2
 
@@ -11,6 +11,7 @@
 > **Note**: Status versions in this file may precede package release versions (`package.json`). Always verify `package.json` for the currently installed version.
 
 ## Recent Updates
+- [v0.118.3] ✅ Completed: Regression Tests - Fixed `UnhandledPromiseRejection` in `useAudioWaveform.test.ts` by explicitly catching mocked decoder rejection.
 - [v0.118.2] ⏳ Planned: Update Quickstart Guide - Generate spec to update the documentation with CLI init method.
 - [v0.118.1] ✅ Completed: Regression Tests - Implemented unit and regression tests for `TimelineAudioTrack` component and `useAudioWaveform` hook.
 - [v0.118.0] ✅ Completed: Enhance MCP Server - Added support for inputProps, videoBitrate, and videoCodec to MCP server tools.

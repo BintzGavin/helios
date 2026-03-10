@@ -138,7 +138,10 @@ describe('useAudioWaveform', () => {
 
     // Mock decodeAudioData to reject
     MockOfflineAudioContext = vi.fn().mockImplementation(function(this: any) {
-        this.decodeAudioData = vi.fn().mockRejectedValue(new Error('Decode failed'));
+        const p = Promise.reject(new Error('Decode failed'));
+        // Explicitly catch the rejection to prevent Node's UnhandledPromiseRejection
+        p.catch(() => {});
+        this.decodeAudioData = vi.fn().mockReturnValue(p);
     });
     (window as any).OfflineAudioContext = MockOfflineAudioContext;
 
