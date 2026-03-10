@@ -1,4 +1,4 @@
-import { describe, bench, afterAll, vi } from 'vitest';
+import { describe, bench, beforeAll, afterAll, vi } from 'vitest';
 import { syncWorkspaceDependencies } from '../../src/governance/sync-workspace.js';
 import fs from 'node:fs/promises';
 
@@ -27,19 +27,21 @@ describe('syncWorkspaceDependencies Benchmark', () => {
     },
   };
 
-  vi.spyOn(fs, 'readdir').mockResolvedValue(mockEntries as any);
+  beforeAll(() => {
+    vi.spyOn(fs, 'readdir').mockResolvedValue(mockEntries as any);
 
-  vi.spyOn(fs, 'readFile').mockImplementation((filepath: any) => {
-    if (typeof filepath === 'string' && filepath.includes('pkg-a')) {
-      return Promise.resolve(JSON.stringify(mockPkgA));
-    }
-    if (typeof filepath === 'string' && filepath.includes('pkg-b')) {
-      return Promise.resolve(JSON.stringify(mockPkgB));
-    }
-    return Promise.reject(Object.assign(new Error('ENOENT'), { code: 'ENOENT' }));
+    vi.spyOn(fs, 'readFile').mockImplementation((filepath: any) => {
+      if (typeof filepath === 'string' && filepath.includes('pkg-a')) {
+        return Promise.resolve(JSON.stringify(mockPkgA));
+      }
+      if (typeof filepath === 'string' && filepath.includes('pkg-b')) {
+        return Promise.resolve(JSON.stringify(mockPkgB));
+      }
+      return Promise.reject(Object.assign(new Error('ENOENT'), { code: 'ENOENT' }));
+    });
+
+    vi.spyOn(fs, 'writeFile').mockResolvedValue(undefined);
   });
-
-  vi.spyOn(fs, 'writeFile').mockResolvedValue(undefined);
 
   afterAll(() => {
     vi.restoreAllMocks();
@@ -49,10 +51,10 @@ describe('syncWorkspaceDependencies Benchmark', () => {
     await syncWorkspaceDependencies({ rootDir });
   }, {
     setup: () => {
-      // Reset mocks to prevent memory leak during bench hot loop
-      vi.mocked(fs.writeFile).mockClear();
-      vi.mocked(fs.readdir).mockClear();
-      vi.mocked(fs.readFile).mockClear();
+      // Reset writeFile mock to prevent memory leak during bench hot loop
+      if (vi.isMockFunction(fs.writeFile)) {
+        vi.mocked(fs.writeFile).mockClear();
+      }
     }
   });
 });
