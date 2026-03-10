@@ -92,6 +92,7 @@ The `packages/infrastructure/src/types/index.ts` file acts as the public API def
 - `cloudrun-adapter.ts`: Facilitates scheduling execution on Google Cloud Run.
 - `cloudflare-workers-adapter.ts`: Facilitates scheduling execution on Cloudflare Workers using the native fetch API.
 - `azure-functions-adapter.ts`: Facilitates scheduling execution on Azure Functions using the native fetch API.
+- `docker-adapter.ts`: Facilitates scheduling execution on local Docker containers or Docker Swarm.
 - `local-adapter.ts`: Facilitates scheduling execution on the local host (typically for debugging).
 
 ## Section E: Integration
