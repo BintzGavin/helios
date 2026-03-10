@@ -1,5 +1,8 @@
 # INFRASTRUCTURE PROGRESS
 
+## INFRASTRUCTURE v0.43.1
+- ✅ Completed: SyncWorkspace Benchmark Update - Updated syncWorkspaceDependencies benchmark to isolate performance testing with virtual file system.
+
 ## INFRASTRUCTURE v0.43.0
 - ✅ Completed: Azure Functions Adapter - Implemented an Azure Functions cloud adapter for distributed rendering.
 

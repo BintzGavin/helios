@@ -1,50 +1,60 @@
-import { describe, bench, beforeAll, afterAll } from 'vitest';
+import { describe, bench, beforeAll, afterAll, vi } from 'vitest';
 import { syncWorkspaceDependencies } from '../../src/governance/sync-workspace.js';
 import fs from 'node:fs/promises';
-import os from 'node:os';
-import path from 'node:path';
 
 describe('syncWorkspaceDependencies Benchmark', () => {
-  let rootDir: string;
+  const rootDir = '/virtual/repo';
 
-  beforeAll(async () => {
-    rootDir = await fs.mkdtemp(path.join(os.tmpdir(), 'sync-workspace-bench-'));
-    const packagesDir = path.join(rootDir, 'packages');
-    await fs.mkdir(packagesDir);
+  beforeAll(() => {
+    const mockEntries = [
+      { name: 'pkg-a', isDirectory: () => true },
+      { name: 'pkg-b', isDirectory: () => true },
+    ];
 
-    const pkgADir = path.join(packagesDir, 'pkg-a');
-    await fs.mkdir(pkgADir);
-    await fs.writeFile(
-      path.join(pkgADir, 'package.json'),
-      JSON.stringify({
-        name: '@helios-project/pkg-a',
-        version: '1.2.3',
-        dependencies: {
-          '@helios-project/pkg-b': '^1.0.0',
-          'external-pkg': '^2.0.0',
-        },
-      })
-    );
+    const mockPkgA = {
+      name: '@helios-project/pkg-a',
+      version: '1.2.3',
+      dependencies: {
+        '@helios-project/pkg-b': '^1.0.0', // Needs updating
+        'external-pkg': '^2.0.0',
+      },
+    };
 
-    const pkgBDir = path.join(packagesDir, 'pkg-b');
-    await fs.mkdir(pkgBDir);
-    await fs.writeFile(
-      path.join(pkgBDir, 'package.json'),
-      JSON.stringify({
-        name: '@helios-project/pkg-b',
-        version: '2.5.0',
-        devDependencies: {
-          '@helios-project/pkg-a': 'workspace:*',
-        },
-      })
-    );
+    const mockPkgB = {
+      name: '@helios-project/pkg-b',
+      version: '2.5.0',
+      devDependencies: {
+        '@helios-project/pkg-a': 'workspace:*', // Needs updating
+      },
+    };
+
+    vi.spyOn(fs, 'readdir').mockResolvedValue(mockEntries as any);
+
+    vi.spyOn(fs, 'readFile').mockImplementation((filepath: any) => {
+      if (typeof filepath === 'string' && filepath.includes('pkg-a')) {
+        return Promise.resolve(JSON.stringify(mockPkgA));
+      }
+      if (typeof filepath === 'string' && filepath.includes('pkg-b')) {
+        return Promise.resolve(JSON.stringify(mockPkgB));
+      }
+      return Promise.reject(Object.assign(new Error('ENOENT'), { code: 'ENOENT' }));
+    });
+
+    vi.spyOn(fs, 'writeFile').mockResolvedValue(undefined);
   });
 
-  afterAll(async () => {
-    await fs.rm(rootDir, { recursive: true, force: true });
+  afterAll(() => {
+    vi.restoreAllMocks();
   });
 
   bench('synchronize dependencies', async () => {
     await syncWorkspaceDependencies({ rootDir });
+  }, {
+    setup: () => {
+      // Reset writeFile mock to prevent memory leak during bench hot loop
+      if (vi.isMockFunction(fs.writeFile)) {
+        vi.mocked(fs.writeFile).mockClear();
+      }
+    }
   });
 });
