@@ -1,5 +1,8 @@
 # INFRASTRUCTURE PROGRESS
 
+## INFRASTRUCTURE v0.50.0
+- ✅ Completed: Hetzner Cloud Adapter - Implemented `HetznerCloudAdapter` for distributed rendering on Hetzner Cloud VMs.
+
 ## INFRASTRUCTURE v0.49.0
 - ✅ Completed: Fly Machines Adapter - Implemented `FlyMachinesAdapter` for distributed rendering on Fly.io infrastructure.
 

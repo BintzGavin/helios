@@ -18,6 +18,7 @@ packages/infrastructure/examples
 ├── fly-machines-adapter.ts
 ├── file-job-repository.ts
 ├── gcs-storage.ts
+├── hetzner-cloud-adapter.ts
 ├── job-executor-standalone.ts
 ├── job-manager-standalone.ts
 ├── local-adapter.ts
@@ -31,6 +32,7 @@ packages/infrastructure/tests
 ├── adapters
 │   ├── cloudflare-workers-adapter.test.ts
 │   ├── fly-machines-adapter.test.ts
+│   ├── hetzner-cloud-adapter.test.ts
 │   └── local-adapter.test.ts
 ├── aws-adapter.test.ts
 ├── benchmarks
@@ -92,6 +94,7 @@ The `packages/infrastructure/src/types/index.ts` file acts as the public API def
 
 ## Section D: Cloud Adapters
 - `aws-adapter.ts`: Facilitates scheduling execution on AWS Lambda.
+- `hetzner-cloud-adapter.ts`: Facilitates scheduling execution on Hetzner Cloud VMs using the native fetch API.
 - `cloudrun-adapter.ts`: Facilitates scheduling execution on Google Cloud Run.
 - `cloudflare-workers-adapter.ts`: Facilitates scheduling execution on Cloudflare Workers using the native fetch API.
 - `azure-functions-adapter.ts`: Facilitates scheduling execution on Azure Functions using the native fetch API.
