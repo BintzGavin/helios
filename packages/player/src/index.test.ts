@@ -1158,6 +1158,7 @@ describe('HeliosPlayer', () => {
 
         expect(mockController.setInputProps).toHaveBeenCalledWith(props);
         expect(player.inputProps).toEqual(props);
+        expect((player as any).pendingProps).toEqual(props);
     });
 
     it('should set input props via property', () => {
@@ -1201,6 +1202,7 @@ describe('HeliosPlayer', () => {
 
         // The property should be null
         expect(player.inputProps).toBeNull();
+        expect((player as any).pendingProps).toBeNull();
 
         warnSpy.mockRestore();
     });
@@ -1212,11 +1214,13 @@ describe('HeliosPlayer', () => {
         player.setAttribute('input-props', '{"valid": true}');
         expect(player.inputProps).toEqual({ valid: true });
 
-        // Setting to empty string should throw a warning in the JSON.parse try/catch
+        // Setting to empty string should clear the props without throwing a warning
         player.setAttribute('input-props', '');
 
-        // The catch block in attributeChangedCallback should catch the JSON error
-        expect(warnSpy).toHaveBeenCalled();
+        // Should not call warn since empty string is now handled gracefully
+        expect(warnSpy).not.toHaveBeenCalled();
+        expect(player.inputProps).toBeNull();
+        expect((player as any).pendingProps).toBeNull();
 
         warnSpy.mockRestore();
     });
