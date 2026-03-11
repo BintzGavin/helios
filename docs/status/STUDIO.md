@@ -4,7 +4,7 @@
 
 # Studio Domain Status
 
-**Status**: 🚧 Alpha / Scaffolding
+**Status**: 🛑 Blocked
 
 **Focus**: UI Implementation & CLI
 
