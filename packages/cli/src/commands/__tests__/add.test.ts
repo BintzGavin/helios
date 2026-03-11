@@ -1,74 +1,91 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { registerAddCommand } from '../add.js';
 import { Command } from 'commander';
-import * as configUtil from '../../utils/config.js';
-import * as installUtil from '../../utils/install.js';
+import { registerAddCommand } from '../add.js';
+import { installComponent } from '../../utils/install.js';
+import { getConfigOrThrow } from '../../utils/config.js';
 import { RegistryClient } from '../../registry/client.js';
 
-vi.mock('../../utils/config.js');
-vi.mock('../../utils/install.js');
-vi.mock('../../registry/client.js');
+vi.mock('../../utils/install.js', () => ({
+  installComponent: vi.fn(),
+}));
+
+vi.mock('../../utils/config.js', () => ({
+  getConfigOrThrow: vi.fn(),
+}));
+
+vi.mock('../../registry/client.js', () => ({
+  RegistryClient: vi.fn(),
+}));
 
 describe('add command', () => {
   let program: Command;
-  let exitSpy: any;
-  let consoleErrorSpy: any;
+  let exitMock: ReturnType<typeof vi.spyOn>;
+  let errorMock: ReturnType<typeof vi.spyOn>;
 
   beforeEach(() => {
     program = new Command();
     registerAddCommand(program);
-    vi.resetAllMocks();
-    exitSpy = vi.spyOn(process, 'exit').mockImplementation((() => {}) as any);
-    consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-
-    vi.mocked(configUtil.getConfigOrThrow).mockReturnValue({
-      framework: 'react',
-      directories: { components: 'src/components' },
-      components: [],
-      registry: 'http://localhost'
-    } as any);
+    exitMock = vi.spyOn(process, 'exit').mockImplementation((() => {}) as any);
+    errorMock = vi.spyOn(console, 'error').mockImplementation(() => {});
   });
 
   afterEach(() => {
-    vi.restoreAllMocks();
+    vi.clearAllMocks();
   });
 
-  it('should call installComponent with correct defaults', async () => {
+  it('should call installComponent with correct arguments on normal installation', async () => {
+    const mockConfig = { registry: 'http://test-registry.com' };
+    vi.mocked(getConfigOrThrow).mockReturnValue(mockConfig as any);
+
     await program.parseAsync(['node', 'test', 'add', 'button']);
-    expect(installUtil.installComponent).toHaveBeenCalledWith(
-      expect.any(String),
+
+    expect(getConfigOrThrow).toHaveBeenCalledWith(process.cwd());
+    expect(RegistryClient).toHaveBeenCalledWith(mockConfig.registry);
+    expect(installComponent).toHaveBeenCalledWith(
+      process.cwd(),
       'button',
-      expect.objectContaining({ install: true })
+      { install: true, client: expect.any(Object) }
     );
+    expect(exitMock).not.toHaveBeenCalled();
+    expect(errorMock).not.toHaveBeenCalled();
   });
 
-  it('should pass --no-install flag correctly', async () => {
+  it('should call installComponent with install: false when --no-install flag is provided', async () => {
+    const mockConfig = { registry: 'http://test-registry.com' };
+    vi.mocked(getConfigOrThrow).mockReturnValue(mockConfig as any);
+
     await program.parseAsync(['node', 'test', 'add', 'button', '--no-install']);
-    expect(installUtil.installComponent).toHaveBeenCalledWith(
-      expect.any(String),
+
+    expect(installComponent).toHaveBeenCalledWith(
+      process.cwd(),
       'button',
-      expect.objectContaining({ install: false })
+      { install: false, client: expect.any(Object) }
     );
   });
 
-  it('should handle configuration errors gracefully', async () => {
-    vi.mocked(configUtil.getConfigOrThrow).mockImplementation(() => {
-      throw new Error('Configuration file not found. Run "helios init" first.');
+  it('should log error and exit when getConfigOrThrow throws', async () => {
+    const error = new Error('Config not found');
+    vi.mocked(getConfigOrThrow).mockImplementation(() => {
+      throw error;
     });
 
     await program.parseAsync(['node', 'test', 'add', 'button']);
 
-    expect(consoleErrorSpy).toHaveBeenCalledWith(expect.stringContaining('Configuration file not found'));
-    expect(exitSpy).toHaveBeenCalledWith(1);
-    expect(installUtil.installComponent).not.toHaveBeenCalled();
+    expect(errorMock).toHaveBeenCalledWith(expect.stringContaining('Config not found'));
+    expect(exitMock).toHaveBeenCalledWith(1);
+    expect(installComponent).not.toHaveBeenCalled();
   });
 
-  it('should handle installation errors gracefully', async () => {
-    vi.mocked(installUtil.installComponent).mockRejectedValue(new Error('Component not found'));
+  it('should log error and exit when installComponent throws', async () => {
+    const mockConfig = { registry: 'http://test-registry.com' };
+    vi.mocked(getConfigOrThrow).mockReturnValue(mockConfig as any);
+
+    const error = new Error('Component not found');
+    vi.mocked(installComponent).mockRejectedValue(error);
 
     await program.parseAsync(['node', 'test', 'add', 'button']);
 
-    expect(consoleErrorSpy).toHaveBeenCalledWith(expect.stringContaining('Component not found'));
-    expect(exitSpy).toHaveBeenCalledWith(1);
+    expect(errorMock).toHaveBeenCalledWith(expect.stringContaining('Component not found'));
+    expect(exitMock).toHaveBeenCalledWith(1);
   });
 });
