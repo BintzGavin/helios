@@ -1,5 +1,8 @@
 # INFRASTRUCTURE PROGRESS
 
+## INFRASTRUCTURE v0.48.1
+- ✅ Completed: Fix Sync Workspace Bench - Fixed execution issues in `syncWorkspaceDependencies` benchmark by moving setup out of `beforeAll`.
+
 ## INFRASTRUCTURE v0.48.0
 - ✅ Completed: Vercel Adapter - Implemented `VercelAdapter` for distributed rendering on Vercel Serverless Functions.
 
