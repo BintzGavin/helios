@@ -1,7 +1,8 @@
 # INFRASTRUCTURE STATUS
-**Version**: 0.44.0
+**Version**: 0.45.0
 
 ## Status Log
+- [v0.45.0] ✅ Completed: Modal Adapter Spec - Created spec for Modal execution adapter.
 - [v0.44.0] ✅ Completed: Kubernetes Adapter Spec - Created spec for KubernetesAdapter.
 - [v0.44.0] ✅ Completed: Docker Adapter - Implemented a `WorkerAdapter` using Docker containers for local distributed rendering execution.
 - [v0.43.2] ✅ Completed: SyncWorkspace Benchmark - Implemented vitest bench performance testing for the syncWorkspaceDependencies utility.
