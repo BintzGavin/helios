@@ -15,6 +15,7 @@ packages/infrastructure/examples
 ├── cloudflare-workers-adapter-example.ts
 ├── cloudrun.ts
 ├── ffmpeg-stitcher.ts
+├── fly-machines-adapter.ts
 ├── file-job-repository.ts
 ├── gcs-storage.ts
 ├── job-executor-standalone.ts
@@ -29,6 +30,7 @@ packages/infrastructure/examples
 packages/infrastructure/tests
 ├── adapters
 │   ├── cloudflare-workers-adapter.test.ts
+│   ├── fly-machines-adapter.test.ts
 │   └── local-adapter.test.ts
 ├── aws-adapter.test.ts
 ├── benchmarks
@@ -40,6 +42,7 @@ packages/infrastructure/tests
 │   ├── command.bench.ts
 │   ├── ffmpeg-stitcher.bench.ts
 │   ├── file-job-repository.bench.ts
+│   ├── fly-machines-adapter.bench.ts
 │   ├── gcs-storage.bench.ts
 │   ├── job-executor.bench.ts
 │   ├── job-manager.bench.ts
@@ -94,6 +97,7 @@ The `packages/infrastructure/src/types/index.ts` file acts as the public API def
 - `azure-functions-adapter.ts`: Facilitates scheduling execution on Azure Functions using the native fetch API.
 - `deno-deploy-adapter.ts`: Facilitates scheduling execution on Deno Deploy using the native fetch API.
 - `vercel-adapter.ts`: Facilitates scheduling execution on Vercel Serverless Functions using the native fetch API.
+- `fly-machines-adapter.ts`: Facilitates scheduling execution on Fly.io Machines using the native fetch API.
 - `docker-adapter.ts`: Facilitates scheduling execution on local Docker containers or Docker Swarm.
 - `local-adapter.ts`: Facilitates scheduling execution on the local host (typically for debugging).
 
