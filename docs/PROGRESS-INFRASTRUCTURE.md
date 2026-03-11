@@ -1,5 +1,8 @@
 # INFRASTRUCTURE PROGRESS
 
+## INFRASTRUCTURE v0.49.0
+- ✅ Completed: Fly Machines Adapter - Implemented `FlyMachinesAdapter` for distributed rendering on Fly.io infrastructure.
+
 ## INFRASTRUCTURE v0.48.1
 - ✅ Completed: Fix Sync Workspace Bench - Fixed execution issues in `syncWorkspaceDependencies` benchmark by moving setup out of `beforeAll`.
 

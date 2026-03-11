@@ -6,3 +6,4 @@ export * from './azure-functions-adapter.js';
 export * from './docker-adapter.js';
 export * from './deno-deploy-adapter.js';
 export * from './vercel-adapter.js';
+export * from './fly-machines-adapter.js';
