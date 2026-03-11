@@ -8,3 +8,4 @@ export * from './deno-deploy-adapter.js';
 export * from './vercel-adapter.js';
 export * from './fly-machines-adapter.js';
 export * from './hetzner-cloud-adapter.js';
+export * from './kubernetes-adapter.js';

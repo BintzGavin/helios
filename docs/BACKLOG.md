@@ -44,7 +44,7 @@ This backlog tracks concrete deliverables derived from [`AGENTS.md`](../AGENTS.m
 
 #### Tier 2 — High Impact, Medium Friction
 
-- [ ] **Cloud execution adapter (Kubernetes Job API).**
+- [x] **Cloud execution adapter (Kubernetes Job API).**
   - Enterprise standard. Any K8s cluster becomes a render farm.
   - **Adapter pattern**: Create K8s Job resource → watch for completion → read logs for output.
   - **Auth**: kubeconfig / in-cluster service account.
