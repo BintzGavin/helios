@@ -1,5 +1,8 @@
 # INFRASTRUCTURE PROGRESS
 
+## INFRASTRUCTURE v0.48.0
+- ✅ Completed: Vercel Adapter - Implemented `VercelAdapter` for distributed rendering on Vercel Serverless Functions.
+
 ## INFRASTRUCTURE v0.46.0
 - ✅ Completed: Deno Deploy Adapter - Implemented `DenoDeployAdapter` for distributed rendering on Deno Deploy's edge network.
 
