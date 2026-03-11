@@ -2,33 +2,33 @@ import { WorkerRuntime } from './runtime.js';
 import { ArtifactStorage } from '../types/index.js';
 
 export interface AwsHandlerConfig {
-  /** The directory to use for the ephemeral workspace. Defaults to '/tmp'. */
   workspaceDir?: string;
-  /** Storage adapter for fetching remote job assets. */
   storage?: ArtifactStorage;
 }
 
-/**
- * Creates an AWS Lambda handler for executing stateless worker jobs.
- *
- * @param config Configuration for the handler
- * @returns An async function compatible with the AWS Lambda Node.js runtime signature
- */
 export function createAwsHandler(config: AwsHandlerConfig = {}) {
   const workspaceDir = config.workspaceDir || '/tmp';
+  const storage = config.storage;
 
   return async (event: any) => {
     try {
-      const { jobPath, chunkIndex } = event;
-
-      if (!jobPath || chunkIndex === undefined) {
-         return {
-            statusCode: 400,
-            body: JSON.stringify({ message: 'Invalid payload: missing jobPath or chunkIndex' })
-         };
+      if (!event || typeof event !== 'object') {
+        return {
+          statusCode: 400,
+          body: JSON.stringify({ message: 'Invalid payload: must be an object' })
+        };
       }
 
-      const runtime = new WorkerRuntime({ workspaceDir, storage: config.storage });
+      const { jobPath, chunkIndex } = event;
+
+      if (typeof jobPath !== 'string' || typeof chunkIndex !== 'number') {
+        return {
+          statusCode: 400,
+          body: JSON.stringify({ message: 'Invalid payload: missing jobPath or chunkIndex' })
+        };
+      }
+
+      const runtime = new WorkerRuntime({ workspaceDir, storage });
       const result = await runtime.run(jobPath, chunkIndex);
 
       return {
@@ -40,9 +40,15 @@ export function createAwsHandler(config: AwsHandlerConfig = {}) {
         })
       };
     } catch (error: any) {
+      let message = 'Unknown error in AWS Lambda handler';
+      if (error && typeof error === 'object' && error.message) {
+        message = error.message;
+      } else if (error && typeof error === 'string') {
+        message = error;
+      }
       return {
         statusCode: 500,
-        body: JSON.stringify({ message: (error && error.message) || 'Unknown error in AWS Lambda handler' })
+        body: JSON.stringify({ message })
       };
     }
   };

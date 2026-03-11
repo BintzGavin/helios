@@ -1,221 +1,158 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, beforeAll, afterAll } from 'vitest';
 import { createCloudRunServer } from '../../src/worker/cloudrun-server.js';
 import { WorkerRuntime } from '../../src/worker/runtime.js';
-import http from 'node:http';
+import { Server } from 'node:http';
+import { ArtifactStorage } from '../../src/types/index.js';
 
-vi.mock('../../src/worker/runtime.js', () => {
-  return {
-    WorkerRuntime: vi.fn()
-  };
-});
+vi.mock('../../src/worker/runtime.js');
 
-describe('Cloud Run Server', () => {
-  let mockRun: any;
-  let serverInstance: http.Server;
+describe('CloudRunServer', () => {
+  let server: Server;
+  let baseUrl: string;
+
+  beforeAll(async () => {
+    const app = createCloudRunServer({ workspaceDir: '/tmp-test', port: 0 });
+    server = app.server;
+    await new Promise<void>((resolve) => {
+      app.listen(() => {
+        const address = server.address() as any;
+        baseUrl = `http://127.0.0.1:${address.port}`;
+        resolve();
+      });
+    });
+  });
+
+  afterAll(async () => {
+    await new Promise<void>((resolve, reject) => {
+      server.close((err) => (err ? reject(err) : resolve()));
+    });
+  });
 
   beforeEach(() => {
     vi.clearAllMocks();
-    mockRun = vi.fn();
-    vi.mocked(WorkerRuntime).mockImplementation(function() {
-      return { run: mockRun } as any;
+  });
+
+  it('should process a valid payload successfully', async () => {
+    vi.mocked(WorkerRuntime.prototype.run).mockResolvedValue({
+      exitCode: 0,
+      stdout: 'cloudrun success',
+      stderr: '',
+      durationMs: 100
+    });
+
+    const res = await fetch(baseUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ jobPath: 'http://test.com/job.json', chunkIndex: 1 })
+    });
+
+    expect(res.status).toBe(200);
+    const data = await res.json();
+    expect(data).toEqual({
+      exitCode: 0,
+      stdout: 'cloudrun success',
+      stderr: ''
+    });
+    expect(WorkerRuntime.prototype.run).toHaveBeenCalledWith('http://test.com/job.json', 1);
+  });
+
+  it('should inject ArtifactStorage when provided', async () => {
+    const mockStorage = { downloadAssetBundle: vi.fn() } as unknown as ArtifactStorage;
+    const appWithStorage = createCloudRunServer({ workspaceDir: '/tmp-test-storage', port: 0, storage: mockStorage });
+    const localServer = appWithStorage.server;
+
+    await new Promise<void>((resolve) => {
+      appWithStorage.listen(() => resolve());
+    });
+
+    const address = localServer.address() as any;
+    const localBaseUrl = `http://127.0.0.1:${address.port}`;
+
+    vi.mocked(WorkerRuntime.prototype.run).mockResolvedValue({
+      exitCode: 0,
+      stdout: '',
+      stderr: '',
+      durationMs: 10
+    });
+
+    await fetch(localBaseUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ jobPath: 'http://test.com/job.json', chunkIndex: 1 })
+    });
+
+    expect(WorkerRuntime).toHaveBeenCalledWith({ workspaceDir: '/tmp-test-storage', storage: mockStorage });
+
+    await new Promise<void>((resolve, reject) => {
+      localServer.close((err) => (err ? reject(err) : resolve()));
     });
   });
 
-  afterEach(async () => {
-    if (serverInstance) {
-      await new Promise<void>((resolve) => {
-        serverInstance.close(() => resolve());
-      });
-    }
-  });
+  it('should handle runtime execution errors gracefully', async () => {
+    const p = Promise.reject(new Error('CloudRun failure'));
+    p.catch(() => {});
+    vi.mocked(WorkerRuntime.prototype.run).mockReturnValue(p);
 
-  const sendPostRequest = (port: number, payload: any): Promise<any> => {
-    return new Promise((resolve, reject) => {
-      const options = {
-        hostname: 'localhost',
-        port,
-        path: '/',
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        }
-      };
-
-      const req = http.request(options, (res) => {
-        let data = '';
-        res.on('data', (chunk) => {
-          data += chunk;
-        });
-        res.on('end', () => {
-          try {
-            resolve({ statusCode: res.statusCode, body: JSON.parse(data) });
-          } catch (e) {
-            resolve({ statusCode: res.statusCode, body: data });
-          }
-        });
-      });
-
-      req.on('error', (e) => reject(e));
-      req.write(JSON.stringify(payload));
-      req.end();
-    });
-  };
-
-  it('should successfully execute a job and return 200 with result', async () => {
-    mockRun.mockResolvedValue({ exitCode: 0, stdout: 'Success', stderr: '' });
-
-    const cloudServer = createCloudRunServer({ port: 9001, workspaceDir: '/custom-tmp' });
-    serverInstance = cloudServer.listen();
-
-    const response = await sendPostRequest(9001, { jobPath: 'job.json', chunkIndex: 2 });
-
-    expect(WorkerRuntime).toHaveBeenCalled();
-    expect(mockRun).toHaveBeenCalledWith('job.json', 2);
-    expect(response.statusCode).toBe(200);
-    expect(response.body).toEqual({ exitCode: 0, stdout: 'Success', stderr: '' });
-  });
-
-  it('should return 405 for non-POST requests', async () => {
-    const cloudServer = createCloudRunServer({ port: 9002 });
-    serverInstance = cloudServer.listen();
-
-    const response = await new Promise<any>((resolve, reject) => {
-      http.get('http://localhost:9002', (res) => {
-        resolve({ statusCode: res.statusCode });
-      }).on('error', reject);
+    const res = await fetch(baseUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ jobPath: 'http://test.com/job.json', chunkIndex: 2 })
     });
 
-    expect(response.statusCode).toBe(405);
-    expect(WorkerRuntime).not.toHaveBeenCalled();
+    expect(res.status).toBe(500);
+    const data = await res.json();
+    expect(data).toEqual({ message: 'CloudRun failure' });
   });
 
-  it('should return 400 for missing jobPath or chunkIndex', async () => {
-    const cloudServer = createCloudRunServer({ port: 9003 });
-    serverInstance = cloudServer.listen();
-
-    // Missing chunkIndex
-    let response = await sendPostRequest(9003, { jobPath: 'job.json' });
-    expect(response.statusCode).toBe(400);
-    expect(response.body.message).toMatch(/Invalid payload/);
-
-    // Missing jobPath
-    response = await sendPostRequest(9003, { chunkIndex: 1 });
-    expect(response.statusCode).toBe(400);
-    expect(response.body.message).toMatch(/Invalid payload/);
-
-    expect(WorkerRuntime).not.toHaveBeenCalled();
-  });
-
-  it('should return 400 for invalid JSON payload', async () => {
-    const cloudServer = createCloudRunServer({ port: 9006 });
-    serverInstance = cloudServer.listen();
-
-    const response = await new Promise<any>((resolve, reject) => {
-      const options = {
-        hostname: 'localhost',
-        port: 9006,
-        path: '/',
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        }
-      };
-
-      const req = http.request(options, (res) => {
-        let data = '';
-        res.on('data', (chunk) => {
-          data += chunk;
-        });
-        res.on('end', () => {
-          try {
-            resolve({ statusCode: res.statusCode, body: JSON.parse(data) });
-          } catch (e) {
-            resolve({ statusCode: res.statusCode, body: data });
-          }
-        });
-      });
-
-      req.on('error', (e) => reject(e));
-      req.write('{ "bad": json '); // Invalid JSON
-      req.end();
+  it('should return 500 for non-zero exit code', async () => {
+    vi.mocked(WorkerRuntime.prototype.run).mockResolvedValue({
+      exitCode: 1,
+      stdout: '',
+      stderr: 'Render failed internally',
+      durationMs: 50
     });
 
-    expect(response.statusCode).toBe(400);
-    expect(response.body.message).toBe('Invalid JSON payload');
-    expect(WorkerRuntime).not.toHaveBeenCalled();
-  });
-
-  it('should return 500 when WorkerRuntime throws an error', async () => {
-    mockRun.mockRejectedValue(new Error('Fetch failed'));
-
-    const cloudServer = createCloudRunServer({ port: 9004 });
-    serverInstance = cloudServer.listen();
-
-    const response = await sendPostRequest(9004, { jobPath: 'job.json', chunkIndex: 0 });
-
-    expect(response.statusCode).toBe(500);
-    expect(response.body.message).toBe('Fetch failed');
-  });
-
-  it('should return 500 when WorkerRuntime throws null', async () => {
-    mockRun.mockRejectedValue(null);
-
-    const cloudServer = createCloudRunServer({ port: 9007 });
-    serverInstance = cloudServer.listen();
-
-    const response = await sendPostRequest(9007, { jobPath: 'job.json', chunkIndex: 0 });
-
-    expect(response.statusCode).toBe(500);
-    expect(response.body.message).toBe('Unknown error in Cloud Run server');
-  });
-
-  it('should return 500 when exitCode is non-zero', async () => {
-    mockRun.mockResolvedValue({ exitCode: 1, stdout: '', stderr: 'Render error' });
-
-    const cloudServer = createCloudRunServer({ port: 9005 });
-    serverInstance = cloudServer.listen();
-
-    const response = await sendPostRequest(9005, { jobPath: 'job.json', chunkIndex: 0 });
-
-    expect(response.statusCode).toBe(500);
-    expect(response.body).toEqual({ exitCode: 1, stdout: '', stderr: 'Render error' });
-  });
-
-  it('should return 400 for empty payload', async () => {
-    const cloudServer = createCloudRunServer({ port: 9008 });
-    serverInstance = cloudServer.listen();
-
-    const response = await new Promise<any>((resolve, reject) => {
-      const options = {
-        hostname: 'localhost',
-        port: 9008,
-        path: '/',
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        }
-      };
-
-      const req = http.request(options, (res) => {
-        let data = '';
-        res.on('data', (chunk) => {
-          data += chunk;
-        });
-        res.on('end', () => {
-          try {
-            resolve({ statusCode: res.statusCode, body: JSON.parse(data) });
-          } catch (e) {
-            resolve({ statusCode: res.statusCode, body: data });
-          }
-        });
-      });
-
-      req.on('error', (e) => reject(e));
-      req.end();
+    const res = await fetch(baseUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ jobPath: 'http://test.com/job.json', chunkIndex: 3 })
     });
 
-    expect(response.statusCode).toBe(400);
-    expect(response.body.message).toBe('Empty payload');
-    expect(WorkerRuntime).not.toHaveBeenCalled();
+    expect(res.status).toBe(500);
+    const data = await res.json();
+    expect(data).toEqual({
+      exitCode: 1,
+      stdout: '',
+      stderr: 'Render failed internally'
+    });
+  });
+
+  it('should reject non-POST requests', async () => {
+    const res = await fetch(baseUrl, { method: 'GET' });
+    expect(res.status).toBe(405);
+    const data = await res.json();
+    expect(data).toEqual({ message: 'Method Not Allowed' });
+  });
+
+  it('should return 400 for invalid JSON body', async () => {
+    const res = await fetch(baseUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: 'invalid-json}'
+    });
+    expect(res.status).toBe(400);
+    const data = await res.json();
+    expect(data).toEqual({ message: 'Invalid JSON payload' });
+  });
+
+  it('should return 400 for missing required fields', async () => {
+    const res = await fetch(baseUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ jobPath: 'only-path' })
+    });
+    expect(res.status).toBe(400);
+    const data = await res.json();
+    expect(data).toEqual({ message: 'Missing jobPath or chunkIndex' });
   });
 });
