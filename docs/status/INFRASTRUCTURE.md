@@ -1,7 +1,8 @@
 # INFRASTRUCTURE STATUS
-**Version**: 0.45.1
+**Version**: 0.46.0
 
 ## Status Log
+- [v0.46.0] ✅ Completed: Deno Deploy Adapter - Implemented `DenoDeployAdapter` for distributed rendering on Deno Deploy's edge network.
 - [v0.45.1] ✅ Completed: SyncWorkspace Benchmark - Added performance benchmark for syncWorkspaceDependencies utility.
 - [v0.45.0] ✅ Completed: Modal Adapter Spec - Created spec for Modal execution adapter.
 - [v0.44.0] ✅ Completed: Kubernetes Adapter Spec - Created spec for KubernetesAdapter.

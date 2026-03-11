@@ -4,3 +4,4 @@ export * from './cloudrun-adapter.js';
 export * from './cloudflare-workers-adapter.js';
 export * from './azure-functions-adapter.js';
 export * from './docker-adapter.js';
+export * from './deno-deploy-adapter.js';

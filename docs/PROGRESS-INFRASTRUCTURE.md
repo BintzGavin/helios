@@ -1,5 +1,8 @@
 # INFRASTRUCTURE PROGRESS
 
+## INFRASTRUCTURE v0.46.0
+- ✅ Completed: Deno Deploy Adapter - Implemented `DenoDeployAdapter` for distributed rendering on Deno Deploy's edge network.
+
 ## INFRASTRUCTURE v0.45.1
 - ✅ Completed: SyncWorkspace Benchmark - Added performance benchmark for syncWorkspaceDependencies utility.
 
