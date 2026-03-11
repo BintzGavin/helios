@@ -1,7 +1,8 @@
 # INFRASTRUCTURE STATUS
-**Version**: 0.50.0
+**Version**: 0.51.0
 
 ## Status Log
+- [v0.51.0] ✅ Completed: Kubernetes Adapter - Implemented `KubernetesAdapter` for cloud execution using the Kubernetes Job API.
 - [v0.50.0] ✅ Completed: Hetzner Cloud Adapter - Implemented `HetznerCloudAdapter` for distributed rendering on Hetzner Cloud VMs.
 - [v0.49.0] ✅ Completed: Fly Machines Adapter - Implemented `FlyMachinesAdapter` for distributed rendering on Fly.io infrastructure.
 - [v0.48.1] ✅ Completed: Fix Sync Workspace Bench - Fixed execution issues in `syncWorkspaceDependencies` benchmark by moving setup out of `beforeAll`.

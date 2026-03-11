@@ -1,5 +1,8 @@
 # INFRASTRUCTURE PROGRESS
 
+## INFRASTRUCTURE v0.51.0
+- ✅ Completed: Kubernetes Adapter - Implemented `KubernetesAdapter` for cloud execution using the Kubernetes Job API.
+
 ## INFRASTRUCTURE v0.50.0
 - ✅ Completed: Hetzner Cloud Adapter - Implemented `HetznerCloudAdapter` for distributed rendering on Hetzner Cloud VMs.
 

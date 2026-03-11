@@ -102,6 +102,7 @@ The `packages/infrastructure/src/types/index.ts` file acts as the public API def
 - `vercel-adapter.ts`: Facilitates scheduling execution on Vercel Serverless Functions using the native fetch API.
 - `fly-machines-adapter.ts`: Facilitates scheduling execution on Fly.io Machines using the native fetch API.
 - `docker-adapter.ts`: Facilitates scheduling execution on local Docker containers or Docker Swarm.
+- `kubernetes-adapter.ts`: Facilitates scheduling execution across a Kubernetes cluster via the Batch Job API.
 - `local-adapter.ts`: Facilitates scheduling execution on the local host (typically for debugging).
 
 ## Section E: Integration
