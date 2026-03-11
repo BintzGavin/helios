@@ -1727,7 +1727,7 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
 
     if (name === "input-props") {
       try {
-        const props = JSON.parse(newVal);
+        const props = (!newVal || newVal.trim() === "") ? null : JSON.parse(newVal);
         this.pendingProps = props;
         if (this.controller) {
           this.controller.setInputProps(props);
