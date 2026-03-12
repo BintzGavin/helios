@@ -1,4 +1,4 @@
-**Version**: v0.76.18
+**Version**: v0.76.19
 
 **Posture**: STABLE AND FEATURE COMPLETE
 

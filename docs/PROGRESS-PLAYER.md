@@ -1,3 +1,6 @@
+## PLAYER v0.76.19
+- ✅ Completed: Regression Tests for MediaProperties - Added comprehensive tests for cross-origin security checks and media property parity (videoWidth/Height).
+
 ## PLAYER v0.76.18
 - ✅ Completed: Regression Tests for InputProps - Added comprehensive tests for `input-props` JSON parsing edge cases (explicit "null", empty strings).
 
