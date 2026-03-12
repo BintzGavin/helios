@@ -12,6 +12,7 @@ The `infrastructure` package manages the distributed cloud rendering execution o
 ```
 packages/infrastructure/examples
 ├── aws-lambda.ts
+├── azure-functions-adapter.ts
 ├── cloudflare-workers-adapter-example.ts
 ├── cloudrun.ts
 ├── ffmpeg-stitcher.ts
@@ -30,6 +31,7 @@ packages/infrastructure/examples
 
 packages/infrastructure/tests
 ├── adapters
+│   ├── azure-functions-adapter.test.ts
 │   ├── cloudflare-workers-adapter.test.ts
 │   ├── fly-machines-adapter.test.ts
 │   ├── hetzner-cloud-adapter.test.ts
@@ -37,6 +39,7 @@ packages/infrastructure/tests
 ├── aws-adapter.test.ts
 ├── benchmarks
 │   ├── aws-adapter.bench.ts
+│   ├── azure-functions-adapter.bench.ts
 │   ├── aws-handler.bench.ts
 │   ├── cloudflare-workers-adapter.bench.ts
 │   ├── cloudrun-adapter.bench.ts
