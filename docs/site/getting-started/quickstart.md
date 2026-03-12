@@ -9,26 +9,26 @@ Helios Engine is a library for creating video-ready animations using web technol
 
 ## The Fastest Way to Start
 
-The quickest way to get started is by cloning one of our examples.
+The quickest way to get started is by using the Helios CLI to scaffold a new project.
 
-### Using an Example
+### Using the CLI
 
-1.  Clone the repository (if you haven't already):
+1.  Initialize a new project:
     ```bash
-    git clone https://github.com/helios-project/helios.git
-    cd helios
+    npx helios init <project-name>
     ```
 
-2.  Install dependencies:
+2.  Navigate to the directory and install dependencies:
     ```bash
+    cd <project-name>
     npm install
     ```
 
-3.  Run the React example:
+3.  Start the development server and open Helios Studio:
     ```bash
-    npm run dev:react-dom
+    npm run dev
     ```
-    Open your browser to the URL shown (usually `http://localhost:5173/composition.html`).
+    Open your browser to the URL shown to access Helios Studio.
 
 ## What's Next?
 

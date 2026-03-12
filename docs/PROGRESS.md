@@ -66,6 +66,9 @@ Each agent should update **their own dedicated progress file** instead of this f
 ### INFRASTRUCTURE v0.2.0
 - ✅ Completed: Stateless Worker Interface - Implemented WorkerAdapter and LocalWorkerAdapter.
 
+### STUDIO v0.118.4
+- ✅ Completed: Update Quickstart Guide - Updated the Quickstart guide to emphasize the `helios init` command as the primary way to get started.
+
 ### STUDIO v0.118.3
 - ✅ Completed: Regression Tests - Fixed `UnhandledPromiseRejection` in `useAudioWaveform.test.ts` by explicitly catching mocked decoder rejection.
 
