@@ -1,7 +1,8 @@
 # INFRASTRUCTURE STATUS
-**Version**: 0.51.0
+**Version**: 0.51.1
 
 ## Status Log
+- [v0.51.1] ✅ Completed: Azure Functions Benchmark & Example - Added performance benchmark using `vitest bench` and a standalone example script for the Azure Functions adapter.
 - [v0.51.0] ✅ Completed: Kubernetes Adapter - Implemented `KubernetesAdapter` for cloud execution using the Kubernetes Job API.
 - [v0.50.0] ✅ Completed: Hetzner Cloud Adapter - Implemented `HetznerCloudAdapter` for distributed rendering on Hetzner Cloud VMs.
 - [v0.49.0] ✅ Completed: Fly Machines Adapter - Implemented `FlyMachinesAdapter` for distributed rendering on Fly.io infrastructure.
