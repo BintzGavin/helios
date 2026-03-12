@@ -2,6 +2,10 @@
 
 This file tracks progress for the CLI domain (`packages/cli`).
 
+## CLI v0.36.10
+
+- ✅ Merge Command Regression Tests - Implemented comprehensive unit tests for `helios merge`.
+
 ## CLI v0.36.9
 
 - ✅ Cloud Worker Execution Azure Cloudflare - Added support for Cloudflare Workers and Azure Functions execution adapters to the job run command.
