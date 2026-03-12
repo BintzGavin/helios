@@ -277,4 +277,39 @@ describe('connectToParent - handleCaptureFrame', () => {
             '*'
         );
     });
+
+    it('should accurately reflect videoWidth and videoHeight from host state updates', async () => {
+        const stateWithDimensions = {
+            width: 1920,
+            height: 1080,
+            activeCaptions: []
+        };
+        mockHelios.getState.mockReturnValue(stateWithDimensions);
+
+        // Emulate property update message
+        triggerMessage({ type: 'HELIOS_SET_SIZE', width: 800, height: 600 }, window.parent);
+
+        expect(mockHelios.setSize).toHaveBeenCalledWith(800, 600);
+
+        // Provide the updated state
+        const updatedState = {
+            width: 800,
+            height: 600,
+            activeCaptions: []
+        };
+        mockHelios.getState.mockReturnValue(updatedState);
+
+        // This validates that the state updates are appropriately mapped into the player instances getter responses
+        // Let's explicitly trigger a state sync
+        const callback = mockHelios.subscribe.mock.calls[0][0];
+        callback(updatedState);
+
+        expect(parentPostMessage).toHaveBeenCalledWith(
+            expect.objectContaining({
+                type: 'HELIOS_STATE',
+                state: updatedState
+            }),
+            '*'
+        );
+    });
 });

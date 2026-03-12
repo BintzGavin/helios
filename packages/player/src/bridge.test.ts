@@ -126,4 +126,40 @@ describe('connectToParent', () => {
 
         expect(mockHelios.play).not.toHaveBeenCalled();
     });
+
+    it('should handle deferred message processing and property updates during initialization safely', async () => {
+        // Test that sending messages rapidly before and during connect doesn't cause errors
+        connectToParent(mockHelios);
+
+        // Simulate properties sent right as it connects
+        triggerMessage({ type: 'HELIOS_SET_SIZE', width: 1920, height: 1080 }, window.parent);
+        triggerMessage({ type: 'HELIOS_SET_FPS', fps: 60 }, window.parent);
+
+        // The bridge itself dispatches immediately to Helios methods
+        expect(mockHelios.setSize).toHaveBeenCalledWith(1920, 1080);
+        expect(mockHelios.setFps).toHaveBeenCalledWith(60);
+
+        // And simulate connection completion
+        triggerMessage({ type: 'HELIOS_CONNECT' }, window.parent);
+
+        expect(parentPostMessage).toHaveBeenCalledWith(
+            expect.objectContaining({ type: 'HELIOS_READY' }),
+            '*'
+        );
+    });
+
+    it('should strictly verify event source against malicious or deeply nested frames', () => {
+        connectToParent(mockHelios);
+
+        const maliciousSource = {
+            parent: window.parent,
+            top: window.parent
+        };
+
+        triggerMessage({ type: 'HELIOS_PLAY' }, maliciousSource);
+        expect(mockHelios.play).not.toHaveBeenCalled();
+
+        triggerMessage({ type: 'HELIOS_SET_DURATION', duration: 10 }, maliciousSource);
+        expect(mockHelios.setDuration).not.toHaveBeenCalled();
+    });
 });
