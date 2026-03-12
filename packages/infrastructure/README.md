@@ -32,6 +32,7 @@ Cloud adapters provide the critical abstraction layer that translates standardiz
 
 - **AwsLambdaAdapter**: Provisions and invokes serverless rendering tasks on AWS Lambda infrastructure. It securely serializes job definitions, manages targeted invocation payloads (including remote job URL and specific chunk indices), rigorously parses Lambda execution responses to ascertain task status, and maps native AWS execution errors seamlessly into the orchestrator's standardized retry framework.
 - **CloudRunAdapter**: Provisions and invokes containerized rendering tasks on Google Cloud Run services. It handles secure, authenticated invocations via OIDC ID Tokens using the `google-auth-library`, constructs robust HTTP POST payloads matching the container's expected schema, and maps standard HTTP status codes directly to the framework's internal execution states.
+- **AzureFunctionsAdapter**: Provisions and invokes rendering tasks on Azure Functions HTTP triggers using the native `fetch` API. It supports secure, authenticated invocations via `x-functions-key`, constructs JSON payloads containing chunk and job definition metadata, and maps non-200 HTTP responses seamlessly into the execution's deterministic retry framework.
 - **LocalWorkerAdapter**: A testing-focused adapter that executes rendering chunks via local child processes, enabling rapid local development and determinism verification without requiring cloud deployments.
 
 ### Worker Runtime
