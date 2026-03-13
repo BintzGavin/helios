@@ -1,7 +1,8 @@
 # INFRASTRUCTURE STATUS
-**Version**: 0.53.1
+**Version**: 0.53.2
 
 ## Status Log
+- [v0.53.2] ✅ Completed: FlyMachinesAdapter-Coverage - Improved test coverage to handle aborted signals, missing job definition, and machine creation failures.
 - [v0.53.1] ✅ Completed: DockerAdapter-Coverage - Improved test coverage to handle aborts and callbacks
 - [v0.53.0] ✅ Completed: Modal Adapter - Implemented `ModalAdapter` for cloud execution using Modal's Python-native serverless platform.
 - [v0.52.1] ✅ Completed: Kubernetes Adapter Refinement - Added documentation comments to the KubernetesAdapter options to satisfy source code change requirements.

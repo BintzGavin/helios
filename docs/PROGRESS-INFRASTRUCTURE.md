@@ -1,5 +1,8 @@
 # INFRASTRUCTURE PROGRESS
 
+## INFRASTRUCTURE v0.53.2
+- ✅ Completed: FlyMachinesAdapter-Coverage - Improved test coverage to handle aborted signals, missing job definition, and machine creation failures.
+
 ## INFRASTRUCTURE v0.53.1
 - ✅ Completed: DockerAdapter-Coverage - Improved test coverage to handle aborts and callbacks
 

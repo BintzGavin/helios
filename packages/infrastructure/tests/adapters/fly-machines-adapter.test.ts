@@ -47,6 +47,43 @@ describe('FlyMachinesAdapter', () => {
     expect(mockFetch.mock.calls[0][1].method).toBe('POST');
   });
 
+  it('should handle abort signal before execution starts', async () => {
+    const controller = new AbortController();
+    controller.abort();
+    const job = {
+      command: 'node',
+      meta: { jobDefUrl: 'http://test.com/job.json', chunkIndex: 0 },
+      signal: controller.signal,
+    };
+
+    await expect(adapter.execute(job)).rejects.toThrow('Job was aborted');
+  });
+
+  it('should fail if missing jobDefUrl or chunkIndex', async () => {
+    const job = {
+      command: 'node',
+      meta: {},
+    };
+
+    await expect(adapter.execute(job)).rejects.toThrow('jobDefUrl and chunkIndex are required in job.meta for FlyMachinesAdapter');
+  });
+
+  it('should fail if creating the machine fails', async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: false,
+      status: 500,
+      statusText: 'Internal Server Error',
+      text: async () => 'Error creating machine',
+    } as Response);
+
+    const job = {
+      command: 'node',
+      meta: { jobDefUrl: 'http://test.com/job.json', chunkIndex: 0 },
+    };
+
+    await expect(adapter.execute(job)).rejects.toThrow('Failed to create Fly Machine: 500 Internal Server Error Error creating machine');
+  });
+
   it('should handle abort signal', async () => {
     mockFetch
       .mockResolvedValueOnce({
