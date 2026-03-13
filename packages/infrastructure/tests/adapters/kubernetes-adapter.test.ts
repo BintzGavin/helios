@@ -79,4 +79,121 @@ describe('KubernetesAdapter', () => {
     expect(result.exitCode).toBe(1);
     expect(result.stderr).toContain('Job aborted');
   });
+
+  it('should handle a job failure (status.failed > 0)', async () => {
+    vi.mocked(adapter['batchV1Api'].readNamespacedJob).mockResolvedValue({
+      body: { status: { failed: 1, succeeded: 0 } },
+    } as any);
+
+    const job: WorkerJob = {
+      command: 'echo',
+      meta: { chunkId: 'fail' },
+    };
+
+    const result = await adapter.execute(job);
+    expect(result.exitCode).toBe(1);
+  });
+
+  it('should handle job creation failure gracefully', async () => {
+    vi.mocked(adapter['batchV1Api'].createNamespacedJob).mockRejectedValue(new Error('Creation failed'));
+
+    const job: WorkerJob = {
+      command: 'echo',
+    };
+
+    const result = await adapter.execute(job);
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toContain('Failed to create Job: Creation failed');
+  });
+
+  it('should handle log retrieval failure gracefully', async () => {
+    vi.mocked(adapter['coreV1Api'].readNamespacedPodLog).mockRejectedValue(new Error('Log read failed'));
+
+    const job: WorkerJob = {
+      command: 'echo',
+    };
+
+    const result = await adapter.execute(job);
+    // Since job succeeded but logs failed, it still returns exitCode 0
+    expect(result.exitCode).toBe(0);
+    expect(result.stderr).toContain('Job monitoring failed: Log read failed');
+  });
+
+  it('should handle missing pods gracefully (no error, empty stdout)', async () => {
+    vi.mocked(adapter['coreV1Api'].listNamespacedPod).mockResolvedValue({
+      body: { items: [] },
+    } as any);
+
+    const job: WorkerJob = {
+      command: 'echo',
+    };
+
+    const result = await adapter.execute(job);
+    expect(result.exitCode).toBe(0);
+    expect(result.stdout).toBe('');
+  });
+
+  it('should pass environment variables properly', async () => {
+    const job: WorkerJob = {
+      command: 'echo',
+      env: { TEST_VAR: 'value' },
+    };
+
+    await adapter.execute(job);
+
+    expect(adapter['batchV1Api'].createNamespacedJob).toHaveBeenCalledWith(
+      'default',
+      expect.objectContaining({
+        spec: expect.objectContaining({
+          template: expect.objectContaining({
+            spec: expect.objectContaining({
+              containers: expect.arrayContaining([
+                expect.objectContaining({
+                  env: [{ name: 'TEST_VAR', value: 'value' }],
+                }),
+              ]),
+            }),
+          }),
+        }),
+      })
+    );
+  });
+
+  it('should respect custom options overrides', async () => {
+    const customAdapter = new KubernetesAdapter({
+      image: 'test-image',
+      namespace: 'custom-ns',
+      jobNamePrefix: 'custom-prefix',
+      serviceAccountName: 'custom-sa',
+    });
+
+    // We mock readNamespacedJob for customAdapter's instance
+    vi.mocked(customAdapter['batchV1Api'].readNamespacedJob).mockResolvedValue({
+      body: { status: { succeeded: 1 } },
+    } as any);
+
+    const job: WorkerJob = {
+      command: 'echo',
+      meta: { chunkId: '1' },
+    };
+
+    await customAdapter.execute(job);
+
+    expect(customAdapter['batchV1Api'].createNamespacedJob).toHaveBeenCalledWith(
+      'custom-ns',
+      expect.objectContaining({
+        metadata: expect.objectContaining({
+          namespace: 'custom-ns',
+          name: expect.stringMatching(/^custom-prefix-1-[a-z0-9-]+$/),
+        }),
+        spec: expect.objectContaining({
+          template: expect.objectContaining({
+            spec: expect.objectContaining({
+              serviceAccountName: 'custom-sa',
+            }),
+          }),
+        }),
+      })
+    );
+  });
 });
