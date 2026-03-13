@@ -1,3 +1,12 @@
+### STUDIO v0.118.5
+- ✅ Completed: Timeline Audio Regression Refinements - Refined JSDoc, inline comments, and minor clarity updates to TimelineAudioTrack and useAudioWaveform implementation following testing.
+
+### STUDIO v0.118.4
+- ✅ Completed: Update Quickstart Guide - Updated the Quickstart guide to emphasize the `helios init` command as the primary way to get started.
+
+### STUDIO v0.118.3
+- ✅ Completed: Regression Tests - Fixed `UnhandledPromiseRejection` in `useAudioWaveform.test.ts` by explicitly catching mocked decoder rejection.
+
 ### STUDIO v0.118.1
 - ✅ Completed: Regression Tests - Implemented unit and regression tests for `TimelineAudioTrack` component and `useAudioWaveform` hook.
 

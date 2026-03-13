@@ -29,7 +29,7 @@ The `npx helios studio` command launches the dev server, which uses `vite-plugin
 
 ## Section D: UI Components
 - **Stage**: The main preview area integrating `<helios-player>`.
-- **Timeline**: Allows scrubbing, setting in/out points, and visualizes audio waveforms.
+- **Timeline**: Allows scrubbing, setting in/out points, and visualizes audio waveforms using precise canvas-based rendering via `useAudioWaveform`.
 - **Props Editor**: A schema-aware UI for modifying input properties interactively, including visual schema validation.
 - **Assets Panel**: For managing local media files with drag-and-drop.
 - **Renders Panel**: For configuring and launching server-side or distributed render jobs.
