@@ -2,6 +2,10 @@
 
 This file tracks progress for the CLI domain (`packages/cli`).
 
+## CLI v0.37.0
+
+- ✅ Deploy Cloudflare - Implemented `helios deploy cloudflare` to scaffold Cloudflare Workers deployment configuration.
+
 ## CLI v0.36.10
 
 - ✅ Merge Command Regression Tests - Implemented comprehensive unit tests for `helios merge`.

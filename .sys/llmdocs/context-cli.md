@@ -90,6 +90,7 @@ packages/cli/
 - `helios deploy setup`: Scaffold deployment configurations (Docker).
 - `helios deploy gcp`: Scaffold Google Cloud Run Job configuration.
 - `helios deploy aws`: Scaffold AWS Lambda deployment configuration.
+- `helios deploy cloudflare`: Scaffold Cloudflare Workers deployment configuration.
 
 ## D. Configuration
 

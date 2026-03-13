@@ -6,6 +6,7 @@ import chalk from 'chalk';
 import { DOCKERFILE_TEMPLATE, DOCKER_COMPOSE_TEMPLATE } from '../templates/docker.js';
 import { CLOUD_RUN_JOB_TEMPLATE, README_GCP_TEMPLATE } from '../templates/gcp.js';
 import { AWS_DOCKERFILE_TEMPLATE, AWS_LAMBDA_HANDLER_TEMPLATE, AWS_SAM_TEMPLATE, README_AWS_TEMPLATE } from '../templates/aws.js';
+import { WRANGLER_TOML_TEMPLATE, CLOUDFLARE_WORKER_TEMPLATE, README_CLOUDFLARE_TEMPLATE } from '../templates/cloudflare.js';
 
 export function registerDeployCommand(program: Command) {
   const deploy = program.command('deploy')
@@ -256,5 +257,99 @@ export function registerDeployCommand(program: Command) {
 
       console.log(chalk.blue('\nAWS Lambda setup complete!'));
       console.log('See README-AWS.md for deployment instructions.');
+    });
+
+  deploy
+    .command('cloudflare')
+    .description('Scaffold Cloudflare Workers deployment configuration')
+    .action(async () => {
+      const cwd = process.cwd();
+      const wranglerPath = path.join(cwd, 'wrangler.toml');
+      const workerPath = path.join(cwd, 'src', 'worker.ts');
+      const readmePath = path.join(cwd, 'README-CLOUDFLARE.md');
+
+      console.log(chalk.blue('Scaffolding Cloudflare Workers deployment files...'));
+
+      // wrangler.toml
+      let writeWrangler = true;
+      if (fs.existsSync(wranglerPath)) {
+        const response = await prompts({
+          type: 'confirm',
+          name: 'value',
+          message: 'wrangler.toml already exists. Overwrite?',
+          initial: false
+        });
+
+        if (typeof response.value === 'undefined') {
+          console.log(chalk.yellow('\nOperation cancelled.'));
+          process.exit(0);
+        }
+
+        writeWrangler = response.value;
+      }
+
+      if (writeWrangler) {
+        fs.writeFileSync(wranglerPath, WRANGLER_TOML_TEMPLATE);
+        console.log(chalk.green('✔ Created wrangler.toml'));
+      } else {
+        console.log(chalk.gray('Skipped wrangler.toml'));
+      }
+
+      // src/worker.ts
+      let writeWorker = true;
+      if (fs.existsSync(workerPath)) {
+        const response = await prompts({
+          type: 'confirm',
+          name: 'value',
+          message: 'src/worker.ts already exists. Overwrite?',
+          initial: false
+        });
+
+        if (typeof response.value === 'undefined') {
+          console.log(chalk.yellow('\nOperation cancelled.'));
+          process.exit(0);
+        }
+
+        writeWorker = response.value;
+      }
+
+      if (writeWorker) {
+        const srcDir = path.dirname(workerPath);
+        if (!fs.existsSync(srcDir)) {
+          fs.mkdirSync(srcDir, { recursive: true });
+        }
+        fs.writeFileSync(workerPath, CLOUDFLARE_WORKER_TEMPLATE);
+        console.log(chalk.green('✔ Created src/worker.ts'));
+      } else {
+        console.log(chalk.gray('Skipped src/worker.ts'));
+      }
+
+      // README-CLOUDFLARE.md
+      let writeReadme = true;
+      if (fs.existsSync(readmePath)) {
+        const response = await prompts({
+          type: 'confirm',
+          name: 'value',
+          message: 'README-CLOUDFLARE.md already exists. Overwrite?',
+          initial: false
+        });
+
+        if (typeof response.value === 'undefined') {
+          console.log(chalk.yellow('\nOperation cancelled.'));
+          process.exit(0);
+        }
+
+        writeReadme = response.value;
+      }
+
+      if (writeReadme) {
+        fs.writeFileSync(readmePath, README_CLOUDFLARE_TEMPLATE);
+        console.log(chalk.green('✔ Created README-CLOUDFLARE.md'));
+      } else {
+        console.log(chalk.gray('Skipped README-CLOUDFLARE.md'));
+      }
+
+      console.log(chalk.blue('\nCloudflare Workers setup complete!'));
+      console.log('See README-CLOUDFLARE.md for deployment instructions.');
     });
 }
