@@ -4,13 +4,14 @@ import { useState, useEffect } from 'react';
 const waveformCache = new Map<string, Float32Array>();
 
 /**
- * Hook to fetch audio from a URL, decode it, and extract waveform peaks.
- * Uses a global cache to avoid re-fetching/decoding the same URL.
+ * Hook to fetch audio from a URL, decode it, and extract waveform peaks for timeline display.
+ * Uses a global cache to avoid re-fetching/decoding the same audio source URL across re-renders.
  *
- * @param src The URL of the audio file
+ * @param src The URL of the audio file (Blob URL or network resource)
  * @param peaksPerSecond Resolution of the waveform (default: 100 = 1 peak per 10ms).
- *                       Higher values give more detail but use more memory.
- *                       We use 100 by default as a balance.
+ *                       Higher values give more visual detail on zoom but use more memory.
+ *                       We use 100 by default as a stable balance for the Studio interface.
+ * @returns Object containing the extracted peaks array and an error flag if loading failed.
  */
 export function useAudioWaveform(src: string, peaksPerSecond: number = 100) {
   const [peaks, setPeaks] = useState<Float32Array | null>(waveformCache.get(src) || null);
@@ -77,11 +78,14 @@ function extractPeaks(buffer: AudioBuffer, peaksPerSecond: number): Float32Array
     const sampleRate = buffer.sampleRate;
 
     const samplesPerPeak = Math.floor(sampleRate / peaksPerSecond);
+
+    // Safety check for extremely low sample rates or very high requested resolution
     if (samplesPerPeak < 1) return new Float32Array(0);
 
     const peakCount = Math.ceil(channelLength / samplesPerPeak);
     const peaks = new Float32Array(peakCount);
 
+    // Group samples into buckets to determine max amplitude per peak interval
     for (let i = 0; i < peakCount; i++) {
         const start = i * samplesPerPeak;
         const end = Math.min(start + samplesPerPeak, channelLength);

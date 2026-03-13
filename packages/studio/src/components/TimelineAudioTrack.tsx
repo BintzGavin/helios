@@ -12,6 +12,10 @@ interface TimelineAudioTrackProps {
   getPercent: (frame: number) => number;
 }
 
+/**
+ * Renders an audio track as a waveform on the composition timeline.
+ * Calculates exact positioning and delegates waveform drawing to a canvas.
+ */
 export const TimelineAudioTrack: React.FC<TimelineAudioTrackProps> = ({
   track,
   fps,
@@ -52,10 +56,11 @@ export const TimelineAudioTrack: React.FC<TimelineAudioTrackProps> = ({
     ctx.clearRect(0, 0, trackWidthPx, height);
     ctx.fillStyle = 'rgba(0, 0, 0, 0.5)'; // Dark semi-transparent
 
-    // Draw waveform
+    // Draw waveform visually matching timeline Zoom level
     const peaksPerPixel = peaks.length / trackWidthPx;
     const midY = height / 2;
 
+    // Draw bars across the calculated pixel width for this specific zoom context
     for (let x = 0; x < trackWidthPx; x++) {
         // Determine the range of peaks that map to this pixel
         const startPeakIndex = Math.floor(x * peaksPerPixel);
