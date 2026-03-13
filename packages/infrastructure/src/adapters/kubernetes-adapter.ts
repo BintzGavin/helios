@@ -4,6 +4,7 @@ import { WorkerJob } from '../types/job.js';
 
 /**
  * Options for configuring the KubernetesAdapter.
+ * Allows execution of distributed rendering jobs across a Kubernetes cluster via the Batch V1 API.
  */
 export interface KubernetesAdapterOptions {
   kubeconfigPath?: string;
