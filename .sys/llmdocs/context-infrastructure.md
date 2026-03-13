@@ -21,6 +21,7 @@ packages/infrastructure/examples
 ├── gcs-storage.ts
 ├── hetzner-cloud-adapter.ts
 ├── job-executor-standalone.ts
+├── kubernetes-adapter-example.ts
 ├── job-manager-standalone.ts
 ├── local-adapter.ts
 ├── local-storage.ts
@@ -35,6 +36,7 @@ packages/infrastructure/tests
 │   ├── cloudflare-workers-adapter.test.ts
 │   ├── fly-machines-adapter.test.ts
 │   ├── hetzner-cloud-adapter.test.ts
+│   ├── kubernetes-adapter.test.ts
 │   └── local-adapter.test.ts
 ├── aws-adapter.test.ts
 ├── benchmarks
@@ -51,6 +53,7 @@ packages/infrastructure/tests
 │   ├── gcs-storage.bench.ts
 │   ├── job-executor.bench.ts
 │   ├── job-manager.bench.ts
+│   ├── kubernetes-adapter.bench.ts
 │   ├── local-adapter.bench.ts
 │   ├── local-storage.bench.ts
 │   ├── render-executor.bench.ts
