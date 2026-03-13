@@ -106,6 +106,109 @@ describe('KubernetesAdapter', () => {
     expect(result.stderr).toContain('Failed to create Job: Creation failed');
   });
 
+  it('should handle log retrieval failure gracefully with onStderr', async () => {
+    vi.mocked(adapter['batchV1Api'].readNamespacedJob).mockRejectedValue(new Error('Read job failed'));
+
+    const onStderr = vi.fn();
+    const job: WorkerJob = {
+      command: 'echo',
+      onStderr,
+    };
+
+    const result = await adapter.execute(job);
+    // Outer catch handles it and throws, then we catch in execute
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toContain('Job monitoring failed: Read job failed');
+    expect(onStderr).toHaveBeenCalledWith(expect.stringContaining('Job monitoring failed: Read job failed'));
+  });
+
+  it('should handle missing pods gracefully with podname falsey', async () => {
+    vi.mocked(adapter['coreV1Api'].listNamespacedPod).mockResolvedValue({
+      body: { items: [{ metadata: {} }] },
+    } as any);
+
+    const job: WorkerJob = {
+      command: 'echo',
+    };
+
+    const result = await adapter.execute(job);
+    expect(result.exitCode).toBe(0);
+    expect(result.stdout).toBe('');
+  });
+
+  it('should handle log retrieval with non-string log value', async () => {
+    vi.mocked(adapter['coreV1Api'].readNamespacedPodLog).mockResolvedValue({ body: 123 } as any);
+
+    const job: WorkerJob = {
+      command: 'echo',
+    };
+
+    const result = await adapter.execute(job);
+    expect(result.exitCode).toBe(0);
+    expect(result.stdout).toBe(123 as any); // actually `(logs as unknown as string) || ''` evaluates to 123 if logs is truthy, so `result.stdout` will be 123
+  });
+
+  it('should handle log retrieval where logResponse body is empty string', async () => {
+    vi.mocked(adapter['coreV1Api'].readNamespacedPodLog).mockResolvedValue({ body: '' } as any);
+
+    const job: WorkerJob = {
+      command: 'echo',
+    };
+
+    const result = await adapter.execute(job);
+    expect(result.exitCode).toBe(0);
+    expect(result.stdout).toBe('');
+  });
+
+  it('should handle logs empty', async () => {
+    vi.mocked(adapter['coreV1Api'].readNamespacedPodLog).mockResolvedValue(undefined as any);
+
+    const job: WorkerJob = {
+      command: 'echo',
+    };
+
+    const result = await adapter.execute(job);
+    expect(result.exitCode).toBe(0);
+    expect(result.stdout).toBe('');
+  });
+
+  it('should handle creation error without error message', async () => {
+    vi.mocked(adapter['batchV1Api'].createNamespacedJob).mockRejectedValue('String error');
+
+    const job: WorkerJob = {
+      command: 'echo',
+    };
+
+    const result = await adapter.execute(job);
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toContain('Failed to create Job: String error');
+  });
+
+  it('should handle monitoring error without error message', async () => {
+    vi.mocked(adapter['batchV1Api'].readNamespacedJob).mockRejectedValue('String error');
+
+    const job: WorkerJob = {
+      command: 'echo',
+    };
+
+    const result = await adapter.execute(job);
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toContain('Job monitoring failed: String error');
+  });
+
+  it('should ignore deletion errors in finally block', async () => {
+    vi.mocked(adapter['batchV1Api'].deleteNamespacedJob).mockRejectedValue(new Error('Deletion failed'));
+
+    const job: WorkerJob = {
+      command: 'echo',
+    };
+
+    // execute shouldn't throw when deletion fails
+    const result = await adapter.execute(job);
+    expect(result.exitCode).toBe(0);
+    expect(adapter['batchV1Api'].deleteNamespacedJob).toHaveBeenCalled();
+  });
+
   it('should handle log retrieval failure gracefully', async () => {
     vi.mocked(adapter['coreV1Api'].readNamespacedPodLog).mockRejectedValue(new Error('Log read failed'));
 
@@ -133,6 +236,71 @@ describe('KubernetesAdapter', () => {
     expect(result.exitCode).toBe(0);
     expect(result.stdout).toBe('test log output');
     expect(onStdout).toHaveBeenCalledWith('test log output');
+  });
+
+  it('should handle log retrieval successfully with direct response body (no .body wrapper)', async () => {
+    const onStdout = vi.fn();
+    // Return a direct object, not wrapped in { body: ... }
+    vi.mocked(adapter['coreV1Api'].listNamespacedPod).mockResolvedValue({
+      items: [{ metadata: { name: 'direct-pod' } }]
+    } as any);
+    vi.mocked(adapter['coreV1Api'].readNamespacedPodLog).mockResolvedValue('direct log output' as any);
+
+    const job: WorkerJob = {
+      command: 'echo',
+      onStdout,
+    };
+
+    const result = await adapter.execute(job);
+    expect(result.exitCode).toBe(0);
+    expect(result.stdout).toBe('direct log output');
+    expect(onStdout).toHaveBeenCalledWith('direct log output');
+  });
+
+  it('should handle job without nested body', async () => {
+    vi.mocked(adapter['batchV1Api'].readNamespacedJob).mockResolvedValue({
+      status: { succeeded: 1 }
+    } as any);
+
+    const job: WorkerJob = {
+      command: 'echo',
+    };
+
+    const result = await adapter.execute(job);
+    expect(result.exitCode).toBe(0);
+  });
+
+  it('should poll if status is empty then succeed', async () => {
+    vi.mocked(adapter['batchV1Api'].readNamespacedJob)
+      .mockResolvedValueOnce({ body: { status: {} } } as any)
+      .mockResolvedValueOnce({ body: { status: { succeeded: 1 } } } as any);
+
+    // Delete pollIntervalMs to trigger the fallback logic
+    const oldPoll = adapter['options'].pollIntervalMs;
+    delete adapter['options'].pollIntervalMs;
+    // Fast forward testing not needed since 2000 is still awaited, but we mock it maybe
+    const spy = vi.spyOn(global, 'setTimeout').mockImplementation((fn: any) => { fn(); return {} as any; });
+
+    const job: WorkerJob = {
+      command: 'echo',
+    };
+
+    const result = await adapter.execute(job);
+    expect(result.exitCode).toBe(0);
+    spy.mockRestore();
+    adapter['options'].pollIntervalMs = oldPoll;
+  });
+
+  it('should handle log retrieval successfully with null body, defaulting to empty string', async () => {
+    vi.mocked(adapter['coreV1Api'].readNamespacedPodLog).mockResolvedValue(null as any);
+
+    const job: WorkerJob = {
+      command: 'echo',
+    };
+
+    const result = await adapter.execute(job);
+    expect(result.exitCode).toBe(0);
+    expect(result.stdout).toBe('');
   });
 
   it('should handle missing pods gracefully (no error, empty stdout)', async () => {
