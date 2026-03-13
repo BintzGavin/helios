@@ -360,3 +360,6 @@
 
 ## INFRASTRUCTURE v0.52.1
 - ✅ Completed: Kubernetes Adapter Refinement - Added documentation comments to the KubernetesAdapter options to satisfy source code change requirements.
+
+### INFRASTRUCTURE v0.53.0
+- ✅ Completed: Modal Adapter - Implemented `ModalAdapter` for cloud execution using Modal's Python-native serverless platform.
