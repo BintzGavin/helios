@@ -1,5 +1,8 @@
 # INFRASTRUCTURE PROGRESS
 
+## INFRASTRUCTURE v0.53.5
+- ✅ Completed: HetznerCloudAdapter-Coverage - Improved test coverage to handle edge cases like polling timeouts, aborts, and cleanup errors.
+
 ## INFRASTRUCTURE v0.53.4
 - ✅ Completed: KubernetesAdapter-Coverage - Improved test coverage to handle job failure, creation errors, and custom options properly.
 

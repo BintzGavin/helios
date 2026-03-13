@@ -121,4 +121,92 @@ describe('HetznerCloudAdapter', () => {
     expect(result.exitCode).toBe(1);
     expect(result.stderr).toContain('Job aborted during execution');
   });
+
+  it('should abort early if signal is already aborted', async () => {
+    const adapter = new HetznerCloudAdapter(config);
+    const fetchMock = vi.mocked(global.fetch);
+    const ac = new AbortController();
+    ac.abort();
+    const abortJob = { ...job, signal: ac.signal };
+
+    const result = await adapter.execute(abortJob);
+
+    expect(fetchMock).not.toHaveBeenCalled();
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toContain('Job aborted before execution');
+  });
+
+  it('should timeout if polling exceeds timeoutMs', async () => {
+    const adapter = new HetznerCloudAdapter({ ...config, timeoutMs: 10 });
+    const fetchMock = vi.mocked(global.fetch);
+
+    fetchMock.mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve({ server: { id: 999, status: 'running' } }),
+    } as any);
+
+    fetchMock.mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve({ server: { id: 999, status: 'running' } }),
+    } as any);
+
+    fetchMock.mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve({}),
+    } as any);
+
+    const result = await adapter.execute(job);
+
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toContain('Execution timeout exceeded');
+  });
+
+  it('should handle polling errors gracefully', async () => {
+    const adapter = new HetznerCloudAdapter(config);
+    const fetchMock = vi.mocked(global.fetch);
+
+    fetchMock.mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve({ server: { id: 888, status: 'running' } }),
+    } as any);
+
+    fetchMock.mockResolvedValueOnce({
+      ok: false,
+      status: 500,
+      json: () => Promise.resolve({}),
+    } as any);
+
+    fetchMock.mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve({}),
+    } as any);
+
+    const result = await adapter.execute(job);
+
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toContain('Failed to poll server status: 500');
+  });
+
+  it('should handle cleanup errors', async () => {
+    const adapter = new HetznerCloudAdapter(config);
+    const fetchMock = vi.mocked(global.fetch);
+
+    fetchMock.mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve({ server: { id: 777, status: 'running' } }),
+    } as any);
+
+    fetchMock.mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve({ server: { id: 777, status: 'off' } }),
+    } as any);
+
+    fetchMock.mockRejectedValueOnce(new Error('Network error during cleanup'));
+
+    const result = await adapter.execute(job);
+
+    // It should exit cleanly but the stderr should capture the cleanup failure
+    expect(result.exitCode).toBe(0);
+    expect(result.stderr).toContain('Failed to clean up server: Network error during cleanup');
+  });
 });
