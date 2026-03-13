@@ -2,6 +2,9 @@ import * as k8s from '@kubernetes/client-node';
 import { WorkerAdapter, WorkerResult } from '../types/adapter.js';
 import { WorkerJob } from '../types/job.js';
 
+/**
+ * Options for configuring the KubernetesAdapter.
+ */
 export interface KubernetesAdapterOptions {
   kubeconfigPath?: string;
   namespace?: string;
