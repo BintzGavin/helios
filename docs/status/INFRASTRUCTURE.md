@@ -1,7 +1,8 @@
 # INFRASTRUCTURE STATUS
-**Version**: 0.53.2
+**Version**: 0.53.3
 
 ## Status Log
+- [v0.53.3] ✅ Completed: DenoDeployAdapter-Coverage - Improved test coverage to ensure missing response fields are properly defaulted.
 - [v0.53.2] ✅ Completed: FlyMachinesAdapter-Coverage - Improved test coverage to handle aborted signals, missing job definition, and machine creation failures.
 - [v0.53.1] ✅ Completed: DockerAdapter-Coverage - Improved test coverage to handle aborts and callbacks
 - [v0.53.0] ✅ Completed: Modal Adapter - Implemented `ModalAdapter` for cloud execution using Modal's Python-native serverless platform.
