@@ -123,4 +123,25 @@ describe('DockerAdapter', () => {
     expect(result.exitCode).toBe(1);
     expect(mockSpawn).toHaveBeenCalledWith('docker', ['rm', '-f', expect.any(String)], { stdio: 'ignore' });
   });
+
+  it('should handle missing exit code from docker process', async () => {
+    const adapter = new DockerAdapter({ image: 'test' });
+    const jobPromise = adapter.execute({ command: 'test' });
+
+    mockChildProcess.emit('close', null); // Simulating no exit code
+
+    const result = await jobPromise;
+    expect(result.exitCode).toBe(1); // Defaults to 1
+  });
+
+  it('should only run cleanup once', async () => {
+    const adapter = new DockerAdapter({ image: 'test' });
+    const controller = new AbortController();
+    const jobPromise = adapter.execute({ command: 'test', signal: controller.signal });
+
+    mockChildProcess.emit('close', 0); // Triggers cleanup
+    mockChildProcess.emit('error', new Error('ignore me')); // Triggers cleanup again
+
+    await jobPromise;
+  });
 });
