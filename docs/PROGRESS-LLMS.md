@@ -1,5 +1,14 @@
 # LLMS Progress
 
+## LLMS v1.40.0
+- ✅ Completed: Daily llms.txt Review
+  - Updated Roadmap based on recent completions in PROGRESS logs.
+  - Added "Schema Validation", "Components Panel", and "Enhance MCP Server" to Studio roadmap.
+  - Added "Cloud Worker Execution Azure Cloudflare" to CLI roadmap.
+  - Added "Regression Tests for MediaProperties/InputProps" to Player roadmap.
+  - Added "Kubernetes, Azure Functions, Hetzner, Fly.io Adapters" to Infrastructure roadmap.
+  - Confirmed all package.json versions match the Quick Facts versions exactly (Core v5.13.0, Studio v0.107.1, Player v0.76.18, Renderer v1.78.0, CLI v0.32.0, Infrastructure v0.25.0).
+
 ## LLMS v1.39.0
 - ✅ Completed: Daily llms.txt Review
   - Fixed version drift by realigning Quick Facts and Roadmap to actual package.json versions (Player v0.76.18+).
