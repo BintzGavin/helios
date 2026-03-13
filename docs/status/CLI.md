@@ -1,6 +1,6 @@
 # CLI Status
 
-**Version**: 0.36.10
+**Version**: 0.37.0
 
 ## Current State
 
@@ -41,6 +41,7 @@ Per AGENTS.md, the CLI is "ACTIVELY EXPANDING FOR V2" with focus on:
 
 ## History
 
+[v0.37.0] ✅ Deploy Cloudflare - Implemented `helios deploy cloudflare` to scaffold Cloudflare Workers deployment configuration.
 [v0.36.10] ✅ Merge Command Regression Tests - Implemented comprehensive unit tests for `helios merge`.
 [v0.36.9] ✅ Cloud Worker Execution Azure Cloudflare - Added support for Cloudflare Workers and Azure Functions execution adapters to the job run command.
 [v0.36.8] ✅ Add Command Regression Tests - Implemented comprehensive unit tests for `helios add`.
