@@ -1,7 +1,8 @@
 # INFRASTRUCTURE STATUS
-**Version**: 0.53.5
+**Version**: 0.53.6
 
 ## Status Log
+- [v0.53.6] ✅ Completed: Kubernetes Adapter Test Coverage - Improved test coverage for KubernetesAdapter.
 - [v0.53.5] ✅ Completed: HetznerCloudAdapter-Coverage - Improved test coverage to handle edge cases like polling timeouts, aborts, and cleanup errors.
 - [v0.53.4] ✅ Completed: KubernetesAdapter-Coverage - Improved test coverage to handle job failure, creation errors, and custom options properly.
 - [v0.53.3] ✅ Completed: DenoDeployAdapter-Coverage - Improved test coverage to ensure missing response fields are properly defaulted.

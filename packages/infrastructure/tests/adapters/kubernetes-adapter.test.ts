@@ -109,14 +109,30 @@ describe('KubernetesAdapter', () => {
   it('should handle log retrieval failure gracefully', async () => {
     vi.mocked(adapter['coreV1Api'].readNamespacedPodLog).mockRejectedValue(new Error('Log read failed'));
 
+    const onStderr = vi.fn();
     const job: WorkerJob = {
       command: 'echo',
+      onStderr,
     };
 
     const result = await adapter.execute(job);
     // Since job succeeded but logs failed, it still returns exitCode 0
     expect(result.exitCode).toBe(0);
     expect(result.stderr).toContain('Job monitoring failed: Log read failed');
+    expect(onStderr).toHaveBeenCalledWith(expect.stringContaining('Job monitoring failed: Log read failed'));
+  });
+
+  it('should call onStdout when logs are successfully retrieved', async () => {
+    const onStdout = vi.fn();
+    const job: WorkerJob = {
+      command: 'echo',
+      onStdout,
+    };
+
+    const result = await adapter.execute(job);
+    expect(result.exitCode).toBe(0);
+    expect(result.stdout).toBe('test log output');
+    expect(onStdout).toHaveBeenCalledWith('test log output');
   });
 
   it('should handle missing pods gracefully (no error, empty stdout)', async () => {
@@ -157,6 +173,15 @@ describe('KubernetesAdapter', () => {
         }),
       })
     );
+  });
+
+  it('should load config from kubeconfigPath if provided', async () => {
+    const customAdapter = new KubernetesAdapter({
+      image: 'test-image',
+      kubeconfigPath: '/custom/path/config',
+    });
+
+    expect(customAdapter['kc'].loadFromFile).toHaveBeenCalledWith('/custom/path/config');
   });
 
   it('should respect custom options overrides', async () => {
