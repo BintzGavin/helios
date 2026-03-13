@@ -1,5 +1,8 @@
 # INFRASTRUCTURE PROGRESS
 
+## INFRASTRUCTURE v0.53.1
+- ✅ Completed: DockerAdapter-Coverage - Improved test coverage to handle aborts and callbacks
+
 ## INFRASTRUCTURE v0.52.2
 - ✅ Completed: Kubernetes Adapter Refinement - Refined Kubernetes Adapter options.
 

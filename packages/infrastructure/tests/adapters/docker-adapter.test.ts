@@ -86,4 +86,41 @@ describe('DockerAdapter', () => {
 
      await expect(jobPromise).rejects.toThrow('spawn failed');
   });
+
+  it('should call onStdout and onStderr callbacks', async () => {
+    const adapter = new DockerAdapter({ image: 'test' });
+    const onStdout = vi.fn();
+    const onStderr = vi.fn();
+
+    const jobPromise = adapter.execute({
+      command: 'test',
+      onStdout,
+      onStderr
+    });
+
+    mockChildProcess.stdout.emit('data', Buffer.from('hello out'));
+    mockChildProcess.stderr.emit('data', Buffer.from('hello err'));
+    mockChildProcess.emit('close', 0);
+
+    await jobPromise;
+
+    expect(onStdout).toHaveBeenCalledWith('hello out');
+    expect(onStderr).toHaveBeenCalledWith('hello err');
+  });
+
+  it('should handle already aborted signal', async () => {
+    const adapter = new DockerAdapter({ image: 'test' });
+    const controller = new AbortController();
+    controller.abort();
+
+    const jobPromise = adapter.execute({
+      command: 'test',
+      signal: controller.signal
+    });
+
+    const result = await jobPromise;
+
+    expect(result.exitCode).toBe(1);
+    expect(mockSpawn).toHaveBeenCalledWith('docker', ['rm', '-f', expect.any(String)], { stdio: 'ignore' });
+  });
 });
