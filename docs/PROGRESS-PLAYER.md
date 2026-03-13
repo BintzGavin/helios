@@ -1,3 +1,6 @@
+## PLAYER v0.76.20
+- ✅ Completed: Regression Tests for Media Session - Added comprehensive edge case tests for HeliosMediaSession to prevent regressions.
+
 ## PLAYER v0.76.19
 - ✅ Completed: Regression Tests for MediaProperties - Added comprehensive tests for cross-origin security checks and media property parity (videoWidth/Height).
 
