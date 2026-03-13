@@ -1,4 +1,4 @@
-**Version**: v0.76.19
+**Version**: v0.76.20
 
 **Posture**: STABLE AND FEATURE COMPLETE
 
@@ -10,6 +10,7 @@
 - **Responsibility**: `<helios-player>` Web Component, UI controls, iframe bridge.
 
 ## Current State
+[v0.76.20] ✅ Completed: Regression Tests for Media Session - Added comprehensive edge case tests for HeliosMediaSession to prevent regressions.
 [v0.76.18] ✅ Completed: Regression Tests for InputProps - Added comprehensive tests for `input-props` JSON parsing edge cases (explicit "null", empty strings).
 [v0.76.17] ✅ Completed: Regression Tests for MediaProperties - Added comprehensive tests for cross-origin security checks and media property parity (videoWidth/Height).
 [v0.76.16] ✅ Completed: Audio Context Manager Tests - Added comprehensive unit test coverage for SharedAudioContextManager and SharedAudioSource logic to prevent regressions.

@@ -157,4 +157,55 @@ describe('HeliosMediaSession', () => {
     expect(mockSetActionHandler).toHaveBeenCalledWith('play', null);
     expect(mockMediaSession.playbackState).toBe('none');
   });
+
+  it('should handle undefined mediaSession', () => {
+    const oldMediaSession = navigator.mediaSession;
+    delete (navigator as any).mediaSession;
+    const session = new HeliosMediaSession(player, controller);
+    expect(session['unsubscribe']).toBeNull();
+    // Verify calling methods doesn't throw
+    expect(() => session.updateMetadata()).not.toThrow();
+    expect(() => session.setupHandlers()).not.toThrow();
+    expect(() => session.updateState({ isPlaying: true })).not.toThrow();
+    expect(() => session.destroy()).not.toThrow();
+    (navigator as any).mediaSession = oldMediaSession;
+  });
+
+  it('should handle seekbackward and seekforward clamping', () => {
+    new HeliosMediaSession(player, controller);
+    const seekBackwardHandler = mockSetActionHandler.mock.calls.find((c: any) => c[0] === 'seekbackward')[1];
+    const seekForwardHandler = mockSetActionHandler.mock.calls.find((c: any) => c[0] === 'seekforward')[1];
+
+    (controller.getState as any).mockReturnValue({ duration: 10, fps: 30, currentFrame: 150 }); // 5 seconds in
+    seekBackwardHandler({ seekOffset: 10 }); // Back 10s should clamp to 0
+    expect(controller.seek).toHaveBeenCalledWith(0);
+
+    (controller.getState as any).mockReturnValue({ duration: 10, fps: 30, currentFrame: 150 });
+    seekForwardHandler({ seekOffset: 10 }); // Forward 10s should clamp to duration
+    expect(controller.seek).toHaveBeenCalledWith(300); // 10s * 30fps
+  });
+
+  it('should ignore seekto without seekTime', () => {
+    new HeliosMediaSession(player, controller);
+    const seekHandler = mockSetActionHandler.mock.calls.find((c: any) => c[0] === 'seekto')[1];
+    controller.seek = vi.fn();
+    seekHandler({});
+    expect(controller.seek).not.toHaveBeenCalled();
+  });
+
+  it('should ignore updateState with invalid duration or fps', () => {
+    const session = new HeliosMediaSession(player, controller);
+    mockSetPositionState.mockClear();
+    session.updateState({ duration: 0, fps: 30, currentFrame: 0 });
+    expect(mockSetPositionState).not.toHaveBeenCalled();
+
+    session.updateState({ duration: 10, fps: 0, currentFrame: 0 });
+    expect(mockSetPositionState).not.toHaveBeenCalled();
+  });
+
+  it('should safely destroy when unsubscribe is null', () => {
+    const session = new HeliosMediaSession(player, controller);
+    session['unsubscribe'] = null; // simulate it never subscribed or already unsubscribed
+    expect(() => session.destroy()).not.toThrow();
+  });
 });
