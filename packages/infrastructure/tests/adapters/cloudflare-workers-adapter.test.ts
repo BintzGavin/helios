@@ -72,4 +72,36 @@ describe('CloudflareWorkersAdapter', () => {
     expect(result.exitCode).toBe(1);
     expect(result.stderr).toContain('Job was cancelled');
   });
+
+  it('should use data.output as stdout fallback', async () => {
+    vi.mocked(global.fetch).mockResolvedValueOnce(new Response(JSON.stringify({ exitCode: 0, output: 'Fallback output', stderr: '' }), { status: 200, headers: { 'Content-Type': 'application/json' } }));
+    const adapter = new CloudflareWorkersAdapter({ serviceUrl, jobDefUrl });
+    const result = await adapter.execute({ command: 'render', meta: { chunkId: 0 } });
+    expect(result.exitCode).toBe(0);
+    expect(result.stdout).toBe('Fallback output');
+  });
+
+  it('should force exitCode 1 when response is not ok and exitCode is 0', async () => {
+    vi.mocked(global.fetch).mockResolvedValueOnce(new Response(JSON.stringify({ exitCode: 0, stderr: 'HTTP Error 500' }), { status: 500, headers: { 'Content-Type': 'application/json' } }));
+    const adapter = new CloudflareWorkersAdapter({ serviceUrl, jobDefUrl });
+    const result = await adapter.execute({ command: 'render', meta: { chunkId: 0 } });
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toContain('HTTP Error 500');
+  });
+
+  it('should use default exit code if not provided (0 for ok response)', async () => {
+    vi.mocked(global.fetch).mockResolvedValueOnce(new Response(JSON.stringify({ stdout: 'success' }), { status: 200, headers: { 'Content-Type': 'application/json' } }));
+    const adapter = new CloudflareWorkersAdapter({ serviceUrl, jobDefUrl });
+    const result = await adapter.execute({ command: 'render', meta: { chunkId: 0 } });
+    expect(result.exitCode).toBe(0);
+    expect(result.stdout).toBe('success');
+  });
+
+  it('should use default exit code if not provided (1 for non-ok response)', async () => {
+    vi.mocked(global.fetch).mockResolvedValueOnce(new Response(JSON.stringify({ stdout: 'error' }), { status: 500, statusText: 'Internal Server Error', headers: { 'Content-Type': 'application/json' } }));
+    const adapter = new CloudflareWorkersAdapter({ serviceUrl, jobDefUrl });
+    const result = await adapter.execute({ command: 'render', meta: { chunkId: 0 } });
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toContain('HTTP Error 500: Internal Server Error');
+  });
 });
