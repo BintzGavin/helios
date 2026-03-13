@@ -138,4 +138,33 @@ describe('DenoDeployAdapter', () => {
 
     await expect(adapter.execute(job)).rejects.toThrow('AbortError');
   });
+
+  it('should fallback to default values if response json fields are missing', async () => {
+    const adapter = new DenoDeployAdapter({ serviceUrl: mockServiceUrl });
+    const job = {
+      command: 'test',
+      args: [],
+      cwd: '/',
+      env: {},
+      meta: {
+        jobDefUrl: 'url',
+        chunkId: 1
+      }
+    };
+
+    const mockResponse = {
+      ok: true,
+      json: vi.fn().mockResolvedValue({})
+    };
+    vi.mocked(fetch).mockResolvedValue(mockResponse as any);
+
+    const result = await adapter.execute(job);
+
+    expect(result).toEqual({
+      exitCode: -1,
+      stdout: '',
+      stderr: '',
+      durationMs: 0
+    });
+  });
 });
