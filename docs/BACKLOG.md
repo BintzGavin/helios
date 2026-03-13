@@ -60,7 +60,7 @@ This backlog tracks concrete deliverables derived from [`AGENTS.md`](../AGENTS.m
 
 #### Tier 3 — Future / Track
 
-- [ ] Cloud execution adapter (Modal) — Python-native serverless with first-class GPU support.
+- [x] Cloud execution adapter (Modal) — Python-native serverless with first-class GPU support.
 - [ ] Cloud execution adapter (Deno Deploy) — Emerging edge platform with native TS.
 - [x] Cloud execution adapter (Vercel Functions) — Huge Next.js ecosystem overlap; 10s timeout is challenging.
 - [ ] Cloud execution adapter (Hetzner Cloud) — Extremely cost-effective EU compute via API-driven VM provisioning.
