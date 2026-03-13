@@ -113,12 +113,12 @@ const report = await Helios.diagnose();
 
 ## Roadmap
 ### V1.x (Active)
-- **Studio**: v0.107.1+ (Export Job Spec, Component Management, Preview Command, CLI Build Command)
-- **CLI**: v0.32.0+ (Remote Job Spec, AWS Deployment, Deploy GCP Command, Registry Filtering)
+- **Studio**: v0.107.1+ (Export Job Spec, Components Panel, Schema Validation, MCP Server Enhancements)
+- **CLI**: v0.32.0+ (Remote Job Spec, Cloudflare/Azure Execution, Deploy GCP Command, Add/Merge Tests)
 - **Core**: v5.13.0+ (Generic Input Props, Active Clips, Input Schema, Shared Virtual Time Binding)
-- **Player**: v0.76.18+ (Async Seek, Export Menu, Api Parity, Synchronize Caption Styling)
-- **Renderer**: v1.78.0+ (Orchestrator Plan, Refactor Media Sync Logic, RenderExecutor Abstraction, Canvas Image Preload)
-- **Infrastructure**: v0.25.0+ (Bounded Dependency Synchronizer, Artifact Storage Cleanup, Orchestrator Asset Upload, Cloud Artifact Storage)
+- **Player**: v0.76.18+ (Async Seek, Export Menu, MediaProperties Tests, InputProps Tests)
+- **Renderer**: v1.78.0+ (Orchestrator Plan, HW Accel Validation, Refactor Media Sync, Canvas Image Preload)
+- **Infrastructure**: v0.25.0+ (Kubernetes, Azure Functions, Hetzner, Fly.io Cloud Adapters)
 
 ### AI Integration
 - **Studio MCP Server**: Inspect, create, and render compositions via LLM tools (Done)
