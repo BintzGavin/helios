@@ -92,4 +92,63 @@ describe('ModalAdapter', () => {
     expect(result.exitCode).toBe(1);
     expect(result.stderr).toContain('Job aborted');
   });
+
+  it('should handle onAbort callback setting aborted=true', async () => {
+    const controller = new AbortController();
+    const onStderr = vi.fn();
+
+    vi.mocked(fetch).mockImplementation(async () => {
+      // Simulate fetch delay, then throw a generic error, but since aborted=true is set, it should catch as aborted.
+      return new Promise((_, reject) => {
+        controller.abort();
+        reject(new Error('Some generic error but abort happened'));
+      });
+    });
+
+    const job: WorkerJob = {
+      command: 'test',
+      signal: controller.signal,
+      onStderr,
+    };
+
+    const result = await adapter.execute(job);
+
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toContain('Job aborted');
+    expect(onStderr).toHaveBeenCalledWith('Job aborted');
+  });
+
+  it('should call onStdout and onStderr when result contains them', async () => {
+    const onStdout = vi.fn();
+    const onStderr = vi.fn();
+
+    vi.mocked(fetch).mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ exitCode: 0, stdout: 'stdout message', stderr: 'stderr message' }),
+    } as any);
+
+    const job: WorkerJob = {
+      command: 'echo',
+      onStdout,
+      onStderr,
+    };
+
+    await adapter.execute(job);
+
+    expect(onStdout).toHaveBeenCalledWith('stdout message');
+    expect(onStderr).toHaveBeenCalledWith('stderr message');
+  });
+
+  it('should call onStderr on generic catch error', async () => {
+    const onStderr = vi.fn();
+
+    vi.mocked(fetch).mockRejectedValueOnce(new Error('Network failure'));
+
+    const job: WorkerJob = { command: 'test', onStderr };
+    const result = await adapter.execute(job);
+
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toContain('Execution failed: Network failure');
+    expect(onStderr).toHaveBeenCalledWith('Execution failed: Network failure');
+  });
 });

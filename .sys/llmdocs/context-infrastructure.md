@@ -1,116 +1,87 @@
-# Infrastructure Package Context
+# INFRASTRUCTURE CONTEXT
+**Version**: 0.53.10
 
 ## Section A: Architecture
-The `infrastructure` package manages the distributed cloud rendering execution of Helios. The architecture is composed of:
-- **Cloud Adapters**: Interfaces that bridge the gap between Helios core orchestrator and the execution environments (e.g. AWS Lambda, Google Cloud Run, Cloudflare Workers).
-- **Stateless Workers**: Handlers that execute render chunks independent of one another.
-- **Orchestration**: The `JobManager` and `JobExecutor` coordinate distributed tasks, schedule execution chunks, and aggregate status.
-- **Artifact Storage**: Interfaces for storing output bundles, chunks, and metadata persistently on specific cloud environments (S3, GCS, Local File System).
-- **Stitcher**: Merges output streams to generate the final media representation after rendering tasks complete.
+The infrastructure package provides cloud-agnostic distributed rendering capabilities. It orchestrates headless rendering workers, handles task distribution, and manages distributed asset lifecycle.
+
+Key Concepts:
+- **WorkerRuntime**: The core execution engine running within a stateless cloud function or container.
+- **JobExecutor**: The client-side orchestration component that distributes rendering chunks to the WorkerRuntime.
+- **JobManager**: The high-level orchestrator that manages job lifecycle, state persistence, and distributed chunk execution via `JobExecutor`.
+- **WorkerAdapters**: Cloud-provider specific interfaces that map the generic `JobExecutor` requests to specific cloud function invocations (e.g., AWS Lambda, Google Cloud Run).
+- **StorageAdapters**: Cloud-provider specific interfaces for managing remote asset storage (e.g., AWS S3, Google Cloud Storage) during distributed executions.
 
 ## Section B: File Tree
 ```
-packages/infrastructure/examples
-├── aws-lambda.ts
-├── azure-functions-adapter.ts
-├── cloudflare-workers-adapter-example.ts
-├── cloudrun.ts
-├── ffmpeg-stitcher.ts
-├── fly-machines-adapter.ts
-├── file-job-repository.ts
-├── gcs-storage.ts
-├── hetzner-cloud-adapter.ts
-├── job-executor-standalone.ts
-├── kubernetes-adapter-example.ts
-├── job-manager-standalone.ts
-├── local-adapter.ts
-├── local-storage.ts
-├── render-executor.ts
-├── s3-storage.ts
-├── sync-workspace.ts
-└── worker-runtime.ts
-
-packages/infrastructure/tests
-├── adapters
-│   ├── azure-functions-adapter.test.ts
-│   ├── cloudflare-workers-adapter.test.ts
-│   ├── fly-machines-adapter.test.ts
-│   ├── hetzner-cloud-adapter.test.ts
-│   ├── kubernetes-adapter.test.ts
-│   └── local-adapter.test.ts
-├── aws-adapter.test.ts
-├── benchmarks
-│   ├── aws-adapter.bench.ts
-│   ├── azure-functions-adapter.bench.ts
-│   ├── aws-handler.bench.ts
-│   ├── cloudflare-workers-adapter.bench.ts
-│   ├── cloudrun-adapter.bench.ts
-│   ├── cloudrun-server.bench.ts
-│   ├── command.bench.ts
-│   ├── ffmpeg-stitcher.bench.ts
-│   ├── file-job-repository.bench.ts
-│   ├── fly-machines-adapter.bench.ts
-│   ├── gcs-storage.bench.ts
-│   ├── job-executor.bench.ts
-│   ├── job-manager.bench.ts
-│   ├── kubernetes-adapter.bench.ts
-│   ├── local-adapter.bench.ts
-│   ├── local-storage.bench.ts
-│   ├── render-executor.bench.ts
-│   ├── s3-storage.bench.ts
-│   ├── sync-workspace.bench.ts
-│   └── worker-runtime.bench.ts
-├── cloudrun-adapter.test.ts
-├── command.test.ts
-├── e2e
-│   ├── deterministic-seeking.test.ts
-│   ├── job-manager-resiliency.test.ts
-│   └── resiliency.test.ts
-├── governance
-│   └── sync-workspace.test.ts
-├── job-executor.test.ts
-├── job-manager.test.ts
-├── orchestrator
-│   ├── file-job-repository-resiliency.test.ts
-│   ├── file-job-repository.test.ts
-│   └── job-manager.test.ts
-├── placeholder.test.ts
-├── render-executor.test.ts
-├── stitcher.test.ts
-├── storage
-│   ├── gcs-storage.test.ts
-│   ├── local-storage.test.ts
-│   └── s3-storage.test.ts
-├── utils
-│   └── command.test.ts
-├── worker
-│   ├── aws-handler-resiliency.test.ts
-│   ├── aws-handler.test.ts
-│   └── cloudrun-server.test.ts
-└── worker-runtime.test.ts
+packages/infrastructure/
+├── src/
+│   ├── index.ts
+│   ├── types/
+│   │   ├── index.ts
+│   │   ├── worker.ts
+│   │   ├── job.ts
+│   │   └── adapter.ts
+│   ├── worker/
+│   │   ├── index.ts
+│   │   ├── stateless-worker.ts
+│   │   ├── frame-worker.ts
+│   │   ├── aws-handler.ts
+│   │   └── cloudrun-server.ts
+│   ├── orchestrator/
+│   │   ├── index.ts
+│   │   ├── job-executor.ts
+│   │   ├── job-manager.ts
+│   │   ├── file-job-repository.ts
+│   │   └── render-executor.ts
+│   ├── stitcher/
+│   │   ├── index.ts
+│   │   └── ffmpeg-stitcher.ts
+│   ├── storage/
+│   │   ├── index.ts
+│   │   ├── local-storage.ts
+│   │   ├── s3-storage.ts
+│   │   └── gcs-storage.ts
+│   ├── adapters/
+│   │   ├── index.ts
+│   │   ├── local-adapter.ts
+│   │   ├── aws-lambda-adapter.ts
+│   │   ├── cloudrun-adapter.ts
+│   │   ├── cloudflare-workers-adapter.ts
+│   │   ├── azure-functions-adapter.ts
+│   │   ├── docker-adapter.ts
+│   │   ├── fly-machines-adapter.ts
+│   │   ├── hetzner-cloud-adapter.ts
+│   │   ├── kubernetes-adapter.ts
+│   │   ├── deno-deploy-adapter.ts
+│   │   ├── vercel-adapter.ts
+│   │   └── modal-adapter.ts
+│   └── utils/
+│       ├── command.ts
+│       └── validation.ts
+└── package.json
 ```
 
 ## Section C: Interfaces
-The `packages/infrastructure/src/types/index.ts` file acts as the public API definition layer.
-
-- `WorkerAdapter`: Standard execution interface (`execute(job: WorkerJob)`)
-- `ArtifactStorage`: Interface for managing remote job bundles (`uploadAssetBundle`, `downloadAssetBundle`, etc).
-- `JobManager`: Manager for distributed job state.
-- `Stitcher`: Joins final outputs into a single video file.
+- `WorkerAdapter`: Defines `execute(job: WorkerJob): Promise<WorkerResult>`
+- `WorkerJob`: Defines payload for cloud chunks (command, args, metadata, streaming callbacks)
+- `WorkerResult`: Defines stdout, stderr, and exit code.
+- `JobRepository`: Defines interface for saving, listing, pausing, and deleting job states.
+- `ArtifactStorage`: Defines interface for uploading and deleting remote job assets.
 
 ## Section D: Cloud Adapters
-- `aws-adapter.ts`: Facilitates scheduling execution on AWS Lambda.
-- `hetzner-cloud-adapter.ts`: Facilitates scheduling execution on Hetzner Cloud VMs using the native fetch API.
-- `cloudrun-adapter.ts`: Facilitates scheduling execution on Google Cloud Run.
-- `cloudflare-workers-adapter.ts`: Facilitates scheduling execution on Cloudflare Workers using the native fetch API.
-- `azure-functions-adapter.ts`: Facilitates scheduling execution on Azure Functions using the native fetch API.
-- `deno-deploy-adapter.ts`: Facilitates scheduling execution on Deno Deploy using the native fetch API.
-- `vercel-adapter.ts`: Facilitates scheduling execution on Vercel Serverless Functions using the native fetch API.
-- `fly-machines-adapter.ts`: Facilitates scheduling execution on Fly.io Machines using the native fetch API.
-- `docker-adapter.ts`: Facilitates scheduling execution on local Docker containers or Docker Swarm.
-- `kubernetes-adapter.ts`: Facilitates scheduling execution across a Kubernetes cluster via the Batch Job API.
-- `modal-adapter.ts`: Facilitates scheduling execution on Modal's Python-native serverless platform using the native fetch API.
-- `local-adapter.ts`: Facilitates scheduling execution on the local host (typically for debugging).
+- `AwsLambdaAdapter`: Invokes AWS Lambda functions.
+- `CloudRunAdapter`: Invokes Google Cloud Run services.
+- `LocalWorkerAdapter`: Spawns local child processes.
+- `CloudflareWorkersAdapter`: Invokes Cloudflare Workers.
+- `AzureFunctionsAdapter`: Invokes Azure Functions.
+- `DockerAdapter`: Spins up local Docker containers.
+- `FlyMachinesAdapter`: Spawns Fly.io machines.
+- `HetznerCloudAdapter`: Spawns Hetzner Cloud VMs.
+- `KubernetesAdapter`: Dispatches Kubernetes Jobs.
+- `DenoDeployAdapter`: Invokes Deno Deploy serverless functions.
+- `VercelAdapter`: Invokes Vercel Serverless functions.
+- `ModalAdapter`: Invokes Modal serverless Python functions.
 
 ## Section E: Integration
-The Infrastructure module provides the backend to scale distributed processing. The Helios `CLI` instantiates jobs using the `JobManager` and injects specific `WorkerAdapter` implementations and `ArtifactStorage` variants based on user inputs or deployment specs. Workers then execute isolated subsets of frames utilizing APIs implemented in the `Renderer`. Finally, output is joined by a `Stitcher` mechanism.
+- Consumes interfaces from `packages/renderer` to render frames.
+- Exported components are utilized by the CLI to manage and execute rendering jobs dynamically.
