@@ -1,87 +1,90 @@
-# INFRASTRUCTURE CONTEXT
-**Version**: 0.53.10
-
+# Infrastructure Context
 ## Section A: Architecture
-The infrastructure package provides cloud-agnostic distributed rendering capabilities. It orchestrates headless rendering workers, handles task distribution, and manages distributed asset lifecycle.
-
-Key Concepts:
-- **WorkerRuntime**: The core execution engine running within a stateless cloud function or container.
-- **JobExecutor**: The client-side orchestration component that distributes rendering chunks to the WorkerRuntime.
-- **JobManager**: The high-level orchestrator that manages job lifecycle, state persistence, and distributed chunk execution via `JobExecutor`.
-- **WorkerAdapters**: Cloud-provider specific interfaces that map the generic `JobExecutor` requests to specific cloud function invocations (e.g., AWS Lambda, Google Cloud Run).
-- **StorageAdapters**: Cloud-provider specific interfaces for managing remote asset storage (e.g., AWS S3, Google Cloud Storage) during distributed executions.
+The Infrastructure domain manages distributed rendering, orchestration, and worker adapters. It uses the Adapter pattern to integrate with various cloud providers (AWS, GCP, Cloudflare, Modal, etc.) and provides job management, stateless worker execution, and artifact storage.
 
 ## Section B: File Tree
 ```
-packages/infrastructure/
-├── src/
-│   ├── index.ts
-│   ├── types/
-│   │   ├── index.ts
-│   │   ├── worker.ts
-│   │   ├── job.ts
-│   │   └── adapter.ts
-│   ├── worker/
-│   │   ├── index.ts
-│   │   ├── stateless-worker.ts
-│   │   ├── frame-worker.ts
-│   │   ├── aws-handler.ts
-│   │   └── cloudrun-server.ts
-│   ├── orchestrator/
-│   │   ├── index.ts
-│   │   ├── job-executor.ts
-│   │   ├── job-manager.ts
-│   │   ├── file-job-repository.ts
-│   │   └── render-executor.ts
-│   ├── stitcher/
-│   │   ├── index.ts
-│   │   └── ffmpeg-stitcher.ts
-│   ├── storage/
-│   │   ├── index.ts
-│   │   ├── local-storage.ts
-│   │   ├── s3-storage.ts
-│   │   └── gcs-storage.ts
-│   ├── adapters/
-│   │   ├── index.ts
-│   │   ├── local-adapter.ts
-│   │   ├── aws-lambda-adapter.ts
-│   │   ├── cloudrun-adapter.ts
-│   │   ├── cloudflare-workers-adapter.ts
-│   │   ├── azure-functions-adapter.ts
-│   │   ├── docker-adapter.ts
-│   │   ├── fly-machines-adapter.ts
-│   │   ├── hetzner-cloud-adapter.ts
-│   │   ├── kubernetes-adapter.ts
-│   │   ├── deno-deploy-adapter.ts
-│   │   ├── vercel-adapter.ts
-│   │   └── modal-adapter.ts
-│   └── utils/
-│       ├── command.ts
-│       └── validation.ts
-└── package.json
+packages/infrastructure/src
+├── adapters
+│   ├── aws-adapter.ts
+│   ├── azure-functions-adapter.ts
+│   ├── cloudflare-workers-adapter.ts
+│   ├── cloudrun-adapter.ts
+│   ├── deno-deploy-adapter.ts
+│   ├── docker-adapter.ts
+│   ├── fly-machines-adapter.ts
+│   ├── hetzner-cloud-adapter.ts
+│   ├── index.ts
+│   ├── kubernetes-adapter.ts
+│   ├── local-adapter.ts
+│   ├── modal-adapter.ts
+│   └── vercel-adapter.ts
+├── governance
+│   ├── index.ts
+│   └── sync-workspace.ts
+├── index.ts
+├── orchestrator
+│   ├── file-job-repository.ts
+│   ├── index.ts
+│   ├── job-executor.ts
+│   └── job-manager.ts
+├── stitcher
+│   ├── ffmpeg-stitcher.ts
+│   └── index.ts
+├── storage
+│   ├── gcs-storage.ts
+│   ├── index.ts
+│   ├── local-storage.ts
+│   └── s3-storage.ts
+├── types
+│   ├── adapter.ts
+│   ├── index.ts
+│   ├── job-spec.ts
+│   ├── job-status.ts
+│   ├── job.ts
+│   └── storage.ts
+├── utils
+│   ├── command.ts
+│   └── index.ts
+└── worker
+    ├── aws-handler.ts
+    ├── cloudrun-server.ts
+    ├── index.ts
+    ├── render-executor.ts
+    └── runtime.ts
+
+9 directories, 39 files
 ```
 
 ## Section C: Interfaces
-- `WorkerAdapter`: Defines `execute(job: WorkerJob): Promise<WorkerResult>`
-- `WorkerJob`: Defines payload for cloud chunks (command, args, metadata, streaming callbacks)
-- `WorkerResult`: Defines stdout, stderr, and exit code.
-- `JobRepository`: Defines interface for saving, listing, pausing, and deleting job states.
-- `ArtifactStorage`: Defines interface for uploading and deleting remote job assets.
+```typescript
+export interface WorkerResult
+export interface WorkerAdapter
+export interface RenderJobChunk
+export interface JobSpec
+export type JobState = 'pending' | 'running' | 'completed' | 'failed' | 'cancelled' | 'paused';
+export interface JobStatus
+export interface JobRepository
+export class InMemoryJobRepository implements JobRepository
+export interface WorkerJob
+export interface ArtifactStorage
+```
 
 ## Section D: Cloud Adapters
-- `AwsLambdaAdapter`: Invokes AWS Lambda functions.
-- `CloudRunAdapter`: Invokes Google Cloud Run services.
-- `LocalWorkerAdapter`: Spawns local child processes.
-- `CloudflareWorkersAdapter`: Invokes Cloudflare Workers.
-- `AzureFunctionsAdapter`: Invokes Azure Functions.
-- `DockerAdapter`: Spins up local Docker containers.
-- `FlyMachinesAdapter`: Spawns Fly.io machines.
-- `HetznerCloudAdapter`: Spawns Hetzner Cloud VMs.
-- `KubernetesAdapter`: Dispatches Kubernetes Jobs.
-- `DenoDeployAdapter`: Invokes Deno Deploy serverless functions.
-- `VercelAdapter`: Invokes Vercel Serverless functions.
-- `ModalAdapter`: Invokes Modal serverless Python functions.
+The following adapters exist:
+- aws-adapter
+- azure-functions-adapter
+- cloudflare-workers-adapter
+- cloudrun-adapter
+- deno-deploy-adapter
+- docker-adapter
+- fly-machines-adapter
+- hetzner-cloud-adapter
+- index
+- kubernetes-adapter
+- local-adapter
+- modal-adapter
+- vercel-adapter
 
 ## Section E: Integration
-- Consumes interfaces from `packages/renderer` to render frames.
-- Exported components are utilized by the CLI to manage and execute rendering jobs dynamically.
+The CLI integrates with the JobManager for local or remote chunk execution. The Renderer acts as the execution core within workers.

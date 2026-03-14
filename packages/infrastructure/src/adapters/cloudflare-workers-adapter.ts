@@ -63,12 +63,14 @@ export class CloudflareWorkersAdapter implements WorkerAdapter {
         data = { stdout: text };
       }
 
+      // Resolve execution exit code based on response payload or fallback to HTTP status
       const exitCode = typeof data.exitCode === 'number' ? data.exitCode : (response.ok ? 0 : 1);
       const stdout = data.stdout || data.output || '';
       const stderr = data.stderr || '';
 
       if (!response.ok) {
         return {
+          // If HTTP failed, ensure we return a non-zero exit code even if payload specifically dictated 0
           exitCode: exitCode !== 0 ? exitCode : 1,
           stdout,
           stderr: stderr || `HTTP Error ${response.status}: ${response.statusText}`,

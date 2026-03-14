@@ -82,6 +82,7 @@ describe('CloudflareWorkersAdapter', () => {
   });
 
   it('should force exitCode 1 when response is not ok and exitCode is 0', async () => {
+    // Verifies the scenario where HTTP status implies failure, but payload exitCode is 0.
     vi.mocked(global.fetch).mockResolvedValueOnce(new Response(JSON.stringify({ exitCode: 0, stderr: 'HTTP Error 500' }), { status: 500, headers: { 'Content-Type': 'application/json' } }));
     const adapter = new CloudflareWorkersAdapter({ serviceUrl, jobDefUrl });
     const result = await adapter.execute({ command: 'render', meta: { chunkId: 0 } });
