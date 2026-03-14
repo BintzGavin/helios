@@ -259,4 +259,117 @@ describe('AwsLambdaAdapter', () => {
     expect(result.exitCode).toBe(0);
     expect(result.stdout).toContain('Just some raw output');
   });
+
+  it('should throw if job.meta.jobDefUrl is undefined, config.jobDefUrl is undefined, and job.meta.chunkId is defined', async () => {
+    const adapter = new AwsLambdaAdapter({
+      functionName: 'test-function'
+    });
+
+    const result = await adapter.execute({
+      command: 'ignored',
+      meta: { chunkId: 1 }
+    });
+
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toContain('AwsLambdaAdapter requires job.meta.jobDefUrl or config.jobDefUrl to be set');
+  });
+
+  it('should handle lambda application error where JSON.parse fails on payload', async () => {
+    const adapter = new AwsLambdaAdapter({
+      functionName: 'test-function',
+      jobDefUrl: 'job.json'
+    });
+
+    const errorPayload = 'Invalid Error JSON';
+
+    lambdaMock.on(InvokeCommand).resolves({
+      StatusCode: 200,
+      FunctionError: 'Unhandled',
+      Payload: new TextEncoder().encode(errorPayload)
+    });
+
+    const result = await adapter.execute({
+      command: 'ignored',
+      meta: { chunkId: 1 }
+    });
+
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toContain('Lambda execution failed: Invalid Error JSON');
+  });
+
+  it('should handle successful execution where result.body exists but does NOT contain an output property', async () => {
+    const adapter = new AwsLambdaAdapter({
+      functionName: 'test-function',
+      jobDefUrl: 'job.json'
+    });
+
+    const mockResponsePayload = JSON.stringify({
+      statusCode: 200,
+      body: JSON.stringify({
+        message: 'Render complete'
+      })
+    });
+
+    lambdaMock.on(InvokeCommand).resolves({
+      StatusCode: 200,
+      Payload: new TextEncoder().encode(mockResponsePayload)
+    });
+
+    const result = await adapter.execute({
+      command: 'ignored',
+      meta: { chunkId: 1 }
+    });
+
+    expect(result.exitCode).toBe(0);
+    expect(result.stdout).toBe('');
+  });
+
+  it('should handle result.statusCode NOT 200 and body.message is missing', async () => {
+    const adapter = new AwsLambdaAdapter({
+      functionName: 'test-function',
+      jobDefUrl: 'job.json'
+    });
+
+    const mockResponsePayload = JSON.stringify({
+      statusCode: 500,
+      body: JSON.stringify({
+        error: 'Something went wrong'
+      })
+    });
+
+    lambdaMock.on(InvokeCommand).resolves({
+      StatusCode: 200,
+      Payload: new TextEncoder().encode(mockResponsePayload)
+    });
+
+    const result = await adapter.execute({
+      command: 'ignored',
+      meta: { chunkId: 1 }
+    });
+
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toBe('Lambda returned non-200 status code');
+  });
+
+  it('should handle malformed JSON in success payload with partial stdout', async () => {
+    const adapter = new AwsLambdaAdapter({
+      functionName: 'test-function',
+      jobDefUrl: 'job.json'
+    });
+
+    // We can simulate a payload that causes JSON.parse(payloadStr) to fail on line 102
+    lambdaMock.on(InvokeCommand).resolves({
+      StatusCode: 200,
+      Payload: new TextEncoder().encode('Invalid JSON Success')
+    });
+
+    const result = await adapter.execute({
+      command: 'ignored',
+      meta: { chunkId: 1 }
+    });
+
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toContain('Failed to parse Lambda response');
+    expect(result.stdout).toBe('Invalid JSON Success');
+  });
 });
