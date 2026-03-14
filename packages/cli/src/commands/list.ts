@@ -13,6 +13,7 @@ export function registerListCommand(program: Command) {
         if (!config) {
           console.error(chalk.red('No helios.config.json found. Run "helios init" to start a project.'));
           process.exit(1);
+          return;
         }
 
         if (!config.components || config.components.length === 0) {
@@ -27,6 +28,7 @@ export function registerListCommand(program: Command) {
       } catch (error: any) {
         console.error(chalk.red(error.message));
         process.exit(1);
+        return;
       }
     });
 }
