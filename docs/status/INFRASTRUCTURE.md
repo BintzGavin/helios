@@ -1,7 +1,8 @@
 # INFRASTRUCTURE STATUS
-**Version**: 0.53.11
+**Version**: 0.53.12
 
 ## Status Log
+- [v0.53.12] ✅ Completed: AWS Adapter Coverage - Maintained and verified 100% test coverage for AwsLambdaAdapter malformed payload edge cases.
 - [v0.53.11] ✅ Completed: Cloudflare Workers Adapter Coverage - Maintained and verified 100% test coverage for CloudflareWorkersAdapter exitCode edge cases.
 - [v0.53.10] ✅ Completed: Modal-Adapter-Coverage - Improved test coverage to ensure ModalAdapter properly handles callbacks and abort edge cases.
 - [v0.53.9] ✅ Completed: Cloudflare Workers Adapter Test Coverage - Added test coverage for fallback cases and HTTP errors to reach 100% statement and branch coverage.

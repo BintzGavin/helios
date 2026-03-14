@@ -214,4 +214,49 @@ describe('AwsLambdaAdapter', () => {
     expect(result.stderr).toContain('Failed to parse Lambda response');
     expect(result.stdout).toBe('Invalid JSON');
   });
+
+  it('should handle malformed JSON error payload (FunctionError with bad JSON)', async () => {
+    const adapter = new AwsLambdaAdapter({
+      functionName: 'test-function',
+      jobDefUrl: 'job.json'
+    });
+
+    lambdaMock.on(InvokeCommand).resolves({
+      StatusCode: 200,
+      FunctionError: 'Unhandled',
+      Payload: new TextEncoder().encode('Bad Error JSON')
+    });
+
+    const result = await adapter.execute({
+      command: 'ignored',
+      meta: { chunkId: 1 }
+    });
+
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toContain('Lambda execution failed: Bad Error JSON');
+  });
+
+  it('should handle successful response with raw payload (no body)', async () => {
+    const adapter = new AwsLambdaAdapter({
+      functionName: 'test-function',
+      jobDefUrl: 'job.json'
+    });
+
+    const mockResponsePayload = JSON.stringify({
+      message: 'Just some raw output, no body wrapper'
+    });
+
+    lambdaMock.on(InvokeCommand).resolves({
+      StatusCode: 200,
+      Payload: new TextEncoder().encode(mockResponsePayload)
+    });
+
+    const result = await adapter.execute({
+      command: 'ignored',
+      meta: { chunkId: 1 }
+    });
+
+    expect(result.exitCode).toBe(0);
+    expect(result.stdout).toContain('Just some raw output');
+  });
 });
