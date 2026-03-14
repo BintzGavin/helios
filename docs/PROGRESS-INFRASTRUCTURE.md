@@ -1,5 +1,8 @@
 # INFRASTRUCTURE PROGRESS
 
+## INFRASTRUCTURE v0.53.13
+- ✅ Completed: Azure and Vercel Adapters Coverage - Verified and maintained 100% test coverage for AzureFunctionsAdapter and VercelAdapter edge cases.
+
 ## INFRASTRUCTURE v0.53.12
 - ✅ Completed: AWS Adapter Coverage - Maintained and verified 100% test coverage for AwsLambdaAdapter malformed payload edge cases.
 

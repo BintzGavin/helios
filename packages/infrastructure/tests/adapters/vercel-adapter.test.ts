@@ -141,6 +141,24 @@ describe('VercelAdapter', () => {
     await expect(adapter.execute(job)).rejects.toThrow('VercelAdapter received invalid JSON: Unexpected token');
   });
 
+  it('should fall back to defaults when response JSON lacks expected fields', async () => {
+    const adapter = new VercelAdapter({ serviceUrl: mockServiceUrl });
+    const job = { command: 'test', args: [], cwd: '/', env: {}, meta: { jobDefUrl: 'url', chunkId: 1 } };
+
+    const mockResponse = {
+      ok: true,
+      json: vi.fn().mockResolvedValue({}) // Empty object, lacking expected fields
+    };
+    vi.mocked(fetch).mockResolvedValue(mockResponse as any);
+
+    const result = await adapter.execute(job);
+
+    expect(result.exitCode).toBe(-1);
+    expect(result.stdout).toBe('');
+    expect(result.stderr).toBe('');
+    expect(result.durationMs).toBe(0);
+  });
+
   it('should propagate AbortError if signal is aborted', async () => {
     const adapter = new VercelAdapter({ serviceUrl: mockServiceUrl });
     const controller = new AbortController();
