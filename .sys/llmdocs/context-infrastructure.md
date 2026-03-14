@@ -12,77 +12,57 @@ The `packages/infrastructure` domain implements distributed rendering logic thro
 ## B. File Tree
 
 ```
-packages/infrastructure/
-├── src/
-│   ├── adapters/
-│   │   ├── aws-adapter.ts
-│   │   ├── azure-functions-adapter.ts
-│   │   ├── cloudflare-workers-adapter.ts
-│   │   ├── cloudrun-adapter.ts
-│   │   ├── deno-deploy-adapter.ts
-│   │   ├── docker-adapter.ts
-│   │   ├── fly-machines-adapter.ts
-│   │   ├── hetzner-cloud-adapter.ts
-│   │   ├── index.ts
-│   │   ├── kubernetes-adapter.ts
-│   │   ├── local-adapter.ts
-│   │   ├── modal-adapter.ts
-│   │   └── vercel-adapter.ts
-│   ├── e2e/
-│   ├── governance/
-│   │   ├── index.ts
-│   │   └── sync-workspace.ts
-│   ├── index.ts
-│   ├── orchestrator/
-│   │   ├── file-job-repository.ts
-│   │   ├── index.ts
-│   │   ├── job-executor.ts
-│   │   ├── job-manager.ts
-│   │   └── scheduler.ts
-│   ├── stitcher/
-│   │   ├── concat-stitcher.ts
-│   │   └── index.ts
-│   ├── storage/
-│   │   ├── gcs-storage.ts
-│   │   ├── index.ts
-│   │   ├── local-storage.ts
-│   │   └── s3-storage.ts
-│   ├── types/
-│   │   ├── adapter.ts
-│   │   ├── index.ts
-│   │   ├── job.ts
-│   │   ├── storage.ts
-│   │   └── worker.ts
-│   ├── utils/
-│   │   ├── command.ts
-│   │   ├── index.ts
-│   │   ├── retry.ts
-│   │   └── validation.ts
-│   └── worker/
-│       ├── aws-handler.ts
-│       ├── cloudrun-server.ts
-│       ├── frame-worker.ts
-│       ├── index.ts
-│       ├── stateless-worker.ts
-│       └── worker-runtime.ts
-├── tests/
-│   ├── adapters/
-│   │   ├── aws-adapter.test.ts
-│   │   ├── azure-functions-adapter.test.ts
-│   │   ├── cloudflare-workers-adapter.test.ts
-│   │   ├── cloudrun-adapter.test.ts
-│   │   ├── deno-deploy-adapter.test.ts
-│   │   ├── docker-adapter.test.ts
-│   │   ├── fly-machines-adapter.test.ts
-│   │   ├── hetzner-cloud-adapter.test.ts
-│   │   ├── kubernetes-adapter.test.ts
-│   │   ├── local-adapter.test.ts
-│   │   ├── modal-adapter.test.ts
-│   │   └── vercel-adapter.test.ts
-│   ├── e2e/
-│   ├── orchestrator/
-│   ├── storage/
-│   └── utils/
+packages/infrastructure/src
+├── adapters
+│   ├── aws-adapter.ts
+│   ├── azure-functions-adapter.ts
+│   ├── cloudflare-workers-adapter.ts
+│   ├── cloudrun-adapter.ts
+│   ├── deno-deploy-adapter.ts
+│   ├── docker-adapter.ts
+│   ├── fly-machines-adapter.ts
+│   ├── hetzner-cloud-adapter.ts
+│   ├── index.ts
+│   ├── kubernetes-adapter.ts
+│   ├── local-adapter.ts
+│   ├── modal-adapter.ts
+│   └── vercel-adapter.ts
+├── governance
+│   ├── index.ts
+│   └── sync-workspace.ts
+├── index.ts
+├── orchestrator
+│   ├── file-job-repository.ts
+│   ├── index.ts
+│   ├── job-executor.ts
+│   └── job-manager.ts
+├── stitcher
+│   ├── ffmpeg-stitcher.ts
+│   └── index.ts
+├── storage
+│   ├── gcs-storage.ts
+│   ├── index.ts
+│   ├── local-storage.ts
+│   └── s3-storage.ts
+├── types
+│   ├── adapter.ts
+│   ├── index.ts
+│   ├── job-spec.ts
+│   ├── job-status.ts
+│   ├── job.ts
+│   └── storage.ts
+├── utils
+│   ├── command.ts
+│   └── index.ts
+└── worker
+    ├── aws-handler.ts
+    ├── cloudrun-server.ts
+    ├── index.ts
+    ├── render-executor.ts
+    └── runtime.ts
+
+9 directories, 39 files
+
 ```
 
 ## C. Interfaces
