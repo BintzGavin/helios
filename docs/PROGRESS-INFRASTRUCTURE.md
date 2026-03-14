@@ -1,5 +1,8 @@
 # INFRASTRUCTURE PROGRESS
 
+## INFRASTRUCTURE v0.53.12
+- ✅ Completed: AWS Adapter Coverage - Maintained and verified 100% test coverage for AwsLambdaAdapter malformed payload edge cases.
+
 ## INFRASTRUCTURE v0.53.11
 - ✅ Completed: Cloudflare Workers Adapter Coverage - Maintained and verified 100% test coverage for CloudflareWorkersAdapter exitCode edge cases.
 
