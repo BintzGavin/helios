@@ -152,4 +152,80 @@ describe('AzureFunctionsAdapter', () => {
     expect(result.exitCode).toBe(143);
     expect(result.stderr).toBe('Job execution aborted by signal');
   });
+
+  it('should omit x-functions-key if not provided in config', async () => {
+    const noKeyAdapter = new AzureFunctionsAdapter({ serviceUrl });
+    const job: WorkerJob = {
+      command: 'helios',
+      meta: { chunkId: 0, jobDefUrl: 's3://bucket/job.json' },
+    };
+
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      headers: new Headers({ 'content-type': 'application/json' }),
+      json: async () => ({ stdout: 'Render complete', stderr: '', exitCode: 0 }),
+    });
+
+    await noKeyAdapter.execute(job);
+
+    expect(mockFetch).toHaveBeenCalledWith(serviceUrl, expect.objectContaining({
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    }));
+  });
+
+  it('should ignore errors when reading text from a non-ok response fails', async () => {
+    const job: WorkerJob = {
+      command: 'helios',
+      meta: { chunkId: 0, jobDefUrl: 's3://bucket/job.json' },
+    };
+
+    mockFetch.mockResolvedValueOnce({
+      ok: false,
+      status: 500,
+      statusText: 'Internal Server Error',
+      headers: new Headers(),
+      text: async () => { throw new Error('Cannot read text'); },
+    });
+
+    const result = await adapter.execute(job);
+
+    expect(result.exitCode).toBe(500);
+    expect(result.stderr).toContain('HTTP Error: 500 Internal Server Error');
+  });
+
+  it('should fallback to default values if JSON response is missing them', async () => {
+    const job: WorkerJob = {
+      command: 'helios',
+      meta: { chunkId: 0, jobDefUrl: 's3://bucket/job.json' },
+    };
+
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      headers: new Headers({ 'content-type': 'application/json' }),
+      json: async () => ({}),
+    });
+
+    const result = await adapter.execute(job);
+
+    expect(result.exitCode).toBe(0);
+    expect(result.stdout).toBe('');
+    expect(result.stderr).toBe('');
+  });
+
+  it('should handle non-Error objects thrown in fetch gracefully', async () => {
+    const job: WorkerJob = {
+      command: 'helios',
+      meta: { chunkId: 0, jobDefUrl: 's3://bucket/job.json' },
+    };
+
+    mockFetch.mockRejectedValueOnce('String error');
+
+    const result = await adapter.execute(job);
+
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toBe('String error');
+  });
 });
