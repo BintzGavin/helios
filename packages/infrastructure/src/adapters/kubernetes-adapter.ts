@@ -21,6 +21,9 @@ export class KubernetesAdapter implements WorkerAdapter {
   private coreV1Api: k8s.CoreV1Api;
 
   constructor(private options: KubernetesAdapterOptions) {
+    if (!options.image) {
+      throw new Error('KubernetesAdapter requires an image option');
+    }
     this.kc = new k8s.KubeConfig();
     if (options.kubeconfigPath) {
       this.kc.loadFromFile(options.kubeconfigPath);
