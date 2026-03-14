@@ -97,6 +97,44 @@ describe('AzureFunctionsAdapter', () => {
     expect(result.stderr).toBe('Network error');
   });
 
+  it('should handle JSON parse error correctly', async () => {
+    const controller = new AbortController();
+    const job: WorkerJob = {
+      command: 'helios',
+      meta: { chunkId: 0, jobDefUrl: 's3://bucket/job.json' },
+      signal: controller.signal,
+    };
+
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      headers: new Headers({ 'content-type': 'application/json' }),
+      json: async () => { throw new Error('Invalid JSON'); },
+    });
+
+    const result = await adapter.execute(job);
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toContain('Failed to parse JSON response: Invalid JSON');
+  });
+
+  it('should handle non-JSON text responses', async () => {
+    const controller = new AbortController();
+    const job: WorkerJob = {
+      command: 'helios',
+      meta: { chunkId: 0, jobDefUrl: 's3://bucket/job.json' },
+      signal: controller.signal,
+    };
+
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      headers: new Headers({ 'content-type': 'text/plain' }),
+      text: async () => 'Raw text output',
+    });
+
+    const result = await adapter.execute(job);
+    expect(result.exitCode).toBe(0);
+    expect(result.stdout).toBe('Raw text output');
+  });
+
   it('should handle AbortSignal gracefully', async () => {
     const controller = new AbortController();
     const job: WorkerJob = {

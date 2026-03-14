@@ -1,7 +1,8 @@
 # INFRASTRUCTURE STATUS
-**Version**: 0.53.12
+**Version**: 0.53.13
 
 ## Status Log
+- [v0.53.13] ✅ Completed: Azure and Vercel Adapters Coverage - Verified and maintained 100% test coverage for AzureFunctionsAdapter and VercelAdapter edge cases.
 - [v0.53.12] ✅ Completed: AWS Adapter Coverage - Maintained and verified 100% test coverage for AwsLambdaAdapter malformed payload edge cases.
 - [v0.53.11] ✅ Completed: Cloudflare Workers Adapter Coverage - Maintained and verified 100% test coverage for CloudflareWorkersAdapter exitCode edge cases.
 - [v0.53.10] ✅ Completed: Modal-Adapter-Coverage - Improved test coverage to ensure ModalAdapter properly handles callbacks and abort edge cases.
