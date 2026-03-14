@@ -1,5 +1,8 @@
 # INFRASTRUCTURE PROGRESS
 
+## INFRASTRUCTURE v0.53.10
+- ✅ Completed: Modal-Adapter-Coverage - Improved test coverage to ensure ModalAdapter properly handles callbacks and abort edge cases.
+
 ## INFRASTRUCTURE v0.53.9
 - ✅ Completed: Cloudflare Workers Adapter Test Coverage - Added test coverage for fallback cases and HTTP errors to reach 100% statement and branch coverage.
 
