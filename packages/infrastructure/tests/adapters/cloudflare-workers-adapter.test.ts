@@ -104,4 +104,28 @@ describe('CloudflareWorkersAdapter', () => {
     expect(result.exitCode).toBe(1);
     expect(result.stderr).toContain('HTTP Error 500: Internal Server Error');
   });
+
+  it('should use data.output when data.stdout is undefined or empty', async () => {
+    vi.mocked(global.fetch).mockResolvedValueOnce(new Response(JSON.stringify({ exitCode: 0, output: 'Output fallback' }), { status: 200, headers: { 'Content-Type': 'application/json' } }));
+    const adapter = new CloudflareWorkersAdapter({ serviceUrl, jobDefUrl });
+    const result = await adapter.execute({ command: 'render', meta: { chunkId: 0 } });
+    expect(result.exitCode).toBe(0);
+    expect(result.stdout).toBe('Output fallback');
+  });
+
+  it('should fallback to exitCode 1 when response is not ok and exitCode is parsed as 0', async () => {
+    vi.mocked(global.fetch).mockResolvedValueOnce(new Response(JSON.stringify({ exitCode: 0, stderr: 'Server Error' }), { status: 500, headers: { 'Content-Type': 'application/json' } }));
+    const adapter = new CloudflareWorkersAdapter({ serviceUrl, jobDefUrl });
+    const result = await adapter.execute({ command: 'render', meta: { chunkId: 0 } });
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toContain('Server Error');
+  });
+
+  it('should preserve non-zero exit code when response is not ok', async () => {
+    vi.mocked(global.fetch).mockResolvedValueOnce(new Response(JSON.stringify({ exitCode: 123, stderr: 'Custom Error' }), { status: 500, headers: { 'Content-Type': 'application/json' } }));
+    const adapter = new CloudflareWorkersAdapter({ serviceUrl, jobDefUrl });
+    const result = await adapter.execute({ command: 'render', meta: { chunkId: 0 } });
+    expect(result.exitCode).toBe(123);
+    expect(result.stderr).toContain('Custom Error');
+  });
 });
