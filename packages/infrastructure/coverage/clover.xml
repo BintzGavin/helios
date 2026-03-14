@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<coverage generated="1773520552889" clover="3.2.0">
+  <project timestamp="1773520552889" name="All files">
+    <metrics statements="44" coveredstatements="44" conditionals="28" coveredconditionals="28" methods="2" coveredmethods="2" elements="74" coveredelements="74" complexity="0" loc="44" ncloc="44" packages="1" files="1" classes="1"/>
+    <file name="aws-adapter.ts" path="/app/packages/infrastructure/src/adapters/aws-adapter.ts">
+      <metrics statements="44" coveredstatements="44" conditionals="28" coveredconditionals="28" methods="2" coveredmethods="2"/>
+      <line num="22" count="22" type="stmt"/>
+      <line num="23" count="22" type="stmt"/>
+      <line num="27" count="22" type="stmt"/>
+      <line num="28" count="22" type="stmt"/>
+      <line num="30" count="22" type="cond" truecount="2" falsecount="0"/>
+      <line num="31" count="1" type="stmt"/>
+      <line num="34" count="21" type="stmt"/>
+      <line num="35" count="21" type="cond" truecount="2" falsecount="0"/>
+      <line num="36" count="22" type="cond" truecount="2" falsecount="0"/>
+      <line num="37" count="2" type="stmt"/>
+      <line num="40" count="19" type="stmt"/>
+      <line num="45" count="19" type="stmt"/>
+      <line num="51" count="19" type="stmt"/>
+      <line num="54" count="17" type="cond" truecount="2" falsecount="0"/>
+      <line num="55" count="6" type="stmt"/>
+      <line num="56" count="6" type="cond" truecount="2" falsecount="0"/>
+      <line num="57" count="5" type="stmt"/>
+      <line num="58" count="5" type="stmt"/>
+      <line num="59" count="5" type="stmt"/>
+      <line num="60" count="5" type="cond" truecount="2" falsecount="0"/>
+      <line num="62" count="2" type="stmt"/>
+      <line num="65" count="6" type="stmt"/>
+      <line num="68" count="11" type="stmt"/>
+      <line num="69" count="11" type="stmt"/>
+      <line num="70" count="11" type="stmt"/>
+      <line num="73" count="11" type="cond" truecount="2" falsecount="0"/>
+      <line num="74" count="10" type="stmt"/>
+      <line num="75" count="10" type="stmt"/>
+      <line num="76" count="10" type="stmt"/>
+      <line num="80" count="10" type="cond" truecount="2" falsecount="0"/>
+      <line num="81" count="7" type="cond" truecount="2" falsecount="0"/>
+      <line num="84" count="7" type="cond" truecount="2" falsecount="0"/>
+      <line num="85" count="4" type="stmt"/>
+      <line num="89" count="7" type="cond" truecount="2" falsecount="0"/>
+      <line num="90" count="4" type="stmt"/>
+      <line num="92" count="3" type="stmt"/>
+      <line num="93" count="3" type="cond" truecount="2" falsecount="0"/>
+      <line num="97" count="1" type="stmt"/>
+      <line num="99" count="1" type="stmt"/>
+      <line num="103" count="3" type="stmt"/>
+      <line num="105" count="3" type="cond" truecount="2" falsecount="0"/>
+      <line num="106" count="3" type="stmt"/>
+      <line num="110" count="11" type="stmt"/>
+      <line num="118" count="10" type="stmt"/>
+    </file>
+  </project>
+</coverage>

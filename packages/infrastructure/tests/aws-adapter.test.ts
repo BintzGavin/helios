@@ -456,4 +456,68 @@ describe('AwsLambdaAdapter', () => {
     expect(result.exitCode).toBe(1);
     expect(result.stderr).toBe('Unknown error executing Lambda');
   });
+
+  it('should handle FunctionError when response.Payload is not defined', async () => {
+    const adapter = new AwsLambdaAdapter({
+      functionName: 'test-function',
+      jobDefUrl: 'job.json'
+    });
+
+    lambdaMock.on(InvokeCommand).resolves({
+      StatusCode: 200,
+      FunctionError: 'Unhandled'
+      // Payload is explicitly undefined by mock
+    });
+
+    const result = await adapter.execute({
+      command: 'ignored',
+      meta: { chunkId: 1 }
+    });
+
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toContain('Lambda execution failed: Unknown Lambda Error');
+  });
+
+  it('should preserve stdout if already set when a parsing error occurs later', async () => {
+    const adapter = new AwsLambdaAdapter({
+      functionName: 'test-function',
+      jobDefUrl: 'job.json'
+    });
+
+    const originalParse = JSON.parse;
+    try {
+      // Monkey patch JSON.parse to return an object with a getter that throws
+      // when `message` is accessed, AFTER `output` has already been read.
+      JSON.parse = (text: string) => {
+        const obj = originalParse(text);
+        if (obj && obj.body && obj.body.output === 'set_stdout_then_throw') {
+           Object.defineProperty(obj.body, 'message', {
+             get: () => { throw new Error('Simulated error after stdout is set'); }
+           });
+        }
+        return obj;
+      };
+
+      lambdaMock.on(InvokeCommand).resolves({
+        StatusCode: 200,
+        Payload: new TextEncoder().encode(JSON.stringify({
+          statusCode: 500, // triggers reading `message`
+          body: {
+            output: 'set_stdout_then_throw' // sets stdout
+          }
+        }))
+      });
+
+      const res = await adapter.execute({
+        command: 'ignored',
+        meta: { chunkId: 1 }
+      });
+
+      expect(res.exitCode).toBe(1);
+      expect(res.stdout).toBe('set_stdout_then_throw'); // verified stdout was preserved!
+      expect(res.stderr).toContain('Simulated error after stdout is set');
+    } finally {
+      JSON.parse = originalParse;
+    }
+  });
 });
