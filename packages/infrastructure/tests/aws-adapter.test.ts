@@ -372,4 +372,88 @@ describe('AwsLambdaAdapter', () => {
     expect(result.stderr).toContain('Failed to parse Lambda response');
     expect(result.stdout).toBe('Invalid JSON Success');
   });
+
+  it('should handle FunctionError with valid JSON payload containing errorMessage', async () => {
+    const adapter = new AwsLambdaAdapter({
+      functionName: 'test-function',
+      jobDefUrl: 'job.json'
+    });
+
+    lambdaMock.on(InvokeCommand).resolves({
+      StatusCode: 200,
+      FunctionError: 'Unhandled',
+      Payload: new TextEncoder().encode(JSON.stringify({ errorMessage: 'Specific error from lambda' }))
+    });
+
+    const result = await adapter.execute({
+      command: 'ignored',
+      meta: { chunkId: 1 }
+    });
+
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toContain('Lambda execution failed: Specific error from lambda');
+  });
+
+  it('should handle FunctionError with valid JSON payload missing errorMessage', async () => {
+    const adapter = new AwsLambdaAdapter({
+      functionName: 'test-function',
+      jobDefUrl: 'job.json'
+    });
+
+    const payloadObj = { customErrorDetail: 'Something else' };
+    lambdaMock.on(InvokeCommand).resolves({
+      StatusCode: 200,
+      FunctionError: 'Unhandled',
+      Payload: new TextEncoder().encode(JSON.stringify(payloadObj))
+    });
+
+    const result = await adapter.execute({
+      command: 'ignored',
+      meta: { chunkId: 1 }
+    });
+
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toContain('Lambda execution failed: {"customErrorDetail":"Something else"}');
+  });
+
+  it('should parse body correctly when it is an object (not a string)', async () => {
+    const adapter = new AwsLambdaAdapter({
+      functionName: 'test-function',
+      jobDefUrl: 'job.json'
+    });
+
+    lambdaMock.on(InvokeCommand).resolves({
+      StatusCode: 200,
+      Payload: new TextEncoder().encode(JSON.stringify({
+        statusCode: 200,
+        body: { output: 'Parsed from object body' }
+      }))
+    });
+
+    const result = await adapter.execute({
+      command: 'ignored',
+      meta: { chunkId: 1 }
+    });
+
+    expect(result.exitCode).toBe(0);
+    expect(result.stdout).toBe('Parsed from object body');
+  });
+
+  it('should catch error when error object thrown does not have message property', async () => {
+    const adapter = new AwsLambdaAdapter({
+      functionName: 'test-function',
+      jobDefUrl: 'job.json'
+    });
+
+    // To hit `error.message || 'Unknown error executing Lambda'` when `error.message` is undefined
+    lambdaMock.on(InvokeCommand).rejects(Object.create(null));
+
+    const result = await adapter.execute({
+      command: 'ignored',
+      meta: { chunkId: 1 }
+    });
+
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toBe('Unknown error executing Lambda');
+  });
 });
