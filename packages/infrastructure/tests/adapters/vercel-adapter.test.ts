@@ -173,4 +173,22 @@ describe('VercelAdapter', () => {
 
     await expect(adapter.execute(job)).rejects.toThrow('AbortError');
   });
+
+  it('should default missing response fields to fallback values', async () => {
+    const adapter = new VercelAdapter({ serviceUrl: mockServiceUrl });
+    const job = { command: 'test', args: [], cwd: '/', env: {}, meta: { jobDefUrl: 'url', chunkId: 1 } };
+
+    const mockResponse = {
+      ok: true,
+      json: vi.fn().mockResolvedValue({})
+    };
+    vi.mocked(fetch).mockResolvedValue(mockResponse as any);
+
+    const result = await adapter.execute(job);
+
+    expect(result.exitCode).toBe(-1);
+    expect(result.stdout).toBe('');
+    expect(result.stderr).toBe('');
+    expect(result.durationMs).toBe(0);
+  });
 });

@@ -228,4 +228,43 @@ describe('AzureFunctionsAdapter', () => {
     expect(result.exitCode).toBe(1);
     expect(result.stderr).toBe('String error');
   });
+
+  it('should hit the catch { // Ignore } block when reading text throws', async () => {
+    const job: WorkerJob = {
+      command: 'helios',
+      meta: { chunkId: 0, jobDefUrl: 's3://bucket/job.json' },
+    };
+
+    mockFetch.mockResolvedValueOnce({
+      ok: false,
+      status: 500,
+      statusText: 'Internal Server Error',
+      headers: new Headers(),
+      text: async () => { throw new Error('Cannot read text'); },
+    });
+
+    const result = await adapter.execute(job);
+
+    expect(result.exitCode).toBe(500);
+    expect(result.stderr).toContain('HTTP Error: 500 Internal Server Error');
+  });
+
+  it('should fallback to default 0 exitCode if JSON response is missing it', async () => {
+    const job: WorkerJob = {
+      command: 'helios',
+      meta: { chunkId: 0, jobDefUrl: 's3://bucket/job.json' },
+    };
+
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      headers: new Headers({ 'content-type': 'application/json' }),
+      json: async () => ({}),
+    });
+
+    const result = await adapter.execute(job);
+
+    expect(result.exitCode).toBe(0);
+    expect(result.stdout).toBe('');
+    expect(result.stderr).toBe('');
+  });
 });
