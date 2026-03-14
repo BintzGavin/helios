@@ -1,3 +1,6 @@
+## PLAYER v0.76.21
+- ✅ Completed: Regression Tests for Audio Fader - Added comprehensive edge case tests for AudioFader DOM mutations and gain calculations.
+
 ## PLAYER v0.76.20
 - ✅ Completed: Regression Tests for Media Session - Added comprehensive edge case tests for HeliosMediaSession to prevent regressions.
 

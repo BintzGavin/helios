@@ -183,4 +183,73 @@ describe('AudioFader', () => {
     // Should not be called anymore because it was removed from sources
     expect(mockSharedSource.setFadeGain).not.toHaveBeenCalled();
   });
+
+  it('should resume suspended audio context on connect', () => {
+    mockManager.context.state = 'suspended';
+    const doc = document.implementation.createHTMLDocument();
+    fader.connect(doc);
+    expect(mockManager.context.resume).toHaveBeenCalled();
+  });
+
+  it('should gracefully handle missing or invalid fade attributes', async () => {
+    const doc = document.implementation.createHTMLDocument();
+    const audio = doc.createElement('audio');
+    audio.setAttribute('data-helios-fade-in', 'abc'); // Invalid float
+    audio.setAttribute('data-helios-fade-out', '-1'); // Negative number
+    doc.body.appendChild(audio);
+
+    // We need to bypass the `scanElement` condition in `connect` since it checks > 0 to add to `sources`.
+    // We add it manually to test the `loop` behavior directly.
+    fader['sources'].set(audio, mockSharedSource);
+
+    // Mock properties
+    Object.defineProperty(audio, 'duration', { value: 10, writable: true });
+    Object.defineProperty(audio, 'currentTime', { value: 1, writable: true });
+    Object.defineProperty(audio, 'isConnected', { value: true, writable: true });
+
+    fader.connect(doc);
+    fader.enable();
+
+    await new Promise(r => setTimeout(r, 10));
+
+    // Because 'abc' becomes NaN -> 0, and '-1' becomes 0.
+    // Gain should be calculated as 1 (no fade).
+    expect(mockSharedSource.setFadeGain).toHaveBeenCalledWith(1);
+  });
+
+  it('should cleanup nodes that are disconnected from the DOM during loop', async () => {
+    const doc = document.implementation.createHTMLDocument();
+    const audio = doc.createElement('audio');
+    audio.setAttribute('data-helios-fade-in', '2');
+    doc.body.appendChild(audio);
+
+    fader.connect(doc);
+
+    // Force isConnected to be false to simulate it being removed from the DOM
+    Object.defineProperty(audio, 'isConnected', { value: false, writable: true });
+
+    fader.enable();
+    await new Promise(r => setTimeout(r, 10));
+
+    // loop checks isConnected, removes from sources, and continues. setFadeGain should not be called.
+    expect(mockSharedSource.setFadeGain).not.toHaveBeenCalled();
+  });
+
+  it('should cancel RAF on disable', () => {
+    fader.enable();
+    fader.disable();
+    // Since we mocked cancelAnimationFrame using vi.stubGlobal, it might not be a jest/vitest spy directly on globalThis in all cases.
+    // However, stubGlobal replaces it. Let's check how it was stubbed.
+    // In beforeEach: vi.stubGlobal('cancelAnimationFrame', (id: any) => clearTimeout(id));
+    // It's not a mock function (vi.fn()), it's just a normal function. So toHaveBeenCalled will fail.
+    // We should mock it with vi.fn() in this test to verify.
+    const spy = vi.fn();
+    vi.stubGlobal('cancelAnimationFrame', spy);
+
+    // Call enable/disable again to use the new spy
+    fader.enable();
+    fader.disable();
+
+    expect(spy).toHaveBeenCalled();
+  });
 });
