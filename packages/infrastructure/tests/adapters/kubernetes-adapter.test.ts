@@ -343,6 +343,10 @@ describe('KubernetesAdapter', () => {
     );
   });
 
+  it('should throw an error if image option is missing', () => {
+    expect(() => new KubernetesAdapter({ image: '' })).toThrow('KubernetesAdapter requires an image option');
+  });
+
   it('should load config from kubeconfigPath if provided', async () => {
     const customAdapter = new KubernetesAdapter({
       image: 'test-image',
