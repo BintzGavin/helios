@@ -296,6 +296,19 @@ describe('JobExecutor', () => {
       warnSpy.mockRestore();
     });
 
+    it('should throw an error if mergeAdapter fails with non-zero exit code', async () => {
+      const mockMergeAdapter: WorkerAdapter = {
+        execute: vi.fn().mockResolvedValue({
+          exitCode: 1,
+          stdout: '',
+          stderr: 'Merge adapter error',
+          durationMs: 100
+        })
+      };
+
+      await expect(jobExecutor.execute(jobSpec, { mergeAdapter: mockMergeAdapter })).rejects.toThrow(/Merge failed with exit code 1: Merge adapter error/);
+    });
+
     it('should pass signal to mergeAdapter', async () => {
       const controller = new AbortController();
       const mockMergeAdapter: WorkerAdapter = {

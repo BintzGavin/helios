@@ -87,6 +87,32 @@ describe('JobManager', () => {
     expect(job?.completedChunks).toBe(2);
   });
 
+  it('should not throw if currentJob is missing in onProgress and onChunkComplete', async () => {
+    mockExecutorExecute = vi.spyOn(executor, 'execute').mockImplementation(async (spec, options) => {
+      // Simulate a deleted job mid-execution
+      await repository.delete(spec.id);
+
+      if (options?.onProgress) {
+        await options.onProgress(1, 2);
+      }
+      if (options?.onChunkComplete) {
+        await options.onChunkComplete(1, { exitCode: 0, stdout: 'out', stderr: '', durationMs: 150 });
+      }
+    });
+
+    const jobId = await jobManager.submitJob(sampleJobSpec);
+
+    // Wait for execution to finish
+    await new Promise(resolve => setTimeout(resolve, 30));
+
+    // Delete the job again just to be sure it's not saved by the execute finish block
+    await repository.delete(jobId);
+
+    // Should have completed without unhandled rejections
+    const job = await repository.get(jobId);
+    expect(job).toBeUndefined();
+  });
+
   it('should aggregate metrics and logs via onChunkComplete', async () => {
     mockExecutorExecute = vi.spyOn(executor, 'execute').mockImplementation(async (spec, options) => {
       if (options?.onChunkComplete) {
