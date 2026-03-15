@@ -1,4 +1,4 @@
-**Version**: v0.76.21
+**Version**: v0.76.22
 
 **Posture**: STABLE AND FEATURE COMPLETE
 
@@ -10,6 +10,7 @@
 - **Responsibility**: `<helios-player>` Web Component, UI controls, iframe bridge.
 
 ## Current State
+[v0.76.22] ✅ Completed: Bridge Coverage Expansion - Added comprehensive unit test coverage for bridge global error handlers and DOM mode frame capture.
 [v0.76.21] ✅ Completed: Regression Tests for Audio Fader - Added comprehensive edge case tests for AudioFader DOM mutations and gain calculations.
 [v0.76.20] ✅ Completed: Regression Tests for Media Session - Added comprehensive edge case tests for HeliosMediaSession to prevent regressions.
 [v0.76.18] ✅ Completed: Regression Tests for InputProps - Added comprehensive tests for `input-props` JSON parsing edge cases (explicit "null", empty strings).

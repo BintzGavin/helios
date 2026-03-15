@@ -1,3 +1,6 @@
+## PLAYER v0.76.22
+- ✅ Completed: Bridge Coverage Expansion - Added comprehensive unit test coverage for bridge global error handlers and DOM mode frame capture.
+
 ## PLAYER v0.76.21
 - ✅ Completed: Regression Tests for Audio Fader - Added comprehensive edge case tests for AudioFader DOM mutations and gain calculations.
 

@@ -20,6 +20,7 @@ vi.mock('@helios-project/core', () => {
 });
 
 // Mock dom-capture
+import { captureDomToBitmap } from './features/dom-capture';
 vi.mock('./features/dom-capture', () => ({
     captureDomToBitmap: vi.fn()
 }));
@@ -39,8 +40,13 @@ describe('connectToParent - handleCaptureFrame', () => {
     let originalOffscreenCanvas: any;
     let originalCreateImageBitmap: any;
 
+    let errorHandlers: ((ev: any) => void)[] = [];
+    let unhandledRejectionHandlers: ((ev: any) => void)[] = [];
+
     beforeEach(() => {
         messageHandlers = [];
+        errorHandlers = [];
+        unhandledRejectionHandlers = [];
         mockHelios = {
             play: vi.fn(),
             pause: vi.fn(),
@@ -66,6 +72,10 @@ describe('connectToParent - handleCaptureFrame', () => {
         vi.spyOn(window, 'addEventListener').mockImplementation((event, handler) => {
             if (event === 'message') {
                 messageHandlers.push(handler as any);
+            } else if (event === 'error') {
+                errorHandlers.push(handler as any);
+            } else if (event === 'unhandledrejection') {
+                unhandledRejectionHandlers.push(handler as any);
             }
         });
 
@@ -273,6 +283,113 @@ describe('connectToParent - handleCaptureFrame', () => {
                 frame: 10,
                 success: false,
                 error: 'Bitmap Error'
+            }),
+            '*'
+        );
+    });
+
+    it('should capture frame in DOM mode successfully', async () => {
+        const dummyBitmap = {} as ImageBitmap;
+        vi.mocked(captureDomToBitmap).mockResolvedValue(dummyBitmap);
+
+        mockHelios.getState.mockReturnValue({ activeCaptions: [{ text: 'test caption' }] });
+
+        triggerMessage({
+            type: 'HELIOS_CAPTURE_FRAME',
+            frame: 10,
+            mode: 'dom',
+            width: 1920,
+            height: 1080
+        });
+
+        await new Promise(resolve => setTimeout(resolve, 10));
+
+        expect(mockHelios.seek).toHaveBeenCalledWith(10);
+        expect(captureDomToBitmap).toHaveBeenCalledWith(document.body, { targetWidth: 1920, targetHeight: 1080 });
+        expect(parentPostMessage).toHaveBeenCalledWith(
+            expect.objectContaining({
+                type: 'HELIOS_FRAME_DATA',
+                frame: 10,
+                success: true,
+                bitmap: dummyBitmap,
+                captions: [{ text: 'test caption' }]
+            }),
+            '*',
+            [dummyBitmap]
+        );
+    });
+
+    it('should handle DOM mode capture error', async () => {
+        vi.mocked(captureDomToBitmap).mockRejectedValue(new Error('DOM Capture Error'));
+
+        triggerMessage({
+            type: 'HELIOS_CAPTURE_FRAME',
+            frame: 10,
+            mode: 'dom',
+            width: 1920,
+            height: 1080
+        });
+
+        await new Promise(resolve => setTimeout(resolve, 10));
+
+        expect(parentPostMessage).toHaveBeenCalledWith(
+            expect.objectContaining({
+                type: 'HELIOS_FRAME_DATA',
+                frame: 10,
+                success: false,
+                error: 'DOM Capture Error'
+            }),
+            '*'
+        );
+    });
+
+    it('should handle global ErrorEvents', async () => {
+        parentPostMessage.mockClear();
+        const error = new Error('Global Error');
+        error.stack = 'Error: Global Error at some/path';
+        const errorEvent = {
+            error,
+            message: error.message,
+            filename: 'test.js',
+            lineno: 10,
+            colno: 5
+        };
+
+        errorHandlers.forEach(h => h(errorEvent));
+
+        expect(parentPostMessage).toHaveBeenCalledWith(
+            expect.objectContaining({
+                type: 'HELIOS_ERROR',
+                error: {
+                    message: 'Global Error',
+                    filename: 'test.js',
+                    lineno: 10,
+                    colno: 5,
+                    stack: error.stack
+                }
+            }),
+            '*'
+        );
+    });
+
+    it('should handle global unhandledrejection events', async () => {
+        parentPostMessage.mockClear();
+        const reason = new Error('Promise Error');
+        reason.stack = 'Error: Promise Error at some/path';
+        const rejectionEvent = {
+            reason,
+            promise: Promise.reject(reason).catch(() => {})
+        };
+
+        unhandledRejectionHandlers.forEach(h => h(rejectionEvent));
+
+        expect(parentPostMessage).toHaveBeenCalledWith(
+            expect.objectContaining({
+                type: 'HELIOS_ERROR',
+                error: {
+                    message: 'Promise Error',
+                    stack: reason.stack
+                }
             }),
             '*'
         );
