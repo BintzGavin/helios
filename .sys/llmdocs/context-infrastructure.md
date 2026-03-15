@@ -106,3 +106,6 @@ The JobExecutor distributes chunks to a pool of adapters and coordinates the sti
 ## Packages
 packages/infrastructure/src/orchestrator/job-manager.ts
 packages/infrastructure/src/orchestrator/job-executor.ts
+
+## Updates
+- v0.53.23: ModalAdapter Coverage - Achieved 100% test coverage for ModalAdapter edge cases.
