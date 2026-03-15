@@ -151,4 +151,41 @@ describe('ModalAdapter', () => {
     expect(result.stderr).toContain('Execution failed: Network failure');
     expect(onStderr).toHaveBeenCalledWith('Execution failed: Network failure');
   });
+
+  it('should not include Authorization header if authToken is not provided', async () => {
+    const noAuthAdapter = new ModalAdapter({
+      endpointUrl: 'https://example.modal.run',
+    });
+
+    vi.mocked(fetch).mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ exitCode: 0, stdout: 'success', stderr: '' }),
+    } as any);
+
+    const job: WorkerJob = { command: 'test' };
+    await noAuthAdapter.execute(job);
+
+    expect(fetch).toHaveBeenCalledWith(
+      'https://example.modal.run',
+      expect.objectContaining({
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+    );
+  });
+
+  it('should fallback to default exitCode and output fields if API response lacks them', async () => {
+    vi.mocked(fetch).mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({}), // Empty JSON object
+    } as any);
+
+    const job: WorkerJob = { command: 'test' };
+    const result = await adapter.execute(job);
+
+    expect(result.exitCode).toBe(0);
+    expect(result.stdout).toBe('');
+    expect(result.stderr).toBe('');
+  });
 });
