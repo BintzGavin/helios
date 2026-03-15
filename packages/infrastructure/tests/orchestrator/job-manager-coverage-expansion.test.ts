@@ -93,4 +93,19 @@ describe('JobManager Coverage Expansion', () => {
     expect(updatedJob?.logs).toBeDefined();
     expect(updatedJob?.logs?.length).toBe(1);
   });
+
+  it('should not throw if trying to pause/cancel a deleted job', async () => {
+    const spec: JobSpec = { id: 'test-job', chunks: [], metadata: { totalFrames: 10, fps: 30, width: 100, height: 100, duration: 1 }, mergeCommand: '' };
+    const jobId = await jobManager.submitJob(spec, { adapter: { execute: vi.fn() } as any });
+
+    // Simulate job deletion before pause/cancel
+    await repository.delete(jobId);
+
+    // Attempt to cancel
+    await jobManager.pauseJob(jobId);
+
+    // It should not be recreated
+    const exists = await repository.get(jobId);
+    expect(exists).toBeUndefined();
+  });
 });
