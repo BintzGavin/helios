@@ -79,4 +79,13 @@ describe('helios merge command', () => {
     expect(errorSpy).toHaveBeenCalledWith(expect.stringContaining('Merge failed: Mock renderer error'));
     expect(exitSpy).toHaveBeenCalledWith(1);
   });
+
+  it('should handle errors thrown by transcodeMerge and exit with 1', async () => {
+    vi.mocked(transcodeMerge).mockRejectedValueOnce(new Error('Mock transcode error'));
+
+    await program.parseAsync(['node', 'test', 'merge', 'output.mp4', 'input1.mp4', '--video-codec', 'libx264']);
+
+    expect(errorSpy).toHaveBeenCalledWith(expect.stringContaining('Merge failed: Mock transcode error'));
+    expect(exitSpy).toHaveBeenCalledWith(1);
+  });
 });
