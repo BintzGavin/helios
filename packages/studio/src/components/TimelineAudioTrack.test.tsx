@@ -1,3 +1,7 @@
+/**
+ * @vitest-environment jsdom
+ */
+import "@testing-library/jest-dom";
 import React from 'react';
 import { render } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';

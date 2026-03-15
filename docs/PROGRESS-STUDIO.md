@@ -1,3 +1,6 @@
+### STUDIO v0.118.6
+- ✅ Completed: TimelineAudioTrack Regression Tests - Added vitest regression tests for TimelineAudioTrack and useAudioWaveform
+
 ### STUDIO v0.118.5
 - ✅ Completed: Timeline Audio Regression Refinements - Refined JSDoc, inline comments, and minor clarity updates to TimelineAudioTrack and useAudioWaveform implementation following testing.
 
