@@ -1,4 +1,4 @@
-**Version**: 0.118.5
+**Version**: 0.118.6
 
 **Posture**: ACTIVELY EXPANDING FOR V2
 
@@ -11,6 +11,7 @@
 > **Note**: Status versions in this file may precede package release versions (`package.json`). Always verify `package.json` for the currently installed version.
 
 ## Recent Updates
+- [v0.118.6] ✅ Completed: TimelineAudioTrack Regression Tests - Added vitest regression tests for TimelineAudioTrack and useAudioWaveform
 - [v0.118.5] ✅ Completed: Timeline Audio Regression Refinements - Refined JSDoc, inline comments, and minor clarity updates to TimelineAudioTrack and useAudioWaveform implementation following testing.
 - [v0.118.4] ✅ Completed: Update Quickstart Guide - Updated the Quickstart guide to emphasize the `helios init` command as the primary way to get started.
 - [v0.118.3] ✅ Completed: Regression Tests - Fixed `UnhandledPromiseRejection` in `useAudioWaveform.test.ts` by explicitly catching mocked decoder rejection.

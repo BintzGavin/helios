@@ -16,7 +16,7 @@ packages/studio/
 │   ├── cli/             # CLI commands (init, render, build, preview)
 │   ├── components/      # UI components (PropsEditor, Timeline, Stage)
 │   ├── context/         # React Context for global state
-│   ├── hooks/           # Custom React hooks
+│   ├── hooks/           # Custom React hooks (includes useAudioWaveform test suite)
 │   ├── server/          # Vite plugin API backend (discovery, rendering, mcp)
 │   ├── utils/           # Utility functions
 │   ├── App.tsx          # Main application component
