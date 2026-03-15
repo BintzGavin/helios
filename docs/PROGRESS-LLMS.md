@@ -1,5 +1,12 @@
 # LLMS Progress
 
+## LLMS v1.42.0
+- ✅ Completed: Daily llms.txt Review
+  - Synced Roadmap with recent actual completions from PROGRESS files across all domain packages.
+  - Added "HetznerCloud Adapter Coverage", "FlyMachines Adapter Coverage", "Orchestrator Test Coverage", "AWS Adapter Coverage", "Azure & Vercel Coverage" to Infrastructure roadmap.
+  - Added "Regression Tests for Audio Fader & Media Session" to Player roadmap.
+  - Retained strict alignment of package.json versions in Quick Facts and Roadmap.
+
 ## LLMS v1.41.0
 - ✅ Completed: Daily llms.txt Review
   - Synced roadmap with progress logs across all packages while retaining correct package.json versions.
