@@ -1,5 +1,8 @@
 # INFRASTRUCTURE PROGRESS
 
+## INFRASTRUCTURE v0.53.30
+- ✅ Completed: CloudRun and Local Adapter Coverage Expansion - Expanded test coverage for `CloudRunAdapter` and `LocalWorkerAdapter` to 100% by adding tests for missing `chunkId`, `timeoutId` cleanup on abort, and stderr accumulation.
+
 ## INFRASTRUCTURE v0.53.29
 - ✅ Completed: SyncWorkspace Coverage Expansion - Expanded coverage for syncWorkspaceDependencies to 100%.
 
