@@ -120,11 +120,52 @@ describe('CloudRunServer', () => {
     expect(data).toEqual({ message: 'Plain string error' });
   });
 
+  it('should handle runtime execution errors gracefully when non-Error thrown without message property', async () => {
+    // This hits the `message: error.message || String(error)` fallback
+    const p = Promise.reject({ something: 'else' });
+    p.catch(() => {});
+    vi.mocked(WorkerRuntime.prototype.run).mockReturnValue(p);
+
+    const res = await fetch(baseUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ jobPath: 'http://test.com/job.json', chunkIndex: 2 })
+    });
+
+    expect(res.status).toBe(500);
+    const data = await res.json();
+    expect(data).toEqual({ message: '[object Object]' });
+  });
+
   it('should default to port 8080 when port is undefined and env PORT is undefined', async () => {
     const originalEnv = process.env.PORT;
     delete process.env.PORT;
 
     const appWithDefaultPort = createCloudRunServer({ workspaceDir: '/tmp-test-port' });
+    const localServer = appWithDefaultPort.server;
+
+    await new Promise<void>((resolve) => {
+      appWithDefaultPort.listen(() => resolve());
+    });
+
+    const address = localServer.address() as any;
+    expect(address.port).toBe(8080);
+
+    await new Promise<void>((resolve, reject) => {
+      localServer.close((err) => (err ? reject(err) : resolve()));
+    });
+
+    if (originalEnv !== undefined) {
+      process.env.PORT = originalEnv;
+    }
+  });
+
+  it('should default to port 8080 when config has undefined port but no other ports are set', async () => {
+    const originalEnv = process.env.PORT;
+    delete process.env.PORT;
+
+    // Call without config block fallback
+    const appWithDefaultPort = createCloudRunServer();
     const localServer = appWithDefaultPort.server;
 
     await new Promise<void>((resolve) => {
