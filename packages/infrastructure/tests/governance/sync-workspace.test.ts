@@ -88,4 +88,30 @@ describe('syncWorkspaceDependencies', () => {
     expect(fs.readdir).toHaveBeenCalled();
     expect(fs.writeFile).not.toHaveBeenCalled();
   });
+
+  it('should throw an error if readdir throws a non-ENOENT error', async () => {
+    const rootDir = '/error/repo';
+
+    const error = new Error('EACCES');
+    (error as any).code = 'EACCES';
+    (fs.readdir as any).mockRejectedValue(error);
+
+    await expect(syncWorkspaceDependencies({ rootDir })).rejects.toThrow('EACCES');
+  });
+
+  it('should throw an error if readFile throws a non-ENOENT error', async () => {
+    const rootDir = '/virtual/repo';
+
+    const mockEntries = [
+      { name: 'pkg-a', isDirectory: () => true },
+    ];
+
+    (fs.readdir as any).mockResolvedValue(mockEntries);
+
+    const error = new Error('EACCES');
+    (error as any).code = 'EACCES';
+    (fs.readFile as any).mockRejectedValue(error);
+
+    await expect(syncWorkspaceDependencies({ rootDir })).rejects.toThrow('EACCES');
+  });
 });
