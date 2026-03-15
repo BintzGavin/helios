@@ -80,6 +80,25 @@ describe('LocalWorkerAdapter', () => {
     await expect(promise).rejects.toThrow('Job was aborted');
   });
 
+  it('should handle explicit cancellation via AbortSignal with timeout', async () => {
+    const controller = new AbortController();
+    const job: WorkerJob = {
+      command: nodePath,
+      args: ['-e', 'setTimeout(() => {}, 5000)'], // Sleep for 5 seconds
+      signal: controller.signal,
+      timeout: 10000,
+    };
+
+    const promise = adapter.execute(job);
+
+    // Give process a bit of time to start, then abort
+    setTimeout(() => {
+      controller.abort();
+    }, 50);
+
+    await expect(promise).rejects.toThrow('Job was aborted');
+  });
+
   it('should fail fast if signal is already aborted', async () => {
     const controller = new AbortController();
     controller.abort();
@@ -116,5 +135,17 @@ describe('LocalWorkerAdapter', () => {
     // Ensure buffered output is also correct
     expect(result.stdout).toContain('stdout message');
     expect(result.stderr).toContain('stderr message');
+  });
+
+  it('should accumulate stderr even without onStderr callback', async () => {
+    const job: WorkerJob = {
+      command: nodePath,
+      args: ['-e', 'console.error("test stderr accumulation");'],
+    };
+
+    const result = await adapter.execute(job);
+
+    expect(result.exitCode).toBe(0);
+    expect(result.stderr).toContain('test stderr accumulation');
   });
 });

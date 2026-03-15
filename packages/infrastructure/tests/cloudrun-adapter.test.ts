@@ -105,6 +105,18 @@ describe('CloudRunAdapter', () => {
     expect(mockRequest).not.toHaveBeenCalled();
   });
 
+  it('should throw an error if chunkId is missing', async () => {
+    const adapter = new CloudRunAdapter({ serviceUrl, jobDefUrl });
+
+    await expect(adapter.execute({
+      command: 'ignored',
+      args: [],
+      cwd: '/tmp',
+      env: {},
+      meta: {} // Missing chunkId
+    })).rejects.toThrow('CloudRunAdapter requires job.meta.chunkId to be set');
+  });
+
   it('should handle non-200 HTTP response', async () => {
     mockRequest.mockResolvedValue({
       status: 500,
