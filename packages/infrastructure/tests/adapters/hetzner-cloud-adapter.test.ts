@@ -209,4 +209,67 @@ describe('HetznerCloudAdapter', () => {
     expect(result.exitCode).toBe(0);
     expect(result.stderr).toContain('Failed to clean up server: Network error during cleanup');
   });
+
+  it('should include location and ssh_keys when provided in config', async () => {
+    const adapter = new HetznerCloudAdapter({ ...config, location: 'fsn1', sshKeyId: 12345 });
+
+    const fetchMock = vi.mocked(global.fetch);
+
+    fetchMock.mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve({ server: { id: 456, status: 'running' } }),
+    } as any);
+
+    fetchMock.mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve({ server: { id: 456, status: 'off' } }),
+    } as any);
+
+    fetchMock.mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve({}),
+    } as any);
+
+    await adapter.execute(job);
+
+    expect(fetchMock).toHaveBeenCalled();
+    const createCall = fetchMock.mock.calls[0];
+    const requestBody = JSON.parse(createCall[1].body as string);
+
+    expect(requestBody.location).toBe('fsn1');
+    expect(requestBody.ssh_keys).toEqual([12345]);
+  });
+
+  it('should trim job command properly when args is not provided', async () => {
+    const adapter = new HetznerCloudAdapter(config);
+
+    const fetchMock = vi.mocked(global.fetch);
+
+    fetchMock.mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve({ server: { id: 456, status: 'running' } }),
+    } as any);
+
+    fetchMock.mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve({ server: { id: 456, status: 'off' } }),
+    } as any);
+
+    fetchMock.mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve({}),
+    } as any);
+
+    const jobWithoutArgs: WorkerJob = {
+      command: 'echo "hello"',
+    };
+
+    await adapter.execute(jobWithoutArgs);
+
+    expect(fetchMock).toHaveBeenCalled();
+    const createCall = fetchMock.mock.calls[0];
+    const requestBody = JSON.parse(createCall[1].body as string);
+
+    expect(requestBody.user_data).toContain('Executing command: echo "hello"');
+  });
 });
