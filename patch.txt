@@ -1,0 +1,29 @@
+<<<<<<< SEARCH
+## Section C: Interfaces
+Worker interface definition (packages/infrastructure/src/types/worker.ts)
+Job definitions (packages/infrastructure/src/types/job.ts)
+Adapter definitions (packages/infrastructure/src/types/adapter.ts)
+=======
+## Section C: Interfaces
+```typescript
+// packages/infrastructure/src/types/worker.ts
+export interface WorkerAdapter {
+  execute(job: WorkerJob): Promise<WorkerResult>;
+}
+
+// packages/infrastructure/src/types/job.ts
+export interface WorkerJob {
+  command: string;
+  meta: Record<string, any>;
+  signal?: AbortSignal;
+}
+
+// packages/infrastructure/src/types/adapter.ts
+export interface WorkerResult {
+  exitCode: number;
+  stdout: string;
+  stderr: string;
+  durationMs: number;
+}
+```
+>>>>>>> REPLACE

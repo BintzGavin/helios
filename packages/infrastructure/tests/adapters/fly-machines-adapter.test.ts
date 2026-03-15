@@ -84,6 +84,57 @@ describe('FlyMachinesAdapter', () => {
     await expect(adapter.execute(job)).rejects.toThrow('Failed to create Fly Machine: 500 Internal Server Error Error creating machine');
   });
 
+  it('should continue polling if poll response is not ok (e.g., transient network error)', async () => {
+    mockFetch
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ id: 'machine-123' }),
+      } as Response) // Create
+      .mockResolvedValueOnce({
+        ok: false,
+      } as Response) // Poll 1: fail
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ state: 'stopped', events: [{ request: { exit_event: { exit_code: 0 } } }] }),
+      } as Response) // Poll 2: success
+      .mockResolvedValueOnce({
+        ok: true,
+      } as Response); // Delete
+
+    const job = {
+      command: 'node',
+      meta: { jobDefUrl: 'http://test.com/job.json', chunkIndex: 0 },
+    };
+
+    const result = await adapter.execute(job);
+    expect(result.exitCode).toBe(0);
+    expect(mockFetch).toHaveBeenCalledTimes(4);
+  });
+
+  it('should handle missing exit event in polling response (fallback to 0)', async () => {
+    mockFetch
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ id: 'machine-123' }),
+      } as Response) // Create
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ state: 'stopped' }),
+      } as Response) // Poll 1: success but no events
+      .mockResolvedValueOnce({
+        ok: true,
+      } as Response); // Delete
+
+    const job = {
+      command: 'node',
+      meta: { jobDefUrl: 'http://test.com/job.json', chunkIndex: 0 },
+    };
+
+    const result = await adapter.execute(job);
+    expect(result.exitCode).toBe(0);
+    expect(mockFetch).toHaveBeenCalledTimes(3);
+  });
+
   it('should handle abort signal', async () => {
     mockFetch
       .mockResolvedValueOnce({
