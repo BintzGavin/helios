@@ -144,4 +144,13 @@ describe('WorkerRuntime', () => {
 
     await expect(runtime.run(jobPath, 0)).rejects.toThrow('String Error');
   });
+
+  it('should throw error when missing assetsUrl if storage is missing and required', async () => {
+    // This provides coverage for branch line 35
+    const jobPath = '/local/job.json';
+    const jobSpecWithAssets = { ...mockJobSpec, assetsUrl: 's3://some/url' };
+    readFileMock.mockResolvedValue(JSON.stringify(jobSpecWithAssets));
+
+    await expect(runtime.run(jobPath, 0)).rejects.toThrow('Worker was not configured with an ArtifactStorage adapter, but the job requires remote assets.');
+  });
 });

@@ -109,4 +109,40 @@ describe('RenderExecutor', () => {
 
     await expect(executor.executeChunk(jobSpec, 1)).rejects.toThrow('Spawn error');
   });
+
+  it('should capture stdout data correctly when stream is present', async () => {
+    vi.mocked(spawn).mockImplementation(((command: any, args: any, options: any) => {
+      const child = new EventEmitter() as any;
+      child.stdout = new EventEmitter();
+      child.stderr = null;
+
+      setTimeout(() => {
+        child.stdout.emit('data', Buffer.from('stdout test'));
+        child.emit('close', 0);
+      }, 10);
+
+      return child as import('node:child_process').ChildProcess;
+    }) as any);
+
+    const result = await executor.executeChunk(jobSpec, 1);
+    expect(result.stdout).toBe('stdout test');
+  });
+
+  it('should capture stderr data correctly when stream is present', async () => {
+    vi.mocked(spawn).mockImplementation(((command: any, args: any, options: any) => {
+      const child = new EventEmitter() as any;
+      child.stdout = null;
+      child.stderr = new EventEmitter();
+
+      setTimeout(() => {
+        child.stderr.emit('data', Buffer.from('stderr test'));
+        child.emit('close', 1);
+      }, 10);
+
+      return child as import('node:child_process').ChildProcess;
+    }) as any);
+
+    const result = await executor.executeChunk(jobSpec, 1);
+    expect(result.stderr).toBe('stderr test');
+  });
 });
