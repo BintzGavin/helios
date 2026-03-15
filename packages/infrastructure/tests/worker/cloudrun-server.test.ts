@@ -104,6 +104,45 @@ describe('CloudRunServer', () => {
     expect(data).toEqual({ message: 'CloudRun failure' });
   });
 
+  it('should handle runtime execution errors gracefully when non-Error thrown', async () => {
+    const p = Promise.reject('Plain string error');
+    p.catch(() => {});
+    vi.mocked(WorkerRuntime.prototype.run).mockReturnValue(p);
+
+    const res = await fetch(baseUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ jobPath: 'http://test.com/job.json', chunkIndex: 2 })
+    });
+
+    expect(res.status).toBe(500);
+    const data = await res.json();
+    expect(data).toEqual({ message: 'Plain string error' });
+  });
+
+  it('should default to port 8080 when port is undefined and env PORT is undefined', async () => {
+    const originalEnv = process.env.PORT;
+    delete process.env.PORT;
+
+    const appWithDefaultPort = createCloudRunServer({ workspaceDir: '/tmp-test-port' });
+    const localServer = appWithDefaultPort.server;
+
+    await new Promise<void>((resolve) => {
+      appWithDefaultPort.listen(() => resolve());
+    });
+
+    const address = localServer.address() as any;
+    expect(address.port).toBe(8080);
+
+    await new Promise<void>((resolve, reject) => {
+      localServer.close((err) => (err ? reject(err) : resolve()));
+    });
+
+    if (originalEnv !== undefined) {
+      process.env.PORT = originalEnv;
+    }
+  });
+
   it('should return 500 for non-zero exit code', async () => {
     vi.mocked(WorkerRuntime.prototype.run).mockResolvedValue({
       exitCode: 1,

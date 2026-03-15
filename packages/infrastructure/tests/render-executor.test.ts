@@ -1,10 +1,31 @@
 
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { RenderExecutor } from '../src/worker/render-executor.js';
 import { JobSpec } from '../src/types/job-spec.js';
 import { parseCommand } from '../src/utils/command.js';
+import { EventEmitter } from 'node:events';
+
+vi.mock('node:child_process', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('node:child_process')>();
+  return {
+    ...actual,
+    spawn: vi.fn(),
+  };
+});
+import { spawn } from 'node:child_process';
+
+// Get the original spawn to use it for non-mocked tests
+const originalChildProcess = await vi.importActual<typeof import('node:child_process')>('node:child_process');
+const originalSpawn = originalChildProcess.spawn;
 
 describe('RenderExecutor', () => {
+  beforeEach(() => {
+    vi.mocked(spawn).mockImplementation(originalSpawn as any);
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
   const executor = new RenderExecutor('/tmp');
 
   const jobSpec: JobSpec = {
@@ -51,5 +72,41 @@ describe('RenderExecutor', () => {
 
   it('should throw if chunk ID not found', async () => {
     await expect(executor.executeChunk(jobSpec, 999)).rejects.toThrow(/Chunk with ID 999 not found/);
+  });
+
+  it('should handle process execution without stdout and stderr', async () => {
+    vi.mocked(spawn).mockImplementation(((command: any, args: any, options: any) => {
+      const child = new EventEmitter() as any;
+      child.stdout = null;
+      child.stderr = null;
+
+      setTimeout(() => {
+        child.emit('close', 0);
+      }, 10);
+
+      return child as import('node:child_process').ChildProcess;
+    }) as any);
+
+    const result = await executor.executeChunk(jobSpec, 1);
+
+    expect(result.exitCode).toBe(0);
+    expect(result.stdout).toBe('');
+    expect(result.stderr).toBe('');
+  });
+
+  it('should capture spawn errors properly', async () => {
+    vi.mocked(spawn).mockImplementation(((command: any, args: any, options: any) => {
+      const child = new EventEmitter() as any;
+      child.stdout = null;
+      child.stderr = null;
+
+      setTimeout(() => {
+        child.emit('error', new Error('Spawn error'));
+      }, 10);
+
+      return child as import('node:child_process').ChildProcess;
+    }) as any);
+
+    await expect(executor.executeChunk(jobSpec, 1)).rejects.toThrow('Spawn error');
   });
 });

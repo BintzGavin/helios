@@ -137,4 +137,11 @@ describe('WorkerRuntime', () => {
 
     await expect(runtime.run(jobPath, 0)).rejects.toThrow('Invalid JobSpec: missing chunks array');
   });
+
+  it('should throw a string error wrapped in an Error object', async () => {
+    const jobPath = '/local/job.json';
+    readFileMock.mockRejectedValue('String Error');
+
+    await expect(runtime.run(jobPath, 0)).rejects.toThrow('String Error');
+  });
 });
