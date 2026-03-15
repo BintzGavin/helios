@@ -86,6 +86,11 @@ export interface JobExecutionOptions {
    * Optional metadata to pass to the adapter's execute method.
    */
   meta?: Record<string, any>;
+
+  /**
+   * Explicitly skip the merge step.
+   */
+  skipMerge?: boolean;
 }
 
 export class JobExecutor {
@@ -238,7 +243,7 @@ export class JobExecutor {
     }
 
     // Merge step
-    if (shouldMerge) {
+    if (shouldMerge && !options.skipMerge) {
       if (options.stitcher && options.outputFile) {
         console.log('All chunks completed. Starting merge step using dedicated VideoStitcher...');
 
