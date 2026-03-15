@@ -108,4 +108,97 @@ describe('JobManager Coverage Expansion', () => {
     const exists = await repository.get(jobId);
     expect(exists).toBeUndefined();
   });
+
+  it('should catch and log error if runJob fails during submitJob', async () => {
+    const spec: JobSpec = { id: 'test-job', chunks: [], metadata: { totalFrames: 10, fps: 30, width: 100, height: 100, duration: 1 }, mergeCommand: '' };
+    // Force repository.get to throw an error during runJob execution (simulating a runJob failure)
+    vi.spyOn(repository, 'get').mockRejectedValueOnce(new Error('Simulated submitJob runJob error'));
+    await jobManager.submitJob(spec, { adapter: { execute: vi.fn() } as any });
+    // wait for async background runJob to complete and catch block to trigger
+    await new Promise(process.nextTick);
+    expect(console.error).toHaveBeenCalledWith(expect.stringContaining('Unhandled error in job'), expect.any(Error));
+  });
+
+  it('should return early if job not found or wrong state in cancelJob', async () => {
+    await jobManager.cancelJob('nonexistent-job');
+    const job: JobStatus = { id: 'test-job', spec: { id: 'test-job', chunks: [], metadata: { totalFrames: 10, fps: 30, width: 100, height: 100, duration: 1 }, mergeCommand: '' }, state: 'completed', progress: 100, totalChunks: 0, completedChunks: 0, createdAt: Date.now(), updatedAt: Date.now() };
+    await repository.save(job);
+    await jobManager.cancelJob('test-job');
+  });
+
+  it('should return early if job not found or wrong state in resumeJob', async () => {
+    await jobManager.resumeJob('nonexistent-job');
+    const job: JobStatus = { id: 'test-job', spec: { id: 'test-job', chunks: [], metadata: { totalFrames: 10, fps: 30, width: 100, height: 100, duration: 1 }, mergeCommand: '' }, state: 'completed', progress: 100, totalChunks: 0, completedChunks: 0, createdAt: Date.now(), updatedAt: Date.now() };
+    await repository.save(job);
+    await jobManager.resumeJob('test-job');
+  });
+
+  it('should catch and log error if runJob fails during resumeJob', async () => {
+    const spec: JobSpec = { id: 'test-job', chunks: [], metadata: { totalFrames: 10, fps: 30, width: 100, height: 100, duration: 1 }, mergeCommand: '' };
+    const job: JobStatus = { id: 'test-job', spec, state: 'paused', progress: 0, totalChunks: 0, completedChunks: 0, createdAt: Date.now(), updatedAt: Date.now(), logs: [{ chunkId: 1, durationMs: 100, stdout: '', stderr: '' }] };
+    await repository.save(job);
+    // Force repository.get to throw an error during runJob execution (simulating a runJob failure)
+    vi.spyOn(repository, 'get').mockImplementationOnce(async () => job).mockRejectedValueOnce(new Error('Simulated resumeJob runJob error'));
+    await jobManager.resumeJob('test-job', { adapter: { execute: vi.fn() } as any });
+    // wait for async background runJob to complete and catch block to trigger
+    await new Promise(process.nextTick);
+    expect(console.error).toHaveBeenCalledWith(expect.stringContaining('Unhandled error resuming job test-job:'), expect.any(Error));
+  });
+
+  it('should return early if job not found in deleteJob', async () => {
+    await jobManager.deleteJob('nonexistent-job');
+  });
+
+  it('should handle storage upload initialization and failure correctly', async () => {
+    const spec: JobSpec = { id: 'test-job', chunks: [], metadata: { totalFrames: 10, fps: 30, width: 100, height: 100, duration: 1 }, mergeCommand: '' };
+
+    // Create the job first so it's in the repo
+    const jobId = await jobManager.submitJob(spec, { adapter: { execute: vi.fn() } as any });
+
+    const options = { jobDir: '/tmp/test' };
+
+    // Simulate an error during upload
+    (storage.uploadAssetBundle as any).mockRejectedValueOnce(new Error('Upload failed'));
+
+    const originalRunJob = (jobManager as any).runJob;
+    await originalRunJob.call(jobManager, jobId, spec, options);
+
+    const job = await repository.get(jobId);
+    expect(job?.state).toBe('failed');
+    expect(job?.error).toContain('Upload failed');
+  });
+
+  it('should save job meta even if missing initially', async () => {
+    const spec: JobSpec = { id: 'test-job', chunks: [], metadata: { totalFrames: 10, fps: 30, width: 100, height: 100, duration: 1 }, mergeCommand: '' };
+
+    const jobId = await jobManager.submitJob(spec, { adapter: { execute: vi.fn() } as any });
+    const jobBefore = await repository.get(jobId);
+    if(jobBefore) {
+        delete jobBefore.meta;
+        await repository.save(jobBefore);
+    }
+
+    const options = { jobDir: '/tmp/test' };
+
+    (storage.uploadAssetBundle as any).mockResolvedValueOnce('s3://assets');
+    (storage.uploadJobSpec as any).mockResolvedValueOnce('s3://spec');
+
+    // Mock the repository save so we can inspect what runJob tried to save
+    const saveSpy = vi.spyOn(repository, 'save');
+
+    // We need to trigger the execution to properly wait for all promises.
+    // By passing options.jobDir, we'll force the upload block to execute
+    await (jobManager as any).runJob(jobId, spec, options);
+
+    // Give it a tiny bit of time to ensure all microtasks are done
+    await new Promise(resolve => setTimeout(resolve, 50));
+
+    // Look at what was saved. The last save is probably the completed state.
+    // But any of the saves should have the meta set.
+    const savedJobs = saveSpy.mock.calls.map(call => call[0]);
+    const jobWithMeta = savedJobs.find(j => j.meta?.jobDefUrl === 's3://spec');
+
+    expect(jobWithMeta).toBeDefined();
+    expect(jobWithMeta?.meta?.jobDefUrl).toBe('s3://spec');
+  });
 });
