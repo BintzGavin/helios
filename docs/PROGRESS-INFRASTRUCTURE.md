@@ -1,5 +1,8 @@
 # INFRASTRUCTURE PROGRESS
 
+## INFRASTRUCTURE v0.53.38
+- ✅ Completed: CloudRun and Local Adapter Coverage - Closed obsolete implementation plan as test coverage for `CloudRunAdapter` and `LocalWorkerAdapter` is already 100%.
+
 ## INFRASTRUCTURE v0.53.37
 - ✅ Completed: S3StorageAdapter Coverage - Expanded test coverage for `S3StorageAdapter` to 100% by handling missing object keys and empty directories on download and deletion.
 
