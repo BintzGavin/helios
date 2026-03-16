@@ -2,6 +2,10 @@
 
 This file tracks progress for the CLI domain (`packages/cli`).
 
+## CLI v0.37.3
+
+- ✅ Completed: CLI Merge Regression Tests - Verified existing regression tests for helios merge command
+
 ## CLI v0.37.2
 
 - ✅ Merge Command Regression Tests Complete - Added missing regression test for `transcodeMerge` error handling in the `helios merge` command.
