@@ -1,5 +1,8 @@
 # INFRASTRUCTURE PROGRESS
 
+## INFRASTRUCTURE v0.53.32
+- ✅ Completed: CloudRunAdapter Test Coverage - Expanded test coverage for `CloudRunAdapter` to 100% by adding edge cases for cached client, missing stderr, and undefined response data.
+
 ## INFRASTRUCTURE v0.53.31
 - ✅ Completed: Storage Adapter Test Coverage - Expanded test coverage for `S3StorageAdapter`, `GcsStorageAdapter`, and `LocalStorageAdapter` to 100% by adding tests for unhandled error throwing edges in cleanup and url parsing.
 

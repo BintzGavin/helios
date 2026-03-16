@@ -10,9 +10,7 @@ vi.mock('google-auth-library', () => {
   return {
     GoogleAuth: class {
       async getIdTokenClient() {
-        if (mockGetIdTokenClient.mock.calls.length > 0) {
-          return mockGetIdTokenClient();
-        }
+        mockGetIdTokenClient();
         return {
           request: mockRequest
         };
@@ -189,9 +187,9 @@ describe('CloudRunAdapter', () => {
   });
 
   it('should handle getIdTokenClient initialization failure', async () => {
-     mockGetIdTokenClient.mockRejectedValue(new Error('Auth failed'));
-     // Pre-populate mock.calls length so condition is hit and catch to avoid UnhandledPromiseRejection
-     mockGetIdTokenClient().catch(() => {});
+     mockGetIdTokenClient.mockImplementation(() => {
+       throw new Error('Auth failed');
+     });
 
      const adapter = new CloudRunAdapter({ serviceUrl, jobDefUrl });
      const result = await adapter.execute({
@@ -224,5 +222,78 @@ describe('CloudRunAdapter', () => {
     expect(result.exitCode).toBe(0);
     expect(result.stdout).toBe('');
     expect(result.stderr).toBe('');
+  });
+
+  it('should use cached client on subsequent executions', async () => {
+    const adapter = new CloudRunAdapter({ serviceUrl, jobDefUrl });
+
+    // First execution
+    await adapter.execute({
+      command: 'ignored',
+      args: [],
+      cwd: '/tmp',
+      env: {},
+      meta: { chunkId: 1 }
+    });
+
+    expect(mockGetIdTokenClient).toHaveBeenCalledTimes(1);
+
+    // Second execution
+    await adapter.execute({
+      command: 'ignored',
+      args: [],
+      cwd: '/tmp',
+      env: {},
+      meta: { chunkId: 2 }
+    });
+
+    // mockGetIdTokenClient should not be called again
+    expect(mockGetIdTokenClient).toHaveBeenCalledTimes(1);
+  });
+
+  it('should fallback to statusText when stderr is missing on non-200 response', async () => {
+    mockRequest.mockResolvedValue({
+      status: 500,
+      statusText: 'Internal Server Error',
+      data: {
+        exitCode: 1,
+        stdout: ''
+        // stderr is missing
+      }
+    });
+
+    const adapter = new CloudRunAdapter({ serviceUrl, jobDefUrl });
+    const result = await adapter.execute({
+      command: 'ignored',
+      args: [],
+      cwd: '/tmp',
+      env: {},
+      meta: { chunkId: 1 }
+    });
+
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toContain('HTTP Error 500: Internal Server Error');
+  });
+
+  it('should fallback to statusText when data is undefined on exception', async () => {
+    const error: any = new Error('Request failed');
+    error.response = {
+      status: 404,
+      statusText: 'Not Found',
+      data: undefined
+    };
+    mockRequest.mockRejectedValue(error);
+
+    const adapter = new CloudRunAdapter({ serviceUrl, jobDefUrl });
+    const result = await adapter.execute({
+      command: 'ignored',
+      args: [],
+      cwd: '/tmp',
+      env: {},
+      meta: { chunkId: 1 }
+    });
+
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toContain('HTTP 404: Not Found');
   });
 });
