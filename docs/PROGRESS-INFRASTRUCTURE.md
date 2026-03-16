@@ -1,5 +1,8 @@
 # INFRASTRUCTURE PROGRESS
 
+## INFRASTRUCTURE v0.53.36
+- ✅ Completed: CloudRunAdapter Coverage - Closed obsolete implementation plan as `CloudRunAdapter` test coverage was already completed in v0.53.32.
+
 ## INFRASTRUCTURE v0.53.35
 - ✅ Completed: LocalAdapter Coverage - Closed obsolete implementation plan as `LocalWorkerAdapter` test coverage was already completed in v0.53.34.
 
