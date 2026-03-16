@@ -453,3 +453,6 @@
 
 ### INFRASTRUCTURE v0.53.0
 - ✅ Completed: Modal Adapter - Implemented `ModalAdapter` for cloud execution using Modal's Python-native serverless platform.
+
+### INFRASTRUCTURE v0.53.31
+- ✅ Completed: CloudRun & Local Worker Adapter Coverage - Expanded test coverage for CloudRun and Local Worker adapters to 100%.
