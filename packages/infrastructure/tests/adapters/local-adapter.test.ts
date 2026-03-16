@@ -148,4 +148,31 @@ describe('LocalWorkerAdapter', () => {
     expect(result.exitCode).toBe(0);
     expect(result.stderr).toContain('test stderr accumulation');
   });
+
+  it('should handle stderr if not provided', async () => {
+    const job: WorkerJob = {
+      command: nodePath,
+      args: ['-e', 'process.stderr.write("test stderr");'],
+    };
+
+    const result = await adapter.execute(job);
+
+    expect(result.exitCode).toBe(0);
+    expect(result.stderr).toContain('test stderr');
+  });
+
+  it('should clear timeout when aborted to prevent process hanging', async () => {
+    const controller = new AbortController();
+
+    const promise = adapter.execute({
+      command: nodePath,
+      args: ['-e', 'setTimeout(() => {}, 5000)'],
+      signal: controller.signal,
+      timeout: 10000,
+    });
+
+    controller.abort();
+
+    await expect(promise).rejects.toThrow('Job was aborted');
+  });
 });

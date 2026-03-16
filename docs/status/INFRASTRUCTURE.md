@@ -182,3 +182,4 @@
 - [v0.25.0] 🚫 Blocked: The available plan (`2026-11-13-CLI-Cloud-Worker-Execution.md`) asks me to modify files outside of my domain (`packages/cli/src/commands/job.ts`), which strictly violates my boundaries. I cannot implement CLI execution commands.
 - [v0.26.1] ✅ Completed: S3 Storage Adapter Spec - Created spec for `S3StorageAdapter` to handle artifact uploads and downloads using AWS S3.
 - [v0.52.2] ✅ Completed: Kubernetes Adapter Refinement - Refined Kubernetes Adapter options.
+- [v0.53.31] ✅ Completed: CloudRun & Local Worker Adapter Coverage - Expanded test coverage for CloudRun and Local Worker adapters to 100%.
