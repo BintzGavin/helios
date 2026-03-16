@@ -233,6 +233,20 @@ describe('S3StorageAdapter', () => {
     await expect(adapter.deleteAssetBundle(jobId, remoteUrl)).rejects.toThrow(/Unsupported remote URL scheme/);
   });
 
+  it('should throw an error if mismatched bucket on delete', async () => {
+    const jobId = 'job-123';
+    const remoteUrl = `s3://other-bucket/${jobId}`;
+
+    await expect(adapter.deleteAssetBundle(jobId, remoteUrl)).rejects.toThrow(/does not match adapter bucket/);
+  });
+
+  it('should throw an error if S3 URL format is invalid', async () => {
+    const jobId = 'job-123';
+    const remoteUrl = `s3://my-test-bucket`;
+
+    await expect(adapter.downloadAssetBundle(jobId, remoteUrl, targetDir)).rejects.toThrow(/Invalid S3 URL format/);
+  });
+
   describe('uploadJobSpec', () => {
     it('should upload a job spec and return an s3:// URL', async () => {
       const jobId = 'job-123';

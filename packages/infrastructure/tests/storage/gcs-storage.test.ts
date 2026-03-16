@@ -197,5 +197,25 @@ describe('GcsStorageAdapter', () => {
         .rejects
         .toThrow(/does not match adapter bucket/);
     });
+
+    it('should throw an error if deletion fails with code other than 404', async () => {
+      const mockFile = {
+        delete: vi.fn().mockRejectedValue({ code: 500, message: 'Internal Server Error' }),
+      };
+      mockBucket.file.mockReturnValue(mockFile);
+
+      await expect(adapter.deleteJobSpec(jobId, `gcs://${bucketName}/${jobId}/job.json`))
+        .rejects
+        .toThrow('Internal Server Error');
+    });
+
+    it('should swallow 404 error during deletion', async () => {
+      const mockFile = {
+        delete: vi.fn().mockRejectedValue({ code: 404, message: 'Not Found' }),
+      };
+      mockBucket.file.mockReturnValue(mockFile);
+
+      await expect(adapter.deleteJobSpec(jobId, `gcs://${bucketName}/${jobId}/job.json`)).resolves.toBeUndefined();
+    });
   });
 });
