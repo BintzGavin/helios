@@ -1,3 +1,6 @@
+### STUDIO v0.118.7
+- ✅ Completed: Close obsolete Regression Tests plan
+
 ### STUDIO v0.118.6
 - ✅ Completed: TimelineAudioTrack Regression Tests - Added vitest regression tests for TimelineAudioTrack and useAudioWaveform
 
