@@ -1,6 +1,16 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
+import { spawn } from 'node:child_process';
+import { EventEmitter } from 'node:events';
 import { LocalWorkerAdapter } from '../../src/adapters/index.js';
 import { WorkerJob } from '../../src/types/index.js';
+
+vi.mock('node:child_process', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('node:child_process')>();
+  return {
+    ...actual,
+    spawn: vi.fn(actual.spawn),
+  };
+});
 
 describe('LocalWorkerAdapter', () => {
   const adapter = new LocalWorkerAdapter();
@@ -174,5 +184,30 @@ describe('LocalWorkerAdapter', () => {
     controller.abort();
 
     await expect(promise).rejects.toThrow('Job was aborted');
+  });
+
+  it('should gracefully handle missing child.stderr stream', async () => {
+    const mockChild = new EventEmitter() as any;
+    mockChild.kill = () => {};
+    mockChild.stdout = new EventEmitter();
+    mockChild.stderr = undefined; // Specifically test undefined stderr
+
+    vi.mocked(spawn).mockImplementationOnce(() => {
+      setTimeout(() => mockChild.emit('close', 0), 10);
+      return mockChild;
+    });
+
+    const job: WorkerJob = {
+      command: 'mock-command',
+      args: [],
+    };
+
+    const result = await adapter.execute(job);
+    expect(result.exitCode).toBe(0);
+    expect(result.stderr).toBe('');
+
+    // Cleanup is automatic with mockImplementationOnce,
+    // but just to be sure we can clear mocks
+    vi.clearAllMocks();
   });
 });
