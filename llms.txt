@@ -113,12 +113,12 @@ const report = await Helios.diagnose();
 
 ## Roadmap
 ### V1.x (Active)
-- **Studio**: v0.107.1+ (Timeline Audio Regression, Quickstart Guide, Components Panel, Schema Validation)
-- **CLI**: v0.32.0+ (Deploy Cloudflare, Merge/Add Tests, Azure/Cloudflare Workers)
+- **Studio**: v0.107.1+ (Update Quickstart Guide, Enhance MCP Server, Components Panel)
+- **CLI**: v0.32.0+ (Merge Command Regression Tests, List Command Regression Tests, Deploy Cloudflare)
 - **Core**: v5.13.0+ (Generic Input Props, Active Clips, Composition Schema, Shared Virtual Time Binding)
-- **Player**: v0.76.18+ (Regression Tests for Audio Fader & Media Session, MediaProperties Tests, Audio Context Manager Tests)
+- **Player**: v0.76.18+ (Bridge Coverage Expansion, Regression Tests for Audio Fader, Regression Tests for Media Session)
 - **Renderer**: v1.78.0+ (Validate HW Accel, Orchestrator Plan, Refactor Media Sync, Pluggable Execution)
-- **Infrastructure**: v0.25.0+ (HetznerCloud Adapter Coverage, FlyMachines Adapter Coverage, Orchestrator Test Coverage, AWS Adapter Coverage, Azure & Vercel Coverage)
+- **Infrastructure**: v0.25.0+ (CloudRunAdapter Test Coverage, Storage Adapter Test Coverage, CloudRun and Local Adapter Coverage Expansion, SyncWorkspace Coverage Expansion)
 
 ### AI Integration
 - **Studio MCP Server**: Inspect, create, and render compositions via LLM tools (Done)
