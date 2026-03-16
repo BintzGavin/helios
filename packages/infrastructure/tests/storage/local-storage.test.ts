@@ -211,5 +211,37 @@ describe('LocalStorageAdapter', () => {
 
       await expect(adapter.deleteJobSpec(jobId, remoteUrl)).rejects.toThrow(/Path traversal detected/);
     });
+
+    it('should throw an error if fs.rm fails with a code other than ENOENT', async () => {
+      const jobId = 'job-123';
+      const remoteUrl = `local://${path.join(storageDir, jobId, 'job.json')}`;
+
+      // Simulate a permission error
+      const mockRm = async () => { throw Object.assign(new Error('EACCES'), { code: 'EACCES' }); };
+      const originalRm = fs.rm;
+      fs.rm = mockRm as any;
+
+      try {
+        await expect(adapter.deleteJobSpec(jobId, remoteUrl)).rejects.toThrow('EACCES');
+      } finally {
+        fs.rm = originalRm;
+      }
+    });
+
+    it('should swallow ENOENT error during deletion', async () => {
+      const jobId = 'job-123';
+      const remoteUrl = `local://${path.join(storageDir, jobId, 'job.json')}`;
+
+      // Simulate file already deleted
+      const mockRm = async () => { throw Object.assign(new Error('ENOENT'), { code: 'ENOENT' }); };
+      const originalRm = fs.rm;
+      fs.rm = mockRm as any;
+
+      try {
+        await expect(adapter.deleteJobSpec(jobId, remoteUrl)).resolves.toBeUndefined();
+      } finally {
+        fs.rm = originalRm;
+      }
+    });
   });
 });
