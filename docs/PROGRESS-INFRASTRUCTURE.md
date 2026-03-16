@@ -1,5 +1,8 @@
 # INFRASTRUCTURE PROGRESS
 
+## INFRASTRUCTURE v0.53.37
+- ✅ Completed: S3StorageAdapter Coverage - Expanded test coverage for `S3StorageAdapter` to 100% by handling missing object keys and empty directories on download and deletion.
+
 ## INFRASTRUCTURE v0.53.36
 - ✅ Completed: CloudRunAdapter Coverage - Closed obsolete implementation plan as `CloudRunAdapter` test coverage was already completed in v0.53.32.
 
