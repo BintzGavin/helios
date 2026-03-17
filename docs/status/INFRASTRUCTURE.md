@@ -1,7 +1,8 @@
 # INFRASTRUCTURE STATUS
-**Version**: 0.53.39
+**Version**: 0.54.0
 
 ## Status Log
+- [v0.54.0] ✅ Completed: Quickstart Documentation - Created spec to add a Quickstart guide to the README.md to help users bootstrap distributed rendering jobs.
 - [v0.53.39] ✅ Completed: Worker Coverage - Closed obsolete implementation plan as test coverage for `cloudrun-server`, `render-executor`, and `worker-runtime` is already 100%.
 - [v0.53.38] ✅ Completed: CloudRun and Local Adapter Coverage - Closed obsolete implementation plan as test coverage for `CloudRunAdapter` and `LocalWorkerAdapter` is already 100%.
 - [v0.53.37] ✅ Completed: S3StorageAdapter Coverage - Expanded test coverage for `S3StorageAdapter` to 100% by handling missing object keys and empty directories on download and deletion.
