@@ -450,6 +450,19 @@ describe('BridgeController', () => {
         expect(result).toEqual({ foo: 'bar' });
     });
 
+    it('should timeout getSchema via bridge', async () => {
+        vi.useFakeTimers();
+        const promise = controller.getSchema();
+
+        expect(mockWindow.postMessage).toHaveBeenCalledWith({ type: 'HELIOS_GET_SCHEMA' }, '*');
+
+        vi.advanceTimersByTime(5000);
+
+        const result = await promise;
+        expect(result).toBeUndefined();
+        vi.useRealTimers();
+    });
+
     it('should notify error subscribers on HELIOS_ERROR', () => {
         const spy = vi.fn();
         const cleanup = controller.onError(spy);
@@ -516,5 +529,17 @@ describe('BridgeController', () => {
 
         const result = await promise;
         expect(result).toEqual(mockReport);
+    });
+
+    it('should timeout get diagnostics via bridge', async () => {
+        vi.useFakeTimers();
+        const promise = controller.diagnose();
+
+        expect(mockWindow.postMessage).toHaveBeenCalledWith({ type: 'HELIOS_DIAGNOSE' }, '*');
+
+        vi.advanceTimersByTime(5000);
+
+        await expect(promise).rejects.toThrow('Timeout waiting for diagnostics');
+        vi.useRealTimers();
     });
 });
