@@ -2,12 +2,15 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { connectToParent } from './bridge';
 
+const mockFaderEnable = vi.fn();
+const mockFaderDisable = vi.fn();
+
 // Mock AudioFader
 vi.mock('./features/audio-fader', () => ({
     AudioFader: class {
         connect = vi.fn();
-        enable = vi.fn();
-        disable = vi.fn();
+        enable = mockFaderEnable;
+        disable = mockFaderDisable;
         dispose = vi.fn();
     }
 }));
@@ -28,6 +31,19 @@ vi.mock('./features/dom-capture', () => ({
 vi.mock('./features/audio-utils', () => ({
     getAudioAssets: vi.fn()
 }));
+
+// Mock audio-metering
+vi.mock('./features/audio-metering', () => {
+    return {
+        AudioMeter: class {
+            connect = vi.fn();
+            enable = vi.fn();
+            disable = vi.fn();
+            getLevels = vi.fn().mockReturnValue([0.5, 0.5]);
+            dispose = vi.fn();
+        }
+    };
+});
 
 describe('connectToParent', () => {
     let mockHelios: any;
@@ -54,7 +70,10 @@ describe('connectToParent', () => {
             setMarkers: vi.fn(),
             getState: vi.fn().mockReturnValue({}),
             subscribe: vi.fn(),
-            schema: {}
+            schema: { type: 'object' }
+        };
+        (mockHelios.constructor as any) = {
+            diagnose: vi.fn().mockResolvedValue({ status: 'ok' })
         };
 
         // Mock window.addEventListener
@@ -161,5 +180,61 @@ describe('connectToParent', () => {
 
         triggerMessage({ type: 'HELIOS_SET_DURATION', duration: 10 }, maliciousSource);
         expect(mockHelios.setDuration).not.toHaveBeenCalled();
+    });
+
+    it('should handle HELIOS_GET_SCHEMA message', () => {
+        connectToParent(mockHelios);
+        triggerMessage({ type: 'HELIOS_GET_SCHEMA' }, window.parent);
+
+        expect(parentPostMessage).toHaveBeenCalledWith(
+            expect.objectContaining({ type: 'HELIOS_SCHEMA', schema: { type: 'object' } }),
+            '*'
+        );
+    });
+
+    it('should handle HELIOS_START_METERING and HELIOS_STOP_METERING messages', () => {
+        vi.useFakeTimers();
+        connectToParent(mockHelios);
+
+        triggerMessage({ type: 'HELIOS_START_METERING' }, window.parent);
+        vi.advanceTimersByTime(16); // allow raf to fire
+
+        // Since AudioMeter is mocked, we verify that postMessage receives HELIOS_AUDIO_LEVELS
+        expect(parentPostMessage).toHaveBeenCalledWith(
+            expect.objectContaining({ type: 'HELIOS_AUDIO_LEVELS', levels: [0.5, 0.5] }),
+            '*'
+        );
+
+        triggerMessage({ type: 'HELIOS_STOP_METERING' }, window.parent);
+        vi.useRealTimers();
+    });
+
+    it('should handle HELIOS_DIAGNOSE message', async () => {
+        const { Helios } = await import('@helios-project/core');
+        Helios.diagnose = vi.fn().mockResolvedValue({ status: 'ok' });
+
+        connectToParent(mockHelios);
+        triggerMessage({ type: 'HELIOS_DIAGNOSE' }, window.parent);
+
+        // Allow async promise to resolve
+        await new Promise(r => setTimeout(r, 0));
+
+        expect(parentPostMessage).toHaveBeenCalledWith(
+            expect.objectContaining({ type: 'HELIOS_DIAGNOSE_RESULT', report: { status: 'ok' } }),
+            '*'
+        );
+    });
+
+    it('should update AudioFader based on play state from subscribe callback', () => {
+        connectToParent(mockHelios);
+
+        // extract the subscribed callback
+        const subscribeCallback = mockHelios.subscribe.mock.calls[0][0];
+
+        subscribeCallback({ isPlaying: true });
+        expect(mockFaderEnable).toHaveBeenCalled();
+
+        subscribeCallback({ isPlaying: false });
+        expect(mockFaderDisable).toHaveBeenCalled();
     });
 });

@@ -1,6 +1,6 @@
 # Context: PLAYER
 
-**Version**: v0.76.21
+**Version**: v0.76.23
 
 ## Section A: Component Structure
 
