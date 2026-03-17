@@ -1,6 +1,6 @@
 # Status: LLMS
 
-**Version**: 1.43.0
+**Version**: 1.44.0
 
 - **Status**: Active
 - **Current Focus**: Comprehensive Review and Maintenance
@@ -53,3 +53,4 @@
 [v1.3.0] ✅ Completed: Comprehensive Daily Review - Updated Studio roadmap details to v0.48+ (Timeline Polish, Safe Areas).
 [v1.2.0] ✅ Completed: Comprehensive Daily Review - Refined Roadmap to distinguish completed vs planned V1 features, updated Status to match README, and verified Core API examples.
 [v1.1.0] ✅ Completed: Comprehensive Daily Review - Updated package names to `@helios-project`, revised Core API example to match v1.33.0, added Studio and CLI packages, and updated roadmap.
+[v1.44.0] ✅ Completed: Daily llms.txt Review - Updated Quick Facts and Roadmap to reflect latest versions (Studio v0.118.7+, Player v0.76.22+, Renderer v1.80.0+, CLI v0.37.3+, Infrastructure v0.54.2+).
