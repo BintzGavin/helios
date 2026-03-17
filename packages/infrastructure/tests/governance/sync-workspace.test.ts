@@ -114,4 +114,138 @@ describe('syncWorkspaceDependencies', () => {
 
     await expect(syncWorkspaceDependencies({ rootDir })).rejects.toThrow('EACCES');
   });
+
+  it('should not process a package.json missing name or version', async () => {
+    const rootDir = '/virtual/repo';
+
+    const mockEntries = [
+      { name: 'pkg-a', isDirectory: () => true },
+    ];
+
+    const mockPkgA = {
+      // missing name and version
+      dependencies: {
+        'external-pkg': '^2.0.0',
+      },
+    };
+
+    (fs.readdir as any).mockResolvedValue(mockEntries);
+
+    (fs.readFile as any).mockImplementation((filepath: string) => {
+      if (filepath.includes('pkg-a')) {
+        return Promise.resolve(JSON.stringify(mockPkgA));
+      }
+      return Promise.reject(Object.assign(new Error('ENOENT'), { code: 'ENOENT' }));
+    });
+
+    await syncWorkspaceDependencies({ rootDir });
+
+    expect(fs.writeFile).not.toHaveBeenCalled();
+  });
+
+  it('should not write file if dependencies are already matched', async () => {
+    const rootDir = '/virtual/repo';
+
+    const mockEntries = [
+      { name: 'pkg-a', isDirectory: () => true },
+      { name: 'pkg-b', isDirectory: () => true },
+    ];
+
+    const mockPkgA = {
+      name: '@helios-project/pkg-a',
+      version: '1.2.3',
+      dependencies: {
+        '@helios-project/pkg-b': '^2.5.0', // Already matching
+      },
+    };
+
+    const mockPkgB = {
+      name: '@helios-project/pkg-b',
+      version: '2.5.0',
+    };
+
+    (fs.readdir as any).mockResolvedValue(mockEntries);
+
+    (fs.readFile as any).mockImplementation((filepath: string) => {
+      if (filepath.includes('pkg-a')) {
+        return Promise.resolve(JSON.stringify(mockPkgA));
+      }
+      if (filepath.includes('pkg-b')) {
+        return Promise.resolve(JSON.stringify(mockPkgB));
+      }
+      return Promise.reject(Object.assign(new Error('ENOENT'), { code: 'ENOENT' }));
+    });
+
+    await syncWorkspaceDependencies({ rootDir });
+
+    expect(fs.writeFile).not.toHaveBeenCalled();
+  });
+
+  it('should throw an error if JSON.parse throws a non-ENOENT error inside the discovery loop', async () => {
+    const rootDir = '/virtual/repo';
+
+    const mockEntries = [
+      { name: 'pkg-a', isDirectory: () => true },
+    ];
+
+    (fs.readdir as any).mockResolvedValue(mockEntries);
+
+    (fs.readFile as any).mockImplementation((filepath: string) => {
+      if (filepath.includes('pkg-a')) {
+        return Promise.resolve('{ invalid json');
+      }
+      return Promise.reject(Object.assign(new Error('ENOENT'), { code: 'ENOENT' }));
+    });
+
+    await expect(syncWorkspaceDependencies({ rootDir })).rejects.toThrow();
+  });
+
+  it('should ignore ENOENT error inside the discovery loop', async () => {
+    const rootDir = '/virtual/repo';
+
+    const mockEntries = [
+      { name: 'pkg-a', isDirectory: () => true }, // Missing package.json
+      { name: 'pkg-b', isDirectory: () => true }, // Has package.json
+    ];
+
+    const mockPkgB = {
+      name: '@helios-project/pkg-b',
+      version: '2.5.0',
+    };
+
+    (fs.readdir as any).mockResolvedValue(mockEntries);
+
+    (fs.readFile as any).mockImplementation((filepath: string) => {
+      if (filepath.includes('pkg-b')) {
+        return Promise.resolve(JSON.stringify(mockPkgB));
+      }
+      return Promise.reject(Object.assign(new Error('ENOENT'), { code: 'ENOENT' }));
+    });
+
+    await syncWorkspaceDependencies({ rootDir });
+
+    // Ensure it continued to process pkg-b despite pkg-a throwing ENOENT
+    expect(fs.writeFile).not.toHaveBeenCalled(); // nothing to update, but no error thrown
+  });
+
+  it('should throw an error if readFile throws a non-ENOENT error inside the discovery loop', async () => {
+    const rootDir = '/virtual/repo';
+
+    const mockEntries = [
+      { name: 'pkg-a', isDirectory: () => true },
+    ];
+
+    (fs.readdir as any).mockResolvedValue(mockEntries);
+
+    (fs.readFile as any).mockImplementation((filepath: string) => {
+      if (filepath.includes('pkg-a')) {
+        const error = new Error('EPERM');
+        (error as any).code = 'EPERM';
+        return Promise.reject(error);
+      }
+      return Promise.reject(Object.assign(new Error('ENOENT'), { code: 'ENOENT' }));
+    });
+
+    await expect(syncWorkspaceDependencies({ rootDir })).rejects.toThrow('EPERM');
+  });
 });
