@@ -96,7 +96,7 @@ This backlog tracks concrete deliverables derived from [`AGENTS.md`](../AGENTS.m
   - **Goal**: Ensure GSAP timelines are correctly synchronized during frame capture.
   - **Verification**: `examples/promo-video` must render correctly with all scenes visible.
 
-- [ ] **Documentation**: Add Quickstart guide.
+- [x] **Documentation**: Add Quickstart guide.
 - [x] ⛔ Renderer Verification Blocked: packages/studio dependency mismatch
 
 ## PLAYER Agent Status

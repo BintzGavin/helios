@@ -11,6 +11,65 @@ This package provides the infrastructure for distributed rendering, including:
 
 ## Features
 
+### Quickstart
+
+Here is a quick example of how to configure and submit a distributed rendering job using the local worker adapter (useful for testing). For production, simply swap `LocalWorkerAdapter` with `AwsLambdaAdapter` or another cloud adapter.
+
+```typescript
+import {
+  JobManager,
+  JobExecutor,
+  LocalWorkerAdapter,
+  FileJobRepository
+} from '@helios-project/infrastructure';
+import { randomUUID } from 'crypto';
+
+async function quickstart() {
+  // 1. Initialize State Repository (stores job status)
+  const repository = new FileJobRepository('/tmp/helios-jobs');
+
+  // 2. Initialize Cloud Adapter (executes the actual rendering)
+  // For production, replace this with new AwsLambdaAdapter({ ... })
+  const workerAdapter = new LocalWorkerAdapter();
+
+  // 3. Initialize Executor (distributes chunks to the adapter)
+  const executor = new JobExecutor(workerAdapter);
+
+  // 4. Initialize Job Manager (the orchestrator)
+  const jobManager = new JobManager(repository, executor);
+
+  // 5. Submit a Job
+  const jobId = await jobManager.submitJob({
+    id: randomUUID(),
+    metadata: {
+      totalFrames: 100,
+      fps: 30,
+      width: 1920,
+      height: 1080,
+      duration: 3.33
+    },
+    chunks: [
+      {
+        id: 0,
+        startFrame: 0,
+        frameCount: 100,
+        outputFile: '/tmp/helios-output/chunk_0.mp4',
+        command: 'node -e "console.log(\'Rendering chunk 0...\')"'
+      }
+    ],
+    mergeCommand: 'node -e "console.log(\'Merging chunks...\')"'
+  });
+
+  console.log(`Job submitted! ID: ${jobId}`);
+
+  // 6. Monitor Status
+  const status = await jobManager.getJob(jobId);
+  console.log(`Current State: ${status?.state}`);
+}
+
+quickstart().catch(console.error);
+```
+
 ### Video Stitching
 
 Video stitching abstractions handle concatenating rendered segments into a single final video without re-encoding. This is crucial for performance after a distributed render.

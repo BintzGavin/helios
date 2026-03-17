@@ -1,5 +1,11 @@
 # INFRASTRUCTURE PROGRESS
 
+## INFRASTRUCTURE v0.54.1
+- ✅ Completed: Quickstart Documentation Implementation - Added a Quickstart guide to `packages/infrastructure/README.md` to help users bootstrap distributed rendering jobs.
+
+## INFRASTRUCTURE v0.54.0
+- ✅ Completed: Quickstart Documentation - Created spec to add a Quickstart guide to the README.md to help users bootstrap distributed rendering jobs.
+
 ## INFRASTRUCTURE v0.53.39
 - ✅ Completed: Worker Coverage - Closed obsolete implementation plan as test coverage for `cloudrun-server`, `render-executor`, and `worker-runtime` is already 100%.
 
