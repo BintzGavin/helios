@@ -84,6 +84,22 @@ describe('FlyMachinesAdapter', () => {
     await expect(adapter.execute(job)).rejects.toThrow('Failed to create Fly Machine: 500 Internal Server Error Error creating machine');
   });
 
+  it('should handle text parsing failure when machine creation fails', async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: false,
+      status: 400,
+      statusText: 'Bad Request',
+      text: async () => { throw new Error('Text parsing error'); },
+    } as Response);
+
+    const job = {
+      command: 'node',
+      meta: { jobDefUrl: 'http://test.com/job.json', chunkIndex: 0 },
+    };
+
+    await expect(adapter.execute(job)).rejects.toThrow('Failed to create Fly Machine: 400 Bad Request ');
+  });
+
   it('should continue polling if poll response is not ok (e.g., transient network error)', async () => {
     mockFetch
       .mockResolvedValueOnce({
@@ -124,6 +140,28 @@ describe('FlyMachinesAdapter', () => {
       .mockResolvedValueOnce({
         ok: true,
       } as Response); // Delete
+
+    const job = {
+      command: 'node',
+      meta: { jobDefUrl: 'http://test.com/job.json', chunkIndex: 0 },
+    };
+
+    const result = await adapter.execute(job);
+    expect(result.exitCode).toBe(0);
+    expect(mockFetch).toHaveBeenCalledTimes(3);
+  });
+
+  it('should ignore errors during machine cleanup', async () => {
+    mockFetch
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ id: 'machine-123' }),
+      } as Response) // Create
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ state: 'stopped', events: [{ request: { exit_event: { exit_code: 0 } } }] }),
+      } as Response) // Poll
+      .mockRejectedValueOnce(new Error('Cleanup network error')); // Delete fails
 
     const job = {
       command: 'node',

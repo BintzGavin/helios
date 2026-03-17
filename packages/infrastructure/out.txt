@@ -1,0 +1,29 @@
+
+> @helios-project/infrastructure@0.25.0 test
+> vitest --coverage tests/adapters/fly-machines-adapter.test.ts
+
+
+[1m[46m RUN [49m[22m [36mv4.1.0 [39m[90m/app/packages/infrastructure[39m
+      [2mCoverage enabled with [22m[33mv8[39m
+
+(node:2653) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///app/postcss.config.js?t=1773765553856 is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /app/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ [32m✓[39m tests/adapters/fly-machines-adapter.test.ts [2m([22m[2m7 tests[22m[2m)[22m[33m 6021[2mms[22m[39m
+     [33m[2m✓[22m[39m should create, poll, and delete a machine [33m 2007[2mms[22m[39m
+     [33m[2m✓[22m[39m should continue polling if poll response is not ok (e.g., transient network error) [33m 2003[2mms[22m[39m
+     [33m[2m✓[22m[39m should handle abort signal [33m 2002[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m1 passed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[32m7 passed[39m[22m[90m (7)[39m
+[2m   Start at [22m 16:39:13
+[2m   Duration [22m 6.49s[2m (transform 66ms, setup 0ms, import 80ms, tests 6.02s, environment 0ms)[22m
+
+[34m % [39m[2mCoverage report from [22m[33mv8[39m
+-------------------|---------|----------|---------|---------|-------------------
+File               | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s
+-------------------|---------|----------|---------|---------|-------------------
+All files          |   97.14 |      100 |   83.33 |     100 |
+ ...nes-adapter.ts |   97.14 |      100 |   83.33 |     100 |
+-------------------|---------|----------|---------|---------|-------------------
