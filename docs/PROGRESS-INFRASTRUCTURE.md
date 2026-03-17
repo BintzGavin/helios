@@ -1,5 +1,9 @@
 # INFRASTRUCTURE PROGRESS
 
+## INFRASTRUCTURE v0.54.9
+- ✅ Completed: HetznerCloudAdapter Coverage - Closed obsolete implementation plan as test coverage for `HetznerCloudAdapter` is already 100%.
+
+
 ## INFRASTRUCTURE v0.54.8
 - ✅ Completed: Document FlyMachinesAdapter - Added FlyMachinesAdapter details to the Cloud Execution Adapters section of the README and marked it complete in the backlog.
 
