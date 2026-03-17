@@ -1,3 +1,6 @@
+### STUDIO v0.118.8
+- ✅ Completed: Enhance MCP Server - Obsolete plan removed as MCP Server features already exist
+
 ### STUDIO v0.118.7
 - ✅ Completed: Close obsolete Regression Tests plan
 

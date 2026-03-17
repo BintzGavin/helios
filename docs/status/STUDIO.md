@@ -1,4 +1,4 @@
-**Version**: 0.118.7
+**Version**: 0.118.8
 
 **Posture**: ACTIVELY EXPANDING FOR V2
 
@@ -11,6 +11,7 @@
 > **Note**: Status versions in this file may precede package release versions (`package.json`). Always verify `package.json` for the currently installed version.
 
 ## Recent Updates
+- [v0.118.8] ✅ Completed: Enhance MCP Server - Obsolete plan removed as MCP Server features already exist
 - [v0.118.7] ✅ Completed: Close obsolete Regression Tests plan
 - [v0.118.6] ✅ Completed: TimelineAudioTrack Regression Tests - Added vitest regression tests for TimelineAudioTrack and useAudioWaveform
 - [v0.118.5] ✅ Completed: Timeline Audio Regression Refinements - Refined JSDoc, inline comments, and minor clarity updates to TimelineAudioTrack and useAudioWaveform implementation following testing.
