@@ -1,5 +1,8 @@
 # INFRASTRUCTURE PROGRESS
 
+## INFRASTRUCTURE v0.54.8
+- ✅ Completed: Document FlyMachinesAdapter - Added FlyMachinesAdapter details to the Cloud Execution Adapters section of the README and marked it complete in the backlog.
+
 ## INFRASTRUCTURE v0.54.7
 - ✅ Completed: SyncWorkspace Coverage - Expanded test coverage to 100% for `syncWorkspaceDependencies`.
 

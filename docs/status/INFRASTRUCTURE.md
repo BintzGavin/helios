@@ -1,7 +1,8 @@
 # INFRASTRUCTURE STATUS
-**Version**: 0.54.7
+**Version**: 0.54.8
 
 ## Status Log
+- [v0.54.8] ✅ Completed: Document FlyMachinesAdapter - Added FlyMachinesAdapter details to the Cloud Execution Adapters section of the README and marked it complete in the backlog.
 - [v0.54.7] ✅ Completed: SyncWorkspace Coverage - Expanded test coverage to 100% for `syncWorkspaceDependencies`.
 - [v0.54.6] ✅ Completed: FlyMachinesAdapter Coverage Refinement - Expanded test coverage to 100% for `FlyMachinesAdapter` error handling edge cases (text parsing failures during creation and fetch errors during cleanup).
 - [v0.54.5] ✅ Completed: Orchestrator Test Coverage - Expanded test coverage for JobManager and JobExecutor to 100%.

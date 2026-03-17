@@ -34,7 +34,7 @@ This backlog tracks concrete deliverables derived from [`AGENTS.md`](../AGENTS.m
   - **Dependencies**: None (uses `fetch`).
   - **Files**: `packages/infrastructure/src/adapters/azure-functions-adapter.ts`, test, example, benchmark.
 
-- [ ] **Cloud execution adapter (Fly.io Machines).**
+- [x] **Cloud execution adapter (Fly.io Machines).**
   - Machines API can start/stop VMs on demand—true pay-per-frame. GPU Machines available for WebGL-heavy compositions.
   - **Adapter pattern**: REST API to create Machine → poll for exit → collect output.
   - **Auth**: Bearer token via `FLY_API_TOKEN`.
