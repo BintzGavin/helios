@@ -1,6 +1,6 @@
 # CLI Status
 
-**Version**: 0.37.3
+**Version**: 0.37.4
 
 ## Current State
 
@@ -41,6 +41,7 @@ Per AGENTS.md, the CLI is "ACTIVELY EXPANDING FOR V2" with focus on:
 
 ## History
 
+[v0.37.4] ✅ Completed: Add Command Regression Tests - Implemented comprehensive unit tests for helios add.
 [v0.37.3] ✅ Completed: CLI Merge Regression Tests - Verified existing regression tests for helios merge command
 [v0.37.2] ✅ Merge Command Regression Tests Complete - Added missing regression test for `transcodeMerge` error handling in the `helios merge` command.
 [v0.37.1] ✅ List Command Regression Tests - Implemented comprehensive unit tests for `helios list`.
