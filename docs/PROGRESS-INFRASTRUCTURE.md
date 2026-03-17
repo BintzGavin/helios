@@ -1,5 +1,8 @@
 # INFRASTRUCTURE PROGRESS
 
+## INFRASTRUCTURE v0.54.3
+- ✅ Completed: Document Cloudflare Workers Adapter - Documented the `CloudflareWorkersAdapter` in the README's Cloud Execution Adapters section.
+
 ## INFRASTRUCTURE v0.54.1
 - ✅ Completed: Quickstart Documentation Implementation - Added a Quickstart guide to `packages/infrastructure/README.md` to help users bootstrap distributed rendering jobs.
 

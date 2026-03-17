@@ -1,7 +1,8 @@
 # INFRASTRUCTURE STATUS
-**Version**: 0.54.2
+**Version**: 0.54.3
 
 ## Status Log
+- [v0.54.3] ✅ Completed: Document Cloudflare Workers Adapter - Documented the `CloudflareWorkersAdapter` in the README's Cloud Execution Adapters section.
 - [v0.54.2] ✅ Completed: FlyMachinesAdapter Coverage Expansion Spec - Created a spec to expand test coverage to 100% for `FlyMachinesAdapter` error handling edge cases.
 - [v0.54.1] ✅ Completed: Quickstart Documentation Implementation - Added a Quickstart guide to `packages/infrastructure/README.md` to help users bootstrap distributed rendering jobs.
 - [v0.54.0] ✅ Completed: Quickstart Documentation - Created spec to add a Quickstart guide to the README.md to help users bootstrap distributed rendering jobs.
