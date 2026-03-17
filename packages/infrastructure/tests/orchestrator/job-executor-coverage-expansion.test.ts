@@ -120,6 +120,35 @@ describe('JobExecutor Coverage Expansion', () => {
     await expect(executor.execute(spec)).rejects.toThrow('Job execution failed: Unknown error');
   });
 
+  it('should throw the promise rejection reason if no explicit failures are captured', async () => {
+    const mockAdapter: WorkerAdapter = {
+      execute: vi.fn().mockResolvedValue({ exitCode: 0, stdout: '', stderr: '' })
+    };
+    const executor = new JobExecutor(mockAdapter);
+    const spec: JobSpec = { id: 'test-job', chunks: [], metadata: { totalFrames: 10, fps: 30, width: 100, height: 100, duration: 1 }, mergeCommand: '' };
+
+    // Hack internal Promise.allSettled to simulate a rejected promise with a specific reason
+    vi.spyOn(Promise, 'allSettled').mockResolvedValueOnce([{ status: 'rejected', reason: new Error('Simulated rejection reason') }] as any);
+
+    await expect(executor.execute(spec)).rejects.toThrow('Simulated rejection reason');
+  });
+
+  it('should explicitly skip merge when skipMerge is true and mergeCommand is undefined', async () => {
+    const mockAdapter: WorkerAdapter = {
+      execute: vi.fn().mockResolvedValue({ exitCode: 0, stdout: '', stderr: '' })
+    };
+    const executor = new JobExecutor(mockAdapter);
+    const spec: JobSpec = { id: 'test-job', chunks: [{ id: 1, startFrame: 0, frameCount: 10, outputFile: 'out.mp4', command: 'cmd' }], metadata: { totalFrames: 10, fps: 30, width: 100, height: 100, duration: 1 }, mergeCommand: undefined as any };
+
+    // Clear the mock so we only see the logs from this test
+    const consoleLogSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    consoleLogSpy.mockClear();
+
+    await executor.execute(spec, { skipMerge: true, outputFile: 'foo' });
+
+    expect(consoleLogSpy).toHaveBeenCalledWith('Skipping merge step (disabled in options).');
+  });
+
   it('should immediately abort chunk execution if abort signal is already triggered', async () => {
     const mockAdapter: WorkerAdapter = {
       execute: vi.fn().mockResolvedValue({ exitCode: 0, stdout: '', stderr: '' })
