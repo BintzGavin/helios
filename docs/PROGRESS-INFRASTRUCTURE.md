@@ -1,5 +1,9 @@
 # INFRASTRUCTURE PROGRESS
 
+## INFRASTRUCTURE v0.54.12
+- ✅ Completed: Document Remaining Adapters - Added documentation for the remaining cloud execution adapters to the README.
+
+
 ## INFRASTRUCTURE v0.54.11
 - ✅ Completed: Orchestrator Test Coverage Expansion - Improved branch coverage for job manager and executor.
 
