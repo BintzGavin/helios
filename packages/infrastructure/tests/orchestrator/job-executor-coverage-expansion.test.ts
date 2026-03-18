@@ -195,4 +195,62 @@ describe('JobExecutor Coverage Expansion', () => {
         command: 'cmd2',
     }));
   });
+
+  it('should throw Error if mergeCommand execution returns non-zero exit code', async () => {
+    const mockAdapter: WorkerAdapter = {
+      execute: vi.fn().mockResolvedValue({ exitCode: 0, stdout: '', stderr: '' })
+    };
+    const executor = new JobExecutor(mockAdapter);
+    const spec: JobSpec = { id: 'test-job', chunks: [{ id: 1, startFrame: 0, frameCount: 10, outputFile: 'out.mp4', command: 'cmd' }], metadata: { totalFrames: 10, fps: 30, width: 100, height: 100, duration: 1 }, mergeCommand: 'merge-cmd' };
+
+    const mockMergeAdapter = { execute: vi.fn().mockResolvedValue({ exitCode: 1, stdout: '', stderr: 'Merge error' }) };
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    await expect(executor.execute(spec, {
+      mergeAdapter: mockMergeAdapter as any,
+      outputFile: 'merged.mp4'
+    })).rejects.toThrow('Merge failed with exit code 1: Merge error');
+
+    expect(console.error).toHaveBeenCalledWith('Merge step failed:', 'Merge failed with exit code 1: Merge error');
+  });
+
+  it('should fallback to this.adapter for merge if options.mergeAdapter is omitted', async () => {
+    const mockAdapter: WorkerAdapter = {
+      execute: vi.fn().mockResolvedValue({ exitCode: 0, stdout: '', stderr: '' })
+    };
+    const executor = new JobExecutor(mockAdapter);
+    const spec: JobSpec = { id: 'test-job', chunks: [], metadata: { totalFrames: 10, fps: 30, width: 100, height: 100, duration: 1 }, mergeCommand: 'merge-cmd' };
+
+    await executor.execute(spec);
+
+    expect(mockAdapter.execute).toHaveBeenCalledWith(expect.objectContaining({
+        command: 'merge-cmd',
+    }));
+  });
+
+  it('should immediately abort chunk execution if abort signal is triggered during retry timeout wait', async () => {
+    const mockAdapter: WorkerAdapter = {
+      execute: vi.fn().mockRejectedValue(new Error('Retry error'))
+    };
+    const executor = new JobExecutor(mockAdapter);
+    const spec: JobSpec = { id: 'test-job', chunks: [{ id: 1, startFrame: 0, frameCount: 10, outputFile: 'out.mp4', command: 'cmd' }], metadata: { totalFrames: 10, fps: 30, width: 100, height: 100, duration: 1 }, mergeCommand: '' };
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+    const controller = new AbortController();
+
+    // In executor.ts line 147 it waits for timeout, and then checks if aborted
+    // We will abort *after* the execution promise resolves in rejection, so it hits the retry delay catch block.
+    // The previous test "should clear timeout when aborted during retry wait" tests line 144, but not the check at 148.
+    // To ensure line 148 is hit, we need the timeout promise to resolve (the timeout happens), and then after it resolves, check if aborted.
+    // Since the event listener resolves the promise early and clears timeout, the check at 148 relies on `aborted` being true.
+    mockAdapter.execute = vi.fn().mockImplementationOnce(async () => {
+      // Setup a background task to abort the controller after a short delay,
+      // but before the retryDelay finishes, triggering the abort event listener,
+      // or right when it wakes up.
+      setTimeout(() => controller.abort(), 10);
+      throw new Error('Retry error');
+    });
+
+    await expect(executor.execute(spec, { retries: 1, retryDelay: 50, signal: controller.signal })).rejects.toThrow('Job aborted');
+  });
 });
