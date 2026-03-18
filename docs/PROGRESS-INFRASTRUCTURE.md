@@ -1,5 +1,9 @@
 # INFRASTRUCTURE PROGRESS
 
+## INFRASTRUCTURE v0.54.13
+- ✅ Completed: Vercel Azure Adapter Coverage - Improved test coverage to 100%
+
+
 ## INFRASTRUCTURE v0.54.12
 - ✅ Completed: Document Remaining Adapters - Added documentation for the remaining cloud execution adapters to the README.
 
