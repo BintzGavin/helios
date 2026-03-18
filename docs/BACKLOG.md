@@ -19,7 +19,7 @@ This backlog tracks concrete deliverables derived from [`AGENTS.md`](../AGENTS.m
 
 #### Tier 1 — High Impact, Low Friction
 
-- [ ] **Cloud execution adapter (Cloudflare Workers).**
+- [x] **Cloud execution adapter (Cloudflare Workers).**
   - Already the platform SwirlBot runs on. Sub-50ms cold starts.
   - **Adapter pattern**: HTTP POST to Worker route with `{ jobPath, chunkIndex }` payload.
   - **Auth**: Cloudflare service token header or mTLS.
@@ -51,7 +51,7 @@ This backlog tracks concrete deliverables derived from [`AGENTS.md`](../AGENTS.m
   - **Dependencies**: `@kubernetes/client-node`.
   - **Files**: `packages/infrastructure/src/adapters/kubernetes-adapter.ts`, test, example, benchmark.
 
-- [ ] **Cloud execution adapter (Docker / Local Swarm).**
+- [x] **Cloud execution adapter (Docker / Local Swarm).**
   - Distributed rendering across local Docker containers. Perfect for on-prem or CI pipelines.
   - **Adapter pattern**: `docker run` with job spec via env vars or mounted volume (similar to `LocalWorkerAdapter` using `spawn`).
   - **Auth**: Local Docker socket.
@@ -61,9 +61,9 @@ This backlog tracks concrete deliverables derived from [`AGENTS.md`](../AGENTS.m
 #### Tier 3 — Future / Track
 
 - [x] Cloud execution adapter (Modal) — Python-native serverless with first-class GPU support.
-- [ ] Cloud execution adapter (Deno Deploy) — Emerging edge platform with native TS.
+- [x] Cloud execution adapter (Deno Deploy) — Emerging edge platform with native TS.
 - [x] Cloud execution adapter (Vercel Functions) — Huge Next.js ecosystem overlap; 10s timeout is challenging.
-- [ ] Cloud execution adapter (Hetzner Cloud) — Extremely cost-effective EU compute via API-driven VM provisioning.
+- [x] Cloud execution adapter (Hetzner Cloud) — Extremely cost-effective EU compute via API-driven VM provisioning.
 
 
 ## Component Registry
