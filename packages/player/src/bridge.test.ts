@@ -61,6 +61,8 @@ describe('connectToParent', () => {
             clearPlaybackRange: vi.fn(),
             setAudioVolume: vi.fn(),
             setAudioMuted: vi.fn(),
+            setAudioTrackVolume: vi.fn(),
+            setAudioTrackMuted: vi.fn(),
             setLoop: vi.fn(),
             setInputProps: vi.fn(),
             setCaptions: vi.fn(),
@@ -108,6 +110,90 @@ describe('connectToParent', () => {
         triggerMessage({ type: 'HELIOS_PLAY' }, window.parent);
 
         expect(mockHelios.play).toHaveBeenCalled();
+
+        triggerMessage({ type: 'HELIOS_PAUSE' }, window.parent);
+        expect(mockHelios.pause).toHaveBeenCalled();
+    });
+
+    it('should process playback range setting messages', () => {
+        connectToParent(mockHelios);
+
+        triggerMessage({ type: 'HELIOS_SET_PLAYBACK_RANGE', start: 10, end: 20 }, window.parent);
+        expect(mockHelios.setPlaybackRange).toHaveBeenCalledWith(10, 20);
+
+        triggerMessage({ type: 'HELIOS_CLEAR_PLAYBACK_RANGE' }, window.parent);
+        expect(mockHelios.clearPlaybackRange).toHaveBeenCalled();
+    });
+
+    it('should process audio and volume setting messages', () => {
+        connectToParent(mockHelios);
+
+        triggerMessage({ type: 'HELIOS_SET_VOLUME', volume: 0.5 }, window.parent);
+        expect(mockHelios.setAudioVolume).toHaveBeenCalledWith(0.5);
+
+        triggerMessage({ type: 'HELIOS_SET_MUTED', muted: true }, window.parent);
+        expect(mockHelios.setAudioMuted).toHaveBeenCalledWith(true);
+
+        triggerMessage({ type: 'HELIOS_SET_AUDIO_TRACK_VOLUME', trackId: 'track1', volume: 0.8 }, window.parent);
+        expect(mockHelios.setAudioTrackVolume).toHaveBeenCalledWith('track1', 0.8);
+
+        triggerMessage({ type: 'HELIOS_SET_AUDIO_TRACK_MUTED', trackId: 'track2', muted: false }, window.parent);
+        expect(mockHelios.setAudioTrackMuted).toHaveBeenCalledWith('track2', false);
+    });
+
+    it('should process general player state messages', () => {
+        connectToParent(mockHelios);
+
+        triggerMessage({ type: 'HELIOS_SET_PLAYBACK_RATE', rate: 1.5 }, window.parent);
+        expect(mockHelios.setPlaybackRate).toHaveBeenCalledWith(1.5);
+
+        triggerMessage({ type: 'HELIOS_SET_LOOP', loop: true }, window.parent);
+        expect(mockHelios.setLoop).toHaveBeenCalledWith(true);
+
+        const props = { text: 'hello' };
+        triggerMessage({ type: 'HELIOS_SET_PROPS', props }, window.parent);
+        expect(mockHelios.setInputProps).toHaveBeenCalledWith(props);
+
+        const captions = [{ id: '1', start: 0, end: 5, text: 'caption' }];
+        triggerMessage({ type: 'HELIOS_SET_CAPTIONS', captions }, window.parent);
+        expect(mockHelios.setCaptions).toHaveBeenCalledWith(captions);
+    });
+
+    it('should handle HELIOS_SEEK and dispatch HELIOS_SEEK_DONE', async () => {
+        vi.useFakeTimers();
+        connectToParent(mockHelios);
+
+        triggerMessage({ type: 'HELIOS_SEEK', frame: 100 }, window.parent);
+        expect(mockHelios.seek).toHaveBeenCalledWith(100);
+
+        // Advance timers to trigger the nested requestAnimationFrames
+        vi.advanceTimersByTime(32); // Roughly 2 frames at 60fps
+
+        expect(parentPostMessage).toHaveBeenCalledWith(
+            expect.objectContaining({ type: 'HELIOS_SEEK_DONE', frame: 100 }),
+            '*'
+        );
+
+        vi.useRealTimers();
+    });
+
+    it('should handle HELIOS_GET_AUDIO_TRACKS and dispatch HELIOS_AUDIO_DATA', async () => {
+        const { getAudioAssets } = await import('./features/audio-utils');
+        (getAudioAssets as any).mockResolvedValue([{ id: 'track1', buffer: new ArrayBuffer(8) }]);
+
+        mockHelios.getState.mockReturnValue({ availableAudioTracks: [], audioTracks: [] });
+
+        connectToParent(mockHelios);
+        triggerMessage({ type: 'HELIOS_GET_AUDIO_TRACKS' }, window.parent);
+
+        // Allow promise to resolve
+        await new Promise(r => setTimeout(r, 0));
+
+        expect(parentPostMessage).toHaveBeenCalledWith(
+            expect.objectContaining({ type: 'HELIOS_AUDIO_DATA', assets: [{ id: 'track1', buffer: expect.any(ArrayBuffer) }] }),
+            '*',
+            [expect.any(ArrayBuffer)]
+        );
     });
 
     it('should process composition setting messages', () => {
