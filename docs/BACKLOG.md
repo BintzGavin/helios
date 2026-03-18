@@ -13,6 +13,7 @@ This backlog tracks concrete deliverables derived from [`AGENTS.md`](../AGENTS.m
 - [x] Implement RenderExecutor abstraction for pluggable execution.
 - [x] Cloud execution adapter (Google Cloud Run).
 - [x] Cloud execution adapter (AWS Lambda).
+- [x] Resiliency testing parity between cloud adapters.
 
 ### Platform Expansion
 *Expand distributed rendering beyond AWS Lambda and Google Cloud Run. All adapters implement the existing `WorkerAdapter` interface (`execute(job: WorkerJob): Promise<WorkerResult>`) in `packages/infrastructure/src/types/adapter.ts`. The `JobExecutor` orchestrator requires zero changes—new adapters are plug-and-play.*

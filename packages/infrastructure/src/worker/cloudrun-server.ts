@@ -25,8 +25,13 @@ export function createCloudRunServer(config: CloudRunServerConfig = {}) {
     }
 
     const buffers: Buffer[] = [];
-    for await (const chunk of req) {
-      buffers.push(chunk as Buffer);
+    try {
+      for await (const chunk of req) {
+        buffers.push(chunk as Buffer);
+      }
+    } catch (e: any) {
+      sendJson(res, 500, { message: `Error reading request body: ${e.message || String(e)}` });
+      return;
     }
     const bodyStr = Buffer.concat(buffers).toString('utf-8');
 
