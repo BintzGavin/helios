@@ -1,32 +1,29 @@
 #### 1. Context & Goal
-- **Objective**: Create an example script demonstrating the standalone use of `DenoDeployAdapter` for custom cloud environments.
-- **Trigger**: The V2 distributed rendering vision requires supporting diverse cloud execution environments. While the `DenoDeployAdapter` exists and is documented in the README, there is no standalone example demonstrating its integration with a mock `WorkerJob`, unlike other cloud adapters (e.g., Vercel, Cloudflare Workers).
-- **Impact**: This unlocks clear developer documentation and a verifiable reference implementation for users wanting to deploy Helios workers to Deno Deploy's edge network.
+- **Objective**: Create an example script demonstrating the usage of `DenoDeployAdapter`.
+- **Trigger**: The backlog indicates that the Deno Deploy adapter is fully implemented. However, an example demonstrating its standalone usage (`deno-deploy-adapter-example.ts`) is missing from the `packages/infrastructure/examples/` directory. Providing an example closes the documentation/example gap for this specific adapter.
+- **Impact**: Provides developers with a concrete, copy-pasteable example of how to configure and dispatch rendering jobs using the Deno Deploy cloud execution adapter.
 
 #### 2. File Inventory
-- **Create**:
-  - `packages/infrastructure/examples/deno-deploy-adapter-example.ts`: A standalone TypeScript script demonstrating how to initialize and use the `DenoDeployAdapter` with a mock job.
+- **Create**: `packages/infrastructure/examples/deno-deploy-adapter-example.ts`
 - **Modify**: None
-- **Read-Only**:
-  - `packages/infrastructure/src/adapters/deno-deploy-adapter.ts`: To understand the constructor configuration and required payload structure.
+- **Read-Only**: `packages/infrastructure/src/adapters/deno-deploy-adapter.ts`
 
 #### 3. Implementation Spec
-- **Architecture**: A simple Node.js script that instantiates a `DenoDeployAdapter` with mock configuration (`serviceUrl`, `authToken`) and constructs a mock `WorkerJob` representing a rendering chunk. It then simulates execution by invoking the `execute` method inside a `try/catch` block to handle expected network failures when no endpoint is available.
+- **Architecture**: A standalone TypeScript script in the `examples/` directory. It instantiates the `DenoDeployAdapter` with a dummy configuration (`serviceUrl`, `authToken`) and demonstrates dispatching a mocked `WorkerJob`.
 - **Pseudo-Code**:
-  - Import `DenoDeployAdapter` from `../src/adapters/deno-deploy-adapter.js`.
-  - Import `WorkerJob` from `../src/types/job.js`.
-  - Define an asynchronous `run` function.
-  - Instantiate `DenoDeployAdapter` with a mock `serviceUrl` and `authToken`.
-  - Create a mock `WorkerJob` object containing required metadata (`jobDefUrl`, `chunkId`).
-  - Call `adapter.execute(job)` inside a `try/catch` block.
-  - Log the adapter initialization and the job payload to demonstrate the expected structure.
-  - Call `run().catch(console.error)`.
-- **Public API Changes**: None.
-- **Dependencies**: None.
-- **Cloud Considerations**: This example simulates the client-side invocation; actual deployment to Deno Deploy requires a server-side handler which is out of scope for this specific example file.
+  - Import `DenoDeployAdapter` and `WorkerJob` from their respective paths.
+  - Define a `DenoDeployAdapterConfig` object with `serviceUrl: 'https://my-deno-worker.deno.dev'` and an optional `authToken`.
+  - Instantiate the adapter.
+  - Construct a mock `WorkerJob` that requires `meta.jobDefUrl` and `meta.chunkId` to satisfy the adapter's input validation constraints.
+  - Await `adapter.execute(job)` wrapped in a `try...catch` block.
+  - Gracefully handle the `fetch` error that will inevitably occur because the `serviceUrl` is mocked. Log the expected execution flow and the error.
+  - Execute the example block.
+- **Public API Changes**: None
+- **Dependencies**: None
+- **Cloud Considerations**: The example script will demonstrate the expected payload requirements (specifically `jobDefUrl` and `chunkId` in `job.meta`) necessary for the Deno Edge Worker to function correctly.
 
 #### 4. Test Plan
-- **Verification**: Run `cd packages/infrastructure && npx tsx examples/deno-deploy-adapter-example.ts`.
-- **Success Criteria**: The script executes successfully and logs the adapter instance and the mock job payload, gracefully handling the expected network failure.
-- **Edge Cases**: N/A
-- **Integration Verification**: N/A
+- **Verification**: Use the `run_in_bash_session` tool to execute `npx tsx packages/infrastructure/examples/deno-deploy-adapter-example.ts`.
+- **Success Criteria**: The script runs, successfully constructs the adapter, attempts execution, and cleanly catches the mocked network error without crashing, logging the demonstration steps.
+- **Edge Cases**: N/A for example scripts, but it must include the required `meta` fields to avoid throwing validation errors before the fetch attempt.
+- **Integration Verification**: Use the `run_in_bash_session` tool to execute `cd packages/infrastructure && npm run lint && npm run test` to verify no workspace errors were introduced.
