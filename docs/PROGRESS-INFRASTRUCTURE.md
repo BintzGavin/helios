@@ -1,4 +1,7 @@
 # INFRASTRUCTURE PROGRESS
+### INFRASTRUCTURE v0.54.16
+- ✅ Completed: Cloud Execution Adapters Documentation - Documented DockerAdapter, DenoDeployAdapter, and HetznerCloudAdapter in README.md.
+
 
 ## INFRASTRUCTURE v0.54.15
 - ✅ Completed: CloudflareWorkersAdapter Test Coverage - Closed obsolete implementation plan as test coverage for `CloudflareWorkersAdapter` is already verified at 100%.
