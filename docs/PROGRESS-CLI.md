@@ -2,6 +2,10 @@
 
 This file tracks progress for the CLI domain (`packages/cli`).
 
+## CLI v0.38.0
+
+- ✅ Completed: Scaffold Fly.io Deployment Command - Implemented helios deploy fly to scaffold fly.toml, Dockerfile, and README-FLY.md for Fly.io Machines.
+
 ## CLI v0.37.4
 
 - ✅ Completed: Add Command Regression Tests - Implemented comprehensive unit tests for helios add.
