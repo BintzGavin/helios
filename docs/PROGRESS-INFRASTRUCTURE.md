@@ -1,5 +1,8 @@
 # INFRASTRUCTURE PROGRESS
 
+## INFRASTRUCTURE v0.54.14
+- ✅ Completed: AwsLambdaAdapter Coverage - Closed obsolete implementation plan as test coverage for `AwsLambdaAdapter` is already verified at 100%.
+
 ## INFRASTRUCTURE v0.54.13
 - ✅ Completed: Vercel Azure Adapter Coverage - Improved test coverage to 100%
 
