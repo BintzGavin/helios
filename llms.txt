@@ -6,7 +6,7 @@ Helios is a modern engine for creating videos programmatically using standard we
 
 ## Quick Facts
 - **License**: Elastic License 2.0 (free commercial use, no SaaS resale)
-- **Status**: Beta / Self-Driving (Core: Stable v5.13.0+, Studio: Alpha v0.118.7+, Player: v0.76.22+, Renderer: v1.80.0+, CLI: Beta v0.37.3+, Infrastructure: v0.54.2+)
+- **Status**: Beta / Self-Driving (Core: Stable v5.13.0+, Studio: Alpha v0.118.8+, Player: v0.76.23+, Renderer: v1.80.0+, CLI: Beta v0.37.4+, Infrastructure: v0.54.10+)
 - **Frameworks**: React, Vue, Svelte, Solid, vanilla JS
 - **Animation**: Standard CSS, Web Animations API (WAAPI), any animation library
 
@@ -113,12 +113,12 @@ const report = await Helios.diagnose();
 
 ## Roadmap
 ### V1.x (Active)
-- **Studio**: v0.118.7+ (Update Quickstart Guide, Enhance MCP Server, Components Panel)
-- **CLI**: v0.37.3+ (Merge Command Regression Tests, List Command Regression Tests, Deploy Cloudflare)
+- **Studio**: v0.118.8+ (Enhance MCP Server, TimelineAudioTrack Regression Tests, Update Quickstart Guide)
+- **CLI**: v0.37.4+ (Add Command Regression Tests, CLI Merge Regression Tests, Deploy Cloudflare)
 - **Core**: v5.13.0+ (Generic Input Props, Active Clips, Composition Schema, Shared Virtual Time Binding)
-- **Player**: v0.76.22+ (Bridge Coverage Expansion, Regression Tests for Audio Fader, Regression Tests for Media Session)
+- **Player**: v0.76.23+ (Bridge Coverage Completeness, Regression Tests for Audio Fader, Regression Tests for Media Session)
 - **Renderer**: v1.80.0+ (Validate HW Accel, Orchestrator Plan, Refactor Media Sync, Pluggable Execution)
-- **Infrastructure**: v0.54.2+ (HetznerCloud Adapter Coverage, ModalAdapter Coverage, CloudRunAdapter Test Coverage, Storage Adapter Test Coverage, CloudRun and Local Adapter Coverage Expansion, SyncWorkspace Coverage Expansion)
+- **Infrastructure**: v0.54.10+ (Gravitational Equilibrium, HetznerCloudAdapter Coverage, Document FlyMachinesAdapter, SyncWorkspace Coverage)
 
 ### AI Integration
 - **Studio MCP Server**: Inspect, create, and render compositions via LLM tools (Done)
