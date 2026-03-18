@@ -1,5 +1,9 @@
 # INFRASTRUCTURE PROGRESS
 
+## INFRASTRUCTURE v0.54.11
+- ✅ Completed: Orchestrator Test Coverage Expansion - Improved branch coverage for job manager and executor.
+
+
 ## INFRASTRUCTURE v0.54.9
 - ✅ Completed: HetznerCloudAdapter Coverage - Closed obsolete implementation plan as test coverage for `HetznerCloudAdapter` is already 100%.
 

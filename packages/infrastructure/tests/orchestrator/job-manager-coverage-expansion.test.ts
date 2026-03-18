@@ -158,4 +158,87 @@ describe('JobManager Coverage Expansion', () => {
       logs: [{ chunkId: 1, durationMs: 1500, stdout: 'ok', stderr: '' }]
     }));
   });
+
+  it('should not throw if repository.get returns undefined during onProgress', async () => {
+    let onProgressCallback: any;
+
+    const mockRepo: JobRepository = {
+      save: vi.fn(),
+      get: vi.fn().mockImplementation((id) => {
+        if (id === 'job-1') {
+          return Promise.resolve({
+            id: 'job-1',
+            state: 'running',
+            spec: { chunks: [{id: 1, command: 'cmd', startFrame: 0, frameCount: 10, outputFile: 'out.mp4'}] },
+            completedChunks: 0,
+            totalChunks: 1
+          } as unknown as JobStatus);
+        }
+        return Promise.resolve(undefined);
+      }),
+      list: vi.fn(),
+      delete: vi.fn()
+    };
+
+    const mockExecutor: JobExecutor = {
+      execute: vi.fn().mockImplementation(async (spec, options) => {
+        onProgressCallback = options.onProgress;
+      })
+    } as unknown as JobExecutor;
+
+    const manager = new JobManager(mockRepo, mockExecutor);
+    const spec: JobSpec = { id: 'job-1', chunks: [{id: 1, command: 'cmd', startFrame: 0, frameCount: 10, outputFile: 'out.mp4'}], metadata: { totalFrames: 10, fps: 30, width: 100, height: 100, duration: 1 }, mergeCommand: '' };
+
+    await (manager as any).runJob('job-1', spec);
+    expect(onProgressCallback).toBeDefined();
+
+    // Clear mock repo tracking and mock get to return undefined for the callback
+    (mockRepo.save as any).mockClear();
+    mockRepo.get = vi.fn().mockResolvedValue(undefined);
+
+    await expect(onProgressCallback(1, 1)).resolves.not.toThrow();
+    // Save should not have been called inside onProgress
+    expect(mockRepo.save).not.toHaveBeenCalled();
+  });
+
+  it('should not throw if repository.get returns undefined during onChunkComplete', async () => {
+    let onChunkCompleteCallback: any;
+
+    const mockRepo: JobRepository = {
+      save: vi.fn(),
+      get: vi.fn().mockImplementation((id) => {
+        if (id === 'job-1') {
+          return Promise.resolve({
+            id: 'job-1',
+            state: 'running',
+            spec: { chunks: [{id: 1, command: 'cmd', startFrame: 0, frameCount: 10, outputFile: 'out.mp4'}] },
+            completedChunks: 0,
+            totalChunks: 1
+          } as unknown as JobStatus);
+        }
+        return Promise.resolve(undefined);
+      }),
+      list: vi.fn(),
+      delete: vi.fn()
+    };
+
+    const mockExecutor: JobExecutor = {
+      execute: vi.fn().mockImplementation(async (spec, options) => {
+        onChunkCompleteCallback = options.onChunkComplete;
+      })
+    } as unknown as JobExecutor;
+
+    const manager = new JobManager(mockRepo, mockExecutor);
+    const spec: JobSpec = { id: 'job-1', chunks: [{id: 1, command: 'cmd', startFrame: 0, frameCount: 10, outputFile: 'out.mp4'}], metadata: { totalFrames: 10, fps: 30, width: 100, height: 100, duration: 1 }, mergeCommand: '' };
+
+    await (manager as any).runJob('job-1', spec);
+    expect(onChunkCompleteCallback).toBeDefined();
+
+    // Clear mock repo tracking and mock get to return undefined for the callback
+    (mockRepo.save as any).mockClear();
+    mockRepo.get = vi.fn().mockResolvedValue(undefined);
+
+    await expect(onChunkCompleteCallback(1, { durationMs: 1500, stdout: 'ok', stderr: '' })).resolves.not.toThrow();
+    expect(mockRepo.save).not.toHaveBeenCalled();
+  });
 });
