@@ -7,6 +7,7 @@ import { DOCKERFILE_TEMPLATE, DOCKER_COMPOSE_TEMPLATE } from '../templates/docke
 import { CLOUD_RUN_JOB_TEMPLATE, README_GCP_TEMPLATE } from '../templates/gcp.js';
 import { AWS_DOCKERFILE_TEMPLATE, AWS_LAMBDA_HANDLER_TEMPLATE, AWS_SAM_TEMPLATE, README_AWS_TEMPLATE } from '../templates/aws.js';
 import { WRANGLER_TOML_TEMPLATE, CLOUDFLARE_WORKER_TEMPLATE, README_CLOUDFLARE_TEMPLATE } from '../templates/cloudflare.js';
+import { FLY_TOML_TEMPLATE, FLY_DOCKERFILE_TEMPLATE, README_FLY_TEMPLATE } from '../templates/fly.js';
 
 export function registerDeployCommand(program: Command) {
   const deploy = program.command('deploy')
@@ -351,5 +352,95 @@ export function registerDeployCommand(program: Command) {
 
       console.log(chalk.blue('\nCloudflare Workers setup complete!'));
       console.log('See README-CLOUDFLARE.md for deployment instructions.');
+    });
+
+  deploy
+    .command('fly')
+    .description('Scaffold Fly.io Machines deployment configuration')
+    .action(async () => {
+      const cwd = process.cwd();
+      const flyTomlPath = path.join(cwd, 'fly.toml');
+      const dockerfilePath = path.join(cwd, 'Dockerfile');
+      const readmePath = path.join(cwd, 'README-FLY.md');
+
+      console.log(chalk.blue('Scaffolding Fly.io deployment files...'));
+
+      // fly.toml
+      let writeFlyToml = true;
+      if (fs.existsSync(flyTomlPath)) {
+        const response = await prompts({
+          type: 'confirm',
+          name: 'value',
+          message: 'fly.toml already exists. Overwrite?',
+          initial: false
+        });
+
+        if (typeof response.value === 'undefined') {
+          console.log(chalk.yellow('\nOperation cancelled.'));
+          process.exit(0);
+        }
+
+        writeFlyToml = response.value;
+      }
+
+      if (writeFlyToml) {
+        fs.writeFileSync(flyTomlPath, FLY_TOML_TEMPLATE);
+        console.log(chalk.green('✔ Created fly.toml'));
+      } else {
+        console.log(chalk.gray('Skipped fly.toml'));
+      }
+
+      // Dockerfile
+      let writeDockerfile = true;
+      if (fs.existsSync(dockerfilePath)) {
+        const response = await prompts({
+          type: 'confirm',
+          name: 'value',
+          message: 'Dockerfile already exists. Overwrite?',
+          initial: false
+        });
+
+        if (typeof response.value === 'undefined') {
+          console.log(chalk.yellow('\nOperation cancelled.'));
+          process.exit(0);
+        }
+
+        writeDockerfile = response.value;
+      }
+
+      if (writeDockerfile) {
+        fs.writeFileSync(dockerfilePath, FLY_DOCKERFILE_TEMPLATE);
+        console.log(chalk.green('✔ Created Dockerfile'));
+      } else {
+        console.log(chalk.gray('Skipped Dockerfile'));
+      }
+
+      // README-FLY.md
+      let writeReadme = true;
+      if (fs.existsSync(readmePath)) {
+        const response = await prompts({
+          type: 'confirm',
+          name: 'value',
+          message: 'README-FLY.md already exists. Overwrite?',
+          initial: false
+        });
+
+        if (typeof response.value === 'undefined') {
+          console.log(chalk.yellow('\nOperation cancelled.'));
+          process.exit(0);
+        }
+
+        writeReadme = response.value;
+      }
+
+      if (writeReadme) {
+        fs.writeFileSync(readmePath, README_FLY_TEMPLATE);
+        console.log(chalk.green('✔ Created README-FLY.md'));
+      } else {
+        console.log(chalk.gray('Skipped README-FLY.md'));
+      }
+
+      console.log(chalk.blue('\nFly.io setup complete!'));
+      console.log('See README-FLY.md for deployment instructions.');
     });
 }
