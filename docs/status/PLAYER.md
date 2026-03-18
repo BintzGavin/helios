@@ -1,4 +1,5 @@
-**Version**: v0.76.23
+**Version**: 0.76.24
+[v0.76.24] ✅ Completed: Bridge Coverage Expansion 2 - Added missing unit test coverage for bridge.ts message handling (e.g., HELIOS_SEEK, HELIOS_SET_PLAYBACK_RANGE).
 
 **Posture**: STABLE AND FEATURE COMPLETE
 
