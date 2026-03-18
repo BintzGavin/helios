@@ -96,11 +96,11 @@ Cloud adapters provide the critical abstraction layer that translates standardiz
 - **FlyMachinesAdapter**: Provisions and invokes containerized rendering tasks on Fly.io using the native `fetch` API via HTTP POST to the Machines API. It constructs machine definitions containing job and chunk coordinates injected as `HELIOS_JOB_PAYLOAD` environment variables, provisions machines with `auto_destroy` enabled, polls for execution completion by repeatedly fetching machine state, and manages machine lifecycle cleanup via explicit DELETE requests.
 - **LocalWorkerAdapter**: A testing-focused adapter that executes rendering chunks via local child processes, enabling rapid local development and determinism verification without requiring cloud deployments.
 - **KubernetesAdapter**: Allows execution of distributed rendering jobs across a Kubernetes cluster via the Batch V1 API using `@kubernetes/client-node`.
-- **DockerAdapter**: Executes rendering chunks via local child processes using `spawn('docker', ...)`.
+- **DockerAdapter**: Executes rendering chunks via local Docker child processes using `spawn('docker', ...)`. This provides an environment closer to cloud execution by running jobs within custom Docker images.
 - **ModalAdapter**: Provides an endpoint URL config for executing jobs, passing the job data via payload.
-- **DenoDeployAdapter**: Adapter for executing rendering chunks on Deno Deploy using endpoint URL and authorization tokens via native fetch POST requests.
+- **DenoDeployAdapter**: Adapter for executing rendering chunks on Deno Deploy using endpoint URL and authorization tokens via native fetch POST requests. It transmits the remote `jobDefUrl` and `chunkId` to be processed by Deno Edge workers.
 - **VercelAdapter**: Adapter for executing rendering chunks on Vercel Serverless Functions using endpoint URL, authorization token, and parsing job definition path and chunk IDs.
-- **HetznerCloudAdapter**: Adapter for executing rendering chunks using Hetzner Cloud API tokens, specifying server types, images, and managing remote server lifecycles.
+- **HetznerCloudAdapter**: Adapter for executing rendering chunks on Hetzner Cloud infrastructure. It provisions server instances programmatically using API tokens, runs the tasks, polls for status, and reliably cleans up the remote VM lifecycles afterward.
 
 ### Worker Runtime
 
