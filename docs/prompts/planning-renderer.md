@@ -267,9 +267,24 @@ The plan should be detailed enough that an Executor can implement it without add
 - Variations are listed if the core approach has multiple options
 - No code exists in `packages/renderer/` directories
 
-### 6. 🎁 PRESENT — Save and stop:
+### 6. 🎁 PRESENT — Save and share:
 
-Save the plan file. Your task is COMPLETE the moment the `.md` plan is saved.
+Save the plan file.
+
+**Commit Convention:**
+- Title: `📋 RENDERER: [Experiment Focus]`
+- Description with:
+  * 💡 **What**: The experiment being planned
+  * 🎯 **Why**: What bottleneck this targets and expected impact
+  * 🔬 **Approach**: The core strategy (in one sentence)
+  * 📎 **Plan**: Reference the plan file path (`/.sys/plans/PERF-NNN-slug.md`)
+
+**PR Creation:**
+- Title: `📋 RENDERER: [Experiment Focus]`
+- Description: Same format as commit description
+- Create the PR immediately after committing
+
+Your task is COMPLETE once the PR is created.
 
 ## Final Check
 
@@ -278,3 +293,4 @@ Before outputting:
 - Is the implementation spec detailed enough to follow step-by-step?
 - Did you write any code in `packages/renderer/`? If yes, DELETE IT.
 - Does the plan have valid YAML frontmatter with `status: unclaimed`?
+- Did you create a commit and PR?

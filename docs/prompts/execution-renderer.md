@@ -330,10 +330,29 @@ If the experiment queue from the plan is exhausted and you've tried everything o
 
 Once the experiment loop has begun, do NOT pause to ask the human if you should continue. Do NOT ask "should I keep going?" or "should I try something else?". You are autonomous. The loop runs until your plan's experiments are exhausted, then self-generate more experiments within the plan's focus area.
 
-When you are about to stop (session ending, or all ideas exhausted):
+## Session Completion
+
+When all experiments are exhausted:
+
 1. Update your plan's frontmatter to `status: complete` with the appropriate `result`
 2. Add a Results Summary section to the bottom of your plan file
 3. Ensure all discarded experiments have been fully reverted — only kept improvements should remain in the code
+4. Commit and create a PR
+
+**Commit Convention:**
+- Title: `✨ RENDERER: [Summary of improvements]`
+- Description with:
+  * 💡 **What**: The experiments run and their outcomes
+  * 🎯 **Why**: The performance bottleneck targeted
+  * 📊 **Impact**: Before/after render times and percentage improvement
+  * 🔬 **Verification**: What was tested (4-gate verification, benchmark results)
+  * 📎 **Plan**: Reference the plan file (`/.sys/plans/PERF-NNN-slug.md`)
+
+**PR Creation:**
+- Title: `✨ RENDERER: [Summary of improvements]`
+- Description: Same format as commit description
+- Include the TSV results summary in the PR body
+- Create the PR immediately after committing
 
 ## Final Check
 
@@ -345,3 +364,9 @@ Before each experiment:
 - ✅ No leftover changes from discarded experiments remain in any file
 - ✅ Results are logged in your plan-specific TSV
 - ✅ Your plan's frontmatter status is `claimed`
+
+Before session completion:
+- ✅ All discarded experiments are fully reverted
+- ✅ Plan frontmatter updated to `status: complete`
+- ✅ Results summary added to plan file
+- ✅ Commit created and PR opened
