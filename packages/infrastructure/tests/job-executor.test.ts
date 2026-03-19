@@ -179,6 +179,54 @@ describe('JobExecutor', () => {
     }
   });
 
+  it('should throw AbortError if signal is aborted explicitly before resolving the retry delay', async () => {
+    const ac = new AbortController();
+    let attempt = 0;
+    let abortListener: () => void;
+
+    mockAdapter.execute = vi.fn().mockImplementation(async (job: WorkerJob) => {
+      if (job.args && job.args.includes('1')) {
+        attempt++;
+        if (attempt === 1) {
+          throw new Error('Trigger retry to wait');
+        }
+      }
+      return { exitCode: 0, stdout: '', stderr: '', durationMs: 0 };
+    });
+
+    // To hit the `if (options.signal?.aborted)` AFTER the retry promise
+    // we need `signal.aborted` to be true when the promise resolves.
+    // The `abort` event listener resolves it early and then we expect the check to throw.
+    const addEventListenerSpy = vi.spyOn(ac.signal, 'addEventListener').mockImplementation((evt, cb) => {
+      if (evt === 'abort') abortListener = cb as () => void;
+    });
+
+    const originalSetTimeout = global.setTimeout;
+    const setTimeoutSpy = vi.spyOn(global, 'setTimeout').mockImplementation(((fn: any, ms: any) => {
+      // Simulate the abort event being dispatched
+      Object.defineProperty(ac.signal, 'aborted', { value: true, configurable: true });
+      if (abortListener) {
+         abortListener();
+      }
+      return originalSetTimeout(fn, 0);
+    }) as any);
+
+    try {
+      const error = await jobExecutor.execute(jobSpec, {
+        signal: ac.signal,
+        retries: 1,
+        retryDelay: 10
+      }).catch(e => e);
+
+      expect(error.name).toBe('AbortError');
+      expect(error.message).toBe('Job aborted');
+      expect(attempt).toBe(1);
+    } finally {
+      setTimeoutSpy.mockRestore();
+      addEventListenerSpy.mockRestore();
+    }
+  });
+
   it('should throw AbortError if signal is aborted at the start of a retry loop', async () => {
     const ac = new AbortController();
 
@@ -194,13 +242,14 @@ describe('JobExecutor', () => {
       return { exitCode: 0, stdout: '', stderr: '', durationMs: 0 };
     });
 
-    // Mock setTimeout so we can set signal.aborted right BEFORE the retry loop continues
+    // We mock the signal.aborted property to be true right when it checks it at the start of the loop
+    // by intercepting setTimeout (which runs after the first failure).
     const originalSetTimeout = global.setTimeout;
     const setTimeoutSpy = vi.spyOn(global, 'setTimeout').mockImplementation(((fn: any, ms: any) => {
-      // We don't abort the signal *during* the timeout (which is handled by addEventListener),
-      // we mock the signal.aborted property to be true right when it checks it at the start of the loop.
+      // Let the timeout resolve normally, but set aborted BEFORE the next iteration
+      const r = originalSetTimeout(fn, 0);
       Object.defineProperty(ac.signal, 'aborted', { value: true, configurable: true });
-      return originalSetTimeout(fn, 0);
+      return r;
     }) as any);
 
     try {
@@ -215,6 +264,22 @@ describe('JobExecutor', () => {
       expect(attempt).toBe(1); // Should only attempt once since it aborts before the second attempt
     } finally {
       setTimeoutSpy.mockRestore();
+    }
+  });
+
+  it('should throw AbortError if signal is aborted at the very beginning of the loop', async () => {
+    const ac = new AbortController();
+    Object.defineProperty(ac.signal, 'aborted', { value: true, configurable: true });
+
+    try {
+      const error = await jobExecutor.execute(jobSpec, {
+        signal: ac.signal
+      }).catch(e => e);
+
+      expect(error.name).toBe('AbortError');
+      expect(error.message).toBe('Job aborted');
+    } catch (e) {
+       throw e;
     }
   });
 
@@ -379,6 +444,20 @@ describe('JobExecutor', () => {
 
     try {
       await expect(jobExecutor.execute(jobSpec)).rejects.toThrow('Job execution failed: Unknown error');
+    } finally {
+      allSettledSpy.mockRestore();
+    }
+  });
+
+  it('should throw Unknown error if a chunk rejects with a non-Error reason but no failures array exists', async () => {
+    // Override Promise.allSettled to simulate a rejection with a non-Error reason string,
+    // simulating a rejected promise with a primitive.
+    const allSettledSpy = vi.spyOn(Promise, 'allSettled').mockResolvedValue([
+      { status: 'rejected', reason: 'Some primitive error string' }
+    ] as any);
+
+    try {
+      await expect(jobExecutor.execute(jobSpec)).rejects.toThrow('Some primitive error string');
     } finally {
       allSettledSpy.mockRestore();
     }
