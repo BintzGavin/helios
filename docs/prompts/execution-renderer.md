@@ -92,20 +92,31 @@ Document the cross-domain need, continue with experiments you CAN do, and let th
 - **Simplicity as tiebreaker** — equal speed? prefer simpler code
 - **Correctness is non-negotiable** — a fast renderer that produces wrong output is a broken renderer
 
+## ⚠️ CRITICAL: Auto-Push Behavior
+
+**When your session ends, ALL file changes are automatically pushed to a PR that gets auto-merged.** You do NOT have access to git commands. This means:
+
+- You cannot `git reset` or `git revert` — those commands are unavailable
+- Any modified file at session end WILL be pushed and merged
+- **To discard an experiment, you MUST manually restore every modified file to its exact pre-experiment state**
+- If you forget to revert a discarded experiment, broken or regressed code will be merged
+
+**This is the most important rule in this entire prompt.** Every experiment follows a strict snapshot → modify → benchmark → keep OR restore cycle.
+
 ## Setup
 
 Before entering the experiment loop:
 
 1. **Read the plan**: Scan `/.sys/plans/` for the latest `RENDERER-PERF-*.md` plan file. If no plan exists, analyze the DOM pipeline yourself and generate your own experiment queue.
 2. **Read the codebase**: Read `packages/renderer/src/` — especially `Renderer.ts`, `DomStrategy.ts`, `SeekTimeDriver.ts`, and FFmpeg utilities.
-3. **Create or find the benchmark composition**: There must be a standardized DOM benchmark composition. Check `packages/renderer/tests/fixtures/` and `examples/` for an appropriate one. If none is suitable, create a simple but representative DOM composition with CSS animations and mixed content.
-4. **Initialize results tracking**: Create `packages/renderer/.sys/perf-results.tsv` with the header row if it doesn't exist:
+3. **Snapshot the baseline code**: Before modifying ANY file, **read and memorize the complete contents** of every file you plan to touch. You will need the original contents to revert if the experiment fails. Store a mental snapshot of each file's full content.
+4. **Create or find the benchmark composition**: There must be a standardized DOM benchmark composition. Check `packages/renderer/tests/fixtures/` and `examples/` for an appropriate one. If none is suitable, create a simple but representative DOM composition with CSS animations and mixed content.
+5. **Initialize results tracking**: Create `packages/renderer/.sys/perf-results.tsv` with the header row if it doesn't exist:
    ```
-   commit	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+   run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
    ```
-5. **Establish the baseline**: Run the renderer as-is in DOM mode on the benchmark composition. Record the result. This is your baseline to beat.
-6. **Canvas smoke test**: Verify Canvas mode still works (a basic render that completes without error). Record this as a pass/fail, not a timed benchmark.
-7. **Create the branch**: `git checkout -b perf/renderer-<tag>` from current HEAD.
+6. **Establish the baseline**: Run the renderer as-is in DOM mode on the benchmark composition. Record the result. This is your baseline to beat.
+7. **Canvas smoke test**: Verify Canvas mode still works (a basic render that completes without error). Record this as a pass/fail, not a timed benchmark.
 
 ## The Benchmark Harness
 
@@ -136,10 +147,10 @@ console.log(`peak_mem_mb:        ${(process.memoryUsage().heapUsed / 1024 / 1024
 
 **LOOP FOREVER:**
 
-1. **Check the state**: Look at git state, current branch, latest results in `perf-results.tsv`
+1. **Check the state**: Review latest results in `perf-results.tsv` and the current state of the codebase
 2. **Pick the next experiment**: From the plan's experiment queue, or generate your own if the queue is empty
-3. **Modify the code**: Edit files in `packages/renderer/src/` directly
-4. **Git commit**: `git add -A && git commit -m "perf: [experiment description]"`
+3. **Snapshot files**: Before modifying any file, **re-read its complete current contents** so you can restore it exactly if needed. Track which files you are about to modify.
+4. **Modify the code**: Edit files in `packages/renderer/src/` directly
 5. **Build**: `npm run build` (or equivalent) in `packages/renderer/`
 6. **Run the DOM benchmark**, redirect output:
    ```bash
@@ -149,26 +160,29 @@ console.log(`peak_mem_mb:        ${(process.memoryUsage().heapUsed / 1024 / 1024
    ```bash
    grep "^render_time_s:\|^peak_mem_mb:\|^fps_effective:" run.log
    ```
-8. **Handle crashes**: If grep output is empty, the run crashed. Run `tail -n 50 run.log` to read the error. If it's a simple bug (typo, missing import), fix and re-run. If the idea is fundamentally broken, log as `crash` and move on.
-9. **Record results**: Append to `perf-results.tsv` (tab-separated). Do NOT commit this file.
+8. **Handle crashes**: If grep output is empty, the run crashed. Run `tail -n 50 run.log` to read the error. If it's a simple bug (typo, missing import), fix and re-run. If the idea is fundamentally broken, **restore all modified files to their pre-experiment state**, log as `crash`, and move on.
+9. **Record results**: Append to `perf-results.tsv` (tab-separated).
 10. **Keep or discard**:
-    - If `render_time_s` improved (lower): **KEEP** — advance the branch
-    - If `render_time_s` is equal or worse: **DISCARD** — `git reset --hard HEAD~1`
-11. **Canvas smoke test**: If you kept the change, verify Canvas mode still works (quick render, no error). If it fails, discard and revert.
+    - If `render_time_s` improved (lower): **KEEP** — the modified files stay as-is. These become the new baseline for future snapshots.
+    - If `render_time_s` is equal or worse: **DISCARD** — **manually restore every modified file to its exact pre-experiment content.** Rewrite each file completely to its snapshotted state. Verify the restore is complete.
+11. **Canvas smoke test**: If you kept the change, verify Canvas mode still works (quick render, no error). If it fails, **restore all modified files to their pre-experiment state** (treat as discard).
 12. **Journal**: If you learned something critical (unexpected bottleneck, surprising result), add it to `.jules/RENDERER.md`
 13. **GOTO 1**
+
+> [!CAUTION]
+> **DISCARD = RESTORE.** When discarding an experiment, you MUST rewrite every modified file back to its exact pre-experiment contents. Do NOT leave partial changes. Do NOT skip files. The auto-push at session end will merge whatever state the files are in — there is no git safety net.
 
 ## Results Format
 
 The TSV file `packages/renderer/.sys/perf-results.tsv` has 7 columns:
 
 ```
-commit	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
 ```
 
 | Column | Description |
 |--------|-------------|
-| `commit` | Git commit hash (short, 7 chars) |
+| `run` | Sequential run number (1, 2, 3, ...) |
 | `render_time_s` | Wall-clock DOM render time in seconds (e.g., `12.345`) — use `0.000` for crashes |
 | `frames` | Total frames rendered |
 | `fps_effective` | Frames per second achieved (frames / render_time_s) |
@@ -178,13 +192,13 @@ commit	render_time_s	frames	fps_effective	peak_mem_mb	status	description
 
 **Example:**
 ```
-commit	render_time_s	frames	fps_effective	peak_mem_mb	status	description
-a1b2c3d	18.500	300	16.22	490.1	keep	baseline
-b2c3d4e	16.200	300	18.52	495.0	keep	CDP captureScreenshot instead of page.screenshot
-c3d4e5f	14.800	300	20.27	510.0	keep	raw BMP pixel pipe (skip PNG encode/decode)
-d4e5f6g	0.000	0	0.00	0.0	crash	WASM pixel encoder (missing binding)
-e5f6g7h	12.100	300	24.79	530.4	keep	parallel capture + encode with worker threads
-f6g7h8i	13.200	300	22.73	490.0	discard	headless shell (slower in this environment)
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	18.500	300	16.22	490.1	keep	baseline
+2	16.200	300	18.52	495.0	keep	CDP captureScreenshot instead of page.screenshot
+3	14.800	300	20.27	510.0	keep	raw BMP pixel pipe (skip PNG encode/decode)
+4	0.000	0	0.00	0.0	crash	WASM pixel encoder (missing binding)
+5	12.100	300	24.79	530.4	keep	parallel capture + encode with worker threads
+6	13.200	300	22.73	490.0	discard	headless shell (slower in this environment)
 ```
 
 ## Correctness Verification
@@ -223,7 +237,6 @@ If the experiment queue from the plan is exhausted and you've tried everything o
 - You have exclusive ownership of `packages/renderer/`
 - Never modify files in `packages/core/`, `packages/player/`, or other domains
 - If you need changes in another domain, update the vision/backlog docs and document the dependency
-- The benchmark composition and `perf-results.tsv` are your artifacts — do not commit `perf-results.tsv` to git
 
 ## NEVER STOP
 
@@ -235,6 +248,6 @@ Before each experiment:
 - ✅ Benchmark composition is the same as baseline
 - ✅ Render settings are identical (resolution, FPS, duration, codec)
 - ✅ Mode is `dom`
-- ✅ Previous experiment was either kept or cleanly reverted
-- ✅ Git state is clean
+- ✅ Previous experiment was either kept or **all files manually restored**
+- ✅ No leftover changes from discarded experiments remain in any file
 - ✅ Results are logged in `perf-results.tsv`
