@@ -1,5 +1,8 @@
 # INFRASTRUCTURE PROGRESS
 
+## INFRASTRUCTURE v0.54.18
+- ✅ Completed: InMemoryJobRepository Coverage - Improved test coverage for `InMemoryJobRepository` to 100%.
+
 ## INFRASTRUCTURE v0.54.17
 - ✅ Completed: CloudRun Resiliency Tests - Added comprehensive edge case testing for the Cloud Run worker entrypoint to ensure parity with AWS Lambda resiliency testing.
 
