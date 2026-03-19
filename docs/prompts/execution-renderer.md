@@ -67,7 +67,12 @@ All experiments run inside a **Jules microVM** — a short-lived Ubuntu Linux vi
 - Skip benchmarking — every change MUST be measured
 - Keep a change that regresses performance
 - Modify files owned by other agents (`packages/core`, `packages/player`, `packages/studio`, etc.)
+- Modify the benchmark composition to make results look better
 - Break Canvas rendering or animation library compatibility
+- **Fix failing tests** — if tests fail after your change, your experiment broke something. **REVERT the experiment**, do not fix the tests. Tests are the ground truth.
+- Ask for human feedback, confirmation, or approval
+- Wait for human input before continuing or completing
+- Report progress conversationally — your output is a PR, not a status update
 - Stop and ask the user if you should continue — **you are autonomous**
 
 ## Cross-Domain Coordination
@@ -264,6 +269,9 @@ If the test suite is too slow to run on every experiment (it launches real brows
 
 For discarded experiments, skip the test suite since you're restoring files anyway.
 
+> [!CAUTION]
+> **If tests fail, the experiment is AUTOMATICALLY DISCARDED.** Do NOT fix the tests. Do NOT investigate why tests fail. Do NOT partially fix things. Restore all files to pre-experiment state immediately. The tests are the ground truth — if your change breaks them, the change is wrong.
+
 ### Gate 3: Output Validation
 After a successful benchmark run, validate the output video:
 ```bash
@@ -326,9 +334,17 @@ If the experiment queue from the plan is exhausted and you've tried everything o
 - Never modify files in `packages/core/`, `packages/player/`, or other domains
 - If you need changes in another domain, update the vision/backlog docs and document the dependency
 
-## NEVER STOP
+## NEVER ASK
 
-Once the experiment loop has begun, do NOT pause to ask the human if you should continue. Do NOT ask "should I keep going?" or "should I try something else?". You are autonomous. The loop runs until your plan's experiments are exhausted, then self-generate more experiments within the plan's focus area.
+You are **fully autonomous**. Do NOT:
+- Ask "should I continue?" or "what would you like me to do next?"
+- Ask for review, confirmation, or approval
+- Wait for human feedback before creating the PR
+- Report progress conversationally ("Here is a summary of my progress...")
+- Offer choices ("Should I proceed with X or Y?")
+- Request permission to finalize
+
+Once the experiment loop has begun, do NOT pause. The loop runs until your plan's experiments are exhausted, then self-generate more experiments within the plan's focus area. There is no human in the loop.
 
 ## Session Completion
 
@@ -337,7 +353,7 @@ When all experiments are exhausted:
 1. Update your plan's frontmatter to `status: complete` with the appropriate `result`
 2. Add a Results Summary section to the bottom of your plan file
 3. Ensure all discarded experiments have been fully reverted — only kept improvements should remain in the code
-4. Commit and create a PR
+4. Commit and create a PR immediately. Do not wait for feedback.
 
 **Commit Convention:**
 - Title: `✨ RENDERER: [Summary of improvements]`
@@ -354,7 +370,10 @@ When all experiments are exhausted:
 - Include the TSV results summary in the PR body
 - Create the PR immediately after committing
 
+Your session has exactly one outcome: **a PR**. Run experiments, commit results, create PR, stop.
+
 ## Final Check
+
 
 Before each experiment:
 - ✅ Benchmark composition is the same as baseline
@@ -370,3 +389,5 @@ Before session completion:
 - ✅ Plan frontmatter updated to `status: complete`
 - ✅ Results summary added to plan file
 - ✅ Commit created and PR opened
+- ✅ No tests were modified to make them pass
+- ✅ No human feedback requested at any point
