@@ -113,3 +113,10 @@
 - `requestPictureInPicture(): Promise<PictureInPictureWindow>`
 - `startAudioMetering(): void`
 - `stopAudioMetering(): void`
+## Section E: Media Session Properties
+
+The following standard media session metadata attributes are available as properties on the `HeliosPlayer` class, mapping to the respective DOM attributes:
+- `mediaTitle`: Maps to `media-title` attribute
+- `mediaArtist`: Maps to `media-artist` attribute
+- `mediaAlbum`: Maps to `media-album` attribute
+- `mediaArtwork`: Maps to `media-artwork` attribute
