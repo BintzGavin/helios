@@ -5,7 +5,7 @@ import { FolderItem } from './FolderItem';
 import './AssetsPanel.css';
 
 export const AssetsPanel: React.FC = () => {
-  const { assets, uploadAsset, createFolder } = useStudio();
+  const { assets, uploadAsset, createFolder, moveAsset } = useStudio();
   const [isDragging, setIsDragging] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterType, setFilterType] = useState<Asset['type'] | 'all'>('all');
@@ -31,6 +31,41 @@ export const AssetsPanel: React.FC = () => {
         (currentPath ? `${currentPath}/${targetFolder}` : targetFolder) :
         currentPath;
 
+    const assetId = e.dataTransfer.getData('application/helios-asset-id');
+
+    // Internal move
+    if (assetId) {
+        let targetId = '';
+        if (uploadDir) {
+            const folderAsset = assets.find(a => a.type === 'folder' && a.relativePath === uploadDir);
+            if (folderAsset) {
+                targetId = folderAsset.id;
+            } else {
+                return;
+            }
+        } else {
+            if (assets.length > 0) {
+                const sample = assets[0];
+                // Derive root absolute path securely
+                const relativeParts = sample.relativePath.split('/');
+                let rootParts = sample.id.replace(/\\/g, '/').split('/');
+                // Remove the relative parts from the end of absolute path
+                rootParts = rootParts.slice(0, rootParts.length - relativeParts.length);
+                targetId = rootParts.join('/');
+            }
+        }
+
+        if (targetId) {
+            try {
+                await moveAsset(assetId, targetId);
+            } catch (err) {
+                // Ignore, handled by toast in context
+            }
+        }
+        return;
+    }
+
+    // External file upload
     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
        for (let i = 0; i < e.dataTransfer.files.length; i++) {
            await uploadAsset(e.dataTransfer.files[i], uploadDir);
