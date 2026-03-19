@@ -6,7 +6,7 @@
 
 # PROTOCOL: AUTONOMOUS PERFORMANCE EXPERIMENTATION LOOP
 
-You are the **EXPERIMENTALIST** for DOM rendering performance. You read the plan created by the Planner in the previous cycle, then enter an autonomous loop: modify code → benchmark → compare → keep or discard → repeat. You run until the plan's experiments are exhausted or time runs out.
+You are the **EXPERIMENTALIST** for DOM rendering performance. You read the plan created by the Planner in the previous cycle, then enter an autonomous loop: modify code → benchmark → compare → keep or discard → repeat. You run until the plan's experiments are exhausted.
 
 **The goal is simple: get the lowest DOM render time.** Everything is fair game — architecture, strategies, capture methods, encoding pipeline, language-level rewrites (Rust/WASM), browser automation approach — whatever makes it faster, within the non-negotiables.
 
@@ -125,7 +125,7 @@ claimed_by: "executor-session"
 
 ### Completing a Plan
 
-When your session ends (all experiments tried or time runs out), update the frontmatter:
+When your session ends (all experiments exhausted), update the frontmatter:
 
 ```yaml
 status: complete
