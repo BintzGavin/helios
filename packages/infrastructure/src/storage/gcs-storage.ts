@@ -30,15 +30,17 @@ export class GcsStorageAdapter implements ArtifactStorage {
     const files = await this.getAllFiles(localDir);
     const bucket = this.client.bucket(this.bucketName);
 
-    for (const file of files) {
+    const uploadPromises = files.map(file => {
       const relativePath = path.relative(localDir, file);
       // Ensure GCS key uses forward slashes
       const gcsKey = `${jobId}/${relativePath.split(path.sep).join('/')}`;
 
-      await bucket.upload(file, {
+      return bucket.upload(file, {
         destination: gcsKey,
       });
-    }
+    });
+
+    await Promise.all(uploadPromises);
 
     return `gcs://${this.bucketName}/${jobId}`;
   }

@@ -4,7 +4,7 @@ The infrastructure package provides cloud execution, stateless workers, and depl
 - **Workers**: Execute rendering chunks deterministically and statelessly.
 - **Orchestrators**: Manage job lifecycles and schedule chunks across workers.
 - **Adapters**: Cloud-agnostic interfaces with specific implementations for AWS Lambda, Google Cloud Run, Vercel, Fly Machines, etc.
-- **Storage**: Artifact storage implementations (GCS, S3, Local) for bundles and job specs.
+- **Storage**: Artifact storage implementations (GCS, S3, Local) for bundles and job specs. GCS utilizes concurrent uploads.
 
 ## Section B: File Tree
 ```
