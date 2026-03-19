@@ -179,6 +179,45 @@ describe('JobExecutor', () => {
     }
   });
 
+  it('should throw AbortError if signal is aborted at the start of a retry loop', async () => {
+    const ac = new AbortController();
+
+    let attempt = 0;
+    mockAdapter.execute = vi.fn().mockImplementation(async (job: WorkerJob) => {
+      if (job.args && job.args.includes('1')) {
+        attempt++;
+        if (attempt === 1) {
+          // On first attempt, we throw to trigger retry
+          throw new Error('Trigger retry');
+        }
+      }
+      return { exitCode: 0, stdout: '', stderr: '', durationMs: 0 };
+    });
+
+    // Mock setTimeout so we can set signal.aborted right BEFORE the retry loop continues
+    const originalSetTimeout = global.setTimeout;
+    const setTimeoutSpy = vi.spyOn(global, 'setTimeout').mockImplementation(((fn: any, ms: any) => {
+      // We don't abort the signal *during* the timeout (which is handled by addEventListener),
+      // we mock the signal.aborted property to be true right when it checks it at the start of the loop.
+      Object.defineProperty(ac.signal, 'aborted', { value: true, configurable: true });
+      return originalSetTimeout(fn, 0);
+    }) as any);
+
+    try {
+      const error = await jobExecutor.execute(jobSpec, {
+        signal: ac.signal,
+        retries: 1,
+        retryDelay: 10
+      }).catch(e => e);
+
+      expect(error.name).toBe('AbortError');
+      expect(error.message).toBe('Job aborted');
+      expect(attempt).toBe(1); // Should only attempt once since it aborts before the second attempt
+    } finally {
+      setTimeoutSpy.mockRestore();
+    }
+  });
+
   it('should throw Unknown error if a chunk rejects with a non-Error reason', async () => {
     // We override Promise.allSettled to simulate an edge case where a worker is rejected
     // without populating the 'failures' array or returning a proper reason
@@ -188,6 +227,20 @@ describe('JobExecutor', () => {
 
     try {
       await expect(jobExecutor.execute(jobSpec)).rejects.toThrow('Job execution failed: Unknown error');
+    } finally {
+      allSettledSpy.mockRestore();
+    }
+  });
+
+  it('should throw the rejection reason if a worker rejects with a specific reason but no failures', async () => {
+    // We override Promise.allSettled to simulate an edge case where a worker is rejected
+    // without populating the 'failures' array but with a specific reason
+    const allSettledSpy = vi.spyOn(Promise, 'allSettled').mockResolvedValue([
+      { status: 'rejected', reason: new Error('Specific worker rejection reason') }
+    ] as any);
+
+    try {
+      await expect(jobExecutor.execute(jobSpec)).rejects.toThrow('Specific worker rejection reason');
     } finally {
       allSettledSpy.mockRestore();
     }
