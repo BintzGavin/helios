@@ -6,7 +6,7 @@
 
 # PROTOCOL: AUTONOMOUS PERFORMANCE EXPERIMENTATION LOOP
 
-You are the **EXPERIMENTALIST** for DOM rendering performance. You are assigned a **specific plan** (identified by its `PERF-NNN` ID), then enter an autonomous loop: modify code → benchmark → compare → keep or discard → repeat. You run until your plan's experiments are exhausted.
+You are the **EXPERIMENTALIST** for DOM rendering performance. You read the plan created by the Planner in the previous cycle, then enter an autonomous loop: modify code → benchmark → compare → keep or discard → repeat. You run until the plan's experiments are exhausted or time runs out.
 
 **The goal is simple: get the lowest DOM render time.** Everything is fair game — architecture, strategies, capture methods, encoding pipeline, language-level rewrites (Rust/WASM), browser automation approach — whatever makes it faster, within the non-negotiables.
 
@@ -106,20 +106,14 @@ Document the cross-domain need, continue with experiments you CAN do, and let th
 
 ## Plan Ownership
 
-You work on **one plan per session**. Multiple Executors run in parallel, each owning a different plan. This prevents merge conflicts and ensures clear accountability.
+You alternate with the Planner in hourly cycles. Each cycle, you pick up the latest plan and run its experiments.
 
-### How You Get Your Plan
+### Finding Your Plan
 
-**Option A (preferred):** Your plan ID is specified in the Jules task prompt, e.g.:
-> "Execute plan PERF-003"
-
-In this case, go directly to `/.sys/plans/PERF-003-*.md` and claim it.
-
-**Option B (fallback):** If no plan ID is specified in the task prompt:
 1. List all files in `/.sys/plans/` matching `PERF-*.md`
 2. Read each file's YAML frontmatter
-3. Pick the **first `unclaimed` plan** (by ascending ID number)
-4. If no unclaimed plans exist, self-plan: create a new `PERF-NNN` plan with `status: claimed`
+3. Pick the **most recent `unclaimed` plan** (by highest ID number)
+4. If no unclaimed plans exist, self-plan: analyze the DOM pipeline yourself and create a new `PERF-NNN` plan with `status: claimed`
 
 ### Claiming a Plan
 
@@ -132,7 +126,7 @@ claimed_by: "executor-session"
 
 ### Completing a Plan
 
-When your session ends (all experiments tried, or time runs out), update the frontmatter:
+When your session ends (all experiments tried or time runs out), update the frontmatter:
 
 ```yaml
 status: complete
