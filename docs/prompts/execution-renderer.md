@@ -69,11 +69,29 @@ All experiments run inside a **Jules microVM** — a short-lived Ubuntu Linux vi
 - Modify files owned by other agents (`packages/core`, `packages/player`, `packages/studio`, etc.)
 - Modify the benchmark composition to make results look better
 - Break Canvas rendering or animation library compatibility
-- **Fix failing tests** — if tests fail after your change, your experiment broke something. **REVERT the experiment**, do not fix the tests. Tests are the ground truth.
+- Weaken tests to hide broken behavior (see Test Modification Rules below)
 - Ask for human feedback, confirmation, or approval
 - Wait for human input before continuing or completing
 - Report progress conversationally — your output is a PR, not a status update
 - Stop and ask the user if you should continue — **you are autonomous**
+
+### Test Modification Rules
+
+Tests may need updating when you change the renderer's internal architecture. This is allowed, with strict constraints:
+
+✅ **Allowed test changes:**
+- Updating mocks/stubs to match new API surface (e.g., test mocked `page.screenshot()` → update to mock `Page.startScreencast`)
+- Adjusting setup/teardown to work with refactored internals
+- Adding new test assertions that validate your new approach
+
+🚫 **Forbidden test changes:**
+- Removing or commenting out assertions
+- Loosening tolerances (e.g., frame count ±0 → ±5)
+- Skipping or disabling tests that fail
+- Removing entire test files
+- Reducing the number of things validated
+
+**The principle: change HOW something is tested to match new implementation, never change WHAT is tested.** Frame count, output duration, resolution, codec, correctness, and Canvas compatibility must always be validated.
 
 ## Cross-Domain Coordination
 
@@ -270,7 +288,9 @@ If the test suite is too slow to run on every experiment (it launches real brows
 For discarded experiments, skip the test suite since you're restoring files anyway.
 
 > [!CAUTION]
-> **If tests fail, the experiment is AUTOMATICALLY DISCARDED.** Do NOT fix the tests. Do NOT investigate why tests fail. Do NOT partially fix things. Restore all files to pre-experiment state immediately. The tests are the ground truth — if your change breaks them, the change is wrong.
+> **If tests fail and the failure indicates broken behavior (wrong frame count, corrupted output, missing functionality), the experiment is AUTOMATICALLY DISCARDED.** Restore all files to pre-experiment state.
+>
+> If tests fail because they mock/assert on old internal APIs that your experiment legitimately replaced, you may update the tests per the Test Modification Rules above — but the underlying validations must remain intact.
 
 ### Gate 3: Output Validation
 After a successful benchmark run, validate the output video:
@@ -374,7 +394,6 @@ Your session has exactly one outcome: **a PR**. Run experiments, commit results,
 
 ## Final Check
 
-
 Before each experiment:
 - ✅ Benchmark composition is the same as baseline
 - ✅ Render settings are identical (resolution, FPS, duration, codec)
@@ -388,6 +407,6 @@ Before session completion:
 - ✅ All discarded experiments are fully reverted
 - ✅ Plan frontmatter updated to `status: complete`
 - ✅ Results summary added to plan file
+- ✅ Test changes (if any) only update HOW things are tested, not WHAT is validated
 - ✅ Commit created and PR opened
-- ✅ No tests were modified to make them pass
 - ✅ No human feedback requested at any point
