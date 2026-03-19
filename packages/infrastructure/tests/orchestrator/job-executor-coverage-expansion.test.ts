@@ -253,4 +253,52 @@ describe('JobExecutor Coverage Expansion', () => {
 
     await expect(executor.execute(spec, { retries: 1, retryDelay: 50, signal: controller.signal })).rejects.toThrow('Job aborted');
   });
+
+  it('should throw AbortError if signal is aborted explicitly before starting a chunk execution loop', async () => {
+    const mockAdapter: WorkerAdapter = {
+      execute: vi.fn().mockResolvedValue({ exitCode: 0, stdout: '', stderr: '' })
+    };
+    const executor = new JobExecutor(mockAdapter);
+    const spec: JobSpec = { id: 'test-job', chunks: [{ id: 1, startFrame: 0, frameCount: 10, outputFile: 'out.mp4', command: 'cmd' }], metadata: { totalFrames: 10, fps: 30, width: 100, height: 100, duration: 1 }, mergeCommand: '' };
+
+    const controller = new AbortController();
+
+    // Make signal aborted right before entering the while(true) loop by intercepting chunk.shift()
+    // or by letting it enter the loop but controller is already aborted.
+    // We already tested pre-aborted before execute is called. Here we test if it aborts during the loop queue.
+    // The easiest way to hit lines 149-153 is to just mutate aborted before the chunk logic evaluates it inside the while loop.
+    Object.defineProperty(controller.signal, 'aborted', {
+      get: vi.fn().mockReturnValueOnce(false).mockReturnValue(true) // Start false to enter execute, then true to abort in while loop
+    });
+
+    await expect(executor.execute(spec, { signal: controller.signal })).rejects.toThrow('Job aborted');
+  });
+
+  it('should explicitly throw rejection reason if chunk Promise fails with an object containing reason property', async () => {
+    const mockAdapter: WorkerAdapter = {
+      execute: vi.fn().mockResolvedValue({ exitCode: 0, stdout: '', stderr: '' })
+    };
+    const executor = new JobExecutor(mockAdapter);
+    const spec: JobSpec = { id: 'test-job', chunks: [{ id: 1, startFrame: 0, frameCount: 10, outputFile: 'out.mp4', command: 'cmd' }], metadata: { totalFrames: 10, fps: 30, width: 100, height: 100, duration: 1 }, mergeCommand: '' };
+
+    // Hack Promise.allSettled to return a rejected status with an object that is NOT an Error instance but HAS a reason property?
+    // Wait, the logic is: `if (rejected && rejected.status === 'rejected') { throw rejected.reason; }`
+    // This handles any rejected reason, we just need `failures.length === 0` which means the reason was NOT an Error instance.
+    vi.spyOn(Promise, 'allSettled').mockResolvedValueOnce([{ status: 'rejected', reason: 'Primitive string reason' }] as any);
+
+    await expect(executor.execute(spec)).rejects.toThrow('Primitive string reason');
+  });
+
+  it('should throw Unknown error if Promise.allSettled rejects but rejected item has no reason', async () => {
+    const mockAdapter: WorkerAdapter = {
+      execute: vi.fn().mockResolvedValue({ exitCode: 0, stdout: '', stderr: '' })
+    };
+    const executor = new JobExecutor(mockAdapter);
+    const spec: JobSpec = { id: 'test-job', chunks: [{ id: 1, startFrame: 0, frameCount: 10, outputFile: 'out.mp4', command: 'cmd' }], metadata: { totalFrames: 10, fps: 30, width: 100, height: 100, duration: 1 }, mergeCommand: '' };
+
+    // Simulate rejected status but with NO reason so it falls through to the 'Unknown error' error
+    vi.spyOn(Promise, 'allSettled').mockResolvedValueOnce([{ status: 'rejected' }] as any);
+
+    await expect(executor.execute(spec)).rejects.toThrow('Job execution failed: Unknown error');
+  });
 });
