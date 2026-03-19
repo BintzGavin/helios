@@ -1,38 +1,78 @@
-#### 1. Context & Goal
-- **Objective**: Implement the ability to move assets (files and folders) into other folders within the Studio Assets Panel.
-- **Trigger**: The current "Assets Panel" lacks organization capabilities; users can create folders but cannot move existing assets into them. This is a documented gap in `docs/status/STUDIO.md` and a core requirement for "Asset Management".
-- **Impact**: Enables users to organize their project assets, fulfilling the "manage assets" vision.
+# 2026-02-18-STUDIO-Asset-Move
 
-#### 2. File Inventory
-- **Create**: None.
+## 1. Context & Goal
+- **Objective**: Implement the ability to move assets between folders in the Studio Assets Panel using Drag & Drop.
+- **Trigger**: Vision gap in "Manage Assets" and specific blocker identified in `v0.112.0` (lack of move capability in backend).
+- **Impact**: Enables users to organize their project assets, fulfilling the "Asset Management" vision.
+
+## 2. File Inventory
 - **Modify**:
     - `packages/studio/src/server/discovery.ts`: Add `moveAsset` function.
     - `packages/studio/src/server/plugin.ts`: Add `POST /api/assets/move` endpoint.
     - `packages/studio/src/context/StudioContext.tsx`: Add `moveAsset` to context.
-    - `packages/studio/src/components/AssetsPanel/AssetsPanel.tsx`: Handle drop of `application/helios-asset` to trigger move.
-- **Read-Only**:
-    - `packages/studio/src/components/AssetsPanel/AssetItem.tsx`: (Verify `handleDragStart` implementation)
-    - `packages/studio/src/components/AssetsPanel/FolderItem.tsx`: (Verify `onDrop` implementation)
+    - `packages/studio/src/components/AssetsPanel/AssetsPanel.tsx`: Update `handleDrop` to support internal asset moving.
+    - `packages/studio/src/components/AssetsPanel/FolderItem.tsx`: Ensure `onDrop` propagates `folderName`.
+- **Create**:
+    - `packages/studio/src/server/discovery-move.test.ts`: Test file for the new backend logic.
 
-#### 3. Implementation Spec
+## 3. Implementation Spec
 - **Architecture**:
-    - **Backend**: Implement `moveAsset` in `discovery.ts` using `fs.renameSync` with security checks to ensure paths stay within the project/public root.
-    - **API**: Create a `POST` route at `/api/assets/move` (or query param handler in `/api/assets` middleware) that accepts `{ id, dest }` and calls `moveAsset`.
-    - **Frontend**: Update `StudioContext` to expose `moveAsset` which calls the API. Update `AssetsPanel` to handle dropping an `AssetItem` (identified by `application/helios-asset` data) onto a folder or the main panel, calculating the correct destination path relative to the project root.
-- **Pseudo-Code**:
-    - `discovery.ts`: `moveAsset(rootDir, id, destPath)` validates inputs, resolves full paths, checks existence, performs rename, and returns new `AssetInfo`.
-    - `plugin.ts`: Middleware checks `req.url === '/move'` (or `/api/assets/move`), parses body, calls `moveAsset`.
-    - `StudioContext.tsx`: `moveAsset` function fetches API and refreshes assets.
-    - `AssetsPanel.tsx`: `handleDrop` checks `e.dataTransfer` for asset data. If present, calls `moveAsset` with `targetFolder` path.
-- **Public API Changes**: New API endpoint `POST /api/assets/move`.
+    - **Backend**: New `moveAsset` function in `discovery.ts` using `fs.renameSync` with path validation to prevent traversal.
+    - **API**: New `POST /api/assets/move` endpoint accepting `{ id, destPath }`.
+    - **Frontend**: Update `StudioContext` to consume the API. Update `AssetsPanel` to handle `application/helios-asset` drop events, calculating the target path based on the drop target (folder or current view).
+
+- **Pseudo-Code (AssetsPanel.tsx handleDrop)**:
+  ```typescript
+  const handleDrop = async (e, targetFolder) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    // 1. Handle Internal Asset Move
+    const assetData = e.dataTransfer.getData('application/helios-asset');
+    if (assetData) {
+        const asset = JSON.parse(assetData);
+        // Calculate destination directory
+        const destDir = targetFolder
+            ? (currentPath ? `${currentPath}/${targetFolder}` : targetFolder)
+            : currentPath;
+
+        // Calculate full destination path (dir + filename)
+        // If destDir is empty (root), just filename
+        const destPath = destDir ? `${destDir}/${asset.name}` : asset.name;
+
+        // Only move if destination is different from source relative path
+        if (asset.relativePath !== destPath) {
+             try {
+                await moveAsset(asset.id, destPath);
+             } catch (err) {
+                // handle error
+             }
+        }
+        return;
+    }
+
+    // 2. Handle External File Upload (Existing)
+    // ...
+  }
+  ```
+
+- **Public API Changes**:
+    - **Backend (`discovery.ts`)**: `export function moveAsset(rootDir: string, id: string, destPath: string): AssetInfo`
+    - **API (`plugin.ts`)**: `POST /api/assets/move` endpoint. Body: `{ id: string, destPath: string }`
+    - **Frontend (`StudioContext.tsx`)**: `moveAsset(id: string, destPath: string): Promise<void>`
+
 - **Dependencies**: None.
 
-#### 4. Test Plan
+## 4. Test Plan
 - **Verification**:
-    1. Run `npm run build -w packages/studio`.
-    2. Run `npx helios studio`.
-    3. Create a test folder and upload a file.
-    4. Drag the file into the folder.
-    5. Verify the file moves in the UI and on disk.
-- **Success Criteria**: Asset moves successfully without errors; UI updates immediately.
-- **Edge Cases**: Moving file to same location (no-op), moving folder into itself (error), naming collision (error).
+    1.  Create verification script `scripts/verify-move-asset.ts` (or rely on `npm test` for backend logic).
+    2.  Run `npx vitest run packages/studio/src/server/discovery-move.test.ts` to verify backend logic (creation, moving, security checks).
+    3.  (Manual) Start Studio (`npm run dev`), drag a file from the root into a subfolder, and verify it moves and the list updates.
+- **Success Criteria**:
+    - `discovery-move.test.ts` passes.
+    - `moveAsset` successfully moves the file on disk.
+    - Frontend refreshes asset list after move.
+- **Edge Cases**:
+    - Moving a file to a location where it already exists (should throw error).
+    - Moving a file outside project root (security check).
+    - Moving a folder (recursive move).
