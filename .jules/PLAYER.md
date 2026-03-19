@@ -13,3 +13,6 @@
 ## v0.77.0 - Documentation Synchronization
 **Learning:** During the implementation of the media session properties, I learned that strict adherence to the protocol requires not only modifying the source files (`src/index.ts`) but also updating the corresponding tracking and context files (`docs/status/PLAYER.md`, `docs/PROGRESS.md`, `.sys/llmdocs/context-player.md`) in the repository. Modifying compiled build artifacts (`dist/`) directly is incorrect and will cause issues.
 **Action:** Always ensure that modifications are made only to source files, and follow the protocol to update status and documentation files before finalizing a commit.
+## [v0.77.1] - Add Missing Plan
+**Learning:** The previous plan was missing from `/.sys/plans/`, violating the protocol.
+**Action:** Always create a plan file when instructed as Planner.
