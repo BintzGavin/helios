@@ -201,6 +201,94 @@ describe('JobManager Coverage Expansion', () => {
     expect(mockRepo.save).not.toHaveBeenCalled();
   });
 
+  it('should exit early in resumeJob if job is not found or not paused', async () => {
+    const mockRepo: JobRepository = {
+      save: vi.fn(),
+      get: vi.fn().mockResolvedValue(undefined),
+      list: vi.fn(),
+      delete: vi.fn()
+    };
+    const mockExecutor = {} as JobExecutor;
+    const manager = new JobManager(mockRepo, mockExecutor);
+
+    // Should not throw or do anything
+    await expect(manager.resumeJob('job-1')).resolves.not.toThrow();
+
+    // Now test with a job that is not paused
+    mockRepo.get = vi.fn().mockResolvedValue({ state: 'running' } as unknown as JobStatus);
+    await expect(manager.resumeJob('job-1')).resolves.not.toThrow();
+  });
+
+  it('should catch and log error in resumeJob if runJob throws', async () => {
+    const mockRepo: JobRepository = {
+      save: vi.fn(),
+      get: vi.fn().mockResolvedValue({
+        id: 'job-1',
+        state: 'paused',
+        spec: { chunks: [] }
+      } as unknown as JobStatus),
+      list: vi.fn(),
+      delete: vi.fn()
+    };
+    const mockExecutor = {} as JobExecutor;
+    const manager = new JobManager(mockRepo, mockExecutor);
+
+    // Mock internal runJob to throw
+    (manager as any).runJob = vi.fn().mockRejectedValue(new Error('Run error'));
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    await manager.resumeJob('job-1');
+
+    // Due to the unhandled promise catch we need to wait a tick
+    await new Promise(resolve => setTimeout(resolve, 0));
+
+    expect(console.error).toHaveBeenCalledWith('Unhandled error resuming job job-1:', expect.any(Error));
+  });
+
+  it('should exit early in deleteJob if job is not found', async () => {
+    const mockRepo: JobRepository = {
+      save: vi.fn(),
+      get: vi.fn().mockResolvedValue(undefined),
+      list: vi.fn(),
+      delete: vi.fn()
+    };
+    const mockExecutor = {} as JobExecutor;
+    const manager = new JobManager(mockRepo, mockExecutor);
+
+    await expect(manager.deleteJob('job-1')).resolves.not.toThrow();
+    expect(mockRepo.delete).not.toHaveBeenCalled();
+  });
+
+  it('should catch and log error during remote asset bundle deletion in deleteJob', async () => {
+    const mockRepo: JobRepository = {
+      save: vi.fn(),
+      get: vi.fn().mockResolvedValue({
+        id: 'job-1',
+        state: 'completed',
+        spec: { chunks: [], assetsUrl: 'http://example.com/assets.zip' },
+        meta: {}
+      } as unknown as JobStatus),
+      list: vi.fn(),
+      delete: vi.fn()
+    };
+    const mockExecutor = {} as JobExecutor;
+    const mockStorage: ArtifactStorage = {
+      uploadAssetBundle: vi.fn(),
+      uploadJobSpec: vi.fn(),
+      deleteAssetBundle: vi.fn().mockRejectedValue(new Error('Asset delete error')),
+      deleteJobSpec: vi.fn(),
+      downloadAssetBundle: vi.fn(),
+      downloadJobSpec: vi.fn()
+    };
+
+    const manager = new JobManager(mockRepo, mockExecutor, mockStorage);
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    await manager.deleteJob('job-1');
+
+    expect(console.error).toHaveBeenCalledWith('Failed to delete assets for job job-1:', expect.any(Error));
+  });
+
   it('should not throw if repository.get returns undefined during onChunkComplete', async () => {
     let onChunkCompleteCallback: any;
 
