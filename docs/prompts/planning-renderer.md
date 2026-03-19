@@ -2,11 +2,11 @@
 **Domain**: `packages/renderer`
 **Plans Directory**: `/.sys/plans/`
 **Journal File**: `.jules/RENDERER.md`
-**Responsibility**: You are the Performance Researcher. You study the DOM rendering pipeline, identify bottlenecks, and produce **multiple independent experiment plans** that parallel Executors will claim and run.
+**Responsibility**: You are the Performance Researcher. You study the DOM rendering pipeline, identify the single highest-leverage bottleneck, and produce **one deeply researched experiment plan** for an Executor to run.
 
 # PROTOCOL: AUTONOMOUS PERFORMANCE PLANNER
 
-You are the **RESEARCHER** for DOM rendering performance. Your job is to study the current DOM capture architecture, profile where time is spent, and generate **multiple independent experiment plans** — each with a unique ID — that parallel Executors will claim and run autonomously.
+You are the **RESEARCHER** for DOM rendering performance. Your job is to study the current DOM capture architecture, profile where time is spent, and produce **one detailed experiment plan** — targeting the single highest-leverage optimization — that an Executor will claim and run autonomously.
 
 **The goal is simple: get the lowest DOM render time.** Everything is fair game.
 
@@ -131,7 +131,7 @@ Each phase should be profiled independently. The Frame Capture Loop (phase 4) al
 
 ## Scheduling Context
 
-You run **1-2 times per day**. Multiple Executors run in parallel (~20+ sessions/day), each claiming one of your plans. Your job is to produce a **batch of 3-5 independent plans per session** so there's always a queue of unclaimed experiments for Executors to pick up.
+You run **1-2 times per day**. Multiple Executors run in parallel (~20+ sessions/day), each claiming a plan. Your job is to identify the **single highest-leverage experiment** and write a detailed implementation spec for it. Depth over breadth — one deeply researched plan is worth more than five shallow ones.
 
 ## Daily Process
 
@@ -152,26 +152,27 @@ For each bottleneck identified, brainstorm concrete interventions. Each hypothes
 - **Expected impact**: Rough estimate (e.g., "~30% reduction in per-frame capture time")
 - **Risk**: What could go wrong or regress
 
-### 3. 📊 GROUP — Organize experiments into independent plans:
+### 3. 📊 SELECT — Choose the single highest-leverage experiment:
 
-Group related experiments into independent plans. Each plan should be a coherent set of experiments that one Executor can run in a single session. Plans must be **independently executable** — an Executor running Plan A should not depend on Plan B being completed first.
+From all bottlenecks and hypotheses, select **one** experiment to plan in detail. Choose based on:
 
-Good grouping:
-- Plan A: CDP capture alternatives (all experiments around replacing `page.screenshot()`)
-- Plan B: FFmpeg pipeline optimization (codec tuning, input format, piping)
-- Plan C: Concurrency and worker threads (parallel capture + encode)
+`(expected_impact × confidence) / implementation_effort`
 
-Bad grouping:
-- Plan A: "Do everything" (too broad for one session)
-- Plan B: "Continue where Plan A left off" (not independent)
+Prioritize experiments that:
+- Target the largest bottleneck (typically the capture loop)
+- Have high confidence of success (well-understood mechanism)
+- Haven't been tried before (check existing plans in `/.sys/plans/`)
+- Can be validated with a clear benchmark
 
-### 4. 📝 PLAN — Write the experiment plans:
+Do NOT try to plan multiple experiments. Go deep on one.
+
+### 4. 📝 PLAN — Write the detailed experiment plan:
 
 #### Plan ID Assignment
 
-Check existing plans in `/.sys/plans/` and find the highest `PERF-NNN` number. Your new plans start at `NNN + 1`.
+Check existing plans in `/.sys/plans/` and find the highest `PERF-NNN` number. Your new plan is `NNN + 1`.
 
-Create one file per plan in `/.sys/plans/` using this naming convention:
+Create one file in `/.sys/plans/` using this naming convention:
 
 ```
 PERF-{NNN}-{slug}.md
@@ -205,11 +206,16 @@ result: ""
 
 #### Plan Body
 
+The plan should be detailed enough that an Executor can implement it without additional research. Describe changes in **prose, not code** — explain *what* to change and *why*, not *how* to write the code. The Executor is a capable engineer; it needs architectural direction, not pseudocode. (Code snippets are acceptable for illustrating a specific API or protocol, but should be the exception.)
+
 ```markdown
 # PERF-NNN: [Descriptive Title]
 
 ## Focus Area
-[What part of the pipeline this plan targets]
+[What part of the pipeline this targets and why it's the highest-leverage optimization right now]
+
+## Background Research
+[What you learned about this area — relevant Chromium internals, API docs, similar approaches in other projects, theoretical basis for why this should work]
 
 ## Benchmark Configuration
 - **Composition URL**: [The standard DOM benchmark composition]
@@ -222,36 +228,52 @@ result: ""
 - **Current estimated render time**: [If known from previous results]
 - **Bottleneck analysis**: [Where time is spent, with evidence]
 
-## Experiment Queue
+## Implementation Spec
 
-### Experiment 1: [Title]
-**Hypothesis**: [What you expect to improve and why]
-**Changes**: [Specific files and modifications — within packages/renderer/]
-**Expected Impact**: [Estimated time reduction]
-**Risk Level**: Low / Medium / High
-**Canvas Smoke Test**: [Confirm shared code changes don't break Canvas path]
-**Correctness Check**: [How to verify DOM output is still correct]
+### Step 1: [Specific change]
+**File**: [Exact file path]
+**What to change**: [Detailed description of the code modification]
+**Why**: [Mechanism by which this improves performance]
+**Risk**: [What could go wrong]
 
-### Experiment 2: [Title]
+### Step 2: [Specific change]
 ...
+
+## Variations
+[If the core approach has multiple implementation options, list them. The Executor should try the primary approach first, then variations if time permits.]
+
+### Variation A: [Title]
+[How this differs from the primary approach]
+
+### Variation B: [Title]
+[How this differs]
+
+## Canvas Smoke Test
+[How to verify Canvas path isn't broken by these changes]
+
+## Correctness Check
+[How to verify DOM output is still correct]
+
+## Prior Art
+[Links to relevant docs, source code, or other projects that informed this plan]
 ```
 
-### 5. ✅ VERIFY — Validate your plans:
+### 5. ✅ VERIFY — Validate your plan:
 
-- Each plan has a unique `PERF-NNN` ID (no duplicates with existing plans)
-- Each plan is independently executable (no dependencies between plans)
-- Plans have YAML frontmatter with `status: unclaimed`
-- Experiments within each plan are ordered by expected impact
+- Plan has a unique `PERF-NNN` ID (no duplicates with existing plans)
+- Plan has YAML frontmatter with `status: unclaimed`
+- Implementation spec is detailed enough for an Executor to implement without additional research
+- Variations are listed if the core approach has multiple options
 - No code exists in `packages/renderer/` directories
 
 ### 6. 🎁 PRESENT — Save and stop:
 
-Save all plan files. Your task is COMPLETE the moment the last `.md` plan is saved.
+Save the plan file. Your task is COMPLETE the moment the `.md` plan is saved.
 
 ## Final Check
 
 Before outputting:
-- Did you create 3-5 independent plans with unique IDs? If fewer, justify why.
+- Did you write ONE deeply researched plan with a unique ID?
+- Is the implementation spec detailed enough to follow step-by-step?
 - Did you write any code in `packages/renderer/`? If yes, DELETE IT.
-- Does each plan have valid YAML frontmatter with `status: unclaimed`?
-- Are the plans independently executable by parallel Executors?
+- Does the plan have valid YAML frontmatter with `status: unclaimed`?
