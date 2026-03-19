@@ -1451,6 +1451,38 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
     }
   }
 
+  public get mediaTitle(): string {
+    return this.getAttribute("media-title") || "";
+  }
+
+  public set mediaTitle(val: string) {
+    this.setAttribute("media-title", val);
+  }
+
+  public get mediaArtist(): string {
+    return this.getAttribute("media-artist") || "";
+  }
+
+  public set mediaArtist(val: string) {
+    this.setAttribute("media-artist", val);
+  }
+
+  public get mediaAlbum(): string {
+    return this.getAttribute("media-album") || "";
+  }
+
+  public set mediaAlbum(val: string) {
+    this.setAttribute("media-album", val);
+  }
+
+  public get mediaArtwork(): string {
+    return this.getAttribute("media-artwork") || "";
+  }
+
+  public set mediaArtwork(val: string) {
+    this.setAttribute("media-artwork", val);
+  }
+
   public async requestPictureInPicture(): Promise<PictureInPictureWindow> {
     if (!document.pictureInPictureEnabled) {
       throw new Error("Picture-in-Picture not supported");
