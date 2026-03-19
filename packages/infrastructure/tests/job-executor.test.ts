@@ -463,6 +463,60 @@ describe('JobExecutor', () => {
     }
   });
 
+  it('should throw AbortError if signal is aborted explicitly before resolving the retry delay', async () => {
+    const ac = new AbortController();
+    let attempt = 0;
+
+    mockAdapter.execute = vi.fn().mockImplementation(async () => {
+      if (attempt === 0) {
+        attempt++;
+        throw new Error('Trigger retry');
+      }
+      return { exitCode: 0, stdout: '', stderr: '', durationMs: 0 };
+    });
+
+    // To hit `if (options.signal?.aborted)` at the top of the while loop (lines 149-153),
+    // we need `aborted` to be true right when it re-evaluates the loop condition or at the top of the loop block.
+    // The delay promise resolves first. We mock `setTimeout` so that right before it executes the timeout callback,
+    // we set `aborted` to true. This ensures the timeout completes successfully (not intercepted by the abort listener),
+    // and then the loop repeats and hits the `aborted` check.
+    const originalSetTimeout = global.setTimeout;
+    const setTimeoutSpy = vi.spyOn(global, 'setTimeout').mockImplementation(((fn: any, ms: any) => {
+      // Simulate waiting
+      const timeoutId = originalSetTimeout(() => {
+          Object.defineProperty(ac.signal, 'aborted', { value: true, configurable: true });
+          fn();
+      }, 0);
+      return timeoutId;
+    }) as any);
+
+    try {
+      const error = await jobExecutor.execute(jobSpec, {
+        signal: ac.signal,
+        retries: 1,
+        retryDelay: 10
+      }).catch(e => e);
+
+      expect(error.name).toBe('AbortError');
+      expect(error.message).toBe('Job aborted');
+    } finally {
+      setTimeoutSpy.mockRestore();
+    }
+  });
+
+  it('should explicitly throw rejection reason if chunk Promise fails with a reason but no failures exist', async () => {
+    // Override Promise.allSettled to simulate a rejection with a generic object that has a reason property
+    const allSettledSpy = vi.spyOn(Promise, 'allSettled').mockResolvedValue([
+      { status: 'rejected', reason: new Error('Some other object error') }
+    ] as any);
+
+    try {
+      await expect(jobExecutor.execute(jobSpec)).rejects.toThrow('Some other object error');
+    } finally {
+      allSettledSpy.mockRestore();
+    }
+  });
+
   describe('merge logic decoupling', () => {
     it('should use mergeAdapter when provided', async () => {
       const mockMergeAdapter: WorkerAdapter = {

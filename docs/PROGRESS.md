@@ -1,3 +1,6 @@
+## INFRASTRUCTURE v0.54.21
+- ✅ Completed: Orchestrator Test Coverage Expansion - Improved branch coverage for job manager and executor by adding AbortError testing and unknown error rejection bubbling.
+
 ## INFRASTRUCTURE v0.28.3
 - ✅ Completed: Documentation Orchestration - Updated README.md to document Orchestration, Job Management, Cloud Execution Adapters, and Worker Runtime abstractions.
 # Helios Project Progress Log

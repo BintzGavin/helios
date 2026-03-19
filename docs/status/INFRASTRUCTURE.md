@@ -1,7 +1,8 @@
 # INFRASTRUCTURE STATUS
-**Version**: 0.54.20
+**Version**: 0.54.21
 
 ## Status Log
+- [v0.54.21] ✅ Completed: Orchestrator Test Coverage Expansion - Improved branch coverage for job manager and executor by adding AbortError testing and unknown error rejection bubbling.
 - [v0.54.20] ✅ Completed: Orchestrator Coverage Expansion - Improved branch coverage to 100% for `JobManager` and `JobExecutor` error handling and early exits.
 - [v0.54.19] ✅ Completed: Orchestrator Coverage Expansion - Improved branch coverage to 100% for `JobManager` and `JobExecutor` error handling and early exits.
 - [v0.54.18] ✅ Completed: InMemoryJobRepository Coverage - Improved test coverage for `InMemoryJobRepository` to 100%.
