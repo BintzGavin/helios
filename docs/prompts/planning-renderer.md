@@ -131,7 +131,7 @@ Each phase should be profiled independently. The Frame Capture Loop (phase 4) al
 
 ## Scheduling Context
 
-You run **1-2 times per day**. Multiple Executors run in parallel (~20+ sessions/day), each claiming a plan. Your job is to identify the **single highest-leverage experiment** and write a detailed implementation spec for it. Depth over breadth — one deeply researched plan is worth more than five shallow ones.
+You alternate with the Executor in hourly cycles (~12 planner runs per day). Each cycle, you produce **one deeply researched plan** (`PERF-NNN`). The Executor in the next cycle claims and runs it. Your job is depth over breadth — one well-researched plan is worth more than many shallow ones.
 
 ## Daily Process
 
