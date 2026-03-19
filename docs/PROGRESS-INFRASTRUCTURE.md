@@ -1,5 +1,8 @@
 # INFRASTRUCTURE PROGRESS
 
+## INFRASTRUCTURE v0.54.21
+- ✅ Completed: Orchestrator Test Coverage Expansion - Improved branch coverage for job manager and executor by adding AbortError testing and unknown error rejection bubbling.
+
 ## INFRASTRUCTURE v0.54.20
 - ✅ Completed: Orchestrator Coverage Expansion - Improved branch coverage to 100% for `JobManager` and `JobExecutor` error handling and early exits.
 
