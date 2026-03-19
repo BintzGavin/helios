@@ -1,111 +1,38 @@
 # Infrastructure Context
-
-This context is automatically generated.
-
 ## Section A: Architecture
-The infrastructure package provides components for distributed rendering.
-- **Workers**: Stateless worker implementations for executing chunks of work.
-- **Adapters**: Cloud provider-specific execution wrappers.
-- **Orchestrators**: JobManager and JobExecutor to distribute work.
-- **Stitchers**: OutputStitcher abstractions to merge chunked videos.
+The infrastructure package provides cloud execution, stateless workers, and deployment tooling for distributed video rendering.
+- **Workers**: Execute rendering chunks deterministically and statelessly.
+- **Orchestrators**: Manage job lifecycles and schedule chunks across workers.
+- **Adapters**: Cloud-agnostic interfaces with specific implementations for AWS Lambda, Google Cloud Run, Vercel, Fly Machines, etc.
+- **Storage**: Artifact storage implementations (GCS, S3, Local) for bundles and job specs.
 
 ## Section B: File Tree
 ```
-- adapters/
-  - aws-adapter.ts
-  - azure-functions-adapter.ts
-  - cloudflare-workers-adapter.ts
-  - cloudrun-adapter.ts
-  - deno-deploy-adapter.ts
-  - docker-adapter.ts
-  - fly-machines-adapter.ts
-  - hetzner-cloud-adapter.ts
-  - index.ts
-  - kubernetes-adapter.ts
-  - local-adapter.ts
-  - modal-adapter.ts
-  - vercel-adapter.ts
-- governance/
-  - index.ts
-  - sync-workspace.ts
-- index.ts
-- orchestrator/
-  - file-job-repository.ts
-  - index.ts
-  - job-executor.ts
-  - job-manager.ts
-- stitcher/
-  - ffmpeg-stitcher.ts
-  - index.ts
-- storage/
-  - gcs-storage.ts
-  - index.ts
-  - local-storage.ts
-  - s3-storage.ts
-- types/
-  - adapter.ts
-  - index.ts
-  - job-spec.ts
-  - job-status.ts
-  - job.ts
-  - storage.ts
-- utils/
-  - command.ts
-  - index.ts
-- worker/
-  - aws-handler.ts
-  - cloudrun-server.ts
-  - index.ts
-  - render-executor.ts
-  - runtime.ts
+packages/infrastructure/
+├── src/
+│   ├── index.ts
+│   ├── types/
+│   ├── worker/
+│   ├── orchestrator/
+│   ├── stitcher/
+│   ├── adapters/
+│   ├── storage/
+│   └── utils/
+├── tests/
+├── package.json
+└── tsconfig.json
 ```
 
 ## Section C: Interfaces
-```typescript
-// packages/infrastructure/src/types/worker.ts
-export interface WorkerAdapter {
-  execute(job: WorkerJob): Promise<WorkerResult>;
-}
-
-// packages/infrastructure/src/types/job.ts
-export interface WorkerJob {
-  command: string;
-  meta: Record<string, any>;
-  signal?: AbortSignal;
-}
-
-// packages/infrastructure/src/types/adapter.ts
-export interface WorkerResult {
-  exitCode: number;
-  stdout: string;
-  stderr: string;
-  durationMs: number;
-}
-```
+- `WorkerAdapter`: `execute(job: WorkerJob): Promise<WorkerResult>`
+- `JobExecutor`: `execute(jobSpec: JobSpec, options: JobExecutionOptions): Promise<void>`
+- `JobManager`: manages job creation, status, pause, resume, cancel, delete.
+- `ArtifactStorage`: methods for uploading/downloading asset bundles and job specs.
+- `VideoStitcher`: `stitch(inputs: string[], output: string): Promise<void>`
 
 ## Section D: Cloud Adapters
-- LocalStorageAdapter
-- S3StorageAdapter
-- GcsStorageAdapter
-- LocalWorkerAdapter
-- AwsLambdaAdapter
-- CloudRunAdapter
-- CloudflareWorkersAdapter
-- AzureFunctionsAdapter
-- DockerAdapter
-- DenoDeployAdapter
-- VercelAdapter
-- FlyMachinesAdapter
-- HetznerCloudAdapter
-- KubernetesAdapter
-- ModalAdapter
+Available adapters: LocalAdapter, DockerAdapter, CloudRunAdapter, AwsLambdaAdapter, VercelAdapter, AzureFunctionsAdapter, FlyMachinesAdapter, CloudflareWorkersAdapter, ModalAdapter, DenoDeployAdapter, HetznerCloudAdapter, KubernetesAdapter.
 
 ## Section E: Integration
-The JobExecutor distributes chunks to a pool of adapters and coordinates the stitching phase via `FfmpegStitcher`. The CLI and Studio components directly use JobManager to orchestrate renderings.
-
-## Packages
-packages/infrastructure/src/orchestrator/job-manager.ts
-packages/infrastructure/src/orchestrator/job-executor.ts
-
-## Updates
-- v0.53.23: ModalAdapter Coverage - Achieved 100% test coverage for ModalAdapter edge cases.
+- Consumes interfaces from `packages/renderer`.
+- Exposes orchestration and execution APIs utilized by the CLI and server environments.
