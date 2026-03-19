@@ -248,14 +248,61 @@ run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
 6	13.200	300	22.73	490.0	discard	headless shell (slower in this environment)
 ```
 
-## Correctness Verification
+## Verification Protocol
 
-After each experiment that shows a time improvement, verify the output is correct:
-- Compare output video file size (should be within ~5% of baseline)
-- If available, do a frame-by-frame pixel diff against baseline output
-- If the experiment changes the capture format, manually inspect a few frames
+Every kept experiment must pass **all four gates** before it's considered a valid improvement. If any gate fails, the experiment is **automatically discarded** (restore all files to pre-experiment state).
 
-A change that produces incorrect output is **automatically discarded** regardless of speed improvement.
+### Gate 1: TypeScript Compilation
+```bash
+npm run build   # tsc — in packages/renderer/
+```
+Must complete with zero errors. Type errors indicate broken contracts.
+
+### Gate 2: Test Suite
+```bash
+npm test        # runs all 74 verification tests via tests/run-all.ts
+```
+Must complete with **all tests passing**. The test suite covers DOM rendering, Canvas rendering, codecs, frame counts, shadow DOM, audio sync, seek driver determinism, and more. This is your strongest safety net.
+
+If the test suite is too slow to run on every experiment (it launches real browsers), run at minimum:
+- After every **kept** experiment (mandatory)
+- Before the session ends (mandatory — final validation)
+
+For discarded experiments, skip the test suite since you're restoring files anyway.
+
+### Gate 3: Output Validation
+After a successful benchmark run, validate the output video:
+```bash
+ffprobe -v error -show_entries format=duration,size -show_entries stream=width,height,nb_frames,codec_name -of json output.mp4
+```
+Verify:
+- **Frame count** matches expected (total_frames = fps × duration). An experiment that "speeds up" rendering by dropping frames is cheating.
+- **Duration** matches expected composition duration (within 0.1s tolerance)
+- **Resolution** matches the benchmark configuration
+- **Codec** is the expected codec
+- **File size** is within ~20% of baseline (large deviations indicate quality issues or encoding errors)
+
+### Gate 4: Benchmark Consistency
+- Run the benchmark **3 times minimum**, use the **median** result
+- If the variance between runs exceeds 15%, the environment is noisy — run 5 times and discard outliers
+- A "faster" result that's within the noise margin (~5%) is NOT a clear improvement — mark as `inconclusive` rather than `keep`
+
+### Canvas Smoke Test (non-blocking)
+After passing all four gates, run a quick Canvas render to confirm it still works:
+```bash
+node -e "/* quick canvas render to verify no breakage */"
+```
+This is a pass/fail check — does it complete without error? It is NOT benchmarked for time.
+
+### Verification Summary
+
+| Gate | Command | Must Pass | When |
+|------|---------|-----------|------|
+| Compilation | `npm run build` | Every experiment | Before benchmark |
+| Test Suite | `npm test` | Every kept experiment + session end | After benchmark |
+| Output Validation | `ffprobe` on output | Every benchmark run | After benchmark |
+| Benchmark Consistency | 3+ runs, median | Every experiment | During benchmark |
+| Canvas Smoke | Quick canvas render | Every kept experiment | After test suite |
 
 ## Vision Rewrites
 
