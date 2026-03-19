@@ -1,5 +1,11 @@
 # LLMS Progress
 
+## LLMS v1.47.0
+- ✅ Completed: Daily llms.txt Review
+  - Updated Quick Facts and Roadmap to reflect latest versions (Studio v0.118.8+, Player v0.76.24+, Renderer v1.80.0+, CLI v0.38.0+, Infrastructure v0.54.19+).
+  - Synced Roadmap features for packages.
+  - Updated distributed rendering comparison to include Azure, Cloudflare, Fly.io.
+
 ## LLMS v1.46.0
 - ✅ Completed: Daily llms.txt Review
   - Updated Quick Facts and Roadmap to reflect latest versions (Studio v0.118.8+, Player v0.76.23+, Renderer v1.80.0+, CLI v0.37.4+, Infrastructure v0.54.10+).
