@@ -147,6 +147,52 @@ describe('JobExecutor', () => {
     expect(attempts).toBe(3); // 1 initial + 2 retries
   });
 
+  it('should throw AbortError if signal is aborted during chunk execution loop', async () => {
+    const ac = new AbortController();
+
+    mockAdapter.execute = vi.fn().mockImplementation(async (job: WorkerJob) => {
+      if (job.args && job.args.includes('1')) {
+        // First attempt throws error
+        return { exitCode: 1, stdout: '', stderr: 'Retry this', durationMs: 0 };
+      }
+      return { exitCode: 0, stdout: '', stderr: '', durationMs: 0 };
+    });
+
+    const originalSetTimeout = global.setTimeout;
+    const setTimeoutSpy = vi.spyOn(global, 'setTimeout').mockImplementation(((fn: any, ms: any) => {
+      // Abort during the retry delay
+      ac.abort();
+      return originalSetTimeout(fn, 0);
+    }) as any);
+
+    try {
+      const error = await jobExecutor.execute(jobSpec, {
+        signal: ac.signal,
+        retries: 1,
+        retryDelay: 10
+      }).catch(e => e);
+
+      expect(error.name).toBe('AbortError');
+      expect(error.message).toBe('Job aborted');
+    } finally {
+      setTimeoutSpy.mockRestore();
+    }
+  });
+
+  it('should throw Unknown error if a chunk rejects with a non-Error reason', async () => {
+    // We override Promise.allSettled to simulate an edge case where a worker is rejected
+    // without populating the 'failures' array or returning a proper reason
+    const allSettledSpy = vi.spyOn(Promise, 'allSettled').mockResolvedValue([
+      { status: 'rejected' } // No reason, failures array is empty
+    ] as any);
+
+    try {
+      await expect(jobExecutor.execute(jobSpec)).rejects.toThrow('Job execution failed: Unknown error');
+    } finally {
+      allSettledSpy.mockRestore();
+    }
+  });
+
   it('should call onProgress callback when a chunk completes', async () => {
     const onProgress = vi.fn();
 
