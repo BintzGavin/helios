@@ -1,3 +1,6 @@
+### STUDIO v0.119.0
+- ✅ Completed: Asset Drag and Drop - Implemented the ability to move assets within the Studio panel by dragging and dropping them into directories or the current view.
+
 ### STUDIO v0.118.8
 - ✅ Completed: Enhance MCP Server - Obsolete plan removed as MCP Server features already exist
 

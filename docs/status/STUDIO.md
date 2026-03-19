@@ -1,4 +1,4 @@
-**Version**: 0.118.8
+**Version**: 0.119.0
 
 **Posture**: ACTIVELY EXPANDING FOR V2
 
@@ -11,6 +11,7 @@
 > **Note**: Status versions in this file may precede package release versions (`package.json`). Always verify `package.json` for the currently installed version.
 
 ## Recent Updates
+- [v0.119.0] ✅ Completed: Asset Drag and Drop - Implemented the ability to move assets within the Studio panel by dragging and dropping them into directories or the current view.
 - [v0.118.8] ✅ Completed: Enhance MCP Server - Obsolete plan removed as MCP Server features already exist
 - [v0.118.7] ✅ Completed: Close obsolete Regression Tests plan
 - [v0.118.6] ✅ Completed: TimelineAudioTrack Regression Tests - Added vitest regression tests for TimelineAudioTrack and useAudioWaveform
