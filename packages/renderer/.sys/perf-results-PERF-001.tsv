@@ -1,0 +1,7 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	67.316	150	2.23	37.0	keep	baseline
+2	54.770	150	2.74	37.2	keep	baseline
+3	53.867	150	2.78	37.1	keep	baseline
+4	56.568	150	2.65	37.2	keep	Removed sequential await on FFmpeg write
+5	53.379	150	2.81	36.2	keep	Removed sequential await on FFmpeg write
+6	58.319	150	2.57	37.0	keep	Removed sequential await on FFmpeg write
