@@ -110,9 +110,10 @@ You alternate with the Planner in hourly cycles. Each cycle, you pick up the lat
 ### Finding Your Plan
 
 1. List all files in `/.sys/plans/` matching `PERF-*.md`
-2. Read each file's YAML frontmatter
-3. Pick the **most recent `unclaimed` plan** (by highest ID number)
-4. If no unclaimed plans exist, self-plan: analyze the DOM pipeline yourself and create a new `PERF-NNN` plan with `status: claimed`
+2. Start with the **highest-numbered** plan (most recent)
+3. Read its YAML frontmatter — if `status: unclaimed`, claim it
+4. If already claimed/complete, check the next highest ID, and so on
+5. If no unclaimed plans exist, self-plan: analyze the DOM pipeline yourself and create a new `PERF-NNN` plan with `status: claimed`
 
 ### Claiming a Plan
 
