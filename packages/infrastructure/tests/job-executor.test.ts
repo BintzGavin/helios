@@ -336,6 +336,54 @@ describe('JobExecutor', () => {
     expect(mockAdapter.execute).toHaveBeenCalledTimes(1);
   });
 
+
+  it('should throw AbortError if signal is aborted after the retry delay', async () => {
+    const ac = new AbortController();
+    let attempt = 0;
+
+    mockAdapter.execute = vi.fn().mockImplementation(async () => {
+      if (attempt === 0) {
+        attempt++;
+        throw new Error('Trigger retry');
+      }
+      return { exitCode: 0, stdout: '', stderr: '', durationMs: 0 };
+    });
+
+    const originalSetTimeout = global.setTimeout;
+    const setTimeoutSpy = vi.spyOn(global, 'setTimeout').mockImplementation(((fn: any, ms: any) => {
+      // Don't actually wait, just resolve immediately and set aborted=true for the logic after delay
+      Object.defineProperty(ac.signal, 'aborted', { value: true, configurable: true });
+      return originalSetTimeout(fn, 0);
+    }) as any);
+
+    try {
+      const error = await jobExecutor.execute(jobSpec, {
+        signal: ac.signal,
+        retries: 1,
+        retryDelay: 10
+      }).catch(e => e);
+
+      expect(error.name).toBe('AbortError');
+      expect(error.message).toBe('Job aborted');
+      expect(attempt).toBe(1);
+    } finally {
+      setTimeoutSpy.mockRestore();
+    }
+  });
+
+  it('should throw "Job execution failed: Unknown error" if Promise.allSettled rejects but no failures and no reason', async () => {
+    // Override Promise.allSettled to simulate a rejection without a reason
+    const allSettledSpy = vi.spyOn(Promise, 'allSettled').mockResolvedValue([
+      { status: 'rejected', reason: undefined } // rejected but reason is undefined
+    ] as any);
+
+    try {
+      await expect(jobExecutor.execute(jobSpec)).rejects.toThrow('Job execution failed: Unknown error');
+    } finally {
+      allSettledSpy.mockRestore();
+    }
+  });
+
   describe('merge logic decoupling', () => {
     it('should use mergeAdapter when provided', async () => {
       const mockMergeAdapter: WorkerAdapter = {
