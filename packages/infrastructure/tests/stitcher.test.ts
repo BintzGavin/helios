@@ -34,6 +34,12 @@ describe('FfmpegStitcher', () => {
     vi.clearAllMocks();
   });
 
+  it('should use LocalWorkerAdapter by default if no adapter is provided', () => {
+    const defaultStitcher = new FfmpegStitcher();
+    expect(defaultStitcher['adapter']).toBeDefined();
+    expect(defaultStitcher['adapter'].constructor.name).toBe('LocalWorkerAdapter');
+  });
+
   it('should throw error if no inputs are provided', async () => {
     await expect(stitcher.stitch([], 'output.mp4')).rejects.toThrow(
       'No input files provided for stitching'
