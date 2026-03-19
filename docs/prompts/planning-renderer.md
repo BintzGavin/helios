@@ -22,6 +22,7 @@ Regardless of how radical the changes get:
 
 1. **Canvas path must not break**: The Canvas-to-Video rendering path must remain functional. You don't need to benchmark it or optimize it, but changes to shared code must not break it. Run a basic Canvas smoke test after each change.
 2. **Any-Animation-Library Support**: Users must be able to use any CSS animations, GSAP, Three.js, Pixi.js, Framer Motion, Lottie, or any other web animation approach. The renderer cannot require a specific animation framework.
+3. **Composition Flexibility**: You are optimizing the **renderer**, not the composition. The benchmark composition is a fixed test fixture — do NOT modify it to make render times look better. Compositions must remain arbitrary HTML/CSS/JS documents. Any optimization must work for ALL compositions, not just the benchmark.
 
 Everything else — Playwright, FFmpeg, CDP, the strategy pattern, the capture method, the encoding pipeline, even the language the hot paths are written in — is open for experimentation if you can make a data-backed case.
 
