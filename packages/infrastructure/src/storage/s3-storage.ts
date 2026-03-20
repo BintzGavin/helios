@@ -38,7 +38,7 @@ export class S3StorageAdapter implements ArtifactStorage {
 
     const files = await this.getAllFiles(localDir);
 
-    for (const file of files) {
+    const uploadPromises = files.map(async (file) => {
       const relativePath = path.relative(localDir, file);
       // Ensure S3 key uses forward slashes
       const s3Key = `${jobId}/${relativePath.split(path.sep).join('/')}`;
@@ -51,8 +51,10 @@ export class S3StorageAdapter implements ArtifactStorage {
         Body: fileStream,
       });
 
-      await this.client.send(command);
-    }
+      return this.client.send(command);
+    });
+
+    await Promise.all(uploadPromises);
 
     return `s3://${this.bucket}/${jobId}`;
   }
