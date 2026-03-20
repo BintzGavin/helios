@@ -1,11 +1,11 @@
 ---
 id: PERF-011
 slug: optimize-intermediate-format-jpeg
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2026-10-18
-completed: ""
-result: ""
+completed: 2026-10-18
+result: improved
 ---
 
 # PERF-011: Optimize Intermediate Format to JPEG
@@ -33,3 +33,8 @@ In the `capture()` method, modify the logic that determines the `format` and `qu
 ## Test Plan
 1. Run a standard Canvas smoke test by executing `npx tsx tests/verify-codecs.ts` inside the `packages/renderer` directory.
 2. Ensure output video is identical in quality by comparing test outputs. Ensure no skipped frames.
+## Results Summary
+- **Best render time**: 46.706s (vs baseline 47.795s)
+- **Improvement**: 2.2%
+- **Kept experiments**: Default to JPEG intermediate format
+- **Discarded experiments**: None
