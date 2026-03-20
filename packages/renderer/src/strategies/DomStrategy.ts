@@ -11,8 +11,6 @@ export class DomStrategy implements RenderStrategy {
   private discoveredAudioTracks: AudioTrackConfig[] = [];
   private cleanupAudio: () => Promise<void> | void = () => {};
   private cdpSession: CDPSession | null = null;
-  private frameQueue: Buffer[] = [];
-  private frameResolver: ((buffer: Buffer) => void) | null = null;
   private lastFrameBuffer: Buffer | null = null;
 
   constructor(private options: RendererOptions) {
@@ -67,23 +65,6 @@ export class DomStrategy implements RenderStrategy {
 
     this.cdpSession = await page.context().newCDPSession(page);
 
-    this.cdpSession.on('Page.screencastFrame', (event: any) => {
-      const buffer = Buffer.from(event.data, 'base64');
-      this.cdpSession?.send('Page.screencastFrameAck', { sessionId: event.sessionId }).catch(() => {});
-
-      this.lastFrameBuffer = buffer;
-
-      if (this.frameResolver) {
-        this.frameResolver(buffer);
-        this.frameResolver = null;
-      } else {
-        this.frameQueue.push(buffer);
-      }
-    });
-
-    const format = this.options.intermediateImageFormat === 'jpeg' ? 'jpeg' : 'png';
-    const quality = format === 'jpeg' ? (this.options.intermediateImageQuality || 100) : undefined;
-
     // Check if the requested pixel format supports alpha
     const pixelFormat = this.options.pixelFormat || 'yuv420p';
     const hasAlpha = pixelFormat.includes('yuva') ||
@@ -98,11 +79,6 @@ export class DomStrategy implements RenderStrategy {
         color: { r: 0, g: 0, b: 0, a: 0 }
       }).catch(() => {});
     }
-
-    await this.cdpSession.send('Page.startScreencast', {
-      format,
-      quality,
-    });
   }
 
   async capture(page: Page, frameTime: number): Promise<Buffer> {
@@ -142,56 +118,31 @@ export class DomStrategy implements RenderStrategy {
       return await element.screenshot(screenshotOptions);
     }
 
-    if (this.frameQueue.length > 0) {
-      return this.frameQueue.shift()!;
-    }
+    // Wait for the browser to finish painting this frame's virtual time
+    await page.evaluate(() => new Promise(requestAnimationFrame));
 
-    return new Promise<Buffer>((resolve, reject) => {
-      this.frameResolver = resolve;
-
-      // Wait for the browser to finish painting this frame's virtual time
-      page.evaluate(() => new Promise(requestAnimationFrame)).then(() => {
-        // rAF resolved. The browser has painted.
-        // Give CDP a tiny bit of time to deliver the screencast event over IPC
-        setTimeout(async () => {
-          if (this.frameResolver === resolve) {
-            this.frameResolver = null;
-            if (this.lastFrameBuffer) {
-              resolve(this.lastFrameBuffer);
-            } else {
-              try {
-                if (this.cdpSession) {
-                  const captureParams: any = { format };
-                  if (format === 'jpeg' && quality !== undefined) {
-                    captureParams.quality = quality;
-                  }
-                  const { data } = await this.cdpSession.send('Page.captureScreenshot', captureParams);
-                  const fallback = Buffer.from(data, 'base64');
-                  this.lastFrameBuffer = fallback;
-                  resolve(fallback);
-                } else {
-                  const fallback = await page.screenshot(screenshotOptions);
-                  this.lastFrameBuffer = fallback;
-                  resolve(fallback);
-                }
-              } catch (err) {
-                reject(err);
-              }
-            }
-          }
-        }, 50);
-      }).catch((err) => {
-        if (this.frameResolver === resolve) {
-          this.frameResolver = null;
-          reject(err);
+    try {
+      if (this.cdpSession) {
+        const captureParams: any = { format };
+        if (format === 'jpeg' && quality !== undefined) {
+          captureParams.quality = quality;
         }
-      });
-    });
+        const { data } = await this.cdpSession.send('Page.captureScreenshot', captureParams);
+        const fallback = Buffer.from(data, 'base64');
+        this.lastFrameBuffer = fallback;
+        return fallback;
+      } else {
+        const fallback = await page.screenshot(screenshotOptions);
+        this.lastFrameBuffer = fallback;
+        return fallback;
+      }
+    } catch (err) {
+      throw err;
+    }
   }
 
   async finish(page: Page): Promise<void> {
     if (this.cdpSession) {
-      await this.cdpSession.send('Page.stopScreencast').catch(() => {});
       await this.cdpSession.detach().catch(() => {});
       this.cdpSession = null;
     }
