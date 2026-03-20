@@ -115,8 +115,6 @@ describe('JobManager', () => {
 
   it('should not throw if currentJob is missing in onProgress and onChunkComplete metrics block', async () => {
     mockExecutorExecute = vi.spyOn(executor, 'execute').mockImplementation(async (spec, options) => {
-      // This time we delete it AFTER hitting the first part of onChunkComplete where it might be present,
-      // but we just simulate get returning nothing to cover line 225
       const origGet = repository.get.bind(repository);
       vi.spyOn(repository, 'get').mockResolvedValue(undefined);
 
@@ -133,6 +131,33 @@ describe('JobManager', () => {
 
     // Should just not crash.
     expect(true).toBe(true);
+  });
+
+  it('should not throw if job is deleted and controller is aborted in runJob catch block', async () => {
+    mockExecutorExecute = vi.spyOn(executor, 'execute').mockImplementation(async (spec) => {
+      let callCount = 0;
+      const origGet = repository.get.bind(repository);
+      vi.spyOn(repository, 'get').mockImplementation(async (id) => {
+        callCount++;
+        // We want `exists` on line 264 to be undefined to trigger the else block return.
+        // It's the 3rd get call (1st is top of runJob, 2nd is start of catch block)
+        if (callCount === 3) {
+            return undefined; // Simulate deleted
+        }
+        return origGet(id);
+      });
+
+      const error = new Error('Job aborted');
+      error.name = 'AbortError';
+      throw error;
+    });
+
+    const jobId = await jobManager.submitJob(sampleJobSpec);
+    await new Promise(resolve => setTimeout(resolve, 50));
+
+    // We expect undefined because it was deleted
+    const finalJob = await repository.get(jobId);
+    expect(finalJob).toBeUndefined();
   });
 
   it('should not crash if job was paused prior to completing execution and repository.get returns paused job', async () => {
@@ -247,6 +272,36 @@ describe('JobManager', () => {
     expect(jobs.length).toBe(2);
   });
 
+  it('should handle unhandled errors returning from runJob without crashing', async () => {
+    // Force a complete crash in runJob by making executor execute throw instantly
+    // Since runJob catches errors via execute catch, we need it to throw before execute
+    // Actually, `runJob` catches all synchronous/asynchronous errors inside it.
+    // The `.catch()` on `this.runJob().catch` only triggers if `runJob` itself throws outside its own try/catch.
+    const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    vi.spyOn(repository, 'get').mockRejectedValueOnce(new Error('DB failure'));
+
+    await jobManager.resumeJob('does-not-exist').catch(e => e); // shouldn't do much if job not found
+
+    // We will submit a job normally, then intercept repository get inside `resumeJob` or `submitJob` to trigger the `.catch`
+    // `submitJob` awaits `repository.save`, then calls `runJob` without awaiting.
+    // Inside `runJob`, the first line is `let job = await this.repository.get(id);`
+    // If that throws, `runJob` throws a rejected promise which is caught by `.catch(err => ...)` in submitJob.
+
+    const submitSpy = vi.spyOn(repository, 'get').mockRejectedValueOnce(new Error('Fatal get error'));
+
+    // Submit normally. The `repository.save` works, then `runJob` is called.
+    await jobManager.submitJob(sampleJobSpec);
+
+    // Yield to event loop
+    await new Promise(resolve => setTimeout(resolve, 10));
+
+    expect(consoleErrorSpy).toHaveBeenCalledWith(expect.stringContaining('Unhandled error'), expect.any(Error));
+
+    consoleErrorSpy.mockRestore();
+    submitSpy.mockRestore();
+  });
+
   it('should successfully pause a running job', async () => {
     mockExecutorExecute.mockImplementation(async (spec: any, options: any) => {
       // simulate long running job
@@ -270,6 +325,25 @@ describe('JobManager', () => {
 
     job = await jobManager.getJob(id);
     expect(job?.state).toBe('paused');
+  });
+
+  it('should transition to failed if asset upload fails', async () => {
+    const mockStorage = {
+      uploadAssetBundle: vi.fn().mockRejectedValue(new Error('S3 offline')),
+      downloadAssetBundle: vi.fn(),
+      deleteAssetBundle: vi.fn(),
+      uploadJobSpec: vi.fn(),
+      deleteJobSpec: vi.fn()
+    };
+
+    const jobManagerWithStorage = new JobManager(repository, executor, mockStorage);
+    const id = await jobManagerWithStorage.submitJob(sampleJobSpec, { jobDir: '/local/job/dir' });
+
+    await new Promise(resolve => setTimeout(resolve, 50));
+
+    const job = await jobManagerWithStorage.getJob(id);
+    expect(job?.state).toBe('failed');
+    expect(job?.error).toContain('S3 offline');
   });
 
   it('should upload assets if storage and jobDir are provided', async () => {

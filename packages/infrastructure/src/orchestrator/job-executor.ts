@@ -186,9 +186,10 @@ export class JobExecutor {
             console.log(`[Worker ${workerId}] Chunk ${chunk.id} completed (${completedChunks}/${totalChunks})`);
             break; // Success, break retry loop
           } catch (error: any) {
+            const errorMessage = error instanceof Error ? error.message : String(error);
             if (attempt < maxRetries) {
               attempt++;
-              console.warn(`[Worker ${workerId}] Chunk ${chunk.id} failed (Attempt ${attempt}/${maxRetries + 1}). Retrying in ${retryDelay}ms... Error: ${error.message}`);
+              console.warn(`[Worker ${workerId}] Chunk ${chunk.id} failed (Attempt ${attempt}/${maxRetries + 1}). Retrying in ${retryDelay}ms... Error: ${errorMessage}`);
               await new Promise(resolve => {
                 const timeout = setTimeout(resolve, retryDelay);
                 if (options.signal) {
@@ -208,8 +209,8 @@ export class JobExecutor {
               continue;
             }
 
-            console.error(`[Worker ${workerId}] Chunk ${chunk.id} failed after ${attempt + 1} attempts:`, error.message);
-            const wrappedError = new Error(`Chunk ${chunk.id} failed after ${attempt + 1} attempts: ${error.message}`);
+            console.error(`[Worker ${workerId}] Chunk ${chunk.id} failed after ${attempt + 1} attempts:`, errorMessage);
+            const wrappedError = new Error(`Chunk ${chunk.id} failed after ${attempt + 1} attempts: ${errorMessage}`);
             failures.push({ chunkId: chunk.id, error: wrappedError });
             hasFailed = true; // Signal other workers to stop
             queue.length = 0; // Clear the queue immediately
