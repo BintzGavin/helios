@@ -82,23 +82,36 @@ export class DomStrategy implements RenderStrategy {
   }
 
   async capture(page: Page, frameTime: number): Promise<Buffer> {
-    const format = this.options.intermediateImageFormat || 'png';
-    const quality = this.options.intermediateImageQuality;
     const pixelFormat = this.options.pixelFormat || 'yuv420p';
+
+    // Check if the requested pixel format supports alpha
+    const hasAlpha = pixelFormat.includes('yuva') ||
+                     pixelFormat.includes('rgba') ||
+                     pixelFormat.includes('bgra') ||
+                     pixelFormat.includes('argb') ||
+                     pixelFormat.includes('abgr');
+
+    let format = this.options.intermediateImageFormat;
+    let quality = this.options.intermediateImageQuality;
+
+    if (!format) {
+      if (hasAlpha) {
+        format = 'png';
+      } else {
+        format = 'jpeg';
+        quality = quality ?? 90;
+      }
+    }
 
     const screenshotOptions: any = {
       type: format,
     };
 
     if (format === 'jpeg') {
-      screenshotOptions.quality = quality;
+      if (quality !== undefined) {
+        screenshotOptions.quality = quality;
+      }
     } else {
-      // Check if the requested pixel format supports alpha
-      const hasAlpha = pixelFormat.includes('yuva') ||
-                       pixelFormat.includes('rgba') ||
-                       pixelFormat.includes('bgra') ||
-                       pixelFormat.includes('argb') ||
-                       pixelFormat.includes('abgr');
       screenshotOptions.omitBackground = hasAlpha;
     }
 
