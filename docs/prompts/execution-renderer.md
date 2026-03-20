@@ -57,6 +57,7 @@ All experiments run inside a **Jules microVM** — a short-lived Ubuntu Linux vi
 - Keep experiments that improve render time, revert experiments that don't
 - Run a Canvas smoke test after changes to shared code
 - Read `.jules/RENDERER.md` before starting (create if missing)
+- Update `.jules/RENDERER.md` after every kept or discarded experiment
 - Update your plan's frontmatter status when claiming and completing
 
 ⚠️ **Ask first:**
@@ -230,11 +231,49 @@ console.log(`peak_mem_mb:        ${(process.memoryUsage().heapUsed / 1024 / 1024
     - If `render_time_s` improved (lower): **KEEP** — the modified files stay as-is. These become the new baseline for future snapshots.
     - If `render_time_s` is equal or worse: **DISCARD** — **manually restore every modified file to its exact pre-experiment content.** Rewrite each file completely to its snapshotted state. Verify the restore is complete.
 11. **Canvas smoke test**: If you kept the change, verify Canvas mode still works (quick render, no error). If it fails, **restore all modified files to their pre-experiment state** (treat as discard).
-12. **Journal**: If you learned something critical (unexpected bottleneck, surprising result), add it to `.jules/RENDERER.md`
+12. **Update the journal**: Update `.jules/RENDERER.md` with structured entries (see Journal Update Rules below)
 13. **GOTO 1**
 
 > [!CAUTION]
 > **DISCARD = RESTORE.** When discarding an experiment, you MUST rewrite every modified file back to its exact pre-experiment contents. Do NOT leave partial changes. Do NOT skip files. The auto-push at session end will merge whatever state the files are in — there is no git safety net.
+
+## Journal Update Rules
+
+After every experiment (kept OR discarded), update `.jules/RENDERER.md` with structured entries:
+
+**If the experiment was KEPT (improved performance):**
+1. Update `## Performance Trajectory` with the new best render time
+2. Add an entry to `## What Works` with:
+   - What you did (brief)
+   - How much it improved (e.g., "~20% faster")
+   - Your plan ID (e.g., `PERF-003`)
+
+**If the experiment was DISCARDED or CRASHED:**
+1. Add an entry to `## What Doesn't Work (and Why)` with:
+   - What you tried (brief)
+   - **WHY it didn't work** — this is the most important part. Not just "it was slower" but the root cause (e.g., "IPC overhead dominated the savings", "encoding format unsupported by FFmpeg", "Jules microVM lacks compositor")
+   - Your plan ID
+
+**If you discovered something interesting (regardless of result):**
+1. Add to `## Open Questions` with a question that future planners should investigate
+
+**If the journal doesn't exist yet**, create it with this structure:
+```markdown
+## Performance Trajectory
+Current best: X.XXXs (baseline was Y.YYYs, -Z%)
+Last updated by: PERF-NNN
+
+## What Works
+- [entries]
+
+## What Doesn't Work (and Why)
+- [entries]
+
+## Open Questions
+- [entries]
+```
+
+**The journal is the shared memory between you and the planner.** What you write here directly determines what experiments the planner will (or won't) suggest next. Be specific about root causes.
 
 ## Results Format
 
@@ -393,6 +432,7 @@ When all experiments are exhausted:
 Your session has exactly one outcome: **a PR**. Run experiments, commit results, create PR, stop.
 
 ## Final Check
+
 
 Before each experiment:
 - ✅ Benchmark composition is the same as baseline
