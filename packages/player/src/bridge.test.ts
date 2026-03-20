@@ -323,4 +323,184 @@ describe('connectToParent', () => {
         subscribeCallback({ isPlaying: false });
         expect(mockFaderDisable).toHaveBeenCalled();
     });
+
+    it('should capture global errors and dispatch HELIOS_ERROR', () => {
+        // Need to explicitly trigger the error event to bypass JSDOM not handling our custom mock Event properly
+        let errorHandler: any;
+        vi.spyOn(window, 'addEventListener').mockImplementation((event, handler) => {
+            if (event === 'error') {
+                errorHandler = handler;
+            }
+        });
+
+        connectToParent(mockHelios);
+
+        // Reset call count because connectToParent calls postMessage HELIOS_READY
+        parentPostMessage.mockClear();
+
+        errorHandler({
+            message: 'Test Error',
+            filename: 'test.ts',
+            lineno: 10,
+            colno: 5,
+        } as any);
+
+        expect(parentPostMessage).toHaveBeenCalledWith(
+            expect.objectContaining({
+                type: 'HELIOS_ERROR',
+                error: expect.objectContaining({
+                    message: 'Test Error',
+                    filename: 'test.ts',
+                    lineno: 10,
+                    colno: 5
+                })
+            }),
+            '*'
+        );
+    });
+
+    it('should capture unhandled promise rejections and dispatch HELIOS_ERROR', () => {
+        let rejectionHandler: any;
+        vi.spyOn(window, 'addEventListener').mockImplementation((event, handler) => {
+            if (event === 'unhandledrejection') {
+                rejectionHandler = handler;
+            }
+        });
+
+        connectToParent(mockHelios);
+
+        parentPostMessage.mockClear();
+
+        rejectionHandler({
+            reason: { message: 'Test Rejection' }
+        } as any);
+
+        expect(parentPostMessage).toHaveBeenCalledWith(
+            expect.objectContaining({
+                type: 'HELIOS_ERROR',
+                error: expect.objectContaining({
+                    message: 'Test Rejection'
+                })
+            }),
+            '*'
+        );
+    });
+
+    it('should handle HELIOS_CAPTURE_FRAME in dom mode', async () => {
+        const { captureDomToBitmap } = await import('./features/dom-capture');
+        const mockBitmap = {} as ImageBitmap;
+        (captureDomToBitmap as any).mockResolvedValue(mockBitmap);
+
+        connectToParent(mockHelios);
+
+        // Mock requestAnimationFrame for the handleCaptureFrame waiting logic
+        const originalRaf = window.requestAnimationFrame;
+        window.requestAnimationFrame = (cb) => {
+            cb(0);
+            return 0;
+        };
+
+        const triggerMessage = (data: any, source: any) => {
+            const event = new MessageEvent('message', { data, source });
+            messageHandlers.forEach(h => h(event));
+        };
+
+        triggerMessage({ type: 'HELIOS_CAPTURE_FRAME', frame: 5, mode: 'dom', width: 100, height: 100 }, window.parent);
+
+        await new Promise(r => setTimeout(r, 0)); // wait for async
+
+        expect(mockHelios.seek).toHaveBeenCalledWith(5);
+        expect(captureDomToBitmap).toHaveBeenCalledWith(document.body, { targetWidth: 100, targetHeight: 100 });
+        expect(parentPostMessage).toHaveBeenCalledWith(
+            expect.objectContaining({ type: 'HELIOS_FRAME_DATA', frame: 5, success: true, bitmap: mockBitmap }),
+            '*',
+            [mockBitmap]
+        );
+
+        window.requestAnimationFrame = originalRaf;
+    });
+
+    it('should handle HELIOS_CAPTURE_FRAME dom mode error', async () => {
+        const { captureDomToBitmap } = await import('./features/dom-capture');
+        (captureDomToBitmap as any).mockRejectedValue(new Error('DOM Error'));
+
+        connectToParent(mockHelios);
+
+        const originalRaf = window.requestAnimationFrame;
+        window.requestAnimationFrame = (cb) => { cb(0); return 0; };
+
+        const triggerMessage = (data: any, source: any) => {
+            const event = new MessageEvent('message', { data, source });
+            messageHandlers.forEach(h => h(event));
+        };
+
+        triggerMessage({ type: 'HELIOS_CAPTURE_FRAME', frame: 5, mode: 'dom' }, window.parent);
+
+        await new Promise(r => setTimeout(r, 0)); // wait for async
+
+        expect(parentPostMessage).toHaveBeenCalledWith(
+            expect.objectContaining({ type: 'HELIOS_FRAME_DATA', frame: 5, success: false, error: 'DOM Error' }),
+            '*'
+        );
+
+        window.requestAnimationFrame = originalRaf;
+    });
+
+    it('should handle HELIOS_CAPTURE_FRAME canvas mode and send back bitmap', async () => {
+        connectToParent(mockHelios);
+
+        const canvas = document.createElement('canvas');
+        canvas.width = 100;
+        canvas.height = 100;
+        document.body.appendChild(canvas);
+
+        const mockBitmap = {} as ImageBitmap;
+        window.createImageBitmap = vi.fn().mockResolvedValue(mockBitmap);
+
+        const originalRaf = window.requestAnimationFrame;
+        window.requestAnimationFrame = (cb) => { cb(0); return 0; };
+
+        const triggerMessage = (data: any, source: any) => {
+            const event = new MessageEvent('message', { data, source });
+            messageHandlers.forEach(h => h(event));
+        };
+
+        triggerMessage({ type: 'HELIOS_CAPTURE_FRAME', frame: 5, selector: 'canvas' }, window.parent);
+
+        await new Promise(r => setTimeout(r, 0)); // wait for async
+
+        expect(window.createImageBitmap).toHaveBeenCalledWith(canvas);
+        expect(parentPostMessage).toHaveBeenCalledWith(
+            expect.objectContaining({ type: 'HELIOS_FRAME_DATA', frame: 5, success: true, bitmap: mockBitmap }),
+            '*',
+            [mockBitmap]
+        );
+
+        window.requestAnimationFrame = originalRaf;
+        canvas.remove();
+    });
+
+    it('should handle HELIOS_CAPTURE_FRAME canvas mode not found', async () => {
+        connectToParent(mockHelios);
+        parentPostMessage.mockClear();
+
+        const originalRaf = window.requestAnimationFrame;
+        window.requestAnimationFrame = (cb) => { cb(0); return 0; };
+
+        const triggerMessage = (data: any, source: any) => {
+            const event = new MessageEvent('message', { data, source });
+            messageHandlers.forEach(h => h(event));
+        };
+
+        triggerMessage({ type: 'HELIOS_CAPTURE_FRAME', frame: 5, selector: '.non-existent' }, window.parent);
+
+        await new Promise(r => setTimeout(r, 0)); // wait for async
+
+        expect(parentPostMessage).toHaveBeenCalledWith(
+            expect.objectContaining({ type: 'HELIOS_FRAME_DATA', frame: 5, success: false, error: 'Canvas not found' }),
+            '*'
+        );
+
+        window.requestAnimationFrame = originalRaf;
+    });
 });
