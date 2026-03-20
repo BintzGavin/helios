@@ -517,6 +517,18 @@ describe('JobExecutor', () => {
     }
   });
 
+  it('should explicitly throw unknown error if chunk Promise fails without a valid reason object', async () => {
+    const allSettledSpy = vi.spyOn(Promise, 'allSettled').mockResolvedValue([
+      { status: 'rejected' } // No reason object
+    ] as any);
+
+    try {
+      await expect(jobExecutor.execute(jobSpec)).rejects.toThrow('Job execution failed: Unknown error');
+    } finally {
+      allSettledSpy.mockRestore();
+    }
+  });
+
   describe('merge logic decoupling', () => {
     it('should use mergeAdapter when provided', async () => {
       const mockMergeAdapter: WorkerAdapter = {
@@ -634,6 +646,27 @@ describe('JobExecutor', () => {
       expect(mockStitcher.stitch).not.toHaveBeenCalled();
 
       warnSpy.mockRestore();
+    });
+
+    it('should throw raw error if stitcher.stitch throws a primitive', async () => {
+      const failingStitcher = {
+        stitch: vi.fn().mockRejectedValue('Primitive stitch error')
+      };
+
+      await expect(jobExecutor.execute(jobSpec, {
+        stitcher: failingStitcher,
+        outputFile: 'out.mp4'
+      })).rejects.toThrow('Primitive stitch error');
+    });
+
+    it('should throw raw error if mergeAdapter.execute throws a primitive', async () => {
+      const failingMergeAdapter: WorkerAdapter = {
+        execute: vi.fn().mockRejectedValue('Primitive merge error')
+      };
+
+      await expect(jobExecutor.execute(jobSpec, {
+        mergeAdapter: failingMergeAdapter
+      })).rejects.toThrow('Primitive merge error');
     });
   });
 });
