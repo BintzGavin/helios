@@ -6,7 +6,7 @@ Helios is a modern engine for creating videos programmatically using standard we
 
 ## Quick Facts
 - **License**: Elastic License 2.0 (free commercial use, no SaaS resale)
-- **Status**: Beta / Self-Driving (Core: Stable v5.13.0+, Studio: Alpha v0.118.8+, Player: v0.76.24+, Renderer: v1.80.0+, CLI: Beta v0.38.0+, Infrastructure: v0.54.19+)
+- **Status**: Beta / Self-Driving (Core: Stable v5.13.0+, Studio: Alpha v0.119.0+, Player: v0.77.0+, Renderer: v1.80.0+, CLI: Beta v0.38.0+, Infrastructure: v0.54.26+)
 - **Frameworks**: React, Vue, Svelte, Solid, vanilla JS
 - **Animation**: Standard CSS, Web Animations API (WAAPI), any animation library
 
@@ -113,12 +113,12 @@ const report = await Helios.diagnose();
 
 ## Roadmap
 ### V1.x (Active)
-- **Studio**: v0.118.8+ (Enhance MCP Server, TimelineAudioTrack Regression Tests, Update Quickstart Guide)
+- **Studio**: v0.119.0+ (Asset Drag and Drop, Enhance MCP Server, TimelineAudioTrack Regression Tests)
 - **CLI**: v0.38.0+ (Deploy Fly.io, Deploy Cloudflare, CLI Merge Regression Tests)
 - **Core**: v5.13.0+ (Generic Input Props, Active Clips, Composition Schema, Shared Virtual Time Binding)
-- **Player**: v0.76.24+ (Bridge Coverage Expansion, Bridge Coverage Completeness, Regression Tests for Audio Fader)
+- **Player**: v0.77.0+ (Media Session Properties, Bridge Coverage Expansion, Regression Tests for Audio Fader)
 - **Renderer**: v1.80.0+ (Validate HW Accel, Orchestrator Plan, Refactor Media Sync, Pluggable Execution)
-- **Infrastructure**: v0.54.19+ (Orchestrator Coverage Expansion, InMemoryJobRepository Coverage, CloudRun Resiliency Tests)
+- **Infrastructure**: v0.54.26+ (Optimize S3/GCS Uploads, Orchestrator Coverage Expansion, CloudRun Resiliency Tests)
 
 ### AI Integration
 - **Studio MCP Server**: Inspect, create, and render compositions via LLM tools (Done)
