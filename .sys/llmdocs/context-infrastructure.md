@@ -1,5 +1,5 @@
 # INFRASTRUCTURE DOMAIN CONTEXT
-**Version**: 0.54.24
+**Version**: 0.54.25
 
 ## A. Architecture
 
