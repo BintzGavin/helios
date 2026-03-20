@@ -207,8 +207,6 @@ export class Renderer {
 
       try {
         const captureLoop = async () => {
-          let previousWritePromise = Promise.resolve();
-
           for (let i = 0; i < totalFrames; i++) {
             if (capturedErrors.length > 0) {
               throw capturedErrors[0];
@@ -227,8 +225,6 @@ export class Renderer {
                jobOptions.onProgress(i / totalFrames);
             }
 
-            await previousWritePromise;
-
             const compositionTimeInSeconds = (startFrame + i) / fps;
             await this.timeDriver.setTime(page, compositionTimeInSeconds);
 
@@ -238,15 +234,14 @@ export class Renderer {
                throw new Error('FFmpeg stdin is not writable');
             }
 
-            previousWritePromise = new Promise<void>((resolve, reject) => {
-                const canWriteMore = ffmpegProcess.stdin.write(buffer, (err?: Error | null) => {
-                    if (err) {
-                       ffmpegProcess.emit('error', err);
-                       reject(err);
-                    }
-                });
+            const canWriteMore = ffmpegProcess.stdin.write(buffer, (err?: Error | null) => {
+                if (err) {
+                   ffmpegProcess.emit('error', err);
+                }
+            });
 
-                if (!canWriteMore) {
+            if (!canWriteMore) {
+                await new Promise<void>((resolve, reject) => {
                     const onDrain = () => {
                         cleanup();
                         resolve();
@@ -269,13 +264,9 @@ export class Renderer {
                     ffmpegProcess.stdin.once('drain', onDrain);
                     ffmpegProcess.stdin.once('error', onError);
                     ffmpegProcess.stdin.once('close', onClose);
-                } else {
-                    resolve();
-                }
-            });
+                });
+            }
           }
-
-          await previousWritePromise;
 
           console.log('Finishing render strategy...');
           const finalBuffer = await this.strategy.finish(page);
