@@ -1,4 +1,4 @@
-import { Page } from 'playwright';
+import { Page, CDPSession } from 'playwright';
 import { RenderStrategy } from './RenderStrategy.js';
 import { RendererOptions, AudioTrackConfig, FFmpegConfig } from '../types.js';
 import { FFmpegBuilder } from '../utils/FFmpegBuilder.js';
@@ -10,6 +10,10 @@ import { PRELOAD_SCRIPT } from '../utils/dom-preload.js';
 export class DomStrategy implements RenderStrategy {
   private discoveredAudioTracks: AudioTrackConfig[] = [];
   private cleanupAudio: () => Promise<void> | void = () => {};
+  private cdpSession: CDPSession | null = null;
+  private frameQueue: Buffer[] = [];
+  private frameResolver: ((buffer: Buffer) => void) | null = null;
+  private lastFrameBuffer: Buffer | null = null;
 
   constructor(private options: RendererOptions) {
     if (this.options.videoCodec === 'copy') {
@@ -60,6 +64,45 @@ export class DomStrategy implements RenderStrategy {
     const extractionResult = await extractBlobTracks(page, initialTracks);
     this.discoveredAudioTracks = extractionResult.tracks;
     this.cleanupAudio = extractionResult.cleanup;
+
+    this.cdpSession = await page.context().newCDPSession(page);
+
+    this.cdpSession.on('Page.screencastFrame', (event: any) => {
+      const buffer = Buffer.from(event.data, 'base64');
+      this.cdpSession?.send('Page.screencastFrameAck', { sessionId: event.sessionId }).catch(() => {});
+
+      this.lastFrameBuffer = buffer;
+
+      if (this.frameResolver) {
+        this.frameResolver(buffer);
+        this.frameResolver = null;
+      } else {
+        this.frameQueue.push(buffer);
+      }
+    });
+
+    const format = this.options.intermediateImageFormat === 'jpeg' ? 'jpeg' : 'png';
+    const quality = format === 'jpeg' ? (this.options.intermediateImageQuality || 100) : undefined;
+
+    // Check if the requested pixel format supports alpha
+    const pixelFormat = this.options.pixelFormat || 'yuv420p';
+    const hasAlpha = pixelFormat.includes('yuva') ||
+                     pixelFormat.includes('rgba') ||
+                     pixelFormat.includes('bgra') ||
+                     pixelFormat.includes('argb') ||
+                     pixelFormat.includes('abgr');
+
+    // Emulate Browser.setDownloadBehavior/etc or use Emulation to set transparent background
+    if (hasAlpha) {
+      await this.cdpSession.send('Emulation.setDefaultBackgroundColorOverride', {
+        color: { r: 0, g: 0, b: 0, a: 0 }
+      }).catch(() => {});
+    }
+
+    await this.cdpSession.send('Page.startScreencast', {
+      format,
+      quality,
+    });
   }
 
   async capture(page: Page, frameTime: number): Promise<Buffer> {
@@ -99,12 +142,48 @@ export class DomStrategy implements RenderStrategy {
       return await element.screenshot(screenshotOptions);
     }
 
-    return await page.screenshot(screenshotOptions);
+    if (this.frameQueue.length > 0) {
+      return this.frameQueue.shift()!;
+    }
+
+    return new Promise<Buffer>((resolve, reject) => {
+      this.frameResolver = resolve;
+
+      // Wait for the browser to finish painting this frame's virtual time
+      page.evaluate(() => new Promise(requestAnimationFrame)).then(() => {
+        // rAF resolved. The browser has painted.
+        // Give CDP a tiny bit of time to deliver the screencast event over IPC
+        setTimeout(async () => {
+          if (this.frameResolver === resolve) {
+            this.frameResolver = null;
+            if (this.lastFrameBuffer) {
+              resolve(this.lastFrameBuffer);
+            } else {
+              try {
+                const fallback = await page.screenshot(screenshotOptions);
+                this.lastFrameBuffer = fallback;
+                resolve(fallback);
+              } catch (err) {
+                reject(err);
+              }
+            }
+          }
+        }, 50);
+      }).catch((err) => {
+        if (this.frameResolver === resolve) {
+          this.frameResolver = null;
+          reject(err);
+        }
+      });
+    });
   }
 
   async finish(page: Page): Promise<void> {
-    // No-op for DomStrategy (cleanup happens in cleanup())
-    return Promise.resolve();
+    if (this.cdpSession) {
+      await this.cdpSession.send('Page.stopScreencast').catch(() => {});
+      await this.cdpSession.detach().catch(() => {});
+      this.cdpSession = null;
+    }
   }
 
   getFFmpegArgs(options: RendererOptions, outputPath: string): FFmpegConfig {
