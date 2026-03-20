@@ -2,7 +2,7 @@ import { Command } from 'commander';
 import fs from 'fs';
 import path from 'path';
 import { JobSpec } from '../types/job.js';
-import { JobExecutor, LocalWorkerAdapter, AwsLambdaAdapter, CloudRunAdapter, CloudflareWorkersAdapter, AzureFunctionsAdapter, WorkerAdapter } from '@helios-project/infrastructure';
+import { JobExecutor, LocalWorkerAdapter, AwsLambdaAdapter, CloudRunAdapter, CloudflareWorkersAdapter, AzureFunctionsAdapter, FlyMachinesAdapter, KubernetesAdapter, DockerAdapter, WorkerAdapter } from '@helios-project/infrastructure';
 
 export async function loadJobSpec(file: string): Promise<{ jobSpec: JobSpec, jobDir: string }> {
   if (file.startsWith('http://') || file.startsWith('https://')) {
@@ -33,7 +33,17 @@ export function registerJobCommand(program: Command) {
     .option('--chunk <id>', 'Execute only the chunk with the specified ID')
     .option('--concurrency <number>', 'Number of concurrent chunks to run locally', '1')
     .option('--no-merge', 'Skip the final merge step')
-    .option('--adapter <type>', 'Adapter to use (local, aws, gcp, cloudflare, azure)', 'local')
+    .option('--adapter <type>', 'Adapter to use (local, aws, gcp, cloudflare, azure, fly, kubernetes, docker)', 'local')
+    .option('--fly-api-token <token>', 'Fly.io API token')
+    .option('--fly-app-name <name>', 'Fly.io app name')
+    .option('--fly-image-ref <ref>', 'Fly.io image ref')
+    .option('--fly-region <region>', 'Fly.io region')
+    .option('--k8s-kubeconfig-path <path>', 'Kubernetes kubeconfig path')
+    .option('--k8s-namespace <namespace>', 'Kubernetes namespace', 'default')
+    .option('--k8s-job-image <image>', 'Kubernetes job image')
+    .option('--k8s-job-name-prefix <prefix>', 'Kubernetes job name prefix')
+    .option('--k8s-service-account-name <name>', 'Kubernetes service account name')
+    .option('--docker-image <image>', 'Docker image to use')
     .option('--aws-region <region>', 'AWS Region for Lambda adapter')
     .option('--aws-function-name <name>', 'AWS Lambda function name')
     .option('--aws-job-def-url <url>', 'URL of the job definition for AWS Lambda')
@@ -109,6 +119,34 @@ export function registerJobCommand(program: Command) {
             serviceUrl: options.azureServiceUrl,
             functionKey: options.azureFunctionKey,
             jobDefUrl: options.azureJobDefUrl || file
+          });
+        } else if (options.adapter === 'fly') {
+          if (!options.flyApiToken || !options.flyAppName || !options.flyImageRef) {
+            throw new Error('Fly adapter requires --fly-api-token, --fly-app-name, and --fly-image-ref');
+          }
+          adapter = new FlyMachinesAdapter({
+            apiToken: options.flyApiToken,
+            appName: options.flyAppName,
+            imageRef: options.flyImageRef,
+            region: options.flyRegion
+          });
+        } else if (options.adapter === 'kubernetes') {
+          if (!options.k8sJobImage) {
+            throw new Error('Kubernetes adapter requires --k8s-job-image');
+          }
+          adapter = new KubernetesAdapter({
+            kubeconfigPath: options.k8sKubeconfigPath,
+            namespace: options.k8sNamespace,
+            image: options.k8sJobImage,
+            jobNamePrefix: options.k8sJobNamePrefix,
+            serviceAccountName: options.k8sServiceAccountName
+          });
+        } else if (options.adapter === 'docker') {
+          if (!options.dockerImage) {
+            throw new Error('Docker adapter requires --docker-image');
+          }
+          adapter = new DockerAdapter({
+            image: options.dockerImage
           });
         } else {
           adapter = new LocalWorkerAdapter();
