@@ -231,25 +231,84 @@ export class Renderer {
 
             const buffer = await this.strategy.capture(page, time);
 
-            await new Promise<void>((resolve, reject) => {
-                // processing write errors is important, especially if ffmpeg died
-                if (!ffmpegProcess.stdin.writable) {
-                   return reject(new Error('FFmpeg stdin is not writable'));
+            if (!ffmpegProcess.stdin.writable) {
+               throw new Error('FFmpeg stdin is not writable');
+            }
+
+            const canWriteMore = ffmpegProcess.stdin.write(buffer, (err?: Error | null) => {
+                if (err) {
+                   ffmpegProcess.emit('error', err);
                 }
-                ffmpegProcess.stdin.write(buffer, (err?: Error | null) => err ? reject(err) : resolve());
             });
+
+            if (!canWriteMore) {
+                await new Promise<void>((resolve, reject) => {
+                    const onDrain = () => {
+                        cleanup();
+                        resolve();
+                    };
+                    const onError = (err: Error) => {
+                        cleanup();
+                        reject(err);
+                    };
+                    const onClose = () => {
+                        cleanup();
+                        reject(new Error('FFmpeg stdin closed before drain'));
+                    };
+
+                    const cleanup = () => {
+                        ffmpegProcess.stdin.removeListener('drain', onDrain);
+                        ffmpegProcess.stdin.removeListener('error', onError);
+                        ffmpegProcess.stdin.removeListener('close', onClose);
+                    };
+
+                    ffmpegProcess.stdin.once('drain', onDrain);
+                    ffmpegProcess.stdin.once('error', onError);
+                    ffmpegProcess.stdin.once('close', onClose);
+                });
+            }
           }
 
           console.log('Finishing render strategy...');
           const finalBuffer = await this.strategy.finish(page);
           if (finalBuffer && Buffer.isBuffer(finalBuffer) && finalBuffer.length > 0) {
             console.log(`Writing final buffer of ${finalBuffer.length} bytes...`);
-            await new Promise<void>((resolve, reject) => {
-               if (!ffmpegProcess.stdin.writable) {
-                   return reject(new Error('FFmpeg stdin is not writable'));
+            if (!ffmpegProcess.stdin.writable) {
+               throw new Error('FFmpeg stdin is not writable');
+            }
+
+            const canWriteMore = ffmpegProcess.stdin.write(finalBuffer, (err?: Error | null) => {
+                if (err) {
+                   ffmpegProcess.emit('error', err);
                 }
-              ffmpegProcess.stdin.write(finalBuffer, (err?: Error | null) => err ? reject(err) : resolve());
             });
+
+            if (!canWriteMore) {
+                await new Promise<void>((resolve, reject) => {
+                    const onDrain = () => {
+                        cleanup();
+                        resolve();
+                    };
+                    const onError = (err: Error) => {
+                        cleanup();
+                        reject(err);
+                    };
+                    const onClose = () => {
+                        cleanup();
+                        reject(new Error('FFmpeg stdin closed before drain'));
+                    };
+
+                    const cleanup = () => {
+                        ffmpegProcess.stdin.removeListener('drain', onDrain);
+                        ffmpegProcess.stdin.removeListener('error', onError);
+                        ffmpegProcess.stdin.removeListener('close', onClose);
+                    };
+
+                    ffmpegProcess.stdin.once('drain', onDrain);
+                    ffmpegProcess.stdin.once('error', onError);
+                    ffmpegProcess.stdin.once('close', onClose);
+                });
+            }
           }
 
           console.log('Finished sending frames. Closing FFmpeg stdin.');

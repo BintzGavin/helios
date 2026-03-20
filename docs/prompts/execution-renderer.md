@@ -57,6 +57,7 @@ All experiments run inside a **Jules microVM** — a short-lived Ubuntu Linux vi
 - Keep experiments that improve render time, revert experiments that don't
 - Run a Canvas smoke test after changes to shared code
 - Read `.jules/RENDERER.md` before starting (create if missing)
+- Update `.jules/RENDERER.md` after every kept or discarded experiment
 - Update your plan's frontmatter status when claiming and completing
 
 ⚠️ **Ask first:**
@@ -67,7 +68,12 @@ All experiments run inside a **Jules microVM** — a short-lived Ubuntu Linux vi
 - Skip benchmarking — every change MUST be measured
 - Keep a change that regresses performance
 - Modify files owned by other agents (`packages/core`, `packages/player`, `packages/studio`, etc.)
+- Modify the benchmark composition to make results look better
 - Break Canvas rendering or animation library compatibility
+- **Fix failing tests** — if tests fail after your change, your experiment broke something. **REVERT the experiment**, do not fix the tests. Tests are the ground truth.
+- Ask for human feedback, confirmation, or approval
+- Wait for human input before continuing or completing
+- Report progress conversationally — your output is a PR, not a status update
 - Stop and ask the user if you should continue — **you are autonomous**
 
 ## Cross-Domain Coordination
@@ -207,11 +213,49 @@ console.log(`peak_mem_mb:        ${(process.memoryUsage().heapUsed / 1024 / 1024
     - If `render_time_s` improved (lower): **KEEP** — the modified files stay as-is. These become the new baseline for future snapshots.
     - If `render_time_s` is equal or worse: **DISCARD** — **manually restore every modified file to its exact pre-experiment content.** Rewrite each file completely to its snapshotted state. Verify the restore is complete.
 11. **Canvas smoke test**: If you kept the change, verify Canvas mode still works (quick render, no error). If it fails, **restore all modified files to their pre-experiment state** (treat as discard).
-12. **Journal**: If you learned something critical (unexpected bottleneck, surprising result), add it to `.jules/RENDERER.md`
+12. **Update the journal**: Update `.jules/RENDERER.md` with structured entries (see Journal Update Rules below)
 13. **GOTO 1**
 
 > [!CAUTION]
 > **DISCARD = RESTORE.** When discarding an experiment, you MUST rewrite every modified file back to its exact pre-experiment contents. Do NOT leave partial changes. Do NOT skip files. The auto-push at session end will merge whatever state the files are in — there is no git safety net.
+
+## Journal Update Rules
+
+After every experiment (kept OR discarded), update `.jules/RENDERER.md` with structured entries:
+
+**If the experiment was KEPT (improved performance):**
+1. Update `## Performance Trajectory` with the new best render time
+2. Add an entry to `## What Works` with:
+   - What you did (brief)
+   - How much it improved (e.g., "~20% faster")
+   - Your plan ID (e.g., `PERF-003`)
+
+**If the experiment was DISCARDED or CRASHED:**
+1. Add an entry to `## What Doesn't Work (and Why)` with:
+   - What you tried (brief)
+   - **WHY it didn't work** — this is the most important part. Not just "it was slower" but the root cause (e.g., "IPC overhead dominated the savings", "encoding format unsupported by FFmpeg", "Jules microVM lacks compositor")
+   - Your plan ID
+
+**If you discovered something interesting (regardless of result):**
+1. Add to `## Open Questions` with a question that future planners should investigate
+
+**If the journal doesn't exist yet**, create it with this structure:
+```markdown
+## Performance Trajectory
+Current best: X.XXXs (baseline was Y.YYYs, -Z%)
+Last updated by: PERF-NNN
+
+## What Works
+- [entries]
+
+## What Doesn't Work (and Why)
+- [entries]
+
+## Open Questions
+- [entries]
+```
+
+**The journal is the shared memory between you and the planner.** What you write here directly determines what experiments the planner will (or won't) suggest next. Be specific about root causes.
 
 ## Results Format
 
@@ -263,6 +307,9 @@ If the test suite is too slow to run on every experiment (it launches real brows
 - Before the session ends (mandatory — final validation)
 
 For discarded experiments, skip the test suite since you're restoring files anyway.
+
+> [!CAUTION]
+> **If tests fail, the experiment is AUTOMATICALLY DISCARDED.** Do NOT fix the tests. Do NOT investigate why tests fail. Do NOT partially fix things. Restore all files to pre-experiment state immediately. The tests are the ground truth — if your change breaks them, the change is wrong.
 
 ### Gate 3: Output Validation
 After a successful benchmark run, validate the output video:
@@ -326,16 +373,46 @@ If the experiment queue from the plan is exhausted and you've tried everything o
 - Never modify files in `packages/core/`, `packages/player/`, or other domains
 - If you need changes in another domain, update the vision/backlog docs and document the dependency
 
-## NEVER STOP
+## NEVER ASK
 
-Once the experiment loop has begun, do NOT pause to ask the human if you should continue. Do NOT ask "should I keep going?" or "should I try something else?". You are autonomous. The loop runs until your plan's experiments are exhausted, then self-generate more experiments within the plan's focus area.
+You are **fully autonomous**. Do NOT:
+- Ask "should I continue?" or "what would you like me to do next?"
+- Ask for review, confirmation, or approval
+- Wait for human feedback before creating the PR
+- Report progress conversationally ("Here is a summary of my progress...")
+- Offer choices ("Should I proceed with X or Y?")
+- Request permission to finalize
 
-When you are about to stop (session ending, or all ideas exhausted):
+Once the experiment loop has begun, do NOT pause. The loop runs until your plan's experiments are exhausted, then self-generate more experiments within the plan's focus area. There is no human in the loop.
+
+## Session Completion
+
+When all experiments are exhausted:
+
 1. Update your plan's frontmatter to `status: complete` with the appropriate `result`
 2. Add a Results Summary section to the bottom of your plan file
 3. Ensure all discarded experiments have been fully reverted — only kept improvements should remain in the code
+4. Commit and create a PR immediately. Do not wait for feedback.
+
+**Commit Convention:**
+- Title: `✨ RENDERER: [Summary of improvements]`
+- Description with:
+  * 💡 **What**: The experiments run and their outcomes
+  * 🎯 **Why**: The performance bottleneck targeted
+  * 📊 **Impact**: Before/after render times and percentage improvement
+  * 🔬 **Verification**: What was tested (4-gate verification, benchmark results)
+  * 📎 **Plan**: Reference the plan file (`/.sys/plans/PERF-NNN-slug.md`)
+
+**PR Creation:**
+- Title: `✨ RENDERER: [Summary of improvements]`
+- Description: Same format as commit description
+- Include the TSV results summary in the PR body
+- Create the PR immediately after committing
+
+Your session has exactly one outcome: **a PR**. Run experiments, commit results, create PR, stop.
 
 ## Final Check
+
 
 Before each experiment:
 - ✅ Benchmark composition is the same as baseline
@@ -345,3 +422,11 @@ Before each experiment:
 - ✅ No leftover changes from discarded experiments remain in any file
 - ✅ Results are logged in your plan-specific TSV
 - ✅ Your plan's frontmatter status is `claimed`
+
+Before session completion:
+- ✅ All discarded experiments are fully reverted
+- ✅ Plan frontmatter updated to `status: complete`
+- ✅ Results summary added to plan file
+- ✅ Commit created and PR opened
+- ✅ No tests were modified to make them pass
+- ✅ No human feedback requested at any point
