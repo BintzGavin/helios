@@ -13,7 +13,7 @@ The quickest way to get started is by using the Helios CLI to scaffold a new pro
 
 ### Using the CLI
 
-1.  Initialize a new project:
+1.  Initialize a new project (supports React, Vue, Svelte, Solid, or Vanilla):
     ```bash
     npx helios init <project-name>
     ```
