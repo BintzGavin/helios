@@ -1,11 +1,11 @@
 ---
 id: PERF-012
 slug: optimize-intermediate-format-jpeg-pipe
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2026-10-18
-completed: ""
-result: ""
+completed: 2026-10-18
+result: failed
 ---
 
 # PERF-012: Optimize FFmpeg Image Pipe Format
@@ -60,3 +60,9 @@ In `DomStrategy.ts`, locate the `getFFmpegArgs` method. Modify the `videoInputAr
 ## Test Plan
 1. Run a standard Canvas smoke test by executing `npx tsx tests/run-all.ts` inside the `packages/renderer` directory.
 2. Execute the DOM render benchmark and measure if wall-clock time improves compared to the PERF-011 baseline (46.706s).
+
+## Results Summary
+- **Best render time**: 46.706s (vs baseline 46.706s)
+- **Improvement**: 0%
+- **Kept experiments**: []
+- **Discarded experiments**: [jpeg_pipe ingest via mjpeg codec]

@@ -1,0 +1,3 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	46.706	150	3.21	36.3	keep	baseline (jpeg format)
+2	47.850	150	3.13	4.3	discard	jpeg_pipe ingest via mjpeg codec
