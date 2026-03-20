@@ -1,8 +1,9 @@
 ## Performance Trajectory
-Current best: 46.706s (baseline was 47.795s, -2.2%)
-Last updated by: PERF-011
+Current best: 40.429s (baseline was 40.442s, -0.0%)
+Last updated by: PERF-013
 
 ## What Works
+- Decoupled frame capture from I/O write for pipelining. Result inconclusive due to environmental limits, but kept as architectural fix. (PERF-013)
 - Defaulting intermediate image format to jpeg when no alpha channel is needed (~2.2% faster) (PERF-011)
 
 ## What Doesn't Work (and Why)

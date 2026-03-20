@@ -1,0 +1,97 @@
+--- packages/renderer/src/Renderer.ts
++++ packages/renderer/src/Renderer.ts
+@@ -207,6 +207,8 @@
+
+       try {
+         const captureLoop = async () => {
++          let previousWritePromise = Promise.resolve();
++
+           for (let i = 0; i < totalFrames; i++) {
+             if (capturedErrors.length > 0) {
+               throw capturedErrors[0];
+@@ -226,6 +228,8 @@
+                jobOptions.onProgress(i / totalFrames);
+             }
+
++            await previousWritePromise;
++
+             const compositionTimeInSeconds = (startFrame + i) / fps;
+             await this.timeDriver.setTime(page, compositionTimeInSeconds);
+
+@@ -235,39 +239,44 @@
+                throw new Error('FFmpeg stdin is not writable');
+             }
+
+-            const canWriteMore = ffmpegProcess.stdin.write(buffer, (err?: Error | null) => {
+-                if (err) {
+-                   ffmpegProcess.emit('error', err);
+-                }
+-            });
+-
+-            if (!canWriteMore) {
+-                await new Promise<void>((resolve, reject) => {
+-                    const onDrain = () => {
+-                        cleanup();
+-                        resolve();
+-                    };
+-                    const onError = (err: Error) => {
+-                        cleanup();
+-                        reject(err);
+-                    };
+-                    const onClose = () => {
+-                        cleanup();
+-                        reject(new Error('FFmpeg stdin closed before drain'));
+-                    };
+-
+-                    const cleanup = () => {
+-                        ffmpegProcess.stdin.removeListener('drain', onDrain);
+-                        ffmpegProcess.stdin.removeListener('error', onError);
+-                        ffmpegProcess.stdin.removeListener('close', onClose);
+-                    };
+-
+-                    ffmpegProcess.stdin.once('drain', onDrain);
+-                    ffmpegProcess.stdin.once('error', onError);
+-                    ffmpegProcess.stdin.once('close', onClose);
+-                });
+-            }
++            previousWritePromise = new Promise<void>((resolve, reject) => {
++                const canWriteMore = ffmpegProcess.stdin.write(buffer, (err?: Error | null) => {
++                    if (err) {
++                       ffmpegProcess.emit('error', err);
++                       reject(err);
++                    }
++                });
++
++                if (!canWriteMore) {
++                    const onDrain = () => {
++                        cleanup();
++                        resolve();
++                    };
++                    const onError = (err: Error) => {
++                        cleanup();
++                        reject(err);
++                    };
++                    const onClose = () => {
++                        cleanup();
++                        reject(new Error('FFmpeg stdin closed before drain'));
++                    };
++
++                    const cleanup = () => {
++                        ffmpegProcess.stdin.removeListener('drain', onDrain);
++                        ffmpegProcess.stdin.removeListener('error', onError);
++                        ffmpegProcess.stdin.removeListener('close', onClose);
++                    };
++
++                    ffmpegProcess.stdin.once('drain', onDrain);
++                    ffmpegProcess.stdin.once('error', onError);
++                    ffmpegProcess.stdin.once('close', onClose);
++                } else {
++                    resolve();
++                }
++            });
+           }
++
++          await previousWritePromise;
+
+           console.log('Finishing render strategy...');
+           const finalBuffer = await this.strategy.finish(page);
