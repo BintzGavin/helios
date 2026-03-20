@@ -396,12 +396,13 @@ Once the experiment has begun, do NOT pause. You run exactly ONE experiment per 
 
 ## Session Completion
 
-When the single experiment is finished:
+When the single experiment is finished, you MUST perform these required administrative tasks before creating the PR or stopping:
 
-1. Update your plan's frontmatter to `status: complete` with the appropriate `result`
-2. Add a Results Summary section to the bottom of your plan file
-3. Ensure the experiment has been fully reverted if discarded — only a kept improvement should remain in the code
-4. Commit and create a PR immediately. Do not wait for feedback.
+1. **Update the Journal**: Update `docs/status/RENDERER-EXPERIMENTS.md` with structured entries for this experiment.
+2. **Update the Plan File**: Update your plan's frontmatter to `status: complete` with the appropriate `result`, and add a Results Summary section to the bottom of the plan file.
+3. **Commit the Data**: Explicitly `git add` and commit the TSV file `.sys/perf-results-PERF-NNN.tsv`, the plan file, and the updated `docs/status/RENDERER-EXPERIMENTS.md` journal.
+4. **Revert if Discarded**: Ensure the experiment code has been fully reverted if discarded — only a kept improvement should remain in the code. (Do not revert the administrative files!)
+5. **Create PR**: Commit any kept code changes and create a PR immediately. Do not wait for feedback.
 
 **Commit Convention:**
 - Title: `✨ RENDERER: [Summary of improvements]`
@@ -414,11 +415,11 @@ When the single experiment is finished:
 
 **PR Creation:**
 - Title: `✨ RENDERER: [Summary of improvements]`
-- Description: Same format as commit description
-- Include the TSV results summary in the PR body
+- Description: Same format as commit description.
+- **CRITICAL**: YOU MUST PASTE the raw TSV results summary (the tabular data) directly into the PR body.
 - Create the PR immediately after committing
 
-Your session has exactly one outcome: **a PR**. Run the single experiment, commit results, create PR, stop.
+Your session has exactly one outcome: **a PR**. Run the single experiment, commit the code AND the administrative files, create PR, stop.
 
 ## Final Check
 
@@ -432,9 +433,10 @@ Before the experiment:
 - ✅ Your plan's frontmatter status is `claimed`
 
 Before session completion:
-- ✅ If discarded, the experiment was fully reverted
-- ✅ Plan frontmatter updated to `status: complete`
-- ✅ Results summary added to plan file
+- ✅ If discarded, the experiment code was fully reverted
+- ✅ `docs/status/RENDERER-EXPERIMENTS.md` journal was updated with this experiment
+- ✅ Plan frontmatter updated to `status: complete` and Results Summary added
+- ✅ TSV file, Plan file, and Journal were `git add`ed and committed
 - ✅ Test changes (if any) only update HOW things are tested, not WHAT is validated
-- ✅ Commit created and PR opened
+- ✅ Commit created and PR opened, with TSV data explicitly pasted in the PR body
 - ✅ No human feedback requested at any point
