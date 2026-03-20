@@ -160,9 +160,20 @@ export class DomStrategy implements RenderStrategy {
               resolve(this.lastFrameBuffer);
             } else {
               try {
-                const fallback = await page.screenshot(screenshotOptions);
-                this.lastFrameBuffer = fallback;
-                resolve(fallback);
+                if (this.cdpSession) {
+                  const captureParams: any = { format };
+                  if (format === 'jpeg' && quality !== undefined) {
+                    captureParams.quality = quality;
+                  }
+                  const { data } = await this.cdpSession.send('Page.captureScreenshot', captureParams);
+                  const fallback = Buffer.from(data, 'base64');
+                  this.lastFrameBuffer = fallback;
+                  resolve(fallback);
+                } else {
+                  const fallback = await page.screenshot(screenshotOptions);
+                  this.lastFrameBuffer = fallback;
+                  resolve(fallback);
+                }
               } catch (err) {
                 reject(err);
               }

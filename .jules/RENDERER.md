@@ -19,3 +19,4 @@ Last updated by: PERF-006
 
 ## What Works
 - Removed GL flags and forced Chromium into native Skia CPU pathways via `--disable-gpu`, `--disable-software-rasterizer`, and `--disable-gpu-compositing`. Reduces translation overhead from SwiftShader (~2.75% faster). (PERF-006)
+- raw CDP capture fallback instead of page.screenshot (PERF-008)
