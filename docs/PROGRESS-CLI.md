@@ -264,3 +264,6 @@ This file tracks progress for the CLI domain (`packages/cli`).
 
 - ✅ Initial CLI setup with Commander.js
 - ✅ `helios studio` command to launch Studio dev server
+
+### CLI v0.39.0
+- ✅ Completed: Cloud Execution Adapters Expansion - Added support for Docker, Fly.io, and Kubernetes to the job run command.

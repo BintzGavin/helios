@@ -398,3 +398,6 @@ Each agent should update **their own dedicated progress file** instead of this f
 
 ### STUDIO v0.119.1
 - ✅ Completed: Update Quickstart - Updated quickstart to mention supported frameworks for CLI init.
+
+### CLI v0.39.0
+- ✅ Completed: Cloud Execution Adapters Expansion - Added support for Docker, Fly.io, and Kubernetes to the job run command.
