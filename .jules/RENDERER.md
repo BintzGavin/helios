@@ -13,3 +13,9 @@
 ## [1.79.1] - GSAP Fragility
 **Learning:** `SeekTimeDriver` relies on the `window.__helios_gsap_timeline__` global for synchronization, which is fragile if the user doesn't expose it correctly or uses multiple timelines.
 **Action:** Future task should consider more robust discovery mechanisms or an explicit registration API.
+## Performance Trajectory
+Current best: 51.645s (baseline was 53.107s, -2.75%)
+Last updated by: PERF-006
+
+## What Works
+- Removed GL flags and forced Chromium into native Skia CPU pathways via `--disable-gpu`, `--disable-software-rasterizer`, and `--disable-gpu-compositing`. Reduces translation overhead from SwiftShader (~2.75% faster). (PERF-006)

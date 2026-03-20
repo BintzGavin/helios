@@ -1,0 +1,3 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	53.107	150	2.82	37.6	keep	baseline
+2	51.645	150	2.90	37.5	keep	disable GPU flags for native Skia CPU pathways
