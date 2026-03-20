@@ -1,11 +1,11 @@
 ---
 id: PERF-006
 slug: optimize-chromium-args
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2026-10-18
-completed: ""
-result: ""
+completed: "2024-03-24"
+result: "improved"
 ---
 
 # PERF-006: Optimize Chromium Launch Arguments for CPU-only MicroVM
@@ -76,3 +76,11 @@ Run a standard Canvas smoke test using `mode: 'canvas'`. Because `mode: 'canvas'
 
 ## Prior Art
 - Puppeteer / Playwright performance guides for Docker/CI environments (which are typically CPU-only) strongly recommend `--disable-gpu` and `--disable-dev-shm-usage` to avoid SwiftShader overhead for standard web scraping and PDF/Screenshot generation.
+
+## Results Summary
+- **Best render time**: 51.645s (vs baseline 53.107s)
+- **Improvement**: 2.75%
+- **Kept experiments**:
+  - Remove GL flags (`--use-gl=egl`, `--ignore-gpu-blocklist`, `--enable-gpu-rasterization`, `--enable-zero-copy`)
+  - Add disable flags (`--disable-gpu`, `--disable-software-rasterizer`, `--disable-gpu-compositing`)
+- **Discarded experiments**: none

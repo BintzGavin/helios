@@ -11,10 +11,9 @@ import { FFmpegInspector } from './utils/FFmpegInspector.js';
 import { RendererOptions, RenderJobOptions } from './types.js';
 
 const DEFAULT_BROWSER_ARGS = [
-  '--use-gl=egl',
-  '--ignore-gpu-blocklist',
-  '--enable-gpu-rasterization',
-  '--enable-zero-copy',
+  '--disable-gpu',
+  '--disable-software-rasterizer',
+  '--disable-gpu-compositing',
   '--disable-web-security',
   '--allow-file-access-from-files',
 ];
