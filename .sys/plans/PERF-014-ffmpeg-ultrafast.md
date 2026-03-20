@@ -1,11 +1,11 @@
 ---
 id: PERF-014
 slug: ffmpeg-ultrafast
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2026-10-18
-completed: ""
-result: ""
+completed: 2026-10-18
+result: no-improvement
 ---
 
 # PERF-014: Optimize FFmpeg with Ultrafast Preset
@@ -30,3 +30,9 @@ Modify this logic so that it defines a local variable representing the preset to
 
 ## Test Plan
 1. Execute `npx tsx tests/verify-dom-media-attributes.ts` inside the `packages/renderer` directory to ensure the FFmpegBuilder arguments are correctly formed.
+
+## Results Summary
+- **Best render time**: 46.307s (vs baseline 46.307s)
+- **Improvement**: 0%
+- **Kept experiments**:
+- **Discarded experiments**: [PERF-014: Defaulting FFmpeg preset to ultrafast]
