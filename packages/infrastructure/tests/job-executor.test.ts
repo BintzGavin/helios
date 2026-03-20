@@ -179,6 +179,43 @@ describe('JobExecutor', () => {
     }
   });
 
+  it('should throw AbortError if signal is aborted at the start of a retry loop', async () => {
+    const ac = new AbortController();
+    let attempt = 0;
+
+    mockAdapter.execute = vi.fn().mockImplementation(async () => {
+      if (attempt === 0) {
+        attempt++;
+        throw new Error('Trigger retry to wait');
+      }
+      return { exitCode: 0, stdout: '', stderr: '', durationMs: 0 };
+    });
+
+    const originalSetTimeout = global.setTimeout;
+    const setTimeoutSpy = vi.spyOn(global, 'setTimeout').mockImplementation(((fn: any, ms: any) => {
+      // Resolve the delay, then set aborted = true.
+      // This ensures the loop proceeds to the next iteration and hits `if (options.signal?.aborted)`
+      const timeoutId = originalSetTimeout(() => {
+        fn();
+        Object.defineProperty(ac.signal, 'aborted', { value: true, configurable: true });
+      }, 0);
+      return timeoutId;
+    }) as any);
+
+    try {
+      const error = await jobExecutor.execute(jobSpec, {
+        signal: ac.signal,
+        retries: 1,
+        retryDelay: 10
+      }).catch(e => e);
+
+      expect(error.name).toBe('AbortError');
+      expect(error.message).toBe('Job aborted');
+    } finally {
+      setTimeoutSpy.mockRestore();
+    }
+  });
+
   it('should throw AbortError if signal is aborted explicitly before resolving the retry delay', async () => {
     const ac = new AbortController();
     let attempt = 0;
@@ -295,6 +332,12 @@ describe('JobExecutor', () => {
     } finally {
       allSettledSpy.mockRestore();
     }
+  });
+
+  it('should throw wrapped error with undefined if adapter.execute rejects with undefined', async () => {
+    mockAdapter.execute = vi.fn().mockRejectedValue(undefined);
+
+    await expect(jobExecutor.execute(jobSpec, { retries: 0 })).rejects.toThrow('Chunk 1 failed after 1 attempts: undefined');
   });
 
   it('should throw the rejection reason if a worker rejects with a specific reason but no failures', async () => {
