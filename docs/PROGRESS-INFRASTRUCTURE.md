@@ -563,3 +563,6 @@
 
 ### INFRASTRUCTURE v0.54.25
 - ✅ Completed: Optimize GCS Uploads - Verified GcsStorageAdapter.uploadAssetBundle uses concurrent Promise.all for faster distributed file uploads.
+
+### INFRASTRUCTURE v0.54.26
+- ✅ Completed: Optimize S3 Uploads - Modified S3StorageAdapter.uploadAssetBundle to perform file uploads concurrently, bringing it to parity with GCS.
