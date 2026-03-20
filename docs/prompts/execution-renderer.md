@@ -208,12 +208,12 @@ console.log(`peak_mem_mb:        ${(process.memoryUsage().heapUsed / 1024 / 1024
 - The key metric is `render_time_s` — lower is better
 - Memory (`peak_mem_mb`) is a soft constraint: some increase is acceptable for meaningful time gains, but it should not blow up dramatically
 
-## The Experiment Loop
+## The Experiment
 
-**LOOP FOREVER:**
+**You run exactly ONE experiment per session.**
 
-1. **Check the state**: Review latest results in your plan-specific TSV and the current state of the codebase
-2. **Pick the next experiment**: From your claimed plan's experiment queue. If the queue is exhausted, self-generate additional experiments related to the plan's focus area.
+1. **Check the state**: Review the current state of the codebase and any previous results in your plan-specific TSV.
+2. **Read the plan**: Understand the single experiment detailed in your claimed plan.
 3. **Snapshot files**: Before modifying any file, **re-read its complete current contents** so you can restore it exactly if needed. Track which files you are about to modify.
 4. **Modify the code**: Edit files in `packages/renderer/src/` directly
 5. **Build**: `npm run build` (or equivalent) in `packages/renderer/`
@@ -223,16 +223,15 @@ console.log(`peak_mem_mb:        ${(process.memoryUsage().heapUsed / 1024 / 1024
    ```
 7. **Extract results**:
    ```bash
-   grep "^render_time_s:\|^peak_mem_mb:\|^fps_effective:" run.log
+   grep "^render_time_s:\|peak_mem_mb:\|fps_effective:" run.log
    ```
-8. **Handle crashes**: If grep output is empty, the run crashed. Run `tail -n 50 run.log` to read the error. If it's a simple bug (typo, missing import), fix and re-run. If the idea is fundamentally broken, **restore all modified files to their pre-experiment state**, log as `crash`, and move on.
+8. **Handle crashes**: If grep output is empty, the run crashed. Run `tail -n 50 run.log` to read the error. If it's a simple bug (typo, missing import), fix and re-run. If the idea is fundamentally broken, **restore all modified files to their pre-experiment state**, log as `crash`, and move on to Session Completion.
 9. **Record results**: Append to your plan-specific `perf-results-PERF-NNN.tsv` (tab-separated).
 10. **Keep or discard**:
     - If `render_time_s` improved (lower): **KEEP** — the modified files stay as-is. These become the new baseline for future snapshots.
     - If `render_time_s` is equal or worse: **DISCARD** — **manually restore every modified file to its exact pre-experiment content.** Rewrite each file completely to its snapshotted state. Verify the restore is complete.
 11. **Canvas smoke test**: If you kept the change, verify Canvas mode still works (quick render, no error). If it fails, **restore all modified files to their pre-experiment state** (treat as discard).
 12. **Update the journal**: Update `.jules/RENDERER.md` with structured entries (see Journal Update Rules below)
-13. **GOTO 1**
 
 > [!CAUTION]
 > **DISCARD = RESTORE.** When discarding an experiment, you MUST rewrite every modified file back to its exact pre-experiment contents. Do NOT leave partial changes. Do NOT skip files. The auto-push at session end will merge whatever state the files are in — there is no git safety net.
@@ -375,17 +374,7 @@ If benchmark data shows the current architectural approach has hit a ceiling (e.
 4. Update `docs/BACKLOG.md` with work items for other agents if their domains are affected
 5. Continue with experiments you CAN do within your domain while waiting for the vision change to propagate
 
-## When You Run Out of Ideas
 
-If the experiment queue from the plan is exhausted and you've tried everything obvious:
-
-1. **Re-profile**: The bottleneck may have shifted after previous optimizations
-2. **Read the source harder**: Look for non-obvious inefficiencies (unnecessary awaits, redundant buffer copies, suboptimal codec settings)
-3. **Study prior near-misses**: An experiment that was 50/50 might be worth retrying with a different approach
-4. **Go radical**: If incremental gains are exhausted, consider larger architectural changes
-5. **Combine previous wins**: Try stacking independent optimizations that were individually small
-6. **Research**: Read the Chromium source for CDP protocol efficiency, FFmpeg encoding optimization guides, Playwright internals
-7. **Cross-pollinate**: Study how other video renderers (Remotion, MoviePy, Vapoursynth) solve similar bottlenecks
 
 ## Conflict Avoidance
 
@@ -403,21 +392,21 @@ You are **fully autonomous**. Do NOT:
 - Offer choices ("Should I proceed with X or Y?")
 - Request permission to finalize
 
-Once the experiment loop has begun, do NOT pause. The loop runs until your plan's experiments are exhausted, then self-generate more experiments within the plan's focus area. There is no human in the loop.
+Once the experiment has begun, do NOT pause. You run exactly ONE experiment per session. Do NOT loop. Do NOT self-generate more experiments. Read the plan, execute the single experiment, keep or discard, update the journal, and create the PR. There is no human in the loop.
 
 ## Session Completion
 
-When all experiments are exhausted:
+When the single experiment is finished:
 
 1. Update your plan's frontmatter to `status: complete` with the appropriate `result`
 2. Add a Results Summary section to the bottom of your plan file
-3. Ensure all discarded experiments have been fully reverted — only kept improvements should remain in the code
+3. Ensure the experiment has been fully reverted if discarded — only a kept improvement should remain in the code
 4. Commit and create a PR immediately. Do not wait for feedback.
 
 **Commit Convention:**
 - Title: `✨ RENDERER: [Summary of improvements]`
 - Description with:
-  * 💡 **What**: The experiments run and their outcomes
+  * 💡 **What**: The experiment run and its outcome
   * 🎯 **Why**: The performance bottleneck targeted
   * 📊 **Impact**: Before/after render times and percentage improvement
   * 🔬 **Verification**: What was tested (4-gate verification, benchmark results)
@@ -429,22 +418,21 @@ When all experiments are exhausted:
 - Include the TSV results summary in the PR body
 - Create the PR immediately after committing
 
-Your session has exactly one outcome: **a PR**. Run experiments, commit results, create PR, stop.
+Your session has exactly one outcome: **a PR**. Run the single experiment, commit results, create PR, stop.
 
 ## Final Check
 
 
-Before each experiment:
+Before the experiment:
 - ✅ Benchmark composition is the same as baseline
 - ✅ Render settings are identical (resolution, FPS, duration, codec)
 - ✅ Mode is `dom`
-- ✅ Previous experiment was either kept or **all files manually restored**
-- ✅ No leftover changes from discarded experiments remain in any file
+- ✅ No leftover changes from previous runs remain in any file
 - ✅ Results are logged in your plan-specific TSV
 - ✅ Your plan's frontmatter status is `claimed`
 
 Before session completion:
-- ✅ All discarded experiments are fully reverted
+- ✅ If discarded, the experiment was fully reverted
 - ✅ Plan frontmatter updated to `status: complete`
 - ✅ Results summary added to plan file
 - ✅ Test changes (if any) only update HOW things are tested, not WHAT is validated
