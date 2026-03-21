@@ -1,8 +1,9 @@
 ## Performance Trajectory
-Current best: 35.125s (baseline was 35.200s, -0.2%)
-Last updated by: PERF-018
+Current best: 32.833s (baseline was 35.281s, -6.9%)
+Last updated by: PERF-021
 
 ## What Works
+- [PERF-021] Optimized redundant `requestAnimationFrame` waits in SeekTimeDriver and DomStrategy, dropping capture idle wait. Reduced render time to 32.833s (vs baseline 35.281s, -6.9%).
 - Pre-compile SeekTimeDriver evaluate script. Passing the arguments directly to the evaluation function avoids repetitive string serialization and V8 compilation overhead per frame (~0.2% faster). (PERF-018)
 - Decoupled frame capture from I/O write for pipelining. Result inconclusive due to environmental limits, but kept as architectural fix. (PERF-013)
 - Defaulting intermediate image format to jpeg when no alpha channel is needed (~2.2% faster) (PERF-011)

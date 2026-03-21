@@ -160,13 +160,7 @@ export class SeekTimeDriver implements TimeDriver {
           }
 
           await new Promise((resolve) => {
-            requestAnimationFrame(() => {
-              requestAnimationFrame(() => {
-                requestAnimationFrame(() => {
-                  requestAnimationFrame(() => resolve());
-                });
-              });
-            });
+            requestAnimationFrame(() => resolve());
           });
         };
       })();
