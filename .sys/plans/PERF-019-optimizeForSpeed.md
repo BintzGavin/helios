@@ -1,11 +1,11 @@
 ---
 id: PERF-019
 slug: optimizeForSpeed
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2026-10-18
-completed: ""
-result: ""
+completed: "2026-03-21"
+result: "no-improvement"
 ---
 
 # PERF-019: Enable optimizeForSpeed flag in CDP Page.captureScreenshot
@@ -28,3 +28,9 @@ In the block where the `captureParams` object is built for `this.cdpSession.send
 ## Test Plan
 1. Run `npx tsx packages/renderer/tests/verify-codecs.ts` to ensure the codecs tests pass and no syntax errors are introduced.
 2. Execute the DOM rendering benchmark using a standard composition to verify output video frames are in chronological order, transparent backgrounds still work, and measure the wall-clock render time improvements.
+
+## Results Summary
+- **Best render time**: 35.455s (vs baseline 35.141s)
+- **Improvement**: 0% (no improvement)
+- **Kept experiments**: []
+- **Discarded experiments**: [Enable optimizeForSpeed flag in CDP Page.captureScreenshot]
