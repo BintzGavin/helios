@@ -1,0 +1,7 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	34.400	150	4.36	40.0	keep	baseline
+2	32.794	150	4.57	36.9	keep	cache DOM scans
+3	32.850	150	4.57	36.9	keep	cache DOM scans
+4	34.351	150	4.37	44.4	keep	cache DOM scans
+5	32.899	150	4.56	36.5	keep	cache DOM scans
+6	32.894	150	4.56	36.6	keep	cache DOM scans

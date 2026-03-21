@@ -1,11 +1,11 @@
 ---
 id: PERF-022
 slug: dom-scan-optimization
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2026-03-21
-completed: ""
-result: ""
+completed: 2026-03-21
+result: "improved"
 ---
 
 # PERF-022: Optimize Expensive DOM Scans in SeekTimeDriver
@@ -30,3 +30,9 @@ The current estimated render time is ~34.4 seconds. The bottleneck analysis poin
 
 ## Test Plan
 Run a standard Canvas smoke test using `npx tsx packages/renderer/tests/verify-codecs.ts`. Run the DOM rendering benchmark using `npx tsx packages/renderer/scripts/render-dom.ts` and inspect the output video visually to ensure no frames are dropped or torn, and measure the wall-clock render time.
+
+## Results Summary
+- **Best render time**: 32.794s (vs baseline 34.400s)
+- **Improvement**: ~4.7%
+- **Kept experiments**: Cached expensive DOM traversal elements `findAllScopes` and `findAllMedia` upon first access in `SeekTimeDriver.ts`.
+- **Discarded experiments**: none

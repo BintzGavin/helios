@@ -44,6 +44,15 @@ export class SeekTimeDriver implements TimeDriver {
         ${PARSE_MEDIA_ATTRIBUTES_FUNCTION}
         ${SYNC_MEDIA_FUNCTION}
 
+        // Cache for expensive DOM scans
+        let cachedScopes = null;
+        let cachedMediaElements = null;
+
+        window.__helios_invalidate_cache = () => {
+          cachedScopes = null;
+          cachedMediaElements = null;
+        };
+
         window.__helios_seek = async (t, timeoutMs) => {
           let gsapTimelineSeeked = false;
           const timeInMs = t * 1000;
@@ -60,8 +69,10 @@ export class SeekTimeDriver implements TimeDriver {
           }
 
           // Synchronize document timeline (WAAPI) across all scopes
-          const allScopes = findAllScopes(document);
-          allScopes.forEach((scope) => {
+          if (!cachedScopes) {
+            cachedScopes = findAllScopes(document);
+          }
+          cachedScopes.forEach((scope) => {
             if (scope.getAnimations) {
               scope.getAnimations().forEach((anim) => {
                 anim.currentTime = timeInMs;
@@ -101,8 +112,10 @@ export class SeekTimeDriver implements TimeDriver {
           }
 
           // 2. Synchronize media elements (video, audio)
-          const mediaElements = findAllMedia(document);
-          mediaElements.forEach((el) => {
+          if (!cachedMediaElements) {
+            cachedMediaElements = findAllMedia(document);
+          }
+          cachedMediaElements.forEach((el) => {
             syncMedia(el, t);
 
             if (el.seeking || el.readyState < 2) {
