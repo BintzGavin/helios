@@ -193,7 +193,9 @@ export class SeekTimeDriver implements TimeDriver {
 
   async setTime(page: Page, timeInSeconds: number): Promise<void> {
     const frames = page.frames();
-    const script = `(async (t, timeoutMs) => window.__helios_seek(t, timeoutMs))(${timeInSeconds}, ${this.timeout})`;
-    await Promise.all(frames.map((frame) => frame.evaluate(script)));
+    await Promise.all(frames.map((frame) => frame.evaluate(
+      ([t, timeoutMs]) => (window as any).__helios_seek(t, timeoutMs),
+      [timeInSeconds, this.timeout]
+    )));
   }
 }
