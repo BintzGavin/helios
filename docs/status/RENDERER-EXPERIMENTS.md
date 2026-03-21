@@ -3,6 +3,7 @@ Current best: 32.794s (baseline was 34.400s, -4.7%)
 Last updated by: PERF-022
 
 ## What Works
+- [PERF-023] Optimized array allocations in SeekTimeDriver by replacing .forEach closures with standard for loops. Render time improved (from ~43.838s to 32.815s, -25.1%).
 - [PERF-022] Cached expensive DOM traversal elements `findAllScopes` and `findAllMedia` upon first access in `SeekTimeDriver.ts`. Reduces redundant DOM traversal per frame via `document.createTreeWalker`. Reduced render time to 32.794s (vs baseline 34.400s, -4.7%).
 - [PERF-021] Optimized redundant `requestAnimationFrame` waits in SeekTimeDriver and DomStrategy, dropping capture idle wait. Reduced render time to 32.833s (vs baseline 35.281s, -6.9%).
 - Pre-compile SeekTimeDriver evaluate script. Passing the arguments directly to the evaluation function avoids repetitive string serialization and V8 compilation overhead per frame (~0.2% faster). (PERF-018)

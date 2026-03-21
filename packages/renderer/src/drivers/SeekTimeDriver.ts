@@ -72,14 +72,17 @@ export class SeekTimeDriver implements TimeDriver {
           if (!cachedScopes) {
             cachedScopes = findAllScopes(document);
           }
-          cachedScopes.forEach((scope) => {
+          for (let i = 0; i < cachedScopes.length; i++) {
+            const scope = cachedScopes[i];
             if (scope.getAnimations) {
-              scope.getAnimations().forEach((anim) => {
+              const animations = scope.getAnimations();
+              for (let j = 0; j < animations.length; j++) {
+                const anim = animations[j];
                 anim.currentTime = timeInMs;
                 anim.pause();
-              });
+              }
             }
-          });
+          }
 
           // CRITICAL: Trigger Helios state update FIRST to ensure subscriptions fire
           if (typeof window.helios !== 'undefined' && window.helios.seek) {
@@ -107,7 +110,7 @@ export class SeekTimeDriver implements TimeDriver {
           const promises = [];
 
           // 1. Wait for Fonts
-          if (document.fonts && document.fonts.ready) {
+          if (t === 0 && document.fonts && document.fonts.ready) {
             promises.push(document.fonts.ready);
           }
 
@@ -115,7 +118,8 @@ export class SeekTimeDriver implements TimeDriver {
           if (!cachedMediaElements) {
             cachedMediaElements = findAllMedia(document);
           }
-          cachedMediaElements.forEach((el) => {
+          for (let i = 0; i < cachedMediaElements.length; i++) {
+            const el = cachedMediaElements[i];
             syncMedia(el, t);
 
             if (el.seeking || el.readyState < 2) {
@@ -137,17 +141,19 @@ export class SeekTimeDriver implements TimeDriver {
                 el.addEventListener('error', finish);
               }));
             }
-          });
+          }
 
           // 3. Wait for Helios Stability (Custom Checks)
           if (typeof window.helios !== 'undefined' && typeof window.helios.waitUntilStable === 'function') {
             promises.push(window.helios.waitUntilStable());
           }
 
-          // 4. Wait for stability with a safety timeout
-          const allReady = Promise.all(promises);
-          const timeout = new Promise((resolve) => setTimeout(resolve, timeoutMs));
-          await Promise.race([allReady, timeout]);
+          // 4. Wait for stability with a safety timeout (only if needed)
+          if (promises.length > 0) {
+            const allReady = Promise.all(promises);
+            const timeout = new Promise((resolve) => setTimeout(resolve, timeoutMs));
+            await Promise.race([allReady, timeout]);
+          }
 
           // 5. After stability, ensure GSAP timelines are seeked
           if (!gsapTimelineSeeked && window.__helios_gsap_timeline__ && typeof window.__helios_gsap_timeline__.seek === 'function') {

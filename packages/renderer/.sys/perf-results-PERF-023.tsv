@@ -1,0 +1,4 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	43.838	150	3.42	38.6	keep	baseline
+2	32.815	150	4.57	36.7	keep	optimize array/promise allocations
+3	33.011	150	4.54	36.7	keep	optimize array/promise allocations retry
