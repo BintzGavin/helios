@@ -1,11 +1,11 @@
 ---
 id: PERF-016
 slug: webp-intermediate-format
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2026-10-18
-completed: ""
-result: ""
+completed: 2026-10-18
+result: improved
 ---
 
 # PERF-016: Intermediate Format Optimization (WEBP)
@@ -27,3 +27,9 @@ The Frame Capture Loop (phase 4) in `packages/renderer/src/strategies/DomStrateg
 ## Test Plan
 1. Run `cd packages/renderer && npx tsx tests/verify-codecs.ts` to ensure the codecs tests pass.
 2. Execute the DOM rendering benchmark using a standard composition to verify output video frames are in chronological order and measure wall-clock render time.
+
+## Results Summary
+- **Best render time**: 35.156s (vs baseline 35.555s)
+- **Improvement**: 1.1%
+- **Kept experiments**: Default to 'webp' format for alpha channel support.
+- **Discarded experiments**: None
