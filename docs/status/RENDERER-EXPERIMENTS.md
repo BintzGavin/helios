@@ -9,6 +9,7 @@ Last updated by: PERF-018
 
 ## What Doesn't Work (and Why)
 - [entries]
+- Enabling `optimizeForSpeed: true` in CDP `Page.captureScreenshot` params. The render time and peak memory consumption remained identical within noise margins (35.455s vs 35.141s baseline). The underlying Chromium build might not effectively support or prioritize this flag in headless mode for this CPU-only microVM. (PERF-019)
 - Defaulting FFmpeg preset to `ultrafast`. The render time remained identical within noise margins (46.161s vs 46.307s baseline). In this CPU-bound microVM, DOM frame capture and IPC appear to be the dominant bottlenecks, making the encoding preset negligible. (PERF-014)
 - Conditionally using `jpeg_pipe` format with `mjpeg` codec for FFmpeg ingestion when intermediate image format is `jpeg`. The render time degraded (47.85s vs 46.706s). It appears that bypassing FFmpeg stream probing doesn't offset other ingestion/decoding overhead in this environment. (PERF-012)
 
