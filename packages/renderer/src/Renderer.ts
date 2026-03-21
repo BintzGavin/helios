@@ -1,6 +1,7 @@
 import { spawn } from 'child_process';
 import { chromium, ConsoleMessage } from 'playwright';
 import ffmpeg from '@ffmpeg-installer/ffmpeg';
+import os from 'os';
 import { RenderStrategy } from './strategies/RenderStrategy.js';
 import { CanvasStrategy } from './strategies/CanvasStrategy.js';
 import { DomStrategy } from './strategies/DomStrategy.js';
@@ -95,44 +96,54 @@ export class Renderer {
       await context.tracing.start({ screenshots: true, snapshots: true });
     }
 
+    let pool: { page: import('playwright').Page, strategy: RenderStrategy, timeDriver: TimeDriver }[] = [];
     try {
-      const page = await context.newPage();
-
-      console.log(`Navigating to ${compositionUrl}...`);
+      const concurrency = os.cpus().length || 4;
+      console.log(`Initializing pool of ${concurrency} pages...`);
 
       const capturedErrors: Error[] = [];
 
-      // Capture console logs from the page
-      page.on('console', (msg: ConsoleMessage) => console.log(`PAGE LOG: ${msg.text()}`));
-      page.on('pageerror', (err: Error) => {
-        console.error(`PAGE ERROR: ${err.message}`);
-        capturedErrors.push(err);
-      });
-      page.on('crash', () => {
-        const err = new Error('Page crashed!');
-        console.error(err.message);
-        capturedErrors.push(err);
-      });
+      const createPage = async (index: number) => {
+        const page = await context.newPage();
+        const strategy = this.options.mode === 'dom' ? new DomStrategy(this.options) : new CanvasStrategy(this.options);
+        const timeDriver = this.options.mode === 'dom' ? new SeekTimeDriver(this.options.stabilityTimeout) : new CdpTimeDriver(this.options.stabilityTimeout);
 
-      if (this.options.inputProps) {
-        const serializedProps = JSON.stringify(this.options.inputProps);
-        await page.addInitScript(`window.__HELIOS_PROPS__ = ${serializedProps};`);
+        page.on('console', (msg: ConsoleMessage) => console.log(`PAGE LOG [${index}]: ${msg.text()}`));
+        page.on('pageerror', (err: Error) => {
+          console.error(`PAGE ERROR [${index}]: ${err.message}`);
+          capturedErrors.push(err);
+        });
+        page.on('crash', () => {
+          const err = new Error(`Page ${index} crashed!`);
+          console.error(err.message);
+          capturedErrors.push(err);
+        });
+
+        if (this.options.inputProps) {
+          const serializedProps = JSON.stringify(this.options.inputProps);
+          await page.addInitScript(`window.__HELIOS_PROPS__ = ${serializedProps};`);
+        }
+
+        await timeDriver.init(page, this.options.randomSeed);
+        await page.goto(compositionUrl, { waitUntil: 'networkidle' });
+
+        await strategy.prepare(page);
+        await timeDriver.prepare(page);
+
+        return { page, strategy, timeDriver };
+      };
+
+      const poolPromises = [];
+      for (let i = 0; i < concurrency; i++) {
+        poolPromises.push(createPage(i));
       }
+      pool = await Promise.all(poolPromises);
 
-      console.log('Initializing time driver...');
-      await this.timeDriver.init(page, this.options.randomSeed);
+      console.log('All pages loaded and prepared.');
 
-      await page.goto(compositionUrl, { waitUntil: 'networkidle' });
-      console.log('Page loaded.');
-
-      console.log('Running diagnostics...');
-      const diagnostics = await this.strategy.diagnose(page);
+      console.log('Running diagnostics on first page...');
+      const diagnostics = await pool[0].strategy.diagnose(pool[0].page);
       console.log('[Helios Diagnostics]', JSON.stringify(diagnostics, null, 2));
-
-      console.log('Preparing render strategy...');
-      await this.strategy.prepare(page);
-      await this.timeDriver.prepare(page);
-      console.log('Strategy prepared.');
 
       const totalFrames = this.options.frameCount
         ? this.options.frameCount
@@ -208,77 +219,99 @@ export class Renderer {
       try {
         const captureLoop = async () => {
           let previousWritePromise = Promise.resolve();
+          let framePromises: Promise<Buffer>[] = [];
 
-          for (let i = 0; i < totalFrames; i++) {
-            if (capturedErrors.length > 0) {
-              throw capturedErrors[0];
-            }
+          // To maximize parallel page utilization, we need to decouple frame production from writing
+          // such that multiple workers can be evaluating frames concurrently.
 
-            if (jobOptions?.signal?.aborted) {
-              throw new Error('Aborted');
-            }
+          let nextFrameToSubmit = 0;
+          let nextFrameToWrite = 0;
 
-            const time = (i / fps) * 1000;
-            if (i > 0 && i % progressInterval === 0) {
-                console.log(`Progress: Rendered ${i} / ${totalFrames} frames`);
-            }
+          while (nextFrameToWrite < totalFrames) {
+              if (capturedErrors.length > 0) {
+                  throw capturedErrors[0];
+              }
+              if (jobOptions?.signal?.aborted) {
+                  throw new Error('Aborted');
+              }
 
-            if (jobOptions?.onProgress) {
-               jobOptions.onProgress(i / totalFrames);
-            }
+              // Refill the active pipeline up to the pool size
+              while (nextFrameToSubmit < totalFrames && (nextFrameToSubmit - nextFrameToWrite) < pool.length) {
+                  const frameIndex = nextFrameToSubmit;
+                  const worker = pool[frameIndex % pool.length];
+                  const time = (frameIndex / fps) * 1000;
+                  const compositionTimeInSeconds = (startFrame + frameIndex) / fps;
 
-            await previousWritePromise;
+                  const framePromise = worker.timeDriver.setTime(worker.page, compositionTimeInSeconds)
+                    .then(() => worker.strategy.capture(worker.page, time));
 
-            const compositionTimeInSeconds = (startFrame + i) / fps;
-            await this.timeDriver.setTime(page, compositionTimeInSeconds);
+                  // Add a no-op catch handler to prevent unhandled promise rejections on abort/error
+                  framePromise.catch(() => {});
 
-            const buffer = await this.strategy.capture(page, time);
+                  framePromises.push(framePromise);
+                  nextFrameToSubmit++;
+              }
 
-            if (!ffmpegProcess.stdin.writable) {
-               throw new Error('FFmpeg stdin is not writable');
-            }
+              const buffer = await framePromises.shift()!;
+              const i = nextFrameToWrite;
 
-            previousWritePromise = new Promise<void>((resolve, reject) => {
-                const canWriteMore = ffmpegProcess.stdin.write(buffer, (err?: Error | null) => {
-                    if (err) {
-                       ffmpegProcess.emit('error', err);
-                       reject(err);
-                    }
-                });
+              if (i > 0 && i % progressInterval === 0) {
+                  console.log(`Progress: Rendered ${i} / ${totalFrames} frames`);
+              }
 
-                if (!canWriteMore) {
-                    const onDrain = () => {
-                        cleanup();
-                        resolve();
-                    };
-                    const onError = (err: Error) => {
-                        cleanup();
-                        reject(err);
-                    };
-                    const onClose = () => {
-                        cleanup();
-                        reject(new Error('FFmpeg stdin closed before drain'));
-                    };
+              if (jobOptions?.onProgress) {
+                 jobOptions.onProgress(i / totalFrames);
+              }
 
-                    const cleanup = () => {
-                        ffmpegProcess.stdin.removeListener('drain', onDrain);
-                        ffmpegProcess.stdin.removeListener('error', onError);
-                        ffmpegProcess.stdin.removeListener('close', onClose);
-                    };
+              await previousWritePromise;
 
-                    ffmpegProcess.stdin.once('drain', onDrain);
-                    ffmpegProcess.stdin.once('error', onError);
-                    ffmpegProcess.stdin.once('close', onClose);
-                } else {
-                    resolve();
-                }
-            });
+              if (!ffmpegProcess.stdin.writable) {
+                 throw new Error('FFmpeg stdin is not writable');
+              }
+
+              previousWritePromise = new Promise<void>((resolve, reject) => {
+                  const canWriteMore = ffmpegProcess.stdin.write(buffer, (err?: Error | null) => {
+                      if (err) {
+                         ffmpegProcess.emit('error', err);
+                         reject(err);
+                      }
+                  });
+
+                  if (!canWriteMore) {
+                      const onDrain = () => {
+                          cleanup();
+                          resolve();
+                      };
+                      const onError = (err: Error) => {
+                          cleanup();
+                          reject(err);
+                      };
+                      const onClose = () => {
+                          cleanup();
+                          reject(new Error('FFmpeg stdin closed before drain'));
+                      };
+
+                      const cleanup = () => {
+                          ffmpegProcess.stdin.removeListener('drain', onDrain);
+                          ffmpegProcess.stdin.removeListener('error', onError);
+                          ffmpegProcess.stdin.removeListener('close', onClose);
+                      };
+
+                      ffmpegProcess.stdin.once('drain', onDrain);
+                      ffmpegProcess.stdin.once('error', onError);
+                      ffmpegProcess.stdin.once('close', onClose);
+                  } else {
+                      resolve();
+                  }
+              });
+
+              nextFrameToWrite++;
           }
 
           await previousWritePromise;
 
           console.log('Finishing render strategy...');
-          const finalBuffer = await this.strategy.finish(page);
+          const finalBuffer = await pool[0].strategy.finish(pool[0].page);
           if (finalBuffer && Buffer.isBuffer(finalBuffer) && finalBuffer.length > 0) {
             console.log(`Writing final buffer of ${finalBuffer.length} bytes...`);
             if (!ffmpegProcess.stdin.writable) {
@@ -355,9 +388,11 @@ export class Renderer {
       await browser.close();
       console.log('Browser closed.');
 
-      if (this.strategy.cleanup) {
-        console.log('Cleaning up strategy resources...');
-        await this.strategy.cleanup();
+      console.log('Cleaning up strategy resources...');
+      for (const worker of pool) {
+          if (worker.strategy.cleanup) {
+              await worker.strategy.cleanup();
+          }
       }
     }
 
