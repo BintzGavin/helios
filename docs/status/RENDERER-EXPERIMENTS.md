@@ -13,3 +13,10 @@ Last updated by: PERF-013
 
 ## Open Questions
 - [entries]
+
+## Performance Trajectory
+Current best: 35.555s (baseline was 46.571s, -23.6%)
+Last updated by: PERF-015
+
+## What Works
+- [PERF-015] Instantiating a pool of multiple Playwright pages based on CPU concurrency and dividing frames between them using a sliding window. It allows concurrent evaluation of `strategy.capture()` across workers, cutting ~23% off render time.

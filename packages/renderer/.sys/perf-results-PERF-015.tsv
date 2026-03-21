@@ -1,0 +1,3 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	46.571	150	3.22	35.8	keep	baseline
+2	35.555	150	4.22	36.5	keep	pool of Playwright pages capturing frames concurrently
