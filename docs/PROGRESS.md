@@ -87,6 +87,9 @@ Each agent should update **their own dedicated progress file** instead of this f
 ### CLI v0.31.0
 - ✅ Completed: AWS Deployment - Implemented AWS Lambda deployment scaffolding and custom browser path support.
 
+### PLAYER v0.77.2
+- ✅ Completed: Expand Test Coverage - Added tests for captureFrame edge cases in DirectController.
+
 ### PLAYER v0.77.1
 - ✅ Completed: Bridge Coverage Expansion - Added comprehensive unit test coverage for HELIOS_CAPTURE_FRAME modes and global error handlers in bridge.ts.
 

@@ -1,4 +1,5 @@
-**Version**: 0.77.1
+**Version**: 0.77.2
+[v0.77.2] ✅ Completed: Expand Test Coverage - Added tests for captureFrame edge cases in DirectController.
 [v0.77.1] ✅ Completed: Bridge Coverage Expansion - Added comprehensive unit test coverage for HELIOS_CAPTURE_FRAME modes and global error handlers in bridge.ts.
 [v0.77.0] ✅ Completed: Media Session Properties - Exposed mediaTitle, mediaArtist, mediaAlbum, and mediaArtwork properties on HeliosPlayer to match HTMLMediaElement parity.
 [v0.76.24] ✅ Completed: Bridge Coverage Expansion 2 - Added missing unit test coverage for bridge.ts message handling (e.g., HELIOS_SEEK, HELIOS_SET_PLAYBACK_RANGE).

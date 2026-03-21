@@ -273,6 +273,26 @@ describe('DirectController', () => {
         }
     });
 
+    it('should return null if DOM capture fails in dom mode', async () => {
+        vi.mocked(domCapture.captureDomToBitmap).mockRejectedValue(new Error('DOM capture error'));
+
+        const result = await controller.captureFrame(5, { mode: 'dom' });
+
+        expect(mockHeliosInstance.seek).toHaveBeenCalledWith(5);
+        expect(domCapture.captureDomToBitmap).toHaveBeenCalled();
+        expect(result).toBeNull();
+    });
+
+    it('should return null if canvas element is not a CANVAS in canvas mode', async () => {
+        const mockDiv = document.createElement('div');
+        (mockIframe.contentDocument!.querySelector as any).mockReturnValue(mockDiv);
+
+        const result = await controller.captureFrame(5, { mode: 'canvas', selector: 'canvas' });
+
+        expect(mockHeliosInstance.seek).toHaveBeenCalledWith(5);
+        expect(result).toBeNull();
+    });
+
     it('should return null if canvas not found', async () => {
         (mockIframe.contentDocument!.querySelector as any).mockReturnValue(null);
 
