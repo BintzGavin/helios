@@ -15,8 +15,9 @@ Last updated by: PERF-013
 - [entries]
 
 ## Performance Trajectory
-Current best: 35.555s (baseline was 46.571s, -23.6%)
-Last updated by: PERF-015
+Current best: 35.156s (baseline was 35.555s, -1.1%)
+Last updated by: PERF-016
 
 ## What Works
+- [PERF-016] Changed the default intermediate image format to 'webp' when an alpha channel is needed. It reduces IPC overhead and is faster to encode/decode than 'png'.
 - [PERF-015] Instantiating a pool of multiple Playwright pages based on CPU concurrency and dividing frames between them using a sliding window. It allows concurrent evaluation of `strategy.capture()` across workers, cutting ~23% off render time.

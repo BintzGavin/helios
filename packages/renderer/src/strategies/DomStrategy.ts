@@ -96,7 +96,8 @@ export class DomStrategy implements RenderStrategy {
 
     if (!format) {
       if (hasAlpha) {
-        format = 'png';
+        format = 'webp';
+        quality = quality ?? 90;
       } else {
         format = 'jpeg';
         quality = quality ?? 90;
@@ -107,11 +108,13 @@ export class DomStrategy implements RenderStrategy {
       type: format,
     };
 
-    if (format === 'jpeg') {
+    if (format === 'jpeg' || format === 'webp') {
       if (quality !== undefined) {
         screenshotOptions.quality = quality;
       }
-    } else {
+    }
+
+    if (format !== 'jpeg') {
       screenshotOptions.omitBackground = hasAlpha;
     }
 
@@ -137,7 +140,7 @@ export class DomStrategy implements RenderStrategy {
     try {
       if (this.cdpSession) {
         const captureParams: any = { format };
-        if (format === 'jpeg' && quality !== undefined) {
+        if ((format === 'jpeg' || format === 'webp') && quality !== undefined) {
           captureParams.quality = quality;
         }
         const { data } = await this.cdpSession.send('Page.captureScreenshot', captureParams);

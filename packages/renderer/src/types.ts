@@ -195,13 +195,13 @@ export interface RendererOptions {
    * The image format to use for intermediate capture in 'dom' mode,
    * or as a fallback in 'canvas' mode if WebCodecs is not available.
    *
-   * Defaults to 'png'.
+   * Defaults to 'webp' if an alpha channel is required, or 'jpeg' otherwise.
    */
-  intermediateImageFormat?: 'png' | 'jpeg';
+  intermediateImageFormat?: 'png' | 'jpeg' | 'webp';
 
   /**
    * The quality of the intermediate image (0-100).
-   * Only applicable if `intermediateImageFormat` is 'jpeg'.
+   * Only applicable if `intermediateImageFormat` is 'jpeg' or 'webp'.
    *
    * Defaults to undefined (browser default).
    */
