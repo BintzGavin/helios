@@ -1,6 +1,6 @@
 # CLI Status
 
-**Version**: 0.39.0
+**Version**: 0.39.1
 
 ## Current State
 
@@ -108,3 +108,4 @@ Per AGENTS.md, the CLI is "ACTIVELY EXPANDING FOR V2" with focus on:
 [v0.36.1] ✅ Add Command Scaffold - Verified the existing `helios add` command fulfills the scaffolding requirements outlined in the plan.
 [v0.39.0] ✅ Completed: Cloud Execution Adapters Expansion - Added support for Docker, Fly.io, and Kubernetes to the job run command.
 [v0.38.0] ✅ Completed: Scaffold Fly.io Deployment Command - Implemented helios deploy fly to scaffold fly.toml, Dockerfile, and README-FLY.md for Fly.io Machines.
+[v0.39.1] ✅ Completed: CLI Scaffold Components - Verified existing implementation of helios components command fulfills the scaffolding requirements.
