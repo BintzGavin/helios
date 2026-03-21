@@ -177,10 +177,6 @@ export class SeekTimeDriver implements TimeDriver {
               console.warn('[SeekTimeDriver] Error seeking Helios:', e);
             }
           }
-
-          await new Promise((resolve) => {
-            requestAnimationFrame(() => resolve());
-          });
         };
       })();
     `;
