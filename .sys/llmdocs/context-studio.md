@@ -1,44 +1,54 @@
 # Studio Context
 
 ## Section A: Architecture
-Studio is a framework-agnostic browser-based development environment for video composition.
-It consists of a CLI, a dev server built on top of Vite, and a browser-based UI.
-The architecture uses a unified state model via `HeliosState` and interacts with a local API backend for file system operations.
-It also includes an MCP (Model Context Protocol) server to expose tools to AI agents.
+Helios Studio is a web-based UI for previewing and modifying Helios projects.
+It consists of:
+- A CLI runner (`packages/studio/bin/studio.js` and `packages/cli`).
+- A Vite-based development server using plugins to expose the filesystem and studio API.
+- A React-based frontend application displaying a Timeline, Properties Editor, Stage, and Assets Panel.
+- It acts as the host environment embedding `<helios-player>`.
 
 ## Section B: File Tree
 ```
 packages/studio/
 ├── bin/
-│   └── helios-studio.js
-├── dist/                # Build artifacts
+│   └── studio.js
+├── scripts/
+│   └── (build/verification scripts)
 ├── src/
-│   ├── cli/             # CLI commands (init, render, build, preview)
-│   ├── components/      # UI components (PropsEditor, Timeline, Stage)
-│   ├── context/         # React Context for global state
-│   ├── hooks/           # Custom React hooks (includes useAudioWaveform test suite)
-│   ├── server/          # Vite plugin API backend (discovery, rendering, mcp)
-│   ├── utils/           # Utility functions
-│   ├── App.tsx          # Main application component
-│   └── index.tsx        # React DOM entry point
-└── tsconfig.json        # TypeScript configuration
+│   ├── api/
+│   ├── components/
+│   │   ├── Stage/
+│   │   ├── Timeline/
+│   │   ├── PropsEditor/
+│   │   ├── AssetsPanel/
+│   │   └── ...
+│   ├── contexts/
+│   ├── hooks/
+│   ├── types/
+│   └── App.tsx
+├── package.json
+└── vite.config.ts
 ```
 
 ## Section C: CLI Interface
-The `npx helios studio` command launches the dev server, which uses `vite-plugin-studio-api` to serve the UI and backend API.
+- `npx helios init <project>`: Scaffolds a new project with chosen framework.
+- `npx helios studio` (or `npm run dev` in initialized projects): Starts the Studio UI on localhost.
+- `npx helios preview`: Serves a production build for verification.
+- `npx helios diff <component>`: Compares a component to the registry.
+- `npx helios components`: Lists available components.
+- `npx helios add <component>`: Installs a component from the registry.
 
 ## Section D: UI Components
-- **Stage**: The main preview area integrating `<helios-player>`.
-- **Timeline**: Allows scrubbing, setting in/out points, and visualizes audio waveforms using precise canvas-based rendering via `useAudioWaveform`.
-- **Props Editor**: A schema-aware UI for modifying input properties interactively, including visual schema validation.
-- **Assets Panel**: For managing local media files with external drag-and-drop and internal drag-to-move folder organization.
-- **Renders Panel**: For configuring and launching server-side or distributed render jobs.
-- **Compositions Panel**: For switching between multiple compositions.
-- **Components Panel**: For browsing and installing components from the registry.
+- **Stage**: Renders the `<helios-player>` with zoom, pan, and safe-area guides.
+- **Timeline**: Visual scrubber for playback, loop ranges, and markers.
+- **Props Editor**: Dynamically generated schema-aware inputs.
+- **Assets Panel**: File explorer for images, video, audio, fonts, and other assets.
+- **Renders Panel**: Manages distributed render jobs and client-side exports.
+- **Components Panel**: Browse and install registry components.
+- **Diagnostics Panel**: Views system capabilities.
 
 ## Section E: Integration
-- Integrates with `@helios-project/core` for state management and schemas.
-- Integrates with `@helios-project/player` for rendering the preview frame.
-- Integrates with `@helios-project/renderer` for launching backend render processes.
-- Integrates with `@helios-project/cli` for injecting the registry manifest into the Studio API backend.
-- Exposes MCP tools (`create_composition`, `render_composition`, etc.) enabling intelligent AI agents to interact with the workspace programmatically.
+- Integrates with `packages/core` via `HeliosState` and `HeliosController`.
+- Integrates with `packages/player` by embedding `<helios-player>`.
+- Integrates with `packages/renderer` via `/api/render` to execute rendering tasks.
