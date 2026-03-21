@@ -12,11 +12,14 @@ import { FFmpegInspector } from './utils/FFmpegInspector.js';
 import { RendererOptions, RenderJobOptions } from './types.js';
 
 const DEFAULT_BROWSER_ARGS = [
+  '--disable-web-security',
+  '--allow-file-access-from-files',
+];
+
+const GPU_DISABLED_ARGS = [
   '--disable-gpu',
   '--disable-software-rasterizer',
   '--disable-gpu-compositing',
-  '--disable-web-security',
-  '--allow-file-access-from-files',
 ];
 
 export class Renderer {
@@ -38,10 +41,11 @@ export class Renderer {
   private getLaunchOptions() {
     const config = this.options.browserConfig || {};
     const userArgs = config.args || [];
+    const gpuArgs = config.gpu === false ? GPU_DISABLED_ARGS : [];
     return {
       headless: config.headless ?? true,
       executablePath: config.executablePath,
-      args: [...DEFAULT_BROWSER_ARGS, ...userArgs],
+      args: [...DEFAULT_BROWSER_ARGS, ...gpuArgs, ...userArgs],
     };
   }
 

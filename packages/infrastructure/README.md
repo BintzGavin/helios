@@ -123,3 +123,45 @@ The following adapters are provided:
 Governance tooling provides utilities to enforce rules and maintain project integrity, adhering strictly to the "DEPENDENCY GOVERNANCE" law defined in the project's architectural guidelines. The guidelines state that agents are prohibited from manually synchronizing internal package versions, and that internal version propagation is handled by deterministic release tooling.
 
 - **Workspace Dependency Synchronizer (`syncWorkspaceDependencies`)**: A bounded utility to automatically synchronize monorepo workspace package versions (e.g., dependencies on `@helios-project/*`) within constrained directories (like test fixtures or temporary build paths). This ensures consistent versions are used during test processes and operations without requiring manual agent intervention or breaking strict cross-package domain boundaries.
+
+### Cloudflare Distributed Rendering (Sandbox + Workflows)
+
+> **Status**: Vision / Not Yet Implemented
+>
+> This section documents the proven architecture for distributed rendering on Cloudflare, based on production experience in the SwirlBot project. The existing `CloudflareWorkersAdapter` targets Workers via HTTP POST, but **Workers are too constrained for actual rendering** (128MB memory, no filesystem, no native binaries, CPU time limits). The proven path uses **Cloudflare Sandboxes** (full Linux containers) orchestrated by **Cloudflare Workflows** (durable multi-step execution).
+
+#### Architecture
+
+1. **Cloudflare Workflow** (Orchestrator): A durable, multi-step execution engine that survives hibernation and replays. Manages the full render lifecycle: generate job ID → provision sandbox(es) → distribute chunks → poll for completion → stitch output → cleanup.
+2. **Cloudflare Sandbox** (Render Worker): An ephemeral Linux container with full filesystem access. Supports installing Chromium + FFmpeg, running Playwright-based rendering, and writing output to disk. Managed via `getSandbox()` from the Workflows SDK.
+3. **R2** (Artifact Storage): Cloudflare's S3-compatible object storage for persisting rendered chunks, logs, and checkpoints. Fits the existing `ArtifactStorage` interface.
+
+#### Why Workers Don't Work for Rendering
+
+| Constraint | Workers | Sandboxes |
+|---|---|---|
+| Memory | 128MB max | Full container memory |
+| Filesystem | None | Full Linux FS |
+| Native binaries (FFmpeg, Chromium) | ❌ | ✅ via apt/npx |
+| CPU time | 30s max (paid) | Minutes-scale |
+| Lifecycle management | Stateless | `getSandbox()` with `keepAlive` |
+
+#### Required Components
+
+- **`CloudflareSandboxAdapter`**: Wraps `getSandbox()`, command execution, status polling, and container lifecycle (keepAlive, destroy). Replaces `CloudflareWorkersAdapter` for rendering use cases.
+- **`R2StorageAdapter`**: Implements `ArtifactStorage` for Cloudflare R2. Handles chunk output persistence, log harvesting, and checkpoint/resume.
+- **Reference Workflow**: A Cloudflare Workflow class demonstrating the full distributed render lifecycle with proper determinism, adaptive polling, and log harvesting.
+
+#### Operational Footguns (Learned from SwirlBot)
+
+These are hard-won lessons from running distributed rendering in production on Cloudflare. Every one of these caused real failures.
+
+1. **Replay Determinism**: Cloudflare Workflows replay the `run()` function on every resume. Code outside `step.do()` is re-executed with fresh state. **Never generate IDs, timestamps, or random values outside a step.** A `sandboxId` generated with `Date.now()` outside a step will produce a different ID on every replay, causing the poller to target a new, empty container each time. Fix: generate all state-dependent values inside `step.do()` and return them.
+
+2. **Container Recycling**: Sandboxes can be evicted mid-render by the platform—even with `keepAlive` active, and sometimes at exactly the 6-minute mark. **Never assume container state persists.** Rendered frames, logs, and status files can vanish. Fix: checkpoint progress to R2 on every poll cycle. On startup, check R2 for existing checkpoints and resume from the last known state.
+
+3. **keepAlive Heartbeat Placement**: Calling `sandbox.setKeepAlive(true)` inside a `step.do()` does not work—replayed steps don't re-establish heartbeats. **Always pass `keepAlive: true` in the `getSandbox()` options**, both in the initiator and the poller. This ensures heartbeats are active every time a sandbox reference is created, even after workflow hibernation.
+
+4. **Log Harvesting**: Assume every container is about to be destroyed. **Persist logs to R2 on every poll cycle**, not just on completion. Capture `status.txt`, full run logs, `ps aux` (to detect resets), and `ls -la /workspace/` (to detect wiped state). If the container is lost at poll N, logs from poll N-1 are preserved in R2.
+
+5. **ANSI Codes in Workflow State**: FFmpeg, Playwright, and agent CLI tools emit ANSI escape codes (colors, progress bars) that break Cloudflare Workflow state serialization (which JSON-serializes step outputs). Fix: Base64-encode captured logs before returning them from `step.do()`, or strip non-printable characters. Prefer persisting logs directly to R2 from the poller to bypass Workflow state size limits entirely.

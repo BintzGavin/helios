@@ -67,6 +67,16 @@ export interface BrowserConfig {
   headless?: boolean;
 
   /**
+   * Whether to enable GPU acceleration in the browser.
+   * Defaults to true (GPU enabled). Set to false to explicitly disable GPU
+   * for CPU-only environments (e.g., cloud functions, CI runners without GPU).
+   *
+   * When false, adds `--disable-gpu`, `--disable-software-rasterizer`, and
+   * `--disable-gpu-compositing` flags to the browser launch args.
+   */
+  gpu?: boolean;
+
+  /**
    * Path to a browser executable to use instead of the bundled Chromium.
    */
   executablePath?: string;
