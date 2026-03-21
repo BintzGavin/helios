@@ -1,11 +1,11 @@
 ---
 id: PERF-021
 slug: optimize-seek-raf
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2026-03-21
-completed: ""
-result: ""
+completed: 2026-03-21
+result: improved
 ---
 
 # PERF-021: Optimize redundant requestAnimationFrame waits in DOM capture
@@ -33,3 +33,9 @@ The Frame Capture Loop (phase 4) relies heavily on advancing time and waiting fo
 
 ## Test Plan
 Run a standard Canvas smoke test using the verification script. Run the DOM rendering benchmark using `npx tsx packages/renderer/scripts/render-dom.ts` and inspect the output video visually to ensure no frames are dropped or torn.
+
+## Results Summary
+- **Best render time**: 32.833s (vs baseline 35.281s)
+- **Improvement**: 6.9%
+- **Kept experiments**: [PERF-021]
+- **Discarded experiments**: []

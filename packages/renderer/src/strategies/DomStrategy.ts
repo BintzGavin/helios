@@ -134,9 +134,6 @@ export class DomStrategy implements RenderStrategy {
       return await element.screenshot(screenshotOptions);
     }
 
-    // Wait for the browser to finish painting this frame's virtual time
-    await page.evaluate(() => new Promise(requestAnimationFrame));
-
     try {
       if (this.cdpSession) {
         const captureParams: any = { format };
