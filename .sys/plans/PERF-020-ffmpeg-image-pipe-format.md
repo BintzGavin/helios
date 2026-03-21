@@ -1,11 +1,11 @@
 ---
 id: PERF-020
 slug: ffmpeg-image-pipe-format
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor"
 created: 2026-03-21
-completed: ""
-result: ""
+completed: "2026-03-21"
+result: "no-improvement"
 ---
 
 # PERF-020: Optimize FFmpeg Image Pipe Format
