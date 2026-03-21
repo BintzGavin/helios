@@ -133,3 +133,7 @@
 ## [0.114.2] - Asset Drag-and-Drop Gap
 **Learning:** The `AssetsPanel` implementation supported uploading files via drag-and-drop but lacked the logic to handle internal `Asset` drag-and-drop for moving files, despite `AssetItem` being draggable. This highlights a gap where "drag and drop" features need to be explicitly specified for both external (OS) and internal (app) sources.
 **Action:** When specifying drag-and-drop features, explicitly distinguish between "Import" (external files) and "Move/Organize" (internal items) to ensure both are covered.
+
+## [0.117.0] - Timeline Drag & Drop Support
+**Learning:** The README lists "Timeline Drag & Drop" as a vision feature for auto-detecting audio/video and updating the composition when an asset is dragged to the timeline. This is currently missing from `Timeline.tsx` and requires mapping `Asset` types from drag events to schema `accept` constraints.
+**Action:** Always verify if drag-and-drop operations on one panel (e.g. Assets Panel) should map to another (e.g. Timeline Panel) by checking the feature spec list.
