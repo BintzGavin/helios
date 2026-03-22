@@ -81,6 +81,9 @@ Each agent should update **their own dedicated progress file** instead of this f
 ### STUDIO v0.115.0
 - ✅ Completed: WebCodecs Preference - Added `webCodecsPreference` configuration to Studio Renders Panel, allowing users to select Hardware, Software, or Disabled modes for rendering.
 
+### CLI v0.40.0
+- ✅ Completed: Tier 3 Cloud Execution Adapters - Added support for Deno Deploy, Vercel, Modal, and Hetzner Cloud to the job run command.
+
 ### CLI v0.32.0
 - ✅ Completed: Remote Job Spec - Implemented support for executing distributed render jobs from remote HTTP/HTTPS URLs in `helios job run`.
 

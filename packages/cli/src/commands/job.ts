@@ -2,7 +2,7 @@ import { Command } from 'commander';
 import fs from 'fs';
 import path from 'path';
 import { JobSpec } from '../types/job.js';
-import { JobExecutor, LocalWorkerAdapter, AwsLambdaAdapter, CloudRunAdapter, CloudflareWorkersAdapter, AzureFunctionsAdapter, FlyMachinesAdapter, KubernetesAdapter, DockerAdapter, WorkerAdapter } from '@helios-project/infrastructure';
+import { JobExecutor, LocalWorkerAdapter, AwsLambdaAdapter, CloudRunAdapter, CloudflareWorkersAdapter, AzureFunctionsAdapter, FlyMachinesAdapter, KubernetesAdapter, DockerAdapter, DenoDeployAdapter, VercelAdapter, ModalAdapter, HetznerCloudAdapter, WorkerAdapter } from '@helios-project/infrastructure';
 
 export async function loadJobSpec(file: string): Promise<{ jobSpec: JobSpec, jobDir: string }> {
   if (file.startsWith('http://') || file.startsWith('https://')) {
@@ -33,7 +33,7 @@ export function registerJobCommand(program: Command) {
     .option('--chunk <id>', 'Execute only the chunk with the specified ID')
     .option('--concurrency <number>', 'Number of concurrent chunks to run locally', '1')
     .option('--no-merge', 'Skip the final merge step')
-    .option('--adapter <type>', 'Adapter to use (local, aws, gcp, cloudflare, azure, fly, kubernetes, docker)', 'local')
+    .option('--adapter <type>', 'Adapter to use (local, aws, gcp, cloudflare, azure, fly, kubernetes, docker, deno, vercel, modal, hetzner)', 'local')
     .option('--fly-api-token <token>', 'Fly.io API token')
     .option('--fly-app-name <name>', 'Fly.io app name')
     .option('--fly-image-ref <ref>', 'Fly.io image ref')
@@ -55,6 +55,18 @@ export function registerJobCommand(program: Command) {
     .option('--azure-service-url <url>', 'Azure Functions service URL')
     .option('--azure-function-key <key>', 'Azure Functions function key')
     .option('--azure-job-def-url <url>', 'URL of the job definition for Azure Functions')
+    .option('--deno-service-url <url>', 'Deno Deploy service URL')
+    .option('--deno-auth-token <token>', 'Deno Deploy authorization token')
+    .option('--vercel-service-url <url>', 'Vercel Serverless Function service URL')
+    .option('--vercel-auth-token <token>', 'Vercel authorization token')
+    .option('--vercel-job-def-url <url>', 'Static job definition URL for Vercel')
+    .option('--modal-endpoint-url <url>', 'Modal endpoint URL')
+    .option('--modal-auth-token <token>', 'Modal authorization token')
+    .option('--hetzner-api-token <token>', 'Hetzner Cloud API token')
+    .option('--hetzner-server-type <type>', 'Hetzner Cloud server type')
+    .option('--hetzner-image <image>', 'Hetzner Cloud server image')
+    .option('--hetzner-ssh-key-id <id>', 'Hetzner Cloud SSH Key ID')
+    .option('--hetzner-location <loc>', 'Hetzner Cloud location')
     .action(async (file, options) => {
       try {
         const { jobSpec, jobDir } = await loadJobSpec(file);
@@ -147,6 +159,42 @@ export function registerJobCommand(program: Command) {
           }
           adapter = new DockerAdapter({
             image: options.dockerImage
+          });
+        } else if (options.adapter === 'deno') {
+          if (!options.denoServiceUrl) {
+            throw new Error('Deno adapter requires --deno-service-url');
+          }
+          adapter = new DenoDeployAdapter({
+            serviceUrl: options.denoServiceUrl,
+            authToken: options.denoAuthToken
+          });
+        } else if (options.adapter === 'vercel') {
+          if (!options.vercelServiceUrl) {
+            throw new Error('Vercel adapter requires --vercel-service-url');
+          }
+          adapter = new VercelAdapter({
+            serviceUrl: options.vercelServiceUrl,
+            authToken: options.vercelAuthToken,
+            jobDefUrl: options.vercelJobDefUrl || file
+          });
+        } else if (options.adapter === 'modal') {
+          if (!options.modalEndpointUrl) {
+            throw new Error('Modal adapter requires --modal-endpoint-url');
+          }
+          adapter = new ModalAdapter({
+            endpointUrl: options.modalEndpointUrl,
+            authToken: options.modalAuthToken
+          });
+        } else if (options.adapter === 'hetzner') {
+          if (!options.hetznerApiToken || !options.hetznerServerType || !options.hetznerImage) {
+            throw new Error('Hetzner adapter requires --hetzner-api-token, --hetzner-server-type, and --hetzner-image');
+          }
+          adapter = new HetznerCloudAdapter({
+            apiToken: options.hetznerApiToken,
+            serverType: options.hetznerServerType,
+            image: options.hetznerImage,
+            sshKeyId: options.hetznerSshKeyId ? parseInt(options.hetznerSshKeyId, 10) : undefined,
+            location: options.hetznerLocation
           });
         } else {
           adapter = new LocalWorkerAdapter();
