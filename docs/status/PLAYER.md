@@ -1,4 +1,5 @@
-**Version**: 0.77.2
+**Version**: 0.77.3
+[v0.77.3] ✅ Completed: Expand Test Coverage - Added tests for audio metering, getAudioTracks timeout, and captureFrame timeout in controllers.ts.
 [v0.77.2] ✅ Completed: Expand Test Coverage - Added tests for captureFrame edge cases in DirectController.
 [v0.77.1] ✅ Completed: Bridge Coverage Expansion - Added comprehensive unit test coverage for HELIOS_CAPTURE_FRAME modes and global error handlers in bridge.ts.
 [v0.77.0] ✅ Completed: Media Session Properties - Exposed mediaTitle, mediaArtist, mediaAlbum, and mediaArtwork properties on HeliosPlayer to match HTMLMediaElement parity.

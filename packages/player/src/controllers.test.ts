@@ -331,6 +331,16 @@ describe('DirectController', () => {
         expect((Helios as any).diagnose).toHaveBeenCalled();
         expect(report).toEqual({ waapi: true, webCodecs: true });
     });
+
+    it('should handle audio metering callbacks', () => {
+        const onMetering = vi.fn();
+        const cleanup = controller.onAudioMetering(onMetering);
+
+        expect((controller as any).audioMeteringCallback).toBe(onMetering);
+
+        cleanup();
+        expect((controller as any).audioMeteringCallback).toBeNull();
+    });
 });
 
 describe('BridgeController', () => {
@@ -561,5 +571,48 @@ describe('BridgeController', () => {
 
         await expect(promise).rejects.toThrow('Timeout waiting for diagnostics');
         vi.useRealTimers();
+    });
+
+    it('should timeout captureFrame via bridge', async () => {
+        vi.useFakeTimers();
+        const promise = controller.captureFrame(10);
+
+        expect(mockWindow.postMessage).toHaveBeenCalledWith({
+            type: 'HELIOS_CAPTURE_FRAME',
+            frame: 10,
+            mode: undefined,
+            selector: undefined,
+            width: undefined,
+            height: undefined
+        }, '*');
+
+        vi.advanceTimersByTime(5000);
+
+        const result = await promise;
+        expect(result).toBeNull();
+        vi.useRealTimers();
+    });
+
+    it('should timeout getAudioTracks via bridge', async () => {
+        vi.useFakeTimers();
+        const promise = controller.getAudioTracks();
+
+        expect(mockWindow.postMessage).toHaveBeenCalledWith({ type: 'HELIOS_GET_AUDIO_TRACKS' }, '*');
+
+        vi.advanceTimersByTime(5000);
+
+        const result = await promise;
+        expect(result).toEqual([]);
+        vi.useRealTimers();
+    });
+
+    it('should handle audio metering callbacks', () => {
+        const onMetering = vi.fn();
+        const cleanup = controller.onAudioMetering(onMetering);
+
+        expect((controller as any).audioMeteringListeners).toHaveLength(1);
+
+        cleanup();
+        expect((controller as any).audioMeteringListeners).toHaveLength(0);
     });
 });
