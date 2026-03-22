@@ -1,4 +1,4 @@
-**Version**: 0.119.2
+**Version**: 0.119.3
 
 **Posture**: ACTIVELY EXPANDING FOR V2
 
@@ -11,6 +11,7 @@
 > **Note**: Status versions in this file may precede package release versions (`package.json`). Always verify `package.json` for the currently installed version.
 
 ## Recent Updates
+- [v0.119.3] ✅ Completed: Asset Move - Verified existing implementation of drag-and-drop support for moving assets into folders within the Studio Assets Panel.
 - [v0.119.2] ✅ Completed: Update Quickstart Guide - Verified that `docs/site/getting-started/quickstart.md` already uses `npx helios init` and is correctly documented.
 - [v0.119.1] ✅ Completed: Update Quickstart - Updated quickstart to mention supported frameworks for CLI init.
 - [v0.119.0] ✅ Completed: Asset Drag and Drop - Implemented the ability to move assets within the Studio panel by dragging and dropping them into directories or the current view.
