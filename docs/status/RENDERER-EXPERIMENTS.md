@@ -18,6 +18,7 @@ Last updated by: PERF-030
 
 ## What Doesn't Work (and Why)
 - [entries]
+- [PERF-033] Replaced `Page.captureScreenshot` polling with continuous `Page.startScreencast` in `DomStrategy`, using a deterministic layout damage toggle in `SeekTimeDriver` to force frame emission. The render time degraded (36.283s vs baseline 32.324s for the benchmark). The theoretical improvement of avoiding IPC roundtrips for capture polling was outweighed by the asynchronous buffering overhead and synchronization complexity. The strictly sequential evaluate-and-capture pipeline remains faster.
 - [PERF-031] Replaced `CDPSession` string `Runtime.evaluate` with a pre-compiled function using `Runtime.callFunctionOn` in the `SeekTimeDriver`'s frame capture loop. Render time was virtually identical to baseline (32.494s vs baseline 32.324s, +0.5% regression within noise margins). It seems Chromium V8 caching for small, repeated string evaluations via CDP is already highly optimized, rendering manual function injection and `callFunctionOn` object targeting redundant and potentially fragile due to context IDs expiring.
 - [PERF-026] Replaced sequential `Page.captureScreenshot` with push-based `Page.startScreencast` in `DomStrategy`. This architectural change fundamentally breaks the frame-by-frame synchronization required for rendering video because Chrome's `Page.startScreencast` is damage-driven (only emits frames on visual changes). This results in indefinite hangs during static scenes or when target selectors are missing. It is fundamentally incompatible with the renderer's strict sequential capture loop.
 - Explicitly specifying the video input codec (`-vcodec mjpeg` or `webp`) for FFmpeg `image2pipe` to bypass probing. The render time did not improve and remained identical within noise margins (36.605s vs 36.547s baseline). The CPU overhead in `image2pipe` probing is negligible compared to Playwright IPC and frame capture overhead in this microVM. (PERF-020)
@@ -27,7 +28,6 @@ Last updated by: PERF-030
 
 ## Open Questions
 - [entries]
-- [PERF-032] Can we overcome the damage-driven limitations of `Page.startScreencast` (which failed in PERF-026) by injecting a forced layout/paint toggle on every virtual time tick, allowing us to buffer continuous screencast frames and eliminate the IPC latency of polling `Page.captureScreenshot`?
 
 ## Performance Trajectory
 Current best: 35.156s (baseline was 35.555s, -1.1%)
