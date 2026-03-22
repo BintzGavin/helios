@@ -100,7 +100,7 @@ export class Renderer {
       await context.tracing.start({ screenshots: true, snapshots: true });
     }
 
-    let pool: { page: import('playwright').Page, strategy: RenderStrategy, timeDriver: TimeDriver }[] = [];
+    let pool: { page: import('playwright').Page, strategy: RenderStrategy, timeDriver: TimeDriver, activePromise: Promise<void> }[] = [];
     try {
       const cpus = os.cpus().length || 4;
       const concurrency = Math.min(Math.ceil(cpus * 1.5), 8);
@@ -135,7 +135,7 @@ export class Renderer {
         await strategy.prepare(page);
         await timeDriver.prepare(page);
 
-        return { page, strategy, timeDriver };
+        return { page, strategy, timeDriver, activePromise: Promise.resolve() };
       };
 
       const poolPromises = [];
@@ -247,11 +247,13 @@ export class Renderer {
                   const time = (frameIndex / fps) * 1000;
                   const compositionTimeInSeconds = (startFrame + frameIndex) / fps;
 
-                  const framePromise = worker.timeDriver.setTime(worker.page, compositionTimeInSeconds)
-                    .then(() => worker.strategy.capture(worker.page, time));
+                  const framePromise = worker.activePromise.then(async () => {
+                      await worker.timeDriver.setTime(worker.page, compositionTimeInSeconds);
+                      return await worker.strategy.capture(worker.page, time);
+                  });
 
                   // Add a no-op catch handler to prevent unhandled promise rejections on abort/error
-                  framePromise.catch(() => {});
+                  worker.activePromise = framePromise.catch(() => {}) as Promise<void>;
 
                   framePromises.push(framePromise);
                   nextFrameToSubmit++;
