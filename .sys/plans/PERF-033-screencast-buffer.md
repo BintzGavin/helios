@@ -1,10 +1,11 @@
 ---
 id: PERF-033
 slug: screencast-buffer
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
+result: failed
 created: 2026-03-22
-completed: ""
+completed: "2026-03-22"
 result: ""
 ---
 
@@ -53,3 +54,10 @@ Run `npx tsx packages/renderer/scripts/render.ts` to ensure Canvas mode remains 
 
 ## Correctness Check
 Run the DOM rendering tests: `npx tsx packages/renderer/tests/verify-codecs.ts` and ensure `DomStrategy` captures correctly. Ensure no hangs occur on static scenes (the primary reason PERF-026 failed).
+
+
+## Results Summary
+- **Best render time**: 35.577s (vs baseline 32.324s)
+- **Improvement**: -10.06%
+- **Kept experiments**: []
+- **Discarded experiments**: [Screencast buffer approach]
