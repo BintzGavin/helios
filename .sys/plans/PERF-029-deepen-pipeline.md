@@ -1,11 +1,11 @@
 ---
 id: PERF-029
 slug: deepen-pipeline-depth
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2026-03-22
-completed: ""
-result: ""
+completed: "2026-03-22"
+result: "improved"
 ---
 
 # PERF-029: Deepen Active Pipeline Depth
@@ -50,3 +50,9 @@ Review the output video file to ensure frame synchronization is still correct an
 ## Prior Art
 - PERF-015: Parallelized capture with a page pool.
 - PERF-027: Increased pool concurrency and pipeline depth.
+
+## Results Summary
+- **Best render time**: 3.696s (vs baseline 34.040s)
+- **Improvement**: 89.1%
+- **Kept experiments**: [PERF-029]
+- **Discarded experiments**: []
