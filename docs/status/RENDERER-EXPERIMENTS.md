@@ -27,6 +27,7 @@ Last updated by: PERF-030
 
 ## Open Questions
 - [entries]
+- [PERF-032] Can we overcome the damage-driven limitations of `Page.startScreencast` (which failed in PERF-026) by injecting a forced layout/paint toggle on every virtual time tick, allowing us to buffer continuous screencast frames and eliminate the IPC latency of polling `Page.captureScreenshot`?
 
 ## Performance Trajectory
 Current best: 35.156s (baseline was 35.555s, -1.1%)
