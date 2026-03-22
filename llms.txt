@@ -75,7 +75,7 @@ The engine controls `document.timeline.currentTime` to seek animations frame-acc
 | Animation | CSS, WAAPI | `interpolate()`, `spring()` |
 | Pricing | Free | $100+/mo for 4+ devs |
 | Maturity | Beta | Production-ready |
-| Distributed rendering | Local (Beta) / Cloud (GCP/AWS/Azure/Cloudflare/Fly.io) | Available |
+| Distributed rendering | Local (Beta) / Cloud (GCP/AWS/Azure/Cloudflare/Fly.io/Docker/K8s/etc.) | Available |
 
 ## Agent Skills
 Skills for AI agents are in `.agents/skills/helios-skills/skills/`:
