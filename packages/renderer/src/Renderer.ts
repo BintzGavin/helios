@@ -102,7 +102,8 @@ export class Renderer {
 
     let pool: { page: import('playwright').Page, strategy: RenderStrategy, timeDriver: TimeDriver }[] = [];
     try {
-      const concurrency = os.cpus().length || 4;
+      const cpus = os.cpus().length || 4;
+      const concurrency = Math.min(Math.ceil(cpus * 1.5), 8);
       console.log(`Initializing pool of ${concurrency} pages...`);
 
       const capturedErrors: Error[] = [];
