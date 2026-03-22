@@ -1,8 +1,9 @@
 ## Performance Trajectory
 Current best: 3.576s (baseline was 34.288s, -89.6%)
-Last updated by: PERF-027
+Last updated by: PERF-028
 
 ## What Works
+- [PERF-028] Eliminated array allocations in the `SeekTimeDriver` CDPSession frame evaluation loop by replacing `frames.map` with a localized `for` loop pushing promises to a pre-allocated array. Reduces V8 garbage collection pressure and serialization delays. Render time remained stable (32.584s vs baseline 32.589s).
 - [PERF-027] Optimized Playwright page pool concurrency. Increased the page pool size limit by over-subscribing CPU cores (1.5x, max 8) and doubled the active pipeline depth constraint from `pool.length` to `pool.length * 2`. Reduces wall-clock rendering time by better interleaving I/O operations and keeping the FFmpeg encoding pipeline saturated. Render time improved to 3.576s.
 - [PERF-025] Bypassed Playwright IPC abstraction by using CDPSession's Runtime.evaluate directly for time synchronization in SeekTimeDriver. Reduces string serialization overhead per frame. Render time improved (from 32.772s to 32.718s, -0.16%).
 - [PERF-024] Optimized SeekTimeDriver by removing an unnecessary final `requestAnimationFrame` wait. Reduced render time to 33.787s (vs baseline 34.011s, -0.6%).

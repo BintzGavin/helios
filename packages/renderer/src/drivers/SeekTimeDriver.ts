@@ -206,24 +206,29 @@ export class SeekTimeDriver implements TimeDriver {
 
   async setTime(page: Page, timeInSeconds: number): Promise<void> {
     const frames = page.frames();
-    const promises = frames.map(async (frame) => {
+    const promises: Promise<void>[] = [];
+
+    for (let i = 0; i < frames.length; i++) {
+      const frame = frames[i];
       if (this.cdpSession && frame === page.mainFrame()) {
-        const response = await this.cdpSession.send('Runtime.evaluate', {
+        const promise = this.cdpSession.send('Runtime.evaluate', {
           expression: `window.__helios_seek(${timeInSeconds}, ${this.timeout})`,
           awaitPromise: true,
           returnByValue: true
+        }).then((response) => {
+          if (response.exceptionDetails) {
+            throw new Error(`Seek error in main frame: ${response.exceptionDetails.exception?.description || 'Unknown error'}`);
+          }
         });
-
-        if (response.exceptionDetails) {
-          throw new Error(`Seek error in main frame: ${response.exceptionDetails.exception?.description || 'Unknown error'}`);
-        }
+        promises.push(promise);
       } else {
-        await frame.evaluate(
+        const promise = frame.evaluate(
           ([t, timeoutMs]) => (window as any).__helios_seek(t, timeoutMs),
           [timeInSeconds, this.timeout]
         );
+        promises.push(promise);
       }
-    });
+    }
 
     await Promise.all(promises);
   }
