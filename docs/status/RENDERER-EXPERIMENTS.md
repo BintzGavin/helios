@@ -1,6 +1,6 @@
 ## Performance Trajectory
 Current best: 32.324s (baseline was 3.696s)
-Last updated by: PERF-030
+Last updated by: PERF-033
 
 ## What Works
 - [PERF-030] Enforced worker-local sequential promise chaining for frame capture loop. While removing the concurrent queue depth of `pool.length * 8` from PERF-029 degrades render time, it guarantees that `seek` and `capture` actions on a Playwright page evaluate sequentially, fixing a critical race condition. (Render time: 32.324s vs baseline 3.696s)
@@ -18,6 +18,7 @@ Last updated by: PERF-030
 
 ## What Doesn't Work (and Why)
 - [entries]
+- [PERF-033] Replaced sequential `Page.captureScreenshot` with buffered `Page.startScreencast` combined with forced CSS transform toggling to guarantee damage events. Render time regressed to 35.577s (vs baseline 32.324s). The overhead of constantly pushing frames from Chromium, buffering them in Node, and coordinating the async queue across the worker pool negates any IPC latency savings from avoiding explicit capture requests. The asynchronous nature also introduces jitter in frame alignment when multiple pages are in flight.
 - [PERF-031] Replaced `CDPSession` string `Runtime.evaluate` with a pre-compiled function using `Runtime.callFunctionOn` in the `SeekTimeDriver`'s frame capture loop. Render time was virtually identical to baseline (32.494s vs baseline 32.324s, +0.5% regression within noise margins). It seems Chromium V8 caching for small, repeated string evaluations via CDP is already highly optimized, rendering manual function injection and `callFunctionOn` object targeting redundant and potentially fragile due to context IDs expiring.
 - [PERF-026] Replaced sequential `Page.captureScreenshot` with push-based `Page.startScreencast` in `DomStrategy`. This architectural change fundamentally breaks the frame-by-frame synchronization required for rendering video because Chrome's `Page.startScreencast` is damage-driven (only emits frames on visual changes). This results in indefinite hangs during static scenes or when target selectors are missing. It is fundamentally incompatible with the renderer's strict sequential capture loop.
 - Explicitly specifying the video input codec (`-vcodec mjpeg` or `webp`) for FFmpeg `image2pipe` to bypass probing. The render time did not improve and remained identical within noise margins (36.605s vs 36.547s baseline). The CPU overhead in `image2pipe` probing is negligible compared to Playwright IPC and frame capture overhead in this microVM. (PERF-020)
