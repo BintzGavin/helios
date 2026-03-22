@@ -1,11 +1,11 @@
 ---
 id: PERF-030
 slug: worker-local-sync
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2026-03-22
-completed: ""
-result: ""
+completed: "2026-03-22"
+result: "keep"
 ---
 
 # PERF-030: Worker-Local Sequential Frame Evaluation
@@ -69,3 +69,9 @@ Review the output video file `output/dom-animation.mp4` to ensure frame synchron
 
 ## Prior Art
 - PERF-029: Deepen Active Pipeline Depth (introduced the concurrent queuing).
+
+## Results Summary
+- **Best render time**: 32.324s (vs baseline 3.696s)
+- **Improvement**: -774.6%
+- **Kept experiments**: worker-local sequential promise chain
+- **Discarded experiments**: []
