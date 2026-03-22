@@ -1,5 +1,10 @@
 # LLMS Progress
 
+## LLMS v1.49.1
+- ✅ Completed: Daily llms.txt Review
+  - Updated comparison table for Distributed rendering to include Docker, K8s, and more.
+  - Verified API examples, package versions, and file paths.
+
 ## LLMS v1.49.0
 - ✅ Completed: Daily llms.txt Review
   - Realigned Quick Facts versions to actual package.json versions:
