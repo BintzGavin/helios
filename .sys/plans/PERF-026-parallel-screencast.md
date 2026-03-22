@@ -1,11 +1,11 @@
 ---
 id: PERF-026
 slug: parallel-screencast
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2026-10-18
-completed: ""
-result: ""
+completed: 2026-03-22
+result: discarded
 ---
 
 # PERF-026: Parallel Screencast Capture
@@ -59,3 +59,10 @@ Run `npx tsx packages/renderer/scripts/render.ts`. Expect to see FFmpeg error ou
 
 ## Correctness Check
 Verify `dom-animation.mp4` renders correctly with synchronized animations.
+
+## Results Summary
+- **Best render time**: 32.777s (vs baseline 32.718s)
+- **Improvement**: ~0% (Within noise margins)
+- **Kept experiments**: None
+- **Discarded experiments**:
+  - Replaced sequential `Page.captureScreenshot` with continuous `Page.startScreencast`. This architectural change fundamentally breaks the frame-by-frame synchronization required for rendering video because Chrome's `Page.startScreencast` is damage-driven (only emits frames on visual changes). This results in indefinite hangs during static scenes or when target selectors are missing. It is fundamentally incompatible with the renderer's strict sequential capture loop.
