@@ -1,8 +1,9 @@
 ## Performance Trajectory
-Current best: 32.794s (baseline was 34.400s, -4.7%)
-Last updated by: PERF-024
+Current best: 32.718s (baseline was 34.400s, -4.9%)
+Last updated by: PERF-025
 
 ## What Works
+- [PERF-025] Bypassed Playwright IPC abstraction by using CDPSession's Runtime.evaluate directly for time synchronization in SeekTimeDriver. Reduces string serialization overhead per frame. Render time improved (from 32.772s to 32.718s, -0.16%).
 - [PERF-024] Optimized SeekTimeDriver by removing an unnecessary final `requestAnimationFrame` wait. Reduced render time to 33.787s (vs baseline 34.011s, -0.6%).
 - [PERF-023] Optimized array allocations in SeekTimeDriver by replacing .forEach closures with standard for loops. Render time improved (from ~43.838s to 32.815s, -25.1%).
 - [PERF-022] Cached expensive DOM traversal elements `findAllScopes` and `findAllMedia` upon first access in `SeekTimeDriver.ts`. Reduces redundant DOM traversal per frame via `document.createTreeWalker`. Reduced render time to 32.794s (vs baseline 34.400s, -4.7%).

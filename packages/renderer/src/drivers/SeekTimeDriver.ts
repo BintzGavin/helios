@@ -1,9 +1,11 @@
-import { Page } from 'playwright';
+import { Page, CDPSession } from 'playwright';
 import { TimeDriver } from './TimeDriver.js';
 import { getSeedScript } from '../utils/random-seed.js';
 import { FIND_ALL_MEDIA_FUNCTION, FIND_ALL_SCOPES_FUNCTION, SYNC_MEDIA_FUNCTION, PARSE_MEDIA_ATTRIBUTES_FUNCTION } from '../utils/dom-scripts.js';
 
 export class SeekTimeDriver implements TimeDriver {
+  private cdpSession: CDPSession | null = null;
+
   constructor(private timeout: number = 30000) {}
 
   async init(page: Page, seed?: number): Promise<void> {
@@ -35,6 +37,8 @@ export class SeekTimeDriver implements TimeDriver {
   }
 
   async prepare(page: Page): Promise<void> {
+    this.cdpSession = await page.context().newCDPSession(page);
+
     // Inject the seek script once during initialization
     // We wrap it in an IIFE to avoid polluting the global namespace with helper functions
     const initScript = `
@@ -202,9 +206,25 @@ export class SeekTimeDriver implements TimeDriver {
 
   async setTime(page: Page, timeInSeconds: number): Promise<void> {
     const frames = page.frames();
-    await Promise.all(frames.map((frame) => frame.evaluate(
-      ([t, timeoutMs]) => (window as any).__helios_seek(t, timeoutMs),
-      [timeInSeconds, this.timeout]
-    )));
+    const promises = frames.map(async (frame) => {
+      if (this.cdpSession && frame === page.mainFrame()) {
+        const response = await this.cdpSession.send('Runtime.evaluate', {
+          expression: `window.__helios_seek(${timeInSeconds}, ${this.timeout})`,
+          awaitPromise: true,
+          returnByValue: true
+        });
+
+        if (response.exceptionDetails) {
+          throw new Error(`Seek error in main frame: ${response.exceptionDetails.exception?.description || 'Unknown error'}`);
+        }
+      } else {
+        await frame.evaluate(
+          ([t, timeoutMs]) => (window as any).__helios_seek(t, timeoutMs),
+          [timeInSeconds, this.timeout]
+        );
+      }
+    });
+
+    await Promise.all(promises);
   }
 }

@@ -1,11 +1,11 @@
 ---
 id: PERF-025
 slug: cdp-evaluate
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2026-03-22
-completed: ""
-result: ""
+completed: 2026-03-22
+result: improved
 ---
 # PERF-025: Eliminate IPC overhead during DOM render setTime calls
 
@@ -57,3 +57,9 @@ Run `npx tsx packages/renderer/scripts/render.ts`. Expect to see FFmpeg error ou
 
 ## Correctness Check
 Verify `dom-animation.mp4` renders correctly with synchronized animations.
+
+## Results Summary
+- **Best render time**: 32.718s (vs baseline 32.772s)
+- **Improvement**: 0.16%
+- **Kept experiments**: Direct use of CDPSession Runtime.evaluate
+- **Discarded experiments**: None

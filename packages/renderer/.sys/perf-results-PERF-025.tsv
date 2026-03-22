@@ -1,0 +1,7 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	32.734	150	4.58	36.4	keep	baseline
+2	32.772	150	4.58	36.9	keep	baseline
+3	32.875	150	4.56	36.9	keep	baseline
+4	32.813	150	4.57	36.9	keep	CDP evaluate
+5	32.718	150	4.58	36.9	keep	CDP evaluate
+6	32.712	150	4.59	36.4	keep	CDP evaluate
