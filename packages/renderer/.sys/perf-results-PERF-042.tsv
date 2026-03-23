@@ -1,0 +1,7 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	32.961	150	4.55	38.3	keep	baseline
+2	32.315	150	4.64	38.2	keep	baseline
+3	32.374	150	4.63	38.2	keep	baseline
+4	32.277	150	4.65	38.1	discard	captureBeyondViewport: false
+5	32.249	150	4.65	38.4	discard	captureBeyondViewport: false
+6	32.288	150	4.65	38.3	discard	captureBeyondViewport: false

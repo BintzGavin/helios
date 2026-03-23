@@ -1,11 +1,11 @@
 ---
 id: PERF-042
 slug: optimize-cdp-capture
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-15
-completed: ""
-result: ""
+completed: 2024-05-15
+result: no-improvement
 ---
 # PERF-042: Optimize CDP Capture using captureBeyondViewport: false
 
@@ -47,3 +47,9 @@ Run the DOM render script and verify output exists and has valid video contents.
 ## Prior Art
 - PERF-034: `optimizeForSpeed` and `fromSurface` testing (failed).
 - CDP `Page.captureScreenshot` documentation.
+
+## Results Summary
+- **Best render time**: 32.249s (vs baseline 32.315s)
+- **Improvement**: 0%
+- **Kept experiments**: None
+- **Discarded experiments**: `captureBeyondViewport: false` in `Page.captureScreenshot` CDP parameters.
