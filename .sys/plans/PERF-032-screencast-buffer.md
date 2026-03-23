@@ -1,11 +1,11 @@
 ---
 id: PERF-032
 slug: screencast-buffer
-status: unclaimed
-claimed_by: ""
+status: claimed
+claimed_by: "executor-session"
 created: 2026-03-22
-completed: ""
-result: ""
+completed: "2026-03-23"
+result: "failed"
 ---
 
 # PERF-032: Parallel Screencast with Local Buffer Queues
@@ -53,3 +53,9 @@ Run `npx tsx scripts/render.ts` to ensure Canvas mode remains unbroken.
 
 ## Correctness Check
 Run the DOM rendering tests: `npx tsx tests/verify-codecs.ts` and ensure `DomStrategy` captures correctly. Ensure no hangs occur on static scenes (the primary reason PERF-026 failed).
+
+## Results Summary
+- **Best render time**: 50.162s (vs baseline 50.162s)
+- **Improvement**: 0%
+- **Kept experiments**: []
+- **Discarded experiments**: [Screencast buffer approach]
