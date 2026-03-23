@@ -42,3 +42,5 @@ Last updated by: PERF-016
 ## What Works
 - [PERF-016] Changed the default intermediate image format to 'webp' when an alpha channel is needed. It reduces IPC overhead and is faster to encode/decode than 'png'.
 - [PERF-015] Instantiating a pool of multiple Playwright pages based on CPU concurrency and dividing frames between them using a sliding window. It allows concurrent evaluation of `strategy.capture()` across workers, cutting ~23% off render time.
+## What Doesn't Work (and Why)
+- Setting `awaitPromise: false` on `Runtime.evaluate` in `SeekTimeDriver.ts`. This resulted in `TypeError: window.__helios_seek is not a function` in the verification tests (`tests/verify-seek-driver-offsets.ts`). It causes the driver's `setTime` to fail, and the benchmark times did not improve regardless (32.25s). Root cause is likely that without `awaitPromise: true`, the evaluation script isn't guaranteed to have run synchronously and properly initialized state before the subsequent test logic or frame captures try to proceed, failing stability tests.
