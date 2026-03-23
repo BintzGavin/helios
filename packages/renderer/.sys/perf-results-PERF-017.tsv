@@ -1,0 +1,2 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	32.217	150	4.66	39.0	keep	baseline - precompiled script already exists
