@@ -1,11 +1,11 @@
 ---
 id: PERF-040
 slug: evaluate-async-capture
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2026-03-31
-completed: ""
-result: ""
+completed: 2026-03-31
+result: no-improvement
 ---
 
 # PERF-040: Asynchronous Runtime.evaluate for Pipelined Frame Capture
@@ -52,3 +52,9 @@ Verify that the resulting MP4 from the `dom` mode benchmark does not contain tea
 
 ## Prior Art
 - PERF-035: Pipelined `Runtime.evaluate` and `Page.captureScreenshot` CDP commands in the worker execution loop.
+
+## Results Summary
+- **Best render time**: 32.347s (vs baseline 32.337s)
+- **Improvement**: 0% (no improvement)
+- **Kept experiments**: none
+- **Discarded experiments**: `awaitPromise: false` on `Runtime.evaluate` in `SeekTimeDriver.ts`. Provided no performance gain because Chromium already buffers the sequential `Runtime.evaluate` and `Page.captureScreenshot` CDP commands without detaching the evaluation via async execution. Detaching execution can break synchronous tests.
