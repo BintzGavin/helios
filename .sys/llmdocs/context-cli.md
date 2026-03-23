@@ -14,53 +14,67 @@ Commands are registered in `src/index.ts` and implemented in individual files wi
 ## B. File Tree
 
 ```
-packages/cli/
-├── bin/
-│   └── helios.js           # Entry point
-├── src/
-│   ├── commands/
-│   │   ├── __tests__/
-│   │   │   ├── deploy.test.ts # Deploy command tests
-│   │   │   ├── init.test.ts   # Init command tests
-│   │   │   ├── job.test.ts    # Job command tests
-│   │   │   ├── remove.test.ts # Remove command tests
-│   │   │   ├── render.test.ts # Render command tests
-│   │   │   └── update.test.ts # Update command tests
-│   │   ├── add.ts          # Adds components
-│   │   ├── build.ts        # Builds for production
-│   │   ├── components.ts   # Lists registry components
-│   │   ├── deploy.ts       # Deployment scaffolding
-│   │   ├── diff.ts         # Diffs components
-│   │   ├── init.ts         # Initializes project
-│   │   ├── job.ts          # Manages render jobs
-│   │   ├── list.ts         # Lists installed components
-│   │   ├── merge.ts        # Merges video files
-│   │   ├── preview.ts      # Previews build
-│   │   ├── remove.ts       # Removes components
-│   │   ├── render.ts       # Renders composition
-│   │   ├── skills.ts       # Installs agent skills
-│   │   ├── studio.ts       # Starts Studio server
-│   │   └── update.ts       # Updates components
-│   ├── registry/
-│   │   ├── __tests__/
-│   │   │   └── client.test.ts # Registry client tests
-│   │   ├── client.ts       # Registry API client
-│   │   ├── manifest.ts     # Local registry manifest
-│   │   └── types.ts        # Registry types
-│   ├── templates/          # Project templates
-│   │   ├── aws.ts          # AWS templates
-│   │   ├── docker.ts       # Docker templates
-│   │   └── gcp.ts          # GCP templates
-│   ├── types/              # Shared types
-│   └── utils/
-│       ├── config.test.ts  # Config tests
-│       ├── config.ts       # Config management
-│       ├── install.test.ts # Installation tests
-│       ├── examples.ts     # Example fetching
-│       ├── install.ts      # Installation logic
-│       └── uninstall.ts    # Uninstallation logic
-├── package.json
-└── vitest.config.ts        # Test configuration
+packages/cli/src/
+├── commands/
+│   ├── __tests__/
+│   │   ├── add.test.ts
+│   │   ├── deploy.test.ts
+│   │   ├── init.test.ts
+│   │   ├── job.test.ts
+│   │   ├── list.test.ts
+│   │   ├── merge.test.ts
+│   │   ├── remove.test.ts
+│   │   ├── render.test.ts
+│   │   └── update.test.ts
+│   ├── add.ts
+│   ├── build.ts
+│   ├── components.test.ts
+│   ├── components.ts
+│   ├── deploy.ts
+│   ├── diff.ts
+│   ├── init.ts
+│   ├── job.ts
+│   ├── list.ts
+│   ├── merge.ts
+│   ├── preview.ts
+│   ├── remove.ts
+│   ├── render.ts
+│   ├── skills.ts
+│   ├── studio.ts
+│   └── update.ts
+├── index.ts
+├── registry/
+│   ├── __tests__/
+│   │   └── client.test.ts
+│   ├── client.ts
+│   ├── manifest.ts
+│   └── types.ts
+├── templates/
+│   ├── aws.ts
+│   ├── cloudflare.ts
+│   ├── docker.ts
+│   ├── fly.ts
+│   ├── gcp.ts
+│   ├── react.ts
+│   ├── solid.ts
+│   ├── svelte.ts
+│   ├── vanilla.ts
+│   └── vue.ts
+├── types/
+│   └── job.ts
+└── utils/
+    ├── __tests__/
+    │   ├── config.test.ts
+    │   ├── examples.test.ts
+    │   └── install.test.ts
+    ├── config.ts
+    ├── examples.ts
+    ├── ffmpeg.ts
+    ├── install.ts
+    ├── package-manager.ts
+    └── uninstall.ts
+
+9 directories, 50 files
 ```
 
 ## C. Commands
