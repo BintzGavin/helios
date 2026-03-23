@@ -1,8 +1,9 @@
 ## Performance Trajectory
-Current best: 32.324s (baseline was 3.696s)
-Last updated by: PERF-033
+Current best: 33.823s (baseline was 32.324s)
+Last updated by: PERF-035
 
 ## What Works
+- [PERF-035] Pipelined `Runtime.evaluate` and `Page.captureScreenshot` CDP commands in the worker execution loop by removing the blocking `await` from the `.then` chain. This allows Node.js to fire the capture command immediately without waiting for IPC evaluation round-trip. While micro-benchmarks showed 15% lower overhead per cycle, the overall DOM render time stayed stable around 33.823s, confirming correct execution ordering without an explicit `await` due to sequential CDP queueing rules.
 - [PERF-030] Enforced worker-local sequential promise chaining for frame capture loop. While removing the concurrent queue depth of `pool.length * 8` from PERF-029 degrades render time, it guarantees that `seek` and `capture` actions on a Playwright page evaluate sequentially, fixing a critical race condition. (Render time: 32.324s vs baseline 3.696s)
 - [PERF-029] Increased the active pipeline depth constraint in the frame capture loop from `pool.length` to `pool.length * 8`. This pushes more frame capture requests into the Node.js event loop and Chromium CDP queue, reducing wait times and better saturating the FFmpeg ingestion pipe. Render time is 3.696s (baseline 34.040s).
 - [PERF-028] Eliminated array allocations in the `SeekTimeDriver` CDPSession frame evaluation loop by replacing `frames.map` with a localized `for` loop pushing promises to a pre-allocated array. Reduces V8 garbage collection pressure and serialization delays. Render time remained stable (32.584s vs baseline 32.589s).

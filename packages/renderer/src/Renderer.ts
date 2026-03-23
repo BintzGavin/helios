@@ -247,10 +247,9 @@ export class Renderer {
                   const time = (frameIndex / fps) * 1000;
                   const compositionTimeInSeconds = (startFrame + frameIndex) / fps;
 
-                  const framePromise = worker.activePromise.then(async () => {
-                      await worker.timeDriver.setTime(worker.page, compositionTimeInSeconds);
-                      return await worker.strategy.capture(worker.page, time);
-                  });
+                  const framePromise = worker.activePromise
+                      .then(() => worker.timeDriver.setTime(worker.page, compositionTimeInSeconds))
+                      .then(() => worker.strategy.capture(worker.page, time));
 
                   // Add a no-op catch handler to prevent unhandled promise rejections on abort/error
                   worker.activePromise = framePromise.catch(() => {}) as Promise<void>;
