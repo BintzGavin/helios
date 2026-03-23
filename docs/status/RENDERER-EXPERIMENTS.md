@@ -1,6 +1,6 @@
 ## Performance Trajectory
-Current best: 33.823s (baseline was 32.324s)
-Last updated by: PERF-035
+Current best: 32.251s (baseline was 32.251s)
+Last updated by: PERF-038
 
 ## What Works
 - [PERF-017] Discovered that the `SeekTimeDriver` script is already pre-compiled and injected via `page.addInitScript(initScript)` in `prepare()`. The `setTime` method correctly uses a lightweight `window.__helios_seek()` call over Playwright CDP, meaning this optimization was already natively implemented in the codebase. Baseline render time confirmed at 32.217s.
@@ -19,6 +19,7 @@ Last updated by: PERF-035
 - Defaulting intermediate image format to jpeg when no alpha channel is needed (~2.2% faster) (PERF-011)
 
 ## What Doesn't Work (and Why)
+- **PERF-038: Native Headless Mode (`--headless=new`)**: Changing Playwright's default arguments to use `--headless=new` instead of the legacy headless shell did not meaningfully improve performance in the microVM. The render times were nearly identical (median ~32.4s). This suggests that the headless implementation (native vs shell) is not the dominant bottleneck for our CPU-bound layout/paint and CDP screenshot capture loop in this specific environment. It might even be slightly slower on some runs, likely because the new mode spins up more full-browser infrastructure. Discarding to maintain simplicity and stick with the known-stable legacy headless.
 - [PERF-034] Adding `fromSurface: true`, `optimizeForSpeed: true`, and an explicit `clip` bounding box to `Page.captureScreenshot` CDP parameters. The render time remained identical within noise margins (35.086s vs 35.156s baseline). In this CPU-only microVM with GPU disabled, forcing surface capture via the internal software rasterizer compositor cache did not yield any meaningful layout/paint latency reduction compared to the standard DOM-to-bitmap copy operation.
 - [PERF-032] Replacing polling CDP screenshots with continuous `Page.startScreencast`. Attempted to buffer `ScreencastFrame` events in `DomStrategy` and pull from this buffer in `Renderer.ts`, triggering forced layout/paint in the browser after each `timeDriver.setTime()` evaluation to overcome the "damage-driven" limitation of screencast. Failed because the screencast mechanism still caused hangs in the strictly synchronized sequential loop.
 - [entries]

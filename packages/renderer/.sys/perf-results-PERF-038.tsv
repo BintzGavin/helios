@@ -1,0 +1,6 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	32.593	150	4.60	39.0	discard	baseline
+2	32.251	150	4.65	38.8	discard	baseline
+3	32.433	150	4.62	39.3	discard	native headless
+4	32.834	150	4.57	38.8	discard	native headless
+5	32.280	150	4.65	38.9	discard	native headless
