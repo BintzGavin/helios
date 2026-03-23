@@ -1,0 +1,5 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	32.680	150	4.59	38.3	keep	baseline
+2	32.253	150	4.65	38.2	discard	awaitPromise: false
+3	32.248	150	4.65	38.4	discard	awaitPromise: false
+4	32.248	150	4.65	38.3	discard	awaitPromise: false

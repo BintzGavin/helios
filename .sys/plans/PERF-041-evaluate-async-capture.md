@@ -1,11 +1,11 @@
 ---
 id: PERF-041
 slug: evaluate-async-capture
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2026-03-31
-completed: ""
-result: ""
+completed: 2026-03-31
+result: no-improvement
 ---
 
 # PERF-041: Asynchronous Runtime.evaluate for Pipelined Frame Capture
@@ -52,3 +52,9 @@ Verify that the resulting MP4 from the `dom` mode benchmark does not contain tea
 
 ## Prior Art
 - PERF-035: Pipelined `Runtime.evaluate` and `Page.captureScreenshot` CDP commands in the worker execution loop.
+
+## Results Summary
+- **Best render time**: 32.248s (vs baseline 32.680s)
+- **Improvement**: ~1.3% (within noise margin)
+- **Kept experiments**: none
+- **Discarded experiments**: Setting `awaitPromise: false` on `Runtime.evaluate`. It causes `tests/verify-seek-driver-offsets.ts` to fail because the seek script doesn't initialize fast enough for the tests to pass. The performance improvement was also non-existent or statistically insignificant.
