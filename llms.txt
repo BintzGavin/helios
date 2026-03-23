@@ -115,7 +115,7 @@ const report = await Helios.diagnose();
 ### V1.x (Active)
 - **Studio**: v0.107.1+ (Composition Switcher, Timeline, Props Editor)
 - **CLI**: v0.32.0+ (Cloud Execution Adapters Expansion, Fly.io Deployment Command)
-- **Core**: v5.13.0+ (RenderSession, Time-Based Control)
+- **Core**: v5.13.0+ (Generic Input Props, Time-Based Control)
 - **Player**: v0.76.18+ (Add Regression Tests, Standard Media States)
 - **Renderer**: v1.78.0+ (Range Rendering, Audio Duration Logic)
 - **Infrastructure**: v0.25.0+ (Optimize GCS Uploads, FfmpegStitcher Coverage)
