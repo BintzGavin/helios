@@ -1,11 +1,11 @@
 ---
 id: PERF-034
 slug: cdp-fromsurface
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2026-03-22
-completed: ""
-result: ""
+completed: "2024-05-24"
+result: "discarded"
 ---
 
 # PERF-034: CDP `fromSurface` capture optimization
@@ -53,3 +53,9 @@ Run `npx tsx packages/renderer/scripts/render.ts` to ensure Canvas mode remains 
 
 ## Correctness Check
 Run the DOM rendering tests: `npx tsx packages/renderer/tests/verify-codecs.ts` and ensure `DomStrategy` captures correctly without cropping or scaling artifacts caused by the `clip` parameter.
+
+## Results Summary
+- **Best render time**: 35.156s (vs baseline 35.156s)
+- **Improvement**: 0%
+- **Kept experiments**: None
+- **Discarded experiments**: [PERF-034] `fromSurface: true` + `clip` parameter optimization.
