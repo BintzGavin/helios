@@ -1,11 +1,11 @@
 ---
 id: PERF-038
 slug: new-headless-mode
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-03-23
-completed: ""
-result: ""
+completed: 2025-03-23
+result: no-improvement
 ---
 # PERF-038: Enable Native Headless Mode (headless: true, --headless=new)
 
@@ -62,3 +62,9 @@ Run the DOM benchmark and verify that the output `out.mp4` contains visually cor
 ## Prior Art
 - Chromium Blog: "Chrome's new headless mode"
 - Playwright release notes on `--headless=new`
+
+## Results Summary
+- **Best render time**: 32.280s (vs baseline 32.251s)
+- **Improvement**: 0%
+- **Kept experiments**: None
+- **Discarded experiments**: Native Headless Mode (`--headless=new`)
