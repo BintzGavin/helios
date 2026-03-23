@@ -2,6 +2,10 @@
 
 This file tracks progress for the CLI domain (`packages/cli`).
 
+## CLI v0.40.1
+
+- ✅ Completed: Scaffold Components Command - Verified existing implementation of helios components command fulfills the scaffolding requirements.
+
 ## CLI v0.38.0
 
 - ✅ Completed: Scaffold Fly.io Deployment Command - Implemented helios deploy fly to scaffold fly.toml, Dockerfile, and README-FLY.md for Fly.io Machines.
