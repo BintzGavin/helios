@@ -118,6 +118,9 @@ Critical learnings only. This is not a log—only add entries for insights that 
 **Learning:** `packages/infrastructure` implemented stateless worker adapters (AWS, GCP, Local) and a `JobExecutor`, but `packages/cli`'s `helios job run` was still using a hardcoded local `spawn` loop. The CLI must be actively integrated with new platform capabilities to realize the "Primary interface for ... workflows" vision.
 **Action:** Always check if core/infrastructure abstractions exist before maintaining custom implementations in the CLI. The CLI should act as the orchestrator/interface for lower-level domain logic.
 
+## [0.41.0] - Distributed Execution Scaffold Prerequisites
+**Learning:** While reviewing `docs/BACKLOG.md` for Cloudflare Sandbox execution, I realized that before the Infrastructure agent can build the `CloudflareSandboxAdapter`, the CLI must provide a way to deploy the required Cloudflare Workflow infrastructure (`getSandbox({ keepAlive: true })`). The adapter cannot be tested or used without the deployed infrastructure.
+**Action:** When bridging "Cloud Execution" gaps, always check if the cloud resource requires specialized deployment configuration (like `wrangler.toml` or Workflow templates). If so, plan the CLI `deploy` command first to unblock the Infrastructure domain.
 ## [0.36.0] - Hardcoded Infrastructure Adapters
 **Learning:** `helios job run` was refactored to use `JobExecutor`, but it still hardcodes `LocalWorkerAdapter`, failing to expose the cloud capabilities (`AwsLambdaAdapter`, `CloudRunAdapter`) provided by the `infrastructure` package.
 **Action:** When integrating new infrastructure abstractions into the CLI, ensure that all relevant capabilities (like execution adapters) are exposed via CLI options, rather than hardcoding local defaults.
