@@ -185,3 +185,5 @@
 [v0.76.15] ✅ Completed: Add Regression Tests - Confirmed existence of tests for API parity (seeking, state persistence) and interactions (export parameters) per `2026-11-24-PLAYER-Regression-Tests.md`. All tests are passing.
 [v0.76.14] ✅ Completed: Add Regression Tests - Add tests for API parity (seeking, state persistence) and interactions (export parameters, UI menu bugfixes)
 [v0.76.12] 🚫 Blocked: No new plan found in /.sys/plans/ for PLAYER. Waiting for Planner to create the next implementation spec.
+
+[v0.76.19] ✅ Completed: Expand Test Coverage - Added test coverage to `DirectController` and `BridgeController` to improve edge case handling and error branches, achieving 100% coverage on `controllers.ts`.

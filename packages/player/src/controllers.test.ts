@@ -4,6 +4,15 @@ import { Helios } from '@helios-project/core';
 import * as domCapture from './features/dom-capture';
 
 // Mock AudioFader
+vi.mock('./features/audio-metering', () => ({
+    AudioMeter: class {
+        connect = vi.fn();
+        enable = vi.fn();
+        disable = vi.fn();
+        dispose = vi.fn();
+        getLevels = vi.fn().mockReturnValue({ left: 0, right: 0 });
+    }
+}));
 vi.mock('./features/audio-fader', () => ({
     AudioFader: class {
         connect = vi.fn();
@@ -66,6 +75,7 @@ describe('DirectController', () => {
             setInputProps: vi.fn(),
             setDuration: vi.fn(),
             setFps: vi.fn(),
+            setCaptions: vi.fn(),
             setSize: vi.fn(),
             setMarkers: vi.fn(),
             subscribe: vi.fn((cb) => {
@@ -129,6 +139,30 @@ describe('DirectController', () => {
         expect(mockHeliosInstance.setInputProps).toHaveBeenCalledWith({ foo: 'bar' });
     });
 
+
+    it('should call setCaptions on instance in DirectController', () => {
+        const captions = [{ id: '1', startTime: 0, endTime: 100, text: 'Hi' }];
+        controller.setCaptions(captions);
+        expect(mockHeliosInstance.setCaptions).toHaveBeenCalledWith(captions);
+    });
+
+    it('should subscribe and enable/disable audio fader', () => {
+        const cb = vi.fn();
+        let internalCb: any;
+        mockHeliosInstance.subscribe = vi.fn((callback: any) => {
+            internalCb = callback;
+            return vi.fn(); // return cleanup
+        });
+
+        const cleanup = controller.subscribe(cb);
+        expect(mockHeliosInstance.subscribe).toHaveBeenCalled();
+
+        internalCb({ isPlaying: true });
+        expect(cb).toHaveBeenCalledWith({ isPlaying: true });
+
+        internalCb({ isPlaying: false });
+        expect(cb).toHaveBeenCalledWith({ isPlaying: false });
+    });
     it('should set duration, fps, size, and markers', () => {
         controller.setDuration(20);
         expect(mockHeliosInstance.setDuration).toHaveBeenCalledWith(20);
@@ -273,6 +307,60 @@ describe('DirectController', () => {
         }
     });
 
+
+    it('should handle iframe frame request when options.mode is not dom and not canvas element', async () => {
+        const mockDiv = document.createElement('div');
+        (mockIframe.contentDocument!.querySelector as any).mockReturnValue(mockDiv);
+
+        const result = await controller.captureFrame(5); // no options mode
+        expect(result).toBeNull();
+    });
+
+    it('should handle OffscreenCanvas fallback when getContext returns null', async () => {
+        const originalOffscreenCanvas = global.OffscreenCanvas;
+        const mockOffscreenCanvas = {
+            getContext: vi.fn().mockReturnValue(null) // return null for ctx
+        };
+        vi.stubGlobal('OffscreenCanvas', vi.fn(function() {
+            return mockOffscreenCanvas;
+        }));
+
+        const mockCanvas = document.createElement('canvas');
+        mockCanvas.width = 1920;
+        mockCanvas.height = 1080;
+        (mockIframe.contentDocument!.querySelector as any).mockReturnValue(mockCanvas);
+
+        const result = await controller.captureFrame(5, { mode: 'canvas', width: 1280, height: 720 });
+        expect((result!.frame as any).source).toBe(mockCanvas);
+
+        if (originalOffscreenCanvas) {
+            vi.stubGlobal('OffscreenCanvas', originalOffscreenCanvas);
+        } else {
+            vi.stubGlobal('OffscreenCanvas', undefined);
+        }
+    });
+
+    it('should handle tempCanvas fallback when getContext returns null', async () => {
+        const originalOffscreenCanvas = global.OffscreenCanvas;
+        vi.stubGlobal('OffscreenCanvas', undefined);
+
+        const mockCanvas = document.createElement('canvas');
+        mockCanvas.width = 1920;
+        mockCanvas.height = 1080;
+        (mockIframe.contentDocument!.querySelector as any).mockReturnValue(mockCanvas);
+
+        const tempCanvas = document.createElement('canvas');
+        (tempCanvas as any).getContext = vi.fn().mockReturnValue(null); // return null
+
+        mockIframe.contentDocument!.createElement = vi.fn().mockReturnValue(tempCanvas) as any;
+
+        const result = await controller.captureFrame(5, { mode: 'canvas', width: 1280, height: 720 });
+        expect((result!.frame as any).source).toBe(mockCanvas);
+
+        if (originalOffscreenCanvas) {
+            vi.stubGlobal('OffscreenCanvas', originalOffscreenCanvas);
+        }
+    });
     it('should return null if DOM capture fails in dom mode', async () => {
         vi.mocked(domCapture.captureDomToBitmap).mockRejectedValue(new Error('DOM capture error'));
 
@@ -282,6 +370,7 @@ describe('DirectController', () => {
         expect(domCapture.captureDomToBitmap).toHaveBeenCalled();
         expect(result).toBeNull();
     });
+
 
     it('should return null if canvas element is not a CANVAS in canvas mode', async () => {
         const mockDiv = document.createElement('div');
@@ -300,6 +389,34 @@ describe('DirectController', () => {
         expect(result).toBeNull();
     });
 
+
+    it('should handle unhandledrejection from iframe errors', () => {
+        const onError = vi.fn();
+        const cleanup2 = controller.onError(onError);
+        const rejectionEvent = {
+            reason: {
+                message: 'Unhandled Promise Error',
+                stack: 'Promise Stack trace'
+            }
+        };
+        iframeListeners['unhandledrejection'][0](rejectionEvent as any);
+
+        expect(onError).toHaveBeenCalledWith(expect.objectContaining({
+            message: 'Unhandled Promise Error',
+            stack: 'Promise Stack trace'
+        }));
+
+        const rejectionEvent2 = {
+            reason: 'Just a string error'
+        };
+        iframeListeners['unhandledrejection'][0](rejectionEvent2 as any);
+
+        expect(onError).toHaveBeenCalledWith(expect.objectContaining({
+            message: 'Just a string error'
+        }));
+
+        cleanup2();
+    });
     it('should handle iframe errors', () => {
         const onError = vi.fn();
         const cleanup = controller.onError(onError);
@@ -326,6 +443,48 @@ describe('DirectController', () => {
         expect(iframeListeners['error']).toHaveLength(0);
     });
 
+
+    it('should resolve getAudioTracks with getAudioAssets result for DirectController', async () => {
+         const mockAssets = [{ id: '1', name: 'audio1', src: 'blob' }];
+         const audioUtils = await import('./features/audio-utils');
+         vi.spyOn(audioUtils, 'getAudioAssets').mockResolvedValue(mockAssets as any);
+
+         const assets = await controller.getAudioTracks();
+         expect(assets).toEqual(mockAssets);
+    });
+
+    it('should return getState from instance in DirectController', () => {
+         const state = controller.getState();
+         expect(state).toEqual({ fps: 30, duration: 10, currentFrame: 0 });
+    });
+
+    it('should stop audio metering when disposed in DirectController', () => {
+         controller.startAudioMetering();
+         const stopSpy = vi.spyOn(controller, 'stopAudioMetering');
+         controller.dispose();
+         expect(stopSpy).toHaveBeenCalled();
+    });
+
+    it('should handle startAudioMetering raf loop', () => {
+         vi.useFakeTimers();
+         const cb = vi.fn();
+         controller.onAudioMetering(cb);
+
+         const cancelAnimationFrameSpy = vi.spyOn(window, 'cancelAnimationFrame');
+
+         controller.startAudioMetering();
+
+         vi.advanceTimersByTime(16); // wait for 1 frame
+
+         expect(cb).toHaveBeenCalled();
+
+         controller.stopAudioMetering();
+         expect(cancelAnimationFrameSpy).toHaveBeenCalled();
+
+         cancelAnimationFrameSpy.mockRestore();
+
+         vi.useRealTimers();
+    });
     it('should return diagnostic report', async () => {
         const report = await controller.diagnose();
         expect((Helios as any).diagnose).toHaveBeenCalled();
@@ -393,6 +552,49 @@ describe('BridgeController', () => {
 
         triggerMessage({ type: 'HELIOS_SEEK_DONE', frame: 10 });
         await promise;
+    });
+
+
+    it('should call setCaptions via bridge', () => {
+        const captions = [{ id: '1', startTime: 0, endTime: 100, text: 'Hi' }];
+        controller.setCaptions(captions);
+        expect(mockWindow.postMessage).toHaveBeenCalledWith({ type: 'HELIOS_SET_CAPTIONS', captions }, '*');
+    });
+
+    it('should call setInputProps via bridge', () => {
+        const props = { color: 'red' };
+        controller.setInputProps(props);
+        expect(mockWindow.postMessage).toHaveBeenCalledWith({ type: 'HELIOS_SET_PROPS', props }, '*');
+    });
+
+    it('should call startAudioMetering and stopAudioMetering via bridge', () => {
+        controller.startAudioMetering();
+        expect(mockWindow.postMessage).toHaveBeenCalledWith({ type: 'HELIOS_START_METERING' }, '*');
+        controller.stopAudioMetering();
+        expect(mockWindow.postMessage).toHaveBeenCalledWith({ type: 'HELIOS_STOP_METERING' }, '*');
+    });
+
+    it('should ignore message from other source for seek', async () => {
+        vi.useFakeTimers();
+        const promise = controller.seek(10);
+        triggerMessage({ type: 'HELIOS_SEEK_DONE', frame: 10 }, {} as Window);
+        vi.advanceTimersByTime(5000);
+        await promise;
+        vi.useRealTimers();
+    });
+
+    it('should handle HELIOS_AUDIO_LEVELS message', () => {
+        const spy = vi.fn();
+        controller.onAudioMetering(spy);
+
+        triggerMessage({ type: 'HELIOS_AUDIO_LEVELS', levels: { left: 0.5, right: 0.5 } });
+
+        expect(spy).toHaveBeenCalledWith({ left: 0.5, right: 0.5 });
+    });
+
+    it('should post messages for setPlaybackRate', () => {
+        controller.setPlaybackRate(1.5);
+        expect(mockWindow.postMessage).toHaveBeenCalledWith({ type: 'HELIOS_SET_PLAYBACK_RATE', rate: 1.5 }, '*');
     });
 
     it('should post messages for audio controls', () => {
@@ -469,6 +671,26 @@ describe('BridgeController', () => {
         expect(spy).toHaveBeenCalledWith(newState);
     });
 
+
+    it('should ignore message from other source for getSchema', async () => {
+        vi.useFakeTimers();
+        const promise = controller.getSchema();
+        triggerMessage({ type: 'HELIOS_SCHEMA', schema: { foo: 'bar' } }, {} as Window);
+        vi.advanceTimersByTime(5000);
+        const result = await promise;
+        expect(result).toBeUndefined();
+        vi.useRealTimers();
+    });
+
+    it('should resolve undefined if getSchema receives non-HELIOS_SCHEMA message', async () => {
+        vi.useFakeTimers();
+        const promise = controller.getSchema();
+        triggerMessage({ type: 'HELIOS_OTHER_MESSAGE', schema: { foo: 'bar' } }, mockWindow);
+        vi.advanceTimersByTime(5000);
+        const result = await promise;
+        expect(result).toBeUndefined();
+        vi.useRealTimers();
+    });
     it('should get schema via bridge', async () => {
         const promise = controller.getSchema();
 
@@ -493,6 +715,18 @@ describe('BridgeController', () => {
         vi.useRealTimers();
     });
 
+
+    it('should unsubscribe properly', () => {
+        const spy1 = vi.fn();
+        const spy2 = vi.fn();
+        const unsubscribe1 = controller.subscribe(spy1);
+        const unsubscribe2 = controller.subscribe(spy2);
+        unsubscribe1();
+        triggerMessage({ type: 'HELIOS_STATE', state: { currentFrame: 10 } });
+        expect(spy1).toHaveBeenCalledTimes(1);
+        expect(spy2).toHaveBeenCalledTimes(2);
+        unsubscribe2();
+    });
     it('should notify error subscribers on HELIOS_ERROR', () => {
         const spy = vi.fn();
         const cleanup = controller.onError(spy);
@@ -508,6 +742,16 @@ describe('BridgeController', () => {
         expect(spy).toHaveBeenCalledTimes(1);
     });
 
+
+    it('should ignore message from other source for captureFrame', async () => {
+        vi.useFakeTimers();
+        const promise = controller.captureFrame(10);
+        triggerMessage({ type: 'HELIOS_FRAME_DATA', frame: 10, success: true }, {} as Window);
+        vi.advanceTimersByTime(5000);
+        const result = await promise;
+        expect(result).toBeNull();
+        vi.useRealTimers();
+    });
     it('should capture frame via bridge', async () => {
         const promise = controller.captureFrame(10, { mode: 'dom' });
 
@@ -549,6 +793,15 @@ describe('BridgeController', () => {
          expect(result).toBeNull();
     });
 
+
+    it('should ignore message from other source for diagnose', async () => {
+        vi.useFakeTimers();
+        const promise = controller.diagnose();
+        triggerMessage({ type: 'HELIOS_DIAGNOSE_RESULT', report: {} }, {} as Window);
+        vi.advanceTimersByTime(5000);
+        await expect(promise).rejects.toThrow('Timeout waiting for diagnostics');
+        vi.useRealTimers();
+    });
     it('should get diagnostics via bridge', async () => {
         const promise = controller.diagnose();
 
@@ -593,6 +846,33 @@ describe('BridgeController', () => {
         vi.useRealTimers();
     });
 
+
+    it('should ignore message from other source for getAudioTracks', async () => {
+        vi.useFakeTimers();
+        const promise = controller.getAudioTracks();
+        triggerMessage({ type: 'HELIOS_AUDIO_DATA', assets: [] }, {} as Window);
+        vi.advanceTimersByTime(5000);
+        const result = await promise;
+        expect(result).toEqual([]);
+        vi.useRealTimers();
+    });
+
+    it('should resolve empty array if getAudioTracks receives non-HELIOS_AUDIO_DATA message', async () => {
+        vi.useFakeTimers();
+        const promise = controller.getAudioTracks();
+        triggerMessage({ type: 'HELIOS_OTHER_MESSAGE', assets: [] }, mockWindow);
+        vi.advanceTimersByTime(5000);
+        const result = await promise;
+        expect(result).toEqual([]);
+        vi.useRealTimers();
+    });
+
+    it('should resolve empty array if getAudioTracks receives HELIOS_AUDIO_DATA message with undefined assets', async () => {
+        const promise = controller.getAudioTracks();
+        triggerMessage({ type: 'HELIOS_AUDIO_DATA' }, mockWindow);
+        const result = await promise;
+        expect(result).toEqual([]);
+    });
     it('should timeout getAudioTracks via bridge', async () => {
         vi.useFakeTimers();
         const promise = controller.getAudioTracks();
