@@ -37,10 +37,11 @@ Last updated by: PERF-038
 - [PERF-032] Can we overcome the damage-driven limitations of `Page.startScreencast` (which failed in PERF-026) by injecting a forced layout/paint toggle on every virtual time tick, allowing us to buffer continuous screencast frames and eliminate the IPC latency of polling `Page.captureScreenshot`?
 
 ## Performance Trajectory
-Current best: 35.156s (baseline was 35.555s, -1.1%)
-Last updated by: PERF-016
+Current best: 32.408s (baseline was 33.696s, -3.8%)
+Last updated by: PERF-043
 
 ## What Works
+- [PERF-043] Optimized `captureLoop` array allocations by replacing O(N) `shift()` with index access and reduced micro-task queue overhead by conditionally creating Promises only when FFmpeg stream writes indicate backpressure. Reduced rendering time by ~4%.
 - [PERF-016] Changed the default intermediate image format to 'webp' when an alpha channel is needed. It reduces IPC overhead and is faster to encode/decode than 'png'.
 - [PERF-015] Instantiating a pool of multiple Playwright pages based on CPU concurrency and dividing frames between them using a sliding window. It allows concurrent evaluation of `strategy.capture()` across workers, cutting ~23% off render time.
 ## What Doesn't Work (and Why)
