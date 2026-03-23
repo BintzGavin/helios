@@ -223,7 +223,7 @@ export class Renderer {
 
       try {
         const captureLoop = async () => {
-          let previousWritePromise = Promise.resolve();
+          let previousWritePromise: Promise<void> | undefined;
           let framePromises: Promise<Buffer>[] = [];
 
           // To maximize parallel page utilization, we need to decouple frame production from writing
@@ -258,7 +258,9 @@ export class Renderer {
                   nextFrameToSubmit++;
               }
 
-              const buffer = await framePromises.shift()!;
+              const buffer = await framePromises[nextFrameToWrite]!;
+              framePromises[nextFrameToWrite] = null as any; // Allow GC
+
               const i = nextFrameToWrite;
 
               if (i > 0 && i % progressInterval === 0) {
@@ -269,21 +271,22 @@ export class Renderer {
                  jobOptions.onProgress(i / totalFrames);
               }
 
-              await previousWritePromise;
+              if (previousWritePromise) {
+                 await previousWritePromise;
+              }
 
               if (!ffmpegProcess.stdin.writable) {
                  throw new Error('FFmpeg stdin is not writable');
               }
 
-              previousWritePromise = new Promise<void>((resolve, reject) => {
-                  const canWriteMore = ffmpegProcess.stdin.write(buffer, (err?: Error | null) => {
-                      if (err) {
-                         ffmpegProcess.emit('error', err);
-                         reject(err);
-                      }
-                  });
+              const canWriteMore = ffmpegProcess.stdin.write(buffer, (err?: Error | null) => {
+                  if (err) {
+                     ffmpegProcess.emit('error', err);
+                  }
+              });
 
-                  if (!canWriteMore) {
+              if (!canWriteMore) {
+                  previousWritePromise = new Promise<void>((resolve, reject) => {
                       const onDrain = () => {
                           cleanup();
                           resolve();
@@ -306,15 +309,17 @@ export class Renderer {
                       ffmpegProcess.stdin.once('drain', onDrain);
                       ffmpegProcess.stdin.once('error', onError);
                       ffmpegProcess.stdin.once('close', onClose);
-                  } else {
-                      resolve();
-                  }
-              });
+                  });
+              } else {
+                  previousWritePromise = undefined;
+              }
 
               nextFrameToWrite++;
           }
 
-          await previousWritePromise;
+          if (previousWritePromise) {
+              await previousWritePromise;
+          }
 
           console.log('Finishing render strategy...');
           const finalBuffer = await pool[0].strategy.finish(pool[0].page);

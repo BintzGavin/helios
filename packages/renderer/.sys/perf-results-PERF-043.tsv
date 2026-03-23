@@ -1,0 +1,3 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	33.696	150	4.45	40.7	keep	baseline
+2	32.408	150	4.63	40.9	keep	optimize captureLoop array allocation and promises
