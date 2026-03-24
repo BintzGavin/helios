@@ -1,0 +1,2 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	31.943	150	4.70	37.7	keep	eliminated frame.evaluate return object serialization
