@@ -1,0 +1,2 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	33.563	150	4.47	39.7	discard	multiple browser instances via pool
