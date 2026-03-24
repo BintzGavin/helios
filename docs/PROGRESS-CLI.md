@@ -1,3 +1,6 @@
+### CLI v0.40.2
+- ✅ Completed: Scaffold Kubernetes Deployment Command - Implemented `helios deploy kubernetes` to scaffold job.yaml and README-KUBERNETES.md for Kubernetes Job clusters.
+
 # CLI Progress
 
 This file tracks progress for the CLI domain (`packages/cli`).

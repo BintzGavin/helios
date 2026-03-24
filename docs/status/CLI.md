@@ -1,6 +1,6 @@
 # CLI Status
 
-**Version**: 0.40.1
+**Version**: 0.40.2
 
 ## Current State
 
@@ -41,6 +41,7 @@ Per AGENTS.md, the CLI is "ACTIVELY EXPANDING FOR V2" with focus on:
 
 ## History
 
+[v0.40.2] ✅ Completed: Scaffold Kubernetes Deployment Command - Implemented `helios deploy kubernetes` to scaffold job.yaml and README-KUBERNETES.md for Kubernetes Job clusters.
 [v0.40.1] ✅ Completed: Scaffold Components Command - Verified existing implementation of helios components command fulfills the scaffolding requirements.
 [v0.40.0] ✅ Completed: Tier 3 Cloud Execution Adapters - Added support for Deno Deploy, Vercel, Modal, and Hetzner Cloud to the job run command.
 [v0.37.4] ✅ Completed: Add Command Regression Tests - Implemented comprehensive unit tests for helios add.
