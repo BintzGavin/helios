@@ -33,6 +33,7 @@ async function main() {
 
   const driver = new SeekTimeDriver();
   await driver.init(page);
+  await driver.prepare(page);
 
   // Helper to get current times
   const getTimes = async () => {

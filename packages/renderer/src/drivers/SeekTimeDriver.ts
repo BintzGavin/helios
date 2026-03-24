@@ -174,7 +174,7 @@ export class SeekTimeDriver implements TimeDriver {
               console.error('[SeekTimeDriver] Error seeking GSAP timeline:', gsapError);
             }
           } else if (!gsapTimelineSeeked) {
-            console.warn('[SeekTimeDriver] GSAP timeline not available - relying on Helios subscription');
+            // console.warn('[SeekTimeDriver] GSAP timeline not available - relying on Helios subscription');
           }
 
           if (typeof window.helios !== 'undefined' && window.helios.seek) {
@@ -220,7 +220,7 @@ export class SeekTimeDriver implements TimeDriver {
         const promise = this.cdpSession.send('Runtime.evaluate', {
           expression: `window.__helios_seek(${timeInSeconds}, ${this.timeout})`,
           awaitPromise: true,
-          returnByValue: true
+          returnByValue: false
         }).then((response) => {
           if (response.exceptionDetails) {
             throw new Error(`Seek error in main frame: ${response.exceptionDetails.exception?.description || 'Unknown error'}`);
