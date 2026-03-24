@@ -8,6 +8,7 @@ import { CLOUD_RUN_JOB_TEMPLATE, README_GCP_TEMPLATE } from '../templates/gcp.js
 import { AWS_DOCKERFILE_TEMPLATE, AWS_LAMBDA_HANDLER_TEMPLATE, AWS_SAM_TEMPLATE, README_AWS_TEMPLATE } from '../templates/aws.js';
 import { WRANGLER_TOML_TEMPLATE, CLOUDFLARE_WORKER_TEMPLATE, README_CLOUDFLARE_TEMPLATE } from '../templates/cloudflare.js';
 import { FLY_TOML_TEMPLATE, FLY_DOCKERFILE_TEMPLATE, README_FLY_TEMPLATE } from '../templates/fly.js';
+import { KUBERNETES_JOB_TEMPLATE, README_KUBERNETES_TEMPLATE } from '../templates/kubernetes.js';
 
 export function registerDeployCommand(program: Command) {
   const deploy = program.command('deploy')
@@ -442,5 +443,69 @@ export function registerDeployCommand(program: Command) {
 
       console.log(chalk.blue('\nFly.io setup complete!'));
       console.log('See README-FLY.md for deployment instructions.');
+    });
+
+  deploy
+    .command('kubernetes')
+    .description('Scaffold Kubernetes deployment configuration')
+    .action(async () => {
+      const cwd = process.cwd();
+      const jobYamlPath = path.join(cwd, 'job.yaml');
+      const readmePath = path.join(cwd, 'README-KUBERNETES.md');
+
+      console.log(chalk.blue('Scaffolding Kubernetes deployment files...'));
+
+      // job.yaml
+      let writeJobYaml = true;
+      if (fs.existsSync(jobYamlPath)) {
+        const response = await prompts({
+          type: 'confirm',
+          name: 'value',
+          message: 'job.yaml already exists. Overwrite?',
+          initial: false
+        });
+
+        if (typeof response.value === 'undefined') {
+          console.log(chalk.yellow('\nOperation cancelled.'));
+          process.exit(0);
+        }
+
+        writeJobYaml = response.value;
+      }
+
+      if (writeJobYaml) {
+        fs.writeFileSync(jobYamlPath, KUBERNETES_JOB_TEMPLATE);
+        console.log(chalk.green('✔ Created job.yaml'));
+      } else {
+        console.log(chalk.gray('Skipped job.yaml'));
+      }
+
+      // README-KUBERNETES.md
+      let writeReadme = true;
+      if (fs.existsSync(readmePath)) {
+        const response = await prompts({
+          type: 'confirm',
+          name: 'value',
+          message: 'README-KUBERNETES.md already exists. Overwrite?',
+          initial: false
+        });
+
+        if (typeof response.value === 'undefined') {
+          console.log(chalk.yellow('\nOperation cancelled.'));
+          process.exit(0);
+        }
+
+        writeReadme = response.value;
+      }
+
+      if (writeReadme) {
+        fs.writeFileSync(readmePath, README_KUBERNETES_TEMPLATE);
+        console.log(chalk.green('✔ Created README-KUBERNETES.md'));
+      } else {
+        console.log(chalk.gray('Skipped README-KUBERNETES.md'));
+      }
+
+      console.log(chalk.blue('\nKubernetes setup complete!'));
+      console.log('See README-KUBERNETES.md for deployment instructions.');
     });
 }

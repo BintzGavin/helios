@@ -106,6 +106,7 @@ packages/cli/src/
 - `helios deploy aws`: Scaffold AWS Lambda deployment configuration.
 - `helios deploy cloudflare`: Scaffold Cloudflare Workers deployment configuration.
 - `helios deploy fly`: Scaffold Fly.io Machines deployment configuration.
+- `helios deploy kubernetes`: Scaffold Kubernetes deployment configuration.
 
 ## D. Configuration
 
