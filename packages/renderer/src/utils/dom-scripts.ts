@@ -1,14 +1,12 @@
 export const FIND_ALL_MEDIA_FUNCTION = `
-  function findAllMedia(rootNode) {
-    const media = [];
-    // Check rootNode (if it is an Element)
-    if (rootNode.nodeType === Node.ELEMENT_NODE) {
+  function findAllMedia(rootNode, mediaArray) {
+    const media = mediaArray || [];
+    if (rootNode.nodeType === Node.ELEMENT_NODE && !mediaArray) {
       const tagName = rootNode.tagName;
       if (tagName === 'AUDIO' || tagName === 'VIDEO') {
         media.push(rootNode);
       }
     }
-
     const walker = document.createTreeWalker(rootNode, NodeFilter.SHOW_ELEMENT);
     while (walker.nextNode()) {
       const node = walker.currentNode;
@@ -16,7 +14,7 @@ export const FIND_ALL_MEDIA_FUNCTION = `
         media.push(node);
       }
       if (node.shadowRoot) {
-        media.push(...findAllMedia(node.shadowRoot));
+        findAllMedia(node.shadowRoot, media);
       }
     }
     return media;
@@ -24,8 +22,8 @@ export const FIND_ALL_MEDIA_FUNCTION = `
 `;
 
 export const FIND_ALL_IMAGES_FUNCTION = `
-  function findAllImages(root) {
-    const images = [];
+  function findAllImages(root, imagesArray) {
+    const images = imagesArray || [];
     const walker = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT);
     while (walker.nextNode()) {
       const node = walker.currentNode;
@@ -48,7 +46,7 @@ export const FIND_ALL_IMAGES_FUNCTION = `
         }
       }
       if (node.shadowRoot) {
-        images.push(...findAllImages(node.shadowRoot));
+        findAllImages(node.shadowRoot, images);
       }
     }
     return images;
@@ -74,13 +72,17 @@ export const FIND_ALL_ELEMENTS_WITH_PSEUDO_FUNCTION = `
 `;
 
 export const FIND_ALL_SCOPES_FUNCTION = `
-  function findAllScopes(rootNode) {
-    const scopes = [rootNode];
+  function findAllScopes(rootNode, scopesArray) {
+    const scopes = scopesArray || [];
+    if (!scopesArray) {
+        scopes.push(rootNode);
+    }
     const walker = document.createTreeWalker(rootNode, NodeFilter.SHOW_ELEMENT);
     while (walker.nextNode()) {
       const node = walker.currentNode;
       if (node.shadowRoot) {
-        scopes.push.apply(scopes, findAllScopes(node.shadowRoot));
+        scopes.push(node.shadowRoot);
+        findAllScopes(node.shadowRoot, scopes);
       }
     }
     return scopes;

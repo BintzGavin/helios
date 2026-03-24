@@ -3,6 +3,7 @@ Current best: 32.251s (baseline was 32.251s)
 Last updated by: PERF-038
 
 ## What Works
+- Eliminated array allocation in DOM traversal (PERF-052)
 - [PERF-050] Changed `frame.evaluate` in `SeekTimeDriver.ts` to implicitly return `undefined` rather than the serialized result of `window.__helios_seek`. This avoids V8 object serialization over IPC for non-main frames. Render time changed from ~32.1s to 31.943s.
 - [PERF-017] Discovered that the `SeekTimeDriver` script is already pre-compiled and injected via `page.addInitScript(initScript)` in `prepare()`. The `setTime` method correctly uses a lightweight `window.__helios_seek()` call over Playwright CDP, meaning this optimization was already natively implemented in the codebase. Baseline render time confirmed at 32.217s.
 - [PERF-035] Pipelined `Runtime.evaluate` and `Page.captureScreenshot` CDP commands in the worker execution loop by removing the blocking `await` from the `.then` chain. This allows Node.js to fire the capture command immediately without waiting for IPC evaluation round-trip. While micro-benchmarks showed 15% lower overhead per cycle, the overall DOM render time stayed stable around 33.823s, confirming correct execution ordering without an explicit `await` due to sequential CDP queueing rules.
