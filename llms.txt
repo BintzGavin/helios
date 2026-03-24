@@ -113,12 +113,12 @@ const report = await Helios.diagnose();
 
 ## Roadmap
 ### V1.x (Active)
-- **Studio**: v0.107.1+ (Composition Switcher, Timeline, Props Editor)
-- **CLI**: v0.32.0+ (Cloud Execution Adapters Expansion, Fly.io Deployment Command)
-- **Core**: v5.13.0+ (Generic Input Props, Time-Based Control)
-- **Player**: v0.76.18+ (Add Regression Tests, Standard Media States)
-- **Renderer**: v1.78.0+ (Range Rendering, Audio Duration Logic)
-- **Infrastructure**: v0.25.0+ (Optimize GCS Uploads, FfmpegStitcher Coverage)
+- **Studio**: v0.107.1+ (Asset Drag and Drop, Composition Switcher, Timeline)
+- **CLI**: v0.32.0+ (Scaffold Components Command, Cloud Execution Adapters Expansion)
+- **Core**: v5.13.0+ (Implement WaitUntilStable, Generic Input Props)
+- **Player**: v0.76.18+ (Bridge Coverage Completeness, Regression Tests)
+- **Renderer**: v1.78.0+ (Validate HW Accel, Orchestrator Plan, Range Rendering)
+- **Infrastructure**: v0.25.0+ (Coverage Expansion, Optimize GCS Uploads)
 
 ### AI Integration
 - **Studio MCP Server**: Inspect, create, and render compositions via LLM tools (Done)
