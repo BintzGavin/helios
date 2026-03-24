@@ -146,13 +146,22 @@ export class DomStrategy implements RenderStrategy {
           screenshot
         });
 
-        if (!screenshotData) {
-           throw new Error("HeadlessExperimental.beginFrame did not return screenshotData");
+        if (screenshotData) {
+          const buffer = Buffer.from(screenshotData, 'base64');
+          this.lastFrameBuffer = buffer;
+          return buffer;
+        } else if (this.lastFrameBuffer) {
+          // Chromium detected no visual damage and omitted the screenshot.
+          // Reuse the last successfully captured frame for the video stream.
+          return this.lastFrameBuffer;
+        } else {
+          // If no damage was detected but we don't have a previous frame (e.g., frame 0),
+          // fallback to a standard CDP capture to guarantee an initial frame buffer.
+          const res = await this.cdpSession.send('Page.captureScreenshot', { format, quality } as any);
+          const buffer = Buffer.from(res.data, 'base64');
+          this.lastFrameBuffer = buffer;
+          return buffer;
         }
-
-        const fallback = Buffer.from(screenshotData, 'base64');
-        this.lastFrameBuffer = fallback;
-        return fallback;
       } else {
         const fallback = await page.screenshot(screenshotOptions);
         this.lastFrameBuffer = fallback;

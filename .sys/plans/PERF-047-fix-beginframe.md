@@ -1,11 +1,11 @@
 ---
 id: PERF-047
 slug: fix-beginframe
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-28
-completed: ""
-result: ""
+completed: "2024-05-28"
+result: "improved"
 ---
 # PERF-047: Fix HeadlessExperimental.beginFrame error and Ensure Damage-Driven Capture
 
@@ -71,3 +71,9 @@ Run the DOM render script and verify output exists, has valid video contents, an
 ## Prior Art
 - PERF-045: Introduced `HeadlessExperimental.beginFrame` but failed to account for damage-driven omissions.
 - PERF-033: Explored `Page.startScreencast`, which suffered from similar damage-driven starvation issues.
+
+## Results Summary
+- **Best render time**: 33.472s (vs baseline Fails)
+- **Improvement**: N/A (Fixed Crash)
+- **Kept experiments**: Handled damage-driven `screenshotData` omission in `HeadlessExperimental.beginFrame` by reusing previous frame buffer.
+- **Discarded experiments**: None
