@@ -124,3 +124,7 @@ Critical learnings only. This is not a log—only add entries for insights that 
 ## [0.36.0] - Hardcoded Infrastructure Adapters
 **Learning:** `helios job run` was refactored to use `JobExecutor`, but it still hardcodes `LocalWorkerAdapter`, failing to expose the cloud capabilities (`AwsLambdaAdapter`, `CloudRunAdapter`) provided by the `infrastructure` package.
 **Action:** When integrating new infrastructure abstractions into the CLI, ensure that all relevant capabilities (like execution adapters) are exposed via CLI options, rather than hardcoding local defaults.
+
+## [0.41.0] - Distributed Execution Scaffold Prerequisites (Kubernetes)
+**Learning:** The Infrastructure agent completed the `KubernetesAdapter`, but the `cli` package lacked a matching `helios deploy kubernetes` command to scaffold the required Kubernetes `job.yaml` manifest. Without the manifest, users cannot easily deploy their rendering workloads to a Kubernetes cluster, preventing the adapter from being usable in production.
+**Action:** Created plan `2027-01-12-CLI-Scaffold-Kubernetes-Deployment.md` to add the `deploy kubernetes` subcommand, completing the product surface for the Kubernetes distributed rendering adapter. When adding new infrastructure adapters, always verify if a corresponding CLI deployment scaffold is required.
