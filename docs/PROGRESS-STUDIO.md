@@ -1,3 +1,6 @@
+### STUDIO v0.119.5
+- ✅ Completed: Refine CLI Component Removal - Verified existing implementation of component file deletion and interactive confirmation prompts in `helios remove` command (2026-10-23-STUDIO-Refine-CLI-Component-Removal.md).
+
 ### STUDIO v0.119.0
 - ✅ Completed: Asset Drag and Drop - Implemented the ability to move assets within the Studio panel by dragging and dropping them into directories or the current view.
 

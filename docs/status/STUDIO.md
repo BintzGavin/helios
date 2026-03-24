@@ -1,4 +1,4 @@
-**Version**: 0.119.3
+**Version**: 0.119.5
 
 **Posture**: ACTIVELY EXPANDING FOR V2
 
@@ -9,6 +9,7 @@
 **Focus**: UI Implementation & CLI
 
 > **Note**: Status versions in this file may precede package release versions (`package.json`). Always verify `package.json` for the currently installed version.
+- [v0.119.5] ✅ Completed: Refine CLI Component Removal - Verified existing implementation of component file deletion and interactive confirmation prompts in `helios remove` command (2026-10-23-STUDIO-Refine-CLI-Component-Removal.md).
 
 ## Recent Updates
 - [v0.119.3] ✅ Completed: Asset Move - Verified existing implementation of drag-and-drop support for moving assets into folders within the Studio Assets Panel.
