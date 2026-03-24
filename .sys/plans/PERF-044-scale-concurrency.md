@@ -1,11 +1,11 @@
 ---
 id: PERF-044
 slug: scale-concurrency
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2026-10-18
-completed: ""
-result: ""
+completed: 2026-10-18
+result: no-improvement
 ---
 # PERF-044: Scale Concurrency via Multiple Browser Instances
 
@@ -56,3 +56,9 @@ Run the DOM render script and verify output exists and has valid video contents.
 ## Prior Art
 - PERF-015: Introduced the sliding-window page pool.
 - PERF-027: Optimized page pool concurrency by oversubscribing CPU cores.
+
+## Results Summary
+- **Best render time**: 33.563s (vs baseline ~32.4s)
+- **Improvement**: 0%
+- **Kept experiments**: None
+- **Discarded experiments**: Scale concurrency via multiple browser instances (PERF-044).
