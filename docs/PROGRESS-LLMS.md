@@ -1,5 +1,17 @@
 # LLMS Progress
 
+## LLMS v1.49.3
+- ✅ Completed: Daily llms.txt Review
+  - Updated Roadmap with latest completed features from progress logs:
+    - Studio: Asset Drag and Drop
+    - CLI: Scaffold Components Command, Add Command Regression Tests, Fly.io Deployment
+    - Core: Implement WaitUntilStable
+    - Player: Bridge Coverage Completeness, Regression Tests
+    - Renderer: Validate HW Accel, Orchestrator Plan
+    - Infrastructure: Coverage Expansion
+  - Maintained version alignment with `package.json` for all packages.
+  - Verified Quick Facts, Core API examples, and file paths.
+
 ## LLMS v1.49.2
 - ✅ Completed: Daily llms.txt Review
   - Updated Roadmap with "Generic Input Props" for Core based on recent progress logs.
