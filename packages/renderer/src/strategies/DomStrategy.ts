@@ -64,6 +64,7 @@ export class DomStrategy implements RenderStrategy {
     this.cleanupAudio = extractionResult.cleanup;
 
     this.cdpSession = await page.context().newCDPSession(page);
+    await this.cdpSession.send('HeadlessExperimental.enable');
 
     // Check if the requested pixel format supports alpha
     const pixelFormat = this.options.pixelFormat || 'yuv420p';
@@ -136,12 +137,20 @@ export class DomStrategy implements RenderStrategy {
 
     try {
       if (this.cdpSession) {
-        const captureParams: any = { format };
+        const screenshot: any = { format };
         if ((format === 'jpeg' || format === 'webp') && quality !== undefined) {
-          captureParams.quality = quality;
+          screenshot.quality = quality;
         }
-        const { data } = await this.cdpSession.send('Page.captureScreenshot', captureParams);
-        const fallback = Buffer.from(data, 'base64');
+
+        const { screenshotData } = await this.cdpSession.send('HeadlessExperimental.beginFrame', {
+          screenshot
+        });
+
+        if (!screenshotData) {
+           throw new Error("HeadlessExperimental.beginFrame did not return screenshotData");
+        }
+
+        const fallback = Buffer.from(screenshotData, 'base64');
         this.lastFrameBuffer = fallback;
         return fallback;
       } else {
