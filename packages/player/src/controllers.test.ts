@@ -131,6 +131,21 @@ describe('DirectController', () => {
         expect(rafSpy).toHaveBeenCalledTimes(2);
     });
 
+    it('should fallback to window.requestAnimationFrame when seeking without iframe', async () => {
+        const c = new DirectController(mockHeliosInstance);
+        const rafSpy = vi.spyOn(window, 'requestAnimationFrame').mockImplementation((cb) => {
+            cb(0);
+            return 1;
+        });
+
+        await c.seek(10);
+
+        expect(mockHeliosInstance.seek).toHaveBeenCalledWith(10);
+        expect(rafSpy).toHaveBeenCalledTimes(2);
+
+        rafSpy.mockRestore();
+    });
+
     it('should set playback rate and input props', () => {
         controller.setPlaybackRate(2);
         expect(mockHeliosInstance.setPlaybackRate).toHaveBeenCalledWith(2);
@@ -162,6 +177,24 @@ describe('DirectController', () => {
 
         internalCb({ isPlaying: false });
         expect(cb).toHaveBeenCalledWith({ isPlaying: false });
+    });
+
+    it('should subscribe and safely handle null audio fader', () => {
+        const c = new DirectController(mockHeliosInstance);
+        (c as any).audioFader = null;
+
+        const cb = vi.fn();
+        let internalCb: any;
+        mockHeliosInstance.subscribe = vi.fn((callback: any) => {
+            internalCb = callback;
+            return vi.fn();
+        });
+
+        c.subscribe(cb);
+
+        // This should not throw
+        internalCb({ isPlaying: true });
+        expect(cb).toHaveBeenCalledWith({ isPlaying: true });
     });
     it('should set duration, fps, size, and markers', () => {
         controller.setDuration(20);
@@ -273,6 +306,18 @@ describe('DirectController', () => {
         }
     });
 
+    it('should use original canvas source when options.width and height match canvas dimensions', async () => {
+        const mockCanvas = document.createElement('canvas');
+        mockCanvas.width = 1920;
+        mockCanvas.height = 1080;
+        (mockIframe.contentDocument!.querySelector as any).mockReturnValue(mockCanvas);
+
+        const result = await controller.captureFrame(5, { mode: 'canvas', width: 1920, height: 1080 });
+
+        expect(result).not.toBeNull();
+        expect((result!.frame as any).source).toBe(mockCanvas);
+    });
+
     it('should capture and resize Canvas frame using fallback when OffscreenCanvas is missing', async () => {
         const originalOffscreenCanvas = global.OffscreenCanvas;
         vi.stubGlobal('OffscreenCanvas', undefined);
@@ -372,6 +417,52 @@ describe('DirectController', () => {
     });
 
 
+    it('should await rAF in iframe when capturing frame', async () => {
+        let rAFCount = 0;
+        const mockCanvas = document.createElement('canvas');
+
+        mockIframe.contentWindow = {
+            requestAnimationFrame: (cb: any) => {
+                rAFCount++;
+                cb();
+                return 1;
+            }
+        } as any;
+
+        (mockIframe.contentDocument!.querySelector as any).mockReturnValue(mockCanvas);
+
+        await controller.captureFrame(5, { mode: 'canvas' });
+
+        expect(rAFCount).toBe(2);
+    });
+
+    it('should handle iframe and contentWindow undefined when capturing frame', async () => {
+        const mockBitmap = {} as ImageBitmap;
+        vi.mocked(domCapture.captureDomToBitmap).mockResolvedValue(mockBitmap);
+        const c = new DirectController(mockHeliosInstance);
+        const result = await c.captureFrame(5, { mode: 'dom' });
+        expect(result).not.toBeNull();
+    });
+
+    it('should fallback to document for getAudioTracks if iframe document is not available', async () => {
+        const c = new DirectController(mockHeliosInstance);
+        const audioUtils = await import('./features/audio-utils');
+        const spy = vi.spyOn(audioUtils, 'getAudioAssets').mockResolvedValue([]);
+
+        await c.getAudioTracks();
+
+        expect(spy).toHaveBeenCalledWith(document, undefined, undefined);
+    });
+
+    it('should handle iframe undefined for onError', () => {
+        const c = new DirectController(mockHeliosInstance);
+        const cb = vi.fn();
+        const cleanup = c.onError(cb);
+
+        expect(typeof cleanup).toBe('function');
+        cleanup();
+    });
+
     it('should return null if canvas element is not a CANVAS in canvas mode', async () => {
         const mockDiv = document.createElement('div');
         (mockIframe.contentDocument!.querySelector as any).mockReturnValue(mockDiv);
@@ -384,6 +475,14 @@ describe('DirectController', () => {
 
     it('should return null if canvas not found', async () => {
         (mockIframe.contentDocument!.querySelector as any).mockReturnValue(null);
+
+        const result = await controller.captureFrame(5, { mode: 'canvas' });
+        expect(result).toBeNull();
+    });
+
+    it('should return null if element is not a CANVAS', async () => {
+        const mockDiv = document.createElement('div');
+        (mockIframe.contentDocument!.querySelector as any).mockReturnValue(mockDiv);
 
         const result = await controller.captureFrame(5, { mode: 'canvas' });
         expect(result).toBeNull();
@@ -458,11 +557,59 @@ describe('DirectController', () => {
          expect(state).toEqual({ fps: 30, duration: 10, currentFrame: 0 });
     });
 
+    it('should dispose without throwing when audio meters are null', () => {
+         // Create fresh controller without starting metering (so meters are null)
+         const c = new DirectController(mockHeliosInstance);
+         expect(() => c.dispose()).not.toThrow();
+    });
+
+    it('should handle stopAudioMetering safely when raf is not running', () => {
+         const c = new DirectController(mockHeliosInstance);
+         expect(() => c.stopAudioMetering()).not.toThrow();
+    });
+
     it('should stop audio metering when disposed in DirectController', () => {
          controller.startAudioMetering();
          const stopSpy = vi.spyOn(controller, 'stopAudioMetering');
          controller.dispose();
          expect(stopSpy).toHaveBeenCalled();
+    });
+
+    it('should not recreate audioMeter if it already exists', () => {
+         controller.startAudioMetering();
+         const meter1 = (controller as any).audioMeter;
+         controller.startAudioMetering();
+         const meter2 = (controller as any).audioMeter;
+         expect(meter1).toBe(meter2);
+    });
+
+    it('should handle startAudioMetering raf loop safely without callback', () => {
+         vi.useFakeTimers();
+         const rafSpy = vi.spyOn(window, 'requestAnimationFrame');
+
+         // Start metering but don't set callback
+         controller.startAudioMetering();
+         vi.advanceTimersByTime(16);
+
+         expect(rafSpy).toHaveBeenCalled();
+         controller.stopAudioMetering();
+
+         rafSpy.mockRestore();
+         vi.useRealTimers();
+    });
+
+    it('should fallback to document for startAudioMetering if iframe document is not available', () => {
+        const c = new DirectController(mockHeliosInstance);
+        c.startAudioMetering();
+        const meter = (c as any).audioMeter;
+        expect(meter).toBeDefined();
+        c.dispose(); // clean up
+    });
+
+    it('should not throw when disposing if audioFader is null', () => {
+        const c = new DirectController(mockHeliosInstance);
+        (c as any).audioFader = null; // simulate it never having one or being set to null
+        expect(() => c.dispose()).not.toThrow();
     });
 
     it('should handle startAudioMetering raf loop', () => {
@@ -578,6 +725,16 @@ describe('BridgeController', () => {
         vi.useFakeTimers();
         const promise = controller.seek(10);
         triggerMessage({ type: 'HELIOS_SEEK_DONE', frame: 10 }, {} as Window);
+        vi.advanceTimersByTime(5000);
+        await promise;
+        vi.useRealTimers();
+    });
+
+    it('should ignore non-HELIOS_SEEK_DONE or wrong frame messages for seek', async () => {
+        vi.useFakeTimers();
+        const promise = controller.seek(10);
+        triggerMessage({ type: 'HELIOS_OTHER', frame: 10 }, mockWindow);
+        triggerMessage({ type: 'HELIOS_SEEK_DONE', frame: 11 }, mockWindow);
         vi.advanceTimersByTime(5000);
         await promise;
         vi.useRealTimers();
@@ -743,6 +900,25 @@ describe('BridgeController', () => {
     });
 
 
+    it('should handle missing fps in lastState during captureFrame', async () => {
+        const promise = controller.captureFrame(10, { mode: 'dom' });
+        const mockBitmap = {} as ImageBitmap;
+
+        // Remove fps from lastState to test default 30 fallback
+        controller['lastState'] = {};
+
+        triggerMessage({
+            type: 'HELIOS_FRAME_DATA',
+            frame: 10,
+            success: true,
+            bitmap: mockBitmap
+        });
+
+        const result = await promise;
+        expect(result).not.toBeNull();
+        expect(result!.frame).toBeInstanceOf(VideoFrame);
+    });
+
     it('should ignore message from other source for captureFrame', async () => {
         vi.useFakeTimers();
         const promise = controller.captureFrame(10);
@@ -752,6 +928,35 @@ describe('BridgeController', () => {
         expect(result).toBeNull();
         vi.useRealTimers();
     });
+
+    it('should ignore non-HELIOS_FRAME_DATA or wrong frame messages for captureFrame', async () => {
+        vi.useFakeTimers();
+        const promise = controller.captureFrame(10);
+        triggerMessage({ type: 'HELIOS_OTHER', frame: 10 }, mockWindow);
+        triggerMessage({ type: 'HELIOS_FRAME_DATA', frame: 11 }, mockWindow);
+        vi.advanceTimersByTime(5000);
+        const result = await promise;
+        expect(result).toBeNull();
+        vi.useRealTimers();
+    });
+
+    it('should capture frame via bridge without captions and default fps', async () => {
+        const promise = controller.captureFrame(10, { mode: 'dom' });
+
+        const mockBitmap = {} as ImageBitmap;
+        triggerMessage({
+            type: 'HELIOS_FRAME_DATA',
+            frame: 10,
+            success: true,
+            bitmap: mockBitmap
+            // no captions to hit default `[]`
+        });
+
+        const result = await promise;
+        expect(result).not.toBeNull();
+        expect(result!.captions).toEqual([]);
+    });
+
     it('should capture frame via bridge', async () => {
         const promise = controller.captureFrame(10, { mode: 'dom' });
 
@@ -764,6 +969,10 @@ describe('BridgeController', () => {
 
         const mockBitmap = {} as ImageBitmap;
         const mockCaptions = [{ id: '1', startTime: 0, endTime: 100, text: 'Hi' }];
+
+        // Setup initial state to provide an fps
+        triggerMessage({ type: 'HELIOS_STATE', state: { fps: 60, isPlaying: true, currentFrame: 10 } });
+
         triggerMessage({
             type: 'HELIOS_FRAME_DATA',
             frame: 10,
@@ -798,6 +1007,15 @@ describe('BridgeController', () => {
         vi.useFakeTimers();
         const promise = controller.diagnose();
         triggerMessage({ type: 'HELIOS_DIAGNOSE_RESULT', report: {} }, {} as Window);
+        vi.advanceTimersByTime(5000);
+        await expect(promise).rejects.toThrow('Timeout waiting for diagnostics');
+        vi.useRealTimers();
+    });
+
+    it('should ignore non-HELIOS_DIAGNOSE_RESULT messages for diagnose', async () => {
+        vi.useFakeTimers();
+        const promise = controller.diagnose();
+        triggerMessage({ type: 'HELIOS_OTHER' }, mockWindow);
         vi.advanceTimersByTime(5000);
         await expect(promise).rejects.toThrow('Timeout waiting for diagnostics');
         vi.useRealTimers();
