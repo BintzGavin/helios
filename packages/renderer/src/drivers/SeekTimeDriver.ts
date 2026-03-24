@@ -122,28 +122,30 @@ export class SeekTimeDriver implements TimeDriver {
           if (!cachedMediaElements) {
             cachedMediaElements = findAllMedia(document);
           }
-          for (let i = 0; i < cachedMediaElements.length; i++) {
-            const el = cachedMediaElements[i];
-            syncMedia(el, t);
+          if (cachedMediaElements.length > 0) {
+            for (let i = 0; i < cachedMediaElements.length; i++) {
+              const el = cachedMediaElements[i];
+              syncMedia(el, t);
 
-            if (el.seeking || el.readyState < 2) {
-              promises.push(new Promise((resolve) => {
-                let resolved = false;
-                const finish = () => {
-                  if (resolved) return;
-                  resolved = true;
-                  cleanup();
-                  resolve();
-                };
-                const cleanup = () => {
-                  el.removeEventListener('seeked', finish);
-                  el.removeEventListener('canplay', finish);
-                  el.removeEventListener('error', finish);
-                };
-                el.addEventListener('seeked', finish);
-                el.addEventListener('canplay', finish);
-                el.addEventListener('error', finish);
-              }));
+              if (el.seeking || el.readyState < 2) {
+                promises.push(new Promise((resolve) => {
+                  let resolved = false;
+                  const finish = () => {
+                    if (resolved) return;
+                    resolved = true;
+                    cleanup();
+                    resolve();
+                  };
+                  const cleanup = () => {
+                    el.removeEventListener('seeked', finish);
+                    el.removeEventListener('canplay', finish);
+                    el.removeEventListener('error', finish);
+                  };
+                  el.addEventListener('seeked', finish);
+                  el.addEventListener('canplay', finish);
+                  el.addEventListener('error', finish);
+                }));
+              }
             }
           }
 
@@ -154,9 +156,13 @@ export class SeekTimeDriver implements TimeDriver {
 
           // 4. Wait for stability with a safety timeout (only if needed)
           if (promises.length > 0) {
+            let timeoutId;
             const allReady = Promise.all(promises);
-            const timeout = new Promise((resolve) => setTimeout(resolve, timeoutMs));
-            await Promise.race([allReady, timeout]);
+            const timeoutPromise = new Promise((resolve) => {
+              timeoutId = setTimeout(resolve, timeoutMs);
+            });
+            await Promise.race([allReady, timeoutPromise]);
+            clearTimeout(timeoutId);
           }
 
           // 5. After stability, ensure GSAP timelines are seeked

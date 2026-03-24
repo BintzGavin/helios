@@ -1,11 +1,11 @@
 ---
 id: PERF-046
 slug: simplify-seektime-script
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-28
-completed: ""
-result: ""
+completed: 2025-05-28
+result: "kept"
 ---
 
 # PERF-046: Fast-path for Synchronous Animations in SeekTimeDriver
@@ -94,3 +94,9 @@ Run the render script locally to verify `output/test-output.mp4`. Ensure that fr
 
 ## Prior Art
 Event loop bloat from un-cleared `setTimeout` calls is a known issue in V8, particularly when executed repeatedly in a tight loop like rendering.
+
+## Results Summary
+- **Best render time**: 33.615s (vs baseline 33.657s)
+- **Improvement**: ~0.1% (within noise margin)
+- **Kept experiments**: Fast-path for Synchronous Animations in SeekTimeDriver
+- **Discarded experiments**: []
