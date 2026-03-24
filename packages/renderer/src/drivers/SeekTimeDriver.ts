@@ -229,7 +229,7 @@ export class SeekTimeDriver implements TimeDriver {
         promises.push(promise);
       } else {
         const promise = frame.evaluate(
-          ([t, timeoutMs]) => (window as any).__helios_seek(t, timeoutMs),
+          ([t, timeoutMs]) => { (window as any).__helios_seek(t, timeoutMs); },
           [timeInSeconds, this.timeout]
         );
         promises.push(promise);

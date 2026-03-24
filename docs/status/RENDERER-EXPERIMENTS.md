@@ -3,6 +3,7 @@ Current best: 32.251s (baseline was 32.251s)
 Last updated by: PERF-038
 
 ## What Works
+- [PERF-050] Changed `frame.evaluate` in `SeekTimeDriver.ts` to implicitly return `undefined` rather than the serialized result of `window.__helios_seek`. This avoids V8 object serialization over IPC for non-main frames. Render time changed from ~32.1s to 31.943s.
 - [PERF-017] Discovered that the `SeekTimeDriver` script is already pre-compiled and injected via `page.addInitScript(initScript)` in `prepare()`. The `setTime` method correctly uses a lightweight `window.__helios_seek()` call over Playwright CDP, meaning this optimization was already natively implemented in the codebase. Baseline render time confirmed at 32.217s.
 - [PERF-035] Pipelined `Runtime.evaluate` and `Page.captureScreenshot` CDP commands in the worker execution loop by removing the blocking `await` from the `.then` chain. This allows Node.js to fire the capture command immediately without waiting for IPC evaluation round-trip. While micro-benchmarks showed 15% lower overhead per cycle, the overall DOM render time stayed stable around 33.823s, confirming correct execution ordering without an explicit `await` due to sequential CDP queueing rules.
 - [PERF-030] Enforced worker-local sequential promise chaining for frame capture loop. While removing the concurrent queue depth of `pool.length * 8` from PERF-029 degrades render time, it guarantees that `seek` and `capture` actions on a Playwright page evaluate sequentially, fixing a critical race condition. (Render time: 32.324s vs baseline 3.696s)
@@ -39,8 +40,8 @@ Last updated by: PERF-038
 - [PERF-032] Can we overcome the damage-driven limitations of `Page.startScreencast` (which failed in PERF-026) by injecting a forced layout/paint toggle on every virtual time tick, allowing us to buffer continuous screencast frames and eliminate the IPC latency of polling `Page.captureScreenshot`?
 
 ## Performance Trajectory
-Current best: 32.161s (baseline was 33.258s, -3.3%)
-Last updated by: PERF-049
+Current best: 31.943s (baseline was ~32.1s, -0.6%)
+Last updated by: PERF-050
 
 ## What Works
 - [PERF-049] Disabled `returnByValue` in `Runtime.evaluate` to skip object serialization over CDP IPC since the script `window.__helios_seek` returns `undefined`. In combination with commenting out synchronous console spam when GSAP timelines aren't found, this cut down idle IPC traffic during the frame capture loop and improved render time (from 33.258s to 32.161s, ~3.3% improvement).
