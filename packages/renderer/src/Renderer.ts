@@ -14,6 +14,8 @@ import { RendererOptions, RenderJobOptions } from './types.js';
 const DEFAULT_BROWSER_ARGS = [
   '--disable-web-security',
   '--allow-file-access-from-files',
+  '--enable-begin-frame-control',
+  '--run-all-compositor-stages-before-draw'
 ];
 
 const GPU_DISABLED_ARGS = [

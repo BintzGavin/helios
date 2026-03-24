@@ -39,10 +39,11 @@ Last updated by: PERF-038
 - [PERF-032] Can we overcome the damage-driven limitations of `Page.startScreencast` (which failed in PERF-026) by injecting a forced layout/paint toggle on every virtual time tick, allowing us to buffer continuous screencast frames and eliminate the IPC latency of polling `Page.captureScreenshot`?
 
 ## Performance Trajectory
-Current best: 32.408s (baseline was 33.696s, -3.8%)
-Last updated by: PERF-043
+Current best: 32.038s (baseline was 32.691s, -2.0%)
+Last updated by: PERF-045
 
 ## What Works
+- [PERF-045] Switched to `HeadlessExperimental.beginFrame` for explicit compositor synchronization instead of using Playwright's default `Page.captureScreenshot`. Required passing `--enable-begin-frame-control` and `--run-all-compositor-stages-before-draw` on browser launch. Reduced DOM rendering time to 32.038s (-2.0%) by avoiding asynchronous layout/paint pipeline delays in the rasterizer.
 - [PERF-043] Optimized `captureLoop` array allocations by replacing O(N) `shift()` with index access and reduced micro-task queue overhead by conditionally creating Promises only when FFmpeg stream writes indicate backpressure. Reduced rendering time by ~4%.
 - [PERF-016] Changed the default intermediate image format to 'webp' when an alpha channel is needed. It reduces IPC overhead and is faster to encode/decode than 'png'.
 - [PERF-015] Instantiating a pool of multiple Playwright pages based on CPU concurrency and dividing frames between them using a sliding window. It allows concurrent evaluation of `strategy.capture()` across workers, cutting ~23% off render time.

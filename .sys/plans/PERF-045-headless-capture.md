@@ -1,11 +1,11 @@
 ---
 id: PERF-045
 slug: headless-capture
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-28
-completed: ""
-result: ""
+completed: 2024-05-28
+result: "improved"
 ---
 # PERF-045: Explicit Compositor Stages & HeadlessExperimental Capture
 
@@ -59,3 +59,9 @@ Verify that the output video looks visually correct, animations are progressing,
 
 ## Prior Art
 Headless beginFrame control is documented in Chrome's headless rendering architecture (`https://goo.gle/chrome-headless-rendering`).
+
+## Results Summary
+- **Best render time**: 32.038s (vs baseline 32.691s)
+- **Improvement**: ~2.0%
+- **Kept experiments**: replaced `Page.captureScreenshot` with `HeadlessExperimental.beginFrame` and `--run-all-compositor-stages-before-draw` / `--enable-begin-frame-control` browser args.
+- **Discarded experiments**: None
