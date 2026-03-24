@@ -39,10 +39,11 @@ Last updated by: PERF-038
 - [PERF-032] Can we overcome the damage-driven limitations of `Page.startScreencast` (which failed in PERF-026) by injecting a forced layout/paint toggle on every virtual time tick, allowing us to buffer continuous screencast frames and eliminate the IPC latency of polling `Page.captureScreenshot`?
 
 ## Performance Trajectory
-Current best: 32.038s (baseline was 32.691s, -2.0%)
-Last updated by: PERF-045
+Current best: 32.161s (baseline was 33.258s, -3.3%)
+Last updated by: PERF-049
 
 ## What Works
+- [PERF-049] Disabled `returnByValue` in `Runtime.evaluate` to skip object serialization over CDP IPC since the script `window.__helios_seek` returns `undefined`. In combination with commenting out synchronous console spam when GSAP timelines aren't found, this cut down idle IPC traffic during the frame capture loop and improved render time (from 33.258s to 32.161s, ~3.3% improvement).
 - [PERF-047] Handled damage-driven frame omissions in `HeadlessExperimental.beginFrame` by reusing the previous frame buffer when Chromium detects no visual damage. Resolves the `screenshotData` omission crashes while preserving the layout/paint optimizations of PERF-045.
 - [PERF-045] Switched to `HeadlessExperimental.beginFrame` for explicit compositor synchronization instead of using Playwright's default `Page.captureScreenshot`. Required passing `--enable-begin-frame-control` and `--run-all-compositor-stages-before-draw` on browser launch. Reduced DOM rendering time to 32.038s (-2.0%) by avoiding asynchronous layout/paint pipeline delays in the rasterizer.
 - [PERF-043] Optimized `captureLoop` array allocations by replacing O(N) `shift()` with index access and reduced micro-task queue overhead by conditionally creating Promises only when FFmpeg stream writes indicate backpressure. Reduced rendering time by ~4%.
