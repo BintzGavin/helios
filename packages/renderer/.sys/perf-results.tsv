@@ -2,3 +2,4 @@ run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
 1	3.696	150	40.58	150.0	keep	PERF-029 deepen pipeline to pool.length * 8
 2	32.324	150	4.64	37.1	keep	worker-local sequential promise chain
 3	33.472	150	4.48	4.4	keep	Fix HeadlessExperimental.beginFrame damage-driven omissions
+1	33.243	150	4.51	38.2	discard	PERF-048 skip serialization already implemented

@@ -1,11 +1,11 @@
 ---
 id: PERF-048
 slug: cdp-evaluate-serialization
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-28
-completed: ""
-result: ""
+completed: "2024-05-28"
+result: "discard"
 ---
 # PERF-048: Eliminate CDP Evaluate Serialization and Synchronous Logs
 
@@ -55,3 +55,9 @@ Run the DOM render script and verify output exists, has valid video contents, an
 
 ## Prior Art
 - PERF-031: Explored `Runtime.callFunctionOn` vs `Runtime.evaluate`, finding V8 string evaluation caching is highly optimized. Eliminating the return serialization is the next logical step.
+
+## Results Summary
+- **Best render time**: 33.243s (vs baseline 33.243s)
+- **Improvement**: 0%
+- **Kept experiments**: none
+- **Discarded experiments**: disabled cdp return by value and removed console warn (already implemented in PERF-049)
