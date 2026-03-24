@@ -10,3 +10,4 @@ export * from './fly-machines-adapter.js';
 export * from './hetzner-cloud-adapter.js';
 export * from './kubernetes-adapter.js';
 export * from './modal-adapter.js';
+export * from './cloudflare-sandbox-adapter.js';

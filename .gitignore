@@ -42,3 +42,16 @@ test-results/
 .env
 the-window/
 climate-central-clip
+
+# Agent scratch files (root-level one-offs)
+completed.txt
+patch.txt
+plan.md
+reproduction.js
+fix-jules.js
+fix_status.js
+append_backlog.js
+verify_*.py
+verify_*.ts
+dom-animation.mp4
+lickstep_videos/
