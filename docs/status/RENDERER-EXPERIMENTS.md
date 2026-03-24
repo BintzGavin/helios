@@ -43,6 +43,7 @@ Current best: 32.038s (baseline was 32.691s, -2.0%)
 Last updated by: PERF-045
 
 ## What Works
+- [PERF-047] Handled damage-driven frame omissions in `HeadlessExperimental.beginFrame` by reusing the previous frame buffer when Chromium detects no visual damage. Resolves the `screenshotData` omission crashes while preserving the layout/paint optimizations of PERF-045.
 - [PERF-045] Switched to `HeadlessExperimental.beginFrame` for explicit compositor synchronization instead of using Playwright's default `Page.captureScreenshot`. Required passing `--enable-begin-frame-control` and `--run-all-compositor-stages-before-draw` on browser launch. Reduced DOM rendering time to 32.038s (-2.0%) by avoiding asynchronous layout/paint pipeline delays in the rasterizer.
 - [PERF-043] Optimized `captureLoop` array allocations by replacing O(N) `shift()` with index access and reduced micro-task queue overhead by conditionally creating Promises only when FFmpeg stream writes indicate backpressure. Reduced rendering time by ~4%.
 - [PERF-016] Changed the default intermediate image format to 'webp' when an alpha channel is needed. It reduces IPC overhead and is faster to encode/decode than 'png'.
