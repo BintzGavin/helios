@@ -100,6 +100,7 @@ Each agent should update **their own dedicated progress file** instead of this f
 - ✅ Completed: Bridge Coverage Expansion - Added comprehensive unit test coverage for HELIOS_CAPTURE_FRAME modes and global error handlers in bridge.ts.
 
 ### PLAYER v0.77.0
+- ✅ Completed: Expand Test Coverage - Added test coverage to DirectController and BridgeController to improve edge case handling and error branches, achieving 100% coverage on controllers.ts.
 - ✅ Completed: Media Session Properties - Exposed mediaTitle, mediaArtist, mediaAlbum, and mediaArtwork properties on HeliosPlayer to match HTMLMediaElement parity.
 
 ### PLAYER v0.76.15
