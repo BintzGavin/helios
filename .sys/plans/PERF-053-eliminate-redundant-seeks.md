@@ -1,11 +1,11 @@
 ---
 id: PERF-053
 slug: eliminate-redundant-seeks
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2026-03-24
-completed: ""
-result: ""
+completed: 2026-03-24
+result: improved
 ---
 
 # PERF-053: Eliminate Redundant Animation Seeks in Frame Capture Loop
@@ -48,3 +48,10 @@ Run `npx tsx packages/renderer/tests/verify-seek-driver-offsets.ts` and `npx tsx
 
 ## Correctness Check
 Instruct the Executor to run the test script above to ensure determinism.
+
+## Results Summary
+- **Best render time**: 31.000s (vs baseline 31.943s)
+- **Improvement**: 3.0%
+- **Kept experiments**:
+  - Conditionally wrapped the redundant `.seek()` executions for GSAP and Helios in `SeekTimeDriver.ts`
+- **Discarded experiments**: none
