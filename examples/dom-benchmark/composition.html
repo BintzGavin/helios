@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body { background: white; font-family: sans-serif; }
+    .box { width: 100px; height: 100px; background: red; position: absolute; }
+    @keyframes move {
+      from { left: 0; }
+      to { left: 500px; }
+    }
+    #box { animation: move 2s linear infinite; }
+  </style>
+</head>
+<body>
+  <div class="box" id="box"></div>
+</body>
+</html>

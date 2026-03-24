@@ -42,10 +42,11 @@ Last updated by: PERF-038
 - [PERF-032] Can we overcome the damage-driven limitations of `Page.startScreencast` (which failed in PERF-026) by injecting a forced layout/paint toggle on every virtual time tick, allowing us to buffer continuous screencast frames and eliminate the IPC latency of polling `Page.captureScreenshot`?
 
 ## Performance Trajectory
-Current best: 31.943s (baseline was ~32.1s, -0.6%)
-Last updated by: PERF-050
+Current best: 31.000s (baseline was ~31.943s, -3.0%)
+Last updated by: PERF-053
 
 ## What Works
+- [PERF-053] Eliminated redundant animation seeks in `SeekTimeDriver.ts`. By conditionally wrapping the second execution of `helios.seek()` and `gsap_timeline.seek()` inside the `if (promises.length > 0)` block, we avoid duplicating expensive layout/paint recalculations in Chromium's main thread on every frame where no async stability wait occurs (which is >99% of frames). Improved render time from ~31.9s to ~31.0s.
 - [PERF-049] Disabled `returnByValue` in `Runtime.evaluate` to skip object serialization over CDP IPC since the script `window.__helios_seek` returns `undefined`. In combination with commenting out synchronous console spam when GSAP timelines aren't found, this cut down idle IPC traffic during the frame capture loop and improved render time (from 33.258s to 32.161s, ~3.3% improvement).
 - [PERF-047] Handled damage-driven frame omissions in `HeadlessExperimental.beginFrame` by reusing the previous frame buffer when Chromium detects no visual damage. Resolves the `screenshotData` omission crashes while preserving the layout/paint optimizations of PERF-045.
 - [PERF-045] Switched to `HeadlessExperimental.beginFrame` for explicit compositor synchronization instead of using Playwright's default `Page.captureScreenshot`. Required passing `--enable-begin-frame-control` and `--run-all-compositor-stages-before-draw` on browser launch. Reduced DOM rendering time to 32.038s (-2.0%) by avoiding asynchronous layout/paint pipeline delays in the rasterizer.
