@@ -70,7 +70,7 @@ This backlog tracks concrete deliverables derived from [`AGENTS.md`](../AGENTS.m
 
 > **Note**: Cloudflare Workers are too constrained for rendering (no filesystem, no native binaries, 128MB memory). The proven path uses Cloudflare Sandboxes (full Linux containers) orchestrated by Cloudflare Workflows (durable multi-step execution). This architecture has been validated in production via SwirlBot.
 
-- [ ] **Cloudflare Sandbox adapter (`cloudflare-sandbox-adapter.ts`).**
+- [x] **Cloudflare Sandbox adapter (`cloudflare-sandbox-adapter.ts`).**
   - Full Linux container with Chromium + FFmpeg via `getSandbox()`.
   - Manages container lifecycle: create, execute commands, poll status, cleanup.
   - Must use `keepAlive: true` in getSandbox options (not `setKeepAlive` inside steps).
@@ -78,21 +78,21 @@ This backlog tracks concrete deliverables derived from [`AGENTS.md`](../AGENTS.m
   - **Dependencies**: Cloudflare Workers SDK.
   - **Files**: `packages/infrastructure/src/adapters/cloudflare-sandbox-adapter.ts`, test, benchmark.
 
-- [ ] **R2 artifact storage adapter (`R2StorageAdapter`).**
+- [x] **R2 artifact storage adapter (`R2StorageAdapter`).**
   - Implements existing `ArtifactStorage` interface for Cloudflare R2.
   - Used for chunk output persistence, log harvesting, and checkpoint/resume.
   - **Dependencies**: S3-compatible SDK or Cloudflare Workers SDK.
   - **Files**: `packages/infrastructure/src/storage/r2-storage.ts`, test, benchmark.
 
-- [ ] **Reference Cloudflare Workflow for distributed rendering.**
+- [x] **Reference Cloudflare Workflow for distributed rendering.**
   - Durable multi-step orchestration: generate ID → provision sandbox → render chunks → poll → stitch → cleanup.
   - Must follow replay determinism: all state-generating logic (IDs, timestamps) inside `step.do()`.
   - Adaptive polling: long initial sleep, shorter polls as completion approaches.
   - Log harvesting to R2 on every poll cycle (assume containers can die at any time).
   - ANSI code handling: Base64-encode or strip logs before returning from steps.
-  - **Files**: `packages/infrastructure/src/workflows/render-workflow.ts` or `examples/distributed-rendering/cloudflare-workflow/`.
+  - **Files**: `examples/distributed-rendering/cloudflare-workflow/`.
 
-- [ ] **Cloudflare rendering footguns documentation.**
+- [x] **Cloudflare rendering footguns documentation.**
   - Replay determinism pitfalls and fixes.
   - Container recycling detection via `ps aux` (PID 1 start time) and mitigation via R2 checkpoints.
   - `keepAlive` heartbeat placement (options, not step side-effects).
