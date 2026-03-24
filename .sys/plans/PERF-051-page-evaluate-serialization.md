@@ -1,11 +1,11 @@
 ---
 id: PERF-051
 slug: page-evaluate-serialization
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-28
-completed: ""
-result: ""
+completed: 2024-05-28
+result: failed
 ---
 # PERF-051: Eliminate Serialization for Frame Evaluate Fallback
 
@@ -42,3 +42,9 @@ None.
 
 ## Correctness Check
 `npx tsx packages/renderer/tests/verify-seek-driver-offsets.ts`
+
+## Results Summary
+- **Best render time**: 32.337s (vs baseline ~32.3s)
+- **Improvement**: 0%
+- **Kept experiments**: []
+- **Discarded experiments**: [PERF-051 (already implemented)]
