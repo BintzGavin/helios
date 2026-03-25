@@ -128,3 +128,6 @@ Critical learnings only. This is not a log—only add entries for insights that 
 ## [0.41.0] - Distributed Execution Scaffold Prerequisites (Kubernetes)
 **Learning:** The Infrastructure agent completed the `KubernetesAdapter`, but the `cli` package lacked a matching `helios deploy kubernetes` command to scaffold the required Kubernetes `job.yaml` manifest. Without the manifest, users cannot easily deploy their rendering workloads to a Kubernetes cluster, preventing the adapter from being usable in production.
 **Action:** Created plan `2027-01-12-CLI-Scaffold-Kubernetes-Deployment.md` to add the `deploy kubernetes` subcommand, completing the product surface for the Kubernetes distributed rendering adapter. When adding new infrastructure adapters, always verify if a corresponding CLI deployment scaffold is required.
+## v0.41.0 - Scaffold Azure Deployment Command
+**Learning:** When adding new cloud infrastructure adapters to the Helios Engine, always ensure a corresponding CLI deployment scaffolding command (e.g., `helios deploy azure`) is created to provide the required manifest templates for users.
+**Action:** Added a check to cross-reference infrastructure adapters with CLI deployment commands.
