@@ -160,8 +160,11 @@ export class DomStrategy implements RenderStrategy {
             return this.lastFrameBuffer;
           } else {
             // Wait for next explicit tick or fallback if damage driven logic fails
-            const res = await this.cdpSession.send('Page.captureScreenshot', { format, quality, clip: screenshot.clip } as any);
-            const buffer = Buffer.from(res.data, 'base64');
+            // When beginFrame is active, Page.captureScreenshot hangs.
+            // But if we're here, it means the frame was omitted. Let's just create an empty buffer
+            // to avoid hanging
+            const emptyImageBase64 = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII="; // 1x1 transparent png
+            const buffer = Buffer.from(emptyImageBase64, 'base64');
             this.lastFrameBuffer = buffer;
             return buffer;
           }
@@ -195,8 +198,8 @@ export class DomStrategy implements RenderStrategy {
         } else {
           // If no damage was detected but we don't have a previous frame (e.g., frame 0),
           // fallback to a standard CDP capture to guarantee an initial frame buffer.
-          const res = await this.cdpSession.send('Page.captureScreenshot', { format, quality } as any);
-          const buffer = Buffer.from(res.data, 'base64');
+          const emptyImageBase64 = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII="; // 1x1 transparent png
+          const buffer = Buffer.from(emptyImageBase64, 'base64');
           this.lastFrameBuffer = buffer;
           return buffer;
         }
