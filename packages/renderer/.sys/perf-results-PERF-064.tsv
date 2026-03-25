@@ -1,2 +1,3 @@
 run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
 1	32.245	150	4.65	37.4	keep	fallback to dummy buffer on beginFrame omission
+1	32.100	150	4.67	36.5	keep	Appended lightweight Chromium flags to DEFAULT_BROWSER_ARGS

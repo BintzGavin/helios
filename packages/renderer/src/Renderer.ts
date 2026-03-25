@@ -15,7 +15,16 @@ const DEFAULT_BROWSER_ARGS = [
   '--disable-web-security',
   '--allow-file-access-from-files',
   '--enable-begin-frame-control',
-  '--run-all-compositor-stages-before-draw'
+  '--run-all-compositor-stages-before-draw',
+  '--disable-dev-shm-usage',
+  '--disable-extensions',
+  '--disable-default-apps',
+  '--disable-sync',
+  '--no-first-run',
+  '--mute-audio',
+  '--disable-background-networking',
+  '--disable-background-timer-throttling',
+  '--disable-breakpad'
 ];
 
 const GPU_DISABLED_ARGS = [
