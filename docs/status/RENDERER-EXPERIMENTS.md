@@ -3,6 +3,7 @@ Current best: 32.251s (baseline was 32.251s)
 Last updated by: PERF-038
 
 ## What Works
+- [PERF-057] Replaced `element.screenshot()` with CDP `HeadlessExperimental.beginFrame` in `DomStrategy.ts` using bounding box clipping when `targetSelector` is specified. Solves the issue where Playwright would hang indefinitely waiting for layout ticks while we ran Chromium in explicitly paused mode (`--enable-begin-frame-control`).
 - Eliminated array allocation in DOM traversal (PERF-052)
 - [PERF-050] Changed `frame.evaluate` in `SeekTimeDriver.ts` to implicitly return `undefined` rather than the serialized result of `window.__helios_seek`. This avoids V8 object serialization over IPC for non-main frames. Render time changed from ~32.1s to 31.943s.
 - [PERF-017] Discovered that the `SeekTimeDriver` script is already pre-compiled and injected via `page.addInitScript(initScript)` in `prepare()`. The `setTime` method correctly uses a lightweight `window.__helios_seek()` call over Playwright CDP, meaning this optimization was already natively implemented in the codebase. Baseline render time confirmed at 32.217s.

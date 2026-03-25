@@ -1,0 +1,2 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	39.633	150	3.78	36.1	keep	Fix Playwright element screenshot hanging by using CDP HeadlessExperimental.beginFrame for target selectors

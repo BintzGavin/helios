@@ -132,7 +132,45 @@ export class DomStrategy implements RenderStrategy {
       if (!element) {
         throw new Error(`Target element found but is not an element: ${this.options.targetSelector}`);
       }
-      return await element.screenshot(screenshotOptions);
+
+      if (this.cdpSession) {
+        const box = await element.boundingBox();
+        if (box) {
+          const screenshot: any = { format };
+          if ((format === 'jpeg' || format === 'webp') && quality !== undefined) {
+            screenshot.quality = quality;
+          }
+          screenshot.clip = {
+            x: box.x,
+            y: box.y,
+            width: box.width,
+            height: box.height,
+            scale: 1
+          };
+
+          const { screenshotData } = await this.cdpSession.send('HeadlessExperimental.beginFrame', {
+            screenshot
+          });
+
+          if (screenshotData) {
+            const buffer = Buffer.from(screenshotData, 'base64');
+            this.lastFrameBuffer = buffer;
+            return buffer;
+          } else if (this.lastFrameBuffer) {
+            return this.lastFrameBuffer;
+          } else {
+            // Wait for next explicit tick or fallback if damage driven logic fails
+            const res = await this.cdpSession.send('Page.captureScreenshot', { format, quality, clip: screenshot.clip } as any);
+            const buffer = Buffer.from(res.data, 'base64');
+            this.lastFrameBuffer = buffer;
+            return buffer;
+          }
+        }
+      }
+
+      const fallback = await element.screenshot(screenshotOptions);
+      this.lastFrameBuffer = fallback;
+      return fallback;
     }
 
     try {

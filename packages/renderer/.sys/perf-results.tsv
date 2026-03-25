@@ -4,3 +4,4 @@ run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
 3	33.472	150	4.48	4.4	keep	Fix HeadlessExperimental.beginFrame damage-driven omissions
 1	33.243	150	4.51	38.2	discard	PERF-048 skip serialization already implemented
 1	32.337	150	4.64	38.0	discard	PERF-051 skip serialization already implemented
+1	39.633	150	3.78	36.1	keep	Fix Playwright element screenshot hanging by using CDP HeadlessExperimental.beginFrame for target selectors
