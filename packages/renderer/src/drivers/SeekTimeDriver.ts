@@ -84,7 +84,9 @@ export class SeekTimeDriver implements TimeDriver {
               for (let j = 0; j < animations.length; j++) {
                 const anim = animations[j];
                 anim.currentTime = timeInMs;
-                anim.pause();
+                if (anim.playState !== 'paused') {
+                  anim.pause();
+                }
               }
             }
           }

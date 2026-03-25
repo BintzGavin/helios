@@ -13,6 +13,7 @@ async function verifyStability() {
     const page = await browser.newPage();
     const driver = new SeekTimeDriver(); // Default timeout
     await driver.init(page);
+    await driver.prepare(page);
 
     const htmlContent = `
       <!DOCTYPE html>
@@ -43,6 +44,7 @@ async function verifyStability() {
     const page = await browser.newPage();
     const driver = new SeekTimeDriver(200); // 200ms timeout
     await driver.init(page);
+    await driver.prepare(page);
 
     const htmlContent = `
       <!DOCTYPE html>
@@ -73,6 +75,7 @@ async function verifyStability() {
     const page = await browser.newPage();
     const driver = new SeekTimeDriver(5000); // 5s timeout
     await driver.init(page);
+    await driver.prepare(page);
 
     const htmlContent = `
       <!DOCTYPE html>

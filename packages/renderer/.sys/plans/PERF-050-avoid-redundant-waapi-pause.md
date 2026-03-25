@@ -1,11 +1,11 @@
 ---
 id: PERF-050
 slug: avoid-redundant-waapi-pause
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-28
-completed: ""
-result: ""
+completed: "2026-03-25"
+result: improved
 ---
 # PERF-050: Avoid Redundant WAAPI Pause
 
@@ -45,3 +45,9 @@ Run the Canvas baseline script to ensure basic rendering still works.
 ## Correctness Check
 Run the DOM render script and verify output exists, has valid video contents, and does not crash.
 `npx tsx packages/renderer/scripts/render-dom.ts`
+
+## Results Summary
+- **Best render time**: 32.221s (vs baseline 32.998s)
+- **Improvement**: 2.3%
+- **Kept experiments**: [PERF-050] Avoid redundant WAAPI pause
+- **Discarded experiments**: none
