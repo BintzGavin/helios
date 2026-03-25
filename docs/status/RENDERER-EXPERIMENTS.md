@@ -3,6 +3,7 @@ Current best: 32.251s (baseline was 32.251s)
 Last updated by: PERF-038
 
 ## What Works
+- [PERF-060] Verified that HeadlessExperimental.beginFrame for targetSelector is natively implemented and passing tests without hanging. No code changes required.
 - [PERF-050] Avoided redundant `anim.pause()` calls on Web Animations API (WAAPI) objects that are already paused in `SeekTimeDriver.ts`. This eliminates potential internal V8/Blink microtasks associated with the `pause()` method call when it's a no-op. Render time changed from ~33.000s to 32.221s.
 - [PERF-050] Avoided redundant `anim.pause()` calls on Web Animations API (WAAPI) objects that are already paused in `SeekTimeDriver.ts`. This eliminates potential internal V8/Blink microtasks associated with the `pause()` method call when it's a no-op. Render time changed from ~33.000s to 32.221s.
 - [PERF-057] Replaced `element.screenshot()` with CDP `HeadlessExperimental.beginFrame` in `DomStrategy.ts` using bounding box clipping when `targetSelector` is specified. Solves the issue where Playwright would hang indefinitely waiting for layout ticks while we ran Chromium in explicitly paused mode (`--enable-begin-frame-control`).
