@@ -5,3 +5,4 @@ run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
 1	33.243	150	4.51	38.2	discard	PERF-048 skip serialization already implemented
 1	32.337	150	4.64	38.0	discard	PERF-051 skip serialization already implemented
 1	39.633	150	3.78	36.1	keep	Fix Playwright element screenshot hanging by using CDP HeadlessExperimental.beginFrame for target selectors
+1	33.592	15	0.45	36.8	keep	Native beginFrame for targetSelector
