@@ -77,6 +77,7 @@ The player will automatically attempt to access `window.helios` on the iframe's 
 | `media-artist` | Artist name for OS Media Session. | - |
 | `media-album` | Album name for OS Media Session. | - |
 | `media-artwork` | URL of artwork for OS Media Session (defaults to poster). | - |
+| `crossorigin` | CORS setting for this media element. | - |
 
 ## User Interface
 
@@ -137,6 +138,7 @@ The `<helios-player>` element implements a subset of the HTMLMediaElement interf
 - `requestPictureInPicture(): Promise<PictureInPictureWindow>` - Requests Picture-in-Picture mode for the player.
 - `export(options?: HeliosExportOptions): Promise<void>` - Programmatically trigger client-side export.
 - `fastSeek(time: number): void` - Seeks to the specified time as fast as possible (currently equivalent to setting `currentTime`).
+- `canPlayType(type: string): CanPlayTypeResult` - Returns whether the player can play the specified media type.
 
 ### Properties
 
@@ -162,6 +164,14 @@ The `<helios-player>` element implements a subset of the HTMLMediaElement interf
 - `inputProps` (object): Get or set the input properties passed to the composition.
 - `playsInline` (boolean): Reflected playsinline attribute.
 - `disablePictureInPicture` (boolean): Hides the Picture-in-Picture button.
+- `error` (MediaError | null, read-only): The current media error.
+- `currentSrc` (string, read-only): The absolute URL of the chosen media resource.
+- `played` (TimeRanges, read-only): The ranges of the media source that the browser has played.
+- `defaultMuted` (boolean): Reflected defaultMuted attribute.
+- `defaultPlaybackRate` (number): The default rate of playback.
+- `preservesPitch` (boolean): Whether pitch should be preserved when altering playback speed.
+- `srcObject` (MediaProvider | null): The media provider object.
+- `crossOrigin` (string | null): The CORS setting for this media element.
 
 ## Events
 
@@ -179,6 +189,7 @@ The element dispatches the following custom events:
 - `loadeddata`: Fired when data for the current frame is available.
 - `canplay`: Fired when the browser can resume playback of the media.
 - `canplaythrough`: Fired when the browser estimates it can play through the media without buffering.
+- `resize`: Fired when the player dimensions change.
 
 ## Client-Side Export
 

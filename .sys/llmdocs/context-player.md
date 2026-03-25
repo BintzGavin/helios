@@ -1,6 +1,6 @@
 # Context: PLAYER
 
-**Version**: 0.77.3
+**Version**: 0.77.4
 
 ## Section A: Component Structure
 
@@ -77,6 +77,7 @@
 
 ## Section C: Attributes
 
+- `crossorigin`: CORS setting for this media element.
 - `src`: The URL of the Helios composition to load.
 - `width`: Overrides the preview width (Standard Media API parity).
 - `height`: Overrides the preview height (Standard Media API parity).
