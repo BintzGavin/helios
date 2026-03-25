@@ -3,6 +3,8 @@ Current best: 32.251s (baseline was 32.251s)
 Last updated by: PERF-038
 
 ## What Works
+- [PERF-050] Avoided redundant `anim.pause()` calls on Web Animations API (WAAPI) objects that are already paused in `SeekTimeDriver.ts`. This eliminates potential internal V8/Blink microtasks associated with the `pause()` method call when it's a no-op. Render time changed from ~33.000s to 32.221s.
+- [PERF-050] Avoided redundant `anim.pause()` calls on Web Animations API (WAAPI) objects that are already paused in `SeekTimeDriver.ts`. This eliminates potential internal V8/Blink microtasks associated with the `pause()` method call when it's a no-op. Render time changed from ~33.000s to 32.221s.
 - [PERF-057] Replaced `element.screenshot()` with CDP `HeadlessExperimental.beginFrame` in `DomStrategy.ts` using bounding box clipping when `targetSelector` is specified. Solves the issue where Playwright would hang indefinitely waiting for layout ticks while we ran Chromium in explicitly paused mode (`--enable-begin-frame-control`).
 - Eliminated array allocation in DOM traversal (PERF-052)
 - [PERF-050] Changed `frame.evaluate` in `SeekTimeDriver.ts` to implicitly return `undefined` rather than the serialized result of `window.__helios_seek`. This avoids V8 object serialization over IPC for non-main frames. Render time changed from ~32.1s to 31.943s.
@@ -43,8 +45,8 @@ Last updated by: PERF-038
 - [PERF-032] Can we overcome the damage-driven limitations of `Page.startScreencast` (which failed in PERF-026) by injecting a forced layout/paint toggle on every virtual time tick, allowing us to buffer continuous screencast frames and eliminate the IPC latency of polling `Page.captureScreenshot`?
 
 ## Performance Trajectory
-Current best: 31.000s (baseline was ~31.943s, -3.0%)
-Last updated by: PERF-053
+Current best: 31s (baseline was 31s, +0.0%)
+Last updated by: PERF-050
 
 ## What Works
 - [PERF-053] Eliminated redundant animation seeks in `SeekTimeDriver.ts`. By conditionally wrapping the second execution of `helios.seek()` and `gsap_timeline.seek()` inside the `if (promises.length > 0)` block, we avoid duplicating expensive layout/paint recalculations in Chromium's main thread on every frame where no async stability wait occurs (which is >99% of frames). Improved render time from ~31.9s to ~31.0s.
