@@ -1,11 +1,11 @@
 ---
 id: PERF-061
 slug: force-cpu-rasterization-dom
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-03-24
-completed: ""
-result: ""
+completed: "2026-03-25"
+result: "discarded"
 ---
 
 # PERF-061: Force CPU Rasterization for DOM Mode
@@ -67,3 +67,9 @@ All tests should pass without hanging and CSS rendering should remain intact.
 
 ## Prior Art
 - PERF-006 previously identified this approach but the exact \`GPU_DISABLED_ARGS\` logic was never strictly enforced for all DOM renders by default.
+
+## Results Summary
+- **Best render time**: 41.765s (vs baseline 41.770s)
+- **Improvement**: 0%
+- **Kept experiments**: []
+- **Discarded experiments**: [Force GPU_DISABLED_ARGS for DOM mode, Add --disable-dev-shm-usage]

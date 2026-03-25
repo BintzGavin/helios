@@ -1,0 +1,4 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	41.770	300	7.18	40.9	keep	baseline
+2	44.178	300	6.79	41.3	discard	force GPU_DISABLED_ARGS for dom mode
+3	41.765	300	7.18	42.4	discard	add --disable-dev-shm-usage

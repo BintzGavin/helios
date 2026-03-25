@@ -25,6 +25,10 @@ Last updated by: PERF-038
 - Defaulting intermediate image format to jpeg when no alpha channel is needed (~2.2% faster) (PERF-011)
 
 ## What Doesn't Work (and Why)
+- **Tried:** Forcing GPU_DISABLED_ARGS (`--disable-gpu`, `--disable-software-rasterizer`, `--disable-gpu-compositing`) for DOM mode rendering. Also tried with `--disable-dev-shm-usage`.
+  **Why it didn't work:** It resulted in slower render times (44s vs 41.7s baseline). The CPU rasterization overhead might actually be higher when trying to explicitly bypass SwiftShader, or SwiftShader is heavily optimized for our specific DOM structures.
+  **Plan ID:** PERF-061
+
 - [PERF-051] The proposed optimization to remove the implicit return in `frame.evaluate` to avoid V8 object serialization overhead was already present in the codebase (`([t, timeoutMs]) => { (window as any).__helios_seek(t, timeoutMs); }`). Render time remained around baseline (~32.3s). Discarded because no code changes were necessary.
 - **PERF-044: Scale Concurrency via Multiple Browser Instances**: Instantiating a new browser process for each worker rather than grouping pages in a single browser context did not meaningfully improve DOM rendering time (median 33.563s vs baseline ~32.4s). Furthermore, creating separate browser instances broke canvas mode testing completely, causing the `CdpTimeDriver` to fail to sync media properly when attempting to process multiple offscreen frames, leading to "Target page, context or browser has been closed" and EPIPE errors. Discarded to maintain a stable, single-browser pool structure.
 - **PERF-040: Asynchronous Runtime.evaluate**: Setting `awaitPromise: false` on `Runtime.evaluate` in `SeekTimeDriver.ts`. This provides no significant performance improvement (32.347s vs baseline 32.337s). Chromium's CDP queueing already allows us to pipeline `Runtime.evaluate` and `Page.captureScreenshot` efficiently via a Promise chain without needing to detach the evaluation execution entirely. Furthermore, previous tests have shown detaching this execution entirely breaks synchronous state initialization in verification tests (e.g. `window.__helios_seek is not a function`).
