@@ -1,7 +1,7 @@
 ---
 id: PERF-057
 slug: target-selector-beginframe
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-03-24
 completed: ""
