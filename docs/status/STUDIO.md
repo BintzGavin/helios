@@ -1,4 +1,4 @@
-**Version**: 0.119.5
+**Version**: 0.120.0
 
 **Posture**: ACTIVELY EXPANDING FOR V2
 
@@ -12,6 +12,7 @@
 - [v0.119.5] ✅ Completed: Refine CLI Component Removal - Verified existing implementation of component file deletion and interactive confirmation prompts in `helios remove` command (2026-10-23-STUDIO-Refine-CLI-Component-Removal.md).
 
 ## Recent Updates
+- [v0.120.0] ✅ Completed: Asset Move - Verified and documented drag-and-drop support for moving assets into folders within the Assets Panel.
 - [v0.119.3] ✅ Completed: Asset Move - Verified existing implementation of drag-and-drop support for moving assets into folders within the Studio Assets Panel.
 - [v0.119.2] ✅ Completed: Update Quickstart Guide - Verified that `docs/site/getting-started/quickstart.md` already uses `npx helios init` and is correctly documented.
 - [v0.119.1] ✅ Completed: Update Quickstart - Updated quickstart to mention supported frameworks for CLI init.

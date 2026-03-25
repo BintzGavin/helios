@@ -43,7 +43,7 @@ packages/studio/
 - **Stage**: Renders the `<helios-player>` with zoom, pan, and safe-area guides.
 - **Timeline**: Visual scrubber for playback, loop ranges, and markers.
 - **Props Editor**: Dynamically generated schema-aware inputs.
-- **Assets Panel**: File explorer for images, video, audio, fonts, and other assets.
+- **Assets Panel**: File explorer for images, video, audio, fonts, and other assets (supports drag-and-drop organization).
 - **Renders Panel**: Manages distributed render jobs and client-side exports.
 - **Components Panel**: Browse and install registry components.
 - **Diagnostics Panel**: Views system capabilities.
@@ -52,3 +52,4 @@ packages/studio/
 - Integrates with `packages/core` via `HeliosState` and `HeliosController`.
 - Integrates with `packages/player` by embedding `<helios-player>`.
 - Integrates with `packages/renderer` via `/api/render` to execute rendering tasks.
+- Integrates with filesystem operations via `discovery.ts` (e.g., `moveAsset`, `deleteAsset`, `renameAsset`) to manage workspace files.
