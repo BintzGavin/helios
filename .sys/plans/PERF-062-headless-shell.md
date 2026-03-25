@@ -1,11 +1,11 @@
 ---
 id: PERF-062
 slug: headless-shell
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-03-25
-completed: ""
-result: ""
+completed: "2024-03-25"
+result: "failed"
 ---
 
 # PERF-062: Headless Shell Exploration
@@ -45,3 +45,9 @@ Run the following targeted verification scripts to establish the new baseline an
 Run the DOM selector verification script:
 `npx tsx packages/renderer/tests/verify-dom-selector.ts`
 All tests should pass without hanging and CSS rendering should remain intact.
+
+## Results Summary
+- **Best render time**: N/A (baseline crashed)
+- **Improvement**: N/A
+- **Kept experiments**: None
+- **Discarded experiments**: Adding aggressive CPU-saving flags (`--disable-features=IsolateOrigins,site-per-process`, `--disable-site-isolation-trials`, `--disable-ipc-flooding-protection`) caused Chromium to completely hang on launch with the existing flags.
