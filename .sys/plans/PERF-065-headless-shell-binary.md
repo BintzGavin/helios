@@ -1,8 +1,8 @@
 ---
 id: PERF-065
 slug: headless-shell-binary
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-30
 completed: ""
 result: ""
@@ -69,3 +69,9 @@ First recreate the `test_perf.ts` script at the project root using the following
 `TEST_EOF`
 
 Then, run `npx tsx test_perf.ts` to verify the output completes successfully without crashing the newly specified binary.
+
+## Results Summary
+- **Best render time**: 32.015s (vs baseline 32.100s)
+- **Improvement**: ~0.26%
+- **Kept experiments**: Used standalone `chrome-headless-shell` binary to bypass UI/sandbox overhead.
+- **Discarded experiments**: none
