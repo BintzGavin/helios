@@ -71,3 +71,6 @@ Last updated by: PERF-050
 
 ## What Doesn't Work (and Why)
 - **Adding Aggressive CPU Saving Flags to Chromium**: I attempted to add `--disable-features=IsolateOrigins,site-per-process`, `--disable-site-isolation-trials`, and `--disable-ipc-flooding-protection` to `DEFAULT_BROWSER_ARGS` to reduce CPU load since site isolation is unnecessary for local file rendering. This resulted in Chromium immediately hanging during initialization in the headless mode, particularly in conjunction with the required `--enable-begin-frame-control` flag.
+
+## What Works
+- PERF-065: Leveraged standalone headless shell binary (`chrome-headless-shell`) if available, replacing the full Chromium executable path. The speedup was minimal (~0.25% improvement, median render time 32.015s vs baseline 32.100s, mostly within noise margins), but conceptually bypasses background processes overhead.

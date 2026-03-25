@@ -2,6 +2,7 @@ import { spawn } from 'child_process';
 import { chromium, ConsoleMessage } from 'playwright';
 import ffmpeg from '@ffmpeg-installer/ffmpeg';
 import os from 'os';
+import fs from 'fs';
 import { RenderStrategy } from './strategies/RenderStrategy.js';
 import { CanvasStrategy } from './strategies/CanvasStrategy.js';
 import { DomStrategy } from './strategies/DomStrategy.js';
@@ -53,9 +54,45 @@ export class Renderer {
     const config = this.options.browserConfig || {};
     const userArgs = config.args || [];
     const gpuArgs = config.gpu === false ? GPU_DISABLED_ARGS : [];
+
+    let executablePath = config.executablePath;
+
+    if (!executablePath) {
+      // Try to find chrome-headless-shell in common Playwright installation paths dynamically
+      const commonPaths = [
+        process.env.PLAYWRIGHT_BROWSERS_PATH,
+        `${os.homedir()}/.cache/ms-playwright`,
+        '/opt/jules/pipx/venvs/playwright/lib/python3.12/site-packages/playwright/driver/package/.local-browsers',
+        // Common global npm install locations for playwright browsers
+        '/usr/local/lib/node_modules/playwright/node_modules/playwright-core/.local-browsers',
+        '/usr/lib/node_modules/playwright/node_modules/playwright-core/.local-browsers'
+      ].filter(Boolean) as string[];
+
+      for (const basePath of commonPaths) {
+        if (!fs.existsSync(basePath)) continue;
+
+        try {
+          // Look for any chromium_headless_shell-* directory
+          const dirs = fs.readdirSync(basePath);
+          const shellDir = dirs.find(dir => dir.startsWith('chromium_headless_shell-'));
+
+          if (shellDir) {
+            // Check for the linux64 binary
+            const binaryPath = `${basePath}/${shellDir}/chrome-headless-shell-linux64/chrome-headless-shell`;
+            if (fs.existsSync(binaryPath)) {
+              executablePath = binaryPath;
+              break;
+            }
+          }
+        } catch (err) {
+          // Ignore permission/read errors for directories we can't access
+        }
+      }
+    }
+
     return {
       headless: config.headless ?? true,
-      executablePath: config.executablePath,
+      executablePath: executablePath,
       args: [...DEFAULT_BROWSER_ARGS, ...gpuArgs, ...userArgs],
     };
   }
