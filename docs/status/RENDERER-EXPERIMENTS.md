@@ -1,6 +1,6 @@
 ## Performance Trajectory
-Current best: 31.717s (baseline was 33.639s)
-Last updated by: PERF-070
+Current best: 33.840s (baseline was 45.588s, -25%)
+Last updated by: PERF-071
 
 ## What Works
 - [PERF-070] Cached `capture` options (`format`, `quality`, CDP params) and the resolved target element handle inside the `prepare` stage of `DomStrategy.ts`. This bypasses redundant string parsing, object allocations, and Playwright `evaluateHandle` script executions on every single frame. This resulted in a render time improvement (31.7s vs 33.6s baseline, an improvement of roughly ~2s or ~6%).
@@ -60,3 +60,4 @@ Last updated by: PERF-070
 
 ## Open Questions
 - [PERF-032] Can we overcome the damage-driven limitations of `Page.startScreencast` (which failed in PERF-026) by injecting a forced layout/paint toggle on every virtual time tick, allowing us to buffer continuous screencast frames and eliminate the IPC latency of polling `Page.captureScreenshot`?
+- [PERF-071] Reduced V8 Garbage Collection pressure in the hot loop by (1) caching Web Animations API (WAAPI) objects into a flat array in `SeekTimeDriver.ts` to avoid `scope.getAnimations()` allocations per frame, and (2) flattening the Node.js IPC Promise chain in `Renderer.ts` using an `async` IIFE wrapper. This significantly reduced memory churn and micro-stalls. Render time improved dramatically from the baseline of 45.588s to 33.840s (a ~25% improvement).

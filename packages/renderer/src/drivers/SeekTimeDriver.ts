@@ -50,10 +50,12 @@ export class SeekTimeDriver implements TimeDriver {
 
         // Cache for expensive DOM scans
         let cachedScopes = null;
+        let cachedAnimations = null;
         let cachedMediaElements = null;
 
         window.__helios_invalidate_cache = () => {
           cachedScopes = null;
+          cachedAnimations = null;
           cachedMediaElements = null;
         };
 
@@ -74,20 +76,26 @@ export class SeekTimeDriver implements TimeDriver {
           }
 
           // Synchronize document timeline (WAAPI) across all scopes
-          if (!cachedScopes) {
-            cachedScopes = findAllScopes(document);
-          }
-          for (let i = 0; i < cachedScopes.length; i++) {
-            const scope = cachedScopes[i];
-            if (scope.getAnimations) {
-              const animations = scope.getAnimations();
-              for (let j = 0; j < animations.length; j++) {
-                const anim = animations[j];
-                anim.currentTime = timeInMs;
-                if (anim.playState !== 'paused') {
-                  anim.pause();
+          if (!cachedAnimations) {
+            if (!cachedScopes) {
+              cachedScopes = findAllScopes(document);
+            }
+            cachedAnimations = [];
+            for (let i = 0; i < cachedScopes.length; i++) {
+              const scope = cachedScopes[i];
+              if (scope.getAnimations) {
+                const animations = scope.getAnimations();
+                for (let j = 0; j < animations.length; j++) {
+                  cachedAnimations.push(animations[j]);
                 }
               }
+            }
+          }
+          for (let i = 0; i < cachedAnimations.length; i++) {
+            const anim = cachedAnimations[i];
+            anim.currentTime = timeInMs;
+            if (anim.playState !== 'paused') {
+              anim.pause();
             }
           }
 
