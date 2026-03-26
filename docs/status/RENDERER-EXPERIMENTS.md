@@ -1,8 +1,9 @@
 ## Performance Trajectory
-Current best: 33.639s (baseline was 33.881s)
-Last updated by: PERF-069
+Current best: 31.717s (baseline was 33.639s)
+Last updated by: PERF-070
 
 ## What Works
+- [PERF-070] Cached `capture` options (`format`, `quality`, CDP params) and the resolved target element handle inside the `prepare` stage of `DomStrategy.ts`. This bypasses redundant string parsing, object allocations, and Playwright `evaluateHandle` script executions on every single frame. This resulted in a render time improvement (31.7s vs 33.6s baseline, an improvement of roughly ~2s or ~6%).
 - [PERF-068] Eliminated unconditional `Promise.all` allocations in `SeekTimeDriver.ts`'s `window.__helios_seek`. By conditionally allocating the `promises` array only when asynchronous waits actually occur (e.g., fonts loading, media seeking), we reduce memory allocations and garbage collection overhead in the V8 IPC layer on every frame. Render time improved by ~1.3% (from 33.893s to 33.446s).
 - [PERF-053] Eliminated redundant animation seeks in `SeekTimeDriver.ts`. By conditionally wrapping the second execution of `helios.seek()` and `gsap_timeline.seek()` inside the `if (promises.length > 0)` block, we avoid duplicating expensive layout/paint recalculations in Chromium's main thread on every frame where no async stability wait occurs (which is >99% of frames). Improved render time from ~31.9s to ~31.0s.
 - [PERF-049] Disabled `returnByValue` in `Runtime.evaluate` to skip object serialization over CDP IPC since the script `window.__helios_seek` returns `undefined`. In combination with commenting out synchronous console spam when GSAP timelines aren't found, this cut down idle IPC traffic during the frame capture loop and improved render time (from 33.258s to 32.161s, ~3.3% improvement).

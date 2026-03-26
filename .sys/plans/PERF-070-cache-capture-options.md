@@ -1,11 +1,11 @@
 ---
 id: PERF-070
 slug: cache-capture-options
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-24
-completed: ""
-result: ""
+completed: 2024-05-24
+result: improved
 ---
 # PERF-070: Cache Capture Options and Element Resolvers in DomStrategy
 
@@ -49,3 +49,9 @@ Verify that `verify-dom-selector.ts` and `verify-dom-media-attributes.ts` still 
 
 ## Canvas Smoke Test
 Run `verify-canvas-strategy.ts`.
+
+## Results Summary
+- **Best render time**: 31.717s (vs baseline 33.6s)
+- **Improvement**: ~6%
+- **Kept experiments**: Cached `capture` options and `targetElementHandle` in `prepare` of `DomStrategy.ts`.
+- **Discarded experiments**: none

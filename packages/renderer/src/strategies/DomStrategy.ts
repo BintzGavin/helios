@@ -12,6 +12,8 @@ export class DomStrategy implements RenderStrategy {
   private cleanupAudio: () => Promise<void> | void = () => {};
   private cdpSession: CDPSession | null = null;
   private lastFrameBuffer: Buffer | null = null;
+  private cdpScreenshotParams: any = null;
+  private targetElementHandle: any = null;
 
   constructor(private options: RendererOptions) {
     if (this.options.videoCodec === 'copy') {
@@ -80,18 +82,8 @@ export class DomStrategy implements RenderStrategy {
         color: { r: 0, g: 0, b: 0, a: 0 }
       }).catch(() => {});
     }
-  }
 
-  async capture(page: Page, frameTime: number): Promise<Buffer> {
-    const pixelFormat = this.options.pixelFormat || 'yuv420p';
-
-    // Check if the requested pixel format supports alpha
-    const hasAlpha = pixelFormat.includes('yuva') ||
-                     pixelFormat.includes('rgba') ||
-                     pixelFormat.includes('bgra') ||
-                     pixelFormat.includes('argb') ||
-                     pixelFormat.includes('abgr');
-
+    // Cache parameters
     let format = this.options.intermediateImageFormat;
     let quality = this.options.intermediateImageQuality;
 
@@ -119,6 +111,17 @@ export class DomStrategy implements RenderStrategy {
       screenshotOptions.omitBackground = hasAlpha;
     }
 
+    const cdpScreenshotParams: any = { format };
+    if ((format === 'jpeg' || format === 'webp') && quality !== undefined) {
+      cdpScreenshotParams.quality = quality;
+    }
+
+    this.cdpScreenshotParams = cdpScreenshotParams;
+
+    // We also save screenshotOptions on this since fallback uses it, though we could just keep it local if not used in capture.
+    // Actually fallback is used in capture when CDP is unavailable. Let's add it to this.
+    (this as any).fallbackScreenshotOptions = screenshotOptions;
+
     if (this.options.targetSelector) {
       const handle = await page.evaluateHandle((args) => {
         // @ts-ignore
@@ -132,14 +135,16 @@ export class DomStrategy implements RenderStrategy {
       if (!element) {
         throw new Error(`Target element found but is not an element: ${this.options.targetSelector}`);
       }
+      this.targetElementHandle = element;
+    }
+  }
 
+  async capture(page: Page, frameTime: number): Promise<Buffer> {
+    if (this.targetElementHandle) {
       if (this.cdpSession) {
-        const box = await element.boundingBox();
+        const box = await this.targetElementHandle.boundingBox();
         if (box) {
-          const screenshot: any = { format };
-          if ((format === 'jpeg' || format === 'webp') && quality !== undefined) {
-            screenshot.quality = quality;
-          }
+          const screenshot = { ...this.cdpScreenshotParams };
           screenshot.clip = {
             x: box.x,
             y: box.y,
@@ -171,20 +176,15 @@ export class DomStrategy implements RenderStrategy {
         }
       }
 
-      const fallback = await element.screenshot(screenshotOptions);
+      const fallback = await this.targetElementHandle.screenshot((this as any).fallbackScreenshotOptions);
       this.lastFrameBuffer = fallback;
       return fallback;
     }
 
     try {
       if (this.cdpSession) {
-        const screenshot: any = { format };
-        if ((format === 'jpeg' || format === 'webp') && quality !== undefined) {
-          screenshot.quality = quality;
-        }
-
         const { screenshotData } = await this.cdpSession.send('HeadlessExperimental.beginFrame', {
-          screenshot
+          screenshot: this.cdpScreenshotParams
         });
 
         if (screenshotData) {
@@ -204,7 +204,7 @@ export class DomStrategy implements RenderStrategy {
           return buffer;
         }
       } else {
-        const fallback = await page.screenshot(screenshotOptions);
+        const fallback = await page.screenshot((this as any).fallbackScreenshotOptions);
         this.lastFrameBuffer = fallback;
         return fallback;
       }
