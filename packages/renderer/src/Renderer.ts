@@ -273,7 +273,7 @@ export class Renderer {
       try {
         const captureLoop = async () => {
           let previousWritePromise: Promise<void> | undefined;
-          let framePromises: Promise<Buffer>[] = [];
+          let framePromises: Promise<Buffer>[] = new Array(totalFrames);
 
           // To maximize parallel page utilization, we need to decouple frame production from writing
           // such that multiple workers can be evaluating frames concurrently.
@@ -309,7 +309,7 @@ export class Renderer {
                   // Add a no-op catch handler to prevent unhandled promise rejections on abort/error
                   worker.activePromise = framePromise.catch(() => {}) as Promise<void>;
 
-                  framePromises.push(framePromise);
+                  framePromises[nextFrameToSubmit] = framePromise;
                   nextFrameToSubmit++;
               }
 
