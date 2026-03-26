@@ -12,3 +12,6 @@ run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
 2	33.446	150	4.48	38.1	keep	eliminate-promise-all-allocations
 1	45.588	150	3.29	37.8	keep	baseline
 2	33.840	150	4.43	37.6	keep	cached animations array and IIFE framePromise
+1	33.497	150	4.48	38.4	discard	PERF-066: Setting returnByValue: false on main frame CDP Runtime.evaluate
+2	33.394	150	4.49	37.9	discard	PERF-066: Setting returnByValue: false on main frame CDP Runtime.evaluate
+3	34.088	150	4.40	37.8	discard	PERF-066: Setting returnByValue: false on main frame CDP Runtime.evaluate

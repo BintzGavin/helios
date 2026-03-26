@@ -1,11 +1,11 @@
 ---
 id: PERF-066
 slug: cdp-evaluate-serialization
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-24
-completed: ""
-result: ""
+completed: "2024-10-24"
+result: "discarded"
 ---
 
 # PERF-066: Bypass CDP IPC Object Serialization Overhead
@@ -39,3 +39,9 @@ In the `setTime` function, locate the `this.cdpSession.send('Runtime.evaluate', 
 
 ## Correctness Check
 Instruct the Executor to run the WAAPI offset verification tests (`npx tsx packages/renderer/tests/verify-seek-driver-offsets.ts`) to ensure time synchronization is not broken.
+
+## Results Summary
+- **Best render time**: ~33.5s (baseline ~33.5s)
+- **Improvement**: 0%
+- **Kept experiments**: None
+- **Discarded experiments**: Setting `returnByValue: false` for `Runtime.evaluate` in `SeekTimeDriver.ts`. This was discarded because it was already present in the codebase.
