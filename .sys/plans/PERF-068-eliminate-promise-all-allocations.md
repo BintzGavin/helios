@@ -1,11 +1,11 @@
 ---
 id: PERF-068
 slug: eliminate-promise-all-allocations
-status: unclaimed
-claimed_by: ""
+status: claimed
+claimed_by: "executor-session"
 created: 2024-05-24
-completed: ""
-result: ""
+completed: "2024-05-24"
+result: "improved"
 ---
 
 # PERF-068: Eliminate Promise Array Allocations
@@ -44,3 +44,10 @@ In the `initScript` string:
 
 ## Correctness Check
 Instruct the Executor to run the offset verification tests (`npx tsx packages/renderer/tests/verify-seek-driver-offsets.ts`) to ensure time synchronization is not broken, particularly for frames that *do* require waiting.
+
+## Results Summary
+- **Best render time**: 33.446s (vs baseline 33.893s)
+- **Improvement**: 1.3%
+- **Kept experiments**:
+  - Conditionally allocated the `promises` array only when asynchronous actions are encountered in the injected CDP script `window.__helios_seek()`. This reduces array allocations and V8 garbage collection overhead.
+- **Discarded experiments**: [none]

@@ -116,10 +116,11 @@ export class SeekTimeDriver implements TimeDriver {
             }
           }
 
-          const promises = [];
+          let promises = null;
 
           // 1. Wait for Fonts
           if (t === 0 && document.fonts && document.fonts.ready) {
+            if (!promises) promises = [];
             promises.push(document.fonts.ready);
           }
 
@@ -133,6 +134,7 @@ export class SeekTimeDriver implements TimeDriver {
               syncMedia(el, t);
 
               if (el.seeking || el.readyState < 2) {
+                if (!promises) promises = [];
                 promises.push(new Promise((resolve) => {
                   let resolved = false;
                   const finish = () => {
@@ -156,11 +158,12 @@ export class SeekTimeDriver implements TimeDriver {
 
           // 3. Wait for Helios Stability (Custom Checks)
           if (typeof window.helios !== 'undefined' && typeof window.helios.waitUntilStable === 'function') {
+            if (!promises) promises = [];
             promises.push(window.helios.waitUntilStable());
           }
 
           // 4. Wait for stability with a safety timeout (only if needed)
-          if (promises.length > 0) {
+          if (promises && promises.length > 0) {
             let timeoutId;
             const allReady = Promise.all(promises);
             const timeoutPromise = new Promise((resolve) => {
