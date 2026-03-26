@@ -1,0 +1,3 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	33.548	150	4.47	38.1	keep	baseline
+2	33.594	150	4.47	38.2	keep	cache-drain-listeners
