@@ -9,6 +9,8 @@ import { AWS_DOCKERFILE_TEMPLATE, AWS_LAMBDA_HANDLER_TEMPLATE, AWS_SAM_TEMPLATE,
 import { WRANGLER_TOML_TEMPLATE, CLOUDFLARE_WORKER_TEMPLATE, README_CLOUDFLARE_TEMPLATE } from '../templates/cloudflare.js';
 import { FLY_TOML_TEMPLATE, FLY_DOCKERFILE_TEMPLATE, README_FLY_TEMPLATE } from '../templates/fly.js';
 import { KUBERNETES_JOB_TEMPLATE, README_KUBERNETES_TEMPLATE } from '../templates/kubernetes.js';
+import { AZURE_FUNCTION_JSON_TEMPLATE, AZURE_HOST_JSON_TEMPLATE, AZURE_LOCAL_SETTINGS_JSON_TEMPLATE, AZURE_INDEX_JS_TEMPLATE, README_AZURE_TEMPLATE } from '../templates/azure.js';
+
 
 export function registerDeployCommand(program: Command) {
   const deploy = program.command('deploy')
@@ -443,6 +445,141 @@ export function registerDeployCommand(program: Command) {
 
       console.log(chalk.blue('\nFly.io setup complete!'));
       console.log('See README-FLY.md for deployment instructions.');
+    });
+
+
+  deploy
+    .command('azure')
+    .description('Scaffold Azure Functions deployment configuration')
+    .action(async () => {
+      const cwd = process.cwd();
+      const hostJsonPath = path.join(cwd, 'host.json');
+      const localSettingsPath = path.join(cwd, 'local.settings.json');
+      const renderJobDirPath = path.join(cwd, 'RenderJob');
+      const functionJsonPath = path.join(renderJobDirPath, 'function.json');
+      const indexJsPath = path.join(renderJobDirPath, 'index.js');
+      const readmePath = path.join(cwd, 'README-AZURE.md');
+
+      console.log(chalk.blue('Scaffolding Azure Functions deployment files...'));
+
+      // host.json
+      let writeHostJson = true;
+      if (fs.existsSync(hostJsonPath)) {
+        const response = await prompts({
+          type: 'confirm',
+          name: 'value',
+          message: 'host.json already exists. Overwrite?',
+          initial: false
+        });
+
+        if (typeof response.value === 'undefined') {
+          console.log(chalk.yellow('\nOperation cancelled.'));
+          process.exit(0);
+        }
+        writeHostJson = response.value;
+      }
+      if (writeHostJson) {
+        fs.writeFileSync(hostJsonPath, AZURE_HOST_JSON_TEMPLATE);
+        console.log(chalk.green('✔ Created host.json'));
+      } else {
+        console.log(chalk.gray('Skipped host.json'));
+      }
+
+      // local.settings.json
+      let writeLocalSettings = true;
+      if (fs.existsSync(localSettingsPath)) {
+        const response = await prompts({
+          type: 'confirm',
+          name: 'value',
+          message: 'local.settings.json already exists. Overwrite?',
+          initial: false
+        });
+        if (typeof response.value === 'undefined') {
+          console.log(chalk.yellow('\nOperation cancelled.'));
+          process.exit(0);
+        }
+        writeLocalSettings = response.value;
+      }
+      if (writeLocalSettings) {
+        fs.writeFileSync(localSettingsPath, AZURE_LOCAL_SETTINGS_JSON_TEMPLATE);
+        console.log(chalk.green('✔ Created local.settings.json'));
+      } else {
+        console.log(chalk.gray('Skipped local.settings.json'));
+      }
+
+      // RenderJob directory and files
+      if (!fs.existsSync(renderJobDirPath)) {
+        fs.mkdirSync(renderJobDirPath, { recursive: true });
+      }
+
+      // RenderJob/function.json
+      let writeFunctionJson = true;
+      if (fs.existsSync(functionJsonPath)) {
+        const response = await prompts({
+          type: 'confirm',
+          name: 'value',
+          message: 'RenderJob/function.json already exists. Overwrite?',
+          initial: false
+        });
+        if (typeof response.value === 'undefined') {
+          console.log(chalk.yellow('\nOperation cancelled.'));
+          process.exit(0);
+        }
+        writeFunctionJson = response.value;
+      }
+      if (writeFunctionJson) {
+        fs.writeFileSync(functionJsonPath, AZURE_FUNCTION_JSON_TEMPLATE);
+        console.log(chalk.green('✔ Created RenderJob/function.json'));
+      } else {
+        console.log(chalk.gray('Skipped RenderJob/function.json'));
+      }
+
+      // RenderJob/index.js
+      let writeIndexJs = true;
+      if (fs.existsSync(indexJsPath)) {
+        const response = await prompts({
+          type: 'confirm',
+          name: 'value',
+          message: 'RenderJob/index.js already exists. Overwrite?',
+          initial: false
+        });
+        if (typeof response.value === 'undefined') {
+          console.log(chalk.yellow('\nOperation cancelled.'));
+          process.exit(0);
+        }
+        writeIndexJs = response.value;
+      }
+      if (writeIndexJs) {
+        fs.writeFileSync(indexJsPath, AZURE_INDEX_JS_TEMPLATE);
+        console.log(chalk.green('✔ Created RenderJob/index.js'));
+      } else {
+        console.log(chalk.gray('Skipped RenderJob/index.js'));
+      }
+
+      // README-AZURE.md
+      let writeReadme = true;
+      if (fs.existsSync(readmePath)) {
+        const response = await prompts({
+          type: 'confirm',
+          name: 'value',
+          message: 'README-AZURE.md already exists. Overwrite?',
+          initial: false
+        });
+        if (typeof response.value === 'undefined') {
+          console.log(chalk.yellow('\nOperation cancelled.'));
+          process.exit(0);
+        }
+        writeReadme = response.value;
+      }
+      if (writeReadme) {
+        fs.writeFileSync(readmePath, README_AZURE_TEMPLATE);
+        console.log(chalk.green('✔ Created README-AZURE.md'));
+      } else {
+        console.log(chalk.gray('Skipped README-AZURE.md'));
+      }
+
+      console.log(chalk.blue('\nAzure Functions setup complete!'));
+      console.log('See README-AZURE.md for deployment instructions.');
     });
 
   deploy
