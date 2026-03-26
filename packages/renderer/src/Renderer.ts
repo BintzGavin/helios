@@ -3,6 +3,7 @@ import { chromium, ConsoleMessage } from 'playwright';
 import ffmpeg from '@ffmpeg-installer/ffmpeg';
 import os from 'os';
 import fs from 'fs';
+import { once } from 'events';
 import { RenderStrategy } from './strategies/RenderStrategy.js';
 import { CanvasStrategy } from './strategies/CanvasStrategy.js';
 import { DomStrategy } from './strategies/DomStrategy.js';
@@ -340,30 +341,18 @@ export class Renderer {
               });
 
               if (!canWriteMore) {
-                  previousWritePromise = new Promise<void>((resolve, reject) => {
-                      const onDrain = () => {
-                          cleanup();
-                          resolve();
-                      };
-                      const onError = (err: Error) => {
-                          cleanup();
-                          reject(err);
-                      };
-                      const onClose = () => {
-                          cleanup();
-                          reject(new Error('FFmpeg stdin closed before drain'));
-                      };
+                  const ac = new AbortController();
+                  const onClose = () => ac.abort(new Error('FFmpeg stdin closed before drain'));
+                  ffmpegProcess.stdin.once('close', onClose);
 
-                      const cleanup = () => {
-                          ffmpegProcess.stdin.removeListener('drain', onDrain);
-                          ffmpegProcess.stdin.removeListener('error', onError);
+                  previousWritePromise = once(ffmpegProcess.stdin, 'drain', { signal: ac.signal })
+                      .then(() => {
                           ffmpegProcess.stdin.removeListener('close', onClose);
-                      };
-
-                      ffmpegProcess.stdin.once('drain', onDrain);
-                      ffmpegProcess.stdin.once('error', onError);
-                      ffmpegProcess.stdin.once('close', onClose);
-                  });
+                      })
+                      .catch(err => {
+                          ffmpegProcess.stdin.removeListener('close', onClose);
+                          throw err;
+                      });
               } else {
                   previousWritePromise = undefined;
               }
@@ -390,30 +379,18 @@ export class Renderer {
             });
 
             if (!canWriteMore) {
-                await new Promise<void>((resolve, reject) => {
-                    const onDrain = () => {
-                        cleanup();
-                        resolve();
-                    };
-                    const onError = (err: Error) => {
-                        cleanup();
-                        reject(err);
-                    };
-                    const onClose = () => {
-                        cleanup();
-                        reject(new Error('FFmpeg stdin closed before drain'));
-                    };
+                const ac = new AbortController();
+                const onClose = () => ac.abort(new Error('FFmpeg stdin closed before drain'));
+                ffmpegProcess.stdin.once('close', onClose);
 
-                    const cleanup = () => {
-                        ffmpegProcess.stdin.removeListener('drain', onDrain);
-                        ffmpegProcess.stdin.removeListener('error', onError);
+                await once(ffmpegProcess.stdin, 'drain', { signal: ac.signal })
+                    .then(() => {
                         ffmpegProcess.stdin.removeListener('close', onClose);
-                    };
-
-                    ffmpegProcess.stdin.once('drain', onDrain);
-                    ffmpegProcess.stdin.once('error', onError);
-                    ffmpegProcess.stdin.once('close', onClose);
-                });
+                    })
+                    .catch(err => {
+                        ffmpegProcess.stdin.removeListener('close', onClose);
+                        throw err;
+                    });
             }
           }
 
