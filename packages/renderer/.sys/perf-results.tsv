@@ -15,3 +15,204 @@ run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
 1	33.497	150	4.48	38.4	discard	PERF-066: Setting returnByValue: false on main frame CDP Runtime.evaluate
 2	33.394	150	4.49	37.9	discard	PERF-066: Setting returnByValue: false on main frame CDP Runtime.evaluate
 3	34.088	150	4.40	37.8	discard	PERF-066: Setting returnByValue: false on main frame CDP Runtime.evaluate
+Starting render for composition: file:///app/output/example-build/examples/simple-animation/composition.html (Mode: dom)
+[Helios Diagnostics] FFmpeg Version: N-47683-g0e8eb07980-static
+[Helios Diagnostics] FFmpeg HW Accel: vdpau, vaapi
+Initializing pool of 6 pages...
+Browser closed.
+Cleaning up strategy resources...
+Starting render for composition: file:///app/output/example-build/examples/simple-animation/composition.html (Mode: dom)
+[Helios Diagnostics] FFmpeg Version: N-47683-g0e8eb07980-static
+[Helios Diagnostics] FFmpeg HW Accel: vdpau, vaapi
+Initializing pool of 6 pages...
+PAGE LOG [1]: [Helios] Math.random() has been seeded for deterministic rendering. Seed: 305419896
+PAGE LOG [4]: [Helios] Math.random() has been seeded for deterministic rendering. Seed: 305419896
+PAGE LOG [0]: [Helios] Math.random() has been seeded for deterministic rendering. Seed: 305419896
+PAGE LOG [2]: [Helios] Math.random() has been seeded for deterministic rendering. Seed: 305419896
+PAGE LOG [3]: [Helios] Math.random() has been seeded for deterministic rendering. Seed: 305419896
+PAGE LOG [5]: [Helios] Math.random() has been seeded for deterministic rendering. Seed: 305419896
+PAGE LOG [0]: Failed to load resource: net::ERR_FILE_NOT_FOUND
+PAGE LOG [0]: Failed to load resource: net::ERR_FILE_NOT_FOUND
+PAGE LOG [4]: Failed to load resource: net::ERR_FILE_NOT_FOUND
+PAGE LOG [4]: Failed to load resource: net::ERR_FILE_NOT_FOUND
+PAGE LOG [1]: Failed to load resource: net::ERR_FILE_NOT_FOUND
+PAGE LOG [1]: Failed to load resource: net::ERR_FILE_NOT_FOUND
+PAGE LOG [3]: Failed to load resource: net::ERR_FILE_NOT_FOUND
+PAGE LOG [3]: Failed to load resource: net::ERR_FILE_NOT_FOUND
+PAGE LOG [5]: Failed to load resource: net::ERR_FILE_NOT_FOUND
+PAGE LOG [5]: Failed to load resource: net::ERR_FILE_NOT_FOUND
+PAGE LOG [1]: Failed to load resource: net::ERR_FILE_NOT_FOUND
+PAGE LOG [0]: Failed to load resource: net::ERR_FILE_NOT_FOUND
+PAGE LOG [2]: Failed to load resource: net::ERR_FILE_NOT_FOUND
+PAGE LOG [2]: Failed to load resource: net::ERR_FILE_NOT_FOUND
+PAGE LOG [4]: Failed to load resource: net::ERR_FILE_NOT_FOUND
+PAGE LOG [2]: Failed to load resource: net::ERR_FILE_NOT_FOUND
+PAGE LOG [3]: Failed to load resource: net::ERR_FILE_NOT_FOUND
+PAGE LOG [5]: Failed to load resource: net::ERR_FILE_NOT_FOUND
+All pages loaded and prepared.
+Running diagnostics on first page...
+PAGE LOG [0]: [Helios Diagnostics] Checking DOM environment...
+[Helios Diagnostics] {
+  "waapi": true,
+  "animations": "supported",
+  "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+  "viewport": {
+    "width": 1280,
+    "height": 720,
+    "dpr": 1
+  },
+  "webgl": true
+}
+Spawning FFmpeg: /app/node_modules/@ffmpeg-installer/linux-x64/ffmpeg -y -f image2pipe -framerate 30 -i - -map 0:v -c:v libx264 -pix_fmt yuv420p -movflags +faststart /app/dom-animation.mp4
+Starting capture for 150 frames...
+Progress: Rendered 15 / 150 frames
+Progress: Rendered 30 / 150 frames
+Progress: Rendered 45 / 150 frames
+Progress: Rendered 60 / 150 frames
+Progress: Rendered 75 / 150 frames
+Progress: Rendered 90 / 150 frames
+Progress: Rendered 105 / 150 frames
+Progress: Rendered 120 / 150 frames
+Progress: Rendered 135 / 150 frames
+Finishing render strategy...
+Finished sending frames. Closing FFmpeg stdin.
+FFmpeg has finished processing.
+Browser closed.
+Cleaning up strategy resources...
+Render complete! Output saved to: /app/dom-animation.mp4
+---
+render_time_s:      34.268
+total_frames:       150
+fps_effective:      4.38
+peak_mem_mb:        38.3
+Starting render for composition: file:///app/output/example-build/examples/simple-animation/composition.html (Mode: dom)
+[Helios Diagnostics] FFmpeg Version: N-47683-g0e8eb07980-static
+[Helios Diagnostics] FFmpeg HW Accel: vdpau, vaapi
+Initializing pool of 6 pages...
+PAGE LOG [0]: [Helios] Math.random() has been seeded for deterministic rendering. Seed: 305419896
+PAGE LOG [0]: Failed to load resource: net::ERR_FILE_NOT_FOUND
+PAGE LOG [0]: Failed to load resource: net::ERR_FILE_NOT_FOUND
+PAGE LOG [2]: [Helios] Math.random() has been seeded for deterministic rendering. Seed: 305419896
+PAGE LOG [0]: Failed to load resource: net::ERR_FILE_NOT_FOUND
+PAGE LOG [3]: [Helios] Math.random() has been seeded for deterministic rendering. Seed: 305419896
+PAGE LOG [2]: Failed to load resource: net::ERR_FILE_NOT_FOUND
+PAGE LOG [3]: Failed to load resource: net::ERR_FILE_NOT_FOUND
+PAGE LOG [2]: Failed to load resource: net::ERR_FILE_NOT_FOUND
+PAGE LOG [2]: Failed to load resource: net::ERR_FILE_NOT_FOUND
+PAGE LOG [1]: [Helios] Math.random() has been seeded for deterministic rendering. Seed: 305419896
+PAGE LOG [3]: Failed to load resource: net::ERR_FILE_NOT_FOUND
+PAGE LOG [3]: Failed to load resource: net::ERR_FILE_NOT_FOUND
+PAGE LOG [5]: [Helios] Math.random() has been seeded for deterministic rendering. Seed: 305419896
+PAGE LOG [1]: Failed to load resource: net::ERR_FILE_NOT_FOUND
+PAGE LOG [1]: Failed to load resource: net::ERR_FILE_NOT_FOUND
+PAGE LOG [1]: Failed to load resource: net::ERR_FILE_NOT_FOUND
+PAGE LOG [4]: [Helios] Math.random() has been seeded for deterministic rendering. Seed: 305419896
+PAGE LOG [4]: Failed to load resource: net::ERR_FILE_NOT_FOUND
+PAGE LOG [5]: Failed to load resource: net::ERR_FILE_NOT_FOUND
+PAGE LOG [5]: Failed to load resource: net::ERR_FILE_NOT_FOUND
+PAGE LOG [5]: Failed to load resource: net::ERR_FILE_NOT_FOUND
+PAGE LOG [4]: Failed to load resource: net::ERR_FILE_NOT_FOUND
+PAGE LOG [4]: Failed to load resource: net::ERR_FILE_NOT_FOUND
+All pages loaded and prepared.
+Running diagnostics on first page...
+PAGE LOG [0]: [Helios Diagnostics] Checking DOM environment...
+[Helios Diagnostics] {
+  "waapi": true,
+  "animations": "supported",
+  "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+  "viewport": {
+    "width": 1280,
+    "height": 720,
+    "dpr": 1
+  },
+  "webgl": true
+}
+Spawning FFmpeg: /app/node_modules/@ffmpeg-installer/linux-x64/ffmpeg -y -f image2pipe -framerate 30 -i - -map 0:v -c:v libx264 -pix_fmt yuv420p -movflags +faststart /app/dom-animation.mp4
+Starting capture for 150 frames...
+Progress: Rendered 15 / 150 frames
+Progress: Rendered 30 / 150 frames
+Progress: Rendered 45 / 150 frames
+Progress: Rendered 60 / 150 frames
+Progress: Rendered 75 / 150 frames
+Progress: Rendered 90 / 150 frames
+Progress: Rendered 105 / 150 frames
+Progress: Rendered 120 / 150 frames
+Progress: Rendered 135 / 150 frames
+Finishing render strategy...
+Finished sending frames. Closing FFmpeg stdin.
+FFmpeg has finished processing.
+Browser closed.
+Cleaning up strategy resources...
+Render complete! Output saved to: /app/dom-animation.mp4
+---
+render_time_s:      33.983
+total_frames:       150
+fps_effective:      4.41
+peak_mem_mb:        38.4
+Starting render for composition: file:///app/output/example-build/examples/simple-animation/composition.html (Mode: dom)
+[Helios Diagnostics] FFmpeg Version: N-47683-g0e8eb07980-static
+[Helios Diagnostics] FFmpeg HW Accel: vdpau, vaapi
+Initializing pool of 6 pages...
+PAGE LOG [1]: [Helios] Math.random() has been seeded for deterministic rendering. Seed: 305419896
+PAGE LOG [0]: [Helios] Math.random() has been seeded for deterministic rendering. Seed: 305419896
+PAGE LOG [2]: [Helios] Math.random() has been seeded for deterministic rendering. Seed: 305419896
+PAGE LOG [0]: Failed to load resource: net::ERR_FILE_NOT_FOUND
+PAGE LOG [0]: Failed to load resource: net::ERR_FILE_NOT_FOUND
+PAGE LOG [0]: Failed to load resource: net::ERR_FILE_NOT_FOUND
+PAGE LOG [1]: Failed to load resource: net::ERR_FILE_NOT_FOUND
+PAGE LOG [1]: Failed to load resource: net::ERR_FILE_NOT_FOUND
+PAGE LOG [1]: Failed to load resource: net::ERR_FILE_NOT_FOUND
+PAGE LOG [5]: [Helios] Math.random() has been seeded for deterministic rendering. Seed: 305419896
+PAGE LOG [3]: [Helios] Math.random() has been seeded for deterministic rendering. Seed: 305419896
+PAGE LOG [2]: Failed to load resource: net::ERR_FILE_NOT_FOUND
+PAGE LOG [2]: Failed to load resource: net::ERR_FILE_NOT_FOUND
+PAGE LOG [2]: Failed to load resource: net::ERR_FILE_NOT_FOUND
+PAGE LOG [4]: [Helios] Math.random() has been seeded for deterministic rendering. Seed: 305419896
+PAGE LOG [5]: Failed to load resource: net::ERR_FILE_NOT_FOUND
+PAGE LOG [3]: Failed to load resource: net::ERR_FILE_NOT_FOUND
+PAGE LOG [5]: Failed to load resource: net::ERR_FILE_NOT_FOUND
+PAGE LOG [5]: Failed to load resource: net::ERR_FILE_NOT_FOUND
+PAGE LOG [3]: Failed to load resource: net::ERR_FILE_NOT_FOUND
+PAGE LOG [3]: Failed to load resource: net::ERR_FILE_NOT_FOUND
+PAGE LOG [4]: Failed to load resource: net::ERR_FILE_NOT_FOUND
+PAGE LOG [4]: Failed to load resource: net::ERR_FILE_NOT_FOUND
+PAGE LOG [4]: Failed to load resource: net::ERR_FILE_NOT_FOUND
+All pages loaded and prepared.
+Running diagnostics on first page...
+PAGE LOG [0]: [Helios Diagnostics] Checking DOM environment...
+[Helios Diagnostics] {
+  "waapi": true,
+  "animations": "supported",
+  "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+  "viewport": {
+    "width": 1280,
+    "height": 720,
+    "dpr": 1
+  },
+  "webgl": true
+}
+Spawning FFmpeg: /app/node_modules/@ffmpeg-installer/linux-x64/ffmpeg -y -f image2pipe -framerate 30 -i - -map 0:v -c:v libx264 -pix_fmt yuv420p -movflags +faststart /app/dom-animation.mp4
+Starting capture for 150 frames...
+Progress: Rendered 15 / 150 frames
+Progress: Rendered 30 / 150 frames
+Progress: Rendered 45 / 150 frames
+Progress: Rendered 60 / 150 frames
+Progress: Rendered 75 / 150 frames
+Progress: Rendered 90 / 150 frames
+Progress: Rendered 105 / 150 frames
+Progress: Rendered 120 / 150 frames
+Progress: Rendered 135 / 150 frames
+Finishing render strategy...
+Finished sending frames. Closing FFmpeg stdin.
+FFmpeg has finished processing.
+Browser closed.
+Cleaning up strategy resources...
+Render complete! Output saved to: /app/dom-animation.mp4
+---
+render_time_s:      33.595
+total_frames:       150
+fps_effective:      4.46
+peak_mem_mb:        38.3
+1	33.820	150	4.43	490.1	discard	events.once drain handler
+2	33.840	150	4.43	490.1	discard	events.once drain handler
+3	33.830	150	4.43	490.1	discard	events.once drain handler

@@ -1,7 +1,7 @@
 ---
 id: PERF-074
 slug: events-once
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-03-27
 completed: ""
