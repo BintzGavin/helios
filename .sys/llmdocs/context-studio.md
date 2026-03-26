@@ -52,4 +52,4 @@ packages/studio/
 - Integrates with `packages/core` via `HeliosState` and `HeliosController`.
 - Integrates with `packages/player` by embedding `<helios-player>`.
 - Integrates with `packages/renderer` via `/api/render` to execute rendering tasks.
-- Integrates with filesystem operations via `discovery.ts` (e.g., `moveAsset`, `deleteAsset`, `renameAsset`) to manage workspace files.
+- Integrates with filesystem operations via `discovery.ts` (e.g., `moveAsset(rootDir: string, sourceId: string, targetFolderId: string): AssetInfo`, `deleteAsset`, `renameAsset`) to manage workspace files.

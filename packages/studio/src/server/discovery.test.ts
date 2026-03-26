@@ -1,6 +1,6 @@
 // @vitest-environment node
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { findAssets, deleteComposition, createComposition, findCompositions, renameComposition, createDirectory, deleteAsset } from './discovery';
+import { findAssets, deleteComposition, createComposition, findCompositions, renameComposition, createDirectory, deleteAsset, moveAsset } from './discovery';
 import fs from 'fs';
 import path from 'path';
 
@@ -18,6 +18,7 @@ vi.mock('fs', async (importOriginal) => {
             rmSync: vi.fn(),
             renameSync: vi.fn(),
             cpSync: vi.fn(),
+            statSync: vi.fn(),
             promises: {
                 readdir: vi.fn(),
                 readFile: vi.fn(),
@@ -461,6 +462,122 @@ describe('renameComposition', () => {
 
         await expect(renameComposition('.', id, newName)).rejects.toThrow(/not found/);
     });
+});
+
+describe('moveAsset', () => {
+  const originalEnv = process.env;
+
+  beforeEach(() => {
+    vi.resetAllMocks();
+    process.env = { ...originalEnv, HELIOS_PROJECT_ROOT: path.resolve('/mock/project') };
+
+    vi.mocked(fs.existsSync).mockImplementation((p) => {
+        const fullPath = String(p);
+        if (fullPath === path.resolve('/mock/project/public')) return true;
+        if (fullPath === path.resolve('/mock/project/public/source.png')) return true;
+        if (fullPath === path.resolve('/mock/project/public/folder')) return true;
+        if (fullPath === path.resolve('/mock/project/public/folder/nested')) return true;
+        return false;
+    });
+
+    vi.mocked(fs.statSync).mockImplementation((p) => {
+        const fullPath = String(p);
+        return {
+            isDirectory: () => !fullPath.endsWith('.png') && !fullPath.endsWith('.txt'),
+            mtimeMs: 1000,
+            size: 1024
+        } as fs.Stats;
+    });
+  });
+
+  afterEach(() => {
+    process.env = originalEnv;
+  });
+
+  it('should move asset into a folder', () => {
+      const sourceId = path.resolve('/mock/project/public/source.png');
+      const targetFolderId = path.resolve('/mock/project/public/folder');
+
+      const result = moveAsset('.', sourceId, targetFolderId);
+
+      expect(fs.renameSync).toHaveBeenCalledWith(
+          sourceId,
+          path.resolve('/mock/project/public/folder/source.png')
+      );
+      expect(result.id).toBe(path.resolve('/mock/project/public/folder/source.png').replace(/\\/g, '/'));
+      expect(result.relativePath).toBe('folder/source.png');
+  });
+
+  it('should throw error if source does not exist', () => {
+      const sourceId = path.resolve('/mock/project/public/missing.png');
+      const targetFolderId = path.resolve('/mock/project/public/folder');
+
+      expect(() => moveAsset('.', sourceId, targetFolderId)).toThrow(/not found/);
+  });
+
+  it('should throw error if target folder does not exist', () => {
+      const sourceId = path.resolve('/mock/project/public/source.png');
+      const targetFolderId = path.resolve('/mock/project/public/missing-folder');
+
+      expect(() => moveAsset('.', sourceId, targetFolderId)).toThrow(/not found/);
+  });
+
+  it('should throw error if target is not a directory', () => {
+      // Mock source.png to be a non-directory but exists
+      const sourceId = path.resolve('/mock/project/public/source.png');
+      // Create a target that is also a file
+      vi.mocked(fs.existsSync).mockImplementation((p) => {
+          const fullPath = String(p);
+          if (fullPath === path.resolve('/mock/project/public')) return true;
+          if (fullPath === path.resolve('/mock/project/public/source.png')) return true;
+          if (fullPath === path.resolve('/mock/project/public/target.png')) return true;
+          return false;
+      });
+
+      const targetFolderId = path.resolve('/mock/project/public/target.png');
+
+      expect(() => moveAsset('.', sourceId, targetFolderId)).toThrow(/is not a directory/);
+  });
+
+  it('should throw error if moving a folder into itself', () => {
+      const sourceId = path.resolve('/mock/project/public/folder');
+      const targetFolderId = path.resolve('/mock/project/public/folder/nested');
+
+      // The destination folder exists
+      vi.mocked(fs.existsSync).mockImplementation((p) => {
+          const fullPath = String(p);
+          if (fullPath === path.resolve('/mock/project/public')) return true;
+          if (fullPath === path.resolve('/mock/project/public/folder')) return true;
+          if (fullPath === path.resolve('/mock/project/public/folder/nested')) return true;
+          return false;
+      });
+
+      expect(() => moveAsset('.', sourceId, targetFolderId)).toThrow(/Cannot move folder/);
+  });
+
+  it('should throw error if destination asset already exists', () => {
+      const sourceId = path.resolve('/mock/project/public/source.png');
+      const targetFolderId = path.resolve('/mock/project/public/folder');
+      const destPath = path.resolve('/mock/project/public/folder/source.png');
+
+      vi.mocked(fs.existsSync).mockImplementation((p) => {
+          const fullPath = String(p);
+          if (fullPath === path.resolve('/mock/project/public')) return true;
+          if (fullPath === sourceId) return true;
+          if (fullPath === targetFolderId) return true;
+          if (fullPath === destPath) return true; // file already exists in target
+          return false;
+      });
+
+      expect(() => moveAsset('.', sourceId, targetFolderId)).toThrow(/already exists in target folder/);
+  });
+
+  it('should prevent path traversal outside project root', () => {
+      const sourceId = path.resolve('/mock/project/public/source.png');
+      const targetFolderId = path.resolve('/mock/outside');
+
+      expect(() => moveAsset('.', sourceId, targetFolderId)).toThrow(/Access denied/);
+  });
 });
 
 describe('deleteAsset', () => {
