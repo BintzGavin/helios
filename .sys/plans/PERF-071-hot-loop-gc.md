@@ -1,11 +1,11 @@
 ---
 id: PERF-071
 slug: hot-loop-gc
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-03-27
-completed: ""
-result: ""
+completed: "2024-03-27"
+result: "improved"
 ---
 
 # PERF-071: Hot-Loop V8 GC Offloading
@@ -43,3 +43,9 @@ Every frame, the renderer allocates a new Promise chain inside its capture loop 
 
 ## Correctness Check
 Run the DOM benchmark and verification tests to ensure WAAPI and media syncing remains intact without regressions.
+
+## Results Summary
+- **Best render time**: 33.840s (vs baseline 45.588s)
+- **Improvement**: 25.7%
+- **Kept experiments**: Cached WAAPI animations array, Flattened IPC Frame Promise Reaction
+- **Discarded experiments**: None

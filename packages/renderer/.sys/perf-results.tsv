@@ -10,3 +10,5 @@ run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
 71	41.215	30	0.73	7.6	discard	conditionally return Promise in __helios_seek
 1	33.893	150	4.43	37.3	keep	baseline
 2	33.446	150	4.48	38.1	keep	eliminate-promise-all-allocations
+1	45.588	150	3.29	37.8	keep	baseline
+2	33.840	150	4.43	37.6	keep	cached animations array and IIFE framePromise
