@@ -1,0 +1,4 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	35.253	150	4.25	38.3	keep	no async seek and iife
+2	33.492	150	4.48	37.2	keep	no async seek and iife
+3	33.639	150	4.46	37.9	keep	no async seek and iife

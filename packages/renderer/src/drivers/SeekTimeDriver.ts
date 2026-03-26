@@ -57,7 +57,7 @@ export class SeekTimeDriver implements TimeDriver {
           cachedMediaElements = null;
         };
 
-        window.__helios_seek = (t, timeoutMs) => {
+        window.__helios_seek = async (t, timeoutMs) => {
           let gsapTimelineSeeked = false;
           let heliosSeeked = false;
           const timeInMs = t * 1000;
@@ -164,35 +164,33 @@ export class SeekTimeDriver implements TimeDriver {
 
           // 4. Wait for stability with a safety timeout (only if needed)
           if (promises && promises.length > 0) {
-            return (async () => {
-              let timeoutId;
-              const allReady = Promise.all(promises);
-              const timeoutPromise = new Promise((resolve) => {
-                timeoutId = setTimeout(resolve, timeoutMs);
-              });
-              await Promise.race([allReady, timeoutPromise]);
-              clearTimeout(timeoutId);
+            let timeoutId;
+            const allReady = Promise.all(promises);
+            const timeoutPromise = new Promise((resolve) => {
+              timeoutId = setTimeout(resolve, timeoutMs);
+            });
+            await Promise.race([allReady, timeoutPromise]);
+            clearTimeout(timeoutId);
 
-              // 5. After stability, ensure GSAP timelines are seeked again in case async changes occurred
-              if (gsapTimelineSeeked && window.__helios_gsap_timeline__ && typeof window.__helios_gsap_timeline__.seek === 'function') {
-                try {
-                  window.__helios_gsap_timeline__.seek(t);
-                } catch (gsapError) {
-                  console.error('[SeekTimeDriver] Error seeking GSAP timeline:', gsapError);
-                }
+            // 5. After stability, ensure GSAP timelines are seeked again in case async changes occurred
+            if (gsapTimelineSeeked && window.__helios_gsap_timeline__ && typeof window.__helios_gsap_timeline__.seek === 'function') {
+              try {
+                window.__helios_gsap_timeline__.seek(t);
+              } catch (gsapError) {
+                console.error('[SeekTimeDriver] Error seeking GSAP timeline:', gsapError);
               }
+            }
 
-              if (heliosSeeked && typeof window.helios !== 'undefined' && window.helios.seek) {
-                try {
-                  const helios = window.helios;
-                  const fps = helios.fps ? helios.fps.value : 30;
-                  const frame = Math.floor(t * fps);
-                  helios.seek(frame);
-                } catch (e) {
-                  console.warn('[SeekTimeDriver] Error seeking Helios:', e);
-                }
+            if (heliosSeeked && typeof window.helios !== 'undefined' && window.helios.seek) {
+              try {
+                const helios = window.helios;
+                const fps = helios.fps ? helios.fps.value : 30;
+                const frame = Math.floor(t * fps);
+                helios.seek(frame);
+              } catch (e) {
+                console.warn('[SeekTimeDriver] Error seeking Helios:', e);
               }
-            })();
+            }
           }
         };
       })();
