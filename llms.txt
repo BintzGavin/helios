@@ -6,7 +6,7 @@ Helios is a modern engine for creating videos programmatically using standard we
 
 ## Quick Facts
 - **License**: Elastic License 2.0 (free commercial use, no SaaS resale)
-- **Status**: Beta / Self-Driving (Core: Stable v5.13.0+, Studio: Alpha v0.107.1+, Player: v0.76.18+, Renderer: v1.78.0+, CLI: Beta v0.32.0+, Infrastructure: v0.25.0+)
+- **Status**: Beta / Self-Driving (Core: Stable v5.13.0+, Studio: Alpha v0.120.0+, Player: v0.77.4+, Renderer: v1.80.0+, CLI: Beta v0.40.2+, Infrastructure: v0.54.28+)
 - **Frameworks**: React, Vue, Svelte, Solid, vanilla JS
 - **Animation**: Standard CSS, Web Animations API (WAAPI), any animation library
 
@@ -75,7 +75,7 @@ The engine controls `document.timeline.currentTime` to seek animations frame-acc
 | Animation | CSS, WAAPI | `interpolate()`, `spring()` |
 | Pricing | Free | $100+/mo for 4+ devs |
 | Maturity | Beta | Production-ready |
-| Distributed rendering | Local (Beta) / Cloud (GCP/AWS/Azure/Cloudflare/Fly.io/Docker/K8s/etc.) | Available |
+| Distributed rendering | Local (Beta) / Cloud (GCP/AWS/Azure/Cloudflare/Fly.io/Docker/K8s/Modal/Deno Deploy/Vercel/Hetzner) | Available |
 
 ## Agent Skills
 Skills for AI agents are in `.agents/skills/helios-skills/skills/`:
@@ -113,12 +113,12 @@ const report = await Helios.diagnose();
 
 ## Roadmap
 ### V1.x (Active)
-- **Studio**: v0.107.1+ (Asset Drag and Drop, Composition Switcher, Timeline)
-- **CLI**: v0.32.0+ (Scaffold Components Command, Cloud Execution Adapters Expansion)
+- **Studio**: v0.120.0+ (Asset Drag and Drop, Composition Switcher, Timeline, CLI Component Removal Refinements)
+- **CLI**: v0.40.2+ (Scaffold Kubernetes/Fly.io Deployment, Component Scaffolding, Add Command Regressions)
 - **Core**: v5.13.0+ (Implement WaitUntilStable, Generic Input Props)
-- **Player**: v0.76.18+ (Bridge Coverage Completeness, Regression Tests)
-- **Renderer**: v1.78.0+ (Validate HW Accel, Orchestrator Plan, Range Rendering)
-- **Infrastructure**: v0.25.0+ (Coverage Expansion, Optimize GCS Uploads)
+- **Player**: v0.77.4+ (Bridge Coverage Completeness, Regression Tests for Audio Fader & Media Session)
+- **Renderer**: v1.80.0+ (Validate HW Accel, Orchestrator Plan, Range Rendering, Media Sync Logic Refactor)
+- **Infrastructure**: v0.54.28+ (Coverage Expansion, Optimize GCS Uploads, Cloud Execution Adapters)
 
 ### AI Integration
 - **Studio MCP Server**: Inspect, create, and render compositions via LLM tools (Done)
