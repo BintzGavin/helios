@@ -8,3 +8,5 @@ run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
 1	33.592	15	0.45	36.8	keep	Native beginFrame for targetSelector
 70	32.015	150	4.68	0.0	keep	use standalone headless shell binary if available
 71	41.215	30	0.73	7.6	discard	conditionally return Promise in __helios_seek
+1	33.893	150	4.43	37.3	keep	baseline
+2	33.446	150	4.48	38.1	keep	eliminate-promise-all-allocations
