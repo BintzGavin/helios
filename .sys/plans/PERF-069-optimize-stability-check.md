@@ -49,3 +49,10 @@ Run a basic canvas build to ensure it doesn't break, though `SeekTimeDriver` is 
 
 ## Correctness Check
 If `verify-seek-driver-stability.ts` passes, the async IIFE correctly blocks the CDP evaluation until stability resolves.
+
+## Results Summary
+- **Best render time**: 33.639s (vs baseline 33.881s)
+- **Improvement**: none
+- **Kept experiments**: [none]
+- **Discarded experiments**:
+  - Removed `async` keyword and conditionally returned an async IIFE in `window.__helios_seek` inside `SeekTimeDriver.ts`. This was meant to bypass V8 Promise creation and microtask queue scheduling entirely on frames that don't need to await stability. However, the performance degraded significantly, and it broke the stability waits (the tests timed out and failed to properly wait). Discarded and restored to the previous synchronous but Promise-yielding state.
