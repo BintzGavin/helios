@@ -69,6 +69,9 @@ Each agent should update **their own dedicated progress file** instead of this f
 ### INFRASTRUCTURE v0.2.0
 - ✅ Completed: Stateless Worker Interface - Implemented WorkerAdapter and LocalWorkerAdapter.
 
+### STUDIO v0.120.1
+- ✅ Completed: STUDIO-Asset-Move - Added drag and drop for assets to folder functionality by implementing unit tests and confirming logic.
+
 ### STUDIO v0.120.0
 - ✅ Completed: Asset Move - Verified and documented drag-and-drop support for moving assets into folders within the Assets Panel.
 
