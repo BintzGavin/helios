@@ -1,6 +1,6 @@
 # Context: PLAYER
 
-**Version**: 0.77.4
+**Version**: 0.77.5
 
 ## Section A: Component Structure
 
@@ -105,6 +105,7 @@
 ## Section D: Methods
 
 - `play(): Promise<void>`
+- `getSchema(): Promise<HeliosSchema | undefined>`
 - `pause(): void`
 - `load(): void`
 - `export(options?: HeliosExportOptions): Promise<void>`
