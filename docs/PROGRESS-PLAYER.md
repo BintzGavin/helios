@@ -1,3 +1,6 @@
+## PLAYER v0.77.5
+- ✅ Completed: Document getSchema API Parity - Added missing getSchema method to README documentation.
+
 ## PLAYER v0.76.23
 - ✅ Completed: Bridge Coverage Completeness - Added test coverage for HELIOS_GET_SCHEMA, HELIOS_START_METERING, HELIOS_STOP_METERING, HELIOS_DIAGNOSE, helios subscribe callbacks, and timeout logic for getSchema and diagnose in BridgeController.
 
