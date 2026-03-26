@@ -1,11 +1,11 @@
 ---
 id: PERF-067
 slug: conditionally-async-seek
-status: unclaimed
-claimed_by: ""
+status: claimed
+claimed_by: "executor-session"
 created: 2024-05-24
-completed: ""
-result: ""
+completed: "2024-05-24"
+result: "failed"
 ---
 
 # PERF-067: Bypass V8 Microtask Queue in SeekTimeDriver
@@ -58,3 +58,9 @@ In the `initScript` string:
 
 ## Correctness Check
 Instruct the Executor to run the offset verification tests (`npx tsx packages/renderer/tests/verify-seek-driver-offsets.ts`) to ensure time synchronization is not broken, particularly for frames that *do* require waiting.
+
+## Results Summary
+- **Best render time**: 41.215s (vs baseline ~32.100s)
+- **Improvement**: -28.4% (Regression)
+- **Kept experiments**: []
+- **Discarded experiments**: [Removed async keyword from window.__helios_seek and conditionally returned a Promise]
