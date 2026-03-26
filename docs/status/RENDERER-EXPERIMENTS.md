@@ -70,6 +70,7 @@ Last updated by: PERF-050
 - [PERF-046] Avoided allocating un-cleared `setTimeout` floating promises and looping over empty arrays in `SeekTimeDriver.ts` when no media elements exist. While best practice, the benchmark execution time was mostly bounded by IPC and Playwright frame captures, so this optimization resulted in a negligible -0.5% (33.615s median vs 33.657s) improvement within noise margins. Kept for stability.
 
 ## What Doesn't Work (and Why)
+- [PERF-067] Attempted to conditionally return a Promise in `SeekTimeDriver`'s `window.__helios_seek` function, to bypass V8 Promise allocation and microtask queue scheduling. Render time regressed significantly (41.215s vs baseline 32.100s). The `async` keyword and returning `undefined` through `awaitPromise: true` is deeply optimized in V8/CDP, and manually returning promises adds unexpected overhead, possibly stalling the evaluation pipeline.
 - **Adding Aggressive CPU Saving Flags to Chromium**: I attempted to add `--disable-features=IsolateOrigins,site-per-process`, `--disable-site-isolation-trials`, and `--disable-ipc-flooding-protection` to `DEFAULT_BROWSER_ARGS` to reduce CPU load since site isolation is unnecessary for local file rendering. This resulted in Chromium immediately hanging during initialization in the headless mode, particularly in conjunction with the required `--enable-begin-frame-control` flag.
 
 ## What Works
