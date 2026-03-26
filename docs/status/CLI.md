@@ -1,6 +1,6 @@
 # CLI Status
 
-**Version**: 0.40.2
+**Version**: 0.40.3
 
 ## Current State
 
@@ -40,6 +40,7 @@ Per AGENTS.md, the CLI is "ACTIVELY EXPANDING FOR V2" with focus on:
 5. **Merge Command** - `helios merge` for stitching distributed render chunks
 
 ## History
+[v0.40.3] ✅ Completed: Scaffold Azure Deployment Command - Implemented `helios deploy azure` to scaffold Azure Functions deployment configuration.
 
 [v0.40.2] ✅ Completed: Scaffold Kubernetes Deployment Command - Implemented `helios deploy kubernetes` to scaffold job.yaml and README-KUBERNETES.md for Kubernetes Job clusters.
 [v0.40.1] ✅ Completed: Scaffold Components Command - Verified existing implementation of helios components command fulfills the scaffolding requirements.

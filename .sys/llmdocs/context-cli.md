@@ -107,6 +107,7 @@ packages/cli/src/
 - `helios deploy cloudflare`: Scaffold Cloudflare Workers deployment configuration.
 - `helios deploy fly`: Scaffold Fly.io Machines deployment configuration.
 - `helios deploy kubernetes`: Scaffold Kubernetes deployment configuration.
+- `helios deploy azure`: Scaffold Azure Functions deployment configuration.
 
 ## D. Configuration
 
