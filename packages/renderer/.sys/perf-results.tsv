@@ -216,3 +216,4 @@ peak_mem_mb:        38.3
 1	33.820	150	4.43	490.1	discard	events.once drain handler
 2	33.840	150	4.43	490.1	discard	events.once drain handler
 3	33.830	150	4.43	490.1	discard	events.once drain handler
+4	35.634	150	4.21	37.5	keep	eliminate CdpTimeDriver .map array allocations
