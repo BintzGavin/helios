@@ -1,8 +1,9 @@
 ## Performance Trajectory
-Current best: 33.407s (baseline was 33.921s, -1.5%)
-Last updated by: PERF-078
+Current best: 33.332s (baseline was 33.445s, -0.3%)
+Last updated by: PERF-079
 
 ## What Works
+- PERF-079: Removed Promise.all array allocations in CdpTimeDriver.ts for single frames (~0.3% improvement)
 - **Avoid Promise.all array allocations for single frames in SeekTimeDriver.ts**: Evaluates single frames directly without `Promise.all()` and dynamic array pushes (~1.5% faster, PERF-078).
 - Cached `ffmpegProcess.stdin` `drain` event listeners using `events.once()` to prevent allocating thousands of Promises and closures for every frame written, avoiding V8 GC micro-stalls and reducing memory pressure inside the hot loop (PERF-073, ~33.594s, slightly better / within noise margin).
 - [PERF-070] Cached `capture` options (`format`, `quality`, CDP params) and the resolved target element handle inside the `prepare` stage of `DomStrategy.ts`. This bypasses redundant string parsing, object allocations, and Playwright `evaluateHandle` script executions on every single frame. This resulted in a render time improvement (31.7s vs 33.6s baseline, an improvement of roughly ~2s or ~6%).
@@ -73,4 +74,5 @@ Last updated by: PERF-078
 - [PERF-072] Refactored the `Renderer.ts` FFmpeg stdin backpressure handler to utilize the highly optimized Node.js `events.once()` utility rather than manually instantiating `new Promise()` and `removeListener` closures on every blocked frame. This reduced GC churn and improved render time slightly from 33.753s to 33.639s.
 
 ## What Works
+- PERF-079: Removed Promise.all array allocations in CdpTimeDriver.ts for single frames (~0.3% improvement)
 - Added lightweight browser args (`--disable-dev-shm-usage`, `--disable-extensions`, `--disable-default-apps`, `--disable-sync`, `--no-first-run`, `--mute-audio`, `--disable-background-networking`, `--disable-background-timer-throttling`, `--disable-breakpad`) to `DEFAULT_BROWSER_ARGS` in `packages/renderer/src/Renderer.ts`. Render time improved from ~34.335s baseline to ~33.657s. (PERF-063)

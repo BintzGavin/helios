@@ -77,17 +77,21 @@ export class CdpTimeDriver implements TimeDriver {
 
     // Execute in all frames (including main frame) to support iframes
     const frames = page.frames();
-    const framePromises: Promise<any>[] = [];
-    for (let i = 0; i < frames.length; i++) {
-      const frame = frames[i];
-      framePromises.push(
-        frame.evaluate(mediaSyncScript).catch(e => {
+    if (frames.length === 1) {
+      await frames[0].evaluate(mediaSyncScript).catch(e => {
+        console.warn('[CdpTimeDriver] Failed to sync media in frame ' + frames[0].url() + ':', e);
+      });
+    } else {
+      const framePromises: Promise<any>[] = new Array(frames.length);
+      for (let i = 0; i < frames.length; i++) {
+        const frame = frames[i];
+        framePromises[i] = frame.evaluate(mediaSyncScript).catch(e => {
           // Ignore errors in restricted frames (e.g. cross-origin if CSP blocks it, though we usually disable security)
           console.warn('[CdpTimeDriver] Failed to sync media in frame ' + frame.url() + ':', e);
-        })
-      );
+        });
+      }
+      await Promise.all(framePromises);
     }
-    await Promise.all(framePromises);
 
     // 2. Advance virtual time
     // This triggers the browser event loop and requestAnimationFrame
