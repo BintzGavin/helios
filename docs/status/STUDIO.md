@@ -1,4 +1,4 @@
-**Version**: 0.120.1
+**Version**: 0.120.2
 
 **Posture**: ACTIVELY EXPANDING FOR V2
 
@@ -188,3 +188,5 @@
 - [v0.2.0] ✅ Completed: Scaffold CLI Package - Created @helios-project/cli and studio command.
 - [v0.1.0] ✅ Completed: Scaffold Studio Package - Created package structure, config, and basic UI.
 - [2026-02-18] Initialized domain status and created scaffold plan.
+
+- [v0.120.2] ✅ Completed: STUDIO-Asset-Move - Implemented drag-and-drop to move assets into folders

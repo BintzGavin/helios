@@ -21,6 +21,13 @@ export const FolderItem: React.FC<FolderItemProps> = ({ name, asset, onClick, on
   const [showRenameWarning, setShowRenameWarning] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
+  const handleDragStart = (e: React.DragEvent) => {
+    if (!asset) return;
+    e.dataTransfer.setData('application/helios-asset', JSON.stringify(asset));
+    e.dataTransfer.setData('application/helios-asset-id', asset.id);
+    e.dataTransfer.effectAllowed = 'copyMove';
+  };
+
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -121,6 +128,8 @@ export const FolderItem: React.FC<FolderItemProps> = ({ name, asset, onClick, on
       <div
         className={`folder-item ${isDragOver ? 'drag-over' : ''}`}
         onClick={onClick}
+        draggable={!!asset}
+        onDragStart={handleDragStart}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
