@@ -7,6 +7,11 @@ import { extractBlobTracks } from '../utils/blob-extractor.js';
 import { FIND_DEEP_ELEMENT_SCRIPT } from '../utils/dom-finder.js';
 import { PRELOAD_SCRIPT } from '../utils/dom-preload.js';
 
+const EMPTY_IMAGE_BUFFER = Buffer.from(
+  "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=",
+  "base64"
+);
+
 export class DomStrategy implements RenderStrategy {
   private discoveredAudioTracks: AudioTrackConfig[] = [];
   private cleanupAudio: () => Promise<void> | void = () => {};
@@ -168,10 +173,8 @@ export class DomStrategy implements RenderStrategy {
             // When beginFrame is active, Page.captureScreenshot hangs.
             // But if we're here, it means the frame was omitted. Let's just create an empty buffer
             // to avoid hanging
-            const emptyImageBase64 = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII="; // 1x1 transparent png
-            const buffer = Buffer.from(emptyImageBase64, 'base64');
-            this.lastFrameBuffer = buffer;
-            return buffer;
+            this.lastFrameBuffer = EMPTY_IMAGE_BUFFER;
+            return EMPTY_IMAGE_BUFFER;
           }
         }
       }
@@ -198,10 +201,8 @@ export class DomStrategy implements RenderStrategy {
         } else {
           // If no damage was detected but we don't have a previous frame (e.g., frame 0),
           // fallback to a standard CDP capture to guarantee an initial frame buffer.
-          const emptyImageBase64 = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII="; // 1x1 transparent png
-          const buffer = Buffer.from(emptyImageBase64, 'base64');
-          this.lastFrameBuffer = buffer;
-          return buffer;
+          this.lastFrameBuffer = EMPTY_IMAGE_BUFFER;
+          return EMPTY_IMAGE_BUFFER;
         }
       } else {
         const fallback = await page.screenshot((this as any).fallbackScreenshotOptions);
