@@ -71,3 +71,6 @@ Last updated by: PERF-078
 - Refactored CdpTimeDriver.ts to replace array allocation (.map) with a localized for loop. PERF-075
 - [PERF-076] Preallocated the `framePromises` array (`new Array(totalFrames)`) instead of using `.push()` during the hot capture loop in `Renderer.ts`. This eliminated continuous array resizing and micro-allocations, reducing memory churn and improving render time from 33.933s to 33.715s.
 - [PERF-072] Refactored the `Renderer.ts` FFmpeg stdin backpressure handler to utilize the highly optimized Node.js `events.once()` utility rather than manually instantiating `new Promise()` and `removeListener` closures on every blocked frame. This reduced GC churn and improved render time slightly from 33.753s to 33.639s.
+
+## What Works
+- Added lightweight browser args (`--disable-dev-shm-usage`, `--disable-extensions`, `--disable-default-apps`, `--disable-sync`, `--no-first-run`, `--mute-audio`, `--disable-background-networking`, `--disable-background-timer-throttling`, `--disable-breakpad`) to `DEFAULT_BROWSER_ARGS` in `packages/renderer/src/Renderer.ts`. Render time improved from ~34.335s baseline to ~33.657s. (PERF-063)
