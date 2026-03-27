@@ -343,14 +343,21 @@ export class Renderer {
               if (!canWriteMore) {
                   const ac = new AbortController();
                   const onClose = () => ac.abort(new Error('FFmpeg stdin closed before drain'));
+                  const onError = (err: Error) => ac.abort(err);
                   ffmpegProcess.stdin.once('close', onClose);
+                  ffmpegProcess.stdin.once('error', onError);
 
                   previousWritePromise = once(ffmpegProcess.stdin, 'drain', { signal: ac.signal })
                       .then(() => {
                           ffmpegProcess.stdin.removeListener('close', onClose);
+                          ffmpegProcess.stdin.removeListener('error', onError);
                       })
                       .catch(err => {
                           ffmpegProcess.stdin.removeListener('close', onClose);
+                          ffmpegProcess.stdin.removeListener('error', onError);
+                          if (err.name === 'AbortError' && ac.signal.reason) {
+                              throw ac.signal.reason;
+                          }
                           throw err;
                       });
               } else {
@@ -381,14 +388,21 @@ export class Renderer {
             if (!canWriteMore) {
                 const ac = new AbortController();
                 const onClose = () => ac.abort(new Error('FFmpeg stdin closed before drain'));
+                const onError = (err: Error) => ac.abort(err);
                 ffmpegProcess.stdin.once('close', onClose);
+                ffmpegProcess.stdin.once('error', onError);
 
                 await once(ffmpegProcess.stdin, 'drain', { signal: ac.signal })
                     .then(() => {
                         ffmpegProcess.stdin.removeListener('close', onClose);
+                        ffmpegProcess.stdin.removeListener('error', onError);
                     })
                     .catch(err => {
                         ffmpegProcess.stdin.removeListener('close', onClose);
+                        ffmpegProcess.stdin.removeListener('error', onError);
+                        if (err.name === 'AbortError' && ac.signal.reason) {
+                            throw ac.signal.reason;
+                        }
                         throw err;
                     });
             }
