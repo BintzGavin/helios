@@ -1,0 +1,7 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	34.708	150	4.32	38.2	keep	baseline
+2	33.780	150	4.44	38.8	keep	baseline
+3	33.814	150	4.44	37.7	keep	baseline
+4	33.723	150	4.45	37.5	keep	cache array lengths in hot loops
+5	34.996	150	4.29	38.4	keep	cache array lengths in hot loops
+6	33.696	150	4.45	38.4	keep	cache array lengths in hot loops
