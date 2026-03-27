@@ -1,11 +1,11 @@
 ---
 id: PERF-084
 slug: cache-frames-length
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2026-03-27
-completed: ""
-result: ""
+completed: 2026-03-27
+result: no-improvement
 ---
 
 # PERF-084: Cache `frames.length` in TimeDrivers to avoid redundant access
@@ -68,3 +68,9 @@ to:
 ## Correctness Check
 1. The DOM verification tests (`npx tsx packages/renderer/tests/verify-dom-selector.ts`) should pass.
 2. The renderer benchmark should execute without errors and produce valid video output.
+
+## Results Summary
+- **Best render time**: 34.764s (vs baseline 33.577s)
+- **Improvement**: -3.53%
+- **Kept experiments**: None
+- **Discarded experiments**: Cache frames.length in SeekTimeDriver and CdpTimeDriver loops
