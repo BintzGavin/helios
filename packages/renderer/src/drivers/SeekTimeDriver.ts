@@ -225,12 +225,32 @@ export class SeekTimeDriver implements TimeDriver {
 
   async setTime(page: Page, timeInSeconds: number): Promise<void> {
     const frames = page.frames();
-    const promises: Promise<void>[] = [];
+
+    if (frames.length === 1) {
+      if (this.cdpSession) {
+        const response = await this.cdpSession.send('Runtime.evaluate', {
+          expression: `window.__helios_seek(${timeInSeconds}, ${this.timeout})`,
+          awaitPromise: true,
+          returnByValue: false
+        });
+        if (response.exceptionDetails) {
+          throw new Error(`Seek error in main frame: ${response.exceptionDetails.exception?.description || 'Unknown error'}`);
+        }
+      } else {
+        await frames[0].evaluate(
+          ([t, timeoutMs]) => { (window as any).__helios_seek(t, timeoutMs); },
+          [timeInSeconds, this.timeout]
+        );
+      }
+      return;
+    }
+
+    const promises: Promise<void>[] = new Array(frames.length);
 
     for (let i = 0; i < frames.length; i++) {
       const frame = frames[i];
       if (this.cdpSession && frame === page.mainFrame()) {
-        const promise = this.cdpSession.send('Runtime.evaluate', {
+        promises[i] = this.cdpSession.send('Runtime.evaluate', {
           expression: `window.__helios_seek(${timeInSeconds}, ${this.timeout})`,
           awaitPromise: true,
           returnByValue: false
@@ -239,13 +259,11 @@ export class SeekTimeDriver implements TimeDriver {
             throw new Error(`Seek error in main frame: ${response.exceptionDetails.exception?.description || 'Unknown error'}`);
           }
         });
-        promises.push(promise);
       } else {
-        const promise = frame.evaluate(
+        promises[i] = frame.evaluate(
           ([t, timeoutMs]) => { (window as any).__helios_seek(t, timeoutMs); },
           [timeInSeconds, this.timeout]
         );
-        promises.push(promise);
       }
     }
 
