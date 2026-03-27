@@ -1,4 +1,4 @@
-**Version**: 0.77.5
+**Version**: 0.77.1
 [v0.77.5] ✅ Completed: Document getSchema API Parity - Added missing getSchema method to README documentation.
 [v0.77.4] ✅ Completed: README API Parity - Documented missing HTMLMediaElement API parity properties, methods, and attributes.
 [v0.77.3] ✅ Completed: Expand Test Coverage - Added tests for audio metering, getAudioTracks timeout, and captureFrame timeout in controllers.ts.
@@ -189,3 +189,4 @@
 [v0.76.12] 🚫 Blocked: No new plan found in /.sys/plans/ for PLAYER. Waiting for Planner to create the next implementation spec.
 
 [v0.77.0] ✅ Completed: Expand Test Coverage - Added test coverage to `DirectController` and `BridgeController` to improve edge case handling and error branches, achieving 100% coverage on `controllers.ts`.
+[v0.77.1] 🚫 Blocked: The current active plan is for RENDERER optimizations. No new implementation plan found in /.sys/plans/ for the PLAYER domain. Waiting for Planner.
