@@ -1,6 +1,6 @@
 ## Performance Trajectory
 Current best: 33.696s (baseline was 33.780s, ~0.25% improvement)
-Last updated by: PERF-082
+Last updated by: PERF-083
 
 ## What Works
 - Cached array lengths in hot loops (`SeekTimeDriver.ts` and `Renderer.ts`) to avoid redundant `.length` property lookups. Minimal improvement but slightly reduces V8 overhead per-frame. (PERF-082)
@@ -65,6 +65,7 @@ Last updated by: PERF-082
 - Conditionally using `jpeg_pipe` format with `mjpeg` codec for FFmpeg ingestion when intermediate image format is `jpeg`. The render time degraded (47.85s vs 46.706s). It appears that bypassing FFmpeg stream probing doesn't offset other ingestion/decoding overhead in this environment. (PERF-012)
 
 ## Open Questions
+- [PERF-083] Can we extract the active pipeline limit (`poolLen * 8`) calculation out of the frame loop while condition to prevent V8 micro-stalls during frame capture?
 - [PERF-032] Can we overcome the damage-driven limitations of `Page.startScreencast` (which failed in PERF-026) by injecting a forced layout/paint toggle on every virtual time tick, allowing us to buffer continuous screencast frames and eliminate the IPC latency of polling `Page.captureScreenshot`?
 - [PERF-071] Reduced V8 Garbage Collection pressure in the hot loop by (1) caching Web Animations API (WAAPI) objects into a flat array in `SeekTimeDriver.ts` to avoid `scope.getAnimations()` allocations per frame, and (2) flattening the Node.js IPC Promise chain in `Renderer.ts` using an `async` IIFE wrapper. This significantly reduced memory churn and micro-stalls. Render time improved dramatically from the baseline of 45.588s to 33.840s (a ~25% improvement).
 - [PERF-074] Verified the usage of `events.once` for backpressure handling in `Renderer.ts`. Performance remained stable with no meaningful reduction in overhead or garbage collection stalls within the noise margin.
