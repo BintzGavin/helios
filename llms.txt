@@ -6,7 +6,7 @@ Helios is a modern engine for creating videos programmatically using standard we
 
 ## Quick Facts
 - **License**: Elastic License 2.0 (free commercial use, no SaaS resale)
-- **Status**: Beta / Self-Driving (Core: Stable v5.13.0+, Studio: Alpha v0.120.0+, Player: v0.77.4+, Renderer: v1.80.0+, CLI: Beta v0.40.2+, Infrastructure: v0.54.28+)
+- **Status**: Beta / Self-Driving (Core: Stable v5.13.0+, Studio: Alpha v0.120.1+, Player: v0.77.5+, Renderer: v1.80.0+, CLI: Beta v0.40.3+, Infrastructure: v0.54.28+)
 - **Frameworks**: React, Vue, Svelte, Solid, vanilla JS
 - **Animation**: Standard CSS, Web Animations API (WAAPI), any animation library
 
@@ -113,12 +113,12 @@ const report = await Helios.diagnose();
 
 ## Roadmap
 ### V1.x (Active)
-- **Studio**: v0.120.0+ (Asset Drag and Drop, Composition Switcher, Timeline, CLI Component Removal Refinements)
-- **CLI**: v0.40.2+ (Scaffold Kubernetes/Fly.io Deployment, Component Scaffolding, Add Command Regressions)
-- **Core**: v5.13.0+ (Implement WaitUntilStable, Generic Input Props)
-- **Player**: v0.77.4+ (Bridge Coverage Completeness, Regression Tests for Audio Fader & Media Session)
+- **Studio**: v0.120.1+ (Asset Move, Timeline Audio Tests, Quickstart Updates)
+- **CLI**: v0.40.3+ (Scaffold Azure/Kubernetes/Fly.io Deployment, Component Scaffolding, Add/Merge/Update Command Regressions)
+- **Core**: v5.13.0+ (Generic Input Props, Implement Composition Schema)
+- **Player**: v0.77.5+ (Document getSchema API Parity, Bridge Coverage Completeness, Regression Tests)
 - **Renderer**: v1.80.0+ (Validate HW Accel, Orchestrator Plan, Range Rendering, Media Sync Logic Refactor)
-- **Infrastructure**: v0.54.28+ (Coverage Expansion, Optimize GCS Uploads, Cloud Execution Adapters)
+- **Infrastructure**: v0.54.28+ (Optimize S3/GCS Uploads, Orchestrator Test Coverage, Cloud Execution Adapters Expansion)
 
 ### AI Integration
 - **Studio MCP Server**: Inspect, create, and render compositions via LLM tools (Done)
