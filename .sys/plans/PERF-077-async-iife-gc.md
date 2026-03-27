@@ -1,11 +1,11 @@
 ---
 id: PERF-077
 slug: async-iife-gc
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-24
-completed: ""
-result: ""
+completed: "2026-03-27"
+result: "no-improvement"
 ---
 
 **PERF-077: Optimize GC pressure by wrapping Playwright CDP interactions in an async IIFE**
@@ -41,3 +41,9 @@ Run a standard canvas composition test to ensure no errors are thrown during enc
 
 **Correctness Check**
 Run `npx tsx packages/renderer/tests/verify-seek-driver-stability.ts` to ensure output frame count and stability are unchanged.
+
+## Results Summary
+- **Best render time**: 33.499s (vs baseline 33.452s)
+- **Improvement**: 0%
+- **Kept experiments**: None
+- **Discarded experiments**: Wrapped events.once backpressure chain in an async IIFE
