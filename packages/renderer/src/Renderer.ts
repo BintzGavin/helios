@@ -300,7 +300,8 @@ export class Renderer {
 
               // Refill the active pipeline up to the pool size
               const poolLen = pool.length;
-              while (nextFrameToSubmit < totalFrames && (nextFrameToSubmit - nextFrameToWrite) < poolLen * 8) {
+              const maxPipelineDepth = poolLen * 8;
+              while (nextFrameToSubmit < totalFrames && (nextFrameToSubmit - nextFrameToWrite) < maxPipelineDepth) {
                   const frameIndex = nextFrameToSubmit;
                   const worker = pool[frameIndex % poolLen];
                   const time = (frameIndex / fps) * 1000;

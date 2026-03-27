@@ -3,6 +3,7 @@ Current best: 33.696s (baseline was 33.780s, ~0.25% improvement)
 Last updated by: PERF-083
 
 ## What Works
+- Cached the active pipeline depth limit (`poolLen * 8`) outside the inner `while` loop condition in `Renderer.ts` to prevent repeated arithmetic and V8 micro-stalls during frame capture. (PERF-083, ~1.27% improvement, 33.664s vs 34.096s).
 - Cached array lengths in hot loops (`SeekTimeDriver.ts` and `Renderer.ts`) to avoid redundant `.length` property lookups. Minimal improvement but slightly reduces V8 overhead per-frame. (PERF-082)
 - PERF-079: Removed Promise.all array allocations in CdpTimeDriver.ts for single frames (~0.3% improvement)
 - **Avoid Promise.all array allocations for single frames in SeekTimeDriver.ts**: Evaluates single frames directly without `Promise.all()` and dynamic array pushes (~1.5% faster, PERF-078).
