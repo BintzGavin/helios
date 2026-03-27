@@ -1,8 +1,9 @@
 ## Performance Trajectory
-Current best: 33.594s (baseline was 18.500s, +81%)
-Last updated by: PERF-073
+Current best: 33.407s (baseline was 33.921s, -1.5%)
+Last updated by: PERF-078
 
 ## What Works
+- **Avoid Promise.all array allocations for single frames in SeekTimeDriver.ts**: Evaluates single frames directly without `Promise.all()` and dynamic array pushes (~1.5% faster, PERF-078).
 - Cached `ffmpegProcess.stdin` `drain` event listeners using `events.once()` to prevent allocating thousands of Promises and closures for every frame written, avoiding V8 GC micro-stalls and reducing memory pressure inside the hot loop (PERF-073, ~33.594s, slightly better / within noise margin).
 - [PERF-070] Cached `capture` options (`format`, `quality`, CDP params) and the resolved target element handle inside the `prepare` stage of `DomStrategy.ts`. This bypasses redundant string parsing, object allocations, and Playwright `evaluateHandle` script executions on every single frame. This resulted in a render time improvement (31.7s vs 33.6s baseline, an improvement of roughly ~2s or ~6%).
 - [PERF-068] Eliminated unconditional `Promise.all` allocations in `SeekTimeDriver.ts`'s `window.__helios_seek`. By conditionally allocating the `promises` array only when asynchronous waits actually occur (e.g., fonts loading, media seeking), we reduce memory allocations and garbage collection overhead in the V8 IPC layer on every frame. Render time improved by ~1.3% (from 33.893s to 33.446s).

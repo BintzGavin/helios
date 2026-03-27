@@ -129,7 +129,7 @@ export class SeekTimeDriver implements TimeDriver {
           // 1. Wait for Fonts
           if (t === 0 && document.fonts && document.fonts.ready) {
             if (!promises) promises = [];
-            promises.push(document.fonts.ready);
+            promises[promises.length] = document.fonts.ready;
           }
 
           // 2. Synchronize media elements (video, audio)
@@ -143,7 +143,7 @@ export class SeekTimeDriver implements TimeDriver {
 
               if (el.seeking || el.readyState < 2) {
                 if (!promises) promises = [];
-                promises.push(new Promise((resolve) => {
+                promises[promises.length] = new Promise((resolve) => {
                   let resolved = false;
                   const finish = () => {
                     if (resolved) return;
@@ -159,7 +159,7 @@ export class SeekTimeDriver implements TimeDriver {
                   el.addEventListener('seeked', finish);
                   el.addEventListener('canplay', finish);
                   el.addEventListener('error', finish);
-                }));
+                });
               }
             }
           }
@@ -167,7 +167,7 @@ export class SeekTimeDriver implements TimeDriver {
           // 3. Wait for Helios Stability (Custom Checks)
           if (typeof window.helios !== 'undefined' && typeof window.helios.waitUntilStable === 'function') {
             if (!promises) promises = [];
-            promises.push(window.helios.waitUntilStable());
+            promises[promises.length] = window.helios.waitUntilStable();
           }
 
           // 4. Wait for stability with a safety timeout (only if needed)
@@ -207,7 +207,15 @@ export class SeekTimeDriver implements TimeDriver {
     await page.addInitScript(initScript);
     // Evaluate the init script immediately in case the page is already loaded or the script applies retroactively.
     const frames = page.frames();
-    await Promise.all(frames.map((frame) => frame.evaluate(initScript)));
+    if (frames.length === 1) {
+      await frames[0].evaluate(initScript);
+    } else {
+      const initPromises: Promise<any>[] = new Array(frames.length);
+      for (let i = 0; i < frames.length; i++) {
+        initPromises[i] = frames[i].evaluate(initScript);
+      }
+      await Promise.all(initPromises);
+    }
 
     // Wait for app initialization (GSAP timeline OR Helios instance)
     // This handles the race condition where main.js (ES module) hasn't finished executing when rendering starts.
@@ -245,7 +253,7 @@ export class SeekTimeDriver implements TimeDriver {
       return;
     }
 
-    const promises: Promise<void>[] = new Array(frames.length);
+    const promises: Promise<any>[] = new Array(frames.length);
 
     for (let i = 0; i < frames.length; i++) {
       const frame = frames[i];
