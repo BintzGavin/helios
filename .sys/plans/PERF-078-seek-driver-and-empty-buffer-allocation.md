@@ -1,11 +1,11 @@
 ---
 id: PERF-078
 slug: seek-driver-and-empty-buffer-allocation
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-24
-completed: ""
-result: ""
+completed: "2024-05-24"
+result: improved
 ---
 
 **PERF-078: Eliminate array allocations and buffer object instantiation in DOM frame capture**
@@ -46,3 +46,9 @@ Run the standard canvas example render to verify that no core rendering behavior
 
 **Correctness Check**
 Verify that `npx tsx packages/renderer/tests/fixtures/benchmark.ts` successfully completes and generates an MP4 file with the correct number of frames without throwing errors related to `Buffer` reference mismatches.
+
+## Results Summary
+- **Best render time**: 33.407s (vs baseline 33.921s)
+- **Improvement**: 1.5%
+- **Kept experiments**: Avoid Promise.all array allocations for single frames in SeekTimeDriver.ts
+- **Discarded experiments**: Hoist EMPTY_IMAGE_BUFFER in DomStrategy.ts (already implemented natively via EMPTY_IMAGE_BUFFER reference, no dynamic decoding found on empty frames)

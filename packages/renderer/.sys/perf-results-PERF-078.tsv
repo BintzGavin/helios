@@ -1,0 +1,2 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+2	33.407	150	4.49	38.4	keep	eliminate promise.all array allocations for single frame seeks
