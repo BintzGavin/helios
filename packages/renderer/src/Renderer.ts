@@ -299,9 +299,10 @@ export class Renderer {
               }
 
               // Refill the active pipeline up to the pool size
-              while (nextFrameToSubmit < totalFrames && (nextFrameToSubmit - nextFrameToWrite) < pool.length * 8) {
+              const poolLen = pool.length;
+              while (nextFrameToSubmit < totalFrames && (nextFrameToSubmit - nextFrameToWrite) < poolLen * 8) {
                   const frameIndex = nextFrameToSubmit;
-                  const worker = pool[frameIndex % pool.length];
+                  const worker = pool[frameIndex % poolLen];
                   const time = (frameIndex / fps) * 1000;
                   const compositionTimeInSeconds = (startFrame + frameIndex) / fps;
 

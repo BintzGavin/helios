@@ -81,7 +81,8 @@ export class SeekTimeDriver implements TimeDriver {
               cachedScopes = findAllScopes(document);
             }
             cachedAnimations = [];
-            for (let i = 0; i < cachedScopes.length; i++) {
+            const numScopes = cachedScopes.length;
+            for (let i = 0; i < numScopes; i++) {
               const scope = cachedScopes[i];
               if (scope.getAnimations) {
                 const animations = scope.getAnimations();
@@ -91,7 +92,8 @@ export class SeekTimeDriver implements TimeDriver {
               }
             }
           }
-          for (let i = 0; i < cachedAnimations.length; i++) {
+          const numAnimations = cachedAnimations.length;
+          for (let i = 0; i < numAnimations; i++) {
             const anim = cachedAnimations[i];
             anim.currentTime = timeInMs;
             if (anim.playState !== 'paused') {
@@ -136,8 +138,9 @@ export class SeekTimeDriver implements TimeDriver {
           if (!cachedMediaElements) {
             cachedMediaElements = findAllMedia(document);
           }
-          if (cachedMediaElements.length > 0) {
-            for (let i = 0; i < cachedMediaElements.length; i++) {
+          const numMedia = cachedMediaElements.length;
+          if (numMedia > 0) {
+            for (let i = 0; i < numMedia; i++) {
               const el = cachedMediaElements[i];
               syncMedia(el, t);
 

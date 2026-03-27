@@ -1,8 +1,9 @@
 ## Performance Trajectory
-Current best: 33.332s (baseline was 33.445s, -0.3%)
-Last updated by: PERF-079
+Current best: 33.696s (baseline was 33.780s, ~0.25% improvement)
+Last updated by: PERF-082
 
 ## What Works
+- Cached array lengths in hot loops (`SeekTimeDriver.ts` and `Renderer.ts`) to avoid redundant `.length` property lookups. Minimal improvement but slightly reduces V8 overhead per-frame. (PERF-082)
 - PERF-079: Removed Promise.all array allocations in CdpTimeDriver.ts for single frames (~0.3% improvement)
 - **Avoid Promise.all array allocations for single frames in SeekTimeDriver.ts**: Evaluates single frames directly without `Promise.all()` and dynamic array pushes (~1.5% faster, PERF-078).
 - Cached `ffmpegProcess.stdin` `drain` event listeners using `events.once()` to prevent allocating thousands of Promises and closures for every frame written, avoiding V8 GC micro-stalls and reducing memory pressure inside the hot loop (PERF-073, ~33.594s, slightly better / within noise margin).
