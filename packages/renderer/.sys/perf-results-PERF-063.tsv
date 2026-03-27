@@ -1,1 +1,5 @@
 run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	34.335	150	4.37	38.3	keep	baseline
+2	33.777	150	4.44	37.6	keep	add lightweight browser args
+3	33.714	150	4.45	37.6	keep	add lightweight browser args
+4	33.657	150	4.46	38.0	keep	add lightweight browser args
