@@ -1,0 +1,6 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	33.578	150	4.47	37.8	keep	baseline
+2	33.574	150	4.47	37.5	keep	baseline
+3	33.545	150	4.47	37.8	keep	baseline
+4	33.753	150	4.44	38.0	keep	Use events.once() over new Promise
+5	33.639	150	4.46	38.4	keep	Use events.once() over new Promise
