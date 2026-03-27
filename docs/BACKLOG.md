@@ -137,6 +137,7 @@ This backlog tracks concrete deliverables derived from [`AGENTS.md`](../AGENTS.m
 ## PLAYER Agent Status
 - [ ] 🚫 Blocked: No new plan found in `/.sys/plans/` for `PLAYER`. Waiting for Planner to create the next implementation spec.
 
+- [ ] [BLOCKED] PLAYER: The current active plan is for RENDERER optimizations. No new implementation plan found in /.sys/plans/ for the PLAYER domain. Waiting for Planner.
 ## INFRASTRUCTURE Agent Status
 - [ ] 🚫 Blocked: No uncompleted implementation plans found for my domain in `/.sys/plans/`. I must stop working.
 - [ ] 🚫 Blocked: No uncompleted implementation plans found for my domain in `/.sys/plans/`. I must stop working.
