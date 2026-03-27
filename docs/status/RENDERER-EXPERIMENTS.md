@@ -76,3 +76,4 @@ Last updated by: PERF-079
 ## What Works
 - PERF-079: Removed Promise.all array allocations in CdpTimeDriver.ts for single frames (~0.3% improvement)
 - Added lightweight browser args (`--disable-dev-shm-usage`, `--disable-extensions`, `--disable-default-apps`, `--disable-sync`, `--no-first-run`, `--mute-audio`, `--disable-background-networking`, `--disable-background-timer-throttling`, `--disable-breakpad`) to `DEFAULT_BROWSER_ARGS` in `packages/renderer/src/Renderer.ts`. Render time improved from ~34.335s baseline to ~33.657s. (PERF-063)
+- PERF-080: The CdpTimeDriver.ts file already contained the single-frame Promise.all avoidance and array preallocation optimization. Verified it is present. The codebase requires no further modifications for this experiment.

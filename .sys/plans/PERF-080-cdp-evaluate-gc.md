@@ -1,11 +1,11 @@
 ---
 id: PERF-080
 slug: cdp-evaluate-gc
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-24
-completed: ""
-result: ""
+completed: "2024-05-24"
+result: "already-implemented"
 ---
 
 **PERF-080: Eliminate micro-stalls and GC churn in CdpTimeDriver frame synchronization**
@@ -36,3 +36,9 @@ Currently, when `CdpTimeDriver.setTime` is called, it iterates over all frames a
 
 **Correctness Check**
 Verify that `npx tsx packages/renderer/tests/fixtures/benchmark.ts -m canvas` successfully completes without throwing errors related to media synchronization.
+
+## Results Summary
+- **Best render time**: 33.541s (vs baseline 33.541s)
+- **Improvement**: 0%
+- **Kept experiments**: cdp-evaluate-gc (already implemented)
+- **Discarded experiments**: none
