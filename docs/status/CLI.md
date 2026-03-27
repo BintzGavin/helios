@@ -1,47 +1,26 @@
+**Version**: 0.41.0
+
 # CLI Status
 
-**Version**: 0.40.3
-
 ## Current State
+The Helios CLI is the primary user interface for component registry, project scaffolding, distributed rendering, and deployment.
 
-The Helios CLI (`packages/cli`) provides the command-line interface for the Helios video engine. It is a first-class product surface in V2, responsible for:
+## Next Steps
+- Implement regression tests for remaining commands (e.g. `job.ts`, `render.ts`, `merge.ts`).
 
-- Component registry management (Shadcn-style)
-- Workflow automation
-- Rendering commands
-- Deployment workflows
+## Blocked Items
+- None
 
-## Existing Commands
-
-- `helios studio` - Launches the Helios Studio dev server
-- `helios init` - Initializes a new Helios project configuration and scaffolds project structure
-- `helios add` - Adds a component to the project
-- `helios list` - Lists installed components in the project
-- `helios components` - Lists available components in the registry
-- `helios render` - Renders a composition to video
-- `helios merge` - Merges multiple video files into one without re-encoding
-- `helios remove` - Removes a component from the project configuration and deletes associated files (with confirmation)
-- `helios update` - Updates a component to the latest version
-- `helios build` - Builds the project for production
-- `helios job` - Manages distributed rendering jobs
-- `helios skills` - Manages AI agent skills installation
-- `helios preview` - Previews the production build locally
-- `helios diff` - Compares local component code with the registry version
-- `helios deploy` - Scaffolds deployment configurations (e.g., Docker, Google Cloud Run)
-
-## V2 Roadmap
-
-Per AGENTS.md, the CLI is "ACTIVELY EXPANDING FOR V2" with focus on:
-
-1. **Registry Commands** - `helios add [component]` for fetching components
-2. **Render Commands** - `helios render` for local/distributed rendering
+## Available Commands
+1. **Studio Command** - `helios studio` for launching dev server
+2. **Render Command** - `helios render` for local/distributed rendering
 3. **Init Command** - `helios init` for project scaffolding
 4. **Components Command** - `helios components` for browsing registry
 5. **Merge Command** - `helios merge` for stitching distributed render chunks
 
 ## History
+[v0.41.0] ✅ Completed: Add Diff Command Regression Tests - Implemented comprehensive unit tests for `helios diff`.
 [v0.40.3] ✅ Completed: Scaffold Azure Deployment Command - Implemented `helios deploy azure` to scaffold Azure Functions deployment configuration.
-
 [v0.40.2] ✅ Completed: Scaffold Kubernetes Deployment Command - Implemented `helios deploy kubernetes` to scaffold job.yaml and README-KUBERNETES.md for Kubernetes Job clusters.
 [v0.40.1] ✅ Completed: Scaffold Components Command - Verified existing implementation of helios components command fulfills the scaffolding requirements.
 [v0.40.0] ✅ Completed: Tier 3 Cloud Execution Adapters - Added support for Deno Deploy, Vercel, Modal, and Hetzner Cloud to the job run command.

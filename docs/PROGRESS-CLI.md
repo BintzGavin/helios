@@ -276,3 +276,7 @@ This file tracks progress for the CLI domain (`packages/cli`).
 - ✅ Completed: Cloud Execution Adapters Expansion - Added support for Docker, Fly.io, and Kubernetes to the job run command.
 ### CLI v0.40.3
 - ✅ Completed: Scaffold Azure Deployment Command - Implemented `helios deploy azure` to scaffold Azure Functions deployment configuration.
+
+## CLI v0.41.0
+
+- ✅ Completed: Add Diff Command Regression Tests - Implemented comprehensive unit tests for `helios diff`.

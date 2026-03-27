@@ -1,11 +1,11 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { Command } from 'commander';
-import { registerComponentsCommand } from './components.js';
-import { RegistryClient } from '../registry/client.js';
-import { loadConfig } from '../utils/config.js';
+import { registerComponentsCommand } from '../components.js';
+import { RegistryClient } from '../../registry/client.js';
+import { loadConfig } from '../../utils/config.js';
 
-vi.mock('../registry/client.js');
-vi.mock('../utils/config.js');
+vi.mock('../../registry/client.js');
+vi.mock('../../utils/config.js');
 
 describe('components command', () => {
   let program: Command;
