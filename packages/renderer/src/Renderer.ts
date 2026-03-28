@@ -288,6 +288,16 @@ export class Renderer {
           // such that multiple workers can be evaluating frames concurrently.
 
           let nextFrameToSubmit = 0;
+          const processWorkerFrame = async (worker: any, compositionTimeInSeconds: number, time: number) => {
+              try {
+                  await worker.activePromise;
+              } catch (e) {
+                  // Ignore previous errors to allow chain to continue (or abort)
+              }
+              await worker.timeDriver.setTime(worker.page, compositionTimeInSeconds);
+              return worker.strategy.capture(worker.page, time);
+          };
+
           let nextFrameToWrite = 0;
           const poolLen = pool.length;
           const maxPipelineDepth = poolLen * 8;
@@ -309,15 +319,7 @@ export class Renderer {
                   const time = frameIndex * timeStep;
                   const compositionTimeInSeconds = (startFrame + frameIndex) * compTimeStep;
 
-                  const framePromise = (async () => {
-                      try {
-                          await worker.activePromise;
-                      } catch (e) {
-                          // Ignore previous errors to allow chain to continue (or abort)
-                      }
-                      await worker.timeDriver.setTime(worker.page, compositionTimeInSeconds);
-                      return worker.strategy.capture(worker.page, time);
-                  })();
+                  const framePromise = processWorkerFrame(worker, compositionTimeInSeconds, time);
 
                   // Add a no-op catch handler to prevent unhandled promise rejections on abort/error
                   worker.activePromise = framePromise.catch(() => {}) as Promise<void>;
