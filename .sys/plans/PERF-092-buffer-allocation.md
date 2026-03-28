@@ -16,7 +16,7 @@ V8 Garbage Collection and memory allocation overhead during frame capture in `Do
 ## Background Research
 During the hot frame capture loop in `DomStrategy.ts` (`capture` method), the application receives base64-encoded strings representing the screenshot data over the Chromium CDP protocol. Currently, it converts this string into a binary `Buffer` using `Buffer.from(screenshotData, 'base64')`.
 This operation allocates a new `Buffer` object for every single frame. At 1080p resolution and high frame rates, this creates continuous churn of multi-megabyte objects in Node's heap, which must be subsequently garbage collected, leading to micro-stalls.
-By pre-allocating a pool of large reusable buffers per `DomStrategy` instance and using `captureBuffer.write(screenshotData, 'base64')`, we can completely eliminate these `Buffer` allocations per frame. Tests verify that Node's `Stream.write` handles this synchronously, and since the max pipeline depth in `Renderer.ts` is exactly 8 frames per worker, a pool of 8 pre-allocated buffers per worker is completely race-condition safe.
+By pre-allocating a pool of large reusable buffers per `DomStrategy` instance and using `captureBuffer.write(screenshotData, 'base64')`, we can completely eliminate these `Buffer` allocations per frame. Tests verify that Node's `Stream.write` handles this synchronously, and since the max pipeline depth in `Renderer.ts` is exactly 8 frames per worker (`const maxPipelineDepth = poolLen * 8`), a pool of 8 pre-allocated buffers per worker is completely race-condition safe.
 
 ## Benchmark Configuration
 - **Composition URL**: The standard DOM benchmark composition
