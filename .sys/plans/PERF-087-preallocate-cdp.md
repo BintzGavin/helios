@@ -1,11 +1,11 @@
 ---
 id: PERF-087
 slug: preallocate-cdp
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-24
-completed: ""
-result: ""
+completed: "2026-03-28"
+result: "improved"
 ---
 
 # PERF-087: Preallocate CDP Evaluate Parameters and Isolate Array Loop Setup
@@ -66,3 +66,9 @@ this.cdpSession.send('Runtime.evaluate', this.evaluateParams)
 ## Variations
 ### Variation A: Inline object pool
 If the instance-level property causes unexpected behavior or tests fail, maintain a small local object pool within `setTime` or rely purely on object pooling logic to ensure 100% thread safety while keeping GC low.
+
+## Results Summary
+- **Best render time**: 34.012s (vs baseline 35.590s)
+- **Improvement**: 4.4%
+- **Kept experiments**: Module-level evaluateParamsPool for CDP parameters
+- **Discarded experiments**: None
