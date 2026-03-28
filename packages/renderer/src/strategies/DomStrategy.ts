@@ -18,7 +18,9 @@ export class DomStrategy implements RenderStrategy {
   private cdpSession: CDPSession | null = null;
   private lastFrameBuffer: Buffer | null = null;
   private cdpScreenshotParams: any = null;
+  private beginFrameParams: any = null;
   private targetElementHandle: any = null;
+  private emptyImageBuffer: Buffer = EMPTY_IMAGE_BUFFER;
 
   constructor(private options: RendererOptions) {
     if (this.options.videoCodec === 'copy') {
@@ -122,6 +124,19 @@ export class DomStrategy implements RenderStrategy {
     }
 
     this.cdpScreenshotParams = cdpScreenshotParams;
+    this.beginFrameParams = { screenshot: this.cdpScreenshotParams };
+
+    // Set format-appropriate empty buffer
+    if (format === 'jpeg') {
+        // 1x1 JPEG pixel
+        this.emptyImageBuffer = Buffer.from('/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAP//////////////////////////////////////////////////////////////////////////////////////wgALCAABAAEBAREA/8QAFBABAAAAAAAAAAAAAAAAAAAAAP/aAAgBAQABPxA=', 'base64');
+    } else if (format === 'webp') {
+        // 1x1 WEBP pixel
+        this.emptyImageBuffer = Buffer.from('UklGRhoAAABXRUJQVlA4TA0AAAAvAAAAEAcQERGIiP4HAA==', 'base64');
+    } else {
+        // Default to PNG
+        this.emptyImageBuffer = EMPTY_IMAGE_BUFFER;
+    }
 
     // We also save screenshotOptions on this since fallback uses it, though we could just keep it local if not used in capture.
     // Actually fallback is used in capture when CDP is unavailable. Let's add it to this.
@@ -173,8 +188,8 @@ export class DomStrategy implements RenderStrategy {
             // When beginFrame is active, Page.captureScreenshot hangs.
             // But if we're here, it means the frame was omitted. Let's just create an empty buffer
             // to avoid hanging
-            this.lastFrameBuffer = EMPTY_IMAGE_BUFFER;
-            return EMPTY_IMAGE_BUFFER;
+            this.lastFrameBuffer = this.emptyImageBuffer;
+            return this.emptyImageBuffer;
           }
         }
       }
@@ -186,9 +201,7 @@ export class DomStrategy implements RenderStrategy {
 
     try {
       if (this.cdpSession) {
-        const { screenshotData } = await this.cdpSession.send('HeadlessExperimental.beginFrame', {
-          screenshot: this.cdpScreenshotParams
-        });
+        const { screenshotData } = await this.cdpSession.send('HeadlessExperimental.beginFrame', this.beginFrameParams);
 
         if (screenshotData) {
           const buffer = Buffer.from(screenshotData, 'base64');
