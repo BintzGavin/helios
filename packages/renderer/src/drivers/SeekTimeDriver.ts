@@ -3,6 +3,8 @@ import { TimeDriver } from './TimeDriver.js';
 import { getSeedScript } from '../utils/random-seed.js';
 import { FIND_ALL_MEDIA_FUNCTION, FIND_ALL_SCOPES_FUNCTION, SYNC_MEDIA_FUNCTION, PARSE_MEDIA_ATTRIBUTES_FUNCTION } from '../utils/dom-scripts.js';
 
+const evaluateParamsPool: any[] = [];
+
 export class SeekTimeDriver implements TimeDriver {
   private cdpSession: CDPSession | null = null;
 
@@ -239,7 +241,13 @@ export class SeekTimeDriver implements TimeDriver {
 
     if (frames.length === 1) {
       if (this.cdpSession) {
-        const response = await this.cdpSession.send('Runtime.evaluate', { expression: `window.__helios_seek(${timeInSeconds}, ${this.timeout})`, awaitPromise: true, returnByValue: false });
+        let params = evaluateParamsPool.pop();
+        if (!params) {
+          params = { expression: '', awaitPromise: true, returnByValue: false };
+        }
+        params.expression = `window.__helios_seek(${timeInSeconds}, ${this.timeout})`;
+        const response = await this.cdpSession.send('Runtime.evaluate', params);
+        evaluateParamsPool.push(params);
         if (response.exceptionDetails) {
           throw new Error(`Seek error in main frame: ${response.exceptionDetails.exception?.description || 'Unknown error'}`);
         }
@@ -257,7 +265,13 @@ export class SeekTimeDriver implements TimeDriver {
     for (let i = 0; i < frames.length; i++) {
       const frame = frames[i];
       if (this.cdpSession && frame === page.mainFrame()) {
-        promises[i] = this.cdpSession.send('Runtime.evaluate', { expression: `window.__helios_seek(${timeInSeconds}, ${this.timeout})`, awaitPromise: true, returnByValue: false }).then((response) => {
+        let params = evaluateParamsPool.pop();
+        if (!params) {
+          params = { expression: '', awaitPromise: true, returnByValue: false };
+        }
+        params.expression = `window.__helios_seek(${timeInSeconds}, ${this.timeout})`;
+        promises[i] = this.cdpSession.send('Runtime.evaluate', params).then((response) => {
+          evaluateParamsPool.push(params);
           if (response.exceptionDetails) {
             throw new Error(`Seek error in main frame: ${response.exceptionDetails.exception?.description || 'Unknown error'}`);
           }

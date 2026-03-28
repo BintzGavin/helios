@@ -3,6 +3,7 @@ Current best: 33.539s (baseline was 33.780s, ~0.25% improvement)
 Last updated by: PERF-083
 
 ## What Works
+- [PERF-087] Preallocated `Runtime.evaluate` parameter objects in `SeekTimeDriver.ts` using a module-level object pool. This eliminated recurrent object allocations in the hot frame capture loop without introducing race conditions. Render time improved from ~35.590s baseline to ~34.012s.
 - Eliminated object allocations for CDP evaluate params in `SeekTimeDriver.ts` and `DomStrategy.ts` by preallocating objects and modifying properties directly, resolving potential IPC race conditions and reducing GC churn during the hot capture loop. (PERF-086, improved from 33.825s to 33.539s)
 - Cached the active pipeline depth limit (`poolLen * 8`) outside the inner `while` loop condition in `Renderer.ts` to prevent repeated arithmetic and V8 micro-stalls during frame capture. (PERF-083, ~1.27% improvement, 33.664s vs 34.096s).
 - Cached array lengths in hot loops (`SeekTimeDriver.ts` and `Renderer.ts`) to avoid redundant `.length` property lookups. Minimal improvement but slightly reduces V8 overhead per-frame. (PERF-082)
