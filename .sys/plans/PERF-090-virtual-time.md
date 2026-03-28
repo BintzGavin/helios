@@ -1,11 +1,11 @@
 ---
 id: PERF-090
 slug: virtual-time-policy
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-06-18
-completed: ""
-result: ""
+completed: "2024-06-18"
+result: "discarded"
 ---
 
 # PERF-090: Native CDP Virtual Time Policy
@@ -46,3 +46,9 @@ Run `npm run test -w packages/renderer` to ensure animations still align correct
 
 ## Prior Art
 Puppeteer internal implementation of deterministic rendering and `TimeDriver` logic using native `virtualTimeBudget`.
+
+## Results Summary
+- **Best render time**: 33.595s (vs baseline 33.895s)
+- **Improvement**: ~0.8% (but within noise margin and fundamentally broken)
+- **Kept experiments**: []
+- **Discarded experiments**: [PERF-090] Native CDP Virtual Time Policy
