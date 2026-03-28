@@ -1,0 +1,5 @@
+1	34.301	150	4.37	38.6	keep	baseline
+2	33.453	150	4.48	38.4	keep	replace Buffer.byteLength with Math.floor heuristic
+3	33.465	150	4.48	37.5	keep	replace Buffer.byteLength with Math.floor heuristic
+4	33.570	150	4.47	38.2	keep	replace Buffer.byteLength with Math.floor heuristic
+5	33.363	150	4.50	37.5	keep	replace Buffer.byteLength with Math.floor heuristic

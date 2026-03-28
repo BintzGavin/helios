@@ -28,10 +28,10 @@ export class DomStrategy implements RenderStrategy {
 
 
   private writeToBufferPool(screenshotData: string): Buffer {
-    const byteLen = Buffer.byteLength(screenshotData, 'base64');
+    const maxByteLen = Math.floor((screenshotData.length * 3) / 4);
     let captureBuffer = this.bufferPool[this.bufferIndex];
-    if (captureBuffer.length < byteLen) {
-        captureBuffer = Buffer.allocUnsafe(Math.max(byteLen + 1024 * 1024, 1920 * 1080 * 2));
+    if (captureBuffer.length < maxByteLen) {
+        captureBuffer = Buffer.allocUnsafe(Math.max(maxByteLen + 1024 * 1024, 1920 * 1080 * 2));
         this.bufferPool[this.bufferIndex] = captureBuffer;
     }
     const bytesWritten = captureBuffer.write(screenshotData, 'base64');
