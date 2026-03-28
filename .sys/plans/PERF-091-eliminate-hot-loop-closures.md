@@ -1,11 +1,11 @@
 ---
 id: PERF-091
 slug: eliminate-hot-loop-closures
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-31
 completed: ""
-result: ""
+result: "discard"
 ---
 
 # PERF-091: Eliminate Hot Loop Closures and Redundant Exception Handlers
@@ -83,3 +83,10 @@ Run the main `benchmark.ts` to ensure rendering still outputs a valid video file
 - PERF-088: Removed `return await` for V8 microtask optimization.
 - PERF-076 & PERF-087: Preallocated arrays and object pools to reduce GC churn.
 - This plan continues the compounding gains by targeting closure allocations inside the identical hot loop.
+
+
+## Results Summary
+- **Best render time**: 33.906s (vs baseline 33.474s)
+- **Improvement**: 0%
+- **Kept experiments**: []
+- **Discarded experiments**: [hoist-closures]
