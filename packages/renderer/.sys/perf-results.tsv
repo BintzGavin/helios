@@ -223,3 +223,4 @@ peak_mem_mb:        38.3
 3	33.825	300	8.87	0.0	keep	baseline
 4	33.539	300	8.94	0.0	keep	eliminate hot loop allocations
 224	33.906	150	4.42	38.1	discard	PERF-091 hoist-closures
+225	33.376	150	4.49	38.5	keep	PERF-092 Preallocate Buffer for Base64 Decoding in DomStrategy.ts

@@ -1,0 +1,2 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	33.376	150	4.49	38.5	keep	PERF-092 Preallocate Buffer for Base64 Decoding in DomStrategy.ts

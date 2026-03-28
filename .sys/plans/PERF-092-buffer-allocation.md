@@ -1,11 +1,11 @@
 ---
 id: PERF-092
 slug: buffer-allocation
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-31
-completed: ""
-result: ""
+completed: "2026-03-28"
+result: "improved"
 ---
 
 # PERF-092: Preallocate Buffer for Base64 Decoding in `DomStrategy.ts`
@@ -73,3 +73,9 @@ Run the main `benchmark.ts` to ensure rendering still outputs a valid video file
 ## Prior Art
 - PERF-076: Preallocated arrays and object pools to reduce GC churn.
 - PERF-091: Targeted closures. This targets the most significant remaining memory allocation in the hot loop.
+
+## Results Summary
+- **Best render time**: 33.376s (vs baseline 33.561s)
+- **Improvement**: ~0.55%
+- **Kept experiments**: [PERF-092] Preallocate Buffer for Base64 Decoding in DomStrategy.ts
+- **Discarded experiments**: []

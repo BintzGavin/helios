@@ -1,8 +1,9 @@
 ## Performance Trajectory
-Current best: 33.474s (baseline was 33.780s, ~0.25% improvement)
-Last updated by: PERF-089
+Current best: 33.376s (baseline was 33.561s, ~0.55% improvement)
+Last updated by: PERF-092
 
 ## What Works
+- [PERF-092] Preallocated a module-level pool of Buffer objects per worker in `DomStrategy.ts` to reuse during base64 decoding of screenshot data. This eliminates the multi-megabyte `Buffer.from()` object allocation and subsequent garbage collection per frame. Render time improved marginally from ~33.561s baseline to ~33.376s.
 - [PERF-088] Removed unnecessary `return await` in the `async` IIFE inside the `Renderer.ts` capture loop. This saves an extra microtask per frame evaluation, reducing overhead in the hot loop. Render time improved marginally.
 
 - [PERF-087] Preallocated `Runtime.evaluate` parameter objects in `SeekTimeDriver.ts` using a module-level object pool. This eliminated recurrent object allocations in the hot frame capture loop without introducing race conditions. Render time improved from ~35.590s baseline to ~34.012s.
