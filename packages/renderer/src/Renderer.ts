@@ -289,6 +289,10 @@ export class Renderer {
 
           let nextFrameToSubmit = 0;
           let nextFrameToWrite = 0;
+          const poolLen = pool.length;
+          const maxPipelineDepth = poolLen * 8;
+          const timeStep = 1000 / fps;
+          const compTimeStep = 1 / fps;
 
           while (nextFrameToWrite < totalFrames) {
               if (capturedErrors.length > 0) {
@@ -299,13 +303,11 @@ export class Renderer {
               }
 
               // Refill the active pipeline up to the pool size
-              const poolLen = pool.length;
-              const maxPipelineDepth = poolLen * 8;
               while (nextFrameToSubmit < totalFrames && (nextFrameToSubmit - nextFrameToWrite) < maxPipelineDepth) {
                   const frameIndex = nextFrameToSubmit;
                   const worker = pool[frameIndex % poolLen];
-                  const time = (frameIndex / fps) * 1000;
-                  const compositionTimeInSeconds = (startFrame + frameIndex) / fps;
+                  const time = frameIndex * timeStep;
+                  const compositionTimeInSeconds = (startFrame + frameIndex) * compTimeStep;
 
                   const framePromise = (async () => {
                       try {
