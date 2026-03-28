@@ -1,0 +1,2 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	36.093	150	4.16	38.5	keep	removed return await in async IIFE
