@@ -23,6 +23,23 @@ export class DomStrategy implements RenderStrategy {
   private targetElementHandle: any = null;
   private emptyImageBuffer: Buffer = EMPTY_IMAGE_BUFFER;
 
+  private bufferPool: Buffer[] = Array.from({ length: 8 }, () => Buffer.allocUnsafe(1920 * 1080 * 2));
+  private bufferIndex: number = 0;
+
+
+  private writeToBufferPool(screenshotData: string): Buffer {
+    const byteLen = Buffer.byteLength(screenshotData, 'base64');
+    let captureBuffer = this.bufferPool[this.bufferIndex];
+    if (captureBuffer.length < byteLen) {
+        captureBuffer = Buffer.allocUnsafe(Math.max(byteLen + 1024 * 1024, 1920 * 1080 * 2));
+        this.bufferPool[this.bufferIndex] = captureBuffer;
+    }
+    const bytesWritten = captureBuffer.write(screenshotData, 'base64');
+    const buffer = captureBuffer.subarray(0, bytesWritten);
+    this.bufferIndex = (this.bufferIndex + 1) % 8;
+    return buffer;
+  }
+
   constructor(private options: RendererOptions) {
     if (this.options.videoCodec === 'copy') {
       throw new Error("DomStrategy produces image sequences and cannot be used with 'copy' codec. Please use a transcoding codec like 'libx264' (default).");
@@ -174,7 +191,7 @@ export class DomStrategy implements RenderStrategy {
           const { screenshotData } = await this.cdpSession.send('HeadlessExperimental.beginFrame', this.beginFrameTargetParams);
 
           if (screenshotData) {
-            const buffer = Buffer.from(screenshotData, 'base64');
+            const buffer = this.writeToBufferPool(screenshotData);
             this.lastFrameBuffer = buffer;
             return buffer;
           } else if (this.lastFrameBuffer) {
@@ -200,7 +217,7 @@ export class DomStrategy implements RenderStrategy {
         const { screenshotData } = await this.cdpSession.send('HeadlessExperimental.beginFrame', this.beginFrameParams);
 
         if (screenshotData) {
-          const buffer = Buffer.from(screenshotData, 'base64');
+          const buffer = this.writeToBufferPool(screenshotData);
           this.lastFrameBuffer = buffer;
           return buffer;
         } else if (this.lastFrameBuffer) {
