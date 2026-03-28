@@ -1,8 +1,9 @@
 ## Performance Trajectory
-Current best: 33.696s (baseline was 33.780s, ~0.25% improvement)
+Current best: 33.539s (baseline was 33.780s, ~0.25% improvement)
 Last updated by: PERF-083
 
 ## What Works
+- Eliminated object allocations for CDP evaluate params in `SeekTimeDriver.ts` and `DomStrategy.ts` by preallocating objects and modifying properties directly, resolving potential IPC race conditions and reducing GC churn during the hot capture loop. (PERF-086, improved from 33.825s to 33.539s)
 - Cached the active pipeline depth limit (`poolLen * 8`) outside the inner `while` loop condition in `Renderer.ts` to prevent repeated arithmetic and V8 micro-stalls during frame capture. (PERF-083, ~1.27% improvement, 33.664s vs 34.096s).
 - Cached array lengths in hot loops (`SeekTimeDriver.ts` and `Renderer.ts`) to avoid redundant `.length` property lookups. Minimal improvement but slightly reduces V8 overhead per-frame. (PERF-082)
 - PERF-079: Removed Promise.all array allocations in CdpTimeDriver.ts for single frames (~0.3% improvement)

@@ -219,3 +219,6 @@ peak_mem_mb:        38.3
 4	35.634	150	4.21	37.5	keep	eliminate CdpTimeDriver .map array allocations
 1	33.933	150	4.42	37.7	keep	baseline
 2	33.715	150	4.45	37.8	keep	Preallocate framePromises array to avoid array push micro-stalls
+
+3	33.825	300	8.87	0.0	keep	baseline
+4	33.539	300	8.94	0.0	keep	eliminate hot loop allocations
