@@ -81,3 +81,7 @@ Last updated by: PERF-083
 - PERF-079: Removed Promise.all array allocations in CdpTimeDriver.ts for single frames (~0.3% improvement)
 - Added lightweight browser args (`--disable-dev-shm-usage`, `--disable-extensions`, `--disable-default-apps`, `--disable-sync`, `--no-first-run`, `--mute-audio`, `--disable-background-networking`, `--disable-background-timer-throttling`, `--disable-breakpad`) to `DEFAULT_BROWSER_ARGS` in `packages/renderer/src/Renderer.ts`. Render time improved from ~34.335s baseline to ~33.657s. (PERF-063)
 - PERF-080: The CdpTimeDriver.ts file already contained the single-frame Promise.all avoidance and array preallocation optimization. Verified it is present. The codebase requires no further modifications for this experiment.
+- **PERF-081: Cache `frames.length` in TimeDrivers**:
+  **What you tried**: Caching `frames.length` to a local `numFrames` variable inside `SeekTimeDriver.ts` and `CdpTimeDriver.ts` to avoid redundant property lookups in hot loop conditions.
+  **Why it didn't work**: In Playwright contexts, the V8 array length property lookup is already highly optimized. The bottleneck is inherently constrained by IPC overhead and Playwright screenshot orchestration (yielding a median ~33.773s vs the baseline of 33.657s), so this micro-optimization provides negligible, if any, benefit.
+  **Plan ID**: PERF-081

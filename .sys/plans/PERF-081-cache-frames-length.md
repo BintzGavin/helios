@@ -1,11 +1,11 @@
 ---
 id: PERF-081
 slug: cache-frames-length
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-03-27
-completed: ""
-result: ""
+completed: "2026-03-28"
+result: no-improvement
 ---
 
 # PERF-081: Cache `frames.length` in TimeDrivers to avoid redundant access
@@ -68,3 +68,9 @@ to:
 ## Correctness Check
 1. The DOM verification tests (`npm run test -w packages/renderer`) should pass.
 2. The renderer benchmark should execute without errors and produce valid video output.
+
+## Results Summary
+- **Best render time**: 33.773s (median vs baseline 33.657s)
+- **Improvement**: none (within noise margin)
+- **Kept experiments**: None
+- **Discarded experiments**: Cache frames.length in TimeDrivers
