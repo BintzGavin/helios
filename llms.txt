@@ -6,7 +6,7 @@ Helios is a modern engine for creating videos programmatically using standard we
 
 ## Quick Facts
 - **License**: Elastic License 2.0 (free commercial use, no SaaS resale)
-- **Status**: Beta / Self-Driving (Core: Stable v5.13.0+, Studio: Alpha v0.120.1+, Player: v0.77.5+, Renderer: v1.80.0+, CLI: Beta v0.40.3+, Infrastructure: v0.54.28+)
+- **Status**: Beta / Self-Driving (Core: Stable v5.13.0+, Studio: Alpha v0.107.1+, Player: v0.76.18+, Renderer: v1.78.0+, CLI: Beta v0.41.0+, Infrastructure: v0.25.0+)
 - **Frameworks**: React, Vue, Svelte, Solid, vanilla JS
 - **Animation**: Standard CSS, Web Animations API (WAAPI), any animation library
 
@@ -113,12 +113,12 @@ const report = await Helios.diagnose();
 
 ## Roadmap
 ### V1.x (Active)
-- **Studio**: v0.120.1+ (Asset Move, Timeline Audio Tests, Quickstart Updates)
-- **CLI**: v0.40.3+ (Scaffold Azure/Kubernetes/Fly.io Deployment, Component Scaffolding, Add/Merge/Update Command Regressions)
+- **Studio**: v0.107.1+ (Preview Command, CompositionsPanel Tests, CLI Build Command)
+- **CLI**: v0.41.0+ (Scaffold Fly.io Deployment Command, Add Command Regression Tests, Cloud Execution Adapters Expansion)
 - **Core**: v5.13.0+ (Generic Input Props, Implement Composition Schema)
-- **Player**: v0.77.5+ (Document getSchema API Parity, Bridge Coverage Completeness, Regression Tests)
-- **Renderer**: v1.80.0+ (Validate HW Accel, Orchestrator Plan, Range Rendering, Media Sync Logic Refactor)
-- **Infrastructure**: v0.54.28+ (Optimize S3/GCS Uploads, Orchestrator Test Coverage, Cloud Execution Adapters Expansion)
+- **Player**: v0.76.18+ (Bridge Coverage Completeness, Diagnostics UI Overlay)
+- **Renderer**: v1.78.0+ (CdpTimeDriver Determinism, Smart Codec Selection, Distributed Audio Mixing)
+- **Infrastructure**: v0.25.0+ (Modal Adapter, CloudRun & Local Worker Adapter Coverage)
 
 ### AI Integration
 - **Studio MCP Server**: Inspect, create, and render compositions via LLM tools (Done)
