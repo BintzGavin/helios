@@ -316,7 +316,7 @@ export class Renderer {
                           // Ignore previous errors to allow chain to continue (or abort)
                       }
                       await worker.timeDriver.setTime(worker.page, compositionTimeInSeconds);
-                      return await worker.strategy.capture(worker.page, time);
+                      return worker.strategy.capture(worker.page, time);
                   })();
 
                   // Add a no-op catch handler to prevent unhandled promise rejections on abort/error
