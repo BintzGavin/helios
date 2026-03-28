@@ -1,6 +1,6 @@
 ## Performance Trajectory
-Current best: 33.539s (baseline was 33.780s, ~0.25% improvement)
-Last updated by: PERF-083
+Current best: 33.474s (baseline was 33.780s, ~0.25% improvement)
+Last updated by: PERF-089
 
 ## What Works
 - [PERF-088] Removed unnecessary `return await` in the `async` IIFE inside the `Renderer.ts` capture loop. This saves an extra microtask per frame evaluation, reducing overhead in the hot loop. Render time improved marginally.
@@ -41,6 +41,8 @@ Last updated by: PERF-083
 - Decoupled frame capture from I/O write for pipelining. Result inconclusive due to environmental limits, but kept as architectural fix. (PERF-013)
 - Defaulting intermediate image format to jpeg when no alpha channel is needed (~2.2% faster) (PERF-011)
 - PERF-065: Leveraged standalone headless shell binary (`chrome-headless-shell`) if available, replacing the full Chromium executable path. The speedup was minimal (~0.25% improvement, median render time 32.015s vs baseline 32.100s, mostly within noise margins), but conceptually bypasses background processes overhead.
+
+- Hoisted worker frame execution async IIFE in Renderer.ts outside of hot loop. ~0.1s improvement. [PERF-089]
 
 ## What Doesn't Work (and Why)
 - [PERF-084] Attempted to cache `frames.length` into a local variable `numFrames` in `SeekTimeDriver.ts` and `CdpTimeDriver.ts` loops. This was intended to avoid repeated property lookup on the `frames` array in the loop condition. The render time actually regressed (34.764s vs baseline 33.577s), indicating that V8's array length property access is already heavily optimized in hot loops, and explicitly caching it may interfere with its internal heuristics or introduce unnecessary local variable allocation overhead.
