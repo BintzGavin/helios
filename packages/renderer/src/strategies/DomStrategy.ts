@@ -19,6 +19,7 @@ export class DomStrategy implements RenderStrategy {
   private lastFrameBuffer: Buffer | null = null;
   private cdpScreenshotParams: any = null;
   private beginFrameParams: any = null;
+  private beginFrameTargetParams: any = null;
   private targetElementHandle: any = null;
   private emptyImageBuffer: Buffer = EMPTY_IMAGE_BUFFER;
 
@@ -125,6 +126,7 @@ export class DomStrategy implements RenderStrategy {
 
     this.cdpScreenshotParams = cdpScreenshotParams;
     this.beginFrameParams = { screenshot: this.cdpScreenshotParams };
+    this.beginFrameTargetParams = { screenshot: { ...this.cdpScreenshotParams, clip: { x: 0, y: 0, width: 0, height: 0, scale: 1 } } };
 
     // Set format-appropriate empty buffer
     if (format === 'jpeg') {
@@ -164,18 +166,12 @@ export class DomStrategy implements RenderStrategy {
       if (this.cdpSession) {
         const box = await this.targetElementHandle.boundingBox();
         if (box) {
-          const screenshot = { ...this.cdpScreenshotParams };
-          screenshot.clip = {
-            x: box.x,
-            y: box.y,
-            width: box.width,
-            height: box.height,
-            scale: 1
-          };
+          this.beginFrameTargetParams.screenshot.clip.x = box.x;
+          this.beginFrameTargetParams.screenshot.clip.y = box.y;
+          this.beginFrameTargetParams.screenshot.clip.width = box.width;
+          this.beginFrameTargetParams.screenshot.clip.height = box.height;
 
-          const { screenshotData } = await this.cdpSession.send('HeadlessExperimental.beginFrame', {
-            screenshot
-          });
+          const { screenshotData } = await this.cdpSession.send('HeadlessExperimental.beginFrame', this.beginFrameTargetParams);
 
           if (screenshotData) {
             const buffer = Buffer.from(screenshotData, 'base64');
