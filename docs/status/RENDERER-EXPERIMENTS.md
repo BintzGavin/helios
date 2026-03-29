@@ -1,6 +1,6 @@
 ## Performance Trajectory
 Current best: 33.376s (baseline was 33.561s, ~0.55% improvement)
-Last updated by: PERF-099
+Last updated by: PERF-100
 
 ## What Works
 - Reduced default intermediate image quality from 90 to 75 to optimize IPC payload sizes and reduce node.js base64 decode overhead (~0.1% improvement). (PERF-096)
@@ -103,7 +103,6 @@ Last updated by: PERF-099
   **Plan ID**: PERF-081
 ## Open Questions
 - Can we disable threaded animations and scrolling (`--disable-threaded-animation`, etc.) in Chromium to force synchronous main-thread execution and reduce layout/paint IPC synchronization overhead during `beginFrame` capture?
-- Can we further optimize base64 decoding in `DomStrategy.ts` by pre-allocating an array of buffers that we fill via indexing rather than allocating new objects at all? Or perhaps `Buffer.write()` is fast enough and we should focus on Playwright API?
 - Would switching to `page.evaluateHandle()` or another more direct API for capturing DOM screenshots be faster than `HeadlessExperimental.beginFrame`?
 - [PERF-093] Attempted to replace `Buffer.byteLength(data, 'base64')` with arithmetic `(data.length * 3) >>> 2` in `DomStrategy.ts` `writeToBufferPool`. Mathematical length calculation is faster, but `Buffer.byteLength` in Node.js handles base64 padding correctly automatically and taking padding into account in JS arithmetic requires inspecting the last few characters, negating performance benefits.
 - [PERF-093] Also experimented with replacing `Array.from({ length: totalFrames })` or `new Array(totalFrames)` array allocations in `Renderer.ts`. V8 optimizes pre-allocated arrays exceptionally well, so micro-optimizing it to `new Array(totalFrames)` (already present) is the best pattern.
