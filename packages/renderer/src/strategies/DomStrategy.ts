@@ -23,21 +23,12 @@ export class DomStrategy implements RenderStrategy {
   private targetElementHandle: any = null;
   private emptyImageBuffer: Buffer = EMPTY_IMAGE_BUFFER;
 
-  private bufferPool: Buffer[] = Array.from({ length: 10 }, () => Buffer.allocUnsafe(1920 * 1080 * 2));
-  private bufferIndex: number = 0;
-
 
   private writeToBufferPool(screenshotData: string): Buffer {
     const maxByteLen = (screenshotData.length * 3) >>> 2;
-    let captureBuffer = this.bufferPool[this.bufferIndex];
-    if (captureBuffer.length < maxByteLen) {
-        captureBuffer = Buffer.allocUnsafe(Math.max(maxByteLen + 1024 * 1024, 1920 * 1080 * 2));
-        this.bufferPool[this.bufferIndex] = captureBuffer;
-    }
+    const captureBuffer = Buffer.allocUnsafe(maxByteLen);
     const bytesWritten = captureBuffer.write(screenshotData, 'base64');
-    const buffer = captureBuffer.subarray(0, bytesWritten);
-    this.bufferIndex = (this.bufferIndex + 1) % 10;
-    return buffer;
+    return captureBuffer.subarray(0, bytesWritten);
   }
 
   constructor(private options: RendererOptions) {
