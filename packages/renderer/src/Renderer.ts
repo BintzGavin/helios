@@ -300,7 +300,7 @@ export class Renderer {
 
           let nextFrameToWrite = 0;
           const poolLen = pool.length;
-          const maxPipelineDepth = poolLen * 8;
+          const maxPipelineDepth = poolLen * 10;
           const timeStep = 1000 / fps;
           const compTimeStep = 1 / fps;
 

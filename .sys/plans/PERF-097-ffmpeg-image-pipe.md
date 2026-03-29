@@ -1,11 +1,11 @@
 ---
 id: PERF-097
 slug: optimize-ffmpeg-image2pipe-buffer
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-25
-completed: ""
-result: ""
+completed: "2026-03-29"
+result: "improved"
 ---
 
 # PERF-097: Buffer Allocation Optimization for Node.js ffmpeg stdin write
@@ -51,3 +51,9 @@ Watch the generated video output to ensure the frames are still correctly render
 
 ## Variations
 Variation A: Increase maxPipelineDepth to 12.
+
+## Results Summary
+- **Best render time**: 33.394s (vs baseline 35.462s)
+- **Improvement**: 5.83%
+- **Kept experiments**: [PERF-097]
+- **Discarded experiments**: []
