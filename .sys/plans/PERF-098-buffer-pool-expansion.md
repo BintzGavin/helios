@@ -1,11 +1,11 @@
 ---
 id: PERF-098
 slug: buffer-pool-expansion
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2026-03-29
-completed: ""
-result: ""
+completed: "2026-03-29"
+result: "discard"
 ---
 
 # PERF-098: Expand Buffer Pool and Pipeline Depth
@@ -46,3 +46,11 @@ Currently, `maxPipelineDepth` in `Renderer.ts` is set to `poolLen * 10`, but the
 
 ## Correctness Check
 Run benchmark and verify video output is not corrupted.
+
+## Results Summary
+- **Best render time**: 33.895s (vs baseline ~33.394s)
+- **Improvement**: 0% (Worse)
+- **Kept experiments**: None
+- **Discarded experiments**:
+  - Hoist catch closure and expand maxPipelineDepth (Renderer.ts)
+  - Expand buffer pool in DomStrategy (DomStrategy.ts)
