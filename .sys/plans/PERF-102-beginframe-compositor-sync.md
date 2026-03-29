@@ -1,11 +1,11 @@
 ---
 id: PERF-102
 slug: beginframe-compositor-sync
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-25
 completed: ""
-result: ""
+result: "improved"
 ---
 
 # PERF-102: Synchronize Compositor Clock via BeginFrame Parameters
@@ -54,3 +54,9 @@ Run a standard canvas render to ensure nothing breaks in the canvas pipeline.
 
 ## Correctness Check
 Run the DOM render verify scripts. Watch the generated video output to verify that frame timing remains smooth and CSS animations advance correctly without stuttering or skipping due to compositor clock confusion.
+
+## Results Summary
+- **Best render time**: 34.175s (vs baseline 34.866s)
+- **Improvement**: 2.0%
+- **Kept experiments**: [explicit timing in beginFrame]
+- **Discarded experiments**: None

@@ -1,0 +1,2 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+2	34.175	150	2.94	24.9	keep	explicit timing in beginFrame

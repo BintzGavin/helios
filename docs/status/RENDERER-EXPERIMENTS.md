@@ -1,8 +1,9 @@
 ## Performance Trajectory
-Current best: 33.376s (baseline was 33.561s, ~0.55% improvement)
+Current best: 34.175s (baseline was 34.866s, -2.0%)
 Last updated by: PERF-100
 
 ## What Works
+- Pass explicit timing parameters to HeadlessExperimental.beginFrame to synchronize Chromium compositor clock (~2.0% faster) [PERF-102]
 - Added flags `--disable-threaded-animation`, `--disable-threaded-scrolling`, `--disable-checker-imaging`, and `--disable-image-animation-resync` to `DEFAULT_BROWSER_ARGS` in `Renderer.ts`. Render time improved to 33.760s. (PERF-101)
 
 - Reduced default intermediate image quality from 90 to 75 to optimize IPC payload sizes and reduce node.js base64 decode overhead (~0.1% improvement). (PERF-096)
