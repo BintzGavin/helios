@@ -1,4 +1,5 @@
-**Version**: 0.77.1
+**Version**: 0.77.6
+[v0.77.6] ✅ Completed: Improve Test Coverage - Added test coverage for onremovetrack and onchange properties in audio and video track lists.
 [v0.77.5] ✅ Completed: Document getSchema API Parity - Added missing getSchema method to README documentation.
 [v0.77.4] ✅ Completed: README API Parity - Documented missing HTMLMediaElement API parity properties, methods, and attributes.
 [v0.77.3] ✅ Completed: Expand Test Coverage - Added tests for audio metering, getAudioTracks timeout, and captureFrame timeout in controllers.ts.

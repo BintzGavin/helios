@@ -122,3 +122,7 @@ The following standard media session metadata attributes are available as proper
 - `mediaArtist`: Maps to `media-artist` attribute
 - `mediaAlbum`: Maps to `media-album` attribute
 - `mediaArtwork`: Maps to `media-artwork` attribute
+
+## Track Lists
+- `HeliosAudioTrackList`: Implements standard HTMLMediaElement event handler properties (`onaddtrack`, `onremovetrack`, `onchange`).
+- `HeliosVideoTrackList`: Implements standard HTMLMediaElement event handler properties (`onaddtrack`, `onremovetrack`, `onchange`).
