@@ -106,3 +106,5 @@ Last updated by: PERF-092
 - Would switching to `page.evaluateHandle()` or another more direct API for capturing DOM screenshots be faster than `HeadlessExperimental.beginFrame`?
 - [PERF-093] Attempted to replace `Buffer.byteLength(data, 'base64')` with arithmetic `(data.length * 3) >>> 2` in `DomStrategy.ts` `writeToBufferPool`. Mathematical length calculation is faster, but `Buffer.byteLength` in Node.js handles base64 padding correctly automatically and taking padding into account in JS arithmetic requires inspecting the last few characters, negating performance benefits.
 - [PERF-093] Also experimented with replacing `Array.from({ length: totalFrames })` or `new Array(totalFrames)` array allocations in `Renderer.ts`. V8 optimizes pre-allocated arrays exceptionally well, so micro-optimizing it to `new Array(totalFrames)` (already present) is the best pattern.
+
+- Increased maxPipelineDepth to poolLen * 10 and used bitwise shift buffer allocation. Improved from 35.462 to 33.394. (PERF-097)
