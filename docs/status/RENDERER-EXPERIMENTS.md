@@ -1,8 +1,9 @@
 ## Performance Trajectory
 Current best: 33.394s (baseline was 34.631s, -3.5%)
-Last updated by: PERF-107
+Last updated by: PERF-109
 
 ## What Works
+- [PERF-109] Removed the previously added flags `--disable-threaded-animation`, `--disable-threaded-scrolling`, `--disable-checker-imaging`, and `--disable-image-animation-resync` from `DEFAULT_BROWSER_ARGS` in `Renderer.ts`. This reverts a regression that occurred when these flags forced operations onto the main thread, negating concurrent execution benefits and slowing down DOM rendering.
 - [PERF-107] Replaced the static array of 10 buffers (`bufferPool`) in `DomStrategy.ts` with dynamically allocated buffers using `Buffer.allocUnsafe` per frame. This resolves a severe memory race condition and crash that occurs when the worker pipeline depth outpaces the static pool size, allowing deep pipelining to function reliably. Render time improved to ~33.459s.
 - Pass explicit timing parameters to HeadlessExperimental.beginFrame to synchronize Chromium compositor clock (~2.0% faster) [PERF-102]
 - Added flags `--disable-threaded-animation`, `--disable-threaded-scrolling`, `--disable-checker-imaging`, and `--disable-image-animation-resync` to `DEFAULT_BROWSER_ARGS` in `Renderer.ts`. Render time improved to 33.760s. (PERF-101)
@@ -114,4 +115,3 @@ Last updated by: PERF-107
 - Increased maxPipelineDepth to poolLen * 10 and used bitwise shift buffer allocation. Improved from 35.462 to 33.394. (PERF-097)
 ## What Doesn't Work (and Why)
 - **Expanding Buffer Pool and Pipeline Depth (PERF-098)**: Tried increasing `maxPipelineDepth` to `poolLen * 15` and `bufferPool` size to `20`. The expected rendering time improvement was not observed, instead it hovered around ~33.9s to ~34.3s. This suggests that expanding the pipeline depth and pre-allocated buffer pool doesn't relieve any critical bottleneck, or the overhead of managing a larger buffer queue balances out the potential concurrent frame gains.
-- **PERF-108:** Adding `--disable-threaded-animation`, `--disable-threaded-scrolling`, `--disable-checker-imaging`, and `--disable-image-animation-resync` to Chromium's `DEFAULT_BROWSER_ARGS` regressed performance from 33.4s to 34.9s. Forcing synchronicity on these specific sub-systems seems to block the main thread too aggressively, neutralizing IPC concurrency benefits.
