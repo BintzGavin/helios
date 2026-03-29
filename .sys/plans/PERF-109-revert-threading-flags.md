@@ -1,11 +1,11 @@
 ---
 id: PERF-109
 slug: revert-threading-flags
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-24
-completed: ""
-result: ""
+completed: 2025-05-25
+result: improved
 ---
 # PERF-109: Revert Threading Synchronicity Flags
 
@@ -34,3 +34,9 @@ In `packages/renderer/src/Renderer.ts`, adding `--disable-threaded-animation`, `
 
 ## Correctness Check
 Run `npm run test -w packages/renderer` to ensure DOM capture output and rendering remain functional.
+
+## Results Summary
+- **Best render time**: 33.601s (vs baseline 34.6s)
+- **Improvement**: ~2.9%
+- **Kept experiments**: Removed threading flag regressions (`--disable-threaded-animation`, `--disable-threaded-scrolling`, `--disable-checker-imaging`, `--disable-image-animation-resync`)
+- **Discarded experiments**: None
