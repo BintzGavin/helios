@@ -1,11 +1,11 @@
 ---
 id: PERF-095
 slug: no-display-updates
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-24
-completed: ""
-result: ""
+completed: "2024-05-24"
+result: "failed"
 ---
 
 # PERF-095: noDisplayUpdates
@@ -50,3 +50,9 @@ Verify that the output video contains the correct frames and is not a black/blan
 
 ## Prior Art
 - Chromium CDP documentation for `HeadlessExperimental.beginFrame` mentions the `noDisplayUpdates` parameter.
+
+## Results Summary
+- **Best render time**: 0.000s (crash vs baseline 33.840s)
+- **Improvement**: N/A
+- **Kept experiments**:
+- **Discarded experiments**: noDisplayUpdates optimization on beginFrameParams (causes crash due to empty 1x1 screenshots)
