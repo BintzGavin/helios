@@ -84,6 +84,7 @@ Last updated by: PERF-100
 - Conditionally using `jpeg_pipe` format with `mjpeg` codec for FFmpeg ingestion when intermediate image format is `jpeg`. The render time degraded (47.85s vs 46.706s). It appears that bypassing FFmpeg stream probing doesn't offset other ingestion/decoding overhead in this environment. (PERF-012)
 
 ## Open Questions
+- [PERF-106] Can we completely eliminate Chromium-internal IPC overhead by adding the `--single-process` or `--in-process-gpu` flag to `DEFAULT_BROWSER_ARGS`?
 - [PERF-089] Can we eliminate the anonymous async function allocation inside the hot loop in `Renderer.ts` by defining a static execution function outside the while loop to reduce V8 GC micro-stalls?
 - [PERF-083] Can we extract the active pipeline limit (`poolLen * 8`) calculation out of the frame loop while condition to prevent V8 micro-stalls during frame capture?
 - [PERF-032] Can we overcome the damage-driven limitations of `Page.startScreencast` (which failed in PERF-026) by injecting a forced layout/paint toggle on every virtual time tick, allowing us to buffer continuous screencast frames and eliminate the IPC latency of polling `Page.captureScreenshot`?
