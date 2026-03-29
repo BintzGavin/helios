@@ -84,7 +84,7 @@ Skills for AI agents are in `.agents/skills/helios-skills/skills/`:
 - `player/SKILL.md` - Player component usage
 - `studio/SKILL.md` - Studio usage and extensions
 - `getting-started/SKILL.md` - Initial scaffolding and basic tasks
-- `workflows/*.md` & `examples/*.md` - Task-specific workflows and example skills
+- `workflows/*.md`, `examples/*.md` & `guided/*.md` - Task-specific workflows, examples, and guided skills
 
 ## Key Files for Agents
 - `README.md` - Vision document
@@ -95,6 +95,7 @@ Skills for AI agents are in `.agents/skills/helios-skills/skills/`:
 - `packages/core/src/index.ts` - Core public API
 - `packages/player/src/index.ts` - Player public API
 - `packages/renderer/src/index.ts` - Renderer public API
+- `packages/cli/src/index.ts` - CLI public API
 - `packages/studio/src/server/mcp.ts` - Studio MCP Server
 - `packages/studio/src/server/plugin.ts` - Studio Vite Plugin
 
@@ -114,11 +115,11 @@ const report = await Helios.diagnose();
 ## Roadmap
 ### V1.x (Active)
 - **Studio**: v0.107.1+ (Preview Command, CompositionsPanel Tests, CLI Build Command)
-- **CLI**: v0.41.0+ (Scaffold Fly.io Deployment Command, Add Command Regression Tests, Cloud Execution Adapters Expansion)
+- **CLI**: v0.41.0+ (Scaffold Kubernetes Deployment Command, Scaffold Fly.io Deployment Command, Add Command Regression Tests)
 - **Core**: v5.13.0+ (Generic Input Props, Implement Composition Schema)
-- **Player**: v0.76.18+ (Bridge Coverage Completeness, Diagnostics UI Overlay)
-- **Renderer**: v1.78.0+ (CdpTimeDriver Determinism, Smart Codec Selection, Distributed Audio Mixing)
-- **Infrastructure**: v0.25.0+ (Modal Adapter, CloudRun & Local Worker Adapter Coverage)
+- **Player**: v0.76.18+ (Bridge Coverage Completeness, Document getSchema API Parity)
+- **Renderer**: v1.78.0+ (Orchestrator Plan, Validate HW Accel, Refactor Media Sync Logic)
+- **Infrastructure**: v0.25.0+ (Cloudflare Workers, Azure Functions, Fly.io Machines, Kubernetes Job API, Docker/Local Swarm)
 
 ### AI Integration
 - **Studio MCP Server**: Inspect, create, and render compositions via LLM tools (Done)

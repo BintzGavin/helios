@@ -1,7 +1,8 @@
 # Status: LLMS
 
-**Version**: 1.52.0
+**Version**: 1.52.1
 
+[v1.52.1] ✅ Completed: Comprehensive Daily Review - Verified all package versions against actual package.json. Updated Roadmap with new CLI features (Scaffold Kubernetes Deployment), Player API parity, Renderer Orchestrator Plan, and multiple Infrastructure Cloud Execution Adapters (Cloudflare Workers, Azure Functions, Fly.io Machines, Kubernetes, Docker). Added CLI index and guided skills to Key Files and Agent Skills sections.
 [v1.52.0] ✅ Completed: Comprehensive Daily Review - Realigned Quick Facts and Roadmap versions to actual package.json versions (Studio v0.107.1+, CLI v0.41.0+, Player v0.76.18+, Renderer v1.78.0+, Infrastructure v0.25.0+). Updated Roadmap with recently verified completions from PROGRESS logs.
 
 [v1.51.0] ✅ Completed: Comprehensive Daily Review - Updated Quick Facts and Roadmap to reflect latest versions (Studio v0.120.1+, CLI v0.40.3+, Player v0.77.5+, Infrastructure v0.54.28+). Synced Roadmap with recent progress logs including Azure/Kubernetes deployment, Studio asset move and audio tests, Player API parity, and Infrastructure S3/GCS optimizations.
