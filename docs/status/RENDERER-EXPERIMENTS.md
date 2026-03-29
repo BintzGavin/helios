@@ -47,6 +47,9 @@ Last updated by: PERF-092
 - Hoisted worker frame execution async IIFE in Renderer.ts outside of hot loop. ~0.1s improvement. [PERF-089]
 
 ## What Doesn't Work (and Why)
+- Tried setting `noDisplayUpdates: true` on CDP `beginFrameParams` to reduce compositor overhead.
+  - **WHY it didn't work**: This parameter caused Chromium to output empty or 1x1 screenshots because without display updates, the pixel buffers never properly generated content for capture, resulting in ffmpeg crashing on the 1x1 buffers. (PERF-095)
+
 - [PERF-093] Attempted to preallocate Promise array when using .evaluate across frames in SeekTimeDriver.ts and CdpTimeDriver.ts. Found that this optimization was already natively implemented (const framePromises = new Array(frames.length);). Render time remained around baseline (~32.479s vs baseline 33.376s). Discarded because no code changes were necessary.
 - [PERF-090] Attempted to use native Chromium CDP `Emulation.setVirtualTimePolicy` (to `pause` and `advance`) instead of the injected WAAPI syncing script. This fundamentally breaks Playwright's `page.goto` network idle wait logic, causing timeouts. Furthermore, advancing virtual time manually does not natively synchronize Web Animations API (WAAPI) timelines correctly without complex CDP Animation Domain tracking. Did not improve times and broke the test suite. Discarded.
 - [PERF-091] Hoisted closures inside the frame capture loop in Renderer.ts. Did not yield a measurable improvement over the baseline (median 33.906s vs 33.474s baseline).
