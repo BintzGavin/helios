@@ -136,4 +136,42 @@ describe('HeliosVideoTrackList', () => {
       list.addTrack(track);
       expect(handler).toHaveBeenCalled();
   });
+
+  it('should support onremovetrack event handler property', () => {
+      const list = new HeliosVideoTrackList();
+      const handler = vi.fn();
+
+      list.onremovetrack = handler;
+      expect(list.onremovetrack).toBe(handler);
+
+      const host = { handleVideoTrackSelectedChange: vi.fn() };
+      const track = new HeliosVideoTrack('v1', 'main', 'Main Video', 'en', true, host);
+
+      list.addTrack(track);
+      list.removeTrack(track);
+      expect(handler).toHaveBeenCalled();
+
+      list.onremovetrack = null;
+      expect(list.onremovetrack).toBeNull();
+      const track2 = new HeliosVideoTrack('v2', 'main', 'Main Video', 'en', true, host);
+      list.addTrack(track2);
+      list.removeTrack(track2);
+      expect(handler).toHaveBeenCalledTimes(1);
+  });
+
+  it('should support onchange event handler property', () => {
+      const list = new HeliosVideoTrackList();
+      const handler = vi.fn();
+
+      list.onchange = handler;
+      expect(list.onchange).toBe(handler);
+
+      list.dispatchChangeEvent();
+      expect(handler).toHaveBeenCalled();
+
+      list.onchange = null;
+      expect(list.onchange).toBeNull();
+      list.dispatchChangeEvent();
+      expect(handler).toHaveBeenCalledTimes(1);
+  });
 });

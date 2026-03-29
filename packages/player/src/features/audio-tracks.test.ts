@@ -106,4 +106,36 @@ describe('HeliosAudioTrackList', () => {
         list.addTrack(track);
         expect(spy).toHaveBeenCalled();
     });
+
+    it('should support onremovetrack property', () => {
+        const spy = vi.fn();
+        list.onremovetrack = spy;
+        expect(list.onremovetrack).toBe(spy);
+
+        const track = new HeliosAudioTrack('1', '', '', '', true, host);
+        list.addTrack(track);
+        list.removeTrack(track);
+        expect(spy).toHaveBeenCalled();
+
+        list.onremovetrack = null;
+        expect(list.onremovetrack).toBeNull();
+        const track2 = new HeliosAudioTrack('2', '', '', '', true, host);
+        list.addTrack(track2);
+        list.removeTrack(track2);
+        expect(spy).toHaveBeenCalledTimes(1);
+    });
+
+    it('should support onchange property', () => {
+        const spy = vi.fn();
+        list.onchange = spy;
+        expect(list.onchange).toBe(spy);
+
+        list.dispatchChangeEvent();
+        expect(spy).toHaveBeenCalled();
+
+        list.onchange = null;
+        expect(list.onchange).toBeNull();
+        list.dispatchChangeEvent();
+        expect(spy).toHaveBeenCalledTimes(1);
+    });
 });
