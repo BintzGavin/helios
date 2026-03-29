@@ -277,6 +277,11 @@ This file tracks progress for the CLI domain (`packages/cli`).
 ### CLI v0.40.3
 - ✅ Completed: Scaffold Azure Deployment Command - Implemented `helios deploy azure` to scaffold Azure Functions deployment configuration.
 
+## CLI v0.41.1
+
+- ✅ Completed: Verify Scaffold Azure Deployment Command - Verified that helios deploy azure is correctly implemented.
+
+
 ## CLI v0.41.0
 
 - ✅ Completed: Add Diff Command Regression Tests - Implemented comprehensive unit tests for `helios diff`.
