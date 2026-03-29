@@ -115,10 +115,10 @@ export class DomStrategy implements RenderStrategy {
     if (!format) {
       if (hasAlpha) {
         format = 'webp';
-        quality = quality ?? 90;
+        quality = quality ?? 75;
       } else {
         format = 'jpeg';
-        quality = quality ?? 90;
+        quality = quality ?? 75;
       }
     }
 
