@@ -104,6 +104,7 @@ export class Renderer {
       headless: config.headless ?? true,
       executablePath: executablePath,
       args: [...DEFAULT_BROWSER_ARGS, ...gpuArgs, ...userArgs],
+      pipe: true,
     };
   }
 
