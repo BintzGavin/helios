@@ -1,11 +1,11 @@
 ---
 id: PERF-101
 slug: disable-threaded-animations
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-25
-completed: ""
-result: ""
+completed: 2026-03-29
+result: improved
 ---
 
 # PERF-101: Disable Threaded Animations and Scrolling in Chromium
@@ -48,3 +48,9 @@ Run the DOM render verify scripts. Watch the generated video output to ensure th
 ## Prior Art
 - Chromium command line switches: https://peter.sh/experiments/chromium-command-line-switches/
 - Previous attempts to disable background processes and GPU optimizations (PERF-061, PERF-064) showed varying results in this CPU-only microVM, but forcing synchronous animation processing hasn't been directly tested yet.
+
+## Results Summary
+- **Best render time**: 33.760s (vs baseline ~35.778s)
+- **Improvement**: 5.64%
+- **Kept experiments**: PERF-101
+- **Discarded experiments**: none

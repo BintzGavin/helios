@@ -3,6 +3,8 @@ Current best: 33.376s (baseline was 33.561s, ~0.55% improvement)
 Last updated by: PERF-100
 
 ## What Works
+- Added flags `--disable-threaded-animation`, `--disable-threaded-scrolling`, `--disable-checker-imaging`, and `--disable-image-animation-resync` to `DEFAULT_BROWSER_ARGS` in `Renderer.ts`. Render time improved to 33.760s. (PERF-101)
+
 - Reduced default intermediate image quality from 90 to 75 to optimize IPC payload sizes and reduce node.js base64 decode overhead (~0.1% improvement). (PERF-096)
 - Replaced `Buffer.byteLength(screenshotData, 'base64')` with `Math.floor((screenshotData.length * 3) / 4)` heuristic for base64 decoding buffer pre-allocation in `packages/renderer/src/strategies/DomStrategy.ts` (`writeToBufferPool`). Reduced memory allocation scan overhead by ~2.5% time per render, saving ~1 second. PERF-094
 - [PERF-092] Preallocated a module-level pool of Buffer objects per worker in `DomStrategy.ts` to reuse during base64 decoding of screenshot data. This eliminates the multi-megabyte `Buffer.from()` object allocation and subsequent garbage collection per frame. Render time improved marginally from ~33.561s baseline to ~33.376s.

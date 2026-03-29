@@ -226,3 +226,5 @@ peak_mem_mb:        38.3
 225	33.376	150	4.49	38.5	keep	PERF-092 Preallocate Buffer for Base64 Decoding in DomStrategy.ts
 226	32.479	150	4.62	38.9	discard	PERF-093 preallocate playwright array
 226	33.601	136	4.05	50.0	keep	quality 75 default
+
+101	33.760	150	4.44	38.0	keep	disable threaded animations and scrolling

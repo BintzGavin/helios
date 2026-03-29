@@ -36,7 +36,11 @@ const DEFAULT_BROWSER_ARGS = [
   '--disable-background-networking',
   '--disable-background-timer-throttling',
   '--disable-breakpad'
-];
+,
+  '--disable-threaded-animation',
+  '--disable-threaded-scrolling',
+  '--disable-checker-imaging',
+  '--disable-image-animation-resync'];
 
 const GPU_DISABLED_ARGS = [
   '--disable-gpu',
