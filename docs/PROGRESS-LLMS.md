@@ -1,5 +1,11 @@
 # LLMS Progress
 
+## LLMS v1.52.1
+- ✅ Completed: Daily llms.txt Review
+  - Verified Quick Facts versions against package.json (Core v5.13.0+, Studio v0.107.1+, Player v0.76.18+, Renderer v1.78.0+, CLI v0.41.0+, Infrastructure v0.25.0+).
+  - Updated Roadmap with recent completions (CLI Kubernetes Scaffold, Player getSchema, Renderer Orchestrator Plan, Infrastructure Cloud Execution Adapters).
+  - Added guided skills path and CLI public API file to Agent Skills and Key Files.
+
 ## LLMS v1.51.0
 - ✅ Completed: Daily llms.txt Review
   - Updated Quick Facts: Core v5.13.0+, Studio v0.120.1+, Player v0.77.5+, Renderer v1.80.0+, CLI v0.40.3+, Infrastructure v0.54.28+
