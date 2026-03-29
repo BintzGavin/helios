@@ -1,11 +1,11 @@
 ---
 id: PERF-106
 slug: single-process-chromium
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-03-29
-completed: ""
-result: ""
+completed: "2026-03-29"
+result: "discarded"
 ---
 
 # PERF-106: Disable Site Isolation Trials
@@ -52,3 +52,9 @@ Run a canvas render test to ensure Canvas mode is unaffected.
 
 ## Correctness Check
 Run the DOM benchmark. Ensure output video is correct.
+
+## Results Summary
+- **Best render time**: 33.423s (baseline)
+- **Improvement**: 0%
+- **Kept experiments**: None
+- **Discarded experiments**: `--single-process`, `--in-process-gpu`

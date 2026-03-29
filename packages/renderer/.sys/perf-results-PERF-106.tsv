@@ -1,0 +1,4 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	33.423	150	4.49	36.1	keep	baseline
+2	33.546	150	4.47	38.0	discard	--single-process
+3	33.432	150	4.49	37.6	discard	--in-process-gpu

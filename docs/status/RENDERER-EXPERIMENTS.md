@@ -50,6 +50,7 @@ Last updated by: PERF-100
 - Hoisted worker frame execution async IIFE in Renderer.ts outside of hot loop. ~0.1s improvement. [PERF-089]
 
 ## What Doesn't Work (and Why)
+- **PERF-106: Disable Site Isolation Trials**: Added `--single-process` and `--in-process-gpu` flags to `DEFAULT_BROWSER_ARGS` in `Renderer.ts`. The render times either remained identical or degraded slightly (33.54s and 33.43s vs 33.42s baseline). In modern Chromium versions running in this CPU-bound microVM, forcing a single process or in-process GPU does not yield any IPC latency savings and likely introduces more thread contention within the single main process. Discarded to maintain stability.
 - Tried setting `noDisplayUpdates: true` on CDP `beginFrameParams` to reduce compositor overhead.
   - **WHY it didn't work**: This parameter caused Chromium to output empty or 1x1 screenshots because without display updates, the pixel buffers never properly generated content for capture, resulting in ffmpeg crashing on the 1x1 buffers. (PERF-095)
 
@@ -84,7 +85,6 @@ Last updated by: PERF-100
 - Conditionally using `jpeg_pipe` format with `mjpeg` codec for FFmpeg ingestion when intermediate image format is `jpeg`. The render time degraded (47.85s vs 46.706s). It appears that bypassing FFmpeg stream probing doesn't offset other ingestion/decoding overhead in this environment. (PERF-012)
 
 ## Open Questions
-- [PERF-106] Can we completely eliminate Chromium-internal IPC overhead by adding the `--single-process` or `--in-process-gpu` flag to `DEFAULT_BROWSER_ARGS`?
 - [PERF-089] Can we eliminate the anonymous async function allocation inside the hot loop in `Renderer.ts` by defining a static execution function outside the while loop to reduce V8 GC micro-stalls?
 - [PERF-083] Can we extract the active pipeline limit (`poolLen * 8`) calculation out of the frame loop while condition to prevent V8 micro-stalls during frame capture?
 - [PERF-032] Can we overcome the damage-driven limitations of `Page.startScreencast` (which failed in PERF-026) by injecting a forced layout/paint toggle on every virtual time tick, allowing us to buffer continuous screencast frames and eliminate the IPC latency of polling `Page.captureScreenshot`?
