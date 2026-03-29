@@ -1,8 +1,9 @@
 ## Performance Trajectory
-Current best: 34.175s (baseline was 34.866s, -2.0%)
-Last updated by: PERF-100
+Current best: 33.394s (baseline was 34.631s, -3.5%)
+Last updated by: PERF-107
 
 ## What Works
+- [PERF-107] Replaced the static array of 10 buffers (`bufferPool`) in `DomStrategy.ts` with dynamically allocated buffers using `Buffer.allocUnsafe` per frame. This resolves a severe memory race condition and crash that occurs when the worker pipeline depth outpaces the static pool size, allowing deep pipelining to function reliably. Render time improved to ~33.459s.
 - Pass explicit timing parameters to HeadlessExperimental.beginFrame to synchronize Chromium compositor clock (~2.0% faster) [PERF-102]
 - Added flags `--disable-threaded-animation`, `--disable-threaded-scrolling`, `--disable-checker-imaging`, and `--disable-image-animation-resync` to `DEFAULT_BROWSER_ARGS` in `Renderer.ts`. Render time improved to 33.760s. (PERF-101)
 
