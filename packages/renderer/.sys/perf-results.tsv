@@ -231,3 +231,4 @@ peak_mem_mb:        38.3
 107	33.459	150	4.48	38.5	keep	PERF-107 Replace static buffer pool with dynamic allocUnsafe
 1	46.493	150	3.23	38.6	keep	baseline
 2	35.175	150	4.29	35.4	keep	PERF-110 Sequential CDP Capture
+3	36.684	150	4.09	35.8	discard	PERF-085: Already implemented

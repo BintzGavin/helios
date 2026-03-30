@@ -55,6 +55,7 @@ Last updated by: PERF-111
 - Hoisted worker frame execution async IIFE in Renderer.ts outside of hot loop. ~0.1s improvement. [PERF-089]
 
 ## What Doesn't Work (and Why)
+- PERF-085: Eliminate hot loop allocations. **WHY**: Already implemented by previous cycles.
 - **PERF-100**: Attempted to use Playwright's `pipe: true` IPC transport.
   **What you tried**: Launching Chromium with `pipe: true` instead of the default WebSocket connection.
   **Why it didn't work**: The `pipe: true` option is already present in the codebase. Benchmarking its removal showed no significant latency difference in this environment, with median render times remaining practically identical (~35.3s vs ~35.2s). The Playwright IPC transport mechanism is not the critical bottleneck for DOM rendering under this microVM setup.
