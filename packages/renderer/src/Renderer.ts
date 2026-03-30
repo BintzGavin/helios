@@ -162,14 +162,14 @@ export class Renderer {
     let pool: { page: import('playwright').Page, strategy: RenderStrategy, timeDriver: TimeDriver, activePromise: Promise<void> }[] = [];
     try {
       const cpus = os.cpus().length || 4;
-      const concurrency = 1;
+      const concurrency = Math.min(os.cpus().length || 4, 8);
       console.log(`Initializing pool of ${concurrency} pages...`);
 
       const capturedErrors: Error[] = [];
 
       const createPage = async (index: number) => {
         const page = await context.newPage();
-        const strategy = this.options.mode === 'dom' ? new DomStrategy(this.options) : new CanvasStrategy(this.options);
+        const strategy = this.strategy || (this.options.mode === 'dom' ? new DomStrategy(this.options) : new CanvasStrategy(this.options));
         const timeDriver = this.options.mode === 'dom' ? new SeekTimeDriver(this.options.stabilityTimeout) : new CdpTimeDriver(this.options.stabilityTimeout);
 
         page.on('console', (msg: ConsoleMessage) => console.log(`PAGE LOG [${index}]: ${msg.text()}`));
@@ -303,7 +303,7 @@ export class Renderer {
 
           let nextFrameToWrite = 0;
           const poolLen = pool.length;
-          const maxPipelineDepth = 50;
+          const maxPipelineDepth = poolLen * 2;
           const timeStep = 1000 / fps;
           const compTimeStep = 1 / fps;
 

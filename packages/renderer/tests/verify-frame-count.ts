@@ -38,6 +38,10 @@ async function verifyFrameCount() {
   // Mock the strategy
   const strategy = (renderer as any).strategy as CanvasStrategy;
 
+  // Override the renderer's internal strategy creation so it uses our mocked instance
+
+
+
   let capturedFrames = 0;
 
   strategy.prepare = async (page) => {
