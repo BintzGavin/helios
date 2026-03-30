@@ -1,8 +1,9 @@
 ## Performance Trajectory
 Current best: 33.394s (baseline was 34.631s, -3.5%)
-Last updated by: PERF-114
+Last updated by: PERF-119
 
 ## What Works
+- [PERF-119] Identified the core concurrency bottleneck blocking deep pipelining (PERF-115) and causing "Another frame is pending" crashes: workers shared a single `DomStrategy` class property, overwriting the `cdpSession`. Planned fix to instantiate independent strategies per worker page.
 - [PERF-114] Pipelined `timeDriver.setTime()` and `strategy.capture()` commands in `Renderer.ts` by invoking both Promises concurrently rather than awaiting `setTime` before invoking `capture`. This eliminates one Node.js-to-Chromium IPC round trip per frame, allowing Chromium to queue and process the `Runtime.evaluate` and `HeadlessExperimental.beginFrame` sequentially without Node.js idling in between. Median render time improved from ~35.2s to 34.8s.
 - [PERF-112] Eliminated `Array.map` allocation in `DomStrategy.ts` `prepare` method by replacing it with a localized `for` loop, marginally reducing GC overhead during strategy preparation.
 - Sequential CDP Capture (concurrency=1, maxPipelineDepth=50) improved render time from 46.493s to 35.175s [PERF-110]
