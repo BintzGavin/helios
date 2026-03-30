@@ -131,3 +131,7 @@ Critical learnings only. This is not a log—only add entries for insights that 
 ## v0.41.0 - Scaffold Azure Deployment Command
 **Learning:** When adding new cloud infrastructure adapters to the Helios Engine, always ensure a corresponding CLI deployment scaffolding command (e.g., `helios deploy azure`) is created to provide the required manifest templates for users.
 **Action:** Added a check to cross-reference infrastructure adapters with CLI deployment commands.
+
+## [0.42.0] - CLI Scaffold Hetzner Deployment Prerequisite
+**Learning:** When adding a new tier-3 cloud infrastructure adapter to the Helios Engine (like Hetzner Cloud), always ensure a corresponding CLI deployment scaffolding command (e.g., `helios deploy hetzner`) is created to provide the required manifest templates for users.
+**Action:** When bridging a "Cloud Execution" gap, always verify if a corresponding CLI deployment scaffold is required.
