@@ -1,6 +1,6 @@
 ## Performance Trajectory
 Current best: 33.394s (baseline was 34.631s, -3.5%)
-Last updated by: PERF-109
+Last updated by: PERF-111
 
 ## What Works
 - Sequential CDP Capture (concurrency=1, maxPipelineDepth=50) improved render time from 46.493s to 35.175s [PERF-110]
@@ -54,6 +54,7 @@ Last updated by: PERF-109
 - Hoisted worker frame execution async IIFE in Renderer.ts outside of hot loop. ~0.1s improvement. [PERF-089]
 
 ## What Doesn't Work (and Why)
+- [PERF-111] Replaced events.once and explicit AbortController instantiations for FFmpeg stdin backpressure handling in Renderer.ts with a direct Promise allocation. This reduces V8 GC pressure in the hot capture loop. The render time changed from ~35.089s to ~35.384s (median of test runs), which is effectively identical within noise margins. Marking as discarded since the GC overhead of AbortController here was not the dominant bottleneck.
 - **PERF-106: Disable Site Isolation Trials**: Added `--single-process` and `--in-process-gpu` flags to `DEFAULT_BROWSER_ARGS` in `Renderer.ts`. The render times either remained identical or degraded slightly (33.54s and 33.43s vs 33.42s baseline). In modern Chromium versions running in this CPU-bound microVM, forcing a single process or in-process GPU does not yield any IPC latency savings and likely introduces more thread contention within the single main process. Discarded to maintain stability.
 - Tried setting `noDisplayUpdates: true` on CDP `beginFrameParams` to reduce compositor overhead.
   - **WHY it didn't work**: This parameter caused Chromium to output empty or 1x1 screenshots because without display updates, the pixel buffers never properly generated content for capture, resulting in ffmpeg crashing on the 1x1 buffers. (PERF-095)
