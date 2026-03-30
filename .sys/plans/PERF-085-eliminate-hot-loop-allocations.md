@@ -1,11 +1,11 @@
 ---
 id: PERF-085
 slug: eliminate-hot-loop-allocations
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-24
-completed: ""
-result: ""
+completed: "2026-03-30"
+result: "discarded"
 ---
 # PERF-085: Eliminate Hot Loop Allocations
 
@@ -54,3 +54,9 @@ Run basic canvas render to ensure it does not break (since `Renderer.ts` logic i
 
 ## Correctness Check
 Run `npx tsx tests/verify-dom-selector.ts` and ensure DOM output is still correct.
+
+## Results Summary
+- **Best render time**: 36.684s (vs baseline 36.684s)
+- **Improvement**: 0%
+- **Kept experiments**: []
+- **Discarded experiments**: [Already implemented]
