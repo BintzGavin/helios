@@ -1,11 +1,11 @@
 ---
 id: PERF-117
 slug: incremental-time-calculation
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-31
-completed: ""
-result: ""
+completed: "2026-03-30"
+result: failed
 ---
 # PERF-117: Incremental Time Calculation in Hot Loop
 
@@ -64,3 +64,9 @@ Run `npx tsx packages/renderer/tests/verify-codecs.ts` to ensure the CanvasStrat
 ## Correctness Check
 Run the DOM verification script to ensure frames are still sequenced correctly:
 `npx tsx packages/renderer/tests/verify-codecs.ts`
+
+## Results Summary
+- **Best render time**: 0.000s
+- **Improvement**: 0%
+- **Kept experiments**:
+- **Discarded experiments**: [PERF-117 Incremental Time Calculation (Crashed)]
