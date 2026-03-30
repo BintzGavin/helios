@@ -3,6 +3,7 @@ Current best: 33.394s (baseline was 34.631s, -3.5%)
 Last updated by: PERF-111
 
 ## What Works
+- [PERF-112] Eliminated `Array.map` allocation in `DomStrategy.ts` `prepare` method by replacing it with a localized `for` loop, marginally reducing GC overhead during strategy preparation.
 - Sequential CDP Capture (concurrency=1, maxPipelineDepth=50) improved render time from 46.493s to 35.175s [PERF-110]
 - [PERF-109] Removed the previously added flags `--disable-threaded-animation`, `--disable-threaded-scrolling`, `--disable-checker-imaging`, and `--disable-image-animation-resync` from `DEFAULT_BROWSER_ARGS` in `Renderer.ts`. This reverts a regression that occurred when these flags forced operations onto the main thread, negating concurrent execution benefits and slowing down DOM rendering.
 - [PERF-107] Replaced the static array of 10 buffers (`bufferPool`) in `DomStrategy.ts` with dynamically allocated buffers using `Buffer.allocUnsafe` per frame. This resolves a severe memory race condition and crash that occurs when the worker pipeline depth outpaces the static pool size, allowing deep pipelining to function reliably. Render time improved to ~33.459s.

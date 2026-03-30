@@ -69,9 +69,12 @@ export class DomStrategy implements RenderStrategy {
     const script = `${PRELOAD_SCRIPT}(${timeout})`;
 
     // Execute preloading script in all frames
-    await Promise.all(page.frames().map(frame =>
-      frame.evaluate(script)
-    ));
+    const frames = page.frames();
+    const framePromises = new Array(frames.length);
+    for (let i = 0; i < frames.length; i++) {
+        framePromises[i] = frames[i].evaluate(script);
+    }
+    await Promise.all(framePromises);
 
     // Scan for audio tracks using the shared utility
     const initialTracks = await scanForAudioTracks(page, timeout);
