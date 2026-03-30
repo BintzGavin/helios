@@ -1,11 +1,11 @@
 ---
 id: PERF-116
 slug: incremental-time-calculation
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2026-10-18
 completed: ""
-result: ""
+result: "failed"
 ---
 # PERF-116: Incremental Time Calculation in Hot Loop
 
@@ -65,3 +65,7 @@ Run `npx tsx packages/renderer/tests/verify-codecs.ts` to ensure the CanvasStrat
 Run the DOM verification scripts to ensure frames are still sequenced correctly:
 `npx tsx packages/renderer/tests/verify-frame-count.ts`
 `npx tsx packages/renderer/tests/verify-seek-driver-determinism.ts`
+
+## Results Summary
+- **Kept experiments**: none
+- **Discarded experiments**: PERF-116
