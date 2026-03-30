@@ -3,10 +3,11 @@ import { TimeDriver } from './TimeDriver.js';
 import { getSeedScript } from '../utils/random-seed.js';
 import { FIND_ALL_MEDIA_FUNCTION, FIND_ALL_SCOPES_FUNCTION, SYNC_MEDIA_FUNCTION, PARSE_MEDIA_ATTRIBUTES_FUNCTION } from '../utils/dom-scripts.js';
 
-const evaluateParamsPool: any[] = [];
+
 
 export class SeekTimeDriver implements TimeDriver {
   private cdpSession: CDPSession | null = null;
+  private evaluateParamsPool: any[] = [];
 
   constructor(private timeout: number = 30000) {}
 
@@ -241,13 +242,13 @@ export class SeekTimeDriver implements TimeDriver {
 
     if (frames.length === 1) {
       if (this.cdpSession) {
-        let params = evaluateParamsPool.pop();
+        let params = this.evaluateParamsPool.pop();
         if (!params) {
           params = { expression: '', awaitPromise: true, returnByValue: false };
         }
         params.expression = `window.__helios_seek(${timeInSeconds}, ${this.timeout})`;
         const response = await this.cdpSession.send('Runtime.evaluate', params);
-        evaluateParamsPool.push(params);
+        this.evaluateParamsPool.push(params);
         if (response.exceptionDetails) {
           throw new Error(`Seek error in main frame: ${response.exceptionDetails.exception?.description || 'Unknown error'}`);
         }
@@ -265,13 +266,13 @@ export class SeekTimeDriver implements TimeDriver {
     for (let i = 0; i < frames.length; i++) {
       const frame = frames[i];
       if (this.cdpSession && frame === page.mainFrame()) {
-        let params = evaluateParamsPool.pop();
+        let params = this.evaluateParamsPool.pop();
         if (!params) {
           params = { expression: '', awaitPromise: true, returnByValue: false };
         }
         params.expression = `window.__helios_seek(${timeInSeconds}, ${this.timeout})`;
         promises[i] = this.cdpSession.send('Runtime.evaluate', params).then((response) => {
-          evaluateParamsPool.push(params);
+          this.evaluateParamsPool.push(params);
           if (response.exceptionDetails) {
             throw new Error(`Seek error in main frame: ${response.exceptionDetails.exception?.description || 'Unknown error'}`);
           }

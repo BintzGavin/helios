@@ -101,7 +101,6 @@ Last updated by: PERF-119
 - Conditionally using `jpeg_pipe` format with `mjpeg` codec for FFmpeg ingestion when intermediate image format is `jpeg`. The render time degraded (47.85s vs 46.706s). It appears that bypassing FFmpeg stream probing doesn't offset other ingestion/decoding overhead in this environment. (PERF-012)
 
 ## Open Questions
-- [PERF-120] Can we resolve the final Playwright worker concurrency race condition by replacing the module-level shared `evaluateParamsPool` in `SeekTimeDriver.ts` with an instance-level property, enabling safe concurrent scaling without "Another frame is pending" crashes?
 - [PERF-089] Can we eliminate the anonymous async function allocation inside the hot loop in `Renderer.ts` by defining a static execution function outside the while loop to reduce V8 GC micro-stalls?
 - [PERF-083] Can we extract the active pipeline limit (`poolLen * 8`) calculation out of the frame loop while condition to prevent V8 micro-stalls during frame capture?
 - [PERF-032] Can we overcome the damage-driven limitations of `Page.startScreencast` (which failed in PERF-026) by injecting a forced layout/paint toggle on every virtual time tick, allowing us to buffer continuous screencast frames and eliminate the IPC latency of polling `Page.captureScreenshot`?
@@ -134,3 +133,6 @@ Last updated by: PERF-119
 
 ## What Works
 - PERF-119: Independent Strategies per Worker. It resolved the "Another frame is pending" crashes and allowed deep pipelining to safely distribute frame renders across workers, unlocking concurrency speedup. Render time reduced to 34.306s.
+
+## What Works
+- PERF-120: Replaced module-level `evaluateParamsPool` with an instance-level pool inside `SeekTimeDriver.ts`. This successfully decoupled Playwright worker pages and eliminated a major concurrency race condition (preventing corrupted evaluation parameters during overlapping `setTime` calls), keeping render time at ~33.4s but guaranteeing safe multi-worker scaling.
