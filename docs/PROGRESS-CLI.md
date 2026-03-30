@@ -1,3 +1,6 @@
+## CLI v0.43.0
+- ✅ Completed: Scaffold Hetzner Deployment Command - Implemented `helios deploy hetzner` to scaffold README-HETZNER.md for the Hetzner Cloud adapter.
+
 ### CLI v0.40.2
 - ✅ Completed: Scaffold Kubernetes Deployment Command - Implemented `helios deploy kubernetes` to scaffold job.yaml and README-KUBERNETES.md for Kubernetes Job clusters.
 

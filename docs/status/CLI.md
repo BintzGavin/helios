@@ -1,4 +1,4 @@
-**Version**: 0.41.1
+**Version**: 0.43.0
 
 # CLI Status
 
@@ -19,6 +19,7 @@ The Helios CLI is the primary user interface for component registry, project sca
 5. **Merge Command** - `helios merge` for stitching distributed render chunks
 
 ## History
+[v0.43.0] ✅ Completed: Scaffold Hetzner Deployment Command - Implemented `helios deploy hetzner` to scaffold README-HETZNER.md for the Hetzner Cloud adapter.
 [v0.42.0] ✅ Completed: CLI Scaffold Hetzner Deployment Plan - Created plan to implement `helios deploy hetzner` for the Hetzner Cloud adapter.
 [v0.41.1] ✅ Completed: Verify Scaffold Azure Deployment Command - Verified that helios deploy azure is correctly implemented.
 [v0.41.0] ✅ Completed: Add Diff Command Regression Tests - Implemented comprehensive unit tests for `helios diff`.

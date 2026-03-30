@@ -9,6 +9,8 @@ import { AWS_DOCKERFILE_TEMPLATE, AWS_LAMBDA_HANDLER_TEMPLATE, AWS_SAM_TEMPLATE,
 import { WRANGLER_TOML_TEMPLATE, CLOUDFLARE_WORKER_TEMPLATE, README_CLOUDFLARE_TEMPLATE } from '../templates/cloudflare.js';
 import { FLY_TOML_TEMPLATE, FLY_DOCKERFILE_TEMPLATE, README_FLY_TEMPLATE } from '../templates/fly.js';
 import { KUBERNETES_JOB_TEMPLATE, README_KUBERNETES_TEMPLATE } from '../templates/kubernetes.js';
+import { README_HETZNER_TEMPLATE } from '../templates/hetzner.js';
+
 import { AZURE_FUNCTION_JSON_TEMPLATE, AZURE_HOST_JSON_TEMPLATE, AZURE_LOCAL_SETTINGS_JSON_TEMPLATE, AZURE_INDEX_JS_TEMPLATE, README_AZURE_TEMPLATE } from '../templates/azure.js';
 
 
@@ -644,5 +646,42 @@ export function registerDeployCommand(program: Command) {
 
       console.log(chalk.blue('\nKubernetes setup complete!'));
       console.log('See README-KUBERNETES.md for deployment instructions.');
+    });
+
+  deploy
+    .command('hetzner')
+    .description('Scaffold Hetzner Cloud deployment configuration')
+    .action(async () => {
+      const cwd = process.cwd();
+      const readmePath = path.join(cwd, 'README-HETZNER.md');
+
+      console.log(chalk.blue('Scaffolding Hetzner Cloud deployment files...'));
+
+      let writeReadme = true;
+      if (fs.existsSync(readmePath)) {
+        const response = await prompts({
+          type: 'confirm',
+          name: 'value',
+          message: 'README-HETZNER.md already exists. Overwrite?',
+          initial: false
+        });
+
+        if (typeof response.value === 'undefined') {
+          console.log(chalk.yellow('\nOperation cancelled.'));
+          process.exit(0);
+        }
+
+        writeReadme = response.value;
+      }
+
+      if (writeReadme) {
+        fs.writeFileSync(readmePath, README_HETZNER_TEMPLATE);
+        console.log(chalk.green('✔ Created README-HETZNER.md'));
+      } else {
+        console.log(chalk.gray('Skipped README-HETZNER.md'));
+      }
+
+      console.log(chalk.blue('\nHetzner Cloud setup complete!'));
+      console.log('See README-HETZNER.md for deployment instructions.');
     });
 }
