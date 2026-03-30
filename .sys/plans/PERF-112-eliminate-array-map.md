@@ -1,11 +1,11 @@
 ---
 id: PERF-112
 slug: eliminate-array-map
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-30
 completed: ""
-result: ""
+result: "improved"
 ---
 
 # PERF-112: Eliminate Array.map in PRELOAD_SCRIPT Execution
