@@ -54,6 +54,10 @@ Last updated by: PERF-111
 - Hoisted worker frame execution async IIFE in Renderer.ts outside of hot loop. ~0.1s improvement. [PERF-089]
 
 ## What Doesn't Work (and Why)
+- **PERF-100**: Attempted to use Playwright's `pipe: true` IPC transport.
+  **What you tried**: Launching Chromium with `pipe: true` instead of the default WebSocket connection.
+  **Why it didn't work**: The `pipe: true` option is already present in the codebase. Benchmarking its removal showed no significant latency difference in this environment, with median render times remaining practically identical (~35.3s vs ~35.2s). The Playwright IPC transport mechanism is not the critical bottleneck for DOM rendering under this microVM setup.
+  **Plan ID**: PERF-100
 - [PERF-111] Replaced events.once and explicit AbortController instantiations for FFmpeg stdin backpressure handling in Renderer.ts with a direct Promise allocation. This reduces V8 GC pressure in the hot capture loop. The render time changed from ~35.089s to ~35.384s (median of test runs), which is effectively identical within noise margins. Marking as discarded since the GC overhead of AbortController here was not the dominant bottleneck.
 - **PERF-106: Disable Site Isolation Trials**: Added `--single-process` and `--in-process-gpu` flags to `DEFAULT_BROWSER_ARGS` in `Renderer.ts`. The render times either remained identical or degraded slightly (33.54s and 33.43s vs 33.42s baseline). In modern Chromium versions running in this CPU-bound microVM, forcing a single process or in-process GPU does not yield any IPC latency savings and likely introduces more thread contention within the single main process. Discarded to maintain stability.
 - Tried setting `noDisplayUpdates: true` on CDP `beginFrameParams` to reduce compositor overhead.

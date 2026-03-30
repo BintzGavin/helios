@@ -1,0 +1,10 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	35.744	150	4.20	35.4	discard	baseline (with pipe)
+2	35.374	150	4.24	35.3	discard	baseline (with pipe)
+3	35.295	150	4.25	35.9	discard	baseline (with pipe)
+4	35.300	150	4.25	35.4	discard	experiment (without pipe)
+5	36.442	150	4.12	35.3	discard	experiment (without pipe)
+6	35.116	150	4.27	35.5	discard	experiment (without pipe)
+7	35.058	150	4.28	35.5	discard	experiment (without pipe)
+8	36.029	150	4.16	35.4	discard	restoring to baseline
+9	34.984	150	4.29	35.4	discard	restoring to baseline
