@@ -89,6 +89,15 @@
 - `poster`: Image URL to display while connecting or loading.
 - `preload`: Indicates caching behavior (`none`, `metadata`, `auto`).
 - `controlslist`: Allows hiding specific UI elements (e.g., `nodownload`, `nofullscreen`).
+- `exportMode`
+- `exportFormat`
+- `exportFilename`
+- `exportWidth`
+- `exportHeight`
+- `exportBitrate`
+- `exportCaptionMode`
+- `canvasSelector`
+- `controlsList`
 - `sandbox`: Overrides the default iframe sandbox flags.
 - `disablepictureinpicture`: If present, hides the PiP button.
 

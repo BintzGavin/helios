@@ -105,6 +105,9 @@ Each agent should update **their own dedicated progress file** instead of this f
 ### CLI v0.31.0
 - ✅ Completed: AWS Deployment - Implemented AWS Lambda deployment scaffolding and custom browser path support.
 
+### PLAYER v0.77.7
+- ✅ Completed: Expose Missing Export Attributes - Added missing properties (exportMode, exportFormat, exportFilename, exportWidth, exportHeight, exportBitrate, exportCaptionMode, canvasSelector, controlsList) to HeliosPlayer to match the documented attributes.
+
 ### PLAYER v0.77.6
 - ✅ Completed: Improve Test Coverage - Added test coverage for onremovetrack and onchange properties in audio and video track lists.
 

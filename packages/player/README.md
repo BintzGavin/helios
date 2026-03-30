@@ -173,6 +173,16 @@ The `<helios-player>` element implements a subset of the HTMLMediaElement interf
 - `preservesPitch` (boolean): Whether pitch should be preserved when altering playback speed.
 - `srcObject` (MediaProvider | null): The media provider object.
 - `crossOrigin` (string | null): The CORS setting for this media element.
+- `exportMode` (string): Reflected export-mode attribute.
+- `exportFormat` (string): Reflected export-format attribute.
+- `exportFilename` (string): Reflected export-filename attribute.
+- `exportWidth` (number | null): Reflected export-width attribute.
+- `exportHeight` (number | null): Reflected export-height attribute.
+- `exportBitrate` (number | null): Reflected export-bitrate attribute.
+- `exportCaptionMode` (string): Reflected export-caption-mode attribute.
+- `canvasSelector` (string): Reflected canvas-selector attribute.
+- `controlsList` (string): Reflected controlslist attribute.
+
 
 ## Events
 
