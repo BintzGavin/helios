@@ -235,3 +235,4 @@ peak_mem_mb:        38.3
 014-pipeline-evaluate-capture	34.814	150	4.31	35.2	keep	Pipeline Evaluate and Capture in Renderer.ts
 15	0.000	0	0.00	0.0	crash	incremental time calculation
 1	0.000	0	0.00	0.0	crash	incremental time calculation
+236	34.306	300	4.37	39.0	keep	Independent Strategies per Worker

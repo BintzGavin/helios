@@ -130,3 +130,6 @@ Last updated by: PERF-119
 - **Expanding Buffer Pool and Pipeline Depth (PERF-098)**: Tried increasing `maxPipelineDepth` to `poolLen * 15` and `bufferPool` size to `20`. The expected rendering time improvement was not observed, instead it hovered around ~33.9s to ~34.3s. This suggests that expanding the pipeline depth and pre-allocated buffer pool doesn't relieve any critical bottleneck, or the overhead of managing a larger buffer queue balances out the potential concurrent frame gains.
 - Tried incremental time calculation in the hot loop (PERF-117).
   - WHY it didn't work: Caused `cdpSession.send: Protocol error (HeadlessExperimental.beginFrame): Another frame is pending` crash. The accumulators likely got out of sync with the true frame offset.
+
+## What Works
+- PERF-119: Independent Strategies per Worker. It resolved the "Another frame is pending" crashes and allowed deep pipelining to safely distribute frame renders across workers, unlocking concurrency speedup. Render time reduced to 34.306s.
