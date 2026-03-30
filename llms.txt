@@ -6,7 +6,7 @@ Helios is a modern engine for creating videos programmatically using standard we
 
 ## Quick Facts
 - **License**: Elastic License 2.0 (free commercial use, no SaaS resale)
-- **Status**: Beta / Self-Driving (Core: Stable v5.13.0+, Studio: Alpha v0.107.1+, Player: v0.76.18+, Renderer: v1.78.0+, CLI: Beta v0.41.0+, Infrastructure: v0.25.0+)
+- **Status**: Beta / Self-Driving (Core: Stable v5.13.0+, Studio: Alpha v0.119.5+, Player: v0.77.5+, Renderer: v1.79.0+, CLI: Beta v0.40.2+, Infrastructure: v0.54.23+)
 - **Frameworks**: React, Vue, Svelte, Solid, vanilla JS
 - **Animation**: Standard CSS, Web Animations API (WAAPI), any animation library
 
@@ -114,12 +114,12 @@ const report = await Helios.diagnose();
 
 ## Roadmap
 ### V1.x (Active)
-- **Studio**: v0.107.1+ (Preview Command, CompositionsPanel Tests, CLI Build Command)
-- **CLI**: v0.41.0+ (Scaffold Kubernetes Deployment Command, Scaffold Fly.io Deployment Command, Add Command Regression Tests)
-- **Core**: v5.13.0+ (Generic Input Props, Implement Composition Schema)
-- **Player**: v0.76.18+ (Bridge Coverage Completeness, Document getSchema API Parity)
-- **Renderer**: v1.78.0+ (Orchestrator Plan, Validate HW Accel, Refactor Media Sync Logic)
-- **Infrastructure**: v0.25.0+ (Cloudflare Workers, Azure Functions, Fly.io Machines, Kubernetes Job API, Docker/Local Swarm)
+- **Studio**: v0.119.5+ (Asset Drag and Drop, Timeline Audio Regression Tests, CLI Component Removal)
+- **CLI**: v0.40.2+ (Scaffold Kubernetes Deployment Command, Scaffold Fly.io Deployment Command, Add Command Regression Tests)
+- **Core**: v5.13.0+ (Generic Input Props, Implement Composition Schema, Fix GSAP Timeline Sync)
+- **Player**: v0.77.5+ (Document getSchema API Parity, Bridge Coverage Completeness)
+- **Renderer**: v1.79.0+ (Validate HW Accel, Orchestrator Plan, Refactor Media Sync Logic)
+- **Infrastructure**: v0.54.23+ (Optimize GCS Uploads, Orchestrator Test Coverage Expansion)
 
 ### AI Integration
 - **Studio MCP Server**: Inspect, create, and render compositions via LLM tools (Done)
