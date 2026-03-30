@@ -135,7 +135,7 @@ export const AssetItem: React.FC<AssetItemProps> = ({ asset }) => {
     e.dataTransfer.setData('application/helios-asset', JSON.stringify(asset));
     e.dataTransfer.setData('application/helios-asset-id', asset.id);
     e.dataTransfer.setData('text/plain', asset.url);
-    e.dataTransfer.effectAllowed = 'copy';
+    e.dataTransfer.effectAllowed = 'copyMove';
   };
 
   const renderPreview = () => {

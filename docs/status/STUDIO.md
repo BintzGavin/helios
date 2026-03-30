@@ -1,4 +1,4 @@
-**Version**: 0.120.2
+**Version**: 0.120.3
 
 **Posture**: ACTIVELY EXPANDING FOR V2
 
@@ -12,6 +12,7 @@
 - [v0.119.5] ✅ Completed: Refine CLI Component Removal - Verified existing implementation of component file deletion and interactive confirmation prompts in `helios remove` command (2026-10-23-STUDIO-Refine-CLI-Component-Removal.md).
 
 ## Recent Updates
+- [v0.120.3] ✅ Completed: STUDIO-Asset-Move - Updated effectAllowed to copyMove in AssetItem.tsx.
 - [v0.120.1] ✅ Completed: STUDIO-Asset-Move - Added drag and drop for assets to folder functionality by implementing unit tests and confirming logic.
 - [v0.120.0] ✅ Completed: Asset Move - Verified and documented drag-and-drop support for moving assets into folders within the Assets Panel.
 - [v0.119.3] ✅ Completed: Asset Move - Verified existing implementation of drag-and-drop support for moving assets into folders within the Studio Assets Panel.

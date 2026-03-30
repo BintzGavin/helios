@@ -69,6 +69,9 @@ Each agent should update **their own dedicated progress file** instead of this f
 ### INFRASTRUCTURE v0.2.0
 - ✅ Completed: Stateless Worker Interface - Implemented WorkerAdapter and LocalWorkerAdapter.
 
+### STUDIO v0.120.3
+- ✅ Completed: STUDIO-Asset-Move - Updated effectAllowed to copyMove in AssetItem.tsx
+
 ### STUDIO v0.120.2
 - ✅ Completed: STUDIO-Asset-Move - Implemented drag-and-drop to move assets into folders
 
