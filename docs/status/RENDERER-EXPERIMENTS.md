@@ -115,3 +115,4 @@ Last updated by: PERF-109
 - Increased maxPipelineDepth to poolLen * 10 and used bitwise shift buffer allocation. Improved from 35.462 to 33.394. (PERF-097)
 ## What Doesn't Work (and Why)
 - **Expanding Buffer Pool and Pipeline Depth (PERF-098)**: Tried increasing `maxPipelineDepth` to `poolLen * 15` and `bufferPool` size to `20`. The expected rendering time improvement was not observed, instead it hovered around ~33.9s to ~34.3s. This suggests that expanding the pipeline depth and pre-allocated buffer pool doesn't relieve any critical bottleneck, or the overhead of managing a larger buffer queue balances out the potential concurrent frame gains.
+- [PERF-110] Would a strictly sequential capture pipeline with a single Playwright page (\`concurrency = 1\`) eliminate V8 context-switching overhead and IPC delays enough to outperform the current over-subscribed multi-page worker pool?
