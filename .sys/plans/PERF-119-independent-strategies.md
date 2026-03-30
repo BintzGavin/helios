@@ -1,7 +1,7 @@
 ---
 id: PERF-119
 slug: independent-strategies
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-05-24
 completed: ""
@@ -76,3 +76,8 @@ Run `npx tsx packages/renderer/tests/verify-canvas-strategy.ts` to ensure Canvas
 
 ## Correctness Check
 Run the `packages/renderer/tests/fixtures/benchmark.ts` to verify DOM output is correct and measure the unlocked concurrency speedup.
+
+## Results Summary
+- **Best render time**: 34.306s
+- **Kept experiments**: Independent Strategies per Worker (PERF-119)
+- **Discarded experiments**: None

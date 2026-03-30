@@ -46,18 +46,9 @@ const GPU_DISABLED_ARGS = [
 
 export class Renderer {
   private options: RendererOptions;
-  private strategy: RenderStrategy;
-  private timeDriver: TimeDriver;
 
   constructor(options: RendererOptions) {
     this.options = options;
-    if (this.options.mode === 'dom') {
-      this.strategy = new DomStrategy(this.options);
-      this.timeDriver = new SeekTimeDriver(this.options.stabilityTimeout);
-    } else {
-      this.strategy = new CanvasStrategy(this.options);
-      this.timeDriver = new CdpTimeDriver(this.options.stabilityTimeout);
-    }
   }
 
   private getLaunchOptions() {
@@ -116,7 +107,8 @@ export class Renderer {
     try {
       const page = await browser.newPage();
       await page.goto('about:blank');
-      const browserDiagnostics = await this.strategy.diagnose(page);
+      const strategy = this.options.mode === 'dom' ? new DomStrategy(this.options) : new CanvasStrategy(this.options);
+      const browserDiagnostics = await strategy.diagnose(page);
 
       const ffmpegPath = this.options.ffmpegPath || ffmpeg.path;
       const ffmpegDiagnostics = FFmpegInspector.inspect(ffmpegPath);
@@ -169,7 +161,7 @@ export class Renderer {
 
       const createPage = async (index: number) => {
         const page = await context.newPage();
-        const strategy = this.strategy || (this.options.mode === 'dom' ? new DomStrategy(this.options) : new CanvasStrategy(this.options));
+        const strategy = this.options.mode === 'dom' ? new DomStrategy(this.options) : new CanvasStrategy(this.options);
         const timeDriver = this.options.mode === 'dom' ? new SeekTimeDriver(this.options.stabilityTimeout) : new CdpTimeDriver(this.options.stabilityTimeout);
 
         page.on('console', (msg: ConsoleMessage) => console.log(`PAGE LOG [${index}]: ${msg.text()}`));
@@ -215,7 +207,7 @@ export class Renderer {
       const fps = this.options.fps;
       const startFrame = this.options.startFrame || 0;
 
-      const { args, inputBuffers } = this.strategy.getFFmpegArgs(this.options, outputPath);
+      const { args, inputBuffers } = pool[0].strategy.getFFmpegArgs(this.options, outputPath);
 
       const stdio: any[] = ['pipe', 'pipe', 'pipe'];
       const maxPipeIndex = Math.max(...inputBuffers.map(b => b.index), 2);
