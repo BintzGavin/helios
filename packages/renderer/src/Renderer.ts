@@ -295,8 +295,10 @@ export class Renderer {
               } catch (e) {
                   // Ignore previous errors to allow chain to continue (or abort)
               }
-              await worker.timeDriver.setTime(worker.page, compositionTimeInSeconds);
-              return worker.strategy.capture(worker.page, time);
+              const setTimePromise = worker.timeDriver.setTime(worker.page, compositionTimeInSeconds);
+              const capturePromise = worker.strategy.capture(worker.page, time);
+              await setTimePromise;
+              return await capturePromise;
           };
 
           let nextFrameToWrite = 0;
