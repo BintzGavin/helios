@@ -229,3 +229,5 @@ peak_mem_mb:        38.3
 
 101	33.760	150	4.44	38.0	keep	disable threaded animations and scrolling
 107	33.459	150	4.48	38.5	keep	PERF-107 Replace static buffer pool with dynamic allocUnsafe
+1	46.493	150	3.23	38.6	keep	baseline
+2	35.175	150	4.29	35.4	keep	PERF-110 Sequential CDP Capture

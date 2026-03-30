@@ -1,8 +1,8 @@
 ---
 id: PERF-110
 slug: sequential-cdp-capture
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-30
 completed: ""
 result: ""
@@ -48,3 +48,8 @@ Run `npx tsx packages/renderer/tests/fixtures/benchmark.ts`.
 
 ## Correctness Check
 Run the `npx tsx packages/renderer/tests/fixtures/benchmark.ts` test or check the output video visually.
+
+## Results Summary
+- **Best render time**: 35.175s (vs baseline 46.493s)
+- **Kept experiments**: PERF-110
+- **Discarded experiments**: None
