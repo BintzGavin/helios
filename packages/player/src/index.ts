@@ -1142,6 +1142,58 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
     console.warn("HeliosPlayer does not support srcObject");
   }
 
+
+  public get exportMode(): string { return this.getAttribute("export-mode") || "auto"; }
+  public set exportMode(val: string) { this.setAttribute("export-mode", val); }
+
+  public get exportFormat(): string { return this.getAttribute("export-format") || "mp4"; }
+  public set exportFormat(val: string) { this.setAttribute("export-format", val); }
+
+  public get exportFilename(): string { return this.getAttribute("export-filename") || "video"; }
+  public set exportFilename(val: string) { this.setAttribute("export-filename", val); }
+
+  public get exportCaptionMode(): string { return this.getAttribute("export-caption-mode") || "burn-in"; }
+  public set exportCaptionMode(val: string) { this.setAttribute("export-caption-mode", val); }
+
+  public get exportWidth(): number | null {
+      const val = this.getAttribute("export-width");
+      if (!val) return null;
+      const num = parseInt(val, 10);
+      return isNaN(num) ? null : num;
+  }
+  public set exportWidth(val: number | null) {
+      if (val === null) this.removeAttribute("export-width");
+      else this.setAttribute("export-width", val.toString());
+  }
+
+  public get exportHeight(): number | null {
+      const val = this.getAttribute("export-height");
+      if (!val) return null;
+      const num = parseInt(val, 10);
+      return isNaN(num) ? null : num;
+  }
+  public set exportHeight(val: number | null) {
+      if (val === null) this.removeAttribute("export-height");
+      else this.setAttribute("export-height", val.toString());
+  }
+
+  public get exportBitrate(): number | null {
+      const val = this.getAttribute("export-bitrate");
+      if (!val) return null;
+      const num = parseInt(val, 10);
+      return isNaN(num) ? null : num;
+  }
+  public set exportBitrate(val: number | null) {
+      if (val === null) this.removeAttribute("export-bitrate");
+      else this.setAttribute("export-bitrate", val.toString());
+  }
+
+  public get canvasSelector(): string { return this.getAttribute("canvas-selector") || "canvas"; }
+  public set canvasSelector(val: string) { this.setAttribute("canvas-selector", val); }
+
+  public get controlsList(): string { return this.getAttribute("controlslist") || ""; }
+  public set controlsList(val: string) { this.setAttribute("controlslist", val); }
+
   public get crossOrigin(): string | null {
     return this.getAttribute("crossorigin");
   }
