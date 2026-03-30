@@ -162,7 +162,7 @@ export class Renderer {
     let pool: { page: import('playwright').Page, strategy: RenderStrategy, timeDriver: TimeDriver, activePromise: Promise<void> }[] = [];
     try {
       const cpus = os.cpus().length || 4;
-      const concurrency = Math.min(Math.ceil(cpus * 1.5), 8);
+      const concurrency = 1;
       console.log(`Initializing pool of ${concurrency} pages...`);
 
       const capturedErrors: Error[] = [];
@@ -301,7 +301,7 @@ export class Renderer {
 
           let nextFrameToWrite = 0;
           const poolLen = pool.length;
-          const maxPipelineDepth = poolLen * 10;
+          const maxPipelineDepth = 50;
           const timeStep = 1000 / fps;
           const compTimeStep = 1 / fps;
 

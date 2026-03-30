@@ -3,6 +3,7 @@ Current best: 33.394s (baseline was 34.631s, -3.5%)
 Last updated by: PERF-109
 
 ## What Works
+- Sequential CDP Capture (concurrency=1, maxPipelineDepth=50) improved render time from 46.493s to 35.175s [PERF-110]
 - [PERF-109] Removed the previously added flags `--disable-threaded-animation`, `--disable-threaded-scrolling`, `--disable-checker-imaging`, and `--disable-image-animation-resync` from `DEFAULT_BROWSER_ARGS` in `Renderer.ts`. This reverts a regression that occurred when these flags forced operations onto the main thread, negating concurrent execution benefits and slowing down DOM rendering.
 - [PERF-107] Replaced the static array of 10 buffers (`bufferPool`) in `DomStrategy.ts` with dynamically allocated buffers using `Buffer.allocUnsafe` per frame. This resolves a severe memory race condition and crash that occurs when the worker pipeline depth outpaces the static pool size, allowing deep pipelining to function reliably. Render time improved to ~33.459s.
 - Pass explicit timing parameters to HeadlessExperimental.beginFrame to synchronize Chromium compositor clock (~2.0% faster) [PERF-102]
@@ -115,4 +116,3 @@ Last updated by: PERF-109
 - Increased maxPipelineDepth to poolLen * 10 and used bitwise shift buffer allocation. Improved from 35.462 to 33.394. (PERF-097)
 ## What Doesn't Work (and Why)
 - **Expanding Buffer Pool and Pipeline Depth (PERF-098)**: Tried increasing `maxPipelineDepth` to `poolLen * 15` and `bufferPool` size to `20`. The expected rendering time improvement was not observed, instead it hovered around ~33.9s to ~34.3s. This suggests that expanding the pipeline depth and pre-allocated buffer pool doesn't relieve any critical bottleneck, or the overhead of managing a larger buffer queue balances out the potential concurrent frame gains.
-- [PERF-110] Would a strictly sequential capture pipeline with a single Playwright page (\`concurrency = 1\`) eliminate V8 context-switching overhead and IPC delays enough to outperform the current over-subscribed multi-page worker pool?
