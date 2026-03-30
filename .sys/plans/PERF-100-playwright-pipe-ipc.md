@@ -1,11 +1,11 @@
 ---
 id: PERF-100
 slug: playwright-pipe-ipc
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-25
-completed: ""
-result: ""
+completed: "2026-03-30"
+result: "no-improvement"
 ---
 
 # PERF-100: Playwright Pipe IPC Transport
@@ -46,3 +46,10 @@ Run the standalone canvas verification script `npx tsx packages/renderer/tests/v
 
 ## Correctness Check
 Run the full verification suite `npx tsx packages/renderer/tests/run-all.ts` to confirm the renderer connects to Playwright correctly in both DOM and Canvas modes.
+
+
+## Results Summary
+- **Best render time**: 35.374s (vs baseline ~35.208s without pipe)
+- **Improvement**: 0% (within noise margin)
+- **Kept experiments**: []
+- **Discarded experiments**: [PERF-100]
