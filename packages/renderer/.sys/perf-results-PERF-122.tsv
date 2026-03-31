@@ -1,0 +1,5 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	45.617	150	3.29	39.5	keep	baseline
+2	33.730	150	4.45	39.7	keep	increase maxPipelineDepth to poolLen * 8
+3	33.671	150	4.45	39.5	keep	increase maxPipelineDepth to poolLen * 8
+4	33.633	150	4.46	39.8	keep	increase maxPipelineDepth to poolLen * 8
