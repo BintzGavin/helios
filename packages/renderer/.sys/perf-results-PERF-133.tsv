@@ -1,0 +1,2 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	34.714	150	4.32	37.7	keep	precompile-cdp-sync-script
