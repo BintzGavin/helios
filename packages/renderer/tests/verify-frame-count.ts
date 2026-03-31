@@ -35,36 +35,25 @@ async function verifyFrameCount() {
 
   const renderer = new Renderer(options);
 
-  // Mock the strategy
-  const strategy = (renderer as any).strategy as CanvasStrategy;
-
-  // Override the renderer's internal strategy creation so it uses our mocked instance
-
-
-
   let capturedFrames = 0;
+  let generatedArgs: string[] = [];
 
+  // Create a mock strategy instance
+  const strategy = new CanvasStrategy(options) as any;
   strategy.prepare = async (page) => {
     console.log('Mock strategy.prepare called');
   };
-
   strategy.diagnose = async (page) => {
     return {};
   };
-
   strategy.capture = async (page, time) => {
     capturedFrames++;
     return Buffer.from('dummy-frame-data');
   };
-
   strategy.finish = async (page) => {
     return Buffer.alloc(0);
   };
-
   const realGetArgs = strategy.getFFmpegArgs.bind(strategy);
-  let generatedArgs: string[] = [];
-
-  // Mock getFFmpegArgs to return args for our dummy script
   strategy.getFFmpegArgs = (opts, outPath) => {
     // Generate real args to verify them later
     const config = FFmpegBuilder.getArgs(opts, outPath, []);
@@ -82,9 +71,27 @@ async function verifyFrameCount() {
   };
 
   try {
+    // Actually, just intercepting CanvasStrategy constructor would be better, but we can't easily.
+    // Let's monkey-patch the prototype of CanvasStrategy since this is a test.
+    const origPrepare = CanvasStrategy.prototype.prepare;
+    const origCapture = CanvasStrategy.prototype.capture;
+    const origFinish = CanvasStrategy.prototype.finish;
+    const origGetArgs = CanvasStrategy.prototype.getFFmpegArgs;
+
+    CanvasStrategy.prototype.prepare = strategy.prepare;
+    CanvasStrategy.prototype.capture = strategy.capture;
+    CanvasStrategy.prototype.finish = strategy.finish;
+    CanvasStrategy.prototype.getFFmpegArgs = strategy.getFFmpegArgs;
+
     // Run render
     // Use about:blank to minimize browser overhead
     await renderer.render('about:blank', outputPath);
+
+    // Restore
+    CanvasStrategy.prototype.prepare = origPrepare;
+    CanvasStrategy.prototype.capture = origCapture;
+    CanvasStrategy.prototype.finish = origFinish;
+    CanvasStrategy.prototype.getFFmpegArgs = origGetArgs;
 
     console.log(`Captured ${capturedFrames} frames.`);
 
