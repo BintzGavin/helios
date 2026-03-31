@@ -125,6 +125,7 @@ Last updated by: PERF-121
 - [PERF-072] Refactored the `Renderer.ts` FFmpeg stdin backpressure handler to utilize the highly optimized Node.js `events.once()` utility rather than manually instantiating `new Promise()` and `removeListener` closures on every blocked frame. This reduced GC churn and improved render time slightly from 33.753s to 33.639s.
 
 ## What Works
+- [PERF-125] Replaced the `try-catch` block around `await worker.activePromise` in the `processWorkerFrame` hot loop with `.catch(() => {})`. This removed V8 execution context allocation and optimized async continuation, improving median render time from ~33.766s to ~33.636s.
 - PERF-079: Removed Promise.all array allocations in CdpTimeDriver.ts for single frames (~0.3% improvement)
 - Added lightweight browser args (`--disable-dev-shm-usage`, `--disable-extensions`, `--disable-default-apps`, `--disable-sync`, `--no-first-run`, `--mute-audio`, `--disable-background-networking`, `--disable-background-timer-throttling`, `--disable-breakpad`) to `DEFAULT_BROWSER_ARGS` in `packages/renderer/src/Renderer.ts`. Render time improved from ~34.335s baseline to ~33.657s. (PERF-063)
 - PERF-080: The CdpTimeDriver.ts file already contained the single-frame Promise.all avoidance and array preallocation optimization. Verified it is present. The codebase requires no further modifications for this experiment.

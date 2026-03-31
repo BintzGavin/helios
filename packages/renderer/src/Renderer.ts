@@ -284,11 +284,7 @@ export class Renderer {
 
           let nextFrameToSubmit = 0;
           const processWorkerFrame = async (worker: any, compositionTimeInSeconds: number, time: number) => {
-              try {
-                  await worker.activePromise;
-              } catch (e) {
-                  // Ignore previous errors to allow chain to continue (or abort)
-              }
+              await worker.activePromise.catch(() => {});
               const setTimePromise = worker.timeDriver.setTime(worker.page, compositionTimeInSeconds);
               const capturePromise = worker.strategy.capture(worker.page, time);
               await setTimePromise;
