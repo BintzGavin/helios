@@ -135,3 +135,7 @@ Critical learnings only. This is not a log—only add entries for insights that 
 ## [0.42.0] - CLI Scaffold Hetzner Deployment Prerequisite
 **Learning:** When adding a new tier-3 cloud infrastructure adapter to the Helios Engine (like Hetzner Cloud), always ensure a corresponding CLI deployment scaffolding command (e.g., `helios deploy hetzner`) is created to provide the required manifest templates for users.
 **Action:** When bridging a "Cloud Execution" gap, always verify if a corresponding CLI deployment scaffold is required.
+
+## [0.43.0] - CLI Scaffold Tier 3 Deployment Prerequisites
+**Learning:** When bridging a "Cloud Execution" gap by adding new tier-3 cloud infrastructure adapters (Modal, Deno Deploy, Vercel) to the Helios Engine, always ensure corresponding CLI deployment scaffolding commands (e.g., `helios deploy modal`) are created to provide the required manifest templates for users.
+**Action:** Created plan `2027-04-02-CLI-Scaffold-Tier3-Deployment.md` to add the `deploy modal`, `deploy deno`, and `deploy vercel` subcommands, completing the product surface for the tier 3 distributed rendering adapters. Always cross-reference new infrastructure adapters with CLI deployment commands.
