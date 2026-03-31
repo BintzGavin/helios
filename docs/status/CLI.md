@@ -1,9 +1,11 @@
-**Version**: 0.43.0
+**Version**: 0.44.0
 
 # CLI Status
 
 ## Current State
 The Helios CLI is the primary user interface for component registry, project scaffolding, distributed rendering, and deployment.
+
+[v0.44.0] ✅ Completed: Tier 3 Scaffold Deployment Commands - Implemented `helios deploy modal`, `helios deploy deno`, and `helios deploy vercel`.
 
 ## Next Steps
 - Implement regression tests for remaining commands (e.g. `job.ts`, `render.ts`, `merge.ts`).

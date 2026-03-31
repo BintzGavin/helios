@@ -12,6 +12,9 @@ import { KUBERNETES_JOB_TEMPLATE, README_KUBERNETES_TEMPLATE } from '../template
 import { README_HETZNER_TEMPLATE } from '../templates/hetzner.js';
 
 import { AZURE_FUNCTION_JSON_TEMPLATE, AZURE_HOST_JSON_TEMPLATE, AZURE_LOCAL_SETTINGS_JSON_TEMPLATE, AZURE_INDEX_JS_TEMPLATE, README_AZURE_TEMPLATE } from '../templates/azure.js';
+import { README_MODAL_TEMPLATE } from '../templates/modal.js';
+import { README_DENO_TEMPLATE } from '../templates/deno.js';
+import { README_VERCEL_TEMPLATE } from '../templates/vercel.js';
 
 
 export function registerDeployCommand(program: Command) {
@@ -683,5 +686,117 @@ export function registerDeployCommand(program: Command) {
 
       console.log(chalk.blue('\nHetzner Cloud setup complete!'));
       console.log('See README-HETZNER.md for deployment instructions.');
+    });
+
+
+  deploy
+    .command('modal')
+    .description('Scaffold Modal deployment configuration')
+    .action(async () => {
+      const cwd = process.cwd();
+      const readmePath = path.join(cwd, 'README-MODAL.md');
+
+      console.log(chalk.blue('Scaffolding Modal deployment files...'));
+
+      let writeReadme = true;
+      if (fs.existsSync(readmePath)) {
+        const response = await prompts({
+          type: 'confirm',
+          name: 'value',
+          message: 'README-MODAL.md already exists. Overwrite?',
+          initial: false
+        });
+
+        if (typeof response.value === 'undefined') {
+          console.log(chalk.yellow('\nOperation cancelled.'));
+          process.exit(0);
+        }
+
+        writeReadme = response.value;
+      }
+
+      if (writeReadme) {
+        fs.writeFileSync(readmePath, README_MODAL_TEMPLATE);
+        console.log(chalk.green('✔ Created README-MODAL.md'));
+      } else {
+        console.log(chalk.gray('Skipped README-MODAL.md'));
+      }
+
+      console.log(chalk.blue('\nModal setup complete!'));
+      console.log('See README-MODAL.md for deployment instructions.');
+    });
+
+  deploy
+    .command('deno')
+    .description('Scaffold Deno Deploy deployment configuration')
+    .action(async () => {
+      const cwd = process.cwd();
+      const readmePath = path.join(cwd, 'README-DENO.md');
+
+      console.log(chalk.blue('Scaffolding Deno Deploy files...'));
+
+      let writeReadme = true;
+      if (fs.existsSync(readmePath)) {
+        const response = await prompts({
+          type: 'confirm',
+          name: 'value',
+          message: 'README-DENO.md already exists. Overwrite?',
+          initial: false
+        });
+
+        if (typeof response.value === 'undefined') {
+          console.log(chalk.yellow('\nOperation cancelled.'));
+          process.exit(0);
+        }
+
+        writeReadme = response.value;
+      }
+
+      if (writeReadme) {
+        fs.writeFileSync(readmePath, README_DENO_TEMPLATE);
+        console.log(chalk.green('✔ Created README-DENO.md'));
+      } else {
+        console.log(chalk.gray('Skipped README-DENO.md'));
+      }
+
+      console.log(chalk.blue('\nDeno setup complete!'));
+      console.log('See README-DENO.md for deployment instructions.');
+    });
+
+  deploy
+    .command('vercel')
+    .description('Scaffold Vercel deployment configuration')
+    .action(async () => {
+      const cwd = process.cwd();
+      const readmePath = path.join(cwd, 'README-VERCEL.md');
+
+      console.log(chalk.blue('Scaffolding Vercel deployment files...'));
+
+      let writeReadme = true;
+      if (fs.existsSync(readmePath)) {
+        const response = await prompts({
+          type: 'confirm',
+          name: 'value',
+          message: 'README-VERCEL.md already exists. Overwrite?',
+          initial: false
+        });
+
+        if (typeof response.value === 'undefined') {
+          console.log(chalk.yellow('\nOperation cancelled.'));
+          process.exit(0);
+        }
+
+        writeReadme = response.value;
+      }
+
+      if (writeReadme) {
+        fs.writeFileSync(readmePath, README_VERCEL_TEMPLATE);
+        console.log(chalk.green('✔ Created README-VERCEL.md'));
+      } else {
+        console.log(chalk.gray('Skipped README-VERCEL.md'));
+      }
+
+      console.log(chalk.blue('\nVercel setup complete!'));
+      console.log('See README-VERCEL.md for deployment instructions.');
     });
 }

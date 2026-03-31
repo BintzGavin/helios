@@ -1,3 +1,6 @@
+## CLI v0.44.0
+- ✅ Completed: Tier 3 Scaffold Deployment Commands - Implemented `helios deploy modal`, `helios deploy deno`, and `helios deploy vercel`.
+
 ## CLI v0.43.0
 - ✅ Completed: Scaffold Hetzner Deployment Command - Implemented `helios deploy hetzner` to scaffold README-HETZNER.md for the Hetzner Cloud adapter.
 
