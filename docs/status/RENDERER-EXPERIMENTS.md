@@ -152,3 +152,6 @@ Last updated by: PERF-121
 
 ## What Doesn't Work (and Why)
 - **Batching chunks for ffmpeg.stdin.write**: PERF-123. Tried aggregating frame buffers into 1MB chunks before calling \`stdin.write()\` to reduce IPC system calls. The result was slightly slower than baseline (~34.088s vs ~33.66s baseline). While batching saves IPC context switches, `Buffer.concat` introduces heavy CPU synchronous overhead for memory copying in Node.js which negates the benefits of fewer writes in this specific microVM environment.
+
+## What Works
+- Removed async/await overhead from `setTime` in `SeekTimeDriver.ts` hot loop. Reduced V8 allocation pressure without changing execution path. Kept in PERF-131. Render time median ~34.0s vs 35.9s (variable but directionally positive).

@@ -237,7 +237,7 @@ export class SeekTimeDriver implements TimeDriver {
     }
   }
 
-  async setTime(page: Page, timeInSeconds: number): Promise<void> {
+  setTime(page: Page, timeInSeconds: number): Promise<void> {
     const frames = page.frames();
 
     if (frames.length === 1) {
@@ -247,18 +247,18 @@ export class SeekTimeDriver implements TimeDriver {
           params = { expression: '', awaitPromise: true, returnByValue: false };
         }
         params.expression = `window.__helios_seek(${timeInSeconds}, ${this.timeout})`;
-        const response = await this.cdpSession.send('Runtime.evaluate', params);
-        this.evaluateParamsPool.push(params);
-        if (response.exceptionDetails) {
-          throw new Error(`Seek error in main frame: ${response.exceptionDetails.exception?.description || 'Unknown error'}`);
-        }
+        return this.cdpSession.send('Runtime.evaluate', params).then((response) => {
+          this.evaluateParamsPool.push(params);
+          if (response.exceptionDetails) {
+            throw new Error(`Seek error in main frame: ${response.exceptionDetails.exception?.description || 'Unknown error'}`);
+          }
+        }) as Promise<void>;
       } else {
-        await frames[0].evaluate(
+        return frames[0].evaluate(
           ([t, timeoutMs]) => { (window as any).__helios_seek(t, timeoutMs); },
           [timeInSeconds, this.timeout]
-        );
+        ) as Promise<void>;
       }
-      return;
     }
 
     const promises: Promise<any>[] = new Array(frames.length);
@@ -285,6 +285,6 @@ export class SeekTimeDriver implements TimeDriver {
       }
     }
 
-    await Promise.all(promises);
+    return Promise.all(promises) as unknown as Promise<void>;
   }
 }

@@ -1,0 +1,5 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	35.910	150	4.18	40.1	keep	remove async/await from SeekTimeDriver.ts setTime single frame
+2	33.953	150	4.42	40.0	keep	remove async/await from SeekTimeDriver.ts setTime single frame
+3	35.191	150	4.26	40.0	keep	remove async/await from SeekTimeDriver.ts setTime single frame
+4	33.881	150	4.43	39.8	keep	remove async/await from SeekTimeDriver.ts setTime single frame
