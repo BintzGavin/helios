@@ -1,11 +1,11 @@
 ---
 id: PERF-124
 slug: cache-page-frames
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2026-03-31
-completed: ""
-result: ""
+completed: "2026-03-31"
+result: "discarded"
 ---
 # PERF-124: Optimize Playwright Page Object Model overhead by bypassing `page.frames()` array allocation
 
@@ -52,3 +52,9 @@ Run `npx tsx packages/renderer/tests/verify-canvas-strategy.ts` to ensure Canvas
 
 ## Correctness Check
 Run `npx tsx packages/renderer/tests/verify-frame-count.ts` to ensure DOM frames render properly.
+
+## Results Summary
+- **Best render time**: 33.686s (vs baseline ~33.4s)
+- **Improvement**: -0.8%
+- **Kept experiments**: []
+- **Discarded experiments**: [PERF-124]

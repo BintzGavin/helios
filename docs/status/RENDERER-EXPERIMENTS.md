@@ -58,6 +58,12 @@ Last updated by: PERF-121
 - Hoisted worker frame execution async IIFE in Renderer.ts outside of hot loop. ~0.1s improvement. [PERF-089]
 
 ## What Doesn't Work (and Why)
+- **PERF-124: Cache page.frames()**:
+  **What you tried**: Caching `page.frames()` in a local property to bypass array allocations per frame in `SeekTimeDriver.ts`.
+  **Why it didn't work**: The overhead of Playwright's array creation for frames is negligible and does not cause significant GC pressure compared to IPC and rendering bottlenecks. Render time remained equivalent or slightly worse than the baseline (33.686s).
+  **Plan ID**: PERF-124
+
+
 - **PERF-122: Increase maxPipelineDepth to poolLen * 8**:
   **What you tried**: Modifying `maxPipelineDepth` from `poolLen * 2` to `poolLen * 8` to increase concurrent frames in-flight.
   **Why it didn't work**: The performance improvement was negligible (around 33.6s, matching baseline noise margins). Deeper pipelines in the Node-Chromium IPC model reach a diminishing returns ceiling due to CPU scheduling constraints.
