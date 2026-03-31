@@ -283,12 +283,12 @@ export class Renderer {
           // such that multiple workers can be evaluating frames concurrently.
 
           let nextFrameToSubmit = 0;
-          const processWorkerFrame = async (worker: any, compositionTimeInSeconds: number, time: number) => {
-              await worker.activePromise.catch(() => {});
-              const setTimePromise = worker.timeDriver.setTime(worker.page, compositionTimeInSeconds);
-              const capturePromise = worker.strategy.capture(worker.page, time);
-              await setTimePromise;
-              return await capturePromise;
+          const processWorkerFrame = (worker: any, compositionTimeInSeconds: number, time: number) => {
+              return worker.activePromise.catch(() => {}).then(() => {
+                  const setTimePromise = worker.timeDriver.setTime(worker.page, compositionTimeInSeconds);
+                  const capturePromise = worker.strategy.capture(worker.page, time);
+                  return setTimePromise.then(() => capturePromise);
+              });
           };
 
           let nextFrameToWrite = 0;
