@@ -3,6 +3,7 @@ Current best: 33.394s (baseline was 34.631s, -3.5%)
 Last updated by: PERF-121
 
 ## What Works
+- [PERF-133] Pre-compiled dynamic CDP sync logic in `CdpTimeDriver.ts`, replacing string evaluation with a lightweight function call on every frame.
 - [PERF-121] Decoupled BrowserContexts per Playwright worker page. By creating a new `BrowserContext` for each worker instead of grouping them in a single context, Chromium spins up independent renderer processes. This prevents OS thread contention where all workers serialize JS and layout calculations on a single V8 thread. Render time reduced to ~34.112s.
 - [PERF-119] Identified the core concurrency bottleneck blocking deep pipelining (PERF-115) and causing "Another frame is pending" crashes: workers shared a single `DomStrategy` class property, overwriting the `cdpSession`. Planned fix to instantiate independent strategies per worker page.
 - [PERF-114] Pipelined `timeDriver.setTime()` and `strategy.capture()` commands in `Renderer.ts` by invoking both Promises concurrently rather than awaiting `setTime` before invoking `capture`. This eliminates one Node.js-to-Chromium IPC round trip per frame, allowing Chromium to queue and process the `Runtime.evaluate` and `HeadlessExperimental.beginFrame` sequentially without Node.js idling in between. Median render time improved from ~35.2s to 34.8s.
@@ -157,4 +158,3 @@ Last updated by: PERF-121
 - Removed async/await overhead from `setTime` in `SeekTimeDriver.ts` hot loop. Reduced V8 allocation pressure without changing execution path. Kept in PERF-131. Render time median ~34.0s vs 35.9s (variable but directionally positive).
 
 ## Open Questions
-- Would pre-compiling the `mediaSyncScript` in `CdpTimeDriver.ts` and executing it natively via argument passing bypass string interpolation and V8 JIT overhead during `setTime` loops, similar to what we achieved in `SeekTimeDriver.ts`?

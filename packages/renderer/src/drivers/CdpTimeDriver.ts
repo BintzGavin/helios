@@ -33,6 +33,39 @@ export class CdpTimeDriver implements TimeDriver {
       window.performance.now = () => Date.now() - epoch;
     }, INITIAL_VIRTUAL_TIME * 1000);
 
+    const initScript = `
+      (() => {
+        ${FIND_ALL_MEDIA_FUNCTION}
+        ${PARSE_MEDIA_ATTRIBUTES_FUNCTION}
+        ${SYNC_MEDIA_FUNCTION}
+
+        window.__helios_sync_media = (t) => {
+          const mediaElements = findAllMedia(document);
+          mediaElements.forEach((el) => {
+            syncMedia(el, t);
+          });
+        };
+
+        window.__helios_wait_until_stable = async () => {
+          if (typeof window.helios !== 'undefined' && typeof window.helios.waitUntilStable === 'function') {
+            await window.helios.waitUntilStable();
+          }
+        };
+      })();
+    `;
+
+    await page.addInitScript(initScript);
+    const frames = page.frames();
+    if (frames.length === 1) {
+      await frames[0].evaluate(initScript);
+    } else {
+      const initPromises: Promise<any>[] = new Array(frames.length);
+      for (let i = 0; i < frames.length; i++) {
+        initPromises[i] = frames[i].evaluate(initScript);
+      }
+      await Promise.all(initPromises);
+    }
+
     this.currentTime = 0;
   }
 
@@ -55,37 +88,25 @@ export class CdpTimeDriver implements TimeDriver {
     // 1. Synchronize media elements (video, audio)
     // We do this manually BEFORE advancing time so that when the frame renders (rAF),
     // the video elements are already at the correct time.
-    const mediaSyncScript = `
-      (async (t) => {
-        // Helper to find all media elements, including in Shadow DOM
-        ${FIND_ALL_MEDIA_FUNCTION}
-        // Helper to sync media
-        ${PARSE_MEDIA_ATTRIBUTES_FUNCTION}
-        ${SYNC_MEDIA_FUNCTION}
-
-        const mediaElements = findAllMedia(document);
-        console.log('[CdpTimeDriver] Syncing ' + mediaElements.length + ' media elements to ' + t);
-
-        mediaElements.forEach((el) => {
-          syncMedia(el, t);
-          // Note: We intentionally do NOT await 'seeked' here because CDP virtual time is paused.
-          // Awaiting async events would cause a deadlock in the frozen task runner.
-          // We rely on the browser to update the frame synchronously enough for the snapshot.
-        });
-      })(${timeInSeconds})
-    `;
-
     // Execute in all frames (including main frame) to support iframes
     const frames = page.frames();
     if (frames.length === 1) {
-      await frames[0].evaluate(mediaSyncScript).catch(e => {
+      await frames[0].evaluate((t) => {
+        if (typeof (window as any).__helios_sync_media === 'function') {
+          (window as any).__helios_sync_media(t);
+        }
+      }, timeInSeconds).catch(e => {
         console.warn('[CdpTimeDriver] Failed to sync media in frame ' + frames[0].url() + ':', e);
       });
     } else {
       const framePromises: Promise<any>[] = new Array(frames.length);
       for (let i = 0; i < frames.length; i++) {
         const frame = frames[i];
-        framePromises[i] = frame.evaluate(mediaSyncScript).catch(e => {
+        framePromises[i] = frame.evaluate((t) => {
+          if (typeof (window as any).__helios_sync_media === 'function') {
+            (window as any).__helios_sync_media(t);
+          }
+        }, timeInSeconds).catch(e => {
           // Ignore errors in restricted frames (e.g. cross-origin if CSP blocks it, though we usually disable security)
           console.warn('[CdpTimeDriver] Failed to sync media in frame ' + frame.url() + ':', e);
         });
@@ -111,14 +132,6 @@ export class CdpTimeDriver implements TimeDriver {
 
     // 3. Wait for custom stability checks
     // We use a string-based evaluation to avoid build-tool artifacts
-    const stabilityScript = `
-      (async () => {
-        if (typeof window.helios !== 'undefined' && typeof window.helios.waitUntilStable === 'function') {
-          await window.helios.waitUntilStable();
-        }
-      })()
-    `;
-
     // We implement timeout in Node.js because setTimeout in the page
     // does not work when CDP virtual time is paused.
     let timeoutId: NodeJS.Timeout;
@@ -130,7 +143,11 @@ export class CdpTimeDriver implements TimeDriver {
 
     try {
       await Promise.race([
-        page.evaluate(stabilityScript),
+        page.evaluate(() => {
+          if (typeof (window as any).__helios_wait_until_stable === 'function') {
+            return (window as any).__helios_wait_until_stable();
+          }
+        }),
         timeoutPromise
       ]);
     } catch (e: any) {
