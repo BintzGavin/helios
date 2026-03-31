@@ -146,9 +146,8 @@ Last updated by: PERF-121
 
 ## What Works
 - PERF-119: Independent Strategies per Worker. It resolved the "Another frame is pending" crashes and allowed deep pipelining to safely distribute frame renders across workers, unlocking concurrency speedup. Render time reduced to 34.306s.
-
-## What Works
 - PERF-120: Replaced module-level `evaluateParamsPool` with an instance-level pool inside `SeekTimeDriver.ts`. This successfully decoupled Playwright worker pages and eliminated a major concurrency race condition (preventing corrupted evaluation parameters during overlapping `setTime` calls), keeping render time at ~33.4s but guaranteeing safe multi-worker scaling.
+- [PERF-129] Optimized frame capture loop by replacing the `async` `processWorkerFrame` function with a synchronous Promise chain, eliminating micro-stalls and V8 context allocation overhead, improving median render time to 33.431s.
 
 ## What Doesn't Work (and Why)
 - **Batching chunks for ffmpeg.stdin.write**: PERF-123. Tried aggregating frame buffers into 1MB chunks before calling \`stdin.write()\` to reduce IPC system calls. The result was slightly slower than baseline (~34.088s vs ~33.66s baseline). While batching saves IPC context switches, `Buffer.concat` introduces heavy CPU synchronous overhead for memory copying in Node.js which negates the benefits of fewer writes in this specific microVM environment.
