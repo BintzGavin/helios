@@ -1,7 +1,7 @@
 ---
 id: PERF-129
 slug: sync-capture-promise-chain
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2026-03-31
 completed: ""
@@ -93,3 +93,7 @@ Run the renderer benchmark script `npx tsx packages/renderer/tests/fixtures/benc
 - PERF-114: Pipelined `setTime` and `capture`.
 - PERF-125: Eliminated redundant `try-catch` contexts around `activePromise`.
 - PERF-089: Hoisted the worker function definition to reduce allocations.
+
+## Results Summary
+- **Best render time**: 33.431s
+- **Kept experiments**: [PERF-129]
