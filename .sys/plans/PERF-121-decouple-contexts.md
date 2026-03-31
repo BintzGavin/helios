@@ -1,11 +1,11 @@
 ---
 id: PERF-121
 slug: decouple-contexts
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2026-03-30
-completed: ""
-result: ""
+completed: "2026-03-31"
+result: improved
 ---
 # PERF-121: Decouple Browser Contexts for Playwright Workers
 
@@ -92,3 +92,9 @@ Run `npx tsx packages/renderer/tests/verify-canvas-strategy.ts` to execute verif
 
 ## Correctness Check
 Run the entire renderer test suite (`npm run test -w packages/renderer`) to ensure this process isolation doesn't break WebCodecs Canvas mode or any edge-case IPC behaviors (since `PERF-044` noted full browser isolation broke Canvas). Also run `npx tsx packages/renderer/tests/fixtures/benchmark.ts` to confirm the speedup.
+
+## Results Summary
+- **Best render time**: 34.112s (vs baseline ~34.3s from plan)
+- **Improvement**: ~0.5%
+- **Kept experiments**: Decouple BrowserContexts per Playwright worker page
+- **Discarded experiments**: none

@@ -139,19 +139,9 @@ export class Renderer {
 
     const browser = await chromium.launch(this.getLaunchOptions());
 
-    const context = await browser.newContext({
-      viewport: {
-        width: this.options.width,
-        height: this.options.height,
-      },
-    });
 
-    if (jobOptions?.tracePath) {
-      console.log(`Enabling Playwright tracing. Trace will be saved to: ${jobOptions.tracePath}`);
-      await context.tracing.start({ screenshots: true, snapshots: true });
-    }
 
-    let pool: { page: import('playwright').Page, strategy: RenderStrategy, timeDriver: TimeDriver, activePromise: Promise<void> }[] = [];
+    let pool: { context: import('playwright').BrowserContext, page: import('playwright').Page, strategy: RenderStrategy, timeDriver: TimeDriver, activePromise: Promise<void> }[] = [];
     try {
       const cpus = os.cpus().length || 4;
       const concurrency = Math.min(os.cpus().length || 4, 8);
@@ -160,7 +150,19 @@ export class Renderer {
       const capturedErrors: Error[] = [];
 
       const createPage = async (index: number) => {
-        const page = await context.newPage();
+        const pageContext = await browser.newContext({
+          viewport: {
+            width: this.options.width,
+            height: this.options.height,
+          },
+        });
+
+        if (jobOptions?.tracePath) {
+          console.log(`Enabling Playwright tracing for worker ${index}...`);
+          await pageContext.tracing.start({ screenshots: true, snapshots: true });
+        }
+
+        const page = await pageContext.newPage();
         const strategy = this.options.mode === 'dom' ? new DomStrategy(this.options) : new CanvasStrategy(this.options);
         const timeDriver = this.options.mode === 'dom' ? new SeekTimeDriver(this.options.stabilityTimeout) : new CdpTimeDriver(this.options.stabilityTimeout);
 
@@ -186,7 +188,7 @@ export class Renderer {
         await strategy.prepare(page);
         await timeDriver.prepare(page);
 
-        return { page, strategy, timeDriver, activePromise: Promise.resolve() };
+        return { context: pageContext, page, strategy, timeDriver, activePromise: Promise.resolve() };
       };
 
       const poolPromises = [];
@@ -448,9 +450,13 @@ export class Renderer {
     } finally {
       if (jobOptions?.tracePath) {
         console.log('Stopping tracing...');
-        await context.tracing.stop({ path: jobOptions.tracePath });
+        if (pool[0]) {
+            await pool[0].context.tracing.stop({ path: jobOptions.tracePath });
+        }
       }
-      await context.close();
+      for (const worker of pool) {
+          await worker.context.close();
+      }
       await browser.close();
       console.log('Browser closed.');
 
