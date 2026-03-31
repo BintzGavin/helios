@@ -155,3 +155,6 @@ Last updated by: PERF-121
 
 ## What Works
 - Removed async/await overhead from `setTime` in `SeekTimeDriver.ts` hot loop. Reduced V8 allocation pressure without changing execution path. Kept in PERF-131. Render time median ~34.0s vs 35.9s (variable but directionally positive).
+
+## Open Questions
+- Would pre-compiling the `mediaSyncScript` in `CdpTimeDriver.ts` and executing it natively via argument passing bypass string interpolation and V8 JIT overhead during `setTime` loops, similar to what we achieved in `SeekTimeDriver.ts`?
