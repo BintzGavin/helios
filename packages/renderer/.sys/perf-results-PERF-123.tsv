@@ -1,0 +1,2 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	34.088	150	4.40	40.0	discard	chunked stdin writes

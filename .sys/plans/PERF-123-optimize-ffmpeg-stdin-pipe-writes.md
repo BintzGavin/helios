@@ -1,11 +1,11 @@
 ---
 id: PERF-123
 slug: optimize-ffmpeg-stdin-pipe-writes
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2026-03-31
-completed: ""
-result: ""
+completed: "2026-03-31"
+result: "no-improvement"
 ---
 # PERF-123: Optimize FFmpeg stdin Pipeline Block Size
 
@@ -60,3 +60,9 @@ Verify that the output video plays correctly and doesn't exhibit tearing or miss
 
 ## Canvas Smoke Test
 Run `npx tsx packages/renderer/tests/verify-canvas-strategy.ts` to make sure Canvas mode isn't negatively affected since both strategies share the FFmpeg encoding pipeline in `Renderer.ts`.
+
+## Results Summary
+- **Best render time**: 34.088s (vs baseline ~33.66s)
+- **Improvement**: -1.27% (Regression)
+- **Kept experiments**: None
+- **Discarded experiments**: [Step 1: Implement chunked writes for FFmpeg stdin]
