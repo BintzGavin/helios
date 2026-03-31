@@ -1,11 +1,11 @@
 ---
 id: PERF-122
 slug: increase-pipeline-depth
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2025-02-18
-completed: ""
-result: ""
+completed: "2025-02-18"
+result: "no-improvement"
 ---
 # PERF-122: Optimize Render Concurrency by Increasing Max Pipeline Depth
 
@@ -36,3 +36,9 @@ Given we have ~4-8 workers, a `maxPipelineDepth` of `poolLen * 2` means only 8-1
 
 ## Correctness Check
 Verify that the output video correctly aligns frames without dropping content.
+
+## Results Summary
+- **Best render time**: 33.633s (vs baseline 45.617s - noisy environment, subsequent baseline is ~33.6s)
+- **Improvement**: ~0% (Noise)
+- **Kept experiments**: []
+- **Discarded experiments**: [Increase maxPipelineDepth to poolLen * 8]

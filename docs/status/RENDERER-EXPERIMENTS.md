@@ -58,6 +58,11 @@ Last updated by: PERF-121
 - Hoisted worker frame execution async IIFE in Renderer.ts outside of hot loop. ~0.1s improvement. [PERF-089]
 
 ## What Doesn't Work (and Why)
+- **PERF-122: Increase maxPipelineDepth to poolLen * 8**:
+  **What you tried**: Modifying `maxPipelineDepth` from `poolLen * 2` to `poolLen * 8` to increase concurrent frames in-flight.
+  **Why it didn't work**: The performance improvement was negligible (around 33.6s, matching baseline noise margins). Deeper pipelines in the Node-Chromium IPC model reach a diminishing returns ceiling due to CPU scheduling constraints.
+  **Plan ID**: PERF-122
+
 - **Incremental time calculation (PERF-116)**: Replaced multiplication with incremental addition for `time` and `compositionTimeInSeconds` inside the hot capture loop. This caused a synchronization error (`Another frame is pending`) from Chromium's `HeadlessExperimental.beginFrame`, indicating that altering the exact timing of variable assignments disrupted the delicate asynchronous pipelining and synchronization between worker evaluations, resulting in a crash.
 
 - **PERF-115: Restore Page Pool Concurrency**: Restored page pool concurrency (`os.cpus().length`) and scaled `maxPipelineDepth` to `poolLen * 2`. Render time regressed to 44.102s (vs baseline 34.584s). The expected multi-core scaling was not realized. Running multiple Playwright pages concurrently caused layout/paint locking in the single Chromium instance, destroying pipeline throughput.
