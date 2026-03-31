@@ -1,11 +1,11 @@
 ---
 id: PERF-130
 slug: promise-all-frames
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "Jules"
 created: 2026-03-31
 completed: ""
-result: ""
+result: "discarded"
 ---
 # PERF-130: Optimize capture loop with Promise.all for workers
 

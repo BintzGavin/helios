@@ -58,6 +58,7 @@ Last updated by: PERF-121
 - Hoisted worker frame execution async IIFE in Renderer.ts outside of hot loop. ~0.1s improvement. [PERF-089]
 
 ## What Doesn't Work (and Why)
+- **PERF-130**: Tried batching `processWorkerFrame` calls using `Promise.all` in the `captureLoop` to optimize V8 promise scheduling. It did not improve performance (median render time ~35.3s, worse than baseline ~33.6s). The overhead of creating arrays for batching and waiting for all frames in a batch to resolve actually increased the sequential stall time before writing to the FFmpeg pipe.
 - **PERF-124: Cache page.frames()**:
   **What you tried**: Caching `page.frames()` in a local property to bypass array allocations per frame in `SeekTimeDriver.ts`.
   **Why it didn't work**: The overhead of Playwright's array creation for frames is negligible and does not cause significant GC pressure compared to IPC and rendering bottlenecks. Render time remained equivalent or slightly worse than the baseline (33.686s).
