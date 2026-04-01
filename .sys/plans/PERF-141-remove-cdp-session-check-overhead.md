@@ -1,11 +1,11 @@
 ---
 id: PERF-141
 slug: remove-cdp-session-check-overhead
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-24
-completed: ""
-result: ""
+completed: 2024-05-24
+result: improved
 ---
 # PERF-141: Remove CDP Session Check Overhead in TimeDrivers
 

@@ -70,10 +70,6 @@ export class CdpTimeDriver implements TimeDriver {
   }
 
   async setTime(page: Page, timeInSeconds: number): Promise<void> {
-    if (!this.client) {
-      throw new Error('CdpTimeDriver not prepared. Call prepare() first.');
-    }
-
     const delta = timeInSeconds - this.currentTime;
 
     // If delta is 0 or negative, we don't advance.
