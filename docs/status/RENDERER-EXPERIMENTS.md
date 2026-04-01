@@ -73,6 +73,10 @@ Last updated by: PERF-136
 - Hoisted worker frame execution async IIFE in Renderer.ts outside of hot loop. ~0.1s improvement. [PERF-089]
 
 ## What Doesn't Work (and Why)
+- **PERF-128: Optimize capture promise chain**:
+  - What you tried: Removed `async` keyword from `processWorkerFrame` to return a synchronous promise chain in `Renderer.ts`.
+  - WHY it didn't work: The optimization was already present in the codebase. Baseline performance remains stable.
+  - Plan ID: PERF-128
 - **Remove truthiness checks in DomStrategy capture (PERF-144)**:
   - What you tried: Removed `if (this.cdpSession)` checks inside `DomStrategy` hot loops.
   - WHY it didn't work: Defensive truthiness checks like `if (this.cdpSession)` must be preserved in the hot loop to maintain necessary fallback paths (e.g., `page.screenshot()`), unlike in the time drivers. Also, static parameter pre-calculation (`frameInterval`) was already implemented.
