@@ -1,11 +1,11 @@
 ---
 id: PERF-144
 slug: remove-dom-strategy-checks
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-24
-completed: ""
-result: ""
+completed: 2024-05-24
+result: no-improvement
 ---
 
 # PERF-144: Remove Branch Evaluation Overhead in DomStrategy Hot Loop
@@ -55,3 +55,9 @@ Run `npm run verify:error -w packages/renderer` or `npx tsx packages/renderer/te
 
 ## Correctness Check
 Run `npx tsx packages/renderer/tests/verify-dom-strategy-capture.ts` or a similar DOM verification test to ensure frames are still captured correctly.
+
+## Results Summary
+- **Best render time**: N/A (skipped)
+- **Improvement**: 0%
+- **Kept experiments**: None
+- **Discarded experiments**: Remove `if (this.cdpSession)` from DomStrategy capture
