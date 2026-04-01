@@ -282,15 +282,14 @@ export class Renderer {
           // To maximize parallel page utilization, we need to decouple frame production from writing
           // such that multiple workers can be evaluating frames concurrently.
 
-          let nextFrameToSubmit = 0;
-          const processWorkerFrame = (worker: any, compositionTimeInSeconds: number, time: number) => {
-              return worker.activePromise.catch(() => {}).then(() => {
-                  const setTimePromise = worker.timeDriver.setTime(worker.page, compositionTimeInSeconds);
-                  const capturePromise = worker.strategy.capture(worker.page, time);
-                  return setTimePromise.then(() => capturePromise);
-              });
+          const noopCatch = () => {};
+          const onWriteError = (err?: Error | null) => {
+              if (err) {
+                 ffmpegProcess.emit('error', err);
+              }
           };
 
+          let nextFrameToSubmit = 0;
           let nextFrameToWrite = 0;
           const poolLen = pool.length;
           const maxPipelineDepth = poolLen * 2;
@@ -312,10 +311,14 @@ export class Renderer {
                   const time = frameIndex * timeStep;
                   const compositionTimeInSeconds = (startFrame + frameIndex) * compTimeStep;
 
-                  const framePromise = processWorkerFrame(worker, compositionTimeInSeconds, time);
+                  const framePromise = worker.activePromise.then(() => {
+                      const setTimePromise = worker.timeDriver.setTime(worker.page, compositionTimeInSeconds);
+                      const capturePromise = worker.strategy.capture(worker.page, time);
+                      return setTimePromise.then(() => capturePromise);
+                  });
 
                   // Add a no-op catch handler to prevent unhandled promise rejections on abort/error
-                  worker.activePromise = framePromise.catch(() => {}) as Promise<void>;
+                  worker.activePromise = framePromise.catch(noopCatch) as Promise<void>;
 
                   framePromises[nextFrameToSubmit] = framePromise;
                   nextFrameToSubmit++;
@@ -342,11 +345,7 @@ export class Renderer {
                  throw new Error('FFmpeg stdin is not writable');
               }
 
-              const canWriteMore = ffmpegProcess.stdin.write(buffer, (err?: Error | null) => {
-                  if (err) {
-                     ffmpegProcess.emit('error', err);
-                  }
-              });
+              const canWriteMore = ffmpegProcess.stdin.write(buffer, onWriteError);
 
               if (!canWriteMore) {
                   const ac = new AbortController();
@@ -387,11 +386,7 @@ export class Renderer {
                throw new Error('FFmpeg stdin is not writable');
             }
 
-            const canWriteMore = ffmpegProcess.stdin.write(finalBuffer, (err?: Error | null) => {
-                if (err) {
-                   ffmpegProcess.emit('error', err);
-                }
-            });
+            const canWriteMore = ffmpegProcess.stdin.write(finalBuffer, onWriteError);
 
             if (!canWriteMore) {
                 const ac = new AbortController();
