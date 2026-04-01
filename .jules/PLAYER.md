@@ -16,3 +16,6 @@
 ## [v0.77.1] - Add Missing Plan
 **Learning:** The previous plan was missing from `/.sys/plans/`, violating the protocol.
 **Action:** Always create a plan file when instructed as Planner.
+## [v0.77.10] - Identifying minor API Parity Gaps
+**Learning:** During review of API parity tests, `srcObject` only returns null and warns on assignment. While `srcObject` stream rendering isn't supported, assigning the property should persist the value to match standard `HTMLMediaElement` wrapper expectations.
+**Action:** When creating plans for API Parity, ensure getters and setters interact coherently with internal state even if the underlying functionality is deferred or partially supported.
