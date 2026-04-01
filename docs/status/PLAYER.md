@@ -1,4 +1,4 @@
-**Version**: 0.77.8
+**Version**: 0.77.9
 [v0.77.8] ✅ Completed: Documented `getSchema` API Parity - Added missing getSchema method to README documentation (already verified present).
 [v0.77.7] ✅ Completed: Expose Missing Export Attributes - Added missing properties (exportMode, exportFormat, exportFilename, exportWidth, exportHeight, exportBitrate, exportCaptionMode, canvasSelector, controlsList) to HeliosPlayer to match the documented attributes.
 
@@ -194,3 +194,4 @@
 
 [v0.77.0] ✅ Completed: Expand Test Coverage - Added test coverage to `DirectController` and `BridgeController` to improve edge case handling and error branches, achieving 100% coverage on `controllers.ts`.
 [v0.77.1] 🚫 Blocked: The current active plan is for RENDERER optimizations. No new implementation plan found in /.sys/plans/ for the PLAYER domain. Waiting for Planner.
+[v0.77.9] ✅ Verified: getSchema API method is already documented in README.md.
