@@ -1,11 +1,11 @@
 ---
 id: PERF-140
 slug: sync-set-time-evaluation
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-24
-completed: ""
-result: ""
+completed: "2026-04-01"
+result: "improved"
 ---
 # PERF-140: Synchronous SetTime Evaluation for SeekTimeDriver
 
@@ -69,3 +69,9 @@ Run the renderer benchmark script `npx tsx packages/renderer/tests/fixtures/benc
 
 ## Canvas Smoke Test
 Run `npx tsx packages/renderer/tests/verify-canvas-strategy.ts` to ensure Canvas mode still works properly.
+
+## Results Summary
+- **Best render time**: 33.706s (vs baseline 35.670s)
+- **Improvement**: ~5.5%
+- **Kept experiments**: Removed evaluateParamsPool and unchained fast/slow setTime evaluations.
+- **Discarded experiments**: []
