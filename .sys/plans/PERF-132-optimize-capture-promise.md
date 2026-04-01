@@ -1,11 +1,11 @@
 ---
 id: PERF-132
 slug: optimize-capture-promise
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2026-03-31
 completed: ""
-result: ""
+result: "inconclusive"
 ---
 # PERF-132: Optimize `DomStrategy.capture()` by removing unnecessary `async/await` overhead
 
@@ -57,3 +57,9 @@ Run `npx tsx packages/renderer/tests/verify-canvas-strategy.ts` to ensure Canvas
 
 ## Correctness Check
 Run the renderer benchmark script `npx tsx packages/renderer/tests/fixtures/benchmark.ts` to verify DOM rendering succeeds.
+
+## Results Summary
+- **Best render time**: 34.916s (vs baseline 34.916s)
+- **Improvement**: 0%
+- **Kept experiments**: []
+- **Discarded experiments**: [optimize-capture-promise]

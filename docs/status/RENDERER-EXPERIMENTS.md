@@ -177,3 +177,8 @@ Last updated by: PERF-136
   - What you tried: Pre-binding `handleBeginFrameResult` to a class property in `DomStrategy.ts` instead of using an inline `.then()` closure to reduce V8 GC pressure.
   - WHY it didn't work: Extracting the `(({ screenshotData }: any) => { ... })` inline closure logic into a pre-bound handler unexpectedly broke the `screenshotData` unpacking, leading to undefined buffers and causing a `RangeError: Invalid array length` crash during the `captureLoop` execution due to empty arrays. The V8 inline closure overhead in Playwright is negligible compared to IPC.
   - Plan ID: PERF-138
+
+- **Remove `async/await` overhead from `DomStrategy.capture()` (PERF-132)**:
+  - What you tried: Removing the `async` keyword from the `capture` method in `DomStrategy.ts` to return the Promise chain directly and avoid V8 generator overhead.
+  - WHY it didn't work: The optimization was already present in the codebase. Verified that the baseline performance remains ~34.916s. No new changes were needed.
+  - Plan ID: PERF-132

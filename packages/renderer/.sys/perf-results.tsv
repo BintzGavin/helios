@@ -238,3 +238,4 @@ peak_mem_mb:        38.3
 236	34.306	300	4.37	39.0	keep	Independent Strategies per Worker
 1	33.686	150	4.45	38.9	discard	cache page.frames() array locally in SeekTimeDriver
 1	34.714	150	4.32	37.7	keep	precompile-cdp-sync-script
+240	34.916	150	4.33	39.1	inconclusive	optimize capture promise (already implemented)
