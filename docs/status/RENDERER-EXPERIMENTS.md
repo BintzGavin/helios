@@ -1,8 +1,9 @@
 ## Performance Trajectory
-Current best: 33.394s (baseline was 34.631s, -3.5%)
-Last updated by: PERF-121
+Current best: 32.057s (baseline was 32.242s, -0.6%)
+Last updated by: PERF-136
 
 ## What Works
+- [PERF-136] Replaced `Buffer.allocUnsafe` and `buffer.write(data, 'base64')` with direct `Buffer.from(data, 'base64')` in `DomStrategy.ts`. This utilizes the highly optimized C++ V8 base64 bindings rather than JavaScript-level buffer memory allocation and writing. Render time improved slightly from ~32.242s to ~32.057s.
 - [PERF-133] Pre-compiled dynamic CDP sync logic in `CdpTimeDriver.ts`, replacing string evaluation with a lightweight function call on every frame.
 - [PERF-121] Decoupled BrowserContexts per Playwright worker page. By creating a new `BrowserContext` for each worker instead of grouping them in a single context, Chromium spins up independent renderer processes. This prevents OS thread contention where all workers serialize JS and layout calculations on a single V8 thread. Render time reduced to ~34.112s.
 - [PERF-119] Identified the core concurrency bottleneck blocking deep pipelining (PERF-115) and causing "Another frame is pending" crashes: workers shared a single `DomStrategy` class property, overwriting the `cdpSession`. Planned fix to instantiate independent strategies per worker page.
