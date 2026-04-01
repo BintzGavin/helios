@@ -73,6 +73,10 @@ Last updated by: PERF-136
 - Hoisted worker frame execution async IIFE in Renderer.ts outside of hot loop. ~0.1s improvement. [PERF-089]
 
 ## What Doesn't Work (and Why)
+- **Remove truthiness checks in DomStrategy capture (PERF-144)**:
+  - What you tried: Removed `if (this.cdpSession)` checks inside `DomStrategy` hot loops.
+  - WHY it didn't work: Defensive truthiness checks like `if (this.cdpSession)` must be preserved in the hot loop to maintain necessary fallback paths (e.g., `page.screenshot()`), unlike in the time drivers. Also, static parameter pre-calculation (`frameInterval`) was already implemented.
+  - Plan ID: PERF-144
 
 - **PERF-130**: Tried batching `processWorkerFrame` calls using `Promise.all` in the `captureLoop` to optimize V8 promise scheduling. It did not improve performance (median render time ~35.3s, worse than baseline ~33.6s). The overhead of creating arrays for batching and waiting for all frames in a batch to resolve actually increased the sequential stall time before writing to the FFmpeg pipe.
 - **PERF-124: Cache page.frames()**:
