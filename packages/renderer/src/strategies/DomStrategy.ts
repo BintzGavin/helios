@@ -22,6 +22,7 @@ export class DomStrategy implements RenderStrategy {
   private beginFrameTargetParams: any = null;
   private targetElementHandle: any = null;
   private emptyImageBuffer: Buffer = EMPTY_IMAGE_BUFFER;
+  private frameInterval: number = 0;
 
 
   private writeToBufferPool(screenshotData: string): Buffer {
@@ -132,9 +133,10 @@ export class DomStrategy implements RenderStrategy {
       cdpScreenshotParams.quality = quality;
     }
 
+    this.frameInterval = 1000 / this.options.fps;
     this.cdpScreenshotParams = cdpScreenshotParams;
-    this.beginFrameParams = { screenshot: this.cdpScreenshotParams };
-    this.beginFrameTargetParams = { screenshot: { ...this.cdpScreenshotParams, clip: { x: 0, y: 0, width: 0, height: 0, scale: 1 } } };
+    this.beginFrameParams = { screenshot: this.cdpScreenshotParams, interval: this.frameInterval };
+    this.beginFrameTargetParams = { screenshot: { ...this.cdpScreenshotParams, clip: { x: 0, y: 0, width: 0, height: 0, scale: 1 } }, interval: this.frameInterval };
 
     // Set format-appropriate empty buffer
     if (format === 'jpeg') {
@@ -179,13 +181,7 @@ export class DomStrategy implements RenderStrategy {
             this.beginFrameTargetParams.screenshot.clip.width = box.width;
             this.beginFrameTargetParams.screenshot.clip.height = box.height;
 
-            const interval = 1000 / (this as any).options.fps;
-            const frameTimeTicks = 10000 + frameTime;
-
-            if (this.beginFrameTargetParams) {
-                this.beginFrameTargetParams.frameTimeTicks = frameTimeTicks;
-                this.beginFrameTargetParams.interval = interval;
-            }
+            this.beginFrameTargetParams.frameTimeTicks = 10000 + frameTime;
 
             return this.cdpSession!.send('HeadlessExperimental.beginFrame', this.beginFrameTargetParams).then(({ screenshotData }: any) => {
               if (screenshotData) {
@@ -218,13 +214,7 @@ export class DomStrategy implements RenderStrategy {
     }
 
     if (this.cdpSession) {
-      const interval = 1000 / (this as any).options.fps;
-      const frameTimeTicks = 10000 + frameTime;
-
-      if (this.beginFrameParams) {
-          this.beginFrameParams.frameTimeTicks = frameTimeTicks;
-          this.beginFrameParams.interval = interval;
-      }
+      this.beginFrameParams.frameTimeTicks = 10000 + frameTime;
 
       return this.cdpSession.send('HeadlessExperimental.beginFrame', this.beginFrameParams).then(({ screenshotData }: any) => {
         if (screenshotData) {
