@@ -1,11 +1,11 @@
 ---
 id: PERF-138
 slug: eliminate-closure-domstrategy
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2026-03-31
-completed: ""
-result: ""
+completed: "2026-04-01"
+result: "discarded"
 ---
 # PERF-138: Eliminate Closure Allocation in DomStrategy.capture
 
@@ -80,3 +80,9 @@ Because `capture()` is called hundreds or thousands of times during a render, V8
 
 ## Canvas Smoke Test
 Run `npx tsx packages/renderer/tests/verify-canvas-strategy.ts` or specific strategy verification tests to ensure the interface still behaves correctly.
+
+## Results Summary
+- **Best render time**: N/A (crash)
+- **Improvement**: N/A
+- **Kept experiments**: None
+- **Discarded experiments**: Eliminate Closure Allocation in DomStrategy.capture
