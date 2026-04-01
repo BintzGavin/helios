@@ -1,11 +1,11 @@
 ---
 id: PERF-128
 slug: optimize-capture-promise-chain
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2026-03-31
-completed: ""
-result: ""
+completed: 2026-04-01
+result: discarded
 ---
 # PERF-128: Optimize capture promise chain in processWorkerFrame
 
@@ -93,3 +93,9 @@ Run the renderer benchmark script `npx tsx packages/renderer/tests/fixtures/benc
 - PERF-114: Pipelined `setTime` and `capture`.
 - PERF-125: Eliminated redundant `try-catch` contexts around `activePromise`.
 - PERF-089: Hoisted the worker function definition to reduce allocations.
+
+## Results Summary
+- **Best render time**: 35.428 s (vs baseline 33.6s)
+- **Improvement**: 0%
+- **Kept experiments**:
+- **Discarded experiments**: [PERF-128]
