@@ -3,6 +3,10 @@ Current best: 32.057s (baseline was 32.242s, -0.6%)
 Last updated by: PERF-136
 
 ## What Works
+- **Remove Duplicate Browser Args (PERF-063)**:
+  - What you did: Removed duplicated strings from `DEFAULT_BROWSER_ARGS` in `Renderer.ts`.
+  - Improvement: ~0.5% faster (33.644s vs 33.814s baseline).
+  - Plan ID: PERF-063
 - **Remove CDP Session Check Overhead (PERF-142)**:
   - What you did: Removed truthiness checks for `this.cdpSession` and `this.client` inside the `setTime` hot loops of `SeekTimeDriver.ts` and `CdpTimeDriver.ts` by using non-null assertions.
   - Improvement: ~4.5% faster (33.501s vs 35.101s baseline).
