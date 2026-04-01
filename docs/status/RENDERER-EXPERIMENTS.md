@@ -3,6 +3,7 @@ Current best: 32.057s (baseline was 32.242s, -0.6%)
 Last updated by: PERF-136
 
 ## What Works
+- [PERF-139] Hoisted `.catch(() => {})` and `ffmpeg.stdin.write` error handlers outside the hot `captureLoop` into static variables, and inlined `processWorkerFrame` logic to eliminate function allocation overhead. Render time improved.
 - [PERF-136] Replaced `Buffer.allocUnsafe` and `buffer.write(data, 'base64')` with direct `Buffer.from(data, 'base64')` in `DomStrategy.ts`. This utilizes the highly optimized C++ V8 base64 bindings rather than JavaScript-level buffer memory allocation and writing. Render time improved slightly from ~32.242s to ~32.057s.
 - [PERF-133] Pre-compiled dynamic CDP sync logic in `CdpTimeDriver.ts`, replacing string evaluation with a lightweight function call on every frame.
 - [PERF-121] Decoupled BrowserContexts per Playwright worker page. By creating a new `BrowserContext` for each worker instead of grouping them in a single context, Chromium spins up independent renderer processes. This prevents OS thread contention where all workers serialize JS and layout calculations on a single V8 thread. Render time reduced to ~34.112s.
