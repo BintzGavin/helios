@@ -240,32 +240,25 @@ export class SeekTimeDriver implements TimeDriver {
     const frames = page.frames();
 
     if (frames.length === 1) {
-      if (this.cdpSession) {
-        const params = {
-          expression: `window.__helios_seek(${timeInSeconds}, ${this.timeout})`,
-          awaitPromise: true,
-          returnByValue: false
-        };
-        return this.cdpSession.send('Runtime.evaluate', params) as Promise<any>;
-      } else {
-        return frames[0].evaluate(
-          ([t, timeoutMs]) => { (window as any).__helios_seek(t, timeoutMs); },
-          [timeInSeconds, this.timeout]
-        ) as Promise<void>;
-      }
+      const params = {
+        expression: `window.__helios_seek(${timeInSeconds}, ${this.timeout})`,
+        awaitPromise: true,
+        returnByValue: false
+      };
+      return this.cdpSession!.send('Runtime.evaluate', params) as Promise<any>;
     }
 
     const promises: Promise<any>[] = new Array(frames.length);
 
     for (let i = 0; i < frames.length; i++) {
       const frame = frames[i];
-      if (this.cdpSession && frame === page.mainFrame()) {
+      if (frame === page.mainFrame()) {
         const params = {
           expression: `window.__helios_seek(${timeInSeconds}, ${this.timeout})`,
           awaitPromise: true,
           returnByValue: false
         };
-        promises[i] = this.cdpSession.send('Runtime.evaluate', params);
+        promises[i] = this.cdpSession!.send('Runtime.evaluate', params);
       } else {
         promises[i] = frame.evaluate(
           ([t, timeoutMs]) => { (window as any).__helios_seek(t, timeoutMs); },

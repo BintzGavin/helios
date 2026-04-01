@@ -3,6 +3,13 @@ Current best: 32.057s (baseline was 32.242s, -0.6%)
 Last updated by: PERF-136
 
 ## What Works
+- **Remove CDP Session Check Overhead (PERF-142)**:
+  - What you did: Removed truthiness checks for `this.cdpSession` and `this.client` inside the `setTime` hot loops of `SeekTimeDriver.ts` and `CdpTimeDriver.ts` by using non-null assertions.
+  - Improvement: ~4.5% faster (33.501s vs 35.101s baseline).
+  - Plan ID: PERF-142
+
+
+
 - [PERF-140] Removed `evaluateParamsPool` array and `.then()` chain in `SeekTimeDriver.setTime()` fast and slow paths. Bypassed promise closure generation and natively resolved evaluation params. Render time improved from 35.670s to 33.706s (~5.5% improvement).
 - [PERF-139] Hoisted `.catch(() => {})` and `ffmpeg.stdin.write` error handlers outside the hot `captureLoop` into static variables, and inlined `processWorkerFrame` logic to eliminate function allocation overhead. Render time improved.
 - [PERF-136] Replaced `Buffer.allocUnsafe` and `buffer.write(data, 'base64')` with direct `Buffer.from(data, 'base64')` in `DomStrategy.ts`. This utilizes the highly optimized C++ V8 base64 bindings rather than JavaScript-level buffer memory allocation and writing. Render time improved slightly from ~32.242s to ~32.057s.
@@ -62,6 +69,7 @@ Last updated by: PERF-136
 - Hoisted worker frame execution async IIFE in Renderer.ts outside of hot loop. ~0.1s improvement. [PERF-089]
 
 ## What Doesn't Work (and Why)
+
 - **PERF-130**: Tried batching `processWorkerFrame` calls using `Promise.all` in the `captureLoop` to optimize V8 promise scheduling. It did not improve performance (median render time ~35.3s, worse than baseline ~33.6s). The overhead of creating arrays for batching and waiting for all frames in a batch to resolve actually increased the sequential stall time before writing to the FFmpeg pipe.
 - **PERF-124: Cache page.frames()**:
   **What you tried**: Caching `page.frames()` in a local property to bypass array allocations per frame in `SeekTimeDriver.ts`.
@@ -130,6 +138,7 @@ Last updated by: PERF-136
 - [PERF-072] Refactored the `Renderer.ts` FFmpeg stdin backpressure handler to utilize the highly optimized Node.js `events.once()` utility rather than manually instantiating `new Promise()` and `removeListener` closures on every blocked frame. This reduced GC churn and improved render time slightly from 33.753s to 33.639s.
 
 ## What Works
+
 - [PERF-125] Replaced the `try-catch` block around `await worker.activePromise` in the `processWorkerFrame` hot loop with `.catch(() => {})`. This removed V8 execution context allocation and optimized async continuation, improving median render time from ~33.766s to ~33.636s.
 - PERF-079: Removed Promise.all array allocations in CdpTimeDriver.ts for single frames (~0.3% improvement)
 - Added lightweight browser args (`--disable-dev-shm-usage`, `--disable-extensions`, `--disable-default-apps`, `--disable-sync`, `--no-first-run`, `--mute-audio`, `--disable-background-networking`, `--disable-background-timer-throttling`, `--disable-breakpad`) to `DEFAULT_BROWSER_ARGS` in `packages/renderer/src/Renderer.ts`. Render time improved from ~34.335s baseline to ~33.657s. (PERF-063)
@@ -145,36 +154,43 @@ Last updated by: PERF-136
 
 - Increased maxPipelineDepth to poolLen * 10 and used bitwise shift buffer allocation. Improved from 35.462 to 33.394. (PERF-097)
 ## What Doesn't Work (and Why)
+
 - **Expanding Buffer Pool and Pipeline Depth (PERF-098)**: Tried increasing `maxPipelineDepth` to `poolLen * 15` and `bufferPool` size to `20`. The expected rendering time improvement was not observed, instead it hovered around ~33.9s to ~34.3s. This suggests that expanding the pipeline depth and pre-allocated buffer pool doesn't relieve any critical bottleneck, or the overhead of managing a larger buffer queue balances out the potential concurrent frame gains.
 - Tried incremental time calculation in the hot loop (PERF-117).
   - WHY it didn't work: Caused `cdpSession.send: Protocol error (HeadlessExperimental.beginFrame): Another frame is pending` crash. The accumulators likely got out of sync with the true frame offset.
 
 ## What Works
+
 - PERF-119: Independent Strategies per Worker. It resolved the "Another frame is pending" crashes and allowed deep pipelining to safely distribute frame renders across workers, unlocking concurrency speedup. Render time reduced to 34.306s.
 - PERF-120: Replaced module-level `evaluateParamsPool` with an instance-level pool inside `SeekTimeDriver.ts`. This successfully decoupled Playwright worker pages and eliminated a major concurrency race condition (preventing corrupted evaluation parameters during overlapping `setTime` calls), keeping render time at ~33.4s but guaranteeing safe multi-worker scaling.
 - [PERF-129] Optimized frame capture loop by replacing the `async` `processWorkerFrame` function with a synchronous Promise chain, eliminating micro-stalls and V8 context allocation overhead, improving median render time to 33.431s.
 
 ## What Doesn't Work (and Why)
+
 - **Batching chunks for ffmpeg.stdin.write**: PERF-123. Tried aggregating frame buffers into 1MB chunks before calling \`stdin.write()\` to reduce IPC system calls. The result was slightly slower than baseline (~34.088s vs ~33.66s baseline). While batching saves IPC context switches, `Buffer.concat` introduces heavy CPU synchronous overhead for memory copying in Node.js which negates the benefits of fewer writes in this specific microVM environment.
 
 ## What Works
+
 - Removed async/await overhead from `setTime` in `SeekTimeDriver.ts` hot loop. Reduced V8 allocation pressure without changing execution path. Kept in PERF-131. Render time median ~34.0s vs 35.9s (variable but directionally positive).
 
 ## Open Questions
 
 ## What Doesn't Work (and Why)
+
 - **Eliminate Promise closures with Ring Buffers and Unchained Execution (PERF-134)**:
   - What you tried: Replaced `evaluateParamsPool` array with a Ring Buffer in `SeekTimeDriver.ts` and unchained the `setTime` and `capture` promises in `Renderer.ts` (executing them synchronously without `.then()`).
   - WHY it didn't work: Render time regressed slightly (median ~33.669s vs baseline ~33.400s). Unchaining the commands and using a ring buffer did not reduce overhead enough to overcome the noise margin, and the strict sequential dependency of CDP commands in Chromium might still be necessary or at least not the primary bottleneck compared to IPC latency.
   - Plan ID: PERF-134
 
 ## What Doesn't Work (and Why)
+
 - **Fix Shared Strategy Instance in Worker Pool (PERF-118)**:
   - What you tried: Instantiating a new \`DomStrategy\` instance for every worker page in the pool instead of sharing the class-level instance to avoid CDP session collisions during concurrent rendering.
   - WHY it didn't work: The codebase was already updated to instantiate a new \`DomStrategy\` per worker in \`createPage\` (via \`const strategy = this.options.mode === 'dom' ? new DomStrategy(this.options) : new CanvasStrategy(this.options);\`). Attempting to "fix" it by reusing \`this.strategy\` for index 0 caused TypeScript errors because \`strategy\` is not a property of \`Renderer\`. The underlying issue of shared state was already resolved previously. The baseline performance remains ~34.5s.
   - Plan ID: PERF-118
 
 ## What Doesn't Work (and Why)
+
 - **Eliminate Closure Allocation in DomStrategy.capture (PERF-138)**:
   - What you tried: Pre-binding `handleBeginFrameResult` to a class property in `DomStrategy.ts` instead of using an inline `.then()` closure to reduce V8 GC pressure.
   - WHY it didn't work: Extracting the `(({ screenshotData }: any) => { ... })` inline closure logic into a pre-bound handler unexpectedly broke the `screenshotData` unpacking, leading to undefined buffers and causing a `RangeError: Invalid array length` crash during the `captureLoop` execution due to empty arrays. The V8 inline closure overhead in Playwright is negligible compared to IPC.

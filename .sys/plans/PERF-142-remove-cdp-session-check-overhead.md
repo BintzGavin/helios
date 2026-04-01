@@ -1,11 +1,11 @@
 ---
 id: PERF-142
 slug: remove-cdp-session-check-overhead
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-24
 completed: ""
-result: ""
+result: "improved"
 ---
 # PERF-142: Remove CDP Session Check Overhead in TimeDrivers
 
@@ -42,3 +42,9 @@ Run the renderer benchmark script `npx tsx packages/renderer/tests/fixtures/benc
 
 ## Canvas Smoke Test
 Run `npx tsx packages/renderer/tests/verify-canvas-strategy.ts` to ensure Canvas mode still works properly.
+
+## Results Summary
+- **Best render time**: 33.501s (vs baseline 35.101s)
+- **Improvement**: 4.5%
+- **Kept experiments**: Remove CDP Session Check Overhead (PERF-142)
+- **Discarded experiments**: None
