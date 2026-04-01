@@ -171,3 +171,9 @@ Last updated by: PERF-136
   - What you tried: Instantiating a new \`DomStrategy\` instance for every worker page in the pool instead of sharing the class-level instance to avoid CDP session collisions during concurrent rendering.
   - WHY it didn't work: The codebase was already updated to instantiate a new \`DomStrategy\` per worker in \`createPage\` (via \`const strategy = this.options.mode === 'dom' ? new DomStrategy(this.options) : new CanvasStrategy(this.options);\`). Attempting to "fix" it by reusing \`this.strategy\` for index 0 caused TypeScript errors because \`strategy\` is not a property of \`Renderer\`. The underlying issue of shared state was already resolved previously. The baseline performance remains ~34.5s.
   - Plan ID: PERF-118
+
+## What Doesn't Work (and Why)
+- **Eliminate Closure Allocation in DomStrategy.capture (PERF-138)**:
+  - What you tried: Pre-binding `handleBeginFrameResult` to a class property in `DomStrategy.ts` instead of using an inline `.then()` closure to reduce V8 GC pressure.
+  - WHY it didn't work: Extracting the `(({ screenshotData }: any) => { ... })` inline closure logic into a pre-bound handler unexpectedly broke the `screenshotData` unpacking, leading to undefined buffers and causing a `RangeError: Invalid array length` crash during the `captureLoop` execution due to empty arrays. The V8 inline closure overhead in Playwright is negligible compared to IPC.
+  - Plan ID: PERF-138
