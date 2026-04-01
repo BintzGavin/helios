@@ -195,3 +195,5 @@
 [v0.77.0] ✅ Completed: Expand Test Coverage - Added test coverage to `DirectController` and `BridgeController` to improve edge case handling and error branches, achieving 100% coverage on `controllers.ts`.
 [v0.77.1] 🚫 Blocked: The current active plan is for RENDERER optimizations. No new implementation plan found in /.sys/plans/ for the PLAYER domain. Waiting for Planner.
 [v0.77.9] ✅ Verified: getSchema API method is already documented in README.md.
+
+[v0.77.10] ✅ Completed: Discovered missing `srcObject` parity logic. Created plan `.sys/plans/2026-11-25-PLAYER-Fix-API-Parity-srcObject.md` to persist assigned `srcObject` values.
