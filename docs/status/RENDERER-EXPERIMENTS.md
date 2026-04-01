@@ -164,3 +164,9 @@ Last updated by: PERF-121
   - What you tried: Replaced `evaluateParamsPool` array with a Ring Buffer in `SeekTimeDriver.ts` and unchained the `setTime` and `capture` promises in `Renderer.ts` (executing them synchronously without `.then()`).
   - WHY it didn't work: Render time regressed slightly (median ~33.669s vs baseline ~33.400s). Unchaining the commands and using a ring buffer did not reduce overhead enough to overcome the noise margin, and the strict sequential dependency of CDP commands in Chromium might still be necessary or at least not the primary bottleneck compared to IPC latency.
   - Plan ID: PERF-134
+
+## What Doesn't Work (and Why)
+- **Fix Shared Strategy Instance in Worker Pool (PERF-118)**:
+  - What you tried: Instantiating a new \`DomStrategy\` instance for every worker page in the pool instead of sharing the class-level instance to avoid CDP session collisions during concurrent rendering.
+  - WHY it didn't work: The codebase was already updated to instantiate a new \`DomStrategy\` per worker in \`createPage\` (via \`const strategy = this.options.mode === 'dom' ? new DomStrategy(this.options) : new CanvasStrategy(this.options);\`). Attempting to "fix" it by reusing \`this.strategy\` for index 0 caused TypeScript errors because \`strategy\` is not a property of \`Renderer\`. The underlying issue of shared state was already resolved previously. The baseline performance remains ~34.5s.
+  - Plan ID: PERF-118

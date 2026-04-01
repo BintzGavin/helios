@@ -1,11 +1,11 @@
 ---
 id: PERF-118
 slug: fix-shared-strategy
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-31
-completed: ""
-result: ""
+completed: "2024-03-24"
+result: "discard"
 ---
 # PERF-118: Fix Shared DomStrategy Instance and Enable Concurrency
 
@@ -64,3 +64,9 @@ Run `npx tsx packages/renderer/tests/verify-codecs.ts` and `npm run test -w pack
 ## Correctness Check
 Run the DOM verification script to ensure frames are sequenced correctly without crashing:
 `npx tsx packages/renderer/tests/verify-dom-selector.ts`
+
+## Results Summary
+- **Best render time**: 34.5s (vs baseline 34.5s)
+- **Improvement**: 0%
+- **Kept experiments**:
+- **Discarded experiments**: All alternatives. Codebase remains unchanged.
