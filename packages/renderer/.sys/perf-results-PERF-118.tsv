@@ -1,0 +1,2 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	34.584	150	4.34	37.8	discard	Baseline from PERF-118
