@@ -5,7 +5,7 @@
 
 #### 2. File Inventory
 - **Create**:
-  - `packages/cli/src/templates/cloudflare-sandbox.ts` (Contains templates for `wrangler.toml`, workflow source `src/index.ts`, and `README-CLOUDFLARE-SANDBOX.md`)
+  - `packages/cli/src/templates/cloudflare-sandbox.ts` (Contains templates for `wrangler.toml`, workflow source `src/index.ts`, `src/render-workflow.ts`, and `README-CLOUDFLARE-SANDBOX.md`)
 - **Modify**:
   - `packages/cli/src/commands/deploy.ts` (Add the `cloudflare-sandbox` subcommand to scaffold the templates)
 - **Read-Only**:
@@ -17,13 +17,13 @@
 #### 3. Implementation Spec
 - **Architecture**:
   - Extend Commander.js `deploy` command with a new subcommand `cloudflare-sandbox`.
-  - The command will create a `wrangler.toml`, a `src/index.ts` file implementing the Cloudflare Workflow, and a `README-CLOUDFLARE-SANDBOX.md` guide.
-  - The templates will closely mirror the proven path found in `examples/distributed-rendering/cloudflare-workflow/wrangler.toml` and its `src/index.ts`.
+  - The command will create a `wrangler.toml`, `src/index.ts`, `src/render-workflow.ts` implementing the Cloudflare Workflow, and a `README-CLOUDFLARE-SANDBOX.md` guide.
+  - The templates will closely mirror the proven path found in `examples/distributed-rendering/cloudflare-workflow`.
 - **Pseudo-Code**:
-  - Define string constants in `packages/cli/src/templates/cloudflare-sandbox.ts` for `WRANGLER_TOML_TEMPLATE`, `WORKFLOW_TS_TEMPLATE`, and `README_CLOUDFLARE_SANDBOX_TEMPLATE`.
+  - Define string constants in `packages/cli/src/templates/cloudflare-sandbox.ts` for `WRANGLER_TOML_TEMPLATE`, `WORKFLOW_INDEX_TS_TEMPLATE`, `WORKFLOW_RENDER_TS_TEMPLATE`, and `README_CLOUDFLARE_SANDBOX_TEMPLATE`.
   - In `packages/cli/src/commands/deploy.ts`, import these templates.
   - Add `.command('cloudflare-sandbox')` to the `deploy` command group.
-  - Inside the action handler, define paths for the new files.
+  - Inside the action handler, define paths for the new files (`wrangler.toml`, `src/index.ts`, `src/render-workflow.ts`, `README-CLOUDFLARE-SANDBOX.md`).
   - Check for existence and prompt for overwrite.
   - Write the template contents to the respective files.
 - **Public API Changes**:
@@ -31,6 +31,6 @@
 - **Dependencies**: None.
 
 #### 4. Test Plan
-- **Verification**: Run `npm run build -w packages/cli` and then execute `npx tsx packages/cli/src/index.ts deploy cloudflare-sandbox`. Check that the files `wrangler.toml`, `src/index.ts`, and `README-CLOUDFLARE-SANDBOX.md` are correctly generated.
+- **Verification**: Run `npm run build -w packages/cli` and then execute `npx tsx packages/cli/src/index.ts deploy cloudflare-sandbox` in a test dir. Check that the files `wrangler.toml`, `src/index.ts`, `src/render-workflow.ts` and `README-CLOUDFLARE-SANDBOX.md` are correctly generated.
 - **Success Criteria**: The `helios deploy cloudflare-sandbox` command successfully creates the deployment scaffold files required for the Cloudflare Sandbox Workflow without errors.
 - **Edge Cases**: Ensure the command gracefully handles existing files by prompting the user for an overwrite decision and skipping file creation if the user declines.
