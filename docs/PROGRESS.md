@@ -449,3 +449,6 @@ Each agent should update **their own dedicated progress file** instead of this f
 
 ### CLI v0.39.0
 - ✅ Completed: Cloud Execution Adapters Expansion - Added support for Docker, Fly.io, and Kubernetes to the job run command.
+
+### PLAYER v0.77.9
+- ✅ Verified: getSchema API method is already documented in README.md.
