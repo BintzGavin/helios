@@ -3,6 +3,7 @@ Current best: 32.057s (baseline was 32.242s, -0.6%)
 Last updated by: PERF-136
 
 ## What Works
+- [PERF-140] Removed `evaluateParamsPool` array and `.then()` chain in `SeekTimeDriver.setTime()` fast and slow paths. Bypassed promise closure generation and natively resolved evaluation params. Render time improved from 35.670s to 33.706s (~5.5% improvement).
 - [PERF-139] Hoisted `.catch(() => {})` and `ffmpeg.stdin.write` error handlers outside the hot `captureLoop` into static variables, and inlined `processWorkerFrame` logic to eliminate function allocation overhead. Render time improved.
 - [PERF-136] Replaced `Buffer.allocUnsafe` and `buffer.write(data, 'base64')` with direct `Buffer.from(data, 'base64')` in `DomStrategy.ts`. This utilizes the highly optimized C++ V8 base64 bindings rather than JavaScript-level buffer memory allocation and writing. Render time improved slightly from ~32.242s to ~32.057s.
 - [PERF-133] Pre-compiled dynamic CDP sync logic in `CdpTimeDriver.ts`, replacing string evaluation with a lightweight function call on every frame.
