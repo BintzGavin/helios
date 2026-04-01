@@ -1,10 +1,11 @@
-**Version**: 0.44.0
+**Version**: 0.45.0
 
 # CLI Status
 
 ## Current State
 The Helios CLI is the primary user interface for component registry, project scaffolding, distributed rendering, and deployment.
 
+[v0.45.0] ✅ Completed: Scaffold Cloudflare Sandbox Deployment - Added `helios deploy cloudflare-sandbox` command to generate wrangler.toml, workflow index, and render script.
 [v0.44.0] ✅ Completed: Tier 3 Scaffold Deployment Commands - Implemented `helios deploy modal`, `helios deploy deno`, and `helios deploy vercel`.
 
 ## Next Steps

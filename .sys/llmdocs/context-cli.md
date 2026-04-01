@@ -41,7 +41,7 @@ packages/cli/
 - `helios add <component>`: Adds a component from the remote registry.
 - `helios build`: Builds the user project via Vite for production usage.
 - `helios components [query]`: Lists available components in the registry (filterable by query, framework, or all).
-- `helios deploy <provider>`: Scaffolds deployment configurations for cloud providers (e.g., `aws`, `gcp`, `cloudflare`, `kubernetes`, `fly`, `azure`, `hetzner`, `modal`, `deno`, `vercel`).
+- `helios deploy <provider>`: Scaffolds deployment configurations for cloud providers (e.g., `aws`, `gcp`, `cloudflare`, `cloudflare-sandbox`, `kubernetes`, `fly`, `azure`, `hetzner`, `modal`, `deno`, `vercel`).
 - `helios diff <component>`: Compares a local component against its remote registry equivalent, outputting patch diffs.
 - `helios init`: Scaffolds `helios.config.json` and base templates (or examples) for user workspaces.
 - `helios job run <spec>`: Executes a distributed execution spec using available Worker adapters.
