@@ -158,3 +158,9 @@ Last updated by: PERF-121
 - Removed async/await overhead from `setTime` in `SeekTimeDriver.ts` hot loop. Reduced V8 allocation pressure without changing execution path. Kept in PERF-131. Render time median ~34.0s vs 35.9s (variable but directionally positive).
 
 ## Open Questions
+
+## What Doesn't Work (and Why)
+- **Eliminate Promise closures with Ring Buffers and Unchained Execution (PERF-134)**:
+  - What you tried: Replaced `evaluateParamsPool` array with a Ring Buffer in `SeekTimeDriver.ts` and unchained the `setTime` and `capture` promises in `Renderer.ts` (executing them synchronously without `.then()`).
+  - WHY it didn't work: Render time regressed slightly (median ~33.669s vs baseline ~33.400s). Unchaining the commands and using a ring buffer did not reduce overhead enough to overcome the noise margin, and the strict sequential dependency of CDP commands in Chromium might still be necessary or at least not the primary bottleneck compared to IPC latency.
+  - Plan ID: PERF-134

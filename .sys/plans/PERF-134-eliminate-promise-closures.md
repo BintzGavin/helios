@@ -1,11 +1,11 @@
 ---
 id: PERF-134
 slug: eliminate-promise-closures
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-27
-completed: ""
-result: ""
+completed: "2024-05-27"
+result: "discard"
 ---
 # PERF-134: Eliminate hot-loop Promise closures with Ring Buffers and Unchained Execution
 
@@ -66,3 +66,9 @@ Verify rendering works by running `npx tsx packages/renderer/tests/verify-canvas
 
 ## Correctness Check
 Run the renderer benchmark script `npx tsx packages/renderer/tests/fixtures/benchmark.ts` to ensure the strategy correctly synchronizes media elements and generates valid video outputs without race conditions.
+
+## Results Summary
+- **Best render time**: 33.669s (vs baseline 33.400s)
+- **Improvement**: 0% (Regression)
+- **Kept experiments**: None
+- **Discarded experiments**: Eliminate hot-loop Promise closures with Ring Buffers and Unchained Execution
