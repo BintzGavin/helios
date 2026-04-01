@@ -7,6 +7,7 @@ import { DOCKERFILE_TEMPLATE, DOCKER_COMPOSE_TEMPLATE } from '../templates/docke
 import { CLOUD_RUN_JOB_TEMPLATE, README_GCP_TEMPLATE } from '../templates/gcp.js';
 import { AWS_DOCKERFILE_TEMPLATE, AWS_LAMBDA_HANDLER_TEMPLATE, AWS_SAM_TEMPLATE, README_AWS_TEMPLATE } from '../templates/aws.js';
 import { WRANGLER_TOML_TEMPLATE, CLOUDFLARE_WORKER_TEMPLATE, README_CLOUDFLARE_TEMPLATE } from '../templates/cloudflare.js';
+import { WRANGLER_TOML_TEMPLATE as CF_SANDBOX_WRANGLER_TOML_TEMPLATE, WORKFLOW_INDEX_TS_TEMPLATE, WORKFLOW_RENDER_TS_TEMPLATE, README_CLOUDFLARE_SANDBOX_TEMPLATE } from '../templates/cloudflare-sandbox.js';
 import { FLY_TOML_TEMPLATE, FLY_DOCKERFILE_TEMPLATE, README_FLY_TEMPLATE } from '../templates/fly.js';
 import { KUBERNETES_JOB_TEMPLATE, README_KUBERNETES_TEMPLATE } from '../templates/kubernetes.js';
 import { README_HETZNER_TEMPLATE } from '../templates/hetzner.js';
@@ -360,6 +361,128 @@ export function registerDeployCommand(program: Command) {
 
       console.log(chalk.blue('\nCloudflare Workers setup complete!'));
       console.log('See README-CLOUDFLARE.md for deployment instructions.');
+    });
+
+  deploy
+    .command('cloudflare-sandbox')
+    .description('Scaffold Cloudflare Sandbox Workflow deployment configuration')
+    .action(async () => {
+      const cwd = process.cwd();
+      const wranglerPath = path.join(cwd, 'wrangler.toml');
+      const srcDir = path.join(cwd, 'src');
+      const indexPath = path.join(srcDir, 'index.ts');
+      const renderWorkflowPath = path.join(srcDir, 'render-workflow.ts');
+      const readmePath = path.join(cwd, 'README-CLOUDFLARE-SANDBOX.md');
+
+      console.log(chalk.blue('Scaffolding Cloudflare Sandbox Workflow deployment files...'));
+
+      // wrangler.toml
+      let writeWrangler = true;
+      if (fs.existsSync(wranglerPath)) {
+        const response = await prompts({
+          type: 'confirm',
+          name: 'value',
+          message: 'wrangler.toml already exists. Overwrite?',
+          initial: false
+        });
+
+        if (typeof response.value === 'undefined') {
+          console.log(chalk.yellow('\nOperation cancelled.'));
+          process.exit(0);
+        }
+
+        writeWrangler = response.value;
+      }
+
+      if (writeWrangler) {
+        fs.writeFileSync(wranglerPath, CF_SANDBOX_WRANGLER_TOML_TEMPLATE);
+        console.log(chalk.green('✔ Created wrangler.toml'));
+      } else {
+        console.log(chalk.gray('Skipped wrangler.toml'));
+      }
+
+      // Ensure src directory exists
+      if (!fs.existsSync(srcDir)) {
+        fs.mkdirSync(srcDir, { recursive: true });
+      }
+
+      // src/index.ts
+      let writeIndex = true;
+      if (fs.existsSync(indexPath)) {
+        const response = await prompts({
+          type: 'confirm',
+          name: 'value',
+          message: 'src/index.ts already exists. Overwrite?',
+          initial: false
+        });
+
+        if (typeof response.value === 'undefined') {
+          console.log(chalk.yellow('\nOperation cancelled.'));
+          process.exit(0);
+        }
+
+        writeIndex = response.value;
+      }
+
+      if (writeIndex) {
+        fs.writeFileSync(indexPath, WORKFLOW_INDEX_TS_TEMPLATE);
+        console.log(chalk.green('✔ Created src/index.ts'));
+      } else {
+        console.log(chalk.gray('Skipped src/index.ts'));
+      }
+
+      // src/render-workflow.ts
+      let writeRenderWorkflow = true;
+      if (fs.existsSync(renderWorkflowPath)) {
+        const response = await prompts({
+          type: 'confirm',
+          name: 'value',
+          message: 'src/render-workflow.ts already exists. Overwrite?',
+          initial: false
+        });
+
+        if (typeof response.value === 'undefined') {
+          console.log(chalk.yellow('\nOperation cancelled.'));
+          process.exit(0);
+        }
+
+        writeRenderWorkflow = response.value;
+      }
+
+      if (writeRenderWorkflow) {
+        fs.writeFileSync(renderWorkflowPath, WORKFLOW_RENDER_TS_TEMPLATE);
+        console.log(chalk.green('✔ Created src/render-workflow.ts'));
+      } else {
+        console.log(chalk.gray('Skipped src/render-workflow.ts'));
+      }
+
+      // README-CLOUDFLARE-SANDBOX.md
+      let writeReadme = true;
+      if (fs.existsSync(readmePath)) {
+        const response = await prompts({
+          type: 'confirm',
+          name: 'value',
+          message: 'README-CLOUDFLARE-SANDBOX.md already exists. Overwrite?',
+          initial: false
+        });
+
+        if (typeof response.value === 'undefined') {
+          console.log(chalk.yellow('\nOperation cancelled.'));
+          process.exit(0);
+        }
+
+        writeReadme = response.value;
+      }
+
+      if (writeReadme) {
+        fs.writeFileSync(readmePath, README_CLOUDFLARE_SANDBOX_TEMPLATE);
+        console.log(chalk.green('✔ Created README-CLOUDFLARE-SANDBOX.md'));
+      } else {
+        console.log(chalk.gray('Skipped README-CLOUDFLARE-SANDBOX.md'));
+      }
+
+      console.log(chalk.blue('\nCloudflare Sandbox Workflow setup complete!'));
+      console.log('See README-CLOUDFLARE-SANDBOX.md for deployment instructions.');
     });
 
   deploy
