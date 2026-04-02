@@ -1,0 +1,27 @@
+--- packages/renderer/src/drivers/CdpTimeDriver.ts
++++ packages/renderer/src/drivers/CdpTimeDriver.ts
+@@ -8,6 +8,11 @@
+     policy: 'advance',
+     budget: 0
+   };
++  private evaluateParams: any = {
++    expression: 'if (typeof (window).__helios_wait_until_stable === "function") return (window).__helios_wait_until_stable();',
++    awaitPromise: true,
++    returnByValue: false
++  };
+
+   constructor(timeout: number = 30000) {
+     this.timeout = timeout;
+@@ -124,11 +129,7 @@
+
+     try {
+       await Promise.race([
+-        page.evaluate(() => {
+-          if (typeof (window as any).__helios_wait_until_stable === 'function') {
+-            return (window as any).__helios_wait_until_stable();
+-          }
+-        }),
++        this.client!.send('Runtime.evaluate', this.evaluateParams),
+         timeoutPromise
+       ]);
+     } catch (e: any) {
