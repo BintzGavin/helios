@@ -7,6 +7,10 @@ export class CdpTimeDriver implements TimeDriver {
   private client: CDPSession | null = null;
   private currentTime: number = 0;
   private timeout: number;
+  private virtualTimePolicyParams: any = {
+    policy: 'advance',
+    budget: 0
+  };
 
   constructor(timeout: number = 30000) {
     this.timeout = timeout;
@@ -116,10 +120,8 @@ export class CdpTimeDriver implements TimeDriver {
       // Use 'once' to avoid leaking listeners
       this.client!.once('Emulation.virtualTimeBudgetExpired', () => resolve());
 
-      this.client!.send('Emulation.setVirtualTimePolicy', {
-        policy: 'advance',
-        budget: budget
-      }).catch(reject);
+      this.virtualTimePolicyParams.budget = budget;
+      this.client!.send('Emulation.setVirtualTimePolicy', this.virtualTimePolicyParams).catch(reject);
     });
 
     this.currentTime = timeInSeconds;
