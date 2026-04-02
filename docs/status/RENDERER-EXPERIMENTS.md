@@ -3,6 +3,11 @@ Current best: 32.057s (baseline was 32.242s, -0.6%)
 Last updated by: PERF-136
 
 ## What Works
+- **Cache jobOptions Properties (PERF-154)**:
+  - What you did: Cached `jobOptions?.signal` and `jobOptions?.onProgress` outside the `while` loop in `Renderer.ts`.
+  - Improvement: Median render time ~33.769s (within noise margin, keeping for reduced V8 branch evaluations).
+  - Plan ID: PERF-154
+
 
 - **Share CDPSession Between Strategy and TimeDriver (PERF-152)**:
   - What you tried: Reusing a single `_sharedCdpSession` between `DomStrategy` and the active `TimeDriver` on the worker page.

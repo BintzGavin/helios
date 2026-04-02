@@ -1,11 +1,11 @@
 ---
 id: PERF-154
 slug: cache-joboptions
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-10-25
-completed: ""
-result: ""
+completed: 2026-04-02
+result: kept
 ---
 # PERF-154: Cache jobOptions Properties in Hot Loop
 
