@@ -4,8 +4,8 @@ slug: modulo-elimination
 status: unclaimed
 claimed_by: ""
 created: 2024-10-25
-completed: ""
-result: ""
+completed: "2026-04-02"
+result: "failed"
 ---
 
 # PERF-149: Eliminate Modulo Arithmetic in Hot Capture Loop
@@ -57,3 +57,9 @@ None.
 
 ## Correctness Check
 Run `npx tsx packages/renderer/tests/fixtures/benchmark.ts` to verify the DOM rendering still succeeds and produces a valid output.
+
+## Results Summary
+- **Best render time**: 33.579s (vs baseline ~32.057s)
+- **Improvement**: -4.7%
+- **Kept experiments**: []
+- **Discarded experiments**: [Eliminate modulo in capture loop]
