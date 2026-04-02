@@ -114,7 +114,7 @@ const report = await Helios.diagnose();
 
 ## Roadmap
 ### V1.x (Active)
-- **Studio**: v0.107.1+ (Asset Drag and Drop, Timeline Audio Regression Tests)
+- **Studio**: v0.107.1+ (Asset Drag and Drop, Timeline Audio Regression Tests, Refine CLI Component Removal)
 - **CLI**: v0.41.0+ (Scaffold Kubernetes Deployment, Scaffold Fly.io Deployment, Scaffold Components)
 - **Core**: v5.13.0+ (Generic Input Props, Implement WaitUntilStable, Fix GSAP Timeline Sync)
 - **Player**: v0.76.18+ (Document getSchema API Parity, Bridge Coverage Completeness, Regression Tests for InputProps)
