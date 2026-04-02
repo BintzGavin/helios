@@ -7,6 +7,7 @@ import prompts from 'prompts';
 import { DOCKERFILE_TEMPLATE, DOCKER_COMPOSE_TEMPLATE } from '../../templates/docker.js';
 import { CLOUD_RUN_JOB_TEMPLATE, README_GCP_TEMPLATE } from '../../templates/gcp.js';
 import { AWS_DOCKERFILE_TEMPLATE, AWS_LAMBDA_HANDLER_TEMPLATE, AWS_SAM_TEMPLATE, README_AWS_TEMPLATE } from '../../templates/aws.js';
+import { DOCKER_COMPOSE_ADAPTER_TEMPLATE, README_DOCKER_TEMPLATE } from '../../templates/docker-adapter.js';
 
 // Mock fs and prompts
 vi.mock('fs');
@@ -99,6 +100,39 @@ describe('deploy command', () => {
 
       // Check if files were NOT overwritten
       expect(fs.writeFileSync).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('docker subcommand', () => {
+    it('should create docker files when they do not exist', async () => {
+      vi.mocked(fs.existsSync).mockReturnValue(false);
+
+      await program.parseAsync(['node', 'test', 'deploy', 'docker']);
+
+      expect(fs.writeFileSync).toHaveBeenCalledWith(expect.stringContaining('docker-compose.yml'), DOCKER_COMPOSE_ADAPTER_TEMPLATE);
+      expect(fs.writeFileSync).toHaveBeenCalledWith(expect.stringContaining('README-DOCKER.md'), README_DOCKER_TEMPLATE);
+    });
+
+    it('should prompt if files exist and overwrite if confirmed', async () => {
+      vi.mocked(fs.existsSync).mockReturnValue(true);
+      vi.mocked(prompts).mockResolvedValue({ value: true });
+
+      await program.parseAsync(['node', 'test', 'deploy', 'docker']);
+
+      expect(prompts).toHaveBeenCalledTimes(2);
+      expect(fs.writeFileSync).toHaveBeenCalledWith(expect.stringContaining('docker-compose.yml'), DOCKER_COMPOSE_ADAPTER_TEMPLATE);
+      expect(fs.writeFileSync).toHaveBeenCalledWith(expect.stringContaining('README-DOCKER.md'), README_DOCKER_TEMPLATE);
+    });
+
+    it('should prompt if files exist and NOT overwrite if declined', async () => {
+      vi.mocked(fs.existsSync).mockReturnValue(true);
+      vi.mocked(prompts).mockResolvedValue({ value: false });
+
+      await program.parseAsync(['node', 'test', 'deploy', 'docker']);
+
+      expect(prompts).toHaveBeenCalledTimes(2);
+      expect(fs.writeFileSync).not.toHaveBeenCalledWith(expect.stringContaining('docker-compose.yml'), expect.any(String));
+      expect(fs.writeFileSync).not.toHaveBeenCalledWith(expect.stringContaining('README-DOCKER.md'), expect.any(String));
     });
   });
 

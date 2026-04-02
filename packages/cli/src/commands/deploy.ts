@@ -11,6 +11,7 @@ import { WRANGLER_TOML_TEMPLATE as CF_SANDBOX_WRANGLER_TOML_TEMPLATE, WORKFLOW_I
 import { FLY_TOML_TEMPLATE, FLY_DOCKERFILE_TEMPLATE, README_FLY_TEMPLATE } from '../templates/fly.js';
 import { KUBERNETES_JOB_TEMPLATE, README_KUBERNETES_TEMPLATE } from '../templates/kubernetes.js';
 import { README_HETZNER_TEMPLATE } from '../templates/hetzner.js';
+import { DOCKER_COMPOSE_ADAPTER_TEMPLATE, README_DOCKER_TEMPLATE } from '../templates/docker-adapter.js';
 
 import { AZURE_FUNCTION_JSON_TEMPLATE, AZURE_HOST_JSON_TEMPLATE, AZURE_LOCAL_SETTINGS_JSON_TEMPLATE, AZURE_INDEX_JS_TEMPLATE, README_AZURE_TEMPLATE } from '../templates/azure.js';
 import { README_MODAL_TEMPLATE } from '../templates/modal.js';
@@ -151,6 +152,70 @@ export function registerDeployCommand(program: Command) {
 
       console.log(chalk.blue('\nGCP setup complete!'));
       console.log('See README-GCP.md for deployment instructions.');
+    });
+
+  deploy
+    .command('docker')
+    .description('Scaffold Docker Compose deployment configuration')
+    .action(async () => {
+      const cwd = process.cwd();
+      const dockerComposePath = path.join(cwd, 'docker-compose.yml');
+      const readmePath = path.join(cwd, 'README-DOCKER.md');
+
+      console.log(chalk.blue('Scaffolding Docker deployment files...'));
+
+      // docker-compose.yml
+      let writeDockerCompose = true;
+      if (fs.existsSync(dockerComposePath)) {
+        const response = await prompts({
+          type: 'confirm',
+          name: 'value',
+          message: 'docker-compose.yml already exists. Overwrite?',
+          initial: false
+        });
+
+        if (typeof response.value === 'undefined') {
+          console.log(chalk.yellow('\nOperation cancelled.'));
+          process.exit(0);
+        }
+
+        writeDockerCompose = response.value;
+      }
+
+      if (writeDockerCompose) {
+        fs.writeFileSync(dockerComposePath, DOCKER_COMPOSE_ADAPTER_TEMPLATE);
+        console.log(chalk.green('✔ Created docker-compose.yml'));
+      } else {
+        console.log(chalk.gray('Skipped docker-compose.yml'));
+      }
+
+      // README-DOCKER.md
+      let writeReadme = true;
+      if (fs.existsSync(readmePath)) {
+        const response = await prompts({
+          type: 'confirm',
+          name: 'value',
+          message: 'README-DOCKER.md already exists. Overwrite?',
+          initial: false
+        });
+
+        if (typeof response.value === 'undefined') {
+          console.log(chalk.yellow('\nOperation cancelled.'));
+          process.exit(0);
+        }
+
+        writeReadme = response.value;
+      }
+
+      if (writeReadme) {
+        fs.writeFileSync(readmePath, README_DOCKER_TEMPLATE);
+        console.log(chalk.green('✔ Created README-DOCKER.md'));
+      } else {
+        console.log(chalk.gray('Skipped README-DOCKER.md'));
+      }
+
+      console.log(chalk.blue('\nDocker setup complete!'));
+      console.log('See README-DOCKER.md for deployment instructions.');
     });
 
   deploy
