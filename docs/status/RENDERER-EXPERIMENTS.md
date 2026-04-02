@@ -90,6 +90,11 @@ Last updated by: PERF-136
 - Hoisted worker frame execution async IIFE in Renderer.ts outside of hot loop. ~0.1s improvement. [PERF-089]
 
 ## What Doesn't Work (and Why)
+- **Forced layout screencast (PERF-156)**:
+  - What you tried: `Page.startScreencast` with forced layout damage via `--helios-force-layout`.
+  - WHY it didn't work: Crashed with `Protocol error (Target.disposeBrowserContext)`. The screencast pushes base64 strings so fast it likely overloads IPC or hits a race condition on cleanup.
+  - Plan ID: PERF-156
+
 - **Optimize FFmpeg Ingestion via thread_queue_size (PERF-155)**:
   - What you tried: Added `-thread_queue_size 1024` to FFmpeg input args.
   - WHY it didn't work: Render time degraded or unchanged (median 33.905s). The overhead of managing a larger buffer queue balances out the potential concurrent frame gains, or FFmpeg input thread backpressure is not the critical bottleneck compared to IPC.
