@@ -245,3 +245,6 @@ peak_mem_mb:        38.3
 145	33.893	150	4.43	39.2	keep	Optimize Renderer Promise Chain
 245	0	150	0	0	crash	investigate-page-evaluate-handle
 246	33.949	300	4.42	37.6	keep	PERF-152 Share CDPSession Between Strategy and TimeDriver
+4	34.794	150	4.31	37.8	keep	Cache jobOptions in hot loop run 1
+5	33.511	150	4.48	38.9	keep	Cache jobOptions in hot loop run 2
+6	33.769	150	4.44	37.8	keep	Cache jobOptions in hot loop run 3

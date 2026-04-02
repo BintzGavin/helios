@@ -286,12 +286,14 @@ export class Renderer {
           const maxPipelineDepth = poolLen * 2;
           const timeStep = 1000 / fps;
           const compTimeStep = 1 / fps;
+          const signal = jobOptions?.signal;
+          const onProgress = jobOptions?.onProgress;
 
           while (nextFrameToWrite < totalFrames) {
               if (capturedErrors.length > 0) {
                   throw capturedErrors[0];
               }
-              if (jobOptions?.signal?.aborted) {
+              if (signal && signal.aborted) {
                   throw new Error('Aborted');
               }
 
@@ -323,8 +325,8 @@ export class Renderer {
                   console.log(`Progress: Rendered ${i} / ${totalFrames} frames`);
               }
 
-              if (jobOptions?.onProgress) {
-                 jobOptions.onProgress(i / totalFrames);
+              if (onProgress) {
+                 onProgress(i / totalFrames);
               }
 
               if (previousWritePromise) {
