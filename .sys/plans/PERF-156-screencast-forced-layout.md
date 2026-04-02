@@ -1,11 +1,17 @@
 ---
 id: PERF-156
 slug: screencast-forced-layout
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-04-02
-completed: ""
-result: ""
+completed: "2024-04-03"
+result: "crashed"
+
+## Results Summary
+- **Best render time**: N/A (crash)
+- **Improvement**: N/A
+- **Kept experiments**: none
+- **Discarded experiments**: Forced layout screencast (crashed, Protocol error Target.disposeBrowserContext)
 ---
 # PERF-156: Screencast with Forced Layout Damage
 
