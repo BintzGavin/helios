@@ -1,11 +1,11 @@
 ---
 id: PERF-145
 slug: optimize-renderer-promise-chain
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-04-02
-completed: ""
-result: ""
+completed: "2024-10-25"
+result: "improved"
 ---
 # PERF-145: Optimize Renderer Promise Chain
 
@@ -63,3 +63,10 @@ Run `npx tsx packages/renderer/tests/verify-seek-driver-determinism.ts` to ensur
 
 ## Canvas Smoke Test
 Run `npx tsx packages/renderer/tests/verify-canvas-strategy.ts` to ensure basic canvas rendering isn't broken.
+
+## Results Summary
+- **Best render time**: 33.893s (vs baseline 34.537s)
+- **Improvement**: ~1.8%
+- **Kept experiments**:
+  - Optimize Renderer Promise Chain: Removed the `.then(() => capturePromise)` allocation and return the `capturePromise` directly after a `.catch(noopCatch)` on the `setTimePromise`.
+- **Discarded experiments**: none
