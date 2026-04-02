@@ -80,6 +80,11 @@ Last updated by: PERF-136
 - Hoisted worker frame execution async IIFE in Renderer.ts outside of hot loop. ~0.1s improvement. [PERF-089]
 
 ## What Doesn't Work (and Why)
+
+- **PERF-148: page.screenshot vs beginFrame**:
+  - What you tried: Replaced `HeadlessExperimental.beginFrame` with `page.screenshot` and `targetElementHandle.screenshot`.
+  - WHY it didn't work: Using `page.screenshot` caused a TimeoutError. Chromium hung when capturing frames via the standard screenshot API when `--enable-begin-frame-control` was used or simply due to CDP loop.
+  - Plan ID: PERF-148
 - **PERF-128: Optimize capture promise chain**:
   - What you tried: Removed `async` keyword from `processWorkerFrame` to return a synchronous promise chain in `Renderer.ts`.
   - WHY it didn't work: The optimization was already present in the codebase. Baseline performance remains stable.
