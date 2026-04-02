@@ -90,6 +90,11 @@ Last updated by: PERF-136
 - Hoisted worker frame execution async IIFE in Renderer.ts outside of hot loop. ~0.1s improvement. [PERF-089]
 
 ## What Doesn't Work (and Why)
+- **Optimize FFmpeg Ingestion via thread_queue_size (PERF-155)**:
+  - What you tried: Added `-thread_queue_size 1024` to FFmpeg input args.
+  - WHY it didn't work: Render time degraded or unchanged (median 33.905s). The overhead of managing a larger buffer queue balances out the potential concurrent frame gains, or FFmpeg input thread backpressure is not the critical bottleneck compared to IPC.
+  - Plan ID: PERF-155
+
 
 - **Timeout Handling Logic bug in CdpTimeDriver (PERF-151)**:
   - What you tried: Updating CdpTimeDriver.ts to replace Playwright's `page.evaluate()` stability check with a pre-allocated CDP `Runtime.evaluate` command to bypass closure allocation overhead.

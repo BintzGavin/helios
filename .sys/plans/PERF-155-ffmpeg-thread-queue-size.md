@@ -1,11 +1,11 @@
 ---
 id: PERF-155
 slug: ffmpeg-thread-queue-size
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-01-20
 completed: ""
-result: ""
+result: no-improvement
 ---
 
 # PERF-155: Optimize FFmpeg Ingestion via thread_queue_size
@@ -60,3 +60,6 @@ Run benchmark tests via `npx tsx packages/renderer/tests/fixtures/benchmark.ts` 
 
 ## Prior Art
 No previous attempts documented for `thread_queue_size` in the microVM.
+
+## Results Summary
+- **Discarded experiments**: [Optimize FFmpeg Ingestion via thread_queue_size]
