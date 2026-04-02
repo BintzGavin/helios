@@ -303,9 +303,8 @@ export class Renderer {
                   const compositionTimeInSeconds = (startFrame + frameIndex) * compTimeStep;
 
                   const framePromise = worker.activePromise.then(() => {
-                      const setTimePromise = worker.timeDriver.setTime(worker.page, compositionTimeInSeconds);
-                      const capturePromise = worker.strategy.capture(worker.page, time);
-                      return setTimePromise.then(() => capturePromise);
+                      worker.timeDriver.setTime(worker.page, compositionTimeInSeconds).catch(noopCatch);
+                      return worker.strategy.capture(worker.page, time);
                   });
 
                   // Add a no-op catch handler to prevent unhandled promise rejections on abort/error

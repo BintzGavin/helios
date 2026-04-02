@@ -3,6 +3,11 @@ Current best: 32.057s (baseline was 32.242s, -0.6%)
 Last updated by: PERF-136
 
 ## What Works
+- **Optimize Renderer Promise Chain (PERF-145)**:
+  - What you did: Removed the `.then(() => capturePromise)` allocation and return the `capturePromise` directly after a `.catch(noopCatch)` on the `setTimePromise`.
+  - How much it improved: ~1.8% faster (34.537s -> 33.893s)
+  - Plan ID: PERF-145
+
 - **Remove Duplicate Browser Args (PERF-063)**:
   - What you did: Removed duplicated strings from `DEFAULT_BROWSER_ARGS` in `Renderer.ts`.
   - Improvement: ~0.5% faster (33.644s vs 33.814s baseline).
