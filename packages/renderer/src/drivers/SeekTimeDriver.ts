@@ -44,7 +44,12 @@ export class SeekTimeDriver implements TimeDriver {
   }
 
   async prepare(page: Page): Promise<void> {
-    this.cdpSession = await page.context().newCDPSession(page);
+    if ((page as any)._sharedCdpSession) {
+      this.cdpSession = (page as any)._sharedCdpSession;
+    } else {
+      this.cdpSession = await page.context().newCDPSession(page);
+      (page as any)._sharedCdpSession = this.cdpSession;
+    }
 
     // Inject the seek script once during initialization
     // We wrap it in an IIFE to avoid polluting the global namespace with helper functions

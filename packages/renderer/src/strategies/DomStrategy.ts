@@ -82,8 +82,13 @@ export class DomStrategy implements RenderStrategy {
     this.discoveredAudioTracks = extractionResult.tracks;
     this.cleanupAudio = extractionResult.cleanup;
 
-    this.cdpSession = await page.context().newCDPSession(page);
-    await this.cdpSession.send('HeadlessExperimental.enable');
+    if ((page as any)._sharedCdpSession) {
+      this.cdpSession = (page as any)._sharedCdpSession;
+    } else {
+      this.cdpSession = await page.context().newCDPSession(page);
+      (page as any)._sharedCdpSession = this.cdpSession;
+    }
+    await this.cdpSession!.send('HeadlessExperimental.enable');
 
     // Check if the requested pixel format supports alpha
     const pixelFormat = this.options.pixelFormat || 'yuv420p';
@@ -95,7 +100,7 @@ export class DomStrategy implements RenderStrategy {
 
     // Emulate Browser.setDownloadBehavior/etc or use Emulation to set transparent background
     if (hasAlpha) {
-      await this.cdpSession.send('Emulation.setDefaultBackgroundColorOverride', {
+      await this.cdpSession!.send('Emulation.setDefaultBackgroundColorOverride', {
         color: { r: 0, g: 0, b: 0, a: 0 }
       }).catch(() => {});
     }
@@ -242,7 +247,6 @@ export class DomStrategy implements RenderStrategy {
 
   async finish(page: Page): Promise<void> {
     if (this.cdpSession) {
-      await this.cdpSession.detach().catch(() => {});
       this.cdpSession = null;
     }
   }

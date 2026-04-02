@@ -21,11 +21,16 @@ export class CdpTimeDriver implements TimeDriver {
   }
 
   async prepare(page: Page): Promise<void> {
-    this.client = await page.context().newCDPSession(page);
+    if ((page as any)._sharedCdpSession) {
+      this.client = (page as any)._sharedCdpSession;
+    } else {
+      this.client = await page.context().newCDPSession(page);
+      (page as any)._sharedCdpSession = this.client;
+    }
     // Initialize virtual time policy to 'pause' to take control of the clock.
     // We set initialVirtualTime to Jan 1, 2024 (UTC) to ensure deterministic Date.now()
     const INITIAL_VIRTUAL_TIME = 1704067200; // 2024-01-01T00:00:00Z in seconds
-    await this.client.send('Emulation.setVirtualTimePolicy', {
+    await this.client!.send('Emulation.setVirtualTimePolicy', {
       policy: 'pause',
       initialVirtualTime: INITIAL_VIRTUAL_TIME
     });
