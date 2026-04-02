@@ -93,6 +93,9 @@ Each agent should update **their own dedicated progress file** instead of this f
 ### STUDIO v0.115.0
 - ✅ Completed: WebCodecs Preference - Added `webCodecsPreference` configuration to Studio Renders Panel, allowing users to select Hardware, Software, or Disabled modes for rendering.
 
+### CLI v0.46.0
+- ✅ Completed: Scaffold Docker Deployment Command - Implemented `helios deploy docker` to scaffold docker-compose.yml and README-DOCKER.md.
+
 ### CLI v0.41.1
 - ✅ Completed: Verify Scaffold Azure Deployment Command - Verified that helios deploy azure is correctly implemented.
 
