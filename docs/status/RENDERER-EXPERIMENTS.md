@@ -3,6 +3,8 @@ Current best: 32.057s (baseline was 32.242s, -0.6%)
 Last updated by: PERF-136
 
 ## What Works
+
+- [PERF-147] Preallocated CDP parameters inside `setTime` driver loops to eliminate per-frame object allocation and reduce GC overhead. Maintained ~33.5s median render time.
 - **Optimize Renderer Promise Chain (PERF-145)**:
   - What you did: Removed the `.then(() => capturePromise)` allocation and return the `capturePromise` directly after a `.catch(noopCatch)` on the `setTimePromise`.
   - How much it improved: ~1.8% faster (34.537s -> 33.893s)

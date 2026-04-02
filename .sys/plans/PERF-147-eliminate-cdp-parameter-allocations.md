@@ -1,8 +1,8 @@
 ---
 id: PERF-147
 slug: eliminate-cdp-parameter-allocations
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-06-01
 completed: ""
 result: ""
