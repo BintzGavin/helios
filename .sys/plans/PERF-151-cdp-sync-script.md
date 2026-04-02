@@ -1,11 +1,11 @@
 ---
 id: PERF-151
 slug: cdp-sync-script
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "jules"
 created: 2024-05-30
-completed: ""
-result: ""
+completed: "2024-05-30"
+result: "discard"
 ---
 
 # PERF-151: Pre-compile CdpTimeDriver.ts Time Sync Script
@@ -58,3 +58,9 @@ Run `npx tsx packages/renderer/tests/verify-cdp-driver.ts` to verify the time dr
 
 ## Canvas Smoke Test
 Run `npx tsx packages/renderer/tests/fixtures/benchmark.ts` or a similar script in `canvas` mode to ensure the canvas path operates correctly.
+
+## Results Summary
+```
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	0.000	0	0.00	0.0	crash	bypassing page.evaluate broke the timeout and stability logic
+```
