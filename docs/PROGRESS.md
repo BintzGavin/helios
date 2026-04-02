@@ -105,6 +105,9 @@ Each agent should update **their own dedicated progress file** instead of this f
 ### CLI v0.31.0
 - ✅ Completed: AWS Deployment - Implemented AWS Lambda deployment scaffolding and custom browser path support.
 
+### PLAYER v0.77.11
+  - ✅ Completed: Fix API Parity srcObject - Updated srcObject getter and setter to persist assigned values internally.
+
 ### PLAYER v0.77.8
 - ✅ Completed: Documented `getSchema` API Parity - Added missing getSchema method to README documentation.
 ### PLAYER v0.77.7

@@ -914,6 +914,7 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
   private _pendingVolume: number = 1;
   private _pendingPlaybackRate: number = 1;
   private _pendingMuted: boolean | null = null;
+  private _srcObject: MediaProvider | null = null;
 
   // --- Standard Media API States ---
 
@@ -1135,11 +1136,12 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
   }
 
   public get srcObject(): MediaProvider | null {
-    return null;
+    return this._srcObject;
   }
 
   public set srcObject(val: MediaProvider | null) {
-    console.warn("HeliosPlayer does not support srcObject");
+    this._srcObject = val;
+    console.warn("HeliosPlayer does not currently render srcObject streams, but value is stored.");
   }
 
 
