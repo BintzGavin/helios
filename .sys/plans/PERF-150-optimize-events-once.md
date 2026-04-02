@@ -1,11 +1,11 @@
 ---
 id: PERF-150
 slug: optimize-events-once
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-28
-completed: ""
-result: ""
+completed: "2026-04-02"
+result: "no-improvement"
 ---
 
 # PERF-150: Optimize FFmpeg Backpressure Handling by Eliminating events.once Overhead
@@ -76,3 +76,9 @@ Remember to remove these listeners in the cleanup phase of the renderer.
 
 ## Correctness Check
 Run the benchmark suite `npx tsx packages/renderer/tests/fixtures/benchmark.ts` to ensure rendering still completes successfully.
+
+## Results Summary
+- **Best render time**: 34.224s (vs baseline 34.119s)
+- **Improvement**: 0%
+- **Kept experiments**: []
+- **Discarded experiments**: [PERF-150]

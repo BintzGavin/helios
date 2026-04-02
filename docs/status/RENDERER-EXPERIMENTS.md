@@ -80,6 +80,7 @@ Last updated by: PERF-136
 - Hoisted worker frame execution async IIFE in Renderer.ts outside of hot loop. ~0.1s improvement. [PERF-089]
 
 ## What Doesn't Work (and Why)
+- Extracted drain event listener out of hot loop to remove events.once overhead (PERF-150). Resulted in ~34.2s (similar to baseline). The overhead of events.once is negligible compared to other bottlenecks.
 - Eliminate modulo operator `%` inside the high-frequency frame capture loop by incrementing an index and resetting. The baseline was ~32.057s. The new runs timed at ~33.9s. The overhead from variable incrementing/branching might negate the savings over standard JIT-optimized constant modulo. Discarding changes. (PERF-149)
 
 - **PERF-148: page.screenshot vs beginFrame**:
