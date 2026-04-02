@@ -115,11 +115,11 @@ const report = await Helios.diagnose();
 ## Roadmap
 ### V1.x (Active)
 - **Studio**: v0.107.1+ (Asset Drag and Drop, Timeline Audio Regression Tests)
-- **CLI**: v0.41.0+ (Scaffold Kubernetes Deployment, Scaffold Fly.io Deployment, Scaffold Components)
+- **CLI**: v0.41.0+ (Scaffold Cloudflare Sandbox Deployment, Tier 3 Scaffold Deployment Commands, Scaffold Hetzner Deployment Command)
 - **Core**: v5.13.0+ (Generic Input Props, Implement WaitUntilStable, Fix GSAP Timeline Sync)
-- **Player**: v0.76.18+ (Document getSchema API Parity, Bridge Coverage Completeness, Regression Tests for InputProps)
+- **Player**: v0.76.18+ (Bridge Coverage Completeness, Bridge Coverage Expansion, Regression Tests for Audio Fader)
 - **Renderer**: v1.78.0+ (Orchestrator Plan, Validate HW Accel, Refactor Media Sync Logic)
-- **Infrastructure**: v0.25.0+ (Cloudflare Workers, Azure Functions, Fly.io Machines, Kubernetes, Docker)
+- **Infrastructure**: v0.25.0+ (Optimize GCS Uploads, Orchestrator Test Coverage Expansion, CloudRun Resiliency Tests)
 
 ### AI Integration
 - **Studio MCP Server**: Inspect, create, and render compositions via LLM tools (Done)
