@@ -90,6 +90,7 @@ Last updated by: PERF-136
 - Hoisted worker frame execution async IIFE in Renderer.ts outside of hot loop. ~0.1s improvement. [PERF-089]
 
 ## What Doesn't Work (and Why)
+- **page.evaluateHandle() screenshot**: Replaced `beginFrame` with `page.evaluateHandle().screenshot()`. It caused timeouts/hangs during rendering due to being incompatible with `--enable-begin-frame-control`. `HeadlessExperimental.beginFrame` remains strictly necessary. (PERF-148)
 - **Forced layout screencast (PERF-156)**:
   - What you tried: `Page.startScreencast` with forced layout damage via `--helios-force-layout`.
   - WHY it didn't work: Crashed with `Protocol error (Target.disposeBrowserContext)`. The screencast pushes base64 strings so fast it likely overloads IPC or hits a race condition on cleanup.

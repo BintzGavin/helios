@@ -1,11 +1,11 @@
 ---
 id: PERF-148
 slug: evaluate-handle
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-10-25
 completed: ""
-result: ""
+result: "crash"
 ---
 
 # PERF-148: Investigate `page.evaluateHandle()` vs `HeadlessExperimental.beginFrame` for DOM Screen Capture
