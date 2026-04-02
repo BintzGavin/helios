@@ -4,6 +4,11 @@ Last updated by: PERF-136
 
 ## What Works
 
+- **Share CDPSession Between Strategy and TimeDriver (PERF-152)**:
+  - What you tried: Reusing a single `_sharedCdpSession` between `DomStrategy` and the active `TimeDriver` on the worker page.
+  - Result: Median time 33.949s vs baseline 33.893s. (Within noise margin, kept due to architectural simplicity and ensuring sequential execution)
+  - Plan ID: PERF-152
+
 - [PERF-147] Preallocated CDP parameters inside `setTime` driver loops to eliminate per-frame object allocation and reduce GC overhead. Maintained ~33.5s median render time.
 - **Optimize Renderer Promise Chain (PERF-145)**:
   - What you did: Removed the `.then(() => capturePromise)` allocation and return the `capturePromise` directly after a `.catch(noopCatch)` on the `setTimePromise`.

@@ -244,3 +244,4 @@ peak_mem_mb:        38.3
 1	35.428	150	4.23	37.8	discard	Optimization was already implemented in PERF-129
 145	33.893	150	4.43	39.2	keep	Optimize Renderer Promise Chain
 245	0	150	0	0	crash	investigate-page-evaluate-handle
+246	33.949	300	4.42	37.6	keep	PERF-152 Share CDPSession Between Strategy and TimeDriver
