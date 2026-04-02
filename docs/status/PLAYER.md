@@ -197,3 +197,4 @@
 [v0.77.9] ✅ Verified: getSchema API method is already documented in README.md.
 
 [v0.77.10] ✅ Completed: Discovered missing `srcObject` parity logic. Created plan `.sys/plans/2026-11-25-PLAYER-Fix-API-Parity-srcObject.md` to persist assigned `srcObject` values.
+[v0.77.11] ✅ Completed: Fix API Parity srcObject - Updated srcObject getter and setter to persist assigned values internally, improving compatibility with third-party wrappers.

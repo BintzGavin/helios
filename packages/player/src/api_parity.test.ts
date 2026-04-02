@@ -388,9 +388,10 @@ describe('HeliosPlayer API Parity', () => {
     const consoleSpy = vi.spyOn(console, 'warn');
     expect(player.srcObject).toBeNull();
 
-    player.srcObject = {} as any;
-    expect(consoleSpy).toHaveBeenCalledWith("HeliosPlayer does not support srcObject");
-    expect(player.srcObject).toBeNull();
+    const mockStream = {} as any;
+    player.srcObject = mockStream;
+    expect(consoleSpy).toHaveBeenCalledWith("HeliosPlayer does not currently render srcObject streams, but value is stored.");
+    expect(player.srcObject).toBe(mockStream);
   });
 
   it('should support crossOrigin property', () => {
