@@ -119,7 +119,7 @@ const report = await Helios.diagnose();
 - **Core**: v5.13.0+ (Generic Input Props, Implement WaitUntilStable, Fix GSAP Timeline Sync)
 - **Player**: v0.76.18+ (Document getSchema API Parity, Bridge Coverage Completeness, Regression Tests for InputProps)
 - **Renderer**: v1.78.0+ (Orchestrator Plan, Validate HW Accel, Refactor Media Sync Logic)
-- **Infrastructure**: v0.25.0+ (Cloudflare Workers, Azure Functions, Fly.io Machines, Kubernetes, Docker)
+- **Infrastructure**: v0.25.0+ (Cloudflare Sandbox, Azure Functions, Fly.io Machines, Kubernetes, Docker, Modal, Deno Deploy, Vercel, Hetzner)
 
 ### AI Integration
 - **Studio MCP Server**: Inspect, create, and render compositions via LLM tools (Done)
