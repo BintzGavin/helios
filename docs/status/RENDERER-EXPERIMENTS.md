@@ -3,6 +3,7 @@ Current best: 32.057s (baseline was 32.242s, -0.6%)
 Last updated by: PERF-136
 
 ## What Works
+- Inlined executeFrameCapture and removed object destructuring in DomStrategy (~1.12769% improvement, PERF-161)
 - [PERF-160] Replaced `.bind` with an inline closure in `Renderer.ts` `captureLoop`. This avoids intermediate `BoundFunction` object creation in the hot path. Render time improved.
 - PERF-159: Removed closure allocation in capture hot loop using bound function (~34.36s improvement)
 - **Cache jobOptions Properties (PERF-154)**:
