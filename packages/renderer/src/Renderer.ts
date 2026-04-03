@@ -26,7 +26,9 @@ const DEFAULT_BROWSER_ARGS = [
   '--disable-web-security',
   '--allow-file-access-from-files',
   '--enable-begin-frame-control',
-  '--run-all-compositor-stages-before-draw'
+  '--run-all-compositor-stages-before-draw',
+  '--disable-site-isolation-trials',
+  '--disable-features=IsolateOrigins,site-per-process'
 ];
 
 const GPU_DISABLED_ARGS = [

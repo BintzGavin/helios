@@ -262,3 +262,4 @@ peak_mem_mb:        38.3
 1	33.890	150	4.42	37.7	keep	inline closure instead of bind
 1	47.202	150	3.18	36.0	discard	PERF-161 inline capture and destructuring
 PERF-162	33.663	150	4.47	37.9	failed	Median changed from 33.654 to 33.663
+PERF-158	33.613	150	4.45	0	keep	Median changed from 33.859 to 33.613
