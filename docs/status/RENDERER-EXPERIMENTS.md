@@ -247,6 +247,10 @@ Last updated by: PERF-136
 
 ## What Doesn't Work (and Why)
 
+- **Cache targetElementHandle boundingBox (PERF-164)**:
+  - What you tried: Caching the `boundingBox()` of the target element in `DomStrategy.prepare()` to avoid calling it on every frame inside `capture()`.
+  - WHY it didn't work: Render time was practically unchanged (~33.936s vs baseline ~33.912s), indicating that the asynchronous `.boundingBox()` IPC overhead is completely negligible compared to `HeadlessExperimental.beginFrame` and FFmpeg. The optimization is not worth the potential risk of breaking animations where the target element changes position.
+
 - **Fix Shared Strategy Instance in Worker Pool (PERF-118)**:
   - What you tried: Instantiating a new \`DomStrategy\` instance for every worker page in the pool instead of sharing the class-level instance to avoid CDP session collisions during concurrent rendering.
   - WHY it didn't work: The codebase was already updated to instantiate a new \`DomStrategy\` per worker in \`createPage\` (via \`const strategy = this.options.mode === 'dom' ? new DomStrategy(this.options) : new CanvasStrategy(this.options);\`). Attempting to "fix" it by reusing \`this.strategy\` for index 0 caused TypeScript errors because \`strategy\` is not a property of \`Renderer\`. The underlying issue of shared state was already resolved previously. The baseline performance remains ~34.5s.
