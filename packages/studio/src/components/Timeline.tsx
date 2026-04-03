@@ -1,10 +1,10 @@
-import React, { useRef, useState, useEffect, useMemo } from 'react';
-import { useStudio } from '../context/StudioContext';
-import { usePersistentState } from '../hooks/usePersistentState';
-import { framesToTimecode } from '@helios-project/core';
-import { TimecodeDisplay } from './Controls/TimecodeDisplay';
-import { TimelineAudioTrack } from './TimelineAudioTrack';
-import './Timeline.css';
+import React, { useRef, useState, useEffect, useMemo } from "react";
+import { useStudio } from "../context/StudioContext";
+import { usePersistentState } from "../hooks/usePersistentState";
+import { framesToTimecode } from "@helios-project/core";
+import { TimecodeDisplay } from "./Controls/TimecodeDisplay";
+import { TimelineAudioTrack } from "./TimelineAudioTrack";
+import "./Timeline.css";
 
 interface Tick {
   frame: number;
@@ -23,7 +23,7 @@ export const Timeline: React.FC = () => {
     inPoint,
     setInPoint,
     outPoint,
-    setOutPoint
+    setOutPoint,
   } = useStudio();
 
   const { currentFrame, duration, fps } = playerState;
@@ -38,9 +38,9 @@ export const Timeline: React.FC = () => {
   const timeProps = useMemo(() => {
     const props: { key: string; label: string; time: number }[] = [];
     for (const [key, def] of Object.entries(schema)) {
-      if (def.type === 'number' && def.format === 'time') {
+      if (def.type === "number" && def.format === "time") {
         const val = inputProps[key];
-        if (typeof val === 'number') {
+        if (typeof val === "number") {
           props.push({ key, label: def.label || key, time: val });
         }
       }
@@ -51,9 +51,11 @@ export const Timeline: React.FC = () => {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
 
-  const [isDragging, setIsDragging] = useState<'playhead' | 'in' | 'out' | 'prop' | null>(null);
+  const [isDragging, setIsDragging] = useState<
+    "playhead" | "in" | "out" | "prop" | null
+  >(null);
   const [draggingPropKey, setDraggingPropKey] = useState<string | null>(null);
-  const [zoom, setZoom] = usePersistentState('timeline-zoom', 0);
+  const [zoom, setZoom] = usePersistentState("timeline-zoom", 0);
   const [hoverFrame, setHoverFrame] = useState<number | null>(null);
   const [contentWidth, setContentWidth] = useState(0);
 
@@ -61,9 +63,9 @@ export const Timeline: React.FC = () => {
   useEffect(() => {
     if (!contentRef.current) return;
     const observer = new ResizeObserver((entries) => {
-        for (const entry of entries) {
-            setContentWidth(entry.contentRect.width);
-        }
+      for (const entry of entries) {
+        setContentWidth(entry.contentRect.width);
+      }
     });
     observer.observe(contentRef.current);
     return () => observer.disconnect();
@@ -72,24 +74,35 @@ export const Timeline: React.FC = () => {
   // Calculate pixels per frame
   const pixelsPerFrame = useMemo(() => {
     if (zoom === 0) {
-        // Fit mode: Width / Total Frames
-        if (contentWidth > 0 && totalFrames > 0) {
-            return contentWidth / totalFrames;
-        }
-        return 0; // fallback
+      // Fit mode: Width / Total Frames
+      if (contentWidth > 0 && totalFrames > 0) {
+        return contentWidth / totalFrames;
+      }
+      return 0; // fallback
     } else {
-        return 0.5 * Math.pow(1.04, zoom);
+      return 0.5 * Math.pow(1.04, zoom);
     }
   }, [zoom, contentWidth, totalFrames]);
 
-  const effectiveWidth = zoom === 0 ? '100%' : `${totalFrames * pixelsPerFrame}px`;
+  const effectiveWidth =
+    zoom === 0 ? "100%" : `${totalFrames * pixelsPerFrame}px`;
 
   // Calculate Layout Heights
   const audioTrackCount = audioTracks.length;
   // Ruler + Gap + Video Track + Gap + Audio Tracks + Padding
-  const totalContentHeight = RULER_HEIGHT + TRACK_GAP + TRACK_HEIGHT + TRACK_GAP + (audioTrackCount * (TRACK_HEIGHT + TRACK_GAP)) + 20;
+  const totalContentHeight =
+    RULER_HEIGHT +
+    TRACK_GAP +
+    TRACK_HEIGHT +
+    TRACK_GAP +
+    audioTrackCount * (TRACK_HEIGHT + TRACK_GAP) +
+    20;
   const videoTrackTop = RULER_HEIGHT + TRACK_GAP;
-  const getAudioTrackTop = (index: number) => videoTrackTop + TRACK_HEIGHT + TRACK_GAP + (index * (TRACK_HEIGHT + TRACK_GAP));
+  const getAudioTrackTop = (index: number) =>
+    videoTrackTop +
+    TRACK_HEIGHT +
+    TRACK_GAP +
+    index * (TRACK_HEIGHT + TRACK_GAP);
 
   // Calculate Ticks
   const ticks = useMemo(() => {
@@ -108,30 +121,29 @@ export const Timeline: React.FC = () => {
 
     // Find best interval
     for (const secs of intervals) {
-        const frames = secs * fps;
-        const tickCount = totalFrames / frames;
-        if (tickCount <= maxTicks) {
-            intervalFrames = frames;
-            break;
-        }
+      const frames = secs * fps;
+      const tickCount = totalFrames / frames;
+      if (tickCount <= maxTicks) {
+        intervalFrames = frames;
+        break;
+      }
     }
 
     // Sub-second handling for high zoom
     if (totalFrames / intervalFrames < 2 && width > 1000) {
-        if (totalFrames / (fps/2) <= maxTicks) intervalFrames = fps / 2;
-        else if (totalFrames / (fps/10) <= maxTicks) intervalFrames = fps / 10;
-        else if (totalFrames <= maxTicks) intervalFrames = 1;
+      if (totalFrames / (fps / 2) <= maxTicks) intervalFrames = fps / 2;
+      else if (totalFrames / (fps / 10) <= maxTicks) intervalFrames = fps / 10;
+      else if (totalFrames <= maxTicks) intervalFrames = 1;
     }
 
     const res: Tick[] = [];
     for (let f = 0; f <= totalFrames; f += intervalFrames) {
-        res.push({
-            frame: f,
-            label: framesToTimecode(f, fps)
-        });
+      res.push({
+        frame: f,
+        label: framesToTimecode(f, fps),
+      });
     }
     return res;
-
   }, [fps, totalFrames, pixelsPerFrame, zoom, contentWidth]);
 
   const formatTime = (frame: number, fps: number) => {
@@ -152,49 +164,99 @@ export const Timeline: React.FC = () => {
   };
 
   const getSnapFrame = (rawFrame: number) => {
-      const ppf = pixelsPerFrame || (contentWidth / totalFrames);
-      if (ppf <= 0) return rawFrame;
+    const ppf = pixelsPerFrame || contentWidth / totalFrames;
+    if (ppf <= 0) return rawFrame;
 
-      const thresholdFrames = SNAP_THRESHOLD_PX / ppf;
+    const thresholdFrames = SNAP_THRESHOLD_PX / ppf;
 
-      const snapPoints = [
-          0,
-          totalFrames,
-          inPoint,
-          outPoint,
-          ...markers.map(m => m.time * fps),
-          ...captions.map(c => (c.startTime / 1000) * fps),
-          ...captions.map(c => (c.endTime / 1000) * fps),
-          ...timeProps.map(p => p.time * fps)
-      ];
+    const snapPoints = [
+      0,
+      totalFrames,
+      inPoint,
+      outPoint,
+      ...markers.map((m) => m.time * fps),
+      ...captions.map((c) => (c.startTime / 1000) * fps),
+      ...captions.map((c) => (c.endTime / 1000) * fps),
+      ...timeProps.map((p) => p.time * fps),
+    ];
 
-      let closest = rawFrame;
-      let minDist = Infinity;
+    let closest = rawFrame;
+    let minDist = Infinity;
 
-      for (const p of snapPoints) {
-          const dist = Math.abs(rawFrame - p);
-          if (dist < minDist) {
-              minDist = dist;
-              closest = p;
-          }
+    for (const p of snapPoints) {
+      const dist = Math.abs(rawFrame - p);
+      if (dist < minDist) {
+        minDist = dist;
+        closest = p;
       }
+    }
 
-      if (minDist <= thresholdFrames) {
-          return Math.round(closest);
-      }
+    if (minDist <= thresholdFrames) {
+      return Math.round(closest);
+    }
 
-      return rawFrame;
+    return rawFrame;
   };
 
-  const handleMouseDown = (e: React.MouseEvent, type: 'playhead' | 'in' | 'out' | 'prop', key?: string) => {
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    const assetData = e.dataTransfer.getData("application/helios-asset");
+    if (!assetData) return;
+
+    try {
+      const asset = JSON.parse(assetData);
+
+      if (!contentRef.current) return;
+      const rect = contentRef.current.getBoundingClientRect();
+      const x = Math.max(0, Math.min(e.clientX - rect.left, rect.width));
+      const percentage = x / rect.width;
+      const dropFrame = Math.round(percentage * totalFrames);
+      const dropTime = dropFrame / fps;
+
+      let targetProp = "";
+      for (const [key, def] of Object.entries(schema)) {
+        if (def.type === asset.type) {
+          targetProp = key;
+          break;
+        }
+      }
+
+      if (targetProp && controller) {
+        // Find any corresponding time prop (e.g. videoTime)
+        const timeProp = Object.keys(schema).find(
+          (k) => k === `${targetProp}Time` || k === `time`,
+        );
+        const updates: Record<string, any> = {
+          ...inputProps,
+          [targetProp]: asset.url,
+        };
+        if (timeProp) {
+          updates[timeProp] = dropTime;
+        }
+        controller.setInputProps(updates);
+      }
+    } catch (err) {
+      console.error("Failed to parse dropped asset", err);
+    }
+  };
+
+  const handleMouseDown = (
+    e: React.MouseEvent,
+    type: "playhead" | "in" | "out" | "prop",
+    key?: string,
+  ) => {
     e.preventDefault();
     setIsDragging(type);
 
-    if (type === 'prop' && key) {
+    if (type === "prop" && key) {
       setDraggingPropKey(key);
     }
 
-    if (type === 'playhead' && controller) {
+    if (type === "playhead" && controller) {
       const rawFrame = getFrameFromEvent(e);
       const frame = e.shiftKey ? rawFrame : getSnapFrame(rawFrame);
       controller.seek(frame);
@@ -203,15 +265,15 @@ export const Timeline: React.FC = () => {
 
   // Track mouse over track area for Hover Guide
   const handleTrackMouseMove = (e: React.MouseEvent) => {
-      if (!isDragging) {
-          setHoverFrame(getFrameFromEvent(e));
-      }
+    if (!isDragging) {
+      setHoverFrame(getFrameFromEvent(e));
+    }
   };
 
   const handleTrackMouseLeave = () => {
-      if (!isDragging) {
-          setHoverFrame(null);
-      }
+    if (!isDragging) {
+      setHoverFrame(null);
+    }
   };
 
   useEffect(() => {
@@ -221,15 +283,15 @@ export const Timeline: React.FC = () => {
       const rawFrame = getFrameFromEvent(e);
       const frame = e.shiftKey ? rawFrame : getSnapFrame(rawFrame);
 
-      if (isDragging === 'playhead') {
+      if (isDragging === "playhead") {
         if (controller) controller.seek(frame);
-      } else if (isDragging === 'in') {
+      } else if (isDragging === "in") {
         const newIn = Math.max(0, Math.min(frame, outPoint - 1));
         setInPoint(newIn);
-      } else if (isDragging === 'out') {
+      } else if (isDragging === "out") {
         const newOut = Math.max(inPoint + 1, Math.min(frame, totalFrames));
         setOutPoint(newOut);
-      } else if (isDragging === 'prop' && draggingPropKey && controller) {
+      } else if (isDragging === "prop" && draggingPropKey && controller) {
         const time = frame / fps;
         controller.setInputProps({ [draggingPropKey]: time });
       }
@@ -239,14 +301,28 @@ export const Timeline: React.FC = () => {
       setIsDragging(null);
     };
 
-    document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseup', handleMouseUp);
+    document.addEventListener("mousemove", handleMouseMove);
+    document.addEventListener("mouseup", handleMouseUp);
 
     return () => {
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseup", handleMouseUp);
     };
-  }, [isDragging, controller, totalFrames, inPoint, outPoint, setInPoint, setOutPoint, pixelsPerFrame, contentWidth, markers, captions, draggingPropKey, fps]);
+  }, [
+    isDragging,
+    controller,
+    totalFrames,
+    inPoint,
+    outPoint,
+    setInPoint,
+    setOutPoint,
+    pixelsPerFrame,
+    contentWidth,
+    markers,
+    captions,
+    draggingPropKey,
+    fps,
+  ]);
 
   const getPercent = (frame: number) => {
     const p = (frame / totalFrames) * 100;
@@ -263,7 +339,7 @@ export const Timeline: React.FC = () => {
             totalFrames={totalFrames}
             onChange={(f) => controller?.seek(f)}
           />
-          <span style={{ margin: '0 4px', color: '#666' }}>/</span>
+          <span style={{ margin: "0 4px", color: "#666" }}>/</span>
           <span>{formatTime(totalFrames, fps)}</span>
           <div className="timeline-zoom-control">
             <span className="timeline-zoom-label">Fit</span>
@@ -287,157 +363,169 @@ export const Timeline: React.FC = () => {
         </div>
       </div>
 
-      <div
-        className="timeline-track-area"
-        ref={scrollContainerRef}
-      >
+      <div className="timeline-track-area" ref={scrollContainerRef}>
         <div
-            className="timeline-content"
-            ref={contentRef}
-            style={{ width: effectiveWidth, height: `${totalContentHeight}px` }}
-            onMouseDown={(e) => handleMouseDown(e, 'playhead')}
-            onMouseMove={handleTrackMouseMove}
-            onMouseLeave={handleTrackMouseLeave}
+          className="timeline-content"
+          onDragOver={handleDragOver}
+          onDrop={handleDrop}
+          ref={contentRef}
+          style={{ width: effectiveWidth, height: `${totalContentHeight}px` }}
+          onMouseDown={(e) => handleMouseDown(e, "playhead")}
+          onMouseMove={handleTrackMouseMove}
+          onMouseLeave={handleTrackMouseLeave}
         >
-            {/* Ruler Layer */}
-            <div className="timeline-ruler">
-                {ticks.map(tick => (
-                    <div
-                        key={tick.frame}
-                        className="timeline-tick"
-                        style={{ left: `${getPercent(tick.frame)}%` }}
-                    >
-                        <div className="timeline-tick-line" />
-                        <div className="timeline-tick-label">{tick.label}</div>
-                    </div>
-                ))}
+          {/* Ruler Layer */}
+          <div className="timeline-ruler">
+            {ticks.map((tick) => (
+              <div
+                key={tick.frame}
+                className="timeline-tick"
+                style={{ left: `${getPercent(tick.frame)}%` }}
+              >
+                <div className="timeline-tick-line" />
+                <div className="timeline-tick-label">{tick.label}</div>
+              </div>
+            ))}
+          </div>
+
+          {/* Video Track (Lane 0) */}
+          <div
+            className="timeline-track"
+            style={{ top: `${videoTrackTop}px` }}
+            title="Composition Track"
+          />
+
+          {/* Render Region (on Video Track) */}
+          <div
+            className="timeline-region"
+            style={{
+              left: `${getPercent(inPoint)}%`,
+              width: `${getPercent(outPoint - inPoint)}%`,
+              top: `${videoTrackTop}px`,
+            }}
+          />
+
+          {/* Audio Tracks (Lanes 1..N) */}
+          {audioTracks.map((track, i) => {
+            const top = getAudioTrackTop(i);
+            const containerWidth =
+              zoom === 0 ? contentWidth : totalFrames * pixelsPerFrame;
+
+            return (
+              <TimelineAudioTrack
+                key={track.id}
+                track={track}
+                fps={fps}
+                height={TRACK_HEIGHT}
+                top={top}
+                totalFrames={totalFrames}
+                containerWidth={containerWidth}
+                getPercent={getPercent}
+              />
+            );
+          })}
+
+          {/* Caption Markers (on Video Track) */}
+          {captions.map((cue, i) => {
+            const startFrame = (cue.startTime / 1000) * fps;
+            const endFrame = (cue.endTime / 1000) * fps;
+            const durationFrame = endFrame - startFrame;
+
+            return (
+              <div
+                key={i}
+                className="timeline-caption-marker"
+                style={{
+                  left: `${getPercent(startFrame)}%`,
+                  width: `${Math.max(0.5, (durationFrame / totalFrames) * 100)}%`,
+                  top: `${videoTrackTop}px`,
+                }}
+                title={cue.text}
+              />
+            );
+          })}
+
+          {/* Composition Markers (on Video Track) */}
+          {markers.map((marker) => (
+            <div
+              key={marker.id}
+              className="timeline-marker-comp"
+              style={{
+                left: `${getPercent(marker.time * fps)}%`,
+                top: `${videoTrackTop}px`,
+                backgroundColor: marker.color || "#ff9800",
+              }}
+              title={`${marker.label} (${marker.id})`}
+              onMouseDown={(e) => {
+                e.stopPropagation();
+                if (controller) controller.seek(marker.time * fps);
+              }}
+            />
+          ))}
+
+          {/* Time Prop Markers (on Video Track) */}
+          {timeProps.map((prop) => (
+            <div
+              key={`prop-${prop.key}`}
+              className="timeline-marker-prop"
+              style={{
+                left: `${getPercent(prop.time * fps)}%`,
+                top: `${videoTrackTop}px`,
+                cursor: "ew-resize",
+              }}
+              title={`${prop.label} (${formatTime(prop.time * fps, fps)})`}
+              onMouseDown={(e) => {
+                e.stopPropagation();
+                handleMouseDown(e, "prop", prop.key);
+              }}
+            />
+          ))}
+
+          {/* In Marker (on Video Track) */}
+          <div
+            className="timeline-marker in"
+            style={{
+              left: `${getPercent(inPoint)}%`,
+              top: `${videoTrackTop}px`,
+            }}
+            onMouseDown={(e) => {
+              e.stopPropagation();
+              handleMouseDown(e, "in");
+            }}
+            title="In Point (I)"
+          />
+
+          {/* Out Marker (on Video Track) */}
+          <div
+            className="timeline-marker out"
+            style={{
+              left: `${getPercent(outPoint)}%`,
+              top: `${videoTrackTop}px`,
+            }}
+            onMouseDown={(e) => {
+              e.stopPropagation();
+              handleMouseDown(e, "out");
+            }}
+            title="Out Point (O)"
+          />
+
+          {/* Playhead (Spans entire height) */}
+          <div
+            className="timeline-playhead"
+            style={{ left: `${getPercent(currentFrame)}%` }}
+          />
+
+          {/* Hover Guide (Spans entire height) */}
+          {hoverFrame !== null && (
+            <div
+              className="timeline-hover-guide"
+              style={{ left: `${getPercent(hoverFrame)}%` }}
+            >
+              <div className="timeline-hover-tooltip">
+                {formatTime(hoverFrame, fps)}
+              </div>
             </div>
-
-            {/* Video Track (Lane 0) */}
-            <div
-                className="timeline-track"
-                style={{ top: `${videoTrackTop}px` }}
-                title="Composition Track"
-            />
-
-            {/* Render Region (on Video Track) */}
-            <div
-                className="timeline-region"
-                style={{
-                    left: `${getPercent(inPoint)}%`,
-                    width: `${getPercent(outPoint - inPoint)}%`,
-                    top: `${videoTrackTop}px`
-                }}
-            />
-
-            {/* Audio Tracks (Lanes 1..N) */}
-            {audioTracks.map((track, i) => {
-              const top = getAudioTrackTop(i);
-              const containerWidth = zoom === 0 ? contentWidth : totalFrames * pixelsPerFrame;
-
-              return (
-                <TimelineAudioTrack
-                  key={track.id}
-                  track={track}
-                  fps={fps}
-                  height={TRACK_HEIGHT}
-                  top={top}
-                  totalFrames={totalFrames}
-                  containerWidth={containerWidth}
-                  getPercent={getPercent}
-                />
-              );
-            })}
-
-            {/* Caption Markers (on Video Track) */}
-            {captions.map((cue, i) => {
-                const startFrame = (cue.startTime / 1000) * fps;
-                const endFrame = (cue.endTime / 1000) * fps;
-                const durationFrame = endFrame - startFrame;
-
-                return (
-                    <div
-                        key={i}
-                        className="timeline-caption-marker"
-                        style={{
-                            left: `${getPercent(startFrame)}%`,
-                            width: `${Math.max(0.5, (durationFrame / totalFrames) * 100)}%`,
-                            top: `${videoTrackTop}px`
-                        }}
-                        title={cue.text}
-                    />
-                );
-            })}
-
-            {/* Composition Markers (on Video Track) */}
-            {markers.map((marker) => (
-              <div
-                key={marker.id}
-                className="timeline-marker-comp"
-                style={{
-                  left: `${getPercent(marker.time * fps)}%`,
-                  top: `${videoTrackTop}px`,
-                  backgroundColor: marker.color || '#ff9800'
-                }}
-                title={`${marker.label} (${marker.id})`}
-                onMouseDown={(e) => {
-                  e.stopPropagation();
-                  if (controller) controller.seek(marker.time * fps);
-                }}
-              />
-            ))}
-
-            {/* Time Prop Markers (on Video Track) */}
-            {timeProps.map((prop) => (
-              <div
-                key={`prop-${prop.key}`}
-                className="timeline-marker-prop"
-                style={{
-                  left: `${getPercent(prop.time * fps)}%`,
-                  top: `${videoTrackTop}px`,
-                  cursor: 'ew-resize'
-                }}
-                title={`${prop.label} (${formatTime(prop.time * fps, fps)})`}
-                onMouseDown={(e) => {
-                  e.stopPropagation();
-                  handleMouseDown(e, 'prop', prop.key);
-                }}
-              />
-            ))}
-
-            {/* In Marker (on Video Track) */}
-            <div
-                className="timeline-marker in"
-                style={{ left: `${getPercent(inPoint)}%`, top: `${videoTrackTop}px` }}
-                onMouseDown={(e) => { e.stopPropagation(); handleMouseDown(e, 'in'); }}
-                title="In Point (I)"
-            />
-
-            {/* Out Marker (on Video Track) */}
-            <div
-                className="timeline-marker out"
-                style={{ left: `${getPercent(outPoint)}%`, top: `${videoTrackTop}px` }}
-                onMouseDown={(e) => { e.stopPropagation(); handleMouseDown(e, 'out'); }}
-                title="Out Point (O)"
-            />
-
-            {/* Playhead (Spans entire height) */}
-            <div
-                className="timeline-playhead"
-                style={{ left: `${getPercent(currentFrame)}%` }}
-            />
-
-            {/* Hover Guide (Spans entire height) */}
-            {hoverFrame !== null && (
-                <div
-                    className="timeline-hover-guide"
-                    style={{ left: `${getPercent(hoverFrame)}%` }}
-                >
-                    <div className="timeline-hover-tooltip">
-                        {formatTime(hoverFrame, fps)}
-                    </div>
-                </div>
-            )}
+          )}
         </div>
       </div>
     </div>
