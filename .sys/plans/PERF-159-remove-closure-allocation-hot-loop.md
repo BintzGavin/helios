@@ -1,8 +1,8 @@
 ---
 id: PERF-159
 slug: remove-closure-allocation-hot-loop
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-26
 completed: ""
 result: ""
@@ -68,3 +68,9 @@ Run `npx tsx packages/renderer/tests/verify-dom-strategy-capture.ts` to ensure D
 
 ## Prior Art
 - PERF-089: Identified the anonymous async function allocation inside the hot loop as a potential GC micro-stall source.
+
+## Results Summary
+- **Best render time**: 34.361s (vs baseline 36.166s)
+- **Improvement**: ~5%
+- **Kept experiments**: PERF-159
+- **Discarded experiments**: none
