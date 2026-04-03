@@ -260,3 +260,5 @@ peak_mem_mb:        38.3
 259	33.950	150	4.42	37.7	discard	remove anonymous closure inside capture hot loop
 260	33.950	150	4.42	37.7	keep	remove anonymous closure inside capture hot loop
 1	33.890	150	4.42	37.7	keep	inline closure instead of bind
+1	35.781	150	4.19	37.9	discard	inline executeFrameCapture and remove destructuring
+1	35.781	150	4.19	37.9	keep	inline executeFrameCapture and remove destructuring
