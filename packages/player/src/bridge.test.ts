@@ -121,6 +121,11 @@ describe('connectToParent', () => {
         triggerMessage({ type: 'HELIOS_SET_PLAYBACK_RANGE', start: 10, end: 20 }, window.parent);
         expect(mockHelios.setPlaybackRange).toHaveBeenCalledWith(10, 20);
 
+        // invalid range
+        mockHelios.setPlaybackRange.mockClear();
+        triggerMessage({ type: 'HELIOS_SET_PLAYBACK_RANGE', start: '10', end: 20 }, window.parent);
+        expect(mockHelios.setPlaybackRange).not.toHaveBeenCalled();
+
         triggerMessage({ type: 'HELIOS_CLEAR_PLAYBACK_RANGE' }, window.parent);
         expect(mockHelios.clearPlaybackRange).toHaveBeenCalled();
     });
@@ -131,14 +136,34 @@ describe('connectToParent', () => {
         triggerMessage({ type: 'HELIOS_SET_VOLUME', volume: 0.5 }, window.parent);
         expect(mockHelios.setAudioVolume).toHaveBeenCalledWith(0.5);
 
+        // invalid volume
+        mockHelios.setAudioVolume.mockClear();
+        triggerMessage({ type: 'HELIOS_SET_VOLUME', volume: 'loud' }, window.parent);
+        expect(mockHelios.setAudioVolume).not.toHaveBeenCalled();
+
         triggerMessage({ type: 'HELIOS_SET_MUTED', muted: true }, window.parent);
         expect(mockHelios.setAudioMuted).toHaveBeenCalledWith(true);
+
+        // invalid muted
+        mockHelios.setAudioMuted.mockClear();
+        triggerMessage({ type: 'HELIOS_SET_MUTED', muted: 'yes' }, window.parent);
+        expect(mockHelios.setAudioMuted).not.toHaveBeenCalled();
 
         triggerMessage({ type: 'HELIOS_SET_AUDIO_TRACK_VOLUME', trackId: 'track1', volume: 0.8 }, window.parent);
         expect(mockHelios.setAudioTrackVolume).toHaveBeenCalledWith('track1', 0.8);
 
+        // invalid track volume
+        mockHelios.setAudioTrackVolume.mockClear();
+        triggerMessage({ type: 'HELIOS_SET_AUDIO_TRACK_VOLUME', trackId: 'track1', volume: 'high' }, window.parent);
+        expect(mockHelios.setAudioTrackVolume).not.toHaveBeenCalled();
+
         triggerMessage({ type: 'HELIOS_SET_AUDIO_TRACK_MUTED', trackId: 'track2', muted: false }, window.parent);
         expect(mockHelios.setAudioTrackMuted).toHaveBeenCalledWith('track2', false);
+
+        // invalid track muted
+        mockHelios.setAudioTrackMuted.mockClear();
+        triggerMessage({ type: 'HELIOS_SET_AUDIO_TRACK_MUTED', trackId: 'track2', muted: 'no' }, window.parent);
+        expect(mockHelios.setAudioTrackMuted).not.toHaveBeenCalled();
     });
 
     it('should process general player state messages', () => {
@@ -147,16 +172,36 @@ describe('connectToParent', () => {
         triggerMessage({ type: 'HELIOS_SET_PLAYBACK_RATE', rate: 1.5 }, window.parent);
         expect(mockHelios.setPlaybackRate).toHaveBeenCalledWith(1.5);
 
+        // invalid playback rate
+        mockHelios.setPlaybackRate.mockClear();
+        triggerMessage({ type: 'HELIOS_SET_PLAYBACK_RATE', rate: 'fast' }, window.parent);
+        expect(mockHelios.setPlaybackRate).not.toHaveBeenCalled();
+
         triggerMessage({ type: 'HELIOS_SET_LOOP', loop: true }, window.parent);
         expect(mockHelios.setLoop).toHaveBeenCalledWith(true);
+
+        // invalid loop
+        mockHelios.setLoop.mockClear();
+        triggerMessage({ type: 'HELIOS_SET_LOOP', loop: 'yes' }, window.parent);
+        expect(mockHelios.setLoop).not.toHaveBeenCalled();
 
         const props = { text: 'hello' };
         triggerMessage({ type: 'HELIOS_SET_PROPS', props }, window.parent);
         expect(mockHelios.setInputProps).toHaveBeenCalledWith(props);
 
+        // missing props
+        mockHelios.setInputProps.mockClear();
+        triggerMessage({ type: 'HELIOS_SET_PROPS' }, window.parent);
+        expect(mockHelios.setInputProps).not.toHaveBeenCalled();
+
         const captions = [{ id: '1', start: 0, end: 5, text: 'caption' }];
         triggerMessage({ type: 'HELIOS_SET_CAPTIONS', captions }, window.parent);
         expect(mockHelios.setCaptions).toHaveBeenCalledWith(captions);
+
+        // undefined captions
+        mockHelios.setCaptions.mockClear();
+        triggerMessage({ type: 'HELIOS_SET_CAPTIONS' }, window.parent);
+        expect(mockHelios.setCaptions).not.toHaveBeenCalled();
     });
 
     it('should handle HELIOS_SEEK and dispatch HELIOS_SEEK_DONE', async () => {
@@ -165,6 +210,11 @@ describe('connectToParent', () => {
 
         triggerMessage({ type: 'HELIOS_SEEK', frame: 100 }, window.parent);
         expect(mockHelios.seek).toHaveBeenCalledWith(100);
+
+        // invalid seek
+        mockHelios.seek.mockClear();
+        triggerMessage({ type: 'HELIOS_SEEK', frame: '100' }, window.parent);
+        expect(mockHelios.seek).not.toHaveBeenCalled();
 
         // Advance timers to trigger the nested requestAnimationFrames
         vi.advanceTimersByTime(32); // Roughly 2 frames at 60fps
@@ -202,15 +252,35 @@ describe('connectToParent', () => {
         triggerMessage({ type: 'HELIOS_SET_DURATION', duration: 30 }, window.parent);
         expect(mockHelios.setDuration).toHaveBeenCalledWith(30);
 
+        // invalid duration
+        mockHelios.setDuration.mockClear();
+        triggerMessage({ type: 'HELIOS_SET_DURATION', duration: '30s' }, window.parent);
+        expect(mockHelios.setDuration).not.toHaveBeenCalled();
+
         triggerMessage({ type: 'HELIOS_SET_FPS', fps: 24 }, window.parent);
         expect(mockHelios.setFps).toHaveBeenCalledWith(24);
+
+        // invalid fps
+        mockHelios.setFps.mockClear();
+        triggerMessage({ type: 'HELIOS_SET_FPS', fps: '24' }, window.parent);
+        expect(mockHelios.setFps).not.toHaveBeenCalled();
 
         triggerMessage({ type: 'HELIOS_SET_SIZE', width: 800, height: 600 }, window.parent);
         expect(mockHelios.setSize).toHaveBeenCalledWith(800, 600);
 
+        // invalid size
+        mockHelios.setSize.mockClear();
+        triggerMessage({ type: 'HELIOS_SET_SIZE', width: '800', height: 600 }, window.parent);
+        expect(mockHelios.setSize).not.toHaveBeenCalled();
+
         const markers = [{ id: '1', time: 5, label: 'Test' }];
         triggerMessage({ type: 'HELIOS_SET_MARKERS', markers }, window.parent);
         expect(mockHelios.setMarkers).toHaveBeenCalledWith(markers);
+
+        // invalid markers
+        mockHelios.setMarkers.mockClear();
+        triggerMessage({ type: 'HELIOS_SET_MARKERS', markers: 'not array' }, window.parent);
+        expect(mockHelios.setMarkers).not.toHaveBeenCalled();
     });
 
     it('should IGNORE messages from other sources', () => {

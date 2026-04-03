@@ -450,6 +450,9 @@ Each agent should update **their own dedicated progress file** instead of this f
 ### STUDIO v0.119.2
 - ✅ Completed: Update Quickstart Guide - Verified that `docs/site/getting-started/quickstart.md` already uses `npx helios init` and is correctly documented.
 
+### PLAYER v0.77.12
+- ✅ Completed: Bridge Coverage Expansion 2 - Added missing unit test coverage for `bridge.ts` message handling boundary conditions (e.g., `HELIOS_SET_PLAYBACK_RATE` invalid args), achieving 100% coverage.
+
 ### STUDIO v0.119.1
 - ✅ Completed: Update Quickstart - Updated quickstart to mention supported frameworks for CLI init.
 

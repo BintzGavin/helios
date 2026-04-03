@@ -19,3 +19,6 @@
 ## [v0.77.10] - Identifying minor API Parity Gaps
 **Learning:** During review of API parity tests, `srcObject` only returns null and warns on assignment. While `srcObject` stream rendering isn't supported, assigning the property should persist the value to match standard `HTMLMediaElement` wrapper expectations.
 **Action:** When creating plans for API Parity, ensure getters and setters interact coherently with internal state even if the underlying functionality is deferred or partially supported.
+## [v0.77.12] - Bridge Coverage Limitations
+**Learning:** Attempting to force missing parameter boundaries onto the `bridge.ts` message listener improves branch coverage, but highlights that the true source of validation should be on the core `Helios` controller side. Testing these defensive checks in `bridge.test.ts` brings the file to 100% coverage, satisfying the objective.
+**Action:** Write tests for the boundaries anyway to achieve the 100% coverage goal.
