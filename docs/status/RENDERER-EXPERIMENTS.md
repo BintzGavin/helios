@@ -92,6 +92,10 @@ Last updated by: PERF-136
 - Hoisted worker frame execution async IIFE in Renderer.ts outside of hot loop. ~0.1s improvement. [PERF-089]
 
 ## What Doesn't Work (and Why)
+- **Pre-calculate execution closures (PERF-162)**:
+  - What you tried: Pre-calculating closures outside hot loop in Renderer.ts.
+  - WHY it didn't work: Render time degraded or unchanged (Median changed from 33.654 to 33.663). The inline closure overhead is negligible.
+  - Plan ID: PERF-162
 - Eliminate modulo operator `%` inside the high-frequency frame capture loop by incrementing an index and resetting. Baseline was ~34.475s, new time ~34.643 s. Discarding changes. (PERF-149)
 - **Evaluate Handle Capture API (PERF-157)**:
   - **What you tried**: Investigated using `page.evaluateHandle()` to capture screenshots directly within the browser context to avoid base64 IPC bottlenecks.
