@@ -1,11 +1,11 @@
 ---
 id: PERF-166
 slug: chromium-no-sandbox
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2023-10-25
-completed: ""
-result: ""
+completed: "2026-04-03"
+result: "failed"
 ---
 # PERF-166: Disable Chromium Sandbox
 
@@ -44,3 +44,9 @@ Run the verification suite to ensure frames are still accurately captured.
 
 ## Prior Art
 Standard Playwright and Puppeteer practices for Docker environments often recommend `--no-sandbox` to improve performance and stability.
+
+## Results Summary
+- **Best render time**: 34.953s (vs baseline 33.5s)
+- **Improvement**: 0% (discarded)
+- **Kept experiments**: []
+- **Discarded experiments**: [PERF-166]
