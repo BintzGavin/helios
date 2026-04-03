@@ -260,3 +260,4 @@ peak_mem_mb:        38.3
 259	33.950	150	4.42	37.7	discard	remove anonymous closure inside capture hot loop
 260	33.950	150	4.42	37.7	keep	remove anonymous closure inside capture hot loop
 1	33.890	150	4.42	37.7	keep	inline closure instead of bind
+1	47.202	150	3.18	36.0	discard	PERF-161 inline capture and destructuring
