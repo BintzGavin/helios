@@ -3,6 +3,7 @@ Current best: 32.057s (baseline was 32.242s, -0.6%)
 Last updated by: PERF-136
 
 ## What Works
+- Inline executeFrameCapture function: Improved performance from 36.167s to 36.046s (PERF-167)
 - [PERF-158] Disabled site isolation in Chromium. (Median changed from 33.859 to 33.613)
 - [PERF-160] Replaced `.bind` with an inline closure in `Renderer.ts` `captureLoop`. This avoids intermediate `BoundFunction` object creation in the hot path. Render time improved.
 - PERF-159: Removed closure allocation in capture hot loop using bound function (~34.36s improvement)

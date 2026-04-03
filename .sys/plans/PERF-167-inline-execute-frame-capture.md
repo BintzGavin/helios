@@ -1,11 +1,11 @@
 ---
 id: PERF-167
 slug: inline-execute-frame-capture
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-04-03
-completed: ""
-result: ""
+completed: 2026-04-03
+result: keep
 ---
 # PERF-167: Inline executeFrameCapture function
 
@@ -61,3 +61,9 @@ Review the output `dom-animation.mp4` from the benchmark to ensure frames are su
 ## Prior Art
 - PERF-160: Replaced `.bind` with an inline closure in `Renderer.ts`.
 - PERF-161: Inline capture and destructuring.
+
+## Results Summary
+- **Best render time**: 36.046s (vs baseline 36.167s)
+- **Improvement**: 0.33%
+- **Kept experiments**: PERF-167
+- **Discarded experiments**:
