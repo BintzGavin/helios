@@ -114,11 +114,11 @@ const report = await Helios.diagnose();
 
 ## Roadmap
 ### V1.x (Active)
-- **Studio**: v0.107.1+ (Asset Drag and Drop, Timeline Audio Regression Tests)
-- **CLI**: v0.41.0+ (Scaffold Kubernetes Deployment, Scaffold Fly.io Deployment, Scaffold Components)
-- **Core**: v5.13.0+ (Generic Input Props, Implement WaitUntilStable, Fix GSAP Timeline Sync)
-- **Player**: v0.76.18+ (Document getSchema API Parity, Bridge Coverage Completeness, Regression Tests for InputProps)
-- **Renderer**: v1.78.0+ (Orchestrator Plan, Validate HW Accel, Refactor Media Sync Logic)
+- **Studio**: v0.107.1+ (Asset Move, Timeline Polish)
+- **CLI**: v0.41.0+ (Scaffold Kubernetes Deployment, Tier 3 Cloud Execution Adapters)
+- **Core**: v5.13.0+ (Generic Input Props, Implement WaitUntilStable)
+- **Player**: v0.76.18+ (Regression Tests for InputProps, MediaProperties, Audio Context)
+- **Renderer**: v1.78.0+ (Refactor FFmpeg Config, DomStrategy Media Attributes)
 - **Infrastructure**: v0.25.0+ (Cloudflare Workers, Azure Functions, Fly.io Machines, Kubernetes, Docker, Modal, Deno Deploy, Vercel, Hetzner)
 
 ### AI Integration
