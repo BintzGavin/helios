@@ -90,6 +90,7 @@ Last updated by: PERF-136
 - Hoisted worker frame execution async IIFE in Renderer.ts outside of hot loop. ~0.1s improvement. [PERF-089]
 
 ## What Doesn't Work (and Why)
+- Eliminate modulo operator `%` inside the high-frequency frame capture loop by incrementing an index and resetting. Baseline was ~34.475s, new time ~34.643 s. Discarding changes. (PERF-149)
 - **Evaluate Handle Capture API (PERF-157)**:
   - **What you tried**: Investigated using `page.evaluateHandle()` to capture screenshots directly within the browser context to avoid base64 IPC bottlenecks.
   - **WHY it didn't work**: In DOM rendering strategies, deterministic animation requires `--enable-begin-frame-control`. As previously seen in PERF-148, activating this flag causes standard `elementHandle.screenshot()` or `page.screenshot()` to hang indefinitely. Using `html2canvas` is far too slow (~311ms vs 22ms) to be viable. `HeadlessExperimental.beginFrame` string serialization remains structurally unavoidable.
@@ -111,7 +112,6 @@ Last updated by: PERF-136
   - WHY it didn't work: The direct `Runtime.evaluate` command via CDP was executed without actually awaiting the asynchronous Promise inside the page (since Playwright wraps evaluating promises transparently, but direct CDP `Runtime.evaluate` requires the `awaitPromise: true` parameter and specific result handling). This broke the timeout and stability logic, as `Runtime.evaluate` returns immediately without waiting for the page script. We verified this by adding tests, which failed.
   - Plan ID: PERF-151
 - Extracted drain event listener out of hot loop to remove events.once overhead (PERF-150). Resulted in ~34.2s (similar to baseline). The overhead of events.once is negligible compared to other bottlenecks.
-- Eliminate modulo operator `%` inside the high-frequency frame capture loop by incrementing an index and resetting. The baseline was ~32.057s. The new runs timed at ~33.9s. The overhead from variable incrementing/branching might negate the savings over standard JIT-optimized constant modulo. Discarding changes. (PERF-149)
 
 - **PERF-148: page.screenshot vs beginFrame**:
   - What you tried: Replaced `HeadlessExperimental.beginFrame` with `page.screenshot` and `targetElementHandle.screenshot`.
