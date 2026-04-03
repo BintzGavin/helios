@@ -54,4 +54,4 @@ append_backlog.js
 verify_*.py
 verify_*.ts
 dom-animation.mp4
-lickstep_videos/
+lickstep_videos/coverage/
