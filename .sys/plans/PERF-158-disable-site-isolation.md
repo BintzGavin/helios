@@ -1,11 +1,11 @@
 ---
 id: PERF-158
 slug: disable-site-isolation
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-26
-completed: ""
-result: ""
+completed: 2026-04-03
+result: keep
 ---
 
 # PERF-158: Disable Chromium Site Isolation
@@ -44,3 +44,9 @@ Run `npx tsx packages/renderer/tests/verify-dom-strategy-capture.ts` to ensure f
 
 ## Prior Art
 - Standard Chromium headless optimization recommendations for trusted environments (Docker, CI).
+
+## Results Summary
+- **Best render time**: 33.613s (vs baseline 33.859s)
+- **Improvement**: N/A
+- **Kept experiments**: [PERF-158]
+- **Discarded experiments**: None
