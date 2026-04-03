@@ -1,8 +1,8 @@
 ---
 id: PERF-161
 slug: inline-capture-and-destructuring
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-26
 completed: ""
 result: ""
@@ -66,3 +66,9 @@ Run `npx tsx packages/renderer/tests/verify-canvas-strategy.ts` to ensure Canvas
 
 ## Correctness Check
 Run `npx tsx packages/renderer/tests/verify-dom-strategy-capture.ts` to ensure DOM frames remain correct.
+
+## Results Summary
+- **Best render time**: 33.866 s (baseline unchanged)
+- **Improvement**: 0%
+- **Kept experiments**: []
+- **Discarded experiments**: [PERF-161]
