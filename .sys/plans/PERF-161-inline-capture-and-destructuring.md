@@ -1,11 +1,11 @@
 ---
 id: PERF-161
 slug: inline-capture-and-destructuring
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-05-26
-completed: ""
-result: ""
+completed: 2026-04-03
+result: no-improvement
 ---
 
 # PERF-161: Inline Frame Capture Logic and Remove Destructuring Overhead
