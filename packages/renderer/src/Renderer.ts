@@ -310,7 +310,7 @@ export class Renderer {
                   const compositionTimeInSeconds = (startFrame + frameIndex) * compTimeStep;
 
                   const framePromise = worker.activePromise.then(
-                      executeFrameCapture.bind(null, worker, compositionTimeInSeconds, time)
+                      () => executeFrameCapture(worker, compositionTimeInSeconds, time)
                   );
 
                   // Add a no-op catch handler to prevent unhandled promise rejections on abort/error

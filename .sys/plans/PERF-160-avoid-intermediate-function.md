@@ -1,7 +1,7 @@
 ---
 id: PERF-160
 slug: avoid-intermediate-function
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-05-26
 completed: ""
