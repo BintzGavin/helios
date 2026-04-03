@@ -93,6 +93,10 @@ Last updated by: PERF-136
 - Hoisted worker frame execution async IIFE in Renderer.ts outside of hot loop. ~0.1s improvement. [PERF-089]
 
 ## What Doesn't Work (and Why)
+- **Disable Chromium Sandbox (PERF-166)**:
+  - What you tried: Added `--no-sandbox` and `--disable-setuid-sandbox` to Chromium launch args to avoid zygote processes.
+  - WHY it didn't work: Render time was 34.953s vs baseline 33.5s. In this microVM environment, the sandbox initialization and IPC overhead does not appear to be the limiting factor for layout/paint rendering, or the potential CPU savings are offset by Playwright orchestration overhead.
+  - Plan ID: PERF-166
 - **Pre-calculate execution closures (PERF-162)**:
   - What you tried: Pre-calculating closures outside hot loop in Renderer.ts.
   - WHY it didn't work: Render time degraded or unchanged (Median changed from 33.654 to 33.663). The inline closure overhead is negligible.
