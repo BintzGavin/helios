@@ -3,6 +3,7 @@ Current best: 32.057s (baseline was 32.242s, -0.6%)
 Last updated by: PERF-136
 
 ## What Works
+- PERF-159: Removed closure allocation in capture hot loop using bound function (~34.36s improvement)
 - **Cache jobOptions Properties (PERF-154)**:
   - What you did: Cached `jobOptions?.signal` and `jobOptions?.onProgress` outside the `while` loop in `Renderer.ts`.
   - Improvement: Median render time ~33.769s (within noise margin, keeping for reduced V8 branch evaluations).
