@@ -188,7 +188,8 @@ export class DomStrategy implements RenderStrategy {
 
             this.beginFrameTargetParams.frameTimeTicks = 10000 + frameTime;
 
-            return this.cdpSession!.send('HeadlessExperimental.beginFrame', this.beginFrameTargetParams).then(({ screenshotData }: any) => {
+            return this.cdpSession!.send('HeadlessExperimental.beginFrame', this.beginFrameTargetParams).then((res: any) => {
+              const screenshotData = res?.screenshotData;
               if (screenshotData) {
                 const buffer = this.writeToBufferPool(screenshotData);
                 this.lastFrameBuffer = buffer;
@@ -221,7 +222,8 @@ export class DomStrategy implements RenderStrategy {
     if (this.cdpSession) {
       this.beginFrameParams.frameTimeTicks = 10000 + frameTime;
 
-      return this.cdpSession.send('HeadlessExperimental.beginFrame', this.beginFrameParams).then(({ screenshotData }: any) => {
+      return this.cdpSession.send('HeadlessExperimental.beginFrame', this.beginFrameParams).then((res: any) => {
+        const screenshotData = res?.screenshotData;
         if (screenshotData) {
           const buffer = this.writeToBufferPool(screenshotData);
           this.lastFrameBuffer = buffer;
