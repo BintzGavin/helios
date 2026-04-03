@@ -1,11 +1,11 @@
 ---
 id: PERF-161
 slug: inline-capture-and-destructuring
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-26
-completed: ""
-result: ""
+completed: "2026-04-03"
+result: "no-improvement"
 ---
 
 # PERF-161: Inline Frame Capture Logic and Remove Destructuring Overhead
@@ -66,3 +66,9 @@ Run `npx tsx packages/renderer/tests/verify-canvas-strategy.ts` to ensure Canvas
 
 ## Correctness Check
 Run `npx tsx packages/renderer/tests/verify-dom-strategy-capture.ts` to ensure DOM frames remain correct.
+
+## Results Summary
+- **Best render time**: 33.982s (vs baseline 33.6s)
+- **Improvement**: calculated
+- **Kept experiments**:
+- **Discarded experiments**: PERF-161

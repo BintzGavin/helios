@@ -92,6 +92,7 @@ Last updated by: PERF-136
 - Hoisted worker frame execution async IIFE in Renderer.ts outside of hot loop. ~0.1s improvement. [PERF-089]
 
 ## What Doesn't Work (and Why)
+- PERF-161: Inline frame capture logic and remove destructuring overhead (No improvement)
 - Eliminate modulo operator `%` inside the high-frequency frame capture loop by incrementing an index and resetting. Baseline was ~34.475s, new time ~34.643 s. Discarding changes. (PERF-149)
 - **Evaluate Handle Capture API (PERF-157)**:
   - **What you tried**: Investigated using `page.evaluateHandle()` to capture screenshots directly within the browser context to avoid base64 IPC bottlenecks.
