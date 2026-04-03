@@ -1,11 +1,11 @@
 ---
 id: PERF-162
 slug: worker-capture-closure
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-05-30
-completed: ""
-result: ""
+completed: 2026-04-03
+result: failed
 ---
 
 # PERF-162: Optimize worker capture closure binding
@@ -121,3 +121,9 @@ Run `npx tsx packages/renderer/tests/verify-dom-strategy-capture.ts` to verify D
 - PERF-160 (Replaced bind with inline closure)
 - PERF-159 (Removed closure allocation)
 - PERF-134 (Failed unchained execution)
+
+## Results Summary
+- **Best render time**: 33.663s (vs baseline 33.654s)
+- **Improvement**: 0%
+- **Kept experiments**: None
+- **Discarded experiments**: Pre-calculating execution closures in Renderer.ts captureLoop outside hot loop
