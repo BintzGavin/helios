@@ -1,11 +1,11 @@
 ---
 id: PERF-164
 slug: cache-boundingbox
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-04-03
-completed: ""
-result: ""
+completed: 2024-04-03
+result: discarded
 ---
 # PERF-164: Cache targetElementHandle boundingBox to avoid per-frame IPC
 
@@ -90,3 +90,9 @@ Run `npx tsx packages/renderer/tests/verify-canvas-strategy.ts` to ensure Canvas
 
 ## Correctness Check
 Run `npx tsx packages/renderer/tests/verify-dom-strategy-capture.ts` and verify output.
+
+## Results Summary
+- **Best render time**: 33.912s (baseline)
+- **Improvement**: 0%
+- **Kept experiments**: None
+- **Discarded experiments**: Cache targetElementHandle boundingBox in DomStrategy.prepare (PERF-164)
