@@ -291,11 +291,6 @@ export class Renderer {
           const signal = jobOptions?.signal;
           const onProgress = jobOptions?.onProgress;
 
-          const executeFrameCapture = function(this: any, worker: any, compositionTimeInSeconds: number, time: number) {
-              worker.timeDriver.setTime(worker.page, compositionTimeInSeconds).catch(noopCatch);
-              return worker.strategy.capture(worker.page, time);
-          };
-
           while (nextFrameToWrite < totalFrames) {
               if (capturedErrors.length > 0) {
                   throw capturedErrors[0];
@@ -311,9 +306,10 @@ export class Renderer {
                   const time = frameIndex * timeStep;
                   const compositionTimeInSeconds = (startFrame + frameIndex) * compTimeStep;
 
-                  const framePromise = worker.activePromise.then(
-                      () => executeFrameCapture(worker, compositionTimeInSeconds, time)
-                  );
+                  const framePromise = worker.activePromise.then(() => {
+                      worker.timeDriver.setTime(worker.page, compositionTimeInSeconds).catch(noopCatch);
+                      return worker.strategy.capture(worker.page, time);
+                  });
 
                   // Add a no-op catch handler to prevent unhandled promise rejections on abort/error
                   worker.activePromise = framePromise.catch(noopCatch) as Promise<void>;
