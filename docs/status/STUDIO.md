@@ -1,4 +1,4 @@
-**Version**: 0.120.3
+**Version**: 0.120.4
 
 **Posture**: ACTIVELY EXPANDING FOR V2
 
@@ -190,4 +190,5 @@
 - [v0.1.0] ✅ Completed: Scaffold Studio Package - Created package structure, config, and basic UI.
 - [2026-02-18] Initialized domain status and created scaffold plan.
 
+[v0.120.4] ✅ Completed: STUDIO-Timeline-Drag-Drop - Implemented drag and drop support for the Timeline to accept assets
 - [v0.120.2] ✅ Completed: STUDIO-Asset-Move - Implemented drag-and-drop to move assets into folders

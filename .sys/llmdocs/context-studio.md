@@ -1,55 +1,35 @@
-# Studio Context
+# Studio Domain Context
 
 ## Section A: Architecture
-Helios Studio is a web-based UI for previewing and modifying Helios projects.
-It consists of:
-- A CLI runner (`packages/studio/bin/studio.js` and `packages/cli`).
-- A Vite-based development server using plugins to expose the filesystem and studio API.
-- A React-based frontend application displaying a Timeline, Properties Editor, Stage, and Assets Panel.
-- It acts as the host environment embedding `<helios-player>`.
+Helios Studio is a web-based integrated development environment for video composition. It consists of:
+- **CLI/Dev Server**: Express server providing hot-module replacement, asset discovery, and preview capabilities via an MCP server architecture.
+- **Client Application**: A React-based web interface containing the video player stage, timeline, property controls, and asset management panels. It relies extensively on contexts to maintain player, compositional, and application state.
 
 ## Section B: File Tree
-```
-packages/studio/
-├── bin/
-│   └── studio.js
-├── scripts/
-│   └── (build/verification scripts)
-├── src/
-│   ├── api/
-│   ├── components/
-│   │   ├── Stage/
-│   │   ├── Timeline/
-│   │   ├── PropsEditor/
-│   │   ├── AssetsPanel/
-│   │   └── ...
-│   ├── contexts/
-│   ├── hooks/
-│   ├── types/
-│   └── App.tsx
-├── package.json
-└── vite.config.ts
-```
+`packages/studio/`
+├── `bin/` - CLI executable entry point.
+├── `src/`
+│   ├── `cli.ts` - CLI commands definition.
+│   ├── `server/` - Express server and dynamic dev environment handling.
+│   ├── `context/` - React Contexts managing global state (e.g. `StudioContext`, `ToastContext`).
+│   ├── `hooks/` - Custom React Hooks (e.g., audio waveforms).
+│   └── `components/` - Application UI views.
+│       ├── `Timeline.tsx` - Timeline view with drag-and-drop integration.
+│       ├── `AssetsPanel/` - Asset management user interface.
+│       ├── `Stage/` - Composition video player stage.
+│       └── `...` - Additional UI panels (Props, Mixer, Captions, Diagnostics).
 
 ## Section C: CLI Interface
-- `npx helios init <project>`: Scaffolds a new project with chosen framework.
-- `npx helios studio` (or `npm run dev` in initialized projects): Starts the Studio UI on localhost.
-- `npx helios preview`: Serves a production build for verification.
-- `npx helios diff <component>`: Compares a component to the registry.
-- `npx helios components`: Lists available components.
-- `npx helios add <component>`: Installs a component from the registry.
+- `npx helios studio`: Starts the development server, initiating the MCP server and web UI to interactively view and edit compositions. It parses `helios.config.json` and supports various command options for port binding and path overrides.
 
 ## Section D: UI Components
-- **Stage**: Renders the `<helios-player>` with zoom, pan, and safe-area guides.
-- **Timeline**: Visual scrubber for playback, loop ranges, and markers.
-- **Props Editor**: Dynamically generated schema-aware inputs.
-- **Assets Panel**: File explorer for images, video, audio, fonts, and other assets (supports drag-and-drop organization).
-- **Renders Panel**: Manages distributed render jobs and client-side exports.
-- **Components Panel**: Browse and install registry components.
-- **Diagnostics Panel**: Views system capabilities.
+- **Timeline (`Timeline.tsx`)**: Displays timeline with playhead tracking, markers, captions, and supports dragging dropping assets (from `AssetsPanel`) directly to specific timecode points on the timeline.
+- **Stage (`Stage.tsx`)**: Integrates the `HeliosPlayer` Web Component.
+- **Assets Panel**: Interfaces with backend server to list and drag-and-drop media items.
+- **Props Editor**: Interrogates the active `HeliosSchema` to auto-generate a form setting properties for the current composition.
+- **Compositions Panel**: Lists dynamically discovered components.
+- **Audio Mixer Panel**: Configures runtime audio levels and settings.
 
 ## Section E: Integration
-- Integrates with `packages/core` via `HeliosState` and `HeliosController`.
-- Integrates with `packages/player` by embedding `<helios-player>`.
-- Integrates with `packages/renderer` via `/api/render` to execute rendering tasks.
-- Integrates with filesystem operations via `discovery.ts` (e.g., `moveAsset(rootDir: string, sourceId: string, targetFolderId: string): AssetInfo`, `deleteAsset`, `renameAsset`) to manage workspace files.
+- Consumes `HeliosController` and the `<helios-player>` Web Component from `packages/player` to construct the interactive `Stage`.
+- Exposes composition props and states leveraging schemas exported from `packages/core`.

@@ -1,3 +1,6 @@
+## STUDIO v0.120.4
+  - ✅ Completed: STUDIO-Timeline-Drag-Drop - Implemented drag and drop support for the Timeline to accept assets
+
 ## INFRASTRUCTURE v0.54.21
 - ✅ Completed: Orchestrator Test Coverage Expansion - Improved branch coverage for job manager and executor by adding AbortError testing and unknown error rejection bubbling.
 
