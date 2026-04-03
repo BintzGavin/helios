@@ -90,6 +90,10 @@ Last updated by: PERF-136
 - Hoisted worker frame execution async IIFE in Renderer.ts outside of hot loop. ~0.1s improvement. [PERF-089]
 
 ## What Doesn't Work (and Why)
+- **Evaluate Handle Capture API (PERF-157)**:
+  - **What you tried**: Investigated using `page.evaluateHandle()` to capture screenshots directly within the browser context to avoid base64 IPC bottlenecks.
+  - **WHY it didn't work**: In DOM rendering strategies, deterministic animation requires `--enable-begin-frame-control`. As previously seen in PERF-148, activating this flag causes standard `elementHandle.screenshot()` or `page.screenshot()` to hang indefinitely. Using `html2canvas` is far too slow (~311ms vs 22ms) to be viable. `HeadlessExperimental.beginFrame` string serialization remains structurally unavoidable.
+  - **Plan ID**: PERF-157
 - **page.evaluateHandle() screenshot**: Replaced `beginFrame` with `page.evaluateHandle().screenshot()`. It caused timeouts/hangs during rendering due to being incompatible with `--enable-begin-frame-control`. `HeadlessExperimental.beginFrame` remains strictly necessary. (PERF-148)
 - **Forced layout screencast (PERF-156)**:
   - What you tried: `Page.startScreencast` with forced layout damage via `--helios-force-layout`.

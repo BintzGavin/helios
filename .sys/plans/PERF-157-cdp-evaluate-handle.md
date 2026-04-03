@@ -1,11 +1,11 @@
 ---
 id: PERF-157
 slug: cdp-evaluate-handle
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "Jules"
 created: 2024-04-03
-completed: ""
-result: ""
+completed: "2024-04-03"
+result: "discard"
 ---
 
 # PERF-157: Evaluate Handle Capture API
@@ -41,3 +41,9 @@ If `html2canvas` is too slow, explore if there's a way to trigger a native rende
 
 ## Correctness Check
 Run benchmark tests to check if rendering completes successfully.
+
+## Results Summary
+```
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	0.000	0	0.00	0.0	discard	Evaluate Handle Capture API (blocked by PERF-148 begin-frame-control hang)
+```
