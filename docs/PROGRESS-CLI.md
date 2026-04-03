@@ -1,3 +1,6 @@
+## CLI v0.46.1
+- ✅ Completed: All Worker Execution - Added missing --docker-args to Docker execution adapter
+
 ## CLI v0.45.0
 - ✅ Completed: Scaffold Cloudflare Sandbox Deployment - Added `helios deploy cloudflare-sandbox` command to generate wrangler.toml, workflow index, and render script.
 

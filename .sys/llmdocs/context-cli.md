@@ -44,7 +44,7 @@ packages/cli/
 - `helios deploy <provider>`: Scaffolds deployment configurations for cloud providers (e.g., `aws`, `gcp`, `cloudflare`, `cloudflare-sandbox`, `kubernetes`, `fly`, `azure`, `docker`, `hetzner`, `modal`, `deno`, `vercel`).
 - `helios diff <component>`: Compares a local component against its remote registry equivalent, outputting patch diffs.
 - `helios init`: Scaffolds `helios.config.json` and base templates (or examples) for user workspaces.
-- `helios job run <spec>`: Executes a distributed execution spec using available Worker adapters.
+- `helios job run <spec>`: Executes a distributed execution spec using available Worker adapters. Accepts adapter-specific configurations such as `--docker-args`.
 - `helios list`: Lists all currently tracked local components.
 - `helios merge`: Stitches together chunks from distributed execution outputs using FFmpeg.
 - `helios preview`: Previews a production build.

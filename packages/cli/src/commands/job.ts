@@ -44,6 +44,7 @@ export function registerJobCommand(program: Command) {
     .option('--k8s-job-name-prefix <prefix>', 'Kubernetes job name prefix')
     .option('--k8s-service-account-name <name>', 'Kubernetes service account name')
     .option('--docker-image <image>', 'Docker image to use')
+    .option('--docker-args <args>', 'Comma-separated additional arguments for docker run')
     .option('--aws-region <region>', 'AWS Region for Lambda adapter')
     .option('--aws-function-name <name>', 'AWS Lambda function name')
     .option('--aws-job-def-url <url>', 'URL of the job definition for AWS Lambda')
@@ -158,7 +159,8 @@ export function registerJobCommand(program: Command) {
             throw new Error('Docker adapter requires --docker-image');
           }
           adapter = new DockerAdapter({
-            image: options.dockerImage
+            image: options.dockerImage,
+            dockerArgs: options.dockerArgs ? options.dockerArgs.split(',') : undefined
           });
         } else if (options.adapter === 'deno') {
           if (!options.denoServiceUrl) {

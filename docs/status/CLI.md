@@ -1,9 +1,11 @@
-**Version**: 0.46.0
+**Version**: 0.46.1
 
 # CLI Status
 
 ## Current State
 The Helios CLI is the primary user interface for component registry, project scaffolding, distributed rendering, and deployment.
+
+[v0.46.1] ✅ Completed: All Worker Execution - Added missing --docker-args to Docker execution adapter
 
 [v0.46.0] ✅ Completed: Scaffold Docker Deployment Command - Implemented `helios deploy docker` to scaffold docker-compose.yml and README-DOCKER.md for running distributed rendering workloads via Docker Swarm/Compose.
 
