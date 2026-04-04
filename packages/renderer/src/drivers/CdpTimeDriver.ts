@@ -121,11 +121,10 @@ export class CdpTimeDriver implements TimeDriver {
       // Use 'once' to avoid leaking listeners
       this.client!.once('Emulation.virtualTimeBudgetExpired', () => resolve());
 
-      const params = {
+      this.client!.send('Emulation.setVirtualTimePolicy', {
         policy: 'advance' as const,
         budget: budget
-      };
-      this.client!.send('Emulation.setVirtualTimePolicy', params).catch(reject);
+      }).catch(reject);
     });
 
     this.currentTime = timeInSeconds;
