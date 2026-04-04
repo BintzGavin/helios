@@ -287,3 +287,6 @@ Last updated by: PERF-168
   - What you tried: Removing the `async` keyword from the `capture` method in `DomStrategy.ts` to return the Promise chain directly and avoid V8 generator overhead.
   - WHY it didn't work: The optimization was already present in the codebase. Verified that the baseline performance remains ~34.916s. No new changes were needed.
   - Plan ID: PERF-132
+### PERF-174: optimize setTime promise
+- **Status:** KEPT
+- **Details:** Replaced `.catch()` with `.then(undefined, ...)` in `worker.timeDriver.setTime` to eliminate Promise allocation. Improved median render time from baseline.
