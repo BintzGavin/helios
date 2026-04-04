@@ -1,0 +1,7 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	38.397	150	3.91	39.4	keep	baseline
+2	33.871	150	4.43	38.1	keep	baseline
+3	34.036	150	4.41	39.1	keep	baseline
+4	33.894	150	4.43	37.8	keep	Remove defensive truthiness checks for cdpSession
+5	33.892	150	4.43	39.7	keep	Remove defensive truthiness checks for cdpSession
+6	33.757	150	4.44	38.1	keep	Remove defensive truthiness checks for cdpSession
