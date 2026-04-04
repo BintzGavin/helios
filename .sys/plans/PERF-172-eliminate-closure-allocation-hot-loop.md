@@ -1,7 +1,7 @@
 ---
 id: PERF-172
 slug: eliminate-closure-allocation-hot-loop
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2026-10-18
 completed: ""
