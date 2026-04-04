@@ -297,3 +297,6 @@ This file tracks progress for the CLI domain (`packages/cli`).
 ## CLI v0.41.0
 
 - ✅ Completed: Add Diff Command Regression Tests - Implemented comprehensive unit tests for `helios diff`.
+
+### CLI v0.45.1
+- ✅ Completed: Scaffold Cloudflare Sandbox Deployment - Verified `helios deploy cloudflare-sandbox` command is implemented and working.
