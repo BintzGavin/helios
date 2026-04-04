@@ -1,0 +1,5 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	14.132	150	10.61	38.3	keep	baseline
+2	3.705	150	40.48	37.6	keep	Inline params object
+3	3.787	150	39.61	39.7	keep	Inline params object
+4	4.765	150	31.48	37.9	keep	Inline params object
