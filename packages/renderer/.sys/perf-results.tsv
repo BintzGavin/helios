@@ -267,3 +267,4 @@ PERF-158	33.613	150	4.45	0	keep	Median changed from 33.859 to 33.613
 117	36.046	150	4.16	38.5	keep	inline executeFrameCapture
 267	33.840	150	4.43	37.6	discard	PERF-170: Remove defensive this.cdpSession truthiness checks in capture()
 3	33.451	150	4.48	46.2	discard	eliminate destructuring in DomStrategy capture
+1	0.000	0	0.00	0.0	discard	Eliminated closure allocations in DomStrategy PERF-172 (caused crash/skip)
