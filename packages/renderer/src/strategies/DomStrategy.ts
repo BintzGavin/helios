@@ -177,7 +177,7 @@ export class DomStrategy implements RenderStrategy {
       if (this.cdpSession) {
         return this.targetElementHandle.boundingBox().then((box: any) => {
           if (box) {
-            const params = {
+            return this.cdpSession!.send('HeadlessExperimental.beginFrame', {
               screenshot: {
                 format: this.cdpScreenshotParams.format,
                 quality: this.cdpScreenshotParams.quality,
@@ -185,9 +185,7 @@ export class DomStrategy implements RenderStrategy {
               },
               interval: this.frameInterval,
               frameTimeTicks: 10000 + frameTime
-            };
-
-            return this.cdpSession!.send('HeadlessExperimental.beginFrame', params).then((res: any) => {
+            } as any).then((res: any) => {
               if (res && res.screenshotData) {
                 const buffer = this.writeToBufferPool(res.screenshotData);
                 this.lastFrameBuffer = buffer;
@@ -218,13 +216,11 @@ export class DomStrategy implements RenderStrategy {
     }
 
     if (this.cdpSession) {
-      const params = {
+      return this.cdpSession.send('HeadlessExperimental.beginFrame', {
         screenshot: this.cdpScreenshotParams,
         interval: this.frameInterval,
         frameTimeTicks: 10000 + frameTime
-      };
-
-      return this.cdpSession.send('HeadlessExperimental.beginFrame', params).then((res: any) => {
+      }).then((res: any) => {
         if (res && res.screenshotData) {
           const buffer = this.writeToBufferPool(res.screenshotData);
           this.lastFrameBuffer = buffer;

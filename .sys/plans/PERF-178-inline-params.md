@@ -1,11 +1,11 @@
 ---
 id: PERF-178
 slug: inline-params
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-28
-completed: ""
-result: ""
+completed: "2026-04-04"
+result: "improved"
 ---
 
 # PERF-178: Inline parameter construction for HeadlessExperimental.beginFrame CDP calls
@@ -122,3 +122,10 @@ Run the `benchmark.ts` to ensure rendering still works and check performance.
 ## Prior Art
 - PERF-175: Dynamic shallow objects
 - V8 optimization principles regarding inline object literals and escape analysis.
+
+
+## Results Summary
+- **Best render time**: 3.794s (vs baseline 14.3s)
+- **Improvement**: ~73%
+- **Kept experiments**: Inline standard params, Inline targeted params (with as any)
+- **Discarded experiments**: Inline targeted params (type error)

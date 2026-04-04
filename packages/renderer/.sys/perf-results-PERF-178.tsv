@@ -1,0 +1,6 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	3.802	150	39.45	37.9	keep	inline standard params
+2	4.242	150	35.36	43.3	keep	inline standard params
+3	3.794	150	39.53	38.0	keep	inline standard params
+4	4.205	150	35.67	37.9	discard	inline targeted params (type error)
+5	3.920	150	38.27	37.9	keep	inline targeted params (with as any)
