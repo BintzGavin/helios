@@ -240,4 +240,55 @@ describe('Timeline', () => {
     // 50% of 10s = 5s
     expect(setInputPropsMock).toHaveBeenCalledWith({ myTime: 5 });
   });
+
+  it('handles asset drop correctly', () => {
+    const setInputPropsMock = vi.fn();
+    (StudioContext.useStudio as any).mockReturnValue({
+      ...defaultContext,
+      playerState: {
+        ...defaultPlayerState,
+        schema: {
+          myVideo: { type: 'video', label: 'My Video' },
+          myVideoTime: { type: 'number', format: 'time' }
+        },
+        inputProps: {}
+      },
+      controller: {
+        ...defaultContext.controller,
+        setInputProps: setInputPropsMock
+      }
+    });
+
+    const { container } = render(<Timeline />);
+    const content = container.querySelector('.timeline-content');
+    expect(content).toBeInTheDocument();
+
+    if (content) {
+      content.getBoundingClientRect = vi.fn(() => ({
+        left: 0, top: 0, width: 1000, height: 100, bottom: 100, right: 1000, x: 0, y: 0, toJSON: () => {}
+      }));
+    }
+
+    const mockAsset = {
+      id: 'asset1',
+      name: 'test.mp4',
+      url: 'assets/test.mp4',
+      type: 'video'
+    };
+
+    const dropEvent = createEvent.drop(content!);
+    Object.defineProperty(dropEvent, 'dataTransfer', {
+      value: {
+        getData: vi.fn((key) => key === 'application/helios-asset' ? JSON.stringify(mockAsset) : null)
+      }
+    });
+    Object.defineProperty(dropEvent, 'clientX', { value: 500 }); // 50% of 10s = 5s
+
+    fireEvent(content!, dropEvent);
+
+    expect(setInputPropsMock).toHaveBeenCalledWith({
+      myVideo: 'assets/test.mp4',
+      myVideoTime: 5
+    });
+  });
 });
