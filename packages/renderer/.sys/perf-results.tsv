@@ -275,3 +275,4 @@ run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
 1	3.993	150	37.57	38.3	baseline	PERF-174 optimize setTime promise
 2	3.764	150	39.42	40.8	keep	PERF-174 optimize setTime promise
 276	3.980	150	37.69	39.7	keep	PERF-175: dynamic shallow objects for CDP
+277	3.875	150	38.71	37.9	keep	eliminate destructuring and spread in capture
