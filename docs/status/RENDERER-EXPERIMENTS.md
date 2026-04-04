@@ -1,8 +1,12 @@
 ## Performance Trajectory
 Current best: 32.057s (baseline was 32.242s, -0.6%)
-Last updated by: PERF-136
+Last updated by: PERF-168
 
 ## What Works
+- **Optimize activePromise .catch allocation (PERF-168)**:
+  - What you did: Replaced `.catch(noopCatch)` on frame promises with the two-argument `.then(onFulfilled, onRejected)` in `Renderer.ts` `captureLoop`.
+  - Improvement: ~8.2% faster (33.747s vs 36.518s baseline). Avoids secondary Promise allocations per frame, eliminating V8 generator overhead and GC stalls.
+  - Plan ID: PERF-168
 - Inline executeFrameCapture function: Improved performance from 36.167s to 36.046s (PERF-167)
 - [PERF-158] Disabled site isolation in Chromium. (Median changed from 33.859 to 33.613)
 - [PERF-160] Replaced `.bind` with an inline closure in `Renderer.ts` `captureLoop`. This avoids intermediate `BoundFunction` object creation in the hot path. Render time improved.

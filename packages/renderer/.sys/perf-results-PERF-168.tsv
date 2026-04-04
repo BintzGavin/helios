@@ -1,0 +1,3 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	36.518	150	4.11	38.3	keep	baseline
+2	33.747	150	4.44	37.7	keep	Optimize activePromise .catch allocation
