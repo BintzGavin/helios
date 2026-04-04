@@ -1,4 +1,5 @@
-**Version**: 0.77.12
+**Version**: 0.77.13
+[v0.77.13] 🚫 Blocked: No new plan found in /.sys/plans/ for PLAYER. Waiting for Planner to create the next implementation spec.
 [v0.77.12] ✅ Completed: Bridge Coverage Expansion 2 - Added missing unit test coverage for `bridge.ts` message handling boundary conditions (e.g., `HELIOS_SET_PLAYBACK_RATE` invalid args), achieving 100% coverage.
 [v0.77.8] ✅ Completed: Documented `getSchema` API Parity - Added missing getSchema method to README documentation (already verified present).
 [v0.77.7] ✅ Completed: Expose Missing Export Attributes - Added missing properties (exportMode, exportFormat, exportFilename, exportWidth, exportHeight, exportBitrate, exportCaptionMode, canvasSelector, controlsList) to HeliosPlayer to match the documented attributes.
