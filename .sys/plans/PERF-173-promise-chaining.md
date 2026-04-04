@@ -1,11 +1,11 @@
 ---
 id: PERF-173
 slug: promise-chaining
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2025-05-18
-completed: ""
-result: ""
+completed: 2025-05-18
+result: "failed"
 ---
 # PERF-173: Optimize Promise Chaining in Hot Loop
 
@@ -52,3 +52,9 @@ To:
 
 ## Correctness Check
 Run the `verify-dom-strategy-capture.ts` test script to ensure screenshots are captured.
+
+## Results Summary
+- **Best render time**: 123.588s (vs baseline ~33.6s)
+- **Improvement**: -268%
+- **Kept experiments**: None
+- **Discarded experiments**: Flatten Promise Chain (PERF-173)
