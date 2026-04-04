@@ -312,7 +312,7 @@ export class Renderer {
                   });
 
                   // Add a no-op catch handler to prevent unhandled promise rejections on abort/error
-                  worker.activePromise = framePromise.catch(noopCatch) as Promise<void>;
+                  worker.activePromise = framePromise.then(undefined, noopCatch) as Promise<void>;
 
                   framePromises[nextFrameToSubmit] = framePromise;
                   nextFrameToSubmit++;
