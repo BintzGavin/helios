@@ -98,6 +98,10 @@ Last updated by: PERF-168
 - Hoisted worker frame execution async IIFE in Renderer.ts outside of hot loop. ~0.1s improvement. [PERF-089]
 
 ## What Doesn't Work (and Why)
+- **Eliminate Destructuring (PERF-171)**:
+  - What you tried: Removed `({ screenshotData }: any)` object destructuring in `DomStrategy.ts` hot loop.
+  - WHY it didn't work: Micro-allocations from destructuring inside promise resolutions were negligible or did not improve median times. V8 optimization is already good.
+  - Plan ID: PERF-171
 - **Remove defensive truthiness checks for cdpSession directly (PERF-170)**:
   - What you tried: Removing `if (this.cdpSession)` and `else` fallback branches in `DomStrategy.capture()`.
   - WHY it didn't work: The micro-stalls from this branch evaluation are negligible and do not improve median render time significantly (33.84s vs 33.96s). Furthermore, removing the fallback paths creates a regression risk if the CDP session fails to attach or isn't supported, causing a crash instead of gracefully falling back to standard `page.screenshot`.

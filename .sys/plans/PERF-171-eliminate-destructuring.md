@@ -1,11 +1,11 @@
 ---
 id: PERF-171
 slug: eliminate-destructuring
-status: unclaimed
-claimed_by: ""
+status: claimed
+claimed_by: "executor-session"
 created: 2024-05-26
-completed: ""
-result: ""
+completed: "2024-05-26"
+result: "failed"
 ---
 
 # PERF-171: Eliminate Object Destructuring Micro-Allocations in Promise Continuation
@@ -88,3 +88,9 @@ N/A
 ## Correctness Check
 Run `npx tsx packages/renderer/tests/verify-dom-strategy-capture.ts` to verify DOM frame generation still functions properly across configurations.
 Run `npm run test -w packages/renderer` to ensure baseline functionality remains green.
+
+## Results Summary
+- **Best render time**: 33.451s (vs baseline 33.390s)
+- **Improvement**: -0.18% (worse)
+- **Kept experiments**: []
+- **Discarded experiments**: [Eliminate Object Destructuring in DomStrategy]
