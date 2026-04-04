@@ -307,7 +307,7 @@ export class Renderer {
                   const compositionTimeInSeconds = (startFrame + frameIndex) * compTimeStep;
 
                   const framePromise = worker.activePromise.then(() => {
-                      worker.timeDriver.setTime(worker.page, compositionTimeInSeconds).catch(noopCatch);
+                      worker.timeDriver.setTime(worker.page, compositionTimeInSeconds).then(undefined, noopCatch);
                       return worker.strategy.capture(worker.page, time);
                   });
 
