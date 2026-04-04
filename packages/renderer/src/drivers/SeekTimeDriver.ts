@@ -7,11 +7,6 @@ import { FIND_ALL_MEDIA_FUNCTION, FIND_ALL_SCOPES_FUNCTION, SYNC_MEDIA_FUNCTION,
 
 export class SeekTimeDriver implements TimeDriver {
   private cdpSession: CDPSession | null = null;
-  private evaluateParams = {
-    expression: '',
-    awaitPromise: true,
-    returnByValue: false
-  };
 
   constructor(private timeout: number = 30000) {}
 
@@ -250,8 +245,12 @@ export class SeekTimeDriver implements TimeDriver {
     const frames = page.frames();
 
     if (frames.length === 1) {
-      this.evaluateParams.expression = `window.__helios_seek(${timeInSeconds}, ${this.timeout})`;
-      return this.cdpSession!.send('Runtime.evaluate', this.evaluateParams) as Promise<any>;
+      const params = {
+        expression: `window.__helios_seek(${timeInSeconds}, ${this.timeout})`,
+        awaitPromise: true,
+        returnByValue: false
+      };
+      return this.cdpSession!.send('Runtime.evaluate', params) as Promise<any>;
     }
 
     const promises: Promise<any>[] = new Array(frames.length);
@@ -259,8 +258,12 @@ export class SeekTimeDriver implements TimeDriver {
     for (let i = 0; i < frames.length; i++) {
       const frame = frames[i];
       if (frame === page.mainFrame()) {
-        this.evaluateParams.expression = `window.__helios_seek(${timeInSeconds}, ${this.timeout})`;
-        promises[i] = this.cdpSession!.send('Runtime.evaluate', this.evaluateParams);
+        const params = {
+          expression: `window.__helios_seek(${timeInSeconds}, ${this.timeout})`,
+          awaitPromise: true,
+          returnByValue: false
+        };
+        promises[i] = this.cdpSession!.send('Runtime.evaluate', params);
       } else {
         promises[i] = frame.evaluate(
           ([t, timeoutMs]) => { (window as any).__helios_seek(t, timeoutMs); },

@@ -1,7 +1,7 @@
 ---
 id: PERF-175
 slug: dynamic-shallow-objects
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-05-23
 completed: ""

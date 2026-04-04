@@ -18,8 +18,6 @@ export class DomStrategy implements RenderStrategy {
   private cdpSession: CDPSession | null = null;
   private lastFrameBuffer: Buffer | null = null;
   private cdpScreenshotParams: any = null;
-  private beginFrameParams: any = null;
-  private beginFrameTargetParams: any = null;
   private targetElementHandle: any = null;
   private emptyImageBuffer: Buffer = EMPTY_IMAGE_BUFFER;
   private frameInterval: number = 0;
@@ -140,8 +138,6 @@ export class DomStrategy implements RenderStrategy {
 
     this.frameInterval = 1000 / this.options.fps;
     this.cdpScreenshotParams = cdpScreenshotParams;
-    this.beginFrameParams = { screenshot: this.cdpScreenshotParams, interval: this.frameInterval };
-    this.beginFrameTargetParams = { screenshot: { ...this.cdpScreenshotParams, clip: { x: 0, y: 0, width: 0, height: 0, scale: 1 } }, interval: this.frameInterval };
 
     // Set format-appropriate empty buffer
     if (format === 'jpeg') {
@@ -181,14 +177,16 @@ export class DomStrategy implements RenderStrategy {
       if (this.cdpSession) {
         return this.targetElementHandle.boundingBox().then((box: any) => {
           if (box) {
-            this.beginFrameTargetParams.screenshot.clip.x = box.x;
-            this.beginFrameTargetParams.screenshot.clip.y = box.y;
-            this.beginFrameTargetParams.screenshot.clip.width = box.width;
-            this.beginFrameTargetParams.screenshot.clip.height = box.height;
+            const params = {
+              screenshot: {
+                ...this.cdpScreenshotParams,
+                clip: { x: box.x, y: box.y, width: box.width, height: box.height, scale: 1 }
+              },
+              interval: this.frameInterval,
+              frameTimeTicks: 10000 + frameTime
+            };
 
-            this.beginFrameTargetParams.frameTimeTicks = 10000 + frameTime;
-
-            return this.cdpSession!.send('HeadlessExperimental.beginFrame', this.beginFrameTargetParams).then(({ screenshotData }: any) => {
+            return this.cdpSession!.send('HeadlessExperimental.beginFrame', params).then(({ screenshotData }: any) => {
               if (screenshotData) {
                 const buffer = this.writeToBufferPool(screenshotData);
                 this.lastFrameBuffer = buffer;
@@ -219,9 +217,13 @@ export class DomStrategy implements RenderStrategy {
     }
 
     if (this.cdpSession) {
-      this.beginFrameParams.frameTimeTicks = 10000 + frameTime;
+      const params = {
+        screenshot: this.cdpScreenshotParams,
+        interval: this.frameInterval,
+        frameTimeTicks: 10000 + frameTime
+      };
 
-      return this.cdpSession.send('HeadlessExperimental.beginFrame', this.beginFrameParams).then(({ screenshotData }: any) => {
+      return this.cdpSession.send('HeadlessExperimental.beginFrame', params).then(({ screenshotData }: any) => {
         if (screenshotData) {
           const buffer = this.writeToBufferPool(screenshotData);
           this.lastFrameBuffer = buffer;
