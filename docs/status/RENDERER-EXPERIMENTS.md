@@ -98,6 +98,7 @@ Last updated by: PERF-168
 - Hoisted worker frame execution async IIFE in Renderer.ts outside of hot loop. ~0.1s improvement. [PERF-089]
 
 ## What Doesn't Work (and Why)
+- **Remove defensive truthiness checks for cdpSession**: Pre-resolving the capture pathway in `DomStrategy.prepare` and executing the pre-bound pathway in the hot loop actually slowed down rendering by ~5.6% (baseline: ~32.05s, experiment: ~33.84s). WHY it didn't work: Re-introducing closure allocation for the pre-resolved `_captureStrategy` negated any minor gains from removing truthiness checks (`cdpSession` and `targetElementHandle`). V8 likely optimizes these highly predictable branches effectively, while dynamic closure execution in the hot loop introduces overhead. (PERF-169)
 - **Disable Chromium Sandbox (PERF-166)**:
   - What you tried: Added `--no-sandbox` and `--disable-setuid-sandbox` to Chromium launch args to avoid zygote processes.
   - WHY it didn't work: Render time was 34.953s vs baseline 33.5s. In this microVM environment, the sandbox initialization and IPC overhead does not appear to be the limiting factor for layout/paint rendering, or the potential CPU savings are offset by Playwright orchestration overhead.

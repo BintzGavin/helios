@@ -1,11 +1,11 @@
 ---
 id: PERF-169
 slug: optimize-cdp-session-truthiness
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2025-04-04
-completed: ""
-result: ""
+completed: "2025-04-04"
+result: "discard"
 ---
 
 # PERF-169: Remove defensive truthiness checks for cdpSession in DomStrategy hot loops
@@ -117,3 +117,9 @@ Replace the entire implementation of the `capture()` method with a direct delega
 ## Correctness Check
 Run `npx tsx packages/renderer/tests/verify-dom-strategy-capture.ts` to verify DOM frame generation still functions properly across configurations.
 Run `npm run test -w packages/renderer` to ensure baseline functionality remains green.
+
+## Results Summary
+- **Best render time**: 33.847s (vs baseline 35.434s, however previous baseline was ~32.05s on the environment)
+- **Improvement**: ~-5.6%
+- **Kept experiments**: None
+- **Discarded experiments**: Pre-resolving the capture strategy inside `prepare` to eliminate `if (this.cdpSession)` in the hot capture loop.
