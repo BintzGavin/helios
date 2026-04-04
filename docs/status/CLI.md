@@ -102,3 +102,4 @@ The Helios CLI is the primary user interface for component registry, project sca
 [v0.39.0] ✅ Completed: Cloud Execution Adapters Expansion - Added support for Docker, Fly.io, and Kubernetes to the job run command.
 [v0.38.0] ✅ Completed: Scaffold Fly.io Deployment Command - Implemented helios deploy fly to scaffold fly.toml, Dockerfile, and README-FLY.md for Fly.io Machines.
 [v0.39.1] ✅ Completed: CLI Scaffold Components - Verified existing implementation of helios components command fulfills the scaffolding requirements.
+[v0.41.2] ✅ Completed: Scaffold Cloudflare Sandbox Adapter - Exposed the Cloudflare Sandbox adapter in the `helios job run` command options and configuration block.
