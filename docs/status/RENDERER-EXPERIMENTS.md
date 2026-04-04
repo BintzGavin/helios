@@ -98,6 +98,9 @@ Last updated by: PERF-168
 - Hoisted worker frame execution async IIFE in Renderer.ts outside of hot loop. ~0.1s improvement. [PERF-089]
 
 ## What Doesn't Work (and Why)
+- **Remove defensive truthiness checks for cdpSession directly (PERF-170)**:
+  - What you tried: Removing `if (this.cdpSession)` and `else` fallback branches in `DomStrategy.capture()`.
+  - WHY it didn't work: The micro-stalls from this branch evaluation are negligible and do not improve median render time significantly (33.84s vs 33.96s). Furthermore, removing the fallback paths creates a regression risk if the CDP session fails to attach or isn't supported, causing a crash instead of gracefully falling back to standard `page.screenshot`.
 - **Remove defensive truthiness checks for cdpSession**: Pre-resolving the capture pathway in `DomStrategy.prepare` and executing the pre-bound pathway in the hot loop actually slowed down rendering by ~5.6% (baseline: ~32.05s, experiment: ~33.84s). WHY it didn't work: Re-introducing closure allocation for the pre-resolved `_captureStrategy` negated any minor gains from removing truthiness checks (`cdpSession` and `targetElementHandle`). V8 likely optimizes these highly predictable branches effectively, while dynamic closure execution in the hot loop introduces overhead. (PERF-169)
 - **Disable Chromium Sandbox (PERF-166)**:
   - What you tried: Added `--no-sandbox` and `--disable-setuid-sandbox` to Chromium launch args to avoid zygote processes.
