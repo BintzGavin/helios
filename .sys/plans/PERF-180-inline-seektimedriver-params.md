@@ -1,11 +1,11 @@
 ---
 id: PERF-180
 slug: inline-seektimedriver-params
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-28
-completed: ""
-result: ""
+completed: 2024-05-28
+result: "failed"
 ---
 
 # PERF-180: Inline Parameters in SeekTimeDriver
@@ -101,3 +101,8 @@ Verify that rendering completes correctly and the output MP4 is generated.
 ## Prior Art
 - PERF-178: Inline parameters in `DomStrategy.ts`
 - PERF-179: Inline parameters in `CdpTimeDriver.ts`
+## Results Summary
+- **Best render time**: 14.631s (vs baseline 3.993s)
+- **Improvement**: -366%
+- **Kept experiments**: []
+- **Discarded experiments**: [PERF-180: Inline parameters in SeekTimeDriver]
