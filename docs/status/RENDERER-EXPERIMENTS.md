@@ -290,3 +290,5 @@ Last updated by: PERF-168
 ### PERF-174: optimize setTime promise
 - **Status:** KEPT
 - **Details:** Replaced `.catch()` with `.then(undefined, ...)` in `worker.timeDriver.setTime` to eliminate Promise allocation. Improved median render time from baseline.
+## What Works
+- Dynamic shallow CDP objects inline (~$RENDER_TIME s, PERF-175)
