@@ -98,6 +98,8 @@ Last updated by: PERF-168
 - Hoisted worker frame execution async IIFE in Renderer.ts outside of hot loop. ~0.1s improvement. [PERF-089]
 
 ## What Doesn't Work (and Why)
+- Tried flattening `.then()` promise chains instead of synchronous block closures in `Renderer.ts` hot loop. \n  - **Why it didn't work**: Made rendering time significantly slower (~123s vs ~33s baseline). Reverted as this indicates either excessive chained tick allocations or issues with evaluation execution order. (PERF-173)
+
 - Tried pre-binding result handlers in DomStrategy.capture() (PERF-172), but the benchmark produced an impossibly fast result (3s vs 32s baseline) indicating a crash or frame skipping.
 - **Eliminate Destructuring (PERF-171)**:
   - What you tried: Removed `({ screenshotData }: any)` object destructuring in `DomStrategy.ts` hot loop.
