@@ -1,7 +1,10 @@
-**Version**: 0.46.1
-
 # CLI Status
 
+**Version**: 0.45.1
+
+## Recent Completions
+[v0.45.1] ✅ Completed: Scaffold Cloudflare Sandbox Deployment - Verified `helios deploy cloudflare-sandbox` command is implemented and working.
+[v0.45.0] ✅ Completed: Scaffold Cloudflare Sandbox Deployment - Added `helios deploy cloudflare-sandbox` command to generate wrangler.toml, workflow index, and render script.
 ## Current State
 The Helios CLI is the primary user interface for component registry, project scaffolding, distributed rendering, and deployment.
 
@@ -9,7 +12,6 @@ The Helios CLI is the primary user interface for component registry, project sca
 
 [v0.46.0] ✅ Completed: Scaffold Docker Deployment Command - Implemented `helios deploy docker` to scaffold docker-compose.yml and README-DOCKER.md for running distributed rendering workloads via Docker Swarm/Compose.
 
-[v0.45.0] ✅ Completed: Scaffold Cloudflare Sandbox Deployment - Added `helios deploy cloudflare-sandbox` command to generate wrangler.toml, workflow index, and render script.
 [v0.44.0] ✅ Completed: Tier 3 Scaffold Deployment Commands - Implemented `helios deploy modal`, `helios deploy deno`, and `helios deploy vercel`.
 
 ## Next Steps
