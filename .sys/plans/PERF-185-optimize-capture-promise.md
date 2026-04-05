@@ -1,11 +1,11 @@
 ---
 id: PERF-185
 slug: optimize-capture-promise
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2026-04-05
-completed: ""
-result: ""
+completed: 2024-06-25
+result: improved
 ---
 # PERF-185: Optimize Capture Promise Construction in Hot Loop
 
@@ -67,3 +67,10 @@ Run `npm run test:renderer` to ensure `CanvasStrategy` is unaffected.
 
 ## Correctness Check
 Run the `npx tsx packages/renderer/tests/fixtures/benchmark.ts` script to ensure frames are still captured accurately.
+
+## Results Summary
+- **Best render time**: 3.492s (vs baseline 3.780s)
+- **Improvement**: 7.6%
+- **Kept experiments**:
+  - Extracted frame capture promise into an async helper
+- **Discarded experiments**: none

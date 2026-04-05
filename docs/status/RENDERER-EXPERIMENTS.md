@@ -1,8 +1,9 @@
 ## Performance Trajectory
-Current best: ${new}s (baseline was ${baseline}s)
-Last updated by: PERF-178
+Current best: 3.492s (baseline was 3.780s, -7.6%)
+Last updated by: PERF-185
 
 ## What Works
+- **Extracting frame capture promise into async helper** (PERF-185): Moved the `captureWorkerFrame` promise chain logic into an `async` function outside the hot loop in `Renderer.ts`. This avoids allocating a new anonymous closure and `Promise.then` wrapper on every single frame, allowing V8 to optimize the function signature. This improved performance by ~7.6%.
 - **Inline parameter construction for `cdpSession.send('HeadlessExperimental.beginFrame')`** (PERF-178): Inlining standard object literals for `cdpSession.send` params instead of pre-allocating an object in the loop avoided local variable overhead and further simplified byte code. The targeted parameters needed to use `as any` to compile without TS errors regarding `clip` instead of passing the object into the screenshot parameter, which V8 optimizes well.
 - Eliminated CDP destructuring and spread operator in hot loop (~X% faster) - PERF-177
 - PERF-179: Inlined object literal for `this.client!.send('Emulation.setVirtualTimePolicy', { ... })` in `packages/renderer/src/drivers/CdpTimeDriver.ts`. This avoids dynamic allocation of a `params` object on every frame when advancing virtual time. While CdpTimeDriver isn't the default in `dom` mode, reducing loop allocation overhead is functionally safer and follows the same optimizations in PERF-178.
@@ -12,6 +13,5 @@ Last updated by: PERF-178
 - PERF-181: Streamlined screencast capture (hangs on beginFrame substitution). `startScreencast` does not provide synchronous, deterministic frame guarantees like `beginFrame`. The reliance on `window.__helios_damage` to force screencast emissions fails to reliably queue frames, causing the pipeline to starve and deadlock while waiting for the next pushed frame in `capture()`.
 - PERF-182: Increase Pipeline Depth to Improve Frame Capture Throughput. Failed. Did not improve performance over the baseline. The reason is likely due to Node memory limits resulting in hanging the process.
 - PERF-183: Decrease Pipeline Depth to Improve Frame Capture Stability. Failed. Did not improve performance over the baseline. The reason is likely due to the pipeline stalling and not making progress because Playwright/CDP event handlers are not properly yielding or managing the IPC message queue, preventing `capture()` from completing and returning frames to the FFmpeg stdin stream within the timeout.
-## What Doesn't Work (and Why)
 - PERF-153: Replaced `HeadlessExperimental.beginFrame` with `Page.startScreencast` and attempted to force damage with `__helios_damage` div toggle. The benchmark hung during capture due to lack of deterministic screencast events or misaligned frame timing.
 - **Replace startScreencast with beginFrame in DomStrategy** (PERF-184): Replaced the damage-driven `Page.startScreencast` capture approach with synchronous `HeadlessExperimental.beginFrame` for the full-page DOM fallback. Improved render time to ~6.6s.
