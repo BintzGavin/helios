@@ -1,11 +1,11 @@
 ---
 id: PERF-187
 slug: target-beginframe
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2026-04-05
-completed: ""
-result: ""
+completed: "2026-04-05"
+result: "improved"
 ---
 # PERF-187: Target Element BeginFrame Parameter Unrolling
 
@@ -177,3 +177,9 @@ Run the renderer benchmark script `npx tsx packages/renderer/tests/verify-dom-st
 
 ## Canvas Smoke Test
 Run `npx tsx packages/renderer/tests/verify-canvas-strategy.ts` to ensure Canvas mode still works properly.
+
+## Results Summary
+- **Best render time**: 3.846s (vs baseline 4.139s)
+- **Improvement**: ~7%
+- **Kept experiments**: Target Element BeginFrame Parameter Unrolling
+- **Discarded experiments**: None

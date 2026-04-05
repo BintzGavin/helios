@@ -168,71 +168,61 @@ export class DomStrategy implements RenderStrategy {
 
   }
 
-  capture(page: Page, frameTime: number): Promise<Buffer> {
+  async capture(page: Page, frameTime: number): Promise<Buffer> {
     if (this.targetElementHandle) {
       if (this.cdpSession) {
-        return this.targetElementHandle.boundingBox().then((box: any) => {
-          if (box) {
-            return this.cdpSession!.send('HeadlessExperimental.beginFrame', {
-              screenshot: {
-                format: this.cdpScreenshotParams.format,
-                quality: this.cdpScreenshotParams.quality,
-                clip: { x: box.x, y: box.y, width: box.width, height: box.height, scale: 1 }
-              },
-              interval: this.frameInterval,
-              frameTimeTicks: 10000 + frameTime
-            } as any).then((res: any) => {
-              if (res && res.screenshotData) {
-                const buffer = Buffer.from(res.screenshotData, 'base64');
-                this.lastFrameBuffer = buffer;
-                return buffer;
-              } else if (this.lastFrameBuffer) {
-                return this.lastFrameBuffer;
-              } else {
-                // Wait for next explicit tick or fallback if damage driven logic fails
-                // When beginFrame is active, Page.captureScreenshot hangs.
-                // But if we're here, it means the frame was omitted. Let's just create an empty buffer
-                // to avoid hanging
-                this.lastFrameBuffer = this.emptyImageBuffer;
-                return this.emptyImageBuffer;
-              }
-            });
+        const box = await this.targetElementHandle.boundingBox();
+        if (box) {
+          const res = await this.cdpSession!.send('HeadlessExperimental.beginFrame', {
+            screenshot: {
+              format: this.cdpScreenshotParams.format,
+              quality: this.cdpScreenshotParams.quality,
+              clip: { x: box.x, y: box.y, width: box.width, height: box.height, scale: 1 }
+            },
+            interval: this.frameInterval,
+            frameTimeTicks: 10000 + frameTime
+          } as any);
+          if (res && res.screenshotData) {
+            const buffer = Buffer.from(res.screenshotData, 'base64');
+            this.lastFrameBuffer = buffer;
+            return buffer;
+          } else if (this.lastFrameBuffer) {
+            return this.lastFrameBuffer;
+          } else {
+            this.lastFrameBuffer = this.emptyImageBuffer;
+            return this.emptyImageBuffer;
           }
-          return this.targetElementHandle.screenshot((this as any).fallbackScreenshotOptions).then((fallback: any) => {
-            this.lastFrameBuffer = fallback;
-            return fallback as Buffer;
-          });
-        });
+        }
+        const fallback = await this.targetElementHandle.screenshot((this as any).fallbackScreenshotOptions);
+        this.lastFrameBuffer = fallback as Buffer;
+        return fallback as Buffer;
       }
 
-      return this.targetElementHandle.screenshot((this as any).fallbackScreenshotOptions).then((fallback: any) => {
-        this.lastFrameBuffer = fallback;
-        return fallback as Buffer;
-      });
+      const fallback = await this.targetElementHandle.screenshot((this as any).fallbackScreenshotOptions);
+      this.lastFrameBuffer = fallback as Buffer;
+      return fallback as Buffer;
     }
 
     if (this.cdpSession) {
-      return this.cdpSession!.send('HeadlessExperimental.beginFrame', {
+      const res = await this.cdpSession!.send('HeadlessExperimental.beginFrame', {
         screenshot: { format: this.cdpScreenshotParams.format, quality: this.cdpScreenshotParams.quality },
         interval: this.frameInterval,
         frameTimeTicks: 10000 + frameTime
-      } as any).then((res: any) => {
-        if (res && res.screenshotData) {
-          const buffer = Buffer.from(res.screenshotData, 'base64');
-          this.lastFrameBuffer = buffer;
-          return buffer;
-        } else if (this.lastFrameBuffer) {
-          return this.lastFrameBuffer;
-        } else {
-          this.lastFrameBuffer = this.emptyImageBuffer;
-          return this.emptyImageBuffer;
-        }
-      });
+      } as any);
+      if (res && res.screenshotData) {
+        const buffer = Buffer.from(res.screenshotData, 'base64');
+        this.lastFrameBuffer = buffer;
+        return buffer;
+      } else if (this.lastFrameBuffer) {
+        return this.lastFrameBuffer;
+      } else {
+        this.lastFrameBuffer = this.emptyImageBuffer;
+        return this.emptyImageBuffer;
+      }
     } else {
-      return page.screenshot((this as any).fallbackScreenshotOptions).then((fallback: any) => {
-        this.lastFrameBuffer = fallback;
-        return fallback as Buffer;
-      });
+      const fallback = await page.screenshot((this as any).fallbackScreenshotOptions);
+      this.lastFrameBuffer = fallback as Buffer;
+      return fallback as Buffer;
     }
   }
 

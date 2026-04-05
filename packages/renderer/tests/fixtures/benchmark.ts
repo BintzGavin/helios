@@ -8,7 +8,8 @@ async function runBenchmark() {
         height: 720,
         fps: 30,
         durationInSeconds: 5, // 150 frames
-        mode: 'dom'
+        mode: 'dom',
+        targetSelector: 'body'
     });
 
     const compositionUrl = 'file:///app/output/example-build/examples/simple-animation/composition.html';
