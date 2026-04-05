@@ -3,7 +3,8 @@
 
 [v1.56.0] ✅ Completed: Daily llms.txt Review - Verified current packages versions. Updated Roadmap to include new Cloud Execution Adapters (Modal, Deno Deploy, Vercel, Hetzner Cloud).
 
-**Version**: 1.58.0
+**Version**: 1.59.0
+[v1.59.0] ✅ Completed: Comprehensive Daily Review - Updated CLI version to v0.45.1+ in Quick Facts and Roadmap.
 
 [v1.55.0] ✅ Completed: Comprehensive Daily Review - Realigned Quick Facts and Roadmap versions to actual package.json versions (Studio v0.107.1+, CLI v0.41.0+, Player v0.76.18+, Renderer v1.78.0+, Infrastructure v0.25.0+). Updated Roadmap with recent verifiable completions from domain PROGRESS logs.
 
