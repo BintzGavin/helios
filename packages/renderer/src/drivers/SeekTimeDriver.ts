@@ -71,6 +71,24 @@ export class SeekTimeDriver implements TimeDriver {
           let heliosSeeked = false;
           const timeInMs = t * 1000;
 
+          // Force a microscopic DOM update to trigger screencast damage
+          let d = document.getElementById('__helios_damage');
+          if (!d) {
+            d = document.createElement('div');
+            d.id = '__helios_damage';
+            d.style.position = 'fixed';
+            d.style.top = '0';
+            d.style.left = '0';
+            d.style.width = '1px';
+            d.style.height = '1px';
+            d.style.opacity = '0.001';
+            d.style.pointerEvents = 'none';
+            d.style.zIndex = '999999';
+            document.body.appendChild(d);
+          }
+          // Toggle the background color or opacity slightly
+          d.style.backgroundColor = (t % 2 === 0) ? '#000' : '#111';
+
           // Update the global virtual time
           window.__HELIOS_VIRTUAL_TIME__ = timeInMs;
 
