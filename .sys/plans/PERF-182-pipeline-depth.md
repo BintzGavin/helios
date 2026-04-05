@@ -1,11 +1,11 @@
 ---
 id: PERF-182
 slug: pipeline-depth
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2026-04-05
-completed: ""
-result: ""
+completed: 2026-04-05
+result: failed
 ---
 
 # PERF-182: Increase Pipeline Depth to Improve Frame Capture Throughput
@@ -48,3 +48,8 @@ Run the `benchmark.ts` to ensure rendering still completes successfully with the
 
 ## Canvas Smoke Test
 No changes are being made to canvas-specific APIs, but we will ensure standard imports and logic compiles correctly by running `npm run test -w packages/renderer`.
+## Results Summary
+- **Best render time**: 0.000s (vs baseline 3.800s)
+- **Improvement**: 0%
+- **Kept experiments**: []
+- **Discarded experiments**: [PERF-182-pipeline-depth]
