@@ -1,0 +1,5 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	5.815	150	25.79	38.7	keep	Unroll worker object and inline Buffer allocation
+2	3.893	150	38.53	38.4	keep	Unroll worker object and inline Buffer allocation
+3	3.692	150	40.62	38.4	keep	Unroll worker object and inline Buffer allocation
+4	3.853	150	38.93	41.2	keep	Unroll worker object and inline Buffer allocation
