@@ -205,7 +205,7 @@ export class DomStrategy implements RenderStrategy {
 
     if (this.cdpSession) {
       const res = await this.cdpSession!.send('HeadlessExperimental.beginFrame', {
-        screenshot: { format: this.cdpScreenshotParams.format, quality: this.cdpScreenshotParams.quality },
+        screenshot: this.cdpScreenshotParams,
         interval: this.frameInterval,
         frameTimeTicks: 10000 + frameTime
       } as any);
