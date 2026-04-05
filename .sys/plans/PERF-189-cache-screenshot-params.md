@@ -1,11 +1,11 @@
 ---
 id: PERF-189
 slug: cache-screenshot-params
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-23
-completed: ""
-result: ""
+completed: "2024-05-23"
+result: "improved"
 ---
 
 # PERF-189: Optimize HeadlessExperimental.beginFrame Parameter Allocation
