@@ -7,6 +7,8 @@ import { FIND_ALL_MEDIA_FUNCTION, FIND_ALL_SCOPES_FUNCTION, SYNC_MEDIA_FUNCTION,
 
 export class SeekTimeDriver implements TimeDriver {
   private cdpSession: CDPSession | null = null;
+  private cachedFrames: import('playwright').Frame[] = [];
+  private cachedMainFrame: import('playwright').Frame | null = null;
 
   constructor(private timeout: number = 30000) {}
 
@@ -239,10 +241,13 @@ export class SeekTimeDriver implements TimeDriver {
       // Ignore - likely a static page or initialization took too long.
       // We'll proceed and rely on Helios subscription/polling as fallback.
     }
+
+    this.cachedFrames = page.frames();
+    this.cachedMainFrame = page.mainFrame();
   }
 
   setTime(page: Page, timeInSeconds: number): Promise<void> {
-    const frames = page.frames();
+    const frames = this.cachedFrames;
 
     if (frames.length === 1) {
       const params = {
@@ -257,7 +262,7 @@ export class SeekTimeDriver implements TimeDriver {
 
     for (let i = 0; i < frames.length; i++) {
       const frame = frames[i];
-      if (frame === page.mainFrame()) {
+      if (frame === this.cachedMainFrame) {
         const params = {
           expression: `window.__helios_seek(${timeInSeconds}, ${this.timeout})`,
           awaitPromise: true,
