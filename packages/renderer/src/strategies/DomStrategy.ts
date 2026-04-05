@@ -21,9 +21,7 @@ export class DomStrategy implements RenderStrategy {
   private targetElementHandle: any = null;
   private emptyImageBuffer: Buffer = EMPTY_IMAGE_BUFFER;
   private frameInterval: number = 0;
-
-  private screencastQueue: Buffer[] = [];
-  private screencastResolvers: ((buf: Buffer) => void)[] = [];
+  private beginFrameParams: any = null;
 
   private writeToBufferPool(screenshotData: string): Buffer {
     return Buffer.from(screenshotData, 'base64');
@@ -174,21 +172,10 @@ export class DomStrategy implements RenderStrategy {
     }
 
     if (this.cdpSession && !this.targetElementHandle) {
-      this.cdpSession.on('Page.screencastFrame', (event: any) => {
-        const buffer = this.writeToBufferPool(event.data);
-        this.cdpSession!.send('Page.screencastFrameAck', { sessionId: event.sessionId }).catch(() => {});
-        if (this.screencastResolvers.length > 0) {
-          const resolve = this.screencastResolvers.shift()!;
-          resolve(buffer);
-        } else {
-          this.screencastQueue.push(buffer);
-        }
-      });
-      await this.cdpSession.send('Page.startScreencast', {
-        format: format as 'jpeg' | 'png',
-        quality: quality,
-        everyNthFrame: 1
-      });
+      this.beginFrameParams = {
+        format: this.cdpScreenshotParams.format,
+        quality: this.cdpScreenshotParams.quality
+      };
     }
   }
 
@@ -236,16 +223,20 @@ export class DomStrategy implements RenderStrategy {
     }
 
     if (this.cdpSession) {
-      return new Promise<Buffer>((resolve) => {
-        if (this.screencastQueue.length > 0) {
-          const buffer = this.screencastQueue.shift()!;
+      return this.cdpSession!.send('HeadlessExperimental.beginFrame', {
+        screenshot: this.beginFrameParams,
+        interval: this.frameInterval,
+        frameTimeTicks: 10000 + frameTime
+      } as any).then((res: any) => {
+        if (res && res.screenshotData) {
+          const buffer = this.writeToBufferPool(res.screenshotData);
           this.lastFrameBuffer = buffer;
-          resolve(buffer);
+          return buffer;
+        } else if (this.lastFrameBuffer) {
+          return this.lastFrameBuffer;
         } else {
-          this.screencastResolvers.push((buffer: Buffer) => {
-            this.lastFrameBuffer = buffer;
-            resolve(buffer);
-          });
+          this.lastFrameBuffer = this.emptyImageBuffer;
+          return this.emptyImageBuffer;
         }
       });
     } else {

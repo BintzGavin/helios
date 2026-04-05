@@ -278,3 +278,4 @@ run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
 277	3.875	150	38.71	37.9	keep	eliminate destructuring and spread in capture
 278	14.631	150	10.25	38.5	discard	inline seektimedriver params
 279	0.000	0	0.00	0.0	crash	screencast-forced-layout
+184	6.615	150	22.68	37.6	keep	replace startScreencast with beginFrame
