@@ -6,7 +6,7 @@ Helios is a modern engine for creating videos programmatically using standard we
 
 ## Quick Facts
 - **License**: Elastic License 2.0 (free commercial use, no SaaS resale)
-- **Status**: Beta / Self-Driving (Core: Stable v5.13.0+, Studio: Alpha v0.107.1+, Player: v0.76.18+, Renderer: v1.78.0+, CLI: Beta v0.41.0+, Infrastructure: v0.25.0+)
+- **Status**: Beta / Self-Driving (Core: Stable v5.13.0+, Studio: Alpha v0.107.1+, Player: v0.76.18+, Renderer: v1.78.0+, CLI: Beta v0.45.1+, Infrastructure: v0.25.0+)
 - **Frameworks**: React, Vue, Svelte, Solid, vanilla JS
 - **Animation**: Standard CSS, Web Animations API (WAAPI), any animation library
 
@@ -115,7 +115,7 @@ const report = await Helios.diagnose();
 ## Roadmap
 ### V1.x (Active)
 - **Studio**: v0.107.1+ (Asset Move, Timeline Polish)
-- **CLI**: v0.41.0+ (Scaffold Kubernetes Deployment, Tier 3 Cloud Execution Adapters)
+- **CLI**: v0.45.1+ (Scaffold Kubernetes Deployment, Tier 3 Cloud Execution Adapters)
 - **Core**: v5.13.0+ (Generic Input Props, Implement WaitUntilStable)
 - **Player**: v0.76.18+ (Regression Tests for InputProps, MediaProperties, Audio Context)
 - **Renderer**: v1.78.0+ (Refactor FFmpeg Config, DomStrategy Media Attributes)
