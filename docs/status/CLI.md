@@ -1,6 +1,6 @@
 # CLI Status
 
-**Version**: 0.45.1
+**Version**: 0.46.2
 
 ## Recent Completions
 [v0.45.1] ✅ Completed: Scaffold Cloudflare Sandbox Deployment - Verified `helios deploy cloudflare-sandbox` command is implemented and working.
@@ -18,7 +18,7 @@ The Helios CLI is the primary user interface for component registry, project sca
 - Implement regression tests for remaining commands (e.g. `job.ts`, `render.ts`, `merge.ts`).
 
 ## Blocked Items
-- None
+- [v0.46.2] Blocked: Waiting for a new, valid plan in /.sys/plans/
 
 ## Available Commands
 1. **Studio Command** - `helios studio` for launching dev server
