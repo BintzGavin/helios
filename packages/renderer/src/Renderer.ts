@@ -282,6 +282,12 @@ export class Renderer {
               }
           };
 
+          const captureWorkerFrame = async (worker: { context: import('playwright').BrowserContext, page: import('playwright').Page, strategy: RenderStrategy, timeDriver: TimeDriver, activePromise: Promise<void> }, compositionTimeInSeconds: number, time: number): Promise<Buffer> => {
+              await worker.activePromise;
+              worker.timeDriver.setTime(worker.page, compositionTimeInSeconds).then(undefined, noopCatch);
+              return worker.strategy.capture(worker.page, time);
+          };
+
           let nextFrameToSubmit = 0;
           let nextFrameToWrite = 0;
           const poolLen = pool.length;
@@ -306,10 +312,7 @@ export class Renderer {
                   const time = frameIndex * timeStep;
                   const compositionTimeInSeconds = (startFrame + frameIndex) * compTimeStep;
 
-                  const framePromise = worker.activePromise.then(() => {
-                      worker.timeDriver.setTime(worker.page, compositionTimeInSeconds).then(undefined, noopCatch);
-                      return worker.strategy.capture(worker.page, time);
-                  });
+                  const framePromise = captureWorkerFrame(worker, compositionTimeInSeconds, time);
 
                   // Add a no-op catch handler to prevent unhandled promise rejections on abort/error
                   worker.activePromise = framePromise.then(undefined, noopCatch) as Promise<void>;
