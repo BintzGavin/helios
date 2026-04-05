@@ -1,11 +1,11 @@
 ---
 id: PERF-181
 slug: screencast-streaming
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2025-05-28
-completed: ""
-result: ""
+completed: "2025-05-28"
+result: "failed"
 ---
 
 # PERF-181: Streamline Capture using CDP Page.startScreencast
@@ -110,3 +110,9 @@ Run the benchmark script `npx tsx packages/renderer/tests/fixtures/benchmark.ts`
 
 ## Prior Art
 - PERF-153 / PERF-156
+
+## Results Summary
+- **Best render time**: N/A (crash)
+- **Improvement**: N/A
+- **Kept experiments**: None
+- **Discarded experiments**: Replaced `beginFrame` with `startScreencast` and attempted to force damage with `__helios_damage` div. The benchmark hung due to lack of deterministic screencast events.
