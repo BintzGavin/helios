@@ -7,6 +7,7 @@ export class CdpTimeDriver implements TimeDriver {
   private client: CDPSession | null = null;
   private currentTime: number = 0;
   private timeout: number;
+  private cachedFrames: import('playwright').Frame[] = [];
 
   constructor(timeout: number = 30000) {
     this.timeout = timeout;
@@ -71,6 +72,8 @@ export class CdpTimeDriver implements TimeDriver {
       await Promise.all(initPromises);
     }
 
+    this.cachedFrames = page.frames();
+
     this.currentTime = 0;
   }
 
@@ -90,7 +93,7 @@ export class CdpTimeDriver implements TimeDriver {
     // We do this manually BEFORE advancing time so that when the frame renders (rAF),
     // the video elements are already at the correct time.
     // Execute in all frames (including main frame) to support iframes
-    const frames = page.frames();
+    const frames = this.cachedFrames;
     if (frames.length === 1) {
       await frames[0].evaluate((t) => {
         if (typeof (window as any).__helios_sync_media === 'function') {
