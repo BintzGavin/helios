@@ -134,16 +134,3 @@ This backlog tracks concrete deliverables derived from [`AGENTS.md`](../AGENTS.m
 - [x] **Documentation**: Add Quickstart guide.
 - [x] ⛔ Renderer Verification Blocked: packages/studio dependency mismatch
 
-## PLAYER Agent Status
-- [ ] 🚫 Blocked: No new plan found in `/.sys/plans/` for `PLAYER`. Waiting for Planner to create the next implementation spec.
-
-- [ ] [BLOCKED] PLAYER: The current active plan is for RENDERER optimizations. No new implementation plan found in /.sys/plans/ for the PLAYER domain. Waiting for Planner.
-## INFRASTRUCTURE Agent Status
-- [ ] 🚫 Blocked: No uncompleted implementation plans found for my domain in `/.sys/plans/`. I must stop working.
-- [ ] 🚫 Blocked: No uncompleted implementation plans found for my domain in `/.sys/plans/`. I must stop working.
-- [ ] 🚫 Blocked: No uncompleted implementation plans found for my domain in `/.sys/plans/`. I must stop working.
-- [ ] 🚫 Blocked: No new plan found in `/.sys/plans/` for `INFRASTRUCTURE`. Waiting for Planner to create the next implementation spec.
-- [ ] 🚫 Blocked: No uncompleted implementation plans found for my domain in `/.sys/plans/`. I must stop working.
-- [ ] 🚫 Blocked: The only available plans (`2026-03-02-INFRASTRUCTURE-SyncDependency.md` and `2026-03-02-INFRASTRUCTURE-Workspace-Dependency-Synchronizer.md`) require modifying files outside of my domain (`packages/cli/package.json` and the root workspace package definitions), which strictly violates my boundaries. I must stop working.
-- [ ] 🚫 Blocked: The available plan (`2026-11-13-CLI-Cloud-Worker-Execution.md`) asks me to modify files outside of my domain (`packages/cli/src/commands/job.ts`), which strictly violates my boundaries. I cannot implement CLI execution commands.
-- [ ] 🚫 Blocked: No uncompleted implementation plans found for my domain in `/.sys/plans/`. I must stop working.
