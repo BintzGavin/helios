@@ -15,3 +15,6 @@ Last updated by: PERF-185
 - PERF-183: Decrease Pipeline Depth to Improve Frame Capture Stability. Failed. Did not improve performance over the baseline. The reason is likely due to the pipeline stalling and not making progress because Playwright/CDP event handlers are not properly yielding or managing the IPC message queue, preventing `capture()` from completing and returning frames to the FFmpeg stdin stream within the timeout.
 - PERF-153: Replaced `HeadlessExperimental.beginFrame` with `Page.startScreencast` and attempted to force damage with `__helios_damage` div toggle. The benchmark hung during capture due to lack of deterministic screencast events or misaligned frame timing.
 - **Replace startScreencast with beginFrame in DomStrategy** (PERF-184): Replaced the damage-driven `Page.startScreencast` capture approach with synchronous `HeadlessExperimental.beginFrame` for the full-page DOM fallback. Improved render time to ~6.6s.
+
+## What Works
+- PERF-186: Unrolling worker object parameters into explicit arguments in `captureWorkerFrame` and inlining Base64 object/Buffer allocation in `DomStrategy.ts` reduced micro-stalls and object property allocations, accelerating render time significantly (down to ~3.7s). (~73% faster than the 13.7s baseline).
