@@ -8,6 +8,9 @@
 - ✅ Completed: Documentation Orchestration - Updated README.md to document Orchestration, Job Management, Cloud Execution Adapters, and Worker Runtime abstractions.
 # Helios Project Progress Log
 
+### PLAYER v0.77.14
+- ✅ Completed: Document getSchema API Parity - Added missing getSchema method to README documentation.
+
 This file serves as a central index. Each agent maintains their own progress file to avoid merge conflicts.
 
 ## Agent Progress Files
