@@ -1,10 +1,11 @@
 ---
 id: PERF-153
 slug: screencast-forced-layout
-status: unclaimed
-claimed_by: ""
+status: complete
+completed: 2024-04-02
+result: failed
+claimed_by: "executor-session"
 created: 2024-04-02
-completed: ""
 result: ""
 ---
 # PERF-153: Screencast with Forced Layout Damage
@@ -63,3 +64,8 @@ Review the output video to verify no duplicate frames or dropped animations.
 ## Prior Art
 - PERF-026: Failed screencast attempt (dropped frames due to lack of damage).
 - PERF-032: Open question in the RENDERER-EXPERIMENTS.md journal regarding this exact forced layout approach.
+## Results Summary
+- **Best render time**: N/A (crash/hang)
+- **Improvement**: N/A
+- **Kept experiments**: None
+- **Discarded experiments**: Replaced `beginFrame` with `startScreencast` and attempted to force damage with `__helios_damage` div. The benchmark hung due to lack of deterministic screencast events.
