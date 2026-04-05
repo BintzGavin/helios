@@ -1,8 +1,9 @@
 ## Performance Trajectory
 Current best: 3.492s (baseline was 3.780s, -7.6%)
-Last updated by: PERF-185
+Last updated by: PERF-187
 
 ## What Works
+- **Target Element BeginFrame Parameter Unrolling** (PERF-187): Refactored the `capture` method in `DomStrategy.ts` to use `async/await` rather than returning a dynamically chained Promise (`.then()`). This avoids allocating multiple anonymous closures per frame on the `targetElementHandle` fallback path, reducing GC pressure and micro-stalls.
 - **Extracting frame capture promise into async helper** (PERF-185): Moved the `captureWorkerFrame` promise chain logic into an `async` function outside the hot loop in `Renderer.ts`. This avoids allocating a new anonymous closure and `Promise.then` wrapper on every single frame, allowing V8 to optimize the function signature. This improved performance by ~7.6%.
 - **Inline parameter construction for `cdpSession.send('HeadlessExperimental.beginFrame')`** (PERF-178): Inlining standard object literals for `cdpSession.send` params instead of pre-allocating an object in the loop avoided local variable overhead and further simplified byte code. The targeted parameters needed to use `as any` to compile without TS errors regarding `clip` instead of passing the object into the screenshot parameter, which V8 optimizes well.
 - Eliminated CDP destructuring and spread operator in hot loop (~X% faster) - PERF-177
