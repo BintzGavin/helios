@@ -1,8 +1,12 @@
 ## Performance Trajectory
+Current best: 32.916s (baseline was 33.6s, -2.0%)
+Last updated by: PERF-127
+
 Current best: 33.331s (baseline was 49.436s, -32.5%)
 Last updated by: PERF-198
 
 ## What Works
+- Removed `await` from `capturePromise` return inside `captureWorkerFrame` hot loop natively allowing V8 promise chaining (PERF-127) (~2.0% faster)
 - Stream base64 string directly to FFmpeg stdin (`PERF-195`): Avoids buffering Base64 string from CDP inside JS before writing to FFmpeg by taking advantage of Node.js string base64 write streaming. Reduced garbage collection of large `Buffer`s. Yielded 33.700s median render time (similar to baseline 33.557s). Kept for reduced GC load.
 - Preallocate Runtime.evaluate Parameters in SeekTimeDriver (`PERF-194`): Improved render time slightly from 33.664s to 33.557s by caching the evaluate parameters object as a class property and mutating its `expression` property inside the `setTime()` hot loop, eliminating continuous object literal allocation for `Runtime.evaluate` calls.
 - Inlining parameters in SeekTimeDriver.ts (`PERF-191`): Improved render time from 49.436s to ~33.664s (~32% faster) by removing dynamic object allocation of params inside `setTime()` hot-loop and explicitly omitting `returnByValue: false`.
@@ -34,6 +38,7 @@ Last updated by: PERF-198
 - **Result**: Reduced contention, improved rendering speed over 34.2s baseline to 33.9s.
 
 ## What Works
+- Removed `await` from `capturePromise` return inside `captureWorkerFrame` hot loop natively allowing V8 promise chaining (PERF-127) (~2.0% faster)
 - Eliminated `.then()` closure in Renderer.ts capture loop to reduce GC pressure (~1% faster, PERF-192)
 - **PERF-197**: Replaced dynamic format mapping with static image2pipe. Kept because it improved performance by eliminating demuxer probing overhead.
 - **PERF-198**: Optimized FFmpeg stream throughput by increasing the `-thread_queue_size` flag to `1024` on the input pipe in `DomStrategy.ts`. The NodeJS event loop was originally blocking while waiting for FFmpeg to drain `stdin` sequentially. This parameter unblocked Node.js writes, avoided the `bitstream truncated in mjpeg_decode_scan_progressive_ac` and `component 0 is incomplete` errors, and improved render time from 33.5s to 33.331s.
