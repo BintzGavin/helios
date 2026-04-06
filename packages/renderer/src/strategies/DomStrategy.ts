@@ -16,11 +16,12 @@ export class DomStrategy implements RenderStrategy {
   private discoveredAudioTracks: AudioTrackConfig[] = [];
   private cleanupAudio: () => Promise<void> | void = () => {};
   private cdpSession: CDPSession | null = null;
-  private lastFrameBuffer: Buffer | null = null;
+  private lastFrameData: Buffer | string | null = null;
   private cdpScreenshotParams: any = null;
   private beginFrameParams: any = null;
   private targetElementHandle: any = null;
   private emptyImageBuffer: Buffer = EMPTY_IMAGE_BUFFER;
+  private emptyImageBase64: string = "";
   private frameInterval: number = 0;
 
   constructor(private options: RendererOptions) {
@@ -138,12 +139,15 @@ export class DomStrategy implements RenderStrategy {
     // Set format-appropriate empty buffer
     if (format === 'jpeg') {
         // 1x1 JPEG pixel
-        this.emptyImageBuffer = Buffer.from('/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAP//////////////////////////////////////////////////////////////////////////////////////wgALCAABAAEBAREA/8QAFBABAAAAAAAAAAAAAAAAAAAAAP/aAAgBAQABPxA=', 'base64');
+        this.emptyImageBase64 = '/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAP//////////////////////////////////////////////////////////////////////////////////////wgALCAABAAEBAREA/8QAFBABAAAAAAAAAAAAAAAAAAAAAP/aAAgBAQABPxA=';
+        this.emptyImageBuffer = Buffer.from(this.emptyImageBase64, 'base64');
     } else if (format === 'webp') {
         // 1x1 WEBP pixel
-        this.emptyImageBuffer = Buffer.from('UklGRhoAAABXRUJQVlA4TA0AAAAvAAAAEAcQERGIiP4HAA==', 'base64');
+        this.emptyImageBase64 = 'UklGRhoAAABXRUJQVlA4TA0AAAAvAAAAEAcQERGIiP4HAA==';
+        this.emptyImageBuffer = Buffer.from(this.emptyImageBase64, 'base64');
     } else {
         // Default to PNG
+        this.emptyImageBase64 = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=";
         this.emptyImageBuffer = EMPTY_IMAGE_BUFFER;
     }
 
@@ -175,7 +179,7 @@ export class DomStrategy implements RenderStrategy {
 
   }
 
-  async capture(page: Page, frameTime: number): Promise<Buffer> {
+  async capture(page: Page, frameTime: number): Promise<Buffer | string> {
     if (this.targetElementHandle) {
       const box = await this.targetElementHandle.boundingBox();
       if (box) {
@@ -191,32 +195,30 @@ export class DomStrategy implements RenderStrategy {
           frameTimeTicks: 10000 + frameTime
         } as any);
         if (res && res.screenshotData) {
-          const buffer = Buffer.from(res.screenshotData, 'base64');
-          this.lastFrameBuffer = buffer;
-          return buffer;
-        } else if (this.lastFrameBuffer) {
-          return this.lastFrameBuffer;
+          this.lastFrameData = res.screenshotData;
+          return res.screenshotData;
+        } else if (this.lastFrameData) {
+          return this.lastFrameData;
         } else {
-          this.lastFrameBuffer = this.emptyImageBuffer;
-          return this.emptyImageBuffer;
+          this.lastFrameData = this.emptyImageBase64;
+          return this.emptyImageBase64;
         }
       }
       const fallback = await this.targetElementHandle.screenshot((this as any).fallbackScreenshotOptions);
-      this.lastFrameBuffer = fallback as Buffer;
+      this.lastFrameData = fallback as Buffer;
       return fallback as Buffer;
     }
 
     this.beginFrameParams.frameTimeTicks = 10000 + frameTime;
     const res = await this.cdpSession!.send('HeadlessExperimental.beginFrame', this.beginFrameParams);
     if (res && res.screenshotData) {
-      const buffer = Buffer.from(res.screenshotData, 'base64');
-      this.lastFrameBuffer = buffer;
-      return buffer;
-    } else if (this.lastFrameBuffer) {
-      return this.lastFrameBuffer;
+      this.lastFrameData = res.screenshotData;
+      return res.screenshotData;
+    } else if (this.lastFrameData) {
+      return this.lastFrameData;
     } else {
-      this.lastFrameBuffer = this.emptyImageBuffer;
-      return this.emptyImageBuffer;
+      this.lastFrameData = this.emptyImageBase64;
+      return this.emptyImageBase64;
     }
   }
 

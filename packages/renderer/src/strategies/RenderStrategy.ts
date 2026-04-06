@@ -23,7 +23,7 @@ export interface RenderStrategy {
    * @param frameTime The time in milliseconds to capture.
    * @returns A Promise that resolves to a Buffer containing the image data.
    */
-  capture(page: Page, frameTime: number): Promise<Buffer>;
+  capture(page: Page, frameTime: number): Promise<Buffer | string>;
 
   /**
    * Finishes the rendering process.
@@ -32,7 +32,7 @@ export interface RenderStrategy {
    * @param page The Playwright page instance.
    * @returns A Promise that resolves to a Buffer containing any remaining data, or void.
    */
-  finish(page: Page): Promise<Buffer | void>;
+  finish(page: Page): Promise<Buffer | string | void>;
 
   /**
    * Returns the full FFmpeg arguments for this strategy.
