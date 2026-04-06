@@ -319,7 +319,7 @@ export class Renderer {
 
                   // Keep a lightweight catch handler to prevent unhandled promise rejections
                   // on the final frame assigned to a worker
-                  worker.activePromise = framePromise.catch(noopCatch) as Promise<void>;
+                  worker.activePromise = framePromise as unknown as Promise<void>;
 
                   framePromises[nextFrameToSubmit] = framePromise;
                   nextFrameToSubmit++;

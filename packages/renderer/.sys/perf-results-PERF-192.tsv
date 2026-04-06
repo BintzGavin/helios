@@ -1,1 +1,4 @@
-1	35.972	150	4.17	38.1	keep	eliminated .then() closure and cached promise array
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	36.210	150	4.14	37.7	keep	eliminated .then() closure and cached promise array
+2	33.808	150	4.44	37.5	keep	eliminated .then() closure and cached promise array
+3	33.951	150	4.42	38.6	keep	eliminated .then() closure and cached promise array

@@ -30,3 +30,6 @@ Last updated by: PERF-194
 ### PERF-196
 - **What**: Replaced Chromium site isolation flags with `--process-per-tab`.
 - **Result**: Reduced contention, improved rendering speed over 34.2s baseline to 33.9s.
+
+## What Works
+- Eliminated `.then()` closure in Renderer.ts capture loop to reduce GC pressure (~1% faster, PERF-192)
