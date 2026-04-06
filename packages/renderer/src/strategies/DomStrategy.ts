@@ -179,6 +179,8 @@ export class DomStrategy implements RenderStrategy {
     if (this.targetElementHandle) {
       const box = await this.targetElementHandle.boundingBox();
       if (box) {
+        // PERF-193: Reusing object is possible here too, but object creation with box clip is more complex and less common.
+        // We optimize the main path first.
         const res = await this.cdpSession!.send('HeadlessExperimental.beginFrame', {
           screenshot: {
             format: this.cdpScreenshotParams.format,
