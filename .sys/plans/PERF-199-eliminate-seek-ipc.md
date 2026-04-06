@@ -1,11 +1,11 @@
 ---
 id: PERF-199
 slug: eliminate-seek-ipc
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-30
-completed: ""
-result: ""
+completed: "2024-05-30"
+result: "discarded"
 ---
 
 # PERF-199: Eliminate SeekTimeDriver IPC Overhead
@@ -56,3 +56,9 @@ Run the standard benchmark and manually inspect the output mp4 to ensure the ani
 ## Prior Art
 - PERF-194 (Preallocate evaluate objects) targeted this exact same bottleneck.
 - PERF-184 (Replace startScreencast with beginFrame) established synchronous DOM frame captures.
+
+## Results Summary
+- **Best render time**: 35.091s (vs baseline 33.331s)
+- **Improvement**: -5.2%
+- **Kept experiments**: []
+- **Discarded experiments**: [Eliminate SeekTimeDriver IPC via rAF synchronous evaluate hook]
