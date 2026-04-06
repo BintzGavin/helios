@@ -1,0 +1,3 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	44.607	150	3.36	40.2	keep	baseline
+2	35.568	150	4.22	38.6	keep	replace image2pipe
