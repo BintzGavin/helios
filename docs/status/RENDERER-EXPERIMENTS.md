@@ -19,3 +19,6 @@ Last updated by: PERF-189
 - PERF-182: Increase Pipeline Depth to Improve Frame Capture Throughput. Failed. Did not improve performance over the baseline. The reason is likely due to Node memory limits resulting in hanging the process.
 - PERF-183: Decrease Pipeline Depth to Improve Frame Capture Stability. Failed. Did not improve performance over the baseline. The reason is likely due to the pipeline stalling and not making progress because Playwright/CDP event handlers are not properly yielding or managing the IPC message queue, preventing `capture()` from completing and returning frames to the FFmpeg stdin stream within the timeout.
 - PERF-153: Replaced `HeadlessExperimental.beginFrame` with `Page.startScreencast` and attempted to force damage with `__helios_damage` div toggle. The benchmark hung during capture due to lack of deterministic screencast events or misaligned frame timing.
+## What Doesn't Work (and Why)
+- Removed `this.cdpSession` checks in `DomStrategy.ts` hot loop (PERF-190).
+  - **Why it didn't work**: Removing the explicit truthiness checks and fallbacks did not improve render time (actually degraded from ~33.9s to ~35.7s). V8's branch predictor likely optimizes the repeated truthy checks efficiently enough that removing them has negligible benefit, and the execution of the CDP session send itself dominates the time.
