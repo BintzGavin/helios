@@ -243,6 +243,7 @@ export class DomStrategy implements RenderStrategy {
     const videoInputArgs = [
       '-f', inputFormat,
       '-framerate', `${options.fps}`,
+      '-thread_queue_size', '1024',
       '-i', '-',
     ];
 
