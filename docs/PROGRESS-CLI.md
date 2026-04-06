@@ -1,3 +1,6 @@
+## CLI v0.46.3
+- ✅ Completed: Scaffold Hetzner Deployment Command - Verified existing implementation of helios deploy hetzner command fulfills the scaffolding requirements.
+
 ## CLI v0.46.1
 - ✅ Completed: All Worker Execution - Added missing --docker-args to Docker execution adapter
 
