@@ -35,3 +35,4 @@ Last updated by: PERF-194
 
 ## What Works
 - Eliminated `.then()` closure in Renderer.ts capture loop to reduce GC pressure (~1% faster, PERF-192)
+- **PERF-197**: Replaced dynamic format mapping with static image2pipe. Kept because it improved performance by eliminating demuxer probing overhead.

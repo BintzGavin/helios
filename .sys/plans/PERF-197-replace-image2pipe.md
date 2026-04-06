@@ -1,11 +1,11 @@
 ---
 id: PERF-197
 slug: replace-image2pipe
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-04-06
-completed: ""
-result: ""
+completed: 2024-04-06
+result: improved
 ---
 PERF-197: Replace image2pipe input with parallel raw base64 frame pushes and `-f webp_pipe`
 
@@ -66,3 +66,8 @@ Run the `dom` verify script to ensure the resulting mp4 is playable and correct.
 
 Prior Art
 N/A
+Results Summary
+- Best render time: 35.568s (vs baseline 44.607s)
+- Improvement: 20.3%
+- Kept experiments: [replace-image2pipe]
+- Discarded experiments: []
