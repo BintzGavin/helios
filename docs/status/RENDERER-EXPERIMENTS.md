@@ -1,8 +1,9 @@
 ## Performance Trajectory
-Current best: 3.492s (baseline was 3.780s, -7.6%)
-Last updated by: PERF-189
+Current best: 33.664s (baseline was 49.436s, -31.9%)
+Last updated by: PERF-191
 
 ## What Works
+- Inlining parameters in SeekTimeDriver.ts (`PERF-191`): Improved render time from 49.436s to ~33.664s (~32% faster) by removing dynamic object allocation of params inside `setTime()` hot-loop and explicitly omitting `returnByValue: false`.
 - **Cache HeadlessExperimental.beginFrame Parameters** (PERF-189): Pre-allocated the `screenshot` configuration object in `DomStrategy.ts` to avoid V8 allocating nested object literals on every frame. This reduced GC pressure and micro-stalls in the hot loop.
 - **Cache Page Frames Array in Time Drivers to Eliminate Per-Frame Allocation Overhead** (PERF-188): Cached `page.frames()` and `page.mainFrame()` in `SeekTimeDriver` and `CdpTimeDriver` inside `packages/renderer/src/drivers/`. Since the Playwright Node.js client's `page.frames()` method constructs and returns a new Array by traversing its internal frame tree, calling it repeatedly 60 times per second per parallel worker forced continuous Array allocation and subsequent garbage collection. Caching the array structure dramatically reduced micro-stalls and object allocations during rendering.
 - **Target Element BeginFrame Parameter Unrolling** (PERF-187): Refactored the `capture` method in `DomStrategy.ts` to use `async/await` rather than returning a dynamically chained Promise (`.then()`). This avoids allocating multiple anonymous closures per frame on the `targetElementHandle` fallback path, reducing GC pressure and micro-stalls.

@@ -250,12 +250,10 @@ export class SeekTimeDriver implements TimeDriver {
     const frames = this.cachedFrames;
 
     if (frames.length === 1) {
-      const params = {
+      return this.cdpSession!.send('Runtime.evaluate', {
         expression: `window.__helios_seek(${timeInSeconds}, ${this.timeout})`,
-        awaitPromise: true,
-        returnByValue: false
-      };
-      return this.cdpSession!.send('Runtime.evaluate', params) as Promise<any>;
+        awaitPromise: true
+      }) as Promise<any>;
     }
 
     const promises: Promise<any>[] = new Array(frames.length);
@@ -263,12 +261,10 @@ export class SeekTimeDriver implements TimeDriver {
     for (let i = 0; i < frames.length; i++) {
       const frame = frames[i];
       if (frame === this.cachedMainFrame) {
-        const params = {
+        promises[i] = this.cdpSession!.send('Runtime.evaluate', {
           expression: `window.__helios_seek(${timeInSeconds}, ${this.timeout})`,
-          awaitPromise: true,
-          returnByValue: false
-        };
-        promises[i] = this.cdpSession!.send('Runtime.evaluate', params);
+          awaitPromise: true
+        });
       } else {
         promises[i] = frame.evaluate(
           ([t, timeoutMs]) => { (window as any).__helios_seek(t, timeoutMs); },

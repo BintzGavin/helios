@@ -1,11 +1,11 @@
 ---
 id: PERF-191
 slug: inline-seektimedriver-params
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-05-29
-completed: ""
-result: ""
+completed: "2024-05-29"
+result: "improved"
 ---
 
 PERF-191: Inline Parameters in SeekTimeDriver.setTime
@@ -52,3 +52,9 @@ npx tsx packages/renderer/tests/fixtures/benchmark.ts (with dom mode active).
 Prior Art
 - PERF-178: Inline parameters in DomStrategy.ts
 - PERF-180: Failed inline approach (this revision is simplified to avoid complex type casting that may trigger de-opts).
+
+## Results Summary
+- **Best render time**: 33.664s (vs baseline 49.436s)
+- **Improvement**: 31.9%
+- **Kept experiments**: Inlining params in SeekTimeDriver and omitting `returnByValue: false`
+- **Discarded experiments**: None
