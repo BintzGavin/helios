@@ -10,6 +10,7 @@ export class SeekTimeDriver implements TimeDriver {
   private cachedFrames: import('playwright').Frame[] = [];
   private cachedMainFrame: import('playwright').Frame | null = null;
   private cachedPromises: Promise<any>[] = [];
+  private evaluateParams = { expression: '', awaitPromise: true };
 
   constructor(private timeout: number = 30000) {}
 
@@ -249,12 +250,10 @@ export class SeekTimeDriver implements TimeDriver {
 
   setTime(page: Page, timeInSeconds: number): Promise<void> {
     const frames = this.cachedFrames;
+    this.evaluateParams.expression = `window.__helios_seek(${timeInSeconds}, ${this.timeout})`;
 
     if (frames.length === 1) {
-      return this.cdpSession!.send('Runtime.evaluate', {
-        expression: `window.__helios_seek(${timeInSeconds}, ${this.timeout})`,
-        awaitPromise: true
-      }) as Promise<any>;
+      return this.cdpSession!.send('Runtime.evaluate', this.evaluateParams) as Promise<any>;
     }
 
     if (this.cachedPromises.length !== frames.length) {
@@ -265,10 +264,7 @@ export class SeekTimeDriver implements TimeDriver {
     for (let i = 0; i < frames.length; i++) {
       const frame = frames[i];
       if (frame === this.cachedMainFrame) {
-        promises[i] = this.cdpSession!.send('Runtime.evaluate', {
-          expression: `window.__helios_seek(${timeInSeconds}, ${this.timeout})`,
-          awaitPromise: true
-        });
+        promises[i] = this.cdpSession!.send('Runtime.evaluate', this.evaluateParams);
       } else {
         promises[i] = frame.evaluate(
           ([t, timeoutMs]) => { (window as any).__helios_seek(t, timeoutMs); },
