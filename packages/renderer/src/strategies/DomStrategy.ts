@@ -18,6 +18,7 @@ export class DomStrategy implements RenderStrategy {
   private cdpSession: CDPSession | null = null;
   private lastFrameBuffer: Buffer | null = null;
   private cdpScreenshotParams: any = null;
+  private beginFrameParams: any = null;
   private targetElementHandle: any = null;
   private emptyImageBuffer: Buffer = EMPTY_IMAGE_BUFFER;
   private frameInterval: number = 0;
@@ -150,6 +151,12 @@ export class DomStrategy implements RenderStrategy {
     // Actually fallback is used in capture when CDP is unavailable. Let's add it to this.
     (this as any).fallbackScreenshotOptions = screenshotOptions;
 
+    this.beginFrameParams = {
+      screenshot: this.cdpScreenshotParams,
+      interval: this.frameInterval,
+      frameTimeTicks: 0
+    };
+
     if (this.options.targetSelector) {
       const handle = await page.evaluateHandle((args) => {
         // @ts-ignore
@@ -197,11 +204,8 @@ export class DomStrategy implements RenderStrategy {
       return fallback as Buffer;
     }
 
-    const res = await this.cdpSession!.send('HeadlessExperimental.beginFrame', {
-      screenshot: this.cdpScreenshotParams,
-      interval: this.frameInterval,
-      frameTimeTicks: 10000 + frameTime
-    } as any);
+    this.beginFrameParams.frameTimeTicks = 10000 + frameTime;
+    const res = await this.cdpSession!.send('HeadlessExperimental.beginFrame', this.beginFrameParams);
     if (res && res.screenshotData) {
       const buffer = Buffer.from(res.screenshotData, 'base64');
       this.lastFrameBuffer = buffer;
