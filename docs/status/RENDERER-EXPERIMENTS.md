@@ -2,7 +2,7 @@
 Current best: 32.916s (baseline was 33.6s, -2.0%)
 Last updated by: PERF-127
 
-Current best: 33.331s (baseline was 49.436s, -32.5%)
+Current best: 35.091s (baseline was 49.436s, -32.5%)
 Last updated by: PERF-198
 
 ## What Works
@@ -21,6 +21,7 @@ Last updated by: PERF-198
 - **Replace startScreencast with beginFrame in DomStrategy** (PERF-184): Replaced the damage-driven `Page.startScreencast` capture approach with synchronous `HeadlessExperimental.beginFrame` for the full-page DOM fallback. Improved render time to ~6.6s.
 
 ## What Doesn't Work (and Why)
+- **Eliminate SeekTimeDriver IPC** (PERF-199): Hooked rAF to evaluate __helios_seek inline in browser rather than Node CDP per frame. Render time was 35.091s, which is slower than the 33.331s baseline, so it was discarded.
 - Replace image2pipe (`PERF-197`): Update the -f flag for the video input from image2pipe to the format dynamically corresponding to this.cdpScreenshotParams.format. Did not improve render time, actually degraded from ~33.5s to 34.2s. Bypassing FFmpeg probing heuristics dynamically provided no real-world gain, suggesting pipe format parsing overhead in FFmpeg is not the bottleneck or node writable stream handles image2pipe identically well.
 - PERF-180: Inline parameters in SeekTimeDriver. Inlined parameters in the cdpSession.send. Did not improve performance over the baseline, resulting in 14.631s vs baseline 3.993s. The reason is likely due to V8 having already cached object types efficiently in earlier optimization phases or the difference being imperceptible against IPC overhead, coupled with unexpected regression overhead from garbage collection handling of intermediate anonymous objects in `Promises[i]`.
 - PERF-181: Streamlined screencast capture (hangs on beginFrame substitution). `startScreencast` does not provide synchronous, deterministic frame guarantees like `beginFrame`. The reliance on `window.__helios_damage` to force screencast emissions fails to reliably queue frames, causing the pipeline to starve and deadlock while waiting for the next pushed frame in `capture()`.
