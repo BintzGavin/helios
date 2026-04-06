@@ -132,6 +132,7 @@ The `<helios-player>` element implements a subset of the HTMLMediaElement interf
 
 - `play(): Promise<void>` - Starts playback.
 - `getSchema(): Promise<HeliosSchema | undefined>` - Retrieves the input properties schema from the composition.
+- `getSchema(): Promise<HeliosSchema | undefined>` - Retrieves the input properties schema from the composition.
 - `pause(): void` - Pauses playback.
 - `load(): void` - Reloads the iframe (useful if `src` changed or to retry connection).
 - `addTextTrack(kind: string, label?: string, language?: string): TextTrack` - Adds a new text track to the media element.
