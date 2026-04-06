@@ -1,3 +1,4 @@
+// @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { ClientSideExporter } from './exporter';
 import { HeliosController } from '../controllers';
@@ -119,6 +120,10 @@ if (typeof URL.createObjectURL === 'undefined') {
     vi.spyOn(URL, 'createObjectURL').mockReturnValue('blob:mock');
     vi.spyOn(URL, 'revokeObjectURL');
 }
+
+/**
+ * @vitest-environment jsdom
+ */
 
 describe('ClientSideExporter', () => {
     let mockController: HeliosController;

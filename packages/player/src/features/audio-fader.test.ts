@@ -1,3 +1,4 @@
+// @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { AudioFader } from './audio-fader';
 import { SharedAudioContextManager } from './audio-context-manager';
@@ -23,6 +24,10 @@ vi.mock('./audio-context-manager', () => {
     SharedAudioSource: vi.fn(),
   };
 });
+
+/**
+ * @vitest-environment jsdom
+ */
 
 describe('AudioFader', () => {
   let fader: AudioFader;

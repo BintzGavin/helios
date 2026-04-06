@@ -1,3 +1,4 @@
+// @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { HeliosPlayer } from './index';
 import type { HeliosController } from './controllers';
