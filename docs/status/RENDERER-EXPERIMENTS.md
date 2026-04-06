@@ -3,6 +3,7 @@ Current best: 33.557s (baseline was 49.436s, -32.1%)
 Last updated by: PERF-194
 
 ## What Works
+- Stream base64 string directly to FFmpeg stdin (`PERF-195`): Avoids buffering Base64 string from CDP inside JS before writing to FFmpeg by taking advantage of Node.js string base64 write streaming. Reduced garbage collection of large `Buffer`s. Yielded 33.700s median render time (similar to baseline 33.557s). Kept for reduced GC load.
 - Preallocate Runtime.evaluate Parameters in SeekTimeDriver (`PERF-194`): Improved render time slightly from 33.664s to 33.557s by caching the evaluate parameters object as a class property and mutating its `expression` property inside the `setTime()` hot loop, eliminating continuous object literal allocation for `Runtime.evaluate` calls.
 - Inlining parameters in SeekTimeDriver.ts (`PERF-191`): Improved render time from 49.436s to ~33.664s (~32% faster) by removing dynamic object allocation of params inside `setTime()` hot-loop and explicitly omitting `returnByValue: false`.
 - **Cache HeadlessExperimental.beginFrame Parameters** (PERF-189): Pre-allocated the `screenshot` configuration object in `DomStrategy.ts` to avoid V8 allocating nested object literals on every frame. This reduced GC pressure and micro-stalls in the hot loop.

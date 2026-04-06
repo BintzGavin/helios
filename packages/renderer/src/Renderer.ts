@@ -270,7 +270,7 @@ export class Renderer {
       try {
         const captureLoop = async () => {
           let previousWritePromise: Promise<void> | undefined;
-          let framePromises: Promise<Buffer>[] = new Array(totalFrames);
+          let framePromises: Promise<Buffer | string>[] = new Array(totalFrames);
 
           // To maximize parallel page utilization, we need to decouple frame production from writing
           // such that multiple workers can be evaluating frames concurrently.
@@ -282,7 +282,7 @@ export class Renderer {
               }
           };
 
-          const captureWorkerFrame = async (activePromise: Promise<void>, timeDriver: TimeDriver, page: import('playwright').Page, strategy: RenderStrategy, compositionTimeInSeconds: number, time: number): Promise<Buffer> => {
+          const captureWorkerFrame = async (activePromise: Promise<void>, timeDriver: TimeDriver, page: import('playwright').Page, strategy: RenderStrategy, compositionTimeInSeconds: number, time: number): Promise<Buffer | string> => {
               try {
                   await activePromise;
               } catch (e) {
@@ -347,7 +347,12 @@ export class Renderer {
                  throw new Error('FFmpeg stdin is not writable');
               }
 
-              const canWriteMore = ffmpegProcess.stdin.write(buffer, onWriteError);
+              let canWriteMore: boolean;
+              if (typeof buffer === 'string') {
+                  canWriteMore = ffmpegProcess.stdin.write(buffer, 'base64', onWriteError);
+              } else {
+                  canWriteMore = ffmpegProcess.stdin.write(buffer, onWriteError);
+              }
 
               if (!canWriteMore) {
                   const ac = new AbortController();
@@ -382,13 +387,18 @@ export class Renderer {
 
           console.log('Finishing render strategy...');
           const finalBuffer = await pool[0].strategy.finish(pool[0].page);
-          if (finalBuffer && Buffer.isBuffer(finalBuffer) && finalBuffer.length > 0) {
-            console.log(`Writing final buffer of ${finalBuffer.length} bytes...`);
+          if (finalBuffer && ((Buffer.isBuffer(finalBuffer) && finalBuffer.length > 0) || (typeof finalBuffer === 'string' && finalBuffer.length > 0))) {
+            console.log(`Writing final buffer...`);
             if (!ffmpegProcess.stdin.writable) {
                throw new Error('FFmpeg stdin is not writable');
             }
 
-            const canWriteMore = ffmpegProcess.stdin.write(finalBuffer, onWriteError);
+            let canWriteMore: boolean;
+            if (typeof finalBuffer === 'string') {
+                canWriteMore = ffmpegProcess.stdin.write(finalBuffer, 'base64', onWriteError);
+            } else {
+                canWriteMore = ffmpegProcess.stdin.write(finalBuffer, onWriteError);
+            }
 
             if (!canWriteMore) {
                 const ac = new AbortController();
