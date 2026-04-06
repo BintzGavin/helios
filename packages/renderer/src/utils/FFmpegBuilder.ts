@@ -267,6 +267,8 @@ export class FFmpegBuilder {
 
       if (options.preset) {
         finalArgs.push('-preset', options.preset);
+      } else if (videoCodec === 'libx264' || videoCodec === 'libx265') {
+        finalArgs.push('-preset', 'ultrafast');
       }
 
       if (options.videoBitrate) {
