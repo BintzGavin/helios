@@ -1,0 +1,5 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	35.468	150	4.23	37.8	keep	baseline
+2	33.759	150	4.44	37.7	keep	optimize beginFrame literal initialization
+3	33.959	150	4.42	39.3	keep	optimize beginFrame literal initialization
+4	33.778	150	4.44	39.2	keep	optimize beginFrame literal initialization
