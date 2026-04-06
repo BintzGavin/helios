@@ -1,7 +1,7 @@
 ---
 id: PERF-196
 slug: process-per-tab
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-06-01
 completed: ""
@@ -43,3 +43,8 @@ Run `npx tsx packages/renderer/tests/verify-cdp-driver.ts` to ensure CDP communi
 
 ## Prior Art
 PERF-158 previously disabled site isolation to reduce overhead, but failed to account for multi-page lock contention in a concurrent worker pool architecture.
+## Results Summary
+- **Best render time**: 33.929s (vs baseline ~34.2s)
+- **Improvement**: ~1%
+- **Kept experiments**: Process per tab isolation
+- **Discarded experiments**: None
