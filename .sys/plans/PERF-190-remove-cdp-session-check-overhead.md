@@ -1,11 +1,11 @@
 ---
 id: PERF-190
 slug: remove-cdp-session-check-overhead
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2026-04-06
 completed: ""
-result: ""
+result: failed
 ---
 
 # PERF-190: Remove CDP Session Check Overhead in DomStrategy Hot Loop
@@ -67,3 +67,8 @@ Run the renderer benchmark script `npx tsx packages/renderer/tests/fixtures/benc
 
 ## Canvas Smoke Test
 Run `npx tsx packages/renderer/tests/verify-canvas-strategy.ts` to ensure Canvas mode still works properly.
+
+## Results Summary
+- **Best render time**: 35.690 (vs baseline 33.9s)
+- **Improvement**: N/A (Degradation)
+- **Discarded experiments**: Removed this.cdpSession checks in DomStrategy

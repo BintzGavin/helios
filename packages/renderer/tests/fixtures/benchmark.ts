@@ -12,7 +12,7 @@ async function runBenchmark() {
         targetSelector: 'body'
     });
 
-    const compositionUrl = 'file:///app/output/example-build/examples/simple-animation/composition.html';
+    const compositionUrl = 'file:///app/examples/simple-animation/composition.html';
     const outputPath = path.resolve(process.cwd(), 'dom-animation.mp4');
 
     await renderer.render(compositionUrl, outputPath);
