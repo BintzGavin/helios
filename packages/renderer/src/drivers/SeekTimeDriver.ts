@@ -9,6 +9,7 @@ export class SeekTimeDriver implements TimeDriver {
   private cdpSession: CDPSession | null = null;
   private cachedFrames: import('playwright').Frame[] = [];
   private cachedMainFrame: import('playwright').Frame | null = null;
+  private cachedPromises: Promise<any>[] = [];
 
   constructor(private timeout: number = 30000) {}
 
@@ -256,7 +257,10 @@ export class SeekTimeDriver implements TimeDriver {
       }) as Promise<any>;
     }
 
-    const promises: Promise<any>[] = new Array(frames.length);
+    if (this.cachedPromises.length !== frames.length) {
+      this.cachedPromises = new Array(frames.length);
+    }
+    const promises = this.cachedPromises;
 
     for (let i = 0; i < frames.length; i++) {
       const frame = frames[i];
