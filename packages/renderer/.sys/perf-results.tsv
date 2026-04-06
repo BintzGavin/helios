@@ -283,3 +283,4 @@ PERF-158	33.613	150	4.45	0	keep	Median changed from 33.859 to 33.613
 30	33.700	150	4.45	37.7	keep	stream base64 string directly to FFmpeg stdin
 1	33.929	150	4.42	37.8	keep	Re-enabled process-per-tab
 8	35.091	150	4.27	37.3	discard	Eliminate SeekTimeDriver IPC via rAF synchronous evaluate hook
+2	33.749	150	4.44	37.8	keep	ultrafast preset for libx264
