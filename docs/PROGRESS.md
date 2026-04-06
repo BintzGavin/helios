@@ -470,3 +470,5 @@ Each agent should update **their own dedicated progress file** instead of this f
 
 ### STUDIO v0.120.5
 - ✅ Completed: Timeline Drag & Drop - Verified existing handleDrop implementation and added unit test for asset drop functionality.
+### PLAYER v0.77.10
+- ✅ Verified: getSchema API method is already documented in README.md.
