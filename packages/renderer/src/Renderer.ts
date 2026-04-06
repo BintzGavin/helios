@@ -283,7 +283,11 @@ export class Renderer {
           };
 
           const captureWorkerFrame = async (activePromise: Promise<void>, timeDriver: TimeDriver, page: import('playwright').Page, strategy: RenderStrategy, compositionTimeInSeconds: number, time: number): Promise<Buffer> => {
-              await activePromise;
+              try {
+                  await activePromise;
+              } catch (e) {
+                  // ignore
+              }
               timeDriver.setTime(page, compositionTimeInSeconds).then(undefined, noopCatch);
               return strategy.capture(page, time);
           };
@@ -314,8 +318,9 @@ export class Renderer {
 
                   const framePromise = captureWorkerFrame(worker.activePromise, worker.timeDriver, worker.page, worker.strategy, compositionTimeInSeconds, time);
 
-                  // Add a no-op catch handler to prevent unhandled promise rejections on abort/error
-                  worker.activePromise = framePromise.then(undefined, noopCatch) as Promise<void>;
+                  // Keep a lightweight catch handler to prevent unhandled promise rejections
+                  // on the final frame assigned to a worker
+                  worker.activePromise = framePromise.catch(noopCatch) as Promise<void>;
 
                   framePromises[nextFrameToSubmit] = framePromise;
                   nextFrameToSubmit++;
