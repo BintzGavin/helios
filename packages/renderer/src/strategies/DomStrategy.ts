@@ -229,8 +229,19 @@ export class DomStrategy implements RenderStrategy {
   }
 
   getFFmpegArgs(options: RendererOptions, outputPath: string): FFmpegConfig {
+    let inputFormat = 'image2pipe';
+    const format = this.cdpScreenshotParams?.format || 'png';
+
+    if (format === 'webp') {
+      inputFormat = 'webp_pipe';
+    } else if (format === 'jpeg') {
+      inputFormat = 'mjpeg';
+    } else if (format === 'png') {
+       inputFormat = 'image2pipe';
+    }
+
     const videoInputArgs = [
-      '-f', 'image2pipe',
+      '-f', inputFormat,
       '-framerate', `${options.fps}`,
       '-i', '-',
     ];
