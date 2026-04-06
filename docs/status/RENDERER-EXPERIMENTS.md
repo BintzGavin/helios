@@ -27,3 +27,6 @@ Last updated by: PERF-194
   - **Why it didn't work**: Removing the explicit truthiness checks and fallbacks did not improve render time (actually degraded from ~33.9s to ~35.7s). V8's branch predictor likely optimizes the repeated truthy checks efficiently enough that removing them has negligible benefit, and the execution of the CDP session send itself dominates the time.
 - **PERF-192**: Eliminated `.then()` closure in `Renderer.ts` and cached promise array in `SeekTimeDriver.ts`. The test passed correctness and the performance was 35.972 s. The closures were refactored into a native `try...catch` to avoid heavy dynamic garbage collection on a per-frame basis, and the SeekTimeDriver avoids array allocations for frames.
 - Optimize beginFrame literal initialization in DomStrategy (`PERF-193`): Improved render time slightly from 35.468s to ~33.7s by caching the beginFrame parameters object as a class property and mutating its `frameTimeTicks` property inside the `capture()` hot loop, eliminating continuous object literal allocation for `HeadlessExperimental.beginFrame` calls.
+### PERF-196
+- **What**: Replaced Chromium site isolation flags with `--process-per-tab`.
+- **Result**: Reduced contention, improved rendering speed over 34.2s baseline to 33.9s.
