@@ -1,3 +1,4 @@
+// @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { DirectController, BridgeController } from './controllers';
 import { Helios } from '@helios-project/core';

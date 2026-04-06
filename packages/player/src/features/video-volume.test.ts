@@ -1,9 +1,14 @@
+// @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { getAudioAssets } from './audio-utils';
 
 // Mock fetch
 const fetchMock = vi.fn();
 global.fetch = fetchMock;
+
+/**
+ * @vitest-environment jsdom
+ */
 
 describe('getAudioAssets - Video Volume', () => {
     beforeEach(() => {

@@ -22,3 +22,6 @@
 ## [v0.77.12] - Bridge Coverage Limitations
 **Learning:** Attempting to force missing parameter boundaries onto the `bridge.ts` message listener improves branch coverage, but highlights that the true source of validation should be on the core `Helios` controller side. Testing these defensive checks in `bridge.test.ts` brings the file to 100% coverage, satisfying the objective.
 **Action:** Write tests for the boundaries anyway to achieve the 100% coverage goal.
+## v0.77.15 - Strict Execution of Plans
+**Learning:** Even if a feature like srcObject persistence has been previously completed according to the status file, I must strictly identify the *next uncompleted plan* for my domain and implement it, or create a new plan for an unaddressed vision gap. In this case,  parity was already completed in , so creating another plan for it was incorrect.
+**Action:** Always check  for completed versions to avoid creating duplicate plans. If the latest plan is completed, look for new gaps in the vision.
