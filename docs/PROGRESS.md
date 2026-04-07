@@ -473,3 +473,6 @@ Each agent should update **their own dedicated progress file** instead of this f
 - ✅ Completed: Timeline Drag & Drop - Verified existing handleDrop implementation and added unit test for asset drop functionality.
 ### PLAYER v0.77.10
 - ✅ Verified: getSchema API method is already documented in README.md.
+
+### PLAYER v0.77.15
+- ✅ Completed: Bridge coverage for postMessage expanded and properties verified. Completed plans: 2026-12-25, 2026-12-26, 2027-01-16, 2027-01-08.

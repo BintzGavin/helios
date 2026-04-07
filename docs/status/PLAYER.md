@@ -1,4 +1,4 @@
-**Version**: 0.77.14
+**Version**: 0.77.15
 [v0.77.14] ✅ Completed: Document getSchema API Parity - Added missing getSchema method to README documentation.
 [v0.77.13] 🚫 Blocked: No new plan found in /.sys/plans/ for PLAYER. Waiting for Planner to create the next implementation spec.
 [v0.77.12] ✅ Completed: Bridge Coverage Expansion 2 - Added missing unit test coverage for `bridge.ts` message handling boundary conditions (e.g., `HELIOS_SET_PLAYBACK_RATE` invalid args), achieving 100% coverage.
@@ -201,3 +201,4 @@
 
 [v0.77.10] ✅ Completed: Discovered missing `srcObject` parity logic. Created plan `.sys/plans/2026-11-25-PLAYER-Fix-API-Parity-srcObject.md` to persist assigned `srcObject` values.
 [v0.77.11] ✅ Completed: Fix API Parity srcObject - Updated srcObject getter and setter to persist assigned values internally, improving compatibility with third-party wrappers.
+[v0.77.15] ✅ Verified: Bridge coverage for postMessage expanded and properties verified. Completed plans: 2026-12-25, 2026-12-26, 2027-01-16, 2027-01-08.
