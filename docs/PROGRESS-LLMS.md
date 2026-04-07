@@ -1,5 +1,11 @@
 # LLMS Progress
 
+## LLMS v1.61.0
+- ✅ Completed: Daily llms.txt Review
+  - Updated Roadmap section to include recently completed and verified features.
+  - Added Studio Timeline Drag & Drop, Player getSchema API parity, and Infrastructure Orchestrator Test Coverage.
+  - Verified API examples, package versions, and file paths.
+
 ## LLMS v1.60.0
 - ✅ Completed: Daily llms.txt Review
   - Synced Roadmap features from verified progress logs (Studio Renders Panel Tests, Player Regression Tests, Renderer Orchestrator Plan, CLI deployments).
