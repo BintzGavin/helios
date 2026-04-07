@@ -28,7 +28,6 @@ const DEFAULT_BROWSER_ARGS = [
 
 const GPU_DISABLED_ARGS = [
   '--disable-gpu',
-  '--disable-software-rasterizer',
   '--disable-gpu-compositing',
 ];
 

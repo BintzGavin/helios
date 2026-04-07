@@ -1,11 +1,11 @@
 ---
 id: PERF-208
 slug: enable-software-rasterizer
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2025-02-18
-completed: ""
-result: ""
+completed: 2025-02-23
+result: "improved"
 ---
 # PERF-208: Enable Chromium Software Rasterizer
 
@@ -40,3 +40,9 @@ Run `npx tsx packages/renderer/tests/verify-canvas-strategy.ts` to ensure Canvas
 
 ## Correctness Check
 Run `npx tsx packages/renderer/tests/verify-cdp-driver.ts` to ensure CDP communication remains intact.
+
+## Results Summary
+- **Best render time**: 32.713s (vs baseline 45.461s)
+- **Improvement**: 28%
+- **Kept experiments**: [Removed '--disable-software-rasterizer' from launch arguments]
+- **Discarded experiments**: []
