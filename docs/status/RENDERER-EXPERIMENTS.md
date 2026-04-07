@@ -62,3 +62,11 @@ Last updated by: PERF-200
 - Removed `--disable-software-rasterizer` from `GPU_DISABLED_ARGS` in `packages/renderer/src/core/BrowserPool.ts`. Allowed Chromium to fallback to its software rasterizer (SwiftShader) which provides significant execution speedups in the headless, CPU-bound environment. Reduced rendering time in benchmark from ~45.4s to ~32.7s (~28% improvement).
   - ID: PERF-208
 - [PERF-209] Inline virtual time budget params to reduce GC overhead
+
+## Performance Trajectory
+Current best: 33.156s (baseline was ~32.7s)
+Last updated by: PERF-210
+
+## What Doesn't Work (and Why)
+- Shared BrowserContext for all pages in BrowserPool (PERF-210)
+  - Sharing a single BrowserContext across concurrent workers causes cross-worker contamination or resource contention that breaks the tests (specifically CDP media sync timing and iframe sync tests). While benchmark render time was around 33.156s, the approach fundamentally breaks test assertions.
