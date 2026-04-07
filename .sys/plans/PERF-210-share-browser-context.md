@@ -1,12 +1,18 @@
 ---
 id: PERF-210
 slug: share-browser-context
-status: unclaimed
-claimed_by: ""
+status: claimed
+claimed_by: "executor-session"
 created: 2024-06-03
-completed: ""
-result: ""
+completed: "2024-06-03"
+result: "discarded"
 ---
+
+## Results Summary
+- **Best render time**: 33.156s
+- **Improvement**: N/A (Failed tests)
+- **Kept experiments**: None
+- **Discarded experiments**: Shared BrowserContext across workers
 
 # PERF-210: Share Browser Context
 
