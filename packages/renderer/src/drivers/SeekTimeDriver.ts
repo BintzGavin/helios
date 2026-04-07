@@ -258,14 +258,13 @@ export class SeekTimeDriver implements TimeDriver {
     if (windowRes.result && windowRes.result.objectId) {
       this.callParams.objectId = windowRes.result.objectId;
     }
-    this.callParams.arguments[1].value = this.timeout;
   }
 
   setTime(page: Page, timeInSeconds: number): Promise<void> {
     const frames = this.cachedFrames;
 
     if (frames.length === 1 && this.callParams.objectId) {
-      this.callParams.arguments[0].value = timeInSeconds;
+      this.callParams.arguments = [{ value: timeInSeconds }, { value: this.timeout }];
       return this.cdpSession!.send('Runtime.callFunctionOn', this.callParams) as Promise<any>;
     }
 
