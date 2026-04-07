@@ -1,7 +1,7 @@
 ---
 id: PERF-211
 slug: disable-chromium-features
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-06-03
 completed: ""

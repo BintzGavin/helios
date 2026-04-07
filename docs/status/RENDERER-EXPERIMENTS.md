@@ -70,3 +70,7 @@ Last updated by: PERF-210
 ## What Doesn't Work (and Why)
 - Shared BrowserContext for all pages in BrowserPool (PERF-210)
   - Sharing a single BrowserContext across concurrent workers causes cross-worker contamination or resource contention that breaks the tests (specifically CDP media sync timing and iframe sync tests). While benchmark render time was around 33.156s, the approach fundamentally breaks test assertions.
+
+## What Works
+- **PERF-211**: Disabled `AudioServiceOutOfProcess` and `PaintHolding` to reduce Chromium memory/context switching footprint.
+  - **Why it didn't work**: Did not improve render time (regressed from ~32.7s to 47.938s). The change may have removed optimizations built into Chromium's default multiprocess architecture or caused unexpected stalling in the CPU-bound environment.
