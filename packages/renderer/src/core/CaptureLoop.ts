@@ -1,0 +1,173 @@
+import { once } from 'events';
+import { WorkerInfo } from './BrowserPool.js';
+import { FFmpegManager } from './FFmpegManager.js';
+import { RendererOptions, RenderJobOptions } from '../types.js';
+import { RenderStrategy } from '../strategies/RenderStrategy.js';
+import { TimeDriver } from '../drivers/TimeDriver.js';
+
+export class CaptureLoop {
+  constructor(
+    private options: RendererOptions,
+    private pool: WorkerInfo[],
+    private ffmpegManager: FFmpegManager,
+    private totalFrames: number,
+    private startFrame: number,
+    private capturedErrors: Error[],
+    private jobOptions?: RenderJobOptions
+  ) {}
+
+  public async run(): Promise<void> {
+    const fps = this.options.fps;
+    const progressInterval = Math.floor(this.totalFrames / 10);
+
+    let previousWritePromise: Promise<void> | undefined;
+    let framePromises: Promise<Buffer | string>[] = new Array(this.totalFrames);
+
+    const noopCatch = () => {};
+    const onWriteError = (err?: Error | null) => {
+        if (err) {
+           this.ffmpegManager.emitError(err);
+        }
+    };
+
+    const captureWorkerFrame = async (activePromise: Promise<void>, timeDriver: TimeDriver, page: import('playwright').Page, strategy: RenderStrategy, compositionTimeInSeconds: number, time: number): Promise<Buffer | string> => {
+        try {
+            await activePromise;
+        } catch (e) {
+            // ignore
+        }
+        timeDriver.setTime(page, compositionTimeInSeconds).then(undefined, noopCatch);
+        return strategy.capture(page, time);
+    };
+
+    let nextFrameToSubmit = 0;
+    let nextFrameToWrite = 0;
+    const poolLen = this.pool.length;
+    const maxPipelineDepth = poolLen * 2;
+    const timeStep = 1000 / fps;
+    const compTimeStep = 1 / fps;
+    const signal = this.jobOptions?.signal;
+    const onProgress = this.jobOptions?.onProgress;
+
+    while (nextFrameToWrite < this.totalFrames) {
+        if (this.capturedErrors.length > 0) {
+            throw this.capturedErrors[0];
+        }
+        if (signal && signal.aborted) {
+            throw new Error('Aborted');
+        }
+
+        while (nextFrameToSubmit < this.totalFrames && (nextFrameToSubmit - nextFrameToWrite) < maxPipelineDepth) {
+            const frameIndex = nextFrameToSubmit;
+            const worker = this.pool[frameIndex % poolLen];
+            const time = frameIndex * timeStep;
+            const compositionTimeInSeconds = (this.startFrame + frameIndex) * compTimeStep;
+
+            const framePromise = captureWorkerFrame(worker.activePromise, worker.timeDriver, worker.page, worker.strategy, compositionTimeInSeconds, time);
+
+            worker.activePromise = framePromise as unknown as Promise<void>;
+            framePromises[nextFrameToSubmit] = framePromise;
+            nextFrameToSubmit++;
+        }
+
+        const buffer = await framePromises[nextFrameToWrite]!;
+        framePromises[nextFrameToWrite] = null as any;
+
+        const i = nextFrameToWrite;
+
+        if (i > 0 && i % progressInterval === 0) {
+            console.log(`Progress: Rendered ${i} / ${this.totalFrames} frames`);
+        }
+
+        if (onProgress) {
+           onProgress(i / this.totalFrames);
+        }
+
+        if (previousWritePromise) {
+           await previousWritePromise;
+        }
+
+        if (!this.ffmpegManager.stdin?.writable) {
+           throw new Error('FFmpeg stdin is not writable');
+        }
+
+        let canWriteMore: boolean;
+        if (typeof buffer === 'string') {
+            canWriteMore = this.ffmpegManager.stdin.write(buffer, 'base64', onWriteError);
+        } else {
+            canWriteMore = this.ffmpegManager.stdin.write(buffer, onWriteError);
+        }
+
+        if (!canWriteMore) {
+            const ac = new AbortController();
+            const onClose = () => ac.abort(new Error('FFmpeg stdin closed before drain'));
+            const onError = (err: Error) => ac.abort(err);
+            this.ffmpegManager.stdin.once('close', onClose);
+            this.ffmpegManager.stdin.once('error', onError);
+
+            previousWritePromise = once(this.ffmpegManager.stdin, 'drain', { signal: ac.signal })
+                .then(() => {
+                    this.ffmpegManager.stdin?.removeListener('close', onClose);
+                    this.ffmpegManager.stdin?.removeListener('error', onError);
+                })
+                .catch(err => {
+                    this.ffmpegManager.stdin?.removeListener('close', onClose);
+                    this.ffmpegManager.stdin?.removeListener('error', onError);
+                    if (err.name === 'AbortError' && ac.signal.reason) {
+                        throw ac.signal.reason;
+                    }
+                    throw err;
+                });
+        } else {
+            previousWritePromise = undefined;
+        }
+
+        nextFrameToWrite++;
+    }
+
+    if (previousWritePromise) {
+        await previousWritePromise;
+    }
+
+    console.log('Finishing render strategy...');
+    const finalBuffer = await this.pool[0].strategy.finish(this.pool[0].page);
+    if (finalBuffer && ((Buffer.isBuffer(finalBuffer) && finalBuffer.length > 0) || (typeof finalBuffer === 'string' && finalBuffer.length > 0))) {
+      console.log(`Writing final buffer...`);
+      if (!this.ffmpegManager.stdin?.writable) {
+         throw new Error('FFmpeg stdin is not writable');
+      }
+
+      let canWriteMore: boolean;
+      if (typeof finalBuffer === 'string') {
+          canWriteMore = this.ffmpegManager.stdin.write(finalBuffer, 'base64', onWriteError);
+      } else {
+          canWriteMore = this.ffmpegManager.stdin.write(finalBuffer, onWriteError);
+      }
+
+      if (!canWriteMore) {
+          const ac = new AbortController();
+          const onClose = () => ac.abort(new Error('FFmpeg stdin closed before drain'));
+          const onError = (err: Error) => ac.abort(err);
+          this.ffmpegManager.stdin.once('close', onClose);
+          this.ffmpegManager.stdin.once('error', onError);
+
+          await once(this.ffmpegManager.stdin, 'drain', { signal: ac.signal })
+              .then(() => {
+                  this.ffmpegManager.stdin?.removeListener('close', onClose);
+                  this.ffmpegManager.stdin?.removeListener('error', onError);
+              })
+              .catch(err => {
+                  this.ffmpegManager.stdin?.removeListener('close', onClose);
+                  this.ffmpegManager.stdin?.removeListener('error', onError);
+                  if (err.name === 'AbortError' && ac.signal.reason) {
+                      throw ac.signal.reason;
+                  }
+                  throw err;
+              });
+      }
+    }
+
+    console.log('Finished sending frames. Closing FFmpeg stdin.');
+    this.ffmpegManager.stdin?.end();
+  }
+}
