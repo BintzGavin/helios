@@ -1,11 +1,11 @@
 ---
 id: PERF-206
 slug: remove-active-promise-await
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2026-10-18
-completed: ""
-result: ""
+completed: "2026-10-18"
+result: "failed"
 ---
 # PERF-206: Remove Worker IPC Serialization
 
@@ -29,3 +29,9 @@ Currently, the `captureLoop` limits in-flight frames using a sliding window. How
 
 ## Correctness Check
 Run the DOM verification scripts to ensure frames are still sequenced correctly: `npx tsx packages/renderer/tests/verify-cdp-driver.ts`
+
+## Results Summary
+- **Best render time**: 0.000s (vs baseline 33.7s)
+- **Improvement**: N/A
+- **Kept experiments**: none
+- **Discarded experiments**: Remove `await activePromise` (crashed with `Another frame is pending` protocol error)
