@@ -1,40 +1,8 @@
-import { spawn } from 'child_process';
-import { chromium, ConsoleMessage } from 'playwright';
-import ffmpeg from '@ffmpeg-installer/ffmpeg';
-import os from 'os';
-import fs from 'fs';
-import { once } from 'events';
-import { RenderStrategy } from './strategies/RenderStrategy.js';
-import { CanvasStrategy } from './strategies/CanvasStrategy.js';
-import { DomStrategy } from './strategies/DomStrategy.js';
-import { TimeDriver } from './drivers/TimeDriver.js';
-import { CdpTimeDriver } from './drivers/CdpTimeDriver.js';
-import { SeekTimeDriver } from './drivers/SeekTimeDriver.js';
-import { FFmpegInspector } from './utils/FFmpegInspector.js';
 import { RendererOptions, RenderJobOptions } from './types.js';
-
-const DEFAULT_BROWSER_ARGS = [
-  '--disable-dev-shm-usage',
-  '--disable-extensions',
-  '--disable-default-apps',
-  '--disable-sync',
-  '--no-first-run',
-  '--mute-audio',
-  '--disable-background-networking',
-  '--disable-background-timer-throttling',
-  '--disable-breakpad',
-  '--disable-web-security',
-  '--allow-file-access-from-files',
-  '--enable-begin-frame-control',
-  '--run-all-compositor-stages-before-draw',
-  '--process-per-tab'
-];
-
-const GPU_DISABLED_ARGS = [
-  '--disable-gpu',
-  '--disable-software-rasterizer',
-  '--disable-gpu-compositing',
-];
+import { BrowserPool } from './core/BrowserPool.js';
+import { FFmpegManager } from './core/FFmpegManager.js';
+import { CaptureLoop } from './core/CaptureLoop.js';
+import { Diagnostics } from './core/Diagnostics.js';
 
 export class Renderer {
   private options: RendererOptions;
@@ -43,217 +11,41 @@ export class Renderer {
     this.options = options;
   }
 
-  private getLaunchOptions() {
-    const config = this.options.browserConfig || {};
-    const userArgs = config.args || [];
-    const gpuArgs = config.gpu === false ? GPU_DISABLED_ARGS : [];
-
-    let executablePath = config.executablePath;
-
-    if (!executablePath) {
-      // Try to find chrome-headless-shell in common Playwright installation paths dynamically
-      const commonPaths = [
-        process.env.PLAYWRIGHT_BROWSERS_PATH,
-        `${os.homedir()}/.cache/ms-playwright`,
-        '/opt/jules/pipx/venvs/playwright/lib/python3.12/site-packages/playwright/driver/package/.local-browsers',
-        // Common global npm install locations for playwright browsers
-        '/usr/local/lib/node_modules/playwright/node_modules/playwright-core/.local-browsers',
-        '/usr/lib/node_modules/playwright/node_modules/playwright-core/.local-browsers'
-      ].filter(Boolean) as string[];
-
-      for (const basePath of commonPaths) {
-        if (!fs.existsSync(basePath)) continue;
-
-        try {
-          // Look for any chromium_headless_shell-* directory
-          const dirs = fs.readdirSync(basePath);
-          const shellDir = dirs.find(dir => dir.startsWith('chromium_headless_shell-'));
-
-          if (shellDir) {
-            // Check for the linux64 binary
-            const binaryPath = `${basePath}/${shellDir}/chrome-headless-shell-linux64/chrome-headless-shell`;
-            if (fs.existsSync(binaryPath)) {
-              executablePath = binaryPath;
-              break;
-            }
-          }
-        } catch (err) {
-          // Ignore permission/read errors for directories we can't access
-        }
-      }
-    }
-
-    return {
-      headless: config.headless ?? true,
-      executablePath: executablePath,
-      args: [...DEFAULT_BROWSER_ARGS, ...gpuArgs, ...userArgs],
-      pipe: true,
-    };
-  }
-
   public async diagnose(): Promise<any> {
-    console.log(`Starting diagnostics (Mode: ${this.options.mode || 'canvas'})`);
-
-    const browser = await chromium.launch(this.getLaunchOptions());
-
-    try {
-      const page = await browser.newPage();
-      await page.goto('about:blank');
-      const strategy = this.options.mode === 'dom' ? new DomStrategy(this.options) : new CanvasStrategy(this.options);
-      const browserDiagnostics = await strategy.diagnose(page);
-
-      const ffmpegPath = this.options.ffmpegPath || ffmpeg.path;
-      const ffmpegDiagnostics = FFmpegInspector.inspect(ffmpegPath);
-
-      return {
-        browser: browserDiagnostics,
-        ffmpeg: ffmpegDiagnostics,
-      };
-    } finally {
-      await browser.close();
-    }
+    const diagnostics = new Diagnostics(this.options);
+    return diagnostics.run();
   }
 
   public async render(compositionUrl: string, outputPath: string, jobOptions?: RenderJobOptions): Promise<void> {
     console.log(`Starting render for composition: ${compositionUrl} (Mode: ${this.options.mode || 'canvas'})`);
 
-    // Validate Hardware Acceleration
-    const ffmpegPath = this.options.ffmpegPath || ffmpeg.path;
-    const ffmpegInfo = FFmpegInspector.inspect(ffmpegPath);
-    console.log(`[Helios Diagnostics] FFmpeg Version: ${ffmpegInfo.version}`);
-    console.log(`[Helios Diagnostics] FFmpeg HW Accel: ${ffmpegInfo.hwaccels.join(', ') || 'none'}`);
+    const diagnostics = new Diagnostics(this.options);
+    diagnostics.validateHardwareAcceleration();
 
-    if (this.options.hwAccel && this.options.hwAccel !== 'auto') {
-      if (!ffmpegInfo.hwaccels.includes(this.options.hwAccel)) {
-        console.warn(`[Helios Warning] Hardware acceleration '${this.options.hwAccel}' was requested but is not listed in 'ffmpeg -hwaccels' output. Available: ${ffmpegInfo.hwaccels.join(', ') || 'none'}`);
-      }
-    }
+    const pool = new BrowserPool(this.options);
+    const ffmpegManager = new FFmpegManager(this.options, jobOptions);
 
-    const browser = await chromium.launch(this.getLaunchOptions());
-
-
-
-    let pool: { context: import('playwright').BrowserContext, page: import('playwright').Page, strategy: RenderStrategy, timeDriver: TimeDriver, activePromise: Promise<void> }[] = [];
     try {
-      const cpus = os.cpus().length || 4;
-      const concurrency = Math.min(os.cpus().length || 4, 8);
-      console.log(`Initializing pool of ${concurrency} pages...`);
-
-      const capturedErrors: Error[] = [];
-
-      const createPage = async (index: number) => {
-        const pageContext = await browser.newContext({
-          viewport: {
-            width: this.options.width,
-            height: this.options.height,
-          },
-        });
-
-        if (jobOptions?.tracePath) {
-          console.log(`Enabling Playwright tracing for worker ${index}...`);
-          await pageContext.tracing.start({ screenshots: true, snapshots: true });
-        }
-
-        const page = await pageContext.newPage();
-        const strategy = this.options.mode === 'dom' ? new DomStrategy(this.options) : new CanvasStrategy(this.options);
-        const timeDriver = this.options.mode === 'dom' ? new SeekTimeDriver(this.options.stabilityTimeout) : new CdpTimeDriver(this.options.stabilityTimeout);
-
-        page.on('console', (msg: ConsoleMessage) => console.log(`PAGE LOG [${index}]: ${msg.text()}`));
-        page.on('pageerror', (err: Error) => {
-          console.error(`PAGE ERROR [${index}]: ${err.message}`);
-          capturedErrors.push(err);
-        });
-        page.on('crash', () => {
-          const err = new Error(`Page ${index} crashed!`);
-          console.error(err.message);
-          capturedErrors.push(err);
-        });
-
-        if (this.options.inputProps) {
-          const serializedProps = JSON.stringify(this.options.inputProps);
-          await page.addInitScript(`window.__HELIOS_PROPS__ = ${serializedProps};`);
-        }
-
-        await timeDriver.init(page, this.options.randomSeed);
-        await page.goto(compositionUrl, { waitUntil: 'networkidle' });
-
-        await strategy.prepare(page);
-        await timeDriver.prepare(page);
-
-        return { context: pageContext, page, strategy, timeDriver, activePromise: Promise.resolve() };
-      };
-
-      const poolPromises = [];
-      for (let i = 0; i < concurrency; i++) {
-        poolPromises.push(createPage(i));
-      }
-      pool = await Promise.all(poolPromises);
-
-      console.log('All pages loaded and prepared.');
+      await pool.init(compositionUrl, jobOptions);
 
       console.log('Running diagnostics on first page...');
-      const diagnostics = await pool[0].strategy.diagnose(pool[0].page);
-      console.log('[Helios Diagnostics]', JSON.stringify(diagnostics, null, 2));
+      const firstWorker = pool.workers[0];
+      const strategyDiagnostics = await firstWorker.strategy.diagnose(firstWorker.page);
+      console.log('[Helios Diagnostics]', JSON.stringify(strategyDiagnostics, null, 2));
 
       const totalFrames = this.options.frameCount
         ? this.options.frameCount
         : this.options.durationInSeconds * this.options.fps;
-      const fps = this.options.fps;
       const startFrame = this.options.startFrame || 0;
 
-      const { args, inputBuffers } = pool[0].strategy.getFFmpegArgs(this.options, outputPath);
+      const { args, inputBuffers } = firstWorker.strategy.getFFmpegArgs(this.options, outputPath);
+      ffmpegManager.spawn(args, inputBuffers);
 
-      const stdio: any[] = ['pipe', 'pipe', 'pipe'];
-      const maxPipeIndex = Math.max(...inputBuffers.map(b => b.index), 2);
-      while (stdio.length <= maxPipeIndex) {
-        stdio.push('pipe');
-      }
+      const ffmpegExitPromise = ffmpegManager.getExitPromise(pool.capturedErrors);
 
-      const ffmpegProcess = spawn(ffmpegPath, args, { stdio });
-      console.log(`Spawning FFmpeg: ${ffmpegPath} ${args.join(' ')}`);
-
-      inputBuffers.forEach(({ index, buffer }) => {
-        const pipe = ffmpegProcess.stdio[index] as any;
-        if (pipe) {
-          pipe.on('error', (err: any) => console.error(`Error writing to pipe ${index}:`, err));
-          pipe.write(buffer);
-          pipe.end();
-        } else {
-          console.error(`Failed to get pipe ${index} from FFmpeg process`);
-        }
-      });
-
-      ffmpegProcess.stderr.on('data', (data: Buffer) => {
-        console.error(`ffmpeg: ${data.toString()}`);
-      });
-
-      const ffmpegExitPromise = new Promise<void>((resolve, reject) => {
-        ffmpegProcess.on('close', (code: number | null) => {
-          if (code === 0) {
-            resolve();
-          } else {
-            // If aborted, we expect a non-zero exit code (likely SIGKILL/SIGTERM).
-            // We resolve the promise to prevent unhandled rejections, as the main flow handles the abort error.
-            if (jobOptions?.signal?.aborted || capturedErrors.length > 0) {
-              resolve();
-            } else {
-              reject(new Error(`FFmpeg process exited with code ${code}`));
-            }
-          }
-        });
-        ffmpegProcess.on('error', (err: Error) => {
-            if (jobOptions?.signal?.aborted || capturedErrors.length > 0) {
-              resolve();
-            } else {
-              reject(err);
-            }
-        });
-      });
-
-      // Handle AbortSignal
       const abortHandler = () => {
         console.log('Render aborted via signal. Killing FFmpeg...');
-        ffmpegProcess.kill();
+        ffmpegManager.kill();
       };
 
       if (jobOptions?.signal) {
@@ -264,181 +56,24 @@ export class Renderer {
       }
 
       console.log(`Starting capture for ${totalFrames} frames...`);
-      const progressInterval = Math.floor(totalFrames / 10);
 
       try {
-        const captureLoop = async () => {
-          let previousWritePromise: Promise<void> | undefined;
-          let framePromises: Promise<Buffer | string>[] = new Array(totalFrames);
+        const captureLoop = new CaptureLoop(
+          this.options,
+          pool.workers,
+          ffmpegManager,
+          totalFrames,
+          startFrame,
+          pool.capturedErrors,
+          jobOptions
+        );
 
-          // To maximize parallel page utilization, we need to decouple frame production from writing
-          // such that multiple workers can be evaluating frames concurrently.
-
-          const noopCatch = () => {};
-          const onWriteError = (err?: Error | null) => {
-              if (err) {
-                 ffmpegProcess.emit('error', err);
-              }
-          };
-
-          const captureWorkerFrame = async (activePromise: Promise<void>, timeDriver: TimeDriver, page: import('playwright').Page, strategy: RenderStrategy, compositionTimeInSeconds: number, time: number): Promise<Buffer | string> => {
-              try {
-                  await activePromise;
-              } catch (e) {
-                  // ignore
-              }
-              timeDriver.setTime(page, compositionTimeInSeconds).then(undefined, noopCatch);
-              return strategy.capture(page, time);
-          };
-
-          let nextFrameToSubmit = 0;
-          let nextFrameToWrite = 0;
-          const poolLen = pool.length;
-          const maxPipelineDepth = poolLen * 2;
-          const timeStep = 1000 / fps;
-          const compTimeStep = 1 / fps;
-          const signal = jobOptions?.signal;
-          const onProgress = jobOptions?.onProgress;
-
-          while (nextFrameToWrite < totalFrames) {
-              if (capturedErrors.length > 0) {
-                  throw capturedErrors[0];
-              }
-              if (signal && signal.aborted) {
-                  throw new Error('Aborted');
-              }
-
-              // Refill the active pipeline up to the pool size
-              while (nextFrameToSubmit < totalFrames && (nextFrameToSubmit - nextFrameToWrite) < maxPipelineDepth) {
-                  const frameIndex = nextFrameToSubmit;
-                  const worker = pool[frameIndex % poolLen];
-                  const time = frameIndex * timeStep;
-                  const compositionTimeInSeconds = (startFrame + frameIndex) * compTimeStep;
-
-                  const framePromise = captureWorkerFrame(worker.activePromise, worker.timeDriver, worker.page, worker.strategy, compositionTimeInSeconds, time);
-
-                  // Keep a lightweight catch handler to prevent unhandled promise rejections
-                  // on the final frame assigned to a worker
-                  worker.activePromise = framePromise as unknown as Promise<void>;
-
-                  framePromises[nextFrameToSubmit] = framePromise;
-                  nextFrameToSubmit++;
-              }
-
-              const buffer = await framePromises[nextFrameToWrite]!;
-              framePromises[nextFrameToWrite] = null as any; // Allow GC
-
-              const i = nextFrameToWrite;
-
-              if (i > 0 && i % progressInterval === 0) {
-                  console.log(`Progress: Rendered ${i} / ${totalFrames} frames`);
-              }
-
-              if (onProgress) {
-                 onProgress(i / totalFrames);
-              }
-
-              if (previousWritePromise) {
-                 await previousWritePromise;
-              }
-
-              if (!ffmpegProcess.stdin.writable) {
-                 throw new Error('FFmpeg stdin is not writable');
-              }
-
-              let canWriteMore: boolean;
-              if (typeof buffer === 'string') {
-                  canWriteMore = ffmpegProcess.stdin.write(buffer, 'base64', onWriteError);
-              } else {
-                  canWriteMore = ffmpegProcess.stdin.write(buffer, onWriteError);
-              }
-
-              if (!canWriteMore) {
-                  const ac = new AbortController();
-                  const onClose = () => ac.abort(new Error('FFmpeg stdin closed before drain'));
-                  const onError = (err: Error) => ac.abort(err);
-                  ffmpegProcess.stdin.once('close', onClose);
-                  ffmpegProcess.stdin.once('error', onError);
-
-                  previousWritePromise = once(ffmpegProcess.stdin, 'drain', { signal: ac.signal })
-                      .then(() => {
-                          ffmpegProcess.stdin.removeListener('close', onClose);
-                          ffmpegProcess.stdin.removeListener('error', onError);
-                      })
-                      .catch(err => {
-                          ffmpegProcess.stdin.removeListener('close', onClose);
-                          ffmpegProcess.stdin.removeListener('error', onError);
-                          if (err.name === 'AbortError' && ac.signal.reason) {
-                              throw ac.signal.reason;
-                          }
-                          throw err;
-                      });
-              } else {
-                  previousWritePromise = undefined;
-              }
-
-              nextFrameToWrite++;
-          }
-
-          if (previousWritePromise) {
-              await previousWritePromise;
-          }
-
-          console.log('Finishing render strategy...');
-          const finalBuffer = await pool[0].strategy.finish(pool[0].page);
-          if (finalBuffer && ((Buffer.isBuffer(finalBuffer) && finalBuffer.length > 0) || (typeof finalBuffer === 'string' && finalBuffer.length > 0))) {
-            console.log(`Writing final buffer...`);
-            if (!ffmpegProcess.stdin.writable) {
-               throw new Error('FFmpeg stdin is not writable');
-            }
-
-            let canWriteMore: boolean;
-            if (typeof finalBuffer === 'string') {
-                canWriteMore = ffmpegProcess.stdin.write(finalBuffer, 'base64', onWriteError);
-            } else {
-                canWriteMore = ffmpegProcess.stdin.write(finalBuffer, onWriteError);
-            }
-
-            if (!canWriteMore) {
-                const ac = new AbortController();
-                const onClose = () => ac.abort(new Error('FFmpeg stdin closed before drain'));
-                const onError = (err: Error) => ac.abort(err);
-                ffmpegProcess.stdin.once('close', onClose);
-                ffmpegProcess.stdin.once('error', onError);
-
-                await once(ffmpegProcess.stdin, 'drain', { signal: ac.signal })
-                    .then(() => {
-                        ffmpegProcess.stdin.removeListener('close', onClose);
-                        ffmpegProcess.stdin.removeListener('error', onError);
-                    })
-                    .catch(err => {
-                        ffmpegProcess.stdin.removeListener('close', onClose);
-                        ffmpegProcess.stdin.removeListener('error', onError);
-                        if (err.name === 'AbortError' && ac.signal.reason) {
-                            throw ac.signal.reason;
-                        }
-                        throw err;
-                    });
-            }
-          }
-
-          console.log('Finished sending frames. Closing FFmpeg stdin.');
-          ffmpegProcess.stdin.end();
-        };
-
-        // Run capture loop and ffmpeg process in parallel.
-        // If ffmpeg fails (e.g. invalid path), it will reject ffmpegExitPromise immediately,
-        // which will cause Promise.all to reject, correctly propagating the error.
-        await Promise.all([captureLoop(), ffmpegExitPromise]);
+        await Promise.all([captureLoop.run(), ffmpegExitPromise]);
 
         console.log('FFmpeg has finished processing.');
       } catch (err: any) {
-        // Kill FFmpeg if an error occurs to prevent it from hanging
-        if (ffmpegProcess && !ffmpegProcess.killed) {
-           ffmpegProcess.kill();
-        }
+        ffmpegManager.kill();
 
-        // If it was aborted, ensure we throw an AbortError-like message
         if (jobOptions?.signal?.aborted) {
            throw new Error('Aborted');
         }
@@ -450,24 +85,8 @@ export class Renderer {
       }
 
     } finally {
-      if (jobOptions?.tracePath) {
-        console.log('Stopping tracing...');
-        if (pool[0]) {
-            await pool[0].context.tracing.stop({ path: jobOptions.tracePath });
-        }
-      }
-      for (const worker of pool) {
-          await worker.context.close();
-      }
-      await browser.close();
-      console.log('Browser closed.');
-
-      console.log('Cleaning up strategy resources...');
-      for (const worker of pool) {
-          if (worker.strategy.cleanup) {
-              await worker.strategy.cleanup();
-          }
-      }
+      await pool.close(jobOptions);
+      await pool.cleanupStrategies();
     }
 
     console.log(`Render complete! Output saved to: ${outputPath}`);
