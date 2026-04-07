@@ -57,3 +57,7 @@ Last updated by: PERF-200
 ## What Doesn't Work (and Why)
 - **PERF-207**: Refactored `CaptureLoop.ts` to replace round-robin sequential assignment with an Actor Model where concurrent worker loops pull from an atomic shared counter.
   - **Why it didn't work**: Did not improve render time (remained ~33.35s compared to the ~33.33s baseline). The overhead of V8 Promise chaining in the old loop was negligible compared to the underlying Playwright/Chromium CDP frame capture and FFmpeg encode bottlenecks. Restructuring the execution graph did not yield a tangible wall-clock improvement on the CPU-only VM.
+
+## What Works
+- Removed `--disable-software-rasterizer` from `GPU_DISABLED_ARGS` in `packages/renderer/src/core/BrowserPool.ts`. Allowed Chromium to fallback to its software rasterizer (SwiftShader) which provides significant execution speedups in the headless, CPU-bound environment. Reduced rendering time in benchmark from ~45.4s to ~32.7s (~28% improvement).
+  - ID: PERF-208
