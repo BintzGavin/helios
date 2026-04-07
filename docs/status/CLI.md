@@ -1,8 +1,10 @@
 # CLI Status
 
-**Version**: 0.46.3
+**Version**: 0.46.4
 
 ## Recent Completions
+[v0.46.4] ✅ Completed: Add Cloudflare Sandbox Adapter support to job run - Exposes the adapter from infrastructure package
+
 [v0.46.3] ✅ Completed: Scaffold Hetzner Deployment Command - Verified existing implementation of helios deploy hetzner command fulfills the scaffolding requirements.
 [v0.45.1] ✅ Completed: Scaffold Cloudflare Sandbox Deployment - Verified `helios deploy cloudflare-sandbox` command is implemented and working.
 [v0.45.0] ✅ Completed: Scaffold Cloudflare Sandbox Deployment - Added `helios deploy cloudflare-sandbox` command to generate wrangler.toml, workflow index, and render script.

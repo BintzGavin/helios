@@ -3,7 +3,7 @@ import { loadJobSpec, registerJobCommand } from '../job';
 import path from 'path';
 import fs from 'fs';
 import { Command } from 'commander';
-import { JobExecutor, LocalWorkerAdapter, AwsLambdaAdapter, CloudRunAdapter } from '@helios-project/infrastructure';
+import { JobExecutor, LocalWorkerAdapter, AwsLambdaAdapter, CloudRunAdapter, CloudflareSandboxAdapter } from '@helios-project/infrastructure';
 
 vi.mock('@helios-project/infrastructure', () => {
   return {
@@ -13,6 +13,7 @@ vi.mock('@helios-project/infrastructure', () => {
     LocalWorkerAdapter: vi.fn(),
     AwsLambdaAdapter: vi.fn(),
     CloudRunAdapter: vi.fn(),
+    CloudflareSandboxAdapter: vi.fn(),
   };
 });
 
@@ -124,6 +125,27 @@ describe('loadJobSpec', () => {
     it('should error if gcp adapter is used without service url', async () => {
       await program.parseAsync(['node', 'test', 'job', 'run', 'job.json', '--adapter', 'gcp']);
       expect(mockConsoleError).toHaveBeenCalledWith('Job execution failed:', 'GCP adapter requires --gcp-service-url');
+      expect(mockExit).toHaveBeenCalledWith(1);
+    });
+
+    it('should instantiate CloudflareSandboxAdapter when --adapter cloudflare-sandbox is used', async () => {
+      await program.parseAsync([
+        'node', 'test', 'job', 'run', 'job.json',
+        '--adapter', 'cloudflare-sandbox',
+        '--cloudflare-sandbox-account-id', 'test-account',
+        '--cloudflare-sandbox-api-token', 'test-token',
+        '--cloudflare-sandbox-namespace', 'test-namespace'
+      ]);
+      expect(CloudflareSandboxAdapter).toHaveBeenCalledWith(expect.objectContaining({
+        accountId: 'test-account',
+        apiToken: 'test-token',
+        namespace: 'test-namespace'
+      }));
+    });
+
+    it('should error if cloudflare-sandbox adapter is used without required options', async () => {
+      await program.parseAsync(['node', 'test', 'job', 'run', 'job.json', '--adapter', 'cloudflare-sandbox']);
+      expect(mockConsoleError).toHaveBeenCalledWith('Job execution failed:', 'Cloudflare Sandbox adapter requires --cloudflare-sandbox-account-id, --cloudflare-sandbox-api-token, and --cloudflare-sandbox-namespace');
       expect(mockExit).toHaveBeenCalledWith(1);
     });
   });
