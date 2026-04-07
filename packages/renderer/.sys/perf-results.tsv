@@ -287,3 +287,4 @@ PERF-158	33.613	150	4.45	0	keep	Median changed from 33.859 to 33.613
 50	32.947	150	4.55	38.6	keep	PERF-202: Sync seek driver via callFunctionOn
 3	32.713	150	4.59	37.7	keep	PERF-208: Enable Chromium Software Rasterizer
 1	33.156	150	4.52	38.1	discard	Shared BrowserContext
+1	47.938	150	3.13	40.4	discard	PERF-211-disable-chromium-features
