@@ -1,11 +1,11 @@
 ---
 id: PERF-201
 slug: polymorphic-capture
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-25
-completed: ""
-result: ""
+completed: 2024-05-25
+result: discarded
 ---
 
 # PERF-201: Polymorphic Capture Method
@@ -68,3 +68,9 @@ Run `npx tsx packages/renderer/tests/verify-canvas-selector.ts` to verify target
 
 ## Canvas Smoke Test
 Run `npx tsx packages/renderer/tests/verify-canvas-strategy.ts` to ensure Canvas mode still works properly.
+
+## Results Summary
+- **Best render time**: 43.649s (vs baseline ~33.3s)
+- **Improvement**: -31%
+- **Kept experiments**: None
+- **Discarded experiments**: Extracted capture logic into polymorphic method properties to eliminate branches in hot loop.
