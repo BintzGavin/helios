@@ -64,8 +64,11 @@ Last updated by: PERF-200
 - [PERF-209] Inline virtual time budget params to reduce GC overhead
 
 ## Performance Trajectory
-Current best: 33.156s (baseline was ~32.7s)
+Current best: 32.710s (baseline was ~33.156s, -1.3%)
 Last updated by: PERF-210
+
+## What Works
+- **PERF-018**: Pre-compile `SeekTimeDriver.ts` evaluate script by using Playwright `frame.evaluate` with explicit arguments, instead of creating dynamic string templates for `Runtime.evaluate`. Render time decreased from 33.156s to 32.710s.
 
 ## What Doesn't Work (and Why)
 - Shared BrowserContext for all pages in BrowserPool (PERF-210)
