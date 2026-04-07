@@ -339,6 +339,81 @@ describe('connectToParent', () => {
         expect(mockHelios.setDuration).not.toHaveBeenCalled();
     });
 
+    it('should handle property update commands', () => {
+        connectToParent(mockHelios);
+        triggerMessage({ type: 'HELIOS_PAUSE' }, window.parent);
+        expect(mockHelios.pause).toHaveBeenCalled();
+
+        triggerMessage({ type: 'HELIOS_SET_PLAYBACK_RATE', rate: 2.0 }, window.parent);
+        expect(mockHelios.setPlaybackRate).toHaveBeenCalledWith(2.0);
+
+        triggerMessage({ type: 'HELIOS_SET_PLAYBACK_RANGE', start: 10, end: 50 }, window.parent);
+        expect(mockHelios.setPlaybackRange).toHaveBeenCalledWith(10, 50);
+
+        triggerMessage({ type: 'HELIOS_CLEAR_PLAYBACK_RANGE' }, window.parent);
+        expect(mockHelios.clearPlaybackRange).toHaveBeenCalled();
+
+        triggerMessage({ type: 'HELIOS_SET_VOLUME', volume: 0.5 }, window.parent);
+        expect(mockHelios.setAudioVolume).toHaveBeenCalledWith(0.5);
+
+        triggerMessage({ type: 'HELIOS_SET_MUTED', muted: true }, window.parent);
+        expect(mockHelios.setAudioMuted).toHaveBeenCalledWith(true);
+
+        triggerMessage({ type: 'HELIOS_SET_AUDIO_TRACK_VOLUME', trackId: 'test', volume: 0.8 }, window.parent);
+        expect(mockHelios.setAudioTrackVolume).toHaveBeenCalledWith('test', 0.8);
+
+        triggerMessage({ type: 'HELIOS_SET_AUDIO_TRACK_MUTED', trackId: 'test', muted: true }, window.parent);
+        expect(mockHelios.setAudioTrackMuted).toHaveBeenCalledWith('test', true);
+
+        triggerMessage({ type: 'HELIOS_SET_LOOP', loop: true }, window.parent);
+        expect(mockHelios.setLoop).toHaveBeenCalledWith(true);
+
+        triggerMessage({ type: 'HELIOS_SET_PROPS', props: { a: 1 } }, window.parent);
+        expect(mockHelios.setInputProps).toHaveBeenCalledWith({ a: 1 });
+
+        triggerMessage({ type: 'HELIOS_SET_CAPTIONS', captions: [{ start: 0, end: 1, text: 'a' }] }, window.parent);
+        expect(mockHelios.setCaptions).toHaveBeenCalledWith([{ start: 0, end: 1, text: 'a' }]);
+    });
+
+    it('should handle HELIOS_GET_AUDIO_TRACKS', async () => {
+        connectToParent(mockHelios);
+
+        // Ensure promise resolves and pushes HELIOS_AUDIO_DATA to postMessage
+        parentPostMessage.mockClear();
+        triggerMessage({ type: 'HELIOS_GET_AUDIO_TRACKS' }, window.parent);
+        await new Promise(r => setTimeout(r, 0));
+
+        expect(parentPostMessage).toHaveBeenCalledWith(
+            expect.objectContaining({ type: 'HELIOS_AUDIO_DATA' }),
+            '*',
+            expect.any(Array)
+        );
+    });
+
+    it('should handle HELIOS_SEEK message', async () => {
+        const originalRaf = window.requestAnimationFrame;
+        let cbs: Function[] = [];
+        window.requestAnimationFrame = (cb) => { cbs.push(cb); return 0; };
+
+        connectToParent(mockHelios);
+        parentPostMessage.mockClear();
+
+        triggerMessage({ type: 'HELIOS_SEEK', frame: 50 }, window.parent);
+        expect(mockHelios.seek).toHaveBeenCalledWith(50);
+
+        // requestAnimationFrame(() => requestAnimationFrame(() => postMessage))
+        cbs.forEach(cb => cb(0));
+        cbs.shift(); // The outer raf cb fired and registered an inner one.
+        cbs.forEach(cb => cb(0)); // Second frame
+
+        expect(parentPostMessage).toHaveBeenCalledWith(
+            expect.objectContaining({ type: 'HELIOS_SEEK_DONE', frame: 50 }),
+            '*'
+        );
+
+        window.requestAnimationFrame = originalRaf;
+    });
+
     it('should handle HELIOS_GET_SCHEMA message', () => {
         connectToParent(mockHelios);
         triggerMessage({ type: 'HELIOS_GET_SCHEMA' }, window.parent);
