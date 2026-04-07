@@ -100,6 +100,9 @@ Each agent should update **their own dedicated progress file** instead of this f
 - ✅ Completed: WebCodecs Preference - Added `webCodecsPreference` configuration to Studio Renders Panel, allowing users to select Hardware, Software, or Disabled modes for rendering.
 
 
+### CLI v0.46.4
+- ✅ Completed: Add Cloudflare Sandbox Adapter support to job run - Exposes the adapter from infrastructure package
+
 ### CLI v0.46.0
 - ✅ Completed: Scaffold Docker Deployment Command - Implemented `helios deploy docker` to scaffold docker-compose.yml and README-DOCKER.md.
 

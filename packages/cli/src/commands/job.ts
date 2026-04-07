@@ -2,7 +2,7 @@ import { Command } from 'commander';
 import fs from 'fs';
 import path from 'path';
 import { JobSpec } from '../types/job.js';
-import { JobExecutor, LocalWorkerAdapter, AwsLambdaAdapter, CloudRunAdapter, CloudflareWorkersAdapter, AzureFunctionsAdapter, FlyMachinesAdapter, KubernetesAdapter, DockerAdapter, DenoDeployAdapter, VercelAdapter, ModalAdapter, HetznerCloudAdapter, WorkerAdapter } from '@helios-project/infrastructure';
+import { JobExecutor, LocalWorkerAdapter, AwsLambdaAdapter, CloudRunAdapter, CloudflareWorkersAdapter, AzureFunctionsAdapter, FlyMachinesAdapter, KubernetesAdapter, DockerAdapter, DenoDeployAdapter, VercelAdapter, ModalAdapter, HetznerCloudAdapter, CloudflareSandboxAdapter, WorkerAdapter } from '@helios-project/infrastructure';
 
 export async function loadJobSpec(file: string): Promise<{ jobSpec: JobSpec, jobDir: string }> {
   if (file.startsWith('http://') || file.startsWith('https://')) {
@@ -33,7 +33,7 @@ export function registerJobCommand(program: Command) {
     .option('--chunk <id>', 'Execute only the chunk with the specified ID')
     .option('--concurrency <number>', 'Number of concurrent chunks to run locally', '1')
     .option('--no-merge', 'Skip the final merge step')
-    .option('--adapter <type>', 'Adapter to use (local, aws, gcp, cloudflare, azure, fly, kubernetes, docker, deno, vercel, modal, hetzner)', 'local')
+    .option('--adapter <type>', 'Adapter to use (local, aws, gcp, cloudflare, cloudflare-sandbox, azure, fly, kubernetes, docker, deno, vercel, modal, hetzner)', 'local')
     .option('--fly-api-token <token>', 'Fly.io API token')
     .option('--fly-app-name <name>', 'Fly.io app name')
     .option('--fly-image-ref <ref>', 'Fly.io image ref')
@@ -53,6 +53,9 @@ export function registerJobCommand(program: Command) {
     .option('--cloudflare-service-url <url>', 'Cloudflare Workers service URL')
     .option('--cloudflare-auth-token <token>', 'Cloudflare Workers bearer token')
     .option('--cloudflare-job-def-url <url>', 'URL of the job definition for Cloudflare Workers')
+    .option('--cloudflare-sandbox-account-id <id>', 'Cloudflare Account ID for Sandbox adapter')
+    .option('--cloudflare-sandbox-api-token <token>', 'Cloudflare API Token for Sandbox adapter')
+    .option('--cloudflare-sandbox-namespace <namespace>', 'Sandbox namespace for Sandbox adapter')
     .option('--azure-service-url <url>', 'Azure Functions service URL')
     .option('--azure-function-key <key>', 'Azure Functions function key')
     .option('--azure-job-def-url <url>', 'URL of the job definition for Azure Functions')
@@ -123,6 +126,15 @@ export function registerJobCommand(program: Command) {
             serviceUrl: options.cloudflareServiceUrl,
             authToken: options.cloudflareAuthToken,
             jobDefUrl: options.cloudflareJobDefUrl || file
+          });
+        } else if (options.adapter === 'cloudflare-sandbox') {
+          if (!options.cloudflareSandboxAccountId || !options.cloudflareSandboxApiToken || !options.cloudflareSandboxNamespace) {
+            throw new Error('Cloudflare Sandbox adapter requires --cloudflare-sandbox-account-id, --cloudflare-sandbox-api-token, and --cloudflare-sandbox-namespace');
+          }
+          adapter = new CloudflareSandboxAdapter({
+            accountId: options.cloudflareSandboxAccountId,
+            apiToken: options.cloudflareSandboxApiToken,
+            namespace: options.cloudflareSandboxNamespace,
           });
         } else if (options.adapter === 'azure') {
           if (!options.azureServiceUrl) {
