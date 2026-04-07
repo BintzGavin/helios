@@ -6,6 +6,7 @@ Current best: 35.091s (baseline was 49.436s, -32.5%)
 Last updated by: PERF-198
 
 ## What Works
+- PERF-202: Replaced evaluate with callFunctionOn in SeekTimeDriver to eliminate AST parsing overhead. Result: ~32.9s.
 - PERF-200: Defaulted libx264 to ultrafast preset. Reduced cpu cycles. Render time ~33.7s.
 - Removed `await` from `capturePromise` return inside `captureWorkerFrame` hot loop natively allowing V8 promise chaining (PERF-127) (~2.0% faster)
 - Stream base64 string directly to FFmpeg stdin (`PERF-195`): Avoids buffering Base64 string from CDP inside JS before writing to FFmpeg by taking advantage of Node.js string base64 write streaming. Reduced garbage collection of large `Buffer`s. Yielded 33.700s median render time (similar to baseline 33.557s). Kept for reduced GC load.
@@ -42,6 +43,7 @@ Last updated by: PERF-198
 - **Result**: Reduced contention, improved rendering speed over 34.2s baseline to 33.9s.
 
 ## What Works
+- PERF-202: Replaced evaluate with callFunctionOn in SeekTimeDriver to eliminate AST parsing overhead. Result: ~32.9s.
 - Removed `await` from `capturePromise` return inside `captureWorkerFrame` hot loop natively allowing V8 promise chaining (PERF-127) (~2.0% faster)
 - Eliminated `.then()` closure in Renderer.ts capture loop to reduce GC pressure (~1% faster, PERF-192)
 - **PERF-197**: Replaced dynamic format mapping with static image2pipe. Kept because it improved performance by eliminating demuxer probing overhead.

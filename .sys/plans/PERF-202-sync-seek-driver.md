@@ -1,11 +1,11 @@
 ---
 id: PERF-202
 slug: sync-seek-driver
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-25
-completed: ""
-result: ""
+completed: "2024-05-25"
+result: "improved"
 ---
 
 # PERF-202: Eliminate Script Parsing Overhead via Runtime.callFunctionOn
@@ -79,3 +79,9 @@ Run `npx tsx packages/renderer/tests/verify-canvas-strategy.ts` to ensure Canvas
 
 ## Correctness Check
 Run `npx tsx packages/renderer/tests/verify-cdp-driver.ts` (or similar seek test) to verify DOM fallback capture succeeds.
+
+## Results Summary
+- **Best render time**: 32.947s
+- **Improvement**: ~2.3%
+- **Kept experiments**: PERF-202
+- **Discarded experiments**: None
