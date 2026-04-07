@@ -1,7 +1,7 @@
 ---
 id: PERF-209
 slug: inline-virtual-time-budget
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-05-24
 completed: ""
@@ -46,3 +46,5 @@ Run `npx tsx packages/renderer/tests/verify-cdp-driver.ts` to ensure virtual tim
 
 ## Prior Art
 PERF-193, PERF-194, PERF-179 all optimize CDP arguments allocation in the hot loop.
+## Results Summary
+- **Kept experiments**: Inline virtual time budget params
