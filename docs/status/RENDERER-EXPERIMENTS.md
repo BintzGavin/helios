@@ -52,3 +52,5 @@ Last updated by: PERF-198
 ## Performance Trajectory
 Current best: 33.749s (baseline was 33.6s, -2.0%)
 Last updated by: PERF-200
+- **PERF-206**: Removed `await activePromise;` inside the `captureWorkerFrame` loop.
+  - **Why it didn't work**: The renderer crashed immediately with `Protocol error (HeadlessExperimental.beginFrame): Another frame is pending`. Playwright and Chromium do not allow sending multiple `beginFrame` commands concurrently on the same CDP session. Explicit sequencing must be maintained per worker.
