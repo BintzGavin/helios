@@ -1,11 +1,11 @@
 ---
 id: PERF-207
 slug: actor-model-pipeline
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2026-10-18
 completed: ""
-result: ""
+result: no-improvement
 ---
 # PERF-207: Actor Model Frame Pipeline
 
@@ -44,3 +44,8 @@ By refactoring the pipeline into an "Actor Model", we can instantiate a number o
 
 ## Correctness Check
 Run `npx tsx packages/renderer/tests/verify-cdp-driver.ts` to ensure frame generation is still sequentially correct per worker.
+## Results Summary
+- **Best render time**: 33.357s (vs baseline 33.33s)
+- **Improvement**: 0%
+- **Kept experiments**: []
+- **Discarded experiments**: [Refactor CaptureLoop to Actor Model]
