@@ -8,6 +8,7 @@ export class CdpTimeDriver implements TimeDriver {
   private currentTime: number = 0;
   private timeout: number;
   private cachedFrames: import('playwright').Frame[] = [];
+  private setVirtualTimePolicyParams: any = { policy: 'advance', budget: 0 };
 
   constructor(timeout: number = 30000) {
     this.timeout = timeout;
@@ -124,10 +125,8 @@ export class CdpTimeDriver implements TimeDriver {
       // Use 'once' to avoid leaking listeners
       this.client!.once('Emulation.virtualTimeBudgetExpired', () => resolve());
 
-      this.client!.send('Emulation.setVirtualTimePolicy', {
-        policy: 'advance' as const,
-        budget: budget
-      }).catch(reject);
+      this.setVirtualTimePolicyParams.budget = budget;
+      this.client!.send('Emulation.setVirtualTimePolicy', this.setVirtualTimePolicyParams).catch(reject);
     });
 
     this.currentTime = timeInSeconds;

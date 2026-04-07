@@ -61,3 +61,4 @@ Last updated by: PERF-200
 ## What Works
 - Removed `--disable-software-rasterizer` from `GPU_DISABLED_ARGS` in `packages/renderer/src/core/BrowserPool.ts`. Allowed Chromium to fallback to its software rasterizer (SwiftShader) which provides significant execution speedups in the headless, CPU-bound environment. Reduced rendering time in benchmark from ~45.4s to ~32.7s (~28% improvement).
   - ID: PERF-208
+- [PERF-209] Inline virtual time budget params to reduce GC overhead
