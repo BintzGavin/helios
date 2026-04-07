@@ -1,0 +1,4 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	44.294	150	3.39	37.9	discard	baseline
+2	32.832	150	4.57	37.8	keep	use frame.evaluate instead of Runtime.evaluate string
+3	32.710	150	4.59	38.0	keep	use frame.evaluate instead of Runtime.evaluate string
