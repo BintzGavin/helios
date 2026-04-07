@@ -66,7 +66,7 @@ The system uses individual prompts for each agent role:
 
 **Note**: 
 - Each agent has its own dedicated planning and execution prompt files with role definitions embedded directly (no template variables).
-- Execution agents (CORE/RENDERER/PLAYER/DEMO/STUDIO) update progress logs, context files, backlog, and system context immediately upon completing work, eliminating the need for a separate scribe agent.
+- Execution agents (CORE/RENDERER/PLAYER/DEMO/STUDIO) update progress logs, context files, backlog, and system context immediately upon completing work.
 - The DOCS agent runs **once per day** to perform a comprehensive review and update of all user-facing documentation, ensuring the entire documentation site stays synchronized with the codebase.
 - The SKILLS agent runs **once per day** to maintain agent-facing skills, ensuring AI agents can effectively use Helios APIs with specialized, LLM-optimized guidance.
 - The LLMS agent runs **once per day** to maintain the `llms.txt` file, ensuring AI assistants can quickly and accurately understand the project's capabilities, APIs, and structure.

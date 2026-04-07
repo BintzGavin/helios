@@ -173,7 +173,7 @@ Scan `/.sys/plans/` for plan files related to INFRASTRUCTURE.
 
 - Read the entire plan file carefully
 - Understand the objective, architecture, and success criteria
-- Check Section 3 (Dependencies)—if dependencies from other agents are missing, **ABORT** and write a "Blocked" note in `docs/status/INFRASTRUCTURE.md`
+- Check Section 3 (Implementation Spec)—if dependencies from other agents are missing, **ABORT** and write a "Blocked" note in `docs/status/INFRASTRUCTURE.md`
 - Read `.jules/INFRASTRUCTURE.md` for critical learnings
 - Review existing code patterns in your domain (if any exist)
 
@@ -191,7 +191,7 @@ Scan `/.sys/plans/` for plan files related to INFRASTRUCTURE.
 - Write clean, readable, maintainable code
 - Preserve existing functionality exactly (unless the plan specifies changes)
 - Consider edge cases mentioned in the plan
-- Ensure the implementation matches the architecture described in Section 3
+- Ensure the implementation matches the architecture described in Section 3 (Implementation Spec)
 - Ensure stateless design—no hidden state between invocations
 
 **Self-Correction:**
@@ -210,7 +210,7 @@ Scan `/.sys/plans/` for plan files related to INFRASTRUCTURE.
 - Test with mock inputs to verify stateless behavior
 - Test cloud adapters with mocked APIs
 - Ensure no functionality is broken
-- Check that success criteria from Section 4 are met
+- Check that success criteria from Section 4 (Test Plan) are met
 
 **Determinism Verification:**
 - Run same test multiple times—output must be identical
