@@ -71,8 +71,7 @@ export interface BrowserConfig {
    * Defaults to true (GPU enabled). Set to false to explicitly disable GPU
    * for CPU-only environments (e.g., cloud functions, CI runners without GPU).
    *
-   * When false, adds `--disable-gpu`, `--disable-software-rasterizer`, and
-   * `--disable-gpu-compositing` flags to the browser launch args.
+   * When false, adds `--disable-gpu` and `--disable-gpu-compositing` flags to the browser launch args.
    */
   gpu?: boolean;
 

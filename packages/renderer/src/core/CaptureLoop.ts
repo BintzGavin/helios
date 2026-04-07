@@ -16,6 +16,41 @@ export class CaptureLoop {
     private jobOptions?: RenderJobOptions
   ) {}
 
+  private async writeToStdin(buffer: Buffer | string, onWriteError: (err?: Error | null) => void): Promise<void> {
+    if (!this.ffmpegManager.stdin?.writable) {
+      throw new Error('FFmpeg stdin is not writable');
+    }
+
+    let canWriteMore: boolean;
+    if (typeof buffer === 'string') {
+        canWriteMore = this.ffmpegManager.stdin.write(buffer, 'base64', onWriteError);
+    } else {
+        canWriteMore = this.ffmpegManager.stdin.write(buffer, onWriteError);
+    }
+
+    if (!canWriteMore) {
+        const ac = new AbortController();
+        const onClose = () => ac.abort(new Error('FFmpeg stdin closed before drain'));
+        const onError = (err: Error) => ac.abort(err);
+        this.ffmpegManager.stdin.once('close', onClose);
+        this.ffmpegManager.stdin.once('error', onError);
+
+        await once(this.ffmpegManager.stdin, 'drain', { signal: ac.signal })
+            .then(() => {
+                this.ffmpegManager.stdin?.removeListener('close', onClose);
+                this.ffmpegManager.stdin?.removeListener('error', onError);
+            })
+            .catch(err => {
+                this.ffmpegManager.stdin?.removeListener('close', onClose);
+                this.ffmpegManager.stdin?.removeListener('error', onError);
+                if (err.name === 'AbortError' && ac.signal.reason) {
+                    throw ac.signal.reason;
+                }
+                throw err;
+            });
+    }
+  }
+
   public async run(): Promise<void> {
     const fps = this.options.fps;
     const progressInterval = Math.floor(this.totalFrames / 10);
@@ -87,40 +122,7 @@ export class CaptureLoop {
            await previousWritePromise;
         }
 
-        if (!this.ffmpegManager.stdin?.writable) {
-           throw new Error('FFmpeg stdin is not writable');
-        }
-
-        let canWriteMore: boolean;
-        if (typeof buffer === 'string') {
-            canWriteMore = this.ffmpegManager.stdin.write(buffer, 'base64', onWriteError);
-        } else {
-            canWriteMore = this.ffmpegManager.stdin.write(buffer, onWriteError);
-        }
-
-        if (!canWriteMore) {
-            const ac = new AbortController();
-            const onClose = () => ac.abort(new Error('FFmpeg stdin closed before drain'));
-            const onError = (err: Error) => ac.abort(err);
-            this.ffmpegManager.stdin.once('close', onClose);
-            this.ffmpegManager.stdin.once('error', onError);
-
-            previousWritePromise = once(this.ffmpegManager.stdin, 'drain', { signal: ac.signal })
-                .then(() => {
-                    this.ffmpegManager.stdin?.removeListener('close', onClose);
-                    this.ffmpegManager.stdin?.removeListener('error', onError);
-                })
-                .catch(err => {
-                    this.ffmpegManager.stdin?.removeListener('close', onClose);
-                    this.ffmpegManager.stdin?.removeListener('error', onError);
-                    if (err.name === 'AbortError' && ac.signal.reason) {
-                        throw ac.signal.reason;
-                    }
-                    throw err;
-                });
-        } else {
-            previousWritePromise = undefined;
-        }
+        previousWritePromise = this.writeToStdin(buffer, onWriteError);
 
         nextFrameToWrite++;
     }
@@ -133,38 +135,7 @@ export class CaptureLoop {
     const finalBuffer = await this.pool[0].strategy.finish(this.pool[0].page);
     if (finalBuffer && ((Buffer.isBuffer(finalBuffer) && finalBuffer.length > 0) || (typeof finalBuffer === 'string' && finalBuffer.length > 0))) {
       console.log(`Writing final buffer...`);
-      if (!this.ffmpegManager.stdin?.writable) {
-         throw new Error('FFmpeg stdin is not writable');
-      }
-
-      let canWriteMore: boolean;
-      if (typeof finalBuffer === 'string') {
-          canWriteMore = this.ffmpegManager.stdin.write(finalBuffer, 'base64', onWriteError);
-      } else {
-          canWriteMore = this.ffmpegManager.stdin.write(finalBuffer, onWriteError);
-      }
-
-      if (!canWriteMore) {
-          const ac = new AbortController();
-          const onClose = () => ac.abort(new Error('FFmpeg stdin closed before drain'));
-          const onError = (err: Error) => ac.abort(err);
-          this.ffmpegManager.stdin.once('close', onClose);
-          this.ffmpegManager.stdin.once('error', onError);
-
-          await once(this.ffmpegManager.stdin, 'drain', { signal: ac.signal })
-              .then(() => {
-                  this.ffmpegManager.stdin?.removeListener('close', onClose);
-                  this.ffmpegManager.stdin?.removeListener('error', onError);
-              })
-              .catch(err => {
-                  this.ffmpegManager.stdin?.removeListener('close', onClose);
-                  this.ffmpegManager.stdin?.removeListener('error', onError);
-                  if (err.name === 'AbortError' && ac.signal.reason) {
-                      throw ac.signal.reason;
-                  }
-                  throw err;
-              });
-      }
+      await this.writeToStdin(finalBuffer, onWriteError);
     }
 
     console.log('Finished sending frames. Closing FFmpeg stdin.');
