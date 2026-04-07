@@ -135,4 +135,4 @@ This backlog tracks concrete deliverables derived from [`AGENTS.md`](../AGENTS.m
 - [x] ⛔ Renderer Verification Blocked: packages/studio dependency mismatch
 
 ## Blocked Items
-- [ ] [v0.46.2] CLI Blocked: Waiting for a new, valid plan in /.sys/plans/
+- [x] [v0.46.2] CLI Blocked: Waiting for a new, valid plan in /.sys/plans/
