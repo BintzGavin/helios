@@ -482,3 +482,5 @@ Each agent should update **their own dedicated progress file** instead of this f
 
 ### PLAYER v0.77.15
 - ✅ Completed: Bridge coverage for postMessage expanded and properties verified. Completed plans: 2026-12-25, 2026-12-26, 2027-01-16, 2027-01-08.
+### PLAYER v0.77.16
+- ✅ Completed: Document API Parity Gap - Verified README already contains API parity documentation and deleted lingering plan file.
