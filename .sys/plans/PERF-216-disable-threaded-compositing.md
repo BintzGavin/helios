@@ -1,11 +1,11 @@
 ---
 id: PERF-216
 slug: disable-threaded-compositing
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-24
-completed: ""
-result: ""
+completed: 2024-05-24
+result: failed
 ---
 
 # PERF-216: Disable Component/Layout Resync in Chromium via Single Process Disabling Feature Flags
@@ -39,3 +39,8 @@ Run `npx tsx packages/renderer/tests/verify-canvas-strategy.ts` to ensure the Ca
 
 ## Correctness Check
 Run the DOM smoke tests (`npx tsx packages/renderer/tests/verify-dom-strategy-capture.ts`) to ensure deterministic rendering is not broken.
+## Results Summary
+- **Best render time**: N/A (baseline 32.595s)
+- **Improvement**: N/A
+- **Kept experiments**: []
+- **Discarded experiments**: [Step 1: Add `--disable-threaded-compositing` and Feature Flags]
