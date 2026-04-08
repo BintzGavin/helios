@@ -86,3 +86,8 @@ Last updated by: PERF-210
 ## Performance Trajectory
 Current best: 32.595s (baseline was ~33.156s, -1.7%)
 Last updated by: PERF-214
+
+## What Doesn't Work (and Why)
+- Removed `--disable-gpu` from `GPU_DISABLED_ARGS` allowing Chromium to handle software fallback automatically.
+  - Slower than baseline. Explicitly disabling GPU yields better performance than native software fallback. Render time was 33.543s (-2.90842% change).
+  - PERF-215
