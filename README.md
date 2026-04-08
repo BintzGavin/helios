@@ -44,7 +44,7 @@ https://github.com/user-attachments/assets/89ee2a20-77c5-4440-ad68-9f9180d969bd
 
 ## ⚡️ Recommended Quickstart: Helios Skills
 
-**The fastest way to get started.** With one prompt into OpenCode, Cursor, Antigravity, or Claude, you can generate 6 professional video types:
+**The fastest way to get started.** We offer guided skills so that with one prompt into Claude Code, Cursor, or Opencode, Openclaw, Pi, Hermes, etc. you can generate one of six professional video types:
 
 **1 prompt →**
 • Launch announcement
@@ -60,13 +60,13 @@ Run this in an existing repo (preferably your marketing site):
 npx skills add BintzGavin/helios-skills
 ```
 
-Then tell your agent this prompt:
+Then tell your agent something like:
 
 ```bash
-follow the skills instructions and generate one video of each guided type.**
+generate a product demo video using the guided helios skill.
 ```
 
-This tends to get the best results using Opus 4.6. I've gotten mixed results with Gemini 3.1 so far.
+This tends to get the best results using Opus 4.6 or GPT 5.4. I've gotten mixed results with Gemini 3.1 so far.
 
 ---
 
