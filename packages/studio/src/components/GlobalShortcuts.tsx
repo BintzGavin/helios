@@ -11,8 +11,7 @@ export const GlobalShortcuts: React.FC = () => {
     inPoint,
     setInPoint,
     outPoint,
-    setOutPoint,
-    toggleLoop
+    setOutPoint
   } = useStudio();
 
   const { currentFrame, duration, fps } = playerState;
@@ -72,9 +71,38 @@ export const GlobalShortcuts: React.FC = () => {
     setOutPoint(newOut);
   }, { ignoreInput: true });
 
-  // L: Toggle Loop
+  // J: Play Reverse / Speed Up Reverse
+  useKeyboardShortcut('j', () => {
+    if (!controller) return;
+    const currentRate = playerState.playbackRate || 1;
+    if (!playerState.isPlaying || currentRate > -0.25) {
+      controller.setPlaybackRate(-1);
+      controller.play();
+    } else {
+      const newRate = Math.max(-4, currentRate === -0.25 ? -0.5 : (currentRate === -0.5 ? -1 : currentRate * 2));
+      controller.setPlaybackRate(newRate);
+      if (!playerState.isPlaying) controller.play();
+    }
+  }, { ignoreInput: true });
+
+  // K: Pause
+  useKeyboardShortcut('k', () => {
+    if (!controller) return;
+    controller.pause();
+  }, { ignoreInput: true });
+
+  // L: Play Forward / Speed Up
   useKeyboardShortcut('l', () => {
-    toggleLoop();
+    if (!controller) return;
+    const currentRate = playerState.playbackRate || 1;
+    if (!playerState.isPlaying || currentRate < 0.25) {
+      controller.setPlaybackRate(1);
+      controller.play();
+    } else {
+      const newRate = Math.min(4, currentRate === 0.25 ? 0.5 : (currentRate === 0.5 ? 1 : currentRate * 2));
+      controller.setPlaybackRate(newRate);
+      if (!playerState.isPlaying) controller.play();
+    }
   }, { ignoreInput: true });
 
   return null;

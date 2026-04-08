@@ -13,6 +13,7 @@ describe('GlobalShortcuts', () => {
   const mockSeek = vi.fn();
   const mockPlay = vi.fn();
   const mockPause = vi.fn();
+  const mockSetPlaybackRate = vi.fn();
   const mockSetInPoint = vi.fn();
   const mockSetOutPoint = vi.fn();
   const mockToggleLoop = vi.fn();
@@ -24,6 +25,7 @@ describe('GlobalShortcuts', () => {
     duration: 10, // 10 seconds
     fps: 30,
     isPlaying: false,
+    playbackRate: 1,
   };
 
   const defaultContext = {
@@ -31,6 +33,7 @@ describe('GlobalShortcuts', () => {
       seek: mockSeek,
       play: mockPlay,
       pause: mockPause,
+      setPlaybackRate: mockSetPlaybackRate,
     },
     playerState: defaultPlayerState,
     inPoint: 0,
@@ -48,7 +51,7 @@ describe('GlobalShortcuts', () => {
   });
 
   it('toggles play/pause with Space', () => {
-    render(<GlobalShortcuts />);
+    const { rerender } = render(<GlobalShortcuts />);
     fireEvent.keyDown(window, { key: ' ' });
     expect(mockPlay).toHaveBeenCalled();
 
@@ -57,14 +60,7 @@ describe('GlobalShortcuts', () => {
         ...defaultContext,
         playerState: { ...defaultPlayerState, isPlaying: true }
     });
-    // Re-render to pick up new state (or just fire event again if effect depends on state)
-    // In our implementation, the effect depends on controller/state in callback.
-    // The hook refs the callback, so it should see fresh state.
-    // But we need to make sure the hook updates.
-
-    // Easier to just re-render cleanly for second assertion or rely on ref mechanism
-    // Let's re-render
-    render(<GlobalShortcuts />);
+    rerender(<GlobalShortcuts />);
     fireEvent.keyDown(window, { key: ' ' });
     expect(mockPause).toHaveBeenCalled();
   });
@@ -99,10 +95,58 @@ describe('GlobalShortcuts', () => {
     expect(mockSeek).toHaveBeenCalledWith(50);
   });
 
-  it('toggles loop with L', () => {
-    render(<GlobalShortcuts />);
+  it('speeds up playback with L', () => {
+    (StudioContext.useStudio as any).mockReturnValue({
+      ...defaultContext,
+      playerState: { ...defaultPlayerState, isPlaying: false, playbackRate: 1 }
+    });
+    const { rerender } = render(<GlobalShortcuts />);
+
     fireEvent.keyDown(window, { key: 'l' });
-    expect(mockToggleLoop).toHaveBeenCalled();
+    expect(mockSetPlaybackRate).toHaveBeenCalledWith(1);
+    expect(mockPlay).toHaveBeenCalled();
+
+    mockSetPlaybackRate.mockClear();
+
+    (StudioContext.useStudio as any).mockReturnValue({
+      ...defaultContext,
+      playerState: { ...defaultPlayerState, isPlaying: true, playbackRate: 1 }
+    });
+
+    rerender(<GlobalShortcuts />);
+
+    fireEvent.keyDown(window, { key: 'l' });
+    expect(mockSetPlaybackRate).toHaveBeenCalledWith(2);
+  });
+
+  it('reverses playback with J', () => {
+    (StudioContext.useStudio as any).mockReturnValue({
+      ...defaultContext,
+      playerState: { ...defaultPlayerState, isPlaying: false, playbackRate: 1 }
+    });
+    const { rerender } = render(<GlobalShortcuts />);
+
+    fireEvent.keyDown(window, { key: 'j' });
+    expect(mockSetPlaybackRate).toHaveBeenCalledWith(-1);
+    expect(mockPlay).toHaveBeenCalled();
+
+    mockSetPlaybackRate.mockClear();
+
+    (StudioContext.useStudio as any).mockReturnValue({
+      ...defaultContext,
+      playerState: { ...defaultPlayerState, isPlaying: true, playbackRate: -1 }
+    });
+
+    rerender(<GlobalShortcuts />);
+
+    fireEvent.keyDown(window, { key: 'j' });
+    expect(mockSetPlaybackRate).toHaveBeenCalledWith(-2);
+  });
+
+  it('pauses with K', () => {
+    render(<GlobalShortcuts />);
+    fireEvent.keyDown(window, { key: 'k' });
+    expect(mockPause).toHaveBeenCalled();
   });
 
   it('sets In point with I (clamped)', () => {
