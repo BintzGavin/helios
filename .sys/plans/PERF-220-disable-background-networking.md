@@ -1,11 +1,11 @@
 ---
 id: PERF-220
 slug: test-remove-background-networking
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-06-04
-completed: ""
-result: ""
+completed: "2026-04-08"
+result: "no-improvement"
 ---
 
 # PERF-220: Test removing background networking flags
@@ -43,3 +43,9 @@ Run `npx tsx packages/renderer/tests/run-all.ts`.
 
 ## Correctness Check
 Run the DOM render tests to ensure no visual regressions break tests.
+
+## Results Summary
+- **Best render time**: 32.552s (baseline)
+- **Improvement**: 0%
+- **Kept experiments**: None
+- **Discarded experiments**: Remove background networking flags (no meaningful improvement)
