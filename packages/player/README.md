@@ -77,7 +77,7 @@ The player will automatically attempt to access `window.helios` on the iframe's 
 | `media-artist` | Artist name for OS Media Session. | - |
 | `media-album` | Album name for OS Media Session. | - |
 | `media-artwork` | URL of artwork for OS Media Session (defaults to poster). | - |
-| `crossorigin` | CORS setting for this media element. | - |
+| `crossorigin` | CORS setting for this media element (`anonymous` or `use-credentials`). | - |
 
 ## User Interface
 
@@ -140,7 +140,7 @@ The `<helios-player>` element implements a subset of the HTMLMediaElement interf
 - `requestPictureInPicture(): Promise<PictureInPictureWindow>` - Requests Picture-in-Picture mode for the player.
 - `export(options?: HeliosExportOptions): Promise<void>` - Programmatically trigger client-side export.
 - `fastSeek(time: number): void` - Seeks to the specified time as fast as possible (currently equivalent to setting `currentTime`).
-- `canPlayType(type: string): CanPlayTypeResult` - Returns whether the player can play the specified media type.
+- `canPlayType(type: string): CanPlayTypeResult` - Returns whether the player can play the specified media type (e.g., `'probably'`, `'maybe'`, or `''`).
 
 ### Properties
 
@@ -166,13 +166,13 @@ The `<helios-player>` element implements a subset of the HTMLMediaElement interf
 - `inputProps` (object): Get or set the input properties passed to the composition.
 - `playsInline` (boolean): Reflected playsinline attribute.
 - `disablePictureInPicture` (boolean): Hides the Picture-in-Picture button.
-- `error` (MediaError | null, read-only): The current media error.
+- `error` (MediaError | null, read-only): The current media error, or `null` if no error occurred.
 - `currentSrc` (string, read-only): The absolute URL of the chosen media resource.
 - `played` (TimeRanges, read-only): The ranges of the media source that the browser has played.
-- `defaultMuted` (boolean): Reflected defaultMuted attribute.
+- `defaultMuted` (boolean): Reflected `defaultMuted` attribute.
 - `defaultPlaybackRate` (number): The default rate of playback.
 - `preservesPitch` (boolean): Whether pitch should be preserved when altering playback speed.
-- `srcObject` (MediaProvider | null): The media provider object.
+- `srcObject` (MediaProvider | null): The media provider object assigned to the player.
 - `crossOrigin` (string | null): The CORS setting for this media element.
 - `exportMode` (string): Reflected export-mode attribute.
 - `exportFormat` (string): Reflected export-format attribute.
