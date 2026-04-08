@@ -1,11 +1,11 @@
 ---
 id: PERF-222
 slug: disable-renderer-backgrounding
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-24
-completed: ""
-result: ""
+completed: 2026-04-08
+result: no-improvement
 ---
 
 # PERF-222: Disable Renderer Backgrounding
@@ -43,3 +43,9 @@ Run `npx tsx packages/renderer/tests/run-all.ts` to verify the Canvas path is un
 
 ## Prior Art
 PERF-221, PERF-219, PERF-218 optimize renderer scheduling and compositing overhead via Chromium flags.
+
+## Results Summary
+- **Best render time**: 32.839s (vs baseline 32.767s)
+- **Improvement**: -0.2%
+- **Kept experiments**: []
+- **Discarded experiments**: [PERF-222]
