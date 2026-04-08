@@ -26,6 +26,9 @@ Last updated by: PERF-198
 - **Replace startScreencast with beginFrame in DomStrategy** (PERF-184): Replaced the damage-driven `Page.startScreencast` capture approach with synchronous `HeadlessExperimental.beginFrame` for the full-page DOM fallback. Improved render time to ~6.6s.
 
 ## What Doesn't Work (and Why)
+- Discarded `PERF-220` (remove background networking flags)
+  - Time: 32.547s (baseline: 32.552s). The difference is well within the margin of error (less than 0.1%).
+  - Conclusion: Allowing background networking and background timer throttling did not yield a tangible performance improvement.
 - **Eliminate SeekTimeDriver IPC** (PERF-199): Hooked rAF to evaluate __helios_seek inline in browser rather than Node CDP per frame. Render time was 35.091s, which is slower than the 33.331s baseline, so it was discarded.
 - Replace image2pipe (`PERF-197`): Update the -f flag for the video input from image2pipe to the format dynamically corresponding to this.cdpScreenshotParams.format. Did not improve render time, actually degraded from ~33.5s to 34.2s. Bypassing FFmpeg probing heuristics dynamically provided no real-world gain, suggesting pipe format parsing overhead in FFmpeg is not the bottleneck or node writable stream handles image2pipe identically well.
 - PERF-180: Inline parameters in SeekTimeDriver. Inlined parameters in the cdpSession.send. Did not improve performance over the baseline, resulting in 14.631s vs baseline 3.993s. The reason is likely due to V8 having already cached object types efficiently in earlier optimization phases or the difference being imperceptible against IPC overhead, coupled with unexpected regression overhead from garbage collection handling of intermediate anonymous objects in `Promises[i]`.
