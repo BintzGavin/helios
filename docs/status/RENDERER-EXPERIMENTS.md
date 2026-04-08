@@ -91,3 +91,7 @@ Last updated by: PERF-214
 - Removed `--disable-gpu` from `GPU_DISABLED_ARGS` allowing Chromium to handle software fallback automatically.
   - Slower than baseline. Explicitly disabling GPU yields better performance than native software fallback. Render time was 33.543s (-2.90842% change).
   - PERF-215
+
+## What Doesn't Work (and Why)
+- **PERF-216**: Added `--disable-threaded-compositing` and `--disable-features=PaintHolding,ThreadedCompositing` flags to `DEFAULT_BROWSER_ARGS` in `BrowserPool.ts`.
+  - **Why it didn't work**: The renderer crashed immediately during the benchmark. Disabling threaded compositing in the headless Chromium environment resulted in a broken rendering pipeline that failed to process the `beginFrame` commands properly, outputting a 1x1 corrupted stream and throwing `FFmpeg stdin is not writable`. This approach fundamentally breaks the required rendering paths.
