@@ -1,13 +1,13 @@
 ---
-id: PERF-212
+id: PERF-213
 slug: single-process
 status: unclaimed
 claimed_by: ""
-created: 2025-05-24
+created: 2025-05-25
 completed: ""
 result: ""
 ---
-# PERF-212: Disable Chromium Multiprocess Architecture (Single Process)
+# PERF-213: Disable Chromium Multiprocess Architecture (Single Process)
 
 ## Focus Area
 Browser Architecture / Process Management
