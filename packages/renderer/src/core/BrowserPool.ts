@@ -28,7 +28,8 @@ const DEFAULT_BROWSER_ARGS = [
   '--disable-threaded-animation',
   '--disable-threaded-scrolling',
   '--disable-checker-imaging',
-  '--disable-image-animation-resync'
+  '--disable-image-animation-resync',
+  '--disable-smooth-scrolling'
 ];
 
 const GPU_DISABLED_ARGS = [

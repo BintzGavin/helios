@@ -7,6 +7,7 @@ Current best: 35.091s (baseline was 49.436s, -32.5%)
 Last updated by: PERF-198
 
 ## What Works
+- PERF-221: Added `--disable-smooth-scrolling` to `DEFAULT_BROWSER_ARGS` in `BrowserPool.ts` to reduce Chromium Compositor overhead on smooth scrolling animations. Render time changed to 32.767s.
 - **PERF-219**: Added synchronous compositor flags (`--disable-threaded-animation`, `--disable-threaded-scrolling`, `--disable-checker-imaging`, `--disable-image-animation-resync`) to `DEFAULT_BROWSER_ARGS`. Reduced render time from ~33.303s to ~32.716s (-1.8%).
 - Disabled LCD text antialiasing in Chromium args (`--disable-lcd-text`), avoiding expensive Skia text rasterization paths in SwiftShader. Improved from 43.200s to 33.270s (PERF-218)
 - PERF-202: Replaced evaluate with callFunctionOn in SeekTimeDriver to eliminate AST parsing overhead. Result: ~32.9s.
