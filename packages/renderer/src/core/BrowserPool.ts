@@ -24,7 +24,11 @@ const DEFAULT_BROWSER_ARGS = [
   '--enable-begin-frame-control',
   '--run-all-compositor-stages-before-draw',
   '--process-per-tab',
-  '--disable-lcd-text'
+  '--disable-lcd-text',
+  '--disable-threaded-animation',
+  '--disable-threaded-scrolling',
+  '--disable-checker-imaging',
+  '--disable-image-animation-resync'
 ];
 
 const GPU_DISABLED_ARGS = [
