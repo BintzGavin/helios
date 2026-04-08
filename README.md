@@ -308,18 +308,6 @@ Helios is designed from the ground up for AI-assisted development. Whether you'r
 - **Markdown URLs** - Add `.md` to any doc URL for raw markdown (planned)
 - **Structured errors** - All errors are machine-parseable with actionable guidance
 
-**Agent Skills:**
-Skills are installable best-practice guides for AI agents. Located in `.agents/skills/helios/`:
-- `core/SKILL.md` - Core API patterns
-- `renderer/SKILL.md` - Rendering pipeline (planned)
-- `player/SKILL.md` - Player component (planned)
-- `workflows/` - Common task workflows (planned)
-
-```bash
-# Coming soon: Install Helios skills for your AI agent
-npx @helios-engine/skills install
-```
-
 ### For Autonomous Agent Systems
 
 Helios uses a **Black Hole Architecture** where AI agents continuously pull the codebase toward this documented vision. If you're building similar systems:
