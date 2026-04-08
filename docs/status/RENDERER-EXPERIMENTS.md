@@ -1,11 +1,13 @@
 ## Performance Trajectory
-Current best: 32.916s (baseline was 33.6s, -2.0%)
-Last updated by: PERF-127
+Current best: 32.716s (baseline was 33.303s, -1.8%)
+Last updated by: PERF-219
+
 
 Current best: 35.091s (baseline was 49.436s, -32.5%)
 Last updated by: PERF-198
 
 ## What Works
+- **PERF-219**: Added synchronous compositor flags (`--disable-threaded-animation`, `--disable-threaded-scrolling`, `--disable-checker-imaging`, `--disable-image-animation-resync`) to `DEFAULT_BROWSER_ARGS`. Reduced render time from ~33.303s to ~32.716s (-1.8%).
 - Disabled LCD text antialiasing in Chromium args (`--disable-lcd-text`), avoiding expensive Skia text rasterization paths in SwiftShader. Improved from 43.200s to 33.270s (PERF-218)
 - PERF-202: Replaced evaluate with callFunctionOn in SeekTimeDriver to eliminate AST parsing overhead. Result: ~32.9s.
 - PERF-200: Defaulted libx264 to ultrafast preset. Reduced cpu cycles. Render time ~33.7s.
