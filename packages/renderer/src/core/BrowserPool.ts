@@ -23,7 +23,8 @@ const DEFAULT_BROWSER_ARGS = [
   '--allow-file-access-from-files',
   '--enable-begin-frame-control',
   '--run-all-compositor-stages-before-draw',
-  '--process-per-tab'
+  '--process-per-tab',
+  '--disable-lcd-text'
 ];
 
 const GPU_DISABLED_ARGS = [
