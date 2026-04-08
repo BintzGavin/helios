@@ -1,12 +1,18 @@
 ---
 id: PERF-214
 slug: swiftshader
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor"
 created: 2024-05-24
-completed: ""
-result: ""
+completed: "2024-05-24"
+result: "kept"
 ---
+## Results Summary
+- **Best render time**: 32.595s
+- **Improvement**: 1.7%
+- **Kept experiments**: Removed `--disable-gpu-compositing` to enable SwiftShader compositing
+- **Discarded experiments**: none
+
 # PERF-214: Remove `--disable-gpu-compositing` to Enable SwiftShader Compositor
 
 ## Focus Area
