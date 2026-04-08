@@ -84,7 +84,6 @@ Last updated by: PERF-210
 ## What Works
 - **PERF-211**: Disabled `AudioServiceOutOfProcess` and `PaintHolding` to reduce Chromium memory/context switching footprint.
   - **Why it didn't work**: Did not improve render time (regressed from ~32.7s to 47.938s). The change may have removed optimizations built into Chromium's default multiprocess architecture or caused unexpected stalling in the CPU-bound environment.
-## What Doesn't Work (and Why)
 - **PERF-213**: Added `--single-process` flag to `DEFAULT_BROWSER_ARGS` in `BrowserPool.ts`.
   - **Why it didn't work**: The renderer crashed because Chrome headless shell cannot load the audio output devices when falling back to single-process mode, causing tests and benchmarks to fail immediately (`Target page, context or browser has been closed`).
 - Removed `--disable-gpu-compositing` from `GPU_DISABLED_ARGS` in `packages/renderer/src/core/BrowserPool.ts`. Allowed Chromium to fallback to its software rasterizer (SwiftShader) which provides significant execution speedups in the headless, CPU-bound environment. Reduced rendering time in benchmark from ~33.156s to ~32.595s (~1.7% improvement).
@@ -98,7 +97,7 @@ Last updated by: PERF-214
 - Removed `--disable-gpu` from `GPU_DISABLED_ARGS` allowing Chromium to handle software fallback automatically.
   - Slower than baseline. Explicitly disabling GPU yields better performance than native software fallback. Render time was 33.543s (-2.90842% change).
   - PERF-215
-
-## What Doesn't Work (and Why)
 - **PERF-216**: Added `--disable-threaded-compositing` and `--disable-features=PaintHolding,ThreadedCompositing` flags to `DEFAULT_BROWSER_ARGS` in `BrowserPool.ts`.
   - **Why it didn't work**: The renderer crashed immediately during the benchmark. Disabling threaded compositing in the headless Chromium environment resulted in a broken rendering pipeline that failed to process the `beginFrame` commands properly, outputting a 1x1 corrupted stream and throwing `FFmpeg stdin is not writable`. This approach fundamentally breaks the required rendering paths.
+- **PERF-217**: Disabled Font Subpixel Positioning using `--disable-font-subpixel-positioning` flag in `BrowserPool.ts`.
+  - **Why it didn't work**: The renderer performance regressed significantly from ~32.6s to ~43.8s and tests failed. The change caused unexpected stalling in the CPU-bound environment, likely due to rendering path incompatibility or increased software rasterization overhead.
