@@ -1,3 +1,9 @@
+## LLMS v1.61.1
+- ✅ Completed: Daily llms.txt Review
+  - Updated Distributed rendering comparison table to include Cloudflare Sandbox adapter.
+  - Verified package versions perfectly match `package.json`.
+  - Verified API examples, roadmap synchronization, and key file paths.
+
 # LLMS Progress
 
 ## LLMS v1.61.0
