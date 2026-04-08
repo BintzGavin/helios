@@ -1,11 +1,11 @@
 ---
 id: PERF-213
 slug: single-process
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2025-05-25
-completed: ""
-result: ""
+completed: 2026-04-08
+result: failed
 ---
 # PERF-213: Disable Chromium Multiprocess Architecture (Single Process)
 
@@ -55,3 +55,8 @@ Run the main test suite `npx tsx packages/renderer/tests/run-all.ts` to verify t
 - PERF-196 (Process per tab improved performance by reducing contention)
 - PERF-211 (Disabling specific features didn't work, but architectural changes have a higher ceiling)
 - Chromium documentation on `--single-process` (used in embedded Chromium deployments and specific testing environments).
+## Results Summary
+- **Best render time**: 0.000s (vs baseline ~33.882s)
+- **Improvement**: 0%
+- **Kept experiments**: []
+- **Discarded experiments**: [single-process]
