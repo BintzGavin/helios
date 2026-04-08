@@ -3,7 +3,9 @@
 
 [v1.56.0] ✅ Completed: Daily llms.txt Review - Verified current packages versions. Updated Roadmap to include new Cloud Execution Adapters (Modal, Deno Deploy, Vercel, Hetzner Cloud).
 
-**Version**: 1.61.0
+**Version**: 1.61.1
+[v1.61.1] ✅ Completed: Comprehensive Daily Review - Verified package versions, API examples, and key file paths. Updated Distributed Rendering comparison table to include Cloudflare Sandbox.
+
 [v1.61.0] ✅ Completed: Comprehensive Daily Review - Updated Roadmap with recent verifiable completions (Studio Timeline Drag & Drop, Player getSchema API parity, Infrastructure Orchestrator Test Coverage).
 
 [v1.60.0] ✅ Completed: Comprehensive Daily Review - Synced roadmap items from progress logs including Studio Renders Panel Tests, Player Regression Tests, Renderer Orchestrator Plan, and CLI deployment scaffolds.
