@@ -1,11 +1,11 @@
 ---
 id: PERF-215
 slug: remove-disable-gpu
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-24
-completed: ""
-result: ""
+completed: "2024-05-24"
+result: "no-improvement"
 ---
 
 # PERF-215: Remove `--disable-gpu` to Evaluate Hardware Acceleration Fallback
@@ -37,3 +37,9 @@ Run `npx tsx packages/renderer/tests/verify-canvas-strategy.ts` to ensure the Ca
 
 ## Correctness Check
 Run the `verify-cdp-driver.ts` and `verify-cdp-determinism.ts` scripts to ensure frame capture timing remains accurate. Run the main suite with `npx tsx packages/renderer/tests/run-all.ts` to catch any regressions.
+
+## Results Summary
+- **Best render time**: 33.543s (vs baseline 32.595s)
+- **Improvement**: -2.91%
+- **Kept experiments**: none
+- **Discarded experiments**: PERF-215
