@@ -1,11 +1,11 @@
 ---
 id: PERF-218
 slug: disable-lcd-text
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-06-03
-completed: ""
-result: ""
+completed: 2024-06-03
+result: "improved"
 ---
 
 # PERF-218: Disable LCD Text Antialiasing
@@ -40,3 +40,8 @@ Run `npx tsx packages/renderer/tests/run-all.ts`.
 
 ## Correctness Check
 Run the DOM render tests to ensure no visual regressions break tests.
+
+## Results Summary
+- **Best render time**: 33.270s (vs baseline 43.200s)
+- **Kept experiments**: [--disable-lcd-text]
+- **Discarded experiments**: []
