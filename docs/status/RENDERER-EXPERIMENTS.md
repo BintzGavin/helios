@@ -27,6 +27,7 @@ Last updated by: PERF-198
 - **Replace startScreencast with beginFrame in DomStrategy** (PERF-184): Replaced the damage-driven `Page.startScreencast` capture approach with synchronous `HeadlessExperimental.beginFrame` for the full-page DOM fallback. Improved render time to ~6.6s.
 
 ## What Doesn't Work (and Why)
+- PERF-222: Added `--disable-renderer-backgrounding` and `--disable-backgrounding-occluded-windows` to `DEFAULT_BROWSER_ARGS`. Resulted in 32.839s (-0.2% change). Status: discard.
 - Discarded `PERF-220` (remove background networking flags)
   - Time: 32.547s (baseline: 32.552s). The difference is well within the margin of error (less than 0.1%).
   - Conclusion: Allowing background networking and background timer throttling did not yield a tangible performance improvement.

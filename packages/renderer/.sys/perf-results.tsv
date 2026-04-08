@@ -291,3 +291,4 @@ PERF-158	33.613	150	4.45	0	keep	Median changed from 33.859 to 33.613
 218	33.270	150	4.51	37.9	keep	PERF-218: disable LCD text antialiasing
 289	32.716	150	4.58	37.9	keep	Reintroduce synchronous compositor flags
 221	32.767	150	4.58	37.9	keep	PERF-221: Add --disable-smooth-scrolling
+222	32.839	150	4.57	39.4	discard	PERF-222 disable renderer backgrounding flags
