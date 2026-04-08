@@ -77,3 +77,6 @@ Last updated by: PERF-210
 ## What Works
 - **PERF-211**: Disabled `AudioServiceOutOfProcess` and `PaintHolding` to reduce Chromium memory/context switching footprint.
   - **Why it didn't work**: Did not improve render time (regressed from ~32.7s to 47.938s). The change may have removed optimizations built into Chromium's default multiprocess architecture or caused unexpected stalling in the CPU-bound environment.
+## What Doesn't Work (and Why)
+- **PERF-213**: Added `--single-process` flag to `DEFAULT_BROWSER_ARGS` in `BrowserPool.ts`.
+  - **Why it didn't work**: The renderer crashed because Chrome headless shell cannot load the audio output devices when falling back to single-process mode, causing tests and benchmarks to fail immediately (`Target page, context or browser has been closed`).
