@@ -80,3 +80,9 @@ Last updated by: PERF-210
 ## What Doesn't Work (and Why)
 - **PERF-213**: Added `--single-process` flag to `DEFAULT_BROWSER_ARGS` in `BrowserPool.ts`.
   - **Why it didn't work**: The renderer crashed because Chrome headless shell cannot load the audio output devices when falling back to single-process mode, causing tests and benchmarks to fail immediately (`Target page, context or browser has been closed`).
+- Removed `--disable-gpu-compositing` from `GPU_DISABLED_ARGS` in `packages/renderer/src/core/BrowserPool.ts`. Allowed Chromium to fallback to its software rasterizer (SwiftShader) which provides significant execution speedups in the headless, CPU-bound environment. Reduced rendering time in benchmark from ~33.156s to ~32.595s (~1.7% improvement).
+  - ID: PERF-214
+
+## Performance Trajectory
+Current best: 32.595s (baseline was ~33.156s, -1.7%)
+Last updated by: PERF-214
