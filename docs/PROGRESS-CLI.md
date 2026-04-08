@@ -303,3 +303,5 @@ This file tracks progress for the CLI domain (`packages/cli`).
 
 ### CLI v0.45.1
 - ✅ Completed: Scaffold Cloudflare Sandbox Deployment - Verified `helios deploy cloudflare-sandbox` command is implemented and working.
+### CLI v0.46.5
+- ✅ Completed: Implement job command regression tests - Add unit tests for job run and adapters.
