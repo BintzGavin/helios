@@ -1,11 +1,12 @@
 ---
 id: PERF-228
 slug: cdp-evaluate-optimization
-status: unclaimed
+status: claimed
+claimed_by: "Jules"
 claimed_by: ""
 created: 2024-04-09
-completed: ""
-result: ""
+completed: "2026-04-09"
+result: "keep"
 ---
 # PERF-228: Optimize CDP Time Driver hot loop evaluation
 
@@ -47,3 +48,13 @@ Run `npx tsx scripts/benchmark-test.js` to ensure the benchmark still runs corre
 
 ## Prior Art
 PERF-202 successfully eliminated evaluation overhead in `SeekTimeDriver.ts` using `Runtime.callFunctionOn`.
+
+## Results Summary
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	35.252	150	4.26	38.0	keep	baseline
+2	34.869	150	4.30	37.6	keep	Use callFunctionOn for sync media
+3	34.968	150	4.29	37.3	keep	Eliminate page evaluate for wait stable
+4	35.093	150	4.27	37.3	keep	re-run benchmark
+5	35.128	150	4.27	38.0	keep	re-run benchmark
+6	35.123	150	4.27	37.2	keep	re-run benchmark
+7	34.820	150	4.31	37.1	keep	re-run benchmark
