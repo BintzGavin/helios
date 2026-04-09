@@ -1,4 +1,4 @@
-**Version**: 0.121.0
+**Version**: 0.121.1
 
 **Posture**: ACTIVELY EXPANDING FOR V2
 
@@ -12,6 +12,7 @@
 - [v0.119.5] ✅ Completed: Refine CLI Component Removal - Verified existing implementation of component file deletion and interactive confirmation prompts in `helios remove` command (2026-10-23-STUDIO-Refine-CLI-Component-Removal.md).
 
 ## Recent Updates
+- [v0.121.1] ✅ Completed: STUDIO-Timeline-Drag-Drop - Verified existing implementation for timeline drag and drop support to accept assets (2026-11-13-STUDIO-Timeline-Drag-Drop.md).
 - [v0.121.0] ✅ Completed: Add JKL Playback Shortcuts - Implemented standard J, K, L keyboard shortcuts for variable playback speed and reverse.
 - [v0.120.5] ✅ Completed: Timeline Drag & Drop - Verified existing handleDrop implementation and added unit test for asset drop functionality.
 - [v0.120.3] ✅ Completed: STUDIO-Asset-Move - Updated effectAllowed to copyMove in AssetItem.tsx.
