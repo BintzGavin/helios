@@ -1,3 +1,10 @@
+## LLMS v1.62.0
+- ✅ Completed: Daily llms.txt Review
+  - Updated Roadmap:
+    - CLI: Added "Scaffold Azure/Cloudflare/Docker Deployment" and "Regression Tests".
+    - Infrastructure: Added "Cloudflare Sandbox".
+  - Verified package versions against actual package.json.
+
 ## LLMS v1.61.1
 - ✅ Completed: Daily llms.txt Review
   - Updated Distributed rendering comparison table to include Cloudflare Sandbox adapter.
