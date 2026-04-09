@@ -102,3 +102,7 @@ Last updated by: PERF-214
   - **Why it didn't work**: The renderer crashed immediately during the benchmark. Disabling threaded compositing in the headless Chromium environment resulted in a broken rendering pipeline that failed to process the `beginFrame` commands properly, outputting a 1x1 corrupted stream and throwing `FFmpeg stdin is not writable`. This approach fundamentally breaks the required rendering paths.
 - **PERF-217**: Disabled Font Subpixel Positioning using `--disable-font-subpixel-positioning` flag in `BrowserPool.ts`.
   - **Why it didn't work**: The renderer performance regressed significantly from ~32.6s to ~43.8s and tests failed. The change caused unexpected stalling in the CPU-bound environment, likely due to rendering path incompatibility or increased software rasterization overhead.
+
+- Verified site isolation flags (PERF-223)
+  - Render time: ~32.672s
+  - Plan ID: PERF-223
