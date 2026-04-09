@@ -9,6 +9,19 @@ export class CdpTimeDriver implements TimeDriver {
   private timeout: number;
   private cachedFrames: import('playwright').Frame[] = [];
   private setVirtualTimePolicyParams: any = { policy: 'advance', budget: 0 };
+  private syncMediaParams: any = {
+    functionDeclaration: 'function(t) { if(typeof window.__helios_sync_media==="function") window.__helios_sync_media(t); }',
+    objectId: undefined,
+    arguments: [{ value: 0 }],
+    returnByValue: false,
+    awaitPromise: false
+  };
+  private waitStableParams: any = {
+    functionDeclaration: 'function() { if(typeof window.__helios_wait_until_stable==="function") return window.__helios_wait_until_stable(); }',
+    objectId: undefined,
+    returnByValue: false,
+    awaitPromise: true
+  };
 
   constructor(timeout: number = 30000) {
     this.timeout = timeout;
@@ -75,6 +88,12 @@ export class CdpTimeDriver implements TimeDriver {
 
     this.cachedFrames = page.frames();
 
+    const windowRes = await this.client!.send('Runtime.evaluate', { expression: 'window' });
+    if (windowRes.result && windowRes.result.objectId) {
+      this.syncMediaParams.objectId = windowRes.result.objectId;
+      this.waitStableParams.objectId = windowRes.result.objectId;
+    }
+
     this.currentTime = 0;
   }
 
@@ -95,28 +114,34 @@ export class CdpTimeDriver implements TimeDriver {
     // the video elements are already at the correct time.
     // Execute in all frames (including main frame) to support iframes
     const frames = this.cachedFrames;
-    if (frames.length === 1) {
-      await frames[0].evaluate((t) => {
-        if (typeof (window as any).__helios_sync_media === 'function') {
-          (window as any).__helios_sync_media(t);
-        }
-      }, timeInSeconds).catch(e => {
-        console.warn('[CdpTimeDriver] Failed to sync media in frame ' + frames[0].url() + ':', e);
+    if (frames.length === 1 && this.syncMediaParams.objectId) {
+      this.syncMediaParams.arguments[0].value = timeInSeconds;
+      await this.client!.send('Runtime.callFunctionOn', this.syncMediaParams).catch(e => {
+        console.warn('[CdpTimeDriver] Failed to sync media in main frame:', e);
       });
     } else {
-      const framePromises: Promise<any>[] = new Array(frames.length);
-      for (let i = 0; i < frames.length; i++) {
-        const frame = frames[i];
-        framePromises[i] = frame.evaluate((t) => {
+      if (frames.length === 1) {
+        await frames[0].evaluate((t) => {
           if (typeof (window as any).__helios_sync_media === 'function') {
             (window as any).__helios_sync_media(t);
           }
         }, timeInSeconds).catch(e => {
-          // Ignore errors in restricted frames (e.g. cross-origin if CSP blocks it, though we usually disable security)
-          console.warn('[CdpTimeDriver] Failed to sync media in frame ' + frame.url() + ':', e);
+          console.warn('[CdpTimeDriver] Failed to sync media in frame ' + frames[0].url() + ':', e);
         });
+      } else {
+        const framePromises: Promise<any>[] = new Array(frames.length);
+        for (let i = 0; i < frames.length; i++) {
+          const frame = frames[i];
+          framePromises[i] = frame.evaluate((t) => {
+            if (typeof (window as any).__helios_sync_media === 'function') {
+              (window as any).__helios_sync_media(t);
+            }
+          }, timeInSeconds).catch(e => {
+            console.warn('[CdpTimeDriver] Failed to sync media in frame ' + frame.url() + ':', e);
+          });
+        }
+        await Promise.all(framePromises);
       }
-      await Promise.all(framePromises);
     }
 
     // 2. Advance virtual time
@@ -144,11 +169,17 @@ export class CdpTimeDriver implements TimeDriver {
 
     try {
       await Promise.race([
-        page.evaluate(() => {
-          if (typeof (window as any).__helios_wait_until_stable === 'function') {
-            return (window as any).__helios_wait_until_stable();
-          }
-        }),
+        (this.waitStableParams.objectId
+          ? this.client!.send('Runtime.callFunctionOn', this.waitStableParams).then(res => {
+              if (res.exceptionDetails) {
+                throw new Error('Stability check failed: ' + res.exceptionDetails.exception?.description);
+              }
+            })
+          : page.evaluate(() => {
+              if (typeof (window as any).__helios_wait_until_stable === 'function') {
+                return (window as any).__helios_wait_until_stable();
+              }
+            })),
         timeoutPromise
       ]);
     } catch (e: any) {
