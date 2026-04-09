@@ -487,3 +487,6 @@ Each agent should update **their own dedicated progress file** instead of this f
 - ✅ Completed: Bridge coverage for postMessage expanded and properties verified. Completed plans: 2026-12-25, 2026-12-26, 2027-01-16, 2027-01-08.
 ### PLAYER v0.77.16
 - ✅ Completed: Document API Parity Gap - Verified README already contains API parity documentation and deleted lingering plan file.
+
+### CLI v0.46.6
+- ✅ Completed: Add Cloudflare Sandbox Adapter support to job run - Verified implementation and tests for Cloudflare Sandbox adapter support in the job run command.
