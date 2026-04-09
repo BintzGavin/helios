@@ -106,3 +106,6 @@ Last updated by: PERF-214
 - Verified site isolation flags (PERF-223)
   - Render time: ~32.672s
   - Plan ID: PERF-223
+
+## What Works
+- Mutated `callParams.arguments` array instead of reallocating it on every frame inside `SeekTimeDriver.ts`, avoiding dynamic allocations in the hot loop. Reduced V8 GC pressure. Plan ID: PERF-224

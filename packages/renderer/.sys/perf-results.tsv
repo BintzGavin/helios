@@ -293,3 +293,4 @@ PERF-158	33.613	150	4.45	0	keep	Median changed from 33.859 to 33.613
 221	32.767	150	4.58	37.9	keep	PERF-221: Add --disable-smooth-scrolling
 222	32.839	150	4.57	39.4	discard	PERF-222 disable renderer backgrounding flags
 223	32.672	150	4.59	38.0	keep	PERF-223 site isolation flags verified
+PERF-224-run	32.807	150			keep	mutate callParams.arguments instead of reallocating in SeekTimeDriver
