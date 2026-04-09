@@ -295,3 +295,4 @@ PERF-158	33.613	150	4.45	0	keep	Median changed from 33.859 to 33.613
 223	32.672	150	4.59	38.0	keep	PERF-223 site isolation flags verified
 PERF-224-run	32.807	150			keep	mutate callParams.arguments instead of reallocating in SeekTimeDriver
 225	32.896	150	4.56	36.2	keep	Cache FFmpeg drain listeners to eliminate GC pressure
+227	33.244	150	4.51	39.8	keep	optimize targetBeginFrameParams allocation
