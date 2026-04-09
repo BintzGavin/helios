@@ -110,3 +110,6 @@ Last updated by: PERF-214
 
 ## What Works
 - Mutated `callParams.arguments` array instead of reallocating it on every frame inside `SeekTimeDriver.ts`, avoiding dynamic allocations in the hot loop. Reduced V8 GC pressure. Plan ID: PERF-224
+
+### PERF-227: Pre-allocate targetBeginFrameParams
+- **Result**: KEPT. Pre-allocate targetBeginFrameParams to eliminate object allocation overhead in DomStrategy.ts hot loop (~36.7s -> ~33.244s)

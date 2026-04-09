@@ -19,6 +19,7 @@ export class DomStrategy implements RenderStrategy {
   private lastFrameData: Buffer | string | null = null;
   private cdpScreenshotParams: any = null;
   private beginFrameParams: any = null;
+  private targetBeginFrameParams: any = null;
   private targetElementHandle: any = null;
   private emptyImageBuffer: Buffer = EMPTY_IMAGE_BUFFER;
   private emptyImageBase64: string = "";
@@ -161,6 +162,16 @@ export class DomStrategy implements RenderStrategy {
       frameTimeTicks: 0
     };
 
+    this.targetBeginFrameParams = {
+      screenshot: {
+        format: this.cdpScreenshotParams.format,
+        quality: this.cdpScreenshotParams.quality,
+        clip: { x: 0, y: 0, width: 0, height: 0, scale: 1 }
+      },
+      interval: this.frameInterval,
+      frameTimeTicks: 0
+    };
+
     if (this.options.targetSelector) {
       const handle = await page.evaluateHandle((args) => {
         // @ts-ignore
@@ -183,17 +194,13 @@ export class DomStrategy implements RenderStrategy {
     if (this.targetElementHandle) {
       const box = await this.targetElementHandle.boundingBox();
       if (box) {
-        // PERF-193: Reusing object is possible here too, but object creation with box clip is more complex and less common.
-        // We optimize the main path first.
-        const res = await this.cdpSession!.send('HeadlessExperimental.beginFrame', {
-          screenshot: {
-            format: this.cdpScreenshotParams.format,
-            quality: this.cdpScreenshotParams.quality,
-            clip: { x: box.x, y: box.y, width: box.width, height: box.height, scale: 1 }
-          },
-          interval: this.frameInterval,
-          frameTimeTicks: 10000 + frameTime
-        } as any);
+        this.targetBeginFrameParams.screenshot.clip.x = box.x;
+        this.targetBeginFrameParams.screenshot.clip.y = box.y;
+        this.targetBeginFrameParams.screenshot.clip.width = box.width;
+        this.targetBeginFrameParams.screenshot.clip.height = box.height;
+        this.targetBeginFrameParams.frameTimeTicks = 10000 + frameTime;
+
+        const res = await this.cdpSession!.send('HeadlessExperimental.beginFrame', this.targetBeginFrameParams);
         if (res && res.screenshotData) {
           this.lastFrameData = res.screenshotData;
           return res.screenshotData;
