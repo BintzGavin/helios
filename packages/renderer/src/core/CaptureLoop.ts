@@ -93,14 +93,13 @@ export class CaptureLoop {
         }
     };
 
-    const captureWorkerFrame = async (activePromise: Promise<void>, timeDriver: TimeDriver, page: import('playwright').Page, strategy: RenderStrategy, compositionTimeInSeconds: number, time: number): Promise<Buffer | string> => {
-        try {
-            await activePromise;
-        } catch (e) {
-            // ignore
-        }
-        timeDriver.setTime(page, compositionTimeInSeconds).then(undefined, noopCatch);
-        return strategy.capture(page, time);
+    const captureWorkerFrame = (activePromise: Promise<void>, timeDriver: TimeDriver, page: import('playwright').Page, strategy: RenderStrategy, compositionTimeInSeconds: number, time: number): Promise<Buffer | string> => {
+        return activePromise
+            .catch(noopCatch)
+            .then(() => {
+                timeDriver.setTime(page, compositionTimeInSeconds).then(undefined, noopCatch);
+                return strategy.capture(page, time);
+            });
     };
 
     let nextFrameToSubmit = 0;
