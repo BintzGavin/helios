@@ -1,8 +1,9 @@
 # CLI Status
 
-**Version**: 0.46.5
+**Version**: 0.46.6
 
 ## Recent Completions
+[v0.46.6] ✅ Completed: Add Cloudflare Sandbox Adapter support to job run - Verified implementation and tests for Cloudflare Sandbox adapter support in the job run command.
 [v0.46.5] ✅ Completed: Implement job command regression tests - Add unit tests for job run and adapters.
 [v0.46.4] ✅ Completed: Add Cloudflare Sandbox Adapter support to job run - Exposes the adapter from infrastructure package
 
