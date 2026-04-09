@@ -24,7 +24,13 @@ export class FFmpegManager {
     inputBuffers.forEach(({ index, buffer }) => {
       const pipe = this.process!.stdio[index] as any;
       if (pipe) {
-        pipe.on('error', (err: any) => console.error(`Error writing to pipe ${index}:`, err));
+        pipe.on('error', (err: any) => {
+          if (err && err.code === 'EPIPE') {
+            console.warn(`Pipe ${index} closed prematurely (EPIPE). Ignoring.`);
+          } else {
+            console.error(`Error writing to pipe ${index}:`, err);
+          }
+        });
         pipe.write(buffer);
         pipe.end();
       } else {

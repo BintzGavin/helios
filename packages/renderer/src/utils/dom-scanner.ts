@@ -12,7 +12,7 @@ export async function scanForAudioTracks(page: Page, timeout: number = 30000): P
       ${PARSE_MEDIA_ATTRIBUTES_FUNCTION}
 
       // Wait for media elements (video/audio)
-      const mediaElements = findAllMedia(document);
+      const mediaElements = findAllMedia(document).filter(el => !el.hasAttribute('data-helios-no-audio'));
       const tracks = [];
 
       if (mediaElements.length > 0) {

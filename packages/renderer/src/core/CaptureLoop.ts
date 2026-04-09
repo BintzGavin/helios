@@ -31,9 +31,16 @@ export class CaptureLoop {
     this.ffmpegManager.stdin.on('error', (err) => {
       if (this.drainReject) {
         const reject = this.drainReject;
+        const resolve = this.drainResolve;
         this.drainResolve = null;
         this.drainReject = null;
-        reject(err);
+        if (err && (err as any).code === 'EPIPE') {
+           console.warn('FFmpeg stdin closed prematurely (EPIPE). Ignoring error to allow graceful exit.');
+           // Resolve instead of reject on EPIPE to allow the process to finish handling existing frames
+           if (resolve) resolve();
+        } else {
+           reject(err);
+        }
       }
     });
     this.ffmpegManager.stdin.on('close', () => {
@@ -48,7 +55,8 @@ export class CaptureLoop {
 
   private async writeToStdin(buffer: Buffer | string, onWriteError: (err?: Error | null) => void): Promise<void> {
     if (!this.ffmpegManager.stdin?.writable) {
-      throw new Error('FFmpeg stdin is not writable');
+      console.warn('FFmpeg stdin is not writable. Skipping write.');
+      return;
     }
 
     let canWriteMore: boolean;
@@ -77,7 +85,11 @@ export class CaptureLoop {
     const noopCatch = () => {};
     const onWriteError = (err?: Error | null) => {
         if (err) {
-           this.ffmpegManager.emitError(err);
+           if ((err as any).code === 'EPIPE') {
+               console.warn('FFmpeg stdin closed prematurely during write (EPIPE). Ignoring error to allow graceful exit.');
+           } else {
+               this.ffmpegManager.emitError(err);
+           }
         }
     };
 
