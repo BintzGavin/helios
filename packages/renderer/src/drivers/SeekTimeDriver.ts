@@ -70,6 +70,26 @@ export class SeekTimeDriver implements TimeDriver {
         let cachedAnimations = null;
         let cachedMediaElements = null;
 
+        function createMediaPromise(el) {
+          return new Promise((resolve) => {
+            let resolved = false;
+            const finish = () => {
+              if (resolved) return;
+              resolved = true;
+              cleanup();
+              resolve();
+            };
+            const cleanup = () => {
+              el.removeEventListener('seeked', finish);
+              el.removeEventListener('canplay', finish);
+              el.removeEventListener('error', finish);
+            };
+            el.addEventListener('seeked', finish);
+            el.addEventListener('canplay', finish);
+            el.addEventListener('error', finish);
+          });
+        }
+
         window.__helios_invalidate_cache = () => {
           cachedScopes = null;
           cachedAnimations = null;
@@ -163,23 +183,7 @@ export class SeekTimeDriver implements TimeDriver {
 
               if (el.seeking || el.readyState < 2) {
                 if (!promises) promises = [];
-                promises[promises.length] = new Promise((resolve) => {
-                  let resolved = false;
-                  const finish = () => {
-                    if (resolved) return;
-                    resolved = true;
-                    cleanup();
-                    resolve();
-                  };
-                  const cleanup = () => {
-                    el.removeEventListener('seeked', finish);
-                    el.removeEventListener('canplay', finish);
-                    el.removeEventListener('error', finish);
-                  };
-                  el.addEventListener('seeked', finish);
-                  el.addEventListener('canplay', finish);
-                  el.addEventListener('error', finish);
-                });
+                promises[promises.length] = createMediaPromise(el);
               }
             }
           }

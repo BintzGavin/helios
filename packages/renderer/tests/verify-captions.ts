@@ -24,7 +24,7 @@ const videoInputArgs = ['-i', 'pipe:0'];
     subtitles: 'subs.srt'
   };
 
-  const args = FFmpegBuilder.getArgs(options, outputPath, videoInputArgs);
+  const { args } = FFmpegBuilder.getArgs(options, outputPath, videoInputArgs);
 
   // Verify filter complex
   const filterIndex = args.indexOf('-filter_complex');
@@ -49,7 +49,7 @@ const videoInputArgs = ['-i', 'pipe:0'];
     audioFilePath: 'audio.mp3'
   };
 
-  const args = FFmpegBuilder.getArgs(options, outputPath, videoInputArgs);
+  const { args } = FFmpegBuilder.getArgs(options, outputPath, videoInputArgs);
 
   // Verify filter complex
   const filterIndex = args.indexOf('-filter_complex');
@@ -101,7 +101,7 @@ const videoInputArgs = ['-i', 'pipe:0'];
     subtitles: complexPath
   };
 
-  const args = FFmpegBuilder.getArgs(options, outputPath, videoInputArgs);
+  const { args } = FFmpegBuilder.getArgs(options, outputPath, videoInputArgs);
   const filterIndex = args.indexOf('-filter_complex');
   const filter = args[filterIndex + 1];
 
