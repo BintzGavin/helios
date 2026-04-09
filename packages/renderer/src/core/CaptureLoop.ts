@@ -1,4 +1,3 @@
-import { once } from 'events';
 import { WorkerInfo } from './BrowserPool.js';
 import { FFmpegManager } from './FFmpegManager.js';
 import { RendererOptions, RenderJobOptions } from '../types.js';
@@ -6,6 +5,9 @@ import { RenderStrategy } from '../strategies/RenderStrategy.js';
 import { TimeDriver } from '../drivers/TimeDriver.js';
 
 export class CaptureLoop {
+  private drainResolve: (() => void) | null = null;
+  private drainReject: ((err: Error) => void) | null = null;
+
   constructor(
     private options: RendererOptions,
     private pool: WorkerInfo[],
@@ -15,6 +17,34 @@ export class CaptureLoop {
     private capturedErrors: Error[],
     private jobOptions?: RenderJobOptions
   ) {}
+
+  private setupDrainListeners() {
+    if (!this.ffmpegManager.stdin) return;
+    this.ffmpegManager.stdin.on('drain', () => {
+      if (this.drainResolve) {
+        const resolve = this.drainResolve;
+        this.drainResolve = null;
+        this.drainReject = null;
+        resolve();
+      }
+    });
+    this.ffmpegManager.stdin.on('error', (err) => {
+      if (this.drainReject) {
+        const reject = this.drainReject;
+        this.drainResolve = null;
+        this.drainReject = null;
+        reject(err);
+      }
+    });
+    this.ffmpegManager.stdin.on('close', () => {
+      if (this.drainReject) {
+        const reject = this.drainReject;
+        this.drainResolve = null;
+        this.drainReject = null;
+        reject(new Error('FFmpeg stdin closed before drain'));
+      }
+    });
+  }
 
   private async writeToStdin(buffer: Buffer | string, onWriteError: (err?: Error | null) => void): Promise<void> {
     if (!this.ffmpegManager.stdin?.writable) {
@@ -29,29 +59,15 @@ export class CaptureLoop {
     }
 
     if (!canWriteMore) {
-        const ac = new AbortController();
-        const onClose = () => ac.abort(new Error('FFmpeg stdin closed before drain'));
-        const onError = (err: Error) => ac.abort(err);
-        this.ffmpegManager.stdin.once('close', onClose);
-        this.ffmpegManager.stdin.once('error', onError);
-
-        await once(this.ffmpegManager.stdin, 'drain', { signal: ac.signal })
-            .then(() => {
-                this.ffmpegManager.stdin?.removeListener('close', onClose);
-                this.ffmpegManager.stdin?.removeListener('error', onError);
-            })
-            .catch(err => {
-                this.ffmpegManager.stdin?.removeListener('close', onClose);
-                this.ffmpegManager.stdin?.removeListener('error', onError);
-                if (err.name === 'AbortError' && ac.signal.reason) {
-                    throw ac.signal.reason;
-                }
-                throw err;
-            });
+        await new Promise<void>((resolve, reject) => {
+            this.drainResolve = resolve;
+            this.drainReject = reject;
+        });
     }
   }
 
   public async run(): Promise<void> {
+    this.setupDrainListeners();
     const fps = this.options.fps;
     const progressInterval = Math.floor(this.totalFrames / 10);
 
