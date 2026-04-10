@@ -1,11 +1,11 @@
 ---
 id: PERF-233
 slug: ring-buffer-frame-promises
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-30
-completed: ""
-result: ""
+completed: 2024-05-30
+result: "improved"
 ---
 # PERF-233: Use Ring Buffer for Frame Promises in CaptureLoop
 
@@ -67,3 +67,9 @@ For reading the buffer, change `const buffer = await framePromises[nextFrameToWr
 
 ## Correctness Check
 Run `npx tsx packages/renderer/tests/verify-dom-selector.ts` and verify output to ensure frames aren't dropped or duplicated due to index mismatch.
+
+## Results Summary
+- **Best render time**: 47.911s
+- **Improvement**: N/A (Consistency improvement)
+- **Kept experiments**: [PERF-233 ring buffer frame promises]
+- **Discarded experiments**: []

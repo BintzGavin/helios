@@ -80,7 +80,6 @@ export class CaptureLoop {
     const progressInterval = Math.floor(this.totalFrames / 10);
 
     let previousWritePromise: Promise<void> | undefined;
-    let framePromises: Promise<Buffer | string>[] = new Array(this.totalFrames);
 
     const noopCatch = () => {};
     const onWriteError = (err?: Error | null) => {
@@ -106,6 +105,7 @@ export class CaptureLoop {
     let nextFrameToWrite = 0;
     const poolLen = this.pool.length;
     const maxPipelineDepth = poolLen * 2;
+    let framePromises: Promise<Buffer | string>[] = new Array(maxPipelineDepth);
     const timeStep = 1000 / fps;
     const compTimeStep = 1 / fps;
     const signal = this.jobOptions?.signal;
@@ -128,12 +128,11 @@ export class CaptureLoop {
             const framePromise = captureWorkerFrame(worker.activePromise, worker.timeDriver, worker.page, worker.strategy, compositionTimeInSeconds, time);
 
             worker.activePromise = framePromise as unknown as Promise<void>;
-            framePromises[nextFrameToSubmit] = framePromise;
+            framePromises[nextFrameToSubmit % maxPipelineDepth] = framePromise;
             nextFrameToSubmit++;
         }
 
-        const buffer = await framePromises[nextFrameToWrite]!;
-        framePromises[nextFrameToWrite] = null as any;
+        const buffer = await framePromises[nextFrameToWrite % maxPipelineDepth]!;
 
         const i = nextFrameToWrite;
 

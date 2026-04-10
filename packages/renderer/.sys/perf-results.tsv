@@ -302,3 +302,4 @@ PERF-224-run	32.807	150			keep	mutate callParams.arguments instead of reallocati
 2	47.494	600	12.63	43.4	keep	cache boundingBox
 3	47.108	600	12.74	43.9	keep	cache boundingBox
 4	47.415	600	12.65	38.7	keep	cache boundingBox
+5	47.911	600	12.52	42.8	keep	PERF-233 ring buffer frame promises
