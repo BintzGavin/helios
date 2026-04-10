@@ -95,6 +95,14 @@ export async function transcodeMerge(
       reject(err);
     });
 
+    process.stdin.on('error', (err: any) => {
+      if (err && err.code === 'EPIPE') {
+        console.warn('FFmpeg stdin closed prematurely (EPIPE). Ignoring error to allow graceful exit.');
+      } else {
+        reject(err);
+      }
+    });
+
     // Write file list to stdin
     process.stdin.write(listContent);
     process.stdin.end();
