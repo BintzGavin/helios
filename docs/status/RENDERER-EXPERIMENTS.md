@@ -7,6 +7,9 @@ Current best: 35.091s (baseline was 49.436s, -32.5%)
 Last updated by: PERF-198
 
 ## What Works
+- **PERF-238**: Eliminate `async` wrappers in DOM render hot path
+  - **Result**: SKIPPED. Codebase exploration confirmed that the `capture` method in `DomStrategy.ts` and the injected `window.__helios_seek` function in `SeekTimeDriver.ts` already lack `async` wrappers and utilize native Promise chaining or direct synchronous returns.
+
 - Caching target element bounding box in DomStrategy.prepare() instead of per-frame querying (~1.1% faster) (PERF-232)
 
 - **PERF-231**: Verified that eliminating the `async` wrapper for `captureWorkerFrame` in `CaptureLoop.ts` was already correctly implemented natively, avoiding V8 `async` context creation micro-stalls during the hot loop.
