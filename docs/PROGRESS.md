@@ -78,6 +78,9 @@ Each agent should update **their own dedicated progress file** instead of this f
 ### INFRASTRUCTURE v0.2.0
 - ✅ Completed: Stateless Worker Interface - Implemented WorkerAdapter and LocalWorkerAdapter.
 
+### STUDIO v0.121.2
+- ✅ Completed: STUDIO-Timeline-Drag-Drop - Verified timeline drag and drop for assets is fully implemented.
+
 ### STUDIO v0.120.3
 - ✅ Completed: STUDIO-Asset-Move - Updated effectAllowed to copyMove in AssetItem.tsx
 
