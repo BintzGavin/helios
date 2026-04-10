@@ -96,6 +96,7 @@ Skills for AI agents are in `.agents/skills/helios-skills/skills/`:
 - `packages/player/src/index.ts` - Player public API
 - `packages/renderer/src/index.ts` - Renderer public API
 - `packages/cli/src/index.ts` - CLI public API
+- `packages/infrastructure/src/index.ts` - Infrastructure public API
 - `packages/studio/src/server/mcp.ts` - Studio MCP Server
 - `packages/studio/src/server/plugin.ts` - Studio Vite Plugin
 
