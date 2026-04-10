@@ -51,7 +51,7 @@ vi.mock('fs', async (importOriginal) => {
   return {
     ...actual,
     default: {
-      ...actual.default,
+      ...actual,
       existsSync: vi.fn(),
       readFileSync: vi.fn(),
     },

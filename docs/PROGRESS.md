@@ -8,6 +8,9 @@
 - ✅ Completed: Documentation Orchestration - Updated README.md to document Orchestration, Job Management, Cloud Execution Adapters, and Worker Runtime abstractions.
 # Helios Project Progress Log
 
+## CLI v0.46.7
+- ✅ Completed: Deploy Command Regression Tests - Implemented unit tests for all remaining deploy subcommands.
+
 ## STUDIO v0.121.1
 - ✅ Completed: STUDIO-Timeline-Drag-Drop - Verified existing implementation for timeline drag and drop support to accept assets (2026-11-13-STUDIO-Timeline-Drag-Drop.md).
 
