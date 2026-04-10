@@ -1,11 +1,11 @@
 ---
 id: PERF-240
 slug: inline-capture-worker-frame
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: "2026-04-10"
-completed: ""
-result: ""
+completed: "2026-04-10"
+result: "improved"
 ---
 
 # PERF-240: Inline `captureWorkerFrame` into the hot loop
@@ -56,3 +56,8 @@ Run `npx tsx tests/verify-canvas-strategy.ts` to ensure shared logic is unaffect
 
 ## Correctness Check
 Ensure the generated DOM video still has the correct number of frames and audio sync.
+
+## Results Summary
+- **Best render time**: 48.082s
+- **Kept experiments**: Inline captureWorkerFrame (PERF-240)
+- **Discarded experiments**: None
