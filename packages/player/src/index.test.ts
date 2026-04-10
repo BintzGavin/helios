@@ -1122,7 +1122,61 @@ describe('HeliosPlayer', () => {
     });
   });
 
-  describe('Input Props', () => {
+
+    it('should implement HTMLMediaElement event handlers', () => {
+        const events = ['play', 'pause', 'ended', 'timeupdate', 'volumechange', 'ratechange', 'durationchange', 'seeking', 'seeked', 'resize', 'loadstart', 'loadedmetadata', 'loadeddata', 'canplay', 'canplaythrough', 'error', 'enterpictureinpicture', 'leavepictureinpicture'];
+
+        for (const eventName of events) {
+            const propName = `on${eventName}`;
+            const handler = vi.fn();
+
+            // Set handler
+            player[propName] = handler;
+            expect(player[propName]).toBe(handler);
+
+            // Unset handler (this hits lines like 'if (this._onplay) this.removeEventListener')
+            player[propName] = null;
+            expect(player[propName]).toBeNull();
+
+            // Re-set handler to test 'if (handler) this.addEventListener' branch again
+            player[propName] = handler;
+
+            // Dispatch event
+            player.dispatchEvent(new Event(eventName));
+            expect(handler).toHaveBeenCalled();
+
+            // Unset handler again for cleanup
+            player[propName] = null;
+        }
+    });
+
+    it('should handle HTMLMediaElement defaultPlaybackRate property', () => {
+        expect(player.defaultPlaybackRate).toBe(1); // Initial default
+
+        const rateChangeHandler = vi.fn();
+        player.addEventListener('ratechange', rateChangeHandler);
+
+        player.defaultPlaybackRate = 1.5;
+        expect(player.defaultPlaybackRate).toBe(1.5);
+        player.defaultPlaybackRate = 1.5; // Test unchanged branch
+        expect(rateChangeHandler).toHaveBeenCalledTimes(1);
+        expect(rateChangeHandler).toHaveBeenCalled();
+    });
+
+    it('should implement HTMLMediaElement missing properties', () => {
+        expect(player.crossOrigin).toBeNull();
+
+        expect(player.defaultMuted).toBe(false);
+        player.defaultMuted = true;
+        expect(player.defaultMuted).toBe(true);
+        expect(player.hasAttribute('muted')).toBe(true);
+
+        player.defaultMuted = false;
+        expect(player.defaultMuted).toBe(false);
+        expect(player.hasAttribute('muted')).toBe(false);
+    });
+
+describe('Input Props', () => {
     let mockController: any;
 
     beforeEach(() => {

@@ -1,4 +1,6 @@
-**Version**: 0.77.16
+**Version**: 0.77.17
+## Status Log
+[v0.77.17] ✅ Completed: Improve Index Coverage - Expanded unit tests for HTMLMediaElement properties and events.
 [v0.77.14] ✅ Completed: Document getSchema API Parity - Added missing getSchema method to README documentation.
 [v0.77.13] 🚫 Blocked: No new plan found in /.sys/plans/ for PLAYER. Waiting for Planner to create the next implementation spec.
 [v0.77.12] ✅ Completed: Bridge Coverage Expansion 2 - Added missing unit test coverage for `bridge.ts` message handling boundary conditions (e.g., `HELIOS_SET_PLAYBACK_RATE` invalid args), achieving 100% coverage.
