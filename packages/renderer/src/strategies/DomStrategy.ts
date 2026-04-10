@@ -203,38 +203,41 @@ export class DomStrategy implements RenderStrategy {
   }
 
 
-  async capture(page: Page, frameTime: number): Promise<Buffer | string> {
+  capture(page: Page, frameTime: number): Promise<Buffer | string> {
     if (this.targetElementHandle) {
       if (this.targetBeginFrameParams.screenshot.clip.width > 0) {
         this.targetBeginFrameParams.frameTimeTicks = 10000 + frameTime;
 
-        const res = await this.cdpSession!.send('HeadlessExperimental.beginFrame', this.targetBeginFrameParams);
-        if (res && res.screenshotData) {
-          this.lastFrameData = res.screenshotData;
-          return res.screenshotData;
-        } else if (this.lastFrameData) {
-          return this.lastFrameData;
-        } else {
-          this.lastFrameData = this.emptyImageBase64;
-          return this.emptyImageBase64;
-        }
+        return (this.cdpSession!.send('HeadlessExperimental.beginFrame', this.targetBeginFrameParams) as Promise<any>).then((res) => {
+          if (res && res.screenshotData) {
+            this.lastFrameData = res.screenshotData;
+            return res.screenshotData;
+          } else if (this.lastFrameData) {
+            return this.lastFrameData;
+          } else {
+            this.lastFrameData = this.emptyImageBase64;
+            return this.emptyImageBase64;
+          }
+        });
       }
-      const fallback = await this.targetElementHandle.screenshot((this as any).fallbackScreenshotOptions);
-      this.lastFrameData = fallback as Buffer;
-      return fallback as Buffer;
+      return this.targetElementHandle.screenshot((this as any).fallbackScreenshotOptions).then((fallback: Buffer) => {
+        this.lastFrameData = fallback as Buffer;
+        return fallback as Buffer;
+      });
     }
 
     this.beginFrameParams.frameTimeTicks = 10000 + frameTime;
-    const res = await this.cdpSession!.send('HeadlessExperimental.beginFrame', this.beginFrameParams);
-    if (res && res.screenshotData) {
-      this.lastFrameData = res.screenshotData;
-      return res.screenshotData;
-    } else if (this.lastFrameData) {
-      return this.lastFrameData;
-    } else {
-      this.lastFrameData = this.emptyImageBase64;
-      return this.emptyImageBase64;
-    }
+    return (this.cdpSession!.send('HeadlessExperimental.beginFrame', this.beginFrameParams) as Promise<any>).then((res) => {
+      if (res && res.screenshotData) {
+        this.lastFrameData = res.screenshotData;
+        return res.screenshotData;
+      } else if (this.lastFrameData) {
+        return this.lastFrameData;
+      } else {
+        this.lastFrameData = this.emptyImageBase64;
+        return this.emptyImageBase64;
+      }
+    });
   }
 
   async finish(page: Page): Promise<void> {
