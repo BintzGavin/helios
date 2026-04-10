@@ -118,3 +118,7 @@ Last updated by: PERF-214
 - **Result**: KEPT. Pre-allocate targetBeginFrameParams to eliminate object allocation overhead in DomStrategy.ts hot loop (~36.7s -> ~33.244s)
 - **PERF-233**: Implemented ring buffer for `framePromises` in `CaptureLoop.ts`.
   - **Result**: Improved rendering performance and reduced V8 garbage collection overhead by eliminating large array allocation.
+
+## What Doesn't Work (and Why)
+- **PERF-234**: Eliminate Modulo Indexing in CaptureLoop Ring Buffer
+  - **Why it didn't work**: The renderer tests crashed or failed. Implementing custom pointer wrap-around tracking (e.g. `workerIndex++`, `if (workerIndex === poolLen) workerIndex = 0`) instead of standard modulo operator (`%`) broke synchronous evaluation order in tests and caused pipeline stalls.
