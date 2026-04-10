@@ -6,15 +6,6 @@ import { TimeDriver } from '../drivers/TimeDriver.js';
 
 const noopCatch = () => {};
 
-const captureWorkerFrame = (activePromise: Promise<void>, timeDriver: TimeDriver, page: import('playwright').Page, strategy: RenderStrategy, compositionTimeInSeconds: number, time: number): Promise<Buffer | string> => {
-    return activePromise
-        .catch(noopCatch)
-        .then(() => {
-            timeDriver.setTime(page, compositionTimeInSeconds).then(undefined, noopCatch);
-            return strategy.capture(page, time);
-        });
-};
-
 export class CaptureLoop {
   private drainResolve: (() => void) | null = null;
   private drainReject: ((err: Error) => void) | null = null;
@@ -128,7 +119,12 @@ export class CaptureLoop {
             const time = frameIndex * timeStep;
             const compositionTimeInSeconds = (this.startFrame + frameIndex) * compTimeStep;
 
-            const framePromise = captureWorkerFrame(worker.activePromise, worker.timeDriver, worker.page, worker.strategy, compositionTimeInSeconds, time);
+            const framePromise = worker.activePromise
+                .catch(noopCatch)
+                .then(() => {
+                    worker.timeDriver.setTime(worker.page, compositionTimeInSeconds).then(undefined, noopCatch);
+                    return worker.strategy.capture(worker.page, time);
+                });
 
             worker.activePromise = framePromise as unknown as Promise<void>;
             framePromises[nextFrameToSubmit & ringMask] = framePromise;

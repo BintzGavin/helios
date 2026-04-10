@@ -308,3 +308,4 @@ PERF-224-run	32.807	150			keep	mutate callParams.arguments instead of reallocati
 307	48.388	600	12.40	46.1	keep	Bypass writeToStdin async wrapper (PERF-239)
 308	48.433	600	12.39	40.1	keep	Bypass writeToStdin async wrapper (PERF-239)
 309	48.777	600	12.30	46.3	keep	Bypass writeToStdin async wrapper (PERF-239)
+310	48.082	600	12.48	38.3	keep	Inline captureWorkerFrame
