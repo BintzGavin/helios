@@ -4,8 +4,8 @@ slug: move-closure-logic-outside-captureloop
 status: unclaimed
 claimed_by: ""
 created: 2024-04-10
-completed: ""
-result: ""
+completed: "2024-04-10"
+result: "improved"
 ---
 # PERF-235: Move capture closure logic outside of CaptureLoop to avoid V8 allocation on every run iteration
 
@@ -44,3 +44,9 @@ Run `npx tsx tests/benchmark-test.js` or `npx vitest run packages/renderer` with
 ## Correctness Check
 Run `npm run build:examples && npx tsx tests/run-all.ts` inside `packages/renderer`.
 Ensure the output video matches the timeline duration without glitches or skipped frames.
+
+## Results Summary
+- **Best render time**: 45.630s (vs baseline 47.139s)
+- **Improvement**: ~3.2%
+- **Kept experiments**: Move closure logic outside CaptureLoop
+- **Discarded experiments**: None
