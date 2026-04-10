@@ -21,6 +21,16 @@ export class FFmpegManager {
     this.process = spawn(this.ffmpegPath, args, { stdio });
     console.log(`Spawning FFmpeg: ${this.ffmpegPath} ${args.join(' ')}`);
 
+    if (this.process.stdin) {
+      this.process.stdin.on('error', (err: any) => {
+        if (err && err.code === 'EPIPE') {
+          console.warn('FFmpeg stdin closed prematurely (EPIPE). Ignoring error to allow graceful exit.');
+        } else {
+          console.error('Error writing to FFmpeg stdin:', err);
+        }
+      });
+    }
+
     inputBuffers.forEach(({ index, buffer }) => {
       const pipe = this.process!.stdio[index] as any;
       if (pipe) {
