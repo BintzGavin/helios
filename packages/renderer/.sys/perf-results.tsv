@@ -297,3 +297,4 @@ PERF-224-run	32.807	150			keep	mutate callParams.arguments instead of reallocati
 225	32.896	150	4.56	36.2	keep	Cache FFmpeg drain listeners to eliminate GC pressure
 227	33.244	150	4.51	39.8	keep	optimize targetBeginFrameParams allocation
 2	31.114	600	19.28	36.2	keep	eliminate async wrapper in CaptureLoop
+231	32.7	150	4.58	36.2	keep	eliminate async wrapper in CaptureLoop (verified already implemented)
