@@ -1,11 +1,11 @@
 ---
 id: PERF-231
 slug: eliminate-async-wrapper
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "perf-231"
 created: 2024-05-28
-completed: ""
-result: ""
+completed: "2024-05-28"
+result: "improved"
 ---
 # PERF-231: Eliminate async wrapper for frame capture loop
 
