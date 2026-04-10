@@ -304,3 +304,4 @@ PERF-224-run	32.807	150			keep	mutate callParams.arguments instead of reallocati
 4	47.415	600	12.65	38.7	keep	cache boundingBox
 5	47.911	600	12.52	42.8	keep	PERF-233 ring buffer frame promises
 305	58.729	600	10.22	42.2	keep	Bitwise AND ring buffer index (PERF-236)
+306	51.113	600	11.74	40.7	keep	Optimize BrowserPool Concurrency (PERF-237)

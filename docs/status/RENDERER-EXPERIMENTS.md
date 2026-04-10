@@ -129,3 +129,7 @@ Last updated by: PERF-214
 - `maxPipelineDepth` is safely rounded up to a power of 2, satisfying the bitwise condition.
 - Improved hot loop efficiency during indexing.
 - (PERF-236)
+
+## What Works
+- Reduced BrowserPool worker concurrency to half the available CPU cores to reduce context switching overhead and allow FFmpeg enough CPU headroom (PERF-237).
+  - Render time: ~51.113
