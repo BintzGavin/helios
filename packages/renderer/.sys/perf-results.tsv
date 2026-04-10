@@ -305,3 +305,6 @@ PERF-224-run	32.807	150			keep	mutate callParams.arguments instead of reallocati
 5	47.911	600	12.52	42.8	keep	PERF-233 ring buffer frame promises
 305	58.729	600	10.22	42.2	keep	Bitwise AND ring buffer index (PERF-236)
 306	51.113	600	11.74	40.7	keep	Optimize BrowserPool Concurrency (PERF-237)
+307	48.388	600	12.40	46.1	keep	Bypass writeToStdin async wrapper (PERF-239)
+308	48.433	600	12.39	40.1	keep	Bypass writeToStdin async wrapper (PERF-239)
+309	48.777	600	12.30	46.3	keep	Bypass writeToStdin async wrapper (PERF-239)

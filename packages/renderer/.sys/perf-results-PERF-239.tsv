@@ -1,0 +1,4 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	48.388	600	12.40	46.1	discard	Bypass writeToStdin async wrapper (PERF-239)
+2	48.433	600	12.39	40.1	discard	Bypass writeToStdin async wrapper (PERF-239)
+3	48.777	600	12.30	46.3	discard	Bypass writeToStdin async wrapper (PERF-239)
