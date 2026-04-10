@@ -1,7 +1,10 @@
 ---
 id: PERF-232
 slug: cache-boundingbox
-status: unclaimed
+status: complete
+claimed_by: "executor-session"
+completed: 2026-04-10
+result: improved
 claimed_by: ""
 created: 2024-05-30
 completed: ""
@@ -89,3 +92,11 @@ Run `npx tsx packages/renderer/tests/verify-canvas-strategy.ts` to ensure Canvas
 
 ## Correctness Check
 Run `npx tsx packages/renderer/tests/verify-dom-selector.ts` and verify output.
+
+
+## Results Summary
+- **Best render time**: 47.108s (vs baseline 47.649s)
+- **Improvement**: 1.1%
+- **Kept experiments**:
+  - Cache target element bounding box in DomStrategy.prepare()
+- **Discarded experiments**: None
