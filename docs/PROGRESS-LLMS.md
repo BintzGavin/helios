@@ -519,3 +519,8 @@
 - ✅ Completed: Daily llms.txt Review
   - Updated CLI version to v0.45.1+ in Quick Facts and Roadmap.
   - Verified other package versions against package.json.
+
+## LLMS v1.57.1
+- ✅ Completed: Daily llms.txt Review
+  - Added `packages/infrastructure/src/index.ts` to Key Files for Agents.
+  - Verified all package versions perfectly match `package.json`.
