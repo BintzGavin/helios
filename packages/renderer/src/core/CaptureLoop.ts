@@ -105,7 +105,9 @@ export class CaptureLoop {
     let nextFrameToSubmit = 0;
     let nextFrameToWrite = 0;
     const poolLen = this.pool.length;
-    const maxPipelineDepth = poolLen * 2;
+    let maxPipelineDepth = poolLen * 2;
+    maxPipelineDepth = Math.pow(2, Math.ceil(Math.log2(maxPipelineDepth)));
+    const ringMask = maxPipelineDepth - 1;
     let framePromises: Promise<Buffer | string>[] = new Array(maxPipelineDepth);
     const timeStep = 1000 / fps;
     const compTimeStep = 1 / fps;
@@ -129,11 +131,11 @@ export class CaptureLoop {
             const framePromise = captureWorkerFrame(worker.activePromise, worker.timeDriver, worker.page, worker.strategy, compositionTimeInSeconds, time);
 
             worker.activePromise = framePromise as unknown as Promise<void>;
-            framePromises[nextFrameToSubmit % maxPipelineDepth] = framePromise;
+            framePromises[nextFrameToSubmit & ringMask] = framePromise;
             nextFrameToSubmit++;
         }
 
-        const buffer = await framePromises[nextFrameToWrite % maxPipelineDepth]!;
+        const buffer = await framePromises[nextFrameToWrite & ringMask]!;
 
         const i = nextFrameToWrite;
 

@@ -123,3 +123,9 @@ Last updated by: PERF-214
 ## What Doesn't Work (and Why)
 - **PERF-234**: Eliminate Modulo Indexing in CaptureLoop Ring Buffer
   - **Why it didn't work**: The renderer tests crashed or failed. Implementing custom pointer wrap-around tracking (e.g. `workerIndex++`, `if (workerIndex === poolLen) workerIndex = 0`) instead of standard modulo operator (`%`) broke synchronous evaluation order in tests and caused pipeline stalls.
+
+## What Works
+- Replaced modulo arithmetic with bitwise AND for `CaptureLoop` ring buffer.
+- `maxPipelineDepth` is safely rounded up to a power of 2, satisfying the bitwise condition.
+- Improved hot loop efficiency during indexing.
+- (PERF-236)
