@@ -172,6 +172,7 @@ export class DomStrategy implements RenderStrategy {
       frameTimeTicks: 0
     };
 
+
     if (this.options.targetSelector) {
       const handle = await page.evaluateHandle((args) => {
         // @ts-ignore
@@ -186,18 +187,25 @@ export class DomStrategy implements RenderStrategy {
         throw new Error(`Target element found but is not an element: ${this.options.targetSelector}`);
       }
       this.targetElementHandle = element;
-    }
 
-  }
-
-  async capture(page: Page, frameTime: number): Promise<Buffer | string> {
-    if (this.targetElementHandle) {
       const box = await this.targetElementHandle.boundingBox();
       if (box) {
         this.targetBeginFrameParams.screenshot.clip.x = box.x;
         this.targetBeginFrameParams.screenshot.clip.y = box.y;
         this.targetBeginFrameParams.screenshot.clip.width = box.width;
         this.targetBeginFrameParams.screenshot.clip.height = box.height;
+      } else {
+        console.warn(`Could not determine bounding box for target element: ${this.options.targetSelector}`);
+      }
+    }
+
+
+  }
+
+
+  async capture(page: Page, frameTime: number): Promise<Buffer | string> {
+    if (this.targetElementHandle) {
+      if (this.targetBeginFrameParams.screenshot.clip.width > 0) {
         this.targetBeginFrameParams.frameTimeTicks = 10000 + frameTime;
 
         const res = await this.cdpSession!.send('HeadlessExperimental.beginFrame', this.targetBeginFrameParams);

@@ -298,3 +298,7 @@ PERF-224-run	32.807	150			keep	mutate callParams.arguments instead of reallocati
 227	33.244	150	4.51	39.8	keep	optimize targetBeginFrameParams allocation
 2	31.114	600	19.28	36.2	keep	eliminate async wrapper in CaptureLoop
 231	32.7	150	4.58	36.2	keep	eliminate async wrapper in CaptureLoop (verified already implemented)
+1	47.649	600	12.59	47.4	keep	baseline bypass beginFrame width check
+2	47.494	600	12.63	43.4	keep	cache boundingBox
+3	47.108	600	12.74	43.9	keep	cache boundingBox
+4	47.415	600	12.65	38.7	keep	cache boundingBox

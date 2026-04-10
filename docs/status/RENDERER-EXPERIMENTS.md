@@ -1,12 +1,14 @@
 ## Performance Trajectory
 Current best: 32.896s (baseline was 33.303s, -1.8%)
-Last updated by: PERF-219
+Last updated by: PERF-232
 
 
 Current best: 35.091s (baseline was 49.436s, -32.5%)
 Last updated by: PERF-198
 
 ## What Works
+- Caching target element bounding box in DomStrategy.prepare() instead of per-frame querying (~1.1% faster) (PERF-232)
+
 - **PERF-231**: Verified that eliminating the `async` wrapper for `captureWorkerFrame` in `CaptureLoop.ts` was already correctly implemented natively, avoiding V8 `async` context creation micro-stalls during the hot loop.
 - **Optimized CDP evaluate via callFunctionOn:** Replaced expensive `page.evaluate` and `frame.evaluate` calls in `CdpTimeDriver.ts` with pre-cached `Runtime.callFunctionOn` during the `setTime` hot loop, saving AST evaluation parsing costs. Improved from 36.3s to 34.82s. [PERF-228]
 - PERF-221: Added `--disable-smooth-scrolling` to `DEFAULT_BROWSER_ARGS` in `BrowserPool.ts` to reduce Chromium Compositor overhead on smooth scrolling animations. Render time changed to 32.767s.
