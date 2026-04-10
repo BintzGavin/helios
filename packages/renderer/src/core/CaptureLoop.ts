@@ -64,7 +64,7 @@ export class CaptureLoop {
     });
   }
 
-  private async writeToStdin(buffer: Buffer | string, onWriteError: (err?: Error | null) => void): Promise<void> {
+  private writeToStdin(buffer: Buffer | string, onWriteError: (err?: Error | null) => void): Promise<void> | void {
     if (!this.ffmpegManager.stdin?.writable) {
       console.warn('FFmpeg stdin is not writable. Skipping write.');
       return;
@@ -78,7 +78,7 @@ export class CaptureLoop {
     }
 
     if (!canWriteMore) {
-        await new Promise<void>((resolve, reject) => {
+        return new Promise<void>((resolve, reject) => {
             this.drainResolve = resolve;
             this.drainReject = reject;
         });
@@ -151,7 +151,8 @@ export class CaptureLoop {
            await previousWritePromise;
         }
 
-        previousWritePromise = this.writeToStdin(buffer, onWriteError);
+        const writeResult = this.writeToStdin(buffer, onWriteError);
+        previousWritePromise = writeResult ? writeResult : undefined;
 
         nextFrameToWrite++;
     }
@@ -164,7 +165,8 @@ export class CaptureLoop {
     const finalBuffer = await this.pool[0].strategy.finish(this.pool[0].page);
     if (finalBuffer && ((Buffer.isBuffer(finalBuffer) && finalBuffer.length > 0) || (typeof finalBuffer === 'string' && finalBuffer.length > 0))) {
       console.log(`Writing final buffer...`);
-      await this.writeToStdin(finalBuffer, onWriteError);
+      const writeResult = this.writeToStdin(finalBuffer, onWriteError);
+      if (writeResult) await writeResult;
     }
 
     console.log('Finished sending frames. Closing FFmpeg stdin.');

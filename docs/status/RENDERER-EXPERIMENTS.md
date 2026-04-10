@@ -7,6 +7,7 @@ Current best: 35.091s (baseline was 49.436s, -32.5%)
 Last updated by: PERF-198
 
 ## What Works
+- Removing `async` from `writeToStdin` to bypass microtask yields (PERF-239): Improved render times from ~51s to ~48.5s (-5%). Returning `void` on synchronous `stdin.write` avoids creating redundant V8 Promises and eliminates the subsequent microtask queue yield in the hot capture loop.
 - **PERF-238**: Eliminate `async` wrappers in DOM render hot path
   - **Result**: SKIPPED. Codebase exploration confirmed that the `capture` method in `DomStrategy.ts` and the injected `window.__helios_seek` function in `SeekTimeDriver.ts` already lack `async` wrappers and utilize native Promise chaining or direct synchronous returns.
 

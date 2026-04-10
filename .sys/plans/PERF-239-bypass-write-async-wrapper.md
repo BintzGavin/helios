@@ -1,11 +1,11 @@
 ---
 id: PERF-239
 slug: bypass-write-async-wrapper
-status: unclaimed
+status: complete
 claimed_by: ""
 created: "$(date -I)"
-completed: ""
-result: ""
+completed: "2026-04-10"
+result: "keep"
 ---
 
 # PERF-239: Bypass writeToStdin Async Wrapper
