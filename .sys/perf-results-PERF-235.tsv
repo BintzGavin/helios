@@ -1,0 +1,4 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	45.854	600	13.09	41.3	keep	baseline
+1	47.139	600	12.73	46.4	keep	baseline
+2	45.630	600	13.15	41.4	keep	move closure logic outside CaptureLoop

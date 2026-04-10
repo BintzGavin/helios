@@ -4,6 +4,17 @@ import { RendererOptions, RenderJobOptions } from '../types.js';
 import { RenderStrategy } from '../strategies/RenderStrategy.js';
 import { TimeDriver } from '../drivers/TimeDriver.js';
 
+const noopCatch = () => {};
+
+const captureWorkerFrame = (activePromise: Promise<void>, timeDriver: TimeDriver, page: import('playwright').Page, strategy: RenderStrategy, compositionTimeInSeconds: number, time: number): Promise<Buffer | string> => {
+    return activePromise
+        .catch(noopCatch)
+        .then(() => {
+            timeDriver.setTime(page, compositionTimeInSeconds).then(undefined, noopCatch);
+            return strategy.capture(page, time);
+        });
+};
+
 export class CaptureLoop {
   private drainResolve: (() => void) | null = null;
   private drainReject: ((err: Error) => void) | null = null;
@@ -81,7 +92,6 @@ export class CaptureLoop {
 
     let previousWritePromise: Promise<void> | undefined;
 
-    const noopCatch = () => {};
     const onWriteError = (err?: Error | null) => {
         if (err) {
            if ((err as any).code === 'EPIPE') {
@@ -90,15 +100,6 @@ export class CaptureLoop {
                this.ffmpegManager.emitError(err);
            }
         }
-    };
-
-    const captureWorkerFrame = (activePromise: Promise<void>, timeDriver: TimeDriver, page: import('playwright').Page, strategy: RenderStrategy, compositionTimeInSeconds: number, time: number): Promise<Buffer | string> => {
-        return activePromise
-            .catch(noopCatch)
-            .then(() => {
-                timeDriver.setTime(page, compositionTimeInSeconds).then(undefined, noopCatch);
-                return strategy.capture(page, time);
-            });
     };
 
     let nextFrameToSubmit = 0;

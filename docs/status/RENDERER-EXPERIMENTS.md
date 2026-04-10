@@ -1,6 +1,6 @@
 ## Performance Trajectory
-Current best: 32.896s (baseline was 33.303s, -1.8%)
-Last updated by: PERF-232
+Current best: 45.630s (baseline was 47.139s, -3.2%)
+Last updated by: PERF-235
 
 
 Current best: 35.091s (baseline was 49.436s, -32.5%)
@@ -30,6 +30,7 @@ Last updated by: PERF-198
 - PERF-186: Unrolling worker object parameters into explicit arguments in `captureWorkerFrame` and inlining Base64 object/Buffer allocation in `DomStrategy.ts` reduced micro-stalls and object property allocations, accelerating render time significantly (down to ~3.7s). (~73% faster than the 13.7s baseline).
 - **Replace startScreencast with beginFrame in DomStrategy** (PERF-184): Replaced the damage-driven `Page.startScreencast` capture approach with synchronous `HeadlessExperimental.beginFrame` for the full-page DOM fallback. Improved render time to ~6.6s.
 
+- Moved closure logic outside CaptureLoop (~3.2% faster) [PERF-235]
 ## What Doesn't Work (and Why)
 - PERF-222: Added `--disable-renderer-backgrounding` and `--disable-backgrounding-occluded-windows` to `DEFAULT_BROWSER_ARGS`. Resulted in 32.839s (-0.2% change). Status: discard.
 - Discarded `PERF-220` (remove background networking flags)
