@@ -1,11 +1,11 @@
 ---
 id: PERF-238
 slug: eliminate-async-wrappers
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-06-06
 completed: ""
-result: ""
+result: "Skipped: async wrappers already eliminated in codebase"
 ---
 # PERF-238: Eliminate `async` wrappers in DOM render hot path
 
