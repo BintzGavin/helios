@@ -1,11 +1,11 @@
 ---
 id: PERF-237
 slug: optimize-browserpool-concurrency
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-30
-completed: ""
-result: ""
+completed: "2026-04-10"
+result: "improved"
 ---
 # PERF-237: Optimize BrowserPool Concurrency Heuristic
 
@@ -49,3 +49,5 @@ Run `npx tsx tests/verify-browser-config.ts` to ensure the pool still initialize
 
 ## Prior Art
 - PERF-214 (Enabled software rasterizer, which shifted the bottleneck to CPU contention)
+## Results Summary
+- **Kept experiments**: Optimized concurrency in BrowserPool.ts
