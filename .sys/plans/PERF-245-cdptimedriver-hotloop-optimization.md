@@ -1,11 +1,11 @@
 ---
 id: PERF-245
 slug: cdptimedriver-hotloop-optimization
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2026-10-19
-completed: ""
-result: ""
+completed: "2026-04-11"
+result: "keep"
 ---
 
 # PERF-245: Optimize CdpTimeDriver Hot Loop Allocations

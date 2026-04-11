@@ -7,6 +7,8 @@ Current best: 48.082s (baseline was 49.436s, -32.5%)
 Last updated by: PERF-198
 
 ## What Works
+- **PERF-245**: Pre-allocated promises array and pre-bound closure in CdpTimeDriver hot loop to eliminate per-frame V8 array allocation and garbage collection overhead. Render time improved from baseline to 2.936s.
+
 - Replaced batch Promise.all iteration with continuous while-loop overlapping maxPipelineDepth promises (PERF-249, ~1.4% faster)
 - Batch submitting frame capture promises up to `maxPipelineDepth` simultaneously using `Promise.all()` instead of an iterative wait-loop, saving ~13% render time (PERF-248)
 - Restored BrowserPool worker concurrency to os.cpus().length - 1. Render time improved dramatically from ~11.960s to ~1.919s (-83.9%). (PERF-247)

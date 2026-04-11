@@ -323,3 +323,4 @@ PERF-224-run	32.807	150			keep	mutate callParams.arguments instead of reallocati
 PERF-249	CaptureLoop	2.735	Sliding window pipeline optimization
 
 4	0.276	150	542.96	39.5	keep	overlapping promise execution
+run	2.936	150	51.09	38.0	keep	Pre-allocate promises array and pre-bind closure in CdpTimeDriver hot loop

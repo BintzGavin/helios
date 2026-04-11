@@ -22,6 +22,17 @@ export class CdpTimeDriver implements TimeDriver {
     returnByValue: false,
     awaitPromise: true
   };
+  private cachedPromises: Promise<any>[] = [];
+  private cdpResolve: (() => void) | null = null;
+  private cdpReject: ((err: Error) => void) | null = null;
+
+  private handleVirtualTimeBudgetExpired = () => {
+    if (this.cdpResolve) {
+      this.cdpResolve();
+      this.cdpResolve = null;
+      this.cdpReject = null;
+    }
+  };
 
   constructor(timeout: number = 30000) {
     this.timeout = timeout;
@@ -129,7 +140,10 @@ export class CdpTimeDriver implements TimeDriver {
           console.warn('[CdpTimeDriver] Failed to sync media in frame ' + frames[0].url() + ':', e);
         });
       } else {
-        const framePromises: Promise<any>[] = new Array(frames.length);
+        if (this.cachedPromises.length !== frames.length) {
+          this.cachedPromises = new Array(frames.length);
+        }
+        const framePromises = this.cachedPromises;
         for (let i = 0; i < frames.length; i++) {
           const frame = frames[i];
           framePromises[i] = frame.evaluate((t) => {
@@ -147,11 +161,19 @@ export class CdpTimeDriver implements TimeDriver {
     // 2. Advance virtual time
     // This triggers the browser event loop and requestAnimationFrame
     await new Promise<void>((resolve, reject) => {
+      this.cdpResolve = resolve;
+      this.cdpReject = reject;
       // Use 'once' to avoid leaking listeners
-      this.client!.once('Emulation.virtualTimeBudgetExpired', () => resolve());
+      this.client!.once('Emulation.virtualTimeBudgetExpired', this.handleVirtualTimeBudgetExpired);
 
       this.setVirtualTimePolicyParams.budget = budget;
-      this.client!.send('Emulation.setVirtualTimePolicy', this.setVirtualTimePolicyParams).catch(reject);
+      this.client!.send('Emulation.setVirtualTimePolicy', this.setVirtualTimePolicyParams).catch((err) => {
+        if (this.cdpReject) {
+          this.cdpReject(err);
+          this.cdpResolve = null;
+          this.cdpReject = null;
+        }
+      });
     });
 
     this.currentTime = timeInSeconds;
