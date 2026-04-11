@@ -1,11 +1,11 @@
 ---
 id: PERF-244
 slug: increase-pipeline-depth
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: "2026-04-11"
-completed: ""
-result: ""
+completed: "2026-04-11"
+result: "no-improvement"
 ---
 
 # PERF-244: Increase Pipeline Depth to Maximize Concurrency
@@ -63,3 +63,10 @@ Run the DOM render tests to ensure pipeline ordering is maintained correctly.
 
 ## Prior Art
 - PERF-233, PERF-234, PERF-236 (Ring buffer implementations)
+
+
+
+## Results Summary
+- **Best render time**: 50.119s
+- **Kept experiments**: None
+- **Discarded experiments**: Increase pipeline depth to 8
