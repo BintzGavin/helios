@@ -1,11 +1,11 @@
 ---
 id: PERF-247
 slug: restore-concurrency
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: "2026-04-11"
-completed: ""
-result: ""
+completed: "2024-04-12"
+result: "improved"
 ---
 
 # PERF-247: Restore BrowserPool Concurrency
@@ -47,3 +47,15 @@ Run `npx tsx tests/verify-dom-strategy-capture.ts` or a standard benchmark to co
 
 ## Prior Art
 - PERF-237 (the flawed experiment that halved concurrency)
+
+## Results Summary
+- **Best render time**: 1.919s (vs baseline 11.960s)
+- **Improvement**: 83.9%
+- **Kept experiments**: Restored BrowserPool concurrency to
+- **Discarded experiments**: None
+
+## Results Summary
+- **Best render time**: 1.919s (vs baseline 11.960s)
+- **Improvement**: 83.9%
+- **Kept experiments**: Restored BrowserPool concurrency to os.cpus().length - 1
+- **Discarded experiments**: None

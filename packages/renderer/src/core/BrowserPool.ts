@@ -103,7 +103,7 @@ export class BrowserPool {
     this.browser = await chromium.launch(this.getLaunchOptions());
     this.capturedErrors = [];
 
-    const concurrency = Math.max(1, Math.floor((os.cpus().length || 4) / 2));
+    const concurrency = Math.max(1, (os.cpus().length || 4) - 1);
     console.log(`Initializing pool of ${concurrency} pages...`);
 
     const createPage = async (index: number): Promise<WorkerInfo> => {
