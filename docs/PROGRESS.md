@@ -1,3 +1,6 @@
+## STUDIO v0.121.3
+- ✅ Completed: STUDIO-Timeline-Audio-Drag-Drop - Enabled dropping audio assets onto the Timeline and mapped them to composition inputs.
+
 ## STUDIO v0.120.4
   - ✅ Completed: STUDIO-Timeline-Drag-Drop - Implemented drag and drop support for the Timeline to accept assets
 

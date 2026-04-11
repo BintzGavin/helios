@@ -210,6 +210,8 @@ export const Timeline: React.FC = () => {
     try {
       const asset = JSON.parse(assetData);
 
+      if (asset.type !== "video" && asset.type !== "audio") return;
+
       if (!contentRef.current) return;
       const rect = contentRef.current.getBoundingClientRect();
       const x = Math.max(0, Math.min(e.clientX - rect.left, rect.width));
