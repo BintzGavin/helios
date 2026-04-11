@@ -291,4 +291,54 @@ describe('Timeline', () => {
       myVideoTime: 5
     });
   });
+
+  it('handles audio asset drop correctly', () => {
+    const setInputPropsMock = vi.fn();
+    (StudioContext.useStudio as any).mockReturnValue({
+      ...defaultContext,
+      playerState: {
+        ...defaultPlayerState,
+        schema: {
+          myAudio: { type: 'audio', label: 'My Audio' },
+          myAudioTime: { type: 'number', format: 'time' }
+        },
+        inputProps: {}
+      },
+      controller: {
+        ...defaultContext.controller,
+        setInputProps: setInputPropsMock
+      }
+    });
+
+    const { container } = render(<Timeline />);
+    const content = container.querySelector('.timeline-content');
+
+    if (content) {
+      content.getBoundingClientRect = vi.fn(() => ({
+        left: 0, top: 0, width: 1000, height: 100, bottom: 100, right: 1000, x: 0, y: 0, toJSON: () => {}
+      }));
+    }
+
+    const mockAsset = {
+      id: 'asset2',
+      name: 'test.mp3',
+      url: 'assets/test.mp3',
+      type: 'audio'
+    };
+
+    const dropEvent = createEvent.drop(content!);
+    Object.defineProperty(dropEvent, 'dataTransfer', {
+      value: {
+        getData: vi.fn((key) => key === 'application/helios-asset' ? JSON.stringify(mockAsset) : null)
+      }
+    });
+    Object.defineProperty(dropEvent, 'clientX', { value: 250 }); // 25% of 10s = 2.5s
+
+    fireEvent(content!, dropEvent);
+
+    expect(setInputPropsMock).toHaveBeenCalledWith({
+      myAudio: 'assets/test.mp3',
+      myAudioTime: 2.5
+    });
+  });
 });
