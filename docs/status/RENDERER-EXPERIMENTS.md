@@ -7,6 +7,7 @@ Current best: 48.082s (baseline was 49.436s, -32.5%)
 Last updated by: PERF-198
 
 ## What Works
+- Use callFunctionOn for sync media - ~1.2% faster `PERF-228`
 - Eliminated closure allocation in DomStrategy capture by pre-binding CDP response handler (PERF-242)
 - Inline captureWorkerFrame into hot loop (PERF-240)
 - Removing `async` from `writeToStdin` to bypass microtask yields (PERF-239): Improved render times from ~51s to ~48.5s (-5%). Returning `void` on synchronous `stdin.write` avoids creating redundant V8 Promises and eliminates the subsequent microtask queue yield in the hot capture loop.
