@@ -1,11 +1,11 @@
 ---
 id: PERF-249
 slug: capture-loop-promise-all-parallel
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: "2026-04-11"
-completed: ""
-result: ""
+completed: "2026-04-11"
+result: improved
 ---
 
 # PERF-249: Optimize Capture Loop to pipeline Frame Generation and Writing
@@ -46,3 +46,10 @@ Run `npx tsx tests/verify-dom-strategy-capture.ts` to verify frame ordering is p
 
 ## Prior Art
 - PERF-248: Initial implementation of Promise.all batching in CaptureLoop.
+
+
+## Results Summary
+- **Best render time**: 0.276s (vs baseline 0.28s)
+- **Improvement**: 1.4%
+- **Kept experiments**: Overlapping parallel promise generation
+- **Discarded experiments**: none

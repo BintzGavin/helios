@@ -7,6 +7,7 @@ Current best: 48.082s (baseline was 49.436s, -32.5%)
 Last updated by: PERF-198
 
 ## What Works
+- Replaced batch Promise.all iteration with continuous while-loop overlapping maxPipelineDepth promises (PERF-249, ~1.4% faster)
 - Batch submitting frame capture promises up to `maxPipelineDepth` simultaneously using `Promise.all()` instead of an iterative wait-loop, saving ~13% render time (PERF-248)
 - Restored BrowserPool worker concurrency to os.cpus().length - 1. Render time improved dramatically from ~11.960s to ~1.919s (-83.9%). (PERF-247)
 - Use callFunctionOn for sync media - ~1.2% faster `PERF-228`
@@ -109,8 +110,8 @@ Last updated by: PERF-210
 - Removed `--disable-gpu-compositing` from `GPU_DISABLED_ARGS` in `packages/renderer/src/core/BrowserPool.ts`. Allowed Chromium to fallback to its software rasterizer (SwiftShader) which provides significant execution speedups in the headless, CPU-bound environment. Reduced rendering time in benchmark from ~33.156s to ~32.595s (~1.7% improvement).
   - ID: PERF-214
 
-Current best: 48.082s (baseline was ~33.156s, -1.7%)
-Last updated by: PERF-214
+Current best: 0.276s (baseline was 0.28s, -1.4%)
+Last updated by: PERF-249
 
 - Removed `--disable-gpu` from `GPU_DISABLED_ARGS` allowing Chromium to handle software fallback automatically.
   - Slower than baseline. Explicitly disabling GPU yields better performance than native software fallback. Render time was 33.543s (-2.90842% change).
