@@ -502,3 +502,6 @@ Each agent should update **their own dedicated progress file** instead of this f
 
 ### CLI v0.46.6
 - ✅ Completed: Add Cloudflare Sandbox Adapter support to job run - Verified implementation and tests for Cloudflare Sandbox adapter support in the job run command.
+
+### PLAYER v0.77.18
+- ✅ Completed: Fix Duplicate README Entry - Removed duplicate getSchema entry from README.md.

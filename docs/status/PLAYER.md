@@ -1,4 +1,6 @@
-**Version**: 0.77.17
+**Version**: 0.77.18
+
+[v0.77.18] ✅ Completed: Fix Duplicate README Entry - Removed duplicate getSchema entry from README.md.
 ## Status Log
 [v0.77.17] ✅ Completed: Improve Index Coverage - Expanded unit tests for HTMLMediaElement properties and events.
 [v0.77.14] ✅ Completed: Document getSchema API Parity - Added missing getSchema method to README documentation.
