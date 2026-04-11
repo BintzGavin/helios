@@ -311,3 +311,4 @@ PERF-224-run	32.807	150			keep	mutate callParams.arguments instead of reallocati
 310	48.082	600	12.48	38.3	keep	Inline captureWorkerFrame
 1	59.793	300	10.03	37.3	keep	Eliminated closure allocation in DomStrategy capture (PERF-242)
 311	53.825	600	11.15	36.2	discard	Reduce worker concurrency to 1
+312	50.119	600	11.97	39.8	discard	Increase pipeline depth to poolLen * 8 (PERF-244)
