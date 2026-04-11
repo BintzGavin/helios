@@ -16,7 +16,7 @@ async function run() {
   const renderer = new Renderer(options);
   const start = performance.now();
   try {
-    const compUrl = 'file://' + path.resolve(__dirname, '../../../examples/simple-canvas-animation/examples/simple-canvas-animation/output/example-build/composition.html');
+    const compUrl = 'file://' + path.resolve(__dirname, '../../../output/example-build/examples/simple-canvas-animation/composition.html');
     await renderer.render(compUrl, 'test-output.mp4');
   } catch (err) {
     console.error(err);
