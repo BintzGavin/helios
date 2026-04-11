@@ -1,11 +1,11 @@
 ---
 id: PERF-243
 slug: reduce-worker-concurrency
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: "2026-04-11"
-completed: ""
-result: ""
+completed: "2026-04-11"
+result: "failed"
 ---
 
 # PERF-243: Evaluate Minimal Worker Concurrency (Single Page)
@@ -57,3 +57,9 @@ Run the DOM render tests to ensure 1 worker correctly processes all frames in or
 
 ## Prior Art
 - PERF-237: Optimize BrowserPool Concurrency Heuristic (halved cores).
+
+## Results Summary
+- **Best render time**: 53.825s (vs baseline 48.336s)
+- **Improvement**: -11%
+- **Kept experiments**: []
+- **Discarded experiments**: [Reduce worker concurrency to 1]
