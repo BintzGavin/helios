@@ -41,6 +41,9 @@ Last updated by: PERF-198
 
 - Moved closure logic outside CaptureLoop (~3.2% faster) [PERF-235]
 ## What Doesn't Work (and Why)
+- Reduced worker concurrency to 1. Resulted in ~54s render time vs ~49s baseline. Running multiple pages in parallel is faster even if it causes some context switching overhead.
+  (Plan: PERF-243)
+
 - PERF-222: Added `--disable-renderer-backgrounding` and `--disable-backgrounding-occluded-windows` to `DEFAULT_BROWSER_ARGS`. Resulted in 32.839s (-0.2% change). Status: discard.
 - Discarded `PERF-220` (remove background networking flags)
   - Time: 32.547s (baseline: 32.552s). The difference is well within the margin of error (less than 0.1%).
