@@ -1,7 +1,7 @@
 ---
 id: PERF-228
 slug: cdp-evaluate-optimization
-status: claimed
+status: complete
 claimed_by: "Jules"
 claimed_by: ""
 created: 2024-04-09
