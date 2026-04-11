@@ -1,12 +1,13 @@
 ## Performance Trajectory
-Current best: 0.276s (baseline was 0.285s, -3.2%)
-Last updated by: PERF-235
+Current best: 1.919s (baseline was 11.960s, -83.9%)
+Last updated by: PERF-247
 
 
 Current best: 48.082s (baseline was 49.436s, -32.5%)
 Last updated by: PERF-198
 
 ## What Works
+- Restored BrowserPool worker concurrency to os.cpus().length - 1. Render time improved dramatically from ~11.960s to ~1.919s (-83.9%). (PERF-247)
 - Use callFunctionOn for sync media - ~1.2% faster `PERF-228`
 - Eliminated closure allocation in DomStrategy capture by pre-binding CDP response handler (PERF-242)
 - Inline captureWorkerFrame into hot loop (PERF-240)
