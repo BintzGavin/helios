@@ -1,0 +1,5 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	49.337	600	12.16	40.1	discard	Context ring buffer
+2	49.339	600	12.16	38.5	discard	Context ring buffer
+3	53.042	600	11.31	40.4	discard	Context ring buffer
+4	52.477	600	11.43	41.3	discard	Context ring buffer
