@@ -25,6 +25,18 @@ export class DomStrategy implements RenderStrategy {
   private emptyImageBase64: string = "";
   private frameInterval: number = 0;
 
+  private handleBeginFrameResult = (res: any) => {
+    if (res && res.screenshotData) {
+      this.lastFrameData = res.screenshotData;
+      return res.screenshotData;
+    } else if (this.lastFrameData) {
+      return this.lastFrameData;
+    } else {
+      this.lastFrameData = this.emptyImageBase64;
+      return this.emptyImageBase64;
+    }
+  };
+
   constructor(private options: RendererOptions) {
     if (this.options.videoCodec === 'copy') {
       throw new Error("DomStrategy produces image sequences and cannot be used with 'copy' codec. Please use a transcoding codec like 'libx264' (default).");
@@ -208,17 +220,7 @@ export class DomStrategy implements RenderStrategy {
       if (this.targetBeginFrameParams.screenshot.clip.width > 0) {
         this.targetBeginFrameParams.frameTimeTicks = 10000 + frameTime;
 
-        return (this.cdpSession!.send('HeadlessExperimental.beginFrame', this.targetBeginFrameParams) as Promise<any>).then((res) => {
-          if (res && res.screenshotData) {
-            this.lastFrameData = res.screenshotData;
-            return res.screenshotData;
-          } else if (this.lastFrameData) {
-            return this.lastFrameData;
-          } else {
-            this.lastFrameData = this.emptyImageBase64;
-            return this.emptyImageBase64;
-          }
-        });
+        return (this.cdpSession!.send('HeadlessExperimental.beginFrame', this.targetBeginFrameParams) as Promise<any>).then(this.handleBeginFrameResult);
       }
       return this.targetElementHandle.screenshot((this as any).fallbackScreenshotOptions).then((fallback: Buffer) => {
         this.lastFrameData = fallback as Buffer;
@@ -227,17 +229,7 @@ export class DomStrategy implements RenderStrategy {
     }
 
     this.beginFrameParams.frameTimeTicks = 10000 + frameTime;
-    return (this.cdpSession!.send('HeadlessExperimental.beginFrame', this.beginFrameParams) as Promise<any>).then((res) => {
-      if (res && res.screenshotData) {
-        this.lastFrameData = res.screenshotData;
-        return res.screenshotData;
-      } else if (this.lastFrameData) {
-        return this.lastFrameData;
-      } else {
-        this.lastFrameData = this.emptyImageBase64;
-        return this.emptyImageBase64;
-      }
-    });
+    return (this.cdpSession!.send('HeadlessExperimental.beginFrame', this.beginFrameParams) as Promise<any>).then(this.handleBeginFrameResult);
   }
 
   async finish(page: Page): Promise<void> {

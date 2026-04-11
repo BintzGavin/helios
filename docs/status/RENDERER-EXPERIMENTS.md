@@ -7,6 +7,7 @@ Current best: 48.082s (baseline was 49.436s, -32.5%)
 Last updated by: PERF-198
 
 ## What Works
+- Eliminated closure allocation in DomStrategy capture by pre-binding CDP response handler (PERF-242)
 - Inline captureWorkerFrame into hot loop (PERF-240)
 - Inline captureWorkerFrame into hot loop (PERF-240)
 - Inline captureWorkerFrame into hot loop (PERF-240)
@@ -64,6 +65,7 @@ Last updated by: PERF-198
 - **Result**: Reduced contention, improved rendering speed over 34.2s baseline to 33.9s.
 
 ## What Works
+- Eliminated closure allocation in DomStrategy capture by pre-binding CDP response handler (PERF-242)
 - Inline captureWorkerFrame into hot loop (PERF-240)
 - PERF-202: Replaced evaluate with callFunctionOn in SeekTimeDriver to eliminate AST parsing overhead. Result: ~32.9s.
 - Removed `await` from `capturePromise` return inside `captureWorkerFrame` hot loop natively allowing V8 promise chaining (PERF-127) (~2.0% faster)
@@ -81,6 +83,7 @@ Last updated by: PERF-200
   - **Why it didn't work**: Did not improve render time (remained ~33.35s compared to the ~33.33s baseline). The overhead of V8 Promise chaining in the old loop was negligible compared to the underlying Playwright/Chromium CDP frame capture and FFmpeg encode bottlenecks. Restructuring the execution graph did not yield a tangible wall-clock improvement on the CPU-only VM.
 
 ## What Works
+- Eliminated closure allocation in DomStrategy capture by pre-binding CDP response handler (PERF-242)
 - Inline captureWorkerFrame into hot loop (PERF-240)
 - Removed `--disable-software-rasterizer` from `GPU_DISABLED_ARGS` in `packages/renderer/src/core/BrowserPool.ts`. Allowed Chromium to fallback to its software rasterizer (SwiftShader) which provides significant execution speedups in the headless, CPU-bound environment. Reduced rendering time in benchmark from ~45.4s to ~32.7s (~28% improvement).
   - ID: PERF-208
@@ -95,6 +98,7 @@ Last updated by: PERF-210
   - **Why it didn't work**: Creating context objects and binding methods up front degraded performance significantly (~49.6s baseline to ~50.9s). The overhead of calling `.bind()` and using closure functions wrapped in objects outweighed the performance cost of anonymous closure allocation in the `.then()` callback.
 
 ## What Works
+- Eliminated closure allocation in DomStrategy capture by pre-binding CDP response handler (PERF-242)
 - Inline captureWorkerFrame into hot loop (PERF-240)
 - **PERF-018**: Pre-compile `SeekTimeDriver.ts` evaluate script by using Playwright `frame.evaluate` with explicit arguments, instead of creating dynamic string templates for `Runtime.evaluate`. Render time decreased from 33.156s to 32.710s.
 
@@ -103,6 +107,7 @@ Last updated by: PERF-210
   - Sharing a single BrowserContext across concurrent workers causes cross-worker contamination or resource contention that breaks the tests (specifically CDP media sync timing and iframe sync tests). While benchmark render time was around 33.156s, the approach fundamentally breaks test assertions.
 
 ## What Works
+- Eliminated closure allocation in DomStrategy capture by pre-binding CDP response handler (PERF-242)
 - Inline captureWorkerFrame into hot loop (PERF-240)
 - **PERF-211**: Disabled `AudioServiceOutOfProcess` and `PaintHolding` to reduce Chromium memory/context switching footprint.
   - **Why it didn't work**: Did not improve render time (regressed from ~32.7s to 47.938s). The change may have removed optimizations built into Chromium's default multiprocess architecture or caused unexpected stalling in the CPU-bound environment.
@@ -129,6 +134,7 @@ Last updated by: PERF-214
   - Plan ID: PERF-223
 
 ## What Works
+- Eliminated closure allocation in DomStrategy capture by pre-binding CDP response handler (PERF-242)
 - Inline captureWorkerFrame into hot loop (PERF-240)
 - Mutated `callParams.arguments` array instead of reallocating it on every frame inside `SeekTimeDriver.ts`, avoiding dynamic allocations in the hot loop. Reduced V8 GC pressure. Plan ID: PERF-224
 
@@ -142,6 +148,7 @@ Last updated by: PERF-214
   - **Why it didn't work**: The renderer tests crashed or failed. Implementing custom pointer wrap-around tracking (e.g. `workerIndex++`, `if (workerIndex === poolLen) workerIndex = 0`) instead of standard modulo operator (`%`) broke synchronous evaluation order in tests and caused pipeline stalls.
 
 ## What Works
+- Eliminated closure allocation in DomStrategy capture by pre-binding CDP response handler (PERF-242)
 - Inline captureWorkerFrame into hot loop (PERF-240)
 - Replaced modulo arithmetic with bitwise AND for `CaptureLoop` ring buffer.
 - `maxPipelineDepth` is safely rounded up to a power of 2, satisfying the bitwise condition.
@@ -149,6 +156,7 @@ Last updated by: PERF-214
 - (PERF-236)
 
 ## What Works
+- Eliminated closure allocation in DomStrategy capture by pre-binding CDP response handler (PERF-242)
 - Inline captureWorkerFrame into hot loop (PERF-240)
 - Reduced BrowserPool worker concurrency to half the available CPU cores to reduce context switching overhead and allow FFmpeg enough CPU headroom (PERF-237).
   - Render time: ~51.113
