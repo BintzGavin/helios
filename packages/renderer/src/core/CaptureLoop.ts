@@ -114,31 +114,23 @@ export class CaptureLoop {
             throw new Error('Aborted');
         }
 
-        const inFlight = nextFrameToSubmit - nextFrameToWrite;
 
-        if (inFlight <= poolLen) {
-            const framesToSubmit = Math.min(
-                this.totalFrames - nextFrameToSubmit,
-                maxPipelineDepth - inFlight
-            );
+        while (nextFrameToSubmit - nextFrameToWrite < maxPipelineDepth && nextFrameToSubmit < this.totalFrames) {
+            const frameIndex = nextFrameToSubmit;
+            const worker = this.pool[frameIndex % poolLen];
+            const time = frameIndex * timeStep;
+            const compositionTimeInSeconds = (this.startFrame + frameIndex) * compTimeStep;
 
-            for (let i = 0; i < framesToSubmit; i++) {
-                const frameIndex = nextFrameToSubmit;
-                const worker = this.pool[frameIndex % poolLen];
-                const time = frameIndex * timeStep;
-                const compositionTimeInSeconds = (this.startFrame + frameIndex) * compTimeStep;
+            const framePromise = worker.activePromise
+                .catch(noopCatch)
+                .then(() => {
+                    worker.timeDriver.setTime(worker.page, compositionTimeInSeconds).then(undefined, noopCatch);
+                    return worker.strategy.capture(worker.page, time);
+                });
 
-                const framePromise = worker.activePromise
-                    .catch(noopCatch)
-                    .then(() => {
-                        worker.timeDriver.setTime(worker.page, compositionTimeInSeconds).then(undefined, noopCatch);
-                        return worker.strategy.capture(worker.page, time);
-                    });
-
-                worker.activePromise = framePromise as unknown as Promise<void>;
-                framePromises[frameIndex % maxPipelineDepth] = framePromise;
-                nextFrameToSubmit++;
-            }
+            worker.activePromise = framePromise as unknown as Promise<void>;
+            framePromises[frameIndex % maxPipelineDepth] = framePromise;
+            nextFrameToSubmit++;
         }
 
         const buffer = await framePromises[nextFrameToWrite % maxPipelineDepth]!;

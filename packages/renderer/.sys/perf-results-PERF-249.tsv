@@ -1,0 +1,4 @@
+run\trender_time_s\tframes\tfps_effective\tpeak_mem_mb\tstatus\tdescription
+1	0.324	150	462.28	38.5	keep	baseline
+2	0.286	150	523.65	38.2	keep	baseline
+3	0.280	150	536.62	37.9	keep	baseline

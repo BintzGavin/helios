@@ -321,3 +321,5 @@ PERF-224-run	32.807	150			keep	mutate callParams.arguments instead of reallocati
 1	11.960	150	12.54	38.0	keep	baseline
 2	1.919	150	78.16	35.3	keep	restore concurrency to cpus-1 (PERF-247)
 PERF-249	CaptureLoop	2.735	Sliding window pipeline optimization
+
+4	0.276	150	542.96	39.5	keep	overlapping promise execution
