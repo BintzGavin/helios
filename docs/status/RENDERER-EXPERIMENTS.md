@@ -44,7 +44,10 @@ Last updated by: PERF-198
 
 - Moved closure logic outside CaptureLoop (~3.2% faster) [PERF-235]
 ## What Doesn't Work (and Why)
-- Increased pipeline depth to `poolLen * 8` (PERF-244). Result: 50.119s. Reason: Overhead of tracking larger base64 array in Node.js event loop outweighed buffering benefits.
+-
+- **PERF-250**: Restore Counter-Based Indexing in CaptureLoop
+  - **Why it didn't work**: Although microbenchmarks showed counter indexing as faster, the implementation regressed render time from ~2.175s to 2.768s. The added variables and bounds checking inside the deeply overlapping promise pipeline negated the benefits and resulted in slightly slower performance.
+ Increased pipeline depth to `poolLen * 8` (PERF-244). Result: 50.119s. Reason: Overhead of tracking larger base64 array in Node.js event loop outweighed buffering benefits.
 
 - Increased pipeline depth to `poolLen * 8` (PERF-244). . Reason: Overhead of tracking larger base64 array in Node.js event loop outweighed buffering benefits.
 
