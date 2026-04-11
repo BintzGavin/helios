@@ -93,13 +93,10 @@ export class CaptureLoop {
         }
     };
 
-    let nextFrameToSubmit = 0;
     let nextFrameToWrite = 0;
     const poolLen = this.pool.length;
     let maxPipelineDepth = poolLen * 2;
     maxPipelineDepth = Math.pow(2, Math.ceil(Math.log2(maxPipelineDepth)));
-    const ringMask = maxPipelineDepth - 1;
-    let framePromises: Promise<Buffer | string>[] = new Array(maxPipelineDepth);
     const timeStep = 1000 / fps;
     const compTimeStep = 1 / fps;
     const signal = this.jobOptions?.signal;
@@ -113,8 +110,11 @@ export class CaptureLoop {
             throw new Error('Aborted');
         }
 
-        while (nextFrameToSubmit < this.totalFrames && (nextFrameToSubmit - nextFrameToWrite) < maxPipelineDepth) {
-            const frameIndex = nextFrameToSubmit;
+        const batchSize = Math.min(maxPipelineDepth, this.totalFrames - nextFrameToWrite);
+        const batchPromises: Promise<Buffer | string>[] = [];
+
+        for (let i = 0; i < batchSize; i++) {
+            const frameIndex = nextFrameToWrite + i;
             const worker = this.pool[frameIndex % poolLen];
             const time = frameIndex * timeStep;
             const compositionTimeInSeconds = (this.startFrame + frameIndex) * compTimeStep;
@@ -127,30 +127,33 @@ export class CaptureLoop {
                 });
 
             worker.activePromise = framePromise as unknown as Promise<void>;
-            framePromises[nextFrameToSubmit & ringMask] = framePromise;
-            nextFrameToSubmit++;
+            batchPromises.push(framePromise);
         }
 
-        const buffer = await framePromises[nextFrameToWrite & ringMask]!;
+        const buffers = await Promise.all(batchPromises);
 
-        const i = nextFrameToWrite;
+        for (let i = 0; i < buffers.length; i++) {
+            const buffer = buffers[i]!;
 
-        if (i > 0 && i % progressInterval === 0) {
-            console.log(`Progress: Rendered ${i} / ${this.totalFrames} frames`);
+            const currentFrame = nextFrameToWrite + i;
+
+            if (currentFrame > 0 && currentFrame % progressInterval === 0) {
+                console.log(`Progress: Rendered ${currentFrame} / ${this.totalFrames} frames`);
+            }
+
+            if (onProgress) {
+               onProgress(currentFrame / this.totalFrames);
+            }
+
+            if (previousWritePromise) {
+               await previousWritePromise;
+            }
+
+            const writeResult = this.writeToStdin(buffer, onWriteError);
+            previousWritePromise = writeResult ? writeResult : undefined;
         }
 
-        if (onProgress) {
-           onProgress(i / this.totalFrames);
-        }
-
-        if (previousWritePromise) {
-           await previousWritePromise;
-        }
-
-        const writeResult = this.writeToStdin(buffer, onWriteError);
-        previousWritePromise = writeResult ? writeResult : undefined;
-
-        nextFrameToWrite++;
+        nextFrameToWrite += batchSize;
     }
 
     if (previousWritePromise) {
