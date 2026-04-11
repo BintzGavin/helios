@@ -1,5 +1,5 @@
 ## Performance Trajectory
-Current best: 48.082s (baseline was 47.139s, -3.2%)
+Current best: 0.276s (baseline was 0.285s, -3.2%)
 Last updated by: PERF-235
 
 
@@ -139,3 +139,5 @@ Last updated by: PERF-214
 
 - Reduced BrowserPool worker concurrency to half the available CPU cores to reduce context switching overhead and allow FFmpeg enough CPU headroom (PERF-237).
   - Render time: ~51.113
+
+- Kept: Replace Modulo/Bitwise Indexing with Counter-Based Indexing in CaptureLoop (PERF-246)

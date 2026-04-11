@@ -316,3 +316,4 @@ PERF-224-run	32.807	150			keep	mutate callParams.arguments instead of reallocati
 2	34.869	150	4.30	37.6	keep	Use callFunctionOn for sync media
 3	34.968	150	4.29	37.3	keep	Eliminate page evaluate for wait stable
 7	34.820	150	4.31	37.1	keep	re-run benchmark
+2	0.276	150	543.68	37.4	keep	Replace Modulo/Bitwise Indexing with Counter-Based Indexing

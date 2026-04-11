@@ -1,0 +1,3 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	0.285	150	526.47	37.3	keep	baseline
+2	0.276	150	543.68	37.4	keep	Replace Modulo/Bitwise Indexing with Counter-Based Indexing
