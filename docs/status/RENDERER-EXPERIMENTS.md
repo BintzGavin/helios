@@ -44,6 +44,8 @@ Last updated by: PERF-198
 
 - Moved closure logic outside CaptureLoop (~3.2% faster) [PERF-235]
 ## What Doesn't Work (and Why)
+- **PERF-251**: Pre-bind Closure in CaptureLoop Worker Dispatch
+  - **Why it didn't work**: Like PERF-241, pre-allocating closures with captured state arrays (or context objects) did not improve performance. The overhead of looking up state from the closure array or the function call dispatch negated the savings of avoiding per-frame anonymous closure allocation. Render time remained around ~1.74s compared to ~1.71s baseline. V8 seems to optimize the inline arrow function allocation within the `.then()` very well.
 -
 - **PERF-250**: Restore Counter-Based Indexing in CaptureLoop
   - **Why it didn't work**: Although microbenchmarks showed counter indexing as faster, the implementation regressed render time from ~2.175s to 2.768s. The added variables and bounds checking inside the deeply overlapping promise pipeline negated the benefits and resulted in slightly slower performance.
