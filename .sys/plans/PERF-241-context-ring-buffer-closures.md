@@ -1,11 +1,11 @@
 ---
 id: PERF-241
 slug: context-ring-buffer-closures
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: "2026-04-11"
-completed: ""
-result: ""
+completed: "2026-04-11"
+result: "discarded"
 ---
 
 # PERF-241: Eliminate Hot-Loop Closure and Promise Allocations via Context Ring Buffer
@@ -116,3 +116,10 @@ Run the standard test suite to ensure the sequence of frames correctly syncs wit
 - PERF-240 (Inlined `captureWorkerFrame` but re-introduced closure allocations).
 - PERF-236 (Bitwise modulo indexing ring buffer).
 - PERF-159 (Moved closures out of hot loops).
+
+
+## Results Summary
+- **Best render time**: 50.908s (vs baseline 49.631s)
+- **Improvement**: -2.57% (Degraded)
+- **Kept experiments**: []
+- **Discarded experiments**: [PERF-241]

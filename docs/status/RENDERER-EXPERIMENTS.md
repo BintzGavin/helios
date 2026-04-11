@@ -90,6 +90,10 @@ Last updated by: PERF-200
 Current best: 48.082s (baseline was ~33.156s, -1.3%)
 Last updated by: PERF-210
 
+## What Doesn't Work (and Why)
+- Pre-allocated execution context ring buffer inside CaptureLoop hot loop (PERF-241)
+  - **Why it didn't work**: Creating context objects and binding methods up front degraded performance significantly (~49.6s baseline to ~50.9s). The overhead of calling `.bind()` and using closure functions wrapped in objects outweighed the performance cost of anonymous closure allocation in the `.then()` callback.
+
 ## What Works
 - Inline captureWorkerFrame into hot loop (PERF-240)
 - **PERF-018**: Pre-compile `SeekTimeDriver.ts` evaluate script by using Playwright `frame.evaluate` with explicit arguments, instead of creating dynamic string templates for `Runtime.evaluate`. Render time decreased from 33.156s to 32.710s.
