@@ -1,11 +1,11 @@
 ---
 id: PERF-251
 slug: remove-closure
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: "2026-04-11"
-completed: ""
-result: ""
+completed: "2026-04-11"
+result: "discarded"
 ---
 
 # PERF-251: Pre-bind Closure in CaptureLoop Worker Dispatch
@@ -29,3 +29,10 @@ Let's check the journal.
 "Creating context objects and binding methods up front degraded performance significantly (~49.6s baseline to ~50.9s). The overhead of calling .bind() and using closure functions wrapped in objects outweighed the performance cost of anonymous closure allocation in the .then() callback."
 
 Let me check the `CaptureLoop.ts` file again.
+
+
+## Results Summary
+- **Best render time**: 1.730s (vs baseline 1.701s)
+- **Improvement**: -1.7%
+- **Kept experiments**: []
+- **Discarded experiments**: [PERF-251]

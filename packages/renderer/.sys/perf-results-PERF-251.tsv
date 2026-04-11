@@ -1,0 +1,7 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	1.726	150	86.88	34.5	keep	baseline
+2	1.705	150	88.00	40.2	keep	baseline
+3	1.701	150	88.20	48.9	keep	baseline
+4	1.774	150	84.54	34.6	discard	pre-bound closures
+5	1.742	150	86.12	34.7	discard	pre-bound closures
+6	1.730	150	86.71	48.8	discard	pre-bound closures
