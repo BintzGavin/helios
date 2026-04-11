@@ -76,6 +76,7 @@ export class CaptureLoop {
     }
   }
 
+
   public async run(): Promise<void> {
     this.setupDrainListeners();
     const fps = this.options.fps;
@@ -93,6 +94,7 @@ export class CaptureLoop {
         }
     };
 
+    let nextFrameToSubmit = 0;
     let nextFrameToWrite = 0;
     const poolLen = this.pool.length;
     let maxPipelineDepth = poolLen * 2;
@@ -102,6 +104,8 @@ export class CaptureLoop {
     const signal = this.jobOptions?.signal;
     const onProgress = this.jobOptions?.onProgress;
 
+    const framePromises = new Array<Promise<Buffer | string>>(maxPipelineDepth);
+
     while (nextFrameToWrite < this.totalFrames) {
         if (this.capturedErrors.length > 0) {
             throw this.capturedErrors[0];
@@ -110,50 +114,53 @@ export class CaptureLoop {
             throw new Error('Aborted');
         }
 
-        const batchSize = Math.min(maxPipelineDepth, this.totalFrames - nextFrameToWrite);
-        const batchPromises: Promise<Buffer | string>[] = [];
+        const inFlight = nextFrameToSubmit - nextFrameToWrite;
 
-        for (let i = 0; i < batchSize; i++) {
-            const frameIndex = nextFrameToWrite + i;
-            const worker = this.pool[frameIndex % poolLen];
-            const time = frameIndex * timeStep;
-            const compositionTimeInSeconds = (this.startFrame + frameIndex) * compTimeStep;
+        if (inFlight <= poolLen) {
+            const framesToSubmit = Math.min(
+                this.totalFrames - nextFrameToSubmit,
+                maxPipelineDepth - inFlight
+            );
 
-            const framePromise = worker.activePromise
-                .catch(noopCatch)
-                .then(() => {
-                    worker.timeDriver.setTime(worker.page, compositionTimeInSeconds).then(undefined, noopCatch);
-                    return worker.strategy.capture(worker.page, time);
-                });
+            for (let i = 0; i < framesToSubmit; i++) {
+                const frameIndex = nextFrameToSubmit;
+                const worker = this.pool[frameIndex % poolLen];
+                const time = frameIndex * timeStep;
+                const compositionTimeInSeconds = (this.startFrame + frameIndex) * compTimeStep;
 
-            worker.activePromise = framePromise as unknown as Promise<void>;
-            batchPromises.push(framePromise);
+                const framePromise = worker.activePromise
+                    .catch(noopCatch)
+                    .then(() => {
+                        worker.timeDriver.setTime(worker.page, compositionTimeInSeconds).then(undefined, noopCatch);
+                        return worker.strategy.capture(worker.page, time);
+                    });
+
+                worker.activePromise = framePromise as unknown as Promise<void>;
+                framePromises[frameIndex % maxPipelineDepth] = framePromise;
+                nextFrameToSubmit++;
+            }
         }
 
-        const buffers = await Promise.all(batchPromises);
+        const buffer = await framePromises[nextFrameToWrite % maxPipelineDepth]!;
 
-        for (let i = 0; i < buffers.length; i++) {
-            const buffer = buffers[i]!;
+        const currentFrame = nextFrameToWrite;
 
-            const currentFrame = nextFrameToWrite + i;
-
-            if (currentFrame > 0 && currentFrame % progressInterval === 0) {
-                console.log(`Progress: Rendered ${currentFrame} / ${this.totalFrames} frames`);
-            }
-
-            if (onProgress) {
-               onProgress(currentFrame / this.totalFrames);
-            }
-
-            if (previousWritePromise) {
-               await previousWritePromise;
-            }
-
-            const writeResult = this.writeToStdin(buffer, onWriteError);
-            previousWritePromise = writeResult ? writeResult : undefined;
+        if (currentFrame > 0 && currentFrame % progressInterval === 0) {
+            console.log(`Progress: Rendered ${currentFrame} / ${this.totalFrames} frames`);
         }
 
-        nextFrameToWrite += batchSize;
+        if (onProgress) {
+           onProgress(currentFrame / this.totalFrames);
+        }
+
+        if (previousWritePromise) {
+           await previousWritePromise;
+        }
+
+        const writeResult = this.writeToStdin(buffer, onWriteError);
+        previousWritePromise = writeResult ? writeResult : undefined;
+
+        nextFrameToWrite++;
     }
 
     if (previousWritePromise) {
@@ -171,4 +178,5 @@ export class CaptureLoop {
     console.log('Finished sending frames. Closing FFmpeg stdin.');
     this.ffmpegManager.stdin?.end();
   }
+
 }
