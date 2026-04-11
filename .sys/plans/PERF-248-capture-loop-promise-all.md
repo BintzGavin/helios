@@ -1,11 +1,11 @@
 ---
 id: PERF-248
 slug: capture-loop-promise-all
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: "2026-04-11"
-completed: ""
-result: ""
+completed: "2026-04-11"
+result: "improved"
 ---
 
 # PERF-248: Optimize Capture Loop to use Promise.all() for Max Pipeline Batch
@@ -45,3 +45,9 @@ Run `cd packages/renderer && npx tsx tests/verify-dom-strategy-capture.ts` to en
 
 ## Prior Art
 - PERF-246: Replaced modulo with counter indexing for the same loop to reduce iteration overhead.
+
+## Results Summary
+- **Best render time**: 2.001s (vs baseline 2.298s)
+- **Improvement**: 12.9%
+- **Kept experiments**: Promise.all batching in CaptureLoop
+- **Discarded experiments**: none

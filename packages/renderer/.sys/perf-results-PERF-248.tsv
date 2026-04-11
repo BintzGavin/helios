@@ -1,0 +1,6 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	2.298	150	65.28	34.5	keep	baseline
+2	2.001	150	74.98	34.6	keep	Promise.all batching
+3	2.040	150	73.53	34.6	keep	Promise.all batching
+
+4	2.023	150	74.16	34.6	keep	Promise.all batching
