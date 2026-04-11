@@ -1,10 +1,6 @@
 # Status: LLMS
-**Version**: 1.57.1
-[v1.57.0] ✅ Completed: Comprehensive Daily Review - Aligned Quick Facts and Roadmap to active package.json versions (Studio v0.107.1+, CLI v0.41.0+, Player v0.76.18+, Renderer v1.78.0+, Infrastructure v0.25.0+). Synced Roadmap features (Tier 3 adapters, Player regression tests).
-
-[v1.56.0] ✅ Completed: Daily llms.txt Review - Verified current packages versions. Updated Roadmap to include new Cloud Execution Adapters (Modal, Deno Deploy, Vercel, Hetzner Cloud).
-
-**Version**: 1.62.0
+**Version**: 1.63.0
+[v1.63.0] ✅ Completed: Comprehensive Daily Review - Updated Roadmap with verifiable completions from domain progress logs (CLI Hetzner deployment, Studio Asset Drag & Drop/Component Removal, Player Bridge Coverage/Document getSchema API Parity, Renderer HW Accel Validation). Verified package versions against actual package.json.
 [v1.62.0] ✅ Completed: Comprehensive Daily Review - Updated Roadmap with Cloudflare Sandbox infrastructure adapter, Azure/Docker Deployment CLI scaffoldings, and CLI Regression Tests.
 [v1.61.1] ✅ Completed: Comprehensive Daily Review - Verified package versions, API examples, and key file paths. Updated Distributed Rendering comparison table to include Cloudflare Sandbox.
 
@@ -90,3 +86,7 @@
 [v1.58.0] ✅ Completed: Comprehensive Daily Review - Verified package versions, checked Key Files and Agent Skills sections. No changes required to llms.txt as it matches the true project state perfectly.
 
 [v1.57.1] ✅ Completed: Daily llms.txt Review - Added packages/infrastructure/src/index.ts to Key Files for Agents and verified all package versions perfectly match package.json.
+
+[v1.57.0] ✅ Completed: Comprehensive Daily Review - Aligned Quick Facts and Roadmap to active package.json versions (Studio v0.107.1+, CLI v0.41.0+, Player v0.76.18+, Renderer v1.78.0+, Infrastructure v0.25.0+). Synced Roadmap features (Tier 3 adapters, Player regression tests).
+
+[v1.56.0] ✅ Completed: Daily llms.txt Review - Verified current packages versions. Updated Roadmap to include new Cloud Execution Adapters (Modal, Deno Deploy, Vercel, Hetzner Cloud).
