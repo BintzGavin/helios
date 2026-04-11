@@ -4,8 +4,8 @@ slug: eliminate-closure-allocation-in-domstrategy
 status: unclaimed
 claimed_by: ""
 created: "2026-04-11"
-completed: ""
-result: ""
+completed: "2026-04-11"
+result: "improved"
 ---
 
 # PERF-242: Eliminate closure allocation in DomStrategy capture
@@ -127,3 +127,6 @@ Run the `verify-dom-strategy-capture` test or standard DOM integration test to e
 
 ## Prior Art
 - PERF-138 (attempted closure elimination with unsafe destructuring)
+
+## Results Summary
+- **Kept experiments**: Eliminated closure allocation in DomStrategy
