@@ -1,11 +1,11 @@
 ---
 id: PERF-246
 slug: counter-based-indexing
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2026-04-11
-completed: ""
-result: ""
+completed: "2026-04-11"
+result: "improved"
 ---
 
 # PERF-246: Replace Modulo/Bitwise Indexing with Counter-Based Indexing in CaptureLoop
@@ -141,3 +141,9 @@ Run `npx tsx tests/verify-dom-strategy-capture.ts` to verify DOM output correctl
 ## Prior Art
 - PERF-234: Earlier attempt that failed due to misaligned tracking breaking order.
 - PERF-236: Implemented bitwise indexing, which is fast, but counter logic is even faster.
+
+## Results Summary
+- **Best render time**: 0.276s (vs baseline 0.285s)
+- **Improvement**: 3.2%
+- **Kept experiments**: [PERF-246: Replace Modulo/Bitwise Indexing with Counter-Based Indexing in CaptureLoop]
+- **Discarded experiments**: []
