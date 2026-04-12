@@ -1,0 +1,3 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+baseline	49.440	600	12.13	42.0	keep	baseline
+run1	48.655	600	12.33	42.0	keep	Shared BrowserContext

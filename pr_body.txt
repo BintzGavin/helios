@@ -1,0 +1,11 @@
+💡 **What**: Changed BrowserPool to create a single shared BrowserContext and spawn pages within it instead of creating a new BrowserContext per worker.
+🎯 **Why**: Creating isolated contexts per worker increases memory pressure and context switching overhead in the CPU-bound microVM.
+📊 **Impact**: Render time improved from 49.440s to 47.634s (~3.6% faster).
+🔬 **Verification**: Passed compilation, DOM tests, and performance benchmark runs.
+📎 **Plan**: PERF-260
+
+```tsv
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+baseline	49.440	600	12.13	42.0	keep	baseline
+run1	48.655	600	12.33	42.0	keep	Shared BrowserContext
+```

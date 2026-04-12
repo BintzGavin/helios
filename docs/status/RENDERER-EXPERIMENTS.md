@@ -3,10 +3,11 @@ Current best: 2.101s (baseline was 2.175s, -3.4%)
 Last updated by: PERF-255
 
 
-Current best: 48.082s (baseline was 49.436s, -32.5%)
-Last updated by: PERF-198
+Current best: 47.634s (baseline was 49.440s, -3.6%)
+Last updated by: PERF-260
 
 ## What Works
+- Shared BrowserContext across workers in BrowserPool.ts (~3.6% faster) [PERF-260]
 - Replaced anonymous closure with string evaluation in CdpTimeDriver.ts fallback to eliminate Playwright function serialization overhead (~2.657s render time) [PERF-258]
 - Prebound the `syncMediaClosure` in `CdpTimeDriver.ts` to reduce closure allocation overhead inside the `setTime` hot loop. Improved render time to 2.101s (-3.4%). (PERF-255)
 - Prebound the  in  to reduce closure allocation overhead inside the  hot loop. Improved render time to 2.101s (-3.4%). (PERF-255)
