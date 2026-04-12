@@ -167,3 +167,7 @@ Last updated by: PERF-249
 
 - Kept: Replace Modulo/Bitwise Indexing with Counter-Based Indexing in CaptureLoop (PERF-246)
 - **PERF-252**: Pre-bound the CDP `.then` callback inside the `CdpTimeDriver.setTime()` hot loop to avoid dynamically allocating an anonymous closure on every stability check evaluation. Improved benchmark execution time to 587.005ms (vs baseline 584.396ms + noise).
+
+## What Doesn't Work (and Why)
+- **PERF-262**: Prebound the CDP stability timeout promise executor.
+  - **Why it didn't work**: Did not improve render time. V8 optimizes the inline promise and anonymous closure allocation better than the property lookup.
