@@ -46,6 +46,14 @@ export class CdpTimeDriver implements TimeDriver {
     }
   };
 
+  private handleVirtualTimeBudgetError = (err: any) => {
+    if (this.cdpReject) {
+      this.cdpReject(err);
+      this.cdpResolve = null;
+      this.cdpReject = null;
+    }
+  };
+
   constructor(timeout: number = 30000) {
     this.timeout = timeout;
   }
@@ -171,13 +179,7 @@ export class CdpTimeDriver implements TimeDriver {
       this.client!.once('Emulation.virtualTimeBudgetExpired', this.handleVirtualTimeBudgetExpired);
 
       this.setVirtualTimePolicyParams.budget = budget;
-      this.client!.send('Emulation.setVirtualTimePolicy', this.setVirtualTimePolicyParams).catch((err) => {
-        if (this.cdpReject) {
-          this.cdpReject(err);
-          this.cdpResolve = null;
-          this.cdpReject = null;
-        }
-      });
+      this.client!.send('Emulation.setVirtualTimePolicy', this.setVirtualTimePolicyParams).catch(this.handleVirtualTimeBudgetError);
     });
 
     this.currentTime = timeInSeconds;

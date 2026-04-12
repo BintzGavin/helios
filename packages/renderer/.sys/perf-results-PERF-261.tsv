@@ -1,0 +1,5 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	12.574	150	11.93	36.4	keep	baseline
+2	2.000	150	74.99	34.6	keep	prebind setVirtualTimePolicy catch handler
+3	2.027	150	73.99	34.5	keep	prebind setVirtualTimePolicy catch handler
+4	1.972	150	76.05	48.0	keep	prebind setVirtualTimePolicy catch handler
