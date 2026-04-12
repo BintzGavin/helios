@@ -1,4 +1,4 @@
-**Version**: 0.121.3
+**Version**: 0.121.4
 
 **Posture**: ACTIVELY EXPANDING FOR V2
 
@@ -197,3 +197,5 @@
 
 [v0.120.4] ✅ Completed: STUDIO-Timeline-Drag-Drop - Implemented drag and drop support for the Timeline to accept assets
 - [v0.120.2] ✅ Completed: STUDIO-Asset-Move - Implemented drag-and-drop to move assets into folders
+
+- [v0.121.4] ✅ Completed: STUDIO-Timeline-Drag-Drop - Added visual styling when dragging an asset over the Timeline component for visual feedback.

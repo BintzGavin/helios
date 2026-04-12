@@ -1,4 +1,7 @@
 ## STUDIO v0.121.3
+
+### STUDIO v0.121.4
+- ✅ Completed: STUDIO-Timeline-Drag-Drop - Added visual styling when dragging an asset over the Timeline component for visual feedback.
 - ✅ Completed: STUDIO-Timeline-Audio-Drag-Drop - Enabled dropping audio assets onto the Timeline and mapped them to composition inputs.
 
 ## STUDIO v0.120.4

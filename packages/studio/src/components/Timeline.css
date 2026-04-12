@@ -61,6 +61,13 @@
   background: #1e1e1e;
   overflow-x: auto;
   overflow-y: auto; /* Changed to auto */
+  transition: background 0.2s;
+}
+
+.timeline-track-area.drag-over {
+  background: rgba(0, 123, 255, 0.1) !important;
+  outline: 2px dashed #007bff;
+  outline-offset: -2px;
 }
 
 .timeline-content {
