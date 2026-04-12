@@ -1,12 +1,13 @@
 ## Performance Trajectory
-Current best: 2.101s (baseline was 2.175s, -3.4%)
-Last updated by: PERF-255
+Current best: 2s (baseline was 12.574s, -84.1%)
+Last updated by: PERF-261
 
 
 Current best: 47.634s (baseline was 49.440s, -3.6%)
 Last updated by: PERF-260
 
 ## What Works
+- Pre-bound setVirtualTimePolicy error handler to class property in CdpTimeDriver.ts to reduce closure allocations (PERF-261)
 - Shared BrowserContext across workers in BrowserPool.ts (~3.6% faster) [PERF-260]
 - Replaced anonymous closure with string evaluation in CdpTimeDriver.ts fallback to eliminate Playwright function serialization overhead (~2.657s render time) [PERF-258]
 - Prebound the `syncMediaClosure` in `CdpTimeDriver.ts` to reduce closure allocation overhead inside the `setTime` hot loop. Improved render time to 2.101s (-3.4%). (PERF-255)
@@ -49,6 +50,7 @@ Last updated by: PERF-260
 
 - Moved closure logic outside CaptureLoop (~3.2% faster) [PERF-235]
 ## What Doesn't Work (and Why)
+- Pre-bound setVirtualTimePolicy error handler to class property in CdpTimeDriver.ts (PERF-261). Did not yield meaningful improvement, bottleneck is elsewhere.
 - PERF-257: Eliminate timeoutPromise allocation inside CdpTimeDriver.ts setTime
   - **Why it didn't work**: Did not improve render time over the 1.843s baseline. It likely stalled or didn't provide a meaningful GC reduction compared to the baseline.
 - PERF-256: Prebind wait stable evaluate closure in CdpTimeDriver.ts
