@@ -1,10 +1,10 @@
 ---
 id: PERF-257
 slug: evaluate-callFunctionOn
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-24
-completed: ""
+completed: "2026-04-12"
 result: ""
 ---
 
@@ -116,3 +116,9 @@ Run the DOM render benchmark to ensure video generation completes successfully a
 
 ## Prior Art
 Previous optimizations (`PERF-241`, `PERF-242`, `PERF-252`) repeatedly proved that anonymous closures, promises, and dynamic object allocations inside the frame hot-loop (`CaptureLoop` and Time Drivers) cause V8 GC pressure overhead that slows down execution.
+
+## Results Summary
+- **Best render time**: 1.843s (vs baseline 1.843s)
+- **Improvement**: 0%
+- **Kept experiments**: []
+- **Discarded experiments**: [PERF-257]

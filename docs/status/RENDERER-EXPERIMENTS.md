@@ -47,6 +47,8 @@ Last updated by: PERF-198
 
 - Moved closure logic outside CaptureLoop (~3.2% faster) [PERF-235]
 ## What Doesn't Work (and Why)
+- PERF-257: Eliminate timeoutPromise allocation inside CdpTimeDriver.ts setTime
+  - **Why it didn't work**: Did not improve render time over the 1.843s baseline. It likely stalled or didn't provide a meaningful GC reduction compared to the baseline.
 - PERF-256: Prebind wait stable evaluate closure in CdpTimeDriver.ts
   - Result: 11.948s (vs 1.95s baseline)
   - Why it failed: Pre-binding the fallback closure surprisingly regressed performance drastically. This is likely because the hot-loop execution inside `page.evaluate()` behaves differently with class properties vs inline string/functions. Playwright's serialization of the bound property across the CDP boundary per-frame introduces significantly more overhead than compiling the inline string.
