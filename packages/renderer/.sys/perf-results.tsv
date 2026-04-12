@@ -324,3 +324,4 @@ PERF-249	CaptureLoop	2.735	Sliding window pipeline optimization
 
 4	0.276	150	542.96	39.5	keep	overlapping promise execution
 run	2.936	150	51.09	38.0	keep	Pre-allocate promises array and pre-bind closure in CdpTimeDriver hot loop
+253	2.392	150	62.71	0.0	keep	Prebind CaptureLoop stdin write callback closure

@@ -1,11 +1,11 @@
 ---
 id: PERF-253
 slug: optimize-capture-loop-write
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: "2026-04-12"
 completed: ""
-result: ""
+result: "improved"
 ---
 
 # PERF-253: Optimize Capture Loop Write To Stdin Callback Closure
@@ -51,3 +51,10 @@ And remove the `onWriteError` inside `run()`, replacing `onWriteError` usages wi
 
 ## Correctness Check
 Run the canvas test and dom test.
+
+
+## Results Summary
+- **Best render time**: 2.392s (vs baseline 2.8s)
+- **Improvement**: 14.57%
+- **Kept experiments**: [Prebind onWriteError closure]
+- **Discarded experiments**: []
