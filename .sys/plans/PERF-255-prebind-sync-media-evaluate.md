@@ -1,11 +1,11 @@
 ---
 id: PERF-255
 slug: prebind-sync-media-evaluate
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2026-04-12
-completed: ""
-result: ""
+completed: "2026-04-12"
+result: "improved"
 ---
 # PERF-255: Prebind sync media evaluate in CdpTimeDriver
 
@@ -29,3 +29,15 @@ The `setTime` hot loop in `packages/renderer/src/drivers/CdpTimeDriver.ts` evalu
 4. Test Plan
 - Run `benchmark-test.js` to measure CPU render time.
 - Verify correctness using standard CDP determinism, driver, and stability tests: `tests/verify-cdp-driver.ts`.
+
+## Results Summary
+- **Best render time**: 2.101s (vs baseline 2.175s)
+- **Improvement**: 3.4%
+- **Kept experiments**: Prebind sync media evaluate in CdpTimeDriver
+- **Discarded experiments**: none
+
+## Results Summary
+- **Best render time**: 2.101s (vs baseline 2.175s)
+- **Improvement**: 3.4%
+- **Kept experiments**: Prebind sync media evaluate in CdpTimeDriver
+- **Discarded experiments**: none
