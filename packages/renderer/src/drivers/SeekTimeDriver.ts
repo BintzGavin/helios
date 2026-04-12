@@ -11,6 +11,7 @@ export class SeekTimeDriver implements TimeDriver {
   private cachedMainFrame: import('playwright').Frame | null = null;
   private cachedPromises: Promise<any>[] = [];
   private evaluateArgs: [number, number] = [0, 0];
+  private evaluateClosure = ([t, timeoutMs]: any) => { (window as any).__helios_seek(t, timeoutMs); };
   private callParams: any = {
     functionDeclaration: 'function(t, timeout) { return this.__helios_seek(t, timeout); }',
     objectId: '',
@@ -279,7 +280,7 @@ export class SeekTimeDriver implements TimeDriver {
     if (frames.length === 1) {
       this.evaluateArgs[0] = timeInSeconds;
       return frames[0].evaluate(
-        ([t, timeoutMs]) => { (window as any).__helios_seek(t, timeoutMs); },
+        this.evaluateClosure,
         this.evaluateArgs
       );
     }
@@ -292,7 +293,7 @@ export class SeekTimeDriver implements TimeDriver {
     this.evaluateArgs[0] = timeInSeconds;
     for (let i = 0; i < frames.length; i++) {
       promises[i] = frames[i].evaluate(
-        ([t, timeoutMs]) => { (window as any).__helios_seek(t, timeoutMs); },
+        this.evaluateClosure,
         this.evaluateArgs
       );
     }
