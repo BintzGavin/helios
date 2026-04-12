@@ -106,20 +106,20 @@ export class BrowserPool {
     const concurrency = Math.max(1, (os.cpus().length || 4) - 1);
     console.log(`Initializing pool of ${concurrency} pages...`);
 
+    const sharedContext = await this.browser!.newContext({
+      viewport: {
+        width: this.options.width,
+        height: this.options.height,
+      },
+    });
+
+    if (jobOptions?.tracePath) {
+      console.log(`Enabling Playwright tracing for shared context...`);
+      await sharedContext.tracing.start({ screenshots: true, snapshots: true });
+    }
+
     const createPage = async (index: number): Promise<WorkerInfo> => {
-      const pageContext = await this.browser!.newContext({
-        viewport: {
-          width: this.options.width,
-          height: this.options.height,
-        },
-      });
-
-      if (jobOptions?.tracePath) {
-        console.log(`Enabling Playwright tracing for worker ${index}...`);
-        await pageContext.tracing.start({ screenshots: true, snapshots: true });
-      }
-
-      const page = await pageContext.newPage();
+      const page = await sharedContext.newPage();
       const strategy = this.options.mode === 'dom' ? new DomStrategy(this.options) : new CanvasStrategy(this.options);
       const timeDriver = this.options.mode === 'dom' ? new SeekTimeDriver(this.options.stabilityTimeout) : new CdpTimeDriver(this.options.stabilityTimeout);
 
@@ -145,7 +145,7 @@ export class BrowserPool {
       await strategy.prepare(page);
       await timeDriver.prepare(page);
 
-      return { context: pageContext, page, strategy, timeDriver, activePromise: Promise.resolve() };
+      return { context: sharedContext, page, strategy, timeDriver, activePromise: Promise.resolve() };
     };
 
     const poolPromises = [];
@@ -158,13 +158,15 @@ export class BrowserPool {
   }
 
   public async close(jobOptions?: RenderJobOptions): Promise<void> {
-    if (jobOptions?.tracePath && this.workers.length > 0) {
-      console.log('Stopping tracing...');
-      await this.workers[0].context.tracing.stop({ path: jobOptions.tracePath });
+    if (this.workers.length > 0) {
+      const sharedContext = this.workers[0].context;
+      if (jobOptions?.tracePath) {
+        console.log('Stopping tracing...');
+        await sharedContext.tracing.stop({ path: jobOptions.tracePath });
+      }
+      await sharedContext.close();
     }
-    for (const worker of this.workers) {
-      await worker.context.close();
-    }
+
     if (this.browser) {
       await this.browser.close();
       console.log('Browser closed.');
