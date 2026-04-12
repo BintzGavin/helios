@@ -1,12 +1,14 @@
 ## Performance Trajectory
-Current best: 2.001s (baseline was 2.298s, -12.9%)
-Last updated by: PERF-248
+Current best: 2.101s (baseline was 2.175s, -3.4%)
+Last updated by: PERF-255
 
 
 Current best: 48.082s (baseline was 49.436s, -32.5%)
 Last updated by: PERF-198
 
 ## What Works
+- Prebound the `syncMediaClosure` in `CdpTimeDriver.ts` to reduce closure allocation overhead inside the `setTime` hot loop. Improved render time to 2.101s (-3.4%). (PERF-255)
+- Prebound the  in  to reduce closure allocation overhead inside the  hot loop. Improved render time to 2.101s (-3.4%). (PERF-255)
 - [PERF-253] Prebind CaptureLoop onWriteError closure: Improved median time to 2.392s (baseline 2.8s)
 - **PERF-245**: Pre-allocated promises array and pre-bound closure in CdpTimeDriver hot loop to eliminate per-frame V8 array allocation and garbage collection overhead. Render time improved from baseline to 2.936s.
 

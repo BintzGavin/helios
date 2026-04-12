@@ -26,6 +26,12 @@ export class CdpTimeDriver implements TimeDriver {
   private cdpResolve: (() => void) | null = null;
   private cdpReject: ((err: Error) => void) | null = null;
 
+  private syncMediaClosure = (t: number) => {
+    if (typeof (window as any).__helios_sync_media === 'function') {
+      (window as any).__helios_sync_media(t);
+    }
+  };
+
   private handleStabilityCheckResponse = (res: any) => {
     if (res && res.exceptionDetails) {
       throw new Error('Stability check failed: ' + res.exceptionDetails.exception?.description);
@@ -138,11 +144,7 @@ export class CdpTimeDriver implements TimeDriver {
       });
     } else {
       if (frames.length === 1) {
-        await frames[0].evaluate((t) => {
-          if (typeof (window as any).__helios_sync_media === 'function') {
-            (window as any).__helios_sync_media(t);
-          }
-        }, timeInSeconds).catch(e => {
+        await frames[0].evaluate(this.syncMediaClosure, timeInSeconds).catch(e => {
           console.warn('[CdpTimeDriver] Failed to sync media in frame ' + frames[0].url() + ':', e);
         });
       } else {
@@ -152,11 +154,7 @@ export class CdpTimeDriver implements TimeDriver {
         const framePromises = this.cachedPromises;
         for (let i = 0; i < frames.length; i++) {
           const frame = frames[i];
-          framePromises[i] = frame.evaluate((t) => {
-            if (typeof (window as any).__helios_sync_media === 'function') {
-              (window as any).__helios_sync_media(t);
-            }
-          }, timeInSeconds).catch(e => {
+          framePromises[i] = frame.evaluate(this.syncMediaClosure, timeInSeconds).catch(e => {
             console.warn('[CdpTimeDriver] Failed to sync media in frame ' + frame.url() + ':', e);
           });
         }
