@@ -115,12 +115,12 @@ const report = await Helios.diagnose();
 
 ## Roadmap
 ### V1.x (Active)
-- **Studio**: v0.107.1+ (Asset Move, Timeline Polish, Renders Panel Tests, Timeline Drag & Drop, Asset Drag and Drop, Refine CLI Component Removal)
-- **CLI**: v0.45.1+ (Scaffold Fly.io/Kubernetes/Azure/Cloudflare/Docker/Hetzner Deployment, Tier 3 Cloud Execution Adapters, Regression Tests)
+- **Studio**: v0.107.1+ (Timeline Audio Drag Drop, JKL Playback Shortcuts, Asset Move, Timeline Polish, Renders Panel Tests, Timeline Drag & Drop, Asset Drag and Drop, Refine CLI Component Removal)
+- **CLI**: v0.45.1+ (Cloudflare Sandbox Job Run, Scaffold Fly.io/Kubernetes/Azure/Cloudflare/Docker/Hetzner Deployment, Tier 3 Cloud Execution Adapters, Regression Tests)
 - **Core**: v5.13.0+ (Generic Input Props, Implement WaitUntilStable)
-- **Player**: v0.76.18+ (Regression Tests for Audio Fader, Media Session, MediaProperties, getSchema API Parity, Bridge Coverage Completeness, Document getSchema API Parity)
-- **Renderer**: v1.78.0+ (Refactor FFmpeg Config, Orchestrator Plan, Validate HW Accel)
-- **Infrastructure**: v0.25.0+ (Cloudflare Workers, Azure Functions, Fly.io Machines, Kubernetes, Docker, Modal, Deno Deploy, Vercel, Hetzner, Orchestrator Test Coverage, Cloudflare Sandbox)
+- **Player**: v0.76.18+ (Improve Index Coverage, Regression Tests for Audio Fader, Media Session, MediaProperties, getSchema API Parity, Bridge Coverage Completeness, Document getSchema API Parity)
+- **Renderer**: v1.78.0+ (WebCodecs Preference, Refactor FFmpeg Config, Orchestrator Plan, Validate HW Accel)
+- **Infrastructure**: v0.25.0+ (Optimize S3 Uploads, Cloudflare Workers, Azure Functions, Fly.io Machines, Kubernetes, Docker, Modal, Deno Deploy, Vercel, Hetzner, Orchestrator Test Coverage, Cloudflare Sandbox)
 
 ### AI Integration
 - **Studio MCP Server**: Inspect, create, and render compositions via LLM tools (Done)
