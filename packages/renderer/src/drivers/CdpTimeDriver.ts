@@ -197,11 +197,7 @@ export class CdpTimeDriver implements TimeDriver {
       await Promise.race([
         (this.waitStableParams.objectId
           ? this.client!.send('Runtime.callFunctionOn', this.waitStableParams).then(this.handleStabilityCheckResponse)
-          : page.evaluate(() => {
-              if (typeof (window as any).__helios_wait_until_stable === 'function') {
-                return (window as any).__helios_wait_until_stable();
-              }
-            })),
+          : page.evaluate("if (typeof window.__helios_wait_until_stable === 'function') window.__helios_wait_until_stable();")),
         timeoutPromise
       ]);
     } catch (e: any) {

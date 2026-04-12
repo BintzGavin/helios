@@ -7,6 +7,7 @@ Current best: 48.082s (baseline was 49.436s, -32.5%)
 Last updated by: PERF-198
 
 ## What Works
+- Replaced anonymous closure with string evaluation in CdpTimeDriver.ts fallback to eliminate Playwright function serialization overhead (~2.657s render time) [PERF-258]
 - Prebound the `syncMediaClosure` in `CdpTimeDriver.ts` to reduce closure allocation overhead inside the `setTime` hot loop. Improved render time to 2.101s (-3.4%). (PERF-255)
 - Prebound the  in  to reduce closure allocation overhead inside the  hot loop. Improved render time to 2.101s (-3.4%). (PERF-255)
 - [PERF-253] Prebind CaptureLoop onWriteError closure: Improved median time to 2.392s (baseline 2.8s)

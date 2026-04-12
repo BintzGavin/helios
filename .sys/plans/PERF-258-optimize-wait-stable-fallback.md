@@ -1,7 +1,7 @@
 ---
 id: PERF-258
 slug: optimize-wait-stable-fallback
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-06-06
 completed: ""
@@ -84,3 +84,8 @@ Run `tests/verify-cdp-driver.ts` to ensure the driver still passes basic executi
 
 ## Prior Art
 PERF-256 (pre-binding failed due to Playwright serialization). PERF-018 showed string templates or explicit args impact `evaluate`. For simple scripts, pure strings without variables are the fastest way to use `evaluate`.
+
+## Results Summary
+- **Best render time**: 2.657s
+- **Kept experiments**: [PERF-258]
+- **Discarded experiments**: []
