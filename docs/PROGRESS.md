@@ -508,3 +508,5 @@ Each agent should update **their own dedicated progress file** instead of this f
 
 ### PLAYER v0.77.18
 - ✅ Completed: Fix Duplicate README Entry - Removed duplicate getSchema entry from README.md.
+### PLAYER v0.77.19
+- ✅ Completed: Improve index.ts test coverage - Added export-options.test.ts covering untested getters and setters.

@@ -1,4 +1,4 @@
-**Version**: 0.77.18
+**Version**: 0.77.19
 
 [v0.77.18] ✅ Completed: Fix Duplicate README Entry - Removed duplicate getSchema entry from README.md.
 ## Status Log
@@ -207,3 +207,4 @@
 [v0.77.11] ✅ Completed: Fix API Parity srcObject - Updated srcObject getter and setter to persist assigned values internally, improving compatibility with third-party wrappers.
 [v0.77.15] ✅ Verified: Bridge coverage for postMessage expanded and properties verified. Completed plans: 2026-12-25, 2026-12-26, 2027-01-16, 2027-01-08.
 [v0.77.16] ✅ Completed: Document API Parity Gap - Deleted lingering plan file as the README already contained the required documentation updates.
+[v0.77.19] ✅ Completed: Improve index.ts test coverage - Added export-options.test.ts covering untested getters and setters.
