@@ -326,3 +326,4 @@ PERF-249	CaptureLoop	2.735	Sliding window pipeline optimization
 run	2.936	150	51.09	38.0	keep	Pre-allocate promises array and pre-bind closure in CdpTimeDriver hot loop
 253	2.392	150	62.71	0.0	keep	Prebind CaptureLoop stdin write callback closure
 PERF-254	Pre-bind evaluate closures in SeekTimeDriver	render_time_s:      2.119
+256	11.948	150	12.55	37.3	discard	PERF-256 prebind wait stable evaluate

@@ -47,6 +47,10 @@ Last updated by: PERF-198
 
 - Moved closure logic outside CaptureLoop (~3.2% faster) [PERF-235]
 ## What Doesn't Work (and Why)
+- PERF-256: Prebind wait stable evaluate closure in CdpTimeDriver.ts
+  - Result: 11.948s (vs 1.95s baseline)
+  - Why it failed: Pre-binding the fallback closure surprisingly regressed performance drastically. This is likely because the hot-loop execution inside `page.evaluate()` behaves differently with class properties vs inline string/functions. Playwright's serialization of the bound property across the CDP boundary per-frame introduces significantly more overhead than compiling the inline string.
+
 - **PERF-251**: Pre-bind Closure in CaptureLoop Worker Dispatch
   - **Why it didn't work**: Like PERF-241, pre-allocating closures with captured state arrays (or context objects) did not improve performance. The overhead of looking up state from the closure array or the function call dispatch negated the savings of avoiding per-frame anonymous closure allocation. Render time remained around ~1.74s compared to ~1.71s baseline. V8 seems to optimize the inline arrow function allocation within the `.then()` very well.
 -
