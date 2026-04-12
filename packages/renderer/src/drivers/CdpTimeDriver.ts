@@ -26,6 +26,12 @@ export class CdpTimeDriver implements TimeDriver {
   private cdpResolve: (() => void) | null = null;
   private cdpReject: ((err: Error) => void) | null = null;
 
+  private handleStabilityCheckResponse = (res: any) => {
+    if (res && res.exceptionDetails) {
+      throw new Error('Stability check failed: ' + res.exceptionDetails.exception?.description);
+    }
+  };
+
   private handleVirtualTimeBudgetExpired = () => {
     if (this.cdpResolve) {
       this.cdpResolve();
@@ -192,11 +198,7 @@ export class CdpTimeDriver implements TimeDriver {
     try {
       await Promise.race([
         (this.waitStableParams.objectId
-          ? this.client!.send('Runtime.callFunctionOn', this.waitStableParams).then(res => {
-              if (res.exceptionDetails) {
-                throw new Error('Stability check failed: ' + res.exceptionDetails.exception?.description);
-              }
-            })
+          ? this.client!.send('Runtime.callFunctionOn', this.waitStableParams).then(this.handleStabilityCheckResponse)
           : page.evaluate(() => {
               if (typeof (window as any).__helios_wait_until_stable === 'function') {
                 return (window as any).__helios_wait_until_stable();
