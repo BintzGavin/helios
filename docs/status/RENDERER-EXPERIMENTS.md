@@ -151,3 +151,4 @@ Last updated by: PERF-249
   - Render time: ~51.113
 
 - Kept: Replace Modulo/Bitwise Indexing with Counter-Based Indexing in CaptureLoop (PERF-246)
+- **PERF-252**: Pre-bound the CDP `.then` callback inside the `CdpTimeDriver.setTime()` hot loop to avoid dynamically allocating an anonymous closure on every stability check evaluation. Improved benchmark execution time to 587.005ms (vs baseline 584.396ms + noise).

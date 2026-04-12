@@ -1,0 +1,2 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	587.00	150	0	35.5	keep	PERF-252: Prebind CdpTimeDriver Stability Check Closure
