@@ -57,6 +57,7 @@ export const Timeline: React.FC = () => {
   const [draggingPropKey, setDraggingPropKey] = useState<string | null>(null);
   const [zoom, setZoom] = usePersistentState("timeline-zoom", 0);
   const [hoverFrame, setHoverFrame] = useState<number | null>(null);
+  const [isDragOverTimeline, setIsDragOverTimeline] = useState(false);
   const [contentWidth, setContentWidth] = useState(0);
 
   // Measure content width for Fit mode
@@ -200,10 +201,17 @@ export const Timeline: React.FC = () => {
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
+    setIsDragOverTimeline(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOverTimeline(false);
   };
 
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
+    setIsDragOverTimeline(false);
     const assetData = e.dataTransfer.getData("application/helios-asset");
     if (!assetData) return;
 
@@ -365,7 +373,11 @@ export const Timeline: React.FC = () => {
         </div>
       </div>
 
-      <div className="timeline-track-area" ref={scrollContainerRef}>
+      <div
+        className={`timeline-track-area ${isDragOverTimeline ? 'drag-over' : ''}`}
+        ref={scrollContainerRef}
+        onDragLeave={handleDragLeave}
+      >
         <div
           className="timeline-content"
           onDragOver={handleDragOver}
