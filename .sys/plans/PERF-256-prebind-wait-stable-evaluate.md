@@ -1,11 +1,11 @@
 ---
 id: PERF-256
 slug: prebind-wait-stable-evaluate
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2026-04-12
-completed: ""
-result: ""
+completed: "2026-04-12"
+result: "discard"
 ---
 
 # PERF-256: Prebind wait stable evaluate in CdpTimeDriver
@@ -48,3 +48,7 @@ Then update the fallback call in `setTime`:
 
 ## Correctness Check
 Run `tests/verify-cdp-driver.ts` to ensure the driver still passes basic execution flow and stability checks.
+
+## Results Summary
+- **Render time**: 11.948s (vs baseline 1.95s)
+- **Status**: discard
