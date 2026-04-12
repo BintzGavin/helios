@@ -7,6 +7,7 @@ Current best: 48.082s (baseline was 49.436s, -32.5%)
 Last updated by: PERF-198
 
 ## What Works
+- [PERF-253] Prebind CaptureLoop onWriteError closure: Improved median time to 2.392s (baseline 2.8s)
 - **PERF-245**: Pre-allocated promises array and pre-bound closure in CdpTimeDriver hot loop to eliminate per-frame V8 array allocation and garbage collection overhead. Render time improved from baseline to 2.936s.
 
 - Replaced batch Promise.all iteration with continuous while-loop overlapping maxPipelineDepth promises (PERF-249, ~1.4% faster)

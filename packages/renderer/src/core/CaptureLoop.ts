@@ -10,6 +10,16 @@ export class CaptureLoop {
   private drainResolve: (() => void) | null = null;
   private drainReject: ((err: Error) => void) | null = null;
 
+  private handleWriteError = (err?: Error | null) => {
+    if (err) {
+       if ((err as any).code === 'EPIPE') {
+           console.warn('FFmpeg stdin closed prematurely during write (EPIPE). Ignoring error to allow graceful exit.');
+       } else {
+           this.ffmpegManager.emitError(err);
+       }
+    }
+  };
+
   constructor(
     private options: RendererOptions,
     private pool: WorkerInfo[],
@@ -84,16 +94,6 @@ export class CaptureLoop {
 
     let previousWritePromise: Promise<void> | undefined;
 
-    const onWriteError = (err?: Error | null) => {
-        if (err) {
-           if ((err as any).code === 'EPIPE') {
-               console.warn('FFmpeg stdin closed prematurely during write (EPIPE). Ignoring error to allow graceful exit.');
-           } else {
-               this.ffmpegManager.emitError(err);
-           }
-        }
-    };
-
     let nextFrameToSubmit = 0;
     let nextFrameToWrite = 0;
     const poolLen = this.pool.length;
@@ -149,7 +149,7 @@ export class CaptureLoop {
            await previousWritePromise;
         }
 
-        const writeResult = this.writeToStdin(buffer, onWriteError);
+        const writeResult = this.writeToStdin(buffer, this.handleWriteError);
         previousWritePromise = writeResult ? writeResult : undefined;
 
         nextFrameToWrite++;
@@ -163,7 +163,7 @@ export class CaptureLoop {
     const finalBuffer = await this.pool[0].strategy.finish(this.pool[0].page);
     if (finalBuffer && ((Buffer.isBuffer(finalBuffer) && finalBuffer.length > 0) || (typeof finalBuffer === 'string' && finalBuffer.length > 0))) {
       console.log(`Writing final buffer...`);
-      const writeResult = this.writeToStdin(finalBuffer, onWriteError);
+      const writeResult = this.writeToStdin(finalBuffer, this.handleWriteError);
       if (writeResult) await writeResult;
     }
 
