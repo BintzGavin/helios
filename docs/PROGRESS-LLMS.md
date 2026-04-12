@@ -532,3 +532,13 @@
 - ✅ Completed: Daily llms.txt Review
   - Added `packages/infrastructure/src/index.ts` to Key Files for Agents.
   - Verified all package versions perfectly match `package.json`.
+
+## LLMS v1.64.0
+- ✅ Completed: Daily llms.txt Review
+  - Updated Roadmap in llms.txt with verifiable completions from domain PROGRESS logs:
+    - Studio: Timeline Audio Drag Drop, JKL Playback Shortcuts
+    - CLI: Cloudflare Sandbox Job Run
+    - Player: Improve Index Coverage
+    - Renderer: WebCodecs Preference
+    - Infrastructure: Optimize S3 Uploads
+  - Incremented version to 1.64.0

@@ -1,5 +1,6 @@
 # Status: LLMS
-**Version**: 1.63.0
+**Version**: 1.64.0
+[v1.64.0] ✅ Completed: Comprehensive Daily Review - Updated Roadmap with verifiable completions from domain progress logs (Studio Timeline Audio Drag Drop and JKL Playback Shortcuts, CLI Cloudflare Sandbox Job Run, Player Improve Index Coverage, Renderer WebCodecs Preference, Infrastructure Optimize S3 Uploads).
 [v1.63.0] ✅ Completed: Comprehensive Daily Review - Updated Roadmap with verifiable completions from domain progress logs (CLI Hetzner deployment, Studio Asset Drag & Drop/Component Removal, Player Bridge Coverage/Document getSchema API Parity, Renderer HW Accel Validation). Verified package versions against actual package.json.
 [v1.62.0] ✅ Completed: Comprehensive Daily Review - Updated Roadmap with Cloudflare Sandbox infrastructure adapter, Azure/Docker Deployment CLI scaffoldings, and CLI Regression Tests.
 [v1.61.1] ✅ Completed: Comprehensive Daily Review - Verified package versions, API examples, and key file paths. Updated Distributed Rendering comparison table to include Cloudflare Sandbox.
