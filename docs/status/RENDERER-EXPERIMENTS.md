@@ -17,3 +17,6 @@ Last updated by: PERF-270
 
 ## What Works
 - Pre-bind fallback callback in DomStrategy.capture() (PERF-269) - Eliminates GC pressure overhead in fallback screenshot loop
+
+## What Doesn't Work (and Why)
+- Eliminated fallback closure allocation in SeekTimeDriver (PERF-272). Render time regressed to 33.045.
