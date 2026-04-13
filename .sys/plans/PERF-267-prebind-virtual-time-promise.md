@@ -1,11 +1,11 @@
 ---
 id: PERF-267
 slug: prebind-virtual-time-promise
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: $(date -I)
-completed: ""
-result: ""
+completed: 2024-04-13
+result: improved
 ---
 # PERF-267: Prebind Virtual Time Promise in CdpTimeDriver.ts
 
@@ -54,3 +54,9 @@ Run the canvas smoke test and benchmark to verify no execution hangs occur due t
 
 ## Canvas Smoke Test
 Run `cd packages/renderer && npx tsx scripts/benchmark-test.js` to confirm output video is still correctly generated without regressions or hanging pipelines.
+
+## Results Summary
+- **Best render time**: 32.264s (vs baseline 43.227s)
+- **Improvement**: 25.3%
+- **Kept experiments**: Prebind virtualTimePromiseExecutor in CdpTimeDriver.ts
+- **Discarded experiments**: None

@@ -26,6 +26,13 @@ export class CdpTimeDriver implements TimeDriver {
   private cdpResolve: (() => void) | null = null;
   private cdpReject: ((err: Error) => void) | null = null;
 
+  private virtualTimePromiseExecutor = (resolve: () => void, reject: (err: Error) => void) => {
+    this.cdpResolve = resolve;
+    this.cdpReject = reject;
+    this.client!.once('Emulation.virtualTimeBudgetExpired', this.handleVirtualTimeBudgetExpired);
+    this.client!.send('Emulation.setVirtualTimePolicy', this.setVirtualTimePolicyParams).catch(this.handleVirtualTimeBudgetError);
+  };
+
   private syncMediaClosure = (t: number) => {
     if (typeof (window as any).__helios_sync_media === 'function') {
       (window as any).__helios_sync_media(t);
@@ -170,15 +177,8 @@ export class CdpTimeDriver implements TimeDriver {
 
     // 2. Advance virtual time
     // This triggers the browser event loop and requestAnimationFrame
-    await new Promise<void>((resolve, reject) => {
-      this.cdpResolve = resolve;
-      this.cdpReject = reject;
-      // Use 'once' to avoid leaking listeners
-      this.client!.once('Emulation.virtualTimeBudgetExpired', this.handleVirtualTimeBudgetExpired);
-
-      this.setVirtualTimePolicyParams.budget = budget;
-      this.client!.send('Emulation.setVirtualTimePolicy', this.setVirtualTimePolicyParams).catch(this.handleVirtualTimeBudgetError);
-    });
+    this.setVirtualTimePolicyParams.budget = budget;
+    await new Promise<void>(this.virtualTimePromiseExecutor);
 
     this.currentTime = timeInSeconds;
 

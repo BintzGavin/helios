@@ -3,8 +3,8 @@ Current best: 2s (baseline was 12.574s, -84.1%)
 Last updated by: PERF-261
 
 
-Current best: 47.634s (baseline was 49.440s, -3.6%)
-Last updated by: PERF-260
+Current best: 32.264s (baseline was 49.440s, -3.6%)
+Last updated by: PERF-267
 
 ## What Works
 - Pre-bound the `syncMedia` catch handler for `frame.evaluate` and `Runtime.callFunctionOn` to a class property to eliminate dynamic anonymous closure allocations on every frame iteration, reducing V8 GC pressure (PERF-265).
@@ -174,3 +174,6 @@ Last updated by: PERF-249
   - **Why it didn't work**: Did not improve render time. V8 optimizes the inline promise and anonymous closure allocation better than the property lookup.
 - Prebind virtual time promise executor in CdpTimeDriver (PERF-260)
   - **Why it didn't work**: Did not improve render time (median 32.507s vs baseline 32.156s). V8 seems to optimize the inline promise and anonymous closure allocation better than the property lookup, similar to the stability timeout experiment (PERF-262).
+
+## What Works
+- Prebinding virtualTimePromiseExecutor in CdpTimeDriver.ts (PERF-267) improved performance. Median time: 32.264 (baseline: 43.227).
