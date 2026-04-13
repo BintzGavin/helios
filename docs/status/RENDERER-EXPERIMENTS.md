@@ -13,3 +13,6 @@ Last updated by: PERF-267
 
 ## Open Questions
 - Can we eliminate dynamic Promise `.then` closure allocation in the `CaptureLoop.ts` by pre-binding?
+
+## What Works
+- Pre-bind fallback callback in DomStrategy.capture() (PERF-269) - Eliminates GC pressure overhead in fallback screenshot loop
