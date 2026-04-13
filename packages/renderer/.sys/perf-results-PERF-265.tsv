@@ -1,0 +1,3 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	32.712	90	2.75	36.5	keep	baseline
+2	32.789	90	2.74	36.3	keep	PERF-265: prebind syncMedia catch handler

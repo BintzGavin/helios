@@ -32,6 +32,10 @@ export class CdpTimeDriver implements TimeDriver {
     }
   };
 
+  private handleSyncMediaError = (e: any) => {
+    console.warn('[CdpTimeDriver] Failed to sync media:', e);
+  };
+
   private handleStabilityCheckResponse = (res: any) => {
     if (res && res.exceptionDetails) {
       throw new Error('Stability check failed: ' + res.exceptionDetails.exception?.description);
@@ -147,14 +151,10 @@ export class CdpTimeDriver implements TimeDriver {
     const frames = this.cachedFrames;
     if (frames.length === 1 && this.syncMediaParams.objectId) {
       this.syncMediaParams.arguments[0].value = timeInSeconds;
-      await this.client!.send('Runtime.callFunctionOn', this.syncMediaParams).catch(e => {
-        console.warn('[CdpTimeDriver] Failed to sync media in main frame:', e);
-      });
+      await this.client!.send('Runtime.callFunctionOn', this.syncMediaParams).catch(this.handleSyncMediaError);
     } else {
       if (frames.length === 1) {
-        await frames[0].evaluate(this.syncMediaClosure, timeInSeconds).catch(e => {
-          console.warn('[CdpTimeDriver] Failed to sync media in frame ' + frames[0].url() + ':', e);
-        });
+        await frames[0].evaluate(this.syncMediaClosure, timeInSeconds).catch(this.handleSyncMediaError);
       } else {
         if (this.cachedPromises.length !== frames.length) {
           this.cachedPromises = new Array(frames.length);
@@ -162,9 +162,7 @@ export class CdpTimeDriver implements TimeDriver {
         const framePromises = this.cachedPromises;
         for (let i = 0; i < frames.length; i++) {
           const frame = frames[i];
-          framePromises[i] = frame.evaluate(this.syncMediaClosure, timeInSeconds).catch(e => {
-            console.warn('[CdpTimeDriver] Failed to sync media in frame ' + frame.url() + ':', e);
-          });
+          framePromises[i] = frame.evaluate(this.syncMediaClosure, timeInSeconds).catch(this.handleSyncMediaError);
         }
         await Promise.all(framePromises);
       }
