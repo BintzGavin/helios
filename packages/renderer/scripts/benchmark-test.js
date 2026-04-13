@@ -1,32 +1,34 @@
-import { Renderer } from '../dist/Renderer.js';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import { Renderer } from '../src/index.js';
+import { resolve } from 'path';
+import { existsSync } from 'fs';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+async function runBenchmark() {
+  const outputPath = resolve('test-output.mp4');
+  const compUrl = 'file://' + resolve('../../output/example-build/examples/dom-benchmark/composition.html');
 
-async function run() {
-  const options = {
-    mode: 'dom',
-    width: 600,
-    height: 600,
-    fps: 30,
-    durationInSeconds: 5, // 150 frames
-  };
-  const renderer = new Renderer(options);
-  const start = performance.now();
-  try {
-    const compUrl = 'file://' + path.resolve(__dirname, '../../../output/example-build/examples/simple-canvas-animation/composition.html');
-    await renderer.render(compUrl, 'test-output.mp4');
-  } catch (err) {
-    console.error(err);
+  if (!existsSync(resolve('../../output/example-build/examples/dom-benchmark/composition.html'))) {
+     console.error('File not found: ' + resolve('../../output/example-build/examples/dom-benchmark/composition.html'));
   }
+
+  const renderer = new Renderer({
+    durationInSeconds: 3,
+    fps: 30,
+    width: 1280,
+    height: 720,
+    mode: 'dom'
+  });
+
+  const start = performance.now();
+  await renderer.render(compUrl, outputPath);
   const elapsed = (performance.now() - start) / 1000;
+
   console.log('---');
   console.log(`render_time_s:      ${elapsed.toFixed(3)}`);
-  console.log(`total_frames:       150`);
-  console.log(`fps_effective:      ${(150 / elapsed).toFixed(2)}`);
+  console.log(`total_frames:       90`);
+  console.log(`fps_effective:      ${(90 / elapsed).toFixed(2)}`);
   console.log(`peak_mem_mb:        ${(process.memoryUsage().heapUsed / 1024 / 1024).toFixed(1)}`);
+
+  return elapsed;
 }
 
-run();
+runBenchmark().catch(console.error);

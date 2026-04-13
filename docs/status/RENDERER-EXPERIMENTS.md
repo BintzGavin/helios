@@ -7,6 +7,7 @@ Current best: 47.634s (baseline was 49.440s, -3.6%)
 Last updated by: PERF-260
 
 ## What Works
+- Pre-bound the `syncMedia` catch handler for `frame.evaluate` and `Runtime.callFunctionOn` to a class property to eliminate dynamic anonymous closure allocations on every frame iteration, reducing V8 GC pressure (PERF-265).
 - Pre-bound setVirtualTimePolicy error handler to class property in CdpTimeDriver.ts to reduce closure allocations (PERF-261)
 - Shared BrowserContext across workers in BrowserPool.ts (~3.6% faster) [PERF-260]
 - Replaced anonymous closure with string evaluation in CdpTimeDriver.ts fallback to eliminate Playwright function serialization overhead (~2.657s render time) [PERF-258]
