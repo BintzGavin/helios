@@ -1,11 +1,11 @@
 ---
 id: PERF-272
 slug: eliminate-fallback-closure
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2026-04-13
-completed: ""
-result: ""
+completed: "2026-04-13"
+result: "discarded"
 ---
 
 # PERF-272: Eliminate Fallback Closure Allocation in SeekTimeDriver
@@ -89,3 +89,7 @@ If we use static strings, we no longer need the `evaluateClosure` and `evaluateA
 
 ## Correctness Check
 Run the DOM benchmark and inspect the resulting `test-output.mp4` to verify visual correctness.
+
+## Results Summary
+- **Best render time**: Regressed
+- **Discarded experiments**: PERF-272
