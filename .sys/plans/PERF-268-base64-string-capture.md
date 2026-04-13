@@ -1,11 +1,11 @@
 ---
 id: PERF-268
 slug: base64-string-capture
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2026-04-13
-completed: ""
-result: ""
+completed: 2026-04-13
+result: improved
 ---
 
 # PERF-268: Return Base64 String directly from CanvasStrategy WebCodecs capture
@@ -46,3 +46,9 @@ During DOM capture when using WebCodecs, `CanvasStrategy` currently receives a b
 
 ## 4. Test Plan
 Run `benchmark-test.js` to ensure the frames are still correctly piped to FFmpeg.
+
+## Results Summary
+- **Best render time**: 32.326s (vs baseline ~32.596s)
+- **Improvement**: ~0.8%
+- **Kept experiments**: [PERF-268]
+- **Discarded experiments**: []
