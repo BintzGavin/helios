@@ -51,6 +51,8 @@ Last updated by: PERF-267
 
 - Moved closure logic outside CaptureLoop (~3.2% faster) [PERF-235]
 ## What Doesn't Work (and Why)
+- **PERF-259**: Prebinding drain promise executor in CaptureLoop.ts.
+  - **Why it didn't work**: Did not improve performance. V8 optimization of inline promises and anonymous closure allocation is likely better than property lookup overhead.
 - **PERF-262**: Pre-bound stability timeout promise executor to class property in CdpTimeDriver.ts.
   - **Why it didn't work**: Did not improve render time (degraded from ~2.0s to ~2.7s). V8 seems to optimize the inline promise and anonymous closure allocation within the `setTime` hot loop better than looking up the property, or perhaps the added condition check in the executor slightly de-optimized the path.
 - Pre-bound setVirtualTimePolicy error handler to class property in CdpTimeDriver.ts (PERF-261). Did not yield meaningful improvement, bottleneck is elsewhere.
