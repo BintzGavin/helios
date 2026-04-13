@@ -121,12 +121,12 @@ export class CaptureLoop {
             const time = frameIndex * timeStep;
             const compositionTimeInSeconds = (this.startFrame + frameIndex) * compTimeStep;
 
-            const framePromise = worker.activePromise
-                .catch(noopCatch)
-                .then(() => {
+            const executeCapture = () => {
                     worker.timeDriver.setTime(worker.page, compositionTimeInSeconds).then(undefined, noopCatch);
                     return worker.strategy.capture(worker.page, time);
-                });
+                };
+
+            const framePromise = worker.activePromise.then(executeCapture, executeCapture);
 
             worker.activePromise = framePromise as unknown as Promise<void>;
             framePromises[frameIndex % maxPipelineDepth] = framePromise;

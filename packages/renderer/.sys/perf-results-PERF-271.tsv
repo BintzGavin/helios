@@ -1,0 +1,3 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	43.939	90	2.05	37.8	keep	baseline
+2	32.105	90	2.80	37.1	keep	combine catch and then
