@@ -1,0 +1,5 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	32.156	90	2.80	36.6	keep	baseline
+2	33.611	90	2.68	36.6	discard	prebind-virtual-time-executor
+3	32.507	90	2.77	37.2	discard	prebind-virtual-time-executor
+4	32.482	90	2.77	37.1	discard	prebind-virtual-time-executor

@@ -172,3 +172,5 @@ Last updated by: PERF-249
 ## What Doesn't Work (and Why)
 - **PERF-262**: Prebound the CDP stability timeout promise executor.
   - **Why it didn't work**: Did not improve render time. V8 optimizes the inline promise and anonymous closure allocation better than the property lookup.
+- Prebind virtual time promise executor in CdpTimeDriver (PERF-260)
+  - **Why it didn't work**: Did not improve render time (median 32.507s vs baseline 32.156s). V8 seems to optimize the inline promise and anonymous closure allocation better than the property lookup, similar to the stability timeout experiment (PERF-262).
