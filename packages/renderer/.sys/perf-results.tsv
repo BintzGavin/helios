@@ -329,3 +329,4 @@ PERF-254	Pre-bind evaluate closures in SeekTimeDriver	render_time_s:      2.119
 256	11.948	150	12.55	37.3	discard	PERF-256 prebind wait stable evaluate
 325	2.551	150	58.81	34.6	discard	PERF-257: Eliminate timeoutPromise allocation inside CdpTimeDriver.ts setTime
 326	2.657	150	0	0	keep	PERF-258 String evaluate fallback
+270	32.140	90	2.80	36.6	discard	Prebind CaptureLoop then closures
