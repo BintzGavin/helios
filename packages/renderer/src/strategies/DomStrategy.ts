@@ -17,6 +17,11 @@ export class DomStrategy implements RenderStrategy {
   private cleanupAudio: () => Promise<void> | void = () => {};
   private cdpSession: CDPSession | null = null;
   private lastFrameData: Buffer | string | null = null;
+
+  private handleFallbackScreenshot = (fallback: Buffer) => {
+    this.lastFrameData = fallback;
+    return fallback;
+  };
   private cdpScreenshotParams: any = null;
   private beginFrameParams: any = null;
   private targetBeginFrameParams: any = null;
@@ -222,10 +227,7 @@ export class DomStrategy implements RenderStrategy {
 
         return (this.cdpSession!.send('HeadlessExperimental.beginFrame', this.targetBeginFrameParams) as Promise<any>).then(this.handleBeginFrameResult);
       }
-      return this.targetElementHandle.screenshot((this as any).fallbackScreenshotOptions).then((fallback: Buffer) => {
-        this.lastFrameData = fallback as Buffer;
-        return fallback as Buffer;
-      });
+      return this.targetElementHandle.screenshot((this as any).fallbackScreenshotOptions).then(this.handleFallbackScreenshot);
     }
 
     this.beginFrameParams.frameTimeTicks = 10000 + frameTime;
