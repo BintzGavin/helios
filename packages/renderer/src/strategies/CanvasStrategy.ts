@@ -456,7 +456,7 @@ export class CanvasStrategy implements RenderStrategy {
     }
   }
 
-  async capture(page: Page, frameTime: number): Promise<Buffer> {
+  async capture(page: Page, frameTime: number): Promise<Buffer | string> {
     if (this.useWebCodecs) {
       return this.captureWebCodecs(page, frameTime);
     } else {
@@ -464,7 +464,7 @@ export class CanvasStrategy implements RenderStrategy {
     }
   }
 
-  private async captureWebCodecs(page: Page, frameTime: number): Promise<Buffer> {
+  private async captureWebCodecs(page: Page, frameTime: number): Promise<Buffer | string> {
     const selector = this.options.canvasSelector || 'canvas';
 
     // Calculate if this frame should be a keyframe
@@ -520,7 +520,7 @@ export class CanvasStrategy implements RenderStrategy {
     }, { time: frameTime, selector, isKeyFrame });
 
     if (chunkData && chunkData.length > 0) {
-        return Buffer.from(chunkData, 'base64');
+        return chunkData;
     }
     return Buffer.alloc(0);
   }
@@ -552,7 +552,7 @@ export class CanvasStrategy implements RenderStrategy {
     return Buffer.from(dataUrl.split(',')[1], 'base64');
   }
 
-  async finish(page: Page): Promise<Buffer | void> {
+  async finish(page: Page): Promise<Buffer | string | void> {
     if (this.useWebCodecs) {
       const chunkData = await page.evaluate<string>(async function() {
         const context = (window as any).heliosWebCodecs;
@@ -581,7 +581,7 @@ export class CanvasStrategy implements RenderStrategy {
       });
 
       if (chunkData && chunkData.length > 0) {
-        return Buffer.from(chunkData, 'base64');
+        return chunkData;
       }
     }
     return Promise.resolve();

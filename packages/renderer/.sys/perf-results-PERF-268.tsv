@@ -1,0 +1,3 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	32.596	90	2.76	36.7	keep	baseline
+2	32.326	90	2.78	36.4	keep	PERF-268: base64-string-capture
