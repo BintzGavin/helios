@@ -182,3 +182,8 @@ Last updated by: PERF-249
 
 - PERF-268: Returned Base64 String directly from CanvasStrategy WebCodecs capture.
   - Render time: 32.326s (baseline 32.596s)
+
+## What Works
+- Pre-bound the `syncMedia` catch handlers to `this.handleSyncMediaError` inside `CdpTimeDriver.ts` hot loop (already implemented previously).
+  - Improvement: ~0% (Already implemented)
+  - Plan ID: PERF-265
