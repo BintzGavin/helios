@@ -1,5 +1,11 @@
 # LLMS Progress
 
+## LLMS v1.65.0
+- ✅ Completed: Daily llms.txt Review
+  - Synchronized Roadmap section with recent verifiable completions from domain PROGRESS logs.
+  - Added new completions for Core (Active Clips, Virtual Time Binding), Player (Audio Context Manager, Async Seek), Renderer (Pluggable Execution, Canvas Preload), and others.
+  - Verified all package versions and file paths.
+
 ## LLMS v1.63.0
 - ✅ Completed: Daily llms.txt Review
   - Updated Roadmap with recent verified completions from PROGRESS logs (CLI Hetzner deployment, Studio Asset Drag & Drop/Component Removal, Player Bridge Coverage/Document getSchema API Parity, Renderer HW Accel Validation).
