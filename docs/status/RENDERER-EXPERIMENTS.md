@@ -25,3 +25,4 @@ Last updated by: PERF-275
 
 - **PERF-273**: Inline SeekTimeDriver CDP callParams. The `timeout` value is now dynamically injected into the `functionDeclaration` instead of dynamically passing it through arguments list over IPC on every frame. Reduced object tree size for IPC payload. Time: 32.286s (baseline 32.264s). Marginal difference, but logically optimized payload size over CDP IPC, kept.
 - **PERF-275**: Preallocated executeCapture closures dynamically using a ring buffer of context objects. Render time: 32.143
+- **PERF-276**: Replaced modulo (`%`) operators with bitwise AND (`&`) for indexing into the `framePromises` ring buffer in `CaptureLoop.ts`. Render time: 32.243s (baseline 32.062s). Discarded because V8 already optimizes modulo efficiently and the bitwise logic yielded no measurable improvement and was slightly slower.

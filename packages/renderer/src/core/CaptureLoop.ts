@@ -99,6 +99,7 @@ export class CaptureLoop {
     const poolLen = this.pool.length;
     let maxPipelineDepth = poolLen * 2;
     maxPipelineDepth = Math.pow(2, Math.ceil(Math.log2(maxPipelineDepth)));
+    const ringMask = maxPipelineDepth - 1;
     const timeStep = 1000 / fps;
     const compTimeStep = 1 / fps;
     const signal = this.jobOptions?.signal;
@@ -132,7 +133,7 @@ export class CaptureLoop {
             const time = frameIndex * timeStep;
             const compositionTimeInSeconds = (this.startFrame + frameIndex) * compTimeStep;
 
-            const ringIndex = frameIndex % maxPipelineDepth;
+            const ringIndex = frameIndex & ringMask;
             const ctx = contextRing[ringIndex];
             ctx.time = time;
             ctx.compositionTimeInSeconds = compositionTimeInSeconds;
@@ -146,7 +147,7 @@ export class CaptureLoop {
             nextFrameToSubmit++;
         }
 
-        const buffer = await framePromises[nextFrameToWrite % maxPipelineDepth]!;
+        const buffer = await framePromises[nextFrameToWrite & ringMask]!;
 
         const currentFrame = nextFrameToWrite;
 

@@ -1,11 +1,11 @@
 ---
 id: PERF-276
 slug: bitwise-modulo-ring-buffer
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "Jules"
 created: 2026-04-14
-completed: ""
-result: ""
+completed: "2026-04-14"
+result: "32.243s"
 ---
 
 # PERF-276: Bitwise Modulo Ring Buffer in CaptureLoop
@@ -25,7 +25,7 @@ In `packages/renderer/src/core/CaptureLoop.ts`, `maxPipelineDepth` is initialize
 - **Minimum runs**: 3 per experiment, report median
 
 ## Baseline
-- **Current estimated render time**: ~32.075s
+- **Current estimated render time**: ~32.062s
 - **Bottleneck analysis**: Microtask and logic execution in the hot frame capturing loop.
 
 ## Implementation Spec

@@ -1,0 +1,7 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	42.028	90	2.14	36.9	keep	baseline
+2	31.966	90	2.82	36.6	keep	baseline
+3	32.062	90	2.81	37.0	keep	baseline
+4	32.653	90	2.76	37.3	discard	bitwise masking
+5	32.243	90	2.79	36.4	discard	bitwise masking
+6	32.085	90	2.81	36.3	discard	bitwise masking
