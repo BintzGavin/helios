@@ -25,3 +25,6 @@
 ## v0.77.15 - Strict Execution of Plans
 **Learning:** Even if a feature like srcObject persistence has been previously completed according to the status file, I must strictly identify the *next uncompleted plan* for my domain and implement it, or create a new plan for an unaddressed vision gap. In this case,  parity was already completed in , so creating another plan for it was incorrect.
 **Action:** Always check  for completed versions to avoid creating duplicate plans. If the latest plan is completed, look for new gaps in the vision.
+## [v0.77.20] - Frame-based Keydown Alignments
+**Learning:** The implementation of keyboard shortcuts like `ArrowLeft` and `ArrowRight` was originally seeking by seconds, but the `README.md` explicitly promised frame-based seeking.
+**Action:** When planning, double-check that the fine-grained implementation details match the high-level documentation in `README.md`.
