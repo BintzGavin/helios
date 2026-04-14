@@ -38,7 +38,7 @@ helios.play();
 
 ## Packages
 - `@helios-project/core` - Headless video engine (state, timeline, subscriptions)
-- `@helios-project/player` - Web Component player (`<helios-player>`)
+- `@helios-project/player` - Web Component player (`<helios-player>`) and `ClientSideExporter`
 - `@helios-project/renderer` - Server-side rendering (Playwright, FFmpeg)
 - `@helios-project/studio` - Browser-based development environment (Alpha)
 - `@helios-project/cli` - Command-line interface (init, add, components, list, remove, update, build, preview, job, skills, merge, diff, deploy, studio, render)
@@ -89,6 +89,7 @@ Skills for AI agents are in `.agents/skills/helios-skills/skills/`:
 ## Key Files for Agents
 - `README.md` - Vision document
 - `docs/BACKLOG.md` - Feature backlog
+- `docs/PROGRESS.md` - Aggregated progress log
 - `docs/PROGRESS-*.md` - Completed work (per domain)
 - `docs/status/[ROLE].md` - Domain-specific status
 - `.sys/llmdocs/context-*.md` - Architecture summaries
@@ -118,9 +119,9 @@ const report = await Helios.diagnose();
 - **Studio**: v0.107.1+ (Timeline Audio Drag Drop, JKL Playback Shortcuts, Asset Move, Timeline Polish, Renders Panel Tests, Timeline Drag & Drop, Asset Drag and Drop, Refine CLI Component Removal, Enhance MCP Server, Timeline Audio Regression Refinements)
 - **CLI**: v0.45.1+ (Cloudflare Sandbox Job Run, Scaffold Fly.io/Kubernetes/Azure/Cloudflare/Docker/Hetzner Deployment, Tier 3 Cloud Execution Adapters, Regression Tests, All Worker Execution)
 - **Core**: v5.13.0+ (Generic Input Props, Implement WaitUntilStable, Implement Active Clips, Shared Virtual Time Binding, Enable Audio State Persistence)
-- **Player**: v0.76.18+ (Improve Index Coverage, Regression Tests for Audio Fader, Media Session, MediaProperties, getSchema API Parity, Bridge Coverage Completeness, Document getSchema API Parity, Audio Context Manager Tests, Async Seek)
+- **Player**: v0.76.18+ (Improve Index Coverage, Regression Tests for Audio Fader, Media Session, MediaProperties, getSchema API Parity, Bridge Coverage Completeness, Document getSchema API Parity, Audio Context Manager Tests, Async Seek, Bridge Coverage postMessage, Fix Duplicate README Entry, Improve index.ts test coverage)
 - **Renderer**: v1.78.0+ (WebCodecs Preference, Refactor FFmpeg Config, Orchestrator Plan, Validate HW Accel, Refactor Media Sync Logic, Abstraction for Pluggable Execution, Canvas Image Preload)
-- **Infrastructure**: v0.25.0+ (Optimize S3 Uploads, Cloudflare Workers, Azure Functions, Fly.io Machines, Kubernetes, Docker, Modal, Deno Deploy, Vercel, Hetzner, Orchestrator Test Coverage, Cloudflare Sandbox, Optimize GCS Uploads, FfmpegStitcher Coverage)
+- **Infrastructure**: v0.25.0+ (Optimize S3 Uploads, Cloudflare Workers, Azure Functions, Fly.io Machines, Kubernetes, Docker, Modal, Deno Deploy, Vercel, Hetzner, Orchestrator Test Coverage, Cloudflare Sandbox, Optimize GCS Uploads, FfmpegStitcher Coverage, Cloud Execution Adapters Documentation)
 
 ### AI Integration
 - **Studio MCP Server**: Inspect, create, and render compositions via LLM tools (Done)

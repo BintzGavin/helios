@@ -1,5 +1,11 @@
 # LLMS Progress
 
+## LLMS v1.66.0
+- ✅ Completed: Daily llms.txt Review
+  - Updated Roadmap with recent completions (Player Bridge Coverage postMessage, Fix Duplicate README Entry, Improve index.ts test coverage, Infrastructure Cloud Execution Adapters Documentation, Renderer Fix GSAP Timeline Synchronization).
+  - Added `docs/PROGRESS.md` to Key Files for Agents.
+  - Updated `@helios-project/player` package description to include `ClientSideExporter`.
+
 ## LLMS v1.65.0
 - ✅ Completed: Daily llms.txt Review
   - Synchronized Roadmap section with recent verifiable completions from domain PROGRESS logs.
