@@ -33,12 +33,6 @@ export class CdpTimeDriver implements TimeDriver {
     this.client!.send('Emulation.setVirtualTimePolicy', this.setVirtualTimePolicyParams).catch(this.handleVirtualTimeBudgetError);
   };
 
-  private syncMediaClosure = (t: number) => {
-    if (typeof (window as any).__helios_sync_media === 'function') {
-      (window as any).__helios_sync_media(t);
-    }
-  };
-
   private handleSyncMediaError = (e: any) => {
     console.warn('[CdpTimeDriver] Failed to sync media:', e);
   };
@@ -161,7 +155,7 @@ export class CdpTimeDriver implements TimeDriver {
       await this.client!.send('Runtime.callFunctionOn', this.syncMediaParams).catch(this.handleSyncMediaError);
     } else {
       if (frames.length === 1) {
-        await frames[0].evaluate(this.syncMediaClosure, timeInSeconds).catch(this.handleSyncMediaError);
+        await frames[0].evaluate("if(typeof window.__helios_sync_media==='function') window.__helios_sync_media(" + timeInSeconds + ");").catch(this.handleSyncMediaError);
       } else {
         if (this.cachedPromises.length !== frames.length) {
           this.cachedPromises = new Array(frames.length);
@@ -169,7 +163,7 @@ export class CdpTimeDriver implements TimeDriver {
         const framePromises = this.cachedPromises;
         for (let i = 0; i < frames.length; i++) {
           const frame = frames[i];
-          framePromises[i] = frame.evaluate(this.syncMediaClosure, timeInSeconds).catch(this.handleSyncMediaError);
+          framePromises[i] = frame.evaluate("if(typeof window.__helios_sync_media==='function') window.__helios_sync_media(" + timeInSeconds + ");").catch(this.handleSyncMediaError);
         }
         await Promise.all(framePromises);
       }

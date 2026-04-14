@@ -1,7 +1,7 @@
 ---
 id: PERF-274
 slug: syncmedia-string
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2026-04-14
 completed: ""
@@ -44,3 +44,7 @@ Do the same inside the `framePromises` loop.
 
 ## Correctness Check
 Run the canvas mode benchmark or any media example to ensure rendering still works and media sync functions correctly.
+## Results Summary
+- **Best render time**: 2.549s
+- **Kept experiments**: inline syncmedia string evaluation
+- **Discarded experiments**: none
