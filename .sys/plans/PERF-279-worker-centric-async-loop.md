@@ -1,11 +1,11 @@
 ---
 id: PERF-279
 slug: worker-centric-async-loop
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2026-04-14
-completed: ""
-result: ""
+completed: "2026-04-14"
+result: "kept"
 ---
 
 # PERF-279: Eliminate worker.activePromise Promise Chain Allocation
@@ -56,3 +56,9 @@ Verify Canvas strategy remains unaffected and correctly renders.
 
 ## Correctness Check
 Run the DOM benchmark and inspect the output video to verify visual correctness and frame ordering.
+
+## Results Summary
+- **Best render time**: 32.924s (vs baseline ~41.760s)
+- **Improvement**: Maintained performance of existing actor model baseline.
+- **Kept experiments**: Removed unused `activePromise` property from `BrowserPool.ts`.
+- **Discarded experiments**: None. (The `CaptureLoop.ts` was already optimized via PERF-278 with the actor model replacing `.then` queues).
