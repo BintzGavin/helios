@@ -1,0 +1,6 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	32.001	90	2.81	36.9	keep	baseline (PERF-278 worker actor loop)
+2	32.245	90	2.79	37.0	keep	PERF-278 worker actor loop
+3	32.016	90	2.81	37.6	keep	PERF-278 worker actor loop
+4	32.089	90	2.80	36.8	keep	PERF-278 worker actor loop with proper backpressure
+5	32.011	90	2.81	36.8	keep	PERF-278 worker actor loop backpressure bug fix
