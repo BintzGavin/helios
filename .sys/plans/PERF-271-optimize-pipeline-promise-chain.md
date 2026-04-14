@@ -1,11 +1,11 @@
 ---
 id: PERF-271
 slug: optimize-pipeline-promise-chain
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-30
-completed: ""
-result: ""
+completed: "2024-05-30"
+result: "discarded"
 ---
 
 # PERF-271: Optimize Pipeline Promise Chain Allocations
@@ -95,3 +95,9 @@ Run the standard Canvas rendering benchmark (e.g., `npm run test` or render a Ca
 
 ## Correctness Check
 Run the DOM benchmark and inspect the resulting `test-output.mp4` to verify visual correctness (frames are not skipped or out-of-order).
+
+## Results Summary
+- **Best render time**: 32.076s (vs baseline 32.091s)
+- **Improvement**: ~0% (inconclusive / within noise margin)
+- **Kept experiments**: []
+- **Discarded experiments**: [Removed intermediate Promise allocation in CaptureLoop.ts, replaced .catch with try/catch and removed .then in CdpTimeDriver.ts waitStable race]
