@@ -3,6 +3,7 @@ Current best: 32.264s (baseline was 43.227s, -25.3%)
 Last updated by: PERF-270
 
 ## What Works
+- **PERF-274**: Replaced syncMedia closure evaluation with string evaluation in CdpTimeDriver.ts. Faster and avoids IPC overhead.
 - Prebinding virtualTimePromiseExecutor in CdpTimeDriver.ts (PERF-267) improved performance. Median time: 32.264 (baseline: 43.227).
 - PERF-268: Returned Base64 String directly from CanvasStrategy WebCodecs capture. Render time: 32.326s (baseline 32.596s)
 - Pre-bound the `syncMedia` catch handlers to `this.handleSyncMediaError` inside `CdpTimeDriver.ts` hot loop (PERF-265).
@@ -16,6 +17,7 @@ Last updated by: PERF-270
 - Can we eliminate dynamic Promise `.then` closure allocation in the `CaptureLoop.ts` by pre-binding?
 
 ## What Works
+- **PERF-274**: Replaced syncMedia closure evaluation with string evaluation in CdpTimeDriver.ts. Faster and avoids IPC overhead.
 - Pre-bind fallback callback in DomStrategy.capture() (PERF-269) - Eliminates GC pressure overhead in fallback screenshot loop
 
 ## What Doesn't Work (and Why)
