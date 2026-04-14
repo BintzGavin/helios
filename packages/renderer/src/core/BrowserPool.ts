@@ -42,7 +42,6 @@ export interface WorkerInfo {
   page: import('playwright').Page;
   strategy: RenderStrategy;
   timeDriver: TimeDriver;
-  activePromise: Promise<void>;
 }
 
 export class BrowserPool {
@@ -145,7 +144,7 @@ export class BrowserPool {
       await strategy.prepare(page);
       await timeDriver.prepare(page);
 
-      return { context: sharedContext, page, strategy, timeDriver, activePromise: Promise.resolve() };
+      return { context: sharedContext, page, strategy, timeDriver };
     };
 
     const poolPromises = [];
