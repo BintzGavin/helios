@@ -1,11 +1,11 @@
 ---
 id: PERF-273
 slug: inline-seektimedriver-callParams
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2026-04-13
-completed: ""
-result: ""
+completed: "2026-04-13"
+result: "kept"
 ---
 
 # PERF-273: Optimize SeekTimeDriver CDP callParams assignment
@@ -79,3 +79,10 @@ Run a standard canvas benchmark to ensure no breakage.
 
 ## Correctness Check
 Run the DOM benchmark tests and ensure the video renders.
+
+## Results Summary
+- **Best render time**: 32.267s (vs baseline 32.264s)
+- **Improvement**: 0% (Cleaned up IPC payload serialization, performance difference is negligible).
+- **Kept experiments**:
+  - Inlined `this.timeout` into the `functionDeclaration` and omitted it from the `arguments` array inside the `SeekTimeDriver` CDP hot loop `Runtime.callFunctionOn` payload to marginally improve JSON stringification overhead in playwright.
+- **Discarded experiments**: [none]

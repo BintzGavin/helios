@@ -13,9 +13,8 @@ export class SeekTimeDriver implements TimeDriver {
   private evaluateArgs: [number, number] = [0, 0];
   private evaluateClosure = ([t, timeoutMs]: any) => { (window as any).__helios_seek(t, timeoutMs); };
   private callParams: any = {
-    functionDeclaration: 'function(t, timeout) { return this.__helios_seek(t, timeout); }',
     objectId: '',
-    arguments: [ { value: 0 }, { value: 0 } ],
+    arguments: [ { value: 0 } ],
     awaitPromise: true,
     returnByValue: false
   };
@@ -262,6 +261,7 @@ export class SeekTimeDriver implements TimeDriver {
     this.cachedFrames = page.frames();
     this.cachedMainFrame = page.mainFrame();
 
+    this.callParams.functionDeclaration = `function(t) { return this.__helios_seek(t, ${this.timeout}); }`;
     const windowRes = await this.cdpSession!.send('Runtime.evaluate', { expression: 'window' });
     if (windowRes.result && windowRes.result.objectId) {
       this.callParams.objectId = windowRes.result.objectId;
@@ -273,7 +273,6 @@ export class SeekTimeDriver implements TimeDriver {
 
     if (frames.length === 1 && this.callParams.objectId) {
       this.callParams.arguments[0].value = timeInSeconds;
-      this.callParams.arguments[1].value = this.timeout;
       return this.cdpSession!.send('Runtime.callFunctionOn', this.callParams) as Promise<any>;
     }
 
