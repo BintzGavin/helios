@@ -20,3 +20,5 @@ Last updated by: PERF-270
 
 ## What Doesn't Work (and Why)
 - Eliminated fallback closure allocation in SeekTimeDriver (PERF-272). Render time regressed to 33.045.
+
+- **PERF-273**: Inline SeekTimeDriver CDP callParams. The `timeout` value is now dynamically injected into the `functionDeclaration` instead of dynamically passing it through arguments list over IPC on every frame. Reduced object tree size for IPC payload. Time: 32.286s (baseline 32.264s). Marginal difference, but logically optimized payload size over CDP IPC, kept.
