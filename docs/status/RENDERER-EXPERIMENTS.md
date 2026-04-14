@@ -1,6 +1,6 @@
 ## Performance Trajectory
-Current best: 32.143s (baseline was 43.227s, -25.6%)
-Last updated by: PERF-275
+Current best: 32.040s (baseline was 43.227s, -25.6%)
+Last updated by: PERF-277
 
 ## What Works
 - **PERF-277**: Replaced `.then()` with `await` in `DomStrategy.capture()` to eliminate dynamic Promise allocation per frame.

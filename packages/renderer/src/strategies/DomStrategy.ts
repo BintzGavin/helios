@@ -18,10 +18,6 @@ export class DomStrategy implements RenderStrategy {
   private cdpSession: CDPSession | null = null;
   private lastFrameData: Buffer | string | null = null;
 
-  private handleFallbackScreenshot = (fallback: Buffer) => {
-    this.lastFrameData = fallback;
-    return fallback;
-  };
   private cdpScreenshotParams: any = null;
   private beginFrameParams: any = null;
   private targetBeginFrameParams: any = null;
@@ -30,8 +26,11 @@ export class DomStrategy implements RenderStrategy {
   private emptyImageBase64: string = "";
   private frameInterval: number = 0;
 
-  private handleBeginFrameResult = (res: any) => {
-    if (res && res.screenshotData) {
+  public formatResponse = (res: any): Buffer | string => {
+    if (Buffer.isBuffer(res)) {
+      this.lastFrameData = res;
+      return res;
+    } else if (res && res.screenshotData) {
       this.lastFrameData = res.screenshotData;
       return res.screenshotData;
     } else if (this.lastFrameData) {
@@ -220,21 +219,18 @@ export class DomStrategy implements RenderStrategy {
   }
 
 
-  async capture(page: Page, frameTime: number): Promise<Buffer | string> {
+  capture(page: Page, frameTime: number): Promise<any> {
     if (this.targetElementHandle) {
       if (this.targetBeginFrameParams.screenshot.clip.width > 0) {
         this.targetBeginFrameParams.frameTimeTicks = 10000 + frameTime;
 
-        const res = await this.cdpSession!.send('HeadlessExperimental.beginFrame', this.targetBeginFrameParams) as any;
-        return this.handleBeginFrameResult(res);
+        return this.cdpSession!.send('HeadlessExperimental.beginFrame', this.targetBeginFrameParams);
       }
-      const fallback = await this.targetElementHandle.screenshot((this as any).fallbackScreenshotOptions);
-      return this.handleFallbackScreenshot(fallback);
+      return this.targetElementHandle.screenshot((this as any).fallbackScreenshotOptions);
     }
 
     this.beginFrameParams.frameTimeTicks = 10000 + frameTime;
-    const res = await this.cdpSession!.send('HeadlessExperimental.beginFrame', this.beginFrameParams) as any;
-    return this.handleBeginFrameResult(res);
+    return this.cdpSession!.send('HeadlessExperimental.beginFrame', this.beginFrameParams);
   }
 
   async finish(page: Page): Promise<void> {

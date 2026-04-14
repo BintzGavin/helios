@@ -456,7 +456,7 @@ export class CanvasStrategy implements RenderStrategy {
     }
   }
 
-  async capture(page: Page, frameTime: number): Promise<Buffer | string> {
+  async capture(page: Page, frameTime: number): Promise<any> {
     if (this.useWebCodecs) {
       return this.captureWebCodecs(page, frameTime);
     } else {

@@ -1,7 +1,7 @@
 ---
 id: PERF-277
 slug: eliminate-capture-then-allocation
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2026-04-14
 completed: ""

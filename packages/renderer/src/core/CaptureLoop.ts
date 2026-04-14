@@ -216,7 +216,8 @@ export class CaptureLoop {
 
             try {
                 worker.timeDriver.setTime(worker.page, compositionTimeInSeconds).then(undefined, noopCatch);
-                const buffer = await worker.strategy.capture(worker.page, time);
+                const rawResponse = await worker.strategy.capture(worker.page, time);
+                const buffer = worker.strategy.formatResponse ? worker.strategy.formatResponse(rawResponse) : rawResponse;
                 if (ctx.resolve) ctx.resolve(buffer);
             } catch (e) {
                 if (ctx.reject) ctx.reject(e);

@@ -3,5 +3,3 @@
 📊 Impact: Render time changed from 32.102s to 32.040s.
 🔬 Verification: `npm run build`, `ffprobe` format checks, benchmark tests.
 📎 Plan: Reference `/.sys/plans/PERF-277-eliminate-capture-then-allocation.md`
-
-277	32.040	90	2.81	36.7	keep	eliminate promise allocation in DomStrategy capture

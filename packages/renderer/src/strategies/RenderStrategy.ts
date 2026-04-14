@@ -23,7 +23,14 @@ export interface RenderStrategy {
    * @param frameTime The time in milliseconds to capture.
    * @returns A Promise that resolves to a Buffer containing the image data.
    */
-  capture(page: Page, frameTime: number): Promise<Buffer | string>;
+  capture(page: Page, frameTime: number): Promise<any>;
+
+  /**
+   * Formats the raw response from capture into a Buffer or string synchronously.
+   * @param rawRes The raw response from capture.
+   * @returns A Buffer or string containing the image data.
+   */
+  formatResponse?(rawRes: any): Buffer | string;
 
   /**
    * Finishes the rendering process.
