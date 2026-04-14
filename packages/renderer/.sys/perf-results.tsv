@@ -335,3 +335,4 @@ PERF-254	Pre-bind evaluate closures in SeekTimeDriver	render_time_s:      2.119
 1	32.048	90	2.81	36.5	keep	PERF-275
 2	32.830	90	2.74	36.4	keep	PERF-275
 3	32.143	90	2.80	36.5	keep	PERF-275
+PERF-277	eliminate-capture-then-allocation	33.152	90	2.71	36.3	keep	Eliminated per-frame Promise allocation in DomStrategy

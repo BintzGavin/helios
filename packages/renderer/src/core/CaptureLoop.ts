@@ -147,7 +147,10 @@ export class CaptureLoop {
             nextFrameToSubmit++;
         }
 
-        const buffer = await framePromises[nextFrameToWrite & ringMask]!;
+        const rawRes = await framePromises[nextFrameToWrite & ringMask]!;
+
+        const workerForFrame = contextRing[nextFrameToWrite & ringMask].worker;
+        const buffer = workerForFrame.strategy.formatResponse ? workerForFrame.strategy.formatResponse(rawRes) : rawRes;
 
         const currentFrame = nextFrameToWrite;
 

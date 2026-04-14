@@ -36,8 +36,9 @@ async function main() {
   const bufferPromise = strategy.capture(mockPage, 100);
   console.log("Is Promise?", bufferPromise instanceof Promise);
 
-  const buffer = await bufferPromise;
-  console.log("Buffer returned:", buffer.toString() === 'mock-buffer');
+  const raw = await bufferPromise;
+  const buffer = strategy.formatResponse ? strategy.formatResponse(raw) : raw;
+  console.log("Buffer returned:", Buffer.from(buffer as string, 'base64').toString() === 'mock-buffer');
 }
 
 main().catch(console.error);

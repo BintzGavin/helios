@@ -47,4 +47,9 @@ export interface RenderStrategy {
    * This is called after the render process (including FFmpeg) has fully completed.
    */
   cleanup?(): Promise<void>;
+
+  /**
+   * Formats the raw response from the capture strategy.
+   */
+  formatResponse?(rawRes: any): Buffer | string;
 }

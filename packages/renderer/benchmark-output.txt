@@ -1,0 +1,111 @@
+Starting render for composition: file:///app/output/example-build/examples/dom-benchmark/composition.html (Mode: dom)
+[Helios Diagnostics] FFmpeg Version: N-47683-g0e8eb07980-static
+[Helios Diagnostics] FFmpeg HW Accel: vdpau, vaapi
+Initializing pool of 3 pages...
+PAGE LOG [0]: [Helios] Math.random() has been seeded for deterministic rendering. Seed: 305419896
+PAGE LOG [1]: [Helios] Math.random() has been seeded for deterministic rendering. Seed: 305419896
+PAGE LOG [2]: [Helios] Math.random() has been seeded for deterministic rendering. Seed: 305419896
+All pages loaded and prepared.
+Running diagnostics on first page...
+PAGE LOG [0]: [Helios Diagnostics] Checking DOM environment...
+[Helios Diagnostics] {
+  "waapi": true,
+  "animations": "supported",
+  "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+  "viewport": {
+    "width": 1280,
+    "height": 720,
+    "dpr": 1
+  },
+  "webgl": true
+}
+Spawning FFmpeg: /app/node_modules/@ffmpeg-installer/linux-x64/ffmpeg -y -f mjpeg -framerate 30 -thread_queue_size 512 -i - -map 0:v -c:v libx264 -pix_fmt yuv420p -movflags +faststart -preset ultrafast /app/packages/renderer/test-output.mp4
+Starting capture for 90 frames...
+ffmpeg: ffmpeg version N-47683-g0e8eb07980-static https://johnvansickle.com/ffmpeg/  Copyright (c) 2000-2018 the FFmpeg developers
+  built with gcc 6.3.0 (Debian 6.3.0-18+deb9u1) 20170516
+  configuration: --enable-gpl --enable-version3 --enable-static --disable-debug --disable-ffplay --disable-indev=sndio --disable-outdev=sndio --cc=gcc-6 --enable-fontconfig --enable-frei0r --enable-gnutls --enable-gray --enable-libaom --enable-libfribidi --enable-libass --enable-libvmaf --enable-libfreetype --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libopenjpeg --enable-librubberband --enable-libsoxr --enable-libspeex --enable-libvorbis --enable-libopus --enable-libtheora --enable-libvidstab --enable-libvo-amrwbenc --enable-libvpx --enable-libwebp --enable-libx264 --enable-libx265 --enable-libxml2 --enable-libxvid --enable-libzimg
+  libavutil      56. 24.101 / 56. 24.101
+  libavcodec     58. 42.100 / 58. 42.100
+  libavformat    58. 24.100 / 58. 24.100
+  libavdevice    58.  6.101 / 58.  6.101
+  libavfilter     7. 46.101 /  7. 46.101
+  libswscale      5.  4.100 /  5.  4.100
+  libswresample   3.  4.100 /  3.  4.100
+  libpostproc    55.  4.100 / 55.  4.100
+
+ffmpeg: [mjpeg @ 0x6835180] EOI missing, emulating
+
+ffmpeg: Input #0, mjpeg, from 'pipe:':
+  Duration: N/A, bitrate: N/A
+    Stream #0:0: Video: mjpeg (Baseline), yuvj420p(pc, bt470bg/unknown/unknown), 1280x720 [SAR 1:1 DAR 16:9], 30 tbr, 1200k tbn, 30 tbc
+
+ffmpeg: Stream mapping:
+  Stream #0:0 -> #0:0 (mjpeg (native) -> h264 (libx264))
+
+ffmpeg: [swscaler @ 0x6852240] deprecated pixel format used, make sure you did set range correctly
+
+ffmpeg: [libx264 @ 0x6837400] using SAR=1/1
+
+ffmpeg: [libx264 @ 0x6837400] using cpu capabilities: MMX2 SSE2Fast SSSE3 SSE4.2 AVX FMA3 BMI2 AVX2
+
+ffmpeg: [libx264 @ 0x6837400] profile Constrained Baseline, level 3.1, 4:2:0, 8-bit
+
+ffmpeg: [libx264 @ 0x6837400] 264 - core 157 r2935 545de2f - H.264/MPEG-4 AVC codec - Copyleft 2003-2018 - http://www.videolan.org/x264.html - options: cabac=0 ref=1 deblock=0:0:0 analyse=0:0 me=dia subme=0 psy=1 psy_rd=1.00:0.00 mixed_ref=0 me_range=16 chroma_me=1 trellis=1 8x8dct=0 cqm=0 deadzone=21,11 fast_pskip=1 chroma_qp_offset=0 threads=6 lookahead_threads=1 sliced_threads=0 nr=0 decimate=1 interlaced=0 bluray_compat=0 constrained_intra=0 bframes=0 weightp=0 keyint=250 keyint_min=25 scenecut=0 intra_refresh=0 rc=crf mbtree=0 crf=23.0 qcomp=0.60 qpmin=0 qpmax=69 qpstep=4 ip_ratio=1.40 aq=0
+
+ffmpeg: Output #0, mp4, to '/app/packages/renderer/test-output.mp4':
+  Metadata:
+    encoder         : Lavf58.24.100
+
+ffmpeg:     Stream #0:0: Video: h264 (libx264) (avc1 / 0x31637661), yuv420p, 1280x720 [SAR 1:1 DAR 16:9], q=-1--1, 30 fps, 15360 tbn, 30 tbc
+    Metadata:
+      encoder         : Lavc58.42.100 libx264
+    Side data:
+      cpb: bitrate max/min/avg: 0/0/0 buffer size: 0 vbv_delay: -1
+
+ffmpeg: [mjpeg @ 0x6835b40] bitstream truncated in mjpeg_decode_scan_progressive_ac
+[mjpeg @ 0x6835b40] EOI missing, emulating
+[mjpeg @ 0x6835b40] component 0 is incomplete
+
+ffmpeg: [mjpeg @ 0x6835b40] bitstream truncated in mjpeg_decode_scan_progressive_ac
+[mjpeg @ 0x6835b40] EOI missing, emulating
+[mjpeg @ 0x6835b40] component 0 is incomplete
+
+ffmpeg: [swscaler @ 0x6870b00] deprecated pixel format used, make sure you did set range correctly
+
+Progress: Rendered 9 / 90 frames
+ffmpeg: frame=   16 fps=0.0 q=13.0 size=       0kB time=00:00:00.26 bitrate=   1.4kbits/s speed=0.473x
+Progress: Rendered 18 / 90 frames
+Progress: Rendered 27 / 90 frames
+Progress: Rendered 36 / 90 frames
+Progress: Rendered 45 / 90 frames
+ffmpeg: frame=   44 fps= 40 q=13.0 size=       0kB time=00:00:01.20 bitrate=   0.3kbits/s speed=1.09x
+Progress: Rendered 54 / 90 frames
+Progress: Rendered 63 / 90 frames
+Progress: Rendered 72 / 90 frames
+ffmpeg: frame=   76 fps= 47 q=13.0 size=       0kB time=00:00:02.26 bitrate=   0.2kbits/s speed=1.41x
+Progress: Rendered 81 / 90 frames
+Finishing render strategy...
+Finished sending frames. Closing FFmpeg stdin.
+ffmpeg: [mp4 @ 0x6839180] Starting second pass: moving the moov atom to the beginning of the file
+
+ffmpeg: frame=   90 fps= 50 q=-1.0 Lsize=      79kB time=00:00:02.96 bitrate= 216.8kbits/s speed=1.65x
+video:77kB audio:0kB subtitle:0kB other streams:0kB global headers:0kB muxing overhead: 1.504633%
+
+ffmpeg: [libx264 @ 0x6837400] frame I:1     Avg QP:20.00  size:  3128
+[libx264 @ 0x6837400] frame P:89    Avg QP:13.13  size:   848
+[libx264 @ 0x6837400] mb I  I16..4: 100.0%  0.0%  0.0%
+[libx264 @ 0x6837400] mb P  I16..4: 10.9%  0.0%  0.0%  P16..4:  1.5%  0.0%  0.0%  0.0%  0.0%    skip:87.6%
+[libx264 @ 0x6837400] coded y,uvDC,uvAC intra: 0.2% 1.5% 0.8% inter: 0.0% 0.2% 0.2%
+[libx264 @ 0x6837400] i16 v,h,dc,p: 99%  0%  1%  0%
+[libx264 @ 0x6837400] i8c dc,h,v,p: 95%  1%  4%  0%
+[libx264 @ 0x6837400] kb/s:209.66
+
+FFmpeg has finished processing.
+Browser closed.
+Cleaning up strategy resources...
+Render complete! Output saved to: /app/packages/renderer/test-output.mp4
+---
+render_time_s:      33.152
+total_frames:       90
+fps_effective:      2.71
+peak_mem_mb:        36.3
