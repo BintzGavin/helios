@@ -220,18 +220,21 @@ export class DomStrategy implements RenderStrategy {
   }
 
 
-  capture(page: Page, frameTime: number): Promise<Buffer | string> {
+  async capture(page: Page, frameTime: number): Promise<Buffer | string> {
     if (this.targetElementHandle) {
       if (this.targetBeginFrameParams.screenshot.clip.width > 0) {
         this.targetBeginFrameParams.frameTimeTicks = 10000 + frameTime;
 
-        return (this.cdpSession!.send('HeadlessExperimental.beginFrame', this.targetBeginFrameParams) as Promise<any>).then(this.handleBeginFrameResult);
+        const res = await this.cdpSession!.send('HeadlessExperimental.beginFrame', this.targetBeginFrameParams) as any;
+        return this.handleBeginFrameResult(res);
       }
-      return this.targetElementHandle.screenshot((this as any).fallbackScreenshotOptions).then(this.handleFallbackScreenshot);
+      const fallback = await this.targetElementHandle.screenshot((this as any).fallbackScreenshotOptions);
+      return this.handleFallbackScreenshot(fallback);
     }
 
     this.beginFrameParams.frameTimeTicks = 10000 + frameTime;
-    return (this.cdpSession!.send('HeadlessExperimental.beginFrame', this.beginFrameParams) as Promise<any>).then(this.handleBeginFrameResult);
+    const res = await this.cdpSession!.send('HeadlessExperimental.beginFrame', this.beginFrameParams) as any;
+    return this.handleBeginFrameResult(res);
   }
 
   async finish(page: Page): Promise<void> {

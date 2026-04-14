@@ -3,6 +3,7 @@ Current best: 32.143s (baseline was 43.227s, -25.6%)
 Last updated by: PERF-275
 
 ## What Works
+- **PERF-277**: Replaced `.then()` with `await` in `DomStrategy.capture()` to eliminate dynamic Promise allocation per frame.
 - **PERF-274**: Replaced syncMedia closure evaluation with string evaluation in CdpTimeDriver.ts. Faster and avoids IPC overhead.
 - Prebinding virtualTimePromiseExecutor in CdpTimeDriver.ts (PERF-267) improved performance. Median time: 32.264 (baseline: 43.227).
 - PERF-268: Returned Base64 String directly from CanvasStrategy WebCodecs capture. Render time: 32.326s (baseline 32.596s)
