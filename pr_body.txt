@@ -1,11 +1,10 @@
-💡 **What**: Changed BrowserPool to create a single shared BrowserContext and spawn pages within it instead of creating a new BrowserContext per worker.
-🎯 **Why**: Creating isolated contexts per worker increases memory pressure and context switching overhead in the CPU-bound microVM.
-📊 **Impact**: Render time improved from 49.440s to 47.634s (~3.6% faster).
-🔬 **Verification**: Passed compilation, DOM tests, and performance benchmark runs.
-📎 **Plan**: PERF-260
+💡 What: Preallocate executeCapture anonymous functions dynamically using a ring buffer of context objects.
+🎯 Why: Microtask overhead and dynamic closure allocations during the hot loop in CaptureLoop.
+📊 Impact: Render time was evaluated against the 32.264s baseline, improving to a median of 32.143s.
+🔬 Verification: 4-gate verification + benchmark test.
+📎 Plan: /.sys/plans/PERF-275-preallocate-execute-capture-closure.md
 
-```tsv
 run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
-baseline	49.440	600	12.13	42.0	keep	baseline
-run1	48.655	600	12.33	42.0	keep	Shared BrowserContext
-```
+1	32.048	90	2.81	36.5	keep	PERF-275
+2	32.830	90	2.74	36.4	keep	PERF-275
+3	32.143	90	2.80	36.5	keep	PERF-275

@@ -1,11 +1,11 @@
 ---
 id: PERF-275
 slug: preallocate-execute-capture-closure
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "Jules"
 created: 2024-05-30
-completed: ""
-result: ""
+completed: "2026-04-14"
+result: "32.143s"
 ---
 
 # PERF-275: Preallocate Execute Capture Closure in Ring Buffer
