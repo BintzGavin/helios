@@ -94,8 +94,6 @@ export class CaptureLoop {
 
     let previousWritePromise: Promise<void> | undefined;
 
-    let nextFrameToSubmit = 0;
-    let nextFrameToWrite = 0;
     const poolLen = this.pool.length;
     let maxPipelineDepth = poolLen * 2;
     maxPipelineDepth = Math.pow(2, Math.ceil(Math.log2(maxPipelineDepth)));
@@ -107,67 +105,180 @@ export class CaptureLoop {
 
     const framePromises = new Array<Promise<Buffer | string>>(maxPipelineDepth);
     const contextRing = new Array(maxPipelineDepth);
-    const executeCaptures = new Array<() => Promise<Buffer | string>>(maxPipelineDepth);
 
     for (let i = 0; i < maxPipelineDepth; i++) {
-        const ctx = { time: 0, compositionTimeInSeconds: 0, worker: null as any };
-        contextRing[i] = ctx;
-        executeCaptures[i] = () => {
-            ctx.worker.timeDriver.setTime(ctx.worker.page, ctx.compositionTimeInSeconds).then(undefined, noopCatch);
-            return ctx.worker.strategy.capture(ctx.worker.page, ctx.time);
+        contextRing[i] = {
+            resolve: null as ((b: Buffer | string) => void) | null,
+            reject: null as ((e: any) => void) | null,
+            time: 0,
+            compositionTimeInSeconds: 0
         };
     }
 
-    while (nextFrameToWrite < this.totalFrames) {
-        if (this.capturedErrors.length > 0) {
-            throw this.capturedErrors[0];
+    // Multi-worker ACTOR MODEL with backpressure
+    let nextFrameToSubmit = 0;
+    let nextFrameToWrite = 0;
+    let aborted = false;
+    let waitingWorkerResolves: ((i: number) => void)[] = [];
+    let frameWaiterResolve: (() => void) | null = null;
+
+    const checkState = () => {
+        if (this.capturedErrors.length > 0 || (signal && signal.aborted)) {
+            aborted = true;
         }
-        if (signal && signal.aborted) {
-            throw new Error('Aborted');
+
+        if (aborted) {
+            while (waitingWorkerResolves.length > 0) {
+                const res = waitingWorkerResolves.shift()!;
+                res(-1);
+            }
+            if (frameWaiterResolve) {
+                const res = frameWaiterResolve;
+                frameWaiterResolve = null;
+                res();
+            }
+            return;
         }
 
+        // See if we can assign tasks to waiting workers
+        while (waitingWorkerResolves.length > 0 && nextFrameToSubmit < this.totalFrames && nextFrameToSubmit - nextFrameToWrite < maxPipelineDepth) {
+            const i = nextFrameToSubmit++;
+            const ringIndex = i & ringMask;
 
-        while (nextFrameToSubmit - nextFrameToWrite < maxPipelineDepth && nextFrameToSubmit < this.totalFrames) {
-            const frameIndex = nextFrameToSubmit;
-            const worker = this.pool[frameIndex % poolLen];
-            const time = frameIndex * timeStep;
-            const compositionTimeInSeconds = (this.startFrame + frameIndex) * compTimeStep;
+            const promise = new Promise<Buffer | string>((res, rej) => {
+                contextRing[ringIndex].resolve = res;
+                contextRing[ringIndex].reject = rej;
+            });
+            promise.catch(noopCatch); // Prevent unhandled rejections
+            framePromises[ringIndex] = promise;
 
-            const ringIndex = frameIndex & ringMask;
+            // If main loop is waiting for a frame to be queued, wake it up
+            if (frameWaiterResolve) {
+                const fRes = frameWaiterResolve;
+                frameWaiterResolve = null;
+                fRes();
+            }
+
+            const wRes = waitingWorkerResolves.shift()!;
+            wRes(i);
+        }
+
+        // If we still have waiting workers but are at totalFrames, tell them to stop
+        if (nextFrameToSubmit >= this.totalFrames) {
+            while (waitingWorkerResolves.length > 0) {
+                const res = waitingWorkerResolves.shift()!;
+                res(-1);
+            }
+        }
+    };
+
+    const getNextTask = async (): Promise<number> => {
+        return new Promise<number>((resolve) => {
+            if (aborted || nextFrameToSubmit >= this.totalFrames) {
+                resolve(-1);
+                return;
+            }
+
+            if (nextFrameToSubmit - nextFrameToWrite < maxPipelineDepth) {
+                const i = nextFrameToSubmit++;
+                const ringIndex = i & ringMask;
+
+                const promise = new Promise<Buffer | string>((res, rej) => {
+                    contextRing[ringIndex].resolve = res;
+                    contextRing[ringIndex].reject = rej;
+                });
+                promise.catch(noopCatch); // Prevent unhandled rejections
+                framePromises[ringIndex] = promise;
+
+                if (frameWaiterResolve) {
+                    const fRes = frameWaiterResolve;
+                    frameWaiterResolve = null;
+                    fRes();
+                }
+
+                resolve(i);
+            } else {
+                waitingWorkerResolves.push(resolve);
+            }
+        });
+    };
+
+    const runWorker = async (worker: WorkerInfo, workerIndex: number) => {
+        while (!aborted) {
+            const i = await getNextTask();
+            if (i === -1) break;
+
+            const time = i * timeStep;
+            const compositionTimeInSeconds = (this.startFrame + i) * compTimeStep;
+
+            const ringIndex = i & ringMask;
             const ctx = contextRing[ringIndex];
-            ctx.time = time;
-            ctx.compositionTimeInSeconds = compositionTimeInSeconds;
-            ctx.worker = worker;
 
-            const executeCapture = executeCaptures[ringIndex];
-            const framePromise = worker.activePromise.then(executeCapture, executeCapture);
-
-            worker.activePromise = framePromise as unknown as Promise<void>;
-            framePromises[ringIndex] = framePromise;
-            nextFrameToSubmit++;
+            try {
+                worker.timeDriver.setTime(worker.page, compositionTimeInSeconds).then(undefined, noopCatch);
+                const buffer = await worker.strategy.capture(worker.page, time);
+                if (ctx.resolve) ctx.resolve(buffer);
+            } catch (e) {
+                if (ctx.reject) ctx.reject(e);
+            }
         }
+    };
 
-        const buffer = await framePromises[nextFrameToWrite & ringMask]!;
+    const workerPromises = this.pool.map((w, i) => runWorker(w, i));
 
-        const currentFrame = nextFrameToWrite;
+    try {
+        while (nextFrameToWrite < this.totalFrames && !aborted) {
+            checkState();
+            if (aborted) break;
 
-        if (currentFrame > 0 && currentFrame % progressInterval === 0) {
-            console.log(`Progress: Rendered ${currentFrame} / ${this.totalFrames} frames`);
+            // Wait for the task to be queued by a worker or immediately queued
+            if (nextFrameToSubmit <= nextFrameToWrite) {
+                await new Promise<void>(resolve => {
+                    frameWaiterResolve = resolve;
+                });
+                continue;
+            }
+
+            const ringIndex = nextFrameToWrite & ringMask;
+            const buffer = await framePromises[ringIndex]!;
+
+            const currentFrame = nextFrameToWrite;
+
+            if (currentFrame > 0 && currentFrame % progressInterval === 0) {
+                console.log(`Progress: Rendered ${currentFrame} / ${this.totalFrames} frames`);
+            }
+
+            if (onProgress) {
+                onProgress(currentFrame / this.totalFrames);
+            }
+
+            if (previousWritePromise) {
+                await previousWritePromise;
+            }
+
+            const writeResult = this.writeToStdin(buffer, this.handleWriteError);
+            previousWritePromise = writeResult ? writeResult : undefined;
+
+            nextFrameToWrite++;
+            checkState(); // This will unblock a waiting worker if we just opened up pipeline capacity
         }
-
-        if (onProgress) {
-           onProgress(currentFrame / this.totalFrames);
-        }
-
-        if (previousWritePromise) {
-           await previousWritePromise;
-        }
-
-        const writeResult = this.writeToStdin(buffer, this.handleWriteError);
-        previousWritePromise = writeResult ? writeResult : undefined;
-
-        nextFrameToWrite++;
+    } catch (e) {
+        aborted = true;
+        checkState();
+        throw e;
     }
+
+    aborted = true;
+    checkState();
+
+    if (this.capturedErrors.length > 0) {
+        throw this.capturedErrors[0];
+    }
+    if (signal && signal.aborted) {
+        throw new Error('Aborted');
+    }
+
+    await Promise.all(workerPromises);
 
     if (previousWritePromise) {
         await previousWritePromise;
