@@ -1,6 +1,6 @@
 ## Performance Trajectory
-Current best: 32.264s (baseline was 43.227s, -25.3%)
-Last updated by: PERF-270
+Current best: 32.143s (baseline was 43.227s, -25.6%)
+Last updated by: PERF-275
 
 ## What Works
 - **PERF-274**: Replaced syncMedia closure evaluation with string evaluation in CdpTimeDriver.ts. Faster and avoids IPC overhead.
@@ -24,3 +24,4 @@ Last updated by: PERF-270
 - Eliminated fallback closure allocation in SeekTimeDriver (PERF-272). Render time regressed to 33.045.
 
 - **PERF-273**: Inline SeekTimeDriver CDP callParams. The `timeout` value is now dynamically injected into the `functionDeclaration` instead of dynamically passing it through arguments list over IPC on every frame. Reduced object tree size for IPC payload. Time: 32.286s (baseline 32.264s). Marginal difference, but logically optimized payload size over CDP IPC, kept.
+- **PERF-275**: Preallocated executeCapture closures dynamically using a ring buffer of context objects. Render time: 32.143

@@ -332,3 +332,6 @@ PERF-254	Pre-bind evaluate closures in SeekTimeDriver	render_time_s:      2.119
 270	32.140	90	2.80	36.6	discard	Prebind CaptureLoop then closures
 1	33.045	90	2.72	37.2	discard	PERF-272 Eliminate Fallback Closure Allocation
 1	2.549	90	35.31	48.4	keep	inline syncmedia evaluation
+1	32.048	90	2.81	36.5	keep	PERF-275
+2	32.830	90	2.74	36.4	keep	PERF-275
+3	32.143	90	2.80	36.5	keep	PERF-275

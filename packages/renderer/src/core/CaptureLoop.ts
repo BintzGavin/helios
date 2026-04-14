@@ -105,6 +105,17 @@ export class CaptureLoop {
     const onProgress = this.jobOptions?.onProgress;
 
     const framePromises = new Array<Promise<Buffer | string>>(maxPipelineDepth);
+    const contextRing = new Array(maxPipelineDepth);
+    const executeCaptures = new Array<() => Promise<Buffer | string>>(maxPipelineDepth);
+
+    for (let i = 0; i < maxPipelineDepth; i++) {
+        const ctx = { time: 0, compositionTimeInSeconds: 0, worker: null as any };
+        contextRing[i] = ctx;
+        executeCaptures[i] = () => {
+            ctx.worker.timeDriver.setTime(ctx.worker.page, ctx.compositionTimeInSeconds).then(undefined, noopCatch);
+            return ctx.worker.strategy.capture(ctx.worker.page, ctx.time);
+        };
+    }
 
     while (nextFrameToWrite < this.totalFrames) {
         if (this.capturedErrors.length > 0) {
@@ -121,15 +132,17 @@ export class CaptureLoop {
             const time = frameIndex * timeStep;
             const compositionTimeInSeconds = (this.startFrame + frameIndex) * compTimeStep;
 
-            const executeCapture = () => {
-                    worker.timeDriver.setTime(worker.page, compositionTimeInSeconds).then(undefined, noopCatch);
-                    return worker.strategy.capture(worker.page, time);
-                };
+            const ringIndex = frameIndex % maxPipelineDepth;
+            const ctx = contextRing[ringIndex];
+            ctx.time = time;
+            ctx.compositionTimeInSeconds = compositionTimeInSeconds;
+            ctx.worker = worker;
 
+            const executeCapture = executeCaptures[ringIndex];
             const framePromise = worker.activePromise.then(executeCapture, executeCapture);
 
             worker.activePromise = framePromise as unknown as Promise<void>;
-            framePromises[frameIndex % maxPipelineDepth] = framePromise;
+            framePromises[ringIndex] = framePromise;
             nextFrameToSubmit++;
         }
 
