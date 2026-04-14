@@ -208,3 +208,4 @@
 [v0.77.15] ✅ Verified: Bridge coverage for postMessage expanded and properties verified. Completed plans: 2026-12-25, 2026-12-26, 2027-01-16, 2027-01-08.
 [v0.77.16] ✅ Completed: Document API Parity Gap - Deleted lingering plan file as the README already contained the required documentation updates.
 [v0.77.19] ✅ Completed: Improve index.ts test coverage - Added export-options.test.ts covering untested getters and setters.
+[v0.77.20] ✅ Completed: Discovered discrepancy in arrow key shortcut behavior between README documentation (seeks by frames) and actual implementation (seeks by seconds). Created plan to fix this vision gap.
