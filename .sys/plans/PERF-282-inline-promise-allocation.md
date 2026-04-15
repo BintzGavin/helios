@@ -1,11 +1,11 @@
 ---
 id: PERF-282
 slug: inline-promise-allocation
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "jules"
 created: 2026-04-15
-completed: ""
-result: ""
+completed: "2026-04-15"
+result: "Discarded: No measurable performance improvement. Median time 32.321s vs baseline 32.164s. V8 optimizes the small iteration loop efficiently."
 ---
 
 # PERF-282: Inline Promise Allocation for Small Frame Counts in SeekTimeDriver

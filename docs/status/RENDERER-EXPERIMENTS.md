@@ -39,3 +39,4 @@ Last updated by: PERF-277
 ## PERF-283: Preallocate Evaluate Promises in SeekTimeDriver
 - Render time: 33.245s (Baseline: 42.955s)
 - Status: keep
+- **PERF-282**: Inlined promise allocation for `frames.length === 2` and `frames.length === 3` in `SeekTimeDriver.setTime()` to statically allocate `Promise.all` and avoid loop overhead. V8 handles dynamic indexing efficiently enough for very small arrays that the inline logic yielded no measurable performance improvement (median: 32.321s vs baseline 32.164s) and occasionally performed slightly worse due to branching overhead. Discarded as inconclusive.

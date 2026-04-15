@@ -340,3 +340,6 @@ PERF-254	Pre-bind evaluate closures in SeekTimeDriver	render_time_s:      2.119
 277	32.040	90	2.81	36.7	keep	eliminate promise allocation in DomStrategy capture
 281	32.284	90	2.79	37.4	discard	preallocate state array
 341	33.245	90	2.71	36.9	keep	PERF-283: Preallocate Evaluate Promises in SeekTimeDriver
+1	32.678	90	2.75	36.6	discard	PERF-282 inline promise allocation for small frame counts
+2	32.321	90	2.78	36.6	discard	PERF-282 inline promise allocation for small frame counts
+3	32.004	90	2.81	36.9	discard	PERF-282 inline promise allocation for small frame counts
