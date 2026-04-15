@@ -1,5 +1,10 @@
 # LLMS Progress
 
+## LLMS v1.67.0
+- ✅ Completed: Daily llms.txt Review
+  - Updated Roadmap with verifiable completions from domain PROGRESS logs (CLI Tier 3 Scaffold Deployment Commands, Scaffold Kubernetes Deployment Command, Studio Update Quickstart Guide, Player Bridge Coverage Expansion).
+  - Updated `Helios.diagnose` API example to include missing properties (`offscreenCanvas`, `webgl`, `webgl2`, `webAudio`, `colorGamut`) from `DiagnosticReport`.
+
 ## LLMS v1.66.0
 - ✅ Completed: Daily llms.txt Review
   - Updated Roadmap with recent completions (Player Bridge Coverage postMessage, Fix Duplicate README Entry, Improve index.ts test coverage, Infrastructure Cloud Execution Adapters Documentation, Renderer Fix GSAP Timeline Synchronization).
