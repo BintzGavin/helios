@@ -10,6 +10,7 @@ export class SeekTimeDriver implements TimeDriver {
   private cachedFrames: import('playwright').Frame[] = [];
   private cachedMainFrame: import('playwright').Frame | null = null;
   private cachedPromises: Promise<any>[] = [];
+  private executionContextIds: number[] = [];
   private evaluateArgs: [number, number] = [0, 0];
   private evaluateClosure = ([t, timeoutMs]: any) => { (window as any).__helios_seek(t, timeoutMs); };
   private evaluateParams: any = {
@@ -56,6 +57,14 @@ export class SeekTimeDriver implements TimeDriver {
       this.cdpSession = await page.context().newCDPSession(page);
       (page as any)._sharedCdpSession = this.cdpSession;
     }
+
+    this.executionContextIds = [];
+    await this.cdpSession!.send('Runtime.enable');
+    this.cdpSession!.on('Runtime.executionContextCreated', (event) => {
+      if (event.context.name === '') {
+        this.executionContextIds.push(event.context.id);
+      }
+    });
 
     // Inject the seek script once during initialization
     // We wrap it in an IIFE to avoid polluting the global namespace with helper functions
@@ -256,9 +265,12 @@ export class SeekTimeDriver implements TimeDriver {
       // We'll proceed and rely on Helios subscription/polling as fallback.
     }
 
+    // Wait briefly to ensure execution contexts have been gathered by CDP
+    await new Promise(r => setTimeout(r, 100));
+
     this.cachedFrames = page.frames();
     this.cachedMainFrame = page.mainFrame();
-    this.cachedPromises = new Array(this.cachedFrames.length);
+    this.cachedPromises = new Array(this.executionContextIds.length);
   }
 
   setTime(page: Page, timeInSeconds: number): Promise<void> {
@@ -270,13 +282,14 @@ export class SeekTimeDriver implements TimeDriver {
     }
 
     const promises = this.cachedPromises;
+    const expression = 'window.__helios_seek(' + timeInSeconds + ', ' + this.timeout + ')';
 
-    this.evaluateArgs[0] = timeInSeconds;
-    for (let i = 0; i < frames.length; i++) {
-      promises[i] = frames[i].evaluate(
-        this.evaluateClosure,
-        this.evaluateArgs
-      );
+    for (let i = 0; i < this.executionContextIds.length; i++) {
+      promises[i] = this.cdpSession!.send('Runtime.evaluate', {
+        expression: expression,
+        contextId: this.executionContextIds[i],
+        awaitPromise: true
+      });
     }
 
     return Promise.all(promises) as unknown as Promise<void>;
