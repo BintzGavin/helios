@@ -343,3 +343,7 @@ PERF-254	Pre-bind evaluate closures in SeekTimeDriver	render_time_s:      2.119
 1	32.678	90	2.75	36.6	discard	PERF-282 inline promise allocation for small frame counts
 2	32.321	90	2.78	36.6	discard	PERF-282 inline promise allocation for small frame counts
 3	32.004	90	2.81	36.9	discard	PERF-282 inline promise allocation for small frame counts
+1	32.540	90	2.77	36.5	keep	baseline
+2	32.940	90	2.73	36.6	discard	prebind-drain-promise-executor
+3	32.264	90	2.79	36.7	discard	prebind-drain-promise-executor
+4	32.211	90	2.79	37.4	discard	prebind-drain-promise-executor
