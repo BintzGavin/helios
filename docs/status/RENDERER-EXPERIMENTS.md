@@ -57,3 +57,6 @@ Last updated by: PERF-277
 - Render time: 32.241s (Baseline: 32.170s)
 - Status: discard
 - **PERF-280**: Eliminated per-frame dynamic `Promise` object allocation in `CaptureLoop.ts` by replacing `framePromises` with a reusable `frameWaiterResolve` and a `ready` state boolean in `contextRing`. The microtask creation per frame was eliminated, but the result showed no measurable performance improvement compared to the baseline (~32.2s vs baseline ~32.1s). This indicates that V8 handles the per-frame Promise creation and garbage collection efficiently enough in this context, making the allocation overhead negligible. Discarded as inconclusive.
+
+## Open Questions
+- **PERF-286**: Can we improve multi-frame synchronization in SeekTimeDriver by prefetching Context IDs and iterating with raw CDP Runtime.evaluate over all frames?
