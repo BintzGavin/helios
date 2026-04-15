@@ -1,11 +1,11 @@
 ---
 id: PERF-280
 slug: worker-promise-elimination
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "jules"
 created: 2026-04-14
-completed: ""
-result: ""
+completed: "2026-04-15"
+result: "Discarded: No measurable performance improvement. Median time 32.241s vs baseline 32.170s. V8 optimizes the small promise loop effectively."
 ---
 
 # PERF-280: Replace `CaptureLoop.ts` Frame Promise Allocation with Preallocated Signal Array

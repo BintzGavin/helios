@@ -50,3 +50,8 @@ Last updated by: PERF-277
 - Render time: 32.211s (Baseline: 32.540s)
 - Status: discard
 - **PERF-259**: Extracted anonymous promise executor function into a prebound class property `handleDrainPromiseExecutor` when handling FFmpeg write backpressure `drain` event inside `CaptureLoop`. The change yielded a slightly faster render time, however the improvement was smaller than the noise variance and the overall results were inconclusive compared to baseline since backpressure didn't cause enough garbage collection issues to be a primary bottleneck. Discarded as inconclusive.
+
+## PERF-280: Replace CaptureLoop.ts Frame Promise Allocation with Preallocated Signal Array
+- Render time: 32.241s (Baseline: 32.170s)
+- Status: discard
+- **PERF-280**: Eliminated per-frame dynamic `Promise` object allocation in `CaptureLoop.ts` by replacing `framePromises` with a reusable `frameWaiterResolve` and a `ready` state boolean in `contextRing`. The microtask creation per frame was eliminated, but the result showed no measurable performance improvement compared to the baseline (~32.2s vs baseline ~32.1s). This indicates that V8 handles the per-frame Promise creation and garbage collection efficiently enough in this context, making the allocation overhead negligible. Discarded as inconclusive.

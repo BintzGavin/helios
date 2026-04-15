@@ -347,3 +347,6 @@ PERF-254	Pre-bind evaluate closures in SeekTimeDriver	render_time_s:      2.119
 2	32.940	90	2.73	36.6	discard	prebind-drain-promise-executor
 3	32.264	90	2.79	36.7	discard	prebind-drain-promise-executor
 4	32.211	90	2.79	37.4	discard	prebind-drain-promise-executor
+1	33.504	90	2.69	36.9	discard	PERF-280 preallocate worker promises
+2	32.241	90	2.79	37.5	discard	PERF-280 preallocate worker promises
+3	32.089	90	2.80	36.6	discard	PERF-280 preallocate worker promises
