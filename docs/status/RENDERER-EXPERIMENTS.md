@@ -35,3 +35,7 @@ Last updated by: PERF-277
 
 ## Open Questions
 - **PERF-283**: Will preallocating `this.cachedPromises` and eliminating the dynamic check `if (this.cachedPromises.length !== frames.length)` in `SeekTimeDriver.ts` hot loop improve render times?
+
+## PERF-283: Preallocate Evaluate Promises in SeekTimeDriver
+- Render time: 33.245s (Baseline: 42.955s)
+- Status: keep

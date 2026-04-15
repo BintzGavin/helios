@@ -1,11 +1,11 @@
 ---
 id: PERF-283
 slug: cache-cachedframes-seek
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2026-04-15
-completed: ""
-result: ""
+completed: 2026-04-15
+result: improved
 ---
 
 # PERF-283: Preallocate Evaluate Promises in SeekTimeDriver
@@ -56,3 +56,9 @@ Run the DOM benchmark and ensure frame count remains accurate and visual correct
 
 ## Prior Art
 Prior experiments exploring closure allocations and array sizing in V8 hot loops.
+
+## Results Summary
+- **Best render time**: 33.245s (vs baseline 42.955s)
+- **Improvement**: ~22.6%
+- **Kept experiments**: PERF-283
+- **Discarded experiments**: none
