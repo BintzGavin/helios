@@ -60,3 +60,8 @@ Last updated by: PERF-277
 
 ## Open Questions
 - **PERF-286**: Can we improve multi-frame synchronization in SeekTimeDriver by prefetching Context IDs and iterating with raw CDP Runtime.evaluate over all frames?
+
+## What Works
+- Replaced Playwright closure IPC with raw CDP `Runtime.evaluate` for multi-frame in `SeekTimeDriver`
+- Improved render time for multi-frame compositions
+- PERF-286
