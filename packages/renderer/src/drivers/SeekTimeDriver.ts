@@ -260,6 +260,7 @@ export class SeekTimeDriver implements TimeDriver {
 
     this.cachedFrames = page.frames();
     this.cachedMainFrame = page.mainFrame();
+    this.cachedPromises = new Array(this.cachedFrames.length);
 
     this.callParams.functionDeclaration = `function(t) { return this.__helios_seek(t, ${this.timeout}); }`;
     const windowRes = await this.cdpSession!.send('Runtime.evaluate', { expression: 'window' });
@@ -284,9 +285,6 @@ export class SeekTimeDriver implements TimeDriver {
       );
     }
 
-    if (this.cachedPromises.length !== frames.length) {
-      this.cachedPromises = new Array(frames.length);
-    }
     const promises = this.cachedPromises;
 
     this.evaluateArgs[0] = timeInSeconds;
