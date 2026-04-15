@@ -1,0 +1,4 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	33.333	90	2.70	37.3	discard	Pre-bound evaluate closure for CdpTimeDriver multi-frame branch
+2	32.655	90	2.76	37.3	discard	Pre-bound evaluate closure for CdpTimeDriver multi-frame branch
+3	32.492	90	2.77	36.7	discard	Pre-bound evaluate closure for CdpTimeDriver multi-frame branch

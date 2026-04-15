@@ -40,3 +40,8 @@ Last updated by: PERF-277
 - Render time: 33.245s (Baseline: 42.955s)
 - Status: keep
 - **PERF-282**: Inlined promise allocation for `frames.length === 2` and `frames.length === 3` in `SeekTimeDriver.setTime()` to statically allocate `Promise.all` and avoid loop overhead. V8 handles dynamic indexing efficiently enough for very small arrays that the inline logic yielded no measurable performance improvement (median: 32.321s vs baseline 32.164s) and occasionally performed slightly worse due to branching overhead. Discarded as inconclusive.
+
+## PERF-284: Optimize CdpTimeDriver hot loop evaluation
+- Render time: 32.655s (Baseline: 32.207s)
+- Status: discard
+- **PERF-284**: Extracted dynamic inline string evaluation into a pre-bound closure property (`syncMediaClosure`) passed via `frame.evaluate` in `CdpTimeDriver.setTime()`. The goal was to reduce V8 string parsing and compilation overhead over Playwright's CDP IPC when operating on multiple frames. The rendering times regressed slightly (~32.655s vs baseline 32.207s). This indicates that the V8 and IPC overhead of serializing the argument array (`this.evaluateArgs`) combined with invoking the closure dynamically outweighs the cost of the inline string evaluation in this multi-frame hot path. Discarded as slower.
