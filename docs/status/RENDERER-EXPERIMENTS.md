@@ -45,3 +45,8 @@ Last updated by: PERF-277
 - Render time: 32.655s (Baseline: 32.207s)
 - Status: discard
 - **PERF-284**: Extracted dynamic inline string evaluation into a pre-bound closure property (`syncMediaClosure`) passed via `frame.evaluate` in `CdpTimeDriver.setTime()`. The goal was to reduce V8 string parsing and compilation overhead over Playwright's CDP IPC when operating on multiple frames. The rendering times regressed slightly (~32.655s vs baseline 32.207s). This indicates that the V8 and IPC overhead of serializing the argument array (`this.evaluateArgs`) combined with invoking the closure dynamically outweighs the cost of the inline string evaluation in this multi-frame hot path. Discarded as slower.
+
+## PERF-259: Prebind CaptureLoop Drain Promise Executor
+- Render time: 32.211s (Baseline: 32.540s)
+- Status: discard
+- **PERF-259**: Extracted anonymous promise executor function into a prebound class property `handleDrainPromiseExecutor` when handling FFmpeg write backpressure `drain` event inside `CaptureLoop`. The change yielded a slightly faster render time, however the improvement was smaller than the noise variance and the overall results were inconclusive compared to baseline since backpressure didn't cause enough garbage collection issues to be a primary bottleneck. Discarded as inconclusive.

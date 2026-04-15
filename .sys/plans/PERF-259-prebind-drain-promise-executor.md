@@ -1,14 +1,22 @@
 ---
 id: PERF-259
 slug: prebind-drain-promise-executor
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "Jules"
 created: 2026-04-13
-completed: ""
-result: ""
+completed: "2026-04-15"
+result: "discard"
 ---
 
 # PERF-259: Prebind CaptureLoop Drain Promise Executor
+
+## Results Summary
+| run | render_time_s | frames | fps_effective | peak_mem_mb | status | description |
+|---|---|---|---|---|---|---|
+| 1 | 32.540 | 90 | 2.77 | 36.5 | keep | baseline |
+| 2 | 32.940 | 90 | 2.73 | 36.6 | discard | prebind-drain-promise-executor |
+| 3 | 32.264 | 90 | 2.79 | 36.7 | discard | prebind-drain-promise-executor |
+| 4 | 32.211 | 90 | 2.79 | 37.4 | discard | prebind-drain-promise-executor |
 
 ## Focus Area
 DOM Rendering Pipeline - Buffer Drain Logic in `packages/renderer/src/core/CaptureLoop.ts`.
