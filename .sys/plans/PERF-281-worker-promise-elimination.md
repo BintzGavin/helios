@@ -1,11 +1,11 @@
 ---
 id: PERF-281
 slug: worker-promise-elimination
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2026-04-14
 completed: ""
-result: ""
+result: "no-improvement"
 ---
 
 # PERF-281: Replace `CaptureLoop.ts` Frame Promise Allocation with Preallocated Signal Array
