@@ -1,11 +1,11 @@
 ---
 id: PERF-287
 slug: preallocate-multi-evaluate-params
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "Jules"
 created: 2026-04-15
-completed: ""
-result: ""
+completed: "2026-04-15"
+result: "Discarded - Optimization degraded performance"
 ---
 
 # PERF-287: Preallocate CDP Parameters for Multi-Frame seek in SeekTimeDriver
@@ -66,3 +66,11 @@ Run `npx tsx scripts/benchmark-test.js` to ensure rendering output matches the s
 ## Prior Art
 - PERF-286 introduced the `Runtime.evaluate` multi-frame logic, uncovering this micro-allocation opportunity.
 - Various prior PERFs (e.g., PERF-087, PERF-147) successfully optimized CDP parameter allocations.
+
+## Results Summary
+```tsv
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	32.851	90	2.74	36.4	discard	preallocate multi-frame eval params
+2	32.749	90	2.75	36.6	discard	preallocate multi-frame eval params
+3	32.246	90	2.79	36.7	discard	preallocate multi-frame eval params
+```

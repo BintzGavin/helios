@@ -65,3 +65,9 @@ Last updated by: PERF-277
 - Replaced Playwright closure IPC with raw CDP `Runtime.evaluate` for multi-frame in `SeekTimeDriver`
 - Improved render time for multi-frame compositions
 - PERF-286
+
+## What Doesn't Work (and Why)
+- **Preallocating CDP evaluate parameter object for multi-frame seek execution (PERF-287)**
+  - What: In `SeekTimeDriver.ts`, preallocated a statically-sized array of `multiEvaluateParams` objects to reuse during the `setTime` multi-frame execution loop instead of allocating new objects dynamically on every tick.
+  - Why it didn't work: Yielded a median run time of ~32.749s, compared to the baseline median of ~32.186s. The optimization actually degraded performance by adding memory lookup and branching overhead, demonstrating that V8 easily optimizes the inline dynamic object allocation inside this tight loop, rendering the explicit preallocation slower.
+  - Plan: PERF-287
