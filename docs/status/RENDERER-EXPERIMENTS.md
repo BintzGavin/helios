@@ -3,6 +3,7 @@ Current best: 32.040s (baseline was 43.227s, -25.6%)
 Last updated by: PERF-277
 
 ## What Works
+- **PERF-285**: Optimized SeekTimeDriver single-frame evaluation by replacing Playwright IPC closure with raw CDP string evaluation over Runtime.evaluate. Improved render time to ~32.1s.
 - **PERF-277**: Replaced `.then()` with `await` in `DomStrategy.capture()` to eliminate dynamic Promise allocation per frame.
 - **PERF-274**: Replaced syncMedia closure evaluation with string evaluation in CdpTimeDriver.ts. Faster and avoids IPC overhead.
 - **PERF-279**: Cleaned up dead code by removing unused `activePromise` from `BrowserPool.ts`. No significant render time change (baseline maintained at ~32.9s) but improves code cleanliness.
@@ -19,6 +20,7 @@ Last updated by: PERF-277
 - Can we eliminate dynamic Promise `.then` closure allocation in the `CaptureLoop.ts` by pre-binding?
 
 ## What Works
+- **PERF-285**: Optimized SeekTimeDriver single-frame evaluation by replacing Playwright IPC closure with raw CDP string evaluation over Runtime.evaluate. Improved render time to ~32.1s.
 - **PERF-274**: Replaced syncMedia closure evaluation with string evaluation in CdpTimeDriver.ts. Faster and avoids IPC overhead.
 - Pre-bind fallback callback in DomStrategy.capture() (PERF-269) - Eliminates GC pressure overhead in fallback screenshot loop
 
