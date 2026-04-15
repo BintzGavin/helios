@@ -1,0 +1,4 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	32.678	90	2.75	36.6	discard	PERF-282 inline promise allocation for small frame counts
+2	32.321	90	2.78	36.6	discard	PERF-282 inline promise allocation for small frame counts
+3	32.004	90	2.81	36.9	discard	PERF-282 inline promise allocation for small frame counts
