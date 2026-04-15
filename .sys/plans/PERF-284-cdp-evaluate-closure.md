@@ -1,11 +1,11 @@
 ---
 id: PERF-284
 slug: cdp-evaluate-closure
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "Jules"
 created: 2026-04-15
-completed: ""
-result: ""
+completed: "2026-04-15"
+result: "discarded"
 ---
 
 # PERF-284: Optimize CdpTimeDriver hot loop evaluation
@@ -88,3 +88,11 @@ Run the DOM benchmark (`npx tsx scripts/benchmark-test.js`) and ensure frame cou
 
 ## Prior Art
 PERF-272 showed that keeping pre-bound closures and passing arguments is faster than sending raw dynamic strings over Playwright's `evaluate`.
+
+## Results Summary
+```
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	33.333	90	2.70	37.3	discard	Pre-bound evaluate closure for CdpTimeDriver multi-frame branch
+2	32.655	90	2.76	37.3	discard	Pre-bound evaluate closure for CdpTimeDriver multi-frame branch
+3	32.492	90	2.77	36.7	discard	Pre-bound evaluate closure for CdpTimeDriver multi-frame branch
+```
