@@ -32,3 +32,6 @@ Last updated by: PERF-277
 ## What Doesn't Work (and Why)
 - **PERF-271**: Optimized pipeline promise chain in CaptureLoop.ts and CdpTimeDriver.ts by avoiding extra Promise allocations. Eliminated intermediate `.then` and `.catch` wrappers. The changes yielded no measurable improvement (32.076s vs baseline 32.091s), indicating that V8 effectively optimizes simple try/catch and single argument `.then` vs chain allocations, meaning the allocation overhead was negligible compared to the underlying Playwright/IPC calls. Discarded as inconclusive.
 - **PERF-281**: Replaced per-frame Promise allocation in `CaptureLoop.ts` with a preallocated array of `buffer`, `error`, and `done` state. Expected to reduce GC overhead. The microtask creation per frame was eliminated, but the result showed no measurable performance improvement compared to the baseline (~32.2s vs baseline ~32.1s), indicating V8 handles the per-frame Promise creation and garbage collection efficiently enough that the allocation overhead was negligible in this context. Discarded.
+
+## Open Questions
+- **PERF-283**: Will preallocating `this.cachedPromises` and eliminating the dynamic check `if (this.cachedPromises.length !== frames.length)` in `SeekTimeDriver.ts` hot loop improve render times?
