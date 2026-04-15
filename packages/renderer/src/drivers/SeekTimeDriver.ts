@@ -12,11 +12,9 @@ export class SeekTimeDriver implements TimeDriver {
   private cachedPromises: Promise<any>[] = [];
   private evaluateArgs: [number, number] = [0, 0];
   private evaluateClosure = ([t, timeoutMs]: any) => { (window as any).__helios_seek(t, timeoutMs); };
-  private callParams: any = {
-    objectId: '',
-    arguments: [ { value: 0 } ],
-    awaitPromise: true,
-    returnByValue: false
+  private evaluateParams: any = {
+    expression: '',
+    awaitPromise: true
   };
 
   constructor(private timeout: number = 30000) {
@@ -261,28 +259,14 @@ export class SeekTimeDriver implements TimeDriver {
     this.cachedFrames = page.frames();
     this.cachedMainFrame = page.mainFrame();
     this.cachedPromises = new Array(this.cachedFrames.length);
-
-    this.callParams.functionDeclaration = `function(t) { return this.__helios_seek(t, ${this.timeout}); }`;
-    const windowRes = await this.cdpSession!.send('Runtime.evaluate', { expression: 'window' });
-    if (windowRes.result && windowRes.result.objectId) {
-      this.callParams.objectId = windowRes.result.objectId;
-    }
   }
 
   setTime(page: Page, timeInSeconds: number): Promise<void> {
     const frames = this.cachedFrames;
 
-    if (frames.length === 1 && this.callParams.objectId) {
-      this.callParams.arguments[0].value = timeInSeconds;
-      return this.cdpSession!.send('Runtime.callFunctionOn', this.callParams) as Promise<any>;
-    }
-
     if (frames.length === 1) {
-      this.evaluateArgs[0] = timeInSeconds;
-      return frames[0].evaluate(
-        this.evaluateClosure,
-        this.evaluateArgs
-      );
+      this.evaluateParams.expression = 'window.__helios_seek(' + timeInSeconds + ', ' + this.timeout + ')';
+      return this.cdpSession!.send('Runtime.evaluate', this.evaluateParams) as Promise<any>;
     }
 
     const promises = this.cachedPromises;
