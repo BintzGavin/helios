@@ -48,6 +48,7 @@ The system uses individual prompts for each agent role:
 - **[STUDIO Planning](./planning-studio.md)** - Planning agent for Helios Studio dev environment
 - **[CLI Planning](./planning-cli.md)** - Planning agent for CLI (registry, workflows, deployment)
 - **[INFRASTRUCTURE Planning](./planning-infrastructure.md)** - Planning agent for distributed rendering and cloud execution
+- **[ARCHITECT Planning](./planning-architect.md)** - Planning agent for adversarial architecture and code cleanup
 
 **Execution Prompts:**
 - **[CORE Execution](./execution-core.md)** - Execution agent for core logic engine
@@ -57,6 +58,7 @@ The system uses individual prompts for each agent role:
 - **[STUDIO Execution](./execution-studio.md)** - Execution agent for Helios Studio dev environment
 - **[CLI Execution](./execution-cli.md)** - Execution agent for CLI (registry, workflows, deployment)
 - **[INFRASTRUCTURE Execution](./execution-infrastructure.md)** - Execution agent for distributed rendering and cloud execution
+- **[ARCHITECT Execution](./execution-architect.md)** - Execution agent for adversarial architecture and code cleanup
 
 **Other Prompts:**
 - **[Documentation Prompt](./docs.md)** - Unified prompt for user-facing documentation agent (no planning/execution separation)
