@@ -1,11 +1,11 @@
 ---
 id: PERF-281
 slug: preallocate-state-array
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2026-04-14
-completed: ""
-result: ""
+completed: "2026-04-14"
+result: "discard"
 ---
 
 # PERF-281: Preallocate State Array and Eliminate Dynamic Promises in CaptureLoop
@@ -117,3 +117,12 @@ Run the DOM benchmark and inspect `test-output.mp4` to ensure all frames are enc
 
 ## Prior Art
 PERF-280 discarded pre-allocating promises inside the ring buffer, pointing instead to this strategy (PERF-281).
+
+## Results Summary
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	42.298	90	2.13	37.3	keep	baseline
+2	32.084	90	2.81	37.4	keep	baseline
+3	32.115	90	2.80	36.8	keep	baseline
+4	32.916	90	2.73	37.1	discard	preallocate state array
+5	32.284	90	2.79	37.4	discard	preallocate state array
+6	32.146	90	2.80	37.2	discard	preallocate state array
