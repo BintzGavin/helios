@@ -1,11 +1,11 @@
 ---
 id: PERF-292
 slug: eliminate-format-response-call
-status: unclaimed
-claimed_by: ""
+status: claimed
+claimed_by: "executor-session"
 created: 2024-05-18
-completed: ""
-result: ""
+completed: "2024-05-18"
+result: "no-improvement"
 ---
 
 # PERF-292: Eliminate Redundant Function.prototype.call Overhead in CaptureLoop.ts
@@ -72,3 +72,9 @@ Run benchmark-test.js on canvas mode.
 
 ## Correctness Check
 Output video should still be 90 frames and render correctly.
+
+## Results Summary
+- **Best render time**: 32.204s (vs baseline 32.112s)
+- **Improvement**: 0%
+- **Kept experiments**: None
+- **Discarded experiments**: Eliminate `formatResponse.call` in `CaptureLoop.ts`

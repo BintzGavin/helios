@@ -1,0 +1,5 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	32.606	90	2.76	36.6	keep	baseline
+2	32.112	90	2.80	36.5	keep	baseline
+3	32.168	90	2.80	36.4	keep	baseline
+4	32.204	90	2.79	36.8	discard	eliminate formatResponse.call

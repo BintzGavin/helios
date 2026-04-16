@@ -12,6 +12,7 @@ Last updated by: PERF-277
 - Pre-bound the `syncMedia` catch handlers to `this.handleSyncMediaError` inside `CdpTimeDriver.ts` hot loop (PERF-265).
 
 ## What Doesn't Work (and Why)
+- **PERF-292**: Tried eliminating `formatResponse.call` in `CaptureLoop.ts` by replacing it with direct invocation `formatResponse(rawResponse)`. V8 effectively optimizes the `.call()` dynamic dispatch overhead inside tight loops so there was no performance improvement. Render time was slightly worse (~32.204s compared to ~32.112s baseline).
 - **PERF-270**: Prebind CaptureLoop then closures. Avoided creating anonymous closures in the hot pipeline loop by using a pre-allocated state array, but V8 already optimizes this well enough so there was zero performance improvement.
 - **PERF-262**: Prebound the CDP stability timeout promise executor. V8 optimizes the inline promise and anonymous closure allocation better than the property lookup.
 - Prebind virtual time promise executor in CdpTimeDriver (PERF-260). Did not improve render time.
@@ -95,3 +96,5 @@ Last updated by: PERF-277
 - Render time: 32.381s (Baseline: ~32.040s)
 - Status: inconclusive
 - **PERF-291**: Eliminated dynamic `Promise` allocation and `await` yielding inside the worker loops `getNextTask()` by allowing it to return a synchronous index integer when the buffer has capacity. While theoretically sound to avoid microtask yields and GC pressure per frame, testing showed no tangible improvement (32.381s vs baseline ~32.040s) because V8 successfully optimizes small async functions and microtask hopping very well. Kept since the logic explicitly prevents unnecessary Promise wrapping without altering behavior.
+
+- **PERF-292**: Tried eliminating `formatResponse.call` in `CaptureLoop.ts` by replacing it with direct invocation `formatResponse(rawResponse)`. V8 effectively optimizes the `.call()` dynamic dispatch overhead inside tight loops so there was no performance improvement. Render time was slightly worse (~32.204s compared to ~32.112s baseline).
