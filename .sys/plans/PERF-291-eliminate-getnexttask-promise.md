@@ -1,11 +1,11 @@
 ---
 id: PERF-291
 slug: eliminate-getnexttask-promise
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "jules"
 created: 2024-05-15
-completed: ""
-result: ""
+completed: "2024-05-16"
+result: "inconclusive"
 ---
 
 # PERF-291: Eliminate Dynamic Promise Allocation in CaptureLoop.ts getNextTask
