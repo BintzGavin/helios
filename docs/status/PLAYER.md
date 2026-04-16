@@ -1,4 +1,6 @@
-**Version**: 0.77.19
+**Version**: 0.77.21
+
+[v0.77.21] 🚫 Blocked: No new plan found in /.sys/plans/ for PLAYER. Waiting for Planner to create the next implementation spec.
 
 [v0.77.18] ✅ Completed: Fix Duplicate README Entry - Removed duplicate getSchema entry from README.md.
 ## Status Log
