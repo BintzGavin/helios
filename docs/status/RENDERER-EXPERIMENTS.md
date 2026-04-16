@@ -85,3 +85,8 @@ Last updated by: PERF-277
 - Render time: 32.707s (Baseline: 32.040s)
 - Status: discard
 - **PERF-278**: Attempted to implement a worker-centric async loop in `CaptureLoop.ts` to bypass pipeline allocations for a single worker pool by avoiding `contextRing` and `framePromises` entirely. Found that the actor model with backpressure had already been partially implemented, but benchmarking revealed that running it without the actor model or trying to bypass it (if poolLen === 1) degraded performance (32.707s vs baseline 32.040s). The existing pipelined actor model is faster even with a single worker. Discarded.
+
+## PERF-262: Pre-bind stability timeout promise executor in CdpTimeDriver.ts
+- Render time: 32.152s (Baseline: 32.040s)
+- Status: discard
+- **PERF-262**: Prebound the CDP stability timeout promise executor. V8 optimizes the inline promise and anonymous closure allocation better than the property lookup. The method is no longer re-entrant or safe to call concurrently. Discarded.

@@ -89,3 +89,11 @@ Run `cd packages/renderer && npx tsx scripts/benchmark-test.js` to ensure the be
 
 ## Correctness Check
 Run the DOM rendering tests to verify frames are generated correctly and the pipeline completes.
+
+## Results Summary
+```
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+4	32.167	90	2.80	36.6	discard	prebind-stability-timeout
+5	32.127	90	2.80	36.6	discard	prebind-stability-timeout
+6	32.152	90	2.80	36.8	discard	prebind-stability-timeout
+```
