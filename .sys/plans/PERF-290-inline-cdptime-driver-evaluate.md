@@ -1,7 +1,7 @@
 ---
 id: PERF-290
 slug: inline-cdptime-driver-evaluate
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-05-10
 completed: ""
@@ -101,3 +101,10 @@ Smoke test using Canvas logic in `benchmark-test.js`.
 
 ## Variations
 If no improvement, discard the changes.
+
+## Results Summary
+```
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	32.242	90	2.79	36.5	inconclusive	PERF-290: Optimize CdpTimeDriver single-frame evaluate
+2	32.271	90	2.79	36.7	keep	PERF-290: Optimize CdpTimeDriver single-frame evaluate
+```

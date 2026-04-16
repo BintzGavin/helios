@@ -9,19 +9,6 @@ export class CdpTimeDriver implements TimeDriver {
   private timeout: number;
   private cachedFrames: import('playwright').Frame[] = [];
   private setVirtualTimePolicyParams: any = { policy: 'advance', budget: 0 };
-  private syncMediaParams: any = {
-    functionDeclaration: 'function(t) { if(typeof window.__helios_sync_media==="function") window.__helios_sync_media(t); }',
-    objectId: undefined,
-    arguments: [{ value: 0 }],
-    returnByValue: false,
-    awaitPromise: false
-  };
-  private waitStableParams: any = {
-    functionDeclaration: 'function() { if(typeof window.__helios_wait_until_stable==="function") return window.__helios_wait_until_stable(); }',
-    objectId: undefined,
-    returnByValue: false,
-    awaitPromise: true
-  };
   private executionContextIds: number[] = [];
   private cachedPromises: Promise<any>[] = [];
   private cdpResolve: (() => void) | null = null;
@@ -154,12 +141,6 @@ export class CdpTimeDriver implements TimeDriver {
        }
     }
 
-    const windowRes = await this.client!.send('Runtime.evaluate', { expression: 'window' });
-    if (windowRes.result && windowRes.result.objectId) {
-      this.syncMediaParams.objectId = windowRes.result.objectId;
-      this.waitStableParams.objectId = windowRes.result.objectId;
-    }
-
     this.currentTime = 0;
   }
 
@@ -180,15 +161,11 @@ export class CdpTimeDriver implements TimeDriver {
     // the video elements are already at the correct time.
     // Execute in all frames (including main frame) to support iframes
     const frames = this.cachedFrames;
-    if (frames.length === 1 && this.syncMediaParams.objectId) {
-      this.syncMediaParams.arguments[0].value = timeInSeconds;
-      await this.client!.send('Runtime.callFunctionOn', this.syncMediaParams).catch(this.handleSyncMediaError);
+    if (frames.length === 1) {
+      await this.client!.send('Runtime.evaluate', {
+        expression: "if(typeof window.__helios_sync_media==='function') window.__helios_sync_media(" + timeInSeconds + ");"
+      }).catch(this.handleSyncMediaError);
     } else {
-      if (frames.length === 1) {
-        await this.client!.send('Runtime.evaluate', {
-          expression: "if(typeof window.__helios_sync_media==='function') window.__helios_sync_media(" + timeInSeconds + ");"
-        }).catch(this.handleSyncMediaError);
-      } else {
         if (this.executionContextIds.length > 0) {
           if (this.cachedPromises.length !== this.executionContextIds.length) {
             this.cachedPromises = new Array(this.executionContextIds.length);
@@ -215,7 +192,6 @@ export class CdpTimeDriver implements TimeDriver {
           }
           await Promise.all(framePromises);
         }
-      }
     }
 
     // 2. Advance virtual time
@@ -238,9 +214,10 @@ export class CdpTimeDriver implements TimeDriver {
 
     try {
       await Promise.race([
-        (this.waitStableParams.objectId
-          ? this.client!.send('Runtime.callFunctionOn', this.waitStableParams).then(this.handleStabilityCheckResponse)
-          : page.evaluate("if (typeof window.__helios_wait_until_stable === 'function') window.__helios_wait_until_stable();")),
+        this.client!.send('Runtime.evaluate', {
+          expression: "if (typeof window.__helios_wait_until_stable === 'function') window.__helios_wait_until_stable();",
+          awaitPromise: true
+        }).then(this.handleStabilityCheckResponse),
         timeoutPromise
       ]);
     } catch (e: any) {
