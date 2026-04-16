@@ -204,6 +204,9 @@ export class CaptureLoop {
     };
 
     const runWorker = async (worker: WorkerInfo, workerIndex: number) => {
+        const { timeDriver, strategy, page } = worker;
+        const formatResponse = strategy.formatResponse;
+
         while (!aborted) {
             const i = await getNextTask();
             if (i === -1) break;
@@ -215,9 +218,9 @@ export class CaptureLoop {
             const ctx = contextRing[ringIndex];
 
             try {
-                worker.timeDriver.setTime(worker.page, compositionTimeInSeconds).then(undefined, noopCatch);
-                const rawResponse = await worker.strategy.capture(worker.page, time);
-                const buffer = worker.strategy.formatResponse ? worker.strategy.formatResponse(rawResponse) : rawResponse;
+                timeDriver.setTime(page, compositionTimeInSeconds).then(undefined, noopCatch);
+                const rawResponse = await strategy.capture(page, time);
+                const buffer = formatResponse ? formatResponse.call(strategy, rawResponse) : rawResponse;
                 if (ctx.resolve) ctx.resolve(buffer);
             } catch (e) {
                 if (ctx.reject) ctx.reject(e);

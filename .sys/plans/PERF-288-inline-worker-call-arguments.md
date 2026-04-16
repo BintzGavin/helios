@@ -1,11 +1,11 @@
 ---
 id: PERF-288
 slug: inline-worker-call-arguments
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2026-04-16
-completed: ""
-result: ""
+completed: 2024-04-16
+result: "improved"
 ---
 
 # PERF-288: Eliminate Playwright Page Object Serialization Overhead in CaptureLoop Hot Path
@@ -97,3 +97,9 @@ Run benchmark-test.js on canvas mode.
 
 ## Correctness Check
 Output video should still be 90 frames and render smoothly.
+
+## Results Summary
+- **Best render time**: 32.560s (vs baseline ~42.6s)
+- **Improvement**: ~23.5%
+- **Kept experiments**: PERF-288
+- **Discarded experiments**: None

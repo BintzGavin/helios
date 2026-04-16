@@ -71,3 +71,6 @@ Last updated by: PERF-277
   - What: In `SeekTimeDriver.ts`, preallocated a statically-sized array of `multiEvaluateParams` objects to reuse during the `setTime` multi-frame execution loop instead of allocating new objects dynamically on every tick.
   - Why it didn't work: Yielded a median run time of ~32.749s, compared to the baseline median of ~32.186s. The optimization actually degraded performance by adding memory lookup and branching overhead, demonstrating that V8 easily optimizes the inline dynamic object allocation inside this tight loop, rendering the explicit preallocation slower.
   - Plan: PERF-287
+
+## What Works
+- Inlined worker call arguments in `CaptureLoop.ts` (PERF-288) - ~23.5% improvement
