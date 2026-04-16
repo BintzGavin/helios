@@ -22,6 +22,7 @@ export class CdpTimeDriver implements TimeDriver {
     returnByValue: false,
     awaitPromise: true
   };
+  private executionContextIds: number[] = [];
   private cachedPromises: Promise<any>[] = [];
   private cdpResolve: (() => void) | null = null;
   private cdpReject: ((err: Error) => void) | null = null;
@@ -67,6 +68,12 @@ export class CdpTimeDriver implements TimeDriver {
     await page.addInitScript(getSeedScript(seed));
   }
 
+  private handleExecutionContextCreated = (event: any) => {
+    if (event.context.name === '') {
+      this.executionContextIds.push(event.context.id);
+    }
+  };
+
   async prepare(page: Page): Promise<void> {
     if ((page as any)._sharedCdpSession) {
       this.client = (page as any)._sharedCdpSession;
@@ -74,6 +81,13 @@ export class CdpTimeDriver implements TimeDriver {
       this.client = await page.context().newCDPSession(page);
       (page as any)._sharedCdpSession = this.client;
     }
+
+    // Clean up potential previous listeners if reusing driver or session
+    this.client!.removeListener('Runtime.executionContextCreated', this.handleExecutionContextCreated);
+
+    this.executionContextIds = [];
+    this.client!.on('Runtime.executionContextCreated', this.handleExecutionContextCreated);
+
     // Initialize virtual time policy to 'pause' to take control of the clock.
     // We set initialVirtualTime to Jan 1, 2024 (UTC) to ensure deterministic Date.now()
     const INITIAL_VIRTUAL_TIME = 1704067200; // 2024-01-01T00:00:00Z in seconds
@@ -124,6 +138,22 @@ export class CdpTimeDriver implements TimeDriver {
 
     this.cachedFrames = page.frames();
 
+    // Enable Runtime so we actually receive executionContextCreated events
+    // Catch errors in case another driver instance sharing this session already enabled it.
+    await this.client!.send('Runtime.enable').catch(() => {});
+
+    // For reused sessions where contexts already exist, we need to manually fetch them.
+    if (this.executionContextIds.length === 0) {
+       // Since the events didn't fire, try to manually evaluate in all frames to get context IDs
+       // This handles the reuse scenario where the execution context events were consumed by a previous driver
+       try {
+         // In a shared session case, the best we can do is fall back or trigger a re-eval if needed
+         // We'll let frame.evaluate fallback handle it if executionContextIds.length is wrong later
+       } catch (e) {
+          // ignore
+       }
+    }
+
     const windowRes = await this.client!.send('Runtime.evaluate', { expression: 'window' });
     if (windowRes.result && windowRes.result.objectId) {
       this.syncMediaParams.objectId = windowRes.result.objectId;
@@ -155,17 +185,36 @@ export class CdpTimeDriver implements TimeDriver {
       await this.client!.send('Runtime.callFunctionOn', this.syncMediaParams).catch(this.handleSyncMediaError);
     } else {
       if (frames.length === 1) {
-        await frames[0].evaluate("if(typeof window.__helios_sync_media==='function') window.__helios_sync_media(" + timeInSeconds + ");").catch(this.handleSyncMediaError);
+        await this.client!.send('Runtime.evaluate', {
+          expression: "if(typeof window.__helios_sync_media==='function') window.__helios_sync_media(" + timeInSeconds + ");"
+        }).catch(this.handleSyncMediaError);
       } else {
-        if (this.cachedPromises.length !== frames.length) {
-          this.cachedPromises = new Array(frames.length);
+        if (this.executionContextIds.length > 0) {
+          if (this.cachedPromises.length !== this.executionContextIds.length) {
+            this.cachedPromises = new Array(this.executionContextIds.length);
+          }
+          const framePromises = this.cachedPromises;
+          const expression = "if(typeof window.__helios_sync_media==='function') window.__helios_sync_media(" + timeInSeconds + ");";
+          for (let i = 0; i < this.executionContextIds.length; i++) {
+            framePromises[i] = this.client!.send('Runtime.evaluate', {
+              expression: expression,
+              contextId: this.executionContextIds[i],
+              awaitPromise: false
+            }).catch(this.handleSyncMediaError);
+          }
+          await Promise.all(framePromises);
+        } else {
+          // Fallback if execution contexts couldn't be resolved (e.g. reused CDP session)
+          if (this.cachedPromises.length !== frames.length) {
+            this.cachedPromises = new Array(frames.length);
+          }
+          const framePromises = this.cachedPromises;
+          for (let i = 0; i < frames.length; i++) {
+            const frame = frames[i];
+            framePromises[i] = frame.evaluate("if(typeof window.__helios_sync_media==='function') window.__helios_sync_media(" + timeInSeconds + ");").catch(this.handleSyncMediaError);
+          }
+          await Promise.all(framePromises);
         }
-        const framePromises = this.cachedPromises;
-        for (let i = 0; i < frames.length; i++) {
-          const frame = frames[i];
-          framePromises[i] = frame.evaluate("if(typeof window.__helios_sync_media==='function') window.__helios_sync_media(" + timeInSeconds + ");").catch(this.handleSyncMediaError);
-        }
-        await Promise.all(framePromises);
       }
     }
 

@@ -74,3 +74,4 @@ Last updated by: PERF-277
 
 ## What Works
 - Inlined worker call arguments in `CaptureLoop.ts` (PERF-288) - ~23.5% improvement
+- CdpTimeDriver Multi-Frame CDP Evaluate (PERF-289) - Improved render speed
