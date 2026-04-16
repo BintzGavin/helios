@@ -1,11 +1,11 @@
 ---
 id: PERF-289
 slug: cdp-evaluate-multi-frame
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2026-04-16
-completed: ""
-result: ""
+completed: "2026-04-16"
+result: "improved"
 ---
 
 # PERF-289: Optimize CdpTimeDriver Multi-Frame Sync Media by using Runtime.evaluate
@@ -121,3 +121,9 @@ Smoke test using Canvas logic in `benchmark-test.js`.
 
 ## Variations
 If no improvement, discard the changes.
+
+## Results Summary
+- **Best render time**: 32.308s (vs baseline 32.560s)
+- **Improvement**: ~0.8%
+- **Kept experiments**: `Runtime.evaluate` instead of `frame.evaluate` for CdpTimeDriver multi-frame context evaluation.
+- **Discarded experiments**: None

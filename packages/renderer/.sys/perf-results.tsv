@@ -353,3 +353,4 @@ PERF-254	Pre-bind evaluate closures in SeekTimeDriver	render_time_s:      2.119
 1	32.132	90	2.80	36.7	keep	PERF-285 SeekTimeDriver runtime evaluate string
 PERF-286	32.361	90	2.78	22.9	keep	raw CDP evaluate multi-frame
 5	32.560	90	2.76	36.6	keep	Inline worker call arguments (PERF-288)
+6	32.308	90	2.79	36.7	keep	Use Runtime.evaluate for multi-frame (PERF-289)
