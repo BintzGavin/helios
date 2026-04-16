@@ -1,0 +1,3 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	32.242	90	2.79	36.5	inconclusive	PERF-290: Optimize CdpTimeDriver single-frame evaluate
+2	32.271	90	2.79	36.7	keep	PERF-290: Optimize CdpTimeDriver single-frame evaluate

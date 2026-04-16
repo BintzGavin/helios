@@ -75,3 +75,8 @@ Last updated by: PERF-277
 ## What Works
 - Inlined worker call arguments in `CaptureLoop.ts` (PERF-288) - ~23.5% improvement
 - CdpTimeDriver Multi-Frame CDP Evaluate (PERF-289) - Improved render speed
+
+## PERF-290: Optimize CdpTimeDriver single-frame evaluation
+- Render time: 32.271s (Baseline: 32.040s)
+- Status: inconclusive
+- **PERF-290**: Replaced Playwright IPC closure evaluation (`Runtime.callFunctionOn`) with raw CDP string evaluation (`Runtime.evaluate`) for stability checks and single-frame media synchronization in `CdpTimeDriver.ts`. Cleaned up unused execution initializers. Time remained practically identical/within noise margins, indicating that while raw strings save object-mapping overhead on IPC, single-frame evaluate allocations are not the primary bottleneck here. Kept for cleaner code and consistency with SeekTimeDriver.
