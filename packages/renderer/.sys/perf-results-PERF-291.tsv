@@ -1,0 +1,4 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	32.774	90	2.75	36.4	inconclusive	eliminate getNextTask promise allocation
+2	32.381	90	2.78	36.6	inconclusive	eliminate getNextTask promise allocation
+3	32.252	90	2.79	37.4	inconclusive	eliminate getNextTask promise allocation

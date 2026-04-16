@@ -172,35 +172,34 @@ export class CaptureLoop {
         }
     };
 
-    const getNextTask = async (): Promise<number> => {
-        return new Promise<number>((resolve) => {
-            if (aborted || nextFrameToSubmit >= this.totalFrames) {
-                resolve(-1);
-                return;
+    const getNextTask = (): number | Promise<number> => {
+        if (aborted || nextFrameToSubmit >= this.totalFrames) {
+            return -1;
+        }
+
+        if (nextFrameToSubmit - nextFrameToWrite < maxPipelineDepth) {
+            const i = nextFrameToSubmit++;
+            const ringIndex = i & ringMask;
+
+            const promise = new Promise<Buffer | string>((res, rej) => {
+                contextRing[ringIndex].resolve = res;
+                contextRing[ringIndex].reject = rej;
+            });
+            promise.catch(noopCatch); // Prevent unhandled rejections
+            framePromises[ringIndex] = promise;
+
+            if (frameWaiterResolve) {
+                const fRes = frameWaiterResolve;
+                frameWaiterResolve = null;
+                fRes();
             }
 
-            if (nextFrameToSubmit - nextFrameToWrite < maxPipelineDepth) {
-                const i = nextFrameToSubmit++;
-                const ringIndex = i & ringMask;
-
-                const promise = new Promise<Buffer | string>((res, rej) => {
-                    contextRing[ringIndex].resolve = res;
-                    contextRing[ringIndex].reject = rej;
-                });
-                promise.catch(noopCatch); // Prevent unhandled rejections
-                framePromises[ringIndex] = promise;
-
-                if (frameWaiterResolve) {
-                    const fRes = frameWaiterResolve;
-                    frameWaiterResolve = null;
-                    fRes();
-                }
-
-                resolve(i);
-            } else {
+            return i;
+        } else {
+            return new Promise<number>((resolve) => {
                 waitingWorkerResolves.push(resolve);
-            }
-        });
+            });
+        }
     };
 
     const runWorker = async (worker: WorkerInfo, workerIndex: number) => {
@@ -208,7 +207,8 @@ export class CaptureLoop {
         const formatResponse = strategy.formatResponse;
 
         while (!aborted) {
-            const i = await getNextTask();
+            const task = getNextTask();
+            const i = typeof task === 'number' ? task : await task;
             if (i === -1) break;
 
             const time = i * timeStep;
