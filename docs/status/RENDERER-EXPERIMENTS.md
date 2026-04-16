@@ -85,3 +85,8 @@ Last updated by: PERF-277
 - Render time: 32.707s (Baseline: 32.040s)
 - Status: discard
 - **PERF-278**: Attempted to implement a worker-centric async loop in `CaptureLoop.ts` to bypass pipeline allocations for a single worker pool by avoiding `contextRing` and `framePromises` entirely. Found that the actor model with backpressure had already been partially implemented, but benchmarking revealed that running it without the actor model or trying to bypass it (if poolLen === 1) degraded performance (32.707s vs baseline 32.040s). The existing pipelined actor model is faster even with a single worker. Discarded.
+
+## PERF-291: Eliminate getNextTask Promise Allocation
+- Render time: 33.527s (Baseline: ~32.040s)
+- Status: inconclusive
+- **PERF-291**: Eliminated dynamic `Promise` allocation and `await` yielding inside the worker loops `getNextTask()` by allowing it to return a synchronous index integer when the buffer has capacity. While theoretically sound to avoid microtask yields and GC pressure per frame, testing showed no tangible improvement (33.527s due to noisy VM vs baseline ~32.040s) because V8 successfully optimizes small async functions and microtask hopping very well. Kept since the logic explicitly prevents unnecessary Promise wrapping without altering behavior.
