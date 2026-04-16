@@ -80,3 +80,8 @@ Last updated by: PERF-277
 - Render time: 32.271s (Baseline: 32.040s)
 - Status: inconclusive
 - **PERF-290**: Replaced Playwright IPC closure evaluation (`Runtime.callFunctionOn`) with raw CDP string evaluation (`Runtime.evaluate`) for stability checks and single-frame media synchronization in `CdpTimeDriver.ts`. Cleaned up unused execution initializers. Time remained practically identical/within noise margins, indicating that while raw strings save object-mapping overhead on IPC, single-frame evaluate allocations are not the primary bottleneck here. Kept for cleaner code and consistency with SeekTimeDriver.
+
+## PERF-278: Worker-centric async loop actor model check
+- Render time: 32.707s (Baseline: 32.040s)
+- Status: discard
+- **PERF-278**: Attempted to implement a worker-centric async loop in `CaptureLoop.ts` to bypass pipeline allocations for a single worker pool by avoiding `contextRing` and `framePromises` entirely. Found that the actor model with backpressure had already been partially implemented, but benchmarking revealed that running it without the actor model or trying to bypass it (if poolLen === 1) degraded performance (32.707s vs baseline 32.040s). The existing pipelined actor model is faster even with a single worker. Discarded.

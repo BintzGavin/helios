@@ -1,11 +1,11 @@
 ---
 id: PERF-278
 slug: worker-centric-async-loop
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2026-04-14
-completed: ""
-result: ""
+completed: "2026-04-16"
+result: "failed"
 ---
 
 # PERF-278: Eliminate worker.activePromise Promise Chain Allocation
@@ -56,3 +56,9 @@ Verify Canvas strategy remains unaffected and correctly renders.
 
 ## Correctness Check
 Run the DOM benchmark and inspect the output video to verify visual correctness and frame ordering.
+
+## Results Summary
+- **Best render time**: 32.707s (vs baseline 32.040s)
+- **Improvement**: -2.1% (Regressed)
+- **Kept experiments**: []
+- **Discarded experiments**: [PERF-278 (Already partially implemented by previous experiment; attempting single worker bypass logic caused regression)]
