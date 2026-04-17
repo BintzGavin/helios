@@ -1,9 +1,10 @@
-**Version**: 0.121.4
+**Version**: 0.121.5
 
 **Posture**: ACTIVELY EXPANDING FOR V2
 
 # Studio Domain Status
 
+- [v0.121.5] ✅ Completed: Toggle Loop Shortcut - Restored loop toggle functionality using Shift+L keyboard shortcut.
 **Status**: 🟢 Active
 
 **Focus**: UI Implementation & CLI
