@@ -360,3 +360,6 @@ PERF-286	32.361	90	2.78	22.9	keep	raw CDP evaluate multi-frame
 3	47.778	600	12.56	42.6	keep	PERF-293 reorder formatResponse checks
 4	48.157	600	12.46	41.5	keep	PERF-293 reorder formatResponse checks
 5	48.293	600	12.42	42.7	keep	PERF-293 reorder formatResponse checks
+1	51.193	600	11.72	43.3	discard	PERF-294 inline formatResponse
+2	51.097	600	11.74	41.3	discard	PERF-294 inline formatResponse
+3	48.923	600	12.26	41.5	discard	PERF-294 inline formatResponse
