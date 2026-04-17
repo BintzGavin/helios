@@ -1,11 +1,11 @@
 ---
 id: PERF-299
 slug: chromium-skia-cpu
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "Jules"
 created: 2026-10-18
-completed: ""
-result: ""
+completed: "2024-04-17"
+result: "Appended `--disable-software-rasterizer` and `--disable-gpu-compositing` to `GPU_DISABLED_ARGS`. Render time improved from 61.877s to a median of 47.554s. The test proves SwiftShader translation was indeed a major bottleneck in CPU-only environments. Kept."
 ---
 
 # PERF-299: Chromium Skia CPU Pathways for GPU-disabled Environments
