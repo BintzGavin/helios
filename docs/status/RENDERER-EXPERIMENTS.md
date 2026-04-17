@@ -106,3 +106,8 @@ Last updated by: PERF-277
 - Render time: 48.225s (Baseline: 49.244s)
 - Status: keep
 - **PERF-293**: Reordered `DomStrategy.formatResponse()` to check `if (res && res.screenshotData)` before checking `Buffer.isBuffer(res)`. This prioritizes the CDP hot path, avoiding the `Buffer.isBuffer()` function call overhead on every frame, which replaces a function call with a fast V8 hidden-class property access. It improved render times slightly compared to baseline (~48.2s vs baseline ~49.2s). Kept.
+
+## PERF-294: Inline formatResponse in CaptureLoop.ts
+- Render time: 51.097s (Baseline: 48.225s)
+- Status: discard
+- **PERF-294**: Inlined `formatResponse` CDP extraction directly inside the hot loop (`runWorker`) in `CaptureLoop.ts` to avoid the `.call` method invocation overhead. V8 handles the function dispatch effectively, and the added branching `typeof rawResponse.screenshotData === 'string'` in the hot loop actually slightly degraded performance (~51.097s vs baseline ~48.225s). Discarded because the dynamic function dispatch is faster than checking type/property dynamically.

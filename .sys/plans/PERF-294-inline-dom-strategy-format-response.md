@@ -1,11 +1,11 @@
 ---
 id: PERF-294
 slug: inline-dom-strategy-format-response
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2026-04-17
-completed: ""
-result: ""
+completed: 2026-04-17
+result: "no-improvement"
 ---
 
 # PERF-294: Inline `formatResponse` in `CaptureLoop.ts` to Eliminate Function Dispatch Overhead
@@ -70,3 +70,9 @@ Run `npm run build:examples` and then run `npx tsx tests/verify-canvas-strategy.
 
 ## Correctness Check
 Run the DOM benchmark (`npx tsx tests/fixtures/benchmark.ts`) to verify performance gains and ensure the output video is generated correctly.
+
+## Results Summary
+- **Best render time**: 51.097s (vs baseline 48.225s)
+- **Improvement**: -5.9%
+- **Kept experiments**: []
+- **Discarded experiments**: [PERF-294: Inline `formatResponse` in `CaptureLoop.ts`]
