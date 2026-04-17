@@ -124,3 +124,6 @@ Last updated by: PERF-277
 - Render time: 50.364s (Baseline: 48.743s)
 - Status: inconclusive
 - **PERF-297**: Validated the revert of inline object allocations inside the hot loops of `SeekTimeDriver` and `DomStrategy`. Previously, PERF-296 showed that instantiating object literals inside the tight loop caused overhead from V8 garbage collection and memory allocation, which was slower than simply mutating long-lived cached properties. Found that the inline allocations had already been reverted, and reran the baseline benchmark to verify stability.
+
+## Open Questions
+- **PERF-299**: Will explicitly appending `--disable-software-rasterizer` and `--disable-gpu-compositing` to `GPU_DISABLED_ARGS` fully disable SwiftShader and improve render performance by forcing native Skia CPU rasterization?
