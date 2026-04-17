@@ -27,12 +27,12 @@ export class DomStrategy implements RenderStrategy {
   private frameInterval: number = 0;
 
   public formatResponse = (res: any): Buffer | string => {
-    if (Buffer.isBuffer(res)) {
-      this.lastFrameData = res;
-      return res;
-    } else if (res && res.screenshotData) {
+    if (res && res.screenshotData) {
       this.lastFrameData = res.screenshotData;
       return res.screenshotData;
+    } else if (Buffer.isBuffer(res)) {
+      this.lastFrameData = res;
+      return res;
     } else if (this.lastFrameData) {
       return this.lastFrameData;
     } else {

@@ -101,3 +101,8 @@ Last updated by: PERF-277
 
 ## Open Questions
 - **PERF-293**: Can we avoid the `Buffer.isBuffer()` function call overhead in `DomStrategy.formatResponse()` by prioritizing the `res.screenshotData` check for CDP?
+
+## PERF-293: Reorder formatResponse checks in DomStrategy
+- Render time: 48.225s (Baseline: 49.244s)
+- Status: keep
+- **PERF-293**: Reordered `DomStrategy.formatResponse()` to check `if (res && res.screenshotData)` before checking `Buffer.isBuffer(res)`. This prioritizes the CDP hot path, avoiding the `Buffer.isBuffer()` function call overhead on every frame, which replaces a function call with a fast V8 hidden-class property access. It improved render times slightly compared to baseline (~48.2s vs baseline ~49.2s). Kept.

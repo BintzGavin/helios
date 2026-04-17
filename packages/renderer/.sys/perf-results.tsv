@@ -355,3 +355,8 @@ PERF-286	32.361	90	2.78	22.9	keep	raw CDP evaluate multi-frame
 5	32.560	90	2.76	36.6	keep	Inline worker call arguments (PERF-288)
 6	32.308	90	2.79	36.7	keep	Use Runtime.evaluate for multi-frame (PERF-289)
 1	32.707	90	2.75	36.6	discard	PERF-278 worker-centric async loop actor model check
+1	49.244	600	12.18	40.7	keep	PERF-293 baseline
+2	51.556	600	11.64	43.2	keep	PERF-293 reorder formatResponse checks
+3	47.778	600	12.56	42.6	keep	PERF-293 reorder formatResponse checks
+4	48.157	600	12.46	41.5	keep	PERF-293 reorder formatResponse checks
+5	48.293	600	12.42	42.7	keep	PERF-293 reorder formatResponse checks
