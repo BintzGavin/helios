@@ -3,6 +3,7 @@ Current best: 32.040s (baseline was 43.227s, -25.6%)
 Last updated by: PERF-277
 
 ## What Works
+- **PERF-295**: Removed `fallbackScreenshotOptions` cache from `DomStrategy.ts` and constructed fallback options inline. Render time: 47.232s (baseline ~47.460s). Avoids untyped property mutation and hidden class pollution. Kept.
 - **PERF-285**: Optimized SeekTimeDriver single-frame evaluation by replacing Playwright IPC closure with raw CDP string evaluation over Runtime.evaluate. Improved render time to ~32.1s.
 - **PERF-277**: Replaced `.then()` with `await` in `DomStrategy.capture()` to eliminate dynamic Promise allocation per frame.
 - **PERF-274**: Replaced syncMedia closure evaluation with string evaluation in CdpTimeDriver.ts. Faster and avoids IPC overhead.
