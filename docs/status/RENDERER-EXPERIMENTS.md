@@ -10,6 +10,7 @@ Last updated by: PERF-277
 - **PERF-296**: Replaced object mutation with inline object allocation in the hot loops of `SeekTimeDriver.ts` and `DomStrategy.ts`. The median render time worsened to ~48.743s compared to the baseline of ~47.232s. This indicates that creating new object literals inside the hot loop adds more overhead than the write barriers caused by mutating the long-lived properties. Discarded as slower.
 
 ## What Works
+- **PERF-298**: Verified the Skia CPU pathways in `BrowserPool.ts`. Re-tested and achieved ~48.0s median render time. The optimization is already implemented by PERF-299. Kept as baseline verification.
 - **PERF-295**: Removed `fallbackScreenshotOptions` cache from `DomStrategy.ts` and constructed fallback options inline. Render time: 47.232s (baseline ~47.460s). Avoids untyped property mutation and hidden class pollution. Kept.
 - **PERF-285**: Optimized SeekTimeDriver single-frame evaluation by replacing Playwright IPC closure with raw CDP string evaluation over Runtime.evaluate. Improved render time to ~32.1s.
 - **PERF-277**: Replaced `.then()` with `await` in `DomStrategy.capture()` to eliminate dynamic Promise allocation per frame.
