@@ -1,12 +1,18 @@
 ---
 id: PERF-296
 slug: inline-object-allocation
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-05-18
-completed: ""
-result: ""
+completed: "2025-05-18"
+result: "Discarded: Inline object allocation in the hot loop degraded performance compared to mutating the long-lived property, likely due to V8 write barrier overhead being smaller than object instantiation overhead in this context."
 ---
+
+## Results Summary
+```tsv
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	48.743	600	12.31	42.0	discard	inline object allocation in hot paths
+```
 
 # PERF-296: Replace Old-Space Object Mutation with Inline Object Allocation in Hot Paths
 
