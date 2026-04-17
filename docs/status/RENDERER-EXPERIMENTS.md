@@ -3,6 +3,10 @@ Current best: 32.040s (baseline was 43.227s, -25.6%)
 Last updated by: PERF-277
 
 ## What Doesn't Work (and Why)
+- **Bypass Playwright Overhead with Raw CDP Capture (PERF-002)**
+  - What: Replaced Playwright's `page.screenshot()` with raw CDP `Page.captureScreenshot` in `DomStrategy.capture()`.
+  - Why it didn't work: The render time actually regressed slightly (~47.7s vs ~47.6s). `page.screenshot` is only used as a fallback when `targetSelector` is enabled, and `HeadlessExperimental.beginFrame` is the primary capture mechanism. The overhead of Playwright's internal checks is minimal compared to the overall pipeline, and replacing it didn't yield improvements.
+  - Plan: PERF-002
 - **PERF-296**: Replaced object mutation with inline object allocation in the hot loops of `SeekTimeDriver.ts` and `DomStrategy.ts`. The median render time worsened to ~48.743s compared to the baseline of ~47.232s. This indicates that creating new object literals inside the hot loop adds more overhead than the write barriers caused by mutating the long-lived properties. Discarded as slower.
 
 ## What Works
