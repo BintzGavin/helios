@@ -168,10 +168,6 @@ export class DomStrategy implements RenderStrategy {
         this.emptyImageBuffer = EMPTY_IMAGE_BUFFER;
     }
 
-    // We also save screenshotOptions on this since fallback uses it, though we could just keep it local if not used in capture.
-    // Actually fallback is used in capture when CDP is unavailable. Let's add it to this.
-    (this as any).fallbackScreenshotOptions = screenshotOptions;
-
     this.beginFrameParams = {
       screenshot: this.cdpScreenshotParams,
       interval: this.frameInterval,
@@ -226,7 +222,13 @@ export class DomStrategy implements RenderStrategy {
 
         return this.cdpSession!.send('HeadlessExperimental.beginFrame', this.targetBeginFrameParams);
       }
-      return this.targetElementHandle.screenshot((this as any).fallbackScreenshotOptions);
+
+      const isOpaque = this.cdpScreenshotParams.format === 'jpeg';
+      return this.targetElementHandle.screenshot({
+        type: this.cdpScreenshotParams.format,
+        quality: this.cdpScreenshotParams.quality,
+        omitBackground: !isOpaque
+      });
     }
 
     this.beginFrameParams.frameTimeTicks = 10000 + frameTime;
