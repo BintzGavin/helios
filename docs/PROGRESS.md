@@ -1,4 +1,5 @@
-## STUDIO v0.121.3
+### STUDIO v0.121.5
+- ✅ Completed: Toggle Loop Shortcut - Restored loop toggle functionality using Shift+L keyboard shortcut.
 
 ### STUDIO v0.121.4
 - ✅ Completed: STUDIO-Timeline-Drag-Drop - Added visual styling when dragging an asset over the Timeline component for visual feedback.

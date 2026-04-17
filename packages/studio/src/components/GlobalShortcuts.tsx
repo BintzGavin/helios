@@ -11,7 +11,8 @@ export const GlobalShortcuts: React.FC = () => {
     inPoint,
     setInPoint,
     outPoint,
-    setOutPoint
+    setOutPoint,
+    toggleLoop
   } = useStudio();
 
   const { currentFrame, duration, fps } = playerState;
@@ -91,8 +92,13 @@ export const GlobalShortcuts: React.FC = () => {
     controller.pause();
   }, { ignoreInput: true });
 
-  // L: Play Forward / Speed Up
-  useKeyboardShortcut('l', () => {
+  // L: Play Forward / Speed Up, Shift+L: Toggle Loop
+  useKeyboardShortcut('l', (e) => {
+    if (e.shiftKey) {
+      toggleLoop();
+      return;
+    }
+
     if (!controller) return;
     const currentRate = playerState.playbackRate || 1;
     if (!playerState.isPlaying || currentRate < 0.25) {
