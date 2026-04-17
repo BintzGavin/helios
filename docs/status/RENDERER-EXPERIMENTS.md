@@ -115,3 +115,8 @@ Last updated by: PERF-277
 - Render time: 51.097s (Baseline: 48.225s)
 - Status: discard
 - **PERF-294**: Inlined `formatResponse` CDP extraction directly inside the hot loop (`runWorker`) in `CaptureLoop.ts` to avoid the `.call` method invocation overhead. V8 handles the function dispatch effectively, and the added branching `typeof rawResponse.screenshotData === 'string'` in the hot loop actually slightly degraded performance (~51.097s vs baseline ~48.225s). Discarded because the dynamic function dispatch is faster than checking type/property dynamically.
+
+## PERF-297: Revert Inline Object Allocation in SeekTimeDriver and DomStrategy
+- Render time: 50.364s (Baseline: 48.743s)
+- Status: inconclusive
+- **PERF-297**: Validated the revert of inline object allocations inside the hot loops of `SeekTimeDriver` and `DomStrategy`. Previously, PERF-296 showed that instantiating object literals inside the tight loop caused overhead from V8 garbage collection and memory allocation, which was slower than simply mutating long-lived cached properties. Found that the inline allocations had already been reverted, and reran the baseline benchmark to verify stability.
