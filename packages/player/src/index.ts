@@ -3026,14 +3026,14 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
         this.toggleShortcutsOverlay();
         break;
       case "ArrowRight":
-        this.seekRelativeSeconds(e.shiftKey ? 10 : 5);
+        this.seekRelative(e.shiftKey ? 10 : 1);
         break;
       case "l":
       case "L":
         this.seekRelativeSeconds(10);
         break;
       case "ArrowLeft":
-        this.seekRelativeSeconds(e.shiftKey ? -10 : -5);
+        this.seekRelative(e.shiftKey ? -10 : -1);
         break;
       case "j":
       case "J":
