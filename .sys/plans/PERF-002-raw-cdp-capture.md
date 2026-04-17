@@ -1,11 +1,11 @@
 ---
 id: PERF-002
 slug: raw-cdp-capture
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "Jules"
 created: 2026-03-19
-completed: ""
-result: ""
+completed: "2024-05-18"
+result: "discard"
 ---
 
 # PERF-002: Bypass Playwright Overhead with Raw CDP Capture
@@ -90,3 +90,13 @@ Run a standard Canvas smoke test. The changes in `DomStrategy` should not affect
 ## Prior Art
 - Playwright page.screenshot overhead: Standard knowledge in performance-sensitive scraping contexts is to drop down to raw CDP for screenshots.
 - CDP Documentation for `Page.captureScreenshot`: https://chromedevtools.github.io/devtools-protocol/tot/Page/#method-captureScreenshot
+
+
+## Results Summary
+
+```tsv
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	47.689	600	12.58	41.3	keep	baseline
+2	47.773	600	12.56	41.3	discard	CDP captureScreenshot instead of page.screenshot
+3	47.651	600	12.59	42.6	discard	CDP captureScreenshot instead of page.screenshot
+```
