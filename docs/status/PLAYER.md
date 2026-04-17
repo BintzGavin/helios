@@ -214,3 +214,4 @@
 [v0.77.16] ✅ Completed: Document API Parity Gap - Deleted lingering plan file as the README already contained the required documentation updates.
 [v0.77.19] ✅ Completed: Improve index.ts test coverage - Added export-options.test.ts covering untested getters and setters.
 [v0.77.20] ✅ Completed: Discovered discrepancy in arrow key shortcut behavior between README documentation (seeks by frames) and actual implementation (seeks by seconds). Created plan to fix this vision gap.
+[v0.77.21] ✅ Completed: Discovered undocumented keyboard shortcuts (J, L, comma, period) in actual implementation that are missing from the README. Created plan to fix this vision gap.
