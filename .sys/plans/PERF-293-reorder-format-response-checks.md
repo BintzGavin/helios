@@ -1,11 +1,11 @@
 ---
 id: PERF-293
 slug: reorder-format-response-checks
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "Jules"
 created: 2024-05-18
-completed: ""
-result: ""
+completed: "2024-05-18"
+result: "keep"
 ---
 # PERF-293: Reorder DomStrategy formatResponse checks for CDP hot path
 
@@ -81,3 +81,13 @@ Run `npm run build:examples` or the equivalent canvas smoke tests to ensure Canv
 
 ## Correctness Check
 Verify that the output video retains all frames correctly and deterministically.
+
+## Results Summary
+```
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	49.244	600	12.18	40.7	keep	baseline
+2	51.556	600	11.64	43.2	keep	reorder formatResponse checks
+3	47.778	600	12.56	42.6	keep	reorder formatResponse checks
+4	48.157	600	12.46	41.5	keep	reorder formatResponse checks
+5	48.293	600	12.42	42.7	keep	reorder formatResponse checks
+```
