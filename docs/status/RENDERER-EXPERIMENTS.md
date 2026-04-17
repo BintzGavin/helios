@@ -127,3 +127,8 @@ Last updated by: PERF-277
 
 ## Open Questions
 - **PERF-299**: Will explicitly appending `--disable-software-rasterizer` and `--disable-gpu-compositing` to `GPU_DISABLED_ARGS` fully disable SwiftShader and improve render performance by forcing native Skia CPU rasterization?
+
+## PERF-299: Chromium Skia CPU Pathways for GPU-disabled Environments
+- Render time: 47.554s (Baseline: 61.877s)
+- Status: keep
+- **PERF-299**: Appended `--disable-software-rasterizer` and `--disable-gpu-compositing` to `GPU_DISABLED_ARGS` in `BrowserPool.ts`. The missing flags forced Chromium into SwiftShader. Adding them forces Chromium to use its native Skia CPU rasterization path, which bypasses the SwiftShader translation overhead entirely for DOM rendering. This resulted in a significant performance improvement (median: 47.554s vs baseline 61.877s). Kept.

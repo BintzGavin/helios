@@ -1,0 +1,5 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	61.877	600	9.70	42.1	keep	baseline
+2	48.815	600	12.29	42.9	keep	appended --disable-software-rasterizer and --disable-gpu-compositing
+3	47.252	600	12.70	41.4	keep	appended --disable-software-rasterizer and --disable-gpu-compositing
+4	47.554	600	12.62	41.3	keep	appended --disable-software-rasterizer and --disable-gpu-compositing
