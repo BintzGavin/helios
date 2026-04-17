@@ -1,11 +1,11 @@
 ---
 id: PERF-297
 slug: revert-inline-object-allocation
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-18
-completed: ""
-result: ""
+completed: "2026-04-17"
+result: "kept"
 ---
 
 # PERF-297: Revert Inline Object Allocation in SeekTimeDriver and DomStrategy
@@ -57,3 +57,9 @@ Run the DOM benchmark (`npx tsx tests/fixtures/benchmark.ts`) to verify performa
 ## Prior Art
 - PERF-296 (which this reverts)
 - Memory documentation confirming write barrier vs allocation overhead tradeoffs in tight loops.
+
+## Results Summary
+- **Best render time**: 50.364s (vs baseline ~48.743s)
+- **Improvement**: N/A (Verification Only)
+- **Kept experiments**: Verified that `DomStrategy.ts` and `SeekTimeDriver.ts` mutate properties rather than allocating inline objects.
+- **Discarded experiments**: None

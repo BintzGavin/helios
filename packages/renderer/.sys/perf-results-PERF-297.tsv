@@ -1,0 +1,2 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	50.364	600	11.91	42.8	keep	revert inline object allocation
