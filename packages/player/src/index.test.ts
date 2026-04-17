@@ -177,23 +177,23 @@ describe('HeliosPlayer', () => {
     // Reset mocks
     mockController.seek.mockClear();
 
-    // ArrowRight: Seek +5s (Default) -> 150 frames
+    // ArrowRight: Seek +1 frame (Default) -> 1 frame
     mockController.getState.mockReturnValue({ currentFrame: 0, duration: 10, fps: 30, isPlaying: false });
     dispatchKey('ArrowRight');
-    expect(mockController.seek).toHaveBeenCalledWith(150);
+    expect(mockController.seek).toHaveBeenCalledWith(1);
 
-    // ArrowRight + Shift: Seek +10s -> 300 frames
+    // ArrowRight + Shift: Seek +10 frames -> 10 frames
     dispatchKey('ArrowRight', { shiftKey: true });
-    expect(mockController.seek).toHaveBeenCalledWith(300);
+    expect(mockController.seek).toHaveBeenCalledWith(10);
 
-    // ArrowLeft: Seek -5s (Default) -> 150 frames
+    // ArrowLeft: Seek -1 frame (Default) -> 199 frames
     mockController.getState.mockReturnValue({ currentFrame: 200, duration: 10, fps: 30, isPlaying: false });
     dispatchKey('ArrowLeft');
-    expect(mockController.seek).toHaveBeenCalledWith(50); // 200 - 150
+    expect(mockController.seek).toHaveBeenCalledWith(199); // 200 - 1
 
-    // ArrowLeft + Shift: Seek -10s -> 300 frames
+    // ArrowLeft + Shift: Seek -10 frames -> 190 frames
     dispatchKey('ArrowLeft', { shiftKey: true });
-    expect(mockController.seek).toHaveBeenCalledWith(0); // 200 - 300 -> 0
+    expect(mockController.seek).toHaveBeenCalledWith(190); // 200 - 10
 
     // .: Seek +1
     mockController.getState.mockReturnValue({ currentFrame: 10, duration: 10, fps: 30, isPlaying: false });

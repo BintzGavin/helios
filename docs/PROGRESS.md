@@ -1,3 +1,7 @@
+### PLAYER v0.77.22
+- ✅ Completed: Fix Arrow Key Shortcuts
+
+
 ### STUDIO v0.121.5
 - ✅ Completed: Toggle Loop Shortcut - Restored loop toggle functionality using Shift+L keyboard shortcut.
 

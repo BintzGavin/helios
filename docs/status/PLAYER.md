@@ -1,4 +1,7 @@
-**Version**: 0.77.21
+**Version**: 0.77.22
+[v0.77.22] ✅ Completed: Fix Arrow Key Shortcuts
+
+
 
 [v0.77.21] 🚫 Blocked: No new plan found in /.sys/plans/ for PLAYER. Waiting for Planner to create the next implementation spec.
 
