@@ -98,3 +98,6 @@ Last updated by: PERF-277
 - **PERF-291**: Eliminated dynamic `Promise` allocation and `await` yielding inside the worker loops `getNextTask()` by allowing it to return a synchronous index integer when the buffer has capacity. While theoretically sound to avoid microtask yields and GC pressure per frame, testing showed no tangible improvement (32.381s vs baseline ~32.040s) because V8 successfully optimizes small async functions and microtask hopping very well. Kept since the logic explicitly prevents unnecessary Promise wrapping without altering behavior.
 
 - **PERF-292**: Tried eliminating `formatResponse.call` in `CaptureLoop.ts` by replacing it with direct invocation `formatResponse(rawResponse)`. V8 effectively optimizes the `.call()` dynamic dispatch overhead inside tight loops so there was no performance improvement. Render time was slightly worse (~32.204s compared to ~32.112s baseline).
+
+## Open Questions
+- **PERF-293**: Can we avoid the `Buffer.isBuffer()` function call overhead in `DomStrategy.formatResponse()` by prioritizing the `res.screenshotData` check for CDP?
