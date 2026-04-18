@@ -138,3 +138,8 @@ Last updated by: PERF-277
 - Render time: 47.554s (Baseline: 61.877s)
 - Status: keep
 - **PERF-299**: Appended `--disable-software-rasterizer` and `--disable-gpu-compositing` to `GPU_DISABLED_ARGS` in `BrowserPool.ts`. The missing flags forced Chromium into SwiftShader. Adding them forces Chromium to use its native Skia CPU rasterization path, which bypasses the SwiftShader translation overhead entirely for DOM rendering. This resulted in a significant performance improvement (median: 47.554s vs baseline 61.877s). Kept.
+
+## PERF-301: Prebind evaluate parameters in CdpTimeDriver
+- Render time: 46.667s (Baseline: ~47.554s)
+- Status: inconclusive
+- **PERF-301**: Preallocated the `Runtime.evaluate` parameter object (`{ expression: ..., awaitPromise: true }`) for the single-frame stability checks in `CdpTimeDriver.ts` hot loop. The goal was to avoid dynamic object allocation overhead. The render time improved slightly by ~1.9% (median 46.667s vs baseline 47.554s). However, this improvement is within the environmental noise margin (< 5%), showing that V8 optimizes the inline anonymous object allocation very efficiently and explicit caching does not provide a definitive, clear-cut performance gain. Discarded as inconclusive to keep the code simpler.
