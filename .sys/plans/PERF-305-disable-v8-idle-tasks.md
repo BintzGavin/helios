@@ -1,11 +1,11 @@
 ---
 id: PERF-305
 slug: disable-v8-idle-tasks
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-05-24
-completed: ""
-result: ""
+completed: "2024-05-24"
+result: "inconclusive"
 ---
 
 # PERF-305: Disable V8 Idle Tasks in Headless Chromium

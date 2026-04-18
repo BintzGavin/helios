@@ -159,3 +159,8 @@ Last updated by: PERF-303
 - Render time: 48.341s (Baseline: ~47.554s)
 - Status: discard
 - **PERF-304**: Added `--process-per-tab` to `BrowserPool.ts` Chromium flags to force multi-page instances on the same context to share renderer processes to save overhead. The median render time degraded slightly to 48.341s (vs baseline 47.554s), demonstrating that OS-level process consolidation via this flag in our specific headless usage pattern introduces contention or IPC bottlenecking rather than efficiency. Discarded.
+
+## PERF-305: Disable V8 Idle Tasks in Headless Chromium
+- Render time: 48.702s (Baseline: 48.341s)
+- Status: inconclusive
+- **PERF-305**: Added `--disable-v8-idle-tasks` to `BrowserPool.ts` Chromium flags. The median render time degraded slightly to 48.702s (vs baseline 48.341s). Adding the flag `--disable-v8-idle-tasks` instructs V8 to not perform background garbage collection during idle time. However, this did not improve the performance and it degraded slightly. This experiment was deemed inconclusive and the changes were discarded.
