@@ -119,7 +119,7 @@ export class CaptureLoop {
     let nextFrameToSubmit = 0;
     let nextFrameToWrite = 0;
     let aborted = false;
-    let waitingWorkerResolves: ((i: number) => void)[] = [];
+    const workerBlockedResolves = new Array<((i: number) => void) | null>(poolLen).fill(null);
     let frameWaiterResolve: (() => void) | null = null;
 
     const checkState = () => {
@@ -128,9 +128,11 @@ export class CaptureLoop {
         }
 
         if (aborted) {
-            while (waitingWorkerResolves.length > 0) {
-                const res = waitingWorkerResolves.shift()!;
-                res(-1);
+            for (let w = 0; w < poolLen; w++) {
+                if (workerBlockedResolves[w]) {
+                    workerBlockedResolves[w]!(-1);
+                    workerBlockedResolves[w] = null;
+                }
             }
             if (frameWaiterResolve) {
                 const res = frameWaiterResolve;
@@ -141,7 +143,12 @@ export class CaptureLoop {
         }
 
         // See if we can assign tasks to waiting workers
-        while (waitingWorkerResolves.length > 0 && nextFrameToSubmit < this.totalFrames && nextFrameToSubmit - nextFrameToWrite < maxPipelineDepth) {
+        for (let w = 0; w < poolLen; w++) {
+            if (!workerBlockedResolves[w] || nextFrameToSubmit >= this.totalFrames || nextFrameToSubmit - nextFrameToWrite >= maxPipelineDepth) {
+                continue;
+            }
+            const res = workerBlockedResolves[w]!;
+            workerBlockedResolves[w] = null;
             const i = nextFrameToSubmit++;
             const ringIndex = i & ringMask;
 
@@ -159,56 +166,51 @@ export class CaptureLoop {
                 fRes();
             }
 
-            const wRes = waitingWorkerResolves.shift()!;
-            wRes(i);
+            res(i);
         }
 
         // If we still have waiting workers but are at totalFrames, tell them to stop
         if (nextFrameToSubmit >= this.totalFrames) {
-            while (waitingWorkerResolves.length > 0) {
-                const res = waitingWorkerResolves.shift()!;
-                res(-1);
+            for (let w = 0; w < poolLen; w++) {
+                if (workerBlockedResolves[w]) {
+                    workerBlockedResolves[w]!(-1);
+                    workerBlockedResolves[w] = null;
+                }
             }
         }
     };
 
-    const getNextTask = (): number | Promise<number> => {
-        if (aborted || nextFrameToSubmit >= this.totalFrames) {
-            return -1;
-        }
-
-        if (nextFrameToSubmit - nextFrameToWrite < maxPipelineDepth) {
-            const i = nextFrameToSubmit++;
-            const ringIndex = i & ringMask;
-
-            const promise = new Promise<Buffer | string>((res, rej) => {
-                contextRing[ringIndex].resolve = res;
-                contextRing[ringIndex].reject = rej;
-            });
-            promise.catch(noopCatch); // Prevent unhandled rejections
-            framePromises[ringIndex] = promise;
-
-            if (frameWaiterResolve) {
-                const fRes = frameWaiterResolve;
-                frameWaiterResolve = null;
-                fRes();
-            }
-
-            return i;
-        } else {
-            return new Promise<number>((resolve) => {
-                waitingWorkerResolves.push(resolve);
-            });
-        }
-    };
 
     const runWorker = async (worker: WorkerInfo, workerIndex: number) => {
         const { timeDriver, strategy, page } = worker;
         const formatResponse = strategy.formatResponse;
 
         while (!aborted) {
-            const task = getNextTask();
-            const i = typeof task === 'number' ? task : await task;
+            let i: number;
+            if (aborted || nextFrameToSubmit >= this.totalFrames) {
+                i = -1;
+            } else if (nextFrameToSubmit - nextFrameToWrite < maxPipelineDepth) {
+                i = nextFrameToSubmit++;
+                const ringIndex = i & ringMask;
+
+                const promise = new Promise<Buffer | string>((res, rej) => {
+                    contextRing[ringIndex].resolve = res;
+                    contextRing[ringIndex].reject = rej;
+                });
+                promise.catch(noopCatch);
+                framePromises[ringIndex] = promise;
+
+                if (frameWaiterResolve) {
+                    const fRes = frameWaiterResolve;
+                    frameWaiterResolve = null;
+                    fRes();
+                }
+            } else {
+                i = await new Promise<number>(resolve => {
+                    workerBlockedResolves[workerIndex] = resolve;
+                });
+            }
+
             if (i === -1) break;
 
             const time = i * timeStep;
