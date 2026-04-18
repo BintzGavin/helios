@@ -1,0 +1,4 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	46.667	600	12.86	42.9	discard	Prebind evaluate params
+2	46.618	600	12.87	41.2	discard	Prebind evaluate params
+3	46.848	600	12.81	41.6	discard	Prebind evaluate params

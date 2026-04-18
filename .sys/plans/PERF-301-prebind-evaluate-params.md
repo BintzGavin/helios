@@ -1,7 +1,7 @@
 ---
 id: PERF-301
 slug: prebind-evaluate-params
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-04-18
 completed: ""
@@ -61,3 +61,11 @@ Run `npx tsx tests/verify-canvas-strategy.ts` to ensure Canvas rendering still w
 
 ## Correctness Check
 Run the DOM benchmark `npx tsx tests/fixtures/benchmark.ts` to verify performance gains and ensure the output video is generated correctly.
+
+## Results Summary
+```
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	46.667	600	12.86	42.9	discard	Prebind evaluate params
+2	46.618	600	12.87	41.2	discard	Prebind evaluate params
+3	46.848	600	12.81	41.6	discard	Prebind evaluate params
+```
