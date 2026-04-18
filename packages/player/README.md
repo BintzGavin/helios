@@ -109,6 +109,10 @@ The player includes a comprehensive set of controls:
 | `I` | Set In Point |
 | `O` | Set Out Point |
 | `X` | Clear Playback Range |
+| `J` | Seek backward 10 seconds |
+| `L` | Seek forward 10 seconds |
+| `,` | Seek backward 1 frame |
+| `.` | Seek forward 1 frame |
 | `Shift` + `D` | Toggle Diagnostics |
 | `0-9` | Seek to 0-90% |
 

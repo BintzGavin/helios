@@ -1,4 +1,5 @@
-**Version**: 0.77.22
+**Version**: 0.77.23
+[v0.77.23] ✅ Completed: Document Undocumented Shortcuts
 [v0.77.22] ✅ Completed: Fix Arrow Key Shortcuts
 
 
