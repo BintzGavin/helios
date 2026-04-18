@@ -1,11 +1,11 @@
 ---
 id: PERF-304
 slug: process-per-tab
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-24
 completed: ""
-result: ""
+result: "discarded"
 ---
 
 # PERF-304: Process Per Tab Architecture for Playwright Headless Chromium
@@ -52,3 +52,9 @@ Run the DOM render tests to ensure multi-page worker pools still capture frames 
 
 ## Prior Art
 - `PERF-213`: Attempted `--single-process` which failed.
+
+## Results Summary
+- **Best render time**: 48.161s (vs baseline ~47.554s)
+- **Improvement**: -1.65% (worse)
+- **Kept experiments**: []
+- **Discarded experiments**: [process-per-tab flag]

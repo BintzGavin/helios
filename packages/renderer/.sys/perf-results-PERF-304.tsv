@@ -1,0 +1,4 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	50.027	600	11.99	43.1	discard	process-per-tab flag
+2	48.341	600	12.41	41.0	discard	process-per-tab flag
+3	48.161	600	12.46	43.1	discard	process-per-tab flag
