@@ -364,3 +364,5 @@ PERF-286	32.361	90	2.78	22.9	keep	raw CDP evaluate multi-frame
 2	51.097	600	11.74	41.3	discard	PERF-294 inline formatResponse
 3	48.923	600	12.26	41.5	discard	PERF-294 inline formatResponse
 5	48.039	600	12.49	42.6	discard	PERF-298 Already Implemented via PERF-299
+
+6	48.866	600	12.28	43.3	discard	PERF-302 inline object allocation

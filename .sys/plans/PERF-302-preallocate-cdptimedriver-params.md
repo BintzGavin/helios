@@ -1,11 +1,11 @@
 ---
 id: PERF-302
 slug: preallocate-cdptimedriver-params
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-05-24
-completed: ""
-result: ""
+completed: "2026-04-18"
+result: "discarded"
 ---
 
 # PERF-302: Preallocate Runtime.evaluate params in CdpTimeDriver.ts
@@ -61,3 +61,9 @@ Run the DOM smoke tests (`npx tsx tests/verify-dom-strategy-capture.ts`) and ver
 
 ## Prior Art
 - `SeekTimeDriver.ts` uses `this.evaluateParams` to avoid inline object allocation.
+
+## Results Summary
+- **Best render time**: 48.866s (vs baseline ~48.3s)
+- **Improvement**: 0% (discarded)
+- **Kept experiments**: []
+- **Discarded experiments**: [PERF-302]
