@@ -4,7 +4,7 @@
 
 
 
-[v0.77.21] 🚫 Blocked: No new plan found in /.sys/plans/ for PLAYER. Waiting for Planner to create the next implementation spec.
+[v0.77.24] ✅ Completed: Add Undocumented Shortcuts to UI - Created plan to add missing J, L, comma, and period shortcuts to the Shortcuts UI menu.
 
 [v0.77.18] ✅ Completed: Fix Duplicate README Entry - Removed duplicate getSchema entry from README.md.
 ## Status Log
