@@ -154,3 +154,8 @@ Last updated by: PERF-303
 - Render time: 59.078s (Baseline: 2.004s)
 - Status: discard
 - **PERF-262**: Attempted to prebind the stability timeout promise executor in `CdpTimeDriver.ts` to avoid dynamic closure allocation. This degraded performance significantly compared to the baseline (59.078s vs 2.004s). This indicates that V8 optimizes the inline anonymous Promise and closure creation efficiently, and the prebinding approach may have introduced other state-handling overhead. Discarded.
+
+## PERF-304: Process Per Tab Architecture for Playwright Headless Chromium
+- Render time: 48.341s (Baseline: ~47.554s)
+- Status: discard
+- **PERF-304**: Added `--process-per-tab` to `BrowserPool.ts` Chromium flags to force multi-page instances on the same context to share renderer processes to save overhead. The median render time degraded slightly to 48.341s (vs baseline 47.554s), demonstrating that OS-level process consolidation via this flag in our specific headless usage pattern introduces contention or IPC bottlenecking rather than efficiency. Discarded.
