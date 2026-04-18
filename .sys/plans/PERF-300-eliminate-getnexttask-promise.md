@@ -1,11 +1,11 @@
 ---
 id: PERF-300
 slug: eliminate-getnexttask-promise
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor"
 created: 2024-04-18
-completed: ""
-result: ""
+completed: "2026-04-18"
+result: "inconclusive"
 ---
 
 # PERF-300: Eliminate getNextTask() Promise Allocation in CaptureLoop.ts

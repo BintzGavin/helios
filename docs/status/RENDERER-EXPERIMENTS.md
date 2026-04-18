@@ -129,6 +129,11 @@ Last updated by: PERF-277
 ## Open Questions
 - **PERF-299**: Will explicitly appending `--disable-software-rasterizer` and `--disable-gpu-compositing` to `GPU_DISABLED_ARGS` fully disable SwiftShader and improve render performance by forcing native Skia CPU rasterization?
 
+## PERF-300: Eliminate getNextTask() Promise Allocation in CaptureLoop.ts
+- Render time: 48.785s (Baseline: 48.832s)
+- Status: inconclusive
+- **PERF-300**: Eliminated the dynamic `Promise` allocation in `CaptureLoop.ts` `getNextTask()` by replacing it with a statically allocated block array of promises (one for each worker pool spot). Tested the performance. Render times remained almost identical to baseline (48.785s vs 48.832s), indicating that V8 object allocation and runtime microtask hopping inside the single-process environment was not the bottleneck here. Left the structural change as it prevents allocating arbitrary numbers of objects under heavy backpressure.
+
 ## PERF-299: Chromium Skia CPU Pathways for GPU-disabled Environments
 - Render time: 47.554s (Baseline: 61.877s)
 - Status: keep
