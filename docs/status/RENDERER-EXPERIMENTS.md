@@ -149,3 +149,8 @@ Last updated by: PERF-303
 - Render time: 48.141s (Baseline: ~47.375s)
 - Status: inconclusive
 - **PERF-303**: Eliminated the `formatResponse` dynamic dispatch completely by moving its logic directly into `DomStrategy.capture()` to eliminate per-frame function call overhead in `CaptureLoop.ts`. The performance remained largely identical to baseline within the noise margin (median ~48.141s vs baseline ~47.3s), proving that V8 function call dispatch via `.call()` inside hot loops was not the bottleneck here. Left the structural change in as it simplifies the core capture loop worker significantly and shifts CDP-specific mapping into the exact strategy implementation natively.
+
+## PERF-262: Prebind stability timeout in CdpTimeDriver.ts
+- Render time: 59.078s (Baseline: 2.004s)
+- Status: discard
+- **PERF-262**: Attempted to prebind the stability timeout promise executor in `CdpTimeDriver.ts` to avoid dynamic closure allocation. This degraded performance significantly compared to the baseline (59.078s vs 2.004s). This indicates that V8 optimizes the inline anonymous Promise and closure creation efficiently, and the prebinding approach may have introduced other state-handling overhead. Discarded.

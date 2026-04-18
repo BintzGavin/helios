@@ -2,3 +2,4 @@ run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
 1	2.004	150	74.85	48.0	keep	baseline
 2	2.692	150	55.71	34.4	discard	prebind stability timeout executor
 3	2.843	150	52.76	34.8	discard	prebind-stability-timeout
+4	59.078	600	10.16	42.6	discard	prebind-stability-timeout
