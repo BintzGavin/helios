@@ -3,6 +3,7 @@ Current best: 32.040s (baseline was 43.227s, -25.6%)
 Last updated by: PERF-277
 
 ## What Doesn't Work (and Why)
+- **PERF-302**: Attempted to preallocate the `Runtime.evaluate` parameter object in `CdpTimeDriver.ts` (`setTime` single-frame path) to avoid dynamic object allocation (`{ expression: ... }`). Yielded median time 48.866s (baseline was ~48.3s). Discarded because V8 efficiently optimizes inline object allocation here, and storing it statically did not provide any gain and slightly degraded performance.
 - **Bypass Playwright Overhead with Raw CDP Capture (PERF-002)**
   - What: Replaced Playwright's `page.screenshot()` with raw CDP `Page.captureScreenshot` in `DomStrategy.capture()`.
   - Why it didn't work: The render time actually regressed slightly (~47.7s vs ~47.6s). `page.screenshot` is only used as a fallback when `targetSelector` is enabled, and `HeadlessExperimental.beginFrame` is the primary capture mechanism. The overhead of Playwright's internal checks is minimal compared to the overall pipeline, and replacing it didn't yield improvements.
