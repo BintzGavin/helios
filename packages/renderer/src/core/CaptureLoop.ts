@@ -183,7 +183,6 @@ export class CaptureLoop {
 
     const runWorker = async (worker: WorkerInfo, workerIndex: number) => {
         const { timeDriver, strategy, page } = worker;
-        const formatResponse = strategy.formatResponse;
 
         while (!aborted) {
             let i: number;
@@ -221,8 +220,7 @@ export class CaptureLoop {
 
             try {
                 timeDriver.setTime(page, compositionTimeInSeconds).then(undefined, noopCatch);
-                const rawResponse = await strategy.capture(page, time);
-                const buffer = formatResponse ? formatResponse.call(strategy, rawResponse) : rawResponse;
+                const buffer = await strategy.capture(page, time);
                 if (ctx.resolve) ctx.resolve(buffer);
             } catch (e) {
                 if (ctx.reject) ctx.reject(e);

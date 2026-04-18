@@ -26,7 +26,7 @@ export class DomStrategy implements RenderStrategy {
   private emptyImageBase64: string = "";
   private frameInterval: number = 0;
 
-  public formatResponse = (res: any): Buffer | string => {
+  private processCaptureResult(res: any): Buffer | string {
     if (res && res.screenshotData) {
       this.lastFrameData = res.screenshotData;
       return res.screenshotData;
@@ -39,7 +39,7 @@ export class DomStrategy implements RenderStrategy {
       this.lastFrameData = this.emptyImageBase64;
       return this.emptyImageBase64;
     }
-  };
+  }
 
   constructor(private options: RendererOptions) {
     if (this.options.videoCodec === 'copy') {
@@ -215,24 +215,27 @@ export class DomStrategy implements RenderStrategy {
   }
 
 
-  capture(page: Page, frameTime: number): Promise<any> {
+  async capture(page: Page, frameTime: number): Promise<Buffer | string> {
     if (this.targetElementHandle) {
       if (this.targetBeginFrameParams.screenshot.clip.width > 0) {
         this.targetBeginFrameParams.frameTimeTicks = 10000 + frameTime;
 
-        return this.cdpSession!.send('HeadlessExperimental.beginFrame', this.targetBeginFrameParams);
+        const res = await this.cdpSession!.send('HeadlessExperimental.beginFrame', this.targetBeginFrameParams);
+        return this.processCaptureResult(res);
       }
 
       const isOpaque = this.cdpScreenshotParams.format === 'jpeg';
-      return this.targetElementHandle.screenshot({
+      const res = await this.targetElementHandle.screenshot({
         type: this.cdpScreenshotParams.format,
         quality: this.cdpScreenshotParams.quality,
         omitBackground: !isOpaque
       });
+      return this.processCaptureResult(res);
     }
 
     this.beginFrameParams.frameTimeTicks = 10000 + frameTime;
-    return this.cdpSession!.send('HeadlessExperimental.beginFrame', this.beginFrameParams);
+    const res = await this.cdpSession!.send('HeadlessExperimental.beginFrame', this.beginFrameParams);
+    return this.processCaptureResult(res);
   }
 
   async finish(page: Page): Promise<void> {

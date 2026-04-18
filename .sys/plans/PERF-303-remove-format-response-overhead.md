@@ -1,11 +1,11 @@
 ---
 id: PERF-303
 slug: remove-format-response-overhead
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-24
-completed: ""
-result: ""
+completed: "2026-04-18"
+result: "inconclusive"
 ---
 
 # PERF-303: Remove formatResponse call in CaptureLoop.ts
@@ -114,3 +114,9 @@ Run the DOM smoke tests (`npx tsx tests/verify-dom-strategy-capture.ts`) to ensu
 
 ## Prior Art
 - **PERF-294**: Attempted to inline `formatResponse` CDP extraction directly inside the hot loop but degraded performance due to branching overhead inside the loop. By moving the logic *into* the `capture()` promise resolution where it belongs natively, we avoid polluting the `CaptureLoop.ts` worker with strategy-specific branching.
+
+## Results Summary
+- **Best render time**: 48.141s (vs baseline ~47.3s)
+- **Improvement**: Inconclusive (Noise Margin)
+- **Kept experiments**: Removed formatResponse, consolidated processing into DomStrategy capture
+- **Discarded experiments**: None
