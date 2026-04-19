@@ -1,0 +1,8 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	47.304	600	12.68	43.1	keep	baseline
+2	47.112	600	12.74	43.5	keep	baseline
+3	47.768	600	12.56	43.4	keep	baseline
+4	47.078	600	12.74	41.7	inconclusive	cache-cdp-promises
+5	51.000	600	11.76	42.2	inconclusive	cache-cdp-promises
+6	46.937	600	12.78	43.6	inconclusive	cache-cdp-promises
+7	48.578	600	12.35	42.5	inconclusive	cache-cdp-promises

@@ -178,3 +178,8 @@ Last updated by: PERF-303
 - Render time: 49.152s (Baseline: 48.102s)
 - Status: discard
 - **PERF-307**: Re-tested adding `--disable-renderer-backgrounding` and `--disable-backgrounding-occluded-windows` to `BrowserPool.ts` Chromium flags under the new multi-worker actor model. Expected performance gain by preventing Chromium from deprioritizing background renderer processes, but it actually degraded performance (median 49.152s vs baseline 48.102s). This suggests OS scheduling heuristics or IPC congestion worsens when explicitly forcing Chromium to not background non-visible renderers in a highly saturated environment. Discarded.
+
+## PERF-309: Cache CDP Synchronization Promises in SeekTimeDriver
+- Render time: 47.078s (Baseline: 47.304s)
+- Status: inconclusive
+- **PERF-309**: Attempted to preallocate the `Runtime.evaluate` parameter object inside `SeekTimeDriver.ts` hot loop for multiple contexts (iframes). This replaced per-frame dynamic object allocations with property assignments on statically cached objects (`cachedEvaluateParams`). The performance change was inconclusive as the render times fluctuated closely around the baseline (median ~47.0s vs ~47.3s), suggesting that V8 garbage collection and allocation overhead for these simple literal objects is already very well optimized and doesn't bottleneck the multi-frame virtual time seeking. The experiment was discarded to avoid unnecessary caching state complexity.
