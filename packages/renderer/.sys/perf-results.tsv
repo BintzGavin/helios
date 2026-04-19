@@ -4,3 +4,5 @@ run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
 3	49.280	600	12.18	42.0	keep	Removed formatResponse overhead
 4	48.141	600	12.46	43.2	keep	Removed formatResponse overhead
 5	47.147	600	12.73	41.6	keep	Removed formatResponse overhead
+
+6	46.939	600	12.78	43.3	keep	Cache Media Synchronization Promises in SeekTimeDriver
