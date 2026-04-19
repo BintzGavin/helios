@@ -169,3 +169,8 @@ Last updated by: PERF-303
 - Render time: 48.608s (Baseline: 48.156s)
 - Status: discard
 - **PERF-004**: Attempted to use `webp` format as intermediate image capturing format by extending types and `CanvasStrategy.ts` implementation. The tests and implementation successfully passed types and supported `webp` without failure but the rendering median performance slightly degraded (48.608s vs 48.156s). In a non-hardware accelerated environment for Chromium screenshot encoding, JPEG encoding overhead and Node.js intermediate base64 mapping seems sufficiently optimized by existing pathways. Discarded the changes in code.
+
+## PERF-307: Disable Renderer Backgrounding in Multi-Worker Actor Model
+- Render time: 49.152s (Baseline: 48.102s)
+- Status: discard
+- **PERF-307**: Re-tested adding `--disable-renderer-backgrounding` and `--disable-backgrounding-occluded-windows` to `BrowserPool.ts` Chromium flags under the new multi-worker actor model. Expected performance gain by preventing Chromium from deprioritizing background renderer processes, but it actually degraded performance (median 49.152s vs baseline 48.102s). This suggests OS scheduling heuristics or IPC congestion worsens when explicitly forcing Chromium to not background non-visible renderers in a highly saturated environment. Discarded.

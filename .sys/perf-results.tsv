@@ -1,1 +1,2 @@
 2	33.527	90	2.68	36.5	keep	PERF-291: Eliminate Dynamic Promise Allocation in CaptureLoop.ts getNextTask
+3	49.152	90	2.68	36.5	discard	PERF-307: Disable Renderer Backgrounding
