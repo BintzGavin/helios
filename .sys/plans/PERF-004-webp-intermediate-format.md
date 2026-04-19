@@ -1,11 +1,11 @@
 ---
 id: PERF-004
 slug: webp-intermediate-format
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2026-10-18
-completed: ""
-result: ""
+completed: "2026-04-19"
+result: "discarded"
 ---
 
 # PERF-004: Intermediate Format Optimization (WEBP)
@@ -60,3 +60,9 @@ Run a standard Canvas smoke test. The changes should not negatively impact the C
 
 ## Prior Art
 - Image format performance comparisons in Chromium often show WebP encoding is faster than PNG, especially for screenshots.
+## Results Summary
+- **Best render time**: 48.608s (vs baseline 48.156s)
+- **Improvement**: 0% (degraded)
+- **Kept experiments**: [none]
+- **Discarded experiments**:
+  - PERF-004: Added webp support to CanvasStrategy and made it the default for alpha channels. Degraded render time slightly.

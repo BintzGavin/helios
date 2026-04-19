@@ -1,0 +1,7 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	49.584	600	12.10	41.5	keep	baseline
+2	47.954	600	12.51	43.5	keep	baseline
+3	48.156	600	12.46	43.6	keep	baseline
+4	48.608	600	12.34	43.2	discard	webp intermediate format
+5	48.284	600	12.43	42.1	discard	webp intermediate format
+6	48.925	600	12.26	42.0	discard	webp intermediate format
