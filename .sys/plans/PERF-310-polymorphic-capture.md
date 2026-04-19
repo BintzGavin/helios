@@ -1,11 +1,11 @@
 ---
 id: PERF-310
 slug: polymorphic-capture
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-25
-completed: ""
-result: ""
+completed: "2026-04-19"
+result: "no-improvement"
 ---
 
 # PERF-310: Polymorphic Capture Method in DomStrategy
@@ -96,3 +96,10 @@ Run `npx tsx tests/verify-canvas-selector.ts` to verify targeted element capture
 
 ## Prior Art
 PERF-201 originally attempted this using polymorphic assignment but was discarded. By using arrow functions, we aim to verify if the previous rejection was due to `.bind()` overhead.
+
+
+## Results Summary
+- **Best render time**: 37.913s (vs baseline 38.031s)
+- **Improvement**: ~0.3% (within noise margin)
+- **Kept experiments**: []
+- **Discarded experiments**: [polymorphic capture using arrow functions]

@@ -3,6 +3,10 @@ Current best: 47.554s (baseline was 61.877s, -23.1%)
 Last updated by: PERF-303
 
 ## What Doesn't Work (and Why)
+- Tried to optimize branch prediction in `DomStrategy.capture` by assigning the method dynamically in `prepare()` (polymorphic capture) using arrow functions to prevent branch evaluation overhead on every frame. (PERF-310)
+  - **WHY it didn't work**: The variance was within the noise margin (<0.5%). Branch prediction for `if (this.targetElementHandle)` on every frame is fast enough that modifying it via polymorphic assignments provides no measurable benefit and only complicates the class structure.
+
+
 - **PERF-302**: Attempted to preallocate the `Runtime.evaluate` parameter object in `CdpTimeDriver.ts` (`setTime` single-frame path) to avoid dynamic object allocation (`{ expression: ... }`). Yielded median time 48.866s (baseline was ~48.3s). Discarded because V8 efficiently optimizes inline object allocation here, and storing it statically did not provide any gain and slightly degraded performance.
 - **Bypass Playwright Overhead with Raw CDP Capture (PERF-002)**
   - What: Replaced Playwright's `page.screenshot()` with raw CDP `Page.captureScreenshot` in `DomStrategy.capture()`.
