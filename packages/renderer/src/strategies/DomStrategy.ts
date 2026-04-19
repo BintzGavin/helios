@@ -145,7 +145,7 @@ export class DomStrategy implements RenderStrategy {
       screenshotOptions.omitBackground = hasAlpha;
     }
 
-    const cdpScreenshotParams: any = { format };
+    const cdpScreenshotParams: any = { format, optimizeForSpeed: true };
     if ((format === 'jpeg' || format === 'webp') && quality !== undefined) {
       cdpScreenshotParams.quality = quality;
     }
