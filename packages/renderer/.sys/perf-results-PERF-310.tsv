@@ -1,0 +1,6 @@
+1	38.061	300	7.88	39.0	keep	baseline
+2	38.031	300	7.89	37.4	keep	baseline
+3	39.760	300	7.55	37.6	keep	baseline
+4	37.974	300	7.90	38.0	discard	polymorphic capture using arrow functions
+5	37.913	300	7.91	39.5	discard	polymorphic capture using arrow functions
+6	37.931	300	7.91	37.2	discard	polymorphic capture using arrow functions
