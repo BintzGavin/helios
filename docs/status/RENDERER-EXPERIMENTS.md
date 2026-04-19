@@ -164,3 +164,8 @@ Last updated by: PERF-303
 - Render time: 48.702s (Baseline: 48.341s)
 - Status: inconclusive
 - **PERF-305**: Added `--disable-v8-idle-tasks` to `BrowserPool.ts` Chromium flags. The median render time degraded slightly to 48.702s (vs baseline 48.341s). Adding the flag `--disable-v8-idle-tasks` instructs V8 to not perform background garbage collection during idle time. However, this did not improve the performance and it degraded slightly. This experiment was deemed inconclusive and the changes were discarded.
+
+## PERF-004: Intermediate Format Optimization (WEBP)
+- Render time: 48.608s (Baseline: 48.156s)
+- Status: discard
+- **PERF-004**: Attempted to use `webp` format as intermediate image capturing format by extending types and `CanvasStrategy.ts` implementation. The tests and implementation successfully passed types and supported `webp` without failure but the rendering median performance slightly degraded (48.608s vs 48.156s). In a non-hardware accelerated environment for Chromium screenshot encoding, JPEG encoding overhead and Node.js intermediate base64 mapping seems sufficiently optimized by existing pathways. Discarded the changes in code.
