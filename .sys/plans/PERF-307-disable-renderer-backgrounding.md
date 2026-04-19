@@ -1,11 +1,11 @@
 ---
 id: PERF-307
 slug: disable-renderer-backgrounding
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "jules"
 created: 2024-05-24
-completed: ""
-result: ""
+completed: 2024-05-24
+result: "failed"
 ---
 
 # PERF-307: Disable Renderer Backgrounding in Multi-Worker Actor Model
