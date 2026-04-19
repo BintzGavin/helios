@@ -187,3 +187,8 @@ Last updated by: PERF-303
 - Render time: 47.078s (Baseline: 47.304s)
 - Status: inconclusive
 - **PERF-309**: Attempted to preallocate the `Runtime.evaluate` parameter object inside `SeekTimeDriver.ts` hot loop for multiple contexts (iframes). This replaced per-frame dynamic object allocations with property assignments on statically cached objects (`cachedEvaluateParams`). The performance change was inconclusive as the render times fluctuated closely around the baseline (median ~47.0s vs ~47.3s), suggesting that V8 garbage collection and allocation overhead for these simple literal objects is already very well optimized and doesn't bottleneck the multi-frame virtual time seeking. The experiment was discarded to avoid unnecessary caching state complexity.
+
+## PERF-311: optimizeForSpeed in beginFrame for DOM Capture
+- Render time: ~32.118s (Baseline: ~32.108s)
+- Status: inconclusive
+- **PERF-311**: Added `optimizeForSpeed: true` to the screenshot parameters passed to `HeadlessExperimental.beginFrame` during DOM capture in `DomStrategy.ts`. While Chromium documentation suggests this flag prioritizes encoding speed, benchmark results inside the headless VM environment showed no measurable performance difference (median 32.118s vs baseline 32.108s). The Chromium screenshot encoding pathway is likely not the bottleneck, or the flag's effect is negligible for our specific headless setup and frame dimensions. Left the code change as it doesn't degrade performance and may yield benefits on other hardware or larger resolutions.

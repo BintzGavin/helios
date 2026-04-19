@@ -1,7 +1,7 @@
 ---
 id: PERF-311
 slug: optimize-for-speed
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-05-25
 completed: ""

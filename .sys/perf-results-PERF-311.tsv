@@ -1,0 +1,8 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	32.299	90	2.79	37.8	keep	baseline
+2	32.089	90	2.80	37.4	keep	baseline
+3	32.136	90	2.80	37.4	keep	baseline
+4	32.101	90	2.80	37.6	keep	baseline
+5	32.120	90	2.80	37.6	inconclusive	optimizeForSpeed: true in beginFrame
+6	32.103	90	2.80	37.5	inconclusive	optimizeForSpeed: true in beginFrame
+7	32.131	90	2.80	36.7	inconclusive	optimizeForSpeed: true in beginFrame
