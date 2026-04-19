@@ -1,11 +1,11 @@
 ---
 id: PERF-309
 slug: cache-cdp-promises
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2026-04-19
-completed: ""
-result: ""
+completed: "2024-05-18"
+result: "no-improvement"
 ---
 
 # PERF-309: Cache CDP Synchronization Promises in SeekTimeDriver
@@ -136,3 +136,9 @@ Run `npx tsx tests/verify-dom-strategy-capture.ts` to verify DOM output is corre
 
 ## Prior Art
 `PERF-302` tried preallocating `cdpTimeDriver` parameters and found it to be inconclusive because the anonymous object allocation was efficient enough, but `CdpTimeDriver` single context hot path didn't scale proportionally with iframes. This change specifically targets multi-frame CDP context evaluation where inline allocations compound across frames and `SeekTimeDriver`.
+
+## Results Summary
+- **Best render time**: 46.937s (vs baseline ~47.304s)
+- **Improvement**: ~0.8% (within noise margin)
+- **Kept experiments**: []
+- **Discarded experiments**: [PERF-309]
