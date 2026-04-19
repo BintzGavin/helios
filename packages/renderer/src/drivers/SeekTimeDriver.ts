@@ -81,12 +81,15 @@ export class SeekTimeDriver implements TimeDriver {
         let cachedMediaElements = null;
 
         function createMediaPromise(el) {
-          return new Promise((resolve) => {
+          if (el.__helios_sync_promise) return el.__helios_sync_promise;
+
+          el.__helios_sync_promise = new Promise((resolve) => {
             let resolved = false;
             const finish = () => {
               if (resolved) return;
               resolved = true;
               cleanup();
+              el.__helios_sync_promise = null;
               resolve();
             };
             const cleanup = () => {
@@ -98,6 +101,8 @@ export class SeekTimeDriver implements TimeDriver {
             el.addEventListener('canplay', finish);
             el.addEventListener('error', finish);
           });
+
+          return el.__helios_sync_promise;
         }
 
         window.__helios_invalidate_cache = () => {
