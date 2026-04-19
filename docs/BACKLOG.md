@@ -78,7 +78,7 @@ This backlog tracks concrete deliverables derived from [`AGENTS.md`](../AGENTS.m
   - **Dependencies**: Cloudflare Workers SDK.
   - **Files**: `packages/infrastructure/src/adapters/cloudflare-sandbox-adapter.ts`, test, benchmark.
 
-- [x] **R2 artifact storage adapter (`R2StorageAdapter`).**
+- [x] **R2 artifact storage adapter (`R2StorageAdapter`).**\n\n- [x] **Cloudflare Sandbox Deployment Scaffold (`helios deploy cloudflare-sandbox`).**\n  - Scaffolds a full Cloudflare Workflow and Sandbox deployment.\n  - Validated template includes `keepAlive` and log harvesting.
   - Implements existing `ArtifactStorage` interface for Cloudflare R2.
   - Used for chunk output persistence, log harvesting, and checkpoint/resume.
   - **Dependencies**: S3-compatible SDK or Cloudflare Workers SDK.
