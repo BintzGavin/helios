@@ -1,0 +1,4 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	35.976	30	0.83	0.0	keep	Baseline and experiment are comparable. Removing branch overhead.
+2	35.963	30	0.83	0.0	keep	Baseline and experiment are comparable. Removing branch overhead.
+3	35.965	30	0.83	0.0	keep	Baseline and experiment are comparable. Removing branch overhead.
