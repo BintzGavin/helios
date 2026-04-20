@@ -26,17 +26,6 @@ export class DomStrategy implements RenderStrategy {
   private emptyImageBase64: string = "";
   private frameInterval: number = 0;
 
-  private processCaptureResult(res: any): Buffer | string {
-    if (res && res.screenshotData) {
-      this.lastFrameData = res.screenshotData;
-      return res.screenshotData;
-    } else if (Buffer.isBuffer(res)) {
-      this.lastFrameData = res;
-      return res;
-    }
-    return this.lastFrameData!;
-  }
-
   constructor(private options: RendererOptions) {
     if (this.options.videoCodec === 'copy') {
       throw new Error("DomStrategy produces image sequences and cannot be used with 'copy' codec. Please use a transcoding codec like 'libx264' (default).");
@@ -219,7 +208,14 @@ export class DomStrategy implements RenderStrategy {
         this.targetBeginFrameParams.frameTimeTicks = 10000 + frameTime;
 
         const res = await this.cdpSession!.send('HeadlessExperimental.beginFrame', this.targetBeginFrameParams);
-        return this.processCaptureResult(res);
+        if (res && res.screenshotData) {
+      this.lastFrameData = res.screenshotData;
+      return res.screenshotData;
+    } else if (Buffer.isBuffer(res)) {
+      this.lastFrameData = res;
+      return res;
+    }
+    return this.lastFrameData!;
       }
 
       const isOpaque = this.cdpScreenshotParams.format === 'jpeg';
@@ -228,12 +224,26 @@ export class DomStrategy implements RenderStrategy {
         quality: this.cdpScreenshotParams.quality,
         omitBackground: !isOpaque
       });
-      return this.processCaptureResult(res);
+      if (res && res.screenshotData) {
+      this.lastFrameData = res.screenshotData;
+      return res.screenshotData;
+    } else if (Buffer.isBuffer(res)) {
+      this.lastFrameData = res;
+      return res;
+    }
+    return this.lastFrameData!;
     }
 
     this.beginFrameParams.frameTimeTicks = 10000 + frameTime;
     const res = await this.cdpSession!.send('HeadlessExperimental.beginFrame', this.beginFrameParams);
-    return this.processCaptureResult(res);
+    if (res && res.screenshotData) {
+      this.lastFrameData = res.screenshotData;
+      return res.screenshotData;
+    } else if (Buffer.isBuffer(res)) {
+      this.lastFrameData = res;
+      return res;
+    }
+    return this.lastFrameData!;
   }
 
   async finish(page: Page): Promise<void> {

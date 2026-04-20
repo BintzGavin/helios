@@ -1,0 +1,2 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	41.250	300	7.27	39.2	keep	inline processCaptureResult
