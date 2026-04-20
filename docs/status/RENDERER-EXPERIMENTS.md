@@ -28,6 +28,11 @@ Last updated by: PERF-321
 - **PERF-296**: Replaced object mutation with inline object allocation in the hot loops of `SeekTimeDriver.ts` and `DomStrategy.ts`. The median render time worsened to ~48.743s compared to the baseline of ~47.232s. This indicates that creating new object literals inside the hot loop adds more overhead than the write barriers caused by mutating the long-lived properties. Discarded as slower.
 
 ## What Works
+## PERF-322: Eliminate dead branches in DomStrategy capture
+- Render time: 32.089s (Baseline: 45.321s)
+- Status: keep
+- **PERF-322**: Removed dead branches checking `Buffer.isBuffer(res)` in CDP paths and `res.screenshotData` in Playwright target paths. Because `HeadlessExperimental.beginFrame` strictly returns a CDP JSON object and *never* a Node.js `Buffer`, the function call was a waste. The performance improved significantly by eliminating unneeded function calls on the hot path. Kept.
+
 - **PERF-321**: Prebound the promise resolve executors for `workerBlockedResolves` in `CaptureLoop.ts` outside the hot loop. This avoids dynamic closure memory allocation during backpressure events when workers wait. Render times improved compared to the baseline (45.321s vs 47.554s). Kept.
 ## PERF-308: Cache Media Synchronization Promises in SeekTimeDriver
 - Render time: 46.939s (Baseline: 47.147s)
@@ -63,6 +68,11 @@ Last updated by: PERF-321
 - Can we eliminate dynamic Promise `.then` closure allocation in the `CaptureLoop.ts` by pre-binding?
 
 ## What Works
+## PERF-322: Eliminate dead branches in DomStrategy capture
+- Render time: 32.089s (Baseline: 45.321s)
+- Status: keep
+- **PERF-322**: Removed dead branches checking `Buffer.isBuffer(res)` in CDP paths and `res.screenshotData` in Playwright target paths. Because `HeadlessExperimental.beginFrame` strictly returns a CDP JSON object and *never* a Node.js `Buffer`, the function call was a waste. The performance improved significantly by eliminating unneeded function calls on the hot path. Kept.
+
 - **PERF-285**: Optimized SeekTimeDriver single-frame evaluation by replacing Playwright IPC closure with raw CDP string evaluation over Runtime.evaluate. Improved render time to ~32.1s.
 - **PERF-274**: Replaced syncMedia closure evaluation with string evaluation in CdpTimeDriver.ts. Faster and avoids IPC overhead.
 - Pre-bind fallback callback in DomStrategy.capture() (PERF-269) - Eliminates GC pressure overhead in fallback screenshot loop
@@ -125,6 +135,11 @@ Last updated by: PERF-321
 - **PERF-286**: Can we improve multi-frame synchronization in SeekTimeDriver by prefetching Context IDs and iterating with raw CDP Runtime.evaluate over all frames?
 
 ## What Works
+## PERF-322: Eliminate dead branches in DomStrategy capture
+- Render time: 32.089s (Baseline: 45.321s)
+- Status: keep
+- **PERF-322**: Removed dead branches checking `Buffer.isBuffer(res)` in CDP paths and `res.screenshotData` in Playwright target paths. Because `HeadlessExperimental.beginFrame` strictly returns a CDP JSON object and *never* a Node.js `Buffer`, the function call was a waste. The performance improved significantly by eliminating unneeded function calls on the hot path. Kept.
+
 - Replaced Playwright closure IPC with raw CDP `Runtime.evaluate` for multi-frame in `SeekTimeDriver`
 - Improved render time for multi-frame compositions
 - PERF-286
@@ -146,6 +161,11 @@ Last updated by: PERF-321
   - Plan: PERF-287
 
 ## What Works
+## PERF-322: Eliminate dead branches in DomStrategy capture
+- Render time: 32.089s (Baseline: 45.321s)
+- Status: keep
+- **PERF-322**: Removed dead branches checking `Buffer.isBuffer(res)` in CDP paths and `res.screenshotData` in Playwright target paths. Because `HeadlessExperimental.beginFrame` strictly returns a CDP JSON object and *never* a Node.js `Buffer`, the function call was a waste. The performance improved significantly by eliminating unneeded function calls on the hot path. Kept.
+
 - Inlined worker call arguments in `CaptureLoop.ts` (PERF-288) - ~23.5% improvement
 - CdpTimeDriver Multi-Frame CDP Evaluate (PERF-289) - Improved render speed
 
