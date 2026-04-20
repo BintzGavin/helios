@@ -1,0 +1,5 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	47.554	300	6.30	39.0	keep	baseline
+2	48.628	300	6.16	45.2	discard	preallocate noopcatch in seek
+3	48.526	300	6.18	43.2	discard	preallocate noopcatch in seek
+4	48.556	300	6.17	43.0	discard	preallocate noopcatch in seek
