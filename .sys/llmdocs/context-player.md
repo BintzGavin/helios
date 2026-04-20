@@ -135,3 +135,6 @@ The following standard media session metadata attributes are available as proper
 ## Track Lists
 - `HeliosAudioTrackList`: Implements standard HTMLMediaElement event handler properties (`onaddtrack`, `onremovetrack`, `onchange`).
 - `HeliosVideoTrackList`: Implements standard HTMLMediaElement event handler properties (`onaddtrack`, `onremovetrack`, `onchange`).
+
+### v0.77.25 Update
+- Created plan to resolve `document is not defined` error in tests by adding vitest environment pragma.
