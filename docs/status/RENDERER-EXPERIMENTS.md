@@ -249,3 +249,8 @@ Last updated by: PERF-303
 - Render time: 35.965s (Baseline: ~35.965s)
 - Status: keep
 - **PERF-317**: Inlined the `emptyImageBase64` initialization into `lastFrameData` during `prepare()`. This allowed simplifying the `processCaptureResult` hot path by removing two branches that handled the `null` fallback on every frame. The render time is similar (within noise margins), but the branch simplification reduces V8 execution paths. Kept.
+
+## PERF-320: Inline processCaptureResult in DomStrategy
+- Render time: 41.250s (Baseline: 47.554s)
+- Status: keep
+- **PERF-320**: Inlined `processCaptureResult` directly into `DomStrategy.capture()` to eliminate function call overhead and simplify the branch prediction inside the hot path. The performance significantly improved (41.250s vs baseline 47.554s). Kept.
