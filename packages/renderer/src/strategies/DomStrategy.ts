@@ -209,13 +209,10 @@ export class DomStrategy implements RenderStrategy {
 
         const res = await this.cdpSession!.send('HeadlessExperimental.beginFrame', this.targetBeginFrameParams);
         if (res && res.screenshotData) {
-      this.lastFrameData = res.screenshotData;
-      return res.screenshotData;
-    } else if (Buffer.isBuffer(res)) {
-      this.lastFrameData = res;
-      return res;
-    }
-    return this.lastFrameData!;
+          this.lastFrameData = res.screenshotData;
+          return res.screenshotData;
+        }
+        return this.lastFrameData!;
       }
 
       const isOpaque = this.cdpScreenshotParams.format === 'jpeg';
@@ -224,14 +221,11 @@ export class DomStrategy implements RenderStrategy {
         quality: this.cdpScreenshotParams.quality,
         omitBackground: !isOpaque
       });
-      if (res && res.screenshotData) {
-      this.lastFrameData = res.screenshotData;
-      return res.screenshotData;
-    } else if (Buffer.isBuffer(res)) {
-      this.lastFrameData = res;
-      return res;
-    }
-    return this.lastFrameData!;
+      if (res) {
+        this.lastFrameData = res;
+        return res;
+      }
+      return this.lastFrameData!;
     }
 
     this.beginFrameParams.frameTimeTicks = 10000 + frameTime;
@@ -239,9 +233,6 @@ export class DomStrategy implements RenderStrategy {
     if (res && res.screenshotData) {
       this.lastFrameData = res.screenshotData;
       return res.screenshotData;
-    } else if (Buffer.isBuffer(res)) {
-      this.lastFrameData = res;
-      return res;
     }
     return this.lastFrameData!;
   }

@@ -1,0 +1,5 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	45.321	90	1.98	35.0	keep	baseline
+2	32.161	90	2.80	34.7	keep	eliminate-dead-branches
+3	32.089	90	2.80	34.4	keep	eliminate-dead-branches
+4	32.499	90	2.77	35.0	keep	eliminate-dead-branches
