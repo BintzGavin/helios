@@ -194,3 +194,8 @@ Last updated by: PERF-303
 - Render time: ~32.118s (Baseline: ~32.108s)
 - Status: inconclusive
 - **PERF-311**: Added `optimizeForSpeed: true` to the screenshot parameters passed to `HeadlessExperimental.beginFrame` during DOM capture in `DomStrategy.ts`. While Chromium documentation suggests this flag prioritizes encoding speed, benchmark results inside the headless VM environment showed no measurable performance difference (median 32.118s vs baseline 32.108s). The Chromium screenshot encoding pathway is likely not the bottleneck, or the flag's effect is negligible for our specific headless setup and frame dimensions. Left the code change as it doesn't degrade performance and may yield benefits on other hardware or larger resolutions.
+
+## PERF-317: Inline DomStrategy Empty Image
+- Render time: 35.965s (Baseline: ~35.965s)
+- Status: keep
+- **PERF-317**: Inlined the `emptyImageBase64` initialization into `lastFrameData` during `prepare()`. This allowed simplifying the `processCaptureResult` hot path by removing two branches that handled the `null` fallback on every frame. The render time is similar (within noise margins), but the branch simplification reduces V8 execution paths. Kept.

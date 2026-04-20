@@ -1,11 +1,11 @@
 ---
 id: PERF-317
 slug: inline-dom-strategy-empty-image
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "jules"
 created: 2024-05-25
 completed: ""
-result: ""
+result: "keep"
 ---
 
 # PERF-317: Pre-bind the Empty Image Buffer in DomStrategy
