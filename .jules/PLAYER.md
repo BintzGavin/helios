@@ -28,3 +28,6 @@
 ## [v0.77.20] - Frame-based Keydown Alignments
 **Learning:** The implementation of keyboard shortcuts like `ArrowLeft` and `ArrowRight` was originally seeking by seconds, but the `README.md` explicitly promised frame-based seeking.
 **Action:** When planning, double-check that the fine-grained implementation details match the high-level documentation in `README.md`.
+## [v0.77.25] - Addressing Environment Issues in Tests
+**Learning:** `packages/player/src/export-options.test.ts` was failing because the `vitest` environment defaults to Node, making `document` unavailable. The `HeliosPlayer` Web Component uses `document` at the module level.
+**Action:** Created plan to ensure the `@vitest-environment jsdom` pragma is added to files testing DOM components.

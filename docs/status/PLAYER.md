@@ -217,3 +217,4 @@
 [v0.77.20] ✅ Completed: Discovered discrepancy in arrow key shortcut behavior between README documentation (seeks by frames) and actual implementation (seeks by seconds). Created plan to fix this vision gap.
 [v0.77.21] ✅ Completed: Discovered undocumented keyboard shortcuts (J, L, comma, period) in actual implementation that are missing from the README. Created plan to fix this vision gap.
 [v0.77.24] ✅ Completed: Add Undocumented Shortcuts UI - Added undocumented keyboard shortcuts (J, L, comma, period) to the player's Shortcuts UI menu.
+[v0.77.25] ✅ Completed: Discovered broken test due to missing vitest environment pragma. Created plan .sys/plans/2026-12-29-PLAYER-Fix-Export-Options-Test.md to fix test configuration.

@@ -524,3 +524,7 @@ Each agent should update **their own dedicated progress file** instead of this f
 
 ### STUDIO v0.121.6
 - ✅ Completed: STUDIO-Timeline-Drag-Drop - Verified timeline drag and drop for assets is already implemented.
+
+## [v0.77.25] PLAYER
+**Objective**: Fix the export options test failure.
+**Action**: Created plan to add `// @vitest-environment jsdom` to `export-options.test.ts`.
