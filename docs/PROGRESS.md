@@ -518,3 +518,6 @@ Each agent should update **their own dedicated progress file** instead of this f
 
 ### PLAYER v0.77.23
 - ✅ Completed: Document Undocumented Shortcuts - Added J, L, comma, and period keyboard shortcuts to README.md.
+
+### STUDIO v0.121.6
+- ✅ Completed: STUDIO-Timeline-Drag-Drop - Verified timeline drag and drop for assets is already implemented.
