@@ -1,4 +1,7 @@
 ### PLAYER v0.77.22
+### PLAYER v0.77.24
+- ✅ Completed: Add Undocumented Shortcuts UI - Added undocumented keyboard shortcuts (J, L, comma, period) to the player's Shortcuts UI menu.
+
 - ✅ Completed: Fix Arrow Key Shortcuts
 
 
