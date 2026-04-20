@@ -1,11 +1,11 @@
 ---
 id: PERF-321
 slug: prebind-worker-blocked-executor
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-05-27
-completed: ""
-result: ""
+completed: "2024-05-27"
+result: "keep"
 ---
 
 # PERF-321: Prebind Worker Blocked Promise Executors in CaptureLoop

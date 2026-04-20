@@ -181,6 +181,13 @@ export class CaptureLoop {
     };
 
 
+    const workerBlockedExecutors = new Array(poolLen);
+    for (let w = 0; w < poolLen; w++) {
+        workerBlockedExecutors[w] = (resolve: (i: number) => void) => {
+            workerBlockedResolves[w] = resolve;
+        };
+    }
+
     const runWorker = async (worker: WorkerInfo, workerIndex: number) => {
         const { timeDriver, strategy, page } = worker;
 
@@ -205,9 +212,7 @@ export class CaptureLoop {
                     fRes();
                 }
             } else {
-                i = await new Promise<number>(resolve => {
-                    workerBlockedResolves[workerIndex] = resolve;
-                });
+                i = await new Promise<number>(workerBlockedExecutors[workerIndex]);
             }
 
             if (i === -1) break;
