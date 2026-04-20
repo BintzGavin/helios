@@ -1,0 +1,2 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	45.321	300	6.62	450.0	keep	Prebind Worker Blocked Promise Executors in CaptureLoop

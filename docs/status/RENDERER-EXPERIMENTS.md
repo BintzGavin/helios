@@ -1,6 +1,7 @@
 ## Performance Trajectory
-Current best: 47.554s (baseline was 61.877s, -23.1%)
-Last updated by: PERF-303
+Current best: 45.321s (baseline was 47.554s, -4.7%)
+Last updated by: PERF-321
+
 
 ## What Doesn't Work (and Why)
 
@@ -27,6 +28,7 @@ Last updated by: PERF-303
 - **PERF-296**: Replaced object mutation with inline object allocation in the hot loops of `SeekTimeDriver.ts` and `DomStrategy.ts`. The median render time worsened to ~48.743s compared to the baseline of ~47.232s. This indicates that creating new object literals inside the hot loop adds more overhead than the write barriers caused by mutating the long-lived properties. Discarded as slower.
 
 ## What Works
+- **PERF-321**: Prebound the promise resolve executors for `workerBlockedResolves` in `CaptureLoop.ts` outside the hot loop. This avoids dynamic closure memory allocation during backpressure events when workers wait. Render times improved compared to the baseline (45.321s vs 47.554s). Kept.
 ## PERF-308: Cache Media Synchronization Promises in SeekTimeDriver
 - Render time: 46.939s (Baseline: 47.147s)
 - Status: keep
