@@ -1,11 +1,11 @@
 ---
 id: PERF-312
 slug: avoid-seek-promises-allocation
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-26
-completed: ""
-result: ""
+completed: "2024-05-26"
+result: "inconclusive"
 ---
 
 # PERF-312: Avoid Promise.all() Allocation Overhead in SeekTimeDriver
@@ -98,3 +98,11 @@ None needed. SeekTimeDriver is for DOM mode.
 
 ## Correctness Check
 Run `npx tsx tests/verify-dom-strategy-capture.ts` to ensure it still runs correctly.
+
+## Results Summary
+```tsv
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	32.193	90	2.80	36.8	inconclusive	Avoid Promise.all allocation in SeekTimeDriver
+2	32.193	90	2.80	36.8	inconclusive	Avoid Promise.all allocation in SeekTimeDriver
+3	33.405	90	2.69	36.8	inconclusive	Avoid Promise.all allocation in SeekTimeDriver
+```

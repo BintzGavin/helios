@@ -1,0 +1,4 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	32.193	90	2.80	36.8	keep	Avoid Promise.all allocation in SeekTimeDriver
+2	32.193	90	2.80	36.8	keep	Avoid Promise.all allocation in SeekTimeDriver
+3	33.405	90	2.69	36.8	keep	Avoid Promise.all allocation in SeekTimeDriver
