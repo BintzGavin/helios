@@ -1,11 +1,11 @@
 ---
 id: PERF-316
 slug: remove-noopcatch-allocation
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2025-04-19
 completed: ""
-result: ""
+result: "discarded: preallocating noopCatch regressed render time"
 ---
 
 # PERF-316: Avoid Promise Allocation Overhead in SeekTimeDriver's Catch Handlers

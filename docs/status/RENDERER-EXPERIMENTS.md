@@ -3,6 +3,8 @@ Current best: 47.554s (baseline was 61.877s, -23.1%)
 Last updated by: PERF-303
 
 ## What Doesn't Work (and Why)
+- **PERF-316**: Preallocated `noopCatch` function in `SeekTimeDriver.ts` hot loop.
+  - **WHY it didn't work**: The render time actually regressed slightly (~48.556s vs ~47.554s). Avoiding dynamic allocation of empty arrow functions inside the hot loop added minor overhead or disrupted V8 optimizations compared to leaving it inline. Discarded as slower.
 - Tried to optimize branch prediction in `DomStrategy.capture` by assigning the method dynamically in `prepare()` (polymorphic capture) using arrow functions to prevent branch evaluation overhead on every frame. (PERF-310)
   - **WHY it didn't work**: The variance was within the noise margin (<0.5%). Branch prediction for `if (this.targetElementHandle)` on every frame is fast enough that modifying it via polymorphic assignments provides no measurable benefit and only complicates the class structure.
 
