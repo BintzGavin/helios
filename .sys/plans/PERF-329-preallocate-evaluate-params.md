@@ -1,11 +1,11 @@
 ---
 id: PERF-329
 slug: preallocate-evaluate-params
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "jules"
 created: 2024-05-29
-completed: ""
-result: ""
+completed: "2024-05-29"
+result: "kept - ~3.3% improvement"
 ---
 
 # PERF-329: Preallocate Evaluate Params
@@ -58,3 +58,9 @@ Run `npx tsx packages/renderer/tests/verify-canvas-strategy.ts` to ensure Canvas
 
 ## Correctness Check
 Run `npx tsx packages/renderer/tests/verify-dom-strategy-capture.ts` to ensure the DOM strategy logic runs and correctly falls back to the mocked `lastFrameData` buffer.
+
+## Results Summary
+```tsv
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	47.146	600	12.73	41.9	keep	preallocate evaluate params
+```
