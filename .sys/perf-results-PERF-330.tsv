@@ -1,0 +1,4 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	48.034	600	12.49	41.5	keep	promise-free frame ring
+2	48.841	600	12.28	40.2	keep	promise-free frame ring
+3	48.437	600	12.38	40.8	keep	promise-free frame ring
