@@ -104,19 +104,14 @@ export class CaptureLoop {
     const onProgress = this.jobOptions?.onProgress;
 
     const framePromises = new Array<Promise<Buffer | string>>(maxPipelineDepth);
-    const contextRing = new Array(maxPipelineDepth);
+    const resolveRing = new Array<((b: Buffer | string) => void) | null>(maxPipelineDepth).fill(null);
+    const rejectRing = new Array<((e: any) => void) | null>(maxPipelineDepth).fill(null);
     const framePromiseExecutors = new Array(maxPipelineDepth);
 
     for (let i = 0; i < maxPipelineDepth; i++) {
         framePromiseExecutors[i] = (res: (b: Buffer | string) => void, rej: (e: any) => void) => {
-            contextRing[i].resolve = res;
-            contextRing[i].reject = rej;
-        };
-        contextRing[i] = {
-            resolve: null as ((b: Buffer | string) => void) | null,
-            reject: null as ((e: any) => void) | null,
-            time: 0,
-            compositionTimeInSeconds: 0
+            resolveRing[i] = res;
+            rejectRing[i] = rej;
         };
     }
 
@@ -220,7 +215,6 @@ export class CaptureLoop {
             const compositionTimeInSeconds = (this.startFrame + i) * compTimeStep;
 
             const ringIndex = i & ringMask;
-            const ctx = contextRing[ringIndex];
 
             try {
                 const timePromise = timeDriver.setTime(page, compositionTimeInSeconds);
@@ -228,9 +222,9 @@ export class CaptureLoop {
                     timePromise.catch(noopCatch);
                 }
                 const buffer = await strategy.capture(page, time);
-                if (ctx.resolve) ctx.resolve(buffer);
+                if (resolveRing[ringIndex]) resolveRing[ringIndex]!(buffer);
             } catch (e) {
-                if (ctx.reject) ctx.reject(e);
+                if (rejectRing[ringIndex]) rejectRing[ringIndex]!(e);
             }
         }
     };

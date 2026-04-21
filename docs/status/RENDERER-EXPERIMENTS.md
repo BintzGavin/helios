@@ -317,3 +317,8 @@ Last updated by: PERF-321
 - Render time: 39.997s (Baseline: 45.321s)
 - Status: keep
 - **PERF-323**: Changed TimeDriver and SeekTimeDriver interface to allow returning void to eliminate unobserved Promise allocations overhead. Kept.
+
+## PERF-325: Inline contextRing
+- Render time: 39.669s (Baseline: ~39.6s)
+- Status: keep
+- **PERF-325**: Inlined the `contextRing` object properties into parallel arrays (`resolveRing` and `rejectRing`) in `CaptureLoop.ts`. This structurally flattens the capture pipeline resolution arrays and removes object shape creation in the hot path. Render time remained effectively identical to baseline (median 39.669s vs 39.6s) but simplified the code layout. Kept.
