@@ -103,17 +103,11 @@ export class CaptureLoop {
     const signal = this.jobOptions?.signal;
     const onProgress = this.jobOptions?.onProgress;
 
-    const framePromises = new Array<Promise<Buffer | string>>(maxPipelineDepth);
-    const resolveRing = new Array<((b: Buffer | string) => void) | null>(maxPipelineDepth).fill(null);
-    const rejectRing = new Array<((e: any) => void) | null>(maxPipelineDepth).fill(null);
-    const framePromiseExecutors = new Array(maxPipelineDepth);
-
-    for (let i = 0; i < maxPipelineDepth; i++) {
-        framePromiseExecutors[i] = (res: (b: Buffer | string) => void, rej: (e: any) => void) => {
-            resolveRing[i] = res;
-            rejectRing[i] = rej;
-        };
-    }
+    const frameBufferRing = new Array<Buffer | string | null>(maxPipelineDepth).fill(null);
+    const frameErrorRing = new Array<any>(maxPipelineDepth).fill(null);
+    const frameReadyRing = new Uint8Array(maxPipelineDepth); // 0 = not ready, 1 = ready
+    let writerWaiterResolve: (() => void) | null = null;
+    const writerWaiterExecutor = (resolve: () => void) => { writerWaiterResolve = resolve; };
 
     // Multi-worker ACTOR MODEL with backpressure
     let nextFrameToSubmit = 0;
@@ -139,6 +133,11 @@ export class CaptureLoop {
                 frameWaiterResolve = null;
                 res();
             }
+            if (writerWaiterResolve) {
+                const res = writerWaiterResolve;
+                writerWaiterResolve = null;
+                res();
+            }
             return;
         }
 
@@ -152,9 +151,9 @@ export class CaptureLoop {
             const i = nextFrameToSubmit++;
             const ringIndex = i & ringMask;
 
-            const promise = new Promise<Buffer | string>(framePromiseExecutors[ringIndex]);
-            promise.catch(noopCatch); // Prevent unhandled rejections
-            framePromises[ringIndex] = promise;
+            frameReadyRing[ringIndex] = 0;
+            frameBufferRing[ringIndex] = null;
+            frameErrorRing[ringIndex] = null;
 
             // If main loop is waiting for a frame to be queued, wake it up
             if (frameWaiterResolve) {
@@ -196,9 +195,9 @@ export class CaptureLoop {
                 i = nextFrameToSubmit++;
                 const ringIndex = i & ringMask;
 
-                const promise = new Promise<Buffer | string>(framePromiseExecutors[ringIndex]);
-                promise.catch(noopCatch);
-                framePromises[ringIndex] = promise;
+                frameReadyRing[ringIndex] = 0;
+                frameBufferRing[ringIndex] = null;
+                frameErrorRing[ringIndex] = null;
 
                 if (frameWaiterResolve) {
                     const fRes = frameWaiterResolve;
@@ -222,9 +221,16 @@ export class CaptureLoop {
                     timePromise.catch(noopCatch);
                 }
                 const buffer = await strategy.capture(page, time);
-                if (resolveRing[ringIndex]) resolveRing[ringIndex]!(buffer);
+                frameBufferRing[ringIndex] = buffer;
+                frameReadyRing[ringIndex] = 1;
             } catch (e) {
-                if (rejectRing[ringIndex]) rejectRing[ringIndex]!(e);
+                frameErrorRing[ringIndex] = e;
+                frameReadyRing[ringIndex] = 1;
+            }
+            if (writerWaiterResolve) {
+                const res = writerWaiterResolve;
+                writerWaiterResolve = null;
+                res();
             }
         }
     };
@@ -245,7 +251,14 @@ export class CaptureLoop {
             }
 
             const ringIndex = nextFrameToWrite & ringMask;
-            const buffer = await framePromises[ringIndex]!;
+            if (frameReadyRing[ringIndex] === 0) {
+                await new Promise<void>(writerWaiterExecutor);
+                continue;
+            }
+
+            const error = frameErrorRing[ringIndex];
+            if (error) throw error;
+            const buffer = frameBufferRing[ringIndex]!;
 
             const currentFrame = nextFrameToWrite;
 

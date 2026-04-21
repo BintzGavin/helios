@@ -1,11 +1,16 @@
 ---
 id: PERF-330
 slug: promise-free-frame-ring
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "Jules"
 created: 2026-04-21
-completed: ""
-result: ""
+completed: "2026-04-21"
+result: "success"
+
+## Results Summary
+| run | render_time_s | frames | fps_effective | peak_mem_mb | status | description |
+|---|---|---|---|---|---|---|
+| 1 | 48.034 | 600 | 12.49 | 41.5 | keep | promise-free frame ring |
 ---
 
 # PERF-330: Promise-Free Frame Ring in CaptureLoop
