@@ -3,14 +3,16 @@ import { TimeDriver } from './TimeDriver.js';
 import { getSeedScript } from '../utils/random-seed.js';
 import { FIND_ALL_MEDIA_FUNCTION, FIND_ALL_SCOPES_FUNCTION, SYNC_MEDIA_FUNCTION, PARSE_MEDIA_ATTRIBUTES_FUNCTION } from '../utils/dom-scripts.js';
 
+const noopCatch = () => {};
+
+
 
 
 export class SeekTimeDriver implements TimeDriver {
   private cdpSession: CDPSession | null = null;
   private cachedFrames: import('playwright').Frame[] = [];
   private cachedMainFrame: import('playwright').Frame | null = null;
-  private cachedPromises: Promise<any>[] = [];
-  private executionContextIds: number[] = [];
+    private executionContextIds: number[] = [];
   private evaluateArgs: [number, number] = [0, 0];
   private evaluateClosure = ([t, timeoutMs]: any) => { (window as any).__helios_seek(t, timeoutMs); };
   private evaluateParams: any = {
@@ -275,28 +277,25 @@ export class SeekTimeDriver implements TimeDriver {
 
     this.cachedFrames = page.frames();
     this.cachedMainFrame = page.mainFrame();
-    this.cachedPromises = new Array(this.executionContextIds.length);
-  }
+      }
 
-  setTime(page: Page, timeInSeconds: number): Promise<void> {
+  setTime(page: Page, timeInSeconds: number): void {
     const frames = this.cachedFrames;
 
     if (frames.length === 1) {
       this.evaluateParams.expression = 'window.__helios_seek(' + timeInSeconds + ', ' + this.timeout + ')';
-      return this.cdpSession!.send('Runtime.evaluate', this.evaluateParams) as Promise<any>;
+      this.cdpSession!.send('Runtime.evaluate', this.evaluateParams).catch(noopCatch);
+      return;
     }
 
-    const promises = this.cachedPromises;
     const expression = 'window.__helios_seek(' + timeInSeconds + ', ' + this.timeout + ')';
 
     for (let i = 0; i < this.executionContextIds.length; i++) {
-      promises[i] = this.cdpSession!.send('Runtime.evaluate', {
+      this.cdpSession!.send('Runtime.evaluate', {
         expression: expression,
         contextId: this.executionContextIds[i],
         awaitPromise: true
-      });
+      }).catch(noopCatch);
     }
-
-    return Promise.all(promises) as unknown as Promise<void>;
   }
 }
