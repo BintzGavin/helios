@@ -1,11 +1,11 @@
 ---
 id: PERF-324
 slug: prebind-frame-promise-executors
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "jules"
 created: 2024-04-21
-completed: ""
-result: ""
+completed: "2024-04-21"
+result: " ## Results Summary | run | render_time_s | frames | fps_effective | peak_mem_mb | status | description | |-----|---------------|--------|---------------|-------------|--------|-------------| | 1 | 39.665 | 300 | 7.56 | 40.5 | keep | prebind-frame-promise-executors | | 2 | 39.293 | 300 | 7.63 | 39.2 | keep | prebind-frame-promise-executors | | 3 | 40.366 | 300 | 7.43 | 36.2 | keep | prebind-frame-promise-executors | "
 ---
 
 # PERF-324: Prebind Frame Promise Executors in CaptureLoop
@@ -61,3 +61,10 @@ Run `npx tsx packages/renderer/tests/verify-dom-strategy-capture.ts` to verify D
 
 ## Prior Art
 - **PERF-321**: Prebound `workerBlockedExecutors` using the identical array-of-functions technique, which improved performance.
+
+## Results Summary
+| run | render_time_s | frames | fps_effective | peak_mem_mb | status | description |
+|-----|---------------|--------|---------------|-------------|--------|-------------|
+| 1 | 39.665 | 300 | 7.56 | 40.5 | keep | prebind-frame-promise-executors |
+| 2 | 39.293 | 300 | 7.63 | 39.2 | keep | prebind-frame-promise-executors |
+| 3 | 40.366 | 300 | 7.43 | 36.2 | keep | prebind-frame-promise-executors |
