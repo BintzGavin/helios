@@ -1,11 +1,11 @@
 ---
 id: PERF-325
 slug: inline-context-ring
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "jules"
 created: 2024-04-21
-completed: ""
-result: ""
+completed: "2024-04-21"
+result: " ## Results Summary | run | render_time_s | frames | fps_effective | peak_mem_mb | status | description | |-----|---------------|--------|---------------|-------------|--------|-------------| | 1 | 39.669 | 300 | 7.56 | 38.6 | keep | inline-context-ring | | 2 | 39.521 | 300 | 7.59 | 39.1 | keep | inline-context-ring | | 3 | 39.812 | 300 | 7.54 | 38.3 | keep | inline-context-ring |"
 ---
 
 # PERF-325: Inline Context Ring Arrays in CaptureLoop
