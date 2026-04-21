@@ -1,11 +1,11 @@
 ---
 id: PERF-326
 slug: inline-context-ring
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-04-21
 completed: ""
-result: ""
+result: " ## Results Summary | run | render_time_s | frames | fps_effective | peak_mem_mb | status | description | |-----|---------------|--------|---------------|-------------|--------|-------------| | 1 | 45.214 | 300 | 6.64 | 0.0 | keep | PERF-326-inline-context-ring iteration 1 | | 2 | 45.361 | 300 | 6.61 | 0.0 | keep | PERF-326-inline-context-ring iteration 2 | | 3 | 49.348 | 300 | 6.08 | 0.0 | keep | PERF-326-inline-context-ring iteration 3 |"
 ---
 
 # PERF-326: Inline Context Ring Arrays in CaptureLoop
