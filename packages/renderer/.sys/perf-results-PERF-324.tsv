@@ -1,0 +1,4 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	39.665	300	7.56	40.5	keep	prebind-frame-promise-executors
+2	39.293	300	7.63	39.2	keep	prebind-frame-promise-executors
+3	40.366	300	7.43	36.2	keep	prebind-frame-promise-executors

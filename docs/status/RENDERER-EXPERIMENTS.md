@@ -28,6 +28,7 @@ Last updated by: PERF-321
 - **PERF-296**: Replaced object mutation with inline object allocation in the hot loops of `SeekTimeDriver.ts` and `DomStrategy.ts`. The median render time worsened to ~48.743s compared to the baseline of ~47.232s. This indicates that creating new object literals inside the hot loop adds more overhead than the write barriers caused by mutating the long-lived properties. Discarded as slower.
 
 ## What Works
+- **PERF-324**: Prebound frame promise executors in CaptureLoop. Eliminated inline dynamic closure allocations (`new Promise((res, rej) => ...)`) by creating a static array of executor functions upfront. Brought median render time from ~40.0s to 39.293s (~1.8% improvement), further reducing GC pressure in the inner loop.
 - PERF-323: void-time-driver
   - Changed TimeDriver and SeekTimeDriver interface to allow returning void to eliminate unobserved Promise allocations overhead.
   - Improved render time to 39.997s (Baseline: 45.321s).
@@ -85,6 +86,7 @@ Last updated by: PERF-321
 - Can we eliminate dynamic Promise `.then` closure allocation in the `CaptureLoop.ts` by pre-binding?
 
 ## What Works
+- **PERF-324**: Prebound frame promise executors in CaptureLoop. Eliminated inline dynamic closure allocations (`new Promise((res, rej) => ...)`) by creating a static array of executor functions upfront. Brought median render time from ~40.0s to 39.293s (~1.8% improvement), further reducing GC pressure in the inner loop.
 ## PERF-323: void-time-driver
 - Render time: 39.997s (Baseline: 45.321s)
 - Status: keep
@@ -157,6 +159,7 @@ Last updated by: PERF-321
 - **PERF-286**: Can we improve multi-frame synchronization in SeekTimeDriver by prefetching Context IDs and iterating with raw CDP Runtime.evaluate over all frames?
 
 ## What Works
+- **PERF-324**: Prebound frame promise executors in CaptureLoop. Eliminated inline dynamic closure allocations (`new Promise((res, rej) => ...)`) by creating a static array of executor functions upfront. Brought median render time from ~40.0s to 39.293s (~1.8% improvement), further reducing GC pressure in the inner loop.
 ## PERF-323: void-time-driver
 - Render time: 39.997s (Baseline: 45.321s)
 - Status: keep
@@ -188,6 +191,7 @@ Last updated by: PERF-321
   - Plan: PERF-287
 
 ## What Works
+- **PERF-324**: Prebound frame promise executors in CaptureLoop. Eliminated inline dynamic closure allocations (`new Promise((res, rej) => ...)`) by creating a static array of executor functions upfront. Brought median render time from ~40.0s to 39.293s (~1.8% improvement), further reducing GC pressure in the inner loop.
 ## PERF-323: void-time-driver
 - Render time: 39.997s (Baseline: 45.321s)
 - Status: keep

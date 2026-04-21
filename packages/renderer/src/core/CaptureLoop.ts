@@ -105,8 +105,13 @@ export class CaptureLoop {
 
     const framePromises = new Array<Promise<Buffer | string>>(maxPipelineDepth);
     const contextRing = new Array(maxPipelineDepth);
+    const framePromiseExecutors = new Array(maxPipelineDepth);
 
     for (let i = 0; i < maxPipelineDepth; i++) {
+        framePromiseExecutors[i] = (res: (b: Buffer | string) => void, rej: (e: any) => void) => {
+            contextRing[i].resolve = res;
+            contextRing[i].reject = rej;
+        };
         contextRing[i] = {
             resolve: null as ((b: Buffer | string) => void) | null,
             reject: null as ((e: any) => void) | null,
@@ -152,10 +157,7 @@ export class CaptureLoop {
             const i = nextFrameToSubmit++;
             const ringIndex = i & ringMask;
 
-            const promise = new Promise<Buffer | string>((res, rej) => {
-                contextRing[ringIndex].resolve = res;
-                contextRing[ringIndex].reject = rej;
-            });
+            const promise = new Promise<Buffer | string>(framePromiseExecutors[ringIndex]);
             promise.catch(noopCatch); // Prevent unhandled rejections
             framePromises[ringIndex] = promise;
 
@@ -199,10 +201,7 @@ export class CaptureLoop {
                 i = nextFrameToSubmit++;
                 const ringIndex = i & ringMask;
 
-                const promise = new Promise<Buffer | string>((res, rej) => {
-                    contextRing[ringIndex].resolve = res;
-                    contextRing[ringIndex].reject = rej;
-                });
+                const promise = new Promise<Buffer | string>(framePromiseExecutors[ringIndex]);
                 promise.catch(noopCatch);
                 framePromises[ringIndex] = promise;
 
