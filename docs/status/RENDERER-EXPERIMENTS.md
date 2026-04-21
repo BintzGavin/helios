@@ -28,6 +28,23 @@ Last updated by: PERF-321
 - **PERF-296**: Replaced object mutation with inline object allocation in the hot loops of `SeekTimeDriver.ts` and `DomStrategy.ts`. The median render time worsened to ~48.743s compared to the baseline of ~47.232s. This indicates that creating new object literals inside the hot loop adds more overhead than the write barriers caused by mutating the long-lived properties. Discarded as slower.
 
 ## What Works
+- PERF-323: void-time-driver
+  - Changed TimeDriver and SeekTimeDriver interface to allow returning void to eliminate unobserved Promise allocations overhead.
+  - Improved render time to 39.997s (Baseline: 45.321s).
+
+- PERF-323: void-time-driver
+  - Result: 39.997s render time.
+
+## PERF-323: void-time-driver
+- Render time: 39.997s (Baseline: 45.321s)
+- Status: keep
+- **PERF-323**: Changed TimeDriver and SeekTimeDriver interface to allow returning void to eliminate unobserved Promise allocations overhead. Kept.
+
+## PERF-323: void-time-driver
+- Render time: 39.997s (Baseline: 45.321s)
+- Status: keep
+- **PERF-323**: Changed TimeDriver and SeekTimeDriver interface to allow returning void to eliminate unobserved Promise allocations overhead. Kept.
+
 ## PERF-322: Eliminate dead branches in DomStrategy capture
 - Render time: 32.089s (Baseline: 45.321s)
 - Status: keep
@@ -68,6 +85,11 @@ Last updated by: PERF-321
 - Can we eliminate dynamic Promise `.then` closure allocation in the `CaptureLoop.ts` by pre-binding?
 
 ## What Works
+## PERF-323: void-time-driver
+- Render time: 39.997s (Baseline: 45.321s)
+- Status: keep
+- **PERF-323**: Changed TimeDriver and SeekTimeDriver interface to allow returning void to eliminate unobserved Promise allocations overhead. Kept.
+
 ## PERF-322: Eliminate dead branches in DomStrategy capture
 - Render time: 32.089s (Baseline: 45.321s)
 - Status: keep
@@ -135,6 +157,11 @@ Last updated by: PERF-321
 - **PERF-286**: Can we improve multi-frame synchronization in SeekTimeDriver by prefetching Context IDs and iterating with raw CDP Runtime.evaluate over all frames?
 
 ## What Works
+## PERF-323: void-time-driver
+- Render time: 39.997s (Baseline: 45.321s)
+- Status: keep
+- **PERF-323**: Changed TimeDriver and SeekTimeDriver interface to allow returning void to eliminate unobserved Promise allocations overhead. Kept.
+
 ## PERF-322: Eliminate dead branches in DomStrategy capture
 - Render time: 32.089s (Baseline: 45.321s)
 - Status: keep
@@ -161,6 +188,11 @@ Last updated by: PERF-321
   - Plan: PERF-287
 
 ## What Works
+## PERF-323: void-time-driver
+- Render time: 39.997s (Baseline: 45.321s)
+- Status: keep
+- **PERF-323**: Changed TimeDriver and SeekTimeDriver interface to allow returning void to eliminate unobserved Promise allocations overhead. Kept.
+
 ## PERF-322: Eliminate dead branches in DomStrategy capture
 - Render time: 32.089s (Baseline: 45.321s)
 - Status: keep
@@ -276,3 +308,8 @@ Last updated by: PERF-321
 - Render time: 41.250s (Baseline: 47.554s)
 - Status: keep
 - **PERF-320**: Inlined `processCaptureResult` directly into `DomStrategy.capture()` to eliminate function call overhead and simplify the branch prediction inside the hot path. The performance significantly improved (41.250s vs baseline 47.554s). Kept.
+
+## PERF-323: void-time-driver
+- Render time: 39.997s (Baseline: 45.321s)
+- Status: keep
+- **PERF-323**: Changed TimeDriver and SeekTimeDriver interface to allow returning void to eliminate unobserved Promise allocations overhead. Kept.

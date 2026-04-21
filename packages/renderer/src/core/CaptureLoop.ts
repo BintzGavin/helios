@@ -224,7 +224,10 @@ export class CaptureLoop {
             const ctx = contextRing[ringIndex];
 
             try {
-                timeDriver.setTime(page, compositionTimeInSeconds).then(undefined, noopCatch);
+                const timePromise = timeDriver.setTime(page, compositionTimeInSeconds);
+                if (timePromise) {
+                    timePromise.catch(noopCatch);
+                }
                 const buffer = await strategy.capture(page, time);
                 if (ctx.resolve) ctx.resolve(buffer);
             } catch (e) {
