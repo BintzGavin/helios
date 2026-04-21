@@ -1,0 +1,2 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	47.146	600	12.73	41.9	keep	preallocate evaluate params

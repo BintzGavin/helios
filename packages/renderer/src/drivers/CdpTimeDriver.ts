@@ -13,6 +13,9 @@ export class CdpTimeDriver implements TimeDriver {
   private cachedPromises: Promise<any>[] = [];
   private cdpResolve: (() => void) | null = null;
   private cdpReject: ((err: Error) => void) | null = null;
+  private evaluateParams: any = { expression: '', awaitPromise: false };
+  private multiFrameEvaluateParams: any[] = [];
+  private evaluateStabilityParams: any = { expression: "if (typeof window.__helios_wait_until_stable === 'function') window.__helios_wait_until_stable();", awaitPromise: true };
 
   private virtualTimePromiseExecutor = (resolve: () => void, reject: (err: Error) => void) => {
     this.cdpResolve = resolve;
@@ -162,9 +165,9 @@ export class CdpTimeDriver implements TimeDriver {
     // Execute in all frames (including main frame) to support iframes
     const frames = this.cachedFrames;
     if (frames.length === 1) {
-      await this.client!.send('Runtime.evaluate', {
-        expression: "if(typeof window.__helios_sync_media==='function') window.__helios_sync_media(" + timeInSeconds + ");"
-      }).catch(this.handleSyncMediaError);
+      this.evaluateParams.expression = "if(typeof window.__helios_sync_media==='function') window.__helios_sync_media(" + timeInSeconds + ");";
+      this.evaluateParams.contextId = undefined;
+      await this.client!.send('Runtime.evaluate', this.evaluateParams).catch(this.handleSyncMediaError);
     } else {
         if (this.executionContextIds.length > 0) {
           if (this.cachedPromises.length !== this.executionContextIds.length) {
@@ -172,12 +175,17 @@ export class CdpTimeDriver implements TimeDriver {
           }
           const framePromises = this.cachedPromises;
           const expression = "if(typeof window.__helios_sync_media==='function') window.__helios_sync_media(" + timeInSeconds + ");";
+          if (this.multiFrameEvaluateParams.length !== this.executionContextIds.length) {
+            this.multiFrameEvaluateParams = new Array(this.executionContextIds.length);
+            for (let i = 0; i < this.executionContextIds.length; i++) {
+              this.multiFrameEvaluateParams[i] = { expression: '', contextId: this.executionContextIds[i], awaitPromise: false };
+            }
+          }
           for (let i = 0; i < this.executionContextIds.length; i++) {
-            framePromises[i] = this.client!.send('Runtime.evaluate', {
-              expression: expression,
-              contextId: this.executionContextIds[i],
-              awaitPromise: false
-            }).catch(this.handleSyncMediaError);
+            const params = this.multiFrameEvaluateParams[i];
+            params.expression = expression;
+            params.contextId = this.executionContextIds[i]; // Fix: update contextId on each iteration
+            framePromises[i] = this.client!.send('Runtime.evaluate', params).catch(this.handleSyncMediaError);
           }
           await Promise.all(framePromises);
         } else {
@@ -214,10 +222,7 @@ export class CdpTimeDriver implements TimeDriver {
 
     try {
       await Promise.race([
-        this.client!.send('Runtime.evaluate', {
-          expression: "if (typeof window.__helios_wait_until_stable === 'function') window.__helios_wait_until_stable();",
-          awaitPromise: true
-        }).then(this.handleStabilityCheckResponse),
+        this.client!.send('Runtime.evaluate', this.evaluateStabilityParams).then(this.handleStabilityCheckResponse),
         timeoutPromise
       ]);
     } catch (e: any) {
