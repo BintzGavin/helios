@@ -1,0 +1,3 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	46.581	600	12.88	41.7	keep	baseline
+2	47.419	600	12.65	41.6	inconclusive	prebind frameWaiterResolve executor
