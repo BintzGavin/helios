@@ -1,0 +1,6 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	57.585	600	10.42	43.6	inconclusive	preallocate evaluate params (first run)
+2	46.899	600	12.79	43.4	keep	preallocate evaluate params
+3	47.391	600	12.66	41.8	keep	preallocate evaluate params
+4	47.006	600	12.76	42.3	keep	preallocate evaluate params
+5	46.773	600	12.83	42.0	keep	preallocate evaluate params

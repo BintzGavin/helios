@@ -528,3 +528,6 @@ Each agent should update **their own dedicated progress file** instead of this f
 ## [v0.77.25] PLAYER
 **Objective**: Fix the export options test failure.
 **Action**: Created plan to add `// @vitest-environment jsdom` to `export-options.test.ts`.
+
+### Completed
+- `packages/renderer`: **PERF-334** Preallocated `multiFrameEvaluateParams` in `SeekTimeDriver.ts` to reduce GC churn and improve headless CPU performance.

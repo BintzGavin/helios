@@ -19,6 +19,7 @@ export class SeekTimeDriver implements TimeDriver {
     expression: '',
     awaitPromise: true
   };
+  private multiFrameEvaluateParams: any[] = [];
 
   constructor(private timeout: number = 30000) {
     this.evaluateArgs[1] = timeout;
@@ -290,12 +291,18 @@ export class SeekTimeDriver implements TimeDriver {
 
     const expression = 'window.__helios_seek(' + timeInSeconds + ', ' + this.timeout + ')';
 
+    if (this.multiFrameEvaluateParams.length !== this.executionContextIds.length) {
+      this.multiFrameEvaluateParams = new Array(this.executionContextIds.length);
+      for (let i = 0; i < this.executionContextIds.length; i++) {
+        this.multiFrameEvaluateParams[i] = { expression: '', contextId: this.executionContextIds[i], awaitPromise: true };
+      }
+    }
+
     for (let i = 0; i < this.executionContextIds.length; i++) {
-      this.cdpSession!.send('Runtime.evaluate', {
-        expression: expression,
-        contextId: this.executionContextIds[i],
-        awaitPromise: true
-      }).catch(noopCatch);
+      const params = this.multiFrameEvaluateParams[i];
+      params.expression = expression;
+      params.contextId = this.executionContextIds[i]; // Update contextId in case it changed
+      this.cdpSession!.send('Runtime.evaluate', params).catch(noopCatch);
     }
   }
 }

@@ -1,11 +1,11 @@
 ---
 id: PERF-334
 slug: preallocate-seektime-evaluate-params
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-04-22
-completed: ""
-result: ""
+completed: "2024-04-22"
+result: "improved"
 ---
 
 # PERF-334: Preallocate SeekTime Evaluate Parameters
@@ -60,3 +60,10 @@ Run the DOM selector verification test: `npx tsx packages/renderer/tests/verify-
 
 ## Prior Art
 - PERF-329: Preallocated `evaluateParams` in `CdpTimeDriver.ts` (~3.3% improvement).
+
+## Results Summary
+- **Best render time**: ~47.006s (vs baseline ~48.437s)
+- **Improvement**: ~3%
+- **Kept experiments**:
+  - PERF-334: Preallocate SeekTime Evaluate Parameters
+- **Discarded experiments**: none
