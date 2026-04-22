@@ -1,11 +1,11 @@
 ---
 id: PERF-336
 slug: promise-free-frame-ring-executor
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "Jules"
 created: 2024-04-22
-completed: ""
-result: ""
+completed: "2024-04-22"
+result: "inconclusive"
 ---
 
 # PERF-336: Optimize CaptureLoop Actor Pipeline Backpressure
@@ -64,3 +64,10 @@ Run `npx tsx packages/renderer/tests/verify-dom-strategy-capture.ts` to ensure D
 - PERF-321: Prebound `workerBlockedExecutors`.
 - PERF-324: Prebound frame promise executors for workers.
 - PERF-335: Addressed exactly this issue but was unclaimed/unexecuted.
+
+## Results Summary
+```
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	46.581	600	12.88	41.7	keep	baseline
+2	47.419	600	12.65	41.6	inconclusive	prebind frameWaiterResolve executor
+```

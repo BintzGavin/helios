@@ -5,6 +5,13 @@ Last updated by: PERF-321
 
 ## What Doesn't Work (and Why)
 
+## PERF-336: Promise-Free Frame Ring Executor
+- Render time: 47.419s (Baseline: 46.581s)
+- Status: inconclusive
+- **PERF-336**: Prebound the `frameWaiterResolve` executor into `frameWaiterExecutor` to avoid dynamic inline closure allocations during the CaptureLoop actor pipeline backpressure events. The goal was to reduce V8 GC churn in the main event loop. The median render time drifted slightly higher (~47.4s vs ~46.5s baseline). As this fluctuation is within the environmental noise margin (<5%), explicit caching does not provide a definitive, clear-cut performance gain in this instance, likely because the backpressure loop does not trigger frequently enough compared to per-frame hot loop operations. The structural change was reverted to avoid unnecessary caching state complexity.
+
+
+
 ## PERF-312: Avoid Promise.all() Allocation Overhead in SeekTimeDriver
 - Render time: 32.193s (Baseline: ~32.112s)
 - Status: discard
