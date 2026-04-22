@@ -115,6 +115,7 @@ export class CaptureLoop {
     let aborted = false;
     const workerBlockedResolves = new Array<((i: number) => void) | null>(poolLen).fill(null);
     let frameWaiterResolve: (() => void) | null = null;
+    const frameWaiterExecutor = (resolve: () => void) => { frameWaiterResolve = resolve; };
 
     const checkState = () => {
         if (this.capturedErrors.length > 0 || (signal && signal.aborted)) {
@@ -244,9 +245,7 @@ export class CaptureLoop {
 
             // Wait for the task to be queued by a worker or immediately queued
             if (nextFrameToSubmit <= nextFrameToWrite) {
-                await new Promise<void>(resolve => {
-                    frameWaiterResolve = resolve;
-                });
+                await new Promise<void>(frameWaiterExecutor);
                 continue;
             }
 

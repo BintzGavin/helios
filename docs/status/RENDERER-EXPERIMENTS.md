@@ -3,6 +3,9 @@ Current best: 45.321s (baseline was 47.554s, -4.7%)
 Last updated by: PERF-321
 
 
+## What Works
+- **PERF-337**: Prebound `frameWaiterResolve` executor into `frameWaiterExecutor` to avoid dynamic inline closure allocations during the CaptureLoop actor pipeline backpressure events. This adheres to the "simplicity and GC reduction" principle that guided keeping `writerWaiterExecutor`. Render time: 46.464s (Baseline: 57.022s), though baseline was inflated by initial run. Median render times of subsequent runs were around 46.6s, slightly better than PERF-336's ~47.4s. Kept to reduce V8 GC churn in the main event loop.
+
 ## What Doesn't Work (and Why)
 
 ## PERF-336: Promise-Free Frame Ring Executor
@@ -78,6 +81,9 @@ Last updated by: PERF-321
 - PERF-268: Returned Base64 String directly from CanvasStrategy WebCodecs capture. Render time: 32.326s (baseline 32.596s)
 - Pre-bound the `syncMedia` catch handlers to `this.handleSyncMediaError` inside `CdpTimeDriver.ts` hot loop (PERF-265).
 
+## What Works
+- **PERF-337**: Prebound `frameWaiterResolve` executor into `frameWaiterExecutor` to avoid dynamic inline closure allocations during the CaptureLoop actor pipeline backpressure events. This adheres to the "simplicity and GC reduction" principle that guided keeping `writerWaiterExecutor`. Render time: 46.464s (Baseline: 57.022s), though baseline was inflated by initial run. Median render times of subsequent runs were around 46.6s, slightly better than PERF-336's ~47.4s. Kept to reduce V8 GC churn in the main event loop.
+
 ## What Doesn't Work (and Why)
 
 ## PERF-312: Avoid Promise.all() Allocation Overhead in SeekTimeDriver
@@ -114,6 +120,9 @@ Last updated by: PERF-321
 - **PERF-274**: Replaced syncMedia closure evaluation with string evaluation in CdpTimeDriver.ts. Faster and avoids IPC overhead.
 - Pre-bind fallback callback in DomStrategy.capture() (PERF-269) - Eliminates GC pressure overhead in fallback screenshot loop
 
+## What Works
+- **PERF-337**: Prebound `frameWaiterResolve` executor into `frameWaiterExecutor` to avoid dynamic inline closure allocations during the CaptureLoop actor pipeline backpressure events. This adheres to the "simplicity and GC reduction" principle that guided keeping `writerWaiterExecutor`. Render time: 46.464s (Baseline: 57.022s), though baseline was inflated by initial run. Median render times of subsequent runs were around 46.6s, slightly better than PERF-336's ~47.4s. Kept to reduce V8 GC churn in the main event loop.
+
 ## What Doesn't Work (and Why)
 
 ## PERF-312: Avoid Promise.all() Allocation Overhead in SeekTimeDriver
@@ -130,6 +139,9 @@ Last updated by: PERF-321
 - **PERF-273**: Inline SeekTimeDriver CDP callParams. The `timeout` value is now dynamically injected into the `functionDeclaration` instead of dynamically passing it through arguments list over IPC on every frame. Reduced object tree size for IPC payload. Time: 32.286s (baseline 32.264s). Marginal difference, but logically optimized payload size over CDP IPC, kept.
 - **PERF-275**: Preallocated executeCapture closures dynamically using a ring buffer of context objects. Render time: 32.143
 - **PERF-276**: Replaced modulo (`%`) operators with bitwise AND (`&`) for indexing into the `framePromises` ring buffer in `CaptureLoop.ts`. Render time: 32.243s (baseline 32.062s). Discarded because V8 already optimizes modulo efficiently and the bitwise logic yielded no measurable improvement and was slightly slower.
+
+## What Works
+- **PERF-337**: Prebound `frameWaiterResolve` executor into `frameWaiterExecutor` to avoid dynamic inline closure allocations during the CaptureLoop actor pipeline backpressure events. This adheres to the "simplicity and GC reduction" principle that guided keeping `writerWaiterExecutor`. Render time: 46.464s (Baseline: 57.022s), though baseline was inflated by initial run. Median render times of subsequent runs were around 46.6s, slightly better than PERF-336's ~47.4s. Kept to reduce V8 GC churn in the main event loop.
 
 ## What Doesn't Work (and Why)
 
@@ -187,6 +199,9 @@ Last updated by: PERF-321
 - Replaced Playwright closure IPC with raw CDP `Runtime.evaluate` for multi-frame in `SeekTimeDriver`
 - Improved render time for multi-frame compositions
 - PERF-286
+
+## What Works
+- **PERF-337**: Prebound `frameWaiterResolve` executor into `frameWaiterExecutor` to avoid dynamic inline closure allocations during the CaptureLoop actor pipeline backpressure events. This adheres to the "simplicity and GC reduction" principle that guided keeping `writerWaiterExecutor`. Render time: 46.464s (Baseline: 57.022s), though baseline was inflated by initial run. Median render times of subsequent runs were around 46.6s, slightly better than PERF-336's ~47.4s. Kept to reduce V8 GC churn in the main event loop.
 
 ## What Doesn't Work (and Why)
 
