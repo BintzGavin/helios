@@ -5,10 +5,13 @@
 - ✅ Completed: Fix Arrow Key Shortcuts
 
 
+### STUDIO v0.121.7
+- ✅ Completed: STUDIO-Timeline-Drag-Drop - Verified timeline drag and drop for assets is already implemented (2026-11-13-STUDIO-Timeline-Drag-Drop.md).
+
 ### STUDIO v0.121.5
 - ✅ Completed: Toggle Loop Shortcut - Restored loop toggle functionality using Shift+L keyboard shortcut.
-
 ### STUDIO v0.121.4
+
 - ✅ Completed: STUDIO-Timeline-Drag-Drop - Added visual styling when dragging an asset over the Timeline component for visual feedback.
 - ✅ Completed: STUDIO-Timeline-Audio-Drag-Drop - Enabled dropping audio assets onto the Timeline and mapped them to composition inputs.
 
