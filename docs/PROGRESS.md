@@ -25,6 +25,9 @@
 - ✅ Completed: Documentation Orchestration - Updated README.md to document Orchestration, Job Management, Cloud Execution Adapters, and Worker Runtime abstractions.
 # Helios Project Progress Log
 
+### CLI v0.46.10
+- ✅ Completed: Implement remaining CLI command regression tests - Add unit tests for preview, skills, and studio.
+
 ### CLI v0.46.9\n- ✅ Completed: Scaffold Cloudflare Sandbox Deployment Command - Implemented `helios deploy cloudflare-sandbox` to scaffold Cloudflare Workflows and Sandboxes.\n\n## CLI v0.46.7
 - ✅ Completed: Deploy Command Regression Tests - Implemented unit tests for all remaining deploy subcommands.
 
