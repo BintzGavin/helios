@@ -1,5 +1,5 @@
 run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
-1	57.022	600	10.52	43.3	keep	baseline
+1	56.500	600	10.62	42.9	keep	baseline
 2	46.464	600	12.91	41.7	keep	prebind-frame-waiter-resolve
 3	46.747	600	12.84	41.6	keep	prebind-frame-waiter-resolve
 4	46.636	600	12.87	41.8	keep	prebind-frame-waiter-resolve
