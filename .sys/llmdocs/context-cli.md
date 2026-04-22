@@ -11,6 +11,22 @@ packages/cli/
 ├── src/
 │   ├── index.ts
 │   ├── commands/
+│   │   ├── __tests__/
+│   │   │   ├── add.test.ts
+│   │   │   ├── build.test.ts
+│   │   │   ├── components.test.ts
+│   │   │   ├── deploy.test.ts
+│   │   │   ├── diff.test.ts
+│   │   │   ├── init.test.ts
+│   │   │   ├── job.test.ts
+│   │   │   ├── list.test.ts
+│   │   │   ├── merge.test.ts
+│   │   │   ├── preview.test.ts
+│   │   │   ├── remove.test.ts
+│   │   │   ├── render.test.ts
+│   │   │   ├── skills.test.ts
+│   │   │   ├── studio.test.ts
+│   │   │   └── update.test.ts
 │   │   ├── add.ts
 │   │   ├── build.ts
 │   │   ├── components.ts

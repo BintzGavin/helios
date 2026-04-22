@@ -1,8 +1,9 @@
 # CLI Status
 
-**Version**: 0.46.9
+**Version**: 0.46.10
 
 ## Recent Completions
+[v0.46.10] ✅ Completed: Implement remaining CLI command regression tests - Add unit tests for preview, skills, and studio.
 [v0.46.8] ✅ Completed: Build Command Regression Tests - Implemented unit tests for the build command.
 [v0.46.7] ✅ Completed: Deploy Command Regression Tests - Implemented unit tests for all remaining deploy subcommands.
 [v0.46.6] ✅ Completed: Add Cloudflare Sandbox Adapter support to job run - Verified implementation and tests for Cloudflare Sandbox adapter support in the job run command.
