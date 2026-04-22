@@ -114,3 +114,5 @@ The Renderer constructs FFmpeg commands dynamically using `FFmpegBuilder`.
 **Hardware Acceleration:**
 - Controlled via `hwAccel` option (e.g., `-hwaccel cuda`).
 - Checked via `FFmpegInspector` to ensure availability.
+
+- Preallocated `multiFrameEvaluateParams` in `SeekTimeDriver.ts` (PERF-334) to avoid inline GC overhead.

@@ -28,6 +28,9 @@ Last updated by: PERF-321
 - **PERF-296**: Replaced object mutation with inline object allocation in the hot loops of `SeekTimeDriver.ts` and `DomStrategy.ts`. The median render time worsened to ~48.743s compared to the baseline of ~47.232s. This indicates that creating new object literals inside the hot loop adds more overhead than the write barriers caused by mutating the long-lived properties. Discarded as slower.
 
 ## What Works
+- **PERF-334: Preallocate SeekTime Evaluate Parameters**
+  - **Result**: ~47.0s (improved over recent ~48.4s benchmarks)
+  - **Why it works**: Preallocated multiFrameEvaluateParams in `SeekTimeDriver` avoids creating dynamic `{ expression, contextId, awaitPromise }` objects on every single frame iteration in the hot loop, reducing GC churn in the same way it did for `CdpTimeDriver`.
 - **Promise-Free Frame Ring**: Replaced `Promise` object allocation and `.catch()` closures inside `CaptureLoop.ts` with static state rings (`frameReadyRing`, `frameBufferRing`, `frameErrorRing`). This eliminated hundreds of short-lived Promises per second, reducing V8 GC churn and improving rendering time from ~59s to ~48s. (PERF-330)
 - Preallocated `evaluateParams` and `evaluateStabilityParams` objects in `CdpTimeDriver.ts` to avoid inline object creation in the `setTime` hot loop. V8 handles static object mutation well, reducing GC pressure across multiple execution contexts. (~3.3% improvement) (PERF-329)
 - **PERF-324**: Prebound frame promise executors in CaptureLoop. Eliminated inline dynamic closure allocations (`new Promise((res, rej) => ...)`) by creating a static array of executor functions upfront. Brought median render time from ~40.0s to 39.293s (~1.8% improvement), further reducing GC pressure in the inner loop.
