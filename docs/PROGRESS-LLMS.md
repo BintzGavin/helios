@@ -1,5 +1,10 @@
-
 # LLMS Progress
+
+## LLMS v1.71.0
+- ✅ Completed: Daily llms.txt Review
+  - Aligned Quick Facts and Roadmap versions strictly with `package.json` across all domains (Studio v0.107.1+, CLI v0.45.1+, Player v0.76.18+, Renderer v1.78.1+, Infrastructure v0.25.0+).
+  - Updated Roadmap items with verifiable completions from domain progress logs including Tier 3 Scaffold Deployment Commands, Modal Adapter, and Player schema documentation.
+  - Verified content against recent PROGRESS logs and repository file paths.
 
 ## LLMS v1.70.0
 - ✅ Completed: Daily llms.txt Review
@@ -57,6 +62,12 @@
   - Verified API examples, roadmap synchronization, and key file paths.
 
 # LLMS Progress
+
+## LLMS v1.71.0
+- ✅ Completed: Daily llms.txt Review
+  - Aligned Quick Facts and Roadmap versions strictly with `package.json` across all domains (Studio v0.107.1+, CLI v0.45.1+, Player v0.76.18+, Renderer v1.78.1+, Infrastructure v0.25.0+).
+  - Updated Roadmap items with verifiable completions from domain progress logs including Tier 3 Scaffold Deployment Commands, Modal Adapter, and Player schema documentation.
+  - Verified content against recent PROGRESS logs and repository file paths.
 
 ## LLMS v1.61.0
 - ✅ Completed: Daily llms.txt Review
