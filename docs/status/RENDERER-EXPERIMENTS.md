@@ -278,6 +278,11 @@ Last updated by: PERF-321
 ## Open Questions
 - **PERF-299**: Will explicitly appending `--disable-software-rasterizer` and `--disable-gpu-compositing` to `GPU_DISABLED_ARGS` fully disable SwiftShader and improve render performance by forcing native Skia CPU rasterization?
 
+## PERF-341: Prebind Stability Timeout Executor in CdpTimeDriver
+- Render time: 48.346s (Baseline: ~46.793s - 48.695s)
+- Status: inconclusive
+- **PERF-341**: Attempted to prebind the `stabilityTimeoutExecutor` and `stabilityTimeoutCallback` in `CdpTimeDriver.ts` to avoid inline closure allocations during the stability check timeout inside `setTime()`. The render time remained well within the noise margin (median ~48.346s), indicating that V8 optimizes these short-lived closures inside `setTime` efficiently and GC overhead is not the bottleneck here. Left the structural change as it safely nullifies properties to avoid dangling references and slightly simplifies object creation per frame.
+
 ## PERF-300: Eliminate getNextTask() Promise Allocation in CaptureLoop.ts
 - Render time: 48.785s (Baseline: 48.832s)
 - Status: inconclusive

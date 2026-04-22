@@ -1,11 +1,11 @@
 ---
 id: PERF-341
 slug: prebind-stability-timeout-executor
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "jules"
 created: 2024-05-24
-completed: ""
-result: ""
+completed: "2024-05-24"
+result: "inconclusive"
 ---
 
 # PERF-341: Prebind CdpTimeDriver Stability Timeout Executor
@@ -84,3 +84,9 @@ Run `npx tsx packages/renderer/tests/verify-dom-strategy-capture.ts`
 
 ## Prior Art
 - PERF-340
+
+## Results Summary
+```
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	48.346	600	12.41	41.6	inconclusive	prebind stability timeout executor
+```
