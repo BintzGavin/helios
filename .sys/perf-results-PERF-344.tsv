@@ -1,0 +1,2 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	47.183	600	12.72	41.4	discard	eliminate promiserace array allocation in SeekTimeDriver (within noise margin, negligible improvement)
