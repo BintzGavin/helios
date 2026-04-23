@@ -1,11 +1,11 @@
 ---
 id: PERF-342
 slug: prebind-captureloop-waiters
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-24
-completed: ""
-result: ""
+completed: "2024-05-24"
+result: "discarded"
 ---
 
 # PERF-342: Prebind CaptureLoop Waiter Executors
@@ -65,3 +65,9 @@ Run `npx tsx packages/renderer/tests/verify-dom-strategy-capture.ts`
 ## Prior Art
 - PERF-321 (Prebind worker blocked executor)
 - PERF-338 (Prebind stability timeout executor)
+
+## Results Summary
+- **Best render time**: 48.811s (vs baseline 46.939s)
+- **Improvement**: Regressed
+- **Kept experiments**: []
+- **Discarded experiments**: [Prebind captureloop waiter executors]

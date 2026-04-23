@@ -120,3 +120,5 @@ The Renderer constructs FFmpeg commands dynamically using `FFmpegBuilder`.
 
 ### Recent Work
 - **PERF-344**: Evaluated manual Promise resolution to eliminate Promise.race array and wrapper allocation in `SeekTimeDriver.ts`. Discarded as performance gains were negligible (within the noise margin) compared to the logic complexity it introduced.
+
+- (PERF-342): Executed performance experiment: Prebind CaptureLoop Waiter Executors (Discarded).
