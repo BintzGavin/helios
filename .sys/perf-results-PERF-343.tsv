@@ -1,0 +1,5 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	51.553	600	11.64	42.9	keep	eliminate promiserace allocation in cdptimedriver
+2	48.190	600	12.45	42.8	keep	eliminate promiserace allocation in cdptimedriver
+3	49.437	600	12.14	39.8	keep	eliminate promiserace allocation in cdptimedriver
+4	48.091	600	12.48	41.6	keep	eliminate promiserace allocation in cdptimedriver
