@@ -1,0 +1,5 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	47.013	600	12.76	42.8	keep	baseline (median of multiple runs: 58.379, 46.813, 48.648, 46.650, 47.013)
+2	46.805	600	12.82	41.6	discard	experiment run 1
+3	47.245	600	12.70	42.7	discard	experiment run 2
+4	46.433	600	12.92	41.6	discard	experiment run 3 (median: 46.805, inconclusive, noise margin)
