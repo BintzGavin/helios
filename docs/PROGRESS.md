@@ -549,3 +549,5 @@ Each agent should update **their own dedicated progress file** instead of this f
 
 ### 2026-04-23
 - **Renderer**: Evaluated PERF-344 (Eliminate Promise.race Array Allocation in SeekTimeDriver). The performance gains were negligible (within the noise margin) compared to the logic complexity it introduced, so the optimization was discarded.
+
+- (PERF-342): Executed performance experiment: Prebind CaptureLoop Waiter Executors (Discarded due to slight regression).

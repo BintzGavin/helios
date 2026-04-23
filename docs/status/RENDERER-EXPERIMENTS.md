@@ -13,6 +13,8 @@ Last updated by: PERF-321
 - **PERF-337**: Prebound `frameWaiterResolve` executor into `frameWaiterExecutor` to avoid dynamic inline closure allocations during the CaptureLoop actor pipeline backpressure events. This adheres to the "simplicity and GC reduction" principle that guided keeping `writerWaiterExecutor`. Render time: 46.464s (Baseline: 57.022s), though baseline was inflated by initial run. Median render times of subsequent runs were around 46.6s, slightly better than PERF-336's ~47.4s. Kept to reduce V8 GC churn in the main event loop.
 
 ## What Doesn't Work (and Why)
+- **PERF-342 (Prebind CaptureLoop Waiter Executors)**: Discarded. Prebinding `writerWaiterExecutor` and `frameWaiterExecutor` outside the run closure to avoid dynamic Promise allocation actually slightly regressed performance (48.811s vs 46.939s baseline), likely within noise margin, but indicates V8 optimizes these short-lived closures in tight loops well enough that the manual state management overhead is not worth it.
+
 - **Eliminating `async`/`await` in `DomStrategy.capture()`**: Refactored `capture` to return a `Promise` directly instead of using `async`/`await` to avoid generator overhead in the hot loop. The results were within the noise margin (baseline median: 47.013s, experiment median: 46.805s). V8 seems to optimize async/await overhead extremely well when the Promises are resolved quickly or natively by CDP. Discarded to maintain code simplicity. (PERF-345)
 
 - PERF-344: Eliminate Promise.race Array Allocation in SeekTimeDriver. Attempted to eliminate Promise.race array and closure allocations inside the `window.__helios_seek` script. The performance gains were negligible (~47.18s vs ~47.00s baseline, within noise margin). V8 optimizes these short-lived closures and arrays efficiently in the renderer process, so manual Promise resolution isn't worth the logic complexity.
@@ -102,6 +104,8 @@ Last updated by: PERF-321
 - **PERF-337**: Prebound `frameWaiterResolve` executor into `frameWaiterExecutor` to avoid dynamic inline closure allocations during the CaptureLoop actor pipeline backpressure events. This adheres to the "simplicity and GC reduction" principle that guided keeping `writerWaiterExecutor`. Render time: 46.464s (Baseline: 57.022s), though baseline was inflated by initial run. Median render times of subsequent runs were around 46.6s, slightly better than PERF-336's ~47.4s. Kept to reduce V8 GC churn in the main event loop.
 
 ## What Doesn't Work (and Why)
+- **PERF-342 (Prebind CaptureLoop Waiter Executors)**: Discarded. Prebinding `writerWaiterExecutor` and `frameWaiterExecutor` outside the run closure to avoid dynamic Promise allocation actually slightly regressed performance (48.811s vs 46.939s baseline), likely within noise margin, but indicates V8 optimizes these short-lived closures in tight loops well enough that the manual state management overhead is not worth it.
+
 - **Eliminating `async`/`await` in `DomStrategy.capture()`**: Refactored `capture` to return a `Promise` directly instead of using `async`/`await` to avoid generator overhead in the hot loop. The results were within the noise margin (baseline median: 47.013s, experiment median: 46.805s). V8 seems to optimize async/await overhead extremely well when the Promises are resolved quickly or natively by CDP. Discarded to maintain code simplicity. (PERF-345)
 
 
@@ -145,6 +149,8 @@ Last updated by: PERF-321
 - **PERF-337**: Prebound `frameWaiterResolve` executor into `frameWaiterExecutor` to avoid dynamic inline closure allocations during the CaptureLoop actor pipeline backpressure events. This adheres to the "simplicity and GC reduction" principle that guided keeping `writerWaiterExecutor`. Render time: 46.464s (Baseline: 57.022s), though baseline was inflated by initial run. Median render times of subsequent runs were around 46.6s, slightly better than PERF-336's ~47.4s. Kept to reduce V8 GC churn in the main event loop.
 
 ## What Doesn't Work (and Why)
+- **PERF-342 (Prebind CaptureLoop Waiter Executors)**: Discarded. Prebinding `writerWaiterExecutor` and `frameWaiterExecutor` outside the run closure to avoid dynamic Promise allocation actually slightly regressed performance (48.811s vs 46.939s baseline), likely within noise margin, but indicates V8 optimizes these short-lived closures in tight loops well enough that the manual state management overhead is not worth it.
+
 - **Eliminating `async`/`await` in `DomStrategy.capture()`**: Refactored `capture` to return a `Promise` directly instead of using `async`/`await` to avoid generator overhead in the hot loop. The results were within the noise margin (baseline median: 47.013s, experiment median: 46.805s). V8 seems to optimize async/await overhead extremely well when the Promises are resolved quickly or natively by CDP. Discarded to maintain code simplicity. (PERF-345)
 
 
@@ -168,6 +174,8 @@ Last updated by: PERF-321
 - **PERF-337**: Prebound `frameWaiterResolve` executor into `frameWaiterExecutor` to avoid dynamic inline closure allocations during the CaptureLoop actor pipeline backpressure events. This adheres to the "simplicity and GC reduction" principle that guided keeping `writerWaiterExecutor`. Render time: 46.464s (Baseline: 57.022s), though baseline was inflated by initial run. Median render times of subsequent runs were around 46.6s, slightly better than PERF-336's ~47.4s. Kept to reduce V8 GC churn in the main event loop.
 
 ## What Doesn't Work (and Why)
+- **PERF-342 (Prebind CaptureLoop Waiter Executors)**: Discarded. Prebinding `writerWaiterExecutor` and `frameWaiterExecutor` outside the run closure to avoid dynamic Promise allocation actually slightly regressed performance (48.811s vs 46.939s baseline), likely within noise margin, but indicates V8 optimizes these short-lived closures in tight loops well enough that the manual state management overhead is not worth it.
+
 - **Eliminating `async`/`await` in `DomStrategy.capture()`**: Refactored `capture` to return a `Promise` directly instead of using `async`/`await` to avoid generator overhead in the hot loop. The results were within the noise margin (baseline median: 47.013s, experiment median: 46.805s). V8 seems to optimize async/await overhead extremely well when the Promises are resolved quickly or natively by CDP. Discarded to maintain code simplicity. (PERF-345)
 
 
@@ -232,6 +240,8 @@ Last updated by: PERF-321
 - **PERF-337**: Prebound `frameWaiterResolve` executor into `frameWaiterExecutor` to avoid dynamic inline closure allocations during the CaptureLoop actor pipeline backpressure events. This adheres to the "simplicity and GC reduction" principle that guided keeping `writerWaiterExecutor`. Render time: 46.464s (Baseline: 57.022s), though baseline was inflated by initial run. Median render times of subsequent runs were around 46.6s, slightly better than PERF-336's ~47.4s. Kept to reduce V8 GC churn in the main event loop.
 
 ## What Doesn't Work (and Why)
+- **PERF-342 (Prebind CaptureLoop Waiter Executors)**: Discarded. Prebinding `writerWaiterExecutor` and `frameWaiterExecutor` outside the run closure to avoid dynamic Promise allocation actually slightly regressed performance (48.811s vs 46.939s baseline), likely within noise margin, but indicates V8 optimizes these short-lived closures in tight loops well enough that the manual state management overhead is not worth it.
+
 - **Eliminating `async`/`await` in `DomStrategy.capture()`**: Refactored `capture` to return a `Promise` directly instead of using `async`/`await` to avoid generator overhead in the hot loop. The results were within the noise margin (baseline median: 47.013s, experiment median: 46.805s). V8 seems to optimize async/await overhead extremely well when the Promises are resolved quickly or natively by CDP. Discarded to maintain code simplicity. (PERF-345)
 
 
