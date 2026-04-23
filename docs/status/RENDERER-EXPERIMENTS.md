@@ -8,6 +8,11 @@ Last updated by: PERF-321
 
 ## What Doesn't Work (and Why)
 
+## PERF-339: Prebind CaptureLoop Waiter Executors
+- Render time: 47.362s (Baseline: ~47.5s)
+- Status: discard
+- **PERF-339**: Attempted to prebind the `writerWaiterExecutor` and `frameWaiterExecutor` closures in `CaptureLoop.ts` to reduce dynamic allocation overhead during backpressure synchronization, mitigating V8 GC churn. However, performance remained basically the same (47.362s vs 47.5s), well within the margin of noise, indicating that the V8 optimization is already good enough for these short lived promises. Discarded to maintain code simplicity.
+
 ## PERF-336: Promise-Free Frame Ring Executor
 - Render time: 47.419s (Baseline: 46.581s)
 - Status: inconclusive
