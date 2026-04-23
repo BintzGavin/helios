@@ -54,6 +54,7 @@ packages/cli/
 ```
 
 ## Section C: Commands
+- `helios deploy cloudflare-sandbox`: Scaffold Cloudflare Sandbox and Workflows deployment configuration
 - `helios add <component>`: Adds a component from the remote registry.
 - `helios build`: Builds the user project via Vite for production usage.
 - `helios components [query]`: Lists available components in the registry (filterable by query, framework, or all).
