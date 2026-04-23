@@ -1,9 +1,10 @@
-**Version**: 0.121.6
+**Version**: 0.121.7
 
 **Posture**: ACTIVELY EXPANDING FOR V2
 
 # Studio Domain Status
 
+- [v0.121.7] ✅ Verified: Export Job Spec - Verified existing implementation of Export Job Spec functionality in Studio Renders Panel.
 - [v0.121.5] ✅ Completed: Toggle Loop Shortcut - Restored loop toggle functionality using Shift+L keyboard shortcut.
 **Status**: 🟢 Active
 
