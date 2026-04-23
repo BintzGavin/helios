@@ -1,7 +1,7 @@
 ---
 id: PERF-344
 slug: eliminate-promiserace-in-seektimedriver
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2025-02-23
 completed: ""
@@ -72,3 +72,7 @@ Run `npx tsx packages/renderer/tests/verify-dom-strategy-capture.ts`
 
 ## Prior Art
 - PERF-343 (Eliminate Promise.race Array Allocation in CdpTimeDriver)
+## Results Summary
+| run | render_time_s | frames | fps_effective | peak_mem_mb | status | description |
+|---|---|---|---|---|---|---|
+| 1 | 47.183 | 600 | 12.72 | 41.4 | discard | eliminate promiserace array allocation in SeekTimeDriver (within noise margin, negligible improvement) |

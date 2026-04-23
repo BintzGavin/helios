@@ -117,3 +117,6 @@ The Renderer constructs FFmpeg commands dynamically using `FFmpegBuilder`.
 
 - Preallocated `multiFrameEvaluateParams` in `SeekTimeDriver.ts` (PERF-334) to avoid inline GC overhead.
 - PERF-343: Eliminated `Promise.race` and array allocation in `CdpTimeDriver.setTime` stability check by pre-binding executors, improving render time by ~12% (49.437s).
+
+### Recent Work
+- **PERF-344**: Evaluated manual Promise resolution to eliminate Promise.race array and wrapper allocation in `SeekTimeDriver.ts`. Discarded as performance gains were negligible (within the noise margin) compared to the logic complexity it introduced.

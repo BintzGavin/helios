@@ -544,3 +544,6 @@ Each agent should update **their own dedicated progress file** instead of this f
 
 ### Completed
 - `packages/renderer`: **PERF-334** Preallocated `multiFrameEvaluateParams` in `SeekTimeDriver.ts` to reduce GC churn and improve headless CPU performance.
+
+### 2026-04-23
+- **Renderer**: Evaluated PERF-344 (Eliminate Promise.race Array Allocation in SeekTimeDriver). The performance gains were negligible (within the noise margin) compared to the logic complexity it introduced, so the optimization was discarded.

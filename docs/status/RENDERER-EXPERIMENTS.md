@@ -8,6 +8,8 @@ Last updated by: PERF-321
 - **PERF-337**: Prebound `frameWaiterResolve` executor into `frameWaiterExecutor` to avoid dynamic inline closure allocations during the CaptureLoop actor pipeline backpressure events. This adheres to the "simplicity and GC reduction" principle that guided keeping `writerWaiterExecutor`. Render time: 46.464s (Baseline: 57.022s), though baseline was inflated by initial run. Median render times of subsequent runs were around 46.6s, slightly better than PERF-336's ~47.4s. Kept to reduce V8 GC churn in the main event loop.
 
 ## What Doesn't Work (and Why)
+- PERF-344: Eliminate Promise.race Array Allocation in SeekTimeDriver. Attempted to eliminate Promise.race array and closure allocations inside the `window.__helios_seek` script. The performance gains were negligible (~47.18s vs ~47.00s baseline, within noise margin). V8 optimizes these short-lived closures and arrays efficiently in the renderer process, so manual Promise resolution isn't worth the logic complexity.
+
 
 ## PERF-339: Prebind CaptureLoop Waiter Executors
 - Render time: 47.362s (Baseline: ~47.5s)
