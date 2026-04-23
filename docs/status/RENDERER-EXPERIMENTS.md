@@ -1,9 +1,14 @@
 ## Performance Trajectory
-Current best: 49.437s (baseline was 83.181s, -40.6%)
+Current best: 35.965s (baseline was 47.024s, experiment median 46.149s)
 Last updated by: PERF-321
 
 
 ## What Works
+
+## PERF-346: Restore `png` as Default Intermediate Image Format
+- Render time: 46.149s (Baseline: 47.024s)
+- Status: keep
+- **PERF-346**: Changed the default intermediate image format for non-alpha frames from `jpeg` to `png` in `DomStrategy.ts`. While `jpeg` theoretically produces smaller IPC payloads over the CDP socket, the CPU overhead for encoding `jpeg` in Chromium's software path without hardware acceleration outweighs the network transfer cost. `png` encoding provides a slightly faster render time inside the Jules microVM.
 - PERF-343: Eliminated `Promise.race` and array allocation in `CdpTimeDriver.setTime` stability check by pre-binding executors, improving render time by ~12% (49.437s).
 - **PERF-337**: Prebound `frameWaiterResolve` executor into `frameWaiterExecutor` to avoid dynamic inline closure allocations during the CaptureLoop actor pipeline backpressure events. This adheres to the "simplicity and GC reduction" principle that guided keeping `writerWaiterExecutor`. Render time: 46.464s (Baseline: 57.022s), though baseline was inflated by initial run. Median render times of subsequent runs were around 46.6s, slightly better than PERF-336's ~47.4s. Kept to reduce V8 GC churn in the main event loop.
 

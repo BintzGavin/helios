@@ -1,11 +1,11 @@
 ---
 id: PERF-346
 slug: restore-png-default
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-24
-completed: ""
-result: ""
+completed: "2024-05-24"
+result: "improved"
 ---
 
 # PERF-346: Restore `png` as Default Intermediate Image Format
@@ -74,3 +74,9 @@ Run `npx tsx packages/renderer/tests/verify-dom-strategy-capture.ts` to ensure `
 
 ## Prior Art
 - PERF-010: Experimented with `jpeg` defaults, discovered it degraded performance, and was intended to be discarded.
+
+## Results Summary
+- **Best render time**: 46.149s (vs baseline 47.024s)
+- **Improvement**: ~1.9%
+- **Kept experiments**: Restored `png` as default intermediate format for non-alpha frames.
+- **Discarded experiments**: None
