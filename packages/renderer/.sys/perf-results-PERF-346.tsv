@@ -1,0 +1,3 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	47.024	600	12.76	41.8	keep	baseline (jpeg default)
+2	46.149	600	13.00	38.3	keep	restore png default for non-alpha
