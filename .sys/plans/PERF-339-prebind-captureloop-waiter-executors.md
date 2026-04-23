@@ -1,11 +1,11 @@
 ---
 id: PERF-339
 slug: prebind-captureloop-waiter-executors
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "Jules"
 created: 2024-05-24
 completed: ""
-result: ""
+result: "discard"
 ---
 
 # PERF-339: Prebind CaptureLoop Waiter Executors
