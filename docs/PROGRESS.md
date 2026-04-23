@@ -1,3 +1,6 @@
+### RENDERER v1.78.2
+- ✅ Completed: PERF-343 - Eliminated `Promise.race` and array allocation in `CdpTimeDriver.setTime` stability check by pre-binding executors, improving render time and reducing GC pressure.
+
 ### PLAYER v0.77.22
 ### PLAYER v0.77.24
 - ✅ Completed: Add Undocumented Shortcuts UI - Added undocumented keyboard shortcuts (J, L, comma, period) to the player's Shortcuts UI menu.

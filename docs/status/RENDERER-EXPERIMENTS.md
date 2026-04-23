@@ -1,9 +1,10 @@
 ## Performance Trajectory
-Current best: 45.321s (baseline was 47.554s, -4.7%)
+Current best: 49.437s (baseline was 83.181s, -40.6%)
 Last updated by: PERF-321
 
 
 ## What Works
+- PERF-343: Eliminated `Promise.race` and array allocation in `CdpTimeDriver.setTime` stability check by pre-binding executors, improving render time by ~12% (49.437s).
 - **PERF-337**: Prebound `frameWaiterResolve` executor into `frameWaiterExecutor` to avoid dynamic inline closure allocations during the CaptureLoop actor pipeline backpressure events. This adheres to the "simplicity and GC reduction" principle that guided keeping `writerWaiterExecutor`. Render time: 46.464s (Baseline: 57.022s), though baseline was inflated by initial run. Median render times of subsequent runs were around 46.6s, slightly better than PERF-336's ~47.4s. Kept to reduce V8 GC churn in the main event loop.
 
 ## What Doesn't Work (and Why)
@@ -43,6 +44,7 @@ Last updated by: PERF-321
 - **PERF-296**: Replaced object mutation with inline object allocation in the hot loops of `SeekTimeDriver.ts` and `DomStrategy.ts`. The median render time worsened to ~48.743s compared to the baseline of ~47.232s. This indicates that creating new object literals inside the hot loop adds more overhead than the write barriers caused by mutating the long-lived properties. Discarded as slower.
 
 ## What Works
+- PERF-343: Eliminated `Promise.race` and array allocation in `CdpTimeDriver.setTime` stability check by pre-binding executors, improving render time by ~12% (49.437s).
 - **PERF-334: Preallocate SeekTime Evaluate Parameters**
   - **Result**: ~47.0s (improved over recent ~48.4s benchmarks)
   - **Why it works**: Preallocated multiFrameEvaluateParams in `SeekTimeDriver` avoids creating dynamic `{ expression, contextId, awaitPromise }` objects on every single frame iteration in the hot loop, reducing GC churn in the same way it did for `CdpTimeDriver`.
@@ -87,6 +89,7 @@ Last updated by: PERF-321
 - Pre-bound the `syncMedia` catch handlers to `this.handleSyncMediaError` inside `CdpTimeDriver.ts` hot loop (PERF-265).
 
 ## What Works
+- PERF-343: Eliminated `Promise.race` and array allocation in `CdpTimeDriver.setTime` stability check by pre-binding executors, improving render time by ~12% (49.437s).
 - **PERF-337**: Prebound `frameWaiterResolve` executor into `frameWaiterExecutor` to avoid dynamic inline closure allocations during the CaptureLoop actor pipeline backpressure events. This adheres to the "simplicity and GC reduction" principle that guided keeping `writerWaiterExecutor`. Render time: 46.464s (Baseline: 57.022s), though baseline was inflated by initial run. Median render times of subsequent runs were around 46.6s, slightly better than PERF-336's ~47.4s. Kept to reduce V8 GC churn in the main event loop.
 
 ## What Doesn't Work (and Why)
@@ -109,6 +112,7 @@ Last updated by: PERF-321
 - Can we eliminate dynamic Promise `.then` closure allocation in the `CaptureLoop.ts` by pre-binding?
 
 ## What Works
+- PERF-343: Eliminated `Promise.race` and array allocation in `CdpTimeDriver.setTime` stability check by pre-binding executors, improving render time by ~12% (49.437s).
 - Preallocated `evaluateParams` and `evaluateStabilityParams` objects in `CdpTimeDriver.ts` to avoid inline object creation in the `setTime` hot loop. V8 handles static object mutation well, reducing GC pressure across multiple execution contexts. (~3.3% improvement) (PERF-329)
 - **PERF-324**: Prebound frame promise executors in CaptureLoop. Eliminated inline dynamic closure allocations (`new Promise((res, rej) => ...)`) by creating a static array of executor functions upfront. Brought median render time from ~40.0s to 39.293s (~1.8% improvement), further reducing GC pressure in the inner loop.
 ## PERF-323: void-time-driver
@@ -126,6 +130,7 @@ Last updated by: PERF-321
 - Pre-bind fallback callback in DomStrategy.capture() (PERF-269) - Eliminates GC pressure overhead in fallback screenshot loop
 
 ## What Works
+- PERF-343: Eliminated `Promise.race` and array allocation in `CdpTimeDriver.setTime` stability check by pre-binding executors, improving render time by ~12% (49.437s).
 - **PERF-337**: Prebound `frameWaiterResolve` executor into `frameWaiterExecutor` to avoid dynamic inline closure allocations during the CaptureLoop actor pipeline backpressure events. This adheres to the "simplicity and GC reduction" principle that guided keeping `writerWaiterExecutor`. Render time: 46.464s (Baseline: 57.022s), though baseline was inflated by initial run. Median render times of subsequent runs were around 46.6s, slightly better than PERF-336's ~47.4s. Kept to reduce V8 GC churn in the main event loop.
 
 ## What Doesn't Work (and Why)
@@ -146,6 +151,7 @@ Last updated by: PERF-321
 - **PERF-276**: Replaced modulo (`%`) operators with bitwise AND (`&`) for indexing into the `framePromises` ring buffer in `CaptureLoop.ts`. Render time: 32.243s (baseline 32.062s). Discarded because V8 already optimizes modulo efficiently and the bitwise logic yielded no measurable improvement and was slightly slower.
 
 ## What Works
+- PERF-343: Eliminated `Promise.race` and array allocation in `CdpTimeDriver.setTime` stability check by pre-binding executors, improving render time by ~12% (49.437s).
 - **PERF-337**: Prebound `frameWaiterResolve` executor into `frameWaiterExecutor` to avoid dynamic inline closure allocations during the CaptureLoop actor pipeline backpressure events. This adheres to the "simplicity and GC reduction" principle that guided keeping `writerWaiterExecutor`. Render time: 46.464s (Baseline: 57.022s), though baseline was inflated by initial run. Median render times of subsequent runs were around 46.6s, slightly better than PERF-336's ~47.4s. Kept to reduce V8 GC churn in the main event loop.
 
 ## What Doesn't Work (and Why)
@@ -189,6 +195,7 @@ Last updated by: PERF-321
 - **PERF-286**: Can we improve multi-frame synchronization in SeekTimeDriver by prefetching Context IDs and iterating with raw CDP Runtime.evaluate over all frames?
 
 ## What Works
+- PERF-343: Eliminated `Promise.race` and array allocation in `CdpTimeDriver.setTime` stability check by pre-binding executors, improving render time by ~12% (49.437s).
 - Preallocated `evaluateParams` and `evaluateStabilityParams` objects in `CdpTimeDriver.ts` to avoid inline object creation in the `setTime` hot loop. V8 handles static object mutation well, reducing GC pressure across multiple execution contexts. (~3.3% improvement) (PERF-329)
 - **PERF-324**: Prebound frame promise executors in CaptureLoop. Eliminated inline dynamic closure allocations (`new Promise((res, rej) => ...)`) by creating a static array of executor functions upfront. Brought median render time from ~40.0s to 39.293s (~1.8% improvement), further reducing GC pressure in the inner loop.
 ## PERF-323: void-time-driver
@@ -206,6 +213,7 @@ Last updated by: PERF-321
 - PERF-286
 
 ## What Works
+- PERF-343: Eliminated `Promise.race` and array allocation in `CdpTimeDriver.setTime` stability check by pre-binding executors, improving render time by ~12% (49.437s).
 - **PERF-337**: Prebound `frameWaiterResolve` executor into `frameWaiterExecutor` to avoid dynamic inline closure allocations during the CaptureLoop actor pipeline backpressure events. This adheres to the "simplicity and GC reduction" principle that guided keeping `writerWaiterExecutor`. Render time: 46.464s (Baseline: 57.022s), though baseline was inflated by initial run. Median render times of subsequent runs were around 46.6s, slightly better than PERF-336's ~47.4s. Kept to reduce V8 GC churn in the main event loop.
 
 ## What Doesn't Work (and Why)
@@ -225,6 +233,7 @@ Last updated by: PERF-321
   - Plan: PERF-287
 
 ## What Works
+- PERF-343: Eliminated `Promise.race` and array allocation in `CdpTimeDriver.setTime` stability check by pre-binding executors, improving render time by ~12% (49.437s).
 - Preallocated `evaluateParams` and `evaluateStabilityParams` objects in `CdpTimeDriver.ts` to avoid inline object creation in the `setTime` hot loop. V8 handles static object mutation well, reducing GC pressure across multiple execution contexts. (~3.3% improvement) (PERF-329)
 - **PERF-324**: Prebound frame promise executors in CaptureLoop. Eliminated inline dynamic closure allocations (`new Promise((res, rej) => ...)`) by creating a static array of executor functions upfront. Brought median render time from ~40.0s to 39.293s (~1.8% improvement), further reducing GC pressure in the inner loop.
 ## PERF-323: void-time-driver

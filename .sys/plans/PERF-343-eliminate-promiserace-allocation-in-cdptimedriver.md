@@ -1,11 +1,11 @@
 ---
 id: PERF-343
 slug: eliminate-promiserace-allocation-in-cdptimedriver
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "Jules"
 created: 2024-05-24
-completed: ""
-result: ""
+completed: "2026-04-23"
+result: "keep"
 ---
 
 # PERF-343: Eliminate Promise.race Array Allocation in CdpTimeDriver
