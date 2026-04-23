@@ -1,11 +1,11 @@
 ---
 id: PERF-345
 slug: eliminate-capture-await
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-18
-completed: ""
-result: ""
+completed: "2024-05-18"
+result: "no-improvement"
 ---
 
 # PERF-345: Eliminate `async`/`await` overhead in `DomStrategy.capture()`
@@ -100,3 +100,9 @@ Run `npx tsx packages/renderer/tests/verify-dom-strategy-capture.ts`
 ## Prior Art
 - PERF-277 initially used `await` over `.then()` but didn't combine it with pre-bound closures.
 - Pre-binding executor handlers (e.g., PERF-324, PERF-343) consistently improves GC pressure and render times.
+
+## Results Summary
+- **Best render time**: 46.805s (vs baseline 47.013s)
+- **Improvement**: ~0.4% (inconclusive, within noise margin)
+- **Kept experiments**: none
+- **Discarded experiments**: Eliminate `async`/`await` generator overhead in single-frame `capture()`.
