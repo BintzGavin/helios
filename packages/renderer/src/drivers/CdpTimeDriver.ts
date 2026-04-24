@@ -17,58 +17,6 @@ export class CdpTimeDriver implements TimeDriver {
   private multiFrameEvaluateParams: any[] = [];
   private evaluateStabilityParams: any = { expression: "if (typeof window.__helios_wait_until_stable === 'function') window.__helios_wait_until_stable();", awaitPromise: true };
 
-  private stabilityResolve: (() => void) | null = null;
-  private stabilityReject: ((err: Error) => void) | null = null;
-  private stabilityTimeoutId: NodeJS.Timeout | null = null;
-
-  private handleStabilityTimeout = () => {
-    if (this.stabilityReject) {
-      this.stabilityReject(new Error('Stability check timed out'));
-      this.stabilityResolve = null;
-      this.stabilityReject = null;
-    }
-  };
-
-  private handleStabilitySuccess = (res: any) => {
-    if (this.stabilityTimeoutId) {
-      clearTimeout(this.stabilityTimeoutId);
-      this.stabilityTimeoutId = null;
-    }
-    if (res && res.exceptionDetails && this.stabilityReject) {
-      this.stabilityReject(new Error('Stability check failed: ' + res.exceptionDetails.exception?.description));
-      this.stabilityResolve = null;
-      this.stabilityReject = null;
-      return;
-    }
-    if (this.stabilityResolve) {
-      this.stabilityResolve();
-      this.stabilityResolve = null;
-      this.stabilityReject = null;
-    }
-  };
-
-  private handleStabilityError = (err: any) => {
-    if (this.stabilityTimeoutId) {
-      clearTimeout(this.stabilityTimeoutId);
-      this.stabilityTimeoutId = null;
-    }
-    if (this.stabilityReject) {
-      this.stabilityReject(err);
-      this.stabilityResolve = null;
-      this.stabilityReject = null;
-    }
-  };
-
-  private stabilityPromiseExecutor = (resolve: () => void, reject: (err: Error) => void) => {
-    this.stabilityResolve = resolve;
-    this.stabilityReject = reject;
-    this.stabilityTimeoutId = setTimeout(this.handleStabilityTimeout, this.timeout);
-
-    this.client!.send('Runtime.evaluate', this.evaluateStabilityParams)
-      .then(this.handleStabilitySuccess)
-      .catch(this.handleStabilityError);
-  };
-
   private virtualTimePromiseExecutor = (resolve: () => void, reject: (err: Error) => void) => {
     this.cdpResolve = resolve;
     this.cdpReject = reject;
@@ -262,23 +210,37 @@ export class CdpTimeDriver implements TimeDriver {
     this.currentTime = timeInSeconds;
 
     // 3. Wait for custom stability checks
-    // We use a string-based evaluation to avoid build-tool artifacts
-    // We implement timeout in Node.js because setTimeout in the page
-    // does not work when CDP virtual time is paused.
-    // The promise executor is pre-bound to avoid closures in the hot loop
+    // We use a string-based evaluation to avoid build-tool artifacts.
+    // We rely on awaitPromise: true natively.
+
+    // We still need a timeout mechanism because CDP evaluate with awaitPromise doesn't have an inherent timeout,
+    // and virtual time is paused, so internal setTimeout won't work.
+    let timeoutId: NodeJS.Timeout | null = null;
+    const evaluatePromise = this.client!.send('Runtime.evaluate', this.evaluateStabilityParams).then(this.handleStabilityCheckResponse);
+
+    const timeoutPromise = new Promise<void>((_, reject) => {
+        timeoutId = setTimeout(() => {
+            reject(new Error('Stability check timed out'));
+        }, this.timeout);
+    });
+
     try {
-      await new Promise<void>(this.stabilityPromiseExecutor);
+        await Promise.race([evaluatePromise, timeoutPromise]);
     } catch (e: any) {
-      if (e.message === 'Stability check timed out') {
-        console.warn(`[CdpTimeDriver] Stability check timed out after ${this.timeout}ms. Terminating execution.`);
-        try {
-          await this.client?.send('Runtime.terminateExecution');
-        } catch (termErr) {
-          console.warn('[CdpTimeDriver] Failed to terminate hanging script (might have finished race):', termErr);
+        if (e.message === 'Stability check timed out') {
+            console.warn(`[CdpTimeDriver] Stability check timed out after ${this.timeout}ms. Terminating execution.`);
+            try {
+                await this.client?.send('Runtime.terminateExecution');
+            } catch (termErr) {
+                console.warn('[CdpTimeDriver] Failed to terminate hanging script (might have finished race):', termErr);
+            }
+        } else {
+            throw e;
         }
-      } else {
-        throw e;
-      }
+    } finally {
+        if (timeoutId) {
+            clearTimeout(timeoutId);
+        }
     }
   }
 }
