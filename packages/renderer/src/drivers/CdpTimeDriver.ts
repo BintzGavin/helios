@@ -13,7 +13,6 @@ export class CdpTimeDriver implements TimeDriver {
   private cachedPromises: Promise<any>[] = [];
   private cdpResolve: (() => void) | null = null;
   private cdpReject: ((err: Error) => void) | null = null;
-  private evaluateParams: any = { expression: '', awaitPromise: false };
   private multiFrameEvaluateParams: any[] = [];
   private evaluateStabilityParams: any = { expression: "if (typeof window.__helios_wait_until_stable === 'function') window.__helios_wait_until_stable();", awaitPromise: true };
 
@@ -165,9 +164,10 @@ export class CdpTimeDriver implements TimeDriver {
     // Execute in all frames (including main frame) to support iframes
     const frames = this.cachedFrames;
     if (frames.length === 1) {
-      this.evaluateParams.expression = "if(typeof window.__helios_sync_media==='function') window.__helios_sync_media(" + timeInSeconds + ");";
-      this.evaluateParams.contextId = undefined;
-      await this.client!.send('Runtime.evaluate', this.evaluateParams).catch(this.handleSyncMediaError);
+      await this.client!.send('Runtime.evaluate', {
+        expression: "if(typeof window.__helios_sync_media==='function') window.__helios_sync_media(" + timeInSeconds + ");",
+        awaitPromise: false
+      }).catch(this.handleSyncMediaError);
     } else {
         if (this.executionContextIds.length > 0) {
           if (this.cachedPromises.length !== this.executionContextIds.length) {

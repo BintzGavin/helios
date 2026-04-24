@@ -19,8 +19,7 @@ export class DomStrategy implements RenderStrategy {
   private lastFrameData: Buffer | string | null = null;
 
   private cdpScreenshotParams: any = null;
-  private beginFrameParams: any = null;
-  private targetBeginFrameParams: any = null;
+  private targetClipParams: any = null;
   private targetElementHandle: any = null;
   private emptyImageBuffer: Buffer = EMPTY_IMAGE_BUFFER;
   private emptyImageBase64: string = "";
@@ -154,21 +153,7 @@ export class DomStrategy implements RenderStrategy {
 
     this.lastFrameData = this.emptyImageBase64;
 
-    this.beginFrameParams = {
-      screenshot: this.cdpScreenshotParams,
-      interval: this.frameInterval,
-      frameTimeTicks: 0
-    };
 
-    this.targetBeginFrameParams = {
-      screenshot: {
-        format: this.cdpScreenshotParams.format,
-        quality: this.cdpScreenshotParams.quality,
-        clip: { x: 0, y: 0, width: 0, height: 0, scale: 1 }
-      },
-      interval: this.frameInterval,
-      frameTimeTicks: 0
-    };
 
 
     if (this.options.targetSelector) {
@@ -188,10 +173,7 @@ export class DomStrategy implements RenderStrategy {
 
       const box = await this.targetElementHandle.boundingBox();
       if (box) {
-        this.targetBeginFrameParams.screenshot.clip.x = box.x;
-        this.targetBeginFrameParams.screenshot.clip.y = box.y;
-        this.targetBeginFrameParams.screenshot.clip.width = box.width;
-        this.targetBeginFrameParams.screenshot.clip.height = box.height;
+        this.targetClipParams = { x: box.x, y: box.y, width: box.width, height: box.height, scale: 1 };
       } else {
         console.warn(`Could not determine bounding box for target element: ${this.options.targetSelector}`);
       }
@@ -203,10 +185,16 @@ export class DomStrategy implements RenderStrategy {
 
   async capture(page: Page, frameTime: number): Promise<Buffer | string> {
     if (this.targetElementHandle) {
-      if (this.targetBeginFrameParams.screenshot.clip.width > 0) {
-        this.targetBeginFrameParams.frameTimeTicks = 10000 + frameTime;
-
-        const res = await this.cdpSession!.send('HeadlessExperimental.beginFrame', this.targetBeginFrameParams);
+      if (this.targetClipParams) {
+        const res = await this.cdpSession!.send('HeadlessExperimental.beginFrame', {
+          screenshot: {
+            format: this.cdpScreenshotParams.format,
+            quality: this.cdpScreenshotParams.quality,
+            clip: this.targetClipParams
+          } as any,
+          interval: this.frameInterval,
+          frameTimeTicks: 10000 + frameTime
+        });
         if (res && res.screenshotData) {
           this.lastFrameData = res.screenshotData;
           return res.screenshotData;
@@ -227,8 +215,11 @@ export class DomStrategy implements RenderStrategy {
       return this.lastFrameData!;
     }
 
-    this.beginFrameParams.frameTimeTicks = 10000 + frameTime;
-    const res = await this.cdpSession!.send('HeadlessExperimental.beginFrame', this.beginFrameParams);
+    const res = await this.cdpSession!.send('HeadlessExperimental.beginFrame', {
+      screenshot: this.cdpScreenshotParams,
+      interval: this.frameInterval,
+      frameTimeTicks: 10000 + frameTime
+    });
     if (res && res.screenshotData) {
       this.lastFrameData = res.screenshotData;
       return res.screenshotData;
