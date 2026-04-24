@@ -1,0 +1,8 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	56.657	600	10.59	33.6	keep	baseline
+2	47.668	600	12.59	34.2	keep	baseline
+3	45.711	600	13.13	32.6	keep	baseline
+4	45.656	600	13.14	42.6	keep	Eliminated timeout promise in CdpTimeDriver.ts
+5	45.542	600	13.17	36.5	keep	Eliminated timeout promise in CdpTimeDriver.ts
+6	45.814	600	13.10	40.0	keep	Eliminated timeout promise in CdpTimeDriver.ts
+7	46.182	600	12.99	38.8	keep	Re-added timeout for stability check safety in CdpTimeDriver.ts
