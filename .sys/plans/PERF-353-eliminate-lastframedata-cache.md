@@ -1,7 +1,7 @@
 ---
 id: PERF-353
 slug: eliminate-lastframedata-cache
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-04-24
 completed: ""
@@ -72,3 +72,9 @@ Run the DOM mode verification script: `npx tsx packages/renderer/tests/verify-do
 
 ## Prior Art
 - Memory reduction experiments (GC churn) have consistently yielded wins in Node.js pipelines (e.g. `PERF-348` inline allocations).
+
+## Results Summary
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	48.016	600	12.50	35.6	discard	eliminate lastFrameData cache
+2	48.448	600	12.38	38.5	discard	eliminate lastFrameData cache
+3	47.930	600	12.52	35.6	discard	eliminate lastFrameData cache
