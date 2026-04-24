@@ -1,4 +1,6 @@
-**Version**: 0.76.20
+**Version**: 0.77.26
+[v0.77.26] ✅ Completed: Implement WebVTT Support - Refactored WebVTT parser to use single-pass loops instead of chained map/filter arrays for better performance
+
 [v0.77.23] ✅ Completed: Document Undocumented Shortcuts
 [v0.77.22] ✅ Completed: Fix Arrow Key Shortcuts
 
