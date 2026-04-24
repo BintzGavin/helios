@@ -6,7 +6,7 @@ Helios is a modern engine for creating videos programmatically using standard we
 
 ## Quick Facts
 - **License**: Elastic License 2.0 (free commercial use, no SaaS resale)
-- **Status**: Beta / Self-Driving (Core: Stable v5.13.0+, Studio: Alpha v0.107.1+, Player: v0.76.20+, Renderer: v1.78.3+, CLI: Beta v0.45.1+, Infrastructure: v0.25.0+)
+- **Status**: Beta / Self-Driving (Core: Stable v5.13.0+, Studio: Alpha v0.107.1+, Player: v0.76.20+, Renderer: v1.78.3+, CLI: Beta v0.45.2+, Infrastructure: v0.25.0+)
 - **Frameworks**: React, Vue, Svelte, Solid, vanilla JS
 - **Animation**: Standard CSS, Web Animations API (WAAPI), any animation library
 
@@ -121,12 +121,12 @@ const report = await Helios.diagnose();
 
 ## Roadmap
 ### V1.x (Active)
-- **Studio**: v0.107.1+ (Toggle Loop Shortcut, Asset Drag and Drop, Refine CLI Component Removal, Enhance MCP Server, Timeline Audio Regression Refinements, Update Quickstart Guide)
-- **CLI**: v0.45.1+ (Tier 3 Scaffold Deployment Commands, Scaffold Kubernetes Deployment Command, Scaffold Cloudflare Sandbox Deployment, All Worker Execution, Scaffold Hetzner Deployment Command)
-- **Core**: v5.13.0+ (Generic Input Props, Implement WaitUntilStable, Implement Active Clips, Shared Virtual Time Binding, Enable Audio State Persistence, Implement Composition Schema, Expose Fade Easing Metadata)
-- **Player**: v0.76.20+ (Add Undocumented Shortcuts to UI, Bridge Coverage Completeness, Bridge Coverage Expansion, Regression Tests for Audio Fader, Regression Tests for Media Session, Regression Tests for MediaProperties, Regression Tests for InputProps, Document getSchema API Parity, Async Seek)
-- **Renderer**: v1.78.3+ (WebCodecs Preference, Update Skill Documentation, Fix Skill Documentation, Orchestrator Plan, Validate HW Accel, Refactor Media Sync Logic, Abstraction for Pluggable Execution)
-- **Infrastructure**: v0.25.0+ (Optimize S3 Uploads, Optimize GCS Uploads, FfmpegStitcher Coverage, Orchestrator Test Coverage Expansion, Documentation Orchestration, Modal Adapter, InMemoryJobRepository Coverage, CloudRun Resiliency Tests)
+- **Studio**: v0.107.1+ (Refine CLI Component Removal, Asset Drag and Drop, TimelineAudioTrack Regression Tests, Timeline Audio Regression Refinements, Update Quickstart Guide)
+- **CLI**: v0.45.2+ (Scaffold Hetzner Deployment Command, All Worker Execution, Scaffold Cloudflare Sandbox Deployment, Tier 3 Scaffold Deployment Commands, Scaffold Kubernetes Deployment Command)
+- **Core**: v5.13.0+ (Generic Input Props, Implement Active Clips, Implement Composition Schema, Shared Virtual Time Binding, Reactive Virtual Time Getter, Expose Fade Easing Metadata)
+- **Player**: v0.76.20+ (Document getSchema API Parity, Bridge Coverage Completeness, Bridge Coverage Expansion, Regression Tests for Audio Fader, Regression Tests for Media Session, Regression Tests for MediaProperties, Regression Tests for InputProps)
+- **Renderer**: v1.78.3+ (Validate HW Accel, Orchestrator Plan, Refactor Media Sync Logic, Update Skill Documentation, Refactor DOM Traversal, Abstraction for Pluggable Execution)
+- **Infrastructure**: v0.25.0+ (Optimize GCS Uploads, Orchestrator Test Coverage Expansion, InMemoryJobRepository Coverage)
 
 ### AI Integration
 - **Studio MCP Server**: Inspect, create, and render compositions via LLM tools (Done)
