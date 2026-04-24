@@ -15,10 +15,6 @@ export class SeekTimeDriver implements TimeDriver {
     private executionContextIds: number[] = [];
   private evaluateArgs: [number, number] = [0, 0];
   private evaluateClosure = ([t, timeoutMs]: any) => { (window as any).__helios_seek(t, timeoutMs); };
-  private evaluateParams: any = {
-    expression: '',
-    awaitPromise: true
-  };
   private multiFrameEvaluateParams: any[] = [];
 
   constructor(private timeout: number = 30000) {
@@ -284,8 +280,10 @@ export class SeekTimeDriver implements TimeDriver {
     const frames = this.cachedFrames;
 
     if (frames.length === 1) {
-      this.evaluateParams.expression = 'window.__helios_seek(' + timeInSeconds + ', ' + this.timeout + ')';
-      this.cdpSession!.send('Runtime.evaluate', this.evaluateParams).catch(noopCatch);
+      this.cdpSession!.send('Runtime.evaluate', {
+        expression: 'window.__helios_seek(' + timeInSeconds + ', ' + this.timeout + ')',
+        awaitPromise: true
+      }).catch(noopCatch);
       return;
     }
 

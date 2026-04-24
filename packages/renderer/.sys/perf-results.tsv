@@ -6,3 +6,8 @@ run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
 5	47.147	600	12.73	41.6	keep	Removed formatResponse overhead
 6	46.939	600	12.78	43.3	keep	Cache Media Synchronization Promises in SeekTimeDriver
 7	48.811	600	12.29	36.2	discard	PERF-342: prebind captureloop waiters
+1	48.240	600	12.44	45.8	keep	inline allocation
+2	53.688	600	11.18	33.3	keep	inline allocation
+3	46.537	600	12.89	35.0	keep	inline allocation
+4	47.262	600	12.70	36.3	keep	inline allocation
+5	46.298	600	12.96	32.7	keep	inline allocation
