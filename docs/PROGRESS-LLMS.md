@@ -1,5 +1,11 @@
 # LLMS Progress
 
+## LLMS v1.73.0
+- ✅ Completed: Daily llms.txt Review
+  - Updated Quick Facts: CLI v0.45.2+.
+  - Updated Roadmap: Reflected latest completions for all domains based on PROGRESS logs.
+  - Verified package versions, API examples, and file paths.
+
 
 ## LLMS v1.72.0
 - ✅ Completed: Daily llms.txt Review
@@ -68,6 +74,12 @@
   - Verified API examples, roadmap synchronization, and key file paths.
 
 # LLMS Progress
+
+## LLMS v1.73.0
+- ✅ Completed: Daily llms.txt Review
+  - Updated Quick Facts: CLI v0.45.2+.
+  - Updated Roadmap: Reflected latest completions for all domains based on PROGRESS logs.
+  - Verified package versions, API examples, and file paths.
 
 ## LLMS v1.71.0
 - ✅ Completed: Daily llms.txt Review
