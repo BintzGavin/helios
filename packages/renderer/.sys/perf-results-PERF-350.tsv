@@ -1,0 +1,7 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	48.005	600	12.50	32.8	keep	baseline
+2	48.279	600	12.43	46.0	keep	baseline
+3	48.248	600	12.44	41.5	keep	baseline
+4	50.012	600	12.00	42.9	discard	inline evaluate params in seek driver
+5	49.950	600	12.01	38.2	discard	inline evaluate params in seek driver
+6	50.562	600	11.87	36.7	discard	inline evaluate params in seek driver
