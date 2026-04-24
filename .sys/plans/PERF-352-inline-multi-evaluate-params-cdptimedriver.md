@@ -1,11 +1,11 @@
 ---
 id: PERF-352
 slug: inline-multi-evaluate-params-cdptimedriver
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "Jules"
 created: 2024-04-24
 completed: ""
-result: ""
+result: "discarded - performance gain negligible"
 ---
 
 # PERF-352: Inline Multi-Evaluate Params in CdpTimeDriver
@@ -73,3 +73,14 @@ Run the DOM mode verification script: `npx tsx packages/renderer/tests/verify-do
 
 ## Prior Art
 - **PERF-348**: Demonstrated that inline object allocation for `Runtime.evaluate` outperforms mutating cached objects in the single-frame path.
+
+## Results Summary
+```tsv
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	45.881	600	13.08	35.6	discard	baseline
+2	45.962	600	13.05	39.9	discard	baseline
+3	45.897	600	13.07	35.4	discard	baseline
+4	45.943	600	13.06	40.8	discard	inline multiFrameEvaluateParams
+5	45.762	600	13.11	36.3	discard	inline multiFrameEvaluateParams
+6	46.044	600	13.03	35.0	discard	inline multiFrameEvaluateParams
+```
