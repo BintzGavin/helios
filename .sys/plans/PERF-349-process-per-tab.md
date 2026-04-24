@@ -1,11 +1,11 @@
 ---
 id: PERF-349
 slug: process-per-tab
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor"
 created: 2026-10-18
-completed: ""
-result: ""
+completed: "2026-04-24"
+result: "discarded"
 ---
 
 # PERF-349: Implement Process-per-Tab configuration for Chromium
@@ -63,3 +63,10 @@ Run the DOM render benchmark script multiple times to verify median render time 
 
 ## Prior Art
 - PERF-304 attempted this but was discarded. However, since then, we've optimized object allocations and the node event loop significantly, meaning the Chromium process is now more likely to be the true bottleneck.
+
+
+## Results Summary
+- **Best render time**: ~47.607s median (vs baseline ~47.525s)
+- **Improvement**: 0% (Worse)
+- **Kept experiments**: None
+- **Discarded experiments**: `process-per-tab` flag added to `DEFAULT_BROWSER_ARGS`
