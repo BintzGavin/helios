@@ -1,8 +1,9 @@
 # CLI Status
 
-**Version**: 0.46.11
+**Version**: 0.46.12
 
 ## Recent Completions
+[v0.46.12] ✅ Completed: Regression Tests Remaining Commands - Verified comprehensive unit tests for `helios preview`, `helios skills`, and `helios studio`.
 [v0.46.11] ✅ Completed: Scaffold Cloudflare Sandbox Deployment Command - Implemented `helios deploy cloudflare-sandbox` to scaffold Cloudflare Workflows and Sandboxes.
 [v0.46.10] ✅ Completed: Implement remaining CLI command regression tests - Add unit tests for preview, skills, and studio.
 [v0.46.8] ✅ Completed: Build Command Regression Tests - Implemented unit tests for the build command.
