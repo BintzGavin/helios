@@ -1,11 +1,11 @@
 ---
 id: PERF-350
 slug: inline-evaluate-params-seektimedriver
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-06-25
-completed: ""
-result: ""
+completed: 2026-04-24
+result: no-improvement
 ---
 
 # PERF-350: Inline Evaluate Params in SeekTimeDriver
@@ -80,3 +80,9 @@ Run the DOM mode benchmark script. The resulting `output.mp4` should be visually
 
 ## Prior Art
 - **PERF-348**: Demonstrated that inline object allocation for `HeadlessExperimental.beginFrame` and `Runtime.evaluate` outperforms mutating cached objects.
+
+## Results Summary
+- **Best render time**: 50.012s (vs baseline 48.248s)
+- **Improvement**: -3.66%
+- **Kept experiments**: none
+- **Discarded experiments**: Inline object allocation for evaluate params in SeekTimeDriver.
