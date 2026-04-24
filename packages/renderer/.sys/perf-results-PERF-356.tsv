@@ -1,0 +1,7 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	46.353	600	12.94	37.7	keep	baseline
+2	46.412	600	12.93	38.7	keep	baseline
+3	46.419	600	12.93	38.7	keep	baseline
+4	48.275	600	12.43	36.0	keep	Playwright waitForSelector replacement
+5	46.402	600	12.93	37.2	keep	Playwright waitForSelector replacement
+6	46.349	600	12.95	37.3	keep	Playwright waitForSelector replacement

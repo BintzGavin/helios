@@ -4,6 +4,7 @@ Last updated by: PERF-355
 
 
 ## What Works
+- Replaced custom `FIND_DEEP_ELEMENT_SCRIPT` tree walking logic with Playwright's native `waitForSelector` across strategies. While it didn't impact render time measurably, it eliminated dynamic JS evaluation complexity by relying on Playwright's native shadow-piercing implementation (PERF-356).
 - PERF-355: Removed unused `screenshotOptions` allocation in `DomStrategy.prepare()`. Dead code removal. Performance remained stable (~48.9s).
 - Inlined object allocation for `HeadlessExperimental.beginFrame` and `Runtime.evaluate` instead of mutating cached objects. Median render time improved slightly due to Turbofan JIT optimizations for inline object allocation and lack of GC write barrier overhead on cached old-space objects (~46.298s vs baseline ~50s). (PERF-348)
 

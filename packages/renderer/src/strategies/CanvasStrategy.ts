@@ -4,7 +4,6 @@ import { RendererOptions, AudioTrackConfig, FFmpegConfig } from '../types.js';
 import { FFmpegBuilder } from '../utils/FFmpegBuilder.js';
 import { scanForAudioTracks } from '../utils/dom-scanner.js';
 import { extractBlobTracks } from '../utils/blob-extractor.js';
-import { FIND_DEEP_ELEMENT_SCRIPT } from '../utils/dom-finder.js';
 import { PRELOAD_SCRIPT } from '../utils/dom-preload.js';
 
 export class CanvasStrategy implements RenderStrategy {
@@ -137,21 +136,22 @@ export class CanvasStrategy implements RenderStrategy {
     // We use a string-based script to avoid transpiler artifacts (like esbuild's __name)
     const selector = this.options.canvasSelector || 'canvas';
 
-    const canvasFound = await page.evaluate((args) => {
-      // @ts-ignore
-      const finder = eval(args.script);
-      const element = finder(document, args.selector);
+    const handle = await page.waitForSelector(selector, { state: 'attached', timeout: 5000 });
+    if (!handle) {
+      throw new Error(`Canvas not found matching selector: ${selector}`);
+    }
 
+    const canvasFound = await page.evaluate((element) => {
       if (element && element instanceof HTMLCanvasElement) {
         // @ts-ignore
         window.__HELIOS_TARGET_CANVAS__ = element;
         return true;
       }
       return false;
-    }, { script: FIND_DEEP_ELEMENT_SCRIPT, selector });
+    }, handle);
 
     if (!canvasFound) {
-      throw new Error(`Canvas not found matching selector: ${selector}`);
+      throw new Error(`Target element is not a canvas: ${selector}`);
     }
 
     // Scan for audio tracks using the shared utility
