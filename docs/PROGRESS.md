@@ -36,6 +36,9 @@
 - ✅ Completed: Documentation Orchestration - Updated README.md to document Orchestration, Job Management, Cloud Execution Adapters, and Worker Runtime abstractions.
 # Helios Project Progress Log
 
+### CLI v0.46.12
+- ✅ Completed: Regression Tests Remaining Commands - Verified comprehensive unit tests for `helios preview`, `helios skills`, and `helios studio`.
+
 ### CLI v0.46.10
 - ✅ Completed: Implement remaining CLI command regression tests - Add unit tests for preview, skills, and studio.
 
