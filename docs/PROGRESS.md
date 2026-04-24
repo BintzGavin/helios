@@ -8,6 +8,9 @@
 - ✅ Completed: Fix Arrow Key Shortcuts
 
 
+### STUDIO v0.121.8
+- ✅ Completed: STUDIO-Timeline-Drag-Drop - Verified timeline drag and drop for assets is already implemented (2026-11-13-STUDIO-Timeline-Drag-Drop.md).
+
 ### STUDIO v0.121.7
 - ✅ Verified: Export Job Spec - Verified existing implementation of Export Job Spec functionality in Studio Renders Panel.
 

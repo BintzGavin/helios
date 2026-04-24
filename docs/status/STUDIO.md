@@ -1,9 +1,10 @@
-**Version**: 0.121.7
+**Version**: 0.121.8
 
 **Posture**: ACTIVELY EXPANDING FOR V2
 
 # Studio Domain Status
 
+- [v0.121.8] ✅ Completed: STUDIO-Timeline-Drag-Drop - Verified timeline drag and drop for assets is already implemented (2026-11-13-STUDIO-Timeline-Drag-Drop.md).
 - [v0.121.7] ✅ Verified: Export Job Spec - Verified existing implementation of Export Job Spec functionality in Studio Renders Panel.
 - [v0.121.5] ✅ Completed: Toggle Loop Shortcut - Restored loop toggle functionality using Shift+L keyboard shortcut.
 **Status**: 🟢 Active
