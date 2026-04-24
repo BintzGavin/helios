@@ -1,0 +1,4 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	48.016	600	12.50	35.6	discard	eliminate lastFrameData cache
+2	48.448	600	12.38	38.5	discard	eliminate lastFrameData cache
+3	47.930	600	12.52	35.6	discard	eliminate lastFrameData cache
