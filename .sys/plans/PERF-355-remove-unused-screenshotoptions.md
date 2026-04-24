@@ -1,11 +1,11 @@
 ---
 id: PERF-355
 slug: replace-screenshot-options-with-cdp
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-18
-completed: ""
-result: ""
+completed: 2026-04-24
+result: kept
 ---
 
 # PERF-355: Remove unused `screenshotOptions` allocation in `DomStrategy.ts`
@@ -74,3 +74,11 @@ Run the DOM render benchmark script multiple times to verify rendering is unaffe
 
 ## Prior Art
 N/A
+
+
+## Results Summary
+- **Best render time**: 48.870s (vs baseline 48.870s)
+- **Improvement**: 0%
+- **Kept experiments**:
+  - Removed unused `screenshotOptions` object allocation in `DomStrategy.prepare()`
+- **Discarded experiments**: []

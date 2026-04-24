@@ -114,20 +114,6 @@ export class DomStrategy implements RenderStrategy {
       }
     }
 
-    const screenshotOptions: any = {
-      type: format,
-    };
-
-    if (format === 'jpeg' || format === 'webp') {
-      if (quality !== undefined) {
-        screenshotOptions.quality = quality;
-      }
-    }
-
-    if (format !== 'jpeg') {
-      screenshotOptions.omitBackground = hasAlpha;
-    }
-
     const cdpScreenshotParams: any = { format, optimizeForSpeed: true };
     if ((format === 'jpeg' || format === 'webp') && quality !== undefined) {
       cdpScreenshotParams.quality = quality;
