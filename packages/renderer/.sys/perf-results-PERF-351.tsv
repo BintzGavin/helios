@@ -1,0 +1,6 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	48.925	600	12.26	44.3	discard	inline multiFrameEvaluateParams and replace Promise.race with custom Promise in SeekTimeDriver
+2	48.004	600	12.50	41.4	discard	inline multiFrameEvaluateParams and replace Promise.race with custom Promise in SeekTimeDriver
+3	50.451	600	11.89	43.5	discard	inline multiFrameEvaluateParams and replace Promise.race with custom Promise in SeekTimeDriver
+4	48.535	600	12.36	41.2	discard	inline multiFrameEvaluateParams and replace Promise.race with custom Promise in SeekTimeDriver
+5	48.407	600	12.39	36.9	discard	inline multiFrameEvaluateParams and replace Promise.race with custom Promise in SeekTimeDriver
