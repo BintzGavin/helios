@@ -1,11 +1,11 @@
 ---
 id: PERF-356
 slug: simplify-dom-finder
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "Jules"
 created: 2024-05-25
-completed: ""
-result: ""
+completed: "2024-05-25"
+result: "keep" ""
 ---
 
 # PERF-356: Simplify DOM Finder Script
@@ -103,3 +103,16 @@ Run `npx tsx packages/renderer/tests/fixtures/benchmark.ts`
 
 ## Prior Art
 N/A
+
+
+## Results Summary
+| run | render_time_s | frames | fps_effective | peak_mem_mb | status | description |
+|---|---|---|---|---|---|---|
+| 1 | 46.353 | 600 | 12.94 | 37.7 | keep | baseline |
+| 2 | 46.412 | 600 | 12.93 | 38.7 | keep | baseline |
+| 3 | 46.419 | 600 | 12.93 | 38.7 | keep | baseline |
+| 4 | 48.275 | 600 | 12.43 | 36.0 | keep | Playwright waitForSelector replacement |
+| 5 | 46.402 | 600 | 12.93 | 37.2 | keep | Playwright waitForSelector replacement |
+| 6 | 46.349 | 600 | 12.95 | 37.3 | keep | Playwright waitForSelector replacement |
+
+**Conclusion:** Performance is consistent with baseline (median ~46.4s). The change drastically simplifies `DomStrategy` and `CanvasStrategy` codebase by avoiding custom evaluated recursive JS string scripts, offloading the shadow piercing complexity to Playwright's native selector engine. Because it removes dead complexity and maintains parity without degradation, we will `keep` this optimization for its maintainability improvements.

@@ -4,7 +4,6 @@ import { RendererOptions, AudioTrackConfig, FFmpegConfig } from '../types.js';
 import { FFmpegBuilder } from '../utils/FFmpegBuilder.js';
 import { scanForAudioTracks } from '../utils/dom-scanner.js';
 import { extractBlobTracks } from '../utils/blob-extractor.js';
-import { FIND_DEEP_ELEMENT_SCRIPT } from '../utils/dom-finder.js';
 import { PRELOAD_SCRIPT } from '../utils/dom-preload.js';
 
 const EMPTY_IMAGE_BUFFER = Buffer.from(
@@ -143,17 +142,9 @@ export class DomStrategy implements RenderStrategy {
 
 
     if (this.options.targetSelector) {
-      const handle = await page.evaluateHandle((args) => {
-        // @ts-ignore
-        const finder = eval(args.script);
-        const element = finder(document, args.selector);
-        if (!element) throw new Error(`Target element not found: ${args.selector}`);
-        return element;
-      }, { script: FIND_DEEP_ELEMENT_SCRIPT, selector: this.options.targetSelector });
-
-      const element = handle.asElement();
+      const element = await page.waitForSelector(this.options.targetSelector, { state: 'attached', timeout: 5000 });
       if (!element) {
-        throw new Error(`Target element found but is not an element: ${this.options.targetSelector}`);
+        throw new Error(`Target element not found: ${this.options.targetSelector}`);
       }
       this.targetElementHandle = element;
 
