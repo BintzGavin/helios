@@ -1,11 +1,11 @@
 ---
 id: PERF-351
 slug: optimize-seektimedriver-gc-overhead
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-06-25
-completed: ""
-result: ""
+completed: "2024-04-24"
+result: "discarded"
 ---
 
 # PERF-351: Optimize SeekTimeDriver GC Overhead
@@ -157,3 +157,10 @@ Run the DOM mode verification script: `npx tsx packages/renderer/tests/verify-do
 ## Prior Art
 - **PERF-348**: Demonstrated that inline object allocation for `Runtime.evaluate` outperforms mutating cached objects.
 - **PERF-343**: Eliminated `Promise.race` Array Allocation in `CdpTimeDriver`.
+
+
+## Results Summary
+- **Best render time**: 48.004s (vs baseline ~46.298s)
+- **Improvement**: -4.8% (regression)
+- **Kept experiments**: []
+- **Discarded experiments**: [PERF-351 (SeekTimeDriver GC Overhead Optimization)]
