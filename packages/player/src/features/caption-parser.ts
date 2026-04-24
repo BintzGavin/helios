@@ -22,23 +22,26 @@ function parseWebVTT(content: string): SubtitleCue[] {
   const blocks = normalized.split(/\n\n+/);
 
   for (const block of blocks) {
-    const lines = block.split("\n").map(l => l.trim()).filter(l => l);
+    const lines = block.split("\n");
+    const validLines: string[] = [];
+    for (let i = 0; i < lines.length; i++) {
+      const trimmed = lines[i].trim();
+      if (trimmed) validLines.push(trimmed);
+    }
 
     // Skip header block or metadata blocks
-    // Note: A robust parser would need to handle "WEBVTT" followed by text on the same line,
-    // or metadata headers. For now we skip blocks starting with keywords.
-    if (lines.length === 0 ||
-        lines[0] === "WEBVTT" ||
-        lines[0].startsWith("WEBVTT ") ||
-        lines[0].startsWith("NOTE") ||
-        lines[0].startsWith("STYLE") ||
-        lines[0].startsWith("REGION")) {
+    if (validLines.length === 0 ||
+        validLines[0] === "WEBVTT" ||
+        validLines[0].startsWith("WEBVTT ") ||
+        validLines[0].startsWith("NOTE") ||
+        validLines[0].startsWith("STYLE") ||
+        validLines[0].startsWith("REGION")) {
       continue;
     }
 
     let timeLineIndex = -1;
-    for (let i = 0; i < Math.min(lines.length, 2); i++) {
-      if (lines[i].includes("-->")) {
+    for (let i = 0; i < Math.min(validLines.length, 2); i++) {
+      if (validLines[i].includes("-->")) {
         timeLineIndex = i;
         break;
       }
@@ -46,11 +49,10 @@ function parseWebVTT(content: string): SubtitleCue[] {
 
     if (timeLineIndex === -1) continue;
 
-    const timeLine = lines[timeLineIndex];
-    const textLines = lines.slice(timeLineIndex + 1);
+    const timeLine = validLines[timeLineIndex];
     let id: string | undefined;
     if (timeLineIndex > 0) {
-      id = lines[timeLineIndex - 1];
+      id = validLines[timeLineIndex - 1];
     }
 
     // WebVTT timestamp regex:
@@ -60,7 +62,12 @@ function parseWebVTT(content: string): SubtitleCue[] {
     if (timeMatch) {
       const startTime = parseTime(timeMatch[1]);
       const endTime = parseTime(timeMatch[2]);
-      const text = textLines.join("\n").trim();
+
+      let text = "";
+      for (let i = timeLineIndex + 1; i < validLines.length; i++) {
+        if (text.length > 0) text += "\n";
+        text += validLines[i];
+      }
 
       if (!isNaN(startTime) && !isNaN(endTime)) {
         cues.push({ id, startTime, endTime, text });
@@ -100,7 +107,6 @@ export function parseSRT(srt: string): SubtitleCue[] {
     if (timeLineIndex === -1) continue;
 
     const timeLine = lines[timeLineIndex];
-    const textLines = lines.slice(timeLineIndex + 1);
     let id: string | undefined;
     if (timeLineIndex > 0) {
       id = lines[timeLineIndex - 1];
@@ -113,7 +119,13 @@ export function parseSRT(srt: string): SubtitleCue[] {
     if (timeMatch) {
       const startTime = parseTime(timeMatch[1]);
       const endTime = parseTime(timeMatch[2]);
-      const text = textLines.join("\n").trim();
+
+      let text = "";
+      for (let i = timeLineIndex + 1; i < lines.length; i++) {
+        if (text.length > 0) text += "\n";
+        text += lines[i];
+      }
+      text = text.trim();
 
       if (!isNaN(startTime) && !isNaN(endTime)) {
         cues.push({ id, startTime, endTime, text });
