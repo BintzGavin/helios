@@ -16,6 +16,20 @@ export class CdpTimeDriver implements TimeDriver {
   private multiFrameEvaluateParams: any[] = [];
   private evaluateStabilityParams: any = { expression: "if (typeof window.__helios_wait_until_stable === 'function') window.__helios_wait_until_stable();", awaitPromise: true };
 
+  private stabilityTimeoutId: NodeJS.Timeout | null = null;
+  private stabilityTimeoutReject: ((err: Error) => void) | null = null;
+
+  private stabilityTimeoutCallback = () => {
+    if (this.stabilityTimeoutReject) {
+      this.stabilityTimeoutReject(new Error('Stability check timed out'));
+    }
+  };
+
+  private stabilityTimeoutExecutor = (_: () => void, reject: (err: Error) => void) => {
+    this.stabilityTimeoutReject = reject;
+    this.stabilityTimeoutId = setTimeout(this.stabilityTimeoutCallback, this.timeout);
+  };
+
   private virtualTimePromiseExecutor = (resolve: () => void, reject: (err: Error) => void) => {
     this.cdpResolve = resolve;
     this.cdpReject = reject;
@@ -215,14 +229,9 @@ export class CdpTimeDriver implements TimeDriver {
 
     // We still need a timeout mechanism because CDP evaluate with awaitPromise doesn't have an inherent timeout,
     // and virtual time is paused, so internal setTimeout won't work.
-    let timeoutId: NodeJS.Timeout | null = null;
     const evaluatePromise = this.client!.send('Runtime.evaluate', this.evaluateStabilityParams).then(this.handleStabilityCheckResponse);
 
-    const timeoutPromise = new Promise<void>((_, reject) => {
-        timeoutId = setTimeout(() => {
-            reject(new Error('Stability check timed out'));
-        }, this.timeout);
-    });
+    const timeoutPromise = new Promise<void>(this.stabilityTimeoutExecutor);
 
     try {
         await Promise.race([evaluatePromise, timeoutPromise]);
@@ -238,9 +247,11 @@ export class CdpTimeDriver implements TimeDriver {
             throw e;
         }
     } finally {
-        if (timeoutId) {
-            clearTimeout(timeoutId);
+        if (this.stabilityTimeoutId !== null) {
+            clearTimeout(this.stabilityTimeoutId);
+            this.stabilityTimeoutId = null;
         }
+        this.stabilityTimeoutReject = null;
     }
   }
 }
