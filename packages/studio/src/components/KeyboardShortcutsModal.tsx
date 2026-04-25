@@ -16,7 +16,9 @@ const SHORTCUTS: ShortcutSection[] = [
   {
     title: 'Playback',
     shortcuts: [
-      { description: 'Play / Pause', keys: ['Space'] },
+      { description: 'Play / Pause', keys: ['Space', 'or', 'K'] },
+      { description: 'Play Reverse / Slower', keys: ['J'] },
+      { description: 'Play Forward / Faster', keys: ['L'] },
       { description: 'Restart / Rewind', keys: ['Home'] },
       { description: 'Toggle Loop', keys: ['Shift', 'L'] },
     ]

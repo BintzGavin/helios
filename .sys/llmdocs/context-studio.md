@@ -30,12 +30,11 @@ The Studio is invoked via `npx helios studio` (or `npm run dev` in development).
 - **Captions Panel**: Edits and synchronizes subtitle data with the video timeline.
 
 **Key Shortcuts**:
-- `Space`: Play/Pause
+- `Space` or `K`: Play/Pause
 - `Home`: Restart/Rewind
 - `Shift+L`: Toggle Loop
-- `L`: Play Forward / Speed Up
-- `J`: Play Reverse / Speed Up Reverse
-- `K`: Pause
+- `L`: Play Forward / Faster
+- `J`: Play Reverse / Slower
 - `Cmd+K`: Switch Composition
 - `?`: Show Shortcuts Modal
 - `I`/`O`: Set In/Out Point
