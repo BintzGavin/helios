@@ -20,6 +20,7 @@ Last updated by: PERF-355
 - **PERF-337**: Prebound `frameWaiterResolve` executor into `frameWaiterExecutor` to avoid dynamic inline closure allocations during the CaptureLoop actor pipeline backpressure events. This adheres to the "simplicity and GC reduction" principle that guided keeping `writerWaiterExecutor`. Render time: 46.464s (Baseline: 57.022s), though baseline was inflated by initial run. Median render times of subsequent runs were around 46.6s, slightly better than PERF-336's ~47.4s. Kept to reduce V8 GC churn in the main event loop.
 
 ## What Doesn't Work (and Why)
+- PERF-360: Pre-decode CDP Base64 Frames to Buffers. Decoding base64 strings to Buffers in the hot capture loop instead of delegating to stdin.write caused performance inconsistency and negligible median improvement, not justifying the change. It was reverted to maintain simplicity.
 - **PERF-359**: Replaced `multiFrameEvaluateParams` array with inline object allocation in `SeekTimeDriver.ts` and `CdpTimeDriver.ts` for the multi-frame hot loops.
   - **WHY it didn't work**: The performance gain was negligible for multi-frame rendering with iframes (median ~48.630s vs baseline ~48.668s, well within the noise margin). Since most compositions don't use multi-frames, and V8's GC handles this small array efficiently enough, the change didn't yield a measurable render time improvement and it's simpler to keep the existing cached array. Discarded to maintain current code state.
 

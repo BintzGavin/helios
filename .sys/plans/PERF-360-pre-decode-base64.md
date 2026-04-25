@@ -1,11 +1,11 @@
 ---
 id: PERF-360
 slug: pre-decode-base64
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-30
-completed: ""
-result: ""
+completed: "2024-06-05"
+result: "discarded"
 ---
 
 # PERF-360: Pre-decode CDP Base64 Frames to Buffers
@@ -97,3 +97,9 @@ Run `npm run test -- tests/verify-canvas-strategy.ts` to ensure Canvas mode is u
 
 ## Correctness Check
 Run `npm run test -- tests/verify-dom-strategy-capture.ts` to ensure DOM output continues to correctly encode PNGs and fallback to cached frames without crashing.
+
+## Results Summary
+- **Best render time**: 48.372s (vs baseline 49.616s)
+- **Improvement**: Inconclusive
+- **Kept experiments**: []
+- **Discarded experiments**: [Pre-decode CDP Base64 Frames to Buffers]
