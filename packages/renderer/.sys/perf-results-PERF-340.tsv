@@ -1,0 +1,3 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	46.709	600	12.85	44.0	keep	baseline
+2	46.396	600	12.93	43.8	keep	prebind stabilityTimeoutExecutor in CdpTimeDriver
