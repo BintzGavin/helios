@@ -19,6 +19,11 @@ Last updated by: PERF-355
 - **PERF-337**: Prebound `frameWaiterResolve` executor into `frameWaiterExecutor` to avoid dynamic inline closure allocations during the CaptureLoop actor pipeline backpressure events. This adheres to the "simplicity and GC reduction" principle that guided keeping `writerWaiterExecutor`. Render time: 46.464s (Baseline: 57.022s), though baseline was inflated by initial run. Median render times of subsequent runs were around 46.6s, slightly better than PERF-336's ~47.4s. Kept to reduce V8 GC churn in the main event loop.
 
 ## What Doesn't Work (and Why)
+
+- **PERF-358: Replace `Runtime.evaluate` with `Runtime.callFunctionOn` in SeekTimeDriver**
+  - **What I tried:** Replacing dynamic string generation (`window.__helios_seek(${time})`) sent via `Runtime.evaluate` with a cached function declaration and mutated `arguments` array via `Runtime.callFunctionOn` on every single frame.
+  - **Why it didn't work:** V8 string concatenation for `window.__helios_seek(t)` combined with its dynamic compilation cache performs equivalently to allocating and parsing the inline `arguments: [{value: x}]` payload over CDP on every frame. Median baseline was ~47.727s, while median experiment was ~47.843s. The JSON serialization overhead of `arguments` arrays via CDP offsets the cost of compiling the 1-liner dynamic evaluation. Discarded to maintain code simplicity.
+
 - **PERF-292**: Attempted to remove redundant `Function.prototype.call` overhead on `formatResponse` in `CaptureLoop.ts`.
   - **WHY it didn't work**: The `formatResponse` logic itself was completely eliminated in a previous superseding experiment (PERF-303), moving the formatting extraction directly into the strategy's capture resolution. Replacing the call logic is now structurally obsolete, so the experiment was discarded without further modification.
 - **PERF-351**: Attempted to inline `multiFrameEvaluateParams` array and replace `Promise.race` allocation with a custom `Promise` inside `SeekTimeDriver.ts` and the injected `__helios_seek` script.

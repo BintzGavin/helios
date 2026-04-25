@@ -1,0 +1,8 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	47.708	600	12.58	37.2	discard	baseline
+2	47.868	600	12.53	33.2	discard	baseline
+3	47.727	600	12.57	43.8	discard	baseline
+4	47.937	600	12.52	35.1	discard	exp_mutate
+5	47.737	600	12.57	32.7	discard	exp2_preallocate
+6	49.677	600	12.08	36.6	discard	exp2_preallocate
+7	47.843	600	12.54	34.5	discard	exp2_preallocate
