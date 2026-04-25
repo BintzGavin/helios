@@ -1,0 +1,4 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	49.616	600	12.09	43.4	keep	baseline
+2	49.416	600	12.14	32.5	keep	experiment
+3	48.372	600	12.40	32.5	keep	experiment
