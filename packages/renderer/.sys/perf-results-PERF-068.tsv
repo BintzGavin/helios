@@ -1,0 +1,4 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	49.879	600	12.03	42.6	inconclusive	PERF-068 validation run 1
+2	47.232	600	12.70	33.6	inconclusive	PERF-068 validation run 2
+3	46.203	600	12.99	37.5	inconclusive	PERF-068 validation run 3
