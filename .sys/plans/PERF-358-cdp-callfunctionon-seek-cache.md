@@ -1,10 +1,10 @@
 ---
 id: PERF-358
 slug: cdp-callfunctionon-seek-cache
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "Jules"
 created: 2026-10-18
-completed: ""
+completed: "2026-10-18"
 result: ""
 ---
 
@@ -140,3 +140,8 @@ Run the DOM render benchmark script multiple times to verify median render time 
 ## Prior Art
 - `PERF-257` used `callFunctionOn` for stability checks but was discarded because it didn't improve over `page.evaluate` with a timeout node-side. However, this is for the hot loop `setTime` execution, which happens 60 times a second per worker.
 - `PERF-350` and `PERF-351` showed that inline object allocations for evaluate parameters were slower than mutating cached objects. The executor should mutate the cached `multiFrameEvaluateParams` array to avoid GC churn.
+
+## Results
+- **Baseline**: 47.727s median
+- **Experiment**: 47.843s median
+- **Outcome**: Discarded. V8 dynamic string parsing/compilation overhead for such a short string is completely offset by the JSON serialization overhead for `arguments: [{value: x}]` via CDP. Code was reverted.
