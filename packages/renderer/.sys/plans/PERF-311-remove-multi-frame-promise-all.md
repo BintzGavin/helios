@@ -1,11 +1,11 @@
 ---
 id: PERF-311
 slug: remove-multi-frame-promise-all
-status: unclaimed
-claimed_by: ""
+status: impossible
+claimed_by: "executor-session"
 created: 2024-05-28
-completed: ""
-result: ""
+completed: 2026-04-25
+result: impossible
 ---
 # PERF-311: Optimize Multi-Frame Seek Execution in SeekTimeDriver
 
@@ -70,3 +70,6 @@ Run the DOM render script and verify output exists and has valid video contents.
 
 ## Variations
 None.
+
+## Impossibility Explanation
+Upon reviewing `packages/renderer/src/drivers/SeekTimeDriver.ts`, the `Promise.all` allocation targeted by this experiment in the multi-frame path of `setTime()` has already been removed in a prior experiment (PERF-312). The code currently loops through `executionContextIds` and sends `Runtime.evaluate` directly, catching rejections inline, without allocating a `Promise.all` array. Therefore, this optimization has already been implemented and the experiment is structurally obsolete.
