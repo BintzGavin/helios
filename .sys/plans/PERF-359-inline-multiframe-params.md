@@ -1,11 +1,11 @@
 ---
 id: PERF-359
 slug: inline-multiframe-params
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "Jules"
 created: 2024-04-25
-completed: ""
-result: ""
+completed: "2024-04-26"
+result: "discarded"
 ---
 
 # PERF-359: Inline multi-frame `Runtime.evaluate` array params
@@ -103,3 +103,15 @@ Run the DOM render benchmark script multiple times to verify median render time 
 
 ## Canvas Smoke Test
 Ensure Canvas mode works (since it uses `CdpTimeDriver`).
+
+## Results Summary
+```
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	48.668	600	12.33	36.5	discard	baseline_iframe
+2	48.658	600	12.33	40.5	discard	baseline_iframe
+3	49.480	600	12.13	41.5	discard	baseline_iframe
+4	48.604	600	12.34	41.9	discard	inline_params
+5	48.630	600	12.34	36.4	discard	inline_params
+6	48.993	600	12.25	35.5	discard	inline_params
+```
+Outcome: Discarded. The median time for inline params (48.630s) was essentially identical to the baseline (48.668s). V8 handles the write barrier for updating the cached `multiFrameEvaluateParams` array just as efficiently as inline object allocations for this specific multi-frame hot path.
