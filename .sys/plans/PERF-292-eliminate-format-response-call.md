@@ -1,7 +1,7 @@
 ---
 id: PERF-292
 slug: eliminate-format-response-call
-status: claimed
+status: complete
 claimed_by: "executor-session"
 created: 2024-05-18
 completed: "2024-05-18"
@@ -73,8 +73,9 @@ Run benchmark-test.js on canvas mode.
 ## Correctness Check
 Output video should still be 90 frames and render correctly.
 
+
 ## Results Summary
-- **Best render time**: 32.204s (vs baseline 32.112s)
-- **Improvement**: 0%
+- **Best render time**: 47.890s (vs baseline 47.619s)
+- **Improvement**: N/A
 - **Kept experiments**: None
-- **Discarded experiments**: Eliminate `formatResponse.call` in `CaptureLoop.ts`
+- **Discarded experiments**: Eliminate `formatResponse.call` in `CaptureLoop.ts` (Redundant, PERF-303 superseded this by removing `formatResponse` completely).

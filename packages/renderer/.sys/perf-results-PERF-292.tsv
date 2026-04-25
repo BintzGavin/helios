@@ -3,3 +3,4 @@ run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
 2	32.112	90	2.80	36.5	keep	baseline
 3	32.168	90	2.80	36.4	keep	baseline
 4	32.204	90	2.79	36.8	discard	eliminate formatResponse.call
+5	47.890	600	12.53	37.4	discard	eliminate formatResponse.call (redundant after PERF-303)
