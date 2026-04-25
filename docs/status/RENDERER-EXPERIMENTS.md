@@ -4,6 +4,7 @@ Last updated by: PERF-355
 
 
 ## What Works
+- **PERF-068**: Conditionally allocated the `promises` array in `SeekTimeDriver.ts` to reduce V8 GC churn. (Previously completed but log was missing)
 - **PERF-340**: Prebound `stabilityTimeoutExecutor` and `stabilityTimeoutCallback` in `CdpTimeDriver.ts` hot loop, avoiding dynamic Promise and closure allocations on every frame. Improved render time slightly (~46.396s vs ~46.709s baseline) and reduced GC overhead.
 - Replaced custom `FIND_DEEP_ELEMENT_SCRIPT` tree walking logic with Playwright's native `waitForSelector` across strategies. While it didn't impact render time measurably, it eliminated dynamic JS evaluation complexity by relying on Playwright's native shadow-piercing implementation (PERF-356).
 - PERF-355: Removed unused `screenshotOptions` allocation in `DomStrategy.prepare()`. Dead code removal. Performance remained stable (~48.9s).

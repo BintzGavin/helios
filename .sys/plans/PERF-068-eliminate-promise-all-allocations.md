@@ -1,7 +1,7 @@
 ---
 id: PERF-068
 slug: eliminate-promise-all-allocations
-status: claimed
+status: complete
 claimed_by: "executor-session"
 created: 2024-05-24
 completed: "2024-05-24"
