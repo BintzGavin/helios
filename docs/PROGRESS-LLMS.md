@@ -1,5 +1,11 @@
 # LLMS Progress
 
+## LLMS v1.73.1
+- ✅ Completed: Daily llms.txt Review
+  - Updated Core API Diagnostics example to include missing properties from DiagnosticReport.
+  - Updated Roadmap: Reflected recent completions for Studio and Infrastructure based on PROGRESS logs.
+  - Verified package versions, API examples, and file paths.
+
 ## LLMS v1.73.0
 - ✅ Completed: Daily llms.txt Review
   - Updated Quick Facts: CLI v0.45.2+.

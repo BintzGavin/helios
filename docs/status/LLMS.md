@@ -1,5 +1,7 @@
 # Status: LLMS
-**Version**: 1.73.0
+**Version**: 1.73.1
+
+[v1.73.1] ✅ Completed: Daily llms.txt Review - Updated Core API Diagnostics example to include missing properties from DiagnosticReport. Updated Roadmap to reflect recent completions from PROGRESS logs (Studio Enhance MCP Server, Infrastructure CloudRun Resiliency Tests).
 
 [v1.73.0] ✅ Completed: Comprehensive Daily Review - Updated CLI to v0.45.2+ in Quick Facts. Updated Roadmap for all domains to reflect latest completed tasks in PROGRESS logs (CLI v0.45.2+, Studio v0.107.1+, Core v5.13.0+, Player v0.76.20+, Renderer v1.78.3+, Infrastructure v0.25.0+). Verified file paths and APIs.
 [v1.72.0] ✅ Completed: Comprehensive Daily Review - Updated Quick Facts versions (Player v0.76.20+, Renderer v1.78.3+) and updated Roadmap for all domains to reflect latest completed tasks in PROGRESS logs.
