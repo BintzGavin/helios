@@ -31,3 +31,7 @@
 ## [v0.77.25] - Addressing Environment Issues in Tests
 **Learning:** `packages/player/src/export-options.test.ts` was failing because the `vitest` environment defaults to Node, making `document` unavailable. The `HeliosPlayer` Web Component uses `document` at the module level.
 **Action:** Created plan to ensure the `@vitest-environment jsdom` pragma is added to files testing DOM components.
+
+## [v0.77.25] - Missing README properties
+**Learning:** Properties implemented in `index.ts` (e.g., `mediaTitle`) are sometimes missing from the `README.md` properties list due to disconnected implementation and documentation steps.
+**Action:** When adding new properties, explicitly include updating the README in the implementation spec, or periodically cross-reference `index.ts` exported properties with the README.
