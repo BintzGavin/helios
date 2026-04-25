@@ -20,6 +20,11 @@ Last updated by: PERF-355
 
 ## What Doesn't Work (and Why)
 
+- **PERF-357: Eliminate setTimeout in injected seek script**
+  - **What I tried:** Attempted to remove `setTimeout` and custom `Promise.race` inside `SeekTimeDriver` injected `window.__helios_seek` function, and rely completely on Playwright's CDP `Runtime.evaluate` timeout (`awaitPromise: true`, `timeout: this.timeout`).
+  - **Why it didn't work:** Experiment median (~48.6s, excluding an extreme outlier) regressed slightly against baseline (~47.8s median in my tests), and `Runtime.evaluate` timeout caused CDP stability issues with some runs resulting in higher variance. The overhead of setting `setTimeout` inside Chrome's V8 is actually very optimized, while mutating CDP parameters adds slight overhead. Discarded as inconclusive/slower.
+
+
 - **PERF-358: Replace `Runtime.evaluate` with `Runtime.callFunctionOn` in SeekTimeDriver**
   - **What I tried:** Replacing dynamic string generation (`window.__helios_seek(${time})`) sent via `Runtime.evaluate` with a cached function declaration and mutated `arguments` array via `Runtime.callFunctionOn` on every single frame.
   - **Why it didn't work:** V8 string concatenation for `window.__helios_seek(t)` combined with its dynamic compilation cache performs equivalently to allocating and parsing the inline `arguments: [{value: x}]` payload over CDP on every frame. Median baseline was ~47.727s, while median experiment was ~47.843s. The JSON serialization overhead of `arguments` arrays via CDP offsets the cost of compiling the 1-liner dynamic evaluation. Discarded to maintain code simplicity.

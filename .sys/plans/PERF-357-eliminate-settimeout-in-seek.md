@@ -1,11 +1,11 @@
 ---
 id: PERF-357
 slug: eliminate-settimeout-in-seek
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor"
 created: 2026-10-18
-completed: ""
-result: ""
+completed: "2026-04-25"
+result: "failed"
 ---
 
 # PERF-357: Eliminate setTimeout allocation in injected seek script
