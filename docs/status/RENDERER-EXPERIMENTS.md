@@ -24,6 +24,9 @@ Last updated by: PERF-366
 - **PERF-337**: Prebound `frameWaiterResolve` executor into `frameWaiterExecutor` to avoid dynamic inline closure allocations during the CaptureLoop actor pipeline backpressure events. This adheres to the "simplicity and GC reduction" principle that guided keeping `writerWaiterExecutor`. Render time: 46.464s (Baseline: 57.022s), though baseline was inflated by initial run. Median render times of subsequent runs were around 46.6s, slightly better than PERF-336's ~47.4s. Kept to reduce V8 GC churn in the main event loop.
 
 ## What Doesn't Work (and Why)
+- **PERF-367: Eliminate Polymorphic Buffer Checks in CaptureLoop**
+  - **What I tried:** Enforced strict `string` (base64) return types from `DomStrategy.capture()` to eliminate the dynamic `typeof buffer === 'string'` check in the `CaptureLoop.ts` `writeToStdin` method, attempting to optimize V8 branch prediction.
+  - **Why it didn't work:** The median render time was identical (~46.452s vs baseline ~46.443s). V8's JIT optimization easily handles the binary branch for `typeof buffer === 'string'` with negligible overhead, so explicitly converting Playwright fallback screenshots to base64 offers no overall pipeline advantage. Discarded to maintain code simplicity.
 - **PERF-338**: Attempted to prebind the `stabilityTimeoutExecutor` and `stabilityTimeoutCallback` closures in `CdpTimeDriver.ts`.
   - **WHY it didn't work**: The variables and methods are already pre-bound as class properties from a prior optimization. The plan is structurally obsolete and impossible to run, so it was discarded without further modification.
 - **PERF-365: Avoid Promise.race allocation in CdpTimeDriver stability check**

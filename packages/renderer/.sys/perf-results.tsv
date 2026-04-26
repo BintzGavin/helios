@@ -12,3 +12,9 @@ run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
 4	47.262	600	12.70	36.3	keep	inline allocation
 5	46.298	600	12.96	32.7	keep	inline allocation
 6	48.761	600	12.30	40.9	discard	avoid Promise.race allocation in SeekTimeDriver (PERF-361)
+1	48.271	600	12.43	38.5	keep	baseline
+2	46.297	600	12.96	39.9	keep	baseline
+3	46.443	600	12.92	39.4	keep	baseline
+7	46.328	600	12.95	36.2	discard	eliminate polymorphic buffer checks (PERF-367)
+8	47.539	600	12.62	35.8	discard	eliminate polymorphic buffer checks (PERF-367)
+9	46.452	600	12.92	32.6	discard	eliminate polymorphic buffer checks (PERF-367)
