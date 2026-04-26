@@ -1,11 +1,11 @@
 ---
 id: PERF-365
 slug: fix-cdptimedriver-timeout-leak
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor"
 created: 2024-04-26
-completed: ""
-result: ""
+completed: "2024-05-18"
+result: "inconclusive"
 ---
 
 # PERF-365: Avoid Promise.race allocation in CdpTimeDriver stability check
