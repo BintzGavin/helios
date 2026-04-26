@@ -11,3 +11,4 @@ run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
 3	46.537	600	12.89	35.0	keep	inline allocation
 4	47.262	600	12.70	36.3	keep	inline allocation
 5	46.298	600	12.96	32.7	keep	inline allocation
+6	48.761	600	12.30	40.9	discard	avoid Promise.race allocation in SeekTimeDriver (PERF-361)
