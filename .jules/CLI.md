@@ -139,3 +139,7 @@ Critical learnings only. This is not a log—only add entries for insights that 
 ## [0.43.0] - CLI Scaffold Tier 3 Deployment Prerequisites
 **Learning:** When bridging a "Cloud Execution" gap by adding new tier-3 cloud infrastructure adapters (Modal, Deno Deploy, Vercel) to the Helios Engine, always ensure corresponding CLI deployment scaffolding commands (e.g., `helios deploy modal`) are created to provide the required manifest templates for users.
 **Action:** Created plan `2027-04-02-CLI-Scaffold-Tier3-Deployment.md` to add the `deploy modal`, `deploy deno`, and `deploy vercel` subcommands, completing the product surface for the tier 3 distributed rendering adapters. Always cross-reference new infrastructure adapters with CLI deployment commands.
+
+## v0.46.12 - Duplicated Plan Handling
+**Learning:** When a plan specifies work that has already been completed (e.g., tests already exist and pass), the correct approach is to document the duplication as an impossibility in the plan file, and stop work. Do not overwrite existing tracking files.
+**Action:** Append to the journal with the finding, and do not increment versions or add new tracking entries. Always use `>>` when writing to journals.

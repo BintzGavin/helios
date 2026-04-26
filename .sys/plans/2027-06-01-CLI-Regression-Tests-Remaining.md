@@ -1,3 +1,6 @@
+---
+result: impossible
+---
 #### 1. Context & Goal
 - **Objective**: Implement comprehensive regression tests for the remaining untested CLI commands (`helios preview`, `helios skills`, `helios studio`).
 - **Trigger**: `docs/status/CLI.md` states the next step is to "Implement regression tests for remaining commands". While some commands have tests, `preview.ts`, `skills.ts`, and `studio.ts` are still lacking coverage.
