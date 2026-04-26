@@ -24,6 +24,9 @@ Last updated by: PERF-366
 - **PERF-337**: Prebound `frameWaiterResolve` executor into `frameWaiterExecutor` to avoid dynamic inline closure allocations during the CaptureLoop actor pipeline backpressure events. This adheres to the "simplicity and GC reduction" principle that guided keeping `writerWaiterExecutor`. Render time: 46.464s (Baseline: 57.022s), though baseline was inflated by initial run. Median render times of subsequent runs were around 46.6s, slightly better than PERF-336's ~47.4s. Kept to reduce V8 GC churn in the main event loop.
 
 ## What Doesn't Work (and Why)
+- **PERF-328: Inline CdpTimeDriver Evaluate Params**
+  - **What I tried:** Inlined the parameter object for `Runtime.evaluate` in the single-frame setup for `CdpTimeDriver.ts` to reduce object allocation and GC pressure.
+  - **Why it didn't work:** The median render time was ~47.811s, which is within the noise margin or slightly slower than recent baselines (~47.5s). V8 is efficient at inline dynamic object allocation, and manual caching added negligible or no benefit. Discarded to maintain code simplicity.
 - **PERF-367: Eliminate Polymorphic Buffer Checks in CaptureLoop**
   - **What I tried:** Enforced strict `string` (base64) return types from `DomStrategy.capture()` to eliminate the dynamic `typeof buffer === 'string'` check in the `CaptureLoop.ts` `writeToStdin` method, attempting to optimize V8 branch prediction.
   - **Why it didn't work:** The median render time was identical (~46.452s vs baseline ~46.443s). V8's JIT optimization easily handles the binary branch for `typeof buffer === 'string'` with negligible overhead, so explicitly converting Playwright fallback screenshots to base64 offers no overall pipeline advantage. Discarded to maintain code simplicity.
