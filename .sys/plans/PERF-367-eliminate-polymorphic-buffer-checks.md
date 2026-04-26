@@ -1,11 +1,11 @@
 ---
 id: PERF-367
 slug: eliminate-polymorphic-buffer-checks
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-04-26
-completed: ""
-result: ""
+completed: 2024-04-26
+result: discard
 ---
 
 # PERF-367: Eliminate Polymorphic Buffer Checks in CaptureLoop
@@ -99,3 +99,9 @@ Run the DOM render benchmark script multiple times to verify median render time 
 
 ## Prior Art
 - PERF-360 attempted to decode strings to buffers inside `DomStrategy` and failed. This experiment forces everything to strictly remain as strings in DOM mode, relying on FFmpeg `stdin.write`'s native fast C++ base64 decoder.
+
+## Results Summary
+- **Best render time**: 46.328s (vs baseline 46.443s, median: 46.452s vs 46.443s)
+- **Improvement**: ~0%
+- **Kept experiments**: []
+- **Discarded experiments**: [PERF-367]
