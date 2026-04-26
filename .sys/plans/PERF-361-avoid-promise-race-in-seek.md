@@ -1,11 +1,11 @@
 ---
 id: PERF-361
 slug: avoid-promise-race-in-seek
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-06-05
-completed: ""
-result: ""
+completed: "2026-04-26"
+result: "discarded - slower (48.761s vs 46.298s baseline)"
 ---
 
 # PERF-361: Avoid Promise.race allocation in SeekTimeDriver injected script
@@ -151,3 +151,10 @@ Run `npm run test -- tests/verify-canvas-strategy.ts` to ensure Canvas mode is u
 
 ## Correctness Check
 Run `npm run test -- tests/verify-dom-strategy-capture.ts` to ensure DOM output continues to correctly encode PNGs and fallback to cached frames without crashing.
+
+
+## Results Summary
+- **Best render time**: 48.761s (vs baseline 46.298s)
+- **Improvement**: 0%
+- **Kept experiments**: []
+- **Discarded experiments**: [PERF-361]
