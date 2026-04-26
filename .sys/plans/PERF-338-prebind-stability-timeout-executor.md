@@ -1,11 +1,11 @@
 ---
 id: PERF-338
 slug: prebind-stability-timeout-executor
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor"
 created: 2024-04-22
-completed: ""
-result: ""
+completed: "2024-05-18"
+result: "impossible"
 ---
 
 # PERF-338: Prebind CdpTimeDriver Stability Timeout Executor
@@ -85,3 +85,10 @@ Run `npx tsx packages/renderer/tests/verify-dom-strategy-capture.ts`
 ## Prior Art
 - PERF-262 (attempted to prebind stability timeout but degraded performance likely due to state/closure handling)
 - PERF-324 (successfully prebound frame promise executors)
+
+## Results Summary
+- **Best render time**: N/A
+- **Improvement**: N/A
+- **Kept experiments**: []
+- **Discarded experiments**: [PERF-338]
+- **Notes**: The stabilityTimeoutExecutor and stabilityTimeoutCallback are already prebound in the CdpTimeDriver hot loop logic, rendering this plan structurally obsolete and impossible to run.
