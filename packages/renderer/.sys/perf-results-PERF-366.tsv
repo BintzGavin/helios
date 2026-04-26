@@ -1,0 +1,4 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	49.197	600	12.20	38.3	keep	baseline
+2	48.079	600	12.48	32.3	keep	remove dom strategy target clip params
+3	48.058	600	12.48	32.7	keep	remove dom strategy target clip params

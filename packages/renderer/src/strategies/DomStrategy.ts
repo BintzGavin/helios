@@ -18,7 +18,6 @@ export class DomStrategy implements RenderStrategy {
   private lastFrameData: Buffer | string | null = null;
 
   private cdpScreenshotParams: any = null;
-  private targetClipParams: any = null;
   private targetElementHandle: any = null;
   private emptyImageBuffer: Buffer = EMPTY_IMAGE_BUFFER;
   private emptyImageBase64: string = "";
@@ -147,13 +146,6 @@ export class DomStrategy implements RenderStrategy {
         throw new Error(`Target element not found: ${this.options.targetSelector}`);
       }
       this.targetElementHandle = element;
-
-      const box = await this.targetElementHandle.boundingBox();
-      if (box) {
-        this.targetClipParams = { x: box.x, y: box.y, width: box.width, height: box.height, scale: 1 };
-      } else {
-        console.warn(`Could not determine bounding box for target element: ${this.options.targetSelector}`);
-      }
     }
 
 
@@ -162,23 +154,6 @@ export class DomStrategy implements RenderStrategy {
 
   async capture(page: Page, frameTime: number): Promise<Buffer | string> {
     if (this.targetElementHandle) {
-      if (this.targetClipParams) {
-        const res = await this.cdpSession!.send('HeadlessExperimental.beginFrame', {
-          screenshot: {
-            format: this.cdpScreenshotParams.format,
-            quality: this.cdpScreenshotParams.quality,
-            clip: this.targetClipParams
-          } as any,
-          interval: this.frameInterval,
-          frameTimeTicks: 10000 + frameTime
-        });
-        if (res && res.screenshotData) {
-          this.lastFrameData = res.screenshotData;
-          return res.screenshotData;
-        }
-        return this.lastFrameData!;
-      }
-
       const isOpaque = this.cdpScreenshotParams.format === 'jpeg';
       const res = await this.targetElementHandle.screenshot({
         type: this.cdpScreenshotParams.format,
