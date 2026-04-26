@@ -1,11 +1,11 @@
 ---
 id: PERF-328
 slug: inline-cdptime-driver-evaluate
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor"
 created: 2024-05-28
-completed: ""
-result: ""
+completed: "2024-05-28"
+result: "discard"
 ---
 
 # PERF-328: Inline CdpTimeDriver Evaluate Params
@@ -58,3 +58,10 @@ Run `npx tsx packages/renderer/tests/verify-canvas-strategy.ts` to ensure Canvas
 
 ## Correctness Check
 Run `npx tsx packages/renderer/tests/verify-dom-strategy-capture.ts` to ensure the DOM strategy logic runs and correctly falls back to the mocked `lastFrameData` buffer.
+
+## Results Summary
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	61.065	600	9.83	33.2	discard	Inlined CdpTimeDriver evaluate params
+2	49.584	600	12.10	42.4	discard	Inlined CdpTimeDriver evaluate params
+3	47.811	600	12.55	37.2	discard	Inlined CdpTimeDriver evaluate params
+4	47.439	600	12.65	43.7	discard	Inlined CdpTimeDriver evaluate params
