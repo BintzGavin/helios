@@ -1,9 +1,12 @@
 ## Performance Trajectory
-Current best: 46.298s (baseline was 47.024s, experiment median 46.149s)
-Last updated by: PERF-355
+Current best: 48.058s (baseline was 49.197s, -2.3%)
+Last updated by: PERF-366
 
 
 ## What Works
+- **PERF-366**: Removed `targetClipParams` logic in `DomStrategy.ts` and simplified single-element capture to strictly rely on Playwright's `targetElementHandle.screenshot()`.
+  - **What I did**: Eliminated bounding box querying and removed the conditional logic to run `HeadlessExperimental.beginFrame` with `clip` parameters inside the `capture()` hot loop when `targetSelector` is provided.
+  - **Improvement**: ~2.3% faster (48.058s vs 49.197s) for benchmark DOM capture, while also reducing code complexity.
 - **PERF-068**: Conditionally allocated the `promises` array in `SeekTimeDriver.ts` to reduce V8 GC churn. (Previously completed but log was missing)
 - **PERF-340**: Prebound `stabilityTimeoutExecutor` and `stabilityTimeoutCallback` in `CdpTimeDriver.ts` hot loop, avoiding dynamic Promise and closure allocations on every frame. Improved render time slightly (~46.396s vs ~46.709s baseline) and reduced GC overhead.
 - Replaced custom `FIND_DEEP_ELEMENT_SCRIPT` tree walking logic with Playwright's native `waitForSelector` across strategies. While it didn't impact render time measurably, it eliminated dynamic JS evaluation complexity by relying on Playwright's native shadow-piercing implementation (PERF-356).
