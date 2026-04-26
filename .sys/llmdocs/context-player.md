@@ -1,6 +1,6 @@
 # Context: PLAYER
 
-**Version**: 0.77.26
+**Version**: 0.77.27
 
 ## Section A: Component Structure
 
@@ -98,6 +98,10 @@
 - `exportCaptionMode`
 - `canvasSelector`
 - `controlsList`
+- `mediaTitle`: Maps to `media-title` attribute
+- `mediaArtist`: Maps to `media-artist` attribute
+- `mediaAlbum`: Maps to `media-album` attribute
+- `mediaArtwork`: Maps to `media-artwork` attribute
 - `sandbox`: Overrides the default iframe sandbox flags.
 - `disablepictureinpicture`: If present, hides the PiP button.
 
@@ -124,13 +128,6 @@
 - `requestPictureInPicture(): Promise<PictureInPictureWindow>`
 - `startAudioMetering(): void`
 - `stopAudioMetering(): void`
-## Section E: Media Session Properties
-
-The following standard media session metadata attributes are available as properties on the `HeliosPlayer` class, mapping to the respective DOM attributes:
-- `mediaTitle`: Maps to `media-title` attribute
-- `mediaArtist`: Maps to `media-artist` attribute
-- `mediaAlbum`: Maps to `media-album` attribute
-- `mediaArtwork`: Maps to `media-artwork` attribute
 
 ## Track Lists
 - `HeliosAudioTrackList`: Implements standard HTMLMediaElement event handler properties (`onaddtrack`, `onremovetrack`, `onchange`).

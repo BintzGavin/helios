@@ -1,3 +1,6 @@
+### PLAYER v0.77.27
+- ✅ Completed: Add Media Session properties to README
+
 ### STUDIO v0.121.9
 - ✅ Completed: STUDIO-Update-Keyboard-Shortcuts-Documentation - Updated KeyboardShortcutsModal to include J, K, L playback shortcuts.
 
