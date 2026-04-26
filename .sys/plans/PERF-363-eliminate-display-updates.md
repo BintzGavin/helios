@@ -1,11 +1,11 @@
 ---
 id: PERF-363
 slug: eliminate-display-updates
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2026-10-18
-completed: ""
-result: ""
+completed: "2024-05-18"
+result: "failed"
 ---
 
 # PERF-363: Optimize HeadlessExperimental.beginFrame by eliminating display updates
@@ -68,3 +68,9 @@ Run generic canvas mode to ensure shared configuration holds. (N/A here, but sta
 
 ## Correctness Check
 Run the DOM render benchmark script multiple times to verify median render time improvement and ensure generated `output.mp4` contains 600 correct frames.
+
+## Results Summary
+- **Best render time**: N/A (baseline ~47.59s)
+- **Improvement**: -
+- **Kept experiments**: []
+- **Discarded experiments**: [PERF-363-eliminate-display-updates]
