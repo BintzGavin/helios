@@ -1,0 +1,4 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	48.335	600	12.41	36.0	discard	--single-process flag
+2	47.427	600	12.65	37.2	discard	--single-process flag
+3	47.500	600	12.63	34.6	discard	--single-process flag

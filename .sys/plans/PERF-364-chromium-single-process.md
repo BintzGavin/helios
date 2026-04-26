@@ -1,11 +1,11 @@
 ---
 id: PERF-364
 slug: chromium-single-process
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2026-10-24
-completed: ""
-result: ""
+completed: "2026-04-26"
+result: "discarded - slower (47.500s vs 46.298s baseline)"
 ---
 
 # PERF-364: Eliminate IPC Overhead with Chromium Single Process Mode
