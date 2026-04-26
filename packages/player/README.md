@@ -186,6 +186,10 @@ The `<helios-player>` element implements a subset of the HTMLMediaElement interf
 - `exportCaptionMode` (string): Reflected export-caption-mode attribute.
 - `canvasSelector` (string): Reflected canvas-selector attribute.
 - `controlsList` (string): Reflected controlslist attribute.
+- `mediaTitle` (string): Reflected media-title attribute.
+- `mediaArtist` (string): Reflected media-artist attribute.
+- `mediaAlbum` (string): Reflected media-album attribute.
+- `mediaArtwork` (string): Reflected media-artwork attribute.
 
 
 ## Events
