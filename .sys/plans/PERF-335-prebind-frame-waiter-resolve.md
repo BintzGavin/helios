@@ -1,11 +1,11 @@
 ---
 id: PERF-335
 slug: prebind-frame-waiter-resolve
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor"
 created: 2024-04-22
 completed: ""
-result: ""
+result: "impossible"
 ---
 
 # PERF-335: Prebind frameWaiterResolve executor in CaptureLoop
@@ -67,3 +67,7 @@ Run `npx tsx packages/renderer/tests/verify-dom-strategy-capture.ts` to ensure D
 ## Prior Art
 - PERF-324: Prebound frame promise executors for workers.
 - PERF-321: Prebound `workerBlockedExecutors`.
+
+## Results Summary
+- **Result**: impossible
+- **Details**: The structural change proposed in this plan (prebinding `frameWaiterExecutor`) was already implemented and kept by a subsequent experiment (PERF-337). The task is redundant and obsolete.
