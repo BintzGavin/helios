@@ -27,6 +27,8 @@ Last updated by: PERF-366
 - **PERF-337**: Prebound `frameWaiterResolve` executor into `frameWaiterExecutor` to avoid dynamic inline closure allocations during the CaptureLoop actor pipeline backpressure events. This adheres to the "simplicity and GC reduction" principle that guided keeping `writerWaiterExecutor`. Render time: 46.464s (Baseline: 57.022s), though baseline was inflated by initial run. Median render times of subsequent runs were around 46.6s, slightly better than PERF-336's ~47.4s. Kept to reduce V8 GC churn in the main event loop.
 
 ## What Doesn't Work (and Why)
+- **PERF-332**: Prebind frameWaiterResolve executor in CaptureLoop.\
+  - **WHY it didn't work**: Impossible/Obsolete. The structural change (prebinding `frameWaiterExecutor`) was already implemented and kept by a subsequent experiment (PERF-337). Documented duplication and stopped work.
 - **PERF-328: Inline CdpTimeDriver Evaluate Params**
   - **What I tried:** Inlined the parameter object for `Runtime.evaluate` in the single-frame setup for `CdpTimeDriver.ts` to reduce object allocation and GC pressure.
   - **Why it didn't work:** The median render time was ~47.811s, which is within the noise margin or slightly slower than recent baselines (~47.5s). V8 is efficient at inline dynamic object allocation, and manual caching added negligible or no benefit. Discarded to maintain code simplicity.
