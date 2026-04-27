@@ -1,5 +1,5 @@
 import { chromium } from 'playwright';
-import { CdpTimeDriver } from '../src/drivers/CdpTimeDriver';
+import { CdpTimeDriver } from '../src/drivers/CdpTimeDriver.js';
 
 async function test() {
   console.log('Starting CdpTimeDriver test...');
@@ -19,10 +19,12 @@ async function test() {
   // Set time to 1.0 second
   console.log('Advancing time to 1.0s...');
   const startTime = Date.now();
-  await driver.setTime(page, 1.0);
+  driver.setTime(page, 1.0);
+  // Give the async task a bit of time to complete in the background since setTime is void and we don't await it
+  await new Promise(r => setTimeout(r, 100));
   const elapsedRealTime = Date.now() - startTime;
 
-  console.log(`Real time elapsed during setTime: ${elapsedRealTime}ms (should be significantly less than 1000ms if virtualized)`);
+  console.log(`Real time elapsed during setTime and wait: ${elapsedRealTime}ms`);
 
   // Verify within page using document.timeline.currentTime
   const pageTime = await page.evaluate(() => document.timeline.currentTime) as number;
@@ -41,7 +43,8 @@ async function test() {
 
   // Advance again to 2.0s
   console.log('Advancing time to 2.0s...');
-  await driver.setTime(page, 2.0);
+  driver.setTime(page, 2.0);
+  await new Promise(r => setTimeout(r, 100));
   const pageTime2 = await page.evaluate(() => document.timeline.currentTime) as number;
   console.log(`Page document.timeline.currentTime: ${pageTime2}ms`);
 

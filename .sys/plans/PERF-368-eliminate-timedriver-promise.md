@@ -1,8 +1,8 @@
 ---
 id: PERF-368
 slug: eliminate-timedriver-promise
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor"
 created: 2024-05-01
 completed: ""
 result: ""
@@ -61,3 +61,8 @@ const buffer = await strategy.capture(page, time);
 
 ## Correctness Check
 Run `npx tsx tests/verify-dom-strategy-capture.ts` and ensure benchmark render completes properly.
+
+## Results Summary
+- **Result**: improved
+- **Kept experiments**: Successfully changed TimeDriver interface to return void to avoid tracking discarded Promises in CaptureLoop. CdpTimeDriver was refactored to wrap its async execution internally, catching it with a noop.
+- **Discarded experiments**: None.

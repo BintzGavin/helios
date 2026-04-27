@@ -217,10 +217,7 @@ export class CaptureLoop {
             const ringIndex = i & ringMask;
 
             try {
-                const timePromise = timeDriver.setTime(page, compositionTimeInSeconds);
-                if (timePromise) {
-                    timePromise.catch(noopCatch);
-                }
+                timeDriver.setTime(page, compositionTimeInSeconds);
                 const buffer = await strategy.capture(page, time);
                 frameBufferRing[ringIndex] = buffer;
                 frameReadyRing[ringIndex] = 1;

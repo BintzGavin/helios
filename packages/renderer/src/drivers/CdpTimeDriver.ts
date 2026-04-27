@@ -3,6 +3,8 @@ import { TimeDriver } from './TimeDriver.js';
 import { getSeedScript } from '../utils/random-seed.js';
 import { FIND_ALL_MEDIA_FUNCTION, SYNC_MEDIA_FUNCTION, PARSE_MEDIA_ATTRIBUTES_FUNCTION } from '../utils/dom-scripts.js';
 
+const noopCatch = () => {};
+
 export class CdpTimeDriver implements TimeDriver {
   private client: CDPSession | null = null;
   private currentTime: number = 0;
@@ -160,7 +162,11 @@ export class CdpTimeDriver implements TimeDriver {
     this.currentTime = 0;
   }
 
-  async setTime(page: Page, timeInSeconds: number): Promise<void> {
+  setTime(page: Page, timeInSeconds: number): void {
+    this.runSetTime(page, timeInSeconds).catch(noopCatch);
+  }
+
+  private async runSetTime(page: Page, timeInSeconds: number): Promise<void> {
     const delta = timeInSeconds - this.currentTime;
 
     // If delta is 0 or negative, we don't advance.
