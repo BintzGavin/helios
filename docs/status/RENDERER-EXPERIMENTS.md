@@ -109,3 +109,6 @@ Last updated by: PERF-366
 
 - **PERF-335**: Prebind frameWaiterResolve executor in CaptureLoop.
   - **WHY it didn't work**: Impossible/Obsolete. The structural change (prebinding `frameWaiterExecutor`) was already implemented and kept by a subsequent experiment (PERF-337). Documented duplication and stopped work.
+
+## What Works
+- **PERF-333**: Eliminated `multiFrameEvaluateParams` array caching in `SeekTimeDriver` and `CdpTimeDriver`. Moving to strictly inline object literal allocation for multi-frame CDP `Runtime.evaluate` calls prevents race conditions caused by asynchronous serialization of mutated shared objects over Playwright CDP connections without impacting performance.
