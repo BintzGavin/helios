@@ -275,25 +275,26 @@ export class SeekTimeDriver implements TimeDriver {
     this.cachedMainFrame = page.mainFrame();
       }
 
-  setTime(page: Page, timeInSeconds: number): void {
+  setTime(page: Page, timeInSeconds: number): Promise<void> | void {
     const frames = this.cachedFrames;
 
     if (frames.length === 1) {
-      this.cdpSession!.send('Runtime.evaluate', {
+      return this.cdpSession!.send('Runtime.evaluate', {
         expression: 'window.__helios_seek(' + timeInSeconds + ', ' + this.timeout + ')',
         awaitPromise: true
-      }).catch(noopCatch);
-      return;
+      }).then(() => {});
     }
 
     const expression = 'window.__helios_seek(' + timeInSeconds + ', ' + this.timeout + ')';
 
+    const promises = [];
     for (let i = 0; i < this.executionContextIds.length; i++) {
-      this.cdpSession!.send('Runtime.evaluate', {
+      promises.push(this.cdpSession!.send('Runtime.evaluate', {
         expression,
         contextId: this.executionContextIds[i],
         awaitPromise: true
-      }).catch(noopCatch);
+      }));
     }
+    return Promise.all(promises).then(() => {});
   }
 }
