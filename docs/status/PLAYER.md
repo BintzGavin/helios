@@ -1,4 +1,5 @@
 **Version**: 0.77.27
+[v0.77.27] ✅ Completed: Document API Parity Gap - Deleted lingering plan file as the README already contained the required documentation updates.
 [v0.77.27] ✅ Completed: Add Media Session properties to README
 [v0.77.26] ✅ Completed: Implement WebVTT Support - Refactored WebVTT parser to use single-pass loops instead of chained map/filter arrays for better performance
 
