@@ -4,6 +4,9 @@ Last updated by: PERF-366
 
 
 ## What Works
+- **PERF-368**: Eliminated `TimeDriver.setTime` Promise return overhead.
+  - **What I did**: Changed `TimeDriver.setTime` interface to return `void`. Refactored `CdpTimeDriver.ts` to internally catch its async closure and modified `CaptureLoop.ts` to execute `setTime` without tracking a Promise.
+  - **Improvement**: Natively avoided V8 Promise allocation and async/await state machine overhead in the hot loop, shifting control flow purely to CDP sequential message processing.
 - **PERF-366**: Removed `targetClipParams` logic in `DomStrategy.ts` and simplified single-element capture to strictly rely on Playwright's `targetElementHandle.screenshot()`.
   - **What I did**: Eliminated bounding box querying and removed the conditional logic to run `HeadlessExperimental.beginFrame` with `clip` parameters inside the `capture()` hot loop when `targetSelector` is provided.
   - **Improvement**: ~2.3% faster (48.058s vs 49.197s) for benchmark DOM capture, while also reducing code complexity.

@@ -1,43 +1,37 @@
+import { chromium } from 'playwright';
 import { DomStrategy } from '../src/strategies/DomStrategy.js';
-import { RendererOptions } from '../src/types.js';
+import { CdpTimeDriver } from '../src/drivers/CdpTimeDriver.js';
 
-async function main() {
-  const options: RendererOptions = {
+async function test() {
+  const browser = await chromium.launch({ headless: true, args: ['--enable-begin-frame-control', '--run-all-compositor-stages-before-draw'] });
+  const context = await browser.newContext();
+  const page = await context.newPage();
+
+  const driver = new CdpTimeDriver();
+  await driver.prepare(page);
+
+  const strategy = new DomStrategy({
     fps: 30,
     videoCodec: 'libx264',
-    pixelFormat: 'yuv420p'
-  };
+    mode: 'dom',
+    width: 1920,
+    height: 1080,
+    durationInSeconds: 1,
+    intermediateImageFormat: 'png'
+  });
+  await strategy.prepare(page);
 
-  const strategy = new DomStrategy(options);
+  driver.setTime(page, 0.5);
+  // Wait for setTime async execution to complete
+  await new Promise(r => setTimeout(r, 100));
 
-  // Create a mock page and cdpSession
-  const mockPage: any = {
-    context: () => ({
-      newCDPSession: async () => mockCdpSession
-    }),
-    frames: () => [],
-    evaluate: async () => ({}),
-    screenshot: async () => Buffer.from('mock-fallback-buffer')
-  };
+  const result = await strategy.capture(page, 0.5);
 
-  const mockCdpSession = {
-    send: async (method: string, params: any) => {
-      if (method === 'HeadlessExperimental.enable') return {};
-      if (method === 'HeadlessExperimental.beginFrame') {
-        return { screenshotData: Buffer.from('mock-buffer').toString('base64') };
-      }
-      return {};
-    },
-    detach: async () => {}
-  };
+  console.log(`Buffer returned: ${Buffer.isBuffer(result) || typeof result === 'string'}`);
 
-  await strategy.prepare(mockPage);
-
-  const bufferPromise = strategy.capture(mockPage, 100);
-  console.log("Is Promise?", bufferPromise instanceof Promise);
-
-  const buffer = await bufferPromise;
-  console.log("Buffer returned:", buffer.toString() === 'mock-buffer');
+  await browser.close();
 }
-
-main().catch(console.error);
+test().catch(err => {
+  console.error(err);
+  process.exit(1);
+});
