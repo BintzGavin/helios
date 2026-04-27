@@ -107,3 +107,5 @@ Last updated by: PERF-366
   - Plan: PERF-002
 - **PERF-296**: Replaced object mutation with inline object allocation in the hot loops of `SeekTimeDriver.ts` and `DomStrategy.ts`. The median render time worsened to ~48.743s compared to the baseline of ~47.232s. This indicates that creating new object literals inside the hot loop adds more overhead than the write barriers caused by mutating the long-lived properties. Discarded as slower.
 
+- **PERF-335**: Prebind frameWaiterResolve executor in CaptureLoop.
+  - **WHY it didn't work**: Impossible/Obsolete. The structural change (prebinding `frameWaiterExecutor`) was already implemented and kept by a subsequent experiment (PERF-337). Documented duplication and stopped work.
