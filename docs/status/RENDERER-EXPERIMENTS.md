@@ -116,3 +116,7 @@ Last updated by: PERF-366
 - **PERF-333**: Eliminated `multiFrameEvaluateParams` array caching in `SeekTimeDriver` and `CdpTimeDriver`. Moving to strictly inline object literal allocation for multi-frame CDP `Runtime.evaluate` calls prevents race conditions caused by asynchronous serialization of mutated shared objects over Playwright CDP connections without impacting performance.
 - **PERF-370**: Attempted to increase the `CaptureLoop.ts` pipeline depth from `poolLen * 2` to `poolLen * 8`.
   - **WHY it didn't work**: Impossible/Obsolete. The structural change was already implemented in a previous commit and present in the codebase. Documented duplication and stopped work.
+- **PERF-327**: Attempted to prebind `frameWaiterExecutor` in `CaptureLoop.ts`.
+  - **WHY it didn't work**: Impossible/Obsolete. The structural change was already implemented by PERF-337 and is currently active in the codebase.
+- **PERF-327**: Attempted to inline `evaluateParams` allocation in `CdpTimeDriver.ts`.
+  - **WHY it didn't work**: Impossible due to async mutation race conditions. Playwright's CDP serialization is asynchronous. Mutating a shared object across multiple `cdpSession.send` calls (such as in a `for` loop for multiple iframes) can result in sending overwritten state. Allocating new inline objects for each command is strictly required to ensure correct CDP messaging.

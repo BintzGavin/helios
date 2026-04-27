@@ -1,11 +1,11 @@
 ---
 id: PERF-327
 slug: prebind-frame-waiter
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "Jules"
 created: 2024-04-21
-completed: ""
-result: ""
+completed: "2026-04-27"
+result: "impossible - already implemented"
 ---
 
 # PERF-327: Prebind Frame Waiter Promise Executor in CaptureLoop
@@ -77,3 +77,6 @@ Run `npx tsx packages/renderer/tests/verify-canvas-strategy.ts` to ensure Canvas
 
 ## Correctness Check
 Run `npx tsx packages/renderer/tests/verify-dom-strategy-capture.ts` to verify DOM output is correct.
+
+## Results Summary
+Impossible. The structural change (prebinding `frameWaiterExecutor`) was already implemented and kept by a subsequent experiment (PERF-337). Documented duplication and stopped work.
