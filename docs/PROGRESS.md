@@ -1,4 +1,5 @@
 ### PLAYER v0.77.27
+- ✅ Completed: Document API Parity Gap - Deleted lingering plan file as the README already contained the required documentation updates.
 - ✅ Completed: Add Media Session properties to README
 
 ### STUDIO v0.121.9
