@@ -120,3 +120,7 @@ Last updated by: PERF-366
   - **WHY it didn't work**: Impossible/Obsolete. The structural change was already implemented by PERF-337 and is currently active in the codebase.
 - **PERF-327**: Attempted to inline `evaluateParams` allocation in `CdpTimeDriver.ts`.
   - **WHY it didn't work**: Impossible due to async mutation race conditions. Playwright's CDP serialization is asynchronous. Mutating a shared object across multiple `cdpSession.send` calls (such as in a `for` loop for multiple iframes) can result in sending overwritten state. Allocating new inline objects for each command is strictly required to ensure correct CDP messaging.
+
+- **PERF-374**: Eliminate Progress Interval Modulo in CaptureLoop
+  - **What I tried**: Replaced the modulo arithmetic (`currentFrame % progressInterval === 0`) with an explicit addition counter (`nextProgressFrame += progressInterval`) inside `CaptureLoop.ts`'s hot loop.
+  - **WHY it didn't work**: The median render time improved slightly from ~46.546s to ~46.003s, which represents a ~1.1% gain. However, this is well within the ~5% environmental noise margin. V8 handles the occasional integer modulo arithmetic efficiently enough that manual counter management does not provide a definitive, clear-cut performance gain. Discarded to maintain code simplicity.

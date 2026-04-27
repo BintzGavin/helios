@@ -1,8 +1,8 @@
 ---
 id: PERF-374
 slug: eliminate-progress-interval-modulo
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-01
 completed: ""
 result: ""
@@ -30,3 +30,9 @@ The modulo operator (`%`) in the hot loop of `CaptureLoop.ts` (`currentFrame % p
 
 ## Correctness Check
 Verify that progress logs are still emitted exactly 10 times during the render.
+
+## Results Summary
+- **Best render time**: 46.003s (vs baseline 46.546s)
+- **Improvement**: ~1.1% (inconclusive)
+- **Kept experiments**: []
+- **Discarded experiments**: [PERF-374]
