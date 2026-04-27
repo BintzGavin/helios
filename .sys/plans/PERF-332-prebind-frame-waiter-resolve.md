@@ -1,11 +1,11 @@
 ---
 id: PERF-332
 slug: prebind-frame-waiter-resolve
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-04-22
 completed: ""
-result: ""
+result: "impossible"
 ---
 
 # PERF-332: Prebind frameWaiterResolve executor in CaptureLoop
@@ -67,3 +67,9 @@ Run `npx tsx packages/renderer/tests/verify-dom-strategy-capture.ts` to ensure D
 ## Prior Art
 - PERF-324: Prebound frame promise executors for workers.
 - PERF-321: Prebound `workerBlockedExecutors`.
+
+## Results Summary
+- **Best render time**: 0.000s (vs baseline 0.000s)
+- **Improvement**: 0%
+- **Kept experiments**: []
+- **Discarded experiments**: [PERF-332 (already implemented by PERF-337)]
