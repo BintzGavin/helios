@@ -1,11 +1,11 @@
 ---
 id: PERF-370
 slug: increase-pipeline-depth
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "Jules"
 created: 2024-05-02
-completed: ""
-result: ""
+completed: 2026-04-27
+result: "impossible - already implemented"
 ---
 
 # PERF-370: Increase CaptureLoop Pipeline Depth
@@ -36,18 +36,9 @@ If we change `maxPipelineDepth` to `poolLen * 8` (which for 3 workers would be 2
 **File**: `packages/renderer/src/core/CaptureLoop.ts`
 **What to change**:
 Change the calculation of `maxPipelineDepth` from `poolLen * 2` to `poolLen * 8`.
-```typescript
-<<<<<<< SEARCH
-    const poolLen = this.pool.length;
-    let maxPipelineDepth = poolLen * 2;
-    maxPipelineDepth = Math.pow(2, Math.ceil(Math.log2(maxPipelineDepth)));
-=======
-    const poolLen = this.pool.length;
-    let maxPipelineDepth = poolLen * 8;
-    maxPipelineDepth = Math.pow(2, Math.ceil(Math.log2(maxPipelineDepth)));
->>>>>>> REPLACE
-```
-**Why**: Allows workers to process up to 32 frames ahead of the FFmpeg writer, smoothing out CPU vs I/O spikes and preventing premature worker blocking.
 
 ## Correctness Check
 Run `npx tsx tests/verify-dom-strategy-capture.ts` and ensure benchmark render completes properly.
+
+## Results Summary
+Impossible. The structural change (increasing `maxPipelineDepth` to `poolLen * 8`) was already implemented and committed in a previous session. Documented duplication and stopped work.

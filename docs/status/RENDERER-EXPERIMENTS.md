@@ -114,3 +114,5 @@ Last updated by: PERF-366
 
 ## What Works
 - **PERF-333**: Eliminated `multiFrameEvaluateParams` array caching in `SeekTimeDriver` and `CdpTimeDriver`. Moving to strictly inline object literal allocation for multi-frame CDP `Runtime.evaluate` calls prevents race conditions caused by asynchronous serialization of mutated shared objects over Playwright CDP connections without impacting performance.
+- **PERF-370**: Attempted to increase the `CaptureLoop.ts` pipeline depth from `poolLen * 2` to `poolLen * 8`.
+  - **WHY it didn't work**: Impossible/Obsolete. The structural change was already implemented in a previous commit and present in the codebase. Documented duplication and stopped work.
