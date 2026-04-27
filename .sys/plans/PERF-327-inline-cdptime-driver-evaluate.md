@@ -1,11 +1,11 @@
 ---
 id: PERF-327
 slug: inline-cdptime-driver-evaluate
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "Jules"
 created: 2024-05-28
-completed: ""
-result: ""
+completed: "2026-04-27"
+result: "impossible - async mutation race condition"
 ---
 
 # PERF-327: Inline CdpTimeDriver Evaluate Params
@@ -58,3 +58,6 @@ Run `npx tsx packages/renderer/tests/verify-canvas-strategy.ts` to ensure Canvas
 
 ## Correctness Check
 Run `npx tsx packages/renderer/tests/verify-dom-strategy-capture.ts` to ensure the DOM strategy logic runs and correctly falls back to the mocked `lastFrameData` buffer.
+
+## Results Summary
+Impossible. Playwright's CDP serialization is asynchronous. Mutating a shared object across multiple `cdpSession.send` calls (such as in a `for` loop for multiple iframes) can result in sending overwritten state from a subsequent tick. Therefore, allocating inline objects is strictly required to prevent async mutation race conditions.
