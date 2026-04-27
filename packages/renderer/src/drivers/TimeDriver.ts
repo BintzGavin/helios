@@ -18,5 +18,5 @@ export interface TimeDriver {
    * @param page The Playwright page instance.
    * @param timeInSeconds The time to seek to in seconds.
    */
-  setTime(page: Page, timeInSeconds: number): void;
+  setTime(page: Page, timeInSeconds: number): Promise<void> | void;
 }

@@ -161,8 +161,8 @@ export class CdpTimeDriver implements TimeDriver {
     this.currentTime = 0;
   }
 
-  setTime(page: Page, timeInSeconds: number): void {
-    this.runSetTime(page, timeInSeconds).catch(noopCatch);
+  setTime(page: Page, timeInSeconds: number): Promise<void> | void {
+    return this.runSetTime(page, timeInSeconds);
   }
 
   private async runSetTime(page: Page, timeInSeconds: number): Promise<void> {
