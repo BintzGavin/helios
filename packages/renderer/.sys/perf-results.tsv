@@ -20,3 +20,7 @@ run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
 9	46.452	600	12.92	32.6	discard	eliminate polymorphic buffer checks (PERF-367)
 1	0.000	0	0.00	0.0	crash	PERF-332: Duplicate of PERF-337, impossible
 1	0.000	0	0.00	0.0	crash	PERF-370: Duplicate of previous implementation, impossible
+1	46.546	600	12.89	0.0	keep	baseline
+2	46.605	600	12.87	0.0	keep	baseline
+3	45.939	600	13.06	0.0	keep	baseline
+2	46.003	600	13.04	0.0	discard	eliminate progress interval modulo
