@@ -139,3 +139,4 @@ This backlog tracks concrete deliverables derived from [`AGENTS.md`](../AGENTS.m
 
 ## Blocked Items
 - [ ] PLAYER: Waiting for new implementation plans in `/.sys/plans/`.
+- [x] STUDIO: 2026-11-14-STUDIO-Update-Keyboard-Shortcuts-Documentation is structurally obsolete.
