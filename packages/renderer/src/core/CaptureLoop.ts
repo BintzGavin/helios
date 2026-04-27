@@ -95,7 +95,7 @@ export class CaptureLoop {
     let previousWritePromise: Promise<void> | undefined;
 
     const poolLen = this.pool.length;
-    let maxPipelineDepth = poolLen * 2;
+    let maxPipelineDepth = poolLen * 8;
     maxPipelineDepth = Math.pow(2, Math.ceil(Math.log2(maxPipelineDepth)));
     const ringMask = maxPipelineDepth - 1;
     const timeStep = 1000 / fps;
