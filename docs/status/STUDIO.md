@@ -204,3 +204,4 @@
 
 - [v0.121.4] ✅ Completed: STUDIO-Timeline-Drag-Drop - Added visual styling when dragging an asset over the Timeline component for visual feedback.
 - [v0.121.7] ✅ Completed: STUDIO-Timeline-Drag-Drop - Verified timeline drag and drop for assets is already implemented (2026-11-13-STUDIO-Timeline-Drag-Drop.md).
+- ❌ Blocked: 2026-11-14-STUDIO-Update-Keyboard-Shortcuts-Documentation is structurally obsolete as changes are already present.
