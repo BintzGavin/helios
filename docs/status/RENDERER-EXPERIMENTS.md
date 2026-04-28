@@ -138,3 +138,9 @@ Last updated by: PERF-375
 - **What I tried**: Replaced HeadlessExperimental.beginFrame with Page.startScreencast in DomStrategy to invert pull-to-push screenshoting and avoid IPC roundtrip wait.
 - **WHY it didn't work**: When the Chromium browser is launched with `--enable-begin-frame-control` and `--run-all-compositor-stages-before-draw` (which is strictly required by Helios for deterministic offline rendering and precise time synchronization), `Page.startScreencast` fails to emit any `Page.screencastFrame` events, deadlocking the capture pipeline. The underlying Chromium architecture disables or suppresses automatic screencast frame emission when external compositor control is active, as it expects explicit ticks (`HeadlessExperimental.beginFrame`). Attempting to use `Page.startScreencast` alongside explicit compositor control is fundamentally incompatible.
 - **Outcome**: discard
+
+## PERF-382: Pipeline CaptureLoop with Native Promise Ring
+- Render time: ~31.54s (Baseline: ~31.57s)
+- Status: discard
+- **PERF-382**: Attempted to pipeline `CaptureLoop.ts` by replacing the custom ring arrays (`frameReadyRing`, `frameErrorRing`, `frameBufferRing`) and manual V8 Promise executor caching (`writerWaiterResolve`, `frameWaiterResolve`) with a single native `Array<Promise<Buffer | string | null>>`.
+  - **WHY it didn't work**: The performance was essentially identical to the baseline (~31.54s vs ~31.57s), showing V8 optimizes the custom ring arrays and actor model very efficiently already. Replacing it with a native promise ring caused stability and backpressure handling issues when run under load, while also removing visibility into exact worker pipeline state. Since it didn't improve render time and disrupted stable backpressure mechanics, it was discarded.
