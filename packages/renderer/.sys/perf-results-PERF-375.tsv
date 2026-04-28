@@ -1,0 +1,4 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	37.754	150	3.97	39.8	keep	baseline
+2	36.836	150	4.07	35.9	keep	Removed await from sync_media
+3	36.336	150	4.13	39.0	keep	Removed await from sync_media
