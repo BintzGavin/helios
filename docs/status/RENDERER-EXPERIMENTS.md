@@ -131,3 +131,4 @@ Last updated by: PERF-375
 
 ## What Works
 - Removed `await` from the single-frame and multi-frame `Runtime.evaluate` calls for media synchronization in `CdpTimeDriver.ts`. This pipelines the CDP commands natively, saving the IPC acknowledgment latency (~3.76% faster). (PERF-375)
+- **PERF-378**: Inlined the Promise.race logic in window.__helios_seek and removed timeout allocation to reduce micro-allocations in the hot loop of SeekTimeDriver. Performance was essentially identical to the baseline (~46.820s vs ~46.546s), showing V8 optimizes the `Promise.race` wrapper very efficiently. However, stability tests failed because the actual explicit stability checks depend on the client-side `setTimeout` properly acting as a fallback when an unresolved Promise prevents the script from returning. Discarded to maintain timeout stability.
