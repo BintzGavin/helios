@@ -24,3 +24,4 @@ run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
 2	46.605	600	12.87	0.0	keep	baseline
 3	45.939	600	13.06	0.0	keep	baseline
 2	46.003	600	13.04	0.0	discard	eliminate progress interval modulo
+1	46.820	600	12.82	39.5	inconclusive	inline seek promise race
