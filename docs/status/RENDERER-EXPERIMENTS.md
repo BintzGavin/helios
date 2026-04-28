@@ -4,6 +4,7 @@ Last updated by: PERF-366
 
 
 ## What Works
+- Removed `Promise.race` and safety timeout allocation from `window.__helios_seek` script in `SeekTimeDriver.ts`, relying instead on Playwright's native `Runtime.evaluate` timeout to handle script hangs. This eliminated the overhead of allocating closures, arrays, and timers on every execution frame in the browser context, resulting in a ~4.52% improvement in overall render time. (PERF-378)
 - **PERF-368**: Eliminated `TimeDriver.setTime` Promise return overhead.
   - **What I did**: Changed `TimeDriver.setTime` interface to return `void`. Refactored `CdpTimeDriver.ts` to internally catch its async closure and modified `CaptureLoop.ts` to execute `setTime` without tracking a Promise.
   - **Improvement**: Natively avoided V8 Promise allocation and async/await state machine overhead in the hot loop, shifting control flow purely to CDP sequential message processing.
@@ -126,8 +127,8 @@ Last updated by: PERF-366
   - **WHY it didn't work**: The median render time improved slightly from ~46.546s to ~46.003s, which represents a ~1.1% gain. However, this is well within the ~5% environmental noise margin. V8 handles the occasional integer modulo arithmetic efficiently enough that manual counter management does not provide a definitive, clear-cut performance gain. Discarded to maintain code simplicity.
 
 ## Performance Trajectory
-Current best: 36.336s (baseline was 37.754s, -3.76%)
-Last updated by: PERF-375
+Current best: 34.692s (baseline was 36.336s, -4.52%)
+Last updated by: PERF-378
 
 ## What Works
 - Removed `await` from the single-frame and multi-frame `Runtime.evaluate` calls for media synchronization in `CdpTimeDriver.ts`. This pipelines the CDP commands natively, saving the IPC acknowledgment latency (~3.76% faster). (PERF-375)

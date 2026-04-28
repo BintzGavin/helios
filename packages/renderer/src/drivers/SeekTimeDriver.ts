@@ -109,7 +109,7 @@ export class SeekTimeDriver implements TimeDriver {
           cachedMediaElements = null;
         };
 
-        window.__helios_seek = (t, timeoutMs) => {
+        window.__helios_seek = (t) => {
           let gsapTimelineSeeked = false;
           let heliosSeeked = false;
           const timeInMs = t * 1000;
@@ -207,15 +207,9 @@ export class SeekTimeDriver implements TimeDriver {
             promises[promises.length] = window.helios.waitUntilStable();
           }
 
-          // 4. Wait for stability with a safety timeout (only if needed)
+          // 4. Wait for stability
           if (promises && promises.length > 0) {
-            let timeoutId;
-            const allReady = Promise.all(promises);
-            const timeoutPromise = new Promise((resolve) => {
-              timeoutId = setTimeout(resolve, timeoutMs);
-            });
-            return Promise.race([allReady, timeoutPromise]).then(() => {
-              clearTimeout(timeoutId);
+            return Promise.all(promises).then(() => {
 
               // 5. After stability, ensure GSAP timelines are seeked again in case async changes occurred
               if (gsapTimelineSeeked && window.__helios_gsap_timeline__ && typeof window.__helios_gsap_timeline__.seek === 'function') {
@@ -280,19 +274,21 @@ export class SeekTimeDriver implements TimeDriver {
 
     if (frames.length === 1) {
       return this.cdpSession!.send('Runtime.evaluate', {
-        expression: 'window.__helios_seek(' + timeInSeconds + ', ' + this.timeout + ')',
-        awaitPromise: true
+        expression: 'window.__helios_seek(' + timeInSeconds + ')',
+        awaitPromise: true,
+        timeout: this.timeout
       }).then(() => {});
     }
 
-    const expression = 'window.__helios_seek(' + timeInSeconds + ', ' + this.timeout + ')';
+    const expression = 'window.__helios_seek(' + timeInSeconds + ')';
 
     const promises = [];
     for (let i = 0; i < this.executionContextIds.length; i++) {
       promises.push(this.cdpSession!.send('Runtime.evaluate', {
         expression,
         contextId: this.executionContextIds[i],
-        awaitPromise: true
+        awaitPromise: true,
+        timeout: this.timeout
       }));
     }
     return Promise.all(promises).then(() => {});

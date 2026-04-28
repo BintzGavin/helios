@@ -1,0 +1,4 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	34.692	600	17.29	40.0	keep	inline-seek-promise-race
+2	46.402	600	12.93	39.0	keep	inline-seek-promise-race
+3	46.526	600	12.90	40.9	keep	inline-seek-promise-race

@@ -1,11 +1,11 @@
 ---
 id: PERF-378
 slug: inline-seek-promise-race
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-01
-completed: ""
-result: ""
+completed: "2024-05-01"
+result: "improved"
 ---
 
 # PERF-378: Inline `__helios_seek` and Evaluate Promise.race Node-side
@@ -131,3 +131,10 @@ To:
 
 **Why**: Simplifies execution context and removes micro-allocations for timers on every frame. Node.js manages execution boundaries at the parent level, making the client-side timeout largely redundant and an unnecessary source of GC pressure.
 **Risk**: If a frame inherently hangs without resolution (e.g. fonts never load), it could stall the CDP response indefinitely without the client-side timeout wrapper. However, the BrowserPool enforces a timeout natively on page hangs if the orchestrator uses AbortSignals.
+
+## Results Summary
+- **Best render time**: 34.692s (vs baseline 36.336s)
+- **Improvement**: 4.52%
+- **Kept experiments**:
+  - Removed `Promise.race` array allocation and timer overhead from `__helios_seek` script execution in `SeekTimeDriver.ts`, relying on native CDP evaluate timeout.
+- **Discarded experiments**: None
