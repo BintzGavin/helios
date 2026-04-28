@@ -132,3 +132,8 @@ Last updated by: PERF-375
 ## What Works
 - Removed `await` from the single-frame and multi-frame `Runtime.evaluate` calls for media synchronization in `CdpTimeDriver.ts`. This pipelines the CDP commands natively, saving the IPC acknowledgment latency (~3.76% faster). (PERF-375)
 - **PERF-378**: Inlined the Promise.race logic in window.__helios_seek and removed timeout allocation to reduce micro-allocations in the hot loop of SeekTimeDriver. Performance was essentially identical to the baseline (~46.820s vs ~46.546s), showing V8 optimizes the `Promise.race` wrapper very efficiently. However, stability tests failed because the actual explicit stability checks depend on the client-side `setTimeout` properly acting as a fallback when an unresolved Promise prevents the script from returning. Discarded to maintain timeout stability.
+
+## PERF-380: Raw CDP Screencast
+- **What I tried**: Replaced HeadlessExperimental.beginFrame with Page.startScreencast in DomStrategy to invert pull-to-push screenshoting and avoid IPC roundtrip wait.
+- **WHY it didn't work**: When the Chromium browser is launched with `--enable-begin-frame-control` and `--run-all-compositor-stages-before-draw` (which is strictly required by Helios for deterministic offline rendering and precise time synchronization), `Page.startScreencast` fails to emit any `Page.screencastFrame` events, deadlocking the capture pipeline. The underlying Chromium architecture disables or suppresses automatic screencast frame emission when external compositor control is active, as it expects explicit ticks (`HeadlessExperimental.beginFrame`). Attempting to use `Page.startScreencast` alongside explicit compositor control is fundamentally incompatible.
+- **Outcome**: discard

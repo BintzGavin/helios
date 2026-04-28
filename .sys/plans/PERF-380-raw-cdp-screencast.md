@@ -1,11 +1,11 @@
 ---
 id: PERF-380
 slug: raw-cdp-screencast
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor"
 created: 2024-05-01
-completed: ""
-result: ""
+completed: "2026-04-28"
+result: "discard"
 ---
 
 # PERF-380: Replace HeadlessExperimental.beginFrame with Page.startScreencast
@@ -70,3 +70,9 @@ Run `npx tsx tests/verify-canvas-strategy.ts` (if exists) or confirm Canvas mode
 
 ## Correctness Check
 Run `npm run benchmark:dom` (if available) or `node` script to verify frame sequence.
+
+## Results Summary
+- **Best render time**: 0.000s (vs baseline ~46.546s)
+- **Improvement**: 0%
+- **Kept experiments**: []
+- **Discarded experiments**: [Step 1: Replace HeadlessExperimental.beginFrame with Page.startScreencast]
