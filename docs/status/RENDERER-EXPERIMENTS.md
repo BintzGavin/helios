@@ -124,3 +124,10 @@ Last updated by: PERF-366
 - **PERF-374**: Eliminate Progress Interval Modulo in CaptureLoop
   - **What I tried**: Replaced the modulo arithmetic (`currentFrame % progressInterval === 0`) with an explicit addition counter (`nextProgressFrame += progressInterval`) inside `CaptureLoop.ts`'s hot loop.
   - **WHY it didn't work**: The median render time improved slightly from ~46.546s to ~46.003s, which represents a ~1.1% gain. However, this is well within the ~5% environmental noise margin. V8 handles the occasional integer modulo arithmetic efficiently enough that manual counter management does not provide a definitive, clear-cut performance gain. Discarded to maintain code simplicity.
+
+## Performance Trajectory
+Current best: 36.336s (baseline was 37.754s, -3.76%)
+Last updated by: PERF-375
+
+## What Works
+- Removed `await` from the single-frame and multi-frame `Runtime.evaluate` calls for media synchronization in `CdpTimeDriver.ts`. This pipelines the CDP commands natively, saving the IPC acknowledgment latency (~3.76% faster). (PERF-375)

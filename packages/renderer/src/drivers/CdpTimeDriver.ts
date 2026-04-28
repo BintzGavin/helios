@@ -183,36 +183,26 @@ export class CdpTimeDriver implements TimeDriver {
     // Execute in all frames (including main frame) to support iframes
     const frames = this.cachedFrames;
     if (frames.length === 1) {
-      await this.client!.send('Runtime.evaluate', {
+      this.client!.send('Runtime.evaluate', {
         expression: "if(typeof window.__helios_sync_media==='function') window.__helios_sync_media(" + timeInSeconds + ");",
         awaitPromise: false
       }).catch(this.handleSyncMediaError);
     } else {
         if (this.executionContextIds.length > 0) {
-          if (this.cachedPromises.length !== this.executionContextIds.length) {
-            this.cachedPromises = new Array(this.executionContextIds.length);
-          }
-          const framePromises = this.cachedPromises;
           const expression = "if(typeof window.__helios_sync_media==='function') window.__helios_sync_media(" + timeInSeconds + ");";
           for (let i = 0; i < this.executionContextIds.length; i++) {
-            framePromises[i] = this.client!.send('Runtime.evaluate', {
+            this.client!.send('Runtime.evaluate', {
               expression: expression,
               contextId: this.executionContextIds[i],
               awaitPromise: false
             }).catch(this.handleSyncMediaError);
           }
-          await Promise.all(framePromises);
         } else {
           // Fallback if execution contexts couldn't be resolved (e.g. reused CDP session)
-          if (this.cachedPromises.length !== frames.length) {
-            this.cachedPromises = new Array(frames.length);
-          }
-          const framePromises = this.cachedPromises;
           for (let i = 0; i < frames.length; i++) {
             const frame = frames[i];
-            framePromises[i] = frame.evaluate("if(typeof window.__helios_sync_media==='function') window.__helios_sync_media(" + timeInSeconds + ");").catch(this.handleSyncMediaError);
+            frame.evaluate("if(typeof window.__helios_sync_media==='function') window.__helios_sync_media(" + timeInSeconds + ");").catch(this.handleSyncMediaError);
           }
-          await Promise.all(framePromises);
         }
     }
 

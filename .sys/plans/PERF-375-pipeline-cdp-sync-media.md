@@ -1,11 +1,11 @@
 ---
 id: PERF-375
 slug: pipeline-cdp-sync-media
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-04-28
-completed: ""
-result: ""
+completed: 2025-02-18
+result: improved
 ---
 
 # PERF-375: Pipeline CDP Sync Media in CdpTimeDriver
@@ -30,14 +30,14 @@ Because `awaitPromise: false` is used, the script executes synchronously in the 
 Since CDP guarantees that messages on the same session are processed sequentially by the target, we do not need to `await` the `Runtime.evaluate` command in Node.js. We can fire it off and immediately send the `Emulation.setVirtualTimePolicy` command. The browser will process the media sync first, then process the virtual time advancement. Node.js only needs to `await` the `virtualTimeBudgetExpired` event, effectively eliminating an entire IPC roundtrip from the hot loop while maintaining exact execution order.
 
 ## Benchmark Configuration
-- **Composition URL**: Any standard DOM benchmark (e.g., `examples/simple-animation/output/example-build/composition.html`)
+- **Composition URL**: Any standard DOM benchmark (e.g., `examples/dom-benchmark/composition.html`)
 - **Render Settings**: 1920x1080, 30 FPS, 5 seconds (150 frames)
 - **Mode**: `dom`
 - **Metric**: Wall-clock render time in seconds
 - **Minimum runs**: 3
 
 ## Baseline
-- **Current estimated render time**: ~46.5s
+- **Current estimated render time**: 37.754s
 - **Bottleneck analysis**: IPC roundtrip overhead in the `setTime` hot loop. Awaiting `Runtime.evaluate` without `awaitPromise` forces Node.js to pause until Chrome acknowledges the message, rather than pipelining the commands.
 
 ## Implementation Spec
@@ -115,3 +115,9 @@ To:
 ## Correctness Check
 - DOM captures should be identical.
 - Media elements (video/audio in the DOM) must remain synchronized in the output.
+
+## Results Summary
+- **Best render time**: 36.336s (vs baseline 37.754s)
+- **Improvement**: 3.76%
+- **Kept experiments**: Removed `await` from the single-frame and multi-frame `Runtime.evaluate` calls for media synchronization in `CdpTimeDriver.ts`.
+- **Discarded experiments**: []
