@@ -1,11 +1,11 @@
 ---
 id: PERF-382
 slug: native-promise-ring
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "Jules"
 created: 2024-05-01
-completed: ""
-result: ""
+completed: "2026-04-28"
+result: "discard"
 ---
 
 # PERF-382: Pipeline CaptureLoop with Native Promise Ring
@@ -84,3 +84,11 @@ Run `cd packages/renderer && npx tsx tests/verify-dom-strategy-capture.ts`
 
 ## Prior Art
 V8 optimization guidelines on native Promise chaining vs manual event emission.
+
+## Results Summary
+```tsv
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	31.552	90	2.85	0.0	discard	native promise ring
+2	31.541	90	2.85	0.0	discard	native promise ring
+3	31.519	90	2.85	0.0	discard	native promise ring
+```
