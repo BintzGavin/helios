@@ -21,6 +21,7 @@ export class DomStrategy implements RenderStrategy {
   private targetElementHandle: any = null;
   private emptyImageBuffer: Buffer = EMPTY_IMAGE_BUFFER;
   private emptyImageBase64: string = "";
+  private screencastPromiseResolver: ((data: string) => void) | null = null;
   private frameInterval: number = 0;
 
   constructor(private options: RendererOptions) {
@@ -137,6 +138,20 @@ export class DomStrategy implements RenderStrategy {
 
     this.lastFrameData = this.emptyImageBase64;
 
+    this.cdpSession!.on('Page.screencastFrame', (event) => {
+      if (this.screencastPromiseResolver) {
+        this.screencastPromiseResolver(event.data);
+        this.screencastPromiseResolver = null;
+      }
+      this.cdpSession!.send('Page.screencastFrameAck', { sessionId: event.sessionId }).catch(() => {});
+    });
+
+    await this.cdpSession!.send('Page.startScreencast', {
+      format: cdpScreenshotParams.format,
+      quality: cdpScreenshotParams.quality,
+      everyNthFrame: 1
+    });
+
 
 
 
@@ -167,16 +182,18 @@ export class DomStrategy implements RenderStrategy {
       return this.lastFrameData!;
     }
 
-    const res = await this.cdpSession!.send('HeadlessExperimental.beginFrame', {
-      screenshot: this.cdpScreenshotParams,
+    const promise = new Promise<string>((resolve) => {
+      this.screencastPromiseResolver = resolve;
+    });
+
+    this.cdpSession!.send('HeadlessExperimental.beginFrame', {
       interval: this.frameInterval,
       frameTimeTicks: 10000 + frameTime
-    });
-    if (res && res.screenshotData) {
-      this.lastFrameData = res.screenshotData;
-      return res.screenshotData;
-    }
-    return this.lastFrameData!;
+    }).catch(() => {});
+
+    const frameData = await promise;
+    this.lastFrameData = frameData;
+    return frameData;
   }
 
   async finish(page: Page): Promise<void> {

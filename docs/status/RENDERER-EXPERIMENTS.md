@@ -27,6 +27,7 @@ Last updated by: PERF-366
 - **PERF-337**: Prebound `frameWaiterResolve` executor into `frameWaiterExecutor` to avoid dynamic inline closure allocations during the CaptureLoop actor pipeline backpressure events. This adheres to the "simplicity and GC reduction" principle that guided keeping `writerWaiterExecutor`. Render time: 46.464s (Baseline: 57.022s), though baseline was inflated by initial run. Median render times of subsequent runs were around 46.6s, slightly better than PERF-336's ~47.4s. Kept to reduce V8 GC churn in the main event loop.
 
 ## What Doesn't Work (and Why)
+- **PERF-381**: Attempted to pipeline `HeadlessExperimental.beginFrame` with `Page.startScreencast` in `DomStrategy`. **WHY it didn't work**: The pipeline deadlocked. Chromium's compositor does not emit a `Page.screencastFrame` event when `beginFrame` ticks if there are no visual changes (no damage) on the screen. Because the capture loop strictly awaited a pushed screencast event, it hung indefinitely during static sequences. Discarded.
 - **PERF-332**: Prebind frameWaiterResolve executor in CaptureLoop.\
   - **WHY it didn't work**: Impossible/Obsolete. The structural change (prebinding `frameWaiterExecutor`) was already implemented and kept by a subsequent experiment (PERF-337). Documented duplication and stopped work.
 - **PERF-328: Inline CdpTimeDriver Evaluate Params**
