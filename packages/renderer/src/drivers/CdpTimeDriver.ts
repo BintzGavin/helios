@@ -219,12 +219,15 @@ export class CdpTimeDriver implements TimeDriver {
 
     // We still need a timeout mechanism because CDP evaluate with awaitPromise doesn't have an inherent timeout,
     // and virtual time is paused, so internal setTimeout won't work.
-    const evaluatePromise = this.client!.send('Runtime.evaluate', this.evaluateStabilityParams).then(this.handleStabilityCheckResponse);
+    const evaluatePromise = this.client!.send('Runtime.evaluate', this.evaluateStabilityParams);
 
     const timeoutPromise = new Promise<void>(this.stabilityTimeoutExecutor);
 
     try {
-        await Promise.race([evaluatePromise, timeoutPromise]);
+        const res = await Promise.race([evaluatePromise, timeoutPromise]);
+        if (res) {
+            this.handleStabilityCheckResponse(res);
+        }
     } catch (e: any) {
         if (e.message === 'Stability check timed out') {
             console.warn(`[CdpTimeDriver] Stability check timed out after ${this.timeout}ms. Terminating execution.`);
