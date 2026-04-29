@@ -152,3 +152,7 @@ Last updated by: PERF-375
 - Render time: 1.907s (Baseline: 1.954s)
 - Status: keep
 - **PERF-383**: Prebound the `screencastPromiseExecutor` in `DomStrategy.ts` to avoid dynamically allocating an arrow function closure inside `new Promise` on every single frame. Reusing a single prebound executor function reduces garbage collection pressure in the main event loop, yielding a ~2.4% speedup in raw capture strategy tests.
+
+## PERF-376: Inline seek promise
+- Status: discard
+- **PERF-376**: Attempted to inline the Promise.race logic in `window.__helios_seek` and remove timeout allocation to reduce micro-allocations in `SeekTimeDriver.ts`. This was already tested in PERF-378 and discarded because performance was identical to the baseline and it caused client-side stability timeouts to fail. No code changes were kept.
