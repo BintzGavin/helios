@@ -1,8 +1,9 @@
-**Version**: 0.121.9
+**Version**: 0.121.10
 
 **Posture**: ACTIVELY EXPANDING FOR V2
 
 # Studio Domain Status
+- [v0.121.10] ✅ Completed: Update Keyboard Shortcuts - Implemented missing JKL keyboard shortcuts documentation in the Help Modal.
 
 - [v0.121.8] ✅ Completed: STUDIO-Timeline-Drag-Drop - Verified timeline drag and drop for assets is already implemented (2026-11-13-STUDIO-Timeline-Drag-Drop.md).
 - [v0.121.7] ✅ Verified: Export Job Spec - Verified existing implementation of Export Job Spec functionality in Studio Renders Panel.
