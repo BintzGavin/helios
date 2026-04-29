@@ -4,6 +4,7 @@ Last updated by: PERF-366
 
 
 ## What Works
+- **PERF-386**: Eliminated Promise chain allocation in `CdpTimeDriver` stability check (verified existing implementation).
 - **PERF-384**: Eliminated Promise chain allocation in `SeekTimeDriver.setTime`.
   - **What I did**: Removed `.then(() => {})` closure allocations and cast the CDP promise directly to `Promise<void>`.
   - **Improvement**: Eliminated micro-allocations on the event loop for every frame, reducing V8 GC churn.
@@ -119,6 +120,7 @@ Last updated by: PERF-366
   - **WHY it didn't work**: Impossible/Obsolete. The structural change (prebinding `frameWaiterExecutor`) was already implemented and kept by a subsequent experiment (PERF-337). Documented duplication and stopped work.
 
 ## What Works
+- **PERF-386**: Eliminated Promise chain allocation in `CdpTimeDriver` stability check (verified existing implementation).
 - **PERF-333**: Eliminated `multiFrameEvaluateParams` array caching in `SeekTimeDriver` and `CdpTimeDriver`. Moving to strictly inline object literal allocation for multi-frame CDP `Runtime.evaluate` calls prevents race conditions caused by asynchronous serialization of mutated shared objects over Playwright CDP connections without impacting performance.
 - **PERF-370**: Attempted to increase the `CaptureLoop.ts` pipeline depth from `poolLen * 2` to `poolLen * 8`.
   - **WHY it didn't work**: Impossible/Obsolete. The structural change was already implemented in a previous commit and present in the codebase. Documented duplication and stopped work.
@@ -136,6 +138,7 @@ Current best: 36.336s (baseline was 37.754s, -3.76%)
 Last updated by: PERF-375
 
 ## What Works
+- **PERF-386**: Eliminated Promise chain allocation in `CdpTimeDriver` stability check (verified existing implementation).
 - Removed `await` from the single-frame and multi-frame `Runtime.evaluate` calls for media synchronization in `CdpTimeDriver.ts`. This pipelines the CDP commands natively, saving the IPC acknowledgment latency (~3.76% faster). (PERF-375)
 - **PERF-378**: Inlined the Promise.race logic in window.__helios_seek and removed timeout allocation to reduce micro-allocations in the hot loop of SeekTimeDriver. Performance was essentially identical to the baseline (~46.820s vs ~46.546s), showing V8 optimizes the `Promise.race` wrapper very efficiently. However, stability tests failed because the actual explicit stability checks depend on the client-side `setTimeout` properly acting as a fallback when an unresolved Promise prevents the script from returning. Discarded to maintain timeout stability.
 
