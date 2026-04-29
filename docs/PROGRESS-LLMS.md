@@ -1,3 +1,11 @@
+## LLMS v1.75.0
+- ✅ Completed: Daily llms.txt Review
+  - Updated Roadmap in llms.txt with verifiable completions from domain PROGRESS logs:
+    - Studio: Update Quickstart Guide
+    - CLI: Scaffold Cloudflare Sandbox Deployment, Tier 3 Scaffold Deployment Commands, Scaffold Hetzner Deployment Command
+    - Player: Regression Tests for Media Session, Regression Tests for MediaProperties, Regression Tests for InputProps, Audio Context Manager Tests, Async Seek
+  - Verified package versions against actual package.json files.
+
 # LLMS Progress
 
 ## LLMS v1.74.0
