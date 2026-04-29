@@ -23,6 +23,7 @@ export class DomStrategy implements RenderStrategy {
   private emptyImageBase64: string = "";
   private screencastPromiseResolver: ((data: string) => void) | null = null;
   private frameInterval: number = 0;
+  private beginFrameParams: { interval: number; frameTimeTicks: number } = { interval: 0, frameTimeTicks: 0 };
   private screencastPromiseExecutor = (resolve: (value: string) => void) => {
     this.screencastPromiseResolver = resolve;
   };
@@ -122,6 +123,7 @@ export class DomStrategy implements RenderStrategy {
     }
 
     this.frameInterval = 1000 / this.options.fps;
+    this.beginFrameParams.interval = this.frameInterval;
     this.cdpScreenshotParams = cdpScreenshotParams;
 
     // Set format-appropriate empty buffer
@@ -187,10 +189,8 @@ export class DomStrategy implements RenderStrategy {
 
     const promise = new Promise<string>(this.screencastPromiseExecutor);
 
-    this.cdpSession!.send('HeadlessExperimental.beginFrame', {
-      interval: this.frameInterval,
-      frameTimeTicks: 10000 + frameTime
-    }).catch(() => {});
+    this.beginFrameParams.frameTimeTicks = 10000 + frameTime;
+    this.cdpSession!.send('HeadlessExperimental.beginFrame', this.beginFrameParams).catch(() => {});
 
     const frameData = await promise;
     this.lastFrameData = frameData;
