@@ -282,7 +282,7 @@ export class SeekTimeDriver implements TimeDriver {
       return this.cdpSession!.send('Runtime.evaluate', {
         expression: 'window.__helios_seek(' + timeInSeconds + ', ' + this.timeout + ')',
         awaitPromise: true
-      }).then(() => {});
+      }) as unknown as Promise<void>;
     }
 
     const expression = 'window.__helios_seek(' + timeInSeconds + ', ' + this.timeout + ')';
@@ -295,6 +295,6 @@ export class SeekTimeDriver implements TimeDriver {
         awaitPromise: true
       }));
     }
-    return Promise.all(promises).then(() => {});
+    return Promise.all(promises) as unknown as Promise<void>;
   }
 }
