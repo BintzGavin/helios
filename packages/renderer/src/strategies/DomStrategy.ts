@@ -21,11 +21,7 @@ export class DomStrategy implements RenderStrategy {
   private targetElementHandle: any = null;
   private emptyImageBuffer: Buffer = EMPTY_IMAGE_BUFFER;
   private emptyImageBase64: string = "";
-  private screencastPromiseResolver: ((data: string) => void) | null = null;
   private frameInterval: number = 0;
-  private screencastPromiseExecutor = (resolve: (value: string) => void) => {
-    this.screencastPromiseResolver = resolve;
-  };
 
   constructor(private options: RendererOptions) {
     if (this.options.videoCodec === 'copy') {
@@ -141,23 +137,6 @@ export class DomStrategy implements RenderStrategy {
 
     this.lastFrameData = this.emptyImageBase64;
 
-    this.cdpSession!.on('Page.screencastFrame', (event) => {
-      if (this.screencastPromiseResolver) {
-        this.screencastPromiseResolver(event.data);
-        this.screencastPromiseResolver = null;
-      }
-      this.cdpSession!.send('Page.screencastFrameAck', { sessionId: event.sessionId }).catch(() => {});
-    });
-
-    await this.cdpSession!.send('Page.startScreencast', {
-      format: cdpScreenshotParams.format,
-      quality: cdpScreenshotParams.quality,
-      everyNthFrame: 1
-    });
-
-
-
-
     if (this.options.targetSelector) {
       const element = await page.waitForSelector(this.options.targetSelector, { state: 'attached', timeout: 5000 });
       if (!element) {
@@ -185,16 +164,18 @@ export class DomStrategy implements RenderStrategy {
       return this.lastFrameData!;
     }
 
-    const promise = new Promise<string>(this.screencastPromiseExecutor);
-
-    this.cdpSession!.send('HeadlessExperimental.beginFrame', {
+    const result = await this.cdpSession!.send('HeadlessExperimental.beginFrame', {
       interval: this.frameInterval,
-      frameTimeTicks: 10000 + frameTime
-    }).catch(() => {});
+      frameTimeTicks: 10000 + frameTime,
+      screenshot: {
+        format: this.cdpScreenshotParams.format,
+        quality: this.cdpScreenshotParams.quality
+      }
+    });
 
-    const frameData = await promise;
-    this.lastFrameData = frameData;
-    return frameData;
+    const frameData = result.screenshotData || this.lastFrameData;
+    this.lastFrameData = frameData as string;
+    return frameData as string;
   }
 
   async finish(page: Page): Promise<void> {
