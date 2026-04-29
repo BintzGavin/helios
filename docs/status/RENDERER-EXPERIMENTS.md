@@ -152,3 +152,8 @@ Last updated by: PERF-375
 - Render time: 1.907s (Baseline: 1.954s)
 - Status: keep
 - **PERF-383**: Prebound the `screencastPromiseExecutor` in `DomStrategy.ts` to avoid dynamically allocating an arrow function closure inside `new Promise` on every single frame. Reusing a single prebound executor function reduces garbage collection pressure in the main event loop, yielding a ~2.4% speedup in raw capture strategy tests.
+
+## PERF-321: Avoid CDP Promise Array Allocation in SeekTimeDriver
+- **Status**: discard
+- **What I tried**: Attempted to optimize `SeekTimeDriver.ts` by reusing a shared parameter object `evaluateParams` and avoiding `Promise.all` wrappers.
+- **WHY it didn't work**: Dropping `Promise.all` is no longer viable because `CaptureLoop.ts` now actively `await`s the completion of `setTime()` (restored in PERF-373), which requires sequential correctness. Furthermore, mutating a shared object parameter across multiple asynchronous Playwright `cdpSession.send` calls leads to data race conditions as Playwright's CDP serialization occurs asynchronously (as discovered in PERF-327). Allocating inline objects and returning a wrapped Promise is required to prevent broken states and race conditions.

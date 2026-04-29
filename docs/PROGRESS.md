@@ -5,6 +5,9 @@
 ### STUDIO v0.121.9
 - ✅ Completed: STUDIO-Update-Keyboard-Shortcuts-Documentation - Updated KeyboardShortcutsModal to include J, K, L playback shortcuts.
 
+### RENDERER v1.78.3
+- ✅ Completed: PERF-321 - Evaluated Avoid CDP Promise Array Allocation in SeekTimeDriver. Dropping `Promise.all` broke sequential capture dependencies, and reusing parameter objects caused async mutation race conditions. The experiment was discarded.
+
 ### RENDERER v1.78.2
 - ✅ Completed: PERF-343 - Eliminated `Promise.race` and array allocation in `CdpTimeDriver.setTime` stability check by pre-binding executors, improving render time and reducing GC pressure.
 
