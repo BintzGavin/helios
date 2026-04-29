@@ -1,11 +1,11 @@
 ---
 id: PERF-383
 slug: prebind-screencast-promise-executor
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2026-04-29
-completed: ""
-result: ""
+completed: 2026-04-29
+result: improved
 ---
 
 # PERF-383: Prebind Screencast Promise Executor in DomStrategy Capture
@@ -30,7 +30,7 @@ This allocates an arrow function per frame. By prebinding the executor function 
 - **Minimum runs**: 3 per experiment, report median
 
 ## Baseline
-- **Current estimated render time**: ~46.149s (from PERF-346/recent baseline)
+- **Current estimated render time**: ~1.954s (from verify-dom-strategy-capture baseline runs)
 - **Bottleneck analysis**: Micro-allocations inside the hot loop `strategy.capture()` executed per frame (e.g., 60 times per second for a 60fps composition). Removing dynamic closure allocation here compounds with prior loop optimizations.
 
 ## Implementation Spec
@@ -70,3 +70,9 @@ Run `npx tsx tests/verify-dom-strategy-capture.ts` within the `packages/renderer
 ## Prior Art
 - PERF-337: Prebound `frameWaiterResolve` executor into `frameWaiterExecutor`.
 - PERF-340: Prebound `stabilityTimeoutExecutor` in `CdpTimeDriver.ts`.
+
+## Results Summary
+- **Best render time**: 1.907s (vs baseline 1.954s)
+- **Improvement**: ~2.4%
+- **Kept experiments**: Prebound screencast promise executor
+- **Discarded experiments**: None

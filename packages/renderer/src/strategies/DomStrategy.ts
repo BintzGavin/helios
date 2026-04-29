@@ -23,6 +23,9 @@ export class DomStrategy implements RenderStrategy {
   private emptyImageBase64: string = "";
   private screencastPromiseResolver: ((data: string) => void) | null = null;
   private frameInterval: number = 0;
+  private screencastPromiseExecutor = (resolve: (value: string) => void) => {
+    this.screencastPromiseResolver = resolve;
+  };
 
   constructor(private options: RendererOptions) {
     if (this.options.videoCodec === 'copy') {
@@ -182,9 +185,7 @@ export class DomStrategy implements RenderStrategy {
       return this.lastFrameData!;
     }
 
-    const promise = new Promise<string>((resolve) => {
-      this.screencastPromiseResolver = resolve;
-    });
+    const promise = new Promise<string>(this.screencastPromiseExecutor);
 
     this.cdpSession!.send('HeadlessExperimental.beginFrame', {
       interval: this.frameInterval,

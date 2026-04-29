@@ -1,0 +1,3 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	1.954	1	0.51	0.0	keep	baseline (dynamic promise closure)
+2	1.907	1	0.52	0.0	keep	prebound screencast promise executor
