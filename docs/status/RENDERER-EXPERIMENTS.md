@@ -144,3 +144,8 @@ Last updated by: PERF-375
 - Status: discard
 - **PERF-382**: Attempted to pipeline `CaptureLoop.ts` by replacing the custom ring arrays (`frameReadyRing`, `frameErrorRing`, `frameBufferRing`) and manual V8 Promise executor caching (`writerWaiterResolve`, `frameWaiterResolve`) with a single native `Array<Promise<Buffer | string | null>>`.
   - **WHY it didn't work**: The performance was essentially identical to the baseline (~31.54s vs ~31.57s), showing V8 optimizes the custom ring arrays and actor model very efficiently already. Replacing it with a native promise ring caused stability and backpressure handling issues when run under load, while also removing visibility into exact worker pipeline state. Since it didn't improve render time and disrupted stable backpressure mechanics, it was discarded.
+
+## PERF-383: Prebind Screencast Promise Executor
+- Render time: 1.907s (Baseline: 1.954s)
+- Status: keep
+- **PERF-383**: Prebound the `screencastPromiseExecutor` in `DomStrategy.ts` to avoid dynamically allocating an arrow function closure inside `new Promise` on every single frame. Reusing a single prebound executor function reduces garbage collection pressure in the main event loop, yielding a ~2.4% speedup in raw capture strategy tests.
