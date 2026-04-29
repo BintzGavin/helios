@@ -121,11 +121,11 @@ const report = await Helios.diagnose();
 
 ## Roadmap
 ### V1.x (Active)
-- **Studio**: v0.107.1+ (Timeline Drag Drop, Export Job Spec)
-- **CLI**: v0.45.2+ (Scaffold Hetzner Deployment Command, Build Command Regression Tests, Deploy Command Regression Tests, Cloudflare Sandbox Adapter)
+- **Studio**: v0.107.1+ (Timeline Drag Drop, Export Job Spec, Update Quickstart Guide)
+- **CLI**: v0.45.2+ (Scaffold Cloudflare Sandbox Deployment, Tier 3 Scaffold Deployment Commands, Scaffold Hetzner Deployment Command)
 - **Core**: v5.13.0+ (Generic Input Props, Implement Active Clips, Implement Composition Schema, Shared Virtual Time Binding)
-- **Player**: v0.76.20+ (Document Undocumented Shortcuts, Add Missing Shortcuts to UI, Improve Index Coverage, Document getSchema API Parity, Bridge Coverage Completeness)
-- **Renderer**: v1.78.3+ (Validate HW Accel, Orchestrator Plan, Refactor Media Sync Logic, Update Skill Documentation, Refactor DOM Traversal, Fix GSAP Timeline Synchronization)
+- **Player**: v0.76.20+ (Regression Tests for Media Session, Regression Tests for MediaProperties, Regression Tests for InputProps, Audio Context Manager Tests, Async Seek)
+- **Renderer**: v1.78.3+ (Validate HW Accel, Orchestrator Plan, Refactor Media Sync Logic, Update Skill Documentation, Refactor DOM Traversal)
 - **Infrastructure**: v0.25.0+ (Optimize GCS Uploads, Orchestrator Test Coverage Expansion, InMemoryJobRepository Coverage, CloudRun Resiliency Tests)
 
 ### AI Integration

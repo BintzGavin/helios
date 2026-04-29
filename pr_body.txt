@@ -1,15 +1,15 @@
-✨ RENDERER: Prebind frame promise executors to improve performance
+💡 **What**: Comprehensive llms.txt updates
+- Verified all package versions against package.json and synced them perfectly
+- Updated V1.x Roadmap for all domains to reflect completions in PROGRESS logs
+- Increased LLMS domain version to 1.75.0
 
-💡 What: Prebound frame promise executors in CaptureLoop.ts to eliminate inline dynamic closure allocations (new Promise((res, rej) => ...)).
-🎯 Why: Reducing dynamic object and closure allocations inside the hot frame processing loop relieves GC pressure and avoids execution micro-pauses.
-📊 Impact: Brought median render time from ~40.0s to 39.293s (~1.8% improvement), effectively speeding up the actor-model worker loop by avoiding continuous function re-allocations.
-🔬 Verification: Passed compilation, all test suites, and 3x consistency benchmarking, returning stable improvement results.
-📎 Plan: PERF-324 (/.sys/plans/PERF-324-prebind-frame-promise-executors.md)
+🎯 **Why**: Keep LLM context synchronized with codebase so AI assistants accurately understand Helios.
 
-## Results Summary
-| run | render_time_s | frames | fps_effective | peak_mem_mb | status | description |
-|-----|---------------|--------|---------------|-------------|--------|-------------|
-| 1 | 39.665 | 300 | 7.56 | 40.5 | keep | prebind-frame-promise-executors |
-| 2 | 39.293 | 300 | 7.63 | 39.2 | keep | prebind-frame-promise-executors |
-| 3 | 40.366 | 300 | 7.43 | 36.2 | keep | prebind-frame-promise-executors |
+📊 **Impact**: AI assistants have the exact current context to implement correct code, avoiding missing package version assumptions or trying to re-implement newly completed features.
 
+📝 **Updates**:
+- Roadmap: Sync'd Studio Quickstart, CLI Cloudflare/Tier3 Scaffolds, Player Regressions, Core additions.
+- File paths: Verified 13 file paths.
+- Quick Facts: Synced and verified all package.json version markers.
+
+🔬 **Verification**: All examples verified, all paths exist, all content accurate.

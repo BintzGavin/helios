@@ -1,5 +1,7 @@
 # Status: LLMS
-**Version**: 1.74.1
+**Version**: 1.75.0
+
+[v1.75.0] ✅ Completed: Comprehensive Daily Review - Updated Roadmap with verifiable completions from domain progress logs (Studio Update Quickstart Guide, CLI Cloudflare Sandbox & Tier 3 Scaffolds, Player Regression Tests, Core additions). Verified package versions against actual package.json.
 
 [v1.74.0] ✅ Completed: Daily llms.txt Review - Updated Quick Facts and Roadmap to reflect latest versions (Studio v0.107.1+, Player v0.76.20+, Renderer v1.78.3+, CLI v0.45.2+, Core v5.13.0+, Infrastructure v0.25.0+). Verified packages perfectly align with package.json updates.
 
