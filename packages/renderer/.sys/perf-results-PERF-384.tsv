@@ -1,0 +1,4 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	1.191	600	503.60	0.0	keep	Eliminate promise chain in SeekTimeDriver
+2	1.492	600	402.27	0.0	keep	Eliminate promise chain in SeekTimeDriver
+3	0.936	600	640.76	0.0	keep	Eliminate promise chain in SeekTimeDriver
