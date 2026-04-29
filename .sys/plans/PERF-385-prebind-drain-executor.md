@@ -1,11 +1,11 @@
 ---
 id: PERF-385
 slug: prebind-drain-executor
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "Jules"
 created: 2024-05-18
-completed: ""
-result: ""
+completed: 2024-05-18
+result: "discard"
 ---
 
 # PERF-385: Prebind Drain Promise Executor in CaptureLoop
@@ -66,3 +66,13 @@ Run `cd packages/renderer && npx tsx tests/verify-dom-strategy-capture.ts`.
 ## Prior Art
 - `PERF-383`: Prebound the `screencastPromiseExecutor` in `DomStrategy.ts`.
 - `PERF-337`: Prebound `frameWaiterResolve` executor into `frameWaiterExecutor`.
+
+## Results Summary
+| run | render_time_s | frames | fps_effective | peak_mem_mb | status | description |
+|---|---|---|---|---|---|---|
+| 1 | 1.768 | 60 | 33.94 | 0.0 | keep | baseline |
+| 2 | 1.849 | 60 | 32.45 | 0.0 | keep | baseline |
+| 3 | 1.814 | 60 | 33.08 | 0.0 | keep | baseline |
+| 4 | 2.926 | 60 | 20.51 | 0.0 | discard | experiment (prebind drain executor) |
+| 5 | 1.894 | 60 | 31.68 | 0.0 | discard | experiment (prebind drain executor) |
+| 6 | 2.535 | 60 | 23.67 | 0.0 | discard | experiment (prebind drain executor) |
