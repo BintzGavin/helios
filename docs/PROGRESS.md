@@ -6,6 +6,7 @@
 - ✅ Completed: STUDIO-Update-Keyboard-Shortcuts-Documentation - Updated KeyboardShortcutsModal to include J, K, L playback shortcuts.
 
 ### RENDERER v1.78.2
+- ✅ Completed: PERF-386 - Eliminated Promise chain allocation in CdpTimeDriver.setTime stability check by awaiting the raw CDP promise.
 - ✅ Completed: PERF-343 - Eliminated `Promise.race` and array allocation in `CdpTimeDriver.setTime` stability check by pre-binding executors, improving render time and reducing GC pressure.
 
 ### PLAYER v0.77.26

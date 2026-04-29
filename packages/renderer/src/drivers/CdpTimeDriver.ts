@@ -213,7 +213,7 @@ export class CdpTimeDriver implements TimeDriver {
 
     this.currentTime = timeInSeconds;
 
-    // 3. Wait for custom stability checks
+    // Wait for custom stability checks
     // We use a string-based evaluation to avoid build-tool artifacts.
     // We rely on awaitPromise: true natively.
 
