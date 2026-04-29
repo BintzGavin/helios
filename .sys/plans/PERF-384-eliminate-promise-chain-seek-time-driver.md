@@ -1,8 +1,8 @@
 ---
 id: PERF-384
 slug: eliminate-promise-chain-seek-time-driver
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor"
 created: 2026-04-29
 completed: ""
 result: ""

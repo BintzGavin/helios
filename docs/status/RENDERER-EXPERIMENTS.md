@@ -4,6 +4,9 @@ Last updated by: PERF-366
 
 
 ## What Works
+- **PERF-384**: Eliminated Promise chain allocation in `SeekTimeDriver.setTime`.
+  - **What I did**: Removed `.then(() => {})` closure allocations and cast the CDP promise directly to `Promise<void>`.
+  - **Improvement**: Eliminated micro-allocations on the event loop for every frame, reducing V8 GC churn.
 - **PERF-368**: Eliminated `TimeDriver.setTime` Promise return overhead.
   - **What I did**: Changed `TimeDriver.setTime` interface to return `void`. Refactored `CdpTimeDriver.ts` to internally catch its async closure and modified `CaptureLoop.ts` to execute `setTime` without tracking a Promise.
   - **Improvement**: Natively avoided V8 Promise allocation and async/await state machine overhead in the hot loop, shifting control flow purely to CDP sequential message processing.
