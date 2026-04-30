@@ -143,3 +143,7 @@ Critical learnings only. This is not a log—only add entries for insights that 
 ## v0.46.12 - Duplicated Plan Handling
 **Learning:** When a plan specifies work that has already been completed (e.g., tests already exist and pass), the correct approach is to document the duplication as an impossibility in the plan file, and stop work. Do not overwrite existing tracking files.
 **Action:** Append to the journal with the finding, and do not increment versions or add new tracking entries. Always use `>>` when writing to journals.
+
+## v0.46.12 - Duplicated Regression Tests Plan
+**Learning:** The CLI status file listed regression tests for `job`, `render`, and `merge` commands as Next Steps, but these tests were already implemented.
+**Action:** Documented the duplication as an impossibility in the plan file and stopped work.
