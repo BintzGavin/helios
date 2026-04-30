@@ -137,10 +137,11 @@ Last updated by: PERF-366
   - **WHY it didn't work**: The median render time improved slightly from ~46.546s to ~46.003s, which represents a ~1.1% gain. However, this is well within the ~5% environmental noise margin. V8 handles the occasional integer modulo arithmetic efficiently enough that manual counter management does not provide a definitive, clear-cut performance gain. Discarded to maintain code simplicity.
 
 ## Performance Trajectory
-Current best: 36.336s (baseline was 37.754s, -3.76%)
-Last updated by: PERF-375
+Current best: 32.083s (baseline was 33.039s, -2.89%)
+Last updated by: PERF-392
 
 ## What Works
+- **PERF-392**: Preallocated `multiFramePromises` array in `SeekTimeDriver.ts` and explicitly assigned length in the hot loop. Reduced V8 GC churn, improving median render time from ~33.039s to ~32.083s.
 - **PERF-386**: Eliminated Promise chain allocation in `CdpTimeDriver` stability check (verified existing implementation).
 - Removed `await` from the single-frame and multi-frame `Runtime.evaluate` calls for media synchronization in `CdpTimeDriver.ts`. This pipelines the CDP commands natively, saving the IPC acknowledgment latency (~3.76% faster). (PERF-375)
 - **PERF-378**: Inlined the Promise.race logic in window.__helios_seek and removed timeout allocation to reduce micro-allocations in the hot loop of SeekTimeDriver. Performance was essentially identical to the baseline (~46.820s vs ~46.546s), showing V8 optimizes the `Promise.race` wrapper very efficiently. However, stability tests failed because the actual explicit stability checks depend on the client-side `setTimeout` properly acting as a fallback when an unresolved Promise prevents the script from returning. Discarded to maintain timeout stability.

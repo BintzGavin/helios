@@ -1,11 +1,11 @@
 ---
 id: PERF-392
 slug: preallocate-seek-promises-array
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-05-28
 completed: ""
-result: ""
+result: "improved"
 ---
 
 # PERF-392: Preallocate multiFramePromises array in SeekTimeDriver
