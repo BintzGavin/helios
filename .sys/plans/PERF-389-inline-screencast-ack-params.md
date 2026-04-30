@@ -1,11 +1,11 @@
 ---
 id: PERF-389
 slug: inline-screencast-ack-params
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "Jules"
 created: 2024-05-28
-completed: ""
-result: ""
+completed: 2024-05-28
+result: discard
 ---
 
 # PERF-389: Inline screencastFrameAck parameter allocation in DomStrategy
@@ -55,11 +55,15 @@ In `prepare()`, inside the `Page.screencastFrame` listener:
 **Why**: Avoids dynamic object allocation on every frame, reducing V8 GC churn.
 **Risk**: If Playwright's async CDP serialization reads the object later, it could read an overwritten value. However, screencast frames are sequential per worker, meaning the previous ack will be serialized before the next frame is received.
 
-## Variations
-None.
+## Results Summary
+| run | render_time_s | frames | fps_effective | peak_mem_mb | status | description |
+|-----|---------------|--------|---------------|-------------|--------|-------------|
+| 1 | 1.814 | 1 | 0.00 | 0.0 | keep | baseline |
+| 2 | 1.939 | 1 | 0.00 | 0.0 | keep | baseline |
+| 3 | 1.878 | 1 | 0.00 | 0.0 | keep | baseline |
+| 4 | 2.789 | 1 | 0.00 | 0.0 | discard | inline ackParams |
+| 5 | 1.952 | 1 | 0.00 | 0.0 | discard | inline ackParams |
+| 6 | 2.067 | 1 | 0.00 | 0.0 | discard | inline ackParams |
 
-## Canvas Smoke Test
-N/A
-
-## Correctness Check
-Run targeted script `cd packages/renderer && npx tsx tests/verify-dom-strategy-capture.ts`.
+## Conclusion
+The performance regressed from a median of ~1.878s to ~2.067s. This indicates that modifying the preallocated object adds more write-barrier overhead for the V8 garbage collector than simply letting it clean up short-lived objects allocated continuously. Discarding experiment.

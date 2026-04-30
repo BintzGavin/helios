@@ -31,6 +31,9 @@ Last updated by: PERF-366
 - **PERF-337**: Prebound `frameWaiterResolve` executor into `frameWaiterExecutor` to avoid dynamic inline closure allocations during the CaptureLoop actor pipeline backpressure events. This adheres to the "simplicity and GC reduction" principle that guided keeping `writerWaiterExecutor`. Render time: 46.464s (Baseline: 57.022s), though baseline was inflated by initial run. Median render times of subsequent runs were around 46.6s, slightly better than PERF-336's ~47.4s. Kept to reduce V8 GC churn in the main event loop.
 
 ## What Doesn't Work (and Why)
+
+- **PERF-389**: Attempted to inline the `screencastFrameAck` parameter allocation in `DomStrategy.ts`.
+  - **WHY it didn't work**: The render time regressed from a median of ~1.878s to ~2.067s. Modifying a long-lived preallocated object instead of continuously allocating short-lived literals adds more write-barrier overhead for the V8 garbage collector, disrupting its optimizations. Discarded to maintain baseline performance.
 - **PERF-385**: Prebinding `drainPromiseExecutor` in `CaptureLoop.writeToStdin`.
   - **Why it failed**: Render times increased significantly (~1.8s baseline vs ~2.5s median). Hoisting the Promise executor to the class level likely interfered with V8's fast-path optimizations for inline Promise resolution, or altered closure scope contexts in a way that added hidden overhead during high-frequency backpressure events.
 - **PERF-381**: Attempted to pipeline `HeadlessExperimental.beginFrame` with `Page.startScreencast` in `DomStrategy`. **WHY it didn't work**: The pipeline deadlocked. Chromium's compositor does not emit a `Page.screencastFrame` event when `beginFrame` ticks if there are no visual changes (no damage) on the screen. Because the capture loop strictly awaited a pushed screencast event, it hung indefinitely during static sequences. Discarded.
