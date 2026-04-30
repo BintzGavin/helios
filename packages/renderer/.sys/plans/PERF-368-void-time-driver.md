@@ -1,11 +1,11 @@
 ---
 id: PERF-368
 slug: void-time-driver
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-05-28
 completed: ""
-result: ""
+result: "discarded"
 ---
 
 # PERF-368: Eliminate TimeDriver Promise Return Overhead
@@ -102,3 +102,7 @@ Run `npx tsx tests/verify-canvas-strategy.ts` to ensure Canvas mode still works.
 ## Correctness Check
 Run `npx tsx tests/verify-dom-strategy-capture.ts` to verify DOM output is correct.
 Run `npx tsx tests/verify-cdp-driver-stability.ts` to ensure CdpTimeDriver works.
+
+## Results Summary
+- **Status**: Discarded / Impossible
+- **Reason**: CaptureLoop explicitly awaits `timeDriver.setTime` to ensure CDP stability checks and `Runtime.evaluate` seeks finish before capturing the frame. Returning void causes frames to be captured out-of-sync before the browser finishes rendering.
