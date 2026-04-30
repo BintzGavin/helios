@@ -1,11 +1,11 @@
 ---
 id: PERF-395
 slug: eliminate-promise-chain-domstrategy
-status: unclaimed
+status: completed
 claimed_by: ""
 created: 2024-05-24
 completed: ""
-result: ""
+result: "improved"
 ---
 
 # PERF-395: Eliminate Promise Chain Allocation in DomStrategy Capture
