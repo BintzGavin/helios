@@ -1,11 +1,11 @@
 ---
 id: PERF-389
 slug: inline-screencast-ack-params
-status: unclaimed
-claimed_by: ""
+status: claimed
+claimed_by: "executor-perf-389"
 created: 2024-05-28
-completed: ""
-result: ""
+completed: "2024-05-28"
+result: "keep"
 ---
 
 # PERF-389: Inline screencastFrameAck parameter allocation in DomStrategy
