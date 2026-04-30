@@ -141,6 +141,7 @@ Current best: 32.083s (baseline was 33.039s, -2.89%)
 Last updated by: PERF-392
 
 ## What Works
+- **PERF-391**: Preallocated `singleFrameEvaluateParams` in SeekTimeDriver to avoid allocating object literals on every frame, reducing GC overhead.
 - **PERF-392**: Preallocated `multiFramePromises` array in `SeekTimeDriver.ts` and explicitly assigned length in the hot loop. Reduced V8 GC churn, improving median render time from ~33.039s to ~32.083s.
 - **PERF-386**: Eliminated Promise chain allocation in `CdpTimeDriver` stability check (verified existing implementation).
 - Removed `await` from the single-frame and multi-frame `Runtime.evaluate` calls for media synchronization in `CdpTimeDriver.ts`. This pipelines the CDP commands natively, saving the IPC acknowledgment latency (~3.76% faster). (PERF-375)
