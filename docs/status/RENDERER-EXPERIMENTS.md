@@ -4,6 +4,7 @@ Last updated by: PERF-366
 
 
 ## What Works
+- **PERF-389**: Inlined `screencastFrameAck` parameters in `DomStrategy.ts` to reduce GC pressure.
 - **PERF-386**: Eliminated Promise chain allocation in `CdpTimeDriver` stability check (verified existing implementation).
 - **PERF-384**: Eliminated Promise chain allocation in `SeekTimeDriver.setTime`.
   - **What I did**: Removed `.then(() => {})` closure allocations and cast the CDP promise directly to `Promise<void>`.

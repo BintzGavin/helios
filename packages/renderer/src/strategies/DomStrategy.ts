@@ -21,6 +21,7 @@ export class DomStrategy implements RenderStrategy {
   private targetElementHandle: any = null;
   private emptyImageBuffer: Buffer = EMPTY_IMAGE_BUFFER;
   private emptyImageBase64: string = "";
+  private ackParams: { sessionId: number } = { sessionId: 0 };
   private screencastPromiseResolver: ((data: string) => void) | null = null;
   private frameInterval: number = 0;
   private beginFrameParams: { interval: number; frameTimeTicks: number } = { interval: 0, frameTimeTicks: 0 };
@@ -148,7 +149,8 @@ export class DomStrategy implements RenderStrategy {
         this.screencastPromiseResolver(event.data);
         this.screencastPromiseResolver = null;
       }
-      this.cdpSession!.send('Page.screencastFrameAck', { sessionId: event.sessionId }).catch(() => {});
+      this.ackParams.sessionId = event.sessionId;
+      this.cdpSession!.send('Page.screencastFrameAck', this.ackParams).catch(() => {});
     });
 
     await this.cdpSession!.send('Page.startScreencast', {
