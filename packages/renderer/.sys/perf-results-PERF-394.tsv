@@ -1,0 +1,2 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	0.940	30	31.91	120.0	keep	inline beginFrame screenshot parameter to avoid event listeners

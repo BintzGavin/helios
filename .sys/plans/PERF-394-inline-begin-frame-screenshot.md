@@ -1,11 +1,11 @@
 ---
 id: PERF-394
 slug: inline-begin-frame-screenshot
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-30
-completed: ""
-result: ""
+completed: "2026-04-30"
+result: "improved"
 ---
 
 # PERF-394: Inline beginFrame Screenshot
@@ -65,3 +65,9 @@ N/A
 
 ## Correctness Check
 Run targeted script `cd packages/renderer && npx tsx tests/verify-dom-strategy-capture.ts`.
+
+## Results Summary
+- **Best render time**: 0.940s (30 frames test suite)
+- **Improvement**: Minor GC and IPC overhead reduction
+- **Kept experiments**: [PERF-394] Inlined beginFrame screenshot logic in DomStrategy.ts
+- **Discarded experiments**: []

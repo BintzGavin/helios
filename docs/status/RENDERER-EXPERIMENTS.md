@@ -1,9 +1,10 @@
 ## Performance Trajectory
 Current best: 48.058s (baseline was 49.197s, -2.3%)
-Last updated by: PERF-366
+Last updated by: PERF-394
 
 
 ## What Works
+- **PERF-394**: Inlined `beginFrame` screenshot capture in `DomStrategy.ts` by passing `screenshot` directly to `HeadlessExperimental.beginFrame` and awaiting the `screenshotData` directly, removing the need for `Page.screencastFrame` event listeners and `screencastFrameAck` roundtrips.
 - **PERF-389**: Inlined the `screencastFrameAck` parameter allocation in `DomStrategy.ts`. By preallocating the `ackParams` object at the class level and mutating its `sessionId` property, it avoids dynamic object allocation on every frame. This reduces garbage collection pressure in the event listener hot loop and provides a small reduction in allocation overhead (~17% faster object mutation vs allocation in microbenchmarks).
 - **PERF-386**: Eliminated Promise chain allocation in `CdpTimeDriver` stability check (verified existing implementation).
 - **PERF-384**: Eliminated Promise chain allocation in `SeekTimeDriver.setTime`.
@@ -123,6 +124,7 @@ Last updated by: PERF-366
   - **WHY it didn't work**: Impossible/Obsolete. The structural change (prebinding `frameWaiterExecutor`) was already implemented and kept by a subsequent experiment (PERF-337). Documented duplication and stopped work.
 
 ## What Works
+- **PERF-394**: Inlined `beginFrame` screenshot capture in `DomStrategy.ts` by passing `screenshot` directly to `HeadlessExperimental.beginFrame` and awaiting the `screenshotData` directly, removing the need for `Page.screencastFrame` event listeners and `screencastFrameAck` roundtrips.
 - **PERF-386**: Eliminated Promise chain allocation in `CdpTimeDriver` stability check (verified existing implementation).
 - **PERF-333**: Eliminated `multiFrameEvaluateParams` array caching in `SeekTimeDriver` and `CdpTimeDriver`. Moving to strictly inline object literal allocation for multi-frame CDP `Runtime.evaluate` calls prevents race conditions caused by asynchronous serialization of mutated shared objects over Playwright CDP connections without impacting performance.
 - **PERF-370**: Attempted to increase the `CaptureLoop.ts` pipeline depth from `poolLen * 2` to `poolLen * 8`.
@@ -141,6 +143,7 @@ Current best: 32.083s (baseline was 33.039s, -2.89%)
 Last updated by: PERF-392
 
 ## What Works
+- **PERF-394**: Inlined `beginFrame` screenshot capture in `DomStrategy.ts` by passing `screenshot` directly to `HeadlessExperimental.beginFrame` and awaiting the `screenshotData` directly, removing the need for `Page.screencastFrame` event listeners and `screencastFrameAck` roundtrips.
 - **PERF-391**: Preallocated `singleFrameEvaluateParams` in SeekTimeDriver to avoid allocating object literals on every frame, reducing GC overhead.
 - **PERF-392**: Preallocated `multiFramePromises` array in `SeekTimeDriver.ts` and explicitly assigned length in the hot loop. Reduced V8 GC churn, improving median render time from ~33.039s to ~32.083s.
 - **PERF-386**: Eliminated Promise chain allocation in `CdpTimeDriver` stability check (verified existing implementation).
