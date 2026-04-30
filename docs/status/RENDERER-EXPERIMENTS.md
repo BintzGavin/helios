@@ -4,6 +4,8 @@ Last updated by: PERF-366
 
 
 ## What Works
+- **PERF-394**: Inlined `beginFrame` screenshot capture in `DomStrategy.ts`. Calling `HeadlessExperimental.beginFrame` with the `screenshot` parameter directly returns `screenshotData` as a base64 string, eliminating the need to listen for separate `Page.screencastFrame` events and `screencastFrameAck` IPC overhead.
+
 - **PERF-389**: Inlined the `screencastFrameAck` parameter allocation in `DomStrategy.ts`. By preallocating the `ackParams` object at the class level and mutating its `sessionId` property, it avoids dynamic object allocation on every frame. This reduces garbage collection pressure in the event listener hot loop and provides a small reduction in allocation overhead (~17% faster object mutation vs allocation in microbenchmarks).
 - **PERF-386**: Eliminated Promise chain allocation in `CdpTimeDriver` stability check (verified existing implementation).
 - **PERF-384**: Eliminated Promise chain allocation in `SeekTimeDriver.setTime`.

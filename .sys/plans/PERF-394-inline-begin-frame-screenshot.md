@@ -1,11 +1,11 @@
 ---
 id: PERF-394
 slug: inline-begin-frame-screenshot
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-05-30
 completed: ""
-result: ""
+result: "improved"
 ---
 
 # PERF-394: Inline beginFrame Screenshot
