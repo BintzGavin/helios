@@ -15,6 +15,7 @@ export class SeekTimeDriver implements TimeDriver {
   private singleFrameEvaluateParams: any = { expression: '', awaitPromise: true };
     private executionContextIds: number[] = [];
   private multiFramePromises: Promise<any>[] = [];
+  private singleFrameEvaluateParams: any = { expression: '', awaitPromise: true };
   private evaluateArgs: [number, number] = [0, 0];
   private evaluateClosure = ([t, timeoutMs]: any) => { (window as any).__helios_seek(t, timeoutMs); };
 
