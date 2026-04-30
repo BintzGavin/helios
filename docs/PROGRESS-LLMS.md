@@ -1,3 +1,11 @@
+## LLMS v1.76.0
+- ✅ Completed: Daily llms.txt Review
+  - Updated Roadmap in llms.txt with verifiable completions from domain PROGRESS logs:
+    - Studio: Asset Drag and Drop, Refine CLI Component Removal
+    - Player: Document getSchema API Parity, Bridge Coverage Completeness
+  - Incremented version to 1.76.0
+
+
 ## LLMS v1.75.0
 - ✅ Completed: Daily llms.txt Review
   - Updated Roadmap in llms.txt with verifiable completions from domain PROGRESS logs:
