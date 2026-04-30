@@ -21,13 +21,8 @@ export class DomStrategy implements RenderStrategy {
   private targetElementHandle: any = null;
   private emptyImageBuffer: Buffer = EMPTY_IMAGE_BUFFER;
   private emptyImageBase64: string = "";
-  private screencastPromiseResolver: ((data: string) => void) | null = null;
-  private ackParams: { sessionId: number } = { sessionId: 0 };
   private frameInterval: number = 0;
-  private beginFrameParams: { interval: number; frameTimeTicks: number } = { interval: 0, frameTimeTicks: 0 };
-  private screencastPromiseExecutor = (resolve: (value: string) => void) => {
-    this.screencastPromiseResolver = resolve;
-  };
+  private beginFrameParams: any = { interval: 0, frameTimeTicks: 0, screenshot: null };
 
   constructor(private options: RendererOptions) {
     if (this.options.videoCodec === 'copy') {
@@ -126,6 +121,7 @@ export class DomStrategy implements RenderStrategy {
     this.frameInterval = 1000 / this.options.fps;
     this.beginFrameParams.interval = this.frameInterval;
     this.cdpScreenshotParams = cdpScreenshotParams;
+    this.beginFrameParams.screenshot = cdpScreenshotParams;
 
     // Set format-appropriate empty buffer
     if (format === 'jpeg') {
@@ -143,21 +139,6 @@ export class DomStrategy implements RenderStrategy {
     }
 
     this.lastFrameData = this.emptyImageBase64;
-
-    this.cdpSession!.on('Page.screencastFrame', (event) => {
-      if (this.screencastPromiseResolver) {
-        this.screencastPromiseResolver(event.data);
-        this.screencastPromiseResolver = null;
-      }
-      this.ackParams.sessionId = event.sessionId;
-      this.cdpSession!.send('Page.screencastFrameAck', this.ackParams).catch(() => {});
-    });
-
-    await this.cdpSession!.send('Page.startScreencast', {
-      format: cdpScreenshotParams.format,
-      quality: cdpScreenshotParams.quality,
-      everyNthFrame: 1
-    });
 
 
 
@@ -189,12 +170,10 @@ export class DomStrategy implements RenderStrategy {
       return this.lastFrameData!;
     }
 
-    const promise = new Promise<string>(this.screencastPromiseExecutor);
-
     this.beginFrameParams.frameTimeTicks = 10000 + frameTime;
-    this.cdpSession!.send('HeadlessExperimental.beginFrame', this.beginFrameParams).catch(() => {});
+    const result: any = await this.cdpSession!.send('HeadlessExperimental.beginFrame', this.beginFrameParams).catch(() => ({}));
 
-    const frameData = await promise;
+    const frameData = result.screenshotData || this.lastFrameData!;
     this.lastFrameData = frameData;
     return frameData;
   }
