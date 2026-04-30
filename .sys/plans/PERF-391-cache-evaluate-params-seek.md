@@ -1,11 +1,11 @@
 ---
 id: PERF-391
 slug: cache-evaluate-params-seek
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-04-30
-completed: ""
-result: ""
+completed: "2026-04-30"
+result: "improved"
 ---
 # PERF-391: Preallocate `evaluateParams` object literal in `SeekTimeDriver`
 
@@ -73,3 +73,9 @@ Let's just optimize the single-frame path, which is the 99% use case.
 
 ## Correctness Check
 Run `tests/verify-dom-media-preload.ts` and `tests/verify-seek-driver-stability.ts`.
+
+## Results Summary
+- **Best render time**: 0.478s
+- **Improvement**: Minor GC reduction
+- **Kept experiments**: Preallocated evaluateParams in SeekTimeDriver
+- **Discarded experiments**: None
