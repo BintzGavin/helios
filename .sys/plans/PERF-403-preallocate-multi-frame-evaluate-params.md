@@ -1,8 +1,8 @@
 ---
 id: PERF-403
 slug: preallocate-multi-frame-evaluate-params
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "jules"
 created: 2024-06-03
 completed: ""
 result: ""
@@ -98,3 +98,11 @@ None.
 
 ## Correctness Check
 Run targeted script `(cd packages/renderer && npx tsx tests/verify-iframe-sync.ts)`.
+
+## Results Summary
+
+```tsv
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	46.000	300	6.52	450.0	keep	baseline
+2	44.500	300	6.74	455.0	keep	PERF-403: preallocate evaluate params array
+```
