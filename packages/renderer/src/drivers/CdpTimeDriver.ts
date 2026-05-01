@@ -36,7 +36,7 @@ export class CdpTimeDriver implements TimeDriver {
   private virtualTimePromiseExecutor = (resolve: () => void, reject: (err: Error) => void) => {
     this.cdpResolve = resolve;
     this.cdpReject = reject;
-    this.client!.once('Emulation.virtualTimeBudgetExpired', this.handleVirtualTimeBudgetExpired);
+
     this.client!.send('Emulation.setVirtualTimePolicy', this.setVirtualTimePolicyParams).catch(this.handleVirtualTimeBudgetError);
   };
 
@@ -90,6 +90,9 @@ export class CdpTimeDriver implements TimeDriver {
 
     // Clean up potential previous listeners if reusing driver or session
     this.client!.removeListener('Runtime.executionContextCreated', this.handleExecutionContextCreated);
+
+    this.client!.removeListener('Emulation.virtualTimeBudgetExpired', this.handleVirtualTimeBudgetExpired);
+    this.client!.on('Emulation.virtualTimeBudgetExpired', this.handleVirtualTimeBudgetExpired);
 
     this.executionContextIds = [];
     this.client!.on('Runtime.executionContextCreated', this.handleExecutionContextCreated);

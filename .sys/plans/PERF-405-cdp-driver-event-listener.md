@@ -1,7 +1,7 @@
 ---
 id: PERF-405
 slug: cdp-driver-event-listener
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2025-05-01
 completed: ""
@@ -48,3 +48,9 @@ Inside `async prepare(page: Page): Promise<void>`, after `this.client` is initia
 
 ## Correctness Check
 Run `npx tsx tests/verify-cdp-driver.ts` to verify that virtual time still advances correctly without timing out.
+
+## Results Summary
+- **Best render time**: 34.041s
+- **Improvement**: N/A (structural fix)
+- **Kept experiments**: [PERF-405]
+- **Discarded experiments**: []
