@@ -1,11 +1,11 @@
 ---
 id: PERF-404
 slug: preallocate-promiserace-array
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "Jules"
 created: 2026-04-29
-completed: ""
-result: ""
+completed: "2026-04-29"
+result: "discard"
 ---
 
 # PERF-404: Preallocate Promise.race Array in CdpTimeDriver

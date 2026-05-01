@@ -36,6 +36,9 @@ Last updated by: PERF-403
 - **PERF-337**: Prebound `frameWaiterResolve` executor into `frameWaiterExecutor` to avoid dynamic inline closure allocations during the CaptureLoop actor pipeline backpressure events. This adheres to the "simplicity and GC reduction" principle that guided keeping `writerWaiterExecutor`. Render time: 46.464s (Baseline: 57.022s), though baseline was inflated by initial run. Median render times of subsequent runs were around 46.6s, slightly better than PERF-336's ~47.4s. Kept to reduce V8 GC churn in the main event loop.
 
 ## What Doesn't Work (and Why)
+- **PERF-404**: Attempted to preallocate the `Promise.race` array (`[evaluatePromise, timeoutPromise]`) in `CdpTimeDriver.ts`'s single-frame stability check loop.
+  - **WHY it didn't work**: The render time actually regressed slightly (~32.748s vs baseline ~31.854s). Managing the array state manually via an object property (and nulling it out to prevent leaks) adds more overhead or disrupts V8 optimization than the garbage collection pressure from a short-lived array literal. Discarded as slower.
+
 - **PERF-368**: Attempted to update TimeDriver to return void synchronously to eliminate Promise return overhead.
   - **WHY it didn't work**: Impossible. CaptureLoop explicitly awaits `timeDriver.setTime` to ensure CDP stability checks (in CdpTimeDriver) and Runtime.evaluate seeks (in SeekTimeDriver) finish before capturing the frame. Returning void causes frames to be captured out-of-sync before the browser finishes rendering. Discarded to maintain correctness.
 - **PERF-385**: Prebinding `drainPromiseExecutor` in `CaptureLoop.writeToStdin`.
