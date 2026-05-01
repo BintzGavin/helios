@@ -1,0 +1,4 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	34.295	90	2.62	38.6	discard	baseline preallocated race array
+2	32.794	90	2.74	38.7	discard	baseline preallocated race array
+3	32.748	90	2.75	37.7	discard	baseline preallocated race array
