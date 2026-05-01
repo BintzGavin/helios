@@ -13,6 +13,7 @@ export class SeekTimeDriver implements TimeDriver {
   private cachedFrames: import('playwright').Frame[] = [];
   private cachedMainFrame: import('playwright').Frame | null = null;
   private singleFrameEvaluateParams: any = { expression: '', awaitPromise: true };
+  private multiFrameEvaluateParams: any[] = [];
     private executionContextIds: number[] = [];
   private multiFramePromises: Promise<any>[] = [];
   private evaluateArgs: [number, number] = [0, 0];
@@ -288,12 +289,20 @@ export class SeekTimeDriver implements TimeDriver {
     const expression = 'window.__helios_seek(' + timeInSeconds + ', ' + this.timeout + ')';
 
     this.multiFramePromises.length = this.executionContextIds.length;
+    if (this.multiFrameEvaluateParams.length !== this.executionContextIds.length) {
+      this.multiFrameEvaluateParams.length = this.executionContextIds.length;
+      for (let i = 0; i < this.executionContextIds.length; i++) {
+        this.multiFrameEvaluateParams[i] = {
+          expression: "",
+          contextId: this.executionContextIds[i],
+          awaitPromise: true
+        };
+      }
+    }
     for (let i = 0; i < this.executionContextIds.length; i++) {
-      this.multiFramePromises[i] = this.cdpSession!.send('Runtime.evaluate', {
-        expression,
-        contextId: this.executionContextIds[i],
-        awaitPromise: true
-      });
+      this.multiFrameEvaluateParams[i].expression = expression;
+      this.multiFrameEvaluateParams[i].contextId = this.executionContextIds[i];
+      this.multiFramePromises[i] = this.cdpSession!.send('Runtime.evaluate', this.multiFrameEvaluateParams[i]);
     }
     return Promise.all(this.multiFramePromises) as unknown as Promise<void>;
   }

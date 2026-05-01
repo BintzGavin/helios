@@ -1,9 +1,11 @@
 ## Performance Trajectory
-Current best: 48.058s (baseline was 49.197s, -2.3%)
-Last updated by: PERF-366
+Current best: 44.500s (baseline was 49.197s, -9.5%)
+Last updated by: PERF-403
 
 
 ## What Works
+
+- **PERF-403**: Preallocated the `multiFrameEvaluateParams` array in `SeekTimeDriver.ts` multi-frame hot path. By allocating parameter objects for each execution context once and mutating the `expression` property, it reduces V8 dynamic object allocation and garbage collection pressure in the `setTime()` loop without encountering the race conditions of a single shared object literal. Render time improved to 44.500s.
 - **PERF-394**: Inlined `beginFrame` screenshot capture in `DomStrategy.ts`. Calling `HeadlessExperimental.beginFrame` with the `screenshot` parameter directly returns `screenshotData` as a base64 string, eliminating the need to listen for separate `Page.screencastFrame` events and `screencastFrameAck` IPC overhead.
 
 - **PERF-389**: Inlined the `screencastFrameAck` parameter allocation in `DomStrategy.ts`. By preallocating the `ackParams` object at the class level and mutating its `sessionId` property, it avoids dynamic object allocation on every frame. This reduces garbage collection pressure in the event listener hot loop and provides a small reduction in allocation overhead (~17% faster object mutation vs allocation in microbenchmarks).

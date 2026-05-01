@@ -1,0 +1,3 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	46.000	300	6.52	450.0	keep	baseline
+2	44.500	300	6.74	455.0	keep	PERF-403: preallocate evaluate params array

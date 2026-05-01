@@ -1,0 +1,11 @@
+💡 **What**: Preallocated the `multiFrameEvaluateParams` array in `SeekTimeDriver.ts`'s `setTime` multi-frame hot path, assigning separate objects for each execution context instead of allocating dynamically or racing shared literals.
+🎯 **Why**: Mitigate V8 garbage collection overhead inside the event loop for multi-frame compositions.
+📊 **Impact**: Render times improved to ~44.5s (down from ~46s baseline) by avoiding short-lived allocations.
+🔬 **Verification**: Passed Type checks, Determinism checks (`verify-seek-driver-determinism.ts`, `verify-cdp-determinism.ts`), and the `verify-iframe-sync.ts` correctness check which passed perfectly after the rewrite.
+📎 **Plan**: `.sys/plans/PERF-403-preallocate-multi-frame-evaluate-params.md`
+
+```tsv
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	46.000	300	6.52	450.0	keep	baseline
+2	44.500	300	6.74	455.0	keep	PERF-403: preallocate evaluate params array
+```
