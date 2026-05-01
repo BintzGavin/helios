@@ -38,3 +38,4 @@ run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
 3	31.519	90	2.85	0.0	discard	native promise ring
 1	399.547	600	1.50	0.0	keep	eliminated promise chain cdptimedriver (already implemented)
 401	32.648	90	2.76	38.6	keep	Reverted frameTimeTicks 1000x scale bug
+PERF-408	49.135	600	12.21	43.1	keep	Cache Media Elements in CdpTimeDriver to avoid per-frame DOM scans
