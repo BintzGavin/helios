@@ -1,11 +1,11 @@
 ---
 id: PERF-402
 slug: preallocate-multi-frame-sync-media-params
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-06-03
 completed: ""
-result: ""
+result: "failed"
 ---
 
 # PERF-402: Preallocate multi-frame sync media params array in CdpTimeDriver
@@ -88,3 +88,7 @@ None.
 
 ## Correctness Check
 Run targeted script `cd packages/renderer && npx tsx tests/verify-cdp-driver.ts`.
+
+## Results Summary
+- IMPOSSIBLE: DUPLICATION
+- The preallocation of `multiFrameSyncMediaParams` is already present in `packages/renderer/src/drivers/CdpTimeDriver.ts`.
