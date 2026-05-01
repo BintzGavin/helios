@@ -17,6 +17,7 @@ export class CdpTimeDriver implements TimeDriver {
   private cdpReject: ((err: Error) => void) | null = null;
   private evaluateStabilityParams: any = { expression: "if (typeof window.__helios_wait_until_stable === 'function') window.__helios_wait_until_stable();", awaitPromise: true };
   private singleFrameSyncMediaParams: any = { expression: "", awaitPromise: false };
+  private multiFrameSyncMediaParams: any[] = [];
 
   private stabilityTimeoutId: NodeJS.Timeout | null = null;
   private stabilityTimeoutReject: ((err: Error) => void) | null = null;
@@ -189,12 +190,19 @@ export class CdpTimeDriver implements TimeDriver {
     } else {
         if (this.executionContextIds.length > 0) {
           const expression = "if(typeof window.__helios_sync_media==='function') window.__helios_sync_media(" + timeInSeconds + ");";
+          if (this.multiFrameSyncMediaParams.length !== this.executionContextIds.length) {
+            this.multiFrameSyncMediaParams.length = this.executionContextIds.length;
+            for (let i = 0; i < this.executionContextIds.length; i++) {
+              this.multiFrameSyncMediaParams[i] = {
+                expression: "",
+                contextId: this.executionContextIds[i],
+                awaitPromise: false
+              };
+            }
+          }
           for (let i = 0; i < this.executionContextIds.length; i++) {
-            this.client!.send('Runtime.evaluate', {
-              expression: expression,
-              contextId: this.executionContextIds[i],
-              awaitPromise: false
-            }).catch(this.handleSyncMediaError);
+            this.multiFrameSyncMediaParams[i].expression = expression;
+            this.client!.send('Runtime.evaluate', this.multiFrameSyncMediaParams[i]).catch(this.handleSyncMediaError);
           }
         } else {
           // Fallback if execution contexts couldn't be resolved (e.g. reused CDP session)
