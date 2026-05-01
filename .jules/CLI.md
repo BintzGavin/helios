@@ -147,3 +147,7 @@ Critical learnings only. This is not a log—only add entries for insights that 
 ## v0.46.12 - Duplicated Regression Tests Plan
 **Learning:** The CLI status file listed regression tests for `job`, `render`, and `merge` commands as Next Steps, but these tests were already implemented.
 **Action:** Documented the duplication as an impossibility in the plan file and stopped work.
+
+## [0.46.13] - Duplicated Regression Tests Plan (Re-verification)
+**Learning:** The CLI status file still lists regression tests for `job`, `render`, and `merge` as Next Steps, but these tests are already fully implemented. This is a known issue from previous planner executions.
+**Action:** Created plan file documenting IMPOSSIBLE: DUPLICATION and stopping work to avoid inventing unnecessary refactors.
