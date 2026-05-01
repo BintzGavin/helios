@@ -140,10 +140,11 @@ Last updated by: PERF-366
 
 ## Performance Trajectory
 Current best: 31.854s (baseline was 33.039s, -0.7%)
-Last updated by: PERF-395
+Last updated by: PERF-399
 
 ## What Works
 - **PERF-395**: Eliminated Promise chain allocation in `DomStrategy.ts` capture loop. Replaced `.catch(() => ({}))` with standard `try/catch`, preventing dynamic closure and Promise allocation per frame. Reduced median render time from ~32.083s to ~31.854s by relieving V8 garbage collector pressure in the hot loop.
+- **PERF-399**: Fixed `frameTimeTicks` scale in `DomStrategy.ts`. Multiplying the seconds-based `frameTime` by 1000 ensures `HeadlessExperimental.beginFrame` receives the timestamp in milliseconds, matching Chromium CDP expectations and preventing micro-throttling paths.
 - **PERF-391**: Preallocated `singleFrameEvaluateParams` in SeekTimeDriver to avoid allocating object literals on every frame, reducing GC overhead.
 - **PERF-392**: Preallocated `multiFramePromises` array in `SeekTimeDriver.ts` and explicitly assigned length in the hot loop. Reduced V8 GC churn, improving median render time from ~33.039s to ~32.083s.
 - **PERF-386**: Eliminated Promise chain allocation in `CdpTimeDriver` stability check (verified existing implementation).
