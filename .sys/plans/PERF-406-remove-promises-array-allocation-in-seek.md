@@ -1,7 +1,7 @@
 ---
 id: PERF-406
 slug: remove-promises-array-allocation-in-seek
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-05-01
 completed: ""
@@ -76,3 +76,9 @@ Run `npx tsx tests/verify-canvas-strategy.ts` to ensure core rendering functions
 
 ## Correctness Check
 Run `npx tsx tests/verify-seek-driver-stability.ts` to ensure the seek script still correctly stalls for promises and doesn't break due to array caching.
+
+## Results Summary
+- **Best render time**: 38.891s (vs baseline 39.263s)
+- **Improvement**: ~0.9%
+- **Kept experiments**: Preallocate promises array in SeekTimeDriver
+- **Discarded experiments**: None
