@@ -186,3 +186,5 @@ Last updated by: PERF-399
   - Added `cachedMediaElements` to avoid `findAllMedia(document)` being evaluated on every frame capture.
   - Reduced V8 GC churn and execution time slightly (median render time decreased from ~49.217s to ~49.135s).
   - Aligns CdpTimeDriver optimization with previous SeekTimeDriver optimizations. Kept.
+- **PERF-402**: Preallocate multi-frame sync media params array in CdpTimeDriver.
+  - **WHY it didn't work**: IMPOSSIBLE: DUPLICATION. The structural change (prebinding `multiFrameSyncMediaParams`) was already implemented and kept by a previous experiment. Documented duplication and stopped work.
