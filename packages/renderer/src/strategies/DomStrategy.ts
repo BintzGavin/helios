@@ -170,7 +170,7 @@ export class DomStrategy implements RenderStrategy {
       return this.lastFrameData!;
     }
 
-    this.beginFrameParams.frameTimeTicks = 10000 + frameTime;
+    this.beginFrameParams.frameTimeTicks = 10000 + (frameTime * 1000);
     let result: any;
     try {
       result = await this.cdpSession!.send('HeadlessExperimental.beginFrame', this.beginFrameParams);
