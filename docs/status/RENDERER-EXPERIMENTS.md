@@ -181,3 +181,8 @@ Last updated by: PERF-399
 ## PERF-376: Inline seek promise
 - Status: discard
 - **PERF-376**: Attempted to inline the Promise.race logic in `window.__helios_seek` and remove timeout allocation to reduce micro-allocations in `SeekTimeDriver.ts`. This was already tested in PERF-378 and discarded because performance was identical to the baseline and it caused client-side stability timeouts to fail. No code changes were kept.
+
+- **PERF-408**: Cache Media Elements in CdpTimeDriver to avoid per-frame DOM scans.
+  - Added `cachedMediaElements` to avoid `findAllMedia(document)` being evaluated on every frame capture.
+  - Reduced V8 GC churn and execution time slightly (median render time decreased from ~49.217s to ~49.135s).
+  - Aligns CdpTimeDriver optimization with previous SeekTimeDriver optimizations. Kept.

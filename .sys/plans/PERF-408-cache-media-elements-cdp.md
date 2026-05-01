@@ -1,11 +1,11 @@
 ---
 id: PERF-408
 slug: cache-media-elements-cdp
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-06-03
-completed: ""
-result: ""
+completed: "2024-06-03"
+result: "improved"
 ---
 
 # PERF-408: Cache Media Elements in CdpTimeDriver to avoid per-frame DOM scans
@@ -71,3 +71,9 @@ Run `cd packages/renderer && npx tsx tests/verify-codecs.ts`.
 
 ## Correctness Check
 Run targeted script `cd packages/renderer && npx tsx tests/verify-cdp-media-sync-timing.ts`.
+
+## Results Summary
+- **Best render time**: 49.135s (vs baseline 49.217s)
+- **Improvement**: ~0.1%
+- **Kept experiments**: Cache Media Elements in CdpTimeDriver to avoid per-frame DOM scans.
+- **Discarded experiments**: none

@@ -118,11 +118,20 @@ export class CdpTimeDriver implements TimeDriver {
         ${PARSE_MEDIA_ATTRIBUTES_FUNCTION}
         ${SYNC_MEDIA_FUNCTION}
 
+        let cachedMediaElements = null;
+
+        window.__helios_invalidate_cache = () => {
+          cachedMediaElements = null;
+        };
+
         window.__helios_sync_media = (t) => {
-          const mediaElements = findAllMedia(document);
-          mediaElements.forEach((el) => {
-            syncMedia(el, t);
-          });
+          if (!cachedMediaElements) {
+            cachedMediaElements = findAllMedia(document);
+          }
+          const numMedia = cachedMediaElements.length;
+          for (let i = 0; i < numMedia; i++) {
+            syncMedia(cachedMediaElements[i], t);
+          }
         };
 
         window.__helios_wait_until_stable = async () => {
