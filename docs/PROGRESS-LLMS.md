@@ -648,3 +648,13 @@
   - Verified package versions match package.json exactly.
   - Verified File Paths and Key Files.
   - No changes required to llms.txt as it is up-to-date and accurate.
+
+## LLMS v1.77.0
+- ✅ Completed: Daily llms.txt Review
+  - Updated Roadmap in llms.txt with verifiable completions from domain PROGRESS logs:
+    - Studio: Timeline Drag & Drop, Update Keyboard Shortcuts Documentation, Component Management
+    - CLI: Scaffold Azure Deployment Command, Cloud Execution Adapters Expansion, Build Command Regression Tests
+    - Player: Document Undocumented Shortcuts, Improve Index Coverage, Document API Parity Gap
+  - Verified package versions match `package.json` exactly.
+  - Verified File Paths and Key Files.
+  - Incremented version to 1.77.0
