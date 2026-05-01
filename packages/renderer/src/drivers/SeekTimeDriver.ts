@@ -80,6 +80,7 @@ export class SeekTimeDriver implements TimeDriver {
         let cachedScopes = null;
         let cachedAnimations = null;
         let cachedMediaElements = null;
+        const cachedPromises = [];
 
         function createMediaPromise(el) {
           if (el.__helios_sync_promise) return el.__helios_sync_promise;
@@ -110,6 +111,7 @@ export class SeekTimeDriver implements TimeDriver {
           cachedScopes = null;
           cachedAnimations = null;
           cachedMediaElements = null;
+          cachedPromises.length = 0;
         };
 
         window.__helios_seek = (t, timeoutMs) => {
@@ -179,12 +181,12 @@ export class SeekTimeDriver implements TimeDriver {
             }
           }
 
-          let promises = null;
 
+
+          cachedPromises.length = 0;
           // 1. Wait for Fonts
           if (t === 0 && document.fonts && document.fonts.ready) {
-            if (!promises) promises = [];
-            promises[promises.length] = document.fonts.ready;
+            cachedPromises[cachedPromises.length] = document.fonts.ready;
           }
 
           // 2. Synchronize media elements (video, audio)
@@ -198,22 +200,20 @@ export class SeekTimeDriver implements TimeDriver {
               syncMedia(el, t);
 
               if (el.seeking || el.readyState < 2) {
-                if (!promises) promises = [];
-                promises[promises.length] = createMediaPromise(el);
+                cachedPromises[cachedPromises.length] = createMediaPromise(el);
               }
             }
           }
 
           // 3. Wait for Helios Stability (Custom Checks)
           if (typeof window.helios !== 'undefined' && typeof window.helios.waitUntilStable === 'function') {
-            if (!promises) promises = [];
-            promises[promises.length] = window.helios.waitUntilStable();
+            cachedPromises[cachedPromises.length] = window.helios.waitUntilStable();
           }
 
           // 4. Wait for stability with a safety timeout (only if needed)
-          if (promises && promises.length > 0) {
+          if (cachedPromises.length > 0) {
             let timeoutId;
-            const allReady = Promise.all(promises);
+            const allReady = Promise.all(cachedPromises);
             const timeoutPromise = new Promise((resolve) => {
               timeoutId = setTimeout(resolve, timeoutMs);
             });

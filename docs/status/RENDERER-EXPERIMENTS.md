@@ -132,6 +132,7 @@ Last updated by: PERF-403
   - **WHY it didn't work**: Impossible/Obsolete. The structural change (prebinding `frameWaiterExecutor`) was already implemented and kept by a subsequent experiment (PERF-337). Documented duplication and stopped work.
 
 ## What Works
+- Preallocated `promises` array in SeekTimeDriver (PERF-406)
 - **PERF-386**: Eliminated Promise chain allocation in `CdpTimeDriver` stability check (verified existing implementation).
 - **PERF-333**: Eliminated `multiFrameEvaluateParams` array caching in `SeekTimeDriver` and `CdpTimeDriver`. Moving to strictly inline object literal allocation for multi-frame CDP `Runtime.evaluate` calls prevents race conditions caused by asynchronous serialization of mutated shared objects over Playwright CDP connections without impacting performance.
 - **PERF-370**: Attempted to increase the `CaptureLoop.ts` pipeline depth from `poolLen * 2` to `poolLen * 8`.

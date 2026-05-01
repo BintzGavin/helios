@@ -1,0 +1,3 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	39.263	300	7.64	43.0	keep	baseline
+2	38.891	300	7.71	32.7	keep	preallocated promises array
