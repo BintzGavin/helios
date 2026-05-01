@@ -1,7 +1,7 @@
 ---
 id: PERF-407
 slug: prebind-seek-closures
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-05-01
 completed: ""
@@ -129,3 +129,9 @@ Run `npx tsx tests/verify-canvas-strategy.ts` to ensure core rendering functions
 
 ## Correctness Check
 Run `npx tsx tests/verify-seek-driver-stability.ts` to ensure the timeout still fires correctly with the prebound variables and execution contexts don't leak.
+
+## Results Summary
+- **Best render time**: 45.379s (vs baseline 45.545s)
+- **Improvement**: ~0.3%
+- **Kept experiments**:
+- **Discarded experiments**: Prebind Promise Executor and Resolver Closures in SeekTimeDriver
