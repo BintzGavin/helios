@@ -1,11 +1,11 @@
 ---
 id: PERF-411
 slug: optimize-cdp-evaluate-stability
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2026-05-02
 completed: ""
-result: ""
+result: failed
 ---
 
 # PERF-411: Optimize CDP Stability Checks in CdpTimeDriver
@@ -131,3 +131,7 @@ Run `cd packages/renderer && npm run test` to verify no breakages.
 
 ## Prior Art
 - PERF-404: Attempted to preallocate the Promise.race array and failed due to object mutation overhead. This alternative wrapper Promise sidesteps that.
+
+## Results Summary
+IMPOSSIBLE: DUPLICATION
+The experiment PERF-411 has already been attempted and is documented in the RENDERER-EXPERIMENTS.md journal as failed.
