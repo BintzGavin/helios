@@ -1,5 +1,7 @@
 ---
-result: impossible
+status: complete
+---
+result: failed
 ---
 #### 1. Context & Goal
 - **Objective**: Implement comprehensive regression tests for the remaining untested CLI commands (`helios preview`, `helios skills`, `helios studio`).
@@ -38,3 +40,6 @@ result: impossible
   - Missing directories for `preview`.
   - Missing skills directory for `skills install`.
   - Failed server start for `preview` and `studio`.
+
+IMPOSSIBLE: DUPLICATION
+These tests (preview, skills, studio) have already been fully implemented in the codebase.

@@ -314,3 +314,6 @@ This file tracks progress for the CLI domain (`packages/cli`).
 
 ### CLI v0.46.13
 - ✅ Completed: Document duplicated Remove Regression Tests plan - Logged the duplicated plan as impossible.
+
+### CLI v0.46.15
+- ✅ Completed: Document duplicated Remaining Regression Tests plan - Logged the duplicated plan as impossible.
