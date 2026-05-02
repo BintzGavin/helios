@@ -212,32 +212,48 @@ export class SeekTimeDriver implements TimeDriver {
 
           // 4. Wait for stability with a safety timeout (only if needed)
           if (cachedPromises.length > 0) {
-            let timeoutId;
-            const allReady = Promise.all(cachedPromises);
-            const timeoutPromise = new Promise((resolve) => {
-              timeoutId = setTimeout(resolve, timeoutMs);
-            });
-            return Promise.race([allReady, timeoutPromise]).then(() => {
-              clearTimeout(timeoutId);
+            return new Promise((resolve, reject) => {
+              let done = false;
+              const finish = () => {
+                if (done) return;
+                done = true;
+                clearTimeout(timeoutId);
 
-              // 5. After stability, ensure GSAP timelines are seeked again in case async changes occurred
-              if (gsapTimelineSeeked && window.__helios_gsap_timeline__ && typeof window.__helios_gsap_timeline__.seek === 'function') {
-                try {
-                  window.__helios_gsap_timeline__.seek(t);
-                } catch (gsapError) {
-                  console.error('[SeekTimeDriver] Error seeking GSAP timeline:', gsapError);
+                // 5. After stability, ensure GSAP timelines are seeked again in case async changes occurred
+                if (gsapTimelineSeeked && window.__helios_gsap_timeline__ && typeof window.__helios_gsap_timeline__.seek === 'function') {
+                  try {
+                    window.__helios_gsap_timeline__.seek(t);
+                  } catch (gsapError) {
+                    console.error('[SeekTimeDriver] Error seeking GSAP timeline:', gsapError);
+                  }
                 }
-              }
 
-              if (heliosSeeked && typeof window.helios !== 'undefined' && window.helios.seek) {
-                try {
-                  const helios = window.helios;
-                  const fps = helios.fps ? helios.fps.value : 30;
-                  const frame = Math.floor(t * fps);
-                  helios.seek(frame);
-                } catch (e) {
-                  console.warn('[SeekTimeDriver] Error seeking Helios:', e);
+                if (heliosSeeked && typeof window.helios !== 'undefined' && window.helios.seek) {
+                  try {
+                    const helios = window.helios;
+                    const fps = helios.fps ? helios.fps.value : 30;
+                    const frame = Math.floor(t * fps);
+                    helios.seek(frame);
+                  } catch (e) {
+                    console.warn('[SeekTimeDriver] Error seeking Helios:', e);
+                  }
                 }
+                resolve();
+              };
+
+              const fail = (err) => {
+                if (done) return;
+                done = true;
+                clearTimeout(timeoutId);
+                reject(err);
+              };
+
+              const timeoutId = setTimeout(finish, timeoutMs);
+
+              if (cachedPromises.length === 1) {
+                cachedPromises[0].then(finish, fail);
+              } else {
+                Promise.all(cachedPromises).then(finish, fail);
               }
             });
           }
