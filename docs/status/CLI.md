@@ -1,8 +1,9 @@
 # CLI Status
 
-**Version**: 0.46.13
+**Version**: 0.46.14
 
 ## Recent Completions
+[v0.46.14] ✅ Completed: Document duplicated Regression Tests plan - Logged the duplicated plan for job, render, and merge commands as impossible.
 [v0.46.13] ✅ Completed: Document duplicated Remove Regression Tests plan - Logged the duplicated plan as impossible.
 [v0.46.12] ✅ Completed: Regression Tests Remaining Commands - Verified comprehensive unit tests for `helios preview`, `helios skills`, and `helios studio`.
 [v0.46.11] ✅ Completed: Scaffold Cloudflare Sandbox Deployment Command - Implemented `helios deploy cloudflare-sandbox` to scaffold Cloudflare Workflows and Sandboxes.
@@ -25,8 +26,6 @@ The Helios CLI is the primary user interface for component registry, project sca
 
 [v0.44.0] ✅ Completed: Tier 3 Scaffold Deployment Commands - Implemented `helios deploy modal`, `helios deploy deno`, and `helios deploy vercel`.
 
-## Next Steps
-- Implement regression tests for remaining commands (e.g. `job.ts`, `render.ts`, `merge.ts`).
 
 ## Blocked Items
 
