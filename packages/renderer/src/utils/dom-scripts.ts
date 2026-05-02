@@ -91,6 +91,7 @@ export const FIND_ALL_SCOPES_FUNCTION = `
 
 export const PARSE_MEDIA_ATTRIBUTES_FUNCTION = `
   function parseMediaAttributes(el) {
+    if (el.__helios_attrs) return el.__helios_attrs;
     const offset = el.dataset.heliosOffset ? parseFloat(el.dataset.heliosOffset) : 0;
     const seek = el.dataset.heliosSeek ? parseFloat(el.dataset.heliosSeek) : 0;
     const fadeIn = el.dataset.heliosFadeIn ? parseFloat(el.dataset.heliosFadeIn) : 0;
@@ -113,7 +114,7 @@ export const PARSE_MEDIA_ATTRIBUTES_FUNCTION = `
       rate = 1.0;
     }
 
-    return {
+    el.__helios_attrs = {
       offset: isNaN(offset) ? 0 : offset,
       seek: isNaN(seek) ? 0 : seek,
       fadeIn: isNaN(fadeIn) ? 0 : fadeIn,
@@ -123,6 +124,7 @@ export const PARSE_MEDIA_ATTRIBUTES_FUNCTION = `
       playbackRate: rate,
       duration: (Number.isFinite(duration) && duration > 0) ? duration : undefined
     };
+    return el.__helios_attrs;
   }
 `;
 
@@ -139,7 +141,9 @@ export const SYNC_MEDIA_FUNCTION = `
       targetTime = targetTime % attrs.duration;
     }
 
-    el.pause();
+    if (!el.paused) {
+      el.pause();
+    }
     el.currentTime = targetTime;
   }
 `;
