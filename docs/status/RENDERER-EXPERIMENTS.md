@@ -193,3 +193,7 @@ Last updated by: PERF-399
 - **PERF-414**: Preallocate CDP Screenshots Parameters and Object Literals in DomStrategy.
   - Implemented logic to preallocate `screenshot` parameters object (`elementScreenshotParams`) when capturing from an element handle, removing per-frame string comparisons and dynamic object allocations inside the hot loop.
   - Result: Minor reduction in V8 GC pause times for DOM-based multi-frame rendering. Kept.
+
+- **Refactor Media Discovery Logic (2026-03-12-RENDERER-Refactor-Media-Discovery)**
+  - **What I tried**: Attempted to consolidate duplicate "find all media" and "find all scopes" logic into a single source of truth (`dom-scripts.ts`).
+  - **WHY it didn't work**: Impossible/Obsolete (IMPOSSIBLE: DUPLICATION). The structural change was already implemented in a previous commit and present in the codebase. Documented duplication and stopped work.
