@@ -188,3 +188,5 @@ Last updated by: PERF-399
   - Aligns CdpTimeDriver optimization with previous SeekTimeDriver optimizations. Kept.
 - **PERF-402**: Preallocate multi-frame sync media params array in CdpTimeDriver.
   - **WHY it didn't work**: IMPOSSIBLE: DUPLICATION. The structural change (prebinding `multiFrameSyncMediaParams`) was already implemented and kept by a previous experiment. Documented duplication and stopped work.
+- **PERF-411**: Prebind stability promise in CdpTimeDriver to eliminate Promise.race and Array allocations.
+  - **WHY it didn't work**: The performance difference was negligible or worse (median ~33.517s vs baseline ~33.35s). V8 optimizations likely handle Promise.race efficiently enough that eliminating it doesn't yield a net benefit when considering the overhead of manual promise state tracking.
