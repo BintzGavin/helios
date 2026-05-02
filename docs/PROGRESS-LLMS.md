@@ -1,3 +1,15 @@
+## LLMS v1.78.0
+- ✅ Completed: Daily llms.txt Review
+  - Updated Quick Facts and Roadmap versions to match current package.json: Studio v0.121.10+, CLI v0.46.13+, Player v0.77.28+, Renderer v1.80.1+, Infrastructure v0.54.28+
+  - Updated Roadmap with verifiable completions from domain PROGRESS logs:
+    - Studio: Update Keyboard Shortcuts, Timeline Drag & Drop, Toggle Loop Shortcut
+    - CLI: Scaffold Cloudflare Sandbox Deployment, Build/Deploy Command Regression Tests
+    - Player: Document API Parity Gap, Implement WebVTT Support, Document Undocumented Shortcuts
+    - Renderer: WebCodecs Preference, Update Skill Documentation
+    - Infrastructure: Optimize S3/GCS Uploads, Orchestrator Coverage Expansion
+  - Verified package versions match package.json exactly.
+  - Verified File Paths, Key Files, and API examples.
+
 ## LLMS v1.76.0
 - ✅ Completed: Daily llms.txt Review
   - Updated Roadmap in llms.txt with verifiable completions from domain PROGRESS logs:
