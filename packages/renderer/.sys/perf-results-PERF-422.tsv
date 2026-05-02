@@ -1,0 +1,4 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	33.432	300	8.97	40.9	keep	baseline
+2	33.328	300	9.00	40.4	keep	prebind seek closures
+3	33.253	300	9.02	40.2	keep	prebind seek closures (module scoped)
