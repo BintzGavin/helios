@@ -190,3 +190,6 @@ Last updated by: PERF-399
   - **WHY it didn't work**: IMPOSSIBLE: DUPLICATION. The structural change (prebinding `multiFrameSyncMediaParams`) was already implemented and kept by a previous experiment. Documented duplication and stopped work.
 - **PERF-411**: Prebind stability promise in CdpTimeDriver to eliminate Promise.race and Array allocations.
   - **WHY it didn't work**: The performance difference was negligible or worse (median ~33.517s vs baseline ~33.35s). V8 optimizations likely handle Promise.race efficiently enough that eliminating it doesn't yield a net benefit when considering the overhead of manual promise state tracking.
+- **PERF-414**: Preallocate CDP Screenshots Parameters and Object Literals in DomStrategy.
+  - Implemented logic to preallocate `screenshot` parameters object (`elementScreenshotParams`) when capturing from an element handle, removing per-frame string comparisons and dynamic object allocations inside the hot loop.
+  - Result: Minor reduction in V8 GC pause times for DOM-based multi-frame rendering. Kept.

@@ -1,11 +1,11 @@
 ---
 id: PERF-414
 slug: inline-dom-strategy-object-allocation
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-05-02
 completed: ""
-result: ""
+result: "improved"
 ---
 
 # PERF-414: Preallocate CDP Screenshots Parameters and Object Literals in DomStrategy
