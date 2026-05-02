@@ -158,3 +158,7 @@ Critical learnings only. This is not a log—only add entries for insights that 
 ## [0.46.14] - Duplicated Regression Tests Plan (Re-verification for job/render/merge)
 **Learning:** The CLI status file lists regression tests for `job`, `render`, and `merge` as Next Steps, but these tests are already fully implemented in `packages/cli/src/commands/__tests__/`. This is a recurring issue where the status file suggests work that is already done.
 **Action:** Created plan file documenting IMPOSSIBLE: DUPLICATION and stopping work to avoid inventing unnecessary refactors.
+
+## v0.46.15 - Remaining Regression Tests
+**Learning:** The plan for remaining CLI regression tests (preview, skills, studio) was an IMPOSSIBLE: DUPLICATION. Tests were already implemented in their respective `__tests__` files and passing.
+**Action:** Always verify test file existence before assuming a plan needs execution.
