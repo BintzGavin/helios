@@ -35,3 +35,6 @@
 ## [v0.77.25] - Missing README properties
 **Learning:** Properties implemented in `index.ts` (e.g., `mediaTitle`) are sometimes missing from the `README.md` properties list due to disconnected implementation and documentation steps.
 **Action:** When adding new properties, explicitly include updating the README in the implementation spec, or periodically cross-reference `index.ts` exported properties with the README.
+## v0.76.20 - Template Compliance
+**Learning:** Missing one of the required bullet points in the implementation spec template can cause validation failure.
+**Action:** When planning, make sure to include all required sections from the template (Context & Goal, File Inventory, Implementation Spec, Test Plan) and their respective sub-bullets.
