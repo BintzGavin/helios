@@ -16,6 +16,7 @@ export class DomStrategy implements RenderStrategy {
   private cleanupAudio: () => Promise<void> | void = () => {};
   private cdpSession: CDPSession | null = null;
   private lastFrameData: Buffer | string | null = null;
+  private elementScreenshotParams: any = null;
 
   private cdpScreenshotParams: any = null;
   private targetElementHandle: any = null;
@@ -123,6 +124,12 @@ export class DomStrategy implements RenderStrategy {
     this.cdpScreenshotParams = cdpScreenshotParams;
     this.beginFrameParams.screenshot = cdpScreenshotParams;
 
+    this.elementScreenshotParams = {
+      type: cdpScreenshotParams.format,
+      quality: cdpScreenshotParams.quality,
+      omitBackground: cdpScreenshotParams.format !== 'jpeg'
+    };
+
     // Set format-appropriate empty buffer
     if (format === 'jpeg') {
         // 1x1 JPEG pixel
@@ -157,12 +164,7 @@ export class DomStrategy implements RenderStrategy {
 
   async capture(page: Page, frameTime: number): Promise<Buffer | string> {
     if (this.targetElementHandle) {
-      const isOpaque = this.cdpScreenshotParams.format === 'jpeg';
-      const res = await this.targetElementHandle.screenshot({
-        type: this.cdpScreenshotParams.format,
-        quality: this.cdpScreenshotParams.quality,
-        omitBackground: !isOpaque
-      });
+      const res = await this.targetElementHandle.screenshot(this.elementScreenshotParams);
       if (res) {
         this.lastFrameData = res;
         return res;
