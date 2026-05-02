@@ -1,11 +1,11 @@
 ---
 id: PERF-421
 slug: prebind-capture-loop-executors
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-05-02
 completed: ""
-result: ""
+result: "improved"
 ---
 
 # PERF-421: Prebind Promise Executors in CaptureLoop writeToStdin

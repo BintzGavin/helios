@@ -9,6 +9,7 @@ const noopCatch = () => {};
 export class CaptureLoop {
   private drainResolve: (() => void) | null = null;
   private drainReject: ((err: Error) => void) | null = null;
+  private drainPromiseExecutor = (resolve: () => void, reject: (err: Error) => void) => { this.drainResolve = resolve; this.drainReject = reject; };
 
   private handleWriteError = (err?: Error | null) => {
     if (err) {
@@ -79,10 +80,7 @@ export class CaptureLoop {
     }
 
     if (!canWriteMore) {
-        return new Promise<void>((resolve, reject) => {
-            this.drainResolve = resolve;
-            this.drainReject = reject;
-        });
+        return new Promise<void>(this.drainPromiseExecutor);
     }
   }
 
