@@ -197,3 +197,7 @@ Last updated by: PERF-399
 - **Refactor Media Discovery Logic (2026-03-12-RENDERER-Refactor-Media-Discovery)**
   - **What I tried**: Attempted to consolidate duplicate "find all media" and "find all scopes" logic into a single source of truth (`dom-scripts.ts`).
   - **WHY it didn't work**: Impossible/Obsolete (IMPOSSIBLE: DUPLICATION). The structural change was already implemented in a previous commit and present in the codebase. Documented duplication and stopped work.
+
+- **PERF-422**: Prebind SeekTimeDriver Closures (window.__helios_seek)
+  - **WHY it didn't work**: The performance improvement was negligible (baseline ~33.4s vs ~33.3s). This indicates that V8 is already optimizing closure allocations inside `window.__helios_seek` and `createMediaPromise` well enough that moving them out of the hot loop via prebinding/module scope does not yield a meaningful performance benefit. The small gain is within the ~5% margin of error and the manual state management introduces unnecessary code complexity.
+  - **Outcome**: discard
