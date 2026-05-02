@@ -138,5 +138,5 @@ This backlog tracks concrete deliverables derived from [`AGENTS.md`](../AGENTS.m
 - [x] [v0.46.2] CLI Blocked: Waiting for a new, valid plan in /.sys/plans/
 
 ## Blocked Items
-- [ ] PLAYER: Waiting for new implementation plans in `/.sys/plans/`.
+- [x] [v0.46.14] CLI Blocked: Waiting for a new, valid plan in /.sys/plans/
 - [x] STUDIO: 2026-11-14-STUDIO-Update-Keyboard-Shortcuts-Documentation is structurally obsolete.

@@ -154,3 +154,7 @@ Critical learnings only. This is not a log—only add entries for insights that 
 ## [0.46.13] - Duplicated Remove Regression Tests Plan
 **Learning:** The CLI status file triggered a fallback action for regression tests for the `remove` command, but these tests were already fully implemented in `src/commands/__tests__/remove.test.ts`.
 **Action:** Documented the duplication as an impossibility in the plan file and stopped work to avoid inventing unnecessary refactors.
+
+## [0.46.14] - Duplicated Regression Tests Plan (Re-verification for job/render/merge)
+**Learning:** The CLI status file lists regression tests for `job`, `render`, and `merge` as Next Steps, but these tests are already fully implemented in `packages/cli/src/commands/__tests__/`. This is a recurring issue where the status file suggests work that is already done.
+**Action:** Created plan file documenting IMPOSSIBLE: DUPLICATION and stopping work to avoid inventing unnecessary refactors.
