@@ -1,11 +1,11 @@
 ---
 id: PERF-410
 slug: optimize-seek-browser-promises
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2026-05-02
 completed: ""
-result: ""
+result: "failed"
 ---
 
 # PERF-410: Optimize Promise Allocations in SeekTimeDriver Browser Script
@@ -102,3 +102,6 @@ Run `cd packages/renderer && npm run test` or an equivalent check to verify no b
 ## Prior Art
 - PERF-406: Preallocated the `cachedPromises` array to avoid dynamic array allocation inside this same block.
 - PERF-409: Attempted replacing Node.js-side `Promise.race` for stability checks in `CdpTimeDriver.ts`. This applies the same optimization strategy to the browser-side script in `SeekTimeDriver.ts`.
+
+## Duplication Note
+IMPOSSIBLE: DUPLICATION. The optimization to eliminate the Promise.race wrapper and optimize the stability timeout logic in the injected script was already implemented and kept by a previous experiment.
