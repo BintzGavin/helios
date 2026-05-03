@@ -1,8 +1,9 @@
 # CLI Status
 
-**Version**: 0.46.15
+**Version**: 0.46.16
 
 ## Recent Completions
+[v0.46.16] ✅ Completed: Remaining CLI Regression Tests - Identified as duplicate plan; tests for preview, skills, and studio are already implemented.
 [v0.46.15] ✅ Completed: Document duplicated Remaining Regression Tests plan - Logged the duplicated plan as impossible.
 [v0.46.14] ✅ Completed: Document duplicated Regression Tests plan - Logged the duplicated plan for job, render, and merge commands as impossible.
 [v0.46.13] ✅ Completed: Document duplicated Remove Regression Tests plan - Logged the duplicated plan as impossible.
