@@ -1,0 +1,7 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	32.376	150	4.63	38.6	keep	baseline
+2	32.278	150	4.65	38.0	keep	baseline
+3	32.146	150	4.67	38.5	keep	baseline
+4	32.314	150	4.64	37.6	discard	inline allocation
+5	32.231	150	4.65	38.1	discard	inline allocation
+6	32.398	150	4.63	37.7	discard	inline allocation

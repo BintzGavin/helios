@@ -1,11 +1,11 @@
 ---
 id: PERF-429
 slug: inline-object-allocation
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2026-05-03
-completed: ""
-result: ""
+completed: "2024-05-03"
+result: "discard"
 ---
 
 # PERF-429: Inline object literal allocation for `HeadlessExperimental.beginFrame` and `Runtime.evaluate`
@@ -68,3 +68,9 @@ None.
 
 ## Test Plan
 - Run `npx --prefix packages/renderer tsx packages/renderer/tests/verify-dom-strategy-capture.ts` to ensure frames capture correctly without hanging.
+
+## Results Summary
+- **Best render time**: 32.231s (vs baseline 32.146s)
+- **Improvement**: 0%
+- **Kept experiments**: []
+- **Discarded experiments**: [Inline object literal allocation for CDP commands]
