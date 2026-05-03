@@ -1,11 +1,11 @@
 ---
 id: PERF-424
 slug: empty-image-dimensions
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "jules"
 created: 2024-05-03
-completed: ""
-result: ""
+completed: "2024-05-03"
+result: "failed"
 ---
 
 # PERF-424: 2x2 Empty Image Dimensions
