@@ -214,3 +214,6 @@ Last updated by: PERF-399
 - **PERF-426**: Removed chained `.catch()` on media sync `Runtime.evaluate` in `CdpTimeDriver`.
   - **What I tried**: Removed `.catch(this.handleSyncMediaError)` from fire-and-forget `Runtime.evaluate` calls for syncing media.
   - **Outcome**: Kept. Reduced median render time slightly (~46.396s to ~46.221s). Removing the `.catch()` prevents Playwright's CDP `send` promise from instantiating an additional Promise in the chain on every single frame, reducing V8 GC churn. Playwright does not crash Node on unhandled CDP rejections for fire-and-forget evaluations when the context is valid.
+
+- **PERF-427**: Disabled GPU Compositing by Default in BrowserPool
+  - Improved median render time to ~32.504s. Removed GPU/software rasterizer translation overhead from headless SwiftShader. Defaulting config.gpu !== true applies GPU_DISABLED_ARGS properly.

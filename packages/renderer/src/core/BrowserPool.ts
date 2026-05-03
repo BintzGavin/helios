@@ -59,7 +59,7 @@ export class BrowserPool {
   public getLaunchOptions() {
     const config = this.options.browserConfig || {};
     const userArgs = config.args || [];
-    const gpuArgs = config.gpu === false ? GPU_DISABLED_ARGS : [];
+    const gpuArgs = config.gpu !== true ? GPU_DISABLED_ARGS : [];
 
     let executablePath = config.executablePath;
 
