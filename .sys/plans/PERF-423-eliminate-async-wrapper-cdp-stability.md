@@ -1,7 +1,7 @@
 ---
 id: PERF-423
 slug: eliminate-async-wrapper-cdp-stability
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-05-03
 completed: ""
@@ -60,3 +60,7 @@ Update `window.__helios_wait_until_stable` in `CdpTimeDriver.ts` `initScript`:
 ## Prior Art
 - PERF-368: Eliminated TimeDriver promise wrapper Node-side.
 - PERF-410 & PERF-412: Optimized Promise allocations in `SeekTimeDriver` browser scripts.
+## Results Summary
+- **Best render time**: 48.792s (vs baseline 48.192s)
+- **Improvement**: -1.2%
+- **Kept experiments**: Eliminated async wrapper in CdpTimeDriver stability script

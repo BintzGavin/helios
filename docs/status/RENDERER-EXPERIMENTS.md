@@ -201,3 +201,6 @@ Last updated by: PERF-399
 - **PERF-422**: Prebind SeekTimeDriver Closures (window.__helios_seek)
   - **WHY it didn't work**: The performance improvement was negligible (baseline ~33.4s vs ~33.3s). This indicates that V8 is already optimizing closure allocations inside `window.__helios_seek` and `createMediaPromise` well enough that moving them out of the hot loop via prebinding/module scope does not yield a meaningful performance benefit. The small gain is within the ~5% margin of error and the manual state management introduces unnecessary code complexity.
   - **Outcome**: discard
+
+- **PERF-423**: Eliminated async wrapper in CdpTimeDriver stability script
+  - Improved render time to 48.792s
