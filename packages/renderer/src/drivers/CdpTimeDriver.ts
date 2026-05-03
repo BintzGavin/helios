@@ -134,9 +134,9 @@ export class CdpTimeDriver implements TimeDriver {
           }
         };
 
-        window.__helios_wait_until_stable = async () => {
+        window.__helios_wait_until_stable = () => {
           if (typeof window.helios !== 'undefined' && typeof window.helios.waitUntilStable === 'function') {
-            await window.helios.waitUntilStable();
+            return window.helios.waitUntilStable();
           }
         };
       })();
