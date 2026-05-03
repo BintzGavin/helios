@@ -1,11 +1,11 @@
 ---
 id: PERF-415
 slug: inline-dom-strategy-object-allocation
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "EX"
 created: 2024-05-02
-completed: ""
-result: ""
+completed: "2026-05-03"
+result: "failed"
 ---
 
 # PERF-415: Preallocate CDP Screenshots Parameters and Object Literals in DomStrategy
@@ -116,3 +116,6 @@ None.
 
 ## Canvas Smoke Test
 Run `cd packages/renderer && npm run test` to verify no breakages.
+
+## Result
+IMPOSSIBLE: DUPLICATION. The structural change (preallocating `elementScreenshotParams`) was already implemented and kept by a previous experiment (PERF-414). Documented duplication and stopped work.

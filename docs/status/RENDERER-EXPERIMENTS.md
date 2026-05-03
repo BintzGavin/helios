@@ -38,6 +38,9 @@ Last updated by: PERF-403
 - **PERF-337**: Prebound `frameWaiterResolve` executor into `frameWaiterExecutor` to avoid dynamic inline closure allocations during the CaptureLoop actor pipeline backpressure events. This adheres to the "simplicity and GC reduction" principle that guided keeping `writerWaiterExecutor`. Render time: 46.464s (Baseline: 57.022s), though baseline was inflated by initial run. Median render times of subsequent runs were around 46.6s, slightly better than PERF-336's ~47.4s. Kept to reduce V8 GC churn in the main event loop.
 
 ## What Doesn't Work (and Why)
+- **PERF-415**: Preallocate CDP Screenshots Parameters and Object Literals in DomStrategy.
+  - **WHY it didn't work**: IMPOSSIBLE: DUPLICATION. The structural change (preallocating `elementScreenshotParams`) was already implemented and kept by a previous experiment (PERF-414). Documented duplication and stopped work.
+  - **Outcome**: discard
 - **PERF-407**: Prebind Promise Executor and Resolver Closures in SeekTimeDriver.
   - **WHY it didn't work**: The performance was essentially identical to the baseline (~45.3s vs ~45.5s), showing V8 optimizes the dynamic allocations inside window.__helios_seek very efficiently. Discarded to maintain code simplicity and as the variance is within the noise margin.
 - **PERF-404**: Attempted to preallocate the `Promise.race` array (`[evaluatePromise, timeoutPromise]`) in `CdpTimeDriver.ts`'s single-frame stability check loop.
