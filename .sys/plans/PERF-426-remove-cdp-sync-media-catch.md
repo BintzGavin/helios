@@ -1,11 +1,11 @@
 ---
 id: PERF-426
 slug: remove-cdp-sync-media-catch
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2026-04-12
-completed: ""
-result: ""
+completed: "2026-05-03"
+result: "improved"
 ---
 
 # PERF-426: Prebind Media Sync Error Catcher in CdpTimeDriver
@@ -47,3 +47,9 @@ Run `npm test -w packages/renderer` on a Canvas-based composition to ensure stan
 
 ## Correctness Check
 Run the DOM render benchmarks to ensure that no unhandled promise rejections crash the renderer if a CDP session is abruptly closed.
+
+## Results Summary
+- **Best render time**: 46.221s (vs baseline 46.396s)
+- **Improvement**: 0.38%
+- **Kept experiments**: Removed chained .catch() on media sync Runtime.evaluate
+- **Discarded experiments**: none
