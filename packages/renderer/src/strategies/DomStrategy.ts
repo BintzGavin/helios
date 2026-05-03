@@ -7,7 +7,7 @@ import { extractBlobTracks } from '../utils/blob-extractor.js';
 import { PRELOAD_SCRIPT } from '../utils/dom-preload.js';
 
 const EMPTY_IMAGE_BUFFER = Buffer.from(
-  "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=",
+  "iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAFElEQVQIW2NkYGD4z8DAwMgAI0AMDA4wBfQoO4UAAAAASUVORK5CYII=",
   "base64"
 );
 
@@ -132,16 +132,16 @@ export class DomStrategy implements RenderStrategy {
 
     // Set format-appropriate empty buffer
     if (format === 'jpeg') {
-        // 1x1 JPEG pixel
-        this.emptyImageBase64 = '/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAP//////////////////////////////////////////////////////////////////////////////////////wgALCAABAAEBAREA/8QAFBABAAAAAAAAAAAAAAAAAAAAAP/aAAgBAQABPxA=';
+        // 2x2 JPEG pixel
+        this.emptyImageBase64 = '/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAP//////////////////////////////////////////////////////////////////////////////////////wgALCAACAAIBAREA/8QAFBABAAAAAAAAAAAAAAAAAAAAAP/aAAgBAQABPxA=';
         this.emptyImageBuffer = Buffer.from(this.emptyImageBase64, 'base64');
     } else if (format === 'webp') {
-        // 1x1 WEBP pixel
-        this.emptyImageBase64 = 'UklGRhoAAABXRUJQVlA4TA0AAAAvAAAAEAcQERGIiP4HAA==';
+        // 2x2 WEBP pixel
+        this.emptyImageBase64 = 'UklGRjIAAABXRUJQVlA4ICYAAAAwAQCdASoCAAIACgEAAwBkAGsAIP4B2gAAACH+/4IAAA==';
         this.emptyImageBuffer = Buffer.from(this.emptyImageBase64, 'base64');
     } else {
         // Default to PNG
-        this.emptyImageBase64 = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=";
+        this.emptyImageBase64 = "iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAFElEQVQIW2NkYGD4z8DAwMgAI0AMDA4wBfQoO4UAAAAASUVORK5CYII=";
         this.emptyImageBuffer = EMPTY_IMAGE_BUFFER;
     }
 
