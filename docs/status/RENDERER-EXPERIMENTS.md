@@ -217,3 +217,6 @@ Last updated by: PERF-399
 
 - **PERF-427**: Disabled GPU Compositing by Default in BrowserPool
   - Improved median render time to ~32.504s. Removed GPU/software rasterizer translation overhead from headless SwiftShader. Defaulting config.gpu !== true applies GPU_DISABLED_ARGS properly.
+- **PERF-424**: Empty Image Dimensions
+  - **What I tried**: Attempted to update the fallback 1x1 base64 encoded images (PNG, JPEG, WEBP) in `DomStrategy.ts` to 2x2 pixels to prevent FFmpeg crashes when encoding to `yuv420p`.
+  - **WHY it didn't work**: Impossible/Obsolete (IMPOSSIBLE: DUPLICATION). The structural change was already implemented in a previous commit and is present in the codebase. Documented duplication and stopped work.
