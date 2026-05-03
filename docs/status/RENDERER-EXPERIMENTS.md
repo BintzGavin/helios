@@ -220,3 +220,6 @@ Last updated by: PERF-399
 - **PERF-424**: Empty Image Dimensions
   - **What I tried**: Attempted to update the fallback 1x1 base64 encoded images (PNG, JPEG, WEBP) in `DomStrategy.ts` to 2x2 pixels to prevent FFmpeg crashes when encoding to `yuv420p`.
   - **WHY it didn't work**: Impossible/Obsolete (IMPOSSIBLE: DUPLICATION). The structural change was already implemented in a previous commit and is present in the codebase. Documented duplication and stopped work.
+
+## What Doesn't Work (and Why)
+- Inlining object literal allocations for CDP commands (`HeadlessExperimental.beginFrame`, `Runtime.evaluate`, `Emulation.setVirtualTimePolicy`) in `DomStrategy`, `SeekTimeDriver`, and `CdpTimeDriver` (PERF-429). Why: This was hypothesized to be faster (and was tested positively in an isolated earlier plan PERF-348), but the benchmark data shows absolutely no improvement (32.3s vs 32.3s). In V8, reusing a cached object's properties in a hot loop avoids the overhead of instantiating new objects and GCing them. The previous switch back to mutating class properties was likely already optimal or at parity due to hidden class optimizations.
