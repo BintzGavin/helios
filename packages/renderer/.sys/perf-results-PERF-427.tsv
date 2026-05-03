@@ -1,0 +1,4 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	32.635	90	2.76	38.1	keep	GPU disabled by default
+2	32.504	90	2.77	37.7	keep	GPU disabled by default
+3	32.406	90	2.78	38.5	keep	GPU disabled by default
