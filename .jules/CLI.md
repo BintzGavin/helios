@@ -162,3 +162,7 @@ Critical learnings only. This is not a log—only add entries for insights that 
 ## v0.46.15 - Remaining Regression Tests
 **Learning:** The plan for remaining CLI regression tests (preview, skills, studio) was an IMPOSSIBLE: DUPLICATION. Tests were already implemented in their respective `__tests__` files and passing.
 **Action:** Always verify test file existence before assuming a plan needs execution.
+
+## v0.46.16 - Regression Tests Duplication (Re-verification)
+**Learning:** The plan "2027-06-01-CLI-Regression-Tests-Remaining" requests adding tests for `preview`, `skills`, and `studio` commands, but these are already implemented in `packages/cli/src/commands/__tests__/` and pass successfully when run via Vitest.
+**Action:** Always verify if tests requested in the plan exist in the repository before generating or rewriting identical tests, and mark the plan as an impossibility if so.
