@@ -1,11 +1,11 @@
 ---
 id: PERF-412
 slug: optimize-seek-stability-race
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2026-05-02
 completed: ""
-result: ""
+result: "failed"
 ---
 
 # PERF-412: Optimize Promise.race Allocation in SeekTimeDriver
@@ -81,3 +81,6 @@ Run `cd packages/renderer && npm run test` to verify no breakages.
 
 ## Prior Art
 - PERF-411: Attempted the exact same optimization in CdpTimeDriver.ts.
+
+## Duplication Note
+IMPOSSIBLE: DUPLICATION. The optimization to eliminate the Promise.race wrapper and optimize the stability timeout logic in the injected script was already implemented and kept by a previous experiment.

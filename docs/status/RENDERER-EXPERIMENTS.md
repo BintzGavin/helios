@@ -38,6 +38,9 @@ Last updated by: PERF-403
 - **PERF-337**: Prebound `frameWaiterResolve` executor into `frameWaiterExecutor` to avoid dynamic inline closure allocations during the CaptureLoop actor pipeline backpressure events. This adheres to the "simplicity and GC reduction" principle that guided keeping `writerWaiterExecutor`. Render time: 46.464s (Baseline: 57.022s), though baseline was inflated by initial run. Median render times of subsequent runs were around 46.6s, slightly better than PERF-336's ~47.4s. Kept to reduce V8 GC churn in the main event loop.
 
 ## What Doesn't Work (and Why)
+- **PERF-410/412**: Optimize Promise allocations and race conditions in SeekTimeDriver
+  - **WHY it didn't work**: Impossible/Obsolete (IMPOSSIBLE: DUPLICATION). The structural change was already implemented in a previous commit and present in the codebase. Documented duplication and stopped work.
+
 - **PERF-415**: Preallocate CDP Screenshots Parameters and Object Literals in DomStrategy.
   - **WHY it didn't work**: IMPOSSIBLE: DUPLICATION. The structural change (preallocating `elementScreenshotParams`) was already implemented and kept by a previous experiment (PERF-414). Documented duplication and stopped work.
   - **Outcome**: discard
