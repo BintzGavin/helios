@@ -210,3 +210,7 @@ Last updated by: PERF-399
 
 - **PERF-423**: Eliminated async wrapper in CdpTimeDriver stability script
   - Improved render time to 48.792s
+
+- **PERF-426**: Removed chained `.catch()` on media sync `Runtime.evaluate` in `CdpTimeDriver`.
+  - **What I tried**: Removed `.catch(this.handleSyncMediaError)` from fire-and-forget `Runtime.evaluate` calls for syncing media.
+  - **Outcome**: Kept. Reduced median render time slightly (~46.396s to ~46.221s). Removing the `.catch()` prevents Playwright's CDP `send` promise from instantiating an additional Promise in the chain on every single frame, reducing V8 GC churn. Playwright does not crash Node on unhandled CDP rejections for fire-and-forget evaluations when the context is valid.

@@ -198,7 +198,7 @@ export class CdpTimeDriver implements TimeDriver {
     const frames = this.cachedFrames;
     if (frames.length === 1) {
       this.singleFrameSyncMediaParams.expression = "if(typeof window.__helios_sync_media==='function') window.__helios_sync_media(" + timeInSeconds + ");";
-      this.client!.send('Runtime.evaluate', this.singleFrameSyncMediaParams).catch(this.handleSyncMediaError);
+      this.client!.send('Runtime.evaluate', this.singleFrameSyncMediaParams);
     } else {
         if (this.executionContextIds.length > 0) {
           const expression = "if(typeof window.__helios_sync_media==='function') window.__helios_sync_media(" + timeInSeconds + ");";
@@ -214,13 +214,13 @@ export class CdpTimeDriver implements TimeDriver {
           }
           for (let i = 0; i < this.executionContextIds.length; i++) {
             this.multiFrameSyncMediaParams[i].expression = expression;
-            this.client!.send('Runtime.evaluate', this.multiFrameSyncMediaParams[i]).catch(this.handleSyncMediaError);
+            this.client!.send('Runtime.evaluate', this.multiFrameSyncMediaParams[i]);
           }
         } else {
           // Fallback if execution contexts couldn't be resolved (e.g. reused CDP session)
           for (let i = 0; i < frames.length; i++) {
             const frame = frames[i];
-            frame.evaluate("if(typeof window.__helios_sync_media==='function') window.__helios_sync_media(" + timeInSeconds + ");").catch(this.handleSyncMediaError);
+            frame.evaluate("if(typeof window.__helios_sync_media==='function') window.__helios_sync_media(" + timeInSeconds + ");");
           }
         }
     }
