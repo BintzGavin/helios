@@ -166,3 +166,6 @@ Critical learnings only. This is not a log—only add entries for insights that 
 ## v0.46.16 - Regression Tests Duplication (Re-verification)
 **Learning:** The plan "2027-06-01-CLI-Regression-Tests-Remaining" requests adding tests for `preview`, `skills`, and `studio` commands, but these are already implemented in `packages/cli/src/commands/__tests__/` and pass successfully when run via Vitest.
 **Action:** Always verify if tests requested in the plan exist in the repository before generating or rewriting identical tests, and mark the plan as an impossibility if so.
+## [0.46.17] - Duplicate Deploy Regression Tests Plan
+**Learning:** Found an IMPOSSIBLE: DUPLICATION plan for `helios deploy` regression tests (`2027-05-16-CLI-Deploy-Command-Regression-Tests.md`). The tests for all remaining tier 1-3 cloud infrastructure scaffold subcommands (`cloudflare`, `cloudflare-sandbox`, `fly`, `azure`, `kubernetes`, `hetzner`, `modal`, `deno`, and `vercel`) were already fully implemented and verified in `packages/cli/src/commands/__tests__/deploy.test.ts`.
+**Action:** Always verify the actual contents of the target test file (e.g., using `grep` or `cat`) before implementing new tests to prevent duplicate work. If tests exist, document the plan as impossible and stop work.

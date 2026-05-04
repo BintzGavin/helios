@@ -28,4 +28,4 @@
 #### 4. Test Plan
 - **Verification**: Run the test suite using `npx vitest run packages/cli/src/commands/__tests__/deploy.test.ts`.
 - **Success Criteria**: All tests pass, including the new blocks for the 9 additional deployment subcommands. Test coverage for `packages/cli/src/commands/deploy.ts` should be at or near 100%.
-- **Edge Cases**: Ensure prompt cancellation flows (e.g., undefined return values from `prompts`) correctly call `process.exit(0)` and abort file writing where applicable.
+- **Edge Cases**: Ensure prompt cancellation flows (e.g., undefined return values from `prompts`) correctly call `process.exit(0)` and abort file writing where applicable.IMPOSSIBLE: DUPLICATION
