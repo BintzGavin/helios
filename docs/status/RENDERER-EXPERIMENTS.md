@@ -38,6 +38,9 @@ Last updated by: PERF-403
 - **PERF-337**: Prebound `frameWaiterResolve` executor into `frameWaiterExecutor` to avoid dynamic inline closure allocations during the CaptureLoop actor pipeline backpressure events. This adheres to the "simplicity and GC reduction" principle that guided keeping `writerWaiterExecutor`. Render time: 46.464s (Baseline: 57.022s), though baseline was inflated by initial run. Median render times of subsequent runs were around 46.6s, slightly better than PERF-336's ~47.4s. Kept to reduce V8 GC churn in the main event loop.
 
 ## What Doesn't Work (and Why)
+
+- **PERF-431**: Test `Page.startScreencast` as a Capture Strategy with Chromium Flags
+  - **WHY it didn't work**: When the Chromium browser is launched with external compositor control flags (`--enable-begin-frame-control` and `--run-all-compositor-stages-before-draw`), `Page.startScreencast` fails to emit any `Page.screencastFrame` events. While we can remove those flags and advance virtual time via `Emulation.setVirtualTimePolicy`, it breaks deterministic rendering. Because `Page.startScreencast` is damage-driven, if a frame has no visual changes (no damage), Chromium skips emitting the screencast frame. A simple buffer system without fallback causes deadlocks during static scenes, and modifying tests to ignore the external compositor flags bypasses core framework guarantees. Discarded as unsafe.
 - **PERF-372**: Restore TimeDriver Promise
   - **WHY it didn't work**: Impossible/Obsolete (IMPOSSIBLE: DUPLICATION). The structural change was already implemented in a previous commit and is present in the codebase. Documented duplication and stopped work.
   - **Outcome**: discard
@@ -225,6 +228,7 @@ Last updated by: PERF-399
   - **WHY it didn't work**: Impossible/Obsolete (IMPOSSIBLE: DUPLICATION). The structural change was already implemented in a previous commit and is present in the codebase. Documented duplication and stopped work.
 
 ## What Doesn't Work (and Why)
+
 - **PERF-372**: Restore TimeDriver Promise
   - **WHY it didn't work**: Impossible/Obsolete (IMPOSSIBLE: DUPLICATION). The structural change was already implemented in a previous commit and is present in the codebase. Documented duplication and stopped work.
   - **Outcome**: discard
