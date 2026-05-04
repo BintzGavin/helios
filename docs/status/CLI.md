@@ -1,6 +1,6 @@
 # CLI Status
 
-**Version**: 0.46.16
+**Version**: 0.46.17
 
 ## Recent Completions
 [v0.46.16] ✅ Completed: Remaining CLI Regression Tests - Identified as duplicate plan; tests for preview, skills, and studio are already implemented.
@@ -116,4 +116,4 @@ The Helios CLI is the primary user interface for component registry, project sca
 [v0.38.0] ✅ Completed: Scaffold Fly.io Deployment Command - Implemented helios deploy fly to scaffold fly.toml, Dockerfile, and README-FLY.md for Fly.io Machines.
 [v0.39.1] ✅ Completed: CLI Scaffold Components - Verified existing implementation of helios components command fulfills the scaffolding requirements.
 [v0.41.2] ✅ Completed: Scaffold Cloudflare Sandbox Adapter - Exposed the Cloudflare Sandbox adapter in the `helios job run` command options and configuration block.
-\n[0.46.9] ✅ Completed: Scaffold Cloudflare Sandbox Deployment Command - Implemented `helios deploy cloudflare-sandbox` to scaffold Cloudflare Workflows and Sandboxes.
+[v0.46.17] ✅ Completed: Document duplicated Deploy Command Regression Tests plan - Logged the duplicated plan as impossible.
