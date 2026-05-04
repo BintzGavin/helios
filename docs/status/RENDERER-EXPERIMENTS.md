@@ -223,3 +223,4 @@ Last updated by: PERF-399
 
 ## What Doesn't Work (and Why)
 - Inlining object literal allocations for CDP commands (`HeadlessExperimental.beginFrame`, `Runtime.evaluate`, `Emulation.setVirtualTimePolicy`) in `DomStrategy`, `SeekTimeDriver`, and `CdpTimeDriver` (PERF-429). Why: This was hypothesized to be faster (and was tested positively in an isolated earlier plan PERF-348), but the benchmark data shows absolutely no improvement (32.3s vs 32.3s). In V8, reusing a cached object's properties in a hot loop avoids the overhead of instantiating new objects and GCing them. The previous switch back to mutating class properties was likely already optimal or at parity due to hidden class optimizations.
+- **PERF-430**: Optimized CDP evaluate stability and seek checks by forcing `returnByValue: false` in `SeekTimeDriver` and `CdpTimeDriver`. This reduces IPC payload and serialization overhead for void promises.
