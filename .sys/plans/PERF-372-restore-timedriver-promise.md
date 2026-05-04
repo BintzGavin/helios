@@ -1,11 +1,11 @@
 ---
 id: PERF-372
 slug: restore-timedriver-promise
-status: claimed
+status: complete
 claimed_by: "executor-session"
 created: 2024-05-01
 completed: ""
-result: ""
+result: "failed"
 ---
 
 # PERF-372: Restore TimeDriver Promise
@@ -35,3 +35,10 @@ PERF-368 changed `TimeDriver.setTime` to return `void` to eliminate Promise trac
 **File**: `packages/renderer/src/core/CaptureLoop.ts`
 **What to change**: Restore `await` logic for `timeDriver.setTime`.
 **Why**: Fixes the race condition.
+
+## Results Summary
+- **Best render time**: N/A
+- **Improvement**: 0%
+- **Kept experiments**: []
+- **Discarded experiments**: [Restore TimeDriver Promise]
+- **Notes**: IMPOSSIBLE: DUPLICATION. The codebase already implements the TimeDriver interface returning `Promise<void>` and awaiting `timeDriver.setTime()` in `CaptureLoop.ts`.
