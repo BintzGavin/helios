@@ -1,11 +1,11 @@
 ---
 id: PERF-389
 slug: inline-screencast-ack-params
-status: claimed
+status: complete
 claimed_by: "executor-perf-389"
 created: 2024-05-28
 completed: "2024-05-28"
-result: "keep"
+result: "failed"
 ---
 
 # PERF-389: Inline screencastFrameAck parameter allocation in DomStrategy
@@ -63,3 +63,7 @@ N/A
 
 ## Correctness Check
 Run targeted script `cd packages/renderer && npx tsx tests/verify-dom-strategy-capture.ts`.
+
+## Results Summary
+**IMPOSSIBLE: DUPLICATION**
+The codebase no longer uses `Page.screencastFrame` or `Page.screencastFrameAck`. A previous experiment (PERF-394) inlined the `beginFrame` screenshot capture, eliminating the need to listen for separate `Page.screencastFrame` events and `screencastFrameAck` IPC overhead. Therefore, this plan is obsolete and cannot be implemented.
