@@ -1,11 +1,11 @@
 ---
 id: PERF-435
 slug: optimize-ffmpeg-thread-queue
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-04
-completed: ""
-result: ""
+completed: "2024-05-04"
+result: "no-improvement"
 ---
 
 # PERF-435: Optimize FFmpeg Pipe thread_queue_size
@@ -44,3 +44,9 @@ None.
 ## Test Plan
 - Run the DOM Correctness check: `cd packages/renderer && npx tsx tests/verify-dom-strategy-capture.ts`.
 - Run the performance benchmark to record metrics: `npm run build -w packages/core && npm run build -w packages/renderer && npm run build:examples && cd packages/renderer && npx tsx scripts/benchmark-test.js`.
+
+## Results Summary
+- **Best render time**: 32.533s (vs baseline 32.682s)
+- **Improvement**: ~0.4%
+- **Kept experiments**: None
+- **Discarded experiments**: thread_queue_size 4096 (discarded due to negligible performance improvement, confirming default queue is sufficient)

@@ -1,0 +1,5 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	43.070	90	2.09	38.7	keep	baseline
+2	32.682	90	2.75	38.5	keep	baseline retry
+3	32.554	90	2.76	38.6	keep	thread_queue_size 4096 (1)
+4	32.533	90	2.77	37.7	keep	thread_queue_size 4096 (2)
