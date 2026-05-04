@@ -206,6 +206,11 @@ Last updated by: PERF-399
   - Implemented logic to preallocate `screenshot` parameters object (`elementScreenshotParams`) when capturing from an element handle, removing per-frame string comparisons and dynamic object allocations inside the hot loop.
   - Result: Minor reduction in V8 GC pause times for DOM-based multi-frame rendering. Kept.
 
+- **PERF-433**: Skip Unnecessary DOM Media Sync Property Assignments
+  - Implemented `if (Math.abs(el.currentTime - targetTime) > 0.001)` check in `SYNC_MEDIA_FUNCTION` (`dom-scripts.ts`) before setting `el.currentTime` to avoid triggering heavy internal Chromium media pipeline events for identical times.
+  - **WHY it didn't work**: Setting `el.currentTime` is already highly optimized in Chromium and it seems to have a fast path when the time is the same. The added JavaScript check overhead was equal to or slightly worse than just natively setting the property (median render time ~32.623s vs ~32.489s).
+  - **Outcome**: discard
+
 - **Refactor Media Discovery Logic (2026-03-12-RENDERER-Refactor-Media-Discovery)**
   - **What I tried**: Attempted to consolidate duplicate "find all media" and "find all scopes" logic into a single source of truth (`dom-scripts.ts`).
   - **WHY it didn't work**: Impossible/Obsolete (IMPOSSIBLE: DUPLICATION). The structural change was already implemented in a previous commit and present in the codebase. Documented duplication and stopped work.
@@ -234,3 +239,7 @@ Last updated by: PERF-399
   - **Outcome**: discard
 - Inlining object literal allocations for CDP commands (`HeadlessExperimental.beginFrame`, `Runtime.evaluate`, `Emulation.setVirtualTimePolicy`) in `DomStrategy`, `SeekTimeDriver`, and `CdpTimeDriver` (PERF-429). Why: This was hypothesized to be faster (and was tested positively in an isolated earlier plan PERF-348), but the benchmark data shows absolutely no improvement (32.3s vs 32.3s). In V8, reusing a cached object's properties in a hot loop avoids the overhead of instantiating new objects and GCing them. The previous switch back to mutating class properties was likely already optimal or at parity due to hidden class optimizations.
 - **PERF-430**: Optimized CDP evaluate stability and seek checks by forcing `returnByValue: false` in `SeekTimeDriver` and `CdpTimeDriver`. This reduces IPC payload and serialization overhead for void promises.
+
+- **PERF-432**: Eliminate `await` in `DomStrategy.ts` `capture()` method
+  - Removed `await` around the `HeadlessExperimental.beginFrame` CDP call and returned the Promise chain directly to reduce V8 async state machine overhead.
+  - Result: The median render time did not improve and remained at ~32.489s compared to previous baseline (~32.504s). V8 optimizations likely handle native `async/await` perfectly well here, rendering the manual Promise chain overhead equivalent. Discarded to maintain code simplicity and readability.
