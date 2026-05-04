@@ -254,3 +254,8 @@ Last updated by: PERF-432
   - **What I tried**: Replaced `result.screenshotData || this.lastFrameData!` with `result.screenshotData ?? this.lastFrameData!` in `DomStrategy.ts` to avoid V8's `ToBoolean` string coercion overhead.
   - **WHY it didn't work**: The performance improvement was non-existent (baseline ~32.45s vs ~32.47s). V8 is already highly optimized for logical OR truthiness checks on strings inside hot loops (likely through Hidden Classes and inline caches), making the manual micro-optimization of using nullish coalescing irrelevant.
   - **Outcome**: discard
+
+- **PERF-435**: Optimize FFmpeg Pipe thread_queue_size
+  - **What I tried**: Attempted to increase the `-thread_queue_size` for FFmpeg's stdin from `512` to `4096` in `DomStrategy.ts`.
+  - **WHY it didn't work**: The performance improvement was negligible (median ~32.54s vs baseline ~32.68s). This suggests that the default queue size of `512` is already sufficient to buffer the frames and OS-level backpressure is not the primary bottleneck in the capture loop, or the encoder is keeping up closely enough that a larger buffer doesn't significantly unblock Node.js.
+  - **Outcome**: discard
