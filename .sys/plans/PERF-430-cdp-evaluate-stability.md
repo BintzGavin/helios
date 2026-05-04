@@ -1,7 +1,7 @@
 ---
 id: PERF-430
 slug: cdp-evaluate-stability
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2026-05-04
 completed: ""

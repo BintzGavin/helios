@@ -1,0 +1,2 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	32.480	90	2.77	200.0	keep	cdp evaluate stability return value optimization

@@ -15,8 +15,8 @@ export class CdpTimeDriver implements TimeDriver {
   private cachedPromises: Promise<any>[] = [];
   private cdpResolve: (() => void) | null = null;
   private cdpReject: ((err: Error) => void) | null = null;
-  private evaluateStabilityParams: any = { expression: "if (typeof window.__helios_wait_until_stable === 'function') window.__helios_wait_until_stable();", awaitPromise: true };
-  private singleFrameSyncMediaParams: any = { expression: "", awaitPromise: false };
+  private evaluateStabilityParams: any = { expression: "if (typeof window.__helios_wait_until_stable === 'function') window.__helios_wait_until_stable();", awaitPromise: true, returnByValue: false };
+  private singleFrameSyncMediaParams: any = { expression: "", awaitPromise: false, returnByValue: false };
   private multiFrameSyncMediaParams: any[] = [];
 
   private stabilityTimeoutId: NodeJS.Timeout | null = null;
@@ -208,7 +208,8 @@ export class CdpTimeDriver implements TimeDriver {
               this.multiFrameSyncMediaParams[i] = {
                 expression: "",
                 contextId: this.executionContextIds[i],
-                awaitPromise: false
+                awaitPromise: false,
+                returnByValue: false
               };
             }
           }

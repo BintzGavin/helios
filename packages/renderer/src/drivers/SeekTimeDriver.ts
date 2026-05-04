@@ -12,7 +12,7 @@ export class SeekTimeDriver implements TimeDriver {
   private cdpSession: CDPSession | null = null;
   private cachedFrames: import('playwright').Frame[] = [];
   private cachedMainFrame: import('playwright').Frame | null = null;
-  private singleFrameEvaluateParams: any = { expression: '', awaitPromise: true };
+  private singleFrameEvaluateParams: any = { expression: '', awaitPromise: true, returnByValue: false };
   private multiFrameEvaluateParams: any[] = [];
     private executionContextIds: number[] = [];
   private multiFramePromises: Promise<any>[] = [];
@@ -311,7 +311,8 @@ export class SeekTimeDriver implements TimeDriver {
         this.multiFrameEvaluateParams[i] = {
           expression: "",
           contextId: this.executionContextIds[i],
-          awaitPromise: true
+          awaitPromise: true,
+          returnByValue: false
         };
       }
     }
