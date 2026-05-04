@@ -38,6 +38,9 @@ Last updated by: PERF-403
 - **PERF-337**: Prebound `frameWaiterResolve` executor into `frameWaiterExecutor` to avoid dynamic inline closure allocations during the CaptureLoop actor pipeline backpressure events. This adheres to the "simplicity and GC reduction" principle that guided keeping `writerWaiterExecutor`. Render time: 46.464s (Baseline: 57.022s), though baseline was inflated by initial run. Median render times of subsequent runs were around 46.6s, slightly better than PERF-336's ~47.4s. Kept to reduce V8 GC churn in the main event loop.
 
 ## What Doesn't Work (and Why)
+- **PERF-372**: Restore TimeDriver Promise
+  - **WHY it didn't work**: Impossible/Obsolete (IMPOSSIBLE: DUPLICATION). The structural change was already implemented in a previous commit and is present in the codebase. Documented duplication and stopped work.
+  - **Outcome**: discard
 - **PERF-410/412**: Optimize Promise allocations and race conditions in SeekTimeDriver
   - **WHY it didn't work**: Impossible/Obsolete (IMPOSSIBLE: DUPLICATION). The structural change was already implemented in a previous commit and present in the codebase. Documented duplication and stopped work.
 
@@ -222,5 +225,8 @@ Last updated by: PERF-399
   - **WHY it didn't work**: Impossible/Obsolete (IMPOSSIBLE: DUPLICATION). The structural change was already implemented in a previous commit and is present in the codebase. Documented duplication and stopped work.
 
 ## What Doesn't Work (and Why)
+- **PERF-372**: Restore TimeDriver Promise
+  - **WHY it didn't work**: Impossible/Obsolete (IMPOSSIBLE: DUPLICATION). The structural change was already implemented in a previous commit and is present in the codebase. Documented duplication and stopped work.
+  - **Outcome**: discard
 - Inlining object literal allocations for CDP commands (`HeadlessExperimental.beginFrame`, `Runtime.evaluate`, `Emulation.setVirtualTimePolicy`) in `DomStrategy`, `SeekTimeDriver`, and `CdpTimeDriver` (PERF-429). Why: This was hypothesized to be faster (and was tested positively in an isolated earlier plan PERF-348), but the benchmark data shows absolutely no improvement (32.3s vs 32.3s). In V8, reusing a cached object's properties in a hot loop avoids the overhead of instantiating new objects and GCing them. The previous switch back to mutating class properties was likely already optimal or at parity due to hidden class optimizations.
 - **PERF-430**: Optimized CDP evaluate stability and seek checks by forcing `returnByValue: false` in `SeekTimeDriver` and `CdpTimeDriver`. This reduces IPC payload and serialization overhead for void promises.
