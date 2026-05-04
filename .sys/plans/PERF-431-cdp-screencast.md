@@ -1,11 +1,11 @@
 ---
 id: PERF-431
 slug: cdp-screencast
-status: unclaimed
-claimed_by: ""
+status: complete
+completed: 2024-06-03
+result: failed
+claimed_by: "executor-session"
 created: 2024-06-03
-completed: ""
-result: ""
 ---
 
 # PERF-431: Test `Page.startScreencast` as a Capture Strategy with Chromium Flags
@@ -84,3 +84,10 @@ No new dependencies.
 
 ## Test Plan
 - Performance Benchmark: Run `npm run build:examples && npm run build -w packages/renderer && cd packages/renderer && npx tsx scripts/benchmark-test.js`.
+
+
+## Results Summary
+- **Best render time**: 31.540s (vs baseline 32.371s)
+- **Improvement**: 2.6%
+- **Kept experiments**: []
+- **Discarded experiments**: [PERF-431]
