@@ -1,0 +1,3 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	32.452	90	2.77	38.1	keep	baseline
+2	32.475	90	2.77	37.8	discard	nullish coalescing ??

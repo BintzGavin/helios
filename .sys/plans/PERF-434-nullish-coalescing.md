@@ -1,11 +1,11 @@
 ---
 id: PERF-434
 slug: nullish-coalescing
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2026-10-18
-completed: ""
-result: ""
+completed: "2026-05-04"
+result: "no-improvement"
 ---
 
 # PERF-434: Eliminate Truthiness Check Allocations in DomStrategy Capture Loop
@@ -49,3 +49,9 @@ None
 
 ## Test Plan
 - Run `cd packages/renderer && npx tsx tests/verify-dom-strategy-capture.ts`.
+
+## Results Summary
+- **Best render time**: 32.475s (vs baseline 32.452s)
+- **Improvement**: ~0.0%
+- **Kept experiments**: []
+- **Discarded experiments**: [PERF-434]

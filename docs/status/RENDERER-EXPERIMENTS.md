@@ -249,3 +249,8 @@ Last updated by: PERF-432
 - **PERF-389**: Inline screencastFrameAck parameter allocation
   - **WHY it didn't work**: IMPOSSIBLE: DUPLICATION. The codebase no longer uses `Page.screencastFrame` or `Page.screencastFrameAck`. A previous experiment (PERF-394) inlined the `beginFrame` screenshot capture, eliminating the need to listen for separate `Page.screencastFrame` events and `screencastFrameAck` IPC overhead. Documented duplication and stopped work.
   - **Outcome**: discard
+
+- **PERF-434**: Nullish Coalescing in DomStrategy
+  - **What I tried**: Replaced `result.screenshotData || this.lastFrameData!` with `result.screenshotData ?? this.lastFrameData!` in `DomStrategy.ts` to avoid V8's `ToBoolean` string coercion overhead.
+  - **WHY it didn't work**: The performance improvement was non-existent (baseline ~32.45s vs ~32.47s). V8 is already highly optimized for logical OR truthiness checks on strings inside hot loops (likely through Hidden Classes and inline caches), making the manual micro-optimization of using nullish coalescing irrelevant.
+  - **Outcome**: discard
