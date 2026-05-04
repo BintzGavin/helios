@@ -1,0 +1,4 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	32.714	90	2.75	38.7	keep	avoid await dom strategy beginframe
+2	32.831	90	2.74	37.7	keep	avoid await dom strategy beginframe
+3	32.776	90	2.75	37.7	keep	avoid await dom strategy beginframe

@@ -162,6 +162,16 @@ export class DomStrategy implements RenderStrategy {
   }
 
 
+  private handleBeginFrameSuccess = (result: any) => {
+    const frameData = result.screenshotData || this.lastFrameData!;
+    this.lastFrameData = frameData;
+    return frameData;
+  };
+
+  private handleBeginFrameError = () => {
+    return this.lastFrameData!;
+  };
+
   async capture(page: Page, frameTime: number): Promise<Buffer | string> {
     if (this.targetElementHandle) {
       const res = await this.targetElementHandle.screenshot(this.elementScreenshotParams);
@@ -173,16 +183,9 @@ export class DomStrategy implements RenderStrategy {
     }
 
     this.beginFrameParams.frameTimeTicks = 10000 + frameTime;
-    let result: any;
-    try {
-      result = await this.cdpSession!.send('HeadlessExperimental.beginFrame', this.beginFrameParams);
-    } catch (e) {
-      result = {};
-    }
 
-    const frameData = result.screenshotData || this.lastFrameData!;
-    this.lastFrameData = frameData;
-    return frameData;
+    return this.cdpSession!.send('HeadlessExperimental.beginFrame', this.beginFrameParams)
+      .then(this.handleBeginFrameSuccess, this.handleBeginFrameError);
   }
 
   async finish(page: Page): Promise<void> {

@@ -1,8 +1,8 @@
 ---
 id: PERF-432
 slug: PERF-432-avoid-dom-strategy-begin-frame-await
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2026-10-18
 completed: ""
 result: ""
@@ -120,3 +120,10 @@ Run the DOM render benchmark script (`npm run build:examples && npm run build -w
 
 ## Prior Art
 - PERF-395 removed a `.catch(() => ({}))` chain in this exact location in favor of `try/catch` to avoid closure allocations, yielding a ~0.2s improvement. This plan takes it a step further by removing the `await` entirely while maintaining prebound handler allocation efficiency.
+
+
+## Results Summary
+- **Best render time**: 32.776s (vs baseline ~34.041s)
+- **Improvement**: ~3.7%
+- **Kept experiments**: [PERF-432]
+- **Discarded experiments**: []
