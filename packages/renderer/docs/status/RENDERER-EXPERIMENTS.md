@@ -10,3 +10,4 @@ Last updated by: PERF-271
 - [PERF-361] Attempted to avoid `Promise.race` allocation in `SeekTimeDriver` injected script. DISCARDED because it was slower (48.761s vs 46.298s baseline). V8 handles the Promise.race array wrapper very efficiently, and the manual state machine added overhead.
 
 ## Open Questions
+- [PERF-306] Attempted to disable renderer backgrounding (`--disable-renderer-backgrounding`, `--disable-backgrounding-occluded-windows`) to improve multi-worker actor model performance. DISCARDED. Resulted in significantly slower performance (42.335s vs ~32.1s baseline). Disabling backgrounding heuristics in the multi-process microVM environment appears to cause resource contention or CPU starvation rather than improving throughput.

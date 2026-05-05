@@ -1,11 +1,11 @@
 ---
 id: PERF-306
 slug: disable-renderer-backgrounding
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-24
-completed: ""
-result: ""
+completed: 2026-05-05
+result: failed
 ---
 
 # PERF-306: Disable Renderer Backgrounding in Multi-Worker Actor Model
@@ -19,14 +19,14 @@ In headless mode, Chromium still applies some background heuristics. Since there
 In a previous experiment (PERF-222), explicitly passing `--disable-renderer-backgrounding` and `--disable-backgrounding-occluded-windows` was tested but yielded no improvement. However, that was before the pipeline architecture evolved. Now, the `CaptureLoop.ts` uses a multi-worker actor model with backpressure. The system runs multiple pages concurrently and heavily saturates the OS scheduler. In this new highly concurrent setup, Chromium's backgrounding heuristics might be more aggressive or detrimental to the parallel frame generation loop. Re-testing these flags under the new actor model architecture may yield different results, ensuring maximum CPU utilization across all workers.
 
 ## Benchmark Configuration
-- **Composition URL**: `file:///app/examples/simple-animation/composition.html`
-- **Render Settings**: 1920x1080, 60 FPS, 10 seconds, `libx264` codec
+- **Composition URL**: `file:///app/output/example-build/examples/dom-benchmark/composition.html`
+- **Render Settings**: 1080p, 60fps, dom mode
 - **Mode**: `dom`
 - **Metric**: Wall-clock render time in seconds
 - **Minimum runs**: 3 per experiment, report median
 
 ## Baseline
-- **Current estimated render time**: ~47.5s
+- **Current estimated render time**: ~32.1s
 - **Bottleneck analysis**: Micro-stalls from OS and Chromium renderer process background scheduling policies across multiple concurrent workers.
 
 ## Implementation Spec
@@ -41,10 +41,16 @@ In a previous experiment (PERF-222), explicitly passing `--disable-renderer-back
 None.
 
 ## Canvas Smoke Test
-Run `npx tsx tests/verify-canvas-strategy.ts` to verify the Canvas path is unharmed.
+Run `npm run build:examples && npm run build -w packages/renderer && cd packages/renderer && npx tsx scripts/render-canvas.ts` to verify the Canvas path is unharmed.
 
 ## Correctness Check
-Run the DOM render test `npx tsx tests/verify-dom-strategy-capture.ts` to ensure no functionality is broken.
+Run the DOM render benchmark `npm run build:examples && npm run build -w packages/renderer && cd packages/renderer && npx tsx scripts/benchmark-test.js` to ensure no functionality is broken.
 
 ## Prior Art
 PERF-222 tested these flags in an older version of the pipeline. PERF-304 and PERF-305 also modified Chromium flags for scheduling and process management in the new architecture.
+
+## Results Summary
+- **Best render time**: 42.335s (vs baseline ~32.1s)
+- **Improvement**: -31% (Regression)
+- **Kept experiments**: []
+- **Discarded experiments**: [PERF-306]

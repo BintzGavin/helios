@@ -1,11 +1,11 @@
 ---
 id: PERF-388
 slug: cache-evaluate-params
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-05-28
-completed: ""
-result: ""
+completed: 2026-05-05
+result: failed
 ---
 
 # PERF-388: Cache inline evaluation parameter allocation in CdpTimeDriver.ts
@@ -57,3 +57,13 @@ N/A
 
 ## Correctness Check
 Run targeted script `cd packages/renderer && npx tsx tests/run-all.ts`.
+
+## Results Summary
+- **Best render time**: N/A
+- **Improvement**: 0%
+- **Kept experiments**: []
+- **Discarded experiments**: [PERF-388]
+
+IMPOSSIBLE: DUPLICATION
+This optimization is already implemented in `CdpTimeDriver.ts`.
+`singleFrameSyncMediaParams` is pre-allocated and its `expression` is updated in `runSetTime` before being sent via `Runtime.evaluate`.

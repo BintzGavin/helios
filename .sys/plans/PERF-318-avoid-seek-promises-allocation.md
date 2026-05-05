@@ -1,11 +1,11 @@
 ---
 id: PERF-318
 slug: avoid-seek-promises-allocation
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-04-20
-completed: ""
-result: ""
+completed: 2026-05-05
+result: failed
 ---
 
 # PERF-318: Avoid Promise Allocation in SeekTimeDriver
@@ -93,3 +93,13 @@ Run `npx tsx tests/verify-dom-strategy-capture.ts` and `npm test` equivalent on 
 
 ## Prior Art
 - PERF-312
+
+## Results Summary
+- **Best render time**: N/A
+- **Improvement**: 0%
+- **Kept experiments**: []
+- **Discarded experiments**: [PERF-318]
+
+IMPOSSIBLE: DUPLICATION
+This optimization is already implemented/invalidated.
+`SeekTimeDriver.ts` uses `Promise.all` and returns it because the caller `CaptureLoop.ts` does await it to maintain time determinism. Memory PERF-390 indicated this optimization broke sync.

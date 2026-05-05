@@ -1,11 +1,11 @@
 ---
 id: PERF-318
 slug: inline-process-capture-result
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2026-04-20
-completed: ""
-result: ""
+completed: 2026-05-05
+result: failed
 ---
 
 # PERF-318: Inline processCaptureResult in DomStrategy
@@ -59,3 +59,12 @@ Run `npx tsx packages/renderer/tests/verify-dom-strategy-capture.ts` to verify D
 
 ## Prior Art
 PERF-317 simplified the empty frame fallback logic. This builds on it by inlining the rest of the response handling.
+
+## Results Summary
+- **Best render time**: N/A
+- **Improvement**: 0%
+- **Kept experiments**: []
+- **Discarded experiments**: [PERF-318]
+
+IMPOSSIBLE: DUPLICATION
+This optimization is already implemented. `processCaptureResult` is gone.
