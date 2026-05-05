@@ -1,3 +1,17 @@
+## LLMS v1.81.0
+- ✅ Completed: Daily llms.txt Review
+  - Synced Roadmap in llms.txt with recent completions from domain PROGRESS logs:
+    - Core: Implement Animation Helpers, Implement Variable Playback Rate, Implement InputProps
+    - Studio: CLI Build Command, Preview Command, CLI Update Command
+    - Player: Dom Canvas Capture, Bridge Documentation, Client-Side Image Inlining
+    - Renderer: CdpTimeDriver Determinism, Smart Codec Selection Update, Smart Audio Fades
+    - CLI: Scaffold Cloudflare Sandbox Deployment Command, Build Command Regression Tests
+    - Infrastructure: Orchestrator Coverage Expansion, FfmpegStitcher Coverage, Optimize GCS Uploads
+  - Verified package versions match `package.json` exactly.
+  - Verified File Paths and Key Files.
+  - Incremented version to 1.81.0
+
+
 ## LLMS v1.80.0
 - ✅ Completed: Daily llms.txt Review
   - Updated Roadmap in llms.txt with verifiable completions from domain PROGRESS logs:

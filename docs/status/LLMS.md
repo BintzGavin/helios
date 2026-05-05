@@ -1,5 +1,5 @@
 # Status: LLMS
-**Version**: 1.80.0
+**Version**: 1.81.0
 
 [v1.80.0] ✅ Completed: Comprehensive Daily Review - Updated Roadmap in llms.txt with recent completions from domain PROGRESS logs (Studio: Schema Validation, Asset Move, WebCodecs Preference, Enhance MCP Server; CLI: Realtime Log Streaming, Enhance Worker Job Cancellation; Infrastructure: FfmpegStitcher Coverage, Orchestrator Coverage Expansion, FileJobRepository Spec). Verified all package versions match package.json (Core v5.13.0+, Studio v0.107.1+, Player v0.76.20+, Renderer v1.78.3+, CLI v0.45.2+, Infrastructure v0.25.0+). Verified File Paths and Key Files.
 
@@ -127,3 +127,6 @@
 - CLI: Scaffold Azure Deployment Command, Cloud Execution Adapters Expansion, Build Command Regression Tests
 - Player: Document Undocumented Shortcuts, Improve Index Coverage, Document API Parity Gap
 Verified package versions match package.json exactly. Verified File Paths and Key Files.
+
+
+[v1.81.0] ✅ Completed: Comprehensive Daily Review - Updated Roadmap in llms.txt with recent completions from domain PROGRESS logs (Core: Implement Animation Helpers, Implement Variable Playback Rate, Implement InputProps; Studio: CLI Build Command, Preview Command, CLI Update Command; Player: Dom Canvas Capture, Bridge Documentation, Client-Side Image Inlining; Renderer: CdpTimeDriver Determinism, Smart Codec Selection Update, Smart Audio Fades; CLI: Scaffold Cloudflare Sandbox Deployment Command, Build Command Regression Tests; Infrastructure: Orchestrator Coverage Expansion, FfmpegStitcher Coverage, Optimize GCS Uploads). Verified all package versions match package.json (Core v5.13.0, Studio v0.107.1, Player v0.76.20, Renderer v1.78.3, CLI v0.45.2, Infrastructure v0.25.0).
