@@ -1,11 +1,11 @@
 ---
 id: PERF-390
 slug: eliminate-await-seek-multi-frame
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-04-30
 completed: ""
-result: ""
+result: "failed"
 ---
 # PERF-390: Eliminate await on Promise.all in SeekTimeDriver's setTime multi-frame path
 
@@ -78,3 +78,11 @@ If `executionContextIds.length` is constant after initialization, we can just pr
 
 ## Correctness Check
 Run `tests/verify-dom-media-preload.ts` and `tests/verify-seek-driver-stability.ts`.
+
+## Results Summary
+- **Best render time**: N/A
+- **Improvement**: 0%
+- **Kept experiments**: []
+- **Discarded experiments**: [PERF-390]
+
+IMPOSSIBLE: DUPLICATION. The plan to pre-allocate `multiFramePromises` array in `SeekTimeDriver.ts` is already implemented in the current codebase. The arrays `multiFrameEvaluateParams` and `multiFramePromises` are already pre-allocated.
