@@ -260,3 +260,7 @@ Last updated by: PERF-432
   - **What I tried**: Attempted to increase the `-thread_queue_size` for FFmpeg's stdin from `512` to `4096` in `DomStrategy.ts`.
   - **WHY it didn't work**: The performance improvement was negligible (median ~32.54s vs baseline ~32.68s). This suggests that the default queue size of `512` is already sufficient to buffer the frames and OS-level backpressure is not the primary bottleneck in the capture loop, or the encoder is keeping up closely enough that a larger buffer doesn't significantly unblock Node.js.
   - **Outcome**: discard
+- **PERF-436**: Optional Chaining in SeekTimeDriver/CdpTimeDriver
+  - **What I tried**: Replaced verbose `typeof window.helios !== 'undefined'` checks with optional chaining `window.helios?.method` inside injected scripts.
+  - **WHY it didn't work**: The performance improvement was negligible (baseline 32.440s vs 32.429s). V8 already optimizes string comparisons and truthiness checks effectively in hot loops. The manual micro-optimization of using optional chaining yielded zero measurable benefit.
+  - **Outcome**: discard
