@@ -1,7 +1,7 @@
 ---
 id: PERF-438
 slug: eliminate-try-catch-cdptimedriver
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2026-05-06
 completed: ""
@@ -88,3 +88,9 @@ Run the verification suite.
 
 ## Prior Art
 PERF-395 in `DomStrategy.ts` and `PERF-432`.
+
+## Results Summary
+- **Best render time**: 32.530s (vs baseline 32.530s)
+- **Improvement**: 0%
+- **Kept experiments**: none
+- **Discarded experiments**: eliminate try/catch in CdpTimeDriver (PERF-438)

@@ -43,3 +43,4 @@ PERF-408	49.135	600	12.21	43.1	keep	Cache Media Elements in CdpTimeDriver to avo
 1	32.452	90	2.77	38.1	keep	PERF-434 baseline
 2	32.475	90	2.77	37.8	discard	PERF-434 nullish coalescing
 2	32.429	90	2.78	38.0	discard	PERF-436 nullish coalescing
+3	32.530	90	2.77	37.7	discard	PERF-438 eliminate try/catch in CdpTimeDriver stability check
