@@ -41,6 +41,11 @@ Last updated by: PERF-432
 - **PERF-337**: Prebound `frameWaiterResolve` executor into `frameWaiterExecutor` to avoid dynamic inline closure allocations during the CaptureLoop actor pipeline backpressure events. This adheres to the "simplicity and GC reduction" principle that guided keeping `writerWaiterExecutor`. Render time: 46.464s (Baseline: 57.022s), though baseline was inflated by initial run. Median render times of subsequent runs were around 46.6s, slightly better than PERF-336's ~47.4s. Kept to reduce V8 GC churn in the main event loop.
 
 ## What Doesn't Work (and Why)
+
+- **PERF-438**: Eliminate try/catch in CdpTimeDriver stability check
+  - **What I tried**: Attempted to replace the `try/catch/finally` around `await Promise.race` inside `runSetTime` with native promise chaining (`.then()`, `.catch()`, `.finally()`).
+  - **WHY it didn't work**: The performance was essentially identical to the baseline (~32.530s vs ~32.530s). V8 is already optimizing the async/await and exception handling in the hot loop very efficiently, and the overhead introduced by `try/catch` is negligible here. Thus, the added class methods and manual chaining didn't yield any measurable improvement.
+  - **Outcome**: discard
 - **PERF-390 (Pre-allocate Seek multi-frame Promises):** IMPOSSIBLE: DUPLICATION. The codebase already implements pre-allocated `multiFrameEvaluateParams` and `multiFramePromises` arrays in `SeekTimeDriver.ts` to avoid allocations in the hot loop.
 
 - **PERF-431**: Test `Page.startScreencast` as a Capture Strategy with Chromium Flags
