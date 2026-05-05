@@ -1,11 +1,11 @@
 ---
 id: PERF-436
 slug: chromium-disable-features
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2026-04-09
-completed: ""
-result: ""
+completed: "2024-05-05"
+result: "kept"
 ---
 
 # PERF-436: Optimize Chromium Launch Flags
@@ -51,3 +51,9 @@ Run the verification suite to ensure frames are still accurately captured.
 
 ## Prior Art
 Standard Puppeteer and Playwright optimization guides recommend disabling these features for maximum headless performance.
+
+## Results Summary
+
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	42.161	90	2.13	38.7	keep	baseline
+2	33.513	90	2.69	37.7	keep	disabled background chromium features

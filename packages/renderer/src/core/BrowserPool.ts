@@ -24,7 +24,7 @@ const DEFAULT_BROWSER_ARGS = [
   '--enable-begin-frame-control',
   '--run-all-compositor-stages-before-draw',
   '--disable-site-isolation-trials',
-  '--disable-features=IsolateOrigins,site-per-process',
+  '--disable-features=IsolateOrigins,site-per-process,PaintHolding,Translate,OptimizationHints,OptimizationGuideModelDownloading,CalculateNativeWinOcclusion',
   '--disable-lcd-text',
   '--disable-threaded-animation',
   '--disable-threaded-scrolling',
