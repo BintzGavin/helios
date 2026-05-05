@@ -321,3 +321,6 @@ This file tracks progress for the CLI domain (`packages/cli`).
 - ✅ Completed: Remaining CLI Regression Tests - Identified as duplicate plan; tests for preview, skills, and studio are already implemented.
 ### CLI v0.46.17
 - ✅ Completed: Document duplicated Deploy Command Regression Tests plan - Logged the duplicated plan as impossible.
+
+### CLI v0.46.19
+- ✅ Completed: CLI Utils Regression Tests - Implemented comprehensive unit tests for ffmpeg, package-manager, and uninstall utilities in packages/cli/src/utils/.
