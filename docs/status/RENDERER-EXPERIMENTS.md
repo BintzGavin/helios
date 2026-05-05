@@ -264,3 +264,4 @@ Last updated by: PERF-432
   - **What I tried**: Replaced verbose `typeof window.helios !== 'undefined'` checks with optional chaining `window.helios?.method` inside injected scripts.
   - **WHY it didn't work**: The performance improvement was negligible (baseline 32.440s vs 32.429s). V8 already optimizes string comparisons and truthiness checks effectively in hot loops. The manual micro-optimization of using optional chaining yielded zero measurable benefit.
   - **Outcome**: discard
+  - **PERF-314**: IMPOSSIBLE: DUPLICATION / OBSOLETE. Attempted to eliminate `Promise.all` overhead in `SeekTimeDriver.setTime()` by attaching inline catch handlers and returning void. Discovered that the plan's premise was outdated—`CaptureLoop.ts` does await `setTime()`, and returning void would introduce a critical race condition. Additionally, the array allocation was already optimized via pre-allocated arrays in a previous commit.

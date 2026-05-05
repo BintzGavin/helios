@@ -1,11 +1,11 @@
 ---
 id: PERF-314
 slug: avoid-seek-promises-allocation
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2025-04-19
-completed: ""
-result: ""
+completed: 2026-05-05
+result: failed
 ---
 
 # PERF-314: Avoid Promise.all() Allocation Overhead in SeekTimeDriver
@@ -98,3 +98,10 @@ None needed. SeekTimeDriver is for DOM mode.
 
 ## Correctness Check
 Run `npx tsx tests/verify-dom-strategy-capture.ts` to ensure it still runs correctly.
+
+## Results Summary
+- **Best render time**: N/A
+- **Improvement**: 0%
+- **Kept experiments**: []
+- **Discarded experiments**: [PERF-314]
+- **Reason**: IMPOSSIBLE: OBSOLETE / DUPLICATION. The premise of the plan is false for the current version of the codebase. `CaptureLoop.ts` explicitly awaits `timeDriver.setTime()`. Removing the `Promise.all` wrapper and returning void (or a resolved promise) while attaching inline catch handlers would cause the `await` to resolve immediately, introducing a critical race condition where frames are captured before the CDP evaluation (e.g. font loading, media syncing) finishes. Furthermore, the allocation of the promises array has already been optimized using a pre-allocated array (`this.multiFramePromises`), making the performance concern irrelevant.
