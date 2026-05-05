@@ -1,4 +1,5 @@
-**Version**: 0.77.28
+**Version**: 0.77.29
+[v0.77.29] ✅ Completed: Discovered undocumented `audioTracks` and `videoTracks` properties in actual implementation that are missing from the README. Created plan `.sys/plans/2026-12-30-PLAYER-Document-Audio-Video-Tracks.md` to fix this vision gap.
 [v0.77.27] ✅ Completed: Document API Parity Gap - Deleted lingering plan file as the README already contained the required documentation updates.
 [v0.77.27] ✅ Completed: Add Media Session properties to README
 [v0.77.26] ✅ Completed: Implement WebVTT Support - Refactored WebVTT parser to use single-pass loops instead of chained map/filter arrays for better performance

@@ -38,3 +38,6 @@
 ## v0.76.20 - Template Compliance
 **Learning:** Missing one of the required bullet points in the implementation spec template can cause validation failure.
 **Action:** When planning, make sure to include all required sections from the template (Context & Goal, File Inventory, Implementation Spec, Test Plan) and their respective sub-bullets.
+## v0.77.25 - Missing audioTracks and videoTracks properties in README
+**Learning:** `audioTracks` and `videoTracks` getters are fully implemented in `index.ts` to support standard HTMLMediaElement parity, but they were missing from the `README.md` properties list.
+**Action:** Created a plan to document the missing `audioTracks` and `videoTracks` properties in the README to ensure complete API documentation parity with the implementation.
