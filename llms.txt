@@ -121,12 +121,12 @@ const report = await Helios.diagnose();
 
 ## Roadmap
 ### V1.x (Active)
-- **Studio**: v0.107.1+ (Schema Validation, Asset Move, WebCodecs Preference, Enhance MCP Server)
-- **CLI**: v0.45.2+ (Realtime Log Streaming, Enhance Worker Job Cancellation)
-- **Core**: v5.13.0+ (Generic Input Props, Implement Active Clips, Implement Composition Schema, Shared Virtual Time Binding)
-- **Player**: v0.76.20+ (Document getSchema API Parity, Bridge Coverage Completeness, Async Seek)
-- **Renderer**: v1.78.3+ (Validate HW Accel, Orchestrator Plan, Refactor Media Sync Logic)
-- **Infrastructure**: v0.25.0+ (FfmpegStitcher Coverage, Orchestrator Coverage Expansion, FileJobRepository Spec)
+- **Studio**: v0.107.1+ (CLI Build Command, Preview Command, CompositionsPanel Tests, CLI Update Command, Refine Agent Skills)
+- **CLI**: v0.45.2+ (Scaffold Cloudflare Sandbox Deployment, Build Command Regression Tests, Scaffold Cloudflare Sandbox Deployment Command)
+- **Core**: v5.13.0+ (Implement Animation Helpers, Implement Variable Playback Rate, Implement InputProps, Enable Core Testing And Robustness, Implement Helios.diagnose())
+- **Player**: v0.76.20+ (Dom Canvas Capture, Lock UI During Export, Bridge Documentation, CSS Asset Inlining, Client-Side Image Inlining)
+- **Renderer**: v1.78.3+ (CdpTimeDriver Determinism, Robust Distributed Audio Pipeline, Smart Codec Selection Update, CdpTimeDriver Iframe Sync, Smart Audio Fades)
+- **Infrastructure**: v0.25.0+ (Gravitational Equilibrium, Orchestrator Coverage Expansion, FfmpegStitcher Coverage, Optimize GCS Uploads, Optimize S3 Uploads)
 
 ### AI Integration
 - **Studio MCP Server**: Inspect, create, and render compositions via LLM tools (Done)
