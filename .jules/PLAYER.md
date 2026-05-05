@@ -38,3 +38,7 @@
 ## v0.76.20 - Template Compliance
 **Learning:** Missing one of the required bullet points in the implementation spec template can cause validation failure.
 **Action:** When planning, make sure to include all required sections from the template (Context & Goal, File Inventory, Implementation Spec, Test Plan) and their respective sub-bullets.
+
+## 0.77.29 - IMPOSSIBLE DUPLICATION Plan
+**Learning:** Found a plan `2026-03-01-PLAYER-Click-To-Play.md` that requested implementing a `.click-layer` with `pointer-events: none` and click events. However, this feature was already completely implemented in the source code.
+**Action:** When picking up plans, strictly verify their requested changes against the current state of the codebase. Do not blindly overwrite or duplicate existing features if they are already present. If found to be a duplication, document it as impossible and close it.
