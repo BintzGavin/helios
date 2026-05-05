@@ -169,3 +169,7 @@ Critical learnings only. This is not a log—only add entries for insights that 
 ## [0.46.17] - Duplicate Deploy Regression Tests Plan
 **Learning:** Found an IMPOSSIBLE: DUPLICATION plan for `helios deploy` regression tests (`2027-05-16-CLI-Deploy-Command-Regression-Tests.md`). The tests for all remaining tier 1-3 cloud infrastructure scaffold subcommands (`cloudflare`, `cloudflare-sandbox`, `fly`, `azure`, `kubernetes`, `hetzner`, `modal`, `deno`, and `vercel`) were already fully implemented and verified in `packages/cli/src/commands/__tests__/deploy.test.ts`.
 **Action:** Always verify the actual contents of the target test file (e.g., using `grep` or `cat`) before implementing new tests to prevent duplicate work. If tests exist, document the plan as impossible and stop work.
+
+## [0.46.18] - Identify Uncovered Util Files
+**Learning:** The CLI status file indicates that we need to find remaining work when no active delta exists, utilizing the "NOTHING TO DO PROTOCOL". While `cli/src/commands/` test files are extensively covered, the `cli/src/utils/` directory lacks tests for core logic (`ffmpeg.ts`, `package-manager.ts`, `uninstall.ts`).
+**Action:** When a domain is marked stable, prioritize filling testing gaps in utility files to ensure robustness of CLI components. Created a plan to implement these utility regression tests.
