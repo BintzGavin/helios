@@ -1,11 +1,11 @@
 ---
 id: PERF-321
 slug: avoid-cdp-promise-allocation
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-05-27
-completed: ""
-result: ""
+completed: 2026-05-05
+result: failed
 ---
 
 # PERF-321: Avoid CDP Promise Array Allocation in SeekTimeDriver
@@ -98,3 +98,13 @@ Run `npx tsx packages/renderer/tests/verify-dom-strategy-capture.ts` to ensure i
 
 ## Prior Art
 - PERF-312, PERF-318 (Avoid seek promises allocation but had minor regressions or were left unexecuted, and didn't remove parameter object allocations).
+
+## Results Summary
+- **Best render time**: N/A
+- **Improvement**: 0%
+- **Kept experiments**: []
+- **Discarded experiments**: [PERF-321]
+
+IMPOSSIBLE: DUPLICATION
+This optimization is already implemented in `SeekTimeDriver.ts`.
+`Promise.all(this.multiFramePromises)` is returned and awaited by the caller in `CaptureLoop.ts`. Earlier experiments attempting to remove `Promise.all` were reverted because the await was necessary for correctness, as shown in PERF-390 memory. And evaluating parameters are preallocated in `multiFrameEvaluateParams`.

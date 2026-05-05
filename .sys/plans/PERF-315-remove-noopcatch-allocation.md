@@ -1,11 +1,11 @@
 ---
 id: PERF-315
 slug: remove-noopcatch-allocation
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2025-04-19
-completed: ""
-result: ""
+completed: 2026-05-05
+result: failed
 ---
 
 # PERF-315: Avoid Promise Allocation Overhead in SeekTimeDriver's Catch Handlers
@@ -85,3 +85,12 @@ None needed. SeekTimeDriver is for DOM mode.
 
 ## Correctness Check
 Run `npx tsx packages/renderer/tests/verify-dom-strategy-capture.ts` or other tests to ensure it still runs correctly.
+
+## Results Summary
+- **Best render time**: N/A
+- **Improvement**: 0%
+- **Kept experiments**: []
+- **Discarded experiments**: [PERF-315]
+
+IMPOSSIBLE: DUPLICATION
+This optimization is irrelevant because `SeekTimeDriver.ts` now uses `Promise.all` and returns the promises to `CaptureLoop.ts` where it is awaited. No inline catch handlers are present in the `setTime()` loop anymore.

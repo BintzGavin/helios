@@ -1,0 +1,2 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	42.335	90	2.13	38.1	discard	--disable-renderer-backgrounding and occluded-windows flags
