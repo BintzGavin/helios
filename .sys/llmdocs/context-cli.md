@@ -45,6 +45,10 @@ packages/cli/
 │   ├── registry/
 │   │   └── client.ts
 │   ├── utils/
+│   │   ├── __tests__/
+│   │   │   ├── ffmpeg.test.ts
+│   │   │   ├── package-manager.test.ts
+│   │   │   └── uninstall.test.ts
 │   │   ├── config.ts
 │   │   ├── examples.ts
 │   │   ├── ffmpeg.ts

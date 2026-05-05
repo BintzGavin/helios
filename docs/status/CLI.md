@@ -1,6 +1,7 @@
 # CLI Status
 
-**Version**: 0.46.18
+**Version**: 0.46.19
+[v0.46.19] ✅ Completed: CLI Utils Regression Tests - Implemented comprehensive unit tests for ffmpeg, package-manager, and uninstall utilities in packages/cli/src/utils/.
 
 ## Recent Completions
 [v0.46.18] ✅ Completed: CLI Utils Regression Tests Spec - Created specification plan for implementing regression tests for the remaining uncovered utilities in packages/cli/src/utils/ to ensure core functions are robust.
