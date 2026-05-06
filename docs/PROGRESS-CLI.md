@@ -1,3 +1,6 @@
+## CLI v0.46.20
+- ✅ Completed: Document duplicated CLI Utils Regression Tests plan - Logged the duplicated plan as impossible.
+
 ## CLI v0.46.3
 - ✅ Completed: Scaffold Hetzner Deployment Command - Verified existing implementation of helios deploy hetzner command fulfills the scaffolding requirements.
 
