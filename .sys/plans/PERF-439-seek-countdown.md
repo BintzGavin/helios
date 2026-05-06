@@ -1,11 +1,11 @@
 ---
 id: PERF-439
 slug: seek-countdown
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2025-05-23
-completed: ""
-result: ""
+completed: "2026-05-06"
+result: "failed"
 ---
 
 # PERF-439: Eliminate `Promise.all` via Counter Loop in `SeekTimeDriver.ts`
@@ -79,3 +79,9 @@ return new Promise((resolve, reject) => {
 ## Prior Art
 - PERF-312: Attempted to remove `Promise.all` but broke the pipeline by returning synchronously.
 - PERF-406: Preallocated the promises array but kept `Promise.all`.
+
+## Results Summary
+- **Best render time**: 32.651s
+- **Improvement**: -0.58% (worse)
+- **Kept experiments**: []
+- **Discarded experiments**: [Replace Promise.all with countdown in SeekTimeDriver]

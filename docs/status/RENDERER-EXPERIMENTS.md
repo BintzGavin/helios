@@ -273,3 +273,8 @@ Last updated by: PERF-432
 
 - **PERF-436 (Chromium Disable Features)**: Disabled unnecessary background Chromium features (\`PaintHolding\`, \`Translate\`, \`OptimizationHints\`, \`OptimizationGuideModelDownloading\`, \`CalculateNativeWinOcclusion\`) in \`BrowserPool.ts\` \`DEFAULT_BROWSER_ARGS\`.
   - Improved median render time to ~33.513s (baseline ~42.161s on unoptimized run, significant reduction in CPU contention). Kept.
+
+- **PERF-439**: Replace Promise.all with countdown in SeekTimeDriver
+  - **What I tried**: Attempted to eliminate the `Promise.all(cachedPromises)` allocation overhead in `window.__helios_seek` by manually counting down resolved promises.
+  - **WHY it didn't work**: The performance difference was negligible or worse (median ~32.651s vs baseline ~32.462s). Tracking asynchronous state with manual countdown logic and inline closures actually slightly adds to the overhead compared to letting V8's highly optimized `Promise.all` implementation handle the small array of native promises. Discarded to maintain code simplicity and performance.
+  - **Outcome**: discard
