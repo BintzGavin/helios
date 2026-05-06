@@ -41,7 +41,10 @@ Last updated by: PERF-432
 - **PERF-337**: Prebound `frameWaiterResolve` executor into `frameWaiterExecutor` to avoid dynamic inline closure allocations during the CaptureLoop actor pipeline backpressure events. This adheres to the "simplicity and GC reduction" principle that guided keeping `writerWaiterExecutor`. Render time: 46.464s (Baseline: 57.022s), though baseline was inflated by initial run. Median render times of subsequent runs were around 46.6s, slightly better than PERF-336's ~47.4s. Kept to reduce V8 GC churn in the main event loop.
 
 ## What Doesn't Work (and Why)
-
+- **PERF-440**: Inline beginFrame parameter allocation in DomStrategy.
+  - **What I tried**: Attempted to inline the object allocation `{ screenshot, interval, frameTimeTicks }` in the `capture` method instead of mutating a preallocated object.
+  - **WHY it didn't work**: The performance improvement was negligible (median ~32.621s vs baseline ~32.776s). While inlining avoids mutating object properties in the hot loop, V8 is already highly optimized for hidden class mutations. The overhead of instantiating new objects for GC slightly outweighs or equals the cost of write-barriers for mutated properties. Reverted to maintain parity and reduce GC churn.
+  - **Outcome**: discard
 - **PERF-438**: Eliminate try/catch in CdpTimeDriver stability check
   - **What I tried**: Attempted to replace the `try/catch/finally` around `await Promise.race` inside `runSetTime` with native promise chaining (`.then()`, `.catch()`, `.finally()`).
   - **WHY it didn't work**: The performance was essentially identical to the baseline (~32.530s vs ~32.530s). V8 is already optimizing the async/await and exception handling in the hot loop very efficiently, and the overhead introduced by `try/catch` is negligible here. Thus, the added class methods and manual chaining didn't yield any measurable improvement.
@@ -245,7 +248,6 @@ Last updated by: PERF-432
   - **WHY it didn't work**: Impossible/Obsolete (IMPOSSIBLE: DUPLICATION). The structural change was already implemented in a previous commit and is present in the codebase. Documented duplication and stopped work.
 
 ## What Doesn't Work (and Why)
-
 - **PERF-372**: Restore TimeDriver Promise
   - **WHY it didn't work**: Impossible/Obsolete (IMPOSSIBLE: DUPLICATION). The structural change was already implemented in a previous commit and is present in the codebase. Documented duplication and stopped work.
   - **Outcome**: discard

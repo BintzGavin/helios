@@ -1,11 +1,11 @@
 ---
 id: PERF-440
 slug: inline-begin-frame-params
-status: unclaimed
-claimed_by: ""
+status: claimed
+claimed_by: "jules"
 created: 2024-05-28
-completed: ""
-result: ""
+completed: "2026-05-06"
+result: "failed"
 ---
 
 # PERF-440: Inline beginFrame parameter allocation in DomStrategy
