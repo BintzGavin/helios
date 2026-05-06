@@ -1,5 +1,7 @@
 # Status: LLMS
-**Version**: 1.81.0
+**Version**: 1.81.1
+
+[v1.81.1] ✅ Completed: Comprehensive Daily Review - Updated Roadmap in llms.txt with recent verifiable completions from domain PROGRESS logs (Studio: Update Keyboard Shortcuts Documentation, Timeline Drag & Drop; CLI: Scaffold Cloudflare Sandbox Deployment, All Worker Execution; Core: Generic Input Props; Player: Implement WebVTT Support; Renderer: Fix GSAP Timeline Synchronization; Infrastructure: Optimize GCS Uploads). Verified all package versions match package.json.
 
 [v1.80.0] ✅ Completed: Comprehensive Daily Review - Updated Roadmap in llms.txt with recent completions from domain PROGRESS logs (Studio: Schema Validation, Asset Move, WebCodecs Preference, Enhance MCP Server; CLI: Realtime Log Streaming, Enhance Worker Job Cancellation; Infrastructure: FfmpegStitcher Coverage, Orchestrator Coverage Expansion, FileJobRepository Spec). Verified all package versions match package.json (Core v5.13.0+, Studio v0.107.1+, Player v0.76.20+, Renderer v1.78.3+, CLI v0.45.2+, Infrastructure v0.25.0+). Verified File Paths and Key Files.
 

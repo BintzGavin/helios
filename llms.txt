@@ -121,12 +121,12 @@ const report = await Helios.diagnose();
 
 ## Roadmap
 ### V1.x (Active)
-- **Studio**: v0.107.1+ (CLI Build Command, Preview Command, CompositionsPanel Tests, CLI Update Command, Refine Agent Skills)
-- **CLI**: v0.45.2+ (Scaffold Cloudflare Sandbox Deployment, Build Command Regression Tests, Scaffold Cloudflare Sandbox Deployment Command)
-- **Core**: v5.13.0+ (Implement Animation Helpers, Implement Variable Playback Rate, Implement InputProps, Enable Core Testing And Robustness, Implement Helios.diagnose())
-- **Player**: v0.76.20+ (Dom Canvas Capture, Lock UI During Export, Bridge Documentation, CSS Asset Inlining, Client-Side Image Inlining)
-- **Renderer**: v1.78.3+ (CdpTimeDriver Determinism, Robust Distributed Audio Pipeline, Smart Codec Selection Update, CdpTimeDriver Iframe Sync, Smart Audio Fades)
-- **Infrastructure**: v0.25.0+ (Gravitational Equilibrium, Orchestrator Coverage Expansion, FfmpegStitcher Coverage, Optimize GCS Uploads, Optimize S3 Uploads)
+- **Studio**: v0.107.1+ (Update Keyboard Shortcuts Documentation, Timeline Drag & Drop, Asset Move, Enhance MCP Server)
+- **CLI**: v0.45.2+ (Scaffold Cloudflare Sandbox Deployment, All Worker Execution, Tier 3 Scaffold Deployment Commands, Scaffold Hetzner Deployment Command)
+- **Core**: v5.13.0+ (Generic Input Props, Implement Active Clips, Implement Composition Schema, Shared Virtual Time Binding)
+- **Player**: v0.76.20+ (Implement WebVTT Support, Document API Parity Gap, Document Undocumented Shortcuts, Bridge Coverage Expansion)
+- **Renderer**: v1.78.3+ (Fix GSAP Timeline Synchronization, Validate HW Accel, Orchestrator Plan, Refactor Media Sync Logic)
+- **Infrastructure**: v0.25.0+ (Optimize GCS Uploads, Orchestrator Test Coverage Expansion, InMemoryJobRepository Coverage, CloudRun Resiliency Tests)
 
 ### AI Integration
 - **Studio MCP Server**: Inspect, create, and render compositions via LLM tools (Done)
