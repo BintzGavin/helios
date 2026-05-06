@@ -1,7 +1,7 @@
 ---
 id: PERF-440
 slug: inline-begin-frame-params
-status: claimed
+status: complete
 claimed_by: "jules"
 created: 2024-05-28
 completed: "2026-05-06"
@@ -57,3 +57,9 @@ Ensure Canvas mode works (since it uses `CdpTimeDriver`).
 
 ## Correctness Check
 Run the DOM render benchmark script multiple times to verify median render time improvement and ensure generated `output.mp4` contains 600 correct frames.
+
+## Results Summary
+- **Best render time**: 32.662s (vs baseline 32.662s)
+- **Improvement**: 0%
+- **Kept experiments**: []
+- **Discarded experiments**: [Inline beginFrame parameter allocation]

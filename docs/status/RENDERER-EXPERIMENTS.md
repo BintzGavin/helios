@@ -41,9 +41,9 @@ Last updated by: PERF-432
 - **PERF-337**: Prebound `frameWaiterResolve` executor into `frameWaiterExecutor` to avoid dynamic inline closure allocations during the CaptureLoop actor pipeline backpressure events. This adheres to the "simplicity and GC reduction" principle that guided keeping `writerWaiterExecutor`. Render time: 46.464s (Baseline: 57.022s), though baseline was inflated by initial run. Median render times of subsequent runs were around 46.6s, slightly better than PERF-336's ~47.4s. Kept to reduce V8 GC churn in the main event loop.
 
 ## What Doesn't Work (and Why)
-- **PERF-440**: Inline beginFrame parameter allocation in DomStrategy.
-  - **What I tried**: Attempted to inline the object allocation `{ screenshot, interval, frameTimeTicks }` in the `capture` method instead of mutating a preallocated object.
-  - **WHY it didn't work**: The performance improvement was negligible (median ~32.621s vs baseline ~32.776s). While inlining avoids mutating object properties in the hot loop, V8 is already highly optimized for hidden class mutations. The overhead of instantiating new objects for GC slightly outweighs or equals the cost of write-barriers for mutated properties. Reverted to maintain parity and reduce GC churn.
+- **PERF-440**: Inline beginFrame parameter allocation in DomStrategy
+  - **What I tried**: Attempted to inline the `HeadlessExperimental.beginFrame` parameters instead of mutating `this.beginFrameParams`.
+  - **WHY it didn't work**: The performance improvement was non-existent (median ~32.68s vs baseline ~32.66s). V8 is already incredibly efficient at mutating pre-allocated object properties in a hot loop (likely due to Hidden Classes), so allocating a fresh object literally provided zero benefit and just slightly increased GC activity.
   - **Outcome**: discard
 - **PERF-438**: Eliminate try/catch in CdpTimeDriver stability check
   - **What I tried**: Attempted to replace the `try/catch/finally` around `await Promise.race` inside `runSetTime` with native promise chaining (`.then()`, `.catch()`, `.finally()`).
