@@ -7,6 +7,7 @@
 [v0.46.19] ✅ Completed: CLI Utils Regression Tests - Implemented comprehensive unit tests for ffmpeg, package-manager, and uninstall utilities in packages/cli/src/utils/.
 
 ## Recent Completions
+[v0.46.21] ✅ Completed: Registry Manifest Regression Tests Spec - Created specification plan for implementing regression tests for packages/cli/src/registry/manifest.ts to ensure structural data retrieval works as expected.
 [v0.46.18] ✅ Completed: CLI Utils Regression Tests Spec - Created specification plan for implementing regression tests for the remaining uncovered utilities in packages/cli/src/utils/ to ensure core functions are robust.
 [v0.46.16] ✅ Completed: Remaining CLI Regression Tests - Identified as duplicate plan; tests for preview, skills, and studio are already implemented.
 [v0.46.15] ✅ Completed: Document duplicated Remaining Regression Tests plan - Logged the duplicated plan as impossible.

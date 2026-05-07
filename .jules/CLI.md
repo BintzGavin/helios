@@ -173,3 +173,11 @@ Critical learnings only. This is not a log—only add entries for insights that 
 ## [0.46.18] - Identify Uncovered Util Files
 **Learning:** The CLI status file indicates that we need to find remaining work when no active delta exists, utilizing the "NOTHING TO DO PROTOCOL". While `cli/src/commands/` test files are extensively covered, the `cli/src/utils/` directory lacks tests for core logic (`ffmpeg.ts`, `package-manager.ts`, `uninstall.ts`).
 **Action:** When a domain is marked stable, prioritize filling testing gaps in utility files to ensure robustness of CLI components. Created a plan to implement these utility regression tests.
+
+## [0.46.19] - Identify Uncovered Util Files (Duplication)
+**Learning:** The fallback action from [0.46.18] to write regression tests for `cli/src/utils/` (`ffmpeg.ts`, `package-manager.ts`, `uninstall.ts`) was an IMPOSSIBLE: DUPLICATION. Tests for all these utility files are already fully implemented in `packages/cli/src/utils/__tests__/` and are passing.
+**Action:** When a domain is marked stable and falling back to tests, always exhaustively verify if the tests exist in the target directory (e.g. `src/utils/__tests__/`) before declaring a gap.
+
+## [0.46.20] - Identify Uncovered Registry Files
+**Learning:** The fallback action from [0.46.18] for utility files was impossible due to duplication. Searching for uncovered areas in a stable domain requires thoroughly checking tests against source files. `packages/cli/src/registry/manifest.ts` currently lacks test coverage while being a core piece of the fallback registry.
+**Action:** When falling back to regression testing under the NOTHING TO DO PROTOCOL, target non-obvious core files (like manifest singletons) that handle fallback or structural data when command and utility coverage is 100%.
