@@ -148,6 +148,8 @@ The `<helios-player>` element implements a subset of the HTMLMediaElement interf
 ### Properties
 
 - `textTracks` (TextTrackList, read-only): The text tracks associated with the media element.
+- `audioTracks` (AudioTrackList, read-only): The audio tracks associated with the media element.
+- `videoTracks` (VideoTrackList, read-only): The video tracks associated with the media element.
 - `currentTime` (number): Current playback position in seconds.
 - `duration` (number, read-only): Total duration in seconds.
 - `paused` (boolean, read-only): Whether playback is paused.
