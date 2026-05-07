@@ -7,7 +7,6 @@ Last updated by: PERF-432
   - **What I did**: Returned the Promise chain directly using `.then()` with prebound success and error handlers, avoiding the async state machine overhead.
   - **Improvement**: Minor improvement, returning the V8 promise chain natively removes an intermediate async suspension point and reduces event loop overhead. Improved render time to ~32.776s.
 
-
 - **PERF-405**: Eliminated `EventEmitter.once` churn in `CdpTimeDriver.ts`. Moving to a static `.on` listener removes closure and array mutation in the virtual time hot loop, reducing V8 GC pressure. Render time: 34.041s.
 
 - **PERF-403**: Preallocated the `multiFrameEvaluateParams` array in `SeekTimeDriver.ts` multi-frame hot path. By allocating parameter objects for each execution context once and mutating the `expression` property, it reduces V8 dynamic object allocation and garbage collection pressure in the `setTime()` loop without encountering the race conditions of a single shared object literal. Render time improved to 44.500s.
@@ -32,7 +31,6 @@ Last updated by: PERF-432
 
 - Inlined object allocation for `HeadlessExperimental.beginFrame` and `Runtime.evaluate` instead of mutating cached objects. Median render time improved slightly due to Turbofan JIT optimizations for inline object allocation and lack of GC write barrier overhead on cached old-space objects (~46.298s vs baseline ~50s). (PERF-348)
 
-
 ## PERF-346: Restore `png` as Default Intermediate Image Format
 - Render time: 46.149s (Baseline: 47.024s)
 - Status: keep
@@ -41,10 +39,13 @@ Last updated by: PERF-432
 - **PERF-337**: Prebound `frameWaiterResolve` executor into `frameWaiterExecutor` to avoid dynamic inline closure allocations during the CaptureLoop actor pipeline backpressure events. This adheres to the "simplicity and GC reduction" principle that guided keeping `writerWaiterExecutor`. Render time: 46.464s (Baseline: 57.022s), though baseline was inflated by initial run. Median render times of subsequent runs were around 46.6s, slightly better than PERF-336's ~47.4s. Kept to reduce V8 GC churn in the main event loop.
 
 ## What Doesn't Work (and Why)
-- **PERF-443**: Use WebP at quality 50 as default intermediate format for all non-alpha frames. Although it provides a ~25% speedup over PNG, `image2pipe` correctly parses PNGs but using `webp_pipe` for non-alpha causes FFmpeg (version N-47683) to crash with "Could not find codec parameters for stream 0 (Video: webp, none): unspecified size". The `webp_pipe` demuxer in this older FFmpeg build fails to infer frame size when frames arrive strictly one by one without a container header, whereas `image2pipe` handles raw PNG frames flawlessly.
-- **PERF-441**: Changed default format to webp quality 50.
-  - **WHY it didn't work**: FFmpeg process crashed with `Could not find codec parameters for stream 0 (Video: webp, none): unspecified size` and `Cannot determine format of input stream 0:0 after EOF`. The `webp_pipe` demuxer in FFmpeg struggles to determine the resolution automatically from the incoming stream over a pipe compared to `image2pipe` with PNG.
+- **PERF-441**: Changed default intermediate format to webp with quality 50.
+  - **What I tried**: Modified `DomStrategy.ts` to use `webp` and `quality: 50` by default.
+  - **WHY it didn't work**: The `webp` format when sent through FFmpeg `webp_pipe` without an alpha channel crashes with `pipe:: Invalid argument`. This suggests `webp_pipe` requires specific conditions or is unsupported for non-alpha streams in this specific FFmpeg build/configuration.
   - **Outcome**: discard
+
+- **PERF-443**: Use WebP at quality 50 as default intermediate format for all non-alpha frames. Although it provides a ~25% speedup over PNG, `image2pipe` correctly parses PNGs but using `webp_pipe` for non-alpha causes FFmpeg (version N-47683) to crash with "Could not find codec parameters for stream 0 (Video: webp, none): unspecified size". The `webp_pipe` demuxer in this older FFmpeg build fails to infer frame size when frames arrive strictly one by one without a container header, whereas `image2pipe` handles raw PNG frames flawlessly.
+
 - **PERF-442**: Replace Runtime.evaluate with Runtime.callFunctionOn
   - **What I tried**: Used `Runtime.callFunctionOn` instead of `Runtime.evaluate` to avoid V8 parsing overhead for dynamic JS strings in `SeekTimeDriver.ts`.
   - **WHY it didn't work**: The performance improvement was negligible (median ~32.51s vs baseline ~32.45s). V8 is already incredibly efficient at parsing simple JS strings, and the added overhead of `Runtime.enable` to track execution context IDs negates any small parsing optimization.
@@ -102,11 +103,9 @@ Last updated by: PERF-432
 - **PERF-359**: Replaced `multiFrameEvaluateParams` array with inline object allocation in `SeekTimeDriver.ts` and `CdpTimeDriver.ts` for the multi-frame hot loops.
   - **WHY it didn't work**: The performance gain was negligible for multi-frame rendering with iframes (median ~48.630s vs baseline ~48.668s, well within the noise margin). Since most compositions don't use multi-frames, and V8's GC handles this small array efficiently enough, the change didn't yield a measurable render time improvement and it's simpler to keep the existing cached array. Discarded to maintain current code state.
 
-
 - **PERF-357: Eliminate setTimeout in injected seek script**
   - **What I tried:** Attempted to remove `setTimeout` and custom `Promise.race` inside `SeekTimeDriver` injected `window.__helios_seek` function, and rely completely on Playwright's CDP `Runtime.evaluate` timeout (`awaitPromise: true`, `timeout: this.timeout`).
   - **Why it didn't work:** Experiment median (~48.6s, excluding an extreme outlier) regressed slightly against baseline (~47.8s median in my tests), and `Runtime.evaluate` timeout caused CDP stability issues with some runs resulting in higher variance. The overhead of setting `setTimeout` inside Chrome's V8 is actually very optimized, while mutating CDP parameters adds slight overhead. Discarded as inconclusive/slower.
-
 
 - **PERF-358: Replace `Runtime.evaluate` with `Runtime.callFunctionOn` in SeekTimeDriver**
   - **What I tried:** Replacing dynamic string generation (`window.__helios_seek(${time})`) sent via `Runtime.evaluate` with a cached function declaration and mutated `arguments` array via `Runtime.callFunctionOn` on every single frame.
@@ -128,7 +127,6 @@ Last updated by: PERF-432
 
 - PERF-344: Eliminate Promise.race Array Allocation in SeekTimeDriver. Attempted to eliminate Promise.race array and closure allocations inside the `window.__helios_seek` script. The performance gains were negligible (~47.18s vs ~47.00s baseline, within noise margin). V8 optimizes these short-lived closures and arrays efficiently in the renderer process, so manual Promise resolution isn't worth the logic complexity.
 
-
 ## PERF-339: Prebind CaptureLoop Waiter Executors
 - Render time: 47.362s (Baseline: ~47.5s)
 - Status: discard
@@ -138,8 +136,6 @@ Last updated by: PERF-432
 - Render time: 47.419s (Baseline: 46.581s)
 - Status: inconclusive
 - **PERF-336**: Prebound the `frameWaiterResolve` executor into `frameWaiterExecutor` to avoid dynamic inline closure allocations during the CaptureLoop actor pipeline backpressure events. The goal was to reduce V8 GC churn in the main event loop. The median render time drifted slightly higher (~47.4s vs ~46.5s baseline). As this fluctuation is within the environmental noise margin (<5%), explicit caching does not provide a definitive, clear-cut performance gain in this instance, likely because the backpressure loop does not trigger frequently enough compared to per-frame hot loop operations. The structural change was reverted to avoid unnecessary caching state complexity.
-
-
 
 ## PERF-312: Avoid Promise.all() Allocation Overhead in SeekTimeDriver
 - Render time: 32.193s (Baseline: ~32.112s)
@@ -154,7 +150,6 @@ Last updated by: PERF-432
   - **WHY it didn't work**: The render time actually regressed slightly (~48.556s vs ~47.554s). Avoiding dynamic allocation of empty arrow functions inside the hot loop added minor overhead or disrupted V8 optimizations compared to leaving it inline. Discarded as slower.
 - Tried to optimize branch prediction in `DomStrategy.capture` by assigning the method dynamically in `prepare()` (polymorphic capture) using arrow functions to prevent branch evaluation overhead on every frame. (PERF-310)
   - **WHY it didn't work**: The variance was within the noise margin (<0.5%). Branch prediction for `if (this.targetElementHandle)` on every frame is fast enough that modifying it via polymorphic assignments provides no measurable benefit and only complicates the class structure.
-
 
 - **PERF-302**: Attempted to preallocate the `Runtime.evaluate` parameter object in `CdpTimeDriver.ts` (`setTime` single-frame path) to avoid dynamic object allocation (`{ expression: ... }`). Yielded median time 48.866s (baseline was ~48.3s). Discarded because V8 efficiently optimizes inline object allocation here, and storing it statically did not provide any gain and slightly degraded performance.
 - **Bypass Playwright Overhead with Raw CDP Capture (PERF-002)**
