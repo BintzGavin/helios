@@ -46,3 +46,4 @@ PERF-408	49.135	600	12.21	43.1	keep	Cache Media Elements in CdpTimeDriver to avo
 3	32.530	90	2.77	37.7	discard	PERF-438 eliminate try/catch in CdpTimeDriver stability check
 1	32.662	90	2.76	38.7	keep	PERF-440 baseline (median of 32.662, 32.649, 33.560)
 2	32.680	90	2.75	37.8	discard	PERF-440 inline beginFrame allocation
+1	0.000	0	0.00	0.0	crash	PERF-445: WebP intermediate format with image2pipe
