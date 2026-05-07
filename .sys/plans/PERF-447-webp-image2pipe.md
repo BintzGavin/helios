@@ -1,7 +1,7 @@
 ---
 id: PERF-447
 slug: webp-image2pipe
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-05-24
 completed: ""
@@ -83,3 +83,10 @@ Run the DOM render benchmark script (`npm run build:examples && npm run build -w
 
 ## Prior Art
 - PERF-441, PERF-445: Both crashed because they tried using `webp_pipe`. This plan specifically fixes the FFmpeg demuxer configuration to use `image2pipe` with `-vcodec webp`.
+
+## Results Summary
+
+```
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	0.000	0	0.00	0.0	crash	Use WebP with image2pipe and -vcodec webp
+```
