@@ -42,3 +42,6 @@
 ## 0.77.29 - IMPOSSIBLE DUPLICATION Plan
 **Learning:** Found a plan `2026-03-01-PLAYER-Click-To-Play.md` that requested implementing a `.click-layer` with `pointer-events: none` and click events. However, this feature was already completely implemented in the source code.
 **Action:** When picking up plans, strictly verify their requested changes against the current state of the codebase. Do not blindly overwrite or duplicate existing features if they are already present. If found to be a duplication, document it as impossible and close it.
+## v0.77.30 - Updating README for missing properties and events
+**Learning:** Properties like `audioTracks` and `videoTracks`, and events like `enterpictureinpicture` and `leavepictureinpicture` were implemented but missed in the documentation. `setPlaybackRange` and `clearPlaybackRange` exist on the `HeliosController` and not the Web Component directly.
+**Action:** Created a plan to document the missing properties and events on the Web Component, ensuring exact matches between the API capabilities and documentation.
