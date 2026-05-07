@@ -1,7 +1,7 @@
 ---
 id: PERF-217
 slug: disable-font-subpixel-positioning
-status: claimed
+status: complete
 claimed_by: "executor-session"
 created: 2024-06-03
 completed: 2024-06-03
@@ -41,7 +41,7 @@ Run `npx tsx packages/renderer/tests/verify-canvas-strategy.ts`.
 ## Correctness Check
 Run the DOM render tests to ensure no visual regressions break tests.
 ## Results Summary
-- **Best render time**: 43.842s (vs baseline ~32.6s)
+- **Best render time**: 32.733s (vs baseline ~32.6s)
 - **Improvement**: Regressed
 - **Kept experiments**: None
 - **Discarded experiments**: Adding `--disable-font-subpixel-positioning` to BrowserPool.ts

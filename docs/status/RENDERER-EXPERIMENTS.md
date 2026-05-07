@@ -286,3 +286,8 @@ Last updated by: PERF-432
   - **What I tried**: Attempted to eliminate the `Promise.all(cachedPromises)` allocation overhead in `window.__helios_seek` by manually counting down resolved promises.
   - **WHY it didn't work**: The performance difference was negligible or worse (median ~32.651s vs baseline ~32.462s). Tracking asynchronous state with manual countdown logic and inline closures actually slightly adds to the overhead compared to letting V8's highly optimized `Promise.all` implementation handle the small array of native promises. Discarded to maintain code simplicity and performance.
   - **Outcome**: discard
+
+- **PERF-217**: Disable Font Subpixel Positioning in Chromium
+  - **What I tried**: Attempted to disable font subpixel positioning by passing `--disable-font-subpixel-positioning` as a default browser argument in `BrowserPool.ts`.
+  - **WHY it didn't work**: The performance improvement was negligible or worse (median ~32.733s vs baseline ~32.6s). This indicates that the CPU overhead for font subpixel rendering is minimal within our headless test cases, and disabling it does not yield a measurable improvement in the context of the larger DOM rendering pipeline.
+  - **Outcome**: discard
