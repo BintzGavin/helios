@@ -1,6 +1,6 @@
 # Context: PLAYER
 
-**Version**: 0.77.27
+**Version**: 0.77.30
 
 ## Section A: Component Structure
 
@@ -128,6 +128,10 @@
 - `requestPictureInPicture(): Promise<PictureInPictureWindow>`
 - `startAudioMetering(): void`
 - `stopAudioMetering(): void`
+
+- `textTracks`: TextTrackList
+- `audioTracks`: HeliosAudioTrackList
+- `videoTracks`: HeliosVideoTrackList
 
 ## Track Lists
 - `HeliosAudioTrackList`: Implements standard HTMLMediaElement event handler properties (`onaddtrack`, `onremovetrack`, `onchange`).
