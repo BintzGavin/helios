@@ -225,3 +225,4 @@
 [v0.77.25] ✅ Completed: Discovered broken test due to missing vitest environment pragma. Created plan .sys/plans/2026-12-29-PLAYER-Fix-Export-Options-Test.md to fix test configuration.
 [v0.77.28] ✅ Completed: Fix Export Options Test - Deleted obsolete plan file as export-options.test.ts is already configured and passing.
 [v0.77.29] ✅ Completed: Discovered that `2026-03-01-PLAYER-Click-To-Play.md` is an IMPOSSIBLE: DUPLICATION plan. The `.click-layer` and `interactive` attributes are already fully implemented. Documented as impossible and discarded.
+[v0.77.30] ✅ Completed: Discovered undocumented API properties and events in README.md. Created plan `.sys/plans/2026-12-30-PLAYER-README-API-Update.md` to document `audioTracks`, `videoTracks`, `enterpictureinpicture`, and `leavepictureinpicture`.
