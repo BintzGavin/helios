@@ -41,6 +41,11 @@ Last updated by: PERF-432
 - **PERF-337**: Prebound `frameWaiterResolve` executor into `frameWaiterExecutor` to avoid dynamic inline closure allocations during the CaptureLoop actor pipeline backpressure events. This adheres to the "simplicity and GC reduction" principle that guided keeping `writerWaiterExecutor`. Render time: 46.464s (Baseline: 57.022s), though baseline was inflated by initial run. Median render times of subsequent runs were around 46.6s, slightly better than PERF-336's ~47.4s. Kept to reduce V8 GC churn in the main event loop.
 
 ## What Doesn't Work (and Why)
+- **PERF-442**: Replace Runtime.evaluate with Runtime.callFunctionOn
+  - **What I tried**: Used `Runtime.callFunctionOn` instead of `Runtime.evaluate` to avoid V8 parsing overhead for dynamic JS strings in `SeekTimeDriver.ts`.
+  - **WHY it didn't work**: The performance improvement was negligible (median ~32.51s vs baseline ~32.45s). V8 is already incredibly efficient at parsing simple JS strings, and the added overhead of `Runtime.enable` to track execution context IDs negates any small parsing optimization.
+  - **Outcome**: discard
+
 - **PERF-440**: Inline beginFrame parameter allocation in DomStrategy
   - **What I tried**: Attempted to inline the `HeadlessExperimental.beginFrame` parameters instead of mutating `this.beginFrameParams`.
   - **WHY it didn't work**: The performance improvement was non-existent (median ~32.68s vs baseline ~32.66s). V8 is already incredibly efficient at mutating pre-allocated object properties in a hot loop (likely due to Hidden Classes), so allocating a fresh object literally provided zero benefit and just slightly increased GC activity.
