@@ -291,3 +291,8 @@ Last updated by: PERF-432
   - **What I tried**: Attempted to disable font subpixel positioning by passing `--disable-font-subpixel-positioning` as a default browser argument in `BrowserPool.ts`.
   - **WHY it didn't work**: The performance improvement was negligible or worse (median ~32.733s vs baseline ~32.6s). This indicates that the CPU overhead for font subpixel rendering is minimal within our headless test cases, and disabling it does not yield a measurable improvement in the context of the larger DOM rendering pipeline.
   - **Outcome**: discard
+
+- **PERF-447**: Use WebP with image2pipe and `-vcodec webp`.
+  - **What I tried**: Attempted to use the `image2pipe` input format for WebP frames, combined with the `-vcodec webp` flag, instead of using `webp_pipe`.
+  - **WHY it didn't work**: The same crash occurred as with `webp_pipe`: `Could not find codec parameters for stream 0 (Video: webp, none): unspecified size` followed by `pipe:: Invalid argument`. This confirms that even when explicitly telling `image2pipe` to expect a `webp` video codec, the static FFmpeg build provided (N-47683) fails to infer WebP frame parameters or container metadata from a raw pipe of single images. The PNG pipeline handles this natively but WebP does not in this version of FFmpeg without a container format.
+  - **Outcome**: discard
