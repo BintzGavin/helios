@@ -1,11 +1,11 @@
 ---
 id: PERF-441
 slug: webp-intermediate-format
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2025-05-24
-completed: ""
-result: ""
+completed: "2025-05-24"
+result: "discarded"
 ---
 
 # PERF-441: Use WebP with Low Quality for All Intermediate Formats
@@ -52,3 +52,8 @@ Run the `scripts/benchmark-test.js` script to ensure FFmpeg correctly handles `w
 
 ## Prior Art
 - PERF-346: Found JPEG slower than PNG, but WebP wasn't evaluated as a global default.
+## Results Summary
+- **Best render time**: 0.000s
+- **Improvement**: Crash
+- **Kept experiments**: None
+- **Discarded experiments**: Use WebP with Low Quality for All Intermediate Formats
