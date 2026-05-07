@@ -1,11 +1,11 @@
 ---
 id: PERF-445
 slug: webp-intermediate-format
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2025-05-24
 completed: ""
-result: ""
+result: crash
 ---
 
 # PERF-445: Use WebP with Low Quality for All Intermediate Formats
@@ -55,3 +55,9 @@ None.
 
 ## Test Plan
 - Run `npm run build:examples && npm run build -w packages/renderer && cd packages/renderer && npx tsx scripts/benchmark-test.js` to verify FFmpeg handles the stream and performance is benchmarked.
+
+## Results Summary
+- **Best render time**: 0.000s (vs baseline 32.776s)
+- **Improvement**: Crash
+- **Kept experiments**: []
+- **Discarded experiments**: [PERF-445]
