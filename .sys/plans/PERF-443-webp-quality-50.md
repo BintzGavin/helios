@@ -1,11 +1,11 @@
 ---
 id: PERF-443
 slug: webp-quality-50
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2025-05-24
-completed: ""
-result: ""
+completed: "2025-05-24"
+result: "failed"
 ---
 
 # PERF-443: Use WebP with Low Quality for All Intermediate Formats
@@ -49,3 +49,9 @@ In `prepare()`, change the default `format` assignment to always use `webp` with
 
 ## Correctness Check
 Run `npm run build:examples && npm run build -w packages/renderer && cd packages/renderer && npx tsx scripts/benchmark-test.js` to ensure the strategy correctly pipes WebP frames to FFmpeg without crashing.
+
+## Results Summary
+- **Best render time**: 32.622s (vs baseline 43.633s)
+- **Improvement**: ~25%
+- **Kept experiments**: None
+- **Discarded experiments**: Use WebP at quality 50 as default format for all intermediate captures.
