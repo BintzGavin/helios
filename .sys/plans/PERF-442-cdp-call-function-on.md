@@ -1,7 +1,7 @@
 ---
 id: PERF-442
 slug: cdp-call-function-on
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2025-05-24
 completed: ""
@@ -106,3 +106,14 @@ Run the standard tests to verify the canvas path isn't broken.
 
 ## Correctness Check
 Run the `scripts/benchmark-test.js` script to ensure seeking still functions correctly.
+
+## Results Summary
+| run | render_time_s | frames | fps_effective | peak_mem_mb | status | description |
+|---|---|---|---|---|---|---|
+| 1 | 32.596 | 90 | 2.76 | 37.8 | discard | cdp call function on instead of evaluate |
+| 2 | 32.515 | 90 | 2.77 | 37.8 | discard | cdp call function on instead of evaluate |
+| 3 | 32.339 | 90 | 2.78 | 38.4 | discard | cdp call function on instead of evaluate |
+| 4 | 32.312 | 90 | 2.79 | 38.7 | discard | cdp call function on instead of evaluate |
+| 5 | 32.666 | 90 | 2.76 | 37.6 | discard | cdp call function on instead of evaluate |
+
+**Outcome**: DISCARDED. Median render time was 32.515s, which is slower than the baseline ~32.45s. V8 is already incredibly efficient at parsing simple JS strings, and the added overhead of `Runtime.enable` to track execution context IDs negates any small parsing optimization.
