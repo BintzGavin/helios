@@ -1,7 +1,8 @@
 # CLI Status
 
-**Version**: 0.46.20
+**Version**: 0.46.21
 
+[v0.46.21] ✅ Completed: Document duplicated Cloudflare Sandbox Execution plan - Logged the duplicated plan as impossible.
 [v0.46.20] ✅ Completed: Document duplicated CLI Utils Regression Tests plan - Logged the duplicated plan as impossible.
 
 [v0.46.19] ✅ Completed: CLI Utils Regression Tests - Implemented comprehensive unit tests for ffmpeg, package-manager, and uninstall utilities in packages/cli/src/utils/.

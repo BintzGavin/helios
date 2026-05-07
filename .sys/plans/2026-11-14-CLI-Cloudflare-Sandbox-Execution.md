@@ -44,3 +44,7 @@
 - **Verification**: Run `npx tsx packages/cli/src/index.ts job run my-job.json --adapter cloudflare-sandbox --cloudflare-account-id dummy --cloudflare-api-token dummy --cloudflare-namespace dummy` and verify it attempts to instantiate the adapter rather than falling back to `LocalWorkerAdapter` or throwing an unknown adapter error.
 - **Success Criteria**: The CLI correctly parses the arguments and initializes the `CloudflareSandboxAdapter`.
 - **Edge Cases**: Missing required options should throw a clear validation error.
+
+## Result
+
+IMPOSSIBLE: DUPLICATION. The Cloudflare Sandbox Adapter is already fully exposed in the `helios job run` command in `packages/cli/src/commands/job.ts`. The plan is therefore marked as complete/failed and discarded without code changes.
