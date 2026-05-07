@@ -41,6 +41,7 @@ Last updated by: PERF-432
 - **PERF-337**: Prebound `frameWaiterResolve` executor into `frameWaiterExecutor` to avoid dynamic inline closure allocations during the CaptureLoop actor pipeline backpressure events. This adheres to the "simplicity and GC reduction" principle that guided keeping `writerWaiterExecutor`. Render time: 46.464s (Baseline: 57.022s), though baseline was inflated by initial run. Median render times of subsequent runs were around 46.6s, slightly better than PERF-336's ~47.4s. Kept to reduce V8 GC churn in the main event loop.
 
 ## What Doesn't Work (and Why)
+- **PERF-443**: Use WebP at quality 50 as default intermediate format for all non-alpha frames. Although it provides a ~25% speedup over PNG, `image2pipe` correctly parses PNGs but using `webp_pipe` for non-alpha causes FFmpeg (version N-47683) to crash with "Could not find codec parameters for stream 0 (Video: webp, none): unspecified size". The `webp_pipe` demuxer in this older FFmpeg build fails to infer frame size when frames arrive strictly one by one without a container header, whereas `image2pipe` handles raw PNG frames flawlessly.
 - **PERF-441**: Changed default format to webp quality 50.
   - **WHY it didn't work**: FFmpeg process crashed with `Could not find codec parameters for stream 0 (Video: webp, none): unspecified size` and `Cannot determine format of input stream 0:0 after EOF`. The `webp_pipe` demuxer in FFmpeg struggles to determine the resolution automatically from the incoming stream over a pipe compared to `image2pipe` with PNG.
   - **Outcome**: discard
