@@ -1,11 +1,11 @@
 ---
 id: PERF-448
 slug: cdptimedriver-skip-media-sync
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2026-05-06
 completed: ""
-result: ""
+result: "discarded"
 ---
 
 # PERF-448: Skip Media Sync CDP Call in CdpTimeDriver When No Media Exists
@@ -107,3 +107,10 @@ Run the `npm run test` suite for the renderer.
 
 ## Prior Art
 PERF-408: "Cache Media Elements in CdpTimeDriver to avoid per-frame DOM scans." (We are building upon this by extending the cache logic to the Node.js process).
+
+
+## Results Summary
+- **Best render time**: 32.638s (vs baseline ~32.474s)
+- **Improvement**: -0.5% (Regression)
+- **Kept experiments**: []
+- **Discarded experiments**: [PERF-448: Skip Media Sync CDP Call in CdpTimeDriver When No Media Exists]
