@@ -1,2 +1,4 @@
 run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
-1	43.842	150	3.42	39.6	discard	disable-font-subpixel-positioning
+1	32.683	90	2.75	37.8	keep	baseline
+2	32.955	90	2.73	38.6	discard	--disable-font-subpixel-positioning
+3	32.733	90	2.75	38.7	discard	--disable-font-subpixel-positioning
