@@ -142,3 +142,4 @@ This backlog tracks concrete deliverables derived from [`AGENTS.md`](../AGENTS.m
 - [x] [v0.46.14] CLI Blocked: Waiting for a new, valid plan in /.sys/plans/
 - [x] STUDIO: 2026-11-14-STUDIO-Update-Keyboard-Shortcuts-Documentation is structurally obsolete.
 - [x] [v0.46.20] CLI Blocked: Waiting for a new, valid plan in /.sys/plans/
+- [ ] [v0.46.21] CLI Unblocked: Generated plan /.sys/plans/2027-06-05-CLI-Registry-Manifest-Regression-Tests.md
