@@ -330,3 +330,6 @@ This file tracks progress for the CLI domain (`packages/cli`).
 
 ### CLI v0.46.19
 - ✅ Completed: CLI Utils Regression Tests - Implemented comprehensive unit tests for ffmpeg, package-manager, and uninstall utilities in packages/cli/src/utils/.
+
+### CLI v0.46.22
+- ✅ Completed: Registry Manifest Regression Tests - Implemented unit tests for packages/cli/src/registry/manifest.ts
