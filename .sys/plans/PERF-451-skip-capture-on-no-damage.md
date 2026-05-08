@@ -1,8 +1,8 @@
 ---
 id: PERF-451
 slug: skip-capture-on-no-damage
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "jules"
 created: 2024-05-30
 completed: ""
 result: ""
@@ -50,3 +50,7 @@ Run `npm run build:examples && npm run build -w packages/renderer && cd packages
 
 ## Correctness Check
 Render `output/example-build/examples/dom-benchmark/composition.html` and visually inspect the output MP4. Ensure animations do not freeze.
+
+## Results Summary
+- Status: discarded
+- Reason: Chromium's `HeadlessExperimental.beginFrame` always returns `hasDamage: true` if the `screenshot` parameter is included in the request, even for static scenes. It is impossible to both request a screenshot and accurately detect lack of damage in the same CDP call.
