@@ -1,7 +1,8 @@
 # CLI Status
 
-**Version**: 0.46.21
+**Version**: 0.46.22
 
+[v0.46.22] ✅ Completed: Registry Manifest Regression Tests - Implemented unit tests for packages/cli/src/registry/manifest.ts
 [v0.46.21] ✅ Completed: Document duplicated Cloudflare Sandbox Execution plan - Logged the duplicated plan as impossible.
 [v0.46.20] ✅ Completed: Document duplicated CLI Utils Regression Tests plan - Logged the duplicated plan as impossible.
 

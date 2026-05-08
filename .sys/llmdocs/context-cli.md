@@ -43,6 +43,11 @@ packages/cli/
 │   │   ├── studio.ts
 │   │   └── update.ts
 │   ├── registry/
+│   │   ├── __tests__/
+│   │   │   ├── client.test.ts
+│   │   │   └── manifest.test.ts
+│   │   ├── manifest.ts
+│   │   ├── types.ts
 │   │   └── client.ts
 │   ├── utils/
 │   │   ├── __tests__/
