@@ -6,7 +6,6 @@ import { CanvasStrategy } from '../strategies/CanvasStrategy.js';
 import { DomStrategy } from '../strategies/DomStrategy.js';
 import { TimeDriver } from '../drivers/TimeDriver.js';
 import { CdpTimeDriver } from '../drivers/CdpTimeDriver.js';
-import { SeekTimeDriver } from '../drivers/SeekTimeDriver.js';
 import { RendererOptions, RenderJobOptions } from '../types.js';
 
 const DEFAULT_BROWSER_ARGS = [
@@ -122,7 +121,7 @@ export class BrowserPool {
     const createPage = async (index: number): Promise<WorkerInfo> => {
       const page = await sharedContext.newPage();
       const strategy = this.options.mode === 'dom' ? new DomStrategy(this.options) : new CanvasStrategy(this.options);
-      const timeDriver = this.options.mode === 'dom' ? new SeekTimeDriver(this.options.stabilityTimeout) : new CdpTimeDriver(this.options.stabilityTimeout);
+      const timeDriver = new CdpTimeDriver(this.options.stabilityTimeout);
 
       page.on('console', (msg: ConsoleMessage) => console.log(`PAGE LOG [${index}]: ${msg.text()}`));
       page.on('pageerror', (err: Error) => {

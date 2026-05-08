@@ -1,11 +1,11 @@
 ---
 id: PERF-451
 slug: swap-seek-for-cdp-driver
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "jules"
 created: 2026-05-08
-completed: ""
-result: ""
+completed: "2026-05-08"
+result: "keep"
 ---
 
 # PERF-451: Swap SeekTimeDriver for CdpTimeDriver in DOM Mode
@@ -47,3 +47,10 @@ Run the test suite to ensure DOM animations are still deterministically captured
 
 ## Prior Art
 Previous evaluations indicated significant promise with native virtual time policies over manual JS traversal.
+
+## Results Summary
+```
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	3.811	150	39.36	4.3	keep	cdptime driver instead of seektime driver
+2	3.735	150	40.16	4.4	keep	cdptime driver instead of seektime driver
+3	3.728	150	40.23	4.4	keep	cdptime driver instead of seektime driver```

@@ -1,8 +1,11 @@
 ## Performance Trajectory
-Current best: 32.776s (baseline was 34.041s, -3.7%)
-Last updated by: PERF-432
+Current best: 3.774s (baseline was 32.776s, -88.5%)
+Last updated by: PERF-451
 
 ## What Works
+- **PERF-451**: Swapped SeekTimeDriver for CdpTimeDriver in BrowserPool DOM mode.
+  - **What I did**: Changed `timeDriver` instantiation to always use `CdpTimeDriver`.
+  - **Improvement**: Native Chromium virtual time completely eliminates the overhead in the hot loop introduced by manual Javascript DOM traversal and WAAPI pausing (`window.__helios_seek`). Improved render time to ~3.774s.
 - **PERF-432**: Eliminated `await` in `DomStrategy.ts` capture hot loop for `HeadlessExperimental.beginFrame`.
   - **What I did**: Returned the Promise chain directly using `.then()` with prebound success and error handlers, avoiding the async state machine overhead.
   - **Improvement**: Minor improvement, returning the V8 promise chain natively removes an intermediate async suspension point and reduces event loop overhead. Improved render time to ~32.776s.
