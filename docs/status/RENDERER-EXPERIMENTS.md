@@ -310,3 +310,7 @@ Last updated by: PERF-432
   - **What I tried**: Attempted to optimize static scenes by checking `result.hasDamage` from `HeadlessExperimental.beginFrame` to skip processing identical frames.
   - **WHY it didn't work**: Chromium always reports `hasDamage: true` when the `screenshot` parameter is included in the `beginFrame` request. It is impossible to request a frame screenshot and simultaneously rely on `hasDamage` to detect static scenes in a single CDP call. A multi-pass approach (check damage, then request screenshot if damaged) would introduce more overhead than it saves.
   - **Outcome**: discard
+
+- **PERF-450**: Enable CdpTimeDriver for DOM Mode
+  - **What I tried**: Attempted to execute the PERF-450 plan to replace `SeekTimeDriver` with `CdpTimeDriver` for DOM rendering in `BrowserPool.ts`.
+  - **WHY it didn't work**: IMPOSSIBLE: DUPLICATION. Code inspection revealed that `BrowserPool.ts` already implements this change unconditionally (`const timeDriver = new CdpTimeDriver(this.options.stabilityTimeout);` at line 124). Documented duplication and discarded.
