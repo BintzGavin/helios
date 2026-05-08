@@ -300,3 +300,7 @@ Last updated by: PERF-432
   - **What I tried**: Added a check during `prepare()` in `CdpTimeDriver.ts` to count the number of media elements on the page. If no media elements are present (`this.hasMedia === false`), the per-frame `Runtime.evaluate` call for `__helios_sync_media` is skipped entirely to reduce IPC overhead.
   - **WHY it didn't work**: The performance improvement was slightly worse than the baseline (median ~32.638s vs baseline ~32.474s). The additional `this.hasMedia` branch check inside the hot loop (`runSetTime`), along with the async setup during `prepare()`, offsets the theoretical gains of dropping the fire-and-forget `Runtime.evaluate` call. The CDP infrastructure is already efficient at dispatching fire-and-forget evaluations with `returnByValue: false`.
   - **Outcome**: discard
+- **PERF-451**: Skip Capture on No Damage in DomStrategy
+  - **What I tried**: Attempted to optimize static scenes by checking `result.hasDamage` from `HeadlessExperimental.beginFrame` to skip processing identical frames.
+  - **WHY it didn't work**: Chromium always reports `hasDamage: true` when the `screenshot` parameter is included in the `beginFrame` request. It is impossible to request a frame screenshot and simultaneously rely on `hasDamage` to detect static scenes in a single CDP call. A multi-pass approach (check damage, then request screenshot if damaged) would introduce more overhead than it saves.
+  - **Outcome**: discard
