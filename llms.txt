@@ -89,7 +89,6 @@ Skills for AI agents are in `.agents/skills/helios-skills/skills/`:
 ## Key Files for Agents
 - `README.md` - Vision document
 - `docs/BACKLOG.md` - Feature backlog
-- `docs/PROGRESS.md` - Aggregated progress log
 - `docs/PROGRESS-*.md` - Completed work (per domain)
 - `docs/status/[ROLE].md` - Domain-specific status
 - `.sys/llmdocs/context-*.md` - Architecture summaries
@@ -113,9 +112,8 @@ const report = await Helios.diagnose();
 //   webAudio: boolean,
 //   colorGamut: 'srgb' | 'p3' | 'rec2020' | null,
 //   videoCodecs: { h264: boolean, vp8: boolean, vp9: boolean, av1: boolean },
-//   audioCodecs: { aac: boolean, mp3: boolean, opus: boolean, vorbis: boolean },
-//   videoDecoders: { h264: boolean, vp8: boolean, vp9: boolean, av1: boolean },
-//   audioDecoders: { aac: boolean, mp3: boolean, opus: boolean, vorbis: boolean }
+//   audioCodecs: { aac: boolean, opus: boolean },
+//   videoDecoders: { h264: boolean, vp8: boolean, vp9: boolean, av1: boolean }
 // }
 ```
 

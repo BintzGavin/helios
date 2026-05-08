@@ -1,3 +1,8 @@
+## LLMS v1.83.0
+- ✅ Completed: Daily llms.txt Review
+  - Fixed DiagnosticReport API example to match Core package
+  - Removed deprecated PROGRESS.md file path
+
 ## LLMS v1.81.0
 - ✅ Completed: Daily llms.txt Review
   - Synced Roadmap in llms.txt with recent completions from domain PROGRESS logs:
