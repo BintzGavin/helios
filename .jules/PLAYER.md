@@ -45,3 +45,6 @@
 ## v0.77.30 - Updating README for missing properties and events
 **Learning:** Properties like `audioTracks` and `videoTracks`, and events like `enterpictureinpicture` and `leavepictureinpicture` were implemented but missed in the documentation. `setPlaybackRange` and `clearPlaybackRange` exist on the `HeliosController` and not the Web Component directly.
 **Action:** Created a plan to document the missing properties and events on the Web Component, ensuring exact matches between the API capabilities and documentation.
+## v0.77.31 - Accurate Verification of Documented API
+**Learning:** During planning to update `README.md` for undocumented API members (`audioTracks`, `videoTracks`, `setPlaybackRange`, etc.), I found that some of these were actually either already documented or they belonged to the controller interface rather than the public web component API.
+**Action:** Always carefully check the target documentation file (`README.md`) using strict grep patterns to ensure the gap actually exists, and verify if the member belongs to the public API or internal interfaces before adding it to the plan.
