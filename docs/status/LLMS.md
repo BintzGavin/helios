@@ -1,5 +1,7 @@
 # Status: LLMS
-**Version**: 1.82.0
+**Version**: 1.83.0
+
+[v1.83.0] ✅ Completed: Comprehensive Daily Review - Updated DiagnosticReport API example and removed deprecated PROGRESS.md reference from Key Files.
 
 [v1.82.0] ✅ Completed: Comprehensive Daily Review - Updated Roadmap in llms.txt with recent completions from domain PROGRESS logs (Studio: Update Keyboard Shortcuts, Asset Drag and Drop, Toggle Loop Shortcut; CLI: CLI Utils Regression Tests, Build Command Regression Tests, Scaffold Docker Deployment Command; Player: Document API Parity Gap, Implement WebVTT Support, Add Undocumented Shortcuts to UI, Improve Index Coverage; Renderer: WebCodecs Preference, Update Skill Documentation, Validate HW Accel, Orchestrator Plan; Infrastructure: Optimize S3 Uploads, Optimize GCS Uploads, FfmpegStitcher Coverage, Orchestrator Test Coverage Expansion). Verified all package versions match package.json (Core v5.13.0, Studio v0.107.1, Player v0.76.20, Renderer v1.78.3, CLI v0.45.2, Infrastructure v0.25.0).
 
