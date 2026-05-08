@@ -1,8 +1,8 @@
 ---
 id: PERF-227
 slug: optimize-dom-strategy-begin-frame
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "Jules"
 created: 2024-06-06
 completed: ""
 result: ""
@@ -100,3 +100,11 @@ Run `npx tsx packages/renderer/tests/run-all.ts` to ensure FFmpeg piping correct
 
 ## Prior Art
 PERF-193 (which introduced `beginFrameParams` optimization for the non-targeted path).
+
+
+## Results Summary
+| run | render_time_s | frames | fps_effective | peak_mem_mb | status | description |
+|---|---|---|---|---|---|---|
+| 1 | 5.141 | 150 | 29.18 | 100.0 | keep | Pre-allocate targetBeginFrameParams |
+| 2 | 5.067 | 150 | 29.60 | 100.0 | keep | Pre-allocate targetBeginFrameParams |
+| 3 | 4.949 | 150 | 30.31 | 100.0 | keep | Pre-allocate targetBeginFrameParams |

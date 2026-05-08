@@ -2,7 +2,10 @@
 Current best: 3.774s (baseline was 32.776s, -88.5%)
 Last updated by: PERF-451
 
+
 ## What Works
+- **Pre-allocate targetBeginFrameParams object for targeted elements**: (PERF-227) Reused `targetBeginFrameParams` instead of recreating object tree on every frame. Improved performance in targeted element mode from timeouts (>32s) to ~5.0s.
+
 - **PERF-451**: Swapped SeekTimeDriver for CdpTimeDriver in BrowserPool DOM mode.
   - **What I did**: Changed `timeDriver` instantiation to always use `CdpTimeDriver`.
   - **Improvement**: Native Chromium virtual time completely eliminates the overhead in the hot loop introduced by manual Javascript DOM traversal and WAAPI pausing (`window.__helios_seek`). Improved render time to ~3.774s.

@@ -24,6 +24,7 @@ export class DomStrategy implements RenderStrategy {
   private emptyImageBase64: string = "";
   private frameInterval: number = 0;
   private beginFrameParams: any = { interval: 0, frameTimeTicks: 0, screenshot: null };
+  private targetBeginFrameParams: any = null;
 
   constructor(private options: RendererOptions) {
     if (this.options.videoCodec === 'copy') {
@@ -124,10 +125,14 @@ export class DomStrategy implements RenderStrategy {
     this.cdpScreenshotParams = cdpScreenshotParams;
     this.beginFrameParams.screenshot = cdpScreenshotParams;
 
-    this.elementScreenshotParams = {
-      type: cdpScreenshotParams.format,
-      quality: cdpScreenshotParams.quality,
-      omitBackground: cdpScreenshotParams.format !== 'jpeg'
+    this.targetBeginFrameParams = {
+      screenshot: {
+        format: cdpScreenshotParams.format,
+        quality: cdpScreenshotParams.quality,
+        clip: { x: 0, y: 0, width: 0, height: 0, scale: 1 }
+      },
+      interval: this.frameInterval,
+      frameTimeTicks: 0
     };
 
     // Set format-appropriate empty buffer
@@ -151,7 +156,7 @@ export class DomStrategy implements RenderStrategy {
 
 
     if (this.options.targetSelector) {
-      const element = await page.waitForSelector(this.options.targetSelector, { state: 'attached', timeout: 5000 });
+      const element = await page.waitForSelector(this.options.targetSelector, { state: 'attached', timeout: 5000 }).catch(() => null);
       if (!element) {
         throw new Error(`Target element not found: ${this.options.targetSelector}`);
       }
@@ -174,12 +179,19 @@ export class DomStrategy implements RenderStrategy {
 
   async capture(page: Page, frameTime: number): Promise<Buffer | string> {
     if (this.targetElementHandle) {
-      const res = await this.targetElementHandle.screenshot(this.elementScreenshotParams);
-      if (res) {
-        this.lastFrameData = res;
-        return res;
+      const box = await this.targetElementHandle.boundingBox();
+      if (!box) {
+         return this.lastFrameData!;
       }
-      return this.lastFrameData!;
+
+      this.targetBeginFrameParams.screenshot.clip.x = box.x;
+      this.targetBeginFrameParams.screenshot.clip.y = box.y;
+      this.targetBeginFrameParams.screenshot.clip.width = box.width;
+      this.targetBeginFrameParams.screenshot.clip.height = box.height;
+      this.targetBeginFrameParams.frameTimeTicks = 10000 + frameTime;
+
+      return this.cdpSession!.send('HeadlessExperimental.beginFrame', this.targetBeginFrameParams)
+        .then(this.handleBeginFrameSuccess, this.handleBeginFrameError);
     }
 
     this.beginFrameParams.frameTimeTicks = 10000 + frameTime;
