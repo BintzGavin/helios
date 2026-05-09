@@ -19,6 +19,7 @@ export class CdpTimeDriver implements TimeDriver {
   private singleFrameSyncMediaParams: any = { expression: "", awaitPromise: false, returnByValue: false };
   private multiFrameSyncMediaParams: any[] = [];
   private syncMediaFn: (timeInSeconds: number) => void = () => {};
+  private stabilityCheckFn: () => Promise<void> | void = () => {};
 
   private stabilityTimeoutId: NodeJS.Timeout | null = null;
   private stabilityTimeoutReject: ((err: Error) => void) | null = null;
@@ -98,6 +99,35 @@ export class CdpTimeDriver implements TimeDriver {
       this.cdpReject = null;
     }
   };
+
+  private async defaultStabilityCheck(): Promise<void> {
+    const evaluatePromise = this.client!.send('Runtime.evaluate', this.evaluateStabilityParams);
+    const timeoutPromise = new Promise<void>(this.stabilityTimeoutExecutor);
+
+    try {
+        const res = await Promise.race([evaluatePromise, timeoutPromise]);
+        if (res) {
+            this.handleStabilityCheckResponse(res);
+        }
+    } catch (e: any) {
+        if (e.message === 'Stability check timed out') {
+            console.warn(`[CdpTimeDriver] Stability check timed out after ${this.timeout}ms. Terminating execution.`);
+            try {
+                await this.client?.send('Runtime.terminateExecution');
+            } catch (termErr) {
+                console.warn('[CdpTimeDriver] Failed to terminate hanging script (might have finished race):', termErr);
+            }
+        } else {
+            throw e;
+        }
+    } finally {
+        if (this.stabilityTimeoutId !== null) {
+            clearTimeout(this.stabilityTimeoutId);
+            this.stabilityTimeoutId = null;
+        }
+        this.stabilityTimeoutReject = null;
+    }
+  }
 
   constructor(timeout: number = 30000) {
     this.timeout = timeout;
@@ -219,6 +249,25 @@ export class CdpTimeDriver implements TimeDriver {
        }
     }
 
+    // We delay checking the stability function until the first evaluation to allow for synchronous timeline injection during initialization
+    this.stabilityCheckFn = async () => {
+      try {
+        const { result } = await this.client!.send('Runtime.evaluate', {
+          expression: "typeof window.helios !== 'undefined' && typeof window.helios.waitUntilStable === 'function'",
+          returnByValue: true
+        });
+        if (result && result.value) {
+          this.stabilityCheckFn = this.defaultStabilityCheck.bind(this);
+          return this.defaultStabilityCheck();
+        } else {
+          this.stabilityCheckFn = () => {};
+        }
+      } catch (e) {
+        this.stabilityCheckFn = this.defaultStabilityCheck.bind(this);
+        return this.defaultStabilityCheck();
+      }
+    };
+
     this.currentTime = 0;
   }
 
@@ -249,37 +298,6 @@ export class CdpTimeDriver implements TimeDriver {
     this.currentTime = timeInSeconds;
 
     // Wait for custom stability checks
-    // We use a string-based evaluation to avoid build-tool artifacts.
-    // We rely on awaitPromise: true natively.
-
-    // We still need a timeout mechanism because CDP evaluate with awaitPromise doesn't have an inherent timeout,
-    // and virtual time is paused, so internal setTimeout won't work.
-    const evaluatePromise = this.client!.send('Runtime.evaluate', this.evaluateStabilityParams);
-
-    const timeoutPromise = new Promise<void>(this.stabilityTimeoutExecutor);
-
-    try {
-        const res = await Promise.race([evaluatePromise, timeoutPromise]);
-        if (res) {
-            this.handleStabilityCheckResponse(res);
-        }
-    } catch (e: any) {
-        if (e.message === 'Stability check timed out') {
-            console.warn(`[CdpTimeDriver] Stability check timed out after ${this.timeout}ms. Terminating execution.`);
-            try {
-                await this.client?.send('Runtime.terminateExecution');
-            } catch (termErr) {
-                console.warn('[CdpTimeDriver] Failed to terminate hanging script (might have finished race):', termErr);
-            }
-        } else {
-            throw e;
-        }
-    } finally {
-        if (this.stabilityTimeoutId !== null) {
-            clearTimeout(this.stabilityTimeoutId);
-            this.stabilityTimeoutId = null;
-        }
-        this.stabilityTimeoutReject = null;
-    }
+    await this.stabilityCheckFn();
   }
 }

@@ -1,11 +1,11 @@
 ---
 id: PERF-461
 slug: bypass-stability-check
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "jules"
 created: 2024-06-03
-completed: ""
-result: ""
+completed: "2026-05-09"
+result: "keep"
 ---
 
 # PERF-461: Bypass Runtime.evaluate Stability Check in CdpTimeDriver When Unused
@@ -54,3 +54,11 @@ Run the DOM render benchmark script (`npm run build:examples && cd packages/rend
 
 ## Prior Art
 - PERF-460: Successfully bypassed `Runtime.evaluate` for media sync using closure assignment.
+
+
+## Results Summary
+```
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	3.837	150	39.09	39	keep	bypass stability check Runtime.evaluate via closure
+2	4.012	150	37.39	39	keep	bypass stability check Runtime.evaluate via closure
+3	3.791	150	39.57	39	keep	bypass stability check Runtime.evaluate via closure```
