@@ -53,6 +53,10 @@ Last updated by: PERF-463
 - **PERF-337**: Prebound `frameWaiterResolve` executor into `frameWaiterExecutor` to avoid dynamic inline closure allocations during the CaptureLoop actor pipeline backpressure events. This adheres to the "simplicity and GC reduction" principle that guided keeping `writerWaiterExecutor`. Render time: 46.464s (Baseline: 57.022s), though baseline was inflated by initial run. Median render times of subsequent runs were around 46.6s, slightly better than PERF-336's ~47.4s. Kept to reduce V8 GC churn in the main event loop.
 
 ## What Doesn't Work (and Why)
+- **PERF-466**: Conditionally bypass await for stability check in CdpTimeDriver.
+  - **What I tried**: Checked if stability check result was a promise before awaiting to avoid V8 microtask overhead for no-ops.
+  - **WHY it didn't work**: The median execution time was worse (~3.475s vs 3.020s baseline). The overhead of the instanceof check seems to outweigh the V8 promise resolution optimization in the Node.js event loop context when paired with Playwright.
+  - **Outcome**: discard
 - **PERF-459**: Skip Media Sync CDP Call in CdpTimeDriver via closure assignment
   - **What I tried**: Attempted to implement the PERF-459 plan to conditionally bypass the media sync CDP evaluate call using closure assignment.
   - **WHY it didn't work**: IMPOSSIBLE: DUPLICATION. Code inspection revealed that `CdpTimeDriver.ts` already implements this exact optimization (added in PERF-460). Documented duplication and discarded.
