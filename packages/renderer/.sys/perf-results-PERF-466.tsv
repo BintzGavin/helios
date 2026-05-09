@@ -1,0 +1,4 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	24.061	600	24.94	4.5	discard	direct promise chain in runSetTime
+2	23.913	600	25.09	4.5	discard	direct promise chain in runSetTime
+3	22.733	600	26.39	4.5	discard	direct promise chain in runSetTime
