@@ -1,11 +1,11 @@
 ---
 id: PERF-462
 slug: restore-jpeg-default
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-05-30
-completed: ""
-result: ""
+completed: "2026-05-09"
+result: "discard"
 ---
 
 # PERF-462: Restore `jpeg` as Default Intermediate Image Format
@@ -77,3 +77,9 @@ Run the DOM render benchmark script (\`cd packages/renderer && npm run build:exa
 
 ## Prior Art
 - PERF-010, PERF-011, PERF-012, PERF-346: Previous conflicting experiments around JPEG fallback and FFmpeg pipe formats. This plan re-tests these hypotheses under the newly optimized CdpTimeDriver pipeline.
+
+## Results Summary
+- **Best render time**: 3.528s
+- **Improvement**: ~-0.7%
+- **Kept experiments**: []
+- **Discarded experiments**: [Restored `jpeg` as Default Intermediate Image Format]
