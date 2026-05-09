@@ -1,9 +1,12 @@
 ## Performance Trajectory
-Current best: 3.505s (baseline was 32.776s, -89.3%)
-Last updated by: PERF-461
+Current best: 3.020s (baseline was 32.776s, -90.8%)
+Last updated by: PERF-463
 
 
 ## What Works
+- **PERF-463**: Changed default intermediate image format for non-alpha frames to JPEG in DomStrategy.
+  - **What I did**: Set the default fallback format in `DomStrategy.prepare` to `jpeg` (quality 80) instead of `png` when `hasAlpha` is false.
+  - **Improvement**: ~16% faster (~3.020s down from ~3.613s) by reducing base64 string size and intra-browser encoding time.
 - **PERF-461**: Conditionally bypassed Runtime.evaluate in CdpTimeDriver for stability checks.
   - **What I did**: Delayed assignment of `stabilityCheckFn` until the first frame evaluation to check if `window.helios.waitUntilStable` exists. If it doesn't, it is assigned a no-op, avoiding a per-frame CDP evaluate call.
   - **Improvement**: Slightly improved render time by removing CDP chitter (down to ~3.505s).
@@ -179,6 +182,9 @@ Last updated by: PERF-461
   - **WHY it didn't work**: Impossible/Obsolete. The structural change (prebinding `frameWaiterExecutor`) was already implemented and kept by a subsequent experiment (PERF-337). Documented duplication and stopped work.
 
 ## What Works
+- **PERF-463**: Changed default intermediate image format for non-alpha frames to JPEG in DomStrategy.
+  - **What I did**: Set the default fallback format in `DomStrategy.prepare` to `jpeg` (quality 80) instead of `png` when `hasAlpha` is false.
+  - **Improvement**: ~16% faster (~3.020s down from ~3.613s) by reducing base64 string size and intra-browser encoding time.
 - **PERF-432**: Eliminated `await` in `DomStrategy.ts` capture hot loop for `HeadlessExperimental.beginFrame`.
   - **What I did**: Returned the Promise chain directly using `.then()` with prebound success and error handlers, avoiding the async state machine overhead.
   - **Improvement**: Minor improvement, returning the V8 promise chain natively removes an intermediate async suspension point and reduces event loop overhead. Improved render time to ~32.776s.
@@ -198,10 +204,13 @@ Last updated by: PERF-461
   - **WHY it didn't work**: The median render time improved slightly from ~46.546s to ~46.003s, which represents a ~1.1% gain. However, this is well within the ~5% environmental noise margin. V8 handles the occasional integer modulo arithmetic efficiently enough that manual counter management does not provide a definitive, clear-cut performance gain. Discarded to maintain code simplicity.
 
 ## Performance Trajectory
-Current best: 32.776s (baseline was 34.041s, -3.7%)
-Last updated by: PERF-432
+Current best: 3.020s (baseline was 32.776s, -90.8%)
+Last updated by: PERF-463
 
 ## What Works
+- **PERF-463**: Changed default intermediate image format for non-alpha frames to JPEG in DomStrategy.
+  - **What I did**: Set the default fallback format in `DomStrategy.prepare` to `jpeg` (quality 80) instead of `png` when `hasAlpha` is false.
+  - **Improvement**: ~16% faster (~3.020s down from ~3.613s) by reducing base64 string size and intra-browser encoding time.
 - **PERF-432**: Eliminated `await` in `DomStrategy.ts` capture hot loop for `HeadlessExperimental.beginFrame`.
   - **What I did**: Returned the Promise chain directly using `.then()` with prebound success and error handlers, avoiding the async state machine overhead.
   - **Improvement**: Minor improvement, returning the V8 promise chain natively removes an intermediate async suspension point and reduces event loop overhead. Improved render time to ~32.776s.

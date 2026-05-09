@@ -1,11 +1,11 @@
 ---
 id: PERF-463
 slug: restore-jpeg-default
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-09
-completed: ""
-result: ""
+completed: "2024-05-09"
+result: "keep"
 ---
 
 # PERF-463: Use JPEG by default for non-alpha frames
@@ -65,3 +65,11 @@ Verify `packages/renderer/output/dom-animation.mp4` renders successfully and loo
 
 ## Prior Art
 PERF-454, PERF-462 (which were unexecuted duplicates in memory). This formally re-establishes the plan.
+
+## Results Summary
+```tsv
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	3.613	150	41.52	0.0	keep	baseline (png fallback)
+2	3.020	150	49.67	0.0	keep	jpeg default (q80)
+3	3.046	150	49.24	0.0	keep	jpeg default (q80)
+```

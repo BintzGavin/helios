@@ -111,7 +111,8 @@ export class DomStrategy implements RenderStrategy {
         format = 'webp';
         quality = quality ?? 75;
       } else {
-        format = 'png';
+        format = 'jpeg';
+        quality = quality ?? 80;
       }
     }
 
