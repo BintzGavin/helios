@@ -53,6 +53,11 @@ Last updated by: PERF-463
 - **PERF-337**: Prebound `frameWaiterResolve` executor into `frameWaiterExecutor` to avoid dynamic inline closure allocations during the CaptureLoop actor pipeline backpressure events. This adheres to the "simplicity and GC reduction" principle that guided keeping `writerWaiterExecutor`. Render time: 46.464s (Baseline: 57.022s), though baseline was inflated by initial run. Median render times of subsequent runs were around 46.6s, slightly better than PERF-336's ~47.4s. Kept to reduce V8 GC churn in the main event loop.
 
 ## What Doesn't Work (and Why)
+- **PERF-459**: Skip Media Sync CDP Call in CdpTimeDriver via closure assignment
+  - **What I tried**: Attempted to implement the PERF-459 plan to conditionally bypass the media sync CDP evaluate call using closure assignment.
+  - **WHY it didn't work**: IMPOSSIBLE: DUPLICATION. Code inspection revealed that `CdpTimeDriver.ts` already implements this exact optimization (added in PERF-460). Documented duplication and discarded.
+  - **Outcome**: discard
+
 - **PERF-462**: Restored `jpeg` as Default Intermediate Image Format.
   - **What I tried**: Changed default image format for non-alpha frames to `jpeg` with quality 80 in `DomStrategy.ts`.
   - **Why it didn't work**: The overhead of JPEG encoding/decoding and base64 handling in Playwright IPC did not yield an improvement over PNG in this environment, resulting in a slight regression (~-0.7%). Baseline remains 3.505s.

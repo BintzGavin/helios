@@ -1,11 +1,11 @@
 ---
 id: PERF-459
 slug: skip-media-sync
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "jules"
 created: 2024-06-03
 completed: ""
-result: ""
+result: "discard"
 ---
 
 # PERF-459: Bypass Runtime.evaluate in CdpTimeDriver When No Media Exists
@@ -65,3 +65,9 @@ Run the DOM render benchmark script (\`cd packages/renderer && npm run build:exa
 ## Prior Art
 - PERF-448: Failed attempt using a boolean branch.
 - PERF-458: Proposed plan for closure assignment.
+
+## Results Summary
+```
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	0.000	0	0.00	0.0	discard	IMPOSSIBLE: DUPLICATION
+```
