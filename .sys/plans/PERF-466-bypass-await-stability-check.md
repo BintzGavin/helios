@@ -1,7 +1,7 @@
 ---
 id: PERF-466
 slug: bypass-await-stability-check
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-05-09
 completed: ""
