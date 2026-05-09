@@ -1,9 +1,13 @@
 ## Performance Trajectory
-Current best: 3.774s (baseline was 32.776s, -88.5%)
-Last updated by: PERF-451
+Current best: 3.505s (baseline was 32.776s, -89.3%)
+Last updated by: PERF-461
 
 
 ## What Works
+- **PERF-461**: Conditionally bypassed Runtime.evaluate in CdpTimeDriver for stability checks.
+  - **What I did**: Delayed assignment of `stabilityCheckFn` until the first frame evaluation to check if `window.helios.waitUntilStable` exists. If it doesn't, it is assigned a no-op, avoiding a per-frame CDP evaluate call.
+  - **Improvement**: Slightly improved render time by removing CDP chitter (down to ~3.505s).
+
 - Conditionally bypassed Runtime.evaluate in CdpTimeDriver (PERF-460), improving time to 3.511s
 - **Pre-allocate targetBeginFrameParams object for targeted elements**: (PERF-227) Reused `targetBeginFrameParams` instead of recreating object tree on every frame. Improved performance in targeted element mode from timeouts (>32s) to ~5.0s.
 
