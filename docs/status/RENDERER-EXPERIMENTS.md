@@ -4,6 +4,7 @@ Last updated by: PERF-451
 
 
 ## What Works
+- Conditionally bypassed Runtime.evaluate in CdpTimeDriver (PERF-460), improving time to 3.511s
 - **Pre-allocate targetBeginFrameParams object for targeted elements**: (PERF-227) Reused `targetBeginFrameParams` instead of recreating object tree on every frame. Improved performance in targeted element mode from timeouts (>32s) to ~5.0s.
 
 - **PERF-451**: Swapped SeekTimeDriver for CdpTimeDriver in BrowserPool DOM mode.

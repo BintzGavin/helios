@@ -18,6 +18,7 @@ export class CdpTimeDriver implements TimeDriver {
   private evaluateStabilityParams: any = { expression: "if (typeof window.__helios_wait_until_stable === 'function') window.__helios_wait_until_stable();", awaitPromise: true, returnByValue: false };
   private singleFrameSyncMediaParams: any = { expression: "", awaitPromise: false, returnByValue: false };
   private multiFrameSyncMediaParams: any[] = [];
+  private syncMediaFn: (timeInSeconds: number) => void = () => {};
 
   private stabilityTimeoutId: NodeJS.Timeout | null = null;
   private stabilityTimeoutReject: ((err: Error) => void) | null = null;
@@ -39,6 +40,38 @@ export class CdpTimeDriver implements TimeDriver {
 
     this.client!.send('Emulation.setVirtualTimePolicy', this.setVirtualTimePolicyParams).catch(this.handleVirtualTimeBudgetError);
   };
+
+  private defaultSyncMedia(timeInSeconds: number) {
+    const frames = this.cachedFrames;
+    if (frames.length === 1) {
+      this.singleFrameSyncMediaParams.expression = "if(typeof window.__helios_sync_media==='function') window.__helios_sync_media(" + timeInSeconds + ");";
+      this.client!.send('Runtime.evaluate', this.singleFrameSyncMediaParams);
+    } else {
+        if (this.executionContextIds.length > 0) {
+          const expression = "if(typeof window.__helios_sync_media==='function') window.__helios_sync_media(" + timeInSeconds + ");";
+          if (this.multiFrameSyncMediaParams.length !== this.executionContextIds.length) {
+            this.multiFrameSyncMediaParams.length = this.executionContextIds.length;
+            for (let i = 0; i < this.executionContextIds.length; i++) {
+              this.multiFrameSyncMediaParams[i] = {
+                expression: "",
+                contextId: this.executionContextIds[i],
+                awaitPromise: false,
+                returnByValue: false
+              };
+            }
+          }
+          for (let i = 0; i < this.executionContextIds.length; i++) {
+            this.multiFrameSyncMediaParams[i].expression = expression;
+            this.client!.send('Runtime.evaluate', this.multiFrameSyncMediaParams[i]);
+          }
+        } else {
+          for (let i = 0; i < frames.length; i++) {
+            const frame = frames[i];
+            frame.evaluate("if(typeof window.__helios_sync_media==='function') window.__helios_sync_media(" + timeInSeconds + ");");
+          }
+        }
+    }
+  }
 
   private handleSyncMediaError = (e: any) => {
     console.warn('[CdpTimeDriver] Failed to sync media:', e);
@@ -156,6 +189,20 @@ export class CdpTimeDriver implements TimeDriver {
 
     this.cachedFrames = page.frames();
 
+    try {
+      const { result } = await this.client!.send('Runtime.evaluate', {
+        expression: "document.querySelectorAll('video, audio').length > 0",
+        returnByValue: true
+      });
+      if (result && result.value) {
+        this.syncMediaFn = this.defaultSyncMedia.bind(this);
+      } else {
+        this.syncMediaFn = () => {};
+      }
+    } catch (e) {
+      this.syncMediaFn = this.defaultSyncMedia.bind(this);
+    }
+
     // Enable Runtime so we actually receive executionContextCreated events
     // Catch errors in case another driver instance sharing this session already enabled it.
     await this.client!.send('Runtime.enable').catch(() => {});
@@ -191,40 +238,8 @@ export class CdpTimeDriver implements TimeDriver {
     // Convert to milliseconds for CDP
     const budget = delta * 1000;
 
-    // 1. Synchronize media elements (video, audio)
-    // We do this manually BEFORE advancing time so that when the frame renders (rAF),
-    // the video elements are already at the correct time.
-    // Execute in all frames (including main frame) to support iframes
-    const frames = this.cachedFrames;
-    if (frames.length === 1) {
-      this.singleFrameSyncMediaParams.expression = "if(typeof window.__helios_sync_media==='function') window.__helios_sync_media(" + timeInSeconds + ");";
-      this.client!.send('Runtime.evaluate', this.singleFrameSyncMediaParams);
-    } else {
-        if (this.executionContextIds.length > 0) {
-          const expression = "if(typeof window.__helios_sync_media==='function') window.__helios_sync_media(" + timeInSeconds + ");";
-          if (this.multiFrameSyncMediaParams.length !== this.executionContextIds.length) {
-            this.multiFrameSyncMediaParams.length = this.executionContextIds.length;
-            for (let i = 0; i < this.executionContextIds.length; i++) {
-              this.multiFrameSyncMediaParams[i] = {
-                expression: "",
-                contextId: this.executionContextIds[i],
-                awaitPromise: false,
-                returnByValue: false
-              };
-            }
-          }
-          for (let i = 0; i < this.executionContextIds.length; i++) {
-            this.multiFrameSyncMediaParams[i].expression = expression;
-            this.client!.send('Runtime.evaluate', this.multiFrameSyncMediaParams[i]);
-          }
-        } else {
-          // Fallback if execution contexts couldn't be resolved (e.g. reused CDP session)
-          for (let i = 0; i < frames.length; i++) {
-            const frame = frames[i];
-            frame.evaluate("if(typeof window.__helios_sync_media==='function') window.__helios_sync_media(" + timeInSeconds + ");");
-          }
-        }
-    }
+// 1. Synchronize media elements
+    this.syncMediaFn(timeInSeconds);
 
     // 2. Advance virtual time
     // This triggers the browser event loop and requestAnimationFrame
