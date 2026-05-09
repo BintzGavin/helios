@@ -1,11 +1,11 @@
 ---
 id: PERF-003
 slug: concurrent-dom-capture
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "Jules"
 created: 2026-10-18
 completed: ""
-result: ""
+result: "discard"
 ---
 
 # PERF-003: Concurrent DOM Capture Pool
