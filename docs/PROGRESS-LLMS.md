@@ -1,3 +1,8 @@
+## LLMS v1.84.0
+- ✅ Completed: Daily llms.txt Review
+  - Updated DiagnosticReport API example (audioDecoders, userAgent)
+  - Synced Roadmap with recent verifiable completions from domain PROGRESS logs.
+
 ## LLMS v1.83.0
 - ✅ Completed: Daily llms.txt Review
   - Fixed DiagnosticReport API example to match Core package
