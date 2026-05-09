@@ -1,4 +1,4 @@
-**Version**: 0.77.31
+**Version**: 0.77.32
 [v0.77.30] ✅ Completed: Document Tracks API - Added audioTracks and videoTracks properties to README.md API parity list.
 [v0.77.27] ✅ Completed: Document API Parity Gap - Deleted lingering plan file as the README already contained the required documentation updates.
 [v0.77.27] ✅ Completed: Add Media Session properties to README
@@ -228,3 +228,4 @@
 [v0.77.29] ✅ Completed: Discovered that `2026-03-01-PLAYER-Click-To-Play.md` is an IMPOSSIBLE: DUPLICATION plan. The `.click-layer` and `interactive` attributes are already fully implemented. Documented as impossible and discarded.
 [v0.77.30] ✅ Completed: Discovered undocumented API properties and events in README.md. Created plan `.sys/plans/2026-12-30-PLAYER-README-API-Update.md` to document `audioTracks`, `videoTracks`, `enterpictureinpicture`, and `leavepictureinpicture`.
 [v0.77.31] ✅ Completed: Discovered undocumented API properties, methods and events in README.md. Created plan `.sys/plans/2026-12-30-PLAYER-README-API-Update.md` to document `enterpictureinpicture`, `leavepictureinpicture`, `captureStream`, `startAudioMetering`, and `stopAudioMetering`.
+[v0.77.32] ✅ Completed: Document API Parity Gap - Updated README to document existing methods (captureStream, startAudioMetering, stopAudioMetering) and events (enterpictureinpicture, leavepictureinpicture).
