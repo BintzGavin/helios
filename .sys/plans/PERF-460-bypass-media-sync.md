@@ -1,11 +1,11 @@
 ---
 id: PERF-460
 slug: bypass-media-sync
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-06-03
 completed: ""
-result: ""
+result: "keep"
 ---
 
 # PERF-460: Bypass Runtime.evaluate in CdpTimeDriver When No Media Exists
