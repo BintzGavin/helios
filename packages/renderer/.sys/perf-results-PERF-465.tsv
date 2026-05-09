@@ -1,0 +1,4 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	3.412	150	43.96	0.0	discard	experimental direct promise chain
+2	3.213	150	46.69	0.0	discard	experimental direct promise chain
+3	4.202	150	35.70	0.0	discard	experimental direct promise chain

@@ -337,3 +337,8 @@ Last updated by: PERF-463
 - **PERF-450**: Enable CdpTimeDriver for DOM Mode
   - **What I tried**: Attempted to execute the PERF-450 plan to replace `SeekTimeDriver` with `CdpTimeDriver` for DOM rendering in `BrowserPool.ts`.
   - **WHY it didn't work**: IMPOSSIBLE: DUPLICATION. Code inspection revealed that `BrowserPool.ts` already implements this change unconditionally (`const timeDriver = new CdpTimeDriver(this.options.stabilityTimeout);` at line 124). Documented duplication and discarded.
+
+- **PERF-465**: Return direct promise chain in CdpTimeDriver.runSetTime
+  - **What I tried**: Removed async/await in CdpTimeDriver.runSetTime and returned the promise chain natively to try to eliminate V8 state machine and microtask overhead.
+  - **WHY it didn't work**: The performance improvement was non-existent or worse (median ~3.412s vs baseline ~3.046s). The async/await overhead in the hot loop is negligible compared to the IPC and DOM evaluation bottlenecks. The V8 engine already handles async/await for native promises efficiently.
+  - **Outcome**: discard
