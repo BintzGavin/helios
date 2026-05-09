@@ -50,6 +50,10 @@ Last updated by: PERF-461
 - **PERF-337**: Prebound `frameWaiterResolve` executor into `frameWaiterExecutor` to avoid dynamic inline closure allocations during the CaptureLoop actor pipeline backpressure events. This adheres to the "simplicity and GC reduction" principle that guided keeping `writerWaiterExecutor`. Render time: 46.464s (Baseline: 57.022s), though baseline was inflated by initial run. Median render times of subsequent runs were around 46.6s, slightly better than PERF-336's ~47.4s. Kept to reduce V8 GC churn in the main event loop.
 
 ## What Doesn't Work (and Why)
+- **PERF-462**: Restored `jpeg` as Default Intermediate Image Format.
+  - **What I tried**: Changed default image format for non-alpha frames to `jpeg` with quality 80 in `DomStrategy.ts`.
+  - **Why it didn't work**: The overhead of JPEG encoding/decoding and base64 handling in Playwright IPC did not yield an improvement over PNG in this environment, resulting in a slight regression (~-0.7%). Baseline remains 3.505s.
+
 - **PERF-445**: Defaulting to webp intermediate format and webp image2pipe codec.
   - **Why**: Sending raw webp frames sequentially over stdin without a container format to FFmpeg fails with `pipe:: Invalid argument`, as FFmpeg requires `webp_pipe` to handle raw stream data, but `webp_pipe` inherently crashes due to an FFmpeg bug without alpha channels, making raw webp pipes unusable via stdin.
 - **PERF-441**: Changed default intermediate format to webp with quality 50.

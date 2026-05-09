@@ -1,0 +1,4 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	5.508	150	27.23	39	discard	restore jpeg intermediate image default
+2	3.528	150	42.51	39	discard	restore jpeg intermediate image default
+3	3.078	150	48.73	39	discard	restore jpeg intermediate image default
