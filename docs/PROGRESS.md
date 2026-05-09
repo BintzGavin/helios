@@ -583,3 +583,6 @@ Each agent should update **their own dedicated progress file** instead of this f
 
 ### PLAYER v0.77.29
 - ✅ Completed: Discovered that `2026-03-01-PLAYER-Click-To-Play.md` is an IMPOSSIBLE: DUPLICATION plan. The Click-To-Play functionality with `.click-layer` and the `interactive` attribute were already fully implemented in `packages/player/src/index.ts`. Documented as impossible and discarded.
+
+### PLAYER v0.77.32
+- ✅ Completed: Document API Parity Gap - Updated README to document existing methods (captureStream, startAudioMetering, stopAudioMetering) and events (enterpictureinpicture, leavepictureinpicture).

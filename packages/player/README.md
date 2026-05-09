@@ -144,6 +144,9 @@ The `<helios-player>` element implements a subset of the HTMLMediaElement interf
 - `export(options?: HeliosExportOptions): Promise<void>` - Programmatically trigger client-side export.
 - `fastSeek(time: number): void` - Seeks to the specified time as fast as possible (currently equivalent to setting `currentTime`).
 - `canPlayType(type: string): CanPlayTypeResult` - Returns whether the player can play the specified media type (e.g., `'probably'`, `'maybe'`, or `''`).
+- `captureStream(): Promise<MediaStream>` - Returns a MediaStream capturing the player's canvas (if same-origin).
+- `startAudioMetering(): void` - Starts audio metering calculation.
+- `stopAudioMetering(): void` - Stops audio metering calculation.
 
 ### Properties
 
@@ -211,6 +214,8 @@ The element dispatches the following custom events:
 - `canplay`: Fired when the browser can resume playback of the media.
 - `canplaythrough`: Fired when the browser estimates it can play through the media without buffering.
 - `resize`: Fired when the player dimensions change.
+- `enterpictureinpicture`: Fired when the player enters Picture-in-Picture mode.
+- `leavepictureinpicture`: Fired when the player leaves Picture-in-Picture mode.
 
 ## Client-Side Export
 
