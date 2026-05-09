@@ -1,5 +1,7 @@
 # Status: LLMS
-**Version**: 1.83.0
+**Version**: 1.84.0
+
+[v1.84.0] ✅ Completed: Comprehensive Daily Review - Updated DiagnosticReport API example to include audioDecoders and userAgent. Updated Roadmap with latest domain completions (Studio, CLI, Player, Renderer, Infrastructure).
 
 [v1.83.0] ✅ Completed: Comprehensive Daily Review - Updated DiagnosticReport API example and removed deprecated PROGRESS.md reference from Key Files.
 
