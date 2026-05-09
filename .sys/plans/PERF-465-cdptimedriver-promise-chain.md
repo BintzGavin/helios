@@ -1,11 +1,11 @@
 ---
 id: PERF-465
 slug: cdptimedriver-promise-chain
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "Jules"
 created: 2024-05-09
 completed: ""
-result: ""
+result: "discarded (see journal)"
 ---
 
 # PERF-465: Return direct promise chain in CdpTimeDriver.runSetTime
