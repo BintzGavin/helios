@@ -1,3 +1,7 @@
+#!/bin/bash
+# Regenerate .sys/llmdocs/context-cli.md
+
+cat << 'DOCS' > .sys/llmdocs/context-cli.md
 # Helios CLI Context
 
 ## A. Architecture
@@ -80,3 +84,4 @@ packages/cli/
 - **Renderer**: The `render` command wraps `@helios-project/renderer` APIs.
 - **Studio**: The `studio` command wraps `@helios-project/studio` start functions.
 - **Infrastructure**: Distributed worker execution logic (adapters like Cloudflare Sandbox, AWS, GCP) is pulled from `@helios-project/infrastructure` during `job run` execution.
+DOCS
