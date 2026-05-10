@@ -1,7 +1,7 @@
 ---
 id: PERF-469
 slug: prebind-capture-promises
-status: claimed
+status: complete
 claimed_by: "executor-session"
 created: 2024-05-10
 completed: "2024-05-10"
