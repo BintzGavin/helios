@@ -1,11 +1,11 @@
 ---
 id: PERF-471
 slug: eliminate-virtual-time-wait
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "Jules"
 created: 2024-05-10
-completed: ""
-result: ""
+completed: "2024-05-10"
+result: "discard"
 ---
 # PERF-471: Eliminate SetVirtualTimePolicy Event Loop Wait
 
@@ -50,3 +50,6 @@ Run `npm run bench:canvas` in `packages/renderer/` or manually verify that canva
 
 ## Correctness Check
 Run `npm run bench:dom` and manually verify that `output/dom-animation.mp4` renders cleanly.
+## Results Summary
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	0.000	0	0.00	0.0	crash	bypassed virtualTimePromiseExecutor logic in CdpTimeDriver
