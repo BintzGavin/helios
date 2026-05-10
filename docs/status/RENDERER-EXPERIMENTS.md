@@ -4,6 +4,11 @@ Last updated by: PERF-468
 
 
 ## What Works
+
+- **PERF-446**: Use WebP with Low Quality for All Intermediate Formats
+  - **What I tried**: Changed default format to WebP with `image2pipe` demuxer and `-vcodec webp`
+  - **Result**: Median render time ~1.542s
+  - **Outcome**: keep
 - **PERF-468**: Bypassed `await` for undefined `stabilityCheckFn` via a simple truthiness check in `CdpTimeDriver.ts`.
   - Avoids `Promise.resolve` wrapping and microtask queue suspension overhead when no stability check is defined.
   - Unlike `instanceof Promise` checks which degraded performance (PERF-466), a direct truthiness check improved median render time slightly (~3.072s vs ~3.08s) without V8 prototype traversal overhead. Kept.

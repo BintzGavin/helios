@@ -111,8 +111,8 @@ export class DomStrategy implements RenderStrategy {
         format = 'webp';
         quality = quality ?? 75;
       } else {
-        format = 'jpeg';
-        quality = quality ?? 80;
+        format = 'webp';
+        quality = quality ?? 50;
       }
     }
 
@@ -212,7 +212,7 @@ export class DomStrategy implements RenderStrategy {
     const format = this.cdpScreenshotParams?.format || 'png';
 
     if (format === 'webp') {
-      inputFormat = 'webp_pipe';
+      inputFormat = 'image2pipe';
     } else if (format === 'jpeg') {
       inputFormat = 'mjpeg';
     } else if (format === 'png') {
@@ -221,6 +221,7 @@ export class DomStrategy implements RenderStrategy {
 
     const videoInputArgs = [
       '-f', inputFormat,
+      ...(format === 'webp' ? ['-vcodec', 'webp'] : []),
       '-framerate', `${options.fps}`,
       '-thread_queue_size', '512',
       '-i', '-',
