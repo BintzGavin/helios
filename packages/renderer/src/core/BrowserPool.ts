@@ -140,7 +140,7 @@ export class BrowserPool {
       }
 
       await timeDriver.init(page, this.options.randomSeed);
-      await page.goto(compositionUrl, { waitUntil: 'networkidle' });
+      await page.goto(compositionUrl, { waitUntil: 'load' });
 
       await strategy.prepare(page);
       await timeDriver.prepare(page);
