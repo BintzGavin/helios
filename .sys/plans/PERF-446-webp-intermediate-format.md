@@ -1,7 +1,7 @@
 ---
 id: PERF-446
 slug: webp-intermediate-format
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-05-24
 completed: ""
