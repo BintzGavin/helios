@@ -368,3 +368,6 @@ Last updated by: PERF-468
   - **What I tried**: Removed async/await in CdpTimeDriver.runSetTime and returned the promise chain natively to try to eliminate V8 state machine and microtask overhead.
   - **WHY it didn't work**: The performance difference was within the noise margin (median ~1.698s vs baseline ~1.65s-1.70s). The async/await overhead in the hot loop is negligible compared to the Playwright IPC bottlenecks.
   - **Outcome**: discard
+- **PERF-470**: Change BrowserPool waitUntil from networkidle to load
+  - **What I tried**: Switched the `page.goto` configuration in `BrowserPool.ts` from `waitUntil: 'networkidle'` to `waitUntil: 'load'`.
+  - **Outcome**: Kept. Improved performance from ~1.64s to ~1.13s (a ~30% improvement!). The `networkidle` condition imposes a strict, hard-coded 500ms waiting period of network inactivity. Since DOM benchmark compositions are loaded via the extremely fast local `file://` protocol, this completely dead 500ms delay per job was eliminated.
