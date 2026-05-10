@@ -1,11 +1,11 @@
 ---
 id: PERF-469
 slug: prebind-capture-promises
-status: unclaimed
-claimed_by: ""
+status: claimed
+claimed_by: "executor-session"
 created: 2024-05-10
-completed: ""
-result: ""
+completed: "2024-05-10"
+result: "failed"
 ---
 
 # PERF-469: Replace captureloop writeToStdin promise with thenable
@@ -76,3 +76,9 @@ Verify that the output MP4 video is still generated correctly and has the expect
 ## Prior Art
 - PERF-467 successfully eliminated `Promise.race` inside `CdpTimeDriver.ts`.
 - PERF-382 attempted to rewrite the entire CaptureLoop ring into native promises, which failed due to structural changes. This plan specifically targets the isolated `drainPromiseExecutor` allocation without altering the loop's structure.
+
+## Results Summary
+- **Best render time**: 1.711s (vs baseline 1.717s)
+- **Improvement**: Inconclusive (~0%)
+- **Kept experiments**: None
+- **Discarded experiments**: Replaced `drainPromiseExecutor` promise allocation with a pre-allocated thenable in `CaptureLoop.ts`.
