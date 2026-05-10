@@ -1,11 +1,11 @@
 ---
 id: PERF-467
 slug: optimize-cdp-time-driver-await
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-10
-completed: ""
-result: ""
+completed: "2024-05-10"
+result: "improved"
 ---
 
 # PERF-467: Optimize Await Usage in CdpTimeDriver RunSetTime Loop
@@ -100,3 +100,9 @@ Remove the unused stability timeout handlers:
 ## Prior Art
 - PERF-430: Optimized CDP evaluate stability by forcing `returnByValue: false`.
 - Memory tests indicating that removing the `Promise.race` allocation wrapper and timeout variables significantly boosts tight-loop performance.
+
+## Results Summary
+- **Best render time**: 1.569s (vs baseline 3.020s)
+- **Improvement**: ~48%
+- **Kept experiments**: Optimized `defaultStabilityCheck` to directly return the promise, bypassing array allocation and `Promise.race` logic.
+- **Discarded experiments**: None

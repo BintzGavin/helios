@@ -21,20 +21,6 @@ export class CdpTimeDriver implements TimeDriver {
   private syncMediaFn: (timeInSeconds: number) => void = () => {};
   private stabilityCheckFn: () => Promise<void> | void = () => {};
 
-  private stabilityTimeoutId: NodeJS.Timeout | null = null;
-  private stabilityTimeoutReject: ((err: Error) => void) | null = null;
-
-  private stabilityTimeoutCallback = () => {
-    if (this.stabilityTimeoutReject) {
-      this.stabilityTimeoutReject(new Error('Stability check timed out'));
-    }
-  };
-
-  private stabilityTimeoutExecutor = (_: () => void, reject: (err: Error) => void) => {
-    this.stabilityTimeoutReject = reject;
-    this.stabilityTimeoutId = setTimeout(this.stabilityTimeoutCallback, this.timeout);
-  };
-
   private virtualTimePromiseExecutor = (resolve: () => void, reject: (err: Error) => void) => {
     this.cdpResolve = resolve;
     this.cdpReject = reject;
@@ -100,33 +86,12 @@ export class CdpTimeDriver implements TimeDriver {
     }
   };
 
-  private async defaultStabilityCheck(): Promise<void> {
-    const evaluatePromise = this.client!.send('Runtime.evaluate', this.evaluateStabilityParams);
-    const timeoutPromise = new Promise<void>(this.stabilityTimeoutExecutor);
-
-    try {
-        const res = await Promise.race([evaluatePromise, timeoutPromise]);
-        if (res) {
-            this.handleStabilityCheckResponse(res);
-        }
-    } catch (e: any) {
-        if (e.message === 'Stability check timed out') {
-            console.warn(`[CdpTimeDriver] Stability check timed out after ${this.timeout}ms. Terminating execution.`);
-            try {
-                await this.client?.send('Runtime.terminateExecution');
-            } catch (termErr) {
-                console.warn('[CdpTimeDriver] Failed to terminate hanging script (might have finished race):', termErr);
-            }
-        } else {
-            throw e;
-        }
-    } finally {
-        if (this.stabilityTimeoutId !== null) {
-            clearTimeout(this.stabilityTimeoutId);
-            this.stabilityTimeoutId = null;
-        }
-        this.stabilityTimeoutReject = null;
-    }
+  private defaultStabilityCheck(): Promise<void> | void {
+    return this.client!.send('Runtime.evaluate', this.evaluateStabilityParams).then((res) => {
+      if (res) {
+        this.handleStabilityCheckResponse(res);
+      }
+    }) as unknown as Promise<void>;
   }
 
   constructor(timeout: number = 30000) {
