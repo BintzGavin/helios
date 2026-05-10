@@ -1,9 +1,12 @@
 ## Performance Trajectory
-Current best: 1.569s (baseline was 32.776s, -90.8%)
-Last updated by: PERF-467
+Current best: 3.072s (baseline was 32.474s, -90.5%)
+Last updated by: PERF-468
 
 
 ## What Works
+- **PERF-468**: Bypassed `await` for undefined `stabilityCheckFn` via a simple truthiness check in `CdpTimeDriver.ts`.
+  - Avoids `Promise.resolve` wrapping and microtask queue suspension overhead when no stability check is defined.
+  - Unlike `instanceof Promise` checks which degraded performance (PERF-466), a direct truthiness check improved median render time slightly (~3.072s vs ~3.08s) without V8 prototype traversal overhead. Kept.
 - **PERF-463**: Changed default intermediate image format for non-alpha frames to JPEG in DomStrategy.
   - **What I did**: Set the default fallback format in `DomStrategy.prepare` to `jpeg` (quality 80) instead of `png` when `hasAlpha` is false.
   - **Improvement**: ~16% faster (~3.020s down from ~3.613s) by reducing base64 string size and intra-browser encoding time.
@@ -218,7 +221,7 @@ Last updated by: PERF-467
 
 ## Performance Trajectory
 Current best: 1.569s (baseline was 32.776s, -90.8%)
-Last updated by: PERF-467
+Last updated by: PERF-468
 
 ## What Works
 - **PERF-463**: Changed default intermediate image format for non-alpha frames to JPEG in DomStrategy.
