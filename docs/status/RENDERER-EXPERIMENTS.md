@@ -361,3 +361,7 @@ Last updated by: PERF-468
   - **What I tried**: Attempted to replace the `new Promise<void>(this.drainPromiseExecutor)` object allocation in the `CaptureLoop.ts` hot loop with a static, pre-allocated thenable object (`this.drainAwaitable`) to eliminate V8 allocation overhead when encountering FFmpeg pipe backpressure.
   - **WHY it didn't work**: The performance improvement was non-existent or slightly worse (median ~1.713s vs baseline ~1.717s). V8 is already highly optimized for instantiating small native Promise objects in hot loops via hidden classes and inline caching. Bypassing the native Promise structure with a custom thenable object introduces deoptimizations when the `await` keyword integrates it into the microtask queue, negating any allocation savings. The manual micro-optimization yielded zero measurable benefit.
   - **Outcome**: discard
+- **PERF-464**: Return direct promise chain in CdpTimeDriver.runSetTime
+  - **What I tried**: Removed async/await in CdpTimeDriver.runSetTime and returned the promise chain natively to try to eliminate V8 state machine and microtask overhead.
+  - **WHY it didn't work**: The performance difference was within the noise margin (median ~1.698s vs baseline ~1.65s-1.70s). The async/await overhead in the hot loop is negligible compared to the Playwright IPC bottlenecks.
+  - **Outcome**: discard
