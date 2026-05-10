@@ -357,3 +357,7 @@ Last updated by: PERF-468
 - **PERF-467**: Optimize Await Usage in CdpTimeDriver RunSetTime Loop
   - **What I tried**: Modified `defaultStabilityCheck` to return the `Runtime.evaluate` promise directly and removed the `Promise.race` logic and timeout properties inside the `runSetTime` hot loop.
   - **Outcome**: Kept. Improved performance from baseline ~3.020s down to ~1.569s. Directly returning the evaluate promise eliminates the overhead of instantiating `Promise.race`, parallel arrays, and timeout mechanisms in the per-frame loop, greatly speeding up the virtual clock tick execution.
+- **PERF-469**: Prebind Capture Promises in CaptureLoop
+  - **What I tried**: Attempted to replace the `new Promise<void>(this.drainPromiseExecutor)` object allocation in the `CaptureLoop.ts` hot loop with a static, pre-allocated thenable object (`this.drainAwaitable`) to eliminate V8 allocation overhead when encountering FFmpeg pipe backpressure.
+  - **WHY it didn't work**: The performance improvement was non-existent or slightly worse (median ~1.713s vs baseline ~1.717s). V8 is already highly optimized for instantiating small native Promise objects in hot loops via hidden classes and inline caching. Bypassing the native Promise structure with a custom thenable object introduces deoptimizations when the `await` keyword integrates it into the microtask queue, negating any allocation savings. The manual micro-optimization yielded zero measurable benefit.
+  - **Outcome**: discard

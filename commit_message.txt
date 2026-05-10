@@ -1,0 +1,19 @@
+✨ RENDERER: Discard PERF-469 prebind capture promises experiment
+
+💡 What: Evaluated replacing `new Promise<void>(this.drainPromiseExecutor)` with a custom pre-allocated thenable object in `CaptureLoop.ts`. The experiment was discarded because it didn't yield a statistically significant improvement and occasionally introduced performance degradation.
+🎯 Why: V8 relies on hidden class optimizations and native Promise handling within microtask queues. Introducing an artificial thenable object to bypass native `Promise` initialization introduces deoptimizations during `await` that outweigh allocation savings.
+📊 Impact: Median baseline was ~1.717s. The optimized version achieved a median of ~1.713s, well within the margin of noise, showing no practical benefit.
+🔬 Verification: 3 baseline runs and 4 optimization runs via `benchmark.ts`. Reverted code locally and tracked result in PERF-469.
+📎 Plan: /.sys/plans/PERF-469-prebind-capture-promises.md
+
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	1.717	150	87.39	35.1	keep	baseline
+2	1.702	150	88.14	49.4	keep	baseline
+3	1.837	150	81.64	40.6	keep	baseline
+4	1.725	150	86.96	40.3	discard	prebind capture promises
+5	1.713	150	87.57	49.4	discard	prebind capture promises
+6	1.727	150	86.85	49.4	discard	prebind capture promises
+7	1.700	150	88.25	49.4	discard	prebind capture promises
+8	1.761	150	85.16	40.3	discard	revert test
+9	1.733	150	86.58	49.7	discard	revert test
+10	1.711	150	87.66	40.2	discard	revert test
