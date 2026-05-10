@@ -263,6 +263,9 @@ export class CdpTimeDriver implements TimeDriver {
     this.currentTime = timeInSeconds;
 
     // Wait for custom stability checks
-    await this.stabilityCheckFn();
+    const stabilityResult = this.stabilityCheckFn();
+    if (stabilityResult) {
+      await stabilityResult;
+    }
   }
 }
