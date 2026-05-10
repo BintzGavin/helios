@@ -1,11 +1,11 @@
 ---
 id: PERF-464
 slug: cdptimedriver-promise-chain
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-05-09
-completed: ""
-result: ""
+completed: "2024-05-24"
+result: "failed"
 ---
 
 # PERF-464: Return direct promise chain in CdpTimeDriver.runSetTime
@@ -83,3 +83,9 @@ Also verify `tests/verify-cdp-driver.ts` test passes.
 ## Prior Art
 - PERF-432 (Eliminated `await` in `DomStrategy.ts` capture hot loop)
 - PERF-368 (Eliminated `TimeDriver.setTime` Promise return overhead - though this was later reverted/adjusted to support await).
+
+## Results Summary
+- **Best render time**: 1.651s (vs baseline ~1.65s)
+- **Improvement**: ~0%
+- **Kept experiments**: None
+- **Discarded experiments**: Direct promise chain in CdpTimeDriver.runSetTime.
