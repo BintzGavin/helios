@@ -61,6 +61,11 @@ Last updated by: PERF-468
 - **PERF-337**: Prebound `frameWaiterResolve` executor into `frameWaiterExecutor` to avoid dynamic inline closure allocations during the CaptureLoop actor pipeline backpressure events. This adheres to the "simplicity and GC reduction" principle that guided keeping `writerWaiterExecutor`. Render time: 46.464s (Baseline: 57.022s), though baseline was inflated by initial run. Median render times of subsequent runs were around 46.6s, slightly better than PERF-336's ~47.4s. Kept to reduce V8 GC churn in the main event loop.
 
 ## What Doesn't Work (and Why)
+
+- **PERF-471**: Eliminate SetVirtualTimePolicy Event Loop Wait
+  - **What I tried**: Attempted to bypass the parallel event listener `Emulation.virtualTimeBudgetExpired` and `this.virtualTimePromiseExecutor` logic in `CdpTimeDriver.ts`, instead awaiting `this.client!.send('Emulation.setVirtualTimePolicy')` directly in `runSetTime`.
+  - **WHY it didn't work**: Awaiting the `setVirtualTimePolicy` CDP response directly does not guarantee that the virtual time budget has actually been consumed by Chromium and that the browser has fully advanced its internal rendering clock. Skipping the `virtualTimeBudgetExpired` event synchronization resulted in a corrupted frame pipeline where FFmpeg encountered unspecified WebP stream dimensions, causing a crash (`Conversion failed!`). The double-wait (CDP send + Event wait) is strictly necessary for IPC synchronization.
+  - **Outcome**: discard
 - **PERF-469**: Replace `drainPromiseExecutor` with a pre-allocated thenable.
   - **What I tried**: Attempted to replace the `new Promise` allocation in `CaptureLoop.ts` when encountering backpressure with a statically bound thenable object.
   - **WHY it didn't work**: The overhead of the promise allocation was not a bottleneck. In fact, bypassing native Promises and injecting a custom thenable caused play-out regressions and degraded render time (from ~1.711s to ~2.945s). V8 optimally handles basic `new Promise` instantiation natively in the async/await machinery better than non-native thenable adapters in this hot loop.
