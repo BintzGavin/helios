@@ -9,3 +9,4 @@ run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
 8	1.761	150	85.16	40.3	discard	revert test
 9	1.733	150	86.58	49.7	discard	revert test
 10	1.711	150	87.66	40.2	discard	revert test
+11	2.945	150	50.93	49.4	discard	prebind capture promises
