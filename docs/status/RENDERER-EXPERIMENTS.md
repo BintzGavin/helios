@@ -1,6 +1,6 @@
 ## Performance Trajectory
-Current best: 3.020s (baseline was 32.776s, -90.8%)
-Last updated by: PERF-463
+Current best: 1.569s (baseline was 32.776s, -90.8%)
+Last updated by: PERF-467
 
 
 ## What Works
@@ -217,8 +217,8 @@ Last updated by: PERF-463
   - **WHY it didn't work**: The median render time improved slightly from ~46.546s to ~46.003s, which represents a ~1.1% gain. However, this is well within the ~5% environmental noise margin. V8 handles the occasional integer modulo arithmetic efficiently enough that manual counter management does not provide a definitive, clear-cut performance gain. Discarded to maintain code simplicity.
 
 ## Performance Trajectory
-Current best: 3.020s (baseline was 32.776s, -90.8%)
-Last updated by: PERF-463
+Current best: 1.569s (baseline was 32.776s, -90.8%)
+Last updated by: PERF-467
 
 ## What Works
 - **PERF-463**: Changed default intermediate image format for non-alpha frames to JPEG in DomStrategy.
@@ -350,3 +350,7 @@ Last updated by: PERF-463
   - **What I tried**: Removed async/await in CdpTimeDriver.runSetTime and returned the promise chain natively to try to eliminate V8 state machine and microtask overhead.
   - **WHY it didn't work**: The performance improvement was non-existent or worse (median ~3.412s vs baseline ~3.046s). The async/await overhead in the hot loop is negligible compared to the IPC and DOM evaluation bottlenecks. The V8 engine already handles async/await for native promises efficiently.
   - **Outcome**: discard
+
+- **PERF-467**: Optimize Await Usage in CdpTimeDriver RunSetTime Loop
+  - **What I tried**: Modified `defaultStabilityCheck` to return the `Runtime.evaluate` promise directly and removed the `Promise.race` logic and timeout properties inside the `runSetTime` hot loop.
+  - **Outcome**: Kept. Improved performance from baseline ~3.020s down to ~1.569s. Directly returning the evaluate promise eliminates the overhead of instantiating `Promise.race`, parallel arrays, and timeout mechanisms in the per-frame loop, greatly speeding up the virtual clock tick execution.
