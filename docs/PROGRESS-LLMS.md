@@ -729,3 +729,13 @@
   - Updated Roadmap in llms.txt with verifiable completions from domain PROGRESS logs.
   - Verified package versions match `package.json` exactly.
   - Incremented version to 1.81.1
+
+## LLMS v1.84.1
+- ✅ Completed: Daily llms.txt Review
+  - Updated Roadmap in llms.txt with verifiable completions from domain PROGRESS logs:
+    - CLI: Registry Manifest Regression Tests, CLI Utils Regression Tests
+    - Player: Bridge Coverage Expansion
+    - Infrastructure: Orchestrator Coverage Expansion, FfmpegStitcher Coverage
+  - Verified package versions match `package.json` exactly.
+  - Verified File Paths and Key Files.
+  - Incremented version to 1.84.1

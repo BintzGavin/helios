@@ -1,5 +1,7 @@
 # Status: LLMS
-**Version**: 1.84.0
+**Version**: 1.84.1
+
+[v1.84.1] ✅ Completed: Comprehensive Daily Review - Updated Roadmap in llms.txt with recent verifiable completions from domain PROGRESS logs (CLI: CLI Utils Regression Tests, Registry Manifest Regression Tests; Player: Bridge Coverage Expansion; Infrastructure: Orchestrator Coverage Expansion, FfmpegStitcher Coverage). Verified all package versions match package.json.
 
 [v1.84.0] ✅ Completed: Comprehensive Daily Review - Updated DiagnosticReport API example to include audioDecoders and userAgent. Updated Roadmap with latest domain completions (Studio, CLI, Player, Renderer, Infrastructure).
 
