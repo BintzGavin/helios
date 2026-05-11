@@ -1,0 +1,9 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	0.603	600	994.38	43.6	keep	baseline
+2	0.599	600	1001.46	43.6	keep	baseline
+3	0.609	600	985.63	43.5	discard	eliminate-closure-in-evaluate-stability
+4	0.617	600	972.71	43.5	discard	eliminate-closure-in-evaluate-stability
+5	0.576	600	1041.20	43.5	discard	eliminate-closure-in-evaluate-stability
+6	0.586	600	1023.29	45.0	discard	eliminate-closure-in-evaluate-stability
+7	0.544	600	1103.03	45.0	discard	eliminate-closure-in-evaluate-stability
+8	0.582	600	1031.78	43.7	discard	eliminate-closure-in-evaluate-stability
