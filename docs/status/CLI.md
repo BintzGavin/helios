@@ -1,6 +1,8 @@
 # CLI Status
 
-**Version**: 0.46.22
+**Version**: 0.46.23
+[v0.46.23] ✅ Completed: Document duplicated Registry Manifest Regression Tests plan - Logged the duplicated plan as impossible.
+
 [v0.46.22] ✅ Completed: Registry Manifest Regression Tests - Implemented unit tests for packages/cli/src/registry/manifest.ts
 
 
