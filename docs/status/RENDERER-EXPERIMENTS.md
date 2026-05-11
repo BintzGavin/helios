@@ -385,3 +385,7 @@ Last updated by: PERF-468
 - **PERF-470**: Change BrowserPool waitUntil from networkidle to load
   - **What I tried**: Switched the `page.goto` configuration in `BrowserPool.ts` from `waitUntil: 'networkidle'` to `waitUntil: 'load'`.
   - **Outcome**: Kept. Improved performance from ~1.64s to ~1.13s (a ~30% improvement!). The `networkidle` condition imposes a strict, hard-coded 500ms waiting period of network inactivity. Since DOM benchmark compositions are loaded via the extremely fast local `file://` protocol, this completely dead 500ms delay per job was eliminated.
+- **PERF-476**: Optimize runWorker Promise Chain
+  - **What I tried**: Attempted to rewrite the async `runWorker` execution loop in `CaptureLoop.ts` using a recursive `.then()` promise chain to eliminate V8's generator state machine overhead for async/await.
+  - **WHY it didn't work**: The recursive promise implementation crashed the renderer because FFmpeg closed the pipe and the synchronous recursion caused the `frameReadyRing` / backpressure to deadlock, breaking the pipeline.
+  - **Outcome**: discard

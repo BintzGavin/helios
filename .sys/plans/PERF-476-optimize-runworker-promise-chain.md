@@ -1,7 +1,7 @@
 ---
 id: PERF-476
 slug: optimize-runworker-promise-chain
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2026-05-11
 completed: ""
