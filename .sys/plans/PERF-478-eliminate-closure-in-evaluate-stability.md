@@ -1,11 +1,11 @@
 ---
 id: PERF-478
 slug: eliminate-closure-in-evaluate-stability
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2026-05-11
-completed: ""
-result: ""
+completed: 2026-05-11
+result: no-improvement
 ---
 
 # PERF-478: Eliminate evaluateStabilityParams Closure Overhead
@@ -104,3 +104,9 @@ Instead of reassigning the function, we can use a boolean flag or a state variab
 ## Correctness Check
 Run `npm test` in the `packages/renderer` directory to ensure test suites pass, verifying that the new implementation is logically equivalent and doesn't introduce bugs.
 Run the benchmark script to compare performance.
+
+## Results Summary
+- **Best render time**: 0.544s (vs baseline 0.599s)
+- **Improvement**: ~9% (highly variable, not consistently beating noise margin)
+- **Kept experiments**: []
+- **Discarded experiments**: [PERF-478]
