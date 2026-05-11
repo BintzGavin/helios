@@ -1,11 +1,11 @@
 ---
 id: PERF-473
 slug: optimize-worker-run-loop
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2026-05-11
 completed: ""
-result: ""
+result: failed
 ---
 
 # PERF-473: Optimize runWorker Loop by Removing Async Await
@@ -50,3 +50,9 @@ Check if `timeDriver.setTime` or `strategy.capture` return non-promises (or inst
 ## Verification
 Run `npm test` in the `packages/renderer` directory to ensure test suites pass, verifying that the new implementation is logically equivalent and doesn't introduce bugs.
 Run the benchmark script to compare performance. Ensure to use the current working format for FFmpeg (png or jpeg) if webp causes crashes during the benchmark as noted in `RENDERER-EXPERIMENTS.md`.
+
+## Results Summary
+- **Best render time**: 2.719s (vs baseline 2.689s)
+- **Improvement**: -1%
+- **Kept experiments**: None
+- **Discarded experiments**: Replaced async runWorker with recursive promise chain
