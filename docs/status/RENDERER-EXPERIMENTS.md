@@ -61,6 +61,10 @@ Last updated by: PERF-468
 - **PERF-337**: Prebound `frameWaiterResolve` executor into `frameWaiterExecutor` to avoid dynamic inline closure allocations during the CaptureLoop actor pipeline backpressure events. This adheres to the "simplicity and GC reduction" principle that guided keeping `writerWaiterExecutor`. Render time: 46.464s (Baseline: 57.022s), though baseline was inflated by initial run. Median render times of subsequent runs were around 46.6s, slightly better than PERF-336's ~47.4s. Kept to reduce V8 GC churn in the main event loop.
 
 ## What Doesn't Work (and Why)
+- **PERF-472**: Replace async runWorker with recursive promise chain
+  - **What I tried**: Converted the `async` `runWorker` method in `CaptureLoop.ts` to a standard function returning a Promise, using a recursive inner `loop()` to traverse frames.
+  - **WHY it didn't work**: The change introduced a subtle unhandled microtask queue interaction that caused the pipeline to break early, crashing the FFmpeg encoder with a "pipe:: Invalid argument / Cannot determine format of input stream 0:0 after EOF" error. The async/await state machine correctly yielded and managed the tight `drain` backpressure in the Node event loop, but the recursive chain failed to pace it properly, leading to broken data streams into FFmpeg.
+  - **Outcome**: discard
 
 - **PERF-471**: Eliminate SetVirtualTimePolicy Event Loop Wait
   - **What I tried**: Attempted to bypass the parallel event listener `Emulation.virtualTimeBudgetExpired` and `this.virtualTimePromiseExecutor` logic in `CdpTimeDriver.ts`, instead awaiting `this.client!.send('Emulation.setVirtualTimePolicy')` directly in `runSetTime`.

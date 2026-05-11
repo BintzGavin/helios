@@ -1,0 +1,11 @@
+💡 **What**: Executed and discarded PERF-472 (Replace async runWorker with recursive promise chain). The changes crashed the FFmpeg pipe so they were reverted.
+🎯 **Why**: Attempted to remove async state machine overhead from the `runWorker` execution loop.
+📊 **Impact**: N/A (crashing).
+🔬 **Verification**: Code compilation, output benchmark testing (crashed).
+📎 **Plan**: Reference `/.sys/plans/PERF-472-optimize-worker-run-loop.md`
+
+Results summary:
+```
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	0.00	0	0	0.0	crash	Recursive loop promise chain FFmpeg pipe EOF crash
+```
