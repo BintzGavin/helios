@@ -126,3 +126,5 @@ The Helios CLI is the primary user interface for component registry, project sca
 [v0.39.1] ✅ Completed: CLI Scaffold Components - Verified existing implementation of helios components command fulfills the scaffolding requirements.
 [v0.41.2] ✅ Completed: Scaffold Cloudflare Sandbox Adapter - Exposed the Cloudflare Sandbox adapter in the `helios job run` command options and configuration block.
 [v0.46.17] ✅ Completed: Document duplicated Deploy Command Regression Tests plan - Logged the duplicated plan as impossible.
+
+[v0.46.22] 🟢 Completed: CLI Templates Regression Tests Spec - Created specification plan `2027-06-05-CLI-Templates-Regression-Tests.md` for implementing regression tests for all file generation templates in `packages/cli/src/templates`.
