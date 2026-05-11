@@ -399,3 +399,8 @@ Last updated by: PERF-468
   - **What I tried**: Attempted to replace the dynamically assigned `syncMediaFn` closure property in `CdpTimeDriver.ts` with a primitive boolean flag `hasMedia` and an inline conditional check to call the synchronization method.
   - **WHY it didn't work**: The performance improvement was non-existent or slightly worse. The additional boolean branch check inside the `runSetTime` hot loop alongside the static method call offsets any minor gains from avoiding dynamic closure dispatch. V8 is already highly optimized for repeated closure/bound-function calls inside hot loops via inline caches.
   - **Outcome**: discard
+
+- **PERF-473**: Optimize runWorker Promise Chain (Recursive .then)
+  - **What I tried**: Attempted to rewrite the async `runWorker` execution loop in `CaptureLoop.ts` using a recursive `.then()` promise chain to eliminate V8's generator state machine overhead for async/await.
+  - **WHY it didn't work**: The performance improvement was non-existent and in some cases worse than the baseline (~2.71-2.78s vs baseline ~2.68-2.77s). It confirmed the previous failures with PERF-472, PERF-474, PERF-475, and PERF-476, that the Promise machinery of asynchronous recursion actually adds more overhead than the optimized async/await state machine which is better optimized by V8.
+  - **Outcome**: discard
