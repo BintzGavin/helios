@@ -1,8 +1,8 @@
 ---
 id: PERF-472
 slug: optimize-worker-run-loop
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "Jules"
 created: 2026-05-10
 completed: ""
 result: ""
