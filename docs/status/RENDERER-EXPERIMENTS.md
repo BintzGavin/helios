@@ -1,9 +1,14 @@
 ## Performance Trajectory
-Current best: 3.072s (baseline was 32.474s, -90.5%)
-Last updated by: PERF-468
+Current best: ~0.612s (baseline was 32.474s, -98.1%)
+Last updated by: PERF-479
 
 
 ## What Works
+
+- **PERF-479**: Eliminate evaluateStabilityParams Closure Overhead
+  - **What I tried**: Replaced dynamic `stabilityCheckFn` closure assignment with a primitive integer state (`stabilityCheckState`) check in `CdpTimeDriver.ts`.
+  - **Result**: Median render time improved from a previous baseline to ~0.612s.
+  - **Outcome**: keep
 
 - **PERF-446**: Use WebP with Low Quality for All Intermediate Formats
   - **What I tried**: Changed default format to WebP with `image2pipe` demuxer and `-vcodec webp`

@@ -19,7 +19,7 @@ export class CdpTimeDriver implements TimeDriver {
   private singleFrameSyncMediaParams: any = { expression: "", awaitPromise: false, returnByValue: false };
   private multiFrameSyncMediaParams: any[] = [];
   private syncMediaFn: (timeInSeconds: number) => void = () => {};
-  private stabilityCheckFn: () => Promise<void> | void = () => {};
+  private stabilityCheckState: number = 0; // 0 = unknown, 1 = true, 2 = false
 
   private virtualTimePromiseExecutor = (resolve: () => void, reject: (err: Error) => void) => {
     this.cdpResolve = resolve;
@@ -215,23 +215,7 @@ export class CdpTimeDriver implements TimeDriver {
     }
 
     // We delay checking the stability function until the first evaluation to allow for synchronous timeline injection during initialization
-    this.stabilityCheckFn = async () => {
-      try {
-        const { result } = await this.client!.send('Runtime.evaluate', {
-          expression: "typeof window.helios !== 'undefined' && typeof window.helios.waitUntilStable === 'function'",
-          returnByValue: true
-        });
-        if (result && result.value) {
-          this.stabilityCheckFn = this.defaultStabilityCheck.bind(this);
-          return this.defaultStabilityCheck();
-        } else {
-          this.stabilityCheckFn = () => {};
-        }
-      } catch (e) {
-        this.stabilityCheckFn = this.defaultStabilityCheck.bind(this);
-        return this.defaultStabilityCheck();
-      }
-    };
+    this.stabilityCheckState = 0;
 
     this.currentTime = 0;
   }
@@ -263,9 +247,27 @@ export class CdpTimeDriver implements TimeDriver {
     this.currentTime = timeInSeconds;
 
     // Wait for custom stability checks
-    const stabilityResult = this.stabilityCheckFn();
-    if (stabilityResult) {
-      await stabilityResult;
+    if (this.stabilityCheckState === 0) {
+      try {
+        const { result } = await this.client!.send('Runtime.evaluate', {
+          expression: "typeof window.helios !== 'undefined' && typeof window.helios.waitUntilStable === 'function'",
+          returnByValue: true
+        });
+        if (result && result.value) {
+          this.stabilityCheckState = 1;
+        } else {
+          this.stabilityCheckState = 2;
+        }
+      } catch (e) {
+        this.stabilityCheckState = 1;
+      }
+    }
+
+    if (this.stabilityCheckState === 1) {
+      const stabilityResult = this.defaultStabilityCheck();
+      if (stabilityResult) {
+        await stabilityResult;
+      }
     }
   }
 }
