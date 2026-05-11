@@ -333,3 +333,6 @@ This file tracks progress for the CLI domain (`packages/cli`).
 
 ### CLI v0.46.22
 - ✅ Completed: Registry Manifest Regression Tests - Implemented unit tests for packages/cli/src/registry/manifest.ts
+
+### CLI v0.46.23
+- ✅ Completed: Document duplicated Registry Manifest Regression Tests plan - Logged the duplicated plan as impossible.
