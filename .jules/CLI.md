@@ -185,3 +185,7 @@ Critical learnings only. This is not a log—only add entries for insights that 
 ## [0.46.21] - Identify Uncovered Registry Files
 **Learning:** The fallback action from [0.46.18] for utility files was impossible due to duplication. Searching for uncovered areas in a stable domain requires thoroughly checking tests against source files. `packages/cli/src/registry/manifest.ts` currently lacks test coverage while being a core piece of the fallback registry.
 **Action:** When falling back to regression testing under the NOTHING TO DO PROTOCOL, target non-obvious core files (like manifest singletons) that handle fallback or structural data when command and utility coverage is 100%. Created plan `2027-06-05-CLI-Registry-Manifest-Regression-Tests.md`.
+
+## [0.46.22] - Identify Uncovered Templates Files
+**Learning:** The fallback action from [0.46.20] for registry files was completed. Searching for uncovered areas in a stable domain requires thoroughly checking tests against source files. `packages/cli/src/templates/` currently lacks test coverage while being a core piece of the CLI's scaffolding (`init` and `deploy`) commands.
+**Action:** When falling back to regression testing under the NOTHING TO DO PROTOCOL, target static data files (like templates) that are critical for command execution when command, utility, and registry coverage is 100%. Created plan `2027-06-05-CLI-Templates-Regression-Tests.md`.
