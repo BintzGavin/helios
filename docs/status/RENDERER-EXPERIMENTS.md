@@ -389,3 +389,8 @@ Last updated by: PERF-468
   - **What I tried**: Attempted to rewrite the async `runWorker` execution loop in `CaptureLoop.ts` using a recursive `.then()` promise chain to eliminate V8's generator state machine overhead for async/await.
   - **WHY it didn't work**: The recursive promise implementation crashed the renderer because FFmpeg closed the pipe and the synchronous recursion caused the `frameReadyRing` / backpressure to deadlock, breaking the pipeline.
   - **Outcome**: discard
+
+- **PERF-477**: Eliminate syncMediaFn Closure Overhead
+  - **What I tried**: Attempted to replace the dynamically assigned `syncMediaFn` closure property in `CdpTimeDriver.ts` with a primitive boolean flag `hasMedia` and an inline conditional check to call the synchronization method.
+  - **WHY it didn't work**: The performance improvement was non-existent or slightly worse. The additional boolean branch check inside the `runSetTime` hot loop alongside the static method call offsets any minor gains from avoiding dynamic closure dispatch. V8 is already highly optimized for repeated closure/bound-function calls inside hot loops via inline caches.
+  - **Outcome**: discard

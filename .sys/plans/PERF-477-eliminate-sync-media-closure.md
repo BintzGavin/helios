@@ -1,7 +1,7 @@
 ---
 id: PERF-477
 slug: eliminate-sync-media-closure
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2026-05-11
 completed: ""
