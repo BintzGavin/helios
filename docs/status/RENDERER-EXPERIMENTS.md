@@ -409,3 +409,8 @@ Last updated by: PERF-468
   - **What I tried**: Attempted to rewrite the async `runWorker` execution loop in `CaptureLoop.ts` using a recursive `.then()` promise chain to eliminate V8's generator state machine overhead for async/await.
   - **WHY it didn't work**: The performance improvement was non-existent and in some cases worse than the baseline (~2.71-2.78s vs baseline ~2.68-2.77s). It confirmed the previous failures with PERF-472, PERF-474, PERF-475, and PERF-476, that the Promise machinery of asynchronous recursion actually adds more overhead than the optimized async/await state machine which is better optimized by V8.
   - **Outcome**: discard
+
+- **PERF-481**: Optimize FFmpeg Threading Arguments
+  - **What I tried**: Added `-threads 0` and increased `-thread_queue_size` to `1024` for FFmpeg `videoInputArgs` in `DomStrategy.ts`.
+  - **WHY it didn't work**: The performance difference was non-existent (median ~1.583s vs baseline ~1.578s). Node.js sending the frames over the pipe and Playwright IPC remain the bottlenecks. Allocating more FFmpeg decoding threads for incoming PNG/WebP pipe frames does not speed up the overall pipeline because FFmpeg is already decoding faster than the DOM loop can capture and write to the pipe.
+  - **Outcome**: discard

@@ -1,11 +1,11 @@
 ---
 id: PERF-481
 slug: optimize-ffmpeg-threads
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2026-05-11
-completed: ""
-result: ""
+completed: "2026-05-11"
+result: "discard"
 ---
 
 # PERF-481: Optimize FFmpeg Threading Arguments
@@ -72,3 +72,9 @@ Update the `videoInputArgs` array to include threading optimizations.
 
 ## Correctness Check
 Run the benchmark and ensure the video renders successfully without corrupted frames or "queue too small" warnings from FFmpeg.
+
+## Results Summary
+- **Best render time**: 1.543s (median ~1.583s vs baseline ~1.578s)
+- **Improvement**: 0%
+- **Kept experiments**: []
+- **Discarded experiments**: [PERF-481]
