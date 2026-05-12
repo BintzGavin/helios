@@ -1,11 +1,11 @@
 ---
 id: PERF-482
 slug: cache-media-element-check
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-12
-completed: ""
-result: ""
+completed: 2024-05-12
+result: improved
 ---
 
 # PERF-482: Eliminate Closure in CDP Media Sync
@@ -76,3 +76,9 @@ Run a canvas capture test to ensure `CdpTimeDriver` changes do not break basic t
 
 ## Correctness Check
 Run a DOM capture with media elements to ensure audio/video still synchronizes properly when `syncMediaState === 1`.
+
+## Results Summary
+- **Best render time**: 1.515s (vs baseline 1.639s)
+- **Improvement**: ~7.6%
+- **Kept experiments**: Eliminate closure in evaluate stability by using integer state machine
+- **Discarded experiments**: none
