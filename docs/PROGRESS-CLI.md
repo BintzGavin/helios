@@ -336,3 +336,6 @@ This file tracks progress for the CLI domain (`packages/cli`).
 
 ### CLI v0.46.23
 - ✅ Completed: Document duplicated Registry Manifest Regression Tests plan - Logged the duplicated plan as impossible.
+
+### CLI v0.46.24
+- ✅ Completed: CLI Templates Regression Tests - Implemented unit tests for file generation templates in packages/cli/src/templates.

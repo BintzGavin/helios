@@ -1,6 +1,6 @@
 # CLI Status
 
-**Version**: 0.46.23
+**Version**: 0.46.24
 [v0.46.23] ✅ Completed: Document duplicated Registry Manifest Regression Tests plan - Logged the duplicated plan as impossible.
 
 [v0.46.22] ✅ Completed: Registry Manifest Regression Tests - Implemented unit tests for packages/cli/src/registry/manifest.ts
@@ -130,3 +130,5 @@ The Helios CLI is the primary user interface for component registry, project sca
 [v0.46.17] ✅ Completed: Document duplicated Deploy Command Regression Tests plan - Logged the duplicated plan as impossible.
 
 [v0.46.22] 🟢 Completed: CLI Templates Regression Tests Spec - Created specification plan `2027-06-05-CLI-Templates-Regression-Tests.md` for implementing regression tests for all file generation templates in `packages/cli/src/templates`.
+
+[v0.46.24] ✅ Completed: CLI Templates Regression Tests - Implemented unit tests for file generation templates in packages/cli/src/templates.
