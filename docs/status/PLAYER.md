@@ -1,4 +1,5 @@
-**Version**: 0.77.32
+**Version**: 0.77.33
+[v0.77.33] ✅ Completed: Discovered that 2026-03-01-PLAYER-Client-Side-Video-Inlining.md is an IMPOSSIBLE: DUPLICATION plan. The inlineVideos functionality is already fully implemented and tested in dom-capture.ts. Documented as impossible and discarded.
 [v0.77.30] ✅ Completed: Document Tracks API - Added audioTracks and videoTracks properties to README.md API parity list.
 [v0.77.27] ✅ Completed: Document API Parity Gap - Deleted lingering plan file as the README already contained the required documentation updates.
 [v0.77.27] ✅ Completed: Add Media Session properties to README
