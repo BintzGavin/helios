@@ -18,7 +18,7 @@ export class CdpTimeDriver implements TimeDriver {
   private evaluateStabilityParams: any = { expression: "if (typeof window.__helios_wait_until_stable === 'function') window.__helios_wait_until_stable();", awaitPromise: true, returnByValue: false };
   private singleFrameSyncMediaParams: any = { expression: "", awaitPromise: false, returnByValue: false };
   private multiFrameSyncMediaParams: any[] = [];
-  private syncMediaFn: (timeInSeconds: number) => void = () => {};
+  private syncMediaState: number = 0; // 0 = unknown, 1 = true, 2 = false
   private stabilityCheckState: number = 0; // 0 = unknown, 1 = true, 2 = false
 
   private virtualTimePromiseExecutor = (resolve: () => void, reject: (err: Error) => void) => {
@@ -190,12 +190,12 @@ export class CdpTimeDriver implements TimeDriver {
         returnByValue: true
       });
       if (result && result.value) {
-        this.syncMediaFn = this.defaultSyncMedia.bind(this);
+        this.syncMediaState = 1;
       } else {
-        this.syncMediaFn = () => {};
+        this.syncMediaState = 2;
       }
     } catch (e) {
-      this.syncMediaFn = this.defaultSyncMedia.bind(this);
+      this.syncMediaState = 1;
     }
 
     // Enable Runtime so we actually receive executionContextCreated events
@@ -237,7 +237,9 @@ export class CdpTimeDriver implements TimeDriver {
     const budget = delta * 1000;
 
 // 1. Synchronize media elements
-    this.syncMediaFn(timeInSeconds);
+    if (this.syncMediaState === 1) {
+      this.defaultSyncMedia(timeInSeconds);
+    }
 
     // 2. Advance virtual time
     // This triggers the browser event loop and requestAnimationFrame

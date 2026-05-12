@@ -1,10 +1,13 @@
 ## Performance Trajectory
 Current best: ~0.612s (baseline was 32.474s, -98.1%)
-Last updated by: PERF-479
+Last updated by: PERF-482
 
 
 ## What Works
 
+- **PERF-482: Eliminate closure in evaluate stability by using integer state machine**
+  - What: Replaced the syncMediaFn dynamic closure and execution evaluation in CdpTimeDriver with a simple integer state machine similar to PERF-479.
+  - Impact: Improved rendering speed from ~1.639s to ~1.515s.
 - **PERF-479**: Eliminate evaluateStabilityParams Closure Overhead
   - **What I tried**: Replaced dynamic `stabilityCheckFn` closure assignment with a primitive integer state (`stabilityCheckState`) check in `CdpTimeDriver.ts`.
   - **Result**: Median render time improved from a previous baseline to ~0.612s.
@@ -247,7 +250,7 @@ Last updated by: PERF-479
   - **WHY it didn't work**: The median render time improved slightly from ~46.546s to ~46.003s, which represents a ~1.1% gain. However, this is well within the ~5% environmental noise margin. V8 handles the occasional integer modulo arithmetic efficiently enough that manual counter management does not provide a definitive, clear-cut performance gain. Discarded to maintain code simplicity.
 
 ## Performance Trajectory
-Current best: 1.569s (baseline was 32.776s, -90.8%)
+Current best: 1.515s (baseline was 32.776s, -90.8%)
 Last updated by: PERF-468
 
 ## What Works
