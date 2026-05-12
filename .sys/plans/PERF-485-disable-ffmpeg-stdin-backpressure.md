@@ -1,11 +1,11 @@
 ---
 id: PERF-485
 slug: disable-ffmpeg-stdin-backpressure
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "jules"
 created: 2026-05-12
-completed: ""
-result: ""
+completed: "2026-05-12"
+result: "discard"
 ---
 # PERF-485: Disable FFmpeg Stdin Backpressure in CaptureLoop
 
