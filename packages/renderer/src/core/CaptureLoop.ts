@@ -264,12 +264,7 @@ export class CaptureLoop {
                 onProgress(currentFrame / this.totalFrames);
             }
 
-            if (previousWritePromise) {
-                await previousWritePromise;
-            }
-
-            const writeResult = this.writeToStdin(buffer, this.handleWriteError);
-            previousWritePromise = writeResult ? writeResult : undefined;
+            this.writeToStdin(buffer, this.handleWriteError);
 
             nextFrameToWrite++;
             checkState(); // This will unblock a waiting worker if we just opened up pipeline capacity
@@ -291,10 +286,6 @@ export class CaptureLoop {
     }
 
     await Promise.all(workerPromises);
-
-    if (previousWritePromise) {
-        await previousWritePromise;
-    }
 
     console.log('Finishing render strategy...');
     const finalBuffer = await this.pool[0].strategy.finish(this.pool[0].page);

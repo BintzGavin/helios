@@ -422,3 +422,8 @@ Last updated by: PERF-468
   - **What I tried**: Attempted to change `page.goto` configuration from `waitUntil: 'load'` to `waitUntil: 'commit'` to return control to the orchestration loop sooner during pipeline initialization in `BrowserPool.ts`.
   - **WHY it didn't work**: The median render time increased (~1.286s-1.328s vs baseline ~1.130s). The `commit` state in Playwright implies the network response has started but the DOM is completely unparsed. Calling `timeDriver.prepare(page)` or injecting scripts at `commit` requires additional synchronization overhead in Playwright and the browser engine compared to letting the document reach `load` naturally for instantaneous local `file://` navigations.
   - **Outcome**: discard
+
+- **PERF-485**: Disable FFmpeg Stdin Backpressure in CaptureLoop
+  - **What I tried**: Removed the `await previousWritePromise` logic in the `run` method of `CaptureLoop.ts` to allow Node.js to buffer incoming frames in memory unboundedly and decouple the DOM capture loop from FFmpeg's encoding pace.
+  - **WHY it didn't work**: The performance improvement was slightly worse than the baseline (median ~1.731s vs baseline ~1.708s). Bypassing backpressure completely causes Node.js to aggressively accumulate buffers in memory, pushing more garbage collection pressure onto V8 during the hot loop. The slight overhead of GC pauses negates any theoretical gains from unblocking the writer, especially since the WebP frames already process extremely quickly.
+  - **Outcome**: discard
