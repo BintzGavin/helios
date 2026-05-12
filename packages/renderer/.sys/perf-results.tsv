@@ -57,3 +57,4 @@ run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
 4	1.543	150	97.21	40.5	discard	optimize-ffmpeg-threads (PERF-481)
 5	1.580	150	94.94	40.4	discard	optimize-ffmpeg-threads (PERF-481)
 6	1.515	150	99.01	40.4	keep	PERF-482: Eliminate closure in evaluate stability by using integer state machine
+1	1.286	150	116.67	44.5	discard	PERF-483: BrowserPool goto commit
