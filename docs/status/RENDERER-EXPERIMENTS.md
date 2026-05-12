@@ -417,3 +417,8 @@ Last updated by: PERF-468
   - **What I tried**: Added `-threads 0` and increased `-thread_queue_size` to `1024` for FFmpeg `videoInputArgs` in `DomStrategy.ts`.
   - **WHY it didn't work**: The performance difference was non-existent (median ~1.583s vs baseline ~1.578s). Node.js sending the frames over the pipe and Playwright IPC remain the bottlenecks. Allocating more FFmpeg decoding threads for incoming PNG/WebP pipe frames does not speed up the overall pipeline because FFmpeg is already decoding faster than the DOM loop can capture and write to the pipe.
   - **Outcome**: discard
+
+- **PERF-483**: Change BrowserPool waitUntil from load to commit
+  - **What I tried**: Attempted to change `page.goto` configuration from `waitUntil: 'load'` to `waitUntil: 'commit'` to return control to the orchestration loop sooner during pipeline initialization in `BrowserPool.ts`.
+  - **WHY it didn't work**: The median render time increased (~1.286s-1.328s vs baseline ~1.130s). The `commit` state in Playwright implies the network response has started but the DOM is completely unparsed. Calling `timeDriver.prepare(page)` or injecting scripts at `commit` requires additional synchronization overhead in Playwright and the browser engine compared to letting the document reach `load` naturally for instantaneous local `file://` navigations.
+  - **Outcome**: discard

@@ -1,11 +1,11 @@
 ---
 id: PERF-483
 slug: browserpool-goto-commit
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2026-05-12
-completed: ""
-result: ""
+completed: 2026-05-12
+result: no-improvement
 ---
 
 # PERF-483: Change BrowserPool waitUntil from load to commit
@@ -61,3 +61,9 @@ Run the canvas tests to ensure the fallback doesn't break canvas initialization.
 
 ## Correctness Check
 Run tests in the `packages/renderer` directory. Ensure the final video output is still generated correctly without missing frames.
+
+## Results Summary
+- **Best render time**: 1.286s (vs baseline 1.130s)
+- **Improvement**: 0%
+- **Kept experiments**: []
+- **Discarded experiments**: [BrowserPool goto commit]
