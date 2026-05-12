@@ -1,5 +1,5 @@
 ---
-id: PERF-486
+id: PERF-488
 slug: eliminate-spurious-wakeups-and-redundant-checks
 status: unclaimed
 claimed_by: ""
@@ -7,8 +7,7 @@ created: 2026-05-12
 completed: ""
 result: ""
 ---
-
-# PERF-486: Eliminate Spurious Wakeups and Redundant Checks in CaptureLoop
+# PERF-488: Eliminate Spurious Wakeups and Redundant Checks in CaptureLoop
 
 ## Focus Area
 The `CaptureLoop` orchestrator in `packages/renderer/src/core/CaptureLoop.ts`. Specifically, the event loop Wakeup mechanisms (`writerWaiterResolve`) and the orchestrator state verification (`checkState()`).
