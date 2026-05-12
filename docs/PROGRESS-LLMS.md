@@ -751,3 +751,9 @@
   - Verified package versions match `package.json` exactly.
   - Verified File Paths and Key Files.
   - Incremented version to 1.84.2
+
+## LLMS v1.84.3
+- ✅ Completed: Daily llms.txt Review
+  - Updated Roadmap in llms.txt with verifiable completions from domain PROGRESS logs.
+  - Fixed Agent Skill paths to explicitly point to `.agents/skills/helios-skills/skills/*`.
+  - Verified package versions match `package.json` exactly.

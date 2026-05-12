@@ -1,5 +1,5 @@
 # Status: LLMS
-**Version**: 1.84.2
+**Version**: 1.84.3
 
 [v1.84.1] ✅ Completed: Comprehensive Daily Review - Updated Roadmap in llms.txt with recent verifiable completions from domain PROGRESS logs (CLI: CLI Utils Regression Tests, Registry Manifest Regression Tests; Player: Bridge Coverage Expansion; Infrastructure: Orchestrator Coverage Expansion, FfmpegStitcher Coverage). Verified all package versions match package.json.
 
@@ -142,3 +142,4 @@ Verified package versions match package.json exactly. Verified File Paths and Ke
 [v1.81.0] ✅ Completed: Comprehensive Daily Review - Updated Roadmap in llms.txt with recent completions from domain PROGRESS logs (Core: Implement Animation Helpers, Implement Variable Playback Rate, Implement InputProps; Studio: CLI Build Command, Preview Command, CLI Update Command; Player: Dom Canvas Capture, Bridge Documentation, Client-Side Image Inlining; Renderer: CdpTimeDriver Determinism, Smart Codec Selection Update, Smart Audio Fades; CLI: Scaffold Cloudflare Sandbox Deployment Command, Build Command Regression Tests; Infrastructure: Orchestrator Coverage Expansion, FfmpegStitcher Coverage, Optimize GCS Uploads). Verified all package versions match package.json (Core v5.13.0, Studio v0.107.1, Player v0.76.20, Renderer v1.78.3, CLI v0.45.2, Infrastructure v0.25.0).
 
 [v1.84.2] ✅ Completed: Comprehensive Daily Review - Updated Roadmap in llms.txt with recent verifiable completions from domain PROGRESS logs (Studio: Export Job Spec; CLI: Scaffold Hetzner Deployment Command; Player: Regression Tests for Media Session; Renderer: Abstraction for Pluggable Execution; Infrastructure: InMemoryJobRepository Coverage). Verified all package versions match package.json exactly.
+[v1.84.3] ✅ Completed: Daily llms.txt Review - Fixed Agent Skill paths and updated roadmap with recent verified completions.
