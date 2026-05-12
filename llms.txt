@@ -79,11 +79,11 @@ The engine controls `document.timeline.currentTime` to seek animations frame-acc
 
 ## Agent Skills
 Skills for AI agents are in `.agents/skills/helios-skills/skills/`:
-- `core/SKILL.md` - Core API patterns, state management, subscriptions
-- `renderer/SKILL.md` - Rendering pipeline usage
-- `player/SKILL.md` - Player component usage
-- `studio/SKILL.md` - Studio usage and extensions
-- `getting-started/SKILL.md` - Initial scaffolding and basic tasks
+- `.agents/skills/helios-skills/skills/core/SKILL.md` - Core API patterns, state management, subscriptions
+- `.agents/skills/helios-skills/skills/renderer/SKILL.md` - Rendering pipeline usage
+- `.agents/skills/helios-skills/skills/player/SKILL.md` - Player component usage
+- `.agents/skills/helios-skills/skills/studio/SKILL.md` - Studio usage and extensions
+- `.agents/skills/helios-skills/skills/getting-started/SKILL.md` - Initial scaffolding and basic tasks
 - `workflows/*.md`, `examples/*.md` & `guided/*.md` - Task-specific workflows, examples, and guided skills
 
 ## Key Files for Agents
@@ -121,11 +121,11 @@ const report = await Helios.diagnose();
 
 ## Roadmap
 ### V1.x (Active)
-- **Studio**: v0.107.1+ (Asset Drag and Drop, Refine CLI Component Removal, Export Job Spec)
-- **CLI**: v0.45.2+ (Scaffold Cloudflare Sandbox Deployment Command, Scaffold Hetzner Deployment Command, CLI Utils Regression Tests)
+- **Studio**: v0.107.1+ (Export Job Spec, Update Keyboard Shortcuts, Timeline Drag Drop)
+- **CLI**: v0.45.2+ (CLI Templates Regression Tests Spec, Registry Manifest Regression Tests)
 - **Core**: v5.13.0+ (Generic Input Props, Implement Active Clips, Implement Composition Schema, Shared Virtual Time Binding)
-- **Player**: v0.76.20+ (Document getSchema API Parity, Bridge Coverage Completeness, Regression Tests for Media Session)
-- **Renderer**: v1.78.3+ (Validate HW Accel, Orchestrator Plan, Refactor Media Sync Logic, Abstraction for Pluggable Execution)
+- **Player**: v0.76.20+ (Document Tracks API, Document API Parity Gap, Add Media Session properties)
+- **Renderer**: v1.78.3+ (WebCodecs Preference, Update Skill Documentation)
 - **Infrastructure**: v0.25.0+ (Optimize GCS Uploads, Orchestrator Coverage Expansion, InMemoryJobRepository Coverage)
 
 ### AI Integration
