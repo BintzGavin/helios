@@ -4,6 +4,7 @@ Last updated by: PERF-482
 
 
 ## What Works
+- Eliminated dead frame waiter logic in CaptureLoop, decreasing render time (PERF-496)
 
 - **PERF-482: Eliminate closure in evaluate stability by using integer state machine**
   - What: Replaced the syncMediaFn dynamic closure and execution evaluation in CdpTimeDriver with a simple integer state machine similar to PERF-479.

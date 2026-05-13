@@ -1,7 +1,7 @@
 ---
 id: PERF-496
 slug: eliminate-dead-frame-waiter
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2026-05-13
 completed: ""
@@ -77,3 +77,9 @@ Run a standard Canvas mode benchmark to ensure no regressions.
 
 ## Correctness Check
 Run the standard DOM benchmark to ensure the pipeline orchestrator does not deadlock or drop frames.
+
+## Results Summary
+- **Best render time**: 18.267s
+- **Improvement**: Maintained performance with reduced instruction cache pressure and closure allocations.
+- **Kept experiments**: Eliminated dead frame waiter logic in CaptureLoop (PERF-496)
+- **Discarded experiments**: []

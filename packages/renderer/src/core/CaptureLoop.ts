@@ -115,9 +115,6 @@ export class CaptureLoop {
     const freeWorkers = new Int32Array(poolLen);
     let freeWorkersHead = 0;
 
-    let frameWaiterResolve: (() => void) | null = null;
-    const frameWaiterExecutor = (resolve: () => void) => { frameWaiterResolve = resolve; };
-
     const checkState = () => {
         if (this.capturedErrors.length > 0 || (signal && signal.aborted)) {
             aborted = true;
@@ -130,11 +127,6 @@ export class CaptureLoop {
                     workerBlockedResolves[w]!(-1);
                     workerBlockedResolves[w] = null;
                 }
-            }
-            if (frameWaiterResolve) {
-                const res = frameWaiterResolve;
-                frameWaiterResolve = null;
-                res();
             }
             if (writerWaiterResolve) {
                 const res = writerWaiterResolve;
@@ -156,13 +148,6 @@ export class CaptureLoop {
             frameReadyRing[ringIndex] = 0;
             frameBufferRing[ringIndex] = null;
             frameErrorRing[ringIndex] = null;
-
-            // If main loop is waiting for a frame to be queued, wake it up
-            if (frameWaiterResolve) {
-                const fRes = frameWaiterResolve;
-                frameWaiterResolve = null;
-                fRes();
-            }
 
             res(i);
         }
@@ -203,12 +188,6 @@ export class CaptureLoop {
                 frameReadyRing[ringIndex] = 0;
                 frameBufferRing[ringIndex] = null;
                 frameErrorRing[ringIndex] = null;
-
-                if (frameWaiterResolve) {
-                    const fRes = frameWaiterResolve;
-                    frameWaiterResolve = null;
-                    fRes();
-                }
             } else {
                 i = await new Promise<number>(workerBlockedExecutors[workerIndex]);
             }
@@ -243,12 +222,6 @@ export class CaptureLoop {
         while (nextFrameToWrite < this.totalFrames && !aborted) {
             checkState();
             if (aborted) break;
-
-            // Wait for the task to be queued by a worker or immediately queued
-            if (nextFrameToSubmit <= nextFrameToWrite) {
-                await new Promise<void>(frameWaiterExecutor);
-                continue;
-            }
 
             const ringIndex = nextFrameToWrite & ringMask;
             if (frameReadyRing[ringIndex] === 0) {
