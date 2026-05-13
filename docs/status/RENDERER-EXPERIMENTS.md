@@ -431,3 +431,7 @@ Last updated by: PERF-468
 - **PERF-492**: Eliminate Spurious Wakeups and Redundant Checks
   - **What I tried**: Optimized the actor model orchestrator loop (`CaptureLoop.ts`) by making `writerWaiterResolve` execution strictly conditional on `nextFrameToWrite === i` in `runWorker`, and removing the duplicated synchronous `checkState()` call at the bottom of the main `while` loop.
   - **Outcome**: Kept. Eliminating the spurious wakeups dramatically improved performance (e.g. median ~0.603s vs baseline ~1.515s, though baselines have shifted, it yielded a ~1000 FPS throughput over 600 frames). This avoids hundreds of pointless V8 event loop microtask iterations and context switches per render.
+
+- **PERF-010**: Optimize Intermediate Format to JPEG
+  - **What I tried**: Changed the default CDP screenshot fallback format in `DomStrategy.ts` from `webp`/`png` to `jpeg` (quality 90) when no alpha channel is needed.
+  - **Outcome**: Kept. Render time stabilized around ~19.7s. `jpeg` encoding is faster than `png` inside Skia, and eliminates the WebP `unspecified size` pipe issues we saw previously.
