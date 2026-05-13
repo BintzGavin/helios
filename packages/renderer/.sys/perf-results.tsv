@@ -59,3 +59,4 @@ run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
 6	1.515	150	99.01	40.4	keep	PERF-482: Eliminate closure in evaluate stability by using integer state machine
 1	1.286	150	116.67	44.5	discard	PERF-483: BrowserPool goto commit
 1	4.169	300	71.97	40.3	keep	PERF-493 stack-free-workers
+1	18.267	600	32.85	38.1	keep	PERF-496 eliminate dead frame waiter
