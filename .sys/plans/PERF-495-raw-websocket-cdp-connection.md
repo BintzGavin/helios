@@ -1,14 +1,14 @@
 ---
-id: PERF-494
+id: PERF-495
 slug: raw-websocket-cdp-connection
-status: complete
-claimed_by: "jules"
+status: unclaimed
+claimed_by: ""
 created: 2026-05-13
 completed: ""
-result: "discard"
+result: ""
 ---
 
-# PERF-494: Raw WebSocket CDP Connection for Hot Loop
+# PERF-495: Raw WebSocket CDP Connection for Hot Loop
 
 ## Focus Area
 The DOM capture hot loop, specifically `DomStrategy.ts` (for `beginFrame`) and `CdpTimeDriver.ts` (for `setVirtualTimePolicy`).
@@ -33,7 +33,7 @@ By bypassing Playwright's IPC and connecting directly to Chromium's native WebSo
 - **Minimum runs**: 3 per experiment, report median
 
 ## Baseline
-- **Current estimated render time**: ~0.60s (PERF-492)
+- **Current estimated render time**: ~4.169s (PERF-493)
 - **Bottleneck analysis**: Playwright IPC overhead and JSON serialization in the hot loop.
 
 ## Implementation Spec
