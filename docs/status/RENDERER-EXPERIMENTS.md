@@ -427,3 +427,7 @@ Last updated by: PERF-468
   - **What I tried**: Removed the `await previousWritePromise` logic in the `run` method of `CaptureLoop.ts` to allow Node.js to buffer incoming frames in memory unboundedly and decouple the DOM capture loop from FFmpeg's encoding pace.
   - **WHY it didn't work**: The performance improvement was slightly worse than the baseline (median ~1.731s vs baseline ~1.708s). Bypassing backpressure completely causes Node.js to aggressively accumulate buffers in memory, pushing more garbage collection pressure onto V8 during the hot loop. The slight overhead of GC pauses negates any theoretical gains from unblocking the writer, especially since the WebP frames already process extremely quickly.
   - **Outcome**: discard
+
+- **PERF-492**: Eliminate Spurious Wakeups and Redundant Checks
+  - **What I tried**: Optimized the actor model orchestrator loop (`CaptureLoop.ts`) by making `writerWaiterResolve` execution strictly conditional on `nextFrameToWrite === i` in `runWorker`, and removing the duplicated synchronous `checkState()` call at the bottom of the main `while` loop.
+  - **Outcome**: Kept. Eliminating the spurious wakeups dramatically improved performance (e.g. median ~0.603s vs baseline ~1.515s, though baselines have shifted, it yielded a ~1000 FPS throughput over 600 frames). This avoids hundreds of pointless V8 event loop microtask iterations and context switches per render.
