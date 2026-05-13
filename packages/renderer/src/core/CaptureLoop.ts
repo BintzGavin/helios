@@ -223,7 +223,7 @@ export class CaptureLoop {
                 frameErrorRing[ringIndex] = e;
                 frameReadyRing[ringIndex] = 1;
             }
-            if (writerWaiterResolve) {
+            if (writerWaiterResolve && nextFrameToWrite === i) {
                 const res = writerWaiterResolve;
                 writerWaiterResolve = null;
                 res();
@@ -267,7 +267,6 @@ export class CaptureLoop {
             this.writeToStdin(buffer, this.handleWriteError);
 
             nextFrameToWrite++;
-            checkState(); // This will unblock a waiting worker if we just opened up pipeline capacity
         }
     } catch (e) {
         aborted = true;
