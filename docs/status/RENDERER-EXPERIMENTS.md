@@ -435,3 +435,6 @@ Last updated by: PERF-468
 - **PERF-010**: Optimize Intermediate Format to JPEG
   - **What I tried**: Changed the default CDP screenshot fallback format in `DomStrategy.ts` from `webp`/`png` to `jpeg` (quality 90) when no alpha channel is needed.
   - **Outcome**: Kept. Render time stabilized around ~19.7s. `jpeg` encoding is faster than `png` inside Skia, and eliminates the WebP `unspecified size` pipe issues we saw previously.
+
+## What Works
+- PERF-493: Track Free Workers with Stack in CaptureLoop (improved to 4.169s)

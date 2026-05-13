@@ -112,6 +112,9 @@ export class CaptureLoop {
     let nextFrameToWrite = 0;
     let aborted = false;
     const workerBlockedResolves = new Array<((i: number) => void) | null>(poolLen).fill(null);
+    const freeWorkers = new Int32Array(poolLen);
+    let freeWorkersHead = 0;
+
     let frameWaiterResolve: (() => void) | null = null;
     const frameWaiterExecutor = (resolve: () => void) => { frameWaiterResolve = resolve; };
 
@@ -121,7 +124,8 @@ export class CaptureLoop {
         }
 
         if (aborted) {
-            for (let w = 0; w < poolLen; w++) {
+            while (freeWorkersHead > 0) {
+                const w = freeWorkers[--freeWorkersHead];
                 if (workerBlockedResolves[w]) {
                     workerBlockedResolves[w]!(-1);
                     workerBlockedResolves[w] = null;
@@ -141,12 +145,11 @@ export class CaptureLoop {
         }
 
         // See if we can assign tasks to waiting workers
-        for (let w = 0; w < poolLen; w++) {
-            if (!workerBlockedResolves[w] || nextFrameToSubmit >= this.totalFrames || nextFrameToSubmit - nextFrameToWrite >= maxPipelineDepth) {
-                continue;
-            }
+        while (freeWorkersHead > 0 && nextFrameToSubmit < this.totalFrames && nextFrameToSubmit - nextFrameToWrite < maxPipelineDepth) {
+            const w = freeWorkers[--freeWorkersHead];
             const res = workerBlockedResolves[w]!;
             workerBlockedResolves[w] = null;
+
             const i = nextFrameToSubmit++;
             const ringIndex = i & ringMask;
 
@@ -166,7 +169,8 @@ export class CaptureLoop {
 
         // If we still have waiting workers but are at totalFrames, tell them to stop
         if (nextFrameToSubmit >= this.totalFrames) {
-            for (let w = 0; w < poolLen; w++) {
+            while (freeWorkersHead > 0) {
+                const w = freeWorkers[--freeWorkersHead];
                 if (workerBlockedResolves[w]) {
                     workerBlockedResolves[w]!(-1);
                     workerBlockedResolves[w] = null;
@@ -180,6 +184,8 @@ export class CaptureLoop {
     for (let w = 0; w < poolLen; w++) {
         workerBlockedExecutors[w] = (resolve: (i: number) => void) => {
             workerBlockedResolves[w] = resolve;
+            freeWorkers[freeWorkersHead++] = w;
+            checkState();
         };
     }
 

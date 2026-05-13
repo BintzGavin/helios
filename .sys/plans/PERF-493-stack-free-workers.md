@@ -1,11 +1,11 @@
 ---
 id: PERF-493
 slug: stack-free-workers
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2026-05-13
 completed: ""
-result: ""
+result: improved
 ---
 # PERF-493: Track Free Workers with Stack in CaptureLoop
 
@@ -123,3 +123,7 @@ Run a standard Canvas mode benchmark to ensure no regressions.
 
 ## Correctness Check
 Run the standard DOM benchmark to ensure FFmpeg successfully encodes all frames and no workers are starved or leaked.
+## Results Summary
+- **Best render time**: 4.169s
+- **Kept experiments**: stack-free-workers
+- **Discarded experiments**: none
