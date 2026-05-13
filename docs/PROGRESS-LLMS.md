@@ -1,3 +1,13 @@
+## LLMS v1.84.4
+- ✅ Completed: Daily llms.txt Review
+  - Updated Roadmap in llms.txt with verifiable completions from domain PROGRESS logs:
+    - Studio: Asset Drag and Drop
+    - CLI: Scaffold Cloudflare Sandbox Deployment, All Worker Execution
+    - Player: Bridge Coverage Completeness, Regression Tests for Audio Fader
+    - Renderer: Validate HW Accel, Orchestrator Plan
+    - Infrastructure: Optimize GCS Uploads, CloudRun Resiliency Tests
+  - Verified package versions match `package.json` exactly.
+
 ## LLMS v1.84.0
 - ✅ Completed: Daily llms.txt Review
   - Updated DiagnosticReport API example (audioDecoders, userAgent)

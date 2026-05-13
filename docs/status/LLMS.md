@@ -1,5 +1,7 @@
 # Status: LLMS
-**Version**: 1.84.3
+**Version**: 1.84.4
+
+[v1.84.4] ✅ Completed: Comprehensive Daily Review - Updated Roadmap in llms.txt with recent verifiable completions from domain PROGRESS logs (Studio: Asset Drag and Drop; CLI: Scaffold Cloudflare Sandbox Deployment, All Worker Execution; Player: Bridge Coverage Completeness, Regression Tests for Audio Fader; Renderer: Validate HW Accel, Orchestrator Plan; Infrastructure: Optimize GCS Uploads, CloudRun Resiliency Tests). Verified all package versions match package.json exactly.
 
 [v1.84.1] ✅ Completed: Comprehensive Daily Review - Updated Roadmap in llms.txt with recent verifiable completions from domain PROGRESS logs (CLI: CLI Utils Regression Tests, Registry Manifest Regression Tests; Player: Bridge Coverage Expansion; Infrastructure: Orchestrator Coverage Expansion, FfmpegStitcher Coverage). Verified all package versions match package.json.
 
