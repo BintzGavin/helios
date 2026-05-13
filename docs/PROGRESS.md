@@ -1,3 +1,6 @@
+### CLI v0.46.25
+- ✅ Completed: CLI Index Regression Tests - Implemented unit tests for the CLI entry point in index.ts.
+
 ### STUDIO v0.121.11
 - ✅ Completed: STUDIO-ExportJobSpec - Verified that the Export Job Spec feature in Renders Panel was already fully implemented (IMPOSSIBLE: DUPLICATION).
 
@@ -46,6 +49,7 @@
 ## INFRASTRUCTURE v0.28.3
 - ✅ Completed: Documentation Orchestration - Updated README.md to document Orchestration, Job Management, Cloud Execution Adapters, and Worker Runtime abstractions.
 # Helios Project Progress Log
+
 
 ### CLI v0.46.12
 - ✅ Completed: Regression Tests Remaining Commands - Verified comprehensive unit tests for `helios preview`, `helios skills`, and `helios studio`.
