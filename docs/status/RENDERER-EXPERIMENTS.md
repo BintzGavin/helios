@@ -447,3 +447,7 @@ Last updated by: PERF-468
   - **What I tried**: Moved checkState() call from top of while loop to after nextFrameToWrite++ inside the loop.
   - **WHY it didn't work**: Render time of 18.077s was not better than baseline of 17.687s.
   - **Outcome**: discard
+
+## What Doesn't Work (and Why)
+- **PERF-499: Raw WebSocket CDP Connection for Hot Loop**:
+  Bypassing Playwright's `CDPSession` with a raw Node.js TCP/WebSocket connection to reduce IPC and JSON overhead did not improve performance. The render time (18.578s) was slower than the baseline (17.978s). The overhead of managing the WebSocket frames and native Node buffer handling in JavaScript might outweigh the Playwright IPC overhead.

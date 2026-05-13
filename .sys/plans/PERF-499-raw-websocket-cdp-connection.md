@@ -1,11 +1,11 @@
 ---
 id: PERF-499
 slug: raw-websocket-cdp-connection
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2026-05-13
-completed: ""
-result: ""
+completed: "2026-05-13"
+result: "discarded"
 ---
 # PERF-499: Raw WebSocket CDP Connection for Hot Loop
 
@@ -62,3 +62,8 @@ Run a standard Canvas mode benchmark to ensure no regressions (Canvas mode won't
 
 ## Correctness Check
 Run the standard DOM benchmark to ensure FFmpeg successfully encodes all frames and virtual time still ticks deterministically.
+## Results Summary
+- **Best render time**: 18.578s (vs baseline 17.978s)
+- **Improvement**: -3.3%
+- **Kept experiments**: None
+- **Discarded experiments**: Raw WebSocket CDP Connection (PERF-499)
