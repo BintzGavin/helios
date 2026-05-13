@@ -243,7 +243,12 @@ export class CaptureLoop {
                 onProgress(currentFrame / this.totalFrames);
             }
 
-            this.writeToStdin(buffer, this.handleWriteError);
+            if (previousWritePromise) {
+                await previousWritePromise;
+            }
+
+            const writeResult = this.writeToStdin(buffer, this.handleWriteError);
+            previousWritePromise = writeResult ? writeResult : undefined;
 
             nextFrameToWrite++;
         }
@@ -264,6 +269,10 @@ export class CaptureLoop {
     }
 
     await Promise.all(workerPromises);
+
+    if (previousWritePromise) {
+        await previousWritePromise;
+    }
 
     console.log('Finishing render strategy...');
     const finalBuffer = await this.pool[0].strategy.finish(this.pool[0].page);
