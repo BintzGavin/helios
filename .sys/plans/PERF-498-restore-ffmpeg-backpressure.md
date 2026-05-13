@@ -1,11 +1,11 @@
 ---
 id: PERF-498
 slug: restore-ffmpeg-backpressure
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2026-05-13
-completed: ""
-result: ""
+completed: "2026-05-13"
+result: "keep"
 ---
 
 # PERF-498: Restore FFmpeg Backpressure in CaptureLoop
@@ -91,3 +91,9 @@ Run a standard Canvas mode benchmark to ensure no regressions.
 
 ## Correctness Check
 Run the standard DOM benchmark to ensure FFmpeg successfully encodes all frames from the buffered pipe.
+
+## Results Summary
+- **Best render time**: 17.687s (vs baseline 18.267s)
+- **Improvement**: 3.1%
+- **Kept experiments**: PERF-498
+- **Discarded experiments**: none

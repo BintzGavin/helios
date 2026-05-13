@@ -439,3 +439,6 @@ Last updated by: PERF-468
 
 ## What Works
 - PERF-493: Track Free Workers with Stack in CaptureLoop (improved to 4.169s)
+- **PERF-498**: Restore FFmpeg Backpressure in CaptureLoop
+  - **What I tried**: Restored the `previousWritePromise` await when writing to FFmpeg stdin to prevent unbounded memory buffering of frames in Node.js.
+  - **Outcome**: Kept. While the raw time (~17.687s for 600 frames) seemed slower initially when mistakenly compared against a 300-frame Canvas baseline, it is actually a ~3.1% improvement over the true 600-frame baseline (~18.267s for PERF-496). Critically, it prevents unbound buffering and GC pauses, ensuring stability for long renders.

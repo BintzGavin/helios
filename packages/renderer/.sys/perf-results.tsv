@@ -60,3 +60,4 @@ run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
 1	1.286	150	116.67	44.5	discard	PERF-483: BrowserPool goto commit
 1	4.169	300	71.97	40.3	keep	PERF-493 stack-free-workers
 1	18.267	600	32.85	38.1	keep	PERF-496 eliminate dead frame waiter
+1	17.687	600	33.92	43.9	keep	Restore FFmpeg backpressure
