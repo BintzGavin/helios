@@ -1,7 +1,8 @@
 ---
 id: PERF-497
 slug: optimize-orchestrator-state-checks
-status: unclaimed
+status: complete
+result: failed
 claimed_by: ""
 created: 2026-05-13
 completed: ""
@@ -86,3 +87,7 @@ Run a standard Canvas mode benchmark to ensure no regressions.
 
 ## Correctness Check
 Run the standard DOM benchmark to ensure the capture loop successfully processes all frames without deadlocking.
+## Results Summary
+- **Best render time**: 18.077s (vs baseline 17.687s)
+- **Improvement**: none
+- **Discarded experiments**: PERF-497
