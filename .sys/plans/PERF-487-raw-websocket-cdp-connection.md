@@ -1,11 +1,11 @@
 ---
 id: PERF-487
 slug: raw-websocket-cdp-connection
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "jules"
 created: 2026-05-12
 completed: ""
-result: ""
+result: "discard"
 ---
 
 # PERF-487: Raw WebSocket CDP Connection for Hot Loop
