@@ -442,3 +442,8 @@ Last updated by: PERF-468
 - **PERF-498**: Restore FFmpeg Backpressure in CaptureLoop
   - **What I tried**: Restored the `previousWritePromise` await when writing to FFmpeg stdin to prevent unbounded memory buffering of frames in Node.js.
   - **Outcome**: Kept. While the raw time (~17.687s for 600 frames) seemed slower initially when mistakenly compared against a 300-frame Canvas baseline, it is actually a ~3.1% improvement over the true 600-frame baseline (~18.267s for PERF-496). Critically, it prevents unbound buffering and GC pauses, ensuring stability for long renders.
+
+- **PERF-497**: Optimize Orchestrator State Checks
+  - **What I tried**: Moved checkState() call from top of while loop to after nextFrameToWrite++ inside the loop.
+  - **WHY it didn't work**: Render time of 18.077s was not better than baseline of 17.687s.
+  - **Outcome**: discard
