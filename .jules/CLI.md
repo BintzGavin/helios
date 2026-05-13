@@ -196,3 +196,6 @@ Critical learnings only. This is not a log—only add entries for insights that 
 ## [v0.46.24] - Identify Uncovered Templates Files
 **Learning:** Following up on [0.46.22], the plan for templates regression tests (`2027-06-05-CLI-Templates-Regression-Tests.md`) was NOT a duplication, as `packages/cli/src/templates/__tests__` does not exist and `npm run test` output confirmed no template tests ran.
 **Action:** While there are no active deltas, we will rewrite the valid plan for `packages/cli/src/templates/` regression tests as the next actionable gap, keeping the EXACT same structure but updating the name/date to be the current executable plan.
+## [0.46.25] - Identify Uncovered Index File
+**Learning:** The fallback action from [0.46.24] for templates files regression tests was completed. Searching for uncovered areas in a stable domain requires thoroughly checking tests against source files. 'packages/cli/src/index.ts' currently lacks test coverage while being the main entrypoint for the CLI.
+**Action:** When falling back to regression testing under the NOTHING TO DO PROTOCOL, target the entry point file (like index.ts) that is critical for command execution when command, registry, utils and templates coverage is 100%. Created plan '2027-06-05-CLI-Index-Regression-Tests.md'.
