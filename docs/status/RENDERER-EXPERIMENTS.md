@@ -70,6 +70,7 @@ Last updated by: PERF-482
 - **PERF-337**: Prebound `frameWaiterResolve` executor into `frameWaiterExecutor` to avoid dynamic inline closure allocations during the CaptureLoop actor pipeline backpressure events. This adheres to the "simplicity and GC reduction" principle that guided keeping `writerWaiterExecutor`. Render time: 46.464s (Baseline: 57.022s), though baseline was inflated by initial run. Median render times of subsequent runs were around 46.6s, slightly better than PERF-336's ~47.4s. Kept to reduce V8 GC churn in the main event loop.
 
 ## What Doesn't Work (and Why)
+- **PERF-500**: Reduced default intermediate JPEG quality from 90 to 50 in DomStrategy.ts. WHY it didn't work: Render time did not improve over baseline (it degraded to ~28.4s).
 - Inlined CDP screenshot params into beginFrameParams (PERF-501)
   - **WHY it didn't work**: Did not provide significant serialization savings over Baseline ~17.687s. Time: 18.321s
 - **PERF-478**: Eliminate Closure in evaluateStabilityParams
