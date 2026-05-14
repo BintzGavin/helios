@@ -452,6 +452,10 @@ Last updated by: PERF-468
   - **Outcome**: discard
 
 ## What Doesn't Work (and Why)
+- **PERF-504**: Optimize BrowserPool Concurrency Formula
+  - **What I tried**: Modified `BrowserPool.ts` concurrency logic to `const concurrency = Math.max(1, Math.min(8, cpus * 2));` to increase parallel capture capacity.
+  - **WHY it didn't work**: The performance regressed heavily. Increasing Playwright instances/concurrency to 8 exhausted memory and CPU resources, causing the render time to slow down significantly to ~26.429s (compared to baseline ~17.687s).
+  - **Outcome**: discard
 - **PERF-502**: Tune ZeroLatency
   - **What I tried**: Added `-tune zerolatency` to FFmpeg builder arguments for `libx264`.
   - **WHY it didn't work**: The performance degraded compared to the baseline (~18.675s vs baseline ~17.574s). Forcing the encoder to skip its internal frame buffering didn't improve throughput over the IPC/Playwright bottleneck, and might have caused the encoder to work inefficiently, blocking standard input more frequently.
