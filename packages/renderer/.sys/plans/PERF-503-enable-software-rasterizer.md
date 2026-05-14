@@ -1,11 +1,11 @@
 ---
 id: PERF-503
 slug: enable-software-rasterizer
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "Jules"
 created: 2024-05-15
-completed: ""
-result: ""
+completed: "2024-05-15"
+result: "discard"
 ---
 
 # PERF-503: Enable CPU Compositing and Software Rasterizer
