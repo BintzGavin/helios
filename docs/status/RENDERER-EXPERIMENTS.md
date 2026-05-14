@@ -462,3 +462,7 @@ Last updated by: PERF-468
   - **What I tried**: Removed `--disable-software-rasterizer` and `--disable-gpu-compositing` from `GPU_DISABLED_ARGS` in `BrowserPool.ts`.
   - **WHY it didn't work**: The software rasterizer overhead in a completely headless microVM environment was significantly worse than Playwright's default behavior, degrading median render time to 18.887s (baseline 17.687s).
   - **Outcome**: discard
+- **PERF-500**: Reduce Intermediate JPEG Quality
+  - **What I tried**: Reduced intermediate JPEG quality from 90 to 50 in `DomStrategy.ts`.
+  - **WHY it didn't work**: Performance degraded (median ~16.729 vs baseline ~16.634). Visual degradation plus no speed improvements means this is a failure.
+  - **Outcome**: discard

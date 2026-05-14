@@ -1,11 +1,11 @@
 ---
 id: PERF-500
 slug: reduce-jpeg-quality
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2026-10-19
-completed: ""
-result: ""
+completed: "2026-05-14"
+result: "failed"
 ---
 
 # PERF-500: Reduce Intermediate JPEG Quality
@@ -72,3 +72,9 @@ Inspect the final MP4 output visually to ensure the quality degradation is not n
 
 ## Prior Art
 - PERF-010: Changed default CDP screenshot format from webp/png to jpeg (quality 90).
+
+## Results Summary
+- **Best render time**: 16.634s (vs baseline 16.634s)
+- **Improvement**: 0%
+- **Kept experiments**: []
+- **Discarded experiments**: [Reduce JPEG quality to 50]

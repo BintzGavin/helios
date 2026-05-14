@@ -67,3 +67,4 @@ run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
 1	18.675	600	32.13	41.3	discard	PERF-502 tune zerolatency
 1	28.421	600	21.11	0.0	discard	reduce-jpeg-quality
 2	18.887	600	31.77	44.4	discard	PERF-503 enable software rasterizer
+1	16.729	600	35.87	47.5	discard	reduce jpeg quality to 50
