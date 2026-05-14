@@ -1,11 +1,11 @@
 ---
 id: PERF-504
 slug: browser-pool-concurrency
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor"
 created: 2024-05-14
-completed: ""
-result: ""
+completed: "2024-05-14"
+result: "failed"
 ---
 # PERF-504: Optimize BrowserPool Concurrency Formula
 
