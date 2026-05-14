@@ -451,5 +451,8 @@ Last updated by: PERF-468
   - **Outcome**: discard
 
 ## What Doesn't Work (and Why)
+- **PERF-502**: Tune ZeroLatency
+  - **What I tried**: Added `-tune zerolatency` to FFmpeg builder arguments for `libx264`.
+  - **WHY it didn't work**: The performance degraded compared to the baseline (~18.675s vs baseline ~17.574s). Forcing the encoder to skip its internal frame buffering didn't improve throughput over the IPC/Playwright bottleneck, and might have caused the encoder to work inefficiently, blocking standard input more frequently.
 - **PERF-499: Raw WebSocket CDP Connection for Hot Loop**:
   Bypassing Playwright's `CDPSession` with a raw Node.js TCP/WebSocket connection to reduce IPC and JSON overhead did not improve performance. The render time (18.578s) was slower than the baseline (17.978s). The overhead of managing the WebSocket frames and native Node buffer handling in JavaScript might outweigh the Playwright IPC overhead.

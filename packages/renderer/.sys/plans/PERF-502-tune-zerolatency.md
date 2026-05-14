@@ -1,11 +1,11 @@
 ---
 id: PERF-502
 slug: tune-zerolatency
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "Jules"
 created: 2024-05-14
-completed: ""
-result: ""
+completed: "2024-05-14"
+result: "discarded"
 ---
 
 # PERF-502: Optimize FFmpeg Args for Zero-Latency Output
