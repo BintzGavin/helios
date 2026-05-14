@@ -1,11 +1,11 @@
 ---
 id: PERF-500
 slug: reduce-jpeg-quality
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-13
-completed: ""
-result: ""
+completed: "2024-05-14"
+result: "discarded"
 ---
 
 # PERF-500: Reduce Default JPEG Intermediate Quality
@@ -54,3 +54,7 @@ Run the `simple-animation` benchmark and inspect the `output.mp4` to ensure it i
 
 ## Canvas Smoke Test
 Run a basic canvas test to ensure the shared codebase is not broken.
+
+## Results Summary
+- **Render time**: 28.421 s
+- **Discarded experiments**: PERF-500
