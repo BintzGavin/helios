@@ -199,3 +199,9 @@ Critical learnings only. This is not a log—only add entries for insights that 
 ## [0.46.25] - Identify Uncovered Index File
 **Learning:** The fallback action from [0.46.24] for templates files regression tests was completed. Searching for uncovered areas in a stable domain requires thoroughly checking tests against source files. 'packages/cli/src/index.ts' currently lacks test coverage while being the main entrypoint for the CLI.
 **Action:** When falling back to regression testing under the NOTHING TO DO PROTOCOL, target the entry point file (like index.ts) that is critical for command execution when command, registry, utils and templates coverage is 100%. Created plan '2027-06-05-CLI-Index-Regression-Tests.md'.
+## [v0.46.26] - Identify Uncovered Cloud Templates
+**Learning:** Following up on [0.46.24] and [0.46.25], the previous fallback testing left out Docker, Deno, Vercel, Modal, Hetzner, and Fly.io from .
+**Action:** When falling back to regression testing under the NOTHING TO DO PROTOCOL, target specific template variables within test files that are omitted even when the file exists. Created plan '2027-06-05-CLI-Cloud-Templates-Tests.md'.
+## [v0.46.26] - Identify Uncovered Cloud Templates
+**Learning:** Following up on [0.46.24] and [0.46.25], the previous fallback testing left out Docker, Deno, Vercel, Modal, Hetzner, and Fly.io from packages/cli/src/templates/__tests__/cloud.test.ts.
+**Action:** When falling back to regression testing under the NOTHING TO DO PROTOCOL, target specific template variables within test files that are omitted even when the file exists. Created plan 2027-06-05-CLI-Cloud-Templates-Tests.md.

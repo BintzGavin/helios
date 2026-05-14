@@ -133,3 +133,4 @@ The Helios CLI is the primary user interface for component registry, project sca
 [v0.46.22] 🟢 Completed: CLI Templates Regression Tests Spec - Created specification plan `2027-06-05-CLI-Templates-Regression-Tests.md` for implementing regression tests for all file generation templates in `packages/cli/src/templates`.
 
 [v0.46.24] ✅ Completed: CLI Templates Regression Tests - Implemented unit tests for file generation templates in packages/cli/src/templates.
+- [ ] [v0.46.27] CLI Blocked: Waiting for a new, valid plan in /.sys/plans/
