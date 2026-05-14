@@ -1,11 +1,11 @@
 ---
 id: PERF-501
 slug: inline-cdp-screenshot-params
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "jules"
 created: 2024-05-14
-completed: ""
-result: ""
+completed: "2024-05-14"
+result: "discard"
 ---
 
 # PERF-501: Inline CDP Screenshot Params
@@ -36,3 +36,7 @@ Run the benchmark and ensure `output.mp4` is valid.
 
 ## Canvas Smoke Test
 Run a basic canvas test to ensure no breakage.
+## Results Summary
+| run | render_time_s | frames | fps_effective | peak_mem_mb | status | description |
+|-----|---------------|--------|---------------|-------------|--------|-------------|
+| 1   | 18.321        | 600    | 32.75         | 39.4        | discard| Inline CDP Screenshot Params |

@@ -63,3 +63,4 @@ run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
 1	17.687	600	33.92	43.9	keep	Restore FFmpeg backpressure
 63	18.077	600	33.19	37.3	discard	optimize orchestrator state checks
 64	18.077	600	33.19	37.3	discard	optimize orchestrator state checks
+1	18.321	600	32.75	39.4	discard	Inline CDP Screenshot Params

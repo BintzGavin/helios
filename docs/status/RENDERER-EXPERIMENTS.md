@@ -70,6 +70,8 @@ Last updated by: PERF-482
 - **PERF-337**: Prebound `frameWaiterResolve` executor into `frameWaiterExecutor` to avoid dynamic inline closure allocations during the CaptureLoop actor pipeline backpressure events. This adheres to the "simplicity and GC reduction" principle that guided keeping `writerWaiterExecutor`. Render time: 46.464s (Baseline: 57.022s), though baseline was inflated by initial run. Median render times of subsequent runs were around 46.6s, slightly better than PERF-336's ~47.4s. Kept to reduce V8 GC churn in the main event loop.
 
 ## What Doesn't Work (and Why)
+- Inlined CDP screenshot params into beginFrameParams (PERF-501)
+  - **WHY it didn't work**: Did not provide significant serialization savings over Baseline ~17.687s. Time: 18.321s
 - **PERF-478**: Eliminate Closure in evaluateStabilityParams
   - **What I tried**: Attempted to replace the `stabilityCheckFn` closure assignment in `CdpTimeDriver.ts` with a primitive `stabilityCheckState` state machine (0=unknown, 1=true, 2=false) to avoid dynamic function invocation overhead.
   - **WHY it didn't work**: The performance improvement was non-existent (baseline ~0.60s vs ~0.59s median). The overhead of a closure assignment and invocation in V8 is completely negligible compared to Playwright IPC and CDP communication bottlenecks. The manual micro-optimization introduced unnecessary state tracking without meaningful performance gains.
