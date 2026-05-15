@@ -1,11 +1,11 @@
 ---
 id: PERF-506
 slug: inline-stability-check
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-15
 completed: ""
-result: ""
+result: "completed"
 ---
 # PERF-506: Inline Stability Check Promise Handling
 
@@ -40,3 +40,6 @@ The `defaultStabilityCheck` currently wraps the `Runtime.evaluate` call in a `.t
 
 ## Correctness Check
 Run the DOM benchmark (`npx tsx tests/fixtures/benchmark.ts`) and ensure it completes without hanging or errors, and that output looks correct.
+
+## Results Summary
+- **Experiment completed**: results recorded in RENDERER-EXPERIMENTS.md

@@ -479,3 +479,7 @@ Last updated by: PERF-468
   - **What I tried**: Returned direct promise from defaultStabilityCheck without .then() closure overhead
   - **WHY it didn't work**: Did not improve performance over baseline (median ~18.03s vs baseline ~17.37s-19.93s).
   - **Outcome**: discard
+## What Doesn't Work (and Why)
+- Inlining stability check promise resolution in CdpTimeDriver.ts
+- The bottleneck is likely in V8 runtime boundaries or Playwright CDP IPC, meaning microtask queue optimizations yield no measurable performance improvement over the baseline.
+- Plan ID: PERF-506
