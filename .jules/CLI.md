@@ -205,3 +205,9 @@ Critical learnings only. This is not a log—only add entries for insights that 
 ## [v0.46.26] - Identify Uncovered Cloud Templates
 **Learning:** Following up on [0.46.24] and [0.46.25], the previous fallback testing left out Docker, Deno, Vercel, Modal, Hetzner, and Fly.io from packages/cli/src/templates/__tests__/cloud.test.ts.
 **Action:** When falling back to regression testing under the NOTHING TO DO PROTOCOL, target specific template variables within test files that are omitted even when the file exists. Created plan 2027-06-05-CLI-Cloud-Templates-Tests.md.
+## [v0.46.28] - Created Cloud Templates Regression Tests Spec
+**Learning:** Found an actionable gap from previous journal entries: tests were missing in `packages/cli/src/templates/__tests__/cloud.test.ts` for Docker, Deno, Vercel, Modal, Hetzner, and Fly.io templates.
+**Action:** Generated plan `2027-06-05-CLI-Cloud-Templates-Regression-Tests.md` to add the missing tests.
+## [v0.46.28] - Created Cloud Templates Regression Tests Spec
+**Learning:** Found an actionable gap from previous journal entries: tests were missing in `packages/cli/src/templates/__tests__/cloud.test.ts` for Docker, Deno, Vercel, Modal, Hetzner, and Fly.io templates.
+**Action:** Generated plan `2027-06-05-CLI-Cloud-Templates-Regression-Tests.md` to add the missing tests.
