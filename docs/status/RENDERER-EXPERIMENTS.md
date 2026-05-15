@@ -474,3 +474,8 @@ Last updated by: PERF-468
   - **What I tried**: Attempted to replace the single shared browser context in `BrowserPool.ts` with dedicated `browser.newContext()` contexts for each individual worker page to improve Chromium process isolation and CPU utilization.
   - **WHY it didn't work**: The overall render time worsened (median ~19.487s vs baseline ~18.763s). The additional overhead required to instantiate, trace, and coordinate multiple isolated browser contexts inside the Playwright microVM likely outweighs any potential thread contention benefits during DOM capture.
   - **Outcome**: discard
+
+- **PERF-509**: Inline Stability Check Await
+  - **What I tried**: Returned direct promise from defaultStabilityCheck without .then() closure overhead
+  - **WHY it didn't work**: Did not improve performance over baseline (median ~18.03s vs baseline ~17.37s-19.93s).
+  - **Outcome**: discard

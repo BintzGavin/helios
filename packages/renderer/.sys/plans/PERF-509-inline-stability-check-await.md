@@ -1,11 +1,11 @@
 ---
 id: PERF-509
 slug: inline-stability-check-await
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-05-15
 completed: ""
-result: ""
+result: failed
 ---
 
 # PERF-509: Inline Stability Check Await
@@ -67,3 +67,9 @@ Modify `defaultStabilityCheck` to return the promise without `.then()`, and upda
 ```
 **Why**: Avoids creating a secondary Promise object via `.then()` and an anonymous closure per frame.
 **Risk**: None.
+
+## Results Summary
+- **Best render time**: 18.033s (vs baseline ~17.37s-19.93s)
+- **Improvement**: 0%
+- **Kept experiments**: None
+- **Discarded experiments**: Inline Stability Check Await
