@@ -1,3 +1,12 @@
+## LLMS v1.85.0
+- ✅ Completed: Daily llms.txt Review
+  - Updated Roadmap in llms.txt with verifiable completions from domain PROGRESS logs:
+    - CLI: CLI Templates Regression Tests
+    - Infrastructure: InMemoryJobRepository Coverage
+  - Verified package versions match `package.json` exactly.
+  - Verified File Paths and Key Files.
+  - Incremented version to 1.85.0
+
 ## LLMS v1.84.4
 - ✅ Completed: Daily llms.txt Review
   - Updated Roadmap in llms.txt with verifiable completions from domain PROGRESS logs:

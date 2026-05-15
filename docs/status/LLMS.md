@@ -1,5 +1,7 @@
 # Status: LLMS
-**Version**: 1.84.4
+**Version**: 1.85.0
+
+[v1.85.0] ✅ Completed: Comprehensive Daily Review - Updated Roadmap with CLI Templates Regression Tests and InMemoryJobRepository Coverage. Verified versions and file paths.
 
 [v1.84.4] ✅ Completed: Comprehensive Daily Review - Updated Roadmap in llms.txt with recent verifiable completions from domain PROGRESS logs (Studio: Asset Drag and Drop; CLI: Scaffold Cloudflare Sandbox Deployment, All Worker Execution; Player: Bridge Coverage Completeness, Regression Tests for Audio Fader; Renderer: Validate HW Accel, Orchestrator Plan; Infrastructure: Optimize GCS Uploads, CloudRun Resiliency Tests). Verified all package versions match package.json exactly.
 
