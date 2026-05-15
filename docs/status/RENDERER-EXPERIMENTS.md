@@ -470,3 +470,7 @@ Last updated by: PERF-468
   - **What I tried**: Reduced intermediate JPEG quality from 90 to 50 in `DomStrategy.ts`.
   - **WHY it didn't work**: Performance degraded (median ~16.729 vs baseline ~16.634). Visual degradation plus no speed improvements means this is a failure.
   - **Outcome**: discard
+- **PERF-505**: Dedicated Browser Contexts per Worker
+  - **What I tried**: Attempted to replace the single shared browser context in `BrowserPool.ts` with dedicated `browser.newContext()` contexts for each individual worker page to improve Chromium process isolation and CPU utilization.
+  - **WHY it didn't work**: The overall render time worsened (median ~19.487s vs baseline ~18.763s). The additional overhead required to instantiate, trace, and coordinate multiple isolated browser contexts inside the Playwright microVM likely outweighs any potential thread contention benefits during DOM capture.
+  - **Outcome**: discard
