@@ -1,3 +1,6 @@
+### STUDIO v0.121.12
+- ✅ Completed: STUDIO-system-prompt - Verified that the AI System Prompt feature was already fully implemented via AssistantModal (IMPOSSIBLE: DUPLICATION).
+
 ### CLI v0.46.25
 - ✅ Completed: CLI Index Regression Tests - Implemented unit tests for the CLI entry point in index.ts.
 
@@ -57,7 +60,10 @@
 ### CLI v0.46.10
 - ✅ Completed: Implement remaining CLI command regression tests - Add unit tests for preview, skills, and studio.
 
-### CLI v0.46.9\n- ✅ Completed: Scaffold Cloudflare Sandbox Deployment Command - Implemented `helios deploy cloudflare-sandbox` to scaffold Cloudflare Workflows and Sandboxes.\n\n## CLI v0.46.7
+### CLI v0.46.9
+- ✅ Completed: Scaffold Cloudflare Sandbox Deployment Command - Implemented `helios deploy cloudflare-sandbox` to scaffold Cloudflare Workflows and Sandboxes.
+
+## CLI v0.46.7
 - ✅ Completed: Deploy Command Regression Tests - Implemented unit tests for all remaining deploy subcommands.
 
 ## STUDIO v0.121.1

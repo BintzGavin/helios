@@ -1,8 +1,9 @@
-**Version**: 0.121.11
+**Version**: 0.121.12
 
 **Posture**: ACTIVELY EXPANDING FOR V2
 
 # Studio Domain Status
+- [v0.121.12] ✅ Completed: STUDIO-system-prompt - Verified that the AI System Prompt feature was already fully implemented via AssistantModal (IMPOSSIBLE: DUPLICATION).
 - [v0.121.11] ✅ Completed: STUDIO-ExportJobSpec - Verified that the Export Job Spec feature in Renders Panel was already fully implemented (IMPOSSIBLE: DUPLICATION).
 - [v0.121.10] ✅ Completed: Update Keyboard Shortcuts - Implemented missing JKL keyboard shortcuts documentation in the Help Modal.
 
