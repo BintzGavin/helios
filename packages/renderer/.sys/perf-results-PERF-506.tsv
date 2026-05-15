@@ -1,0 +1,3 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	16.893	600	35.52	44.0	keep	baseline
+2	19.260	600	31.15	39.0	discard	inlined stability check
