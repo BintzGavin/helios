@@ -1,6 +1,9 @@
 ### STUDIO v0.121.12
 - ✅ Completed: STUDIO-system-prompt - Verified that the AI System Prompt feature was already fully implemented via AssistantModal (IMPOSSIBLE: DUPLICATION).
 
+### CLI v0.46.26
+- ✅ Completed: Document duplicated CLI Index Regression Tests plan - Logged the duplicated plan as impossible.
+
 ### CLI v0.46.25
 - ✅ Completed: CLI Index Regression Tests - Implemented unit tests for the CLI entry point in index.ts.
 

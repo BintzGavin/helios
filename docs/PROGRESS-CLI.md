@@ -1,3 +1,6 @@
+## CLI v0.46.26
+- ✅ Completed: Document duplicated CLI Index Regression Tests plan - Logged the duplicated plan as impossible.
+
 ## CLI v0.46.21
 - ✅ Completed: Document duplicated Cloudflare Sandbox Execution plan - Logged the duplicated plan as impossible.
 
