@@ -1,8 +1,11 @@
 ## Performance Trajectory
-Current best: 17.687s (baseline was 19.93s, -11.2%)
-Last updated by: PERF-517
+Current best: 17.163s (baseline was 17.687s)
+Last updated by: PERF-519
 
 ## What Works
+- **PERF-519**: Inline DomStrategy Promise
+  - **What I tried**: Replaced the `.then` promise chaining in the `capture` method with an `await` + `try...catch` approach.
+  - **Outcome**: Kept. Improved render time to median ~17.163s vs baseline ~17.687s. Avoiding the secondary Promise wrapper allocation on every frame slightly improved loop performance.
 - PERF-493: Track Free Workers with Stack in CaptureLoop (improved to 4.169s)
 - **PERF-498**: Restore FFmpeg Backpressure in CaptureLoop
   - **What I tried**: Restored the `previousWritePromise` await when writing to FFmpeg stdin to prevent unbounded memory buffering of frames in Node.js.
