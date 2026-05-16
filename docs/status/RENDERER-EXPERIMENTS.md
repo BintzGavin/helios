@@ -19,6 +19,10 @@ Last updated by: PERF-520
   - **Outcome**: discard
 
 ## What Doesn't Work (and Why)
+- **PERF-525**: Reduce Worker Wait Promise Allocation with Shared Promise
+  - **What I tried**: Replaced multiple individual worker wait promises inside `CaptureLoop.ts` with a single shared `workerWaitPromise`.
+  - **WHY it didn't work**: The performance regressed heavily. The median render time increased to ~19.921s compared to the baseline ~17.071s. The "thundering herd" overhead of waking all workers simultaneously to contend for ring buffer slots outweighed the garbage collection savings of not allocating individual worker promises.
+  - **Outcome**: discard
 - **PERF-517**: Bypass Playwright Evaluate for Media Sync
   - **What I tried**: Replaced Playwright `frame.evaluate` in the single-frame fallback of `CdpTimeDriver.ts` with a raw `Runtime.evaluate` CDP command.
   - **WHY it didn't work**: Did not improve performance over baseline (median ~18.05s vs true baseline ~17.687s). The `frame.evaluate` is only used when the initial multi-frame optimization isn't hit, which means it isn't the primary bottleneck, and removing its Promise chain wrapper overhead didn't measurably improve overall pipeline throughput.

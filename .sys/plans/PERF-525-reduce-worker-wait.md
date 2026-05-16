@@ -1,11 +1,11 @@
 ---
 id: PERF-525
 slug: reduce-worker-wait
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "Jules"
 created: 2024-05-30
-completed: ""
-result: ""
+completed: "2024-05-31"
+result: "discard"
 ---
 
 # PERF-525: Reduce Worker Wait Overhead
