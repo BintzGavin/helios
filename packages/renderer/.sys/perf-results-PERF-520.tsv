@@ -1,4 +1,9 @@
--e run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
--e 1	15.941	600	37.64	43.6	keep	PERF-520: inline stability check
--e 2	16.967	600	35.36	42.4	keep	PERF-520: inline stability check
--e 3	16.140	600	37.18	42.5	keep	PERF-520: inline stability check
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	15.941	600	37.64	43.6	keep	PERF-520: inline stability check
+2	16.967	600	35.36	42.4	keep	PERF-520: inline stability check
+3	16.140	600	37.18	42.5	keep	PERF-520: inline stability check
+1	16.680	600	35.97	37.3	keep	baseline
+2	18.127	600	33.10	38.9	discard	inlined stability check await
+3	17.071	600	35.15	37.4	discard	inlined stability check await
+
+4	17.071	600	35.15	37.4	keep	inlined stability check await

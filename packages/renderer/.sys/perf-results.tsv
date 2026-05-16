@@ -70,3 +70,4 @@ run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
 1	16.729	600	35.87	47.5	discard	reduce jpeg quality to 50
 1	18.033	600	33.27	42.1	discard	PERF-509 inline-stability-check-await
 1	17.163	600	34.96	42.7	keep	inline promise in DomStrategy
+1	17.071	600	35.15	37.4	keep	inline promise in defaultStabilityCheck

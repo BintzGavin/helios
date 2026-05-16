@@ -1,8 +1,11 @@
 ## Performance Trajectory
-Current best: 17.163s (baseline was 17.687s)
-Last updated by: PERF-519
+Current best: 17.071s (baseline was 17.163s)
+Last updated by: PERF-520
 
 ## What Works
+- **PERF-520**: Inline defaultStabilityCheck Promise
+  - **What I tried**: Replaced the `.then` promise chaining in the `defaultStabilityCheck` method with an `await` directly in `runSetTime`.
+  - **Outcome**: Kept. Improved render time to median ~17.071s vs baseline ~17.163s. Avoiding the secondary Promise wrapper allocation on every frame slightly improved loop performance.
 - **PERF-519**: Inline DomStrategy Promise
   - **What I tried**: Replaced the `.then` promise chaining in the `capture` method with an `await` + `try...catch` approach.
   - **Outcome**: Kept. Improved render time to median ~17.163s vs baseline ~17.687s. Avoiding the secondary Promise wrapper allocation on every frame slightly improved loop performance.
@@ -58,6 +61,3 @@ Last updated by: PERF-519
 
 ## What Doesn't Work (and Why)
 - **Reducing BrowserPool Concurrency to 2 or 1 (PERF-518)**: Tested reducing `concurrency` in `BrowserPool.ts` from 3 (calculated as `Math.max(1, os.cpus().length - 1)`) to 2, and then to 1 to reduce thread contention in the single Chromium process due to `--disable-site-isolation-trials`. Results showed performance degraded. With concurrency = 2, median render time was ~20.89s (vs baseline ~18.2s-20.6s). With concurrency = 1, median render time dropped to ~28.15s. This indicates that while thread contention exists, the benefits of partial parallelism via multiple browser pages outpace the overhead. The existing formula (`Math.max(1, (os.cpus().length || 4) - 1)`) works best in this CPU environment. Discarded the change.
-- **PERF-520**: Inline Stability Check Await
-  - **What I tried**: Inlined the `defaultStabilityCheck` promise resolution directly inside `runSetTime` using `await` and `try...catch` in `CdpTimeDriver.ts`.
-  - **Outcome**: Kept. Improved render time to median ~16.140s vs baseline ~17.687s (or ~17.163s). Avoiding the `.then()` chain and closure allocation for the stability check in the hot loop yielded a tangible performance improvement.
