@@ -1,6 +1,6 @@
 ---
 slug: inline-stability-check
-status: claimed
+status: complete
 ---
 
 # Plan: Inline Stability Check Await
