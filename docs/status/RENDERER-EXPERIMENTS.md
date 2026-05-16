@@ -1,8 +1,11 @@
 ## Performance Trajectory
-Current best: 17.071s (baseline was 17.163s)
+Current best: 16.306s (baseline was 16.756s)
 Last updated by: PERF-520
 
 ## What Works
+- **PERF-520**: Inlined evaluateStabilityParams await in CdpTimeDriver
+  - **What I tried**: Inlined stability check promise directly without chaining `.then()` inside `runSetTime()` in CdpTimeDriver.ts.
+  - **Outcome**: Kept. Improved median render time to ~16.306s vs baseline ~16.756s. Bypassing closure and Promise chain allocation slightly improved hot loop performance.
 - **PERF-520**: Inline defaultStabilityCheck Promise
   - **What I tried**: Replaced the `.then` promise chaining in the `defaultStabilityCheck` method with an `await` directly in `runSetTime`.
   - **Outcome**: Kept. Improved render time to median ~17.071s vs baseline ~17.163s. Avoiding the secondary Promise wrapper allocation on every frame slightly improved loop performance.

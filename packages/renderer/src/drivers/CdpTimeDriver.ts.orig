@@ -68,6 +68,13 @@ export class CdpTimeDriver implements TimeDriver {
     }
   };
 
+  private defaultStabilityCheck(): Promise<void> | void {
+    return this.client!.send('Runtime.evaluate', this.evaluateStabilityParams).then((res) => {
+      if (res) {
+        this.handleStabilityCheckResponse(res);
+      }
+    }) as unknown as Promise<void>;
+  }
 
   private handleVirtualTimeBudgetExpired = () => {
     if (this.cdpResolve) {
@@ -257,9 +264,9 @@ export class CdpTimeDriver implements TimeDriver {
     }
 
     if (this.stabilityCheckState === 1) {
-      const res = await this.client!.send('Runtime.evaluate', this.evaluateStabilityParams);
-      if (res) {
-        this.handleStabilityCheckResponse(res);
+      const stabilityResult = this.defaultStabilityCheck();
+      if (stabilityResult) {
+        await stabilityResult;
       }
     }
   }
