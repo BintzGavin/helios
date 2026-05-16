@@ -1,11 +1,11 @@
 ---
 id: PERF-513
 slug: test-raw-cdp-screencast-no-external-compositor
-status: unclaimed
+status: claimed
 claimed_by: ""
 created: 2024-05-15
-completed: ""
-result: ""
+completed: "2024-05-15"
+result: "discard"
 ---
 # PERF-513: Test Raw CDP Screencast without External Compositor Control
 

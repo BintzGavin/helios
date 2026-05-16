@@ -480,6 +480,10 @@ Last updated by: PERF-468
   - **WHY it didn't work**: Did not improve performance over baseline (median ~18.03s vs baseline ~17.37s-19.93s).
   - **Outcome**: discard
 ## What Doesn't Work (and Why)
+- **PERF-513**: Raw Screencast without External Compositor
+  - **What I tried**: Dropped `--enable-begin-frame-control` and `--run-all-compositor-stages-before-draw` flags and replaced `HeadlessExperimental.beginFrame` capture loop with a passive `Page.startScreencast` event listener strategy with a timeout fallback.
+  - **WHY it didn't work**: Regression of ~7% (median 21.406s vs baseline 19.93s). While `Page.startScreencast` does capture frames without needing external compositor control, the lack of deterministic frame emission requires arbitrary fallback timeouts (or waiting passively) when there is no visual damage. This passive wait mechanism delays the pipeline significantly compared to the proactive, deterministic pumping of `beginFrame`.
+  - **Outcome**: discard
 - Inlining stability check promise resolution in CdpTimeDriver.ts
 - The bottleneck is likely in V8 runtime boundaries or Playwright CDP IPC, meaning microtask queue optimizations yield no measurable performance improvement over the baseline.
 - Plan ID: PERF-506
