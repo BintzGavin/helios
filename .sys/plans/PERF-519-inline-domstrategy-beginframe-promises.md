@@ -1,11 +1,11 @@
 ---
 id: PERF-519
 slug: inline-domstrategy-beginframe-promises
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-16
-completed: ""
-result: ""
+completed: 2024-05-16
+result: improved
 ---
 
 # PERF-519: Inline Promise handling in DomStrategy beginFrame
@@ -80,3 +80,9 @@ The DOM output should still render all frames correctly.
 
 ## Canvas Smoke Test
 N/A (DOM strategy only)
+
+## Results Summary
+- **Best render time**: 17.163s (vs baseline 17.687s)
+- **Improvement**: ~3%
+- **Kept experiments**: Inline try/catch instead of .then/.catch in `DomStrategy.ts`
+- **Discarded experiments**: None

@@ -167,16 +167,6 @@ export class DomStrategy implements RenderStrategy {
   }
 
 
-  private handleBeginFrameSuccess = (result: any) => {
-    const frameData = result.screenshotData || this.lastFrameData!;
-    this.lastFrameData = frameData;
-    return frameData;
-  };
-
-  private handleBeginFrameError = () => {
-    return this.lastFrameData!;
-  };
-
   async capture(page: Page, frameTime: number): Promise<Buffer | string> {
     if (this.targetElementHandle) {
       const box = await this.targetElementHandle.boundingBox();
@@ -190,14 +180,26 @@ export class DomStrategy implements RenderStrategy {
       this.targetBeginFrameParams.screenshot.clip.height = box.height;
       this.targetBeginFrameParams.frameTimeTicks = 10000 + frameTime;
 
-      return this.cdpSession!.send('HeadlessExperimental.beginFrame', this.targetBeginFrameParams)
-        .then(this.handleBeginFrameSuccess, this.handleBeginFrameError);
+      try {
+        const result = await this.cdpSession!.send('HeadlessExperimental.beginFrame', this.targetBeginFrameParams);
+        const frameData = result.screenshotData || this.lastFrameData!;
+        this.lastFrameData = frameData;
+        return frameData;
+      } catch (e) {
+        return this.lastFrameData!;
+      }
     }
 
     this.beginFrameParams.frameTimeTicks = 10000 + frameTime;
 
-    return this.cdpSession!.send('HeadlessExperimental.beginFrame', this.beginFrameParams)
-      .then(this.handleBeginFrameSuccess, this.handleBeginFrameError);
+    try {
+      const result = await this.cdpSession!.send('HeadlessExperimental.beginFrame', this.beginFrameParams);
+      const frameData = result.screenshotData || this.lastFrameData!;
+      this.lastFrameData = frameData;
+      return frameData;
+    } catch (e) {
+      return this.lastFrameData!;
+    }
   }
 
   async finish(page: Page): Promise<void> {
