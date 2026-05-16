@@ -1,43 +1,49 @@
 ---
-id: PERF-520
 slug: inline-stability-check
-status: unclaimed
-claimed_by: ""
-created: 2024-05-16
-completed: ""
-result: ""
+status: claimed
 ---
 
-# PERF-520: Eliminate defaultStabilityCheck method and inline logic
+# Plan: Inline Stability Check Await
 
-## Focus Area
-Eliminate the `.then()` promise chain and anonymous closure allocation inside the `CdpTimeDriver.ts` stability check. This targets the per-frame event loop microtask overhead during DOM capture.
+## Problem
+In `packages/renderer/src/drivers/CdpTimeDriver.ts`, the `defaultStabilityCheck()` function introduces unnecessary closure and Promise chain overhead by returning `this.client!.send(...).then(...)`. As noted in PERF-509, this overhead is part of the microtask bottleneck during the hot loop in `CdpTimeDriver.setTime()`. The objective is to inline the stability check and replace the `.then` with an `await` to eliminate this overhead.
 
-## Background Research
-The `defaultStabilityCheck` currently wraps the `Runtime.evaluate` call in a `.then()` to handle the result, creating a new promise and a closure on every frame. V8 can optimize this, but directly awaiting the CDP response inside the main `runSetTime` function avoids secondary Promise and closure allocations entirely. This is an identical implementation of `PERF-506` which was not implemented correctly in code (the plan said "complete" but `defaultStabilityCheck` is still in the code and used).
+## Solution Steps
 
-## Benchmark Configuration
-- **Composition URL**: DOM benchmark composition
-- **Render Settings**: 600 frames
-- **Mode**: `dom`
-- **Metric**: Wall-clock render time in seconds
-- **Minimum runs**: 3 per experiment, report median
+1. Modify `packages/renderer/src/drivers/CdpTimeDriver.ts` to inline the stability check using `await` directly in `runSetTime()`.
 
-## Baseline
-- **Current estimated render time**: ~17.163s
-- **Bottleneck analysis**: Microtask queue overhead from intermediate promise chains in the hot loop.
+<<<<<<< SEARCH
+  private defaultStabilityCheck(): Promise<void> | void {
+    return this.client!.send('Runtime.evaluate', this.evaluateStabilityParams).then((res) => {
+      if (res) {
+        this.handleStabilityCheckResponse(res);
+      }
+    }) as unknown as Promise<void>;
+  }
+=======
+>>>>>>> REPLACE
 
-## Implementation Spec
+<<<<<<< SEARCH
+    if (this.stabilityCheckState === 1) {
+      const stabilityResult = this.defaultStabilityCheck();
+      if (stabilityResult) {
+        await stabilityResult;
+      }
+    }
+=======
+    if (this.stabilityCheckState === 1) {
+      const res = await this.client!.send('Runtime.evaluate', this.evaluateStabilityParams);
+      if (res) {
+        this.handleStabilityCheckResponse(res);
+      }
+    }
+>>>>>>> REPLACE
 
-### Step 1: Inline defaultStabilityCheck logic
-**File**: `packages/renderer/src/drivers/CdpTimeDriver.ts`
-**What to change**:
-1. Remove the `defaultStabilityCheck` method.
-2. Inside `runSetTime`, replace the call to `defaultStabilityCheck` with an inline `await this.client!.send('Runtime.evaluate', this.evaluateStabilityParams)`.
-3. Check the result of the `await` and call `this.handleStabilityCheckResponse(res)` if `res` exists.
-
-**Why**: This avoids a `.then()` allocation and directly uses the V8 async/await state machine in the existing `runSetTime` async function, reducing GC churn.
-**Risk**: Negligible risk.
-
-## Correctness Check
-Run the DOM benchmark (`npx tsx tests/fixtures/benchmark.ts`) and ensure it completes without hanging or errors, and that output looks correct.
+2. Run compilation check (`npm run build` in `packages/renderer`).
+3. Run the benchmark (`npx tsx tests/fixtures/benchmark.ts` inside `packages/renderer`) to measure performance. Repeat to find the median.
+4. Run tests (`npm test` in `packages/renderer` if kept, or skip if discarded).
+5. Output validation.
+6. Append results to `packages/renderer/.sys/perf-results.tsv`.
+7. Update `docs/status/RENDERER-EXPERIMENTS.md`.
+8. Complete pre-commit steps to ensure proper testing, verification, review, and reflection are done.
+9. Commit changes.

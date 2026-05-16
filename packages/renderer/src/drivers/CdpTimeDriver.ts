@@ -84,14 +84,6 @@ export class CdpTimeDriver implements TimeDriver {
     }
   };
 
-  private defaultStabilityCheck(): Promise<void> | void {
-    return this.client!.send('Runtime.evaluate', this.evaluateStabilityParams).then((res) => {
-      if (res) {
-        this.handleStabilityCheckResponse(res);
-      }
-    }) as unknown as Promise<void>;
-  }
-
   constructor(timeout: number = 30000) {
     this.timeout = timeout;
   }
@@ -264,9 +256,9 @@ export class CdpTimeDriver implements TimeDriver {
     }
 
     if (this.stabilityCheckState === 1) {
-      const stabilityResult = this.defaultStabilityCheck();
-      if (stabilityResult) {
-        await stabilityResult;
+      const res = await this.client!.send('Runtime.evaluate', this.evaluateStabilityParams);
+      if (res) {
+        this.handleStabilityCheckResponse(res);
       }
     }
   }
