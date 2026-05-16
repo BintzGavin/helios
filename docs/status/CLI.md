@@ -1,3 +1,4 @@
+[v0.46.29] 🟢 Completed: CLI Cloud Templates Regression Tests Spec - Created strictly new specification plan `2027-06-05-CLI-Cloud-Templates-Regression-Tests-V2.md` to address the missing tests for cloud infrastructure templates in `packages/cli/src/templates/__tests__/cloud.test.ts`.
 [v0.46.28] 🟢 Completed: CLI Cloud Templates Regression Tests Spec - Created specification plan `2027-06-05-CLI-Cloud-Templates-Regression-Tests.md` to add missing tests for Docker, Deno, Vercel, Modal, Hetzner, and Fly.io templates to `packages/cli/src/templates/__tests__/cloud.test.ts`.
 [v0.46.28] 🟢 Completed: CLI Cloud Templates Regression Tests Spec - Created specification plan `2027-06-05-CLI-Cloud-Templates-Regression-Tests.md` to add missing tests for Docker, Deno, Vercel, Modal, Hetzner, and Fly.io templates to `packages/cli/src/templates/__tests__/cloud.test.ts`.
 # CLI Status
