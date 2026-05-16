@@ -1,3 +1,6 @@
+### STUDIO v0.121.13
+- ✅ Completed: Expand Reverse Speeds - Added -4x and -2x reverse playback options to the PlaybackControls component.
+
 ### STUDIO v0.121.12
 - ✅ Completed: STUDIO-system-prompt - Verified that the AI System Prompt feature was already fully implemented via AssistantModal (IMPOSSIBLE: DUPLICATION).
 
