@@ -1,3 +1,6 @@
+### CLI v0.46.30
+- ✅ Completed: CLI Cloud Templates Tests - Implemented unit tests for remaining cloud deployment templates.
+
 ### STUDIO v0.121.13
 - ✅ Completed: Expand Reverse Speeds - Added -4x and -2x reverse playback options to the PlaybackControls component.
 
