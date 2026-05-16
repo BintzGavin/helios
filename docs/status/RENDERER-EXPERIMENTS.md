@@ -52,3 +52,6 @@ Last updated by: PERF-517
 - The bottleneck is likely in V8 runtime boundaries or Playwright CDP IPC, meaning microtask queue optimizations yield no measurable performance improvement over the baseline.
 - Plan ID: PERF-506
 - Plan ID: PERF-518
+
+## What Doesn't Work (and Why)
+- **Reducing BrowserPool Concurrency to 2 or 1 (PERF-518)**: Tested reducing `concurrency` in `BrowserPool.ts` from 3 (calculated as `Math.max(1, os.cpus().length - 1)`) to 2, and then to 1 to reduce thread contention in the single Chromium process due to `--disable-site-isolation-trials`. Results showed performance degraded. With concurrency = 2, median render time was ~20.89s (vs baseline ~18.2s-20.6s). With concurrency = 1, median render time dropped to ~28.15s. This indicates that while thread contention exists, the benefits of partial parallelism via multiple browser pages outpace the overhead. The existing formula (`Math.max(1, (os.cpus().length || 4) - 1)`) works best in this CPU environment. Discarded the change.
