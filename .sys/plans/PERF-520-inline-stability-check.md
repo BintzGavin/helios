@@ -1,6 +1,19 @@
 ---
 slug: inline-stability-check
 status: complete
+result: improved
+---
+
+## Results Summary
+
+```tsv
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	16.756	600	35.81	42.2	keep	baseline
+2	16.294	600	36.82	35.6	keep	inlined evaluateStabilityParams await in CdpTimeDriver
+3	16.306	600	36.80	41.3	keep	inlined evaluateStabilityParams await in CdpTimeDriver
+4	16.294	600	36.82	35.6	keep	inlined evaluateStabilityParams await in CdpTimeDriver
+```
+
 ---
 
 # Plan: Inline Stability Check Await

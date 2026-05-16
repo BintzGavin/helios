@@ -72,3 +72,4 @@ run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
 1	17.163	600	34.96	42.7	keep	inline promise in DomStrategy
 1	17.071	600	35.15	37.4	keep	inline promise in defaultStabilityCheck
 74	19.921	600	30.12	40.3	discard	reduced worker wait promise allocation with shared promise
+75	16.306	600	36.82	35.6	keep	inlined evaluateStabilityParams await in CdpTimeDriver

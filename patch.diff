@@ -1,0 +1,31 @@
+--- packages/renderer/src/drivers/CdpTimeDriver.ts
++++ packages/renderer/src/drivers/CdpTimeDriver.ts
+@@ -60,13 +60,6 @@
+     }
+   };
+
+-  private defaultStabilityCheck(): Promise<void> | void {
+-    return this.client!.send('Runtime.evaluate', this.evaluateStabilityParams).then((res) => {
+-      if (res) {
+-        this.handleStabilityCheckResponse(res);
+-      }
+-    }) as unknown as Promise<void>;
+-  }
+
+   private handleVirtualTimeBudgetExpired = () => {
+     if (this.cdpResolve) {
+@@ -263,10 +256,10 @@
+     }
+
+     if (this.stabilityCheckState === 1) {
+-      const stabilityResult = this.defaultStabilityCheck();
+-      if (stabilityResult) {
+-        await stabilityResult;
+-      }
++      const res = await this.client!.send('Runtime.evaluate', this.evaluateStabilityParams);
++      if (res) {
++        this.handleStabilityCheckResponse(res);
++      }
+     }
+   }
+ }
