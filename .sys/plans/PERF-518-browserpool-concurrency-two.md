@@ -1,7 +1,9 @@
 ---
 id: PERF-518
 slug: browserpool-concurrency-two
-status: unclaimed
+status: complete
+completed: 2024-05-16
+result: failed
 claimed_by: ""
 created: 2024-05-16
 completed: ""
@@ -54,3 +56,11 @@ Run a basic canvas render (`mode: 'canvas'`) to ensure changes don't break stand
 
 ## Correctness Check
 Verify the rendered output video to ensure the parallel frame captures are still ordered and visually correct.
+
+## Results Summary
+- **Best render time**: 18.210s (Baseline)
+- **Improvement**: 0% (Regressed)
+- **Kept experiments**: None
+- **Discarded experiments**:
+  - `concurrency = 2` (degraded to ~20.89s)
+  - `concurrency = 1` (degraded to ~28.15s)
