@@ -1,11 +1,11 @@
 ---
 id: PERF-528
 slug: hot-loop-micro-optimizations
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-30
-completed: ""
-result: ""
+completed: "2024-05-30"
+result: "failed"
 ---
 
 # PERF-528: Hot Loop Micro-Optimizations
@@ -68,3 +68,9 @@ Merge `runSetTime` directly into `async setTime(page: Page, timeInSeconds: numbe
 
 ## Correctness Check
 Run the DOM benchmark and verify output video is correctly encoded. Ensure tests pass.
+
+## Results Summary
+- **Best render time**: 28.552s (vs baseline ~15.793s - 16.306s)
+- **Improvement**: -80.7% (regression)
+- **Kept experiments**: None
+- **Discarded experiments**: Eager Base64 decoding in CaptureLoop.ts, inlining runSetTime and handleStabilityCheckResponse in CdpTimeDriver.ts
