@@ -52,10 +52,8 @@ export class CdpTimeDriver implements TimeDriver {
             this.client!.send('Runtime.evaluate', this.multiFrameSyncMediaParams[i]);
           }
         } else {
-          for (let i = 0; i < frames.length; i++) {
-            const frame = frames[i];
-            frame.evaluate("if(typeof window.__helios_sync_media==='function') window.__helios_sync_media(" + timeInSeconds + ");");
-          }
+          this.singleFrameSyncMediaParams.expression = "if(typeof window.__helios_sync_media==='function') window.__helios_sync_media(" + timeInSeconds + ");";
+          this.client!.send('Runtime.evaluate', this.singleFrameSyncMediaParams);
         }
     }
   }

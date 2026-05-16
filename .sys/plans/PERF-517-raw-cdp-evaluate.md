@@ -1,11 +1,11 @@
 ---
 id: PERF-517
 slug: raw-cdp-evaluate
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-16
-completed: ""
-result: ""
+completed: 2024-05-16
+result: no-improvement
 ---
 
 # PERF-517: Bypass Playwright Evaluate
@@ -46,3 +46,9 @@ Specifically, change it to:
 ```
 
 **Why**: Direct CDP avoids Playwright's execution tracking, bypassing intermediate Promises.
+
+## Results Summary
+- **Best render time**: 17.981s (vs baseline 17.687s)
+- **Improvement**: 0% (discarded)
+- **Kept experiments**: []
+- **Discarded experiments**: [PERF-517: Replace `frame.evaluate` with `Runtime.evaluate`]
