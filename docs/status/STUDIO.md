@@ -1,4 +1,6 @@
-**Version**: 0.121.12
+**Version**: 0.121.13
+
+[v0.121.13] ✅ Completed: Expand Reverse Speeds - Added -4x and -2x reverse playback options to the PlaybackControls component.
 
 **Posture**: ACTIVELY EXPANDING FOR V2
 
