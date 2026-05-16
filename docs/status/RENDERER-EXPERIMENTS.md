@@ -51,3 +51,4 @@ Last updated by: PERF-517
 - Inlining stability check promise resolution in CdpTimeDriver.ts
 - The bottleneck is likely in V8 runtime boundaries or Playwright CDP IPC, meaning microtask queue optimizations yield no measurable performance improvement over the baseline.
 - Plan ID: PERF-506
+- Plan ID: PERF-518
