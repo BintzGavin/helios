@@ -211,3 +211,6 @@ Critical learnings only. This is not a log—only add entries for insights that 
 ## [v0.46.28] - Created Cloud Templates Regression Tests Spec
 **Learning:** Found an actionable gap from previous journal entries: tests were missing in `packages/cli/src/templates/__tests__/cloud.test.ts` for Docker, Deno, Vercel, Modal, Hetzner, and Fly.io templates.
 **Action:** Generated plan `2027-06-05-CLI-Cloud-Templates-Regression-Tests.md` to add the missing tests.
+## [v0.46.28] - Planner File Creation Protocol
+**Learning:** Found an IMPOSSIBLE: REVISION_REQUIRED error from the code review tool when trying to implement a plan. The review indicated that modifying an existing plan file instead of creating a new one undermines the planner's logging and history process. The Planner must strictly create NEW plan files for unaddressed gaps, rather than recycling or rephrasing existing ones.
+**Action:** When acting as the CLI Planner, always create a strictly NEW plan file (with a unique name/date) targeting an unaddressed vision gap, rather than modifying or overwriting an existing one. If a gap appears identical to an existing plan, ensure it is genuinely uncovered before creating a new plan with a distinct name.
