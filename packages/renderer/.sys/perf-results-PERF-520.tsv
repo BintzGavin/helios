@@ -1,0 +1,4 @@
+-e run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+-e 1	15.941	600	37.64	43.6	keep	PERF-520: inline stability check
+-e 2	16.967	600	35.36	42.4	keep	PERF-520: inline stability check
+-e 3	16.140	600	37.18	42.5	keep	PERF-520: inline stability check
