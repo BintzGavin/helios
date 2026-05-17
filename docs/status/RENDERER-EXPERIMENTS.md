@@ -25,6 +25,10 @@ Last updated by: PERF-529
   - **Outcome**: discard
 
 ## What Doesn't Work (and Why)
+- **PERF-536**: Inline Stability Evaluate in CdpTimeDriver.ts
+  - **What I tried**: Attempted to reduce function call dispatch and variable assignment overhead by inlining the `handleStabilityCheckResponse` exception check logic directly into `runSetTime()`.
+  - **WHY it didn't work**: Render time regressed to a median of ~17.344s vs baseline ~15.594s. Inlining the error-checking logic inside the V8 hot loop likely caused negative deoptimization side effects, overriding the minuscule savings from avoiding function dispatch.
+  - **Outcome**: discard
 - **PERF-533**: Limit FFmpeg Threads to Reduce CPU Contention
   - **What I tried**: Added `-threads 1` to the FFmpeg builder arguments for video encoding in `FFmpegBuilder.ts` to limit thread contention with Chromium and Node on the CPU.
   - **WHY it didn't work**: The render time regressed to a median of ~17.431s (and as bad as ~26.641s in one run) compared to the baseline of ~15.594s. Limiting FFmpeg to a single thread likely introduced a bottleneck on the encoding side that backed up the pipeline, forcing Chromium workers to wait, which negatively offset any thread contention gains.
