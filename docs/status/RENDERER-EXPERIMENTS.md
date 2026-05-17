@@ -86,3 +86,7 @@ Last updated by: PERF-529
   - **What I tried**: Increased the `maxPipelineDepth` buffer multiplier in `CaptureLoop.ts` from `8` to `64`.
   - **WHY it didn't work**: The performance regressed. The median render time increased to ~19.206s compared to the baseline ~15.594s. Deepening the backpressure ring buffer likely increased memory overhead or V8 GC pressure without significantly improving throughput in this environment.
   - **Outcome**: discard
+- **PERF-534**: Remove `--disable-breakpad` from Chromium arguments
+  - **What I tried**: Removed `--disable-breakpad` from the `DEFAULT_BROWSER_ARGS` array in `BrowserPool.ts`.
+  - **WHY it didn't work**: The performance regressed heavily. The median render time increased to ~19.939s compared to the baseline ~15.594s. Leaving breakpad enabled likely introduced overhead in the headless chromium processes during high-frequency frame capture.
+  - **Outcome**: discard

@@ -1,11 +1,11 @@
 ---
 id: PERF-534
 slug: remove-disable-breakpad
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "Jules"
 created: 2024-05-17
-completed: ""
-result: ""
+completed: "2024-05-17"
+result: "discard"
 ---
 
 # PERF-534: Remove --disable-breakpad from Chromium arguments
@@ -61,3 +61,13 @@ Run the DOM benchmark and verify output video is correctly encoded. Ensure tests
 
 ## Prior Art
 - PERF-529 (Enabled `process-per-tab` which fundamentally changed how processes are launched).
+
+## Results Summary
+```tsv
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	20.577	600	29.16	39.6	discard	remove --disable-breakpad
+2	19.939	600	30.09	44.2	discard	remove --disable-breakpad
+3	20.648	600	29.06	41.3	discard	remove --disable-breakpad
+4	17.388	600	34.51	48.3	discard	remove --disable-breakpad
+5	18.451	600	32.52	44.1	discard	remove --disable-breakpad
+```
