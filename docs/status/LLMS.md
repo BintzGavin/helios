@@ -1,5 +1,7 @@
 # Status: LLMS
-**Version**: 1.85.0
+**Version**: 1.86.0
+
+[v1.86.0] ✅ Completed: Comprehensive Daily Review - Updated Roadmap with TimelineAudioTrack Regression Tests and Bridge Coverage Expansion. Verified versions and file paths.
 
 [v1.85.0] ✅ Completed: Comprehensive Daily Review - Updated Roadmap with CLI Templates Regression Tests and InMemoryJobRepository Coverage. Verified versions and file paths.
 
