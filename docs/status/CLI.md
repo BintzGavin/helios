@@ -1,4 +1,4 @@
-**Version**: 0.46.30
+**Version**: 0.46.31
 
 [v0.46.30] ✅ Completed: CLI Cloud Templates Tests - Implemented unit tests for remaining cloud deployment templates.
 
@@ -142,3 +142,4 @@ The Helios CLI is the primary user interface for component registry, project sca
 
 [v0.46.24] ✅ Completed: CLI Templates Regression Tests - Implemented unit tests for file generation templates in packages/cli/src/templates.
 - [ ] [v0.46.27] CLI Blocked: Waiting for a new, valid plan in /.sys/plans/
+[v0.46.31] ✅ Completed: CLI Index Regression Tests - Implemented unit tests for the main CLI entry point in packages/cli/src/__tests__/index.test.ts.

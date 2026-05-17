@@ -11,12 +11,15 @@ The CLI follows the Subcommand pattern using Commander.js.
 ## B. File Tree
 
 ```
-packages/cli/
+packages/cli
 ├── bin
 │   └── helios.js
+├── package.json
 ├── scripts
 │   └── bundle-skills.js
 ├── src
+│   ├── __tests__
+│   │   └── index.test.ts
 │   ├── commands
 │   │   ├── __tests__
 │   │   │   ├── add.test.ts
@@ -49,6 +52,7 @@ packages/cli/
 │   │   ├── skills.ts
 │   │   ├── studio.ts
 │   │   └── update.ts
+│   ├── index.ts
 │   ├── registry
 │   │   ├── __tests__
 │   │   │   ├── client.test.ts
@@ -80,29 +84,25 @@ packages/cli/
 │   │   └── vue.ts
 │   ├── types
 │   │   └── job.ts
-│   ├── utils
-│   │   ├── __tests__
-│   │   │   ├── config.test.ts
-│   │   │   ├── examples.test.ts
-│   │   │   ├── ffmpeg.test.ts
-│   │   │   ├── install.test.ts
-│   │   │   ├── package-manager.test.ts
-│   │   │   └── uninstall.test.ts
-│   │   ├── config.ts
-│   │   ├── examples.ts
-│   │   ├── ffmpeg.ts
-│   │   ├── install.ts
-│   │   ├── package-manager.ts
-│   │   └── uninstall.ts
-│   └── index.ts
-├── package.json
+│   └── utils
+│       ├── __tests__
+│       │   ├── config.test.ts
+│       │   ├── examples.test.ts
+│       │   ├── ffmpeg.test.ts
+│       │   ├── install.test.ts
+│       │   ├── package-manager.test.ts
+│       │   └── uninstall.test.ts
+│       ├── config.ts
+│       ├── examples.ts
+│       ├── ffmpeg.ts
+│       ├── install.ts
+│       ├── package-manager.ts
+│       └── uninstall.ts
 ├── tsconfig.json
 └── vitest.config.ts
 
-13 directories, 74 files
-
+14 directories, 75 files
 ```
-
 ## C. Commands
 
 - `helios add <component>`: Install a new registry component.
