@@ -342,3 +342,6 @@ This file tracks progress for the CLI domain (`packages/cli`).
 
 ### CLI v0.46.24
 - ✅ Completed: CLI Templates Regression Tests - Implemented unit tests for file generation templates in packages/cli/src/templates.
+
+### CLI v0.46.31
+- ✅ Completed: CLI Index Regression Tests - Implemented unit tests for the main CLI entry point in packages/cli/src/__tests__/index.test.ts.
