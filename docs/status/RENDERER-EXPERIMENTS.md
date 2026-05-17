@@ -75,3 +75,7 @@ Last updated by: PERF-529
   - **What I tried**: Inlined the Base64 frame buffer decoding inside `runWorker` in `CaptureLoop.ts` to improve L1 cache locality, and inlined `runSetTime` logic in `CdpTimeDriver.ts`.
   - **WHY it didn't work**: The performance regressed heavily. The median render time increased to ~28.552s compared to the baseline. Eagerly decoding Base64 in the worker closure actually caused a slowdown, likely due to blocking the worker promise resolution while parsing the buffer, thus delaying the next frame cycle in a multi-worker pipeline.
   - **Outcome**: discard
+- **PERF-531**: Increase CaptureLoop maxPipelineDepth Buffer
+  - **What I tried**: Increased the `maxPipelineDepth` buffer multiplier in `CaptureLoop.ts` from `8` to `64`.
+  - **WHY it didn't work**: The performance regressed. The median render time increased to ~19.206s compared to the baseline ~15.594s. Deepening the backpressure ring buffer likely increased memory overhead or V8 GC pressure without significantly improving throughput in this environment.
+  - **Outcome**: discard
