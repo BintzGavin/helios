@@ -25,6 +25,9 @@ Last updated by: PERF-529
   - **Outcome**: discard
 
 ## What Doesn't Work (and Why)
+- **PERF-532**: Inline defaultSyncMedia inside CdpTimeDriver.ts
+  - **What I tried**: Attempted to reduce function call overhead in the hot loop by replacing the call to `this.defaultSyncMedia(timeInSeconds)` with the inline logic directly inside `runSetTime()`.
+  - **WHY it didn't work**: Render time regressed to a median of ~18.669s vs baseline ~15.594s. Inlining a heavy block with complex looping directly into the main execution function increased V8 deoptimization risk and memory footprint, overriding any minor function call dispatch savings.
 - **PERF-525**: Reduce Worker Wait Promise Allocation with Shared Promise
   - **What I tried**: Replaced multiple individual worker wait promises inside `CaptureLoop.ts` with a single shared `workerWaitPromise`.
   - **WHY it didn't work**: The performance regressed heavily. The median render time increased to ~19.921s compared to the baseline ~17.071s. The "thundering herd" overhead of waking all workers simultaneously to contend for ring buffer slots outweighed the garbage collection savings of not allocating individual worker promises.

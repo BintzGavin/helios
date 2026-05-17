@@ -81,3 +81,4 @@ run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
 4	15.594	600	38.48	44.4	keep	process-per-tab (PERF-529)
 5	15.421	600	38.91	43.6	keep	process-per-tab (PERF-529)
 1	19.206	600	31.24	46.4	discard	increase maxPipelineDepth buffer multiplier to 64 (PERF-531)
+1	18.669	600	32.14	47.3	discard	inline defaultSyncMedia in CdpTimeDriver
