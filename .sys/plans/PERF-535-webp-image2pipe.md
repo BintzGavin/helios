@@ -1,11 +1,11 @@
 ---
 id: PERF-535
 slug: webp-image2pipe
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-25
 completed: ""
-result: ""
+result: "discarded"
 ---
 
 # PERF-535: Use WebP with image2pipe for Intermediate Formats
@@ -96,3 +96,9 @@ Run the benchmark script (`npx tsx packages/renderer/tests/fixtures/benchmark.ts
 
 ## Prior Art
 - PERF-447: Identified `image2pipe` with `-vcodec webp` as a solution to previous `webp_pipe` crashes.
+
+## Results Summary
+- **Best render time**: 0.000s (crashed vs baseline 15.594s)
+- **Improvement**: 0%
+- **Kept experiments**: []
+- **Discarded experiments**: [Step 1: Default to WebP for All Renders]
