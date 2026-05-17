@@ -1745,6 +1745,82 @@ describe('Input Props', () => {
     });
   });
 
+  describe('Export Menu Behavior', () => {
+    it('should show error when export clicked without controller', () => {
+      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      const exportBtn = player.shadowRoot!.querySelector('.export-btn') as HTMLButtonElement;
+
+      // Ensure controller is null
+      (player as any).controller = null;
+      exportBtn.disabled = false;
+      exportBtn.click();
+
+      expect(consoleSpy).toHaveBeenCalledWith("Export not available: Not connected.");
+      consoleSpy.mockRestore();
+    });
+
+    it('should abort export if abortController is set', () => {
+      const exportBtn = player.shadowRoot!.querySelector('.export-btn') as HTMLButtonElement;
+
+      const abortMock = vi.fn();
+      (player as any).abortController = { abort: abortMock };
+      exportBtn.disabled = false;
+      exportBtn.click();
+
+      expect(abortMock).toHaveBeenCalled();
+    });
+
+    it('should toggle export menu when export clicked with controller', () => {
+      const exportBtn = player.shadowRoot!.querySelector('.export-btn') as HTMLButtonElement;
+      const toggleMock = vi.spyOn(player as any, 'toggleExportMenu').mockImplementation(() => {});
+
+      (player as any).controller = { pause: vi.fn(), dispose: vi.fn() }; // Mock controller
+      (player as any).abortController = null;
+      exportBtn.disabled = false;
+      exportBtn.click();
+
+      expect(toggleMock).toHaveBeenCalled();
+      toggleMock.mockRestore();
+    });
+  });
+
+  describe('captureStream API Coverage', () => {
+    it('should throw error if canvas not found for captureStream', async () => {
+      (player as any).mode = 'direct';
+      const mockController = Object.create(DirectController.prototype);
+      mockController.instance = { getCanvas: () => null, fps: { peek: () => 30 } };
+      mockController.pause = vi.fn();
+      mockController.dispose = vi.fn();
+      (player as any).controller = mockController;
+
+      await expect(player.captureStream()).rejects.toThrow('Canvas not found for captureStream().');
+    });
+  });
+
+  describe('Audio Metering APIs Coverage', () => {
+    it('should call controller.startAudioMetering', () => {
+      (player as any).controller = { startAudioMetering: vi.fn(), pause: vi.fn(), dispose: vi.fn() };
+      player.startAudioMetering();
+      expect((player as any).controller.startAudioMetering).toHaveBeenCalled();
+    });
+
+    it('should handle startAudioMetering without controller', () => {
+      (player as any).controller = null;
+      expect(() => player.startAudioMetering()).not.toThrow();
+    });
+
+    it('should call controller.stopAudioMetering', () => {
+      (player as any).controller = { stopAudioMetering: vi.fn(), pause: vi.fn(), dispose: vi.fn() };
+      player.stopAudioMetering();
+      expect((player as any).controller.stopAudioMetering).toHaveBeenCalled();
+    });
+
+    it('should handle stopAudioMetering without controller', () => {
+      (player as any).controller = null;
+      expect(() => player.stopAudioMetering()).not.toThrow();
+    });
+  });
+
   describe('ControlsList', () => {
     it('should hide export button when controlslist="nodownload"', () => {
         player.setAttribute('controlslist', 'nodownload');
