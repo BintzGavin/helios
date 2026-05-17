@@ -1,11 +1,11 @@
 ---
 id: PERF-536
 slug: inline-stability-evaluate
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-25
-completed: ""
-result: ""
+completed: "2026-05-17"
+result: "discarded"
 ---
 
 # PERF-536: Inline Stability Evaluate
@@ -72,3 +72,9 @@ Remove the `handleStabilityCheckResponse` method, and inline its exception check
 
 ## Correctness Check
 Run the benchmark script (`npx tsx packages/renderer/tests/fixtures/benchmark.ts`) to measure speedups. Then run the full test suite (`npm run test -w packages/renderer -- --run`) to verify correctness and ensure no functionality is broken.
+
+## Results Summary
+- **Best render time**: 17.328s (vs baseline ~15.594s)
+- **Improvement**: Regressed
+- **Kept experiments**: []
+- **Discarded experiments**: [Inline Stability Evaluate Exception check in CdpTimeDriver.ts]

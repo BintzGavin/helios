@@ -91,3 +91,6 @@ run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
 4	17.388	600	34.51	48.3	discard	remove --disable-breakpad
 5	18.451	600	32.52	44.1	discard	remove --disable-breakpad
 1	0.000	0	0.00	0.0	crash	webp image2pipe format change
+1	17.332	600	34.62	46.7	discard	inline stability check response evaluation
+2	17.328	600	34.63	37.4	discard	inline stability check response evaluation
+3	17.344	600	34.59	35.7	discard	inline stability check response evaluation
