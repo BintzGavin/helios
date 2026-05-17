@@ -85,3 +85,4 @@ run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
 1	16.640	600	36.06	41.4	discard	limit FFmpeg threads to 1 (PERF-533)
 2	17.431	600	34.42	46.9	discard	limit FFmpeg threads to 1 (PERF-533)
 3	26.641	600	22.52	40.0	discard	limit FFmpeg threads to 1 (PERF-533)
+1	17.587	600	34.12	41.9	discard	remove disable breakpad (PERF-534)

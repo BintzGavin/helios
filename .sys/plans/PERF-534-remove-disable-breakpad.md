@@ -1,11 +1,11 @@
 ---
 id: PERF-534
 slug: remove-disable-breakpad
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor"
 created: 2024-05-17
-completed: ""
-result: ""
+completed: "2024-05-17"
+result: "failed"
 ---
 
 # PERF-534: Remove --disable-breakpad from Chromium arguments
