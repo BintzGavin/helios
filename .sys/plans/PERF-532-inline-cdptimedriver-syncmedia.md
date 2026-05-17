@@ -1,11 +1,11 @@
 ---
 id: PERF-532
 slug: inline-cdptimedriver-syncmedia
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-24
-completed: ""
-result: ""
+completed: "2026-05-17"
+result: "discarded"
 ---
 
 # PERF-532: Inline CdpTimeDriver defaultSyncMedia into runSetTime
@@ -83,3 +83,9 @@ Run the DOM render benchmark script (`npx tsx tests/fixtures/benchmark.ts`) to e
 
 ## Prior Art
 - PERF-520: Inlined the stability check promise to remove closure and promise chain allocation.
+
+## Results Summary
+- **Best render time**: 18.359s (median 18.669s vs baseline 15.594s)
+- **Improvement**: Regressed
+- **Kept experiments**:
+- **Discarded experiments**: Inline defaultSyncMedia
