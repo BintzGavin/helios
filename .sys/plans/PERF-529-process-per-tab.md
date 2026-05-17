@@ -1,11 +1,11 @@
 ---
 id: PERF-529
 slug: process-per-tab
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-30
-completed: ""
-result: ""
+completed: "2024-05-30"
+result: "improved"
 ---
 
 # PERF-529: Isolate Renderers with --process-per-tab
@@ -69,3 +69,9 @@ Run canvas benchmarks to ensure `BrowserPool` correctly provisions instances.
 
 ## Correctness Check
 Run the DOM benchmark and inspect `output.mp4` to verify that all frames were correctly ordered and written without drops.
+
+## Results Summary
+- **Best render time**: 15.594s (vs baseline 16.306s)
+- **Improvement**: 4.37%
+- **Kept experiments**: [--process-per-tab enabled and disabled features cleaned]
+- **Discarded experiments**: []
