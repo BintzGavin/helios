@@ -1,8 +1,11 @@
 ## Performance Trajectory
-Current best: 16.306s (baseline was 16.756s)
-Last updated by: PERF-520
+Current best: 15.594s (baseline was 16.306s)
+Last updated by: PERF-529
 
 ## What Works
+- **PERF-529**: Isolate Renderers with --process-per-tab
+  - **What I tried**: Added `--process-per-tab` to Chromium launch arguments and removed `--disable-site-isolation-trials` to force each worker page into its own renderer process with dedicated V8 isolate and compositor thread.
+  - **Outcome**: Kept. Improved median render time to ~15.594s vs baseline ~16.306s. Eliminating thread contention across shared workers substantially improved multi-core throughput during the hot loop.
 - **PERF-520**: Inlined evaluateStabilityParams await in CdpTimeDriver
   - **What I tried**: Inlined stability check promise directly without chaining `.then()` inside `runSetTime()` in CdpTimeDriver.ts.
   - **Outcome**: Kept. Improved median render time to ~16.306s vs baseline ~16.756s. Bypassing closure and Promise chain allocation slightly improved hot loop performance.
