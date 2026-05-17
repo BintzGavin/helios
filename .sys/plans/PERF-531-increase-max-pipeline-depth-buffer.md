@@ -1,11 +1,11 @@
 ---
 id: PERF-531
 slug: increase-max-pipeline-depth-buffer
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-06-01
-completed: ""
-result: ""
+completed: "2026-05-17"
+result: "discarded"
 ---
 
 # PERF-531: Increase CaptureLoop maxPipelineDepth Buffer
@@ -63,3 +63,9 @@ Run the DOM benchmark and inspect `output.mp4` to verify that all 600 frames wer
 ## Prior Art
 - PERF-498 (Restored FFmpeg backpressure to fix OOM on long renders, but introduced tight coupling due to the shallow buffer)
 - PERF-524 (Unclaimed earlier hypothesis proposing a similar pipeline depth increase)
+
+## Results Summary
+- **Best render time**: 19.206s (vs baseline 15.594s)
+- **Improvement**: -23.16%
+- **Kept experiments**: none
+- **Discarded experiments**: Increased maxPipelineDepth buffer multiplier to 64

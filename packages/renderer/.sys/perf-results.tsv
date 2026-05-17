@@ -80,3 +80,4 @@ run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
 3	15.640	600	38.36	44.3	keep	process-per-tab (PERF-529)
 4	15.594	600	38.48	44.4	keep	process-per-tab (PERF-529)
 5	15.421	600	38.91	43.6	keep	process-per-tab (PERF-529)
+1	19.206	600	31.24	46.4	discard	increase maxPipelineDepth buffer multiplier to 64 (PERF-531)
