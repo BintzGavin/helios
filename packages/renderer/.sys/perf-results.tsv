@@ -101,3 +101,8 @@ run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
 3	15.868	600	37.81	46.8	discard	limit FFmpeg threads to 1 (run 3)
 4	17.319	600	34.64	37.5	discard	limit FFmpeg threads to 1 (run 4)
 5	16.696	600	35.94	44.7	discard	limit FFmpeg threads to 1 (run 5)
+1	10.440	600	57.47	43.0	keep	dedicated browser instances (PERF-526)
+2	10.679	600	56.18	43.0	keep	dedicated browser instances (PERF-526)
+3	10.781	600	55.65	43.0	keep	dedicated browser instances (PERF-526)
+4	10.537	600	56.94	43.0	keep	dedicated browser instances (PERF-526)
+5	10.760	600	55.76	43.6	keep	dedicated browser instances (PERF-526)

@@ -39,6 +39,7 @@ const GPU_DISABLED_ARGS = [
 ];
 
 export interface WorkerInfo {
+  browser: import('playwright').Browser;
   context: import('playwright').BrowserContext;
   page: import('playwright').Page;
   strategy: RenderStrategy;
@@ -47,7 +48,6 @@ export interface WorkerInfo {
 
 export class BrowserPool {
   private options: RendererOptions;
-  public browser: Browser | null = null;
   public workers: WorkerInfo[] = [];
   public capturedErrors: Error[] = [];
 
@@ -100,26 +100,26 @@ export class BrowserPool {
   }
 
   public async init(compositionUrl: string, jobOptions?: RenderJobOptions): Promise<void> {
-    this.browser = await chromium.launch(this.getLaunchOptions());
     this.capturedErrors = [];
 
     const concurrency = Math.max(1, (os.cpus().length || 4) - 1);
-    console.log(`Initializing pool of ${concurrency} pages...`);
-
-    const sharedContext = await this.browser!.newContext({
-      viewport: {
-        width: this.options.width,
-        height: this.options.height,
-      },
-    });
-
-    if (jobOptions?.tracePath) {
-      console.log(`Enabling Playwright tracing for shared context...`);
-      await sharedContext.tracing.start({ screenshots: true, snapshots: true });
-    }
+    console.log(`Initializing pool of ${concurrency} browsers/pages...`);
 
     const createPage = async (index: number): Promise<WorkerInfo> => {
-      const page = await sharedContext.newPage();
+      const browser = await chromium.launch(this.getLaunchOptions());
+      const context = await browser.newContext({
+        viewport: {
+          width: this.options.width,
+          height: this.options.height,
+        },
+      });
+
+      if (index === 0 && jobOptions?.tracePath) {
+        console.log(`Enabling Playwright tracing for worker 0 context...`);
+        await context.tracing.start({ screenshots: true, snapshots: true });
+      }
+
+      const page = await context.newPage();
       const strategy = this.options.mode === 'dom' ? new DomStrategy(this.options) : new CanvasStrategy(this.options);
       const timeDriver = new CdpTimeDriver(this.options.stabilityTimeout);
 
@@ -145,7 +145,7 @@ export class BrowserPool {
       await strategy.prepare(page);
       await timeDriver.prepare(page);
 
-      return { context: sharedContext, page, strategy, timeDriver };
+      return { browser, context, page, strategy, timeDriver };
     };
 
     const poolPromises = [];
@@ -159,17 +159,15 @@ export class BrowserPool {
 
   public async close(jobOptions?: RenderJobOptions): Promise<void> {
     if (this.workers.length > 0) {
-      const sharedContext = this.workers[0].context;
       if (jobOptions?.tracePath) {
         console.log('Stopping tracing...');
-        await sharedContext.tracing.stop({ path: jobOptions.tracePath });
+        await this.workers[0].context.tracing.stop({ path: jobOptions.tracePath });
       }
-      await sharedContext.close();
-    }
-
-    if (this.browser) {
-      await this.browser.close();
-      console.log('Browser closed.');
+      for (const worker of this.workers) {
+        await worker.context.close();
+        await worker.browser.close();
+      }
+      console.log('Browsers closed.');
     }
   }
 
