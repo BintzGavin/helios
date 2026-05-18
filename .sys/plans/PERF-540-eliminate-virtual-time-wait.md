@@ -1,11 +1,11 @@
 ---
 id: PERF-540
 slug: eliminate-virtual-time-wait
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-18
-completed: ""
-result: ""
+completed: 2024-05-18
+result: "discarded"
 ---
 
 # PERF-540: Eliminate Double Await for Virtual Time Policy in CDP Driver
@@ -59,3 +59,9 @@ Run a basic canvas render (`npm run test -w packages/renderer -- --run` if neces
 
 ## Correctness Check
 Run the DOM benchmark (`npx tsx packages/renderer/tests/fixtures/benchmark.ts`) and inspect the output video to verify animations still play correctly without freezing.
+
+## Results Summary
+- **Best render time**: 21.970s (vs baseline ~10.760s)
+- **Improvement**: Regressed
+- **Kept experiments**: []
+- **Discarded experiments**: [Eliminate Double Await for Virtual Time Policy]
