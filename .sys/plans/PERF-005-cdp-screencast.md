@@ -1,11 +1,11 @@
 ---
 id: PERF-005
 slug: cdp-screencast
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "jules"
 created: 2026-10-18
-completed: ""
-result: ""
+completed: "true"
+result: "discarded - regression"
 ---
 
 # PERF-005: Bypass Playwright Overhead with Raw CDP Screencast
