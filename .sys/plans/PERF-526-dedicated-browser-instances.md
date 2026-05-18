@@ -1,11 +1,11 @@
 ---
 id: PERF-526
 slug: dedicated-browser-instances
-status: unclaimed
-claimed_by: ""
+status: claimed
+claimed_by: "executor-session"
 created: 2024-05-30
-completed: ""
-result: ""
+completed: "2025-02-13"
+result: "improved"
 ---
 
 # PERF-526: Dedicated Browser Instances for True Process Isolation
@@ -52,3 +52,9 @@ Run canvas benchmarks to ensure `BrowserPool` correctly provisions instances for
 
 ## Correctness Check
 Run the DOM benchmark and inspect `output.mp4` to verify that all frames were correctly ordered and written without drops.
+
+## Results Summary
+- **Best render time**: 10.760s (vs baseline 17.071s)
+- **Improvement**: ~37%
+- **Kept experiments**: [PERF-526]
+- **Discarded experiments**: []

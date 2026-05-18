@@ -1,8 +1,12 @@
 ## Performance Trajectory
-Current best: 15.594s (baseline was 16.306s)
-Last updated by: PERF-529
+Current best: 10.760s (baseline was 17.071s, -37%)
+Last updated by: PERF-526
 
 ## What Works
+- **Dedicated Browser Instances (PERF-526)**
+  - **What I did**: Updated `BrowserPool.ts` to launch a dedicated Chromium browser instance per worker page instead of sharing a single browser context.
+  - **How much it improved**: ~37% faster (median ~10.760s vs baseline ~17.071s).
+  - **Plan ID**: PERF-526
 - **PERF-529**: Isolate Renderers with --process-per-tab
   - **What I tried**: Added `--process-per-tab` to Chromium launch arguments and removed `--disable-site-isolation-trials` to force each worker page into its own renderer process with dedicated V8 isolate and compositor thread.
   - **Outcome**: Kept. Improved median render time to ~15.594s vs baseline ~16.306s. Eliminating thread contention across shared workers substantially improved multi-core throughput during the hot loop.
