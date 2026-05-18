@@ -95,3 +95,4 @@ run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
 2	17.328	600	34.63	37.4	discard	inline stability check response evaluation
 3	17.344	600	34.59	35.7	discard	inline stability check response evaluation
 538	17.462	600	34.36	37.5	discard	PERF-538: Replace Runtime.evaluate with Runtime.callFunctionOn in CdpTimeDriver
+2	18.790	600	31.93	40.0	discard	CdpTimeDriver Runtime.callFunctionOn

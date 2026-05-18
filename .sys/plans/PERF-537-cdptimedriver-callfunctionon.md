@@ -1,11 +1,11 @@
 ---
 id: PERF-537
 slug: cdptimedriver-callfunctionon
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2026-05-17
-completed: ""
-result: ""
+completed: 2026-05-18
+result: "discarded"
 ---
 
 # PERF-537: Replace Runtime.evaluate with Runtime.callFunctionOn in CdpTimeDriver
@@ -87,3 +87,9 @@ Change `defaultSyncMedia` implementation:
 
 ## Correctness Check
 Run the `npx tsx packages/renderer/tests/fixtures/benchmark.ts` script to test performance, followed by `npm run test -w packages/renderer -- --run` to verify correctness.
+
+## Results Summary
+- **Best render time**: 18.790s (vs baseline ~15.594s)
+- **Improvement**: Regressed
+- **Kept experiments**: []
+- **Discarded experiments**: [PERF-537]

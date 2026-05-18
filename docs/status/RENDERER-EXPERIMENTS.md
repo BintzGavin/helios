@@ -103,3 +103,7 @@ Last updated by: PERF-529
 - **Use WebP with image2pipe for Intermediate Formats** (PERF-535)
   - Tried changing the default intermediate screenshot format to `webp` and using the `image2pipe` FFmpeg demuxer (`-vcodec webp`).
   - **WHY it didn't work**: The benchmark immediately crashed with a pipeline error from FFmpeg: `Could not find codec parameters for stream 0 (Video: webp, none): unspecified size` and `Cannot determine format of input stream 0:0 after EOF`. FFmpeg's `image2pipe` parser natively failed to derive the dimensions of the initial incoming headless Chromium-produced base64-decoded WEBP frames, breaking the pipe before any valid video stream was initiated.
+- **PERF-537**: Replace Runtime.evaluate with Runtime.callFunctionOn in CdpTimeDriver
+  - **What I tried**: Attempted to replace `Runtime.evaluate` with `Runtime.callFunctionOn` in the `defaultSyncMedia` function of `CdpTimeDriver.ts`.
+  - **WHY it didn't work**: Render time regressed to a median of ~18.790s vs baseline ~15.594s. Passing arguments and executing pre-compiled static functions over CDP `callFunctionOn` caused more protocol serialization overhead than just concatenating the strings and executing them via `Runtime.evaluate`, negating the V8 re-parsing savings.
+  - **Outcome**: discard
