@@ -1,11 +1,11 @@
 ---
 id: PERF-538
 slug: cdptimedriver-callfunctionon
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-24
-completed: ""
-result: ""
+completed: 2026-05-18
+result: no-improvement
 ---
 
 # PERF-538: Replace Runtime.evaluate with Runtime.callFunctionOn in CdpTimeDriver
@@ -93,3 +93,9 @@ Run the benchmark via `npx tsx packages/renderer/tests/fixtures/benchmark.ts` to
 
 ## Correctness Check
 Run the renderer test suite using `npm run test -w packages/renderer -- --run` to verify that the changes do not break any tests.
+
+## Results Summary
+- **Best render time**: 17.462s (vs baseline 15.594s)
+- **Improvement**: 0%
+- **Kept experiments**: []
+- **Discarded experiments**: [PERF-538: Replace Runtime.evaluate with Runtime.callFunctionOn]

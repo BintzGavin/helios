@@ -25,6 +25,10 @@ Last updated by: PERF-529
   - **Outcome**: discard
 
 ## What Doesn't Work (and Why)
+- **PERF-538**: Replace Runtime.evaluate with Runtime.callFunctionOn
+  - **What I tried**: Updated `CdpTimeDriver.ts` to use `Runtime.callFunctionOn` instead of `Runtime.evaluate` to synchronize media elements, which passes static function declarations with arguments to bypass V8 string parsing per frame.
+  - **WHY it didn't work**: The median render time regressed to ~17.462s vs the baseline of ~15.594s. Passing static function declarations via `callFunctionOn` introduced higher argument serialization or CDP protocol overhead than executing a pre-concatenated raw string via `evaluate` in the tight frame loop.
+  - **Outcome**: discard
 - **PERF-536**: Inline Stability Evaluate in CdpTimeDriver.ts
   - **What I tried**: Attempted to reduce function call dispatch and variable assignment overhead by inlining the `handleStabilityCheckResponse` exception check logic directly into `runSetTime()`.
   - **WHY it didn't work**: Render time regressed to a median of ~17.344s vs baseline ~15.594s. Inlining the error-checking logic inside the V8 hot loop likely caused negative deoptimization side effects, overriding the minuscule savings from avoiding function dispatch.
