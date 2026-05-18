@@ -111,3 +111,7 @@ Last updated by: PERF-529
   - **What I tried**: Added `-threads 1` to the FFmpeg builder arguments for video encoding in `FFmpegBuilder.ts` to limit thread contention with Chromium and Node on the CPU.
   - **WHY it didn't work**: The render time regressed to a median of ~16.696s (and as bad as ~28.173s in one run) compared to the baseline of ~15.594s. Limiting FFmpeg to a single thread likely introduced a bottleneck on the encoding side that backed up the pipeline, forcing Chromium workers to wait, which negatively offset any thread contention gains.
   - **Outcome**: discard
+- **PERF-539**: Disable Chromium Sandbox
+  - **What I tried**: Added `--no-sandbox` and `--disable-setuid-sandbox` to the `DEFAULT_BROWSER_ARGS` in `BrowserPool.ts`.
+  - **WHY it didn't work**: The median render time did not improve over the baseline (~17.513s vs baseline ~17.175s). Although we disable process isolation in headless microVM, disabling the sandbox mechanisms directly does not decrease IPC overhead enough to speed up the high-frequency `beginFrame` capture loop.
+  - **Outcome**: discard
