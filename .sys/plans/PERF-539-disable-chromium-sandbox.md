@@ -1,11 +1,11 @@
 ---
 id: PERF-539
 slug: disable-chromium-sandbox
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-31
-completed: ""
-result: ""
+completed: 2025-02-13
+result: "no-improvement"
 ---
 
 # PERF-539: Disable Chromium Sandbox for IPC Efficiency
@@ -63,3 +63,9 @@ Run the DOM benchmark (`npx tsx packages/renderer/tests/fixtures/benchmark.ts`) 
 
 ## Prior Art
 - PERF-529 implemented `--process-per-tab`, which successfully optimized multi-core utilization by dedicating a renderer process to each tab. Disabling the sandbox optimizes those newly separated processes.
+
+## Results Summary
+- **Best render time**: 17.362s (vs baseline 17.137s)
+- **Improvement**: -1.3%
+- **Kept experiments**: []
+- **Discarded experiments**: [PERF-539: Disable Chromium Sandbox]
