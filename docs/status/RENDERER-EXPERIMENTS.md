@@ -1,8 +1,11 @@
 ## Performance Trajectory
-Current best: 10.760s (baseline was 17.071s, -37%)
-Last updated by: PERF-526
+Current best: 10.046s (baseline was 10.760s, -7%)
+Last updated by: PERF-541
 
 ## What Works
+- **In-Memory Frame Encoding Optimization (PERF-541)**
+  - Replaced `--process-per-tab` with `--single-process` in `DEFAULT_BROWSER_ARGS` to eliminate Chromium's internal process-to-process IPC.
+  - Render time improved to ~10.046s from the ~10.760s baseline.
 - **Dedicated Browser Instances (PERF-526)**
   - **What I did**: Updated `BrowserPool.ts` to launch a dedicated Chromium browser instance per worker page instead of sharing a single browser context.
   - **How much it improved**: ~37% faster (median ~10.760s vs baseline ~17.071s).
