@@ -22,7 +22,7 @@ const DEFAULT_BROWSER_ARGS = [
   '--allow-file-access-from-files',
   '--enable-begin-frame-control',
   '--run-all-compositor-stages-before-draw',
-  '--process-per-tab',
+  '--single-process',
   '--disable-features=PaintHolding,Translate,OptimizationHints,OptimizationGuideModelDownloading,CalculateNativeWinOcclusion',
   '--disable-lcd-text',
   '--disable-threaded-animation',

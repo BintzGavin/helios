@@ -1,11 +1,11 @@
 ---
 id: PERF-541
 slug: single-process
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "Jules"
 created: 2024-05-18
-completed: ""
-result: ""
+completed: "2024-05-18"
+result: "keep"
 ---
 
 # PERF-541: In-Memory Frame Encoding Optimization
