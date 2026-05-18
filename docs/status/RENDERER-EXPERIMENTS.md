@@ -29,6 +29,7 @@ Last updated by: PERF-526
   - **Outcome**: discard
 
 ## What Doesn't Work (and Why)
+- **Removed `--disable-dev-shm-usage` from DEFAULT_BROWSER_ARGS**: Discarded. Removing this argument caused a slight performance regression (median ~10.950s vs baseline ~10.820s) instead of improving performance. While `/dev/shm` is faster, the flag's removal might lead Chromium to use IPC memory mechanisms that are less efficient for this specific microVM environment or workload. (PERF-543)
 - **PERF-538**: Replace Runtime.evaluate with Runtime.callFunctionOn
   - **What I tried**: Updated `CdpTimeDriver.ts` to use `Runtime.callFunctionOn` instead of `Runtime.evaluate` to synchronize media elements, which passes static function declarations with arguments to bypass V8 string parsing per frame.
   - **WHY it didn't work**: The median render time regressed to ~17.462s vs the baseline of ~15.594s. Passing static function declarations via `callFunctionOn` introduced higher argument serialization or CDP protocol overhead than executing a pre-concatenated raw string via `evaluate` in the tight frame loop.

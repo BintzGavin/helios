@@ -1,11 +1,11 @@
 ---
 id: PERF-543
 slug: disable-dev-shm-usage
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-18
-completed: ""
-result: ""
+completed: 2024-05-18
+result: no-improvement
 ---
 
 # PERF-543: Remove --disable-dev-shm-usage Optimization
@@ -47,3 +47,9 @@ Run the DOM render benchmark script (`npx tsx packages/renderer/tests/fixtures/b
 
 ## Prior Art
 None.
+
+## Results Summary
+- **Best render time**: 10.889s (vs baseline 10.820s)
+- **Improvement**: -0.6%
+- **Kept experiments**: []
+- **Discarded experiments**: [Remove `--disable-dev-shm-usage`]
