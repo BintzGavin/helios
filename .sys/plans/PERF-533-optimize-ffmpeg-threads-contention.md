@@ -1,11 +1,11 @@
 ---
 id: PERF-533
 slug: optimize-ffmepg-threads-contention
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2025-02-27
-completed: ""
-result: ""
+completed: 2026-05-18
+result: no-improvement
 ---
 
 # PERF-533: Limit FFmpeg Threads to Reduce CPU Contention
@@ -71,3 +71,10 @@ Run the DOM benchmark and inspect `output.mp4` to verify visual correctness.
 
 ## Prior Art
 - PERF-518 proved that maximizing Chromium concurrency (`os.cpus().length - 1`) works best. Limiting background consumers (FFmpeg) rather than producers (Chromium) is the logical next step.
+
+## Results Summary
+- **Best render time**: ~16.696s (vs baseline ~15.594s)
+- **Improvement**: -7.0%
+- **Kept experiments**: None
+- **Discarded experiments**:
+  - Limit FFmpeg threads to 1 (`-threads 1`)

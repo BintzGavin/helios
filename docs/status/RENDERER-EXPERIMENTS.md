@@ -107,3 +107,7 @@ Last updated by: PERF-529
   - **What I tried**: Attempted to replace `Runtime.evaluate` with `Runtime.callFunctionOn` in the `defaultSyncMedia` function of `CdpTimeDriver.ts`.
   - **WHY it didn't work**: Render time regressed to a median of ~18.790s vs baseline ~15.594s. Passing arguments and executing pre-compiled static functions over CDP `callFunctionOn` caused more protocol serialization overhead than just concatenating the strings and executing them via `Runtime.evaluate`, negating the V8 re-parsing savings.
   - **Outcome**: discard
+- **PERF-533**: Limit FFmpeg Threads to Reduce CPU Contention
+  - **What I tried**: Added `-threads 1` to the FFmpeg builder arguments for video encoding in `FFmpegBuilder.ts` to limit thread contention with Chromium and Node on the CPU.
+  - **WHY it didn't work**: The render time regressed to a median of ~16.696s (and as bad as ~28.173s in one run) compared to the baseline of ~15.594s. Limiting FFmpeg to a single thread likely introduced a bottleneck on the encoding side that backed up the pipeline, forcing Chromium workers to wait, which negatively offset any thread contention gains.
+  - **Outcome**: discard
