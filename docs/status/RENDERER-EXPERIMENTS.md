@@ -119,3 +119,7 @@ Last updated by: PERF-526
   - **What I tried**: Added `--no-sandbox` and `--disable-setuid-sandbox` to the `DEFAULT_BROWSER_ARGS` in `BrowserPool.ts`.
   - **WHY it didn't work**: The median render time did not improve over the baseline (~17.513s vs baseline ~17.175s). Although we disable process isolation in headless microVM, disabling the sandbox mechanisms directly does not decrease IPC overhead enough to speed up the high-frequency `beginFrame` capture loop.
   - **Outcome**: discard
+- **PERF-540**: Eliminate Double Await for Virtual Time Policy in CDP Driver
+  - **What I tried**: Replaced the double-wait promise architecture for advancing virtual time via CDP (`await new Promise(virtualTimePromiseExecutor)` and waiting for `Emulation.virtualTimeBudgetExpired`) with a simple `await this.client!.send('Emulation.setVirtualTimePolicy', ...).catch(() => {})`.
+  - **WHY it didn't work**: The performance regressed significantly. The median render time increased to ~21.970s compared to the baseline (~10.7s with dedicated instances). The `Emulation.virtualTimeBudgetExpired` event listener is functionally required by Chromium to ensure that the headless compositor has fully resolved the requested time budget and flushed frame paints before the pipeline can request a new `beginFrame`. Without the event listener wait, the time budget loop falls out of sync, severely degrading capture loop throughput or causing excessive frame stalling.
+  - **Outcome**: discard
