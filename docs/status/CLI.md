@@ -1,4 +1,6 @@
-**Version**: 0.46.31
+**Version**: 0.46.32
+
+[v0.46.32] ✅ Completed: CLI Docker Adapter Regression Tests - Implemented unit tests for the docker-adapter cloud template.
 
 [v0.46.30] ✅ Completed: CLI Cloud Templates Tests - Implemented unit tests for remaining cloud deployment templates.
 

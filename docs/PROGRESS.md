@@ -13,6 +13,9 @@
 ### CLI v0.46.26
 - ✅ Completed: Document duplicated CLI Index Regression Tests plan - Logged the duplicated plan as impossible.
 
+### CLI v0.46.32
+- ✅ Completed: CLI Docker Adapter Regression Tests - Implemented unit tests for the docker-adapter cloud template in packages/cli/src/templates/__tests__/cloud.test.ts.
+
 ### CLI v0.46.25
 - ✅ Completed: CLI Index Regression Tests - Implemented unit tests for the CLI entry point in index.ts.
 

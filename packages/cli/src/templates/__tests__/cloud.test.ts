@@ -11,6 +11,7 @@ import { README_VERCEL_TEMPLATE } from '../vercel';
 import { README_MODAL_TEMPLATE } from '../modal';
 import { README_HETZNER_TEMPLATE } from '../hetzner';
 import { FLY_TOML_TEMPLATE, FLY_DOCKERFILE_TEMPLATE, README_FLY_TEMPLATE } from '../fly';
+import { DOCKER_COMPOSE_ADAPTER_TEMPLATE, README_DOCKER_TEMPLATE } from '../docker-adapter';
 
 describe('Cloud Templates', () => {
   it('should export AWS_DOCKERFILE_TEMPLATE containing correct properties', () => {
@@ -81,5 +82,12 @@ describe('Cloud Templates', () => {
     expect(FLY_DOCKERFILE_TEMPLATE).toContain('FROM mcr.microsoft.com/playwright:v1.49.1-jammy');
     expect(README_FLY_TEMPLATE).toBeDefined();
     expect(README_FLY_TEMPLATE).toContain('# Helios Fly.io Deployment');
+  });
+
+  it('should export Docker Adapter templates containing correct properties', () => {
+    expect(DOCKER_COMPOSE_ADAPTER_TEMPLATE).toBeDefined();
+    expect(DOCKER_COMPOSE_ADAPTER_TEMPLATE).toContain("version: '3.8'");
+    expect(README_DOCKER_TEMPLATE).toBeDefined();
+    expect(README_DOCKER_TEMPLATE).toContain('# Docker Deployment');
   });
 });
