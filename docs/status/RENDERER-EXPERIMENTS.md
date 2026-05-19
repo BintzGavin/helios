@@ -98,6 +98,10 @@ Last updated by: PERF-541
 - Plan ID: PERF-518
 
 ## What Doesn't Work (and Why)
+- **PERF-545**: Disable GPU Memory Buffer Optimization
+  - **What I tried**: Added `--disable-gpu-memory-buffer-video-frames` and `--disable-gpu-memory-buffer-compositor-resources` to `GPU_DISABLED_ARGS` in `BrowserPool.ts`.
+  - **WHY it didn't work**: The performance degraded (median ~10.977s vs baseline ~10.046s). Forcing Chromium to disable GPU memory buffers likely interfered with some internal optimization or hardware abstraction layer paths, negating the expected CPU-memory allocation benefits.
+  - **Outcome**: discard
 - **Reducing BrowserPool Concurrency to 2 or 1 (PERF-518)**: Tested reducing `concurrency` in `BrowserPool.ts` from 3 (calculated as `Math.max(1, os.cpus().length - 1)`) to 2, and then to 1 to reduce thread contention in the single Chromium process due to `--disable-site-isolation-trials`. Results showed performance degraded. With concurrency = 2, median render time was ~20.89s (vs baseline ~18.2s-20.6s). With concurrency = 1, median render time dropped to ~28.15s. This indicates that while thread contention exists, the benefits of partial parallelism via multiple browser pages outpace the overhead. The existing formula (`Math.max(1, (os.cpus().length || 4) - 1)`) works best in this CPU environment. Discarded the change.
 - **PERF-528**: Eager Base64 Decoding & CdpTimeDriver Inlining
   - **What I tried**: Inlined the Base64 frame buffer decoding inside `runWorker` in `CaptureLoop.ts` to improve L1 cache locality, and inlined `runSetTime` logic in `CdpTimeDriver.ts`.
