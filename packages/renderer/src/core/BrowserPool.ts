@@ -9,7 +9,6 @@ import { CdpTimeDriver } from '../drivers/CdpTimeDriver.js';
 import { RendererOptions, RenderJobOptions } from '../types.js';
 
 const DEFAULT_BROWSER_ARGS = [
-  '--disable-dev-shm-usage',
   '--disable-extensions',
   '--disable-default-apps',
   '--disable-sync',
