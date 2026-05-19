@@ -36,6 +36,8 @@ const GPU_DISABLED_ARGS = [
   '--disable-gpu',
   '--disable-software-rasterizer',
   '--disable-gpu-compositing',
+  '--disable-gpu-memory-buffer-video-frames',
+  '--disable-gpu-memory-buffer-compositor-resources'
 ];
 
 export interface WorkerInfo {

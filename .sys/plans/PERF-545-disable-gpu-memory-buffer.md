@@ -1,11 +1,11 @@
 ---
 id: PERF-545
 slug: disable-gpu-memory-buffer
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "Jules"
 created: 2024-05-18
-completed: ""
-result: ""
+completed: "2024-05-18"
+result: "discard"
 ---
 
 # PERF-545: Disable GPU Memory Buffer Optimization
@@ -47,3 +47,9 @@ Run the DOM render benchmark script (`npx tsx packages/renderer/tests/fixtures/b
 
 ## Prior Art
 None.
+
+## Results Summary
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	12.204	600	49.16	44.0	discard	disable-gpu-memory-buffer
+2	10.789	600	55.61	43.1	discard	disable-gpu-memory-buffer
+3	11.127	600	53.92	43.1	discard	disable-gpu-memory-buffer
