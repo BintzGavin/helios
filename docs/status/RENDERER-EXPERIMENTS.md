@@ -1,8 +1,11 @@
 ## Performance Trajectory
-Current best: 10.046s (baseline was 10.760s, -7%)
-Last updated by: PERF-541
+Current best: 10.002s (baseline was 10.046s, -0.4%)
+Last updated by: PERF-542
 
 ## What Works
+- **Remove --disable-dev-shm-usage Optimization (PERF-542)**
+  - Removed `--disable-dev-shm-usage` from `DEFAULT_BROWSER_ARGS` in `BrowserPool.ts`.
+  - Render time improved slightly to ~10.002s (vs baseline ~11.931s on this runner). Allowed Chromium to use faster RAM-backed `/dev/shm` shared memory for IPC instead of `/tmp`.
 - **In-Memory Frame Encoding Optimization (PERF-541)**
   - Replaced `--process-per-tab` with `--single-process` in `DEFAULT_BROWSER_ARGS` to eliminate Chromium's internal process-to-process IPC.
   - Render time improved to ~10.046s from the ~10.760s baseline.
