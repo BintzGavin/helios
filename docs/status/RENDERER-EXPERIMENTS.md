@@ -151,3 +151,7 @@ Last updated by: PERF-542
   - **What I tried**: Replaced the double-wait promise architecture for advancing virtual time via CDP (`await new Promise(virtualTimePromiseExecutor)` and waiting for `Emulation.virtualTimeBudgetExpired`) with a simple `await this.client!.send('Emulation.setVirtualTimePolicy', ...).catch(() => {})`.
   - **WHY it didn't work**: The performance regressed significantly. The median render time increased to ~21.970s compared to the baseline (~10.7s with dedicated instances). The `Emulation.virtualTimeBudgetExpired` event listener is functionally required by Chromium to ensure that the headless compositor has fully resolved the requested time budget and flushed frame paints before the pipeline can request a new `beginFrame`. Without the event listener wait, the time budget loop falls out of sync, severely degrading capture loop throughput or causing excessive frame stalling.
   - **Outcome**: discard
+- **PERF-524**: Increase CaptureLoop maxPipelineDepth Buffer
+  - **What I tried**: Increased the `maxPipelineDepth` buffer multiplier in `CaptureLoop.ts` from `8` to `64`.
+  - **WHY it didn't work**: The performance regressed or showed no meaningful improvement. The median render time was ~10.107s, which is slightly worse than the baseline ~10.046s. Deepening the backpressure ring buffer likely increased memory overhead or V8 GC pressure without significantly improving throughput in this environment.
+  - **Outcome**: discard
