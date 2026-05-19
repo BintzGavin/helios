@@ -163,3 +163,7 @@ Last updated by: PERF-542
   - **What I tried**: Increased the `maxPipelineDepth` buffer multiplier in `CaptureLoop.ts` from `8` to `64`.
   - **WHY it didn't work**: The performance regressed or showed no meaningful improvement. The median render time was ~10.107s, which is slightly worse than the baseline ~10.046s. Deepening the backpressure ring buffer likely increased memory overhead or V8 GC pressure without significantly improving throughput in this environment.
   - **Outcome**: discard
+- **PERF-548**: Remove Synchronous Threading Flags in Single-Process Mode
+  - **What I tried**: Removed `--disable-threaded-animation`, `--disable-threaded-scrolling`, `--disable-checker-imaging`, `--disable-image-animation-resync`, and `--disable-smooth-scrolling` from the `DEFAULT_BROWSER_ARGS` array in `BrowserPool.ts`.
+  - **WHY it didn't work**: The median render time degraded to ~10.676s vs the baseline of ~10.002s. While `--single-process` makes the browser conceptually single-threaded, these flags actually force deterministic execution of rendering operations within the main frame loop. Removing them allows Chromium to try offloading work to threads it doesn't have in this context, or breaks the synchronous pipeline expected by the deterministic `beginFrame` capture loop, leading to wait timeouts or stalls.
+  - **Outcome**: discard
