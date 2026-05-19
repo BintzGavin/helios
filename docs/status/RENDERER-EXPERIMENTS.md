@@ -109,6 +109,10 @@ Last updated by: PERF-542
 - Plan ID: PERF-518
 
 ## What Doesn't Work (and Why)
+- **PERF-547**: Disable Skia Wait and Color Profile Overheads
+  - **What I tried**: Added `--disable-color-correct-rendering` and `--disable-skia-runtime-opts` to `DEFAULT_BROWSER_ARGS` in `BrowserPool.ts`.
+  - **WHY it didn't work**: The performance degraded (median ~10.306s vs baseline ~10.002s). Disabling these runtime optimizations likely interfered with Chromium's internal rendering assumptions for the headless software rasterizer, introducing more overhead than they saved.
+  - **Outcome**: discard
 - **PERF-545**: Disable GPU Memory Buffer Optimization
   - **What I tried**: Added `--disable-gpu-memory-buffer-video-frames` and `--disable-gpu-memory-buffer-compositor-resources` to `GPU_DISABLED_ARGS` in `BrowserPool.ts`.
   - **WHY it didn't work**: The performance degraded (median ~10.977s vs baseline ~10.046s). Forcing Chromium to disable GPU memory buffers likely interfered with some internal optimization or hardware abstraction layer paths, negating the expected CPU-memory allocation benefits.

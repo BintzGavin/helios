@@ -1,11 +1,11 @@
 ---
 id: PERF-547
 slug: disable-skia-optimizations
-status: unclaimed
-claimed_by: ""
+status: claimed
+claimed_by: "executor-session"
 created: 2024-05-19
-completed: ""
-result: ""
+completed: 2024-05-19
+result: failed
 ---
 
 # PERF-547: Disable Skia Wait and Color Profile Overheads
@@ -44,3 +44,9 @@ Complete pre-commit steps to ensure proper testing, verification, review, and re
 
 ### Step 4: Submit change
 Submit the plan via PR.
+
+## Results Summary
+- **Best render time**: 10.306s (vs baseline 10.002s)
+- **Improvement**: -3.0%
+- **Kept experiments**:
+- **Discarded experiments**: added disable-color-correct-rendering and disable-skia-runtime-opts
