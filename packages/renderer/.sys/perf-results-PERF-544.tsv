@@ -1,0 +1,4 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	10.509	600	57.09	43.6	discard	Remove try-catch blocks from hot loop in DomStrategy
+2	10.440	600	57.47	43.1	discard	Remove try-catch blocks from hot loop in DomStrategy
+3	10.805	600	55.53	42.6	discard	Remove try-catch blocks from hot loop in DomStrategy

@@ -1,11 +1,11 @@
 ---
 id: PERF-544
 slug: remove-try-catch-dom-strategy
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-18
-completed: ""
-result: ""
+completed: "2024-05-19"
+result: "discard"
 ---
 
 # PERF-544: Eliminate try-catch blocks from hot loop in DomStrategy
@@ -115,3 +115,9 @@ Run the DOM render benchmark script (`npx tsx packages/renderer/tests/fixtures/b
 
 ## Prior Art
 None.
+
+## Results Summary
+- **Best render time**: 10.440s (vs baseline 10.046s)
+- **Improvement**: 0% (Regression)
+- **Kept experiments**: []
+- **Discarded experiments**: [Remove try-catch blocks from hot loop in DomStrategy]

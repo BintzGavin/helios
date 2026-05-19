@@ -32,6 +32,11 @@ Last updated by: PERF-541
   - **Outcome**: discard
 
 ## What Doesn't Work (and Why)
+- **PERF-544**: Remove try-catch blocks from hot loop in DomStrategy
+  - **What I tried**: Rewrote the `capture()` method in `DomStrategy.ts` so that the await uses a native promise chain with `.catch()` instead of setting up a `try...catch` scope on every frame.
+  - **WHY it didn't work**: The performance regressed or showed no clear improvement. The median render time was ~10.509s compared to the baseline ~10.046s. The V8 overhead of setting up a block scope to capture exceptions on every loop iteration is extremely small and chaining a promise `.catch()` likely introduces comparable or worse microtask scheduling overhead.
+  - **Outcome**: discard
+
 - **Removed `--disable-dev-shm-usage` from DEFAULT_BROWSER_ARGS**: Discarded. Removing this argument caused a slight performance regression (median ~10.950s vs baseline ~10.820s) instead of improving performance. While `/dev/shm` is faster, the flag's removal might lead Chromium to use IPC memory mechanisms that are less efficient for this specific microVM environment or workload. (PERF-543)
 - **PERF-538**: Replace Runtime.evaluate with Runtime.callFunctionOn
   - **What I tried**: Updated `CdpTimeDriver.ts` to use `Runtime.callFunctionOn` instead of `Runtime.evaluate` to synchronize media elements, which passes static function declarations with arguments to bypass V8 string parsing per frame.
