@@ -1,3 +1,6 @@
+### PLAYER v0.77.36
+- ✅ Completed: Discovered that 2026-06-21-PLAYER-Smart-Controls.md is an IMPOSSIBLE: DUPLICATION plan. The smart controls for CC and PiP are already fully implemented. Documented as duplicate and discarded.
+
 ### CLI v0.46.30
 - ✅ Completed: CLI Cloud Templates Tests - Implemented unit tests for remaining cloud deployment templates.
 

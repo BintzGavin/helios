@@ -1,4 +1,5 @@
-**Version**: 0.77.35
+**Version**: 0.77.36
+[v0.77.36] ✅ Completed: Discovered that 2026-06-21-PLAYER-Smart-Controls.md is an IMPOSSIBLE: DUPLICATION plan. The smart controls for CC and PiP are already fully implemented. Documented as duplicate and discarded.
 [v0.77.35] ✅ Completed: Improve index.ts test coverage - Added tests for captureStream and audio metering edge cases.
 [v0.77.34] ✅ Completed: Discovered that 2026-11-26-PLAYER-Add-Undocumented-Shortcuts-UI.md is an IMPOSSIBLE: DUPLICATION plan. The shortcuts are already fully implemented in the UI overlay inside index.ts. Documented as impossible and discarded.
 [v0.77.33] ✅ Completed: Discovered that 2026-03-01-PLAYER-Client-Side-Video-Inlining.md is an IMPOSSIBLE: DUPLICATION plan. The inlineVideos functionality is already fully implemented and tested in dom-capture.ts. Documented as impossible and discarded.
