@@ -36,6 +36,10 @@ Last updated by: PERF-541
   - **What I tried**: Rewrote the `capture()` method in `DomStrategy.ts` so that the await uses a native promise chain with `.catch()` instead of setting up a `try...catch` scope on every frame.
   - **WHY it didn't work**: The performance regressed or showed no clear improvement. The median render time was ~10.509s compared to the baseline ~10.046s. The V8 overhead of setting up a block scope to capture exceptions on every loop iteration is extremely small and chaining a promise `.catch()` likely introduces comparable or worse microtask scheduling overhead.
   - **Outcome**: discard
+- **PERF-546**: Disable Site Isolation
+  - **What I tried**: Added `--disable-site-isolation-trials` and `IsolateOrigins,site-per-process` to the `--disable-features` flag in `BrowserPool.ts`.
+  - **WHY it didn't work**: The performance degraded slightly, yielding a median render time of ~10.704s compared to the baseline of ~10.046s. Disabling site isolation in this specific microVM environment likely interfered with Playwright's internal assumptions or Chromium process scheduling without yielding enough IPC reduction to overcome those overheads.
+  - **Outcome**: discard
 
 - **Removed `--disable-dev-shm-usage` from DEFAULT_BROWSER_ARGS**: Discarded. Removing this argument caused a slight performance regression (median ~10.950s vs baseline ~10.820s) instead of improving performance. While `/dev/shm` is faster, the flag's removal might lead Chromium to use IPC memory mechanisms that are less efficient for this specific microVM environment or workload. (PERF-543)
 - **PERF-538**: Replace Runtime.evaluate with Runtime.callFunctionOn

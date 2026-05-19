@@ -1,11 +1,11 @@
 ---
 id: PERF-546
 slug: disable-site-isolation
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "Jules"
 created: 2024-05-18
-completed: ""
-result: ""
+completed: "2024-05-19"
+result: "discard"
 ---
 
 # PERF-546: Disable Site Isolation in Chromium
