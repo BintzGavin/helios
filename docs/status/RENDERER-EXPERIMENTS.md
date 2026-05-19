@@ -117,6 +117,10 @@ Last updated by: PERF-542
   - **What I tried**: Added `--disable-color-correct-rendering` and `--disable-skia-runtime-opts` to `DEFAULT_BROWSER_ARGS` in `BrowserPool.ts`.
   - **WHY it didn't work**: The performance degraded (median ~10.306s vs baseline ~10.002s). Disabling these runtime optimizations likely interfered with Chromium's internal rendering assumptions for the headless software rasterizer, introducing more overhead than they saved.
   - **Outcome**: discard
+- **PERF-548**: Remove Synchronous Threading Flags in Single-Process Mode
+  - **What I tried**: Removed `--disable-threaded-animation`, `--disable-threaded-scrolling`, `--disable-checker-imaging`, `--disable-image-animation-resync`, and `--disable-smooth-scrolling` from the `DEFAULT_BROWSER_ARGS` array in `BrowserPool.ts`.
+  - **WHY it didn't work**: The median render time degraded to ~10.423s vs the baseline of ~10.002s. While `--single-process` makes the browser conceptually single-threaded, these flags actually force deterministic execution of rendering operations within the main frame loop. Removing them allows Chromium to try offloading work to threads it doesn't have in this context, or breaks the synchronous pipeline expected by the deterministic `beginFrame` capture loop, leading to wait timeouts or stalls.
+  - **Outcome**: discard
 - **PERF-545**: Disable GPU Memory Buffer Optimization
   - **What I tried**: Added `--disable-gpu-memory-buffer-video-frames` and `--disable-gpu-memory-buffer-compositor-resources` to `GPU_DISABLED_ARGS` in `BrowserPool.ts`.
   - **WHY it didn't work**: The performance degraded (median ~10.977s vs baseline ~10.046s). Forcing Chromium to disable GPU memory buffers likely interfered with some internal optimization or hardware abstraction layer paths, negating the expected CPU-memory allocation benefits.
