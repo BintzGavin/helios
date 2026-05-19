@@ -1,0 +1,4 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	11.941	600	50.25	43.7	discard	removed synchronous threading flags
+2	10.498	600	57.15	43.7	discard	removed synchronous threading flags
+3	10.423	600	57.56	43.7	discard	removed synchronous threading flags
