@@ -11,18 +11,18 @@
 #### 3. Implementation Spec
 - **Architecture**: Standard vitest unit tests validating exports and essential string content.
 - **Pseudo-Code**:
-  - Import `DOCKERFILE_TEMPLATE`, `DOCKER_COMPOSE_TEMPLATE` from `../docker`.
-  - Import `DOCKER_COMPOSE_ADAPTER_TEMPLATE`, `README_DOCKER_TEMPLATE` from `../docker-adapter`.
-  - Import `README_DENO_TEMPLATE` from `../deno`.
-  - Import `FLY_TOML_TEMPLATE`, `FLY_DOCKERFILE_TEMPLATE`, `README_FLY_TEMPLATE` from `../fly`.
-  - Import `README_HETZNER_TEMPLATE` from `../hetzner`.
-  - Import `README_MODAL_TEMPLATE` from `../modal`.
-  - Import `README_VERCEL_TEMPLATE` from `../vercel`.
-  - Add `it` blocks for each template group to check `toBeDefined()` and string inclusion for key template components.
+  - Import `DOCKERFILE_TEMPLATE`, `DOCKER_COMPOSE_TEMPLATE` from `../docker.js`.
+  - Import `DOCKER_COMPOSE_ADAPTER_TEMPLATE` from `../docker-adapter.js`.
+  - Import `README_DENO_TEMPLATE` from `../deno.js`.
+  - Import `FLY_TOML_TEMPLATE`, `FLY_DOCKERFILE_TEMPLATE`, `README_FLY_TEMPLATE` from `../fly.js`.
+  - Import `README_HETZNER_TEMPLATE` from `../hetzner.js`.
+  - Import `README_MODAL_TEMPLATE` from `../modal.js`.
+  - Import `README_VERCEL_TEMPLATE` from `../vercel.js`.
+  - Add `it` blocks for each template group to check `toBeDefined()` and string inclusion for key template components (e.g., `# Deno Deploy Guide` for `README_DENO_TEMPLATE`).
 - **Public API Changes**: None
 - **Dependencies**: None
 
 #### 4. Test Plan
-- **Verification**: Run `npx vitest packages/cli/src/templates/__tests__/cloud.test.ts`.
-- **Success Criteria**: All tests pass successfully and output indicates all 12 tests passing (6 existing + 6 new).
+- **Verification**: Run `npm run test -w packages/cli -- --run` to verify the modified tests pass successfully.
+- **Success Criteria**: All tests pass successfully and output indicates all 13 tests passing (7 existing + 6 new).
 - **Edge Cases**: Assure no duplicate tests are run and paths resolve correctly.
