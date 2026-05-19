@@ -1,11 +1,11 @@
 ---
 id: PERF-516
 slug: raw-cdp-evaluate
-status: unclaimed
-claimed_by: ""
+status: claimed
+claimed_by: "executor-session"
 created: 2024-05-16
-completed: ""
-result: ""
+completed: 2024-05-16
+result: failed
 ---
 
 # PERF-516: Bypass Playwright Evaluate
@@ -50,3 +50,9 @@ Complete pre commit steps to make sure proper testing, verifications, reviews an
 
 ### Step 4: Submit change
 Submit change, PR creation.
+
+## Results Summary
+- **Best render time**: 11.414s (vs baseline ~10.046s)
+- **Improvement**: -13.6%
+- **Kept experiments**:
+- **Discarded experiments**: Replaced `frame.evaluate` with a raw `Runtime.evaluate` in `CdpTimeDriver.ts`.

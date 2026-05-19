@@ -109,6 +109,10 @@ Last updated by: PERF-542
 - Plan ID: PERF-518
 
 ## What Doesn't Work (and Why)
+- **PERF-516**: Bypass Playwright Evaluate
+  - **What I tried**: Replaced `await frame.evaluate(...)` with a raw CDP `Runtime.evaluate` in `CdpTimeDriver.ts` to check if a page has media before running media synchronization.
+  - **WHY it didn't work**: Performance regressed to ~11.414s compared to the baseline of ~10.046s. This one-time evaluation happens during page initialization/setup, not in the hot loop (unlike `defaultSyncMedia` which was already optimized). Inlining this single check offered no measurable improvement in the hot loop, but likely suffered from slightly less optimized Playwright setup code paths.
+  - **Outcome**: discard
 - **PERF-547**: Disable Skia Wait and Color Profile Overheads
   - **What I tried**: Added `--disable-color-correct-rendering` and `--disable-skia-runtime-opts` to `DEFAULT_BROWSER_ARGS` in `BrowserPool.ts`.
   - **WHY it didn't work**: The performance degraded (median ~10.306s vs baseline ~10.002s). Disabling these runtime optimizations likely interfered with Chromium's internal rendering assumptions for the headless software rasterizer, introducing more overhead than they saved.
