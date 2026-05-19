@@ -9,6 +9,10 @@ Last updated by: PERF-542
 - **In-Memory Frame Encoding Optimization (PERF-541)**
   - Replaced `--process-per-tab` with `--single-process` in `DEFAULT_BROWSER_ARGS` to eliminate Chromium's internal process-to-process IPC.
   - Render time improved to ~10.046s from the ~10.760s baseline.
+- **PERF-449**: Skip Media Sync CDP Call in CdpTimeDriver When No Media Exists
+  - **What I did**: Evaluated media presence during driver initialization and bypassed the `sync_media` CDP IPC call in the `runSetTime` hot loop if no media elements are present.
+  - **How much it improved**: ~1% faster (median ~10.516s vs baseline ~10.640s).
+  - **Plan ID**: PERF-449
 - **Dedicated Browser Instances (PERF-526)**
   - **What I did**: Updated `BrowserPool.ts` to launch a dedicated Chromium browser instance per worker page instead of sharing a single browser context.
   - **How much it improved**: ~37% faster (median ~10.760s vs baseline ~17.071s).

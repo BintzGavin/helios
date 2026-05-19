@@ -20,6 +20,7 @@ export class CdpTimeDriver implements TimeDriver {
   private multiFrameSyncMediaParams: any[] = [];
   private syncMediaState: number = 0; // 0 = unknown, 1 = true, 2 = false
   private stabilityCheckState: number = 0; // 0 = unknown, 1 = true, 2 = false
+  private hasMedia: boolean = true;
 
   private virtualTimePromiseExecutor = (resolve: () => void, reject: (err: Error) => void) => {
     this.cdpResolve = resolve;
@@ -151,6 +152,7 @@ export class CdpTimeDriver implements TimeDriver {
           for (let i = 0; i < numMedia; i++) {
             syncMedia(cachedMediaElements[i], t);
           }
+          return numMedia;
         };
 
         window.__helios_wait_until_stable = () => {
@@ -174,6 +176,24 @@ export class CdpTimeDriver implements TimeDriver {
     }
 
     this.cachedFrames = page.frames();
+
+    try {
+      this.hasMedia = false;
+      for (const frame of this.cachedFrames) {
+         const count = await frame.evaluate(() => {
+            if (typeof (window as any).__helios_sync_media === 'function') {
+               return (window as any).__helios_sync_media(0);
+            }
+            return 0;
+         });
+         if (count > 0) {
+            this.hasMedia = true;
+            break;
+         }
+      }
+    } catch (e) {
+      this.hasMedia = true;
+    }
 
     try {
       const { result } = await this.client!.send('Runtime.evaluate', {
@@ -228,7 +248,7 @@ export class CdpTimeDriver implements TimeDriver {
     const budget = delta * 1000;
 
 // 1. Synchronize media elements
-    if (this.syncMediaState === 1) {
+    if (this.syncMediaState === 1 && this.hasMedia) {
       this.defaultSyncMedia(timeInSeconds);
     }
 
