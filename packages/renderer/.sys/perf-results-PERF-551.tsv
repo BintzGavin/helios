@@ -1,0 +1,11 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	20.398	600	29.41	48.2	keep	baseline
+2	12.219	600	49.11	43.3	keep	baseline
+3	10.043	600	59.74	41.8	keep	baseline
+4	9.958	600	60.25	43.2	keep	baseline
+5	9.908	600	60.56	43.9	keep	baseline
+6	12.433	600	48.26	43.7	discard	experiment
+7	10.148	600	59.13	46.3	discard	experiment
+8	11.841	600	50.67	44.9	discard	experiment
+9	9.937	600	60.38	43.0	discard	experiment
+10	9.787	600	61.30	51.8	discard	experiment

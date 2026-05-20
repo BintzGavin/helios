@@ -183,3 +183,7 @@ Last updated by: PERF-542
   - **What I tried**: Attempted to replace the pre-allocated `singleFrameSyncMediaParams` object mutation with fresh inline object literals in the `defaultSyncMedia` function of `CdpTimeDriver.ts`.
   - **WHY it didn't work**: The performance regressed significantly. The median render time increased to ~14.046s compared to the baseline ~10.002s. In the extremely hot frame loop, rapidly allocating fresh object literals for every single frame and relying on the V8 nursery for garbage collection introduced more overhead (likely due to GC pauses or un-optimized object shapes) than simply mutating a pre-allocated object whose hidden classes were already stabilized.
   - **Outcome**: discard
+- **PERF-551**: Disable Chromium Logging
+  - **What I tried**: Added `--disable-logging` and `--log-level=3` to `DEFAULT_BROWSER_ARGS` in `BrowserPool.ts`.
+  - **WHY it didn't work**: The median render time did not improve meaningfully (median ~10.148s vs baseline ~9.958s). Suppressing the internal logs in headless mode does not significantly decrease IPC or CPU overhead, likely because the headless Chromium instance does not produce enough background logs in a deterministic environment to cause measurable pipeline latency. The benefits of hiding output do not outweigh the cost to debuggability.
+  - **Outcome**: discard
