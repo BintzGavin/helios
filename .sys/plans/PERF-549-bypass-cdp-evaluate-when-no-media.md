@@ -1,11 +1,11 @@
 ---
 id: PERF-549
 slug: bypass-cdp-evaluate-when-no-media
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-20
-completed: ""
-result: ""
+completed: 2024-05-20
+result: discarded
 ---
 
 # PERF-549: Bypass CDP Evaluate on No Media
@@ -44,3 +44,10 @@ Run the full test suite (`npm run test -w packages/renderer -- --run`) to ensure
 
 ## Correctness Check
 Run the full test suite (`npm run test -w packages/renderer -- --run`) to verify DOM output correctly resolves without regressions.
+
+## Results Summary
+- **Best render time**: 10.440s (vs baseline ~10.440s)
+- **Median render time**: 10.531s
+- **Improvement**: ~0%
+- **Kept experiments**:
+- **Discarded experiments**: [Bypass CDP Evaluate on No Media]
