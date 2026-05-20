@@ -1,11 +1,11 @@
 ---
 id: PERF-551
 slug: disable-logging
-status: unclaimed
-claimed_by: ""
+status: claimed
+claimed_by: "executor-session"
 created: 2026-05-20
-completed: ""
-result: ""
+completed: "2026-05-20"
+result: "no-improvement"
 ---
 
 # PERF-551: Disable Chromium Logging
@@ -49,3 +49,9 @@ Run `npm run test -w packages/renderer -- --run` to ensure DOM output is still c
 
 ## Prior Art
 PERF-542 successfully removed `--disable-dev-shm-usage` to reduce IPC overhead. Eliminating logging I/O is a similar strategy targeting communication overhead between Chromium and Node.js.
+
+## Results Summary
+- **Best render time**: 9.787s (vs baseline 9.908s) / Median: 10.148s (vs baseline 9.958s)
+- **Improvement**: ~-1.9%
+- **Kept experiments**: None
+- **Discarded experiments**: Added `--disable-logging` and `--log-level=3` to `DEFAULT_BROWSER_ARGS` in `BrowserPool.ts`.
