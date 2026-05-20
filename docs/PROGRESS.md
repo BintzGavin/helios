@@ -1,3 +1,6 @@
+### PLAYER v0.77.37
+- ✅ Completed: Improve index.ts test coverage - Added tests for diagnose API and retryConnection.
+
 ### PLAYER v0.77.36
 - ✅ Completed: Discovered that 2026-06-21-PLAYER-Smart-Controls.md is an IMPOSSIBLE: DUPLICATION plan. The smart controls for CC and PiP are already fully implemented. Documented as duplicate and discarded.
 
