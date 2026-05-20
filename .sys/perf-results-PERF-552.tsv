@@ -1,0 +1,6 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	10.190	600	58.88	43.2	discard	inline multiFrameSyncMediaParams
+2	9.994	600	60.04	47.7	discard	inline multiFrameSyncMediaParams
+3	9.839	600	60.98	43.5	discard	inline multiFrameSyncMediaParams
+4	9.955	600	60.27	44.2	discard	inline multiFrameSyncMediaParams
+5	9.489	600	63.23	44.5	discard	inline multiFrameSyncMediaParams

@@ -187,3 +187,7 @@ Last updated by: PERF-542
   - **What I tried**: Added `--disable-logging` and `--log-level=3` to `DEFAULT_BROWSER_ARGS` in `BrowserPool.ts`.
   - **WHY it didn't work**: The median render time did not improve meaningfully (median ~10.148s vs baseline ~9.958s). Suppressing the internal logs in headless mode does not significantly decrease IPC or CPU overhead, likely because the headless Chromium instance does not produce enough background logs in a deterministic environment to cause measurable pipeline latency. The benefits of hiding output do not outweigh the cost to debuggability.
   - **Outcome**: discard
+- **PERF-552**: Inline multiFrameSyncMediaParams allocation
+  - **What I tried**: Replaced the `multiFrameSyncMediaParams` array allocation and object mutation logic in `CdpTimeDriver.ts` with direct inline object literal allocations sent to `Runtime.evaluate` in the hot loop.
+  - **WHY it didn't work**: The median render time (~9.955s) did not significantly improve over the baseline (~10.002s). Any minor optimization from avoiding array management was offset or negated by V8 having to rapidly allocate and garbage-collect new inline object literals on every frame loop instead of mutating a pre-allocated structure.
+  - **Outcome**: discard
