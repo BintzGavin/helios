@@ -1,12 +1,22 @@
 ---
 id: PERF-550
 slug: inline-cdp-evaluate-params
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "jules"
 created: 2024-05-20
-completed: ""
-result: ""
+completed: "2024-05-20"
+result: "discard"
 ---
+
+## Results Summary
+| run | render_time_s | frames | fps_effective | peak_mem_mb | status | description |
+|-----|---------------|--------|---------------|-------------|--------|-------------|
+| 1   | 14.046        | 600    | 42.71         | 0.0         | discard| Inline CDP evaluate parameters |
+| 2   | 16.518        | 600    | 36.32         | 0.0         | discard| Inline CDP evaluate parameters |
+| 3   | 13.902        | 600    | 43.15         | 0.0         | discard| Inline CDP evaluate parameters |
+
+**Outcome**: Discarded. The median render time degraded to ~14.046s compared to the 10.002s baseline. Rapidly allocating fresh objects in the hot loop triggers GC overhead and avoids hidden class optimizations that pre-allocated mutation benefits from.
+
 # PERF-550: Inline CDP evaluate parameters to bypass object mutation overhead
 
 ## Focus Area
