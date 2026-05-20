@@ -43,6 +43,7 @@ vi.mock('@helios-project/infrastructure', () => {
     ModalAdapter: vi.fn(),
     HetznerCloudAdapter: vi.fn(),
     LocalWorkerAdapter: vi.fn(),
+    WorkerAdapter: vi.fn(),
   };
 });
 
