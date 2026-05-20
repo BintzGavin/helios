@@ -39,6 +39,10 @@ Last updated by: PERF-542
   - **Outcome**: discard
 
 ## What Doesn't Work (and Why)
+- **PERF-514**: Optimize BrowserPool Concurrency Formula
+  - **What I tried**: Changed the concurrency calculation in `BrowserPool.ts` from `Math.max(1, (os.cpus().length || 4) - 1)` to a hardcoded `2`.
+  - **WHY it didn't work**: The median render time significantly degraded to ~25.049s compared to the baseline of ~10.002s. By lowering the concurrency from the dynamically calculated 3 down to 2, the total capture throughput dropped. It appears the CPU still benefits from having at least 3 active workers generating frames simultaneously even if they are in the same or separate processes.
+  - **Outcome**: discard
 - **PERF-544**: Remove try-catch blocks from hot loop in DomStrategy
   - **What I tried**: Rewrote the `capture()` method in `DomStrategy.ts` so that the await uses a native promise chain with `.catch()` instead of setting up a `try...catch` scope on every frame.
   - **WHY it didn't work**: The performance regressed or showed no clear improvement. The median render time was ~10.509s compared to the baseline ~10.046s. The V8 overhead of setting up a block scope to capture exceptions on every loop iteration is extremely small and chaining a promise `.catch()` likely introduces comparable or worse microtask scheduling overhead.
