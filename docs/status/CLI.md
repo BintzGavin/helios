@@ -1,5 +1,6 @@
-**Version**: 0.46.32
+**Version**: 0.46.33
 
+[v0.46.33] ✅ Completed: CLI Job Regression Tests Missing Mock - Added missing mock setup for @helios-project/infrastructure to fix import resolution errors
 [v0.46.32] ✅ Completed: CLI Docker Adapter Regression Tests - Implemented unit tests for the docker-adapter cloud template.
 
 [v0.46.30] ✅ Completed: CLI Cloud Templates Tests - Implemented unit tests for remaining cloud deployment templates.

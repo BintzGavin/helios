@@ -16,6 +16,9 @@
 ### CLI v0.46.26
 - ✅ Completed: Document duplicated CLI Index Regression Tests plan - Logged the duplicated plan as impossible.
 
+### CLI v0.46.33
+- ✅ Completed: CLI Job Regression Tests Missing Mock - Added missing mock setup for @helios-project/infrastructure to fix import resolution errors
+
 ### CLI v0.46.32
 - ✅ Completed: CLI Docker Adapter Regression Tests - Implemented unit tests for the docker-adapter cloud template in packages/cli/src/templates/__tests__/cloud.test.ts.
 
