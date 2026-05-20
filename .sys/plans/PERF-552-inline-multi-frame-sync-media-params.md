@@ -1,11 +1,11 @@
 ---
 id: PERF-552
 slug: inline-multi-frame-sync-media-params
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "Jules"
 created: 2026-05-20
-completed: ""
-result: ""
+completed: "2026-05-20"
+result: "discard"
 ---
 
 # PERF-552: Inline `multiFrameSyncMediaParams` allocation
@@ -80,3 +80,13 @@ Run `npm run test -w packages/renderer -- --run` to ensure DOM output is still c
 
 ## Prior Art
 PERF-550 attempted to inline `singleFrameSyncMediaParams` and was discarded because it caused a regression. This experiment tests if the multi-frame array mutation logic suffers from different overhead characteristics where inlining might be beneficial.
+
+## Results Summary
+```
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	10.190	600	58.88	43.2	discard	inline multiFrameSyncMediaParams
+2	9.994	600	60.04	47.7	discard	inline multiFrameSyncMediaParams
+3	9.839	600	60.98	43.5	discard	inline multiFrameSyncMediaParams
+4	9.955	600	60.27	44.2	discard	inline multiFrameSyncMediaParams
+5	9.489	600	63.23	44.5	discard	inline multiFrameSyncMediaParams
+```
