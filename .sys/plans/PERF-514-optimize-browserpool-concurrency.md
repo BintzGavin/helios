@@ -1,11 +1,11 @@
 ---
 id: PERF-514
 slug: optimize-browserpool-concurrency
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-16
-completed: ""
-result: ""
+completed: 2024-05-16
+result: "discard"
 ---
 
 # PERF-514: Optimize BrowserPool Concurrency Formula
@@ -40,3 +40,9 @@ Run a basic canvas render (`mode: 'canvas'`) to ensure the browser argument chan
 
 ## Correctness Check
 Verify the rendered output video to ensure the parallel frame captures are still ordered and visually correct.
+
+## Results Summary
+- **Best render time**: ~25.049s (vs baseline ~10.002s)
+- **Improvement**: -150% (Regression)
+- **Kept experiments**: []
+- **Discarded experiments**: [Step 1: Change Concurrency Formula to 2]
