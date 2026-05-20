@@ -105,6 +105,15 @@
 
 # LLMS Progress
 
+## LLMS v1.86.2
+- ✅ Completed: Daily llms.txt Review
+  - Updated Roadmap in llms.txt with verifiable completions from domain PROGRESS logs:
+    - CLI: Cloudflare Sandbox Adapter support to job run
+    - Player: Document Undocumented Shortcuts, Document getSchema API Parity
+  - Verified package versions match `package.json` exactly.
+  - Verified File Paths and Key Files.
+  - Incremented version to 1.86.2
+
 ## LLMS v1.74.0
 - ✅ Completed: Daily llms.txt Review
   - Updated Quick Facts and Roadmap to reflect latest versions (Studio v0.107.1+, Player v0.76.20+, Renderer v1.78.3+, CLI v0.45.2+, Core v5.13.0+, Infrastructure v0.25.0+).
