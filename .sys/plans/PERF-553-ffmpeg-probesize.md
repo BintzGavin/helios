@@ -1,11 +1,11 @@
 ---
 id: PERF-553
 slug: ffmpeg-probesize
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-30
-completed: ""
-result: ""
+completed: "2024-05-30"
+result: "no-improvement"
 ---
 
 # PERF-553: FFmpeg Input Stream Probesize Optimization
@@ -43,3 +43,9 @@ Run `npm run test -w packages/renderer -- --run` and verify `verify-canvas-strat
 
 ## Correctness Check
 Run `npm run test -w packages/renderer -- --run` to ensure all DOM rendering verification tests pass.
+
+## Results Summary
+- **Best render time**: 10.384s (vs baseline ~10.422s)
+- **Improvement**: ~0.36% (Inconclusive/Noise)
+- **Kept experiments**: []
+- **Discarded experiments**: [PERF-553]

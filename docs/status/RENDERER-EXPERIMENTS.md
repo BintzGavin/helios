@@ -191,3 +191,7 @@ Last updated by: PERF-542
   - **What I tried**: Replaced the `multiFrameSyncMediaParams` array allocation and object mutation logic in `CdpTimeDriver.ts` with direct inline object literal allocations sent to `Runtime.evaluate` in the hot loop.
   - **WHY it didn't work**: The median render time (~9.955s) did not significantly improve over the baseline (~10.002s). Any minor optimization from avoiding array management was offset or negated by V8 having to rapidly allocate and garbage-collect new inline object literals on every frame loop instead of mutating a pre-allocated structure.
   - **Outcome**: discard
+- **PERF-553**: FFmpeg Input Stream Probesize Optimization
+  - **What I tried**: Added `-probesize 32` and `-analyzeduration 0` to the FFmpeg video input arguments in `DomStrategy.ts` to bypass the stream analysis phase for the deterministic incoming frame pipe.
+  - **WHY it didn't work**: The median render time (~10.562s) did not significantly improve over the baseline (~10.575s). Since we already explicitly declare `-f mjpeg` and `-framerate 60`, FFmpeg's stream analysis overhead on the deterministic single-image pipe was already negligible. The slight variance was entirely within the margin of noise for the headless environment.
+  - **Outcome**: discard
