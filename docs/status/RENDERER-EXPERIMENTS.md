@@ -39,6 +39,10 @@ Last updated by: PERF-542
   - **Outcome**: discard
 
 ## What Doesn't Work (and Why)
+- **PERF-555**: Disable Chromium IPC Flooding Protection
+  - **What I tried**: Added `--disable-ipc-flooding-protection` and `--disable-hang-monitor` to the `DEFAULT_BROWSER_ARGS` array in `BrowserPool.ts`.
+  - **WHY it didn't work**: The median render time degraded to ~10.851s compared to the baseline ~10.002s. While the intention was to prevent Chromium from throttling our high-frequency CDP commands, these flags did not yield a performance improvement and actually introduced a measurable slowdown, likely due to side effects in process scheduling or event loop polling in headless mode.
+  - **Outcome**: discard
 - **PERF-514**: Optimize BrowserPool Concurrency Formula
   - **What I tried**: Changed the concurrency calculation in `BrowserPool.ts` from `Math.max(1, (os.cpus().length || 4) - 1)` to a hardcoded `2`.
   - **WHY it didn't work**: The median render time significantly degraded to ~25.049s compared to the baseline of ~10.002s. By lowering the concurrency from the dynamically calculated 3 down to 2, the total capture throughput dropped. It appears the CPU still benefits from having at least 3 active workers generating frames simultaneously even if they are in the same or separate processes.
