@@ -1,11 +1,11 @@
 ---
 id: PERF-556
 slug: bypass-capture-await
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "jules"
 created: 2024-06-03
-completed: ""
-result: ""
+completed: "2024-06-03"
+result: "discard"
 ---
 
 # PERF-556: Bypass Await in DomStrategy Capture
@@ -106,3 +106,11 @@ Run the DOM render verification tests (`npm run test -w packages/renderer -- --r
 ## Prior Art
 - PERF-432 previously attempted this on a much older baseline and yielded a 3.7% improvement. Re-testing on the highly-optimized single-process baseline is warranted.
 - PERF-544 attempted to replace `try...catch` with `await .catch()` and caused a regression, confirming that microtask allocation on top of `await` is slow, but returning the `.then()` chain directly bypasses the `await`.
+
+## Results Summary
+```
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	10.941	600	54.84	43.0	discard	bypass await in DomStrategy capture (prebound handlers)
+2	10.688	600	56.14	43.5	discard	bypass await in DomStrategy capture (prebound handlers)
+3	10.652	600	56.33	46.4	discard	bypass await in DomStrategy capture (prebound handlers)
+```

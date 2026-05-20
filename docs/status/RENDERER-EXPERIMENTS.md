@@ -199,3 +199,7 @@ Last updated by: PERF-542
   - **What I tried**: Added `-probesize 32` and `-analyzeduration 0` to the FFmpeg video input arguments in `DomStrategy.ts` to bypass the stream analysis phase for the deterministic incoming frame pipe.
   - **WHY it didn't work**: The median render time (~10.562s) did not significantly improve over the baseline (~10.575s). Since we already explicitly declare `-f mjpeg` and `-framerate 60`, FFmpeg's stream analysis overhead on the deterministic single-image pipe was already negligible. The slight variance was entirely within the margin of noise for the headless environment.
   - **Outcome**: discard
+- **PERF-556**: Bypass Await in DomStrategy Capture
+  - **What I tried**: Modified `capture` method in `DomStrategy.ts` to return the promise chain `.then()` directly rather than using `try...catch` and `await`, prebinding success and error handlers to avoid closure allocation.
+  - **WHY it didn't work**: The median render time regressed to ~10.688s (vs baseline ~10.002s). While returning the promise directly avoids the explicit `await` suspension point within the `capture` function's execution context, passing prebound handlers to `.then()` still introduces microtask scheduling overhead. V8's native async/await state machine optimization for a single awaited promise is faster than manual promise chaining in this highly optimized hot loop.
+  - **Outcome**: discard
