@@ -1,4 +1,5 @@
-**Version**: 0.77.36
+**Version**: 0.77.37
+[v0.77.37] ✅ Completed: Improve index.ts test coverage - Added tests for diagnose API and retryConnection.
 [v0.77.36] ✅ Completed: Discovered that 2026-06-21-PLAYER-Smart-Controls.md is an IMPOSSIBLE: DUPLICATION plan. The smart controls for CC and PiP are already fully implemented. Documented as duplicate and discarded.
 [v0.77.35] ✅ Completed: Improve index.ts test coverage - Added tests for captureStream and audio metering edge cases.
 [v0.77.34] ✅ Completed: Discovered that 2026-11-26-PLAYER-Add-Undocumented-Shortcuts-UI.md is an IMPOSSIBLE: DUPLICATION plan. The shortcuts are already fully implemented in the UI overlay inside index.ts. Documented as impossible and discarded.

@@ -2191,6 +2191,75 @@ describe('Input Props', () => {
     });
   });
 
+  describe('diagnose API', () => {
+    it('should throw error if controller is missing', async () => {
+      (player as any).controller = null;
+      await expect(player.diagnose()).rejects.toThrow("Cannot run diagnostics: Player is not connected.");
+    });
+
+    it('should return report from controller', async () => {
+      const mockReport = { status: 'ok' };
+      const mockController = {
+          diagnose: vi.fn().mockResolvedValue(mockReport),
+          pause: vi.fn(),
+          dispose: vi.fn()
+      } as any;
+      (player as any).controller = mockController;
+      const report = await player.diagnose();
+      expect(report).toBe(mockReport);
+      expect(mockController.diagnose).toHaveBeenCalled();
+    });
+
+    it('should handle toggleDiagnostics success', async () => {
+      const mockReport = { status: 'ok' };
+      player.diagnose = vi.fn().mockResolvedValue(mockReport);
+
+      const debugOverlay = player.shadowRoot!.querySelector('.debug-overlay')!;
+      const debugContent = player.shadowRoot!.querySelector('.debug-content')!;
+
+      // Initially hidden
+      expect(debugOverlay.classList.contains('hidden')).toBe(true);
+
+      // Call toggle
+      await (player as any).toggleDiagnostics();
+
+      // Now visible
+      expect(debugOverlay.classList.contains('hidden')).toBe(false);
+      expect(debugContent.textContent).toBe(JSON.stringify(mockReport, null, 2));
+
+      // Call toggle again
+      await (player as any).toggleDiagnostics();
+
+      // Hidden again
+      expect(debugOverlay.classList.contains('hidden')).toBe(true);
+    });
+
+    it('should handle toggleDiagnostics failure', async () => {
+      player.diagnose = vi.fn().mockRejectedValue(new Error("Diagnostics failed"));
+
+      const debugOverlay = player.shadowRoot!.querySelector('.debug-overlay')!;
+      const debugContent = player.shadowRoot!.querySelector('.debug-content')!;
+
+      // Call toggle
+      await (player as any).toggleDiagnostics();
+
+      // Error message should be displayed
+      expect(debugContent.textContent).toBe("Error: Diagnostics failed");
+    });
+  });
+
+  describe('retryConnection', () => {
+    it('should show retrying status and reload iframe', () => {
+        const showStatusSpy = vi.spyOn(player as any, 'showStatus');
+        const loadSpy = vi.spyOn(player as any, 'load');
+
+        (player as any).retryConnection();
+
+        expect(showStatusSpy).toHaveBeenCalledWith("Retrying...", false);
+        expect(loadSpy).toHaveBeenCalled();
+    });
+  });
+
   describe('Connection Timeout', () => {
     beforeEach(() => {
       vi.useFakeTimers();
