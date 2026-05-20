@@ -1,11 +1,11 @@
 ---
 id: PERF-555
 slug: disable-ipc-flooding-protection
-status: unclaimed
-claimed_by: ""
+status: claimed
+claimed_by: "executor-session"
 created: 2024-05-31
-completed: ""
-result: ""
+completed: 2024-06-01
+result: no-improvement
 ---
 
 # PERF-555: Disable Chromium IPC Flooding Protection
@@ -44,3 +44,9 @@ Run `npm run test -w packages/renderer -- --run` to ensure the flags do not brea
 
 ## Correctness Check
 Run `npm run test -w packages/renderer -- --run` to verify DOM output correctly resolves without regressions.
+
+## Results Summary
+- **Best render time**: 10.851s (vs baseline 10.002s)
+- **Improvement**: -8.5%
+- **Kept experiments**:
+- **Discarded experiments**: `--disable-ipc-flooding-protection` and `--disable-hang-monitor` in BrowserPool.ts
