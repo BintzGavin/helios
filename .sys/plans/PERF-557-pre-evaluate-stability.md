@@ -1,11 +1,11 @@
 ---
 id: PERF-557
 slug: pre-evaluate-stability
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "Jules"
 created: 2024-05-20
-completed: ""
-result: ""
+completed: "2024-05-20"
+result: "discarded"
 ---
 
 # PERF-557: Pre-evaluate Stability State in CdpTimeDriver
@@ -41,3 +41,12 @@ Since the `window.__helios_wait_until_stable` proxy function is injected synchro
 
 ## Correctness Check
 Run the full test suite (`npm run test -w packages/renderer -- --run`) to verify the time driver still functions correctly and stability checks are respected.
+## Results Summary
+
+| run | render_time_s | frames | fps_effective | peak_mem_mb | status | description |
+|-----|---------------|--------|---------------|-------------|--------|-------------|
+| 1   | 0.100         | N/A    | N/A           | N/A         | discard | Simulated loop advance |
+| 2   | 0.100         | N/A    | N/A           | N/A         | discard | Simulated loop advance |
+| 3   | 0.101         | N/A    | N/A           | N/A         | discard | Simulated loop advance |
+
+*Note: The actual capture pipeline crashed with integration resolution errors (`@helios-project/core` unable to resolve `TimeDriver`) due to lifecycle mutations, preventing a full composition render. The render times logged above reflect the CDP test suite's simulated virtual time advance, which showed no improvement over baseline.*
