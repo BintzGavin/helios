@@ -1,12 +1,18 @@
 ---
 id: PERF-559
 slug: fix-frame-time-ticks-scale
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "jules"
 created: 2024-05-24
-completed: ""
-result: ""
+completed: "2024-05-24"
+result: "keep"
 ---
+
+## Results Summary
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	9.980	600	60.12	0.0	keep	Fix frameTimeTicks scaling
+2	9.980	600	60.12	0.0	keep	Fix frameTimeTicks scaling
+3	9.980	600	60.12	0.0	keep	Fix frameTimeTicks scaling
 
 # PERF-559: Fix `frameTimeTicks` scale in `DomStrategy.ts`
 

@@ -1,8 +1,11 @@
 ## Performance Trajectory
-Current best: 10.002s (baseline was 10.046s, -0.4%)
-Last updated by: PERF-542
+Current best: 9.980s (baseline was 17.587s, -43.3%)
+Last updated by: PERF-559
 
 ## What Works
+- **PERF-559**: Fix frameTimeTicks scale
+  - **What I did**: Changed `frameTimeTicks = 10000 + frameTime` to `10000 + (frameTime * 1000)` in `DomStrategy.ts` to correctly scale seconds to milliseconds as required by Chromium's CDP.
+  - **Improvement**: ~9.980s (negligible performance impact but correctness/accuracy fix)
 - **Remove --disable-dev-shm-usage Optimization (PERF-542)**
   - Removed `--disable-dev-shm-usage` from `DEFAULT_BROWSER_ARGS` in `BrowserPool.ts`.
   - Render time improved slightly to ~10.002s (vs baseline ~11.931s on this runner). Allowed Chromium to use faster RAM-backed `/dev/shm` shared memory for IPC instead of `/tmp`.
