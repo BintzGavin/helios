@@ -1,11 +1,11 @@
 ---
 id: PERF-561
 slug: beginframe-nodisplayupdates
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "jules"
 created: 2024-06-12
-completed: ""
-result: ""
+completed: "2024-06-12"
+result: "keep"
 ---
 
 # PERF-561: Explicitly set noDisplayUpdates to false in beginFrame
@@ -85,3 +85,11 @@ Verify all standard `DomStrategy` tests pass.
 
 ## Prior Art
 - `docs/status/RENDERER-EXPERIMENTS.md` (no prior experiments directly touched `noDisplayUpdates` on `beginFrameParams`).
+
+## Results
+```tsv
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	1.435	150	104.51	42.9	keep	Explicitly set noDisplayUpdates to false in beginFrame
+2	1.277	150	117.45	42.9	keep	Explicitly set noDisplayUpdates to false in beginFrame
+3	1.304	150	115.04	42.9	keep	Explicitly set noDisplayUpdates to false in beginFrame
+```

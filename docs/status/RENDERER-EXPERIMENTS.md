@@ -116,6 +116,11 @@ Last updated by: PERF-560
   - **WHY it didn't work**: Regression of ~7% (median 21.406s vs baseline 19.93s). While `Page.startScreencast` does capture frames without needing external compositor control, the lack of deterministic frame emission requires arbitrary fallback timeouts (or waiting passively) when there is no visual damage. This passive wait mechanism delays the pipeline significantly compared to the proactive, deterministic pumping of `beginFrame`.
   - **Outcome**: discard
 
+- **PERF-561**: Explicitly set noDisplayUpdates to false in beginFrame
+  - **What I tried**: Explicitly added `noDisplayUpdates: false` to `beginFrameParams` and `targetBeginFrameParams` in `DomStrategy.ts`.
+  - **How much it improved**: The median render time on the dom-benchmark improved from ~1.448s to ~1.304s (approx 10% faster) on a 150-frame microVM benchmark by bypassing unoptimized synchronization paths inside Chromium for screenshot captures.
+  - **Outcome**: keep
+
 ## Open Questions
 - Inlining stability check promise resolution in CdpTimeDriver.ts
 - The bottleneck is likely in V8 runtime boundaries or Playwright CDP IPC, meaning microtask queue optimizations yield no measurable performance improvement over the baseline.

@@ -23,7 +23,7 @@ export class DomStrategy implements RenderStrategy {
   private emptyImageBuffer: Buffer = EMPTY_IMAGE_BUFFER;
   private emptyImageBase64: string = "";
   private frameInterval: number = 0;
-  private beginFrameParams: any = { interval: 0, frameTimeTicks: 0, screenshot: null };
+  private beginFrameParams: any = { interval: 0, frameTimeTicks: 0, screenshot: null, noDisplayUpdates: false };
   private targetBeginFrameParams: any = null;
 
   constructor(private options: RendererOptions) {
@@ -132,7 +132,8 @@ export class DomStrategy implements RenderStrategy {
         clip: { x: 0, y: 0, width: 0, height: 0, scale: 1 }
       },
       interval: this.frameInterval,
-      frameTimeTicks: 0
+      frameTimeTicks: 0,
+      noDisplayUpdates: false
     };
 
     // Set format-appropriate empty buffer
