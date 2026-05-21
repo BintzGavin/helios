@@ -178,7 +178,7 @@ export class DomStrategy implements RenderStrategy {
       this.targetBeginFrameParams.screenshot.clip.y = box.y;
       this.targetBeginFrameParams.screenshot.clip.width = box.width;
       this.targetBeginFrameParams.screenshot.clip.height = box.height;
-      this.targetBeginFrameParams.frameTimeTicks = 10000 + frameTime;
+      this.targetBeginFrameParams.frameTimeTicks = 10000 + (frameTime * 1000);
 
       try {
         const result = await this.cdpSession!.send('HeadlessExperimental.beginFrame', this.targetBeginFrameParams);
@@ -190,7 +190,7 @@ export class DomStrategy implements RenderStrategy {
       }
     }
 
-    this.beginFrameParams.frameTimeTicks = 10000 + frameTime;
+    this.beginFrameParams.frameTimeTicks = 10000 + (frameTime * 1000);
 
     try {
       const result = await this.cdpSession!.send('HeadlessExperimental.beginFrame', this.beginFrameParams);
