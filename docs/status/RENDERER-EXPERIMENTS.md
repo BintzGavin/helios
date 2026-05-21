@@ -225,3 +225,9 @@ Last updated by: PERF-562
   - **What I tried**: Removed the conditional `stabilityCheckState === 0` logic from the `runSetTime` hot loop in `CdpTimeDriver.ts` and moved it entirely into the `prepare` phase to evaluate if the custom stability function (`waitUntilStable`) existed before the capture loop started.
   - **WHY it didn't work**: Although the unit test for `CdpTimeDriver` passing indicated that moving the check works logically (since we can confirm evaluation at setup), performance-wise it offered no measurable improvement (median simulated advance time remained ~101ms, identical to baseline). More critically, the implementation change triggered downstream dependency import failures in integration layers (`@helios-project/core` couldn't resolve `TimeDriver`), meaning it broke fundamental contract expectations of Playwright's shared CDP session when applied out-of-order in the initialization lifecycle. Given no performance gain and severe pipeline brittleness, it was rolled back.
   - **Outcome**: discard
+
+## What Doesn't Work (and Why)
+- **PERF-554**: Disable Chromium IPC Flooding Protection
+  - **What I tried**: Added `--disable-ipc-flooding-protection` and `--disable-hang-monitor` to the `DEFAULT_BROWSER_ARGS` array in `BrowserPool.ts`.
+  - **WHY it didn't work**: Render time regressed compared to the highly optimized baseline (median ~1.193s with flags vs baseline ~1.147s). While intended to prevent Chromium from throttling our high-frequency CDP commands, these flags introduced a measurable slowdown, likely due to side effects in process scheduling or event loop polling in the single-process headless mode environment.
+  - **Outcome**: discard

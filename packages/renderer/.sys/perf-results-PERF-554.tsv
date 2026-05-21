@@ -1,0 +1,4 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	1.251	600	479.50	47.5	discard	PERF-554 test 1
+2	1.193	600	503.03	47.1	discard	PERF-554 test 2 (median)
+3	1.150	600	521.70	47.0	discard	PERF-554 test 3
