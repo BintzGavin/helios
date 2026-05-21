@@ -235,3 +235,7 @@ Last updated by: PERF-562
   - **What I tried**: Added `--disable-ipc-flooding-protection` and `--disable-hang-monitor` to the `DEFAULT_BROWSER_ARGS` array in `BrowserPool.ts`.
   - **WHY it didn't work**: Render time did not improve and slightly regressed compared to the highly optimized baseline (median ~0.646s with flags vs baseline ~0.636s). While intended to prevent Chromium from throttling our high-frequency CDP commands, these flags did not improve throughput in our headless single-process microVM setup, confirming findings from PERF-554.
   - **Outcome**: discard
+- **PERF-563**: Disable Additional Chromium Features
+  - **What I tried**: Appended `IsolateOrigins,site-per-process` to the `--disable-features` array in `BrowserPool.ts` to strictly disable background site isolation trials.
+  - **WHY it didn't work**: Render time did not meaningfully improve compared to the baseline (~0.582s median with flags). Disabling these features didn't suppress background processes enough to gain speed on the deterministic `beginFrame` capture loop, likely because they were already practically suppressed or inactive in a single-domain `file://` context in a microVM headless state.
+  - **Outcome**: discard
