@@ -231,3 +231,7 @@ Last updated by: PERF-562
   - **What I tried**: Added `--disable-ipc-flooding-protection` and `--disable-hang-monitor` to the `DEFAULT_BROWSER_ARGS` array in `BrowserPool.ts`.
   - **WHY it didn't work**: Render time regressed compared to the highly optimized baseline (median ~1.193s with flags vs baseline ~1.147s). While intended to prevent Chromium from throttling our high-frequency CDP commands, these flags introduced a measurable slowdown, likely due to side effects in process scheduling or event loop polling in the single-process headless mode environment.
   - **Outcome**: discard
+- **PERF-555**: Disable Chromium IPC Flooding Protection (Retry)
+  - **What I tried**: Added `--disable-ipc-flooding-protection` and `--disable-hang-monitor` to the `DEFAULT_BROWSER_ARGS` array in `BrowserPool.ts`.
+  - **WHY it didn't work**: Render time did not improve and slightly regressed compared to the highly optimized baseline (median ~0.646s with flags vs baseline ~0.636s). While intended to prevent Chromium from throttling our high-frequency CDP commands, these flags did not improve throughput in our headless single-process microVM setup, confirming findings from PERF-554.
+  - **Outcome**: discard

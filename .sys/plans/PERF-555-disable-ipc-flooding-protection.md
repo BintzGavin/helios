@@ -1,11 +1,11 @@
 ---
 id: PERF-555
 slug: disable-ipc-flooding-protection
-status: claimed
+status: complete
 claimed_by: "executor-session"
 created: 2024-05-31
 completed: 2024-06-01
-result: no-improvement
+result: failed
 ---
 
 # PERF-555: Disable Chromium IPC Flooding Protection
@@ -25,7 +25,7 @@ By explicitly adding `--disable-ipc-flooding-protection` and `--disable-hang-mon
 - **Minimum runs**: 3 per experiment, report median
 
 ## Baseline
-- **Current estimated render time**: ~10.002s
+- **Current estimated render time**: ~0.636s
 - **Bottleneck analysis**: Potential IPC latency and throttling overhead within the Chromium main thread during the high-frequency `beginFrame` capture loop.
 
 ## Implementation Spec
@@ -46,7 +46,7 @@ Run `npm run test -w packages/renderer -- --run` to ensure the flags do not brea
 Run `npm run test -w packages/renderer -- --run` to verify DOM output correctly resolves without regressions.
 
 ## Results Summary
-- **Best render time**: 10.851s (vs baseline 10.002s)
-- **Improvement**: -8.5%
-- **Kept experiments**:
-- **Discarded experiments**: `--disable-ipc-flooding-protection` and `--disable-hang-monitor` in BrowserPool.ts
+- **Best render time**: 0.657s (vs baseline 0.636s)
+- **Improvement**: -3.3%
+- **Kept experiments**: []
+- **Discarded experiments**: [PERF-555]

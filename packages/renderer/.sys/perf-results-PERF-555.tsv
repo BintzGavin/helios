@@ -1,0 +1,4 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	0.646	150	232.17	42.3	discard	added disable-ipc-flooding-protection and disable-hang-monitor
+2	0.636	150	235.69	43.1	discard	added disable-ipc-flooding-protection and disable-hang-monitor
+3	0.657	150	228.30	42.3	discard	added disable-ipc-flooding-protection and disable-hang-monitor
