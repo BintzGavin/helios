@@ -1,8 +1,11 @@
 ## Performance Trajectory
 Current best: 9.980s (baseline was 17.587s, -43.3%)
-Last updated by: PERF-559
+Last updated by: PERF-560
 
 ## What Works
+- **PERF-560**: Pre-evaluate Sync Media Status in CdpTimeDriver
+  - **What I did**: Removed the redundant `Runtime.evaluate` block that queries `document.querySelectorAll('video, audio').length > 0` over CDP during initialization. Replaced it with purely setting `syncMediaState = hasMedia ? 1 : 2`.
+  - **Improvement**: ~9.980s (No statistically significant time change, but it removes a completely redundant IPC roundtrip during Phase 3 `prepare()`).
 - **PERF-559**: Fix frameTimeTicks scale
   - **What I did**: Changed `frameTimeTicks = 10000 + frameTime` to `10000 + (frameTime * 1000)` in `DomStrategy.ts` to correctly scale seconds to milliseconds as required by Chromium's CDP.
   - **Improvement**: ~9.980s (negligible performance impact but correctness/accuracy fix)
