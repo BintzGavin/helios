@@ -1,4 +1,4 @@
-**Version**: 0.121.14
+**Version**: 0.121.15
 
 [v0.121.13] ✅ Completed: Expand Reverse Speeds - Added -4x and -2x reverse playback options to the PlaybackControls component.
 
@@ -210,4 +210,5 @@
 - [v0.121.4] ✅ Completed: STUDIO-Timeline-Drag-Drop - Added visual styling when dragging an asset over the Timeline component for visual feedback.
 - [v0.121.7] ✅ Completed: STUDIO-Timeline-Drag-Drop - Verified timeline drag and drop for assets is already implemented (2026-11-13-STUDIO-Timeline-Drag-Drop.md).
 - ❌ Blocked: 2026-11-14-STUDIO-Update-Keyboard-Shortcuts-Documentation is structurally obsolete as changes are already present.
+[v0.121.15] ✅ Completed: Document duplicated Timeline-Scrubber plan - Logged the duplicated plan as impossible since Timeline already supports scrubbing.
 [v0.121.14] ✅ Completed: Document duplicated Update-Keyboard-Shortcuts-Documentation plan - Logged the duplicated plan as impossible.

@@ -23,7 +23,7 @@ The Studio is invoked via `npx helios studio` (or `npm run dev` in development).
 
 ## Section D: UI Components
 - **Stage**: Renders the `<helios-player>` and handles resolution, panning, zooming, and snapshot captures. Includes Safe Area Guides.
-- **Timeline**: Visualizes the composition duration, current playhead, draggable In/Out point markers, audio waveforms, and snap-to guides. Supports dragging and dropping assets.
+- **Timeline**: Visualizes the composition duration, current playhead with scrubbing support, draggable In/Out point markers, audio waveforms, and snap-to guides. Supports dragging and dropping assets.
 - **Props Editor**: Dynamically generated input fields based on the active composition's schema, allowing real-time modification of props. Includes specialized editors (JSON, Color, Enum, Asset Inputs).
 - **Assets Panel**: Displays and manages project assets (images, videos, audio, fonts, 3D models). Supports rich preview, drag & drop uploading, and directory organization.
 - **Renders Panel**: Manages remote and local rendering jobs, showing progress and providing export options. Generates distributed render job JSON specs (`exportJobSpec`).
