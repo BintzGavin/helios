@@ -1,11 +1,11 @@
 ---
 id: PERF-563
 slug: disable-additional-chromium-features
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-06-13
-completed: ""
-result: ""
+completed: 2024-05-21
+result: no-improvement
 ---
 
 # PERF-563: Disable Additional Chromium Features
@@ -51,3 +51,9 @@ Run the Canvas strategy tests to ensure Chromium still launches and renders corr
 
 ## Correctness Check
 Run the `DomStrategy` test suite to verify no regressions in capture logic.
+
+## Results Summary
+- **Best render time**: 0.581s (vs baseline ~0.622s)
+- **Improvement**: Inconclusive/noise
+- **Kept experiments**: []
+- **Discarded experiments**: [PERF-563]
