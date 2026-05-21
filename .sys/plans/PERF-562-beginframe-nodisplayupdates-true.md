@@ -1,11 +1,11 @@
 ---
 id: PERF-562
 slug: beginframe-nodisplayupdates-true
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-06-13
-completed: ""
-result: ""
+completed: "2024-06-13"
+result: "improved"
 ---
 
 # PERF-562: Test `noDisplayUpdates: true` in `beginFrameParams`
@@ -78,3 +78,9 @@ Run `npm run test -w packages/renderer -- tests/verify-codecs.ts` to ensure Canv
 
 ## Correctness Check
 Verify all standard `DomStrategy` tests pass.
+
+## Results Summary
+- **Best render time**: 0.622s (vs baseline 1.097s)
+- **Improvement**: 43%
+- **Kept experiments**: [`noDisplayUpdates: true`]
+- **Discarded experiments**: []
