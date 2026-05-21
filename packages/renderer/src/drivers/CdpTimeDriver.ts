@@ -195,19 +195,7 @@ export class CdpTimeDriver implements TimeDriver {
       this.hasMedia = true;
     }
 
-    try {
-      const { result } = await this.client!.send('Runtime.evaluate', {
-        expression: "document.querySelectorAll('video, audio').length > 0",
-        returnByValue: true
-      });
-      if (result && result.value) {
-        this.syncMediaState = 1;
-      } else {
-        this.syncMediaState = 2;
-      }
-    } catch (e) {
-      this.syncMediaState = 1;
-    }
+    this.syncMediaState = this.hasMedia ? 1 : 2;
 
     // Enable Runtime so we actually receive executionContextCreated events
     // Catch errors in case another driver instance sharing this session already enabled it.

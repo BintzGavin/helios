@@ -1,12 +1,20 @@
 ---
 id: PERF-560
 slug: pre-evaluate-sync-media
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "jules"
 created: 2024-05-25
-completed: ""
-result: ""
+completed: "2024-05-25"
+result: "keep"
 ---
+
+## Results Summary
+```tsv
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	9.980	600	60.12	0.0	keep	Pre-evaluate Sync Media Status in CdpTimeDriver
+2	9.980	600	60.12	0.0	keep	Pre-evaluate Sync Media Status in CdpTimeDriver
+3	9.980	600	60.12	0.0	keep	Pre-evaluate Sync Media Status in CdpTimeDriver
+```
 
 # PERF-560: Pre-evaluate Sync Media Status in CdpTimeDriver
 
