@@ -626,5 +626,8 @@ Each agent should update **their own dedicated progress file** instead of this f
 
 ### PLAYER v0.77.35
 - ✅ Completed: Improve index.ts test coverage - Added tests for captureStream and audio metering edge cases.
+### STUDIO v0.121.15
+- ✅ Completed: Document duplicated Timeline-Scrubber plan - Logged the duplicated plan as impossible since Timeline already supports scrubbing.
+
 ### STUDIO v0.121.14
 - ✅ Completed: Document duplicated Update-Keyboard-Shortcuts-Documentation plan - Logged the duplicated plan as impossible.
