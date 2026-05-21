@@ -148,6 +148,10 @@ Last updated by: PERF-542
   - **Outcome**: discard
 
 ## What Doesn't Work (and Why)
+- **PERF-558**: Disable V8 Idle Tasks
+  - **What I tried**: Added `--disable-v8-idle-tasks` to `DEFAULT_BROWSER_ARGS` in `BrowserPool.ts`.
+  - **WHY it didn't work**: The median render time regressed to ~11.118s (vs baseline ~10.002s). While preventing V8 from running background garbage collection and idle tasks was intended to reduce CPU contention, it likely forced those necessary tasks to run synchronously or accumulate, causing larger micro-stutters that delayed the frame capture loop.
+  - **Outcome**: discard
 - **PERF-005**: Raw CDP Screencast
   - **What I tried**: Replaced `HeadlessExperimental.beginFrame` with `Page.startScreencast` in `DomStrategy.ts` to stream frames natively via CDP without compositor synchronization.
   - **WHY it didn't work**: Severe performance regression and pipeline breakage (render time ~101s vs baseline ~18.5s). `Page.startScreencast` natively pushes frames inconsistently, dropping them when visual changes do not meet damage thresholds, which creates deadlock timeouts and truncates the FFmpeg `mjpeg` bitstream in our deterministic capture pipeline.

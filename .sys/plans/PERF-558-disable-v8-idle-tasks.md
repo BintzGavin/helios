@@ -1,11 +1,11 @@
 ---
 id: PERF-558
 slug: disable-v8-idle-tasks
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "jules"
 created: 2024-05-24
-completed: ""
-result: ""
+completed: "2024-05-24"
+result: "discard"
 ---
 
 # PERF-558: Disable V8 Idle Tasks in Headless Chromium
@@ -50,3 +50,11 @@ Run the full test suite (`npm run test -w packages/renderer -- --run`) to verify
 
 ## Prior Art
 - PERF-305 attempted this, but was on an older baseline, re-testing on the highly-optimized single-process baseline is warranted.
+
+## Results Summary
+```tsv
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	12.147	600	49.39	47.4	discard	run 1
+2	10.932	600	54.89	44.0	discard	run 2
+3	11.118	600	53.96	51.7	discard	run 3 (median)
+```
