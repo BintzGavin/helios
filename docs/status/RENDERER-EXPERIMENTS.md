@@ -24,7 +24,7 @@ Last updated by: PERF-565
   - **Plan ID**: PERF-449
 - **Dedicated Browser Instances (PERF-526)**
   - **What I did**: Updated `BrowserPool.ts` to launch a dedicated Chromium browser instance per worker page instead of sharing a single browser context.
-  - **How much it improved**: ~37% faster (median ~10.760s vs baseline ~17.071s).
+  - **How much it improved**: ~37% faster (median ~10.480s vs baseline ~17.071s).
   - **Plan ID**: PERF-526
 - **PERF-529**: Isolate Renderers with --process-per-tab
   - **What I tried**: Added `--process-per-tab` to Chromium launch arguments and removed `--disable-site-isolation-trials` to force each worker page into its own renderer process with dedicated V8 isolate and compositor thread.

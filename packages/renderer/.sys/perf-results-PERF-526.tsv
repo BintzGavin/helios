@@ -1,0 +1,4 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	10.514	600	57.07	47.6	keep	PERF-526 - Dedicated browser instances (already implemented)
+2	12.021	600	49.91	39.0	keep	PERF-526 - Dedicated browser instances (already implemented)
+3	10.457	600	57.38	40.1	keep	PERF-526 - Dedicated browser instances (already implemented)
