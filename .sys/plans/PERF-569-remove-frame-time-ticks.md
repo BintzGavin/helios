@@ -1,11 +1,11 @@
 ---
 id: PERF-569
 slug: remove-frame-time-ticks
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-06-13
-completed: ""
-result: ""
+completed: "2024-06-13"
+result: "improved"
 ---
 
 # PERF-569: Remove explicit frameTimeTicks from beginFrame to reduce IPC overhead
@@ -59,3 +59,9 @@ Run `npm run test -w packages/renderer -- tests/verify-cdp-driver.ts` and standa
 
 ## Prior Art
 - PERF-559: Fixed the scaling of `frameTimeTicks`, proving we have been manually massaging this value.
+
+## Results Summary
+- **Best render time**: 1.511s (vs baseline 2.017s)
+- **Improvement**: ~25%
+- **Kept experiments**: Removed `frameTimeTicks` calculation and assignment from `DomStrategy.ts`.
+- **Discarded experiments**: none

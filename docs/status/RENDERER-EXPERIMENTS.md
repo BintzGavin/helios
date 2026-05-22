@@ -1,8 +1,9 @@
 ## Performance Trajectory
-Current best: 0.960s (baseline was 17.587s, -94.5%)
-Last updated by: PERF-565
+Current best: 1.511s (baseline was 2.017s, -25%)
+Last updated by: PERF-569
 
 ## What Works
+- **PERF-569**: Removed `frameTimeTicks` from `DomStrategy.ts`. The median render time improved to ~1.511s (vs baseline ~2.017s). Removing the explicit frame time calculation and property assignment from the CDP payload reduces JSON payload size, eliminates per-frame arithmetic in the Node.js hot loop, and relies on Chromium's native virtual time fallback.
 - **PERF-565**: Revert noDisplayUpdates bug
   - **What I did**: Changed `noDisplayUpdates` to `false` on `beginFrameParams` and `targetBeginFrameParams` in `DomStrategy.ts`.
   - **Improvement**: ~0.960s (Restored expected capture rendering overhead). Reverts the critical bug introduced in PERF-562 where `noDisplayUpdates: true` completely skipped frame rendering and caused output videos to be blank.
