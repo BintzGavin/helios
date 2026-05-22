@@ -252,3 +252,6 @@ Last updated by: PERF-565
   - **What I tried**: Appended `IsolateOrigins,site-per-process` to the `--disable-features` array in `BrowserPool.ts` to strictly disable background site isolation trials.
   - **WHY it didn't work**: Render time did not meaningfully improve compared to the baseline (~0.582s median with flags). Disabling these features didn't suppress background processes enough to gain speed on the deterministic `beginFrame` capture loop, likely because they were already practically suppressed or inactive in a single-domain `file://` context in a microVM headless state.
   - **Outcome**: discard
+
+## What Doesn't Work (and Why)
+- **PERF-566: Use webp_pipe Demuxer for WEBP Intermediate Format:** Tried to use `webp_pipe` instead of `image2pipe` to handle WEBP format frames coming from CDP. The FFmpeg process still crashes with "Could not find codec parameters for stream 0 (Video: webp, none): unspecified size" and "pipe:: Invalid argument". It seems decoding raw WEBP piped streams in this version of FFmpeg still requires explicit dimensions or different demuxing, making WEBP format over pipe unusable currently.
