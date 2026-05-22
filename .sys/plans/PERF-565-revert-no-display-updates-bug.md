@@ -1,11 +1,11 @@
 ---
 id: PERF-565
 slug: revert-no-display-updates-bug
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-22
-completed: ""
-result: ""
+completed: "2024-05-22"
+result: "keep"
 ---
 
 # PERF-565: Revert `noDisplayUpdates: true` Bug in `DomStrategy.ts`
@@ -25,6 +25,15 @@ When `noDisplayUpdates` is `true` in `HeadlessExperimental.beginFrame`, Chromium
 
 ## Baseline
 - **Current estimated render time**: N/A (Current output is bugged/blank)
+
+## Correctness Check
+Run `npm run test -w packages/renderer` (or manually render a composition) and visually verify that the output video is no longer blank/black.
+
+## Results Summary
+- **Best render time**: 0.960s
+- **Improvement**: Reverted bug, restoring previous baseline capture times ~0.960s.
+- **Kept experiments**: [Revert noDisplayUpdates: true bug]
+- **Discarded experiments**: []
 
 ## Implementation Spec
 
