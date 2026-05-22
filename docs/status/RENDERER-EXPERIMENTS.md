@@ -48,6 +48,17 @@ Last updated by: PERF-565
   - **Outcome**: discard
 
 ## What Doesn't Work (and Why)
+- **PERF-507: Eliminate defaultStabilityCheck method and inline logic**
+  - **What I tried**: Attempted to inline `defaultStabilityCheck` directly into `runSetTime` in `CdpTimeDriver.ts`.
+  - **WHY it didn't work**: The `defaultStabilityCheck` method had already been eliminated in previous iterations (likely PERF-506) and the `Runtime.evaluate` call was already inlined. This experiment was discarded as a duplicate with no code changes.
+  - **Outcome**: discard (duplicate)
+
+- **PERF-507: Eliminate defaultStabilityCheck method and inline logic**
+  - **What I tried**: Attempted to inline `defaultStabilityCheck` directly into `runSetTime` in `CdpTimeDriver.ts`.
+  - **WHY it didn't work**: The `defaultStabilityCheck` method had already been eliminated in previous iterations (likely PERF-506) and the `Runtime.evaluate` call was already inlined. This experiment was discarded as a duplicate with no code changes.
+  - **Outcome**: discard (duplicate)
+
+
 - **PERF-562**: Set noDisplayUpdates to true
   - **What I tried**: Changed `noDisplayUpdates` to `true` on `beginFrameParams` and `targetBeginFrameParams` in `DomStrategy.ts`.
   - **WHY it didn't work**: While it seemed to massively improve benchmark times (median ~0.622s), it was a false positive. Setting this flag true skips the display compositor entirely, resulting in blank/black screenshot data being returned. The performance "gain" was just the speed of not doing the work.
@@ -139,6 +150,17 @@ Last updated by: PERF-565
 - Plan ID: PERF-518
 
 ## What Doesn't Work (and Why)
+- **PERF-507: Eliminate defaultStabilityCheck method and inline logic**
+  - **What I tried**: Attempted to inline `defaultStabilityCheck` directly into `runSetTime` in `CdpTimeDriver.ts`.
+  - **WHY it didn't work**: The `defaultStabilityCheck` method had already been eliminated in previous iterations (likely PERF-506) and the `Runtime.evaluate` call was already inlined. This experiment was discarded as a duplicate with no code changes.
+  - **Outcome**: discard (duplicate)
+
+- **PERF-507: Eliminate defaultStabilityCheck method and inline logic**
+  - **What I tried**: Attempted to inline `defaultStabilityCheck` directly into `runSetTime` in `CdpTimeDriver.ts`.
+  - **WHY it didn't work**: The `defaultStabilityCheck` method had already been eliminated in previous iterations (likely PERF-506) and the `Runtime.evaluate` call was already inlined. This experiment was discarded as a duplicate with no code changes.
+  - **Outcome**: discard (duplicate)
+
+
 - **PERF-516**: Bypass Playwright Evaluate
   - **What I tried**: Replaced `await frame.evaluate(...)` with a raw CDP `Runtime.evaluate` in `CdpTimeDriver.ts` to check if a page has media before running media synchronization.
   - **WHY it didn't work**: Performance regressed to ~11.414s compared to the baseline of ~10.046s. This one-time evaluation happens during page initialization/setup, not in the hot loop (unlike `defaultSyncMedia` which was already optimized). Inlining this single check offered no measurable improvement in the hot loop, but likely suffered from slightly less optimized Playwright setup code paths.
@@ -170,6 +192,17 @@ Last updated by: PERF-565
   - **Outcome**: discard
 
 ## What Doesn't Work (and Why)
+- **PERF-507: Eliminate defaultStabilityCheck method and inline logic**
+  - **What I tried**: Attempted to inline `defaultStabilityCheck` directly into `runSetTime` in `CdpTimeDriver.ts`.
+  - **WHY it didn't work**: The `defaultStabilityCheck` method had already been eliminated in previous iterations (likely PERF-506) and the `Runtime.evaluate` call was already inlined. This experiment was discarded as a duplicate with no code changes.
+  - **Outcome**: discard (duplicate)
+
+- **PERF-507: Eliminate defaultStabilityCheck method and inline logic**
+  - **What I tried**: Attempted to inline `defaultStabilityCheck` directly into `runSetTime` in `CdpTimeDriver.ts`.
+  - **WHY it didn't work**: The `defaultStabilityCheck` method had already been eliminated in previous iterations (likely PERF-506) and the `Runtime.evaluate` call was already inlined. This experiment was discarded as a duplicate with no code changes.
+  - **Outcome**: discard (duplicate)
+
+
 - **PERF-558**: Disable V8 Idle Tasks
   - **What I tried**: Added `--disable-v8-idle-tasks` to `DEFAULT_BROWSER_ARGS` in `BrowserPool.ts`.
   - **WHY it didn't work**: The median render time regressed to ~11.118s (vs baseline ~10.002s). While preventing V8 from running background garbage collection and idle tasks was intended to reduce CPU contention, it likely forced those necessary tasks to run synchronously or accumulate, causing larger micro-stutters that delayed the frame capture loop.
@@ -235,6 +268,22 @@ Last updated by: PERF-565
   - **Outcome**: discard
 
 ## What Doesn't Work (and Why)
+- **PERF-507: Eliminate defaultStabilityCheck method and inline logic**
+  - **What I tried**: Attempted to inline `defaultStabilityCheck` directly into `runSetTime` in `CdpTimeDriver.ts`.
+  - **WHY it didn't work**: The `defaultStabilityCheck` method had already been eliminated in previous iterations (likely PERF-506) and the `Runtime.evaluate` call was already inlined. This experiment was discarded as a duplicate with no code changes.
+  - **Outcome**: discard (duplicate)
+
+- **PERF-507: Eliminate defaultStabilityCheck method and inline logic**
+  - **What I tried**: Attempted to inline `defaultStabilityCheck` directly into `runSetTime` in `CdpTimeDriver.ts`.
+  - **WHY it didn't work**: The `defaultStabilityCheck` method had already been eliminated in previous iterations (likely PERF-506) and the `Runtime.evaluate` call was already inlined. This experiment was discarded as a duplicate with no code changes.
+  - **Outcome**: discard (duplicate)
+
+
+- **PERF-507: Eliminate defaultStabilityCheck method and inline logic**
+  - **What I tried**: Attempted to inline `defaultStabilityCheck` directly into `runSetTime` in `CdpTimeDriver.ts`.
+  - **WHY it didn't work**: The `defaultStabilityCheck` method had already been eliminated in previous iterations (likely PERF-506) and the `Runtime.evaluate` call was already inlined. This experiment was discarded as a duplicate with no code changes.
+  - **Outcome**: discard (duplicate)
+
 - **PERF-515**: Raw CDP evaluate for initialization media check
   - **What I tried**: Replaced Playwright's `frame.evaluate` in `CdpTimeDriver.ts` initialization with direct CDP `Runtime.evaluate` to avoid Playwright overhead, and cleaned up the `executionContextIds` fallback blocks.
   - **WHY it didn't work**: The performance significantly regressed. The median render time increased to ~1.436s (baseline was ~0.960s). Even though it was moved out of the hot loop, altering the initialization phase by bypassing Playwright's execution context synchronization caused the internal pipeline to stall and de-sync, leading to longer execution latency across the entire trace. Since `PERF-560` already optimized the initialization logic efficiently, this caused a performance hit.
@@ -254,4 +303,19 @@ Last updated by: PERF-565
   - **Outcome**: discard
 
 ## What Doesn't Work (and Why)
+- **PERF-507: Eliminate defaultStabilityCheck method and inline logic**
+  - **What I tried**: Attempted to inline `defaultStabilityCheck` directly into `runSetTime` in `CdpTimeDriver.ts`.
+  - **WHY it didn't work**: The `defaultStabilityCheck` method had already been eliminated in previous iterations (likely PERF-506) and the `Runtime.evaluate` call was already inlined. This experiment was discarded as a duplicate with no code changes.
+  - **Outcome**: discard (duplicate)
+
+- **PERF-507: Eliminate defaultStabilityCheck method and inline logic**
+  - **What I tried**: Attempted to inline `defaultStabilityCheck` directly into `runSetTime` in `CdpTimeDriver.ts`.
+  - **WHY it didn't work**: The `defaultStabilityCheck` method had already been eliminated in previous iterations (likely PERF-506) and the `Runtime.evaluate` call was already inlined. This experiment was discarded as a duplicate with no code changes.
+  - **Outcome**: discard (duplicate)
+
+
 - **PERF-566: Use webp_pipe Demuxer for WEBP Intermediate Format:** Tried to use `webp_pipe` instead of `image2pipe` to handle WEBP format frames coming from CDP. The FFmpeg process still crashes with "Could not find codec parameters for stream 0 (Video: webp, none): unspecified size" and "pipe:: Invalid argument". It seems decoding raw WEBP piped streams in this version of FFmpeg still requires explicit dimensions or different demuxing, making WEBP format over pipe unusable currently.
+- **PERF-507: Eliminate defaultStabilityCheck method and inline logic**
+  - **What I tried**: Attempted to inline `defaultStabilityCheck` directly into `runSetTime` in `CdpTimeDriver.ts`.
+  - **WHY it didn't work**: The `defaultStabilityCheck` method had already been eliminated in previous iterations (likely PERF-506) and the `Runtime.evaluate` call was already inlined. This experiment was discarded as a duplicate with no code changes.
+  - **Outcome**: discard (duplicate)
