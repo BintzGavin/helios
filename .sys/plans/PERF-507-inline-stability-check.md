@@ -1,11 +1,11 @@
 ---
 id: PERF-507
 slug: inline-stability-check
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-15
-completed: ""
-result: ""
+completed: 2024-05-22
+result: no-improvement
 ---
 
 # PERF-507: Eliminate defaultStabilityCheck method and inline logic
@@ -41,3 +41,8 @@ The `defaultStabilityCheck` currently wraps the `Runtime.evaluate` call in a `.t
 
 ## Correctness Check
 Run the DOM benchmark (`npx tsx tests/fixtures/benchmark.ts`) and ensure it completes without hanging or errors, and that output looks correct.
+## Results Summary
+- **Best render time**: N/A (Duplicate)
+- **Improvement**: N/A
+- **Kept experiments**: None
+- **Discarded experiments**: Duplicate. The `defaultStabilityCheck` method has already been eliminated and the `Runtime.evaluate` call is already inlined within `runSetTime` in `CdpTimeDriver.ts`. No code changes or benchmarks were executed.
