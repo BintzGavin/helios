@@ -235,6 +235,11 @@ Last updated by: PERF-565
   - **Outcome**: discard
 
 ## What Doesn't Work (and Why)
+- **PERF-515**: Raw CDP evaluate for initialization media check
+  - **What I tried**: Replaced Playwright's `frame.evaluate` in `CdpTimeDriver.ts` initialization with direct CDP `Runtime.evaluate` to avoid Playwright overhead, and cleaned up the `executionContextIds` fallback blocks.
+  - **WHY it didn't work**: The performance significantly regressed. The median render time increased to ~1.436s (baseline was ~0.960s). Even though it was moved out of the hot loop, altering the initialization phase by bypassing Playwright's execution context synchronization caused the internal pipeline to stall and de-sync, leading to longer execution latency across the entire trace. Since `PERF-560` already optimized the initialization logic efficiently, this caused a performance hit.
+  - **Outcome**: discard
+
 - **PERF-554**: Disable Chromium IPC Flooding Protection
   - **What I tried**: Added `--disable-ipc-flooding-protection` and `--disable-hang-monitor` to the `DEFAULT_BROWSER_ARGS` array in `BrowserPool.ts`.
   - **WHY it didn't work**: Render time regressed compared to the highly optimized baseline (median ~1.193s with flags vs baseline ~1.147s). While intended to prevent Chromium from throttling our high-frequency CDP commands, these flags introduced a measurable slowdown, likely due to side effects in process scheduling or event loop polling in the single-process headless mode environment.

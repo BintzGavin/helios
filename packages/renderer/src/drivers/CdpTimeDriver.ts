@@ -179,17 +179,12 @@ export class CdpTimeDriver implements TimeDriver {
 
     try {
       this.hasMedia = false;
-      for (const frame of this.cachedFrames) {
-         const count = await frame.evaluate(() => {
-            if (typeof (window as any).__helios_sync_media === 'function') {
-               return (window as any).__helios_sync_media(0);
-            }
-            return 0;
-         });
-         if (count > 0) {
-            this.hasMedia = true;
-            break;
-         }
+      const { result } = await this.client!.send('Runtime.evaluate', {
+         expression: "typeof window.__helios_sync_media === 'function' ? window.__helios_sync_media(0) : 0",
+         returnByValue: true
+      });
+      if (result && result.value > 0) {
+         this.hasMedia = true;
       }
     } catch (e) {
       this.hasMedia = true;
@@ -200,18 +195,6 @@ export class CdpTimeDriver implements TimeDriver {
     // Enable Runtime so we actually receive executionContextCreated events
     // Catch errors in case another driver instance sharing this session already enabled it.
     await this.client!.send('Runtime.enable').catch(() => {});
-
-    // For reused sessions where contexts already exist, we need to manually fetch them.
-    if (this.executionContextIds.length === 0) {
-       // Since the events didn't fire, try to manually evaluate in all frames to get context IDs
-       // This handles the reuse scenario where the execution context events were consumed by a previous driver
-       try {
-         // In a shared session case, the best we can do is fall back or trigger a re-eval if needed
-         // We'll let frame.evaluate fallback handle it if executionContextIds.length is wrong later
-       } catch (e) {
-          // ignore
-       }
-    }
 
     // We delay checking the stability function until the first evaluation to allow for synchronous timeline injection during initialization
     this.stabilityCheckState = 0;

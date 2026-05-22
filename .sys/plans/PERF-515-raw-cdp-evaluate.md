@@ -1,7 +1,7 @@
 ---
 id: PERF-515
 slug: raw-cdp-evaluate
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-05-16
 completed: ""
