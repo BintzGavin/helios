@@ -1,11 +1,11 @@
 ---
 id: PERF-567
 slug: cdp-capture-screenshot
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-22
-completed: ""
-result: ""
+completed: 2024-05-22
+result: failed
 ---
 
 # PERF-567: Test `Page.captureScreenshot` vs `HeadlessExperimental.beginFrame`
@@ -46,3 +46,9 @@ Run `npm run test -w packages/renderer -- tests/verify-codecs.ts` to ensure Canv
 
 ## Correctness Check
 Run a visual check on the output video of `examples/dom-benchmark` to ensure frames are not torn or skipping. Run `npm run test -w packages/renderer` to ensure baseline rendering is not broken.
+
+## Results Summary
+- **Best render time**: N/A (Hung/Stalled)
+- **Improvement**: 0%
+- **Kept experiments**: []
+- **Discarded experiments**: [PERF-567]

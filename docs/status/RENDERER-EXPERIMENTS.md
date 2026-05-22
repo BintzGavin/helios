@@ -301,6 +301,10 @@ Last updated by: PERF-565
   - **What I tried**: Appended `IsolateOrigins,site-per-process` to the `--disable-features` array in `BrowserPool.ts` to strictly disable background site isolation trials.
   - **WHY it didn't work**: Render time did not meaningfully improve compared to the baseline (~0.582s median with flags). Disabling these features didn't suppress background processes enough to gain speed on the deterministic `beginFrame` capture loop, likely because they were already practically suppressed or inactive in a single-domain `file://` context in a microVM headless state.
   - **Outcome**: discard
+- **PERF-567**: Test `Page.captureScreenshot` vs `HeadlessExperimental.beginFrame`
+  - **What I tried**: Replaced Playwright's `HeadlessExperimental.beginFrame` with `Page.captureScreenshot` in `DomStrategy.ts` using the existing `CdpTimeDriver.ts` virtual time advancement.
+  - **WHY it didn't work**: The renderer process completely hung and timed out during the benchmark. Without the explicit compositor synchronization provided by `HeadlessExperimental.beginFrame`, `Page.captureScreenshot` stalled in headless mode when time was explicitly paused/controlled. `beginFrame` is strictly required to force the compositor to produce deterministic frames when time is frozen.
+  - **Outcome**: discard
 
 ## What Doesn't Work (and Why)
 - **PERF-507: Eliminate defaultStabilityCheck method and inline logic**
