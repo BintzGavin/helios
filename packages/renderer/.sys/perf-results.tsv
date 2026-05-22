@@ -107,3 +107,4 @@ run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
 4	10.537	600	56.94	43.0	keep	dedicated browser instances (PERF-526)
 5	10.760	600	55.76	43.6	keep	dedicated browser instances (PERF-526)
 33	21.970	600	27.31	41.5	discard	eliminate-virtual-time-wait (PERF-540)
+1	4.792	600	125.21	45.2	discard	PERF-568 Prebind stability check to remove branch in hot loop
