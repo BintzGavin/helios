@@ -1,11 +1,11 @@
 ---
 id: PERF-564
 slug: webcodecs-dom-strategy
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-21
-completed: ""
-result: ""
+completed: "2026-05-21"
+result: "failed"
 ---
 
 # PERF-564: Evaluate WebCodecs Fallback for DomStrategy
@@ -39,3 +39,9 @@ Run `npx tsx packages/cli/src/index.ts build examples/simple-canvas-animation/ -
 
 ## Correctness Check
 Run `npm run test -w packages/renderer` to ensure nothing is broken.
+
+## Results Summary
+- **Best render time**: N/A (Failed benchmark, ~1030s projected)
+- **Improvement**: N/A (Massive regression)
+- **Kept experiments**: []
+- **Discarded experiments**: [WebCodecs DomStrategy fallback]
