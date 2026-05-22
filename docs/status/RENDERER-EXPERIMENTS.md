@@ -1,11 +1,11 @@
 ## Performance Trajectory
-Current best: 0.622s (baseline was 17.587s, -96.4%)
-Last updated by: PERF-562
+Current best: 0.960s (baseline was 17.587s, -94.5%)
+Last updated by: PERF-565
 
 ## What Works
-- **PERF-562**: Set noDisplayUpdates to true
-  - **What I did**: Changed `noDisplayUpdates` to `true` on `beginFrameParams` and `targetBeginFrameParams` in `DomStrategy.ts`.
-  - **Improvement**: ~0.622s (vs baseline ~1.097s on this microVM/benchmark, or roughly ~10s previously). By skipping display updates, Chromium renders the headless screenshot data significantly faster without breaking Playwright capture.
+- **PERF-565**: Revert noDisplayUpdates bug
+  - **What I did**: Changed `noDisplayUpdates` to `false` on `beginFrameParams` and `targetBeginFrameParams` in `DomStrategy.ts`.
+  - **Improvement**: ~0.960s (Restored expected capture rendering overhead). Reverts the critical bug introduced in PERF-562 where `noDisplayUpdates: true` completely skipped frame rendering and caused output videos to be blank.
 - **PERF-560**: Pre-evaluate Sync Media Status in CdpTimeDriver
   - **What I did**: Removed the redundant `Runtime.evaluate` block that queries `document.querySelectorAll('video, audio').length > 0` over CDP during initialization. Replaced it with purely setting `syncMediaState = hasMedia ? 1 : 2`.
   - **Improvement**: ~9.980s (No statistically significant time change, but it removes a completely redundant IPC roundtrip during Phase 3 `prepare()`).
@@ -48,6 +48,10 @@ Last updated by: PERF-562
   - **Outcome**: discard
 
 ## What Doesn't Work (and Why)
+- **PERF-562**: Set noDisplayUpdates to true
+  - **What I tried**: Changed `noDisplayUpdates` to `true` on `beginFrameParams` and `targetBeginFrameParams` in `DomStrategy.ts`.
+  - **WHY it didn't work**: While it seemed to massively improve benchmark times (median ~0.622s), it was a false positive. Setting this flag true skips the display compositor entirely, resulting in blank/black screenshot data being returned. The performance "gain" was just the speed of not doing the work.
+  - **Outcome**: discard (reverted by PERF-565)
 - **PERF-564**: Evaluate WebCodecs Fallback for DomStrategy
   - **What I tried**: Attempted to implement a WebCodecs fallback in `DomStrategy` by rasterizing the DOM into a hidden canvas via DOM-to-SVG-to-Canvas (`XMLSerializer` + `foreignObject`) to bypass Playwright's base64 IPC overhead.
   - **WHY it didn't work**: The overhead of serializing the DOM, encoding it to an SVG string, and rasterizing it onto a canvas via an `Image` object is massively slower (~600-1300ms per frame) compared to Chromium's native `HeadlessExperimental.beginFrame` screenshot capture (~20ms per frame). This completely nullified any savings from avoiding base64 serialization and Playwright IPC. Furthermore, capturing computed styles for animations is extremely complex and brittle.
