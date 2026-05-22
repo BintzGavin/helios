@@ -48,6 +48,10 @@ Last updated by: PERF-562
   - **Outcome**: discard
 
 ## What Doesn't Work (and Why)
+- **PERF-564**: Evaluate WebCodecs Fallback for DomStrategy
+  - **What I tried**: Attempted to implement a WebCodecs fallback in `DomStrategy` by rasterizing the DOM into a hidden canvas via DOM-to-SVG-to-Canvas (`XMLSerializer` + `foreignObject`) to bypass Playwright's base64 IPC overhead.
+  - **WHY it didn't work**: The overhead of serializing the DOM, encoding it to an SVG string, and rasterizing it onto a canvas via an `Image` object is massively slower (~600-1300ms per frame) compared to Chromium's native `HeadlessExperimental.beginFrame` screenshot capture (~20ms per frame). This completely nullified any savings from avoiding base64 serialization and Playwright IPC. Furthermore, capturing computed styles for animations is extremely complex and brittle.
+  - **Outcome**: discard
 - **PERF-555**: Disable Chromium IPC Flooding Protection
   - **What I tried**: Added `--disable-ipc-flooding-protection` and `--disable-hang-monitor` to the `DEFAULT_BROWSER_ARGS` array in `BrowserPool.ts`.
   - **WHY it didn't work**: The median render time degraded to ~10.851s compared to the baseline ~10.002s. While the intention was to prevent Chromium from throttling our high-frequency CDP commands, these flags did not yield a performance improvement and actually introduced a measurable slowdown, likely due to side effects in process scheduling or event loop polling in headless mode.
