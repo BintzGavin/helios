@@ -797,3 +797,14 @@
   - Updated Roadmap in llms.txt with verifiable completions from domain PROGRESS logs.
   - Fixed Agent Skill paths to explicitly point to `.agents/skills/helios-skills/skills/*`.
   - Verified package versions match `package.json` exactly.
+
+## LLMS v1.86.3
+- ✅ Completed: Daily llms.txt Review
+  - Updated Roadmap in llms.txt with verifiable completions from domain PROGRESS logs:
+    - CLI: CLI Job Regression Tests Missing Mock, CLI Docker Adapter Regression Tests, CLI Cloud Templates Tests
+    - Player: Improve index.ts test coverage
+    - Renderer: WebCodecs Preference, Update Skill Documentation
+    - Infrastructure: Optimize S3 Uploads
+  - Verified package versions match `package.json` exactly.
+  - Verified File Paths and Key Files.
+  - Incremented version to 1.86.3
