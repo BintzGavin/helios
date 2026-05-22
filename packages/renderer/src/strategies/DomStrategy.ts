@@ -23,7 +23,7 @@ export class DomStrategy implements RenderStrategy {
   private emptyImageBuffer: Buffer = EMPTY_IMAGE_BUFFER;
   private emptyImageBase64: string = "";
   private frameInterval: number = 0;
-  private beginFrameParams: any = { interval: 0, frameTimeTicks: 0, screenshot: null, noDisplayUpdates: false };
+  private beginFrameParams: any = { interval: 0, screenshot: null, noDisplayUpdates: false };
   private targetBeginFrameParams: any = null;
 
   constructor(private options: RendererOptions) {
@@ -132,7 +132,6 @@ export class DomStrategy implements RenderStrategy {
         clip: { x: 0, y: 0, width: 0, height: 0, scale: 1 }
       },
       interval: this.frameInterval,
-      frameTimeTicks: 0,
       noDisplayUpdates: false
     };
 
@@ -179,7 +178,6 @@ export class DomStrategy implements RenderStrategy {
       this.targetBeginFrameParams.screenshot.clip.y = box.y;
       this.targetBeginFrameParams.screenshot.clip.width = box.width;
       this.targetBeginFrameParams.screenshot.clip.height = box.height;
-      this.targetBeginFrameParams.frameTimeTicks = 10000 + (frameTime * 1000);
 
       try {
         const result = await this.cdpSession!.send('HeadlessExperimental.beginFrame', this.targetBeginFrameParams);
@@ -190,8 +188,6 @@ export class DomStrategy implements RenderStrategy {
         return this.lastFrameData!;
       }
     }
-
-    this.beginFrameParams.frameTimeTicks = 10000 + (frameTime * 1000);
 
     try {
       const result = await this.cdpSession!.send('HeadlessExperimental.beginFrame', this.beginFrameParams);
