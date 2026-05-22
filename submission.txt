@@ -1,0 +1,11 @@
+✨ RENDERER: [Discarded] Use webp_pipe demuxer for WEBP format
+
+💡 What: Tried using the webp_pipe demuxer instead of image2pipe in FFmpeg when using the WEBP intermediate image format.
+🎯 Why: Piping base64-decoded WEBP frames into image2pipe crashes FFmpeg. We hoped webp_pipe would handle the continuous stream of WEBP frames over stdin correctly, allowing us to benchmark WEBP as a potentially faster intermediate format.
+📊 Impact: The experiment crashed. FFmpeg still failed to determine codec parameters (unspecified size), meaning WEBP pipeline is still fundamentally broken in this environment.
+🔬 Verification: Ran the benchmark script with WEBP mode, checked FFmpeg error logs. Output video generation failed.
+📎 Plan: Reference PERF-566
+
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	0.000	0	0.00	0.0	crash	baseline - webp intermediate format crashes with image2pipe
+2	0.000	0	0.00	0.0	discard	webp_pipe intermediate format crashes

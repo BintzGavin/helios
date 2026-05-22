@@ -1,11 +1,11 @@
 ---
 id: PERF-566
 slug: webp-pipe-demuxer
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-22
-completed: ""
-result: ""
+completed: 2024-05-22
+result: failed
 ---
 
 # PERF-566: Use webp_pipe Demuxer for WEBP Intermediate Format
@@ -45,3 +45,9 @@ N/A - this only affects `DomStrategy` with `webp` intermediate format.
 
 ## Correctness Check
 Run `npm run test -w packages/renderer` to ensure baseline rendering is not broken, and run a manual test with WEBP format to ensure it completes without crashing.
+
+## Results Summary
+- **Best render time**: N/A (Crashed)
+- **Improvement**: N/A
+- **Kept experiments**: None
+- **Discarded experiments**: Used `webp_pipe` instead of `image2pipe` for WEBP intermediate format demuxing. This crashed with "Could not find codec parameters for stream 0 (Video: webp, none): unspecified size", so `webp` pipe over FFmpeg is still not working.
