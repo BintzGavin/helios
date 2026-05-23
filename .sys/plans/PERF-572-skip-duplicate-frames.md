@@ -1,11 +1,11 @@
 ---
 id: PERF-572
 slug: skip-duplicate-frames
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "Jules"
 created: 2024-06-13
-completed: ""
-result: ""
+completed: "2024-06-13"
+result: "Render time improved to ~1.172s"
 ---
 
 # PERF-572: Skip base64 payload serialization on identical frames

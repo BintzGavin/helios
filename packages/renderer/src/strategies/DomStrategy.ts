@@ -190,6 +190,21 @@ export class DomStrategy implements RenderStrategy {
     }
 
     try {
+      let isDirty = true;
+      try {
+        const { result } = await this.cdpSession!.send('Runtime.evaluate', {
+          expression: "typeof window.__helios_check_and_reset_dirty === 'function' ? window.__helios_check_and_reset_dirty() : true",
+          returnByValue: true
+        });
+        if (result && typeof result.value === 'boolean') {
+          isDirty = result.value;
+        }
+      } catch (e) {
+        // ignore
+      }
+
+      this.beginFrameParams.screenshot = isDirty ? this.cdpScreenshotParams : undefined;
+
       const result = await this.cdpSession!.send('HeadlessExperimental.beginFrame', this.beginFrameParams);
       const frameData = result.screenshotData || this.lastFrameData!;
       this.lastFrameData = frameData;

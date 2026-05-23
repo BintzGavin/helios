@@ -140,6 +140,21 @@ export class CdpTimeDriver implements TimeDriver {
 
         let cachedMediaElements = null;
 
+        window.__helios_is_dirty = true;
+        const observer = new MutationObserver(() => { window.__helios_is_dirty = true; });
+        observer.observe(document, { attributes: true, childList: true, subtree: true, characterData: true });
+        const origRaf = window.requestAnimationFrame;
+        window.requestAnimationFrame = (cb) => {
+            window.__helios_is_dirty = true;
+            return origRaf(cb);
+        };
+
+        window.__helios_check_and_reset_dirty = () => {
+            const dirty = window.__helios_is_dirty;
+            window.__helios_is_dirty = false;
+            return dirty;
+        };
+
         window.__helios_invalidate_cache = () => {
           cachedMediaElements = null;
         };

@@ -344,3 +344,6 @@ Last updated by: PERF-569
   - **What I tried**: Removed `optimizeForSpeed: true` from the CDP screenshot parameters in `DomStrategy.ts`. Hypothesized that skipping optimization would slightly increase Chromium CPU time but produce smaller Base64 payloads to reduce Playwright IPC/JSON parsing overhead.
   - **WHY it didn't work**: Resulted in a negligible performance change/slight regression (median ~1.585s vs baseline ~1.469s) indicating the IPC payload savings from smaller images didn't outweigh the additional CPU cost in Skia compressing the JPEGs.
   - **Outcome**: discard
+
+## What Works
+- **PERF-572**: Skip duplicate frames payload serialization. By using a MutationObserver and monkey-patching `requestAnimationFrame` to detect dirty DOM states, we conditionally omit the `screenshot` parameter in `HeadlessExperimental.beginFrame` when the frame hasn't changed. This completely bypasses the massive overhead of Base64 encoding/decoding and IPC JSON parsing for identical frames. Improved render time to ~1.172s (vs baseline ~1.511s).
