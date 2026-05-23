@@ -1,7 +1,7 @@
 ---
 id: PERF-570
 slug: remove-begin-frame-interval
-status: claimed
+status: complete
 claimed_by: "executor-session"
 created: 2024-06-14
 completed: "2024-06-14"
@@ -50,7 +50,13 @@ N/A.
 Run standard DOM render tests to ensure animations progress correctly.
 
 ## Results Summary
-- **Best render time**: 13.530s (vs baseline 12.413s)
-- **Improvement**: 0%
+```
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	1.494	150	100.41	45.0	discard	baseline
+2	1.481	150	101.25	42.3	discard	remove interval
+3	1.515	150	99.01	42.3	discard	remove interval
+```
+- **Best render time**: 1.481s (vs baseline 1.494s)
+- **Improvement**: ~0.8% (within margin of error)
 - **Kept experiments**: []
 - **Discarded experiments**: [PERF-570]
