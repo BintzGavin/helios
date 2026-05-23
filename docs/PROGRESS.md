@@ -1,3 +1,6 @@
+### PLAYER v0.77.38
+- ✅ Completed: Expand Index Coverage - Added unit tests for disconnectedCallback in packages/player/src/index.ts.
+
 ### PLAYER v0.77.37
 - ✅ Completed: Improve index.ts test coverage - Added tests for diagnose API and retryConnection.
 

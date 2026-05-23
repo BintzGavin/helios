@@ -2532,6 +2532,37 @@ describe('Input Props', () => {
     });
   });
 
+  describe('disconnectedCallback', () => {
+    it('should remove event listeners when disconnected from the DOM', () => {
+      const windowSpy = vi.spyOn(window, 'removeEventListener');
+      const documentSpy = vi.spyOn(document, 'removeEventListener');
+
+      // We know it's attached to the DOM (done in beforeEach), so let's trigger disconnect
+      player.remove();
+
+      // Verify cleanup occurred
+      expect(windowSpy).toHaveBeenCalledWith('message', expect.any(Function));
+      expect(documentSpy).toHaveBeenCalledWith('fullscreenchange', expect.any(Function));
+      expect(documentSpy).toHaveBeenCalledWith('click', expect.any(Function));
+
+      // Verify resize observer was disconnected
+      expect(player['resizeObserver'].disconnect).toHaveBeenCalled();
+
+      windowSpy.mockRestore();
+      documentSpy.mockRestore();
+    });
+
+    it('should not throw if called before the component is fully initialized', () => {
+      // Create a raw instance without appending to DOM
+      const rawPlayer = new HeliosPlayer();
+
+      // Should not throw an error if called before fully initialized
+      expect(() => {
+        rawPlayer.disconnectedCallback();
+      }).not.toThrow();
+    });
+  });
+
   describe('captureStream', () => {
     it('should throw error if not in Direct Mode', async () => {
         // Mock BridgeController
