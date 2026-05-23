@@ -1,11 +1,11 @@
 ---
 id: PERF-571
 slug: remove-optimize-for-speed
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "jules"
 created: 2024-06-15
-completed: ""
-result: ""
+completed: "2026-05-23"
+result: "discard"
 ---
 # PERF-571: Remove `optimizeForSpeed` from intermediate CDP screenshot params
 
@@ -48,3 +48,7 @@ Run canvas benchmark to ensure no regressions.
 
 ## Correctness Check
 Run standard DOM render tests (`npm run test -w packages/renderer`) to ensure the output video renders correctly and animations advance.
+
+## Results
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	1.585	150	94.65	42.5	discard	Remove optimizeForSpeed: true from intermediate CDP screenshot params to reduce payload size

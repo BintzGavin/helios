@@ -340,3 +340,7 @@ Last updated by: PERF-569
   - **What I tried**: Removed the interval property from beginFrameParams and targetBeginFrameParams in DomStrategy.ts.
   - **WHY it didn't work**: The median render time change (~1.481s vs baseline ~1.494s) was well within the margin of error (~0.8%). The optimization did not demonstrate a clear improvement over the noise threshold, so it was discarded to avoid changing a potentially critical parameter for Chromium's internal compositor pacing synchronization without clear benefit.
   - **Plan ID**: PERF-570
+- **PERF-571**: Remove `optimizeForSpeed: true` from intermediate CDP screenshot params
+  - **What I tried**: Removed `optimizeForSpeed: true` from the CDP screenshot parameters in `DomStrategy.ts`. Hypothesized that skipping optimization would slightly increase Chromium CPU time but produce smaller Base64 payloads to reduce Playwright IPC/JSON parsing overhead.
+  - **WHY it didn't work**: Resulted in a negligible performance change/slight regression (median ~1.585s vs baseline ~1.469s) indicating the IPC payload savings from smaller images didn't outweigh the additional CPU cost in Skia compressing the JPEGs.
+  - **Outcome**: discard
