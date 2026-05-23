@@ -345,3 +345,10 @@ Last updated by: PERF-569
   - **What I tried**: Removed `optimizeForSpeed: true` from the CDP screenshot parameters in `DomStrategy.ts`. Hypothesized that skipping optimization would slightly increase Chromium CPU time but produce smaller Base64 payloads to reduce Playwright IPC/JSON parsing overhead.
   - **WHY it didn't work**: Resulted in a negligible performance change/slight regression (median ~1.585s vs baseline ~1.469s) indicating the IPC payload savings from smaller images didn't outweigh the additional CPU cost in Skia compressing the JPEGs.
   - **Outcome**: discard
+
+## Performance Trajectory
+Current best: 1.449s (baseline was 1.511s, -4.1%)
+Last updated by: PERF-573
+
+## What Works
+- **Optimize capture allocation** (`PERF-573`): Removed block-scoped variable allocation and logic operator branching in the CDP `capture` hot loop inside `DomStrategy.ts`. Decreased GC pressure resulting in a ~4.1% performance improvement, reaching a median render time of 1.449s.

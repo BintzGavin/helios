@@ -181,9 +181,10 @@ export class DomStrategy implements RenderStrategy {
 
       try {
         const result = await this.cdpSession!.send('HeadlessExperimental.beginFrame', this.targetBeginFrameParams);
-        const frameData = result.screenshotData || this.lastFrameData!;
-        this.lastFrameData = frameData;
-        return frameData;
+        if (result.screenshotData) {
+          this.lastFrameData = result.screenshotData;
+        }
+        return this.lastFrameData!;
       } catch (e) {
         return this.lastFrameData!;
       }
@@ -191,9 +192,10 @@ export class DomStrategy implements RenderStrategy {
 
     try {
       const result = await this.cdpSession!.send('HeadlessExperimental.beginFrame', this.beginFrameParams);
-      const frameData = result.screenshotData || this.lastFrameData!;
-      this.lastFrameData = frameData;
-      return frameData;
+      if (result.screenshotData) {
+        this.lastFrameData = result.screenshotData;
+      }
+      return this.lastFrameData!;
     } catch (e) {
       return this.lastFrameData!;
     }

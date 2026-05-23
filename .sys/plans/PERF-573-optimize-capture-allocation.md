@@ -1,7 +1,7 @@
 ---
 id: PERF-573
 slug: optimize-capture-allocation
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-06-15
 completed: ""
