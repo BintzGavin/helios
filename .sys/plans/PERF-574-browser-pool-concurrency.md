@@ -1,11 +1,11 @@
 ---
 id: PERF-574
 slug: browser-pool-concurrency
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-06-15
-completed: ""
-result: ""
+completed: "2024-06-15"
+result: "discarded"
 ---
 
 # PERF-574: Increase BrowserPool Concurrency for DOM Strategy
@@ -51,3 +51,9 @@ If `* 2 - 1` causes regressions or crashes due to memory, try exactly `os.cpus()
 
 ## Correctness Check
 Run `npm run test -w packages/renderer -- --run` to ensure rendering works correctly with higher concurrency. Run `npx tsx scripts/benchmark-perf.ts` to verify performance.
+
+## Results Summary
+- **Best render time**: 1.650s (vs baseline 1.368s)
+- **Improvement**: Regressed
+- **Kept experiments**: None
+- **Discarded experiments**: `PERF-574 (os.cpus().length || 4) * 2 - 1`
