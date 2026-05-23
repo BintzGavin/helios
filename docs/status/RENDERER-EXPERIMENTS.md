@@ -338,5 +338,5 @@ Last updated by: PERF-569
   - **Outcome**: discard
 - **PERF-570**: Remove interval from beginFrameParams
   - **What I tried**: Removed the interval property from beginFrameParams and targetBeginFrameParams in DomStrategy.ts.
-  - **WHY it didn't work**: The median render time regressed to ~13.530s (vs baseline ~12.413s). Even though CdpTimeDriver explicitly steps virtual time, Chromium's compositor likely still uses the explicitly provided interval parameter to calculate frame pacing or expected vsync offsets internally. Removing it forces it to fall back to a default interval which causes internal synchronization stuttering.
+  - **WHY it didn't work**: The median render time change (~1.481s vs baseline ~1.494s) was well within the margin of error (~0.8%). The optimization did not demonstrate a clear improvement over the noise threshold, so it was discarded to avoid changing a potentially critical parameter for Chromium's internal compositor pacing synchronization without clear benefit.
   - **Plan ID**: PERF-570
