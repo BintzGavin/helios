@@ -8,3 +8,6 @@
 ## v0.121.11 - ExportJobSpec is already implemented
 **Learning:** The "Export Job Spec" feature in the Renders Panel was found to be fully implemented, representing an "IMPOSSIBLE: DUPLICATION" scenario. This shows the importance of always checking the current codebase state before assuming missing functionality.
 **Action:** Before executing a feature addition, comprehensively search the UI code (e.g. RendersPanel.tsx, StudioContext.tsx) and API endpoints to verify the gap actually exists.
+## 0.121.16 - CLI Refine Component Removal
+**Learning:** IMPOSSIBLE: DUPLICATION. The requested feature in `2026-10-23-STUDIO-Refine-CLI-Component-Removal.md` to refine the `helios remove` CLI command to delete component files by default is already implemented in `packages/cli/src/commands/remove.ts`.
+**Action:** Always check the codebase before implementing features to avoid duplicating effort.

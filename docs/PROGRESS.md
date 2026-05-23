@@ -626,6 +626,11 @@ Each agent should update **their own dedicated progress file** instead of this f
 
 ### PLAYER v0.77.35
 - ✅ Completed: Improve index.ts test coverage - Added tests for captureStream and audio metering edge cases.
+### STUDIO v0.121.16
+- ✅ Completed: Refine CLI Component Removal - Verified that the `helios remove` CLI command already deletes component files by default (IMPOSSIBLE: DUPLICATION).
+- ✅ Completed: Add JKL Playback Shortcuts - Verified that the `J, K, L` playback shortcuts are already implemented in `GlobalShortcuts.tsx` (IMPOSSIBLE: DUPLICATION).
+- ✅ Completed: Timeline Drag & Drop - Verified that the timeline drag drop logic is already fully implemented (IMPOSSIBLE: DUPLICATION).
+
 ### STUDIO v0.121.15
 - ✅ Completed: Document duplicated Timeline-Scrubber plan - Logged the duplicated plan as impossible since Timeline already supports scrubbing.
 

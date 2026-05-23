@@ -1,10 +1,13 @@
-**Version**: 0.121.15
+**Version**: 0.121.16
 
 [v0.121.13] ✅ Completed: Expand Reverse Speeds - Added -4x and -2x reverse playback options to the PlaybackControls component.
 
 **Posture**: ACTIVELY EXPANDING FOR V2
 
 # Studio Domain Status
+- [v0.121.16] ✅ Completed: Refine CLI Component Removal - Verified that the `helios remove` CLI command already deletes component files by default (IMPOSSIBLE: DUPLICATION).
+- [v0.121.16] ✅ Completed: Add JKL Playback Shortcuts - Verified that the `J, K, L` playback shortcuts are already implemented in `GlobalShortcuts.tsx` (IMPOSSIBLE: DUPLICATION).
+- [v0.121.16] ✅ Completed: Timeline Drag & Drop - Verified that the timeline drag drop logic is already fully implemented (IMPOSSIBLE: DUPLICATION).
 - [v0.121.12] ✅ Completed: STUDIO-system-prompt - Verified that the AI System Prompt feature was already fully implemented via AssistantModal (IMPOSSIBLE: DUPLICATION).
 - [v0.121.11] ✅ Completed: STUDIO-ExportJobSpec - Verified that the Export Job Spec feature in Renders Panel was already fully implemented (IMPOSSIBLE: DUPLICATION).
 - [v0.121.10] ✅ Completed: Update Keyboard Shortcuts - Implemented missing JKL keyboard shortcuts documentation in the Help Modal.
