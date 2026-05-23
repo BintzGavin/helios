@@ -328,3 +328,7 @@ Last updated by: PERF-569
   - **What I tried**: Attempted to inline `defaultStabilityCheck` directly into `runSetTime` in `CdpTimeDriver.ts`.
   - **WHY it didn't work**: The `defaultStabilityCheck` method had already been eliminated in previous iterations (likely PERF-506) and the `Runtime.evaluate` call was already inlined. This experiment was discarded as a duplicate with no code changes.
   - **Outcome**: discard (duplicate)
+- **PERF-513**: Enable Site Isolation for Multi-Core Concurrency
+  - **What I tried**: Removed `--single-process` and added `--process-per-tab` to `DEFAULT_BROWSER_ARGS` in `BrowserPool.ts` to allow Chromium to distribute the rendering workload across multiple processes.
+  - **WHY it didn't work**: The median render time (1.600s to 2.303s) actually improved slightly over the microVM baseline (2.209s), but variance was huge, and in general, managing multiple renderer processes per tab caused higher instability and CPU contention without consistent throughput improvements compared to the highly optimized single-process headless architecture. The experiment was discarded because it didn't demonstrate a consistent, clear win over the established baseline and introduced noise.
+  - **Outcome**: discard
