@@ -1,11 +1,11 @@
 ---
 id: PERF-570
 slug: remove-begin-frame-interval
-status: unclaimed
-claimed_by: ""
+status: claimed
+claimed_by: "executor-session"
 created: 2024-06-14
-completed: ""
-result: ""
+completed: "2024-06-14"
+result: "no-improvement"
 ---
 
 # PERF-570: Remove interval from beginFrameParams
@@ -48,3 +48,9 @@ N/A.
 
 ## Correctness Check
 Run standard DOM render tests to ensure animations progress correctly.
+
+## Results Summary
+- **Best render time**: 13.530s (vs baseline 12.413s)
+- **Improvement**: 0%
+- **Kept experiments**: []
+- **Discarded experiments**: [PERF-570]

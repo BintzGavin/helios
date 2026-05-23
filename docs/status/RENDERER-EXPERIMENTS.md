@@ -336,3 +336,7 @@ Last updated by: PERF-569
   - **What I tried**: Removed `--single-process` and added `--process-per-tab` to `DEFAULT_BROWSER_ARGS` in `BrowserPool.ts` to allow Chromium to distribute the rendering workload across multiple processes.
   - **WHY it didn't work**: The median render time (1.600s to 2.303s) actually improved slightly over the microVM baseline (2.209s), but variance was huge, and in general, managing multiple renderer processes per tab caused higher instability and CPU contention without consistent throughput improvements compared to the highly optimized single-process headless architecture. The experiment was discarded because it didn't demonstrate a consistent, clear win over the established baseline and introduced noise.
   - **Outcome**: discard
+- **PERF-570**: Remove interval from beginFrameParams
+  - **What I tried**: Removed the interval property from beginFrameParams and targetBeginFrameParams in DomStrategy.ts.
+  - **WHY it didn't work**: The median render time regressed to ~13.530s (vs baseline ~12.413s). Even though CdpTimeDriver explicitly steps virtual time, Chromium's compositor likely still uses the explicitly provided interval parameter to calculate frame pacing or expected vsync offsets internally. Removing it forces it to fall back to a default interval which causes internal synchronization stuttering.
+  - **Plan ID**: PERF-570
