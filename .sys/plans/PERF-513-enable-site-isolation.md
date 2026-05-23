@@ -1,11 +1,11 @@
 ---
 id: PERF-513
 slug: enable-site-isolation
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-16
-completed: ""
-result: ""
+completed: "2024-05-16"
+result: "no-improvement"
 ---
 
 # PERF-513: Enable Site Isolation for Multi-Core Concurrency
@@ -46,3 +46,9 @@ Run a basic canvas render (`mode: 'canvas'`) to ensure the browser argument chan
 
 ## Correctness Check
 Verify the rendered output video to ensure the parallel frame captures are still ordered and visually correct.
+
+## Results Summary
+- **Best render time**: 1.600s (vs baseline 2.209s, but highly volatile)
+- **Improvement**: Inconclusive/noise
+- **Kept experiments**: none
+- **Discarded experiments**: Replaced `--single-process` with `--process-per-tab` to enable site isolation, which caused high variance and didn't reliably improve throughput.
