@@ -642,3 +642,5 @@ Each agent should update **their own dedicated progress file** instead of this f
 
 ### CLI v0.46.34
 - ✅ Completed: CLI Registry Types Regression Tests - Implemented structural verification tests for registry interfaces.
+### CLI v0.46.35
+- ✅ Completed: CLI Job Types Regression Tests - Implemented unit tests for job specification interfaces in packages/cli/src/types/__tests__/job.test.ts.

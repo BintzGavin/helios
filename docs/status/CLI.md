@@ -1,4 +1,4 @@
-**Version**: 0.46.34
+**Version**: 0.46.35
 
 [v0.46.34] ✅ Completed: CLI Registry Types Regression Tests - Implemented structural verification tests for registry interfaces.
 [v0.46.33] ✅ Completed: CLI Job Regression Tests Missing Mock - Added missing mock setup for @helios-project/infrastructure to fix import resolution errors
@@ -149,3 +149,4 @@ The Helios CLI is the primary user interface for component registry, project sca
 [v0.46.31] ✅ Completed: CLI Index Regression Tests - Implemented unit tests for the main CLI entry point in packages/cli/src/__tests__/index.test.ts.
 [v0.46.33] 🟢 Completed: CLI Registry Types Regression Tests Spec - Created specification plan `2027-06-05-CLI-Registry-Types-Regression-Tests.md` for implementing structural verification tests for registry interfaces.
 [v0.46.34] 🟢 Completed: CLI Job Types Regression Tests Spec - Created specification plan `2027-06-05-CLI-Job-Types-Regression-Tests.md` for implementing structural verification tests for job specification interfaces.
+[v0.46.35] ✅ Completed: CLI Job Types Regression Tests - Implemented unit tests for job specification interfaces in packages/cli/src/types/__tests__/job.test.ts.
