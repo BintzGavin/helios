@@ -1,0 +1,7 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	12.579	600	47.70	45.3	keep	baseline
+2	12.266	600	48.92	45.0	keep	baseline
+3	12.413	600	48.34	38.4	keep	baseline
+4	13.784	600	43.53	46.7	discard	remove-interval-1
+5	12.310	600	48.74	45.3	discard	remove-interval-2
+6	13.530	600	44.35	44.9	discard	remove-interval-3
