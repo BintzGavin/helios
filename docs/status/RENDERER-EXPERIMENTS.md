@@ -3,6 +3,10 @@ Current best: 1.511s (baseline was 2.017s, -25%)
 Last updated by: PERF-569
 
 ## What Works
+- **PERF-505**: Dedicated Browser Contexts for Process Isolation
+  - **What I did**: Evaluated assigning each worker its own dedicated `BrowserContext` to force isolated OS-level Chromium renderer processes instead of a single shared one. Discovered this is already implemented natively by the baseline `createPage` logic which spawns a new `BrowserContext` per worker.
+  - **Impact**: Marked complete and kept natively. Median render time is ~1.511s.
+  - **Plan ID**: PERF-505
 - **PERF-569**: Removed `frameTimeTicks` from `DomStrategy.ts`. The median render time improved to ~1.511s (vs baseline ~2.017s). Removing the explicit frame time calculation and property assignment from the CDP payload reduces JSON payload size, eliminates per-frame arithmetic in the Node.js hot loop, and relies on Chromium's native virtual time fallback.
 - **PERF-565**: Revert noDisplayUpdates bug
   - **What I did**: Changed `noDisplayUpdates` to `false` on `beginFrameParams` and `targetBeginFrameParams` in `DomStrategy.ts`.
