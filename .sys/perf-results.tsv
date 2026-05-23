@@ -1,3 +1,9 @@
 2	33.527	90	2.68	36.5	keep	PERF-291: Eliminate Dynamic Promise Allocation in CaptureLoop.ts getNextTask
 3	49.152	90	2.68	36.5	discard	PERF-307: Disable Renderer Backgrounding
 4	31.854	90	2.68	36.5	keep	PERF-395: Eliminate Promise Chain Allocation in DomStrategy Capture
+1	11.348	150	13.22	39.9	baseline	browser-pool-concurrency baseline 1
+2	1.401	150	107.04	41.6	baseline	browser-pool-concurrency baseline 2
+3	1.368	150	109.61	42.4	baseline	browser-pool-concurrency baseline 3
+4	1.878	150	79.89	46.6	discard	PERF-574 (os.cpus().length || 4) * 2 - 1
+5	1.535	150	97.73	43.3	discard	PERF-574 (os.cpus().length || 4) * 2 - 1
+6	1.650	150	90.91	46.0	discard	PERF-574 (os.cpus().length || 4) * 2 - 1

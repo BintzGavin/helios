@@ -352,3 +352,7 @@ Last updated by: PERF-573
 
 ## What Works
 - **Optimize capture allocation** (`PERF-573`): Removed block-scoped variable allocation and logic operator branching in the CDP `capture` hot loop inside `DomStrategy.ts`. Decreased GC pressure resulting in a ~4.1% performance improvement, reaching a median render time of 1.449s.
+- **PERF-574**: BrowserPool Concurrency
+  - **What I tried**: Modified `BrowserPool.ts` concurrency calculation from `Math.max(1, (os.cpus().length || 4) - 1)` to `Math.max(1, (os.cpus().length || 4) * 2 - 1)` to oversubscribe workers.
+  - **WHY it didn't work**: The median render time regressed to ~1.650s compared to the baseline of ~1.368s. Although Playwright IPC and Chromium's CDP `beginFrame` loop are heavily I/O bound, oversubscribing workers in a CPU-constrained microVM (e.g. 7 workers on a 4-core machine) introduced too much context-switching overhead and CPU contention. The existing formula correctly balances process scheduling and thread pooling for the current headless deployment without saturating Node's event loop with parallel CDP wait routines.
+  - **Outcome**: discard
