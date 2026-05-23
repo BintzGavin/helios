@@ -1,4 +1,5 @@
-**Version**: 0.77.37
+**Version**: 0.77.38
+[v0.77.38] ✅ Completed: Expand Index Coverage - Added unit tests for disconnectedCallback in packages/player/src/index.ts.
 [v0.77.37] ✅ Completed: Improve index.ts test coverage - Added tests for diagnose API and retryConnection.
 [v0.77.36] ✅ Completed: Discovered that 2026-06-21-PLAYER-Smart-Controls.md is an IMPOSSIBLE: DUPLICATION plan. The smart controls for CC and PiP are already fully implemented. Documented as duplicate and discarded.
 [v0.77.35] ✅ Completed: Improve index.ts test coverage - Added tests for captureStream and audio metering edge cases.
