@@ -1,11 +1,11 @@
 ---
 id: PERF-572
 slug: skip-duplicate-frames
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-06-13
 completed: ""
-result: ""
+result: failed
 ---
 
 # PERF-572: Skip base64 payload serialization on identical frames

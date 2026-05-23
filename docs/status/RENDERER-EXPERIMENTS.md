@@ -53,6 +53,7 @@ Last updated by: PERF-569
   - **Outcome**: discard
 
 ## What Doesn't Work (and Why)
+- [FAILED] Skipping base64 payload serialization on identical frames via dirty tracking (PERF-572) - Flawed heuristic misses CSS animations, scrolling, Canvas/WebGL updates, etc.
 - **PERF-507: Eliminate defaultStabilityCheck method and inline logic**
   - **What I tried**: Attempted to inline `defaultStabilityCheck` directly into `runSetTime` in `CdpTimeDriver.ts`.
   - **WHY it didn't work**: The `defaultStabilityCheck` method had already been eliminated in previous iterations (likely PERF-506) and the `Runtime.evaluate` call was already inlined. This experiment was discarded as a duplicate with no code changes.
