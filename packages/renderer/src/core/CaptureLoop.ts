@@ -220,7 +220,9 @@ export class CaptureLoop {
 
     try {
         while (nextFrameToWrite < this.totalFrames && !aborted) {
-            checkState();
+            if (freeWorkersHead > 0 || this.capturedErrors.length > 0 || (signal && signal.aborted)) {
+                checkState();
+            }
             if (aborted) break;
 
             const ringIndex = nextFrameToWrite & ringMask;

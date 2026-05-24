@@ -113,3 +113,4 @@ run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
 7	1.449	150	103.54	42.3	keep	optimize capture allocation in DomStrategy.ts
 1	2.158	150	69.49	42.3	discard	already implemented in baseline (PERF-488)
 1	2.158	150	69.49	42.3	discard	already implemented in baseline (PERF-491)
+2026-05-18	1.476	150	101.62	44.0	keep	Pre-check freeWorkersHead in CaptureLoop orchestrator

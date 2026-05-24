@@ -365,3 +365,4 @@ Last updated by: PERF-573
   - **What I tried**: Evaluated removing redundant checkState calls in CaptureLoop.ts.
   - **WHY it didn't work**: The optimization is already natively implemented in the baseline codebase.
   - **Outcome**: discard (already implemented)
+- Pre-check freeWorkersHead in CaptureLoop orchestrator: ~2% faster (PERF-575)
