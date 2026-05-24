@@ -223,3 +223,6 @@ Critical learnings only. This is not a log—only add entries for insights that 
 ## [v0.46.34] - Identify Uncovered Job Types
 **Learning:** The fallback action from [v0.46.33] for the registry types regression tests was completed. Searching for uncovered areas in a stable domain requires thoroughly checking tests against source files. `packages/cli/src/types/job.ts` currently lacks test coverage (using static types in assertions) while defining the core shape of the render job specification.
 **Action:** When falling back to regression testing under the NOTHING TO DO PROTOCOL, target TypeScript type files (like types.ts) that enforce structural constraints when command, templates, registry and utils coverage is 100%. Created plan `2027-06-05-CLI-Job-Types-Regression-Tests.md`.
+## [v0.46.36] - Document missing mock plan creation
+**Learning:** The fallback action from [v0.46.29] for the job, render, and merge test failure was to write a new plan. I created 2027-06-05-CLI-Job-Render-Merge-Regression-Tests-Missing-Mock.md.
+**Action:** Wrote plan to fix missing vi.mock calls.
