@@ -1,0 +1,3 @@
+run\trender_time_s\tframes\tfps_effective\tpeak_mem_mb\tstatus\tdescription
+1\t1.541\t150\t97.32\t42.3\tkeep\tbaseline
+2\t1.529\t150\t98.12\t44.8\tdiscard\tMath.max(1, (os.cpus().length || 4))
