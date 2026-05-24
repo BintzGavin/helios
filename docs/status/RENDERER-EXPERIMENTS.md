@@ -384,3 +384,7 @@ Last updated by: PERF-573
   - **What I tried**: Removed `--enable-begin-frame-control` and `--run-all-compositor-stages-before-draw` from `DEFAULT_BROWSER_ARGS` in `BrowserPool.ts`. Replaced `HeadlessExperimental.beginFrame` with `Page.startScreencast` and a short timeout fallback in `DomStrategy.ts`.
   - **WHY it didn't work**: The median render time regressed to ~1.801s compared to the baseline of ~1.511s. Relying on screencast frame emission with a timeout fallback for static frames is slower and less efficient than directly advancing and reading frames deterministically in lockstep using `beginFrame`.
   - **Outcome**: discard
+- **PERF-506**: Single Playwright Page Instance
+  - **What I tried**: Changed the concurrency calculation in `BrowserPool.ts` from `Math.max(1, (os.cpus().length || 4) - 1)` to a hardcoded `1` to eliminate multi-process IPC/context-switching overhead in the Playwright pool.
+  - **WHY it didn't work**: The median render time regressed significantly to ~2.158s compared to the baseline of ~1.436s. While single-process rendering can sometimes reduce IPC noise, restricting the pool strictly to one worker in this microVM headless environment caused the capture pipeline to bottleneck heavily, indicating that parallel page workers are still beneficial and necessary for optimal throughput despite context switching overhead.
+  - **Outcome**: discard

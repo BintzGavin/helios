@@ -119,3 +119,6 @@ run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
 1	1.448	150	103.58	42.3	keep	PERF-578 remove per-frame stability check loop
 2	1.436	150	104.45	42.3	keep	PERF-578 remove per-frame stability check loop
 3	1.391	150	107.85	42.2	keep	PERF-578 remove per-frame stability check loop
+1	2.212	150	67.82	38.3	discard	PERF-506 Single Playwright Page
+2	2.188	150	68.54	36.7	discard	PERF-506 Single Playwright Page
+3	2.133	150	70.32	38.4	discard	PERF-506 Single Playwright Page

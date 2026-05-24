@@ -1,11 +1,11 @@
 ---
 id: PERF-506
 slug: single-playwright-page
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-05-15
 completed: ""
-result: ""
+result: "discard"
 ---
 
 # PERF-506: Implement Single Playwright Page Instance
