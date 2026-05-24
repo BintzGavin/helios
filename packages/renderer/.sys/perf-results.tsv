@@ -111,3 +111,5 @@ run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
 1	1.511	150	99.26	42.4	keep	already implemented in baseline
 1	1.585	150	94.65	42.5	discard	Remove optimizeForSpeed: true from intermediate CDP screenshot params to reduce payload size
 7	1.449	150	103.54	42.3	keep	optimize capture allocation in DomStrategy.ts
+1	2.158	150	69.49	42.3	discard	already implemented in baseline (PERF-488)
+1	2.158	150	69.49	42.3	discard	already implemented in baseline (PERF-491)
