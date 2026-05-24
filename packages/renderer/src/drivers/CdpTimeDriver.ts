@@ -15,11 +15,9 @@ export class CdpTimeDriver implements TimeDriver {
   private cachedPromises: Promise<any>[] = [];
   private cdpResolve: (() => void) | null = null;
   private cdpReject: ((err: Error) => void) | null = null;
-  private evaluateStabilityParams: any = { expression: "if (typeof window.__helios_wait_until_stable === 'function') window.__helios_wait_until_stable();", awaitPromise: true, returnByValue: false };
   private singleFrameSyncMediaParams: any = { expression: "", awaitPromise: false, returnByValue: false };
   private multiFrameSyncMediaParams: any[] = [];
   private syncMediaState: number = 0; // 0 = unknown, 1 = true, 2 = false
-  private stabilityCheckState: number = 0; // 0 = unknown, 1 = true, 2 = false
   private hasMedia: boolean = true;
 
   private virtualTimePromiseExecutor = (resolve: () => void, reject: (err: Error) => void) => {
@@ -62,13 +60,6 @@ export class CdpTimeDriver implements TimeDriver {
   private handleSyncMediaError = (e: any) => {
     console.warn('[CdpTimeDriver] Failed to sync media:', e);
   };
-
-  private handleStabilityCheckResponse = (res: any) => {
-    if (res && res.exceptionDetails) {
-      throw new Error('Stability check failed: ' + res.exceptionDetails.exception?.description);
-    }
-  };
-
 
   private handleVirtualTimeBudgetExpired = () => {
     if (this.cdpResolve) {
@@ -192,12 +183,21 @@ export class CdpTimeDriver implements TimeDriver {
 
     this.syncMediaState = this.hasMedia ? 1 : 2;
 
+    try {
+      const { result } = await this.client!.send('Runtime.evaluate', {
+        expression: "typeof window.helios !== 'undefined' && typeof window.helios.waitUntilStable === 'function'",
+        returnByValue: true
+      });
+      if (result && result.value) {
+        await this.client!.send('Runtime.evaluate', { expression: "if (typeof window.__helios_wait_until_stable === 'function') window.__helios_wait_until_stable();", awaitPromise: true, returnByValue: false });
+      }
+    } catch (e) {
+      // Ignore error
+    }
+
     // Enable Runtime so we actually receive executionContextCreated events
     // Catch errors in case another driver instance sharing this session already enabled it.
     await this.client!.send('Runtime.enable').catch(() => {});
-
-    // We delay checking the stability function until the first evaluation to allow for synchronous timeline injection during initialization
-    this.stabilityCheckState = 0;
 
     this.currentTime = 0;
   }
@@ -229,29 +229,5 @@ export class CdpTimeDriver implements TimeDriver {
     await new Promise<void>(this.virtualTimePromiseExecutor);
 
     this.currentTime = timeInSeconds;
-
-    // Wait for custom stability checks
-    if (this.stabilityCheckState === 0) {
-      try {
-        const { result } = await this.client!.send('Runtime.evaluate', {
-          expression: "typeof window.helios !== 'undefined' && typeof window.helios.waitUntilStable === 'function'",
-          returnByValue: true
-        });
-        if (result && result.value) {
-          this.stabilityCheckState = 1;
-        } else {
-          this.stabilityCheckState = 2;
-        }
-      } catch (e) {
-        this.stabilityCheckState = 1;
-      }
-    }
-
-    if (this.stabilityCheckState === 1) {
-      const res = await this.client!.send('Runtime.evaluate', this.evaluateStabilityParams);
-      if (res) {
-        this.handleStabilityCheckResponse(res);
-      }
-    }
   }
 }

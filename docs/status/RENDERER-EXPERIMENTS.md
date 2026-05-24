@@ -1,8 +1,11 @@
 ## Performance Trajectory
-Current best: 1.511s (baseline was 2.017s, -25%)
-Last updated by: PERF-569
+Current best: 1.436s (baseline was 2.017s, -28%)
+Last updated by: PERF-578
 
 ## What Works
+- **PERF-578**: Remove per-frame stability check loop in CdpTimeDriver
+  - **What I did**: Moved the custom window.helios.waitUntilStable() check out of the runSetTime() hot loop to only execute once during prepare().
+  - **Impact**: Reduced CDP overhead by 1 evaluation per frame for all captures. Median render time improved to ~1.436s.
 - **PERF-505**: Dedicated Browser Contexts for Process Isolation
   - **What I did**: Evaluated assigning each worker its own dedicated `BrowserContext` to force isolated OS-level Chromium renderer processes instead of a single shared one. Discovered this is already implemented natively by the baseline `createPage` logic which spawns a new `BrowserContext` per worker.
   - **Impact**: Marked complete and kept natively. Median render time is ~1.511s.
@@ -351,6 +354,9 @@ Current best: 1.449s (baseline was 1.511s, -4.1%)
 Last updated by: PERF-573
 
 ## What Works
+- **PERF-578**: Remove per-frame stability check loop in CdpTimeDriver
+  - **What I did**: Moved the custom window.helios.waitUntilStable() check out of the runSetTime() hot loop to only execute once during prepare().
+  - **Impact**: Reduced CDP overhead by 1 evaluation per frame for all captures. Median render time improved to ~1.436s.
 - **Optimize capture allocation** (`PERF-573`): Removed block-scoped variable allocation and logic operator branching in the CDP `capture` hot loop inside `DomStrategy.ts`. Decreased GC pressure resulting in a ~4.1% performance improvement, reaching a median render time of 1.449s.
 - **PERF-574**: BrowserPool Concurrency
   - **What I tried**: Modified `BrowserPool.ts` concurrency calculation from `Math.max(1, (os.cpus().length || 4) - 1)` to `Math.max(1, (os.cpus().length || 4) * 2 - 1)` to oversubscribe workers.
