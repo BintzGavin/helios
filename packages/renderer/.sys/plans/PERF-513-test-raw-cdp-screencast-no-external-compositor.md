@@ -1,7 +1,7 @@
 ---
 id: PERF-513
 slug: test-raw-cdp-screencast-no-external-compositor
-status: claimed
+status: complete
 claimed_by: ""
 created: 2024-05-15
 completed: "2024-05-15"
@@ -43,3 +43,10 @@ This plan aims to modify `BrowserPool.ts` to remove the conflicting arguments, a
 
 ## Correctness Check
 Verify DOM output is still correct, specifically that animations and transitions remain smooth and accurately timed without external compositor control.
+
+## Results Summary
+| run | render_time_s | frames | fps_effective | peak_mem_mb | status | description |
+|---|---|---|---|---|---|---|
+| 118 | 1.801 | 150 | 83.27 | 36.4 | discard | PERF-513 Test raw CDP Screencast without external compositor control |
+
+**Outcome**: discard. The median render time regressed to ~1.801s compared to the baseline of ~1.511s. Relying on screencast frame emission with a timeout fallback for static frames is slower and less efficient than directly advancing and reading frames deterministically in lockstep using `beginFrame`.
