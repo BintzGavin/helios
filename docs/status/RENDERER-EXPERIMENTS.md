@@ -370,3 +370,7 @@ Last updated by: PERF-573
   - **What I tried**: Modified `BrowserPool.ts` concurrency calculation from `Math.max(1, (os.cpus().length || 4) - 1)` to `Math.max(1, (os.cpus().length || 4))` to match the number of workers exactly to the number of logical cores.
   - **WHY it didn't work**: The median render time did not improve and remained roughly the same as the baseline (~1.529s vs baseline ~1.541s). There was no significant throughput improvement, indicating that leaving one core free (the baseline) is sufficient and matching exactly the number of cores does not alleviate the Playwright CDP IPC wait time bottleneck. Therefore, the experiment was discarded as inconclusive noise.
   - **Outcome**: discard
+- **PERF-512**: Test raw CDP Screencast vs HeadlessExperimental.beginFrame
+  - **What I tried**: Removed `--enable-begin-frame-control` and `--run-all-compositor-stages-before-draw` from `BrowserPool.ts` and replaced `HeadlessExperimental.beginFrame` with `Page.startScreencast` using a small fallback timeout for damage-less frames in `DomStrategy.ts`.
+  - **WHY it didn't work**: The median render time regressed to ~1.664s compared to the baseline of ~1.515s. Without the deterministic explicit synchronization provided by `beginFrame` and Chromium's external compositor control, falling back to timeouts for static frames and relying purely on screencast frame emission overhead is slower and less efficient than directly advancing and reading frames in lockstep.
+  - **Outcome**: discard

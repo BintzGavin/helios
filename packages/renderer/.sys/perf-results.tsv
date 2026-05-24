@@ -114,3 +114,4 @@ run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
 1	2.158	150	69.49	42.3	discard	already implemented in baseline (PERF-488)
 1	2.158	150	69.49	42.3	discard	already implemented in baseline (PERF-491)
 2026-05-18	1.476	150	101.62	44.0	keep	Pre-check freeWorkersHead in CaptureLoop orchestrator
+1	1.664	150	90.12	45.6	discard	PERF-512 Test raw CDP Screencast vs HeadlessExperimental.beginFrame
