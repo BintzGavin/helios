@@ -206,13 +206,13 @@ export class CdpTimeDriver implements TimeDriver {
     return this.runSetTime(page, timeInSeconds);
   }
 
-  private async runSetTime(page: Page, timeInSeconds: number): Promise<void> {
+  private runSetTime(page: Page, timeInSeconds: number): Promise<void> {
     const delta = timeInSeconds - this.currentTime;
 
     // If delta is 0 or negative, we don't advance.
     // In a renderer loop, time usually moves forward.
     if (delta <= 0) {
-        return;
+        return Promise.resolve();
     }
 
     // Convert to milliseconds for CDP
@@ -226,8 +226,8 @@ export class CdpTimeDriver implements TimeDriver {
     // 2. Advance virtual time
     // This triggers the browser event loop and requestAnimationFrame
     this.setVirtualTimePolicyParams.budget = budget;
-    await new Promise<void>(this.virtualTimePromiseExecutor);
-
-    this.currentTime = timeInSeconds;
+    return new Promise<void>(this.virtualTimePromiseExecutor).then(() => {
+        this.currentTime = timeInSeconds;
+    });
   }
 }

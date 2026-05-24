@@ -23,7 +23,7 @@ export interface RenderStrategy {
    * @param frameTime The time in milliseconds to capture.
    * @returns A Promise that resolves to a Buffer containing the image data.
    */
-  capture(page: Page, frameTime: number): Promise<any>;
+  capture(page: Page, frameTime: number): Promise<any> | any;
 
   /**
    * Finishes the rendering process.
