@@ -48,3 +48,6 @@
 ## v0.77.31 - Accurate Verification of Documented API
 **Learning:** During planning to update `README.md` for undocumented API members (`audioTracks`, `videoTracks`, `setPlaybackRange`, etc.), I found that some of these were actually either already documented or they belonged to the controller interface rather than the public web component API.
 **Action:** Always carefully check the target documentation file (`README.md`) using strict grep patterns to ensure the gap actually exists, and verify if the member belongs to the public API or internal interfaces before adding it to the plan.
+## v0.77.32 - Undocumented Seeking Events
+**Learning:** Found that `seeking` and `seeked` events are being dispatched by the player but were not documented in the README.md events list.
+**Action:** Created a plan to document the missing events to maintain API parity visibility.
