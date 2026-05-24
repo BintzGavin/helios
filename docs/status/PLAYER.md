@@ -235,3 +235,4 @@
 [v0.77.30] ✅ Completed: Discovered undocumented API properties and events in README.md. Created plan `.sys/plans/2026-12-30-PLAYER-README-API-Update.md` to document `audioTracks`, `videoTracks`, `enterpictureinpicture`, and `leavepictureinpicture`.
 [v0.77.31] ✅ Completed: Discovered undocumented API properties, methods and events in README.md. Created plan `.sys/plans/2026-12-30-PLAYER-README-API-Update.md` to document `enterpictureinpicture`, `leavepictureinpicture`, `captureStream`, `startAudioMetering`, and `stopAudioMetering`.
 [v0.77.32] ✅ Completed: Document API Parity Gap - Updated README to document existing methods (captureStream, startAudioMetering, stopAudioMetering) and events (enterpictureinpicture, leavepictureinpicture).
+[v0.77.33] ✅ Completed: Discovered undocumented seeking events in README.md. Created plan `.sys/plans/v0.77.33-PLAYER-Document-Seeking-Events.md` to document `seeking` and `seeked` events.
