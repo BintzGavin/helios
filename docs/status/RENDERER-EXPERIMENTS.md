@@ -1,6 +1,6 @@
 ## Performance Trajectory
-Current best: 1.436s (baseline was 2.017s, -28%)
-Last updated by: PERF-578
+Current best: 1.427s (baseline was 1.436s, -0.6%)
+Last updated by: PERF-580
 
 ## What Works
 - **PERF-578**: Remove per-frame stability check loop in CdpTimeDriver
@@ -388,3 +388,6 @@ Last updated by: PERF-573
   - **What I tried**: Changed the concurrency calculation in `BrowserPool.ts` from `Math.max(1, (os.cpus().length || 4) - 1)` to a hardcoded `1` to eliminate multi-process IPC/context-switching overhead in the Playwright pool.
   - **WHY it didn't work**: The median render time regressed significantly to ~2.158s compared to the baseline of ~1.436s. While single-process rendering can sometimes reduce IPC noise, restricting the pool strictly to one worker in this microVM headless environment caused the capture pipeline to bottleneck heavily, indicating that parallel page workers are still beneficial and necessary for optimal throughput despite context switching overhead.
   - **Outcome**: discard
+- **PERF-580**: Bypass `capture` Promise Await and Inline CDP Session Send
+  - **What I did**: Removed `async`/`await` from `capture` in `DomStrategy.ts` and `runSetTime` in `CdpTimeDriver.ts`, returning the CDP Promise chain directly instead.
+  - **Impact**: Reduced V8 generator allocations and microtask ticks per frame. Median render time improved to ~1.427s.

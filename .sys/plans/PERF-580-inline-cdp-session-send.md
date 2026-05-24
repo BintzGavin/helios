@@ -1,11 +1,11 @@
 ---
 id: PERF-580
 slug: inline-cdp-session-send
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2026-10-31
-completed: ""
-result: ""
+completed: "2026-10-31"
+result: "improved"
 ---
 
 # PERF-580: Bypass `capture` Promise Await and Inline CDP Session Send
@@ -56,3 +56,9 @@ Run `npm run test -w packages/renderer -- --run` to ensure changes don't break C
 
 ## Correctness Check
 Run `npm run test -w packages/renderer -- --run` and execute the benchmark.
+
+## Results Summary
+- **Best render time**: 1.427s (vs baseline 1.441s)
+- **Improvement**: ~1.0%
+- **Kept experiments**: Removed `async`/`await` generator from `capture()` and `runSetTime()`
+- **Discarded experiments**: None
