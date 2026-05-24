@@ -144,4 +144,5 @@ This backlog tracks concrete deliverables derived from [`AGENTS.md`](../AGENTS.m
 - [x] [v0.46.20] CLI Blocked: Waiting for a new, valid plan in /.sys/plans/
 - [x] [v0.46.21] CLI Unblocked: Generated plan /.sys/plans/2027-06-05-CLI-Registry-Manifest-Regression-Tests.md
 - [x] [v0.46.22] CLI Unblocked: Generated plan /.sys/plans/2027-06-05-CLI-Templates-Regression-Tests.md
-- [ ] [v0.46.29] CLI Unblocked: Generated strictly new plan /.sys/plans/2027-06-05-CLI-Cloud-Templates-Regression-Tests-V2.md
+- [x] [v0.46.29] CLI Unblocked: Generated strictly new plan /.sys/plans/2027-06-05-CLI-Cloud-Templates-Regression-Tests-V2.md
+- [ ] [v0.46.36] CLI Unblocked: Generated strictly new plan /.sys/plans/2027-06-05-CLI-Job-Render-Merge-Regression-Tests-Missing-Mock.md

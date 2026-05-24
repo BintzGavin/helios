@@ -145,8 +145,9 @@ The Helios CLI is the primary user interface for component registry, project sca
 [v0.46.22] 🟢 Completed: CLI Templates Regression Tests Spec - Created specification plan `2027-06-05-CLI-Templates-Regression-Tests.md` for implementing regression tests for all file generation templates in `packages/cli/src/templates`.
 
 [v0.46.24] ✅ Completed: CLI Templates Regression Tests - Implemented unit tests for file generation templates in packages/cli/src/templates.
-- [ ] [v0.46.27] CLI Blocked: Waiting for a new, valid plan in /.sys/plans/
+- [x] [v0.46.27] CLI Blocked: Waiting for a new, valid plan in /.sys/plans/
 [v0.46.31] ✅ Completed: CLI Index Regression Tests - Implemented unit tests for the main CLI entry point in packages/cli/src/__tests__/index.test.ts.
 [v0.46.33] 🟢 Completed: CLI Registry Types Regression Tests Spec - Created specification plan `2027-06-05-CLI-Registry-Types-Regression-Tests.md` for implementing structural verification tests for registry interfaces.
 [v0.46.34] 🟢 Completed: CLI Job Types Regression Tests Spec - Created specification plan `2027-06-05-CLI-Job-Types-Regression-Tests.md` for implementing structural verification tests for job specification interfaces.
 [v0.46.35] ✅ Completed: CLI Job Types Regression Tests - Implemented unit tests for job specification interfaces in packages/cli/src/types/__tests__/job.test.ts.
+[v0.46.36] 🟢 Completed: CLI Job/Render/Merge Tests Missing Mock Spec - Created specification plan `2027-06-05-CLI-Job-Render-Merge-Regression-Tests-Missing-Mock.md` for fixing vitest mock resolution errors.
