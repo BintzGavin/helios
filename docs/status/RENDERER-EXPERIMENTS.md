@@ -374,3 +374,7 @@ Last updated by: PERF-573
   - **What I tried**: Removed `--enable-begin-frame-control` and `--run-all-compositor-stages-before-draw` from `BrowserPool.ts` and replaced `HeadlessExperimental.beginFrame` with `Page.startScreencast` using a small fallback timeout for damage-less frames in `DomStrategy.ts`.
   - **WHY it didn't work**: The median render time regressed to ~1.664s compared to the baseline of ~1.515s. Without the deterministic explicit synchronization provided by `beginFrame` and Chromium's external compositor control, falling back to timeouts for static frames and relying purely on screencast frame emission overhead is slower and less efficient than directly advancing and reading frames in lockstep.
   - **Outcome**: discard
+- **PERF-513**: Test raw CDP Screencast without external compositor control
+  - **What I tried**: Removed `--enable-begin-frame-control` and `--run-all-compositor-stages-before-draw` from `DEFAULT_BROWSER_ARGS` in `BrowserPool.ts`. Replaced `HeadlessExperimental.beginFrame` with `Page.startScreencast` and a short timeout fallback in `DomStrategy.ts`.
+  - **WHY it didn't work**: The median render time regressed to ~1.801s compared to the baseline of ~1.511s. Relying on screencast frame emission with a timeout fallback for static frames is slower and less efficient than directly advancing and reading frames deterministically in lockstep using `beginFrame`.
+  - **Outcome**: discard
