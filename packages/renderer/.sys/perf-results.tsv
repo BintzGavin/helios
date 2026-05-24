@@ -116,3 +116,6 @@ run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
 2026-05-18	1.476	150	101.62	44.0	keep	Pre-check freeWorkersHead in CaptureLoop orchestrator
 1	1.664	150	90.12	45.6	discard	PERF-512 Test raw CDP Screencast vs HeadlessExperimental.beginFrame
 118	1.801	150	83.27	36.4	discard	PERF-513 Test raw CDP Screencast without external compositor control
+1	1.448	150	103.58	42.3	keep	PERF-578 remove per-frame stability check loop
+2	1.436	150	104.45	42.3	keep	PERF-578 remove per-frame stability check loop
+3	1.391	150	107.85	42.2	keep	PERF-578 remove per-frame stability check loop

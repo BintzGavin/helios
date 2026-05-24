@@ -1,7 +1,7 @@
 ---
 id: PERF-578
 slug: remove-stability-check-loop
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2026-05-18
 completed: ""
@@ -53,3 +53,7 @@ Remove the `stabilityCheckState` block at the end of the `runSetTime` function. 
 
 ## Correctness Check
 Run the DOM render benchmark script (`./test_benchmark.sh` or `npx tsx scripts/benchmark-perf.ts`) to measure performance and ensure valid output video generation.
+## Results
+- **Status**: Kept
+- **Median Render Time**: 1.436s
+- **Improvement**: Minor improvement from baseline (~1.449s). Eliminates a redundant per-frame IPC evaluation in Phase 4 frame capture loop.
