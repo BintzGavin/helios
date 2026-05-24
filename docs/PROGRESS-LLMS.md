@@ -1,3 +1,10 @@
+## LLMS v1.86.5
+- ✅ Completed: Daily llms.txt Review
+  - Updated Roadmap in llms.txt with verifiable completions from domain PROGRESS logs.
+  - Updated Quick Facts and package versions to match the latest status versions from domain docs.
+  - Verified File Paths and Key Files.
+  - Incremented version to 1.86.5
+
 ## LLMS v1.86.1
 - ✅ Completed: Daily llms.txt Review
   - Verified package versions match package.json exactly.
