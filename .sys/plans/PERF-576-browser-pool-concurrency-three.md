@@ -1,11 +1,11 @@
 ---
 id: PERF-576
 slug: browser-pool-concurrency-three
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-24
-completed: ""
-result: ""
+completed: "2024-05-24"
+result: "no-improvement"
 ---
 
 # PERF-576: Test Exact Core Match Concurrency for DOM Strategy
@@ -51,3 +51,9 @@ Run `npm run test -w packages/renderer -- --run`
 
 ## Correctness Check
 Run the DOM render benchmark script (`npx tsx scripts/benchmark-perf.ts`) to measure performance and ensure valid output video generation.
+
+## Results Summary
+- **Best render time**: 1.529s (vs baseline 1.541s)
+- **Improvement**: 0.7% (noise)
+- **Kept experiments**: []
+- **Discarded experiments**: [BrowserPool Concurrency Exact Match]

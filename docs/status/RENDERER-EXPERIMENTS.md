@@ -366,3 +366,7 @@ Last updated by: PERF-573
   - **WHY it didn't work**: The optimization is already natively implemented in the baseline codebase.
   - **Outcome**: discard (already implemented)
 - Pre-check freeWorkersHead in CaptureLoop orchestrator: ~2% faster (PERF-575)
+- **PERF-576**: BrowserPool Concurrency Exact Match
+  - **What I tried**: Modified `BrowserPool.ts` concurrency calculation from `Math.max(1, (os.cpus().length || 4) - 1)` to `Math.max(1, (os.cpus().length || 4))` to match the number of workers exactly to the number of logical cores.
+  - **WHY it didn't work**: The median render time did not improve and remained roughly the same as the baseline (~1.529s vs baseline ~1.541s). There was no significant throughput improvement, indicating that leaving one core free (the baseline) is sufficient and matching exactly the number of cores does not alleviate the Playwright CDP IPC wait time bottleneck. Therefore, the experiment was discarded as inconclusive noise.
+  - **Outcome**: discard
