@@ -1,11 +1,11 @@
 ---
 id: PERF-512
 slug: test-raw-cdp-screencast-no-external-compositor
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-15
-completed: ""
-result: ""
+completed: 2024-05-24
+result: "no-improvement"
 ---
 
 # PERF-512: Test Raw CDP Screencast without External Compositor Control
@@ -41,3 +41,9 @@ Previous attempts to use `Page.startScreencast` failed because Chromium's extern
 
 ## Correctness Check
 Verify DOM output is still correct, specifically that animations and transitions remain smooth and accurately timed without external compositor control.
+
+## Results Summary
+- **Best render time**: 1.664s (vs baseline 1.515s)
+- **Improvement**: -9.8% (regression)
+- **Kept experiments**: []
+- **Discarded experiments**: [Test raw CDP Screencast vs HeadlessExperimental.beginFrame]
