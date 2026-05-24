@@ -1,11 +1,11 @@
 ---
 id: PERF-488
 slug: eliminate-spurious-wakeups-and-redundant-checks
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2026-05-12
-completed: ""
-result: ""
+completed: "2026-05-13"
+result: "discarded"
 ---
 # PERF-488: Eliminate Spurious Wakeups and Redundant Checks in CaptureLoop
 
@@ -83,3 +83,9 @@ Run a standard Canvas mode benchmark to ensure no regressions.
 
 ## Correctness Check
 Run the standard DOM benchmark to ensure FFmpeg successfully encodes all frames from the buffered pipe without deadlock.
+
+## Results Summary
+- **Best render time**: ~2.158s (already implemented)
+- **Improvement**: 0%
+- **Kept experiments**: None
+- **Discarded experiments**: PERF-488 (already implemented)

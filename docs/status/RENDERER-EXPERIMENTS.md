@@ -356,3 +356,12 @@ Last updated by: PERF-573
   - **What I tried**: Modified `BrowserPool.ts` concurrency calculation from `Math.max(1, (os.cpus().length || 4) - 1)` to `Math.max(1, (os.cpus().length || 4) * 2 - 1)` to oversubscribe workers.
   - **WHY it didn't work**: The median render time regressed to ~1.650s compared to the baseline of ~1.368s. Although Playwright IPC and Chromium's CDP `beginFrame` loop are heavily I/O bound, oversubscribing workers in a CPU-constrained microVM (e.g. 7 workers on a 4-core machine) introduced too much context-switching overhead and CPU contention. The existing formula correctly balances process scheduling and thread pooling for the current headless deployment without saturating Node's event loop with parallel CDP wait routines.
   - **Outcome**: discard
+
+- **PERF-488**: Eliminate Spurious Wakeups and Redundant Checks
+  - **What I tried**: Evaluated eliminating spurious wakeups and redundant checkState calls in CaptureLoop.ts.
+  - **WHY it didn't work**: The optimizations are already natively implemented in the baseline codebase.
+  - **Outcome**: discard (already implemented)
+- **PERF-491**: Eliminate Redundant checkState calls
+  - **What I tried**: Evaluated removing redundant checkState calls in CaptureLoop.ts.
+  - **WHY it didn't work**: The optimization is already natively implemented in the baseline codebase.
+  - **Outcome**: discard (already implemented)

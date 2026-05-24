@@ -1,11 +1,11 @@
 ---
 id: PERF-491
 slug: eliminate-redundant-checkstate
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2026-05-13
-completed: ""
-result: ""
+completed: "2026-05-13"
+result: "discarded"
 ---
 # PERF-491: Eliminate Redundant `checkState()` Calls in CaptureLoop
 
@@ -41,3 +41,8 @@ Run a standard Canvas mode benchmark to ensure no regressions.
 
 ## Correctness Check
 Run the standard DOM benchmark to ensure the capture loop successfully processes all frames without deadlocking.
+## Results Summary
+- **Best render time**: ~2.158s (already implemented)
+- **Improvement**: 0%
+- **Kept experiments**: None
+- **Discarded experiments**: PERF-491 (already implemented)
