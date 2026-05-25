@@ -3,19 +3,17 @@ id: PERF-589
 slug: inline-ffmpeg-stdin-writes
 status: unclaimed
 claimed_by: ""
-created: 2024-05-25
+created: 2026-10-31
 completed: ""
 result: ""
 ---
-
 # PERF-589: Inline FFmpeg stdin writes in CaptureLoop
 
 ## Focus Area
-DOM Rendering Pipeline - Output buffer writing loop in `packages/renderer/src/core/CaptureLoop.ts`.
+The write operation to FFmpeg's `stdin` inside the CaptureLoop hot loop. Replacing the separate `writeToStdin` method with direct inline `this.ffmpegManager.stdin.write` calls.
 
 ## Background Research
-In `CaptureLoop.ts`, the frame data is currently piped to FFmpeg via `this.writeToStdin(buffer, this.handleWriteError)`, where `writeToStdin` handles both strings (base64) and raw Buffers, determines writeability, and optionally returns a drain Promise.
-The overhead of invoking `writeToStdin` and returning/handling this mixed state for every frame inside the final synchronization `while` loop can be avoided by directly calling `this.ffmpegManager.stdin.write()` inline. Since the type of `buffer` (either string or Buffer) is known within `writeToStdin` but must be re-checked dynamically on every call, we can optimize this hot path. The V8 JIT compiler can optimize direct property access and `write` calls significantly better than a wrapper function returning an optional Promise, particularly since most intermediate frames will likely be Strings (Base64 from CDP) or pre-allocated Buffers.
+Currently, `CaptureLoop.ts` calls `this.writeToStdin(buffer, this.handleWriteError)` inside its hot loop. This method handles two types of buffers (Buffer and string) and conditionally returns a Promise if `stdin.write` returns `false` indicating backpressure. The overhead of calling a separate method, evaluating conditions for the buffer type, and handling optional Promise returns in V8 can introduce micro-delays inside the `while` loop that writes frames. By inlining this exact behavior directly into the `CaptureLoop.ts` hot loop, we eliminate method invocation overhead and closure generation in V8.
 
 ## Benchmark Configuration
 - **Composition URL**: Standard benchmark composition (`examples/dom-benchmark`)
@@ -25,32 +23,18 @@ The overhead of invoking `writeToStdin` and returning/handling this mixed state 
 - **Minimum runs**: 3 per experiment, report median
 
 ## Baseline
-- **Current estimated render time**: ~1.298s
-- **Bottleneck analysis**: Function call overhead and dynamic type checking during the high-frequency buffer write loop in `CaptureLoop.ts`.
+- **Current estimated render time**: ~1.345s
+- **Bottleneck analysis**: Microtask queue scheduling overhead from function dispatches and promise wrapping inside the frame writing loop.
 
 ## Implementation Spec
 
-### Step 1: Inline `writeToStdin` logic directly into the frame processing loop
+### Step 1: Inline `writeToStdin` inside `CaptureLoop.ts` `run()`
 **File**: `packages/renderer/src/core/CaptureLoop.ts`
 **What to change**:
-In `CaptureLoop.ts`, remove the `writeToStdin` method entirely.
-Inside the `try` block for writing frames:
+1. Remove the `writeToStdin` method entirely from the `CaptureLoop` class.
+2. Inside `run()`, in the hot loop (around line 252):
 ```typescript
-            if (previousWritePromise) {
-                await previousWritePromise;
-            }
-
-            const writeResult = this.writeToStdin(buffer, this.handleWriteError);
-            previousWritePromise = writeResult ? writeResult : undefined;
-```
-
-Replace it with the directly inlined logic:
-```typescript
-            if (previousWritePromise) {
-                await previousWritePromise;
-                previousWritePromise = undefined;
-            }
-
+            let writeResult: Promise<void> | undefined;
             if (this.ffmpegManager.stdin?.writable) {
                 let canWriteMore: boolean;
                 if (typeof buffer === 'string') {
@@ -58,45 +42,40 @@ Replace it with the directly inlined logic:
                 } else {
                     canWriteMore = this.ffmpegManager.stdin.write(buffer, this.handleWriteError);
                 }
-
                 if (!canWriteMore) {
-                    previousWritePromise = new Promise<void>(this.drainPromiseExecutor);
+                    writeResult = new Promise<void>(this.drainPromiseExecutor);
                 }
             } else {
                 console.warn('FFmpeg stdin is not writable. Skipping write.');
             }
+            previousWritePromise = writeResult ? writeResult : undefined;
 ```
-
-And similarly inline it for the `finalBuffer` write at the end of the `run` method:
-```typescript
-    if (finalBuffer && ((Buffer.isBuffer(finalBuffer) && finalBuffer.length > 0) || (typeof finalBuffer === 'string' && finalBuffer.length > 0))) {
-      console.log(`Writing final buffer...`);
-      const writeResult = this.writeToStdin(finalBuffer, this.handleWriteError);
-      if (writeResult) await writeResult;
-    }
-```
-
-Replace it with:
+Replace the existing `const writeResult = this.writeToStdin(...)` and `previousWritePromise = ...` lines with the logic above.
+3. Update the final flush out of the loop (around line 283):
 ```typescript
     if (finalBuffer && ((Buffer.isBuffer(finalBuffer) && finalBuffer.length > 0) || (typeof finalBuffer === 'string' && finalBuffer.length > 0))) {
       console.log(`Writing final buffer...`);
       if (this.ffmpegManager.stdin?.writable) {
-          let canWriteMore: boolean;
-          if (typeof finalBuffer === 'string') {
-              canWriteMore = this.ffmpegManager.stdin.write(finalBuffer, 'base64', this.handleWriteError);
-          } else {
-              canWriteMore = this.ffmpegManager.stdin.write(finalBuffer, this.handleWriteError);
-          }
-          if (!canWriteMore) {
-              await new Promise<void>(this.drainPromiseExecutor);
-          }
+        let canWriteMore: boolean;
+        if (typeof finalBuffer === 'string') {
+            canWriteMore = this.ffmpegManager.stdin.write(finalBuffer, 'base64', this.handleWriteError);
+        } else {
+            canWriteMore = this.ffmpegManager.stdin.write(finalBuffer, this.handleWriteError);
+        }
+        if (!canWriteMore) {
+            await new Promise<void>(this.drainPromiseExecutor);
+        }
       } else {
           console.warn('FFmpeg stdin is not writable. Skipping write.');
       }
     }
 ```
+Replace the existing `const writeResult = this.writeToStdin(finalBuffer, this.handleWriteError);` and `if (writeResult) await writeResult;` logic with the code above.
+**Why**: Avoids function call dispatch overhead and simplifies V8 inline optimization for the hot loop path.
+**Risk**: Minimal. Behavior is identical.
 
-**Why**: Avoids the wrapper function call `writeToStdin` and the optional Promise return assignment overhead on every single frame.
+## Canvas Smoke Test
+Run `npm run test -w packages/renderer -- --run` to ensure changes don't break Canvas compilation.
 
 ## Correctness Check
-Execute the renderer benchmark to verify the video outputs correctly without dropped frames or pipeline deadlocks.
+Verify output video still produces the correct number of frames without truncating or locking.
