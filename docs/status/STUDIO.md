@@ -1,10 +1,12 @@
-**Version**: 0.121.16
+**Version**: 0.121.17
 
 [v0.121.13] ✅ Completed: Expand Reverse Speeds - Added -4x and -2x reverse playback options to the PlaybackControls component.
 
 **Posture**: ACTIVELY EXPANDING FOR V2
 
 # Studio Domain Status
+
+[v0.121.17] ✅ Completed: STUDIO-Timeline-Scrubber - Verified timeline scrubber is already fully implemented as the Timeline.tsx component (IMPOSSIBLE: DUPLICATION).
 - [v0.121.16] ✅ Completed: Refine CLI Component Removal - Verified that the `helios remove` CLI command already deletes component files by default (IMPOSSIBLE: DUPLICATION).
 - [v0.121.16] ✅ Completed: Add JKL Playback Shortcuts - Verified that the `J, K, L` playback shortcuts are already implemented in `GlobalShortcuts.tsx` (IMPOSSIBLE: DUPLICATION).
 - [v0.121.16] ✅ Completed: Timeline Drag & Drop - Verified that the timeline drag drop logic is already fully implemented (IMPOSSIBLE: DUPLICATION).
