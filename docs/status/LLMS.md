@@ -1,5 +1,5 @@
 # Status: LLMS
-**Version**: 1.86.5
+**Version**: 1.86.6
 
 [v1.86.3] ✅ Completed: Comprehensive Daily Review - Updated Roadmap with recent completions across CLI (Regression Tests), Player (Index Coverage), Renderer (WebCodecs, Skill Docs), and Infrastructure (S3 Uploads).
 [v1.86.2] ✅ Completed: Comprehensive Daily Review - Updated Roadmap with Cloudflare Sandbox Adapter support and added Player API parity and shortcut documentation items. Verified File Paths and Key Files.
@@ -155,3 +155,5 @@ Verified package versions match package.json exactly. Verified File Paths and Ke
 [v1.84.3] ✅ Completed: Daily llms.txt Review - Fixed Agent Skill paths and updated roadmap with recent verified completions.
 [v1.86.5] ✅ Completed: Comprehensive Daily Review - Updated Roadmap in llms.txt with recent verifiable completions from domain PROGRESS logs (Studio: Expand Reverse Speeds; Player: Expand Index Coverage, Document Tracks API, Implement WebVTT Support; Renderer: Refactor DOM Traversal, Canvas Image Preload; CLI: CLI Registry Types Regression Tests; Infrastructure: FfmpegStitcher Coverage). Updated Quick Facts to match actual status versions. Verified all Key Files and Package descriptions.
 [v1.86.4] ✅ Completed: Comprehensive Daily Review - Verified package versions, checked Key Files and Agent Skills sections. No changes required to llms.txt as it matches the true project state perfectly.
+
+[v1.86.6] ✅ Completed: Comprehensive Daily Review - Realigned Quick Facts and Roadmap versions to actual package.json versions (Studio v0.107.1+, CLI v0.45.2+, Player v0.76.20+, Renderer v1.78.3+, Infrastructure v0.25.0+). Added CLI Index Regression Tests to Roadmap.
