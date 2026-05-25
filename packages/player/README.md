@@ -203,6 +203,8 @@ The element dispatches the following custom events:
 
 - `play`: Fired when playback starts.
 - `pause`: Fired when playback is paused.
+- `seeking`: Fired when a seek operation starts.
+- `seeked`: Fired when a seek operation completes.
 - `ended`: Fired when playback completes.
 - `timeupdate`: Fired when the current time/frame changes.
 - `volumechange`: Fired when volume or mute state changes.

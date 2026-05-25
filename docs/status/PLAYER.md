@@ -1,9 +1,9 @@
-**Version**: 0.77.38
+**Version**: 0.77.39
 [v0.77.38] ✅ Completed: Expand Index Coverage - Added unit tests for disconnectedCallback in packages/player/src/index.ts.
 [v0.77.37] ✅ Completed: Improve index.ts test coverage - Added tests for diagnose API and retryConnection.
 [v0.77.36] ✅ Completed: Discovered that 2026-06-21-PLAYER-Smart-Controls.md is an IMPOSSIBLE: DUPLICATION plan. The smart controls for CC and PiP are already fully implemented. Documented as duplicate and discarded.
 [v0.77.35] ✅ Completed: Improve index.ts test coverage - Added tests for captureStream and audio metering edge cases.
-[v0.77.34] ✅ Completed: Discovered that 2026-11-26-PLAYER-Add-Undocumented-Shortcuts-UI.md is an IMPOSSIBLE: DUPLICATION plan. The shortcuts are already fully implemented in the UI overlay inside index.ts. Documented as impossible and discarded.
+[v0.77.39] ✅ Completed: Discovered that 2026-11-26-PLAYER-Add-Undocumented-Shortcuts-UI.md is an IMPOSSIBLE: DUPLICATION plan. The shortcuts are already fully implemented in the UI overlay inside index.ts. Documented as impossible and discarded.
 [v0.77.33] ✅ Completed: Discovered that 2026-03-01-PLAYER-Client-Side-Video-Inlining.md is an IMPOSSIBLE: DUPLICATION plan. The inlineVideos functionality is already fully implemented and tested in dom-capture.ts. Documented as impossible and discarded.
 [v0.77.30] ✅ Completed: Document Tracks API - Added audioTracks and videoTracks properties to README.md API parity list.
 [v0.77.27] ✅ Completed: Document API Parity Gap - Deleted lingering plan file as the README already contained the required documentation updates.
@@ -236,3 +236,4 @@
 [v0.77.31] ✅ Completed: Discovered undocumented API properties, methods and events in README.md. Created plan `.sys/plans/2026-12-30-PLAYER-README-API-Update.md` to document `enterpictureinpicture`, `leavepictureinpicture`, `captureStream`, `startAudioMetering`, and `stopAudioMetering`.
 [v0.77.32] ✅ Completed: Document API Parity Gap - Updated README to document existing methods (captureStream, startAudioMetering, stopAudioMetering) and events (enterpictureinpicture, leavepictureinpicture).
 [v0.77.33] ✅ Completed: Discovered undocumented seeking events in README.md. Created plan `.sys/plans/v0.77.33-PLAYER-Document-Seeking-Events.md` to document `seeking` and `seeked` events.
+[v0.77.39] ✅ Completed: Document Seeking Events - Updated README to document existing seeking and seeked events to match the actual implementation in packages/player/src/index.ts.
