@@ -1,11 +1,11 @@
 ---
 id: PERF-589
 slug: inline-ffmpeg-stdin-writes
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-25
-completed: ""
-result: ""
+completed: "2026-05-25"
+result: "improved"
 ---
 
 # PERF-589: Inline FFmpeg stdin writes in CaptureLoop

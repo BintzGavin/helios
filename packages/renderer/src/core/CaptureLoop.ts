@@ -66,23 +66,6 @@ export class CaptureLoop {
     });
   }
 
-  private writeToStdin(buffer: Buffer | string, onWriteError: (err?: Error | null) => void): Promise<void> | void {
-    if (!this.ffmpegManager.stdin?.writable) {
-      console.warn('FFmpeg stdin is not writable. Skipping write.');
-      return;
-    }
-
-    let canWriteMore: boolean;
-    if (typeof buffer === 'string') {
-        canWriteMore = this.ffmpegManager.stdin.write(buffer, 'base64', onWriteError);
-    } else {
-        canWriteMore = this.ffmpegManager.stdin.write(buffer, onWriteError);
-    }
-
-    if (!canWriteMore) {
-        return new Promise<void>(this.drainPromiseExecutor);
-    }
-  }
 
 
   public async run(): Promise<void> {
@@ -247,10 +230,23 @@ export class CaptureLoop {
 
             if (previousWritePromise) {
                 await previousWritePromise;
+                previousWritePromise = undefined;
             }
 
-            const writeResult = this.writeToStdin(buffer, this.handleWriteError);
-            previousWritePromise = writeResult ? writeResult : undefined;
+            if (this.ffmpegManager.stdin?.writable) {
+                let canWriteMore: boolean;
+                if (typeof buffer === 'string') {
+                    canWriteMore = this.ffmpegManager.stdin.write(buffer, 'base64', this.handleWriteError);
+                } else {
+                    canWriteMore = this.ffmpegManager.stdin.write(buffer, this.handleWriteError);
+                }
+
+                if (!canWriteMore) {
+                    previousWritePromise = new Promise<void>(this.drainPromiseExecutor);
+                }
+            } else {
+                console.warn('FFmpeg stdin is not writable. Skipping write.');
+            }
 
             nextFrameToWrite++;
         }
@@ -280,8 +276,19 @@ export class CaptureLoop {
     const finalBuffer = await this.pool[0].strategy.finish(this.pool[0].page);
     if (finalBuffer && ((Buffer.isBuffer(finalBuffer) && finalBuffer.length > 0) || (typeof finalBuffer === 'string' && finalBuffer.length > 0))) {
       console.log(`Writing final buffer...`);
-      const writeResult = this.writeToStdin(finalBuffer, this.handleWriteError);
-      if (writeResult) await writeResult;
+      if (this.ffmpegManager.stdin?.writable) {
+          let canWriteMore: boolean;
+          if (typeof finalBuffer === 'string') {
+              canWriteMore = this.ffmpegManager.stdin.write(finalBuffer, 'base64', this.handleWriteError);
+          } else {
+              canWriteMore = this.ffmpegManager.stdin.write(finalBuffer, this.handleWriteError);
+          }
+          if (!canWriteMore) {
+              await new Promise<void>(this.drainPromiseExecutor);
+          }
+      } else {
+          console.warn('FFmpeg stdin is not writable. Skipping write.');
+      }
     }
 
     console.log('Finished sending frames. Closing FFmpeg stdin.');
