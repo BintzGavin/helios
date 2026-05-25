@@ -405,3 +405,4 @@ Last updated by: PERF-573
   - **What I tried**: Removed `.catch(this.handleVirtualTimeBudgetError)` from the `virtualTimePromiseExecutor` in `CdpTimeDriver.ts` to bypass a Promise allocation on every frame iteration.
   - **Why it didn't work**: It caused a performance regression (median ~1.517s vs baseline ~1.427s). Removing the trailing error handler might have altered how V8 handles the Promise chain closure lifecycle in the hot loop, negatively impacting optimizations despite avoiding the explicit Promise allocation.
   - **Outcome**: discard
+- PERF-579: Bypass `capture` Promise Await. Inlining `currentTime` assignment and returning the promise directly in `runSetTime` (avoiding `.then`) yielded a slight performance regression (1.361s vs 1.349s). The V8 engine seems to optimize the local closure effectively.
