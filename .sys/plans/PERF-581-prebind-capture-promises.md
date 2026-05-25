@@ -1,11 +1,11 @@
 ---
 id: PERF-581
 slug: prebind-capture-promises
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-25
-completed: ""
-result: ""
+completed: "2024-05-25"
+result: "discarded"
 ---
 
 # PERF-581: Prebind Promises and Eliminate Closures in Capture Hot Loop
@@ -103,3 +103,9 @@ Run `npm run test -w packages/renderer -- --run` and execute the benchmark.
 
 ## Prior Art
 Builds on PERF-580, which eliminated the `async`/`await` generator state machines in these exact functions. This takes it a step further by eliminating the closures and trailing `.then()`/.`catch()` Promise chaining.
+
+## Results Summary
+- **Best render time**: 1.477s (median 1.516s)
+- **Improvement**: Regressed compared to baseline (~1.427s)
+- **Kept experiments**: None
+- **Discarded experiments**: Prebind CDP capture handlers and eliminate closures in `DomStrategy.ts` and `CdpTimeDriver.ts`. Reason: Indirect function execution contexts slightly slowed down Promise resolution compared to V8's highly optimized inline closures.
