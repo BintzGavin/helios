@@ -1,11 +1,11 @@
 ---
 id: PERF-583
 slug: bypass-promise-catch-allocation
-status: unclaimed
-claimed_by: ""
+status: completed
+claimed_by: "executor-session"
 created: 2024-05-25
-completed: ""
-result: ""
+completed: 2024-05-25
+result: failed
 ---
 
 # PERF-583: Eliminate `.catch()` Promise Chaining in CdpTimeDriver Executor
@@ -62,3 +62,9 @@ Run `npm run test -w packages/renderer -- --run` and execute the benchmark.
 
 ## Prior Art
 Builds on PERF-580, which eliminated the `async`/`await` generator state machines. This removes the final trailing `.catch()` Promise chain allocation.
+
+## Results Summary
+- **Best render time**: 1.517s (vs baseline 1.427s)
+- **Improvement**: Regressed
+- **Kept experiments**: none
+- **Discarded experiments**: PERF-583
