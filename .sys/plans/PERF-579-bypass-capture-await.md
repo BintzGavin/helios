@@ -1,11 +1,11 @@
 ---
 id: PERF-579
 slug: bypass-capture-await
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2026-10-30
-completed: ""
-result: ""
+completed: 2026-05-25
+result: failed
 ---
 
 # PERF-579: Bypass `capture` Promise Await in Worker Run Loop
@@ -72,3 +72,8 @@ Run `npm run test -w packages/renderer -- --run` to ensure changes don't break C
 
 ## Correctness Check
 Run `npm run test -w packages/renderer -- --run` and execute the benchmark.
+## Results Summary
+- **Best render time**: 1.361s (vs baseline 1.349s)
+- **Improvement**: -0.89%
+- **Kept experiments**: None
+- **Discarded experiments**: Bypass capture Promise await
