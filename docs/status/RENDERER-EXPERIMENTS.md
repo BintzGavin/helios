@@ -401,3 +401,7 @@ Last updated by: PERF-573
   - **What I tried**: Attempted to pre-bind CDP success and error handlers as class properties in `DomStrategy.ts` and manually update the driver state to bypass closures and short promise chains in `CdpTimeDriver.ts`.
   - **WHY it didn't work**: The median render time regressed to ~1.516s compared to the baseline of ~1.427s. Replacing inline closures with bound instance properties likely created indirect execution contexts for V8, slowing down the fast-path resolution of the promise chain slightly more than the garbage collection overhead saved.
   - **Outcome**: discard
+- **PERF-583**: Eliminate `.catch()` Promise Chaining in CdpTimeDriver Executor
+  - **What I tried**: Removed `.catch(this.handleVirtualTimeBudgetError)` from the `virtualTimePromiseExecutor` in `CdpTimeDriver.ts` to bypass a Promise allocation on every frame iteration.
+  - **Why it didn't work**: It caused a performance regression (median ~1.517s vs baseline ~1.427s). Removing the trailing error handler might have altered how V8 handles the Promise chain closure lifecycle in the hot loop, negatively impacting optimizations despite avoiding the explicit Promise allocation.
+  - **Outcome**: discard
