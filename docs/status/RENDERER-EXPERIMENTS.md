@@ -56,6 +56,8 @@ Last updated by: PERF-580
   - **Outcome**: discard
 
 ## What Doesn't Work (and Why)
+- **Inlining `CdpTimeDriver.ts` `setTime` promise via class property (PERF-582)**: Tried to eliminate the trailing `.then()` closure in `runSetTime` by storing `targetTime` as a class property and updating `currentTime` directly in the `handleVirtualTimeBudgetExpired` event handler. Caused a performance regression (median ~1.788s vs baseline ~1.427s). This implies that retaining closure locality within the Promise execution chain is actually more efficient for V8 optimization compared to repeatedly accessing and mutating instance properties.
+- **Inlining `CdpTimeDriver.ts` `setTime` promise via class property (PERF-582)**: Tried to eliminate the trailing `.then()` closure in `runSetTime` by storing `targetTime` as a class property and updating `currentTime` directly in the `handleVirtualTimeBudgetExpired` event handler. Caused a performance regression (median ~1.788s vs baseline ~1.427s). This implies that retaining closure locality within the Promise execution chain is actually more efficient for V8 optimization compared to repeatedly accessing and mutating instance properties.
 - [FAILED] Skipping base64 payload serialization on identical frames via dirty tracking (PERF-572) - Flawed heuristic misses CSS animations, scrolling, Canvas/WebGL updates, etc.
 - **PERF-507: Eliminate defaultStabilityCheck method and inline logic**
   - **What I tried**: Attempted to inline `defaultStabilityCheck` directly into `runSetTime` in `CdpTimeDriver.ts`.
@@ -159,6 +161,7 @@ Last updated by: PERF-580
 - Plan ID: PERF-518
 
 ## What Doesn't Work (and Why)
+- **Inlining `CdpTimeDriver.ts` `setTime` promise via class property (PERF-582)**: Tried to eliminate the trailing `.then()` closure in `runSetTime` by storing `targetTime` as a class property and updating `currentTime` directly in the `handleVirtualTimeBudgetExpired` event handler. Caused a performance regression (median ~1.788s vs baseline ~1.427s). This implies that retaining closure locality within the Promise execution chain is actually more efficient for V8 optimization compared to repeatedly accessing and mutating instance properties.
 - **PERF-507: Eliminate defaultStabilityCheck method and inline logic**
   - **What I tried**: Attempted to inline `defaultStabilityCheck` directly into `runSetTime` in `CdpTimeDriver.ts`.
   - **WHY it didn't work**: The `defaultStabilityCheck` method had already been eliminated in previous iterations (likely PERF-506) and the `Runtime.evaluate` call was already inlined. This experiment was discarded as a duplicate with no code changes.
@@ -201,6 +204,7 @@ Last updated by: PERF-580
   - **Outcome**: discard
 
 ## What Doesn't Work (and Why)
+- **Inlining `CdpTimeDriver.ts` `setTime` promise via class property (PERF-582)**: Tried to eliminate the trailing `.then()` closure in `runSetTime` by storing `targetTime` as a class property and updating `currentTime` directly in the `handleVirtualTimeBudgetExpired` event handler. Caused a performance regression (median ~1.788s vs baseline ~1.427s). This implies that retaining closure locality within the Promise execution chain is actually more efficient for V8 optimization compared to repeatedly accessing and mutating instance properties.
 - **PERF-507: Eliminate defaultStabilityCheck method and inline logic**
   - **What I tried**: Attempted to inline `defaultStabilityCheck` directly into `runSetTime` in `CdpTimeDriver.ts`.
   - **WHY it didn't work**: The `defaultStabilityCheck` method had already been eliminated in previous iterations (likely PERF-506) and the `Runtime.evaluate` call was already inlined. This experiment was discarded as a duplicate with no code changes.
@@ -277,6 +281,7 @@ Last updated by: PERF-580
   - **Outcome**: discard
 
 ## What Doesn't Work (and Why)
+- **Inlining `CdpTimeDriver.ts` `setTime` promise via class property (PERF-582)**: Tried to eliminate the trailing `.then()` closure in `runSetTime` by storing `targetTime` as a class property and updating `currentTime` directly in the `handleVirtualTimeBudgetExpired` event handler. Caused a performance regression (median ~1.788s vs baseline ~1.427s). This implies that retaining closure locality within the Promise execution chain is actually more efficient for V8 optimization compared to repeatedly accessing and mutating instance properties.
 - **PERF-507: Eliminate defaultStabilityCheck method and inline logic**
   - **What I tried**: Attempted to inline `defaultStabilityCheck` directly into `runSetTime` in `CdpTimeDriver.ts`.
   - **WHY it didn't work**: The `defaultStabilityCheck` method had already been eliminated in previous iterations (likely PERF-506) and the `Runtime.evaluate` call was already inlined. This experiment was discarded as a duplicate with no code changes.
@@ -320,6 +325,7 @@ Last updated by: PERF-580
   - **Outcome**: discard
 
 ## What Doesn't Work (and Why)
+- **Inlining `CdpTimeDriver.ts` `setTime` promise via class property (PERF-582)**: Tried to eliminate the trailing `.then()` closure in `runSetTime` by storing `targetTime` as a class property and updating `currentTime` directly in the `handleVirtualTimeBudgetExpired` event handler. Caused a performance regression (median ~1.788s vs baseline ~1.427s). This implies that retaining closure locality within the Promise execution chain is actually more efficient for V8 optimization compared to repeatedly accessing and mutating instance properties.
 - **PERF-507: Eliminate defaultStabilityCheck method and inline logic**
   - **What I tried**: Attempted to inline `defaultStabilityCheck` directly into `runSetTime` in `CdpTimeDriver.ts`.
   - **WHY it didn't work**: The `defaultStabilityCheck` method had already been eliminated in previous iterations (likely PERF-506) and the `Runtime.evaluate` call was already inlined. This experiment was discarded as a duplicate with no code changes.

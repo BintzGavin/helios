@@ -1,11 +1,11 @@
 ---
 id: PERF-582
 slug: inline-setTime-promise
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-05-25
-completed: ""
-result: ""
+completed: "2024-05-25"
+result: "discard"
 ---
 
 # PERF-582: Eliminate `.then()` Chain in CdpTimeDriver `runSetTime`
@@ -75,3 +75,10 @@ Run `npm run test -w packages/renderer -- --run` and execute the benchmark.
 
 ## Prior Art
 Builds on PERF-580, which eliminated the `async`/`await` generator state machines in these exact functions. This takes it a step further by eliminating the closures and trailing `.then()`/.`catch()` Promise chaining.
+
+## Results Summary
+| run | render_time_s | frames | fps_effective | peak_mem_mb | status | description |
+|-----|---------------|--------|---------------|-------------|--------|-------------|
+| 1   | 1.639         | 150    | 91.52         | 42.3        | discard | inlining setTime promise |
+| 2   | 1.791         | 150    | 83.76         | 42.1        | discard | inlining setTime promise |
+| 3   | 1.788         | 150    | 83.89         | 42.2        | discard | inlining setTime promise |
