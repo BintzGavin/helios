@@ -56,6 +56,14 @@ Last updated by: PERF-580
   - **Outcome**: discard
 
 ## What Doesn't Work (and Why)
+- **PERF-585**: Eliminate Progress Modulo
+  - **What I tried**: Eliminated the per-frame modulo operator in the `CaptureLoop.ts` hot loop.
+  - **Why it didn't work**: The overhead of tracking an additional numeric state variable and reassigning it offset the micro-savings from avoiding the modulo operator in V8, leading to a performance regression (median ~1.663s vs baseline ~1.550s).
+  - **Plan ID**: PERF-585
+- **PERF-585**: Eliminate Progress Modulo
+  - **What I tried**: Eliminated the per-frame modulo operator in the `CaptureLoop.ts` hot loop.
+  - **Why it didn't work**: The overhead of tracking an additional numeric state variable and reassigning it offset the micro-savings from avoiding the modulo operator in V8, leading to a performance regression (median ~1.663s vs baseline ~1.550s).
+  - **Plan ID**: PERF-585
 - **Inlining `CdpTimeDriver.ts` `setTime` promise via class property (PERF-582)**: Tried to eliminate the trailing `.then()` closure in `runSetTime` by storing `targetTime` as a class property and updating `currentTime` directly in the `handleVirtualTimeBudgetExpired` event handler. Caused a performance regression (median ~1.788s vs baseline ~1.427s). This implies that retaining closure locality within the Promise execution chain is actually more efficient for V8 optimization compared to repeatedly accessing and mutating instance properties.
 - **Inlining `CdpTimeDriver.ts` `setTime` promise via class property (PERF-582)**: Tried to eliminate the trailing `.then()` closure in `runSetTime` by storing `targetTime` as a class property and updating `currentTime` directly in the `handleVirtualTimeBudgetExpired` event handler. Caused a performance regression (median ~1.788s vs baseline ~1.427s). This implies that retaining closure locality within the Promise execution chain is actually more efficient for V8 optimization compared to repeatedly accessing and mutating instance properties.
 - [FAILED] Skipping base64 payload serialization on identical frames via dirty tracking (PERF-572) - Flawed heuristic misses CSS animations, scrolling, Canvas/WebGL updates, etc.
@@ -161,6 +169,10 @@ Last updated by: PERF-580
 - Plan ID: PERF-518
 
 ## What Doesn't Work (and Why)
+- **PERF-585**: Eliminate Progress Modulo
+  - **What I tried**: Eliminated the per-frame modulo operator in the `CaptureLoop.ts` hot loop.
+  - **Why it didn't work**: The overhead of tracking an additional numeric state variable and reassigning it offset the micro-savings from avoiding the modulo operator in V8, leading to a performance regression (median ~1.663s vs baseline ~1.550s).
+  - **Plan ID**: PERF-585
 - **Inlining `CdpTimeDriver.ts` `setTime` promise via class property (PERF-582)**: Tried to eliminate the trailing `.then()` closure in `runSetTime` by storing `targetTime` as a class property and updating `currentTime` directly in the `handleVirtualTimeBudgetExpired` event handler. Caused a performance regression (median ~1.788s vs baseline ~1.427s). This implies that retaining closure locality within the Promise execution chain is actually more efficient for V8 optimization compared to repeatedly accessing and mutating instance properties.
 - **PERF-507: Eliminate defaultStabilityCheck method and inline logic**
   - **What I tried**: Attempted to inline `defaultStabilityCheck` directly into `runSetTime` in `CdpTimeDriver.ts`.
@@ -204,6 +216,10 @@ Last updated by: PERF-580
   - **Outcome**: discard
 
 ## What Doesn't Work (and Why)
+- **PERF-585**: Eliminate Progress Modulo
+  - **What I tried**: Eliminated the per-frame modulo operator in the `CaptureLoop.ts` hot loop.
+  - **Why it didn't work**: The overhead of tracking an additional numeric state variable and reassigning it offset the micro-savings from avoiding the modulo operator in V8, leading to a performance regression (median ~1.663s vs baseline ~1.550s).
+  - **Plan ID**: PERF-585
 - **Inlining `CdpTimeDriver.ts` `setTime` promise via class property (PERF-582)**: Tried to eliminate the trailing `.then()` closure in `runSetTime` by storing `targetTime` as a class property and updating `currentTime` directly in the `handleVirtualTimeBudgetExpired` event handler. Caused a performance regression (median ~1.788s vs baseline ~1.427s). This implies that retaining closure locality within the Promise execution chain is actually more efficient for V8 optimization compared to repeatedly accessing and mutating instance properties.
 - **PERF-507: Eliminate defaultStabilityCheck method and inline logic**
   - **What I tried**: Attempted to inline `defaultStabilityCheck` directly into `runSetTime` in `CdpTimeDriver.ts`.
@@ -281,6 +297,10 @@ Last updated by: PERF-580
   - **Outcome**: discard
 
 ## What Doesn't Work (and Why)
+- **PERF-585**: Eliminate Progress Modulo
+  - **What I tried**: Eliminated the per-frame modulo operator in the `CaptureLoop.ts` hot loop.
+  - **Why it didn't work**: The overhead of tracking an additional numeric state variable and reassigning it offset the micro-savings from avoiding the modulo operator in V8, leading to a performance regression (median ~1.663s vs baseline ~1.550s).
+  - **Plan ID**: PERF-585
 - **Inlining `CdpTimeDriver.ts` `setTime` promise via class property (PERF-582)**: Tried to eliminate the trailing `.then()` closure in `runSetTime` by storing `targetTime` as a class property and updating `currentTime` directly in the `handleVirtualTimeBudgetExpired` event handler. Caused a performance regression (median ~1.788s vs baseline ~1.427s). This implies that retaining closure locality within the Promise execution chain is actually more efficient for V8 optimization compared to repeatedly accessing and mutating instance properties.
 - **PERF-507: Eliminate defaultStabilityCheck method and inline logic**
   - **What I tried**: Attempted to inline `defaultStabilityCheck` directly into `runSetTime` in `CdpTimeDriver.ts`.
@@ -325,6 +345,10 @@ Last updated by: PERF-580
   - **Outcome**: discard
 
 ## What Doesn't Work (and Why)
+- **PERF-585**: Eliminate Progress Modulo
+  - **What I tried**: Eliminated the per-frame modulo operator in the `CaptureLoop.ts` hot loop.
+  - **Why it didn't work**: The overhead of tracking an additional numeric state variable and reassigning it offset the micro-savings from avoiding the modulo operator in V8, leading to a performance regression (median ~1.663s vs baseline ~1.550s).
+  - **Plan ID**: PERF-585
 - **Inlining `CdpTimeDriver.ts` `setTime` promise via class property (PERF-582)**: Tried to eliminate the trailing `.then()` closure in `runSetTime` by storing `targetTime` as a class property and updating `currentTime` directly in the `handleVirtualTimeBudgetExpired` event handler. Caused a performance regression (median ~1.788s vs baseline ~1.427s). This implies that retaining closure locality within the Promise execution chain is actually more efficient for V8 optimization compared to repeatedly accessing and mutating instance properties.
 - **PERF-507: Eliminate defaultStabilityCheck method and inline logic**
   - **What I tried**: Attempted to inline `defaultStabilityCheck` directly into `runSetTime` in `CdpTimeDriver.ts`.
