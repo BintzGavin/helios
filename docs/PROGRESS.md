@@ -651,3 +651,6 @@ Each agent should update **their own dedicated progress file** instead of this f
 - ✅ Completed: CLI Registry Types Regression Tests - Implemented structural verification tests for registry interfaces.
 ### CLI v0.46.35
 - ✅ Completed: CLI Job Types Regression Tests - Implemented unit tests for job specification interfaces in packages/cli/src/types/__tests__/job.test.ts.
+
+### CLI v0.46.36
+- ✅ Completed: CLI Job Regression Tests Missing Mock - Added deps.inline config to vitest.config.ts to fix import resolution errors for workspace dependencies

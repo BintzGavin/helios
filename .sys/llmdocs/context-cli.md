@@ -83,6 +83,8 @@ packages/cli
 │   │   ├── vercel.ts
 │   │   └── vue.ts
 │   ├── types
+│   │   ├── __tests__
+│   │   │   └── job.test.ts
 │   │   └── job.ts
 │   └── utils
 │       ├── __tests__
@@ -101,7 +103,7 @@ packages/cli
 ├── tsconfig.json
 └── vitest.config.ts
 
-14 directories, 75 files
+14 directories, 76 files
 ```
 ## C. Commands
 
