@@ -51,3 +51,7 @@
 ## v0.77.32 - Undocumented Seeking Events
 **Learning:** Found that `seeking` and `seeked` events are being dispatched by the player but were not documented in the README.md events list.
 **Action:** Created a plan to document the missing events to maintain API parity visibility.
+
+## [v0.77.40] - Undocumented Events
+**Learning:** The `error` and `audiometering` events were being fired by `<helios-player>` but were missing from the `README.md` events list.
+**Action:** Created a plan to document these missing events to maintain strict API parity visibility.
