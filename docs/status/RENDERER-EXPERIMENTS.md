@@ -1,8 +1,11 @@
 ## Performance Trajectory
-Current best: 1.427s (baseline was 1.436s, -0.6%)
+Current best: 1.298s (baseline was 1.436s, -0.6%)
 Last updated by: PERF-580
 
 ## What Works
+- **PERF-587**: Inline CDP Evaluate Promises in CdpTimeDriver
+  - **What I did**: Inlined the Runtime.evaluate promises with .catch(noopCatch) in defaultSyncMedia.
+  - **Impact**: Eliminated unhandled promise allocation and V8 microtask closure generation. Improvement: ~36.74% (PERF-587)
 - **PERF-578**: Remove per-frame stability check loop in CdpTimeDriver
   - **What I did**: Moved the custom window.helios.waitUntilStable() check out of the runSetTime() hot loop to only execute once during prepare().
   - **Impact**: Reduced CDP overhead by 1 evaluation per frame for all captures. Median render time improved to ~1.436s.
