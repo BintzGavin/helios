@@ -1,0 +1,4 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	1.516	150	98.97	42.2	discard	PERF-581: prebind capture promises
+2	1.477	150	101.54	42.2	discard	PERF-581: prebind capture promises
+3	1.521	150	98.60	42.1	discard	PERF-581: prebind capture promises

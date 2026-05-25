@@ -391,3 +391,7 @@ Last updated by: PERF-573
 - **PERF-580**: Bypass `capture` Promise Await and Inline CDP Session Send
   - **What I did**: Removed `async`/`await` from `capture` in `DomStrategy.ts` and `runSetTime` in `CdpTimeDriver.ts`, returning the CDP Promise chain directly instead.
   - **Impact**: Reduced V8 generator allocations and microtask ticks per frame. Median render time improved to ~1.427s.
+- **PERF-581**: Prebind Promises and Eliminate Closures in Capture Hot Loop
+  - **What I tried**: Attempted to pre-bind CDP success and error handlers as class properties in `DomStrategy.ts` and manually update the driver state to bypass closures and short promise chains in `CdpTimeDriver.ts`.
+  - **WHY it didn't work**: The median render time regressed to ~1.516s compared to the baseline of ~1.427s. Replacing inline closures with bound instance properties likely created indirect execution contexts for V8, slowing down the fast-path resolution of the promise chain slightly more than the garbage collection overhead saved.
+  - **Outcome**: discard
