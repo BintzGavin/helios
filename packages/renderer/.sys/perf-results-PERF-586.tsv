@@ -1,0 +1,6 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	2.281	150	65.76	41.0	discard	optimize writerWaiter Promise Allocation
+2	1.490	150	100.67	40.7	discard	optimize writerWaiter Promise Allocation
+3	1.478	150	101.49	41.1	discard	optimize writerWaiter Promise Allocation
+4	1.491	150	100.60	40.5	discard	optimize writerWaiter Promise Allocation
+5	1.514	150	99.08	40.5	discard	optimize writerWaiter Promise Allocation

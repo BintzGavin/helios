@@ -1,11 +1,11 @@
 ---
 id: PERF-586
 slug: optimize-writer-waiter
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2026-11-01
-completed: ""
-result: ""
+completed: 2026-05-25
+result: discard
 ---
 
 # PERF-586: Optimize writerWaiter Promise Allocation in CaptureLoop
@@ -67,3 +67,7 @@ Execute the renderer benchmark to verify that no frames are dropped, the video o
 
 ## Canvas Smoke Test
 Run `npm run test -w packages/renderer -- --run` to ensure changes don't break Canvas compilation.
+
+## Results Summary
+- **Best render time**: 1.491s (vs baseline 1.449s)
+- **Status**: discard

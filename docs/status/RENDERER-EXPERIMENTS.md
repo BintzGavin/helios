@@ -430,3 +430,7 @@ Last updated by: PERF-573
   - **Why it didn't work**: It caused a performance regression (median ~1.517s vs baseline ~1.427s). Removing the trailing error handler might have altered how V8 handles the Promise chain closure lifecycle in the hot loop, negatively impacting optimizations despite avoiding the explicit Promise allocation.
   - **Outcome**: discard
 - PERF-579: Bypass `capture` Promise Await. Inlining `currentTime` assignment and returning the promise directly in `runSetTime` (avoiding `.then`) yielded a slight performance regression (1.361s vs 1.349s). The V8 engine seems to optimize the local closure effectively.
+- **PERF-586**: Optimize writerWaiter Promise Allocation
+  - **What I tried**: Replaced closure-based writerWaiterExecutor with a deferred writerWaiterPromise.
+  - **WHY it didn't work**: The median render time was ~1.491s compared to baseline ~1.449s. Avoiding the small Promise allocation overhead did not compensate for the overhead of the added branch conditions (`if (!writerWaiterPromise)`) and closure nullification in the hot loop.
+  - **Outcome**: discard
