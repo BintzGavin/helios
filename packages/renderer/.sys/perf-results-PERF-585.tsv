@@ -1,0 +1,5 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	12.021	150	12.48	39.4	inconclusive	baseline
+2	1.547	150	96.93	42.2	keep	baseline
+3	1.553	150	96.59	41.6	keep	baseline
+4	1.663	150	90.21	42.2	discard	PERF-585: Eliminate modulo from CaptureLoop

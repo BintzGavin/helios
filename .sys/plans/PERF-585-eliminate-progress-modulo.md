@@ -1,11 +1,11 @@
 ---
 id: PERF-585
 slug: eliminate-progress-modulo
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2026-10-31
-completed: ""
-result: ""
+completed: "2026-05-25"
+result: "failed"
 ---
 
 # PERF-585: Eliminate Progress Modulo in Capture Hot Loop
@@ -67,3 +67,9 @@ Run the renderer benchmark to ensure frames are successfully generated, video is
 
 ## Canvas Smoke Test
 Run `npm run test -w packages/renderer -- --run` to ensure changes don't break standard compilation and rendering loops.
+
+## Results Summary
+- **Best render time**: 1.663s (vs baseline ~1.550s)
+- **Improvement**: Regressed
+- **Kept experiments**: None
+- **Discarded experiments**: PERF-585
