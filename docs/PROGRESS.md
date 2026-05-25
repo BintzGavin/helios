@@ -10,7 +10,12 @@
 ### CLI v0.46.30
 - ✅ Completed: CLI Cloud Templates Tests - Implemented unit tests for remaining cloud deployment templates.
 
-### STUDIO v0.121.13
+
+
+### STUDIO v0.121.17
+- ✅ Completed: STUDIO-Timeline-Scrubber - Verified timeline scrubber is already fully implemented as the Timeline.tsx component (IMPOSSIBLE: DUPLICATION).
+
+## STUDIO v0.121.13
 - ✅ Completed: Expand Reverse Speeds - Added -4x and -2x reverse playback options to the PlaybackControls component.
 
 ### STUDIO v0.121.12
