@@ -31,7 +31,7 @@ export class CdpTimeDriver implements TimeDriver {
     const frames = this.cachedFrames;
     if (frames.length === 1) {
       this.singleFrameSyncMediaParams.expression = "if(typeof window.__helios_sync_media==='function') window.__helios_sync_media(" + timeInSeconds + ");";
-      this.client!.send('Runtime.evaluate', this.singleFrameSyncMediaParams);
+      this.client!.send('Runtime.evaluate', this.singleFrameSyncMediaParams).catch(noopCatch);
     } else {
         if (this.executionContextIds.length > 0) {
           const expression = "if(typeof window.__helios_sync_media==='function') window.__helios_sync_media(" + timeInSeconds + ");";
@@ -48,11 +48,11 @@ export class CdpTimeDriver implements TimeDriver {
           }
           for (let i = 0; i < this.executionContextIds.length; i++) {
             this.multiFrameSyncMediaParams[i].expression = expression;
-            this.client!.send('Runtime.evaluate', this.multiFrameSyncMediaParams[i]);
+            this.client!.send('Runtime.evaluate', this.multiFrameSyncMediaParams[i]).catch(noopCatch);
           }
         } else {
           this.singleFrameSyncMediaParams.expression = "if(typeof window.__helios_sync_media==='function') window.__helios_sync_media(" + timeInSeconds + ");";
-          this.client!.send('Runtime.evaluate', this.singleFrameSyncMediaParams);
+          this.client!.send('Runtime.evaluate', this.singleFrameSyncMediaParams).catch(noopCatch);
         }
     }
   }

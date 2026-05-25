@@ -1,10 +1,10 @@
 ---
 id: PERF-587
 slug: inline-cdp-evaluate-promises
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2026-10-31
-completed: ""
+completed: "2026-10-31"
 result: ""
 ---
 
