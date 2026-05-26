@@ -81,4 +81,12 @@ describe('build command', () => {
     const buildArgs = vi.mocked(build).mock.calls[0][0] as any;
     expect(buildArgs.build.outDir).toBe('build-out');
   });
+
+  it('should handle build errors', async () => {
+    vi.mocked(fs.existsSync).mockReturnValue(true);
+    vi.mocked(build).mockRejectedValue(new Error('failed'));
+    await program.parseAsync(['node', 'test', 'build', '.']);
+    expect(consoleErrorSpy).toHaveBeenCalled();
+    expect(process.exitCode).toBe(1);
+  });
 });

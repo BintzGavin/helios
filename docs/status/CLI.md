@@ -1,4 +1,4 @@
-**Version**: 0.46.36
+**Version**: 0.46.37
 
 [v0.46.34] ✅ Completed: CLI Registry Types Regression Tests - Implemented structural verification tests for registry interfaces.
 [v0.46.33] ✅ Completed: CLI Job Regression Tests Missing Mock - Added missing mock setup for @helios-project/infrastructure to fix import resolution errors
@@ -153,3 +153,5 @@ The Helios CLI is the primary user interface for component registry, project sca
 [v0.46.36] 🟢 Completed: CLI Job/Render/Merge Tests Missing Mock Spec - Created specification plan `2027-06-05-CLI-Job-Render-Merge-Regression-Tests-Missing-Mock.md` for fixing vitest mock resolution errors.
 [v0.46.36] ✅ Completed: CLI Job Regression Tests Missing Mock - Added deps.inline config to vitest.config.ts to fix import resolution errors for workspace dependencies
 [v0.46.37] 🟢 Completed: CLI Command Coverage Tests Spec - Created specification plan 2027-06-05-CLI-Command-Coverage-Tests-V2.md for improving CLI command regression tests.
+
+[v0.46.37] ✅ Completed: CLI Command Coverage Tests V2 - Implemented missing test cases for render, build, init, and studio commands.

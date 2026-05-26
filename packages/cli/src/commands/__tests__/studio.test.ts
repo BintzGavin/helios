@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { Command } from 'commander';
 import { registerStudioCommand } from '../studio.js';
 import { createServer } from 'vite';
+import fs from 'fs';
 import { loadConfig } from '../../utils/config.js';
 import { RegistryClient } from '../../registry/client.js';
 
@@ -17,11 +18,14 @@ vi.mock('../../utils/config.js', () => ({
   loadConfig: vi.fn(),
 }));
 
+vi.mock('../../utils/install.js', () => ({ installComponent: vi.fn() }));
+vi.mock('../../utils/uninstall.js', () => ({ uninstallComponent: vi.fn() }));
+
 vi.mock('../../registry/client.js', () => {
   return {
     RegistryClient: vi.fn().mockImplementation(function() {
       return {
-        getComponents: vi.fn().mockResolvedValue([{ name: 'test-comp' }]),
+        getComponents: vi.fn().mockResolvedValue([{ name: 'test-comp', files: [{name: 'f.ts'}] }]),
       };
     })
   };
@@ -97,5 +101,40 @@ describe('studio command', () => {
 
     expect(consoleErrorMock).toHaveBeenCalledWith('Failed to start Studio:', error);
     expect(exitMock).toHaveBeenCalledWith(1);
+  });
+
+  it('should handle plugin callbacks', async () => {
+    const mockServer = { listen: vi.fn(), printUrls: vi.fn() };
+    vi.mocked(createServer).mockResolvedValue(mockServer as any);
+    vi.mocked(loadConfig).mockReturnValue({ directories: { components: 'src/components' } } as any);
+
+    let pluginConfig: any;
+    const { studioApiPlugin } = await import('@helios-project/studio/cli');
+    (vi.mocked(studioApiPlugin) as any).mockImplementation((config: any) => {
+        pluginConfig = config;
+        return { name: 'mock-plugin' };
+    });
+
+    await program.parseAsync(['node', 'test', 'studio']);
+
+    expect(pluginConfig).toBeDefined();
+
+    const { installComponent } = await import('../../utils/install.js');
+    const installMock = vi.mocked(installComponent).mockResolvedValue(undefined);
+    const { uninstallComponent } = await import('../../utils/uninstall.js');
+    const uninstallMock = vi.mocked(uninstallComponent).mockResolvedValue(undefined);
+
+    await pluginConfig.onInstallComponent('test');
+    expect(installMock).toHaveBeenCalledWith(process.cwd(), 'test', { install: true, client: expect.any(Object) });
+
+    await pluginConfig.onRemoveComponent('test');
+    expect(uninstallMock).toHaveBeenCalledWith(process.cwd(), 'test', { removeFiles: true, client: expect.any(Object) });
+
+    await pluginConfig.onUpdateComponent('test');
+    expect(installMock).toHaveBeenCalledWith(process.cwd(), 'test', { install: true, overwrite: true, client: expect.any(Object) });
+
+    vi.mocked(fs.existsSync).mockReturnValue(true);
+    const isInstalled = await pluginConfig.onCheckInstalled('test-comp');
+    expect(isInstalled).toBe(true);
   });
 });
