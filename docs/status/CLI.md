@@ -152,3 +152,4 @@ The Helios CLI is the primary user interface for component registry, project sca
 [v0.46.35] ✅ Completed: CLI Job Types Regression Tests - Implemented unit tests for job specification interfaces in packages/cli/src/types/__tests__/job.test.ts.
 [v0.46.36] 🟢 Completed: CLI Job/Render/Merge Tests Missing Mock Spec - Created specification plan `2027-06-05-CLI-Job-Render-Merge-Regression-Tests-Missing-Mock.md` for fixing vitest mock resolution errors.
 [v0.46.36] ✅ Completed: CLI Job Regression Tests Missing Mock - Added deps.inline config to vitest.config.ts to fix import resolution errors for workspace dependencies
+[v0.46.37] 🟢 Completed: CLI Command Coverage Tests Spec - Created specification plan 2027-06-05-CLI-Command-Coverage-Tests-V2.md for improving CLI command regression tests.
