@@ -467,3 +467,7 @@ Last updated by: PERF-592
   - **What I did**: Removed `typeof window.__helios_sync_media==='function'` check from the expression string assignments in the `defaultSyncMedia` method in `CdpTimeDriver.ts`.
   - **Impact**: Improved median render time to ~1.374.
 - **PERF-593**: Could caching `targetElementHandle.boundingBox()` in `prepare()` instead of calling it on every frame in `capture()` avoid unnecessary IPC and Promise allocations, speeding up the hot loop?
+- **PERF-593**: Cache targetElement boundingBox in DomStrategy prepare
+  - **What I tried**: Pre-calculated and cached boundingBox in prepare(), removing the IPC wait from capture().
+  - **WHY it didn't work**: The median render time regressed to ~6.714s vs baseline ~6.684s.
+  - **Plan ID**: PERF-593

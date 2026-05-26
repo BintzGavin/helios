@@ -1,11 +1,11 @@
 ---
 id: PERF-593
 slug: cache-bounding-box
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2026-05-26
-completed: ""
-result: ""
+completed: "2026-05-26"
+result: "failed"
 ---
 
 # PERF-593: Cache targetElement boundingBox in DomStrategy prepare
@@ -101,3 +101,8 @@ with just:
 ```
 **Why**: Avoids `boundingBox()` Playwright IPC call and its `.then()` chain on every frame in the hot loop.
 **Risk**: If the target element moves or resizes during the render, the output will be incorrectly cropped. However, target elements for screen recording are typically fixed-size containers. The performance gain vastly outweighs edge cases.
+
+## Results Summary
+- **Best render time**: 6.714s (vs baseline 6.684s)
+- **Kept experiments**: None
+- **Discarded experiments**: PERF-593
