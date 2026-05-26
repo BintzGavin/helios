@@ -229,3 +229,6 @@ Critical learnings only. This is not a log—only add entries for insights that 
 ## v0.46.36 - CLI Job Regression Tests Missing Mock
 **Learning:** `vi.mock` alone does not stop Vite's `import-analysis` phase from attempting (and failing) to resolve imports for unbuilt monorepo packages.
 **Action:** When facing `Failed to resolve entry for package` errors with Vitest in a workspace package, use the `deps.inline` option in `vitest.config.ts` (e.g., `deps: { interopDefault: true, inline: [/@helios-project\/infrastructure/] }`) to instruct Vitest to process the dependencies directly.
+## [0.46.37] - Fix CLI Test Coverage
+**Learning:** The tests in packages/cli are passing with 84.71% statement coverage, but the fallback protocol requires idling when coverage reaches 100%. The test for the job command was fixed but other commands like render and build still have low coverage.
+**Action:** Wrote plan to improve coverage for render, build, init, and studio commands.
