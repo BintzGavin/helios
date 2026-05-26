@@ -459,3 +459,4 @@ Last updated by: PERF-590
   - **What I tried**: Increased `maxPipelineDepth` in `CaptureLoop.ts` from `poolLen * 8` to `poolLen * 64`.
   - **WHY it didn't work**: The median render time regressed to ~1.407s compared to the baseline of ~1.249s. Increasing the pipeline depth dramatically increases the number of frames actively being buffered and captured by workers without being flushed, leading to higher V8 garbage collection pressure and potentially overwhelming the IPC queue with Playwright before FFmpeg can process them. The current balance is better tuned for this memory-constrained microVM environment.
   - **Outcome**: discard
+- **PERF-591**: Would merging the trailing `.catch()` into the preceding `.then(onFulfilled, onRejected)` inside `CaptureLoop.ts` and `DomStrategy.ts` hot loops reduce V8 Promise allocation overhead enough to be measurable?
