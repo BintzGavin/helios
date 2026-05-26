@@ -1,11 +1,11 @@
 ---
 id: PERF-594
 slug: inline-writerwaiter-wakeup
-status: unclaimed
-claimed_by: ""
+status: claimed
+claimed_by: "jules"
 created: 2024-05-26
-completed: ""
-result: ""
+completed: "2024-05-26"
+result: "discard"
 ---
 
 # PERF-594: Inline `writerWaiterResolve` Wakeup into Promise Chain in CaptureLoop
