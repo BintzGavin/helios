@@ -217,3 +217,4 @@
 - ❌ Blocked: 2026-11-14-STUDIO-Update-Keyboard-Shortcuts-Documentation is structurally obsolete as changes are already present.
 [v0.121.15] ✅ Completed: Document duplicated Timeline-Scrubber plan - Logged the duplicated plan as impossible since Timeline already supports scrubbing.
 [v0.121.14] ✅ Completed: Document duplicated Update-Keyboard-Shortcuts-Documentation plan - Logged the duplicated plan as impossible.
+- ❌ Blocked: Waiting for a new, valid plan in /.sys/plans/ as existing plans are already implemented or obsolete.
