@@ -68,6 +68,9 @@ Last updated by: PERF-590
   - **Outcome**: discard
 
 ## What Doesn't Work (and Why)
+- **PERF-591**: Merged .catch into .then in hot loops.
+  - **What I tried**: Merged .catch() into .then(onFulfilled, onRejected) in CaptureLoop and DomStrategy.
+  - **Why it didn't work**: Did not improve performance (median 1.397s vs baseline 1.229s). The microtask overhead saved by skipping the .catch promise allocation was negligible compared to other factors like IPC overhead, and altering the promise structure might have even slightly deoptimized V8's hot path for these specific loops.
 - **PERF-585**: Eliminate Progress Modulo
   - **What I tried**: Eliminated the per-frame modulo operator in the `CaptureLoop.ts` hot loop.
   - **Why it didn't work**: The overhead of tracking an additional numeric state variable and reassigning it offset the micro-savings from avoiding the modulo operator in V8, leading to a performance regression (median ~1.663s vs baseline ~1.550s).
