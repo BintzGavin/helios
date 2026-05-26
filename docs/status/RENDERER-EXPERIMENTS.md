@@ -1,6 +1,6 @@
 ## Performance Trajectory
-Current best: 1.229s (baseline was 1.249s, -1.6%)
-Last updated by: PERF-590
+Current best: 1.374s (baseline was 1.378s, -0.3%)
+Last updated by: PERF-592
 
 ## What Works
 - **PERF-590**: Eliminate `Promise.resolve()` Wrapper in CaptureLoop
@@ -395,8 +395,8 @@ Last updated by: PERF-590
   - **Outcome**: discard
 
 ## Performance Trajectory
-Current best: 1.229s (baseline was 1.249s, -1.6%)
-Last updated by: PERF-590
+Current best: 1.374s (baseline was 1.378s, -0.3%)
+Last updated by: PERF-592
 
 ## What Works
 - **PERF-590**: Eliminate `Promise.resolve()` Wrapper in CaptureLoop
@@ -463,3 +463,6 @@ Last updated by: PERF-590
   - **WHY it didn't work**: The median render time regressed to ~1.407s compared to the baseline of ~1.249s. Increasing the pipeline depth dramatically increases the number of frames actively being buffered and captured by workers without being flushed, leading to higher V8 garbage collection pressure and potentially overwhelming the IPC queue with Playwright before FFmpeg can process them. The current balance is better tuned for this memory-constrained microVM environment.
   - **Outcome**: discard
 - **PERF-591**: Would merging the trailing `.catch()` into the preceding `.then(onFulfilled, onRejected)` inside `CaptureLoop.ts` and `DomStrategy.ts` hot loops reduce V8 Promise allocation overhead enough to be measurable?
+- **PERF-592**: Simplify sync media CDP expression
+  - **What I did**: Removed `typeof window.__helios_sync_media==='function'` check from the expression string assignments in the `defaultSyncMedia` method in `CdpTimeDriver.ts`.
+  - **Impact**: Improved median render time to ~1.374.

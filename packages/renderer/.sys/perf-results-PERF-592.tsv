@@ -1,0 +1,2 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	1.374	150	109.21	42.0	keep	Simplify sync media CDP expression

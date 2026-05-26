@@ -30,11 +30,11 @@ export class CdpTimeDriver implements TimeDriver {
   private defaultSyncMedia(timeInSeconds: number) {
     const frames = this.cachedFrames;
     if (frames.length === 1) {
-      this.singleFrameSyncMediaParams.expression = "if(typeof window.__helios_sync_media==='function') window.__helios_sync_media(" + timeInSeconds + ");";
+      this.singleFrameSyncMediaParams.expression = "window.__helios_sync_media(" + timeInSeconds + ");";
       this.client!.send('Runtime.evaluate', this.singleFrameSyncMediaParams).catch(noopCatch);
     } else {
         if (this.executionContextIds.length > 0) {
-          const expression = "if(typeof window.__helios_sync_media==='function') window.__helios_sync_media(" + timeInSeconds + ");";
+          const expression = "window.__helios_sync_media(" + timeInSeconds + ");";
           if (this.multiFrameSyncMediaParams.length !== this.executionContextIds.length) {
             this.multiFrameSyncMediaParams.length = this.executionContextIds.length;
             for (let i = 0; i < this.executionContextIds.length; i++) {
@@ -51,7 +51,7 @@ export class CdpTimeDriver implements TimeDriver {
             this.client!.send('Runtime.evaluate', this.multiFrameSyncMediaParams[i]).catch(noopCatch);
           }
         } else {
-          this.singleFrameSyncMediaParams.expression = "if(typeof window.__helios_sync_media==='function') window.__helios_sync_media(" + timeInSeconds + ");";
+          this.singleFrameSyncMediaParams.expression = "window.__helios_sync_media(" + timeInSeconds + ");";
           this.client!.send('Runtime.evaluate', this.singleFrameSyncMediaParams).catch(noopCatch);
         }
     }
