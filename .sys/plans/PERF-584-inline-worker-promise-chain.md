@@ -1,11 +1,11 @@
 ---
 id: PERF-584
 slug: inline-worker-promise-chain
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2026-10-31
-completed: ""
-result: ""
+completed: "2026-05-25"
+result: "keep"
 ---
 
 # PERF-584: Inline Worker Promise Chain in CaptureLoop
@@ -77,3 +77,11 @@ Execute the renderer benchmark to verify that no frames are dropped, the video o
 
 ## Canvas Smoke Test
 Run `npm run test -w packages/renderer -- --run` to ensure changes don't break Canvas compilation.
+
+## Results Summary
+```tsv
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	1.377	150	108.93	42.5	keep	inline worker promise chain
+2	1.317	150	113.88	45.3	keep	inline worker promise chain
+3	1.373	150	109.27	42.6	keep	inline worker promise chain
+```
