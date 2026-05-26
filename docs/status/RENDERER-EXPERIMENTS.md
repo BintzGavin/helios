@@ -471,3 +471,8 @@ Last updated by: PERF-592
   - **What I tried**: Pre-calculated and cached boundingBox in prepare(), removing the IPC wait from capture().
   - **WHY it didn't work**: The median render time regressed to ~6.714s vs baseline ~6.684s.
   - **Plan ID**: PERF-593
+
+- **PERF-594**: Inline `writerWaiterResolve` Wakeup into Promise Chain in CaptureLoop
+  - **What I tried**: Modified the `timePromise` chain in `CaptureLoop.ts` to check and execute `writerWaiterResolve` directly within the `.then()` and `.catch()` fulfillment handlers instead of awaiting the generator resumption.
+  - **WHY it didn't work**: The median render time regressed slightly to ~10.417s compared to the baseline of ~10.347s. Resolving the waiter inside the callback did not outweigh the overhead of checking `writerWaiterResolve && nextFrameToWrite === i` conditionally inside both the `.then` and `.catch` closures. V8 seems to optimize the generator `await` resumption more efficiently than the repeated closure state checks.
+  - **Outcome**: discard
