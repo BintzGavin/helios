@@ -182,7 +182,9 @@ export class CaptureLoop {
 
             const ringIndex = i & ringMask;
 
-            await Promise.resolve(timeDriver.setTime(page, compositionTimeInSeconds))
+            const setTimeResult = timeDriver.setTime(page, compositionTimeInSeconds);
+            const timePromise = setTimeResult ? setTimeResult : Promise.resolve();
+            await timePromise
                 .then(() => strategy.capture(page, time))
                 .then((buffer) => {
                     frameBufferRing[ringIndex] = buffer;

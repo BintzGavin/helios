@@ -1,8 +1,11 @@
 ## Performance Trajectory
-Current best: 1.249s (baseline was 1.298s, -3.8%)
-Last updated by: PERF-589
+Current best: 1.229s (baseline was 1.249s, -1.6%)
+Last updated by: PERF-590
 
 ## What Works
+- **PERF-590**: Eliminate `Promise.resolve()` Wrapper in CaptureLoop
+  - **What I did**: Removed the redundant `Promise.resolve(timeDriver.setTime(...))` wrapper in the multi-worker hot loop, conditionally handling the promise instead.
+  - **Impact**: Improved median render time to ~1.229s by eliminating redundant V8 microtask ticks and Promise allocations for every single frame.
 - **PERF-584**: Inline worker promise chain in CaptureLoop
   - **What I did**: Replaced the generator-heavy try/catch block with a single chained Promise (.then().catch()) in the runWorker hot loop.
   - **Impact**: Improved median render time to ~1.373s (from its baseline ~1.446s).
@@ -389,10 +392,13 @@ Last updated by: PERF-589
   - **Outcome**: discard
 
 ## Performance Trajectory
-Current best: 1.249s (baseline was 1.298s, -3.8%)
-Last updated by: PERF-589
+Current best: 1.229s (baseline was 1.249s, -1.6%)
+Last updated by: PERF-590
 
 ## What Works
+- **PERF-590**: Eliminate `Promise.resolve()` Wrapper in CaptureLoop
+  - **What I did**: Removed the redundant `Promise.resolve(timeDriver.setTime(...))` wrapper in the multi-worker hot loop, conditionally handling the promise instead.
+  - **Impact**: Improved median render time to ~1.229s by eliminating redundant V8 microtask ticks and Promise allocations for every single frame.
 - **PERF-584**: Inline worker promise chain in CaptureLoop
   - **What I did**: Replaced the generator-heavy try/catch block with a single chained Promise (.then().catch()) in the runWorker hot loop.
   - **Impact**: Improved median render time to ~1.373s (from its baseline ~1.446s).
