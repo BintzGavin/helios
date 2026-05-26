@@ -1,11 +1,11 @@
 ---
 id: PERF-591
 slug: merge-promise-catch-handlers
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-05-25
 completed: ""
-result: ""
+result: "discard"
 ---
 
 # PERF-591: Merge Promise Catch Handlers in Hot Loops
