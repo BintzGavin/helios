@@ -3,6 +3,9 @@ Current best: 1.249s (baseline was 1.298s, -3.8%)
 Last updated by: PERF-589
 
 ## What Works
+- **PERF-584**: Inline worker promise chain in CaptureLoop
+  - **What I did**: Replaced the generator-heavy try/catch block with a single chained Promise (.then().catch()) in the runWorker hot loop.
+  - **Impact**: Improved median render time to ~1.373s (from its baseline ~1.446s).
 - **PERF-589**: Inline FFmpeg stdin writes in CaptureLoop
   - **What I did**: Inlined writeToStdin logic directly within the capture loops to avoid closure and wrapper overhead.
   - **Impact**: Improved median render time to ~1.249s.
@@ -390,6 +393,9 @@ Current best: 1.249s (baseline was 1.298s, -3.8%)
 Last updated by: PERF-589
 
 ## What Works
+- **PERF-584**: Inline worker promise chain in CaptureLoop
+  - **What I did**: Replaced the generator-heavy try/catch block with a single chained Promise (.then().catch()) in the runWorker hot loop.
+  - **Impact**: Improved median render time to ~1.373s (from its baseline ~1.446s).
 - **PERF-589**: Inline FFmpeg stdin writes in CaptureLoop
   - **What I did**: Inlined writeToStdin logic directly within the capture loops to avoid closure and wrapper overhead.
   - **Impact**: Improved median render time to ~1.249s.
