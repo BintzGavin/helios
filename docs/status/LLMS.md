@@ -1,5 +1,7 @@
 # Status: LLMS
-**Version**: 1.86.6
+**Version**: 1.86.7
+
+[v1.86.7] ✅ Completed: Comprehensive Daily Review - Updated V1.x Roadmap with recent verified features from all domain progress logs and removed the invalid `docs/prompts/` link from Key Files. Verified package versions.
 
 [v1.86.3] ✅ Completed: Comprehensive Daily Review - Updated Roadmap with recent completions across CLI (Regression Tests), Player (Index Coverage), Renderer (WebCodecs, Skill Docs), and Infrastructure (S3 Uploads).
 [v1.86.2] ✅ Completed: Comprehensive Daily Review - Updated Roadmap with Cloudflare Sandbox Adapter support and added Player API parity and shortcut documentation items. Verified File Paths and Key Files.
