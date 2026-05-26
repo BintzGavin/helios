@@ -1,4 +1,4 @@
-**Version**: 0.77.39
+**Version**: 0.77.40
 [v0.77.38] ✅ Completed: Expand Index Coverage - Added unit tests for disconnectedCallback in packages/player/src/index.ts.
 [v0.77.37] ✅ Completed: Improve index.ts test coverage - Added tests for diagnose API and retryConnection.
 [v0.77.36] ✅ Completed: Discovered that 2026-06-21-PLAYER-Smart-Controls.md is an IMPOSSIBLE: DUPLICATION plan. The smart controls for CC and PiP are already fully implemented. Documented as duplicate and discarded.
@@ -237,3 +237,4 @@
 [v0.77.32] ✅ Completed: Document API Parity Gap - Updated README to document existing methods (captureStream, startAudioMetering, stopAudioMetering) and events (enterpictureinpicture, leavepictureinpicture).
 [v0.77.33] ✅ Completed: Discovered undocumented seeking events in README.md. Created plan `.sys/plans/v0.77.33-PLAYER-Document-Seeking-Events.md` to document `seeking` and `seeked` events.
 [v0.77.39] ✅ Completed: Document Seeking Events - Updated README to document existing seeking and seeked events to match the actual implementation in packages/player/src/index.ts.
+[v0.77.40] ✅ Completed: Document Missing Events - Updated README.md to include documentation for error and audiometering events.

@@ -201,6 +201,8 @@ The `<helios-player>` element implements a subset of the HTMLMediaElement interf
 
 The element dispatches the following custom events:
 
+- `error`: Fired when an error occurs during media loading or playback.
+- `audiometering`: Fired during playback to report stereo RMS and Peak audio levels.
 - `play`: Fired when playback starts.
 - `pause`: Fired when playback is paused.
 - `seeking`: Fired when a seek operation starts.

@@ -16,6 +16,7 @@ The component dispatches standard HTML5 Media events:
 
 Custom extensions:
 - `error` events carry a `code` and `message` compatible with `MediaError`.
+- `audiometering` events report stereo RMS and Peak audio levels.
 
 ## Section C: Attributes
 Observed attributes:

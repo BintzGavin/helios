@@ -654,3 +654,6 @@ Each agent should update **their own dedicated progress file** instead of this f
 
 ### CLI v0.46.36
 - ✅ Completed: CLI Job Regression Tests Missing Mock - Added deps.inline config to vitest.config.ts to fix import resolution errors for workspace dependencies
+
+### PLAYER v0.77.40
+- ✅ Completed: Document Missing Events - Updated README.md to include documentation for error and audiometering events.
