@@ -1,3 +1,10 @@
+## LLMS v1.86.7
+- ✅ Completed: Daily llms.txt Review
+  - Updated Roadmap in llms.txt with recent verifiable completions from domain PROGRESS logs (Refine CLI Component Removal, Bridge Coverage Completeness, Enable Audio State Persistence, Fix Verification Script Regression, Orchestrator Test Coverage Expansion).
+  - Removed invalid `docs/prompts/` link from the Links section.
+  - Verified package versions match package.json exactly.
+  - Incremented version to 1.86.7
+
 ## LLMS v1.86.5
 - ✅ Completed: Daily llms.txt Review
   - Updated Roadmap in llms.txt with verifiable completions from domain PROGRESS logs.
