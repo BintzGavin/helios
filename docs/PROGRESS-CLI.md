@@ -345,3 +345,6 @@ This file tracks progress for the CLI domain (`packages/cli`).
 
 ### CLI v0.46.31
 - ✅ Completed: CLI Index Regression Tests - Implemented unit tests for the main CLI entry point in packages/cli/src/__tests__/index.test.ts.
+
+### CLI v0.46.37
+- ✅ Completed: CLI Command Coverage Tests V2 - Implemented missing test cases for render, build, init, and studio commands.

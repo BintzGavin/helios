@@ -179,4 +179,26 @@ describe('init command', () => {
     expect(exitSpy).toHaveBeenCalledWith(1);
     expect(configUtil.saveConfig).not.toHaveBeenCalled();
   });
+
+  it('should exit when failing to download example', async () => {
+    vi.mocked(examplesUtil.downloadExample).mockRejectedValue(new Error('fail'));
+    vi.mocked(prompts).mockResolvedValueOnce({ framework: 'react', components: 'c', lib: 'l' });
+    await program.parseAsync(['node', 'test', 'init', '--example', 'bad']);
+    expect(exitSpy).toHaveBeenCalledWith(1);
+  });
+
+  it('should exit when scaffold fails', async () => {
+    vi.mocked(fs.promises.writeFile).mockRejectedValue(new Error('fail'));
+    await program.parseAsync(['node', 'test', 'init', '--yes']);
+    expect(exitSpy).toHaveBeenCalledWith(1);
+  });
+
+  it('should prompt for config and framework if missing', async () => {
+    vi.mocked(prompts)
+      .mockResolvedValueOnce({ mode: 'template' })
+      .mockResolvedValueOnce({ framework: 'solid' })
+      .mockResolvedValueOnce({ framework: 'solid', components: 'c', lib: 'l' });
+    await program.parseAsync(['node', 'test', 'init']);
+    expect(fs.promises.writeFile).toHaveBeenCalled();
+  });
 });
