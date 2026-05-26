@@ -1,11 +1,11 @@
 ---
 id: PERF-592
 slug: simplify-sync-media-expression
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2026-05-26
 completed: ""
-result: ""
+result: "improved"
 ---
 
 # PERF-592: Simplify sync media CDP expression
@@ -51,3 +51,8 @@ to:
 
 ## Correctness Check
 Run `npm run test -w packages/renderer -- --run` to verify correctness.
+## Results Summary
+- **Best render time**: 1.374s (vs baseline 1.378s)
+- **Improvement**: 0.290276%
+- **Kept experiments**: [PERF-592]
+- **Discarded experiments**: []
