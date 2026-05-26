@@ -449,3 +449,7 @@ Last updated by: PERF-589
   - **What I tried**: Replaced closure-based writerWaiterExecutor with a deferred writerWaiterPromise.
   - **WHY it didn't work**: The median render time was ~1.491s compared to baseline ~1.449s. Avoiding the small Promise allocation overhead did not compensate for the overhead of the added branch conditions (`if (!writerWaiterPromise)`) and closure nullification in the hot loop.
   - **Outcome**: discard
+- **PERF-484**: Increase maxPipelineDepth
+  - **What I tried**: Increased `maxPipelineDepth` in `CaptureLoop.ts` from `poolLen * 8` to `poolLen * 64`.
+  - **WHY it didn't work**: The median render time regressed to ~1.407s compared to the baseline of ~1.249s. Increasing the pipeline depth dramatically increases the number of frames actively being buffered and captured by workers without being flushed, leading to higher V8 garbage collection pressure and potentially overwhelming the IPC queue with Playwright before FFmpeg can process them. The current balance is better tuned for this memory-constrained microVM environment.
+  - **Outcome**: discard

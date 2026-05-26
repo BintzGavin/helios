@@ -1,11 +1,11 @@
 ---
 id: PERF-484
 slug: increase-pipeline-depth
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2026-05-12
-completed: ""
-result: ""
+completed: "2026-05-26"
+result: "discarded"
 ---
 # PERF-484: Increase CaptureLoop maxPipelineDepth
 
@@ -52,3 +52,8 @@ Run a standard Canvas mode benchmark to ensure no regressions.
 
 ## Correctness Check
 Run the standard DOM benchmark to ensure FFmpeg video output remains valid and frames are not dropped.
+## Results Summary
+- **Best render time**: 1.407s (vs baseline 1.249s)
+- **Improvement**: -12.6% (Regression)
+- **Kept experiments**: []
+- **Discarded experiments**: [Increase maxPipelineDepth to 64]
