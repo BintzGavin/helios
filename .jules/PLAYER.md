@@ -55,3 +55,6 @@
 ## [v0.77.40] - Undocumented Events
 **Learning:** The `error` and `audiometering` events were being fired by `<helios-player>` but were missing from the `README.md` events list.
 **Action:** Created a plan to document these missing events to maintain strict API parity visibility.
+## [v0.77.41] - Documenting Event Handlers
+**Learning**: The standard event handler properties (`onplay`, `onpause`, etc.) were implemented for API parity but never explicitly documented in the README, leading to a vision gap.
+**Action**: Always verify that newly implemented API surfaces are immediately documented in the project's README to maintain synchronization between implementation and vision.
