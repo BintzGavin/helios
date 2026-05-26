@@ -466,3 +466,4 @@ Last updated by: PERF-592
 - **PERF-592**: Simplify sync media CDP expression
   - **What I did**: Removed `typeof window.__helios_sync_media==='function'` check from the expression string assignments in the `defaultSyncMedia` method in `CdpTimeDriver.ts`.
   - **Impact**: Improved median render time to ~1.374.
+- **PERF-593**: Could caching `targetElementHandle.boundingBox()` in `prepare()` instead of calling it on every frame in `capture()` avoid unnecessary IPC and Promise allocations, speeding up the hot loop?
