@@ -71,6 +71,7 @@ Last updated by: PERF-592
   - **Outcome**: discard
 
 ## What Doesn't Work (and Why)
+- Map based string cache in CdpTimeDriver (PERF-599) - Slower than baseline (1.728s vs 1.267s). Overhead of checking and setting map values might be worse than simple V8 string concatenation for small strings.
 - **PERF-591**: Merged .catch into .then in hot loops.
   - **What I tried**: Merged .catch() into .then(onFulfilled, onRejected) in CaptureLoop and DomStrategy.
   - **Why it didn't work**: Did not improve performance (median 1.397s vs baseline 1.229s). The microtask overhead saved by skipping the .catch promise allocation was negligible compared to other factors like IPC overhead, and altering the promise structure might have even slightly deoptimized V8's hot path for these specific loops.

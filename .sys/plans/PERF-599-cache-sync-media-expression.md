@@ -1,7 +1,7 @@
 ---
 id: PERF-599
 slug: cache-sync-media-expression
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-05-27
 completed: ""
@@ -49,3 +49,12 @@ Since the set of `timeInSeconds` is extremely small and deterministic, the Map w
 
 ## Correctness Check
 Run the `npx tsx packages/renderer/scripts/benchmark-perf.ts` script to test performance, followed by `npm run test -w packages/renderer` to verify correctness and ensure media synchronization continues to work properly.
+
+## Results Summary
+```tsv
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	1.267	150	95.0	70.0	discard	baseline
+2	1.728	150	86.82	70.3	discard	PERF-599: map string cache
+3	1.522	150	98.58	70.0	discard	PERF-599: map string cache
+4	3.126	150	47.99	70.2	discard	PERF-599: map string cache
+```

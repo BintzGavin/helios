@@ -1,0 +1,5 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	1.267	150	95.0	70.0	discard	baseline
+2	1.728	150	86.82	70.3	discard	PERF-599: map string cache
+3	1.522	150	98.58	70.0	discard	PERF-599: map string cache
+4	3.126	150	47.99	70.2	discard	PERF-599: map string cache
