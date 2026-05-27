@@ -122,11 +122,11 @@ const report = await Helios.diagnose();
 ## Roadmap
 ### V1.x (Active)
 - **Studio**: v0.107.1+ (Expand Reverse Speeds, Toggle Loop Shortcut, Export Job Spec, Asset Drag and Drop, TimelineAudioTrack Regression Tests, Refine CLI Component Removal)
-- **CLI**: v0.45.2+ (CLI Index Regression Tests, CLI Registry Types Regression Tests, CLI Docker Adapter Regression Tests, CLI Cloud Templates Tests, Scaffold Hetzner Deployment, All Worker Execution, Scaffold Cloudflare Sandbox Deployment, Tier 3 Scaffold Deployment Commands)
+- **CLI**: v0.45.2+ (CLI Registry Types Regression Tests, CLI Docker Adapter Regression Tests, CLI Cloud Templates Tests, CLI Index Regression Tests, Scaffold Hetzner Deployment, All Worker Execution, Scaffold Cloudflare Sandbox Deployment, Tier 3 Scaffold Deployment Commands)
 - **Core**: v5.13.0+ (Generic Input Props, Implement Active Clips, Implement Composition Schema, Shared Virtual Time Binding, Enable Audio State Persistence, Audio Fade Easing)
-- **Player**: v0.76.20+ (Expand Index Coverage, Improve index.ts test coverage, Document Tracks API, Add Media Session properties to README, Implement WebVTT Support, Fix Arrow Key Shortcuts, Document getSchema API Parity, Bridge Coverage Completeness)
-- **Renderer**: v1.78.3+ (WebCodecs Preference, Update Skill Documentation, Validate HW Accel, Orchestrator Plan, Refactor Media Sync Logic, Refactor DOM Traversal, Canvas Image Preload, Fix Verification Script Regression)
-- **Infrastructure**: v0.25.0+ (Optimize S3 Uploads, Optimize GCS Uploads, Orchestrator Test Coverage Expansion, CloudRun Resiliency Tests, InMemoryJobRepository Coverage, FfmpegStitcher Coverage)
+- **Player**: v0.76.20+ (Document getSchema API Parity, Bridge Coverage Completeness, Bridge Coverage Expansion, Regression Tests for Audio Fader, Regression Tests for Media Session, Regression Tests for MediaProperties, Regression Tests for InputProps)
+- **Renderer**: v1.78.3+ (Validate HW Accel, Orchestrator Plan, Refactor Media Sync Logic, Update Skill Documentation, Fix Verification Script Regression, Refactor DOM Traversal, Abstraction for Pluggable Execution)
+- **Infrastructure**: v0.25.0+ (Optimize GCS Uploads, Orchestrator Coverage Expansion, InMemoryJobRepository Coverage, Orchestrator Test Coverage Expansion)
 
 ### AI Integration
 - **Studio MCP Server**: Inspect, create, and render compositions via LLM tools (Done)
