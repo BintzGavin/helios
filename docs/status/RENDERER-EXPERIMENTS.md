@@ -71,6 +71,10 @@ Last updated by: PERF-592
   - **Outcome**: discard
 
 ## What Doesn't Work (and Why)
+- **PERF-603**: Batch FFmpeg stdin writes via Writable.cork()
+  - **What I tried**: Used node Writable.cork() to batch frames.
+  - **WHY it didn't work**: The median render time regressed to ~1.360s compared to baseline ~1.267s. Native node stream batching via cork/uncork added overhead or interfered with Playwright/FFmpeg IPC pipe draining pacing.
+  - **Plan ID**: PERF-603
 - **PERF-602**: Eager Base64 Buffer Decoding in Capture Hot Loop
   - **What I tried**: Eagerly decoded Base64 strings to Buffers in CaptureLoop's runWorker to bypass Node.js Writable stream type checks and reduce V8 string GC pressure.
   - **WHY it didn't work**: The median render time regressed to ~1.454s compared to baseline ~1.267s. The CPU overhead and blocking nature of `Buffer.from(string, 'base64')` on the main thread inside the hot loop outweighed the benefits of bypassing stream coercion, starving the event loop and delaying IPC writes.

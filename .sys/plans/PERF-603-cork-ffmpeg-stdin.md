@@ -1,11 +1,11 @@
 ---
 id: PERF-603
 slug: cork-ffmpeg-stdin
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-05-27
 completed: ""
-result: ""
+result: "discard"
 ---
 
 # PERF-603: Native IPC Batching via Writable.cork()
