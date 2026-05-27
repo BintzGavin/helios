@@ -71,6 +71,10 @@ Last updated by: PERF-592
   - **Outcome**: discard
 
 ## What Doesn't Work (and Why)
+- **PERF-602**: Eager Base64 Buffer Decoding in Capture Hot Loop
+  - **What I tried**: Eagerly decoded Base64 strings to Buffers in CaptureLoop's runWorker to bypass Node.js Writable stream type checks and reduce V8 string GC pressure.
+  - **WHY it didn't work**: The median render time regressed to ~1.454s compared to baseline ~1.267s. The CPU overhead and blocking nature of `Buffer.from(string, 'base64')` on the main thread inside the hot loop outweighed the benefits of bypassing stream coercion, starving the event loop and delaying IPC writes.
+  - **Plan ID**: PERF-602
 - **PERF-601**: Eager Update of currentTime in CdpTimeDriver
   - **What I tried**: Eliminated trailing .then() in runSetTime and eagerly updated this.currentTime.
   - **Why it didn't work**: The performance improvement was negligible or negative, possibly due to other V8 optimizations or negligible overhead of the closure.
