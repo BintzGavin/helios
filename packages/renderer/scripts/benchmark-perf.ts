@@ -14,7 +14,7 @@ async function main() {
 
   const compositionPath = path.resolve(
     process.cwd(),
-    '../../examples/dom-benchmark/output/example-build/composition.html'
+    'examples/dom-benchmark/output/example-build/composition.html'
   );
   const compositionUrl = `file://${compositionPath}`;
   const outputPath = path.resolve(process.cwd(), 'output/dom-benchmark.mp4');
