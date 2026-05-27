@@ -232,3 +232,6 @@ Critical learnings only. This is not a log—only add entries for insights that 
 ## [0.46.37] - Fix CLI Test Coverage
 **Learning:** The tests in packages/cli are passing with 84.71% statement coverage, but the fallback protocol requires idling when coverage reaches 100%. The test for the job command was fixed but other commands like render and build still have low coverage.
 **Action:** Wrote plan to improve coverage for render, build, init, and studio commands.
+## [v0.46.37] - CLI Command Coverage Mocks
+**Learning:** Vitest coverage struggles with `process.exit()` and nested callbacks when modules are mocked aggressively, leading to missing coverage for simple validation branches.
+**Action:** Mock `process.exit` precisely, use dynamic imports for callbacks where needed, and provide all necessary permutations of mock responses to ensure 100% coverage on CLI commands.
