@@ -476,3 +476,4 @@ Last updated by: PERF-592
   - **What I tried**: Modified the `timePromise` chain in `CaptureLoop.ts` to check and execute `writerWaiterResolve` directly within the `.then()` and `.catch()` fulfillment handlers instead of awaiting the generator resumption.
   - **WHY it didn't work**: The median render time regressed slightly to ~10.417s compared to the baseline of ~10.347s. Resolving the waiter inside the callback did not outweigh the overhead of checking `writerWaiterResolve && nextFrameToWrite === i` conditionally inside both the `.then` and `.catch` closures. V8 seems to optimize the generator `await` resumption more efficiently than the repeated closure state checks.
   - **Outcome**: discard
+- Would batching frame buffers via Buffer.concat() before writing to FFmpeg stdin reduce IPC overhead? (PERF-597)
