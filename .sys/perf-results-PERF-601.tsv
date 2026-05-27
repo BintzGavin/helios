@@ -1,0 +1,4 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	2.207	150	67.96	70.0	discard	Eager Update of currentTime in CdpTimeDriver
+2	1.584	150	94.71	70.1	discard	Eager Update of currentTime in CdpTimeDriver
+3	1.505	150	99.64	69.9	discard	Eager Update of currentTime in CdpTimeDriver

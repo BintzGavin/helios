@@ -71,6 +71,10 @@ Last updated by: PERF-592
   - **Outcome**: discard
 
 ## What Doesn't Work (and Why)
+- **PERF-601**: Eager Update of currentTime in CdpTimeDriver
+  - **What I tried**: Eliminated trailing .then() in runSetTime and eagerly updated this.currentTime.
+  - **Why it didn't work**: The performance improvement was negligible or negative, possibly due to other V8 optimizations or negligible overhead of the closure.
+  - **Plan ID**: PERF-601
 - Map based string cache in CdpTimeDriver (PERF-599) - Slower than baseline (1.728s vs 1.267s). Overhead of checking and setting map values might be worse than simple V8 string concatenation for small strings.
 - **PERF-591**: Merged .catch into .then in hot loops.
   - **What I tried**: Merged .catch() into .then(onFulfilled, onRejected) in CaptureLoop and DomStrategy.
