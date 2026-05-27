@@ -78,5 +78,8 @@
     "vite-plugin-solid": "^2.11.10",
     "vitest": "^4.0.17",
     "vue": "^3.5.27"
+  },
+  "dependencies": {
+    "playwright": "^1.60.0"
   }
 }
