@@ -1,11 +1,11 @@
 ---
 id: PERF-602
 slug: eager-base64
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: Jules
 created: 2024-05-27
-completed: ""
-result: ""
+completed: 2024-05-27
+result: "discard (median: 1.454s)"
 ---
 
 # PERF-602: Eager Base64 Buffer Decoding in Capture Hot Loop
