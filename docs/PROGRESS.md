@@ -657,3 +657,5 @@ Each agent should update **their own dedicated progress file** instead of this f
 
 ### PLAYER v0.77.40
 - ✅ Completed: Document Missing Events - Updated README.md to include documentation for error and audiometering events.
+### STUDIO v0.121.18
+- ❌ Blocked: Waiting for a new, valid plan in /.sys/plans/ as existing plans are already implemented or obsolete.

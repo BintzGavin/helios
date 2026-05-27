@@ -1,4 +1,4 @@
-**Version**: 0.121.17
+**Version**: 0.121.18
 
 [v0.121.13] ✅ Completed: Expand Reverse Speeds - Added -4x and -2x reverse playback options to the PlaybackControls component.
 
@@ -218,3 +218,4 @@
 [v0.121.15] ✅ Completed: Document duplicated Timeline-Scrubber plan - Logged the duplicated plan as impossible since Timeline already supports scrubbing.
 [v0.121.14] ✅ Completed: Document duplicated Update-Keyboard-Shortcuts-Documentation plan - Logged the duplicated plan as impossible.
 - ❌ Blocked: Waiting for a new, valid plan in /.sys/plans/ as existing plans are already implemented or obsolete.
+- [v0.121.18] ❌ Blocked: Waiting for a new, valid plan in /.sys/plans/ as existing plans are already implemented or obsolete.
