@@ -1,3 +1,7 @@
+## [2024-05-27] - PERF-598: Cache Sync Media Expression
+**Learning:** String allocation in hot loop is expensive and should be cached to reduce GC pressure.
+**Action:** Created plan `PERF-598-cache-sync-media-expression.md` to cache string allocations in `CdpTimeDriver` using a Map based on `timeInSeconds`.
+
 ## [2026-10-18] - WebCodecs Determinism Gap (Retry)
 **Learning:** Re-identified the WebCodecs determinism gap. The original plan from 2026-09-15 was not executed. `CanvasStrategy` still strictly prioritizes hardware encoding.
 **Action:** Created fresh plan `2026-10-18-RENDERER-WebCodecs-Preference.md` to introduce `webCodecsPreference` option. This is critical for reliable regression testing.
