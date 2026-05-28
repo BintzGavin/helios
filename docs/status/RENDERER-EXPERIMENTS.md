@@ -1,8 +1,11 @@
 ## Performance Trajectory
-Current best: 1.267s (baseline was 1.378s, -0.3%)
-Last updated by: PERF-592
+Current best: 1.466s (baseline was 1.489s, -1.5%)
+Last updated by: PERF-606
 
 ## What Works
+- **PERF-606**: Merged runWorker promise chain
+  - **What I did**: Merged .catch() into preceding .then() in CaptureLoop.ts runWorker.
+  - **Impact**: Improved median render time to ~1.466s (from baseline ~1.489s).
 - **PERF-597**: Batch FFmpeg stdin writes
   - **What I did**: Accumulated frames in memory and wrote them in batches (size 8) to FFmpeg stdin to reduce IPC overhead.
   - **Impact**: Reduced Node.js IPC context switches, median render time improved to ~1.267s.

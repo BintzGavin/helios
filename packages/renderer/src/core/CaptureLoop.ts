@@ -186,14 +186,16 @@ export class CaptureLoop {
             const timePromise = setTimeResult ? setTimeResult : Promise.resolve();
             await timePromise
                 .then(() => strategy.capture(page, time))
-                .then((buffer) => {
-                    frameBufferRing[ringIndex] = buffer;
-                    frameReadyRing[ringIndex] = 1;
-                })
-                .catch((e) => {
-                    frameErrorRing[ringIndex] = e;
-                    frameReadyRing[ringIndex] = 1;
-                });
+                .then(
+                    (buffer) => {
+                        frameBufferRing[ringIndex] = buffer;
+                        frameReadyRing[ringIndex] = 1;
+                    },
+                    (e) => {
+                        frameErrorRing[ringIndex] = e;
+                        frameReadyRing[ringIndex] = 1;
+                    }
+                );
             if (writerWaiterResolve && nextFrameToWrite === i) {
                 const res = writerWaiterResolve;
                 writerWaiterResolve = null;
