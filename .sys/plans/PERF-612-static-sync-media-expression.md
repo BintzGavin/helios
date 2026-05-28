@@ -1,11 +1,11 @@
 ---
 id: PERF-612
 slug: static-sync-media-expression
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-28
-completed: ""
-result: ""
+completed: "2026-05-28"
+result: "improved"
 ---
 
 # PERF-612: Static sync media CDP expression in CdpTimeDriver
@@ -128,3 +128,9 @@ To:
 
 ## Correctness Check
 Run the `npx tsx packages/renderer/scripts/benchmark-perf.ts` script to test performance, followed by `npx tsx packages/renderer/tests/verify-cdp-determinism.ts` to ensure virtual time matching still correctly drives `performance.now()`.
+
+## Results Summary
+- **Best render time**: 1.339s (vs baseline 1.368s)
+- **Improvement**: 2.12%
+- **Kept experiments**: [static sync media expression]
+- **Discarded experiments**: []

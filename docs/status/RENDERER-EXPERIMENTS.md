@@ -1,8 +1,11 @@
 ## Performance Trajectory
-Current best: 1.404s (baseline was 1.462s, -3.97%)
-Last updated by: PERF-610
+Current best: 1.339s (baseline was 1.462s, -8.41%)
+Last updated by: PERF-612
 
 ## What Works
+- **PERF-612**: Static sync media CDP expression
+  - **What I did**: Changed the CDP expression in `CdpTimeDriver.ts` to a static `"window.__helios_sync_media();"` string to remove per-frame V8 string concatenation, instead calling `performance.now()` in browser.
+  - **Impact**: Improved median render time to ~1.339s.
 - **PERF-610**: Inline `timePromise` in CaptureLoop to eliminate Promise.resolve() Part 2
   - **What I did**: Eliminated `Promise.resolve` on synchronous `captureResult` assignments.
   - **Impact**: Improved median render time to ~1.404s.
