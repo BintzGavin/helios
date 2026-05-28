@@ -1,7 +1,7 @@
 ---
 id: PERF-609
 slug: inline-timepromise
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-05-28
 completed: ""
