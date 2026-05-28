@@ -501,3 +501,7 @@ Last updated by: PERF-592
   - **What I tried**: Accumulated frames in memory (unified Buffer[]) and wrote them in batches (size 8) to FFmpeg stdin to reduce IPC overhead.
   - **WHY it didn't work**: The median render time regressed to ~1.442s compared to baseline ~1.413s. The memory pressure from Buffer allocations/concatenation and GC pauses likely outweighed the savings from reducing the IPC calls.
   - **Plan ID**: PERF-597
+- **PERF-604**: Restore `await` sequence in `runWorker`
+  - **What I tried**: Replaced `.then()` chain with native `await`s wrapped in `try/catch` to avoid closure allocations.
+  - **WHY it didn't work**: The median render time was ~1.590s compared to baseline ~1.267s. V8 optimization of closures inside async generators is highly efficient, and the native `try/catch` overhead still outweighs the closure allocation cost.
+  - **Plan ID**: PERF-604
