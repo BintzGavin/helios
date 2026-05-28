@@ -1,11 +1,11 @@
 ---
 id: PERF-607
 slug: merge-runworker-promise-chain-part2
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-05-28
-completed: ""
-result: ""
+completed: 2024-05-28
+result: failed
 ---
 
 # PERF-607: Merge Promise Catch Handlers in runWorker
@@ -38,3 +38,9 @@ In the `runWorker` promise chain around line 187-196, the executor must read the
 
 ## Correctness Check
 Run `npx tsx packages/renderer/tests/run-all.ts` to verify correctness and ensure no unhandled promise rejections occur.
+
+## Results Summary
+```tsv
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	0.000	0	0.00	0.0	discard	already implemented natively
+```
