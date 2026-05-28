@@ -1,7 +1,7 @@
 ---
 id: PERF-610
 slug: inline-timepromise-retry
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-05-28
 completed: ""
@@ -108,3 +108,9 @@ with:
 
 ## Correctness Check
 Run `npx tsx packages/renderer/tests/run-all.ts` to verify correctness and ensure no unhandled promise rejections occur.
+
+## Results
+- Baseline median: ~1.462s
+- Improved median: ~1.404s
+- Improvement: ~3.97%
+- Status: keep

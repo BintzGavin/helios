@@ -1,8 +1,11 @@
 ## Performance Trajectory
-Current best: 1.462s (baseline was 1.466s, -0.2%)
-Last updated by: PERF-609
+Current best: 1.404s (baseline was 1.462s, -3.97%)
+Last updated by: PERF-610
 
 ## What Works
+- **PERF-610**: Inline `timePromise` in CaptureLoop to eliminate Promise.resolve() Part 2
+  - **What I did**: Eliminated `Promise.resolve` on synchronous `captureResult` assignments.
+  - **Impact**: Improved median render time to ~1.404s.
 - **PERF-609**: Inline timePromise
   - **What I did**: Conditionally inlined timePromise in CaptureLoop.
   - **Impact**: Improved median render time to ~1.462s (from baseline ~1.466s).
