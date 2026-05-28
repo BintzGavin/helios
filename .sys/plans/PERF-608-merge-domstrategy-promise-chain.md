@@ -1,11 +1,11 @@
 ---
 id: PERF-608
 slug: merge-domstrategy-promise-chain
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-28
-completed: ""
-result: ""
+completed: "2024-05-28"
+result: "discarded"
 ---
 
 # PERF-608: Merge Promise Catch Handlers in DomStrategy
@@ -45,3 +45,9 @@ Do this for the `targetElementHandle` branch. Explore the rest of the `capture` 
 
 ## Correctness Check
 Run `npx tsx packages/renderer/tests/run-all.ts` to verify correctness and ensure no unhandled promise rejections occur.
+
+## Results Summary
+- **Best render time**: 1.368s (vs baseline 1.374s)
+- **Improvement**: 0.4% (inconclusive)
+- **Kept experiments**: []
+- **Discarded experiments**: [PERF-608]

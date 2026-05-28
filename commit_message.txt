@@ -1,0 +1,1 @@
+✨ RENDERER: Discard PERF-608 merge DomStrategy promise catch
