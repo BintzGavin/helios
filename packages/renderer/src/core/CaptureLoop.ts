@@ -183,19 +183,24 @@ export class CaptureLoop {
             const ringIndex = i & ringMask;
 
             const setTimeResult = timeDriver.setTime(page, compositionTimeInSeconds);
-            const timePromise = setTimeResult ? setTimeResult : Promise.resolve();
-            await timePromise
-                .then(() => strategy.capture(page, time))
-                .then(
-                    (buffer) => {
-                        frameBufferRing[ringIndex] = buffer;
-                        frameReadyRing[ringIndex] = 1;
-                    },
-                    (e) => {
-                        frameErrorRing[ringIndex] = e;
-                        frameReadyRing[ringIndex] = 1;
-                    }
-                );
+            const captureResult = setTimeResult
+                ? setTimeResult.then(() => strategy.capture(page, time))
+                : strategy.capture(page, time);
+
+            const finalPromise = captureResult instanceof Promise
+                ? captureResult
+                : Promise.resolve(captureResult);
+
+            await finalPromise.then(
+                (buffer) => {
+                    frameBufferRing[ringIndex] = buffer;
+                    frameReadyRing[ringIndex] = 1;
+                },
+                (e) => {
+                    frameErrorRing[ringIndex] = e;
+                    frameReadyRing[ringIndex] = 1;
+                }
+            );
             if (writerWaiterResolve && nextFrameToWrite === i) {
                 const res = writerWaiterResolve;
                 writerWaiterResolve = null;

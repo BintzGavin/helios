@@ -1,8 +1,11 @@
 ## Performance Trajectory
-Current best: 1.466s (baseline was 1.489s, -1.5%)
-Last updated by: PERF-606
+Current best: 1.462s (baseline was 1.466s, -0.2%)
+Last updated by: PERF-609
 
 ## What Works
+- **PERF-609**: Inline timePromise
+  - **What I did**: Conditionally inlined timePromise in CaptureLoop.
+  - **Impact**: Improved median render time to ~1.462s (from baseline ~1.466s).
 - **PERF-606**: Merged runWorker promise chain
   - **What I did**: Merged .catch() into preceding .then() in CaptureLoop.ts runWorker.
   - **Impact**: Improved median render time to ~1.466s (from baseline ~1.489s).
@@ -539,3 +542,5 @@ Last updated by: PERF-592
   - **What I tried**: Replaced `.then()` chain with native `await`s wrapped in `try/catch` to avoid closure allocations.
   - **WHY it didn't work**: The median render time was ~1.590s compared to baseline ~1.267s. V8 optimization of closures inside async generators is highly efficient, and the native `try/catch` overhead still outweighs the closure allocation cost.
   - **Plan ID**: PERF-604
+  - **What I tried**: Inlined timePromise
+  - **WHY it didn't work**: Did not improve over baseline.
