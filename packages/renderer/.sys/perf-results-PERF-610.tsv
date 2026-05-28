@@ -1,0 +1,5 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	1.487	150	100.84	70.9	keep	inline timePromise Part 2
+2	1.394	150	107.59	70.1	keep	inline timePromise Part 2
+3	1.440	150	104.15	70.2	keep	inline timePromise Part 2
+4	1.404	150	106.80	70.8	keep	inline timePromise Part 2
