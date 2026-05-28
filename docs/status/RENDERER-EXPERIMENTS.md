@@ -71,6 +71,11 @@ Last updated by: PERF-592
   - **Outcome**: discard
 
 ## What Doesn't Work (and Why)
+- **PERF-605**: Omit write callback in FFmpeg stdin writes
+  - **What I tried**: Removed the `handleWriteError` callback from `this.ffmpegManager.stdin.write()` calls in `CaptureLoop.ts` to bypass Node.js Writable stream internal tracking allocations, and centralized error handling via the `error` event in `FFmpegManager.ts`.
+  - **WHY it didn't work**: The median render time regressed to ~1.341s compared to the baseline of ~1.267s. Although omitting the callback avoids allocating a `WriteReq` object, Node.js might use a less optimized or more complex internal queuing path for fully asynchronous, fire-and-forget writes compared to synchronous, tracked writes, leading to increased overhead in this specific high-frequency IPC write loop.
+  - **Plan ID**: PERF-605
+
 - **PERF-603**: Batch FFmpeg stdin writes via Writable.cork()
   - **What I tried**: Used node Writable.cork() to batch frames.
   - **WHY it didn't work**: The median render time regressed to ~1.360s compared to baseline ~1.267s. Native node stream batching via cork/uncork added overhead or interfered with Playwright/FFmpeg IPC pipe draining pacing.
@@ -200,6 +205,11 @@ Last updated by: PERF-592
 - Plan ID: PERF-518
 
 ## What Doesn't Work (and Why)
+- **PERF-605**: Omit write callback in FFmpeg stdin writes
+  - **What I tried**: Removed the `handleWriteError` callback from `this.ffmpegManager.stdin.write()` calls in `CaptureLoop.ts` to bypass Node.js Writable stream internal tracking allocations, and centralized error handling via the `error` event in `FFmpegManager.ts`.
+  - **WHY it didn't work**: The median render time regressed to ~1.341s compared to the baseline of ~1.267s. Although omitting the callback avoids allocating a `WriteReq` object, Node.js might use a less optimized or more complex internal queuing path for fully asynchronous, fire-and-forget writes compared to synchronous, tracked writes, leading to increased overhead in this specific high-frequency IPC write loop.
+  - **Plan ID**: PERF-605
+
 - **PERF-585**: Eliminate Progress Modulo
   - **What I tried**: Eliminated the per-frame modulo operator in the `CaptureLoop.ts` hot loop.
   - **Why it didn't work**: The overhead of tracking an additional numeric state variable and reassigning it offset the micro-savings from avoiding the modulo operator in V8, leading to a performance regression (median ~1.663s vs baseline ~1.550s).
@@ -247,6 +257,11 @@ Last updated by: PERF-592
   - **Outcome**: discard
 
 ## What Doesn't Work (and Why)
+- **PERF-605**: Omit write callback in FFmpeg stdin writes
+  - **What I tried**: Removed the `handleWriteError` callback from `this.ffmpegManager.stdin.write()` calls in `CaptureLoop.ts` to bypass Node.js Writable stream internal tracking allocations, and centralized error handling via the `error` event in `FFmpegManager.ts`.
+  - **WHY it didn't work**: The median render time regressed to ~1.341s compared to the baseline of ~1.267s. Although omitting the callback avoids allocating a `WriteReq` object, Node.js might use a less optimized or more complex internal queuing path for fully asynchronous, fire-and-forget writes compared to synchronous, tracked writes, leading to increased overhead in this specific high-frequency IPC write loop.
+  - **Plan ID**: PERF-605
+
 - **PERF-585**: Eliminate Progress Modulo
   - **What I tried**: Eliminated the per-frame modulo operator in the `CaptureLoop.ts` hot loop.
   - **Why it didn't work**: The overhead of tracking an additional numeric state variable and reassigning it offset the micro-savings from avoiding the modulo operator in V8, leading to a performance regression (median ~1.663s vs baseline ~1.550s).
@@ -328,6 +343,11 @@ Last updated by: PERF-592
   - **Outcome**: discard
 
 ## What Doesn't Work (and Why)
+- **PERF-605**: Omit write callback in FFmpeg stdin writes
+  - **What I tried**: Removed the `handleWriteError` callback from `this.ffmpegManager.stdin.write()` calls in `CaptureLoop.ts` to bypass Node.js Writable stream internal tracking allocations, and centralized error handling via the `error` event in `FFmpegManager.ts`.
+  - **WHY it didn't work**: The median render time regressed to ~1.341s compared to the baseline of ~1.267s. Although omitting the callback avoids allocating a `WriteReq` object, Node.js might use a less optimized or more complex internal queuing path for fully asynchronous, fire-and-forget writes compared to synchronous, tracked writes, leading to increased overhead in this specific high-frequency IPC write loop.
+  - **Plan ID**: PERF-605
+
 - **PERF-585**: Eliminate Progress Modulo
   - **What I tried**: Eliminated the per-frame modulo operator in the `CaptureLoop.ts` hot loop.
   - **Why it didn't work**: The overhead of tracking an additional numeric state variable and reassigning it offset the micro-savings from avoiding the modulo operator in V8, leading to a performance regression (median ~1.663s vs baseline ~1.550s).
@@ -376,6 +396,11 @@ Last updated by: PERF-592
   - **Outcome**: discard
 
 ## What Doesn't Work (and Why)
+- **PERF-605**: Omit write callback in FFmpeg stdin writes
+  - **What I tried**: Removed the `handleWriteError` callback from `this.ffmpegManager.stdin.write()` calls in `CaptureLoop.ts` to bypass Node.js Writable stream internal tracking allocations, and centralized error handling via the `error` event in `FFmpegManager.ts`.
+  - **WHY it didn't work**: The median render time regressed to ~1.341s compared to the baseline of ~1.267s. Although omitting the callback avoids allocating a `WriteReq` object, Node.js might use a less optimized or more complex internal queuing path for fully asynchronous, fire-and-forget writes compared to synchronous, tracked writes, leading to increased overhead in this specific high-frequency IPC write loop.
+  - **Plan ID**: PERF-605
+
 - **PERF-585**: Eliminate Progress Modulo
   - **What I tried**: Eliminated the per-frame modulo operator in the `CaptureLoop.ts` hot loop.
   - **Why it didn't work**: The overhead of tracking an additional numeric state variable and reassigning it offset the micro-savings from avoiding the modulo operator in V8, leading to a performance regression (median ~1.663s vs baseline ~1.550s).

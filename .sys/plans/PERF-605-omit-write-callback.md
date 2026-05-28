@@ -1,11 +1,11 @@
 ---
 id: PERF-605
 slug: omit-write-callback
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "Jules"
 created: 2024-05-28
-completed: ""
-result: ""
+completed: 2024-05-28
+result: "discard"
 ---
 
 # PERF-605: Omit write callback in FFmpeg stdin writes
@@ -58,14 +58,10 @@ to:
 **What to change**:
 Instruct the executor to explore the `spawn()` function and locate the `this.process.stdin.on('error', ...)` handler block. When the error is not `EPIPE`, the handler should be updated to invoke `this.emitError(err)` to replace the removed logic from `handleWriteError`.
 
-## Variations
-No variations planned. The primary approach is straightforward and directly targets the Node.js Writable stream optimization path.
-
-## Canvas Smoke Test
-Run `npx tsx packages/renderer/scripts/benchmark-perf.ts` to ensure Canvas mode still renders cleanly without stream write errors.
-
-## Correctness Check
-Run the `npm run test -w packages/renderer` to verify output correctly retains all frames and avoids truncation, ensuring error handling logic is not broken.
-
-## Prior Art
-Builds on findings from PERF-597 and PERF-603 regarding FFmpeg stdin write overhead and stream optimization techniques.
+## Results Summary
+```
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	1.346	150	111.42	69.9	discard	omit write callback
+2	1.327	150	113.06	70.1	discard	omit write callback
+3	1.341	150	111.89	70.1	discard	omit write callback
+```
