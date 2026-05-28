@@ -1,7 +1,7 @@
 ---
 id: PERF-611
 slug: preallocate-capture-handlers
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-05-28
 completed: ""

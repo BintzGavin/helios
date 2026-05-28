@@ -1,0 +1,4 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	1.449	150	103.53	70.0	discard	Pre-allocate capture handlers
+2	1.455	150	103.08	70.1	discard	Pre-allocate capture handlers
+3	1.472	150	101.91	70.2	discard	Pre-allocate capture handlers
