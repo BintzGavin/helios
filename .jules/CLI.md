@@ -235,3 +235,6 @@ Critical learnings only. This is not a log—only add entries for insights that 
 ## [v0.46.37] - CLI Command Coverage Mocks
 **Learning:** Vitest coverage struggles with `process.exit()` and nested callbacks when modules are mocked aggressively, leading to missing coverage for simple validation branches.
 **Action:** Mock `process.exit` precisely, use dynamic imports for callbacks where needed, and provide all necessary permutations of mock responses to ensure 100% coverage on CLI commands.
+## [v0.46.37] - CLI Command Coverage Mocks
+**Learning:** Vitest coverage struggles with `process.exit()` and nested callbacks when modules are mocked aggressively, leading to missing coverage for simple validation branches.
+**Action:** Mock `process.exit` precisely, use dynamic imports for callbacks where needed, and provide all necessary permutations of mock responses to ensure 100% coverage on CLI commands.
