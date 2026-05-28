@@ -74,6 +74,12 @@ Last updated by: PERF-606
   - **Outcome**: discard
 
 ## What Doesn't Work (and Why)
+
+- **PERF-608**: Merge Promise Catch Handlers in DomStrategy
+  - **What I tried**: Rewrote `.then(onFulfilled).catch(onRejected)` to `.then(onFulfilled, onRejected)` in `DomStrategy.ts` hot loop.
+  - **WHY it didn't work**: The median render time did not improve significantly over the baseline (median ~1.375s vs baseline ~1.374s). The minor promise allocation savings were offset by potential V8 deoptimization from altering the promise structure, just as observed previously in PERF-591. The experiment was discarded as inconclusive noise.
+  - **Plan ID**: PERF-608
+
 - **PERF-605**: Omit write callback in FFmpeg stdin writes
   - **What I tried**: Removed the `handleWriteError` callback from `this.ffmpegManager.stdin.write()` calls in `CaptureLoop.ts` to bypass Node.js Writable stream internal tracking allocations, and centralized error handling via the `error` event in `FFmpegManager.ts`.
   - **WHY it didn't work**: The median render time regressed to ~1.341s compared to the baseline of ~1.267s. Although omitting the callback avoids allocating a `WriteReq` object, Node.js might use a less optimized or more complex internal queuing path for fully asynchronous, fire-and-forget writes compared to synchronous, tracked writes, leading to increased overhead in this specific high-frequency IPC write loop.

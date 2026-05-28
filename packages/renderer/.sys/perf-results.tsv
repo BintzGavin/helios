@@ -127,3 +127,8 @@ run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
 2	1.414	150	106.05	44.8	keep	inline CDP session send
 3	1.405	150	106.78	42.4	keep	inline CDP session send
 4	1.427	150	105.13	42.1	keep	inline CDP session send
+1	1.382	150	108.50	70.1	keep	PERF-608: merge promise catch in DomStrategy
+2	1.375	150	109.08	70.7	keep	PERF-608: merge promise catch in DomStrategy
+3	1.391	150	107.85	70.0	keep	PERF-608: merge promise catch in DomStrategy
+4	1.368	150	109.68	70.0	keep	PERF-608: merge promise catch in DomStrategy
+5	1.390	150	107.91	70.1	keep	PERF-608: merge promise catch in DomStrategy
