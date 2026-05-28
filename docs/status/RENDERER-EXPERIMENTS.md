@@ -80,6 +80,9 @@ Last updated by: PERF-610
   - **Outcome**: discard
 
 ## What Doesn't Work (and Why)
+- **PERF-611**: Pre-allocate Capture Handlers
+  - **What I tried**: Pre-allocated fulfillment and rejection handlers in runWorker.
+  - **Why it didn't work**: No significant improvement. Overhead of accessing array elements is equal to or greater than closure allocation, or within noise. Median was 1.455s.
 
 - **PERF-608**: Merge Promise Catch Handlers in DomStrategy
   - **What I tried**: Rewrote `.then(onFulfilled).catch(onRejected)` to `.then(onFulfilled, onRejected)` in `DomStrategy.ts` hot loop.
