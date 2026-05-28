@@ -1,7 +1,7 @@
 ---
 id: PERF-606
 slug: merge-runworker-promise-chain
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-05-28
 completed: ""
@@ -45,4 +45,12 @@ run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
 1	1.402	150	106.97	70.0	discard	baseline
 2	1.489	150	100.72	70.0	discard	baseline
 3	1.507	150	99.51	70.1	discard	baseline
+```
+
+## New Results Summary
+```tsv
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	3.018	150	49.69	70.2	keep	merged runWorker promise chain
+2	1.403	150	106.89	70.1	keep	merged runWorker promise chain
+3	1.466	150	102.35	70.1	keep	merged runWorker promise chain
 ```
