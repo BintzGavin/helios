@@ -27,14 +27,14 @@ export class CdpTimeDriver implements TimeDriver {
     this.client!.send('Emulation.setVirtualTimePolicy', this.setVirtualTimePolicyParams).catch(this.handleVirtualTimeBudgetError);
   };
 
-  private defaultSyncMedia(timeInSeconds: number) {
+  private defaultSyncMedia() {
     const frames = this.cachedFrames;
     if (frames.length === 1) {
-      this.singleFrameSyncMediaParams.expression = "window.__helios_sync_media(" + timeInSeconds + ");";
+      this.singleFrameSyncMediaParams.expression = "window.__helios_sync_media();";
       this.client!.send('Runtime.evaluate', this.singleFrameSyncMediaParams).catch(noopCatch);
     } else {
         if (this.executionContextIds.length > 0) {
-          const expression = "window.__helios_sync_media(" + timeInSeconds + ");";
+          const expression = "window.__helios_sync_media();";
           if (this.multiFrameSyncMediaParams.length !== this.executionContextIds.length) {
             this.multiFrameSyncMediaParams.length = this.executionContextIds.length;
             for (let i = 0; i < this.executionContextIds.length; i++) {
@@ -51,7 +51,7 @@ export class CdpTimeDriver implements TimeDriver {
             this.client!.send('Runtime.evaluate', this.multiFrameSyncMediaParams[i]).catch(noopCatch);
           }
         } else {
-          this.singleFrameSyncMediaParams.expression = "window.__helios_sync_media(" + timeInSeconds + ");";
+          this.singleFrameSyncMediaParams.expression = "window.__helios_sync_media();";
           this.client!.send('Runtime.evaluate', this.singleFrameSyncMediaParams).catch(noopCatch);
         }
     }
@@ -135,7 +135,8 @@ export class CdpTimeDriver implements TimeDriver {
           cachedMediaElements = null;
         };
 
-        window.__helios_sync_media = (t) => {
+        window.__helios_sync_media = () => {
+          const t = performance.now() / 1000;
           if (!cachedMediaElements) {
             cachedMediaElements = findAllMedia(document);
           }
@@ -171,7 +172,7 @@ export class CdpTimeDriver implements TimeDriver {
     try {
       this.hasMedia = false;
       const { result } = await this.client!.send('Runtime.evaluate', {
-         expression: "typeof window.__helios_sync_media === 'function' ? window.__helios_sync_media(0) : 0",
+         expression: "typeof window.__helios_sync_media === 'function' ? window.__helios_sync_media() : 0",
          returnByValue: true
       });
       if (result && result.value > 0) {
@@ -220,7 +221,7 @@ export class CdpTimeDriver implements TimeDriver {
 
 // 1. Synchronize media elements
     if (this.syncMediaState === 1 && this.hasMedia) {
-      this.defaultSyncMedia(timeInSeconds);
+      this.defaultSyncMedia();
     }
 
     // 2. Advance virtual time
