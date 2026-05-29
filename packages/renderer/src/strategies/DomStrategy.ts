@@ -167,41 +167,38 @@ export class DomStrategy implements RenderStrategy {
   }
 
 
-  capture(page: Page, frameTime: number): Promise<Buffer | string> | Buffer | string {
+  async capture(page: Page, frameTime: number): Promise<Buffer | string> {
     if (this.targetElementHandle) {
-      return this.targetElementHandle.boundingBox().then((box: any) => {
-        if (!box) {
-           return this.lastFrameData!;
-        }
+      const box = await this.targetElementHandle.boundingBox();
+      if (!box) {
+         return this.lastFrameData!;
+      }
 
-        this.targetBeginFrameParams.screenshot.clip.x = box.x;
-        this.targetBeginFrameParams.screenshot.clip.y = box.y;
-        this.targetBeginFrameParams.screenshot.clip.width = box.width;
-        this.targetBeginFrameParams.screenshot.clip.height = box.height;
+      this.targetBeginFrameParams.screenshot.clip.x = box.x;
+      this.targetBeginFrameParams.screenshot.clip.y = box.y;
+      this.targetBeginFrameParams.screenshot.clip.width = box.width;
+      this.targetBeginFrameParams.screenshot.clip.height = box.height;
 
-        return this.cdpSession!.send('HeadlessExperimental.beginFrame', this.targetBeginFrameParams)
-          .then(result => {
-            if (result.screenshotData) {
-              this.lastFrameData = result.screenshotData;
-            }
-            return this.lastFrameData!;
-          })
-          .catch(e => {
-            return this.lastFrameData!;
-          });
-      });
-    }
-
-    return this.cdpSession!.send('HeadlessExperimental.beginFrame', this.beginFrameParams)
-      .then(result => {
+      try {
+        const result = await this.cdpSession!.send('HeadlessExperimental.beginFrame', this.targetBeginFrameParams);
         if (result.screenshotData) {
           this.lastFrameData = result.screenshotData;
         }
         return this.lastFrameData!;
-      })
-      .catch(e => {
+      } catch (e) {
         return this.lastFrameData!;
-      });
+      }
+    }
+
+    try {
+      const result = await this.cdpSession!.send('HeadlessExperimental.beginFrame', this.beginFrameParams);
+      if (result.screenshotData) {
+        this.lastFrameData = result.screenshotData;
+      }
+      return this.lastFrameData!;
+    } catch (e) {
+      return this.lastFrameData!;
+    }
   }
 
   async finish(page: Page): Promise<void> {

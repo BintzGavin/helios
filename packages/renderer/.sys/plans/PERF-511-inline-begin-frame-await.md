@@ -1,11 +1,11 @@
 ---
 id: PERF-511
 slug: inline-begin-frame-await
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-15
-completed: ""
-result: ""
+completed: 2026-05-29
+result: improved
 ---
 
 # PERF-511: Inline Begin Frame Await
@@ -106,3 +106,9 @@ Remove `handleBeginFrameSuccess` and `handleBeginFrameError` methods. Update `ca
 ```
 **Why**: Avoids creating secondary Promise objects via `.then()` and anonymous closures per frame, directly executing logic synchronously after the awaited CDP call.
 **Risk**: Negligible. Error behavior remains strictly identical.
+
+## Results Summary
+- **Best render time**: 10.819s (vs baseline 17.687s)
+- **Improvement**: 38.8%
+- **Kept experiments**: [Inline Begin Frame Await]
+- **Discarded experiments**: []

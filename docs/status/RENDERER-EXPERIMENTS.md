@@ -3,6 +3,9 @@ Current best: 1.339s (baseline was 1.462s, -8.41%)
 Last updated by: PERF-612
 
 ## What Works
+- **PERF-511**: Inline Begin Frame Await
+  - **What I did**: Replaced the `.then().catch()` promise chains in `DomStrategy.capture()` with synchronous inline `try/catch` using `await`.
+  - **Impact**: Reduced V8 closure and promise allocation overhead. Median render time improved to ~10.819s (from ~17.687s).
 - **PERF-612**: Static sync media CDP expression
   - **What I did**: Changed the CDP expression in `CdpTimeDriver.ts` to a static `"window.__helios_sync_media();"` string to remove per-frame V8 string concatenation, instead calling `performance.now()` in browser.
   - **Impact**: Improved median render time to ~1.339s.
