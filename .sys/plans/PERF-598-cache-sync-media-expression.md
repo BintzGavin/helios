@@ -1,11 +1,11 @@
 ---
 id: PERF-598
 slug: cache-sync-media-expression
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-27
-completed: ""
-result: ""
+completed: "2024-05-29"
+result: "failed"
 ---
 
 # PERF-598: Cache sync media CDP expression in CdpTimeDriver
@@ -49,3 +49,9 @@ Since the set of `timeInSeconds` is extremely small and deterministic, the Map w
 
 ## Correctness Check
 Run the `npx tsx packages/renderer/scripts/benchmark-perf.ts` script to test performance, followed by `npm run test -w packages/renderer` to verify correctness and ensure media synchronization continues to work properly.
+
+## Results Summary
+- **Best render time**: 0.000s (vs baseline 1.317s)
+- **Improvement**: 0%
+- **Kept experiments**: []
+- **Discarded experiments**: [PERF-598]

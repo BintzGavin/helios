@@ -89,6 +89,10 @@ Last updated by: PERF-614
   - **Outcome**: discard
 
 ## What Doesn't Work (and Why)
+- **PERF-598**: Cache sync media CDP expression in CdpTimeDriver
+  - **What I tried**: Planned to cache the dynamically generated sync media expression.
+  - **WHY it didn't work**: The experiment was discarded as an IMPOSSIBLE/duplicate plan because the code was already natively optimized to use a static string (`"window.__helios_sync_media();"`) in PERF-612, eliminating the dynamic concatenation altogether.
+  - **Plan ID**: PERF-598
 - **PERF-615**: Flatten CaptureLoop Promise Chain into Native Await
   - **What I tried**: Flattened the setTimeResult promise chain into a native await block in CaptureLoop.ts runWorker.
   - **WHY it didn't work**: The median render time difference (~2.392s vs baseline ~2.478s) was too small to be conclusive and falls within variance noise. The native `try/catch` block execution overhead negates any minor savings from avoiding `.then()` closure allocations in the V8 engine, similar to past experiments (PERF-604).
@@ -259,6 +263,10 @@ Last updated by: PERF-614
 - Plan ID: PERF-518
 
 ## What Doesn't Work (and Why)
+- **PERF-598**: Cache sync media CDP expression in CdpTimeDriver
+  - **What I tried**: Planned to cache the dynamically generated sync media expression.
+  - **WHY it didn't work**: The experiment was discarded as an IMPOSSIBLE/duplicate plan because the code was already natively optimized to use a static string (`"window.__helios_sync_media();"`) in PERF-612, eliminating the dynamic concatenation altogether.
+  - **Plan ID**: PERF-598
 - **PERF-605**: Omit write callback in FFmpeg stdin writes
   - **What I tried**: Removed the `handleWriteError` callback from `this.ffmpegManager.stdin.write()` calls in `CaptureLoop.ts` to bypass Node.js Writable stream internal tracking allocations, and centralized error handling via the `error` event in `FFmpegManager.ts`.
   - **WHY it didn't work**: The median render time regressed to ~1.341s compared to the baseline of ~1.267s. Although omitting the callback avoids allocating a `WriteReq` object, Node.js might use a less optimized or more complex internal queuing path for fully asynchronous, fire-and-forget writes compared to synchronous, tracked writes, leading to increased overhead in this specific high-frequency IPC write loop.
@@ -311,6 +319,10 @@ Last updated by: PERF-614
   - **Outcome**: discard
 
 ## What Doesn't Work (and Why)
+- **PERF-598**: Cache sync media CDP expression in CdpTimeDriver
+  - **What I tried**: Planned to cache the dynamically generated sync media expression.
+  - **WHY it didn't work**: The experiment was discarded as an IMPOSSIBLE/duplicate plan because the code was already natively optimized to use a static string (`"window.__helios_sync_media();"`) in PERF-612, eliminating the dynamic concatenation altogether.
+  - **Plan ID**: PERF-598
 - **PERF-605**: Omit write callback in FFmpeg stdin writes
   - **What I tried**: Removed the `handleWriteError` callback from `this.ffmpegManager.stdin.write()` calls in `CaptureLoop.ts` to bypass Node.js Writable stream internal tracking allocations, and centralized error handling via the `error` event in `FFmpegManager.ts`.
   - **WHY it didn't work**: The median render time regressed to ~1.341s compared to the baseline of ~1.267s. Although omitting the callback avoids allocating a `WriteReq` object, Node.js might use a less optimized or more complex internal queuing path for fully asynchronous, fire-and-forget writes compared to synchronous, tracked writes, leading to increased overhead in this specific high-frequency IPC write loop.
@@ -397,6 +409,10 @@ Last updated by: PERF-614
   - **Outcome**: discard
 
 ## What Doesn't Work (and Why)
+- **PERF-598**: Cache sync media CDP expression in CdpTimeDriver
+  - **What I tried**: Planned to cache the dynamically generated sync media expression.
+  - **WHY it didn't work**: The experiment was discarded as an IMPOSSIBLE/duplicate plan because the code was already natively optimized to use a static string (`"window.__helios_sync_media();"`) in PERF-612, eliminating the dynamic concatenation altogether.
+  - **Plan ID**: PERF-598
 - **PERF-605**: Omit write callback in FFmpeg stdin writes
   - **What I tried**: Removed the `handleWriteError` callback from `this.ffmpegManager.stdin.write()` calls in `CaptureLoop.ts` to bypass Node.js Writable stream internal tracking allocations, and centralized error handling via the `error` event in `FFmpegManager.ts`.
   - **WHY it didn't work**: The median render time regressed to ~1.341s compared to the baseline of ~1.267s. Although omitting the callback avoids allocating a `WriteReq` object, Node.js might use a less optimized or more complex internal queuing path for fully asynchronous, fire-and-forget writes compared to synchronous, tracked writes, leading to increased overhead in this specific high-frequency IPC write loop.
@@ -450,6 +466,10 @@ Last updated by: PERF-614
   - **Outcome**: discard
 
 ## What Doesn't Work (and Why)
+- **PERF-598**: Cache sync media CDP expression in CdpTimeDriver
+  - **What I tried**: Planned to cache the dynamically generated sync media expression.
+  - **WHY it didn't work**: The experiment was discarded as an IMPOSSIBLE/duplicate plan because the code was already natively optimized to use a static string (`"window.__helios_sync_media();"`) in PERF-612, eliminating the dynamic concatenation altogether.
+  - **Plan ID**: PERF-598
 - **PERF-607**: Merge Promise Catch Handlers in runWorker (Part 2)
   - **What I tried**: Attempted to merge the `.catch()` block into the preceding `.then()` in `CaptureLoop.ts`.
   - **WHY it didn't work**: The change is already implemented natively in the file (from a previous PERF execution). The `.catch` block no longer exists in `CaptureLoop.ts` around line 187-196, it has already been converted to `.then(onFulfilled, onRejected)`.
