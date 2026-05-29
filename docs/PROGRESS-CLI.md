@@ -348,3 +348,6 @@ This file tracks progress for the CLI domain (`packages/cli`).
 
 ### CLI v0.46.37
 - ✅ Completed: CLI Command Coverage Tests V2 - Implemented missing test cases for render, build, init, and studio commands.
+
+### CLI v0.46.38
+- ✅ Completed: CLI Job/Render/Merge Tests Missing Mock - Fixed vitest mock resolution errors by setting `server.deps.inline` in `vitest.config.ts`.
