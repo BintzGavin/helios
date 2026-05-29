@@ -1,11 +1,11 @@
 ---
 id: PERF-613
 slug: merge-domstrategy-promises
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-29
-completed: ""
-result: ""
+completed: "2024-05-29"
+result: "discard (duplicate)"
 ---
 
 # PERF-613: Merge Promise Catch Handlers in DomStrategy
