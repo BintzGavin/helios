@@ -1,0 +1,8 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	13.812	150	10.86	62.5	keep	baseline
+2	2.891	150	51.88	62.7	keep	flatten_captureloop_await
+3	2.386	150	62.87	63.4	keep	flatten_captureloop_await
+4	2.392	150	62.71	62.7	keep	flatten_captureloop_await
+5	2.548	150	58.88	63.2	keep	baseline_retest
+6	2.478	150	60.53	63.0	keep	baseline_retest
+7	2.393	150	62.68	63.8	keep	baseline_retest

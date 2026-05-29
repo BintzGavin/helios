@@ -1,8 +1,8 @@
 ---
 id: PERF-615
 slug: flatten-captureloop-await
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-29
 completed: ""
 result: ""
@@ -104,3 +104,8 @@ Run the DOM benchmark and inspect the output video to ensure frames are still ca
 ## Prior Art
 - **PERF-511**: Inlined Begin Frame Await (`.then` to `await`), which significantly improved performance.
 - **PERF-614**: Eliminated Capture Result Promise Allocation, moving to inline `try/catch`. This experiment naturally extends PERF-614 upstream to `setTimeResult`.
+## Results Summary
+- **Best render time**: 2.392s (vs baseline 2.478s)
+- **Improvement**: ~3.5% (Inconclusive/Noise)
+- **Kept experiments**: []
+- **Discarded experiments**: [PERF-615]
