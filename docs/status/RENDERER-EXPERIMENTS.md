@@ -86,6 +86,11 @@ Last updated by: PERF-612
   - **Outcome**: discard
 
 ## What Doesn't Work (and Why)
+- **PERF-613**: Merge Promise Catch Handlers in DomStrategy
+  - **What I tried**: Attempted to rewrite `.then(onFulfilled).catch(onRejected)` to `.then(onFulfilled, onRejected)` in the `DomStrategy.ts` hot loop.
+  - **WHY it didn't work**: The experiment was discarded as an IMPOSSIBLE/duplicate plan. The target code was already optimized to natively use `async/await` and an inline `try/catch` sequence in `PERF-511`, meaning the `then/catch` promise chain target no longer exists.
+  - **Plan ID**: PERF-613
+
 - **PERF-611**: Pre-allocate Capture Handlers
   - **What I tried**: Pre-allocated fulfillment and rejection handlers in runWorker.
   - **Why it didn't work**: No significant improvement. Overhead of accessing array elements is equal to or greater than closure allocation, or within noise. Median was 1.455s.
