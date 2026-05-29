@@ -89,6 +89,10 @@ Last updated by: PERF-614
   - **Outcome**: discard
 
 ## What Doesn't Work (and Why)
+- **PERF-615**: Flatten CaptureLoop Promise Chain into Native Await
+  - **What I tried**: Flattened the setTimeResult promise chain into a native await block in CaptureLoop.ts runWorker.
+  - **WHY it didn't work**: The median render time difference (~2.392s vs baseline ~2.478s) was too small to be conclusive and falls within variance noise. The native `try/catch` block execution overhead negates any minor savings from avoiding `.then()` closure allocations in the V8 engine, similar to past experiments (PERF-604).
+  - **Plan ID**: PERF-615
 - PERF-620: Flatten and Inline worker logic in CaptureLoop. Discarded. The attempt to blindly await setTime() and strategy.capture() in runWorker() replacing the dynamic checking resulted in slightly worse median performance (~2.436s vs ~2.435s), likely due to await tick overhead adding latency compared to branching.
 - **PERF-619**: Eager update of currentTime in CdpTimeDriver
   - **What I tried**: Eagerly updated currentTime.
