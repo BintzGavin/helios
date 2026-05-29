@@ -1,7 +1,7 @@
 ---
 id: PERF-616
 slug: monomorphic-capture-worker
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-05-29
 completed: ""

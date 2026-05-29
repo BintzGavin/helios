@@ -89,6 +89,10 @@ Last updated by: PERF-614
   - **Outcome**: discard
 
 ## What Doesn't Work (and Why)
+- **PERF-616**: Monomorphic Capture Worker Paths
+  - **What I tried**: Split runWorker into monomorphic runAsyncWorker and runSyncWorker to eliminate dynamic instanceof Promise checks.
+  - **WHY it didn't work**: The median render time regressed to ~2.204s vs baseline ~1.317s. V8 optimization inside async generators and closures seems to perform better or at least equally well with the dynamic type check in this context compared to splitting the logic into multiple closure functions and checking options outside the loop. The regression is quite large, potentially because V8 optimizes the unified runWorker better with monomorphic inline caches under the hood, or because there is an additional closure overhead.
+  - **Plan ID**: PERF-616
 - **PERF-613**: Merge Promise Catch Handlers in DomStrategy
   - **What I tried**: Attempted to rewrite `.then(onFulfilled).catch(onRejected)` to `.then(onFulfilled, onRejected)` in the `DomStrategy.ts` hot loop.
   - **WHY it didn't work**: The experiment was discarded as an IMPOSSIBLE/duplicate plan. The target code was already optimized to natively use `async/await` and an inline `try/catch` sequence in `PERF-511`, meaning the `then/catch` promise chain target no longer exists.
