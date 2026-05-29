@@ -1,7 +1,7 @@
 ---
 id: PERF-619
 slug: eager-current-time-update
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-05-29
 completed: ""

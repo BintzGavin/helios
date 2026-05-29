@@ -89,6 +89,10 @@ Last updated by: PERF-614
   - **Outcome**: discard
 
 ## What Doesn't Work (and Why)
+- **PERF-619**: Eager update of currentTime in CdpTimeDriver
+  - **What I tried**: Eagerly updated currentTime.
+  - **WHY it didn't work**: Caused performance regression (median ~18.655s vs baseline ~1.317s).
+  - **Plan ID**: PERF-619
 - **PERF-618**: Avoid Media Sync Branching
   - **What I tried**: Used method dispatch for media sync instead of evaluating a boolean branch in the hot loop.
   - **WHY it didn't work**: The median render time regressed to ~2.725s compared to baseline ~1.317s. V8 optimization of boolean checks inside the hot loop might be highly efficient, and method dispatch overhead outweighs the cost of evaluating the branch condition.
