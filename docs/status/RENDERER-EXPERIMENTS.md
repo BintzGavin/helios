@@ -1,8 +1,11 @@
 ## Performance Trajectory
-Current best: 1.339s (baseline was 1.462s, -8.41%)
-Last updated by: PERF-612
+Current best: 1.317s (baseline was 1.339s, -1.64%)
+Last updated by: PERF-614
 
 ## What Works
+- **PERF-614**: Eliminate Capture Result Promise Allocation
+  - **What I did**: Replaced the explicit Promise `.then` handling of `captureResult` in `CaptureLoop.ts` with an inline `try/catch` wrapping the `await captureResult`.
+  - **Impact**: Reduced Promise allocation overhead. Median render time improved to ~1.317s (from ~1.339s).
 - **PERF-511**: Inline Begin Frame Await
   - **What I did**: Replaced the `.then().catch()` promise chains in `DomStrategy.capture()` with synchronous inline `try/catch` using `await`.
   - **Impact**: Reduced V8 closure and promise allocation overhead. Median render time improved to ~10.819s (from ~17.687s).
