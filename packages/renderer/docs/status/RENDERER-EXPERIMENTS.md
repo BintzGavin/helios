@@ -1,8 +1,9 @@
 ## Performance Trajectory
-Current best: 32.105s (baseline was 43.939s, -26.9%)
-Last updated by: PERF-271
+Current best: 2.573s (baseline was 13.003s, -80.2%)
+Last updated by: PERF-508
 
 ## What Works
+- [PERF-508] Optimized Playwright concurrency by setting it to exactly 1. Because Helios disables site isolation for performance, all pages share the same renderer process. Using multiple workers caused severe thread contention and IPC queueing latency within the single Chromium process. Forcing concurrency to 1 eliminated this overhead (~80.2% faster).
 - [PERF-271] Combined `.catch` and `.then` handlers into a single `.then(resolve, reject)` in `CaptureLoop.ts` to reduce GC overhead and microtask serialization delays (~26.9% faster).
 
 ## What Doesn't Work (and Why)

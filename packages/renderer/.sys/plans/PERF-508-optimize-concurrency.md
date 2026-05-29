@@ -1,11 +1,11 @@
 ---
 id: PERF-508
 slug: optimize-concurrency
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-15
-completed: ""
-result: ""
+completed: 2026-05-29
+result: improved
 ---
 
 # PERF-508: Optimize Playwright Concurrency for Single-Threaded Renderer
@@ -48,3 +48,9 @@ Ensure Canvas mode still launches and successfully captures (it uses the same Br
 
 ## Correctness Check
 Run the DOM benchmark and inspect `output.mp4` to ensure all frames are encoded correctly and the animation is perfectly smooth.
+
+## Results Summary
+- **Best render time**: 2.573s
+- **Improvement**: Set concurrency to 1 to reduce thread contention
+- **Kept experiments**: [Optimize concurrency to 1]
+- **Discarded experiments**: []
