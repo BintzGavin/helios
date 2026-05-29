@@ -132,3 +132,7 @@ run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
 3	1.391	150	107.85	70.0	keep	PERF-608: merge promise catch in DomStrategy
 4	1.368	150	109.68	70.0	keep	PERF-608: merge promise catch in DomStrategy
 5	1.390	150	107.91	70.1	keep	PERF-608: merge promise catch in DomStrategy
+1	2.436	150	61.59	63.0	keep	PERF-508: Optimize Playwright Concurrency
+2	2.650	150	56.60	63.8	keep	PERF-508: Optimize Playwright Concurrency
+3	2.658	150	56.42	63.2	keep	PERF-508: Optimize Playwright Concurrency
+4	2.573	150	58.30	63.1	keep	PERF-508: Optimize Playwright Concurrency

@@ -103,7 +103,7 @@ export class BrowserPool {
   public async init(compositionUrl: string, jobOptions?: RenderJobOptions): Promise<void> {
     this.capturedErrors = [];
 
-    const concurrency = Math.max(1, (os.cpus().length || 4) - 1);
+    const concurrency = 1;
     console.log(`Initializing pool of ${concurrency} browsers/pages...`);
 
     const createPage = async (index: number): Promise<WorkerInfo> => {
