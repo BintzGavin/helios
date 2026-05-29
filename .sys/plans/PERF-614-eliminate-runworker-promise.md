@@ -1,11 +1,11 @@
 ---
 id: PERF-614
 slug: eliminate-runworker-promise
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "Jules"
 created: 2024-05-29
-completed: ""
-result: ""
+completed: 2024-05-29
+result: "keep"
 ---
 
 # PERF-614: Eliminate Capture Result Promise Allocation
@@ -89,3 +89,14 @@ with:
 
 ## Correctness Check
 Run `npx tsx packages/renderer/tests/verify-cdp-determinism.ts` to verify the rendering still succeeds without errors.
+
+## Results Summary
+| run | render_time_s | frames | fps_effective | peak_mem_mb | status | description |
+|-----|---------------|--------|---------------|-------------|--------|-------------|
+| 1   | 1.417         | 150    | 105.83        | 70.2        | keep   | baseline    |
+| 2   | 1.317         | 150    | 113.89        | 70.2        | keep   | try/catch   |
+| 3   | 1.291         | 150    | 116.23        | 70.1        | keep   | try/catch   |
+| 4   | 1.320         | 150    | 113.68        | 70.0        | keep   | try/catch   |
+| 5   | 1.312         | 150    | 114.30        | 70.1        | keep   | try/catch   |
+
+Median: 1.317s

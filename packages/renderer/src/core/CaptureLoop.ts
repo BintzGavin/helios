@@ -187,16 +187,14 @@ export class CaptureLoop {
                 ? setTimeResult.then(() => strategy.capture(page, time))
                 : strategy.capture(page, time);
             if (captureResult instanceof Promise) {
-                await captureResult.then(
-                    (buffer) => {
-                        frameBufferRing[ringIndex] = buffer;
-                        frameReadyRing[ringIndex] = 1;
-                    },
-                    (e) => {
-                        frameErrorRing[ringIndex] = e;
-                        frameReadyRing[ringIndex] = 1;
-                    }
-                );
+                try {
+                    const buffer = await captureResult;
+                    frameBufferRing[ringIndex] = buffer;
+                    frameReadyRing[ringIndex] = 1;
+                } catch (e) {
+                    frameErrorRing[ringIndex] = e;
+                    frameReadyRing[ringIndex] = 1;
+                }
             } else {
                 frameBufferRing[ringIndex] = captureResult;
                 frameReadyRing[ringIndex] = 1;
