@@ -1,5 +1,6 @@
-**Version**: 0.46.38
+**Version**: 0.46.39
 
+[v0.46.39] 🟢 Completed: CLI Command Coverage Tests Spec V3 - Created specification plan 2027-06-05-CLI-Command-Coverage-Tests-V3.md for improving CLI command regression tests.
 [v0.46.38] ✅ Completed: CLI Registry Types Regression Tests - Logged the duplicated plan as impossible since registry types regression tests are already fully implemented.
 [v0.46.34] ✅ Completed: CLI Registry Types Regression Tests - Implemented structural verification tests for registry interfaces.
 [v0.46.33] ✅ Completed: CLI Job Regression Tests Missing Mock - Added missing mock setup for @helios-project/infrastructure to fix import resolution errors

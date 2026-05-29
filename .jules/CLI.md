@@ -238,3 +238,7 @@ Critical learnings only. This is not a log—only add entries for insights that 
 ## [v0.46.37] - CLI Command Coverage Mocks
 **Learning:** Vitest coverage struggles with `process.exit()` and nested callbacks when modules are mocked aggressively, leading to missing coverage for simple validation branches.
 **Action:** Mock `process.exit` precisely, use dynamic imports for callbacks where needed, and provide all necessary permutations of mock responses to ensure 100% coverage on CLI commands.
+
+## [0.46.39] - Spec V3 for Command Coverage Tests
+**Learning:** The orchestrator tests enforce the strict specification template from AGENTS.md, requiring correct formatting for sections like Context & Goal, File Inventory, Implementation Spec, and Test Plan. Writing arbitrary plans that just outline execution steps is rejected.
+**Action:** When acting as a PLANNER, generate markdown files matching the strict template layout in `/.sys/plans` exactly.
