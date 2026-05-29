@@ -1,0 +1,4 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	13.081	150	11.47	63.1	discard	method dispatch for media sync branch elimination
+2	2.725	150	55.05	63.1	discard	method dispatch for media sync branch elimination
+3	2.478	150	60.53	63.0	discard	method dispatch for media sync branch elimination

@@ -1,11 +1,11 @@
 ---
 id: PERF-618
 slug: avoid-media-sync-branching
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "Jules"
 created: 2024-05-29
-completed: ""
-result: ""
+completed: "2024-05-29"
+result: "discarded"
 ---
 
 # PERF-618: Avoid Media Sync Branching
@@ -26,7 +26,7 @@ if (this.syncMediaState === 1 && this.hasMedia) {
 `this.syncMediaState` and `this.hasMedia` are established once during the `prepare()` phase and never change. Checking this condition every frame adds branch prediction overhead inside the `runSetTime` hot loop. We can eliminate this branch entirely by dynamically modifying the `runSetTime` method prototype based on whether the composition has media or not, eliminating the boolean check entirely.
 
 ## Benchmark Configuration
-- **Composition URL**: Extract exact standard settings from a previous successful `.sys/plans/PERF-*.md` file during execution.
+- **Composition URL**: N/A (will use `benchmark-perf.ts`)
 - **Mode**: `dom`
 - **Metric**: Wall-clock render time in seconds
 - **Minimum runs**: 3 per experiment, report median
@@ -40,7 +40,7 @@ if (this.syncMediaState === 1 && this.hasMedia) {
 ### Step 1: Eliminate the Branch in `CdpTimeDriver.ts`
 **File**: `packages/renderer/src/drivers/CdpTimeDriver.ts`
 **What to change**:
-1. Replace `private runSetTime` with a mutable property: `private runSetTimeFn: (page: Page, timeInSeconds: number) => Promise<void>;`
+1. Replace `private runSetTime` with a mutable property: `private runSetTimeFn: (page: Page, timeInSeconds: number) => Promise<void> = this.runSetTimeWithMedia.bind(this);`
 2. Define two new variants for `runSetTime`:
    ```typescript
    private runSetTimeWithMedia(page: Page, timeInSeconds: number): Promise<void> {
