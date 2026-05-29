@@ -1,0 +1,4 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	2.343	150	64.01	62.9	discard	Monomorphic capture worker paths
+2	2.203	150	68.08	62.8	discard	Monomorphic capture worker paths
+3	2.204	150	68.07	62.8	discard	Monomorphic capture worker paths
