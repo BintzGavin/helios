@@ -157,3 +157,4 @@ The Helios CLI is the primary user interface for component registry, project sca
 [v0.46.37] 🟢 Completed: CLI Command Coverage Tests Spec - Created specification plan 2027-06-05-CLI-Command-Coverage-Tests-V2.md for improving CLI command regression tests.
 
 [v0.46.37] ✅ Completed: CLI Command Coverage Tests V2 - Implemented missing test cases for render, build, init, and studio commands.
+[v0.46.38] ✅ Completed: CLI Job/Render/Merge Tests Missing Mock - Fixed vitest mock resolution errors by setting `server.deps.inline` in `vitest.config.ts`.
