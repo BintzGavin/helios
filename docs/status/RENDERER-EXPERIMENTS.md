@@ -89,6 +89,7 @@ Last updated by: PERF-614
   - **Outcome**: discard
 
 ## What Doesn't Work (and Why)
+- PERF-620: Flatten and Inline worker logic in CaptureLoop. Discarded. The attempt to blindly await setTime() and strategy.capture() in runWorker() replacing the dynamic checking resulted in slightly worse median performance (~2.436s vs ~2.435s), likely due to await tick overhead adding latency compared to branching.
 - **PERF-619**: Eager update of currentTime in CdpTimeDriver
   - **What I tried**: Eagerly updated currentTime.
   - **WHY it didn't work**: Caused performance regression (median ~18.655s vs baseline ~1.317s).

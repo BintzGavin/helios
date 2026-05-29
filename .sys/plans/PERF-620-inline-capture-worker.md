@@ -1,11 +1,11 @@
 ---
 id: PERF-620
 slug: inline-capture-worker
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-29
-completed: ""
-result: ""
+completed: "2026-05-29"
+result: "failed"
 ---
 
 # PERF-620: Flatten and Inline worker logic in CaptureLoop
@@ -82,3 +82,9 @@ Run the `npx tsx packages/renderer/scripts/benchmark-perf.ts` script to test per
 
 ## Prior Art
 - **PERF-615**: Planned but not fully implemented this exact unified `try/catch` and `await` approach.
+
+## Results Summary
+- **Best render time**: 2.436s (vs baseline 2.435s)
+- **Improvement**: -0.04%
+- **Kept experiments**: []
+- **Discarded experiments**: [Flatten and Inline Promise logic]
