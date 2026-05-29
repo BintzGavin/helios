@@ -89,6 +89,11 @@ Last updated by: PERF-614
   - **Outcome**: discard
 
 ## What Doesn't Work (and Why)
+- **PERF-617**: Flatten CdpTimeDriver Promise Chain into Native Await
+  - **What I tried**: Made runSetTime async and replaced .then() with await.
+  - **WHY it didn't work**: The median render time regressed to ~2.079s compared to baseline ~1.317s.
+  - **Outcome**: discard
+
 - **PERF-616**: Monomorphic Capture Worker Paths
   - **What I tried**: Split runWorker into monomorphic runAsyncWorker and runSyncWorker to eliminate dynamic instanceof Promise checks.
   - **WHY it didn't work**: The median render time regressed to ~2.204s vs baseline ~1.317s. V8 optimization inside async generators and closures seems to perform better or at least equally well with the dynamic type check in this context compared to splitting the logic into multiple closure functions and checking options outside the loop. The regression is quite large, potentially because V8 optimizes the unified runWorker better with monomorphic inline caches under the hood, or because there is an additional closure overhead.

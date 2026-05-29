@@ -136,3 +136,6 @@ run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
 2	2.650	150	56.60	63.8	keep	PERF-508: Optimize Playwright Concurrency
 3	2.658	150	56.42	63.2	keep	PERF-508: Optimize Playwright Concurrency
 4	2.573	150	58.30	63.1	keep	PERF-508: Optimize Playwright Concurrency
+1	2.110	150	71.09	63.0	discard	PERF-617: flatten cdptimedriver await
+2	2.079	150	72.15	63.8	discard	PERF-617: flatten cdptimedriver await
+3	2.072	150	72.39	63.2	discard	PERF-617: flatten cdptimedriver await

@@ -1,11 +1,11 @@
 ---
 id: PERF-617
 slug: flatten-cdptimedriver-await
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-05-29
 completed: ""
-result: ""
+result: "discard"
 ---
 
 # PERF-617: Flatten CdpTimeDriver Promise Chain into Native Await
@@ -80,3 +80,9 @@ Run the tests, specifically `npx tsx packages/renderer/tests/verify-cdp-determin
 ## Prior Art
 - **PERF-511**: Inlined Begin Frame Await (`.then` to `await`), which significantly improved performance.
 - **PERF-614**: Eliminated Capture Result Promise Allocation, moving to inline `try/catch`. This experiment naturally extends this paradigm to `CdpTimeDriver`.
+
+## Results Summary
+- **Best render time**: 2.079s (vs baseline 1.317s)
+- **Improvement**: 0%
+- **Kept experiments**: []
+- **Discarded experiments**: [flatten cdptimedriver await]
