@@ -93,6 +93,10 @@ Last updated by: PERF-614
   - **Outcome**: discard
 
 ## What Doesn't Work (and Why)
+- **PERF-628**: Eliminate `frameReadyRing` array in CaptureLoop.ts
+  - **What I tried**: Removed the `frameReadyRing` TypedArray to reduce synchronous operations and array lookups. Replaced its readiness flag entirely by checking `frameBufferRing[ringIndex] === null`.
+  - **Why it didn't work**: It caused a massive performance regression (~2.874s vs baseline ~1.317s). V8 is likely heavily optimized for `Uint8Array` read/writes over checking for `null` in a polymorphic array (`Buffer | string | null`). The type-checked read overhead inside the writer loop negated the savings of removing the assignment flags.
+  - **Plan ID**: PERF-628
 - Single worker fast path (PERF-624): Discarded because bypassing the multi-worker actor model entirely for the single worker case didn't significantly reduce overhead, rendering mostly stayed within noise constraints and regressed slightly in medians.
 - **PERF-621**: Disable V8 Idle Tasks and Background GC
   - **What I did**: Added `--disable-v8-idle-tasks` and `--disable-background-gc` to `DEFAULT_BROWSER_ARGS` in `BrowserPool.ts`.

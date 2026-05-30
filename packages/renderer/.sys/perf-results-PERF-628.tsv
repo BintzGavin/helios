@@ -1,0 +1,1 @@
+1	2.874	150	52.20	63.0	discard	Eliminate frameReadyRing - Regressed performance (2.874s vs 1.317s baseline)
