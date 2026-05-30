@@ -1,11 +1,11 @@
 ---
 id: PERF-626
 slug: bypass-capture-async-await
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-30
-completed: ""
-result: ""
+completed: "2024-05-30"
+result: "no-improvement"
 ---
 
 # PERF-626: Bypass `async/await` in DomStrategy capture
@@ -62,3 +62,9 @@ However, if we pre-bind the success and error handlers as class methods, we can 
 
 ## Correctness Check
 Run the `npx tsx packages/renderer/scripts/benchmark-perf.ts` script to test performance and verify correct output. Ensure the video renders successfully and doesn't crash.
+
+## Results Summary
+- **Best render time**: 2.221s (vs baseline 2.233s)
+- **Improvement**: 0% (noise)
+- **Kept experiments**:
+- **Discarded experiments**: PERF-626
