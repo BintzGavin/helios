@@ -1,11 +1,11 @@
 ---
 id: PERF-627
 slug: consolidate-capture-branching
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2027-06-06
 completed: ""
-result: ""
+result: "discard"
 ---
 
 # PERF-627: Consolidate Capture Branching in DomStrategy

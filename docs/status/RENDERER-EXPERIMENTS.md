@@ -630,3 +630,5 @@ Last updated by: PERF-592
   - **What I tried**: Removing the `async/await` and `try/catch` wrapping around `this.cdpSession!.send('HeadlessExperimental.beginFrame', ...)` and directly returning the promise chain to avoid microtask allocations in V8.
   - **Why it didn't work**: It severely regressed performance from ~1.317s down to ~2.685s. This suggests that the V8 engine has highly optimized fast-paths for inline `try/catch` and `async/await` around promises, whereas manual Promise chaining `.then()` introduces significantly more closure allocations and overhead in this specific hot loop.
   - **Plan ID**: PERF-623
+
+- PERF-627 (discard): Attempted to consolidate capture branching in DomStrategy's hot loop by pre-computing activeBeginFrameParams to eliminate conditional evaluations on every frame and improve V8 inlining. The median render time regressed from the ~1.317s baseline to ~2.127s. This is likely because the added memory lookup and setup for `activeBeginFrameParams` negated the minor savings from avoiding the branch, or potentially defeated other V8 optimizations related to constant parameters.
