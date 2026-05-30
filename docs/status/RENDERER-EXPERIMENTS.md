@@ -632,3 +632,8 @@ Last updated by: PERF-592
   - **Plan ID**: PERF-623
 
 - PERF-627 (discard): Attempted to consolidate capture branching in DomStrategy's hot loop by pre-computing activeBeginFrameParams to eliminate conditional evaluations on every frame and improve V8 inlining. The median render time regressed from the ~1.317s baseline to ~2.127s. This is likely because the added memory lookup and setup for `activeBeginFrameParams` negated the minor savings from avoiding the branch, or potentially defeated other V8 optimizations related to constant parameters.
+
+- **PERF-626**: Bypass `async/await` in DomStrategy capture
+  - **What I tried**: Added pre-bound success and error handler methods to `DomStrategy` and removed `async/await` from `capture()`, returning the Promise chain directly instead.
+  - **WHY it didn't work**: The median render time was ~2.221s, compared to the baseline of ~2.233s. The difference is within noise margins and the change slightly adds more complexity without providing meaningful improvement. V8 appears highly optimized for inline `async/await` and `try/catch`.
+  - **Plan ID**: PERF-626
