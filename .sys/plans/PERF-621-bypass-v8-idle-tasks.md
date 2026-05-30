@@ -1,7 +1,7 @@
 ---
 id: PERF-621
 slug: bypass-v8-idle-tasks
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-05-30
 completed: ""

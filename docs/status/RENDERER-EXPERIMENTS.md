@@ -89,6 +89,9 @@ Last updated by: PERF-614
   - **Outcome**: discard
 
 ## What Doesn't Work (and Why)
+- **PERF-621**: Disable V8 Idle Tasks and Background GC
+  - **What I did**: Added `--disable-v8-idle-tasks` and `--disable-background-gc` to `DEFAULT_BROWSER_ARGS` in `BrowserPool.ts`.
+  - **Impact**: Did not improve performance significantly. The median render time was ~2.391s (vs roughly ~2.44s previous measurements), but earlier optimized baseline from PERF-614 was ~1.317s. This discrepancy in current environment speed means we cannot strictly claim a massive improvement, but it does seem to smooth out GC stutters marginally within the noise threshold. Since it's within noise / slower in this run, it's discarded.
 - **PERF-598**: Cache sync media CDP expression in CdpTimeDriver
   - **What I tried**: Planned to cache the dynamically generated sync media expression.
   - **WHY it didn't work**: The experiment was discarded as an IMPOSSIBLE/duplicate plan because the code was already natively optimized to use a static string (`"window.__helios_sync_media();"`) in PERF-612, eliminating the dynamic concatenation altogether.
