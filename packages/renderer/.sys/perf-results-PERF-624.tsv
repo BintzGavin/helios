@@ -1,0 +1,7 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	2.290	150	65.51	63.1	keep	baseline
+2	2.641	150	56.80	63.4	keep	baseline
+3	2.082	150	72.04	63.1	keep	baseline
+4	2.943	150	50.96	64.1	discard	single worker fast path
+5	2.120	150	70.75	64.2	discard	single worker fast path
+6	2.321	150	64.62	64.2	discard	single worker fast path
