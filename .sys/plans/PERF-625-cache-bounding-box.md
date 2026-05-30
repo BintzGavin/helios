@@ -1,11 +1,11 @@
 ---
 id: PERF-625
 slug: cache-bounding-box
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-30
-completed: ""
-result: ""
+completed: "2024-05-30"
+result: "improved"
 ---
 
 # PERF-625: Cache targetElement boundingBox in DomStrategy prepare
@@ -115,3 +115,9 @@ To:
 
 ## Correctness Check
 Run the `npx tsx packages/renderer/scripts/benchmark-perf.ts` script to test performance and verify correct output. Ensure the video renders successfully and doesn't crash.
+
+## Results Summary
+- **Best render time**: 2.116s (vs baseline 2.212s)
+- **Improvement**: ~4.3%
+- **Kept experiments**: PERF-625 Cache bounding box in prepare
+- **Discarded experiments**: None

@@ -3,6 +3,10 @@ Current best: 1.317s (baseline was 1.339s, -1.64%)
 Last updated by: PERF-614
 
 ## What Works
+- **PERF-625**: Cache targetElement boundingBox in DomStrategy prepare
+  - **What I did**: Moved the asynchronous `targetElementHandle.boundingBox()` call from the hot `capture` loop to the `prepare` phase, caching its result in `targetBeginFrameParams`.
+  - **Impact**: Reduced V8 IPC overhead and Promise allocation per frame. Median render time improved to ~2.129s (from baseline ~2.212s).
+  - **Plan ID**: PERF-625
 - **PERF-614**: Eliminate Capture Result Promise Allocation
   - **What I did**: Replaced the explicit Promise `.then` handling of `captureResult` in `CaptureLoop.ts` with an inline `try/catch` wrapping the `await captureResult`.
   - **Impact**: Reduced Promise allocation overhead. Median render time improved to ~1.317s (from ~1.339s).
