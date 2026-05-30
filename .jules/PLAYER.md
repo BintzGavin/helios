@@ -58,3 +58,14 @@
 ## [v0.77.41] - Documenting Event Handlers
 **Learning**: The standard event handler properties (`onplay`, `onpause`, etc.) were implemented for API parity but never explicitly documented in the README, leading to a vision gap.
 **Action**: Always verify that newly implemented API surfaces are immediately documented in the project's README to maintain synchronization between implementation and vision.
+## [v0.77.44] - Add Missing Plan Content
+**Learning:** When using `cat << 'EOF'` to create a file in an execution plan, the complete, explicit text/markdown content must be provided within the command. Using placeholders like `...` violates the Specificity Rule.
+**Action:** Always write out the full file content inside the `cat << 'EOF'` command when drafting a plan.
+
+## [v0.77.44] - Avoid Unverified Test Assumptions
+**Learning:** The script `packages/renderer/tests/verify-orchestrator-plan.ts` is strictly for verifying performance experiment plans (`PERF-*.md`) and is not applicable to Frontend Planner specs (`PLAYER-*.md`). Furthermore, the Planner role explicitly forbids running tests.
+**Action:** Do not include steps to run tests (e.g., `npm test` or `verify-orchestrator-plan.ts`) in the execution plan when acting as the Planner.
+
+## [v0.77.44] - Missing onaudiometering Event Handler Property
+**Learning:** The `audiometering` event was dispatched and documented, but the corresponding IDL attribute (event handler property `onaudiometering`) was missing from the `<helios-player>` implementation, creating an API parity gap with standard HTMLMediaElement patterns.
+**Action:** Created an implementation spec to add the `onaudiometering` getter and setter to complete standard media API parity.
