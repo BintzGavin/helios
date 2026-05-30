@@ -197,6 +197,28 @@ The `<helios-player>` element implements a subset of the HTMLMediaElement interf
 - `mediaArtwork` (string): Reflected media-artwork attribute.
 
 
+
+### Event Handlers
+
+- `onplay` (function | null): Event handler for the `play` event.
+- `onpause` (function | null): Event handler for the `pause` event.
+- `onended` (function | null): Event handler for the `ended` event.
+- `ontimeupdate` (function | null): Event handler for the `timeupdate` event.
+- `onvolumechange` (function | null): Event handler for the `volumechange` event.
+- `onratechange` (function | null): Event handler for the `ratechange` event.
+- `ondurationchange` (function | null): Event handler for the `durationchange` event.
+- `onseeking` (function | null): Event handler for the `seeking` event.
+- `onseeked` (function | null): Event handler for the `seeked` event.
+- `onresize` (function | null): Event handler for the `resize` event.
+- `onloadstart` (function | null): Event handler for the `loadstart` event.
+- `onloadedmetadata` (function | null): Event handler for the `loadedmetadata` event.
+- `onloadeddata` (function | null): Event handler for the `loadeddata` event.
+- `oncanplay` (function | null): Event handler for the `canplay` event.
+- `oncanplaythrough` (function | null): Event handler for the `canplaythrough` event.
+- `onerror` (function | null): Event handler for the `error` event.
+- `onenterpictureinpicture` (function | null): Event handler for the `enterpictureinpicture` event.
+- `onleavepictureinpicture` (function | null): Event handler for the `leavepictureinpicture` event.
+
 ## Events
 
 The element dispatches the following custom events:
