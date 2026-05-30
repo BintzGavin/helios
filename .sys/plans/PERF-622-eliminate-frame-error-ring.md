@@ -1,11 +1,11 @@
 ---
 id: PERF-622
 slug: eliminate-frame-error-ring
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-30
-completed: ""
-result: ""
+completed: 2024-05-30
+result: kept
 ---
 
 # PERF-622: Eliminate `frameErrorRing` in CaptureLoop
@@ -56,3 +56,9 @@ Run `npx tsx tests/verify-orchestrator-plan.ts` and standard canvas tests to ens
 
 ## Correctness Check
 Verify output via `benchmark-perf.ts`.
+
+## Results Summary
+- **Best render time**: 2.160s (vs baseline 2.296s)
+- **Improvement**: ~6.0%
+- **Kept experiments**: Eliminated `frameErrorRing` in `CaptureLoop.ts`.
+- **Discarded experiments**: none
