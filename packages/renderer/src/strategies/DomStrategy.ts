@@ -161,6 +161,14 @@ export class DomStrategy implements RenderStrategy {
         throw new Error(`Target element not found: ${this.options.targetSelector}`);
       }
       this.targetElementHandle = element;
+
+      const box = await element.boundingBox();
+      if (box) {
+        this.targetBeginFrameParams.screenshot.clip.x = box.x;
+        this.targetBeginFrameParams.screenshot.clip.y = box.y;
+        this.targetBeginFrameParams.screenshot.clip.width = box.width;
+        this.targetBeginFrameParams.screenshot.clip.height = box.height;
+      }
     }
 
 
@@ -169,16 +177,6 @@ export class DomStrategy implements RenderStrategy {
 
   async capture(page: Page, frameTime: number): Promise<Buffer | string> {
     if (this.targetElementHandle) {
-      const box = await this.targetElementHandle.boundingBox();
-      if (!box) {
-         return this.lastFrameData!;
-      }
-
-      this.targetBeginFrameParams.screenshot.clip.x = box.x;
-      this.targetBeginFrameParams.screenshot.clip.y = box.y;
-      this.targetBeginFrameParams.screenshot.clip.width = box.width;
-      this.targetBeginFrameParams.screenshot.clip.height = box.height;
-
       try {
         const result = await this.cdpSession!.send('HeadlessExperimental.beginFrame', this.targetBeginFrameParams);
         if (result.screenshotData) {

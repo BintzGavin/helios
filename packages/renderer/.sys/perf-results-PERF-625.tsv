@@ -1,0 +1,5 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	2.212	150	67.80	63.0	keep	baseline
+2	2.129	150	70.46	63.0	keep	Cache bounding box
+3	2.147	150	69.85	63.1	keep	Cache bounding box run 2
+4	2.116	150	70.88	63.3	keep	Cache bounding box run 3
