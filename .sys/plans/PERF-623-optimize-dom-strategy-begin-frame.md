@@ -1,11 +1,11 @@
 ---
 id: PERF-623
 slug: optimize-dom-strategy-begin-frame
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-30
-completed: ""
-result: ""
+completed: "2026-05-30"
+result: failed
 ---
 
 # PERF-623: Optimize HeadlessExperimental.beginFrame calls in DomStrategy
@@ -128,3 +128,9 @@ Run `npx tsx packages/renderer/tests/verify-orchestrator-plan.ts` to ensure basi
 
 ## Correctness Check
 Verify output via `npx tsx packages/renderer/scripts/benchmark-perf.ts`.
+
+## Results Summary
+- **Best render time**: 2.632s (vs baseline ~1.317s)
+- **Improvement**: Regressed by ~100%
+- **Kept experiments**: []
+- **Discarded experiments**: [Step 1, Step 2, Step 3]

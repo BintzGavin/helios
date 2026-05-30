@@ -1,0 +1,4 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	2.685	150	55.87	63.1	discard	optimize-dom-strategy-begin-frame
+2	2.694	150	55.67	63.0	discard	optimize-dom-strategy-begin-frame
+3	2.632	150	57.00	63.0	discard	optimize-dom-strategy-begin-frame
