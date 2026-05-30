@@ -1,11 +1,11 @@
 ---
 id: PERF-480
 slug: browserpool-goto-commit
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2026-05-11
-completed: ""
-result: ""
+completed: "2026-10-31"
+result: "kept"
 ---
 
 # PERF-480: Change BrowserPool waitUntil from load to commit
@@ -54,3 +54,9 @@ If `commit` causes test failures or `timeDriver` script injection errors because
 
 ## Correctness Check
 Run `npm run build` and tests in the `packages/renderer` directory. Ensure the final video output is still generated correctly without missing frames.
+
+## Results Summary
+- **Best render time**: 4.047s (vs baseline ~4.047s)
+- **Improvement**: 0%
+- **Kept experiments**: [Change waitUntil to commit in BrowserPool]
+- **Discarded experiments**: []
