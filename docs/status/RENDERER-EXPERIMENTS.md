@@ -619,3 +619,9 @@ Last updated by: PERF-592
   - **What I did**: Replaced the `frameErrorRing` array with a single global `fatalError` variable in `CaptureLoop.ts` to reduce array write bounds checking inside the V8 hot loop.
   - **Impact**: Improved median render time by ~6% (median ~2.16s compared to baseline ~2.296s).
   - **Plan ID**: PERF-622
+
+## What Doesn't Work (and Why)
+- **PERF-623**: Optimize HeadlessExperimental.beginFrame calls in DomStrategy
+  - **What I tried**: Removing the `async/await` and `try/catch` wrapping around `this.cdpSession!.send('HeadlessExperimental.beginFrame', ...)` and directly returning the promise chain to avoid microtask allocations in V8.
+  - **Why it didn't work**: It severely regressed performance from ~1.317s down to ~2.685s. This suggests that the V8 engine has highly optimized fast-paths for inline `try/catch` and `async/await` around promises, whereas manual Promise chaining `.then()` introduces significantly more closure allocations and overhead in this specific hot loop.
+  - **Plan ID**: PERF-623
