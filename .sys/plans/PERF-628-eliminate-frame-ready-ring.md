@@ -1,11 +1,11 @@
 ---
 id: PERF-628
 slug: eliminate-frame-ready-ring
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-06-01
-completed: ""
-result: ""
+completed: "2024-06-01"
+result: "failed"
 ---
 
 # PERF-628: Eliminate `frameReadyRing` in CaptureLoop
@@ -50,3 +50,9 @@ Currently, `CaptureLoop.ts` synchronizes the workers and the FFmpeg writer loop 
 ## Correctness Check
 - Verify the pipeline completes without stalling (no infinite writer waits).
 - Run `npx tsx packages/renderer/scripts/benchmark-perf.ts` to confirm rendering outputs the expected frame count.
+
+## Results Summary
+- **Best render time**: 2.874s (vs baseline 1.317s)
+- **Improvement**: Regressed
+- **Kept experiments**: None
+- **Discarded experiments**: PERF-628
