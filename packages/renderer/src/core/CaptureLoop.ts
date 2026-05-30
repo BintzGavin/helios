@@ -85,8 +85,8 @@ export class CaptureLoop {
     const onProgress = this.jobOptions?.onProgress;
 
     const frameBufferRing = new Array<Buffer | string | null>(maxPipelineDepth).fill(null);
-    const frameErrorRing = new Array<any>(maxPipelineDepth).fill(null);
     const frameReadyRing = new Uint8Array(maxPipelineDepth); // 0 = not ready, 1 = ready
+    let fatalError: any = null;
     let writerWaiterResolve: (() => void) | null = null;
     const writerWaiterExecutor = (resolve: () => void) => { writerWaiterResolve = resolve; };
 
@@ -130,7 +130,6 @@ export class CaptureLoop {
 
             frameReadyRing[ringIndex] = 0;
             frameBufferRing[ringIndex] = null;
-            frameErrorRing[ringIndex] = null;
 
             res(i);
         }
@@ -170,7 +169,6 @@ export class CaptureLoop {
 
                 frameReadyRing[ringIndex] = 0;
                 frameBufferRing[ringIndex] = null;
-                frameErrorRing[ringIndex] = null;
             } else {
                 i = await new Promise<number>(workerBlockedExecutors[workerIndex]);
             }
@@ -192,8 +190,9 @@ export class CaptureLoop {
                     frameBufferRing[ringIndex] = buffer;
                     frameReadyRing[ringIndex] = 1;
                 } catch (e) {
-                    frameErrorRing[ringIndex] = e;
-                    frameReadyRing[ringIndex] = 1;
+                    fatalError = e;
+                    aborted = true;
+                    checkState();
                 }
             } else {
                 frameBufferRing[ringIndex] = captureResult;
@@ -222,8 +221,6 @@ export class CaptureLoop {
                 continue;
             }
 
-            const error = frameErrorRing[ringIndex];
-            if (error) throw error;
             const buffer = frameBufferRing[ringIndex]!;
 
             const currentFrame = nextFrameToWrite;
@@ -267,6 +264,7 @@ export class CaptureLoop {
     aborted = true;
     checkState();
 
+    if (fatalError) throw fatalError;
     if (this.capturedErrors.length > 0) {
         throw this.capturedErrors[0];
     }

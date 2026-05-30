@@ -613,3 +613,9 @@ Last updated by: PERF-592
   - **Plan ID**: PERF-604
   - **What I tried**: Inlined timePromise
   - **WHY it didn't work**: Did not improve over baseline.
+
+## What Works
+- **PERF-622**: Eliminate `frameErrorRing` in CaptureLoop
+  - **What I did**: Replaced the `frameErrorRing` array with a single global `fatalError` variable in `CaptureLoop.ts` to reduce array write bounds checking inside the V8 hot loop.
+  - **Impact**: Improved median render time by ~6% (median ~2.16s compared to baseline ~2.296s).
+  - **Plan ID**: PERF-622
