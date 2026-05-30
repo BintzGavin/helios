@@ -1,5 +1,6 @@
 [v0.77.41] ✅ Completed: Discovered undocumented event handler properties in implementation missing from README. Created plan `.sys/plans/2027-02-15-PLAYER-Document-Event-Handlers.md` to document `onplay`, `onpause`, etc.
-**Version**: 0.77.42
+**Version**: 0.77.43
+[v0.77.43] ✅ Completed: Document Event Handlers - Updated README.md to include standard event handler properties to match the actual implementation in packages/player/src/index.ts.
 [v0.77.42] ✅ Completed: Discovered that v0.77.40-PLAYER-Document-Missing-Events.md is an IMPOSSIBLE plan because the events `error` and `audiometering` are already documented in `packages/player/README.md`. Documented as duplicate and discarded.
 [v0.77.38] ✅ Completed: Expand Index Coverage - Added unit tests for disconnectedCallback in packages/player/src/index.ts.
 [v0.77.37] ✅ Completed: Improve index.ts test coverage - Added tests for diagnose API and retryConnection.
