@@ -24,7 +24,6 @@ export class DomStrategy implements RenderStrategy {
   private emptyImageBase64: string = "";
   private frameInterval: number = 0;
   private beginFrameParams: any = { interval: 0, screenshot: null, noDisplayUpdates: false };
-  private targetBeginFrameParams: any = null;
 
   constructor(private options: RendererOptions) {
     if (this.options.videoCodec === 'copy') {
@@ -125,16 +124,6 @@ export class DomStrategy implements RenderStrategy {
     this.cdpScreenshotParams = cdpScreenshotParams;
     this.beginFrameParams.screenshot = cdpScreenshotParams;
 
-    this.targetBeginFrameParams = {
-      screenshot: {
-        format: cdpScreenshotParams.format,
-        quality: cdpScreenshotParams.quality,
-        clip: { x: 0, y: 0, width: 0, height: 0, scale: 1 }
-      },
-      interval: this.frameInterval,
-      noDisplayUpdates: false
-    };
-
     // Set format-appropriate empty buffer
     if (format === 'jpeg') {
         // 2x2 JPEG pixel
@@ -164,10 +153,13 @@ export class DomStrategy implements RenderStrategy {
 
       const box = await element.boundingBox();
       if (box) {
-        this.targetBeginFrameParams.screenshot.clip.x = box.x;
-        this.targetBeginFrameParams.screenshot.clip.y = box.y;
-        this.targetBeginFrameParams.screenshot.clip.width = box.width;
-        this.targetBeginFrameParams.screenshot.clip.height = box.height;
+        this.beginFrameParams.screenshot.clip = {
+          x: box.x,
+          y: box.y,
+          width: box.width,
+          height: box.height,
+          scale: 1
+        };
       }
     }
 
@@ -176,18 +168,6 @@ export class DomStrategy implements RenderStrategy {
 
 
   async capture(page: Page, frameTime: number): Promise<Buffer | string> {
-    if (this.targetElementHandle) {
-      try {
-        const result = await this.cdpSession!.send('HeadlessExperimental.beginFrame', this.targetBeginFrameParams);
-        if (result.screenshotData) {
-          this.lastFrameData = result.screenshotData;
-        }
-        return this.lastFrameData!;
-      } catch (e) {
-        return this.lastFrameData!;
-      }
-    }
-
     try {
       const result = await this.cdpSession!.send('HeadlessExperimental.beginFrame', this.beginFrameParams);
       if (result.screenshotData) {
