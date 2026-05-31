@@ -682,3 +682,8 @@ Last updated by: PERF-592
   - **What I did**: Removed redundant static string reassignment for syncMedia expressions in CdpTimeDriver.ts inside the defaultSyncMedia hot loop to reduce string property allocations in V8.
   - **Impact**: Reduced loop redundancy. Render time benchmarked to a median of ~2.202s (baseline ~2.308s).
   - **Plan ID**: PERF-641
+
+- **PERF-642**: Eager Update of `currentTime` in `CdpTimeDriver`
+  - **What I tried**: Attempted to eliminate the `.then()` chain in `runSetTime` by eagerly assigning `this.currentTime = timeInSeconds` right before sending the `Emulation.setVirtualTimePolicy` CDP command and directly returning the new Promise, aiming to bypass V8 microtask closure allocation overhead per frame.
+  - **WHY it didn't work**: The median render time did not improve and remained around ~2.492s (baseline ~2.499s). V8 is likely already highly efficient at optimizing local closure execution and short `.then()` microtasks inside generator await loops. The overhead saved by avoiding `.then()` was negligible and absorbed by the noise floor of Playwright IPC.
+  - **Plan ID**: PERF-642

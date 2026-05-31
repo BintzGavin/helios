@@ -1,7 +1,7 @@
 ---
 id: PERF-642
 slug: eager-current-time-update
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-06-01
 completed: ""
@@ -60,3 +60,12 @@ Modify `virtualTimePromiseExecutor` to not contain `this.client!.send(...)` dire
 
 ## Correctness Check
 Run the `npx tsx packages/renderer/scripts/benchmark-perf.ts` script to test performance. Follow up with `npm run test -w packages/renderer` to ensure frame advancement remains accurate.
+
+## Results Summary
+
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	3.017	150	49.71	63.0	discard	eager current time update
+2	2.499	150	60.03	63.1	discard	eager current time update
+3	2.558	150	58.65	63.0	discard	eager current time update
+4	2.475	150	60.61	62.9	discard	eager current time update
+5	2.458	150	61.03	63.1	discard	eager current time update
