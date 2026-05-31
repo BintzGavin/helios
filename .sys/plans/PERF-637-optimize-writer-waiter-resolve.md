@@ -1,11 +1,11 @@
 ---
 id: PERF-637
 slug: optimize-writer-waiter-resolve
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-31
-completed: ""
-result: ""
+completed: "2024-05-31"
+result: "kept"
 ---
 
 # PERF-637: Optimize Writer Waiter Check in CaptureLoop Hot Loop
@@ -71,3 +71,14 @@ Run `npx tsx packages/renderer/tests/verify-canvas-strategy.ts`.
 
 ## Correctness Check
 Run `npx tsx packages/renderer/tests/verify-cdp-determinism.ts`.
+
+## Results Summary
+```tsv
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	3.494	150	42.93	63.1	keep	baseline
+2	2.468	150	60.78	63.9	keep	baseline
+3	2.746	150	54.63	63.2	keep	baseline
+4	2.695	150	55.66	63.1	keep	writerWaiterResolve optimization
+5	2.514	150	59.66	63.0	keep	writerWaiterResolve optimization
+6	2.499	150	60.03	62.9	keep	writerWaiterResolve optimization
+```

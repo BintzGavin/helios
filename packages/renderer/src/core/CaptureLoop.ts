@@ -198,7 +198,7 @@ export class CaptureLoop {
                 frameBufferRing[ringIndex] = captureResult;
                 frameReadyRing[ringIndex] = 1;
             }
-            if (writerWaiterResolve && nextFrameToWrite === i) {
+            if (writerWaiterResolve) {
                 const res = writerWaiterResolve;
                 writerWaiterResolve = null;
                 res();
