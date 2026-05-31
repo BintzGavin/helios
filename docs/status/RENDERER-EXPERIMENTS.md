@@ -93,6 +93,11 @@ Last updated by: PERF-614
   - **Outcome**: discard
 
 ## What Doesn't Work (and Why)
+- **PERF-631**: Inline CdpTimeDriver setTime allocation
+  - **What I tried**: Inlined `runSetTime` logic into `setTime` directly in `CdpTimeDriver.ts` and removed a redundant string assignment `this.singleFrameSyncMediaParams.expression` inside `defaultSyncMedia` to bypass V8 Promise allocation overhead and property mutation in the hot loop.
+  - **WHY it didn't work**: It did not improve performance. The median render time was ~2.638s (vs baseline ~2.513s), with the best run at ~2.513s which is within the noise margin. V8 likely already inlines this effectively and the redundant string assignment overhead is negligible.
+  - **Plan ID**: PERF-631
+
 - **PERF-630**: Bypass `lastFrameData` assignment in DomStrategy capture loop
   - **What I tried**: Attempted to directly return `result.screenshotData || this.lastFrameData!` to avoid property mutation overhead.
   - **Why it didn't work**: Breaks the frame fallback mechanism, which is critical for recovering from dropped frames or CDP errors.
