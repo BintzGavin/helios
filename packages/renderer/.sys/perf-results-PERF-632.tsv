@@ -1,0 +1,4 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	2.664	150	56.30	63.4	discard	baseline (memory ~2.16s but regression in environment)
+2	2.620	150	57.24	62.9	discard	consolidate worker wait logic
+3	2.610	150	57.47	64.0	discard	consolidate worker wait logic
