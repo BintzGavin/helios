@@ -93,6 +93,10 @@ Last updated by: PERF-614
   - **Outcome**: discard
 
 ## What Doesn't Work (and Why)
+- **PERF-630**: Bypass `lastFrameData` assignment in DomStrategy capture loop
+  - **What I tried**: Attempted to directly return `result.screenshotData || this.lastFrameData!` to avoid property mutation overhead.
+  - **Why it didn't work**: Breaks the frame fallback mechanism, which is critical for recovering from dropped frames or CDP errors.
+  - **Plan ID**: PERF-630
 - **PERF-628**: Eliminate `frameReadyRing` array in CaptureLoop.ts
   - **What I tried**: Removed the `frameReadyRing` TypedArray to reduce synchronous operations and array lookups. Replaced its readiness flag entirely by checking `frameBufferRing[ringIndex] === null`.
   - **Why it didn't work**: It caused a massive performance regression (~2.874s vs baseline ~1.317s). V8 is likely heavily optimized for `Uint8Array` read/writes over checking for `null` in a polymorphic array (`Buffer | string | null`). The type-checked read overhead inside the writer loop negated the savings of removing the assignment flags.
