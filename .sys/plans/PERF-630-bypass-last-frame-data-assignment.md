@@ -1,11 +1,11 @@
 ---
 id: PERF-630
 slug: bypass-last-frame-data-assignment
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-06-05
-completed: ""
-result: ""
+completed: "2026-05-31"
+result: failed
 ---
 
 # PERF-630: Bypass `lastFrameData` State Tracking in `DomStrategy` Hot Loop
@@ -60,3 +60,9 @@ Not applicable to Canvas.
 
 ## Correctness Check
 Run renderer tests `npm run test -w packages/renderer`.
+
+## Results Summary
+- **Best render time**: N/A
+- **Improvement**: 0%
+- **Kept experiments**: []
+- **Discarded experiments**: [PERF-630]
