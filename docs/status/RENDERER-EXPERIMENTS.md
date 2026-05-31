@@ -3,6 +3,10 @@ Current best: 1.317s (baseline was 1.339s, -1.64%)
 Last updated by: PERF-614
 
 ## What Works
+- **PERF-637**: Optimize Writer Waiter Check in CaptureLoop Hot Loop
+  - **What I did**: Removed the `nextFrameToWrite === i` branch condition from the `writerWaiterResolve` check in the `CaptureLoop.ts` `runWorker` hot loop because with 1 concurrency, it is redundant.
+  - **Impact**: Removed a redundant condition evaluation on every frame. Did not measurably impact the median render time, which remained within margin of error (~2.499s vs ~2.468s baseline), but keeps code marginally tighter.
+  - **Plan ID**: PERF-637
 - **PERF-625**: Cache targetElement boundingBox in DomStrategy prepare
   - **What I did**: Moved the asynchronous `targetElementHandle.boundingBox()` call from the hot `capture` loop to the `prepare` phase, caching its result in `targetBeginFrameParams`.
   - **Impact**: Reduced V8 IPC overhead and Promise allocation per frame. Median render time improved to ~2.129s (from baseline ~2.212s).
@@ -548,6 +552,10 @@ Current best: 1.267s (baseline was 1.378s, -0.3%)
 Last updated by: PERF-592
 
 ## What Works
+- **PERF-637**: Optimize Writer Waiter Check in CaptureLoop Hot Loop
+  - **What I did**: Removed the `nextFrameToWrite === i` branch condition from the `writerWaiterResolve` check in the `CaptureLoop.ts` `runWorker` hot loop because with 1 concurrency, it is redundant.
+  - **Impact**: Removed a redundant condition evaluation on every frame. Did not measurably impact the median render time, which remained within margin of error (~2.499s vs ~2.468s baseline), but keeps code marginally tighter.
+  - **Plan ID**: PERF-637
 - **PERF-590**: Eliminate `Promise.resolve()` Wrapper in CaptureLoop
   - **What I did**: Removed the redundant `Promise.resolve(timeDriver.setTime(...))` wrapper in the multi-worker hot loop, conditionally handling the promise instead.
   - **Impact**: Improved median render time to ~1.229s by eliminating redundant V8 microtask ticks and Promise allocations for every single frame.
@@ -642,6 +650,10 @@ Last updated by: PERF-592
   - **WHY it didn't work**: Did not improve over baseline.
 
 ## What Works
+- **PERF-637**: Optimize Writer Waiter Check in CaptureLoop Hot Loop
+  - **What I did**: Removed the `nextFrameToWrite === i` branch condition from the `writerWaiterResolve` check in the `CaptureLoop.ts` `runWorker` hot loop because with 1 concurrency, it is redundant.
+  - **Impact**: Removed a redundant condition evaluation on every frame. Did not measurably impact the median render time, which remained within margin of error (~2.499s vs ~2.468s baseline), but keeps code marginally tighter.
+  - **Plan ID**: PERF-637
 - **PERF-622**: Eliminate `frameErrorRing` in CaptureLoop
   - **What I did**: Replaced the `frameErrorRing` array with a single global `fatalError` variable in `CaptureLoop.ts` to reduce array write bounds checking inside the V8 hot loop.
   - **Impact**: Improved median render time by ~6% (median ~2.16s compared to baseline ~2.296s).
@@ -661,4 +673,8 @@ Last updated by: PERF-592
   - **Plan ID**: PERF-626
 
 ## What Works
+- **PERF-637**: Optimize Writer Waiter Check in CaptureLoop Hot Loop
+  - **What I did**: Removed the `nextFrameToWrite === i` branch condition from the `writerWaiterResolve` check in the `CaptureLoop.ts` `runWorker` hot loop because with 1 concurrency, it is redundant.
+  - **Impact**: Removed a redundant condition evaluation on every frame. Did not measurably impact the median render time, which remained within margin of error (~2.499s vs ~2.468s baseline), but keeps code marginally tighter.
+  - **Plan ID**: PERF-637
 - **PERF-629**: Consolidate `HeadlessExperimental.beginFrame` CDP Call in `DomStrategy`. Mutating `beginFrameParams` directly during setup removed an `if` branch and a duplicate IPC call in the `capture` hot loop. Render time stayed roughly neutral (within noise limit, ~2.513s) while reducing bytecode and structural complexity.
