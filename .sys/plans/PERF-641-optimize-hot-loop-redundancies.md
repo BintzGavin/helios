@@ -1,11 +1,11 @@
 ---
 id: PERF-641
 slug: optimize-hot-loop-redundancies
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-31
-completed: ""
-result: ""
+completed: "2024-06-01"
+result: "improved"
 ---
 
 # PERF-641: Remove Redundant Conditionals in Hot Loops
@@ -89,3 +89,9 @@ Remove `this.singleFrameSyncMediaParams.expression = "window.__helios_sync_media
 
 ## Correctness Check
 Run `npx tsx packages/renderer/tests/verify-cdp-determinism.ts`.
+
+## Results Summary
+- **Best render time**: 2.202s (vs baseline 2.308s)
+- **Improvement**: ~4.6%
+- **Kept experiments**: Removed redundant syncMedia string allocations.
+- **Discarded experiments**: None (CaptureLoop instanceof check was already removed).

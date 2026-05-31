@@ -32,12 +32,11 @@ export class CdpTimeDriver implements TimeDriver {
       this.client!.send('Runtime.evaluate', this.singleFrameSyncMediaParams).catch(noopCatch);
     } else {
         if (this.executionContextIds.length > 0) {
-          const expression = "window.__helios_sync_media();";
           if (this.multiFrameSyncMediaParams.length !== this.executionContextIds.length) {
             this.multiFrameSyncMediaParams.length = this.executionContextIds.length;
             for (let i = 0; i < this.executionContextIds.length; i++) {
               this.multiFrameSyncMediaParams[i] = {
-                expression: "",
+                expression: "window.__helios_sync_media();",
                 contextId: this.executionContextIds[i],
                 awaitPromise: false,
                 returnByValue: false
@@ -45,7 +44,6 @@ export class CdpTimeDriver implements TimeDriver {
             }
           }
           for (let i = 0; i < this.executionContextIds.length; i++) {
-            this.multiFrameSyncMediaParams[i].expression = expression;
             this.client!.send('Runtime.evaluate', this.multiFrameSyncMediaParams[i]).catch(noopCatch);
           }
         } else {
