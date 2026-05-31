@@ -1,11 +1,11 @@
 ---
 id: PERF-632
 slug: consolidate-worker-wait
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-31
-completed: ""
-result: ""
+completed: "2024-05-31"
+result: "discarded"
 ---
 
 # PERF-632: Consolidate `CaptureLoop` Worker Wait Logic to Reduce Microtask Overhead
@@ -70,3 +70,10 @@ Run `npx tsx packages/renderer/tests/verify-canvas-strategy.ts`.
 
 ## Correctness Check
 Run `npx tsx packages/renderer/tests/verify-cdp-determinism.ts`.
+
+
+## Results Summary
+- **Best render time**: 2.610s (vs baseline ~2.16s)
+- **Improvement**: 0%
+- **Kept experiments**: []
+- **Discarded experiments**: [Consolidate `CaptureLoop` Worker Wait Logic]

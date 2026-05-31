@@ -93,6 +93,10 @@ Last updated by: PERF-614
   - **Outcome**: discard
 
 ## What Doesn't Work (and Why)
+- **PERF-632**: Consolidate `CaptureLoop` Worker Wait Logic
+  - **What I tried**: Replaced `workerBlockedExecutors` array and multiple Promise closures with a single `workerBlockedPromises` array containing a deferred promise pattern to reduce V8 allocation overhead in the `CaptureLoop` multi-worker wait block.
+  - **WHY it didn't work**: The median render time was ~2.620s, which is slower than the historical best of ~2.160s (and roughly the same as the current local baseline of ~2.664s). The minor savings from avoiding `new Promise` on every block was negated by the overhead of allocating the deferred object wrapper and the added logic to resolve it. V8's optimization of simple promise allocations in closures within hot async generators is likely more efficient than maintaining custom deferred objects in this hot loop.
+  - **Plan ID**: PERF-632
 - **PERF-631**: Inline CdpTimeDriver setTime allocation
   - **What I tried**: Inlined `runSetTime` logic into `setTime` directly in `CdpTimeDriver.ts` and removed a redundant string assignment `this.singleFrameSyncMediaParams.expression` inside `defaultSyncMedia` to bypass V8 Promise allocation overhead and property mutation in the hot loop.
   - **WHY it didn't work**: It did not improve performance. The median render time was ~2.638s (vs baseline ~2.513s), with the best run at ~2.513s which is within the noise margin. V8 likely already inlines this effectively and the redundant string assignment overhead is negligible.
