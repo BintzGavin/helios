@@ -1,11 +1,11 @@
 ---
 id: PERF-631
 slug: inline-cdptime-settime
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-31
-completed: ""
-result: ""
+completed: "2024-05-31"
+result: "no-improvement"
 ---
 # PERF-631: Inline CdpTimeDriver setTime allocation
 
@@ -59,3 +59,9 @@ Run `npx tsx packages/renderer/tests/verify-cdp-determinism.ts` to verify DOM ou
 
 ## Prior Art
 - PERF-630 and PERF-612 optimizations attempted to clean up hot loop variables but missed these specific redundant allocations and function wrapper layers.
+
+## Results Summary
+- **Best render time**: 2.513s (vs baseline ~2.490s - 2.520s)
+- **Improvement**: 0% (Median ~2.638s is worse than baseline median ~2.513s. Best was ~2.513s, which is within noise)
+- **Kept experiments**: []
+- **Discarded experiments**: [PERF-631]
