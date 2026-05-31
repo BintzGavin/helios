@@ -93,6 +93,11 @@ Last updated by: PERF-614
   - **Outcome**: discard
 
 ## What Doesn't Work (and Why)
+- **PERF-594**: Inline `writerWaiterResolve` Wakeup into Promise Chain in CaptureLoop
+  - **What I tried**: Modified the `captureResult` try/catch block in `CaptureLoop.ts` to check and execute `writerWaiterResolve` immediately after setting `frameReadyRing` to 1, instead of awaiting the generator resumption of the whole block.
+  - **WHY it didn't work**: The median render time regressed to ~2.955s compared to the baseline of ~2.785s. Resolving the waiter inside the microtask did not outweigh the overhead of checking `writerWaiterResolve && nextFrameToWrite === i` conditionally inside both the `try` and `else` blocks. V8 seems to optimize the generator `await` resumption more efficiently than the repeated closure state checks.
+  - **Outcome**: discard
+
 - **PERF-632**: Consolidate `CaptureLoop` Worker Wait Logic
   - **What I tried**: Replaced `workerBlockedExecutors` array and multiple Promise closures with a single `workerBlockedPromises` array containing a deferred promise pattern to reduce V8 allocation overhead in the `CaptureLoop` multi-worker wait block.
   - **WHY it didn't work**: The median render time was ~2.620s, which is slower than the historical best of ~2.160s (and roughly the same as the current local baseline of ~2.664s). The minor savings from avoiding `new Promise` on every block was negated by the overhead of allocating the deferred object wrapper and the added logic to resolve it. V8's optimization of simple promise allocations in closures within hot async generators is likely more efficient than maintaining custom deferred objects in this hot loop.

@@ -1,7 +1,7 @@
 ---
 id: PERF-594
 slug: inline-writerwaiter-wakeup
-status: claimed
+status: complete
 claimed_by: "jules"
 created: 2024-05-26
 completed: "2024-05-26"
@@ -98,3 +98,9 @@ With:
 
 ## Correctness Check
 Run the `npx tsx packages/renderer/tests/fixtures/benchmark.ts` script to test performance, followed by `npm run test -w packages/renderer -- --run` to verify correctness and ensure no race conditions are introduced in the ring buffer.
+
+## Results Summary
+- **Best render time**: 2.846s (vs baseline ~2.727s)
+- **Improvement**: ~-4.3% (worse)
+- **Kept experiments**: none
+- **Discarded experiments**: [PERF-594: Inline writerWaiterResolve Wakeup into Promise Chain in CaptureLoop]
