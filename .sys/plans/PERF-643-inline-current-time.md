@@ -1,11 +1,11 @@
 ---
 id: PERF-643
 slug: inline-current-time
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-31
-completed: ""
-result: ""
+completed: "2024-05-31"
+result: failed
 ---
 
 # PERF-643: Inline `currentTime` update into `handleVirtualTimeBudgetExpired`
@@ -76,3 +76,9 @@ Run a basic canvas render.
 
 ## Correctness Check
 Run `npx tsx packages/renderer/tests/verify-cdp-media-sync-timing.ts` to ensure time advances correctly.
+
+## Results Summary
+- **Best render time**: 2.882s (vs baseline 2.780s)
+- **Improvement**: -3.6%
+- **Kept experiments**: []
+- **Discarded experiments**: [Inline `currentTime` update into `handleVirtualTimeBudgetExpired`]

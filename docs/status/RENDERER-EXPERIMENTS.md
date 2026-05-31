@@ -687,3 +687,8 @@ Last updated by: PERF-592
   - **What I tried**: Attempted to eliminate the `.then()` chain in `runSetTime` by eagerly assigning `this.currentTime = timeInSeconds` right before sending the `Emulation.setVirtualTimePolicy` CDP command and directly returning the new Promise, aiming to bypass V8 microtask closure allocation overhead per frame.
   - **WHY it didn't work**: The median render time did not improve and remained around ~2.492s (baseline ~2.499s). V8 is likely already highly efficient at optimizing local closure execution and short `.then()` microtasks inside generator await loops. The overhead saved by avoiding `.then()` was negligible and absorbed by the noise floor of Playwright IPC.
   - **Plan ID**: PERF-642
+
+- **PERF-643**: Inline `currentTime` update into `handleVirtualTimeBudgetExpired`
+  - **What I tried**: Added a `nextTimeInSeconds` variable to `CdpTimeDriver.ts` to eagerly store the time and updated `this.currentTime` directly in the `handleVirtualTimeBudgetExpired` CDP event handler, bypassing the `.then()` promise closure allocation in `runSetTime`.
+  - **WHY it didn't work**: The median render time regressed slightly to ~2.882s compared to the baseline median of ~2.780s. Despite eliminating the promise closure allocation in the hot loop, V8 is highly optimized for short `.then()` microtasks inside async chains. By shifting state mutation into the CDP callback context, we might have disrupted the JIT compiler's optimization of the async/await hot loop sequence, resulting in a net negative performance impact.
+  - **Plan ID**: PERF-643
