@@ -1,10 +1,10 @@
 ---
 id: PERF-629
 slug: consolidate-beginframe
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-31
-completed: ""
+completed: "2024-06-03"
 result: ""
 ---
 
@@ -80,3 +80,11 @@ Run the `npx tsx packages/renderer/scripts/benchmark-perf.ts` script to test per
 ## Prior Art
 - PERF-627 (discarded due to `activeBeginFrameParams` indirection regression)
 - PERF-625 (moved bounding box calc to prepare phase)
+
+## Results Summary
+- **Best render time**: ~2.490s (median ~2.513s)
+- **Improvement**: ~0% (Within noise margin but code size reduced)
+- **Kept experiments**:
+  - Unified parameter mutation in `prepare`
+  - Removed branch and duplicated logic in `capture`
+- **Discarded experiments**: None

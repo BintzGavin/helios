@@ -641,3 +641,6 @@ Last updated by: PERF-592
   - **What I tried**: Added pre-bound success and error handler methods to `DomStrategy` and removed `async/await` from `capture()`, returning the Promise chain directly instead.
   - **WHY it didn't work**: The median render time was ~2.221s, compared to the baseline of ~2.233s. The difference is within noise margins and the change slightly adds more complexity without providing meaningful improvement. V8 appears highly optimized for inline `async/await` and `try/catch`.
   - **Plan ID**: PERF-626
+
+## What Works
+- **PERF-629**: Consolidate `HeadlessExperimental.beginFrame` CDP Call in `DomStrategy`. Mutating `beginFrameParams` directly during setup removed an `if` branch and a duplicate IPC call in the `capture` hot loop. Render time stayed roughly neutral (within noise limit, ~2.513s) while reducing bytecode and structural complexity.
