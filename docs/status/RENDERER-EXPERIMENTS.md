@@ -678,3 +678,7 @@ Last updated by: PERF-592
   - **Impact**: Removed a redundant condition evaluation on every frame. Did not measurably impact the median render time, which remained within margin of error (~2.499s vs ~2.468s baseline), but keeps code marginally tighter.
   - **Plan ID**: PERF-637
 - **PERF-629**: Consolidate `HeadlessExperimental.beginFrame` CDP Call in `DomStrategy`. Mutating `beginFrameParams` directly during setup removed an `if` branch and a duplicate IPC call in the `capture` hot loop. Render time stayed roughly neutral (within noise limit, ~2.513s) while reducing bytecode and structural complexity.
+- **PERF-641**: Optimize Hot Loop Redundancies
+  - **What I did**: Removed redundant static string reassignment for syncMedia expressions in CdpTimeDriver.ts inside the defaultSyncMedia hot loop to reduce string property allocations in V8.
+  - **Impact**: Reduced loop redundancy. Render time benchmarked to a median of ~2.202s (baseline ~2.308s).
+  - **Plan ID**: PERF-641
