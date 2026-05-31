@@ -15,9 +15,8 @@ export class CdpTimeDriver implements TimeDriver {
   private cachedPromises: Promise<any>[] = [];
   private cdpResolve: (() => void) | null = null;
   private cdpReject: ((err: Error) => void) | null = null;
-  private singleFrameSyncMediaParams: any = { expression: "", awaitPromise: false, returnByValue: false };
+  private singleFrameSyncMediaParams: any = { expression: "window.__helios_sync_media();", awaitPromise: false, returnByValue: false };
   private multiFrameSyncMediaParams: any[] = [];
-  private syncMediaState: number = 0; // 0 = unknown, 1 = true, 2 = false
   private hasMedia: boolean = true;
 
   private virtualTimePromiseExecutor = (resolve: () => void, reject: (err: Error) => void) => {
@@ -30,7 +29,6 @@ export class CdpTimeDriver implements TimeDriver {
   private defaultSyncMedia() {
     const frames = this.cachedFrames;
     if (frames.length === 1) {
-      this.singleFrameSyncMediaParams.expression = "window.__helios_sync_media();";
       this.client!.send('Runtime.evaluate', this.singleFrameSyncMediaParams).catch(noopCatch);
     } else {
         if (this.executionContextIds.length > 0) {
@@ -51,7 +49,6 @@ export class CdpTimeDriver implements TimeDriver {
             this.client!.send('Runtime.evaluate', this.multiFrameSyncMediaParams[i]).catch(noopCatch);
           }
         } else {
-          this.singleFrameSyncMediaParams.expression = "window.__helios_sync_media();";
           this.client!.send('Runtime.evaluate', this.singleFrameSyncMediaParams).catch(noopCatch);
         }
     }
@@ -182,8 +179,6 @@ export class CdpTimeDriver implements TimeDriver {
       this.hasMedia = true;
     }
 
-    this.syncMediaState = this.hasMedia ? 1 : 2;
-
     try {
       const { result } = await this.client!.send('Runtime.evaluate', {
         expression: "typeof window.helios !== 'undefined' && typeof window.helios.waitUntilStable === 'function'",
@@ -220,7 +215,7 @@ export class CdpTimeDriver implements TimeDriver {
     const budget = delta * 1000;
 
 // 1. Synchronize media elements
-    if (this.syncMediaState === 1 && this.hasMedia) {
+    if (this.hasMedia) {
       this.defaultSyncMedia();
     }
 
