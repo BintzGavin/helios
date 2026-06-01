@@ -102,6 +102,11 @@ Last updated by: PERF-614
   - **Outcome**: discard
 
 ## What Doesn't Work (and Why)
+- **PERF-596**: Cache sync media CDP expression in CdpTimeDriver
+  - **What I tried**: Attempted to implement expression string caching from plan PERF-596.
+  - **WHY it didn't work**: Skipped because the static string optimization (`PERF-612`) made dynamic string generation obsolete, removing the need for `timeInSeconds` caching entirely. Marked as IMPOSSIBLE: DUPLICATION and deleted.
+  - **Plan ID**: PERF-596
+
 - **PERF-649**: Optimize Await Chain in CaptureLoop
   - **What I tried**: Attempted to replace `.then()` chain in CaptureLoop with sequential `await`s to avoid intermediate closure allocation.
   - **WHY it didn't work**: The median render time was ~2.931s, compared to the baseline median of ~3.003s. The difference is within the noise margin, and the performance benefit of avoiding the small closure was negligible while complicating control flow structure.
