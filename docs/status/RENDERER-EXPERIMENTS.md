@@ -97,6 +97,11 @@ Last updated by: PERF-614
   - **Outcome**: discard
 
 ## What Doesn't Work (and Why)
+- **PERF-647**: Eliminate Media Sync IPC in CdpTimeDriver
+  - **What I tried**: Attempted to remove the per-frame `Runtime.evaluate` CDP call for media synchronization and replace it with an injected browser-side `requestAnimationFrame` loop to execute `window.__helios_sync_media()`.
+  - **WHY it didn't work**: The median render time did not improve (2.193s vs baseline 2.201s). The `requestAnimationFrame` approach likely incurred equivalent or slightly higher overhead inside the browser event loop, or the Playwright IPC was not the dominant bottleneck for this specific sync call.
+  - **Plan ID**: PERF-647
+
 
 - **PERF-646**: Fast path sync media check
   - **What I tried**: Inlined the common case of single-frame media sync directly into `runSetTime` in `CdpTimeDriver.ts` to bypass the function call and branching overhead of `defaultSyncMedia`.
