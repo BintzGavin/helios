@@ -218,6 +218,7 @@ The `<helios-player>` element implements a subset of the HTMLMediaElement interf
 - `onerror` (function | null): Event handler for the `error` event.
 - `onenterpictureinpicture` (function | null): Event handler for the `enterpictureinpicture` event.
 - `onleavepictureinpicture` (function | null): Event handler for the `leavepictureinpicture` event.
+- `onaudiometering` (function | null): Event handler for the `audiometering` event.
 
 ## Events
 

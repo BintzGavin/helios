@@ -1094,6 +1094,14 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
     if (handler) this.addEventListener('leavepictureinpicture', handler);
   }
 
+  private _onaudiometering: ((event: Event) => void) | null = null;
+  public get onaudiometering() { return this._onaudiometering; }
+  public set onaudiometering(handler: ((event: Event) => void) | null) {
+    if (this._onaudiometering) this.removeEventListener('audiometering', this._onaudiometering);
+    this._onaudiometering = handler;
+    if (handler) this.addEventListener('audiometering', handler);
+  }
+
   // --- Standard Media API ---
 
   public canPlayType(type: string): CanPlayTypeResult {

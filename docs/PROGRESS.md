@@ -679,3 +679,6 @@ Each agent should update **their own dedicated progress file** instead of this f
 
 ### STUDIO v0.121.21
 - ✅ Completed: Timeline Drag & Drop - Verified that the timeline drag drop logic is already fully implemented (IMPOSSIBLE: DUPLICATION).
+
+### PLAYER v0.77.45
+- ✅ Completed: Add onaudiometering event handler to HeliosPlayer class and documentation.

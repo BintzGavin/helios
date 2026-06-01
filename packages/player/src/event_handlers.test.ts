@@ -52,7 +52,8 @@ describe('HeliosPlayer Event Handlers', () => {
       'pause', 'ended', 'timeupdate', 'volumechange', 'ratechange',
       'durationchange', 'seeking', 'seeked', 'resize', 'loadstart',
       'loadedmetadata', 'loadeddata', 'canplay', 'canplaythrough',
-      'error', 'enterpictureinpicture', 'leavepictureinpicture'
+      'error', 'enterpictureinpicture', 'leavepictureinpicture',
+      'audiometering'
     ];
 
     events.forEach(eventName => {
