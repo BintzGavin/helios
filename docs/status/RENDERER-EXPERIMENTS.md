@@ -106,6 +106,12 @@ Last updated by: PERF-614
   - **Outcome**: discard
 
 ## What Doesn't Work (and Why)
+
+- **PERF-654**: Inline defaultSyncMedia into runSetTime
+  - **What I tried**: Attempted to eliminate function call overhead in the hot loop by replacing `this.defaultSyncMedia()` call with its implementation directly inside `runSetTime`.
+  - **WHY it didn't work**: The median render time was ~27.245s compared to the baseline median of ~27.116s. V8 likely already inlines this effectively. The overhead is negligible, and modifying the code added visual clutter.
+  - **Plan ID**: PERF-654
+
 - **PERF-651**: Replace CaptureLoop runWorker Dynamic Promise Await
   - **What I tried**: Extracted dynamic time/capture promise resolution into a dedicated variable.
   - **Impact**: The median render time was ~2.705s-3.288s, which is slower than the baseline ~2.596s (and historical best ~2.261s). The structured promise chain did not improve execution time and likely added slightly more variable allocation latency compared to the highly optimized inline evaluation.
