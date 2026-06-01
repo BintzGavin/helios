@@ -1,0 +1,4 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	29.084	600	20.63	61.8	discard	PERF-654: inline sync media
+2	26.973	600	22.24	62.2	discard	PERF-654: inline sync media
+3	27.245	600	22.02	61.8	discard	PERF-654: inline sync media
