@@ -1,8 +1,8 @@
 ---
 id: PERF-646
 slug: fast-path-sync-media
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-06-01
 completed: ""
 result: ""
@@ -63,3 +63,9 @@ Run the tests and benchmark to verify determinism and performance.
 
 ## Prior Art
 - Many optimizations (e.g. PERF-637, PERF-641) focused on stripping redundant calls and branches from the `CaptureLoop` and `CdpTimeDriver` hot loops.
+
+## Results Summary
+- **Best render time**: ~2.568s (vs baseline ~2.483s)
+- **Improvement**: 0%
+- **Kept experiments**: none
+- **Discarded experiments**: Inlined fast-path media sync

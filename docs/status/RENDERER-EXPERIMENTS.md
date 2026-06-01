@@ -97,6 +97,11 @@ Last updated by: PERF-614
   - **Outcome**: discard
 
 ## What Doesn't Work (and Why)
+
+- **PERF-646**: Fast path sync media check
+  - **What I tried**: Inlined the common case of single-frame media sync directly into `runSetTime` in `CdpTimeDriver.ts` to bypass the function call and branching overhead of `defaultSyncMedia`.
+  - **Why it didn't work**: Did not provide a clear performance improvement compared to the baseline variations (median of ~2.568s vs runs of 2.483s-2.649s). V8 likely already optimizes and inlines this function call efficiently, rendering the manual inline redundant.
+  - **Plan ID**: PERF-646
 - **PERF-594**: Inline `writerWaiterResolve` Wakeup into Promise Chain in CaptureLoop
   - **What I tried**: Modified the `captureResult` try/catch block in `CaptureLoop.ts` to check and execute `writerWaiterResolve` immediately after setting `frameReadyRing` to 1, instead of awaiting the generator resumption of the whole block.
   - **WHY it didn't work**: The median render time regressed to ~2.955s compared to the baseline of ~2.785s. Resolving the waiter inside the microtask did not outweigh the overhead of checking `writerWaiterResolve && nextFrameToWrite === i` conditionally inside both the `try` and `else` blocks. V8 seems to optimize the generator `await` resumption more efficiently than the repeated closure state checks.

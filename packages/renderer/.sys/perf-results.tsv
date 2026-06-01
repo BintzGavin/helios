@@ -142,3 +142,4 @@ PERF-408	49.135	600	12.21	43.1	keep	Cache Media Elements in CdpTimeDriver to avo
 1	0.000	0	0.00	0.0	discard	bypass lastFrameData assignment (breaks frame fallback)
 PERF-641	2.202	150	68.11	63.1	keep	removed redundant sync media string assignment
 643	2.882	150	52.05	63.2	discard	inline-current-time (median of 6 runs: 3.110, 3.089, 2.860, 3.196, 2.757, 2.882)
+5	2.568	150	58.41	63.7	discard	PERF-646 fast path sync media check in CdpTimeDriver
