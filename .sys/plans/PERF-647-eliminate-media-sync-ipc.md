@@ -1,11 +1,11 @@
 ---
 id: PERF-647
 slug: eliminate-media-sync-ipc
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-06-01
-completed: ""
-result: ""
+completed: "2024-06-01"
+result: "discard"
 ---
 
 # PERF-647: Eliminate Media Sync IPC in CdpTimeDriver
@@ -62,3 +62,9 @@ Canvas path doesn't use `CdpTimeDriver`. No specific smoke test needed beyond th
 
 ## Correctness Check
 Run the DOM benchmark and ensure media playback matches the expected output and does not stall.
+
+## Results Summary
+- **Best render time**: 2.154s (vs baseline 2.201s) (Inconclusive)
+- **Improvement**: 0%
+- **Kept experiments**: []
+- **Discarded experiments**: [Eliminate Media Sync IPC in CdpTimeDriver]
