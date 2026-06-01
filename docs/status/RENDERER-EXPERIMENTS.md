@@ -1,8 +1,12 @@
 ## Performance Trajectory
-Current best: 1.317s (baseline was 1.339s, -1.64%)
+Current best: 2.261s (baseline was 2.596s)
 Last updated by: PERF-614
 
 ## What Works
+- **PERF-650**: Optimize Hot Loop Variables
+  - **What I did**: Extracted totalFrames, startFrame, capturedErrors and stdin getter to local vars. Modulo check eliminated.
+  - **Impact**: Improved performance to ~2.261s (baseline 2.596s)
+  - **Plan ID**: PERF-650
 - **PERF-648**: Optimize Hot Loop Allocations
   - **What I did**: Changed `CdpTimeDriver.ts`'s `runSetTime` to return `void` instead of `Promise.resolve()` when time delta is <= 0. Also inlined the `await` execution in `CaptureLoop.ts` to bypass intermediate variable allocation.
   - **Impact**: Improved median render time by ~7.5% (median ~2.594s vs baseline ~2.806s) by reducing microtask wrapper and variable allocation overhead in V8.

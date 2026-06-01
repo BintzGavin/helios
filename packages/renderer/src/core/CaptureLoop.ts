@@ -71,7 +71,13 @@ export class CaptureLoop {
   public async run(): Promise<void> {
     this.setupDrainListeners();
     const fps = this.options.fps;
-    const progressInterval = Math.floor(this.totalFrames / 10);
+    const totalFrames = this.totalFrames;
+    const startFrame = this.startFrame;
+    const capturedErrors = this.capturedErrors;
+    const stdin = this.ffmpegManager.stdin;
+
+    const progressInterval = Math.floor(totalFrames / 10);
+    let nextProgressFrame = progressInterval;
 
     let previousWritePromise: Promise<void> | undefined;
 
@@ -99,7 +105,7 @@ export class CaptureLoop {
     let freeWorkersHead = 0;
 
     const checkState = () => {
-        if (this.capturedErrors.length > 0 || (signal && signal.aborted)) {
+        if (capturedErrors.length > 0 || (signal && signal.aborted)) {
             aborted = true;
         }
 
@@ -120,7 +126,7 @@ export class CaptureLoop {
         }
 
         // See if we can assign tasks to waiting workers
-        while (freeWorkersHead > 0 && nextFrameToSubmit < this.totalFrames && nextFrameToSubmit - nextFrameToWrite < maxPipelineDepth) {
+        while (freeWorkersHead > 0 && nextFrameToSubmit < totalFrames && nextFrameToSubmit - nextFrameToWrite < maxPipelineDepth) {
             const w = freeWorkers[--freeWorkersHead];
             const res = workerBlockedResolves[w]!;
             workerBlockedResolves[w] = null;
@@ -135,7 +141,7 @@ export class CaptureLoop {
         }
 
         // If we still have waiting workers but are at totalFrames, tell them to stop
-        if (nextFrameToSubmit >= this.totalFrames) {
+        if (nextFrameToSubmit >= totalFrames) {
             while (freeWorkersHead > 0) {
                 const w = freeWorkers[--freeWorkersHead];
                 if (workerBlockedResolves[w]) {
@@ -161,7 +167,7 @@ export class CaptureLoop {
 
         while (!aborted) {
             let i: number;
-            if (aborted || nextFrameToSubmit >= this.totalFrames) {
+            if (aborted || nextFrameToSubmit >= totalFrames) {
                 i = -1;
             } else if (nextFrameToSubmit - nextFrameToWrite < maxPipelineDepth) {
                 i = nextFrameToSubmit++;
@@ -176,7 +182,7 @@ export class CaptureLoop {
             if (i === -1) break;
 
             const time = i * timeStep;
-            const compositionTimeInSeconds = (this.startFrame + i) * compTimeStep;
+            const compositionTimeInSeconds = (startFrame + i) * compTimeStep;
 
             const ringIndex = i & ringMask;
 
@@ -203,8 +209,8 @@ export class CaptureLoop {
     const workerPromises = this.pool.map((w, i) => runWorker(w, i));
 
     try {
-        while (nextFrameToWrite < this.totalFrames && !aborted) {
-            if (freeWorkersHead > 0 || this.capturedErrors.length > 0 || (signal && signal.aborted)) {
+        while (nextFrameToWrite < totalFrames && !aborted) {
+            if (freeWorkersHead > 0 || capturedErrors.length > 0 || (signal && signal.aborted)) {
                 checkState();
             }
             if (aborted) break;
@@ -219,12 +225,13 @@ export class CaptureLoop {
 
             const currentFrame = nextFrameToWrite;
 
-            if (currentFrame > 0 && currentFrame % progressInterval === 0) {
-                console.log(`Progress: Rendered ${currentFrame} / ${this.totalFrames} frames`);
+            if (currentFrame === nextProgressFrame) {
+                console.log(`Progress: Rendered ${currentFrame} / ${totalFrames} frames`);
+                nextProgressFrame += progressInterval;
             }
 
             if (onProgress) {
-                onProgress(currentFrame / this.totalFrames);
+                onProgress(currentFrame / totalFrames);
             }
 
             if (previousWritePromise) {
@@ -232,12 +239,12 @@ export class CaptureLoop {
                 previousWritePromise = undefined;
             }
 
-            if (this.ffmpegManager.stdin?.writable) {
+            if (stdin?.writable) {
                 let canWriteMore: boolean;
                 if (typeof buffer === 'string') {
-                    canWriteMore = this.ffmpegManager.stdin.write(buffer, 'base64', this.handleWriteError);
+                    canWriteMore = stdin.write(buffer, 'base64', this.handleWriteError);
                 } else {
-                    canWriteMore = this.ffmpegManager.stdin.write(buffer, this.handleWriteError);
+                    canWriteMore = stdin.write(buffer, this.handleWriteError);
                 }
 
                 if (!canWriteMore) {
@@ -259,8 +266,8 @@ export class CaptureLoop {
     checkState();
 
     if (fatalError) throw fatalError;
-    if (this.capturedErrors.length > 0) {
-        throw this.capturedErrors[0];
+    if (capturedErrors.length > 0) {
+        throw capturedErrors[0];
     }
     if (signal && signal.aborted) {
         throw new Error('Aborted');
@@ -276,12 +283,12 @@ export class CaptureLoop {
     const finalBuffer = await this.pool[0].strategy.finish(this.pool[0].page);
     if (finalBuffer && ((Buffer.isBuffer(finalBuffer) && finalBuffer.length > 0) || (typeof finalBuffer === 'string' && finalBuffer.length > 0))) {
       console.log(`Writing final buffer...`);
-      if (this.ffmpegManager.stdin?.writable) {
+      if (stdin?.writable) {
           let canWriteMore: boolean;
           if (typeof finalBuffer === 'string') {
-              canWriteMore = this.ffmpegManager.stdin.write(finalBuffer, 'base64', this.handleWriteError);
+              canWriteMore = stdin.write(finalBuffer, 'base64', this.handleWriteError);
           } else {
-              canWriteMore = this.ffmpegManager.stdin.write(finalBuffer, this.handleWriteError);
+              canWriteMore = stdin.write(finalBuffer, this.handleWriteError);
           }
           if (!canWriteMore) {
               await new Promise<void>(this.drainPromiseExecutor);
@@ -292,7 +299,7 @@ export class CaptureLoop {
     }
 
     console.log('Finished sending frames. Closing FFmpeg stdin.');
-    this.ffmpegManager.stdin?.end();
+    stdin?.end();
   }
 
 }

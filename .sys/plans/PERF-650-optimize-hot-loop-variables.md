@@ -1,11 +1,11 @@
 ---
 id: PERF-650
 slug: optimize-hot-loop-variables
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-06-01
 completed: ""
-result: ""
+result: "keep"
 ---
 
 # PERF-650: Optimize Hot Loop Variable Access and Getter Invocations in CaptureLoop
