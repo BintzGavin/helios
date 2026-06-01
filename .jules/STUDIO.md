@@ -15,3 +15,6 @@
 ## 0.121.18 - Prioritize Test Coverage
 **Learning:** When looking for a vision gap and falling back to test coverage, verify the component coverage accurately via vitest coverage reports to avoid trying to create missing components that already exist.
 **Action:** Run npm run test -w packages/studio -- --coverage and examine the output for files with 0 or low coverage before committing to a coverage task.
+## v0.121.21 - STUDIO-Timeline-Drag-Drop
+**Learning:** IMPOSSIBLE: DUPLICATION. The requested feature in `2026-11-13-STUDIO-Timeline-Drag-Drop.md` to implement drag and drop support for the Timeline to accept assets (audio/video) is already implemented in `Timeline.tsx` via the `handleDrop` function. The test coverage for the `Timeline.test.tsx` component passes successfully.
+**Action:** Always verify if a feature is already implemented before attempting to build it.
