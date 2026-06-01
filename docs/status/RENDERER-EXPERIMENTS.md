@@ -102,6 +102,13 @@ Last updated by: PERF-614
   - **Outcome**: discard
 
 ## What Doesn't Work (and Why)
+- **PERF-649**: Optimize Await Chain in CaptureLoop
+  - **What I tried**: Attempted to replace `.then()` chain in CaptureLoop with sequential `await`s to avoid intermediate closure allocation.
+  - **WHY it didn't work**: The median render time was ~2.931s, compared to the baseline median of ~3.003s. The difference is within the noise margin, and the performance benefit of avoiding the small closure was negligible while complicating control flow structure.
+  - **Plan ID**: PERF-649
+
+- **PERF-639 & PERF-640**: Marked as IMPOSSIBLE: DUPLICATION and deleted, as their target micro-optimizations (removing `captureResult instanceof Promise` and redundant string assignments) were already implemented by previous experiments.
+
 - **PERF-638**: Batch Micro-Optimizations in Hot Loop
   - **What I tried**: Attempted to implement batch micro-optimizations from plan PERF-638.
   - **WHY it didn't work**: Skipped because all of the requested code changes were already implemented in previous PRs.
