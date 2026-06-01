@@ -50,6 +50,7 @@ Properties:
 - `paused: boolean`
 - `ended: boolean`
 - `error: MediaError | null`
+- `onaudiometering: ((event: Event) => void) | null`
 - `readyState: number`
 - `networkState: number`
 - `srcObject: MediaStream | MediaSource | Blob | null`
