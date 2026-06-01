@@ -97,6 +97,10 @@ Last updated by: PERF-614
   - **Outcome**: discard
 
 ## What Doesn't Work (and Why)
+- **PERF-644**: Bitmask Optimization for frameReadyRing in CaptureLoop
+  - **What I tried**: Replaced the Uint8Array frameReadyRing in CaptureLoop.ts with a scalar bitmask to eliminate bounds checking and memory allocation in the hot loop.
+  - **WHY it didn't work**: The median render time was ~2.246s, which is slightly slower than the local baseline of ~2.223s. The bitwise mask operations and bitshifts in V8 do not seem to outperform simple direct array writes and lookups on a small statically sized Uint8Array.
+  - **Plan ID**: PERF-644
 - **PERF-647**: Eliminate Media Sync IPC in CdpTimeDriver
   - **What I tried**: Attempted to remove the per-frame `Runtime.evaluate` CDP call for media synchronization and replace it with an injected browser-side `requestAnimationFrame` loop to execute `window.__helios_sync_media()`.
   - **WHY it didn't work**: The median render time did not improve (2.193s vs baseline 2.201s). The `requestAnimationFrame` approach likely incurred equivalent or slightly higher overhead inside the browser event loop, or the Playwright IPC was not the dominant bottleneck for this specific sync call.
