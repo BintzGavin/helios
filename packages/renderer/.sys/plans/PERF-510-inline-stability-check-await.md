@@ -1,11 +1,11 @@
 ---
 id: PERF-510
 slug: inline-stability-check-await
-status: unclaimed
+status: impossible
 claimed_by: ""
 created: 2024-05-15
-completed: ""
-result: ""
+completed: 2026-06-01
+result: impossible
 ---
 
 # PERF-510: Inline Stability Check Await
@@ -68,3 +68,6 @@ Modify `defaultStabilityCheck` to return the promise without `.then()`, and upda
 ```
 **Why**: Avoids creating a secondary Promise object via `.then()` and an anonymous closure per frame.
 **Risk**: None.
+
+## Impossibility Explanation
+Upon reviewing `packages/renderer/src/drivers/CdpTimeDriver.ts`, this optimization has already been fully implemented by `PERF-520`. That experiment entirely removed `defaultStabilityCheck` and `evaluateStabilityParams`, inlining the `await` directly into `runSetTime()`. Therefore, this experiment's target code no longer exists and the optimization is structurally obsolete.
