@@ -102,6 +102,11 @@ Last updated by: PERF-614
   - **Outcome**: discard
 
 ## What Doesn't Work (and Why)
+- **PERF-638**: Batch Micro-Optimizations in Hot Loop
+  - **What I tried**: Attempted to implement batch micro-optimizations from plan PERF-638.
+  - **WHY it didn't work**: Skipped because all of the requested code changes were already implemented in previous PRs.
+  - **Plan ID**: PERF-638
+
 - **PERF-644**: Bitmask frameReadyRing
   - **What I tried**: Replaced the `frameReadyRing` Uint8Array in `CaptureLoop.ts` with a single integer `frameReadyMask` bitmask to optimize read/write overhead in the hot loop.
   - **WHY it didn't work**: It yielded slightly worse performance (~2.395s vs ~2.239s baseline) because V8 bitwise operations did not outperform direct array writes and lookups on a small, statically sized Uint8Array.
