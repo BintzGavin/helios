@@ -181,11 +181,10 @@ export class CaptureLoop {
             const ringIndex = i & ringMask;
 
             const setTimeResult = timeDriver.setTime(page, compositionTimeInSeconds);
-            const captureResult = setTimeResult
-                ? setTimeResult.then(() => strategy.capture(page, time))
-                : strategy.capture(page, time);
             try {
-                const buffer = await captureResult;
+                const buffer = setTimeResult
+                    ? await setTimeResult.then(() => strategy.capture(page, time))
+                    : await strategy.capture(page, time);
                 frameBufferRing[ringIndex] = buffer;
                 frameReadyRing[ringIndex] = 1;
             } catch (e) {

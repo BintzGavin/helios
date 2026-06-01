@@ -3,6 +3,11 @@ Current best: 1.317s (baseline was 1.339s, -1.64%)
 Last updated by: PERF-614
 
 ## What Works
+- **PERF-648**: Optimize Hot Loop Allocations
+  - **What I did**: Changed `CdpTimeDriver.ts`'s `runSetTime` to return `void` instead of `Promise.resolve()` when time delta is <= 0. Also inlined the `await` execution in `CaptureLoop.ts` to bypass intermediate variable allocation.
+  - **Impact**: Improved median render time by ~7.5% (median ~2.594s vs baseline ~2.806s) by reducing microtask wrapper and variable allocation overhead in V8.
+  - **Plan ID**: PERF-648
+
 - **PERF-637**: Optimize Writer Waiter Check in CaptureLoop Hot Loop
   - **What I did**: Removed the `nextFrameToWrite === i` branch condition from the `writerWaiterResolve` check in the `CaptureLoop.ts` `runWorker` hot loop because with 1 concurrency, it is redundant.
   - **Impact**: Removed a redundant condition evaluation on every frame. Did not measurably impact the median render time, which remained within margin of error (~2.499s vs ~2.468s baseline), but keeps code marginally tighter.
