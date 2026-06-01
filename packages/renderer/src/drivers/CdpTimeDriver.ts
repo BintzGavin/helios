@@ -200,13 +200,13 @@ export class CdpTimeDriver implements TimeDriver {
     return this.runSetTime(page, timeInSeconds);
   }
 
-  private runSetTime(page: Page, timeInSeconds: number): Promise<void> {
+  private runSetTime(page: Page, timeInSeconds: number): Promise<void> | void {
     const delta = timeInSeconds - this.currentTime;
 
     // If delta is 0 or negative, we don't advance.
     // In a renderer loop, time usually moves forward.
     if (delta <= 0) {
-        return Promise.resolve();
+        return;
     }
 
     // Convert to milliseconds for CDP
