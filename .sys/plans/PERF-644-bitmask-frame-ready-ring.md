@@ -1,11 +1,11 @@
 ---
 id: PERF-644
 slug: bitmask-frame-ready-ring
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-06-01
-completed: ""
-result: ""
+completed: "2024-06-01"
+result: "discard"
 ---
 
 # PERF-644: Bitmask Optimization for `frameReadyRing` in CaptureLoop
@@ -61,3 +61,8 @@ Run the DOM benchmark and ensure the video renders successfully without hanging 
 
 ## Prior Art
 - **PERF-622**: Replaced `frameErrorRing` array with a single scalar `fatalError` which improved performance by 6%. Scalar/primitive replacement of short arrays is a proven optimization in this loop.
+## Results Summary
+- **Best render time**: ~2.395s (vs baseline ~2.239s)
+- **Improvement**: 0% (Regression)
+- **Kept experiments**: None
+- **Discarded experiments**: Bitmask frameReadyRing

@@ -97,6 +97,11 @@ Last updated by: PERF-614
   - **Outcome**: discard
 
 ## What Doesn't Work (and Why)
+- **PERF-644**: Bitmask frameReadyRing
+  - **What I tried**: Replaced the `frameReadyRing` Uint8Array in `CaptureLoop.ts` with a single integer `frameReadyMask` bitmask to optimize read/write overhead in the hot loop.
+  - **WHY it didn't work**: It yielded slightly worse performance (~2.395s vs ~2.239s baseline) because V8 bitwise operations did not outperform direct array writes and lookups on a small, statically sized Uint8Array.
+  - **Plan ID**: PERF-644
+
 - **PERF-644**: Bitmask Optimization for frameReadyRing in CaptureLoop
   - **What I tried**: Replaced the Uint8Array frameReadyRing in CaptureLoop.ts with a scalar bitmask to eliminate bounds checking and memory allocation in the hot loop.
   - **WHY it didn't work**: The median render time was ~2.246s, which is slightly slower than the local baseline of ~2.223s. The bitwise mask operations and bitshifts in V8 do not seem to outperform simple direct array writes and lookups on a small statically sized Uint8Array.
