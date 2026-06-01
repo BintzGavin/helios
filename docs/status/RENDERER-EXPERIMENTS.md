@@ -106,6 +106,10 @@ Last updated by: PERF-614
   - **Outcome**: discard
 
 ## What Doesn't Work (and Why)
+- **PERF-651**: Replace CaptureLoop runWorker Dynamic Promise Await
+  - **What I tried**: Extracted dynamic time/capture promise resolution into a dedicated variable.
+  - **Impact**: The median render time was ~2.705s-3.288s, which is slower than the baseline ~2.596s (and historical best ~2.261s). The structured promise chain did not improve execution time and likely added slightly more variable allocation latency compared to the highly optimized inline evaluation.
+  - **Plan ID**: PERF-651
 - **PERF-596**: Cache sync media CDP expression in CdpTimeDriver
   - **What I tried**: Attempted to implement expression string caching from plan PERF-596.
   - **WHY it didn't work**: Skipped because the static string optimization (`PERF-612`) made dynamic string generation obsolete, removing the need for `timeInSeconds` caching entirely. Marked as IMPOSSIBLE: DUPLICATION and deleted.
