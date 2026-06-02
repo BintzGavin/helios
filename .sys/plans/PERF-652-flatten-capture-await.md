@@ -1,11 +1,11 @@
 ---
 id: PERF-652
 slug: flatten-capture-await
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-06-02
-completed: ""
-result: ""
+completed: "2024-06-02"
+result: "discard"
 ---
 
 # PERF-652: Bypass DOM Strategy Async Generator and Promise Return
@@ -69,3 +69,7 @@ None.
 
 ## Correctness Check
 Run the DOM render benchmark `npx tsx packages/renderer/scripts/benchmark-perf.ts` and verify output integrity. Run `npx tsx packages/renderer/tests/run-all.ts` to ensure no regressions.
+
+## Results Summary
+- **Best render time**: 2.286s
+- **Status**: discard
