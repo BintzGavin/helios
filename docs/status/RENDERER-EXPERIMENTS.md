@@ -106,6 +106,10 @@ Last updated by: PERF-614
   - **Outcome**: discard
 
 ## What Doesn't Work (and Why)
+- **PERF-652**: Flatten capture await
+  - **What I tried**: Changed the ternary await in CaptureLoop.ts to sequential awaits.
+  - **Why it didn't work**: Time was ~2.286s, not an improvement over the 2.261s baseline. The additional control flow logic (if) and sequential await unwrapping negated any gains from bypassing the .then() closure allocation in the hot loop.
+  - **Plan ID**: PERF-652
 
 - **PERF-654**: Inline defaultSyncMedia into runSetTime
   - **What I tried**: Attempted to eliminate function call overhead in the hot loop by replacing `this.defaultSyncMedia()` call with its implementation directly inside `runSetTime`.
