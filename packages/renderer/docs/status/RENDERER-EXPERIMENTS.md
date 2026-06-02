@@ -13,3 +13,4 @@ Last updated by: PERF-508
 
 ## Open Questions
 - [PERF-306] Attempted to disable renderer backgrounding (`--disable-renderer-backgrounding`, `--disable-backgrounding-occluded-windows`) to improve multi-worker actor model performance. DISCARDED. Resulted in significantly slower performance (42.335s vs ~32.1s baseline). Disabling backgrounding heuristics in the multi-process microVM environment appears to cause resource contention or CPU starvation rather than improving throughput.
+- [PERF-474] Attempted to replace the async/await `runWorker` loop in `CaptureLoop.ts` with direct recursive Promise `.then()` chaining. DISCARDED because it resulted in a slower median render time (~2.565s vs baseline ~2.395s). The overhead from allocating many closure contexts for the `.then()` handlers outweighed any savings from bypassing the V8 async generator state machine.
