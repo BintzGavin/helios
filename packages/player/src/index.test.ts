@@ -1205,7 +1205,7 @@ describe('HeliosPlayer', () => {
 
 
     it('should implement HTMLMediaElement event handlers', () => {
-        const events = ['play', 'pause', 'ended', 'timeupdate', 'volumechange', 'ratechange', 'durationchange', 'seeking', 'seeked', 'resize', 'loadstart', 'loadedmetadata', 'loadeddata', 'canplay', 'canplaythrough', 'error', 'enterpictureinpicture', 'leavepictureinpicture'];
+        const events = ['play', 'pause', 'ended', 'timeupdate', 'volumechange', 'ratechange', 'durationchange', 'seeking', 'seeked', 'resize', 'loadstart', 'loadedmetadata', 'loadeddata', 'canplay', 'canplaythrough', 'error', 'enterpictureinpicture', 'leavepictureinpicture', 'audiometering'];
 
         for (const eventName of events) {
             const propName = `on${eventName}`;
