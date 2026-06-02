@@ -106,6 +106,10 @@ Last updated by: PERF-614
   - **Outcome**: discard
 
 ## What Doesn't Work (and Why)
+- **PERF-588**: Inline Worker Promise Chain in CaptureLoop
+  - **What I tried**: Replaced try/catch block with a single Promise chain.
+  - **Why it didn't work**: Caused a performance regression (slower, median ~2.503s vs baseline ~2.261s) because shifting generator suspension into a structured promise chain negated the performance benefits of bypassing the try/catch overhead, adding variable allocation latency.
+  - **Plan ID**: PERF-588
 - **PERF-656**: Pre-bind currentTime Update Handler in CdpTimeDriver.ts
   - **What I tried**: Added `nextTimeInSeconds` and `updateCurrentTime` properties to `CdpTimeDriver` and updated `runSetTime` to use these instead of an anonymous closure for the promise resolution.
   - **Why it didn't work**: It caused a performance regression (median ~2.543s vs baseline ~2.261s). This indicates that shifting the state mutation into a pre-bound handler rather than an inline anonymous closure slightly disrupted V8's optimization of the async/await hot loop sequence or introduced additional scope resolution overhead.

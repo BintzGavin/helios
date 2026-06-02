@@ -1,11 +1,11 @@
 ---
 id: PERF-588
 slug: inline-worker-promise-chain
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "jules"
 created: 2026-10-31
-completed: ""
-result: ""
+completed: 2026-10-31
+result: discard
 ---
 
 # PERF-588: Inline Worker Promise Chain in CaptureLoop
@@ -17,13 +17,15 @@ DOM Rendering Pipeline - Hot loop in `packages/renderer/src/core/CaptureLoop.ts`
 In `CaptureLoop.ts`, the multi-worker ACTOR MODEL spins up independent asynchronous tasks inside `runWorker` that orchestrate frame capture. Currently, the inner loop executes:
 ```typescript
             try {
-                await timeDriver.setTime(page, compositionTimeInSeconds);
-                const buffer = await strategy.capture(page, time);
+                const buffer = setTimeResult
+                    ? await setTimeResult.then(() => strategy.capture(page, time))
+                    : await strategy.capture(page, time);
                 frameBufferRing[ringIndex] = buffer;
                 frameReadyRing[ringIndex] = 1;
             } catch (e) {
-                frameErrorRing[ringIndex] = e;
-                frameReadyRing[ringIndex] = 1;
+                fatalError = e;
+                aborted = true;
+                checkState();
             }
 ```
 This requires multiple `await` resumptions inside the generator and specifically wraps them in a `try/catch` block. Research has demonstrated that V8's generator state machine allocates more execution context overhead for `try/catch` blocks inside hot asynchronous loops.
@@ -37,7 +39,7 @@ By chaining the calls using `.then()` and `.catch()` behind a single `await`, we
 - **Minimum runs**: 3 per experiment, report median
 
 ## Baseline
-- **Current estimated render time**: ~1.298s
+- **Current estimated render time**: ~2.261s
 - **Bottleneck analysis**: V8 generator state machine transitions (`try/catch` and multiple `await`s) in the core inner loop of `CaptureLoop.ts`.
 
 ## Implementation Spec
@@ -47,27 +49,32 @@ By chaining the calls using `.then()` and `.catch()` behind a single `await`, we
 **What to change**:
 Inside the `runWorker` function, replace the `try/catch` block:
 ```typescript
+            const setTimeResult = timeDriver.setTime(page, compositionTimeInSeconds);
             try {
-                await timeDriver.setTime(page, compositionTimeInSeconds);
-                const buffer = await strategy.capture(page, time);
+                const buffer = setTimeResult
+                    ? await setTimeResult.then(() => strategy.capture(page, time))
+                    : await strategy.capture(page, time);
                 frameBufferRing[ringIndex] = buffer;
                 frameReadyRing[ringIndex] = 1;
             } catch (e) {
-                frameErrorRing[ringIndex] = e;
-                frameReadyRing[ringIndex] = 1;
+                fatalError = e;
+                aborted = true;
+                checkState();
             }
 ```
 with the following single `await` expression:
 ```typescript
-            await Promise.resolve(timeDriver.setTime(page, compositionTimeInSeconds))
+            const setTimeResult = timeDriver.setTime(page, compositionTimeInSeconds);
+            await Promise.resolve(setTimeResult)
                 .then(() => strategy.capture(page, time))
                 .then((buffer) => {
                     frameBufferRing[ringIndex] = buffer;
                     frameReadyRing[ringIndex] = 1;
                 })
                 .catch((e) => {
-                    frameErrorRing[ringIndex] = e;
-                    frameReadyRing[ringIndex] = 1;
+                    fatalError = e;
+                    aborted = true;
+                    checkState();
                 });
 ```
 **Why**: Consolidating to a single `await` and utilizing `.then()` and `.catch()` eliminates the explicit `try/catch` block from the generator context. Wrapping in `Promise.resolve()` ensures it cleanly chains regardless of whether `setTime` returns `Promise<void>` or `void` synchronously.
