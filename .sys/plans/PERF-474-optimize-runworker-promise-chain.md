@@ -1,11 +1,11 @@
 ---
 id: PERF-474
 slug: optimize-runworker-promise-chain
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "Jules"
 created: 2024-05-18
-completed: ""
-result: ""
+completed: "2024-06-02"
+result: "discard"
 ---
 
 # PERF-474: Optimize runWorker Loop by Removing Async Await
@@ -47,3 +47,9 @@ Check if `timeDriver.setTime` or `strategy.capture` actually return Promises at 
 
 ## Verification Check
 Run `npm test -w @helios-project/renderer` to ensure test suites pass, validating logical equivalence. Run the benchmark script to compare performance. Ensure that the test suite runs correctly by checking for regressions in DOM rendering output.
+
+## Results Summary
+- **Best render time**: 2.565s (vs baseline 2.395s)
+- **Improvement**: -7%
+- **Kept experiments**: []
+- **Discarded experiments**: [PERF-474]
