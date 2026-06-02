@@ -1,33 +1,36 @@
 #### 1. Context & Goal
-- **Objective**: Improve test coverage for the `render`, `build`, `init`, and `studio` commands in the CLI to reach 100% statement coverage.
-- **Trigger**: The NOTHING TO DO PROTOCOL allows regression tests and test improvements as a fallback when there are no active features to develop. Vitest coverage revealed missing coverage for error handling and process.exit branches due to mocking limitations.
-- **Impact**: Improving coverage ensures all branches and error handling paths in CLI commands are explicitly verified, fulfilling the system requirement to eliminate untested code paths before idling.
+- **Objective**: Improve code coverage in `packages/cli` command files to reach closer to 100%.
+- **Trigger**: `src/commands/__tests__/init.test.ts` has missing test cases for lines 103-119 (example fetching/download logic), 192 (detecting solid/svelte/react/vue), and 241-242 (error writing config file). `src/commands/__tests__/render.test.ts` is missing coverage for lines 133-153 (base URL logic). `src/commands/__tests__/job.test.ts` is missing coverage for `azure`, `fly`, and `cloudflare-sandbox` adapters. `src/commands/__tests__/build.test.ts` is missing coverage for the rename output file logic. `src/commands/__tests__/studio.test.ts` has uncovered lines in `onCheckInstalled` (when comp is undefined).
+- **Impact**: Better test reliability and stability for the CLI tool.
 
 #### 2. File Inventory
-- **Create**: (None)
+- **Create**:
 - **Modify**:
-  - `packages/cli/src/commands/__tests__/render.test.ts` (Add tests for missing lines `17`, `133-153`, `172`, `175`, `178`)
-  - `packages/cli/src/commands/__tests__/build.test.ts` (Add tests for missing lines `65-75`)
-  - `packages/cli/src/commands/__tests__/init.test.ts` (Add tests for missing lines `103-119`, `192`, `241-242`)
-  - `packages/cli/src/commands/__tests__/studio.test.ts` (Add tests for any missing coverage, assuming there might be some process.exit or error paths missed)
+  - `packages/cli/src/commands/__tests__/init.test.ts` (Add tests for example list fetching edge cases, config framework auto-detection, and config write errors)
+  - `packages/cli/src/commands/__tests__/render.test.ts` (Add test for `--base-url` logic in job chunk generation)
+  - `packages/cli/src/commands/__tests__/job.test.ts` (Add tests for remaining worker adapters: `azure`, `fly`, `cloudflare-sandbox`)
+  - `packages/cli/src/commands/__tests__/build.test.ts` (Add tests for `builtEntryPath` renaming)
+  - `packages/cli/src/commands/__tests__/studio.test.ts` (Add test for `onCheckInstalled` when component is not found)
 - **Read-Only**:
-  - `packages/cli/src/commands/render.ts`
-  - `packages/cli/src/commands/build.ts`
   - `packages/cli/src/commands/init.ts`
+  - `packages/cli/src/commands/render.ts`
+  - `packages/cli/src/commands/job.ts`
+  - `packages/cli/src/commands/build.ts`
   - `packages/cli/src/commands/studio.ts`
-  - `packages/cli/vitest.config.ts`
 
 #### 3. Implementation Spec
-- **Architecture**: Expand existing Vitest test files for CLI commands to mock `process.exit`, `console.error`, and dependent utility functions dynamically to force execution down uncovered error and validation branches.
+- **Architecture**: Append unit tests using `vitest` mocking conventions existing in each test file.
 - **Pseudo-Code**:
-  - For `render.test.ts`: Mock `console.error` and `process.exit` correctly. Test the path where `job-base-url` logic is evaluated and where unexpected runtime exceptions occur in `renderer.render()`.
-  - For `build.test.ts`: Add test cases for when the output directory creation fails or the build step encounters a generic exception, ensuring the catch blocks are reached.
-  - For `init.test.ts`: Add tests covering the `promptForConfig` when users reject scaffolding, when reading `helios.config.json` fails, or when a specific validation branch like missing frameworks evaluates.
-  - For `studio.test.ts`: Ensure testing of scenarios where the studio dev server fails to start.
-- **Public API Changes**: None
-- **Dependencies**: None. Can be done immediately.
+  - In `init.test.ts`, write a test that mocks `fs.readFileSync` for `package.json` to include `"react": "*"` inside `dependencies` to auto-detect framework.
+  - In `init.test.ts`, write a test that mocks `prompts` to pick an example, and `downloadExample` succeeds.
+  - In `init.test.ts`, write a test for `fs.promises.writeFile` throwing an error when saving the config file.
+  - In `render.test.ts`, run `render --emit-job job.json --base-url http://my-remote-site.com` and assert the chunk command input includes the remote URL.
+  - In `job.test.ts`, write `adapter === 'azure'`, `adapter === 'fly'`, and `adapter === 'cloudflare-sandbox'` test blocks and expect `JobExecutor.execute` to have been called. Ensure error checking tests if parameters are omitted are also written.
+  - In `build.test.ts`, mock `fs.existsSync` to return true for `builtEntryPath` and assert `fs.renameSync` is called.
+  - In `studio.test.ts`, in `onCheckInstalled`, check for a component that does not exist in `components` list, expect it to return `false`.
+- **Dependencies**: None.
 
 #### 4. Test Plan
-- **Verification**: Run `cd packages/cli && npx vitest run --coverage src/commands/__tests__/render.test.ts src/commands/__tests__/build.test.ts src/commands/__tests__/init.test.ts src/commands/__tests__/studio.test.ts`.
-- **Success Criteria**: The coverage report shows 100% statement, branch, and function coverage for `render.ts`, `build.ts`, `init.ts`, and `studio.ts`.
-- **Edge Cases**: Ensure mocks for `process.exit` are scoped per test or restored cleanly to prevent test suite premature exit. Use `vi.spyOn(process, 'exit').mockImplementation(...)`.
+- **Verification**: Run `cd packages/cli && npx vitest run --coverage src/commands/__tests__`
+- **Success Criteria**: Line coverage should substantially increase for `init.ts`, `render.ts`, `job.ts`, `build.ts`, and `studio.ts`, avoiding regression in previously covered lines.
+- **Edge Cases**: None.
