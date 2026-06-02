@@ -145,3 +145,4 @@ PERF-641	2.202	150	68.11	63.1	keep	removed redundant sync media string assignmen
 5	2.568	150	58.41	63.7	discard	PERF-646 fast path sync media check in CdpTimeDriver
 6	2.931	150	51.18	62.5	discard	PERF-649 optimize await chain in CaptureLoop
 PERF-652	2.286	150	65.61	62.7	discard	flatten capture await
+20	3.045	150	49.26	63.2	discard	PERF-458: Bypass Runtime.evaluate in CdpTimeDriver When No Media Exists
