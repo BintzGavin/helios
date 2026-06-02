@@ -106,6 +106,11 @@ Last updated by: PERF-614
   - **Outcome**: discard
 
 ## What Doesn't Work (and Why)
+- **PERF-458**: Bypass Runtime.evaluate in CdpTimeDriver When No Media Exists
+  - **What I tried**: Conditionally assigned a `syncMediaFn` closure during initialization instead of checking `if (this.hasMedia)` on every frame inside the `runSetTime` hot loop in `CdpTimeDriver.ts`.
+  - **WHY it didn't work**: The median render time was ~3.045s vs the baseline of ~2.595s (up to ~3.236s). By substituting a simple boolean branch with a closure invocation, we likely defeated V8's fast-path optimization for the branch, resulting in added closure resolution overhead that outweighed any gains from avoiding the `if` check.
+  - **Plan ID**: PERF-458
+
 - **PERF-588**: Inline Worker Promise Chain in CaptureLoop
   - **What I tried**: Replaced try/catch block with a single Promise chain.
   - **Why it didn't work**: Caused a performance regression (slower, median ~2.503s vs baseline ~2.261s) because shifting generator suspension into a structured promise chain negated the performance benefits of bypassing the try/catch overhead, adding variable allocation latency.
