@@ -106,6 +106,11 @@ Last updated by: PERF-614
   - **Outcome**: discard
 
 ## What Doesn't Work (and Why)
+- **PERF-656**: Prebind currentTime Update Handler
+  - **What I did**: Created a private bound method and private property to avoid closure allocations in CdpTimeDriver virtual time await chain.
+  - **Why it didn't work**: The median render time was ~2.463s (baseline ~2.48s). V8 seems to already optimize away the overhead of inline anonymous closures in this hot loop, so replacing it with a pre-bound function provides no measurable gain.
+  - **Plan ID**: PERF-656
+
 - **PERF-652**: Flatten capture await
   - **What I tried**: Changed the ternary await in CaptureLoop.ts to sequential awaits.
   - **Why it didn't work**: Time was ~2.286s, not an improvement over the 2.261s baseline. The additional control flow logic (if) and sequential await unwrapping negated any gains from bypassing the .then() closure allocation in the hot loop.
