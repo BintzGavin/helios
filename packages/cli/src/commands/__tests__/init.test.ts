@@ -16,6 +16,7 @@ vi.mock('fs', async () => {
       existsSync: vi.fn(),
       mkdirSync: vi.fn(),
       readdirSync: vi.fn(),
+      readFileSync: vi.fn(),
       promises: {
         mkdir: vi.fn(),
         writeFile: vi.fn()
@@ -200,5 +201,39 @@ describe('init command', () => {
       .mockResolvedValueOnce({ framework: 'solid', components: 'c', lib: 'l' });
     await program.parseAsync(['node', 'test', 'init']);
     expect(fs.promises.writeFile).toHaveBeenCalled();
+  });
+
+  it('should auto-detect framework from package.json for examples', async () => {
+    vi.mocked(fs.readFileSync).mockReturnValue(JSON.stringify({ dependencies: { "react": "*" } }));
+    // We want the script to think package.json is NOT there initially so it enters scaffolding flow,
+    // but then we want it to read package.json when auto-detecting framework.
+    // However, it calls fs.readFileSync(packageJsonPath) without checking fs.existsSync.
+    // The initial fs.existsSync(packageJsonPath) must be FALSE.
+    let existsSyncCalls = 0;
+    vi.mocked(fs.existsSync).mockImplementation((p: any) => {
+      if (typeof p === 'string' && p.endsWith('package.json')) {
+        existsSyncCalls++;
+        return false;
+      }
+      return false;
+    });
+
+    vi.mocked(prompts).mockResolvedValueOnce({ mode: 'example' }).mockResolvedValueOnce({ example: 'test-example' });
+    vi.mocked(examplesUtil.fetchExamples).mockResolvedValue(['test-example']);
+    vi.mocked(examplesUtil.downloadExample).mockResolvedValue(undefined);
+    vi.mocked(examplesUtil.transformProject).mockImplementation(() => {});
+
+    await program.parseAsync(['node', 'test', 'init']);
+
+    expect(configUtil.saveConfig).toHaveBeenCalledWith(
+      expect.objectContaining({ framework: 'react' }),
+      expect.any(String)
+    );
+  });
+
+  it('should exit when saving config fails', async () => {
+    vi.mocked(configUtil.saveConfig).mockImplementation(() => { throw new Error('fail'); });
+    await program.parseAsync(['node', 'test', 'init', '--yes']);
+    expect(exitSpy).toHaveBeenCalledWith(1);
   });
 });

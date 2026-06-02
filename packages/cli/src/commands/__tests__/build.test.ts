@@ -89,4 +89,22 @@ describe('build command', () => {
     expect(consoleErrorSpy).toHaveBeenCalled();
     expect(process.exitCode).toBe(1);
   });
+
+  it('should rename the built entry file if it exists', async () => {
+    vi.mocked(build).mockResolvedValue({} as any);
+    // Return true for composition.html check and builtEntryPath check
+    vi.mocked(fs.existsSync).mockImplementation((pathStr) => {
+      if (typeof pathStr === 'string' && pathStr.includes('composition.html')) {
+        return true;
+      }
+      if (typeof pathStr === 'string' && pathStr.includes('.helios-build-entry.html')) {
+        return true;
+      }
+      return false;
+    });
+
+    await program.parseAsync(['node', 'test', 'build', '.']);
+
+    expect(fs.renameSync).toHaveBeenCalled();
+  });
 });
