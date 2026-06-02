@@ -18,10 +18,6 @@ export class CdpTimeDriver implements TimeDriver {
   private singleFrameSyncMediaParams: any = { expression: "window.__helios_sync_media();", awaitPromise: false, returnByValue: false };
   private multiFrameSyncMediaParams: any[] = [];
   private hasMedia: boolean = true;
-  private nextTimeInSeconds: number = 0;
-  private updateCurrentTime = () => {
-    this.currentTime = this.nextTimeInSeconds;
-  };
 
   private virtualTimePromiseExecutor = (resolve: () => void, reject: (err: Error) => void) => {
     this.cdpResolve = resolve;
@@ -224,7 +220,8 @@ export class CdpTimeDriver implements TimeDriver {
     // 2. Advance virtual time
     // This triggers the browser event loop and requestAnimationFrame
     this.setVirtualTimePolicyParams.budget = budget;
-    this.nextTimeInSeconds = timeInSeconds;
-    return new Promise<void>(this.virtualTimePromiseExecutor).then(this.updateCurrentTime);
+    return new Promise<void>(this.virtualTimePromiseExecutor).then(() => {
+      this.currentTime = timeInSeconds;
+    });
   }
 }
