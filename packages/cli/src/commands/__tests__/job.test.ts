@@ -184,6 +184,12 @@ describe('job command', () => {
       }));
     });
 
+    it('should error if cloudflare-sandbox adapter missing required args', async () => {
+      await program.parseAsync(['node', 'test', 'job', 'run', 'job.json', '--adapter', 'cloudflare-sandbox']);
+      expect(errorSpy).toHaveBeenCalledWith('Job execution failed:', expect.stringContaining('Cloudflare Sandbox adapter requires'));
+      expect(exitSpy).toHaveBeenCalledWith(1);
+    });
+
     it('should instantiate AzureFunctionsAdapter when azure is specified', async () => {
       await program.parseAsync([
         'node', 'test', 'job', 'run', 'job.json',
@@ -191,6 +197,12 @@ describe('job command', () => {
         '--azure-service-url', 'http://az'
       ]);
       expect(AzureFunctionsAdapter).toHaveBeenCalledWith(expect.objectContaining({ serviceUrl: 'http://az' }));
+    });
+
+    it('should error if azure adapter missing required arg', async () => {
+      await program.parseAsync(['node', 'test', 'job', 'run', 'job.json', '--adapter', 'azure']);
+      expect(errorSpy).toHaveBeenCalledWith('Job execution failed:', expect.stringContaining('Azure adapter requires'));
+      expect(exitSpy).toHaveBeenCalledWith(1);
     });
 
     it('should instantiate FlyMachinesAdapter when fly is specified', async () => {
@@ -206,6 +218,12 @@ describe('job command', () => {
         appName: 'app',
         imageRef: 'img'
       }));
+    });
+
+    it('should error if fly adapter missing required args', async () => {
+      await program.parseAsync(['node', 'test', 'job', 'run', 'job.json', '--adapter', 'fly']);
+      expect(errorSpy).toHaveBeenCalledWith('Job execution failed:', expect.stringContaining('Fly adapter requires'));
+      expect(exitSpy).toHaveBeenCalledWith(1);
     });
 
     it('should instantiate KubernetesAdapter when kubernetes is specified', async () => {

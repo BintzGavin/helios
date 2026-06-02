@@ -82,4 +82,23 @@ describe('render command', () => {
     expect(exitSpy).toHaveBeenCalledWith(1);
     expect(consoleErrorSpy).toHaveBeenCalled();
   });
+
+  it('should construct absolute urls for job chunks if input is a local file and base-url is provided', async () => {
+    await program.parseAsync([
+      'node', 'test', 'render', './comp.html',
+      '--emit-job', 'job.json',
+      '--job-base-url', 'http://cdn.example.com/'
+    ]);
+    expect(RenderOrchestrator.plan).toHaveBeenCalled();
+    const calls = vi.mocked(fs.writeFileSync).mock.calls;
+    const writeCall = calls.find(call => typeof call[0] === 'string' && call[0].endsWith('job.json'));
+    expect(writeCall).toBeDefined();
+
+    if (writeCall) {
+      const writtenJobStr = writeCall[1] as string;
+      const job = JSON.parse(writtenJobStr);
+      // We expect the command in the chunk to include the resolved jobBaseUrl + comp.html
+      expect(job.chunks[0].command).toContain('http://cdn.example.com/comp.html');
+    }
+  });
 });

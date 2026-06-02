@@ -136,5 +136,8 @@ describe('studio command', () => {
     vi.mocked(fs.existsSync).mockReturnValue(true);
     const isInstalled = await pluginConfig.onCheckInstalled('test-comp');
     expect(isInstalled).toBe(true);
+
+    const isNotInstalled = await pluginConfig.onCheckInstalled('unknown-comp');
+    expect(isNotInstalled).toBe(false);
   });
 });
