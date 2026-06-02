@@ -1,0 +1,4 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	2.482	150	60.43	63.2	discard	PERF-656: Pre-bind currentTime Update Handler
+2	2.463	150	60.89	63.0	discard	PERF-656: Pre-bind currentTime Update Handler
+3	2.370	150	63.29	63.0	discard	PERF-656: Pre-bind currentTime Update Handler

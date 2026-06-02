@@ -1,7 +1,7 @@
 ---
 id: PERF-656
 slug: prebind-currenttime-update
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-06-02
 completed: ""
