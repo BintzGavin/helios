@@ -106,6 +106,10 @@ Last updated by: PERF-614
   - **Outcome**: discard
 
 ## What Doesn't Work (and Why)
+- **PERF-656**: Pre-bind currentTime Update Handler in CdpTimeDriver.ts
+  - **What I tried**: Added `nextTimeInSeconds` and `updateCurrentTime` properties to `CdpTimeDriver` and updated `runSetTime` to use these instead of an anonymous closure for the promise resolution.
+  - **Why it didn't work**: It caused a performance regression (median ~2.543s vs baseline ~2.261s). This indicates that shifting the state mutation into a pre-bound handler rather than an inline anonymous closure slightly disrupted V8's optimization of the async/await hot loop sequence or introduced additional scope resolution overhead.
+  - **Plan ID**: PERF-656
 - **PERF-656**: Prebind currentTime Update Handler
   - **What I did**: Created a private bound method and private property to avoid closure allocations in CdpTimeDriver virtual time await chain.
   - **Why it didn't work**: The median render time was ~2.463s (baseline ~2.48s). V8 seems to already optimize away the overhead of inline anonymous closures in this hot loop, so replacing it with a pre-bound function provides no measurable gain.

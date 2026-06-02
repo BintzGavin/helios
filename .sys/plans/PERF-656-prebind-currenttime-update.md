@@ -5,7 +5,7 @@ status: complete
 claimed_by: ""
 created: 2024-06-02
 completed: ""
-result: ""
+result: "failed"
 ---
 
 # PERF-656: Pre-bind `currentTime` Update Handler in `CdpTimeDriver.ts`
@@ -112,3 +112,9 @@ Run a canvas capture via `npx tsx packages/renderer/scripts/benchmark-perf.ts` i
 
 ## Correctness Check
 Run the DOM render benchmark `npx tsx packages/renderer/scripts/benchmark-perf.ts` and verify output integrity. Run `npx tsx packages/renderer/tests/run-all.ts` to ensure no regressions.
+
+## Results Summary
+- **Best render time**: 2.543s (vs baseline 2.261s)
+- **Improvement**: -12.47%
+- **Kept experiments**: none
+- **Discarded experiments**: Pre-bind currentTime Update Handler in CdpTimeDriver.ts
