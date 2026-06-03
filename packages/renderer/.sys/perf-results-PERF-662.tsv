@@ -1,0 +1,4 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	2.905	150	51.64	62.8	keep	baseline
+2	2.495	150	60.11	62.7	keep	inline virtualTimePromiseExecutor logic
+3	2.447	150	61.29	63.4	keep	inline virtualTimePromiseExecutor logic
