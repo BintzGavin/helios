@@ -110,6 +110,10 @@ Last updated by: PERF-662
   - **Outcome**: discard
 
 ## What Doesn't Work (and Why)
+- **PERF-665**: Remove redundant null assignment in CaptureLoop
+  - **What I tried**: Removed `frameBufferRing[ringIndex] = null;` before assigning a task to a worker in `CaptureLoop.ts`.
+  - **WHY it didn't work**: The overhead of setting a local array element to null is virtually nonexistent in V8 due to efficient memory layouts. It yielded no measurable performance improvement and failed to beat the current best time of 2.447s (median of modified runs was ~2.705s).
+  - **Plan ID**: PERF-665
 - **PERF-659**: Inline try-catch inside DomStrategy capture to reduce per-frame scope allocation
   - **What I tried**: Added a prebound catch handler and rewrote the `capture` method in `DomStrategy.ts` to use `.catch(this.beginFrameErrorHandler)` on the CDP promise instead of setting up a `try...catch` scope on every frame.
   - **WHY it didn't work**: The median render time was ~2.587s compared to the local baseline of ~2.565s. The overhead of setting up a block scope for `try...catch` on every loop iteration is extremely small in V8, and replacing it with a chained promise `.catch()` introduces slightly more microtask scheduling/promise resolution overhead, resulting in no gain and a minor regression. This confirms findings from earlier similar experiments (like PERF-623).

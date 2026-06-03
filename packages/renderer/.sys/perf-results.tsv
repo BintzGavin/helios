@@ -157,3 +157,4 @@ PERF-652	2.286	150	65.61	62.7	discard	flatten capture await
 6	2.677	150	56.04	63.1	keep	prebind capture promises
 7	2.699	150	55.57	62.9	keep	prebind capture promises
 8	2.538	150	59.09	63.0	keep	prebind capture promises
+6	2.705	150	55.45	62.8	discard	remove redundant null assignment frameBufferRing
