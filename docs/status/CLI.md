@@ -1,5 +1,6 @@
-**Version**: 0.46.40
+**Version**: 0.46.41
 
+[v0.46.41] ✅ Completed: CLI Docker Adapter Regression Tests - Logged the duplicated plan as impossible since docker-adapter template tests are already fully implemented.
 [v0.46.40] 🟢 Completed: CLI Command Coverage Tests Spec V3 - Created specification plan 2027-06-05-CLI-Command-Coverage-Tests-V3.md for improving CLI command regression tests.
 [v0.46.39] 🟢 Completed: CLI Command Coverage Tests Spec V3 - Created specification plan 2027-06-05-CLI-Command-Coverage-Tests-V3.md for improving CLI command regression tests.
 [v0.46.38] ✅ Completed: CLI Registry Types Regression Tests - Logged the duplicated plan as impossible since registry types regression tests are already fully implemented.
