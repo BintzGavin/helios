@@ -1,3 +1,18 @@
+## LLMS v1.89.0
+- ✅ Completed: Daily llms.txt Review
+  - Updated versions in Quick Facts and Roadmap to match current package.json versions:
+    - Studio: v0.121.22+
+    - CLI: v0.46.40+
+    - Player: v0.77.46+
+    - Renderer: v1.80.1+
+    - Infrastructure: v0.54.28+
+  - Updated Roadmap with recent completions from domain PROGRESS logs:
+    - CLI: CLI Command Coverage Tests V4, CLI Job Types Regression Tests, CLI Registry Types Regression Tests
+    - Player: Document Missing Events, Add onaudiometering event handler, Fix API Parity srcObject
+    - Infrastructure: Modal Adapter, CloudRun & Local Worker Adapter Coverage
+  - Verified Agent Skills paths
+  - Verified API examples
+
 ## LLMS v1.88.0
 - ✅ Completed: Daily llms.txt Review
   - Updated Quick Facts and Roadmap to reflect latest versions (Studio v0.121.11+, CLI v0.46.26+, Player v0.77.5+, Renderer v1.79.0+, Infrastructure v0.54.26+).
