@@ -1,11 +1,11 @@
 ---
 id: PERF-664
 slug: inline-writer-waiter-resolve
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor"
 created: 2024-06-03
-completed: ""
-result: ""
+completed: 2024-06-03
+result: "no-improvement"
 ---
 
 # PERF-664: Inline Writer Waiter Resolve Call to Bypass Null Reassignment

@@ -798,3 +798,8 @@ Last updated by: PERF-592
   - **What I did**: Inlined the `virtualTimePromiseExecutor` logic directly into the `runSetTime` method within `CdpTimeDriver.ts`. This moved the CDP client `send` call outside the promise constructor and utilized a localized inline executor.
   - **Impact**: Improved median render time to ~2.447s (from baseline ~2.525s), avoiding the overhead of invoking a pre-bound class method callback on every frame.
   - **Plan ID**: PERF-662
+
+- **PERF-664**: Inline `writerWaiterResolve` in CaptureLoop
+  - **What I tried**: Attempted to remove the local `res` variable allocation in `CaptureLoop.ts` (`checkState` and `runWorker`) by directly invoking `writerWaiterResolve()` before setting it to null.
+  - **WHY it didn't work**: The median render time was ~2.444s, which did not improve upon the baseline best of ~2.447s. The difference is within the noise margin. V8 already optimally handles local block-scoped variables and garbage-collecting them inside such conditions.
+  - **Plan ID**: PERF-664
