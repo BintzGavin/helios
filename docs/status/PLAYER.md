@@ -1,5 +1,5 @@
 [v0.77.41] ✅ Completed: Discovered undocumented event handler properties in implementation missing from README. Created plan `.sys/plans/2027-02-15-PLAYER-Document-Event-Handlers.md` to document `onplay`, `onpause`, etc.
-**Version**: 0.77.46
+**Version**: 0.77.47
 [v0.77.46] ✅ Completed: Discovered that `2027-02-16-PLAYER-Add-onaudiometering-handler.md` is an IMPOSSIBLE: DUPLICATION plan. The `onaudiometering` property is already fully implemented. Documented as impossible and discarded. Also added 'audiometering' to the event handlers test in `index.test.ts`.
 [v0.77.44] ✅ Completed: Document Missing Events - Deleted lingering plan file as the README already contained the required documentation updates.
 [v0.77.43] ✅ Completed: Document Event Handlers - Updated README.md to include standard event handler properties to match the actual implementation in packages/player/src/index.ts.
@@ -244,3 +244,4 @@
 [v0.77.39] ✅ Completed: Document Seeking Events - Updated README to document existing seeking and seeked events to match the actual implementation in packages/player/src/index.ts.
 [v0.77.40] ✅ Completed: Document Missing Events - Updated README.md to include documentation for error and audiometering events.
 [v0.77.45] ✅ Completed: Add onaudiometering event handler to HeliosPlayer class and documentation.
+[v0.77.47] ✅ Completed: Document Missing Attributes - Updated README.md to document the missing `muted` and `playsinline` attributes.

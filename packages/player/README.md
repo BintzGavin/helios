@@ -69,6 +69,8 @@ The player will automatically attempt to access `window.helios` on the iframe's 
 | `sandbox` | Security flags for the iframe. | `allow-scripts allow-same-origin` |
 | `export-width` | Target width for client-side export. | - |
 | `export-height` | Target height for client-side export. | - |
+| `muted` | Automatically mute the player's audio upon loading. | `false` |
+| `playsinline` | Indicates that the video is to be played "inline", that is within the element's playback area. | `false` |
 | `export-bitrate` | Target bitrate for client-side export (bps). | - |
 | `export-filename` | Filename for client-side export (without extension). | `video` |
 | `export-caption-mode` | Strategy for caption export: `burn-in` or `file`. | `burn-in` |
