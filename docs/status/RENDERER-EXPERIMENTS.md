@@ -1,6 +1,6 @@
 ## Performance Trajectory
-Current best: 2.261s (baseline was 2.596s)
-Last updated by: PERF-614
+Current best: 2.447s (baseline was 2.525s)
+Last updated by: PERF-662
 
 ## What Works
 - **PERF-660**: Prebind Capture Promises
@@ -789,3 +789,8 @@ Last updated by: PERF-592
 - **PERF-661**: Optimize Last Frame Data Fallback Assignment in DomStrategy
   - **WHY it didn't work**: Skipped because the assignment was already implemented by PERF-660. Marked as IMPOSSIBLE: DUPLICATION and deleted.
   - **Plan ID**: PERF-661
+
+- **PERF-662**: Inline virtualTimePromiseExecutor to Avoid Pre-bound Method
+  - **What I did**: Inlined the `virtualTimePromiseExecutor` logic directly into the `runSetTime` method within `CdpTimeDriver.ts`. This moved the CDP client `send` call outside the promise constructor and utilized a localized inline executor.
+  - **Impact**: Improved median render time to ~2.447s (from baseline ~2.525s), avoiding the overhead of invoking a pre-bound class method callback on every frame.
+  - **Plan ID**: PERF-662

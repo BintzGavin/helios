@@ -19,13 +19,6 @@ export class CdpTimeDriver implements TimeDriver {
   private multiFrameSyncMediaParams: any[] = [];
   private hasMedia: boolean = true;
 
-  private virtualTimePromiseExecutor = (resolve: () => void, reject: (err: Error) => void) => {
-    this.cdpResolve = resolve;
-    this.cdpReject = reject;
-
-    this.client!.send('Emulation.setVirtualTimePolicy', this.setVirtualTimePolicyParams).catch(this.handleVirtualTimeBudgetError);
-  };
-
   private defaultSyncMedia() {
     const frames = this.cachedFrames;
     if (frames.length === 1) {
@@ -220,7 +213,12 @@ export class CdpTimeDriver implements TimeDriver {
     // 2. Advance virtual time
     // This triggers the browser event loop and requestAnimationFrame
     this.setVirtualTimePolicyParams.budget = budget;
-    return new Promise<void>(this.virtualTimePromiseExecutor).then(() => {
+    const promise = new Promise<void>((resolve, reject) => {
+      this.cdpResolve = resolve;
+      this.cdpReject = reject;
+    });
+    this.client!.send('Emulation.setVirtualTimePolicy', this.setVirtualTimePolicyParams).catch(this.handleVirtualTimeBudgetError);
+    return promise.then(() => {
       this.currentTime = timeInSeconds;
     });
   }
