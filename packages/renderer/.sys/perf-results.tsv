@@ -153,3 +153,7 @@ PERF-652	2.286	150	65.61	62.7	discard	flatten capture await
 474	2.443	150	61.40	63.6	discard	PERF-474 recursive .then chain
 474	2.565	150	58.49	63.5	discard	PERF-474 recursive .then chain
 659	2.587	150	57.98	63.1	discard	PERF-659 inline try-catch inside DomStrategy capture to reduce per-frame scope allocation
+5	2.748	150	54.59	63.1	keep	baseline
+6	2.677	150	56.04	63.1	keep	prebind capture promises
+7	2.699	150	55.57	62.9	keep	prebind capture promises
+8	2.538	150	59.09	63.0	keep	prebind capture promises

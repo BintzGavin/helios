@@ -1,11 +1,11 @@
 ---
 id: PERF-660
 slug: prebind-capture-promises
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-06-03
-completed: ""
-result: ""
+completed: "2024-06-03"
+result: "improved"
 ---
 
 # PERF-660: Prebind Capture Promises in DomStrategy
@@ -77,3 +77,9 @@ Run the DOM render benchmark script (`npx tsx packages/renderer/scripts/benchmar
 
 ## Prior Art
 - PERF-659 (Inline try-catch inside DomStrategy capture) - Demonstrated that native `try...catch` is faster than `.catch()` for CDP IPC.
+
+## Results Summary
+- **Best render time**: 2.677s (vs baseline 2.748s)
+- **Improvement**: ~2.58%
+- **Kept experiments**: Prebind Capture Promises in DomStrategy.ts
+- **Discarded experiments**: None

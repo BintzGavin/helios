@@ -3,6 +3,10 @@ Current best: 2.261s (baseline was 2.596s)
 Last updated by: PERF-614
 
 ## What Works
+- **PERF-660**: Prebind Capture Promises
+  - **What I did**: Bypassed secondary `lastFrameData` assignment in `DomStrategy.capture()` by storing the CDP result data inline.
+  - **Impact**: Improved median render time to ~2.677s (baseline ~2.748s).
+  - **Plan ID**: PERF-660
 - **PERF-650**: Optimize Hot Loop Variables
   - **What I did**: Extracted totalFrames, startFrame, capturedErrors and stdin getter to local vars. Modulo check eliminated.
   - **Impact**: Improved performance to ~2.261s (baseline 2.596s)
