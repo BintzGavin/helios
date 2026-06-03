@@ -152,3 +152,4 @@ PERF-652	2.286	150	65.61	62.7	discard	flatten capture await
 474	2.896	150	51.80	63.7	discard	PERF-474 recursive .then chain
 474	2.443	150	61.40	63.6	discard	PERF-474 recursive .then chain
 474	2.565	150	58.49	63.5	discard	PERF-474 recursive .then chain
+659	2.587	150	57.98	63.1	discard	PERF-659 inline try-catch inside DomStrategy capture to reduce per-frame scope allocation

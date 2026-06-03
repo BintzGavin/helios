@@ -106,6 +106,11 @@ Last updated by: PERF-614
   - **Outcome**: discard
 
 ## What Doesn't Work (and Why)
+- **PERF-659**: Inline try-catch inside DomStrategy capture to reduce per-frame scope allocation
+  - **What I tried**: Added a prebound catch handler and rewrote the `capture` method in `DomStrategy.ts` to use `.catch(this.beginFrameErrorHandler)` on the CDP promise instead of setting up a `try...catch` scope on every frame.
+  - **WHY it didn't work**: The median render time was ~2.587s compared to the local baseline of ~2.565s. The overhead of setting up a block scope for `try...catch` on every loop iteration is extremely small in V8, and replacing it with a chained promise `.catch()` introduces slightly more microtask scheduling/promise resolution overhead, resulting in no gain and a minor regression. This confirms findings from earlier similar experiments (like PERF-623).
+  - **Plan ID**: PERF-659
+
 - **PERF-458**: Bypass Runtime.evaluate in CdpTimeDriver When No Media Exists
   - **What I tried**: Conditionally assigned a `syncMediaFn` closure during initialization instead of checking `if (this.hasMedia)` on every frame inside the `runSetTime` hot loop in `CdpTimeDriver.ts`.
   - **WHY it didn't work**: The median render time was ~3.045s vs the baseline of ~2.595s (up to ~3.236s). By substituting a simple boolean branch with a closure invocation, we likely defeated V8's fast-path optimization for the branch, resulting in added closure resolution overhead that outweighed any gains from avoiding the `if` check.

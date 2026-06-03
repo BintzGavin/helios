@@ -1,11 +1,11 @@
 ---
 id: PERF-659
 slug: inline-try-catch-domstrategy
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-06-03
-completed: ""
-result: ""
+completed: 2026-06-03
+result: "discard"
 ---
 
 # PERF-659: Inline try-catch inside DomStrategy capture to reduce per-frame scope allocation
@@ -66,3 +66,9 @@ Run the DOM render benchmark script (`npx tsx packages/renderer/scripts/benchmar
 ## Prior Art
 - PERF-544 tried to remove try-catch but used inline closures (`.catch(() => ...)`), causing performance regression due to closure allocations.
 - PERF-656 and others showed the importance of pre-binding callbacks in hot loops.
+
+## Results Summary
+- **Best render time**: ~2.587s (vs local baseline ~2.565s)
+- **Improvement**: -0.8% (worse)
+- **Kept experiments**: None
+- **Discarded experiments**: Inline try-catch inside DomStrategy capture (restored)
