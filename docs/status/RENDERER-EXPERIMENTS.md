@@ -778,3 +778,7 @@ Last updated by: PERF-592
 - **PERF-658**: Restore inline anonymous closure for updateCurrentTime
   - **WHY it didn't work**: Skipped because the inline anonymous closure for updating `currentTime` in `CdpTimeDriver.ts` was already restored by a previous experiment or manual fix. Marked as IMPOSSIBLE: DUPLICATION and deleted.
   - **Plan ID**: PERF-658
+
+- **PERF-595**: Eliminate Dynamic String Allocation for Sync Media Expression
+  - **WHY it didn't work**: Skipped because the static string optimization `"window.__helios_sync_media();"` was already implemented in `CdpTimeDriver.ts` in a prior experiment. Marked as IMPOSSIBLE: DUPLICATION and deleted.
+  - **Plan ID**: PERF-595
