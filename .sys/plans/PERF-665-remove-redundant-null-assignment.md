@@ -1,11 +1,11 @@
 ---
 id: PERF-665
 slug: remove-redundant-null-assignment
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-06-03
-completed: ""
-result: ""
+completed: 2024-06-03
+result: no-improvement
 ---
 
 # PERF-665: Remove explicit null assignments from local variables in CaptureLoop to reduce bytecode
@@ -97,3 +97,9 @@ None.
 
 ## Correctness Check
 Run the DOM render benchmark script (`npx tsx packages/renderer/scripts/benchmark-perf.ts`) to ensure it produces valid outputs without regressions.
+
+## Results Summary
+- **Best render time**: 2.705s (vs baseline ~2.755s, but overall current best is 2.447s)
+- **Improvement**: ~1.8% vs local baseline, but regressed vs overall best.
+- **Kept experiments**: []
+- **Discarded experiments**: [PERF-665]
