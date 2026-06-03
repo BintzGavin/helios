@@ -786,3 +786,6 @@ Last updated by: PERF-592
 - **PERF-595**: Eliminate Dynamic String Allocation for Sync Media Expression
   - **WHY it didn't work**: Skipped because the static string optimization `"window.__helios_sync_media();"` was already implemented in `CdpTimeDriver.ts` in a prior experiment. Marked as IMPOSSIBLE: DUPLICATION and deleted.
   - **Plan ID**: PERF-595
+- **PERF-661**: Optimize Last Frame Data Fallback Assignment in DomStrategy
+  - **WHY it didn't work**: Skipped because the assignment was already implemented by PERF-660. Marked as IMPOSSIBLE: DUPLICATION and deleted.
+  - **Plan ID**: PERF-661
