@@ -691,3 +691,6 @@ Each agent should update **their own dedicated progress file** instead of this f
 
 ### STUDIO v0.121.23
 - ✅ Completed: CompositionsPanel Test Coverage - Implemented comprehensive unit tests for `CompositionsPanel` component, increasing its coverage to 100%.
+
+### PLAYER v0.77.47
+- ✅ Completed: Document Missing Attributes - Updated README.md to document the missing `muted` and `playsinline` attributes.

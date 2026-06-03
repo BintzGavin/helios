@@ -26,6 +26,7 @@ Observed attributes:
 - `loop`: Boolean attribute to enable looping playback.
 - `autoplay`: Boolean attribute for auto-playback.
 - `muted`: Boolean attribute to start the player muted.
+- `playsinline`: Indicates that the video is to be played "inline", within the element's playback area.
 - `poster`: Image URL displayed before playback starts.
 - `preload`: Strategy for preloading (none, metadata, auto).
 - `canvas-selector`: CSS selector for the primary canvas inside the iframe (default: `canvas`).
