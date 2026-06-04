@@ -110,6 +110,10 @@ Last updated by: PERF-662
   - **Outcome**: discard
 
 ## What Doesn't Work (and Why)
+- **PERF-676**: Bypass redundant virtual time policy budget allocation in CdpTimeDriver.
+  - **What I tried**: Wrapped `this.setVirtualTimePolicyParams.budget = budget` in a conditional check.
+  - **WHY it didn't work**: The median render time was ~2.722s, which did not improve upon the baseline best of ~2.447s. V8 is likely already highly optimized for property reassignment or inline caching.
+  - **Plan ID**: PERF-676
 - **PERF-665**: Remove redundant null assignment in CaptureLoop
   - **What I tried**: Removed `frameBufferRing[ringIndex] = null;` before assigning a task to a worker in `CaptureLoop.ts`.
   - **WHY it didn't work**: The overhead of setting a local array element to null is virtually nonexistent in V8 due to efficient memory layouts. It yielded no measurable performance improvement and failed to beat the current best time of 2.447s (median of modified runs was ~2.705s).
