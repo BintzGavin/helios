@@ -808,3 +808,4 @@ Last updated by: PERF-592
   - **What I tried**: Removed `diagnostics.validateHardwareAcceleration()` and `strategy.diagnose()` from the `render` path in `Renderer.ts` to reduce blocking startup operations.
   - **WHY it didn't work**: The median render time was ~2.650s, which is within the noise margin of the baseline ~2.550s. The operations happen outside the hot loop and therefore do not noticeably impact the median render time, only slightly shifting the absolute startup initialization which is hidden by variance in benchmark runs.
   - **Plan ID**: PERF-669
+- Would avoiding `Array.map` array allocation overhead for `workerPromises` in `CaptureLoop.ts` improve startup latency? (PERF-667)
