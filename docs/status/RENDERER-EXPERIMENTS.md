@@ -803,3 +803,8 @@ Last updated by: PERF-592
   - **What I tried**: Attempted to remove the local `res` variable allocation in `CaptureLoop.ts` (`checkState` and `runWorker`) by directly invoking `writerWaiterResolve()` before setting it to null.
   - **WHY it didn't work**: The median render time was ~2.444s, which did not improve upon the baseline best of ~2.447s. The difference is within the noise margin. V8 already optimally handles local block-scoped variables and garbage-collecting them inside such conditions.
   - **Plan ID**: PERF-664
+
+- **PERF-669**: Eliminate Diagnostic Checks from Render Startup Path
+  - **What I tried**: Removed `diagnostics.validateHardwareAcceleration()` and `strategy.diagnose()` from the `render` path in `Renderer.ts` to reduce blocking startup operations.
+  - **WHY it didn't work**: The median render time was ~2.650s, which is within the noise margin of the baseline ~2.550s. The operations happen outside the hot loop and therefore do not noticeably impact the median render time, only slightly shifting the absolute startup initialization which is hidden by variance in benchmark runs.
+  - **Plan ID**: PERF-669
