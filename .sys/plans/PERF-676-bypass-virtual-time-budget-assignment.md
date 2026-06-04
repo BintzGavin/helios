@@ -1,11 +1,11 @@
 ---
 id: PERF-676
 slug: bypass-virtual-time-budget-assignment
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-06-05
-completed: ""
-result: ""
+completed: "2026-06-04"
+result: "no-improvement"
 ---
 
 # PERF-676: Bypass Property Allocation for Virtual Time Policy Budget
@@ -64,3 +64,9 @@ None.
 
 ## Correctness Check
 Run the DOM render benchmark `cd packages/renderer && npx tsx scripts/benchmark-perf.ts` and verify output integrity.
+
+## Results Summary
+- **Best render time**: 2.495s (vs baseline 2.726s)
+- **Improvement**: N/A (Discarded due to slower median/inconsistency)
+- **Kept experiments**: None
+- **Discarded experiments**: Bypass virtual time budget assignment
