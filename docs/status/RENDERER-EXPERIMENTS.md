@@ -819,3 +819,7 @@ Last updated by: PERF-592
   - **What I tried**: Added a `bufferIsString` local variable to cache the result of `typeof buffer === 'string'` in `CaptureLoop.ts` to avoid dynamically evaluating `typeof` on the V8 hot path 30-60 times a second.
   - **WHY it didn't work**: The median render time was ~2.691s, compared to the baseline best of ~2.447s. The minor overhead of dynamically evaluating the fast `typeof` operator on every frame in the highly optimized V8 environment is less than or equivalent to the logic added to branch, conditionally execute the cache assignment `if (bufferIsString === null)`, and maintain the local state flag. V8 is likely already monomorphically optimizing the `typeof` check based on inline cache profiling.
   - **Plan ID**: PERF-670
+- **PERF-672**: Cache Client Send Binding in CdpTimeDriver hot loop
+  - **What I tried**: Pre-bound `this.client!.send` as `this.cdpSend` in `CdpTimeDriver.ts` to bypass the property resolution overhead on every frame.
+  - **WHY it didn't work**: The median render time was ~2.212s, which is slower than the baseline best of ~2.145s to ~2.170s. By breaking the standard object method execution context `this.client.send()`, we likely defeated internal V8 optimisations for object shape, or added a bound function closure overhead that was more expensive than property resolution on an established shape.
+  - **Plan ID**: PERF-672
