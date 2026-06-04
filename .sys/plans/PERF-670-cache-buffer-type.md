@@ -1,11 +1,11 @@
 ---
 id: PERF-670
 slug: cache-buffer-type
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "jules"
 created: 2024-06-04
-completed: ""
-result: ""
+completed: 2024-06-04
+result: "discarded"
 ---
 
 # PERF-670: Optimize Capture Buffer Type Check in Writer Loop
@@ -111,3 +111,9 @@ None.
 
 ## Correctness Check
 Run the DOM render benchmark script (`cd packages/renderer && npx tsx scripts/benchmark-perf.ts`) to verify correct output without regressions.
+
+## Results Summary
+- **Best render time**: ~2.691s (vs baseline ~2.447s)
+- **Improvement**: -9.97% (regression)
+- **Kept experiments**: none
+- **Discarded experiments**: PERF-670 (cache buffer type in CaptureLoop)
