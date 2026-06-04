@@ -1,11 +1,11 @@
 ---
 id: PERF-672
 slug: eliminate-captureloop-allocations
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-06-04
-completed: ""
-result: ""
+completed: "2024-06-04"
+result: "discard"
 ---
 # PERF-672: Eliminate Final Per-Frame Allocations in CaptureLoop
 
@@ -68,3 +68,9 @@ Run the standard DOM benchmark and verify the output `dom-benchmark.mp4` success
 ## Prior Art
 - PERF-652 explored sequential `await` but failed. This approach keeps the highly optimized ternary `.then()` chain while simply removing the closure allocation.
 - PERF-671 explored eliminating allocations for type checking but failed because V8 optimizes operators better than branches. This targets actual object/function memory allocations, which V8 cannot entirely elide when passed to native boundaries like Node streams.
+
+## Results Summary
+- **Best render time**: ~2.522s (vs baseline ~2.502s)
+- **Improvement**: 0%
+- **Kept experiments**: []
+- **Discarded experiments**: [Removed stdin.write callbacks, Pre-bound captureNext closure]

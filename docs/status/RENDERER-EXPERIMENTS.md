@@ -823,3 +823,7 @@ Last updated by: PERF-592
   - **What I tried**: Pre-bound `this.client!.send` as `this.cdpSend` in `CdpTimeDriver.ts` to bypass the property resolution overhead on every frame.
   - **WHY it didn't work**: The median render time was ~2.212s, which is slower than the baseline best of ~2.145s to ~2.170s. By breaking the standard object method execution context `this.client.send()`, we likely defeated internal V8 optimisations for object shape, or added a bound function closure overhead that was more expensive than property resolution on an established shape.
   - **Plan ID**: PERF-672
+- **PERF-672**: Eliminate final per-frame allocations in CaptureLoop
+  - **What I tried**: Attempted to eliminate per-frame allocations by removing Node.js `stdin.write` error callbacks and pre-binding the `captureNext` closure inside `CaptureLoop.ts`.
+  - **WHY it didn't work**: The median render time did not improve (~2.522s vs baseline ~2.502s). The difference is within the noise margin. V8 already optimally handles local block-scoped closure allocations for promises, and Node's event loop overhead for the omitted stream callbacks was negligible.
+  - **Plan ID**: PERF-672
