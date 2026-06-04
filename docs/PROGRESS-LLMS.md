@@ -1,3 +1,9 @@
+## LLMS v1.90.0
+- ✅ Completed: Daily llms.txt Review
+  - Realigned all Quick Facts and Roadmap versions to actual package.json versions.
+  - Synced Roadmap features with verified completions across domains (CLI Docker Adapter Regression Tests, Document Event Handlers, Infrastructure Coverage Expansion, etc.).
+  - Verified package versions and API examples.
+
 ## LLMS v1.89.0
 - ✅ Completed: Daily llms.txt Review
   - Updated versions in Quick Facts and Roadmap to match current package.json versions:
