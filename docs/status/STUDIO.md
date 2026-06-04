@@ -224,3 +224,4 @@
 - [v0.121.21] ✅ Completed: STUDIO-Timeline-Drag-Drop - Verified timeline drag and drop is already implemented (IMPOSSIBLE: DUPLICATION).
 
 - [v0.121.22] ✅ Completed: Server Templates Test Coverage - Added 100% unit test coverage for scaffolding templates
+- [v0.121.23] ✅ Completed: Improve AudioMeter Coverage - Created plan to test AudioMeter component (2026-06-04-STUDIO-Improve-AudioMeter-Coverage.md).
