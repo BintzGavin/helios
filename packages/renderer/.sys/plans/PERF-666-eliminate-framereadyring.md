@@ -1,11 +1,11 @@
 ---
 id: PERF-666
 slug: eliminate-framereadyring
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "Jules"
 created: 2024-06-04
-completed: ""
-result: ""
+completed: "2026-06-04"
+result: "discarded"
 ---
 # PERF-666: Eliminate frameReadyRing in CaptureLoop
 
@@ -63,3 +63,13 @@ Verify output video opens and contains 150 frames.
 
 ## Prior Art
 PERF-622 successfully eliminated `frameErrorRing`, showing that consolidating parallel tracking arrays in the hot loop yields measurable performance improvements in V8.
+
+
+## Results Summary
+| run | render_time_s | frames | fps_effective | peak_mem_mb | status | description |
+|---|---|---|---|---|---|---|
+| 1 | 2.904 | 150 | 51.65 | 62.8 | discard | eliminate frameReadyRing |
+| 2 | 2.814 | 150 | 53.30 | 63.0 | discard | eliminate frameReadyRing |
+| 3 | 2.830 | 150 | 53.00 | 62.8 | discard | eliminate frameReadyRing |
+
+**Outcome:** Discarded. Using parallel fixed-type Uint8Arrays for state tracking is faster in V8 than checking for null/object references in a mixed-type array.

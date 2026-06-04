@@ -1,21 +1,14 @@
-💡 **What**: The experiment run and its outcome
-Tried rewriting \`.then(onFulfilled).catch(onRejected)\` to \`.then(onFulfilled, onRejected)\` in \`DomStrategy.ts\` hot loop. It was discarded.
+💡 **What**: The PERF-666 experiment run and its outcome, discarding the removal of `frameReadyRing` in `CaptureLoop.ts`.
+🎯 **Why**: Attempted to reduce memory footprint and CPU overhead by consolidating state tracking into the primary `frameBufferRing` with null checks, avoiding maintaining parallel arrays.
+📊 **Impact**: Discarded. The median render time regressed to ~2.830s vs the baseline of ~2.447s.
+🔬 **Verification**:
+- Benchmarks executed 3 times to gather median.
+- Output validated (duration 5s, 150 frames, x264).
+- Tests passed.
+📎 **Plan**: `packages/renderer/.sys/plans/PERF-666-eliminate-framereadyring.md`
 
-🎯 **Why**: The performance bottleneck targeted
-Microtask and Promise allocation overhead in the `capture` hot loop.
-
-📊 **Impact**: Before/after render times and percentage improvement
-The median render time did not improve significantly over the baseline (median ~1.375s vs baseline ~1.374s). The minor promise allocation savings were offset by potential V8 deoptimization from altering the promise structure, just as observed previously in PERF-591. The experiment was discarded as inconclusive noise.
-
-🔬 **Verification**: What was tested (4-gate verification, benchmark results)
-Passed compilation, all tests, and output verification. Benchmark results showed a slight regression.
-
-run | render_time_s | frames | fps_effective | peak_mem_mb | status  | description
-1   | 1.382         | 150    | 108.50        | 70.1        | discard | PERF-608: merge promise catch in DomStrategy
-2   | 1.375         | 150    | 109.08        | 70.7        | discard | PERF-608: merge promise catch in DomStrategy
-3   | 1.391         | 150    | 107.85        | 70.0        | discard | PERF-608: merge promise catch in DomStrategy
-4   | 1.368         | 150    | 109.68        | 70.0        | discard | PERF-608: merge promise catch in DomStrategy
-5   | 1.390         | 150    | 107.91        | 70.1        | discard | PERF-608: merge promise catch in DomStrategy
-
-📎 **Plan**: Reference the plan file
-/.sys/plans/PERF-608-merge-domstrategy-promise-chain.md
+| run | render_time_s | frames | fps_effective | peak_mem_mb | status | description |
+|---|---|---|---|---|---|---|
+| 1 | 2.904 | 150 | 51.65 | 62.8 | discard | eliminate frameReadyRing |
+| 2 | 2.814 | 150 | 53.30 | 63.0 | discard | eliminate frameReadyRing |
+| 3 | 2.830 | 150 | 53.00 | 62.8 | discard | eliminate frameReadyRing |

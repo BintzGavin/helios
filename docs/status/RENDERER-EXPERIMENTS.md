@@ -809,3 +809,5 @@ Last updated by: PERF-592
   - **WHY it didn't work**: The median render time was ~2.650s, which is within the noise margin of the baseline ~2.550s. The operations happen outside the hot loop and therefore do not noticeably impact the median render time, only slightly shifting the absolute startup initialization which is hidden by variance in benchmark runs.
   - **Plan ID**: PERF-669
 - Would avoiding `Array.map` array allocation overhead for `workerPromises` in `CaptureLoop.ts` improve startup latency? (PERF-667)
+
+- **PERF-666 (Discarded):** Eliminated `frameReadyRing` in `CaptureLoop.ts` by using `null` checks on `frameBufferRing` to track readiness. Yielded a performance regression (median ~2.830s vs baseline ~2.447s). This indicates that using parallel fixed-type Uint8Arrays for state tracking is faster in V8 than checking for null/object references in a mixed-type array, likely due to monomorphic optimizations on typed arrays versus polymorphism checks in the `Array<Buffer | string | null>`.
