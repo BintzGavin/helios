@@ -161,3 +161,10 @@ PERF-652	2.286	150	65.61	62.7	discard	flatten capture await
 7	2.830	150	53.00	62.8	discard	eliminate frameReadyRing
 1	2.805	150	53.48	62.8	keep	baseline (median of 3)
 2	2.522	150	59.47	62.6	discard	eliminate CaptureLoop per-frame allocations (PERF-672)
+259	2.549	150	58.85	62.9	discard	quality 80
+260	2.574	150	58.26	62.9	discard	quality 80
+261	2.543	150	58.99	62.7	discard	quality 80
+262	2.575	150	58.24	62.9	discard	quality 80
+263	2.465	150	60.86	62.8	discard	quality 80
+264	2.502	150	59.94	62.8	discard	quality 80
+265	2.468	150	60.77	62.9	discard	quality 80
