@@ -811,3 +811,7 @@ Last updated by: PERF-592
 - Would avoiding `Array.map` array allocation overhead for `workerPromises` in `CaptureLoop.ts` improve startup latency? (PERF-667)
 
 - **PERF-666 (Discarded):** Eliminated `frameReadyRing` in `CaptureLoop.ts` by using `null` checks on `frameBufferRing` to track readiness. Yielded a performance regression (median ~2.830s vs baseline ~2.447s). This indicates that using parallel fixed-type Uint8Arrays for state tracking is faster in V8 than checking for null/object references in a mixed-type array, likely due to monomorphic optimizations on typed arrays versus polymorphism checks in the `Array<Buffer | string | null>`.
+- **PERF-671**: Optimize Capture Buffer Type Check in Writer Loop
+  - **What I tried**: Added a `bufferIsString` local variable to cache the result of `typeof buffer === 'string'` in `CaptureLoop.ts` to avoid dynamically evaluating `typeof` on the V8 hot path 30-60 times a second.
+  - **WHY it didn't work**: The median render time was ~2.544s, compared to the baseline best of ~2.447s. The minor overhead of dynamically evaluating the fast `typeof` operator on every frame in the highly optimized V8 environment is less than or equivalent to the logic added to branch, conditionally execute the cache assignment `if (bufferIsString === null)`, and maintain the local state flag. V8 is likely already monomorphically optimizing the `typeof` check based on inline cache profiling.
+  - **Plan ID**: PERF-671
