@@ -110,6 +110,11 @@ Last updated by: PERF-662
   - **Outcome**: discard
 
 ## What Doesn't Work (and Why)
+- **PERF-673**: Switch Default Intermediate Image Format to JPEG Quality 1
+  - **What I did**: Changed default fallback JPEG quality from 90 to 1 for intermediate frames when `hasAlpha` is false in `DomStrategy.ts`.
+  - **WHY it didn't work**: The median render time was ~2.880s, which is slower than the baseline best of ~2.447s. The Chromium encoding time improvements for a 600x600 image with quality 1 were negligible over quality 90 in the headless environment, and did not overcome natural variance, while slightly regressing performance compared to a highly optimized baseline.
+  - **Plan ID**: PERF-673
+
 - **PERF-676**: Bypass redundant virtual time policy budget allocation in CdpTimeDriver.
   - **What I tried**: Wrapped `this.setVirtualTimePolicyParams.budget = budget` in a conditional check.
   - **WHY it didn't work**: The median render time was ~2.722s, which did not improve upon the baseline best of ~2.447s. V8 is likely already highly optimized for property reassignment or inline caching.
