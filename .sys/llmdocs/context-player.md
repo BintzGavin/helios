@@ -64,3 +64,5 @@ Properties:
 The player supports client-side export utilizing `@helios-project/core` rendering.
 Supported Formats: `mp4`, `webm`, `png`, `jpeg`
 Supported Features: Resizing, Bitrate control, Audio merging, Caption rendering.
+
+- `onplaying`, `onwaiting`, `onsuspend`, `onstalled`: Standard media event handler properties.
