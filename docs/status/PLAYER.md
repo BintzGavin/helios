@@ -24,6 +24,7 @@
 
 [v0.77.18] ✅ Completed: Fix Duplicate README Entry - Removed duplicate getSchema entry from README.md.
 ## Status Log
+[v0.77.49] ✅ Completed: Discovered undocumented event handler properties and events (playing, waiting, suspend, stalled) in implementation missing from README. Created plan `.sys/plans/v0.77.49-PLAYER-Document-Missing-Event-Handlers.md` to document them.
 [v0.77.17] ✅ Completed: Improve Index Coverage - Expanded unit tests for HTMLMediaElement properties and events.
 [v0.77.14] ✅ Completed: Document getSchema API Parity - Added missing getSchema method to README documentation.
 [v0.77.13] 🚫 Blocked: No new plan found in /.sys/plans/ for PLAYER. Waiting for Planner to create the next implementation spec.

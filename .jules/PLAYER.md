@@ -73,3 +73,6 @@
 ## [v0.77.46] - Duplicate Implementation Plan
 **Learning:** Sometimes plans are generated for features that are already fully implemented in the code.
 **Action:** Always verify code and README first, mark as 'IMPOSSIBLE: DUPLICATION', and discard the plan if the feature exists.
+## [v0.77.49] - Document Missing Event Handlers
+**Learning:** Found an undocumented event handler properties gap (playing, waiting, suspend, stalled) between the `index.ts` implementation and `README.md`.
+**Action:** Generated plan to document them in `README.md` ensuring complete API parity matching `index.ts`. Always compare actual getter/setter implementations to README properties lists.
