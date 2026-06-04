@@ -827,3 +827,7 @@ Last updated by: PERF-592
   - **What I tried**: Attempted to eliminate per-frame allocations by removing Node.js `stdin.write` error callbacks and pre-binding the `captureNext` closure inside `CaptureLoop.ts`.
   - **WHY it didn't work**: The median render time did not improve (~2.522s vs baseline ~2.502s). The difference is within the noise margin. V8 already optimally handles local block-scoped closure allocations for promises, and Node's event loop overhead for the omitted stream callbacks was negligible.
   - **Plan ID**: PERF-672
+- **PERF-675**: Optimize JPEG Quality
+  - **What I tried**: Lowered `intermediateImageQuality` in `DomStrategy.ts` from 90 to 80 to reduce the CDP payload size and IPC processing overhead.
+  - **WHY it didn't work**: The median render time did not improve noticeably (~2.54s for quality 80 vs ~2.53s baseline). The potential savings in Node.js Base64 decoding and IPC transfer were either negligible or offset by differences in Chromium's internal image encoding times, meaning that 90 quality performs effectively the same as 80 in this environment.
+  - **Plan ID**: PERF-675
