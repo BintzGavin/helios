@@ -568,4 +568,91 @@ describe('HeliosPlayer API Parity', () => {
     (player as any).updateUI({ ...baseState, width: 1280, height: 721 });
     expect(resizeSpy).toHaveBeenCalledTimes(2);
   });
+
+  it('should support standard media event handlers properties', () => {
+    const playingSpy = vi.fn();
+    const waitingSpy = vi.fn();
+    const suspendSpy = vi.fn();
+    const stalledSpy = vi.fn();
+
+    player.onplaying = playingSpy;
+    player.onwaiting = waitingSpy;
+    player.onsuspend = suspendSpy;
+    player.onstalled = stalledSpy;
+
+    expect(player.onplaying).toBe(playingSpy);
+    expect(player.onwaiting).toBe(waitingSpy);
+    expect(player.onsuspend).toBe(suspendSpy);
+    expect(player.onstalled).toBe(stalledSpy);
+
+    // Verify events trigger the handlers
+    player.dispatchEvent(new Event('playing'));
+    expect(playingSpy).toHaveBeenCalledTimes(1);
+
+    player.dispatchEvent(new Event('waiting'));
+    expect(waitingSpy).toHaveBeenCalledTimes(1);
+
+    player.dispatchEvent(new Event('suspend'));
+    expect(suspendSpy).toHaveBeenCalledTimes(1);
+
+    player.dispatchEvent(new Event('stalled'));
+    expect(stalledSpy).toHaveBeenCalledTimes(1);
+
+    // Remove handlers
+    player.onplaying = null;
+    player.onwaiting = null;
+    player.onsuspend = null;
+    player.onstalled = null;
+
+    expect(player.onplaying).toBeNull();
+    player.dispatchEvent(new Event('playing'));
+    expect(playingSpy).toHaveBeenCalledTimes(1); // should not be called again
+  });
+
+  it('should dispatch playing event when playback starts', () => {
+    const playingSpy = vi.fn();
+    const playSpy = vi.fn();
+    const pauseSpy = vi.fn();
+    player.addEventListener('playing', playingSpy);
+    player.addEventListener('play', playSpy);
+    player.addEventListener('pause', pauseSpy);
+
+    const baseState = { width: 1920, height: 1080, duration: 10, fps: 30, currentFrame: 0, isPlaying: false };
+
+    const mockController = {
+      getState: () => baseState,
+      pause: vi.fn(),
+      dispose: vi.fn(),
+      subscribe: vi.fn((cb) => {
+        cb(baseState); // Initial state
+        return vi.fn();
+      }),
+      onError: vi.fn().mockReturnValue(() => {}),
+      onAudioMetering: vi.fn().mockReturnValue(() => {}),
+      setAudioVolume: vi.fn(),
+      setPlaybackRate: vi.fn(),
+      setAudioMuted: vi.fn(),
+      setInputProps: vi.fn(),
+      setLoop: vi.fn(),
+      play: vi.fn(),
+    };
+    (player as any).setController(mockController);
+
+    // Initial state set should not trigger events
+    expect(playingSpy).toHaveBeenCalledTimes(0);
+    expect(playSpy).toHaveBeenCalledTimes(0);
+    expect(pauseSpy).toHaveBeenCalledTimes(0);
+
+    // Transition to playing
+    (player as any).updateUI({ ...baseState, isPlaying: true });
+    expect(playSpy).toHaveBeenCalledTimes(1);
+    expect(playingSpy).toHaveBeenCalledTimes(1);
+    expect(pauseSpy).toHaveBeenCalledTimes(0);
+
+    // Transition to pause
+    (player as any).updateUI({ ...baseState, isPlaying: false });
+    expect(playSpy).toHaveBeenCalledTimes(1);
+    expect(playingSpy).toHaveBeenCalledTimes(1);
+    expect(pauseSpy).toHaveBeenCalledTimes(1);
+  });
 });

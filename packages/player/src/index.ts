@@ -966,6 +966,38 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
     if (handler) this.addEventListener('pause', handler);
   }
 
+  private _onplaying: ((event: Event) => void) | null = null;
+  public get onplaying() { return this._onplaying; }
+  public set onplaying(handler: ((event: Event) => void) | null) {
+    if (this._onplaying) this.removeEventListener('playing', this._onplaying);
+    this._onplaying = handler;
+    if (handler) this.addEventListener('playing', handler);
+  }
+
+  private _onwaiting: ((event: Event) => void) | null = null;
+  public get onwaiting() { return this._onwaiting; }
+  public set onwaiting(handler: ((event: Event) => void) | null) {
+    if (this._onwaiting) this.removeEventListener('waiting', this._onwaiting);
+    this._onwaiting = handler;
+    if (handler) this.addEventListener('waiting', handler);
+  }
+
+  private _onsuspend: ((event: Event) => void) | null = null;
+  public get onsuspend() { return this._onsuspend; }
+  public set onsuspend(handler: ((event: Event) => void) | null) {
+    if (this._onsuspend) this.removeEventListener('suspend', this._onsuspend);
+    this._onsuspend = handler;
+    if (handler) this.addEventListener('suspend', handler);
+  }
+
+  private _onstalled: ((event: Event) => void) | null = null;
+  public get onstalled() { return this._onstalled; }
+  public set onstalled(handler: ((event: Event) => void) | null) {
+    if (this._onstalled) this.removeEventListener('stalled', this._onstalled);
+    this._onstalled = handler;
+    if (handler) this.addEventListener('stalled', handler);
+  }
+
   private _onended: ((event: Event) => void) | null = null;
   public get onended() { return this._onended; }
   public set onended(handler: ((event: Event) => void) | null) {
@@ -3212,6 +3244,9 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
       if (this.lastState) {
         if (state.isPlaying !== this.lastState.isPlaying) {
           this.dispatchEvent(new Event(state.isPlaying ? "play" : "pause"));
+          if (state.isPlaying) {
+            this.dispatchEvent(new Event("playing"));
+          }
         }
 
         const wasFinished = this.lastState.currentFrame >= this.lastState.duration * this.lastState.fps - 1;

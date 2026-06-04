@@ -1,5 +1,9 @@
 #
-### PLAYER v0.77.43
+### PLAYER v0.77.48
+### PLAYER v0.77.48
+- ✅ Completed: Fix API Parity Events - Implemented missing media events (playing, waiting, suspend, stalled).
+
+## PLAYER v0.77.43
 - ✅ Completed: Document Event Handlers - Updated README.md to include standard event handler properties to match the actual implementation in packages/player/src/index.ts.
 
 ## PLAYER v0.77.42
