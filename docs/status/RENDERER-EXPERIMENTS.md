@@ -110,6 +110,11 @@ Last updated by: PERF-662
   - **Outcome**: discard
 
 ## What Doesn't Work (and Why)
+- **PERF-676**: Bypass Property Allocation for Virtual Time Policy Budget
+  - **What I tried**: Modified `runSetTime` in `CdpTimeDriver.ts` to only update `this.setVirtualTimePolicyParams.budget` if the new `budget` value was different from the current one, bypassing redundant object property assignments.
+  - **WHY it didn't work**: The median render time regressed to ~2.722s, compared to the baseline median of ~2.726s. V8 is already highly optimized for repeated property assignments of the same structure (via inline caching). Adding the conditional check (`if (this.setVirtualTimePolicyParams.budget !== budget)`) introduced branching overhead that slightly negated any gains from bypassing the assignment.
+  - **Plan ID**: PERF-676
+
 - **PERF-673**: Switch Default Intermediate Image Format to JPEG Quality 1
   - **What I did**: Changed default fallback JPEG quality from 90 to 1 for intermediate frames when `hasAlpha` is false in `DomStrategy.ts`.
   - **WHY it didn't work**: The median render time was ~2.880s, which is slower than the baseline best of ~2.447s. The Chromium encoding time improvements for a 600x600 image with quality 1 were negligible over quality 90 in the headless environment, and did not overcome natural variance, while slightly regressing performance compared to a highly optimized baseline.
