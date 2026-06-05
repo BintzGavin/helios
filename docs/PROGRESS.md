@@ -1,4 +1,7 @@
 #
+### PLAYER v0.77.49
+- ✅ Completed: Document Missing Event Handlers - Documented onplaying, onwaiting, onsuspend, and onstalled properties and events.
+
 ### PLAYER v0.77.48
 ### PLAYER v0.77.48
 - ✅ Completed: Fix API Parity Events - Implemented missing media events (playing, waiting, suspend, stalled).

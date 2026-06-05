@@ -203,6 +203,7 @@ The `<helios-player>` element implements a subset of the HTMLMediaElement interf
 ### Event Handlers
 
 - `onplay` (function | null): Event handler for the `play` event.
+- `onplaying` (function | null): Event handler for the `playing` event.
 - `onpause` (function | null): Event handler for the `pause` event.
 - `onended` (function | null): Event handler for the `ended` event.
 - `ontimeupdate` (function | null): Event handler for the `timeupdate` event.
@@ -217,6 +218,9 @@ The `<helios-player>` element implements a subset of the HTMLMediaElement interf
 - `onloadeddata` (function | null): Event handler for the `loadeddata` event.
 - `oncanplay` (function | null): Event handler for the `canplay` event.
 - `oncanplaythrough` (function | null): Event handler for the `canplaythrough` event.
+- `onsuspend` (function | null): Event handler for the `suspend` event.
+- `onstalled` (function | null): Event handler for the `stalled` event.
+- `onwaiting` (function | null): Event handler for the `waiting` event.
 - `onerror` (function | null): Event handler for the `error` event.
 - `onenterpictureinpicture` (function | null): Event handler for the `enterpictureinpicture` event.
 - `onleavepictureinpicture` (function | null): Event handler for the `leavepictureinpicture` event.
@@ -228,6 +232,10 @@ The element dispatches the following custom events:
 
 - `error`: Fired when an error occurs during media loading or playback.
 - `audiometering`: Fired during playback to report stereo RMS and Peak audio levels.
+- `playing`: Fired when playback is ready to start after having been paused or delayed due to lack of data.
+- `suspend`: Fired when media data loading has been suspended.
+- `stalled`: Fired when the user agent is trying to fetch media data, but data is unexpectedly not forthcoming.
+- `waiting`: Fired when playback has stopped because of a temporary lack of data.
 - `play`: Fired when playback starts.
 - `pause`: Fired when playback is paused.
 - `seeking`: Fired when a seek operation starts.
