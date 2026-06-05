@@ -1,3 +1,9 @@
+## LLMS v1.91.0
+- ✅ Completed: Daily llms.txt Review
+  - Realigned all Quick Facts and Roadmap versions to actual package.json versions (Studio v0.107.1+, Player v0.76.20+, CLI v0.45.2+, Renderer v1.78.3+, Infrastructure v0.25.0+).
+  - Synced Roadmap with recent verifiable completions.
+  - Verified package versions and API examples.
+
 ## LLMS v1.90.0
 - ✅ Completed: Daily llms.txt Review
   - Realigned all Quick Facts and Roadmap versions to actual package.json versions.

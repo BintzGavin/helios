@@ -1,5 +1,7 @@
 # Status: LLMS
-**Version**: 1.90.0
+**Version**: 1.91.0
+
+[v1.91.0] ✅ Completed: Comprehensive Daily Review - Realigned Quick Facts and Roadmap versions to actual package.json versions (Studio v0.107.1+, Player v0.76.20+, Renderer v1.78.3+, CLI v0.45.2+, Infrastructure v0.25.0+). Synced Roadmap with recent verifiable completions. Verified Agent Skills paths.
 
 [v1.90.0] ✅ Completed: Comprehensive Daily Review - Updated Quick Facts and Roadmap to reflect latest versions (Studio v0.121.23+, CLI v0.46.41+, Player v0.77.47+, Renderer v1.80.1+, Infrastructure v0.54.28+). Synced Roadmap features across domains. Verified Key Files and Agent Skills section.
 

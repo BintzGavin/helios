@@ -6,7 +6,7 @@ Helios is a modern engine for creating videos programmatically using standard we
 
 ## Quick Facts
 - **License**: Elastic License 2.0 (free commercial use, no SaaS resale)
-- **Status**: Beta / Self-Driving (Core: Stable v5.13.0+, Studio: Alpha v0.121.23+, Player: v0.77.47+, Renderer: v1.80.1+, CLI: Beta v0.46.41+, Infrastructure: v0.54.28+)
+- **Status**: Beta / Self-Driving (Core: Stable v5.13.0+, Studio: Alpha v0.107.1+, Player: v0.76.20+, Renderer: v1.78.3+, CLI: Beta v0.45.2+, Infrastructure: v0.25.0+)
 - **Frameworks**: React, Vue, Svelte, Solid, vanilla JS
 - **Animation**: Standard CSS, Web Animations API (WAAPI), any animation library
 
@@ -121,12 +121,12 @@ const report = await Helios.diagnose();
 
 ## Roadmap
 ### V1.x (Active)
-- **Studio**: v0.121.23+ (Expand Reverse Speeds, Preview Command, CompositionsPanel Tests, CLI Build Command, Export Job Spec, Asset Drag and Drop)
-- **CLI**: v0.46.41+ (CLI Docker Adapter Regression Tests, CLI Command Coverage Tests V4, CLI Job Types Regression Tests, CLI Registry Types Regression Tests, Scaffold Cloudflare Sandbox Deployment)
+- **Studio**: v0.107.1+ (Export Job Spec, Asset Drag and Drop, Expand Reverse Speeds)
+- **CLI**: v0.45.2+ (Scaffold Hetzner Deployment Command, All Worker Execution, Scaffold Cloudflare Sandbox Deployment, Tier 3 Scaffold Deployment Commands, Scaffold Kubernetes Deployment Command)
 - **Core**: v5.13.0+ (Generic Input Props, Implement Active Clips, Implement Composition Schema, Shared Virtual Time Binding)
-- **Player**: v0.77.47+ (Document Event Handlers, Fix API Parity srcObject, Bridge Coverage Completeness)
-- **Renderer**: v1.80.1+ (Validate HW Accel, Orchestrator Plan, Refactor Media Sync Logic, Update Skill Documentation)
-- **Infrastructure**: v0.54.28+ (Coverage Expansion, Modal Adapter, CloudRun & Local Worker Adapter Coverage, Orchestrator Coverage Expansion, InMemoryJobRepository Coverage)
+- **Player**: v0.76.20+ (Regression Tests for Media Session, Regression Tests for MediaProperties, Regression Tests for InputProps, Audio Context Manager Tests, Async Seek)
+- **Renderer**: v1.78.3+ (Validate HW Accel, Orchestrator Plan, Refactor Media Sync Logic, Update Skill Documentation, Abstraction for Pluggable Execution)
+- **Infrastructure**: v0.25.0+ (Optimize GCS Uploads, Orchestrator Test Coverage Expansion, InMemoryJobRepository Coverage, CloudRun Resiliency Tests, Cloud Execution Adapters Documentation)
 
 ### AI Integration
 - **Studio MCP Server**: Inspect, create, and render compositions via LLM tools (Done)
