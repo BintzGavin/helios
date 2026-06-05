@@ -179,3 +179,5 @@ run	27.619	600	21.72	66.9	discard	PERF-681 eliminate async await domstrategy cap
 5	2.382	150	62.97	62.6	discard	PERF-682 Transfer Ring Buffer Cleanup to Writer
 PERF-683	2024-06-05	2.050
 run	2.534	150	34.65	63.8	discard	PERF-680 Inline writerWaiterExecutor
+
+181	2.487	150	60.31	63.6	discard	Separate setTime Await from Strategy Capture
