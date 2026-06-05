@@ -859,3 +859,8 @@ Last updated by: PERF-592
   - **What I tried**: Attempted to avoid the allocation and iterator overhead of `Array.map` when creating `workerPromises` in `CaptureLoop.ts` by using a pre-allocated array and a standard `for` loop.
   - **WHY it didn't work**: The median render time did not improve and remained around ~1.988s, which is not measurably better than the baseline. In fact, standard `.map` calls are highly optimized by V8's JIT compiler. The perceived overhead of a small map allocation in the startup sequence is trivial and easily absorbed by the baseline variance.
   - **Plan ID**: PERF-667
+
+- **PERF-680**: Inline `writerWaiterExecutor` in `CaptureLoop`
+  - **What I tried**: Removed the pre-bound `writerWaiterExecutor` function and inlined the promise executor in the writer wait loop inside `CaptureLoop.ts`.
+  - **WHY it didn't work**: The median render time was ~2.375, regressing compared to the baseline of ~2.127s. V8's optimization of the await loop sequence likely prefers the statically allocated promise executor reference, as allocating a new closure inline every iteration incurred greater allocation overhead than context-switching to the pre-bound closure.
+  - **Plan ID**: PERF-680
