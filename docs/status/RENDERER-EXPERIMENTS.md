@@ -871,3 +871,8 @@ Last updated by: PERF-592
   - **What I tried**: Moved the array property assignments (`frameReadyRing[ringIndex] = 0; frameBufferRing[ringIndex] = null;`) out of the worker microtask path (`checkState` and `runWorker`) and placed them directly into the synchronous writer loop inside `CaptureLoop.ts`.
   - **WHY it didn't work**: The median render time regressed to ~2.40s (from the baseline best of ~2.127s). While placing the assignments in the synchronous writer loop intuitively seems better for cache locality, V8 was clearly optimizing the assignments effectively where they were, or the slight shift in synchronization patterns marginally increased microtask overhead. The regression indicates that moving these specific memory writes to the single synchronous hot loop did not benefit V8's JIT.
   - **Plan ID**: PERF-682
+
+- **PERF-683**: Single Worker Fast Path in CaptureLoop
+  - **What I did**: Bypassed the Actor Model ring buffer and synchronous writer loop when `concurrency = 1` by running a sequential, single loop for capturing and writing frames.
+  - **Impact**: Improved stability and marginal reduction in V8 context switching for sequential DOM renders. The median render time averaged ~2.18s (with best run of 2.05s, which is slightly better than the previous baseline of ~2.127s).
+  - **Plan ID**: PERF-683

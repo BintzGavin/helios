@@ -81,7 +81,71 @@ export class CaptureLoop {
 
     let previousWritePromise: Promise<void> | undefined;
 
+    const timeStep = 1000 / fps;
+    const compTimeStep = 1 / fps;
     const poolLen = this.pool.length;
+
+    // FAST PATH FOR SINGLE WORKER
+    if (poolLen === 1) {
+        const worker = this.pool[0];
+        const { timeDriver, strategy, page } = worker;
+        let fatalError: any = null;
+
+        const signal = this.jobOptions?.signal;
+        const onProgress = this.jobOptions?.onProgress;
+        try {
+            for (let i = 0; i < totalFrames; i++) {
+                if (capturedErrors.length > 0 || (signal && signal.aborted)) break;
+
+                const time = i * timeStep;
+                const compositionTimeInSeconds = (startFrame + i) * compTimeStep;
+
+                const setTimeResult = timeDriver.setTime(page, compositionTimeInSeconds);
+                const buffer = setTimeResult
+                    ? await setTimeResult.then(() => strategy.capture(page, time))
+                    : await strategy.capture(page, time);
+
+                if (i === nextProgressFrame) {
+                    console.log(`Progress: Rendered ${i} / ${totalFrames} frames`);
+                    nextProgressFrame += progressInterval;
+                }
+
+                if (onProgress) {
+                    onProgress(i / totalFrames);
+                }
+
+                if (previousWritePromise) {
+                    await previousWritePromise;
+                    previousWritePromise = undefined;
+                }
+
+                if (stdin?.writable) {
+                    let canWriteMore: boolean;
+                    if (typeof buffer === 'string') {
+                        canWriteMore = stdin.write(buffer, 'base64', this.handleWriteError);
+                    } else {
+                        canWriteMore = stdin.write(buffer, this.handleWriteError);
+                    }
+
+                    if (!canWriteMore) {
+                        previousWritePromise = new Promise<void>(this.drainPromiseExecutor);
+                    }
+                } else {
+                    console.warn('FFmpeg stdin is not writable. Skipping write.');
+                }
+            }
+        } catch (e) {
+            fatalError = e;
+        }
+
+        if (fatalError) throw fatalError;
+        if (capturedErrors.length > 0) throw capturedErrors[0];
+        if (signal && signal.aborted) throw new Error('Aborted');
+
+        if (previousWritePromise) {
+            await previousWritePromise;
+        }
+    } else {
     let maxPipelineDepth = 64;
     maxPipelineDepth = Math.pow(2, Math.ceil(Math.log2(maxPipelineDepth)));
     const ringMask = maxPipelineDepth - 1;
@@ -277,6 +341,7 @@ export class CaptureLoop {
 
     if (previousWritePromise) {
         await previousWritePromise;
+    }
     }
 
     console.log('Finishing render strategy...');
