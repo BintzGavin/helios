@@ -327,4 +327,44 @@ describe('job command', () => {
       expect(exitSpy).toHaveBeenCalledWith(1);
     });
   });
+
+  it('should exit when executing a job with fly adapter without token', async () => {
+    vi.mocked(fs.existsSync).mockReturnValue(true);
+    vi.mocked(fs.readFileSync).mockReturnValue(JSON.stringify({
+      chunks: [{ id: '1', startFrame: 0, frameCount: 10, outputFile: 'out.mp4', command: 'cmd' }],
+      mergeCommand: 'merge'
+    }));
+
+    await program.parseAsync(['node', 'test', 'job', 'run', 'job.json', '--adapter', 'fly']);
+    expect(exitSpy).toHaveBeenCalledWith(1);
+    expect(console.error).toHaveBeenCalledWith('Job execution failed:', expect.stringContaining('Fly adapter requires --fly-api-token'));
+  });
+
+  it('should exit when executing a job with cloudflare-sandbox adapter without worker URL', async () => {
+    vi.mocked(fs.existsSync).mockReturnValue(true);
+    vi.mocked(fs.readFileSync).mockReturnValue(JSON.stringify({
+      chunks: [{ id: '1', startFrame: 0, frameCount: 10, outputFile: 'out.mp4', command: 'cmd' }],
+      mergeCommand: 'merge'
+    }));
+
+    await program.parseAsync(['node', 'test', 'job', 'run', 'job.json', '--adapter', 'cloudflare-sandbox']);
+    expect(exitSpy).toHaveBeenCalledWith(1);
+    expect(console.error).toHaveBeenCalledWith('Job execution failed:', expect.stringContaining('Cloudflare Sandbox adapter requires --cloudflare-sandbox-account-id'));
+  });
+
+  it('should error if azure adapter missing required arg', async () => {
+    vi.mocked(fs.existsSync).mockReturnValue(true);
+    vi.mocked(fs.readFileSync).mockReturnValue(JSON.stringify({
+      chunks: [{ id: '1', startFrame: 0, frameCount: 10, outputFile: 'out.mp4', command: 'cmd' }],
+      mergeCommand: 'merge'
+    }));
+
+    await program.parseAsync(['node', 'test', 'job', 'run', 'job.json', '--adapter', 'azure']);
+
+    // Azure doesn't require explicit tokens initially in the CLI if it just spins up the adapter with defaults or process.env
+    // We just want to cover the branch in the switch
+    expect(exitSpy).toHaveBeenCalledWith(1);
+    expect(console.error).toHaveBeenCalledWith('Job execution failed:', expect.stringContaining('Azure adapter requires --azure-service-url'));
+  });
+
 });

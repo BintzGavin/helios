@@ -106,7 +106,11 @@ describe('studio command', () => {
   it('should handle plugin callbacks', async () => {
     const mockServer = { listen: vi.fn(), printUrls: vi.fn() };
     vi.mocked(createServer).mockResolvedValue(mockServer as any);
-    vi.mocked(loadConfig).mockReturnValue({ directories: { components: 'src/components' } } as any);
+
+    vi.mocked(loadConfig).mockReturnValue({
+      directories: { components: 'src/components' },
+      components: [{ name: 'test-comp', path: 'src/components/test-comp.tsx' }]
+    } as any);
 
     let pluginConfig: any;
     const { studioApiPlugin } = await import('@helios-project/studio/cli');
@@ -140,4 +144,26 @@ describe('studio command', () => {
     const isNotInstalled = await pluginConfig.onCheckInstalled('unknown-comp');
     expect(isNotInstalled).toBe(false);
   });
+
+  it('should return false from onCheckInstalled when component is missing', async () => {
+    const mockServer = { listen: vi.fn(), printUrls: vi.fn() };
+    vi.mocked(createServer).mockResolvedValue(mockServer as any);
+    vi.mocked(loadConfig).mockReturnValue({
+      directories: { components: 'src/components' },
+      components: []
+    } as any);
+
+    let pluginConfig: any;
+    const { studioApiPlugin } = await import('@helios-project/studio/cli');
+    (vi.mocked(studioApiPlugin) as any).mockImplementation((config: any) => {
+        pluginConfig = config;
+        return { name: 'mock-plugin' };
+    });
+
+    await program.parseAsync(['node', 'test', 'studio']);
+
+    const isInstalled = await pluginConfig.onCheckInstalled('missing-comp');
+    expect(isInstalled).toBe(false);
+  });
+
 });

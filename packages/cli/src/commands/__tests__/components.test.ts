@@ -107,4 +107,15 @@ describe('components command', () => {
 
     expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('No components found'));
   });
+
+  it('should print no components found message when query yields empty result', async () => {
+    vi.mocked(loadConfig).mockReturnValue({ framework: 'react' } as any);
+    const mockClient = { getComponents: vi.fn().mockResolvedValue([{ name: 'foo', description: 'bar', framework: 'react' }]) };
+    vi.mocked(RegistryClient).mockImplementation(function() { return mockClient as any; });
+
+    await program.parseAsync(['node', 'test', 'components', 'nonexistent']);
+
+    expect(console.log).toHaveBeenCalledWith(expect.stringContaining('No components found matching "nonexistent"'));
+  });
+
 });
