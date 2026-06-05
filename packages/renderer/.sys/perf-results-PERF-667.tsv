@@ -1,0 +1,6 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	2.248	150	66.72	0.0	discard	avoid map allocation in capture loop
+2	2.106	150	71.22	0.0	discard	avoid map allocation in capture loop
+3	1.988	150	75.45	0.0	discard	avoid map allocation in capture loop
+4	1.986	150	75.52	0.0	discard	avoid map allocation in capture loop
+5	1.968	150	76.21	0.0	discard	avoid map allocation in capture loop
