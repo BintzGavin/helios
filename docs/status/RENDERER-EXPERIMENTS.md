@@ -876,3 +876,8 @@ Last updated by: PERF-592
   - **What I did**: Bypassed the Actor Model ring buffer and synchronous writer loop when `concurrency = 1` by running a sequential, single loop for capturing and writing frames.
   - **Impact**: Improved stability and marginal reduction in V8 context switching for sequential DOM renders. The median render time averaged ~2.18s (with best run of 2.05s, which is slightly better than the previous baseline of ~2.127s).
   - **Plan ID**: PERF-683
+
+- **PERF-680 (Retry)**: Inline `writerWaiterExecutor` in `CaptureLoop`
+  - **What I tried**: Attempted again to remove the pre-bound `writerWaiterExecutor` function and inline the promise executor in the writer wait loop inside `CaptureLoop.ts`.
+  - **WHY it didn't work**: Regressed performance (2.534s vs baseline 2.127s). Once again confirmed that adding scope allocation overhead for an anonymous closure on every iteration of the hot loop is slower than letting V8 reference the pre-bound closure.
+  - **Plan ID**: PERF-680

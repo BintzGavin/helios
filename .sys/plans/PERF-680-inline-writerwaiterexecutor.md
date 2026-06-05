@@ -1,11 +1,11 @@
 ---
 id: PERF-680
 slug: inline-writerwaiterexecutor
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-06-05
 completed: ""
-result: ""
+result: "discarded"
 ---
 
 # PERF-680: Inline writerWaiterExecutor in CaptureLoop
@@ -76,3 +76,9 @@ Run the DOM benchmark and manually ensure the output video is still generated co
 - PERF-662: Inlined `virtualTimePromiseExecutor` in `CdpTimeDriver.ts` to avoid pre-bound method overhead, improving performance.
 - PERF-658: Confirmed inline anonymous closures for `updateCurrentTime` were better than pre-bound handlers.
 - PERF-632: Attempted custom deferred objects for workers which failed; native simple promises are best.
+
+## Results Summary
+- **Best render time**: 2.534s (vs baseline ~2.127s)
+- **Improvement**: Regressed
+- **Kept experiments**: None
+- **Discarded experiments**: Inline writerWaiterExecutor in CaptureLoop
