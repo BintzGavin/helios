@@ -57,7 +57,6 @@ PERF-408	49.135	600	12.21	43.1	keep	Cache Media Elements in CdpTimeDriver to avo
 5	1.580	150	94.94	40.4	discard	optimize-ffmpeg-threads (PERF-481)
 6	1.515	150	99.01	40.4	keep	PERF-482: Eliminate closure in evaluate stability by using integer state machine
 1	1.286	150	116.67	44.5	discard	PERF-483: BrowserPool goto commit
-1	4.169	300	71.97	40.3	keep	PERF-493 stack-free-workers
 1	18.267	600	32.85	38.1	keep	PERF-496 eliminate dead frame waiter
 1	17.687	600	33.92	43.9	keep	Restore FFmpeg backpressure
 63	18.077	600	33.19	37.3	discard	optimize orchestrator state checks
@@ -170,3 +169,4 @@ PERF-652	2.286	150	65.61	62.7	discard	flatten capture await
 265	2.468	150	60.77	62.9	discard	quality 80
 6	2.722	300	55.10	62.8	discard	bypass redundant budget property allocation
 1	2.828	150	53.05	62.8	discard	eliminate internal promise chain in CdpTimeDriver
+170	26.324	600	22.79	67.1	discard	inline writerWaiterExecutor (PERF-680)
