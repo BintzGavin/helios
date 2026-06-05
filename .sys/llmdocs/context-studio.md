@@ -1,60 +1,185 @@
-# Studio Context
+# STUDIO DOMAIN CONTEXT
 
-## A. Architecture
+## Section A: Architecture
+Studio is a framework-agnostic development environment for video composition.
+- **CLI**: Entry point via `npx helios studio` starting the dev server and CLI tools.
+- **Server**: Dev server built using Vite plugins to serve, discover, and build compositions.
+- **UI Structure**: Uses a React-based interface with key panels like Timeline, Stage, AssetsPanel, and PropsEditor.
 
-Helios Studio is a web-based IDE for creating and previewing video compositions. It integrates with `@helios-project/core` for state management and `@helios-project/player` for preview rendering.
+## Section B: File Tree
+```text
+packages/studio/src
+├── App.tsx
+├── components
+│   ├── AssetsPanel
+│   │   ├── AssetItem.css
+│   │   ├── AssetItem.test.tsx
+│   │   ├── AssetItem.tsx
+│   │   ├── AssetsPanel.css
+│   │   ├── AssetsPanel.test.tsx
+│   │   ├── AssetsPanel.tsx
+│   │   ├── FolderItem.css
+│   │   └── FolderItem.tsx
+│   ├── AssistantModal
+│   │   ├── AssistantModal.css
+│   │   ├── AssistantModal.test.tsx
+│   │   ├── AssistantModal.tsx
+│   │   └── index.ts
+│   ├── AudioMixerPanel
+│   │   ├── AudioMeter.tsx
+│   │   ├── AudioMixerPanel.css
+│   │   ├── AudioMixerPanel.test.tsx
+│   │   └── AudioMixerPanel.tsx
+│   ├── CaptionsPanel
+│   │   ├── CaptionsPanel.css
+│   │   ├── CaptionsPanel.test.tsx
+│   │   └── CaptionsPanel.tsx
+│   ├── ComponentsPanel
+│   │   ├── ComponentsPanel.css
+│   │   ├── ComponentsPanel.test.tsx
+│   │   └── ComponentsPanel.tsx
+│   ├── CompositionSettingsModal.css
+│   ├── CompositionSettingsModal.tsx
+│   ├── CompositionsPanel
+│   │   ├── CompositionItem.test.tsx
+│   │   ├── CompositionItem.tsx
+│   │   ├── CompositionTree.css
+│   │   ├── CompositionTree.tsx
+│   │   ├── CompositionsPanel.css
+│   │   ├── CompositionsPanel.test.tsx
+│   │   └── CompositionsPanel.tsx
+│   ├── ConfirmationModal
+│   │   ├── ConfirmationModal.css
+│   │   └── ConfirmationModal.tsx
+│   ├── Controls
+│   │   ├── PlaybackControls.test.tsx
+│   │   ├── PlaybackControls.tsx
+│   │   ├── TimecodeDisplay.css
+│   │   ├── TimecodeDisplay.test.tsx
+│   │   ├── TimecodeDisplay.tsx
+│   │   ├── TimecodeInput.css
+│   │   ├── TimecodeInput.test.tsx
+│   │   └── TimecodeInput.tsx
+│   ├── CreateCompositionModal.css
+│   ├── CreateCompositionModal.tsx
+│   ├── DiagnosticsModal.css
+│   ├── DiagnosticsModal.test.tsx
+│   ├── DiagnosticsModal.tsx
+│   ├── DuplicateCompositionModal.css
+│   ├── DuplicateCompositionModal.tsx
+│   ├── GlobalShortcuts.test.tsx
+│   ├── GlobalShortcuts.tsx
+│   ├── KeyboardShortcutsModal.css
+│   ├── KeyboardShortcutsModal.test.tsx
+│   ├── KeyboardShortcutsModal.tsx
+│   ├── Layout
+│   │   ├── Panel.tsx
+│   │   ├── Resizer.css
+│   │   ├── Resizer.tsx
+│   │   ├── StudioLayout.css
+│   │   └── StudioLayout.tsx
+│   ├── Omnibar.css
+│   ├── Omnibar.test.tsx
+│   ├── Omnibar.tsx
+│   ├── PropsEditor.css
+│   ├── PropsEditor.test.tsx
+│   ├── PropsEditor.tsx
+│   ├── RenderPreviewModal.css
+│   ├── RenderPreviewModal.tsx
+│   ├── RendersPanel
+│   │   ├── RenderConfig.test.tsx
+│   │   ├── RenderConfig.tsx
+│   │   ├── RendersPanel.css
+│   │   ├── RendersPanel.test.tsx
+│   │   └── RendersPanel.tsx
+│   ├── SchemaInputs.test.tsx
+│   ├── SchemaInputs.tsx
+│   ├── Sidebar
+│   │   ├── Sidebar.css
+│   │   └── Sidebar.tsx
+│   ├── Stage
+│   │   ├── EmptyState.css
+│   │   ├── EmptyState.tsx
+│   │   ├── Stage.css
+│   │   ├── Stage.test.tsx
+│   │   ├── Stage.tsx
+│   │   └── StageToolbar.tsx
+│   ├── Timeline.css
+│   ├── Timeline.test.tsx
+│   ├── Timeline.tsx
+│   ├── TimelineAudioTrack.test.tsx
+│   ├── TimelineAudioTrack.tsx
+│   └── Toast
+│       ├── Toast.css
+│       ├── Toast.test.tsx
+│       ├── Toast.tsx
+│       ├── ToastContainer.test.tsx
+│       └── ToastContainer.tsx
+├── context
+│   ├── StudioContext.test.tsx
+│   ├── StudioContext.tsx
+│   ├── ToastContext.test.tsx
+│   └── ToastContext.tsx
+├── data
+│   └── ai-context.ts
+├── hooks
+│   ├── useAudioWaveform.test.ts
+│   ├── useAudioWaveform.ts
+│   ├── useKeyboardShortcut.ts
+│   └── usePersistentState.ts
+├── main.tsx
+├── server
+│   ├── discovery.test.ts
+│   ├── discovery.ts
+│   ├── documentation.test.ts
+│   ├── documentation.ts
+│   ├── mcp.test.ts
+│   ├── mcp.ts
+│   ├── plugin.ts
+│   ├── render-manager.test.ts
+│   ├── render-manager.ts
+│   ├── templates
+│   │   ├── index.test.ts
+│   │   ├── index.ts
+│   │   ├── react.test.ts
+│   │   ├── react.ts
+│   │   ├── solid.test.ts
+│   │   ├── solid.ts
+│   │   ├── svelte.test.ts
+│   │   ├── svelte.ts
+│   │   ├── threejs.test.ts
+│   │   ├── threejs.ts
+│   │   ├── types.ts
+│   │   ├── vanilla.test.ts
+│   │   ├── vanilla.ts
+│   │   ├── vue.test.ts
+│   │   └── vue.ts
+│   └── types.ts
+├── setupTests.ts
+├── types.ts
+├── utils
+│   ├── srt.test.ts
+│   ├── srt.ts
+│   ├── tree.test.ts
+│   └── tree.ts
+└── vite-env.d.ts
 
-- **Vite Plugin API (`vite-plugin-studio-api.ts`)**: Serves as the backend for the Studio UI, handling local file system operations, composition discovery, and asset management.
-- **Studio UI (`src/components/`)**: A React-based interface built to orchestrate the player and edit the active composition state.
-- **Context Management (`StudioContext.tsx`)**: Bridges the Vite backend APIs, the Helios Player instance, and UI state.
-
-## B. File Tree
+21 directories, 134 files
 
 ```
-packages/studio/
-├── bin/                 # CLI entry points
-├── docs/                # Domain documentation
-├── src/
-│   ├── components/      # React UI Components
-│   │   ├── AssetsPanel/
-│   │   ├── CompositionsPanel/
-│   │   ├── Controls/
-│   │   ├── Stage/
-│   │   ├── Timeline/
-│   │   └── ...
-│   ├── context/         # React Context Providers
-│   ├── hooks/           # Custom React Hooks
-│   ├── server/          # Backend APIs (Render Manager, Discovery)
-│   ├── utils/           # Shared utilities
-│   └── App.tsx          # Main Application Entry
-├── vite.config.ts       # Studio UI build config
-└── vite-plugin-studio-api.ts # Backend API middleware
-```
 
-## C. CLI Interface
+## Section C: CLI Interface
+- `npx helios studio`: Starts the Studio development server and opens the UI.
+- `npx helios studio --port <port>`: Starts the server on a specific port.
 
-The Studio package provides a CLI command to launch the environment.
+## Section D: UI Components
+- **Timeline**: Manages composition timeline, playback scrubbing, and range markers.
+- **PropsEditor**: Schema-aware property editor for components (e.g. Range, Enum, Color, Arrays).
+- **AssetsPanel**: Manages project assets including video, audio, images, fonts, 3D models, and JSON data.
+- **Stage**: Renders the `<helios-player>` with pan, zoom, and snapshot controls.
+- **RendersPanel**: Manages render jobs via the Renderer integration.
 
-`npx helios studio [options]`
-
-Options:
-- `-p, --port <number>`: Port to run the studio server on (default: 3000)
-- `--host`: Expose server to network
-
-The CLI command automatically resolves `HELIOS_PROJECT_ROOT` to the directory where the command was run, allowing it to discover user compositions and assets.
-
-## D. UI Components
-
-- **Stage**: Main preview area containing the `<helios-player>` and visual safe-area guides.
-- **Timeline**: Visual representation of the composition's duration, active clips, and audio tracks. Supports drag-and-drop from the Assets panel.
-- **Props Editor**: Dynamic property editor generated from the active composition's schema, including specialized inputs for ranges, colors, and assets.
-- **Assets Panel**: File explorer for managing media assets, 3D models, fonts, and shaders with drag-and-drop upload and moving capabilities.
-- **Compositions Panel**: Explorer for switching between discovered compositions and creating new ones.
-- **Renders Panel**: Interface for configuring and launching rendering jobs via the `@helios-project/renderer` package.
-- **Diagnostics Panel**: System diagnostics panel showing both Client (Preview) and Server (Renderer) capabilities.
-
-## E. Integration
-
-- **Core**: Uses `Helios` classes for logic, and relies on `controller.setCaptions` or `inputProps` injection to manage state dynamically.
-- **Player**: The Studio Stage renders the `<helios-player>` web component directly, controlling it via the DOM API for playback (play, pause, seek).
-- **Renderer**: The Studio's backend Vite plugin communicates with the renderer package to execute jobs locally when requested via the UI, saving outputs to the user's project folder.
+## Section E: Integration
+- **Core**: Consumes `Helios` for schema, state management, and caption sync.
+- **Player**: Utilizes `<helios-player>` for live previews.
+- **Renderer**: Communicates with `/api/render` endpoint for dispatching and canceling real render jobs.
