@@ -172,3 +172,8 @@ PERF-652	2.286	150	65.61	62.7	discard	flatten capture await
 1	2.828	150	53.05	62.8	discard	eliminate internal promise chain in CdpTimeDriver
 1	2.375	150	63.16	63.5	discard	Inline writerWaiterExecutor in CaptureLoop
 run	27.619	600	21.72	66.9	discard	PERF-681 eliminate async await domstrategy capture
+1	2.503	150	59.92	62.7	discard	PERF-682 Transfer Ring Buffer Cleanup to Writer
+2	2.474	150	60.64	63.0	discard	PERF-682 Transfer Ring Buffer Cleanup to Writer
+3	2.431	150	61.71	62.8	discard	PERF-682 Transfer Ring Buffer Cleanup to Writer
+4	2.373	150	63.21	63.4	discard	PERF-682 Transfer Ring Buffer Cleanup to Writer
+5	2.382	150	62.97	62.6	discard	PERF-682 Transfer Ring Buffer Cleanup to Writer
