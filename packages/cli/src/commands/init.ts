@@ -140,7 +140,7 @@ export function registerInitCommand(program: Command) {
                  { title: 'Vanilla', value: 'vanilla' },
                ]
              });
-             if (!response.framework) process.exit(0);
+             if (!response || !response.framework) return process.exit(0);
              selectedFramework = response.framework as Framework;
           }
 
@@ -225,7 +225,7 @@ export function registerInitCommand(program: Command) {
                 }
              ]);
 
-             if (!response.framework) process.exit(0);
+             if (!response || !response.framework) return process.exit(0);
 
              config.framework = response.framework;
              config.directories.components = response.components;

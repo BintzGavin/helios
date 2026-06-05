@@ -101,4 +101,16 @@ describe('render command', () => {
       expect(job.chunks[0].command).toContain('http://cdn.example.com/comp.html');
     }
   });
+
+  it('should emit job payload chunks containing base URL when --emit-job and --base-url are provided', async () => {
+    // The commandInput will contain baseUrl instead of baseUrl property directly
+    await program.parseAsync(['node', 'test', 'render', 'comp.html', '-o', 'output.mp4', '--emit-job', 'job.json', '--base-url', 'http://my-remote-site.com']);
+
+    // So the command string inside the job JSON should have "http://my-remote-site.com/comp.html"
+    expect(fs.writeFileSync).toHaveBeenCalledWith(
+      expect.stringContaining('job.json'),
+      expect.stringContaining('http://my-remote-site.com/comp.html')
+    );
+  });
+
 });

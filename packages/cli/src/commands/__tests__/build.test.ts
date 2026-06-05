@@ -107,4 +107,11 @@ describe('build command', () => {
 
     expect(fs.renameSync).toHaveBeenCalled();
   });
+
+  it('should rename dist/.helios-build-entry.html to dist/index.html if it exists', async () => {
+    vi.mocked(fs.existsSync).mockReturnValue(true);
+    await program.parseAsync(['node', 'test', 'build', 'src/comp.tsx']);
+    expect(fs.renameSync).toHaveBeenCalledWith(expect.stringContaining('.helios-build-entry.html'), expect.stringContaining('index.html'));
+  });
+
 });

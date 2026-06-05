@@ -1,4 +1,4 @@
-**Version**: 0.46.41
+**Version**: 0.46.42
 
 [v0.46.41] ✅ Completed: CLI Docker Adapter Regression Tests - Logged the duplicated plan as impossible since docker-adapter template tests are already fully implemented.
 [v0.46.40] 🟢 Completed: CLI Command Coverage Tests Spec V3 - Created specification plan 2027-06-05-CLI-Command-Coverage-Tests-V3.md for improving CLI command regression tests.
@@ -164,3 +164,5 @@ The Helios CLI is the primary user interface for component registry, project sca
 [v0.46.39] 🟢 Completed: CLI Command Coverage Tests Spec V4 - Created specification plan `2027-06-05-CLI-Command-Coverage-Tests-V4.md` for covering missing branches in commands.
 [v0.46.39] ✅ Completed: CLI Command Coverage Tests V4 - Implemented missing test cases for init, build, job, render, and studio commands, improving test coverage metrics and resolving missing branch execution logic.
 [v0.46.41] 🟢 Completed: CLI Command Coverage Tests Spec V5 - Created specification plan `2027-06-05-CLI-Command-Coverage-Tests-V5.md` for covering missing command edges.
+
+[v0.46.42] ✅ Completed: CLI Command Coverage Tests V5 - Implemented edge-case test coverage for commands and fixed prompt cancellation exit bug in init.ts.
