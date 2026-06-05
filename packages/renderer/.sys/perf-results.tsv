@@ -171,3 +171,4 @@ PERF-652	2.286	150	65.61	62.7	discard	flatten capture await
 6	2.722	300	55.10	62.8	discard	bypass redundant budget property allocation
 1	2.828	150	53.05	62.8	discard	eliminate internal promise chain in CdpTimeDriver
 1	2.375	150	63.16	63.5	discard	Inline writerWaiterExecutor in CaptureLoop
+run	27.619	600	21.72	66.9	discard	PERF-681 eliminate async await domstrategy capture

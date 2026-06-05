@@ -1,11 +1,11 @@
 ---
 id: PERF-681
 slug: eliminate-async-await-domstrategy-capture
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-11-20
 completed: ""
-result: ""
+result: "discard"
 ---
 
 # PERF-681: Eliminate Async/Await Overhead in DomStrategy.capture()
@@ -78,3 +78,7 @@ Run the renderer benchmark script `npx tsx packages/renderer/tests/fixtures/benc
 ## Prior Art
 - PERF-132 (Inconclusive prior attempt to manually return promises)
 - PERF-172 (Eliminate Closure Allocation via pre-bound handlers)
+
+
+## Result
+Discarded. The performance regression was substantial (~27.6s vs ~2.4s). Removing the async/await generator forced V8 to construct full closure continuation states, performing worse than standard await suspension in this loop.

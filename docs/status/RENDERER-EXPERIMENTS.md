@@ -115,6 +115,8 @@ Last updated by: PERF-678
   - **Outcome**: discard
 
 ## What Doesn't Work (and Why)
+- Tried returning CDP Promise directly with pre-bound handlers in DomStrategy.capture() (PERF-681)
+  - **Result:** Median render time regressed dramatically to ~27.6s. The V8 engine prefers highly optimized microtask scheduling around `async/await` over native direct promise continuation within hot execution contexts like the main loop.
 - **PERF-676**: Bypass Property Allocation for Virtual Time Policy Budget
   - **What I tried**: Modified `runSetTime` in `CdpTimeDriver.ts` to only update `this.setVirtualTimePolicyParams.budget` if the new `budget` value was different from the current one, bypassing redundant object property assignments.
   - **WHY it didn't work**: The median render time regressed to ~2.722s, compared to the baseline median of ~2.726s. V8 is already highly optimized for repeated property assignments of the same structure (via inline caching). Adding the conditional check (`if (this.setVirtualTimePolicyParams.budget !== budget)`) introduced branching overhead that slightly negated any gains from bypassing the assignment.
