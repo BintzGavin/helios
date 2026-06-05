@@ -854,3 +854,8 @@ Last updated by: PERF-592
   - **What I tried**: Attempted to eagerly advance `this.currentTime` and directly return the base promise in `runSetTime` within `CdpTimeDriver.ts` to eliminate the `.then()` chain and microtask closure allocation overhead.
   - **WHY it didn't work**: The median render time regressed to ~2.828s compared to the baseline of ~2.447s. While avoiding an extra promise and closure allocation logically seems faster, V8 is highly optimized for short, chained `.then()` microtasks inside async sequences. Eagerly modifying state or removing the `.then()` chain disrupted the JIT compiler's optimized path for this hot loop, leading to a net negative performance impact.
   - **Plan ID**: PERF-677
+
+- **PERF-667**: Avoid `Array.map` Allocation in CaptureLoop
+  - **What I tried**: Attempted to avoid the allocation and iterator overhead of `Array.map` when creating `workerPromises` in `CaptureLoop.ts` by using a pre-allocated array and a standard `for` loop.
+  - **WHY it didn't work**: The median render time did not improve and remained around ~1.988s, which is not measurably better than the baseline. In fact, standard `.map` calls are highly optimized by V8's JIT compiler. The perceived overhead of a small map allocation in the startup sequence is trivial and easily absorbed by the baseline variance.
+  - **Plan ID**: PERF-667

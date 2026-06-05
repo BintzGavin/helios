@@ -1,11 +1,11 @@
 ---
 id: PERF-667
 slug: avoid-map-allocation-captureloop
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "jules"
 created: 2024-06-04
-completed: ""
-result: ""
+completed: "2024-06-05"
+result: "discarded"
 ---
 # PERF-667: Avoid Array.map Allocation in CaptureLoop
 
@@ -52,3 +52,14 @@ Verify output video opens and contains 150 frames.
 
 ## Prior Art
 Optimizations like PERF-650 have shown that reducing array operations and variables in `CaptureLoop.ts` can yield minor improvements.
+
+## Results Summary
+
+```
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	2.248	150	66.72	0.0	discard	avoid map allocation in capture loop
+2	2.106	150	71.22	0.0	discard	avoid map allocation in capture loop
+3	1.988	150	75.45	0.0	discard	avoid map allocation in capture loop
+4	1.986	150	75.52	0.0	discard	avoid map allocation in capture loop
+5	1.968	150	76.21	0.0	discard	avoid map allocation in capture loop
+```
