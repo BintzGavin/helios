@@ -1,11 +1,11 @@
 ---
 id: PERF-678
 slug: increase-pipeline-depth
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "Jules"
 created: 2024-06-05
-completed: ""
-result: ""
+completed: "2024-06-05"
+result: "kept"
 ---
 
 # PERF-678: Increase Actor Model Pipeline Depth in CaptureLoop
@@ -61,3 +61,13 @@ Verify output video opens, plays correctly, and contains the expected number of 
 
 ## Prior Art
 Previous experiments (PERF-666, PERF-672) have targeted allocation overhead in `CaptureLoop.ts`. This targets execution flow and async context switching overhead.
+
+## Results Summary
+
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	2.290	150	65.50	62.7	keep	PERF-678: Increase pipeline depth to 64
+2	2.753	150	54.49	62.8	keep	PERF-678: Increase pipeline depth to 64
+3	2.586	150	58.00	62.7	keep	PERF-678: Increase pipeline depth to 64
+4	2.127	150	70.53	63.6	keep	PERF-678: Increase pipeline depth to 64
+5	2.402	150	62.46	63.6	keep	PERF-678: Increase pipeline depth to 64
+6	2.400	150	62.51	63.6	keep	PERF-678: Increase pipeline depth to 64
