@@ -1,11 +1,11 @@
 ---
 id: PERF-680
 slug: eliminate-pre-bound-executor
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2025-05-26
 completed: ""
-result: ""
+result: failed
 ---
 
 # PERF-680: Eliminate Pre-Bound Writer Waiter Executor
@@ -63,3 +63,9 @@ Run a basic Canvas smoke test to ensure the fallback pipeline is not broken.
 
 ## Correctness Check
 Verify that the output DOM video is fully rendered and identical in length and content.
+
+## Results Summary
+- **Best render time**: 2.375s (vs baseline ~2.127s)
+- **Improvement**: Regressed
+- **Kept experiments**: None
+- **Discarded experiments**: Inline writerWaiterExecutor in CaptureLoop
