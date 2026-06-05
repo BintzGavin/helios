@@ -169,3 +169,4 @@ PERF-652	2.286	150	65.61	62.7	discard	flatten capture await
 264	2.502	150	59.94	62.8	discard	quality 80
 265	2.468	150	60.77	62.9	discard	quality 80
 6	2.722	300	55.10	62.8	discard	bypass redundant budget property allocation
+1	2.828	150	53.05	62.8	discard	eliminate internal promise chain in CdpTimeDriver

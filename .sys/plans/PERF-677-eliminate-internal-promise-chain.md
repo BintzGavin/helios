@@ -1,11 +1,11 @@
 ---
 id: PERF-677
 slug: eliminate-internal-promise-chain
-status: unclaimed
-claimed_by: ""
+status: claimed
+claimed_by: "executor-session"
 created: 2024-06-05
-completed: ""
-result: ""
+completed: "2024-06-05"
+result: "failed"
 ---
 
 # PERF-677: Eliminate Internal Promise Chain in CdpTimeDriver
@@ -73,3 +73,9 @@ Run the DOM render benchmark `cd packages/renderer && npx tsx scripts/benchmark-
 ## Prior Art
 - **PERF-662**: Inlined `virtualTimePromiseExecutor` to avoid pre-bound method closures, which yielded a performance improvement. This builds upon that by eliminating the `.then()` closure as well.
 - **PERF-652**: Tried removing `.then()` inside `CaptureLoop.ts` in favor of sequential awaits, but failed because V8 optimizes the specific ternary promise pattern well. This optimization specifically targets the hidden, redundant `.then()` inside `CdpTimeDriver.ts`.
+
+## Results Summary
+- **Best render time**: ~2.828s (vs baseline ~2.447s)
+- **Improvement**: Regressed
+- **Kept experiments**: none
+- **Discarded experiments**: Step 1: Eagerly advance current time to eliminate promise chain
