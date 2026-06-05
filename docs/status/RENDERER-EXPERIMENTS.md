@@ -845,3 +845,7 @@ Last updated by: PERF-592
   - **What I tried**: Lowered `intermediateImageQuality` in `DomStrategy.ts` from 90 to 80 to reduce the CDP payload size and IPC processing overhead.
   - **WHY it didn't work**: The median render time did not improve noticeably (~2.54s for quality 80 vs ~2.53s baseline). The potential savings in Node.js Base64 decoding and IPC transfer were either negligible or offset by differences in Chromium's internal image encoding times, meaning that 90 quality performs effectively the same as 80 in this environment.
   - **Plan ID**: PERF-675
+- **PERF-677**: Eliminate Internal Promise Chain in CdpTimeDriver
+  - **What I tried**: Attempted to eagerly advance `this.currentTime` and directly return the base promise in `runSetTime` within `CdpTimeDriver.ts` to eliminate the `.then()` chain and microtask closure allocation overhead.
+  - **WHY it didn't work**: The median render time regressed to ~2.828s compared to the baseline of ~2.447s. While avoiding an extra promise and closure allocation logically seems faster, V8 is highly optimized for short, chained `.then()` microtasks inside async sequences. Eagerly modifying state or removing the `.then()` chain disrupted the JIT compiler's optimized path for this hot loop, leading to a net negative performance impact.
+  - **Plan ID**: PERF-677
