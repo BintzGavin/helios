@@ -1,11 +1,11 @@
 ---
 id: PERF-684
 slug: await-capture-separately
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-06-05
-completed: ""
-result: ""
+completed: "2024-06-05"
+result: "discard (median 2.487s)"
 ---
 
 # PERF-684: Separate setTime Await from Strategy Capture

@@ -115,6 +115,10 @@ Last updated by: PERF-678
   - **Outcome**: discard
 
 ## What Doesn't Work (and Why)
+- **PERF-684**: Separate setTime Await from Strategy Capture
+  - **What I tried**: Replaced chained `.then()` with sequential `await` in CaptureLoop.ts.
+  - **WHY**: Removing the chained closure allocations actually caused a regression or negligible improvement (median 2.487s vs baseline 2.127s), as V8 optimizes inline `.then()` very well for short microtasks.
+  - **Plan ID**: PERF-684
 - Tried returning CDP Promise directly with pre-bound handlers in DomStrategy.capture() (PERF-681)
   - **Result:** Median render time regressed dramatically to ~27.6s. The V8 engine prefers highly optimized microtask scheduling around `async/await` over native direct promise continuation within hot execution contexts like the main loop.
 - **PERF-676**: Bypass Property Allocation for Virtual Time Policy Budget
