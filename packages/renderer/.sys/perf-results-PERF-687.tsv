@@ -1,0 +1,4 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	2.976	150	50.40	64.5	discard	PERF-687 Use Promise.withResolvers
+2	2.901	150	51.71	63.7	discard	PERF-687 Use Promise.withResolvers
+3	3.296	150	45.51	63.8	discard	PERF-687 Use Promise.withResolvers
