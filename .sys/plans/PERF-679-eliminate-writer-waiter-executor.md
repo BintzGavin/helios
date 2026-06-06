@@ -1,11 +1,11 @@
 ---
 id: PERF-679
 slug: eliminate-writer-waiter-executor
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "jules"
 created: 2024-06-05
-completed: ""
-result: ""
+completed: "2024-06-06"
+result: "discard"
 ---
 
 # PERF-679: Eliminate Writer Waiter Executor Closure in CaptureLoop
@@ -77,3 +77,7 @@ Run a canvas test to ensure no breaking changes in CaptureLoop structure.
 
 ## Correctness Check
 Run the DOM render benchmark `cd packages/renderer && npx tsx scripts/benchmark-perf.ts` and verify output integrity.
+
+## Results Summary
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	2.453	150	61.15	500.0	discard	inline writer waiter executor
