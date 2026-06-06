@@ -1,11 +1,11 @@
 ---
 id: PERF-678
 slug: eliminate-run-worker-promise-allocation
-status: unclaimed
-claimed_by: ""
+status: complete
+result: discard
+claimed_by: "executor-session"
 created: 2025-06-05
-completed: ""
-result: ""
+completed: 2026-06-06
 ---
 # PERF-678: Eliminate `workerPromises` Array Mapping in `CaptureLoop`
 
@@ -58,3 +58,9 @@ Run `npm run test` or check the output video of the DOM benchmark.
 
 ## Prior Art
 - PERF-667 (in journal open questions): "Would avoiding `Array.map` array allocation overhead for `workerPromises` in `CaptureLoop.ts` improve startup latency?"
+
+## Results Summary
+- **Best render time**: 2.662s
+- **Improvement**: 0%
+- **Kept experiments**: none
+- **Discarded experiments**: [PERF-678]
