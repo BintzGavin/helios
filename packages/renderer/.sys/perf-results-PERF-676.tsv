@@ -1,9 +1,5 @@
 run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
-1	2.825	150	53.09	62.8	keep	baseline
-2	2.762	150	54.30	62.7	keep	baseline
-3	3.756	150	39.94	62.7	keep	baseline
-4	2.726	150	55.02	62.7	keep	baseline
-5	2.760	150	54.35	63.0	discard	PERF-676: bypass virtual time budget assignment
-6	2.746	150	54.63	63.0	discard	PERF-676: bypass virtual time budget assignment
-7	2.624	150	57.17	63.0	discard	PERF-676: bypass virtual time budget assignment
-8	2.495	150	60.12	62.7	discard	PERF-676: bypass virtual time budget assignment
+1	2.744	150	54.67	63.6	keep	PERF-676 conditionally update budget
+2	2.466	150	60.83	63.7	keep	PERF-676 conditionally update budget
+3	2.475	150	60.60	63.7	keep	PERF-676 conditionally update budget
+4	2.432	150	61.66	63.8	keep	PERF-676 conditionally update budget
