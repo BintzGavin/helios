@@ -718,3 +718,6 @@ Each agent should update **their own dedicated progress file** instead of this f
 
 ### PLAYER v0.77.50
 - ✅ Completed: Discovered that `v0.77.49-PLAYER-Document-Missing-Event-Handlers.md` is an IMPOSSIBLE: DUPLICATION plan. The event handlers (`onplaying`, `onsuspend`, `onstalled`, `onwaiting`) are already fully documented in the README. Documented as impossible and discarded.
+
+### CLI v0.46.42
+- ✅ IMPOSSIBLE: DUPLICATION - CLI Docker Adapter Templates Regression Tests Spec - Tests are already fully implemented.
