@@ -115,6 +115,10 @@ Last updated by: PERF-693
   - **Outcome**: discard
 
 ## What Doesn't Work (and Why)
+- **PERF-676**: Conditionally Update Virtual Time Budget
+  - **What I tried**: Attempted to conditionally assign `this.setVirtualTimePolicyParams.budget = budget` in `CdpTimeDriver.ts` only if the budget value changed from the previous frame.
+  - **WHY it didn't work**: The median render time regressed to ~2.46s (baseline best ~2.347s). Adding the conditional check and branch logic overhead outweighs the cost of blindly writing the budget property in the V8 hot loop, as V8 is highly optimized for consecutive property writes to the same object shape via inline caching.
+  - **Plan ID**: PERF-676
 - **PERF-687**: Use Promise.withResolvers in CdpTimeDriver
   - **What I tried**: Attempted to use `Promise.withResolvers<void>()` instead of allocating a new Promise and an anonymous executor closure `new Promise<void>((resolve, reject) => { ... })` on every frame in `CdpTimeDriver.ts`.
   - **WHY it didn't work**: The median render time was ~2.976s compared to the baseline median of ~3.054s. The results are within the noise margin (baseline fluctuated from 2.969s to 3.489s). While `Promise.withResolvers()` is a cleaner abstraction to avoid creating the closure block, it did not significantly alter the JIT execution profile or reduce garbage collection overhead in a way that measurably decreased total execution time, likely because V8 heavily optimizes inline closure construction for promises.
