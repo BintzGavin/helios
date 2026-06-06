@@ -899,3 +899,7 @@ Last updated by: PERF-592
   - **What I tried**: Removed the pre-bound writerWaiterExecutor function and inlined the promise executor in the writer wait loop inside CaptureLoop.ts.
   - **WHY it didn't work**: The median render time regressed compared to the baseline. V8's optimization of the await loop sequence likely prefers the statically allocated promise executor reference, as allocating a new closure inline every iteration incurred greater allocation overhead than context-switching to the pre-bound closure.
   - **Plan ID**: PERF-679
+- **PERF-686**: Prebind stdin closures and eliminate `this` references
+  - **What I tried**: Stored `this.handleWriteError` and `this.drainPromiseExecutor` in local variables in `CaptureLoop.ts` to bypass property resolution in the hot loop.
+  - **WHY it didn't work**: The median render time regressed slightly to ~2.173s (baseline best ~2.127s). V8 is already incredibly optimized for `this` property access due to hidden classes (inline caching). By breaking `this.handleWriteError` and passing it as a local variable, we may have modified how V8 executes the context of those callbacks, or added unnecessary local variables causing slight overhead. The JIT optimizations prefer standard method context passing.
+  - **Plan ID**: PERF-686
