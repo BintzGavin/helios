@@ -115,6 +115,11 @@ Last updated by: PERF-678
   - **Outcome**: discard
 
 ## What Doesn't Work (and Why)
+- **PERF-678 (Retry)**: Eliminate workerPromises Array.map
+  - **What I tried**: Attempted to use a pre-allocated array and for loop instead of Array.map in CaptureLoop.ts.
+  - **WHY it didn't work**: The median render time was 2.662s vs baseline 2.758s, no significant improvement. V8 optimally handles array mapping for small arrays, and this allocation happens once before the hot loop.
+  - **Plan ID**: PERF-678
+
 - **PERF-684**: Separate setTime Await from Strategy Capture
   - **What I tried**: Replaced chained `.then()` with sequential `await` in CaptureLoop.ts.
   - **WHY**: Removing the chained closure allocations actually caused a regression or negligible improvement (median 2.487s vs baseline 2.127s), as V8 optimizes inline `.then()` very well for short microtasks.

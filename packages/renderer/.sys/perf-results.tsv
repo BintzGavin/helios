@@ -183,3 +183,4 @@ run	2.534	150	34.65	63.8	discard	PERF-680 Inline writerWaiterExecutor
 181	2.487	150	60.31	63.6	discard	Separate setTime Await from Strategy Capture
 run	2.293	150	60.0	60.0	discard	PERF-685: prebind capture closure
 2004	2.453	150	61.15	500.0	discard	inline writer waiter executor
+run	2.662	150	56.35	63.8	discard	PERF-678 Eliminate Array.map in workerPromises
