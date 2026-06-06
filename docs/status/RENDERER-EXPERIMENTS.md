@@ -889,3 +889,8 @@ Last updated by: PERF-592
   - **What I tried**: Prebound the capture closure before the hot loop to avoid per-frame scope allocation and garbage collection overhead.
   - **WHY it didn't work**: The median render time did not improve significantly (2.293s vs baseline 2.18s). V8 is likely optimizing the anonymous inline closure construction optimally during the JIT pass without the need to maintain an external reference wrapper that modifies a captured variable.
   - **Plan ID**: PERF-685
+
+- **PERF-679**: Eliminate Writer Waiter Executor Closure
+  - **What I tried**: Removed the pre-bound writerWaiterExecutor function and inlined the promise executor in the writer wait loop inside CaptureLoop.ts.
+  - **WHY it didn't work**: The median render time regressed compared to the baseline. V8's optimization of the await loop sequence likely prefers the statically allocated promise executor reference, as allocating a new closure inline every iteration incurred greater allocation overhead than context-switching to the pre-bound closure.
+  - **Plan ID**: PERF-679
