@@ -115,6 +115,11 @@ Last updated by: PERF-678
   - **Outcome**: discard
 
 ## What Doesn't Work (and Why)
+- **PERF-687**: Use Promise.withResolvers in CdpTimeDriver
+  - **What I tried**: Attempted to use `Promise.withResolvers<void>()` instead of allocating a new Promise and an anonymous executor closure `new Promise<void>((resolve, reject) => { ... })` on every frame in `CdpTimeDriver.ts`.
+  - **WHY it didn't work**: The median render time was ~2.976s compared to the baseline median of ~3.054s. The results are within the noise margin (baseline fluctuated from 2.969s to 3.489s). While `Promise.withResolvers()` is a cleaner abstraction to avoid creating the closure block, it did not significantly alter the JIT execution profile or reduce garbage collection overhead in a way that measurably decreased total execution time, likely because V8 heavily optimizes inline closure construction for promises.
+  - **Plan ID**: PERF-687
+
 - **PERF-688**: Pipeline Overlap in Single Worker
   - **What I tried**: Deferred `await capturePromise` until after `await previousWritePromise` in the `CaptureLoop.ts` single-worker fast path to overlap Chromium capture with FFmpeg stream draining.
   - **WHY it didn't work**: The median render time regressed to ~2.187s compared to the single-worker fast path baseline of ~2.18s (or was indistinguishable from noise). Node's event loop overhead and microtask queuing behavior when suppressing the promise rejection inline is either equal to or slightly higher than waiting sequentially. V8's internal optimization might prefer strict await sequences over detached promise chaining here.
