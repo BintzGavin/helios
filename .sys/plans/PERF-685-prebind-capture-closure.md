@@ -1,11 +1,11 @@
 ---
 id: PERF-685
 slug: prebind-capture-closure
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-11-20
-completed: ""
-result: ""
+completed: 2026-06-06
+result: discard
 ---
 
 # PERF-685: Prebind Capture Closure in CaptureLoop
@@ -106,3 +106,9 @@ Not directly applicable to Canvas API as this optimizes the general render loop 
 
 ## Correctness Check
 Run the DOM render benchmark script (`cd packages/renderer && npx tsx scripts/benchmark-perf.ts`) to ensure it produces valid outputs without regressions.
+
+## Results Summary
+- **Best render time**: 2.293s (vs baseline ~2.18s)
+- **Improvement**: 0.0%
+- **Kept experiments**: none
+- **Discarded experiments**: Prebind Capture Closure
