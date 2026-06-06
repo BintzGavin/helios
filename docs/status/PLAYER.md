@@ -249,3 +249,4 @@
 [v0.77.47] ✅ Completed: Document Missing Attributes - Updated README.md to document the missing `muted` and `playsinline` attributes.
 
 [v0.77.48] ✅ Completed: Fix API Parity Events - Implemented missing media events (playing, waiting, suspend, stalled) to improve API parity with HTMLMediaElement.
+[v0.77.50] ✅ Completed: Discovered that `v0.77.49-PLAYER-Document-Missing-Event-Handlers.md` is an IMPOSSIBLE: DUPLICATION plan. The event handlers (`onplaying`, `onsuspend`, `onstalled`, `onwaiting`) are already fully documented in the README. Documented as impossible and discarded.
