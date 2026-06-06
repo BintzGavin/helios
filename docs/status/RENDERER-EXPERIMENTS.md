@@ -115,6 +115,11 @@ Last updated by: PERF-678
   - **Outcome**: discard
 
 ## What Doesn't Work (and Why)
+- **PERF-688**: Pipeline Overlap in Single Worker
+  - **What I tried**: Deferred `await capturePromise` until after `await previousWritePromise` in the `CaptureLoop.ts` single-worker fast path to overlap Chromium capture with FFmpeg stream draining.
+  - **WHY it didn't work**: The median render time regressed to ~2.187s compared to the single-worker fast path baseline of ~2.18s (or was indistinguishable from noise). Node's event loop overhead and microtask queuing behavior when suppressing the promise rejection inline is either equal to or slightly higher than waiting sequentially. V8's internal optimization might prefer strict await sequences over detached promise chaining here.
+  - **Plan ID**: PERF-688
+
 - **PERF-678 (Retry)**: Eliminate workerPromises Array.map
   - **What I tried**: Attempted to use a pre-allocated array and for loop instead of Array.map in CaptureLoop.ts.
   - **WHY it didn't work**: The median render time was 2.662s vs baseline 2.758s, no significant improvement. V8 optimally handles array mapping for small arrays, and this allocation happens once before the hot loop.
