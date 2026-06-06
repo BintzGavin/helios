@@ -1,11 +1,11 @@
 ---
 id: PERF-688
 slug: pipeline-overlap-single-worker
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "agent"
 created: 2024-05-24
-completed: ""
-result: ""
+completed: "2026-06-06"
+result: "discarded"
 ---
 
 # PERF-688: Pipeline Capture and FFmpeg Drain in Single Worker Fast Path
