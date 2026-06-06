@@ -11,16 +11,6 @@ export class CaptureLoop {
   private drainReject: ((err: Error) => void) | null = null;
   private drainPromiseExecutor = (resolve: () => void, reject: (err: Error) => void) => { this.drainResolve = resolve; this.drainReject = reject; };
 
-  private handleWriteError = (err?: Error | null) => {
-    if (err) {
-       if ((err as any).code === 'EPIPE') {
-           console.warn('FFmpeg stdin closed prematurely during write (EPIPE). Ignoring error to allow graceful exit.');
-       } else {
-           this.ffmpegManager.emitError(err);
-       }
-    }
-  };
-
   constructor(
     private options: RendererOptions,
     private pool: WorkerInfo[],
@@ -311,9 +301,9 @@ export class CaptureLoop {
             if (stdin?.writable) {
                 let canWriteMore: boolean;
                 if (typeof buffer === 'string') {
-                    canWriteMore = stdin.write(buffer, 'base64', this.handleWriteError);
+                    canWriteMore = stdin.write(buffer, 'base64');
                 } else {
-                    canWriteMore = stdin.write(buffer, this.handleWriteError);
+                    canWriteMore = stdin.write(buffer);
                 }
 
                 if (!canWriteMore) {
@@ -356,9 +346,9 @@ export class CaptureLoop {
       if (stdin?.writable) {
           let canWriteMore: boolean;
           if (typeof finalBuffer === 'string') {
-              canWriteMore = stdin.write(finalBuffer, 'base64', this.handleWriteError);
+              canWriteMore = stdin.write(finalBuffer, 'base64');
           } else {
-              canWriteMore = stdin.write(finalBuffer, this.handleWriteError);
+              canWriteMore = stdin.write(finalBuffer);
           }
           if (!canWriteMore) {
               await new Promise<void>(this.drainPromiseExecutor);
