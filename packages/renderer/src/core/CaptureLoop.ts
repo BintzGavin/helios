@@ -42,17 +42,22 @@ export class CaptureLoop {
       }
     });
     this.ffmpegManager.stdin.on('error', (err) => {
-      if (this.drainReject) {
-        const reject = this.drainReject;
-        const resolve = this.drainResolve;
-        this.drainResolve = null;
-        this.drainReject = null;
-        if (err && (err as any).code === 'EPIPE') {
-           console.warn('FFmpeg stdin closed prematurely (EPIPE). Ignoring error to allow graceful exit.');
-           // Resolve instead of reject on EPIPE to allow the process to finish handling existing frames
-           if (resolve) resolve();
+      if (err && (err as any).code === 'EPIPE') {
+         console.warn('FFmpeg stdin closed prematurely (EPIPE). Ignoring error to allow graceful exit.');
+         if (this.drainResolve) {
+           const resolve = this.drainResolve;
+           this.drainResolve = null;
+           this.drainReject = null;
+           resolve();
+         }
+      } else {
+        if (this.drainReject) {
+          const reject = this.drainReject;
+          this.drainResolve = null;
+          this.drainReject = null;
+          reject(err);
         } else {
-           reject(err);
+          this.ffmpegManager.emitError(err);
         }
       }
     });
@@ -122,9 +127,9 @@ export class CaptureLoop {
                 if (stdin?.writable) {
                     let canWriteMore: boolean;
                     if (typeof buffer === 'string') {
-                        canWriteMore = stdin.write(buffer, 'base64', this.handleWriteError);
+                        canWriteMore = stdin.write(buffer, 'base64');
                     } else {
-                        canWriteMore = stdin.write(buffer, this.handleWriteError);
+                        canWriteMore = stdin.write(buffer);
                     }
 
                     if (!canWriteMore) {
