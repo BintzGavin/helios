@@ -1,11 +1,11 @@
 ---
 id: PERF-693
 slug: omit-stream-write-callback
-status: unclaimed
-claimed_by: ""
+status: claimed
+claimed_by: Jules
 created: 2024-06-08
-completed: ""
-result: ""
+completed: "2024-06-08"
+result: "keep"
 ---
 
 # PERF-693: Omit Stream Write Callback in CaptureLoop
@@ -87,3 +87,11 @@ Run the DOM benchmark (`cd packages/renderer && npx tsx scripts/benchmark-perf.t
 
 ## Prior Art
 - PERF-686: Tried prebinding `this.handleWriteError` but failed due to V8 inline caching already optimizing `this`. This experiment removes the callback entirely from the Node API call.
+
+## Results Summary
+```
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	2.456	150	61.09	63.7	keep	Omit stdin.write callback
+2	2.462	150	60.92	63.7	keep	Omit stdin.write callback
+3	2.399	150	62.52	64.1	keep	Omit stdin.write callback
+```

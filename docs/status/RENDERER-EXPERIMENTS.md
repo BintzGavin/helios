@@ -1,8 +1,13 @@
 ## Performance Trajectory
-Current best: 2.347s (baseline was 2.471s, -5.0%)
+Current best: ~2.456s (median of PERF-693)
 Last updated by: PERF-693
 
 ## What Works
+- **PERF-693**: Omit Stream Write Callback in CaptureLoop
+  - **What I did**: Omitted `this.handleWriteError` callbacks to `stdin.write` in `CaptureLoop.ts` to avoid Node.js stream internal state machine tracking overhead.
+  - **Impact**: Median render time ~2.456s.
+  - **Plan ID**: PERF-693
+
 - **PERF-678**: Increase Actor Model Pipeline Depth in CaptureLoop
   - **What I did**: Hardcoded the `maxPipelineDepth` in `CaptureLoop.ts` to 64 instead of dynamically calculating it based on the number of workers (which resulted in a shallow depth of 8).
   - **Impact**: Improved median render time to ~2.400s with a best run of ~2.127s (baseline ~2.447s). By increasing the ring buffer size, workers can continuously batch more rendered frames before hitting backpressure and yielding to the writer, significantly reducing V8 microtask churn and Promise context switching overhead.

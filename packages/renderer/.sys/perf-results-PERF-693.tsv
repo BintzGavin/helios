@@ -1,3 +1,4 @@
 run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
-1	2.471	300	0	0	keep	baseline
-2	2.347	300	0	0	keep	PERF-693: Omit write callbacks in CaptureLoop fast path
+1	2.456	150	61.09	63.7	keep	Omit stdin.write callback
+2	2.462	150	60.92	63.7	keep	Omit stdin.write callback
+3	2.399	150	62.52	64.1	keep	Omit stdin.write callback
