@@ -1,12 +1,20 @@
 ---
 id: PERF-694
 slug: bypass-capture-await
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "Jules"
 created: 2024-06-06
-completed: ""
-result: ""
+completed: "2024-06-06"
+result: "discard"
 ---
+
+### Results Summary
+```
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	2.590	150	57.91	64.0	discard	peel first iteration
+2	2.543	150	58.99	63.7	discard	peel first iteration
+3	2.409	150	62.26	63.6	discard	peel first iteration
+```
 
 # PERF-694: Bypass Promise Wrapper in CaptureLoop Capture Logic
 

@@ -925,3 +925,7 @@ Last updated by: PERF-693
 
 ## What Works
 - PERF-693: Omit `this.handleWriteError` callbacks to `stdin.write` in the `CaptureLoop.ts` single-worker fast path to avoid Node.js stream internal state machine tracking overhead. This reduced median render time to ~2.347s (from ~2.471s baseline).
+- **PERF-694**: Bypass capture await check in single-worker hot loop
+  - **What I tried**: Unrolled the first iteration of the loop in `CaptureLoop.ts` to skip evaluating the `setTimeResult ? await ... : await` ternary condition on every frame.
+  - **WHY it didn't work**: Yielded a performance regression (median ~2.543s vs baseline ~2.456s). V8 is evidently better at maintaining an inline branch prediction for the ternary condition (which is always truthy for `i>0`) than handling the increased code size and shifted fast-path sequence resulting from peeling the first iteration.
+  - **Plan ID**: PERF-694
