@@ -1,3 +1,9 @@
+## LLMS v1.91.1
+- ✅ Completed: Daily llms.txt Review
+  - Synced Roadmap with recent verifiable completions (CLI Docker Adapter/Cloudflare Sandbox Execution, Player Bridge Coverage, Infrastructure Optimize S3 Uploads).
+  - Verified all package versions match package.json exactly.
+  - Verified Key Files and Agent Skills paths.
+
 ## LLMS v1.91.0
 - ✅ Completed: Daily llms.txt Review
   - Realigned all Quick Facts and Roadmap versions to actual package.json versions (Studio v0.107.1+, Player v0.76.20+, CLI v0.45.2+, Renderer v1.78.3+, Infrastructure v0.25.0+).
