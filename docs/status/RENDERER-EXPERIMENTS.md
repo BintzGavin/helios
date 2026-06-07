@@ -3,6 +3,7 @@ Current best: ~2.397s (median of PERF-692, best ~2.335s)
 Last updated by: PERF-692
 
 ## What Works
+- **PERF-699**: Removed the `async` / `await` wrapper from the `DomStrategy.capture()` hot path, returning the explicitly chained CDP `Promise.then` directly instead. This eliminated the V8 async generator state machine and the box promise wrapping allocation in the tight inner loop. Render time improved to a median of ~2.11s (best ~2.00s).
 - **PERF-692**: Avoid Capture Promise Boxing in Single Worker
   - **What I did**: Prebound the `cdpResolve` closure natively bypassing `.then()` wrapping in `runSetTime` of `CdpTimeDriver.ts`.
   - **Impact**: Median render time improved slightly by bypassing an allocation (median 2.397s, best 2.335s vs baseline 2.456s).
