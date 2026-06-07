@@ -76,3 +76,7 @@
 ## [v0.77.49] - Document Missing Event Handlers
 **Learning:** Found an undocumented event handler properties gap (playing, waiting, suspend, stalled) between the `index.ts` implementation and `README.md`.
 **Action:** Generated plan to document them in `README.md` ensuring complete API parity matching `index.ts`. Always compare actual getter/setter implementations to README properties lists.
+
+## [v0.77.49] - Undocumented Events Dispatched
+**Learning:** Found that some events mentioned in the README (`suspend`, `stalled`, `waiting`) are exposed as handler properties (e.g. `onsuspend`) but are never actually dispatched by the player implementation, creating an API parity gap.
+**Action:** Generated plan to implement the missing event dispatches in `src/index.ts` to match standard `HTMLMediaElement` lifecycles and ensure complete API parity.
