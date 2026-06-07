@@ -1,11 +1,11 @@
 ---
 id: PERF-692
 slug: avoid-capture-promise-boxing
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "Jules"
 created: 2024-06-08
-completed: ""
-result: ""
+completed: "2024-06-08"
+result: "keep"
 ---
 
 # PERF-692: Avoid Capture Promise Boxing in Single Worker
@@ -117,3 +117,9 @@ Run the DOM benchmark (`cd packages/renderer && npx tsx scripts/benchmark-perf.t
 
 ## Prior Art
 - PERF-677: Attempted to eliminate the Promise chain by eagerly advancing `this.currentTime` and returning the base promise, but this disrupted the logic and caused regressions because time advanced before the CDP call resolved. This plan delays the time advancement to the CDP resolution callback natively, which correctly maintains the state flow without a `.then()` chain.
+
+## Results Summary
+- **Best render time**: 2.335s (vs baseline ~2.399s)
+- **Improvement**: ~2.6%
+- **Kept experiments**: Avoid Capture Promise Boxing in Single Worker
+- **Discarded experiments**: None

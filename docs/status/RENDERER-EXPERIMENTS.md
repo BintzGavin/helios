@@ -1,8 +1,13 @@
 ## Performance Trajectory
-Current best: ~2.456s (median of PERF-693)
-Last updated by: PERF-693
+Current best: ~2.397s (median of PERF-692, best ~2.335s)
+Last updated by: PERF-692
 
 ## What Works
+- **PERF-692**: Avoid Capture Promise Boxing in Single Worker
+  - **What I did**: Prebound the `cdpResolve` closure natively bypassing `.then()` wrapping in `runSetTime` of `CdpTimeDriver.ts`.
+  - **Impact**: Median render time improved slightly by bypassing an allocation (median 2.397s, best 2.335s vs baseline 2.456s).
+  - **Plan ID**: PERF-692
+
 - **PERF-693**: Omit Stream Write Callback in CaptureLoop
   - **What I did**: Omitted `this.handleWriteError` callbacks to `stdin.write` in `CaptureLoop.ts` to avoid Node.js stream internal state machine tracking overhead.
   - **Impact**: Median render time ~2.456s.
