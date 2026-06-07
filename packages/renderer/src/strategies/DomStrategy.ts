@@ -203,7 +203,6 @@ export class DomStrategy implements RenderStrategy {
       '-f', inputFormat,
       ...(format === 'webp' ? ['-vcodec', 'webp'] : []),
       '-framerate', `${options.fps}`,
-      '-thread_queue_size', '512',
       '-i', '-',
     ];
 

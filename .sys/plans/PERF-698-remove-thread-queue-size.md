@@ -1,11 +1,11 @@
 ---
 id: PERF-698
 slug: remove-thread-queue-size
-status: unclaimed
-claimed_by: ""
+status: completed
+claimed_by: "Jules"
 created: 2024-06-11
-completed: ""
-result: ""
+completed: "2024-06-11"
+result: "keep"
 ---
 
 # PERF-698: Optimize FFmpeg Stdin Pipe by Removing Thread Queue
@@ -37,7 +37,7 @@ By adding `-thread_queue_size 512`, we force FFmpeg to spawn an additional threa
 - **Minimum runs**: 3 per experiment, report median
 
 ## Baseline
-- **Current estimated render time**: ~2.347s
+- **Current estimated render time**: ~2.7s
 - **Bottleneck analysis**: IPC latency and thread synchronization overhead in the FFmpeg child process, compounded by Node.js stream overhead.
 
 ## Implementation Spec
