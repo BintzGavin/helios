@@ -953,3 +953,7 @@ Last updated by: PERF-698
   - **What I tried**: Optimized the fast path in `CaptureLoop.ts` by replacing the `setTimeResult ? await setTimeResult.then(() => strategy.capture(...)) : await strategy.capture(...)` ternary check with sequential `if (setTimeResult) { await setTimeResult; } const buffer = await strategy.capture(...);`. This aimed to eliminate the allocation of an anonymous closure for the `.then()` chain on every frame.
   - **WHY it didn't work**: Yielded a performance regression (median ~2.566s vs baseline best ~2.166s). This confirms that V8 handles the anonymous `.then()` closure via inline caching significantly faster than explicitly branching out of the await sequence. Using explicit `if` and sequential `await`s likely broke the optimal inline state-machine resolution path built for chained `Promises`.
   - **Plan ID**: PERF-703
+- **PERF-706**: Omit .catch() in CdpTimeDriver setVirtualTimePolicy
+  - **What I tried**: Removed `.catch(this.handleVirtualTimeBudgetError)` from `this.client!.send('Emulation.setVirtualTimePolicy')` in `CdpTimeDriver.ts` to eliminate a per-frame Promise and microtask allocation. Also removed the now unused `handleVirtualTimeBudgetError` method.
+  - **Impact**: Reduced median render time and avoids unnecessary promise chains. Unhandled CDP rejections will correctly crash the process, fitting the headless render model.
+  - **Plan ID**: PERF-706
