@@ -21,6 +21,8 @@ Custom extensions:
 ## Section C: Attributes
 Observed attributes:
 - `src`: The URL of the content to load into the iframe.
+- `interactive`: Enable direct interaction with the composition.
+- `sandbox`: Security flags for the iframe.
 - `width`, `height`: Dimensions of the player.
 - `controls`: Boolean attribute to toggle the UI overlay.
 - `loop`: Boolean attribute to enable looping playback.
