@@ -126,6 +126,11 @@ Last updated by: PERF-692
   - **Outcome**: discard
 
 ## What Doesn't Work (and Why)
+- **PERF-700**: Strict undefined checks for previousWritePromise
+  - **What I tried**: Used strict `!== undefined` checks instead of truthiness evaluation for `previousWritePromise` in the hot loop inside `CaptureLoop.ts`.
+  - **WHY it didn't work**: The median render time regressed to ~2.696s (baseline best ~2.347s). JavaScript truthiness checking `if (previousWritePromise)` is highly optimized in V8 for object/undefined checks, and replacing it with an explicit strict equality check may have subtly altered the inline caching profile or bytecode generation, resulting in slightly more overhead per frame.
+  - **Plan ID**: PERF-700
+
 - **PERF-695**: Bypass Promise Wrapper in CaptureLoop Capture Logic
   - **What I tried**: Replaced the ternary promise check inside the hot loop in `CaptureLoop.ts` with an eagerly chained promise using `await Promise.resolve(setTimeResult).then(...)`.
   - **WHY it didn't work**: Yielded a performance regression (median ~2.854s vs baseline ~2.347s). Eagerly wrapping the potentially undefined result in a native `Promise.resolve()` and adding a `.then()` chain allocated more closures and microtasks on every frame than simply relying on V8's optimization of the explicit branch and native await.
