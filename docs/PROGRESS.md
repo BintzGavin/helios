@@ -1,4 +1,7 @@
 #
+### PLAYER v0.77.50
+- ✅ Completed: Document Missing Media Properties - Added src, autoplay, loop, controls, poster, preload, sandbox, and interactive to README.md
+
 ### PLAYER v0.77.49
 - ✅ Completed: Document Missing Event Handlers - Documented onplaying, onwaiting, onsuspend, and onstalled properties and events.
 

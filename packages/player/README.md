@@ -152,6 +152,14 @@ The `<helios-player>` element implements a subset of the HTMLMediaElement interf
 
 ### Properties
 
+- `src` (string): URL of the composition page to load in the iframe.
+- `autoplay` (boolean): Reflected autoplay attribute.
+- `loop` (boolean): Reflected loop attribute.
+- `controls` (boolean): Reflected controls attribute.
+- `poster` (string): Reflected poster attribute.
+- `preload` (string): Reflected preload attribute.
+- `sandbox` (string): Reflected sandbox attribute.
+- `interactive` (boolean): Reflected interactive attribute.
 - `textTracks` (TextTrackList, read-only): The text tracks associated with the media element.
 - `audioTracks` (AudioTrackList, read-only): The audio tracks associated with the media element.
 - `videoTracks` (VideoTrackList, read-only): The video tracks associated with the media element.
