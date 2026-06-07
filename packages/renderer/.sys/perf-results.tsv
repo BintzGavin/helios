@@ -190,3 +190,4 @@ run	2.662	150	56.35	63.8	discard	PERF-678 Eliminate Array.map in workerPromises
 3	2.187	150	68.57	63.1	discard	PERF-688 overlap pipeline
 50	2.166	150	70.79	63.5	keep	PERF-701: Optimize Promise Closure in DomStrategy.capture()
 51	2.236	150	67.08	63.6	discard	PERF-702: Optimize CDP Send Parameters in SeekTimeDriver.ts
+52	2.327	150	67.89	63.8	keep	PERF-704: Eliminate per-frame closures
