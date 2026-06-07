@@ -1,8 +1,8 @@
 ---
 id: PERF-704
 slug: eliminate-closures-dom-strategy
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-06-08
 completed: ""
 result: ""
@@ -61,3 +61,7 @@ Verify that the output `dom-benchmark.mp4` video accurately renders the composit
 ## Prior Art
 - **PERF-701**: Simplified the closure body inside `.then()` and `.catch()`, improving performance.
 - **PERF-680**: Proved that inline promise executors can regress performance compared to statically allocated pre-bound properties, highlighting V8's preference for stable references in hot loops.
+
+## Results Summary
+- **Best render time**: 2.327s
+- **Kept experiments**: PERF-704
