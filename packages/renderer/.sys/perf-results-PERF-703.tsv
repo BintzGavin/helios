@@ -1,0 +1,1 @@
+1	2.566	150	58.47	63.3	discard	Replace .then() chain with sequential awaits in CaptureLoop fast path
