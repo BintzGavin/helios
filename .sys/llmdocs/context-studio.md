@@ -9,9 +9,10 @@ Studio is a framework-agnostic development environment for video composition.
 ## Section B: File Tree
 ```text
 packages/studio/src
+./
 ├── App.tsx
-├── components
-│   ├── AssetsPanel
+├── components/
+│   ├── AssetsPanel/
 │   │   ├── AssetItem.css
 │   │   ├── AssetItem.test.tsx
 │   │   ├── AssetItem.tsx
@@ -20,27 +21,28 @@ packages/studio/src
 │   │   ├── AssetsPanel.tsx
 │   │   ├── FolderItem.css
 │   │   └── FolderItem.tsx
-│   ├── AssistantModal
+│   ├── AssistantModal/
 │   │   ├── AssistantModal.css
 │   │   ├── AssistantModal.test.tsx
 │   │   ├── AssistantModal.tsx
 │   │   └── index.ts
-│   ├── AudioMixerPanel
+│   ├── AudioMixerPanel/
+│   │   ├── AudioMeter.test.tsx
 │   │   ├── AudioMeter.tsx
 │   │   ├── AudioMixerPanel.css
 │   │   ├── AudioMixerPanel.test.tsx
 │   │   └── AudioMixerPanel.tsx
-│   ├── CaptionsPanel
+│   ├── CaptionsPanel/
 │   │   ├── CaptionsPanel.css
 │   │   ├── CaptionsPanel.test.tsx
 │   │   └── CaptionsPanel.tsx
-│   ├── ComponentsPanel
+│   ├── ComponentsPanel/
 │   │   ├── ComponentsPanel.css
 │   │   ├── ComponentsPanel.test.tsx
 │   │   └── ComponentsPanel.tsx
 │   ├── CompositionSettingsModal.css
 │   ├── CompositionSettingsModal.tsx
-│   ├── CompositionsPanel
+│   ├── CompositionsPanel/
 │   │   ├── CompositionItem.test.tsx
 │   │   ├── CompositionItem.tsx
 │   │   ├── CompositionTree.css
@@ -48,10 +50,10 @@ packages/studio/src
 │   │   ├── CompositionsPanel.css
 │   │   ├── CompositionsPanel.test.tsx
 │   │   └── CompositionsPanel.tsx
-│   ├── ConfirmationModal
+│   ├── ConfirmationModal/
 │   │   ├── ConfirmationModal.css
 │   │   └── ConfirmationModal.tsx
-│   ├── Controls
+│   ├── Controls/
 │   │   ├── PlaybackControls.test.tsx
 │   │   ├── PlaybackControls.tsx
 │   │   ├── TimecodeDisplay.css
@@ -72,7 +74,7 @@ packages/studio/src
 │   ├── KeyboardShortcutsModal.css
 │   ├── KeyboardShortcutsModal.test.tsx
 │   ├── KeyboardShortcutsModal.tsx
-│   ├── Layout
+│   ├── Layout/
 │   │   ├── Panel.tsx
 │   │   ├── Resizer.css
 │   │   ├── Resizer.tsx
@@ -86,7 +88,7 @@ packages/studio/src
 │   ├── PropsEditor.tsx
 │   ├── RenderPreviewModal.css
 │   ├── RenderPreviewModal.tsx
-│   ├── RendersPanel
+│   ├── RendersPanel/
 │   │   ├── RenderConfig.test.tsx
 │   │   ├── RenderConfig.tsx
 │   │   ├── RendersPanel.css
@@ -94,10 +96,10 @@ packages/studio/src
 │   │   └── RendersPanel.tsx
 │   ├── SchemaInputs.test.tsx
 │   ├── SchemaInputs.tsx
-│   ├── Sidebar
+│   ├── Sidebar/
 │   │   ├── Sidebar.css
 │   │   └── Sidebar.tsx
-│   ├── Stage
+│   ├── Stage/
 │   │   ├── EmptyState.css
 │   │   ├── EmptyState.tsx
 │   │   ├── Stage.css
@@ -109,26 +111,26 @@ packages/studio/src
 │   ├── Timeline.tsx
 │   ├── TimelineAudioTrack.test.tsx
 │   ├── TimelineAudioTrack.tsx
-│   └── Toast
+│   └── Toast/
 │       ├── Toast.css
 │       ├── Toast.test.tsx
 │       ├── Toast.tsx
 │       ├── ToastContainer.test.tsx
 │       └── ToastContainer.tsx
-├── context
+├── context/
 │   ├── StudioContext.test.tsx
 │   ├── StudioContext.tsx
 │   ├── ToastContext.test.tsx
 │   └── ToastContext.tsx
-├── data
+├── data/
 │   └── ai-context.ts
-├── hooks
+├── hooks/
 │   ├── useAudioWaveform.test.ts
 │   ├── useAudioWaveform.ts
 │   ├── useKeyboardShortcut.ts
 │   └── usePersistentState.ts
 ├── main.tsx
-├── server
+├── server/
 │   ├── discovery.test.ts
 │   ├── discovery.ts
 │   ├── documentation.test.ts
@@ -138,7 +140,7 @@ packages/studio/src
 │   ├── plugin.ts
 │   ├── render-manager.test.ts
 │   ├── render-manager.ts
-│   ├── templates
+│   ├── templates/
 │   │   ├── index.test.ts
 │   │   ├── index.ts
 │   │   ├── react.test.ts
@@ -157,14 +159,14 @@ packages/studio/src
 │   └── types.ts
 ├── setupTests.ts
 ├── types.ts
-├── utils
+├── utils/
 │   ├── srt.test.ts
 │   ├── srt.ts
 │   ├── tree.test.ts
 │   └── tree.ts
 └── vite-env.d.ts
 
-21 directories, 134 files
+21 directories, 135 files
 
 ```
 
@@ -178,6 +180,7 @@ packages/studio/src
 - **AssetsPanel**: Manages project assets including video, audio, images, fonts, 3D models, and JSON data.
 - **Stage**: Renders the `<helios-player>` with pan, zoom, and snapshot controls.
 - **RendersPanel**: Manages render jobs via the Renderer integration.
+- **AudioMixerPanel**: Manages individual audio track volumes with an AudioMeter for visual levels.
 
 ## Section E: Integration
 - **Core**: Consumes `Helios` for schema, state management, and caption sync.

@@ -1,10 +1,11 @@
-**Version**: 0.121.25
+**Version**: 0.121.26
 
 [v0.121.13] ✅ Completed: Expand Reverse Speeds - Added -4x and -2x reverse playback options to the PlaybackControls component.
 
 **Posture**: ACTIVELY EXPANDING FOR V2
 
 # Studio Domain Status
+- [v0.121.26] ✅ Completed: Improve AudioMeter Test Coverage - Added null ref handling tests to `AudioMeter.test.tsx` achieving 100% coverage.
 - [v0.121.25] ✅ Completed: Improve AudioMeter Coverage - Added unit tests for AudioMeter to ensure full line and branch coverage including clipping and warning thresholds.
 - [v0.121.24] ✅ Completed: STUDIO-Server-Templates-Test-Coverage - Verified tests are already fully implemented with 100% coverage (IMPOSSIBLE: DUPLICATION).
 -[v0.121.19] ✅ Completed: TimecodeInput Test Coverage - Added comprehensive unit tests for the TimecodeInput component, increasing coverage to 100%.

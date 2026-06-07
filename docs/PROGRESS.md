@@ -37,6 +37,9 @@
 - ✅ Completed: Improve AudioMeter Coverage - Added unit tests for AudioMeter to ensure full line and branch coverage including clipping and warning thresholds.
 
 
+### STUDIO v0.121.26
+- ✅ Completed: Improve AudioMeter Test Coverage - Added null ref handling tests to `AudioMeter.test.tsx` achieving 100% coverage.
+
 ### STUDIO v0.121.25
 - ✅ Completed: Improve AudioMeter Coverage - Added unit tests for AudioMeter to ensure full line and branch coverage including clipping and warning thresholds.
 
