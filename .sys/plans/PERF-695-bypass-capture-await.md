@@ -1,11 +1,11 @@
 ---
 id: PERF-695
 slug: bypass-capture-await
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-06-09
-completed: ""
-result: ""
+completed: 2026-06-07
+result: discarded
 ---
 
 # PERF-695: Bypass Promise Wrapper in CaptureLoop Capture Logic
@@ -94,3 +94,15 @@ Run `npm run build -w packages/renderer` to ensure no syntax errors.
 
 ## Correctness Check
 Run the DOM benchmark (`cd packages/renderer && npx tsx scripts/benchmark-perf.ts`) and ensure output videos render correctly.
+
+## Impossibility Explanation
+This experiment was discarded because it resulted in a performance regression. The median render time was ~2.854s, compared to the baseline of ~2.347s. Eagerly wrapping the potentially undefined result in a native `Promise.resolve()` and adding a `.then()` chain allocated more closures and microtasks on every frame than simply relying on V8's optimization of the explicit branch and native await.
+
+## Results Summary
+```tsv
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	2.854	150	52.56	63.7	discard	eager promise chain capture
+2	2.953	150	50.80	63.5	discard	eager promise chain capture
+3	2.617	150	57.32	63.6	discard	eager promise chain capture
+
+```

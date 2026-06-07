@@ -125,6 +125,10 @@ Last updated by: PERF-692
   - **Outcome**: discard
 
 ## What Doesn't Work (and Why)
+- **PERF-695**: Bypass Promise Wrapper in CaptureLoop Capture Logic
+  - **What I tried**: Replaced the ternary promise check inside the hot loop in `CaptureLoop.ts` with an eagerly chained promise using `await Promise.resolve(setTimeResult).then(...)`.
+  - **WHY it didn't work**: Yielded a performance regression (median ~2.854s vs baseline ~2.347s). Eagerly wrapping the potentially undefined result in a native `Promise.resolve()` and adding a `.then()` chain allocated more closures and microtasks on every frame than simply relying on V8's optimization of the explicit branch and native await.
+  - **Plan ID**: PERF-695
 - **PERF-676**: Conditionally Update Virtual Time Budget
   - **What I tried**: Attempted to conditionally assign `this.setVirtualTimePolicyParams.budget = budget` in `CdpTimeDriver.ts` only if the budget value changed from the previous frame.
   - **WHY it didn't work**: The median render time regressed to ~2.46s (baseline best ~2.347s). Adding the conditional check and branch logic overhead outweighs the cost of blindly writing the budget property in the V8 hot loop, as V8 is highly optimized for consecutive property writes to the same object shape via inline caching.
