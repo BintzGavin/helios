@@ -100,4 +100,28 @@ describe('AudioMeter', () => {
     expect(bars[0].style.height).toBe('100%');
     expect(bars[0].style.backgroundColor).toBe('rgb(255, 82, 82)'); // Clip color due to peak = 1
   });
+
+  it('handles updates when DOM nodes are unmounted (null refs)', () => {
+    let globalRef: AudioMeterRef | null = null;
+
+    const Wrapper = () => {
+      const ref = useRef<AudioMeterRef>(null);
+      React.useEffect(() => {
+        globalRef = ref.current;
+      }, []);
+      return <AudioMeter ref={ref} />;
+    };
+
+    const { unmount } = render(<Wrapper />);
+
+    // Unmount causes the internal refs to become null
+    unmount();
+
+    // Call update, which should not throw an error despite internal null refs
+    expect(() => {
+      act(() => {
+        globalRef?.update({ left: 1, right: 1, peakLeft: 1, peakRight: 1 });
+      });
+    }).not.toThrow();
+  });
 });
