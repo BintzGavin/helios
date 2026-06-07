@@ -696,8 +696,8 @@ Last updated by: PERF-692
   - **Outcome**: discard
 
 ## Performance Trajectory
-Current best: 2.347s (baseline was 2.471s, -5.0%)
-Last updated by: PERF-693
+Current best: ~2.624s (baseline was ~2.710s, -3%)
+Last updated by: PERF-698
 
 ## What Works
 - **PERF-637**: Optimize Writer Waiter Check in CaptureLoop Hot Loop
@@ -933,6 +933,7 @@ Last updated by: PERF-693
   - **Plan ID**: PERF-686
 
 ## What Works
+- PERF-698: Removed `-thread_queue_size 512` from `DomStrategy.ts` FFmpeg arguments. By relying on native Unix pipe backpressure instead of an internal FFmpeg thread queue, the median render time improved to ~2.624s (from ~2.710s baseline).
 - PERF-693: Omit `this.handleWriteError` callbacks to `stdin.write` in the `CaptureLoop.ts` single-worker fast path to avoid Node.js stream internal state machine tracking overhead. This reduced median render time to ~2.347s (from ~2.471s baseline).
 - **PERF-694**: Bypass capture await check in single-worker hot loop
   - **What I tried**: Unrolled the first iteration of the loop in `CaptureLoop.ts` to skip evaluating the `setTimeResult ? await ... : await` ternary condition on every frame.
