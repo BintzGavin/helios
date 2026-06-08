@@ -89,7 +89,6 @@ export class CdpTimeDriver implements TimeDriver {
     this.client!.on('Emulation.virtualTimeBudgetExpired', this.handleVirtualTimeBudgetExpired);
 
     this.executionContextIds = [];
-    this.client!.on('Runtime.executionContextCreated', this.handleExecutionContextCreated);
 
     // Initialize virtual time policy to 'pause' to take control of the clock.
     // We set initialVirtualTime to Jan 1, 2024 (UTC) to ensure deterministic Date.now()
@@ -177,9 +176,13 @@ export class CdpTimeDriver implements TimeDriver {
       // Ignore error
     }
 
-    // Enable Runtime so we actually receive executionContextCreated events
-    // Catch errors in case another driver instance sharing this session already enabled it.
-    await this.client!.send('Runtime.enable').catch(() => {});
+    if (this.hasMedia) {
+      this.client!.on('Runtime.executionContextCreated', this.handleExecutionContextCreated);
+      // Enable Runtime so we actually receive executionContextCreated events
+      // Catch errors in case another driver instance sharing this session already enabled it.
+      await this.client!.send('Runtime.enable').catch(() => {});
+    }
+
 
     this.currentTime = 0;
   }
