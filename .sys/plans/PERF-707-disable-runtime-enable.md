@@ -1,8 +1,8 @@
 ---
 id: PERF-707
 slug: disable-runtime-enable
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor"
 created: 2024-05-18
 completed: ""
 result: ""
@@ -100,3 +100,7 @@ Run the standard canvas benchmark (`packages/renderer/scripts/benchmark-perf.ts`
 
 ## Correctness Check
 Run the `dom-benchmark.mp4` output check. Ensure the video renders properly with the expected number of frames and the animation looks visually identical.
+
+## Results Summary
+- **Best render time**: 3.269s
+- **Result**: discard
