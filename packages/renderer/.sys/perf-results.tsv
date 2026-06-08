@@ -192,3 +192,4 @@ run	2.662	150	56.35	63.8	discard	PERF-678 Eliminate Array.map in workerPromises
 51	2.236	150	67.08	63.6	discard	PERF-702: Optimize CDP Send Parameters in SeekTimeDriver.ts
 52	2.327	150	67.89	63.8	keep	PERF-704: Eliminate per-frame closures
 53	3.269	150	45.89	63.6	discard	PERF-707: Disable Runtime.enable
+194	2.824	150	53.12	63.4	discard	Omit .catch() in CdpTimeDriver defaultSyncMedia

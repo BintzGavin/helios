@@ -128,6 +128,11 @@ Last updated by: PERF-699
   - **Outcome**: discard
 
 ## What Doesn't Work (and Why)
+- **PERF-708**: Omit .catch() in CdpTimeDriver defaultSyncMedia
+  - **What I tried**: Removed `.catch(noopCatch)` in `defaultSyncMedia` of `CdpTimeDriver.ts` to avoid per-frame promise and microtask allocation during CDP evaluate calls.
+  - **WHY it didn't work**: Yielded a median render time of ~2.824s vs baseline ~2.115s. This is slower, so we are discarding it.
+  - **Plan ID**: PERF-708
+
 - **PERF-707**: Disable Runtime.enable when no media elements are present
   - **What I tried**: Wrapped the `Runtime.enable` and `executionContextCreated` listener inside `if (this.hasMedia)` in `CdpTimeDriver.ts` to avoid CDP overhead for standard DOM frames.
   - **Impact**: Median render time was 3.269s (baseline 2.115s). Status: discard.

@@ -3,8 +3,6 @@ import { TimeDriver } from './TimeDriver.js';
 import { getSeedScript } from '../utils/random-seed.js';
 import { FIND_ALL_MEDIA_FUNCTION, SYNC_MEDIA_FUNCTION, PARSE_MEDIA_ATTRIBUTES_FUNCTION } from '../utils/dom-scripts.js';
 
-const noopCatch = () => {};
-
 export class CdpTimeDriver implements TimeDriver {
   private client: CDPSession | null = null;
   private currentTime: number = 0;
@@ -23,7 +21,7 @@ export class CdpTimeDriver implements TimeDriver {
   private defaultSyncMedia() {
     const frames = this.cachedFrames;
     if (frames.length === 1) {
-      this.client!.send('Runtime.evaluate', this.singleFrameSyncMediaParams).catch(noopCatch);
+      this.client!.send('Runtime.evaluate', this.singleFrameSyncMediaParams);
     } else {
         if (this.executionContextIds.length > 0) {
           if (this.multiFrameSyncMediaParams.length !== this.executionContextIds.length) {
@@ -38,10 +36,10 @@ export class CdpTimeDriver implements TimeDriver {
             }
           }
           for (let i = 0; i < this.executionContextIds.length; i++) {
-            this.client!.send('Runtime.evaluate', this.multiFrameSyncMediaParams[i]).catch(noopCatch);
+            this.client!.send('Runtime.evaluate', this.multiFrameSyncMediaParams[i]);
           }
         } else {
-          this.client!.send('Runtime.evaluate', this.singleFrameSyncMediaParams).catch(noopCatch);
+          this.client!.send('Runtime.evaluate', this.singleFrameSyncMediaParams);
         }
     }
   }
