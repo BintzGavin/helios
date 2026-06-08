@@ -128,6 +128,11 @@ Last updated by: PERF-699
   - **Outcome**: discard
 
 ## What Doesn't Work (and Why)
+- **PERF-709**: Prebind virtualTimePromiseExecutor in CdpTimeDriver
+  - **What I tried**: Attempted to extract the inline anonymous closure `(resolve, reject) => { ... }` for `new Promise<void>` into a prebound class property `virtualTimePromiseExecutor` to avoid allocating a closure on every frame.
+  - **WHY it didn't work**: Yielded a performance regression (median ~2.559s vs baseline ~2.115s). While V8 performs inline closure allocation, creating a static reference to the bound closure adds additional property-lookup overhead in the hot loop, which seems to disrupt V8's optimization of the async/await promise execution sequence. We are discarding this change.
+  - **Plan ID**: PERF-709
+
 - **PERF-708**: Omit .catch() in CdpTimeDriver defaultSyncMedia
   - **What I tried**: Removed `.catch(noopCatch)` in `defaultSyncMedia` of `CdpTimeDriver.ts` to avoid per-frame promise and microtask allocation during CDP evaluate calls.
   - **WHY it didn't work**: Yielded a median render time of ~2.824s vs baseline ~2.115s. This is slower, so we are discarding it.
