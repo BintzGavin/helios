@@ -1,0 +1,4 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	2.739	150	54.76	64.4	discard	inline beginFrame handler
+2	2.739	150	54.76	63.4	discard	inline beginFrame handler
+3	2.735	150	54.84	63.5	discard	inline beginFrame handler
