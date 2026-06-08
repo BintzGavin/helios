@@ -133,6 +133,11 @@ Last updated by: PERF-699
   - **Outcome**: discard
 
 ## What Doesn't Work (and Why)
+- **PERF-690**: Bypass timeStep multiplication in fast path
+  - **What I tried**: Used accumulating variables instead of loop multiplication.
+  - **WHY it didn't work**: Yielded no measurable performance improvement beyond the noise margin (~2.520s vs current ~2.530s baseline, well off the historical ~2.115s best). V8 handles the simple loop multiplication well enough.
+  - **Plan ID**: PERF-690
+
 
 - **PERF-713**: Simplify Empty Try-Catch Overhead in CdpTimeDriver
   - **What I tried**: Attempted to simplify the `hasMedia` and `waitUntilStable` try-catch blocks utilizing a `noopCatch` and replaced the empty closure in `.catch(() => {})` for `Runtime.enable` with `noopCatch` in `CdpTimeDriver.ts`.

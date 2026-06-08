@@ -1,11 +1,11 @@
 ---
 id: PERF-690
 slug: bypass-time-step-multiplication
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-06-07
-completed: ""
-result: ""
+completed: "2026-06-08"
+result: "failed"
 ---
 
 # PERF-690: Bypass timeStep Multiplication in Fast Path
@@ -92,3 +92,9 @@ Run the DOM benchmark (`npx tsx scripts/benchmark-perf.ts`) and ensure output vi
 ## Prior Art
 - PERF-683: Introduced the single-worker fast path.
 - General V8 optimization knowledge: simple addition is computationally cheaper than loop-dependent multiplication.
+
+## Results Summary
+- **Best render time**: ~2.520s (vs baseline ~2.530s)
+- **Improvement**: ~0.4% (Within noise margin)
+- **Kept experiments**: None
+- **Discarded experiments**: Bypass timeStep multiplication
