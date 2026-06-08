@@ -194,3 +194,5 @@ run	2.662	150	56.35	63.8	discard	PERF-678 Eliminate Array.map in workerPromises
 53	3.269	150	45.89	63.6	discard	PERF-707: Disable Runtime.enable
 194	2.824	150	53.12	63.4	discard	Omit .catch() in CdpTimeDriver defaultSyncMedia
 195	2.310	150	64.94	63.5	keep	PERF-457: Conditionally assign syncMediaFn
+
+196	2.638	150	56.86	63.5	discard	PERF-711: Clean up unused cdpReject
