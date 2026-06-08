@@ -133,6 +133,12 @@ Last updated by: PERF-699
   - **Outcome**: discard
 
 ## What Doesn't Work (and Why)
+
+- **PERF-713**: Simplify Empty Try-Catch Overhead in CdpTimeDriver
+  - **What I tried**: Attempted to simplify the `hasMedia` and `waitUntilStable` try-catch blocks utilizing a `noopCatch` and replaced the empty closure in `.catch(() => {})` for `Runtime.enable` with `noopCatch` in `CdpTimeDriver.ts`.
+  - **WHY it didn't work**: Yielded a median render time of ~2.534s vs baseline ~2.115s. While simplifying the JIT compilation tree is conceptually sound, V8 handles the native try-catch block scope very efficiently. Explicit `.then().catch()` wrapping introduces additional promise evaluation sequences and microtask overhead in V8 which degraded performance.
+  - **Plan ID**: PERF-713
+
 - Reverted prebound `handleBeginFrameResult` in `DomStrategy.capture()` to an inline closure. PERF-710.
   - **WHY it didn't work:** It regressed performance (median ~2.739s vs baseline ~2.115s). While V8 does highly optimize inline closures, the original issue wasn't the closure dispatch but V8's optimization limits around `async/await` and object property lookups inside hot loops that pre-bound fields resolved. Going back to an inline arrow function meant more allocations per frame.
 
