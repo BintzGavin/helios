@@ -469,6 +469,11 @@ Last updated by: PERF-699
   - **How much it improved**: The median render time on the dom-benchmark improved from ~1.448s to ~1.304s (approx 10% faster) on a 150-frame microVM benchmark by bypassing unoptimized synchronization paths inside Chromium for screenshot captures.
   - **Outcome**: keep
 
+- **PERF-711**: Remove unused cdpReject in CdpTimeDriver
+  - **What I tried**: Removed unused `cdpReject` tracking in `CdpTimeDriver.ts` left over from PERF-706 to reduce GC pressure.
+  - **WHY it didn't work**: Yielded a median render time of ~2.638s vs baseline ~2.115s.
+  - **Plan ID**: PERF-711
+
 ## Open Questions
 - Inlining stability check promise resolution in CdpTimeDriver.ts
 - The bottleneck is likely in V8 runtime boundaries or Playwright CDP IPC, meaning microtask queue optimizations yield no measurable performance improvement over the baseline.
