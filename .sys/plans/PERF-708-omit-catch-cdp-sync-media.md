@@ -1,11 +1,11 @@
 ---
 id: PERF-708
 slug: omit-catch-cdp-sync-media
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-06-08
-completed: ""
-result: ""
+completed: "2026-06-08"
+result: "discarded"
 ---
 
 # PERF-708: Omit .catch() in CdpTimeDriver defaultSyncMedia
@@ -106,3 +106,8 @@ export class CdpTimeDriver implements TimeDriver {
 
 ## Correctness Check
 Run the DOM benchmark `npx tsx scripts/benchmark-perf.ts` and ensure the output `dom-benchmark.mp4` has smoothly synced media (if applicable) and doesn't crash prematurely.
+
+## Results Summary
+- **Best render time**: ~2.824s (vs baseline ~2.115s)
+- **Kept experiments**: []
+- **Discarded experiments**: [PERF-708]
