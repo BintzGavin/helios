@@ -3,6 +3,11 @@ Current best: ~2.115s (median of PERF-699, best ~2.00s)
 Last updated by: PERF-699
 
 ## What Works
+- **PERF-457**: Skip Media Sync via Closure Assignment
+  - **What I tried**: Assigned syncMediaFn to avoid boolean branch in hot loop.
+  - **Impact**: 2.31s render time (baseline 2.498s). Status: keep.
+  - **Plan ID**: PERF-457
+
 - **PERF-704**: Removed per-frame closures in `DomStrategy.capture` by pre-binding `.then` and eliminating `.catch`. It reduced GC pressure but the result is ~2.327s (worse than baseline ~2.115s). However, keeping as it's an architectural simplification.
 
 - **PERF-699**: Removed the `async` / `await` wrapper from the `DomStrategy.capture()` hot path, returning the explicitly chained CDP `Promise.then` directly instead. This eliminated the V8 async generator state machine and the box promise wrapping allocation in the tight inner loop. Render time improved to a median of ~2.11s (best ~2.00s).
