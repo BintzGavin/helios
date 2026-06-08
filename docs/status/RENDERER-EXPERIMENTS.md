@@ -128,6 +128,7 @@ Last updated by: PERF-699
   - **Outcome**: discard
 
 ## What Doesn't Work (and Why)
+- Conditionally calling `Runtime.enable` based on `this.hasMedia` in `CdpTimeDriver.ts`. **Why it didn't work:** It yielded no measurable performance improvement (median ~2.13s vs baseline ~2.115s). The overhead of tracking `executionContextCreated` events via the Runtime domain during DOM compositions is negligible compared to other bottlenecks. We discard this to avoid complicating the initialization logic. (PERF-707)
 - **PERF-700**: Strict undefined checks for previousWritePromise
   - **What I tried**: Used strict `!== undefined` checks instead of truthiness evaluation for `previousWritePromise` in the hot loop inside `CaptureLoop.ts`.
   - **WHY it didn't work**: The median render time regressed to ~2.696s (baseline best ~2.347s). JavaScript truthiness checking `if (previousWritePromise)` is highly optimized in V8 for object/undefined checks, and replacing it with an explicit strict equality check may have subtly altered the inline caching profile or bytecode generation, resulting in slightly more overhead per frame.

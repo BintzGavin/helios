@@ -1,7 +1,7 @@
 ---
 id: PERF-707
 slug: disable-runtime-enable
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-05-18
 completed: ""
@@ -100,3 +100,15 @@ Run the standard canvas benchmark (`packages/renderer/scripts/benchmark-perf.ts`
 
 ## Correctness Check
 Run the `dom-benchmark.mp4` output check. Ensure the video renders properly with the expected number of frames and the animation looks visually identical.
+
+## Results
+
+```tsv
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	12.037	150	12.46	63.4	discard	initial warm up, conditionally enable Runtime.enable
+2	2.495	150	60.12	63.6	discard	conditionally enable Runtime.enable
+3	2.120	150	70.75	63.4	discard	conditionally enable Runtime.enable
+4	2.137	150	70.19	63.5	discard	conditionally enable Runtime.enable
+```
+
+**Outcome**: DISCARDED. The median render time did not improve over the baseline. The overhead of the Runtime domain events is negligible for DOM animations compared to other rendering costs, and conditional initialization adds complexity without benefit.

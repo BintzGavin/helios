@@ -1,0 +1,14 @@
+💡 **What**: Conditionally enabled `Runtime.enable` in `CdpTimeDriver.ts` only when media elements are present.
+🎯 **Why**: To reduce CDP overhead and avoid tracking executionContextCreated events during DOM compositions that have no media elements.
+📊 **Impact**: Median render time ~2.13s (baseline ~2.115s). The change is within the noise margin and provides no measurable improvement. The experiment is DISCARDED.
+🔬 **Verification**: Code built, ran benchmark 4 times.
+📎 **Plan**: `.sys/plans/PERF-707-disable-runtime-enable.md`
+
+**Results Summary:**
+```tsv
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	12.037	150	12.46	63.4	discard	initial warm up, conditionally enable Runtime.enable
+2	2.495	150	60.12	63.6	discard	conditionally enable Runtime.enable
+3	2.120	150	70.75	63.4	discard	conditionally enable Runtime.enable
+4	2.137	150	70.19	63.5	discard	conditionally enable Runtime.enable
+```

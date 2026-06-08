@@ -191,3 +191,7 @@ run	2.662	150	56.35	63.8	discard	PERF-678 Eliminate Array.map in workerPromises
 50	2.166	150	70.79	63.5	keep	PERF-701: Optimize Promise Closure in DomStrategy.capture()
 51	2.236	150	67.08	63.6	discard	PERF-702: Optimize CDP Send Parameters in SeekTimeDriver.ts
 52	2.327	150	67.89	63.8	keep	PERF-704: Eliminate per-frame closures
+193	12.037	150	12.46	63.4	discard	initial warm up, conditionally enable Runtime.enable
+194	2.495	150	60.12	63.6	discard	conditionally enable Runtime.enable
+195	2.12	150	70.75	63.4	discard	conditionally enable Runtime.enable
+196	2.137	150	70.19	63.5	discard	conditionally enable Runtime.enable
