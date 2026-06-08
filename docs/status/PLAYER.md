@@ -1,5 +1,5 @@
 [v0.77.41] ✅ Completed: Discovered undocumented event handler properties in implementation missing from README. Created plan `.sys/plans/2027-02-15-PLAYER-Document-Event-Handlers.md` to document `onplay`, `onpause`, etc.
-**Version**: 0.77.50
+**Version**: 0.77.51
 [0.77.49] ✅ Completed: Document Missing Event Handlers - Documented onplaying, onwaiting, onsuspend, and onstalled properties and events.
 [v0.77.46] ✅ Completed: Discovered that `2027-02-16-PLAYER-Add-onaudiometering-handler.md` is an IMPOSSIBLE: DUPLICATION plan. The `onaudiometering` property is already fully implemented. Documented as impossible and discarded. Also added 'audiometering' to the event handlers test in `index.test.ts`.
 [v0.77.44] ✅ Completed: Document Missing Events - Deleted lingering plan file as the README already contained the required documentation updates.
@@ -251,3 +251,4 @@
 
 [v0.77.48] ✅ Completed: Fix API Parity Events - Implemented missing media events (playing, waiting, suspend, stalled) to improve API parity with HTMLMediaElement.
 [v0.77.50] ✅ Completed: Discovered that `v0.77.49-PLAYER-Document-Missing-Event-Handlers.md` is an IMPOSSIBLE: DUPLICATION plan. The event handlers (`onplaying`, `onsuspend`, `onstalled`, `onwaiting`) are already fully documented in the README. Documented as impossible and discarded.
+[v0.77.51] ✅ Completed: Discovered that 2027-02-17-PLAYER-Document-Missing-Media-Properties.md is an IMPOSSIBLE: DUPLICATION plan. The missing properties are already fully documented in the README. Documented as impossible and discarded.
