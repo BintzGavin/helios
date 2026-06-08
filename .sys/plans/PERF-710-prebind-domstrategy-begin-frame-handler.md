@@ -1,11 +1,11 @@
 ---
 id: PERF-710
 slug: prebind-domstrategy-begin-frame-handler
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-05-27
 completed: ""
-result: ""
+result: "Discarded, regression to 2.739s"
 ---
 
 # PERF-710: Prebind `handleBeginFrameResult` logic and simplify `.then` in DomStrategy

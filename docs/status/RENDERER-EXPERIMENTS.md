@@ -133,6 +133,9 @@ Last updated by: PERF-699
   - **Outcome**: discard
 
 ## What Doesn't Work (and Why)
+- Reverted prebound `handleBeginFrameResult` in `DomStrategy.capture()` to an inline closure. PERF-710.
+  - **WHY it didn't work:** It regressed performance (median ~2.739s vs baseline ~2.115s). While V8 does highly optimize inline closures, the original issue wasn't the closure dispatch but V8's optimization limits around `async/await` and object property lookups inside hot loops that pre-bound fields resolved. Going back to an inline arrow function meant more allocations per frame.
+
 - **PERF-709**: Prebind virtualTimePromiseExecutor in CdpTimeDriver
   - **What I tried**: Attempted to extract the inline anonymous closure `(resolve, reject) => { ... }` for `new Promise<void>` into a prebound class property `virtualTimePromiseExecutor` to avoid allocating a closure on every frame.
   - **WHY it didn't work**: Yielded a performance regression (median ~2.559s vs baseline ~2.115s). While V8 performs inline closure allocation, creating a static reference to the bound closure adds additional property-lookup overhead in the hot loop, which seems to disrupt V8's optimization of the async/await promise execution sequence. We are discarding this change.
