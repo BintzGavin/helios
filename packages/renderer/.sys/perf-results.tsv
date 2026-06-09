@@ -203,3 +203,5 @@ run	2.662	150	56.35	63.8	discard	PERF-678 Eliminate Array.map in workerPromises
 202	2.779	150	53.97	63.5	discard	eliminate-empty-try-catch
 203	3.212	150	46.70	63.6	discard	PERF-716: Omit default CDP evaluate params in syncMedia
 1	2.054	150	73.02	63.5	keep	native stream buffering in CaptureLoop single worker
+
+2	2.489	150	60.26	63.5	discard	PERF-717: Overlap Time Progression with FFmpeg Drain
