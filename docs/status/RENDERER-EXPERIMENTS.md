@@ -133,6 +133,11 @@ Last updated by: PERF-699
   - **Outcome**: discard
 
 ## What Doesn't Work (and Why)
+- **PERF-716**: Omit default CDP evaluate params in syncMedia
+  - **What I tried**: Omitted `awaitPromise` and `returnByValue` in CDP `Runtime.evaluate` payload in `CdpTimeDriver.ts`.
+  - **Why it didn't work**: It caused a performance regression. Median render time was ~3.212s vs baseline ~2.115s. Omitting default parameters did not improve processing overhead and negatively impacted parsing or branch prediction for missing keys in Chromium's CDP handling over repeated evaluations.
+  - **Plan ID**: PERF-716
+
 - **PERF-715**: Eliminate Empty Try-Catch Overhead in CdpTimeDriver prepare
   - **What I tried**: Simplified the hasMedia and waitUntilStable try-catch blocks utilizing chained promises and a noopCatch in CdpTimeDriver.ts.
   - **WHY it didn't work**: The median render time did not improve significantly (~2.779s vs baseline ~2.695s). The overhead from allocating promises and handling rejection inside them outweighed the cost of V8's native block-scoped try/catch optimizations.
