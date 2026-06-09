@@ -3,6 +3,8 @@ import { TimeDriver } from './TimeDriver.js';
 import { getSeedScript } from '../utils/random-seed.js';
 import { FIND_ALL_MEDIA_FUNCTION, SYNC_MEDIA_FUNCTION, PARSE_MEDIA_ATTRIBUTES_FUNCTION } from '../utils/dom-scripts.js';
 
+const RESOLVED_PROMISE = Promise.resolve();
+
 export class CdpTimeDriver implements TimeDriver {
   private client: CDPSession | null = null;
   private currentTime: number = 0;
@@ -185,17 +187,17 @@ export class CdpTimeDriver implements TimeDriver {
     this.currentTime = 0;
   }
 
-  setTime(page: Page, timeInSeconds: number): Promise<void> | void {
+  setTime(page: Page, timeInSeconds: number): Promise<void> {
     return this.runSetTime(page, timeInSeconds);
   }
 
-  private runSetTime(page: Page, timeInSeconds: number): Promise<void> | void {
+  private runSetTime(page: Page, timeInSeconds: number): Promise<void> {
     const delta = timeInSeconds - this.currentTime;
 
     // If delta is 0 or negative, we don't advance.
     // In a renderer loop, time usually moves forward.
     if (delta <= 0) {
-        return;
+        return RESOLVED_PROMISE;
     }
 
     // Convert to milliseconds for CDP
