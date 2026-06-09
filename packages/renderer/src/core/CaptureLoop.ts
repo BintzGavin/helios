@@ -122,7 +122,7 @@ export class CaptureLoop {
                         canWriteMore = stdin.write(buffer);
                     }
 
-                    if (!canWriteMore) {
+                    if (!canWriteMore && stdin.writableLength >= 16777216) {
                         previousWritePromise = new Promise<void>(this.drainPromiseExecutor);
                     }
                 } else {
@@ -306,7 +306,7 @@ export class CaptureLoop {
                     canWriteMore = stdin.write(buffer);
                 }
 
-                if (!canWriteMore) {
+                if (!canWriteMore && stdin.writableLength >= 16777216) {
                     previousWritePromise = new Promise<void>(this.drainPromiseExecutor);
                 }
             } else {
