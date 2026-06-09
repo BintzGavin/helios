@@ -113,4 +113,37 @@ describe('render command', () => {
     );
   });
 
+
+
+  it('should use HELIOS_BROWSER_ARGS correctly', async () => {
+    process.env.HELIOS_BROWSER_ARGS = '--no-sandbox,--disable-gpu';
+    const consoleLogSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    await program.parseAsync(['node', 'test', 'render', 'http://example.com/comp.html']);
+    expect(consoleLogSpy).toHaveBeenCalledWith('Using custom browser arguments: --no-sandbox,--disable-gpu');
+    expect(RenderOrchestrator.render).toHaveBeenCalledWith(expect.any(String), expect.any(String), expect.objectContaining({ browserConfig: expect.objectContaining({ args: ['--no-sandbox,--disable-gpu'] }) }));
+    consoleLogSpy.mockRestore();
+    delete process.env.HELIOS_BROWSER_ARGS;
+  });
+
+  it('should generate mergeCommand with mixOptions when using --emit-job', async () => {
+    vi.mocked(RenderOrchestrator.plan).mockReturnValueOnce({
+      chunks: [{ id: '1', startFrame: 0, frameCount: 10, outputFile: 'out.mp4', options: {} }],
+      concatManifest: ['out.mp4'],
+      mixOptions: { videoCodec: 'libx264', audioCodec: 'aac', crf: 23 },
+      totalFrames: 10
+    });
+
+    await program.parseAsync(['node', 'test', 'render', 'http://example.com/comp.html', '--emit-job', 'job.json', '--video-codec', 'libx264', '--audio-codec', 'aac', '--quality', '23']);
+
+    const writeCall = vi.mocked(fs.writeFileSync).mock.calls.find(call => typeof call[0] === 'string' && call[0].endsWith('job.json'));
+    expect(writeCall).toBeDefined();
+    if (writeCall) {
+      const writtenJobStr = writeCall[1];
+      const job = JSON.parse(writtenJobStr);
+      expect(job.mergeCommand).toContain('--video-codec libx264');
+      expect(job.mergeCommand).toContain('--audio-codec aac');
+      expect(job.mergeCommand).toContain('--quality 23');
+    }
+  });
+
 });

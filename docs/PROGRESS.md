@@ -83,6 +83,9 @@
 ### STUDIO v0.121.9
 - ✅ Completed: STUDIO-Update-Keyboard-Shortcuts-Documentation - Updated KeyboardShortcutsModal to include J, K, L playback shortcuts.
 
+### CLI v0.46.43
+- ✅ Completed: CLI Command Coverage Tests V6 - Implemented test coverage for missing command edges including job adapter options and executor errors.
+
 ### RENDERER v1.78.2
 - ✅ Completed: PERF-386 - Eliminated Promise chain allocation in CdpTimeDriver.setTime stability check by awaiting the raw CDP promise.
 - ✅ Completed: PERF-343 - Eliminated `Promise.race` and array allocation in `CdpTimeDriver.setTime` stability check by pre-binding executors, improving render time and reducing GC pressure.
