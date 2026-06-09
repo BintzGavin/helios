@@ -153,3 +153,4 @@ This backlog tracks concrete deliverables derived from [`AGENTS.md`](../AGENTS.m
 - [ ] [v0.121.21] STUDIO Blocked: Waiting for a new, valid plan in /.sys/plans/
 
 - [x] [v0.46.40] CLI Unblocked: Generated plan /.sys/plans/2027-06-05-CLI-Command-Coverage-Tests-V4.md
+- [x] [v0.46.43] CLI Unblocked: Generated plan /.sys/plans/2027-06-05-CLI-Command-Coverage-Tests-V6.md

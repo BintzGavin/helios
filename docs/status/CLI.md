@@ -167,3 +167,4 @@ The Helios CLI is the primary user interface for component registry, project sca
 
 [v0.46.42] ✅ Completed: CLI Command Coverage Tests V5 - Implemented edge-case test coverage for commands and fixed prompt cancellation exit bug in init.ts.
 [v0.46.42] 🟢 IMPOSSIBLE: DUPLICATION - CLI Docker Adapter Templates Regression Tests Spec - Tests are already fully implemented.
+[v0.46.43] 🟢 Completed: CLI Command Coverage Tests Spec V6 - Created specification plan 2027-06-05-CLI-Command-Coverage-Tests-V6.md for covering missing command edges.
