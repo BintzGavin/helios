@@ -367,4 +367,124 @@ describe('job command', () => {
     expect(console.error).toHaveBeenCalledWith('Job execution failed:', expect.stringContaining('Azure adapter requires --azure-service-url'));
   });
 
+
+  describe('executor error handling', () => {
+    it('should catch executor errors gracefully and exit', async () => {
+      vi.mocked(fs.existsSync).mockReturnValue(true);
+      vi.mocked(fs.readFileSync).mockReturnValue(JSON.stringify({
+        chunks: [{ id: '1', startFrame: 0, frameCount: 10, outputFile: 'out.mp4', command: 'cmd' }],
+        mergeCommand: 'merge'
+      }));
+      const testError = new Error('Execute threw');
+      mockExecute.mockRejectedValueOnce(testError);
+
+      await program.parseAsync(['node', 'test', 'job', 'run', 'job.json', '--adapter', 'local']);
+
+      expect(console.error).toHaveBeenCalledWith('Job execution failed:', 'Execute threw');
+      expect(exitSpy).toHaveBeenCalledWith(1);
+    });
+
+    it('should catch non-Error exceptions from executor gracefully', async () => {
+      vi.mocked(fs.existsSync).mockReturnValue(true);
+      vi.mocked(fs.readFileSync).mockReturnValue(JSON.stringify({
+        chunks: [{ id: '1', startFrame: 0, frameCount: 10, outputFile: 'out.mp4', command: 'cmd' }],
+        mergeCommand: 'merge'
+      }));
+      mockExecute.mockRejectedValueOnce('Some string error');
+
+      await program.parseAsync(['node', 'test', 'job', 'run', 'job.json', '--adapter', 'local']);
+
+      expect(console.error).toHaveBeenCalledWith('Job execution failed:', undefined);
+      expect(exitSpy).toHaveBeenCalledWith(1);
+    });
+
+    it('should map executor stdout and stderr callbacks', async () => {
+      vi.mocked(fs.existsSync).mockReturnValue(true);
+      vi.mocked(fs.readFileSync).mockReturnValue(JSON.stringify({
+        chunks: [{ id: '1', startFrame: 0, frameCount: 10, outputFile: 'out.mp4', command: 'cmd' }],
+        mergeCommand: 'merge'
+      }));
+      mockExecute.mockImplementationOnce(async (spec, options) => {
+        options.onChunkStdout(1, 'stdout test');
+        options.onChunkStderr(1, 'stderr test');
+      });
+
+      const stdoutSpy = vi.spyOn(process.stdout, 'write').mockImplementation(() => true);
+      const stderrSpy = vi.spyOn(process.stderr, 'write').mockImplementation(() => true);
+
+      await program.parseAsync(['node', 'test', 'job', 'run', 'job.json', '--adapter', 'local']);
+
+      expect(stdoutSpy).toHaveBeenCalledWith('stdout test');
+      expect(stderrSpy).toHaveBeenCalledWith('stderr test');
+
+      stdoutSpy.mockRestore();
+      stderrSpy.mockRestore();
+    });
+  });
+
+  it('should error if deno adapter missing required arg', async () => {
+    vi.mocked(fs.existsSync).mockReturnValue(true);
+    vi.mocked(fs.readFileSync).mockReturnValue(JSON.stringify({ chunks: [] }));
+    await program.parseAsync(['node', 'test', 'job', 'run', 'job.json', '--adapter', 'deno']);
+    expect(exitSpy).toHaveBeenCalledWith(1);
+    expect(console.error).toHaveBeenCalledWith('Job execution failed:', expect.stringContaining('Deno adapter requires --deno-service-url'));
+  });
+
+  it('should error if vercel adapter missing required arg', async () => {
+    vi.mocked(fs.existsSync).mockReturnValue(true);
+    vi.mocked(fs.readFileSync).mockReturnValue(JSON.stringify({ chunks: [] }));
+    await program.parseAsync(['node', 'test', 'job', 'run', 'job.json', '--adapter', 'vercel']);
+    expect(exitSpy).toHaveBeenCalledWith(1);
+    expect(console.error).toHaveBeenCalledWith('Job execution failed:', expect.stringContaining('Vercel adapter requires'));
+  });
+
+  it('should error if modal adapter missing required arg', async () => {
+    vi.mocked(fs.existsSync).mockReturnValue(true);
+    vi.mocked(fs.readFileSync).mockReturnValue(JSON.stringify({ chunks: [] }));
+    await program.parseAsync(['node', 'test', 'job', 'run', 'job.json', '--adapter', 'modal']);
+    expect(exitSpy).toHaveBeenCalledWith(1);
+    expect(console.error).toHaveBeenCalledWith('Job execution failed:', expect.stringContaining('Modal adapter requires'));
+  });
+
+  it('should error if hetzner adapter missing required arg', async () => {
+    vi.mocked(fs.existsSync).mockReturnValue(true);
+    vi.mocked(fs.readFileSync).mockReturnValue(JSON.stringify({ chunks: [] }));
+    await program.parseAsync(['node', 'test', 'job', 'run', 'job.json', '--adapter', 'hetzner']);
+    expect(exitSpy).toHaveBeenCalledWith(1);
+    expect(console.error).toHaveBeenCalledWith('Job execution failed:', expect.stringContaining('Hetzner adapter requires --hetzner-api-token, --hetzner-server-type, and --hetzner-image'));
+  });
+
+
+  it('should error if gcp adapter missing required arg', async () => {
+    vi.mocked(fs.existsSync).mockReturnValue(true);
+    vi.mocked(fs.readFileSync).mockReturnValue(JSON.stringify({ chunks: [] }));
+    await program.parseAsync(['node', 'test', 'job', 'run', 'job.json', '--adapter', 'gcp']);
+    expect(exitSpy).toHaveBeenCalledWith(1);
+    expect(console.error).toHaveBeenCalledWith('Job execution failed:', expect.stringContaining('GCP adapter requires --gcp-service-url'));
+  });
+
+  it('should error if cloudflare adapter missing required arg', async () => {
+    vi.mocked(fs.existsSync).mockReturnValue(true);
+    vi.mocked(fs.readFileSync).mockReturnValue(JSON.stringify({ chunks: [] }));
+    await program.parseAsync(['node', 'test', 'job', 'run', 'job.json', '--adapter', 'cloudflare']);
+    expect(exitSpy).toHaveBeenCalledWith(1);
+    expect(console.error).toHaveBeenCalledWith('Job execution failed:', expect.stringContaining('Cloudflare adapter requires --cloudflare-service-url'));
+  });
+
+  it('should error if kubernetes adapter missing required arg', async () => {
+    vi.mocked(fs.existsSync).mockReturnValue(true);
+    vi.mocked(fs.readFileSync).mockReturnValue(JSON.stringify({ chunks: [] }));
+    await program.parseAsync(['node', 'test', 'job', 'run', 'job.json', '--adapter', 'kubernetes']);
+    expect(exitSpy).toHaveBeenCalledWith(1);
+    expect(console.error).toHaveBeenCalledWith('Job execution failed:', expect.stringContaining('Kubernetes adapter requires --k8s-job-image'));
+  });
+
+  it('should error if docker adapter missing required arg', async () => {
+    vi.mocked(fs.existsSync).mockReturnValue(true);
+    vi.mocked(fs.readFileSync).mockReturnValue(JSON.stringify({ chunks: [] }));
+    await program.parseAsync(['node', 'test', 'job', 'run', 'job.json', '--adapter', 'docker']);
+    expect(exitSpy).toHaveBeenCalledWith(1);
+    expect(console.error).toHaveBeenCalledWith('Job execution failed:', expect.stringContaining('Docker adapter requires --docker-image'));
+  });
+
 });
