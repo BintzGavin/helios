@@ -1,8 +1,8 @@
 ---
 id: PERF-689
 slug: native-stream-buffering-single-worker
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-06-06
 completed: ""
 result: ""

@@ -3,6 +3,10 @@ Current best: ~2.115s (median of PERF-699, best ~2.00s)
 Last updated by: PERF-699
 
 ## What Works
+- **PERF-689**: Native Stream Buffering in Single Worker Fast Path
+  - **What I tried**: Modified the drain condition in `CaptureLoop.ts` for the single worker path to only block on FFmpeg drain when `stdin.writableLength >= 16777216`.
+  - **Impact**: Improved median render time to ~2.054s (baseline ~2.128s). By allowing Node to buffer multiple frames instead of waiting for a pipe drain on every frame, we achieved pipeline overlap between Chromium rendering and FFmpeg encoding natively.
+  - **Plan ID**: PERF-689
 - **PERF-457**: Skip Media Sync via Closure Assignment
   - **What I tried**: Assigned syncMediaFn to avoid boolean branch in hot loop.
   - **Impact**: 2.31s render time (baseline 2.498s). Status: keep.
