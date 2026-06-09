@@ -1,11 +1,11 @@
 ---
 id: PERF-715
 slug: eliminate-empty-try-catch
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-06-09
-completed: ""
-result: ""
+completed: "2026-06-09"
+result: "discarded"
 ---
 
 # PERF-715: Eliminate Empty Try-Catch Overhead in CdpTimeDriver `prepare`
@@ -112,3 +112,9 @@ Run `npx tsx scripts/benchmark-perf.ts` and ensure it completes without throwing
 
 ## Correctness Check
 The output video should match the expected rendering timing since these changes do not alter media playback behavior, only exception handling paths during CDP initialization.
+
+## Results Summary
+- **Best render time**: 2.779s (vs baseline 2.695s)
+- **Improvement**: -3.12%
+- **Kept experiments**: None
+- **Discarded experiments**: PERF-715
