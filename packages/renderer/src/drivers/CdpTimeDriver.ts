@@ -150,37 +150,35 @@ export class CdpTimeDriver implements TimeDriver {
 
     this.cachedFrames = page.frames();
 
-    try {
-      this.hasMedia = false;
-      const { result } = await this.client!.send('Runtime.evaluate', {
-         expression: "typeof window.__helios_sync_media === 'function' ? window.__helios_sync_media() : 0",
-         returnByValue: true
-      });
+    const noopCatch = () => {};
+
+    this.hasMedia = false;
+    await this.client!.send('Runtime.evaluate', {
+       expression: "typeof window.__helios_sync_media === 'function' ? window.__helios_sync_media() : 0",
+       returnByValue: true
+    }).then(({ result }) => {
       if (result && result.value > 0) {
          this.hasMedia = true;
       }
-    } catch (e) {
+    }).catch(() => {
       this.hasMedia = true;
-    }
+    });
 
-    try {
-      const { result } = await this.client!.send('Runtime.evaluate', {
-        expression: "typeof window.helios !== 'undefined' && typeof window.helios.waitUntilStable === 'function'",
-        returnByValue: true
-      });
+    await this.client!.send('Runtime.evaluate', {
+      expression: "typeof window.helios !== 'undefined' && typeof window.helios.waitUntilStable === 'function'",
+      returnByValue: true
+    }).then(async ({ result }) => {
       if (result && result.value) {
-        await this.client!.send('Runtime.evaluate', { expression: "if (typeof window.__helios_wait_until_stable === 'function') window.__helios_wait_until_stable();", awaitPromise: true, returnByValue: false });
+        await this.client!.send('Runtime.evaluate', { expression: "if (typeof window.__helios_wait_until_stable === 'function') window.__helios_wait_until_stable();", awaitPromise: true, returnByValue: false }).catch(noopCatch);
       }
-    } catch (e) {
-      // Ignore error
-    }
+    }).catch(noopCatch);
 
     if (this.hasMedia) {
       this.syncMediaFn = this.defaultSyncMedia;
       this.client!.on('Runtime.executionContextCreated', this.handleExecutionContextCreated);
       // Enable Runtime so we actually receive executionContextCreated events
       // Catch errors in case another driver instance sharing this session already enabled it.
-      await this.client!.send('Runtime.enable').catch(() => {});
+      await this.client!.send('Runtime.enable').catch(noopCatch);
     } else {
       this.syncMediaFn = () => {};
     }

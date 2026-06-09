@@ -133,6 +133,10 @@ Last updated by: PERF-699
   - **Outcome**: discard
 
 ## What Doesn't Work (and Why)
+- **PERF-715**: Eliminate Empty Try-Catch Overhead in CdpTimeDriver prepare
+  - **What I tried**: Simplified the hasMedia and waitUntilStable try-catch blocks utilizing chained promises and a noopCatch in CdpTimeDriver.ts.
+  - **WHY it didn't work**: The median render time did not improve significantly (~2.779s vs baseline ~2.695s). The overhead from allocating promises and handling rejection inside them outweighed the cost of V8's native block-scoped try/catch optimizations.
+  - **Plan ID**: PERF-715
 - **PERF-714**: Promise.withResolvers in CdpTimeDriver
   - **What I tried**: Replaced the inline promise executor with Promise.withResolvers.
   - **WHY it didn't work**: The median render time did not improve (~2.435s vs baseline ~2.408s). The optimization likely has negligible impact here since Node supports inline executors efficiently. And we have to create object wrapping for promise/resolve/reject with withResolvers.
