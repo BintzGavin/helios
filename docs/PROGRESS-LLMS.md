@@ -1,4 +1,10 @@
 
+
+## LLMS v1.94.0
+- ✅ Completed: Daily llms.txt Review
+  - Synced roadmap with progress across Studio, CLI, and Infrastructure
+  - Verified package versions matched package.json exactly
+  - Verified all agent file paths
 ## LLMS v1.93.0
 - ✅ Completed: Daily llms.txt Review
   - Realigned all Quick Facts and Roadmap versions to actual package.json versions (Studio v0.107.1+, Player v0.76.20+, CLI v0.45.2+, Renderer v1.78.3+, Infrastructure v0.25.0+).
