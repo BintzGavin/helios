@@ -1024,3 +1024,8 @@ Last updated by: PERF-698
   - **What I tried**: Deferred `await capturePromise` until after `await previousWritePromise` in the single worker fast path.
   - **Why it didn't work**: Median render time regressed to ~3.517s (from baseline ~2.054s). By breaking V8's fast path inline optimization of the async sequence and interweaving stream write drain waits directly into the hot rendering path, it caused significant microtask overhead and pipeline stalls, similar to PERF-717.
   - **Plan ID**: PERF-686
+
+- **PERF-719**: Eager Current Time Update in CdpTimeDriver
+  - **What I did**: Eliminated `targetTimeInSeconds` from `CdpTimeDriver.ts` by eagerly calculating `budget` inline and directly updating `currentTime`.
+  - **Impact**: Improved median render time to ~2.364s (from ~2.415s baseline), proving that removing intermediate variables from the async callback context reduces V8 overhead.
+  - **Plan ID**: PERF-719

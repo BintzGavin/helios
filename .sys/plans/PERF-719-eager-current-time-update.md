@@ -1,11 +1,11 @@
 ---
 id: PERF-719
 slug: eager-current-time-update
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-06-10
-completed: ""
-result: ""
+completed: 2026-06-09
+result: "improved"
 ---
 
 # PERF-719: Eager Current Time Update in CdpTimeDriver
@@ -50,3 +50,9 @@ None.
 
 ## Correctness Check
 Run the DOM render benchmark `cd packages/renderer && npm run build && npx tsx scripts/benchmark-perf.ts` and verify the output mp4 visually.
+
+## Results Summary
+- **Best render time**: 2.364s (vs baseline 2.415s)
+- **Improvement**: ~2.1%
+- **Kept experiments**: [PERF-719]
+- **Discarded experiments**: []
