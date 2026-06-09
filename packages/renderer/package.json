@@ -47,7 +47,7 @@
     "playwright": "^1.60.0"
   },
   "devDependencies": {
-    "@types/node": "^20.11.24",
+    "@types/node": "^20.19.42",
     "ts-node": "^10.9.2",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3"

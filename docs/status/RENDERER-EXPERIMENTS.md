@@ -503,6 +503,12 @@ Last updated by: PERF-699
   - **WHY it didn't work**: Yielded a median render time of ~2.638s vs baseline ~2.115s.
   - **Plan ID**: PERF-711
 
+
+- **PERF-717**: Overlap Time Progression with FFmpeg Drain
+  - **What I tried**: Deferred `await capturePromise` and `setTime` execution by moving `if (previousWritePromise)` block inside the `CaptureLoop.ts` single-worker fast path to overlap Chromium rendering with FFmpeg stream draining natively.
+  - **WHY it didn't work**: The median render time regressed to ~2.489s compared to the single-worker fast path baseline of ~2.115s. Node's event loop queueing behaves less efficiently when interweaving I/O bound pipe waits with microtask closures in the hot loop, likely breaking V8's fast-path inline optimization of the async sequence.
+  - **Plan ID**: PERF-717
+
 ## Open Questions
 - Inlining stability check promise resolution in CdpTimeDriver.ts
 - The bottleneck is likely in V8 runtime boundaries or Playwright CDP IPC, meaning microtask queue optimizations yield no measurable performance improvement over the baseline.
