@@ -1,8 +1,8 @@
 ---
 id: PERF-714
 slug: promise-with-resolvers
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-06-09
 completed: ""
 result: ""
@@ -57,3 +57,9 @@ Replace it with:
 
 ## Correctness Check
 Run the `renderer` package tests to ensure DOM strategies function as expected.
+
+## Results Summary
+- **Best render time**: 2.435s (vs baseline ~2.408s)
+- **Improvement**: -1.12%
+- **Kept experiments**: None
+- **Discarded experiments**: Use Promise.withResolvers in CdpTimeDriver

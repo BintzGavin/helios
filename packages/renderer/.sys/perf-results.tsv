@@ -199,3 +199,4 @@ run	2.662	150	56.35	63.8	discard	PERF-678 Eliminate Array.map in workerPromises
 197	2.453	150	61.15	63.3	discard	PERF-713: Simplify empty try-catches in CdpTimeDriver
 
 198	2.520	150	59.52	63.4	discard	PERF-690: Bypass timeStep multiplication
+198	2.435	150	61.60	63.6	discard	PERF-714 Promise.withResolvers

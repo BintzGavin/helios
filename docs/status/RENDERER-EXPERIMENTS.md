@@ -133,6 +133,11 @@ Last updated by: PERF-699
   - **Outcome**: discard
 
 ## What Doesn't Work (and Why)
+- **PERF-714**: Promise.withResolvers in CdpTimeDriver
+  - **What I tried**: Replaced the inline promise executor with Promise.withResolvers.
+  - **WHY it didn't work**: The median render time did not improve (~2.435s vs baseline ~2.408s). The optimization likely has negligible impact here since Node supports inline executors efficiently. And we have to create object wrapping for promise/resolve/reject with withResolvers.
+  - **Plan ID**: PERF-714
+
 - **PERF-690**: Bypass timeStep multiplication in fast path
   - **What I tried**: Used accumulating variables instead of loop multiplication.
   - **WHY it didn't work**: Yielded no measurable performance improvement beyond the noise margin (~2.520s vs current ~2.530s baseline, well off the historical ~2.115s best). V8 handles the simple loop multiplication well enough.
