@@ -26,6 +26,11 @@ export interface RenderStrategy {
   capture(page: Page, frameTime: number): Promise<any> | any;
 
   /**
+   * Optional synchronous post-processing step for the capture result.
+   */
+  processCaptureResult?(rawResult: any): string | Buffer;
+
+  /**
    * Finishes the rendering process.
    * This method is called after the capture loop ends.
    * Useful for flushing encoders or cleaning up resources.
