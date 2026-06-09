@@ -1,5 +1,5 @@
 ---
-id: PERF-718
+id: PERF-719
 slug: eager-current-time-update
 status: unclaimed
 claimed_by: ""
@@ -8,7 +8,7 @@ completed: ""
 result: ""
 ---
 
-# PERF-718: Eager Current Time Update in CdpTimeDriver
+# PERF-719: Eager Current Time Update in CdpTimeDriver
 
 ## Focus Area
 `CdpTimeDriver.ts` hot loop - `runSetTime` and `handleVirtualTimeBudgetExpired`.
@@ -35,8 +35,8 @@ Since `runSetTime` is sequentially awaited by the `CaptureLoop`, we can safely c
 **File**: `packages/renderer/src/drivers/CdpTimeDriver.ts`
 **What to change**:
 1. Remove the declaration `private targetTimeInSeconds: number = 0;`.
-2. Update `handleVirtualTimeBudgetExpired` to no longer assign `this.currentTime = this.targetTimeInSeconds;`.
-3. In `runSetTime`, replace `const delta = ...` and `const budget = delta * 1000;` with inline `const budget = (timeInSeconds - this.currentTime) * 1000;`.
+2. Update `handleVirtualTimeBudgetExpired` to no longer assign `this.currentTime = this.targetTimeInSeconds;` (since `this.currentTime` will already be updated).
+3. In `runSetTime`, replace `const delta = timeInSeconds - this.currentTime;` and `const budget = delta * 1000;` with `const budget = (timeInSeconds - this.currentTime) * 1000;`.
 4. In `runSetTime`, assign `this.currentTime = timeInSeconds;` immediately instead of assigning `targetTimeInSeconds`.
 
 **Why**: Simplifies the class structure, reduces property allocations, and shifts property assignment out of the async execution context, giving V8 less state to track.
