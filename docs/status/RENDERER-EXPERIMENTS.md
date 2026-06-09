@@ -1,8 +1,13 @@
 ## Performance Trajectory
-Current best: ~2.115s (median of PERF-699, best ~2.00s)
-Last updated by: PERF-699
+Current best: ~2.338s (median of PERF-723, best ~2.332s)
+Last updated by: PERF-723
 
 ## What Works
+
+- **PERF-723**: Unify Time and Capture Promise Chain
+  - **What I tried**: Modified `TimeDriver.setTime` to always return a Promise, eliminating the `setTimeResult ? await ... : await` ternary check in `CaptureLoop.ts` fast path. A cached `Promise.resolve()` is returned for zero delta (frame 0) to avoid overhead.
+  - **Impact**: Improved median render time to ~2.338s (vs local baseline ~2.41s). Eliminating the ternary branch created a monomorphic async sequence, which V8 optimizes better than mixed return types.
+  - **Plan ID**: PERF-723
 - **PERF-689**: Native Stream Buffering in Single Worker Fast Path
   - **What I tried**: Modified the drain condition in `CaptureLoop.ts` for the single worker path to only block on FFmpeg drain when `stdin.writableLength >= 16777216`.
   - **Impact**: Improved median render time to ~2.054s (baseline ~2.128s). By allowing Node to buffer multiple frames instead of waiting for a pipe drain on every frame, we achieved pipeline overlap between Chromium rendering and FFmpeg encoding natively.

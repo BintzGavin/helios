@@ -1,0 +1,8 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	2.563	150	58.53	63.4	keep	baseline
+2	2.948	150	50.88	63.5	keep	baseline
+3	2.410	150	62.24	63.5	keep	baseline
+4	2.424	150	61.87	63.6	keep	baseline
+5	2.332	150	64.33	63.5	keep	PERF-723 flatten time capture chain
+6	2.338	150	64.15	63.5	keep	PERF-723 flatten time capture chain
+7	2.366	150	63.40	63.4	keep	PERF-723 flatten time capture chain

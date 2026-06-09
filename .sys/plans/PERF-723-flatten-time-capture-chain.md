@@ -1,11 +1,11 @@
 ---
 id: PERF-723
 slug: flatten-time-capture-chain
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-06-11
-completed: ""
-result: ""
+completed: "2024-06-11"
+result: "improved"
 ---
 
 # PERF-723: Unify Time and Capture Promise Chain
@@ -154,3 +154,9 @@ None.
 
 ## Correctness Check
 Run the DOM render benchmark `cd packages/renderer && npm run build && npx tsx scripts/benchmark-perf.ts` and verify the output mp4 visually.
+
+## Results Summary
+- **Best render time**: 2.338s (vs local baseline ~2.410s)
+- **Improvement**: ~3%
+- **Kept experiments**: [Unify Time and Capture Promise Chain]
+- **Discarded experiments**: []

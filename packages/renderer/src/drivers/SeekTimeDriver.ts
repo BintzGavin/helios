@@ -294,7 +294,7 @@ export class SeekTimeDriver implements TimeDriver {
     this.cachedMainFrame = page.mainFrame();
       }
 
-  setTime(page: Page, timeInSeconds: number): Promise<void> | void {
+  setTime(page: Page, timeInSeconds: number): Promise<void> {
     const frames = this.cachedFrames;
 
     if (frames.length === 1) {
