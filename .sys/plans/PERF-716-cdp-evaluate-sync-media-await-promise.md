@@ -1,11 +1,11 @@
 ---
 id: PERF-716
 slug: cdp-evaluate-sync-media-await-promise
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-06-09
 completed: ""
-result: ""
+result: "discard"
 ---
 
 # PERF-716: Omit default CDP evaluate params in syncMedia
@@ -76,3 +76,9 @@ Run the DOM render benchmark and ensure an mp4 is produced.
 
 ## Prior Art
 Previous optimizations (like PERF-702) found that changing CDP methods (e.g. `callFunctionOn`) caused regressions due to larger payloads. Reducing payload size directly might have a positive impact.
+
+
+## Results Summary
+| run | render_time_s | frames | fps_effective | peak_mem_mb | status | description |
+|---|---|---|---|---|---|---|
+| 203 | 3.212 | 150 | 46.70 | 63.6 | discard | PERF-716: Omit default CDP evaluate params in syncMedia |

@@ -201,3 +201,4 @@ run	2.662	150	56.35	63.8	discard	PERF-678 Eliminate Array.map in workerPromises
 198	2.520	150	59.52	63.4	discard	PERF-690: Bypass timeStep multiplication
 198	2.435	150	61.60	63.6	discard	PERF-714 Promise.withResolvers
 202	2.779	150	53.97	63.5	discard	eliminate-empty-try-catch
+203	3.212	150	46.70	63.6	discard	PERF-716: Omit default CDP evaluate params in syncMedia
