@@ -1,11 +1,11 @@
 ---
 id: PERF-686
 slug: pipeline-overlap-single-worker
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-24
-completed: ""
-result: ""
+completed: 2026-06-09
+result: discard
 ---
 
 # PERF-686: Pipeline Capture and FFmpeg Drain in Single Worker Fast Path
@@ -96,3 +96,9 @@ Run the DOM benchmark (`npx tsx scripts/benchmark-perf.ts`) and ensure output vi
 ## Prior Art
 - PERF-683: Introduced the fast path but made it strictly sequential.
 - PERF-684: Separated awaits but did not overlap with `previousWritePromise`, causing a regression due to broken `.then()` microtask chains. This plan preserves the inline `.then()` chain while adding the overlap.
+
+## Results Summary
+- **Best render time**: 3.517s (vs baseline ~2.054s)
+- **Improvement**: Regressed
+- **Kept experiments**: None
+- **Discarded experiments**: Overlap capture and FFmpeg drain
