@@ -1,8 +1,14 @@
 ## Performance Trajectory
-Current best: ~2.338s (median of PERF-723, best ~2.332s)
-Last updated by: PERF-723
+Current best: ~2.317s (median of PERF-725)
+Last updated by: PERF-725
 
 ## What Works
+
+- **PERF-725**: Replace .then() with Sequential Await in CaptureLoop
+  - **What I tried**: Changed `await timeDriver.setTime(...).then(() => strategy.capture(...))` to sequential `await timeDriver.setTime(...); const rawResult = await strategy.capture(...);` in `CaptureLoop.ts` fast path and multi-worker loops.
+  - **Impact**: Improved median render time from ~2.338s to ~2.317s by eliminating per-frame anonymous closure allocation for the `.then()` chain, taking advantage of the monomorphic `Promise` return introduced in PERF-723.
+  - **Plan ID**: PERF-725
+
 - **PERF-724**: Eliminate DomStrategy Promise Chain
   - **What I tried**: Added a synchronous `processCaptureResult` method to `RenderStrategy` to offload `handleBeginFrameResult` out of a Promise `.then()` chain in `DomStrategy.ts`.
   - **WHY it didn't work / Impact**: Reduced median render time from 2.613s to 2.192s by avoiding an extra microtask and promise allocation.

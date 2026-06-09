@@ -95,7 +95,8 @@ export class CaptureLoop {
                 const time = i * timeStep;
                 const compositionTimeInSeconds = (startFrame + i) * compTimeStep;
 
-                const rawResult = await timeDriver.setTime(page, compositionTimeInSeconds).then(() => strategy.capture(page, time));
+                await timeDriver.setTime(page, compositionTimeInSeconds);
+                const rawResult = await strategy.capture(page, time);
                 const buffer = strategy.processCaptureResult ? strategy.processCaptureResult(rawResult) : rawResult;
 
                 if (i === nextProgressFrame) {
@@ -244,7 +245,8 @@ export class CaptureLoop {
             const ringIndex = i & ringMask;
 
             try {
-                const rawResult = await timeDriver.setTime(page, compositionTimeInSeconds).then(() => strategy.capture(page, time));
+                await timeDriver.setTime(page, compositionTimeInSeconds);
+                const rawResult = await strategy.capture(page, time);
                 const buffer = strategy.processCaptureResult ? strategy.processCaptureResult(rawResult) : rawResult;
                 frameBufferRing[ringIndex] = buffer;
                 frameReadyRing[ringIndex] = 1;
