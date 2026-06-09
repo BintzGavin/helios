@@ -566,6 +566,9 @@ Each agent should update **their own dedicated progress file** instead of this f
 ## STUDIO v0.105.1
 - ✅ Verified: Components Panel Tests - Implemented comprehensive unit tests for ComponentsPanel covering loading, listing, install, update, and remove flows.
 
+### PLAYER v0.77.52
+- ✅ Completed: Fix API Parity Events - Implemented synthetic dispatches for missing media events (suspend, stalled, waiting) to improve HTMLMediaElement API parity.
+
 ## STUDIO v0.105.0
 - ✅ Completed: Component Management - Implemented ability to remove and update components from the Studio UI, adding corresponding CLI hooks and backend API endpoints.
 

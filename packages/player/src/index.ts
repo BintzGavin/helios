@@ -3563,6 +3563,9 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
 
   private retryConnection() {
     this.showStatus("Retrying...", false);
+    this.dispatchEvent(new Event("suspend"));
+    this.dispatchEvent(new Event("stalled"));
+    this.dispatchEvent(new Event("waiting"));
     // Reload iframe to force fresh start
     this.load();
   }
