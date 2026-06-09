@@ -1020,3 +1020,7 @@ Last updated by: PERF-698
   - **What I tried**: Removed `.catch(this.handleVirtualTimeBudgetError)` from `this.client!.send('Emulation.setVirtualTimePolicy')` in `CdpTimeDriver.ts` to eliminate a per-frame Promise and microtask allocation. Also removed the now unused `handleVirtualTimeBudgetError` method.
   - **Impact**: Reduced median render time and avoids unnecessary promise chains. Unhandled CDP rejections will correctly crash the process, fitting the headless render model.
   - **Plan ID**: PERF-706
+- **PERF-686**: Overlap pipeline capture and FFmpeg drain
+  - **What I tried**: Deferred `await capturePromise` until after `await previousWritePromise` in the single worker fast path.
+  - **Why it didn't work**: Median render time regressed to ~3.517s (from baseline ~2.054s). By breaking V8's fast path inline optimization of the async sequence and interweaving stream write drain waits directly into the hot rendering path, it caused significant microtask overhead and pipeline stalls, similar to PERF-717.
+  - **Plan ID**: PERF-686
