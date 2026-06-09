@@ -1,7 +1,8 @@
 ---
 id: PERF-724
 slug: eliminate-dom-strategy-promise-chain
-status: unclaimed
+status: complete
+claimed_by: "executor-session"
 claimed_by: ""
 created: 2026-06-09
 completed: ""
@@ -120,3 +121,10 @@ Run the DOM render benchmark `cd packages/renderer && npm run build && npx tsx s
 
 ## Prior Art
 - PERF-699 (Removed async/await from capture).
+
+
+## Results Summary
+- **Best render time**: 2.192s (vs baseline 2.613s)
+- **Improvement**: 16.11%
+- **Kept experiments**: [PERF-724]
+- **Discarded experiments**: []

@@ -208,3 +208,5 @@ run	2.662	150	56.35	63.8	discard	PERF-678 Eliminate Array.map in workerPromises
 3	3.517	150	42.65	62.7	discard	PERF-686 Pipeline capture and drain
 
 2027	2.380	150	63.04	63.5	keep	PERF-719: Eager Current Time Update in CdpTimeDriver
+
+2028	2.192	150	68.43	63.5	keep	PERF-724: Eliminate DomStrategy Promise Chain

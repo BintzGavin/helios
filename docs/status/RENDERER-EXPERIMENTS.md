@@ -3,6 +3,10 @@ Current best: ~2.338s (median of PERF-723, best ~2.332s)
 Last updated by: PERF-723
 
 ## What Works
+- **PERF-724**: Eliminate DomStrategy Promise Chain
+  - **What I tried**: Added a synchronous `processCaptureResult` method to `RenderStrategy` to offload `handleBeginFrameResult` out of a Promise `.then()` chain in `DomStrategy.ts`.
+  - **WHY it didn't work / Impact**: Reduced median render time from 2.613s to 2.192s by avoiding an extra microtask and promise allocation.
+  - **Plan ID**: PERF-724
 
 - **PERF-723**: Unify Time and Capture Promise Chain
   - **What I tried**: Modified `TimeDriver.setTime` to always return a Promise, eliminating the `setTimeResult ? await ... : await` ternary check in `CaptureLoop.ts` fast path. A cached `Promise.resolve()` is returned for zero delta (frame 0) to avoid overhead.
