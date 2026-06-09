@@ -13,7 +13,6 @@ export class CdpTimeDriver implements TimeDriver {
   private cachedPromises: Promise<any>[] = [];
   private cdpResolve: (() => void) | null = null;
   private cdpReject: ((err: Error) => void) | null = null;
-  private targetTimeInSeconds: number = 0;
   private singleFrameSyncMediaParams: any = { expression: "window.__helios_sync_media();", awaitPromise: false, returnByValue: false };
   private multiFrameSyncMediaParams: any[] = [];
   private hasMedia: boolean = true;
@@ -51,7 +50,6 @@ export class CdpTimeDriver implements TimeDriver {
 
   private handleVirtualTimeBudgetExpired = () => {
     if (this.cdpResolve) {
-      this.currentTime = this.targetTimeInSeconds;
       this.cdpResolve();
       this.cdpResolve = null;
       this.cdpReject = null;
@@ -201,15 +199,14 @@ export class CdpTimeDriver implements TimeDriver {
     }
 
     // Convert to milliseconds for CDP
-    const budget = delta * 1000;
 
 // 1. Synchronize media elements
     this.syncMediaFn();
 
     // 2. Advance virtual time
     // This triggers the browser event loop and requestAnimationFrame
-    this.setVirtualTimePolicyParams.budget = budget;
-    this.targetTimeInSeconds = timeInSeconds;
+    this.setVirtualTimePolicyParams.budget = delta * 1000;
+    this.currentTime = timeInSeconds;
     const promise = new Promise<void>((resolve, reject) => {
       this.cdpResolve = resolve;
       this.cdpReject = reject;

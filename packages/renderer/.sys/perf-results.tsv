@@ -206,3 +206,5 @@ run	2.662	150	56.35	63.8	discard	PERF-678 Eliminate Array.map in workerPromises
 
 2	2.489	150	60.26	63.5	discard	PERF-717: Overlap Time Progression with FFmpeg Drain
 3	3.517	150	42.65	62.7	discard	PERF-686 Pipeline capture and drain
+
+2027	2.380	150	63.04	63.5	keep	PERF-719: Eager Current Time Update in CdpTimeDriver
