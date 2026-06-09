@@ -210,3 +210,4 @@ run	2.662	150	56.35	63.8	discard	PERF-678 Eliminate Array.map in workerPromises
 2027	2.380	150	63.04	63.5	keep	PERF-719: Eager Current Time Update in CdpTimeDriver
 
 2028	2.192	150	68.43	63.5	keep	PERF-724: Eliminate DomStrategy Promise Chain
+2029	2.317	150	64.73	63.1	keep	PERF-725: Sequential Await CaptureLoop
