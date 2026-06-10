@@ -4,6 +4,11 @@ Last updated by: PERF-725
 
 ## What Works
 
+- **PERF-734**: Simplify Sync Media Branching in CdpTimeDriver
+  - **What I did**: Eliminated `cachedFrames` tracking entirely, relying directly on `executionContextIds` to branch single vs multi-frame evaluation.
+  - **Impact**: Kept code logic simpler by deleting tracking array with negligible overhead/regression on baseline.
+  - **Plan ID**: PERF-734
+
 - **PERF-725**: Preallocate CDP evaluate payloads in CdpTimeDriver
   - **What I tried**: Preallocated `multiFrameSyncMediaParams` inside `handleExecutionContextCreated` and simplified `defaultSyncMedia`.
   - **Impact**: Improved median render time to ~23.422s.

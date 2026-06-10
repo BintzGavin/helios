@@ -1,0 +1,2 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	2.433	300	123.30	0.0	keep	simplified sync media branching by dropping cachedFrames tracking entirely
