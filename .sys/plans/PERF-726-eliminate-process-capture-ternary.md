@@ -1,11 +1,11 @@
 ---
 id: PERF-726
 slug: eliminate-process-capture-ternary
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2027-02-18
-completed: ""
-result: ""
+completed: "2026-06-10"
+result: "Discarded - The experiment resulted in a regression. The overhead of calling an identity function unconditionally was slightly higher than the V8 property truthiness check."
 ---
 # PERF-726: Eliminate Optional Branching in processCaptureResult
 
@@ -58,3 +58,16 @@ Run `npm run test -w packages/renderer` and ensure tests pass, specifically chec
 ## Prior Art
 - PERF-724 introduced `processCaptureResult` as optional.
 - PERF-618 avoided media sync branching by relying on a monomorphic empty function instead of a boolean check.
+
+
+## Results Summary
+
+```tsv
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	2.177	150	68.89	63.1	keep	baseline (re-run on new environment)
+2	2.174	150	69.00	63.1	keep	eliminate processCaptureResult ternary
+3	2.205	150	68.02	63.3	keep	eliminate processCaptureResult ternary
+4	2.237	150	67.07	63.0	keep	eliminate processCaptureResult ternary
+5	2.586	150	58.00	63.1	discard	test with identity CanvasStrategy.processCaptureResult (slower)
+6	2.333	150	64.31	63.3	discard	test with identity CanvasStrategy.processCaptureResult (slower)
+```
