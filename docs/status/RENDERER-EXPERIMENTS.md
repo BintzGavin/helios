@@ -1,8 +1,13 @@
 ## Performance Trajectory
-Current best: ~2.325s (median of PERF-726)
-Last updated by: PERF-726
+Current best: ~23.422s (median of PERF-725)
+Last updated by: PERF-725
 
 ## What Works
+
+- **PERF-725**: Preallocate CDP evaluate payloads in CdpTimeDriver
+  - **What I tried**: Preallocated `multiFrameSyncMediaParams` inside `handleExecutionContextCreated` and simplified `defaultSyncMedia`.
+  - **Impact**: Improved median render time to ~23.422s.
+  - **Plan ID**: PERF-725
 
 - **PERF-726**: Prebind processCaptureResult in CaptureLoop
   - **What I tried**: Extracted strategy.processCaptureResult branch out of the CaptureLoop hot path.
