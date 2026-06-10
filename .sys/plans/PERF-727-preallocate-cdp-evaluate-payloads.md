@@ -1,10 +1,10 @@
 ---
 id: PERF-727
 slug: preallocate-cdp-evaluate-payloads
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-03-01
-completed: ""
+completed: "2026-06-10"
 result: ""
 ---
 # PERF-727: Preallocate CDP evaluate payloads in CdpTimeDriver Multi-Frame Sync Media
@@ -76,3 +76,9 @@ Instead of checking and creating new objects in `defaultSyncMedia`, we can updat
 
 ## Correctness Check
 Run tests in `packages/renderer` and ensure tests pass, specifically checking that DOM captures still render multi-frame videos properly.
+
+## Results Summary
+- **Best render time**: 2.907s (vs baseline 2.325s)
+- **Improvement**: -25.03%
+- **Kept experiments**: None
+- **Discarded experiments**: Preallocate CDP payloads

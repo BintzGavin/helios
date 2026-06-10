@@ -162,6 +162,11 @@ Last updated by: PERF-726
   - **Outcome**: discard
 
 ## What Doesn't Work (and Why)
+- **PERF-727**: Preallocate CDP evaluate payloads in CdpTimeDriver
+  - **What I tried**: Moved payload allocation to handleExecutionContextCreated to simplify the defaultSyncMedia branch.
+  - **Impact**: Median render time was ~2.907s (baseline 2.325s). It regressed performance, possibly due to memory locality issues or array resizing overhead when pushing incrementally compared to bulk setting.
+  - **Plan ID**: PERF-727
+
 - **PERF-726:** Eliminate Optional Branching in processCaptureResult
   - Tried to make `processCaptureResult` mandatory on `RenderStrategy` and implemented an identity function in `CanvasStrategy`, removing the optional truthiness check in `CaptureLoop.ts`.
   - **WHY it didn't work:** Moving the identity function onto the `RenderStrategy` interface and invoking it unconditionally per frame introduced slightly more overhead than the native JavaScript truthiness check (`strategy.processCaptureResult ? ...`). V8 is already extremely efficient at checking properties, and invoking a function with object context is marginally slower.
