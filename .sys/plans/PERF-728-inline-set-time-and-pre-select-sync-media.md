@@ -1,11 +1,11 @@
 ---
 id: PERF-728
 slug: inline-set-time-and-pre-select-sync-media
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "Jules"
 created: 2024-05-28
-completed: ""
-result: ""
+completed: "2024-05-28"
+result: "discarded"
 ---
 # PERF-728: Inline setTime and Pre-select Media Sync Strategy
 

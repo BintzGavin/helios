@@ -167,6 +167,7 @@ Last updated by: PERF-725
   - **Outcome**: discard
 
 ## What Doesn't Work (and Why)
+- PERF-728: Inlining `runSetTime` into `setTime` and pre-selecting `syncMediaFn` closures. **Why**: The overhead of pre-selecting and calling closures was not significantly better than a single if-check inside a default sync function, and removing the `runSetTime` indirection layer yielded negligible improvements within the noise margin (baseline ~2.878s vs experiment ~2.862s).
 - **PERF-727**: Preallocate CDP evaluate payloads in CdpTimeDriver
   - **What I tried**: Moved payload allocation to handleExecutionContextCreated to simplify the defaultSyncMedia branch.
   - **Impact**: Median render time was ~2.907s (baseline 2.325s). It regressed performance, possibly due to memory locality issues or array resizing overhead when pushing incrementally compared to bulk setting.
