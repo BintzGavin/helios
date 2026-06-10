@@ -1,0 +1,7 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1					discard	preallocate-cdp-evaluate-payloads
+2					discard	preallocate-cdp-evaluate-payloads
+3					discard	preallocate-cdp-evaluate-payloads
+1	3.488	150	43.00	63.7	discard	preallocate-cdp-evaluate-payloads
+2	2.907	150	51.60	63.8	discard	preallocate-cdp-evaluate-payloads
+3	2.692	150	55.73	63.2	discard	preallocate-cdp-evaluate-payloads

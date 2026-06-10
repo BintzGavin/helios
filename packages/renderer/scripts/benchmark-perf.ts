@@ -1,6 +1,10 @@
-import { Renderer } from '../src/index';
+import { Renderer } from '../src/index.js';
 import * as path from 'path';
 import * as fs from 'fs/promises';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 async function main() {
   const renderer = new Renderer({
@@ -12,10 +16,7 @@ async function main() {
     intermediateImageFormat: 'png'
   });
 
-  const compositionPath = path.resolve(
-    process.cwd(),
-    '../../examples/dom-benchmark/composition.html'
-  );
+  const compositionPath = path.resolve(__dirname, '../../../examples/dom-benchmark/composition.html');
   const compositionUrl = `file://${compositionPath}`;
   const outputPath = path.resolve(process.cwd(), 'output/dom-benchmark.mp4');
   await fs.mkdir(path.dirname(outputPath), { recursive: true });
