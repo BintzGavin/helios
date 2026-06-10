@@ -9,7 +9,6 @@ export class CdpTimeDriver implements TimeDriver {
   private client: CDPSession | null = null;
   private currentTime: number = 0;
   private timeout: number;
-  private cachedFrames: import('playwright').Frame[] = [];
   private setVirtualTimePolicyParams: any = { policy: 'advance', budget: 0 };
   private executionContextIds: number[] = [];
   private cachedPromises: Promise<any>[] = [];
@@ -21,17 +20,12 @@ export class CdpTimeDriver implements TimeDriver {
   private syncMediaFn: () => void = () => {};
 
   private defaultSyncMedia() {
-    const frames = this.cachedFrames;
-    if (frames.length === 1) {
-      this.client!.send('Runtime.evaluate', this.singleFrameSyncMediaParams);
+    if (this.executionContextIds.length > 0) {
+      for (let i = 0; i < this.executionContextIds.length; i++) {
+        this.client!.send('Runtime.evaluate', this.multiFrameSyncMediaParams[i]);
+      }
     } else {
-        if (this.executionContextIds.length > 0) {
-          for (let i = 0; i < this.executionContextIds.length; i++) {
-            this.client!.send('Runtime.evaluate', this.multiFrameSyncMediaParams[i]);
-          }
-        } else {
-          this.client!.send('Runtime.evaluate', this.singleFrameSyncMediaParams);
-        }
+      this.client!.send('Runtime.evaluate', this.singleFrameSyncMediaParams);
     }
   }
 
@@ -143,8 +137,6 @@ export class CdpTimeDriver implements TimeDriver {
       }
       await Promise.all(initPromises);
     }
-
-    this.cachedFrames = page.frames();
 
     const noopCatch = () => {};
 
