@@ -925,3 +925,9 @@
   - Updated Roadmap in llms.txt with recent verifiable completions from domain PROGRESS logs.
   - Verified package versions match `package.json` exactly.
   - Incremented version to 1.88.2
+### LLMS v1.95.0
+- ✅ Completed: Daily llms.txt Review
+  - Synced Roadmap with recent verifiable completions (Studio RenderManager/AudioMeter tests, CLI templates tests, Infrastructure coverage)
+  - Verified package versions and API examples
+  - Verified Key Files for Agents match existing paths
+  - Incremented version to 1.95.0
