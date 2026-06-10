@@ -1,11 +1,11 @@
 ---
 id: PERF-736
 slug: eliminate-process-capture-bind
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "Jules"
 created: 2026-06-10
-completed: ""
-result: ""
+completed: "2026-06-10"
+result: "discard"
 ---
 
 # PERF-736: Eliminate native .bind() for processCaptureResult in CaptureLoop
