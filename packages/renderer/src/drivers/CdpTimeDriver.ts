@@ -184,10 +184,6 @@ export class CdpTimeDriver implements TimeDriver {
   }
 
   setTime(page: Page, timeInSeconds: number): Promise<void> {
-    return this.runSetTime(page, timeInSeconds);
-  }
-
-  private runSetTime(page: Page, timeInSeconds: number): Promise<void> {
     const delta = timeInSeconds - this.currentTime;
 
     // If delta is 0 or negative, we don't advance.
