@@ -15,6 +15,13 @@ export class SeekTimeDriver implements TimeDriver {
   private singleFrameEvaluateParams: any = { expression: '', awaitPromise: true, returnByValue: false };
   private multiFrameEvaluateParams: any[] = [];
     private executionContextIds: number[] = [];
+  private windowObjectId: string | null = null;
+  private callFunctionOnParams: any = {
+    objectId: '',
+    functionDeclaration: 'function(t, timeoutMs) { return window.__helios_seek(t, timeoutMs); }',
+    arguments: [{ value: 0 }, { value: 0 }],
+    awaitPromise: true
+  };
   private multiFramePromises: Promise<any>[] = [];
   private evaluateArgs: [number, number] = [0, 0];
   private evaluateClosure = ([t, timeoutMs]: any) => { (window as any).__helios_seek(t, timeoutMs); };
@@ -290,6 +297,17 @@ export class SeekTimeDriver implements TimeDriver {
     // Wait briefly to ensure execution contexts have been gathered by CDP
     await new Promise(r => setTimeout(r, 100));
 
+    try {
+      const { result } = await this.cdpSession!.send('Runtime.evaluate', { expression: 'window' });
+      if (result && result.objectId) {
+        this.windowObjectId = result.objectId;
+        this.callFunctionOnParams.objectId = this.windowObjectId;
+        this.callFunctionOnParams.arguments[1].value = this.timeout;
+      }
+    } catch (e) {
+      // Ignore, fallback to evaluate
+    }
+
     this.cachedFrames = page.frames();
     this.cachedMainFrame = page.mainFrame();
       }
@@ -298,8 +316,13 @@ export class SeekTimeDriver implements TimeDriver {
     const frames = this.cachedFrames;
 
     if (frames.length === 1) {
-      this.singleFrameEvaluateParams.expression = 'window.__helios_seek(' + timeInSeconds + ', ' + this.timeout + ')';
-      return this.cdpSession!.send('Runtime.evaluate', this.singleFrameEvaluateParams) as unknown as Promise<void>;
+      if (this.windowObjectId) {
+        this.callFunctionOnParams.arguments[0].value = timeInSeconds;
+        return this.cdpSession!.send('Runtime.callFunctionOn', this.callFunctionOnParams) as unknown as Promise<void>;
+      } else {
+        this.singleFrameEvaluateParams.expression = 'window.__helios_seek(' + timeInSeconds + ', ' + this.timeout + ')';
+        return this.cdpSession!.send('Runtime.evaluate', this.singleFrameEvaluateParams) as unknown as Promise<void>;
+      }
     }
 
     const expression = 'window.__helios_seek(' + timeInSeconds + ', ' + this.timeout + ')';
