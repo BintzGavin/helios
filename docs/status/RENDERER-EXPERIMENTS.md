@@ -1,8 +1,18 @@
 ## Performance Trajectory
-Current best: ~2.317s (median of PERF-725)
-Last updated by: PERF-725
+Current best: ~2.325s (median of PERF-726)
+Last updated by: PERF-726
 
 ## What Works
+
+- **PERF-726**: Prebind processCaptureResult in CaptureLoop
+  - **What I tried**: Extracted strategy.processCaptureResult branch out of the CaptureLoop hot path.
+  - **Impact**: Improved median render time to ~2.325s.
+  - **Plan ID**: PERF-726
+
+- **PERF-726**: Prebind processCaptureResult in CaptureLoop
+  - **What I tried**: Extracted strategy.processCaptureResult branch out of the CaptureLoop hot path.
+  - **Impact**: Improved median render time to ~2.325s.
+  - **Plan ID**: PERF-726
 
 - **PERF-725**: Replace .then() with Sequential Await in CaptureLoop
   - **What I tried**: Changed `await timeDriver.setTime(...).then(() => strategy.capture(...))` to sequential `await timeDriver.setTime(...); const rawResult = await strategy.capture(...);` in `CaptureLoop.ts` fast path and multi-worker loops.
@@ -152,6 +162,11 @@ Last updated by: PERF-725
   - **Outcome**: discard
 
 ## What Doesn't Work (and Why)
+
+- **PERF-726**: Prebind processCaptureResult in CaptureLoop
+  - **What I tried**: Extracted strategy.processCaptureResult branch out of the CaptureLoop hot path.
+  - **WHY it didn't work**: The median render time was ~2.46s, which did not improve significantly over the baseline. The per-frame property lookup was already heavily optimized by V8's inline caching.
+  - **Plan ID**: PERF-726
 - **PERF-716**: Omit default CDP evaluate params in syncMedia
   - **What I tried**: Omitted `awaitPromise` and `returnByValue` in CDP `Runtime.evaluate` payload in `CdpTimeDriver.ts`.
   - **Why it didn't work**: It caused a performance regression. Median render time was ~3.212s vs baseline ~2.115s. Omitting default parameters did not improve processing overhead and negatively impacted parsing or branch prediction for missing keys in Chromium's CDP handling over repeated evaluations.
