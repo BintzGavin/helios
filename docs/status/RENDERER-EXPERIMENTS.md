@@ -1,8 +1,12 @@
 ## Performance Trajectory
-Current best: ~23.422s (median of PERF-725)
+Current best: ~2.48s (median of PERF-737)
 Last updated by: PERF-725
 
 ## What Works
+- **PERF-737**: Replace Promise.all with sequential awaits in SeekTimeDriver
+  - **What I did**: Removed Promise.all and tracking array for multi-frame evaluation in SeekTimeDriver.
+  - **Impact**: Improved median render time to ~2.48s.
+  - **Plan ID**: PERF-737
 
 - **PERF-734**: Simplify Sync Media Branching in CdpTimeDriver
   - **What I did**: Eliminated `cachedFrames` tracking entirely, relying directly on `executionContextIds` to branch single vs multi-frame evaluation.
