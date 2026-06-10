@@ -26,17 +26,6 @@ export class CdpTimeDriver implements TimeDriver {
       this.client!.send('Runtime.evaluate', this.singleFrameSyncMediaParams);
     } else {
         if (this.executionContextIds.length > 0) {
-          if (this.multiFrameSyncMediaParams.length !== this.executionContextIds.length) {
-            this.multiFrameSyncMediaParams.length = this.executionContextIds.length;
-            for (let i = 0; i < this.executionContextIds.length; i++) {
-              this.multiFrameSyncMediaParams[i] = {
-                expression: "window.__helios_sync_media();",
-                contextId: this.executionContextIds[i],
-                awaitPromise: false,
-                returnByValue: false
-              };
-            }
-          }
           for (let i = 0; i < this.executionContextIds.length; i++) {
             this.client!.send('Runtime.evaluate', this.multiFrameSyncMediaParams[i]);
           }
@@ -70,6 +59,12 @@ export class CdpTimeDriver implements TimeDriver {
   private handleExecutionContextCreated = (event: any) => {
     if (event.context.name === '') {
       this.executionContextIds.push(event.context.id);
+      this.multiFrameSyncMediaParams.push({
+          expression: "window.__helios_sync_media();",
+          contextId: event.context.id,
+          awaitPromise: false,
+          returnByValue: false
+      });
     }
   };
 
@@ -88,6 +83,7 @@ export class CdpTimeDriver implements TimeDriver {
     this.client!.on('Emulation.virtualTimeBudgetExpired', this.handleVirtualTimeBudgetExpired);
 
     this.executionContextIds = [];
+    this.multiFrameSyncMediaParams = [];
 
     // Initialize virtual time policy to 'pause' to take control of the clock.
     // We set initialVirtualTime to Jan 1, 2024 (UTC) to ensure deterministic Date.now()
