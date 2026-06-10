@@ -1,0 +1,7 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	2.177	150	68.89	63.1	keep	baseline (re-run on new environment)
+2	2.174	150	69.00	63.1	keep	eliminate processCaptureResult ternary
+3	2.205	150	68.02	63.3	keep	eliminate processCaptureResult ternary
+4	2.237	150	67.07	63.0	keep	eliminate processCaptureResult ternary
+5	2.586	150	58.00	63.1	discard	test with identity CanvasStrategy.processCaptureResult (slower)
+6	2.333	150	64.31	63.3	discard	test with identity CanvasStrategy.processCaptureResult (slower)
