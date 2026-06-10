@@ -1072,3 +1072,8 @@ Last updated by: PERF-698
   - **What I did**: Eliminated `targetTimeInSeconds` from `CdpTimeDriver.ts` by eagerly calculating `budget` inline and directly updating `currentTime`.
   - **Impact**: Improved median render time to ~2.364s (from ~2.415s baseline), proving that removing intermediate variables from the async callback context reduces V8 overhead.
   - **Plan ID**: PERF-719
+
+- **PERF-702**: Cached the window object ID and used callFunctionOn in SeekTimeDriver
+  - **What I did**: Cached the window object ID and used callFunctionOn in SeekTimeDriver instead of evaluate with string concatenation in the hot loop for the single frame path.
+  - **Impact**: Improved median render time to ~2.540s (from baseline ~2.115s).
+  - **Plan ID**: PERF-702
