@@ -216,3 +216,5 @@ run	2.662	150	56.35	63.8	discard	PERF-678 Eliminate Array.map in workerPromises
 727	24.674	600	24.44	61.8	keep	baseline (PERF-725)
 728	23.422	600	26.04	61.9	keep	modified (PERF-725)
 729	2.155	150	69.61	62.8	keep	inline setTime
+
+1	2.759	150	54.36	62.9	discard	Eliminate native .bind() for processCaptureResult in CaptureLoop

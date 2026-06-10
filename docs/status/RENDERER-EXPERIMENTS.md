@@ -172,6 +172,11 @@ Last updated by: PERF-725
   - **Outcome**: discard
 
 ## What Doesn't Work (and Why)
+- **PERF-736**: Eliminate native .bind() for processCaptureResult in CaptureLoop
+  - **What I tried**: Replaced native `.bind()` with a standard closure `(res) => strategy.processCaptureResult!(res)` during the hot loop setup phase.
+  - **WHY it didn't work**: Yielded a performance regression (median ~2.759s vs baseline ~2.317s). This indicates that the V8 JIT handles the native bound function object better than the allocation or execution overhead of a standard wrapper closure on every iteration in this specific context.
+  - **Plan ID**: PERF-736
+
 - PERF-728: Inlining `runSetTime` into `setTime` and pre-selecting `syncMediaFn` closures. **Why**: The overhead of pre-selecting and calling closures was not significantly better than a single if-check inside a default sync function, and removing the `runSetTime` indirection layer yielded negligible improvements within the noise margin (baseline ~2.878s vs experiment ~2.862s).
 - **PERF-727**: Preallocate CDP evaluate payloads in CdpTimeDriver
   - **What I tried**: Moved payload allocation to handleExecutionContextCreated to simplify the defaultSyncMedia branch.
