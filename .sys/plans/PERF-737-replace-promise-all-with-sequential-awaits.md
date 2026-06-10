@@ -1,7 +1,7 @@
 ---
 id: PERF-737
 slug: replace-promise-all-with-sequential-awaits
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-06-12
 completed: ""
