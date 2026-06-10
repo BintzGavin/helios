@@ -1,5 +1,5 @@
 # Status: LLMS
-**Version**: 1.94.0
+**Version**: 1.95.0
 
 [v1.93.0] ✅ Completed: Comprehensive Daily Review - Realigned Quick Facts and Roadmap versions exactly to package.json. Verified API stability and file paths.
 
@@ -183,3 +183,4 @@ Verified package versions match package.json exactly. Verified File Paths and Ke
 [v1.92.0] ✅ Completed: Comprehensive Daily Review - Synced Roadmap with recent progress (Enable Audio State Persistence, Audio Fade Easing). Kept package versions in Quick Facts aligned to package.json.
 
 [v1.94.0] ✅ Completed: Comprehensive Daily Review - Synced Roadmap with recent progress (Studio Asset Drag and Drop, CLI Registry updates, Infrastructure Modal adapter). Verified all file paths and package versions.
+[v1.95.0] ✅ Completed: Comprehensive Daily Review - Synced Roadmap with recent progress (Studio RenderManager/AudioMeter tests, CLI template tests, Infrastructure coverage). Verified all file paths and package versions perfectly match package.json.
