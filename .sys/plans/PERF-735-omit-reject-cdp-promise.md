@@ -1,11 +1,11 @@
 ---
 id: PERF-735
 slug: omit-reject-cdp-promise
-status: unclaimed
+status: complete
+completed: 2024-06-12
+result: discarded
 claimed_by: ""
 created: 2024-06-12
-completed: ""
-result: ""
 ---
 
 # PERF-735: Omit reject parameter in CdpTimeDriver.setTime promise
@@ -58,3 +58,9 @@ Run the `dom` benchmark (`cd packages/renderer && npx tsx scripts/benchmark-perf
 ## Prior Art
 - PERF-711 tried removing `cdpReject` tracking entirely, which caused a regression. We are not removing the tracking or the property itself, we are specifically omitting the `reject` parameter from the inline promise executor to optimize V8's closure handling, based on micro-benchmark results.
 - PERF-725 and PERF-729 focused on removing promise chaining and function wrappers in the hot loop.
+
+## Results Summary
+- **Best render time**: 2.660s (vs baseline 2.321s)
+- **Improvement**: -14% (Regression)
+- **Kept experiments**: None
+- **Discarded experiments**: Omit reject parameter in CdpTimeDriver.setTime promise
