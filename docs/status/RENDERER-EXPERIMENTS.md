@@ -182,6 +182,11 @@ Last updated by: PERF-740
   - **Plan ID**: PERF-740
 
 ## What Doesn't Work (and Why)
+- **PERF-739**: Eager CDP Session Initialization in DomStrategy
+  - **What I tried**: Moved CDP session setup and HeadlessExperimental.enable to the top of DomStrategy.prepare()
+  - **WHY it didn't work**: The median render time regressed to ~28.646s (from the baseline of ~27.41s). Eagerly enabling CDP might have caused Playwright's page evaluation for preload scripts to compete with early internal CDP processing overhead, delaying startup.
+  - **Plan ID**: PERF-739
+
 - Replace Runtime.evaluate with Runtime.callFunctionOn in CdpTimeDriver syncMedia (PERF-741)
   - WHY: V8 optimization for evaluation vs callFunctionOn was negligible or slower than the baseline in the hot loop. The median time skyrocketed to ~25.1s, indicating a severe regression, likely due to execution context ID handling issues or closure capture problems.
 - **PERF-735**: Omit reject parameter in CdpTimeDriver.setTime promise

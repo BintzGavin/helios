@@ -1,11 +1,11 @@
 ---
 id: PERF-739
 slug: eager-cdp-session-in-dom-strategy
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-06-12
-completed: ""
-result: ""
+completed: "2024-06-12"
+result: "discarded"
 ---
 
 # PERF-739: Eager CDP Session Initialization in DomStrategy
@@ -49,3 +49,9 @@ We can eagerly initialize `this.cdpSession` at the very beginning of `prepare()`
 
 ## Correctness Check
 Run the canvas and dom smoke tests to ensure startup still works correctly.
+
+## Results Summary
+- **Best render time**: 28.646s (vs baseline 27.410s)
+- **Improvement**: Regressed
+- **Kept experiments**: None
+- **Discarded experiments**: [PERF-739]
