@@ -1,8 +1,9 @@
 ## Performance Trajectory
-Current best: 1.815s (baseline was 2.660s, -31.8%)
-Last updated by: PERF-740
+Current best: 2.470s (baseline was 2.720s, -9.19%)
+Last updated by: PERF-744
 
 ## What Works
+- Bypassed `Promise.all` and sequential await in `SeekTimeDriver.ts` multi-frame path by allocating a custom `ReusableAggregator`, reducing tracking overhead while fully pipelining CDP commands. (Improved median render time from ~2.72s to 2.47s, ~9% faster) [PERF-744]
 
 - **PERF-737**: Replace Promise.all with sequential awaits in SeekTimeDriver
   - **What I did**: Removed Promise.all and tracking array for multi-frame evaluation in SeekTimeDriver.
