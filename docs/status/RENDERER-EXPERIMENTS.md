@@ -1109,3 +1109,7 @@ Last updated by: PERF-698
   - **What I did**: Replaced dynamic string concatenation and `Runtime.evaluate` with preallocated payloads and `Runtime.callFunctionOn` using `executionContextId`.
   - **Impact**: Kept code logic simpler and reduced string GC pressure. Performance check skipped due to environment limits, functionally verified.
   - **Plan ID**: PERF-738
+- **PERF-742**: Eliminate Promise Allocation in CdpTimeDriver setTime
+  - **What I did**: Replaced the per-frame \`new Promise\` and executor closure allocation with a single instance of a \`ReusableThenable\` class that duck-types as a Promise, allowing `await` to still work properly.
+  - **Impact**: Improved median render time to ~28.717s (from baseline ~30.719s in the isolated environment), avoiding closure allocation and tracking overhead per frame in the core headless rendering loop.
+  - **Plan ID**: PERF-742

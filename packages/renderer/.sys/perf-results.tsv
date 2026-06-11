@@ -222,3 +222,5 @@ run	2.662	150	56.35	63.8	discard	PERF-678 Eliminate Array.map in workerPromises
 2	2.660	150	56.54	62.8	discard	PERF-735 omit reject parameter
 3	1.815	150	82.64	37.0	keep	Inline media promise creation in SeekTimeDriver
 223	25.139	600	23.87	60.8	discard	replace evaluate with callFunctionOn in syncMedia
+742	30.719	600	19.53	60.0	keep	baseline (PERF-742)
+742	28.717	600	20.89	60.0	keep	eliminate promise allocation in setTime
