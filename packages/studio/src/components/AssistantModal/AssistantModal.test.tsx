@@ -127,7 +127,7 @@ describe('AssistantModal', () => {
       const input = screen.getByPlaceholderText('How do I add audio?');
 
       await act(async () => {
-        fireEvent.change(input, { target: { value: 'How to use audio?' } });
+        fireEvent.change(input, { target: { value: 'How to use audio' } });
       });
 
       await act(async () => {
@@ -140,7 +140,10 @@ describe('AssistantModal', () => {
       expect(textarea.value).toContain('Test Comp');
       expect(textarea.value).toContain('Schema: {');
 
-      expect(textarea.value).toContain('How to use audio?');
+      expect(textarea.value).toContain('Relevant Documentation');
+      expect(textarea.value).toContain('Audio Component');
+
+      expect(textarea.value).toContain('How to use audio');
     });
 
     it('generates prompt with enter key', async () => {
@@ -254,6 +257,12 @@ describe('AssistantModal', () => {
       // Only Video should be shown
       expect(screen.queryByText('Audio Component')).not.toBeInTheDocument();
       expect(screen.getByText('Video Component')).toBeInTheDocument();
+
+      // Switch back to Ask AI
+      await act(async () => {
+        fireEvent.click(screen.getByText('Ask AI'));
+      });
+      expect(screen.getByPlaceholderText('How do I add audio?')).toBeInTheDocument();
     });
 
     it('toggles doc sections', async () => {

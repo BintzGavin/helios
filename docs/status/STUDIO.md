@@ -1,4 +1,4 @@
-**Version**: 0.121.28
+**Version**: 0.121.29
 
 - [v0.121.28] ✅ Completed: Improve AssistantModal Coverage - Reached 90%+ test coverage for AssistantModal.
 
@@ -231,3 +231,5 @@
 
 - [v0.121.22] ✅ Completed: Server Templates Test Coverage - Added 100% unit test coverage for scaffolding templates
 - [v0.121.23] ✅ Completed: Improve AudioMeter Coverage - Created plan to test AudioMeter component (2026-06-04-STUDIO-Improve-AudioMeter-Coverage.md).
+
+[v0.121.29] ✅ Completed: Improve AssistantModal Coverage - Test coverage increased to 100%.
