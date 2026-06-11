@@ -1,11 +1,11 @@
 ---
 id: PERF-738
 slug: preallocate-call-function-on
-status: unclaimed
-claimed_by: ""
+status: claimed
+claimed_by: "executor-session"
 created: 2024-06-12
-completed: ""
-result: ""
+completed: "2024-06-12"
+result: "discard"
 ---
 
 # PERF-738: Use `Runtime.callFunctionOn` Instead of `Runtime.evaluate` in `SeekTimeDriver`
@@ -44,3 +44,10 @@ However, CDP `Runtime.callFunctionOn` accepts `executionContextId` instead of `o
 
 ## Correctness Check
 Run the `dom` benchmark and verify output video generation completes successfully.
+
+
+## Results Summary
+- **Best render time**: 3.928s (vs baseline 3.789s)
+- **Improvement**: Regression
+- **Kept experiments**: None
+- **Discarded experiments**: Preallocate `Runtime.callFunctionOn` payloads in `SeekTimeDriver.ts` to eliminate per-frame string concatenation

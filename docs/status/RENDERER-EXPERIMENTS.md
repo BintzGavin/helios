@@ -177,6 +177,7 @@ Last updated by: PERF-725
   - **Outcome**: discard
 
 ## What Doesn't Work (and Why)
+- Tried PERF-738: using Runtime.callFunctionOn with preallocated payloads instead of Runtime.evaluate in SeekTimeDriver.ts to avoid string allocations. Why it didn't work: Resulted in a slight performance regression (median ~3.928s vs baseline ~3.789s). It seems executionContextId lookups and calling functions might be slower than Chromium's fast-path parsing of simple cached evaluation strings, or the object/array modification overhead in JS for arguments offsets the gains.
 - **PERF-735**: Omit reject parameter in CdpTimeDriver.setTime promise
   - **What I tried**: Omitted the reject parameter from the inline promise executor in the CdpTimeDriver.setTime hot loop to reduce V8 closure allocation overhead.
   - **WHY it didn't work**: The median render time regressed to ~2.66s compared to the baseline of ~2.321s (or the current best of ~2.48s). V8 is already highly optimized for handling standard two-argument promise executors.
