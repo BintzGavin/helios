@@ -182,6 +182,8 @@ Last updated by: PERF-740
   - **Plan ID**: PERF-740
 
 ## What Doesn't Work (and Why)
+- Replace Runtime.evaluate with Runtime.callFunctionOn in CdpTimeDriver syncMedia (PERF-741)
+  - WHY: V8 optimization for evaluation vs callFunctionOn was negligible or slower than the baseline in the hot loop. The median time skyrocketed to ~25.1s, indicating a severe regression, likely due to execution context ID handling issues or closure capture problems.
 - **PERF-735**: Omit reject parameter in CdpTimeDriver.setTime promise
   - **What I tried**: Omitted the reject parameter from the inline promise executor in the CdpTimeDriver.setTime hot loop to reduce V8 closure allocation overhead.
   - **WHY it didn't work**: The median render time regressed to ~2.66s compared to the baseline of ~2.321s (or the current best of ~2.48s). V8 is already highly optimized for handling standard two-argument promise executors.

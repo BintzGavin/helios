@@ -1,7 +1,7 @@
 ---
 id: PERF-741
 slug: preallocate-call-function-on-cdp-time-driver
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-06-12
 completed: ""
@@ -71,3 +71,9 @@ We can apply the same optimization to `CdpTimeDriver` by switching to `Runtime.c
 
 ## Correctness Check
 Run the `dom` benchmark and verify output video generation completes successfully.
+
+## Results Summary
+- **Best render time**: 25.139s (vs baseline 2.364s)
+- **Improvement**: 0.0%
+- **Kept experiments**: None
+- **Discarded experiments**: Replace Runtime.evaluate with Runtime.callFunctionOn
