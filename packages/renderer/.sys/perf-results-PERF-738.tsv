@@ -1,0 +1,4 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	2.320	600	258.62	210.0	keep	baseline best
+2	2.250	600	266.66	209.5	keep	callFunctionOn with executionContextId
+3	2.280	600	263.15	211.2	keep	callFunctionOn with executionContextId

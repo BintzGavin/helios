@@ -10,14 +10,9 @@ const noopCatch = () => {};
 
 export class SeekTimeDriver implements TimeDriver {
   private cdpSession: CDPSession | null = null;
-  private cachedFrames: import('playwright').Frame[] = [];
-  private cachedMainFrame: import('playwright').Frame | null = null;
-  private singleFrameEvaluateParams: any = { expression: '', awaitPromise: true, returnByValue: false };
-  private multiFrameEvaluateParams: any[] = [];
+  private multiFrameCallParams: any[] = [];
     private executionContextIds: number[] = [];
-  private windowObjectId: string | null = null;
   private callFunctionOnParams: any = {
-    objectId: '',
     functionDeclaration: 'function(t, timeoutMs) { return window.__helios_seek(t, timeoutMs); }',
     arguments: [{ value: 0 }, { value: 0 }],
     awaitPromise: true
@@ -296,56 +291,39 @@ export class SeekTimeDriver implements TimeDriver {
     // Wait briefly to ensure execution contexts have been gathered by CDP
     await new Promise(r => setTimeout(r, 100));
 
-    try {
-      const { result } = await this.cdpSession!.send('Runtime.evaluate', { expression: 'window' });
-      if (result && result.objectId) {
-        this.windowObjectId = result.objectId;
-        this.callFunctionOnParams.objectId = this.windowObjectId;
-        this.callFunctionOnParams.arguments[1].value = this.timeout;
-      }
-    } catch (e) {
-      // Ignore, fallback to evaluate
-    }
-
-    this.cachedFrames = page.frames();
-    this.cachedMainFrame = page.mainFrame();
+    this.callFunctionOnParams.arguments[1].value = this.timeout;
       }
 
   setTime(page: Page, timeInSeconds: number): Promise<void> {
-    const frames = this.cachedFrames;
+    if (this.executionContextIds.length === 0) return Promise.resolve();
 
-    if (frames.length === 1) {
-      if (this.windowObjectId) {
-        this.callFunctionOnParams.arguments[0].value = timeInSeconds;
-        return this.cdpSession!.send('Runtime.callFunctionOn', this.callFunctionOnParams) as unknown as Promise<void>;
-      } else {
-        this.singleFrameEvaluateParams.expression = 'window.__helios_seek(' + timeInSeconds + ', ' + this.timeout + ')';
-        return this.cdpSession!.send('Runtime.evaluate', this.singleFrameEvaluateParams) as unknown as Promise<void>;
-      }
+    if (this.executionContextIds.length === 1) {
+      this.callFunctionOnParams.arguments[0].value = timeInSeconds;
+      this.callFunctionOnParams.executionContextId = this.executionContextIds[0];
+      return this.cdpSession!.send('Runtime.callFunctionOn', this.callFunctionOnParams) as unknown as Promise<void>;
     }
 
-    const expression = 'window.__helios_seek(' + timeInSeconds + ', ' + this.timeout + ')';
-
-    if (this.multiFrameEvaluateParams.length !== this.executionContextIds.length) {
-      this.multiFrameEvaluateParams.length = this.executionContextIds.length;
+    if (this.multiFrameCallParams.length !== this.executionContextIds.length) {
+      this.multiFrameCallParams.length = this.executionContextIds.length;
       for (let i = 0; i < this.executionContextIds.length; i++) {
-        this.multiFrameEvaluateParams[i] = {
-          expression: expression,
-          contextId: this.executionContextIds[i],
+        this.multiFrameCallParams[i] = {
+          functionDeclaration: 'function(t, timeoutMs) { return window.__helios_seek(t, timeoutMs); }',
+          arguments: [{ value: timeInSeconds }, { value: this.timeout }],
+          executionContextId: this.executionContextIds[i],
           awaitPromise: true,
           returnByValue: false
         };
       }
     } else {
       for (let i = 0; i < this.executionContextIds.length; i++) {
-        this.multiFrameEvaluateParams[i].expression = expression;
-        this.multiFrameEvaluateParams[i].contextId = this.executionContextIds[i];
+        this.multiFrameCallParams[i].executionContextId = this.executionContextIds[i];
+        this.multiFrameCallParams[i].arguments[0].value = timeInSeconds;
       }
     }
 
     return (async () => {
       for (let i = 0; i < this.executionContextIds.length; i++) {
-        await this.cdpSession!.send('Runtime.evaluate', this.multiFrameEvaluateParams[i]);
+        await this.cdpSession!.send('Runtime.callFunctionOn', this.multiFrameCallParams[i]);
       }
     })();
   }

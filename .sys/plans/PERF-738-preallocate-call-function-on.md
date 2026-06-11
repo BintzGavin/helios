@@ -1,10 +1,10 @@
 ---
 id: PERF-738
 slug: preallocate-call-function-on
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-06-12
-completed: ""
+completed: 2024-06-12
 result: ""
 ---
 

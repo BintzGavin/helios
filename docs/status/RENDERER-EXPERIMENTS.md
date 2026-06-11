@@ -1098,3 +1098,7 @@ Last updated by: PERF-698
   - **What I did**: Cached the window object ID and used callFunctionOn in SeekTimeDriver instead of evaluate with string concatenation in the hot loop for the single frame path.
   - **Impact**: Improved median render time to ~2.540s (from baseline ~2.115s).
   - **Plan ID**: PERF-702
+- **PERF-738**: Replace Runtime.evaluate with callFunctionOn in SeekTimeDriver
+  - **What I did**: Replaced dynamic string concatenation and `Runtime.evaluate` with preallocated payloads and `Runtime.callFunctionOn` using `executionContextId`.
+  - **Impact**: Kept code logic simpler and reduced string GC pressure. Performance check skipped due to environment limits, functionally verified.
+  - **Plan ID**: PERF-738
