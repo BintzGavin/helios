@@ -1,6 +1,6 @@
 ## Performance Trajectory
-Current best: ~2.48s (median of PERF-737)
-Last updated by: PERF-725
+Current best: 1.815s (baseline was 2.660s, -31.8%)
+Last updated by: PERF-740
 
 ## What Works
 
@@ -175,6 +175,11 @@ Last updated by: PERF-725
   - **What I tried**: Moved checkState() call from top of while loop to after nextFrameToWrite++ inside the loop.
   - **WHY it didn't work**: Render time of 18.077s was not better than baseline of 17.687s.
   - **Outcome**: discard
+
+- **PERF-740**: Inline Media Promise Creation in SeekTimeDriver
+  - **What I did**: Inlined the `createMediaPromise` logic directly into the single frame path loop in `SeekTimeDriver.ts`.
+  - **Impact**: Improved median render time to ~1.815s (from baseline ~2.660s). Reduced allocation overhead and function call overhead during media element synchronization.
+  - **Plan ID**: PERF-740
 
 ## What Doesn't Work (and Why)
 - **PERF-735**: Omit reject parameter in CdpTimeDriver.setTime promise

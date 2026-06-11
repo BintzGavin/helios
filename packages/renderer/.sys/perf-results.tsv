@@ -220,3 +220,4 @@ run	2.662	150	56.35	63.8	discard	PERF-678 Eliminate Array.map in workerPromises
 1	2.759	150	54.36	62.9	discard	Eliminate native .bind() for processCaptureResult in CaptureLoop
 1	2.48	150	60.48	0	keep	Replace Promise.all with sequential awaits in SeekTimeDriver.setTime
 2	2.660	150	56.54	62.8	discard	PERF-735 omit reject parameter
+3	1.815	150	82.64	37.0	keep	Inline media promise creation in SeekTimeDriver
