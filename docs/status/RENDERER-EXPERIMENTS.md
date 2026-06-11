@@ -3,6 +3,7 @@ Current best: ~2.48s (median of PERF-737)
 Last updated by: PERF-725
 
 ## What Works
+
 - **PERF-737**: Replace Promise.all with sequential awaits in SeekTimeDriver
   - **What I did**: Removed Promise.all and tracking array for multi-frame evaluation in SeekTimeDriver.
   - **Impact**: Improved median render time to ~2.48s.
@@ -176,6 +177,11 @@ Last updated by: PERF-725
   - **Outcome**: discard
 
 ## What Doesn't Work (and Why)
+- **PERF-735**: Omit reject parameter in CdpTimeDriver.setTime promise
+  - **What I tried**: Omitted the reject parameter from the inline promise executor in the CdpTimeDriver.setTime hot loop to reduce V8 closure allocation overhead.
+  - **WHY it didn't work**: The median render time regressed to ~2.66s compared to the baseline of ~2.321s (or the current best of ~2.48s). V8 is already highly optimized for handling standard two-argument promise executors.
+  - **Plan ID**: PERF-735
+
 - **PERF-736**: Eliminate native .bind() for processCaptureResult in CaptureLoop
   - **What I tried**: Replaced native `.bind()` with a standard closure `(res) => strategy.processCaptureResult!(res)` during the hot loop setup phase.
   - **WHY it didn't work**: Yielded a performance regression (median ~2.759s vs baseline ~2.317s). This indicates that the V8 JIT handles the native bound function object better than the allocation or execution overhead of a standard wrapper closure on every iteration in this specific context.
