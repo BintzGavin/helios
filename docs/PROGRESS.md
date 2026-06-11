@@ -40,6 +40,10 @@
 - ✅ Completed: Improve AudioMeter Coverage - Added unit tests for AudioMeter to ensure full line and branch coverage including clipping and warning thresholds.
 
 
+## STUDIO v0.121.29
+### STUDIO v0.121.29
+- ✅ Completed: Improve AssistantModal Coverage - Test coverage increased to 100%.
+
 ### STUDIO v0.121.28
 ### STUDIO v0.121.28
 - ✅ Completed: Improve AssistantModal Coverage - Reached 90%+ test coverage for AssistantModal.
