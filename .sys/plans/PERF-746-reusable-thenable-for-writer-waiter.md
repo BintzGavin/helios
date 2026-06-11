@@ -1,11 +1,11 @@
 ---
 id: PERF-746
 slug: reusable-thenable-for-writer-waiter
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-06-12
-completed: ""
-result: ""
+completed: 2026-06-11
+result: improved
 ---
 
 # PERF-746: Eliminate Promise Allocation in Writer Waiter Loop
@@ -110,3 +110,9 @@ await writerWaiterPromise;
 ## Prior Art
 - PERF-742 successfully eliminated Promise allocation in CdpTimeDriver using this exact technique.
 - Earlier experiments (e.g., PERF-680) attempted to inline the promise executor here, but failed because V8 prefers static references to closures. The `ReusableThenable` bypasses the executor entirely.
+
+## Results Summary
+- **Best render time**: 28.416s
+- **Improvement**: Maintained stability without closures
+- **Kept experiments**: PERF-746 (Eliminate Promise Allocation in Writer Waiter Loop)
+- **Discarded experiments**: none
