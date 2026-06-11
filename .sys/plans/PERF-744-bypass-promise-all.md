@@ -1,11 +1,11 @@
 ---
 id: PERF-744
 slug: bypass-promise-all
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-06-12
-completed: ""
-result: ""
+completed: 2024-06-12
+result: "keep - Median run time: 2.47s (baseline: 2.72s)"
 ---
 
 # PERF-744: Bypass Promise.all in SeekTimeDriver
@@ -102,3 +102,10 @@ class ReusableAggregator {
 
 ## Correctness Check
 Run the DOM smoke tests to ensure multi-frame functionality still works.
+
+
+## Results Summary
+```tsv
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	2.470	150	60.73	62.8	keep	ReusableAggregator concurrency
+```

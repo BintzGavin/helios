@@ -3,12 +3,50 @@ import { TimeDriver } from './TimeDriver.js';
 import { getSeedScript } from '../utils/random-seed.js';
 import { FIND_ALL_MEDIA_FUNCTION, FIND_ALL_SCOPES_FUNCTION, SYNC_MEDIA_FUNCTION, PARSE_MEDIA_ATTRIBUTES_FUNCTION } from '../utils/dom-scripts.js';
 
+
+class ReusableAggregator {
+  public resolveCb: (() => void) | null = null;
+  public rejectCb: ((err: Error) => void) | null = null;
+  public target: number = 0;
+  public count: number = 0;
+
+  then(resolve: () => void, reject: (err: Error) => void) {
+    this.resolveCb = resolve;
+    this.rejectCb = reject;
+    this.check();
+  }
+
+  check() {
+    if (this.count >= this.target && this.resolveCb) {
+        const cb = this.resolveCb;
+        this.resolveCb = null;
+        this.rejectCb = null;
+        cb();
+    }
+  }
+
+  tick = () => {
+      this.count++;
+      this.check();
+  };
+
+  fail = (err: Error) => {
+    if (this.rejectCb) {
+        const cb = this.rejectCb;
+        this.resolveCb = null;
+        this.rejectCb = null;
+        cb(err);
+    }
+  };
+}
+
 const noopCatch = () => {};
 
 
 
 
 export class SeekTimeDriver implements TimeDriver {
+  private aggregator = new ReusableAggregator();
   private cdpSession: CDPSession | null = null;
   private multiFrameCallParams: any[] = [];
     private executionContextIds: number[] = [];
@@ -313,10 +351,14 @@ export class SeekTimeDriver implements TimeDriver {
       }
     }
 
-    return (async () => {
-      for (let i = 0; i < this.executionContextIds.length; i++) {
-        await this.cdpSession!.send('Runtime.callFunctionOn', this.multiFrameCallParams[i]);
-      }
-    })();
+    this.aggregator.count = 0;
+    this.aggregator.target = this.executionContextIds.length;
+
+    for (let i = 0; i < this.executionContextIds.length; i++) {
+        this.cdpSession!.send('Runtime.callFunctionOn', this.multiFrameCallParams[i])
+            .then(this.aggregator.tick)
+            .catch(this.aggregator.fail);
+    }
+    return this.aggregator as any as Promise<void>;
   }
 }
