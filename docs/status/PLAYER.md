@@ -254,3 +254,5 @@
 [v0.77.48] ✅ Completed: Fix API Parity Events - Implemented missing media events (playing, waiting, suspend, stalled) to improve API parity with HTMLMediaElement.
 [v0.77.50] ✅ Completed: Discovered that `v0.77.49-PLAYER-Document-Missing-Event-Handlers.md` is an IMPOSSIBLE: DUPLICATION plan. The event handlers (`onplaying`, `onsuspend`, `onstalled`, `onwaiting`) are already fully documented in the README. Documented as impossible and discarded.
 [v0.77.51] ✅ Completed: Discovered that 2027-02-17-PLAYER-Document-Missing-Media-Properties.md is an IMPOSSIBLE: DUPLICATION plan. The missing properties are already fully documented in the README. Documented as impossible and discarded.
+
+[v0.77.52] ✅ Completed: Document Event Handlers - Implemented missing media event handlers (onabort, onemptied, onprogress) to improve API parity with HTMLMediaElement and updated documentation.

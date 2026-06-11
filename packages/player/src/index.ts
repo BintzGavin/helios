@@ -949,6 +949,30 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
   }
 
   // --- Standard Event Handlers ---
+  private _onabort: ((event: Event) => void) | null = null;
+  public get onabort() { return this._onabort; }
+  public set onabort(handler: ((event: Event) => void) | null) {
+    if (this._onabort) this.removeEventListener('abort', this._onabort);
+    this._onabort = handler;
+    if (handler) this.addEventListener('abort', handler);
+  }
+
+  private _onemptied: ((event: Event) => void) | null = null;
+  public get onemptied() { return this._onemptied; }
+  public set onemptied(handler: ((event: Event) => void) | null) {
+    if (this._onemptied) this.removeEventListener('emptied', this._onemptied);
+    this._onemptied = handler;
+    if (handler) this.addEventListener('emptied', handler);
+  }
+
+  private _onprogress: ((event: Event) => void) | null = null;
+  public get onprogress() { return this._onprogress; }
+  public set onprogress(handler: ((event: Event) => void) | null) {
+    if (this._onprogress) this.removeEventListener('progress', this._onprogress);
+    this._onprogress = handler;
+    if (handler) this.addEventListener('progress', handler);
+  }
+
 
   private _onplay: ((event: Event) => void) | null = null;
   public get onplay() { return this._onplay; }
