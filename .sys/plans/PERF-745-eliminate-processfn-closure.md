@@ -1,11 +1,11 @@
 ---
 id: PERF-745
 slug: eliminate-processfn-closure
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-06-12
-completed: ""
-result: ""
+completed: 2024-06-12
+result: improved
 ---
 
 # PERF-745: Eliminate processCaptureResult Branching and Inline Closure
@@ -45,3 +45,10 @@ We can completely eliminate the closure allocation `processFn` from `CaptureLoop
 `const buffer = hasProcessFn ? strategy.processCaptureResult!(rawResult) : rawResult;`
 
 **Why**: Replaces an intermediate closure invocation with a fast boolean branch and direct object method invocation, saving closure allocation and indirection overhead.
+
+
+## Results Summary
+- **Best render time**: 26.385s (vs baseline 28.134s)
+- **Improvement**: 6.2%
+- **Kept experiments**: Eliminate `processFn` bound closure in favor of cached `hasProcessFn` boolean in `CaptureLoop.ts`
+- **Discarded experiments**: None
