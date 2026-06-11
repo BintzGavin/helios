@@ -1,30 +1,28 @@
 #### 1. Context & Goal
-- **Objective**: Implement missing `abort`, `emptied`, and `progress` media events in `<helios-player>` Web Component for full HTMLMediaElement API parity.
-- **Trigger**: Vision gap identified in `README.md` (Standard Media API parity) comparing standard HTMLMediaElement event handlers to implemented ones.
-- **Impact**: Improves standard compliance and allows drop-in replacement for standard `<video>` element for users relying on these events.
+- **Objective**: Implement missing dispatch of `abort`, `emptied`, and `progress` media events in the `<helios-player>` Web Component to complete HTMLMediaElement API parity.
+- **Trigger**: Issue reported: The player has handler properties (`onabort`, `onemptied`, `onprogress`) but these events are never actually dispatched in the `src/index.ts` file.
+- **Impact**: Improves standard compliance and ensures event listeners for these media events are properly triggered during the player's lifecycle.
 
 #### 2. File Inventory
-- **Modify**: `packages/player/src/index.ts` - Add `_onabort`, `_onemptied`, `_onprogress` private properties and their corresponding public getters and setters. Update `bridgeMessageHandler` to forward these events if they arrive from the iframe (or simply mock them in the player based on state changes).
-- **Modify**: `packages/player/README.md` - Document `onabort`, `onemptied`, `onprogress` in the "Event Handlers" section and their corresponding events in the "Events" section.
-- **Modify**: `packages/player/src/index.test.ts` - Add assertions to verify `onabort`, `onemptied`, and `onprogress` properties work correctly.
+- **Modify**: `packages/player/src/index.ts`
+  - Add dispatch for `abort` and `emptied` in `loadIframe()` if the player was already loaded.
+  - Add dispatch for `progress` in `loadIframe()` after `loadstart`.
 
 #### 3. Implementation Spec
-- **Architecture**: Extend the existing Web Component properties to include getters and setters for the `onabort`, `onemptied`, and `onprogress` event handlers following the established pattern.
+- **Architecture**: In `packages/player/src/index.ts`, locate the `loadIframe(src: string)` method.
+  - Before setting the new `src` and resetting states, check if the player is already loaded. If so, it means we are aborting the previous load/playback. Dispatch `abort` and `emptied` events.
+  - Immediately after dispatching `loadstart`, dispatch a `progress` event to indicate data fetching has started.
 - **Pseudo-Code**:
-  ```typescript
-  private _onabort: ((event: Event) => void) | null = null;
-  public get onabort() { return this._onabort; }
-  public set onabort(handler: ((event: Event) => void) | null) {
-    if (this._onabort) this.removeEventListener('abort', this._onabort);
-    this._onabort = handler;
-    if (handler) this.addEventListener('abort', handler);
-  }
-  ```
-  (Repeat for `onemptied` and `onprogress`)
-- **Public API Changes**: Adds `onabort`, `onemptied`, and `onprogress` event handler properties to `HeliosPlayer`.
+  - `loadIframe` function:
+    - If previously loaded: dispatch `abort` and `emptied`.
+    - Reset internal state variables.
+    - Dispatch `loadstart`.
+    - Dispatch `progress`.
+    - Set new iframe source and internal state.
+- **Public API Changes**: None.
 - **Dependencies**: None.
 
 #### 4. Test Plan
 - **Verification**: Run `npm run build -w packages/player` and `npm run test -w packages/player`.
-- **Success Criteria**: The player exposes the properties `onabort`, `onemptied`, and `onprogress` and they function as valid event listeners, passing tests.
-- **Edge Cases**: None.
+- **Success Criteria**: The player successfully dispatches the `abort`, `emptied`, and `progress` events during the appropriate lifecycle states. Tests pass.
+- **Edge Cases**: Ensure `abort` and `emptied` do not fire on the very first load. Ensure these events do not break existing logic.
