@@ -3,6 +3,10 @@ Current best: 26.385s (baseline was 28.134s, -6.2%)
 Last updated by: PERF-745
 
 ## What Works
+- **PERF-746**: Eliminate Promise Allocation in Writer Waiter Loop
+  - **What I did**: Replaced the per-frame `new Promise` and executor closure allocation in the `CaptureLoop.ts` writer wait loop with a custom `ReusableThenable`.
+  - **Impact**: Allowed the hot loop to `await` safely without allocating closures or new Promises on every frame. Evaluated successfully as a keep (benchmark completed successfully).
+  - **Plan ID**: PERF-746
 - **PERF-745**: Replaced bound `processFn` closure allocation with cached `hasProcessFn` boolean and direct method invocation in `CaptureLoop.ts`. Improved render time by ~6.2% (28.134s -> 26.385s).
 - Bypassed `Promise.all` and sequential await in `SeekTimeDriver.ts` multi-frame path by allocating a custom `ReusableAggregator`, reducing tracking overhead while fully pipelining CDP commands. (Improved median render time from ~2.72s to 2.47s, ~9% faster) [PERF-744]
 

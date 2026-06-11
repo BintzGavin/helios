@@ -6,6 +6,34 @@ import { TimeDriver } from '../drivers/TimeDriver.js';
 
 const noopCatch = () => {};
 
+class ReusableThenable {
+  public resolveCb: (() => void) | null = null;
+  public rejectCb: ((err: Error) => void) | null = null;
+
+  then(resolve: () => void, reject: (err: Error) => void) {
+    this.resolveCb = resolve;
+    this.rejectCb = reject;
+  }
+
+  resolve() {
+    if (this.resolveCb) {
+      const cb = this.resolveCb;
+      this.resolveCb = null;
+      this.rejectCb = null;
+      cb();
+    }
+  }
+
+  reject(err: Error) {
+    if (this.rejectCb) {
+      const cb = this.rejectCb;
+      this.resolveCb = null;
+      this.rejectCb = null;
+      cb(err);
+    }
+  }
+}
+
 export class CaptureLoop {
   private drainResolve: (() => void) | null = null;
   private drainReject: ((err: Error) => void) | null = null;
@@ -152,8 +180,7 @@ export class CaptureLoop {
     const frameBufferRing = new Array<Buffer | string | null>(maxPipelineDepth).fill(null);
     const frameReadyRing = new Uint8Array(maxPipelineDepth); // 0 = not ready, 1 = ready
     let fatalError: any = null;
-    let writerWaiterResolve: (() => void) | null = null;
-    const writerWaiterExecutor = (resolve: () => void) => { writerWaiterResolve = resolve; };
+    const writerWaiterPromise = new ReusableThenable();
 
     // Multi-worker ACTOR MODEL with backpressure
     let nextFrameToSubmit = 0;
@@ -176,11 +203,7 @@ export class CaptureLoop {
                     workerBlockedResolves[w] = null;
                 }
             }
-            if (writerWaiterResolve) {
-                const res = writerWaiterResolve;
-                writerWaiterResolve = null;
-                res();
-            }
+            writerWaiterPromise.resolve();
             return;
         }
 
@@ -257,11 +280,7 @@ export class CaptureLoop {
                 aborted = true;
                 checkState();
             }
-            if (writerWaiterResolve) {
-                const res = writerWaiterResolve;
-                writerWaiterResolve = null;
-                res();
-            }
+            writerWaiterPromise.resolve();
         }
     };
 
@@ -276,7 +295,7 @@ export class CaptureLoop {
 
             const ringIndex = nextFrameToWrite & ringMask;
             if (frameReadyRing[ringIndex] === 0) {
-                await new Promise<void>(writerWaiterExecutor);
+                await writerWaiterPromise;
                 continue;
             }
 
