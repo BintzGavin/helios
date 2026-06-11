@@ -1,5 +1,3 @@
-
-
 ## LLMS v1.94.0
 - ✅ Completed: Daily llms.txt Review
   - Synced roadmap with progress across Studio, CLI, and Infrastructure
@@ -931,3 +929,9 @@
   - Verified package versions and API examples
   - Verified Key Files for Agents match existing paths
   - Incremented version to 1.95.0
+### LLMS v1.96.0
+- ✅ Completed: Daily llms.txt Review
+  - Synced Roadmap with recent verifiable completions (Studio TimelineAudioTrack Regression Tests, CLI Templates Regression Tests, Player Bridge Coverage Expansion, Infrastructure Orchestrator Coverage Expansion)
+  - Verified package versions and API examples
+  - Verified Key Files for Agents match existing paths
+  - Incremented version to 1.96.0
