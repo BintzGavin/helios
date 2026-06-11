@@ -1,11 +1,11 @@
 ---
 id: PERF-742
 slug: eliminate-promise-allocation-in-cdp-time-driver
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2026-06-11
-completed: ""
-result: ""
+completed: "2026-06-11"
+result: "improved"
 ---
 # PERF-742: Reusable Thenable for CDP Virtual Time in CdpTimeDriver
 
@@ -84,3 +84,10 @@ None.
 
 ## Correctness Check
 Ensure the DOM frames still render sequentially and correctly without hanging.
+
+
+## Results Summary
+- **Best render time**: 28.717s (vs baseline 30.719s)
+- **Improvement**: ~6.5%
+- **Kept experiments**: [PERF-742-eliminate-promise-allocation-in-cdp-time-driver]
+- **Discarded experiments**: []

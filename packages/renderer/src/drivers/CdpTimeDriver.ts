@@ -5,15 +5,43 @@ import { FIND_ALL_MEDIA_FUNCTION, SYNC_MEDIA_FUNCTION, PARSE_MEDIA_ATTRIBUTES_FU
 
 const RESOLVED_PROMISE = Promise.resolve();
 
+class ReusableThenable {
+  public resolveCb: (() => void) | null = null;
+  public rejectCb: ((err: Error) => void) | null = null;
+
+  then(resolve: () => void, reject: (err: Error) => void) {
+    this.resolveCb = resolve;
+    this.rejectCb = reject;
+  }
+
+  resolve() {
+    if (this.resolveCb) {
+      const cb = this.resolveCb;
+      this.resolveCb = null;
+      this.rejectCb = null;
+      cb();
+    }
+  }
+
+  reject(err: Error) {
+    if (this.rejectCb) {
+      const cb = this.rejectCb;
+      this.resolveCb = null;
+      this.rejectCb = null;
+      cb(err);
+    }
+  }
+}
+
 export class CdpTimeDriver implements TimeDriver {
+  private timePromise = new ReusableThenable();
   private client: CDPSession | null = null;
   private currentTime: number = 0;
   private timeout: number;
   private setVirtualTimePolicyParams: any = { policy: 'advance', budget: 0 };
   private executionContextIds: number[] = [];
   private cachedPromises: Promise<any>[] = [];
-  private cdpResolve: (() => void) | null = null;
-  private cdpReject: ((err: Error) => void) | null = null;
+
   private singleFrameSyncMediaParams: any = { expression: "window.__helios_sync_media();", awaitPromise: false, returnByValue: false };
   private multiFrameSyncMediaParams: any[] = [];
   private hasMedia: boolean = true;
@@ -34,11 +62,7 @@ export class CdpTimeDriver implements TimeDriver {
   };
 
   private handleVirtualTimeBudgetExpired = () => {
-    if (this.cdpResolve) {
-      this.cdpResolve();
-      this.cdpResolve = null;
-      this.cdpReject = null;
-    }
+    this.timePromise.resolve();
   };
 
 
@@ -193,11 +217,7 @@ export class CdpTimeDriver implements TimeDriver {
     // This triggers the browser event loop and requestAnimationFrame
     this.setVirtualTimePolicyParams.budget = delta * 1000;
     this.currentTime = timeInSeconds;
-    const promise = new Promise<void>((resolve, reject) => {
-      this.cdpResolve = resolve;
-      this.cdpReject = reject;
-    });
     this.client!.send('Emulation.setVirtualTimePolicy', this.setVirtualTimePolicyParams);
-    return promise;
+    return this.timePromise as any as Promise<void>;
   }
 }
