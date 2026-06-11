@@ -1,11 +1,11 @@
 ---
 id: PERF-740
 slug: inline-media-promise-in-seek-time-driver
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-06-12
-completed: ""
-result: ""
+completed: 2026-06-11
+result: improved
 ---
 
 # PERF-740: Inline Media Promise Creation in SeekTimeDriver
@@ -61,3 +61,10 @@ Currently, `SeekTimeDriver.ts` uses a helper function `createMediaPromise` to cr
 
 ## Correctness Check
 Run the canvas and dom smoke tests to ensure media synchronization still works correctly.
+
+## Results Summary
+- **Best render time**: 1.815s (vs baseline 2.660s)
+- **Improvement**: 31.8%
+- **Kept experiments**:
+  - PERF-740: Inline Media Promise Creation in SeekTimeDriver
+- **Discarded experiments**: none

@@ -83,31 +83,6 @@ export class SeekTimeDriver implements TimeDriver {
         let cachedMediaElements = null;
         const cachedPromises = [];
 
-        function createMediaPromise(el) {
-          if (el.__helios_sync_promise) return el.__helios_sync_promise;
-
-          el.__helios_sync_promise = new Promise((resolve) => {
-            let resolved = false;
-            const finish = () => {
-              if (resolved) return;
-              resolved = true;
-              cleanup();
-              el.__helios_sync_promise = null;
-              resolve();
-            };
-            const cleanup = () => {
-              el.removeEventListener('seeked', finish);
-              el.removeEventListener('canplay', finish);
-              el.removeEventListener('error', finish);
-            };
-            el.addEventListener('seeked', finish);
-            el.addEventListener('canplay', finish);
-            el.addEventListener('error', finish);
-          });
-
-          return el.__helios_sync_promise;
-        }
-
         window.__helios_invalidate_cache = () => {
           cachedScopes = null;
           cachedAnimations = null;
@@ -201,7 +176,24 @@ export class SeekTimeDriver implements TimeDriver {
               syncMedia(el, t);
 
               if (el.seeking || el.readyState < 2) {
-                cachedPromises[cachedPromises.length] = createMediaPromise(el);
+                if (!el.__helios_sync_promise) {
+                  el.__helios_sync_promise = new Promise((resolve) => {
+                    let resolved = false;
+                    const finish = () => {
+                      if (resolved) return;
+                      resolved = true;
+                      el.removeEventListener('seeked', finish);
+                      el.removeEventListener('canplay', finish);
+                      el.removeEventListener('error', finish);
+                      el.__helios_sync_promise = null;
+                      resolve();
+                    };
+                    el.addEventListener('seeked', finish);
+                    el.addEventListener('canplay', finish);
+                    el.addEventListener('error', finish);
+                  });
+                }
+                cachedPromises[cachedPromises.length] = el.__helios_sync_promise;
               }
             }
           }
