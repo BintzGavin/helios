@@ -85,6 +85,7 @@ export class DomStrategy implements RenderStrategy {
       (page as any)._sharedCdpSession = this.cdpSession;
     }
     await this.cdpSession!.send('HeadlessExperimental.enable');
+    await this.cdpSession!.send('Runtime.enable');
 
     // Check if the requested pixel format supports alpha
     const pixelFormat = this.options.pixelFormat || 'yuv420p';

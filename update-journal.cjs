@@ -1,0 +1,4 @@
+const fs = require('fs');
+let content = fs.readFileSync('docs/status/RENDERER-EXPERIMENTS.md', 'utf8');
+const entry = `\n- **PERF-751**: Hoist Runtime.enable to DomStrategy.prepare()\n  - **What I tried**: Hoist Runtime.enable out of CdpTimeDriver and into DomStrategy to avoid competition with frame evaluation.\n  - **WHY it didn't work**: The median render time regressed slightly to ~28.229s vs baseline ~27.882s. Enabling the Runtime earlier in DomStrategy after initial script evaluation does not speed up the process. Likely, moving it earlier clusters too many CDP commands early on, or Playwright internals compete with the event processing, reducing performance compared to conditional lazy enabling.\n  - **Plan ID**: PERF-751\n`;
+fs.appendFileSync('docs/status/RENDERER-EXPERIMENTS.md', entry);

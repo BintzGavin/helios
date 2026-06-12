@@ -190,7 +190,7 @@ export class CdpTimeDriver implements TimeDriver {
       this.client!.on('Runtime.executionContextCreated', this.handleExecutionContextCreated);
       // Enable Runtime so we actually receive executionContextCreated events
       // Catch errors in case another driver instance sharing this session already enabled it.
-      await this.client!.send('Runtime.enable').catch(noopCatch);
+      // Runtime is enabled in DomStrategy
     } else {
       this.syncMediaFn = () => {};
     }
