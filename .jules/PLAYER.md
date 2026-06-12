@@ -80,3 +80,7 @@
 ## [v0.77.49] - Undocumented Events Dispatched
 **Learning:** Found that some events mentioned in the README (`suspend`, `stalled`, `waiting`) are exposed as handler properties (e.g. `onsuspend`) but are never actually dispatched by the player implementation, creating an API parity gap.
 **Action:** Generated plan to implement the missing event dispatches in `src/index.ts` to match standard `HTMLMediaElement` lifecycles and ensure complete API parity.
+
+## [v0.77.52] - Document Event Handlers
+**Learning:** Implemented missing media event handlers (onabort, onemptied, onprogress) to improve API parity with HTMLMediaElement and updated documentation.
+**Action:** Generated plan to implement missing event dispatches for abort, emptied, progress and updated README.md to ensure complete API parity matching index.ts.
