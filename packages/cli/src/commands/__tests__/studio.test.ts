@@ -166,4 +166,40 @@ describe('studio command', () => {
     expect(isInstalled).toBe(false);
   });
 
+
+  it('should skip printing skillsRoot if it does not exist', async () => {
+    const mockServer = { listen: vi.fn(), printUrls: vi.fn() };
+    vi.mocked(createServer).mockResolvedValue(mockServer as any);
+    vi.mocked(loadConfig).mockReturnValue({ registry: 'test-reg', framework: 'react' } as any);
+
+    // Explicitly return false for existsSync
+    vi.mocked(fs.existsSync).mockReturnValue(false);
+
+    await program.parseAsync(['node', 'test', 'studio']);
+
+    // we mock consoleLogMock in beforeEach
+    const logCalls = consoleLogMock.mock.calls.map(args => args[0]);
+    expect(logCalls.some(arg => typeof arg === 'string' && arg.includes('Skills Root:'))).toBe(false);
+  });
+
+  it('should use default components directory if config.directories.components is missing', async () => {
+    const mockServer = { listen: vi.fn(), printUrls: vi.fn() };
+    vi.mocked(createServer).mockResolvedValue(mockServer as any);
+
+    // Return config WITHOUT directories.components
+    vi.mocked(loadConfig).mockReturnValue({} as any);
+
+    let pluginConfig: any;
+    const { studioApiPlugin } = await import('@helios-project/studio/cli');
+    (vi.mocked(studioApiPlugin) as any).mockImplementation((config: any) => {
+        pluginConfig = config;
+        return { name: 'mock-plugin' };
+    });
+
+    await program.parseAsync(['node', 'test', 'studio']);
+
+    vi.mocked(fs.existsSync).mockReturnValue(true);
+    const isInstalled = await pluginConfig.onCheckInstalled('test-comp');
+    expect(isInstalled).toBe(true);
+  });
 });

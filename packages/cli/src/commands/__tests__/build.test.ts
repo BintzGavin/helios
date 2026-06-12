@@ -114,4 +114,18 @@ describe('build command', () => {
     expect(fs.renameSync).toHaveBeenCalledWith(expect.stringContaining('.helios-build-entry.html'), expect.stringContaining('index.html'));
   });
 
+
+  it('should skip unlinking entryPath if it does not exist', async () => {
+    vi.mocked(build).mockResolvedValue({} as any);
+    vi.mocked(fs.existsSync).mockImplementation((pathStr) => {
+      if (typeof pathStr === 'string' && pathStr.includes('composition.html')) {
+        return true;
+      }
+      return false; // Specifically, return false for entryPath in cleanup and rename
+    });
+
+    await program.parseAsync(['node', 'test', 'build', '.']);
+
+    expect(fs.unlinkSync).not.toHaveBeenCalled();
+  });
 });

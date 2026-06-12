@@ -1,4 +1,4 @@
-**Version**: 0.46.44
+**Version**: 0.46.46
 
 [v0.46.44] ✅ Completed: CLI Registry Types Regression Tests - Logged the duplicated plan as impossible since registry types regression tests are already fully implemented.
 [v0.46.41] ✅ Completed: CLI Docker Adapter Regression Tests - Logged the duplicated plan as impossible since docker-adapter template tests are already fully implemented.
@@ -172,3 +172,5 @@ The Helios CLI is the primary user interface for component registry, project sca
 
 [v0.46.43] ✅ Completed: CLI Command Coverage Tests V6 - Implemented test coverage for missing command edges including job adapter options and executor errors.
 [v0.46.45] 🟢 Completed: CLI Command Coverage Tests Spec V7 - Created specification plan 2027-06-05-CLI-Command-Coverage-Tests-V7.md for covering missing command edges.
+
+[v0.46.46] ✅ Completed: CLI Command Coverage Tests V7 - Implemented 100% test coverage for the remaining branch logic in the CLI commands build.ts and studio.ts.
