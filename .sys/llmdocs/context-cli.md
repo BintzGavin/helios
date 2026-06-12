@@ -54,3 +54,6 @@ Reads `helios.config.json` or scaffold defaults. Supports `directories.component
 
 ## Section E: Integration
 Integrates with Registry (`@helios-project/registry`), Studio (`@helios-project/studio`), Infrastructure (`@helios-project/infrastructure`), and Renderer (`@helios-project/renderer`).
+
+
+<!-- Context regenerated and verified for v0.46.46 -->

@@ -67,7 +67,7 @@ export function registerStudioCommand(program: Command) {
               },
               onCheckInstalled: async (name: string) => {
                 const config = loadConfig(process.cwd());
-                const componentsDir = config?.directories.components || 'src/components/helios';
+                const componentsDir = config?.directories?.components || 'src/components/helios';
                 const comp = components.find(c => c.name === name);
                 if (!comp) return false;
 
