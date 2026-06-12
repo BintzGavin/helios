@@ -1124,3 +1124,8 @@ Last updated by: PERF-698
   - **What I did**: Replaced the per-frame \`new Promise\` and executor closure allocation with a single instance of a \`ReusableThenable\` class that duck-types as a Promise, allowing `await` to still work properly.
   - **Impact**: Improved median render time to ~28.717s (from baseline ~30.719s in the isolated environment), avoiding closure allocation and tracking overhead per frame in the core headless rendering loop.
   - **Plan ID**: PERF-742
+
+- **PERF-748**: Eliminate Promise Allocation for Worker Waiters in Actor Model Ring
+  - **What I did**: Replaced the per-frame `new Promise<number>` allocation during worker backpressure in `CaptureLoop.ts` with an array of `ReusableNumberThenable` instances (one per worker).
+  - **Impact**: Improved multi-worker median render time to ~13.318s (concurrency=1) and ~13.005s (concurrency=2) vs baselines of ~14.231s and ~14.790s.
+  - **Plan ID**: PERF-748

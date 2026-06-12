@@ -1,11 +1,11 @@
 ---
 id: PERF-748
 slug: reusable-thenable-for-worker-waiter
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2025-02-23
-completed: ""
-result: ""
+completed: "2024-06-12"
+result: "improved"
 ---
 
 # PERF-748: Eliminate Promise Allocation for Worker Waiters in Actor Model Ring
@@ -79,3 +79,10 @@ Run the DOM render sequence and ensure all frames are output and the FFmpeg enco
 
 ## Prior Art
 PERF-746 successfully applied this to `writerWaiterPromise` in the single-worker writer loop. PERF-747 applied it to stream backpressure `drainPromiseExecutor`.
+
+
+## Results Summary
+- **Best render time**: 13.005s (vs baseline 14.790s)
+- **Improvement**: ~12%
+- **Kept experiments**: [PERF-748]
+- **Discarded experiments**: None
