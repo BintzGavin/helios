@@ -7,3 +7,6 @@
 ## [v0.46.43] - CLI Command Coverage Spec V6
 **Learning:** Found remaining uncovered branches in `job.ts` relating to missing CLI options for new cloud adapters (Deno, Vercel, Modal, Hetzner), as well as missing error catching coverage for the `JobExecutor`. For `render.ts`, we missed the `browserArgs` array logger and `--video-codec / --audio-codec / --quality` formatting logic for the emitted job's merge command.
 **Action:** Consistently verify execution of all CLI flags by targeting the specific missing lines (e.g. 75, 172, 175, 178 in `render.ts` and 179, 187, 196, 204, 230-231 in `job.ts`).
+## [v0.46.45] - CLI Command Coverage Spec V7
+**Learning:** Checking overall command coverage highlighted additional missing lines in `build.ts` (cleanup phase) and `studio.ts` (handling config and skills roots).
+**Action:** When gathering metrics for execution plans on testing gaps, always explicitly navigate to the package and test specific folders and identify the explicit missing branches for building accurate planner specs.
