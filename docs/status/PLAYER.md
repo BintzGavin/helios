@@ -1,5 +1,5 @@
 [v0.77.53] ✅ Completed: Identified missing HTMLMediaElement events (`abort`, `emptied`, `progress`) in `<helios-player>`. Created plan `.sys/plans/2027-02-15-PLAYER-Add-Missing-Events.md` to implement them.
-**Version**: 0.77.53
+**Version**: 0.77.54
 [v0.77.41] ✅ Completed: Discovered undocumented event handler properties in implementation missing from README. Created plan `.sys/plans/2027-02-15-PLAYER-Document-Event-Handlers.md` to document `onplay`, `onpause`, etc.
 [v0.77.52] ✅ Completed: Fix API Parity Events - Implemented synthetic dispatches for missing media events (suspend, stalled, waiting) to improve HTMLMediaElement API parity.
 [0.77.49] ✅ Completed: Document Missing Event Handlers - Documented onplaying, onwaiting, onsuspend, and onstalled properties and events.
@@ -256,3 +256,4 @@
 [v0.77.51] ✅ Completed: Discovered that 2027-02-17-PLAYER-Document-Missing-Media-Properties.md is an IMPOSSIBLE: DUPLICATION plan. The missing properties are already fully documented in the README. Documented as impossible and discarded.
 
 [v0.77.52] ✅ Completed: Document Event Handlers - Implemented missing media event handlers (onabort, onemptied, onprogress) to improve API parity with HTMLMediaElement and updated documentation.
+[v0.77.54] ✅ Completed: Implement Missing Media Properties - Added `disableRemotePlayback`, `mediaGroup`, `sinkId`, and `setSinkId` to `HeliosPlayer` to complete API parity.

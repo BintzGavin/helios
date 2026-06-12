@@ -136,6 +136,8 @@ The `<helios-player>` element implements a subset of the HTMLMediaElement interf
 
 ### Methods
 
+- `setSinkId(sinkId: string): Promise<void>` - Sets the audio sink id.
+
 - `play(): Promise<void>` - Starts playback.
 - `getSchema(): Promise<HeliosSchema | undefined>` - Retrieves the input properties schema from the composition.
 - `pause(): void` - Pauses playback.
@@ -151,6 +153,9 @@ The `<helios-player>` element implements a subset of the HTMLMediaElement interf
 - `stopAudioMetering(): void` - Stops audio metering calculation.
 
 ### Properties
+- `disableRemotePlayback` (boolean): Reflected disableremoteplayback attribute.
+- `mediaGroup` (string): Reflected mediagroup attribute.
+- `sinkId` (string, read-only): Returns the current audio sink id.
 
 - `src` (string): URL of the composition page to load in the iframe.
 - `autoplay` (boolean): Reflected autoplay attribute.

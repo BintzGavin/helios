@@ -19,6 +19,8 @@ Custom extensions:
 - `audiometering` events report stereo RMS and Peak audio levels.
 
 ## Section C: Attributes
+- `disableremoteplayback`: Reflected boolean attribute.
+- `mediagroup`: Reflected string attribute.
 Observed attributes:
 - `src`: The URL of the content to load into the iframe.
 - `interactive`: Enable direct interaction with the composition.
