@@ -3,6 +3,11 @@ Current best: 26.385s (baseline was 28.134s, -6.2%)
 Last updated by: PERF-745
 
 ## What Works
+- **PERF-750**: Replace previousWritePromise variable with direct await in CaptureLoop
+  - **What I did**: Removed the `previousWritePromise` variable tracking and replaced it with direct `await this.drainPromise` in both the single worker and multi-worker loops.
+  - **Impact**: Improved median render time to ~2.475s (from baseline ~13.087s), massively reducing the branch overhead on every single frame.
+  - **Plan ID**: PERF-750
+
 - **PERF-746**: Eliminate Promise Allocation in Writer Waiter Loop
   - **What I did**: Replaced the per-frame `new Promise` and executor closure allocation in the `CaptureLoop.ts` writer wait loop with a custom `ReusableThenable`.
   - **Impact**: Allowed the hot loop to `await` safely without allocating closures or new Promises on every frame. Evaluated successfully as a keep (benchmark completed successfully).

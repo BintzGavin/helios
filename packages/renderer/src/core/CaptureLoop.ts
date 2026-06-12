@@ -130,7 +130,6 @@ export class CaptureLoop {
     const progressInterval = Math.floor(totalFrames / 10);
     let nextProgressFrame = progressInterval;
 
-    let previousWritePromise: Promise<void> | undefined;
 
     const timeStep = 1000 / fps;
     const compTimeStep = 1 / fps;
@@ -165,10 +164,6 @@ export class CaptureLoop {
                     onProgress(i / totalFrames);
                 }
 
-                if (previousWritePromise) {
-                    await previousWritePromise;
-                    previousWritePromise = undefined;
-                }
 
                 if (stdin?.writable) {
                     let canWriteMore: boolean;
@@ -179,7 +174,7 @@ export class CaptureLoop {
                     }
 
                     if (!canWriteMore && stdin.writableLength >= 16777216) {
-                        previousWritePromise = this.drainPromise as any as Promise<void>;
+                        await this.drainPromise;
                     }
                 } else {
                     console.warn('FFmpeg stdin is not writable. Skipping write.');
@@ -193,9 +188,6 @@ export class CaptureLoop {
         if (capturedErrors.length > 0) throw capturedErrors[0];
         if (signal && signal.aborted) throw new Error('Aborted');
 
-        if (previousWritePromise) {
-            await previousWritePromise;
-        }
     } else {
     let maxPipelineDepth = 64;
     maxPipelineDepth = Math.pow(2, Math.ceil(Math.log2(maxPipelineDepth)));
@@ -327,10 +319,6 @@ export class CaptureLoop {
                 onProgress(currentFrame / totalFrames);
             }
 
-            if (previousWritePromise) {
-                await previousWritePromise;
-                previousWritePromise = undefined;
-            }
 
             if (stdin?.writable) {
                 let canWriteMore: boolean;
@@ -341,7 +329,7 @@ export class CaptureLoop {
                 }
 
                 if (!canWriteMore && stdin.writableLength >= 16777216) {
-                    previousWritePromise = this.drainPromise as any as Promise<void>;
+                    await this.drainPromise;
                 }
             } else {
                 console.warn('FFmpeg stdin is not writable. Skipping write.');
@@ -368,9 +356,6 @@ export class CaptureLoop {
 
     await Promise.all(workerPromises);
 
-    if (previousWritePromise) {
-        await previousWritePromise;
-    }
     }
 
     console.log('Finishing render strategy...');
