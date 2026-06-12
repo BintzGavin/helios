@@ -1,0 +1,7 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	14.231	300	21.08	59.8	baseline	baseline multi-worker (concurrency 1)
+2	14.790	300	20.28	59.9	baseline	baseline multi-worker (concurrency 2)
+3	13.318	300	22.53	59.7	keep	ReusableNumberThenable multi-worker (concurrency 1)
+4	13.562	300	22.12	59.7	keep	ReusableNumberThenable multi-worker (concurrency 1, run 2)
+5	13.005	300	23.07	59.7	keep	ReusableNumberThenable multi-worker (concurrency 2, run 2)
+6	13.092	300	22.91	59.7	keep	ReusableNumberThenable multi-worker (concurrency 2, run 3)

@@ -34,6 +34,52 @@ class ReusableThenable {
   }
 }
 
+class ReusableNumberThenable {
+  public resolveCb: ((val: number) => void) | null = null;
+  public rejectCb: ((err: Error) => void) | null = null;
+  public isResolved: boolean = false;
+  public isRejected: boolean = false;
+  public resolvedValue: number = 0;
+  public rejectedError: Error | null = null;
+
+  then(resolve: (val: number) => void, reject: (err: Error) => void) {
+    if (this.isResolved) {
+      this.isResolved = false;
+      resolve(this.resolvedValue);
+    } else if (this.isRejected) {
+      this.isRejected = false;
+      reject(this.rejectedError!);
+    } else {
+      this.resolveCb = resolve;
+      this.rejectCb = reject;
+    }
+  }
+
+  resolve(val: number) {
+    if (this.resolveCb) {
+      const cb = this.resolveCb;
+      this.resolveCb = null;
+      this.rejectCb = null;
+      cb(val);
+    } else {
+      this.isResolved = true;
+      this.resolvedValue = val;
+    }
+  }
+
+  reject(err: Error) {
+    if (this.rejectCb) {
+      const cb = this.rejectCb;
+      this.resolveCb = null;
+      this.rejectCb = null;
+      cb(err);
+    } else {
+      this.isRejected = true;
+      this.rejectedError = err;
+    }
+  }
+}
+
 export class CaptureLoop {
   private drainPromise = new ReusableThenable();
 
@@ -168,7 +214,8 @@ export class CaptureLoop {
     let nextFrameToSubmit = 0;
     let nextFrameToWrite = 0;
     let aborted = false;
-    const workerBlockedResolves = new Array<((i: number) => void) | null>(poolLen).fill(null);
+    const workerThenables = new Array<ReusableNumberThenable>(poolLen);
+    for(let i=0;i<poolLen;i++) workerThenables[i] = new ReusableNumberThenable();
     const freeWorkers = new Int32Array(poolLen);
     let freeWorkersHead = 0;
 
@@ -180,10 +227,7 @@ export class CaptureLoop {
         if (aborted) {
             while (freeWorkersHead > 0) {
                 const w = freeWorkers[--freeWorkersHead];
-                if (workerBlockedResolves[w]) {
-                    workerBlockedResolves[w]!(-1);
-                    workerBlockedResolves[w] = null;
-                }
+                workerThenables[w].resolve(-1);
             }
             writerWaiterPromise.resolve();
             return;
@@ -192,39 +236,26 @@ export class CaptureLoop {
         // See if we can assign tasks to waiting workers
         while (freeWorkersHead > 0 && nextFrameToSubmit < totalFrames && nextFrameToSubmit - nextFrameToWrite < maxPipelineDepth) {
             const w = freeWorkers[--freeWorkersHead];
-            const res = workerBlockedResolves[w]!;
-            workerBlockedResolves[w] = null;
-
             const i = nextFrameToSubmit++;
             const ringIndex = i & ringMask;
 
             frameReadyRing[ringIndex] = 0;
             frameBufferRing[ringIndex] = null;
 
-            res(i);
+            workerThenables[w].resolve(i);
         }
 
         // If we still have waiting workers but are at totalFrames, tell them to stop
         if (nextFrameToSubmit >= totalFrames) {
             while (freeWorkersHead > 0) {
                 const w = freeWorkers[--freeWorkersHead];
-                if (workerBlockedResolves[w]) {
-                    workerBlockedResolves[w]!(-1);
-                    workerBlockedResolves[w] = null;
-                }
+                workerThenables[w].resolve(-1);
             }
         }
     };
 
 
-    const workerBlockedExecutors = new Array(poolLen);
-    for (let w = 0; w < poolLen; w++) {
-        workerBlockedExecutors[w] = (resolve: (i: number) => void) => {
-            workerBlockedResolves[w] = resolve;
-            freeWorkers[freeWorkersHead++] = w;
-            checkState();
-        };
-    }
+
 
     const runWorker = async (worker: WorkerInfo, workerIndex: number) => {
         const { timeDriver, strategy, page } = worker;
@@ -241,7 +272,9 @@ export class CaptureLoop {
                 frameReadyRing[ringIndex] = 0;
                 frameBufferRing[ringIndex] = null;
             } else {
-                i = await new Promise<number>(workerBlockedExecutors[workerIndex]);
+                freeWorkers[freeWorkersHead++] = workerIndex;
+                checkState();
+                i = (await workerThenables[workerIndex] as any) as number;
             }
 
             if (i === -1) break;
