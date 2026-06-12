@@ -41,6 +41,9 @@
 
 
 ## STUDIO v0.121.29
+### STUDIO v0.121.30
+- ✅ Completed: Improve PropsEditor Coverage - Increased line and branch coverage to ~99% for PropsEditor.tsx.
+
 ### STUDIO v0.121.29
 - ✅ Completed: Improve AssistantModal Coverage - Test coverage increased to 100%.
 

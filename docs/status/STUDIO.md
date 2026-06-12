@@ -1,4 +1,4 @@
-**Version**: 0.121.29
+**Version**: 0.121.30
 
 - [v0.121.28] ✅ Completed: Improve AssistantModal Coverage - Reached 90%+ test coverage for AssistantModal.
 
@@ -233,3 +233,4 @@
 - [v0.121.23] ✅ Completed: Improve AudioMeter Coverage - Created plan to test AudioMeter component (2026-06-04-STUDIO-Improve-AudioMeter-Coverage.md).
 
 [v0.121.29] ✅ Completed: Improve AssistantModal Coverage - Test coverage increased to 100%.
+- [v0.121.30] ✅ Completed: Improve PropsEditor Coverage - Test coverage increased to ~99% line and branch coverage (2026-06-11-STUDIO-Improve-PropsEditor-Coverage.md).
