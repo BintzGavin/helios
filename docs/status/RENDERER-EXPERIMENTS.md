@@ -1129,3 +1129,6 @@ Last updated by: PERF-698
   - **What I did**: Replaced the per-frame `new Promise<number>` allocation during worker backpressure in `CaptureLoop.ts` with an array of `ReusableNumberThenable` instances (one per worker).
   - **Impact**: Improved multi-worker median render time to ~13.318s (concurrency=1) and ~13.005s (concurrency=2) vs baselines of ~14.231s and ~14.790s.
   - **Plan ID**: PERF-748
+
+## What Doesn't Work (and Why)
+- **Hoisting `try/catch` outside the concurrent worker `while` hot loop in `CaptureLoop.ts` (PERF-749)**: Hoisted the try/catch block outside the multi-worker loop to reduce AST exception handler mapping overhead. Discarded because it yielded no measurable improvement (~14.464s vs baseline ~14.582s). V8's TurboFan optimizes try/catch blocks effectively inside tight async loops, meaning exception handler boundaries no longer incur significant performance penalties on the hot path compared to earlier V8 versions.
