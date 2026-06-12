@@ -1,8 +1,12 @@
 ## Performance Trajectory
-Current best: 26.385s (baseline was 28.134s, -6.2%)
-Last updated by: PERF-745
+Current best: 2.415s (baseline was 2.532s, -4.6%)
+Last updated by: PERF-752
 
 ## What Works
+- **PERF-752**: Unify FFmpeg stdin write without branches
+  - **What I did**: Replaced the type check and branching for string and buffer when writing to FFmpeg stdin, leveraging Node.js native behavior to ignore encoding when passing a Buffer.
+  - **Impact**: Improved median render time to ~2.415s (from ~2.532s baseline) by simplifying the V8 AST representation inside the hot loop.
+  - **Plan ID**: PERF-752
 - **PERF-750**: Replace previousWritePromise variable with direct await in CaptureLoop
   - **What I did**: Removed the `previousWritePromise` variable tracking and replaced it with direct `await this.drainPromise` in both the single worker and multi-worker loops.
   - **Impact**: Improved median render time to ~2.475s (from baseline ~13.087s), massively reducing the branch overhead on every single frame.

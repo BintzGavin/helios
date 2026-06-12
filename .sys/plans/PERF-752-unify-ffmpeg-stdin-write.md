@@ -1,11 +1,11 @@
 ---
 id: PERF-752
 slug: unify-ffmpeg-stdin-write
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "jules"
 created: 2024-06-12
-completed: ""
-result: ""
+completed: "2024-06-12"
+result: "keep"
 ---
 
 # PERF-752: Unify FFmpeg stdin write without branches
