@@ -35,9 +35,7 @@ class ReusableThenable {
 }
 
 export class CaptureLoop {
-  private drainResolve: (() => void) | null = null;
-  private drainReject: ((err: Error) => void) | null = null;
-  private drainPromiseExecutor = (resolve: () => void, reject: (err: Error) => void) => { this.drainResolve = resolve; this.drainReject = reject; };
+  private drainPromise = new ReusableThenable();
 
   constructor(
     private options: RendererOptions,
@@ -52,39 +50,23 @@ export class CaptureLoop {
   private setupDrainListeners() {
     if (!this.ffmpegManager.stdin) return;
     this.ffmpegManager.stdin.on('drain', () => {
-      if (this.drainResolve) {
-        const resolve = this.drainResolve;
-        this.drainResolve = null;
-        this.drainReject = null;
-        resolve();
-      }
+      this.drainPromise.resolve();
     });
     this.ffmpegManager.stdin.on('error', (err) => {
       if (err && (err as any).code === 'EPIPE') {
          console.warn('FFmpeg stdin closed prematurely (EPIPE). Ignoring error to allow graceful exit.');
-         if (this.drainResolve) {
-           const resolve = this.drainResolve;
-           this.drainResolve = null;
-           this.drainReject = null;
-           resolve();
-         }
+         this.drainPromise.resolve();
       } else {
-        if (this.drainReject) {
-          const reject = this.drainReject;
-          this.drainResolve = null;
-          this.drainReject = null;
-          reject(err);
+        if (this.drainPromise.rejectCb) {
+          this.drainPromise.reject(err);
         } else {
           this.ffmpegManager.emitError(err);
         }
       }
     });
     this.ffmpegManager.stdin.on('close', () => {
-      if (this.drainReject) {
-        const reject = this.drainReject;
-        this.drainResolve = null;
-        this.drainReject = null;
-        reject(new Error('FFmpeg stdin closed before drain'));
+      if (this.drainPromise.rejectCb) {
+        this.drainPromise.reject(new Error('FFmpeg stdin closed before drain'));
       }
     });
   }
@@ -151,7 +133,7 @@ export class CaptureLoop {
                     }
 
                     if (!canWriteMore && stdin.writableLength >= 16777216) {
-                        previousWritePromise = new Promise<void>(this.drainPromiseExecutor);
+                        previousWritePromise = this.drainPromise as any as Promise<void>;
                     }
                 } else {
                     console.warn('FFmpeg stdin is not writable. Skipping write.');
@@ -326,7 +308,7 @@ export class CaptureLoop {
                 }
 
                 if (!canWriteMore && stdin.writableLength >= 16777216) {
-                    previousWritePromise = new Promise<void>(this.drainPromiseExecutor);
+                    previousWritePromise = this.drainPromise as any as Promise<void>;
                 }
             } else {
                 console.warn('FFmpeg stdin is not writable. Skipping write.');
@@ -370,7 +352,7 @@ export class CaptureLoop {
               canWriteMore = stdin.write(finalBuffer);
           }
           if (!canWriteMore) {
-              await new Promise<void>(this.drainPromiseExecutor);
+              await this.drainPromise;
           }
       } else {
           console.warn('FFmpeg stdin is not writable. Skipping write.');
