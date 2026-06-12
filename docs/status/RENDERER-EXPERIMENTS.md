@@ -1137,3 +1137,13 @@ Last updated by: PERF-698
 
 ## What Doesn't Work (and Why)
 - **Hoisting `try/catch` outside the concurrent worker `while` hot loop in `CaptureLoop.ts` (PERF-749)**: Hoisted the try/catch block outside the multi-worker loop to reduce AST exception handler mapping overhead. Discarded because it yielded no measurable improvement (~14.464s vs baseline ~14.582s). V8's TurboFan optimizes try/catch blocks effectively inside tight async loops, meaning exception handler boundaries no longer incur significant performance penalties on the hot path compared to earlier V8 versions.
+
+- **PERF-751**: Hoist Runtime.enable to DomStrategy.prepare()
+  - **What I tried**: Hoist Runtime.enable out of CdpTimeDriver and into DomStrategy to avoid competition with frame evaluation.
+  - **WHY it didn't work**: The FFmpeg pipe in the environment failed to handle mjpeg properly causing a crash during the benchmark run. Experiment discarded due to benchmark crash.
+  - **Plan ID**: PERF-751
+
+- **PERF-751**: Hoist Runtime.enable to DomStrategy.prepare()
+  - **What I tried**: Hoist Runtime.enable out of CdpTimeDriver and into DomStrategy to avoid competition with frame evaluation.
+  - **WHY it didn't work**: The median render time regressed slightly to ~28.229s vs baseline ~27.882s. Enabling the Runtime earlier in DomStrategy after initial script evaluation does not speed up the process. Likely, moving it earlier clusters too many CDP commands early on, or Playwright internals compete with the event processing, reducing performance compared to conditional lazy enabling.
+  - **Plan ID**: PERF-751

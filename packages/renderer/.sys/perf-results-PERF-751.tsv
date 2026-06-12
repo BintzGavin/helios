@@ -1,0 +1,2 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	28.229	600	21.25	57.5	discard	hoist Runtime.enable

@@ -1,11 +1,11 @@
 ---
 id: PERF-751
 slug: hoist-runtime
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2025-05-24
-completed: ""
-result: ""
+completed: 2024-06-12
+result: failed
 ---
 
 # PERF-751: Hoist Runtime.enable to DomStrategy.prepare()
@@ -44,3 +44,15 @@ However, if we enable `Runtime` *after* the preload scripts have been evaluated 
 **What to change**: Remove the `await this.client!.send('Runtime.enable').catch(noopCatch);` line from the `if (this.hasMedia)` block in `prepare()`.
 **Why**: It is already enabled by the `DomStrategy`, so we don't need to conditionally await it here. This removes an async operation from the initialization flow.
 **Risk**: If `CdpTimeDriver` is used with a different strategy that doesn't enable `Runtime`, it might not receive `executionContextCreated` events. However, the DOM renderer pipeline tightly couples `DomStrategy` and `CdpTimeDriver` (or `SeekTimeDriver`), so this risk is acceptable for this experiment.
+
+## Results Summary
+- **Best render time**: 0.000s (vs baseline 26.385s)
+- **Improvement**: 0%
+- **Kept experiments**:
+- **Discarded experiments**: Hoist Runtime.enable to DomStrategy.prepare()
+
+## Results Summary
+- **Best render time**: 28.229s (vs baseline 27.882s)
+- **Improvement**: 0%
+- **Kept experiments**:
+- **Discarded experiments**: Hoist Runtime.enable to DomStrategy.prepare()
