@@ -166,12 +166,7 @@ export class CaptureLoop {
 
 
                 if (stdin?.writable) {
-                    let canWriteMore: boolean;
-                    if (typeof buffer === 'string') {
-                        canWriteMore = stdin.write(buffer, 'base64');
-                    } else {
-                        canWriteMore = stdin.write(buffer);
-                    }
+                    const canWriteMore = stdin.write(buffer as any, 'base64');
 
                     if (!canWriteMore && stdin.writableLength >= 16777216) {
                         await this.drainPromise;
@@ -321,14 +316,9 @@ export class CaptureLoop {
 
 
             if (stdin?.writable) {
-                let canWriteMore: boolean;
-                if (typeof buffer === 'string') {
-                    canWriteMore = stdin.write(buffer, 'base64');
-                } else {
-                    canWriteMore = stdin.write(buffer);
-                }
+                    const canWriteMore = stdin.write(buffer as any, 'base64');
 
-                if (!canWriteMore && stdin.writableLength >= 16777216) {
+                    if (!canWriteMore && stdin.writableLength >= 16777216) {
                     await this.drainPromise;
                 }
             } else {
@@ -363,12 +353,7 @@ export class CaptureLoop {
     if (finalBuffer && ((Buffer.isBuffer(finalBuffer) && finalBuffer.length > 0) || (typeof finalBuffer === 'string' && finalBuffer.length > 0))) {
       console.log(`Writing final buffer...`);
       if (stdin?.writable) {
-          let canWriteMore: boolean;
-          if (typeof finalBuffer === 'string') {
-              canWriteMore = stdin.write(finalBuffer, 'base64');
-          } else {
-              canWriteMore = stdin.write(finalBuffer);
-          }
+          const canWriteMore = stdin.write(finalBuffer as any, 'base64');
           if (!canWriteMore) {
               await this.drainPromise;
           }

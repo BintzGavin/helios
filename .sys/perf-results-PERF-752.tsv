@@ -1,0 +1,4 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	2.532	150	59.25	63.0	keep	baseline (PERF-750)
+2	2.524	150	59.42	62.9	keep	unify ffmpeg stdin write
+3	2.415	150	62.11	63.8	keep	unify ffmpeg stdin write
