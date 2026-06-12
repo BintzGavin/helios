@@ -47,6 +47,38 @@ describe('HeliosPlayer API Parity', () => {
     expect(player.hasAttribute('autoplay')).toBe(false);
   });
 
+    it('should reflect disableremoteplayback attribute as boolean property', () => {
+    expect(player.disableRemotePlayback).toBe(false);
+
+    player.setAttribute('disableremoteplayback', '');
+    expect(player.disableRemotePlayback).toBe(true);
+
+    player.removeAttribute('disableremoteplayback');
+    expect(player.disableRemotePlayback).toBe(false);
+
+    player.disableRemotePlayback = true;
+    expect(player.hasAttribute('disableremoteplayback')).toBe(true);
+
+    player.disableRemotePlayback = false;
+    expect(player.hasAttribute('disableremoteplayback')).toBe(false);
+  });
+
+  it('should reflect mediagroup attribute as string property', () => {
+    expect(player.mediaGroup).toBe('');
+
+    player.setAttribute('mediagroup', 'test-group');
+    expect(player.mediaGroup).toBe('test-group');
+
+    player.mediaGroup = 'other-group';
+    expect(player.getAttribute('mediagroup')).toBe('other-group');
+  });
+
+  it('should support sinkId and setSinkId', async () => {
+    expect(player.sinkId).toBe('');
+    await player.setSinkId('test-sink');
+    expect(player.sinkId).toBe('test-sink');
+  });
+
   it('should reflect loop attribute as boolean property', () => {
     expect(player.loop).toBe(false);
 

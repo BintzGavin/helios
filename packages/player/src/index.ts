@@ -1272,6 +1272,30 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
     }
   }
 
+  public get disableRemotePlayback(): boolean {
+    return this.hasAttribute("disableremoteplayback");
+  }
+  public set disableRemotePlayback(val: boolean) {
+    if (val) this.setAttribute("disableremoteplayback", "");
+    else this.removeAttribute("disableremoteplayback");
+  }
+
+  public get mediaGroup(): string {
+    return this.getAttribute("mediagroup") || "";
+  }
+  public set mediaGroup(val: string) {
+    this.setAttribute("mediagroup", val);
+  }
+
+  private _sinkId: string = "";
+  public get sinkId(): string {
+    return this._sinkId;
+  }
+  public async setSinkId(sinkId: string): Promise<void> {
+    this._sinkId = sinkId;
+    return Promise.resolve();
+  }
+
   public get seeking(): boolean {
     // Return internal scrubbing state as seeking
     return this.isScrubbing || this._isSeeking;
