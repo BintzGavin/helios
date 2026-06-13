@@ -21,11 +21,19 @@ const helios = new Helios<{ title: string }>({
   fps: 30,
   autoSyncAnimations: true, // Auto-sync CSS/WAAPI
   inputProps: { title: "Hello World" }, // Dynamic data via constructor
-  captions: [{ id: "1", startTime: 0, endTime: 1000, text: "Welcome" }] // SRT string or objects (milliseconds)
+  captions: [{ id: "1", startTime: 0, endTime: 1000, text: "Welcome" }], // SRT string or objects (milliseconds)
+  timeline: {
+    tracks: [
+      {
+        id: "main",
+        clips: [{ id: "clip1", startFrame: 0, durationInFrames: 300 }]
+      }
+    ]
+  }
 });
 
 // Reactively subscribe to state changes
-helios.subscribe(({ currentFrame, inputProps, availableAudioTracks }) => {
+helios.subscribe(({ currentFrame, inputProps, availableAudioTracks, activeClips }) => {
   // Drive animations with progress or props
   // availableAudioTracks is AudioTrackMetadata[] (id, src, startTime, duration, fadeInDuration, fadeOutDuration, fadeEasing)
 });
@@ -122,7 +130,7 @@ const report = await Helios.diagnose();
 ## Roadmap
 ### V1.x (Active)
 - **Studio**: v0.107.1+ (Export Job Spec, Asset Move, Components Panel, Enhance MCP Server, Asset Drag and Drop, Expand Reverse Speeds, TimelineAudioTrack Regression Tests)
-- **CLI**: v0.45.2+ (Command Coverage Tests V4, CLI Job/Render/Merge Tests Missing Mock, Scaffold Cloudflare Sandbox Deployment, Build Command Regression Tests, Registry Auth, Diff Command, Example Init, Command Coverage Tests, CLI Templates Regression Tests)
+- **CLI**: v0.45.2+ (Command Coverage Tests V4, CLI Job/Render/Merge Tests Missing Mock, Scaffold Cloudflare Sandbox Deployment, Build Command Regression Tests, Registry Auth, Diff Command, Example Init, Command Coverage Tests, CLI Templates Regression Tests, CLI Registry Types Regression Tests)
 - **Core**: v5.13.0+ (Generic Input Props, Implement Active Clips, Implement Composition Schema, Shared Virtual Time Binding, Enable Audio State Persistence, Audio Fade Easing)
 - **Player**: v0.76.20+ (Regression Tests for Media Session, Regression Tests for MediaProperties, Regression Tests for InputProps, Audio Context Manager Tests, Async Seek, Bridge Coverage Completeness, Bridge Coverage Expansion)
 - **Renderer**: v1.78.3+ (Validate HW Accel, Orchestrator Plan, Refactor Media Sync Logic, Update Skill Documentation, Abstraction for Pluggable Execution)

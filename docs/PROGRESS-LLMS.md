@@ -1,3 +1,10 @@
+## LLMS v1.98.0
+- ✅ Completed: Daily llms.txt Review
+  - Updated API examples for Core
+  - Synced roadmap with progress across Studio, CLI, Core, Player, Renderer, and Infrastructure
+  - Verified package versions matched package.json exactly
+  - Verified all agent file paths
+
 ## LLMS v1.94.0
 - ✅ Completed: Daily llms.txt Review
   - Synced roadmap with progress across Studio, CLI, and Infrastructure
