@@ -153,7 +153,10 @@ export class CaptureLoop {
 
                 await timeDriver.setTime(page, compositionTimeInSeconds);
                 const rawResult = await strategy.capture(page, time);
-                const buffer = hasProcessFn ? strategy.processCaptureResult!(rawResult) : rawResult;
+                let buffer = hasProcessFn ? strategy.processCaptureResult!(rawResult) : rawResult;
+                if (typeof buffer === 'string') {
+                    buffer = Buffer.from(buffer, 'base64');
+                }
 
                 if (i === nextProgressFrame) {
                     console.log(`Progress: Rendered ${i} / ${totalFrames} frames`);
@@ -166,7 +169,7 @@ export class CaptureLoop {
 
 
                 if (stdin?.writable) {
-                    const canWriteMore = stdin.write(buffer as any, 'base64');
+                    const canWriteMore = stdin.write(buffer as any);
 
                     if (!canWriteMore && stdin.writableLength >= 16777216) {
                         await this.drainPromise;
@@ -274,7 +277,10 @@ export class CaptureLoop {
             try {
                 await timeDriver.setTime(page, compositionTimeInSeconds);
                 const rawResult = await strategy.capture(page, time);
-                const buffer = hasProcessFn ? strategy.processCaptureResult!(rawResult) : rawResult;
+                let buffer = hasProcessFn ? strategy.processCaptureResult!(rawResult) : rawResult;
+                if (typeof buffer === 'string') {
+                    buffer = Buffer.from(buffer, 'base64');
+                }
                 frameBufferRing[ringIndex] = buffer;
                 frameReadyRing[ringIndex] = 1;
             } catch (e) {
@@ -316,7 +322,7 @@ export class CaptureLoop {
 
 
             if (stdin?.writable) {
-                    const canWriteMore = stdin.write(buffer as any, 'base64');
+                    const canWriteMore = stdin.write(buffer as any);
 
                     if (!canWriteMore && stdin.writableLength >= 16777216) {
                     await this.drainPromise;
@@ -353,7 +359,7 @@ export class CaptureLoop {
     if (finalBuffer && ((Buffer.isBuffer(finalBuffer) && finalBuffer.length > 0) || (typeof finalBuffer === 'string' && finalBuffer.length > 0))) {
       console.log(`Writing final buffer...`);
       if (stdin?.writable) {
-          const canWriteMore = stdin.write(finalBuffer as any, 'base64');
+          const canWriteMore = stdin.write(finalBuffer as any);
           if (!canWriteMore) {
               await this.drainPromise;
           }
