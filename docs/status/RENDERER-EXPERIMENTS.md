@@ -210,6 +210,9 @@ Last updated by: PERF-726
   - **Plan ID**: PERF-740
 
 ## What Doesn't Work (and Why)
+- **What:** Configure FFmpeg to use multi-threaded decoding for `image2pipe` PNG streams via `-c:v png -threads 0`.
+  **Why it didn't work:** The median render time (2.436s) was slower than the baseline (2.351s - 2.359s). The multithreading introduces CPU context-switching overhead and pipeline synchronization cost for PNG decompression, which actually hurts performance compared to sequential single-threaded decoding in a fast pipe context.
+  **Plan ID:** PERF-761
 - **PERF-755**: Pre-Evaluate Runtime.evaluate for hasMedia in CdpTimeDriver
   - **What I did**: Replaced two separate `Runtime.evaluate` CDP calls during initialization with a single `page.evaluate()` call to extract both the media presence flag and execute stability checks.
   - **Impact**: It yielded a performance regression (median ~2.543s vs ~2.36s baseline). Playwright's `page.evaluate` overhead (serialization, internal routing) during the critical path seems slower than making raw `Runtime.evaluate` calls via CDP directly, despite reducing the number of IPC calls. Experiment discarded.
