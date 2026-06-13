@@ -143,7 +143,7 @@ export class CaptureLoop {
 
         const signal = this.jobOptions?.signal;
         const onProgress = this.jobOptions?.onProgress;
-        const hasProcessFn = !!strategy.processCaptureResult;
+        const processFn = strategy.processCaptureResult ? strategy.processCaptureResult.bind(strategy) : (res: any) => res;
         try {
             for (let i = 0; i < totalFrames; i++) {
                 if (capturedErrors.length > 0 || (signal && signal.aborted)) break;
@@ -153,7 +153,7 @@ export class CaptureLoop {
 
                 await timeDriver.setTime(page, compositionTimeInSeconds);
                 const rawResult = await strategy.capture(page, time);
-                let buffer = hasProcessFn ? strategy.processCaptureResult!(rawResult) : rawResult;
+                let buffer = processFn(rawResult);
                 if (typeof buffer === 'string') {
                     buffer = Buffer.from(buffer, 'base64');
                 }
@@ -249,7 +249,7 @@ export class CaptureLoop {
 
     const runWorker = async (worker: WorkerInfo, workerIndex: number) => {
         const { timeDriver, strategy, page } = worker;
-        const hasProcessFn = !!strategy.processCaptureResult;
+        const processFn = strategy.processCaptureResult ? strategy.processCaptureResult.bind(strategy) : (res: any) => res;
 
         while (!aborted) {
             let i: number;
@@ -277,7 +277,7 @@ export class CaptureLoop {
             try {
                 await timeDriver.setTime(page, compositionTimeInSeconds);
                 const rawResult = await strategy.capture(page, time);
-                let buffer = hasProcessFn ? strategy.processCaptureResult!(rawResult) : rawResult;
+                let buffer = processFn(rawResult);
                 if (typeof buffer === 'string') {
                     buffer = Buffer.from(buffer, 'base64');
                 }

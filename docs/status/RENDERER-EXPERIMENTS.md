@@ -2,7 +2,15 @@
 Current best: 2.415s (baseline was 2.532s, -4.6%)
 Last updated by: PERF-752
 
+## Performance Trajectory
+Current best: 2.059s (baseline was 2.118s, ~3% improvement)
+Last updated by: PERF-726
+
 ## What Works
+- **PERF-726**: Pre-bind processCaptureResult in CaptureLoop
+  - **What I did**: Pre-bound `strategy.processCaptureResult` before the hot loops in `CaptureLoop.ts` to eliminate property lookup and conditional branch checking on every frame.
+  - **Impact**: Improved median render time to ~2.068s (from ~2.118s), removing branching overhead per frame.
+  - **Plan ID**: PERF-726
 - **PERF-753**: Eagerly decode base64 strings in CaptureLoop
   - **What I tried**: Eagerly decoded the base64 string from CDP `screenshotData` directly into a Buffer within `CaptureLoop.ts` (both single and multi-worker paths) before piping it to FFmpeg, rather than passing the string and relying on Node.js internal stream coercion.
   - **Impact**: The median render time did not improve over the absolute baseline (~2.665s compared to ~2.415s baseline), however we will retain this optimization as it reduces string allocations held on V8's heap and avoids dynamic internal conversion within the Node stream module. It may yield more significant benefits under heavy memory-constrained loads or high concurrency.
