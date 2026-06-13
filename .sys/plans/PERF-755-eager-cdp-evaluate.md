@@ -1,11 +1,11 @@
 ---
 id: PERF-755
 slug: runtime-evaluate-has-media
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor"
 created: 2024-06-13
 completed: ""
-result: ""
+result: "failed"
 ---
 
 # PERF-755: Pre-Evaluate Runtime.evaluate for hasMedia in CdpTimeDriver

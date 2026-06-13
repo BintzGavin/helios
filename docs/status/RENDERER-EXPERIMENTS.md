@@ -202,6 +202,11 @@ Last updated by: PERF-752
   - **Plan ID**: PERF-740
 
 ## What Doesn't Work (and Why)
+- **PERF-755**: Pre-Evaluate Runtime.evaluate for hasMedia in CdpTimeDriver
+  - **What I did**: Replaced two separate `Runtime.evaluate` CDP calls during initialization with a single `page.evaluate()` call to extract both the media presence flag and execute stability checks.
+  - **Impact**: It yielded a performance regression (median ~2.543s vs ~2.36s baseline). Playwright's `page.evaluate` overhead (serialization, internal routing) during the critical path seems slower than making raw `Runtime.evaluate` calls via CDP directly, despite reducing the number of IPC calls. Experiment discarded.
+  - **Plan ID**: PERF-755
+
 - **PERF-739**: Eager CDP Session Initialization in DomStrategy
   - **What I tried**: Moved CDP session setup and HeadlessExperimental.enable to the top of DomStrategy.prepare()
   - **WHY it didn't work**: The median render time regressed to ~28.646s (from the baseline of ~27.41s). Eagerly enabling CDP might have caused Playwright's page evaluation for preload scripts to compete with early internal CDP processing overhead, delaying startup.
