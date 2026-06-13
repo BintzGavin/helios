@@ -174,6 +174,24 @@ describe('HeliosPlayer additional tests', () => {
         expect(player.videoHeight).toBe(600);
     });
 
+    it('should test mediaTitle, mediaArtist, mediaAlbum, mediaArtwork', () => {
+        expect(player.mediaTitle).toBe('');
+        player.mediaTitle = 'My Title';
+        expect(player.mediaTitle).toBe('My Title');
+
+        expect(player.mediaArtist).toBe('');
+        player.mediaArtist = 'My Artist';
+        expect(player.mediaArtist).toBe('My Artist');
+
+        expect(player.mediaAlbum).toBe('');
+        player.mediaAlbum = 'My Album';
+        expect(player.mediaAlbum).toBe('My Album');
+
+        expect(player.mediaArtwork).toBe('');
+        player.mediaArtwork = 'http://example.com/art.jpg';
+        expect(player.mediaArtwork).toBe('http://example.com/art.jpg');
+    });
+
     it('should test error getter', () => {
         expect(player.error).toBe(null);
     });

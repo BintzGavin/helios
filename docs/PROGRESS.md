@@ -1,4 +1,7 @@
 #
+### PLAYER v0.77.55
+- ✅ Completed: Fix Missing Coverage - Added test coverage for mediaTitle, mediaArtist, mediaAlbum, and mediaArtwork properties in export-options.test.ts.
+
 ### PLAYER v0.77.50
 - ✅ Completed: Document Missing Media Properties - Added src, autoplay, loop, controls, poster, preload, sandbox, and interactive to README.md
 
