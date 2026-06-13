@@ -1,0 +1,8 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	2.649	150	56.63	63.0	keep	baseline
+2	2.735	150	54.84	63.0	keep	baseline
+3	2.969	150	50.52	63.0	keep	baseline
+4	2.698	150	55.60	63.0	keep	baseline
+5	2.713	150	55.29	63.0	keep	cache decoded buffer (concurrency 1)
+6	2.673	150	56.12	63.0	keep	cache decoded buffer (concurrency 1)
+7	2.620	150	57.25	63.0	keep	cache decoded buffer (concurrency 1)

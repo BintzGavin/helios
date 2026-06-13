@@ -1,11 +1,11 @@
 ---
 id: PERF-756
 slug: cache-decoded-buffer
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-06-13
-completed: ""
-result: ""
+completed: "2026-06-13"
+result: "discarded"
 ---
 
 # PERF-756: Cache Decoded Buffer in CaptureLoop for Unchanged Frames
@@ -86,3 +86,9 @@ Run `npm run build -w packages/renderer` to ensure no syntax errors.
 
 ## Correctness Check
 Run the DOM render benchmark `cd packages/renderer && npx tsx scripts/benchmark-perf.ts --concurrency 1` to verify performance and correctness.
+
+## Results Summary
+- **Best render time**: 2.673s (vs baseline 2.716s)
+- **Improvement**: ~1.5% (Within noise margin)
+- **Kept experiments**: None
+- **Discarded experiments**: Cache Decoded Buffer in CaptureLoop for Unchanged Frames
