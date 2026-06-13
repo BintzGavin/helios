@@ -1,11 +1,11 @@
 ---
 id: PERF-754
 slug: cdp-screencast-push-model
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-06-13
-completed: ""
-result: ""
+completed: 2024-06-13
+result: failed
 ---
 
 # PERF-754: Test `Page.startScreencast` Push-Based Capture
@@ -50,3 +50,9 @@ Run the DOM render benchmark `cd packages/renderer && npx tsx scripts/benchmark-
 
 ## Prior Art
 - PERF-381 previously attempted this but was discarded. The current setup might allow it to work or at least give us new insight.
+
+## Results Summary
+- **Best render time**: 0.000s (Crash) (vs baseline 11.684s)
+- **Improvement**: N/A
+- **Kept experiments**: []
+- **Discarded experiments**: [Push-based model using Page.startScreencast]
