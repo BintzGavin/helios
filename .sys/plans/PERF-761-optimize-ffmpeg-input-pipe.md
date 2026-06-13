@@ -1,11 +1,11 @@
 ---
 id: PERF-761
 slug: optimize-ffmpeg-input-pipe
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "Jules"
 created: 2026-06-13
-completed: ""
-result: ""
+completed: "2026-06-13"
+result: "discard"
 ---
 
 # PERF-761: Optimize FFmpeg Image2Pipe Threads
@@ -68,3 +68,10 @@ Run canvas benchmark or `npm run build -w packages/renderer`.
 
 ## Correctness Check
 Run the DOM render benchmark script (`cd packages/renderer && npx tsx scripts/benchmark-perf.ts`) to ensure it produces valid outputs without regressions.
+
+## Results Summary
+| run | render_time_s | frames | fps_effective | peak_mem_mb | status | description |
+|-----|---------------|--------|---------------|-------------|--------|-------------|
+| 1   | 2.314         | 150    | 64.83         | 63.1        | discard| FFmpeg PNG multithreading via -threads 0 |
+| 2   | 2.455         | 150    | 61.09         | 63.0        | discard| FFmpeg PNG multithreading via -threads 0 |
+| 3   | 2.436         | 150    | 61.58         | 62.9        | discard| FFmpeg PNG multithreading via -threads 0 |
