@@ -1,0 +1,7 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	2.400	150	62.49	62.9	keep	baseline
+2	2.558	150	58.64	63.1	keep	baseline
+3	2.523	150	59.45	62.8	keep	baseline
+4	2.418	150	62.05	63.0	discard	cache base64
+5	2.584	150	58.05	62.9	discard	cache base64
+6	2.527	150	59.36	63.0	discard	cache base64

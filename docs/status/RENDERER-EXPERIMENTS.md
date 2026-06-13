@@ -1186,3 +1186,7 @@ Last updated by: PERF-698
   - **Plan ID**: PERF-758
 
 - **PERF-759**: Hoisted `hasMedia` and `waitUntilStable` CDP checks into a single `Runtime.evaluate` call in `CdpTimeDriver.prepare`. **Discarded**. The baseline median was ~2.046s and the experimental median was ~2.145s (slower). The overhead of creating an inline object in V8 inside the CDP call negated the benefits of saving one CDP roundtrip during initialization.
+- **PERF-760**: Skip Base64 Decode for Duplicate Frames
+  - **What I tried**: Caching the exact base64 string reference returned from `DomStrategy.processCaptureResult` along with its decoded Buffer, to bypass `Buffer.from(..., 'base64')` if the new frame is identical to the previous frame in `CaptureLoop.ts`.
+  - **WHY it didn't work**: The median render time in the fast path regressed to ~2.527s (vs baseline median ~2.523s). This proves that the overhead of introducing additional state tracking (two local variables per context) and checking the conditional `buffer === lastBase64Str` string reference is greater than letting V8 quickly handle base64 decodes using its highly optimized built-ins, especially in a benchmark where frames change frequently.
+  - **Plan ID**: PERF-760
