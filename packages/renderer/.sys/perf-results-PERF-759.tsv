@@ -1,0 +1,6 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	2.030	150	73.90	62.9	discard	baseline
+2	2.046	150	73.33	63.1	discard	baseline
+3	2.166	150	69.24	62.9	discard	baseline
+4	2.145	150	69.94	63.7	discard	hoist has media check into single cdp call
+5	2.322	150	64.60	62.9	discard	hoist has media check into single cdp call

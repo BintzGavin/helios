@@ -1,8 +1,8 @@
 ---
 id: PERF-759
 slug: hoist-has-media-check-to-init-script
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "Jules"
 created: 2024-06-13
 completed: ""
 result: ""
@@ -88,3 +88,8 @@ Run the DOM render benchmark `cd packages/renderer && npx tsx scripts/benchmark-
 
 ## Prior Art
 PERF-755 attempted to use `page.evaluate()` but failed due to Playwright serialization overhead. This approach uses raw CDP directly, maintaining fast-path performance while consolidating requests.
+
+## Results Summary
+Baseline: ~2.046s
+Experiment: ~2.145s
+Result: Discarded - saving one CDP IPC round-trip did not improve performance because creating a temporary object to hold both boolean results incurred more V8 inline allocation overhead than two simple, scalar-returning CDP calls.
