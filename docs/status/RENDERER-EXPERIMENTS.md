@@ -611,6 +611,7 @@ Last updated by: PERF-752
   - **Plan ID**: PERF-717
 
 ## Open Questions
+- Plan ID: PERF-758 (Eliminate processCaptureResult branching in DomStrategy)
 - Inlining stability check promise resolution in CdpTimeDriver.ts
 - The bottleneck is likely in V8 runtime boundaries or Playwright CDP IPC, meaning microtask queue optimizations yield no measurable performance improvement over the baseline.
 - Plan ID: PERF-506
