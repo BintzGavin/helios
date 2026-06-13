@@ -1,11 +1,11 @@
 ---
 id: PERF-726
 slug: eliminate-empty-image-buffer-allocation
-status: claimed
+status: complete
 claimed_by: "jules"
 created: 2024-06-11
-completed: ""
-result: ""
+completed: "2024-06-12"
+result: "improved"
 ---
 
 # PERF-726: Prebind processCaptureResult in CaptureLoop
@@ -110,3 +110,7 @@ Multi-worker:
 **Risk**: Function binding creates a small object closure, but it's done *outside* the hot loop, so there's no per-frame penalty. This is a very safe change.
 
 ## Results Summary
+- **Best render time**: 2.059s
+- **Improvement**: ~3% improvement over 2.118s
+- **Kept experiments**: PERF-726
+- **Discarded experiments**: none
