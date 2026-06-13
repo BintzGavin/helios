@@ -1,11 +1,11 @@
 ---
 id: PERF-760
 slug: skip-base64-decode-for-duplicate-frames
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-06-14
-completed: ""
-result: ""
+completed: "2026-06-13"
+result: failed
 ---
 
 # PERF-760: Skip Base64 Decode for Duplicate Frames
@@ -78,3 +78,10 @@ Run canvas benchmark or `npm run build -w packages/renderer`.
 
 ## Correctness Check
 Run the DOM render benchmark script (`cd packages/renderer && npx tsx scripts/benchmark-perf.ts`) to ensure it produces valid outputs without regressions.
+
+
+## Results Summary
+- **Best render time**: 2.527s (vs baseline 2.523s)
+- **Improvement**: -0.15% (slower)
+- **Kept experiments**: []
+- **Discarded experiments**: [PERF-760]
