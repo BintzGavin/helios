@@ -1,7 +1,7 @@
 ---
 id: PERF-753
 slug: captureloop-eager-base64
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-06-13
 completed: ""
