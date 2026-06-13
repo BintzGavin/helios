@@ -1,11 +1,11 @@
 ---
 id: PERF-758
 slug: eliminate-process-capture-result-branching
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "Jules"
 created: 2024-06-13
-completed: ""
-result: ""
+completed: "2026-06-13"
+result: "discarded"
 ---
 
 # PERF-758: Eliminate branch logic around processCaptureResult in DomStrategy
@@ -99,3 +99,15 @@ Run canvas benchmark or `npm run build -w packages/renderer`.
 
 ## Correctness Check
 Run the DOM render benchmark script (`cd packages/renderer && npx tsx scripts/benchmark-perf.ts`) to ensure it produces valid outputs without regressions.
+
+
+## Results Summary
+```tsv
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	2.412	150	62.20	63.1	keep	baseline
+2	2.401	150	62.48	63.0	keep	baseline
+3	2.417	150	62.07	63.0	keep	baseline
+4	3.829	150	39.17	63.1	discard	inline process capture result
+5	2.441	150	61.46	62.9	discard	inline process capture result
+6	2.551	150	58.80	62.9	discard	inline process capture result
+```

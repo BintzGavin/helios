@@ -1172,3 +1172,7 @@ Last updated by: PERF-698
   - **What I tried**: Caching the decoded Buffer in CaptureLoop and reusing it if the CDP frame output string is identical to the previous frame's string.
   - **WHY it didn't work**: The median render time in single worker fast path (~2.673s) did not meaningfully improve over the baseline (~2.716s). V8 seems to optimize the Base64 decode overhead well enough natively, and identical frames don't happen frequently enough in typical UI scenarios to make the caching overhead worthwhile on the fast path.
   - **Plan ID**: PERF-756
+- **PERF-758**: Eliminate processCaptureResult Branching
+  - **What I tried**: Removed `processCaptureResult` from `RenderStrategy` and `DomStrategy`, pre-binding the processing closure directly to the `beginFrame` promise resolution in `DomStrategy.capture()`, eliminating the ternary branch in `CaptureLoop.ts`.
+  - **WHY it didn't work**: The median render time regressed to ~2.551s (from ~2.412s baseline). Pushing the logic inside `DomStrategy` forced returning a chained Promise via `.then()`, resulting in additional anonymous closure and microtask allocation per frame, which proved to be slower than explicitly evaluating the ternary inside `CaptureLoop`. V8 inline caches the boolean condition `hasProcessFn` faster than Promise resolution chaining.
+  - **Plan ID**: PERF-758

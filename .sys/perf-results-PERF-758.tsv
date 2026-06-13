@@ -1,0 +1,7 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	2.412	150	62.20	63.1	keep	baseline
+2	2.401	150	62.48	63.0	keep	baseline
+3	2.417	150	62.07	63.0	keep	baseline
+4	3.829	150	39.17	63.1	discard	inline process capture result
+5	2.441	150	61.46	62.9	discard	inline process capture result
+6	2.551	150	58.80	62.9	discard	inline process capture result
