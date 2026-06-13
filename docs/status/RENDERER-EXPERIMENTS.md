@@ -1166,3 +1166,8 @@ Last updated by: PERF-698
 - **`Page.startScreencast` push-based capture (PERF-754)**
   - Tried switching from `HeadlessExperimental.beginFrame` to `Page.startScreencast`.
   - **WHY it didn't work**: `Page.startScreencast` ONLY emits `screencastFrame` events when the page has visual damage (changes). In a deterministic frame-by-frame renderer where we advance virtual time, if a frame has no visual changes or if the engine drops frames because it's too fast, we get no frame emitted, causing a deadlock when awaiting frames for the encoding pipeline.
+
+- **PERF-756**: Cache Decoded Buffer in CaptureLoop for Unchanged Frames
+  - **What I tried**: Caching the decoded Buffer in CaptureLoop and reusing it if the CDP frame output string is identical to the previous frame's string.
+  - **WHY it didn't work**: The median render time in single worker fast path (~2.673s) did not meaningfully improve over the baseline (~2.716s). V8 seems to optimize the Base64 decode overhead well enough natively, and identical frames don't happen frequently enough in typical UI scenarios to make the caching overhead worthwhile on the fast path.
+  - **Plan ID**: PERF-756
