@@ -1156,3 +1156,8 @@ Last updated by: PERF-698
   - **What I tried**: Hoist Runtime.enable out of CdpTimeDriver and into DomStrategy to avoid competition with frame evaluation.
   - **WHY it didn't work**: The median render time regressed slightly to ~28.229s vs baseline ~27.882s. Enabling the Runtime earlier in DomStrategy after initial script evaluation does not speed up the process. Likely, moving it earlier clusters too many CDP commands early on, or Playwright internals compete with the event processing, reducing performance compared to conditional lazy enabling.
   - **Plan ID**: PERF-751
+
+## What Doesn't Work (and Why)
+- **`Page.startScreencast` push-based capture (PERF-754)**
+  - Tried switching from `HeadlessExperimental.beginFrame` to `Page.startScreencast`.
+  - **WHY it didn't work**: `Page.startScreencast` ONLY emits `screencastFrame` events when the page has visual damage (changes). In a deterministic frame-by-frame renderer where we advance virtual time, if a frame has no visual changes or if the engine drops frames because it's too fast, we get no frame emitted, causing a deadlock when awaiting frames for the encoding pipeline.
