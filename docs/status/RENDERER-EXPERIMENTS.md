@@ -1184,3 +1184,5 @@ Last updated by: PERF-698
   - **What I tried**: Removed `processCaptureResult` from `RenderStrategy` and `DomStrategy`, pre-binding the processing closure directly to the `beginFrame` promise resolution in `DomStrategy.capture()`, eliminating the ternary branch in `CaptureLoop.ts`.
   - **WHY it didn't work**: The median render time regressed to ~2.551s (from ~2.412s baseline). Pushing the logic inside `DomStrategy` forced returning a chained Promise via `.then()`, resulting in additional anonymous closure and microtask allocation per frame, which proved to be slower than explicitly evaluating the ternary inside `CaptureLoop`. V8 inline caches the boolean condition `hasProcessFn` faster than Promise resolution chaining.
   - **Plan ID**: PERF-758
+
+- **PERF-759**: Hoisted `hasMedia` and `waitUntilStable` CDP checks into a single `Runtime.evaluate` call in `CdpTimeDriver.prepare`. **Discarded**. The baseline median was ~2.046s and the experimental median was ~2.145s (slower). The overhead of creating an inline object in V8 inside the CDP call negated the benefits of saving one CDP roundtrip during initialization.
