@@ -1212,3 +1212,8 @@ Last updated by: PERF-764
   - **What I tried**: Inlined the `await strategy.capture` result into the ternary expression in `CaptureLoop.ts` and peeled the `defaultSyncMedia` execution context loop in `CdpTimeDriver.ts`.
   - **WHY it worked/didn't work**: Improved median render time to ~2.388s (from ~2.664s baseline). The reduction of V8 JIT context allocation per frame and loop AST overhead yielded a faster path for the monomorphic case.
   - **Plan ID**: PERF-767
+
+- **PERF-747**: ReusableThenable for Drain Promise
+  - **What I tried**: Applied the `ReusableThenable` pattern from `PERF-746` to the stream drain backpressure handling in `CaptureLoop.ts` by replacing `new Promise<void>(this.drainPromiseExecutor)` allocations with a shared `drainPromise`.
+  - **WHY it worked**: V8 heap allocation pressure during FFmpeg stdin backpressure events is eliminated by reusing the same duck-typed `ReusableThenable` instance, further reducing garbage collection overhead and keeping the fast-path clean.
+  - **Plan ID**: PERF-747
