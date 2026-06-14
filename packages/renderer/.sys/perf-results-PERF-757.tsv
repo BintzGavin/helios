@@ -1,0 +1,2 @@
+discard	baseline is ~2.41s, removing processCaptureResult regressed to ~2.51s due to Promise  closure overhead being worse than the ternary branch.
+discard	baseline is ~2.41s, removing processCaptureResult regressed to ~2.51s due to Promise .then closure overhead being worse than the ternary branch.
