@@ -48,12 +48,15 @@ export class CdpTimeDriver implements TimeDriver {
   private syncMediaFn: () => void = () => {};
 
   private defaultSyncMedia() {
-    if (this.executionContextIds.length > 0) {
-      for (let i = 0; i < this.executionContextIds.length; i++) {
+    const len = this.executionContextIds.length;
+    if (len === 0) {
+      this.client!.send('Runtime.evaluate', this.singleFrameSyncMediaParams);
+    } else if (len === 1) {
+      this.client!.send('Runtime.evaluate', this.multiFrameSyncMediaParams[0]);
+    } else {
+      for (let i = 0; i < len; i++) {
         this.client!.send('Runtime.evaluate', this.multiFrameSyncMediaParams[i]);
       }
-    } else {
-      this.client!.send('Runtime.evaluate', this.singleFrameSyncMediaParams);
     }
   }
 
