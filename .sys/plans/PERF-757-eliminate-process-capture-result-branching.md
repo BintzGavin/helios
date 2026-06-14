@@ -1,8 +1,10 @@
 ---
 id: PERF-757
 slug: eliminate-process-capture-result-branching
-status: unclaimed
-claimed_by: ""
+status: complete
+completed: "2024-06-13"
+result: "discarded"
+claimed_by: "executor-session"
 created: 2024-06-13
 completed: ""
 result: ""
@@ -129,3 +131,9 @@ Run canvas benchmark or `npm run build -w packages/renderer`.
 
 ## Correctness Check
 Run the DOM render benchmark script (`npx tsx scripts/benchmark-perf.ts`) to ensure it produces valid outputs without regressions.
+
+## Results Summary
+- **Best render time**: 2.513s (vs baseline 2.441s)
+- **Improvement**: -2.9% (Regression)
+- **Kept experiments**: []
+- **Discarded experiments**: [PERF-757]

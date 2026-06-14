@@ -1198,3 +1198,6 @@ Last updated by: PERF-764
   - **What I tried**: Caching the exact base64 string reference returned from `DomStrategy.processCaptureResult` along with its decoded Buffer, to bypass `Buffer.from(..., 'base64')` if the new frame is identical to the previous frame in `CaptureLoop.ts`.
   - **WHY it didn't work**: The median render time in the fast path regressed to ~2.527s (vs baseline median ~2.523s). This proves that the overhead of introducing additional state tracking (two local variables per context) and checking the conditional `buffer === lastBase64Str` string reference is greater than letting V8 quickly handle base64 decodes using its highly optimized built-ins, especially in a benchmark where frames change frequently.
   - **Plan ID**: PERF-760
+
+## What Doesn't Work (and Why)
+- Inlining `processCaptureResult` into `DomStrategy.capture()` via `.then(this.processCaptureResultBound)` (PERF-757): Regressed median render time to ~2.513s (vs ~2.441s baseline). Returning a chained Promise via `.then()` incurred more microtask allocation overhead than explicitly evaluating the ternary condition (`hasProcessFn ? ...`) which V8 inline caches efficiently.
