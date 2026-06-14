@@ -1,0 +1,4 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	2.168	150	69.18	62.8	discard	optimize-captureloop-write
+2	2.231	150	67.23	62.9	discard	optimize-captureloop-write
+3	2.222	150	67.51	62.9	discard	optimize-captureloop-write
