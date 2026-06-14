@@ -1,11 +1,11 @@
 ---
 id: PERF-764
 slug: eager-base64-domstrategy
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "jules"
 created: 2024-06-14
 completed: ""
-result: ""
+result: "improved"
 ---
 
 # PERF-764: Eager Base64 Decode in DomStrategy processCaptureResult

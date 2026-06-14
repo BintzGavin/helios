@@ -7,6 +7,10 @@ Current best: 2.059s (baseline was 2.118s, ~3% improvement)
 Last updated by: PERF-726
 
 ## What Works
+- **PERF-764**: Eager Base64 Decode in DomStrategy processCaptureResult
+  - **What I did**: Moved base64 decoding directly into `DomStrategy.processCaptureResult` and eliminated conditional type checking inside `CaptureLoop.ts`.
+  - **Impact**: Improved median render time to ~2.306s (from ~2.624s baseline).
+  - **Plan ID**: PERF-764
 - **PERF-726**: Pre-bind processCaptureResult in CaptureLoop
   - **What I did**: Pre-bound `strategy.processCaptureResult` before the hot loops in `CaptureLoop.ts` to eliminate property lookup and conditional branch checking on every frame.
   - **Impact**: Improved median render time to ~2.068s (from ~2.118s), removing branching overhead per frame.
@@ -880,8 +884,8 @@ Last updated by: PERF-726
   - **Outcome**: discard
 
 ## Performance Trajectory
-Current best: ~2.624s (baseline was ~2.710s, -3%)
-Last updated by: PERF-698
+Current best: ~2.306s (baseline was ~2.624s, -12%)
+Last updated by: PERF-764
 
 ## What Works
 - **PERF-637**: Optimize Writer Waiter Check in CaptureLoop Hot Loop
