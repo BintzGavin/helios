@@ -1202,3 +1202,8 @@ Last updated by: PERF-764
 
 ## What Doesn't Work (and Why)
 - Inlining `processCaptureResult` into `DomStrategy.capture()` via `.then(this.processCaptureResultBound)` (PERF-757): Regressed median render time to ~2.513s (vs ~2.441s baseline). Returning a chained Promise via `.then()` incurred more microtask allocation overhead than explicitly evaluating the ternary condition (`hasProcessFn ? ...`) which V8 inline caches efficiently.
+
+- **PERF-765**: Optimize CaptureLoop Write
+  - **What I tried**: Used short-circuit logic `if (!stdin.write(buffer as any) && stdin.writableLength >= 16777216)` to avoid re-checking `canWriteMore` in `CaptureLoop.ts`.
+  - **Why it didn't work**: The overhead of setting a variable versus evaluating the condition directly is indistinguishable for V8 inline caching. The median render time regressed slightly to ~2.222s (from ~2.069s baseline), so this experiment was discarded as the micro-optimization did not yield a tangible benefit and could introduce noise.
+  - **Plan ID**: PERF-765

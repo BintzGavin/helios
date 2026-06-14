@@ -1,11 +1,11 @@
 ---
 id: PERF-765
 slug: optimize-captureloop-write
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "jules"
 created: 2024-06-14
 completed: ""
-result: ""
+result: "discarded"
 ---
 
 # PERF-765: Avoid Re-Checking canWriteMore in CaptureLoop
@@ -81,3 +81,12 @@ Run the DOM render benchmark script (`cd packages/renderer && npx tsx scripts/be
 ## Prior Art
 - PERF-689 (Native Stream Buffering Single Worker)
 - PERF-752 (Unify FFmpeg stdin write)
+
+## Results Summary
+
+```tsv
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	2.168	150	69.18	62.8	discard	optimize-captureloop-write
+2	2.231	150	67.23	62.9	discard	optimize-captureloop-write
+3	2.222	150	67.51	62.9	discard	optimize-captureloop-write
+```
