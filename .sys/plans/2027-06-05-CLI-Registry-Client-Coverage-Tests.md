@@ -1,36 +1,29 @@
 #### 1. Context & Goal
-- **Objective**: Implement missing test coverage for `RegistryClient` in `@helios-project/cli` to achieve 100% code coverage.
-- **Trigger**: Backlog item to complete CLI test suite and ensure registry client robustness.
-- **Impact**: Ensures that `RegistryClient` behaves correctly under various edge cases (like network timeouts, missing caches, empty responses, hydration errors), improving reliability and maintaining code quality standards.
+- **Objective**: Implement missing test coverage for `packages/cli/src/registry/client.ts`.
+- **Trigger**: The CLI package has uncovered lines in `RegistryClient` (lines 32, 85, 90-91, 96-97, 137).
+- **Impact**: Full test coverage of registry client ensuring reliability of component caching, fetching and hydration logic in various fallback scenarios.
 
 #### 2. File Inventory
 - **Create**: None
-- **Modify**: `packages/cli/src/registry/__tests__/client.test.ts` (Add test cases to cover the uncovered branches in `client.ts`)
-- **Read-Only**: `packages/cli/src/registry/client.ts`
+- **Modify**:
+  - `packages/cli/src/registry/__tests__/client.test.ts` (Add test cases for missing lines in `RegistryClient` caching, finding, and hydration fallback logic)
+- **Read-Only**:
+  - `packages/cli/src/registry/client.ts`
 
 #### 3. Implementation Spec
-- **Architecture**: We need to write unit tests for `RegistryClient` that explicitly trigger the uncovered lines identified in the coverage report:
-    - `setTimeout` callback in `fetch` (`controller.abort()`).
-    - The `framework` conditional when returning cached data.
-    - `findInList` returning `undefined` when `matches.length === 0`.
-    - `findInList` returning `matches[0]` when `framework` is undefined.
-    - The `if (found)` branch for `this.cache` inside `findComponent`.
-    - The `if (found)` branch for `this.remoteCache` inside `findComponent`.
-    - `!res.ok` condition during `hydrateComponent` throwing an error.
-    - The `catch (e)` block in `hydrateComponent` throwing an error.
+- **Architecture**: Add new `it` blocks within `describe('RegistryClient')` in `client.test.ts`:
+  1. For line 32: Test `getComponents(framework)` where `this.cache` is already populated.
+  2. For line 85: Test `findComponent(name)` (without framework arg) hitting a multiple-match fallback.
+  3. For lines 90-91: Test `findComponent(name)` checking the populated `this.cache`.
+  4. For lines 96-97: Test `findComponent(name)` checking the populated `this.remoteCache` (triggering `hydrateComponent`).
+  5. For line 137: Test `hydrateComponent` when fetching a specific component file fails and throws an Error.
 - **Pseudo-Code**:
-  - Mock `fetch` or `setTimeout` and `AbortController` to test the timeout.
-  - Test `getComponents` returning cached data with framework defined to test `this.cache.filter`.
-  - Call `findComponent` with a name that doesn't exist to test `matches.length === 0`.
-  - Call `findComponent` without passing `framework` to test returning `matches[0]`.
-  - Setup `this.cache` (e.g. by a first call) and then call `findComponent` where `findInList(this.cache)` finds a match.
-  - Setup `this.remoteCache` and then call `findComponent` where it finds a match.
-  - Mock `fetch` to return `res.ok = false` when fetching a file in `hydrateComponent` to test `throw new Error("Status ...")`.
-  - Mock `fetch` to throw a network error when fetching a file in `hydrateComponent` to test the `catch` block.
+  - Add specific tests to seed internal cache (`client['cache']`) and test `getComponents(framework)`.
+  - Add specific tests to test file fetch failures throwing the catch block inside the loop.
 - **Public API Changes**: None (internal test coverage improvements only).
-- **Dependencies**: The `packages/cli` workspace.
+- **Dependencies**: None.
 
 #### 4. Test Plan
-- **Verification**: Run `cd packages/cli && npx vitest run --coverage`.
-- **Success Criteria**: 100% test coverage for `packages/cli/src/registry/client.ts`.
-- **Edge Cases**: Ensure the test for the `setTimeout` callback doesn't actually wait 5 seconds (we can mock `global.setTimeout` or use Vitest's fake timers).
+- **Verification**: Run `cd packages/cli && npx vitest run --coverage src/registry/__tests__/client.test.ts`
+- **Success Criteria**: 100% test coverage for `client.ts` in lines, statements, branches, and functions.
+- **Edge Cases**: Verify that caching and finding handles `undefined` arguments properly.
