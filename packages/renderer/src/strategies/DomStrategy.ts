@@ -140,7 +140,7 @@ export class DomStrategy implements RenderStrategy {
         this.emptyImageBuffer = EMPTY_IMAGE_BUFFER;
     }
 
-    this.lastFrameData = this.emptyImageBase64;
+    this.lastFrameData = this.emptyImageBuffer;
 
 
 
@@ -168,8 +168,11 @@ export class DomStrategy implements RenderStrategy {
   }
 
 
-  processCaptureResult(result: any): string | Buffer {
-    return (this.lastFrameData = result.screenshotData || this.lastFrameData)!;
+  processCaptureResult(result: any): Buffer {
+    if (result.screenshotData) {
+      this.lastFrameData = Buffer.from(result.screenshotData, 'base64');
+    }
+    return this.lastFrameData as Buffer;
   }
 
   capture(page: Page, frameTime: number): Promise<any> {

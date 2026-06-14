@@ -154,9 +154,6 @@ export class CaptureLoop {
                 await timeDriver.setTime(page, compositionTimeInSeconds);
                 const rawResult = await strategy.capture(page, time);
                 let buffer = processFn(rawResult);
-                if (typeof buffer === 'string') {
-                    buffer = Buffer.from(buffer, 'base64');
-                }
 
                 if (i === nextProgressFrame) {
                     console.log(`Progress: Rendered ${i} / ${totalFrames} frames`);
@@ -278,9 +275,6 @@ export class CaptureLoop {
                 await timeDriver.setTime(page, compositionTimeInSeconds);
                 const rawResult = await strategy.capture(page, time);
                 let buffer = processFn(rawResult);
-                if (typeof buffer === 'string') {
-                    buffer = Buffer.from(buffer, 'base64');
-                }
                 frameBufferRing[ringIndex] = buffer;
                 frameReadyRing[ringIndex] = 1;
             } catch (e) {
