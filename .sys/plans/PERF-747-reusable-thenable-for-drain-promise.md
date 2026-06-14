@@ -1,7 +1,7 @@
 ---
 id: PERF-747
 slug: reusable-thenable-for-drain-promise
-status: unclaimed
+status: completed
 claimed_by: ""
 created: 2024-06-12
 completed: ""
@@ -107,3 +107,9 @@ Replace with:
 ## Prior Art
 - PERF-746 successfully eliminated Promise allocation for the writer wait loop using `ReusableThenable`.
 - PERF-742 eliminated Promise allocation in CdpTimeDriver.
+
+## Results Summary
+- **Best render time**: 2.074s (vs baseline 2.135s)
+- **Improvement**: ~3%
+- **Kept experiments**: [PERF-747] Replaced `new Promise` for drain with `ReusableThenable` to eliminate GC pressure during backpressure.
+- **Discarded experiments**: none
