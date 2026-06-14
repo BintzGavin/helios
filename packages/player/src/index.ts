@@ -2552,10 +2552,14 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
   }
 
   private loadIframe(src: string) {
+    if (this._networkState === HeliosPlayer.NETWORK_LOADING) {
+        this.dispatchEvent(new Event('abort'));
+    }
     this._error = null;
     this._networkState = HeliosPlayer.NETWORK_LOADING;
     this._readyState = HeliosPlayer.HAVE_NOTHING;
     this._hasPlayed = false;
+    this.dispatchEvent(new Event('emptied'));
     this.dispatchEvent(new Event('loadstart'));
 
     this.iframe.src = src;
@@ -2666,6 +2670,7 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
     // We poll because window.helios might be set asynchronously.
     const startTime = Date.now();
     this.connectionInterval = window.setInterval(() => {
+        this.dispatchEvent(new Event('progress'));
         // If we connected via Bridge in the meantime, stop polling
         if (this.controller) {
             this.stopConnectionAttempts();

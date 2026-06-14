@@ -11,6 +11,9 @@ The `HeliosPlayer` is a standard Web Component (Custom Element: `<helios-player>
 - `.loading-overlay`, `.error-overlay`, `.export-overlay`, `.status-overlay`: State-specific overlays.
 
 ## Section B: Events
+- `abort`: Dispatched when media data loading has been aborted.
+- `emptied`: Dispatched when the media has become empty.
+- `progress`: Dispatched periodically as the browser loads a resource.
 The component dispatches standard HTML5 Media events:
 - `play`, `pause`, `ended`, `timeupdate`, `durationchange`, `volumechange`, `ratechange`, `seeked`, `seeking`, `error`, `loadedmetadata`, `loadeddata`, `canplay`, `canplaythrough`, `playing`, `waiting`, `emptied`, `stalled`, `suspend`, `abort`
 

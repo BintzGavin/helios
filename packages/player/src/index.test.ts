@@ -918,6 +918,61 @@ describe('HeliosPlayer', () => {
     });
   });
 
+
+
+  describe('Missing Event Dispatches', () => {
+    it('should dispatch abort event when loadIframe is called while already loading', () => {
+      const abortSpy = vi.fn();
+      player.addEventListener('abort', abortSpy);
+
+      // Force network state to loading
+      player['_networkState'] = 2; // HeliosPlayer.NETWORK_LOADING
+
+      player['loadIframe']('test.html');
+
+      expect(abortSpy).toHaveBeenCalled();
+    });
+
+    it('should dispatch emptied event when loadIframe is called', () => {
+      const emptiedSpy = vi.fn();
+      player.addEventListener('emptied', emptiedSpy);
+
+      player['loadIframe']('test.html');
+
+      expect(emptiedSpy).toHaveBeenCalled();
+    });
+
+    it('should dispatch progress event during connection polling', () => {
+      vi.useFakeTimers();
+
+      const progressSpy = vi.fn();
+      player.addEventListener('progress', progressSpy);
+
+      // Mock iframe contentWindow
+      Object.defineProperty(player, 'iframe', {
+        value: {
+          contentWindow: {
+            postMessage: vi.fn()
+          },
+          getAttribute: vi.fn(),
+          setAttribute: vi.fn(),
+          addEventListener: vi.fn(),
+          removeEventListener: vi.fn()
+        },
+        writable: true
+      });
+
+      player['startConnectionAttempts']();
+
+      // Fast forward interval to trigger the polling logic
+      vi.advanceTimersByTime(150);
+
+      expect(progressSpy).toHaveBeenCalled();
+
+      player['stopConnectionAttempts']();
+      vi.useRealTimers();
+    });
+  });
   describe('Captions', () => {
     let mockController: any;
 
