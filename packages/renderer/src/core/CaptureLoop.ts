@@ -143,7 +143,7 @@ export class CaptureLoop {
 
         const signal = this.jobOptions?.signal;
         const onProgress = this.jobOptions?.onProgress;
-        const processFn = strategy.processCaptureResult ? strategy.processCaptureResult.bind(strategy) : (res: any) => res;
+        const hasProcessFn = !!strategy.processCaptureResult;
         try {
             for (let i = 0; i < totalFrames; i++) {
                 if (capturedErrors.length > 0 || (signal && signal.aborted)) break;
@@ -153,7 +153,7 @@ export class CaptureLoop {
 
                 await timeDriver.setTime(page, compositionTimeInSeconds);
                 const rawResult = await strategy.capture(page, time);
-                let buffer = processFn(rawResult);
+                let buffer = hasProcessFn ? strategy.processCaptureResult!(rawResult) : rawResult;
 
                 if (i === nextProgressFrame) {
                     console.log(`Progress: Rendered ${i} / ${totalFrames} frames`);
@@ -246,7 +246,7 @@ export class CaptureLoop {
 
     const runWorker = async (worker: WorkerInfo, workerIndex: number) => {
         const { timeDriver, strategy, page } = worker;
-        const processFn = strategy.processCaptureResult ? strategy.processCaptureResult.bind(strategy) : (res: any) => res;
+        const hasProcessFn = !!strategy.processCaptureResult;
 
         while (!aborted) {
             let i: number;
@@ -274,7 +274,7 @@ export class CaptureLoop {
             try {
                 await timeDriver.setTime(page, compositionTimeInSeconds);
                 const rawResult = await strategy.capture(page, time);
-                let buffer = processFn(rawResult);
+                let buffer = hasProcessFn ? strategy.processCaptureResult!(rawResult) : rawResult;
                 frameBufferRing[ringIndex] = buffer;
                 frameReadyRing[ringIndex] = 1;
             } catch (e) {

@@ -1,11 +1,11 @@
 ---
 id: PERF-762
 slug: reapply-has-process-fn
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "Jules"
 created: 2026-06-14
-completed: ""
-result: ""
+completed: "2026-06-14"
+result: "Kept"
 ---
 
 # PERF-762: Reapply processFn Closure Elimination
@@ -57,3 +57,13 @@ Run the DOM render benchmark script (`cd packages/renderer && npx tsx scripts/be
 
 ## Prior Art
 - PERF-745 (Eliminate processCaptureResult Branching and Inline Closure)
+
+## Results Summary
+```
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	2.154	150	69.64	63.1	keep	baseline
+2	2.479	150	60.50	62.9	keep	baseline
+3	2.130	150	70.42	63.0	keep	baseline
+4	2.110	150	71.08	62.9	keep	baseline
+5	2.069	150	72.49	62.9	keep	baseline
+```
