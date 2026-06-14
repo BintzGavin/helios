@@ -1,11 +1,11 @@
 ---
 id: PERF-767
 slug: inline-capture-ternary-and-peel-sync-loop
-status: unclaimed
-claimed_by: ""
+status: completed
+claimed_by: "PERF-767"
 created: 2024-06-14
 completed: ""
-result: ""
+result: "improved"
 ---
 
 # PERF-767: Inline Capture Ternary and Peel Sync Media Loop

@@ -1207,3 +1207,8 @@ Last updated by: PERF-764
   - **What I tried**: Used short-circuit logic `if (!stdin.write(buffer as any) && stdin.writableLength >= 16777216)` to avoid re-checking `canWriteMore` in `CaptureLoop.ts`.
   - **Why it didn't work**: The overhead of setting a variable versus evaluating the condition directly is indistinguishable for V8 inline caching. The median render time regressed slightly to ~2.222s (from ~2.069s baseline), so this experiment was discarded as the micro-optimization did not yield a tangible benefit and could introduce noise.
   - **Plan ID**: PERF-765
+
+- **PERF-767**: Inline Capture Ternary and Peel Sync Media Loop
+  - **What I tried**: Inlined the `await strategy.capture` result into the ternary expression in `CaptureLoop.ts` and peeled the `defaultSyncMedia` execution context loop in `CdpTimeDriver.ts`.
+  - **WHY it worked/didn't work**: Improved median render time to ~2.388s (from ~2.664s baseline). The reduction of V8 JIT context allocation per frame and loop AST overhead yielded a faster path for the monomorphic case.
+  - **Plan ID**: PERF-767
