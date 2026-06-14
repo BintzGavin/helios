@@ -1,12 +1,13 @@
 ## Performance Trajectory
-Current best: 2.415s (baseline was 2.532s, -4.6%)
-Last updated by: PERF-752
+Current best: 2.069s (baseline was ~2.154s, -3.9%)
+Last updated by: PERF-762
 
 ## Performance Trajectory
 Current best: 2.059s (baseline was 2.118s, ~3% improvement)
 Last updated by: PERF-726
 
 ## What Works
+- **PERF-762 (Reapply processFn Closure Elimination)**: Strictly re-applied the PERF-745 `hasProcessFn` inline boolean check to eliminate the per-frame closure evaluation overhead in `CaptureLoop.ts`. Improved median render time by ~3.9% (from 2.154s to 2.069s).
 - **PERF-764**: Eager Base64 Decode in DomStrategy processCaptureResult
   - **What I did**: Moved base64 decoding directly into `DomStrategy.processCaptureResult` and eliminated conditional type checking inside `CaptureLoop.ts`.
   - **Impact**: Improved median render time to ~2.306s (from ~2.624s baseline).
