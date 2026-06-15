@@ -1245,3 +1245,8 @@ Last updated by: PERF-764
   - **What I did**: Inlined the media sync boolean check (`if (this.hasMedia)`), removing the empty closure invocation (`this.syncMediaFn()`) per frame on the fast path.
   - **Impact**: Fast-path execution optimization for single worker loops.
   - **Plan ID**: PERF-776
+
+- **PERF-777**: Bypass Stream Writable Getter in CaptureLoop
+  - **What I tried**: Bypassed `stdin?.writable` stream state getter evaluation in `CaptureLoop.ts` single-worker fast path.
+  - **WHY it worked/didn't work**: The median render time in the fast path regressed slightly to ~2.311s (vs baseline median ~2.281s). Replacing the nullable property access with a strict stream variable likely didn't offset the fact that `stdin.write` and `drainPromise` await still carry overhead. The experiment yielded no improvement and increased noise. Discarded.
+  - **Plan ID**: PERF-777
