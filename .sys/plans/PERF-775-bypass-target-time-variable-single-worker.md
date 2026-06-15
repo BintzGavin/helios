@@ -1,11 +1,11 @@
 ---
 id: PERF-775
 slug: bypass-target-time-variable-single-worker
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-06-15
-completed: ""
-result: ""
+completed: "2026-06-15"
+result: "discard"
 ---
 
 # PERF-775: Bypass time calculation in CaptureLoop single worker fast path
@@ -74,3 +74,9 @@ Run `npm run test -w packages/renderer` to ensure test pipeline isn't impacted.
 
 ## Correctness Check
 Run the DOM render benchmark script (`cd packages/renderer && npx tsx scripts/benchmark-perf.ts`) to ensure it produces valid outputs without regressions.
+
+## Results Summary
+- **Best render time**: ~2.337s (vs baseline ~2.304s)
+- **Improvement**: 0%
+- **Kept experiments**: none
+- **Discarded experiments**: Bypass time calculation in CaptureLoop single worker fast path
