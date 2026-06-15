@@ -1,7 +1,7 @@
 ---
 id: PERF-777
 slug: bypass-stream-writable-getter
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-06-15
 completed: ""
