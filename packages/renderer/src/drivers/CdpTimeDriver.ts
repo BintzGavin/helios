@@ -45,7 +45,6 @@ export class CdpTimeDriver implements TimeDriver {
   private singleFrameSyncMediaParams: any = { expression: "window.__helios_sync_media();" };
   private multiFrameSyncMediaParams: any[] = [];
   private hasMedia: boolean = true;
-  private syncMediaFn: () => void = () => {};
 
   private defaultSyncMedia() {
     const len = this.executionContextIds.length;
@@ -187,13 +186,10 @@ export class CdpTimeDriver implements TimeDriver {
     }).catch(noopCatch);
 
     if (this.hasMedia) {
-      this.syncMediaFn = this.defaultSyncMedia;
       this.client!.on('Runtime.executionContextCreated', this.handleExecutionContextCreated);
       // Enable Runtime so we actually receive executionContextCreated events
       // Catch errors in case another driver instance sharing this session already enabled it.
       // Runtime is enabled in DomStrategy
-    } else {
-      this.syncMediaFn = () => {};
     }
 
 
@@ -212,7 +208,9 @@ export class CdpTimeDriver implements TimeDriver {
     // Convert to milliseconds for CDP
 
 // 1. Synchronize media elements
-    this.syncMediaFn();
+    if (this.hasMedia) {
+      this.defaultSyncMedia();
+    }
 
     // 2. Advance virtual time
     // This triggers the browser event loop and requestAnimationFrame

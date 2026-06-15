@@ -1239,3 +1239,9 @@ Last updated by: PERF-764
   - **What I tried**: Replaced async runWorker loop with recursive promise chain.
   - **WHY it worked/didn't work**: The median render time regressed to ~3.360s compared to the baseline (~2.40s). Eliminating the `async while` generator loop in favor of a recursive `.then()` chain proved to be slower. The deep closure allocation and chained microtask resolution overhead outpaced V8's native, highly-optimized `async`/`await` state machine compilation. Discarded.
   - **Plan ID**: PERF-475
+
+## What Works
+- **PERF-776**: Inline media sync check
+  - **What I did**: Inlined the media sync boolean check (`if (this.hasMedia)`), removing the empty closure invocation (`this.syncMediaFn()`) per frame on the fast path.
+  - **Impact**: Fast-path execution optimization for single worker loops.
+  - **Plan ID**: PERF-776
