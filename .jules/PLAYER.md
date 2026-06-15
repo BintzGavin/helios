@@ -88,3 +88,6 @@
 ## [v0.77.57] - Duplicate Implementation Plan
 **Learning:** Sometimes plans are generated for features that are already fully implemented in the code.
 **Action:** Always verify code and README first, mark as 'IMPOSSIBLE: DUPLICATION', and discard the plan if the feature exists.
+## [v0.77.58] - Document Missing Media Events
+**Learning:** Implemented event dispatches were missing from the Events list in README.md despite event handlers being documented.
+**Action:** Ensure both the event and its handler are documented when adding new events.
