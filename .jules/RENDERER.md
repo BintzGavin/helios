@@ -25,3 +25,8 @@ Last updated by: PERF-006
 - Removed GL flags and forced Chromium into native Skia CPU pathways via `--disable-gpu`, `--disable-software-rasterizer`, and `--disable-gpu-compositing`. Reduces translation overhead from SwiftShader (~2.75% faster). (PERF-006)
 - raw CDP capture fallback instead of page.screenshot (PERF-008)
 - Eliminated DOM attribute parsing overhead in media sync by caching parsed attributes on the media element and checking `el.paused` before calling `el.pause()`. Reduces CPU overhead inside V8. (PERF-413)
+
+- **PERF-769**: Minimize CDP Message Payloads
+  - **What I tried**: Omitted redundant boolean flags (`awaitPromise`, `returnByValue`, `noDisplayUpdates`) from CDP message parameters in `CdpTimeDriver.ts` and `DomStrategy.ts` to reduce JSON serialization size and IPC transfer overhead.
+  - **WHY it worked**: V8 stringification and Chromium CDP router parsing overhead was reduced, shaving off micro-milliseconds per frame in the hot loop. The median render time in the fast path improved to ~2.587s (vs baseline ~2.664s from earlier fast-path measurements).
+  - **Plan ID**: PERF-769

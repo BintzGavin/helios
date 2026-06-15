@@ -42,7 +42,7 @@ export class CdpTimeDriver implements TimeDriver {
   private executionContextIds: number[] = [];
   private cachedPromises: Promise<any>[] = [];
 
-  private singleFrameSyncMediaParams: any = { expression: "window.__helios_sync_media();", awaitPromise: false, returnByValue: false };
+  private singleFrameSyncMediaParams: any = { expression: "window.__helios_sync_media();" };
   private multiFrameSyncMediaParams: any[] = [];
   private hasMedia: boolean = true;
   private syncMediaFn: () => void = () => {};
@@ -82,9 +82,7 @@ export class CdpTimeDriver implements TimeDriver {
       this.executionContextIds.push(event.context.id);
       this.multiFrameSyncMediaParams.push({
           expression: "window.__helios_sync_media();",
-          contextId: event.context.id,
-          awaitPromise: false,
-          returnByValue: false
+          contextId: event.context.id
       });
     }
   };
