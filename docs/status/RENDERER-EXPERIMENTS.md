@@ -1235,3 +1235,7 @@ Last updated by: PERF-764
   - **What I tried**: Fully unrolled the single-worker and multi-worker loops in `CaptureLoop.ts` by peeling the `hasProcessFn` check to the outside, eliminating the per-frame ternary branch.
   - **WHY it didn't work**: The median render time regressed to ~2.312s (vs baseline ~2.069s). The larger bytecode size from duplicating the entire loop bodies likely reduced CPU instruction cache locality or disrupted TurboFan optimizations, overriding any minor benefit from bypassing the inline boolean evaluation (which V8 already handles effectively via branch prediction).
   - **Plan ID**: PERF-774
+- **PERF-475**: Optimize runWorker Promise Chain
+  - **What I tried**: Replaced async runWorker loop with recursive promise chain.
+  - **WHY it worked/didn't work**: The median render time regressed to ~3.360s compared to the baseline (~2.40s). Eliminating the `async while` generator loop in favor of a recursive `.then()` chain proved to be slower. The deep closure allocation and chained microtask resolution overhead outpaced V8's native, highly-optimized `async`/`await` state machine compilation. Discarded.
+  - **Plan ID**: PERF-475
