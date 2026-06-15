@@ -766,3 +766,6 @@ Each agent should update **their own dedicated progress file** instead of this f
 
 ### STUDIO v0.107.2
 - ✅ Completed: Improve SchemaInputs Coverage - Added unit test coverage for TypedArrayInput components in SchemaInputs.tsx
+
+### CLI v0.46.47
+- ✅ Completed: CLI Utils Coverage Tests - Added unit tests to utils to achieve 100% coverage.
