@@ -760,3 +760,6 @@ Each agent should update **their own dedicated progress file** instead of this f
 
 ### PLAYER v0.77.51
 - ✅ Completed: Discarded duplicate plan 2027-02-17-PLAYER-Document-Missing-Media-Properties.md because the properties were already documented.
+
+### STUDIO v0.107.2
+- ✅ Completed: Improve SchemaInputs Coverage - Added unit test coverage for TypedArrayInput components in SchemaInputs.tsx
