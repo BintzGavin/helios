@@ -145,33 +145,63 @@ export class CaptureLoop {
         const onProgress = this.jobOptions?.onProgress;
         const hasProcessFn = !!strategy.processCaptureResult;
         try {
-            for (let i = 0; i < totalFrames; i++) {
-                if (capturedErrors.length > 0 || (signal && signal.aborted)) break;
+            if (hasProcessFn) {
+                for (let i = 0; i < totalFrames; i++) {
+                    if (capturedErrors.length > 0 || (signal && signal.aborted)) break;
 
-                const time = i * timeStep;
-                const compositionTimeInSeconds = (startFrame + i) * compTimeStep;
+                    const time = i * timeStep;
+                    const compositionTimeInSeconds = (startFrame + i) * compTimeStep;
 
-                await timeDriver.setTime(page, compositionTimeInSeconds);
-                const buffer = hasProcessFn ? strategy.processCaptureResult!(await strategy.capture(page, time)) : await strategy.capture(page, time);
+                    await timeDriver.setTime(page, compositionTimeInSeconds);
+                    const buffer = strategy.processCaptureResult!(await strategy.capture(page, time));
 
-                if (i === nextProgressFrame) {
-                    console.log(`Progress: Rendered ${i} / ${totalFrames} frames`);
-                    nextProgressFrame += progressInterval;
-                }
-
-                if (onProgress) {
-                    onProgress(i / totalFrames);
-                }
-
-
-                if (stdin?.writable) {
-                    const canWriteMore = stdin.write(buffer as any);
-
-                    if (!canWriteMore && stdin.writableLength >= 16777216) {
-                        await this.drainPromise;
+                    if (i === nextProgressFrame) {
+                        console.log(`Progress: Rendered ${i} / ${totalFrames} frames`);
+                        nextProgressFrame += progressInterval;
                     }
-                } else {
-                    console.warn('FFmpeg stdin is not writable. Skipping write.');
+
+                    if (onProgress) {
+                        onProgress(i / totalFrames);
+                    }
+
+                    if (stdin?.writable) {
+                        const canWriteMore = stdin.write(buffer as any);
+
+                        if (!canWriteMore && stdin.writableLength >= 16777216) {
+                            await this.drainPromise;
+                        }
+                    } else {
+                        console.warn('FFmpeg stdin is not writable. Skipping write.');
+                    }
+                }
+            } else {
+                for (let i = 0; i < totalFrames; i++) {
+                    if (capturedErrors.length > 0 || (signal && signal.aborted)) break;
+
+                    const time = i * timeStep;
+                    const compositionTimeInSeconds = (startFrame + i) * compTimeStep;
+
+                    await timeDriver.setTime(page, compositionTimeInSeconds);
+                    const buffer = await strategy.capture(page, time);
+
+                    if (i === nextProgressFrame) {
+                        console.log(`Progress: Rendered ${i} / ${totalFrames} frames`);
+                        nextProgressFrame += progressInterval;
+                    }
+
+                    if (onProgress) {
+                        onProgress(i / totalFrames);
+                    }
+
+                    if (stdin?.writable) {
+                        const canWriteMore = stdin.write(buffer as any);
+
+                        if (!canWriteMore && stdin.writableLength >= 16777216) {
+                            await this.drainPromise;
+                        }
+                    } else {
+                        console.warn('FFmpeg stdin is not writable. Skipping write.');
+                    }
                 }
             }
         } catch (e) {
@@ -247,40 +277,78 @@ export class CaptureLoop {
         const { timeDriver, strategy, page } = worker;
         const hasProcessFn = !!strategy.processCaptureResult;
 
-        while (!aborted) {
-            let i: number;
-            if (aborted || nextFrameToSubmit >= totalFrames) {
-                i = -1;
-            } else if (nextFrameToSubmit - nextFrameToWrite < maxPipelineDepth) {
-                i = nextFrameToSubmit++;
+        if (hasProcessFn) {
+            while (!aborted) {
+                let i: number;
+                if (aborted || nextFrameToSubmit >= totalFrames) {
+                    i = -1;
+                } else if (nextFrameToSubmit - nextFrameToWrite < maxPipelineDepth) {
+                    i = nextFrameToSubmit++;
+                    const ringIndex = i & ringMask;
+
+                    frameReadyRing[ringIndex] = 0;
+                    frameBufferRing[ringIndex] = null;
+                } else {
+                    freeWorkers[freeWorkersHead++] = workerIndex;
+                    checkState();
+                    i = (await workerThenables[workerIndex] as any) as number;
+                }
+
+                if (i === -1) break;
+
+                const time = i * timeStep;
+                const compositionTimeInSeconds = (startFrame + i) * compTimeStep;
+
                 const ringIndex = i & ringMask;
 
-                frameReadyRing[ringIndex] = 0;
-                frameBufferRing[ringIndex] = null;
-            } else {
-                freeWorkers[freeWorkersHead++] = workerIndex;
-                checkState();
-                i = (await workerThenables[workerIndex] as any) as number;
+                try {
+                    await timeDriver.setTime(page, compositionTimeInSeconds);
+                    const buffer = strategy.processCaptureResult!(await strategy.capture(page, time));
+                    frameBufferRing[ringIndex] = buffer;
+                    frameReadyRing[ringIndex] = 1;
+                } catch (e) {
+                    fatalError = e;
+                    aborted = true;
+                    checkState();
+                }
+                writerWaiterPromise.resolve();
             }
+        } else {
+            while (!aborted) {
+                let i: number;
+                if (aborted || nextFrameToSubmit >= totalFrames) {
+                    i = -1;
+                } else if (nextFrameToSubmit - nextFrameToWrite < maxPipelineDepth) {
+                    i = nextFrameToSubmit++;
+                    const ringIndex = i & ringMask;
 
-            if (i === -1) break;
+                    frameReadyRing[ringIndex] = 0;
+                    frameBufferRing[ringIndex] = null;
+                } else {
+                    freeWorkers[freeWorkersHead++] = workerIndex;
+                    checkState();
+                    i = (await workerThenables[workerIndex] as any) as number;
+                }
 
-            const time = i * timeStep;
-            const compositionTimeInSeconds = (startFrame + i) * compTimeStep;
+                if (i === -1) break;
 
-            const ringIndex = i & ringMask;
+                const time = i * timeStep;
+                const compositionTimeInSeconds = (startFrame + i) * compTimeStep;
 
-            try {
-                await timeDriver.setTime(page, compositionTimeInSeconds);
-                const buffer = hasProcessFn ? strategy.processCaptureResult!(await strategy.capture(page, time)) : await strategy.capture(page, time);
-                frameBufferRing[ringIndex] = buffer;
-                frameReadyRing[ringIndex] = 1;
-            } catch (e) {
-                fatalError = e;
-                aborted = true;
-                checkState();
+                const ringIndex = i & ringMask;
+
+                try {
+                    await timeDriver.setTime(page, compositionTimeInSeconds);
+                    const buffer = await strategy.capture(page, time);
+                    frameBufferRing[ringIndex] = buffer;
+                    frameReadyRing[ringIndex] = 1;
+                } catch (e) {
+                    fatalError = e;
+                    aborted = true;
+                    checkState();
+                }
+                writerWaiterPromise.resolve();
             }
-            writerWaiterPromise.resolve();
         }
     };
 
