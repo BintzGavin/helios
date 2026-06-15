@@ -1230,3 +1230,8 @@ Last updated by: PERF-764
   - **What I tried**: Initialized `time` and `compositionTimeInSeconds` once before the loop and simply add the step values on each iteration.
   - **WHY it worked/didn't work**: The median render time in the fast path slightly regressed to ~2.474s (vs baseline median ~2.337s). Pre-calculating increments seems to interfere with V8's optimization, perhaps by decoupling the time calculations from the loop index that TurboFan expects. Discarded.
   - **Plan ID**: PERF-775
+
+- **PERF-774**: Monomorphic Capture Loop via Loop Peeling
+  - **What I tried**: Fully unrolled the single-worker and multi-worker loops in `CaptureLoop.ts` by peeling the `hasProcessFn` check to the outside, eliminating the per-frame ternary branch.
+  - **WHY it didn't work**: The median render time regressed to ~2.312s (vs baseline ~2.069s). The larger bytecode size from duplicating the entire loop bodies likely reduced CPU instruction cache locality or disrupted TurboFan optimizations, overriding any minor benefit from bypassing the inline boolean evaluation (which V8 already handles effectively via branch prediction).
+  - **Plan ID**: PERF-774

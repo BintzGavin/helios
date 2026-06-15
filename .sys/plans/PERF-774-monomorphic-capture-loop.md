@@ -1,11 +1,11 @@
 ---
 id: PERF-774
 slug: monomorphic-capture-loop
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-24
-completed: ""
-result: ""
+completed: "$(date +%Y-%m-%d)"
+result: "discard"
 ---
 
 # PERF-774: Monomorphic Capture Loop
@@ -14,7 +14,7 @@ result: ""
 The frame capture loop in `packages/renderer/src/core/CaptureLoop.ts` contains a polymorphic ternary operation on every frame evaluation (`hasProcessFn ? strategy.processCaptureResult!(await strategy.capture(page, time)) : await strategy.capture(page, time)`). By unrolling this branch entirely, we can provide V8 with a fully monomorphic hot path, minimizing closure and context switching overhead in the innermost loops.
 
 ## Background Research
-Previous experiments (PERF-762, PERF-758, PERF-745) explored various ways to optimize the closure execution of `processCaptureResult`. While replacing the dynamic lookup with a boolean variable (`hasProcessFn`) improved performance slightly, the inline ternary still causes V8's TurboFan compiler to generate polymorphic byte-code and branch logic inside the hot loop. By fully peeling the loop (i.e. splitting the `for` and `while` loop logic based on `hasProcessFn` prior to entering them), we ensure monomorphic execution.
+Previous experiments (PERF-762, PERF-758, PERF-745) explored various ways to optimize the closure execution of `processCaptureResult`. While replacing the dynamic lookup with a boolean variable (`hasProcessFn`) improved performance slightly, the inline ternary still causes V8's TurboFan compiler to generate polymorphic byte-code and branch logic inside the hot loop. By fully peeling the loop (ie. splitting the `for` and `while` loop logic based on `hasProcessFn` prior to entering them), we ensure monomorphic execution.
 
 ## Benchmark Configuration
 - **Composition URL**: `http://localhost:3000/dom-benchmark`
@@ -60,3 +60,8 @@ Run the standard DOM benchmark and ensure the output video is generated without 
 
 ## Prior Art
 PERF-762 (Re-applied inline boolean check), PERF-767 (Inlined capture ternary and peeled sync media loop).
+
+## Results Summary
+- **Best render time**: ~2.312s (baseline ~2.069s)
+- **Improvement**: none (regressed)
+- **Discarded experiments**: Monomorphic capture loop via loop peeling did not improve performance. The larger bytecode from duplicating the loop bodies likely countered any minor gains from avoiding the single boolean evaluation per frame, which V8 inline caching already handles efficiently.
