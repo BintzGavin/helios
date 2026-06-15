@@ -2,8 +2,8 @@
 id: PERF-751
 slug: hoist-runtime
 status: complete
-claimed_by: ""
-created: 2025-05-24
+claimed_by: "Jules"
+created: 2024-06-12
 completed: 2024-06-12
 result: failed
 ---
@@ -28,7 +28,7 @@ However, if we enable `Runtime` *after* the preload scripts have been evaluated 
 - **Minimum runs**: 3 per experiment, report median
 
 ## Baseline
-- **Current estimated render time**: ~26.385s (baseline from journal)
+- **Current estimated render time**: ~2.534s (baseline from journal/benchmark)
 - **Bottleneck analysis**: The `CdpTimeDriver` conditionally awaits `Runtime.enable` if media elements are present. By hoisting this into the guaranteed earlier `DomStrategy.prepare()` phase (but *after* script evaluation), we can potentially overlap its initialization with other operations or remove the conditional await overhead from the time driver entirely.
 
 ## Implementation Spec
@@ -46,13 +46,8 @@ However, if we enable `Runtime` *after* the preload scripts have been evaluated 
 **Risk**: If `CdpTimeDriver` is used with a different strategy that doesn't enable `Runtime`, it might not receive `executionContextCreated` events. However, the DOM renderer pipeline tightly couples `DomStrategy` and `CdpTimeDriver` (or `SeekTimeDriver`), so this risk is acceptable for this experiment.
 
 ## Results Summary
-- **Best render time**: 0.000s (vs baseline 26.385s)
+- **Best render time**: 2.814s (vs baseline 2.534s)
 - **Improvement**: 0%
 - **Kept experiments**:
 - **Discarded experiments**: Hoist Runtime.enable to DomStrategy.prepare()
 
-## Results Summary
-- **Best render time**: 28.229s (vs baseline 27.882s)
-- **Improvement**: 0%
-- **Kept experiments**:
-- **Discarded experiments**: Hoist Runtime.enable to DomStrategy.prepare()
