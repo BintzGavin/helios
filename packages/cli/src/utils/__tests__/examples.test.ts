@@ -169,4 +169,54 @@ export default defineConfig({
     expect(writtenContent).not.toContain('searchForWorkspaceRoot');
     expect(writtenContent).not.toContain("'@helios-project/core':");
   });
+
+  it('catches errors when transforming package.json', () => {
+    (fs.readFileSync as any).mockImplementation((p: string) => {
+        if (p.endsWith('package.json')) throw new Error('Read error');
+        return '';
+    });
+    const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+    transformProject(targetDir);
+
+    expect(consoleWarnSpy).toHaveBeenCalledWith(expect.stringContaining('Failed to transform package.json'));
+    consoleWarnSpy.mockRestore();
+  });
+
+  it('catches errors when transforming vite.config.ts', () => {
+    (fs.readFileSync as any).mockImplementation((p: string) => {
+        if (p.endsWith('vite.config.ts')) throw new Error('Read error');
+        return '{}'; // valid for others
+    });
+    const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+    transformProject(targetDir);
+
+    expect(consoleWarnSpy).toHaveBeenCalledWith(expect.stringContaining('Failed to transform vite.config.ts'));
+    consoleWarnSpy.mockRestore();
+  });
+
+  it('catches errors when transforming tsconfig.json', () => {
+    (fs.readFileSync as any).mockImplementation((p: string) => {
+        if (p.endsWith('tsconfig.json')) throw new Error('Read error');
+        return '{}';
+    });
+    const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+    transformProject(targetDir);
+
+    expect(consoleWarnSpy).toHaveBeenCalledWith(expect.stringContaining('Failed to transform tsconfig.json'));
+    consoleWarnSpy.mockRestore();
+  });
+
+  it('creates postcss.config.cjs if missing', () => {
+    (fs.existsSync as any).mockImplementation((p: string) => p.endsWith('postcss.config.cjs') ? false : true);
+
+    transformProject(targetDir);
+
+    expect(fs.writeFileSync).toHaveBeenCalledWith(
+      path.join(targetDir, 'postcss.config.cjs'),
+      'module.exports = {};\n'
+    );
+  });
 });
