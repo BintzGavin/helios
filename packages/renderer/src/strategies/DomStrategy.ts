@@ -23,7 +23,7 @@ export class DomStrategy implements RenderStrategy {
   private emptyImageBuffer: Buffer = EMPTY_IMAGE_BUFFER;
   private emptyImageBase64: string = "";
   private frameInterval: number = 0;
-  private beginFrameParams: any = { interval: 0, screenshot: null, noDisplayUpdates: false };
+  private beginFrameParams: any = {};
 
   constructor(private options: RendererOptions) {
     if (this.options.videoCodec === 'copy') {

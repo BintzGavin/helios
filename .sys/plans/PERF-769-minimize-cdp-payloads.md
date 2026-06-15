@@ -1,11 +1,11 @@
 ---
 id: PERF-769
 slug: minimize-cdp-payloads
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "jules"
 created: 2024-06-15
 completed: ""
-result: ""
+result: "improved"
 ---
 
 # PERF-769: Minimize CDP Message Payloads
