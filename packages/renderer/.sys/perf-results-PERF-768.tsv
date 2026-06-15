@@ -1,0 +1,7 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	2.257	150	66.47	63.0	keep	baseline
+2	2.150	150	69.75	63.7	keep	baseline
+3	2.178	150	68.87	62.9	keep	baseline
+4	2.207	150	67.98	62.9	discard	hoist rAF loop
+5	2.195	150	68.34	62.8	discard	hoist rAF loop
+6	2.188	150	68.56	62.9	discard	hoist rAF loop

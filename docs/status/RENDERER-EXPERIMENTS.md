@@ -1217,3 +1217,8 @@ Last updated by: PERF-764
   - **What I tried**: Applied the `ReusableThenable` pattern from `PERF-746` to the stream drain backpressure handling in `CaptureLoop.ts` by replacing `new Promise<void>(this.drainPromiseExecutor)` allocations with a shared `drainPromise`.
   - **WHY it worked**: V8 heap allocation pressure during FFmpeg stdin backpressure events is eliminated by reusing the same duck-typed `ReusableThenable` instance, further reducing garbage collection overhead and keeping the fast-path clean.
   - **Plan ID**: PERF-747
+
+- **PERF-768**: Eliminate per-frame CDP call by hoisting media sync to requestAnimationFrame
+  - **What I tried**: Hoisted the `window.__helios_sync_media()` call into a persistent `requestAnimationFrame` loop in the initialization script of `CdpTimeDriver.ts`, entirely eliminating the `this.client!.send('Runtime.evaluate')` IPC call from the Node.js hot loop per frame.
+  - **WHY it didn't work**: The median render time in the fast path slightly regressed to ~2.195s (vs baseline median ~2.178s). This suggests that letting the browser run its own internal `requestAnimationFrame` loop on every virtual frame tick adds more processing overhead inside Chromium than sending a lightweight asynchronous, un-awaited CDP message from Node.js.
+  - **Plan ID**: PERF-768
