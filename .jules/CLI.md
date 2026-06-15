@@ -10,3 +10,6 @@
 ## [v0.46.45] - CLI Command Coverage Spec V7
 **Learning:** Checking overall command coverage highlighted additional missing lines in `build.ts` (cleanup phase) and `studio.ts` (handling config and skills roots).
 **Action:** When gathering metrics for execution plans on testing gaps, always explicitly navigate to the package and test specific folders and identify the explicit missing branches for building accurate planner specs.
+## [v0.46.49] - CLI Utils Coverage Tests Spec
+**Learning:** Found remaining uncovered branches in `packages/cli/src/utils` specifically related to failure catch blocks on file mutations in `examples.ts` and empty parent directory recursive pruning in `uninstall.ts` (lines 83, 119, 140, 147 in `examples.ts`, 50-54 in `uninstall.ts`, 35-50 in `package-manager.ts`, 132, 141 in `install.ts`).
+**Action:** Always mock `fs.writeFileSync` or `fs.readdirSync` with an error throwing impl to accurately hit file system handling fallback coverage lines.
