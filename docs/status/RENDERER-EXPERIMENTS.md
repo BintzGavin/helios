@@ -1225,3 +1225,8 @@ Last updated by: PERF-764
 
 ## Open Questions
 - [Monomorphic Capture Loop (PERF-771)] Will completely unrolling the ternary branch (`hasProcessFn ? ... : ...`) to duplicate the `for` and `while` loops inside `CaptureLoop.ts` improve the hot path speed by making it fully monomorphic?
+
+- **PERF-775**: Bypass time calculation in CaptureLoop single worker fast path
+  - **What I tried**: Initialized `time` and `compositionTimeInSeconds` once before the loop and simply add the step values on each iteration.
+  - **WHY it worked/didn't work**: The median render time in the fast path slightly regressed to ~2.474s (vs baseline median ~2.337s). Pre-calculating increments seems to interfere with V8's optimization, perhaps by decoupling the time calculations from the loop index that TurboFan expects. Discarded.
+  - **Plan ID**: PERF-775
