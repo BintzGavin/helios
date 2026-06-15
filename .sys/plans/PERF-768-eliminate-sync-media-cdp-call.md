@@ -1,11 +1,11 @@
 ---
 id: PERF-768
 slug: eliminate-sync-media-cdp-call
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-06-14
-completed: ""
-result: ""
+completed: 2024-06-14
+result: discard
 ---
 
 # PERF-768: Eliminate per-frame CDP call by hoisting media sync to `requestAnimationFrame`
@@ -67,3 +67,9 @@ Add this immediately after the `window.__helios_wait_until_stable` definition.
 
 ## Correctness Check
 Run the `npm run test -w packages/renderer` tests to ensure DOM rendering behavior remains correct and videos stay in sync.
+
+## Results Summary
+- **Best render time**: 2.188s (vs baseline 2.150s)
+- **Improvement**: 0%
+- **Kept experiments**:
+- **Discarded experiments**: Eliminate per-frame CDP call by hoisting media sync to `requestAnimationFrame`
