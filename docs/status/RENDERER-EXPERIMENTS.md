@@ -1222,3 +1222,6 @@ Last updated by: PERF-764
   - **What I tried**: Hoisted the `window.__helios_sync_media()` call into a persistent `requestAnimationFrame` loop in the initialization script of `CdpTimeDriver.ts`, entirely eliminating the `this.client!.send('Runtime.evaluate')` IPC call from the Node.js hot loop per frame.
   - **WHY it didn't work**: The median render time in the fast path slightly regressed to ~2.195s (vs baseline median ~2.178s). This suggests that letting the browser run its own internal `requestAnimationFrame` loop on every virtual frame tick adds more processing overhead inside Chromium than sending a lightweight asynchronous, un-awaited CDP message from Node.js.
   - **Plan ID**: PERF-768
+
+## Open Questions
+- [Monomorphic Capture Loop (PERF-771)] Will completely unrolling the ternary branch (`hasProcessFn ? ... : ...`) to duplicate the `for` and `while` loops inside `CaptureLoop.ts` improve the hot path speed by making it fully monomorphic?
