@@ -1,11 +1,11 @@
 ---
 id: PERF-475
 slug: optimize-runworker-promise-chain
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2026-05-11
 completed: ""
-result: ""
+result: "discarded"
 ---
 
 # PERF-475: Optimize runWorker Loop by Removing Async Await
@@ -50,3 +50,7 @@ Check if `timeDriver.setTime` or `strategy.capture` return non-promises (or inst
 ## Verification
 Run `npm test` in the `packages/renderer` directory to ensure test suites pass, verifying that the new implementation is logically equivalent and doesn't introduce bugs.
 Run the benchmark script to compare performance. Ensure to use the current working format for FFmpeg (png or jpeg) if webp causes crashes during the benchmark as noted in `RENDERER-EXPERIMENTS.md`.
+## Results Summary
+- **Best render time**: ~3.360s (vs baseline ~2.40s)
+- **Improvement**: Regressed
+- **Discarded experiments**: Replacing `async while` with recursive promise chains was discarded because the microtask allocation overhead was greater than V8's async state machine overhead.
