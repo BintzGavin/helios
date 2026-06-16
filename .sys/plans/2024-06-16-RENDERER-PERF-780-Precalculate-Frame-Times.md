@@ -1,11 +1,11 @@
 ---
 id: PERF-780
 slug: precalculate-frame-times
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-06-16
 completed: ""
-result: ""
+result: "discard"
 ---
 
 # PERF-780: Precalculate Frame Times using Typed Arrays
@@ -79,3 +79,9 @@ Run the standard DOM benchmark (`npx tsx scripts/benchmark-perf.ts`) and ensure 
 
 ## Prior Art
 PERF-775 (Bypass time calculation using cumulative addition - discarded).
+
+## Results Summary
+- **Best render time**: ~2.435s (vs baseline ~2.069s)
+- **Improvement**: Regressed
+- **Kept experiments**:
+- **Discarded experiments**: Precalculate Frame Times using Typed Arrays
