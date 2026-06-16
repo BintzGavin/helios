@@ -1275,3 +1275,6 @@ Last updated by: PERF-764
   - **What I tried**: Rounded and cached the frame time delta `budget` in `CdpTimeDriver.ts` to avoid modifying the `this.setVirtualTimePolicyParams.budget` object property for consecutive frames, aiming to reduce V8 internal object mutation overhead inside the hot path.
   - **WHY it didn't work**: The median render time regressed to ~2.262s (from ~2.069s baseline). The arithmetic overhead of `Math.round(delta * 1000)` combined with an explicit conditional property branch negated any savings from bypassing object mutation. V8's hidden classes already optimize simple integer-like float assignments to the same property shape extremely well.
   - **Plan ID**: PERF-782
+## What Works
+- Removed `timesArray` and `compTimesArray` typed arrays in favor of inline math for time calculations (~3.385s -> fast path).
+- PERF-783

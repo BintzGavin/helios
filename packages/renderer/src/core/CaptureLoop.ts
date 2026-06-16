@@ -135,13 +135,6 @@ export class CaptureLoop {
     const compTimeStep = 1 / fps;
     const poolLen = this.pool.length;
 
-    const timesArray = new Float64Array(totalFrames);
-    const compTimesArray = new Float64Array(totalFrames);
-    for (let i = 0; i < totalFrames; i++) {
-        timesArray[i] = i * timeStep;
-        compTimesArray[i] = (startFrame + i) * compTimeStep;
-    }
-
     // FAST PATH FOR SINGLE WORKER
     if (poolLen === 1) {
         const worker = this.pool[0];
@@ -156,8 +149,8 @@ export class CaptureLoop {
                 for (let i = 0; i < totalFrames; i++) {
                     if (capturedErrors.length > 0 || (signal && signal.aborted)) break;
 
-                    await timeDriver.setTime(page, compTimesArray[i]);
-                    const buffer = strategy.processCaptureResult!(await strategy.capture(page, timesArray[i]));
+                    await timeDriver.setTime(page, (startFrame + i) * compTimeStep);
+                    const buffer = strategy.processCaptureResult!(await strategy.capture(page, i * timeStep));
 
                     if (i === nextProgressFrame) {
                         console.log(`Progress: Rendered ${i} / ${totalFrames} frames`);
@@ -182,8 +175,8 @@ export class CaptureLoop {
                 for (let i = 0; i < totalFrames; i++) {
                     if (capturedErrors.length > 0 || (signal && signal.aborted)) break;
 
-                    await timeDriver.setTime(page, compTimesArray[i]);
-                    const buffer = await strategy.capture(page, timesArray[i]);
+                    await timeDriver.setTime(page, (startFrame + i) * compTimeStep);
+                    const buffer = await strategy.capture(page, i * timeStep);
 
                     if (i === nextProgressFrame) {
                         console.log(`Progress: Rendered ${i} / ${totalFrames} frames`);
@@ -300,8 +293,8 @@ export class CaptureLoop {
                 const ringIndex = i & ringMask;
 
                 try {
-                    await timeDriver.setTime(page, compTimesArray[i]);
-                    const buffer = strategy.processCaptureResult!(await strategy.capture(page, timesArray[i]));
+                    await timeDriver.setTime(page, (startFrame + i) * compTimeStep);
+                    const buffer = strategy.processCaptureResult!(await strategy.capture(page, i * timeStep));
                     frameBufferRing[ringIndex] = buffer;
                     frameReadyRing[ringIndex] = 1;
                 } catch (e) {
@@ -333,8 +326,8 @@ export class CaptureLoop {
                 const ringIndex = i & ringMask;
 
                 try {
-                    await timeDriver.setTime(page, compTimesArray[i]);
-                    const buffer = await strategy.capture(page, timesArray[i]);
+                    await timeDriver.setTime(page, (startFrame + i) * compTimeStep);
+                    const buffer = await strategy.capture(page, i * timeStep);
                     frameBufferRing[ringIndex] = buffer;
                     frameReadyRing[ringIndex] = 1;
                 } catch (e) {
