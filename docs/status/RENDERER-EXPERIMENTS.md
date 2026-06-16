@@ -1251,3 +1251,7 @@ Last updated by: PERF-764
   - **What I tried**: Bypassed `stdin?.writable` stream state getter evaluation in `CaptureLoop.ts` single-worker fast path.
   - **WHY it worked/didn't work**: The median render time in the fast path regressed slightly to ~2.311s (vs baseline median ~2.281s). Replacing the nullable property access with a strict stream variable likely didn't offset the fact that `stdin.write` and `drainPromise` await still carry overhead. The experiment yielded no improvement and increased noise. Discarded.
   - **Plan ID**: PERF-777
+- **Inline `strategy.capture()` into `stdin.write()`**
+  - **What I tried**: Removed intermediate buffer allocation in the `CaptureLoop.ts` fast path by directly passing the result to `stdin.write()`.
+  - **WHY it worked/didn't work**: The median render time in the fast path regressed to ~2.636s (vs baseline median ~2.3s). The AST simplification likely negatively affected TurboFan optimization, leading to slower execution despite fewer local scope allocations. Discarded.
+  - **Plan ID**: PERF-778
