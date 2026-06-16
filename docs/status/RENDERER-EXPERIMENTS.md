@@ -1260,3 +1260,8 @@ Last updated by: PERF-764
   - **What I tried**: Hoisted `await this.drainPromise` in the single-worker path to occur *after* the `timeDriver.setTime()` call for the subsequent frame, attempting to overlap the Node.js block waiting for FFmpeg with the Chromium execution of the next frame.
   - **Impact**: The median render time regressed to ~2.68s (from a highly optimized baseline of ~2.069s). It appears that holding the promise and awaiting it later interferes with the deeply optimized V8 fast-path monomorphism achieved in earlier experiments, outweighing the minor theoretical IPC overlap benefit.
   - **Plan ID**: PERF-779
+
+- **PERF-780**: Precalculate Frame Times using Typed Arrays
+  - **What I tried**: Pre-calculated `time` and `compositionTimeInSeconds` arrays as Float64Array and indexed them in the `CaptureLoop.ts` single-worker and multi-worker loops.
+  - **WHY it didn't work**: V8 natively optimizes `i * timeStep` arithmetic inside simple hot loops effectively. Attempting to use a Typed Array index read (`compTimesArray[i]`) actually incurred a performance regression compared to simply multiplying the numbers, as V8 had to perform bounds checking or memory access instead of registering simple floating-point multiplications inline.
+  - **Plan ID**: PERF-780
