@@ -127,10 +127,13 @@ describe('render command', () => {
 
   it('should generate mergeCommand with mixOptions when using --emit-job', async () => {
     vi.mocked(RenderOrchestrator.plan).mockReturnValueOnce({
-      chunks: [{ id: '1', startFrame: 0, frameCount: 10, outputFile: 'out.mp4', options: {} }],
+      chunks: [{ id: 1, startFrame: 0, frameCount: 10, outputFile: 'out.mp4', options: {} as any }],
       concatManifest: ['out.mp4'],
-      mixOptions: { videoCodec: 'libx264', audioCodec: 'aac', crf: 23 },
-      totalFrames: 10
+      mixOptions: { videoCodec: 'libx264', audioCodec: 'aac', crf: 23 } as any,
+      totalFrames: 10,
+      concatOutputFile: 'out_concat.mp4',
+      finalOutputFile: 'out_final.mp4',
+      cleanupFiles: []
     });
 
     await program.parseAsync(['node', 'test', 'render', 'http://example.com/comp.html', '--emit-job', 'job.json', '--video-codec', 'libx264', '--audio-codec', 'aac', '--quality', '23']);
@@ -138,7 +141,7 @@ describe('render command', () => {
     const writeCall = vi.mocked(fs.writeFileSync).mock.calls.find(call => typeof call[0] === 'string' && call[0].endsWith('job.json'));
     expect(writeCall).toBeDefined();
     if (writeCall) {
-      const writtenJobStr = writeCall[1];
+      const writtenJobStr = writeCall[1] as string;
       const job = JSON.parse(writtenJobStr);
       expect(job.mergeCommand).toContain('--video-codec libx264');
       expect(job.mergeCommand).toContain('--audio-codec aac');
