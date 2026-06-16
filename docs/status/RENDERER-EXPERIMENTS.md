@@ -215,6 +215,7 @@ Last updated by: PERF-726
   - **Plan ID**: PERF-740
 
 ## What Doesn't Work (and Why)
+- **PERF-704 (Omit .catch(noopCatch) in defaultSyncMedia)**: The code targeted by this plan (`defaultSyncMedia` in `CdpTimeDriver.ts`) no longer contains `.catch(noopCatch)` in the latest codebase. It appears the optimization has already been made or the closure was removed by a previous architectural change. Marked as failed/impossible due to duplication.
 - **What:** Configure FFmpeg to use multi-threaded decoding for `image2pipe` PNG streams via `-c:v png -threads 0`.
   **Why it didn't work:** The median render time (2.436s) was slower than the baseline (2.351s - 2.359s). The multithreading introduces CPU context-switching overhead and pipeline synchronization cost for PNG decompression, which actually hurts performance compared to sequential single-threaded decoding in a fast pipe context.
   **Plan ID:** PERF-761
