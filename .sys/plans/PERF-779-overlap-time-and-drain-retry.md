@@ -1,11 +1,11 @@
 ---
 id: PERF-779
 slug: overlap-time-and-drain-retry
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-06-16
-completed: ""
-result: ""
+completed: "2024-06-16"
+result: "failed"
 ---
 # PERF-779: Overlap Time Progression with FFmpeg Drain (Retry)
 
@@ -52,7 +52,7 @@ This effectively revives the concept from PERF-717, which showed a performance r
 - **Minimum runs**: 3 per experiment, report median
 
 ## Baseline
-- **Current estimated render time**: ~12.994s (latest benchmark run)
+- **Current estimated render time**: ~2.069s (latest benchmark run)
 - **Bottleneck analysis**: The node thread is blocking on IPC pipe IO (`drainPromise`), completely pausing Chromium rendering, creating a sequential pipeline stall.
 
 ## Implementation Spec
@@ -82,3 +82,9 @@ None.
 
 ## Correctness Check
 Run `npx tsx scripts/benchmark-perf.ts` and verify output.
+
+## Results Summary
+- **Best render time**: ~2.580s (vs baseline ~2.069s)
+- **Improvement**: Regressed
+- **Kept experiments**:
+- **Discarded experiments**: Overlap Time Progression with FFmpeg Drain (Retry)
