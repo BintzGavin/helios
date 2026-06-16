@@ -178,8 +178,8 @@ describe('studio command', () => {
     await program.parseAsync(['node', 'test', 'studio']);
 
     // we mock consoleLogMock in beforeEach
-    const logCalls = consoleLogMock.mock.calls.map(args => args[0]);
-    expect(logCalls.some(arg => typeof arg === 'string' && arg.includes('Skills Root:'))).toBe(false);
+    const logCalls = consoleLogMock.mock.calls.map((args: any[]) => args[0]);
+    expect(logCalls.some((arg: any) => typeof arg === 'string' && arg.includes('Skills Root:'))).toBe(false);
   });
 
   it('should use default components directory if config.directories.components is missing', async () => {

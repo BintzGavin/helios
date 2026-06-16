@@ -244,6 +244,16 @@ describe('job command', () => {
       expect(DockerAdapter).toHaveBeenCalledWith(expect.objectContaining({ image: 'img' }));
     });
 
+    it('should pass docker args correctly', async () => {
+      await program.parseAsync([
+        'node', 'test', 'job', 'run', 'job.json',
+        '--adapter', 'docker',
+        '--docker-image', 'img',
+        '--docker-args', 'a,b'
+      ]);
+      expect(DockerAdapter).toHaveBeenCalledWith(expect.objectContaining({ dockerArgs: ['a', 'b'] }));
+    });
+
     it('should instantiate DenoDeployAdapter when deno is specified', async () => {
       await program.parseAsync([
         'node', 'test', 'job', 'run', 'job.json',
@@ -283,6 +293,20 @@ describe('job command', () => {
         apiToken: 'tok',
         serverType: 'type',
         image: 'img'
+      }));
+    });
+
+    it('should pass hetzner ssh key id correctly', async () => {
+      await program.parseAsync([
+        'node', 'test', 'job', 'run', 'job.json',
+        '--adapter', 'hetzner',
+        '--hetzner-api-token', 'tok',
+        '--hetzner-server-type', 'type',
+        '--hetzner-image', 'img',
+        '--hetzner-ssh-key-id', '123'
+      ]);
+      expect(HetznerCloudAdapter).toHaveBeenCalledWith(expect.objectContaining({
+        sshKeyId: 123
       }));
     });
   });
