@@ -1255,3 +1255,8 @@ Last updated by: PERF-764
   - **What I tried**: Removed intermediate buffer allocation in the `CaptureLoop.ts` fast path by directly passing the result to `stdin.write()`.
   - **WHY it worked/didn't work**: The median render time in the fast path regressed to ~2.636s (vs baseline median ~2.3s). The AST simplification likely negatively affected TurboFan optimization, leading to slower execution despite fewer local scope allocations. Discarded.
   - **Plan ID**: PERF-778
+
+- **PERF-779**: Overlap Time Progression with FFmpeg Drain (Retry)
+  - **What I tried**: Hoisted `await this.drainPromise` in the single-worker path to occur *after* the `timeDriver.setTime()` call for the subsequent frame, attempting to overlap the Node.js block waiting for FFmpeg with the Chromium execution of the next frame.
+  - **Impact**: The median render time regressed to ~2.68s (from a highly optimized baseline of ~2.069s). It appears that holding the promise and awaiting it later interferes with the deeply optimized V8 fast-path monomorphism achieved in earlier experiments, outweighing the minor theoretical IPC overlap benefit.
+  - **Plan ID**: PERF-779
