@@ -1,11 +1,11 @@
 ---
 id: PERF-778
 slug: inline-capture-write
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-06-16
-completed: ""
-result: ""
+completed: "2024-06-16"
+result: "failed"
 ---
 # PERF-778: Inline strategy.capture() into stdin.write()
 
@@ -88,3 +88,9 @@ Verify that the output MP4 compiles successfully without truncation and visual o
 
 ## Prior Art
 - PERF-777 (Bypass stream writable getter)
+
+## Results Summary
+- **Best render time**: 2.636s (vs baseline ~2.3s)
+- **Improvement**: Regressed
+- **Kept experiments**:
+- **Discarded experiments**: Inline strategy.capture() into stdin.write()
