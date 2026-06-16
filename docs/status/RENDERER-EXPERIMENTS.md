@@ -215,6 +215,11 @@ Last updated by: PERF-726
   - **Plan ID**: PERF-740
 
 ## What Doesn't Work (and Why)
+- **PERF-781**: Infinite Node.js Stream Buffering (No Drain Await)
+  - **What I tried**: Removed the `await this.drainPromise` in the FFmpeg stdin writing block in the single-worker fast path to decouple Chromium frame generation from FFmpeg processing.
+  - **WHY it didn't work**: The median render time in the fast path regressed to ~2.96s (vs baseline median ~2.069s). While it theoretically avoids event loop stalls from `drainPromise`, removing the backpressure causes memory pressure and seems to disrupt V8's optimization of the hot loop, likely due to uncontrolled stream buffer expansion or garbage collection.
+  - **Plan ID**: PERF-781
+
 - **PERF-704 (Omit .catch(noopCatch) in defaultSyncMedia)**: The code targeted by this plan (`defaultSyncMedia` in `CdpTimeDriver.ts`) no longer contains `.catch(noopCatch)` in the latest codebase. It appears the optimization has already been made or the closure was removed by a previous architectural change. Marked as failed/impossible due to duplication.
 - **What:** Configure FFmpeg to use multi-threaded decoding for `image2pipe` PNG streams via `-c:v png -threads 0`.
   **Why it didn't work:** The median render time (2.436s) was slower than the baseline (2.351s - 2.359s). The multithreading introduces CPU context-switching overhead and pipeline synchronization cost for PNG decompression, which actually hurts performance compared to sequential single-threaded decoding in a fast pipe context.

@@ -1,11 +1,11 @@
 ---
 id: PERF-781
 slug: infinite-node-buffering
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-06-16
 completed: ""
-result: ""
+result: "failed"
 ---
 
 # PERF-781: Infinite Node.js Stream Buffering (No Drain Await)
