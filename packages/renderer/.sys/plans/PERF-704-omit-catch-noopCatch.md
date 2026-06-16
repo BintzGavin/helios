@@ -1,11 +1,11 @@
 ---
 id: PERF-704
 slug: omit-catch-noopcatch-sync-media
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-06-08
-completed: ""
-result: ""
+completed: "2026-06-16"
+result: failed
 ---
 # PERF-704: Omit .catch(noopCatch) in defaultSyncMedia
 
@@ -48,3 +48,9 @@ Verify that the output video (`packages/renderer/output/dom-benchmark.mp4`) stil
 
 ## Prior Art
 - Eliminating `.catch` handlers on ephemeral CDP calls has been proven to reduce promise allocation overhead in tight loops.
+
+## Results Summary
+- **Best render time**: N/A
+- **Improvement**: 0%
+- **Kept experiments**: []
+- **Discarded experiments**: [PERF-704: Code targeted by plan already matches the desired state (no `.catch(noopCatch)` present in `defaultSyncMedia`).]
