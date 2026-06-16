@@ -1,11 +1,11 @@
 ---
 id: PERF-782
 slug: bypass-cdptime-driver-budget-assignment
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "jules"
 created: 2026-06-16
-completed: ""
-result: ""
+completed: 2026-06-16
+result: "discard"
 ---
 
 # PERF-782: Bypass virtualTimeBudget parameter assignment in CdpTimeDriver
@@ -57,3 +57,7 @@ Run the DOM benchmark. Ensure the video isn't structurally desynced and that it 
 ## Prior Art
 - PERF-777: Bypassing stream state getter to avoid property access overhead in hot loop.
 - PERF-769: Minimizing CDP Message Payloads by caching object shapes.
+
+## Results
+- **Outcome**: discard
+- **Median Time**: 2.262s

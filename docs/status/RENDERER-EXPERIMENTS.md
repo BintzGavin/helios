@@ -1270,3 +1270,8 @@ Last updated by: PERF-764
   - **What I tried**: Pre-calculated `time` and `compositionTimeInSeconds` arrays as Float64Array and indexed them in the `CaptureLoop.ts` single-worker and multi-worker loops.
   - **WHY it didn't work**: V8 natively optimizes `i * timeStep` arithmetic inside simple hot loops effectively. Attempting to use a Typed Array index read (`compTimesArray[i]`) actually incurred a performance regression compared to simply multiplying the numbers, as V8 had to perform bounds checking or memory access instead of registering simple floating-point multiplications inline.
   - **Plan ID**: PERF-780
+
+- **PERF-782**: Bypass virtualTimeBudget parameter assignment in CdpTimeDriver
+  - **What I tried**: Rounded and cached the frame time delta `budget` in `CdpTimeDriver.ts` to avoid modifying the `this.setVirtualTimePolicyParams.budget` object property for consecutive frames, aiming to reduce V8 internal object mutation overhead inside the hot path.
+  - **WHY it didn't work**: The median render time regressed to ~2.262s (from ~2.069s baseline). The arithmetic overhead of `Math.round(delta * 1000)` combined with an explicit conditional property branch negated any savings from bypassing object mutation. V8's hidden classes already optimize simple integer-like float assignments to the same property shape extremely well.
+  - **Plan ID**: PERF-782
