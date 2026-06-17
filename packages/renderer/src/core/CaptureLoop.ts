@@ -144,10 +144,19 @@ export class CaptureLoop {
         const signal = this.jobOptions?.signal;
         const onProgress = this.jobOptions?.onProgress;
         const hasProcessFn = !!strategy.processCaptureResult;
+
+        let aborted = false;
+        let abortListener: (() => void) | null = null;
+        if (signal) {
+            if (signal.aborted) aborted = true;
+            abortListener = () => { aborted = true; };
+            signal.addEventListener('abort', abortListener);
+        }
+
         try {
             if (hasProcessFn) {
                 for (let i = 0; i < totalFrames; i++) {
-                    if (capturedErrors.length > 0 || (signal && signal.aborted)) break;
+                    if (aborted || capturedErrors.length > 0) break;
 
                     await timeDriver.setTime(page, (startFrame + i) * compTimeStep);
                     const buffer = strategy.processCaptureResult!(await strategy.capture(page, i * timeStep));
@@ -173,7 +182,7 @@ export class CaptureLoop {
                 }
             } else {
                 for (let i = 0; i < totalFrames; i++) {
-                    if (capturedErrors.length > 0 || (signal && signal.aborted)) break;
+                    if (aborted || capturedErrors.length > 0) break;
 
                     await timeDriver.setTime(page, (startFrame + i) * compTimeStep);
                     const buffer = await strategy.capture(page, i * timeStep);
@@ -200,6 +209,10 @@ export class CaptureLoop {
             }
         } catch (e) {
             fatalError = e;
+        } finally {
+            if (signal && abortListener) {
+                signal.removeEventListener('abort', abortListener);
+            }
         }
 
         if (fatalError) throw fatalError;

@@ -1278,3 +1278,10 @@ Last updated by: PERF-764
 ## What Works
 - Removed `timesArray` and `compTimesArray` typed arrays in favor of inline math for time calculations (~3.385s -> fast path).
 - PERF-783
+
+## Performance Trajectory
+Current best: 3.009s (baseline was ~3.03s, -1%)
+Last updated by: PERF-786
+
+## What Works
+- Simplification of abort check in single-worker fast path. It slightly improved execution time by ~1% by hoisting the `signal.aborted` condition checks out of the hot path inside the `for` loops in `packages/renderer/src/core/CaptureLoop.ts`. (PERF-786)
