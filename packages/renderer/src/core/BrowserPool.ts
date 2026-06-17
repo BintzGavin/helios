@@ -122,7 +122,7 @@ export class BrowserPool {
 
       const page = await context.newPage();
       const strategy = this.options.mode === 'dom' ? new DomStrategy(this.options) : new CanvasStrategy(this.options);
-      const timeDriver = new CdpTimeDriver(this.options.stabilityTimeout);
+      const timeDriver = new CdpTimeDriver(this.options.stabilityTimeout, this.options.mode);
 
       page.on('console', (msg: ConsoleMessage) => console.log(`PAGE LOG [${index}]: ${msg.text()}`));
       page.on('pageerror', (err: Error) => {

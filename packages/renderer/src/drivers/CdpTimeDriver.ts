@@ -45,6 +45,7 @@ export class CdpTimeDriver implements TimeDriver {
   private singleFrameSyncMediaParams: any = { expression: "window.__helios_sync_media();" };
   private multiFrameSyncMediaParams: any[] = [];
   private hasMedia: boolean = true;
+  private mode: string;
 
   private defaultSyncMedia() {
     const len = this.executionContextIds.length;
@@ -68,8 +69,9 @@ export class CdpTimeDriver implements TimeDriver {
   };
 
 
-  constructor(timeout: number = 30000) {
+  constructor(timeout: number = 30000, mode: string = 'canvas') {
     this.timeout = timeout;
+    this.mode = mode;
   }
 
   async init(page: Page, seed?: number): Promise<void> {
@@ -214,8 +216,14 @@ export class CdpTimeDriver implements TimeDriver {
 
     // 2. Advance virtual time
     // This triggers the browser event loop and requestAnimationFrame
-    this.setVirtualTimePolicyParams.budget = delta * 1000;
     this.currentTime = timeInSeconds;
+
+    if (this.mode === 'dom') {
+      // DomStrategy's beginFrame will advance the virtual time via its 'interval' parameter
+      return RESOLVED_PROMISE;
+    }
+
+    this.setVirtualTimePolicyParams.budget = delta * 1000;
     this.client!.send('Emulation.setVirtualTimePolicy', this.setVirtualTimePolicyParams);
     return this.timePromise as any as Promise<void>;
   }
