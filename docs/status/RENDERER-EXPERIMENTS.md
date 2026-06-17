@@ -1290,3 +1290,8 @@ Last updated by: PERF-786
   - **What I tried**: Lowered `stdin.writableLength` threshold from `16777216` (16MB) to `4194304` (4MB) in single-worker fast path.
   - **WHY it didn't work**: The median render time in the fast path slightly regressed to ~2.274s (vs baseline median ~2.069s). The tighter synchronization caused more frequent yielding to FFmpeg which created more backpressure bottlenecks than a larger buffer space. The 16MB threshold correctly buffers chunks before pausing.
   - **Plan ID**: PERF-789
+
+- **PERF-784**: Remove Drain Promise Await in Multi-Worker Loop
+  - **What I tried**: Attempted to remove `await this.drainPromise` in the multi-worker loop to decouple the writer thread from FFmpeg's consumption speed.
+  - **WHY it didn't work**: This plan was marked as IMPOSSIBLE: DUPLICATION because inspection of the codebase (`packages/renderer/src/core/CaptureLoop.ts`) revealed that the `await this.drainPromise` block does not exist in the multi-worker write path (around line 380). The target code described in the plan was specific to the single-worker fast path. The multi-worker loop is already decoupled in this manner.
+  - **Plan ID**: PERF-784
