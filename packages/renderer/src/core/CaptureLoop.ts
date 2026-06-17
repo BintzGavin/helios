@@ -370,11 +370,7 @@ export class CaptureLoop {
 
 
             if (stdin?.writable) {
-                    const canWriteMore = stdin.write(buffer as any);
-
-                    if (!canWriteMore && stdin.writableLength >= 16777216) {
-                    await this.drainPromise;
-                }
+                    stdin.write(buffer as any);
             } else {
                 console.warn('FFmpeg stdin is not writable. Skipping write.');
             }
