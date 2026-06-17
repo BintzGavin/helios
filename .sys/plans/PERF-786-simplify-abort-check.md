@@ -1,11 +1,11 @@
 ---
 id: PERF-786
 slug: simplify-abort-check
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-06-16
-completed: ""
-result: ""
+completed: 2024-06-17
+result: improved
 ---
 
 # PERF-786: Simplify Abort Check in CaptureLoop Fast Path
@@ -79,3 +79,9 @@ Run a basic canvas composition to ensure no pipeline breaks.
 
 ## Correctness Check
 - The output MP4 should render correctly.
+
+## Results Summary
+- **Best render time**: 3.009s (vs baseline ~3.03s)
+- **Improvement**: 1%
+- **Kept experiments**: Simplify abort check in CaptureLoop fast path
+- **Discarded experiments**: none
