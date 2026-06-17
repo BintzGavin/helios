@@ -1285,3 +1285,8 @@ Last updated by: PERF-786
 
 ## What Works
 - Simplification of abort check in single-worker fast path. It slightly improved execution time by ~1% by hoisting the `signal.aborted` condition checks out of the hot path inside the `for` loops in `packages/renderer/src/core/CaptureLoop.ts`. (PERF-786)
+
+- **PERF-789**: Tune FFmpeg Stdin Backpressure
+  - **What I tried**: Lowered `stdin.writableLength` threshold from `16777216` (16MB) to `4194304` (4MB) in single-worker fast path.
+  - **WHY it didn't work**: The median render time in the fast path slightly regressed to ~2.274s (vs baseline median ~2.069s). The tighter synchronization caused more frequent yielding to FFmpeg which created more backpressure bottlenecks than a larger buffer space. The 16MB threshold correctly buffers chunks before pausing.
+  - **Plan ID**: PERF-789

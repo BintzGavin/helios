@@ -1,8 +1,8 @@
 ---
 id: PERF-789
 slug: tune-ffmpeg-stdin-backpressure
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "jules"
 created: 2024-06-17
 completed: ""
 result: ""
@@ -70,3 +70,9 @@ Run a basic canvas composition to ensure rendering completes successfully withou
 ## Prior Art
 - PERF-781 (infinite buffering regressed performance)
 - PERF-689 (introduced the 16MB limit)
+
+## Results Summary
+- **Best render time**: 2.257s
+- **Improvement**: Regression
+- **Kept experiments**: None
+- **Discarded experiments**: 4MB writableLength threshold
