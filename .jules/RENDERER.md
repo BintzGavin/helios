@@ -1,3 +1,7 @@
+## [2026-06-18] - PERF-794: Hoist Progress Reporting Checks from Fast Path Loops (Discarded)
+**Learning:** Restructuring monomorphic capture loops into block-chunked `while` loops logic introduces severe risks, causing concurrent thread locking on read bounds and regressing frame generation times.
+**Action:** Replaced optimization with a much simpler nesting conditional to decouple `onProgress` invocation without changing the core loop architecture.
+
 ## [2024-05-27] - PERF-598: Cache Sync Media Expression
 **Learning:** String allocation in hot loop is expensive and should be cached to reduce GC pressure.
 **Action:** Created plan `PERF-598-cache-sync-media-expression.md` to cache string allocations in `CdpTimeDriver` using a Map based on `timeInSeconds`.

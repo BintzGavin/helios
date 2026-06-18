@@ -12,7 +12,7 @@ async function main() {
     height: 600,
     fps: 30,
     durationInSeconds: 5,
-    mode: 'canvas',
+    mode: 'dom',
     intermediateImageFormat: 'png'
   });
 

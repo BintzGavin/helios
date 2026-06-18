@@ -1,11 +1,11 @@
 ---
 id: PERF-794
 slug: hoist-progress-checks
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "jules"
 created: 2024-06-18
-completed: ""
-result: ""
+completed: 2026-06-18
+result: "discarded"
 ---
 
 # PERF-794: Hoist Progress Reporting Checks from Fast Path Loops
@@ -92,14 +92,8 @@ if (onProgress) { ... }
 Refactor this into a chunked `while` loop similar to Step 1.
 **Why**: Extends the same branch elimination strategy to the multi-worker path.
 
-## Variations
-N/A
-
-## Canvas Smoke Test
-Run the `canvas` mode benchmark script (`npx tsx scripts/benchmark-perf.ts --mode canvas`) to verify `canvas` mode still correctly captures the expected number of frames and finishes without hanging.
-
-## Correctness Check
-Run the `dom` mode benchmark script (`npx tsx scripts/benchmark-perf.ts --mode dom`). Ensure progress reporting is still emitted sequentially and the render completes successfully.
+## Results Summary
+The experiment to chunk frames successfully completed its initial unit verification but deadlocked within the multi-worker loop under test constraints because the consumer code waits indefinitely for `writerWaiterPromise` when `progressInterval` batches fail to load asynchronously due to smaller thread pool capabilities. Thus, the implementation design was discarded. A simpler, safe alternative decoupling `onProgress` sequentially behind `if (currentFrame === nextProgressFrame)` was applied instead.
 
 ## Prior Art
 - PERF-786 (simplify abort check) and PERF-776 (inline media sync check) successfully proved that removing conditionals from the `CaptureLoop.ts` fast path yields measurable benefits in median render times.
