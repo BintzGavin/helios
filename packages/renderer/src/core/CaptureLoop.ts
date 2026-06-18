@@ -167,10 +167,10 @@ export class CaptureLoop {
                     if (i === nextProgressFrame) {
                         console.log(`Progress: Rendered ${i} / ${totalFrames} frames`);
                         nextProgressFrame += progressInterval;
-                    }
 
-                    if (onProgress) {
-                        onProgress(i / totalFrames);
+                        if (onProgress) {
+                            onProgress(i / totalFrames);
+                        }
                     }
 
                     if (stdin?.writable) {
@@ -196,10 +196,10 @@ export class CaptureLoop {
                     if (i === nextProgressFrame) {
                         console.log(`Progress: Rendered ${i} / ${totalFrames} frames`);
                         nextProgressFrame += progressInterval;
-                    }
 
-                    if (onProgress) {
-                        onProgress(i / totalFrames);
+                        if (onProgress) {
+                            onProgress(i / totalFrames);
+                        }
                     }
 
                     if (stdin?.writable) {
@@ -387,10 +387,10 @@ export class CaptureLoop {
             if (currentFrame === nextProgressFrame) {
                 console.log(`Progress: Rendered ${currentFrame} / ${totalFrames} frames`);
                 nextProgressFrame += progressInterval;
-            }
 
-            if (onProgress) {
-                onProgress(currentFrame / totalFrames);
+                if (onProgress) {
+                    onProgress(currentFrame / totalFrames);
+                }
             }
 
 
