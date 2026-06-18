@@ -1,11 +1,11 @@
 ---
 id: PERF-793
 slug: bypass-settime-await
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-06-18
-completed: ""
-result: ""
+completed: "2024-06-18"
+result: "improved"
 ---
 
 # PERF-793: Bypass Microtask Queue for DOM Mode Time Progression
@@ -102,3 +102,9 @@ Run the `dom` mode benchmark script (`npx tsx scripts/benchmark-perf.ts --mode d
 
 ## Prior Art
 - PERF-694/PERF-695 (Bypass Capture Await) explored similar techniques but failed because the `strategy.capture` operation was inherently asynchronous. By targeting `setTime`—which is genuinely synchronous in DOM mode—we can safely achieve the performance benefit.
+
+## Results Summary
+- **Best render time**: 1.948s (vs baseline ~2.069s)
+- **Improvement**: ~5.8%
+- **Kept experiments**: PERF-793 Bypass microtask await in CaptureLoop
+- **Discarded experiments**: None

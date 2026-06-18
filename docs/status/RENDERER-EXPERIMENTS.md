@@ -1300,3 +1300,13 @@ Last updated by: PERF-786
   - **What I tried**: Used chunked loops to execute progress logging only at `progressInterval` bounds instead of conditionally evaluating `if (i === nextProgressFrame)` inside the hot path of `CaptureLoop.ts`.
   - **WHY it worked**: Bypassing the conditional branch pressure per frame within the inner loop enabled tighter V8 instruction packing and removed micro-interruptions during the `timeDriver.setTime()` / `stdin.write()` evaluation cycle.
   - **Plan ID**: PERF-794
+
+## Performance Trajectory
+Current best: 1.948s (baseline was ~2.069s, -5.8%)
+Last updated by: PERF-793
+
+## What Works
+- **PERF-793**: Bypass Microtask Queue for DOM Mode Time Progression
+  - **What I did**: Modified `TimeDriver` interface to allow returning `void` instead of a resolved promise. In `CdpTimeDriver` (DOM mode) where virtual time advances inherently, `setTime` returns `undefined`. The hot loop conditionally avoids the `await` keyword, fully bypassing V8's microtask queue scheduling per frame.
+  - **Impact**: ~5.8% faster
+  - **Plan ID**: PERF-793

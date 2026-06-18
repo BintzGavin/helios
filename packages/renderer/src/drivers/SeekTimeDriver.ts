@@ -324,7 +324,7 @@ export class SeekTimeDriver implements TimeDriver {
     this.callFunctionOnParams.arguments[1].value = this.timeout;
       }
 
-  setTime(page: Page, timeInSeconds: number): Promise<void> {
+  setTime(page: Page, timeInSeconds: number): Promise<void> | void {
     if (this.executionContextIds.length === 0) return Promise.resolve();
 
     if (this.executionContextIds.length === 1) {

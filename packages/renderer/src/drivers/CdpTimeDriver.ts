@@ -198,13 +198,13 @@ export class CdpTimeDriver implements TimeDriver {
     this.currentTime = 0;
   }
 
-  setTime(page: Page, timeInSeconds: number): Promise<void> {
+  setTime(page: Page, timeInSeconds: number): Promise<void> | void {
     const delta = timeInSeconds - this.currentTime;
 
     // If delta is 0 or negative, we don't advance.
     // In a renderer loop, time usually moves forward.
     if (delta <= 0) {
-        return RESOLVED_PROMISE;
+        return;
     }
 
     // Convert to milliseconds for CDP
@@ -220,7 +220,7 @@ export class CdpTimeDriver implements TimeDriver {
 
     if (this.mode === 'dom') {
       // DomStrategy's beginFrame will advance the virtual time via its 'interval' parameter
-      return RESOLVED_PROMISE;
+      return;
     }
 
     this.setVirtualTimePolicyParams.budget = delta * 1000;

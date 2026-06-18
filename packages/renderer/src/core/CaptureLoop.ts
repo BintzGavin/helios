@@ -158,7 +158,10 @@ export class CaptureLoop {
                 for (let i = 0; i < totalFrames; i++) {
                     if (aborted || capturedErrors.length > 0) break;
 
-                    await timeDriver.setTime(page, (startFrame + i) * compTimeStep);
+                    const timePromise = timeDriver.setTime(page, (startFrame + i) * compTimeStep);
+                    if (timePromise) {
+                        await timePromise;
+                    }
                     const buffer = strategy.processCaptureResult!(await strategy.capture(page, i * timeStep));
 
                     if (i === nextProgressFrame) {
@@ -184,7 +187,10 @@ export class CaptureLoop {
                 for (let i = 0; i < totalFrames; i++) {
                     if (aborted || capturedErrors.length > 0) break;
 
-                    await timeDriver.setTime(page, (startFrame + i) * compTimeStep);
+                    const timePromise = timeDriver.setTime(page, (startFrame + i) * compTimeStep);
+                    if (timePromise) {
+                        await timePromise;
+                    }
                     const buffer = await strategy.capture(page, i * timeStep);
 
                     if (i === nextProgressFrame) {
@@ -306,7 +312,10 @@ export class CaptureLoop {
                 const ringIndex = i & ringMask;
 
                 try {
-                    await timeDriver.setTime(page, (startFrame + i) * compTimeStep);
+                    const timePromise = timeDriver.setTime(page, (startFrame + i) * compTimeStep);
+                    if (timePromise) {
+                        await timePromise;
+                    }
                     const buffer = strategy.processCaptureResult!(await strategy.capture(page, i * timeStep));
                     frameBufferRing[ringIndex] = buffer;
                     frameReadyRing[ringIndex] = 1;
@@ -339,7 +348,10 @@ export class CaptureLoop {
                 const ringIndex = i & ringMask;
 
                 try {
-                    await timeDriver.setTime(page, (startFrame + i) * compTimeStep);
+                    const timePromise = timeDriver.setTime(page, (startFrame + i) * compTimeStep);
+                    if (timePromise) {
+                        await timePromise;
+                    }
                     const buffer = await strategy.capture(page, i * timeStep);
                     frameBufferRing[ringIndex] = buffer;
                     frameReadyRing[ringIndex] = 1;
