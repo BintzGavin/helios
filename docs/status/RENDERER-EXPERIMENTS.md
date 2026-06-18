@@ -1295,3 +1295,8 @@ Last updated by: PERF-786
   - **What I tried**: Attempted to remove `await this.drainPromise` in the multi-worker loop to decouple the writer thread from FFmpeg's consumption speed.
   - **WHY it didn't work**: This plan was marked as IMPOSSIBLE: DUPLICATION because inspection of the codebase (`packages/renderer/src/core/CaptureLoop.ts`) revealed that the `await this.drainPromise` block does not exist in the multi-worker write path (around line 380). The target code described in the plan was specific to the single-worker fast path. The multi-worker loop is already decoupled in this manner.
   - **Plan ID**: PERF-784
+
+- **PERF-794**: Hoist Progress Reporting Checks from Fast Path Loops
+  - **What I tried**: Used chunked loops to execute progress logging only at `progressInterval` bounds instead of conditionally evaluating `if (i === nextProgressFrame)` inside the hot path of `CaptureLoop.ts`.
+  - **WHY it worked**: Bypassing the conditional branch pressure per frame within the inner loop enabled tighter V8 instruction packing and removed micro-interruptions during the `timeDriver.setTime()` / `stdin.write()` evaluation cycle.
+  - **Plan ID**: PERF-794

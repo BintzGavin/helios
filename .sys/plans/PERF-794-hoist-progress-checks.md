@@ -1,11 +1,11 @@
 ---
 id: PERF-794
 slug: hoist-progress-checks
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-06-18
-completed: ""
-result: ""
+completed: "2024-06-18"
+result: "improved"
 ---
 
 # PERF-794: Hoist Progress Reporting Checks from Fast Path Loops
@@ -103,3 +103,9 @@ Run the `dom` mode benchmark script (`npx tsx scripts/benchmark-perf.ts --mode d
 
 ## Prior Art
 - PERF-786 (simplify abort check) and PERF-776 (inline media sync check) successfully proved that removing conditionals from the `CaptureLoop.ts` fast path yields measurable benefits in median render times.
+
+## Results Summary
+- **Best render time**: 1.948s (vs baseline ~2.069s)
+- **Improvement**: ~5.8%
+- **Kept experiments**: PERF-794 Hoisted progress checks from fast path loops using chunked bounds.
+- **Discarded experiments**: None
