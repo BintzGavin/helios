@@ -1,3 +1,6 @@
+### CLI v0.46.52
+- ✅ Completed: CLI Docker Adapter Regression Tests - Logged the duplicated plan as impossible since docker-adapter template tests are already fully implemented.
+
 ### CLI v0.46.44
 - ✅ Completed: CLI Registry Types Regression Tests - Logged the duplicated plan as impossible since registry types regression tests are already fully implemented.
 
