@@ -1318,3 +1318,8 @@ Last updated by: PERF-793
 
 ## What Works
 - Bypass Buffer.byteLength in base64 decode by allocating using string length and writing actual bytes. (PERF-799) - Estimated improvement: avoided O(N) scan overhead per frame in base64 decode
+
+- **PERF-800**: Exponential Capacity Growth for Base64 Decode Buffer
+  - **What I did**: Updated `DomStrategy.ts` to reallocate the decode buffer exponentially by a factor of 1.5 when the buffer size is exceeded.
+  - **Impact**: It correctly allocates capacity logarithmically instead of linearly per frame when dimensions grow.
+  - **Plan ID**: PERF-800
