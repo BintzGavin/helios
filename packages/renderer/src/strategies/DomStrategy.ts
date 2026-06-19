@@ -16,6 +16,7 @@ export class DomStrategy implements RenderStrategy {
   private cleanupAudio: () => Promise<void> | void = () => {};
   private cdpSession: CDPSession | null = null;
   private lastFrameData: Buffer | string | null = null;
+  private decodeBuffer: Buffer | null = null;
   private elementScreenshotParams: any = null;
 
   private cdpScreenshotParams: any = null;
@@ -170,7 +171,12 @@ export class DomStrategy implements RenderStrategy {
 
   processCaptureResult(result: any): Buffer {
     if (result.screenshotData) {
-      this.lastFrameData = Buffer.from(result.screenshotData, 'base64');
+      const len = Buffer.byteLength(result.screenshotData, 'base64');
+      if (!this.decodeBuffer || len > this.decodeBuffer.length) {
+        this.decodeBuffer = Buffer.allocUnsafe(len);
+      }
+      this.decodeBuffer.write(result.screenshotData, 'base64');
+      this.lastFrameData = this.decodeBuffer.subarray(0, len);
     }
     return this.lastFrameData as Buffer;
   }
