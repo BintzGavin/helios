@@ -266,6 +266,9 @@ The element dispatches the following custom events:
 - `loadeddata`: Fired when data for the current frame is available.
 - `canplay`: Fired when the browser can resume playback of the media.
 - `canplaythrough`: Fired when the browser estimates it can play through the media without buffering.
+- `abort`: Fired when the loading of the media has been aborted.
+- `emptied`: Fired when the media has become empty.
+- `progress`: Fired periodically as the browser loads a resource.
 - `resize`: Fired when the player dimensions change.
 - `enterpictureinpicture`: Fired when the player enters Picture-in-Picture mode.
 - `leavepictureinpicture`: Fired when the player leaves Picture-in-Picture mode.
