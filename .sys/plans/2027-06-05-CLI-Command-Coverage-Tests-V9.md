@@ -1,35 +1,25 @@
-# CLI Command Coverage Tests Spec V9
+#### 1. Context & Goal
+- **Objective**: Improve test coverage for `packages/cli/src/commands/render.ts` by testing uncovered branches in `rendererOptionsToFlags`, options parsing, and URL manipulation logic.
+- **Trigger**: Identifying missing branch coverage lines (10-17, 62, 135, 149, 203) from vitest execution reports.
+- **Impact**: Attains 100% test coverage for the `render.ts` file, ensuring all flags and combinations are robustly handled by the CLI.
 
-## 1. Context & Goal
-- **Objective**: Improve the test coverage for the `deploy` command to cover the exit/cancel condition when prompting for file overwriting.
-- **Trigger**: The recent coverage run shows that the lines checking `typeof response.value === 'undefined'` in the deploy subcommands are not covered.
-- **Impact**: Getting to 100% test coverage in the CLI module.
-
-## 2. File Inventory
+#### 2. File Inventory
 - **Create**: none
-- **Modify**: `packages/cli/src/commands/__tests__/deploy.test.ts`
-- **Read-Only**: `packages/cli/src/commands/deploy.ts`
+- **Modify**: `packages/cli/src/commands/__tests__/render.test.ts`
+- **Read-Only**: `packages/cli/src/commands/render.ts`
 
-## 3. Implementation Spec
-- **Architecture**: In the deploy unit tests, I will add a new test case for each of the subcommands (like `setup`, `gcp`, `aws`, `cloudflare`, `cloudflare-sandbox`, `fly`, `azure`, `kubernetes`, `hetzner`, `modal`, `deno`, `vercel`) that mimics the user cancelling the prompt (Ctrl+C). This is achieved by having `prompts` resolve with an empty object `{}` so `response.value` is undefined. I will mock `process.exit` and assert it is called.
+#### 3. Implementation Spec
+- **Architecture**: We will add tests covering missing scenarios in `packages/cli/src/commands/__tests__/render.test.ts`.
 - **Pseudo-Code**:
-  ```pseudo-code
-    mock fs.existsSync to return true
-    mock prompts to return {}
-    mock process.exit
+  - Add test asserting that all flags in `rendererOptionsToFlags` are joined correctly when providing an exhaustive options payload (this hits `10-17`, `203`, via chunk command generation logic that relies on `rendererOptionsToFlags`).
+  - Add test asserting `parseInt(options.concurrency, 10)` fallback logic when concurrency is undefined/default (hits line `62`).
+  - Add test asserting `file://` scheme logic when the URL starts with `file://` (hits line `135`).
+  - Add test asserting URL cleanup path mapping logic (`cleanPath` starting with `./`) (hits line `149`).
+  - This involves executing the `render` command with flags like `--quality 23`, `--mode dom`, `--audio-codec aac`, `--video-codec libx264`, `--no-headless` alongside `--emit-job` to trigger `rendererOptionsToFlags` internally within the `RenderOrchestrator.plan` mocking context.
+- **Public API Changes**: None
+- **Dependencies**: None
 
-    call program.parseAsync with deploy subcommand
-
-    expect process.exit to have been called with 0
-
-    restore mockExit
-
-
-  ```
-- **Public API Changes**: none.
-- **Dependencies**: none.
-
-## 4. Test Plan
-- **Verification**: Run `npm run test -w packages/cli -- --coverage`
-- **Success Criteria**: The coverage report shows `packages/cli/src/commands/deploy.ts` branch and statement coverage at 100%. Uncovered lines 936-937, 973-974 and similar missing lines are gone.
-- **Edge Cases**: Make sure to restore the mock of `process.exit` correctly to avoid issues with other tests. Complete pre-commit steps to ensure proper testing, verification, review, and reflection are done.
+#### 4. Test Plan
+- **Verification**: `npm run test -w packages/cli -- --run src/commands/__tests__/render.test.ts --coverage`
+- **Success Criteria**: Coverage report for `render.ts` must show 100% Stmts, Branch, Funcs, and Lines coverage with no uncovered lines remaining.
+- **Edge Cases**: Assuring the `rendererOptionsToFlags` is executed correctly involves checking the outputted `job.json` chunks payload format.
