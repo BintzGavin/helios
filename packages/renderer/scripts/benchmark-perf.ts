@@ -7,12 +7,22 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 async function main() {
+  const args = process.argv.slice(2);
+  const modeArg = args.find(arg => arg.startsWith('--mode='));
+  let mode: 'dom' | 'canvas' = 'canvas';
+
+  if (modeArg) {
+      mode = modeArg.split('=')[1] as 'dom' | 'canvas';
+  } else if (args.includes('--mode') && args.includes('dom')) {
+      mode = 'dom';
+  }
+
   const renderer = new Renderer({
     width: 600,
     height: 600,
     fps: 30,
     durationInSeconds: 5,
-    mode: 'canvas',
+    mode: mode,
     intermediateImageFormat: 'png'
   });
 
