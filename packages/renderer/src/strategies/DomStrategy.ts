@@ -171,12 +171,13 @@ export class DomStrategy implements RenderStrategy {
 
   processCaptureResult(result: any): Buffer {
     if (result.screenshotData) {
-      const len = Buffer.byteLength(result.screenshotData, 'base64');
-      if (!this.decodeBuffer || len > this.decodeBuffer.length) {
-        this.decodeBuffer = Buffer.allocUnsafe(len);
+      const b64 = result.screenshotData;
+      const chars = b64.length;
+      if (!this.decodeBuffer || chars > this.decodeBuffer.length) {
+        this.decodeBuffer = Buffer.allocUnsafe(chars);
       }
-      this.decodeBuffer.write(result.screenshotData, 'base64');
-      this.lastFrameData = this.decodeBuffer.subarray(0, len);
+      const bytesWritten = this.decodeBuffer.write(b64, 'base64');
+      this.lastFrameData = this.decodeBuffer.subarray(0, bytesWritten);
     }
     return this.lastFrameData as Buffer;
   }

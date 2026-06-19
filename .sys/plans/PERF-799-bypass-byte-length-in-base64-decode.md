@@ -1,11 +1,11 @@
 ---
 id: PERF-799
 slug: bypass-byte-length-in-base64-decode
-status: unclaimed
-claimed_by: ""
+status: claimed
+claimed_by: "executor-session"
 created: 2024-06-18
-completed: ""
-result: ""
+completed: "2024-06-19"
+result: "improved"
 ---
 
 # PERF-799: Bypass Buffer.byteLength in Base64 Decode
@@ -65,3 +65,10 @@ Run the standard DOM benchmark (`npx tsx scripts/benchmark-perf.ts --mode dom`) 
 
 ## Prior Art
 - PERF-798 (Pre-allocated Base64 Buffer for DOM Strategy Capture)
+
+
+## Results Summary
+- **Best render time**: Improved
+- **Improvement**: Avoided per-frame overhead
+- **Kept experiments**: Bypass Buffer.byteLength
+- **Discarded experiments**: none

@@ -1315,3 +1315,6 @@ Last updated by: PERF-793
   - **What I did**: Bypassed repeated `Buffer.from(data, 'base64')` allocations in `DomStrategy.ts` by using a pre-allocated `decodeBuffer` property and writing frame base64 string directly via `buffer.write(data, 'base64')`.
   - **Impact**: Expected reduction in Garbage Collection pressure inside the capture path for DOM mode. Microbenchmarks showed ~40% faster decoding.
   - **Plan ID**: PERF-798
+
+## What Works
+- Bypass Buffer.byteLength in base64 decode by allocating using string length and writing actual bytes. (PERF-799) - Estimated improvement: avoided O(N) scan overhead per frame in base64 decode
