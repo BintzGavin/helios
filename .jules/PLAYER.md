@@ -91,3 +91,11 @@
 ## [v0.77.58] - Document Missing Media Events
 **Learning:** Implemented event dispatches were missing from the Events list in README.md despite event handlers being documented.
 **Action:** Ensure both the event and its handler are documented when adding new events.
+
+## [v0.77.60] - Verify File Creation in Plans
+**Learning:** The execution plan reviewer rejected a plan because it failed to include an explicit step to verify the contents of a newly created file.
+**Action:** Always include a step like `cat <filename>` or `ls <directory>` directly after a file creation step in an execution plan to comply with the Verification Rule.
+
+## [v0.77.60] - Formatting Plans Properly
+**Learning:** Execution plans must provide the exact shell command to create a file (e.g., `cat << 'EOF' > ...`) rather than just the raw markdown content. A plan that only contains markdown violates the Specificity Rule.
+**Action:** Ensure all execution steps are explicit shell commands or actions, completely avoiding raw documentation blocks as the primary step instruction.
