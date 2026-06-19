@@ -1324,3 +1324,7 @@ Last updated by: PERF-793
   - **What I did**: Updated `DomStrategy.ts` to reallocate the decode buffer exponentially by a factor of 1.5 when the buffer size is exceeded.
   - **Impact**: It correctly allocates capacity logarithmically instead of linearly per frame when dimensions grow.
   - **Plan ID**: PERF-800
+- **PERF-803**: Optimize DOM Rendering Hot Path
+  - **What I did**: Replaced math exact re-allocation checks in `DomStrategy.ts` with bitwise logic `buf.length + (buf.length >> 1)`, and alias decoding buffers locally. In `CdpTimeDriver.ts`, deferred the subtraction of `timeInSeconds - previousTime` until after the dom mode early exit block to save arithmetic computations.
+  - **Impact**: Micro-optimizations resulting in faster frame captures.
+  - **Plan ID**: PERF-803

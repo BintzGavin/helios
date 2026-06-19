@@ -199,15 +199,11 @@ export class CdpTimeDriver implements TimeDriver {
   }
 
   setTime(page: Page, timeInSeconds: number): Promise<void> | void {
-    const delta = timeInSeconds - this.currentTime;
-
     // If delta is 0 or negative, we don't advance.
     // In a renderer loop, time usually moves forward.
-    if (delta <= 0) {
+    if (timeInSeconds <= this.currentTime) {
         return;
     }
-
-    // Convert to milliseconds for CDP
 
 // 1. Synchronize media elements
     if (this.hasMedia) {
@@ -216,6 +212,7 @@ export class CdpTimeDriver implements TimeDriver {
 
     // 2. Advance virtual time
     // This triggers the browser event loop and requestAnimationFrame
+    const previousTime = this.currentTime;
     this.currentTime = timeInSeconds;
 
     if (this.mode === 'dom') {
@@ -223,6 +220,8 @@ export class CdpTimeDriver implements TimeDriver {
       return;
     }
 
+    // Convert to milliseconds for CDP
+    const delta = timeInSeconds - previousTime;
     this.setVirtualTimePolicyParams.budget = delta * 1000;
     this.client!.send('Emulation.setVirtualTimePolicy', this.setVirtualTimePolicyParams);
     return this.timePromise as any as Promise<void>;
