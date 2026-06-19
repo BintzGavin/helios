@@ -144,6 +144,7 @@ export class CaptureLoop {
         const signal = this.jobOptions?.signal;
         const onProgress = this.jobOptions?.onProgress;
         const hasProcessFn = !!strategy.processCaptureResult;
+        const stream = stdin!;
 
         let aborted = false;
         let abortListener: (() => void) | null = null;
@@ -173,15 +174,9 @@ export class CaptureLoop {
                         }
                     }
 
-                    if (stdin?.writable) {
-                        const canWriteMore = stdin.write(buffer as any);
-
-                        if (!canWriteMore && stdin.writableLength >= 16777216) {
+                    if (!stream.write(buffer as any) && stream.writableLength >= 16777216) {
                             await this.drainPromise;
                         }
-                    } else {
-                        console.warn('FFmpeg stdin is not writable. Skipping write.');
-                    }
                 }
             } else {
                 for (let i = 0; i < totalFrames; i++) {
@@ -202,15 +197,9 @@ export class CaptureLoop {
                         }
                     }
 
-                    if (stdin?.writable) {
-                        const canWriteMore = stdin.write(buffer as any);
-
-                        if (!canWriteMore && stdin.writableLength >= 16777216) {
+                    if (!stream.write(buffer as any) && stream.writableLength >= 16777216) {
                             await this.drainPromise;
                         }
-                    } else {
-                        console.warn('FFmpeg stdin is not writable. Skipping write.');
-                    }
                 }
             }
         } catch (e) {
@@ -366,6 +355,7 @@ export class CaptureLoop {
     };
 
     const workerPromises = this.pool.map((w, i) => runWorker(w, i));
+    const stream = stdin!;
 
     try {
         while (nextFrameToWrite < totalFrames && !aborted) {
@@ -394,11 +384,7 @@ export class CaptureLoop {
             }
 
 
-            if (stdin?.writable) {
-                    stdin.write(buffer as any);
-            } else {
-                console.warn('FFmpeg stdin is not writable. Skipping write.');
-            }
+            stream.write(buffer as any);
 
             nextFrameToWrite++;
         }
@@ -427,14 +413,9 @@ export class CaptureLoop {
     const finalBuffer = await this.pool[0].strategy.finish(this.pool[0].page);
     if (finalBuffer && ((Buffer.isBuffer(finalBuffer) && finalBuffer.length > 0) || (typeof finalBuffer === 'string' && finalBuffer.length > 0))) {
       console.log(`Writing final buffer...`);
-      if (stdin?.writable) {
-          const canWriteMore = stdin.write(finalBuffer as any);
-          if (!canWriteMore) {
+      if (!stdin!.write(finalBuffer as any)) {
               await this.drainPromise;
           }
-      } else {
-          console.warn('FFmpeg stdin is not writable. Skipping write.');
-      }
     }
 
     console.log('Finished sending frames. Closing FFmpeg stdin.');
