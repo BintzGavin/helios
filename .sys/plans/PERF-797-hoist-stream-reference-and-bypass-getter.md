@@ -1,11 +1,11 @@
 ---
 id: PERF-797
 slug: hoist-stream-reference-and-bypass-getter
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-06-18
-completed: ""
-result: ""
+completed: "2026-06-20"
+result: "discard"
 ---
 
 # PERF-797: Hoist Stream Reference and Bypass Getter in CaptureLoop
@@ -65,3 +65,9 @@ Run the standard DOM benchmark and ensure the output video is generated without 
 
 ## Prior Art
 - PERF-777 (Bypass Stream Writable Getter in single worker CaptureLoop)
+
+## Results Summary
+- **Best render time**: N/A
+- **Improvement**: N/A
+- **Kept experiments**: None
+- **Discarded experiments**: PERF-797 (Duplicate of PERF-801/806)
