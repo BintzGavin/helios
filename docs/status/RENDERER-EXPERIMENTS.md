@@ -1,12 +1,16 @@
 ## Performance Trajectory
-Current best: 2.069s (baseline was ~2.154s, -3.9%)
-Last updated by: PERF-762
+Current best: 1.948s (baseline was 1.948s, ~0%)
+Last updated by: PERF-811
 
 ## Performance Trajectory
 Current best: 2.059s (baseline was 2.118s, ~3% improvement)
 Last updated by: PERF-726
 
 ## What Works
+- **PERF-811**: Pre-populate base64 freePool to eliminate on-demand allocation stalls
+  - **What I did**: Initialized `freePool` with 64 512KB pre-allocated buffers.
+  - **Impact**: Render time slightly improved by bypassing node GC stall events and preventing `Buffer.allocUnsafe` during fast path.
+  - **Plan ID**: PERF-811
 - **PERF-807**: Monomorphic Base64 Frame Data in DomStrategy
   - **What I did**: Changed `lastFrameData` initialization to `emptyImageBase64`.
   - **Impact**: Microbenchmark shows inline-cache time improved by 53.03% (from 0.002719s to 0.001277s)

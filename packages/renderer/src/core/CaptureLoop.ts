@@ -154,7 +154,14 @@ export class CaptureLoop {
             signal.addEventListener('abort', abortListener);
         }
 
-        const freePool: Buffer[] = [];
+        // A standard 1080p frame is ~300KB to 2MB in base64. A 600x600 canvas frame base64 decode needs ~200KB.
+        // We pre-allocate with a conservative 512KB to cover most initial frame dimensions without realloc.
+        const POOL_SIZE = 64;
+        const INITIAL_BUFFER_SIZE = 512 * 1024;
+        const freePool: Buffer[] = new Array(POOL_SIZE);
+        for (let i = 0; i < POOL_SIZE; i++) {
+            freePool[i] = Buffer.allocUnsafe(INITIAL_BUFFER_SIZE);
+        }
 
         try {
             let isString: boolean | null = null;
