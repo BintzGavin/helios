@@ -230,6 +230,7 @@ Last updated by: PERF-726
   - **Plan ID**: PERF-740
 
 ## What Doesn't Work (and Why)
+- Prebound base64 freePool callback in CaptureLoop.ts (PERF-810) — Discarded because `stream.write(chunk, cb)` strictly queues the callback correctly in node.js internal mechanics, but attempting to mutate the bound object and recycle the `Buffer` instance by appending the bound callback triggered a deep corruption in stream processing, causing ffmpeg slice decoding failures and crashing the verify-trace pipeline.
 - **PERF-781**: Infinite Node.js Stream Buffering (No Drain Await)
   - **What I tried**: Removed the `await this.drainPromise` in the FFmpeg stdin writing block in the single-worker fast path to decouple Chromium frame generation from FFmpeg processing.
   - **WHY it didn't work**: The median render time in the fast path regressed to ~2.96s (vs baseline median ~2.069s). While it theoretically avoids event loop stalls from `drainPromise`, removing the backpressure causes memory pressure and seems to disrupt V8's optimization of the hot loop, likely due to uncontrolled stream buffer expansion or garbage collection.
