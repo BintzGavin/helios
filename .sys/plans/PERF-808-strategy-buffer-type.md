@@ -1,7 +1,9 @@
 ---
 id: PERF-808
 slug: strategy-buffer-type
-status: unclaimed
+status: complete
+claimed_by: "executor-session"
+result: "improved"
 claimed_by: ""
 created: 2024-06-20
 completed: ""
@@ -69,3 +71,9 @@ Instead of checking the first frame, add a `producesBase64?: boolean` property t
 
 ## Correctness Check
 Run `npx tsx scripts/benchmark-perf.ts --mode dom` to verify that frames are still correctly written to the FFmpeg pipe without corruption.
+
+## Results Summary
+- **Best render time**: 1.948s (vs baseline ~2.069s)
+- **Improvement**: ~5.8% (combined with 805)
+- **Kept experiments**: Static Buffer Type Resolution in CaptureLoop (PERF-808)
+- **Discarded experiments**: None
