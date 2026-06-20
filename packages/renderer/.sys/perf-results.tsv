@@ -236,3 +236,4 @@ run	28.646	600	20.95	60.0	discard	PERF-739 Eager CDP Session Initialization in D
 1	0.000	0	0.00	0.0	discard	duplicate of PERF-801
 1001	1.948	150	77.00	120.0	keep	Static Buffer Type Resolution in CaptureLoop (PERF-808)
 1002	0.001277	0	0.00	0.0	keep	monomorphic base64 (microbenchmark)
+809	1.682	150	0.00	0.0	keep	monomorphic base64 ring buffer (microbenchmark)
