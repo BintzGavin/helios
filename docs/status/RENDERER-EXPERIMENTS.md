@@ -1212,6 +1212,11 @@ Last updated by: PERF-764
   - **Plan ID**: PERF-760
 
 ## What Doesn't Work (and Why)
+- **PERF-797**: Hoist Stream Reference and Bypass Getter in CaptureLoop
+  - **What I tried**: Bypassing `stdin?.writable` and hoisting `stream`.
+  - **WHY it didn't work**: The planned optimizations were already implemented in previous experiments (PERF-801 and PERF-806). The plan was a duplicate and marked discarded.
+  - **Plan ID**: PERF-797
+
 - **PERF-804**: Bypass stream.writableLength and buffer property lookup
   - **What I tried**: Bypassed `stream.writableLength` getter by accessing `_writableState` directly in `CaptureLoop.ts` fast path, and cached `buf.length` locally in `DomStrategy.ts`.
   - **WHY it worked/didn't work**: The performance regressed and induced instability in some environments due to accessing internal Node.js `_writableState` directly and possibly complicating TurboFan's optimization of inline variable caches. Discarded.
