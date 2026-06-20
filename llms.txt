@@ -129,12 +129,12 @@ const report = await Helios.diagnose();
 
 ## Roadmap
 ### V1.x (Active)
-- **Studio**: v0.107.1+ (Completed: Asset Drag & Drop, Components Panel, Schema Validation, Export Job Spec)
-- **CLI**: v0.45.2+ (Completed: Cloudflare Sandbox, Kubernetes, Fly.io Deployment, Add Command Tests)
+- **Studio**: v0.107.1+ (Completed: Asset Drag & Drop, Components Panel, Schema Validation, Export Job Spec, Component Management)
+- **CLI**: v0.45.2+ (Completed: Cloudflare Sandbox, Kubernetes, Fly.io Deployment, Add Command Tests, Tier 3 Cloud Execution Adapters)
 - **Core**: v5.13.0+ (Completed: Active Clips, Generic Input Props, Composition Schema)
 - **Player**: v0.76.20+ (Completed: getSchema API Parity, Bridge Coverage, Regression Tests)
 - **Renderer**: v1.78.3+ (Completed: Validate HW Accel, Orchestrator Plan, Refactor Media Sync Logic)
-- **Infrastructure**: v0.25.0+ (Completed: Optimize GCS Uploads, Orchestrator Coverage)
+- **Infrastructure**: v0.25.0+ (Completed: Optimize GCS Uploads, Orchestrator Coverage, Tier 3 Cloud Execution Adapters)
 
 ### AI Integration
 - **Studio MCP Server**: Inspect, create, and render compositions via LLM tools (Done)
