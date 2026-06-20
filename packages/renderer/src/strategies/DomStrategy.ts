@@ -140,7 +140,7 @@ export class DomStrategy implements RenderStrategy {
         this.emptyImageBuffer = EMPTY_IMAGE_BUFFER;
     }
 
-    this.lastFrameData = this.emptyImageBuffer;
+    this.lastFrameData = this.emptyImageBase64;
 
 
 

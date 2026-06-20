@@ -1,11 +1,11 @@
 ---
 id: PERF-807
 slug: monomorphic-base64
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-06-20
-completed: ""
-result: ""
+completed: "2026-06-20"
+result: "keep"
 ---
 # PERF-807: Monomorphic Base64 Frame Data in DomStrategy
 
@@ -65,3 +65,9 @@ None.
 
 ## Correctness Check
 Run the `npm run build` and `npx tsx scripts/benchmark-perf.ts --mode dom` to verify that frames are still correctly written to the FFmpeg pipe without corruption.
+
+## Results Summary
+- **Best render time**: 0.001277s (microbench, vs baseline 0.002719s)
+- **Improvement**: 53.03%
+- **Kept experiments**: [PERF-807]
+- **Discarded experiments**: []
