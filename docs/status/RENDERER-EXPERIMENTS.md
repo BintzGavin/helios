@@ -1208,6 +1208,11 @@ Last updated by: PERF-764
   - **Plan ID**: PERF-760
 
 ## What Doesn't Work (and Why)
+- **PERF-804**: Bypass stream.writableLength and buffer property lookup
+  - **What I tried**: Bypassed `stream.writableLength` getter by accessing `_writableState` directly in `CaptureLoop.ts` fast path, and cached `buf.length` locally in `DomStrategy.ts`.
+  - **WHY it worked/didn't work**: The performance regressed and induced instability in some environments due to accessing internal Node.js `_writableState` directly and possibly complicating TurboFan's optimization of inline variable caches. Discarded.
+  - **Plan ID**: PERF-804
+
 - Inlining `processCaptureResult` into `DomStrategy.capture()` via `.then(this.processCaptureResultBound)` (PERF-757): Regressed median render time to ~2.513s (vs ~2.441s baseline). Returning a chained Promise via `.then()` incurred more microtask allocation overhead than explicitly evaluating the ternary condition (`hasProcessFn ? ...`) which V8 inline caches efficiently.
 
 - **PERF-765**: Optimize CaptureLoop Write
