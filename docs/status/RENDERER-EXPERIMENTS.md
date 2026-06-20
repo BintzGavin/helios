@@ -7,6 +7,10 @@ Current best: 2.059s (baseline was 2.118s, ~3% improvement)
 Last updated by: PERF-726
 
 ## What Works
+- **PERF-806**: Bypass Base64 Decode
+  - **What I did**: Updated `DomStrategy.ts` to return the base64 string directly and passed the `'base64'` encoding to `stream.write()` in `CaptureLoop.ts`.
+  - **Impact**: Removes intermediate Node.js `Buffer` allocations and subarray overhead during Base64 decoding, preventing potential frame corruption under backpressure.
+  - **Plan ID**: PERF-806
 - **PERF-801**: Streamline FFmpeg writes (Optimized stream property checks). Hoisting the `stdin` stream reference and replacing the properties check with native `write()` handling avoids repeated JIT overhead.
 - **PERF-762 (Reapply processFn Closure Elimination)**: Strictly re-applied the PERF-745 `hasProcessFn` inline boolean check to eliminate the per-frame closure evaluation overhead in `CaptureLoop.ts`. Improved median render time by ~3.9% (from 2.154s to 2.069s).
 - **PERF-764**: Eager Base64 Decode in DomStrategy processCaptureResult

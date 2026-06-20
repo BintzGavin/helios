@@ -174,7 +174,8 @@ export class CaptureLoop {
                         }
                     }
 
-                    if (!stream.write(buffer as any) && stream.writableLength >= 16777216) {
+                    const isString = typeof buffer === 'string';
+                    if (!(isString ? stream.write(buffer as any, 'base64') : stream.write(buffer as any)) && stream.writableLength >= 16777216) {
                             await this.drainPromise;
                         }
                 }
@@ -197,7 +198,8 @@ export class CaptureLoop {
                         }
                     }
 
-                    if (!stream.write(buffer as any) && stream.writableLength >= 16777216) {
+                    const isString = typeof buffer === 'string';
+                    if (!(isString ? stream.write(buffer as any, 'base64') : stream.write(buffer as any)) && stream.writableLength >= 16777216) {
                             await this.drainPromise;
                         }
                 }
@@ -384,7 +386,8 @@ export class CaptureLoop {
             }
 
 
-            stream.write(buffer as any);
+            const isString = typeof buffer === 'string';
+            if (isString) { stream.write(buffer as any, 'base64'); } else { stream.write(buffer as any); }
 
             nextFrameToWrite++;
         }
@@ -413,7 +416,8 @@ export class CaptureLoop {
     const finalBuffer = await this.pool[0].strategy.finish(this.pool[0].page);
     if (finalBuffer && ((Buffer.isBuffer(finalBuffer) && finalBuffer.length > 0) || (typeof finalBuffer === 'string' && finalBuffer.length > 0))) {
       console.log(`Writing final buffer...`);
-      if (!stdin!.write(finalBuffer as any)) {
+      const isString = typeof finalBuffer === 'string';
+      if (!(isString ? stdin!.write(finalBuffer as any, 'base64') : stdin!.write(finalBuffer as any))) {
               await this.drainPromise;
           }
     }

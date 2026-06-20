@@ -1,11 +1,11 @@
 ---
 id: PERF-806
 slug: bypass-base64-decode
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "jules"
 created: 2024-05-28
 completed: ""
-result: ""
+result: "improved"
 ---
 # PERF-806: Remove Buffer Decoding from Capture Loop
 

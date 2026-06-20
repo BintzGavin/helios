@@ -16,7 +16,6 @@ export class DomStrategy implements RenderStrategy {
   private cleanupAudio: () => Promise<void> | void = () => {};
   private cdpSession: CDPSession | null = null;
   private lastFrameData: Buffer | string | null = null;
-  private decodeBuffer: Buffer | null = null;
   private elementScreenshotParams: any = null;
 
   private cdpScreenshotParams: any = null;
@@ -169,23 +168,11 @@ export class DomStrategy implements RenderStrategy {
   }
 
 
-  processCaptureResult(result: any): Buffer {
+  processCaptureResult(result: any): string | Buffer {
     if (result.screenshotData) {
-      const b64 = result.screenshotData;
-      const chars = b64.length;
-      const maxBytes = (chars * 3) >>> 2;
-      let buf = this.decodeBuffer;
-      if (!buf || maxBytes > buf.length) {
-        const newCapacity = buf
-          ? Math.max(maxBytes, buf.length + (buf.length >> 1))
-          : maxBytes;
-        buf = Buffer.allocUnsafe(newCapacity);
-        this.decodeBuffer = buf;
-      }
-      const bytesWritten = buf.write(b64, 'base64');
-      this.lastFrameData = buf.subarray(0, bytesWritten);
+      this.lastFrameData = result.screenshotData;
     }
-    return this.lastFrameData as Buffer;
+    return this.lastFrameData as string | Buffer;
   }
 
   capture(page: Page, frameTime: number): Promise<any> {
