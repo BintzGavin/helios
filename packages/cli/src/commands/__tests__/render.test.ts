@@ -149,4 +149,97 @@ describe('render command', () => {
     }
   });
 
+
+  it('should include all options in rendererOptionsToFlags correctly', async () => {
+    vi.mocked(RenderOrchestrator.plan).mockReturnValueOnce({
+      chunks: [{ id: 1, startFrame: 0, frameCount: 10, outputFile: 'out.mp4', options: { width: 1920, height: 1080, fps: 60, crf: 23, mode: 'dom', audioCodec: 'aac', videoCodec: 'libx264', browserConfig: { headless: false } } as any }],
+      concatManifest: ['out.mp4'],
+      mixOptions: {} as any,
+      totalFrames: 10,
+      concatOutputFile: 'out_concat.mp4',
+      finalOutputFile: 'out_final.mp4',
+      cleanupFiles: []
+    });
+    await program.parseAsync([
+      'node', 'test', 'render', 'http://example.com/comp.html',
+      '--emit-job', 'job.json',
+      '--width', '1920',
+      '--height', '1080',
+      '--fps', '60',
+      '--quality', '23',
+      '--mode', 'dom',
+      '--audio-codec', 'aac',
+      '--video-codec', 'libx264',
+      '--no-headless'
+    ]);
+    const writeCall = fs.writeFileSync.mock.calls.find(call => typeof call[0] === 'string' && call[0].endsWith('job.json'));
+    expect(writeCall).toBeDefined();
+    if (writeCall) {
+      const job = JSON.parse(writeCall[1]);
+      const command = job.chunks[0].command;
+      expect(command).toContain('--width 1920');
+      expect(command).toContain('--height 1080');
+      expect(command).toContain('--fps 60');
+      expect(command).toContain('--quality 23');
+      expect(command).toContain('--mode dom');
+      expect(command).toContain('--audio-codec aac');
+      expect(command).toContain('--video-codec libx264');
+      expect(command).toContain('--no-headless');
+    }
+  });
+
+  it('should use default concurrency of 1 when undefined', async () => {
+    await program.parseAsync([
+      'node', 'test', 'render', 'http://example.com/comp.html',
+    ]);
+    expect(RenderOrchestrator.render).toHaveBeenCalledWith(
+      expect.any(String),
+      expect.any(String),
+      expect.objectContaining({ concurrency: 1 })
+    );
+    // Also cover --concurrency explicitly and --quality
+    await program.parseAsync([
+      'node', 'test', 'render', 'http://example.com/comp.html',
+      '--quality', '23'
+    ]);
+    expect(RenderOrchestrator.render).toHaveBeenCalledWith(
+      expect.any(String),
+      expect.any(String),
+      expect.objectContaining({ crf: 23 })
+    );
+    await program.parseAsync([
+      'node', 'test', 'render', 'http://example.com/comp.html',
+      '--concurrency', '4'
+    ]);
+    expect(RenderOrchestrator.render).toHaveBeenCalledWith(
+      expect.any(String),
+      expect.any(String),
+      expect.objectContaining({ concurrency: 4 })
+    );
+  });
+
+  it('should handle file:// URL and clean path logic starting with ./', async () => {
+    const path = require('path');
+    const originalRelative = path.relative;
+    vi.spyOn(path, 'relative').mockImplementation((from, to) => {
+      const rel = originalRelative(from, to);
+      if (rel === 'comp.html') return './comp.html';
+      return rel;
+    });
+
+    await program.parseAsync([
+      'node', 'test', 'render', './comp.html',
+      '--emit-job', 'job.json',
+      '--job-base-url', 'http://my-remote-site.com/'
+    ]);
+
+    vi.restoreAllMocks();
+    const writeCall = fs.writeFileSync.mock.calls.find(call => typeof call[0] === 'string' && call[0].endsWith('job.json'));
+    expect(writeCall).toBeDefined();
+    if (writeCall) {
+      const job = JSON.parse(writeCall[1]);
+      expect(job.chunks[0].command).toContain('http://my-remote-site.com/comp.html');
+    }
+  });
+
 });
