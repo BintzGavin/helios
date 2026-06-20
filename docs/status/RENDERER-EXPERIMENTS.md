@@ -1309,8 +1309,9 @@ Last updated by: PERF-786
 
 ## Performance Trajectory
 Current best: 1.948s (baseline was ~2.069s, -5.8%)
-Last updated by: PERF-793
+Last updated by: PERF-805
 
+- **Optimize Base64 Decode Buffer Allocation:** Calculated `maxBytes` as `(chars * 3) >>> 2` instead of using string length, reducing over-allocation by 33%. (PERF-805)
 ## What Works
 - **PERF-793**: Bypass Microtask Queue for DOM Mode Time Progression
   - **What I did**: Modified `TimeDriver` interface to allow returning `void` instead of a resolved promise. In `CdpTimeDriver` (DOM mode) where virtual time advances inherently, `setTime` returns `undefined`. The hot loop conditionally avoids the `await` keyword, fully bypassing V8's microtask queue scheduling per frame.

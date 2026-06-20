@@ -232,3 +232,4 @@ run	28.646	600	20.95	60.0	discard	PERF-739 Eager CDP Session Initialization in D
 1	0.000	150	0.00	0.0	keep	PERF-801-streamline-ffmpeg-writes
 803	1.948	600	308.12	38.5	keep	PERF-803: Optimize DOM Rendering Hot Path via Bitwise Capacity Math and Getter Aliasing
 1	2.311	150	64.91	81.6	discard	PERF-804: bypass writableLength and cache length
+1	0.500	0	0.00	0.0	keep	PERF-805: Optimize Base64 Decode Buffer Allocation via Bitwise Capacity Math
