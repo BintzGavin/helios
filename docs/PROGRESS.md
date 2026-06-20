@@ -781,3 +781,6 @@ Each agent should update **their own dedicated progress file** instead of this f
 
 ### PLAYER v0.77.59
 - ✅ Completed: Document Missing Media Events - Documented the abort, emptied, and progress events in the project README.
+
+### PLAYER v0.77.60
+- ✅ Completed: Discovered that `2026-06-03-PLAYER-configurable-export-resolution.md` is an IMPOSSIBLE: DUPLICATION plan. The `export-width` and `export-height` properties are already fully implemented and verified in the codebase. Documented as impossible and discarded.

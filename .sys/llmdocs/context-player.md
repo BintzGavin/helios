@@ -36,6 +36,8 @@ Observed attributes:
 - `playsinline`: Indicates that the video is to be played "inline", within the element's playback area.
 - `poster`: Image URL displayed before playback starts.
 - `preload`: Strategy for preloading (none, metadata, auto).
+- `export-width`, `export-height`: Optional target dimensions for exported media.
+- `export-bitrate`: Optional target bitrate for video exports.
 - `canvas-selector`: CSS selector for the primary canvas inside the iframe (default: `canvas`).
 
 ## Section D: Public API
