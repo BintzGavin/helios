@@ -154,6 +154,8 @@ export class CaptureLoop {
             signal.addEventListener('abort', abortListener);
         }
 
+        const freePool: Buffer[] = [];
+
         try {
             let isString: boolean | null = null;
             if (hasProcessFn) {
@@ -176,7 +178,25 @@ export class CaptureLoop {
                     }
 
                     if (isString === null) isString = typeof buffer === 'string';
-                    if (!(isString ? stream.write(buffer as any, 'base64') : stream.write(buffer as any)) && stream.writableLength >= 16777216) {
+
+                    let writeSuccess = false;
+                    if (isString) {
+                        const str = buffer as string;
+                        const maxBytes = (str.length * 3) >>> 2;
+                        let buf = freePool.pop();
+                        if (!buf || buf.length < maxBytes) {
+                            buf = Buffer.allocUnsafe(maxBytes + (maxBytes >> 1)); // 1.5x capacity
+                        }
+                        const written = buf.write(str, 'base64');
+                        const chunk = buf.subarray(0, written);
+                        writeSuccess = stream.write(chunk, () => {
+                            freePool.push(buf!);
+                        });
+                    } else {
+                        writeSuccess = stream.write(buffer as any);
+                    }
+
+                    if (!writeSuccess && stream.writableLength >= 16777216) {
                             await this.drainPromise;
                         }
                 }
@@ -200,7 +220,25 @@ export class CaptureLoop {
                     }
 
                     if (isString === null) isString = typeof buffer === 'string';
-                    if (!(isString ? stream.write(buffer as any, 'base64') : stream.write(buffer as any)) && stream.writableLength >= 16777216) {
+
+                    let writeSuccess = false;
+                    if (isString) {
+                        const str = buffer as string;
+                        const maxBytes = (str.length * 3) >>> 2;
+                        let buf = freePool.pop();
+                        if (!buf || buf.length < maxBytes) {
+                            buf = Buffer.allocUnsafe(maxBytes + (maxBytes >> 1)); // 1.5x capacity
+                        }
+                        const written = buf.write(str, 'base64');
+                        const chunk = buf.subarray(0, written);
+                        writeSuccess = stream.write(chunk, () => {
+                            freePool.push(buf!);
+                        });
+                    } else {
+                        writeSuccess = stream.write(buffer as any);
+                    }
+
+                    if (!writeSuccess && stream.writableLength >= 16777216) {
                             await this.drainPromise;
                         }
                 }

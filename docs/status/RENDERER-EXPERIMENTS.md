@@ -1335,7 +1335,7 @@ Last updated by: PERF-786
 
 ## Performance Trajectory
 Current best: 1.948s (baseline was ~2.069s, -5.8%)
-Last updated by: PERF-805
+Last updated by: PERF-809
 
 - **Optimize Base64 Decode Buffer Allocation:** Calculated `maxBytes` as `(chars * 3) >>> 2` instead of using string length, reducing over-allocation by 33%. (PERF-805)
 ## What Works
@@ -1362,3 +1362,8 @@ Last updated by: PERF-805
   - **What I did**: Replaced math exact re-allocation checks in `DomStrategy.ts` with bitwise logic `buf.length + (buf.length >> 1)`, and alias decoding buffers locally. In `CdpTimeDriver.ts`, deferred the subtraction of `timeInSeconds - previousTime` until after the dom mode early exit block to save arithmetic computations.
   - **Impact**: Micro-optimizations resulting in faster frame captures.
   - **Plan ID**: PERF-803
+
+- **PERF-809**: Base64 Decode Buffer Pool for DOM Capture
+  - **What I did**: Initialized a 64-buffer ring pool in `CaptureLoop.ts` fast path to process string decoding directly to buffers.
+  - **Impact**: It restores the previously reverted GC overhead reduction in `DOMStrategy`, while carefully preventing overwritten backpressure references on FFmpeg streams.
+  - **Plan ID**: PERF-809

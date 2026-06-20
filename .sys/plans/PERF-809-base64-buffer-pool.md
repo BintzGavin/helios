@@ -1,11 +1,11 @@
 ---
 id: PERF-809
 slug: base64-buffer-pool
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "jules"
 created: 2024-06-21
-completed: ""
-result: ""
+completed: "2026-06-20"
+result: "improved"
 ---
 
 # PERF-809: Base64 Decode Buffer Pool for DOM Capture
