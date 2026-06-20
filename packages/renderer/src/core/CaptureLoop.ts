@@ -155,6 +155,7 @@ export class CaptureLoop {
         }
 
         try {
+            let isString: boolean | null = null;
             if (hasProcessFn) {
                 for (let i = 0; i < totalFrames; i++) {
                     if (aborted || capturedErrors.length > 0) break;
@@ -174,7 +175,7 @@ export class CaptureLoop {
                         }
                     }
 
-                    const isString = typeof buffer === 'string';
+                    if (isString === null) isString = typeof buffer === 'string';
                     if (!(isString ? stream.write(buffer as any, 'base64') : stream.write(buffer as any)) && stream.writableLength >= 16777216) {
                             await this.drainPromise;
                         }
@@ -198,7 +199,7 @@ export class CaptureLoop {
                         }
                     }
 
-                    const isString = typeof buffer === 'string';
+                    if (isString === null) isString = typeof buffer === 'string';
                     if (!(isString ? stream.write(buffer as any, 'base64') : stream.write(buffer as any)) && stream.writableLength >= 16777216) {
                             await this.drainPromise;
                         }
@@ -360,6 +361,7 @@ export class CaptureLoop {
     const stream = stdin!;
 
     try {
+        let isString: boolean | null = null;
         while (nextFrameToWrite < totalFrames && !aborted) {
             if (freeWorkersHead > 0 || capturedErrors.length > 0 || (signal && signal.aborted)) {
                 checkState();
@@ -385,8 +387,7 @@ export class CaptureLoop {
                 }
             }
 
-
-            const isString = typeof buffer === 'string';
+            if (isString === null) isString = typeof buffer === 'string';
             if (isString) { stream.write(buffer as any, 'base64'); } else { stream.write(buffer as any); }
 
             nextFrameToWrite++;
