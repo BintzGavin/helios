@@ -7,6 +7,10 @@ Current best: 2.059s (baseline was 2.118s, ~3% improvement)
 Last updated by: PERF-726
 
 ## What Works
+- **PERF-807**: Monomorphic Base64 Frame Data in DomStrategy
+  - **What I did**: Changed `lastFrameData` initialization to `emptyImageBase64`.
+  - **Impact**: Microbenchmark shows inline-cache time improved by 53.03% (from 0.002719s to 0.001277s)
+  - **Plan ID**: PERF-807
 - **PERF-808**: Static Buffer Type Resolution in CaptureLoop
   - **What I did**: Bypassed per-frame `typeof` buffer type checking in `CaptureLoop.ts` fast path and multi-worker loops by evaluating it once on the first frame and caching the result.
   - **Impact**: Fast-path execution optimization for DOM rendering.
