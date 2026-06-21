@@ -21,3 +21,9 @@
 ## 0.121.23 - STUDIO-Improve-AudioMeter-Coverage
 **Learning:** Found a component (`AudioMeter.tsx`) that had missing lines covered in its unit tests. Writing a test file to cover this gap is a legitimate planning action when no vision gap exists, following the "Nothing to Do Protocol".
 **Action:** When a domain is aligned with the vision, running test coverage (e.g., `npm run test -w packages/studio -- --coverage`) can reveal useful tasks to create.
+## 0.121.32 - TimelineAudioTrack Coverage Update
+**Learning:** Found an untested area in `TimelineAudioTrack.tsx` (waveform canvas drawing logic in `useEffect`) and updated `TimelineAudioTrack.test.tsx` to reach 100% coverage, including checking for null context and specific inner-loop bounds logic.
+**Action:** Use `--coverage` to spot untested lines, and provide targeted mocks (e.g. `HTMLCanvasElement.prototype.getContext`) to trigger edge case return branches.
+## 0.121.32 - AudioMixerPanel Coverage Update
+**Learning:** Found an untested area in `AudioMixerPanel.tsx` (optimistic UI updates and fetch track errors) and updated `AudioMixerPanel.test.tsx` to reach 100% coverage, verifying both the UI state and controller interactions for volume changes and fetch failures.
+**Action:** Mock error responses directly in test cases (`mockRejectedValueOnce`) and trigger UI events (`fireEvent.change`) to hit edge case logic.
