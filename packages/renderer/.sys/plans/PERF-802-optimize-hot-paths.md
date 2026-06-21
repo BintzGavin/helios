@@ -1,11 +1,11 @@
 ---
 id: PERF-802
 slug: optimize-hot-paths
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "Jules"
 created: 2026-06-19
 completed: ""
-result: ""
+result: "Discarded"
 ---
 
 # PERF-802: Optimize DomStrategy Capture and CdpTimeDriver SetTime Hot Paths

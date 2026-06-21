@@ -239,6 +239,11 @@ Last updated by: PERF-726
   - **Plan ID**: PERF-740
 
 ## What Doesn't Work (and Why)
+- **PERF-802**: Optimize DOM Rendering Hot Path
+  - **What I tried**: Deferred computing `const previousTime` and `timeInSeconds - previousTime` in `CdpTimeDriver.ts` until after the `dom` mode early exit.
+  - **WHY it didn't work**: Bypassing `setTime` progression in `CdpTimeDriver.ts` disrupted side-effects and caused Playwright rendering loops to hang entirely. Discarded.
+  - **Plan ID**: PERF-802
+
 - Prebound base64 freePool callback in CaptureLoop.ts (PERF-810) — Discarded because `stream.write(chunk, cb)` strictly queues the callback correctly in node.js internal mechanics, but attempting to mutate the bound object and recycle the `Buffer` instance by appending the bound callback triggered a deep corruption in stream processing, causing ffmpeg slice decoding failures and crashing the verify-trace pipeline.
 - **PERF-781**: Infinite Node.js Stream Buffering (No Drain Await)
   - **What I tried**: Removed the `await this.drainPromise` in the FFmpeg stdin writing block in the single-worker fast path to decouple Chromium frame generation from FFmpeg processing.
