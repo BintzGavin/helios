@@ -7,6 +7,10 @@ Current best: 2.059s (baseline was 2.118s, ~3% improvement)
 Last updated by: PERF-726
 
 ## What Works
+- **What:** Extended the single-worker `freePool` mechanism for Base64 strings to the multi-worker loop to prevent heap allocation per chunk.
+  **Improvement:** Microbenchmark decode time improved from 44.7ms to 11.1ms
+  **Plan:** PERF-815
+
 
 - **PERF-814**: Single-Worker Pipeline Overlap (Retry)
   - **What I did**: Pre-fired the `strategy.capture` command for frame `i+1` before decoding the current frame `i`'s Base64 string in the single-worker hot loop (`CaptureLoop.ts`).

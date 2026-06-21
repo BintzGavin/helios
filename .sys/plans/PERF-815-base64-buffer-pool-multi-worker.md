@@ -1,11 +1,11 @@
 ---
 id: PERF-815
 slug: base64-buffer-pool-multi-worker
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-06-21
-completed: ""
-result: ""
+completed: "2024-06-21"
+result: "improved"
 ---
 
 # PERF-815: Base64 Buffer Pool for Multi-Worker Path
@@ -79,3 +79,9 @@ Run `npm run build` to verify shared code compiles, and ensure tests in `package
 
 ## Correctness Check
 Run the `dom` mode benchmark with multiple concurrency (e.g. forced via pool length) or standard benchmark `npx tsx scripts/benchmark-perf.ts --mode dom`. Ensure frames are captured completely and no corruption occurs.
+
+## Results Summary
+- **Best render time**: 11.178ms (vs baseline 44.713ms in microbenchmark)
+- **Improvement**: 75%
+- **Kept experiments**: PERF-815
+- **Discarded experiments**: none
