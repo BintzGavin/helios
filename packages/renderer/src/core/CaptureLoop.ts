@@ -301,6 +301,13 @@ export class CaptureLoop {
     const frameBufferRing = new Array<Buffer | string | null>(maxPipelineDepth).fill(null);
     const frameReadyRing = new Uint8Array(maxPipelineDepth); // 0 = not ready, 1 = ready
     let fatalError: any = null;
+
+    const MULTI_POOL_SIZE = 64;
+    const MULTI_INITIAL_BUFFER_SIZE = 512 * 1024;
+    const multiFreePool: Buffer[] = new Array(MULTI_POOL_SIZE);
+    for (let i = 0; i < MULTI_POOL_SIZE; i++) {
+        multiFreePool[i] = Buffer.allocUnsafe(MULTI_INITIAL_BUFFER_SIZE);
+    }
     const writerWaiterPromise = new ReusableThenable();
 
     // Multi-worker ACTOR MODEL with backpressure
@@ -460,7 +467,26 @@ export class CaptureLoop {
             }
 
             if (isString === null) isString = typeof buffer === 'string';
-            if (isString) { stream.write(buffer as any, 'base64'); } else { stream.write(buffer as any); }
+
+            let writeSuccess = false;
+            if (isString) {
+                const str = buffer as string;
+                const maxBytes = (str.length * 3) >>> 2;
+                let buf = multiFreePool.pop();
+                if (!buf || buf.length < maxBytes) {
+                    buf = Buffer.allocUnsafe(maxBytes + (maxBytes >> 1)); // 1.5x capacity
+                }
+                const written = buf.write(str, 'base64');
+                const chunk = buf.subarray(0, written);
+                writeSuccess = stream.write(chunk, () => {
+                    multiFreePool.push(buf!);
+                });
+            } else {
+                writeSuccess = stream.write(buffer as any);
+            }
+            if (!writeSuccess && stream.writableLength >= 16777216) {
+                await this.drainPromise;
+            }
 
             nextFrameToWrite++;
         }
