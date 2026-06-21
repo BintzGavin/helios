@@ -1,4 +1,4 @@
-**Version**: 0.107.2
+**Version**: 0.107.3
 
 - [v0.121.28] ✅ Completed: Improve AssistantModal Coverage - Reached 90%+ test coverage for AssistantModal.
 
@@ -7,6 +7,7 @@
 **Posture**: ACTIVELY EXPANDING FOR V2
 
 # Studio Domain Status
+- [v0.107.3] ✅ Completed: Improve PlaybackControls Coverage - Reached 100% test coverage for PlaybackControls.
 - [v0.121.27] ✅ Completed: Improve RenderManager Test Coverage - Added 100% test coverage for RenderManager including `startRender`, `cancelJob`, `deleteJob` and `diagnoseServer`.
 - [v0.121.26] ✅ Completed: Improve AudioMeter Test Coverage - Added null ref handling tests to `AudioMeter.test.tsx` achieving 100% coverage.
 - [v0.121.25] ✅ Completed: Improve AudioMeter Coverage - Added unit tests for AudioMeter to ensure full line and branch coverage including clipping and warning thresholds.

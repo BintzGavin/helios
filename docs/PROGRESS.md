@@ -46,6 +46,9 @@
 - ✅ Completed: Improve AudioMeter Coverage - Added unit tests for AudioMeter to ensure full line and branch coverage including clipping and warning thresholds.
 
 
+### STUDIO v0.107.3
+- ✅ Completed: Improve PlaybackControls Coverage - Reached 100% test coverage for PlaybackControls.
+
 ## STUDIO v0.121.29
 ### STUDIO v0.121.30
 - ✅ Completed: Improve PropsEditor Coverage - Increased line and branch coverage to ~99% for PropsEditor.tsx.
