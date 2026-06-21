@@ -1,12 +1,17 @@
 ## Performance Trajectory
-Current best: 1.948s (baseline was 1.948s, ~0%)
-Last updated by: PERF-811
+Current best: 1.831s (baseline was 1.948s, 6.0%)
+Last updated by: PERF-814
 
 ## Performance Trajectory
 Current best: 2.059s (baseline was 2.118s, ~3% improvement)
 Last updated by: PERF-726
 
 ## What Works
+
+- **PERF-814**: Single-Worker Pipeline Overlap (Retry)
+  - **What I did**: Pre-fired the `strategy.capture` command for frame `i+1` before decoding the current frame `i`'s Base64 string in the single-worker hot loop (`CaptureLoop.ts`).
+  - **Impact**: Allowed Node.js to concurrently use the CPU for string decoding and writing while Chromium renders the next frame in the background via CDP, yielding faster overall frames.
+  - **Plan ID**: PERF-814
 - **PERF-811**: Pre-populate base64 freePool to eliminate on-demand allocation stalls
   - **What I did**: Initialized `freePool` with 64 512KB pre-allocated buffers.
   - **Impact**: Render time slightly improved by bypassing node GC stall events and preventing `Buffer.allocUnsafe` during fast path.

@@ -1,11 +1,11 @@
 ---
 id: PERF-814
 slug: single-worker-pipeline-overlap-retry
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-06-21
 completed: ""
-result: ""
+result: improved
 ---
 
 # PERF-814: Single-Worker Pipeline Overlap (Retry)

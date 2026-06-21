@@ -239,3 +239,5 @@ run	28.646	600	20.95	60.0	discard	PERF-739 Eager CDP Session Initialization in D
 809	1.682	150	0.00	0.0	keep	monomorphic base64 ring buffer (microbenchmark)
 1	0.000	0	0.00	0.0	discard	PERF-810 Prebind base64 callback
 811	1.948	150	77.00	0.0	keep	PERF-811: eliminate ondemand buffer pool allocation
+
+814	1.831	150	81.92	0	keep	PERF-814 Single-Worker Pipeline Overlap (Retry)

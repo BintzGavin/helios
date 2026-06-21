@@ -166,14 +166,28 @@ export class CaptureLoop {
         try {
             let isString: boolean | null = null;
             if (hasProcessFn) {
-                for (let i = 0; i < totalFrames; i++) {
-                    if (aborted || capturedErrors.length > 0) break;
-
-                    const timePromise = timeDriver.setTime(page, (startFrame + i) * compTimeStep);
+                let nextCapturePromise = null;
+                if (totalFrames > 0) {
+                    const timePromise = timeDriver.setTime(page, startFrame * compTimeStep);
                     if (timePromise) {
                         await timePromise;
                     }
-                    const buffer = strategy.processCaptureResult!(await strategy.capture(page, i * timeStep));
+                    nextCapturePromise = strategy.capture(page, 0);
+                }
+                for (let i = 0; i < totalFrames; i++) {
+                    if (aborted || capturedErrors.length > 0) break;
+
+                    const rawResult = await nextCapturePromise;
+
+                    if (i + 1 < totalFrames) {
+                        const timePromise = timeDriver.setTime(page, (startFrame + i + 1) * compTimeStep);
+                        if (timePromise) {
+                            await timePromise;
+                        }
+                        nextCapturePromise = strategy.capture(page, (i + 1) * timeStep);
+                    }
+
+                    const buffer = strategy.processCaptureResult!(rawResult);
 
                     if (i === nextProgressFrame) {
                         console.log(`Progress: Rendered ${i} / ${totalFrames} frames`);
@@ -208,14 +222,27 @@ export class CaptureLoop {
                         }
                 }
             } else {
-                for (let i = 0; i < totalFrames; i++) {
-                    if (aborted || capturedErrors.length > 0) break;
-
-                    const timePromise = timeDriver.setTime(page, (startFrame + i) * compTimeStep);
+                let nextCapturePromise = null;
+                if (totalFrames > 0) {
+                    const timePromise = timeDriver.setTime(page, startFrame * compTimeStep);
                     if (timePromise) {
                         await timePromise;
                     }
-                    const buffer = await strategy.capture(page, i * timeStep);
+                    nextCapturePromise = strategy.capture(page, 0);
+                }
+                for (let i = 0; i < totalFrames; i++) {
+                    if (aborted || capturedErrors.length > 0) break;
+
+                    const buffer = await nextCapturePromise;
+
+                    if (i + 1 < totalFrames) {
+                        const timePromise = timeDriver.setTime(page, (startFrame + i + 1) * compTimeStep);
+                        if (timePromise) {
+                            await timePromise;
+                        }
+                        nextCapturePromise = strategy.capture(page, (i + 1) * timeStep);
+                    }
+
 
                     if (i === nextProgressFrame) {
                         console.log(`Progress: Rendered ${i} / ${totalFrames} frames`);
