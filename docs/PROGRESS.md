@@ -787,3 +787,6 @@ Each agent should update **their own dedicated progress file** instead of this f
 
 ### PLAYER v0.77.60
 - ✅ Completed: Discovered that `2026-06-03-PLAYER-configurable-export-resolution.md` is an IMPOSSIBLE: DUPLICATION plan. The `export-width` and `export-height` properties are already fully implemented and verified in the codebase. Documented as impossible and discarded.
+
+### PLAYER v0.77.61
+- ✅ Completed: Discovered that 2027-02-15-PLAYER-Add-Missing-Events.md is an IMPOSSIBLE: DUPLICATION plan. The event dispatches (abort, emptied, progress) are already fully implemented in packages/player/src/index.ts. Documented as impossible and discarded.
