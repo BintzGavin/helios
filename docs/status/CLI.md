@@ -2,7 +2,7 @@
 
 [v0.46.51] 🟢 Completed: CLI Command Coverage Tests Spec V9 - Created specification plan 2027-06-05-CLI-Command-Coverage-Tests-V9.md for covering missing exit prompt branches in deploy subcommands.
 
-**Version**: 0.46.53
+**Version**: 0.46.54
 
 [v0.46.44] ✅ Completed: CLI Registry Types Regression Tests - Logged the duplicated plan as impossible since registry types regression tests are already fully implemented.
 [v0.46.41] ✅ Completed: CLI Docker Adapter Regression Tests - Logged the duplicated plan as impossible since docker-adapter template tests are already fully implemented.
@@ -186,3 +186,4 @@ The Helios CLI is the primary user interface for component registry, project sca
 [v0.46.49] ✅ Completed: CLI Registry Types Regression Tests - Implemented unit tests for registry type definitions
 
 [v0.46.53] ✅ Completed: CLI Command Coverage Tests V9 - Implemented tests to achieve 100% line coverage for the render command.
+[v0.46.54] ✅ Completed: CLI Deploy Command Coverage Tests - Added unit tests to deploy.ts to cover process.exit(0) branches for missing prompts.

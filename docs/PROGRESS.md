@@ -790,3 +790,6 @@ Each agent should update **their own dedicated progress file** instead of this f
 
 ### PLAYER v0.77.61
 - ✅ Completed: Discovered that 2027-02-15-PLAYER-Add-Missing-Events.md is an IMPOSSIBLE: DUPLICATION plan. The event dispatches (abort, emptied, progress) are already fully implemented in packages/player/src/index.ts. Documented as impossible and discarded.
+
+### CLI v0.46.54
+- ✅ Completed: CLI Deploy Command Coverage Tests - Added unit tests to deploy.ts to cover process.exit(0) branches for missing prompts.

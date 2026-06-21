@@ -172,10 +172,10 @@ describe('render command', () => {
       '--video-codec', 'libx264',
       '--no-headless'
     ]);
-    const writeCall = fs.writeFileSync.mock.calls.find(call => typeof call[0] === 'string' && call[0].endsWith('job.json'));
+    const writeCall = vi.mocked(fs.writeFileSync).mock.calls.find((call: any[]) => typeof call[0] === 'string' && call[0].endsWith('job.json'));
     expect(writeCall).toBeDefined();
     if (writeCall) {
-      const job = JSON.parse(writeCall[1]);
+      const job = JSON.parse(writeCall[1] as string);
       const command = job.chunks[0].command;
       expect(command).toContain('--width 1920');
       expect(command).toContain('--height 1080');
@@ -234,10 +234,10 @@ describe('render command', () => {
     ]);
 
     vi.restoreAllMocks();
-    const writeCall = fs.writeFileSync.mock.calls.find(call => typeof call[0] === 'string' && call[0].endsWith('job.json'));
+    const writeCall = vi.mocked(fs.writeFileSync).mock.calls.find((call: any[]) => typeof call[0] === 'string' && call[0].endsWith('job.json'));
     expect(writeCall).toBeDefined();
     if (writeCall) {
-      const job = JSON.parse(writeCall[1]);
+      const job = JSON.parse(writeCall[1] as string);
       expect(job.chunks[0].command).toContain('http://my-remote-site.com/comp.html');
     }
   });
