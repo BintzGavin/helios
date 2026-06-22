@@ -7,6 +7,11 @@ Current best: 2.059s (baseline was 2.118s, ~3% improvement)
 Last updated by: PERF-726
 
 ## What Works
+
+- **PERF-804**: Bypass Writable State Getter and Property Lookups
+  - **What I did**: Bypassed `stream.writableLength` getter by accessing `_writableState.length` directly in `CaptureLoop.ts` and simplified property lookup in `DomStrategy.ts`.
+  - **Impact**: Removes an unnecessary function dispatch on every frame in the hot loop.
+  - **Plan ID**: PERF-804
 - Bypassed multi-frame sync media branching in CdpTimeDriver. Baseline: ~15ms, Opt: ~13ms (1000000 runs) in microbenchmark. (PERF-816)
 - **What:** Extended the single-worker `freePool` mechanism for Base64 strings to the multi-worker loop to prevent heap allocation per chunk.
   **Improvement:** Microbenchmark decode time improved from 44.7ms to 11.1ms
