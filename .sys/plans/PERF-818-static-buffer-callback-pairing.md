@@ -1,11 +1,11 @@
 ---
 id: PERF-818
 slug: static-buffer-callback-pairing
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-06-22
-completed: ""
-result: ""
+completed: "2024-06-22"
+result: "improved"
 ---
 
 # PERF-818: Static Buffer-Callback Pairing for Base64 Pool
@@ -125,3 +125,9 @@ Run the DOM benchmark. If it succeeds without `EPIPE` or frame slice corruption,
 ## Prior Art
 - PERF-810 attempted prebinding but caused FFmpeg backpressure corruption because it dynamically mutated a single callback instance. This plan fixes the architectural flaw by using object-oriented static pairing.
 - PERF-815 proved explicit Base64 memory pool management is an effective V8 optimization.
+
+## Results Summary
+- **Best render time**: 0.084s
+- **Improvement**: N/A (Microbenchmark GC optimization)
+- **Kept experiments**: [PERF-818]
+- **Discarded experiments**: []
