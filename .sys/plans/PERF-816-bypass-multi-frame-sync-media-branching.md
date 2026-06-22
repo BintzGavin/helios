@@ -1,11 +1,11 @@
 ---
 id: PERF-816
 slug: bypass-multi-frame-sync-media-branching
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-06-21
 completed: ""
-result: ""
+result: "improved"
 ---
 
 # PERF-816: Bypass Multi-Frame Sync Media Branching

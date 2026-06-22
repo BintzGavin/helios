@@ -1386,3 +1386,7 @@ Last updated by: PERF-809
   - **What I did**: Initialized a 64-buffer ring pool in `CaptureLoop.ts` fast path to process string decoding directly to buffers.
   - **Impact**: It restores the previously reverted GC overhead reduction in `DOMStrategy`, while carefully preventing overwritten backpressure references on FFmpeg streams.
   - **Plan ID**: PERF-809
+- **PERF-816**: Bypass multi-frame sync media branching in CdpTimeDriver.
+  - **What I did**: Removed branch evaluations inside the hot frame loop by pre-binding \`syncMediaFn\` during \`prepare()\`.
+  - **Impact**: It bypassed dynamic arrays property evaluations \`executionContextIds.length\` on every frame leading to smaller hot frame loop.
+  - **Plan ID**: PERF-816

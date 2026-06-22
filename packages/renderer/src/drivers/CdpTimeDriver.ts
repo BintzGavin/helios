@@ -47,18 +47,7 @@ export class CdpTimeDriver implements TimeDriver {
   private hasMedia: boolean = true;
   private mode: string;
 
-  private defaultSyncMedia() {
-    const len = this.executionContextIds.length;
-    if (len === 0) {
-      this.client!.send('Runtime.evaluate', this.singleFrameSyncMediaParams);
-    } else if (len === 1) {
-      this.client!.send('Runtime.evaluate', this.multiFrameSyncMediaParams[0]);
-    } else {
-      for (let i = 0; i < len; i++) {
-        this.client!.send('Runtime.evaluate', this.multiFrameSyncMediaParams[i]);
-      }
-    }
-  }
+  private syncMediaFn: () => void = () => {};
 
   private handleSyncMediaError = (e: any) => {
     console.warn('[CdpTimeDriver] Failed to sync media:', e);
@@ -196,6 +185,25 @@ export class CdpTimeDriver implements TimeDriver {
 
 
     this.currentTime = 0;
+
+    const len = this.executionContextIds.length;
+    if (len === 0) {
+      this.syncMediaFn = () => {
+        this.client!.send('Runtime.evaluate', this.singleFrameSyncMediaParams);
+      };
+    } else if (len === 1) {
+      const param = this.multiFrameSyncMediaParams[0];
+      this.syncMediaFn = () => {
+        this.client!.send('Runtime.evaluate', param);
+      };
+    } else {
+      const params = this.multiFrameSyncMediaParams;
+      this.syncMediaFn = () => {
+        for (let i = 0; i < len; i++) {
+          this.client!.send('Runtime.evaluate', params[i]);
+        }
+      };
+    }
   }
 
   setTime(page: Page, timeInSeconds: number): Promise<void> | void {
@@ -207,7 +215,7 @@ export class CdpTimeDriver implements TimeDriver {
 
 // 1. Synchronize media elements
     if (this.hasMedia) {
-      this.defaultSyncMedia();
+      this.syncMediaFn();
     }
 
     // 2. Advance virtual time
