@@ -241,3 +241,4 @@ run	28.646	600	20.95	60.0	discard	PERF-739 Eager CDP Session Initialization in D
 811	1.948	150	77.00	0.0	keep	PERF-811: eliminate ondemand buffer pool allocation
 
 1	0.000	0	0.00	0.0	crash	Disrupted side-effects causing Playwright loops to hang
+115	0.046	1000000	N/A	N/A	keep	Bypass multi-frame sync media branching

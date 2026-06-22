@@ -7,6 +7,7 @@ Current best: 2.059s (baseline was 2.118s, ~3% improvement)
 Last updated by: PERF-726
 
 ## What Works
+- Bypassed multi-frame sync media branching in CdpTimeDriver. Baseline: ~15ms, Opt: ~13ms (1000000 runs) in microbenchmark. (PERF-816)
 - **What:** Extended the single-worker `freePool` mechanism for Base64 strings to the multi-worker loop to prevent heap allocation per chunk.
   **Improvement:** Microbenchmark decode time improved from 44.7ms to 11.1ms
   **Plan:** PERF-815
@@ -930,6 +931,7 @@ Current best: ~2.306s (baseline was ~2.624s, -12%)
 Last updated by: PERF-764
 
 ## What Works
+- Bypassed multi-frame sync media branching in CdpTimeDriver. Baseline: ~15ms, Opt: ~13ms (1000000 runs) in microbenchmark. (PERF-816)
 
 - **PERF-637**: Optimize Writer Waiter Check in CaptureLoop Hot Loop
   - **What I did**: Removed the `nextFrameToWrite === i` branch condition from the `writerWaiterResolve` check in the `CaptureLoop.ts` `runWorker` hot loop because with 1 concurrency, it is redundant.
@@ -1029,6 +1031,7 @@ Last updated by: PERF-764
   - **WHY it didn't work**: Did not improve over baseline.
 
 ## What Works
+- Bypassed multi-frame sync media branching in CdpTimeDriver. Baseline: ~15ms, Opt: ~13ms (1000000 runs) in microbenchmark. (PERF-816)
 
 - **PERF-637**: Optimize Writer Waiter Check in CaptureLoop Hot Loop
   - **What I did**: Removed the `nextFrameToWrite === i` branch condition from the `writerWaiterResolve` check in the `CaptureLoop.ts` `runWorker` hot loop because with 1 concurrency, it is redundant.
@@ -1053,6 +1056,7 @@ Last updated by: PERF-764
   - **Plan ID**: PERF-626
 
 ## What Works
+- Bypassed multi-frame sync media branching in CdpTimeDriver. Baseline: ~15ms, Opt: ~13ms (1000000 runs) in microbenchmark. (PERF-816)
 
 - **PERF-637**: Optimize Writer Waiter Check in CaptureLoop Hot Loop
   - **What I did**: Removed the `nextFrameToWrite === i` branch condition from the `writerWaiterResolve` check in the `CaptureLoop.ts` `runWorker` hot loop because with 1 concurrency, it is redundant.
@@ -1166,6 +1170,7 @@ Last updated by: PERF-764
   - **Plan ID**: PERF-686
 
 ## What Works
+- Bypassed multi-frame sync media branching in CdpTimeDriver. Baseline: ~15ms, Opt: ~13ms (1000000 runs) in microbenchmark. (PERF-816)
 
 - PERF-698: Removed `-thread_queue_size 512` from `DomStrategy.ts` FFmpeg arguments. By relying on native Unix pipe backpressure instead of an internal FFmpeg thread queue, the median render time improved to ~2.624s (from ~2.710s baseline).
 - PERF-693: Omit `this.handleWriteError` callbacks to `stdin.write` in the `CaptureLoop.ts` single-worker fast path to avoid Node.js stream internal state machine tracking overhead. This reduced median render time to ~2.347s (from ~2.471s baseline).
@@ -1295,6 +1300,7 @@ Last updated by: PERF-764
   - **Plan ID**: PERF-475
 
 ## What Works
+- Bypassed multi-frame sync media branching in CdpTimeDriver. Baseline: ~15ms, Opt: ~13ms (1000000 runs) in microbenchmark. (PERF-816)
 
 - **PERF-776**: Inline media sync check
   - **What I did**: Inlined the media sync boolean check (`if (this.hasMedia)`), removing the empty closure invocation (`this.syncMediaFn()`) per frame on the fast path.
@@ -1325,6 +1331,7 @@ Last updated by: PERF-764
   - **WHY it didn't work**: The median render time regressed to ~2.262s (from ~2.069s baseline). The arithmetic overhead of `Math.round(delta * 1000)` combined with an explicit conditional property branch negated any savings from bypassing object mutation. V8's hidden classes already optimize simple integer-like float assignments to the same property shape extremely well.
   - **Plan ID**: PERF-782
 ## What Works
+- Bypassed multi-frame sync media branching in CdpTimeDriver. Baseline: ~15ms, Opt: ~13ms (1000000 runs) in microbenchmark. (PERF-816)
 
 - Removed `timesArray` and `compTimesArray` typed arrays in favor of inline math for time calculations (~3.385s -> fast path).
 - PERF-783
@@ -1334,6 +1341,7 @@ Current best: 3.009s (baseline was ~3.03s, -1%)
 Last updated by: PERF-786
 
 ## What Works
+- Bypassed multi-frame sync media branching in CdpTimeDriver. Baseline: ~15ms, Opt: ~13ms (1000000 runs) in microbenchmark. (PERF-816)
 
 - Simplification of abort check in single-worker fast path. It slightly improved execution time by ~1% by hoisting the `signal.aborted` condition checks out of the hot path inside the `for` loops in `packages/renderer/src/core/CaptureLoop.ts`. (PERF-786)
 
@@ -1358,6 +1366,7 @@ Last updated by: PERF-809
 
 - **Optimize Base64 Decode Buffer Allocation:** Calculated `maxBytes` as `(chars * 3) >>> 2` instead of using string length, reducing over-allocation by 33%. (PERF-805)
 ## What Works
+- Bypassed multi-frame sync media branching in CdpTimeDriver. Baseline: ~15ms, Opt: ~13ms (1000000 runs) in microbenchmark. (PERF-816)
 
 - **PERF-793**: Bypass Microtask Queue for DOM Mode Time Progression
   - **What I did**: Modified `TimeDriver` interface to allow returning `void` instead of a resolved promise. In `CdpTimeDriver` (DOM mode) where virtual time advances inherently, `setTime` returns `undefined`. The hot loop conditionally avoids the `await` keyword, fully bypassing V8's microtask queue scheduling per frame.
@@ -1370,6 +1379,7 @@ Last updated by: PERF-809
   - **Plan ID**: PERF-798
 
 ## What Works
+- Bypassed multi-frame sync media branching in CdpTimeDriver. Baseline: ~15ms, Opt: ~13ms (1000000 runs) in microbenchmark. (PERF-816)
 
 - Bypass Buffer.byteLength in base64 decode by allocating using string length and writing actual bytes. (PERF-799) - Estimated improvement: avoided O(N) scan overhead per frame in base64 decode
 
