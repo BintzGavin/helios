@@ -1,8 +1,8 @@
 ---
 id: PERF-804
 slug: bypass-writable-getter
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "jules"
 created: 2024-06-19
 completed: ""
 result: ""

@@ -169,8 +169,9 @@ export class DomStrategy implements RenderStrategy {
 
 
   processCaptureResult(result: any): string | Buffer {
-    if (result.screenshotData) {
-      this.lastFrameData = result.screenshotData;
+    const data = result.screenshotData;
+    if (data) {
+      this.lastFrameData = data;
     }
     return this.lastFrameData as string | Buffer;
   }

@@ -156,6 +156,7 @@ export class CaptureLoop {
         const onProgress = this.jobOptions?.onProgress;
         const hasProcessFn = !!strategy.processCaptureResult;
         const stream = stdin!;
+        const writableState = (stream as any)._writableState;
 
         let aborted = false;
         let abortListener: (() => void) | null = null;
@@ -217,7 +218,7 @@ export class CaptureLoop {
                         writeSuccess = stream.write(buffer as any);
                     }
 
-                    if (!writeSuccess && stream.writableLength >= 16777216) {
+                    if (!writeSuccess && writableState.length >= 16777216) {
                         await this.drainPromise;
                     }
 
@@ -248,7 +249,7 @@ export class CaptureLoop {
                                 const chunk = pooled.buffer.subarray(0, written);
                                 const writeSuccessStr = stream.write(chunk, pooled.freeCb);
 
-                                if (!writeSuccessStr && stream.writableLength >= 16777216) {
+                                if (!writeSuccessStr && writableState.length >= 16777216) {
                                     await this.drainPromise;
                                 }
                             }
@@ -282,7 +283,7 @@ export class CaptureLoop {
                                 const buf = strategy.processCaptureResult!(rawResult);
                                 const writeSuccessBuf = stream.write(buf as any);
 
-                                if (!writeSuccessBuf && stream.writableLength >= 16777216) {
+                                if (!writeSuccessBuf && writableState.length >= 16777216) {
                                     await this.drainPromise;
                                 }
                             }
@@ -336,7 +337,7 @@ export class CaptureLoop {
                         writeSuccess = stream.write(buffer as any);
                     }
 
-                    if (!writeSuccess && stream.writableLength >= 16777216) {
+                    if (!writeSuccess && writableState.length >= 16777216) {
                         await this.drainPromise;
                     }
 
@@ -367,7 +368,7 @@ export class CaptureLoop {
                                 const chunk = pooled.buffer.subarray(0, written);
                                 const writeSuccessStr = stream.write(chunk, pooled.freeCb);
 
-                                if (!writeSuccessStr && stream.writableLength >= 16777216) {
+                                if (!writeSuccessStr && writableState.length >= 16777216) {
                                     await this.drainPromise;
                                 }
                             }
@@ -396,7 +397,7 @@ export class CaptureLoop {
 
                                 const writeSuccessBuf = stream.write(buf as any);
 
-                                if (!writeSuccessBuf && stream.writableLength >= 16777216) {
+                                if (!writeSuccessBuf && writableState.length >= 16777216) {
                                     await this.drainPromise;
                                 }
                             }
@@ -571,6 +572,7 @@ export class CaptureLoop {
 
     const workerPromises = this.pool.map((w, i) => runWorker(w, i));
     const stream = stdin!;
+    const writableState = (stream as any)._writableState;
 
     try {
         let isString: boolean | null = null;
@@ -614,7 +616,7 @@ export class CaptureLoop {
                 } else {
                     writeSuccess = stream.write(buffer as any);
                 }
-                if (!writeSuccess && stream.writableLength >= 16777216) {
+                if (!writeSuccess && writableState.length >= 16777216) {
                     await this.drainPromise;
                 }
 
@@ -656,7 +658,7 @@ export class CaptureLoop {
                     const chunk = pooled.buffer.subarray(0, written);
                     const writeSuccess = stream.write(chunk, pooled.freeCb);
 
-                    if (!writeSuccess && stream.writableLength >= 16777216) {
+                    if (!writeSuccess && writableState.length >= 16777216) {
                         await this.drainPromise;
                     }
 
@@ -689,7 +691,7 @@ export class CaptureLoop {
 
                     const writeSuccess = stream.write(buffer as any);
 
-                    if (!writeSuccess && stream.writableLength >= 16777216) {
+                    if (!writeSuccess && writableState.length >= 16777216) {
                         await this.drainPromise;
                     }
 
