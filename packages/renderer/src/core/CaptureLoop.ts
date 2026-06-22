@@ -175,7 +175,7 @@ export class CaptureLoop {
                     nextCapturePromise = strategy.capture(page, 0);
                 }
                 for (let i = 0; i < totalFrames; i++) {
-                    if (aborted || capturedErrors.length > 0) break;
+                    if (aborted) break;
 
                     const rawResult = await nextCapturePromise;
 
@@ -231,7 +231,7 @@ export class CaptureLoop {
                     nextCapturePromise = strategy.capture(page, 0);
                 }
                 for (let i = 0; i < totalFrames; i++) {
-                    if (aborted || capturedErrors.length > 0) break;
+                    if (aborted) break;
 
                     const buffer = await nextCapturePromise;
 
