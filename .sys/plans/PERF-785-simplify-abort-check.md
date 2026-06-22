@@ -1,11 +1,11 @@
 ---
 id: PERF-785
 slug: simplify-abort-check
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-06-16
-completed: ""
-result: ""
+completed: "2024-06-21"
+result: "improved"
 ---
 
 # PERF-785: Simplify Abort Check in CaptureLoop Fast Path
