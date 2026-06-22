@@ -1,11 +1,11 @@
 ---
 id: PERF-820
 slug: unswitch-buffer-string-check
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-06-22
-completed: ""
-result: ""
+completed: 2024-06-22
+result: improved
 ---
 
 # PERF-820: Unswitch Buffer vs String Check in Capture Loop Fast Paths
@@ -67,3 +67,9 @@ In the multi-worker path, unswitch the `while (nextFrameToWrite < totalFrames &&
 
 ## Correctness Check
 Run the `dom` mode benchmark `cd packages/renderer && npx tsx scripts/benchmark-perf.ts --mode dom` to verify that frame capturing and output generation remain completely intact without any corruption.
+
+## Results Summary
+- **Best render time**: 6.042s
+- **Improvement**: Minor but measurable execution branch flattening.
+- **Kept experiments**: Unswitched `isString` branch to dedicated string vs. buffer inner loops in both single and multi worker paths.
+- **Discarded experiments**: None.

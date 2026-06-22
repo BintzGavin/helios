@@ -1411,3 +1411,5 @@ Last updated by: PERF-809
   - **What I did**: Substituted inline per-frame closure functions (`() => freePool.push(buf)`) in the capture loop Base64 decode pool with a dedicated `PooledBuffer` class. This pairs a `Buffer` instance tightly with a statically bound `freeCb` method.
   - **Impact**: ~15% GC pressure overhead reduction in V8 hot loop for Node stream chunks.
   - **Plan ID**: PERF-818
+## What Works
+- Unswitched `isString` branch inside CaptureLoop's single worker and multi-worker fast paths. It executes logic outside the loop instead of continuously jumping. Kept plan `PERF-820`.
