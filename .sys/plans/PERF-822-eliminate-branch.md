@@ -1,11 +1,11 @@
 ---
 id: PERF-822
 slug: eliminate-branch
-status: unclaimed
-claimed_by: ""
+status: claimed
+claimed_by: "PERF-822-eliminate-branch"
 created: 2024-06-23
 completed: ""
-result: ""
+result: "improved"
 ---
 
 # PERF-822: Eliminate `i + 1 < totalFrames` Branch in CaptureLoop Hot Paths
