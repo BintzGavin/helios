@@ -45,20 +45,10 @@ export class CdpTimeDriver implements TimeDriver {
   private singleFrameSyncMediaParams: any = { expression: "window.__helios_sync_media();" };
   private multiFrameSyncMediaParams: any[] = [];
   private hasMedia: boolean = true;
+  private syncMediaFn: () => void = () => {};
   private mode: string;
 
-  private defaultSyncMedia() {
-    const len = this.executionContextIds.length;
-    if (len === 0) {
-      this.client!.send('Runtime.evaluate', this.singleFrameSyncMediaParams);
-    } else if (len === 1) {
-      this.client!.send('Runtime.evaluate', this.multiFrameSyncMediaParams[0]);
-    } else {
-      for (let i = 0; i < len; i++) {
-        this.client!.send('Runtime.evaluate', this.multiFrameSyncMediaParams[i]);
-      }
-    }
-  }
+
 
   private handleSyncMediaError = (e: any) => {
     console.warn('[CdpTimeDriver] Failed to sync media:', e);
@@ -195,6 +185,25 @@ export class CdpTimeDriver implements TimeDriver {
     }
 
 
+    const len = this.executionContextIds.length;
+    if (len === 0) {
+      this.syncMediaFn = () => {
+        this.client!.send('Runtime.evaluate', this.singleFrameSyncMediaParams);
+      };
+    } else if (len === 1) {
+      const param = this.multiFrameSyncMediaParams[0];
+      this.syncMediaFn = () => {
+        this.client!.send('Runtime.evaluate', param);
+      };
+    } else {
+      const params = this.multiFrameSyncMediaParams;
+      this.syncMediaFn = () => {
+        for (let i = 0; i < len; i++) {
+          this.client!.send('Runtime.evaluate', params[i]);
+        }
+      };
+    }
+
     this.currentTime = 0;
   }
 
@@ -207,7 +216,7 @@ export class CdpTimeDriver implements TimeDriver {
 
 // 1. Synchronize media elements
     if (this.hasMedia) {
-      this.defaultSyncMedia();
+      this.syncMediaFn();
     }
 
     // 2. Advance virtual time
