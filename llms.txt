@@ -129,12 +129,12 @@ const report = await Helios.diagnose();
 
 ## Roadmap
 ### V1.x (Active)
-- **Studio**: v0.107.1+ (Completed: Configurable Example Registry, Component Management, Preview & Update Commands, Export Job Spec, Portable Job Paths)
+- **Studio**: v0.107.1+ (Completed: CLI Build Command, CompositionsPanel Tests, Agent Skills Tests, Component Management, Preview & Update Commands)
 - **CLI**: v0.45.2+ (Completed: Cloudflare Sandbox, Tier 3 Cloud Adapters, Registry/Template/Index/Command Regression Tests)
 - **Core**: v5.13.0+ (Completed: Active Clips, Generic Input Props, Variable Playback Rate, Animation Helpers, Stability Checks)
-- **Player**: v0.76.20+ (Completed: DOM Canvas Capture, Bridge Coverage, Client-Side Image/CSS Inlining, Media Session/Property Tests)
+- **Player**: v0.76.20+ (Completed: DOM Canvas Capture, Lock UI During Export, Bridge Documentation, CSS Asset Inlining, Client-Side Image Inlining)
 - **Renderer**: v1.78.3+ (Completed: CdpTimeDriver Determinism, Smart Codec Priority, Iframe Media Sync, Smart Audio Fades, Distributed Audio Mixing)
-- **Infrastructure**: v0.25.0+ (Completed: Bounded Dependency Synchronizer, Optimize GCS/S3 Uploads, Orchestrator Coverage, Tier 3 Cloud Adapters)
+- **Infrastructure**: v0.25.0+ (Completed: Optimize GCS/S3 Uploads, Orchestrator Coverage Expansion, FfmpegStitcher Coverage, Tier 3 Cloud Adapters)
 
 ### AI Integration
 - **Studio MCP Server**: Inspect, create, and render compositions via LLM tools (Done)
