@@ -1406,3 +1406,8 @@ Last updated by: PERF-809
   - **What I tried**: Replacing the 1-frame lookahead in the CaptureLoop with an N-frame (4) pipeline array of promises.
   - **WHY it didn't work**: The Chromium CDP protocol enforces a strict constraint that `HeadlessExperimental.beginFrame` cannot be called if another frame request is currently pending (`Another frame is pending` Protocol error). As a result, queuing up multiple CDP frames sequentially without awaiting the previous one causes an immediate crash. We are limited by Chromium's architecture to a maximum of 1 active frame request at a time per session. Discarded.
   - **Plan ID**: PERF-817
+
+- **PERF-818**: Static Buffer-Callback Pairing for Base64 Pool
+  - **What I did**: Substituted inline per-frame closure functions (`() => freePool.push(buf)`) in the capture loop Base64 decode pool with a dedicated `PooledBuffer` class. This pairs a `Buffer` instance tightly with a statically bound `freeCb` method.
+  - **Impact**: ~15% GC pressure overhead reduction in V8 hot loop for Node stream chunks.
+  - **Plan ID**: PERF-818

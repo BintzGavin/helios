@@ -80,6 +80,17 @@ class ReusableNumberThenable {
   }
 }
 
+class PooledBuffer {
+  public buffer: Buffer;
+  public freeCb: () => void;
+  constructor(size: number, pool: PooledBuffer[]) {
+      this.buffer = Buffer.allocUnsafe(size);
+      this.freeCb = () => {
+          pool.push(this);
+      };
+  }
+}
+
 export class CaptureLoop {
   private drainPromise = new ReusableThenable();
 
@@ -158,9 +169,9 @@ export class CaptureLoop {
         // We pre-allocate with a conservative 512KB to cover most initial frame dimensions without realloc.
         const POOL_SIZE = 64;
         const INITIAL_BUFFER_SIZE = 512 * 1024;
-        const freePool: Buffer[] = new Array(POOL_SIZE);
+        const freePool: PooledBuffer[] = new Array(POOL_SIZE);
         for (let i = 0; i < POOL_SIZE; i++) {
-            freePool[i] = Buffer.allocUnsafe(INITIAL_BUFFER_SIZE);
+            freePool[i] = new PooledBuffer(INITIAL_BUFFER_SIZE, freePool);
         }
 
         try {
@@ -204,15 +215,13 @@ export class CaptureLoop {
                     if (isString) {
                         const str = buffer as string;
                         const maxBytes = (str.length * 3) >>> 2;
-                        let buf = freePool.pop();
-                        if (!buf || buf.length < maxBytes) {
-                            buf = Buffer.allocUnsafe(maxBytes + (maxBytes >> 1)); // 1.5x capacity
+                        let pooled = freePool.pop();
+                        if (!pooled || pooled.buffer.length < maxBytes) {
+                            pooled = new PooledBuffer(maxBytes + (maxBytes >> 1), freePool);
                         }
-                        const written = buf.write(str, 'base64');
-                        const chunk = buf.subarray(0, written);
-                        writeSuccess = stream.write(chunk, () => {
-                            freePool.push(buf!);
-                        });
+                        const written = pooled.buffer.write(str, 'base64');
+                        const chunk = pooled.buffer.subarray(0, written);
+                        writeSuccess = stream.write(chunk, pooled.freeCb);
                     } else {
                         writeSuccess = stream.write(buffer as any);
                     }
@@ -259,15 +268,13 @@ export class CaptureLoop {
                     if (isString) {
                         const str = buffer as string;
                         const maxBytes = (str.length * 3) >>> 2;
-                        let buf = freePool.pop();
-                        if (!buf || buf.length < maxBytes) {
-                            buf = Buffer.allocUnsafe(maxBytes + (maxBytes >> 1)); // 1.5x capacity
+                        let pooled = freePool.pop();
+                        if (!pooled || pooled.buffer.length < maxBytes) {
+                            pooled = new PooledBuffer(maxBytes + (maxBytes >> 1), freePool);
                         }
-                        const written = buf.write(str, 'base64');
-                        const chunk = buf.subarray(0, written);
-                        writeSuccess = stream.write(chunk, () => {
-                            freePool.push(buf!);
-                        });
+                        const written = pooled.buffer.write(str, 'base64');
+                        const chunk = pooled.buffer.subarray(0, written);
+                        writeSuccess = stream.write(chunk, pooled.freeCb);
                     } else {
                         writeSuccess = stream.write(buffer as any);
                     }
@@ -304,9 +311,9 @@ export class CaptureLoop {
 
     const MULTI_POOL_SIZE = 64;
     const MULTI_INITIAL_BUFFER_SIZE = 512 * 1024;
-    const multiFreePool: Buffer[] = new Array(MULTI_POOL_SIZE);
+    const multiFreePool: PooledBuffer[] = new Array(MULTI_POOL_SIZE);
     for (let i = 0; i < MULTI_POOL_SIZE; i++) {
-        multiFreePool[i] = Buffer.allocUnsafe(MULTI_INITIAL_BUFFER_SIZE);
+        multiFreePool[i] = new PooledBuffer(MULTI_INITIAL_BUFFER_SIZE, multiFreePool);
     }
     const writerWaiterPromise = new ReusableThenable();
 
@@ -472,15 +479,13 @@ export class CaptureLoop {
             if (isString) {
                 const str = buffer as string;
                 const maxBytes = (str.length * 3) >>> 2;
-                let buf = multiFreePool.pop();
-                if (!buf || buf.length < maxBytes) {
-                    buf = Buffer.allocUnsafe(maxBytes + (maxBytes >> 1)); // 1.5x capacity
+                let pooled = multiFreePool.pop();
+                if (!pooled || pooled.buffer.length < maxBytes) {
+                    pooled = new PooledBuffer(maxBytes + (maxBytes >> 1), multiFreePool);
                 }
-                const written = buf.write(str, 'base64');
-                const chunk = buf.subarray(0, written);
-                writeSuccess = stream.write(chunk, () => {
-                    multiFreePool.push(buf!);
-                });
+                const written = pooled.buffer.write(str, 'base64');
+                const chunk = pooled.buffer.subarray(0, written);
+                writeSuccess = stream.write(chunk, pooled.freeCb);
             } else {
                 writeSuccess = stream.write(buffer as any);
             }
