@@ -1,11 +1,11 @@
 ---
 id: PERF-817
 slug: n-frame-pipeline-lookahead
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-06-22
-completed: ""
-result: ""
+completed: "2026-06-22"
+result: "failed"
 ---
 
 # PERF-817: N-Frame Pipeline Lookahead (Deep Overlap)
@@ -103,3 +103,10 @@ Run `npm run build` and ensure the `packages/player` tests pass to verify `canva
 
 ## Correctness Check
 Run the `dom` mode benchmark script (`cd packages/renderer && npx tsx scripts/benchmark-perf.ts --mode dom`). Ensure progress reporting is still emitted sequentially and the output video correctly captures all frames without skipping or corrupting.
+
+
+## Results Summary
+- **Best render time**: N/A (crash)
+- **Improvement**: 0%
+- **Kept experiments**: []
+- **Discarded experiments**: [N-frame pipeline lookahead]

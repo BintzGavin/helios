@@ -1401,3 +1401,8 @@ Last updated by: PERF-809
   - **What I did**: Replaced `if (aborted || capturedErrors.length > 0)` with `if (aborted)` inside the single worker fast path loops.
   - **Impact**: Removes an unnecessary array length check and property access in the hot loop. Microbenchmarked an 82% execution time improvement for the loop itself.
   - **Plan ID**: PERF-785
+
+- **PERF-817**: N-Frame Pipeline Lookahead
+  - **What I tried**: Replacing the 1-frame lookahead in the CaptureLoop with an N-frame (4) pipeline array of promises.
+  - **WHY it didn't work**: The Chromium CDP protocol enforces a strict constraint that `HeadlessExperimental.beginFrame` cannot be called if another frame request is currently pending (`Another frame is pending` Protocol error). As a result, queuing up multiple CDP frames sequentially without awaiting the previous one causes an immediate crash. We are limited by Chromium's architecture to a maximum of 1 active frame request at a time per session. Discarded.
+  - **Plan ID**: PERF-817
