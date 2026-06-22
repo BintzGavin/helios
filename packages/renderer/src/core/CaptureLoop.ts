@@ -231,15 +231,34 @@ export class CaptureLoop {
                             if (aborted) break;
                             const endFrame = Math.min(currentFrame + progressInterval, totalFrames);
 
-                            for (let i = currentFrame; i < endFrame; i++) {
+                            const prefetchEnd = endFrame === totalFrames ? endFrame - 1 : endFrame;
+                            for (let i = currentFrame; i < prefetchEnd; i++) {
                                 if (aborted) break;
                                 const rawResult = await nextCapturePromise;
 
-                                if (i + 1 < totalFrames) {
-                                    const timePromise = timeDriver.setTime(page, (startFrame + i + 1) * compTimeStep);
-                                    if (timePromise) await timePromise;
-                                    nextCapturePromise = strategy.capture(page, (i + 1) * timeStep);
+                                const timePromise = timeDriver.setTime(page, (startFrame + i + 1) * compTimeStep);
+                                if (timePromise) await timePromise;
+                                nextCapturePromise = strategy.capture(page, (i + 1) * timeStep);
+
+                                const buf = strategy.processCaptureResult!(rawResult) as string;
+
+                                const maxBytes = (buf.length * 3) >>> 2;
+                                let pooled = freePool.pop();
+                                if (!pooled || pooled.buffer.length < maxBytes) {
+                                    pooled = new PooledBuffer(maxBytes + (maxBytes >> 1), freePool);
                                 }
+                                const written = pooled.buffer.write(buf, 'base64');
+                                const chunk = pooled.buffer.subarray(0, written);
+                                pendingBytes += written;
+                                const writeSuccessStr = stream.write(chunk, pooled.freeCb);
+
+                                if (!writeSuccessStr && pendingBytes >= 16777216) {
+                                    await this.drainPromise;
+                                    pendingBytes = 0;
+                                }
+                            }
+                            if (endFrame === totalFrames && !aborted) {
+                                const rawResult = await nextCapturePromise;
 
                                 const buf = strategy.processCaptureResult!(rawResult) as string;
 
@@ -275,15 +294,26 @@ export class CaptureLoop {
                             if (aborted) break;
                             const endFrame = Math.min(currentFrame + progressInterval, totalFrames);
 
-                            for (let i = currentFrame; i < endFrame; i++) {
+                            const prefetchEnd = endFrame === totalFrames ? endFrame - 1 : endFrame;
+                            for (let i = currentFrame; i < prefetchEnd; i++) {
                                 if (aborted) break;
                                 const rawResult = await nextCapturePromise;
 
-                                if (i + 1 < totalFrames) {
-                                    const timePromise = timeDriver.setTime(page, (startFrame + i + 1) * compTimeStep);
-                                    if (timePromise) await timePromise;
-                                    nextCapturePromise = strategy.capture(page, (i + 1) * timeStep);
+                                const timePromise = timeDriver.setTime(page, (startFrame + i + 1) * compTimeStep);
+                                if (timePromise) await timePromise;
+                                nextCapturePromise = strategy.capture(page, (i + 1) * timeStep);
+
+                                const buf = strategy.processCaptureResult!(rawResult);
+                                pendingBytes += (buf as any).length;
+                                const writeSuccessBuf = stream.write(buf as any);
+
+                                if (!writeSuccessBuf && pendingBytes >= 16777216) {
+                                    await this.drainPromise;
+                                    pendingBytes = 0;
                                 }
+                            }
+                            if (endFrame === totalFrames && !aborted) {
+                                const rawResult = await nextCapturePromise;
 
                                 const buf = strategy.processCaptureResult!(rawResult);
                                 pendingBytes += (buf as any).length;
@@ -357,15 +387,34 @@ export class CaptureLoop {
                             if (aborted) break;
                             const endFrame = Math.min(currentFrame + progressInterval, totalFrames);
 
-                            for (let i = currentFrame; i < endFrame; i++) {
+                            const prefetchEnd = endFrame === totalFrames ? endFrame - 1 : endFrame;
+                            for (let i = currentFrame; i < prefetchEnd; i++) {
                                 if (aborted) break;
                                 const rawResult = await nextCapturePromise;
 
-                                if (i + 1 < totalFrames) {
-                                    const timePromise = timeDriver.setTime(page, (startFrame + i + 1) * compTimeStep);
-                                    if (timePromise) await timePromise;
-                                    nextCapturePromise = strategy.capture(page, (i + 1) * timeStep);
+                                const timePromise = timeDriver.setTime(page, (startFrame + i + 1) * compTimeStep);
+                                if (timePromise) await timePromise;
+                                nextCapturePromise = strategy.capture(page, (i + 1) * timeStep);
+
+                                const buf = rawResult as unknown as string;
+
+                                const maxBytes = (buf.length * 3) >>> 2;
+                                let pooled = freePool.pop();
+                                if (!pooled || pooled.buffer.length < maxBytes) {
+                                    pooled = new PooledBuffer(maxBytes + (maxBytes >> 1), freePool);
                                 }
+                                const written = pooled.buffer.write(buf, 'base64');
+                                const chunk = pooled.buffer.subarray(0, written);
+                                pendingBytes += written;
+                                const writeSuccessStr = stream.write(chunk, pooled.freeCb);
+
+                                if (!writeSuccessStr && pendingBytes >= 16777216) {
+                                    await this.drainPromise;
+                                    pendingBytes = 0;
+                                }
+                            }
+                            if (endFrame === totalFrames && !aborted) {
+                                const rawResult = await nextCapturePromise;
 
                                 const buf = rawResult as unknown as string;
 
@@ -397,15 +446,25 @@ export class CaptureLoop {
                             if (aborted) break;
                             const endFrame = Math.min(currentFrame + progressInterval, totalFrames);
 
-                            for (let i = currentFrame; i < endFrame; i++) {
+                            const prefetchEnd = endFrame === totalFrames ? endFrame - 1 : endFrame;
+                            for (let i = currentFrame; i < prefetchEnd; i++) {
                                 if (aborted) break;
                                 const buf = await nextCapturePromise;
 
-                                if (i + 1 < totalFrames) {
-                                    const timePromise = timeDriver.setTime(page, (startFrame + i + 1) * compTimeStep);
-                                    if (timePromise) await timePromise;
-                                    nextCapturePromise = strategy.capture(page, (i + 1) * timeStep);
+                                const timePromise = timeDriver.setTime(page, (startFrame + i + 1) * compTimeStep);
+                                if (timePromise) await timePromise;
+                                nextCapturePromise = strategy.capture(page, (i + 1) * timeStep);
+
+                                pendingBytes += (buf as any).length;
+                                const writeSuccessBuf = stream.write(buf as any);
+
+                                if (!writeSuccessBuf && pendingBytes >= 16777216) {
+                                    await this.drainPromise;
+                                    pendingBytes = 0;
                                 }
+                            }
+                            if (endFrame === totalFrames && !aborted) {
+                                const buf = await nextCapturePromise;
 
                                 pendingBytes += (buf as any).length;
                                 const writeSuccessBuf = stream.write(buf as any);

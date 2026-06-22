@@ -254,3 +254,4 @@ run	28.646	600	20.95	60.0	discard	PERF-739 Eager CDP Session Initialization in D
 2	1.895	300	158.31	490.1	keep	Chunked progress checks
 3	1.912	300	156.90	490.1	keep	Chunked progress checks
 1	32.679	10000000	0.00	0.0	keep	PERF-804 bypass writable getter (baseline: 38.423ms)
+PERF-822	Eliminate `i + 1 < totalFrames` branch	7.38	8.26	11.0%	Microbenchmark	Branch hoisted out of hot loop	2.573

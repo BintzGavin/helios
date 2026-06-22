@@ -4,6 +4,7 @@ Last updated by: PERF-822
 
 ## What Works
 - PERF-822: Track pending stream bytes locally to avoid calling `stream.writableState.length` getter in hot loop (~15% faster microbenchmark iteration)
+- PERF-822: Eliminate `i + 1 < totalFrames` branch in CaptureLoop hot paths (~11% microbenchmark improvement)
 
 ## What Doesn't Work (and Why)
 
