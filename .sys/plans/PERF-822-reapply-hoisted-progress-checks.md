@@ -1,5 +1,5 @@
 ---
-id: PERF-821
+id: PERF-822
 slug: reapply-hoisted-progress-checks
 status: unclaimed
 claimed_by: ""
@@ -8,14 +8,14 @@ completed: ""
 result: ""
 ---
 
-# PERF-821: Reapply Hoisted Progress Checks to Unswitched Loops
+# PERF-822: Reapply Hoisted Progress Checks to Unswitched Loops
 
 ## Focus Area
-`CaptureLoop.ts` single-worker fast path.
+`CaptureLoop.ts` single-worker and multi-worker fast paths.
 
 ## Background Research
-PERF-794 successfully optimized the hot loops by evaluating progress checks in chunked bounds instead of conditionally evaluating `if (i === nextProgressFrame)` on every frame inside the inner loop.
-However, PERF-820 subsequently refactored the fast path by unswitching the `isString` condition to separate the loops entirely. In doing so, it reverted the inner loops to evaluating `if (i === nextProgressFrame)` on every frame.
+PERF-794 successfully optimized the hot loops by evaluating progress checks in chunked bounds (`while (currentFrame < totalFrames) ... for (let i = currentFrame; i < endFrame; i++)`) instead of conditionally evaluating `if (i === nextProgressFrame)` on every frame inside the inner loop.
+However, PERF-820 subsequently refactored the fast path by unswitching the `if (isString)` condition to separate the loops entirely. In doing so, it reverted the inner loops to evaluating `if (i === nextProgressFrame)` on every frame.
 By merging these two optimizations—re-applying the chunked loop structure from PERF-794 into the newly unswitched loops from PERF-820—we should be able to eliminate the branch prediction overhead of the progress checks while keeping the monomorphic String vs Buffer loops intact.
 
 ## Benchmark Configuration
@@ -48,7 +48,9 @@ if (isString) {
 
             if (i + 1 < totalFrames) {
                 const timePromise = timeDriver.setTime(page, (startFrame + i + 1) * compTimeStep);
-                if (timePromise) await timePromise;
+                if (timePromise) {
+                    await timePromise;
+                }
                 nextCapturePromise = strategy.capture(page, (i + 1) * timeStep);
             }
 
@@ -69,13 +71,17 @@ if (isString) {
         }
 
         currentFrame = endFrame;
-        console.log(`Progress: Rendered ${currentFrame - 1} / ${totalFrames} frames`);
-        if (onProgress) {
-            onProgress((currentFrame - 1) / totalFrames);
+        if (currentFrame <= totalFrames) {
+            console.log(`Progress: Rendered ${currentFrame - 1} / ${totalFrames} frames`);
+            if (onProgress) {
+                onProgress((currentFrame - 1) / totalFrames);
+            }
         }
     }
 }
 ```
+**Why**: Avoid checking `if (i === nextProgressFrame)` on every frame iteration.
+**Risk**: Progress callbacks might be slightly grouped instead of exact frame match, but it shouldn't matter since interval logging is an approximation already.
 
 ### Step 2: Chunked Loop in Single Worker `hasProcessFn` Buffer Path
 **File**: `packages/renderer/src/core/CaptureLoop.ts`
@@ -86,6 +92,11 @@ Apply the same chunking structure to the `else` (Buffer) branch of the `hasProce
 **File**: `packages/renderer/src/core/CaptureLoop.ts`
 **What to change**:
 Apply the chunking structure to both the `isString` and Buffer paths in the `!hasProcessFn` block.
+
+### Step 4: Chunked Loops in Multi-Worker Loop
+**File**: `packages/renderer/src/core/CaptureLoop.ts`
+**What to change**:
+In the multi-worker path, where the loop reads `while (nextFrameToWrite < totalFrames && !aborted)`, wrap the inner execution in a loop that stops at `endFrame = Math.min(nextFrameToWrite + progressInterval, totalFrames)`. Only evaluate the progress condition when `nextFrameToWrite` reaches `endFrame`.
 
 ## Variations
 None.
