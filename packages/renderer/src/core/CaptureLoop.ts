@@ -139,7 +139,7 @@ export class CaptureLoop {
     const stdin = this.ffmpegManager.stdin;
 
     const progressInterval = Math.floor(totalFrames / 10);
-    let nextProgressFrame = progressInterval;
+
 
 
     const timeStep = 1000 / fps;
@@ -196,12 +196,9 @@ export class CaptureLoop {
                         nextCapturePromise = strategy.capture(page, timeStep);
                     }
                     const buffer = strategy.processCaptureResult!(rawResult);
-                    if (0 === nextProgressFrame) {
-                        console.log(`Progress: Rendered ${0} / ${totalFrames} frames`);
-                        nextProgressFrame += progressInterval;
-                        if (onProgress) {
-                            onProgress(0 / totalFrames);
-                        }
+                    console.log(`Progress: Rendered ${0} / ${totalFrames} frames`);
+                    if (onProgress) {
+                        onProgress(0 / totalFrames);
                     }
                     isString = typeof buffer === 'string';
 
@@ -225,72 +222,75 @@ export class CaptureLoop {
                     }
 
                     if (isString) {
-                        for (let i = 1; i < totalFrames; i++) {
+                        let currentFrame = 1;
+                        while (currentFrame < totalFrames) {
                             if (aborted) break;
+                            const endFrame = Math.min(currentFrame + progressInterval, totalFrames);
 
-                            const rawResult = await nextCapturePromise;
+                            for (let i = currentFrame; i < endFrame; i++) {
+                                if (aborted) break;
+                                const rawResult = await nextCapturePromise;
 
-                            if (i + 1 < totalFrames) {
-                                const timePromise = timeDriver.setTime(page, (startFrame + i + 1) * compTimeStep);
-                                if (timePromise) {
-                                    await timePromise;
+                                if (i + 1 < totalFrames) {
+                                    const timePromise = timeDriver.setTime(page, (startFrame + i + 1) * compTimeStep);
+                                    if (timePromise) await timePromise;
+                                    nextCapturePromise = strategy.capture(page, (i + 1) * timeStep);
                                 }
-                                nextCapturePromise = strategy.capture(page, (i + 1) * timeStep);
-                            }
 
-                            const buf = strategy.processCaptureResult!(rawResult) as string;
+                                const buf = strategy.processCaptureResult!(rawResult) as string;
 
-                            if (i === nextProgressFrame) {
-                                console.log(`Progress: Rendered ${i} / ${totalFrames} frames`);
-                                nextProgressFrame += progressInterval;
+                                const maxBytes = (buf.length * 3) >>> 2;
+                                let pooled = freePool.pop();
+                                if (!pooled || pooled.buffer.length < maxBytes) {
+                                    pooled = new PooledBuffer(maxBytes + (maxBytes >> 1), freePool);
+                                }
+                                const written = pooled.buffer.write(buf, 'base64');
+                                const chunk = pooled.buffer.subarray(0, written);
+                                const writeSuccessStr = stream.write(chunk, pooled.freeCb);
 
-                                if (onProgress) {
-                                    onProgress(i / totalFrames);
+                                if (!writeSuccessStr && stream.writableLength >= 16777216) {
+                                    await this.drainPromise;
                                 }
                             }
 
-                            const maxBytes = (buf.length * 3) >>> 2;
-                            let pooled = freePool.pop();
-                            if (!pooled || pooled.buffer.length < maxBytes) {
-                                pooled = new PooledBuffer(maxBytes + (maxBytes >> 1), freePool);
-                            }
-                            const written = pooled.buffer.write(buf, 'base64');
-                            const chunk = pooled.buffer.subarray(0, written);
-                            const writeSuccessStr = stream.write(chunk, pooled.freeCb);
-
-                            if (!writeSuccessStr && stream.writableLength >= 16777216) {
-                                await this.drainPromise;
+                            if (aborted) break;
+                            if (aborted) break;
+                            if (aborted) break;
+                            if (aborted) break;
+                            currentFrame = endFrame;
+                            console.log(`Progress: Rendered ${currentFrame - 1} / ${totalFrames} frames`);
+                            if (onProgress) {
+                                onProgress((currentFrame - 1) / totalFrames);
                             }
                         }
                     } else {
-                        for (let i = 1; i < totalFrames; i++) {
+                        let currentFrame = 1;
+                        while (currentFrame < totalFrames) {
                             if (aborted) break;
+                            const endFrame = Math.min(currentFrame + progressInterval, totalFrames);
 
-                            const rawResult = await nextCapturePromise;
+                            for (let i = currentFrame; i < endFrame; i++) {
+                                if (aborted) break;
+                                const rawResult = await nextCapturePromise;
 
-                            if (i + 1 < totalFrames) {
-                                const timePromise = timeDriver.setTime(page, (startFrame + i + 1) * compTimeStep);
-                                if (timePromise) {
-                                    await timePromise;
+                                if (i + 1 < totalFrames) {
+                                    const timePromise = timeDriver.setTime(page, (startFrame + i + 1) * compTimeStep);
+                                    if (timePromise) await timePromise;
+                                    nextCapturePromise = strategy.capture(page, (i + 1) * timeStep);
                                 }
-                                nextCapturePromise = strategy.capture(page, (i + 1) * timeStep);
-                            }
 
-                            const buf = strategy.processCaptureResult!(rawResult);
+                                const buf = strategy.processCaptureResult!(rawResult);
+                                const writeSuccessBuf = stream.write(buf as any);
 
-                            if (i === nextProgressFrame) {
-                                console.log(`Progress: Rendered ${i} / ${totalFrames} frames`);
-                                nextProgressFrame += progressInterval;
-
-                                if (onProgress) {
-                                    onProgress(i / totalFrames);
+                                if (!writeSuccessBuf && stream.writableLength >= 16777216) {
+                                    await this.drainPromise;
                                 }
                             }
 
-                            const writeSuccessBuf = stream.write(buf as any);
-
-                            if (!writeSuccessBuf && stream.writableLength >= 16777216) {
-                                await this.drainPromise;
+                            currentFrame = endFrame;
+                            console.log(`Progress: Rendered ${currentFrame - 1} / ${totalFrames} frames`);
+                            if (onProgress) {
+                                onProgress((currentFrame - 1) / totalFrames);
                             }
                         }
                     }
@@ -314,12 +314,9 @@ export class CaptureLoop {
                         }
                         nextCapturePromise = strategy.capture(page, timeStep);
                     }
-                    if (0 === nextProgressFrame) {
-                        console.log(`Progress: Rendered ${0} / ${totalFrames} frames`);
-                        nextProgressFrame += progressInterval;
-                        if (onProgress) {
-                            onProgress(0 / totalFrames);
-                        }
+                    console.log(`Progress: Rendered ${0} / ${totalFrames} frames`);
+                    if (onProgress) {
+                        onProgress(0 / totalFrames);
                     }
                     const buffer = bufRaw;
                     isString = typeof buffer === 'string';
@@ -344,70 +341,70 @@ export class CaptureLoop {
                     }
 
                     if (isString) {
-                        for (let i = 1; i < totalFrames; i++) {
+                        let currentFrame = 1;
+                        while (currentFrame < totalFrames) {
                             if (aborted) break;
+                            const endFrame = Math.min(currentFrame + progressInterval, totalFrames);
 
-                            const rawResult = await nextCapturePromise;
+                            for (let i = currentFrame; i < endFrame; i++) {
+                                if (aborted) break;
+                                const rawResult = await nextCapturePromise;
 
-                            if (i + 1 < totalFrames) {
-                                const timePromise = timeDriver.setTime(page, (startFrame + i + 1) * compTimeStep);
-                                if (timePromise) {
-                                    await timePromise;
+                                if (i + 1 < totalFrames) {
+                                    const timePromise = timeDriver.setTime(page, (startFrame + i + 1) * compTimeStep);
+                                    if (timePromise) await timePromise;
+                                    nextCapturePromise = strategy.capture(page, (i + 1) * timeStep);
                                 }
-                                nextCapturePromise = strategy.capture(page, (i + 1) * timeStep);
-                            }
 
-                            const buf = rawResult as unknown as string;
+                                const buf = rawResult as unknown as string;
 
-                            if (i === nextProgressFrame) {
-                                console.log(`Progress: Rendered ${i} / ${totalFrames} frames`);
-                                nextProgressFrame += progressInterval;
+                                const maxBytes = (buf.length * 3) >>> 2;
+                                let pooled = freePool.pop();
+                                if (!pooled || pooled.buffer.length < maxBytes) {
+                                    pooled = new PooledBuffer(maxBytes + (maxBytes >> 1), freePool);
+                                }
+                                const written = pooled.buffer.write(buf, 'base64');
+                                const chunk = pooled.buffer.subarray(0, written);
+                                const writeSuccessStr = stream.write(chunk, pooled.freeCb);
 
-                                if (onProgress) {
-                                    onProgress(i / totalFrames);
+                                if (!writeSuccessStr && stream.writableLength >= 16777216) {
+                                    await this.drainPromise;
                                 }
                             }
 
-                            const maxBytes = (buf.length * 3) >>> 2;
-                            let pooled = freePool.pop();
-                            if (!pooled || pooled.buffer.length < maxBytes) {
-                                pooled = new PooledBuffer(maxBytes + (maxBytes >> 1), freePool);
-                            }
-                            const written = pooled.buffer.write(buf, 'base64');
-                            const chunk = pooled.buffer.subarray(0, written);
-                            const writeSuccessStr = stream.write(chunk, pooled.freeCb);
-
-                            if (!writeSuccessStr && stream.writableLength >= 16777216) {
-                                await this.drainPromise;
+                            currentFrame = endFrame;
+                            console.log(`Progress: Rendered ${currentFrame - 1} / ${totalFrames} frames`);
+                            if (onProgress) {
+                                onProgress((currentFrame - 1) / totalFrames);
                             }
                         }
                     } else {
-                        for (let i = 1; i < totalFrames; i++) {
+                        let currentFrame = 1;
+                        while (currentFrame < totalFrames) {
                             if (aborted) break;
+                            const endFrame = Math.min(currentFrame + progressInterval, totalFrames);
 
-                            const buf = await nextCapturePromise;
+                            for (let i = currentFrame; i < endFrame; i++) {
+                                if (aborted) break;
+                                const buf = await nextCapturePromise;
 
-                            if (i + 1 < totalFrames) {
-                                const timePromise = timeDriver.setTime(page, (startFrame + i + 1) * compTimeStep);
-                                if (timePromise) {
-                                    await timePromise;
+                                if (i + 1 < totalFrames) {
+                                    const timePromise = timeDriver.setTime(page, (startFrame + i + 1) * compTimeStep);
+                                    if (timePromise) await timePromise;
+                                    nextCapturePromise = strategy.capture(page, (i + 1) * timeStep);
                                 }
-                                nextCapturePromise = strategy.capture(page, (i + 1) * timeStep);
+
+                                const writeSuccessBuf = stream.write(buf as any);
+
+                                if (!writeSuccessBuf && stream.writableLength >= 16777216) {
+                                    await this.drainPromise;
+                                }
                             }
 
-                            if (i === nextProgressFrame) {
-                                console.log(`Progress: Rendered ${i} / ${totalFrames} frames`);
-                                nextProgressFrame += progressInterval;
-
-                                if (onProgress) {
-                                    onProgress(i / totalFrames);
-                                }
-                            }
-
-                            const writeSuccessBuf = stream.write(buf as any);
-
-                            if (!writeSuccessBuf && stream.writableLength >= 16777216) {
-                                await this.drainPromise;
+                            currentFrame = endFrame;
+                            console.log(`Progress: Rendered ${currentFrame - 1} / ${totalFrames} frames`);
+                            if (onProgress) {
+                                onProgress((currentFrame - 1) / totalFrames);
                             }
                         }
                     }
@@ -594,10 +591,8 @@ export class CaptureLoop {
 
                 const currentFrame = nextFrameToWrite;
 
-                if (currentFrame === nextProgressFrame) {
+                if (currentFrame % progressInterval === 0) {
                     console.log(`Progress: Rendered ${currentFrame} / ${totalFrames} frames`);
-                    nextProgressFrame += progressInterval;
-
                     if (onProgress) {
                         onProgress(currentFrame / totalFrames);
                     }
@@ -644,9 +639,8 @@ export class CaptureLoop {
 
                     const currentFrame = nextFrameToWrite;
 
-                    if (currentFrame === nextProgressFrame) {
+                    if (currentFrame % progressInterval === 0) {
                         console.log(`Progress: Rendered ${currentFrame} / ${totalFrames} frames`);
-                        nextProgressFrame += progressInterval;
 
                         if (onProgress) {
                             onProgress(currentFrame / totalFrames);
@@ -685,9 +679,8 @@ export class CaptureLoop {
 
                     const currentFrame = nextFrameToWrite;
 
-                    if (currentFrame === nextProgressFrame) {
+                    if (currentFrame % progressInterval === 0) {
                         console.log(`Progress: Rendered ${currentFrame} / ${totalFrames} frames`);
-                        nextProgressFrame += progressInterval;
 
                         if (onProgress) {
                             onProgress(currentFrame / totalFrames);

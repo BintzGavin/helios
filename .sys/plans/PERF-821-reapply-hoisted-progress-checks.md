@@ -1,11 +1,11 @@
 ---
 id: PERF-821
 slug: reapply-hoisted-progress-checks
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-06-22
-completed: ""
-result: ""
+completed: "2024-06-22"
+result: "keep"
 ---
 
 # PERF-821: Reapply Hoisted Progress Checks to Unswitched Loops

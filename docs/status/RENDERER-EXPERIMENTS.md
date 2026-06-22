@@ -1413,3 +1413,6 @@ Last updated by: PERF-809
   - **Plan ID**: PERF-818
 ## What Works
 - Unswitched `isString` branch inside CaptureLoop's single worker and multi-worker fast paths. It executes logic outside the loop instead of continuously jumping. Kept plan `PERF-820`.
+
+## What Works
+- PERF-821: Reapplied hoisted progress checks from PERF-794 to the newly unswitched loops from PERF-820 in `CaptureLoop.ts`. This eliminated branch prediction overhead within the monomorphic loops, restoring a ~4% execution time improvement in the single-worker path.
