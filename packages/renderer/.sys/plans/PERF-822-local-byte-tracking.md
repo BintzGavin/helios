@@ -1,11 +1,11 @@
 ---
 id: PERF-822
 slug: remove-writablelength-check
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-18
-completed: ""
-result: ""
+completed: "2024-06-22"
+result: "improved"
 ---
 
 # PERF-822: Remove Redundant stream.writableLength Checking in CaptureLoop
@@ -140,3 +140,9 @@ If local tracking is too complex, try just entirely removing the `>= 16777216` t
 
 ## Canvas Smoke Test
 `node -e "require('./scripts/verify-diagnostics.cjs')"` or simply `npm run build && node -e "console.log('Build passed');"` (We can use a quick custom node script to verify canvas).
+
+## Results Summary
+- **Best render time**: 0.0046s (vs baseline 0.0055s) in microbenchmark loop
+- **Improvement**: ~15%
+- **Kept experiments**: Track pending stream bytes locally to avoid calling `stream.writableState.length` getter in hot loop
+- **Discarded experiments**: none

@@ -156,7 +156,7 @@ export class CaptureLoop {
         const onProgress = this.jobOptions?.onProgress;
         const hasProcessFn = !!strategy.processCaptureResult;
         const stream = stdin!;
-        const writableState = (stream as any)._writableState;
+        let pendingBytes = 0;
 
         let aborted = false;
         let abortListener: (() => void) | null = null;
@@ -213,13 +213,16 @@ export class CaptureLoop {
                         }
                         const written = pooled.buffer.write(str, 'base64');
                         const chunk = pooled.buffer.subarray(0, written);
+                        pendingBytes += written;
                         writeSuccess = stream.write(chunk, pooled.freeCb);
                     } else {
+                        pendingBytes += (buffer as any).length;
                         writeSuccess = stream.write(buffer as any);
                     }
 
-                    if (!writeSuccess && writableState.length >= 16777216) {
+                    if (!writeSuccess && pendingBytes >= 16777216) {
                         await this.drainPromise;
+                        pendingBytes = 0;
                     }
 
                     if (isString) {
@@ -247,10 +250,12 @@ export class CaptureLoop {
                                 }
                                 const written = pooled.buffer.write(buf, 'base64');
                                 const chunk = pooled.buffer.subarray(0, written);
+                                pendingBytes += written;
                                 const writeSuccessStr = stream.write(chunk, pooled.freeCb);
 
-                                if (!writeSuccessStr && writableState.length >= 16777216) {
+                                if (!writeSuccessStr && pendingBytes >= 16777216) {
                                     await this.drainPromise;
+                                    pendingBytes = 0;
                                 }
                             }
 
@@ -281,10 +286,12 @@ export class CaptureLoop {
                                 }
 
                                 const buf = strategy.processCaptureResult!(rawResult);
+                                pendingBytes += (buf as any).length;
                                 const writeSuccessBuf = stream.write(buf as any);
 
-                                if (!writeSuccessBuf && writableState.length >= 16777216) {
+                                if (!writeSuccessBuf && pendingBytes >= 16777216) {
                                     await this.drainPromise;
+                                    pendingBytes = 0;
                                 }
                             }
 
@@ -332,13 +339,16 @@ export class CaptureLoop {
                         }
                         const written = pooled.buffer.write(str, 'base64');
                         const chunk = pooled.buffer.subarray(0, written);
+                        pendingBytes += written;
                         writeSuccess = stream.write(chunk, pooled.freeCb);
                     } else {
+                        pendingBytes += (buffer as any).length;
                         writeSuccess = stream.write(buffer as any);
                     }
 
-                    if (!writeSuccess && writableState.length >= 16777216) {
+                    if (!writeSuccess && pendingBytes >= 16777216) {
                         await this.drainPromise;
+                        pendingBytes = 0;
                     }
 
                     if (isString) {
@@ -366,10 +376,12 @@ export class CaptureLoop {
                                 }
                                 const written = pooled.buffer.write(buf, 'base64');
                                 const chunk = pooled.buffer.subarray(0, written);
+                                pendingBytes += written;
                                 const writeSuccessStr = stream.write(chunk, pooled.freeCb);
 
-                                if (!writeSuccessStr && writableState.length >= 16777216) {
+                                if (!writeSuccessStr && pendingBytes >= 16777216) {
                                     await this.drainPromise;
+                                    pendingBytes = 0;
                                 }
                             }
 
@@ -395,10 +407,12 @@ export class CaptureLoop {
                                     nextCapturePromise = strategy.capture(page, (i + 1) * timeStep);
                                 }
 
+                                pendingBytes += (buf as any).length;
                                 const writeSuccessBuf = stream.write(buf as any);
 
-                                if (!writeSuccessBuf && writableState.length >= 16777216) {
+                                if (!writeSuccessBuf && pendingBytes >= 16777216) {
                                     await this.drainPromise;
+                                    pendingBytes = 0;
                                 }
                             }
 
@@ -572,7 +586,7 @@ export class CaptureLoop {
 
     const workerPromises = this.pool.map((w, i) => runWorker(w, i));
     const stream = stdin!;
-    const writableState = (stream as any)._writableState;
+    let pendingBytes = 0;
 
     try {
         let isString: boolean | null = null;
@@ -612,12 +626,15 @@ export class CaptureLoop {
                     }
                     const written = pooled.buffer.write(str, 'base64');
                     const chunk = pooled.buffer.subarray(0, written);
+                    pendingBytes += written;
                     writeSuccess = stream.write(chunk, pooled.freeCb);
                 } else {
+                    pendingBytes += (buffer as any).length;
                     writeSuccess = stream.write(buffer as any);
                 }
-                if (!writeSuccess && writableState.length >= 16777216) {
+                if (!writeSuccess && pendingBytes >= 16777216) {
                     await this.drainPromise;
+                    pendingBytes = 0;
                 }
 
                 nextFrameToWrite++;
@@ -656,10 +673,12 @@ export class CaptureLoop {
                     }
                     const written = pooled.buffer.write(buffer, 'base64');
                     const chunk = pooled.buffer.subarray(0, written);
+                    pendingBytes += written;
                     const writeSuccess = stream.write(chunk, pooled.freeCb);
 
-                    if (!writeSuccess && writableState.length >= 16777216) {
+                    if (!writeSuccess && pendingBytes >= 16777216) {
                         await this.drainPromise;
+                        pendingBytes = 0;
                     }
 
                     nextFrameToWrite++;
@@ -689,10 +708,12 @@ export class CaptureLoop {
                         }
                     }
 
+                    pendingBytes += (buffer as any).length;
                     const writeSuccess = stream.write(buffer as any);
 
-                    if (!writeSuccess && writableState.length >= 16777216) {
+                    if (!writeSuccess && pendingBytes >= 16777216) {
                         await this.drainPromise;
+                        pendingBytes = 0;
                     }
 
                     nextFrameToWrite++;
