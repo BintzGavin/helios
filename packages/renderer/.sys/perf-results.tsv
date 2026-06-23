@@ -257,3 +257,4 @@ run	28.646	600	20.95	60.0	discard	PERF-739 Eager CDP Session Initialization in D
 PERF-822	Eliminate `i + 1 < totalFrames` branch	7.38	8.26	11.0%	Microbenchmark	Branch hoisted out of hot loop	2.573
 PERF-823	339.266297	30000000	0	0	keep	baseline
 PERF-823	77.596143	30000000	0	0	keep	opt
+PERF-825	159.577	1000000	0	0	keep	opt

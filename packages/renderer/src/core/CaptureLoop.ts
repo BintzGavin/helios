@@ -568,6 +568,10 @@ export class CaptureLoop {
         const { timeDriver, strategy, page } = worker;
         const hasProcessFn = !!strategy.processCaptureResult;
 
+        const isDomStrategy = !!(strategy as any).beginFrameParams;
+        const domCdpSession = isDomStrategy ? (strategy as any).cdpSession : null;
+        const domBeginFrameParams = isDomStrategy ? (strategy as any).beginFrameParams : null;
+
         if (hasProcessFn) {
             while (!aborted) {
                 let i: number;
@@ -594,7 +598,17 @@ export class CaptureLoop {
                     if (timePromise) {
                         await timePromise;
                     }
-                    const buffer = strategy.processCaptureResult!(await strategy.capture(page, i * timeStep));
+                    let buffer: any;
+                    if (isDomStrategy) {
+                        const rawResult = await domCdpSession!.send('HeadlessExperimental.beginFrame', domBeginFrameParams);
+                        const data = rawResult.screenshotData;
+                        if (data) {
+                            (strategy as any).lastFrameData = data;
+                        }
+                        buffer = (strategy as any).lastFrameData;
+                    } else {
+                        buffer = strategy.processCaptureResult!(await strategy.capture(page, i * timeStep));
+                    }
                     frameBufferRing[ringIndex] = buffer;
                     frameReadyRing[ringIndex] = 1;
                 } catch (e) {
@@ -630,7 +644,12 @@ export class CaptureLoop {
                     if (timePromise) {
                         await timePromise;
                     }
-                    const buffer = await strategy.capture(page, i * timeStep);
+                    let buffer: any;
+                    if (isDomStrategy) {
+                        buffer = await domCdpSession!.send('HeadlessExperimental.beginFrame', domBeginFrameParams);
+                    } else {
+                        buffer = await strategy.capture(page, i * timeStep);
+                    }
                     frameBufferRing[ringIndex] = buffer;
                     frameReadyRing[ringIndex] = 1;
                 } catch (e) {
