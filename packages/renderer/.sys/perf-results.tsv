@@ -258,3 +258,4 @@ PERF-822	Eliminate `i + 1 < totalFrames` branch	7.38	8.26	11.0%	Microbenchmark	B
 PERF-823	339.266297	30000000	0	0	keep	baseline
 PERF-823	77.596143	30000000	0	0	keep	opt
 PERF-825	159.577	1000000	0	0	keep	opt
+PERF-824	873.3	Single-worker DomStrategy inlining (no-op here since benchmark is multi)	1.831s	2026-06-23
