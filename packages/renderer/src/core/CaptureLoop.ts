@@ -467,12 +467,6 @@ export class CaptureLoop {
                                 const rawResult = await nextCapturePromise;
 
                                 const timePromise = timeDriver.setTime(page, (startFrame + i + 1) * compTimeStep);
-                                if (timePromise) await timePromise;
-                                if (isDomStrategy) {
-                                    nextCapturePromise = domBeginFrame!();
-                                } else {
-                                    nextCapturePromise = strategy.capture(page, (i + 1) * timeStep);
-                                }
 
                                 const buf = rawResult as unknown as string;
 
@@ -483,6 +477,15 @@ export class CaptureLoop {
                                 }
                                 const written = pooled.buffer.write(buf, 'base64');
                                 const chunk = pooled.buffer.subarray(0, written);
+
+                                if (timePromise) await timePromise;
+
+                                if (isDomStrategy) {
+                                    nextCapturePromise = domBeginFrame!();
+                                } else {
+                                    nextCapturePromise = strategy.capture(page, (i + 1) * timeStep);
+                                }
+
                                 pendingBytes += written;
                                 const writeSuccessStr = stream.write(chunk, pooled.freeCb);
 

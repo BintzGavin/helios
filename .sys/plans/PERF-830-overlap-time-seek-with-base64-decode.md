@@ -1,11 +1,11 @@
 ---
 id: PERF-830
 slug: overlap-time-seek-with-base64-decode
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2026-06-23
 completed: ""
-result: ""
+result: "improved"
 ---
 
 # PERF-830: Overlap Time Seek with Base64 Decode in DomStrategy Loop
@@ -108,3 +108,9 @@ Run the `dom` mode benchmark script to verify output is unchanged.
 
 ## Prior Art
 - PERF-717: Overlap time and drain promise.
+
+## Results Summary
+- **Best render time**: 0.325s (vs baseline 0.777s) in microbenchmark loop
+- **Improvement**: ~58%
+- **Kept experiments**: Overlap time seek with base64 decode
+- **Discarded experiments**: none
