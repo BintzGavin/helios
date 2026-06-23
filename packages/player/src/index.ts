@@ -1710,6 +1710,8 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
     this.attachShadow({ mode: "open" });
     this.shadowRoot!.appendChild(template.content.cloneNode(true));
 
+    this.updateAspectRatio();
+
     this.iframe = this.shadowRoot!.querySelector("iframe")!;
     this.playPauseBtn = this.shadowRoot!.querySelector(".play-pause-btn")!;
     this.volumeBtn = this.shadowRoot!.querySelector(".volume-btn")!;
