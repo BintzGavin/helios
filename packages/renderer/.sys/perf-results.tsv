@@ -263,3 +263,4 @@ PERF-824	873.3	Single-worker DomStrategy inlining (no-op here since benchmark is
 828	146.484	300	0	5.3	keep	PERF-828: Enlarge and Pre-allocate Base64 Pool for Hot Paths (raw opt ms)
 828	100.105	300	0	5.4	keep	PERF-828: Enlarge and Pre-allocate Base64 Pool for Hot Paths (raw opt ms)
 1	0.0	0	0.0	0.0	keep	baseline: 8.83ms, opt: 5.92ms (PERF-829)
+1	0.325	300	923.20	0.0	keep	overlap time seek with base64 decode
