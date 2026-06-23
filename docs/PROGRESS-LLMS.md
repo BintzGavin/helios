@@ -1004,3 +1004,9 @@
   - Updated Roadmap for Player (DOM Canvas Capture, Lock UI During Export, Bridge Documentation).
   - Updated Roadmap for Infrastructure (FfmpegStitcher Coverage, Optimize GCS/S3 Uploads).
   - Verified all package versions match package.json exactly.
+
+### LLMS v1.107.0
+- ✅ Completed: Daily llms.txt Review
+  - Updated Roadmap in llms.txt with recent verifiable completions from domain PROGRESS logs (Studio: Timeline Audio/Waveform Regression Tests, Asset Drag and Drop, Enhance MCP Server; CLI: Command Coverage Tests V9; Player: Audio Fader Regression, Bridge Coverage Completeness, Document getSchema; Renderer: Validate HW Accel; Infrastructure: Modal Adapter, Optimize GCS/S3 Uploads, Orchestrator/Stitcher Coverage).
+  - Fixed Core API clip properties in llms.txt.
+  - Verified all package versions match package.json exactly.

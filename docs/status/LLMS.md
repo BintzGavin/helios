@@ -1,5 +1,5 @@
 # Status: LLMS
-**Version**: 1.106.0
+**Version**: 1.107.0
 
 [v1.104.0] ✅ Completed: Comprehensive Daily Review - Synced Roadmap with recent verifiable completions from domain PROGRESS logs (Tier 3 Cloud Adapters for CLI and Infrastructure, Component Management for Studio). Verified all package versions match package.json exactly. Verified File Paths and Key Files.
 
@@ -207,3 +207,5 @@ Verified package versions match package.json exactly. Verified File Paths and Ke
 [v1.105.0] ✅ Completed: Comprehensive Daily Review - Synced Roadmap with recent verifiable completions across all domains (Studio: Component Management, Preview/Update Commands, Portable Job Paths; CLI: Registry/Template/Index/Command Regression Tests; Core: Variable Playback Rate, Animation Helpers, Stability Checks; Player: DOM Canvas Capture, Bridge Coverage Expansion, Client-Side Inlining, Media Session/Property Tests; Renderer: CdpTimeDriver Determinism, Smart Codec Priority, Iframe Media Sync, Smart Audio Fades, Distributed Audio Mixing; Infrastructure: Bounded Dependency Synchronizer, Optimize GCS/S3 Uploads, Orchestrator Coverage). Verified all file paths and package versions perfectly match package.json.
 
 [v1.106.0] ✅ Completed: Comprehensive Daily Review - Updated Roadmap in llms.txt with recent verifiable completions from domain PROGRESS logs (Studio: CLI Build Command, CompositionsPanel Tests, Agent Skills Tests; Player: DOM Canvas Capture, Lock UI During Export, Bridge Documentation; Infrastructure: FfmpegStitcher Coverage, Optimize GCS/S3 Uploads). Verified exact package.json versions.
+
+[v1.107.0] ✅ Completed: Comprehensive Daily Review - Synced Roadmap with recent verifiable completions across all domains (Studio: Timeline Audio/Waveform Regression Tests, Asset Drag and Drop, Enhance MCP Server; CLI: Command Coverage Tests V9; Player: Audio Fader Regression, Bridge Coverage Completeness, Document getSchema; Renderer: Validate HW Accel; Infrastructure: Modal Adapter, Optimize GCS/S3 Uploads, Orchestrator/Stitcher Coverage). Fixed Core API example in llms.txt (using start and duration). Verified all file paths and package versions perfectly match package.json.
