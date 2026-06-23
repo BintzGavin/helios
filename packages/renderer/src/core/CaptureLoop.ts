@@ -169,7 +169,7 @@ export class CaptureLoop {
         // A standard 1080p frame is ~300KB to 2MB in base64. A 600x600 canvas frame base64 decode needs ~200KB.
         // We pre-allocate with a conservative 512KB to cover most initial frame dimensions without realloc.
         const POOL_SIZE = 64;
-        const INITIAL_BUFFER_SIZE = 512 * 1024;
+        const INITIAL_BUFFER_SIZE = Math.max(512 * 1024, (this.options.width * this.options.height * 4));
         const freePool: PooledBuffer[] = new Array(POOL_SIZE);
         for (let i = 0; i < POOL_SIZE; i++) {
             freePool[i] = new PooledBuffer(INITIAL_BUFFER_SIZE, freePool);
@@ -566,7 +566,7 @@ export class CaptureLoop {
     let fatalError: any = null;
 
     const MULTI_POOL_SIZE = 64;
-    const MULTI_INITIAL_BUFFER_SIZE = 512 * 1024;
+    const MULTI_INITIAL_BUFFER_SIZE = Math.max(512 * 1024, (this.options.width * this.options.height * 4));
     const multiFreePool: PooledBuffer[] = new Array(MULTI_POOL_SIZE);
     for (let i = 0; i < MULTI_POOL_SIZE; i++) {
         multiFreePool[i] = new PooledBuffer(MULTI_INITIAL_BUFFER_SIZE, multiFreePool);

@@ -259,3 +259,6 @@ PERF-823	339.266297	30000000	0	0	keep	baseline
 PERF-823	77.596143	30000000	0	0	keep	opt
 PERF-825	159.577	1000000	0	0	keep	opt
 PERF-824	873.3	Single-worker DomStrategy inlining (no-op here since benchmark is multi)	1.831s	2026-06-23
+828	0.098	300	3062.68	5.4	keep	PERF-828: Enlarge and Pre-allocate Base64 Pool for Hot Paths
+828	146.484	300	0	5.3	keep	PERF-828: Enlarge and Pre-allocate Base64 Pool for Hot Paths (raw opt ms)
+828	100.105	300	0	5.4	keep	PERF-828: Enlarge and Pre-allocate Base64 Pool for Hot Paths (raw opt ms)
