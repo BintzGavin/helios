@@ -99,3 +99,6 @@
 ## [v0.77.60] - Formatting Plans Properly
 **Learning:** Execution plans must provide the exact shell command to create a file (e.g., `cat << 'EOF' > ...`) rather than just the raw markdown content. A plan that only contains markdown violates the Specificity Rule.
 **Action:** Ensure all execution steps are explicit shell commands or actions, completely avoiding raw documentation blocks as the primary step instruction.
+## [v0.77.63] - Identifying HTMLVideoElement Parity Gaps
+**Learning:** While the Player has achieved deep API parity with `HTMLMediaElement` (e.g. `videoWidth`, `played`, `buffered`, `srcObject`), it was missing key methods from the specialized `HTMLVideoElement` interface, specifically `getVideoPlaybackQuality()` and `requestVideoFrameCallback()`.
+**Action:** When planning for API parity, cross-reference both `HTMLMediaElement` and `HTMLVideoElement` MDN pages to ensure all expected APIs of a video-focused element are implemented.
