@@ -1,11 +1,11 @@
 ---
 id: PERF-827
 slug: unswitch-capture-branch-initial-frames
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2026-06-23
-completed: ""
-result: ""
+completed: "2026-06-23"
+result: "improved"
 ---
 
 # PERF-827: Inline Strategy Calls for Initial Frames in Single-Worker Fast Path
@@ -110,3 +110,8 @@ Run the `dom` mode benchmark script to verify output is identical.
 ## Prior Art
 - PERF-824: Plan to inline strategy calls in single-worker path (missed the initial frames).
 - PERF-825: Plan to inline strategy calls in multi-worker path.
+
+## Results Summary
+- **Improvement**: Minor pipeline initialization improvement for single worker
+- **Kept experiments**: PERF-827
+- **Discarded experiments**: None

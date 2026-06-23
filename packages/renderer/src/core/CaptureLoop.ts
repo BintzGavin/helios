@@ -188,7 +188,11 @@ export class CaptureLoop {
                     if (timePromise) {
                         await timePromise;
                     }
-                    nextCapturePromise = strategy.capture(page, 0);
+                    if (isDomStrategy) {
+                        nextCapturePromise = domCdpSession!.send('HeadlessExperimental.beginFrame', domBeginFrameParams);
+                    } else {
+                        nextCapturePromise = strategy.capture(page, 0);
+                    }
                 }
 
                 if (totalFrames > 0) {
@@ -198,9 +202,22 @@ export class CaptureLoop {
                         if (timePromise) {
                             await timePromise;
                         }
-                        nextCapturePromise = strategy.capture(page, timeStep);
+                        if (isDomStrategy) {
+                            nextCapturePromise = domCdpSession!.send('HeadlessExperimental.beginFrame', domBeginFrameParams);
+                        } else {
+                            nextCapturePromise = strategy.capture(page, timeStep);
+                        }
                     }
-                    const buffer = strategy.processCaptureResult!(rawResult);
+                    let buffer;
+                    if (isDomStrategy) {
+                        const data = (rawResult as any).screenshotData;
+                        if (data) {
+                            (strategy as any).lastFrameData = data;
+                        }
+                        buffer = (strategy as any).lastFrameData;
+                    } else {
+                        buffer = strategy.processCaptureResult!(rawResult);
+                    }
                     console.log(`Progress: Rendered ${0} / ${totalFrames} frames`);
                     if (onProgress) {
                         onProgress(0 / totalFrames);
@@ -388,7 +405,11 @@ export class CaptureLoop {
                     if (timePromise) {
                         await timePromise;
                     }
-                    nextCapturePromise = strategy.capture(page, 0);
+                    if (isDomStrategy) {
+                        nextCapturePromise = domCdpSession!.send('HeadlessExperimental.beginFrame', domBeginFrameParams);
+                    } else {
+                        nextCapturePromise = strategy.capture(page, 0);
+                    }
                 }
 
                 if (totalFrames > 0) {
@@ -398,7 +419,11 @@ export class CaptureLoop {
                         if (timePromise) {
                             await timePromise;
                         }
-                        nextCapturePromise = strategy.capture(page, timeStep);
+                        if (isDomStrategy) {
+                            nextCapturePromise = domCdpSession!.send('HeadlessExperimental.beginFrame', domBeginFrameParams);
+                        } else {
+                            nextCapturePromise = strategy.capture(page, timeStep);
+                        }
                     }
                     console.log(`Progress: Rendered ${0} / ${totalFrames} frames`);
                     if (onProgress) {
