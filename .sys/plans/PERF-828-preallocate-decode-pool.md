@@ -1,11 +1,11 @@
 ---
 id: PERF-828
 slug: preallocate-decode-pool
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2026-06-23
-completed: ""
-result: ""
+completed: "2026-06-23"
+result: "improved"
 ---
 
 # PERF-828: Enlarge and Pre-allocate Base64 Pool for Hot Paths
@@ -78,3 +78,9 @@ Run the `dom` mode benchmark script to verify successful rendering.
 
 ## Prior Art
 - PERF-815: Introduced the `multiFreePool` Base64 mechanism, but hardcoded 512KB.
+
+## Results Summary
+- **Best render time**: 100.104ms (microbenchmark loop opt time vs baseline 110.424ms)
+- **Improvement**: ~9% (microbenchmark execution loop time)
+- **Kept experiments**: PERF-828
+- **Discarded experiments**: None
