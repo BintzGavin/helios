@@ -178,6 +178,7 @@ export class CaptureLoop {
         const isDomStrategy = !!(strategy as any).cdpSession;
         const domCdpSession = isDomStrategy ? (strategy as any).cdpSession : null;
         const domBeginFrameParams = isDomStrategy ? (strategy as any).beginFrameParams : null;
+        const domBeginFrame = isDomStrategy ? domCdpSession!.send.bind(domCdpSession, 'HeadlessExperimental.beginFrame', domBeginFrameParams) : null;
 
         try {
             let isString: boolean | null = null;
@@ -189,7 +190,7 @@ export class CaptureLoop {
                         await timePromise;
                     }
                     if (isDomStrategy) {
-                        nextCapturePromise = domCdpSession!.send('HeadlessExperimental.beginFrame', domBeginFrameParams);
+                        nextCapturePromise = domBeginFrame!();
                     } else {
                         nextCapturePromise = strategy.capture(page, 0);
                     }
@@ -203,7 +204,7 @@ export class CaptureLoop {
                             await timePromise;
                         }
                         if (isDomStrategy) {
-                            nextCapturePromise = domCdpSession!.send('HeadlessExperimental.beginFrame', domBeginFrameParams);
+                            nextCapturePromise = domBeginFrame!();
                         } else {
                             nextCapturePromise = strategy.capture(page, timeStep);
                         }
@@ -260,7 +261,7 @@ export class CaptureLoop {
                                 const timePromise = timeDriver.setTime(page, (startFrame + i + 1) * compTimeStep);
                                 if (timePromise) await timePromise;
                                 if (isDomStrategy) {
-                                    nextCapturePromise = domCdpSession!.send('HeadlessExperimental.beginFrame', domBeginFrameParams);
+                                    nextCapturePromise = domBeginFrame!();
                                 } else {
                                     nextCapturePromise = strategy.capture(page, (i + 1) * timeStep);
                                 }
@@ -345,7 +346,7 @@ export class CaptureLoop {
                                 const timePromise = timeDriver.setTime(page, (startFrame + i + 1) * compTimeStep);
                                 if (timePromise) await timePromise;
                                 if (isDomStrategy) {
-                                    nextCapturePromise = domCdpSession!.send('HeadlessExperimental.beginFrame', domBeginFrameParams);
+                                    nextCapturePromise = domBeginFrame!();
                                 } else {
                                     nextCapturePromise = strategy.capture(page, (i + 1) * timeStep);
                                 }
@@ -406,7 +407,7 @@ export class CaptureLoop {
                         await timePromise;
                     }
                     if (isDomStrategy) {
-                        nextCapturePromise = domCdpSession!.send('HeadlessExperimental.beginFrame', domBeginFrameParams);
+                        nextCapturePromise = domBeginFrame!();
                     } else {
                         nextCapturePromise = strategy.capture(page, 0);
                     }
@@ -420,7 +421,7 @@ export class CaptureLoop {
                             await timePromise;
                         }
                         if (isDomStrategy) {
-                            nextCapturePromise = domCdpSession!.send('HeadlessExperimental.beginFrame', domBeginFrameParams);
+                            nextCapturePromise = domBeginFrame!();
                         } else {
                             nextCapturePromise = strategy.capture(page, timeStep);
                         }
@@ -468,7 +469,7 @@ export class CaptureLoop {
                                 const timePromise = timeDriver.setTime(page, (startFrame + i + 1) * compTimeStep);
                                 if (timePromise) await timePromise;
                                 if (isDomStrategy) {
-                                    nextCapturePromise = domCdpSession!.send('HeadlessExperimental.beginFrame', domBeginFrameParams);
+                                    nextCapturePromise = domBeginFrame!();
                                 } else {
                                     nextCapturePromise = strategy.capture(page, (i + 1) * timeStep);
                                 }
@@ -531,7 +532,7 @@ export class CaptureLoop {
                                 const timePromise = timeDriver.setTime(page, (startFrame + i + 1) * compTimeStep);
                                 if (timePromise) await timePromise;
                                 if (isDomStrategy) {
-                                    nextCapturePromise = domCdpSession!.send('HeadlessExperimental.beginFrame', domBeginFrameParams);
+                                    nextCapturePromise = domBeginFrame!();
                                 } else {
                                     nextCapturePromise = strategy.capture(page, (i + 1) * timeStep);
                                 }
@@ -652,6 +653,7 @@ export class CaptureLoop {
         const isDomStrategy = !!(strategy as any).beginFrameParams;
         const domCdpSession = isDomStrategy ? (strategy as any).cdpSession : null;
         const domBeginFrameParams = isDomStrategy ? (strategy as any).beginFrameParams : null;
+        const domBeginFrame = isDomStrategy ? domCdpSession!.send.bind(domCdpSession, 'HeadlessExperimental.beginFrame', domBeginFrameParams) : null;
 
         if (hasProcessFn) {
             while (!aborted) {
@@ -681,7 +683,7 @@ export class CaptureLoop {
                     }
                     let buffer: any;
                     if (isDomStrategy) {
-                        const rawResult = await domCdpSession!.send('HeadlessExperimental.beginFrame', domBeginFrameParams);
+                        const rawResult = await domBeginFrame!();
                         const data = rawResult.screenshotData;
                         if (data) {
                             (strategy as any).lastFrameData = data;
@@ -727,7 +729,7 @@ export class CaptureLoop {
                     }
                     let buffer: any;
                     if (isDomStrategy) {
-                        buffer = await domCdpSession!.send('HeadlessExperimental.beginFrame', domBeginFrameParams);
+                        buffer = await domBeginFrame!();
                     } else {
                         buffer = await strategy.capture(page, i * timeStep);
                     }
