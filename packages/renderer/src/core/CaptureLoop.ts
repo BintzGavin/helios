@@ -707,40 +707,48 @@ export class CaptureLoop {
                     }
                     if (aborted) break;
 
-                    const ringIndex = nextFrameToWrite & ringMask;
-                    if (frameReadyRing[ringIndex] === 0) {
-                        await writerWaiterPromise;
-                        continue;
-                    }
+                    let currentFrame = nextFrameToWrite;
+                    const endFrame = Math.min(currentFrame + progressInterval, totalFrames);
 
-                    const buffer = frameBufferRing[ringIndex]! as string;
+                    while (nextFrameToWrite < endFrame) {
+                        if (aborted) break;
 
-                    const currentFrame = nextFrameToWrite;
-
-                    if (currentFrame % progressInterval === 0) {
-                        console.log(`Progress: Rendered ${currentFrame} / ${totalFrames} frames`);
-
-                        if (onProgress) {
-                            onProgress(currentFrame / totalFrames);
+                        const ringIndex = nextFrameToWrite & ringMask;
+                        while (frameReadyRing[ringIndex] === 0 && !aborted) {
+                            await writerWaiterPromise;
+                            if (freeWorkersHead > 0 || capturedErrors.length > 0 || (signal && signal.aborted)) {
+                                checkState();
+                            }
                         }
+                        if (aborted) break;
+
+                        const buffer = frameBufferRing[ringIndex]! as string;
+
+                        const maxBytes = (buffer.length * 3) >>> 2;
+                        let pooled = multiFreePool.pop();
+                        if (!pooled || pooled.buffer.length < maxBytes) {
+                            pooled = new PooledBuffer(maxBytes + (maxBytes >> 1), multiFreePool);
+                        }
+                        const written = pooled.buffer.write(buffer, 'base64');
+                        const chunk = pooled.buffer.subarray(0, written);
+                        pendingBytes += written;
+                        const writeSuccess = stream.write(chunk, pooled.freeCb);
+
+                        if (!writeSuccess && pendingBytes >= 16777216) {
+                            await this.drainPromise;
+                            pendingBytes = 0;
+                            if (freeWorkersHead > 0 || capturedErrors.length > 0 || (signal && signal.aborted)) {
+                                checkState();
+                            }
+                        }
+
+                        nextFrameToWrite++;
                     }
 
-                    const maxBytes = (buffer.length * 3) >>> 2;
-                    let pooled = multiFreePool.pop();
-                    if (!pooled || pooled.buffer.length < maxBytes) {
-                        pooled = new PooledBuffer(maxBytes + (maxBytes >> 1), multiFreePool);
+                    if (!aborted && nextFrameToWrite % progressInterval === 0) {
+                         console.log(`Progress: Rendered ${nextFrameToWrite} / ${totalFrames} frames`);
+                         if (onProgress) onProgress(nextFrameToWrite / totalFrames);
                     }
-                    const written = pooled.buffer.write(buffer, 'base64');
-                    const chunk = pooled.buffer.subarray(0, written);
-                    pendingBytes += written;
-                    const writeSuccess = stream.write(chunk, pooled.freeCb);
-
-                    if (!writeSuccess && pendingBytes >= 16777216) {
-                        await this.drainPromise;
-                        pendingBytes = 0;
-                    }
-
-                    nextFrameToWrite++;
                 }
             } else if (!aborted) {
                 while (nextFrameToWrite < totalFrames && !aborted) {
@@ -749,33 +757,41 @@ export class CaptureLoop {
                     }
                     if (aborted) break;
 
-                    const ringIndex = nextFrameToWrite & ringMask;
-                    if (frameReadyRing[ringIndex] === 0) {
-                        await writerWaiterPromise;
-                        continue;
-                    }
+                    let currentFrame = nextFrameToWrite;
+                    const endFrame = Math.min(currentFrame + progressInterval, totalFrames);
 
-                    const buffer = frameBufferRing[ringIndex]!;
+                    while (nextFrameToWrite < endFrame) {
+                        if (aborted) break;
 
-                    const currentFrame = nextFrameToWrite;
-
-                    if (currentFrame % progressInterval === 0) {
-                        console.log(`Progress: Rendered ${currentFrame} / ${totalFrames} frames`);
-
-                        if (onProgress) {
-                            onProgress(currentFrame / totalFrames);
+                        const ringIndex = nextFrameToWrite & ringMask;
+                        while (frameReadyRing[ringIndex] === 0 && !aborted) {
+                            await writerWaiterPromise;
+                            if (freeWorkersHead > 0 || capturedErrors.length > 0 || (signal && signal.aborted)) {
+                                checkState();
+                            }
                         }
+                        if (aborted) break;
+
+                        const buffer = frameBufferRing[ringIndex]!;
+
+                        pendingBytes += (buffer as any).length;
+                        const writeSuccess = stream.write(buffer as any);
+
+                        if (!writeSuccess && pendingBytes >= 16777216) {
+                            await this.drainPromise;
+                            pendingBytes = 0;
+                            if (freeWorkersHead > 0 || capturedErrors.length > 0 || (signal && signal.aborted)) {
+                                checkState();
+                            }
+                        }
+
+                        nextFrameToWrite++;
                     }
 
-                    pendingBytes += (buffer as any).length;
-                    const writeSuccess = stream.write(buffer as any);
-
-                    if (!writeSuccess && pendingBytes >= 16777216) {
-                        await this.drainPromise;
-                        pendingBytes = 0;
+                    if (!aborted && nextFrameToWrite % progressInterval === 0) {
+                         console.log(`Progress: Rendered ${nextFrameToWrite} / ${totalFrames} frames`);
+                         if (onProgress) onProgress(nextFrameToWrite / totalFrames);
                     }
-
-                    nextFrameToWrite++;
                 }
             }
         }
