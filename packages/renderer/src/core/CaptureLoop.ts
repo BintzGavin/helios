@@ -179,6 +179,7 @@ export class CaptureLoop {
         const domCdpSession = isDomStrategy ? (strategy as any).cdpSession : null;
         const domBeginFrameParams = isDomStrategy ? (strategy as any).beginFrameParams : null;
         const domBeginFrame = isDomStrategy ? domCdpSession!.send.bind(domCdpSession, 'HeadlessExperimental.beginFrame', domBeginFrameParams) : null;
+        let domLastFrameData: any = isDomStrategy ? (strategy as any).lastFrameData : null;
 
         try {
             let isString: boolean | null = null;
@@ -213,9 +214,9 @@ export class CaptureLoop {
                     if (isDomStrategy) {
                         const data = (rawResult as any).screenshotData;
                         if (data) {
-                            (strategy as any).lastFrameData = data;
+                            domLastFrameData = data;
                         }
-                        buffer = (strategy as any).lastFrameData;
+                        buffer = domLastFrameData;
                     } else {
                         buffer = strategy.processCaptureResult!(rawResult);
                     }
@@ -270,9 +271,9 @@ export class CaptureLoop {
                                 if (isDomStrategy) {
                                     const data = rawResult.screenshotData;
                                     if (data) {
-                                        (strategy as any).lastFrameData = data;
+                                        domLastFrameData = data;
                                     }
-                                    buf = (strategy as any).lastFrameData as string;
+                                    buf = domLastFrameData as string;
                                 } else {
                                     buf = strategy.processCaptureResult!(rawResult) as string;
                                 }
@@ -299,9 +300,9 @@ export class CaptureLoop {
                                 if (isDomStrategy) {
                                     const data = rawResult.screenshotData;
                                     if (data) {
-                                        (strategy as any).lastFrameData = data;
+                                        domLastFrameData = data;
                                     }
-                                    buf = (strategy as any).lastFrameData as string;
+                                    buf = domLastFrameData as string;
                                 } else {
                                     buf = strategy.processCaptureResult!(rawResult) as string;
                                 }
@@ -355,9 +356,9 @@ export class CaptureLoop {
                                 if (isDomStrategy) {
                                     const data = rawResult.screenshotData;
                                     if (data) {
-                                        (strategy as any).lastFrameData = data;
+                                        domLastFrameData = data;
                                     }
-                                    buf = (strategy as any).lastFrameData;
+                                    buf = domLastFrameData;
                                 } else {
                                     buf = strategy.processCaptureResult!(rawResult);
                                 }
@@ -376,9 +377,9 @@ export class CaptureLoop {
                                 if (isDomStrategy) {
                                     const data = rawResult.screenshotData;
                                     if (data) {
-                                        (strategy as any).lastFrameData = data;
+                                        domLastFrameData = data;
                                     }
-                                    buf = (strategy as any).lastFrameData;
+                                    buf = domLastFrameData;
                                 } else {
                                     buf = strategy.processCaptureResult!(rawResult);
                                 }
@@ -657,6 +658,7 @@ export class CaptureLoop {
         const domCdpSession = isDomStrategy ? (strategy as any).cdpSession : null;
         const domBeginFrameParams = isDomStrategy ? (strategy as any).beginFrameParams : null;
         const domBeginFrame = isDomStrategy ? domCdpSession!.send.bind(domCdpSession, 'HeadlessExperimental.beginFrame', domBeginFrameParams) : null;
+        let domLastFrameData: any = isDomStrategy ? (strategy as any).lastFrameData : null;
 
         if (hasProcessFn) {
             while (!aborted) {
@@ -689,9 +691,9 @@ export class CaptureLoop {
                         const rawResult = await domBeginFrame!();
                         const data = rawResult.screenshotData;
                         if (data) {
-                            (strategy as any).lastFrameData = data;
+                            domLastFrameData = data;
                         }
-                        buffer = (strategy as any).lastFrameData;
+                        buffer = domLastFrameData;
                     } else {
                         buffer = strategy.processCaptureResult!(await strategy.capture(page, i * timeStep));
                     }
