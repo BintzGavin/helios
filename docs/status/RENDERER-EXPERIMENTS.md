@@ -1,8 +1,11 @@
 ## Performance Trajectory
 Current best: 1.831s (baseline was 1.831s, -0%)
-Last updated by: PERF-822
+Last updated by: PERF-832
 
 ## What Works
+- **What Works:** PERF-832 hoisted the `nextFrameToWrite` progress check out of the inner loop in `CaptureLoop.ts` for the single-worker path, replacing chunked iteration with a straight `for` loop.
+  - **Improvement:** Improves loop branching predictability and code maintainability by eliminating branch evaluations inside nested loops.
+  - **Plan ID:** PERF-832
 - **What Works:** PERF-839 hoisted the error and worker polling logic out of the multi-worker write loop in `CaptureLoop.ts`.
   - **Improvement:** ~13% improvement on loop execution speed in microbenchmarks (from ~2.678 ms to ~2.329 ms median for 300,000 iterations).
   - **Plan ID:** PERF-839
