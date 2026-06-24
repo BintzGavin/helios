@@ -3,6 +3,7 @@ Current best: 1.831s (baseline was 1.831s, -0%)
 Last updated by: PERF-822
 
 ## What Works
+- Unswitched `isDomStrategy` inner loops in CaptureLoop.ts fast paths, reducing microbenchmark execution time by ~5.3% (PERF-834)
 - Hoisted nextFrameToWrite progress check in multi-worker path (PERF-835)
 - PERF-833: Unswitch isDomStrategy in CaptureLoop fast paths (~25% microbenchmark loop improvement)
 - PERF-831: Cached DomStrategy lastFrameData in CaptureLoop fast paths (~73% microbenchmark loop improvement)
