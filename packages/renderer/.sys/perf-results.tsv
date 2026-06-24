@@ -278,3 +278,7 @@ PERF-831	Cache DomStrategy lastFrameData Locally	33.791	9.127
 3	20.075	600	0.00	0.0	keep	PERF-835: hoist progress check multi-worker
 1	0.000	0	0.00	0.0	keep	unswitch isDomStrategy in CaptureLoop fast paths
 1	0.002329	300000	0.00	0.0	keep	PERF-839: hoist error/polling in multi-worker write loop
+1	1.368	10000000	0.00	0.0	keep	PERF-845 remove redundant checkState in multi-worker path (baseline: 1.372s)
+1	1.392	10000000	0.00	0.0	keep	PERF-845 remove redundant checkState in multi-worker path (baseline: 1.387s)
+1	1.377	10000000	0.00	0.0	keep	PERF-845 remove redundant checkState in multi-worker path (baseline: 1.420s)
+2	1.376	10000000	0.00	0.0	keep	PERF-845 remove redundant checkState in multi-worker path (baseline: 1.419s)
