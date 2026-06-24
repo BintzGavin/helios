@@ -3,6 +3,9 @@ Current best: 1.831s (baseline was 1.831s, -0%)
 Last updated by: PERF-822
 
 ## What Works
+- **What Works:** PERF-839 hoisted the error and worker polling logic out of the multi-worker write loop in `CaptureLoop.ts`.
+  - **Improvement:** ~13% improvement on loop execution speed in microbenchmarks (from ~2.678 ms to ~2.329 ms median for 300,000 iterations).
+  - **Plan ID:** PERF-839
 - Unswitched `isDomStrategy` inner loops in CaptureLoop.ts fast paths, reducing microbenchmark execution time by ~5.3% (PERF-834)
 - Hoisted nextFrameToWrite progress check in multi-worker path (PERF-835)
 - PERF-833: Unswitch isDomStrategy in CaptureLoop fast paths (~25% microbenchmark loop improvement)
