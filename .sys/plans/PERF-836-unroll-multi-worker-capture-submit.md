@@ -1,11 +1,11 @@
 ---
 id: PERF-836
 slug: unroll-multi-worker-capture-submit
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-06-24
 completed: ""
-result: ""
+result: discarded
 ---
 
 # PERF-836: Unroll Branching in Multi-Worker Loop Submission
