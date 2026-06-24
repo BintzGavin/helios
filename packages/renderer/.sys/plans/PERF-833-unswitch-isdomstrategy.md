@@ -1,7 +1,7 @@
 ---
 id: PERF-833
 slug: unswitch-isdomstrategy
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-06-24
 completed: ""
