@@ -15,5 +15,6 @@ Last updated by: PERF-822
 - PERF-822: Eliminate `i + 1 < totalFrames` branch in CaptureLoop hot paths (~11% microbenchmark improvement)
 
 ## What Doesn't Work (and Why)
+- Tried to optimize Base64 buffer allocation in DomStrategy.ts (PERF-805), but the buffer allocation logic has been hoisted to CaptureLoop.ts and the optimization is already present. Discarded as obsolete.
 
 ## Open Questions
