@@ -974,45 +974,38 @@ export class CaptureLoop {
                     }
                     if (aborted) break;
 
-                    let currentFrame = nextFrameToWrite;
-                    const endFrame = Math.min(currentFrame + progressInterval, totalFrames);
-
-                    while (nextFrameToWrite < endFrame) {
-                        if (aborted) break;
-
-                        const ringIndex = nextFrameToWrite & ringMask;
-                        while (frameReadyRing[ringIndex] === 0 && !aborted) {
-                            await writerWaiterPromise;
-                            if (freeWorkersHead > 0 || capturedErrors.length > 0 || (signal && signal.aborted)) {
-                                checkState();
-                            }
+                    const ringIndex = nextFrameToWrite & ringMask;
+                    while (frameReadyRing[ringIndex] === 0 && !aborted) {
+                        await writerWaiterPromise;
+                        if (freeWorkersHead > 0 || capturedErrors.length > 0 || (signal && signal.aborted)) {
+                            checkState();
                         }
-                        if (aborted) break;
+                    }
+                    if (aborted) break;
 
-                        const buffer = frameBufferRing[ringIndex]! as string;
+                    const buffer = frameBufferRing[ringIndex]! as string;
 
-                        const maxBytes = (buffer.length * 3) >>> 2;
-                        let pooled = multiFreePool.pop();
-                        if (!pooled || pooled.buffer.length < maxBytes) {
-                            pooled = new PooledBuffer(maxBytes + (maxBytes >> 1), multiFreePool);
+                    const maxBytes = (buffer.length * 3) >>> 2;
+                    let pooled = multiFreePool.pop();
+                    if (!pooled || pooled.buffer.length < maxBytes) {
+                        pooled = new PooledBuffer(maxBytes + (maxBytes >> 1), multiFreePool);
+                    }
+                    const written = pooled.buffer.write(buffer, 'base64');
+                    const chunk = pooled.buffer.subarray(0, written);
+                    pendingBytes += written;
+                    const writeSuccess = stream.write(chunk, pooled.freeCb);
+
+                    if (!writeSuccess && pendingBytes >= 16777216) {
+                        await this.drainPromise;
+                        pendingBytes = 0;
+                        if (freeWorkersHead > 0 || capturedErrors.length > 0 || (signal && signal.aborted)) {
+                            checkState();
                         }
-                        const written = pooled.buffer.write(buffer, 'base64');
-                        const chunk = pooled.buffer.subarray(0, written);
-                        pendingBytes += written;
-                        const writeSuccess = stream.write(chunk, pooled.freeCb);
-
-                        if (!writeSuccess && pendingBytes >= 16777216) {
-                            await this.drainPromise;
-                            pendingBytes = 0;
-                            if (freeWorkersHead > 0 || capturedErrors.length > 0 || (signal && signal.aborted)) {
-                                checkState();
-                            }
-                        }
-
-                        nextFrameToWrite++;
                     }
 
-                    if (!aborted && nextFrameToWrite % progressInterval === 0) {
+                    nextFrameToWrite++;
+
+                    if (!aborted && (nextFrameToWrite % progressInterval === 0 || nextFrameToWrite === totalFrames)) {
                          console.log(`Progress: Rendered ${nextFrameToWrite} / ${totalFrames} frames`);
                          if (onProgress) onProgress(nextFrameToWrite / totalFrames);
                     }
@@ -1024,38 +1017,31 @@ export class CaptureLoop {
                     }
                     if (aborted) break;
 
-                    let currentFrame = nextFrameToWrite;
-                    const endFrame = Math.min(currentFrame + progressInterval, totalFrames);
-
-                    while (nextFrameToWrite < endFrame) {
-                        if (aborted) break;
-
-                        const ringIndex = nextFrameToWrite & ringMask;
-                        while (frameReadyRing[ringIndex] === 0 && !aborted) {
-                            await writerWaiterPromise;
-                            if (freeWorkersHead > 0 || capturedErrors.length > 0 || (signal && signal.aborted)) {
-                                checkState();
-                            }
+                    const ringIndex = nextFrameToWrite & ringMask;
+                    while (frameReadyRing[ringIndex] === 0 && !aborted) {
+                        await writerWaiterPromise;
+                        if (freeWorkersHead > 0 || capturedErrors.length > 0 || (signal && signal.aborted)) {
+                            checkState();
                         }
-                        if (aborted) break;
+                    }
+                    if (aborted) break;
 
-                        const buffer = frameBufferRing[ringIndex]!;
+                    const buffer = frameBufferRing[ringIndex]!;
 
-                        pendingBytes += (buffer as any).length;
-                        const writeSuccess = stream.write(buffer as any);
+                    pendingBytes += (buffer as any).length;
+                    const writeSuccess = stream.write(buffer as any);
 
-                        if (!writeSuccess && pendingBytes >= 16777216) {
-                            await this.drainPromise;
-                            pendingBytes = 0;
-                            if (freeWorkersHead > 0 || capturedErrors.length > 0 || (signal && signal.aborted)) {
-                                checkState();
-                            }
+                    if (!writeSuccess && pendingBytes >= 16777216) {
+                        await this.drainPromise;
+                        pendingBytes = 0;
+                        if (freeWorkersHead > 0 || capturedErrors.length > 0 || (signal && signal.aborted)) {
+                            checkState();
                         }
-
-                        nextFrameToWrite++;
                     }
 
-                    if (!aborted && nextFrameToWrite % progressInterval === 0) {
+                    nextFrameToWrite++;
+
+                    if (!aborted && (nextFrameToWrite % progressInterval === 0 || nextFrameToWrite === totalFrames)) {
                          console.log(`Progress: Rendered ${nextFrameToWrite} / ${totalFrames} frames`);
                          if (onProgress) onProgress(nextFrameToWrite / totalFrames);
                     }
