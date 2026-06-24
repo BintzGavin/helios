@@ -1,7 +1,7 @@
 ---
 id: PERF-834
 slug: unswitch-is-dom-strategy
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-06-24
 completed: ""
