@@ -1,8 +1,8 @@
 ---
 id: PERF-839
 slug: hoist-aborted-checks
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "Jules"
 created: 2024-06-25
 completed: ""
 result: ""
@@ -93,3 +93,10 @@ if (signal && abortListener) {
 
 ## Variations
 None. This strictly reduces polling and eliminates unnecessary branch evaluations in the hot path.
+
+## Results Summary
+
+```tsv
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	0.002329	300000	0.00	0.0	keep	PERF-839: hoist error/polling in multi-worker write loop
+```

@@ -838,6 +838,13 @@ export class CaptureLoop {
         }
     };
 
+    let abortListener: (() => void) | null = null;
+    if (signal) {
+        if (signal.aborted) { aborted = true; checkState(); }
+        abortListener = () => { aborted = true; checkState(); };
+        signal.addEventListener('abort', abortListener);
+    }
+
 
 
 
@@ -1019,14 +1026,12 @@ export class CaptureLoop {
         let isString: boolean | null = null;
         if (nextFrameToWrite < totalFrames && !aborted) {
             while (!aborted) {
-                if (freeWorkersHead > 0 || capturedErrors.length > 0 || (signal && signal.aborted)) {
-                    checkState();
-                }
                 if (aborted) break;
 
                 const ringIndex = nextFrameToWrite & ringMask;
                 if (frameReadyRing[ringIndex] === 0) {
                     await writerWaiterPromise;
+                    if (freeWorkersHead > 0 || capturedErrors.length > 0) checkState();
                     continue;
                 }
 
@@ -1065,22 +1070,18 @@ export class CaptureLoop {
                 }
 
                 nextFrameToWrite++;
+                    if (freeWorkersHead > 0) checkState();
                 break;
             }
 
             if (!aborted && isString) {
                 while (nextFrameToWrite < totalFrames && !aborted) {
-                    if (freeWorkersHead > 0 || capturedErrors.length > 0 || (signal && signal.aborted)) {
-                        checkState();
-                    }
                     if (aborted) break;
 
                     const ringIndex = nextFrameToWrite & ringMask;
                     while (frameReadyRing[ringIndex] === 0 && !aborted) {
                         await writerWaiterPromise;
-                        if (freeWorkersHead > 0 || capturedErrors.length > 0 || (signal && signal.aborted)) {
-                            checkState();
-                        }
+                        if (freeWorkersHead > 0 || capturedErrors.length > 0) checkState();
                     }
                     if (aborted) break;
 
@@ -1099,12 +1100,11 @@ export class CaptureLoop {
                     if (!writeSuccess && pendingBytes >= 16777216) {
                         await this.drainPromise;
                         pendingBytes = 0;
-                        if (freeWorkersHead > 0 || capturedErrors.length > 0 || (signal && signal.aborted)) {
-                            checkState();
-                        }
+                        if (freeWorkersHead > 0 || capturedErrors.length > 0) checkState();
                     }
 
                     nextFrameToWrite++;
+                    if (freeWorkersHead > 0) checkState();
 
                     if (!aborted && (nextFrameToWrite % progressInterval === 0 || nextFrameToWrite === totalFrames)) {
                          console.log(`Progress: Rendered ${nextFrameToWrite} / ${totalFrames} frames`);
@@ -1113,17 +1113,12 @@ export class CaptureLoop {
                 }
             } else if (!aborted) {
                 while (nextFrameToWrite < totalFrames && !aborted) {
-                    if (freeWorkersHead > 0 || capturedErrors.length > 0 || (signal && signal.aborted)) {
-                        checkState();
-                    }
                     if (aborted) break;
 
                     const ringIndex = nextFrameToWrite & ringMask;
                     while (frameReadyRing[ringIndex] === 0 && !aborted) {
                         await writerWaiterPromise;
-                        if (freeWorkersHead > 0 || capturedErrors.length > 0 || (signal && signal.aborted)) {
-                            checkState();
-                        }
+                        if (freeWorkersHead > 0 || capturedErrors.length > 0) checkState();
                     }
                     if (aborted) break;
 
@@ -1135,12 +1130,11 @@ export class CaptureLoop {
                     if (!writeSuccess && pendingBytes >= 16777216) {
                         await this.drainPromise;
                         pendingBytes = 0;
-                        if (freeWorkersHead > 0 || capturedErrors.length > 0 || (signal && signal.aborted)) {
-                            checkState();
-                        }
+                        if (freeWorkersHead > 0 || capturedErrors.length > 0) checkState();
                     }
 
                     nextFrameToWrite++;
+                    if (freeWorkersHead > 0) checkState();
 
                     if (!aborted && (nextFrameToWrite % progressInterval === 0 || nextFrameToWrite === totalFrames)) {
                          console.log(`Progress: Rendered ${nextFrameToWrite} / ${totalFrames} frames`);
@@ -1153,6 +1147,10 @@ export class CaptureLoop {
         aborted = true;
         checkState();
         throw e;
+    } finally {
+        if (signal && abortListener) {
+            signal.removeEventListener('abort', abortListener);
+        }
     }
 
     aborted = true;

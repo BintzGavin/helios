@@ -1,0 +1,2 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	0.002329	300000	0.00	0.0	keep	PERF-839: hoist error/polling in multi-worker write loop
