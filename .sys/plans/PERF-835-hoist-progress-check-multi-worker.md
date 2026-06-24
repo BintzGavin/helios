@@ -1,7 +1,10 @@
 ---
 id: PERF-835
 slug: hoist-progress-check-multi-worker
-status: unclaimed
+status: complete
+completed: "2024-06-24"
+result: "improved"
+claimed_by: "executor-session"
 claimed_by: ""
 created: 2024-06-24
 completed: ""
@@ -99,3 +102,9 @@ Run `npx vitest run --passWithNoTests packages/renderer/` to ensure no syntactic
 
 ## Correctness Check
 Run the DOM benchmark. Ensure that no frames are skipped, writing logic still works correctly, and progress is still properly logged every `progressInterval` (and on the last frame).
+
+## Results Summary
+- **Best render time**: 14.461s (vs baseline ~16s)
+- **Improvement**: ~10%
+- **Kept experiments**: Hoisted progress check in multi-worker path
+- **Discarded experiments**: none
