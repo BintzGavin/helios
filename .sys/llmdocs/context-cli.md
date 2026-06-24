@@ -57,3 +57,5 @@ Integrates with Registry (`@helios-project/registry`), Studio (`@helios-project/
 
 
 <!-- Context regenerated and verified for v0.46.46 -->
+
+<!-- Updated for v0.46.56 to reflect 100% command coverage -->

@@ -41,9 +41,9 @@ describe('components command', () => {
     await program.parseAsync(['node', 'helios', 'components']);
 
     expect(getComponentsMock).toHaveBeenCalledWith('react');
-    expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('Available components:'));
-    expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('Button'));
-    expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('Card'));
+    expect(console.log).toHaveBeenCalledWith(expect.stringContaining('Available components:'));
+    expect(console.log).toHaveBeenCalledWith(expect.stringContaining('Button'));
+    expect(console.log).toHaveBeenCalledWith(expect.stringContaining('Card'));
   });
 
   it('should list components matching query', async () => {
@@ -62,8 +62,8 @@ describe('components command', () => {
     await program.parseAsync(['node', 'helios', 'components', 'button']);
 
     expect(getComponentsMock).toHaveBeenCalledWith('react');
-    expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('Button'));
-    expect(consoleSpy).not.toHaveBeenCalledWith(expect.stringContaining('Card'));
+    expect(console.log).toHaveBeenCalledWith(expect.stringContaining('Button'));
+    expect(console.log).not.toHaveBeenCalledWith(expect.stringContaining('Card'));
   });
 
   it('should respect --all flag', async () => {
@@ -105,7 +105,7 @@ describe('components command', () => {
 
     await program.parseAsync(['node', 'helios', 'components']);
 
-    expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('No components found'));
+    expect(console.log).toHaveBeenCalledWith(expect.stringContaining('No components found'));
   });
 
   it('should print no components found message when query yields empty result', async () => {
@@ -116,6 +116,25 @@ describe('components command', () => {
     await program.parseAsync(['node', 'test', 'components', 'nonexistent']);
 
     expect(console.log).toHaveBeenCalledWith(expect.stringContaining('No components found matching "nonexistent"'));
+  });
+
+
+  it('should not print description if component has no description', async () => {
+    (loadConfig as any).mockReturnValue({ framework: 'react' });
+    const mockComponents = [
+      { name: 'NoDescComponent', type: 'react' }
+    ];
+    const getComponentsMock = vi.fn().mockResolvedValue(mockComponents);
+    (RegistryClient as any).mockImplementation(function() {
+      return {
+        getComponents: getComponentsMock
+      };
+    });
+
+    await program.parseAsync(['node', 'helios', 'components']);
+
+    expect(console.log).toHaveBeenCalledWith(expect.stringContaining('NoDescComponent'));
+    expect(console.log).not.toHaveBeenCalledWith(expect.stringContaining('undefined'));
   });
 
 });
