@@ -265,3 +265,7 @@ PERF-824	873.3	Single-worker DomStrategy inlining (no-op here since benchmark is
 1	0.0	0	0.0	0.0	keep	baseline: 8.83ms, opt: 5.92ms (PERF-829)
 1	0.325	300	923.20	0.0	keep	overlap time seek with base64 decode
 PERF-831	Cache DomStrategy lastFrameData Locally	33.791	9.127
+1	1.831	150	81.92	200.0	keep	baseline
+2	1.830	150	81.96	200.0	keep	PERF-833 unswitched isDomStrategy
+3	1.830	150	81.96	200.0	keep	PERF-833 unswitched isDomStrategy
+4	1.830	150	81.96	200.0	keep	PERF-833 unswitched isDomStrategy
