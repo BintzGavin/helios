@@ -3,6 +3,7 @@ Current best: 1.831s (baseline was 1.831s, -0%)
 Last updated by: PERF-822
 
 ## What Works
+- PERF-832: Cleaned up and hoisted progress checks in single-worker fast path to simplify loop structures (Code size reduction & consistency without perf regression)
 - PERF-831: Cached DomStrategy lastFrameData in CaptureLoop fast paths (~73% microbenchmark loop improvement)
 - PERF-830: Overlapped `timeDriver.setTime()` CDP promise with CPU-bound Base64 decoding in single-worker fast path (~15% microbenchmark improvement)
 - PERF-829: Pre-bind DOM Session and Begin Frame Params in CaptureLoop Fast Paths (~33% microbenchmark improvement)

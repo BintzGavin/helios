@@ -249,13 +249,9 @@ export class CaptureLoop {
                     }
 
                     if (isString) {
-                        let currentFrame = 1;
-                        while (currentFrame < totalFrames) {
+                        for (let i = 1; i < totalFrames; i++) {
                             if (aborted) break;
-                            const endFrame = Math.min(currentFrame + progressInterval, totalFrames);
 
-                            const prefetchEnd = endFrame === totalFrames ? endFrame - 1 : endFrame;
-                            for (let i = currentFrame; i < prefetchEnd; i++) {
                                 if (aborted) break;
                                 const rawResult = await nextCapturePromise;
 
@@ -292,55 +288,18 @@ export class CaptureLoop {
                                     await this.drainPromise;
                                     pendingBytes = 0;
                                 }
-                            }
-                            if (endFrame === totalFrames && !aborted) {
-                                const rawResult = await nextCapturePromise;
 
-                                let buf;
-                                if (isDomStrategy) {
-                                    const data = rawResult.screenshotData;
-                                    if (data) {
-                                        domLastFrameData = data;
-                                    }
-                                    buf = domLastFrameData as string;
-                                } else {
-                                    buf = strategy.processCaptureResult!(rawResult) as string;
+                            if (i % progressInterval === 0 || i === totalFrames - 1) {
+                                console.log(`Progress: Rendered ${i} / ${totalFrames} frames`);
+                                if (onProgress) {
+                                    onProgress(i / totalFrames);
                                 }
-
-                                const maxBytes = (buf.length * 3) >>> 2;
-                                let pooled = freePool.pop();
-                                if (!pooled || pooled.buffer.length < maxBytes) {
-                                    pooled = new PooledBuffer(maxBytes + (maxBytes >> 1), freePool);
-                                }
-                                const written = pooled.buffer.write(buf, 'base64');
-                                const chunk = pooled.buffer.subarray(0, written);
-                                pendingBytes += written;
-                                const writeSuccessStr = stream.write(chunk, pooled.freeCb);
-
-                                if (!writeSuccessStr && pendingBytes >= 16777216) {
-                                    await this.drainPromise;
-                                    pendingBytes = 0;
-                                }
-                            }
-
-                            if (aborted) break;
-                            if (aborted) break;
-                            if (aborted) break;
-                            if (aborted) break;
-                            currentFrame = endFrame;
-                            console.log(`Progress: Rendered ${currentFrame - 1} / ${totalFrames} frames`);
-                            if (onProgress) {
-                                onProgress((currentFrame - 1) / totalFrames);
                             }
                         }
                     } else {
-                        let currentFrame = 1;
-                        while (currentFrame < totalFrames) {
+                        for (let i = 1; i < totalFrames; i++) {
                             if (aborted) break;
-                            const endFrame = Math.min(currentFrame + progressInterval, totalFrames);
 
-                            const prefetchEnd = endFrame === totalFrames ? endFrame - 1 : endFrame;
-                            for (let i = currentFrame; i < prefetchEnd; i++) {
                                 if (aborted) break;
                                 const rawResult = await nextCapturePromise;
 
@@ -369,33 +328,12 @@ export class CaptureLoop {
                                     await this.drainPromise;
                                     pendingBytes = 0;
                                 }
-                            }
-                            if (endFrame === totalFrames && !aborted) {
-                                const rawResult = await nextCapturePromise;
 
-                                let buf;
-                                if (isDomStrategy) {
-                                    const data = rawResult.screenshotData;
-                                    if (data) {
-                                        domLastFrameData = data;
-                                    }
-                                    buf = domLastFrameData;
-                                } else {
-                                    buf = strategy.processCaptureResult!(rawResult);
+                            if (i % progressInterval === 0 || i === totalFrames - 1) {
+                                console.log(`Progress: Rendered ${i} / ${totalFrames} frames`);
+                                if (onProgress) {
+                                    onProgress(i / totalFrames);
                                 }
-                                pendingBytes += (buf as any).length;
-                                const writeSuccessBuf = stream.write(buf as any);
-
-                                if (!writeSuccessBuf && pendingBytes >= 16777216) {
-                                    await this.drainPromise;
-                                    pendingBytes = 0;
-                                }
-                            }
-
-                            currentFrame = endFrame;
-                            console.log(`Progress: Rendered ${currentFrame - 1} / ${totalFrames} frames`);
-                            if (onProgress) {
-                                onProgress((currentFrame - 1) / totalFrames);
                             }
                         }
                     }
@@ -457,13 +395,9 @@ export class CaptureLoop {
                     }
 
                     if (isString) {
-                        let currentFrame = 1;
-                        while (currentFrame < totalFrames) {
+                        for (let i = 1; i < totalFrames; i++) {
                             if (aborted) break;
-                            const endFrame = Math.min(currentFrame + progressInterval, totalFrames);
 
-                            const prefetchEnd = endFrame === totalFrames ? endFrame - 1 : endFrame;
-                            for (let i = currentFrame; i < prefetchEnd; i++) {
                                 if (aborted) break;
                                 const rawResult = await nextCapturePromise;
 
@@ -494,42 +428,18 @@ export class CaptureLoop {
                                     await this.drainPromise;
                                     pendingBytes = 0;
                                 }
-                            }
-                            if (endFrame === totalFrames && !aborted) {
-                                const rawResult = await nextCapturePromise;
 
-                                const buf = rawResult as unknown as string;
-
-                                const maxBytes = (buf.length * 3) >>> 2;
-                                let pooled = freePool.pop();
-                                if (!pooled || pooled.buffer.length < maxBytes) {
-                                    pooled = new PooledBuffer(maxBytes + (maxBytes >> 1), freePool);
+                            if (i % progressInterval === 0 || i === totalFrames - 1) {
+                                console.log(`Progress: Rendered ${i} / ${totalFrames} frames`);
+                                if (onProgress) {
+                                    onProgress(i / totalFrames);
                                 }
-                                const written = pooled.buffer.write(buf, 'base64');
-                                const chunk = pooled.buffer.subarray(0, written);
-                                pendingBytes += written;
-                                const writeSuccessStr = stream.write(chunk, pooled.freeCb);
-
-                                if (!writeSuccessStr && pendingBytes >= 16777216) {
-                                    await this.drainPromise;
-                                    pendingBytes = 0;
-                                }
-                            }
-
-                            currentFrame = endFrame;
-                            console.log(`Progress: Rendered ${currentFrame - 1} / ${totalFrames} frames`);
-                            if (onProgress) {
-                                onProgress((currentFrame - 1) / totalFrames);
                             }
                         }
                     } else {
-                        let currentFrame = 1;
-                        while (currentFrame < totalFrames) {
+                        for (let i = 1; i < totalFrames; i++) {
                             if (aborted) break;
-                            const endFrame = Math.min(currentFrame + progressInterval, totalFrames);
 
-                            const prefetchEnd = endFrame === totalFrames ? endFrame - 1 : endFrame;
-                            for (let i = currentFrame; i < prefetchEnd; i++) {
                                 if (aborted) break;
                                 const buf = await nextCapturePromise;
 
@@ -548,23 +458,12 @@ export class CaptureLoop {
                                     await this.drainPromise;
                                     pendingBytes = 0;
                                 }
-                            }
-                            if (endFrame === totalFrames && !aborted) {
-                                const buf = await nextCapturePromise;
 
-                                pendingBytes += (buf as any).length;
-                                const writeSuccessBuf = stream.write(buf as any);
-
-                                if (!writeSuccessBuf && pendingBytes >= 16777216) {
-                                    await this.drainPromise;
-                                    pendingBytes = 0;
+                            if (i % progressInterval === 0 || i === totalFrames - 1) {
+                                console.log(`Progress: Rendered ${i} / ${totalFrames} frames`);
+                                if (onProgress) {
+                                    onProgress(i / totalFrames);
                                 }
-                            }
-
-                            currentFrame = endFrame;
-                            console.log(`Progress: Rendered ${currentFrame - 1} / ${totalFrames} frames`);
-                            if (onProgress) {
-                                onProgress((currentFrame - 1) / totalFrames);
                             }
                         }
                     }

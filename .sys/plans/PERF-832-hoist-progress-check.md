@@ -1,11 +1,11 @@
 ---
 id: PERF-832
 slug: hoist-progress-check
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: jules
 created: 2024-06-24
-completed: ""
-result: ""
+completed: 2024-06-24
+result: improved
 ---
 
 # PERF-832: Hoist nextFrameToWrite Progress Check in Single-Worker Loop
