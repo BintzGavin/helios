@@ -1,11 +1,11 @@
 ---
 id: PERF-800
 slug: exponential-buffer-growth
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "Jules"
 created: 2026-06-19
-completed: ""
-result: ""
+completed: "2026-06-24"
+result: "discarded"
 ---
 
 # PERF-800: Exponential Capacity Growth for Base64 Decode Buffer
@@ -55,3 +55,10 @@ Run the DOM benchmark and inspect the output video to ensure frames are not corr
 
 ## Prior Art
 - PERF-798: Pre-allocated Base64 Buffer for DOM Strategy Capture
+
+
+## Results Summary
+```tsv
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	0.000	0	0.00	0.0	discard	PERF-800: Obsolete (Base64 buffer allocation hoisted to CaptureLoop.ts with exponential growth)
+```
