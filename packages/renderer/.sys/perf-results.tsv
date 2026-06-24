@@ -269,3 +269,4 @@ PERF-831	Cache DomStrategy lastFrameData Locally	33.791	9.127
 2	1.830	150	81.96	200.0	keep	PERF-833 unswitched isDomStrategy
 3	1.830	150	81.96	200.0	keep	PERF-833 unswitched isDomStrategy
 4	1.830	150	81.96	200.0	keep	PERF-833 unswitched isDomStrategy
+1	0.000	0	0.00	0.0	discard	PERF-805 discarded as obsolete because DomStrategy logic was moved to CaptureLoop

@@ -1,5 +1,6 @@
 ---
-status: claimed
+status: complete
+result: "Discarded"
 ---
 # PERF-805: Optimize Base64 Decode Buffer Allocation
 
@@ -18,3 +19,6 @@ Base64 encoding represents 3 bytes of data for every 4 characters. Currently in 
 5. Update `docs/status/RENDERER-EXPERIMENTS.md` with the outcome.
 6. Record results to `packages/renderer/.sys/perf-results-PERF-805.tsv`.
 7. Mark plan complete and PR changes.
+
+## Results Summary
+Discarded as obsolete: The Base64 decode logic in `DomStrategy.ts` was refactored and hoisted to `CaptureLoop.ts` in previous experiments, and the `(length * 3) >>> 2` bitwise optimization is already natively present in the codebase. No changes necessary.
