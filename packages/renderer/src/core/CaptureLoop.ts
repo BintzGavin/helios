@@ -1153,8 +1153,6 @@ export class CaptureLoop {
             const ringIndex = nextFrameToWrite & ringMask;
             if (frameReadyRing[ringIndex] === 0) {
               await writerWaiterPromise;
-              if (freeWorkersHead > 0 || capturedErrors.length > 0)
-                checkState();
               continue;
             }
 
@@ -1209,8 +1207,6 @@ export class CaptureLoop {
               const ringIndex = nextFrameToWrite & ringMask;
               while (frameReadyRing[ringIndex] === 0 && !aborted) {
                 await writerWaiterPromise;
-                if (freeWorkersHead > 0 || capturedErrors.length > 0)
-                  checkState();
               }
               if (aborted) break;
 
@@ -1257,8 +1253,6 @@ export class CaptureLoop {
               const ringIndex = nextFrameToWrite & ringMask;
               while (frameReadyRing[ringIndex] === 0 && !aborted) {
                 await writerWaiterPromise;
-                if (freeWorkersHead > 0 || capturedErrors.length > 0)
-                  checkState();
               }
               if (aborted) break;
 

@@ -1,8 +1,8 @@
 ---
 id: PERF-845
 slug: remove-redundant-checkstate-multi-worker
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "Jules"
 created: 2024-06-25
 completed: ""
 result: ""
@@ -68,3 +68,9 @@ None.
 
 ## Correctness Check
 Ensure tests pass and rendering does not hang.
+
+## Results Summary
+```
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+2	1.376	10000000	0.00	0.0	keep	PERF-845 remove redundant checkState in multi-worker path (baseline: 1.419s)
+```

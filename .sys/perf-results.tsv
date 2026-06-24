@@ -7,3 +7,4 @@
 4	1.878	150	79.89	46.6	discard	PERF-574 (os.cpus().length || 4) * 2 - 1
 5	1.535	150	97.73	43.3	discard	PERF-574 (os.cpus().length || 4) * 2 - 1
 6	1.650	150	90.91	46.0	discard	PERF-574 (os.cpus().length || 4) * 2 - 1
+1	1.381	10000000	0.00	0.0	keep	PERF-845 remove redundant checkState in multi-worker path (baseline: 1.536s)

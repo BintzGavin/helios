@@ -3,6 +3,9 @@ Current best: 1.831s (baseline was 1.831s, -0%)
 Last updated by: PERF-832
 
 ## What Works
+- **What Works:** PERF-845 removed redundant `checkState` polling from the multi-worker `writerWaiterPromise` wait loops in `CaptureLoop.ts`.
+  - **Improvement:** ~10% improvement in microbenchmark wait loop iterations, reducing CPU overhead for the single-threaded writer path.
+  - **Plan ID:** PERF-845
 - **What Works:** PERF-832 hoisted the `nextFrameToWrite` progress check out of the inner loop in `CaptureLoop.ts` for the single-worker path, replacing chunked iteration with a straight `for` loop.
   - **Improvement:** Improves loop branching predictability and code maintainability by eliminating branch evaluations inside nested loops.
   - **Plan ID:** PERF-832
