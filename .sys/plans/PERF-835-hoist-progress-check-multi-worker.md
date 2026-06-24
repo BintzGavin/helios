@@ -1,11 +1,11 @@
 ---
 id: PERF-835
 slug: hoist-progress-check-multi-worker
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "Jules"
 created: 2024-06-24
 completed: ""
-result: ""
+result: "discarded"
 ---
 
 # PERF-835: Hoist nextFrameToWrite Progress Check in Multi-Worker Loop
