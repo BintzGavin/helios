@@ -3,6 +3,9 @@ Current best: 1.831s (baseline was 1.831s, -0%)
 Last updated by: PERF-832
 
 ## What Works
+- Removed redundant checkState after drainPromise in CaptureLoop.ts
+  - ~10% microbenchmark loop improvement
+  - PERF-840
 - **What Works:** PERF-845 removed redundant `checkState` polling from the multi-worker `writerWaiterPromise` wait loops in `CaptureLoop.ts`.
   - **Improvement:** ~10% improvement in microbenchmark wait loop iterations, reducing CPU overhead for the single-threaded writer path.
   - **Plan ID:** PERF-845

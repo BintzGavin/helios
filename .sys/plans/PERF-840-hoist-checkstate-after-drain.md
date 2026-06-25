@@ -1,7 +1,7 @@
 ---
 id: PERF-840
 slug: hoist-checkstate-after-drain
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-06-25
 completed: ""
