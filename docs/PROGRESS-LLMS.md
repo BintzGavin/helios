@@ -1010,3 +1010,8 @@
   - Updated Roadmap in llms.txt with recent verifiable completions from domain PROGRESS logs (Studio: Timeline Audio/Waveform Regression Tests, Asset Drag and Drop, Enhance MCP Server; CLI: Command Coverage Tests V9; Player: Audio Fader Regression, Bridge Coverage Completeness, Document getSchema; Renderer: Validate HW Accel; Infrastructure: Modal Adapter, Optimize GCS/S3 Uploads, Orchestrator/Stitcher Coverage).
   - Fixed Core API clip properties in llms.txt.
   - Verified all package versions match package.json exactly.
+
+### LLMS v1.108.0
+- ✅ Completed: Daily llms.txt Review
+  - Synced Roadmap in llms.txt with recent verifiable completions from domain PROGRESS logs (Studio: Export Job Spec, Asset Drag and Drop, TimelineAudioTrack Tests; CLI: Command Coverage V9, Docker Adapter Tests, Registry Types Tests; Core: Generic Input Props, Active Clips, Shared Virtual Time Binding; Player: Bridge Coverage Completeness, Media Session Tests, Audio Fader Tests; Renderer: Validate HW Accel, Orchestrator Plan, Refactor Media Sync Logic; Infrastructure: Optimize GCS Uploads, Orchestrator Test Coverage Expansion).
+  - Verified package versions exactly match package.json.
