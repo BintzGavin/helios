@@ -1,11 +1,11 @@
 ---
 id: PERF-849
 slug: peel-single-worker-last-frame
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "claim-PERF-849"
 created: 2024-06-25
-completed: ""
-result: ""
+completed: "2026-06-25"
+result: "discarded"
 ---
 
 # PERF-849: Peel Last Frame Iteration in Single-Worker CaptureLoop Fast Paths

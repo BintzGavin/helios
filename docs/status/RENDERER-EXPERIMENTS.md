@@ -29,6 +29,7 @@ Last updated by: PERF-832
 - PERF-822: Eliminate `i + 1 < totalFrames` branch in CaptureLoop hot paths (~11% microbenchmark improvement)
 
 ## What Doesn't Work (and Why)
+- PERF-849: Peeling the last frame iteration in the single-worker fast path frame loops to avoid `if (i < totalFrames - 1)` check actually increases execution time in V8 (likely due to deoptimization or code duplication). Discarded.
 - Removing redundant aborted checks in single worker loop (slower by 0.00%) - PERF-848
 - PERF-836: Unrolling the `nextFrameToSubmit - nextFrameToWrite < maxPipelineDepth` check in the multi-worker CaptureLoop path. Microbenchmarks showed a ~14% performance degradation. This is likely due to the inner fast-loop increasing closure allocations or V8 engine failing to optimize the deeply nested structure properly, outweighing the minor savings from avoiding branch checks.
 - PERF-800: Exponential Capacity Growth for Base64 Decode Buffer. Discarded as obsolete. The Base64 decode buffer reallocation logic has already been hoisted to CaptureLoop.ts, where it naturally uses 1.5x exponential growth.
