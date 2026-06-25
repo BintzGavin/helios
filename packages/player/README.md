@@ -151,6 +151,9 @@ The `<helios-player>` element implements a subset of the HTMLMediaElement interf
 - `captureStream(): Promise<MediaStream>` - Returns a MediaStream capturing the player's canvas (if same-origin).
 - `startAudioMetering(): void` - Starts audio metering calculation.
 - `stopAudioMetering(): void` - Stops audio metering calculation.
+- `getVideoPlaybackQuality(): VideoPlaybackQuality` - Returns an object containing the video playback quality metrics.
+- `requestVideoFrameCallback(callback: VideoFrameRequestCallback): number` - Registers a callback to be fired when a new frame is rendered.
+- `cancelVideoFrameCallback(handle: number): void` - Cancels a previously registered video frame callback.
 
 ### Properties
 - `disableRemotePlayback` (boolean): Reflected disableremoteplayback attribute.

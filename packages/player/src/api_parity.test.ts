@@ -149,6 +149,22 @@ describe('HeliosPlayer API Parity', () => {
     expect(player.height).toBe(0);
   });
 
+  it('should support getVideoPlaybackQuality method', () => {
+    const quality = player.getVideoPlaybackQuality();
+    expect(quality.creationTime).toBeDefined();
+    expect(quality.totalVideoFrames).toBe(0);
+    expect(quality.droppedVideoFrames).toBe(0);
+    expect(quality.corruptedVideoFrames).toBe(0);
+  });
+
+  it('should support requestVideoFrameCallback and cancelVideoFrameCallback methods', () => {
+    const callback = vi.fn();
+    const handle = player.requestVideoFrameCallback(callback);
+    expect(typeof handle).toBe('number');
+
+    player.cancelVideoFrameCallback(handle);
+  });
+
   it('should support videoWidth and videoHeight', () => {
     // Default 0
     expect(player.videoWidth).toBe(0);
