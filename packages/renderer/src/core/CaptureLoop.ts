@@ -274,7 +274,6 @@ export class CaptureLoop {
                   if (aborted) break;
 
                   if (i < totalFrames - 1) {
-                    if (aborted) break;
                     const rawResult = await nextCapturePromise;
 
                     const timePromise = timeDriver.setTime(
@@ -352,7 +351,6 @@ export class CaptureLoop {
                   if (aborted) break;
 
                   if (i < totalFrames - 1) {
-                    if (aborted) break;
                     const rawResult = await nextCapturePromise;
 
                     const timePromise = timeDriver.setTime(
@@ -427,7 +425,6 @@ export class CaptureLoop {
                   if (aborted) break;
 
                   if (i < totalFrames - 1) {
-                    if (aborted) break;
                     const rawResult = await nextCapturePromise;
 
                     const timePromise = timeDriver.setTime(
@@ -483,7 +480,6 @@ export class CaptureLoop {
                   if (aborted) break;
 
                   if (i < totalFrames - 1) {
-                    if (aborted) break;
                     const rawResult = await nextCapturePromise;
 
                     const timePromise = timeDriver.setTime(
@@ -600,7 +596,6 @@ export class CaptureLoop {
                   if (aborted) break;
 
                   if (i < totalFrames - 1) {
-                    if (aborted) break;
                     const rawResult = await nextCapturePromise;
 
                     const timePromise = timeDriver.setTime(
@@ -671,7 +666,6 @@ export class CaptureLoop {
                   if (aborted) break;
 
                   if (i < totalFrames - 1) {
-                    if (aborted) break;
                     const rawResult = await nextCapturePromise;
 
                     const timePromise = timeDriver.setTime(
@@ -747,7 +741,6 @@ export class CaptureLoop {
                   if (aborted) break;
 
                   if (i < totalFrames - 1) {
-                    if (aborted) break;
                     const buf = await nextCapturePromise;
 
                     const timePromise = timeDriver.setTime(
@@ -792,7 +785,6 @@ export class CaptureLoop {
                   if (aborted) break;
 
                   if (i < totalFrames - 1) {
-                    if (aborted) break;
                     const buf = await nextCapturePromise;
 
                     const timePromise = timeDriver.setTime(

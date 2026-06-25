@@ -287,3 +287,4 @@ PERF-831	Cache DomStrategy lastFrameData Locally	33.791	9.127
 1	0.109	600	0.00	0.0	keep	PERF-840: Remove redundant checkState after drainPromise
 1	1.831	0	0.0	0.0	discard	PERF-849: Peeling the final frame loop iteration in single-worker fast path increases execution time
 1	0.000	0	0.00	0.0	keep	PERF-852 replaced modulo % progress check with fast counter in CaptureLoop.ts (microbenchmark improvement)
+1	0.000	300	0.00	0.0	keep	PERF-848
