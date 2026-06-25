@@ -41,3 +41,6 @@ Last updated by: PERF-832
 - PERF-846: Discarded as obsolete. Duplicate of PERF-848.
 
 ## Open Questions
+
+## What Works
+- Removed 8 redundant inner aborted checks in single-worker fast loop to eliminate V8 per-iteration branch evaluation overhead (~1.4% faster in microbenchmark) (PERF-848)
