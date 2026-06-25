@@ -237,3 +237,4 @@
 - [v0.121.30] ✅ Completed: Improve PropsEditor Coverage - Test coverage increased to ~99% line and branch coverage (2026-06-11-STUDIO-Improve-PropsEditor-Coverage.md).
 [v0.107.2] ✅ Completed: Improve SchemaInputs Coverage - Added unit test coverage for TypedArrayInput components in SchemaInputs.tsx
 [v0.107.2] ✅ Completed: Improve SchemaInputs Coverage - Added unit test coverage for TypedArrayInput components in SchemaInputs.tsx
+[v0.121.33] ✅ Completed: Improve StudioContext Coverage - Created plan to test uncalled lines in StudioContext file (2026-06-15-STUDIO-Improve-StudioContext-Coverage.md).
