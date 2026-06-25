@@ -1,11 +1,11 @@
 ---
 id: PERF-852
 slug: replace-modulo-with-counter-captureloop
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-06-25
 completed: ""
-result: ""
+result: "improved"
 ---
 
 # PERF-852: Replace Modulo Progress Check with Fast Counter in CaptureLoop

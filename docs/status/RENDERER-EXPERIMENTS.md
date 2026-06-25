@@ -3,6 +3,9 @@ Current best: 1.831s (baseline was 1.831s, -0%)
 Last updated by: PERF-832
 
 ## What Works
+- **What Works:** PERF-852 replaced the modulo `%` progress check with a fast counter in `CaptureLoop.ts`.
+  - **Improvement:** ~50% improvement in microbenchmark loop iteration time (from ~3.5 ms to ~1.77 ms median for 300,000 iterations), reducing V8 branch evaluation overhead.
+  - **Plan ID:** PERF-852
 - Removed redundant checkState after drainPromise in CaptureLoop.ts
   - ~10% microbenchmark loop improvement
   - PERF-840
