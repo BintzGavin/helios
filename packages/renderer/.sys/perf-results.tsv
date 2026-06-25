@@ -282,3 +282,6 @@ PERF-831	Cache DomStrategy lastFrameData Locally	33.791	9.127
 1	1.392	10000000	0.00	0.0	keep	PERF-845 remove redundant checkState in multi-worker path (baseline: 1.387s)
 1	1.377	10000000	0.00	0.0	keep	PERF-845 remove redundant checkState in multi-worker path (baseline: 1.420s)
 2	1.376	10000000	0.00	0.0	keep	PERF-845 remove redundant checkState in multi-worker path (baseline: 1.419s)
+
+1	0.109	600	0.00	0.0	keep	PERF-840: Remove redundant checkState after drainPromise
+1	0.109	600	0.00	0.0	keep	PERF-840: Remove redundant checkState after drainPromise

@@ -1228,8 +1228,6 @@ export class CaptureLoop {
               if (!writeSuccess && pendingBytes >= 16777216) {
                 await this.drainPromise;
                 pendingBytes = 0;
-                if (freeWorkersHead > 0 || capturedErrors.length > 0)
-                  checkState();
               }
 
               nextFrameToWrite++;
@@ -1264,8 +1262,6 @@ export class CaptureLoop {
               if (!writeSuccess && pendingBytes >= 16777216) {
                 await this.drainPromise;
                 pendingBytes = 0;
-                if (freeWorkersHead > 0 || capturedErrors.length > 0)
-                  checkState();
               }
 
               nextFrameToWrite++;
