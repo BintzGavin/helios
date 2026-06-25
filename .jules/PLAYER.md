@@ -106,3 +106,7 @@
 ## [v0.77.63] - Identifying HTMLVideoElement Parity Gaps
 **Learning:** While the Player has achieved deep API parity with `HTMLMediaElement` (e.g. `videoWidth`, `played`, `buffered`, `srcObject`), it was missing key methods from the specialized `HTMLVideoElement` interface, specifically `getVideoPlaybackQuality()` and `requestVideoFrameCallback()`.
 **Action:** When planning for API parity, cross-reference both `HTMLMediaElement` and `HTMLVideoElement` MDN pages to ensure all expected APIs of a video-focused element are implemented.
+
+## [v0.77.64] - Documenting and Exposing Media Constants
+**Learning**: Standard `HTMLMediaElement` constants like `HAVE_NOTHING` and `NETWORK_EMPTY` are exposed as both static properties on the constructor and instance properties on the prototype. They were implemented statically in `<helios-player>` but missing from the instance API and documentation.
+**Action**: When achieving API parity with built-in DOM elements, ensure constants are available on both the instance and constructor as expected by standard JavaScript usage patterns, and explicitly document them in the README.

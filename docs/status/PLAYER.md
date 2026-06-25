@@ -266,3 +266,6 @@
 [v0.77.62] ✅ Completed: Discovered missing HTMLVideoElement parity methods (`getVideoPlaybackQuality`, `requestVideoFrameCallback`). Created plan `.sys/plans/2027-03-01-PLAYER-Implement-Video-API-Parity-Methods.md` to implement them.
 [v0.77.63] ✅ Completed: Created `2027-03-01-PLAYER-Implement-Video-API-Parity-Methods.md` execution plan to achieve deeper API parity with the HTMLVideoElement interface.
 [v0.78.0] ✅ Completed: Implement Video API Parity Methods - Added `getVideoPlaybackQuality`, `requestVideoFrameCallback`, and `cancelVideoFrameCallback` to complete HTMLVideoElement API parity.
+
+### Pending Implementations
+- API Parity: Implement missing `HTMLMediaElement` instance constants (e.g. `HAVE_NOTHING`, `NETWORK_EMPTY`) and document them. See plan: `.sys/plans/2024-05-24-PLAYER-Instance-Constants.md`
