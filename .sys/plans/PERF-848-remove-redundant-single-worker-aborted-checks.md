@@ -1,8 +1,8 @@
 ---
 id: PERF-848
 slug: remove-redundant-single-worker-aborted-checks
-status: unclaimed
-claimed_by: ""
+status: discarded
+claimed_by: "jules"
 created: 2024-06-25
 completed: ""
 result: ""
