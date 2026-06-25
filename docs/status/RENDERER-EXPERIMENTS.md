@@ -41,3 +41,4 @@ Last updated by: PERF-832
 - PERF-846: Discarded as obsolete. Duplicate of PERF-848.
 
 ## Open Questions
+- PERF-853: Reapply Time Seek Overlap with CPU Processing in CaptureLoop Fast Paths (Plan created as unclaimed).
