@@ -843,6 +843,18 @@ template.innerHTML = `
   </div>
 `;
 
+export interface VideoFrameCallbackMetadata {
+  presentationTime: DOMHighResTimeStamp;
+  expectedDisplayTime: DOMHighResTimeStamp;
+  width: number;
+  height: number;
+  mediaTime: number;
+  presentedFrames: number;
+  processingDuration: number;
+}
+
+export type VideoFrameRequestCallback = (now: DOMHighResTimeStamp, metadata: VideoFrameCallbackMetadata) => void;
+
 export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHost, VideoTrackHost {
   private iframe: HTMLIFrameElement;
   private pipVideo: HTMLVideoElement;
@@ -1164,6 +1176,34 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
     // We strictly play Helios compositions, not standard video MIME types.
     // Return empty string to be spec-compliant for video/mp4 etc.
     return "";
+  }
+
+  public getVideoPlaybackQuality(): VideoPlaybackQuality {
+    return {
+      creationTime: performance.now(),
+      totalVideoFrames: this.currentFrame,
+      droppedVideoFrames: 0,
+      corruptedVideoFrames: 0
+    };
+  }
+
+  public requestVideoFrameCallback(callback: VideoFrameRequestCallback): number {
+    return requestAnimationFrame((now: DOMHighResTimeStamp) => {
+      const metadata: VideoFrameCallbackMetadata = {
+        presentationTime: now,
+        expectedDisplayTime: now,
+        width: this.videoWidth,
+        height: this.videoHeight,
+        mediaTime: this.currentTime,
+        presentedFrames: this.currentFrame,
+        processingDuration: 0,
+      };
+      callback(now, metadata);
+    });
+  }
+
+  public cancelVideoFrameCallback(handle: number): void {
+    cancelAnimationFrame(handle);
   }
 
   public get defaultMuted(): boolean {

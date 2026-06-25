@@ -75,3 +75,4 @@ Supported Formats: `mp4`, `webm`, `png`, `jpeg`
 Supported Features: Resizing, Bitrate control, Audio merging, Caption rendering.
 
 - `onplaying`, `onwaiting`, `onsuspend`, `onstalled`: Standard media event handler properties.
+\n## Section D: Methods\n- `getVideoPlaybackQuality()`: Returns playback quality metrics.\n- `requestVideoFrameCallback(callback: VideoFrameRequestCallback): number`: Registers a callback to be fired when a new frame is rendered.\n- `cancelVideoFrameCallback(handle: number): void`: Cancels a previously registered video frame callback.

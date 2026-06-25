@@ -1,4 +1,7 @@
 #
+### PLAYER v0.78.0
+- ✅ Completed: Implement Video API Parity Methods - Added `getVideoPlaybackQuality`, `requestVideoFrameCallback`, and `cancelVideoFrameCallback` to complete HTMLVideoElement API parity.
+
 ### PLAYER v0.77.57
 - ✅ Completed: Discovered that `2027-02-18-PLAYER-Implement-Missing-Media-Event-Dispatches.md` is an IMPOSSIBLE: DUPLICATION plan. The event dispatches (`abort`, `emptied`, `progress`) are already fully implemented in the code. Documented as impossible and discarded.
 
