@@ -1,11 +1,11 @@
 ---
 id: PERF-851
 slug: counter-based-progress-check
-status: unclaimed
+status: discarded
 claimed_by: ""
 created: 2024-06-25
 completed: ""
-result: ""
+result: superseded-by-852
 ---
 
 # PERF-851: Replace Modulo Progress Check with Fast Counter
