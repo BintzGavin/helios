@@ -196,6 +196,7 @@ export class CaptureLoop {
 
       try {
         let isString: boolean | null = null;
+        let nextProgress = progressInterval;
         if (hasProcessFn) {
           let nextCapturePromise = null;
           if (totalFrames > 0) {
@@ -336,7 +337,8 @@ export class CaptureLoop {
                     }
                   }
 
-                  if (i % progressInterval === 0 || i === totalFrames - 1) {
+                  if (i === nextProgress || i === totalFrames - 1) {
+                    if (i === nextProgress) nextProgress += progressInterval;
                     console.log(
                       `Progress: Rendered ${i} / ${totalFrames} frames`,
                     );
@@ -408,7 +410,8 @@ export class CaptureLoop {
                     }
                   }
 
-                  if (i % progressInterval === 0 || i === totalFrames - 1) {
+                  if (i === nextProgress || i === totalFrames - 1) {
+                    if (i === nextProgress) nextProgress += progressInterval;
                     console.log(
                       `Progress: Rendered ${i} / ${totalFrames} frames`,
                     );
@@ -465,7 +468,8 @@ export class CaptureLoop {
                     }
                   }
 
-                  if (i % progressInterval === 0 || i === totalFrames - 1) {
+                  if (i === nextProgress || i === totalFrames - 1) {
+                    if (i === nextProgress) nextProgress += progressInterval;
                     console.log(
                       `Progress: Rendered ${i} / ${totalFrames} frames`,
                     );
@@ -515,7 +519,8 @@ export class CaptureLoop {
                     }
                   }
 
-                  if (i % progressInterval === 0 || i === totalFrames - 1) {
+                  if (i === nextProgress || i === totalFrames - 1) {
+                    if (i === nextProgress) nextProgress += progressInterval;
                     console.log(
                       `Progress: Rendered ${i} / ${totalFrames} frames`,
                     );
@@ -651,7 +656,8 @@ export class CaptureLoop {
                     }
                   }
 
-                  if (i % progressInterval === 0 || i === totalFrames - 1) {
+                  if (i === nextProgress || i === totalFrames - 1) {
+                    if (i === nextProgress) nextProgress += progressInterval;
                     console.log(
                       `Progress: Rendered ${i} / ${totalFrames} frames`,
                     );
@@ -724,7 +730,8 @@ export class CaptureLoop {
                     }
                   }
 
-                  if (i % progressInterval === 0 || i === totalFrames - 1) {
+                  if (i === nextProgress || i === totalFrames - 1) {
+                    if (i === nextProgress) nextProgress += progressInterval;
                     console.log(
                       `Progress: Rendered ${i} / ${totalFrames} frames`,
                     );
@@ -770,7 +777,8 @@ export class CaptureLoop {
                     }
                   }
 
-                  if (i % progressInterval === 0 || i === totalFrames - 1) {
+                  if (i === nextProgress || i === totalFrames - 1) {
+                    if (i === nextProgress) nextProgress += progressInterval;
                     console.log(
                       `Progress: Rendered ${i} / ${totalFrames} frames`,
                     );
@@ -817,7 +825,8 @@ export class CaptureLoop {
                     }
                   }
 
-                  if (i % progressInterval === 0 || i === totalFrames - 1) {
+                  if (i === nextProgress || i === totalFrames - 1) {
+                    if (i === nextProgress) nextProgress += progressInterval;
                     console.log(
                       `Progress: Rendered ${i} / ${totalFrames} frames`,
                     );
@@ -1146,6 +1155,7 @@ export class CaptureLoop {
 
       try {
         let isString: boolean | null = null;
+        let nextProgress = progressInterval;
         if (nextFrameToWrite < totalFrames && !aborted) {
           while (!aborted) {
             if (aborted) break;
@@ -1160,7 +1170,8 @@ export class CaptureLoop {
 
             const currentFrame = nextFrameToWrite;
 
-            if (currentFrame % progressInterval === 0) {
+            if (currentFrame === nextProgress) {
+              nextProgress += progressInterval;
               console.log(
                 `Progress: Rendered ${currentFrame} / ${totalFrames} frames`,
               );
@@ -1235,9 +1246,11 @@ export class CaptureLoop {
 
               if (
                 !aborted &&
-                (nextFrameToWrite % progressInterval === 0 ||
+                (nextFrameToWrite === nextProgress ||
                   nextFrameToWrite === totalFrames)
               ) {
+                if (nextFrameToWrite === nextProgress)
+                  nextProgress += progressInterval;
                 console.log(
                   `Progress: Rendered ${nextFrameToWrite} / ${totalFrames} frames`,
                 );
@@ -1269,9 +1282,11 @@ export class CaptureLoop {
 
               if (
                 !aborted &&
-                (nextFrameToWrite % progressInterval === 0 ||
+                (nextFrameToWrite === nextProgress ||
                   nextFrameToWrite === totalFrames)
               ) {
+                if (nextFrameToWrite === nextProgress)
+                  nextProgress += progressInterval;
                 console.log(
                   `Progress: Rendered ${nextFrameToWrite} / ${totalFrames} frames`,
                 );
