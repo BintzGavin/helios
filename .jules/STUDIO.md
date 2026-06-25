@@ -27,3 +27,6 @@
 ## 0.121.32 - AudioMixerPanel Coverage Update
 **Learning:** Found an untested area in `AudioMixerPanel.tsx` (optimistic UI updates and fetch track errors) and updated `AudioMixerPanel.test.tsx` to reach 100% coverage, verifying both the UI state and controller interactions for volume changes and fetch failures.
 **Action:** Mock error responses directly in test cases (`mockRejectedValueOnce`) and trigger UI events (`fireEvent.change`) to hit edge case logic.
+## 0.121.33 - StudioContext Coverage Update
+**Learning:** Uncovered lines in `StudioContext.tsx` (openInEditor utility calling a special endpoint and the unprovided hook throw case). A new coverage plan handles these paths.
+**Action:** Use `renderHook` from `@testing-library/react` without wrappers to trigger the throw edge case, and mock `fetch` appropriately for utility endpoints.
