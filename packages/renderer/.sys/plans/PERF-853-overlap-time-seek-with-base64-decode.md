@@ -1,11 +1,11 @@
 ---
 id: PERF-853
 slug: overlap-time-seek-with-base64-decode
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor"
 created: 2026-06-25
-completed: ""
-result: ""
+completed: "2026-06-25"
+result: "improved"
 ---
 
 # PERF-853: Reapply Time Seek Overlap with Base64 Decode in CaptureLoop
