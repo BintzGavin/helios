@@ -280,8 +280,6 @@ export class CaptureLoop {
                       page,
                       (startFrame + i + 1) * compTimeStep,
                     );
-                    if (timePromise) await timePromise;
-                    nextCapturePromise = domBeginFrame!();
 
                     let buf;
                     const data = rawResult.screenshotData;
@@ -300,6 +298,10 @@ export class CaptureLoop {
                     }
                     const written = pooled.buffer.write(buf, "base64");
                     const chunk = pooled.buffer.subarray(0, written);
+
+                    if (timePromise) await timePromise;
+                    nextCapturePromise = domBeginFrame!();
+
                     pendingBytes += written;
                     const writeSuccessStr = stream.write(chunk, pooled.freeCb);
 
@@ -357,11 +359,6 @@ export class CaptureLoop {
                       page,
                       (startFrame + i + 1) * compTimeStep,
                     );
-                    if (timePromise) await timePromise;
-                    nextCapturePromise = strategy.capture(
-                      page,
-                      (i + 1) * timeStep,
-                    );
 
                     let buf;
                     buf = strategy.processCaptureResult!(rawResult) as string;
@@ -376,6 +373,13 @@ export class CaptureLoop {
                     }
                     const written = pooled.buffer.write(buf, "base64");
                     const chunk = pooled.buffer.subarray(0, written);
+
+                    if (timePromise) await timePromise;
+                    nextCapturePromise = strategy.capture(
+                      page,
+                      (i + 1) * timeStep,
+                    );
+
                     pendingBytes += written;
                     const writeSuccessStr = stream.write(chunk, pooled.freeCb);
 
