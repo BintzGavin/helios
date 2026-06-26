@@ -1,11 +1,11 @@
 ---
 id: PERF-854
 slug: overlap-ffmpeg-write-with-time-seek
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-06-25
 completed: ""
-result: ""
+result: "discarded"
 ---
 
 # PERF-854: Overlap FFmpeg stream write with Time Seek CDP await
