@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { render, act, waitFor } from '@testing-library/react';
+import { render, act, waitFor, renderHook } from '@testing-library/react';
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { StudioProvider, useStudio } from './StudioContext';
 
@@ -272,6 +272,73 @@ describe('StudioContext', () => {
       await waitFor(() => {
         expect(mockController.seek).toHaveBeenCalledWith(50);
       });
+    });
+  });
+
+  describe('Editor Integration', () => {
+    it('openInEditor calls fetch with mapped url', async () => {
+      let context: any;
+
+      render(
+        <StudioProvider>
+          <TestComponent onReady={(ctx) => { context = ctx; }} />
+        </StudioProvider>
+      );
+
+      await waitFor(() => expect(context).toBeDefined());
+
+      act(() => {
+        context.openInEditor('/@fs/my/file/path.ts');
+      });
+
+      expect(mockFetch).toHaveBeenCalledWith('/__open-in-editor?file=%2Fmy%2Ffile%2Fpath.ts');
+    });
+
+    it('openInEditor handles fetch error gracefully', async () => {
+      let context: any;
+
+      // Override the specific call in openInEditor to reject
+      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      mockFetch.mockImplementation((url: string) => {
+        if (url.startsWith('/__open-in-editor')) {
+            return Promise.reject(new Error('Network error'));
+        }
+        return Promise.resolve({
+            json: () => Promise.resolve([]),
+            ok: true
+        });
+      });
+
+      render(
+        <StudioProvider>
+          <TestComponent onReady={(ctx) => { context = ctx; }} />
+        </StudioProvider>
+      );
+
+      await waitFor(() => expect(context).toBeDefined());
+
+      act(() => {
+        context.openInEditor('/my/file/path.ts');
+      });
+
+      await waitFor(() => {
+        expect(errorSpy).toHaveBeenCalledWith('Failed to open in editor', expect.any(Error));
+      });
+
+      errorSpy.mockRestore();
+    });
+  });
+
+  describe('useStudio hook', () => {
+    it('throws error when used outside of StudioProvider', () => {
+      // Suppress the expected error from React boundaries in test output
+      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+      expect(() => {
+        renderHook(() => useStudio());
+      }).toThrow('useStudio must be used within a StudioProvider');
+
+      errorSpy.mockRestore();
     });
   });
 
