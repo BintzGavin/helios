@@ -1,3 +1,8 @@
+### LLMS v1.109.0
+- ✅ Completed: Daily llms.txt Review
+  - Updated Quick Facts and Roadmap with the current package versions (Studio v0.121.11+, Player v0.77.5+, Renderer v1.79.0+, CLI v0.46.53+, Infrastructure v0.54.26+).
+  - Synced Roadmap in llms.txt with recent verifiable completions from domain PROGRESS logs (Studio: Asset Drag and Drop; CLI: Scaffold Cloudflare Sandbox Deployment, Scaffold Hetzner Deployment; Player: Document getSchema API Parity; Renderer: Canvas Image Preload; Infrastructure: CloudRun Resiliency Tests).
+
 ### LLMS v1.104.0
 - ✅ Completed: Daily llms.txt Review
   - Synced roadmap with progress logs (added Component Management for Studio, Tier 3 Cloud Execution Adapters for CLI and Infrastructure).
