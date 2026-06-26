@@ -1,4 +1,7 @@
 #
+### PLAYER v0.78.1
+- ✅ Completed: Implement Instance Constants - Added standard media constants (e.g., HAVE_NOTHING, NETWORK_EMPTY) to the HeliosPlayer instance for HTMLMediaElement parity.
+
 ### PLAYER v0.78.0
 - ✅ Completed: Implement Video API Parity Methods - Added `getVideoPlaybackQuality`, `requestVideoFrameCallback`, and `cancelVideoFrameCallback` to complete HTMLVideoElement API parity.
 

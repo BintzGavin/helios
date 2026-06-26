@@ -156,6 +156,16 @@ The `<helios-player>` element implements a subset of the HTMLMediaElement interf
 - `cancelVideoFrameCallback(handle: number): void` - Cancels a previously registered video frame callback.
 
 ### Properties
+- `HAVE_NOTHING` (number, read-only): Constant representing no media data available (0).
+- `HAVE_METADATA` (number, read-only): Constant representing media metadata available (1).
+- `HAVE_CURRENT_DATA` (number, read-only): Constant representing data for current playback position available (2).
+- `HAVE_FUTURE_DATA` (number, read-only): Constant representing data for current and future playback position available (3).
+- `HAVE_ENOUGH_DATA` (number, read-only): Constant representing enough data available to play through (4).
+- `NETWORK_EMPTY` (number, read-only): Constant representing uninitialized network state (0).
+- `NETWORK_IDLE` (number, read-only): Constant representing idle network state (1).
+- `NETWORK_LOADING` (number, read-only): Constant representing loading network state (2).
+- `NETWORK_NO_SOURCE` (number, read-only): Constant representing no source network state (3).
+
 - `disableRemotePlayback` (boolean): Reflected disableremoteplayback attribute.
 - `mediaGroup` (string): Reflected mediagroup attribute.
 - `sinkId` (string, read-only): Returns the current audio sink id.

@@ -1,5 +1,6 @@
 [v0.77.53] ✅ Completed: Identified missing HTMLMediaElement events (`abort`, `emptied`, `progress`) in `<helios-player>`. Created plan `.sys/plans/2027-02-15-PLAYER-Add-Missing-Events.md` to implement them.
-**Version**: 0.78.0
+**Version**: 0.78.1
+[v0.78.1] ✅ Completed: Implement Instance Constants - Added standard media constants (e.g., HAVE_NOTHING, NETWORK_EMPTY) to the HeliosPlayer instance for HTMLMediaElement parity.
 [v0.77.60] ✅ Completed: Discovered that 2026-06-03-PLAYER-configurable-export-resolution.md is an IMPOSSIBLE: DUPLICATION plan. The export-width and export-height properties are already fully implemented and verified in the codebase. Documented as impossible and discarded.
 [v0.77.41] ✅ Completed: Discovered undocumented event handler properties in implementation missing from README. Created plan `.sys/plans/2027-02-15-PLAYER-Document-Event-Handlers.md` to document `onplay`, `onpause`, etc.
 [v0.77.52] ✅ Completed: Fix API Parity Events - Implemented synthetic dispatches for missing media events (suspend, stalled, waiting) to improve HTMLMediaElement API parity.

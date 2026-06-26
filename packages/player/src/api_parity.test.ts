@@ -19,6 +19,18 @@ describe('HeliosPlayer API Parity', () => {
     document.body.appendChild(player);
   });
 
+  it('should support standard media constants on instances', () => {
+    expect(player.HAVE_NOTHING).toBe(0);
+    expect(player.HAVE_METADATA).toBe(1);
+    expect(player.HAVE_CURRENT_DATA).toBe(2);
+    expect(player.HAVE_FUTURE_DATA).toBe(3);
+    expect(player.HAVE_ENOUGH_DATA).toBe(4);
+    expect(player.NETWORK_EMPTY).toBe(0);
+    expect(player.NETWORK_IDLE).toBe(1);
+    expect(player.NETWORK_LOADING).toBe(2);
+    expect(player.NETWORK_NO_SOURCE).toBe(3);
+  });
+
   afterEach(() => {
     document.body.innerHTML = '';
   });
