@@ -53,6 +53,8 @@ Observed attributes:
 - `addTextTrack(kind: TextTrackKind, label?: string, language?: string): TextTrack`
 
 Properties:
+- `HAVE_NOTHING`, `HAVE_METADATA`, `HAVE_CURRENT_DATA`, `HAVE_FUTURE_DATA`, `HAVE_ENOUGH_DATA`: Instance media constant values.
+- `NETWORK_EMPTY`, `NETWORK_IDLE`, `NETWORK_LOADING`, `NETWORK_NO_SOURCE`: Instance media constant values.
 - `currentTime: number`
 - `duration: number`
 - `volume: number`

@@ -944,6 +944,17 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
   private _readyState: number = HeliosPlayer.HAVE_NOTHING;
   private _networkState: number = HeliosPlayer.NETWORK_EMPTY;
 
+  public get HAVE_NOTHING(): number { return HeliosPlayer.HAVE_NOTHING; }
+  public get HAVE_METADATA(): number { return HeliosPlayer.HAVE_METADATA; }
+  public get HAVE_CURRENT_DATA(): number { return HeliosPlayer.HAVE_CURRENT_DATA; }
+  public get HAVE_FUTURE_DATA(): number { return HeliosPlayer.HAVE_FUTURE_DATA; }
+  public get HAVE_ENOUGH_DATA(): number { return HeliosPlayer.HAVE_ENOUGH_DATA; }
+
+  public get NETWORK_EMPTY(): number { return HeliosPlayer.NETWORK_EMPTY; }
+  public get NETWORK_IDLE(): number { return HeliosPlayer.NETWORK_IDLE; }
+  public get NETWORK_LOADING(): number { return HeliosPlayer.NETWORK_LOADING; }
+  public get NETWORK_NO_SOURCE(): number { return HeliosPlayer.NETWORK_NO_SOURCE; }
+
   public get readyState(): number {
     return this._readyState;
   }
