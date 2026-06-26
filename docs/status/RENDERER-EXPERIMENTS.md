@@ -1,8 +1,9 @@
 ## Performance Trajectory
 Current best: 1.831s (baseline was 1.831s, -0%)
-Last updated by: PERF-832
+Last updated by: PERF-855
 
 ## What Works
+- Hoisted redundant aborted checks in multi-worker fast path to eliminate V8 per-iteration branch evaluation overhead (~3.8% faster in microbenchmark) (PERF-855)
 - Overlapped Time Seek CDP command with CPU-bound Base64 decoding in single-worker DOM loops, preventing network roundtrip from blocking V8 decode (~6% improvement on microbenchmarks) (PERF-853)
 - **What Works:** PERF-852 replaced the modulo `%` progress check with a fast counter in `CaptureLoop.ts`.
   - **Improvement:** ~50% improvement in microbenchmark loop iteration time (from ~3.5 ms to ~1.77 ms median for 300,000 iterations), reducing V8 branch evaluation overhead.

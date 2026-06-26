@@ -1209,13 +1209,13 @@ export class CaptureLoop {
 
           if (!aborted && isString) {
             while (nextFrameToWrite < totalFrames && !aborted) {
-              if (aborted) break;
-
               const ringIndex = nextFrameToWrite & ringMask;
-              while (frameReadyRing[ringIndex] === 0 && !aborted) {
-                await writerWaiterPromise;
+              if (frameReadyRing[ringIndex] === 0) {
+                while (frameReadyRing[ringIndex] === 0 && !aborted) {
+                  await writerWaiterPromise;
+                }
+                if (aborted) break;
               }
-              if (aborted) break;
 
               const buffer = frameBufferRing[ringIndex]! as string;
 
@@ -1255,13 +1255,13 @@ export class CaptureLoop {
             }
           } else if (!aborted) {
             while (nextFrameToWrite < totalFrames && !aborted) {
-              if (aborted) break;
-
               const ringIndex = nextFrameToWrite & ringMask;
-              while (frameReadyRing[ringIndex] === 0 && !aborted) {
-                await writerWaiterPromise;
+              if (frameReadyRing[ringIndex] === 0) {
+                while (frameReadyRing[ringIndex] === 0 && !aborted) {
+                  await writerWaiterPromise;
+                }
+                if (aborted) break;
               }
-              if (aborted) break;
 
               const buffer = frameBufferRing[ringIndex]!;
 
