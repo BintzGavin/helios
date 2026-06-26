@@ -238,3 +238,4 @@
 [v0.107.2] ✅ Completed: Improve SchemaInputs Coverage - Added unit test coverage for TypedArrayInput components in SchemaInputs.tsx
 [v0.107.2] ✅ Completed: Improve SchemaInputs Coverage - Added unit test coverage for TypedArrayInput components in SchemaInputs.tsx
 [v0.121.33] ✅ Completed: Improve StudioContext Coverage - Created plan to test uncalled lines in StudioContext file (2026-06-15-STUDIO-Improve-StudioContext-Coverage.md).
+- [v0.121.33] ✅ Completed: Improve StudioContext Coverage - Achieved 100% test coverage by addressing `useStudio` outside-provider exceptions and `openInEditor` fetch errors.
