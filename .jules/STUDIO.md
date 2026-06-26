@@ -30,3 +30,6 @@
 ## 0.121.33 - StudioContext Coverage Update
 **Learning:** Uncovered lines in `StudioContext.tsx` (openInEditor utility calling a special endpoint and the unprovided hook throw case). A new coverage plan handles these paths.
 **Action:** Use `renderHook` from `@testing-library/react` without wrappers to trigger the throw edge case, and mock `fetch` appropriately for utility endpoints.
+## 0.121.34 - DiagnosticsModal Coverage Update
+**Learning:** React Testing Library's `act` wrapper is necessary when a component has async fetches and side effects (like updating loading states, or reading from `global.fetch` inside `useEffect`) during testing, to avoid the annoying `not wrapped in act(...)` warning, and also allows full traversal of error branches when API fetches reject.
+**Action:** Always wrap state-updating logic or the rendering of components containing `useEffect` data fetching in `act()` or wait for updates explicitly.
