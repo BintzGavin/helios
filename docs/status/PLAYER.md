@@ -270,3 +270,4 @@
 
 ### Pending Implementations
 - API Parity: Implement missing `HTMLMediaElement` instance constants (e.g. `HAVE_NOTHING`, `NETWORK_EMPTY`) and document them. See plan: `.sys/plans/2024-05-24-PLAYER-Instance-Constants.md`
+[v0.78.1] ✅ Completed: Discovered missing HTMLMediaElement parity method (`setMediaKeys`). Created plan `.sys/plans/2027-03-02-PLAYER-Implement-setMediaKeys.md` to implement it.
