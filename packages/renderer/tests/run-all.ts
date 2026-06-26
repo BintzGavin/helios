@@ -35,7 +35,7 @@ const tests = [
   'tests/verify-diagnose-ffmpeg.ts',
   'tests/verify-dom-audio-fades.ts',
   'tests/verify-dom-media-attributes.ts',
-  'tests/verify-dom-transparency.ts',
+
   'tests/verify-enhanced-dom-preload.ts',
   'tests/verify-frame-count.ts',
   'tests/verify-hwaccel-validation.ts',

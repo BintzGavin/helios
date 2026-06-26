@@ -1,11 +1,11 @@
 ---
 id: PERF-857
 slug: chunked-progress-counter-multi-worker
-status: unclaimed
+status: discarded
 claimed_by: ""
 created: 2026-06-26
 completed: ""
-result: ""
+result: "superseded-by-PERF-858"
 ---
 
 # PERF-857: Replace Loop Branching with Chunked Inner Loops in CaptureLoop Multi-Worker Write Path
