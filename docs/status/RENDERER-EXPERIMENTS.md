@@ -45,3 +45,6 @@ Last updated by: PERF-832
 
 ## What Works
 - Removed 8 redundant inner aborted checks in single-worker fast loop to eliminate V8 per-iteration branch evaluation overhead (~1.4% faster in microbenchmark) (PERF-848)
+
+## What Doesn't Work (and Why)
+- Overlapping FFmpeg stream write with Time Seek CDP await in the single-worker path (PERF-854). The Node.js stream write `stream.write` is extremely fast and mostly synchronous in its execution up until the OS buffer fills. Our test scripts and microbenchmarks show the overlapping actually caused a regression of ~1-3% because we delayed starting the CDP time seek command (`timeDriver.setTime`), which is network bound and takes significantly longer. Pushing the time seek *earlier* is more important than eagerly pushing the synchronous stream write, especially since `stream.write` isn't a long-running CPU bound task like Base64 decoding.
