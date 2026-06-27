@@ -108,4 +108,63 @@ describe('AudioMixerPanel', () => {
 
     expect(mockController.setAudioTrackMuted).toHaveBeenCalledWith('track-3', false);
   });
+
+  it('changes volume correctly', async () => {
+    renderComponent();
+    await waitFor(() => screen.getByText('track-1'));
+
+    const sliders = screen.getAllByRole('slider');
+    fireEvent.change(sliders[0], { target: { value: '0.5' } });
+
+    expect(mockController.setAudioTrackVolume).toHaveBeenCalledWith('track-1', 0.5);
+  });
+
+  it('handles fetch error gracefully', async () => {
+    mockController.getAudioTracks.mockRejectedValue(new Error('Fetch Error'));
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    renderComponent();
+    await waitFor(() => {
+        expect(consoleSpy).toHaveBeenCalledWith("Failed to fetch audio tracks", expect.any(Error));
+    });
+
+    consoleSpy.mockRestore();
+  });
+
+  it('refreshes tracks on button click', async () => {
+     renderComponent();
+     await waitFor(() => screen.getByText('track-1'));
+
+     const refreshBtn = screen.getByTitle('Refresh Tracks');
+     fireEvent.click(refreshBtn);
+
+     expect(mockController.getAudioTracks).toHaveBeenCalledTimes(2);
+  });
+
+  it('toggles solo correctly with snapshot restoration', async () => {
+    renderComponent();
+    await waitFor(() => screen.getByText('track-1'));
+
+    const soloBtns = screen.getAllByTitle('Solo');
+
+    fireEvent.click(soloBtns[1]); // track-2 (initially muted)
+    expect(mockController.setAudioTrackMuted).toHaveBeenCalledWith('track-1', true);
+
+    // Deactivate solo
+    fireEvent.click(soloBtns[1]);
+    expect(mockController.setAudioTrackMuted).toHaveBeenCalledWith('track-2', true);
+  });
+
+  it('renders empty state when no controller', () => {
+    mockContextValue.controller = null;
+    renderComponent();
+    expect(screen.getByText('Connect to player...')).toBeInTheDocument();
+  });
+
+  it('renders empty state when no tracks', async () => {
+    mockController.getAudioTracks.mockResolvedValue([]);
+    renderComponent();
+    await waitFor(() => expect(screen.getByText('No audio tracks found.')).toBeInTheDocument());
+  });
+
 });

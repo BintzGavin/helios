@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import React from 'react';
-import { render, screen, waitFor, fireEvent } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { DiagnosticsModal } from './DiagnosticsModal';
 import { StudioContext } from '../context/StudioContext';
@@ -169,7 +169,7 @@ describe('DiagnosticsModal', () => {
         expect(await screen.findByText(/Server Error/)).toBeDefined();
     });
 
-    it('should close when close button is clicked', () => {
+    it('should close when close button is clicked', async () => {
         // Mock success for this test to avoid crash
         vi.mocked(Helios.diagnose).mockResolvedValue(mockClientReport as any);
         vi.mocked(global.fetch).mockResolvedValue({
@@ -178,39 +178,28 @@ describe('DiagnosticsModal', () => {
         } as Response);
 
         renderWithContext(true);
+        await waitFor(() => expect(screen.getByText('System Diagnostics')).toBeInTheDocument());
         const closeBtn = screen.getByText('×');
         fireEvent.click(closeBtn);
         expect(setDiagnosticsOpen).toHaveBeenCalledWith(false);
     });
 
-    it('should close when overlay is clicked', () => {
-        // Mock success
+    it('should close when overlay is clicked', async () => {
         vi.mocked(Helios.diagnose).mockResolvedValue(mockClientReport as any);
         vi.mocked(global.fetch).mockResolvedValue({
             ok: true,
             json: async () => mockServerReport
         } as Response);
 
-        renderWithContext(true);
-        // The overlay is the outer div with class diagnostics-modal-overlay
-        // Since we can't easily select by class in testing-library without adding data-testid,
-        // we can find the modal content and click its parent?
-        // Or just assume the first div is overlay.
-        // Let's rely on the structure. The Modal is inside the Overlay.
-        // We can click the document body? No, overlay covers screen.
-
-        // Let's add data-testid to the component (or just rely on class selector if supported by custom queries, but here we stick to standard)
-        // Actually, we can click the element that has the onClick handler.
-        // In the component: <div className="diagnostics-modal-overlay" onClick={() => setDiagnosticsOpen(false)}>
-
-        // We can use container.firstChild
         const { container } = renderWithContext(true);
+        await waitFor(() => expect(screen.getByText('TestServerAgent')).toBeInTheDocument());
+
         const overlay = container.firstChild as HTMLElement;
         fireEvent.click(overlay);
         expect(setDiagnosticsOpen).toHaveBeenCalledWith(false);
     });
 
-    it('should NOT close when modal content is clicked', () => {
+    it('should NOT close when modal content is clicked', async () => {
         // Mock success
         vi.mocked(Helios.diagnose).mockResolvedValue(mockClientReport as any);
         vi.mocked(global.fetch).mockResolvedValue({
@@ -219,6 +208,7 @@ describe('DiagnosticsModal', () => {
         } as Response);
 
         renderWithContext(true);
+        await waitFor(() => expect(screen.getByText('System Diagnostics')).toBeInTheDocument());
         const modalContent = screen.getByText('System Diagnostics').closest('.diagnostics-modal');
         expect(modalContent).not.toBeNull();
 

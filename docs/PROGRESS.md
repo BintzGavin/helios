@@ -52,6 +52,9 @@
 - ✅ Completed: Improve AudioMeter Coverage - Added unit tests for AudioMeter to ensure full line and branch coverage including clipping and warning thresholds.
 
 
+### STUDIO v0.107.4
+- ✅ Completed: Improve AudioMixerPanel Coverage - Reached 90%+ test coverage for AudioMixerPanel and DiagnosticsModal.
+
 ### STUDIO v0.107.3
 - ✅ Completed: Improve PlaybackControls Coverage - Reached 100% test coverage for PlaybackControls.
 
