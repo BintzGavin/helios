@@ -137,6 +137,7 @@ The `<helios-player>` element implements a subset of the HTMLMediaElement interf
 ### Methods
 
 - `setSinkId(sinkId: string): Promise<void>` - Sets the audio sink id.
+- `setMediaKeys(mediaKeys: MediaKeys | null): Promise<void>` - Sets the MediaKeys object to use for decrypting media.
 
 - `play(): Promise<void>` - Starts playback.
 - `getSchema(): Promise<HeliosSchema | undefined>` - Retrieves the input properties schema from the composition.
@@ -169,6 +170,7 @@ The `<helios-player>` element implements a subset of the HTMLMediaElement interf
 - `disableRemotePlayback` (boolean): Reflected disableremoteplayback attribute.
 - `mediaGroup` (string): Reflected mediagroup attribute.
 - `sinkId` (string, read-only): Returns the current audio sink id.
+- `mediaKeys` (MediaKeys | null, read-only): The MediaKeys object associated with the media element.
 
 - `src` (string): URL of the composition page to load in the iframe.
 - `autoplay` (boolean): Reflected autoplay attribute.
