@@ -66,3 +66,6 @@ Last updated by: PERF-855
 - Would chunked loops benefit multi-worker paths as well? (PERF-856) -> Yes, PERF-859 planned.
 - PERF-860: Single-worker chunked loops planned.
 - PERF-862: Eliminate redundant aborted checks in chunked loop conditions planned.
+- **What Works:** PERF-863 hoisted the `checkState()` call out of the inner multi-worker write loop in `CaptureLoop.ts`.
+  - **Improvement:** Reduced synchronous function call overhead in the fast-path writer, improving microbenchmark loop execution time from ~9.6ms to ~3.0ms.
+  - **Plan ID:** PERF-863

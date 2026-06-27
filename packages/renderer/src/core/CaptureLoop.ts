@@ -1356,7 +1356,7 @@ export class CaptureLoop {
               let chunkEnd = nextFrameToWrite + progressInterval;
               if (chunkEnd > totalFrames) chunkEnd = totalFrames;
 
-              for (; nextFrameToWrite < chunkEnd; ) {
+              while (nextFrameToWrite < chunkEnd) {
                 const ringIndex = nextFrameToWrite & ringMask;
                 if (frameReadyRing[ringIndex] === 0) {
                   while (frameReadyRing[ringIndex] === 0 && !aborted) {
@@ -1386,8 +1386,8 @@ export class CaptureLoop {
                 }
 
                 nextFrameToWrite++;
-                if (freeWorkersHead > 0) checkState();
               }
+              if (freeWorkersHead > 0) checkState();
 
               if (aborted) break;
 
@@ -1401,7 +1401,7 @@ export class CaptureLoop {
               let chunkEnd = nextFrameToWrite + progressInterval;
               if (chunkEnd > totalFrames) chunkEnd = totalFrames;
 
-              for (; nextFrameToWrite < chunkEnd; ) {
+              while (nextFrameToWrite < chunkEnd) {
                 const ringIndex = nextFrameToWrite & ringMask;
                 if (frameReadyRing[ringIndex] === 0) {
                   while (frameReadyRing[ringIndex] === 0 && !aborted) {
@@ -1421,8 +1421,8 @@ export class CaptureLoop {
                 }
 
                 nextFrameToWrite++;
-                if (freeWorkersHead > 0) checkState();
               }
+              if (freeWorkersHead > 0) checkState();
 
               if (aborted) break;
 
