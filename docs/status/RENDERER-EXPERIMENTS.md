@@ -55,3 +55,4 @@ Last updated by: PERF-855
 
 ## Open Questions
 - Would chunked loops benefit multi-worker paths as well? (PERF-856) -> Yes, PERF-859 planned.
+- PERF-856: Superseded by PERF-860 for single-worker chunked loops.

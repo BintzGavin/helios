@@ -1,11 +1,11 @@
 ---
 id: PERF-856
 slug: chunked-progress-counter
-status: unclaimed
+status: discarded
 claimed_by: ""
 created: 2026-06-25
 completed: ""
-result: ""
+result: "superseded-by-PERF-860"
 ---
 
 # PERF-856: Replace Loop Branching with Chunked Inner Loops in CaptureLoop
