@@ -45,6 +45,7 @@ Observed attributes:
 - `pause(): void`
 - `seek(timeInSeconds: number): Promise<void>`
 - `fastSeek(timeInSeconds: number): void`
+- `setMediaKeys(mediaKeys: MediaKeys | null): Promise<void>`
 - `captureStream(): Promise<MediaStream>`
 - `export(options?: ExportOptions): Promise<void>`
 - `diagnose(): Promise<DiagnosticReport>`
@@ -70,6 +71,7 @@ Properties:
 - `videoTracks: VideoTrackList`
 - `textTracks: TextTrackList`
 - `mediaSession: MediaSession`
+- `mediaKeys: MediaKeys | null`
 
 ## Section E: Export Capabilities
 The player supports client-side export utilizing `@helios-project/core` rendering.
