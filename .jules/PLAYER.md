@@ -110,3 +110,7 @@
 ## [v0.77.64] - Documenting and Exposing Media Constants
 **Learning**: Standard `HTMLMediaElement` constants like `HAVE_NOTHING` and `NETWORK_EMPTY` are exposed as both static properties on the constructor and instance properties on the prototype. They were implemented statically in `<helios-player>` but missing from the instance API and documentation.
 **Action**: When achieving API parity with built-in DOM elements, ensure constants are available on both the instance and constructor as expected by standard JavaScript usage patterns, and explicitly document them in the README.
+
+## [v0.78.3] - Redundant Instance Constants Plan
+**Learning:** A plan (`.sys/plans/2024-05-24-PLAYER-Instance-Constants.md`) was marked as pending but the constants (`HAVE_NOTHING`, `NETWORK_EMPTY`, etc.) were actually already implemented as getters on the instance and static readonly properties on the class. However, they were not documented in the README.
+**Action:** When finding a pending implementation plan, first check if the feature has already been implemented. If it has, mark the plan as an `IMPOSSIBLE: DUPLICATION` in the status file and create a new plan to document the gap if necessary.
