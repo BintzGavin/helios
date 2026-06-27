@@ -276,7 +276,7 @@ export class CaptureLoop {
                   let chunkEnd = i + progressInterval;
                   if (chunkEnd > totalFrames - 1) chunkEnd = totalFrames - 1;
 
-                  for (; i < chunkEnd && !aborted; i++) {
+                  for (; i < chunkEnd; i++) {
                     const rawResult = await nextCapturePromise;
 
                     const timePromise = timeDriver.setTime(
@@ -373,7 +373,7 @@ export class CaptureLoop {
                   let chunkEnd = i + progressInterval;
                   if (chunkEnd > totalFrames - 1) chunkEnd = totalFrames - 1;
 
-                  for (; i < chunkEnd && !aborted; i++) {
+                  for (; i < chunkEnd; i++) {
                     const rawResult = await nextCapturePromise;
 
                     const timePromise = timeDriver.setTime(
@@ -467,7 +467,7 @@ export class CaptureLoop {
                   let chunkEnd = i + progressInterval;
                   if (chunkEnd > totalFrames - 1) chunkEnd = totalFrames - 1;
 
-                  for (; i < chunkEnd && !aborted; i++) {
+                  for (; i < chunkEnd; i++) {
                     const rawResult = await nextCapturePromise;
 
                     const timePromise = timeDriver.setTime(
@@ -540,7 +540,7 @@ export class CaptureLoop {
                   let chunkEnd = i + progressInterval;
                   if (chunkEnd > totalFrames - 1) chunkEnd = totalFrames - 1;
 
-                  for (; i < chunkEnd && !aborted; i++) {
+                  for (; i < chunkEnd; i++) {
                     const rawResult = await nextCapturePromise;
 
                     const timePromise = timeDriver.setTime(
@@ -674,7 +674,7 @@ export class CaptureLoop {
                   let chunkEnd = i + progressInterval;
                   if (chunkEnd > totalFrames - 1) chunkEnd = totalFrames - 1;
 
-                  for (; i < chunkEnd && !aborted; i++) {
+                  for (; i < chunkEnd; i++) {
                     const rawResult = await nextCapturePromise;
 
                     const timePromise = timeDriver.setTime(
@@ -762,7 +762,7 @@ export class CaptureLoop {
                   let chunkEnd = i + progressInterval;
                   if (chunkEnd > totalFrames - 1) chunkEnd = totalFrames - 1;
 
-                  for (; i < chunkEnd && !aborted; i++) {
+                  for (; i < chunkEnd; i++) {
                     const rawResult = await nextCapturePromise;
 
                     const timePromise = timeDriver.setTime(
@@ -855,7 +855,7 @@ export class CaptureLoop {
                   let chunkEnd = i + progressInterval;
                   if (chunkEnd > totalFrames - 1) chunkEnd = totalFrames - 1;
 
-                  for (; i < chunkEnd && !aborted; i++) {
+                  for (; i < chunkEnd; i++) {
                     const buf = await nextCapturePromise;
 
                     const timePromise = timeDriver.setTime(
@@ -917,7 +917,7 @@ export class CaptureLoop {
                   let chunkEnd = i + progressInterval;
                   if (chunkEnd > totalFrames - 1) chunkEnd = totalFrames - 1;
 
-                  for (; i < chunkEnd && !aborted; i++) {
+                  for (; i < chunkEnd; i++) {
                     const buf = await nextCapturePromise;
 
                     const timePromise = timeDriver.setTime(
@@ -1356,7 +1356,7 @@ export class CaptureLoop {
               let chunkEnd = nextFrameToWrite + progressInterval;
               if (chunkEnd > totalFrames) chunkEnd = totalFrames;
 
-              for (; nextFrameToWrite < chunkEnd && !aborted; ) {
+              for (; nextFrameToWrite < chunkEnd; ) {
                 const ringIndex = nextFrameToWrite & ringMask;
                 if (frameReadyRing[ringIndex] === 0) {
                   while (frameReadyRing[ringIndex] === 0 && !aborted) {
@@ -1401,7 +1401,7 @@ export class CaptureLoop {
               let chunkEnd = nextFrameToWrite + progressInterval;
               if (chunkEnd > totalFrames) chunkEnd = totalFrames;
 
-              for (; nextFrameToWrite < chunkEnd && !aborted; ) {
+              for (; nextFrameToWrite < chunkEnd; ) {
                 const ringIndex = nextFrameToWrite & ringMask;
                 if (frameReadyRing[ringIndex] === 0) {
                   while (frameReadyRing[ringIndex] === 0 && !aborted) {

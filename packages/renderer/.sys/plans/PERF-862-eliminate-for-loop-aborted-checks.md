@@ -1,11 +1,11 @@
 ---
 id: PERF-862
 slug: eliminate-for-loop-aborted-checks
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-05-28
 completed: ""
-result: ""
+result: improved
 ---
 
 # PERF-862: Eliminate Redundant `aborted` Checks in Chunked Loop Conditions
