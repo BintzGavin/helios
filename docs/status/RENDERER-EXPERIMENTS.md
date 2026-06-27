@@ -54,6 +54,8 @@ Last updated by: PERF-855
 
 
 ## What Works
+- Removed redundant aborted checks in chunked inner for loops to eliminate V8 branch evaluation overhead (PERF-862)
+  - Plan ID: PERF-862
 - Removed 8 redundant inner aborted checks in single-worker fast loop to eliminate V8 per-iteration branch evaluation overhead (~1.4% faster in microbenchmark) (PERF-848)
 
 ## What Doesn't Work (and Why)

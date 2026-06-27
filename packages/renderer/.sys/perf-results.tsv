@@ -289,3 +289,5 @@ PERF-831	Cache DomStrategy lastFrameData Locally	33.791	9.127
 1	0.000	0	0.00	0.0	keep	PERF-852 replaced modulo % progress check with fast counter in CaptureLoop.ts (microbenchmark improvement)
 1	0.000	300	0.00	0.0	keep	PERF-848
 PERF-853	CaptureLoop.ts single worker TimeSeek/Decode overlap	improved
+
+316	1.800	300	166.67	400.0	keep	PERF-862 single and multi worker loop condition optimizations
