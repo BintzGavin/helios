@@ -1,11 +1,11 @@
 ---
 id: PERF-858
 slug: chunked-progress-counter-multi-worker
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2026-06-26
 completed: ""
-result: ""
+result: "discard"
 ---
 
 # PERF-858: Replace Loop Branching with Chunked Inner Loops in CaptureLoop Multi-Worker Write Path
@@ -227,3 +227,9 @@ None.
 
 ## Correctness Check
 Run the vitest test suite (`npx vitest run packages/renderer/`).
+
+## Results Summary
+- **Best render time**: N/A
+- **Improvement**: 0%
+- **Kept experiments**: None
+- **Discarded experiments**: PERF-858 (Discarded as duplicate, superseded by PERF-859)
