@@ -6,7 +6,7 @@ Helios is a modern engine for creating videos programmatically using standard we
 
 ## Quick Facts
 - **License**: Elastic License 2.0 (free commercial use, no SaaS resale)
-- **Status**: Beta / Self-Driving (Core: Stable v5.13.0+, Studio: Alpha v0.121.11+, Player: v0.77.5+, Renderer: v1.79.0+, CLI: Beta v0.46.53+, Infrastructure: v0.54.26+)
+- **Status**: Beta / Self-Driving (Core: Stable v5.13.0+, Studio: Alpha v0.107.1+, Player: v0.78.1+, Renderer: v1.78.3+, CLI: Beta v0.45.2+, Infrastructure: v0.25.0+)
 - **Frameworks**: React, Vue, Svelte, Solid, vanilla JS
 - **Animation**: Standard CSS, Web Animations API (WAAPI), any animation library
 
@@ -129,12 +129,12 @@ const report = await Helios.diagnose();
 
 ## Roadmap
 ### V1.x (Active)
-- **Studio**: v0.121.11+ (Completed: Asset Drag and Drop, Refine CLI Component Removal, Export Job Spec)
-- **CLI**: v0.46.53+ (Completed: Command Coverage Tests V9, Scaffold Cloudflare Sandbox Deployment, Scaffold Hetzner Deployment)
-- **Core**: v5.13.0+ (Completed: Generic Input Props, Active Clips, Shared Virtual Time Binding)
-- **Player**: v0.77.5+ (Completed: Document getSchema API Parity, Bridge Coverage Completeness, Regression Tests)
-- **Renderer**: v1.79.0+ (Completed: Validate HW Accel, Orchestrator Plan, Canvas Image Preload)
-- **Infrastructure**: v0.54.26+ (Completed: Optimize GCS Uploads, Orchestrator Test Coverage Expansion, CloudRun Resiliency Tests)
+- **Studio**: v0.107.1+ (Completed: Portable Job Paths, Export Job Spec, Preview Command)
+- **CLI**: v0.45.2+ (Completed: CLI Docker Adapter Regression Tests, CLI Registry Types Regression Tests)
+- **Core**: v5.13.0+ (Completed: Generic Input Props, Active Clips, Composition Schema)
+- **Player**: v0.78.1+ (Completed: Bridge Coverage Expansion, Media Session Regression Tests, Audio Fader Regression Tests)
+- **Renderer**: v1.78.3+ (Completed: Orchestrator Plan, Refactor Media Sync Logic, Abstraction for Pluggable Execution)
+- **Infrastructure**: v0.25.0+ (Completed: Cloudflare Sandbox adapter, R2 artifact storage adapter)
 
 ### AI Integration
 - **Studio MCP Server**: Inspect, create, and render compositions via LLM tools (Done)
