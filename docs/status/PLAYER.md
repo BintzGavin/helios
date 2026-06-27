@@ -268,7 +268,7 @@
 [v0.77.63] ✅ Completed: Created `2027-03-01-PLAYER-Implement-Video-API-Parity-Methods.md` execution plan to achieve deeper API parity with the HTMLVideoElement interface.
 [v0.78.0] ✅ Completed: Implement Video API Parity Methods - Added `getVideoPlaybackQuality`, `requestVideoFrameCallback`, and `cancelVideoFrameCallback` to complete HTMLVideoElement API parity.
 
-### Pending Implementations
-- API Parity: Implement missing `HTMLMediaElement` instance constants (e.g. `HAVE_NOTHING`, `NETWORK_EMPTY`) and document them. See plan: `.sys/plans/2024-05-24-PLAYER-Instance-Constants.md`
+
 [v0.78.1] ✅ Completed: Discovered missing HTMLMediaElement parity method (`setMediaKeys`). Created plan `.sys/plans/2027-03-02-PLAYER-Implement-setMediaKeys.md` to implement it.
 [v0.78.2] ✅ Completed: Implement setMediaKeys - Added mediaKeys property and setMediaKeys method to complete HTMLMediaElement parity.
+[v0.78.3] ✅ Completed: Discovered that `.sys/plans/2024-05-24-PLAYER-Instance-Constants.md` is an IMPOSSIBLE: DUPLICATION plan. The missing constants are already implemented. Created plan `.sys/plans/2027-03-03-PLAYER-Document-Instance-Constants.md` to document them.
