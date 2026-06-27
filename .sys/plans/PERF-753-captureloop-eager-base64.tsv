@@ -1,8 +1,0 @@
-run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
-1	2.861	150	52.43	62.9	keep	Eagerly decode base64 strings to Buffer in CaptureLoop to reduce V8 JS heap time
-2	3.062	150	48.99	62.9	keep	Eagerly decode base64 strings to Buffer in CaptureLoop to reduce V8 JS heap time
-3	2.690	150	55.75	62.9	keep	Eagerly decode base64 strings to Buffer in CaptureLoop to reduce V8 JS heap time
-4	3.354	150	44.73	63.1	keep	Eagerly decode base64 strings to Buffer in CaptureLoop to reduce V8 JS heap time
-5	2.533	150	59.23	63.0	keep	Eagerly decode base64 strings to Buffer in CaptureLoop to reduce V8 JS heap time
-6	2.521	150	59.51	63.7	keep	Eagerly decode base64 strings to Buffer in CaptureLoop to reduce V8 JS heap time
-7	2.665	150	56.29	63.1	keep	Eagerly decode base64 strings to Buffer in CaptureLoop to reduce V8 JS heap time
