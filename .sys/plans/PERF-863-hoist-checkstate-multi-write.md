@@ -1,7 +1,7 @@
 ---
 id: PERF-863
 slug: hoist-checkstate-multi-write
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-06-27
 completed: ""
