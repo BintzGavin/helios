@@ -1,7 +1,8 @@
 ---
 id: PERF-860
 slug: chunked-progress-counter-single-worker
-status: unclaimed
+status: discarded
+result: failed - chunked implementation with peeled final frame loop boundaries is slower than fast counter (4.997ms vs 4.146ms) in V8.
 claimed_by: ""
 created: 2024-06-27
 completed: ""

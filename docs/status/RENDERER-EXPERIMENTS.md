@@ -46,6 +46,8 @@ Last updated by: PERF-855
 - PERF-846: Discarded as obsolete. Duplicate of PERF-848.
 
 ## Open Questions
+- PERF-860 was discarded as the microbenchmarks showed that a chunked implementation with peeled final frame loop boundaries is slower than the fast counter. A new plan, PERF-861, was created to properly unbranch the inner loop by peeling the final frame entirely out of the while loop.
+
 
 ## What Works
 - Removed 8 redundant inner aborted checks in single-worker fast loop to eliminate V8 per-iteration branch evaluation overhead (~1.4% faster in microbenchmark) (PERF-848)
