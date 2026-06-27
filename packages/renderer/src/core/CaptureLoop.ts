@@ -1209,85 +1209,83 @@ export class CaptureLoop {
 
           if (!aborted && isString) {
             while (nextFrameToWrite < totalFrames && !aborted) {
-              const ringIndex = nextFrameToWrite & ringMask;
-              if (frameReadyRing[ringIndex] === 0) {
-                while (frameReadyRing[ringIndex] === 0 && !aborted) {
-                  await writerWaiterPromise;
+              let chunkEnd = nextFrameToWrite + progressInterval;
+              if (chunkEnd > totalFrames) chunkEnd = totalFrames;
+
+              for (; nextFrameToWrite < chunkEnd && !aborted; ) {
+                const ringIndex = nextFrameToWrite & ringMask;
+                if (frameReadyRing[ringIndex] === 0) {
+                  while (frameReadyRing[ringIndex] === 0 && !aborted) {
+                    await writerWaiterPromise;
+                  }
+                  if (aborted) break;
                 }
-                if (aborted) break;
+
+                const buffer = frameBufferRing[ringIndex]! as string;
+
+                const maxBytes = (buffer.length * 3) >>> 2;
+                let pooled = multiFreePool.pop();
+                if (!pooled || pooled.buffer.length < maxBytes) {
+                  pooled = new PooledBuffer(
+                    maxBytes + (maxBytes >> 1),
+                    multiFreePool,
+                  );
+                }
+                const written = pooled.buffer.write(buffer, "base64");
+                const chunk = pooled.buffer.subarray(0, written);
+                pendingBytes += written;
+                const writeSuccess = stream.write(chunk, pooled.freeCb);
+
+                if (!writeSuccess && pendingBytes >= 16777216) {
+                  await this.drainPromise;
+                  pendingBytes = 0;
+                }
+
+                nextFrameToWrite++;
+                if (freeWorkersHead > 0) checkState();
               }
 
-              const buffer = frameBufferRing[ringIndex]! as string;
+              if (aborted) break;
 
-              const maxBytes = (buffer.length * 3) >>> 2;
-              let pooled = multiFreePool.pop();
-              if (!pooled || pooled.buffer.length < maxBytes) {
-                pooled = new PooledBuffer(
-                  maxBytes + (maxBytes >> 1),
-                  multiFreePool,
-                );
-              }
-              const written = pooled.buffer.write(buffer, "base64");
-              const chunk = pooled.buffer.subarray(0, written);
-              pendingBytes += written;
-              const writeSuccess = stream.write(chunk, pooled.freeCb);
-
-              if (!writeSuccess && pendingBytes >= 16777216) {
-                await this.drainPromise;
-                pendingBytes = 0;
-              }
-
-              nextFrameToWrite++;
-              if (freeWorkersHead > 0) checkState();
-
-              if (
-                !aborted &&
-                (nextFrameToWrite === nextProgress ||
-                  nextFrameToWrite === totalFrames)
-              ) {
-                if (nextFrameToWrite === nextProgress)
-                  nextProgress += progressInterval;
-                console.log(
-                  `Progress: Rendered ${nextFrameToWrite} / ${totalFrames} frames`,
-                );
-                if (onProgress) onProgress(nextFrameToWrite / totalFrames);
-              }
+              console.log(
+                `Progress: Rendered ${nextFrameToWrite} / ${totalFrames} frames`,
+              );
+              if (onProgress) onProgress(nextFrameToWrite / totalFrames);
             }
           } else if (!aborted) {
             while (nextFrameToWrite < totalFrames && !aborted) {
-              const ringIndex = nextFrameToWrite & ringMask;
-              if (frameReadyRing[ringIndex] === 0) {
-                while (frameReadyRing[ringIndex] === 0 && !aborted) {
-                  await writerWaiterPromise;
+              let chunkEnd = nextFrameToWrite + progressInterval;
+              if (chunkEnd > totalFrames) chunkEnd = totalFrames;
+
+              for (; nextFrameToWrite < chunkEnd && !aborted; ) {
+                const ringIndex = nextFrameToWrite & ringMask;
+                if (frameReadyRing[ringIndex] === 0) {
+                  while (frameReadyRing[ringIndex] === 0 && !aborted) {
+                    await writerWaiterPromise;
+                  }
+                  if (aborted) break;
                 }
-                if (aborted) break;
+
+                const buffer = frameBufferRing[ringIndex]!;
+
+                pendingBytes += (buffer as any).length;
+                const writeSuccess = stream.write(buffer as any);
+
+                if (!writeSuccess && pendingBytes >= 16777216) {
+                  await this.drainPromise;
+                  pendingBytes = 0;
+                }
+
+                nextFrameToWrite++;
+                if (freeWorkersHead > 0) checkState();
               }
 
-              const buffer = frameBufferRing[ringIndex]!;
+              if (aborted) break;
 
-              pendingBytes += (buffer as any).length;
-              const writeSuccess = stream.write(buffer as any);
-
-              if (!writeSuccess && pendingBytes >= 16777216) {
-                await this.drainPromise;
-                pendingBytes = 0;
-              }
-
-              nextFrameToWrite++;
-              if (freeWorkersHead > 0) checkState();
-
-              if (
-                !aborted &&
-                (nextFrameToWrite === nextProgress ||
-                  nextFrameToWrite === totalFrames)
-              ) {
-                if (nextFrameToWrite === nextProgress)
-                  nextProgress += progressInterval;
-                console.log(
-                  `Progress: Rendered ${nextFrameToWrite} / ${totalFrames} frames`,
-                );
-                if (onProgress) onProgress(nextFrameToWrite / totalFrames);
-              }
+              console.log(
+                `Progress: Rendered ${nextFrameToWrite} / ${totalFrames} frames`,
+              );
+              if (onProgress) onProgress(nextFrameToWrite / totalFrames);
             }
           }
         }
