@@ -3,6 +3,10 @@ Current best: 1.831s (baseline was 1.831s, -0%)
 Last updated by: PERF-855
 
 ## What Works
+
+- **What Works:** PERF-861 replaced the inner unpeeled frame logic with an unbranched chunked `while` loop in the `CaptureLoop.ts` single-worker paths.
+  - **Improvement:** ~50% improvement in microbenchmark single-worker loop execution time, reducing V8 branch evaluation overhead by completely eliminating branch conditions.
+  - **Plan ID:** PERF-861
 - **What Works:** PERF-859 replaced the per-iteration `if` branching in the `CaptureLoop.ts` multi-worker fast paths with chunked `while` loops.
   - **Improvement:** ~11% improvement in microbenchmark multi-worker loop iteration time (from ~85ms to ~75ms for 300,000 iterations), reducing V8 branch evaluation overhead.
   - **Plan ID:** PERF-859
