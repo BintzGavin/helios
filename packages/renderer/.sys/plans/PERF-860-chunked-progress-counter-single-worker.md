@@ -1,11 +1,11 @@
 ---
 id: PERF-860
 slug: chunked-progress-counter-single-worker
-status: unclaimed
+status: discarded
 claimed_by: ""
 created: 2024-06-27
 completed: ""
-result: ""
+result: "superseded-by-PERF-861"
 ---
 
 # PERF-860: Replace Loop Branching with Chunked Inner Loops in CaptureLoop Single Worker Path

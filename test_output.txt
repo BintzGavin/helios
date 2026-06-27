@@ -1,0 +1,2838 @@
+
+> @helios-project/renderer@1.78.3 test
+> npx tsx tests/run-all.ts
+
+Running Renderer Verification Suite...
+
+---------------------------------------------------------
+Running: tests/verify-asset-timeout.ts
+---------------------------------------------------------
+Verifying Configurable Asset Timeout...
+Running strategy.prepare() with stabilityTimeout=2000ms...
+[Test] Holding request for hanging.jpg
+prepare() took 2027ms
+✅ Duration check passed (2027ms)
+All Logs: [
+  '[Helios Preload] Preloading 1 images...',
+  '[Helios Preload] Timeout waiting for images'
+]
+✅ Timeout warning logged: "[Helios Preload] Timeout waiting for images"
+✅ Verification Passed
+
+✅ PASSED: tests/verify-asset-timeout.ts
+
+---------------------------------------------------------
+Running: tests/verify-audio-codecs.ts
+---------------------------------------------------------
+Running Audio Codec Verification...
+
+Test 1: Default Audio Codec
+✅ Passed
+
+Test 2: Explicit Audio Codec (libopus)
+✅ Passed
+
+Test 3: WebM Default (libvpx implies libvorbis)
+✅ Passed
+
+Test 4: Audio Bitrate
+✅ Passed
+
+✅ All verification tests passed!
+
+✅ PASSED: tests/verify-audio-codecs.ts
+
+---------------------------------------------------------
+Running: tests/verify-audio-fades.ts
+---------------------------------------------------------
+Starting Audio Fades Verification...
+[Test 1] Testing Fade In...
+✅ PASS: Fade In filter found.
+[Test 2] Testing Fade Out...
+✅ PASS: Fade Out filter found.
+[Test 3] Testing Fade In with Offset...
+✅ PASS: Fade In with Offset filter found.
+[Test 4] Testing Fade Out with Frame Count...
+✅ PASS: Fade Out with Frame Count filter found.
+[Test 5] Testing Multiple Tracks with Fades...
+✅ PASS: Both filters found.
+
+✅ All verification tests passed!
+
+✅ PASSED: tests/verify-audio-fades.ts
+
+---------------------------------------------------------
+Running: tests/verify-audio-loop.ts
+---------------------------------------------------------
+Starting Audio Loop Verification...
+Preparing strategy...
+[DomScanner] Discovered 4 audio/video tracks across 1 frames.
+Generating FFmpeg arguments...
+FFmpeg Args: [
+  '-y',
+  '-f',
+  'mjpeg',
+  '-framerate',
+  '30',
+  '-i',
+  '-',
+  '-stream_loop',
+  '-1',
+  '-ss',
+  '0',
+  '-i',
+  'loop.mp3',
+  '-ss',
+  '0',
+  '-i',
+  'once.mp3',
+  '-stream_loop',
+  '-1',
+  '-ss',
+  '0',
+  '-i',
+  'loop-video.mp4',
+  '-stream_loop',
+  '-1',
+  '-ss',
+  '0',
+  '-i',
+  'loop-offset.mp3',
+  '-filter_complex',
+  '[1:a]aformat=channel_layouts=stereo[a0];[2:a]aformat=channel_layouts=stereo[a1];[3:a]aformat=channel_layouts=stereo,volume=0[a2];[4:a]aformat=channel_layouts=stereo,adelay=2000|2000[a3];[a0][a1][a2][a3]amix=inputs=4:duration=longest[aout]',
+  '-map',
+  '0:v',
+  '-map',
+  '[aout]',
+  '-c:v',
+  'libx264',
+  '-pix_fmt',
+  'yuv420p',
+  '-movflags',
+  '+faststart',
+  '-preset',
+  'ultrafast',
+  '-c:a',
+  'aac',
+  '-t',
+  '10',
+  'output.mp4'
+]
+✅ loop.mp3 has -stream_loop -1
+✅ once.mp3 correctly does not have -stream_loop
+✅ loop-video.mp4 has -stream_loop -1
+✅ loop-offset.mp3 has -stream_loop -1
+✅ loop-offset.mp3 has adelay=2000|2000
+PASSED
+
+✅ PASSED: tests/verify-audio-loop.ts
+
+---------------------------------------------------------
+Running: tests/verify-audio-playback-rate.ts
+---------------------------------------------------------
+Running Audio Playback Rate Verification...
+
+Test 1: Rate 1.0 (Default)
+✅ Passed
+
+Test 2: Rate 2.0
+✅ Passed
+
+Test 3: Rate 0.5
+✅ Passed
+
+Test 4: Rate 4.0 (Chained)
+✅ Passed
+
+Test 5: Rate 0.25 (Chained)
+✅ Passed
+
+Test 6: Rate 3.0 (Chained + Remainder)
+✅ Passed
+
+Test 7: Integration with Delay
+✅ Passed
+
+Test 8: Invalid Rate (Infinity)
+[FFmpegBuilder] Invalid playbackRate: Infinity. Resetting to 1.0.
+✅ Passed
+
+✅ All verification tests passed!
+
+✅ PASSED: tests/verify-audio-playback-rate.ts
+
+---------------------------------------------------------
+Running: tests/verify-audio-playback-seek.ts
+---------------------------------------------------------
+Running Audio Playback Seek Verification...
+
+Test 1: Rate 1.0 (Normal)
+✅ Passed: Seek is 5.0s
+
+Test 2: Rate 2.0 (Double Speed)
+✅ Passed: Seek is 10.0s
+
+Test 3: Rate 0.5 (Half Speed)
+✅ Passed: Seek is 2.5s
+
+Test 4: Rate 1.5 with Initial Seek
+✅ Passed: Seek is 9.5s
+
+✅ All verification tests passed!
+
+✅ PASSED: tests/verify-audio-playback-seek.ts
+
+---------------------------------------------------------
+Running: tests/verify-bitrate.ts
+---------------------------------------------------------
+Testing bitrate for Standard HD (1920x1080 @ 30fps)...
+CanvasStrategy: Using WebCodecs (vp8) with bitrate: 25000000, alpha: discard
+✅ Standard HD passed: Bitrate 25000000 >= 25000000
+Testing bitrate for 4K 60fps (3840x2160 @ 60fps)...
+CanvasStrategy: Using WebCodecs (vp8) with bitrate: 99532800, alpha: discard
+✅ 4K 60fps passed: Bitrate 99532800 >= 99000000
+
+All bitrate tests passed!
+
+✅ PASSED: tests/verify-bitrate.ts
+
+---------------------------------------------------------
+Running: tests/verify-blob-audio.ts
+---------------------------------------------------------
+Running Blob Audio Verification...
+Created temp HTML: /tmp/blob-audio-test.html
+Starting render for composition: file:///tmp/blob-audio-test.html (Mode: canvas)
+[Helios Diagnostics] FFmpeg Version: N-47683-g0e8eb07980-static
+[Helios Diagnostics] FFmpeg HW Accel: vdpau, vaapi
+Initializing pool of 1 browsers/pages...
+PAGE LOG [0]: [Helios] Math.random() has been seeded for deterministic rendering. Seed: 305419896
+PAGE LOG [0]: Created Blob URL: blob:file:///80de8adf-3ea7-4a48-a0de-6a45d367a130
+PAGE LOG [0]: [DomScanner] Found 1 media elements. Waiting for readiness...
+PAGE LOG [0]: [DomScanner] Media elements ready.
+[DomScanner] Discovered 1 audio/video tracks across 1 frames.
+[BlobExtractor] Extracting audio from blob: blob:file:///80de8adf-3ea7-4a48-a0de-6a45d367a130
+[BlobExtractor] Extracted blob content to memory (4044 bytes)
+CanvasStrategy: Using WebCodecs (avc1.4d002a) with bitrate: 25000000, alpha: discard
+All pages loaded and prepared.
+Running diagnostics on first page...
+PAGE LOG [0]: [Helios Diagnostics] Checking Canvas environment...
+[Helios Diagnostics] {
+  "videoEncoder": true,
+  "offscreenCanvas": true,
+  "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+  "codecs": {
+    "h264": {
+      "supported": true,
+      "hardware": false,
+      "alpha": false,
+      "type": "unknown"
+    },
+    "vp8": {
+      "supported": true,
+      "hardware": false,
+      "alpha": false,
+      "type": "unknown"
+    },
+    "vp9": {
+      "supported": false,
+      "hardware": false,
+      "alpha": false,
+      "type": "unknown"
+    },
+    "av1": {
+      "supported": true,
+      "hardware": false,
+      "alpha": false,
+      "type": "unknown"
+    }
+  }
+}
+Spawning FFmpeg: /app/node_modules/@ffmpeg-installer/linux-x64/ffmpeg -y -f h264 -i - -ss 0 -i pipe:3 -filter_complex [1:a]aformat=channel_layouts=stereo[a0] -map 0:v -map [a0] -c:v libx264 -pix_fmt yuv420p -movflags +faststart -preset ultrafast -c:a aac -t 1 /tmp/blob-audio-output.mp4
+Starting capture for 30 frames...
+ffmpeg: ffmpeg version N-47683-g0e8eb07980-static https://johnvansickle.com/ffmpeg/  Copyright (c) 2000-2018 the FFmpeg developers
+  built with gcc 6.3.0 (Debian 6.3.0-18+deb9u1) 20170516
+  configuration: --enable-gpl --enable-version3 --enable-static --disable-debug --disable-ffplay --disable-indev=sndio --disable-outdev=sndio --cc=gcc-6 --enable-fontconfig --enable-frei0r --enable-gnutls --enable-gray --enable-libaom --enable-libfribidi --enable-libass --enable-libvmaf --enable-libfreetype --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libopenjpeg --enable-librubberband --enable-libsoxr --enable-libspeex --enable-libvorbis --enable-libopus --enable-libtheora --enable-libvidstab --enable-libvo-amrwbenc --enable-libvpx --enable-libwebp --enable-libx264 --enable-libx265 --enable-libxml2 --enable-libxvid --enable-libzimg
+  libavutil      56. 24.101 / 56. 24.101
+  libavcodec     58. 42.100 / 58. 42.100
+  libavformat    58. 24.100 / 58. 24.100
+  libavdevice    58.  6.101 / 58.  6.101
+  libavfilter     7. 46.101 /  7. 46.101
+  libswscale      5.  4.100 /  5.  4.100
+  libswresample   3.  4.100 /  3.  4.100
+  libpostproc    55.  4.100 / 55.  4.100
+
+Progress: Rendered 0 / 30 frames
+Progress: Rendered 3 / 30 frames
+Progress: Rendered 6 / 30 frames
+Progress: Rendered 9 / 30 frames
+Progress: Rendered 12 / 30 frames
+Progress: Rendered 15 / 30 frames
+Progress: Rendered 18 / 30 frames
+Progress: Rendered 21 / 30 frames
+Progress: Rendered 24 / 30 frames
+Progress: Rendered 27 / 30 frames
+Progress: Rendered 29 / 30 frames
+Finishing render strategy...
+Writing final buffer...
+Finished sending frames. Closing FFmpeg stdin.
+ffmpeg: [h264 @ 0x58f4480] non-existing PPS 0 referenced
+
+ffmpeg:     Last message repeated 1 times
+[h264 @ 0x58f4480] decode_slice_header error
+[h264 @ 0x58f4480] no frame!
+[h264 @ 0x58f2fc0] decoding for stream 0 failed
+[h264 @ 0x58f2fc0] Could not find codec parameters for stream 0 (Video: h264, none): unspecified size
+Consider increasing the value for the 'analyzeduration' and 'probesize' options
+
+ffmpeg: Input #0, h264, from 'pipe:':
+  Duration: N/A, bitrate: N/A
+    Stream #0:0: Video: h264, none, 25 tbr, 1200k tbn, 50 tbc
+
+ffmpeg: Guessed Channel Layout for Input Stream #1.0 : mono
+Input #1, wav, from 'pipe:3':
+  Duration: N/A, bitrate: 64 kb/s
+    Stream #1:0: Audio: pcm_u8 ([1][0][0][0] / 0x0001), 8000 Hz, mono, u8, 64 kb/s
+
+ffmpeg: Stream mapping:
+  Stream #1:0 (pcm_u8) -> aformat (graph 0)
+  Stream #0:0 -> #0:0 (h264 (native) -> h264 (libx264))
+  aformat (graph 0) -> Stream #0:1 (aac)
+
+ffmpeg: [h264 @ 0x5910ac0] non-existing PPS 0 referenced
+[h264 @ 0x5910ac0] decode_slice_header error
+[h264 @ 0x5910ac0] no frame!
+
+ffmpeg: Error while decoding stream #0:0: Invalid data found when processing input
+
+ffmpeg: Cannot determine format of input stream 0:0 after EOF
+Error marking filters as finished
+
+ffmpeg: Conversion failed!
+
+Browsers closed.
+Cleaning up strategy resources...
+❌ Test failed: Error: FFmpeg process exited with code 1
+    at ChildProcess.<anonymous> (/app/packages/renderer/src/core/FFmpegManager.ts:69:20)
+    at ChildProcess.emit (node:events:519:28)
+    at maybeClose (node:internal/child_process:1101:16)
+    at ChildProcess._handle.onexit (node:internal/child_process:304:5)
+    at Process.callbackTrampoline (node:internal/async_hooks:130:17)
+
+❌ FAILED: tests/verify-blob-audio.ts (Exit Code: 1)
+
+---------------------------------------------------------
+Running: tests/verify-browser-config.ts
+---------------------------------------------------------
+Verifying browser config...
+Starting diagnostics (Mode: canvas)
+Diagnostics: {
+  "browser": {
+    "videoEncoder": false,
+    "offscreenCanvas": true,
+    "userAgent": "HeliosTestAgent",
+    "codecs": {
+      "h264": {
+        "supported": false,
+        "hardware": false,
+        "alpha": false,
+        "type": "unknown"
+      },
+      "vp8": {
+        "supported": false,
+        "hardware": false,
+        "alpha": false,
+        "type": "unknown"
+      },
+      "vp9": {
+        "supported": false,
+        "hardware": false,
+        "alpha": false,
+        "type": "unknown"
+      },
+      "av1": {
+        "supported": false,
+        "hardware": false,
+        "alpha": false,
+        "type": "unknown"
+      }
+    }
+  },
+  "ffmpeg": {
+    "path": "/app/node_modules/@ffmpeg-installer/linux-x64/ffmpeg",
+    "present": true,
+    "encoders": [
+      "=",
+      "=",
+      "=",
+      "a64multi",
+      "a64multi5",
+      "alias_pix",
+      "amv",
+      "apng",
+      "asv1",
+      "asv2",
+      "libaom-av1",
+      "avrp",
+      "avui",
+      "ayuv",
+      "bmp",
+      "cinepak",
+      "cljr",
+      "vc2",
+      "dnxhd",
+      "dpx",
+      "dvvideo",
+      "ffv1",
+      "ffvhuff",
+      "fits",
+      "flashsv",
+      "flashsv2",
+      "flv",
+      "gif",
+      "h261",
+      "h263",
+      "h263_v4l2m2m",
+      "h263p",
+      "libx264",
+      "libx264rgb",
+      "h264_v4l2m2m",
+      "h264_vaapi",
+      "libx265",
+      "hevc_vaapi",
+      "huffyuv",
+      "jpeg2000",
+      "libopenjpeg",
+      "jpegls",
+      "ljpeg",
+      "magicyuv",
+      "mjpeg",
+      "mjpeg_vaapi",
+      "mpeg1video",
+      "mpeg2video",
+      "mpeg2_vaapi",
+      "mpeg4",
+      "libxvid",
+      "mpeg4_v4l2m2m",
+      "msmpeg4v2",
+      "msmpeg4",
+      "msvideo1",
+      "pam",
+      "pbm",
+      "pcx",
+      "pgm",
+      "pgmyuv",
+      "png",
+      "ppm",
+      "prores",
+      "prores_aw",
+      "prores_ks",
+      "qtrle",
+      "r10k",
+      "r210",
+      "rawvideo",
+      "roqvideo",
+      "rv10",
+      "rv20",
+      "sgi",
+      "snow",
+      "sunrast",
+      "svq1",
+      "targa",
+      "libtheora",
+      "tiff",
+      "utvideo",
+      "v210",
+      "v308",
+      "v408",
+      "v410",
+      "libvpx",
+      "vp8_v4l2m2m",
+      "vp8_vaapi",
+      "libvpx-vp9",
+      "vp9_vaapi",
+      "libwebp_anim",
+      "libwebp",
+      "wmv1",
+      "wmv2",
+      "wrapped_avframe",
+      "xbm",
+      "xface",
+      "xwd",
+      "y41p",
+      "yuv4",
+      "zlib",
+      "zmbv",
+      "aac",
+      "ac3",
+      "ac3_fixed",
+      "adpcm_adx",
+      "g722",
+      "g726",
+      "g726le",
+      "adpcm_ima_qt",
+      "adpcm_ima_wav",
+      "adpcm_ms",
+      "adpcm_swf",
+      "adpcm_yamaha",
+      "alac",
+      "libopencore_amrnb",
+      "libvo_amrwbenc",
+      "aptx",
+      "aptx_hd",
+      "comfortnoise",
+      "dca",
+      "eac3",
+      "flac",
+      "g723_1",
+      "mlp",
+      "mp2",
+      "mp2fixed",
+      "libmp3lame",
+      "nellymoser",
+      "opus",
+      "libopus",
+      "pcm_alaw",
+      "pcm_dvd",
+      "pcm_f32be",
+      "pcm_f32le",
+      "pcm_f64be",
+      "pcm_f64le",
+      "pcm_mulaw",
+      "pcm_s16be",
+      "pcm_s16be_planar",
+      "pcm_s16le",
+      "pcm_s16le_planar",
+      "pcm_s24be",
+      "pcm_s24daud",
+      "pcm_s24le",
+      "pcm_s24le_planar",
+      "pcm_s32be",
+      "pcm_s32le",
+      "pcm_s32le_planar",
+      "pcm_s64be",
+      "pcm_s64le",
+      "pcm_s8",
+      "pcm_s8_planar",
+      "pcm_u16be",
+      "pcm_u16le",
+      "pcm_u24be",
+      "pcm_u24le",
+      "pcm_u32be",
+      "pcm_u32le",
+      "pcm_u8",
+      "pcm_vidc",
+      "real_144",
+      "roq_dpcm",
+      "s302m",
+      "sbc",
+      "sonic",
+      "sonicls",
+      "libspeex",
+      "truehd",
+      "tta",
+      "vorbis",
+      "libvorbis",
+      "wavpack",
+      "wmav1",
+      "wmav2",
+      "ssa",
+      "ass",
+      "dvbsub",
+      "dvdsub",
+      "mov_text",
+      "srt",
+      "subrip",
+      "text",
+      "webvtt",
+      "xsub"
+    ],
+    "filters": [
+      "=",
+      "=",
+      "=",
+      "abench",
+      "acompressor",
+      "acontrast",
+      "acopy",
+      "acue",
+      "acrossfade",
+      "acrossover",
+      "acrusher",
+      "adeclick",
+      "adeclip",
+      "adelay",
+      "aderivative",
+      "aecho",
+      "aemphasis",
+      "aeval",
+      "afade",
+      "afftdn",
+      "afftfilt",
+      "afir",
+      "aformat",
+      "agate",
+      "aiir",
+      "aintegral",
+      "ainterleave",
+      "alimiter",
+      "allpass",
+      "aloop",
+      "amerge",
+      "ametadata",
+      "amix",
+      "amultiply",
+      "anequalizer",
+      "anull",
+      "apad",
+      "aperms",
+      "aphaser",
+      "apulsator",
+      "arealtime",
+      "aresample",
+      "areverse",
+      "aselect",
+      "asendcmd",
+      "asetnsamples",
+      "asetpts",
+      "asetrate",
+      "asettb",
+      "ashowinfo",
+      "asidedata",
+      "asplit",
+      "astats",
+      "astreamselect",
+      "atempo",
+      "atrim",
+      "bandpass",
+      "bandreject",
+      "bass",
+      "biquad",
+      "channelmap",
+      "channelsplit",
+      "chorus",
+      "compand",
+      "compensationdelay",
+      "crossfeed",
+      "crystalizer",
+      "dcshift",
+      "drmeter",
+      "dynaudnorm",
+      "earwax",
+      "ebur128",
+      "equalizer",
+      "extrastereo",
+      "firequalizer",
+      "flanger",
+      "haas",
+      "hdcd",
+      "headphone",
+      "highpass",
+      "highshelf",
+      "join",
+      "loudnorm",
+      "lowpass",
+      "lowshelf",
+      "mcompand",
+      "pan",
+      "replaygain",
+      "rubberband",
+      "sidechaincompress",
+      "sidechaingate",
+      "silencedetect",
+      "silenceremove",
+      "stereotools",
+      "stereowiden",
+      "superequalizer",
+      "surround",
+      "treble",
+      "tremolo",
+      "vibrato",
+      "volume",
+      "volumedetect",
+      "aevalsrc",
+      "anoisesrc",
+      "anullsrc",
+      "hilbert",
+      "sinc",
+      "sine",
+      "anullsink",
+      "alphaextract",
+      "alphamerge",
+      "amplify",
+      "ass",
+      "atadenoise",
+      "avgblur",
+      "bbox",
+      "bench",
+      "bitplanenoise",
+      "blackdetect",
+      "blackframe",
+      "blend",
+      "bm3d",
+      "boxblur",
+      "bwdif",
+      "chromahold",
+      "chromakey",
+      "chromashift",
+      "ciescope",
+      "codecview",
+      "colorbalance",
+      "colorchannelmixer",
+      "colorkey",
+      "colorlevels",
+      "colormatrix",
+      "colorspace",
+      "convolution",
+      "convolve",
+      "copy",
+      "cover_rect",
+      "crop",
+      "cropdetect",
+      "cue",
+      "curves",
+      "datascope",
+      "dctdnoiz",
+      "deband",
+      "deblock",
+      "decimate",
+      "deconvolve",
+      "dedot",
+      "deflate",
+      "deflicker",
+      "deinterlace_vaapi",
+      "dejudder",
+      "delogo",
+      "denoise_vaapi",
+      "deshake",
+      "despill",
+      "detelecine",
+      "dilation",
+      "displace",
+      "doubleweave",
+      "drawbox",
+      "drawgraph",
+      "drawgrid",
+      "drawtext",
+      "edgedetect",
+      "elbg",
+      "entropy",
+      "eq",
+      "erosion",
+      "extractplanes",
+      "fade",
+      "fftdnoiz",
+      "fftfilt",
+      "field",
+      "fieldhint",
+      "fieldmatch",
+      "fieldorder",
+      "fillborders",
+      "find_rect",
+      "floodfill",
+      "format",
+      "fps",
+      "framepack",
+      "framerate",
+      "framestep",
+      "freezedetect",
+      "frei0r",
+      "fspp",
+      "gblur",
+      "geq",
+      "gradfun",
+      "graphmonitor",
+      "greyedge",
+      "haldclut",
+      "hflip",
+      "histeq",
+      "histogram",
+      "hqdn3d",
+      "hqx",
+      "hstack",
+      "hue",
+      "hwdownload",
+      "hwmap",
+      "hwupload",
+      "hysteresis",
+      "idet",
+      "il",
+      "inflate",
+      "interlace",
+      "interleave",
+      "kerndeint",
+      "lenscorrection",
+      "libvmaf",
+      "limiter",
+      "loop",
+      "lumakey",
+      "lut",
+      "lut1d",
+      "lut2",
+      "lut3d",
+      "lutrgb",
+      "lutyuv",
+      "maskedclamp",
+      "maskedmerge",
+      "mcdeint",
+      "mergeplanes",
+      "mestimate",
+      "metadata",
+      "midequalizer",
+      "minterpolate",
+      "mix",
+      "mpdecimate",
+      "negate",
+      "nlmeans",
+      "nnedi",
+      "noformat",
+      "noise",
+      "normalize",
+      "null",
+      "oscilloscope",
+      "overlay",
+      "owdenoise",
+      "pad",
+      "palettegen",
+      "paletteuse",
+      "perms",
+      "perspective",
+      "phase",
+      "pixdesctest",
+      "pixscope",
+      "pp",
+      "pp7",
+      "premultiply",
+      "prewitt",
+      "procamp_vaapi",
+      "pseudocolor",
+      "psnr",
+      "pullup",
+      "qp",
+      "random",
+      "readeia608",
+      "readvitc",
+      "realtime",
+      "remap",
+      "removegrain",
+      "removelogo",
+      "repeatfields",
+      "reverse",
+      "rgbashift",
+      "roberts",
+      "rotate",
+      "sab",
+      "scale",
+      "scale_vaapi",
+      "scale2ref",
+      "select",
+      "selectivecolor",
+      "sendcmd",
+      "separatefields",
+      "setdar",
+      "setfield",
+      "setparams",
+      "setpts",
+      "setrange",
+      "setsar",
+      "settb",
+      "sharpness_vaapi",
+      "showinfo",
+      "showpalette",
+      "shuffleframes",
+      "shuffleplanes",
+      "sidedata",
+      "signalstats",
+      "signature",
+      "smartblur",
+      "sobel",
+      "split",
+      "spp",
+      "sr",
+      "ssim",
+      "stereo3d",
+      "streamselect",
+      "subtitles",
+      "super2xsai",
+      "swaprect",
+      "swapuv",
+      "tblend",
+      "telecine",
+      "threshold",
+      "thumbnail",
+      "tile",
+      "tinterlace",
+      "tlut2",
+      "tmix",
+      "tonemap",
+      "tpad",
+      "transpose",
+      "trim",
+      "unpremultiply",
+      "unsharp",
+      "uspp",
+      "vaguedenoiser",
+      "vectorscope",
+      "vflip",
+      "vfrdet",
+      "vibrance",
+      "vidstabdetect",
+      "vidstabtransform",
+      "vignette",
+      "vmafmotion",
+      "vstack",
+      "w3fdif",
+      "waveform",
+      "weave",
+      "xbr",
+      "xstack",
+      "yadif",
+      "zoompan",
+      "zscale",
+      "allrgb",
+      "allyuv",
+      "cellauto",
+      "color",
+      "frei0r_src",
+      "haldclutsrc",
+      "life",
+      "mandelbrot",
+      "mptestsrc",
+      "nullsrc",
+      "pal75bars",
+      "pal100bars",
+      "rgbtestsrc",
+      "smptebars",
+      "smptehdbars",
+      "testsrc",
+      "testsrc2",
+      "yuvtestsrc",
+      "nullsink",
+      "abitscope",
+      "adrawgraph",
+      "agraphmonitor",
+      "ahistogram",
+      "aphasemeter",
+      "avectorscope",
+      "concat",
+      "showcqt",
+      "showfreqs",
+      "showspectrum",
+      "showspectrumpic",
+      "showvolume",
+      "showwaves",
+      "showwavespic",
+      "spectrumsynth",
+      "amovie",
+      "movie",
+      "afifo",
+      "fifo",
+      "abuffer",
+      "buffer",
+      "abuffersink",
+      "buffersink"
+    ],
+    "hwaccels": [
+      "vdpau",
+      "vaapi"
+    ],
+    "version": "N-47683-g0e8eb07980-static"
+  }
+}
+✅ Success: User agent contains "HeliosTestAgent".
+
+✅ PASSED: tests/verify-browser-config.ts
+
+---------------------------------------------------------
+Running: tests/verify-canvas-implicit-audio.ts
+---------------------------------------------------------
+Running Canvas Implicit Audio Verification...
+Preparing strategy...
+❌ Error during test: TypeError: page.waitForSelector is not a function
+    at CanvasStrategy.prepare (/app/packages/renderer/src/strategies/CanvasStrategy.ts:139:31)
+    at async runTests (/app/packages/renderer/tests/verify-canvas-implicit-audio.ts:61:5)
+
+❌ Verification Failed.
+
+❌ FAILED: tests/verify-canvas-implicit-audio.ts (Exit Code: 1)
+
+---------------------------------------------------------
+Running: tests/verify-canvas-preload.ts
+---------------------------------------------------------
+Verifying Canvas Preloading...
+Running strategy.prepare()...
+Intercepted slow-image.png, delaying response...
+CanvasStrategy: WebCodecs not available (VideoEncoder not found). Falling back to toDataURL.
+prepare() took 607ms
+✅ Found preload log: [Helios Preload] Preloading 1 images...
+✅ slow-image.png requested
+✅ prepare() waited for image load
+✅ Verification Passed
+
+✅ PASSED: tests/verify-canvas-preload.ts
+
+---------------------------------------------------------
+Running: tests/verify-canvas-selector.ts
+---------------------------------------------------------
+Testing with fixture: file:///app/packages/renderer/tests/fixtures/multi-canvas.html
+
+--- Test 1: Selecting #canvas-a ---
+Starting render for composition: file:///app/packages/renderer/tests/fixtures/multi-canvas.html (Mode: canvas)
+[Helios Diagnostics] FFmpeg Version: N-47683-g0e8eb07980-static
+[Helios Diagnostics] FFmpeg HW Accel: vdpau, vaapi
+Initializing pool of 1 browsers/pages...
+PAGE LOG [0]: [Helios] Math.random() has been seeded for deterministic rendering. Seed: 305419896
+CanvasStrategy: Using WebCodecs (avc1.4d002a) with bitrate: 25000000, alpha: discard
+All pages loaded and prepared.
+Running diagnostics on first page...
+PAGE LOG [0]: [Helios Diagnostics] Checking Canvas environment...
+[Helios Diagnostics] {
+  "videoEncoder": true,
+  "offscreenCanvas": true,
+  "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+  "codecs": {
+    "h264": {
+      "supported": true,
+      "hardware": false,
+      "alpha": false,
+      "type": "unknown"
+    },
+    "vp8": {
+      "supported": true,
+      "hardware": false,
+      "alpha": false,
+      "type": "unknown"
+    },
+    "vp9": {
+      "supported": false,
+      "hardware": false,
+      "alpha": false,
+      "type": "unknown"
+    },
+    "av1": {
+      "supported": true,
+      "hardware": false,
+      "alpha": false,
+      "type": "unknown"
+    }
+  }
+}
+Spawning FFmpeg: /app/node_modules/@ffmpeg-installer/linux-x64/ffmpeg -y -f h264 -i - -map 0:v -c:v libx264 -pix_fmt yuv420p -movflags +faststart -preset ultrafast /app/packages/test-results/canvas-selector/output-a.mp4
+Starting capture for 15 frames...
+ffmpeg: ffmpeg version N-47683-g0e8eb07980-static https://johnvansickle.com/ffmpeg/  Copyright (c) 2000-2018 the FFmpeg developers
+  built with gcc 6.3.0 (Debian 6.3.0-18+deb9u1) 20170516
+  configuration: --enable-gpl --enable-version3 --enable-static --disable-debug --disable-ffplay --disable-indev=sndio --disable-outdev=sndio --cc=gcc-6 --enable-fontconfig --enable-frei0r --enable-gnutls --enable-gray --enable-libaom --enable-libfribidi --enable-libass --enable-libvmaf --enable-libfreetype --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libopenjpeg --enable-librubberband --enable-libsoxr --enable-libspeex --enable-libvorbis --enable-libopus --enable-libtheora --enable-libvidstab --enable-libvo-amrwbenc --enable-libvpx --enable-libwebp --enable-libx264 --enable-libx265 --enable-libxml2 --enable-libxvid --enable-libzimg
+  libavutil      56. 24.101 / 56. 24.101
+  libavcodec     58. 42.100 / 58. 42.100
+  libavformat    58. 24.100 / 58. 24.100
+  libavdevice    58.  6.101 / 58.  6.101
+  libavfilter     7. 46.101 /  7. 46.101
+  libswscale      5.  4.100 /  5.  4.100
+  libswresample   3.  4.100 /  3.  4.100
+  libpostproc    55.  4.100 / 55.  4.100
+
+Progress: Rendered 0 / 15 frames
+Progress: Rendered 1 / 15 frames
+Progress: Rendered 2 / 15 frames
+Progress: Rendered 3 / 15 frames
+Progress: Rendered 4 / 15 frames
+Progress: Rendered 5 / 15 frames
+Progress: Rendered 6 / 15 frames
+Progress: Rendered 7 / 15 frames
+Progress: Rendered 8 / 15 frames
+Progress: Rendered 9 / 15 frames
+Progress: Rendered 10 / 15 frames
+Progress: Rendered 11 / 15 frames
+Progress: Rendered 12 / 15 frames
+Progress: Rendered 13 / 15 frames
+Progress: Rendered 14 / 15 frames
+Finishing render strategy...
+Writing final buffer...
+Finished sending frames. Closing FFmpeg stdin.
+ffmpeg: [h264 @ 0x5cac180] non-existing PPS 0 referenced
+    Last message repeated 1 times
+[h264 @ 0x5cac180] decode_slice_header error
+[h264 @ 0x5cac180] no frame!
+[h264 @ 0x5caacc0] decoding for stream 0 failed
+[h264 @ 0x5caacc0] Could not find codec parameters for stream 0 (Video: h264, none): unspecified size
+Consider increasing the value for the 'analyzeduration' and 'probesize' options
+Input #0, h264, from 'pipe:':
+  Duration: N/A, bitrate: N/A
+    Stream #0:0: Video: h264, none, 25 tbr, 1200k tbn, 50 tbc
+
+ffmpeg: Stream mapping:
+  Stream #0:0 -> #0:0 (h264 (native) -> h264 (libx264))
+
+ffmpeg: [h264 @ 0x5caf800] non-existing PPS 0 referenced
+[h264 @ 0x5caf800] decode_slice_header error
+[h264 @ 0x5caf800] no frame!
+
+ffmpeg: Error while decoding stream #0:0: Invalid data found when processing input
+
+ffmpeg: Cannot determine format of input stream 0:0 after EOF
+Error marking filters as finished
+
+ffmpeg: Conversion failed!
+
+Browsers closed.
+Cleaning up strategy resources...
+❌ Test 1 Failed with error: Error: FFmpeg process exited with code 1
+    at ChildProcess.<anonymous> (/app/packages/renderer/src/core/FFmpegManager.ts:69:20)
+    at ChildProcess.emit (node:events:519:28)
+    at maybeClose (node:internal/child_process:1101:16)
+    at ChildProcess._handle.onexit (node:internal/child_process:304:5)
+    at Process.callbackTrampoline (node:internal/async_hooks:130:17)
+
+❌ FAILED: tests/verify-canvas-selector.ts (Exit Code: 1)
+
+---------------------------------------------------------
+Running: tests/verify-canvas-shadow-dom.ts
+---------------------------------------------------------
+Testing with fixture: file:///app/packages/renderer/tests/fixtures/shadow-canvas.html
+Attempts to find canvas #gl inside Shadow DOM...
+Starting render for composition: file:///app/packages/renderer/tests/fixtures/shadow-canvas.html (Mode: canvas)
+[Helios Diagnostics] FFmpeg Version: N-47683-g0e8eb07980-static
+[Helios Diagnostics] FFmpeg HW Accel: vdpau, vaapi
+Initializing pool of 1 browsers/pages...
+PAGE LOG [0]: [Helios] Math.random() has been seeded for deterministic rendering. Seed: 305419896
+CanvasStrategy: Using WebCodecs (avc1.4d002a) with bitrate: 25000000, alpha: discard
+All pages loaded and prepared.
+Running diagnostics on first page...
+PAGE LOG [0]: [Helios Diagnostics] Checking Canvas environment...
+[Helios Diagnostics] {
+  "videoEncoder": true,
+  "offscreenCanvas": true,
+  "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+  "codecs": {
+    "h264": {
+      "supported": true,
+      "hardware": false,
+      "alpha": false,
+      "type": "unknown"
+    },
+    "vp8": {
+      "supported": true,
+      "hardware": false,
+      "alpha": false,
+      "type": "unknown"
+    },
+    "vp9": {
+      "supported": false,
+      "hardware": false,
+      "alpha": false,
+      "type": "unknown"
+    },
+    "av1": {
+      "supported": true,
+      "hardware": false,
+      "alpha": false,
+      "type": "unknown"
+    }
+  }
+}
+Spawning FFmpeg: /app/node_modules/@ffmpeg-installer/linux-x64/ffmpeg -y -f h264 -i - -map 0:v -c:v libx264 -pix_fmt yuv420p -movflags +faststart -preset ultrafast /app/packages/test-results/canvas-shadow-dom/output.mp4
+Starting capture for 30 frames...
+ffmpeg: ffmpeg version N-47683-g0e8eb07980-static https://johnvansickle.com/ffmpeg/  Copyright (c) 2000-2018 the FFmpeg developers
+  built with gcc 6.3.0 (Debian 6.3.0-18+deb9u1) 20170516
+  configuration: --enable-gpl --enable-version3 --enable-static --disable-debug --disable-ffplay --disable-indev=sndio --disable-outdev=sndio --cc=gcc-6 --enable-fontconfig --enable-frei0r --enable-gnutls --enable-gray --enable-libaom --enable-libfribidi --enable-libass --enable-libvmaf --enable-libfreetype --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libopenjpeg --enable-librubberband --enable-libsoxr --enable-libspeex --enable-libvorbis --enable-libopus --enable-libtheora --enable-libvidstab --enable-libvo-amrwbenc --enable-libvpx --enable-libwebp --enable-libx264 --enable-libx265 --enable-libxml2 --enable-libxvid --enable-libzimg
+  libavutil      56. 24.101 / 56. 24.101
+  libavcodec     58. 42.100 / 58. 42.100
+  libavformat    58. 24.100 / 58. 24.100
+  libavdevice    58.  6.101 / 58.  6.101
+  libavfilter     7. 46.101 /  7. 46.101
+  libswscale      5.  4.100 /  5.  4.100
+  libswresample   3.  4.100 /  3.  4.100
+  libpostproc    55.  4.100 / 55.  4.100
+
+Progress: Rendered 0 / 30 frames
+Progress: Rendered 3 / 30 frames
+Progress: Rendered 6 / 30 frames
+Progress: Rendered 9 / 30 frames
+Progress: Rendered 12 / 30 frames
+Progress: Rendered 15 / 30 frames
+Progress: Rendered 18 / 30 frames
+Progress: Rendered 21 / 30 frames
+Progress: Rendered 24 / 30 frames
+Progress: Rendered 27 / 30 frames
+Progress: Rendered 29 / 30 frames
+Finishing render strategy...
+Writing final buffer...
+Finished sending frames. Closing FFmpeg stdin.
+ffmpeg: [h264 @ 0x5e62180] non-existing PPS 0 referenced
+    Last message repeated 1 times
+[h264 @ 0x5e62180] decode_slice_header error
+[h264 @ 0x5e62180] no frame!
+[h264 @ 0x5e60cc0] decoding for stream 0 failed
+[h264 @ 0x5e60cc0] Could not find codec parameters for stream 0 (Video: h264, none): unspecified size
+Consider increasing the value for the 'analyzeduration' and 'probesize' options
+Input #0, h264, from 'pipe:':
+  Duration: N/A, bitrate: N/A
+    Stream #0:0: Video: h264, none, 25 tbr, 1200k tbn, 50 tbc
+
+ffmpeg: Stream mapping:
+  Stream #0:0 -> #0:0 (h264 (native) -> h264 (libx264))
+
+ffmpeg: [h264 @ 0x5e67cc0] non-existing PPS 0 referenced
+[h264 @ 0x5e67cc0] decode_slice_header error
+[h264 @ 0x5e67cc0] no frame!
+
+ffmpeg: Error while decoding stream #0:0: Invalid data found when processing input
+
+ffmpeg: Cannot determine format of input stream 0:0 after EOF
+Error marking filters as finished
+
+ffmpeg: Conversion failed!
+
+Browsers closed.
+Cleaning up strategy resources...
+❌ Test Failed with error: Error: FFmpeg process exited with code 1
+    at ChildProcess.<anonymous> (/app/packages/renderer/src/core/FFmpegManager.ts:69:20)
+    at ChildProcess.emit (node:events:519:28)
+    at maybeClose (node:internal/child_process:1101:16)
+    at ChildProcess._handle.onexit (node:internal/child_process:304:5)
+    at Process.callbackTrampoline (node:internal/async_hooks:130:17)
+
+❌ FAILED: tests/verify-canvas-shadow-dom.ts (Exit Code: 1)
+
+---------------------------------------------------------
+Running: tests/verify-canvas-strategy.ts
+---------------------------------------------------------
+Testing intermediateVideoCodec: default (vp8)...
+CanvasStrategy: Using WebCodecs (avc1.4d002a) with bitrate: 25000000, alpha: discard
+✅ Default (H.264) passed: No IVF header written
+Testing intermediateVideoCodec: vp8...
+CanvasStrategy: Using WebCodecs (vp8) with bitrate: 25000000, alpha: discard
+✅ Explicit VP8 passed: Got VP80
+Testing intermediateVideoCodec: vp9...
+CanvasStrategy: Using WebCodecs (vp9) with bitrate: 25000000, alpha: discard
+✅ VP9 passed: Got VP90
+Testing intermediateVideoCodec: av1...
+CanvasStrategy: Using WebCodecs (av01.0.05M.08) with bitrate: 25000000, alpha: discard
+✅ AV1 passed: Got AV01
+Testing intermediateVideoCodec: av01.0.05M.08...
+CanvasStrategy: Using WebCodecs (av01.0.05M.08) with bitrate: 25000000, alpha: discard
+✅ Specific AV1 passed: Got AV01
+Testing intermediateVideoCodec: avc1...
+CanvasStrategy: Using WebCodecs (avc1) with bitrate: 25000000, alpha: discard
+✅ H.264 (avc1) passed: No IVF header written
+Testing intermediateVideoCodec: h264...
+CanvasStrategy: Using WebCodecs (h264) with bitrate: 25000000, alpha: discard
+✅ H.264 (string) passed: No IVF header written
+
+All tests passed!
+
+✅ PASSED: tests/verify-canvas-strategy.ts
+
+---------------------------------------------------------
+Running: tests/verify-captions.ts
+---------------------------------------------------------
+Verifying Caption Burning logic...
+Test 1: Subtitles Only
+✅ Passed
+Test 2: Subtitles + Audio
+✅ Passed
+Test 3: Subtitles + Copy Codec
+✅ Passed
+Test 4: Path Escaping
+Original: C:\Users\Name's\Project\subs.srt
+Escaped:  C\:/Users/Name\'s/Project/subs.srt
+✅ Passed
+All verification tests passed!
+
+✅ PASSED: tests/verify-captions.ts
+
+---------------------------------------------------------
+Running: tests/verify-cdp-determinism.ts
+---------------------------------------------------------
+Starting CdpTimeDriver determinism verification...
+Running Session 1...
+Session 1 Timestamps: [
+  { now: 1704067200000, perf: 0 },
+  { now: 1704067201000, perf: 1000 },
+  { now: 1704067202000, perf: 2000 },
+  { now: 1704067205000, perf: 5000 }
+]
+Running Session 2...
+Session 2 Timestamps: [
+  { now: 1704067200000, perf: 0 },
+  { now: 1704067201000, perf: 1000 },
+  { now: 1704067202000, perf: 2000 },
+  { now: 1704067205000, perf: 5000 }
+]
+✅ Date.now() is correctly anchored to Jan 1, 2024.
+✅ performance.now() is correctly anchored to 0.
+✅ SUCCESS: Runs are consistent.
+
+✅ PASSED: tests/verify-cdp-determinism.ts
+
+---------------------------------------------------------
+Running: tests/verify-cdp-driver.ts
+---------------------------------------------------------
+Starting CdpTimeDriver test...
+Driver prepared. Virtual time policy set to PAUSE.
+Initial page time (drift): 36.7ms
+Advancing time to 1.0s...
+Real time elapsed during setTime and wait: 100ms
+Page document.timeline.currentTime: 1036.66ms
+✅ Time advanced correctly (diff: 0.03999999999996362ms).
+Advancing time to 2.0s...
+Page document.timeline.currentTime: 2036.62ms
+✅ Time advanced correctly to 2.0s (diff: 0.08000000000015461ms).
+
+✅ PASSED: tests/verify-cdp-driver.ts
+
+---------------------------------------------------------
+Running: tests/verify-cdp-driver-stability.ts
+---------------------------------------------------------
+Starting CdpTimeDriver Stability test...
+Driver prepared.
+Advancing time to 1.0s...
+❌ Stability check was NOT awaited.
+
+❌ FAILED: tests/verify-cdp-driver-stability.ts (Exit Code: 1)
+
+---------------------------------------------------------
+Running: tests/verify-cdp-driver-timeout.ts
+---------------------------------------------------------
+Starting CdpTimeDriver Timeout test...
+Driver prepared with 500ms timeout.
+Advancing time to 1.0s...
+setTime completed in 2ms
+❌ returned too early (2ms). It should have waited at least 500ms.
+
+❌ FAILED: tests/verify-cdp-driver-timeout.ts (Exit Code: 1)
+
+---------------------------------------------------------
+Running: tests/verify-cdp-hang.ts
+---------------------------------------------------------
+Running CDP Hang Verification...
+Starting render (should hang/timeout if bug exists)...
+Starting render for composition: file:///tmp/cdp-hang-test.html (Mode: canvas)
+[Helios Diagnostics] FFmpeg Version: N-47683-g0e8eb07980-static
+[Helios Diagnostics] FFmpeg HW Accel: vdpau, vaapi
+Initializing pool of 1 browsers/pages...
+PAGE LOG [0]: [Helios] Math.random() has been seeded for deterministic rendering. Seed: 305419896
+PAGE LOG [0]: [DomScanner] Found 1 media elements. Waiting for readiness...
+PAGE LOG [0]: [DomScanner] Media elements ready.
+[DomScanner] Discovered 1 audio/video tracks across 1 frames.
+CanvasStrategy: Using WebCodecs (avc1.4d002a) with bitrate: 25000000, alpha: discard
+All pages loaded and prepared.
+Running diagnostics on first page...
+PAGE LOG [0]: [Helios Diagnostics] Checking Canvas environment...
+[Helios Diagnostics] {
+  "videoEncoder": true,
+  "offscreenCanvas": true,
+  "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+  "codecs": {
+    "h264": {
+      "supported": true,
+      "hardware": false,
+      "alpha": false,
+      "type": "unknown"
+    },
+    "vp8": {
+      "supported": true,
+      "hardware": false,
+      "alpha": false,
+      "type": "unknown"
+    },
+    "vp9": {
+      "supported": false,
+      "hardware": false,
+      "alpha": false,
+      "type": "unknown"
+    },
+    "av1": {
+      "supported": true,
+      "hardware": false,
+      "alpha": false,
+      "type": "unknown"
+    }
+  }
+}
+Spawning FFmpeg: /app/node_modules/@ffmpeg-installer/linux-x64/ffmpeg -y -f h264 -i - -ss 0 -i data:audio/wav;base64,UklGRsQPAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YaAPAACAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA -filter_complex [1:a]aformat=channel_layouts=stereo[a0] -map 0:v -map [a0] -c:v libx264 -pix_fmt yuv420p -movflags +faststart -preset ultrafast -c:a aac -t 1 /tmp/cdp-hang-output.mp4
+Starting capture for 30 frames...
+ffmpeg: ffmpeg version N-47683-g0e8eb07980-static https://johnvansickle.com/ffmpeg/  Copyright (c) 2000-2018 the FFmpeg developers
+  built with gcc 6.3.0 (Debian 6.3.0-18+deb9u1) 20170516
+  configuration: --enable-gpl --enable-version3 --enable-static --disable-debug --disable-ffplay --disable-indev=sndio --disable-outdev=sndio --cc=gcc-6 --enable-fontconfig --enable-frei0r --enable-gnutls --enable-gray --enable-libaom --enable-libfribidi --enable-libass --enable-libvmaf --enable-libfreetype --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libopenjpeg --enable-librubberband --enable-libsoxr --enable-libspeex --enable-libvorbis --enable-libopus --enable-libtheora --enable-libvidstab --enable-libvo-amrwbenc --enable-libvpx --enable-libwebp --enable-libx264 --enable-libx265 --enable-libxml2 --enable-libxvid --enable-libzimg
+  libavutil      56. 24.101 / 56. 24.101
+  libavcodec     58. 42.100 / 58. 42.100
+  libavformat    58. 24.100 / 58. 24.100
+  libavdevice    58.  6.101 / 58.  6.101
+  libavfilter     7. 46.101 /  7. 46.101
+  libswscale      5.  4.100 /  5.  4.100
+  libswresample   3.  4.100 /  3.  4.100
+  libpostproc    55.  4.100 / 55.  4.100
+
+Progress: Rendered 0 / 30 frames
+Progress: Rendered 3 / 30 frames
+Progress: Rendered 6 / 30 frames
+Progress: Rendered 9 / 30 frames
+Progress: Rendered 12 / 30 frames
+Progress: Rendered 15 / 30 frames
+Progress: Rendered 18 / 30 frames
+Progress: Rendered 21 / 30 frames
+Progress: Rendered 24 / 30 frames
+Progress: Rendered 27 / 30 frames
+Progress: Rendered 29 / 30 frames
+Finishing render strategy...
+Writing final buffer...
+Finished sending frames. Closing FFmpeg stdin.
+ffmpeg: [h264 @ 0x54cb480] non-existing PPS 0 referenced
+    Last message repeated 1 times
+[h264 @ 0x54cb480] decode_slice_header error
+[h264 @ 0x54cb480] no frame!
+[h264 @ 0x54c9fc0] decoding for stream 0 failed
+[h264 @ 0x54c9fc0] Could not find codec parameters for stream 0 (Video: h264, none): unspecified size
+Consider increasing the value for the 'analyzeduration' and 'probesize' options
+Input #0, h264, from 'pipe:':
+  Duration: N/A, bitrate: N/A
+    Stream #0:0: Video: h264, none, 25 tbr, 1200k tbn, 50 tbc
+
+ffmpeg: Guessed Channel Layout for Input Stream #1.0 : mono
+Input #1, wav, from 'data:audio/wav;base64,UklGRsQPAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YaAPAACAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA':
+  Duration: N/A, bitrate:
+ffmpeg: 64 kb/s
+    Stream #1:0: Audio: pcm_u8 ([1][0][0][0] / 0x0001), 8000 Hz, mono, u8, 64 kb/s
+
+ffmpeg: Stream mapping:
+  Stream #1:0 (pcm_u8) -> aformat (graph 0)
+  Stream #0:0 -> #0:0 (h264 (native) -> h264 (libx264))
+  aformat (graph 0) -> Stream #0:1 (aac)
+
+ffmpeg: [h264 @ 0x54ede40] non-existing PPS 0 referenced
+[h264 @ 0x54ede40] decode_slice_header error
+[h264 @ 0x54ede40] no frame!
+
+ffmpeg: Error while decoding stream #0:0: Invalid data found when processing input
+
+ffmpeg: Cannot determine format of input stream 0:0 after EOF
+Error marking filters as finished
+
+ffmpeg: Conversion failed!
+
+Browsers closed.
+Cleaning up strategy resources...
+❌ Test failed with error: Error: FFmpeg process exited with code 1
+    at ChildProcess.<anonymous> (/app/packages/renderer/src/core/FFmpegManager.ts:69:20)
+    at ChildProcess.emit (node:events:519:28)
+    at maybeClose (node:internal/child_process:1101:16)
+    at ChildProcess._handle.onexit (node:internal/child_process:304:5)
+    at Process.callbackTrampoline (node:internal/async_hooks:130:17)
+
+❌ FAILED: tests/verify-cdp-hang.ts (Exit Code: 1)
+
+---------------------------------------------------------
+Running: tests/verify-cdp-media-offsets.ts
+---------------------------------------------------------
+Testing t=1.0...
+Results at t=1.0: { v1: 0, v2: 5, v3: 3, v4: 0 }
+Error: v2 at t=1.0 failed: expected 6, got 5
+    at main (/app/packages/renderer/tests/verify-cdp-media-offsets.ts:58:36)
+
+❌ FAILED: tests/verify-cdp-media-offsets.ts (Exit Code: 1)
+
+---------------------------------------------------------
+Running: tests/verify-cdp-media-sync-timing.ts
+---------------------------------------------------------
+Starting CdpTimeDriver media sync timing verification...
+Step 1: Setting time to 1.0s...
+Step 1 Logs: []
+⚠️ Warning: No frames captured in Step 1. This might be due to test timing, but verify-cdp-driver.ts confirms time advancement.
+Step 2: Setting time to 2.0s...
+Step 2 Logs: [ { rafTimestamp: 112, videoTime: 1 } ]
+❌ FAILURE: Found stale frame (videoTime < 2.0) during setTime(2.0).
+
+❌ FAILED: tests/verify-cdp-media-sync-timing.ts (Exit Code: 1)
+
+---------------------------------------------------------
+Running: tests/verify-cdp-shadow-dom-sync.ts
+---------------------------------------------------------
+Testing t=1.0...
+Results at t=1.0: { shadowV1: 0, shadowV2: 5, nestedV1: 0, nestedV2: 5 }
+Error: shadowV2 at t=1.0 failed: expected 6, got 5
+    at main (/app/packages/renderer/tests/verify-cdp-shadow-dom-sync.ts:118:42)
+
+❌ FAILED: tests/verify-cdp-shadow-dom-sync.ts (Exit Code: 1)
+
+---------------------------------------------------------
+Running: tests/verify-codec-validation.ts
+---------------------------------------------------------
+Starting Codec Validation Verification...
+[Test 1] Testing DomStrategy with videoCodec="copy"...
+✅ PASS: DomStrategy threw expected error.
+[Test 2] Testing CanvasStrategy (Fallback) with videoCodec="copy"...
+❌ FAIL: CanvasStrategy threw unexpected error: page.waitForSelector is not a function
+
+Validation failed with 1 errors.
+
+❌ FAILED: tests/verify-codec-validation.ts (Exit Code: 1)
+
+---------------------------------------------------------
+Running: tests/verify-codecs.ts
+---------------------------------------------------------
+Running Codec Configuration Verification...
+
+Testing CanvasStrategy...
+✅ CanvasStrategy default codec passed
+✅ CanvasStrategy default pix_fmt passed
+✅ CanvasStrategy custom codec passed
+✅ CanvasStrategy custom pix_fmt passed
+✅ CanvasStrategy CRF passed
+✅ CanvasStrategy preset passed
+✅ CanvasStrategy bitrate passed
+
+Testing DomStrategy...
+✅ DomStrategy default codec passed
+✅ DomStrategy default pix_fmt passed
+✅ DomStrategy custom codec passed
+✅ DomStrategy custom pix_fmt passed
+✅ DomStrategy CRF passed
+✅ DomStrategy preset passed
+✅ DomStrategy bitrate passed
+
+✅ All verification tests passed!
+
+✅ PASSED: tests/verify-codecs.ts
+
+---------------------------------------------------------
+Running: tests/verify-concat.ts
+---------------------------------------------------------
+Starting Concatenation Verification...
+Rendering Clip 1...
+Starting render for composition: data:text/html;charset=utf-8,%0A%3C!DOCTYPE%20html%3E%0A%3Chtml%3E%0A%3Cbody%20style%3D%22margin%3A0%3B%20overflow%3Ahidden%3B%22%3E%0A%3Ccanvas%20id%3D%22c%22%3E%3C%2Fcanvas%3E%0A%3Cscript%3E%0A%20%20const%20canvas%20%3D%20document.getElementById('c')%3B%0A%20%20canvas.width%20%3D%20600%3B%0A%20%20canvas.height%20%3D%20600%3B%0A%20%20const%20ctx%20%3D%20canvas.getContext('2d')%3B%0A%20%20function%20draw(time)%20%7B%0A%20%20%20%20%20%20ctx.fillStyle%20%3D%20'red'%3B%0A%20%20%20%20%20%20ctx.fillRect(0%2C%200%2C%20600%2C%20600)%3B%0A%20%20%20%20%20%20ctx.fillStyle%20%3D%20'white'%3B%0A%20%20%20%20%20%20ctx.font%20%3D%20'40px%20Arial'%3B%0A%20%20%20%20%20%20ctx.fillText(time%2C%2050%2C%2050)%3B%0A%20%20%20%20%20%20requestAnimationFrame(draw)%3B%0A%20%20%7D%0A%20%20requestAnimationFrame(draw)%3B%0A%3C%2Fscript%3E%0A%3C%2Fbody%3E%0A%3C%2Fhtml%3E%0A%20%20 (Mode: canvas)
+[Helios Diagnostics] FFmpeg Version: N-47683-g0e8eb07980-static
+[Helios Diagnostics] FFmpeg HW Accel: vdpau, vaapi
+Initializing pool of 1 browsers/pages...
+PAGE LOG [0]: [Helios] Math.random() has been seeded for deterministic rendering. Seed: 305419896
+CanvasStrategy: WebCodecs not available (VideoEncoder not found). Falling back to toDataURL.
+All pages loaded and prepared.
+Running diagnostics on first page...
+PAGE LOG [0]: [Helios Diagnostics] Checking Canvas environment...
+[Helios Diagnostics] {
+  "videoEncoder": false,
+  "offscreenCanvas": true,
+  "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+  "codecs": {
+    "h264": {
+      "supported": false,
+      "hardware": false,
+      "alpha": false,
+      "type": "unknown"
+    },
+    "vp8": {
+      "supported": false,
+      "hardware": false,
+      "alpha": false,
+      "type": "unknown"
+    },
+    "vp9": {
+      "supported": false,
+      "hardware": false,
+      "alpha": false,
+      "type": "unknown"
+    },
+    "av1": {
+      "supported": false,
+      "hardware": false,
+      "alpha": false,
+      "type": "unknown"
+    }
+  }
+}
+Spawning FFmpeg: /app/node_modules/@ffmpeg-installer/linux-x64/ffmpeg -y -f image2pipe -framerate 30 -i - -map 0:v -c:v libx264 -pix_fmt yuv420p -movflags +faststart -preset ultrafast /app/packages/renderer/tests/test-output-clip1.mp4
+Starting capture for 15 frames...
+ffmpeg: ffmpeg version N-47683-g0e8eb07980-static https://johnvansickle.com/ffmpeg/  Copyright (c) 2000-2018 the FFmpeg developers
+  built with gcc 6.3.0 (Debian 6.3.0-18+deb9u1) 20170516
+  configuration: --enable-gpl --enable-version3 --enable-static --disable-debug --disable-ffplay --disable-indev=sndio --disable-outdev=sndio --cc=gcc-6 --enable-fontconfig --enable-frei0r --enable-gnutls --enable-gray --enable-libaom --enable-libfribidi --enable-libass --enable-libvmaf --enable-libfreetype --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libopenjpeg --enable-librubberband --enable-libsoxr --enable-libspeex --enable-libvorbis --enable-libopus --enable-libtheora --enable-libvidstab --enable-libvo-amrwbenc --enable-libvpx --enable-libwebp --enable-libx264 --enable-libx265 --enable-libxml2 --enable-libxvid --enable-libzimg
+  libavutil      56. 24.101 / 56. 24.101
+  libavcodec     58. 42.100 / 58. 42.100
+  libavformat    58. 24.100 / 58. 24.100
+  libavdevice    58.  6.101 / 58.  6.101
+  libavfilter     7. 46.101 /  7. 46.101
+  libswscale      5.  4.100 /  5.  4.100
+  libswresample   3.  4.100 /  3.  4.100
+  libpostproc    55.  4.100 / 55.  4.100
+
+Progress: Rendered 0 / 15 frames
+Progress: Rendered 1 / 15 frames
+Progress: Rendered 2 / 15 frames
+Progress: Rendered 3 / 15 frames
+Progress: Rendered 4 / 15 frames
+Progress: Rendered 5 / 15 frames
+Progress: Rendered 6 / 15 frames
+Progress: Rendered 7 / 15 frames
+Progress: Rendered 8 / 15 frames
+Progress: Rendered 9 / 15 frames
+Progress: Rendered 10 / 15 frames
+Progress: Rendered 11 / 15 frames
+Progress: Rendered 12 / 15 frames
+Progress: Rendered 13 / 15 frames
+Progress: Rendered 14 / 15 frames
+Finishing render strategy...
+Finished sending frames. Closing FFmpeg stdin.
+ffmpeg: Input #0, image2pipe, from 'pipe:':
+  Duration: N/A, bitrate: N/A
+    Stream #0:0: Video: png, rgba(pc), 600x600, 30 fps, 30 tbr, 30 tbn, 30 tbc
+
+ffmpeg: Stream mapping:
+  Stream #0:0 -> #0:0 (png (native) -> h264 (libx264))
+
+ffmpeg: [libx264 @ 0x64adb40] using cpu capabilities: MMX2 SSE2Fast SSSE3 SSE4.2 AVX FMA3 BMI2 AVX2
+
+ffmpeg: [libx264 @ 0x64adb40] profile Constrained Baseline, level 3.1, 4:2:0, 8-bit
+[libx264 @ 0x64adb40] 264 - core 157 r2935 545de2f - H.264/MPEG-4 AVC codec - Copyleft 2003-2018 - http://www.videolan.org/x264.html - options: cabac=0 ref=1 deblock=0:0:0 analyse=0:0 me=dia subme=0 psy=1 psy_rd=1.00:0.00 mixed_ref=0 me_range=16 chroma_me=1 trellis=1 8x8dct=0 cqm=0 deadzone=21,11 fast_pskip=1 chroma_qp_offset=0 threads=6 lookahead_threads=1 sliced_threads=0 nr=0 decimate=1 interlaced=0 bluray_compat=0 constrained_intra=0 bframes=0 weightp=0 keyint=250 keyint_min=25 scenecut=0 intra_refresh=0 rc=crf mbtree=0 crf=23.0 qcomp=0.60 qpmin=0 qpmax=69 qpstep=4 ip_ratio=1.40 aq=0
+
+ffmpeg: Output #0, mp4, to '/app/packages/renderer/tests/test-output-clip1.mp4':
+  Metadata:
+    encoder         : Lavf58.24.100
+    Stream #0:0: Video: h264 (libx264) (avc1 / 0x31637661), yuv420p, 600x600, q=-1--1, 30 fps, 15360 tbn, 30 tbc
+    Metadata:
+      encoder         : Lavc58.42.100 libx264
+    Side data:
+      cpb: bitrate max/min/avg: 0/0/0 buffer size: 0 vbv_delay: -1
+
+ffmpeg: [mp4 @ 0x64afe00] Starting second pass: moving the moov atom to the beginning of the file
+
+ffmpeg: frame=   15 fps=0.0 q=-1.0 Lsize=       3kB time=00:00:00.46 bitrate=  46.9kbits/s speed=9.16x
+video:2kB audio:0kB subtitle:0kB other streams:0kB global headers:0kB muxing overhead: 47.201290%
+
+ffmpeg: [libx264 @ 0x64adb40] frame I:1     Avg QP:20.00  size:  1105
+[libx264 @ 0x64adb40] frame P:14    Avg QP:13.07  size:    11
+[libx264 @ 0x64adb40] mb I  I16..4: 100.0%  0.0%  0.0%
+[libx264 @ 0x64adb40] mb P  I16..4:  0.0%  0.0%  0.0%  P16..4:  0.0%  0.0%  0.0%  0.0%  0.0%    skip:100.0%
+[libx264 @ 0x64adb40] coded y,uvDC,uvAC intra: 0.0% 0.0% 0.0% inter: 0.0% 0.0% 0.0%
+[libx264 @ 0x64adb40] i16 v,h,dc,p: 97%  0%  3%  0%
+[libx264 @ 0x64adb40] i8c dc,h,v,p: 100%  0%  0%  0%
+[libx264 @ 0x64adb40] kb/s:20.14
+
+FFmpeg has finished processing.
+Browsers closed.
+Cleaning up strategy resources...
+Render complete! Output saved to: /app/packages/renderer/tests/test-output-clip1.mp4
+Rendering Clip 2...
+Starting render for composition: data:text/html;charset=utf-8,%0A%3C!DOCTYPE%20html%3E%0A%3Chtml%3E%0A%3Cbody%20style%3D%22margin%3A0%3B%20overflow%3Ahidden%3B%22%3E%0A%3Ccanvas%20id%3D%22c%22%3E%3C%2Fcanvas%3E%0A%3Cscript%3E%0A%20%20const%20canvas%20%3D%20document.getElementById('c')%3B%0A%20%20canvas.width%20%3D%20600%3B%0A%20%20canvas.height%20%3D%20600%3B%0A%20%20const%20ctx%20%3D%20canvas.getContext('2d')%3B%0A%20%20function%20draw(time)%20%7B%0A%20%20%20%20%20%20ctx.fillStyle%20%3D%20'red'%3B%0A%20%20%20%20%20%20ctx.fillRect(0%2C%200%2C%20600%2C%20600)%3B%0A%20%20%20%20%20%20ctx.fillStyle%20%3D%20'white'%3B%0A%20%20%20%20%20%20ctx.font%20%3D%20'40px%20Arial'%3B%0A%20%20%20%20%20%20ctx.fillText(time%2C%2050%2C%2050)%3B%0A%20%20%20%20%20%20requestAnimationFrame(draw)%3B%0A%20%20%7D%0A%20%20requestAnimationFrame(draw)%3B%0A%3C%2Fscript%3E%0A%3C%2Fbody%3E%0A%3C%2Fhtml%3E%0A%20%20 (Mode: canvas)
+[Helios Diagnostics] FFmpeg Version: N-47683-g0e8eb07980-static
+[Helios Diagnostics] FFmpeg HW Accel: vdpau, vaapi
+Initializing pool of 1 browsers/pages...
+PAGE LOG [0]: [Helios] Math.random() has been seeded for deterministic rendering. Seed: 305419896
+CanvasStrategy: WebCodecs not available (VideoEncoder not found). Falling back to toDataURL.
+All pages loaded and prepared.
+Running diagnostics on first page...
+PAGE LOG [0]: [Helios Diagnostics] Checking Canvas environment...
+[Helios Diagnostics] {
+  "videoEncoder": false,
+  "offscreenCanvas": true,
+  "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+  "codecs": {
+    "h264": {
+      "supported": false,
+      "hardware": false,
+      "alpha": false,
+      "type": "unknown"
+    },
+    "vp8": {
+      "supported": false,
+      "hardware": false,
+      "alpha": false,
+      "type": "unknown"
+    },
+    "vp9": {
+      "supported": false,
+      "hardware": false,
+      "alpha": false,
+      "type": "unknown"
+    },
+    "av1": {
+      "supported": false,
+      "hardware": false,
+      "alpha": false,
+      "type": "unknown"
+    }
+  }
+}
+Spawning FFmpeg: /app/node_modules/@ffmpeg-installer/linux-x64/ffmpeg -y -f image2pipe -framerate 30 -i - -map 0:v -c:v libx264 -pix_fmt yuv420p -movflags +faststart -preset ultrafast /app/packages/renderer/tests/test-output-clip2.mp4
+Starting capture for 15 frames...
+ffmpeg: ffmpeg version N-47683-g0e8eb07980-static https://johnvansickle.com/ffmpeg/  Copyright (c) 2000-2018 the FFmpeg developers
+  built with gcc 6.3.0 (Debian 6.3.0-18+deb9u1) 20170516
+  configuration: --enable-gpl --enable-version3 --enable-static --disable-debug --disable-ffplay --disable-indev=sndio --disable-outdev=sndio --cc=gcc-6 --enable-fontconfig --enable-frei0r --enable-gnutls --enable-gray --enable-libaom --enable-libfribidi --enable-libass --enable-libvmaf --enable-libfreetype --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libopenjpeg --enable-librubberband --enable-libsoxr --enable-libspeex --enable-libvorbis --enable-libopus --enable-libtheora --enable-libvidstab --enable-libvo-amrwbenc --enable-libvpx --enable-libwebp --enable-libx264 --enable-libx265 --enable-libxml2 --enable-libxvid --enable-libzimg
+  libavutil      56. 24.101 / 56. 24.101
+  libavcodec     58. 42.100 / 58. 42.100
+  libavformat    58. 24.100 / 58. 24.100
+  libavdevice    58.  6.101 / 58.  6.101
+  libavfilter     7. 46.101 /  7. 46.101
+  libswscale      5.  4.100 /  5.  4.100
+  libswresample   3.  4.100 /  3.  4.100
+  libpostproc    55.  4.100 / 55.  4.100
+
+Progress: Rendered 0 / 15 frames
+Progress: Rendered 1 / 15 frames
+Progress: Rendered 2 / 15 frames
+Progress: Rendered 3 / 15 frames
+Progress: Rendered 4 / 15 frames
+Progress: Rendered 5 / 15 frames
+Progress: Rendered 6 / 15 frames
+Progress: Rendered 7 / 15 frames
+Progress: Rendered 8 / 15 frames
+Progress: Rendered 9 / 15 frames
+Progress: Rendered 10 / 15 frames
+Progress: Rendered 11 / 15 frames
+Progress: Rendered 12 / 15 frames
+Progress: Rendered 13 / 15 frames
+Progress: Rendered 14 / 15 frames
+Finishing render strategy...
+Finished sending frames. Closing FFmpeg stdin.
+ffmpeg: Input #0, image2pipe, from 'pipe:':
+  Duration: N/A, bitrate: N/A
+
+ffmpeg:     Stream #0:0: Video: png, rgba(pc), 600x600, 30 fps, 30 tbr, 30 tbn, 30 tbc
+
+ffmpeg: Stream mapping:
+  Stream #0:0 -> #0:0 (png (native) -> h264 (libx264))
+
+ffmpeg: [libx264 @ 0x550db40] using cpu capabilities: MMX2 SSE2Fast SSSE3 SSE4.2 AVX FMA3 BMI2 AVX2
+
+ffmpeg: [libx264 @ 0x550db40] profile Constrained Baseline, level 3.1, 4:2:0, 8-bit
+[libx264 @ 0x550db40] 264 - core 157 r2935 545de2f - H.264/MPEG-4 AVC codec - Copyleft 2003-2018 - http://www.videolan.org/x264.html - options: cabac=0 ref=1 deblock=0:0:0 analyse=0:0 me=dia subme=0 psy=1 psy_rd=1.00:0.00 mixed_ref=0 me_range=16 chroma_me=1 trellis=1 8x8dct=0 cqm=0 deadzone=21,11 fast_pskip=1 chroma_qp_offset=0 threads=6 lookahead_threads=1 sliced_threads=0 nr=0 decimate=1 interlaced=0 bluray_compat=0 constrained_intra=0 bframes=0 weightp=0 keyint=250 keyint_min=25 scenecut=0 intra_refresh=0 rc=crf mbtree=0 crf=23.0 qcomp=0.60 qpmin=0 qpmax=69 qpstep=4 ip_ratio=1.40 aq=0
+
+ffmpeg: Output #0, mp4, to '/app/packages/renderer/tests/test-output-clip2.mp4':
+  Metadata:
+    encoder         : Lavf58.24.100
+    Stream #0:0: Video: h264 (libx264) (avc1 / 0x31637661), yuv420p, 600x600, q=-1--1, 30 fps, 15360 tbn, 30 tbc
+    Metadata:
+      encoder         : Lavc58.42.100 libx264
+    Side data:
+      cpb: bitrate max/min/avg: 0/0/0 buffer size: 0 vbv_delay: -1
+
+ffmpeg: [mp4 @ 0x550fe00] Starting second pass: moving the moov atom to the beginning of the file
+
+ffmpeg: frame=   15 fps=0.0 q=-1.0 Lsize=       3kB time=00:00:00.46 bitrate=  46.9kbits/s speed= 8.8x
+video:2kB audio:0kB subtitle:0kB other streams:0kB global headers:0kB muxing overhead: 47.201290%
+
+ffmpeg: [libx264 @ 0x550db40] frame I:1     Avg QP:20.00  size:  1105
+[libx264 @ 0x550db40] frame P:14    Avg QP:13.07  size:    11
+[libx264 @ 0x550db40] mb I  I16..4: 100.0%  0.0%  0.0%
+[libx264 @ 0x550db40] mb P  I16..4:  0.0%  0.0%  0.0%  P16..4:  0.0%  0.0%  0.0%  0.0%  0.0%    skip:100.0%
+[libx264 @ 0x550db40] coded y,uvDC,uvAC intra: 0.0% 0.0% 0.0% inter: 0.0% 0.0% 0.0%
+[libx264 @ 0x550db40] i16 v,h,dc,p: 97%  0%  3%  0%
+[libx264 @ 0x550db40] i8c dc,h,v,p: 100%  0%  0%  0%
+[libx264 @ 0x550db40] kb/s:20.14
+
+FFmpeg has finished processing.
+Browsers closed.
+Cleaning up strategy resources...
+Render complete! Output saved to: /app/packages/renderer/tests/test-output-clip2.mp4
+Concatenating clips...
+Spawning FFmpeg for concat (piping list to stdin): /app/node_modules/@ffmpeg-installer/linux-x64/ffmpeg -f concat -safe 0 -protocol_whitelist file,pipe -i - -c copy -y /app/packages/renderer/tests/test-output-concat.mp4
+✅ Verification Passed! Concatenated video saved to: /app/packages/renderer/tests/test-output-concat.mp4 (4730 bytes)
+
+✅ PASSED: tests/verify-concat.ts
+
+---------------------------------------------------------
+Running: tests/verify-deep-dom.ts
+---------------------------------------------------------
+Verifying Deep DOM Strategy (Iframe Discovery)...
+Running strategy.prepare()...
+[DomScanner] Discovered 2 audio/video tracks across 2 frames.
+Getting FFmpeg args...
+FFmpeg Args: [
+  '-y',
+  '-f',
+  'mjpeg',
+  '-framerate',
+  '30',
+  '-i',
+  '-',
+  '-ss',
+  '0',
+  '-i',
+  'https://example.com/main-audio.mp3',
+  '-ss',
+  '0',
+  '-i',
+  'https://example.com/iframe-audio.mp3',
+  '-filter_complex',
+  '[1:a]aformat=channel_layouts=stereo[a0];[2:a]aformat=channel_layouts=stereo[a1];[a0][a1]amix=inputs=2:duration=longest[aout]',
+  '-map',
+  '0:v',
+  '-map',
+  '[aout]',
+  '-c:v',
+  'libx264',
+  '-pix_fmt',
+  'yuv420p',
+  '-movflags',
+  '+faststart',
+  '-preset',
+  'ultrafast',
+  '-c:a',
+  'aac',
+  '-t',
+  '5',
+  'output.mp4'
+]
+✅ Found main-audio.mp3
+✅ Found iframe-audio.mp3
+✅ Verification Passed
+
+✅ PASSED: tests/verify-deep-dom.ts
+
+---------------------------------------------------------
+Running: tests/verify-distributed.ts
+---------------------------------------------------------
+Starting distributed render verification...
+Generating dummy audio file...
+Starting distributed render with concurrency: 2
+[Worker 0] Rendering frames 0 to 60 (60 frames) to /app/packages/renderer/output/temp_1782543378958_kfagv_part_0.mov
+Starting render for composition: file:///app/packages/renderer/output/example-build/examples/simple-canvas-animation/composition.html (Mode: canvas)
+[Helios Diagnostics] FFmpeg Version: N-47683-g0e8eb07980-static
+[Helios Diagnostics] FFmpeg HW Accel: vdpau, vaapi
+Initializing pool of 1 browsers/pages...
+[Worker 1] Rendering frames 60 to 120 (60 frames) to /app/packages/renderer/output/temp_1782543378958_kfagv_part_1.mov
+Starting render for composition: file:///app/packages/renderer/output/example-build/examples/simple-canvas-animation/composition.html (Mode: canvas)
+[Helios Diagnostics] FFmpeg Version: N-47683-g0e8eb07980-static
+[Helios Diagnostics] FFmpeg HW Accel: vdpau, vaapi
+Initializing pool of 1 browsers/pages...
+Cleaning up strategy resources...
+[Worker 1] failed. Aborting other workers...
+Cleaning up temporary files...
+Distributed render failed: page.goto: net::ERR_FILE_NOT_FOUND at file:///app/packages/renderer/output/example-build/examples/simple-canvas-animation/composition.html
+Call log:
+[2m  - navigating to "file:///app/packages/renderer/output/example-build/examples/simple-canvas-animation/composition.html", waiting until "commit"[22m
+
+    at createPage (/app/packages/renderer/src/core/BrowserPool.ts:144:18)
+    at async BrowserPool.init (/app/packages/renderer/src/core/BrowserPool.ts:156:20)
+    at async Renderer.render (/app/packages/renderer/src/Renderer.ts:29:7)
+    at async LocalExecutor.render (/app/packages/renderer/src/executors/LocalExecutor.ts:8:5)
+    at async Function.render (/app/packages/renderer/src/Orchestrator.ts:185:7)
+    at async main (/app/packages/renderer/tests/verify-distributed.ts:46:5) {
+  name: 'Error'
+}
+
+❌ FAILED: tests/verify-distributed.ts (Exit Code: 1)
+
+---------------------------------------------------------
+Running: tests/verify-distributed-cancellation.ts
+---------------------------------------------------------
+Starting Distributed Cancellation Verification...
+Starting distributed render with concurrency: 2
+[Worker 0] Rendering frames 0 to 30 (30 frames) to output/temp_1782543380891_y7ty3e_part_0.mov
+[Mock Worker 1] Started. Failing immediately...
+[Worker 1] Rendering frames 30 to 60 (30 frames) to output/temp_1782543380891_y7ty3e_part_1.mov
+[Mock Worker 2] Started. Waiting...
+[Worker 0] failed. Aborting other workers...
+[Mock Worker 2] Received abort signal!
+Cleaning up temporary files...
+Caught expected error: Worker 1 Simulated Failure
+SUCCESS: Worker 2 was correctly aborted when Worker 1 failed.
+
+✅ PASSED: tests/verify-distributed-cancellation.ts
+
+---------------------------------------------------------
+Running: tests/verify-diagnose.ts
+---------------------------------------------------------
+Verifying Renderer.diagnose()...
+
+--- Testing Canvas Mode ---
+Starting diagnostics (Mode: canvas)
+Canvas Diagnostics: {
+  browser: {
+    videoEncoder: false,
+    offscreenCanvas: true,
+    userAgent: 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36',
+    codecs: { h264: [Object], vp8: [Object], vp9: [Object], av1: [Object] }
+  },
+  ffmpeg: {
+    path: '/app/node_modules/@ffmpeg-installer/linux-x64/ffmpeg',
+    present: true,
+    encoders: [
+      '=',           '=',               '=',            'a64multi',
+      'a64multi5',   'alias_pix',       'amv',          'apng',
+      'asv1',        'asv2',            'libaom-av1',   'avrp',
+      'avui',        'ayuv',            'bmp',          'cinepak',
+      'cljr',        'vc2',             'dnxhd',        'dpx',
+      'dvvideo',     'ffv1',            'ffvhuff',      'fits',
+      'flashsv',     'flashsv2',        'flv',          'gif',
+      'h261',        'h263',            'h263_v4l2m2m', 'h263p',
+      'libx264',     'libx264rgb',      'h264_v4l2m2m', 'h264_vaapi',
+      'libx265',     'hevc_vaapi',      'huffyuv',      'jpeg2000',
+      'libopenjpeg', 'jpegls',          'ljpeg',        'magicyuv',
+      'mjpeg',       'mjpeg_vaapi',     'mpeg1video',   'mpeg2video',
+      'mpeg2_vaapi', 'mpeg4',           'libxvid',      'mpeg4_v4l2m2m',
+      'msmpeg4v2',   'msmpeg4',         'msvideo1',     'pam',
+      'pbm',         'pcx',             'pgm',          'pgmyuv',
+      'png',         'ppm',             'prores',       'prores_aw',
+      'prores_ks',   'qtrle',           'r10k',         'r210',
+      'rawvideo',    'roqvideo',        'rv10',         'rv20',
+      'sgi',         'snow',            'sunrast',      'svq1',
+      'targa',       'libtheora',       'tiff',         'utvideo',
+      'v210',        'v308',            'v408',         'v410',
+      'libvpx',      'vp8_v4l2m2m',     'vp8_vaapi',    'libvpx-vp9',
+      'vp9_vaapi',   'libwebp_anim',    'libwebp',      'wmv1',
+      'wmv2',        'wrapped_avframe', 'xbm',          'xface',
+      'xwd',         'y41p',            'yuv4',         'zlib',
+      ... 84 more items
+    ],
+    filters: [
+      '=',             '=',                 '=',
+      'abench',        'acompressor',       'acontrast',
+      'acopy',         'acue',              'acrossfade',
+      'acrossover',    'acrusher',          'adeclick',
+      'adeclip',       'adelay',            'aderivative',
+      'aecho',         'aemphasis',         'aeval',
+      'afade',         'afftdn',            'afftfilt',
+      'afir',          'aformat',           'agate',
+      'aiir',          'aintegral',         'ainterleave',
+      'alimiter',      'allpass',           'aloop',
+      'amerge',        'ametadata',         'amix',
+      'amultiply',     'anequalizer',       'anull',
+      'apad',          'aperms',            'aphaser',
+      'apulsator',     'arealtime',         'aresample',
+      'areverse',      'aselect',           'asendcmd',
+      'asetnsamples',  'asetpts',           'asetrate',
+      'asettb',        'ashowinfo',         'asidedata',
+      'asplit',        'astats',            'astreamselect',
+      'atempo',        'atrim',             'bandpass',
+      'bandreject',    'bass',              'biquad',
+      'channelmap',    'channelsplit',      'chorus',
+      'compand',       'compensationdelay', 'crossfeed',
+      'crystalizer',   'dcshift',           'drmeter',
+      'dynaudnorm',    'earwax',            'ebur128',
+      'equalizer',     'extrastereo',       'firequalizer',
+      'flanger',       'haas',              'hdcd',
+      'headphone',     'highpass',          'highshelf',
+      'join',          'loudnorm',          'lowpass',
+      'lowshelf',      'mcompand',          'pan',
+      'replaygain',    'rubberband',        'sidechaincompress',
+      'sidechaingate', 'silencedetect',     'silenceremove',
+      'stereotools',   'stereowiden',       'superequalizer',
+      'surround',      'treble',            'tremolo',
+      'vibrato',
+      ... 283 more items
+    ],
+    hwaccels: [ 'vdpau', 'vaapi' ],
+    version: 'N-47683-g0e8eb07980-static'
+  }
+}
+
+--- Testing DOM Mode ---
+Starting diagnostics (Mode: dom)
+DOM Diagnostics: {
+  browser: {
+    waapi: true,
+    animations: 'supported',
+    userAgent: 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36',
+    viewport: { width: 1280, height: 720, dpr: 1 },
+    webgl: false
+  },
+  ffmpeg: {
+    path: '/app/node_modules/@ffmpeg-installer/linux-x64/ffmpeg',
+    present: true,
+    encoders: [
+      '=',           '=',               '=',            'a64multi',
+      'a64multi5',   'alias_pix',       'amv',          'apng',
+      'asv1',        'asv2',            'libaom-av1',   'avrp',
+      'avui',        'ayuv',            'bmp',          'cinepak',
+      'cljr',        'vc2',             'dnxhd',        'dpx',
+      'dvvideo',     'ffv1',            'ffvhuff',      'fits',
+      'flashsv',     'flashsv2',        'flv',          'gif',
+      'h261',        'h263',            'h263_v4l2m2m', 'h263p',
+      'libx264',     'libx264rgb',      'h264_v4l2m2m', 'h264_vaapi',
+      'libx265',     'hevc_vaapi',      'huffyuv',      'jpeg2000',
+      'libopenjpeg', 'jpegls',          'ljpeg',        'magicyuv',
+      'mjpeg',       'mjpeg_vaapi',     'mpeg1video',   'mpeg2video',
+      'mpeg2_vaapi', 'mpeg4',           'libxvid',      'mpeg4_v4l2m2m',
+      'msmpeg4v2',   'msmpeg4',         'msvideo1',     'pam',
+      'pbm',         'pcx',             'pgm',          'pgmyuv',
+      'png',         'ppm',             'prores',       'prores_aw',
+      'prores_ks',   'qtrle',           'r10k',         'r210',
+      'rawvideo',    'roqvideo',        'rv10',         'rv20',
+      'sgi',         'snow',            'sunrast',      'svq1',
+      'targa',       'libtheora',       'tiff',         'utvideo',
+      'v210',        'v308',            'v408',         'v410',
+      'libvpx',      'vp8_v4l2m2m',     'vp8_vaapi',    'libvpx-vp9',
+      'vp9_vaapi',   'libwebp_anim',    'libwebp',      'wmv1',
+      'wmv2',        'wrapped_avframe', 'xbm',          'xface',
+      'xwd',         'y41p',            'yuv4',         'zlib',
+      ... 84 more items
+    ],
+    filters: [
+      '=',             '=',                 '=',
+      'abench',        'acompressor',       'acontrast',
+      'acopy',         'acue',              'acrossfade',
+      'acrossover',    'acrusher',          'adeclick',
+      'adeclip',       'adelay',            'aderivative',
+      'aecho',         'aemphasis',         'aeval',
+      'afade',         'afftdn',            'afftfilt',
+      'afir',          'aformat',           'agate',
+      'aiir',          'aintegral',         'ainterleave',
+      'alimiter',      'allpass',           'aloop',
+      'amerge',        'ametadata',         'amix',
+      'amultiply',     'anequalizer',       'anull',
+      'apad',          'aperms',            'aphaser',
+      'apulsator',     'arealtime',         'aresample',
+      'areverse',      'aselect',           'asendcmd',
+      'asetnsamples',  'asetpts',           'asetrate',
+      'asettb',        'ashowinfo',         'asidedata',
+      'asplit',        'astats',            'astreamselect',
+      'atempo',        'atrim',             'bandpass',
+      'bandreject',    'bass',              'biquad',
+      'channelmap',    'channelsplit',      'chorus',
+      'compand',       'compensationdelay', 'crossfeed',
+      'crystalizer',   'dcshift',           'drmeter',
+      'dynaudnorm',    'earwax',            'ebur128',
+      'equalizer',     'extrastereo',       'firequalizer',
+      'flanger',       'haas',              'hdcd',
+      'headphone',     'highpass',          'highshelf',
+      'join',          'loudnorm',          'lowpass',
+      'lowshelf',      'mcompand',          'pan',
+      'replaygain',    'rubberband',        'sidechaincompress',
+      'sidechaingate', 'silencedetect',     'silenceremove',
+      'stereotools',   'stereowiden',       'superequalizer',
+      'surround',      'treble',            'tremolo',
+      'vibrato',
+      ... 283 more items
+    ],
+    hwaccels: [ 'vdpau', 'vaapi' ],
+    version: 'N-47683-g0e8eb07980-static'
+  }
+}
+
+✅ Verification passed!
+
+✅ PASSED: tests/verify-diagnose.ts
+
+---------------------------------------------------------
+Running: tests/verify-diagnose-ffmpeg.ts
+---------------------------------------------------------
+Verifying FFmpeg Diagnostics...
+Starting diagnostics (Mode: canvas)
+Diagnostics received: {
+  "browser": {
+    "videoEncoder": false,
+    "offscreenCanvas": true,
+    "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+    "codecs": {
+      "h264": {
+        "supported": false,
+        "hardware": false,
+        "alpha": false,
+        "type": "unknown"
+      },
+      "vp8": {
+        "supported": false,
+        "hardware": false,
+        "alpha": false,
+        "type": "unknown"
+      },
+      "vp9": {
+        "supported": false,
+        "hardware": false,
+        "alpha": false,
+        "type": "unknown"
+      },
+      "av1": {
+        "supported": false,
+        "hardware": false,
+        "alpha": false,
+        "type": "unknown"
+      }
+    }
+  },
+  "ffmpeg": {
+    "path": "/app/node_modules/@ffmpeg-installer/linux-x64/ffmpeg",
+    "present": true,
+    "encoders": [
+      "=",
+      "=",
+      "=",
+      "a64multi",
+      "a64multi5",
+      "alias_pix",
+      "amv",
+      "apng",
+      "asv1",
+      "asv2",
+      "libaom-av1",
+      "avrp",
+      "avui",
+      "ayuv",
+      "bmp",
+      "cinepak",
+      "cljr",
+      "vc2",
+      "dnxhd",
+      "dpx",
+      "dvvideo",
+      "ffv1",
+      "ffvhuff",
+      "fits",
+      "flashsv",
+      "flashsv2",
+      "flv",
+      "gif",
+      "h261",
+      "h263",
+      "h263_v4l2m2m",
+      "h263p",
+      "libx264",
+      "libx264rgb",
+      "h264_v4l2m2m",
+      "h264_vaapi",
+      "libx265",
+      "hevc_vaapi",
+      "huffyuv",
+      "jpeg2000",
+      "libopenjpeg",
+      "jpegls",
+      "ljpeg",
+      "magicyuv",
+      "mjpeg",
+      "mjpeg_vaapi",
+      "mpeg1video",
+      "mpeg2video",
+      "mpeg2_vaapi",
+      "mpeg4",
+      "libxvid",
+      "mpeg4_v4l2m2m",
+      "msmpeg4v2",
+      "msmpeg4",
+      "msvideo1",
+      "pam",
+      "pbm",
+      "pcx",
+      "pgm",
+      "pgmyuv",
+      "png",
+      "ppm",
+      "prores",
+      "prores_aw",
+      "prores_ks",
+      "qtrle",
+      "r10k",
+      "r210",
+      "rawvideo",
+      "roqvideo",
+      "rv10",
+      "rv20",
+      "sgi",
+      "snow",
+      "sunrast",
+      "svq1",
+      "targa",
+      "libtheora",
+      "tiff",
+      "utvideo",
+      "v210",
+      "v308",
+      "v408",
+      "v410",
+      "libvpx",
+      "vp8_v4l2m2m",
+      "vp8_vaapi",
+      "libvpx-vp9",
+      "vp9_vaapi",
+      "libwebp_anim",
+      "libwebp",
+      "wmv1",
+      "wmv2",
+      "wrapped_avframe",
+      "xbm",
+      "xface",
+      "xwd",
+      "y41p",
+      "yuv4",
+      "zlib",
+      "zmbv",
+      "aac",
+      "ac3",
+      "ac3_fixed",
+      "adpcm_adx",
+      "g722",
+      "g726",
+      "g726le",
+      "adpcm_ima_qt",
+      "adpcm_ima_wav",
+      "adpcm_ms",
+      "adpcm_swf",
+      "adpcm_yamaha",
+      "alac",
+      "libopencore_amrnb",
+      "libvo_amrwbenc",
+      "aptx",
+      "aptx_hd",
+      "comfortnoise",
+      "dca",
+      "eac3",
+      "flac",
+      "g723_1",
+      "mlp",
+      "mp2",
+      "mp2fixed",
+      "libmp3lame",
+      "nellymoser",
+      "opus",
+      "libopus",
+      "pcm_alaw",
+      "pcm_dvd",
+      "pcm_f32be",
+      "pcm_f32le",
+      "pcm_f64be",
+      "pcm_f64le",
+      "pcm_mulaw",
+      "pcm_s16be",
+      "pcm_s16be_planar",
+      "pcm_s16le",
+      "pcm_s16le_planar",
+      "pcm_s24be",
+      "pcm_s24daud",
+      "pcm_s24le",
+      "pcm_s24le_planar",
+      "pcm_s32be",
+      "pcm_s32le",
+      "pcm_s32le_planar",
+      "pcm_s64be",
+      "pcm_s64le",
+      "pcm_s8",
+      "pcm_s8_planar",
+      "pcm_u16be",
+      "pcm_u16le",
+      "pcm_u24be",
+      "pcm_u24le",
+      "pcm_u32be",
+      "pcm_u32le",
+      "pcm_u8",
+      "pcm_vidc",
+      "real_144",
+      "roq_dpcm",
+      "s302m",
+      "sbc",
+      "sonic",
+      "sonicls",
+      "libspeex",
+      "truehd",
+      "tta",
+      "vorbis",
+      "libvorbis",
+      "wavpack",
+      "wmav1",
+      "wmav2",
+      "ssa",
+      "ass",
+      "dvbsub",
+      "dvdsub",
+      "mov_text",
+      "srt",
+      "subrip",
+      "text",
+      "webvtt",
+      "xsub"
+    ],
+    "filters": [
+      "=",
+      "=",
+      "=",
+      "abench",
+      "acompressor",
+      "acontrast",
+      "acopy",
+      "acue",
+      "acrossfade",
+      "acrossover",
+      "acrusher",
+      "adeclick",
+      "adeclip",
+      "adelay",
+      "aderivative",
+      "aecho",
+      "aemphasis",
+      "aeval",
+      "afade",
+      "afftdn",
+      "afftfilt",
+      "afir",
+      "aformat",
+      "agate",
+      "aiir",
+      "aintegral",
+      "ainterleave",
+      "alimiter",
+      "allpass",
+      "aloop",
+      "amerge",
+      "ametadata",
+      "amix",
+      "amultiply",
+      "anequalizer",
+      "anull",
+      "apad",
+      "aperms",
+      "aphaser",
+      "apulsator",
+      "arealtime",
+      "aresample",
+      "areverse",
+      "aselect",
+      "asendcmd",
+      "asetnsamples",
+      "asetpts",
+      "asetrate",
+      "asettb",
+      "ashowinfo",
+      "asidedata",
+      "asplit",
+      "astats",
+      "astreamselect",
+      "atempo",
+      "atrim",
+      "bandpass",
+      "bandreject",
+      "bass",
+      "biquad",
+      "channelmap",
+      "channelsplit",
+      "chorus",
+      "compand",
+      "compensationdelay",
+      "crossfeed",
+      "crystalizer",
+      "dcshift",
+      "drmeter",
+      "dynaudnorm",
+      "earwax",
+      "ebur128",
+      "equalizer",
+      "extrastereo",
+      "firequalizer",
+      "flanger",
+      "haas",
+      "hdcd",
+      "headphone",
+      "highpass",
+      "highshelf",
+      "join",
+      "loudnorm",
+      "lowpass",
+      "lowshelf",
+      "mcompand",
+      "pan",
+      "replaygain",
+      "rubberband",
+      "sidechaincompress",
+      "sidechaingate",
+      "silencedetect",
+      "silenceremove",
+      "stereotools",
+      "stereowiden",
+      "superequalizer",
+      "surround",
+      "treble",
+      "tremolo",
+      "vibrato",
+      "volume",
+      "volumedetect",
+      "aevalsrc",
+      "anoisesrc",
+      "anullsrc",
+      "hilbert",
+      "sinc",
+      "sine",
+      "anullsink",
+      "alphaextract",
+      "alphamerge",
+      "amplify",
+      "ass",
+      "atadenoise",
+      "avgblur",
+      "bbox",
+      "bench",
+      "bitplanenoise",
+      "blackdetect",
+      "blackframe",
+      "blend",
+      "bm3d",
+      "boxblur",
+      "bwdif",
+      "chromahold",
+      "chromakey",
+      "chromashift",
+      "ciescope",
+      "codecview",
+      "colorbalance",
+      "colorchannelmixer",
+      "colorkey",
+      "colorlevels",
+      "colormatrix",
+      "colorspace",
+      "convolution",
+      "convolve",
+      "copy",
+      "cover_rect",
+      "crop",
+      "cropdetect",
+      "cue",
+      "curves",
+      "datascope",
+      "dctdnoiz",
+      "deband",
+      "deblock",
+      "decimate",
+      "deconvolve",
+      "dedot",
+      "deflate",
+      "deflicker",
+      "deinterlace_vaapi",
+      "dejudder",
+      "delogo",
+      "denoise_vaapi",
+      "deshake",
+      "despill",
+      "detelecine",
+      "dilation",
+      "displace",
+      "doubleweave",
+      "drawbox",
+      "drawgraph",
+      "drawgrid",
+      "drawtext",
+      "edgedetect",
+      "elbg",
+      "entropy",
+      "eq",
+      "erosion",
+      "extractplanes",
+      "fade",
+      "fftdnoiz",
+      "fftfilt",
+      "field",
+      "fieldhint",
+      "fieldmatch",
+      "fieldorder",
+      "fillborders",
+      "find_rect",
+      "floodfill",
+      "format",
+      "fps",
+      "framepack",
+      "framerate",
+      "framestep",
+      "freezedetect",
+      "frei0r",
+      "fspp",
+      "gblur",
+      "geq",
+      "gradfun",
+      "graphmonitor",
+      "greyedge",
+      "haldclut",
+      "hflip",
+      "histeq",
+      "histogram",
+      "hqdn3d",
+      "hqx",
+      "hstack",
+      "hue",
+      "hwdownload",
+      "hwmap",
+      "hwupload",
+      "hysteresis",
+      "idet",
+      "il",
+      "inflate",
+      "interlace",
+      "interleave",
+      "kerndeint",
+      "lenscorrection",
+      "libvmaf",
+      "limiter",
+      "loop",
+      "lumakey",
+      "lut",
+      "lut1d",
+      "lut2",
+      "lut3d",
+      "lutrgb",
+      "lutyuv",
+      "maskedclamp",
+      "maskedmerge",
+      "mcdeint",
+      "mergeplanes",
+      "mestimate",
+      "metadata",
+      "midequalizer",
+      "minterpolate",
+      "mix",
+      "mpdecimate",
+      "negate",
+      "nlmeans",
+      "nnedi",
+      "noformat",
+      "noise",
+      "normalize",
+      "null",
+      "oscilloscope",
+      "overlay",
+      "owdenoise",
+      "pad",
+      "palettegen",
+      "paletteuse",
+      "perms",
+      "perspective",
+      "phase",
+      "pixdesctest",
+      "pixscope",
+      "pp",
+      "pp7",
+      "premultiply",
+      "prewitt",
+      "procamp_vaapi",
+      "pseudocolor",
+      "psnr",
+      "pullup",
+      "qp",
+      "random",
+      "readeia608",
+      "readvitc",
+      "realtime",
+      "remap",
+      "removegrain",
+      "removelogo",
+      "repeatfields",
+      "reverse",
+      "rgbashift",
+      "roberts",
+      "rotate",
+      "sab",
+      "scale",
+      "scale_vaapi",
+      "scale2ref",
+      "select",
+      "selectivecolor",
+      "sendcmd",
+      "separatefields",
+      "setdar",
+      "setfield",
+      "setparams",
+      "setpts",
+      "setrange",
+      "setsar",
+      "settb",
+      "sharpness_vaapi",
+      "showinfo",
+      "showpalette",
+      "shuffleframes",
+      "shuffleplanes",
+      "sidedata",
+      "signalstats",
+      "signature",
+      "smartblur",
+      "sobel",
+      "split",
+      "spp",
+      "sr",
+      "ssim",
+      "stereo3d",
+      "streamselect",
+      "subtitles",
+      "super2xsai",
+      "swaprect",
+      "swapuv",
+      "tblend",
+      "telecine",
+      "threshold",
+      "thumbnail",
+      "tile",
+      "tinterlace",
+      "tlut2",
+      "tmix",
+      "tonemap",
+      "tpad",
+      "transpose",
+      "trim",
+      "unpremultiply",
+      "unsharp",
+      "uspp",
+      "vaguedenoiser",
+      "vectorscope",
+      "vflip",
+      "vfrdet",
+      "vibrance",
+      "vidstabdetect",
+      "vidstabtransform",
+      "vignette",
+      "vmafmotion",
+      "vstack",
+      "w3fdif",
+      "waveform",
+      "weave",
+      "xbr",
+      "xstack",
+      "yadif",
+      "zoompan",
+      "zscale",
+      "allrgb",
+      "allyuv",
+      "cellauto",
+      "color",
+      "frei0r_src",
+      "haldclutsrc",
+      "life",
+      "mandelbrot",
+      "mptestsrc",
+      "nullsrc",
+      "pal75bars",
+      "pal100bars",
+      "rgbtestsrc",
+      "smptebars",
+      "smptehdbars",
+      "testsrc",
+      "testsrc2",
+      "yuvtestsrc",
+      "nullsink",
+      "abitscope",
+      "adrawgraph",
+      "agraphmonitor",
+      "ahistogram",
+      "aphasemeter",
+      "avectorscope",
+      "concat",
+      "showcqt",
+      "showfreqs",
+      "showspectrum",
+      "showspectrumpic",
+      "showvolume",
+      "showwaves",
+      "showwavespic",
+      "spectrumsynth",
+      "amovie",
+      "movie",
+      "afifo",
+      "fifo",
+      "abuffer",
+      "buffer",
+      "abuffersink",
+      "buffersink"
+    ],
+    "hwaccels": [
+      "vdpau",
+      "vaapi"
+    ],
+    "version": "N-47683-g0e8eb07980-static"
+  }
+}
+✅ libx264 found.
+✅ FFmpeg Diagnostics Verified!
+
+✅ PASSED: tests/verify-diagnose-ffmpeg.ts
+
+---------------------------------------------------------
+Running: tests/verify-dom-audio-fades.ts
+---------------------------------------------------------
+Verifying DomStrategy Audio Fades...
+Running strategy.prepare()...
+[DomScanner] Discovered 1 audio/video tracks across 1 frames.
+Getting FFmpeg args...
+FFmpeg Args: [
+  '-y',
+  '-f',
+  'mjpeg',
+  '-framerate',
+  '30',
+  '-i',
+  '-',
+  '-ss',
+  '0',
+  '-i',
+  'https://example.com/fades.mp3',
+  '-filter_complex',
+  '[1:a]aformat=channel_layouts=stereo,afade=t=in:st=0:d=2,afade=t=out:st=7:d=3[a0]',
+  '-map',
+  '0:v',
+  '-map',
+  '[a0]',
+  '-c:v',
+  'libx264',
+  '-pix_fmt',
+  'yuv420p',
+  '-movflags',
+  '+faststart',
+  '-preset',
+  'ultrafast',
+  '-c:a',
+  'aac',
+  '-t',
+  '10',
+  'output.mp4'
+]
+✅ Found afade=t=in:st=0:d=2
+✅ Found afade=t=out:st=7:d=3
+✅ Verification Passed
+
+✅ PASSED: tests/verify-dom-audio-fades.ts
+
+---------------------------------------------------------
+Running: tests/verify-dom-media-attributes.ts
+---------------------------------------------------------
+Verifying DomStrategy Media Attributes (Offset, Seek, Muted, PlaybackRate)...
+Running strategy.prepare()...
+[DomScanner] Discovered 4 audio/video tracks across 1 frames.
+Getting FFmpeg args...
+FFmpeg Args: [
+  '-y',
+  '-f',
+  'mjpeg',
+  '-framerate',
+  '30',
+  '-i',
+  '-',
+  '-ss',
+  '0',
+  '-i',
+  'https://example.com/offset.mp3',
+  '-ss',
+  '10',
+  '-i',
+  'https://example.com/seek-muted.mp4',
+  '-ss',
+  '0',
+  '-i',
+  'https://example.com/default.mp3',
+  '-ss',
+  '0',
+  '-i',
+  'https://example.com/rate.mp3',
+  '-filter_complex',
+  '[1:a]aformat=channel_layouts=stereo,adelay=2500|2500[a0];[2:a]aformat=channel_layouts=stereo,volume=0[a1];[3:a]aformat=channel_layouts=stereo[a2];[4:a]aformat=channel_layouts=stereo,atempo=2[a3];[a0][a1][a2][a3]amix=inputs=4:duration=longest[aout]',
+  '-map',
+  '0:v',
+  '-map',
+  '[aout]',
+  '-c:v',
+  'libx264',
+  '-pix_fmt',
+  'yuv420p',
+  '-movflags',
+  '+faststart',
+  '-preset',
+  'ultrafast',
+  '-c:a',
+  'aac',
+  '-t',
+  '5',
+  'output.mp4'
+]
+✅ Found adelay=2500
+✅ Found -ss 10 before seek-muted.mp4
+✅ Found volume=0
+✅ Found atempo=2.0
+✅ Verification Passed
+
+✅ PASSED: tests/verify-dom-media-attributes.ts
+
+---------------------------------------------------------
+Running: tests/verify-enhanced-dom-preload.ts
+---------------------------------------------------------
+Verifying Enhanced Dom Preloading...
+Running strategy.prepare()...
+Initial requests: 3
+[DomScanner] Discovered 1 audio/video tracks across 1 frames.
+Logs: [
+  '[Helios Preload] Preloading 2 images...',
+  '[Helios Preload] Preloading 1 background images...',
+  '[Helios Preload] Failed to preload background image: http://example.com/mask.png',
+  '[DomScanner] Found 1 media elements. Waiting for readiness...',
+  '[DomScanner] Timeout waiting for media element: video.mp4',
+  '[DomScanner] Media elements ready.'
+]
+✅ poster.jpg requested
+✅ image.svg requested
+✅ mask.png requested
+✅ Verification Passed (Assets Requested)
+
+✅ PASSED: tests/verify-enhanced-dom-preload.ts
+
+---------------------------------------------------------
+Running: tests/verify-frame-count.ts
+---------------------------------------------------------
+Verifying frameCount support...
+Starting render for composition: about:blank (Mode: canvas)
+[Helios Diagnostics] FFmpeg Version: undefined
+[Helios Diagnostics] FFmpeg HW Accel: none
+Initializing pool of 1 browsers/pages...
+Mock strategy.prepare called
+PAGE LOG [0]: [Helios] Math.random() has been seeded for deterministic rendering. Seed: 305419896
+All pages loaded and prepared.
+Running diagnostics on first page...
+PAGE LOG [0]: [Helios Diagnostics] Checking Canvas environment...
+[Helios Diagnostics] {
+  "videoEncoder": false,
+  "offscreenCanvas": true,
+  "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+  "codecs": {
+    "h264": {
+      "supported": false,
+      "hardware": false,
+      "alpha": false,
+      "type": "unknown"
+    },
+    "vp8": {
+      "supported": false,
+      "hardware": false,
+      "alpha": false,
+      "type": "unknown"
+    },
+    "vp9": {
+      "supported": false,
+      "hardware": false,
+      "alpha": false,
+      "type": "unknown"
+    },
+    "av1": {
+      "supported": false,
+      "hardware": false,
+      "alpha": false,
+      "type": "unknown"
+    }
+  }
+}
+Spawning FFmpeg: /home/jules/.nvm/versions/node/v22.22.1/bin/node -e process.stdin.resume(); process.stdin.on("end", () => process.exit(0));
+Starting capture for 100 frames...
+Progress: Rendered 0 / 100 frames
+Progress: Rendered 10 / 100 frames
+Progress: Rendered 20 / 100 frames
+Progress: Rendered 30 / 100 frames
+Progress: Rendered 40 / 100 frames
+Progress: Rendered 50 / 100 frames
+Progress: Rendered 60 / 100 frames
+Progress: Rendered 70 / 100 frames
+Progress: Rendered 80 / 100 frames
+Progress: Rendered 90 / 100 frames
+Progress: Rendered 99 / 100 frames
+Finishing render strategy...
+Finished sending frames. Closing FFmpeg stdin.
+FFmpeg has finished processing.
+Browsers closed.
+Cleaning up strategy resources...
+Render complete! Output saved to: /app/packages/renderer/test-frame-count.mp4
+Captured 100 frames.
+✅ Frame count verified: 100
+⚠️ Audio track not present, skipping -t verification in FFmpeg args.
+
+Verifying Audio Duration Logic...
+✅ Audio duration verified: 3.3333333333333335 (Expected: ~3.3333333333333335)
+
+✅ PASSED: tests/verify-frame-count.ts
+
+---------------------------------------------------------
+Running: tests/verify-hwaccel-validation.ts
+---------------------------------------------------------
+Verifying Hardware Acceleration Validation...
+Starting render for composition: data:text/html;base64,PCFET0NUWVBFIGh0bWw+CjxodG1sPgo8aGVhZD4KICA8c3R5bGU+Ym9keSB7IGJhY2tncm91bmQ6IHJlZDsgfTwvc3R5bGU+CjwvaGVhZD4KPGJvZHk+CiAgPGgxPkhXIEFjY2VsIFRlc3Q8L2gxPgo8L2JvZHk+CjwvaHRtbD4= (Mode: canvas)
+[Helios Diagnostics] FFmpeg Version: N-47683-g0e8eb07980-static
+[Helios Diagnostics] FFmpeg HW Accel: vdpau, vaapi
+[Helios Warning] Hardware acceleration 'fake-accel-9999' was requested but is not listed in 'ffmpeg -hwaccels' output. Available: vdpau, vaapi
+Initializing pool of 1 browsers/pages...
+PAGE LOG [0]: [Helios] Math.random() has been seeded for deterministic rendering. Seed: 305419896
+Cleaning up strategy resources...
+Render failed as expected (FFmpeg likely rejected invalid hwaccel).
+✅ Validation Passed: Warning was logged.
+Captured warning: [Helios Warning] Hardware acceleration 'fake-accel-9999' was requested but is not listed in 'ffmpeg -hwaccels' output. Available: vdpau, vaapi
