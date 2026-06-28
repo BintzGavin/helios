@@ -1,3 +1,6 @@
+### STUDIO v0.122.0
+- ✅ Completed: Improve Omnibar Test Coverage - Reached 100% test coverage for Omnibar by adding tests for commands, asset icons, and keyboard boundary edge cases.
+
 ### STUDIO v0.121.11
 - ✅ Completed: STUDIO-ExportJobSpec - Verified that the Export Job Spec feature in Renders Panel was already fully implemented (IMPOSSIBLE: DUPLICATION).
 
