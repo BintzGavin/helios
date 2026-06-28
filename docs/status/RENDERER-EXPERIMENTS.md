@@ -6,7 +6,6 @@ Last updated by: PERF-855
 - **What Works:** PERF-866 hoisted the `nextFrameToSubmit >= totalFrames` condition out of the inner multi-worker loops into the `while` loop continuation conditions in `CaptureLoop.ts`.
   - **Improvement:** Removed redundant branching on every multi-worker loop iteration, improving multi-worker microbenchmark loop execution by ~23% (from ~101.9ms to ~78.4ms for 10M iterations).
   - **Plan ID:** PERF-866
-
 - **What Works:** PERF-861 replaced the inner unpeeled frame logic with an unbranched chunked `while` loop in the `CaptureLoop.ts` single-worker paths.
   - **Improvement:** ~50% improvement in microbenchmark single-worker loop execution time, reducing V8 branch evaluation overhead by completely eliminating branch conditions.
   - **Plan ID:** PERF-861
@@ -42,8 +41,19 @@ Last updated by: PERF-855
 - Inlined DomStrategy capture and processCaptureResult in CaptureLoop multi worker path (PERF-825) - ~42% faster in microbenchmark
 - PERF-822: Track pending stream bytes locally to avoid calling `stream.writableState.length` getter in hot loop (~15% faster microbenchmark iteration)
 - PERF-822: Eliminate `i + 1 < totalFrames` branch in CaptureLoop hot paths (~11% microbenchmark improvement)
+- Removed redundant aborted checks in chunked inner for loops to eliminate V8 branch evaluation overhead (PERF-862)
+  - Plan ID: PERF-862
+- Removed 8 redundant inner aborted checks in single-worker fast loop to eliminate V8 per-iteration branch evaluation overhead (~1.4% faster in microbenchmark) (PERF-848)
+- **What Works:** PERF-863 hoisted the `checkState()` call out of the inner multi-worker write loop in `CaptureLoop.ts`.
+  - **Improvement:** Reduced synchronous function call overhead in the fast-path writer, improving microbenchmark loop execution time from ~9.6ms to ~3.0ms.
+  - **Plan ID:** PERF-863
+- **What Works:** PERF-864 unrolled the frame ready polling loop in the multi-worker fast paths of `CaptureLoop.ts`.
+  - **Improvement:** Removed the nested `while` loop overhead from the fast path chunk traversal. If a frame is unready, it exits the inner fast chunk loop and awaits the frame normally in the outer loop scope. This decreases branch evaluations inside the fast chunk iterator.
+  - **Plan ID:** PERF-864
 
 ## What Doesn't Work (and Why)
+- PERF-867: Attempted to optimize the drain condition `!writeSuccess && pendingBytes >= 16777216` by reordering it to `pendingBytes >= 16777216 && !writeSuccess`. Microbenchmarks showed no improvement and in some cases slight regression (e.g., from 48.5ms to 52.4ms in tight loops) due to `writeSuccess` being a highly predictable boolean that is cheaper to evaluate first. The experiment was discarded.
+- PERF-865 attempted to implement a faster `ReusableThenable` in `CaptureLoop.ts` by reducing redundant V8 object property accesses. Microbenchmarks showed a ~5.4% regression in execution speed, likely due to V8's hidden class optimizations being disrupted. The change was discarded.
 - PERF-858: Discarded as duplicate. The chunked loop approach in the multi-worker path was already successfully implemented and kept under PERF-859.
 - PERF-849: Peeling the last frame iteration in the single-worker fast path frame loops to avoid `if (i < totalFrames - 1)` check actually increases execution time in V8 (likely due to deoptimization or code duplication). Discarded.
 - Removing redundant aborted checks in single worker loop (slower by 0.00%) - PERF-848
@@ -52,32 +62,11 @@ Last updated by: PERF-855
 - Tried to optimize Base64 buffer allocation in DomStrategy.ts (PERF-805), but the buffer allocation logic has been hoisted to CaptureLoop.ts and the optimization is already present. Discarded as obsolete.
 - PERF-848: Hoist redundant `aborted` checks in single-worker fast loops (Plan created as unclaimed).
 - PERF-846: Discarded as obsolete. Duplicate of PERF-848.
-
-## Open Questions
-- PERF-860 was discarded as the microbenchmarks showed that a chunked implementation with peeled final frame loop boundaries is slower than the fast counter. A new plan, PERF-861, was created to properly unbranch the inner loop by peeling the final frame entirely out of the while loop.
-
-
-## What Works
-- **What Works:** PERF-866 hoisted the `nextFrameToSubmit >= totalFrames` condition out of the inner multi-worker loops into the `while` loop continuation conditions in `CaptureLoop.ts`.
-  - **Improvement:** Removed redundant branching on every multi-worker loop iteration, improving multi-worker microbenchmark loop execution by ~23% (from ~101.9ms to ~78.4ms for 10M iterations).
-  - **Plan ID:** PERF-866
-- Removed redundant aborted checks in chunked inner for loops to eliminate V8 branch evaluation overhead (PERF-862)
-  - Plan ID: PERF-862
-- Removed 8 redundant inner aborted checks in single-worker fast loop to eliminate V8 per-iteration branch evaluation overhead (~1.4% faster in microbenchmark) (PERF-848)
-
-## What Doesn't Work (and Why)
 - Overlapping FFmpeg stream write with Time Seek CDP await in the single-worker path (PERF-854). The Node.js stream write `stream.write` is extremely fast and mostly synchronous in its execution up until the OS buffer fills. Our test scripts and microbenchmarks show the overlapping actually caused a regression of ~1-3% because we delayed starting the CDP time seek command (`timeDriver.setTime`), which is network bound and takes significantly longer. Pushing the time seek *earlier* is more important than eagerly pushing the synchronous stream write, especially since `stream.write` isn't a long-running CPU bound task like Base64 decoding.
+- PERF-860 was discarded as the microbenchmarks showed that a chunked implementation with peeled final frame loop boundaries is slower than the fast counter. A new plan, PERF-861, was created to properly unbranch the inner loop by peeling the final frame entirely out of the while loop.
 
 ## Open Questions
 - Would chunked loops benefit multi-worker paths as well? (PERF-856) -> Yes, PERF-859 planned.
 - PERF-860: Single-worker chunked loops planned.
 - PERF-862: Eliminate redundant aborted checks in chunked loop conditions planned.
-- **What Works:** PERF-863 hoisted the `checkState()` call out of the inner multi-worker write loop in `CaptureLoop.ts`.
-  - **Improvement:** Reduced synchronous function call overhead in the fast-path writer, improving microbenchmark loop execution time from ~9.6ms to ~3.0ms.
-  - **Plan ID:** PERF-863
 - PERF-864: Unroll frame ready check from multi-worker fast path write loops planned.
-- **What Works:** PERF-864 unrolled the frame ready polling loop in the multi-worker fast paths of `CaptureLoop.ts`.
-  - **Improvement:** Removed the nested `while` loop overhead from the fast path chunk traversal. If a frame is unready, it exits the inner fast chunk loop and awaits the frame normally in the outer loop scope. This decreases branch evaluations inside the fast chunk iterator.
-  - **Plan ID:** PERF-864
-- **What Doesn't Work (and Why):** PERF-865 attempted to implement a faster `ReusableThenable` in `CaptureLoop.ts` by reducing redundant V8 object property accesses. Microbenchmarks showed a ~5.4% regression in execution speed, likely due to V8's hidden class optimizations being disrupted. The change was discarded.
-  - **Plan ID:** PERF-865
