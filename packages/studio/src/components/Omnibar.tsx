@@ -269,7 +269,7 @@ export const Omnibar: React.FC = () => {
   );
 };
 
-function getIconForType(type: string) {
+export function getIconForType(type: string) {
     switch (type) {
         case 'command': return '⚡️';
         case 'composition': return '🎬';
@@ -278,7 +278,7 @@ function getIconForType(type: string) {
     }
 }
 
-function getAssetIcon(type: string) {
+export function getAssetIcon(type: string) {
     switch (type) {
         case 'image': return '🖼️';
         case 'video': return '🎥';
