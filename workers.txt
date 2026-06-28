@@ -1,0 +1,53 @@
+1079-          checkState();
+1080-        };
+1081-        signal.addEventListener("abort", abortListener);
+1082-      }
+1083-
+1084:      const runWorker = async (worker: WorkerInfo, workerIndex: number) => {
+1085-        const { timeDriver, strategy, page } = worker;
+1086-        const hasProcessFn = !!strategy.processCaptureResult;
+1087-
+1088-        const isDomStrategy = !!(strategy as any).beginFrameParams;
+1089-        const domCdpSession = isDomStrategy
+1090-          ? (strategy as any).cdpSession
+1091-          : null;
+1092-        const domBeginFrameParams = isDomStrategy
+1093-          ? (strategy as any).beginFrameParams
+1094-          : null;
+1095-        const domBeginFrame = isDomStrategy
+1096-          ? domCdpSession!.send.bind(
+1097-              domCdpSession,
+1098-              "HeadlessExperimental.beginFrame",
+1099-              domBeginFrameParams,
+1100-            )
+1101-          : null;
+1102-        let domLastFrameData: any = isDomStrategy
+1103-          ? (strategy as any).lastFrameData
+1104-          : null;
+--
+1287-            }
+1288-          }
+1289-        }
+1290-      };
+1291-
+1292:      const workerPromises = this.pool.map((w, i) => runWorker(w, i));
+1293-      const stream = stdin!;
+1294-      let pendingBytes = 0;
+1295-
+1296-      try {
+1297-        let isString: boolean | null = null;
+1298-        let nextProgress = progressInterval;
+1299-        if (nextFrameToWrite < totalFrames && !aborted) {
+1300-          while (!aborted) {
+1301-            if (aborted) break;
+1302-
+1303-            const ringIndex = nextFrameToWrite & ringMask;
+1304-            if (frameReadyRing[ringIndex] === 0) {
+1305-              await writerWaiterPromise;
+1306-              continue;
+1307-            }
+1308-
+1309-            const buffer = frameBufferRing[ringIndex]!;
+1310-
+1311-            const currentFrame = nextFrameToWrite;
+1312-
