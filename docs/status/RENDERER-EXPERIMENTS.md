@@ -3,6 +3,9 @@ Current best: 1.831s (baseline was 1.831s, -0%)
 Last updated by: PERF-855
 
 ## What Works
+- **What Works:** PERF-866 hoisted the `nextFrameToSubmit >= totalFrames` condition out of the inner multi-worker loops into the `while` loop continuation conditions in `CaptureLoop.ts`.
+  - **Improvement:** Removed redundant branching on every multi-worker loop iteration, improving multi-worker microbenchmark loop execution by ~23% (from ~101.9ms to ~78.4ms for 10M iterations).
+  - **Plan ID:** PERF-866
 
 - **What Works:** PERF-861 replaced the inner unpeeled frame logic with an unbranched chunked `while` loop in the `CaptureLoop.ts` single-worker paths.
   - **Improvement:** ~50% improvement in microbenchmark single-worker loop execution time, reducing V8 branch evaluation overhead by completely eliminating branch conditions.
@@ -55,6 +58,9 @@ Last updated by: PERF-855
 
 
 ## What Works
+- **What Works:** PERF-866 hoisted the `nextFrameToSubmit >= totalFrames` condition out of the inner multi-worker loops into the `while` loop continuation conditions in `CaptureLoop.ts`.
+  - **Improvement:** Removed redundant branching on every multi-worker loop iteration, improving multi-worker microbenchmark loop execution by ~23% (from ~101.9ms to ~78.4ms for 10M iterations).
+  - **Plan ID:** PERF-866
 - Removed redundant aborted checks in chunked inner for loops to eliminate V8 branch evaluation overhead (PERF-862)
   - Plan ID: PERF-862
 - Removed 8 redundant inner aborted checks in single-worker fast loop to eliminate V8 per-iteration branch evaluation overhead (~1.4% faster in microbenchmark) (PERF-848)
