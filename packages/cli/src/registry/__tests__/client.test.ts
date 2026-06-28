@@ -14,6 +14,197 @@ describe('RegistryClient', () => {
     vi.unstubAllGlobals();
   });
 
+  it('should return from cache early without filtering if framework is undefined', async () => {
+    const mockComponents = [
+      { name: 'CompReact', type: 'react', files: [] },
+      { name: 'CompVanilla', type: 'vanilla', files: [] },
+    ];
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => mockComponents,
+    });
+    vi.stubGlobal('fetch', fetchMock);
+
+    const client = new RegistryClient('http://test.registry');
+    await client.getComponents(); // populates cache
+
+    const fetchMock2 = vi.fn().mockRejectedValue(new Error("Should not be called"));
+    vi.stubGlobal('fetch', fetchMock2);
+
+    const result = await client.getComponents(); // should return from cache early
+    expect(result).toHaveLength(2);
+    expect(fetchMock2).not.toHaveBeenCalled();
+  });
+
+  it('should return first exact match in findInList when framework is omitted', async () => {
+    const mockComponents = [
+      { name: 'CompReact', type: 'react', files: [] },
+    ];
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => mockComponents,
+    });
+    vi.stubGlobal('fetch', fetchMock);
+
+    const client = new RegistryClient('http://test.registry');
+    await client.getComponents(); // populates cache
+
+    const result = await client.findComponent('CompReact'); // omitted framework
+    expect(result).toBeDefined();
+    expect(result!.type).toBe('react');
+  });
+
+  it('should hit remoteCache early in findComponent if it exists', async () => {
+    const mockIndex = {
+      version: '1.0.0',
+      components: [
+        {
+          name: 'test-comp',
+          description: 'Test Component',
+          type: 'react',
+          files: ['test-comp.tsx'],
+          dependencies: { react: '18' }
+        }
+      ]
+    };
+    const fetchMock = vi.fn()
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockIndex,
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        text: async () => 'export const Test = () => <div>Test</div>;',
+      });
+    vi.stubGlobal('fetch', fetchMock);
+
+    const client = new RegistryClient('https://example.com/registry/index.json');
+    await client.getComponents(); // populates remoteCache
+
+    const component = await client.findComponent('test-comp', 'react');
+    expect(component).toBeDefined();
+    expect(component!.name).toBe('test-comp');
+
+    // Test hitting line 96-97 with remoteCache pre-populated
+    const fetchMock2 = vi.fn().mockResolvedValue({
+      ok: true,
+      text: async () => 'from remote cache fetch',
+    });
+    vi.stubGlobal('fetch', fetchMock2);
+
+    const component2 = await client.findComponent('test-comp');
+    expect(component2).toBeDefined();
+    expect(component2!.files[0].content).toBe('from remote cache fetch');
+  });
+
+  it('should throw an error in hydrateComponent when fetch for individual file fails', async () => {
+    const mockIndex = {
+      version: '1.0.0',
+      components: [
+        {
+          name: 'test-comp',
+          description: 'Test Component',
+          type: 'react',
+          files: ['test-comp.tsx'],
+          dependencies: { react: '18' }
+        }
+      ]
+    };
+    const fetchMock = vi.fn()
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockIndex,
+      })
+      .mockResolvedValueOnce({
+        ok: false,
+        status: 404,
+      });
+    vi.stubGlobal('fetch', fetchMock);
+
+    const client = new RegistryClient('https://example.com/registry/index.json');
+    await expect(client.findComponent('test-comp', 'react')).rejects.toThrow(/Failed to fetch file test-comp.tsx for component test-comp: Status 404/);
+  });
+
+  it('should throw an error in hydrateComponent when fetch for individual file throws an error', async () => {
+    const mockIndex = {
+      version: '1.0.0',
+      components: [
+        {
+          name: 'test-comp',
+          description: 'Test Component',
+          type: 'react',
+          files: ['test-comp.tsx'],
+          dependencies: { react: '18' }
+        }
+      ]
+    };
+    const fetchMock = vi.fn()
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockIndex,
+      })
+      .mockRejectedValueOnce(new Error("Network disconnect"));
+    vi.stubGlobal('fetch', fetchMock);
+
+    const client = new RegistryClient('https://example.com/registry/index.json');
+    await expect(client.findComponent('test-comp', 'react')).rejects.toThrow(/Failed to fetch file test-comp.tsx for component test-comp: Network disconnect/);
+  });
+
+  it('should hit cache block after force fetch in findComponent', async () => {
+    // Old format registry triggers caching in `this.cache`
+    const mockComponents = [
+      { name: 'CompReact', type: 'react', files: [] },
+      { name: 'CompVanilla', type: 'vanilla', files: [] },
+    ];
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => mockComponents,
+    });
+    vi.stubGlobal('fetch', fetchMock);
+
+    const client = new RegistryClient('http://test.registry');
+    // We intentionally don't call getComponents() so caches are empty
+    // findComponent will fetch and then check cache again
+    const result = await client.findComponent('CompReact');
+
+    expect(result).toBeDefined();
+    expect(result!.name).toBe('CompReact');
+  });
+
+  it('should hit remoteCache block after force fetch in findComponent', async () => {
+    // New format registry triggers caching in `this.remoteCache`
+    const mockIndex = {
+      version: '1.0.0',
+      components: [
+        {
+          name: 'CompReact',
+          description: 'Test Component',
+          type: 'react',
+          files: ['CompReact.tsx'],
+          dependencies: { react: '18' }
+        }
+      ]
+    };
+    const fetchMock = vi.fn()
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockIndex,
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        text: async () => 'export const CompReact = () => <div>React</div>;',
+      });
+    vi.stubGlobal('fetch', fetchMock);
+
+    const client = new RegistryClient('https://example.com/registry/index.json');
+    // Caches are empty initially, force fetch occurs
+    const result = await client.findComponent('CompReact');
+
+    expect(result).toBeDefined();
+    expect(result!.name).toBe('CompReact');
+    expect(result!.files[0].content).toContain('React');
+  });
+
   it('should use token provided in constructor', async () => {
     const fetchMock = vi.fn().mockResolvedValue({
       ok: true,
