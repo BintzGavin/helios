@@ -70,3 +70,6 @@ Last updated by: PERF-855
   - **Improvement:** Reduced synchronous function call overhead in the fast-path writer, improving microbenchmark loop execution time from ~9.6ms to ~3.0ms.
   - **Plan ID:** PERF-863
 - PERF-864: Unroll frame ready check from multi-worker fast path write loops planned.
+- **What Works:** PERF-864 unrolled the frame ready polling loop in the multi-worker fast paths of `CaptureLoop.ts`.
+  - **Improvement:** Removed the nested `while` loop overhead from the fast path chunk traversal. If a frame is unready, it exits the inner fast chunk loop and awaits the frame normally in the outer loop scope. This decreases branch evaluations inside the fast chunk iterator.
+  - **Plan ID:** PERF-864

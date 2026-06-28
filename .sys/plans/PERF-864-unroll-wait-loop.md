@@ -1,11 +1,11 @@
 ---
 id: PERF-864
 slug: unroll-wait-loop
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-06-28
 completed: ""
-result: ""
+result: improved
 ---
 
 # PERF-864: Unroll Frame Ready Polling in Multi-Worker Write Paths
