@@ -190,3 +190,4 @@ The Helios CLI is the primary user interface for component registry, project sca
 [v0.46.55] 🟢 Completed: CLI Command Coverage Tests Spec V10 - Created specification plan 2027-06-05-CLI-Command-Coverage-Tests-V10.md for covering missing branches in components and update commands.
 [v0.46.56] ✅ Completed: CLI Command Coverage Tests V10 - Implemented unit tests for missing branch logic in components.ts and update.ts, achieving 100% test coverage.
 [v0.46.57] 🛑 Blocked: Waiting for a new, valid plan in /.sys/plans/
+- [ ] [v0.46.58] CLI Unblocked: Generated strictly new plan /.sys/plans/2027-06-05-CLI-Registry-Client-Coverage-Tests.md

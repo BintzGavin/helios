@@ -16,3 +16,6 @@
 ## [v0.46.51] - CLI Command Coverage Spec V9
 **Learning:** Checking coverage highlighted that missing branches existed for user aborts on prompts across the `deploy` subcommands (e.g. `typeof response.value === 'undefined'` check).
 **Action:** When tracking uncovered branches to improve test suites, ensure user prompt cancellations are addressed.
+## [v0.46.58] - CLI Registry Client Coverage Tests
+**Learning:** Found missing coverage for early cache returns and fetch error catching in `client.ts`.
+**Action:** Add tests specifically mocking cache state and file fetch errors to hit lines 32, 85, 90-91, 96-97, 137.
