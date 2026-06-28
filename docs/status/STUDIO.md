@@ -241,4 +241,5 @@
 [v0.121.33] ✅ Completed: Improve StudioContext Coverage - Created plan to test uncalled lines in StudioContext file (2026-06-15-STUDIO-Improve-StudioContext-Coverage.md).
 - [v0.121.33] ✅ Completed: Improve StudioContext Coverage - Achieved 100% test coverage by addressing `useStudio` outside-provider exceptions and `openInEditor` fetch errors.
 [v0.121.34] ✅ Completed: Improve AudioMixerPanel Coverage - Created plan to test AudioMixerPanel and DiagnosticsModal components (2026-06-16-STUDIO-Improve-AudioMixerPanel-Coverage.md).
+- [v0.122.1] ✅ Completed: Improve CaptionsPanel Coverage - Added test cases for missing branches in CaptionsPanel.tsx.
 - [v0.122.0] ✅ Completed: Improve Omnibar Test Coverage - Reached 100% test coverage for Omnibar by adding tests for commands, asset icons, and keyboard boundary edge cases.
