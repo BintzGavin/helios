@@ -1105,11 +1105,9 @@ export class CaptureLoop {
 
         if (hasProcessFn) {
           if (isDomStrategy) {
-            while (!aborted) {
+            while (!aborted && nextFrameToSubmit < totalFrames) {
               let i: number;
-              if (aborted || nextFrameToSubmit >= totalFrames) {
-                i = -1;
-              } else if (
+              if (
                 nextFrameToSubmit - nextFrameToWrite <
                 maxPipelineDepth
               ) {
@@ -1153,11 +1151,9 @@ export class CaptureLoop {
               writerWaiterPromise.resolve();
             }
           } else {
-            while (!aborted) {
+            while (!aborted && nextFrameToSubmit < totalFrames) {
               let i: number;
-              if (aborted || nextFrameToSubmit >= totalFrames) {
-                i = -1;
-              } else if (
+              if (
                 nextFrameToSubmit - nextFrameToWrite <
                 maxPipelineDepth
               ) {
@@ -1200,11 +1196,9 @@ export class CaptureLoop {
           }
         } else {
           if (isDomStrategy) {
-            while (!aborted) {
+            while (!aborted && nextFrameToSubmit < totalFrames) {
               let i: number;
-              if (aborted || nextFrameToSubmit >= totalFrames) {
-                i = -1;
-              } else if (
+              if (
                 nextFrameToSubmit - nextFrameToWrite <
                 maxPipelineDepth
               ) {
@@ -1243,11 +1237,9 @@ export class CaptureLoop {
               writerWaiterPromise.resolve();
             }
           } else {
-            while (!aborted) {
+            while (!aborted && nextFrameToSubmit < totalFrames) {
               let i: number;
-              if (aborted || nextFrameToSubmit >= totalFrames) {
-                i = -1;
-              } else if (
+              if (
                 nextFrameToSubmit - nextFrameToWrite <
                 maxPipelineDepth
               ) {

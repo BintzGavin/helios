@@ -1,11 +1,11 @@
 ---
 id: PERF-866
 slug: hoist-totalframes
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2026-06-28
-completed: ""
-result: ""
+completed: "2026-06-28"
+result: "improved"
 ---
 
 # PERF-866: Hoist totalFrames condition in Multi-Worker Capture Loop
