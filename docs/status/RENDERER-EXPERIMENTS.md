@@ -69,3 +69,4 @@ Last updated by: PERF-855
 - **What Works:** PERF-863 hoisted the `checkState()` call out of the inner multi-worker write loop in `CaptureLoop.ts`.
   - **Improvement:** Reduced synchronous function call overhead in the fast-path writer, improving microbenchmark loop execution time from ~9.6ms to ~3.0ms.
   - **Plan ID:** PERF-863
+- PERF-864: Unroll frame ready check from multi-worker fast path write loops planned.
