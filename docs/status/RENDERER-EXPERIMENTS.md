@@ -73,3 +73,5 @@ Last updated by: PERF-855
 - **What Works:** PERF-864 unrolled the frame ready polling loop in the multi-worker fast paths of `CaptureLoop.ts`.
   - **Improvement:** Removed the nested `while` loop overhead from the fast path chunk traversal. If a frame is unready, it exits the inner fast chunk loop and awaits the frame normally in the outer loop scope. This decreases branch evaluations inside the fast chunk iterator.
   - **Plan ID:** PERF-864
+- **What Doesn't Work (and Why):** PERF-865 attempted to implement a faster `ReusableThenable` in `CaptureLoop.ts` by reducing redundant V8 object property accesses. Microbenchmarks showed a ~5.4% regression in execution speed, likely due to V8's hidden class optimizations being disrupted. The change was discarded.
+  - **Plan ID:** PERF-865

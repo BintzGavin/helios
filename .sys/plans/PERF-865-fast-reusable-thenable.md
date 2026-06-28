@@ -1,11 +1,11 @@
 ---
 id: PERF-865
 slug: fast-reusable-thenable
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "perf-865"
 created: 2026-06-28
 completed: ""
-result: ""
+result: "failed"
 ---
 
 # PERF-865: Fast ReusableThenable Implementation
