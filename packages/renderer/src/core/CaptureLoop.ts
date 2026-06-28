@@ -1359,10 +1359,7 @@ export class CaptureLoop {
               while (nextFrameToWrite < chunkEnd) {
                 const ringIndex = nextFrameToWrite & ringMask;
                 if (frameReadyRing[ringIndex] === 0) {
-                  while (frameReadyRing[ringIndex] === 0 && !aborted) {
-                    await writerWaiterPromise;
-                  }
-                  if (aborted) break;
+                  break;
                 }
 
                 const buffer = frameBufferRing[ringIndex]! as string;
@@ -1387,9 +1384,18 @@ export class CaptureLoop {
 
                 nextFrameToWrite++;
               }
-              if (freeWorkersHead > 0) checkState();
 
-              if (aborted) break;
+              if (nextFrameToWrite < chunkEnd) {
+                const ringIndex = nextFrameToWrite & ringMask;
+                while (frameReadyRing[ringIndex] === 0 && !aborted) {
+                  await writerWaiterPromise;
+                }
+                if (aborted) break;
+              } else if (aborted) {
+                break;
+              }
+
+              if (freeWorkersHead > 0) checkState();
 
               console.log(
                 `Progress: Rendered ${nextFrameToWrite} / ${totalFrames} frames`,
@@ -1404,10 +1410,7 @@ export class CaptureLoop {
               while (nextFrameToWrite < chunkEnd) {
                 const ringIndex = nextFrameToWrite & ringMask;
                 if (frameReadyRing[ringIndex] === 0) {
-                  while (frameReadyRing[ringIndex] === 0 && !aborted) {
-                    await writerWaiterPromise;
-                  }
-                  if (aborted) break;
+                  break;
                 }
 
                 const buffer = frameBufferRing[ringIndex]!;
@@ -1422,9 +1425,18 @@ export class CaptureLoop {
 
                 nextFrameToWrite++;
               }
-              if (freeWorkersHead > 0) checkState();
 
-              if (aborted) break;
+              if (nextFrameToWrite < chunkEnd) {
+                const ringIndex = nextFrameToWrite & ringMask;
+                while (frameReadyRing[ringIndex] === 0 && !aborted) {
+                  await writerWaiterPromise;
+                }
+                if (aborted) break;
+              } else if (aborted) {
+                break;
+              }
+
+              if (freeWorkersHead > 0) checkState();
 
               console.log(
                 `Progress: Rendered ${nextFrameToWrite} / ${totalFrames} frames`,
