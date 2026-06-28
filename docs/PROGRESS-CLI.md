@@ -370,3 +370,6 @@ This file tracks progress for the CLI domain (`packages/cli`).
 
 ### CLI v0.46.46
 - ✅ Completed: CLI Command Coverage Tests V7 - Implemented 100% test coverage for the remaining branch logic in the CLI commands build.ts and studio.ts.
+
+### CLI v0.46.58
+- ✅ Completed: CLI Registry Client Coverage Tests - Improved test coverage for RegistryClient in client.ts.
