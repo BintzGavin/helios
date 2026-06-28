@@ -1,3 +1,7 @@
+## v0.122.1 - CaptionsPanel Coverage Update
+**Learning:** The `CaptionsPanel.tsx` had incomplete test coverage (60%), particularly missing file upload, error handling, and time parsing branches.
+**Action:** Extended the vitest file with specific cases to cover these branches. Using `act` with small timeouts handles asynchronous FileReader callbacks smoothly during testing.
+
 ## 0.120.4 - Timeline Drag Drop
 **Learning:** React drag events need `e.preventDefault()` on both `onDragOver` and `onDrop` to successfully trigger the drop event and calculate correct timeline placement metrics using cursor coordinates. And `playerState.schema` values might not have `inputProps` locally defined but it's available via context logic.
 **Action:** Always ensure dragover receives `e.preventDefault()` to bypass default browser behaviors preventing the drop action.
