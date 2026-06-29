@@ -1,6 +1,7 @@
+[v0.78.5] ✅ Completed: Discovered missing composition setters on the public API wrapper. Created plan `.sys/plans/2027-03-05-PLAYER-Expose-Composition-Setters.md` to expose `setDuration`, `setFps`, `setSize`, and `setMarkers`.
 [v0.78.4] ✅ Completed: Discovered missing HTMLMediaElement-like parity methods (`setPlaybackRange`, `clearPlaybackRange`) in HeliosPlayer public API. Created plan `.sys/plans/2027-03-04-PLAYER-Expose-Playback-Range-Methods.md` to implement them.
 [v0.77.53] ✅ Completed: Identified missing HTMLMediaElement events (`abort`, `emptied`, `progress`) in `<helios-player>`. Created plan `.sys/plans/2027-02-15-PLAYER-Add-Missing-Events.md` to implement them.
-**Version**: 0.78.4
+**Version**: 0.78.5
 [v0.78.4] ✅ Completed: Discovered missing HTMLMediaElement-like parity methods (`setPlaybackRange`, `clearPlaybackRange`) in HeliosPlayer public API. Created plan `.sys/plans/2027-03-04-PLAYER-Expose-Playback-Range-Methods.md` to implement them.
 [v0.78.4] ✅ Completed: Discovered missing HTMLMediaElement-like parity methods (`setPlaybackRange`, `clearPlaybackRange`) in HeliosPlayer public API. Created plan `.sys/plans/2027-03-04-PLAYER-Expose-Playback-Range-Methods.md` to implement them.
 [v0.78.1] ✅ Completed: Implement Instance Constants - Added standard media constants (e.g., HAVE_NOTHING, NETWORK_EMPTY) to the HeliosPlayer instance for HTMLMediaElement parity.
