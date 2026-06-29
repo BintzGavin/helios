@@ -279,17 +279,18 @@ export class CaptureLoop {
                   for (; i < chunkEnd; i++) {
                     const rawResult = await nextCapturePromise;
 
-                    const timePromise = timeDriver.setTime(
-                      page,
-                      (startFrame + i + 1) * compTimeStep,
-                    );
-
                     let buf;
                     const data = rawResult.screenshotData;
                     if (data) {
                       domLastFrameData = data;
                     }
                     buf = domLastFrameData as string;
+
+                    timeDriver.setTime(
+                      page,
+                      (startFrame + i + 1) * compTimeStep,
+                    );
+                    nextCapturePromise = domBeginFrame!();
 
                     const maxBytes = (buf.length * 3) >>> 2;
                     let pooled = freePool.pop();
@@ -301,9 +302,6 @@ export class CaptureLoop {
                     }
                     const written = pooled.buffer.write(buf, "base64");
                     const chunk = pooled.buffer.subarray(0, written);
-
-                    await timePromise;
-                    nextCapturePromise = domBeginFrame!();
 
                     pendingBytes += written;
                     const writeSuccessStr = stream.write(chunk, pooled.freeCb);
@@ -677,12 +675,13 @@ export class CaptureLoop {
                   for (; i < chunkEnd; i++) {
                     const rawResult = await nextCapturePromise;
 
-                    const timePromise = timeDriver.setTime(
+                    const buf = rawResult as unknown as string;
+
+                    timeDriver.setTime(
                       page,
                       (startFrame + i + 1) * compTimeStep,
                     );
-
-                    const buf = rawResult as unknown as string;
+                    nextCapturePromise = domBeginFrame!();
 
                     const maxBytes = (buf.length * 3) >>> 2;
                     let pooled = freePool.pop();
@@ -694,10 +693,6 @@ export class CaptureLoop {
                     }
                     const written = pooled.buffer.write(buf, "base64");
                     const chunk = pooled.buffer.subarray(0, written);
-
-                    await timePromise;
-
-                    nextCapturePromise = domBeginFrame!();
 
                     pendingBytes += written;
                     const writeSuccessStr = stream.write(chunk, pooled.freeCb);

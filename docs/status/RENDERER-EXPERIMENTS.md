@@ -3,6 +3,9 @@ Current best: 1.831s (baseline was 1.831s, -0%)
 Last updated by: PERF-873
 
 ## What Works
+- **What Works:** PERF-878 overlapped `domBeginFrame` with CPU-bound Base64 decoding in the `CaptureLoop.ts` single-worker DOM fast paths.
+  - **Improvement:** ~28% faster in microbenchmarks. By triggering `domBeginFrame` immediately and not awaiting the synchronously returning `timeDriver.setTime`, the browser renders the next frame concurrently while Node.js decodes the current frame, and microtask overhead is eliminated.
+  - **Plan ID:** PERF-878
 - **What Works:** PERF-874 removed unnecessary `await timePromise` calls in the single-worker and multi-worker fast paths of `CaptureLoop.ts` where `timePromise` is known to be `undefined`.
   - **Improvement:** Eliminated microtask queueing overhead for awaiting undefined promises, saving CPU cycles in the capture loops.
   - **Plan ID:** PERF-874
