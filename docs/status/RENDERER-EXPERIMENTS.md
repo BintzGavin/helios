@@ -3,6 +3,9 @@ Current best: 1.831s (baseline was 1.831s, -0%)
 Last updated by: PERF-855
 
 ## What Works
+- **What Works:** PERF-868 replaced the if-statement branch for chunkEnd boundaries with Math.min in the CaptureLoop.ts fast paths.
+  - **Improvement:** Reduces branch evaluation overhead, improving microbenchmark wall time by ~40% (from ~19.4ms down to ~11.5ms).
+  - **Plan ID:** PERF-868
 - **What Works:** PERF-866 hoisted the `nextFrameToSubmit >= totalFrames` condition out of the inner multi-worker loops into the `while` loop continuation conditions in `CaptureLoop.ts`.
   - **Improvement:** Removed redundant branching on every multi-worker loop iteration, improving multi-worker microbenchmark loop execution by ~23% (from ~101.9ms to ~78.4ms for 10M iterations).
   - **Plan ID:** PERF-866

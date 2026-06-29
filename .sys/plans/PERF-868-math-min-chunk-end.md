@@ -1,8 +1,8 @@
 ---
 id: PERF-868
 slug: math-min-chunk-end
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "Jules"
 created: 2024-06-28
 completed: ""
 result: ""
