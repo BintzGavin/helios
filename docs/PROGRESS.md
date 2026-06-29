@@ -53,6 +53,8 @@
 
 
 ### STUDIO v0.107.4
+### STUDIO v0.122.2
+- ✅ Completed: Improve CaptionsPanel Coverage - Increased coverage to 100% by testing file uploads and time formatting edge cases.
 - ✅ Completed: Improve AudioMixerPanel Coverage - Reached 90%+ test coverage for AudioMixerPanel and DiagnosticsModal.
 
 ### STUDIO v0.107.3
