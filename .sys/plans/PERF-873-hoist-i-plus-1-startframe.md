@@ -1,5 +1,7 @@
 ---
-status: unclaimed
+status: complete
+completed: 2024-06-29
+result: discarded
 ---
 
 # Plan: Pre-calculate `startFrame + 1` to reduce additions in `CaptureLoop.ts`
@@ -15,3 +17,9 @@ In the `CaptureLoop.ts` multi-worker fast path, the loop evaluates `(startFrame 
 2. Inside the loop, change `(startFrame + i + 1)` to `(startFramePlusOne + i)`.
 3. Test and benchmark.
 4. Record results.
+
+## Results Summary
+- **Best render time**: -12% on inner loop microbenchmark, but failed integration tests
+- **Improvement**: Regressed
+- **Kept experiments**: None
+- **Discarded experiments**: Hoisting `startFrame + 1` into `startFramePlusOne` outside the inner `for` loops in `CaptureLoop.ts`
