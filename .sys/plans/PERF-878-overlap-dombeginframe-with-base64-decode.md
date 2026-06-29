@@ -1,11 +1,11 @@
 ---
 id: PERF-878
 slug: overlap-dombeginframe-with-base64-decode
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "jules"
 created: 2025-02-12
-completed: ""
-result: ""
+completed: 2025-02-12
+result: "keep"
 ---
 
 # PERF-878: Overlap domBeginFrame with Base64 Decode and Remove Redundant Microtasks in DOM Fast Paths
@@ -145,3 +145,11 @@ Run `npm test -w packages/renderer` to ensure `isDomStrategy = false` paths are 
 
 ## Correctness Check
 Run `npm test -w packages/renderer` specifically focusing on `verify-cdp-shadow-dom-sync.ts` and `verify-dom-media-attributes.ts` to ensure frame rendering order and timestamps remain correct.
+
+## Results Summary
+```
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	1.347	300	222.64	490.0	keep	overlap domBeginFrame and Base64 decode
+2	1.382	300	217.04	490.0	keep	overlap domBeginFrame and Base64 decode
+3	1.364	300	219.87	490.0	keep	overlap domBeginFrame and Base64 decode
+```
