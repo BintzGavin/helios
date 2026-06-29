@@ -1,4 +1,4 @@
-**Version**: 0.107.4
+**Version**: 0.122.2
 
 - [v0.121.28] ✅ Completed: Improve AssistantModal Coverage - Reached 90%+ test coverage for AssistantModal.
 
@@ -8,7 +8,7 @@
 
 # Studio Domain Status
 - [v0.107.4] ✅ Completed: Improve AudioMixerPanel Coverage - Reached 90%+ test coverage for AudioMixerPanel and DiagnosticsModal.
-- [v0.107.3] ✅ Completed: Improve PlaybackControls Coverage - Reached 100% test coverage for PlaybackControls.
+- [v0.107.3] ✅ Completed: Improve PlaybackControls Coverage - Reached ~98% test coverage for PlaybackControls.
 - [v0.121.27] ✅ Completed: Improve RenderManager Test Coverage - Added 100% test coverage for RenderManager including `startRender`, `cancelJob`, `deleteJob` and `diagnoseServer`.
 - [v0.121.26] ✅ Completed: Improve AudioMeter Test Coverage - Added null ref handling tests to `AudioMeter.test.tsx` achieving 100% coverage.
 - [v0.121.25] ✅ Completed: Improve AudioMeter Coverage - Added unit tests for AudioMeter to ensure full line and branch coverage including clipping and warning thresholds.
@@ -243,3 +243,4 @@
 [v0.121.34] ✅ Completed: Improve AudioMixerPanel Coverage - Created plan to test AudioMixerPanel and DiagnosticsModal components (2026-06-16-STUDIO-Improve-AudioMixerPanel-Coverage.md).
 - [v0.122.1] ✅ Completed: Improve CaptionsPanel Coverage - Added test cases for missing branches in CaptionsPanel.tsx.
 - [v0.122.0] ✅ Completed: Improve Omnibar Test Coverage - Reached 100% test coverage for Omnibar by adding tests for commands, asset icons, and keyboard boundary edge cases.
+- [v0.122.2] ✅ Completed: Improve CaptionsPanel Coverage - Increased coverage to 100% by testing file uploads and time formatting edge cases (2026-06-18-STUDIO-Improve-CaptionsPanel-Coverage.md).
