@@ -1,11 +1,11 @@
 ---
 id: PERF-870
 slug: hoist-timepromise
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "Jules"
 created: 2024-06-28
-completed: ""
-result: ""
+completed: "2024-06-29"
+result: "improved"
 ---
 
 # PERF-870: Unswitch `timePromise` checks in `CaptureLoop.ts`

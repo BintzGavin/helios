@@ -302,7 +302,7 @@ export class CaptureLoop {
                     const written = pooled.buffer.write(buf, "base64");
                     const chunk = pooled.buffer.subarray(0, written);
 
-                    if (timePromise) await timePromise;
+                    await timePromise;
                     nextCapturePromise = domBeginFrame!();
 
                     pendingBytes += written;
@@ -474,7 +474,7 @@ export class CaptureLoop {
                       page,
                       (startFrame + i + 1) * compTimeStep,
                     );
-                    if (timePromise) await timePromise;
+                    await timePromise;
                     nextCapturePromise = domBeginFrame!();
 
                     let buf;
@@ -695,7 +695,7 @@ export class CaptureLoop {
                     const written = pooled.buffer.write(buf, "base64");
                     const chunk = pooled.buffer.subarray(0, written);
 
-                    if (timePromise) await timePromise;
+                    await timePromise;
 
                     nextCapturePromise = domBeginFrame!();
 
@@ -862,7 +862,7 @@ export class CaptureLoop {
                       page,
                       (startFrame + i + 1) * compTimeStep,
                     );
-                    if (timePromise) await timePromise;
+                    await timePromise;
 
                     nextCapturePromise = domBeginFrame!();
 
@@ -1131,9 +1131,7 @@ export class CaptureLoop {
                   page,
                   (startFrame + i) * compTimeStep,
                 );
-                if (timePromise) {
-                  await timePromise;
-                }
+                await timePromise;
                 let buffer: any;
                 const rawResult = await domBeginFrame!();
                 const data = rawResult.screenshotData;
@@ -1222,9 +1220,7 @@ export class CaptureLoop {
                   page,
                   (startFrame + i) * compTimeStep,
                 );
-                if (timePromise) {
-                  await timePromise;
-                }
+                await timePromise;
                 let buffer: any;
                 buffer = await domBeginFrame!();
                 frameBufferRing[ringIndex] = buffer;

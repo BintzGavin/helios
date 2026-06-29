@@ -70,3 +70,7 @@ Last updated by: PERF-855
 - PERF-860: Single-worker chunked loops planned.
 - PERF-862: Eliminate redundant aborted checks in chunked loop conditions planned.
 - PERF-864: Unroll frame ready check from multi-worker fast path write loops planned.
+
+- **What Works:** PERF-870 unswitched the `timePromise` checks in the single-worker and multi-worker fast paths of `CaptureLoop.ts`.
+  - **Improvement:** Reduced V8 branch evaluation overhead by eliminating `if (timePromise)` checks where `timePromise` is guaranteed to be a Promise (in `isDomStrategy` paths).
+  - **Plan ID:** PERF-870
