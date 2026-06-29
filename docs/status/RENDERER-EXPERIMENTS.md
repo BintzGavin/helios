@@ -77,3 +77,5 @@ Last updated by: PERF-855
 - **What Works:** PERF-870 unswitched the `timePromise` checks in the single-worker and multi-worker fast paths of `CaptureLoop.ts`.
   - **Improvement:** Reduced V8 branch evaluation overhead by eliminating `if (timePromise)` checks where `timePromise` is guaranteed to be a Promise (in `isDomStrategy` paths).
   - **Plan ID:** PERF-870
+
+- PERF-871 and PERF-872: Attempted to replace per-frame time multiplication `(startFrame + i + 1) * compTimeStep` with a cumulative addition `currentTime += compTimeStep` in `CaptureLoop.ts` fast paths. Microbenchmarks showed a ~34% loop improvement. However, this was discarded because floating-point compounding errors during continuous addition caused frame timing regressions in Shadow DOM synchronization (verified by `verify-cdp-shadow-dom-sync.ts`). The per-iteration multiplication is required to maintain strict timestamp precision over long compositions.

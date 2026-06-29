@@ -1,0 +1,2 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	0.0	0	0.0	0.0	discard	PERF-871 and PERF-872: Incremental currentTime instead of recalculating
