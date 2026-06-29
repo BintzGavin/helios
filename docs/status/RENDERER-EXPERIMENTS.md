@@ -1,6 +1,6 @@
 ## Performance Trajectory
 Current best: 1.831s (baseline was 1.831s, -0%)
-Last updated by: PERF-855
+Last updated by: PERF-873
 
 ## What Works
 - **What Works:** PERF-868 replaced the if-statement branch for chunkEnd boundaries with Math.min in the CaptureLoop.ts fast paths.
@@ -67,6 +67,10 @@ Last updated by: PERF-855
 - PERF-846: Discarded as obsolete. Duplicate of PERF-848.
 - Overlapping FFmpeg stream write with Time Seek CDP await in the single-worker path (PERF-854). The Node.js stream write `stream.write` is extremely fast and mostly synchronous in its execution up until the OS buffer fills. Our test scripts and microbenchmarks show the overlapping actually caused a regression of ~1-3% because we delayed starting the CDP time seek command (`timeDriver.setTime`), which is network bound and takes significantly longer. Pushing the time seek *earlier* is more important than eagerly pushing the synchronous stream write, especially since `stream.write` isn't a long-running CPU bound task like Base64 decoding.
 - PERF-860 was discarded as the microbenchmarks showed that a chunked implementation with peeled final frame loop boundaries is slower than the fast counter. A new plan, PERF-861, was created to properly unbranch the inner loop by peeling the final frame entirely out of the while loop.
+
+
+- **What Doesn't Work**: PERF-873 attempted to hoist the `startFrame + 1` calculation outside the inner chunked loops in `CaptureLoop.ts` to reduce addition operations per frame. Microbenchmarks showed a ~9-12% improvement in pure loop overhead. However, when integrated into the codebase, the experiment caused regressions in the test suite (`verify-cdp-shadow-dom-sync.ts`). The optimization was discarded to maintain frame correctness.
+  - Plan: `PERF-873`
 
 ## Open Questions
 - Would chunked loops benefit multi-worker paths as well? (PERF-856) -> Yes, PERF-859 planned.
