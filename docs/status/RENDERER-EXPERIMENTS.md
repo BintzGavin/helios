@@ -58,6 +58,8 @@ Last updated by: PERF-873
   - **Plan ID:** PERF-864
 
 ## What Doesn't Work (and Why)
+- IMPOSSIBLE: DUPLICATION: PERF-876 proposed removing the per-iteration progress check from multi-worker fast paths. However, this was marked as obsolete/discarded because the chunked loop implementations (PERF-859, PERF-868) already hoisted the progress check naturally, making the original PERF-876 plan redundant.
+  - Plan: `PERF-876`
 - PERF-867: Attempted to optimize the drain condition `!writeSuccess && pendingBytes >= 16777216` by reordering it to `pendingBytes >= 16777216 && !writeSuccess`. Microbenchmarks showed no improvement and in some cases slight regression (e.g., from 48.5ms to 52.4ms in tight loops) due to `writeSuccess` being a highly predictable boolean that is cheaper to evaluate first. The experiment was discarded.
 - PERF-865 attempted to implement a faster `ReusableThenable` in `CaptureLoop.ts` by reducing redundant V8 object property accesses. Microbenchmarks showed a ~5.4% regression in execution speed, likely due to V8's hidden class optimizations being disrupted. The change was discarded.
 - PERF-858: Discarded as duplicate. The chunked loop approach in the multi-worker path was already successfully implemented and kept under PERF-859.
@@ -76,6 +78,7 @@ Last updated by: PERF-873
   - Plan: `PERF-873`
 
 ## Open Questions
+- PERF-877: Fix Progress Spam in Multi-Worker Chunked Loops planned
 - Would chunked loops benefit multi-worker paths as well? (PERF-856) -> Yes, PERF-859 planned.
 - PERF-860: Single-worker chunked loops planned.
 - PERF-862: Eliminate redundant aborted checks in chunked loop conditions planned.
