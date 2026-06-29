@@ -1382,10 +1382,13 @@ export class CaptureLoop {
 
               if (freeWorkersHead > 0) checkState();
 
-              console.log(
-                `Progress: Rendered ${nextFrameToWrite} / ${totalFrames} frames`,
-              );
-              if (onProgress) onProgress(nextFrameToWrite / totalFrames);
+              if (nextFrameToWrite >= nextProgress) {
+                nextProgress += progressInterval;
+                console.log(
+                  `Progress: Rendered ${nextFrameToWrite} / ${totalFrames} frames`,
+                );
+                if (onProgress) onProgress(nextFrameToWrite / totalFrames);
+              }
             }
           } else if (!aborted) {
             while (nextFrameToWrite < totalFrames && !aborted) {
@@ -1423,10 +1426,13 @@ export class CaptureLoop {
 
               if (freeWorkersHead > 0) checkState();
 
-              console.log(
-                `Progress: Rendered ${nextFrameToWrite} / ${totalFrames} frames`,
-              );
-              if (onProgress) onProgress(nextFrameToWrite / totalFrames);
+              if (nextFrameToWrite >= nextProgress) {
+                nextProgress += progressInterval;
+                console.log(
+                  `Progress: Rendered ${nextFrameToWrite} / ${totalFrames} frames`,
+                );
+                if (onProgress) onProgress(nextFrameToWrite / totalFrames);
+              }
             }
           }
         }
