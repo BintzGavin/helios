@@ -204,12 +204,12 @@ export class CaptureLoop {
               page,
               startFrame * compTimeStep,
             );
-            if (timePromise) {
-              await timePromise;
-            }
             if (isDomStrategy) {
               nextCapturePromise = domBeginFrame!();
             } else {
+              if (timePromise) {
+                await timePromise;
+              }
               nextCapturePromise = strategy.capture(page, 0);
             }
           }
@@ -221,12 +221,12 @@ export class CaptureLoop {
                 page,
                 (startFrame + 1) * compTimeStep,
               );
-              if (timePromise) {
-                await timePromise;
-              }
               if (isDomStrategy) {
                 nextCapturePromise = domBeginFrame!();
               } else {
+                if (timePromise) {
+                  await timePromise;
+                }
                 nextCapturePromise = strategy.capture(page, timeStep);
               }
             }
@@ -470,11 +470,11 @@ export class CaptureLoop {
                   for (; i < chunkEnd; i++) {
                     const rawResult = await nextCapturePromise;
 
-                    const timePromise = timeDriver.setTime(
+                    timeDriver.setTime(
                       page,
                       (startFrame + i + 1) * compTimeStep,
                     );
-                    await timePromise;
+
                     nextCapturePromise = domBeginFrame!();
 
                     let buf;
@@ -611,12 +611,12 @@ export class CaptureLoop {
               page,
               startFrame * compTimeStep,
             );
-            if (timePromise) {
-              await timePromise;
-            }
             if (isDomStrategy) {
               nextCapturePromise = domBeginFrame!();
             } else {
+              if (timePromise) {
+                await timePromise;
+              }
               nextCapturePromise = strategy.capture(page, 0);
             }
           }
@@ -628,12 +628,12 @@ export class CaptureLoop {
                 page,
                 (startFrame + 1) * compTimeStep,
               );
-              if (timePromise) {
-                await timePromise;
-              }
               if (isDomStrategy) {
                 nextCapturePromise = domBeginFrame!();
               } else {
+                if (timePromise) {
+                  await timePromise;
+                }
                 nextCapturePromise = strategy.capture(page, timeStep);
               }
             }
@@ -858,11 +858,10 @@ export class CaptureLoop {
                   for (; i < chunkEnd; i++) {
                     const buf = await nextCapturePromise;
 
-                    const timePromise = timeDriver.setTime(
+                    timeDriver.setTime(
                       page,
                       (startFrame + i + 1) * compTimeStep,
                     );
-                    await timePromise;
 
                     nextCapturePromise = domBeginFrame!();
 
@@ -1127,11 +1126,10 @@ export class CaptureLoop {
               const ringIndex = i & ringMask;
 
               try {
-                const timePromise = timeDriver.setTime(
+                timeDriver.setTime(
                   page,
                   (startFrame + i) * compTimeStep,
                 );
-                await timePromise;
                 let buffer: any;
                 const rawResult = await domBeginFrame!();
                 const data = rawResult.screenshotData;
@@ -1216,11 +1214,10 @@ export class CaptureLoop {
               const ringIndex = i & ringMask;
 
               try {
-                const timePromise = timeDriver.setTime(
+                timeDriver.setTime(
                   page,
                   (startFrame + i) * compTimeStep,
                 );
-                await timePromise;
                 let buffer: any;
                 buffer = await domBeginFrame!();
                 frameBufferRing[ringIndex] = buffer;

@@ -3,6 +3,9 @@ Current best: 1.831s (baseline was 1.831s, -0%)
 Last updated by: PERF-873
 
 ## What Works
+- **What Works:** PERF-874 removed unnecessary `await timePromise` calls in the single-worker and multi-worker fast paths of `CaptureLoop.ts` where `timePromise` is known to be `undefined`.
+  - **Improvement:** Eliminated microtask queueing overhead for awaiting undefined promises, saving CPU cycles in the capture loops.
+  - **Plan ID:** PERF-874
 - **What Works:** PERF-868 replaced the if-statement branch for chunkEnd boundaries with Math.min in the CaptureLoop.ts fast paths.
   - **Improvement:** Reduces branch evaluation overhead, improving microbenchmark wall time by ~40% (from ~19.4ms down to ~11.5ms).
   - **Plan ID:** PERF-868
