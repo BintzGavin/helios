@@ -83,7 +83,6 @@ Last updated by: PERF-873
 
 ## Open Questions
 - PERF-885: Inline and De-duplicate Worker Dispatch in Multi-Worker Loop planned.
-- PERF-886: Remove Redundant Array Nulling in Multi-Worker Loop planned.
 - PERF-877: Fix Progress Spam in Multi-Worker Chunked Loops planned
 - Would chunked loops benefit multi-worker paths as well? (PERF-856) -> Yes, PERF-859 planned.
 - PERF-860: Single-worker chunked loops planned.
@@ -102,3 +101,6 @@ Last updated by: PERF-873
 - **What Works:** PERF-881 inlined the `checkState()` closure function within the multi-worker DOM paths of `CaptureLoop.ts`.
   - **Improvement:** ~9.5% improvement in microbenchmarks for tight wait loops by eliminating synchronous function call overhead in hot loops.
   - **Plan ID:** PERF-881
+- **What Works:** PERF-886 removed redundant `frameBufferRing[ringIndex] = null` assignments in the multi-worker `CaptureLoop.ts` path.
+  - **Improvement:** Reduced redundant array store operations in hot loops.
+  - **Plan ID:** PERF-886

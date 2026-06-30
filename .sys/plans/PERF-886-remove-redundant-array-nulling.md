@@ -1,11 +1,11 @@
 ---
 id: PERF-886
 slug: remove-redundant-array-nulling
-status: unclaimed
-claimed_by: ""
+status: completed
+claimed_by: "perf-886"
 created: 2024-05-25
 completed: ""
-result: ""
+result: "improved"
 ---
 
 # PERF-886: Remove Redundant Array Nulling in Multi-Worker Loop
