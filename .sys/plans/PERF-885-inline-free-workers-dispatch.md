@@ -1,7 +1,7 @@
 ---
 id: PERF-885
 slug: inline-free-workers-dispatch
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-05-25
 completed: ""
