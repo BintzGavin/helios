@@ -244,7 +244,7 @@ export class CaptureLoop {
             if (onProgress) {
               onProgress(0 / totalFrames);
             }
-            isString = typeof buffer === "string";
+            isString = isDomStrategy || typeof buffer === "string";
 
             let writeSuccess = false;
             if (isString) {
@@ -640,7 +640,7 @@ export class CaptureLoop {
               onProgress(0 / totalFrames);
             }
             const buffer = bufRaw;
-            isString = typeof buffer === "string";
+            isString = isDomStrategy || typeof buffer === "string";
 
             let writeSuccess = false;
             if (isString) {
@@ -1389,6 +1389,8 @@ export class CaptureLoop {
       const stream = stdin!;
       let pendingBytes = 0;
 
+      const isDomStrategyWriter = this.pool[0].strategy.constructor.name === 'DomStrategy';
+
       try {
         let isString: boolean | null = null;
         let nextProgress = progressInterval;
@@ -1416,7 +1418,7 @@ export class CaptureLoop {
               }
             }
 
-            isString = typeof buffer === "string";
+            isString = isDomStrategyWriter || typeof buffer === "string";
 
             let writeSuccess = false;
             if (isString) {

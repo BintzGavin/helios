@@ -3,6 +3,7 @@ Current best: 2.573s (baseline was 13.003s, -80.2%)
 Last updated by: PERF-823
 
 ## What Works
+- [PERF-884] Unrolled `isString` dynamic type check in the multi-worker capture loops of `CaptureLoop.ts` by replacing `typeof buffer === 'string'` with `isDomStrategyWriter || typeof buffer === 'string'`. It eliminated per-iteration V8 type checking overhead for DOM strategies, yielding a ~25% improvement in microbenchmarks (from ~315ms to ~235ms for 100M iterations).
 - [PERF-823] Hoisted `nextFrameToWrite < totalFrames` branch and internal progress checks in the multi-worker capture hot path (`CaptureLoop.ts`) by grouping frames into chunks based on `progressInterval`. It eliminates per-frame branch prediction overhead similarly to PERF-822, yielding an 80% improvement in multi-worker tight-loop microbenchmarks.
 - [PERF-508] Optimized Playwright concurrency by setting it to exactly 1. Because Helios disables site isolation for performance, all pages share the same renderer process. Using multiple workers caused severe thread contention and IPC queueing latency within the single Chromium process. Forcing concurrency to 1 eliminated this overhead (~80.2% faster).
 - [PERF-271] Combined `.catch` and `.then` handlers into a single `.then(resolve, reject)` in `CaptureLoop.ts` to reduce GC overhead and microtask serialization delays (~26.9% faster).
