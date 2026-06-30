@@ -1,11 +1,11 @@
 ---
 id: PERF-879
 slug: overlap-dombeginframe-with-base64-decode-multi-worker
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2025-02-12
-completed: ""
-result: ""
+completed: "2026-06-30"
+result: "failed"
 ---
 
 # PERF-879: Overlap domBeginFrame with Base64 Decode in DOM Multi-Worker Paths
@@ -143,3 +143,9 @@ Run `npm test -w packages/renderer` to ensure Canvas strategies still work.
 
 ## Correctness Check
 Run `npm test -w packages/renderer` specifically focusing on `verify-cdp-shadow-dom-sync.ts` and `verify-dom-media-attributes.ts`.
+
+## Results Summary
+- **Best render time**: N/A (regression)
+- **Improvement**: N/A
+- **Kept experiments**: None
+- **Discarded experiments**: Pipelined domBeginFrame in Multi-Worker DOM paths
