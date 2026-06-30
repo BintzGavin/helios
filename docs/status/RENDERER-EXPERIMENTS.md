@@ -61,6 +61,7 @@ Last updated by: PERF-873
   - **Plan ID:** PERF-864
 
 ## What Doesn't Work (and Why)
+- **Pipelined domBeginFrame in Multi-Worker DOM paths** (PERF-879): Attempting to pre-fetch the next frame inside the worker loop breaks frame timing, causing regressions in `verify-cdp-shadow-dom-sync.ts`. In the multi-worker architecture, eagerly stepping `nextFrameToSubmit` and calling `setTime` inside the worker before the writer has advanced causes the browser to evaluate state prematurely, corrupting the synchronized timestamps.
 - IMPOSSIBLE: DUPLICATION: PERF-876 proposed removing the per-iteration progress check from multi-worker fast paths. However, this was marked as obsolete/discarded because the chunked loop implementations (PERF-859, PERF-868) already hoisted the progress check naturally, making the original PERF-876 plan redundant.
   - Plan: `PERF-876`
 - PERF-867: Attempted to optimize the drain condition `!writeSuccess && pendingBytes >= 16777216` by reordering it to `pendingBytes >= 16777216 && !writeSuccess`. Microbenchmarks showed no improvement and in some cases slight regression (e.g., from 48.5ms to 52.4ms in tight loops) due to `writeSuccess` being a highly predictable boolean that is cheaper to evaluate first. The experiment was discarded.
