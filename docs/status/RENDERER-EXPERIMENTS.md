@@ -82,6 +82,8 @@ Last updated by: PERF-873
   - Plan: `PERF-873`
 
 ## Open Questions
+- PERF-885: Inline and De-duplicate Worker Dispatch in Multi-Worker Loop planned.
+- PERF-886: Remove Redundant Array Nulling in Multi-Worker Loop planned.
 - PERF-877: Fix Progress Spam in Multi-Worker Chunked Loops planned
 - Would chunked loops benefit multi-worker paths as well? (PERF-856) -> Yes, PERF-859 planned.
 - PERF-860: Single-worker chunked loops planned.
