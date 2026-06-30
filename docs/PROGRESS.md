@@ -812,3 +812,6 @@ Each agent should update **their own dedicated progress file** instead of this f
 - ✅ Completed: Improve StudioContext Coverage - Achieved 100% test coverage by addressing `useStudio` outside-provider exceptions and `openInEditor` fetch errors.
 ### PLAYER v0.78.3
 - ✅ Completed: Document HTMLMediaElement Constants - Added documentation for HTMLMediaElement instance and class constants to the README.
+
+### PLAYER v0.78.6
+- ✅ Completed: Document Playback Range Methods - Added `setPlaybackRange` and `clearPlaybackRange` to the README methods section.
