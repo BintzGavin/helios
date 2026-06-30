@@ -1037,3 +1037,9 @@
 - ✅ Completed: Daily llms.txt Review
   - Synced Roadmap in llms.txt with recent verifiable completions from domain PROGRESS logs (Studio: Export Job Spec, Asset Drag and Drop, TimelineAudioTrack Tests; CLI: Command Coverage V9, Docker Adapter Tests, Registry Types Tests; Core: Generic Input Props, Active Clips, Shared Virtual Time Binding; Player: Bridge Coverage Completeness, Media Session Tests, Audio Fader Tests; Renderer: Validate HW Accel, Orchestrator Plan, Refactor Media Sync Logic; Infrastructure: Optimize GCS Uploads, Orchestrator Test Coverage Expansion).
   - Verified package versions exactly match package.json.
+
+### LLMS v1.113.0
+- ✅ Completed: Daily llms.txt Review
+  - Synced Roadmap in llms.txt with recent verifiable completions from domain PROGRESS logs (Renderer: Fix GSAP Timeline, CLI: Docker Adapter Tests, Player: Media Session Tests, Infrastructure: InMemoryJobRepository Coverage).
+  - Updated Architecture components to reflect `timeline` and `RenderExecutor`.
+  - Verified package versions exactly match package.json.
