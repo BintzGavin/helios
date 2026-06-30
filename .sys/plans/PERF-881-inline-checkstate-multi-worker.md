@@ -1,11 +1,11 @@
 ---
 id: PERF-881
 slug: inline-checkstate-multi-worker
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2025-02-12
-completed: ""
-result: ""
+completed: "2025-02-12"
+result: "improved"
 ---
 
 # PERF-881: Inline checkState in CaptureLoop Multi-Worker Paths
@@ -122,3 +122,8 @@ Run `npm test -w packages/renderer` to ensure Canvas rendering still works.
 
 ## Correctness Check
 Run `npm test -w packages/renderer` to ensure multi-worker paths behave correctly and terminate successfully on both success and error paths.
+
+## Results Summary
+- **Improvement**: ~9.5% microbenchmark loop improvement
+- **Kept experiments**: Inlined checkState in multi-worker fast paths
+- **Discarded experiments**: None
