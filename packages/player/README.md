@@ -156,6 +156,8 @@ Both class-level and instance-level properties are provided for standard media s
 - `play(): Promise<void>` - Starts playback.
 - `getSchema(): Promise<HeliosSchema | undefined>` - Retrieves the input properties schema from the composition.
 - `pause(): void` - Pauses playback.
+- `setPlaybackRange(startFrame: number, endFrame: number): void` - Sets the playback range to a specific start and end frame.
+- `clearPlaybackRange(): void` - Clears the playback range.
 - `load(): void` - Reloads the iframe (useful if `src` changed or to retry connection).
 - `addTextTrack(kind: string, label?: string, language?: string): TextTrack` - Adds a new text track to the media element.
 - `diagnose(): Promise<DiagnosticReport>` - Runs environment diagnostics (WebCodecs, WebGL) and returns a report.

@@ -43,6 +43,8 @@ Observed attributes:
 ## Section D: Public API
 - `play(): Promise<void>`
 - `pause(): void`
+- `setPlaybackRange(startFrame: number, endFrame: number): void`
+- `clearPlaybackRange(): void`
 - `seek(timeInSeconds: number): Promise<void>`
 - `fastSeek(timeInSeconds: number): void`
 - `setMediaKeys(mediaKeys: MediaKeys | null): Promise<void>`
