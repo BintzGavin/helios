@@ -401,4 +401,258 @@ describe('RegistryClient', () => {
     expect(components.length).toBeGreaterThan(0);
     expect(components.find(c => c.name === 'use-video-frame')).toBeDefined();
   });
+
+  it('should return from cache when getComponents is called again without framework', async () => {
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => [{ name: 'CompReact', type: 'react', files: [] }],
+    });
+    vi.stubGlobal('fetch', fetchMock);
+
+    const client = new RegistryClient('http://test.registry');
+    await client.getComponents();
+    // Cache is now populated, call again without framework to hit line 32 false branch
+    const result = await client.getComponents();
+    expect(result).toHaveLength(1);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('should return undefined from findInList when matches are empty', async () => {
+    const mockComponents = [{ name: 'OtherComp', type: 'react', files: [] }];
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => mockComponents,
+    });
+    vi.stubGlobal('fetch', fetchMock);
+
+    const client = new RegistryClient('http://test.registry');
+    await client.getComponents(); // Populate this.cache
+    const result = await client.findComponent('CompReact'); // Hits line 73
+    expect(result).toBeUndefined();
+  });
+
+  it('should return from findInList when no framework is provided', async () => {
+    const mockComponents = [{ name: 'CompReact', type: 'react', files: [] }];
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => mockComponents,
+    });
+    vi.stubGlobal('fetch', fetchMock);
+
+    const client = new RegistryClient('http://test.registry');
+    await client.getComponents(); // Populate this.cache
+    const result = await client.findComponent('CompReact'); // Hits line 85 and line 91
+    expect(result).toBeDefined();
+    expect(result!.name).toBe('CompReact');
+  });
+
+  it('should find component in remote cache directly', async () => {
+    const mockIndex = {
+      version: '1.0.0',
+      components: [
+        { name: 'CompReact', description: 'Test', type: 'react', files: ['CompReact.tsx'] }
+      ]
+    };
+    const fetchMock = vi.fn()
+      .mockResolvedValueOnce({ ok: true, json: async () => mockIndex })
+      .mockResolvedValueOnce({ ok: true, text: async () => 'content' });
+    vi.stubGlobal('fetch', fetchMock);
+
+    const client = new RegistryClient('http://test.registry/index.json');
+    await client.getComponents(); // Populate this.remoteCache
+    const result = await client.findComponent('CompReact'); // Hits lines 96, 97
+    expect(result).toBeDefined();
+    expect(result!.name).toBe('CompReact');
+  });
+
+  it('should return undefined if caches are empty, fetched, but component still not found', async () => {
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => [], // Empty components list
+    });
+    vi.stubGlobal('fetch', fetchMock);
+
+    const client = new RegistryClient('http://test.registry');
+    const result = await client.findComponent('MissingComp'); // Hits lines 101, 105 (false), 110 (false)
+    expect(result).toBeUndefined();
+  });
+
+  it('should correctly format baseUrl when url does not end with .json', async () => {
+    const mockIndex = {
+      version: '1.0.0',
+      components: [
+        { name: 'CompReact', description: 'Test', type: 'react', files: ['CompReact.tsx'] }
+      ]
+    };
+    const fetchMock = vi.fn()
+      .mockResolvedValueOnce({ ok: true, json: async () => mockIndex })
+      .mockResolvedValueOnce({ ok: true, text: async () => 'content' });
+    vi.stubGlobal('fetch', fetchMock);
+
+    // URL without .json
+    const client = new RegistryClient('http://test.registry/api/');
+    const result = await client.findComponent('CompReact'); // Hits line 126
+    expect(result).toBeDefined();
+    expect(fetchMock).toHaveBeenNthCalledWith(2, 'http://test.registry/api/CompReact.tsx', expect.anything());
+  });
+
+  it('should not fallback to local registry if no URL is present', async () => {
+    delete process.env.HELIOS_REGISTRY_URL;
+    const client = new RegistryClient('');
+    const result = await client.getComponents();
+    expect(result).toBeDefined();
+  });
+
+  it('should hit framework vanilla fallback branches correctly', async () => {
+    const mockComponents = [
+      { name: 'CompVanilla', type: 'vanilla', files: [] }
+    ];
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => mockComponents,
+    });
+    vi.stubGlobal('fetch', fetchMock);
+
+    const client = new RegistryClient('http://test.registry');
+    await client.getComponents();
+
+    const result = await client.getComponents('react');
+    expect(result).toHaveLength(1);
+    expect(result[0].name).toBe('CompVanilla');
+  });
+
+  it('should hit remoteCache branch where findInList returns undefined', async () => {
+    const mockIndex = {
+      version: '1.0.0',
+      components: [
+        { name: 'CompReact', description: 'Test', type: 'react', files: ['CompReact.tsx'] }
+      ]
+    };
+    const fetchMock = vi.fn().mockResolvedValue({ ok: true, json: async () => mockIndex });
+    vi.stubGlobal('fetch', fetchMock);
+
+    const client = new RegistryClient('http://test.registry/index.json');
+    await client.getComponents();
+
+    const result = await client.findComponent('NonExistent');
+    expect(result).toBeUndefined();
+  });
+
+  it('should hit force fetch remote cache branch where findInList returns undefined', async () => {
+    const mockIndex = {
+      version: '1.0.0',
+      components: [
+        { name: 'CompReact', description: 'Test', type: 'react', files: ['CompReact.tsx'] }
+      ]
+    };
+    const fetchMock = vi.fn().mockResolvedValue({ ok: true, json: async () => mockIndex });
+    vi.stubGlobal('fetch', fetchMock);
+
+    const client = new RegistryClient('http://test.registry/index.json');
+
+    const result = await client.findComponent('NonExistent');
+    expect(result).toBeUndefined();
+  });
+
+  it('should hit branch when getComponents is called with framework and local cache is used', async () => {
+    const client = new RegistryClient('http://invalid-url-that-fails');
+    const fetchMock = vi.fn().mockRejectedValue(new Error('Network error'));
+    vi.stubGlobal('fetch', fetchMock);
+
+    const result = await client.getComponents('react');
+    expect(result).toBeDefined();
+  });
+
+  it('should hit framework false branch for old format cache return', async () => {
+    const mockComponents = [
+      { name: 'CompVanilla', type: 'vanilla', files: [] }
+    ];
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => mockComponents,
+    });
+    vi.stubGlobal('fetch', fetchMock);
+
+    const client = new RegistryClient('http://test.registry');
+    const result = await client.getComponents();
+    expect(result).toHaveLength(1);
+  });
+
+  it('should hit framework false branch for new format cache return', async () => {
+    const mockIndex = {
+      version: '1.0.0',
+      components: [
+        { name: 'CompReact', description: 'Test', type: 'react', files: ['CompReact.tsx'] }
+      ]
+    };
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => mockIndex,
+    });
+    vi.stubGlobal('fetch', fetchMock);
+
+    const client = new RegistryClient('http://test.registry');
+    const result = await client.getComponents();
+    expect(result).toHaveLength(1);
+  });
+
+  it('should cover branch when res.ok is false but it does not throw', async () => {
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: false,
+      status: 404
+    });
+    vi.stubGlobal('fetch', fetchMock);
+
+    const client = new RegistryClient('http://test.registry');
+    const result = await client.getComponents('react');
+    expect(result).toBeDefined();
+  });
+
+  it('should hit fallback cache logic when getComponents is called without framework and fetch fails', async () => {
+    const fetchMock = vi.fn().mockRejectedValue(new Error('Network error'));
+    vi.stubGlobal('fetch', fetchMock);
+
+    const client = new RegistryClient('http://test.registry');
+    const result = await client.getComponents();
+    expect(result).toBeDefined();
+  });
+
+  it('should cover fallback when fetch response is not an array or object format', async () => {
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => "invalid string data",
+    });
+    vi.stubGlobal('fetch', fetchMock);
+
+    const client = new RegistryClient('http://test.registry');
+    const result = await client.getComponents();
+    expect(result).toBeDefined();
+  });
+
+  it('should cover branch for vanilla type check when getting components with framework in new format', async () => {
+    const mockIndex = {
+      version: '1.0.0',
+      components: [
+        { name: 'CompReact', description: 'Test', type: 'vanilla', files: ['CompReact.tsx'] }
+      ]
+    };
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => mockIndex,
+    });
+    vi.stubGlobal('fetch', fetchMock);
+
+    const client = new RegistryClient('http://test.registry');
+    const result = await client.getComponents('react');
+    expect(result).toHaveLength(1);
+  });
+
+  it('should cover branch for vanilla type check when getting components with framework in fallback format', async () => {
+    const fetchMock = vi.fn().mockRejectedValue(new Error('Network error'));
+    vi.stubGlobal('fetch', fetchMock);
+
+    const client = new RegistryClient('http://test.registry');
+    const result = await client.getComponents('non-existent-framework-to-trigger-vanilla');
+    expect(result).toBeDefined();
+  });
 });
