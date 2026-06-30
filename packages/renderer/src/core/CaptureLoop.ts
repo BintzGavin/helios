@@ -1048,7 +1048,6 @@ export class CaptureLoop {
           const ringIndex = i & ringMask;
 
           frameReadyRing[ringIndex] = 0;
-          frameBufferRing[ringIndex] = null;
 
           workerThenables[w].resolve(i);
         }
@@ -1109,7 +1108,6 @@ export class CaptureLoop {
                 const ringIndex = i & ringMask;
 
                 frameReadyRing[ringIndex] = 0;
-                frameBufferRing[ringIndex] = null;
               } else {
                 freeWorkers[freeWorkersHead++] = workerIndex;
                 if (capturedErrors.length > 0 || (signal && signal.aborted)) {
@@ -1132,7 +1130,6 @@ export class CaptureLoop {
                     const n = nextFrameToSubmit++;
                     const ringIndex = n & ringMask;
                     frameReadyRing[ringIndex] = 0;
-                    frameBufferRing[ringIndex] = null;
                     workerThenables[w].resolve(n);
                   }
                   if (nextFrameToSubmit >= totalFrames) {
@@ -1181,7 +1178,6 @@ export class CaptureLoop {
                 const ringIndex = i & ringMask;
 
                 frameReadyRing[ringIndex] = 0;
-                frameBufferRing[ringIndex] = null;
               } else {
                 freeWorkers[freeWorkersHead++] = workerIndex;
                 if (capturedErrors.length > 0 || (signal && signal.aborted)) {
@@ -1204,7 +1200,6 @@ export class CaptureLoop {
                     const n = nextFrameToSubmit++;
                     const ringIndex = n & ringMask;
                     frameReadyRing[ringIndex] = 0;
-                    frameBufferRing[ringIndex] = null;
                     workerThenables[w].resolve(n);
                   }
                   if (nextFrameToSubmit >= totalFrames) {
@@ -1255,7 +1250,6 @@ export class CaptureLoop {
                 const ringIndex = i & ringMask;
 
                 frameReadyRing[ringIndex] = 0;
-                frameBufferRing[ringIndex] = null;
               } else {
                 freeWorkers[freeWorkersHead++] = workerIndex;
                 if (capturedErrors.length > 0 || (signal && signal.aborted)) {
@@ -1278,7 +1272,6 @@ export class CaptureLoop {
                     const n = nextFrameToSubmit++;
                     const ringIndex = n & ringMask;
                     frameReadyRing[ringIndex] = 0;
-                    frameBufferRing[ringIndex] = null;
                     workerThenables[w].resolve(n);
                   }
                   if (nextFrameToSubmit >= totalFrames) {
@@ -1322,7 +1315,6 @@ export class CaptureLoop {
                 const ringIndex = i & ringMask;
 
                 frameReadyRing[ringIndex] = 0;
-                frameBufferRing[ringIndex] = null;
               } else {
                 freeWorkers[freeWorkersHead++] = workerIndex;
                 if (capturedErrors.length > 0 || (signal && signal.aborted)) {
@@ -1345,7 +1337,6 @@ export class CaptureLoop {
                     const n = nextFrameToSubmit++;
                     const ringIndex = n & ringMask;
                     frameReadyRing[ringIndex] = 0;
-                    frameBufferRing[ringIndex] = null;
                     workerThenables[w].resolve(n);
                   }
                   if (nextFrameToSubmit >= totalFrames) {
@@ -1466,7 +1457,6 @@ export class CaptureLoop {
                   const n = nextFrameToSubmit++;
                   const ringIndex = n & ringMask;
                   frameReadyRing[ringIndex] = 0;
-                  frameBufferRing[ringIndex] = null;
                   workerThenables[w].resolve(n);
                 }
                 if (nextFrameToSubmit >= totalFrames) {
@@ -1545,7 +1535,6 @@ export class CaptureLoop {
                     const n = nextFrameToSubmit++;
                     const ringIndex = n & ringMask;
                     frameReadyRing[ringIndex] = 0;
-                    frameBufferRing[ringIndex] = null;
                     workerThenables[w].resolve(n);
                   }
                   if (nextFrameToSubmit >= totalFrames) {
@@ -1620,7 +1609,6 @@ export class CaptureLoop {
                     const n = nextFrameToSubmit++;
                     const ringIndex = n & ringMask;
                     frameReadyRing[ringIndex] = 0;
-                    frameBufferRing[ringIndex] = null;
                     workerThenables[w].resolve(n);
                   }
                   if (nextFrameToSubmit >= totalFrames) {
