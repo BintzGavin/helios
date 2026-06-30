@@ -1112,7 +1112,36 @@ export class CaptureLoop {
                 frameBufferRing[ringIndex] = null;
               } else {
                 freeWorkers[freeWorkersHead++] = workerIndex;
-                checkState();
+                if (capturedErrors.length > 0 || (signal && signal.aborted)) {
+                  aborted = true;
+                }
+
+                if (aborted) {
+                  while (freeWorkersHead > 0) {
+                    const w = freeWorkers[--freeWorkersHead];
+                    workerThenables[w].resolve(-1);
+                  }
+                  writerWaiterPromise.resolve();
+                } else {
+                  while (
+                    freeWorkersHead > 0 &&
+                    nextFrameToSubmit < totalFrames &&
+                    nextFrameToSubmit - nextFrameToWrite < maxPipelineDepth
+                  ) {
+                    const w = freeWorkers[--freeWorkersHead];
+                    const n = nextFrameToSubmit++;
+                    const ringIndex = n & ringMask;
+                    frameReadyRing[ringIndex] = 0;
+                    frameBufferRing[ringIndex] = null;
+                    workerThenables[w].resolve(n);
+                  }
+                  if (nextFrameToSubmit >= totalFrames) {
+                    while (freeWorkersHead > 0) {
+                      const w = freeWorkers[--freeWorkersHead];
+                      workerThenables[w].resolve(-1);
+                    }
+                  }
+                }
                 i = (await workerThenables[workerIndex]) as any as number;
               }
 
@@ -1155,7 +1184,36 @@ export class CaptureLoop {
                 frameBufferRing[ringIndex] = null;
               } else {
                 freeWorkers[freeWorkersHead++] = workerIndex;
-                checkState();
+                if (capturedErrors.length > 0 || (signal && signal.aborted)) {
+                  aborted = true;
+                }
+
+                if (aborted) {
+                  while (freeWorkersHead > 0) {
+                    const w = freeWorkers[--freeWorkersHead];
+                    workerThenables[w].resolve(-1);
+                  }
+                  writerWaiterPromise.resolve();
+                } else {
+                  while (
+                    freeWorkersHead > 0 &&
+                    nextFrameToSubmit < totalFrames &&
+                    nextFrameToSubmit - nextFrameToWrite < maxPipelineDepth
+                  ) {
+                    const w = freeWorkers[--freeWorkersHead];
+                    const n = nextFrameToSubmit++;
+                    const ringIndex = n & ringMask;
+                    frameReadyRing[ringIndex] = 0;
+                    frameBufferRing[ringIndex] = null;
+                    workerThenables[w].resolve(n);
+                  }
+                  if (nextFrameToSubmit >= totalFrames) {
+                    while (freeWorkersHead > 0) {
+                      const w = freeWorkers[--freeWorkersHead];
+                      workerThenables[w].resolve(-1);
+                    }
+                  }
+                }
                 i = (await workerThenables[workerIndex]) as any as number;
               }
 
@@ -1200,7 +1258,36 @@ export class CaptureLoop {
                 frameBufferRing[ringIndex] = null;
               } else {
                 freeWorkers[freeWorkersHead++] = workerIndex;
-                checkState();
+                if (capturedErrors.length > 0 || (signal && signal.aborted)) {
+                  aborted = true;
+                }
+
+                if (aborted) {
+                  while (freeWorkersHead > 0) {
+                    const w = freeWorkers[--freeWorkersHead];
+                    workerThenables[w].resolve(-1);
+                  }
+                  writerWaiterPromise.resolve();
+                } else {
+                  while (
+                    freeWorkersHead > 0 &&
+                    nextFrameToSubmit < totalFrames &&
+                    nextFrameToSubmit - nextFrameToWrite < maxPipelineDepth
+                  ) {
+                    const w = freeWorkers[--freeWorkersHead];
+                    const n = nextFrameToSubmit++;
+                    const ringIndex = n & ringMask;
+                    frameReadyRing[ringIndex] = 0;
+                    frameBufferRing[ringIndex] = null;
+                    workerThenables[w].resolve(n);
+                  }
+                  if (nextFrameToSubmit >= totalFrames) {
+                    while (freeWorkersHead > 0) {
+                      const w = freeWorkers[--freeWorkersHead];
+                      workerThenables[w].resolve(-1);
+                    }
+                  }
+                }
                 i = (await workerThenables[workerIndex]) as any as number;
               }
 
@@ -1238,7 +1325,36 @@ export class CaptureLoop {
                 frameBufferRing[ringIndex] = null;
               } else {
                 freeWorkers[freeWorkersHead++] = workerIndex;
-                checkState();
+                if (capturedErrors.length > 0 || (signal && signal.aborted)) {
+                  aborted = true;
+                }
+
+                if (aborted) {
+                  while (freeWorkersHead > 0) {
+                    const w = freeWorkers[--freeWorkersHead];
+                    workerThenables[w].resolve(-1);
+                  }
+                  writerWaiterPromise.resolve();
+                } else {
+                  while (
+                    freeWorkersHead > 0 &&
+                    nextFrameToSubmit < totalFrames &&
+                    nextFrameToSubmit - nextFrameToWrite < maxPipelineDepth
+                  ) {
+                    const w = freeWorkers[--freeWorkersHead];
+                    const n = nextFrameToSubmit++;
+                    const ringIndex = n & ringMask;
+                    frameReadyRing[ringIndex] = 0;
+                    frameBufferRing[ringIndex] = null;
+                    workerThenables[w].resolve(n);
+                  }
+                  if (nextFrameToSubmit >= totalFrames) {
+                    while (freeWorkersHead > 0) {
+                      const w = freeWorkers[--freeWorkersHead];
+                      workerThenables[w].resolve(-1);
+                    }
+                  }
+                }
                 i = (await workerThenables[workerIndex]) as any as number;
               }
 
@@ -1327,7 +1443,38 @@ export class CaptureLoop {
             }
 
             nextFrameToWrite++;
-            if (freeWorkersHead > 0) checkState();
+            if (freeWorkersHead > 0) {
+              if (capturedErrors.length > 0 || (signal && signal.aborted)) {
+                aborted = true;
+              }
+
+              if (aborted) {
+                while (freeWorkersHead > 0) {
+                  const w = freeWorkers[--freeWorkersHead];
+                  workerThenables[w].resolve(-1);
+                }
+                writerWaiterPromise.resolve();
+              } else {
+                while (
+                  freeWorkersHead > 0 &&
+                  nextFrameToSubmit < totalFrames &&
+                  nextFrameToSubmit - nextFrameToWrite < maxPipelineDepth
+                ) {
+                  const w = freeWorkers[--freeWorkersHead];
+                  const n = nextFrameToSubmit++;
+                  const ringIndex = n & ringMask;
+                  frameReadyRing[ringIndex] = 0;
+                  frameBufferRing[ringIndex] = null;
+                  workerThenables[w].resolve(n);
+                }
+                if (nextFrameToSubmit >= totalFrames) {
+                  while (freeWorkersHead > 0) {
+                    const w = freeWorkers[--freeWorkersHead];
+                    workerThenables[w].resolve(-1);
+                  }
+                }
+              }
+            }
             break;
           }
 
@@ -1375,7 +1522,38 @@ export class CaptureLoop {
                 break;
               }
 
-              if (freeWorkersHead > 0) checkState();
+              if (freeWorkersHead > 0) {
+                if (capturedErrors.length > 0 || (signal && signal.aborted)) {
+                  aborted = true;
+                }
+
+                if (aborted) {
+                  while (freeWorkersHead > 0) {
+                    const w = freeWorkers[--freeWorkersHead];
+                    workerThenables[w].resolve(-1);
+                  }
+                  writerWaiterPromise.resolve();
+                } else {
+                  while (
+                    freeWorkersHead > 0 &&
+                    nextFrameToSubmit < totalFrames &&
+                    nextFrameToSubmit - nextFrameToWrite < maxPipelineDepth
+                  ) {
+                    const w = freeWorkers[--freeWorkersHead];
+                    const n = nextFrameToSubmit++;
+                    const ringIndex = n & ringMask;
+                    frameReadyRing[ringIndex] = 0;
+                    frameBufferRing[ringIndex] = null;
+                    workerThenables[w].resolve(n);
+                  }
+                  if (nextFrameToSubmit >= totalFrames) {
+                    while (freeWorkersHead > 0) {
+                      const w = freeWorkers[--freeWorkersHead];
+                      workerThenables[w].resolve(-1);
+                    }
+                  }
+                }
+              }
 
               if (nextFrameToWrite >= nextProgress) {
                 nextProgress += progressInterval;
@@ -1419,7 +1597,38 @@ export class CaptureLoop {
                 break;
               }
 
-              if (freeWorkersHead > 0) checkState();
+              if (freeWorkersHead > 0) {
+                if (capturedErrors.length > 0 || (signal && signal.aborted)) {
+                  aborted = true;
+                }
+
+                if (aborted) {
+                  while (freeWorkersHead > 0) {
+                    const w = freeWorkers[--freeWorkersHead];
+                    workerThenables[w].resolve(-1);
+                  }
+                  writerWaiterPromise.resolve();
+                } else {
+                  while (
+                    freeWorkersHead > 0 &&
+                    nextFrameToSubmit < totalFrames &&
+                    nextFrameToSubmit - nextFrameToWrite < maxPipelineDepth
+                  ) {
+                    const w = freeWorkers[--freeWorkersHead];
+                    const n = nextFrameToSubmit++;
+                    const ringIndex = n & ringMask;
+                    frameReadyRing[ringIndex] = 0;
+                    frameBufferRing[ringIndex] = null;
+                    workerThenables[w].resolve(n);
+                  }
+                  if (nextFrameToSubmit >= totalFrames) {
+                    while (freeWorkersHead > 0) {
+                      const w = freeWorkers[--freeWorkersHead];
+                      workerThenables[w].resolve(-1);
+                    }
+                  }
+                }
+              }
 
               if (nextFrameToWrite >= nextProgress) {
                 nextProgress += progressInterval;

@@ -96,3 +96,7 @@ Last updated by: PERF-873
 - PERF-878: Overlap domBeginFrame with Base64 Decode and Remove Redundant Microtasks in DOM Fast Paths planned.
 
 - PERF-879: Overlap domBeginFrame with Base64 Decode in DOM Multi-Worker Paths planned.
+
+- **What Works:** PERF-881 inlined the `checkState()` closure function within the multi-worker DOM paths of `CaptureLoop.ts`.
+  - **Improvement:** ~9.5% improvement in microbenchmarks for tight wait loops by eliminating synchronous function call overhead in hot loops.
+  - **Plan ID:** PERF-881

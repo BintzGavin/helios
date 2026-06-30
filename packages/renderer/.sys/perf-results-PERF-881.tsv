@@ -1,0 +1,2 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	0.080	300	30	4.0	keep	inlined checkState closure function in multi-worker paths
