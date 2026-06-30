@@ -61,6 +61,9 @@ Last updated by: PERF-873
   - **Plan ID:** PERF-864
 
 ## What Doesn't Work (and Why)
+- **What Doesn't Work**: PERF-889 hoisted the `drainPromise` condition check out of the innermost fast chunk loops in the multi-worker writer path of `CaptureLoop.ts`.
+  - **WHY it didn't work**: While it reduced pure microbenchmark overhead slightly (from 871ms to 858ms), pulling the check entirely outside the chunk loop broke the stream's memory backpressure. If a large burst of frames is written synchronously without the inline check, the 16MB threshold is bypassed, leading to unbounded memory spikes and OOM risks during the chunk interval.
+  - **Plan ID:** PERF-889
 - **Pipelined domBeginFrame in Multi-Worker DOM paths** (PERF-879): Attempting to pre-fetch the next frame inside the worker loop breaks frame timing, causing regressions in `verify-cdp-shadow-dom-sync.ts`. In the multi-worker architecture, eagerly stepping `nextFrameToSubmit` and calling `setTime` inside the worker before the writer has advanced causes the browser to evaluate state prematurely, corrupting the synchronized timestamps.
 - IMPOSSIBLE: DUPLICATION: PERF-876 proposed removing the per-iteration progress check from multi-worker fast paths. However, this was marked as obsolete/discarded because the chunked loop implementations (PERF-859, PERF-868) already hoisted the progress check naturally, making the original PERF-876 plan redundant.
   - Plan: `PERF-876`

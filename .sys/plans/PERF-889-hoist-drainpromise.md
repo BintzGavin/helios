@@ -1,11 +1,11 @@
 ---
 id: PERF-889
 slug: hoist-drainpromise
-status: unclaimed
-claimed_by: ""
+status: complete
+result: discard
+claimed_by: Jules
 created: 2024-06-30
 completed: ""
-result: ""
 ---
 
 # PERF-889: Hoist drainPromise check in Multi-Worker Writer
