@@ -71,10 +71,10 @@ The engine controls `document.timeline.currentTime` to seek animations frame-acc
 2. **DOM-to-Video**: Playwright screenshots for HTML/CSS/SVG
 
 ### Components
-- **Helios class**: Headless state machine (currentFrame, isPlaying, etc.)
+- **Helios class**: Headless state machine (currentFrame, isPlaying, timeline, etc.)
 - **Framework adapters**: React hook, Vue composable, Svelte store, Solid signal
-- **Web Component**: `<helios-player>` for browser preview
-- **Renderer**: FFmpeg with piped frames (no temp files)
+- **Web Component**: `<helios-player>` for browser preview and client-side export
+- **Renderer**: FFmpeg with piped frames (no temp files) and pluggable RenderExecutor
 
 ## vs Remotion
 | | Helios | Remotion |
@@ -130,11 +130,11 @@ const report = await Helios.diagnose();
 ## Roadmap
 ### V1.x (Active)
 - **Studio**: v0.107.1+ (Completed: Improve Omnibar Test Coverage, Asset Drag and Drop, Refine CLI Component Removal)
-- **CLI**: v0.45.2+ (Completed: CLI Command Coverage Tests V9)
+- **CLI**: v0.45.2+ (Completed: CLI Command Coverage Tests V9, Docker Adapter Regression Tests)
 - **Core**: v5.13.0+ (Completed: Generic Input Props, Implement Active Clips, Shared Virtual Time Binding)
-- **Player**: v0.78.1+ (Completed: Document getSchema API Parity, Bridge Coverage Completeness, Regression Tests for Audio Fader)
-- **Renderer**: v1.78.3+ (Completed: Validate HW Accel, Orchestrator Plan, Refactor Media Sync Logic)
-- **Infrastructure**: v0.25.0+ (Completed: Optimize GCS Uploads, Orchestrator Test Coverage Expansion)
+- **Player**: v0.78.1+ (Completed: Document getSchema API Parity, Bridge Coverage Completeness, Regression Tests for Media Session & Audio Fader)
+- **Renderer**: v1.78.3+ (Completed: Validate HW Accel, Orchestrator Plan, Fix GSAP Timeline Synchronization)
+- **Infrastructure**: v0.25.0+ (Completed: Optimize GCS Uploads, Orchestrator & InMemoryJobRepository Coverage)
 
 ### AI Integration
 - **Studio MCP Server**: Inspect, create, and render compositions via LLM tools (Done)
