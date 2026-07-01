@@ -411,4 +411,111 @@ describe('StudioContext', () => {
       expect(context.renderConfig).toEqual({ mode: 'canvas' });
     });
   });
+
+  describe('export functions', () => {
+    it('cancels export if controller exists', async () => {
+      let ctx: any;
+      const TestComponent = () => {
+        ctx = useStudio();
+        return null;
+      };
+
+      render(
+
+          <StudioProvider>
+            <TestComponent />
+          </StudioProvider>
+
+      );
+
+      await act(async () => {
+        ctx.exportVideo('mp4');
+      });
+
+      await act(async () => {
+        ctx.cancelExport();
+      });
+    });
+
+    it('exports job spec successfully', async () => {
+      let ctx: any;
+      const TestComponent = () => {
+        ctx = useStudio();
+        return null;
+      };
+
+      render(
+
+          <StudioProvider>
+            <TestComponent />
+          </StudioProvider>
+
+      );
+
+      // Set active composition
+      await act(async () => {
+        ctx.setActiveComposition({ url: 'http://test.com/comp', id: '1', name: 'Test' });
+      });
+
+      // Mock URL functions
+      const mockCreateObjectURL = vi.fn().mockReturnValue('blob:test');
+      const mockRevokeObjectURL = vi.fn();
+      global.URL.createObjectURL = mockCreateObjectURL;
+      global.URL.revokeObjectURL = mockRevokeObjectURL;
+
+      // Spy on HTMLAnchorElement click instead of mocking the whole element
+      const clickSpy = vi.spyOn(window.HTMLAnchorElement.prototype, 'click').mockImplementation(() => {});
+
+      // Mock fetch for job spec
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        blob: () => Promise.resolve(new Blob(['{}']))
+      });
+
+      await act(async () => {
+        await ctx.exportJobSpec();
+      });
+
+      expect(mockCreateObjectURL).toHaveBeenCalled();
+      expect(clickSpy).toHaveBeenCalled();
+      expect(mockRevokeObjectURL).toHaveBeenCalled();
+
+      vi.restoreAllMocks();
+    });
+
+    it('handles export job spec failure', async () => {
+      let ctx: any;
+      const TestComponent = () => {
+        ctx = useStudio();
+        return null;
+      };
+
+      render(
+
+          <StudioProvider>
+            <TestComponent />
+          </StudioProvider>
+
+      );
+
+      await act(async () => {
+        ctx.setActiveComposition({ url: 'http://test.com/comp', id: '1', name: 'Test' });
+      });
+
+      mockFetch.mockResolvedValueOnce({
+        ok: false,
+        json: () => Promise.resolve({ error: 'Server error' })
+      });
+
+      await act(async () => {
+        await ctx.exportJobSpec();
+      });
+
+      // Test fetch failure catch block
+      mockFetch.mockRejectedValueOnce(new Error('Network error'));
+      await act(async () => {
+        await ctx.exportJobSpec();
+      });
+    });
+  });
 });

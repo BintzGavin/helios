@@ -53,7 +53,10 @@
 
 
 ### STUDIO v0.107.4
-### STUDIO v0.122.2
+### STUDIO v0.122.3
+- ✅ Completed: Improve StudioContext Export Coverage - Reached 100% test coverage for StudioContext exportJobSpec and cancelExport.
+
+## STUDIO v0.122.2
 - ✅ Completed: Improve CaptionsPanel Coverage - Increased coverage to 100% by testing file uploads and time formatting edge cases.
 - ✅ Completed: Improve AudioMixerPanel Coverage - Reached 90%+ test coverage for AudioMixerPanel and DiagnosticsModal.
 
