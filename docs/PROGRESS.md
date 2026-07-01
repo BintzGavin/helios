@@ -1,4 +1,7 @@
 #
+### PLAYER v0.79.0
+- ✅ Completed: Expose Composition Setters - Exposed setDuration, setFps, setSize, and setMarkers on HeliosPlayer Web Component
+
 ### PLAYER v0.78.1
 - ✅ Completed: Implement Instance Constants - Added standard media constants (e.g., HAVE_NOTHING, NETWORK_EMPTY) to the HeliosPlayer instance for HTMLMediaElement parity.
 

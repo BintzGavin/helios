@@ -45,6 +45,11 @@ Observed attributes:
 - `pause(): void`
 - `setPlaybackRange(startFrame: number, endFrame: number): void`
 - `clearPlaybackRange(): void`
+- `setDuration(seconds: number): void`
+- `setFps(fps: number): void`
+- `setSize(width: number, height: number): void`
+- `setMarkers(markers: Marker[]): void`
+
 - `seek(timeInSeconds: number): Promise<void>`
 - `fastSeek(timeInSeconds: number): void`
 - `setMediaKeys(mediaKeys: MediaKeys | null): Promise<void>`
