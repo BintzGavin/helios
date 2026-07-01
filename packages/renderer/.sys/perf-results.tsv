@@ -292,3 +292,4 @@ PERF-853	CaptureLoop.ts single worker TimeSeek/Decode overlap	improved
 
 316	1.800	300	166.67	400.0	keep	PERF-862 single and multi worker loop condition optimizations
 1	235.985	100000000	0.00	0.0	keep	PERF-884 unroll isString (baseline: 315.510ms)
+2	0.318	300	944.06	49.0	keep	removed redundant dynamic abort checks

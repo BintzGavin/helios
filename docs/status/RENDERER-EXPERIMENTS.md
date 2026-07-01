@@ -111,3 +111,6 @@ Last updated by: PERF-873
   - **Plan ID:** PERF-886
 - PERF-890: Precalculate Loop Boundary in Multi-Worker Dispatch planned.
 - PERF-891: Consolidate Frame Ready and Buffer Rings in Multi-Worker Path planned.
+
+## What Works
+- Removed redundant dynamic checks for capturedErrors and signal.aborted in CaptureLoop.ts multi-worker paths (~80% loop overhead reduction per microbenchmark) (PERF-892)
