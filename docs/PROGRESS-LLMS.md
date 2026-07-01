@@ -1,3 +1,8 @@
+### LLMS v1.114.0
+- ✅ Completed: Daily llms.txt Review
+  - Added `packages/studio/src/server/render-manager.ts` to Key Files for Agents.
+  - Verified all file paths and package versions.
+
 ### LLMS v1.112.0
 - ✅ Completed: Daily llms.txt Review
   - Synced Roadmap in llms.txt with recent verifiable completions from domain PROGRESS logs (Core: Generic Input Props, Active Clips; Studio: Improve Omnibar Test Coverage, Asset Drag and Drop; Player: Document getSchema API Parity, Bridge Coverage; Renderer: Validate HW Accel, Orchestrator Plan; CLI: CLI Command Coverage V9; Infrastructure: Optimize GCS Uploads, Orchestrator Coverage Expansion).
