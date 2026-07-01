@@ -110,3 +110,4 @@ Last updated by: PERF-873
   - **Improvement:** Reduced redundant array store operations in hot loops.
   - **Plan ID:** PERF-886
 - PERF-890: Precalculate Loop Boundary in Multi-Worker Dispatch planned.
+- PERF-891: Consolidate Frame Ready and Buffer Rings in Multi-Worker Path planned.
