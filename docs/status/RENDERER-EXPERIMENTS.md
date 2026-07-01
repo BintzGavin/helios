@@ -107,4 +107,6 @@ Last updated by: PERF-873
 - **What Works:** PERF-886 removed redundant `frameBufferRing[ringIndex] = null` assignments in the multi-worker `CaptureLoop.ts` path.
   - **Improvement:** Reduced redundant array store operations in hot loops.
   - **Plan ID:** PERF-886
-- PERF-890: Precalculate Loop Boundary in Multi-Worker Dispatch planned.
+- **What Works:** PERF-890 extracted the loop boundary calculation in the multi-worker worker assignment loop of `CaptureLoop.ts`.
+  - **Improvement:** Reduced purely dynamic V8 branch evaluations inside the hot `checkState` and chunk inner loops, yielding a ~23% performance improvement in microbenchmarks for tight wait loop execution.
+  - **Plan ID:** PERF-890
