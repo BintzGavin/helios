@@ -113,4 +113,7 @@ Last updated by: PERF-873
 - PERF-891: Consolidate Frame Ready and Buffer Rings in Multi-Worker Path planned.
 
 ## What Works
+- **What Works:** PERF-882 unrolled the `isString = typeof buffer === 'string'` check in the multi-worker capture loops of `CaptureLoop.ts`.
+  - **Improvement:** Removed dynamic per-frame type evaluation in the writer loop, relying on the known strategy type (`isDomStrategyWriter`), yielding ~34% improvement in execution time for hot write loop microbenchmarks.
+  - **Plan ID:** PERF-882
 - Removed redundant dynamic checks for capturedErrors and signal.aborted in CaptureLoop.ts multi-worker paths (~80% loop overhead reduction per microbenchmark) (PERF-892)
