@@ -1110,10 +1110,6 @@ export class CaptureLoop {
                 frameReadyRing[ringIndex] = 0;
               } else {
                 freeWorkers[freeWorkersHead++] = workerIndex;
-                if (capturedErrors.length > 0 || (signal && signal.aborted)) {
-                  aborted = true;
-                }
-
                 if (aborted) {
                   while (freeWorkersHead > 0) {
                     const w = freeWorkers[--freeWorkersHead];
@@ -1180,10 +1176,6 @@ export class CaptureLoop {
                 frameReadyRing[ringIndex] = 0;
               } else {
                 freeWorkers[freeWorkersHead++] = workerIndex;
-                if (capturedErrors.length > 0 || (signal && signal.aborted)) {
-                  aborted = true;
-                }
-
                 if (aborted) {
                   while (freeWorkersHead > 0) {
                     const w = freeWorkers[--freeWorkersHead];
@@ -1252,10 +1244,6 @@ export class CaptureLoop {
                 frameReadyRing[ringIndex] = 0;
               } else {
                 freeWorkers[freeWorkersHead++] = workerIndex;
-                if (capturedErrors.length > 0 || (signal && signal.aborted)) {
-                  aborted = true;
-                }
-
                 if (aborted) {
                   while (freeWorkersHead > 0) {
                     const w = freeWorkers[--freeWorkersHead];
@@ -1317,10 +1305,6 @@ export class CaptureLoop {
                 frameReadyRing[ringIndex] = 0;
               } else {
                 freeWorkers[freeWorkersHead++] = workerIndex;
-                if (capturedErrors.length > 0 || (signal && signal.aborted)) {
-                  aborted = true;
-                }
-
                 if (aborted) {
                   while (freeWorkersHead > 0) {
                     const w = freeWorkers[--freeWorkersHead];
@@ -1437,10 +1421,6 @@ export class CaptureLoop {
 
             nextFrameToWrite++;
             if (freeWorkersHead > 0) {
-              if (capturedErrors.length > 0 || (signal && signal.aborted)) {
-                aborted = true;
-              }
-
               if (aborted) {
                 while (freeWorkersHead > 0) {
                   const w = freeWorkers[--freeWorkersHead];
@@ -1515,10 +1495,6 @@ export class CaptureLoop {
               }
 
               if (freeWorkersHead > 0) {
-                if (capturedErrors.length > 0 || (signal && signal.aborted)) {
-                  aborted = true;
-                }
-
                 if (aborted) {
                   while (freeWorkersHead > 0) {
                     const w = freeWorkers[--freeWorkersHead];
@@ -1589,10 +1565,6 @@ export class CaptureLoop {
               }
 
               if (freeWorkersHead > 0) {
-                if (capturedErrors.length > 0 || (signal && signal.aborted)) {
-                  aborted = true;
-                }
-
                 if (aborted) {
                   while (freeWorkersHead > 0) {
                     const w = freeWorkers[--freeWorkersHead];
