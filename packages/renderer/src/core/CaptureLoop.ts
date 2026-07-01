@@ -1367,7 +1367,6 @@ export class CaptureLoop {
       const isDomStrategyWriter = this.pool[0].strategy.constructor.name === 'DomStrategy';
 
       try {
-        let isString: boolean | null = null;
         let nextProgress = progressInterval;
         if (nextFrameToWrite < totalFrames && !aborted) {
           while (!aborted) {
@@ -1393,10 +1392,8 @@ export class CaptureLoop {
               }
             }
 
-            isString = isDomStrategyWriter || typeof buffer === "string";
-
             let writeSuccess = false;
-            if (isString) {
+            if (isDomStrategyWriter) {
               const str = buffer as string;
               const maxBytes = (str.length * 3) >>> 2;
               let pooled = multiFreePool.pop();
@@ -1450,7 +1447,7 @@ export class CaptureLoop {
             break;
           }
 
-          if (!aborted && isString) {
+          if (!aborted && isDomStrategyWriter) {
             while (nextFrameToWrite < totalFrames && !aborted) {
               const chunkEnd = Math.min(nextFrameToWrite + progressInterval, totalFrames);
 
