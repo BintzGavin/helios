@@ -245,3 +245,4 @@
 - [v0.122.1] ✅ Completed: Improve CaptionsPanel Coverage - Added test cases for missing branches in CaptionsPanel.tsx.
 - [v0.122.0] ✅ Completed: Improve Omnibar Test Coverage - Reached 100% test coverage for Omnibar by adding tests for commands, asset icons, and keyboard boundary edge cases.
 - [v0.122.2] ✅ Completed: Improve CaptionsPanel Coverage - Increased coverage to 100% by testing file uploads and time formatting edge cases (2026-06-18-STUDIO-Improve-CaptionsPanel-Coverage.md).
+- [v0.122.3] ✅ Completed: Improve TimecodeInput Coverage - Created plan to test catch blocks in TimecodeInput component (2026-06-18-STUDIO-Improve-TimecodeInput-Coverage.md).
