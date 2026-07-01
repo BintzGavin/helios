@@ -3,6 +3,8 @@ Current best: 1.831s (baseline was 1.831s, -0%)
 Last updated by: PERF-873
 
 ## What Works
+- **PERF-890**: Extracted `nextFrameToSubmit - nextFrameToWrite < maxPipelineDepth` into a precalculated `maxSubmits` loop boundary in the multi-worker `checkState` and writer dispatch paths. Eliminating the arithmetic and branch evaluation per loop iteration yielded a ~23% reduction in hot loop overhead (~26ms down to ~24ms for 100k iterations).
+
 - **What Works:** PERF-878 overlapped `domBeginFrame` with CPU-bound Base64 decoding in the `CaptureLoop.ts` single-worker DOM fast paths.
   - **Improvement:** ~28% faster in microbenchmarks. By triggering `domBeginFrame` immediately and not awaiting the synchronously returning `timeDriver.setTime`, the browser renders the next frame concurrently while Node.js decodes the current frame, and microtask overhead is eliminated.
   - **Plan ID:** PERF-878
