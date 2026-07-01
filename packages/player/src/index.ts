@@ -1,4 +1,4 @@
-import type { Helios, HeliosSchema, DiagnosticReport } from "@helios-project/core";
+import type { Helios, HeliosSchema, DiagnosticReport, Marker } from "@helios-project/core";
 import { DirectController, BridgeController } from "./controllers";
 import type { HeliosController } from "./controllers";
 import { AudioLevels } from "./features/audio-metering";
@@ -1771,6 +1771,30 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
   public clearPlaybackRange(): void {
     if (this.controller) {
       this.controller.clearPlaybackRange();
+    }
+  }
+
+  public setDuration(seconds: number): void {
+    if (this.controller) {
+      this.controller.setDuration(seconds);
+    }
+  }
+
+  public setFps(fps: number): void {
+    if (this.controller) {
+      this.controller.setFps(fps);
+    }
+  }
+
+  public setSize(width: number, height: number): void {
+    if (this.controller) {
+      this.controller.setSize(width, height);
+    }
+  }
+
+  public setMarkers(markers: Marker[]): void {
+    if (this.controller) {
+      this.controller.setMarkers(markers);
     }
   }
 
