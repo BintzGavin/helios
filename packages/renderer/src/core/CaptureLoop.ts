@@ -1038,10 +1038,11 @@ export class CaptureLoop {
         }
 
         // See if we can assign tasks to waiting workers
-        const maxSubmits = Math.min(totalFrames, nextFrameToWrite + maxPipelineDepth);
+        const maxSubmits = nextFrameToWrite + maxPipelineDepth;
         while (
           freeWorkersHead > 0 &&
-          nextFrameToSubmit < maxSubmits
+          nextFrameToSubmit < totalFrames &&
+                    nextFrameToSubmit < maxSubmits
         ) {
           const w = freeWorkers[--freeWorkersHead];
           const i = nextFrameToSubmit++;
@@ -1117,9 +1118,10 @@ export class CaptureLoop {
                   }
                   writerWaiterPromise.resolve();
                 } else {
-                  const maxSubmits = Math.min(totalFrames, nextFrameToWrite + maxPipelineDepth);
+                  const maxSubmits = nextFrameToWrite + maxPipelineDepth;
                   while (
                     freeWorkersHead > 0 &&
+                    nextFrameToSubmit < totalFrames &&
                     nextFrameToSubmit < maxSubmits
                   ) {
                     const w = freeWorkers[--freeWorkersHead];
@@ -1183,9 +1185,10 @@ export class CaptureLoop {
                   }
                   writerWaiterPromise.resolve();
                 } else {
-                  const maxSubmits = Math.min(totalFrames, nextFrameToWrite + maxPipelineDepth);
+                  const maxSubmits = nextFrameToWrite + maxPipelineDepth;
                   while (
                     freeWorkersHead > 0 &&
+                    nextFrameToSubmit < totalFrames &&
                     nextFrameToSubmit < maxSubmits
                   ) {
                     const w = freeWorkers[--freeWorkersHead];
@@ -1251,9 +1254,10 @@ export class CaptureLoop {
                   }
                   writerWaiterPromise.resolve();
                 } else {
-                  const maxSubmits = Math.min(totalFrames, nextFrameToWrite + maxPipelineDepth);
+                  const maxSubmits = nextFrameToWrite + maxPipelineDepth;
                   while (
                     freeWorkersHead > 0 &&
+                    nextFrameToSubmit < totalFrames &&
                     nextFrameToSubmit < maxSubmits
                   ) {
                     const w = freeWorkers[--freeWorkersHead];
@@ -1312,9 +1316,10 @@ export class CaptureLoop {
                   }
                   writerWaiterPromise.resolve();
                 } else {
-                  const maxSubmits = Math.min(totalFrames, nextFrameToWrite + maxPipelineDepth);
+                  const maxSubmits = nextFrameToWrite + maxPipelineDepth;
                   while (
                     freeWorkersHead > 0 &&
+                    nextFrameToSubmit < totalFrames &&
                     nextFrameToSubmit < maxSubmits
                   ) {
                     const w = freeWorkers[--freeWorkersHead];
@@ -1425,10 +1430,11 @@ export class CaptureLoop {
                 }
                 writerWaiterPromise.resolve();
               } else {
-                const maxSubmits = Math.min(totalFrames, nextFrameToWrite + maxPipelineDepth);
+                const maxSubmits = nextFrameToWrite + maxPipelineDepth;
                 while (
                   freeWorkersHead > 0 &&
-                  nextFrameToSubmit < maxSubmits
+                  nextFrameToSubmit < totalFrames &&
+                    nextFrameToSubmit < maxSubmits
                 ) {
                   const w = freeWorkers[--freeWorkersHead];
                   const n = nextFrameToSubmit++;
@@ -1499,9 +1505,10 @@ export class CaptureLoop {
                   }
                   writerWaiterPromise.resolve();
                 } else {
-                  const maxSubmits = Math.min(totalFrames, nextFrameToWrite + maxPipelineDepth);
+                  const maxSubmits = nextFrameToWrite + maxPipelineDepth;
                   while (
                     freeWorkersHead > 0 &&
+                    nextFrameToSubmit < totalFrames &&
                     nextFrameToSubmit < maxSubmits
                   ) {
                     const w = freeWorkers[--freeWorkersHead];
@@ -1569,9 +1576,10 @@ export class CaptureLoop {
                   }
                   writerWaiterPromise.resolve();
                 } else {
-                  const maxSubmits = Math.min(totalFrames, nextFrameToWrite + maxPipelineDepth);
+                  const maxSubmits = nextFrameToWrite + maxPipelineDepth;
                   while (
                     freeWorkersHead > 0 &&
+                    nextFrameToSubmit < totalFrames &&
                     nextFrameToSubmit < maxSubmits
                   ) {
                     const w = freeWorkers[--freeWorkersHead];
