@@ -19,3 +19,6 @@
 ## [v0.46.58] - CLI Registry Client Coverage Tests
 **Learning:** Found missing coverage for early cache returns and fetch error catching in `client.ts`.
 **Action:** Add tests specifically mocking cache state and file fetch errors to hit lines 32, 85, 90-91, 96-97, 137.
+## [v0.46.60] - CLI Utils Coverage Tests V2
+**Learning:** Generating plans for test coverage alone when critical application gaps (like missing architectural features outlined in the Vision documentation) exist violates the "Vision-Driven Planner" philosophy.
+**Action:** Never invent arbitrary chores (like code coverage tasks) if the backlog or AGENTS.md document explicitly specifies missing features (like a new CLI command). Always choose the task that brings reality closer to the stated product vision.
