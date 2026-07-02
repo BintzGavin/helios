@@ -827,3 +827,5 @@ Each agent should update **their own dedicated progress file** instead of this f
 
 ### STUDIO v0.122.4
 - ✅ Completed: Improve TimecodeInput Coverage - Mocked framesToTimecode and added tests for fallback logic to reach 100% test coverage.
+### CLI v0.46.60
+- ✅ Completed: Document duplicated Registry Client Coverage Tests plan - Logged the duplicated plan as impossible.

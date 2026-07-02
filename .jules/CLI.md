@@ -19,3 +19,6 @@
 ## [v0.46.58] - CLI Registry Client Coverage Tests
 **Learning:** Found missing coverage for early cache returns and fetch error catching in `client.ts`.
 **Action:** Add tests specifically mocking cache state and file fetch errors to hit lines 32, 85, 90-91, 96-97, 137.
+## [v0.46.60] - Avoid Duplicate Plans
+**Learning:** If a plan in `/.sys/plans/` has already been fully completed by an earlier version but the file was left behind (or recreated), do not execute it again. Mark it as IMPOSSIBLE/DUPLICATION and remove the redundant plan file.
+**Action:** Always check the codebase (e.g. coverage reports or file contents) to verify if the work is already done before starting. If it is, delete the plan and document the duplication.
