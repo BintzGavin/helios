@@ -821,3 +821,6 @@ Each agent should update **their own dedicated progress file** instead of this f
 
 ### PLAYER v0.78.6
 - ✅ Completed: Document Playback Range Methods - Added `setPlaybackRange` and `clearPlaybackRange` to the README methods section.
+
+### STUDIO v0.122.4
+- ✅ Completed: Improve TimecodeInput Coverage - Mocked framesToTimecode and added tests for fallback logic to reach 100% test coverage.
