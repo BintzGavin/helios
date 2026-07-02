@@ -1,11 +1,11 @@
 ---
 id: PERF-893
 slug: remove-math-min
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "jules"
 created: 2026-06-19
-completed: ""
-result: ""
+completed: "2026-06-19"
+result: "improved"
 ---
 
 # PERF-893: Remove Math.min from Multi-Worker Dispatch
