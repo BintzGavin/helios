@@ -1,7 +1,10 @@
 ---
 id: PERF-891
 slug: consolidate-rings
-status: unclaimed
+status: complete
+claimed_by: "jules"
+completed: "2026-06-19"
+result: "improved"
 claimed_by: ""
 created: 2026-06-19
 completed: ""

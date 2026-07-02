@@ -996,7 +996,7 @@ export class CaptureLoop {
       const frameBufferRing = new Array<Buffer | string | null>(
         maxPipelineDepth,
       ).fill(null);
-      const frameReadyRing = new Uint8Array(maxPipelineDepth); // 0 = not ready, 1 = ready
+      const frameReadyRing = null; // removed in PERF-891 // 0 = not ready, 1 = ready
       let fatalError: any = null;
 
       const MULTI_POOL_SIZE = 64;
@@ -1048,7 +1048,7 @@ export class CaptureLoop {
           const i = nextFrameToSubmit++;
           const ringIndex = i & ringMask;
 
-          frameReadyRing[ringIndex] = 0;
+          frameBufferRing[ringIndex] = null;
 
           workerThenables[w].resolve(i);
         }
@@ -1108,7 +1108,7 @@ export class CaptureLoop {
                 i = nextFrameToSubmit++;
                 const ringIndex = i & ringMask;
 
-                frameReadyRing[ringIndex] = 0;
+                frameBufferRing[ringIndex] = null;
               } else {
                 freeWorkers[freeWorkersHead++] = workerIndex;
                 if (aborted) {
@@ -1127,7 +1127,7 @@ export class CaptureLoop {
                     const w = freeWorkers[--freeWorkersHead];
                     const n = nextFrameToSubmit++;
                     const ringIndex = n & ringMask;
-                    frameReadyRing[ringIndex] = 0;
+                    frameBufferRing[ringIndex] = null;
                     workerThenables[w].resolve(n);
                   }
                   if (nextFrameToSubmit >= totalFrames) {
@@ -1157,7 +1157,7 @@ export class CaptureLoop {
                 }
                 buffer = domLastFrameData;
                 frameBufferRing[ringIndex] = buffer;
-                frameReadyRing[ringIndex] = 1;
+
               } catch (e) {
                 fatalError = e;
                 aborted = true;
@@ -1175,7 +1175,7 @@ export class CaptureLoop {
                 i = nextFrameToSubmit++;
                 const ringIndex = i & ringMask;
 
-                frameReadyRing[ringIndex] = 0;
+                frameBufferRing[ringIndex] = null;
               } else {
                 freeWorkers[freeWorkersHead++] = workerIndex;
                 if (aborted) {
@@ -1194,7 +1194,7 @@ export class CaptureLoop {
                     const w = freeWorkers[--freeWorkersHead];
                     const n = nextFrameToSubmit++;
                     const ringIndex = n & ringMask;
-                    frameReadyRing[ringIndex] = 0;
+                    frameBufferRing[ringIndex] = null;
                     workerThenables[w].resolve(n);
                   }
                   if (nextFrameToSubmit >= totalFrames) {
@@ -1224,7 +1224,7 @@ export class CaptureLoop {
                   await strategy.capture(page, i * timeStep),
                 );
                 frameBufferRing[ringIndex] = buffer;
-                frameReadyRing[ringIndex] = 1;
+
               } catch (e) {
                 fatalError = e;
                 aborted = true;
@@ -1244,7 +1244,7 @@ export class CaptureLoop {
                 i = nextFrameToSubmit++;
                 const ringIndex = i & ringMask;
 
-                frameReadyRing[ringIndex] = 0;
+                frameBufferRing[ringIndex] = null;
               } else {
                 freeWorkers[freeWorkersHead++] = workerIndex;
                 if (aborted) {
@@ -1263,7 +1263,7 @@ export class CaptureLoop {
                     const w = freeWorkers[--freeWorkersHead];
                     const n = nextFrameToSubmit++;
                     const ringIndex = n & ringMask;
-                    frameReadyRing[ringIndex] = 0;
+                    frameBufferRing[ringIndex] = null;
                     workerThenables[w].resolve(n);
                   }
                   if (nextFrameToSubmit >= totalFrames) {
@@ -1288,7 +1288,7 @@ export class CaptureLoop {
                 let buffer: any;
                 buffer = await domBeginFrame!();
                 frameBufferRing[ringIndex] = buffer;
-                frameReadyRing[ringIndex] = 1;
+
               } catch (e) {
                 fatalError = e;
                 aborted = true;
@@ -1306,7 +1306,7 @@ export class CaptureLoop {
                 i = nextFrameToSubmit++;
                 const ringIndex = i & ringMask;
 
-                frameReadyRing[ringIndex] = 0;
+                frameBufferRing[ringIndex] = null;
               } else {
                 freeWorkers[freeWorkersHead++] = workerIndex;
                 if (aborted) {
@@ -1325,7 +1325,7 @@ export class CaptureLoop {
                     const w = freeWorkers[--freeWorkersHead];
                     const n = nextFrameToSubmit++;
                     const ringIndex = n & ringMask;
-                    frameReadyRing[ringIndex] = 0;
+                    frameBufferRing[ringIndex] = null;
                     workerThenables[w].resolve(n);
                   }
                   if (nextFrameToSubmit >= totalFrames) {
@@ -1353,7 +1353,7 @@ export class CaptureLoop {
                 let buffer: any;
                 buffer = await strategy.capture(page, i * timeStep);
                 frameBufferRing[ringIndex] = buffer;
-                frameReadyRing[ringIndex] = 1;
+
               } catch (e) {
                 fatalError = e;
                 aborted = true;
@@ -1378,7 +1378,7 @@ export class CaptureLoop {
             if (aborted) break;
 
             const ringIndex = nextFrameToWrite & ringMask;
-            if (frameReadyRing[ringIndex] === 0) {
+            if (frameBufferRing[ringIndex] === null) {
               await writerWaiterPromise;
               continue;
             }
@@ -1439,7 +1439,7 @@ export class CaptureLoop {
                   const w = freeWorkers[--freeWorkersHead];
                   const n = nextFrameToSubmit++;
                   const ringIndex = n & ringMask;
-                  frameReadyRing[ringIndex] = 0;
+                  frameBufferRing[ringIndex] = null;
                   workerThenables[w].resolve(n);
                 }
                 if (nextFrameToSubmit >= totalFrames) {
@@ -1460,7 +1460,7 @@ export class CaptureLoop {
 
               while (nextFrameToWrite < chunkEnd) {
                 const ringIndex = nextFrameToWrite & ringMask;
-                if (frameReadyRing[ringIndex] === 0) {
+                if (frameBufferRing[ringIndex] === null) {
                   break;
                 }
 
@@ -1489,7 +1489,7 @@ export class CaptureLoop {
 
               if (nextFrameToWrite < chunkEnd) {
                 const ringIndex = nextFrameToWrite & ringMask;
-                while (frameReadyRing[ringIndex] === 0 && !aborted) {
+                while (frameBufferRing[ringIndex] === null && !aborted) {
                   await writerWaiterPromise;
                 }
                 if (aborted) break;
@@ -1514,7 +1514,7 @@ export class CaptureLoop {
                     const w = freeWorkers[--freeWorkersHead];
                     const n = nextFrameToSubmit++;
                     const ringIndex = n & ringMask;
-                    frameReadyRing[ringIndex] = 0;
+                    frameBufferRing[ringIndex] = null;
                     workerThenables[w].resolve(n);
                   }
                   if (nextFrameToSubmit >= totalFrames) {
@@ -1541,7 +1541,7 @@ export class CaptureLoop {
 
               while (nextFrameToWrite < chunkEnd) {
                 const ringIndex = nextFrameToWrite & ringMask;
-                if (frameReadyRing[ringIndex] === 0) {
+                if (frameBufferRing[ringIndex] === null) {
                   break;
                 }
 
@@ -1560,7 +1560,7 @@ export class CaptureLoop {
 
               if (nextFrameToWrite < chunkEnd) {
                 const ringIndex = nextFrameToWrite & ringMask;
-                while (frameReadyRing[ringIndex] === 0 && !aborted) {
+                while (frameBufferRing[ringIndex] === null && !aborted) {
                   await writerWaiterPromise;
                 }
                 if (aborted) break;
@@ -1585,7 +1585,7 @@ export class CaptureLoop {
                     const w = freeWorkers[--freeWorkersHead];
                     const n = nextFrameToSubmit++;
                     const ringIndex = n & ringMask;
-                    frameReadyRing[ringIndex] = 0;
+                    frameBufferRing[ringIndex] = null;
                     workerThenables[w].resolve(n);
                   }
                   if (nextFrameToSubmit >= totalFrames) {
