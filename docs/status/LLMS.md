@@ -1,6 +1,6 @@
 # Status: LLMS
 [v1.114.0] ✅ Completed: Comprehensive Daily Review - Updated Key Files to include `packages/studio/src/server/render-manager.ts`. Verified package versions and existing completions.
-**Version**: 1.114.0
+**Version**: 1.115.0
 
 [v1.113.0] ✅ Completed: Comprehensive Daily Review - Synced Roadmap with recent verifiable completions from domain PROGRESS logs (Renderer: Fix GSAP Timeline, CLI: Docker Adapter Tests, Player: Media Session Tests, Infrastructure: InMemoryJobRepository Coverage). Updated Architecture components to reflect `timeline` and `RenderExecutor`. Verified all Key Files and Agent Skills sections.
 
@@ -224,3 +224,5 @@ Verified package versions match package.json exactly. Verified File Paths and Ke
 [v1.107.0] ✅ Completed: Comprehensive Daily Review - Synced Roadmap with recent verifiable completions across all domains (Studio: Timeline Audio/Waveform Regression Tests, Asset Drag and Drop, Enhance MCP Server; CLI: Command Coverage Tests V9; Player: Audio Fader Regression, Bridge Coverage Completeness, Document getSchema; Renderer: Validate HW Accel; Infrastructure: Modal Adapter, Optimize GCS/S3 Uploads, Orchestrator/Stitcher Coverage). Fixed Core API example in llms.txt (using start and duration). Verified all file paths and package versions perfectly match package.json.
 
 [v1.108.0] ✅ Completed: Daily llms.txt Review - Synced Roadmap with recent verifiable completions across Studio, CLI, Core, Player, Renderer, and Infrastructure domains. Verified package versions exactly match package.json.
+
+[v1.115.0] ✅ Completed: Daily llms.txt Review - Verified versions and roadmap
