@@ -1423,13 +1423,6 @@ export class CaptureLoop {
 
             nextFrameToWrite++;
             if (freeWorkersHead > 0) {
-              if (aborted) {
-                while (freeWorkersHead > 0) {
-                  const w = freeWorkers[--freeWorkersHead];
-                  workerThenables[w].resolve(-1);
-                }
-                writerWaiterPromise.resolve();
-              } else {
                 const maxSubmits = nextFrameToWrite + maxPipelineDepth;
                 while (
                   freeWorkersHead > 0 &&
@@ -1446,7 +1439,6 @@ export class CaptureLoop {
                   while (freeWorkersHead > 0) {
                     const w = freeWorkers[--freeWorkersHead];
                     workerThenables[w].resolve(-1);
-                  }
                 }
               }
             }
@@ -1498,14 +1490,7 @@ export class CaptureLoop {
               }
 
               if (freeWorkersHead > 0) {
-                if (aborted) {
-                  while (freeWorkersHead > 0) {
-                    const w = freeWorkers[--freeWorkersHead];
-                    workerThenables[w].resolve(-1);
-                  }
-                  writerWaiterPromise.resolve();
-                } else {
-                  const maxSubmits = nextFrameToWrite + maxPipelineDepth;
+                const maxSubmits = nextFrameToWrite + maxPipelineDepth;
                   while (
                     freeWorkersHead > 0 &&
                     nextFrameToSubmit < totalFrames &&
@@ -1521,8 +1506,7 @@ export class CaptureLoop {
                     while (freeWorkersHead > 0) {
                       const w = freeWorkers[--freeWorkersHead];
                       workerThenables[w].resolve(-1);
-                    }
-                  }
+            }
                 }
               }
 
@@ -1569,14 +1553,7 @@ export class CaptureLoop {
               }
 
               if (freeWorkersHead > 0) {
-                if (aborted) {
-                  while (freeWorkersHead > 0) {
-                    const w = freeWorkers[--freeWorkersHead];
-                    workerThenables[w].resolve(-1);
-                  }
-                  writerWaiterPromise.resolve();
-                } else {
-                  const maxSubmits = nextFrameToWrite + maxPipelineDepth;
+                const maxSubmits = nextFrameToWrite + maxPipelineDepth;
                   while (
                     freeWorkersHead > 0 &&
                     nextFrameToSubmit < totalFrames &&
@@ -1592,8 +1569,7 @@ export class CaptureLoop {
                     while (freeWorkersHead > 0) {
                       const w = freeWorkers[--freeWorkersHead];
                       workerThenables[w].resolve(-1);
-                    }
-                  }
+            }
                 }
               }
 
