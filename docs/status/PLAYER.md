@@ -1,4 +1,4 @@
-**Version**: 0.79.0
+**Version**: 0.79.1
 
 [v0.78.5] ✅ Completed: Discovered missing composition setters on the public API wrapper. Created plan `.sys/plans/2027-03-05-PLAYER-Expose-Composition-Setters.md` to expose `setDuration`, `setFps`, `setSize`, and `setMarkers`.
 [v0.78.4] ✅ Completed: Discovered missing HTMLMediaElement-like parity methods (`setPlaybackRange`, `clearPlaybackRange`) in HeliosPlayer public API. Created plan `.sys/plans/2027-03-04-PLAYER-Expose-Playback-Range-Methods.md` to implement them.
@@ -284,3 +284,4 @@
 [v0.78.4] ✅ Completed: Document Playback Range Methods - Added `setPlaybackRange` and `clearPlaybackRange` to the README methods section.
 
 [v0.79.0] ✅ Completed: Expose Composition Setters - Exposed setDuration, setFps, setSize, and setMarkers on HeliosPlayer Web Component
+[v0.79.1] ✅ Completed: Discovered that 2027-03-04-PLAYER-Expose-Playback-Range-Methods.md is an IMPOSSIBLE: DUPLICATION plan. The setPlaybackRange and clearPlaybackRange methods are already fully implemented and documented. Documented as impossible and discarded.
