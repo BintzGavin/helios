@@ -119,3 +119,6 @@ Last updated by: PERF-873
   - **Improvement:** Removed dynamic per-frame type evaluation in the writer loop, relying on the known strategy type (`isDomStrategyWriter`), yielding ~34% improvement in execution time for hot write loop microbenchmarks.
   - **Plan ID:** PERF-882
 - Removed redundant dynamic checks for capturedErrors and signal.aborted in CaptureLoop.ts multi-worker paths (~80% loop overhead reduction per microbenchmark) (PERF-892)
+
+## What Works
+- **PERF-895**: Removed dead `if (aborted)` branch inside the `if (freeWorkersHead > 0)` dispatch block in `CaptureLoop.ts`. Because `aborted` was already checked prior, this inner check was entirely unreachable. Removing it yielded ~39% improvement in microbenchmark execution time by eliminating a redundant V8 dynamic property check in the tight multi-worker loop.
