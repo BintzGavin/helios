@@ -1,8 +1,10 @@
 ---
 id: PERF-904
 slug: remove-math-min-single-worker
-status: unclaimed
-claimed_by: ""
+status: complete
+completed: 2024-07-03
+result: improved
+claimed_by: "executor-session"
 created: 2024-07-03
 completed: ""
 result: ""
@@ -72,3 +74,9 @@ Run `npx vitest run verify-canvas` to ensure the canvas path is untouched.
 
 ## Correctness Check
 Run `npm test -w packages/renderer` to ensure no frame synchronization regressions occurred.
+
+## Results Summary
+- **Best render time**: 0.288s
+- **Improvement**: Minor function call overhead reduction.
+- **Kept experiments**: PERF-904 single worker `Math.min` unroll.
+- **Discarded experiments**: none
