@@ -273,7 +273,7 @@ export class CaptureLoop {
 
                 let i = 1;
                 while (i < totalFrames - 1 && !aborted) {
-                  const chunkEnd = Math.min(i + progressInterval, totalFrames - 1);
+                  let chunkEnd = i + progressInterval; if (chunkEnd > totalFrames - 1) chunkEnd = totalFrames - 1;
 
 
                   for (; i < chunkEnd; i++) {
@@ -368,7 +368,7 @@ export class CaptureLoop {
 
                 let i = 1;
                 while (i < totalFrames - 1 && !aborted) {
-                  const chunkEnd = Math.min(i + progressInterval, totalFrames - 1);
+                  let chunkEnd = i + progressInterval; if (chunkEnd > totalFrames - 1) chunkEnd = totalFrames - 1;
 
 
                   for (; i < chunkEnd; i++) {
@@ -462,7 +462,7 @@ export class CaptureLoop {
 
                 let i = 1;
                 while (i < totalFrames - 1 && !aborted) {
-                  const chunkEnd = Math.min(i + progressInterval, totalFrames - 1);
+                  let chunkEnd = i + progressInterval; if (chunkEnd > totalFrames - 1) chunkEnd = totalFrames - 1;
 
 
                   for (; i < chunkEnd; i++) {
@@ -535,7 +535,7 @@ export class CaptureLoop {
 
                 let i = 1;
                 while (i < totalFrames - 1 && !aborted) {
-                  const chunkEnd = Math.min(i + progressInterval, totalFrames - 1);
+                  let chunkEnd = i + progressInterval; if (chunkEnd > totalFrames - 1) chunkEnd = totalFrames - 1;
 
 
                   for (; i < chunkEnd; i++) {
@@ -669,7 +669,7 @@ export class CaptureLoop {
 
                 let i = 1;
                 while (i < totalFrames - 1 && !aborted) {
-                  const chunkEnd = Math.min(i + progressInterval, totalFrames - 1);
+                  let chunkEnd = i + progressInterval; if (chunkEnd > totalFrames - 1) chunkEnd = totalFrames - 1;
 
 
                   for (; i < chunkEnd; i++) {
@@ -754,7 +754,7 @@ export class CaptureLoop {
 
                 let i = 1;
                 while (i < totalFrames - 1 && !aborted) {
-                  const chunkEnd = Math.min(i + progressInterval, totalFrames - 1);
+                  let chunkEnd = i + progressInterval; if (chunkEnd > totalFrames - 1) chunkEnd = totalFrames - 1;
 
 
                   for (; i < chunkEnd; i++) {
@@ -847,7 +847,7 @@ export class CaptureLoop {
 
                 let i = 1;
                 while (i < totalFrames - 1 && !aborted) {
-                  const chunkEnd = Math.min(i + progressInterval, totalFrames - 1);
+                  let chunkEnd = i + progressInterval; if (chunkEnd > totalFrames - 1) chunkEnd = totalFrames - 1;
 
 
                   for (; i < chunkEnd; i++) {
@@ -908,7 +908,7 @@ export class CaptureLoop {
 
                 let i = 1;
                 while (i < totalFrames - 1 && !aborted) {
-                  const chunkEnd = Math.min(i + progressInterval, totalFrames - 1);
+                  let chunkEnd = i + progressInterval; if (chunkEnd > totalFrames - 1) chunkEnd = totalFrames - 1;
 
 
                   for (; i < chunkEnd; i++) {
@@ -1447,7 +1447,7 @@ export class CaptureLoop {
 
           if (!aborted && isDomStrategyWriter) {
             while (nextFrameToWrite < totalFrames && !aborted) {
-              const chunkEnd = Math.min(nextFrameToWrite + progressInterval, totalFrames);
+              let chunkEnd = nextFrameToWrite + progressInterval; if (chunkEnd > totalFrames) chunkEnd = totalFrames;
 
 
               while (nextFrameToWrite < chunkEnd) {
@@ -1520,7 +1520,7 @@ export class CaptureLoop {
             }
           } else if (!aborted) {
             while (nextFrameToWrite < totalFrames && !aborted) {
-              const chunkEnd = Math.min(nextFrameToWrite + progressInterval, totalFrames);
+              let chunkEnd = nextFrameToWrite + progressInterval; if (chunkEnd > totalFrames) chunkEnd = totalFrames;
 
 
               while (nextFrameToWrite < chunkEnd) {
