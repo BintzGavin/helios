@@ -830,3 +830,6 @@ Each agent should update **their own dedicated progress file** instead of this f
 
 ### STUDIO v0.122.5
 - ✅ Completed: Add 100% unit test coverage for usePersistentState and useKeyboardShortcut hooks
+
+### PLAYER v0.79.2
+- ✅ Completed: Document Composition Setters - Documented setDuration, setFps, setSize, and setMarkers in the player README.
