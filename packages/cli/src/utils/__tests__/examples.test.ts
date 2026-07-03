@@ -57,6 +57,27 @@ describe('fetchExamples', () => {
     expect(result).toEqual([]);
   });
 });
+  it('should return empty list if repo format is invalid', async () => {
+    const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const result = await fetchExamples('invalidformat');
+    expect(result).toEqual([]);
+    expect(consoleWarnSpy).toHaveBeenCalledWith(expect.stringContaining('Invalid repository format: invalidformat'));
+    consoleWarnSpy.mockRestore();
+  });
+
+  it('should return empty list if path is not a directory (not an array)', async () => {
+    const mockResponse = {
+      ok: true,
+      json: async () => ({ type: 'file', content: 'hello' }),
+    };
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(mockResponse));
+
+    const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const result = await fetchExamples('owner/repo/notadir');
+    expect(result).toEqual([]);
+    expect(consoleWarnSpy).toHaveBeenCalledWith(expect.stringContaining('Path owner/repo/notadir is not a directory.'));
+    consoleWarnSpy.mockRestore();
+  });
 
 describe('downloadExample', () => {
   beforeEach(() => {
