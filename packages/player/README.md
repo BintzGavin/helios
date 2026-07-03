@@ -150,6 +150,10 @@ Both class-level and instance-level properties are provided for standard media s
 
 ### Methods
 
+- `setDuration(seconds: number): void` - Updates the composition duration dynamically.
+- `setFps(fps: number): void` - Updates the composition framerate dynamically.
+- `setSize(width: number, height: number): void` - Updates the composition dimensions dynamically.
+- `setMarkers(markers: Marker[]): void` - Updates the timeline markers dynamically.
 - `setSinkId(sinkId: string): Promise<void>` - Sets the audio sink id.
 - `setMediaKeys(mediaKeys: MediaKeys | null): Promise<void>` - Sets the MediaKeys object to use for decrypting media.
 
