@@ -1,0 +1,5 @@
+run\trender_time_s\tframes\tfps_effective\tpeak_mem_mb\tstatus\tdescription
+1\t11.500\t300\t26.08\t490.0\tkeep\tbaseline
+2\t11.450\t300\t26.20\t490.0\tkeep\tremove-dead-is-dom-strategy
+3\t11.430\t300\t26.24\t490.0\tkeep\tremove-dead-is-dom-strategy
+4\t11.440\t300\t26.22\t490.0\tkeep\tremove-dead-is-dom-strategy
