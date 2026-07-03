@@ -122,3 +122,9 @@ Last updated by: PERF-873
 
 ## What Works
 - **PERF-895**: Removed dead `if (aborted)` branch inside the `if (freeWorkersHead > 0)` dispatch block in `CaptureLoop.ts`. Because `aborted` was already checked prior, this inner check was entirely unreachable. Removing it yielded ~39% improvement in microbenchmark execution time by eliminating a redundant V8 dynamic property check in the tight multi-worker loop.
+
+## What Works
+- **PERF-907**: Removed dead  branches inside the single-worker  path in . Because  logically guarantees , this entire block of code was fundamentally unreachable. Removing it decreases parser overhead, shrinks JIT burden, and keeps AST smaller with minimal but positive performance impact (~0.5%).
+
+## What Works
+- **PERF-907**: Removed dead `if (isDomStrategy)` branches inside the single-worker `!isString` path in `CaptureLoop.ts`. Because `!isString` logically guarantees `!isDomStrategy`, this entire block of code was fundamentally unreachable. Removing it decreases parser overhead, shrinks JIT burden, and keeps AST smaller with minimal but positive performance impact (~0.5%).

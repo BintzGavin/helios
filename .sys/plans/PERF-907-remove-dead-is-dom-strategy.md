@@ -1,8 +1,8 @@
 ---
 id: PERF-907
 slug: remove-dead-is-dom-strategy
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "jules"
 created: 2024-07-03
 completed: ""
 result: ""

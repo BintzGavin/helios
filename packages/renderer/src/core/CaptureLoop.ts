@@ -458,80 +458,6 @@ export class CaptureLoop {
                 }
               }
             } else {
-              if (isDomStrategy) {
-
-                let i = 1;
-                while (i < totalFrames - 1 && !aborted) {
-                  let chunkEnd = i + progressInterval; if (chunkEnd > totalFrames - 1) chunkEnd = totalFrames - 1;
-
-
-                  for (; i < chunkEnd; i++) {
-                    const rawResult = await nextCapturePromise;
-
-                    timeDriver.setTime(
-                      page,
-                      (startFrame + i + 1) * compTimeStep,
-                    );
-
-                    nextCapturePromise = domBeginFrame!();
-
-                    let buf;
-                    const data = rawResult.screenshotData;
-                    if (data) {
-                      domLastFrameData = data;
-                    }
-                    buf = domLastFrameData;
-                    pendingBytes += (buf as any).length;
-                    const writeSuccessBuf = stream.write(buf as any);
-
-                    if (!writeSuccessBuf && pendingBytes >= 16777216) {
-                      await this.drainPromise;
-                      pendingBytes = 0;
-                    }
-                  }
-
-                  if (aborted) break;
-
-                  if (i - 1 === nextProgress) {
-                    nextProgress += progressInterval;
-                    console.log(
-                      `Progress: Rendered ${i - 1} / ${totalFrames} frames`,
-                    );
-                    if (onProgress) {
-                      onProgress((i - 1) / totalFrames);
-                    }
-                  }
-                }
-
-                if (!aborted && totalFrames > 1) {
-                  const rawResult = await nextCapturePromise;
-
-                  let buf;
-                  const data = rawResult.screenshotData;
-                  if (data) {
-                    domLastFrameData = data;
-                  }
-                  buf = domLastFrameData;
-                  pendingBytes += (buf as any).length;
-                  const writeSuccessBuf = stream.write(buf as any);
-
-                  if (!writeSuccessBuf && pendingBytes >= 16777216) {
-                    await this.drainPromise;
-                    pendingBytes = 0;
-                  }
-
-                  i++;
-                  if (i - 1 === nextProgress || i === totalFrames) {
-                    if (i - 1 === nextProgress) nextProgress += progressInterval;
-                    console.log(
-                      `Progress: Rendered ${i - 1} / ${totalFrames} frames`,
-                    );
-                    if (onProgress) {
-                      onProgress((i - 1) / totalFrames);
-                    }
-                  }
-                }
-              } else {
 
                 let i = 1;
                 while (i < totalFrames - 1 && !aborted) {
@@ -599,7 +525,6 @@ export class CaptureLoop {
                     }
                   }
                 }
-              }
             }
           }
         } else {
@@ -843,68 +768,6 @@ export class CaptureLoop {
                 }
               }
             } else {
-              if (isDomStrategy) {
-
-                let i = 1;
-                while (i < totalFrames - 1 && !aborted) {
-                  let chunkEnd = i + progressInterval; if (chunkEnd > totalFrames - 1) chunkEnd = totalFrames - 1;
-
-
-                  for (; i < chunkEnd; i++) {
-                    const buf = await nextCapturePromise;
-
-                    timeDriver.setTime(
-                      page,
-                      (startFrame + i + 1) * compTimeStep,
-                    );
-
-                    nextCapturePromise = domBeginFrame!();
-
-                    pendingBytes += (buf as any).length;
-                    const writeSuccessBuf = stream.write(buf as any);
-
-                    if (!writeSuccessBuf && pendingBytes >= 16777216) {
-                      await this.drainPromise;
-                      pendingBytes = 0;
-                    }
-                  }
-
-                  if (aborted) break;
-
-                  if (i - 1 === nextProgress) {
-                    nextProgress += progressInterval;
-                    console.log(
-                      `Progress: Rendered ${i - 1} / ${totalFrames} frames`,
-                    );
-                    if (onProgress) {
-                      onProgress((i - 1) / totalFrames);
-                    }
-                  }
-                }
-
-                if (!aborted && totalFrames > 1) {
-                  const buf = await nextCapturePromise;
-
-                  pendingBytes += (buf as any).length;
-                  const writeSuccessBuf = stream.write(buf as any);
-
-                  if (!writeSuccessBuf && pendingBytes >= 16777216) {
-                    await this.drainPromise;
-                    pendingBytes = 0;
-                  }
-
-                  i++;
-                  if (i - 1 === nextProgress || i === totalFrames) {
-                    if (i - 1 === nextProgress) nextProgress += progressInterval;
-                    console.log(
-                      `Progress: Rendered ${i - 1} / ${totalFrames} frames`,
-                    );
-                    if (onProgress) {
-                      onProgress((i - 1) / totalFrames);
-                    }
-                  }
-                }
-              } else {
 
                 let i = 1;
                 while (i < totalFrames - 1 && !aborted) {
@@ -969,7 +832,6 @@ export class CaptureLoop {
                     }
                   }
                 }
-              }
             }
           }
         }
