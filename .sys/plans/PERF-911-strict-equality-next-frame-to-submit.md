@@ -1,11 +1,11 @@
 ---
 id: PERF-911
 slug: strict-equality-next-frame-to-submit
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-07-05
-completed: ""
-result: ""
+completed: "2024-07-05"
+result: "improved"
 ---
 
 # PERF-911: Optimize `nextFrameToSubmit >= totalFrames` check using strict equality
@@ -57,3 +57,9 @@ Run `npx vitest run verify-canvas` to ensure basic single-worker canvas mode rem
 
 ## Correctness Check
 Run multi-worker DOM verify scripts `verify-cdp-shadow-dom-sync.ts` and ensure workers correctly hit `-1` and exit when the stream finishes.
+
+## Results Summary
+- **Best render time**: 0.707s (vs baseline 0.732s)
+- **Improvement**: 3.5%
+- **Kept experiments**: Use strict equality `===` over `>=` for `nextFrameToSubmit` and `totalFrames`
+- **Discarded experiments**: []

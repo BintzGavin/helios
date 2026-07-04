@@ -914,7 +914,7 @@ export class CaptureLoop {
                   }
 
         // If we still have waiting workers but are at totalFrames, tell them to stop
-        if (nextFrameToSubmit >= totalFrames) {
+        if (nextFrameToSubmit === totalFrames) {
           while (freeWorkersHead > 0) {
             const w = freeWorkers[--freeWorkersHead];
             workerThenables[w].resolve(-1);
@@ -1191,7 +1191,7 @@ export class CaptureLoop {
                       workerThenables[w].resolve(n);
                     }
                   }
-                if (nextFrameToSubmit >= totalFrames) {
+                if (nextFrameToSubmit === totalFrames) {
                   while (freeWorkersHead > 0) {
                     const w = freeWorkers[--freeWorkersHead];
                     workerThenables[w].resolve(-1);
@@ -1258,7 +1258,7 @@ export class CaptureLoop {
                       workerThenables[w].resolve(n);
                     }
                   }
-                  if (nextFrameToSubmit >= totalFrames) {
+                  if (nextFrameToSubmit === totalFrames) {
                     while (freeWorkersHead > 0) {
                       const w = freeWorkers[--freeWorkersHead];
                       workerThenables[w].resolve(-1);
@@ -1321,7 +1321,7 @@ export class CaptureLoop {
                       workerThenables[w].resolve(n);
                     }
                   }
-                  if (nextFrameToSubmit >= totalFrames) {
+                  if (nextFrameToSubmit === totalFrames) {
                     while (freeWorkersHead > 0) {
                       const w = freeWorkers[--freeWorkersHead];
                       workerThenables[w].resolve(-1);
