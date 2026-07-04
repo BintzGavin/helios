@@ -137,3 +137,4 @@ Last updated by: PERF-873
 
 ## What Works
 - **PERF-910**: Removed dead mathematically unreachable code in `CaptureLoop.ts` fast loop else blocks. Evaluated loop counts per microbenchmark frame simulation dropped drastically from ~275ms down to ~64ms.
+- **PERF-911**: Replaced `>=` relational comparison with strict equality `===` for `nextFrameToSubmit` vs `totalFrames` in `CaptureLoop.ts`. Because `nextFrameToSubmit` cannot logically exceed `totalFrames` (due to tight upstream dispatches limit), strict equality reduces dynamic evaluator overhead and yields ~3.5% microbenchmark improvement.
