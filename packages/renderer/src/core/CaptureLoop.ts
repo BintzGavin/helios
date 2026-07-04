@@ -1134,10 +1134,10 @@ export class CaptureLoop {
             if (aborted) break;
 
             const ringIndex = nextFrameToWrite & ringMask;
-            if (frameBufferRing[ringIndex] === null) {
+            while (frameBufferRing[ringIndex] === null && !aborted) {
               await writerWaiterPromise;
-              continue;
             }
+            if (aborted) break;
 
             const buffer = frameBufferRing[ringIndex]!;
 
