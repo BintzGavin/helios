@@ -828,6 +828,9 @@ Each agent should update **their own dedicated progress file** instead of this f
 ### STUDIO v0.122.4
 - ✅ Completed: Improve TimecodeInput Coverage - Mocked framesToTimecode and added tests for fallback logic to reach 100% test coverage.
 
+### STUDIO v0.122.6
+- ✅ Completed: STUDIO-Improve-PlaybackControls-Coverage - Achieved 100% test coverage for PlaybackControls by refactoring disabled state conditions.
+
 ### STUDIO v0.122.5
 - ✅ Completed: Add 100% unit test coverage for usePersistentState and useKeyboardShortcut hooks
 

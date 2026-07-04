@@ -1,4 +1,4 @@
-**Version**: 0.122.5
+**Version**: 0.122.6
 
 - [v0.121.28] ✅ Completed: Improve AssistantModal Coverage - Reached 90%+ test coverage for AssistantModal.
 
@@ -248,3 +248,4 @@
 - [v0.122.3] ✅ Completed: Improve TimecodeInput Coverage - Created plan to test catch blocks in TimecodeInput component (2026-06-18-STUDIO-Improve-TimecodeInput-Coverage.md).
 - [v0.122.4] ✅ Completed: Improve TimecodeInput Coverage - Mocked framesToTimecode and added tests for fallback logic to reach 100% test coverage.
 - [v0.122.5] ✅ Completed: Add 100% unit test coverage for usePersistentState and useKeyboardShortcut hooks
+- [v0.122.6] ✅ Completed: STUDIO-Improve-PlaybackControls-Coverage - Achieved 100% test coverage for PlaybackControls by refactoring disabled state conditions.
