@@ -212,4 +212,28 @@ describe('PlaybackControls', () => {
     expect(prevBtn).toBeDisabled();
     expect(nextBtn).toBeDisabled();
   });
+
+  it('covers the toggle loop background branch', () => {
+    (StudioContext.useStudio as any).mockReturnValue({
+      ...defaultContext,
+      loop: true,
+    });
+    render(<PlaybackControls />);
+    const toggleLoopBtn = screen.getByTitle('Toggle Loop');
+    expect(toggleLoopBtn).toHaveStyle('background: #007acc');
+  });
+
+  it('calls seek to inPoint then play when play/pause is clicked at the end with outPoint > 0', () => {
+    (StudioContext.useStudio as any).mockReturnValue({
+      ...defaultContext,
+      playerState: { ...defaultPlayerState, isPlaying: false, currentFrame: 50, duration: 10, fps: 30 },
+      inPoint: 10,
+      outPoint: 50
+    });
+    render(<PlaybackControls />);
+    const button = screen.getByTitle('Play / Pause (Space)');
+    fireEvent.click(button);
+    expect(mockSeek).toHaveBeenCalledWith(10);
+    expect(mockPlay).toHaveBeenCalled();
+  });
 });
