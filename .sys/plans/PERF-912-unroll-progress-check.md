@@ -1,11 +1,11 @@
 ---
 id: PERF-912
 slug: unroll-progress-check
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-07-04
-completed: ""
-result: ""
+completed: "2024-07-04"
+result: "failed"
 ---
 # PERF-912: Unroll Progress Check inside Single and Multi-Worker Inner Fast Loops
 
@@ -67,3 +67,9 @@ Run `npx vitest run verify-canvas` to ensure the canvas path is untouched.
 
 ## Correctness Check
 Run `npm test -w packages/renderer` to ensure no frame synchronization regressions occurred.
+
+## Results Summary
+- **Best render time**: X.XXXs (vs baseline Y.YYYs)
+- **Improvement**: 0%
+- **Kept experiments**: None
+- **Discarded experiments**: PERF-912 unroll progress check
