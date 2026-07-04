@@ -9,6 +9,8 @@ Last updated by: PERF-823
 - [PERF-271] Combined `.catch` and `.then` handlers into a single `.then(resolve, reject)` in `CaptureLoop.ts` to reduce GC overhead and microtask serialization delays (~26.9% faster).
 
 ## What Doesn't Work (and Why)
+
+- PERF-912 attempted to replace omitted-initializer `for (; i < chunkEnd; i++)` loops with strict `while (i < chunkEnd) { ... i++ }` blocks in `CaptureLoop.ts` fast loops. However, the plan actually says "Unroll Progress Check inside Single and Multi-Worker Inner Fast Loops" and the progress check was already unrolled in the codebase (the chunking logic was already there). We discarded this change as it was a hallucinated task and introduced maintainability risks (infinite loops if a `continue` was added).
 - [PERF-466] Attempted to return direct promise chain in CdpTimeDriver.runSetTime instead of using async/await. DISCARDED because performance did not improve (median 23.91s vs 20.43s baseline). The overhead of async/await state machine in the hot loop is negligible compared to other factors like IPC, and the structural change slightly degraded execution time.
 - [PERF-409] Attempted to replace `Promise.race` with a manual wrapper promise in `CdpTimeDriver.ts` stability check. DISCARDED as IMPOSSIBLE DUPLICATION. Previous experiments (PERF-361/PERF-411) showed V8 handles Promise.race arrays very efficiently, and manual tracking adds overhead.
 - [PERF-361] Attempted to avoid `Promise.race` allocation in `SeekTimeDriver` injected script. DISCARDED because it was slower (48.761s vs 46.298s baseline). V8 handles the Promise.race array wrapper very efficiently, and the manual state machine added overhead.
