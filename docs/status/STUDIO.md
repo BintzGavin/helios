@@ -7,16 +7,17 @@
 **Posture**: ACTIVELY EXPANDING FOR V2
 
 # Studio Domain Status
+
 - [v0.122.3] ✅ Completed: Improve StudioContext Export Coverage - Reached 100% test coverage for StudioContext exportJobSpec and cancelExport.
 - [v0.107.4] ✅ Completed: Improve AudioMixerPanel Coverage - Reached 90%+ test coverage for AudioMixerPanel and DiagnosticsModal.
 - [v0.107.3] ✅ Completed: Improve PlaybackControls Coverage - Reached ~98% test coverage for PlaybackControls.
 - [v0.121.27] ✅ Completed: Improve RenderManager Test Coverage - Added 100% test coverage for RenderManager including `startRender`, `cancelJob`, `deleteJob` and `diagnoseServer`.
 - [v0.121.26] ✅ Completed: Improve AudioMeter Test Coverage - Added null ref handling tests to `AudioMeter.test.tsx` achieving 100% coverage.
 - [v0.121.25] ✅ Completed: Improve AudioMeter Coverage - Added unit tests for AudioMeter to ensure full line and branch coverage including clipping and warning thresholds.
-- [v0.121.24] ✅ Completed: STUDIO-Server-Templates-Test-Coverage - Verified tests are already fully implemented with 100% coverage (IMPOSSIBLE: DUPLICATION).
--[v0.121.19] ✅ Completed: TimecodeInput Test Coverage - Added comprehensive unit tests for the TimecodeInput component, increasing coverage to 100%.
+- [v0.121.24] ✅ Completed: STUDIO-Server-Templates-Test-Coverage - Verified tests are already fully implemented with 100% coverage (IMPOSSIBLE: DUPLICATION). -[v0.121.19] ✅ Completed: TimecodeInput Test Coverage - Added comprehensive unit tests for the TimecodeInput component, increasing coverage to 100%.
 
 [v0.121.17] ✅ Completed: STUDIO-Timeline-Scrubber - Verified timeline scrubber is already fully implemented as the Timeline.tsx component (IMPOSSIBLE: DUPLICATION).
+
 - [v0.121.16] ✅ Completed: Refine CLI Component Removal - Verified that the `helios remove` CLI command already deletes component files by default (IMPOSSIBLE: DUPLICATION).
 - [v0.121.16] ✅ Completed: Add JKL Playback Shortcuts - Verified that the `J, K, L` playback shortcuts are already implemented in `GlobalShortcuts.tsx` (IMPOSSIBLE: DUPLICATION).
 - [v0.121.16] ✅ Completed: Timeline Drag & Drop - Verified that the timeline drag drop logic is already fully implemented (IMPOSSIBLE: DUPLICATION).
@@ -27,14 +28,16 @@
 - [v0.121.8] ✅ Completed: STUDIO-Timeline-Drag-Drop - Verified timeline drag and drop for assets is already implemented (2026-11-13-STUDIO-Timeline-Drag-Drop.md).
 - [v0.121.7] ✅ Verified: Export Job Spec - Verified existing implementation of Export Job Spec functionality in Studio Renders Panel.
 - [v0.121.5] ✅ Completed: Toggle Loop Shortcut - Restored loop toggle functionality using Shift+L keyboard shortcut.
-**Status**: 🟢 Active
+  **Status**: 🟢 Active
 
 **Focus**: UI Implementation & CLI
 
 > **Note**: Status versions in this file may precede package release versions (`package.json`). Always verify `package.json` for the currently installed version.
+
 - [v0.119.5] ✅ Completed: Refine CLI Component Removal - Verified existing implementation of component file deletion and interactive confirmation prompts in `helios remove` command (2026-10-23-STUDIO-Refine-CLI-Component-Removal.md).
 
 ## Recent Updates
+
 - [v0.121.23] ✅ Completed: CompositionsPanel Test Coverage - Implemented comprehensive unit tests for `CompositionsPanel` component, increasing its coverage to 100%.
 - [v0.121.9] ✅ Completed: STUDIO-Update-Keyboard-Shortcuts-Documentation - Updated KeyboardShortcutsModal to include J, K, L playback shortcuts.
 - [v0.121.3] ✅ Completed: STUDIO-Timeline-Audio-Drag-Drop - Enabled dropping audio assets onto the Timeline and mapped them to composition inputs.
@@ -221,13 +224,14 @@
 - [2026-02-18] Initialized domain status and created scaffold plan.
 
 [v0.120.4] ✅ Completed: STUDIO-Timeline-Drag-Drop - Implemented drag and drop support for the Timeline to accept assets
+
 - [v0.120.2] ✅ Completed: STUDIO-Asset-Move - Implemented drag-and-drop to move assets into folders
 
 - [v0.121.4] ✅ Completed: STUDIO-Timeline-Drag-Drop - Added visual styling when dragging an asset over the Timeline component for visual feedback.
 - [v0.121.7] ✅ Completed: STUDIO-Timeline-Drag-Drop - Verified timeline drag and drop for assets is already implemented (2026-11-13-STUDIO-Timeline-Drag-Drop.md).
 - ❌ Blocked: 2026-11-14-STUDIO-Update-Keyboard-Shortcuts-Documentation is structurally obsolete as changes are already present.
-[v0.121.15] ✅ Completed: Document duplicated Timeline-Scrubber plan - Logged the duplicated plan as impossible since Timeline already supports scrubbing.
-[v0.121.14] ✅ Completed: Document duplicated Update-Keyboard-Shortcuts-Documentation plan - Logged the duplicated plan as impossible.
+  [v0.121.15] ✅ Completed: Document duplicated Timeline-Scrubber plan - Logged the duplicated plan as impossible since Timeline already supports scrubbing.
+  [v0.121.14] ✅ Completed: Document duplicated Update-Keyboard-Shortcuts-Documentation plan - Logged the duplicated plan as impossible.
 - ❌ Blocked: Waiting for a new, valid plan in /.sys/plans/ as existing plans are already implemented or obsolete.
 - [v0.121.18] ❌ Blocked: Waiting for a new, valid plan in /.sys/plans/ as existing plans are already implemented or obsolete.
 - [v0.121.21] ✅ Completed: STUDIO-Timeline-Drag-Drop - Verified timeline drag and drop is already implemented (IMPOSSIBLE: DUPLICATION).
@@ -236,12 +240,13 @@
 - [v0.121.23] ✅ Completed: Improve AudioMeter Coverage - Created plan to test AudioMeter component (2026-06-04-STUDIO-Improve-AudioMeter-Coverage.md).
 
 [v0.121.29] ✅ Completed: Improve AssistantModal Coverage - Test coverage increased to 100%.
+
 - [v0.121.30] ✅ Completed: Improve PropsEditor Coverage - Test coverage increased to ~99% line and branch coverage (2026-06-11-STUDIO-Improve-PropsEditor-Coverage.md).
-[v0.107.2] ✅ Completed: Improve SchemaInputs Coverage - Added unit test coverage for TypedArrayInput components in SchemaInputs.tsx
-[v0.107.2] ✅ Completed: Improve SchemaInputs Coverage - Added unit test coverage for TypedArrayInput components in SchemaInputs.tsx
-[v0.121.33] ✅ Completed: Improve StudioContext Coverage - Created plan to test uncalled lines in StudioContext file (2026-06-15-STUDIO-Improve-StudioContext-Coverage.md).
+  [v0.107.2] ✅ Completed: Improve SchemaInputs Coverage - Added unit test coverage for TypedArrayInput components in SchemaInputs.tsx
+  [v0.107.2] ✅ Completed: Improve SchemaInputs Coverage - Added unit test coverage for TypedArrayInput components in SchemaInputs.tsx
+  [v0.121.33] ✅ Completed: Improve StudioContext Coverage - Created plan to test uncalled lines in StudioContext file (2026-06-15-STUDIO-Improve-StudioContext-Coverage.md).
 - [v0.121.33] ✅ Completed: Improve StudioContext Coverage - Achieved 100% test coverage by addressing `useStudio` outside-provider exceptions and `openInEditor` fetch errors.
-[v0.121.34] ✅ Completed: Improve AudioMixerPanel Coverage - Created plan to test AudioMixerPanel and DiagnosticsModal components (2026-06-16-STUDIO-Improve-AudioMixerPanel-Coverage.md).
+  [v0.121.34] ✅ Completed: Improve AudioMixerPanel Coverage - Created plan to test AudioMixerPanel and DiagnosticsModal components (2026-06-16-STUDIO-Improve-AudioMixerPanel-Coverage.md).
 - [v0.122.1] ✅ Completed: Improve CaptionsPanel Coverage - Added test cases for missing branches in CaptionsPanel.tsx.
 - [v0.122.0] ✅ Completed: Improve Omnibar Test Coverage - Reached 100% test coverage for Omnibar by adding tests for commands, asset icons, and keyboard boundary edge cases.
 - [v0.122.2] ✅ Completed: Improve CaptionsPanel Coverage - Increased coverage to 100% by testing file uploads and time formatting edge cases (2026-06-18-STUDIO-Improve-CaptionsPanel-Coverage.md).
@@ -249,3 +254,4 @@
 - [v0.122.4] ✅ Completed: Improve TimecodeInput Coverage - Mocked framesToTimecode and added tests for fallback logic to reach 100% test coverage.
 - [v0.122.5] ✅ Completed: Add 100% unit test coverage for usePersistentState and useKeyboardShortcut hooks
 - [v0.122.6] ✅ Completed: STUDIO-Improve-PlaybackControls-Coverage - Achieved 100% test coverage for PlaybackControls by refactoring disabled state conditions.
+  [v0.122.7] ✅ Completed: STUDIO-Improve-AssetsPanel-Coverage - Fixed act() warnings and created plan for missing coverage in AssetItem.tsx and AssetsPanel.tsx.
