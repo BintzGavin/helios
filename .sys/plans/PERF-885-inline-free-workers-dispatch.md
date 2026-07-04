@@ -85,3 +85,9 @@ Run `npm test -w packages/renderer` to ensure canvas mode still works.
 
 ## Correctness Check
 Run `npm test -w packages/renderer` to verify DOM output is still correct.
+
+## Results Summary
+```
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	0.000	0	0.00	0.0	discard	Extracted dispatch block closure
+```

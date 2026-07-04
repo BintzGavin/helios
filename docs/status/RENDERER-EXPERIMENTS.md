@@ -86,8 +86,11 @@ Last updated by: PERF-873
 - **What Doesn't Work**: PERF-873 attempted to hoist the `startFrame + 1` calculation outside the inner chunked loops in `CaptureLoop.ts` to reduce addition operations per frame. Microbenchmarks showed a ~9-12% improvement in pure loop overhead. However, when integrated into the codebase, the experiment caused regressions in the test suite (`verify-cdp-shadow-dom-sync.ts`). The optimization was discarded to maintain frame correctness.
   - Plan: `PERF-873`
 
+- PERF-885: Evaluated inlining and deduplicating the `dispatchFreeWorkers` logic in `CaptureLoop.ts`.
+  - **WHY it didn't work:** Microbenchmarks showed that extracting the dispatch block into a local closure (`dispatchFreeWorkers()`) degraded performance by ~46%. V8 is able to better optimize the deeply inlined identical blocks inside the `try` scope because they avoid the function call overhead in the fast loop path.
+  - **Plan ID:** PERF-885
+
 ## Open Questions
-- PERF-885: Inline and De-duplicate Worker Dispatch in Multi-Worker Loop planned.
 - PERF-877: Fix Progress Spam in Multi-Worker Chunked Loops planned
 - Would chunked loops benefit multi-worker paths as well? (PERF-856) -> Yes, PERF-859 planned.
 - PERF-860: Single-worker chunked loops planned.
