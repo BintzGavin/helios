@@ -1,24 +1,29 @@
 #### 1. Context & Goal
-- **Objective**: Scaffold the `add` command for the component registry.
-- **Trigger**: `AGENTS.md` states the CLI should have registry commands, and the backlog explicitly lists "Implement CLI command to fetch and copy components". The current state only has `studio.ts`.
-- **Impact**: Unlocks the ability for users to fetch and copy Shadcn-style components directly into their Helios projects.
+- **Objective**: Implement the `helios add` CLI command to fetch and copy components from the registry.
+- **Trigger**: The V2 vision mandates a Shadcn-style registry, and the backlog explicitly requests "Implement CLI command to fetch and copy components." Currently, only `studio` exists.
+- **Impact**: Enables users to seamlessly adopt and modify core Helios components in their local repositories, unlocking the primary distribution model for V2.
 
 #### 2. File Inventory
-- **Create**: `packages/cli/src/commands/add.ts` (Implementation of the add command)
-- **Modify**: `packages/cli/src/index.ts` (Register the new add command with Commander.js)
-- **Read-Only**: `AGENTS.md`
+- **Create**: `packages/cli/src/commands/add.ts` (Implementation of the `add` command logic)
+- **Modify**: `packages/cli/src/index.ts` (Import and register the `add` subcommand with Commander.js)
+- **Read-Only**: `AGENTS.md` (To verify architectural constraints for components)
 
 #### 3. Implementation Spec
-- **Architecture**: Use Commander.js subcommands to implement `helios add [component]`. The command should fetch the component code from the registry URL and copy it into the user's local repository.
+- **Architecture**: Using Commander.js subcommands, the `add` command will accept a component name, fetch its definition and files from the registry URL, and write the raw source code into the user's project directory (e.g., `src/components/helios`).
 - **Pseudo-Code**:
-  - Register `add` command.
-  - Parse `component` argument.
-  - Fetch component code from registry.
-  - Write component code to local file system.
-- **Public API Changes**: Export `registerAddCommand(program: Command)` from `add.ts`.
-- **Dependencies**: The registry manifest format must be defined (already complete).
+  - Define `add` command with an argument `<componentName>`.
+  - Fetch component manifest from the registry API.
+  - Read configured destination path (or default to `src/components/helios`).
+  - For each file in the manifest, download the source content.
+  - Write files to the local file system.
+  - Print success message and usage instructions.
+- **Public API Changes**: Exports a new `addCommand` setup function for the CLI application.
+- **Dependencies**: None.
 
 #### 4. Test Plan
-- **Verification**: Run `cd packages/cli && npx ts-node src/index.ts add test-component` to verify the command executes.
-- **Success Criteria**: The command should successfully fetch and copy a component, or emit an appropriate error if the registry is unreachable.
-- **Edge Cases**: Missing component argument, registry fetch failure, local file write permissions.
+- **Verification**: `node packages/cli/dist/index.js add button` (or equivalent execution of `helios add button`)
+- **Success Criteria**: A new file `button.ts` (or `.tsx`) is successfully written to the target local directory, containing the correct registry code.
+- **Edge Cases**:
+  - Component does not exist in registry (handle 404).
+  - Destination file already exists (prompt for overwrite or abort safely).
+  - Network failure during fetch.
