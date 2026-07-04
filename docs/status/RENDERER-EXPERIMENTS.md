@@ -128,3 +128,6 @@ Last updated by: PERF-873
 
 ## What Works
 - **PERF-907**: Removed dead `if (isDomStrategy)` branches inside the single-worker `!isString` path in `CaptureLoop.ts`. Because `!isString` logically guarantees `!isDomStrategy`, this entire block of code was fundamentally unreachable. Removing it decreases parser overhead, shrinks JIT burden, and keeps AST smaller with minimal but positive performance impact (~0.5%).
+
+## What Works
+- **PERF-908**: Optimized free worker dispatch multi-worker loop in `CaptureLoop.ts` by replacing `while` condition block with an exact calculated loop limit.

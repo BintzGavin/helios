@@ -901,19 +901,17 @@ export class CaptureLoop {
 
         // See if we can assign tasks to waiting workers
         const maxSubmits = nextFrameToWrite + maxPipelineDepth;
-        while (
-          freeWorkersHead > 0 &&
-          nextFrameToSubmit < totalFrames &&
-                    nextFrameToSubmit < maxSubmits
-        ) {
-          const w = freeWorkers[--freeWorkersHead];
-          const i = nextFrameToSubmit++;
-          const ringIndex = i & ringMask;
-
-          frameBufferRing[ringIndex] = null;
-
-          workerThenables[w].resolve(i);
-        }
+                  const limit = maxSubmits < totalFrames ? maxSubmits : totalFrames;
+                  let dispatches = limit - nextFrameToSubmit;
+                  if (dispatches > 0) {
+                    if (dispatches > freeWorkersHead) dispatches = freeWorkersHead;
+                    while (dispatches-- > 0) {
+                      const w = freeWorkers[--freeWorkersHead];
+                      const i = nextFrameToSubmit++;
+                      frameBufferRing[i & ringMask] = null;
+                      workerThenables[w].resolve(i);
+                    }
+                  }
 
         // If we still have waiting workers but are at totalFrames, tell them to stop
         if (nextFrameToSubmit >= totalFrames) {
@@ -981,16 +979,16 @@ export class CaptureLoop {
                   writerWaiterPromise.resolve();
                 } else {
                   const maxSubmits = nextFrameToWrite + maxPipelineDepth;
-                  while (
-                    freeWorkersHead > 0 &&
-                    nextFrameToSubmit < totalFrames &&
-                    nextFrameToSubmit < maxSubmits
-                  ) {
-                    const w = freeWorkers[--freeWorkersHead];
-                    const n = nextFrameToSubmit++;
-                    const ringIndex = n & ringMask;
-                    frameBufferRing[ringIndex] = null;
-                    workerThenables[w].resolve(n);
+                  const limit = maxSubmits < totalFrames ? maxSubmits : totalFrames;
+                  let dispatches = limit - nextFrameToSubmit;
+                  if (dispatches > 0) {
+                    if (dispatches > freeWorkersHead) dispatches = freeWorkersHead;
+                    while (dispatches-- > 0) {
+                      const w = freeWorkers[--freeWorkersHead];
+                      const n = nextFrameToSubmit++;
+                      frameBufferRing[n & ringMask] = null;
+                      workerThenables[w].resolve(n);
+                    }
                   }
                   if (nextFrameToSubmit >= totalFrames) {
                     while (freeWorkersHead > 0) {
@@ -1048,16 +1046,16 @@ export class CaptureLoop {
                   writerWaiterPromise.resolve();
                 } else {
                   const maxSubmits = nextFrameToWrite + maxPipelineDepth;
-                  while (
-                    freeWorkersHead > 0 &&
-                    nextFrameToSubmit < totalFrames &&
-                    nextFrameToSubmit < maxSubmits
-                  ) {
-                    const w = freeWorkers[--freeWorkersHead];
-                    const n = nextFrameToSubmit++;
-                    const ringIndex = n & ringMask;
-                    frameBufferRing[ringIndex] = null;
-                    workerThenables[w].resolve(n);
+                  const limit = maxSubmits < totalFrames ? maxSubmits : totalFrames;
+                  let dispatches = limit - nextFrameToSubmit;
+                  if (dispatches > 0) {
+                    if (dispatches > freeWorkersHead) dispatches = freeWorkersHead;
+                    while (dispatches-- > 0) {
+                      const w = freeWorkers[--freeWorkersHead];
+                      const n = nextFrameToSubmit++;
+                      frameBufferRing[n & ringMask] = null;
+                      workerThenables[w].resolve(n);
+                    }
                   }
                   if (nextFrameToSubmit >= totalFrames) {
                     while (freeWorkersHead > 0) {
@@ -1117,16 +1115,16 @@ export class CaptureLoop {
                   writerWaiterPromise.resolve();
                 } else {
                   const maxSubmits = nextFrameToWrite + maxPipelineDepth;
-                  while (
-                    freeWorkersHead > 0 &&
-                    nextFrameToSubmit < totalFrames &&
-                    nextFrameToSubmit < maxSubmits
-                  ) {
-                    const w = freeWorkers[--freeWorkersHead];
-                    const n = nextFrameToSubmit++;
-                    const ringIndex = n & ringMask;
-                    frameBufferRing[ringIndex] = null;
-                    workerThenables[w].resolve(n);
+                  const limit = maxSubmits < totalFrames ? maxSubmits : totalFrames;
+                  let dispatches = limit - nextFrameToSubmit;
+                  if (dispatches > 0) {
+                    if (dispatches > freeWorkersHead) dispatches = freeWorkersHead;
+                    while (dispatches-- > 0) {
+                      const w = freeWorkers[--freeWorkersHead];
+                      const n = nextFrameToSubmit++;
+                      frameBufferRing[n & ringMask] = null;
+                      workerThenables[w].resolve(n);
+                    }
                   }
                   if (nextFrameToSubmit >= totalFrames) {
                     while (freeWorkersHead > 0) {
@@ -1179,16 +1177,16 @@ export class CaptureLoop {
                   writerWaiterPromise.resolve();
                 } else {
                   const maxSubmits = nextFrameToWrite + maxPipelineDepth;
-                  while (
-                    freeWorkersHead > 0 &&
-                    nextFrameToSubmit < totalFrames &&
-                    nextFrameToSubmit < maxSubmits
-                  ) {
-                    const w = freeWorkers[--freeWorkersHead];
-                    const n = nextFrameToSubmit++;
-                    const ringIndex = n & ringMask;
-                    frameBufferRing[ringIndex] = null;
-                    workerThenables[w].resolve(n);
+                  const limit = maxSubmits < totalFrames ? maxSubmits : totalFrames;
+                  let dispatches = limit - nextFrameToSubmit;
+                  if (dispatches > 0) {
+                    if (dispatches > freeWorkersHead) dispatches = freeWorkersHead;
+                    while (dispatches-- > 0) {
+                      const w = freeWorkers[--freeWorkersHead];
+                      const n = nextFrameToSubmit++;
+                      frameBufferRing[n & ringMask] = null;
+                      workerThenables[w].resolve(n);
+                    }
                   }
                   if (nextFrameToSubmit >= totalFrames) {
                     while (freeWorkersHead > 0) {
@@ -1286,17 +1284,17 @@ export class CaptureLoop {
             nextFrameToWrite++;
             if (freeWorkersHead > 0) {
                 const maxSubmits = nextFrameToWrite + maxPipelineDepth;
-                while (
-                  freeWorkersHead > 0 &&
-                  nextFrameToSubmit < totalFrames &&
-                    nextFrameToSubmit < maxSubmits
-                ) {
-                  const w = freeWorkers[--freeWorkersHead];
-                  const n = nextFrameToSubmit++;
-                  const ringIndex = n & ringMask;
-                  frameBufferRing[ringIndex] = null;
-                  workerThenables[w].resolve(n);
-                }
+                  const limit = maxSubmits < totalFrames ? maxSubmits : totalFrames;
+                  let dispatches = limit - nextFrameToSubmit;
+                  if (dispatches > 0) {
+                    if (dispatches > freeWorkersHead) dispatches = freeWorkersHead;
+                    while (dispatches-- > 0) {
+                      const w = freeWorkers[--freeWorkersHead];
+                      const n = nextFrameToSubmit++;
+                      frameBufferRing[n & ringMask] = null;
+                      workerThenables[w].resolve(n);
+                    }
+                  }
                 if (nextFrameToSubmit >= totalFrames) {
                   while (freeWorkersHead > 0) {
                     const w = freeWorkers[--freeWorkersHead];
@@ -1353,16 +1351,16 @@ export class CaptureLoop {
 
               if (freeWorkersHead > 0) {
                 const maxSubmits = nextFrameToWrite + maxPipelineDepth;
-                  while (
-                    freeWorkersHead > 0 &&
-                    nextFrameToSubmit < totalFrames &&
-                    nextFrameToSubmit < maxSubmits
-                  ) {
-                    const w = freeWorkers[--freeWorkersHead];
-                    const n = nextFrameToSubmit++;
-                    const ringIndex = n & ringMask;
-                    frameBufferRing[ringIndex] = null;
-                    workerThenables[w].resolve(n);
+                  const limit = maxSubmits < totalFrames ? maxSubmits : totalFrames;
+                  let dispatches = limit - nextFrameToSubmit;
+                  if (dispatches > 0) {
+                    if (dispatches > freeWorkersHead) dispatches = freeWorkersHead;
+                    while (dispatches-- > 0) {
+                      const w = freeWorkers[--freeWorkersHead];
+                      const n = nextFrameToSubmit++;
+                      frameBufferRing[n & ringMask] = null;
+                      workerThenables[w].resolve(n);
+                    }
                   }
                   if (nextFrameToSubmit >= totalFrames) {
                     while (freeWorkersHead > 0) {
@@ -1416,16 +1414,16 @@ export class CaptureLoop {
 
               if (freeWorkersHead > 0) {
                 const maxSubmits = nextFrameToWrite + maxPipelineDepth;
-                  while (
-                    freeWorkersHead > 0 &&
-                    nextFrameToSubmit < totalFrames &&
-                    nextFrameToSubmit < maxSubmits
-                  ) {
-                    const w = freeWorkers[--freeWorkersHead];
-                    const n = nextFrameToSubmit++;
-                    const ringIndex = n & ringMask;
-                    frameBufferRing[ringIndex] = null;
-                    workerThenables[w].resolve(n);
+                  const limit = maxSubmits < totalFrames ? maxSubmits : totalFrames;
+                  let dispatches = limit - nextFrameToSubmit;
+                  if (dispatches > 0) {
+                    if (dispatches > freeWorkersHead) dispatches = freeWorkersHead;
+                    while (dispatches-- > 0) {
+                      const w = freeWorkers[--freeWorkersHead];
+                      const n = nextFrameToSubmit++;
+                      frameBufferRing[n & ringMask] = null;
+                      workerThenables[w].resolve(n);
+                    }
                   }
                   if (nextFrameToSubmit >= totalFrames) {
                     while (freeWorkersHead > 0) {
