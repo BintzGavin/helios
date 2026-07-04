@@ -1,11 +1,11 @@
 ---
 id: PERF-913
 slug: unroll-writer-wait-loop
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-07-04
 completed: ""
-result: ""
+result: "keep"
 ---
 # PERF-913: Unroll Writer Wait Loop in Multi-Worker Capture
 
