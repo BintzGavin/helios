@@ -134,3 +134,6 @@ Last updated by: PERF-873
 
 ## What Works
 - **PERF-908**: Optimized free worker dispatch multi-worker loop in `CaptureLoop.ts` by replacing `while` condition block with an exact calculated loop limit.
+
+## What Works
+- **PERF-910**: Removed dead mathematically unreachable code in `CaptureLoop.ts` fast loop else blocks. Evaluated loop counts per microbenchmark frame simulation dropped drastically from ~275ms down to ~64ms.

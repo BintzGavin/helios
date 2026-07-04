@@ -971,32 +971,6 @@ export class CaptureLoop {
                 frameBufferRing[ringIndex] = null;
               } else {
                 freeWorkers[freeWorkersHead++] = workerIndex;
-                if (aborted) {
-                  while (freeWorkersHead > 0) {
-                    const w = freeWorkers[--freeWorkersHead];
-                    workerThenables[w].resolve(-1);
-                  }
-                  writerWaiterPromise.resolve();
-                } else {
-                  const maxSubmits = nextFrameToWrite + maxPipelineDepth;
-                  const limit = maxSubmits < totalFrames ? maxSubmits : totalFrames;
-                  let dispatches = limit - nextFrameToSubmit;
-                  if (dispatches > 0) {
-                    if (dispatches > freeWorkersHead) dispatches = freeWorkersHead;
-                    while (dispatches-- > 0) {
-                      const w = freeWorkers[--freeWorkersHead];
-                      const n = nextFrameToSubmit++;
-                      frameBufferRing[n & ringMask] = null;
-                      workerThenables[w].resolve(n);
-                    }
-                  }
-                  if (nextFrameToSubmit >= totalFrames) {
-                    while (freeWorkersHead > 0) {
-                      const w = freeWorkers[--freeWorkersHead];
-                      workerThenables[w].resolve(-1);
-                    }
-                  }
-                }
                 i = (await workerThenables[workerIndex]) as any as number;
               }
 
@@ -1038,32 +1012,6 @@ export class CaptureLoop {
                 frameBufferRing[ringIndex] = null;
               } else {
                 freeWorkers[freeWorkersHead++] = workerIndex;
-                if (aborted) {
-                  while (freeWorkersHead > 0) {
-                    const w = freeWorkers[--freeWorkersHead];
-                    workerThenables[w].resolve(-1);
-                  }
-                  writerWaiterPromise.resolve();
-                } else {
-                  const maxSubmits = nextFrameToWrite + maxPipelineDepth;
-                  const limit = maxSubmits < totalFrames ? maxSubmits : totalFrames;
-                  let dispatches = limit - nextFrameToSubmit;
-                  if (dispatches > 0) {
-                    if (dispatches > freeWorkersHead) dispatches = freeWorkersHead;
-                    while (dispatches-- > 0) {
-                      const w = freeWorkers[--freeWorkersHead];
-                      const n = nextFrameToSubmit++;
-                      frameBufferRing[n & ringMask] = null;
-                      workerThenables[w].resolve(n);
-                    }
-                  }
-                  if (nextFrameToSubmit >= totalFrames) {
-                    while (freeWorkersHead > 0) {
-                      const w = freeWorkers[--freeWorkersHead];
-                      workerThenables[w].resolve(-1);
-                    }
-                  }
-                }
                 i = (await workerThenables[workerIndex]) as any as number;
               }
 
@@ -1107,32 +1055,6 @@ export class CaptureLoop {
                 frameBufferRing[ringIndex] = null;
               } else {
                 freeWorkers[freeWorkersHead++] = workerIndex;
-                if (aborted) {
-                  while (freeWorkersHead > 0) {
-                    const w = freeWorkers[--freeWorkersHead];
-                    workerThenables[w].resolve(-1);
-                  }
-                  writerWaiterPromise.resolve();
-                } else {
-                  const maxSubmits = nextFrameToWrite + maxPipelineDepth;
-                  const limit = maxSubmits < totalFrames ? maxSubmits : totalFrames;
-                  let dispatches = limit - nextFrameToSubmit;
-                  if (dispatches > 0) {
-                    if (dispatches > freeWorkersHead) dispatches = freeWorkersHead;
-                    while (dispatches-- > 0) {
-                      const w = freeWorkers[--freeWorkersHead];
-                      const n = nextFrameToSubmit++;
-                      frameBufferRing[n & ringMask] = null;
-                      workerThenables[w].resolve(n);
-                    }
-                  }
-                  if (nextFrameToSubmit >= totalFrames) {
-                    while (freeWorkersHead > 0) {
-                      const w = freeWorkers[--freeWorkersHead];
-                      workerThenables[w].resolve(-1);
-                    }
-                  }
-                }
                 i = (await workerThenables[workerIndex]) as any as number;
               }
 
@@ -1169,32 +1091,6 @@ export class CaptureLoop {
                 frameBufferRing[ringIndex] = null;
               } else {
                 freeWorkers[freeWorkersHead++] = workerIndex;
-                if (aborted) {
-                  while (freeWorkersHead > 0) {
-                    const w = freeWorkers[--freeWorkersHead];
-                    workerThenables[w].resolve(-1);
-                  }
-                  writerWaiterPromise.resolve();
-                } else {
-                  const maxSubmits = nextFrameToWrite + maxPipelineDepth;
-                  const limit = maxSubmits < totalFrames ? maxSubmits : totalFrames;
-                  let dispatches = limit - nextFrameToSubmit;
-                  if (dispatches > 0) {
-                    if (dispatches > freeWorkersHead) dispatches = freeWorkersHead;
-                    while (dispatches-- > 0) {
-                      const w = freeWorkers[--freeWorkersHead];
-                      const n = nextFrameToSubmit++;
-                      frameBufferRing[n & ringMask] = null;
-                      workerThenables[w].resolve(n);
-                    }
-                  }
-                  if (nextFrameToSubmit >= totalFrames) {
-                    while (freeWorkersHead > 0) {
-                      const w = freeWorkers[--freeWorkersHead];
-                      workerThenables[w].resolve(-1);
-                    }
-                  }
-                }
                 i = (await workerThenables[workerIndex]) as any as number;
               }
 

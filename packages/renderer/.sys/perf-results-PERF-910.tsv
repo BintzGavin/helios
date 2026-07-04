@@ -1,0 +1,3 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	275.49	1000000	3629.89	0.0	keep	baseline
+2	64.18	1000000	15581.17	0.0	keep	Remove Dead Dispatch Logic in Worker Wait Paths
