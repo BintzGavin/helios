@@ -1,8 +1,9 @@
 ---
 id: PERF-922
 slug: separate-increments
-status: unclaimed
-claimed_by: ""
+status: complete
+result: improved
+claimed_by: "executor-session"
 created: 2024-07-06
 completed: ""
 result: ""
@@ -69,3 +70,9 @@ Run `npx vitest run verify-canvas` (or equivalent smoke test script) to ensure t
 
 ## Correctness Check
 Run `npm test -w packages/renderer` to ensure frame generation bounds and array indexes remain exactly the same.
+
+## Results Summary
+- **Best render time**: 2.700s (vs baseline 2.960s)
+- **Improvement**: ~8.8%
+- **Kept experiments**: Separated pre/post increments in `CaptureLoop.ts`
+- **Discarded experiments**: None

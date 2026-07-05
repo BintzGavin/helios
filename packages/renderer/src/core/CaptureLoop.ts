@@ -907,8 +907,10 @@ export class CaptureLoop {
                   if (dispatches > 0) {
                     dispatches = Math.min(dispatches, freeWorkersHead);
                     while (dispatches-- > 0) {
-                      const w = freeWorkers[--freeWorkersHead];
-                      const i = nextFrameToSubmit++;
+                      freeWorkersHead--;
+                      const w = freeWorkers[freeWorkersHead];
+                      const i = nextFrameToSubmit;
+                      nextFrameToSubmit++;
                       frameBufferRing[i & ringMask] = null;
                       workerThenables[w].resolve(i);
                     }
@@ -1186,8 +1188,10 @@ export class CaptureLoop {
                   if (dispatches > 0) {
                     dispatches = Math.min(dispatches, freeWorkersHead);
                     while (dispatches-- > 0) {
-                      const w = freeWorkers[--freeWorkersHead];
-                      const n = nextFrameToSubmit++;
+                      freeWorkersHead--;
+                      const w = freeWorkers[freeWorkersHead];
+                      const n = nextFrameToSubmit;
+                      nextFrameToSubmit++;
                       frameBufferRing[n & ringMask] = null;
                       workerThenables[w].resolve(n);
                     }
@@ -1253,8 +1257,10 @@ export class CaptureLoop {
                   if (dispatches > 0) {
                     dispatches = Math.min(dispatches, freeWorkersHead);
                     while (dispatches-- > 0) {
-                      const w = freeWorkers[--freeWorkersHead];
-                      const n = nextFrameToSubmit++;
+                      freeWorkersHead--;
+                      const w = freeWorkers[freeWorkersHead];
+                      const n = nextFrameToSubmit;
+                      nextFrameToSubmit++;
                       frameBufferRing[n & ringMask] = null;
                       workerThenables[w].resolve(n);
                     }
@@ -1316,8 +1322,10 @@ export class CaptureLoop {
                   if (dispatches > 0) {
                     dispatches = Math.min(dispatches, freeWorkersHead);
                     while (dispatches-- > 0) {
-                      const w = freeWorkers[--freeWorkersHead];
-                      const n = nextFrameToSubmit++;
+                      freeWorkersHead--;
+                      const w = freeWorkers[freeWorkersHead];
+                      const n = nextFrameToSubmit;
+                      nextFrameToSubmit++;
                       frameBufferRing[n & ringMask] = null;
                       workerThenables[w].resolve(n);
                     }
