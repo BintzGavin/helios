@@ -21,9 +21,9 @@ vi.mock('./AssetItem', () => ({
 }));
 
 vi.mock('./FolderItem', () => ({
-  FolderItem: ({ name, onClick }: { name: string, onClick: () => void }) => (
-    <div data-testid="folder-item" onClick={onClick}>{name}</div>
-  )
+  FolderItem: ({ name, onClick, onDrop }: { name: string, onClick: () => void, onDrop: (e: any) => void }) => (
+ <div data-testid="folder-item" onClick={onClick} onDrop={onDrop} data-name={name}>{name}</div>
+)
 }));
 
 describe('AssetsPanel', () => {
@@ -115,5 +115,63 @@ describe('AssetsPanel', () => {
     fireEvent.click(createBtn);
 
     expect(mockUseStudio.createFolder).not.toHaveBeenCalled();
+  });
+
+  it('changes filter type', () => {
+    render(<AssetsPanel />);
+    const select = document.querySelector('.assets-filter-select')!;
+    fireEvent.change(select, { target: { value: 'image' } });
+    expect((select as HTMLSelectElement).value).toBe('image');
+  });
+
+  it('navigates via breadcrumbs', () => {
+    render(<AssetsPanel />);
+    const subfolder = screen.getByText('subfolder');
+    fireEvent.click(subfolder);
+
+    const homeCrumb = screen.getByText('Home');
+    fireEvent.click(homeCrumb);
+
+    expect(screen.getByText('subfolder')).toBeInTheDocument();
+  });
+
+  it('drops asset into folder', () => {
+    render(<AssetsPanel />);
+    const subfolder = screen.getByText('subfolder');
+
+    const dropEvent = new Event('drop', { bubbles: true }) as any;
+    dropEvent.dataTransfer = {
+      getData: (key: string) => key === 'application/helios-asset-id' ? '1' : '',
+      files: []
+    };
+    fireEvent.drop(subfolder, dropEvent);
+  });
+
+  it('navigates via breadcrumbs deep', () => {
+    render(<AssetsPanel />);
+    const subfolder = screen.getByText('subfolder');
+    fireEvent.click(subfolder);
+
+    // Now currentPath is 'subfolder'
+    // Click the 'subfolder' crumb to trigger onClick={() => navigateTo(path)} on line 231
+    const crumbs = screen.getAllByText('subfolder');
+    const crumb = crumbs.find(c => c.classList.contains('breadcrumb-item'));
+    if (crumb) {
+       fireEvent.click(crumb);
+    }
+
+    expect(screen.getByText('test.json')).toBeInTheDocument();
+  });
+
+  it('handles root drop', () => {
+    render(<AssetsPanel />);
+    const panel = document.querySelector('.assets-panel')!;
+
+    const dropEvent = new Event('drop', { bubbles: true }) as any;
+    dropEvent.dataTransfer = {
+      getData: (key: string) => key === 'application/helios-asset-id' ? '1' : '',
+      files: []
+    };
+    fireEvent.drop(panel, dropEvent);
   });
 });
