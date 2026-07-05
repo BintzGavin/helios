@@ -1,6 +1,6 @@
 # Status: LLMS
 [v1.114.0] ✅ Completed: Comprehensive Daily Review - Updated Key Files to include `packages/studio/src/server/render-manager.ts`. Verified package versions and existing completions.
-**Version**: 1.116.0
+**Version**: 1.117.0
 
 [v1.116.0] ✅ Completed: Comprehensive Daily Review - Synced Roadmap with recent verifiable completions from domain PROGRESS logs (Core: WaitUntilStable, Diagnose, Testing; Studio: CLI Build/Update, Refine Skills; Player: Sandbox/Bridge, setMediaKeys, Refactor Control Logic; Renderer: Smart Audio Fades, Distributed Audio Mixing, CdpTimeDriver Iframe Sync; CLI: Command Coverage V7, Registry Client Coverage; Infrastructure: Optimize S3 Uploads, Orchestrator Coverage Expansion). Verified all package versions and Key Files.
 
@@ -229,3 +229,5 @@ Verified package versions match package.json exactly. Verified File Paths and Ke
 [v1.108.0] ✅ Completed: Daily llms.txt Review - Synced Roadmap with recent verifiable completions across Studio, CLI, Core, Player, Renderer, and Infrastructure domains. Verified package versions exactly match package.json.
 
 [v1.115.0] ✅ Completed: Daily llms.txt Review - Verified versions and roadmap
+
+[v1.117.0] ✅ Completed: Comprehensive Daily Review - Synced Roadmap with recent verifiable completions from domain PROGRESS logs (Studio: Component Management, Preview Command; CLI: CLI Utils Coverage Tests, Registry Client Coverage; Renderer: Fix GSAP Timeline Synchronization; Infrastructure: Cloudflare Sandbox Adapter, R2 Storage Adapter). Verified all package versions exactly match package.json. Verified Key Files and Agent Skills section.
