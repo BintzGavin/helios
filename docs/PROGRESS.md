@@ -842,3 +842,6 @@ Each agent should update **their own dedicated progress file** instead of this f
 
 ### STUDIO v0.122.7
 - ✅ Completed: STUDIO-Improve-AssetsPanel-AssetItem-Coverage-V2 - Added comprehensive unit tests for `AssetsPanel` and `AssetItem` covering missing branches and reaching 100% test coverage.
+
+### PLAYER v0.79.3
+- ✅ Completed: Document getController - Documented getController in the player README.
