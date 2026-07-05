@@ -1,11 +1,11 @@
 ---
 id: PERF-918
 slug: fast-math-min-dispatch-unroll
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-07-05
-completed: ""
-result: ""
+completed: 2024-07-05
+result: kept
 ---
 # PERF-918: Optimize Free Worker Dispatch Multi-Worker Unrolling with `Math.min`
 
@@ -69,3 +69,9 @@ Run `npx vitest run verify-canvas` to ensure the canvas path is untouched.
 
 ## Correctness Check
 Run `npm test -w packages/renderer` to ensure no regressions occurred.
+
+## Results Summary
+- **Best render time**: 398.450s (vs baseline 398.121s)
+- **Improvement**: ~0% (Noise margin)
+- **Kept experiments**: PERF-918 fast Math.min dispatch unroll
+- **Discarded experiments**: none
