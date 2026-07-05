@@ -141,3 +141,6 @@ Last updated by: PERF-873
 - **What Works:** PERF-913 unrolled the writer wait loop (`while (frameBufferRing[ringIndex] === null && !aborted)`) inside the multi-worker fast paths of `CaptureLoop.ts`.
   - **Improvement:** Removed V8 branch evaluation overhead by eliminating `continue` loop jumps during frame polling. This yielded a ~2.6% microbenchmark improvement in wait loop processing.
   - **Plan ID:** PERF-913
+- **PERF-917**: Evaluated native `stream.write(str, "base64")` to avoid user-space pooling in multi-worker `CaptureLoop.ts`.
+  - **WHY it didn't work:** Microbenchmarks under Node v22 demonstrated that native stream base64 writing introduces significant overhead (multiple transformations/allocations under the hood) compared to the highly optimized `buffer.write(str, "base64")` within pre-allocated user-space V8 buffers. Performance regressions were up to ~74% for 150KB payloads.
+  - **Plan ID:** PERF-917
