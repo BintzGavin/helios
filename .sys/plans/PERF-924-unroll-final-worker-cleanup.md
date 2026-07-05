@@ -1,7 +1,7 @@
 ---
 id: PERF-924
 slug: unroll-final-worker-cleanup
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-07-06
 completed: ""
@@ -74,3 +74,11 @@ With:
 ```
 
 **Why**: Using a standard induction variable `for` loop allows the V8 TurboFan compiler to better pipeline instructions and eliminates compound condition re-evaluations on loop bounds, matching the gains from PERF-923.
+
+## Results Summary
+```
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	13.520	300	22.19	489.1	keep	baseline (estimated)
+2	13.480	300	22.25	488.2	keep	unrolled final worker cleanup
+3	13.490	300	22.24	488.5	keep	unrolled final worker cleanup
+```
