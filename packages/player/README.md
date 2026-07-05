@@ -158,6 +158,8 @@ Both class-level and instance-level properties are provided for standard media s
 - `setMediaKeys(mediaKeys: MediaKeys | null): Promise<void>` - Sets the MediaKeys object to use for decrypting media.
 
 - `play(): Promise<void>` - Starts playback.
+- `getController(): HeliosController | null` - Retrieves the underlying HeliosController instance, if connected.
+
 - `getSchema(): Promise<HeliosSchema | undefined>` - Retrieves the input properties schema from the composition.
 - `pause(): void` - Pauses playback.
 - `setPlaybackRange(startFrame: number, endFrame: number): void` - Sets the playback range to a specific start and end frame.

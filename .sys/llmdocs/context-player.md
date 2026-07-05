@@ -52,6 +52,7 @@ Observed attributes:
 - `captureStream(): Promise<MediaStream>`
 - `export(options?: ExportOptions): Promise<void>`
 - `diagnose(): Promise<DiagnosticReport>`
+- `getController(): HeliosController | null`
 - `startAudioMetering(): void`
 - `stopAudioMetering(): void`
 - `addTextTrack(kind: TextTrackKind, label?: string, language?: string): TextTrack`
