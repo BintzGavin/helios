@@ -963,12 +963,10 @@ export class CaptureLoop {
 
         if (hasProcessFn) {
           if (isDomStrategy) {
+            let maxSubmits = nextFrameToWrite + maxPipelineDepth;
             while (!aborted && nextFrameToSubmit < totalFrames) {
               let i: number;
-              if (
-                nextFrameToSubmit - nextFrameToWrite <
-                maxPipelineDepth
-              ) {
+              if (nextFrameToSubmit < maxSubmits) {
                 i = nextFrameToSubmit++;
                 const ringIndex = i & ringMask;
 
@@ -976,6 +974,7 @@ export class CaptureLoop {
               } else {
                 freeWorkers[freeWorkersHead++] = workerIndex;
                 i = (await workerThenables[workerIndex]) as any as number;
+                maxSubmits = nextFrameToWrite + maxPipelineDepth;
               }
 
               if (i === -1) break;
@@ -1004,12 +1003,10 @@ export class CaptureLoop {
               writerWaiterPromise.resolve();
             }
           } else {
+            let maxSubmits = nextFrameToWrite + maxPipelineDepth;
             while (!aborted && nextFrameToSubmit < totalFrames) {
               let i: number;
-              if (
-                nextFrameToSubmit - nextFrameToWrite <
-                maxPipelineDepth
-              ) {
+              if (nextFrameToSubmit < maxSubmits) {
                 i = nextFrameToSubmit++;
                 const ringIndex = i & ringMask;
 
@@ -1017,6 +1014,7 @@ export class CaptureLoop {
               } else {
                 freeWorkers[freeWorkersHead++] = workerIndex;
                 i = (await workerThenables[workerIndex]) as any as number;
+                maxSubmits = nextFrameToWrite + maxPipelineDepth;
               }
 
               if (i === -1) break;
@@ -1047,12 +1045,10 @@ export class CaptureLoop {
           }
         } else {
           if (isDomStrategy) {
+            let maxSubmits = nextFrameToWrite + maxPipelineDepth;
             while (!aborted && nextFrameToSubmit < totalFrames) {
               let i: number;
-              if (
-                nextFrameToSubmit - nextFrameToWrite <
-                maxPipelineDepth
-              ) {
+              if (nextFrameToSubmit < maxSubmits) {
                 i = nextFrameToSubmit++;
                 const ringIndex = i & ringMask;
 
@@ -1060,6 +1056,7 @@ export class CaptureLoop {
               } else {
                 freeWorkers[freeWorkersHead++] = workerIndex;
                 i = (await workerThenables[workerIndex]) as any as number;
+                maxSubmits = nextFrameToWrite + maxPipelineDepth;
               }
 
               if (i === -1) break;
@@ -1083,12 +1080,10 @@ export class CaptureLoop {
               writerWaiterPromise.resolve();
             }
           } else {
+            let maxSubmits = nextFrameToWrite + maxPipelineDepth;
             while (!aborted && nextFrameToSubmit < totalFrames) {
               let i: number;
-              if (
-                nextFrameToSubmit - nextFrameToWrite <
-                maxPipelineDepth
-              ) {
+              if (nextFrameToSubmit < maxSubmits) {
                 i = nextFrameToSubmit++;
                 const ringIndex = i & ringMask;
 
@@ -1096,6 +1091,7 @@ export class CaptureLoop {
               } else {
                 freeWorkers[freeWorkersHead++] = workerIndex;
                 i = (await workerThenables[workerIndex]) as any as number;
+                maxSubmits = nextFrameToWrite + maxPipelineDepth;
               }
 
               if (i === -1) break;

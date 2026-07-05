@@ -3,6 +3,9 @@ Current best: 1.831s (baseline was 1.831s, -0%)
 Last updated by: PERF-873
 
 ## What Works
+- **What Works:** PERF-903 hoisted the `nextFrameToSubmit - nextFrameToWrite < maxPipelineDepth` loop boundary condition out of the inner single-worker and multi-worker wait loops inside `runWorker` in `CaptureLoop.ts` by precalculating `maxSubmits`.
+  - **Improvement:** ~8-9% performance improvement in the tight loop iteration time in microbenchmarks (from ~7.7s to ~7.0s for 10M iterations).
+  - **Plan ID:** PERF-903
 - **What Works:** PERF-922 separated compound pre-decrement and post-increment operations (`const w = freeWorkers[--freeWorkersHead]; const n = nextFrameToSubmit++;`) into separate statements in the multi-worker paths of `CaptureLoop.ts`.
   - **Improvement:** ~8.8% faster overhead in microbenchmarks. Uncoupling the math from the load allows V8/CPU to pipeline operations rather than forcing sequential evaluation.
   - **Plan ID:** PERF-922

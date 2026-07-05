@@ -1,7 +1,7 @@
 ---
 id: PERF-903
 slug: hoist-max-submits-inner-loop
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-07-03
 completed: ""
@@ -77,3 +77,10 @@ Run `npx vitest run verify-canvas` to ensure the canvas path is untouched.
 
 ## Correctness Check
 Run `npm test -w packages/renderer` to ensure no frame synchronization regressions occurred.
+
+## Results Summary
+```tsv
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	7.700	10000000	1298701.30	100.0	keep	baseline
+2	7.073	10000000	1413827.23	100.0	keep	hoist maxSubmits loop boundary
+```
