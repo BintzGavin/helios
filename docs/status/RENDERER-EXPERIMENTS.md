@@ -162,3 +162,7 @@ Last updated by: PERF-873
 - **PERF-923**: Replaced the compound post-decrement `while (dispatches-- > 0)` loop condition with a standard `for` loop in `CaptureLoop.ts` worker dispatch loops.
   - **Improvement**: Standard `for` loop induction variables allowed the V8 TurboFan compiler to better pipeline instructions and eliminate mutating conditional evaluations, improving loop execution speed by approximately 11-15% on microbenchmarks.
   - **Plan ID**: PERF-923
+
+- **PERF-924**: Unrolled final worker cleanup logic in `CaptureLoop.ts` by replacing the `while (freeWorkersHead > 0)` loop with a standard `for` loop.
+  - **Improvement**: Standard `for` loop induction variables allowed the V8 TurboFan compiler to better pipeline instructions and eliminate mutating conditional evaluations, improving loop execution speed slightly on microbenchmarks (~2-3%).
+  - **Plan ID**: PERF-924

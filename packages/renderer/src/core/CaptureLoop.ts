@@ -918,10 +918,11 @@ export class CaptureLoop {
 
         // If we still have waiting workers but are at totalFrames, tell them to stop
         if (nextFrameToSubmit === totalFrames) {
-          while (freeWorkersHead > 0) {
-            const w = freeWorkers[--freeWorkersHead];
+          for (let j = 0; j < freeWorkersHead; j++) {
+            const w = freeWorkers[j];
             workerThenables[w].resolve(-1);
           }
+          freeWorkersHead = 0;
         }
       };
 
@@ -1197,10 +1198,11 @@ export class CaptureLoop {
                     }
                   }
                 if (nextFrameToSubmit === totalFrames) {
-                  while (freeWorkersHead > 0) {
-                    const w = freeWorkers[--freeWorkersHead];
+                  for (let j = 0; j < freeWorkersHead; j++) {
+                    const w = freeWorkers[j];
                     workerThenables[w].resolve(-1);
-                }
+                  }
+                  freeWorkersHead = 0;
               }
             }
             break;
@@ -1266,10 +1268,11 @@ export class CaptureLoop {
                     }
                   }
                   if (nextFrameToSubmit === totalFrames) {
-                    while (freeWorkersHead > 0) {
-                      const w = freeWorkers[--freeWorkersHead];
+                    for (let j = 0; j < freeWorkersHead; j++) {
+                      const w = freeWorkers[j];
                       workerThenables[w].resolve(-1);
-            }
+                    }
+                    freeWorkersHead = 0;
                 }
               }
 
@@ -1331,10 +1334,11 @@ export class CaptureLoop {
                     }
                   }
                   if (nextFrameToSubmit === totalFrames) {
-                    while (freeWorkersHead > 0) {
-                      const w = freeWorkers[--freeWorkersHead];
+                    for (let j = 0; j < freeWorkersHead; j++) {
+                      const w = freeWorkers[j];
                       workerThenables[w].resolve(-1);
-            }
+                    }
+                    freeWorkersHead = 0;
                 }
               }
 
