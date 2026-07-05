@@ -149,3 +149,8 @@ Last updated by: PERF-873
 - **PERF-918**: Optimized the free worker dispatch boundary conditions in `CaptureLoop.ts` by replacing the inner `if (dispatches > freeWorkersHead)` bound condition with `Math.min(dispatches, freeWorkersHead)`.
   - **Improvement:** Microbenchmarks showed execution speed reduction of ~24% due to V8's native compilation of `Math.min` into branchless conditional moves, bypassing branch predictors on the queue management paths.
   - **Plan ID:** PERF-918
+
+## What Works
+- **PERF-920**: Enforced a minimum `progressInterval` of 1 in `CaptureLoop.ts`.
+  - **Improvement:** Fixed an infinite loop / process hang during short (< 10 frames) chunked rendering paths.
+  - **Plan ID:** PERF-920

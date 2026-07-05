@@ -138,7 +138,8 @@ export class CaptureLoop {
     const capturedErrors = this.capturedErrors;
     const stdin = this.ffmpegManager.stdin;
 
-    const progressInterval = Math.floor(totalFrames / 10);
+    let progressInterval = Math.floor(totalFrames / 10);
+    if (progressInterval < 1) progressInterval = 1;
 
     const timeStep = 1000 / fps;
     const compTimeStep = 1 / fps;

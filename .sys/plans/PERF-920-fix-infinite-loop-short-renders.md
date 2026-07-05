@@ -1,11 +1,11 @@
 ---
 id: PERF-920
 slug: fix-infinite-loop-short-renders
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "Jules"
 created: 2024-07-06
-completed: ""
-result: ""
+completed: "2024-07-06"
+result: "keep"
 ---
 # PERF-920: Fix Infinite Loop on Short Renders by Enforcing Minimum Progress Interval
 
@@ -69,3 +69,9 @@ None.
 
 ## Correctness Check
 Run FFmpeg verify scripts with a 5-frame composition to ensure they complete successfully.
+
+## Results Summary
+```
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	0.341	5	14.66	0.0	keep	fix infinite loop short renders
+```
