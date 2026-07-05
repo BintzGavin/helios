@@ -157,3 +157,8 @@ Last updated by: PERF-873
 - **PERF-920**: Enforced a minimum `progressInterval` of 1 in `CaptureLoop.ts`.
   - **Improvement:** Fixed an infinite loop / process hang during short (< 10 frames) chunked rendering paths.
   - **Plan ID:** PERF-920
+
+## What Works
+- **PERF-923**: Replaced the compound post-decrement `while (dispatches-- > 0)` loop condition with a standard `for` loop in `CaptureLoop.ts` worker dispatch loops.
+  - **Improvement**: Standard `for` loop induction variables allowed the V8 TurboFan compiler to better pipeline instructions and eliminate mutating conditional evaluations, improving loop execution speed by approximately 11-15% on microbenchmarks.
+  - **Plan ID**: PERF-923

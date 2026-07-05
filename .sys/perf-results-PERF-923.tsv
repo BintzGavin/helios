@@ -1,0 +1,2 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	93.98	10000000	0.00	0.0	keep	PERF-923 standard for loop dispatch (baseline: 197.29ms on 10M loop iteration microbenchmark)

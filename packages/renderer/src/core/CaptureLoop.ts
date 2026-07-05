@@ -906,7 +906,7 @@ export class CaptureLoop {
                   let dispatches = limit - nextFrameToSubmit;
                   if (dispatches > 0) {
                     dispatches = Math.min(dispatches, freeWorkersHead);
-                    while (dispatches-- > 0) {
+                    for (let d = 0; d < dispatches; d++) {
                       freeWorkersHead--;
                       const w = freeWorkers[freeWorkersHead];
                       const i = nextFrameToSubmit;
@@ -1187,7 +1187,7 @@ export class CaptureLoop {
                   let dispatches = limit - nextFrameToSubmit;
                   if (dispatches > 0) {
                     dispatches = Math.min(dispatches, freeWorkersHead);
-                    while (dispatches-- > 0) {
+                    for (let d = 0; d < dispatches; d++) {
                       freeWorkersHead--;
                       const w = freeWorkers[freeWorkersHead];
                       const n = nextFrameToSubmit;
@@ -1256,7 +1256,7 @@ export class CaptureLoop {
                   let dispatches = limit - nextFrameToSubmit;
                   if (dispatches > 0) {
                     dispatches = Math.min(dispatches, freeWorkersHead);
-                    while (dispatches-- > 0) {
+                    for (let d = 0; d < dispatches; d++) {
                       freeWorkersHead--;
                       const w = freeWorkers[freeWorkersHead];
                       const n = nextFrameToSubmit;
@@ -1321,7 +1321,7 @@ export class CaptureLoop {
                   let dispatches = limit - nextFrameToSubmit;
                   if (dispatches > 0) {
                     dispatches = Math.min(dispatches, freeWorkersHead);
-                    while (dispatches-- > 0) {
+                    for (let d = 0; d < dispatches; d++) {
                       freeWorkersHead--;
                       const w = freeWorkers[freeWorkersHead];
                       const n = nextFrameToSubmit;
