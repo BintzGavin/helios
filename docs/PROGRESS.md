@@ -845,3 +845,6 @@ Each agent should update **their own dedicated progress file** instead of this f
 
 ### PLAYER v0.79.3
 - ✅ Completed: Document getController - Documented getController in the player README.
+
+### CLI v0.46.61
+- ✅ Completed: Document duplicated CLI Templates Spec plan - Logged the duplicated plan as impossible since tests were already completed.
