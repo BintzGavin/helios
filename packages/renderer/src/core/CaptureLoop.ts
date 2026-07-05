@@ -904,7 +904,7 @@ export class CaptureLoop {
                   const limit = maxSubmits < totalFrames ? maxSubmits : totalFrames;
                   let dispatches = limit - nextFrameToSubmit;
                   if (dispatches > 0) {
-                    if (dispatches > freeWorkersHead) dispatches = freeWorkersHead;
+                    dispatches = Math.min(dispatches, freeWorkersHead);
                     while (dispatches-- > 0) {
                       const w = freeWorkers[--freeWorkersHead];
                       const i = nextFrameToSubmit++;
@@ -1183,7 +1183,7 @@ export class CaptureLoop {
                   const limit = maxSubmits < totalFrames ? maxSubmits : totalFrames;
                   let dispatches = limit - nextFrameToSubmit;
                   if (dispatches > 0) {
-                    if (dispatches > freeWorkersHead) dispatches = freeWorkersHead;
+                    dispatches = Math.min(dispatches, freeWorkersHead);
                     while (dispatches-- > 0) {
                       const w = freeWorkers[--freeWorkersHead];
                       const n = nextFrameToSubmit++;
@@ -1250,7 +1250,7 @@ export class CaptureLoop {
                   const limit = maxSubmits < totalFrames ? maxSubmits : totalFrames;
                   let dispatches = limit - nextFrameToSubmit;
                   if (dispatches > 0) {
-                    if (dispatches > freeWorkersHead) dispatches = freeWorkersHead;
+                    dispatches = Math.min(dispatches, freeWorkersHead);
                     while (dispatches-- > 0) {
                       const w = freeWorkers[--freeWorkersHead];
                       const n = nextFrameToSubmit++;
@@ -1313,7 +1313,7 @@ export class CaptureLoop {
                   const limit = maxSubmits < totalFrames ? maxSubmits : totalFrames;
                   let dispatches = limit - nextFrameToSubmit;
                   if (dispatches > 0) {
-                    if (dispatches > freeWorkersHead) dispatches = freeWorkersHead;
+                    dispatches = Math.min(dispatches, freeWorkersHead);
                     while (dispatches-- > 0) {
                       const w = freeWorkers[--freeWorkersHead];
                       const n = nextFrameToSubmit++;
