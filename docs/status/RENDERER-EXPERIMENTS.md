@@ -3,6 +3,9 @@ Current best: 1.831s (baseline was 1.831s, -0%)
 Last updated by: PERF-873
 
 ## What Works
+- **What Works:** PERF-922 separated compound pre-decrement and post-increment operations (`const w = freeWorkers[--freeWorkersHead]; const n = nextFrameToSubmit++;`) into separate statements in the multi-worker paths of `CaptureLoop.ts`.
+  - **Improvement:** ~8.8% faster overhead in microbenchmarks. Uncoupling the math from the load allows V8/CPU to pipeline operations rather than forcing sequential evaluation.
+  - **Plan ID:** PERF-922
 - **PERF-890**: Extracted `nextFrameToSubmit - nextFrameToWrite < maxPipelineDepth` into a precalculated `maxSubmits` loop boundary in the multi-worker `checkState` and writer dispatch paths. Eliminating the arithmetic and branch evaluation per loop iteration yielded a ~23% reduction in hot loop overhead (~26ms down to ~24ms for 100k iterations).
 
 - **What Works:** PERF-878 overlapped `domBeginFrame` with CPU-bound Base64 decoding in the `CaptureLoop.ts` single-worker DOM fast paths.
