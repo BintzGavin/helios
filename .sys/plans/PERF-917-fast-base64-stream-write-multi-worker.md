@@ -1,11 +1,11 @@
 ---
 id: PERF-917
 slug: fast-base64-stream-write-multi-worker
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-07-05
-completed: ""
-result: ""
+completed: 2024-07-05
+result: failed
 ---
 # PERF-917: Optimize Base64 Stream Writes for Multi-Worker Paths
 
@@ -83,3 +83,9 @@ Run canvas benchmark to ensure `Buffer` paths aren't broken.
 
 ## Correctness Check
 Run FFmpeg tests (`npm test -w packages/renderer`) to verify PNG frames encode properly.
+
+## Results Summary
+- **Best render time**: 2894.59ms (vs baseline 1664.59ms in 150KB microbenchmark)
+- **Improvement**: -73.89%
+- **Kept experiments**: None
+- **Discarded experiments**: Replaced multi-worker user-space pooling with native `stream.write(str, "base64")`.
