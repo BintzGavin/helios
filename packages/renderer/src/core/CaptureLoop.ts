@@ -83,10 +83,12 @@ class ReusableNumberThenable {
 class PooledBuffer {
   public buffer: Buffer;
   public freeCb: () => void;
-  constructor(size: number, pool: PooledBuffer[]) {
+  public next: PooledBuffer | null = null;
+  constructor(size: number, poolObj: { head: PooledBuffer | null }) {
     this.buffer = Buffer.allocUnsafe(size);
     this.freeCb = () => {
-      pool.push(this);
+      this.next = poolObj.head;
+      poolObj.head = this;
     };
   }
 }
@@ -174,9 +176,11 @@ export class CaptureLoop {
         512 * 1024,
         this.options.width * this.options.height * 4,
       );
-      const freePool: PooledBuffer[] = new Array(POOL_SIZE);
+      const freePool = { head: null as PooledBuffer | null };
       for (let i = 0; i < POOL_SIZE; i++) {
-        freePool[i] = new PooledBuffer(INITIAL_BUFFER_SIZE, freePool);
+        const node = new PooledBuffer(INITIAL_BUFFER_SIZE, freePool);
+        node.next = freePool.head;
+        freePool.head = node;
       }
 
       const isDomStrategy = !!(strategy as any).cdpSession;
@@ -251,7 +255,8 @@ export class CaptureLoop {
             if (isString) {
               const str = buffer as string;
               const maxBytes = (str.length * 3) >>> 2;
-              let pooled = freePool.pop();
+              let pooled = freePool.head;
+              if (pooled) freePool.head = pooled.next;
               if (!pooled || pooled.buffer.length < maxBytes) {
                 pooled = new PooledBuffer(maxBytes + (maxBytes >> 1), freePool);
               }
@@ -294,13 +299,11 @@ export class CaptureLoop {
                     nextCapturePromise = domBeginFrame!();
 
                     const maxBytes = (buf.length * 3) >>> 2;
-                    let pooled = freePool.pop();
-                    if (!pooled || pooled.buffer.length < maxBytes) {
-                      pooled = new PooledBuffer(
-                        maxBytes + (maxBytes >> 1),
-                        freePool,
-                      );
-                    }
+                    let pooled = freePool.head;
+              if (pooled) freePool.head = pooled.next;
+              if (!pooled || pooled.buffer.length < maxBytes) {
+                pooled = new PooledBuffer(maxBytes + (maxBytes >> 1), freePool);
+              }
                     const written = pooled.buffer.write(buf, "base64");
                     const chunk = pooled.buffer.subarray(0, written);
 
@@ -337,13 +340,11 @@ export class CaptureLoop {
                   buf = domLastFrameData as string;
 
                   const maxBytes = (buf.length * 3) >>> 2;
-                  let pooled = freePool.pop();
-                  if (!pooled || pooled.buffer.length < maxBytes) {
-                    pooled = new PooledBuffer(
-                      maxBytes + (maxBytes >> 1),
-                      freePool,
-                    );
-                  }
+                  let pooled = freePool.head;
+              if (pooled) freePool.head = pooled.next;
+              if (!pooled || pooled.buffer.length < maxBytes) {
+                pooled = new PooledBuffer(maxBytes + (maxBytes >> 1), freePool);
+              }
                   const written = pooled.buffer.write(buf, "base64");
                   const chunk = pooled.buffer.subarray(0, written);
                   pendingBytes += written;
@@ -384,13 +385,11 @@ export class CaptureLoop {
                     buf = strategy.processCaptureResult!(rawResult) as string;
 
                     const maxBytes = (buf.length * 3) >>> 2;
-                    let pooled = freePool.pop();
-                    if (!pooled || pooled.buffer.length < maxBytes) {
-                      pooled = new PooledBuffer(
-                        maxBytes + (maxBytes >> 1),
-                        freePool,
-                      );
-                    }
+                    let pooled = freePool.head;
+              if (pooled) freePool.head = pooled.next;
+              if (!pooled || pooled.buffer.length < maxBytes) {
+                pooled = new PooledBuffer(maxBytes + (maxBytes >> 1), freePool);
+              }
                     const written = pooled.buffer.write(buf, "base64");
                     const chunk = pooled.buffer.subarray(0, written);
 
@@ -429,13 +428,11 @@ export class CaptureLoop {
                   buf = strategy.processCaptureResult!(rawResult) as string;
 
                   const maxBytes = (buf.length * 3) >>> 2;
-                  let pooled = freePool.pop();
-                  if (!pooled || pooled.buffer.length < maxBytes) {
-                    pooled = new PooledBuffer(
-                      maxBytes + (maxBytes >> 1),
-                      freePool,
-                    );
-                  }
+                  let pooled = freePool.head;
+              if (pooled) freePool.head = pooled.next;
+              if (!pooled || pooled.buffer.length < maxBytes) {
+                pooled = new PooledBuffer(maxBytes + (maxBytes >> 1), freePool);
+              }
                   const written = pooled.buffer.write(buf, "base64");
                   const chunk = pooled.buffer.subarray(0, written);
                   pendingBytes += written;
@@ -572,7 +569,8 @@ export class CaptureLoop {
             if (isString) {
               const str = buffer as string;
               const maxBytes = (str.length * 3) >>> 2;
-              let pooled = freePool.pop();
+              let pooled = freePool.head;
+              if (pooled) freePool.head = pooled.next;
               if (!pooled || pooled.buffer.length < maxBytes) {
                 pooled = new PooledBuffer(maxBytes + (maxBytes >> 1), freePool);
               }
@@ -610,13 +608,11 @@ export class CaptureLoop {
                     nextCapturePromise = domBeginFrame!();
 
                     const maxBytes = (buf.length * 3) >>> 2;
-                    let pooled = freePool.pop();
-                    if (!pooled || pooled.buffer.length < maxBytes) {
-                      pooled = new PooledBuffer(
-                        maxBytes + (maxBytes >> 1),
-                        freePool,
-                      );
-                    }
+                    let pooled = freePool.head;
+              if (pooled) freePool.head = pooled.next;
+              if (!pooled || pooled.buffer.length < maxBytes) {
+                pooled = new PooledBuffer(maxBytes + (maxBytes >> 1), freePool);
+              }
                     const written = pooled.buffer.write(buf, "base64");
                     const chunk = pooled.buffer.subarray(0, written);
 
@@ -648,13 +644,11 @@ export class CaptureLoop {
                   const buf = rawResult as unknown as string;
 
                   const maxBytes = (buf.length * 3) >>> 2;
-                  let pooled = freePool.pop();
-                  if (!pooled || pooled.buffer.length < maxBytes) {
-                    pooled = new PooledBuffer(
-                      maxBytes + (maxBytes >> 1),
-                      freePool,
-                    );
-                  }
+                  let pooled = freePool.head;
+              if (pooled) freePool.head = pooled.next;
+              if (!pooled || pooled.buffer.length < maxBytes) {
+                pooled = new PooledBuffer(maxBytes + (maxBytes >> 1), freePool);
+              }
                   const written = pooled.buffer.write(buf, "base64");
                   const chunk = pooled.buffer.subarray(0, written);
                   pendingBytes += written;
@@ -694,13 +688,11 @@ export class CaptureLoop {
                     const buf = rawResult as unknown as string;
 
                     const maxBytes = (buf.length * 3) >>> 2;
-                    let pooled = freePool.pop();
-                    if (!pooled || pooled.buffer.length < maxBytes) {
-                      pooled = new PooledBuffer(
-                        maxBytes + (maxBytes >> 1),
-                        freePool,
-                      );
-                    }
+                    let pooled = freePool.head;
+              if (pooled) freePool.head = pooled.next;
+              if (!pooled || pooled.buffer.length < maxBytes) {
+                pooled = new PooledBuffer(maxBytes + (maxBytes >> 1), freePool);
+              }
                     const written = pooled.buffer.write(buf, "base64");
                     const chunk = pooled.buffer.subarray(0, written);
 
@@ -739,13 +731,11 @@ export class CaptureLoop {
                   const buf = rawResult as unknown as string;
 
                   const maxBytes = (buf.length * 3) >>> 2;
-                  let pooled = freePool.pop();
-                  if (!pooled || pooled.buffer.length < maxBytes) {
-                    pooled = new PooledBuffer(
-                      maxBytes + (maxBytes >> 1),
-                      freePool,
-                    );
-                  }
+                  let pooled = freePool.head;
+              if (pooled) freePool.head = pooled.next;
+              if (!pooled || pooled.buffer.length < maxBytes) {
+                pooled = new PooledBuffer(maxBytes + (maxBytes >> 1), freePool);
+              }
                   const written = pooled.buffer.write(buf, "base64");
                   const chunk = pooled.buffer.subarray(0, written);
                   pendingBytes += written;
@@ -867,12 +857,11 @@ export class CaptureLoop {
         512 * 1024,
         this.options.width * this.options.height * 4,
       );
-      const multiFreePool: PooledBuffer[] = new Array(MULTI_POOL_SIZE);
+      const multiFreePool = { head: null as PooledBuffer | null };
       for (let i = 0; i < MULTI_POOL_SIZE; i++) {
-        multiFreePool[i] = new PooledBuffer(
-          MULTI_INITIAL_BUFFER_SIZE,
-          multiFreePool,
-        );
+        const node = new PooledBuffer(MULTI_INITIAL_BUFFER_SIZE, multiFreePool);
+        node.next = multiFreePool.head;
+        multiFreePool.head = node;
       }
       const writerWaiterPromise = new ReusableThenable();
 
@@ -1157,12 +1146,10 @@ export class CaptureLoop {
             if (isDomStrategyWriter) {
               const str = buffer as string;
               const maxBytes = (str.length * 3) >>> 2;
-              let pooled = multiFreePool.pop();
+              let pooled = multiFreePool.head;
+              if (pooled) multiFreePool.head = pooled.next;
               if (!pooled || pooled.buffer.length < maxBytes) {
-                pooled = new PooledBuffer(
-                  maxBytes + (maxBytes >> 1),
-                  multiFreePool,
-                );
+                pooled = new PooledBuffer(maxBytes + (maxBytes >> 1), multiFreePool);
               }
               const written = pooled.buffer.write(str, "base64");
               const chunk = pooled.buffer.subarray(0, written);
@@ -1248,13 +1235,11 @@ export class CaptureLoop {
                 const buffer = frameBufferRing[ringIndex]! as string;
 
                 const maxBytes = (buffer.length * 3) >>> 2;
-                let pooled = multiFreePool.pop();
-                if (!pooled || pooled.buffer.length < maxBytes) {
-                  pooled = new PooledBuffer(
-                    maxBytes + (maxBytes >> 1),
-                    multiFreePool,
-                  );
-                }
+                let pooled = multiFreePool.head;
+              if (pooled) multiFreePool.head = pooled.next;
+              if (!pooled || pooled.buffer.length < maxBytes) {
+                pooled = new PooledBuffer(maxBytes + (maxBytes >> 1), multiFreePool);
+              }
                 const written = pooled.buffer.write(buffer, "base64");
                 const chunk = pooled.buffer.subarray(0, written);
                 pendingBytes += written;
