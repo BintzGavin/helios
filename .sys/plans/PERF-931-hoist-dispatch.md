@@ -1,7 +1,7 @@
 ---
 id: PERF-931
 slug: hoist-dispatch
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-07-06
 completed: ""

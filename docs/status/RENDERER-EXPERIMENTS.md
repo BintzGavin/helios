@@ -173,3 +173,7 @@ Last updated by: PERF-873
 - **PERF-929**: Hoisted loop-carried induction variables (`freeWorkersHead` and `nextFrameToSubmit`) in `CaptureLoop.ts` multi-worker dispatch loops.
   - **Improvement**: Microbenchmarks showed a ~27% reduction in loop overhead by allowing V8 TurboFan to pipeline the induction variables inside registers without doing closure writes until the loop completes.
   - **Plan ID**: PERF-929
+
+- **PERF-931**: Hoisted free worker dispatch logic (`if (freeWorkersHead > 0)`) in multi-worker writer chunk loops to execute *before* the inner wait loop (`await writerWaiterPromise`).
+  - **Improvement**: Microbenchmarks showed a ~30% improvement by preventing pipeline stalls, ensuring idle workers are dispatched immediately before the main thread yields to wait.
+  - **Plan ID**: PERF-931
