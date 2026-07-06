@@ -1,62 +1,101 @@
+# CLI Domain Context
 
-# CLI Context
+## A. Architecture
+The `@helios-project/cli` provides the core command-line interface for the Helios toolchain, structured around a subcommand pattern utilizing Commander.js.
 
-## Section A: Architecture
-The CLI uses Commander.js for command parsing. Subcommands are registered using a `registerXCommand(program)` pattern inside `packages/cli/src/commands/[command].ts`.
+- **Entry Point:** The primary entry point for users is `bin/helios.js`, which wraps `src/index.ts`.
+- **Command Registration:** The `src/index.ts` file acts as the router, registering discrete commands implemented in the `src/commands/` directory using a uniform signature: `export function register[CommandName]Command(program: Command): void`.
+- **Exit Codes:** Adheres to standard POSIX conventions; exits with code `0` on success and `1` (or specific error codes) upon failure.
 
-## Section B: File Tree
+## B. File Tree
 ```
 packages/cli/
 ├── bin/
-│   └── helios.js
+│   └── helios.js                # Shell entry point script wrapper
+├── scripts/
+│   └── bundle-skills.js         # Script to bundle AI skills logic
 ├── src/
-│   ├── index.ts
-│   ├── commands/
-│   │   ├── add.ts
-│   │   ├── build.ts
-│   │   ├── components.ts
-│   │   ├── deploy.ts
-│   │   ├── diff.ts
-│   │   ├── init.ts
-│   │   ├── job.ts
-│   │   ├── list.ts
-│   │   ├── merge.ts
-│   │   ├── preview.ts
-│   │   ├── remove.ts
-│   │   ├── render.ts
-│   │   ├── skills.ts
-│   │   ├── studio.ts
-│   │   └── update.ts
-│   ├── registry/
-│   ├── templates/
-│   └── utils/
+│   ├── commands/                # Subcommand implementations
+│   │   ├── add.ts               # Registry fetch and code injection
+│   │   ├── build.ts             # Vite production build execution
+│   │   ├── components.ts        # CLI registry browser/search
+│   │   ├── deploy.ts            # Deployment scaffolding logic
+│   │   ├── diff.ts              # Local vs remote registry diffing
+│   │   ├── init.ts              # Helios workspace bootstrapper
+│   │   ├── job.ts               # Remote/local render job execution
+│   │   ├── list.ts              # Installed components viewer
+│   │   ├── merge.ts             # Video chunk stitiching (ffmpeg)
+│   │   ├── preview.ts           # Local preview server running
+│   │   ├── remove.ts            # Component uninstaller
+│   │   ├── render.ts            # Video rendering entry point
+│   │   ├── skills.ts            # AI skills integration installer
+│   │   ├── studio.ts            # Interactive local development studio
+│   │   └── update.ts            # In-place component upgrader
+│   ├── registry/                # Registry interaction layer
+│   │   ├── client.ts            # Remote/local component fetcher
+│   │   ├── manifest.ts          # Registry schema validation
+│   │   └── types.ts             # Internal registry data models
+│   ├── templates/               # Generation string templates
+│   │   ├── aws.ts
+│   │   ├── azure.ts
+│   │   ├── cloudflare-sandbox.ts
+│   │   ├── cloudflare.ts
+│   │   ├── deno.ts
+│   │   ├── docker-adapter.ts
+│   │   ├── docker.ts
+│   │   ├── fly.ts
+│   │   ├── frameworks.ts        # Client framework starting configurations
+│   │   ├── gcp.ts
+│   │   ├── hetzner.ts
+│   │   ├── kubernetes.ts
+│   │   ├── modal.ts
+│   │   ├── react.ts
+│   │   ├── solid.ts
+│   │   ├── svelte.ts
+│   │   ├── vanilla.ts
+│   │   └── vercel.ts
+│   ├── types/                   # Cross-package shared types
+│   │   ├── index.ts
+│   │   └── job.ts               # Render job execution schemas
+│   ├── utils/                   # CLI helper functions
+│   │   ├── config.ts            # Configuration resolution
+│   │   ├── examples.ts          # GitHub template downloader
+│   │   ├── ffmpeg.ts            # Ffmpeg binary invocation wrapper
+│   │   ├── install.ts           # File/dependency copy logic
+│   │   ├── logger.ts            # Standardized CLI console logging
+│   │   ├── package-manager.ts   # Npm/yarn/pnpm detector and runner
+│   │   └── uninstall.ts         # Artifact cleanup handling
+│   └── index.ts                 # Commander.js registry router
+└── package.json
 ```
 
-## Section C: Commands
-- `helios add [component]` - Install components from registry
-- `helios build [dir]` - Build for production
-- `helios components [query]` - Search registry
-- `helios deploy <provider>` - Scaffold deployments
-- `helios diff <component>` - Compare local components
-- `helios init [target]` - Scaffold project/configs
-- `helios job run <file>` - Run distributed job
-- `helios list` - List installed components
-- `helios merge <audio> <video>` - Merge output chunks
-- `helios preview [dir]` - Local preview
-- `helios remove <component>` - Uninstall component
-- `helios render <input>` - Render compositions
-- `helios skills install` - Distribute AI skills
-- `helios studio [dir]` - Visual studio
-- `helios update <component>` - Update/restore components
+## C. Commands
+The CLI exposes the following `helios` commands:
 
-## Section D: Configuration
-Reads `helios.config.json` or scaffold defaults. Supports `directories.components`, `directories.lib`, `framework` and `registry` definitions.
+- `helios add <component>`: Injects code from the registry. `--no-install` skips dependency loading.
+- `helios build`: Triggers a production client bundle.
+- `helios components`: Browses the registry index.
+- `helios deploy <target>`: Scaffolds deployment configuration (e.g. `aws`, `azure`, `docker`, `kubernetes`).
+- `helios diff <component>`: Shows colorized structural differences against remote versions.
+- `helios init`: Scaffolds a new project, handles `helios.config.json` generation. `--example` triggers GitHub cloning.
+- `helios job run <spec>`: Distributed rendering worker node runtime using cloud adapters.
+- `helios list`: Lists installed registry components.
+- `helios merge <chunks...>`: FFmpeg-based video stitching of render chunks.
+- `helios preview`: Boots a local server to view the bundled build.
+- `helios remove <component>`: Reverses an `add` command, optionally deleting source files.
+- `helios render`: Kicks off the standard Chromium puppeteer renderer or emits a distributed job (`--emit-job`).
+- `helios skills install`: Connects local AI agent configuration.
+- `helios studio`: Interactive Web UI editor / Vite dev server launcher.
+- `helios update <component>`: Pulls the latest registry version over local modifications.
 
-## Section E: Integration
-Integrates with Registry (`@helios-project/registry`), Studio (`@helios-project/studio`), Infrastructure (`@helios-project/infrastructure`), and Renderer (`@helios-project/renderer`).
+## D. Configuration
+The CLI's primary source of truth is the `.helios.config.json` located at the root of a user's workspace.
+- This configuration is read and resolved via `getConfigOrThrow` in `src/utils/config.ts`.
+- It defines critical parameters such as the local framework (`react`, `vue`), output directories, registry endpoints, and tracks the list of installed components.
 
-
-<!-- Context regenerated and verified for v0.46.46 -->
-
-<!-- Updated for v0.46.59 to reflect 100% registry client coverage -->
-<!-- Updated for v0.46.61 to reflect 100% utility coverage -->
+## E. Integration
+The CLI package coordinates across multiple Helios packages:
+- **Registry:** `RegistryClient` acts as the liaison between the user's local disk and remote HTTP indices to handle dependency injection logic.
+- **Renderer:** Triggers `@helios-project/renderer` instances during the `render` command.
+- **Infrastructure:** Delegates cloud workload distribution to `@helios-project/infrastructure` when executing distributed jobs (`job run`).
+- **Studio:** Initiates the developer server defined in `@helios-project/studio` via the `studio` command.
