@@ -1,11 +1,11 @@
 ---
 id: PERF-937
 slug: strict-equal-next-progress
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-07-06
 completed: ""
-result: ""
+result: "keep"
 ---
 # PERF-937: Use Strict Equality for Progress Tracking in Multi-Worker Paths
 
@@ -52,3 +52,11 @@ Run a standard Canvas smoke test since these multi-worker routines are shared vi
 
 ## Correctness Check
 Run the main `verify-all` test suite.
+
+## Results Summary
+```
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	1.315	1000000	760456.27	0.0	keep	Use strict equality for progress tracking (baseline >=: 1.334)
+2	1.265	1000000	790513.83	0.0	keep	Use strict equality for progress tracking (baseline >=: 1.295)
+3	1.273	1000000	785545.95	0.0	keep	Use strict equality for progress tracking (baseline >=: 1.315)
+```
