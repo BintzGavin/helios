@@ -1278,7 +1278,7 @@ export class CaptureLoop {
                 break;
               }
 
-              if (nextFrameToWrite >= nextProgress) {
+              if (nextFrameToWrite === nextProgress) {
                 nextProgress += progressInterval;
                 console.log(
                   `Progress: Rendered ${nextFrameToWrite} / ${totalFrames} frames`,
@@ -1347,7 +1347,7 @@ export class CaptureLoop {
                 break;
               }
 
-              if (nextFrameToWrite >= nextProgress) {
+              if (nextFrameToWrite === nextProgress) {
                 nextProgress += progressInterval;
                 console.log(
                   `Progress: Rendered ${nextFrameToWrite} / ${totalFrames} frames`,
