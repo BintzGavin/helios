@@ -1241,16 +1241,6 @@ export class CaptureLoop {
                 nextFrameToWrite++;
               }
 
-              if (nextFrameToWrite < chunkEnd) {
-                const ringIndex = nextFrameToWrite & ringMask;
-                while (frameBufferRing[ringIndex] === null && !aborted) {
-                  await writerWaiterPromise;
-                }
-                if (aborted) break;
-              } else if (aborted) {
-                break;
-              }
-
               if (freeWorkersHead > 0) {
                 const maxSubmits = nextFrameToWrite + maxPipelineDepth;
                   const limit = maxSubmits < totalFrames ? maxSubmits : totalFrames;
@@ -1276,6 +1266,16 @@ export class CaptureLoop {
                     }
                     freeWorkersHead = 0;
                 }
+              }
+
+              if (nextFrameToWrite < chunkEnd) {
+                const ringIndex = nextFrameToWrite & ringMask;
+                while (frameBufferRing[ringIndex] === null && !aborted) {
+                  await writerWaiterPromise;
+                }
+                if (aborted) break;
+              } else if (aborted) {
+                break;
               }
 
               if (nextFrameToWrite >= nextProgress) {
@@ -1310,16 +1310,6 @@ export class CaptureLoop {
                 nextFrameToWrite++;
               }
 
-              if (nextFrameToWrite < chunkEnd) {
-                const ringIndex = nextFrameToWrite & ringMask;
-                while (frameBufferRing[ringIndex] === null && !aborted) {
-                  await writerWaiterPromise;
-                }
-                if (aborted) break;
-              } else if (aborted) {
-                break;
-              }
-
               if (freeWorkersHead > 0) {
                 const maxSubmits = nextFrameToWrite + maxPipelineDepth;
                   const limit = maxSubmits < totalFrames ? maxSubmits : totalFrames;
@@ -1345,6 +1335,16 @@ export class CaptureLoop {
                     }
                     freeWorkersHead = 0;
                 }
+              }
+
+              if (nextFrameToWrite < chunkEnd) {
+                const ringIndex = nextFrameToWrite & ringMask;
+                while (frameBufferRing[ringIndex] === null && !aborted) {
+                  await writerWaiterPromise;
+                }
+                if (aborted) break;
+              } else if (aborted) {
+                break;
               }
 
               if (nextFrameToWrite >= nextProgress) {
