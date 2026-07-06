@@ -169,3 +169,7 @@ Last updated by: PERF-873
 - **PERF-924**: Unrolled final worker cleanup logic in `CaptureLoop.ts` by replacing the `while (freeWorkersHead > 0)` loop with a standard `for` loop.
   - **Improvement**: Standard `for` loop induction variables allowed the V8 TurboFan compiler to better pipeline instructions and eliminate mutating conditional evaluations, improving loop execution speed slightly on microbenchmarks (~2-3%).
   - **Plan ID**: PERF-924
+
+- **PERF-929**: Hoisted loop-carried induction variables (`freeWorkersHead` and `nextFrameToSubmit`) in `CaptureLoop.ts` multi-worker dispatch loops.
+  - **Improvement**: Microbenchmarks showed a ~27% reduction in loop overhead by allowing V8 TurboFan to pipeline the induction variables inside registers without doing closure writes until the loop completes.
+  - **Plan ID**: PERF-929
