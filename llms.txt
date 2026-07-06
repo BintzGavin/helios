@@ -15,13 +15,19 @@ Helios is a modern engine for creating videos programmatically using standard we
 ```typescript
 import { Helios } from '@helios-project/core';
 
-// Define strict types for input props (Generic TInputProps)
+// Define strict types for input props (Generic TInputProps) and structure
 const helios = new Helios<{ title: string }>({
   duration: 10,  // seconds
   fps: 30,
+  width: 1920,
+  height: 1080,
+  loop: false,
+  playbackRate: 1,
+  volume: 1,
+  muted: false,
   autoSyncAnimations: true, // Auto-sync CSS/WAAPI
   inputProps: { title: "Hello World" }, // Dynamic data via constructor
-  captions: [{ id: "1", startTime: 0, endTime: 1000, text: "Welcome" }], // SRT string or objects (milliseconds)
+  captions: [{ id: "1", start: 0, end: 1000, text: "Welcome" }], // SRT string or objects (milliseconds)
   timeline: {
     tracks: [
       {
@@ -130,12 +136,12 @@ const report = await Helios.diagnose();
 
 ## Roadmap
 ### V1.x (Active)
-- **Studio**: v0.107.1+ (Completed: Component Management, Preview Command, CLI Update Command)
-- **CLI**: v0.45.2+ (Completed: CLI Utils Coverage Tests, CLI Registry Client Coverage Tests, CLI Command Coverage Tests V7)
+- **Studio**: v0.107.1+ (Completed: Preview Command, CompositionsPanel Tests, CLI Build Command)
+- **CLI**: v0.45.2+ (Completed: CLI Command Coverage Tests V7, CLI Utils Coverage Tests V2)
 - **Core**: v5.13.0+ (Completed: Implement WaitUntilStable, Implement Helios.diagnose, Enable Core Testing And Robustness)
 - **Player**: v0.78.1+ (Completed: Refactor Player Control Logic, Implement setMediaKeys, Sandbox and Bridge)
-- **Renderer**: v1.78.3+ (Completed: Fix GSAP Timeline Synchronization, Smart Audio Fades, CdpTimeDriver Iframe Sync)
-- **Infrastructure**: v0.25.0+ (Completed: Cloudflare Sandbox Adapter, R2 Storage Adapter, Orchestrator Coverage Expansion)
+- **Renderer**: v1.78.3+ (Completed: Smart Codec Selection Update, CdpTimeDriver Iframe Sync, Smart Audio Fades)
+- **Infrastructure**: v0.25.0+ (Completed: CloudRun & Local Worker Adapter Coverage, Modal Adapter, Orchestrator Coverage Expansion)
 
 ### AI Integration
 - **Studio MCP Server**: Inspect, create, and render compositions via LLM tools (Done)

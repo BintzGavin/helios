@@ -1,3 +1,10 @@
+### LLMS v1.117.1
+- ✅ Completed: Daily llms.txt Review
+  - Synced Roadmap in llms.txt with recent verifiable completions from domain PROGRESS logs (Studio: Preview Command, CLI Build Command; CLI: Command Coverage Tests V7, Utils Coverage Tests V2; Core: WaitUntilStable, diagnose; Player: Refactor Player Control Logic, setMediaKeys; Renderer: Smart Codec Selection, CdpTimeDriver Iframe Sync; Infrastructure: CloudRun Coverage, Modal Adapter).
+  - Fixed Core API example in llms.txt (using start and duration).
+  - Verified package versions exactly match package.json.
+  - Verified all File Paths and Key Files.
+
 ### LLMS v1.114.0
 - ✅ Completed: Daily llms.txt Review
   - Added `packages/studio/src/server/render-manager.ts` to Key Files for Agents.
