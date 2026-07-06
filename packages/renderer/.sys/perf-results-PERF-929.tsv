@@ -1,0 +1,3 @@
+run	execution_time_ms	status	description
+1	1196.65	keep	baseline
+2	871.13	keep	hoisted

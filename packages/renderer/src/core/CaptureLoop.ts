@@ -1184,14 +1184,17 @@ export class CaptureLoop {
                   let dispatches = limit - nextFrameToSubmit;
                   if (dispatches > 0) {
                     dispatches = Math.min(dispatches, freeWorkersHead);
+                    let h = freeWorkersHead;
+                    let n = nextFrameToSubmit;
                     for (let d = 0; d < dispatches; d++) {
-                      freeWorkersHead--;
-                      const w = freeWorkers[freeWorkersHead];
-                      const n = nextFrameToSubmit;
-                      nextFrameToSubmit++;
+                      h--;
+                      const w = freeWorkers[h];
                       frameBufferRing[n & ringMask] = null;
                       workerThenables[w].resolve(n);
+                      n++;
                     }
+                    freeWorkersHead = h;
+                    nextFrameToSubmit = n;
                   }
                 if (nextFrameToSubmit === totalFrames) {
                   for (let j = 0; j < freeWorkersHead; j++) {
@@ -1254,14 +1257,17 @@ export class CaptureLoop {
                   let dispatches = limit - nextFrameToSubmit;
                   if (dispatches > 0) {
                     dispatches = Math.min(dispatches, freeWorkersHead);
+                    let h = freeWorkersHead;
+                    let n = nextFrameToSubmit;
                     for (let d = 0; d < dispatches; d++) {
-                      freeWorkersHead--;
-                      const w = freeWorkers[freeWorkersHead];
-                      const n = nextFrameToSubmit;
-                      nextFrameToSubmit++;
+                      h--;
+                      const w = freeWorkers[h];
                       frameBufferRing[n & ringMask] = null;
                       workerThenables[w].resolve(n);
+                      n++;
                     }
+                    freeWorkersHead = h;
+                    nextFrameToSubmit = n;
                   }
                   if (nextFrameToSubmit === totalFrames) {
                     for (let j = 0; j < freeWorkersHead; j++) {
@@ -1320,14 +1326,17 @@ export class CaptureLoop {
                   let dispatches = limit - nextFrameToSubmit;
                   if (dispatches > 0) {
                     dispatches = Math.min(dispatches, freeWorkersHead);
+                    let h = freeWorkersHead;
+                    let n = nextFrameToSubmit;
                     for (let d = 0; d < dispatches; d++) {
-                      freeWorkersHead--;
-                      const w = freeWorkers[freeWorkersHead];
-                      const n = nextFrameToSubmit;
-                      nextFrameToSubmit++;
+                      h--;
+                      const w = freeWorkers[h];
                       frameBufferRing[n & ringMask] = null;
                       workerThenables[w].resolve(n);
+                      n++;
                     }
+                    freeWorkersHead = h;
+                    nextFrameToSubmit = n;
                   }
                   if (nextFrameToSubmit === totalFrames) {
                     for (let j = 0; j < freeWorkersHead; j++) {
