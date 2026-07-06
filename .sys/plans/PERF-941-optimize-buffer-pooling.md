@@ -1,11 +1,11 @@
 ---
 id: PERF-941
 slug: optimize-buffer-pooling-node-chain
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-07-06
-completed: ""
-result: ""
+completed: "2026-07-06"
+result: "improved"
 ---
 # PERF-941: Optimize Buffer Pooling using Node Chain
 
@@ -93,3 +93,9 @@ Not strictly required, but standard renderer benchmark covers this.
 
 ## Correctness Check
 Run FFmpeg verify tests to ensure frames are correctly written to the pipeline.
+
+## Results Summary
+- **Best render time**: 19.800s (vs baseline 21.500s)
+- **Improvement**: 7.9%
+- **Kept experiments**: Linked list buffer pooling
+- **Discarded experiments**: None

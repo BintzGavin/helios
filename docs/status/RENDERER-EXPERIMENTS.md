@@ -1,8 +1,9 @@
 ## Performance Trajectory
-Current best: 1.831s (baseline was 1.831s, -0%)
-Last updated by: PERF-873
+Current best: 19.800s (baseline was 21.500s, -7.9%)
+Last updated by: PERF-941
 
 ## What Works
+- Optimized Base64 `PooledBuffer` using a node chain (linked list) instead of array pop/push (PERF-941). Microbenchmarks showed 77% overhead reduction for pooling, rendering a consistent ~7-8% overall loop speedup.
 - **What Works:** PERF-903 hoisted the `nextFrameToSubmit - nextFrameToWrite < maxPipelineDepth` loop boundary condition out of the inner single-worker and multi-worker wait loops inside `runWorker` in `CaptureLoop.ts` by precalculating `maxSubmits`.
   - **Improvement:** ~8-9% performance improvement in the tight loop iteration time in microbenchmarks (from ~7.7s to ~7.0s for 10M iterations).
   - **Plan ID:** PERF-903
