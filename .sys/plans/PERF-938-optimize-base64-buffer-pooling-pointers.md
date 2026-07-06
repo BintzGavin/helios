@@ -1,11 +1,11 @@
 ---
 id: PERF-938
 slug: optimize-base64-buffer-pooling-pointers
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-07-06
-completed: ""
-result: ""
+completed: "2024-07-06"
+result: "failed"
 ---
 # PERF-938: Optimize Base64 Buffer Pooling With Manual Pointers
 
@@ -78,3 +78,9 @@ Run canvas benchmark.
 
 ## Correctness Check
 Run FFmpeg verify tests to ensure streams are fully intact and pooled buffers are recycled properly.
+
+## Results Summary
+- **Best render time**: 0.000s (vs baseline)
+- **Improvement**: 0%
+- **Kept experiments**:
+- **Discarded experiments**: optimize base64 buffer pooling pointers (crashed/hung)

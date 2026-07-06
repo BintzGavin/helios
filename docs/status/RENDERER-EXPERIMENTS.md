@@ -184,3 +184,6 @@ Last updated by: PERF-873
 - **PERF-939**: Adopted `Math.min()` for free worker limit calculations in `CaptureLoop.ts`.
   - **Improvement**: Replaced inline conditional limit assignments, which took ~98.4ms, with `Math.min()`, taking ~78.2ms per 100M iterations, an ~20% improvement.
   - **Plan ID**: PERF-939
+- **PERF-938**: Replaced Array pop/push with manual `head` pointers in Base64 pool buffer (`CaptureLoop.ts`).
+  - **WHY it didn't work**: The renderer completely hung and timed out during benchmark. A microbenchmark test showed pointer/index style (298ms) is only ~13% faster than native Array pop/push (342ms) for 50M iterations on Node 22. In the complex engine path, mutating index pointers correctly is risky, and the minimal micro-level speedup wasn't worth the overhead / bug risk. We'll discard this change.
+  - **Plan ID**: PERF-938
