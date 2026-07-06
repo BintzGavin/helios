@@ -1212,6 +1212,33 @@ export class CaptureLoop {
               let chunkEnd = nextFrameToWrite + progressInterval; if (chunkEnd > totalFrames) chunkEnd = totalFrames;
 
 
+              if (freeWorkersHead > 0) {
+                const maxSubmits = nextFrameToWrite + maxPipelineDepth;
+                  const limit = maxSubmits < totalFrames ? maxSubmits : totalFrames;
+                  let dispatches = limit - nextFrameToSubmit;
+                  if (dispatches > 0) {
+                    dispatches = Math.min(dispatches, freeWorkersHead);
+                    let h = freeWorkersHead;
+                    let n = nextFrameToSubmit;
+                    for (let d = 0; d < dispatches; d++) {
+                      h--;
+                      const w = freeWorkers[h];
+                      frameBufferRing[n & ringMask] = null;
+                      workerThenables[w].resolve(n);
+                      n++;
+                    }
+                    freeWorkersHead = h;
+                    nextFrameToSubmit = n;
+                  }
+                  if (nextFrameToSubmit === totalFrames) {
+                    for (let j = 0; j < freeWorkersHead; j++) {
+                      const w = freeWorkers[j];
+                      workerThenables[w].resolve(-1);
+                    }
+                    freeWorkersHead = 0;
+                }
+              }
+
               while (nextFrameToWrite < chunkEnd) {
                 const ringIndex = nextFrameToWrite & ringMask;
                 if (frameBufferRing[ringIndex] === null) {
@@ -1241,33 +1268,6 @@ export class CaptureLoop {
                 nextFrameToWrite++;
               }
 
-              if (freeWorkersHead > 0) {
-                const maxSubmits = nextFrameToWrite + maxPipelineDepth;
-                  const limit = maxSubmits < totalFrames ? maxSubmits : totalFrames;
-                  let dispatches = limit - nextFrameToSubmit;
-                  if (dispatches > 0) {
-                    dispatches = Math.min(dispatches, freeWorkersHead);
-                    let h = freeWorkersHead;
-                    let n = nextFrameToSubmit;
-                    for (let d = 0; d < dispatches; d++) {
-                      h--;
-                      const w = freeWorkers[h];
-                      frameBufferRing[n & ringMask] = null;
-                      workerThenables[w].resolve(n);
-                      n++;
-                    }
-                    freeWorkersHead = h;
-                    nextFrameToSubmit = n;
-                  }
-                  if (nextFrameToSubmit === totalFrames) {
-                    for (let j = 0; j < freeWorkersHead; j++) {
-                      const w = freeWorkers[j];
-                      workerThenables[w].resolve(-1);
-                    }
-                    freeWorkersHead = 0;
-                }
-              }
-
               if (nextFrameToWrite < chunkEnd) {
                 const ringIndex = nextFrameToWrite & ringMask;
                 while (frameBufferRing[ringIndex] === null && !aborted) {
@@ -1291,25 +1291,6 @@ export class CaptureLoop {
               let chunkEnd = nextFrameToWrite + progressInterval; if (chunkEnd > totalFrames) chunkEnd = totalFrames;
 
 
-              while (nextFrameToWrite < chunkEnd) {
-                const ringIndex = nextFrameToWrite & ringMask;
-                if (frameBufferRing[ringIndex] === null) {
-                  break;
-                }
-
-                const buffer = frameBufferRing[ringIndex]!;
-
-                pendingBytes += (buffer as any).length;
-                const writeSuccess = stream.write(buffer as any);
-
-                if (!writeSuccess && pendingBytes >= 16777216) {
-                  await this.drainPromise;
-                  pendingBytes = 0;
-                }
-
-                nextFrameToWrite++;
-              }
-
               if (freeWorkersHead > 0) {
                 const maxSubmits = nextFrameToWrite + maxPipelineDepth;
                   const limit = maxSubmits < totalFrames ? maxSubmits : totalFrames;
@@ -1335,6 +1316,25 @@ export class CaptureLoop {
                     }
                     freeWorkersHead = 0;
                 }
+              }
+
+              while (nextFrameToWrite < chunkEnd) {
+                const ringIndex = nextFrameToWrite & ringMask;
+                if (frameBufferRing[ringIndex] === null) {
+                  break;
+                }
+
+                const buffer = frameBufferRing[ringIndex]!;
+
+                pendingBytes += (buffer as any).length;
+                const writeSuccess = stream.write(buffer as any);
+
+                if (!writeSuccess && pendingBytes >= 16777216) {
+                  await this.drainPromise;
+                  pendingBytes = 0;
+                }
+
+                nextFrameToWrite++;
               }
 
               if (nextFrameToWrite < chunkEnd) {
