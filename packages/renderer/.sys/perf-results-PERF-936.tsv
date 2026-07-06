@@ -1,0 +1,3 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	65.960	300	15.11	500.0	discard	baseline
+2	26.860	300	37.23	500.0	keep	unroll-math-min-for-chunk-end

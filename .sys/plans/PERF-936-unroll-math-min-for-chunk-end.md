@@ -1,10 +1,10 @@
 ---
 id: PERF-936
 slug: unroll-math-min-for-chunk-end
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "Jules"
 created: 2024-07-06
-completed: ""
+completed: 2024-07-06
 result: ""
 ---
 # PERF-936: Use Math.min For Loop Chunk Boundaries
@@ -69,3 +69,8 @@ Ensure the single-worker canvas logic runs smoothly by firing up a standard rend
 
 ## Correctness Check
 Run the main `verify-all` test suite.
+
+## Results Summary
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	65.960	300	15.11	500.0	discard	baseline
+2	26.860	300	37.23	500.0	keep	unroll-math-min-for-chunk-end
