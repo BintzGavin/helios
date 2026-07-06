@@ -902,7 +902,7 @@ export class CaptureLoop {
 
         // See if we can assign tasks to waiting workers
         const maxSubmits = nextFrameToWrite + maxPipelineDepth;
-                  const limit = maxSubmits < totalFrames ? maxSubmits : totalFrames;
+                  const limit = Math.min(maxSubmits, totalFrames);
                   let dispatches = limit - nextFrameToSubmit;
                   if (dispatches > 0) {
                     dispatches = Math.min(dispatches, freeWorkersHead);
@@ -1180,7 +1180,7 @@ export class CaptureLoop {
             nextFrameToWrite++;
             if (freeWorkersHead > 0) {
                 const maxSubmits = nextFrameToWrite + maxPipelineDepth;
-                  const limit = maxSubmits < totalFrames ? maxSubmits : totalFrames;
+                  const limit = Math.min(maxSubmits, totalFrames);
                   let dispatches = limit - nextFrameToSubmit;
                   if (dispatches > 0) {
                     dispatches = Math.min(dispatches, freeWorkersHead);
@@ -1214,7 +1214,7 @@ export class CaptureLoop {
 
               if (freeWorkersHead > 0) {
                 const maxSubmits = nextFrameToWrite + maxPipelineDepth;
-                  const limit = maxSubmits < totalFrames ? maxSubmits : totalFrames;
+                  const limit = Math.min(maxSubmits, totalFrames);
                   let dispatches = limit - nextFrameToSubmit;
                   if (dispatches > 0) {
                     dispatches = Math.min(dispatches, freeWorkersHead);
@@ -1293,7 +1293,7 @@ export class CaptureLoop {
 
               if (freeWorkersHead > 0) {
                 const maxSubmits = nextFrameToWrite + maxPipelineDepth;
-                  const limit = maxSubmits < totalFrames ? maxSubmits : totalFrames;
+                  const limit = Math.min(maxSubmits, totalFrames);
                   let dispatches = limit - nextFrameToSubmit;
                   if (dispatches > 0) {
                     dispatches = Math.min(dispatches, freeWorkersHead);

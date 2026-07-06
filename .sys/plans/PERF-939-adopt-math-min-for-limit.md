@@ -1,7 +1,7 @@
 ---
 id: PERF-939
 slug: adopt-math-min-for-limit
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-07-06
 completed: ""
