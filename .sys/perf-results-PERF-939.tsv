@@ -1,0 +1,2 @@
+run	render_time_ms	status	description
+1	78.25	keep	Math.min for multi-worker limits
