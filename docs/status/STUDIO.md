@@ -1,4 +1,4 @@
-**Version**: 0.122.7
+**Version**: 0.122.8
 
 - [v0.121.28] ✅ Completed: Improve AssistantModal Coverage - Reached 90%+ test coverage for AssistantModal.
 
@@ -256,3 +256,4 @@
 - [v0.122.6] ✅ Completed: STUDIO-Improve-PlaybackControls-Coverage - Achieved 100% test coverage for PlaybackControls by refactoring disabled state conditions.
   [v0.122.7] ✅ Completed: STUDIO-Improve-AssetsPanel-Coverage - Fixed act() warnings and created plan for missing coverage in AssetItem.tsx and AssetsPanel.tsx.
 - [v0.122.7] ✅ Completed: STUDIO-Improve-AssetsPanel-AssetItem-Coverage-V2 - Added comprehensive unit tests for `AssetsPanel` and `AssetItem` covering missing branches and reaching 100% test coverage.
+- [v0.122.8] ✅ Completed: STUDIO-Improve-AudioWaveform-Coverage - Verified useAudioWaveform already has 100% test coverage.
