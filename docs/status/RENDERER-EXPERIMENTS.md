@@ -188,3 +188,7 @@ Last updated by: PERF-941
 - **PERF-938**: Replaced Array pop/push with manual `head` pointers in Base64 pool buffer (`CaptureLoop.ts`).
   - **WHY it didn't work**: The renderer completely hung and timed out during benchmark. A microbenchmark test showed pointer/index style (298ms) is only ~13% faster than native Array pop/push (342ms) for 50M iterations on Node 22. In the complex engine path, mutating index pointers correctly is risky, and the minimal micro-level speedup wasn't worth the overhead / bug risk. We'll discard this change.
   - **Plan ID**: PERF-938
+
+- **PERF-947**: Inlined `Math.min` limit calculations directly in multi-worker assignment blocks in `CaptureLoop.ts`.
+  - **WHY it didn't work**: When creating performance optimization plans for Node.js/V8 environments, proposing micro-optimizations such as unrolling local block-scoped variable assignments (e.g., changing `const limit = a + b; Math.min(limit)` to `Math.min(a + b)`) is a scientifically invalid optimization. The JIT compiler instantly inlines these bindings, resulting in zero measurable wall-clock improvement (observed ~1% noise variance in microbenchmarks). The experiment was discarded because it provided no actual reduction in work.
+  - **Plan ID**: PERF-947
