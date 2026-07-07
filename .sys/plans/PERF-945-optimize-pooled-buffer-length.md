@@ -1,11 +1,11 @@
 ---
 id: PERF-945
 slug: optimize-pooled-buffer-length
-status: unclaimed
-claimed_by: ""
+status: claimed
+claimed_by: "jules"
 created: 2025-02-23
-completed: ""
-result: ""
+completed: "2025-02-23"
+result: "improved"
 ---
 
 # PERF-945: Optimize Pooled Buffer Length Access
