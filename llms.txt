@@ -136,12 +136,12 @@ const report = await Helios.diagnose();
 
 ## Roadmap
 ### V1.x (Active)
-- **Studio**: v0.107.1+ (Completed: Preview Command, CompositionsPanel Tests, CLI Build Command)
-- **CLI**: v0.45.2+ (Completed: CLI Command Coverage Tests V7, CLI Utils Coverage Tests V2)
-- **Core**: v5.13.0+ (Completed: Implement WaitUntilStable, Implement Helios.diagnose, Enable Core Testing And Robustness)
-- **Player**: v0.78.1+ (Completed: Refactor Player Control Logic, Implement setMediaKeys, Sandbox and Bridge)
-- **Renderer**: v1.78.3+ (Completed: Smart Codec Selection Update, CdpTimeDriver Iframe Sync, Smart Audio Fades)
-- **Infrastructure**: v0.25.0+ (Completed: CloudRun & Local Worker Adapter Coverage, Modal Adapter, Orchestrator Coverage Expansion)
+- **Studio**: v0.107.1+ (Completed: AssistantModal Coverage, RenderManager Test Coverage, Expand Reverse Speeds)
+- **CLI**: v0.45.2+ (Completed: CLI Command Coverage Tests V9, Registry Types Regression Tests, Docker Adapter Tests)
+- **Core**: v5.13.0+ (Completed: Generic Input Props, Active Clips, Composition Schema)
+- **Player**: v0.78.1+ (Completed: Expose Composition Setters, Expose Playback Range Methods, Missing Events)
+- **Renderer**: v1.78.3+ (Completed: Validate HW Accel, Orchestrator Plan, Refactor Media Sync Logic)
+- **Infrastructure**: v0.25.0+ (Completed: Optimize S3 Uploads, Optimize GCS Uploads, FfmpegStitcher Coverage)
 
 ### AI Integration
 - **Studio MCP Server**: Inspect, create, and render compositions via LLM tools (Done)
