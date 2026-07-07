@@ -82,10 +82,12 @@ class ReusableNumberThenable {
 
 class PooledBuffer {
   public buffer: Buffer;
+  public size: number;
   public freeCb: () => void;
   public next: PooledBuffer | null = null;
   constructor(size: number, poolObj: { head: PooledBuffer | null }) {
     this.buffer = Buffer.allocUnsafe(size);
+    this.size = size;
     this.freeCb = () => {
       this.next = poolObj.head;
       poolObj.head = this;
@@ -257,7 +259,7 @@ export class CaptureLoop {
               const maxBytes = (str.length * 3) >>> 2;
               let pooled = freePool.head;
               if (pooled) freePool.head = pooled.next;
-              if (!pooled || pooled.buffer.length < maxBytes) {
+              if (!pooled || pooled.size < maxBytes) {
                 pooled = new PooledBuffer(maxBytes + (maxBytes >> 1), freePool);
               }
               const written = pooled.buffer.write(str, "base64");
@@ -301,7 +303,7 @@ export class CaptureLoop {
                     const maxBytes = (buf.length * 3) >>> 2;
                     let pooled = freePool.head;
               if (pooled) freePool.head = pooled.next;
-              if (!pooled || pooled.buffer.length < maxBytes) {
+              if (!pooled || pooled.size < maxBytes) {
                 pooled = new PooledBuffer(maxBytes + (maxBytes >> 1), freePool);
               }
                     const written = pooled.buffer.write(buf, "base64");
@@ -342,7 +344,7 @@ export class CaptureLoop {
                   const maxBytes = (buf.length * 3) >>> 2;
                   let pooled = freePool.head;
               if (pooled) freePool.head = pooled.next;
-              if (!pooled || pooled.buffer.length < maxBytes) {
+              if (!pooled || pooled.size < maxBytes) {
                 pooled = new PooledBuffer(maxBytes + (maxBytes >> 1), freePool);
               }
                   const written = pooled.buffer.write(buf, "base64");
@@ -387,7 +389,7 @@ export class CaptureLoop {
                     const maxBytes = (buf.length * 3) >>> 2;
                     let pooled = freePool.head;
               if (pooled) freePool.head = pooled.next;
-              if (!pooled || pooled.buffer.length < maxBytes) {
+              if (!pooled || pooled.size < maxBytes) {
                 pooled = new PooledBuffer(maxBytes + (maxBytes >> 1), freePool);
               }
                     const written = pooled.buffer.write(buf, "base64");
@@ -430,7 +432,7 @@ export class CaptureLoop {
                   const maxBytes = (buf.length * 3) >>> 2;
                   let pooled = freePool.head;
               if (pooled) freePool.head = pooled.next;
-              if (!pooled || pooled.buffer.length < maxBytes) {
+              if (!pooled || pooled.size < maxBytes) {
                 pooled = new PooledBuffer(maxBytes + (maxBytes >> 1), freePool);
               }
                   const written = pooled.buffer.write(buf, "base64");
@@ -571,7 +573,7 @@ export class CaptureLoop {
               const maxBytes = (str.length * 3) >>> 2;
               let pooled = freePool.head;
               if (pooled) freePool.head = pooled.next;
-              if (!pooled || pooled.buffer.length < maxBytes) {
+              if (!pooled || pooled.size < maxBytes) {
                 pooled = new PooledBuffer(maxBytes + (maxBytes >> 1), freePool);
               }
               const written = pooled.buffer.write(str, "base64");
@@ -610,7 +612,7 @@ export class CaptureLoop {
                     const maxBytes = (buf.length * 3) >>> 2;
                     let pooled = freePool.head;
               if (pooled) freePool.head = pooled.next;
-              if (!pooled || pooled.buffer.length < maxBytes) {
+              if (!pooled || pooled.size < maxBytes) {
                 pooled = new PooledBuffer(maxBytes + (maxBytes >> 1), freePool);
               }
                     const written = pooled.buffer.write(buf, "base64");
@@ -646,7 +648,7 @@ export class CaptureLoop {
                   const maxBytes = (buf.length * 3) >>> 2;
                   let pooled = freePool.head;
               if (pooled) freePool.head = pooled.next;
-              if (!pooled || pooled.buffer.length < maxBytes) {
+              if (!pooled || pooled.size < maxBytes) {
                 pooled = new PooledBuffer(maxBytes + (maxBytes >> 1), freePool);
               }
                   const written = pooled.buffer.write(buf, "base64");
@@ -690,7 +692,7 @@ export class CaptureLoop {
                     const maxBytes = (buf.length * 3) >>> 2;
                     let pooled = freePool.head;
               if (pooled) freePool.head = pooled.next;
-              if (!pooled || pooled.buffer.length < maxBytes) {
+              if (!pooled || pooled.size < maxBytes) {
                 pooled = new PooledBuffer(maxBytes + (maxBytes >> 1), freePool);
               }
                     const written = pooled.buffer.write(buf, "base64");
@@ -733,7 +735,7 @@ export class CaptureLoop {
                   const maxBytes = (buf.length * 3) >>> 2;
                   let pooled = freePool.head;
               if (pooled) freePool.head = pooled.next;
-              if (!pooled || pooled.buffer.length < maxBytes) {
+              if (!pooled || pooled.size < maxBytes) {
                 pooled = new PooledBuffer(maxBytes + (maxBytes >> 1), freePool);
               }
                   const written = pooled.buffer.write(buf, "base64");
@@ -1148,7 +1150,7 @@ export class CaptureLoop {
               const maxBytes = (str.length * 3) >>> 2;
               let pooled = multiFreePool.head;
               if (pooled) multiFreePool.head = pooled.next;
-              if (!pooled || pooled.buffer.length < maxBytes) {
+              if (!pooled || pooled.size < maxBytes) {
                 pooled = new PooledBuffer(maxBytes + (maxBytes >> 1), multiFreePool);
               }
               const written = pooled.buffer.write(str, "base64");
@@ -1237,7 +1239,7 @@ export class CaptureLoop {
                 const maxBytes = (buffer.length * 3) >>> 2;
                 let pooled = multiFreePool.head;
               if (pooled) multiFreePool.head = pooled.next;
-              if (!pooled || pooled.buffer.length < maxBytes) {
+              if (!pooled || pooled.size < maxBytes) {
                 pooled = new PooledBuffer(maxBytes + (maxBytes >> 1), multiFreePool);
               }
                 const written = pooled.buffer.write(buffer, "base64");
