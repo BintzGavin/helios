@@ -221,7 +221,6 @@ Both class-level and instance-level properties are provided for standard media s
 - `played` (TimeRanges, read-only): The ranges of the media source that the browser has played.
 - `defaultMuted` (boolean): Reflected `defaultMuted` attribute.
 - `defaultPlaybackRate` (number): The default rate of playback.
-- `preservesPitch` (boolean): Whether pitch should be preserved when altering playback speed.
 - `srcObject` (MediaProvider | null): The media provider object assigned to the player.
 - `crossOrigin` (string | null): The CORS setting for this media element.
 - `exportMode` (string): Reflected export-mode attribute.

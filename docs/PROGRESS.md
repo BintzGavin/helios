@@ -1,3 +1,6 @@
+### PLAYER v0.79.4
+- ✅ Completed: Remove preservesPitch documentation - Removed preservesPitch from the player README as it is currently unsupported by the core architecture.
+
 #
 ### PLAYER v0.79.1
 - ✅ Completed: Discovered that 2027-03-04-PLAYER-Expose-Playback-Range-Methods.md is an IMPOSSIBLE: DUPLICATION plan. The setPlaybackRange and clearPlaybackRange methods are already fully implemented and documented. Documented as impossible and discarded.
