@@ -1,7 +1,7 @@
 ---
 id: PERF-945
 slug: optimize-pooled-buffer-length
-status: claimed
+status: complete
 claimed_by: "jules"
 created: 2025-02-23
 completed: "2025-02-23"
