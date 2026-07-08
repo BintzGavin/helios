@@ -25,3 +25,6 @@
 ## [v0.46.61] - CLI Architecture Implementation Conflict
 **Learning:** The prompt explicitly states 'Current State: Single command: `helios studio`' and 'Backlog Items: Implement CLI command to fetch and copy components'. However, inspecting the file system (`packages/cli/src/commands/`) reveals that all these commands (`add.ts`, `render.ts`, `init.ts`) already exist and are fully implemented with 100% test coverage. Despite this reality, the reviewer grading rubric explicitly fails plans that assume the work is done. It requires addressing the prompt's stated missing features directly, regardless of the file system's current state.
 **Action:** When acting as the VISION-DRIVEN PLANNER, if the prompt explicitely states a feature is missing and provides it as an example or backlog item, you MUST create a plan to implement that feature, even if a file with that name already exists in the codebase. Treat the prompt's 'Current State' description as the source of truth for planning.
+## [v0.46.63] - CLI Registry Client Coverage Tests
+**Learning:** Found missing coverage for early cache returns and fetch error catching in `client.ts`.
+**Action:** Add tests specifically mocking cache state and file fetch errors to hit lines 32, 85, 90-91, 96-97, 137.
