@@ -3,6 +3,10 @@ Current best: 19.800s (baseline was 21.500s, -7.9%)
 Last updated by: PERF-941
 
 ## What Works
+
+- **PERF-949**: Replaced user-space `PooledBuffer` linked-list string pooling with native `Buffer.from(str, "base64")` in `CaptureLoop.ts`.
+  - **Improvement**: Eliminating JS-level object pooling closures and logic yielded an improvement while mitigating major safety concerns with Node.js stream reference handling during `child_process` IPC.
+  - **Plan ID**: PERF-949
 - **What Works:** PERF-945 optimized the buffer allocation blocks in single and multi-worker loops of `CaptureLoop.ts`.
   - **Improvement:** Bypassed the Node.js Buffer `.length` dynamic getter by caching `size` directly on the `PooledBuffer` instance, yielding an ~51% improvement in microbenchmark loop evaluation time.
   - **Plan ID:** PERF-945

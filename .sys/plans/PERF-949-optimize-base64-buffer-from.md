@@ -1,11 +1,11 @@
 ---
 id: PERF-949
 slug: optimize-base64-buffer-from
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "Jules"
 created: 2024-07-08
-completed: ""
-result: ""
+completed: "2024-07-08"
+result: "kept"
 ---
 
 # PERF-949: Optimize Base64 String Writes using Native Buffer.from
@@ -119,3 +119,13 @@ None needed.
 
 ## Correctness Check
 Run \`npm run test -w packages/renderer\` and execute standard benchmarks.
+
+
+## Results Summary
+
+```tsv
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	5.859	150	25.60	490.1	keep	Buffer.from optimization
+2	5.860	150	25.59	490.0	keep	Buffer.from optimization
+3	5.855	150	25.61	490.5	keep	Buffer.from optimization
+```
