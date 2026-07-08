@@ -4,7 +4,9 @@
 
 [v0.46.51] 🟢 Completed: CLI Command Coverage Tests Spec V9 - Created specification plan 2027-06-05-CLI-Command-Coverage-Tests-V9.md for covering missing exit prompt branches in deploy subcommands.
 
-**Version**: 0.46.62
+**Version**: 0.46.63
+
+[v0.46.63] ✅ Completed: CLI Registry Client Coverage Tests - Implemented unit tests for caching logic and fallback handlers in RegistryClient, achieving 100% branch and line coverage.
 
 [v0.46.44] ✅ Completed: CLI Registry Types Regression Tests - Logged the duplicated plan as impossible since registry types regression tests are already fully implemented.
 [v0.46.41] ✅ Completed: CLI Docker Adapter Regression Tests - Logged the duplicated plan as impossible since docker-adapter template tests are already fully implemented.
@@ -22,7 +24,7 @@
 [v0.46.28] 🟢 Completed: CLI Cloud Templates Regression Tests Spec - Created specification plan `2027-06-05-CLI-Cloud-Templates-Regression-Tests.md` to add missing tests for Docker, Deno, Vercel, Modal, Hetzner, and Fly.io templates to `packages/cli/src/templates/__tests__/cloud.test.ts`.
 # CLI Status
 
-**Version**: 0.46.26
+
 [v0.46.26] ✅ Completed: Document duplicated CLI Index Regression Tests plan - Logged the duplicated plan as impossible.
 [v0.46.25] ✅ Completed: CLI Index Regression Tests - Implemented unit tests for the CLI entry point in index.ts.
 [v0.46.23] ✅ Completed: Document duplicated Registry Manifest Regression Tests plan - Logged the duplicated plan as impossible.
